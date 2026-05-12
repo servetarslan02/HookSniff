@@ -2,104 +2,42 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/store';
-import {
-  statsApi,
-  webhooksApi,
-  analyticsApi,
-  type StatsResponse,
-  type Delivery,
-  type DeliveryTrendResponse,
-  type SuccessRateData,
-} from '@/lib/api';
-import { OnboardingWizard, SetupChecklist } from '@/components/OnboardingWizard';
-import { StatCard } from '@/components/tremor';
+import { statsApi, webhooksApi, type StatsResponse, type Delivery } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { TimeRangeSelector, type TimeRange } from './components/TimeRangeSelector';
-import { AnimatedCounter } from './components/AnimatedCounter';
-import { DeliveryTrendChart } from './components/DeliveryTrendChart';
-import { SuccessRateDonut } from './components/SuccessRateDonut';
-import { ActivityFeed } from './components/ActivityFeed';
-import { RecentDeliveriesTable } from './components/RecentDeliveriesTable';
+import { Link } from '@/i18n/navigation';
+
+/* ─── Hook0-style: Basit dashboard — 3 metric + tablo ─── */
 
 export default function DashboardOverview() {
   const { token } = useAuth();
   const t = useTranslations('dashboard');
   const tc = useTranslations('common');
   const [stats, setStats] = useState<StatsResponse | null>(null);
-  const [recentDeliveries, setRecentDeliveries] = useState<Delivery[]>([]);
+  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
-  const [_error, setError] = useState<string | null>(null);
-  const [timeRange, setTimeRange] = useState<TimeRange>('24h');
 
-  // Analytics state
-  const [trendData, setTrendData] = useState<DeliveryTrendResponse | null>(null);
-  const [successRateData, setSuccessRateData] = useState<SuccessRateData | null>(null);
-  const [chartLoading, setChartLoading] = useState(true);
-
-  // Load stats + recent deliveries
   useEffect(() => {
     if (!token) return;
     let mounted = true;
-
-    async function load() {
-      try {
-        setError(null);
-        const [statsData, deliveriesData] = await Promise.all([
-          statsApi.get(token!).catch(() => null),
-          webhooksApi.list(token!, { page: 1 }).catch(() => null),
-        ]);
-        if (!mounted) return;
-        if (statsData) setStats(statsData);
-        if (deliveriesData) setRecentDeliveries(deliveriesData.deliveries.slice(0, 5));
-        if (!statsData && !deliveriesData) {
-          setError(tc('failedToLoad'));
-        }
-      } catch (err) {
-        if (mounted) setError(err instanceof Error ? err.message : tc('failedToLoad'));
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-
-    load();
+    Promise.all([
+      statsApi.get(token!).catch(() => null),
+      webhooksApi.list(token!, { page: 1 }).catch(() => null),
+    ]).then(([s, d]) => {
+      if (!mounted) return;
+      if (s) setStats(s);
+      if (d) setDeliveries(d.deliveries.slice(0, 10));
+    }).finally(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };
   }, [token]);
-
-  // Load analytics when time range changes
-  useEffect(() => {
-    if (!token) return;
-    let mounted = true;
-    setChartLoading(true);
-
-    async function loadAnalytics() {
-      try {
-        const [trend, sr] = await Promise.all([
-          analyticsApi.deliveryTrend(token!, timeRange).catch(() => null),
-          analyticsApi.successRate(token!, timeRange).catch(() => null),
-        ]);
-        if (!mounted) return;
-        if (trend) setTrendData(trend);
-        if (sr) setSuccessRateData(sr);
-      } catch {
-        // ignore
-      } finally {
-        if (mounted) setChartLoading(false);
-      }
-    }
-
-    loadAnalytics();
-    return () => { mounted = false; };
-  }, [token, timeRange]);
 
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="glass-card p-6 skeleton-shimmer">
-              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-4"></div>
-              <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/2 mb-2"></div>
-              <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-2/3"></div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 animate-pulse">
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-3"></div>
+              <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
             </div>
           ))}
         </div>
@@ -107,114 +45,69 @@ export default function DashboardOverview() {
     );
   }
 
-  const statCards = [
-    {
-      label: t('stats.totalDeliveries'),
-      value: stats?.total_deliveries ?? 0,
-      color: 'blue' as const,
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <rect x="2" y="7" width="20" height="14" rx="2" />
-          <path d="M16 7V5a4 4 0 00-8 0v2" />
-          <path d="M12 12v3" />
-        </svg>
-      ),
-    },
-    {
-      label: t('delivered'),
-      value: stats?.delivered ?? 0,
-      color: 'emerald' as const,
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="8,12 11,15 16,9" />
-        </svg>
-      ),
-    },
-    {
-      label: t('failed'),
-      value: stats?.failed ?? 0,
-      color: 'red' as const,
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="15" y1="9" x2="9" y2="15" />
-          <line x1="9" y1="9" x2="15" y2="15" />
-        </svg>
-      ),
-    },
-    {
-      label: t('stats.successRate'),
-      value: stats?.success_rate ?? 0,
-      color: 'violet' as const,
-      isPercent: true,
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M3 3v18h18" />
-          <path d="M7 16l4-8 4 4 4-6" />
-        </svg>
-      ),
-    },
-    {
-      label: t('pending'),
-      value: stats?.pending ?? 0,
-      color: 'amber' as const,
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12,6 12,12 16,14" />
-        </svg>
-      ),
-    },
-    {
-      label: t('endpoints'),
-      value: stats?.endpoints_count ?? 0,
-      color: 'slate' as const,
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
-          <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
-        </svg>
-      ),
-    },
-  ];
-
   return (
-    <div className="space-y-8">
-      <OnboardingWizard />
-      <SetupChecklist />
-      {/* Time Range Selector */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-        <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {statCards.map((stat) => (
-          <StatCard
-            key={stat.label}
-            label={stat.label}
-            value={stat.isPercent ? `${stat.value}` : <AnimatedCounter value={stat.value} />}
-            icon={stat.icon}
-            color={stat.color}
-            isPercent={stat.isPercent}
-          />
-        ))}
-      </div>
-
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <DeliveryTrendChart data={trendData} loading={chartLoading} />
+    <div className="space-y-6">
+      {/* ── 3 Metric Kart (Hook0 gibi) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('stats.totalDeliveries')}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats?.total_deliveries ?? 0}</p>
         </div>
-        <SuccessRateDonut data={successRateData} loading={chartLoading} />
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('stats.successRate')}</p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">{stats?.success_rate ?? 0}%</p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('endpoints')}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stats?.endpoints_count ?? 0}</p>
+        </div>
       </div>
 
-      {/* Activity Feed + Recent Deliveries */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActivityFeed deliveries={recentDeliveries} loading={loading} />
-        <RecentDeliveriesTable deliveries={recentDeliveries} />
+      {/* ── Son Teslimatlar Tablosu (Hook0 gibi) ── */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('recentDeliveries')}</h3>
+          <Link href="/deliveries" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+            {tc('viewAll')} →
+          </Link>
+        </div>
+
+        {deliveries.length === 0 ? (
+          <div className="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+            {t('noDeliveriesYet')}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 dark:border-gray-700">
+                  <th className="text-left px-5 py-3 text-gray-500 dark:text-gray-400 font-medium">ID</th>
+                  <th className="text-left px-5 py-3 text-gray-500 dark:text-gray-400 font-medium">{t('status')}</th>
+                  <th className="text-left px-5 py-3 text-gray-500 dark:text-gray-400 font-medium">{t('endpoint')}</th>
+                  <th className="text-left px-5 py-3 text-gray-500 dark:text-gray-400 font-medium">{t('time')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {deliveries.map((d) => (
+                  <tr key={d.id} className="border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                    <td className="px-5 py-3 font-mono text-gray-900 dark:text-gray-200">{d.id.slice(0, 8)}…</td>
+                    <td className="px-5 py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        d.status === 'delivered' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                        d.status === 'failed' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                        'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                      }`}>
+                        {d.status}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 font-mono text-gray-600 dark:text-gray-400">{d.endpoint_id?.slice(0, 8)}…</td>
+                    <td className="px-5 py-3 text-gray-500 dark:text-gray-400">{new Date(d.created_at).toLocaleString('tr-TR')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
