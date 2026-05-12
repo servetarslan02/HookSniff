@@ -338,9 +338,10 @@ export function HomeContent() {
 
   const isTr = locale === 'tr';
   const plans = [
-    { name: tPricing('free'), price: '$0', period: tPricing('month'), features: tPricing.raw('freeFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('pro'), price: isTr ? '₺999' : '$49', period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('startTrial'), popular: true },
-    { name: tPricing('business'), price: isTr ? '₺1,999' : '$99', period: tPricing('month'), features: tPricing.raw('businessFeatures') as string[], cta: tPricing('contactSales'), popular: false },
+    { name: tPricing('developer'), price: '$0', period: tPricing('month'), features: tPricing.raw('developerFeatures') as string[], cta: tPricing('getStarted'), popular: false },
+    { name: tPricing('startup'), price: isTr ? '₺599' : '$29', period: tPricing('month'), features: tPricing.raw('startupFeatures') as string[], cta: tPricing('getStarted'), popular: false },
+    { name: tPricing('pro'), price: isTr ? '₺999' : '$49', period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('getStarted'), popular: true },
+    { name: tPricing('enterprise'), price: tPricing('customPricing'), period: '', features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('contactSales'), popular: false },
   ];
 
   return (
@@ -518,8 +519,8 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
               </ul>
               <button
                 onClick={() => {
-                  if (plan.name === tPricing('business')) {
-                    router.push('/contact');
+                  if (plan.name === tPricing('enterprise')) {
+                    window.location.href = 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
                   } else if (token) {
                     router.push('/dashboard/billing');
                   } else {
