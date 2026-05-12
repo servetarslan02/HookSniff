@@ -1,40 +1,30 @@
 # NEXT_SESSION.md — Oturum 132+
 
-> Son güncelleme: 2026-05-12 23:00 GMT+8 (Oturum 132)
+> Son güncelleme: 2026-05-12 23:05 GMT+8 (Oturum 132)
 
 ## Kaldığımız Yer
 - **IMPLEMENTATION-PLAN: 359/364 tamamlandı (%99)**
 - 5 kalan ⬜ madde — TAMAMI Servet görevleri
-- **Cloud Build hatası var — worker'da 2 hata düzeltilecek**
+- **Worker build hatası DÜZELTİLDİ ✅**
 
-## ACİL — Build Düzeltmeleri (Oturum 132 başlangıcı)
+## ~~ACİL — Build Düzeltmeleri (Oturum 132 başlangıcı)~~ ✅ TAMAMLANDI
 
-### Worker Build Hataları (3 dosya)
-1. `worker/src/main.rs` veya ilgili dosyada: `common::` → `hooksniff_common::` (API'de düzeltildi, worker'da kalmış)
-2. `worker/src/` dosyalarında: `PgTransaction` → `PgTransaction<'_>` (implicit elided lifetime)
-3. Worker Cargo.toml: `hooksniff-common` dependency kontrol et
+### Worker Build Hataları — Düzeltildi (2026-05-12 23:05 GMT+8)
+1. ✅ `worker/src/delivery/http.rs`: `common::` → `hooksniff_common::`
+2. ✅ `worker/src/main.rs`: `PgTransaction` → `PgTransaction<'_>` (2 yer)
+3. ✅ `worker/Cargo.toml`: `hooksniff-common` dependency zaten mevcut
+4. ✅ Commit: `52a2e63a` — main branch'e push edildi
 
-### Cloud Build Durumu
-- API image: ✅ BUILD BAŞARILI (step 0 geçti)
-- Worker image: ❌ 3 compile hatası (yukarıdaki)
+### Cloud Build Durumu (Güncel)
+- API image: ✅ BUILD BAŞARILI
+- Worker image: ✅ ARTIK DERLENECEK (düzeltildi)
 - Cloud Run API: ✅ Deploy edildi (revision 00071-cd6, RS256 secrets bağlı)
-- Son build ID: `3574cf55-be84-44cc-b616-53c6f666e370`
 
 ### Düzeltme Komutları
 ```bash
 # Worker'da common → hooksniff_common
 grep -rn "common::" worker/src/ --include="*.rs"
 # Her birini hooksniff_common:: ile değiştir
-
-# PgTransaction lifetime
-grep -rn "PgTransaction" worker/src/ --include="*.rs"
-# PgTransaction → PgTransaction<'_>
-
-# Push + rebuild
-git add -A && git commit -m "fix: worker build — common crate + lifetime"
-git push origin main
-gcloud builds submit --config=cloudbuild.yaml --project=hooksniff-app
-```
 
 ## JWT RS256 Kurulum Durumu
 - ✅ RSA key pair oluşturuldu (`deploy/keys/`)
