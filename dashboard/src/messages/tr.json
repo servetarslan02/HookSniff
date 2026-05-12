@@ -11,7 +11,7 @@
     "back": "Geri",
     "next": "İleri",
     "previous": "Önceki",
-    "pageOf": "Sayfa {page} / {total}",
+    "pageOf": "Sayfa {page} / {totalPages}",
     "loading": "Yükleniyor...",
     "search": "Ara",
     "filter": "Filtrele",
@@ -52,7 +52,6 @@
     "headers": "Başlıklar",
     "statusCode": "Durum Kodu",
     "showing": "{from}–{to} / {total} gösteriliyor",
-    "pageOf": "Sayfa {page} / {totalPages}",
     "autoRefresh": "Otomatik yenile",
     "live": "Canlı",
     "failed": "Başarısız",
@@ -140,7 +139,14 @@
     "ssoSaml": "SSO / SAML",
     "retryPolicy": "Tekrar Politikası",
     "customDomain": "Özel Alan Adı",
-    "webhookDashboard": "Webhook Paneli"
+    "webhookDashboard": "Webhook Paneli",
+    "schemas": "Şemalar",
+    "templates": "Şablonlar",
+    "portalManage": "Portal",
+    "sectionCore": "Temel",
+    "sectionTools": "Araçlar",
+    "sectionAdvanced": "Gelişmiş",
+    "sectionAccount": "Hesap"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
