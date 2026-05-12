@@ -334,7 +334,7 @@ mod tests {
     #[test]
     fn test_token_wrong_secret_fails() {
         let secret = "correct-secret";
-        let token = generate_token(Uuid::new_v4(), "a@b.com", "free", secret).unwrap();
+        let token = generate_token(Uuid::new_v4(), "a@b.com", "developer", secret).unwrap();
         assert!(verify_token(&token, "wrong-secret").is_err());
     }
 
@@ -365,7 +365,7 @@ mod tests {
     fn test_access_token_has_short_expiry() {
         let secret = "secret";
         let before = Utc::now().timestamp() as usize;
-        let token = generate_access_token(Uuid::new_v4(), "a@b.com", "free", secret, false).unwrap();
+        let token = generate_access_token(Uuid::new_v4(), "a@b.com", "developer", secret, false).unwrap();
         let claims = verify_token(&token, secret).unwrap();
         // 15 min = 900s, allow 5s tolerance
         assert!(claims.exp >= before + 895);
@@ -378,7 +378,7 @@ mod tests {
     fn test_custom_duration_token() {
         let secret = "secret";
         let id = Uuid::new_v4();
-        let token = generate_token_with_duration(id, "a@b.com", "free", secret, Duration::hours(1), false)
+        let token = generate_token_with_duration(id, "a@b.com", "developer", secret, Duration::hours(1), false)
             .unwrap();
         let claims = verify_token(&token, secret).unwrap();
         assert_eq!(claims.sub, id);
@@ -493,7 +493,7 @@ mod tests {
         // Existing HS256 tokens must continue to verify
         let secret = "my-hs256-secret";
         let id = Uuid::new_v4();
-        let token = generate_token(id, "legacy@test.com", "free", secret).unwrap();
+        let token = generate_token(id, "legacy@test.com", "developer", secret).unwrap();
         let claims = verify_token(&token, secret).unwrap();
         assert_eq!(claims.sub, id);
         assert_eq!(claims.email, "legacy@test.com");
@@ -503,18 +503,18 @@ mod tests {
     fn test_token_with_admin_claim() {
         let secret = "admin-test-secret";
         let id = Uuid::new_v4();
-        let token = generate_admin_token(id, "admin@test.com", "business", secret).unwrap();
+        let token = generate_admin_token(id, "admin@test.com", "enterprise", secret).unwrap();
         let claims = verify_token(&token, secret).unwrap();
         assert!(claims.is_admin);
-        assert_eq!(claims.plan, "business");
+        assert_eq!(claims.plan, "enterprise");
     }
 
     #[test]
     fn test_token_jti_is_unique() {
         let secret = "jti-test-secret";
         let id = Uuid::new_v4();
-        let t1 = generate_token(id, "a@b.com", "free", secret).unwrap();
-        let t2 = generate_token(id, "a@b.com", "free", secret).unwrap();
+        let t1 = generate_token(id, "a@b.com", "developer", secret).unwrap();
+        let t2 = generate_token(id, "a@b.com", "developer", secret).unwrap();
         let c1 = verify_token(&t1, secret).unwrap();
         let c2 = verify_token(&t2, secret).unwrap();
         assert_ne!(c1.jti, c2.jti, "Each token should have a unique jti");
