@@ -266,7 +266,7 @@ async fn handle_inbound(
     // Use 24-char prefix to match DB storage (api_key_prefix)
     let prefix = &api_key[..24.min(api_key.len())];
     let candidates =
-        sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
+        sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at FROM customers WHERE api_key_prefix = $1")
             .bind(prefix)
             .fetch_all(&pool)
             .await?;
@@ -290,7 +290,7 @@ async fn handle_inbound(
 
         for (hash, customer_id) in &api_key_rows {
             if crate::middleware::verify_api_key(api_key, hash) {
-                customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
+                customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at FROM customers WHERE id = $1")
                     .bind(customer_id)
                     .fetch_optional(&pool)
                     .await?;
@@ -303,7 +303,7 @@ async fn handle_inbound(
 
     // Find inbound config for this provider
     let config = sqlx::query_as::<_, InboundConfig>(
-        "SELECT * FROM inbound_configs WHERE customer_id = $1 AND provider = $2 AND enabled = true",
+        "SELECT id, customer_id, provider, secret, endpoint_id, enabled, created_at FROM inbound_configs WHERE customer_id = $1 AND provider = $2 AND enabled = true",
     )
     .bind(customer.id)
     .bind(provider.to_string())
@@ -342,7 +342,7 @@ async fn handle_inbound(
     ))?;
 
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
     )
     .bind(endpoint_id)
     .bind(customer.id)
@@ -415,7 +415,7 @@ async fn handle_inbound_to_endpoint(
     // Use 24-char prefix to match DB storage (api_key_prefix)
     let prefix = &api_key[..24.min(api_key.len())];
     let candidates =
-        sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE api_key_prefix = $1")
+        sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at FROM customers WHERE api_key_prefix = $1")
             .bind(prefix)
             .fetch_all(&pool)
             .await?;
@@ -439,7 +439,7 @@ async fn handle_inbound_to_endpoint(
 
         for (hash, customer_id) in &api_key_rows {
             if crate::middleware::verify_api_key(api_key, hash) {
-                customer = sqlx::query_as::<_, Customer>("SELECT * FROM customers WHERE id = $1")
+                customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at FROM customers WHERE id = $1")
                     .bind(customer_id)
                     .fetch_optional(&pool)
                     .await?;
@@ -452,7 +452,7 @@ async fn handle_inbound_to_endpoint(
 
     // Find endpoint
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
     )
     .bind(endpoint_id)
     .bind(customer.id)
@@ -462,7 +462,7 @@ async fn handle_inbound_to_endpoint(
 
     // Verify signature if config exists — reject if secret is empty
     if let Ok(config) = sqlx::query_as::<_, InboundConfig>(
-        "SELECT * FROM inbound_configs WHERE customer_id = $1 AND provider = $2 AND enabled = true",
+        "SELECT id, customer_id, provider, secret, endpoint_id, enabled, created_at FROM inbound_configs WHERE customer_id = $1 AND provider = $2 AND enabled = true",
     )
     .bind(customer.id)
     .bind(provider.to_string())

@@ -130,7 +130,7 @@ async fn require_team_member(
     customer_id: Uuid,
 ) -> Result<TeamMember, AppError> {
     sqlx::query_as::<_, TeamMember>(
-        "SELECT * FROM team_members WHERE team_id = $1 AND customer_id = $2",
+        "SELECT id, team_id, customer_id, role, invited_at, joined_at FROM team_members WHERE team_id = $1 AND customer_id = $2",
     )
     .bind(team_id)
     .bind(customer_id)
@@ -145,7 +145,7 @@ async fn require_team_admin(
     team_id: Uuid,
     customer_id: Uuid,
 ) -> Result<(), AppError> {
-    let team = sqlx::query_as::<_, Team>("SELECT * FROM teams WHERE id = $1")
+    let team = sqlx::query_as::<_, Team>("SELECT id, name, owner_id, created_at, updated_at FROM teams WHERE id = $1")
         .bind(team_id)
         .fetch_optional(pool)
         .await?
@@ -244,7 +244,7 @@ async fn get_team(
 ) -> Result<Json<TeamDetailResponse>, AppError> {
     require_team_member(&pool, id, customer.id).await?;
 
-    let team = sqlx::query_as::<_, Team>("SELECT * FROM teams WHERE id = $1")
+    let team = sqlx::query_as::<_, Team>("SELECT id, name, owner_id, created_at, updated_at FROM teams WHERE id = $1")
         .bind(id)
         .fetch_optional(&pool)
         .await?
@@ -402,7 +402,7 @@ async fn remove_member(
     require_team_admin(&pool, team_id, customer.id).await?;
 
     // Cannot remove the owner
-    let team = sqlx::query_as::<_, Team>("SELECT * FROM teams WHERE id = $1")
+    let team = sqlx::query_as::<_, Team>("SELECT id, name, owner_id, created_at, updated_at FROM teams WHERE id = $1")
         .bind(team_id)
         .fetch_optional(&pool)
         .await?
@@ -445,7 +445,7 @@ async fn change_role(
     validate_role(&req.role)?;
 
     // Cannot change owner's role
-    let team = sqlx::query_as::<_, Team>("SELECT * FROM teams WHERE id = $1")
+    let team = sqlx::query_as::<_, Team>("SELECT id, name, owner_id, created_at, updated_at FROM teams WHERE id = $1")
         .bind(team_id)
         .fetch_optional(&pool)
         .await?
