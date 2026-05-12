@@ -13,6 +13,7 @@ const adminNavigation = [
   { nameKey: 'revenue', href: '/admin/revenue', icon: '💰' },
   { nameKey: 'system', href: '/admin/system', icon: '🖥️' },
   { nameKey: 'settingsNav', href: '/admin/settings', icon: '⚙️' },
+  { nameKey: 'activityLog', href: '/admin/activity', icon: '📋' },
 ];
 
 function AdminShell({ children }: { children: React.ReactNode }) {
