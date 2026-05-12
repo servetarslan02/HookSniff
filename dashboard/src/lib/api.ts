@@ -311,6 +311,12 @@ export interface AdminStatsResponse {
   active_users_today: number;
   users_by_plan: { plan: string; count: number }[];
   recent_signups: { id: string; email: string; name?: string; plan: string; created_at: string }[];
+  trends: {
+    total_users_yesterday: number;
+    total_deliveries_yesterday: number;
+    revenue_yesterday: number;
+    active_users_yesterday: number;
+  };
 }
 
 export interface AdminUsersResponse {
@@ -341,6 +347,7 @@ export interface RevenueResponse {
   revenue_by_plan: { plan: string; revenue: number; count: number }[];
   mrr: number;
   churn_rate: number;
+  mrr_trend: number;
 }
 
 // Team types
@@ -462,12 +469,14 @@ export const adminApi = {
   getStats: (token: string) =>
     apiFetch<AdminStatsResponse>('/admin/stats', { token }),
 
-  listUsers: (token: string, params?: { page?: number; search?: string; plan?: string; status?: string }) => {
+  listUsers: (token: string, params?: { page?: number; search?: string; plan?: string; status?: string; created_after?: string; created_before?: string }) => {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set('page', params.page.toString());
     if (params?.search) searchParams.set('search', params.search);
     if (params?.plan) searchParams.set('plan', params.plan);
     if (params?.status) searchParams.set('status', params.status);
+    if (params?.created_after) searchParams.set('created_after', params.created_after);
+    if (params?.created_before) searchParams.set('created_before', params.created_before);
     const qs = searchParams.toString();
     return apiFetch<AdminUsersResponse>(`/admin/users${qs ? `?${qs}` : ''}`, { token });
   },
@@ -550,6 +559,10 @@ export interface PlatformSettings {
   retention_days_pro: number;
   maintenance_mode: boolean;
   signup_enabled: boolean;
+  plan_price_pro: number;
+  plan_price_business: number;
+  resend_api_key: string | null;
+  email_sender: string | null;
 }
 
 // Team API

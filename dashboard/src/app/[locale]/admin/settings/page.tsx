@@ -18,6 +18,10 @@ interface PlatformSettings {
   retention_days_pro: number;
   maintenance_mode: boolean;
   signup_enabled: boolean;
+  plan_price_pro: number;
+  plan_price_business: number;
+  resend_api_key: string | null;
+  email_sender: string | null;
 }
 
 interface AlertRule {
@@ -45,6 +49,10 @@ const defaultSettings: PlatformSettings = {
   retention_days_pro: 30,
   maintenance_mode: false,
   signup_enabled: true,
+  plan_price_pro: 29,
+  plan_price_business: 99,
+  resend_api_key: null,
+  email_sender: null,
 };
 
 // Map frontend threshold keys to backend alert conditions
@@ -460,6 +468,70 @@ export default function AdminSettingsPage() {
                 />
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Plan Prices */}
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💰 {t('planPrices') || 'Plan Prices'}</h2>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('planPricesDesc') || 'Monthly prices used for revenue calculations.'}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="plan_price_pro" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('proPlan')} ($) <span className="text-red-500">*</span></label>
+            <input
+              id="plan_price_pro"
+              type="number"
+              min={0}
+              max={99999}
+              step={0.01}
+              value={settings.plan_price_pro}
+              onChange={(e) => update('plan_price_pro', parseFloat(e.target.value) || 0)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
+            />
+          </div>
+          <div>
+            <label htmlFor="plan_price_business" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('businessPlan')} ($) <span className="text-red-500">*</span></label>
+            <input
+              id="plan_price_business"
+              type="number"
+              min={0}
+              max={99999}
+              step={0.01}
+              value={settings.plan_price_business}
+              onChange={(e) => update('plan_price_business', parseFloat(e.target.value) || 0)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Email Settings */}
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📧 {t('emailSettings') || 'Email Settings'}</h2>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('emailSettingsDesc') || 'Configure email delivery via Resend.'}</p>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="resend_api_key" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Resend API Key</label>
+            <input
+              id="resend_api_key"
+              type="password"
+              value={settings.resend_api_key || ''}
+              onChange={(e) => update('resend_api_key', e.target.value || null)}
+              placeholder="re_..."
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
+            />
+          </div>
+          <div>
+            <label htmlFor="email_sender" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('senderAddress') || 'Sender Address'}</label>
+            <input
+              id="email_sender"
+              type="email"
+              value={settings.email_sender || ''}
+              onChange={(e) => update('email_sender', e.target.value || null)}
+              placeholder="noreply@hooksniff.dev"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
+            />
           </div>
         </div>
       </div>

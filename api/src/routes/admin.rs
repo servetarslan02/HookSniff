@@ -42,6 +42,10 @@ pub struct PaginationParams {
     pub search: Option<String>,
     pub plan: Option<String>,
     pub status: Option<String>,
+    /// Filter users created after this date (ISO 8601, e.g. "2024-01-01")
+    pub created_after: Option<String>,
+    /// Filter users created before this date (ISO 8601, e.g. "2024-12-31")
+    pub created_before: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -139,6 +143,16 @@ pub struct SystemStats {
     pub active_users_today: i64,
     pub users_by_plan: Vec<PlanCount>,
     pub recent_signups: Vec<RecentSignup>,
+    /// Yesterday's values for trend comparison
+    pub trends: StatsTrends,
+}
+
+#[derive(Debug, Serialize)]
+pub struct StatsTrends {
+    pub total_users_yesterday: i64,
+    pub total_deliveries_yesterday: i64,
+    pub revenue_yesterday: f64,
+    pub active_users_yesterday: i64,
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -175,6 +189,8 @@ pub struct RevenueResponse {
     pub revenue_by_plan: Vec<RevenueByPlan>,
     pub mrr: f64,
     pub churn_rate: f64,
+    /// Percentage change in MRR compared to last month (e.g. 5.0 means +5%)
+    pub mrr_trend: f64,
 }
 
 /// Admin middleware — call this as a layer on admin routes, or check inline.
@@ -212,6 +228,14 @@ async fn list_users(
     }
     if params.status.is_some() {
         conditions.push(format!("is_active = ${}", bind_idx));
+        bind_idx += 1;
+    }
+    if params.created_after.is_some() {
+        conditions.push(format!("created_at >= ${}", bind_idx));
+        bind_idx += 1;
+    }
+    if params.created_before.is_some() {
+        conditions.push(format!("created_at <= ${}", bind_idx));
         bind_idx += 1;
         let _ = bind_idx; // suppress unused assignment warning
     }
@@ -251,6 +275,14 @@ async fn list_users(
         let is_active = status == "active";
         users_query = users_query.bind(is_active);
         count_query = count_query.bind(is_active);
+    }
+    if let Some(ref created_after) = params.created_after {
+        users_query = users_query.bind(created_after);
+        count_query = count_query.bind(created_after);
+    }
+    if let Some(ref created_before) = params.created_before {
+        users_query = users_query.bind(created_before);
+        count_query = count_query.bind(created_before);
     }
 
     let users = users_query
@@ -465,15 +497,20 @@ async fn system_stats(
         .fetch_one(&pool)
         .await?;
 
-    // Revenue: assume $0 for free, $29 for pro, $99 for business (monthly)
+    // Revenue: read plan prices from platform_settings
+    let settings = fetch_platform_settings(&pool).await;
     let revenue: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(SUM(
+        &format!(
+            r#"SELECT COALESCE(SUM(
             CASE plan
-                WHEN 'pro' THEN 29.0
-                WHEN 'business' THEN 99.0
+                WHEN 'pro' THEN {pro}
+                WHEN 'business' THEN {biz}
                 ELSE 0.0
             END
         ), 0.0) as revenue FROM customers WHERE is_active = TRUE"#,
+            pro = settings.plan_price_pro,
+            biz = settings.plan_price_business,
+        ),
     )
     .fetch_one(&pool)
     .await?;
@@ -499,6 +536,41 @@ async fn system_stats(
     .fetch_all(&pool)
     .await?;
 
+    // Yesterday's trends
+    let users_yesterday: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM customers WHERE created_at < CURRENT_DATE",
+    )
+    .fetch_one(&pool)
+    .await?;
+
+    let deliveries_yesterday: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM deliveries WHERE created_at < CURRENT_DATE",
+    )
+    .fetch_one(&pool)
+    .await?;
+
+    let revenue_yesterday: (Option<f64>,) = sqlx::query_as(
+        &format!(
+            r#"SELECT COALESCE(SUM(
+            CASE plan
+                WHEN 'pro' THEN {pro}
+                WHEN 'business' THEN {biz}
+                ELSE 0.0
+            END
+        ), 0.0) as revenue FROM customers WHERE is_active = TRUE AND created_at < CURRENT_DATE"#,
+            pro = settings.plan_price_pro,
+            biz = settings.plan_price_business,
+        ),
+    )
+    .fetch_one(&pool)
+    .await?;
+
+    let active_yesterday: (i64,) = sqlx::query_as(
+        "SELECT COUNT(DISTINCT customer_id) FROM deliveries WHERE created_at >= CURRENT_DATE - INTERVAL '1 day' AND created_at < CURRENT_DATE",
+    )
+    .fetch_one(&pool)
+    .await?;
+
     Ok(Json(SystemStats {
         total_users: total_users.0,
         total_deliveries: total_deliveries.0,
@@ -506,6 +578,12 @@ async fn system_stats(
         active_users_today: active_today.0,
         users_by_plan,
         recent_signups,
+        trends: StatsTrends {
+            total_users_yesterday: users_yesterday.0,
+            total_deliveries_yesterday: deliveries_yesterday.0,
+            revenue_yesterday: revenue_yesterday.0.unwrap_or(0.0),
+            active_users_yesterday: active_yesterday.0,
+        },
     }))
 }
 
@@ -516,16 +594,20 @@ async fn revenue_by_month(
 ) -> Result<Json<RevenueResponse>, AppError> {
     require_admin(&customer)?;
 
+    let settings = fetch_platform_settings(&pool).await;
+    let pro_price = settings.plan_price_pro;
+    let biz_price = settings.plan_price_business;
+
     // 1. Monthly revenue (last 12 months) — Neon DB compatible
-    // Use integer generate_series instead of date-based to avoid Neon compatibility issues
     let monthly_revenue = sqlx::query_as::<_, RevenueRow>(
-        r#"SELECT
+        &format!(
+            r#"SELECT
             TO_CHAR(DATE_TRUNC('month', NOW()) - (n || ' months')::interval, 'YYYY-MM') as month,
             COALESCE(
                 (SELECT SUM(
                     CASE plan
-                        WHEN 'pro' THEN 29.0
-                        WHEN 'business' THEN 99.0
+                        WHEN 'pro' THEN {pro}
+                        WHEN 'business' THEN {biz}
                         ELSE 0.0
                     END
                 )
@@ -536,18 +618,22 @@ async fn revenue_by_month(
             ) as revenue
         FROM generate_series(0, 11) as n
         ORDER BY month"#,
+            pro = pro_price,
+            biz = biz_price,
+        ),
     )
     .fetch_all(&pool)
     .await?;
 
     // 2. Revenue by plan (active customers only)
     let revenue_by_plan = sqlx::query_as::<_, RevenueByPlan>(
-        r#"SELECT
+        &format!(
+            r#"SELECT
             plan,
             COALESCE(SUM(
                 CASE plan
-                    WHEN 'pro' THEN 29.0
-                    WHEN 'business' THEN 99.0
+                    WHEN 'pro' THEN {pro}
+                    WHEN 'business' THEN {biz}
                     ELSE 0.0
                 END
             ), 0.0) as revenue,
@@ -556,19 +642,26 @@ async fn revenue_by_month(
         WHERE is_active = TRUE
         GROUP BY plan
         ORDER BY revenue DESC"#,
+            pro = pro_price,
+            biz = biz_price,
+        ),
     )
     .fetch_all(&pool)
     .await?;
 
     // 3. MRR = sum of all active customer monthly revenue
     let mrr: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(SUM(
+        &format!(
+            r#"SELECT COALESCE(SUM(
             CASE plan
-                WHEN 'pro' THEN 29.0
-                WHEN 'business' THEN 99.0
+                WHEN 'pro' THEN {pro}
+                WHEN 'business' THEN {biz}
                 ELSE 0.0
             END
         ), 0.0) as mrr FROM customers WHERE is_active = TRUE"#,
+            pro = pro_price,
+            biz = biz_price,
+        ),
     )
     .fetch_one(&pool)
     .await?;
@@ -590,11 +683,27 @@ async fn revenue_by_month(
         0.0
     };
 
+    // 5. MRR trend: compare current month to previous month
+    let mrr_trend = if monthly_revenue.len() >= 2 {
+        let current = monthly_revenue.last().map(|r| r.revenue).unwrap_or(0.0);
+        let previous = monthly_revenue[monthly_revenue.len() - 2].revenue;
+        if previous > 0.0 {
+            ((current - previous) / previous) * 100.0
+        } else if current > 0.0 {
+            100.0
+        } else {
+            0.0
+        }
+    } else {
+        0.0
+    };
+
     Ok(Json(RevenueResponse {
         monthly_revenue,
         revenue_by_plan,
         mrr: mrr.0.unwrap_or(0.0),
         churn_rate,
+        mrr_trend,
     }))
 }
 
@@ -760,15 +869,17 @@ async fn export_revenue_csv(
     }
 
     let months = params.months.unwrap_or(12).clamp(1, 60);
+    let settings = fetch_platform_settings(&pool).await;
 
     let all_rows = sqlx::query_as::<_, RevenueRow>(
-        r#"SELECT
+        &format!(
+            r#"SELECT
             TO_CHAR(DATE_TRUNC('month', NOW()) - (n || ' months')::interval, 'YYYY-MM') as month,
             COALESCE(
                 (SELECT SUM(
                     CASE plan
-                        WHEN 'pro' THEN 29.0
-                        WHEN 'business' THEN 99.0
+                        WHEN 'pro' THEN {pro}
+                        WHEN 'business' THEN {biz}
                         ELSE 0.0
                     END
                 )
@@ -779,6 +890,9 @@ async fn export_revenue_csv(
             ) as revenue
         FROM generate_series(0, 11) as n
         ORDER BY month"#,
+            pro = settings.plan_price_pro,
+            biz = settings.plan_price_business,
+        ),
     )
     .fetch_all(&pool)
     .await?;
@@ -1098,15 +1212,18 @@ async fn churn_report(
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&customer)?;
 
+    let settings = fetch_platform_settings(&pool).await;
+
     let churned = sqlx::query_as::<_, ChurnedUser>(
-        r#"SELECT
+        &format!(
+            r#"SELECT
             id,
             email,
             name,
             plan,
             CASE plan
-                WHEN 'pro' THEN 29.0
-                WHEN 'business' THEN 99.0
+                WHEN 'pro' THEN {pro}
+                WHEN 'business' THEN {biz}
                 ELSE 0.0
             END as amount,
             updated_at as churn_date
@@ -1115,6 +1232,9 @@ async fn churn_report(
           AND updated_at >= NOW() - INTERVAL '30 days'
         ORDER BY updated_at DESC
         LIMIT 1000"#,
+            pro = settings.plan_price_pro,
+            biz = settings.plan_price_business,
+        ),
     )
     .fetch_all(&pool)
     .await?;
@@ -1364,7 +1484,22 @@ pub struct PlatformSettings {
     pub retention_days_pro: i32,
     pub maintenance_mode: bool,
     pub signup_enabled: bool,
+    /// Monthly price for Pro plan (e.g. 29.0)
+    #[serde(default = "default_price_pro")]
+    pub plan_price_pro: f64,
+    /// Monthly price for Business plan (e.g. 99.0)
+    #[serde(default = "default_price_business")]
+    pub plan_price_business: f64,
+    /// Resend API key for sending emails
+    #[serde(default)]
+    pub resend_api_key: Option<String>,
+    /// Sender email address (e.g. "noreply@hooksniff.dev")
+    #[serde(default)]
+    pub email_sender: Option<String>,
 }
+
+fn default_price_pro() -> f64 { 29.0 }
+fn default_price_business() -> f64 { 99.0 }
 
 impl Default for PlatformSettings {
     fn default() -> Self {
@@ -1381,8 +1516,29 @@ impl Default for PlatformSettings {
             retention_days_pro: 30,
             maintenance_mode: false,
             signup_enabled: true,
+            plan_price_pro: 29.0,
+            plan_price_business: 99.0,
+            resend_api_key: None,
+            email_sender: None,
         }
     }
+}
+
+/// Fetch platform settings from DB, falling back to defaults
+async fn fetch_platform_settings(pool: &PgPool) -> PlatformSettings {
+    let row: Option<(serde_json::Value,)> =
+        sqlx::query_as("SELECT value FROM platform_settings WHERE key = 'main'")
+            .fetch_optional(pool)
+            .await
+            .ok()
+            .flatten();
+
+    if let Some((value,)) = row {
+        if let Ok(settings) = serde_json::from_value::<PlatformSettings>(value) {
+            return settings;
+        }
+    }
+    PlatformSettings::default()
 }
 
 /// GET /v1/admin/settings — Get platform settings
