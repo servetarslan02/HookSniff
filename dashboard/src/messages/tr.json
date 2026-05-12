@@ -885,7 +885,20 @@
     "systemStatus": "Sistem Durumu",
     "overallUptime": "Genel Çalışma Süresi",
     "scheduledMaintenance": "Planlı Bakım",
-    "docs": "Dokümanlar"
+    "docs": "Dokümanlar",
+    "lastChecked": "Son kontrol: {time}",
+    "refresh": "Yenile",
+    "allOperational": "Tüm Sistemler Çalışıyor",
+    "someDegraded": "Bazı Sistemler Yavaşladı",
+    "majorOutage": "Büyük Kesinti Tespit Edildi",
+    "realTimeMonitoring": "Tüm HookSniff servislerinin gerçek zamanlı izlenmesi",
+    "showingCachedData": "(önbelleklenmiş veri gösteriliyor)",
+    "uptimeLast90Days": "Uptime — Son 90 Gün",
+    "subscribeToUpdates": "Güncellemelere abone ol",
+    "poweredBy": "HookSniff monitoring tarafından desteklenmektedir • Veriler 30 saniyede bir yenilenir",
+    "affects": "Etkilenen: {components}",
+    "resolvedAt": "{time} çözüldü",
+    "portUrl": "Portal URL"
   },
   "terms": {
     "title": "Hizmet Şartları",
@@ -1298,7 +1311,10 @@
     "below": "altında",
     "above": "üstünde",
     "messages": "mesaj",
-    "perHour": "/saat"
+    "perHour": "/saat",
+    "fast": "Hızlı",
+    "moderate": "Normal",
+    "slow": "Yavaş"
   },
   "landing": {
     "nav": {

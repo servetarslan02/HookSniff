@@ -1,3 +1,5 @@
+import { getUserFriendlyMessage, extractErrorCode } from './error-catalog';
+
 // In production, "/api" is rewritten by Vercel to the GCP Cloud Run API (see vercel.json).
 // In development, point directly to the local API server.
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? "/api" : "http://localhost:3000/v1");
@@ -125,7 +127,12 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
         }
 
         const error = await res.json().catch(() => ({ message: `API error: ${res.status}` }));
-        throw new Error(error.error?.message || `API error: ${res.status}`);
+        // Item 282: Use error catalog for user-friendly messages
+        const errorCode = extractErrorCode(error);
+        const message = errorCode
+          ? getUserFriendlyMessage(errorCode)
+          : (error.error?.message || `API error: ${res.status}`);
+        throw new Error(message);
       }
 
       return res.json();
