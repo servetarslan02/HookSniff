@@ -1,234 +1,76 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-
 import React, { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-
-
-
-const categories = ['All', 'Announcement', 'Engineering', 'Standard', 'Changelog', 'Integration', 'AI & Agents'];
 
 const POSTS_PER_PAGE = 6;
 
 type BlogPost = {
   slug: string;
-  title: string;
-  excerpt: string;
+  titleKey: string;
+  excerptKey: string;
   date: string;
-  category: string;
+  categoryKey: string;
   readTime: string;
   tags: string[];
   featured?: boolean;
 };
 
 const posts: BlogPost[] = [
-  {
-    slug: 'hooksniff-vs-svix-vs-hookdeck',
-    title: 'HookSniff vs Svix vs Hookdeck vs Hook0: 2026 Webhook Service Comparison',
-    excerpt: 'A comprehensive comparison of the top webhook services in 2026 — pricing, SDKs, features, self-hosting, and free tiers. Find the right fit for your stack.',
-    date: '2026-05-10',
-    category: 'Engineering',
-    readTime: '10 min',
-    tags: ['comparison', 'svix', 'hookdeck', 'webhooks'],
-    featured: true,
-  },
-  {
-    slug: 'may-2026-changelog',
-    title: 'HookSniff Changelog — May 2026 (Week 2)',
-    excerpt: 'Blog launch, 11/11 SDKs published, CSP fixes, 4 new DB tables, API deploy automation, admin dashboard, and 1,378 tests passing.',
-    date: '2026-05-10',
-    category: 'Changelog',
-    readTime: '4 min',
-    tags: ['changelog', 'product'],
-  },
-  {
-    slug: 'why-ai-agents-need-webhooks',
-    title: 'Why AI Agents Need Webhooks',
-    excerpt: 'As AI agents become autonomous, they need real-time event delivery. Webhooks are the nervous system of the agent ecosystem.',
-    date: '2026-05-09',
-    category: 'AI & Agents',
-    readTime: '6 min',
-    tags: ['ai', 'agents', 'mcp'],
-  },
-  {
-    slug: 'building-mcp-ready-webhooks',
-    title: 'Building an MCP-Ready Webhook Service: Lessons from HookSniff',
-    excerpt: 'MCP assumes synchronous request-response, but the real world is async. Here is how we built webhook infrastructure that bridges the gap for AI agents.',
-    date: '2026-05-09',
-    category: 'AI & Agents',
-    readTime: '8 min',
-    tags: ['mcp', 'ai', 'agents', 'architecture'],
-  },
-  {
-    slug: 'gemini-webhook-integration',
-    title: 'How to Handle Google Gemini Webhooks',
-    excerpt: 'Google just added webhooks to the Gemini API. Here is how to receive, verify, and process them with HookSniff.',
-    date: '2026-05-08',
-    category: 'Integration',
-    readTime: '5 min',
-    tags: ['google', 'gemini', 'integration'],
-  },
-  {
-    slug: 'webhook-integration-tutorial',
-    title: 'Complete Webhook Integration Tutorial: From Zero to Production',
-    excerpt: 'A hands-on guide to integrating webhooks with HookSniff — from signing up and creating endpoints to verifying signatures and monitoring delivery.',
-    date: '2026-05-07',
-    category: 'Engineering',
-    readTime: '12 min',
-    tags: ['tutorial', 'getting-started', 'integration'],
-  },
-  {
-    slug: 'stripe-webhook-guide',
-    title: 'Complete Guide to Stripe Webhooks',
-    excerpt: 'Stripe sends dozens of event types. Learn how to set up, verify, and handle Stripe webhooks reliably in production.',
-    date: '2026-05-05',
-    category: 'Integration',
-    readTime: '8 min',
-    tags: ['stripe', 'payments', 'integration'],
-  },
-  {
-    slug: 'webhook-architecture-deep-dive',
-    title: 'Inside HookSniff: How We Built a $0/Month Webhook Service',
-    excerpt: 'A technical deep-dive into HookSniff architecture — Rust/Axum, PostgreSQL queues, Upstash Redis rate limiting, and how we handle 10K+ webhooks on free tiers.',
-    date: '2026-05-03',
-    category: 'Engineering',
-    readTime: '10 min',
-    tags: ['architecture', 'rust', 'engineering', 'infrastructure'],
-  },
-  {
-    slug: 'changelog-may-2026',
-    title: 'HookSniff Changelog — May 2026',
-    excerpt: 'Blog launch, CSP fixes, 4 new database tables, API deploy automation, and 11 SDK updates.',
-    date: '2026-05-01',
-    category: 'Changelog',
-    readTime: '3 min',
-    tags: ['changelog', 'product'],
-  },
-  {
-    slug: 'shopify-webhook-incident-analysis',
-    title: 'What the Shopify Webhook Incident Teaches Us About Resilience',
-    excerpt: 'Analysis of the Shopify webhook delivery latency incident (April 28, 2026) and lessons for building resilient webhook infrastructure.',
-    date: '2026-04-30',
-    category: 'Engineering',
-    readTime: '8 min',
-    tags: ['incident', 'resilience', 'shopify', 'engineering'],
-  },
-  {
-    slug: 'introducing-hooksniff',
-    title: 'Introducing HookSniff: Webhooks Made Simple',
-    excerpt: 'We built HookSniff to solve a simple problem — webhook delivery should just work. No more missed events, no more complex retry logic.',
-    date: '2026-04-28',
-    category: 'Announcement',
-    readTime: '3 min',
-    tags: ['announcement', 'product'],
-  },
-  {
-    slug: 'webhook-best-practices',
-    title: 'Webhook Best Practices for Production',
-    excerpt: 'Learn how to implement secure, reliable webhooks with HMAC signatures, idempotency keys, and exponential backoff retries.',
-    date: '2026-04-25',
-    category: 'Engineering',
-    readTime: '7 min',
-    tags: ['security', 'engineering', 'best-practices'],
-  },
-  {
-    slug: 'fifo-webhook-delivery',
-    title: 'Why FIFO Webhook Delivery Matters',
-    excerpt: 'Event ordering is critical for many workflows. Learn how HookSniff guarantees ordered delivery with sequence numbers.',
-    date: '2026-04-20',
-    category: 'Engineering',
-    readTime: '5 min',
-    tags: ['engineering', 'fifo', 'architecture'],
-  },
-  {
-    slug: 'customer-spotlight-ecommerce',
-    title: 'How an E-Commerce Platform Scaled Webhook Delivery with HookSniff',
-    excerpt: 'How an e-commerce platform processing 50K orders/day achieved 99.97% webhook delivery rate and cut infrastructure engineering time by 60%.',
-    date: '2026-04-18',
-    category: 'Announcement',
-    readTime: '6 min',
-    tags: ['customer', 'use-case', 'ecommerce'],
-  },
-  {
-    slug: 'github-webhook-guide',
-    title: 'How to Set Up GitHub Webhooks',
-    excerpt: 'Receive push, PR, and issue events from GitHub. Full guide with code examples in Node.js and Python.',
-    date: '2026-04-15',
-    category: 'Integration',
-    readTime: '6 min',
-    tags: ['github', 'integration', 'ci-cd'],
-  },
-  {
-    slug: 'cloudevents-standard',
-    title: 'Embracing the CloudEvents Standard',
-    excerpt: 'CloudEvents v1.0 provides a standardized way to describe event data. Here is why we adopted it and how it benefits your integrations.',
-    date: '2026-04-10',
-    category: 'Standard',
-    readTime: '4 min',
-    tags: ['cloudevents', 'standard', 'architecture'],
-  },
-  {
-    slug: 'webhook-security-guide',
-    title: 'Webhook Security: A Complete Guide',
-    excerpt: 'HMAC signatures, replay attack prevention, IP whitelisting, and TLS — everything you need to secure your webhook endpoints.',
-    date: '2026-04-05',
-    category: 'Engineering',
-    readTime: '9 min',
-    tags: ['security', 'hmac', 'best-practices'],
-  },
+  { slug: 'hooksniff-vs-svix-vs-hookdeck', titleKey: 'post1Title', excerptKey: 'post1Excerpt', date: '2026-05-10', categoryKey: 'catEngineering', readTime: '10 min', tags: ['comparison', 'svix', 'hookdeck', 'webhooks'], featured: true },
+  { slug: 'may-2026-changelog', titleKey: 'post2Title', excerptKey: 'post2Excerpt', date: '2026-05-10', categoryKey: 'catChangelog', readTime: '4 min', tags: ['changelog', 'product'] },
+  { slug: 'why-ai-agents-need-webhooks', titleKey: 'post3Title', excerptKey: 'post3Excerpt', date: '2026-05-09', categoryKey: 'catAiAgents', readTime: '6 min', tags: ['ai', 'agents', 'mcp'] },
+  { slug: 'building-mcp-ready-webhooks', titleKey: 'post4Title', excerptKey: 'post4Excerpt', date: '2026-05-09', categoryKey: 'catAiAgents', readTime: '8 min', tags: ['mcp', 'ai', 'agents', 'architecture'] },
+  { slug: 'gemini-webhook-integration', titleKey: 'post5Title', excerptKey: 'post5Excerpt', date: '2026-05-08', categoryKey: 'catIntegration', readTime: '5 min', tags: ['google', 'gemini', 'integration'] },
+  { slug: 'webhook-integration-tutorial', titleKey: 'post6Title', excerptKey: 'post6Excerpt', date: '2026-05-07', categoryKey: 'catEngineering', readTime: '12 min', tags: ['tutorial', 'getting-started', 'integration'] },
+  { slug: 'stripe-webhook-guide', titleKey: 'post7Title', excerptKey: 'post7Excerpt', date: '2026-05-05', categoryKey: 'catIntegration', readTime: '8 min', tags: ['stripe', 'payments', 'integration'] },
+  { slug: 'webhook-architecture-deep-dive', titleKey: 'post8Title', excerptKey: 'post8Excerpt', date: '2026-05-03', categoryKey: 'catEngineering', readTime: '10 min', tags: ['architecture', 'rust', 'engineering', 'infrastructure'] },
+  { slug: 'changelog-may-2026', titleKey: 'post9Title', excerptKey: 'post9Excerpt', date: '2026-05-01', categoryKey: 'catChangelog', readTime: '3 min', tags: ['changelog', 'product'] },
+  { slug: 'shopify-webhook-incident-analysis', titleKey: 'post10Title', excerptKey: 'post10Excerpt', date: '2026-04-30', categoryKey: 'catEngineering', readTime: '8 min', tags: ['incident', 'resilience', 'shopify', 'engineering'] },
+  { slug: 'introducing-hooksniff', titleKey: 'post11Title', excerptKey: 'post11Excerpt', date: '2026-04-28', categoryKey: 'catAnnouncement', readTime: '3 min', tags: ['announcement', 'product'] },
+  { slug: 'webhook-best-practices', titleKey: 'post12Title', excerptKey: 'post12Excerpt', date: '2026-04-25', categoryKey: 'catEngineering', readTime: '7 min', tags: ['security', 'engineering', 'best-practices'] },
+  { slug: 'fifo-webhook-delivery', titleKey: 'post13Title', excerptKey: 'post13Excerpt', date: '2026-04-20', categoryKey: 'catEngineering', readTime: '5 min', tags: ['engineering', 'fifo', 'architecture'] },
+  { slug: 'customer-spotlight-ecommerce', titleKey: 'post14Title', excerptKey: 'post14Excerpt', date: '2026-04-18', categoryKey: 'catAnnouncement', readTime: '6 min', tags: ['customer', 'use-case', 'ecommerce'] },
+  { slug: 'github-webhook-guide', titleKey: 'post15Title', excerptKey: 'post15Excerpt', date: '2026-04-15', categoryKey: 'catIntegration', readTime: '6 min', tags: ['github', 'integration', 'ci-cd'] },
+  { slug: 'cloudevents-standard', titleKey: 'post16Title', excerptKey: 'post16Excerpt', date: '2026-04-10', categoryKey: 'catStandard', readTime: '4 min', tags: ['cloudevents', 'standard', 'architecture'] },
+  { slug: 'webhook-security-guide', titleKey: 'post17Title', excerptKey: 'post17Excerpt', date: '2026-04-05', categoryKey: 'catEngineering', readTime: '9 min', tags: ['security', 'hmac', 'best-practices'] },
 ];
 
-const testimonials = [
-  {
-    quote: "We switched from building our own webhooks to HookSniff. Saved us 3 months of engineering time.",
-    author: "CTO",
-    company: "SaaS Startup",
-  },
-  {
-    quote: "The FIFO delivery feature is a game-changer for our order processing pipeline.",
-    author: "Lead Developer",
-    company: "E-commerce Platform",
-  },
-  {
-    quote: "Free tier that actually works for startups. We process 8K webhooks/month without paying a cent.",
-    author: "Solo Founder",
-    company: "Indie Hacker",
-  },
-];
+const categoryKeys = ['catAll', 'catAnnouncement', 'catEngineering', 'catStandard', 'catChangelog', 'catIntegration', 'catAiAgents'];
 
 export function BlogPageContent() {
   const t = useTranslations('blog');
   const tc = useTranslations('common');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeCategory, setActiveCategory] = useState('catAll');
   const [currentPage, setCurrentPage] = useState(1);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [newsletterMessage, setNewsletterMessage] = useState('');
 
   const filteredPosts = posts.filter(post => {
-    const matchesSearch = !searchQuery.trim() || post.title.toLowerCase().includes(searchQuery.toLowerCase()) || post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeCategory === 'All' || post.category === activeCategory;
+    const title = t(post.titleKey);
+    const excerpt = t(post.excerptKey);
+    const matchesSearch = !searchQuery.trim() || title.toLowerCase().includes(searchQuery.toLowerCase()) || excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === 'catAll' || post.categoryKey === activeCategory;
     return matchesSearch && matchesCategory;
   });
 
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   const paginatedPosts = filteredPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
 
-  const handleCategoryClick = (cat: string) => {
-    setActiveCategory(cat);
+  const handleCategoryClick = (catKey: string) => {
+    setActiveCategory(catKey);
     setCurrentPage(1);
   };
 
   const handleNewsletterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newsletterEmail.trim()) return;
-
     setNewsletterStatus('loading');
     setNewsletterMessage('');
-
     try {
       const res = await fetch('/api/newsletter', {
         method: 'POST',
@@ -236,7 +78,6 @@ export function BlogPageContent() {
         body: JSON.stringify({ email: newsletterEmail }),
       });
       const data = await res.json();
-
       if (data.success) {
         setNewsletterStatus('success');
         setNewsletterMessage(data.message);
@@ -251,31 +92,8 @@ export function BlogPageContent() {
     }
   };
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Blog',
-    name: 'HookSniff Blog',
-    description: 'Insights on webhooks, event-driven architecture, AI agents, and developer tools.',
-    url: 'https://hooksniff.vercel.app/blog',
-    blogPost: posts.map((post) => ({
-      '@type': 'BlogPosting',
-      headline: post.title,
-      abstract: post.excerpt,
-      datePublished: post.date,
-      url: `https://hooksniff.vercel.app/blog/${post.slug}`,
-      author: {
-        '@type': 'Organization',
-        name: 'HookSniff',
-      },
-    })),
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
@@ -291,7 +109,7 @@ export function BlogPageContent() {
         {/* Hero */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
-          <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">Insights on webhooks, event-driven architecture, AI agents, and developer tools.</p>
+          <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">{t('desc')}</p>
         </div>
 
         {/* Newsletter */}
@@ -299,7 +117,7 @@ export function BlogPageContent() {
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <div className="flex-1">
               <h3 className="font-semibold text-gray-900 dark:text-white">{t("subscribe")}</h3>
-              <p className="text-sm text-gray-600 dark:text-slate-400">Get webhook tips, product updates, and engineering insights. No spam.</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400">{t('desc')}</p>
             </div>
             <form className="flex gap-2" onSubmit={handleNewsletterSubmit}>
               <input
@@ -314,7 +132,7 @@ export function BlogPageContent() {
                 disabled={newsletterStatus === 'loading'}
                 className="px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
               >
-                {newsletterStatus === 'loading' ? 'Subscribing...' : 'Subscribe'}
+                {newsletterStatus === 'loading' ? t('subscribing') : t('subscribeBtn')}
               </button>
             </form>
           </div>
@@ -333,7 +151,7 @@ export function BlogPageContent() {
             </svg>
             <input
               type="text"
-              placeholder="Search posts by title or content..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
               className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
@@ -350,41 +168,41 @@ export function BlogPageContent() {
           </div>
           {searchQuery && (
             <p className="text-sm text-gray-500 dark:text-slate-500 mt-2">
-              {filteredPosts.length} {filteredPosts.length === 1 ? 'post' : 'posts'} found
+              {t('postsFound', { count: filteredPosts.length })}
             </p>
           )}
         </div>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-8">
-          {categories.map((cat) => (
+          {categoryKeys.map((catKey) => (
             <button
-              key={cat}
-              onClick={() => handleCategoryClick(cat)}
+              key={catKey}
+              onClick={() => handleCategoryClick(catKey)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-colors ${
-                activeCategory === cat
+                activeCategory === catKey
                   ? 'bg-brand-600 text-white'
                   : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40'
               }`}
             >
-              {cat}
+              {t(catKey)}
             </button>
           ))}
         </div>
 
         {/* Featured Post */}
-        {currentPage === 1 && activeCategory === 'All' && !searchQuery && filteredPosts.filter((p: typeof posts[0]) => p.featured).map((post) => (
+        {currentPage === 1 && activeCategory === 'catAll' && !searchQuery && filteredPosts.filter((p) => p.featured).map((post) => (
           <Link key={post.slug} href={`/blog/${post.slug}`} className="block group mb-8">
             <article className="bg-gradient-to-br from-white to-gray-50 dark:from-slate-900 dark:to-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-700 p-8 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-xs font-medium bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 px-2.5 py-1 rounded-full">⭐ Featured</span>
-                <span className="text-xs font-medium bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-2.5 py-1 rounded-full">{post.category}</span>
+                <span className="text-xs font-medium bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 px-2.5 py-1 rounded-full">⭐ {t('featured')}</span>
+                <span className="text-xs font-medium bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-2.5 py-1 rounded-full">{t(post.categoryKey)}</span>
                 <span className="text-sm text-gray-500 dark:text-slate-500">{post.date}</span>
                 <span className="text-sm text-gray-500 dark:text-slate-600">·</span>
                 <span className="text-sm text-gray-500 dark:text-slate-500">{post.readTime}</span>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{post.title}</h2>
-              <p className="text-gray-600 dark:text-slate-400 leading-relaxed text-lg">{post.excerpt}</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{t(post.titleKey)}</h2>
+              <p className="text-gray-600 dark:text-slate-400 leading-relaxed text-lg">{t(post.excerptKey)}</p>
               <div className="flex gap-2 mt-4">
                 {post.tags.map(tag => (
                   <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 px-2 py-0.5 rounded">#{tag}</span>
@@ -396,20 +214,20 @@ export function BlogPageContent() {
 
         {/* Post Grid */}
         <div className="grid md:grid-cols-2 gap-6">
-          {(currentPage === 1 && activeCategory === 'All' && !searchQuery
-            ? paginatedPosts.filter((p: BlogPost) => !p.featured)
+          {(currentPage === 1 && activeCategory === 'catAll' && !searchQuery
+            ? paginatedPosts.filter((p) => !p.featured)
             : paginatedPosts
           ).map((post) => (
             <Link key={post.slug} href={`/blog/${post.slug}`} className="block group">
               <article className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors h-full">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-xs font-medium bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-2.5 py-1 rounded-full">{post.category}</span>
+                  <span className="text-xs font-medium bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-2.5 py-1 rounded-full">{t(post.categoryKey)}</span>
                   <span className="text-sm text-gray-500 dark:text-slate-500">{post.date}</span>
                   <span className="text-sm text-gray-500 dark:text-slate-600">·</span>
                   <span className="text-sm text-gray-500 dark:text-slate-500">{post.readTime}</span>
                 </div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{post.title}</h2>
-                <p className="text-gray-600 dark:text-slate-400 leading-relaxed text-sm">{post.excerpt}</p>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{t(post.titleKey)}</h2>
+                <p className="text-gray-600 dark:text-slate-400 leading-relaxed text-sm">{t(post.excerptKey)}</p>
                 <div className="flex gap-2 mt-3">
                   {post.tags.map(tag => (
                     <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 px-2 py-0.5 rounded">#{tag}</span>
@@ -428,17 +246,17 @@ export function BlogPageContent() {
               disabled={currentPage === 1}
               className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:border-brand-300 dark:hover:border-brand-500/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              ← Previous
+              {t('previous')}
             </button>
             <span className="text-sm text-gray-500 dark:text-slate-500">
-              Page {currentPage} of {totalPages}
+              {t('pageOf', { page: currentPage, totalPages })}
             </span>
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
               className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:border-brand-300 dark:hover:border-brand-500/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              Next →
+              {t('next')}
             </button>
           </div>
         )}
@@ -447,19 +265,19 @@ export function BlogPageContent() {
         <div className="mt-16 pt-10 border-t border-gray-200 dark:border-slate-700">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("whatUsersSay")}</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
                 <svg className="w-8 h-8 text-brand-200 dark:text-brand-800 mb-3" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z" />
                 </svg>
-                <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-4">{t.quote}</p>
+                <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-4">{t(`testimonial${i}Quote`)}</p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-bold">
-                    {t.author.split(' ').map(w => w[0]).join('')}
+                    {t(`testimonial${i}Author`)[0]}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{t.author}</p>
-                    <p className="text-xs text-gray-500 dark:text-slate-500">{t.company}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{t(`testimonial${i}Author`)}</p>
+                    <p className="text-xs text-gray-500 dark:text-slate-500">{t(`testimonial${i}Company`)}</p>
                   </div>
                 </div>
               </div>
@@ -471,7 +289,7 @@ export function BlogPageContent() {
         <div className="text-center mt-12">
           <a href="/blog/rss" className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a1 1 0 000 2c5.523 0 10 4.477 10 10a1 1 0 102 0C17 8.373 11.627 3 5 3z"/><path d="M4 9a1 1 0 000 2 4 4 0 014 4 1 1 0 102 0 6 6 0 00-6-6z"/><circle cx="5" cy="15" r="2"/></svg>
-            Subscribe via RSS
+            {t('subscribeRss')}
           </a>
         </div>
       </main>

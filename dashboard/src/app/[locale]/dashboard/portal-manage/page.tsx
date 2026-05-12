@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 
@@ -27,6 +27,7 @@ interface PortalUsage {
 
 export default function PortalPage() {
   const t = useTranslations('portal');
+  const locale = useLocale();
   const { token } = useAuth();
   const [profile, setProfile] = useState<PortalProfile | null>(null);
   const [usage, setUsage] = useState<PortalUsage | null>(null);
@@ -77,7 +78,7 @@ export default function PortalPage() {
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-slate-400">{t('memberSince')}</p>
-              <p className="font-medium">{new Date(profile.created_at).toLocaleDateString()}</p>
+              <p className="font-medium">{new Date(profile.created_at).toLocaleDateString(locale)}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-slate-400">{t('webhookLimit')}</p>

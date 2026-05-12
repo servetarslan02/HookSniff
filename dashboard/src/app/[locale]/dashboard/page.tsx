@@ -27,7 +27,7 @@ import {
 } from '@/components/LazyCharts';
 import { OnboardingWizard, SetupChecklist } from '@/components/OnboardingWizard';
 import { StatCard, ChartCard, StatusBadge } from '@/components/tremor';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 // ─── Time Range Selector ───
 type TimeRange = '24h' | '7d' | '30d';
@@ -108,8 +108,9 @@ function DeliveryTrendChart({
   loading: boolean;
 }) {
   const t = useTranslations("dashboard");
+  const locale = useLocale();
   const chartData = data?.buckets.map((b) => ({
-    date: new Date(b.timestamp).toLocaleDateString(undefined, {
+    date: new Date(b.timestamp).toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
       ...(data.range === '24h' ? { hour: '2-digit', minute: '2-digit' } : {}),
@@ -252,6 +253,7 @@ function SuccessRateDonut({
 function ActivityFeed({ token }: { token: string }) {
   const t = useTranslations("dashboard");
   const tc = useTranslations("common");
+  const locale = useLocale();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -333,7 +335,7 @@ function ActivityFeed({ token }: { token: string }) {
                   {d.attempt_count} attempt{d.attempt_count !== 1 ? 's' : ''}
                 </span>
                 <span className="text-xs text-gray-500 dark:text-slate-400">
-                  {new Date(d.created_at).toLocaleTimeString()}
+                  {new Date(d.created_at).toLocaleTimeString(locale)}
                 </span>
               </div>
             </div>
@@ -615,7 +617,7 @@ export default function DashboardOverview() {
                         {d.attempt_count}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-500">
-                        {new Date(d.created_at).toLocaleString()}
+                        {new Date(d.created_at).toLocaleString(locale)}
                       </td>
                     </tr>
                   ))}
