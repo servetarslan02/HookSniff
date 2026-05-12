@@ -453,7 +453,7 @@
 307. ✅ `settings/page.tsx` — 545→65 satır (-88%) ✅ YAPILDI
 308. ✅ `portal-customize/page.tsx` — 436→280 satır (-36%) ✅ YAPILDI
 309. ⬜ `retry-policy/page.tsx` — 355 satır
-310. ⬜ `team/page.tsx` — 339 satır
+310. ✅ `team/page.tsx` — 378→140 satır (-63%) ✅ YAPILDI
 311. ⬜ `api-importer/page.tsx` — 336 satır
 312. ⬜ `api-keys/page.tsx` — 332 satır
 313. ✅ `status/page.tsx` — 16 satır (top-level, zaten küçük) ✅ YAPILDI (Oturum 128)
