@@ -6,45 +6,43 @@
 
 ## Sayfa Listesi
 
-| # | Sayfa | Route | Durum |
-|---|-------|-------|-------|
-| 01 | 📊 Kontrol Paneli | /dashboard | ✅ İncelendi |
-| 02 | 🔗 Endpoint'ler | /dashboard/endpoints | ✅ İncelendi |
-| 03 | 📦 Teslimatlar | /dashboard/deliveries | ✅ İncelendi |
-| 04 | 📋 Loglar | /dashboard/logs | ✅ İncelendi |
-| 05 | 🔍 Arama | /dashboard/search | ✅ İncelendi |
-| 06 | 💓 Sağlık | /dashboard/health | ✅ İncelendi |
-| 07 | 🔔 Uyarılar | /dashboard/alerts | ✅ İncelendi |
-| 08 | 🔑 API Anahtarları | /dashboard/api-keys | ✅ İncelendi |
-| 09 | 🧪 Oyun Alanı | /dashboard/playground | ✅ İncelendi |
-| 10 | 📈 Analitik | /dashboard/analytics | ✅ İncelendi |
-| 11 | 🔄 Dönüştürmeler | /dashboard/transforms | ✅ İncelendi |
-| 12 | 📨 Gelen | /dashboard/inbound | ✅ İncelendi |
-| 13 | 🔐 İmza Aracı | /dashboard/signature-verifier | ✅ İncelendi |
-| 14 | 📥 API İçe Aktarıcı | /dashboard/api-importer | ✅ İncelendi |
-| 15 | 🔧 Webhook Oluşturucu | /dashboard/webhook-builder | ✅ İncelendi |
-| 16 | 📐 Şemalar | /dashboard/schemas | ✅ İncelendi + Uyumsuzluk |
-| 17 | 📄 Şablonlar | /dashboard/templates | ✅ İncelendi + Uyumsuzluk |
-| 18 | 🖼️ Portal Özelleştir | /dashboard/portal-customize | ✅ İncelendi |
-| 19 | 👤 Portal | /dashboard/portal-manage | ✅ İncelendi |
-| 20 | ⚡ Hız Sınırı | /dashboard/rate-limiting | ✅ İncelendi + Uyumsuzluk |
-| 21 | 📋 Denetim Günlüğü | /dashboard/audit-log | ✅ İncelendi |
-| 22 | 🔐 SSO / SAML | /dashboard/sso | ✅ İncelendi |
-| 23 | 🔄 Tekrar Politikası | /dashboard/retry-policy | ✅ İncelendi |
-| 24 | 🔀 Yönlendirme | /dashboard/routing | ✅ İncelendi + Uyumsuzluk |
-| 25 | 🌐 Özel Alan Adı | /dashboard/custom-domain | ✅ İncelendi |
-| 26 | 👥 Ekip | /dashboard/team | ✅ İncelendi |
-| 27 | 🔔 Bildirimler | /dashboard/notifications | ✅ İncelendi |
-| 28 | 💳 Faturalandırma | /dashboard/billing | ✅ İncelendi |
-| 29 | ⚙️ Ayarlar | /dashboard/settings | ✅ İncelendi |
-| 30 | 📱 Uygulamalar | /dashboard/applications | 🔴 Yeni — Backend var, frontend yok |
-| 31 | 🧪 Simülatör | /dashboard/simulator | 🔴 Yeni — Backend var, frontend yok |
-| 32 | 📡 Stream | /dashboard/stream | 🔴 Yeni — Backend var, frontend yok |
-| 33 | 🌐 Çıkış IP'leri | /dashboard/outbound-ips | 🔴 Yeni — Backend var, frontend yok |
-| 34 | 📲 Cihazlar | /dashboard/devices | 🔴 Yeni — Backend var, frontend yok |
-| 35 | 🔬 Derin Analiz | — | 🔴 Backend-Frontend uyumsuzluk raporu |
-| 35 | ⚡ Yönetici Paneli | /admin (6 alt sayfa) | ✅ İncelendi |
-| 36 | 🧪 Webhook Araçları | /admin/webhook-tools | 🔴 Eklenecek |
+| # | Sayfa | Route | Durum | Yapılacak |
+|---|-------|-------|-------|-----------|
+| 01 | 📊 Kontrol Paneli | /dashboard | ✅ | 3 madde |
+| 02 | 🔗 Endpoint'ler | /dashboard/endpoints | ✅ | 5 madde |
+| 03 | 📦 Teslimatlar | /dashboard/deliveries | ✅ | 5 madde |
+| 04 | 📋 Loglar | /dashboard/logs | ✅ | 3 madde |
+| 05 | 🔍 Arama | /dashboard/search | ✅ | 2 madde |
+| 06 | 💓 Sağlık | /dashboard/health | ✅ | 3 madde |
+| 07 | 🔔 Uyarılar | /dashboard/alerts | ✅ | 4 madde |
+| 08 | 🔑 API Anahtarları | /dashboard/api-keys | ✅ | 2 madde |
+| 09 | 🧪 Oyun Alanı | /dashboard/playground | ✅ | 4 madde |
+| 10 | 📈 Analitik | /dashboard/analytics | ✅ | 3 madde |
+| 11 | 🔄 Dönüştürmeler | /dashboard/transforms | ✅ | 4 madde |
+| 12 | 📨 Gelen | /dashboard/inbound | ✅ | 4 madde |
+| 13 | 🔐 İmza Aracı | /dashboard/signature-verifier | ✅ | — |
+| 14 | 📥 API İçe Aktarıcı | /dashboard/api-importer | ✅ | — |
+| 15 | 🔧 Webhook Oluşturucu | /dashboard/webhook-builder | ✅ | — |
+| 16 | 📐 Şemalar | /dashboard/schemas | ✅ | 4 madde |
+| 17 | 📄 Şablonlar | /dashboard/templates | ✅ | 3 madde |
+| 18 | 🖼️ Portal Özelleştir | /dashboard/portal-customize | ✅ | — |
+| 19 | 👤 Portal | /dashboard/portal-manage | ✅ | — |
+| 20 | ⚡ Hız Sınırı | /dashboard/rate-limiting | ✅ | 4 madde |
+| 21 | 📋 Denetim Günlüğü | /dashboard/audit-log | ✅ | — |
+| 22 | 🔐 SSO / SAML | /dashboard/sso | ✅ | 2 madde |
+| 23 | 🔄 Tekrar Politikası | /dashboard/retry-policy | ✅ | — |
+| 24 | 🔀 Yönlendirme | /dashboard/routing | ✅ | 2 madde |
+| 25 | 🌐 Özel Alan Adı | /dashboard/custom-domain | ✅ | 1 madde |
+| 26 | 👥 Ekip | /dashboard/team | ✅ | — |
+| 27 | 🔔 Bildirimler | /dashboard/notifications | ✅ | 2 madde |
+| 28 | 💳 Faturalandırma | /dashboard/billing | ✅ | 3 madde |
+| 29 | ⚙️ Ayarlar | /dashboard/settings | ✅ | 7 madde ⚠️ EN KRİTİK |
+| 30 | 📱 Uygulamalar | /dashboard/applications | 🔴 Yeni | Sayfa oluşturulmalı |
+| 31 | 🧪 Simülatör | /dashboard/simulator | 🔴 Yeni | Sayfa oluşturulmalı |
+| 32 | 📡 Stream | /dashboard/stream | 🔴 Yeni | Sayfa oluşturulmalı |
+| 33 | 🌐 Çıkış IP'leri | /dashboard/outbound-ips | 🔴 Yeni | Sayfa oluşturulmalı |
+| 34 | 📲 Cihazlar | /dashboard/devices | 🔴 Yeni | Sayfa oluşturulmalı |
+| — | ⚡ Yönetici Paneli | /admin (6 alt sayfa) | ✅ | 3 madde |
 
 ## 📄 Ek Analiz Dosyaları
 - `PATRON-NE-YAPABILMELI.md` — Kapsamlı admin yetenek analizi (sektör karşılaştırmalı)
@@ -56,27 +54,52 @@
 - /dashboard/webhooks/glossary — Webhook terimleri sözlüğü
 - /dashboard/webhooks/guides — Webhook rehberleri
 
-## Backend-Frontend Uyumsuzluğu Özeti (2026-05-13)
+## 🔧 Toplam Yapılacak Madde: 65
 
-### 🔴 Backend'de VAR, Frontend'de YOK (5 sayfa)
-| # | Sayfa | Backend Route | Frontend Durum |
-|---|-------|---------------|----------------|
-| 30 | Uygulamalar | `/v1/applications` (CRUD) | ❌ Sayfa yok |
-| 31 | Simülatör | `/v1/simulator` (test) | ❌ Sayfa yok |
-| 32 | Stream | `/v1/stream` (SSE) | ❌ Sayfa yok |
-| 33 | Çıkış IP'leri | `/v1/outbound-ips` | ❌ Sayfa yok |
-| 34 | Cihazlar | `/v1/devices` (CRUD) | ❌ Sayfa yok |
+### Kategorilere Göre Dağılım
 
-### 🟡 Backend'de VAR, Frontend'de EKSİK (7 sayfa)
-| # | Sayfa | Eksik Özellik | Backend Endpoint |
-|---|-------|---------------|------------------|
-| 07 | Uyarılar | Düzenleme, pause/resume | `PUT /v1/alerts/{id}` |
-| 11 | Dönüştürmeler | Düzenleme, sıralama, test | — (backend'e eklenmeli) |
-| 12 | Gelen | Silme, düzenleme, test | — (backend'e eklenmeli) |
-| 16 | Şemalar | Oluşturma, silme, doğrulama | `POST /v1/schemas`, `POST /v1/schemas/{id}/validate` |
-| 17 | Şablonlar | Kullan (apply), detay | `POST /v1/templates/{id}/apply` |
-| 20 | Hız Sınırı | Ayarlama, silme | `POST /v1/rate-limits/{id}`, `DELETE /v1/rate-limits/{id}` |
-| 24 | Yönlendirme | Düzenleme, fallback URL | `PUT /v1/endpoints/{id}/routing` |
+| Kategori | Madde | Açıklama |
+|----------|-------|----------|
+| 🔴 Backend-Frontend Uyumsuzluğu | 25 | Backend'de var ama frontend'de yok/eksik |
+| ⚡ Performans | 22 | Race condition, pagination, cleanup |
+| 🔒 Güvenlik | 5 | Raw fetch, hardcoded strings |
+| 🔒 Memory Leak | 5 | setTimeout cleanup eksik |
+| 🎨 Erişilebilirlik | 3 | aria-label, type="button" |
+| 🔴 Kod Kalitesi | 5 | any type, console.log, localStorage |
+
+### Öncelik Sırası
+
+#### 🔴 KRİTİK — Hemen (8 madde)
+1. **Settings/2FA** — 2FA ayarları eksik (BF-01)
+2. **Settings/GDPR Export** — Veri dışa aktarma butonu yok (BF-02)
+3. **Settings/ConsentToggle** — API çağırmıyor, GDPR uyumsuz (BF-03)
+4. **Settings/Notifications** — Başlangıç değerleri localStorage'dan (BF-04)
+5. **Admin Settings** — 5x raw fetch, CSRF koruması yok (G-01)
+6. **Admin Overview** — Feature flags CRUD eksik (BF-01)
+7. **Deliveries** — Webhook export butonu yok (BF-01)
+8. **Deliveries** — Batch replay butonu yok (BF-02)
+
+#### 🟡 YÜKSEK — 1-2 hafta (25 madde)
+- Endpoint secret rotasyonu UI
+- Circuit breaker durumu (Health)
+- Alert düzenleme + pause/resume
+- Schema oluşturma + doğrulama
+- Template "Kullan" butonu
+- Rate limit ayarlama + silme
+- Routing düzenleme
+- SSO test butonu
+- Domain doğrulama butonu
+- Latency trend grafiği
+- Okunmamış bildirim sayısı
+- Customer portal erişimi
+- 26 sayfada race condition fix
+- 19 sayfada pagination
+
+#### 🟢 ORTA — 1 ay (7 madde)
+- 5 memory leak fix
+- Raw fetch → apiFetch dönüşümleri
+- any/unknown type düzeltmesi
+- console.log kaldırma
 
 ## Genel İstatistikler
 
@@ -88,40 +111,3 @@
 - ✅ Loading states (skeleton/spinner)
 - ✅ Empty states
 - ✅ ConfirmDialog ile silme onayı
-
-### Yaygın Sorunlar
-- ⚠️ Bazı hardcoded İngilizce string'ler
-- ⚠️ Catch bloklarında hata yutulması
-- ⚠️ Pagination olmayan büyük listeler
-- ⚠️ Export/indirme özellikleri eksik
-
-### Kritik Eksiklikler
-- 🔴 5 sayfa tamamen eksik (backend var, frontend yok)
-- 🔴 7 sayfada düzenleme/yazma eksik (backend var, frontend sadece okuma)
-- 🔴 Düzenleme (update) çoğu sayfada yok
-- 🔴 Toplu işlem çoğu sayfada yok
-- 🔴 Export (CSV/JSON) hiçbir sayfada yok
-- 🔴 Gerçek zamanlı güncelleme yok
-- 🔴 Gelişmiş filtreleme (tarih aralığı) eksik
-
-### Derin Araştırma Bulguları (2026-05-13)
-- 🔴 Standard Webhooks uyumluluğu (OpenAI, Anthropic, Google kullanıyor)
-- 🔴 Deduplication (tekrarlayan webhook filtreleme)
-- 🔴 Support Agent rolü (destek ekibi müşteri portalı erişimi)
-- 🔴 Endpoint disable email (otomatik müşteri bildirimi)
-- 🔴 GDPR data deletion (right to be forgotten)
-- 🔴 SSRF/Spoofing/Replay attempt log'ları
-- 🔴 Custom retry schedules (müşteri tanımlı)
-- 🔴 Teams/Slack/Discord bildirim kanalları
-
-### Admin Paneli — 10 Sayfa Yapısı (Yeni)
-- 📊 Genel Bakış — MRR/ARR, uptime, feature flags, güvenlik uyarıları
-- 👤 Kullanıcılar — Liste, arama, filtre, toplu işlem, impersonate
-- 💰 Gelir — MRR/ARR, churn, cohort, fatura, promosyon
-- 🖥️ Sistem — DB/Redis/API, backup, uptime, log seviyesi, feature flags, disk
-- 📋 Aktivite — Audit log, güvenlik log (SSRF/spoofing/replay), session, 2FA
-- ⚙️ Ayarlar — Platform + Standard Webhooks + retry + dedup + email + bildirim + GDPR + whitelabel
-- 🛡️ Güvenlik — SSRF dashboard, abuse tespiti, compliance, IP reputation
-- 🧪 Webhook Araçları — Test konsolu + bulk replay + quick filters
-- 📊 Raporlar — Haftalık/aylık otomatik raporlar + metrik export
-- 👥 Ekip — Admin kullanıcı yönetimi + roller + Support Agent

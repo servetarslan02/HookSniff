@@ -52,3 +52,35 @@
    - Frontend: Client-side arama input'u + tag filtreleri
 4. **Template Kategorileri** — Kategori bazlı gruplama
    - Frontend: Kategori sekmeleri (e-commerce, saas, devops, vb.)
+
+---
+
+## 🔧 Yapılacaklar (2026-05-13)
+
+### 🔴 Backend-Frontend Uyumsuzluğu
+
+#### BF-01: "Kullan" Butonu Yok
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/templates/page.tsx`
+- **Backend:** `POST /v1/templates/{id}/apply` — template uygulama
+- **Sorun:** api.ts'de tanımlı değil, UI'da buton yok.
+- **Adımlar:**
+  1. `api.ts`'ye ekle:
+     ```typescript
+     applyTemplate: (token: string, templateId: string, endpointId: string) =>
+       apiFetch(`/templates/${templateId}/apply`, { method: 'POST', body: { endpoint_id: endpointId }, token }),
+     ```
+  2. Her template kartına "Kullan" butonu ekle
+  3. Modal: Endpoint seçici (dropdown) + "Uygula" butonu
+  4. Başarı toast mesajı
+  5. i18n key: `applyTemplate`, `selectEndpoint`, `templateApplied`
+
+### ⚡ Performans
+
+#### P-01: Race Condition — AbortController Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/templates/page.tsx`
+- **Sorun:** 2 useEffect, fetch var ama abort yok.
+- **Adımlar:** (standart — bkz. 01-kontrol-paneli P-01)
+
+#### P-02: Pagination Eksik
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/templates/page.tsx`
+- **Sorun:** Tüm şablonlar tek seferde yükleniyor.
