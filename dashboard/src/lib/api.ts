@@ -74,7 +74,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     ...getCSRFHeaders(method),
   };
 
-  if (token) {
+  if (token && token !== 'cookie') {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
