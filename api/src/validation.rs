@@ -74,7 +74,7 @@ pub fn validate_url(url: &str) -> Result<(), String> {
 ///
 /// Delegates to common::header_validation to avoid duplication with worker.
 pub fn validate_header_name(name: &str) -> Result<(), String> {
-    common::header_validation::validate_header_name(name)
+    hooksniff_common::header_validation::validate_header_name(name)
 }
 
 /// Validate JSON nesting depth. Returns error if depth exceeds MAX_JSON_DEPTH.
