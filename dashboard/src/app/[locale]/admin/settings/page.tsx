@@ -3,750 +3,172 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
+import { adminApi, type PlatformSettings } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 
-interface PlatformSettings {
-  default_plan: string;
-  max_endpoints_free: number;
-  max_endpoints_pro: number;
-  max_webhooks_free: number;
-  max_webhooks_pro: number;
-  rate_limit_free: number;
-  rate_limit_pro: number;
-  retry_max_attempts: number;
-  retention_days_free: number;
-  retention_days_pro: number;
-  maintenance_mode: boolean;
-  signup_enabled: boolean;
-  plan_price_pro: number;
-  plan_price_business: number;
-  resend_api_key: string | null;
-  email_sender: string | null;
-  webhook_secret: string | null;
-  backup_retention_days: number;
-  global_rate_limit: number;
-  cors_origins: string | null;
-}
-
-interface AlertRule {
-  id: string;
-  customer_id: string | null;
-  customer_email: string | null;
-  name: string;
-  condition: string;
-  threshold: number;
-  channels: string[];
-  is_active: boolean;
-  created_at: string;
-}
-
-const defaultSettings: PlatformSettings = {
-  default_plan: 'developer',
-  max_endpoints_free: 5,
-  max_endpoints_pro: 50,
-  max_webhooks_free: 10000,
-  max_webhooks_pro: 50000,
-  rate_limit_free: 100,
-  rate_limit_pro: 1000,
-  retry_max_attempts: 3,
-  retention_days_free: 7,
-  retention_days_pro: 30,
-  maintenance_mode: false,
-  signup_enabled: true,
-  plan_price_pro: 29,
-  plan_price_business: 99,
-  resend_api_key: null,
-  email_sender: null,
-  webhook_secret: null,
-  backup_retention_days: 30,
-  global_rate_limit: 1000,
-  cors_origins: null,
-};
-
-// Map frontend threshold keys to backend alert conditions
-const ALERT_CONDITIONS: Record<string, { condition: string; label: string; unit: string; direction: 'below' | 'above'; default: number }> = {
-  success_rate: { condition: 'failure_rate', label: 'successRateThreshold', unit: '%', direction: 'below', default: 95 },
-  latency: { condition: 'latency', label: 'latencyThreshold', unit: 'ms', direction: 'above', default: 5000 },
-  consecutive_failures: { condition: 'consecutive_failures', label: 'failedDeliveryThreshold', unit: 'perHour', direction: 'above', default: 10 },
-};
+/* ─── Hook0-style Admin Settings: Kart tabanlı ayarlar ─── */
 
 export default function AdminSettingsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
-  const [settings, setSettings] = useState<PlatformSettings>(defaultSettings);
-  const [saving, setSaving] = useState(false);
+  const [settings, setSettings] = useState<PlatformSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [saving, setSaving] = useState(false);
   const t = useTranslations('admin');
   const tc = useTranslations('common');
 
-  // Alert state
-  const [alertRules, setAlertRules] = useState<AlertRule[]>([]);
-  const [alertThresholds, setAlertThresholds] = useState<Record<string, number>>({
-    success_rate: 95,
-    latency: 5000,
-    consecutive_failures: 10,
-  });
-  const [alertChannels, setAlertChannels] = useState<Record<string, boolean>>({
-    email: true,
-    slack: false,
-    webhook: false,
-  });
-  const [alertSaving, setAlertSaving] = useState(false);
-
-  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-
-  // Fetch platform settings
   const fetchSettings = useCallback(async () => {
     if (!token) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API}/admin/settings`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSettings(data);
-      }
+      const data = await adminApi.getSettings(token);
+      setSettings(data);
     } catch {
-      // Silently fall back to defaults
+      toast(t('failedToLoadSettings') || 'Ayarlar yüklenemedi', 'error');
     } finally {
       setLoading(false);
     }
-  }, [token, API]);
+  }, [token, toast, t]);
 
-  // Fetch alert rules
-  const fetchAlerts = useCallback(async () => {
-    if (!token) return;
-    try {
-      const res = await fetch(`${API}/admin/alerts`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data: AlertRule[] = await res.json();
-        setAlertRules(data);
-
-        // Map existing rules back to thresholds
-        const thresholds: Record<string, number> = {};
-        const channels: Record<string, boolean> = { email: false, slack: false, webhook: false };
-
-        for (const rule of data) {
-          if (rule.condition === 'failure_rate') {
-            thresholds.success_rate = rule.threshold;
-          } else if (rule.condition === 'latency') {
-            thresholds.latency = rule.threshold;
-          } else if (rule.condition === 'consecutive_failures') {
-            thresholds.consecutive_failures = rule.threshold;
-          }
-          // Merge channels from all rules
-          for (const ch of rule.channels) {
-            channels[ch] = true;
-          }
-        }
-
-        if (Object.keys(thresholds).length > 0) {
-          setAlertThresholds((prev) => ({ ...prev, ...thresholds }));
-        }
-        setAlertChannels((prev) => ({ ...prev, ...channels }));
-      }
-    } catch {
-      // Keep defaults
-    }
-  }, [token, API]);
-
-  useEffect(() => {
-    fetchSettings();
-    fetchAlerts();
-  }, [fetchSettings, fetchAlerts]);
+  useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
   const handleSave = async () => {
+    if (!token || !settings) return;
     setSaving(true);
-    setShowSuccess(false);
     try {
-      const res = await fetch(`${API}/admin/settings`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(settings),
-      });
-      if (!res.ok) throw new Error(tc('error'));
-      toast(t('settingsSaved'), 'success');
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+      await adminApi.updateSettings(token, settings);
+      toast(t('settingsSaved') || 'Ayarlar kaydedildi', 'success');
     } catch {
-      toast(t('settingsSaveFailed'), 'error');
+      toast(t('settingsSaveFailed') || 'Kaydetme başarısız', 'error');
     } finally {
       setSaving(false);
     }
   };
 
-  // Save alert thresholds as alert rules
-  const handleAlertSave = async () => {
-    setAlertSaving(true);
-    try {
-      const channels = Object.entries(alertChannels)
-        .filter(([, enabled]) => enabled)
-        .map(([ch]) => ch);
-
-      // Determine which rules exist and which need to be created
-      const existingByCondition: Record<string, AlertRule> = {};
-      for (const rule of alertRules) {
-        existingByCondition[rule.condition] = rule;
-      }
-
-      const promises: Promise<Response>[] = [];
-
-      for (const [, config] of Object.entries(ALERT_CONDITIONS)) {
-        const existing = existingByCondition[config.condition];
-        const threshold = alertThresholds[config.condition === 'failure_rate' ? 'success_rate' : config.condition === 'latency' ? 'latency' : 'consecutive_failures'];
-
-        if (existing) {
-          // Update existing rule
-          promises.push(
-            fetch(`${API}/admin/alerts/${existing.id}`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                threshold,
-                channels,
-                is_active: true,
-              }),
-            })
-          );
-        } else {
-          // Create new rule
-          promises.push(
-            fetch(`${API}/admin/alerts`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                name: `${config.condition} alert`,
-                condition: config.condition,
-                threshold,
-                channels,
-              }),
-            })
-          );
-        }
-      }
-
-      const results = await Promise.all(promises);
-      const allOk = results.every((r) => r.ok);
-
-      if (allOk) {
-        toast(t('alertSettingsSaved') || 'Alert settings saved', 'success');
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
-        // Refresh alert rules
-        await fetchAlerts();
-      } else {
-        throw new Error('Some alerts failed to save');
-      }
-    } catch {
-      toast(t('alertSettingsFailed') || 'Failed to save alert settings', 'error');
-    } finally {
-      setAlertSaving(false);
-    }
-  };
-
   const update = (key: keyof PlatformSettings, value: unknown) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
-    setShowSuccess(false);
+    if (!settings) return;
+    setSettings({ ...settings, [key]: value });
   };
 
-  const updateAlertThreshold = (key: string, value: number) => {
-    setAlertThresholds((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const toggleChannel = (channel: string) => {
-    setAlertChannels((prev) => ({ ...prev, [channel]: !prev[channel] }));
-  };
-
-  // Loading state
   if (loading) {
     return (
-      <div className="space-y-8 max-w-3xl">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('platformSettings')}</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('loadingSettings')}</p>
-        </div>
-        <div className="flex flex-col items-center justify-center py-16">
-          <div className="relative w-12 h-12 mb-4">
-            <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-slate-700" />
-            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-red-500 animate-spin" />
-          </div>
-          <p className="text-sm text-gray-500 dark:text-slate-400">{t('loadingSettings')}</p>
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('settingsNav') || 'Ayarlar'}</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
+          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
         </div>
       </div>
     );
   }
 
+  if (!settings) return null;
+
   return (
-    <div className="space-y-8 max-w-3xl">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('platformSettings')}</h1>
-        <p className="text-gray-500 dark:text-slate-400 mt-1">
-          {t('platformSettingsDesc')}
-        </p>
-      </div>
-
-      {/* Success feedback banner */}
-      {showSuccess && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-xl p-4 flex items-center gap-2"
-        >
-          <span className="text-green-600 dark:text-green-400" aria-hidden="true">✅</span>
-          <span className="text-green-700 dark:text-green-400 text-sm font-medium">{t('settingsSaved')}</span>
-        </div>
-      )}
-
-      {/* General */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('general')}</h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">{t('maintenanceMode')}</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400">{t('maintenanceDesc')}</div>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={settings.maintenance_mode}
-              onClick={() => update('maintenance_mode', !settings.maintenance_mode)}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                settings.maintenance_mode ? 'bg-red-600' : 'bg-gray-300 dark:bg-slate-600'
-              }`}
-            >
-              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                settings.maintenance_mode ? 'translate-x-5' : 'translate-x-0'
-              }`} />
-            </button>
-          </div>
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">{t('signupsEnabled')}</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400">{t('signupsDesc')}</div>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={settings.signup_enabled}
-              onClick={() => update('signup_enabled', !settings.signup_enabled)}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                settings.signup_enabled ? 'bg-green-600' : 'bg-gray-300 dark:bg-slate-600'
-              }`}
-            >
-              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                settings.signup_enabled ? 'translate-x-5' : 'translate-x-0'
-              }`} />
-            </button>
-          </div>
-          <div>
-            <label htmlFor="default_plan" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('defaultPlan')} <span className="text-red-500">*</span></label>
-            <select
-              id="default_plan"
-              value={settings.default_plan}
-              onChange={(e) => update('default_plan', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            >
-              <option value="developer">{t('developerPlan')}</option>
-              <option value="startup">{t('startupPlan')}</option>
-              <option value="pro">{t('proPlan')}</option>
-              <option value="enterprise">{t('enterprisePlan')}</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Plan Limits */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('planLimits')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('freePlan')}</h3>
-            <div className="space-y-3">
-              <div>
-                <label htmlFor="max_endpoints_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')} <span className="text-red-500">*</span></label>
-                <input
-                  id="max_endpoints_free"
-                  type="number"
-                  min={1}
-                  max={999}
-                  value={settings.max_endpoints_free}
-                  onChange={(e) => update('max_endpoints_free', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="max_webhooks_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxWebhooksMonth')} <span className="text-red-500">*</span></label>
-                <input
-                  id="max_webhooks_free"
-                  type="number"
-                  min={0}
-                  max={9999999}
-                  value={settings.max_webhooks_free}
-                  onChange={(e) => update('max_webhooks_free', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="rate_limit_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('rateLimitReqMin')} <span className="text-red-500">*</span></label>
-                <input
-                  id="rate_limit_free"
-                  type="number"
-                  min={1}
-                  max={100000}
-                  value={settings.rate_limit_free}
-                  onChange={(e) => update('rate_limit_free', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="retention_days_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('retentionDays')} <span className="text-red-500">*</span></label>
-                <input
-                  id="retention_days_free"
-                  type="number"
-                  min={1}
-                  max={365}
-                  value={settings.retention_days_free}
-                  onChange={(e) => update('retention_days_free', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
-              </div>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('proPlan')}</h3>
-            <div className="space-y-3">
-              <div>
-                <label htmlFor="max_endpoints_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')} <span className="text-red-500">*</span></label>
-                <input
-                  id="max_endpoints_pro"
-                  type="number"
-                  min={1}
-                  max={999}
-                  value={settings.max_endpoints_pro}
-                  onChange={(e) => update('max_endpoints_pro', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="max_webhooks_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxWebhooksMonth')} <span className="text-red-500">*</span></label>
-                <input
-                  id="max_webhooks_pro"
-                  type="number"
-                  min={0}
-                  max={9999999}
-                  value={settings.max_webhooks_pro}
-                  onChange={(e) => update('max_webhooks_pro', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="rate_limit_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('rateLimitReqMin')} <span className="text-red-500">*</span></label>
-                <input
-                  id="rate_limit_pro"
-                  type="number"
-                  min={1}
-                  max={100000}
-                  value={settings.rate_limit_pro}
-                  onChange={(e) => update('rate_limit_pro', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="retention_days_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('retentionDays')} <span className="text-red-500">*</span></label>
-                <input
-                  id="retention_days_pro"
-                  type="number"
-                  min={1}
-                  max={365}
-                  value={settings.retention_days_pro}
-                  onChange={(e) => update('retention_days_pro', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Plan Prices */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💰 {t('planPrices') || 'Plan Prices'}</h2>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('planPricesDesc') || 'Monthly prices used for revenue calculations.'}</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="plan_price_pro" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('proPlan')} ($) <span className="text-red-500">*</span></label>
-            <input
-              id="plan_price_pro"
-              type="number"
-              min={0}
-              max={99999}
-              step={0.01}
-              value={settings.plan_price_pro}
-              onChange={(e) => update('plan_price_pro', parseFloat(e.target.value) || 0)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
-          </div>
-          <div>
-            <label htmlFor="plan_price_business" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('businessPlan')} ($) <span className="text-red-500">*</span></label>
-            <input
-              id="plan_price_business"
-              type="number"
-              min={0}
-              max={99999}
-              step={0.01}
-              value={settings.plan_price_business}
-              onChange={(e) => update('plan_price_business', parseFloat(e.target.value) || 0)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Email Settings */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📧 {t('emailSettings') || 'Email Settings'}</h2>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('emailSettingsDesc') || 'Configure email delivery via Resend.'}</p>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="resend_api_key" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Resend API Key</label>
-            <input
-              id="resend_api_key"
-              type="password"
-              value={settings.resend_api_key || ''}
-              onChange={(e) => update('resend_api_key', e.target.value || null)}
-              placeholder="re_..."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
-          </div>
-          <div>
-            <label htmlFor="email_sender" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('senderAddress') || 'Sender Address'}</label>
-            <input
-              id="email_sender"
-              type="email"
-              value={settings.email_sender || ''}
-              onChange={(e) => update('email_sender', e.target.value || null)}
-              placeholder="noreply@hooksniff.dev"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Webhook & Security Settings */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🔐 {t('securitySettings') || 'Security & Webhook Settings'}</h2>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="webhook_secret" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('webhookSecret') || 'Default Webhook Secret'}</label>
-            <input
-              id="webhook_secret"
-              type="password"
-              value={settings.webhook_secret || ''}
-              onChange={(e) => update('webhook_secret', e.target.value || null)}
-              placeholder="whsec_..."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
-            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('webhookSecretDesc') || 'Default signing secret for webhook payloads.'}</p>
-          </div>
-          <div>
-            <label htmlFor="global_rate_limit" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('globalRateLimit') || 'Global API Rate Limit (req/min)'}</label>
-            <input
-              id="global_rate_limit"
-              type="number"
-              min={10}
-              max={100000}
-              value={settings.global_rate_limit}
-              onChange={(e) => update('global_rate_limit', parseInt(e.target.value) || 1000)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
-          </div>
-          <div>
-            <label htmlFor="cors_origins" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('corsOrigins') || 'Allowed CORS Origins'}</label>
-            <input
-              id="cors_origins"
-              type="text"
-              value={settings.cors_origins || ''}
-              onChange={(e) => update('cors_origins', e.target.value || null)}
-              placeholder="https://hooksniff.vercel.app, https://app.example.com"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
-            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('corsOriginsDesc') || 'Comma-separated list of allowed origins. Leave empty for default.'}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Backup Settings */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💾 {t('backupSettings') || 'Backup Settings'}</h2>
-        <div>
-          <label htmlFor="backup_retention" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('backupRetention') || 'Backup Retention (days)'}</label>
-          <input
-            id="backup_retention"
-            type="number"
-            min={1}
-            max={365}
-            value={settings.backup_retention_days}
-            onChange={(e) => update('backup_retention_days', parseInt(e.target.value) || 30)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-          />
-          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('backupRetentionDesc') || 'Number of days to keep database backups.'}</p>
-        </div>
-      </div>
-
-      {/* Retry Settings */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('retrySettings')}</h2>
-        <div>
-          <label htmlFor="retry_max_attempts" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('maxRetryAttempts')} <span className="text-red-500">*</span></label>
-          <input
-            id="retry_max_attempts"
-            type="number"
-            value={settings.retry_max_attempts}
-            onChange={(e) => update('retry_max_attempts', parseInt(e.target.value) || 0)}
-            min={0}
-            max={10}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-          />
-          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('retryDesc')}</p>
-        </div>
-      </div>
-
-      {/* Alert Thresholds — connected to backend */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🚨 {t('alertThresholds')}</h2>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('alertThresholdsDesc')}</p>
-
-        {/* Status indicator */}
-        {alertRules.length > 0 && (
-          <div className="mb-4 flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
-            <span className="w-2 h-2 rounded-full bg-green-500" />
-            {alertRules.length} {t('activeAlertRules') || 'active alert rule(s) configured'}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="alert_success_rate" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('successRateThreshold')}</label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 dark:text-slate-400">{t('below')}</span>
-              <input
-                id="alert_success_rate"
-                type="number"
-                min={0}
-                max={100}
-                value={alertThresholds.success_rate}
-                onChange={(e) => updateAlertThreshold('success_rate', parseInt(e.target.value) || 0)}
-                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-              />
-              <span className="text-sm text-gray-500 dark:text-slate-400">%</span>
-            </div>
-          </div>
-          <div>
-            <label htmlFor="alert_latency" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('latencyThreshold')}</label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 dark:text-slate-400">{t('above')}</span>
-              <input
-                id="alert_latency"
-                type="number"
-                min={0}
-                max={60000}
-                value={alertThresholds.latency}
-                onChange={(e) => updateAlertThreshold('latency', parseInt(e.target.value) || 0)}
-                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-              />
-              <span className="text-sm text-gray-500 dark:text-slate-400">ms</span>
-            </div>
-          </div>
-          <div>
-            <label htmlFor="alert_failed" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('failedDeliveryThreshold')}</label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 dark:text-slate-400">{t('above')}</span>
-              <input
-                id="alert_failed"
-                type="number"
-                min={0}
-                max={10000}
-                value={alertThresholds.consecutive_failures}
-                onChange={(e) => updateAlertThreshold('consecutive_failures', parseInt(e.target.value) || 0)}
-                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-              />
-              <span className="text-sm text-gray-500 dark:text-slate-400">{t('perHour')}</span>
-            </div>
-          </div>
-        </div>
-        <div className="mt-6">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('notificationChannels')}</h3>
-          <div className="flex flex-wrap gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={alertChannels.email}
-                onChange={() => toggleChannel('email')}
-                className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-slate-300">📧 Email</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={alertChannels.slack}
-                onChange={() => toggleChannel('slack')}
-                className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-slate-300">💬 Slack</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={alertChannels.webhook}
-                onChange={() => toggleChannel('webhook')}
-                className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-slate-300">🔗 Webhook</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Alert Save Button */}
-        <div className="mt-6 flex items-center gap-3 justify-end">
-          <button type="button"
-            onClick={handleAlertSave}
-            disabled={alertSaving}
-            className="px-6 py-3 bg-orange-600 dark:bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 dark:hover:bg-orange-700 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition disabled:opacity-60"
-          >
-            {alertSaving ? tc('saving') : (t('saveAlertSettings') || '🚨 Save Alert Settings')}
-          </button>
-        </div>
-      </div>
-
-      {/* Save button for platform settings */}
-      <div className="flex items-center gap-3 justify-end">
-        {showSuccess && (
-          <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
-            <span aria-hidden="true">✓</span> {t('settingsSaved')}
-          </span>
-        )}
-        <button type="button"
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('settingsNav') || 'Ayarlar'}</h2>
+        <button
+          type="button"
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-3 bg-red-600 dark:bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 dark:hover:bg-red-700 focus:ring-2 focus:ring-red-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition disabled:opacity-60"
+          className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition disabled:opacity-60"
         >
-          {saving ? tc('saving') : t('saveSettings')}
+          {saving ? (tc('saving') || 'Kaydediliyor...') : (tc('save') || 'Kaydet')}
         </button>
+      </div>
+
+      {/* ── Plan Fiyatları ── */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('planPrices') || 'Plan Fiyatları'}</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Pro ($)</label>
+            <input
+              type="number"
+              value={settings.plan_price_pro}
+              onChange={(e) => update('plan_price_pro', Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Business ($)</label>
+            <input
+              type="number"
+              value={settings.plan_price_business}
+              onChange={(e) => update('plan_price_business', Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Limitler ── */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('limits') || 'Limitler'}</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">{t('maxEndpointsFree') || 'Max Endpoint (Free)'}</label>
+            <input
+              type="number"
+              value={settings.max_endpoints_free}
+              onChange={(e) => update('max_endpoints_free', Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">{t('maxEndpointsPro') || 'Max Endpoint (Pro)'}</label>
+            <input
+              type="number"
+              value={settings.max_endpoints_pro}
+              onChange={(e) => update('max_endpoints_pro', Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">{t('rateLimitFree') || 'Rate Limit (Free)'}</label>
+            <input
+              type="number"
+              value={settings.rate_limit_free}
+              onChange={(e) => update('rate_limit_free', Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">{t('rateLimitPro') || 'Rate Limit (Pro)'}</label>
+            <input
+              type="number"
+              value={settings.rate_limit_pro}
+              onChange={(e) => update('rate_limit_pro', Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Toggle'lar ── */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('platform') || 'Platform'}</h3>
+        <div className="space-y-3">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.signup_enabled}
+              onChange={(e) => update('signup_enabled', e.target.checked)}
+              className="w-4 h-4 rounded text-green-600 focus:ring-green-500"
+            />
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('signupEnabled') || 'Kayıt açık'}</span>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.maintenance_mode}
+              onChange={(e) => update('maintenance_mode', e.target.checked)}
+              className="w-4 h-4 rounded text-green-600 focus:ring-green-500"
+            />
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('maintenanceMode') || 'Bakım modu'}</span>
+          </label>
+        </div>
       </div>
     </div>
   );
