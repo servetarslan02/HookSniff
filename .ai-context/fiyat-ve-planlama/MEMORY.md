@@ -125,3 +125,17 @@
   - `developerPlan`, `startupPlan`, `enterprisePlan` key'leri eklendi (EN+TR)
   - Pricing section: `free`→`developer`, `business`→`enterprise` display names
 - **Commits:** 2 commit, main branch
+
+### Oturum 7 (2026-05-13 02:00 - 02:10 GMT+8)
+- **Hook0 tarzı plan açıklamaları eklendi** — 4 dosya
+- **Plan açıklamaları (Hook0 benzeri):**
+  - Developer: "Perfect for trying out HookSniff..."
+  - Startup: "Enhance your webhook experience..."
+  - Pro: "Unleash your data connectivity..."
+  - Enterprise: "Need more? Need something different?..."
+- **Homepage plan kartları:** açıklama metni eklendi (plan adının altında)
+- **Pricing sayfası plan kartları:** açıklama metni eklendi
+- **proFeatures güncellendi:** webhooks/month → events/day formatı (12 özellik)
+- **enterpriseFeatures güncellendi:** Hook0 tarzı, excluded items kaldırıldı (custom SLA, static IP, priority email support kaldırıldı)
+- **Orphaned key'ler kaldırıldı:** freeFeatures, businessFeatures (landing.pricing)
+- **Commits:** 1 commit, main branch
