@@ -20,7 +20,8 @@ admin-sayfalar-inceleme/
 │   ├── 31-simulator.md          ← YENİ (backend var, frontend yok)
 │   ├── 32-stream.md             ← YENİ (backend var, frontend yok)
 │   ├── 33-cikis-ip.md           ← YENİ (backend var, frontend yok)
-│   └── 34-cihazlar.md           ← YENİ (backend var, frontend yok)
+│   ├── 34-cihazlar.md           ← YENİ (backend var, frontend yok)
+│   └── 35-derin-analiz.md       ← YENİ (derin uyumsuzluk analizi)
 │
 └── admin/                       ← Admin panel sayfaları (7 dosya)
     ├── 01-genel-bakis.md
