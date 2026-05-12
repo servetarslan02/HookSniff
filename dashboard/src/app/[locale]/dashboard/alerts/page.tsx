@@ -114,8 +114,9 @@ export default function AlertsPage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createTitle')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')}</label>
+              <label htmlFor="alert-name" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')}</label>
               <input
+                id="alert-name"
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -124,8 +125,9 @@ export default function AlertsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('condition')}</label>
+              <label htmlFor="alert-condition" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('condition')}</label>
               <select
+                id="alert-condition"
                 value={form.condition}
                 onChange={(e) => setForm({ ...form, condition: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
@@ -136,8 +138,9 @@ export default function AlertsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('threshold')}</label>
+              <label htmlFor="alert-threshold" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('threshold')}</label>
               <input
+                id="alert-threshold"
                 type="number"
                 value={form.threshold}
                 onChange={(e) => setForm({ ...form, threshold: parseInt(e.target.value) || 0 })}
