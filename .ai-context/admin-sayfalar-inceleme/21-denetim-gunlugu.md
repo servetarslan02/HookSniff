@@ -50,6 +50,13 @@
 - Error handling (endpoint yoksa empty state)
 
 ### 🔴 Eksiklikler
+
+### 🆕 Eklenecekler (Sektör Karşılaştırma)
+- **Session management** — Aktif oturum listesi ve sonlandırma
+- **2FA zorunlu** — Admin kullanıcılar için 2FA zorunluluğu
+- **IP whitelist** — Admin paneline erişim IP kısıtlaması
+- **Login history** — Giriş denemeleri kaydı (başarılı/başarısız)
+- **Anomali tespiti** — Olağandışı aktivite uyarısı
 - Export (CSV/JSON)
 - Tarih aralığı filtresi
 - Actor bazlı filtreleme
