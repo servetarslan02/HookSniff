@@ -37,6 +37,7 @@ pub fn router() -> Router {
 
 /// Query parameters for listing audit log entries
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AuditLogQuery {
     pub action: Option<String>,
     pub resource_type: Option<String>,
