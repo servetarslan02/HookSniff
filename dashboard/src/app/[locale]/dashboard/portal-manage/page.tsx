@@ -47,7 +47,7 @@ export default function PortalPage() {
       .finally(() => setLoading(false));
   }, [token, t]);
 
-  if (loading) return <div className="p-8 text-gray-500">{t('loading')}</div>;
+  if (loading) return <div className="p-8 text-gray-500 dark:text-slate-400">{t('loading')}</div>;
 
   if (error) {
     return (
@@ -69,19 +69,19 @@ export default function PortalPage() {
           <h2 className="text-lg font-semibold mb-4">{t('profile')}</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-500">{t('email')}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">{t('email')}</p>
               <p className="font-medium">{profile.email}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">{t('plan')}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">{t('plan')}</p>
               <p className="font-medium capitalize">{profile.plan}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">{t('memberSince')}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">{t('memberSince')}</p>
               <p className="font-medium">{new Date(profile.created_at).toLocaleDateString()}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">{t('webhookLimit')}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">{t('webhookLimit')}</p>
               <p className="font-medium">{t('perMonth', { limit: profile.webhook_limit?.toLocaleString() ?? '0' })}</p>
             </div>
           </div>
@@ -93,15 +93,15 @@ export default function PortalPage() {
           <h2 className="text-lg font-semibold mb-4">{t('usage')}</h2>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <p className="text-sm text-gray-500">{t('webhooksUsed')}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">{t('webhooksUsed')}</p>
               <p className="text-2xl font-bold text-purple-500">{usage.webhooks_used?.toLocaleString() || 0}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">{t('endpoints')}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">{t('endpoints')}</p>
               <p className="text-2xl font-bold">{usage.endpoints_count || 0}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">{t('apiCallsToday')}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">{t('apiCallsToday')}</p>
               <p className="text-2xl font-bold">{usage.api_calls_today?.toLocaleString() || 0}</p>
             </div>
           </div>
