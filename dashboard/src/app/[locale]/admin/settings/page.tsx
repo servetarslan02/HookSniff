@@ -41,7 +41,7 @@ interface AlertRule {
 }
 
 const defaultSettings: PlatformSettings = {
-  default_plan: 'free',
+  default_plan: 'developer',
   max_endpoints_free: 5,
   max_endpoints_pro: 50,
   max_webhooks_free: 10000,
