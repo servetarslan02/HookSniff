@@ -1,3 +1,12 @@
+// TODO (Item 288): Refactor billing into a cleaner abstraction layer.
+//   Current state: Each provider (Stripe, Polar, Iyzico) has its own module
+//   with inconsistent error handling and response types.
+//   Refactoring goals:
+//   1. Define a unified BillingProvider trait with consistent error types
+//   2. Standardize webhook event handling across providers
+//   3. Create a single BillingService that routes to the correct provider
+//   4. Extract provider-specific logic behind the trait boundary
+
 pub mod iyzico;
 pub mod polar;
 pub mod provider;

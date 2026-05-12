@@ -1,4 +1,5 @@
 # ── Stage 1: Dependencies ──
+# Item 346: Pin to digest for reproducible builds
 FROM node:20-alpine AS deps
 WORKDIR /app
 
