@@ -1,40 +1,34 @@
-# NEXT_SESSION.md — Oturum 143
+# NEXT_SESSION.md — Oturum 144
 
-> Son güncelleme: 2026-05-13 22:35 GMT+8
+> Son güncelleme: 2026-05-13 22:55 GMT+8
 
 ## Kaldığımız Yer
-- **Build hatası düzeltildi** ✅ (playground metadata + feature-flags unused import)
-- **Konsolide sayfa i18n eklendi** ✅ (sidebar label'ları artık i18n kullanıyor)
-- **GitHub push başarılı** ✅ (commit 8681c7b1)
+- **Widget drag-drop sistemi eklendi** ✅
+- **Chart time range selector eklendi** ✅ (24h/7d/30d/90d)
+- Build başarılı, GitHub push edildi
 
-## Son Yapılan İş (Oturum 143)
-- `playground/page.tsx`: metadata export kaldırıldı (client component çakışması)
-- `feature-flags/page.tsx`: kullanılmayan `tc` ve `useTranslations` kaldırıldı
-- `layout.tsx`: hardcoded sidebar isimleri i18n ile değiştirildi
-- `en.json` + `tr.json`: 10 konsolide sayfa i18n key'i eklendi
-- Build: başarılı ✅, 216 sayfa
+## Son Yapılan İş (Oturum 143-144)
+1. Build hatası düzeltildi (playground metadata + feature-flags unused import)
+2. Konsolide sayfa i18n eklendi (sidebar label'ları)
+3. DashboardWidget.tsx: sürükle-bırak widget sistemi + localStorage persistence
+4. 3 widget: stat-cards, charts, recent-deliveries (sürükle-bırak + toggle)
+5. Chart time range: 24h/7d/30d/90d selector aktif edildi
+6. ChartCard: 90d seçeneği eklendi
 
-## Yapılacaklar (Oturum 144+)
+## Yapılacaklar (Oturum 145+)
 
-### 🔴 Kritik — Hemen
-1. **Vercel deploy kontrol et** — Push sonrası Vercel otomatik deploy tetiklenmeli
-2. **Deploy sonrası test et:**
-   - Login → orijinal sidebar görünmeli (açık tema, i18n label'lar)
-   - Konsolide sayfalar çalışıyor mu (core, monitoring, devtools vb.)
-   - Applications sayfası çalışıyor mu
-   - Service Tokens sayfası çalışıyor mu
-   - Mobil responsive kontrol
-   - Tüm nav linkleri çalışıyor mu
-   - Türkçe/İngilizce dil geçişi çalışıyor mu
+### 🔴 Kritik
+1. **Vercel deploy kontrol et** — Push sonrası deploy olmuş mu?
+2. **Deploy sonrası test:** login, sidebar, widget drag-drop, chart time range
 
-### 🟡 Orta — Konsolasyon Kalan İşler
-3. **Widget özelleştirme** — Sürükle-bırak dashboard düzenleme (düşük öncelik)
-4. **Grafik zoom/drill-down** — Chart library bağımlı (düşük öncelik)
+### 🟡 Orta
+3. **Grafana trial** — 20 Mayıs'ta bitiyor, alternatif plan gerekli
+4. **Widget özelleştirme iyileştirmesi** — Daha fazla widget eklenebilir (son aktivite, performans metrikleri)
 
 ### 🟢 Düşük
-5. **Grafana trial** — 20 Mayıs'ta bitiyor, alternatif plan gerekli
-6. **GitHub PAT + GCP key rotate** — Güvenlik
+5. **GitHub PAT + GCP key rotate** — Güvenlik
+6. **Feature-flags toast i18n** — Hardcoded EN mesajlar
 
 ## Bilinen Sorunlar
-- Vercel deploy durumu bilinmiyor (push sonrası kontrol gerekli)
-- Feature-flags sayfasındaki toast mesajları hâlâ hardcoded (TODO: i18n)
+- Vercel deploy durumu bilinmiyor
+- Grafik drill-down (tıklayarak detay görme) henüz yok — sadece time range selector var
