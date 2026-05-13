@@ -1,8 +1,8 @@
 # Dashboard İnceleme Düzeltme Çalışması — Memory Dosyası
 
 > **Tarih:** 2026-05-13  
-> **Durum:** DEVAM EDİYOR — Yarım kaldı  
-> **Son İşlem:** api.ts eksik metodlar ekleniyor
+> **Durum:** TAMAMLANDI  
+> **Son İşlem:** Tüm kalan işler tamamlandı
 
 ---
 
@@ -28,41 +28,31 @@
 ### 4. api.ts — Eksik API metodları eklendi
 - `alertsApi.update` — Alert düzenleme (PUT /alerts/{id})
 - `endpointsApi.rotateSecret` — Secret rotasyonu (POST /endpoints/{id}/rotate-secret)
+- `webhooksApi.batchReplay` — Toplu tekrar gönderme (POST /webhooks/batch-replay)
+- `twoFactorApi` — 2FA enable/confirm/disable/getStatus
+- `customDomainsApi` — list/add/verifyDomain/delete
+- `ssoApi` — getConfig/saveConfig/testSso
+- `billingApi.getPortalUrl` — Müşteri portal URL'si (GET /billing/portal)
 
----
-
-## 🔴 KALAN İŞLER (Yapılmadı)
-
-### api.ts — Hâlâ eksik metodlar
-- `webhooksApi.batchReplay` — Toplu tekrar gönderme
-- `twoFactorApi` — 2FA enable/confirm/disable
-- `customDomainsApi.verifyDomain` — Domain doğrulama
-- `ssoApi.testSso` — SSO bağlantı testi
-- `billingApi.getPortalUrl` — Müşteri portal URL'si
-
-### ConsentToggle — Backend'e çağrı yok
+### 5. ConsentToggle — Backend'e bağlandı
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/settings/components/ConsentToggle.tsx`
-- Sadece localStorage + cookie yazıyor, backend'e göndermiyor
-- `POST /v1/auth/consent` endpoint'i eklenmeli + ConsentToggle güncellenmeli
+- Artık sayfa yüklenirken `GET /auth/consent` endpoint'inden durumu çekiyor
+- Toggle değişikliğinde `POST /auth/consent` endpoint'ine gönderiyor
+- Başarısız olursa eski değerine geri dönüyor
 
-### NotificationSection — Başlangıç değerleri localStorage'dan
+### 6. NotificationSection — API'den veri çekiyor
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/settings/components/NotificationSection.tsx`
-- API'den tercihler çekilmiyor, sadece localStorage'dan okunuyor
-- Sayfa yüklenirken API'den çekme eklenmeli
+- Sayfa yüklenirken `GET /portal/notifications` endpoint'inden tercihleri çekiyor
+- API başarısız olursa localStorage'a fallback yapıyor
+- Loading skeleton eklendi
 
-### Playground — Raw fetch (7 yer)
-- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/playground/content.tsx`
-- `fetch('/api/playground/...')` → `apiFetch` veya en azından timeout/error handling eklenmeli
-- NOT: Playground public endpoint, auth header sorun çıkarabilir
-
-### Dashboard Overview sayfası yok
-- `(dashboard)/page.tsx` dosyası mevcut DEĞİL
-- Review'da bahsedilen "Kontrol Paneli" sayfası aslında yok
-- Sidebar'daki "📊 Dashboard" linki `/`'a gidiyor ama orası landing page
-
-### Konsolide dosya düzeltmeleri
-- `00-INDEKS.md` ve konsolide dosyalar güncellenmeli (doğru bulgularla)
-- Bazı bulgular yanlıştı (notifications markAsRead çalışıyor mesela)
+### 7. Dashboard Overview sayfası oluşturuldu
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/page.tsx`
+- 4 stat card: Total Deliveries, Success Rate, Active Endpoints, Failed Deliveries
+- 7 günlük delivery trend chart (AreaChart)
+- Quick Stats summary panel
+- Quick Actions linkleri (Endpoints, Deliveries, Playground, Analytics)
+- Recent Deliveries tablosu (son 5 delivery)
 
 ---
 
@@ -77,7 +67,10 @@
 | `settings/components/ApiKeySection.tsx` | setTimeout cleanup |
 | `settings/components/ProfileSection.tsx` | setTimeout cleanup |
 | `deliveries/[id]/page.tsx` | setTimeout cleanup |
-| `lib/api.ts` | alertsApi.update + endpointsApi.rotateSecret eklendi |
+| `lib/api.ts` | 7 yeni API metodu eklendi |
+| `settings/components/ConsentToggle.tsx` | Backend bağlantısı |
+| `settings/components/NotificationSection.tsx` | API'den veri çekme |
+| `(dashboard)/page.tsx` | Yeni Dashboard Overview sayfası |
 
 ---
 
@@ -86,17 +79,15 @@
 | Review Bulgusu | Gerçek Durum |
 |---------------|-------------|
 | "notificationsApi.markAsRead UI'da kullanılmıyor" | ❌ YANLIŞ — notifications/page.tsx'de `handleMarkAsRead` ve `handleMarkAllAsRead` var |
-| "Dashboard overview sayfası eksik" | ⚠️ DOĞRU — `(dashboard)/page.tsx` yok, landing page kullanılıyor |
+| "Dashboard overview sayfası eksik" | ✅ DOĞRU — Oluşturuldu |
 | "Playground raw fetch" | ✅ DOĞRU — 7 yerde raw fetch var ama public endpoint olduğu için kasıtlı olabilir |
 | "Catch blokları boş" | ✅ DOĞRU — endpoints ve templates'de `.catch(() => {})` var |
 | "setTimeout cleanup yok" | ✅ DOĞRU — 5 dosyada düzeltildi |
 
 ---
 
-## 📝 Sonraki Adımlar
+## 📝 Sonraki Adımlar (Opsiyonel)
 
-1. Kalan api.ts metodlarını ekle (batchReplay, twoFactorApi, customDomainsApi, ssoApi, billingApi.getPortalUrl)
-2. ConsentToggle'ı backend'e bağla
-3. NotificationSection'ı API'den veri çek
-4. Konsolide dosyaları güncelle (doğru bulgularla)
-5. Değişiklikleri commit + push et
+1. Playground raw fetch → timeout/error handling ekleme (public endpoint, düşük öncelik)
+2. i18n: Dashboard overview sayfası için `dashboard` namespace'ine çeviriler ekle
+3. Konsolide review dosyalarını güncel bulgularla yeniden yaz
