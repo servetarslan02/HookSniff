@@ -208,6 +208,9 @@ export const endpointsApi = {
 
   delete: (token: string, id: string) =>
     apiFetch<{ deleted: boolean }>(`/endpoints/${id}`, { method: "DELETE", token }),
+
+  rotateSecret: (token: string, id: string) =>
+    apiFetch<{ secret: string }>(`/endpoints/${id}/rotate-secret`, { method: "POST", token }),
 };
 
 // Webhook API
@@ -714,6 +717,9 @@ export const alertsApi = {
 
   create: (token: string | undefined, data: { name: string; condition: string; threshold: number; channels: string[] }) =>
     apiFetch<AlertRule>('/alerts', { method: 'POST', body: data, token }),
+
+  update: (token: string | undefined, id: string, data: Partial<{ name: string; condition: string; threshold: number; channels: string[]; is_active: boolean }>) =>
+    apiFetch<AlertRule>(`/alerts/${id}`, { method: 'PUT', body: data, token }),
 
   delete: (token: string | undefined, id: string) =>
     apiFetch<{ success: boolean }>(`/alerts/${id}`, { method: 'DELETE', token }),

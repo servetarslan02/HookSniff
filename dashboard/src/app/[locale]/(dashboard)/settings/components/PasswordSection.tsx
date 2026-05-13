@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { getErrorMessage } from '@/lib/errors';
 
@@ -13,6 +13,13 @@ export function PasswordSection({ token }: { token: string | null }) {
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +43,8 @@ export function PasswordSection({ token }: { token: string | null }) {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      setTimeout(() => setPasswordSuccess(''), 3000);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setPasswordSuccess(''), 3000);
     } catch (e: unknown) {
       setPasswordError(getErrorMessage(e, tc('unknownError')));
     } finally {
