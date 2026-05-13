@@ -26,23 +26,17 @@ package hooksniff.sdk.models
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.ShouldSpec
 
-import hooksniff.sdk.models.OutboundIpsResponse
+import hooksniff.sdk.models.OutboundIPsResponse
 
-class OutboundIpsResponseTest : ShouldSpec() {
+class OutboundIPsResponseTest : ShouldSpec() {
     init {
-        // uncomment below to create an instance of OutboundIpsResponse
-        //val modelInstance = OutboundIpsResponse()
+        // uncomment below to create an instance of OutboundIPsResponse
+        //val modelInstance = OutboundIPsResponse()
 
-        // to test the property `ips`
+        // to test the property `ips` - IPv4 and IPv6 addresses used for outbound requests
         should("test ips") {
             // uncomment below to test the property
             //modelInstance.ips shouldBe ("TODO")
-        }
-
-        // to test the property `updatedAt`
-        should("test updatedAt") {
-            // uncomment below to test the property
-            //modelInstance.updatedAt shouldBe ("TODO")
         }
 
     }

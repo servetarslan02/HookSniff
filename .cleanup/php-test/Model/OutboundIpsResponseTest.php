@@ -1,6 +1,6 @@
 <?php
 /**
- * OutboundIpsResponseTest
+ * OutboundIPsResponseTest
  *
  * PHP version 8.1
  *
@@ -32,15 +32,15 @@ namespace OpenAPI\Client\Test\Model;
 use PHPUnit\Framework\TestCase;
 
 /**
- * OutboundIpsResponseTest Class Doc Comment
+ * OutboundIPsResponseTest Class Doc Comment
  *
  * @category    Class
- * @description OutboundIpsResponse
+ * @description List of static outbound IP addresses for firewall whitelisting
  * @package     OpenAPI\Client
  * @author      OpenAPI Generator team
  * @link        https://openapi-generator.tech
  */
-class OutboundIpsResponseTest extends TestCase
+class OutboundIPsResponseTest extends TestCase
 {
 
     /**
@@ -72,9 +72,9 @@ class OutboundIpsResponseTest extends TestCase
     }
 
     /**
-     * Test "OutboundIpsResponse"
+     * Test "OutboundIPsResponse"
      */
-    public function testOutboundIpsResponse()
+    public function testOutboundIPsResponse()
     {
         // TODO: implement
         self::markTestIncomplete('Not implemented');
@@ -84,15 +84,6 @@ class OutboundIpsResponseTest extends TestCase
      * Test attribute "ips"
      */
     public function testPropertyIps()
-    {
-        // TODO: implement
-        self::markTestIncomplete('Not implemented');
-    }
-
-    /**
-     * Test attribute "updated_at"
-     */
-    public function testPropertyUpdatedAt()
     {
         // TODO: implement
         self::markTestIncomplete('Not implemented');
