@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -13,20 +13,44 @@ export function NotificationSection() {
   const { token } = useAuth();
   const { toast } = useToast();
 
-  const [emailNotifs, setEmailNotifs] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return localStorage.getItem('hooksniff_email_notifs') !== 'false';
-  });
-  const [failureAlerts, setFailureAlerts] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return localStorage.getItem('hooksniff_failure_alerts') !== 'false';
-  });
-  const [weeklyDigest, setWeeklyDigest] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return localStorage.getItem('hooksniff_weekly_digest') === 'true';
-  });
+  const [emailNotifs, setEmailNotifs] = useState(true);
+  const [failureAlerts, setFailureAlerts] = useState(true);
+  const [weeklyDigest, setWeeklyDigest] = useState(false);
   const [notificationSaving, setNotificationSaving] = useState(false);
+  const [loadingPrefs, setLoadingPrefs] = useState(true);
 
+  // Fetch notification preferences from backend on mount
+  const fetchPreferences = useCallback(async () => {
+    if (!token) {
+      setLoadingPrefs(false);
+      return;
+    }
+    try {
+      const { apiFetch } = await import('@/lib/api');
+      const data = await apiFetch<{
+        email_on_failure?: boolean;
+        email_on_dead_letter?: boolean;
+        email_on_success?: boolean;
+        email_on_weekly_digest?: boolean;
+      }>('/portal/notifications', { token });
+      if (data.email_on_success !== undefined) setEmailNotifs(data.email_on_success);
+      if (data.email_on_failure !== undefined) setFailureAlerts(data.email_on_failure);
+      if (data.email_on_weekly_digest !== undefined) setWeeklyDigest(data.email_on_weekly_digest);
+    } catch {
+      // Fallback to localStorage
+      setEmailNotifs(localStorage.getItem('hooksniff_email_notifs') !== 'false');
+      setFailureAlerts(localStorage.getItem('hooksniff_failure_alerts') !== 'false');
+      setWeeklyDigest(localStorage.getItem('hooksniff_weekly_digest') === 'true');
+    } finally {
+      setLoadingPrefs(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchPreferences();
+  }, [fetchPreferences]);
+
+  // Sync to localStorage when values change
   useEffect(() => {
     localStorage.setItem('hooksniff_email_notifs', String(emailNotifs));
   }, [emailNotifs]);
@@ -55,6 +79,26 @@ export function NotificationSection() {
       setNotificationSaving(false);
     }
   };
+
+  if (loadingPrefs) {
+    return (
+      <div className="glass-card p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('notifications')}</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('notificationsDesc')}</p>
+        <div className="space-y-4 animate-pulse">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center justify-between py-3">
+              <div>
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-40 mb-2" />
+                <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-64" />
+              </div>
+              <div className="w-11 h-6 bg-gray-200 dark:bg-slate-700 rounded-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="glass-card p-6">
