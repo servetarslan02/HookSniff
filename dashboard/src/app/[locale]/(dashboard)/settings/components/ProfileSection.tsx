@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { getErrorMessage } from '@/lib/errors';
 
@@ -18,6 +18,13 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +35,8 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
       const { api } = await import('@/lib/api');
       await api.put('/auth/profile', { name: profileName, email: profileEmail }, token ?? undefined);
       setProfileSuccess(tc('success'));
-      setTimeout(() => setProfileSuccess(''), 3000);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setProfileSuccess(''), 3000);
     } catch (e: unknown) {
       setProfileError(getErrorMessage(e, tc('unknownError')));
     } finally {
