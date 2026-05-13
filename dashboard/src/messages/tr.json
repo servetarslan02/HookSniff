@@ -206,7 +206,12 @@
       "7d": "7 Gün",
       "30d": "30 Gün"
     },
-    "webhookDashboard": "Webhook Paneli"
+    "webhookDashboard": "Webhook Paneli",
+    "customizeWidgets": "Widget Özelleştir",
+    "widgetSettings": "Widget Ayarları",
+    "widgetSettingsDesc": "Widget aç/kapa. Yeniden sıralamak için her widget üzerindeki tutamaçları sürükleyin.",
+    "statCards": "İstatistik Kartları",
+    "charts": "Grafikler"
   },
   "endpoints": {
     "title": "Endpoint'ler",
