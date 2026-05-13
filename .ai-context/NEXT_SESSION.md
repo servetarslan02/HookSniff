@@ -1,34 +1,31 @@
 # NEXT_SESSION.md — Oturum 154
 
-> Son güncelleme: 2026-05-14 05:50 GMT+8
+> Son güncelleme: 2026-05-14 06:05 GMT+8
 
 ## Kaldığımız Yer
-- **Oturum 153** — Login DATABASE_ERROR düzeltmesi yapıldı
+- **Oturum 153** — Login DATABASE_ERROR düzeltmesi **TAMAMLANDI** ✅
 - **Root cause:** 
   1. `allow_overage` ve `overage_email_notification` kolonları Customer struct'ta var ama migration'da yok
   2. `webhook_count` hâlâ INT idi, struct i64 (BIGINT) bekliyordu
 - **Düzeltmeler:**
   - `db.rs`'ye Step 50 (049_overage_columns) + Step 51 (050_webhook_count_bigint) eklendi
   - `migrations/047` güncellendi
-  - Veritabanına doğrudan migration çalıştırıldı (tüm eksik kolonlar eklendi + webhook_count BIGINT)
-  - Kod GitHub'a push edildi: commit `e41c0899`
-- **⚠️ Deploy bekleniyor** — Cloud Build tetiklenmeli, eski binary hâlâ çalışıyor
+  - Veritabanına doğrudan migration çalıştırıldı
+  - Kod GitHub'a push edildi: commit `0c9e608`
+  - Cloud Build tetiklendi, API deploy oldu (revision 00109-s7p)
+  - **Login test: BAŞARILI** ✅ (demo + admin ikisi de çalışıyor)
 
 ## Oturum 154 — Öncelikli Görevler
 
-### 🔴 Kritik
-1. **Cloud Build tetikle** — Servet GCP Console'dan manuel tetikleyecek
-2. **Login test** — Deploy sonrası `POST /v1/auth/login` çalışacak mı?
-3. **Dashboard login akışı** — https://hooksniff.vercel.app → login → dashboard
-
 ### 🟡 Orta
-4. **Hook0-style kalan sayfalar** — Analytics, Playground, Billing, Logs, Health, Alerts, Schemas, Transforms, Routing, Inbound
-5. **Sidebar navigasyonu** kontrol
-6. **i18n eksikleri**
+1. **Hook0-style kalan sayfalar** — Analytics, Playground, Billing, Logs, Health, Alerts, Schemas, Transforms, Routing, Inbound
+2. **Sidebar navigasyonu** kontrol
+3. **i18n eksikleri**
+4. **Worker compile hatası** — `sem` lifetime error (build 7823f87d'de worker compile başarısız)
 
 ### 🟢 Düşük
-7. **Widget drag-drop + chart time range** test
-8. **Grafana trial bitişi (20 Mayıs)** — Free tier geçiş
+5. **Widget drag-drop + chart time range** test
+6. **Grafana trial bitişi (20 Mayıs)** — Free tier geçiş
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
@@ -37,8 +34,7 @@
 - Dashboard: https://hooksniff.vercel.app
 
 ## Öğrenilen Dersler
-- **Customer struct ↔ migration uyumu**: Struct'a yeni kolon eklerken MUTLAKA db.rs migration runner'ına da ekle!
-- **İki ayrı migration sistemi var**: Root `migrations/` (Cloud Build) + `api/src/db.rs` (API startup). İkisi de güncel olmalı.
-- **BIGINT vs INT**: PostgreSQL BIGINT → Rust i64, INT → i32. Migration BIGINT yapıyorsa struct'ı da güncelle!
-- **DATABASE_ERROR generic**: Herhangi bir sqlx hatası bu hatayı verir, spesifik olmayabilir
-- **Deploy tetikleme**: Cloud Build GCP Console'dan manuel tetiklenebilir
+- **Deploy zinciri**: GitHub push → Cloud Build tetiklenir → API deploy olur → login çalışır
+- **Cloud Build tetikleme**: GCP Console → Cloud Build → Triggers → "Run" butonu
+- **Login DATABASE_ERROR**: Customer struct'taki her kolon DB'de olmalı, yoksa sqlx hata verir
+- **`_migrations` tablosu**: db.rs'nin migration tracking mekanizması, Cloud Build run-migrations.js'den bağımsız
