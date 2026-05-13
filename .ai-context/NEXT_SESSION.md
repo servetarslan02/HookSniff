@@ -1,22 +1,42 @@
-# NEXT_SESSION.md — Oturum 147
+# NEXT_SESSION.md — Oturum 148
 
-> Son güncelleme: 2026-05-14 00:45 GMT+8
+> Son güncelleme: 2026-05-14 01:00 GMT+8
 
 ## Kaldığımız Yer
-- **30→10 rota konsolidasyonu tamamlandı** ✅
-- Eski rotalar konsolide rotalara redirect edildi
-- Tüm dahili linkler güncellendi
-- Push edildi: `8fbeae5b`
+- **Rota konsolidasyonu kod olarak tamamlandı** ✅ ama **deploy edilemedi** ❌
+- Vercel Hobby plan rate limit aşıldı
+- Mevcut production: `5ptc6DHK4` — Ready (commit `1b55267`)
 
-## Son Yapılan İş (Oturum 147)
-1. `next.config.js`'e 30 redirect eklendi (eski rotalar → konsolide rotalar)
-2. 12 dosyada eski route linkleri güncellendi:
-   - DashboardOverview, OnboardingWizard, Footer, NotificationCenter
-   - SetupChecklist, ApiKeySection, DelayPreviewCard
-   - applications/[id], content.tsx, get-started/content.tsx
-3. Detay sayfaları (/endpoints/[id], /deliveries/[id]) erişilebilir bırakıldı
+## Son Yapılan İş (Oturum 147-148)
+1. 30 eski rota → 10 konsolide rota redirect eklendi (next.config.js)
+2. 12 dosyada eski route linkleri güncellendi
+3. middleware publicPaths'a konsolide rotalar eklendi
+4. dashboard/vercel.json temizlendi
+5. Vercel'e Google ile giriş yapıldı (2FA ile)
+6. Rate limit sorunu tespit edildi — deploy edilemedi
+7. Commit squash: 5 commit → 1 (`87e5f5f3`, author: servetarslan02)
 
-## Redirect Haritası
+## 🔴 Deploy Sorunu
+- **Sebep 1:** Vercel Hobby plan günlük deploy limiti dolmuş
+- **Sebep 2:** "AI Assistant" committer GitHub kullanıcısı değil → Vercel reddediyor
+- **Çözüm:** Rate limit 24 saatte sıfırlanır. Yarın otomatik deploy olmalı.
+- **Ek:** dependabot PR'ları kapatılmalı — her biri ayrı deploy tetikliyor
+
+## Yapılacaklar (Oturum 149)
+
+### 🔴 Kritik
+1. **Deploy durumunu kontrol et** — rate limit sıfırlanmış mı?
+2. **Dependabot PR'larını kapat** — gereksiz deploy tetikliyorlar
+3. **bhanuprasad14 contributor** — GitHub Actions workflow'u silmiş, kontrol et
+
+### 🟡 Orta
+4. **Vercel Deploy Hook oluştur** — rate limit'ten muaf manuel tetikleme
+5. **Grafana trial bitişi (20 Mayıs)** — Free tier otomatik geçiş
+
+### 🟢 Düşük
+6. **Widget drag-drop + chart time range** — Önceki oturumda eklenmişti, test edilmedi
+
+## Redirect Haritası (hatırlatma)
 | Eski Rota | Konsolide Rota |
 |-----------|---------------|
 | /endpoints, /deliveries, /search | /core |
@@ -29,18 +49,3 @@
 | /team, /notifications, /applications | /team-mgmt |
 | /api-keys, /billing | /billing-overview |
 | /settings, /service-tokens | /settings-section |
-
-## Yapılacaklar (Oturum 148+)
-
-### 🔴 Kritik
-1. **GitHub token yenile** — `ghp_...` sohbette paylaşıldı, Servet revoke + yeni token oluşturmalı
-2. **Vercel deploy kontrol et** — Redirect'ler canlıda çalışıyor mu?
-3. **Detay sayfaları test** — /endpoints/[id], /deliveries/[id] hâlâ çalışıyor mu?
-
-### 🟡 Orta
-4. **bhanuprasad14 contributor** — GitHub Actions workflow'u silmiş, kontrol et
-5. **Grafana trial bitişi (20 Mayıs)** — Free tier otomatik geçiş
-
-### 🟢 Düşük
-6. **Widget drag-drop + chart time range** — Önceki oturumda eklenmişti, test edilmedi
-# Deploy trigger Thu May 14 12:49:54 AM CST 2026
