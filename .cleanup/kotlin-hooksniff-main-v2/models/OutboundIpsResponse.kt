@@ -28,20 +28,17 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /**
- * 
+ * List of static outbound IP addresses for firewall whitelisting
  *
- * @param ips 
- * @param updatedAt 
+ * @param ips IPv4 and IPv6 addresses used for outbound requests
  */
 
 
-data class OutboundIpsResponse (
+data class OutboundIPsResponse (
 
+    /* IPv4 and IPv6 addresses used for outbound requests */
     @Json(name = "ips")
-    val ips: kotlin.collections.List<kotlin.String>,
-
-    @Json(name = "updated_at")
-    val updatedAt: kotlin.String
+    val ips: kotlin.collections.List<kotlin.String>
 
 ) {
 
