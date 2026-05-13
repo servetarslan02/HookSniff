@@ -158,7 +158,10 @@
     "adminRevenue": "Revenue",
     "adminSystem": "System",
     "adminActivity": "Activity",
-    "adminSettings": "Settings"
+    "adminSettings": "Settings",
+    "sectionUserPanel": "User Panel",
+    "adminOverview": "Overview",
+    "userDashboard": "Dashboard"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1445,7 +1448,8 @@
     "weekComparison": "Weekly Comparison",
     "weekVsLastWeek": "This week vs last week",
     "whsecSecret": "whsec_ Secret Format",
-    "widgetCustomization": "Widget Customization"
+    "widgetCustomization": "Widget Customization",
+    "userPanel": "User Panel"
   },
   "landing": {
     "nav": {
