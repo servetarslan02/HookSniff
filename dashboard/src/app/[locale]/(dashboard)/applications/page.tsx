@@ -288,7 +288,7 @@ export default function ApplicationsPage() {
                 {/* Footer */}
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
                   <Link
-                    href={`/deliveries`}
+                    href={`/core`}
                     className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
                   >
                     See events →
