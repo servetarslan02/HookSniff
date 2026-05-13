@@ -4,12 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, type FeatureFlag } from '@/lib/api';
-import { useTranslations } from 'next-intl';
+// import { useTranslations } from 'next-intl'; // TODO: uncomment when i18n is added
 
 export default function FeatureFlagsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
-  const tc = useTranslations('common');
+  // const tc = useTranslations('common'); // TODO: i18n hardcoded strings below
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);

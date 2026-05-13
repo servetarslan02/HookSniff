@@ -1,11 +1,5 @@
 import { Suspense } from 'react';
-import type { Metadata } from 'next';
 import { PlaygroundPageContent } from './content';
-
-export const metadata: Metadata = {
-  title: 'Webhook Playground',
-  description: 'Test and debug webhooks in real-time with the HookSniff playground',
-};
 
 export default function PlaygroundPage() {
   return (
