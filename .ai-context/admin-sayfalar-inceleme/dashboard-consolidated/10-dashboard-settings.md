@@ -3,6 +3,7 @@
 > **Bölüm:** Ayarlar  
 > **İçerik:** Profil, Şifre, API Key, Bildirimler, Gizlilik, Tehlike  
 > **İnceleme Tarihi:** 2026-05-12  
+> **Güncelleme:** 2026-05-13 (kod değişiklikleriyle eşleştirildi)  
 > **Kaynak Dosyalar:** `29-ayarlar.md`
 
 ---
@@ -18,8 +19,8 @@
 
 ## Sayfa Yapısı
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/settings/page.tsx`  
-> Route: `/dashboard/settings`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/settings/page.tsx`  
+> Route: `/settings`
 
 6 ayrı bölüm (section bileşenleri):
 
@@ -53,6 +54,10 @@
 - GDPR uyumlu (PrivacyConsentSection)
 - Danger zone ayrılmış
 - i18n desteği
+- ConsentToggle: Backend'e bağlandı ✅ — `GET /auth/consent` ile durum çekme, `POST /auth/consent` ile kaydetme
+- NotificationSection: API'den veri çekiyor ✅ — `GET /portal/notifications` ile tercih çekme, localStorage fallback
+- setTimeout cleanup: 5 dosyada useRef + useEffect cleanup pattern ✅
+- twoFactorApi: api.ts'de tanımlı ✅ — enable/confirm/disable/getStatus
 
 ### 🔴 Eksiklikler
 - İki faktörlü doğrulama (2FA) ayarı
@@ -65,6 +70,35 @@
 
 ## 🔧 Yapılacaklar (2026-05-13)
 
+### ✅ Düzeltildi
+
+#### ~~BF-03: ConsentToggle API Çağırmıyor~~
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/settings/components/ConsentToggle.tsx`
+- **Durum:** ✅ DÜZELTİLDİ — Backend'e bağlandı
+- Sayfa yüklenirken `GET /auth/consent` endpoint'inden durum çekiyor
+- Toggle değişikliğinde `POST /auth/consent` endpoint'ine gönderiyor
+- Başarısız olursa eski değerine geri dönüyor (optimistic update + rollback)
+- localStorage ve cookie senkronizasyonu devam ediyor
+
+#### ~~BF-04: Bildirim Tercihleri Başlangıç Değerleri localStorage'dan~~
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/settings/components/NotificationSection.tsx`
+- **Durum:** ✅ DÜZELTİLDİ — API'den veri çekiyor
+- Sayfa yüklenirken `GET /portal/notifications` endpoint'inden tercihleri çekiyor
+- API başarısız olursa localStorage'a fallback yapıyor
+- Loading skeleton eklendi
+
+#### ~~ML-01: PasswordSection — setTimeout Cleanup Yok~~
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/settings/components/PasswordSection.tsx`
+- **Durum:** ✅ DÜZELTİLDİ — `useRef` + `useEffect` cleanup pattern uygulandı
+
+#### ~~ML-02: ApiKeySection — setTimeout Cleanup Yok~~
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/settings/components/ApiKeySection.tsx`
+- **Durum:** ✅ DÜZELTİLDİ — `useRef` + `useEffect` cleanup pattern uygulandı
+
+#### ~~ML-03: ProfileSection — setTimeout Cleanup Yok~~
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/settings/components/ProfileSection.tsx`
+- **Durum:** ✅ DÜZELTİLDİ — `useRef` + `useEffect` cleanup pattern uygulandı
+
 ### 🔴 KRİTİK: Backend-Frontend Uyumsuzluğu
 
 #### BF-01: 2FA Ayarları Eksik ⚠️ EN KRİTİK
@@ -76,7 +110,7 @@
   POST /v1/auth/2fa/verify   → Giriş sırasında 2FA doğrular
   POST /v1/auth/2fa/disable  → 2FA'yı kapatır (şifre + TOTP gerekli)
   ```
-- **Sorun:** Settings sayfasında 2FA bölümü yok. Müşteri 2FA'yı aktif edemiyor.
+- **Durum:** `twoFactorApi` api.ts'de tanımlı ✅ (enable/confirm/disable/getStatus). Settings sayfasında 2FA bölümü yok.
 - **Adımlar:**
   1. `settings/components/TwoFactorSection.tsx` oluştur
   2. `api.ts`'ye ekle:
