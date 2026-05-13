@@ -46,6 +46,11 @@ const nextConfig = {
         destination: '/:locale/applications',
         permanent: false,
       },
+      {
+        source: '/',
+        destination: '/applications',
+        permanent: false,
+      },
     ];
   },
 };
