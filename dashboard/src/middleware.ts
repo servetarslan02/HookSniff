@@ -4,11 +4,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const handleI18nRouting = createMiddleware(routing);
 
-const LOCALE_REGEX = new RegExp(`^/(${routing.locales.join('|')})`);
+// Match locale prefix WITH the trailing slash to avoid double-slash bug
+const LOCALE_REGEX = new RegExp(`^/(${routing.locales.join('|')})(/|$)`);
 
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const withoutLocale = pathname.replace(LOCALE_REGEX, '/') || '/';
+  const withoutLocale = pathname.replace(LOCALE_REGEX, '/');
 
   // Auth check for admin routes
   if (withoutLocale.startsWith('/admin')) {
@@ -28,7 +29,7 @@ export default function middleware(request: NextRequest) {
     '/faq', '/changelog', '/customers', '/alternatives', '/providers',
     '/use-cases', '/webhooks', '/what-is-a-webhook', '/security',
     '/privacy', '/terms', '/status', '/newsletter', '/build-vs-buy',
-    '/get-started', '/startups', '/health',
+    '/get-started', '/startups', '/health', '/analytics', '/logs', '/alerts', '/endpoints', '/deliveries', '/search', '/playground', '/signature-verifier', '/api-importer', '/webhook-builder', '/transforms', '/inbound', '/schemas', '/templates', '/portal-customize', '/portal-manage', '/rate-limiting', '/audit-log', '/sso', '/retry-policy', '/routing', '/custom-domain', '/team', '/notifications', '/applications', '/api-keys', '/billing', '/settings', '/service-tokens',
     // Consolidated routes (public)
     '/core', '/monitoring', '/devtools', '/content-mgmt', '/portal-section',
     '/security-section', '/routing-config', '/team-mgmt', '/billing-overview',
