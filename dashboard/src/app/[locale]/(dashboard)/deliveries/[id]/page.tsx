@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
@@ -26,6 +26,13 @@ export default function DeliveryDetailPage() {
   const [replaying, setReplaying] = useState(false);
   const [showReplayConfirm, setShowReplayConfirm] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const fetchData = useCallback(async () => {
     if (!token || !id) return;
@@ -68,7 +75,8 @@ export default function DeliveryDetailPage() {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedField(field);
-      setTimeout(() => setCopiedField(null), 2000);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setCopiedField(null), 2000);
     } catch {
       toast(t('toastCopyFailed'), 'error');
     }
