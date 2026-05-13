@@ -1,26 +1,41 @@
 'use client';
 
-import { useState } from 'react';
-import { Link, usePathname } from '@/i18n/navigation';
+import { useState, useRef, useEffect } from 'react';
+import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { AuthGuard } from '@/components/AuthGuard';
 import { NotificationCenter } from '@/components/NotificationCenter';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
   const t = useTranslations('nav');
   const tc = useTranslations('common');
   const locale = useLocale();
 
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   const toggleSection = (key: string) => {
     setCollapsedSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -65,6 +80,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Sidebar */}
       <aside
         className={clsx(
           'fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-auto',
@@ -119,33 +135,9 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             </div>
           ))}
         </nav>
-
-        <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium">
-                {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || '?'}
-              </div>
-            </div>
-            <div className="ml-3 flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                {user?.name || user?.email}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {user?.email}
-              </p>
-            </div>
-            <button
-              onClick={logout}
-              className="ml-2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-              title={tc('logout')}
-            >
-              🚪
-            </button>
-          </div>
-        </div>
       </aside>
 
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
@@ -153,8 +145,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         />
       )}
 
+      {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="flex items-center justify-between h-16 px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 lg:px-6">
+        {/* Header */}
+        <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 lg:px-6">
           <button
             className="p-2 text-gray-500 lg:hidden"
             onClick={() => setSidebarOpen(true)}
@@ -162,12 +156,74 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             ☰
           </button>
           <div className="flex-1" />
-          <div className="flex items-center space-x-4">
+
+          <div className="flex items-center gap-3">
             <NotificationCenter />
             <LanguageSwitcher />
+            <ThemeToggle />
+
+            {/* Profile dropdown */}
+            <div className="relative" ref={profileRef}>
+              <button
+                type="button"
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                  {(user?.name?.charAt(0) || user?.email?.charAt(0) || '?').toUpperCase()}
+                </div>
+              </button>
+
+              {profileOpen && (
+                <div className="absolute right-0 top-full mt-1 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+                  <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {user?.name || user?.email}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {user?.email}
+                    </p>
+                  </div>
+                  <Link
+                    href="/settings-section"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    ⚙️ {t('settingsSection')}
+                  </Link>
+                  <a
+                    href="https://hooksniff.vercel.app/docs"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    📖 {tc('documentation') || 'Documentation'}
+                  </a>
+                  <a
+                    href="https://hooksniff.vercel.app/docs/api-reference"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    🔗 API Reference
+                  </a>
+                  <div className="border-t border-gray-100 dark:border-gray-700 mt-1" />
+                  <button
+                    type="button"
+                    onClick={() => { setProfileOpen(false); logout(); router.push('/login'); }}
+                    className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                  >
+                    🚪 {tc('logout')}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
+        {/* Page content */}
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
           <EmailVerificationBanner />
           <ErrorBoundary>
