@@ -76,7 +76,7 @@ fn init_otel(
         .build()
     {
         Ok(exporter) => {
-            tracing::info!("✅ OTLP span exporter built successfully (HTTP/proto)");
+            tracing::info!("✅ OTLP span exporter built successfully (HTTP/JSON)");
             exporter
         }
         Err(e) => {
