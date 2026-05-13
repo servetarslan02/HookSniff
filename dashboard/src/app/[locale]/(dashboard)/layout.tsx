@@ -80,17 +80,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         { name: t('auditLog'), href: '/audit-log', icon: '📜' },
       ],
     },
-    ...(user?.is_admin
-      ? [
-          {
-            key: 'admin',
-            label: t('sectionAdmin') || 'Yönetim',
-            items: [
-              { name: t('adminPanel') || 'Admin Panel', href: '/admin', icon: '⚡' },
-            ],
-          },
-        ]
-      : []),
   ];
 
   return (
