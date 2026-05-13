@@ -106,7 +106,7 @@ pub struct UserDetail {
     pub plan: String,
     pub is_active: bool,
     pub is_admin: bool,
-    pub webhook_limit: i32,
+    pub webhook_limit: i64,
     pub webhook_count: i64,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub endpoints: Vec<EndpointSummary>,
