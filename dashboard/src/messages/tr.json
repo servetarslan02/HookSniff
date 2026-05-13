@@ -158,7 +158,10 @@
     "adminRevenue": "Gelir",
     "adminSystem": "Sistem",
     "adminActivity": "Aktivite",
-    "adminSettings": "Ayarlar"
+    "adminSettings": "Ayarlar",
+    "sectionUserPanel": "Kullanıcı Paneli",
+    "adminOverview": "Genel Bakış",
+    "userDashboard": "Dashboard"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
@@ -1445,7 +1448,8 @@
     "weekComparison": "Haftalık Karşılaştırma",
     "weekVsLastWeek": "Bu hafta vs geçen hafta",
     "whsecSecret": "whsec_ Secret Format",
-    "widgetCustomization": "Widget Özelleştirme"
+    "widgetCustomization": "Widget Özelleştirme",
+    "userPanel": "Kullanıcı Paneli"
   },
   "landing": {
     "nav": {
