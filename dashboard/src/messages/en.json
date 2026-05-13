@@ -2998,6 +2998,8 @@
   "playgroundPublic": {
     "title": "Playground",
     "webhookPlayground": "Webhook Playground",
+    "subtitle": "Get a unique URL, send webhooks, inspect requests in real-time. No signup required.",
+    "expiresIn": "Expires in 24h",
     "sendTest": "Send a test webhook",
     "eventType": "Event type",
     "quickSamples": "Quick samples",

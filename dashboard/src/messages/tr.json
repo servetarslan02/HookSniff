@@ -2995,8 +2995,10 @@
     "pizzaWebhook": "Pizza webhook'u: Sipariş verdiğinizde mutfağa otomatik bildirim gider"
   },
   "playgroundPublic": {
-    "title": "Alan",
-    "webhookPlayground": "Webhook Alanı",
+    "title": "Playground",
+    "webhookPlayground": "Webhook Playground",
+    "subtitle": "Benzersiz bir URL alın, webhook'lar gönderin, istekleri gerçek zamanlı olarak inceleyin. Kayıt gerekmez.",
+    "expiresIn": "24 saat geçerli",
     "sendTest": "Test webhook gönder",
     "eventType": "Olay türü",
     "quickSamples": "Hızlı örnekler",
@@ -3008,7 +3010,7 @@
     "headers": "Başlıklar",
     "body": "Gövde",
     "ipAddress": "IP Adresi",
-    "api": "Alan API",
+    "api": "Playground API",
     "noSignup": "Kayıt gerekmez",
     "restApi": "REST API",
     "rateLimited": "Hız sınırlı",
