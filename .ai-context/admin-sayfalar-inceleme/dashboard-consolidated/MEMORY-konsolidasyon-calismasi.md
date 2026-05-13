@@ -139,8 +139,8 @@
 ### Düşük Öncelik
 | # | İş | Açıklama |
 |---|-----|----------|
-| 1 | Playground raw fetch timeout | 7 yerde `fetch()` kullanılıyor, `apiFetch`'e çevrilmeli (public endpoint, kasıtlı olabilir) |
-| 2 | Feature Flags CRUD UI | Backend hazır ama frontend'de yönetim UI'ı yok |
+| 1 | ~~Playground raw fetch timeout~~ | ✅ TAMAMLANDI — 4 fetch çağrısına 15s timeout eklendi |
+| 2 | ~~Feature Flags CRUD UI~~ | ✅ TAMAMLANDI — `/admin/feature-flags` sayfası oluşturuldu (CRUD + toggle + rollout + plan filter) |
 | 3 | Widget özelleştirme | Sürükle-bırak dashboard düzenleme |
 | 4 | Grafik zoom/drill-down | Chart library bağımlı |
 
