@@ -59,9 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-    // Verify session by calling /auth/me (cookie is sent automatically)
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
-    fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
+    // Verify session by calling /auth/me via proxy (cookie is sent automatically)
+    fetch('/api/auth/me')
       .then((res) => {
         if (res.ok) return res.json();
         throw new Error('Not authenticated');
@@ -104,11 +103,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
-    const res = await fetch(`${API_BASE}/auth/login`, {
+    const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
     if (!res.ok) {
@@ -122,11 +119,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [persistAuth]);
 
   const register = useCallback(async (email: string, password: string, name?: string) => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
-    const res = await fetch(`${API_BASE}/auth/register`, {
+    const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({ email, password, name }),
     });
     if (!res.ok) {
@@ -141,10 +136,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     // Call backend logout to clear HttpOnly cookie
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
-    fetch(`${API_BASE}/auth/logout`, {
+    fetch('/api/auth/logout', {
       method: 'POST',
-      credentials: 'include',
     }).catch((err) => console.warn('Logout request failed:', err)); // dev only
     setToken(null);
     setUser(null);
