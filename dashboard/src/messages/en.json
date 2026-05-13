@@ -1566,7 +1566,8 @@
       "developerDesc": "Perfect for trying out HookSniff. No setup needed, free forever for side projects.",
       "startupDesc": "Enhance your webhook experience with new features and grow your startup!",
       "proDesc": "Unleash your data connectivity with enterprise features and better support.",
-      "enterpriseDesc": "Need more? Need something different? Let us know, we will build a custom plan for you."
+      "enterpriseDesc": "Need more? Need something different? Let us know, we will build a custom plan for you.",
+      "customPricing": "Custom Pricing"
     },
     "footer": {
       "github": "GitHub",
@@ -2068,7 +2069,8 @@
     "applications": "Applications",
     "eventTypes": "Event types",
     "subscriptions": "Subscriptions",
-    "overagePerEvent": "Overage per event"
+    "overagePerEvent": "Overage per event",
+    "custom": "Custom"
   },
   "pricingFaq": [
     {
