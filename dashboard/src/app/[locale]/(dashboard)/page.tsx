@@ -1,7 +1,9 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { DashboardOverview } from './DashboardOverview';
-
+// Dashboard root redirects to /core
+// This page must NOT be a client component — it causes ENOENT on Vercel
+// because Next.js 15 doesn't generate page_client-reference-manifest.js
+// for route group root pages.
 export default function DashboardPage() {
-  return <DashboardOverview />;
+  redirect('/core');
 }

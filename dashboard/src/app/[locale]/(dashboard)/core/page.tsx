@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
 
-const DashboardOverview = dynamic(() => import('../page'), { ssr: false });
+const DashboardOverview = dynamic(() => import('../DashboardOverview').then(mod => ({ default: mod.DashboardOverview })), { ssr: false });
 const EndpointsPage = dynamic(() => import('../endpoints/page'), { ssr: false });
 const DeliveriesPage = dynamic(() => import('../deliveries/page'), { ssr: false });
 const SearchPage = dynamic(() => import('../search/page'), { ssr: false });
