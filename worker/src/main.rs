@@ -497,7 +497,7 @@ async fn process_pending(
             // Per-endpoint concurrency: get or create semaphore for this endpoint
             let endpoint_permit = {
                 let mut map = endpoint_semaphores.lock().await;
-                let sem = map.entry(endpoint_id).or_insert_with(|| {
+                let sem = map.entry(item.endpoint_id).or_insert_with(|| {
                     std::sync::Arc::new(tokio::sync::Semaphore::new(PER_ENDPOINT_CONCURRENCY_LIMIT))
                 }).clone();
                 sem.acquire().await.expect("endpoint semaphore closed")
