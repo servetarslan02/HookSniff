@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 /**
  * OAuth callback page.
@@ -15,7 +15,6 @@ import { useTranslations, useLocale } from 'next-intl';
  */
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const locale = useLocale();
   const t = useTranslations('error');
   const [error, setError] = useState<string | null>(null);
 
