@@ -2,7 +2,7 @@
 
 > **Tarih:** 2026-05-13  
 > **Durum:** TAMAMLANDI  
-> **Oturum:** 2 oturum (1. oturum: API düzeltmeleri, 2. oturum: konsolidasyon)
+> **Oturum:** 3 oturum (1. oturum: API düzeltmeleri, 2. oturum: konsolidasyon, 3. oturum: build + i18n)
 
 ---
 
@@ -111,6 +111,34 @@
 
 ---
 
+### 8. Build Düzeltmeleri + i18n (3. Oturum — 2026-05-13 22:25 GMT+8)
+
+**Dosyalar:**
+- `playground/page.tsx`: metadata export kaldırıldı (client component çakışması)
+- `feature-flags/page.tsx`: kullanılmayan `tc` ve `useTranslations` kaldırıldı
+- `layout.tsx`: hardcoded sidebar isimleri i18n ile değiştirildi
+- `en.json`: 10 konsolide sayfa i18n key'i eklendi
+- `tr.json`: 10 konsolide sayfa i18n key'i eklendi
+
+**i18n Key'leri:**
+| Key | EN | TR |
+|-----|----|----|
+| core | Core | Çekirdek |
+| monitoring | Monitoring | İzleme |
+| devtools | DevTools | Geliştirici Araçları |
+| contentMgmt | Content | İçerik |
+| portalSection | Portal | Portal |
+| securitySection | Security | Güvenlik |
+| routingConfig | Routing | Yönlendirme |
+| teamMgmt | Team | Ekip |
+| billingOverview | Billing | Faturalandırma |
+| settingsSection | Settings | Ayarlar |
+
+**Build:** 216 sayfa, başarılı ✅  
+**Commit:** 8681c7b1 — main branch
+
+---
+
 ## 📊 Dosya Değişiklik Listesi
 
 | Dosya | Değişiklik |
@@ -130,7 +158,11 @@
 | `(dashboard)/team-mgmt/page.tsx` | Yeni konsolide sayfa |
 | `(dashboard)/billing-overview/page.tsx` | Yeni konsolide sayfa |
 | `(dashboard)/settings-section/page.tsx` | Yeni konsolide sayfa |
-| `(dashboard)/layout.tsx` | Sidebar güncellendi |
+| `(dashboard)/layout.tsx` | Sidebar güncellendi + i18n |
+| `(dashboard)/playground/page.tsx` | metadata export kaldırıldı |
+| `admin/feature-flags/page.tsx` | unused import kaldırıldı |
+| `messages/en.json` | 10 konsolide i18n key |
+| `messages/tr.json` | 10 konsolide i18n key |
 
 ---
 
@@ -139,39 +171,35 @@
 ### Düşük Öncelik
 | # | İş | Açıklama |
 |---|-----|----------|
-| 1 | ~~Playground raw fetch timeout~~ | ✅ TAMAMLANDI — 4 fetch çağrısına 15s timeout eklendi |
-| 2 | ~~Feature Flags CRUD UI~~ | ✅ TAMAMLANDI — `/admin/feature-flags` sayfası oluşturuldu (CRUD + toggle + rollout + plan filter) |
-| 3 | ~~2FA Ayarları UI~~ | ✅ TAMAMLANDI — `TwoFactorSection.tsx` oluşturuldu, settings sayfasına eklendi |
-| 4 | ~~Endpoint Toggle~~ | ✅ TAMAMLANDI — endpoints sayfasına aktif/pasif toggle eklendi |
-| 5 | ~~Alert Düzenleme + Toggle~~ | ✅ TAMAMLANDI — alerts sayfasına edit modal + toggle eklendi |
-| 6 | ~~Secret Rotasyonu UI~~ | ✅ TAMAMLANDI — endpoints sayfasına rotate butonu + yeni secret modal eklendi |
-| 7 | ~~Batch Replay UI~~ | ✅ TAMAMLANDI — deliveries sayfasına checkbox + batch replay butonu eklendi |
-| 8 | ~~SSO Test Butonu~~ | ✅ TAMAMLANDI — SSO sayfasına test connection butonu eklendi |
 | 9 | Widget özelleştirme | Sürükle-bırak dashboard düzenleme |
 | 10 | Grafik zoom/drill-down | Chart library bağımlı |
 
-### Build Doğrulama
+### Deploy Doğrulama
 | # | İş | Açıklama |
 |---|-----|----------|
-| 1 | `npm install` + `npm run build` | node_modules kurulu değil, build testi yapılamadı |
-| 2 | Vercel deploy kontrolü | Push edildi, Vercel'de deploy edince kontrol et |
+| 1 | Vercel deploy kontrolü | Push edildi, Vercel'de deploy edince kontrol et |
+| 2 | Feature-flags toast i18n | Hardcoded EN mesajlar, TODO olarak işaretlendi |
 
 ---
 
 ## 📝 Git Geçmişi
 
 ```
+8681c7b1 fix: build errors + konsolide sayfa i18n
+2bdf544b feat: secret rotasyonu, batch replay, SSO test butonu
+e177ea92 feat: 2FA ayarlari, endpoint toggle, alert duzenleme
+a4ec037f docs: memory dosyasi guncellendi
+ee2840df feat: Feature Flags CRUD UI + Playground timeout + i18n
+37c2bf8e docs: konsolidasyon memory dosyası eklendi
 00c7a11d feat: 30 sayfayi 10 konsolide sayfada birlestir
 667244fd feat: eksik API metodlari, ConsentToggle/NotificationSection backend baglantisi, Dashboard Overview sayfasi
-1b552677 fix: dashboard API hatalari ve memory leak duzeltmeleri (kismi)
-738e84d0 docs: 34 dashboard inceleme dosyasini 10 konsolide dosyaya birlestir
 ```
 
 ---
 
 ## 🔧 Sonraki Oturum İçin Notlar
 
-1. Build testi yapılmalı (Vercel deploy kontrolü)
-2. Konsolide review dosyaları (`dashboard-consolidated/`) güncel kodla güncellenmeli
-3. Eski 30 sayfanın sidebar'dan kaldırılmasıdług ama URL'leri çalışıyor — ileride silinebilir
-4. i18n: Konsolide sayfalar için Türkçe/İngilizce çeviriler eklenmeli
+1. Vercel deploy kontrolü — Servet yapacak
+2. Deploy sonrası: login, sidebar, konsolide sayfalar, dil geçişi test et
+3. Widget özelleştirme (sürükle-bırak) — düşük öncelik
+4. Grafik zoom/drill-down — chart library bağımlı
