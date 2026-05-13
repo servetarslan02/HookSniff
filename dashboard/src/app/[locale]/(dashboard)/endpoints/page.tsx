@@ -29,7 +29,9 @@ export default function EndpointsPage() {
     if (!token) return;
     endpointsApi.list(token)
       .then(setEndpoints)
-      .catch(() => {})
+      .catch((err: unknown) => {
+        setError((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToLoad'));
+      })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -112,6 +114,18 @@ export default function EndpointsPage() {
             <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-1/2"></div>
           </div>
         ))}
+      </div>
+    );
+  }
+
+  if (error && endpoints.length === 0) {
+    return (
+      <div className="glass-card p-12 text-center">
+        <div className="text-4xl mb-3">⚠️</div>
+        <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error}</p>
+        <button type="button" onClick={() => { setError(''); setLoading(true); if (token) endpointsApi.list(token).then(setEndpoints).catch(() => {}).finally(() => setLoading(false)); }} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
+          {tc('retry')}
+        </button>
       </div>
     );
   }
