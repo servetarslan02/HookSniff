@@ -1,4 +1,7 @@
-# Dependabot — Otomatik güvenlik güncelleştirmeleri
+# Dependabot — DEVRE DIŞI bırakıldı (Oturum 149)
+# Sebep: Vercel Hobby plan günlük 100 deploy limiti aşıldı
+# Her PR ayrı deploy tetikliyordu. Manuel güncellemeler yeterli.
+# Tekrar açmak için: open-pull-requests-limit değerlerini 3 yap
 version: 2
 updates:
   # Rust (API + Worker)
@@ -7,7 +10,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "security"
@@ -18,7 +21,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "security"
@@ -29,7 +32,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "ci"
