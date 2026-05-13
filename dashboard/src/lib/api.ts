@@ -660,7 +660,7 @@ export const teamsApi = {
     apiFetch<TeamMember[]>(`/teams/${teamId}/members`, { token }),
 
   inviteMember: (token: string, teamId: string, data: { email: string; role: string }) =>
-    apiFetch<{ success: boolean }>(`/teams/${teamId}/members`, { method: 'POST', body: data, token }),
+    apiFetch<{ success: boolean }>(`/teams/${teamId}/invite`, { method: 'POST', body: data, token }),
 
   removeMember: (token: string, teamId: string, memberId: string) =>
     apiFetch<{ success: boolean }>(`/teams/${teamId}/members/${memberId}`, { method: 'DELETE', token }),

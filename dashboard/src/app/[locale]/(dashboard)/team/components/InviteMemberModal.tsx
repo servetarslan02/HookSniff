@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-const ROLE_OPTIONS = ['owner', 'admin', 'member'] as const;
+const ROLE_OPTIONS = ['admin', 'editor', 'viewer'] as const;
 
 function roleLabel(t: ReturnType<typeof useTranslations>, role: string): string {
-  const map: Record<string, string> = { owner: t('roleOwner'), admin: t('roleAdmin'), member: t('roleMember') };
+  const map: Record<string, string> = { admin: t('roleAdmin'), editor: t('roleEditor', { defaultValue: 'Editor' }), viewer: t('roleViewer', { defaultValue: 'Viewer' }) };
   return map[role] || role;
 }
 
@@ -22,7 +22,7 @@ export function InviteMemberModal({
   const t = useTranslations('team');
   const tc = useTranslations('common');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState('member');
+  const [role, setRole] = useState('viewer');
   const [inviting, setInviting] = useState(false);
 
   if (!open) return null;
@@ -33,7 +33,7 @@ export function InviteMemberModal({
     try {
       await onInvite(email.trim(), role);
       setEmail('');
-      setRole('member');
+      setRole('viewer');
       onClose();
     } finally {
       setInviting(false);
@@ -65,7 +65,7 @@ export function InviteMemberModal({
               onChange={(e) => setRole(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
             >
-              {ROLE_OPTIONS.filter((r) => r !== 'owner').map((r) => (
+              {ROLE_OPTIONS.map((r) => (
                 <option key={r} value={r}>{roleLabel(t, r)}</option>
               ))}
             </select>
