@@ -284,8 +284,15 @@ function HowItWorks() {
 export function HomeContent() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const router = useRouter();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const locale = useLocale();
+
+  // Admin users go to admin panel
+  useEffect(() => {
+    if (user?.is_admin) {
+      router.replace('/admin');
+    }
+  }, [user, router]);
   const tNav = useTranslations('landing.nav');
   const tHero = useTranslations('landing.hero');
   const tFeatures = useTranslations('landing.features');
