@@ -77,13 +77,48 @@ const nextConfig = {
         source: '/api/health',
         destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/health',
       },
-      {
-        source: '/api/:path*',
-        destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/:path*',
-      },
+      // Auth
+      { source: '/api/auth/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/:path*' },
+      // Endpoints
+      { source: '/api/endpoints/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints/:path*' },
+      // Webhooks / Deliveries
+      { source: '/api/webhooks/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/:path*' },
+      // Stats
+      { source: '/api/stats/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/stats/:path*' },
+      // Billing
+      { source: '/api/billing/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing/:path*' },
+      // Team
+      { source: '/api/team/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/team/:path*' },
+      // API Keys
+      { source: '/api/api-keys/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/api-keys/:path*' },
+      // Settings
+      { source: '/api/settings/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/settings/:path*' },
+      // Notifications
+      { source: '/api/notifications/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/notifications/:path*' },
+      // Inbound
+      { source: '/api/inbound/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/inbound/:path*' },
+      // Schemas
+      { source: '/api/schemas/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/schemas/:path*' },
+      // Admin
+      { source: '/api/admin/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/admin/:path*' },
+      // Alerts
+      { source: '/api/alerts/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/alerts/:path*' },
+      // Custom Domains
+      { source: '/api/custom-domains/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/custom-domains/:path*' },
+      // SSO
+      { source: '/api/sso/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/sso/:path*' },
+      // Teams
+      { source: '/api/teams/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/teams/:path*' },
+      // Deliveries (individual)
+      { source: '/api/deliveries/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/deliveries/:path*' },
+      // Service Tokens
+      { source: '/api/service-tokens/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/service-tokens/:path*' },
+      // GDPR
+      { source: '/api/gdpr/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/gdpr/:path*' },
     ];
   },
 };
 
 module.exports = withNextIntl(nextConfig);
 // Build cache invalidation — Wed May 14 01:03 AM CST 2026
+
