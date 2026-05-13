@@ -6,14 +6,9 @@ const handleI18nRouting = createMiddleware(routing);
 
 const LOCALE_REGEX = new RegExp(`^/(${routing.locales.join('|')})`);
 
-function getLocaleFromPath(pathname: string): string {
-  return pathname.match(LOCALE_REGEX)?.[1] || routing.defaultLocale || 'en';
-}
-
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const withoutLocale = pathname.replace(LOCALE_REGEX, '/') || '/';
-  const locale = getLocaleFromPath(pathname);
 
   // Redirect old /dashboard/* URLs to root with cookie
   if (withoutLocale.startsWith('/dashboard')) {
