@@ -27,6 +27,50 @@ const nextConfig = {
       ],
     }];
   },
+  async redirects() {
+    return [
+      // ── Core ──
+      { source: '/endpoints', destination: '/core', permanent: false },
+      { source: '/deliveries', destination: '/core', permanent: false },
+      { source: '/search', destination: '/core', permanent: false },
+      // ── Monitoring ──
+      { source: '/logs', destination: '/monitoring', permanent: false },
+      { source: '/health', destination: '/monitoring', permanent: false },
+      { source: '/alerts', destination: '/monitoring', permanent: false },
+      { source: '/analytics', destination: '/monitoring', permanent: false },
+      // ── DevTools ──
+      { source: '/playground', destination: '/devtools', permanent: false },
+      { source: '/signature-verifier', destination: '/devtools', permanent: false },
+      { source: '/api-importer', destination: '/devtools', permanent: false },
+      { source: '/webhook-builder', destination: '/devtools', permanent: false },
+      // ── Content Mgmt ──
+      { source: '/transforms', destination: '/content-mgmt', permanent: false },
+      { source: '/inbound', destination: '/content-mgmt', permanent: false },
+      { source: '/schemas', destination: '/content-mgmt', permanent: false },
+      { source: '/templates', destination: '/content-mgmt', permanent: false },
+      // ── Portal ──
+      { source: '/portal-customize', destination: '/portal-section', permanent: false },
+      { source: '/portal-manage', destination: '/portal-section', permanent: false },
+      // ── Security ──
+      { source: '/rate-limiting', destination: '/security-section', permanent: false },
+      { source: '/audit-log', destination: '/security-section', permanent: false },
+      { source: '/sso', destination: '/security-section', permanent: false },
+      // ── Routing Config ──
+      { source: '/retry-policy', destination: '/routing-config', permanent: false },
+      { source: '/routing', destination: '/routing-config', permanent: false },
+      { source: '/custom-domain', destination: '/routing-config', permanent: false },
+      // ── Team ──
+      { source: '/team', destination: '/team-mgmt', permanent: false },
+      { source: '/notifications', destination: '/team-mgmt', permanent: false },
+      { source: '/applications', destination: '/team-mgmt', permanent: false },
+      // ── Billing ──
+      { source: '/api-keys', destination: '/billing-overview', permanent: false },
+      { source: '/billing', destination: '/billing-overview', permanent: false },
+      // ── Settings ──
+      { source: '/settings', destination: '/settings-section', permanent: false },
+      { source: '/service-tokens', destination: '/settings-section', permanent: false },
+    ];
+  },
   async rewrites() {
     return [
       {
