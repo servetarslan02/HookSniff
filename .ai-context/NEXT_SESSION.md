@@ -1,20 +1,20 @@
-# NEXT_SESSION.md — Oturum 148
+# NEXT_SESSION.md — Oturum 149
 
-> Son güncelleme: 2026-05-14 01:00 GMT+8
+> Son güncelleme: 2026-05-14 01:55 GMT+8
 
 ## Kaldığımız Yer
-- **Rota konsolidasyonu kod olarak tamamlandı** ✅ ama **deploy edilemedi** ❌
-- Vercel Hobby plan rate limit aşıldı
-- Mevcut production: `5ptc6DHK4` — Ready (commit `1b55267`)
+- **ENOENT page_client-reference-manifest.js hatası düzeltildi** ✅
+- `next/dynamic` ile `ssr: false` kullanıldı — Vercel'de manifest dosyası sorunu bypass edildi
+- Push edilen commit: `1015bbbf` — Vercel deploy tetiklenmeli
+- Mevcut production: commit `1b55267` (eski)
 
-## Son Yapılan İş (Oturum 147-148)
-1. 30 eski rota → 10 konsolide rota redirect eklendi (next.config.js)
-2. 12 dosyada eski route linkleri güncellendi
-3. middleware publicPaths'a konsolide rotalar eklendi
-4. dashboard/vercel.json temizlendi
-5. Vercel'e Google ile giriş yapıldı (2FA ile)
-6. Rate limit sorunu tespit edildi — deploy edilemedi
-7. Commit squash: 5 commit → 1 (`87e5f5f3`, author: servetarslan02)
+## Son Yapılan İş (Oturum 149 — OpenClaw)
+1. Servet OpenClaw'a giriş yaptı, `.ai-context` hafıza sistemi okundu
+2. ENOENT hatası teşhis edildi: `(dashboard)/page.tsx` → client component import → manifest eksik
+3. `next/dynamic` + `ssr: false` ile düzeltildi (1 dosya: `page.tsx`)
+4. Build testi başarılı (216 sayfa)
+5. Commit `1015bbbf` push edildi → Vercel deploy tetiklendi
+6. ⚠️ Servet GitHub token ve Google şifresini sohbette paylaştı — revoke önerildi
 
 ## 🔴 Deploy Sorunu
 - **Sebep 1:** Vercel Hobby plan günlük deploy limiti dolmuş
