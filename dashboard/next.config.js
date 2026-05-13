@@ -86,3 +86,4 @@ const nextConfig = {
 module.exports = withNextIntl(nextConfig);
 // Build cache invalidation — Wed May 14 01:03 AM CST 2026
 
+// deploy trigger Thu May 14 03:05:08 AM CST 2026
