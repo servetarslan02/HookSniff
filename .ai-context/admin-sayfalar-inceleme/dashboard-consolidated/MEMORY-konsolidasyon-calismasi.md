@@ -141,8 +141,11 @@
 |---|-----|----------|
 | 1 | ~~Playground raw fetch timeout~~ | ✅ TAMAMLANDI — 4 fetch çağrısına 15s timeout eklendi |
 | 2 | ~~Feature Flags CRUD UI~~ | ✅ TAMAMLANDI — `/admin/feature-flags` sayfası oluşturuldu (CRUD + toggle + rollout + plan filter) |
-| 3 | Widget özelleştirme | Sürükle-bırak dashboard düzenleme |
-| 4 | Grafik zoom/drill-down | Chart library bağımlı |
+| 3 | ~~2FA Ayarları UI~~ | ✅ TAMAMLANDI — `TwoFactorSection.tsx` oluşturuldu, settings sayfasına eklendi |
+| 4 | ~~Endpoint Toggle~~ | ✅ TAMAMLANDI — endpoints sayfasına aktif/pasif toggle eklendi |
+| 5 | ~~Alert Düzenleme + Toggle~~ | ✅ TAMAMLANDI — alerts sayfasına edit modal + toggle eklendi |
+| 6 | Widget özelleştirme | Sürükle-bırak dashboard düzenleme |
+| 7 | Grafik zoom/drill-down | Chart library bağımlı |
 
 ### Build Doğrulama
 | # | İş | Açıklama |

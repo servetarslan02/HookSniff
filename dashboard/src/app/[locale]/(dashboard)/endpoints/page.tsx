@@ -22,6 +22,7 @@ export default function EndpointsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const t = useTranslations('endpoints');
   const tc = useTranslations('common');
 
@@ -84,6 +85,20 @@ export default function EndpointsPage() {
       setSelected(new Set());
     } else {
       setSelected(new Set(endpoints.map((ep) => ep.id)));
+    }
+  };
+
+  const handleToggleActive = async (ep: Endpoint) => {
+    if (!token) return;
+    setTogglingId(ep.id);
+    try {
+      await endpointsApi.update(token, ep.id, { is_active: !ep.is_active });
+      setEndpoints((prev) => prev.map((e) => e.id === ep.id ? { ...e, is_active: !e.is_active } : e));
+      toast(ep.is_active ? t('endpointDisabled', { defaultValue: 'Endpoint disabled' }) : t('endpointEnabled', { defaultValue: 'Endpoint enabled' }), 'success');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : tc('error'), 'error');
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -244,7 +259,18 @@ export default function EndpointsPage() {
                     <span className="font-mono text-sm text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-3 py-1 rounded-lg">
                       {ep.id.slice(0, 12)}…
                     </span>
-                    <span className={`w-2 h-2 rounded-full ${ep.is_active ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                    {/* Active/Inactive Toggle */}
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={ep.is_active}
+                      onClick={() => handleToggleActive(ep)}
+                      disabled={togglingId === ep.id}
+                      className={`relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${ep.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'} ${togglingId === ep.id ? 'opacity-60' : ''}`}
+                      title={ep.is_active ? t('disable', { defaultValue: 'Disable' }) : t('enable', { defaultValue: 'Enable' })}
+                    >
+                      <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${ep.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
+                    </button>
                     <span className="text-xs text-gray-500 dark:text-slate-400">{ep.is_active ? t('active') : t('inactive')}</span>
                   </div>
                   <div className="text-sm font-mono text-gray-900 dark:text-white mb-1">{ep.url}</div>
