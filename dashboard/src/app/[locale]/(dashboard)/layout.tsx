@@ -28,20 +28,38 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const sections = [
     {
-      key: 'main',
+      key: 'core',
       label: t('sectionCore'),
       items: [
         { name: t('dashboard'), href: '/', icon: '📊' },
-        { name: `🔗 ${t('core')}`, href: '/core', icon: '' },
-        { name: `📡 ${t('monitoring')}`, href: '/monitoring', icon: '' },
-        { name: `🛠️ ${t('devtools')}`, href: '/devtools', icon: '' },
-        { name: `📐 ${t('contentMgmt')}`, href: '/content-mgmt', icon: '' },
-        { name: `🖼️ ${t('portalSection')}`, href: '/portal-section', icon: '' },
-        { name: `🔒 ${t('securitySection')}`, href: '/security-section', icon: '' },
-        { name: `🔀 ${t('routingConfig')}`, href: '/routing-config', icon: '' },
-        { name: `👥 ${t('teamMgmt')}`, href: '/team-mgmt', icon: '' },
-        { name: `💳 ${t('billingOverview')}`, href: '/billing-overview', icon: '' },
-        { name: `⚙️ ${t('settingsSection')}`, href: '/settings-section', icon: '' },
+        { name: t('core'), href: '/core', icon: '🔗' },
+        { name: t('monitoring'), href: '/monitoring', icon: '📡' },
+      ],
+    },
+    {
+      key: 'tools',
+      label: t('sectionTools'),
+      items: [
+        { name: t('devtools'), href: '/devtools', icon: '🛠️' },
+        { name: t('contentMgmt'), href: '/content-mgmt', icon: '📐' },
+        { name: t('portalSection'), href: '/portal-section', icon: '🖼️' },
+      ],
+    },
+    {
+      key: 'advanced',
+      label: t('sectionAdvanced'),
+      items: [
+        { name: t('securitySection'), href: '/security-section', icon: '🔒' },
+        { name: t('routingConfig'), href: '/routing-config', icon: '🔀' },
+        { name: t('teamMgmt'), href: '/team-mgmt', icon: '👥' },
+      ],
+    },
+    {
+      key: 'account',
+      label: t('sectionAccount'),
+      items: [
+        { name: t('billingOverview'), href: '/billing-overview', icon: '💳' },
+        { name: t('settingsSection'), href: '/settings-section', icon: '⚙️' },
       ],
     },
   ];
