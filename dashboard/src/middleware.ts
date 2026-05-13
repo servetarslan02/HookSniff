@@ -37,6 +37,11 @@ function isPublicRoute(pathname: string): boolean {
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Root redirect to /applications
+  if (pathname === '/' || pathname === '/en' || pathname === '/tr') {
+    return NextResponse.redirect(new URL('/applications', request.url));
+  }
+
   // Redirect old locale-prefixed URLs: /tr/deliveries → /deliveries
   if (LOCALE_REGEX.test(pathname)) {
     const oldLocale = pathname.match(LOCALE_REGEX)?.[1];
