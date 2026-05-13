@@ -10,11 +10,6 @@ export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const withoutLocale = pathname.replace(LOCALE_REGEX, '/') || '/';
 
-  // Root redirect to /applications
-  if (pathname === '/' || pathname === '/en' || pathname === '/tr') {
-    return NextResponse.redirect(new URL('/applications', request.url));
-  }
-
   // Auth check for admin routes
   if (withoutLocale.startsWith('/admin')) {
     const authCookie = request.cookies.get('hooksniff_token');
