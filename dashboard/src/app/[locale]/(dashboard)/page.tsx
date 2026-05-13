@@ -42,6 +42,7 @@ export default function DashboardPage() {
   const [showWidgetSettings, setShowWidgetSettings] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | '90d'>('7d');
 
   const loadData = useCallback(async () => {
     if (!token) return;
@@ -49,7 +50,7 @@ export default function DashboardPage() {
     try {
       const [statsRes, trendRes, deliveriesRes, endpointsRes] = await Promise.allSettled([
         statsApi.get(token),
-        analyticsApi.deliveryTrend(token, '7d'),
+        analyticsApi.deliveryTrend(token, timeRange),
         webhooksApi.list(token, { page: 1 }),
         endpointsApi.list(token),
       ]);
@@ -63,7 +64,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, timeRange]);
 
   useEffect(() => {
     loadData();
@@ -264,8 +265,11 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <ChartCard
-            title={t('deliveryTrends', { defaultValue: 'Delivery Trends (7d)' })}
-            subtitle={t('deliveryTrendsDesc', { defaultValue: 'Successful vs failed deliveries over the last 7 days' })}
+            title={t('deliveryTrends', { defaultValue: 'Delivery Trends' })}
+            subtitle={t('deliveryTrendsDesc', { defaultValue: 'Successful vs failed deliveries over time' })}
+            showTimeRange
+            timeRange={timeRange}
+            onTimeRangeChange={setTimeRange}
           >
             <div className="h-72">
               {loading ? (
