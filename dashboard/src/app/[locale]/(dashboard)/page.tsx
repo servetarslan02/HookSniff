@@ -7,7 +7,6 @@ import {
   applicationsApi,
   analyticsApi,
   billingApiExtended,
-  endpointsApi,
   type Application,
   type DeliveryTrendResponse,
   type BillingUsage,
@@ -103,7 +102,6 @@ export default function DashboardPage() {
   const peakDay = trendData?.buckets.reduce((max, b) => (b.total > max.total ? b : max), trendData.buckets[0])?.total ?? 0;
 
   // Usage percentages
-  const memberLimit = 10; // Default
   const endpointPercent = usage ? Math.min(100, Math.round((usage.endpoints_count / Math.max(usage.endpoints_limit, 1)) * 100)) : 0;
   const deliveryPercent = usage ? Math.min(100, Math.round((usage.deliveries_used / Math.max(usage.deliveries_limit, 1)) * 100)) : 0;
 
