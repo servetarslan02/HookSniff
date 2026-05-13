@@ -691,3 +691,13 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Google hesabı girişi**: Backup code ile 2FA aşıldı
 - **GCP 3 aylık free trial**: $300 kredi, 90 gün. Free tier ürünler (Cloud Run, Neon, Upstash) süresiz ücretsiz
 - **Öğrenilen ders**: `migrations/` dizini root'ta, `api/migrations/` değil. sqlx BIGINT→i64 zorunlu
+
+## Oturum 153 (2026-05-14 05:28 - 05:40 GMT+8) ✅
+- **OpenClaw on beşinci oturum** — Servet ile Login DATABASE_ERROR düzeltmesi
+- **Root cause bulundu:** Customer struct'ta 4 kolon (`allow_overage`, `overage_email_notification`, `cancel_at_period_end`, `payment_failed_at`) var ama migration'da yok
+- **Düzeltmeler:**
+  - `api/src/db.rs` — Step 50 (049_overage_columns) eklendi: `allow_overage`, `overage_email_notification`
+  - `migrations/047_missing_customer_columns.sql` — güncellendi, tüm eksik kolonları kapsıyor
+  - Unit test güncellendi (46 → 49 migration)
+- **Deploy bekleniyor** — Cloud Build tetiklenmeli
+- **Commit:** pending push
