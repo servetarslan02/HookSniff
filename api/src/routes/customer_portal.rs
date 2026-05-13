@@ -41,7 +41,7 @@ struct ProfileResponse {
     email: String,
     plan: String,
     webhook_limit: i32,
-    webhook_count: i32,
+    webhook_count: i64,
     created_at: String,
 }
 
