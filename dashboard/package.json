@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "next dev --port 3001",
-    "build": "next build",
+    "build": "next build && node -e \"const fs=require('fs');const p='.next/server/app/[locale]/(dashboard)/page_client-reference-manifest.js';if(!fs.existsSync(p)){console.log('[postbuild] Creating missing manifest:',p);fs.mkdirSync(require('path').dirname(p),{recursive:true});fs.writeFileSync(p,'module.exports={id:{},name:{},chunks:{}}');}\"",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
