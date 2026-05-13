@@ -5,6 +5,7 @@ use axum::extract::{Extension, Query};
 use axum::routing::get;
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
+use chrono::{DateTime, Utc};
 use sqlx::PgPool;
 
 use crate::error::AppError;
@@ -89,7 +90,7 @@ async fn delivery_trend(
     let bucket_hours = query.bucket_size_hours();
     let range_label = query.range.as_deref().unwrap_or("24h");
 
-    let buckets: Vec<(chrono::NaiveDateTime, i64, i64, i64)> = sqlx::query_as(
+    let buckets: Vec<(DateTime<Utc>, i64, i64, i64)> = sqlx::query_as(
         r#"
         SELECT
             date_trunc('hour', created_at) - (EXTRACT(HOUR FROM created_at)::int % $3) * INTERVAL '1 hour' AS bucket,
