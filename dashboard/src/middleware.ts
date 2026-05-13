@@ -20,7 +20,7 @@ export default function middleware(request: NextRequest) {
     const usernameCookie = request.cookies.get('hooksniff_username');
     if (usernameCookie) {
       const newPath = withoutLocale.replace('/dashboard', `/${usernameCookie.value}`);
-      return NextResponse.redirect(new URL(`/${locale}${newPath}`, request.url));
+      return NextResponse.redirect(new URL(newPath, request.url));
     }
   }
 
@@ -29,7 +29,7 @@ export default function middleware(request: NextRequest) {
     const authCookie = request.cookies.get('hooksniff_token');
     const refreshCookie = request.cookies.get('hooksniff_refresh');
     if (!authCookie && !refreshCookie) {
-      const loginUrl = new URL(`/${locale}/login`, request.url);
+      const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -49,7 +49,7 @@ export default function middleware(request: NextRequest) {
     const authCookie = request.cookies.get('hooksniff_token');
     const refreshCookie = request.cookies.get('hooksniff_refresh');
     if (!authCookie && !refreshCookie) {
-      const loginUrl = new URL(`/${locale}/login`, request.url);
+      const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
