@@ -36,6 +36,7 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
     {
       label: t('sectionCore') || 'Core',
       items: [
+        { name: t('dashboard') || 'Dashboard', href: '/', icon: '🏠' },
         { name: t('applications') || 'Applications', href: '/applications', icon: '📱' },
         { name: t('endpoints') || 'Endpoints', href: '/endpoints', icon: '🔗' },
         { name: 'Webhooks', href: '/webhooks', icon: '🪝' },
