@@ -1296,6 +1296,14 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 51: Migration 050 — webhook_count BIGINT (match i64 in Customer struct)
+    run_migration(
+        pool,
+        "050_webhook_count_bigint",
+        "ALTER TABLE customers ALTER COLUMN webhook_count SET DATA TYPE BIGINT",
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
