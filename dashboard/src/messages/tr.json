@@ -151,8 +151,8 @@
     "routing": "Yönlendirme",
     "applications": "Uygulamalar",
     "serviceTokens": "Hizmet Jetonları",
-    "overview": "Genel Bakış",
-    "live": "Canlı"
+    "sectionConfig": "Yapılandırma",
+    "sso": "SSO"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
@@ -180,43 +180,14 @@
       "avgLatency": "Ort. Gecikme",
       "activeEndpoints": "Aktif Endpoint",
       "failedDeliveries": "Başarısız Teslimat",
-      "pendingRetries": "Bekleyen Tekrar",
-      "totalEvents": "Toplam Olay",
-      "avgPerDay": "Günlük Ort.",
-      "peakDay": "Pik Gün"
+      "pendingRetries": "Bekleyen Tekrar"
     },
     "timeRange": {
       "24h": "24 Saat",
       "7d": "7 Gün",
       "30d": "30 Gün"
     },
-    "webhookDashboard": "Webhook Paneli",
-    "orgName": "Organizasyonum",
-    "memberCount": "{count} üye",
-    "applicationCount": "{count} uygulama",
-    "eventsPerDay": "{count} olay/gün",
-    "inboundEvents": "Gelen Olaylar",
-    "inboundEventsDesc": "Seçilen dönem için olay hacmi",
-    "totalEvents": "Toplam Olay",
-    "noData": "Henüz olay verisi yok",
-    "applications": "Uygulamalar",
-    "createApplication": "Uygulama Oluştur",
-    "noApplications": "Henüz uygulama yok. Başlamak için bir tane oluşturun.",
-    "appDeleted": "Uygulama silindi",
-    "usage": "Kullanım",
-    "deliveries": "Teslimatlar",
-    "retention": "Saklama",
-    "days": "gün",
-    "planInfo": "Plan",
-    "currentPlan": "Mevcut Plan",
-    "renewsOn": "Yenilenme tarihi",
-    "upgradePlan": "Planı Yükselt",
-    "deleteAppTitle": "Uygulamayı Sil",
-    "deleteAppConfirm": "Bu uygulamayı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
-    "planDeveloper": "Geliştirici",
-    "planStartup": "Girişim",
-    "planPro": "Pro",
-    "planEnterprise": "Kurumsal"
+    "webhookDashboard": "Webhook Paneli"
   },
   "endpoints": {
     "title": "Endpoint'ler",
@@ -455,12 +426,6 @@
     "roleOwner": "Sahip",
     "roleAdmin": "Yönetici",
     "roleMember": "Üye",
-    "roleViewer": "Görüntüleyici",
-    "roleEditor": "Editör",
-    "currentUser": "mevcut kullanıcı",
-    "inviteDesc": "Organizasyonunuza başka üyeler davet edin ve onlara bir rol atayın.",
-    "membersTitle": "Üyeler",
-    "membersDesc": "Bu organizasyona kimin erişimi olduğunu ve izinlerini yönetin.",
     "removeBtn": "Kaldır"
   },
   "notifications": {
@@ -1601,8 +1566,7 @@
       "developerDesc": "HookSniff'ı denemek için mükemmel bir yol. Kurulum gerektirmez, yan projeler için sonsuza dek ücretsiz.",
       "startupDesc": "Yeni özelliklerimizle webhook deneyiminizi geliştirin ve girişiminizi büyütün!",
       "proDesc": "Kurumsal özellikleri ve daha iyi desteği ile veri bağlantınızı serbest bırakın.",
-      "enterpriseDesc": "Daha fazla mı ihtiyacınız var? Farklı bir şeye mi ihtiyacınız var? Bize bildirin, sizin için özel bir plan oluşturalım.",
-      "customPricing": "Özel Fiyat"
+      "enterpriseDesc": "Daha fazla mı ihtiyacınız var? Farklı bir şeye mi ihtiyacınız var? Bize bildirin, sizin için özel bir plan oluşturalım."
     },
     "footer": {
       "github": "GitHub",
@@ -2104,8 +2068,7 @@
     "applications": "Uygulamalar",
     "eventTypes": "Event tipleri",
     "subscriptions": "Abonelikler",
-    "overagePerEvent": "Event başına overage",
-    "custom": "Özel"
+    "overagePerEvent": "Event başına overage"
   },
   "pricingFaq": [
     {

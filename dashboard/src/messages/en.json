@@ -151,8 +151,8 @@
     "routing": "Routing",
     "applications": "Applications",
     "serviceTokens": "Service Tokens",
-    "overview": "Overview",
-    "live": "Live"
+    "sectionConfig": "Configuration",
+    "sso": "SSO"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -180,43 +180,14 @@
       "avgLatency": "Avg Latency",
       "activeEndpoints": "Active Endpoints",
       "failedDeliveries": "Failed Deliveries",
-      "pendingRetries": "Pending Retries",
-      "totalEvents": "Total Events",
-      "avgPerDay": "Avg / Day",
-      "peakDay": "Peak Day"
+      "pendingRetries": "Pending Retries"
     },
     "timeRange": {
       "24h": "24 Hours",
       "7d": "7 Days",
       "30d": "30 Days"
     },
-    "webhookDashboard": "Webhook Dashboard",
-    "orgName": "My Organization",
-    "memberCount": "{count, plural, one {# member} other {# members}}",
-    "applicationCount": "{count, plural, one {# application} other {# applications}}",
-    "eventsPerDay": "{count, plural, one {# event/day} other {# events/day}}",
-    "inboundEvents": "Inbound Events",
-    "inboundEventsDesc": "Event volume over the selected period",
-    "totalEvents": "Total Events",
-    "noData": "No event data yet",
-    "applications": "Applications",
-    "createApplication": "Create Application",
-    "noApplications": "No applications yet. Create one to get started.",
-    "appDeleted": "Application deleted",
-    "usage": "Usage",
-    "deliveries": "Deliveries",
-    "retention": "Retention",
-    "days": "days",
-    "planInfo": "Plan",
-    "currentPlan": "Current Plan",
-    "renewsOn": "Renews on",
-    "upgradePlan": "Upgrade Plan",
-    "deleteAppTitle": "Delete Application",
-    "deleteAppConfirm": "Are you sure you want to delete this application? This action cannot be undone.",
-    "planDeveloper": "Developer",
-    "planStartup": "Startup",
-    "planPro": "Pro",
-    "planEnterprise": "Enterprise"
+    "webhookDashboard": "Webhook Dashboard"
   },
   "endpoints": {
     "title": "Endpoints",
@@ -455,12 +426,6 @@
     "roleOwner": "Owner",
     "roleAdmin": "Admin",
     "roleMember": "Member",
-    "roleViewer": "Viewer",
-    "roleEditor": "Editor",
-    "currentUser": "current user",
-    "inviteDesc": "Invite other members to your organization and assign them a role.",
-    "membersTitle": "Members",
-    "membersDesc": "Manage who has access to this organization and their permissions.",
     "removeBtn": "Remove"
   },
   "notifications": {
@@ -1601,8 +1566,7 @@
       "developerDesc": "Perfect for trying out HookSniff. No setup needed, free forever for side projects.",
       "startupDesc": "Enhance your webhook experience with new features and grow your startup!",
       "proDesc": "Unleash your data connectivity with enterprise features and better support.",
-      "enterpriseDesc": "Need more? Need something different? Let us know, we will build a custom plan for you.",
-      "customPricing": "Custom"
+      "enterpriseDesc": "Need more? Need something different? Let us know, we will build a custom plan for you."
     },
     "footer": {
       "github": "GitHub",
@@ -2104,8 +2068,7 @@
     "applications": "Applications",
     "eventTypes": "Event types",
     "subscriptions": "Subscriptions",
-    "overagePerEvent": "Overage per event",
-    "custom": "Custom"
+    "overagePerEvent": "Overage per event"
   },
   "pricingFaq": [
     {
