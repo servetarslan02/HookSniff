@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
-type TimeRange = '24h' | '7d' | '30d';
+type TimeRange = '24h' | '7d' | '30d' | '90d';
 
 interface ChartCardProps {
   /** Chart title */
