@@ -24,7 +24,7 @@ import {
 import { ChartCard, StatCard } from '@/components/tremor';
 import { useTranslations } from 'next-intl';
 
-type TimeRange = '24h' | '7d' | '30d';
+type TimeRange = '24h' | '7d' | '30d' | '90d';
 
 export default function AnalyticsPage() {
   const { token } = useAuth();
