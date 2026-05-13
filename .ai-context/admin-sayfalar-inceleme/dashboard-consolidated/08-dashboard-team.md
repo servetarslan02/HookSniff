@@ -89,13 +89,22 @@
 
 ### Tespit Edilen Durumlar
 
+#### ✅ İyi Yönler
+- Bildirim listeleme
+- Tip filtresi (all/webhook_failed/alert/system/billing)
+- Okunma filtresi (all/read/unread)
+- Sayfalama (20/sayfa)
+- Bildirim silme (ConfirmDialog)
+- Tip ikonları
+- i18n desteği
+- `notificationsApi.markAsRead` kullanımı ✅ — `handleMarkAsRead` fonksiyonu ile tekil bildirim okundu işaretleme
+- `notificationsApi.markAllAsRead` kullanımı ✅ — `handleMarkAllAsRead` fonksiyonu ile toplu okundu işaretleme
+- "Mark all as read" butonu header'da ✅
+
 #### ⚠️ Potansiyel Sorunlar
-- **Bildirim okundu işaretleme yok** — UI'da buton yok
-- **Toplu okundu işaretleme yok**
+- **any type kullanımı** — 1 yerde `any` type kullanılıyor (TYPE_I18N_MAP key erişimi)
 
 #### 🔴 Eksiklikler
-- Bildirim okundu işaretleme
-- Toplu okundu işaretleme
 - Bildirim ayarları (tercihler)
 - Push notification desteği
 
@@ -126,7 +135,7 @@
    - Durum göstergesi (aktif/pasif)
 2. **Oluşturma Formu** — Modal veya yeni sayfa
    - Ad, açıklama, webhook URL
-3. **Detay Sayfası** — `/dashboard/applications/[id]`
+3. **Detay Sayfası** — `/applications/[id]`
    - Endpoint'ler, teslimatlar, istatistikler
 4. **Düzenleme** — Inline edit veya modal
 5. **Silme** — ConfirmDialog ile

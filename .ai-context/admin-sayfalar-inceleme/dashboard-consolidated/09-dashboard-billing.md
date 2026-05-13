@@ -3,6 +3,7 @@
 > **Bölüm:** Faturalandırma & API  
 > **İçerik:** API Anahtarları, Faturalandırma  
 > **İnceleme Tarihi:** 2026-05-12  
+> **Güncelleme:** 2026-05-13 (kod değişiklikleriyle eşleştirildi)  
 > **Kaynak Dosyalar:** `08-api-anahtarlari.md`, `28-faturalandirma.md`
 
 ---
@@ -16,8 +17,8 @@
 
 ## 1. API Anahtarları (API Keys)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/api-keys/page.tsx`  
-> Route: `/dashboard/api-keys`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/api-keys/page.tsx`  
+> Route: `/api-keys`
 
 ### Sayfa Yapısı
 
@@ -99,8 +100,8 @@ interface ApiKey {
 
 ## 2. Faturalandırma (Billing)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/billing/page.tsx`  
-> Route: `/dashboard/billing`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/billing/page.tsx`  
+> Route: `/billing`
 
 ### Sayfa Yapısı
 - PlanCards — Plan karşılaştırma (Free/Pro/Business)
@@ -146,14 +147,12 @@ interface ApiKey {
 - **Sorun:** 2 useEffect, fetch var ama abort yok.
 - **Adımlar:** (standart — bkz. 01-dashboard-core P-01)
 
-### 🔒 Memory Leak
+### ✅ Düzeltildi
 
-#### ML-01: NewKeyAlert — setTimeout Cleanup Yok
+#### ~~ML-01: NewKeyAlert — setTimeout Cleanup Yok~~
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/api-keys/components/NewKeyAlert.tsx`
-- **Sorun:** `setTimeout` kullanılıyor ama `clearTimeout` yok.
-- **Adımlar:**
-  1. useEffect içinde timer oluştur
-  2. Return'de `clearTimeout(timer)` ekle
+- **Durum:** ✅ DÜZELTİLDİ — `useRef` + `useEffect` cleanup pattern uygulandı
+- `timerRef.current = setTimeout(...)` → `useEffect(() => { return () => { if (timerRef.current) clearTimeout(timerRef.current); }; }, [])`
 
 ### 🔴 Backend-Frontend Uyumsuzluğu
 
@@ -176,7 +175,7 @@ interface ApiKey {
 #### BF-03: Customer Portal Erişimi Yok
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/billing/page.tsx`
 - **Backend:** `GET /v1/billing/portal` — müşteri portalı URL'si
-- **Sorun:** api.ts'de tanımlı değil, "Müşteri Portalına Git" butonu yok.
+- **Durum:** `billingApi.getPortalUrl` api.ts'de tanımlı ✅, "Müşteri Portalına Git" butonu yok.
 - **Adımlar:**
   1. `api.ts`'ye ekle:
      ```typescript
