@@ -59,51 +59,63 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-    // Verify session by calling /auth/me via proxy (cookie is sent automatically)
-    fetch('/api/auth/me')
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw new Error('Not authenticated');
+    // Verify session by calling /auth/me directly on Cloud Run
+    const API_BASE = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
+    const savedToken = localStorage.getItem('hooksniff_token');
+    if (savedToken) {
+      fetch(`${API_BASE}/auth/me`, {
+        headers: { 'Authorization': `Bearer ${savedToken}` },
       })
-      .then((data) => {
-        const username = toSlug(data.email.split('@')[0]);
-        const u: User = {
-          id: data.id,
-          email: data.email,
-          name: data.name,
-          username,
-          plan: data.plan,
-          is_admin: data.is_admin ?? false,
-        };
-        setUser(u);
-        setApiKeyState(null); // Don't persist API key in localStorage
-        setToken('cookie'); // Indicates session is active via cookie
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
-        setUsernameCookie(username);
-      })
-      .catch(() => {
-        // Not authenticated — clear stale data
-        setUser(null);
-        setToken(null);
-        setApiKeyState(null);
-        localStorage.removeItem(STORAGE_KEY);
-      })
-      .finally(() => setIsLoading(false));
+        .then((res) => {
+          if (res.ok) return res.json();
+          throw new Error('Not authenticated');
+        })
+        .then((data) => {
+          const username = toSlug(data.email.split('@')[0]);
+          const u: User = {
+            id: data.id,
+            email: data.email,
+            name: data.name,
+            username,
+            plan: data.plan,
+            is_admin: data.is_admin ?? false,
+          };
+          setUser(u);
+          setApiKeyState(null);
+          setToken(savedToken);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
+          setUsernameCookie(username);
+        })
+        .catch(() => {
+          setUser(null);
+          setToken(null);
+          setApiKeyState(null);
+          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem('hooksniff_token');
+        })
+        .finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
+    }
   }, []);
 
-  const persistAuth = useCallback((u: User, k?: string) => {
+  const persistAuth = useCallback((u: User, k?: string, authToken?: string) => {
     // Generate username slug from email prefix (unique per user)
     const slug = toSlug(u.email.split('@')[0]);
     const userWithUsername = { ...u, username: slug };
     setUser(userWithUsername);
     setApiKeyState(k || null); // Keep in memory only for one-time display
-    setToken('cookie'); // Token is in HttpOnly cookie
+    if (authToken) {
+      setToken(authToken);
+      localStorage.setItem('hooksniff_token', authToken);
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: userWithUsername }));
     setUsernameCookie(slug);
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await fetch('/api/auth/login', {
+    const API_BASE = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
+    const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -114,12 +126,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const data = await res.json();
     const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
-    persistAuth(u, data.customer.api_key);
+    persistAuth(u, data.customer.api_key, data.token);
     return u;
   }, [persistAuth]);
 
   const register = useCallback(async (email: string, password: string, name?: string) => {
-    const res = await fetch('/api/auth/register', {
+    const API_BASE = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
+    const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, name }),
@@ -130,19 +143,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const data = await res.json();
     const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
-    persistAuth(u, data.customer.api_key);
+    persistAuth(u, data.customer.api_key, data.token);
     return u;
   }, [persistAuth]);
 
   const logout = useCallback(async () => {
-    // Call backend logout to clear HttpOnly cookie
-    fetch('/api/auth/logout', {
-      method: 'POST',
-    }).catch((err) => console.warn('Logout request failed:', err)); // dev only
     setToken(null);
     setUser(null);
     setApiKeyState(null);
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('hooksniff_token');
     clearUsernameCookie();
   }, []);
 
