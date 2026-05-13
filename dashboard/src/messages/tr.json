@@ -161,7 +161,17 @@
     "adminSettings": "Ayarlar",
     "sectionUserPanel": "Kullanıcı Paneli",
     "adminOverview": "Genel Bakış",
-    "userDashboard": "Dashboard"
+    "userDashboard": "Dashboard",
+    "core": "Çekirdek",
+    "monitoring": "İzleme",
+    "devtools": "Geliştirici Araçları",
+    "contentMgmt": "İçerik",
+    "portalSection": "Portal",
+    "securitySection": "Güvenlik",
+    "routingConfig": "Yönlendirme",
+    "teamMgmt": "Ekip",
+    "billingOverview": "Faturalandırma",
+    "settingsSection": "Ayarlar"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
