@@ -3195,5 +3195,16 @@
     "aiCap4": "Endpoint sağlığını ve performansını izleyin",
     "quickStart": "Hızlı başlangıç",
     "quickStartDesc": "Bir hizmet jetonu oluşturun, ardından MCP yapılandırmanızda HOOKSNIFF_API_TOKEN olarak ekleyin."
+  },
+  "featureFlags": {
+    "loadFailed": "Feature flaglar yüklenemedi",
+    "created": "Feature flag oluşturuldu",
+    "createFailed": "Oluşturma başarısız",
+    "updated": "Feature flag güncellendi",
+    "updateFailed": "Güncelleme başarısız",
+    "toggled": "Feature flag durumu değiştirildi",
+    "toggleFailed": "Durum değiştirme başarısız",
+    "deleted": "Feature flag silindi",
+    "deleteFailed": "Silme başarısız"
   }
 }

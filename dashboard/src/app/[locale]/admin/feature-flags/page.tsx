@@ -4,12 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, type FeatureFlag } from '@/lib/api';
-// import { useTranslations } from 'next-intl'; // TODO: uncomment when i18n is added
+import { useTranslations } from 'next-intl';
 
 export default function FeatureFlagsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
-  // const tc = useTranslations('common'); // TODO: i18n hardcoded strings below
+  const t = useTranslations('featureFlags');
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -41,7 +41,7 @@ export default function FeatureFlagsPage() {
       const data = await adminApi.listFeatureFlags(token);
       setFlags(data.flags || []);
     } catch {
-      toast('Failed to load feature flags', 'error');
+      toast(t('loadFailed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ export default function FeatureFlagsPage() {
         rollout_percentage: newRollout,
         enabled_for_plans: newPlans,
       });
-      toast('Feature flag created', 'success');
+      toast(t('created'), 'success');
       setShowCreate(false);
       setNewName('');
       setNewDesc('');
@@ -70,7 +70,7 @@ export default function FeatureFlagsPage() {
       setNewPlans([]);
       fetchFlags();
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to create', 'error');
+      toast(err instanceof Error ? err.message : t('createFailed'), 'error');
     } finally {
       setCreating(false);
     }
@@ -97,11 +97,11 @@ export default function FeatureFlagsPage() {
         rollout_percentage: editRollout,
         enabled_for_plans: editPlans,
       });
-      toast('Feature flag updated', 'success');
+      toast(t('updated'), 'success');
       setEditTarget(null);
       fetchFlags();
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to update', 'error');
+      toast(err instanceof Error ? err.message : t('updateFailed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -114,7 +114,7 @@ export default function FeatureFlagsPage() {
       await adminApi.updateFeatureFlag(token, flag.id, { is_enabled: !flag.is_enabled });
       setFlags((prev) => prev.map((f) => f.id === flag.id ? { ...f, is_enabled: !f.is_enabled } : f));
     } catch {
-      toast('Failed to toggle', 'error');
+      toast(t('toggleFailed'), 'error');
     }
   };
 
@@ -123,11 +123,11 @@ export default function FeatureFlagsPage() {
     if (!token || !deleteTarget) return;
     try {
       await adminApi.deleteFeatureFlag(token, deleteTarget.id);
-      toast('Feature flag deleted', 'success');
+      toast(t('deleted'), 'success');
       setDeleteTarget(null);
       fetchFlags();
     } catch {
-      toast('Failed to delete', 'error');
+      toast(t('deleteFailed'), 'error');
     }
   };
 
