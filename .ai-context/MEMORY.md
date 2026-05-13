@@ -604,7 +604,17 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Build başarılı** ✅ — push edildi (commit fe11318)
 - **5 dosya değişti, 413 satır eklendi, 2220 satır silindi**
 
-## 📊 Güncel İlerleme (2026-05-13 07:15 — Oturum 138)
+## Oturum 141 (2026-05-13 17:07 GMT+8) ✅
+- **OpenClaw** — Servet ile Vercel build hatası düzeltmesi
+- **4 TypeScript hatası düzeltildi (4 dosya):**
+  - `layout.tsx`: Unused `Link`, `usePathname`, `useLocale`, `cleanPath` kaldırıldı
+  - `page.tsx`: Unused `endpointsApi`, `memberLimit` kaldırıldı
+  - `ChartCard.tsx`: `TimeRange` tipine `'90d'` eklendi
+  - `analytics/page.tsx`: `TimeRange` tipine `'90d'` eklendi
+- **Build başarılı** — 216 sayfa, 8.8s
+- **Commit:** `fdd46f77` — main branch, push ✅
+
+## 📊 Güncel İlerleme (2026-05-13 17:07 — Oturum 141)
 
 ### Hook0-Style UI Redesign
 | Kategori | Durum | Satır Azalma |
