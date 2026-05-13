@@ -150,7 +150,9 @@
     "sectionAccount": "Account",
     "routing": "Routing",
     "applications": "Applications",
-    "serviceTokens": "Service Tokens"
+    "serviceTokens": "Service Tokens",
+    "overview": "Overview",
+    "live": "Live"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -3133,6 +3135,8 @@
     "event": "Event",
     "time": "Time",
     "noEndpoints": "No endpoints in this application yet",
-    "noDeliveries": "No deliveries yet"
+    "searchPlaceholder": "Search for a specific application...",
+    "noDeliveries": "No deliveries yet",
+    "statusLabel": "Status"
   }
 }
