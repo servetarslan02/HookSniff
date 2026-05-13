@@ -31,8 +31,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       key: 'core',
       label: t('sectionCore'),
       items: [
-        { name: t('dashboard'), href: '/', icon: '📊' },
-        { name: t('core'), href: '/core', icon: '🔗' },
+        { name: t('dashboard'), href: '/core', icon: '📊' },
         { name: t('monitoring'), href: '/monitoring', icon: '📡' },
       ],
     },
@@ -73,7 +72,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="flex items-center h-16 px-6 border-b border-gray-200 dark:border-gray-700">
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/core" className="flex items-center space-x-2">
             <span className="text-2xl">🪝</span>
             <span className="text-xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </Link>
