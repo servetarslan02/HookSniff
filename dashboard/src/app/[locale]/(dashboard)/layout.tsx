@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Link, usePathname } from '@/i18n/navigation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { AuthGuard } from '@/components/AuthGuard';
 import { NotificationCenter } from '@/components/NotificationCenter';
@@ -12,13 +11,9 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { AppSidebar } from '@/components/AppSidebar';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   const { user, logout } = useAuth();
   const tc = useTranslations('common');
-  const locale = useLocale();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
