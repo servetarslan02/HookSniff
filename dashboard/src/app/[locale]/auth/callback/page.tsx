@@ -36,7 +36,7 @@ export default function AuthCallbackPage() {
         if (res.ok) {
           // Session is valid — redirect to dashboard
           // The AuthProvider's mount effect will pick up the cookie
-          router.replace(`/${locale}/dashboard`);
+          router.replace('/applications');
         } else {
           setError(t('authFailed'));
         }
