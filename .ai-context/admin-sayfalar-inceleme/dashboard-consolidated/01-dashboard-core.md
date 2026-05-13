@@ -3,6 +3,7 @@
 > **Bölüm:** Dashboard Core  
 > **İçerik:** Kontrol Paneli, Endpoint'ler, Teslimatlar, Arama  
 > **İnceleme Tarihi:** 2026-05-12/13  
+> **Güncelleme:** 2026-05-13 (kod değişiklikleriyle eşleştirildi)  
 > **Kaynak Dosyalar:** `01-kontrol-paneli.md`, `02-endpoints.md`, `03-teslimatlar.md`, `05-arama.md`
 
 ---
@@ -18,69 +19,76 @@
 
 ## 1. Kontrol Paneli (Dashboard Overview)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/page.tsx`  
-> Route: `/dashboard`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/page.tsx`  
+> Route: `/`
 
 ### Sayfa Yapısı
+
+> ⚠️ **2026-05-13 Güncelleme:** Eski overview sayfası tamamen yeniden yazıldı. Aşağıdaki bilgiler güncel kodu yansıtmaktadır.
 
 #### Bileşenler
 | Bileşen | Dosya | Açıklama |
 |---------|-------|----------|
-| OnboardingWizard | `@/components/OnboardingWizard` | İlk giriş wizard'ı |
-| SetupChecklist | `@/components/OnboardingWizard` | Kurulum kontrol listesi |
-| StatCard | `@/components/tremor` | İstatistik kartları |
-| TimeRangeSelector | `./components/TimeRangeSelector` | Zaman aralığı seçici |
-| AnimatedCounter | `./components/AnimatedCounter` | Animasyonlu sayılar |
-| DeliveryTrendChart | `./components/DeliveryTrendChart` | Teslimat trend grafiği |
-| SuccessRateDonut | `./components/SuccessRateDonut` | Başarı oranı donut grafiği |
-| ActivityFeed | `./components/ActivityFeed` | Son aktivite akışı |
-| RecentDeliveriesTable | `./components/RecentDeliveriesTable` | Son teslimatlar tablosu |
+| StatCard | `@/components/tremor/StatCard` | İstatistik kartları (4 adet) |
+| ChartCard | `@/components/tremor/ChartCard` | Grafik kartı |
+| AreaChart (LazyAreaChart) | `@/components/LazyCharts` | Teslimat trend grafiği |
+| Link | `@/i18n/navigation` | Sayfa içi linkler |
+
+> **Not:** OnboardingWizard, SetupChecklist, TimeRangeSelector, AnimatedCounter, SuccessRateDonut, ActivityFeed, RecentDeliveriesTable bileşenleri hâlâ mevcut ama bu sayfada **kullanılmıyor**.
 
 #### Veri Akışı
 1. `useAuth()` → token alınır
 2. `statsApi.get(token)` → genel istatistikler
-3. `webhooksApi.list(token, {page: 1})` → son teslimatlar (5 adet)
-4. `analyticsApi.deliveryTrend(token, timeRange)` → trend verisi
-5. `analyticsApi.successRate(token, timeRange)` → başarı oranı verisi
+3. `analyticsApi.deliveryTrend(token, '7d')` → 7 günlük trend verisi
+4. `webhooksApi.list(token, {page: 1})` → son teslimatlar (5 adet)
+5. `endpointsApi.list(token)` → endpoint sayısı
+6. Tüm istekler `Promise.allSettled` ile paralel gönderilir
 
-#### İstatistik Kartları (6 adet)
-1. **Toplam Teslimat** — `stats.total_deliveries` (mavi)
-2. **Teslim Edilen** — `stats.delivered` (yeşil)
-3. **Başarısız** — `stats.failed` (kırmızı)
-4. **Başarı Oranı** — `stats.success_rate` (mor, %)
-5. **Bekleyen** — `stats.pending` (sarı)
-6. **Endpoint Sayısı** — `stats.endpoints_count` (gri)
+#### İstatistik Kartları (4 adet)
+1. **Total Deliveries** — `stats.total_deliveries` (mavi)
+2. **Success Rate** — `stats.success_rate` (emerald/amber/red, %)
+3. **Active Endpoints** — `endpointCount` (mor)
+4. **Failed Deliveries** — `stats.failed` (kırmızı)
 
-#### Zaman Aralığı Seçici
-- `TimeRange` tipi ile filtreleme
-- Değişiklikte otomatik analytics yenileme
+#### Grafik
+- **Delivery Trends (7d)** — AreaChart (successful + failed), gradient fill
+- ChartCard içinde, `ResponsiveContainer` ile responsive
+
+#### Quick Stats Paneli
+- Delivered, Pending, Failed, Endpoints sayıları
+- Quick Actions linkleri: Manage Endpoints, View Deliveries, Open Playground, View Analytics
+
+#### Recent Deliveries Tablosu
+- Son 5 teslimat: ID (link), Event, Status (badge), Attempts, Time
+- "View all →" linki `/deliveries` sayfasına yönlendirir
+- Empty state: 📭 ikonu + Playground linki
 
 #### Loading State
-- 6 adet skeleton shimmer kart
-- `mounted` flag ile cleanup kontrolü
+- Skeleton shimmer kartları (animate-pulse)
+- useCallback + useEffect ile data loading
 
 ### Tespit Edilen Durumlar
 
 #### ✅ İyi Yönler
-- i18n kullanımı (dashboard, common namespace)
-- Skeleton loading state
-- Cleanup (mounted flag)
-- Error handling (try/catch + fallback)
-- Time range ile dinamik grafik
-- OnboardingWizard + SetupChecklist entegrasyonu
+- i18n kullanımı (dashboard, common namespace) — `defaultValue` fallback'leri ile
+- Promise.allSettled ile hata toleranslı paralel istek
+- StatCard renk dinamikası (success rate ≥95 → emerald, ≥80 → amber, else → red)
+- Quick Actions linkleri ile hızlı navigasyon
+- Empty state tasarımı (📭 ikonu + Playground CTA)
+- Refresh butonu (manuel yenileme)
+- Dark mode tam destek
+- AreaChart gradient fill ile görsel kalite
 
 #### ⚠️ Potansiyel Sorunlar
-- `_error` state tanımlanmış ama UI'da gösterilmiyor (sadece console)
-- `recentDeliveries` sadece ilk 5 item — pagination yok
-- Analytics catch bloğu boş (`// ignore`)
-- Token null iken bileşenler render ediliyor (early return yok)
-- `useEffect` dependency array'de `t` ve `tc` yok (stable reference)
+- **Refresh butonu** — i18n key yerine `tc('refresh', { defaultValue: 'Refresh' })` kullanılmış (defaultValue fallback)
+- **recentDeliveries sadece ilk 5** — "View all" linki ile `/deliveries`'a yönlendirme var
+- **TimeRange sabit '7d'** — Kullanıcı zaman aralığı seçemiyor
+- **_error state yok** — Hata toast ile gösteriliyor ama sayfada error banner yok
 
 #### 🔴 Eksiklikler
-- Error toast/banner gösterimi yok
-- Refresh/polling mekanizması yok (manuel yenileme gerekli)
-- Empty state tasarımı yok (hiç veri yoksa)
-- Grafik verisi yoksa placeholder mesajı eksik
+- Zaman aralığı seçici (24h/7d/30d) yok
+- Grafik zoom/drill-down yok
+- Polling/auto-refresh mekanizması yok
 - Mobile responsive grid breakpoint'leri kontrol edilmeli
 
 #### 🆕 Eklenecekler (Sektör Karşılaştırma)
@@ -93,8 +101,8 @@
 
 ## 2. Endpoint'ler
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/endpoints/page.tsx`  
-> Route: `/dashboard/endpoints`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`  
+> Route: `/endpoints`
 
 ### Sayfa Yapısı
 
@@ -143,10 +151,11 @@
 - Hover-lift animasyonu
 - Responsive grid layout
 - i18n desteği (endpoints, common namespace)
+- Error state: error banner + retry butonu ✅
 
 #### Erişilebilirlik
 - ✅ `htmlFor/id` eşleştirmesi (endpoint-url, endpoint-desc)
-- ✅ `aria-label` butonlarda
+- ✅ `aria-label` butonlarda (settingsTitle, deleteTitle)
 - ✅ `type="button"` butonlarda
 - ✅ Focus ring (brand-500)
 - ✅ Dark mode desteği
@@ -159,11 +168,12 @@
 - i18n tam destek
 - Dark mode uyumlu
 - Form validasyonu (url required)
-- Error handling (try/catch + toast)
+- Error handling: `.catch((err) => setError(...))` ile hata yakalama ✅
+- Error banner + retry butonu (boş liste durumunda) ✅
 - Mounted cleanup pattern
 
 #### ⚠️ Potansiyel Sorunlar
-- **Catch bloğu boş** — `endpointsApi.list().catch(() => {})` → hata yutuluyor
+- **Retry butonunda catch boş** — Error banner'daki retry butonunda `.catch(() => {})` kullanılmış (hata yutuluyor, ama bu retry senaryosunda kabul edilebilir)
 - **Toplu silme seri** — `for...of` ile tek tek siliniyor, paralel yapılabilir
 - **Düzenleme yok** — Sadece detay sayfasına yönlendirme, inline edit yok
 - **Pagination yok** — Tüm endpoint'ler tek seferde yükleniyor
@@ -183,9 +193,10 @@
 
 ## 3. Teslimatlar (Deliveries)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/deliveries/page.tsx`  
-> Route: `/dashboard/deliveries`  
-> Detay Sayfası: `/dashboard/deliveries/[id]`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/deliveries/page.tsx`  
+> Route: `/deliveries`  
+> Detay Sayfası: `dashboard/src/app/[locale]/(dashboard)/deliveries/[id]/page.tsx`  
+> Route Detay: `/deliveries/[id]`
 
 ### Sayfa Yapısı
 
@@ -224,16 +235,14 @@
 - ✅ **Sıralama** — Yok (varsayılan created_at DESC varsayılıyor)
 - ✅ **Tablo Kolonları:** ID, Event, Status, Attempts, Response, Time, Actions
 
-#### Detay Modalı
-- ✅ ID, Event, Endpoint, Status, Attempts, HTTP Status, Created
-- ✅ Attempts Timeline (deneme sayısı kadar adım)
-- ✅ Modal kapatma (✕ + backdrop click)
-- ✅ max-h-[80dvh] overflow-y-auto
-
-#### Replay İşlemi
-- ✅ ConfirmDialog ile onay
-- ✅ Toast ile başarı/hata mesajı
-- ✅ Liste otomatik yenileme
+#### Detay Sayfası (`/deliveries/[id]`)
+- ✅ Bileşenlere ayrılmış yapı: DeliveryOverviewCards, DeliveryInfoPanel, RequestDetailsPanel, AttemptTimeline
+- ✅ Replay butonu (ConfirmDialog ile onay) ✅
+- ✅ Copy-to-clipboard desteği (timerRef + useRef cleanup) ✅
+- ✅ attempts listesi (webhooksApi.getAttempts ile)
+- ✅ Error state + retry + back to deliveries
+- ✅ Back navigation butonu
+- ✅ Loading skeleton
 
 #### Erişilebilirlik
 - ✅ Tablo satırı `role="link"` + `tabIndex={0}`
@@ -248,18 +257,18 @@
 #### ✅ İyi Yönler
 - Server-side sayfalama (20 kayıt/sayfa)
 - Durum filtresi ile API filtreleme
-- Replay özelliği
-- Attempts timeline
+- Replay özelliği (detay sayfasında ConfirmDialog ile) ✅
+- Attempts timeline (AttemptTimeline bileşeni)
 - Keyboard accessible tablo satırları
 - getErrorMessage kullanımı
 - useCallback ile fetchData memoization
 - Overflow-x-auto tablo
+- setTimeout cleanup: useRef + useEffect cleanup pattern ✅
 
 #### ⚠️ Potansiyel Sorunlar
 - **Arama client-side** — search sadece mevcut sayfada filtreliyor, tüm veriyi kapsamıyor
 - **Search + Pagination çelişisi** — Arama yapıldığında pagination gizleniyor ama veri sadece 20 kayıt
 - **selected state unused** — Detay modalı var ama `selected` hiç set edilmiyor (satıra tıklama → router.push)
-- **Replay butonu yok** — `replayTarget` state var ama UI'da replay butonu bulunamadı
 - **Sıralama yok** — Kullanıcı sıralama seçemiyor
 - **Tarih formatı** — `toLocaleString()` locale-aware ama i18n key ile yapılabilir
 - **"View Details" hardcoded** — i18n key yerine hardcoded İngilizce
@@ -272,14 +281,13 @@
 - Tarih aralığı filtresi yok
 - Endpoint bazlı filtreleme yok
 - Event type bazlı filtreleme yok
-- Teslimat detayında request/response body gösterimi yok (modalda)
 
 ---
 
 ## 4. Arama (Search)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/search/page.tsx`  
-> Route: `/dashboard/search`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/search/page.tsx`  
+> Route: `/search`
 
 ### Sayfa Yapısı
 
@@ -387,10 +395,10 @@ interface SearchResult {
 
 #### P-02: Pagination Eksik — Kontrol Paneli
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/page.tsx`
-- **Sorun:** Son teslimatlar sadece ilk 5 kayıt. Tüm liste tek seferde yükleniyor.
+- **Sorun:** Son teslimatlar sadece ilk 5 kayıt. "View all" linki var ama pagination yok.
 - **Adımlar:**
-  1. `webhooksApi.list(token, { page: 1 })` çağrısını pagination'lı yap
-  2. "Tüm Teslimatları Gör" linki ekle → `/deliveries` sayfasına yönlendir
+  1. "Tüm Teslimatları Gör" linki zaten mevcut → `/deliveries`
+  2. Opsiyonel: Daha fazla kayıt gösterimi
 
 #### P-03: Pagination Eksik — Endpoint'ler
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`
@@ -402,22 +410,7 @@ interface SearchResult {
 
 ### 🔒 Güvenlik
 
-#### G-01: Error State UI'da Gösterilmiyor — Kontrol Paneli
-- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/page.tsx`
-- **Sorun:** `_error` state tanımlanmış ama UI'da gösterilmiyor (sadece console).
-- **Adımlar:**
-  1. Error banner bileşeni ekle (kapatılabilir)
-  2. `{error && <ErrorBanner message={error} onRetry={fetchData} />}` ekle
-  3. i18n key: `dashboardError`, `dashboardErrorDesc`
-
-#### G-02: "View Details" Hardcoded — Teslimatlar
-- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/deliveries/page.tsx`
-- **Sorun:** `View Details` metni i18n key kullanılmamış.
-- **Adımlar:**
-  1. i18n key ekle: `viewDetails`
-  2. `t('viewDetails')` kullan
-
-#### G-03: Hardcoded Stringler — Arama
+#### G-01: Hardcoded Stringler — Arama
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/search/page.tsx`
 - **Sorun:** "Search", "Search and filter...", "Searching...", "results" hardcoded.
 - **Adımlar:**
@@ -425,22 +418,7 @@ interface SearchResult {
 
 ### 🔴 Backend-Frontend Uyumsuzluğu
 
-#### BF-01: Secret Rotasyonu UI Yok — Endpoint'ler
-- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`
-- **Backend:** `POST /v1/endpoints/{id}/rotate-secret` — endpoint secret'ını yeniler
-- **Sorun:** api.ts'de `endpointsApi.rotateSecret` tanımlı değil, UI'da buton yok.
-- **Adımlar:**
-  1. `api.ts`'ye ekle:
-     ```typescript
-     rotateSecret: (token: string, id: string) =>
-       apiFetch<{ secret: string }>(`/endpoints/${id}/rotate-secret`, { method: "POST", token }),
-     ```
-  2. Endpoint kartına "Secret Yenile" butonu ekle
-  3. ConfirmDialog: "Secret yenilenecek, eski secret geçersiz olacak"
-  4. Yeni secret'ı göster (bir kez)
-  5. i18n key: `rotateSecret`, `rotateSecretConfirm`, `newSecret`
-
-#### BF-02: Endpoint Durumu Toggle Yok — Endpoint'ler
+#### BF-01: Endpoint Durumu Toggle Yok — Endpoint'ler
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`
 - **Sorun:** Endpoint aktif/pasif yapılamıyor.
 - **Adımlar:**
@@ -448,56 +426,44 @@ interface SearchResult {
   2. `endpointsApi.update(token, id, { is_active: !current })` çağrısı
   3. Toggle değişiminde optimistic UI update
 
-#### BF-03: Webhook Export Butonu Yok — Teslimatlar
+#### BF-02: Webhook Export Butonu Yok — Teslimatlar
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/deliveries/page.tsx`
 - **Backend:** `GET /v1/webhooks/export?status=...&format=csv|json` — teslimatları dışa aktarır
-- **Sorun:** api.ts'de `webhooksApi.export` tanımlı değil, UI'da buton yok.
+- **Sorun:** UI'da export butonu yok.
 - **Adımlar:**
-  1. `api.ts`'ye ekle:
-     ```typescript
-     exportDeliveries: (token: string, params?: { status?: string; format?: string }) => {
-       const qs = new URLSearchParams(params).toString();
-       return apiFetch<string>(`/webhooks/export${qs ? `?${qs}` : ''}`, { token });
-     },
-     ```
-  2. Sayfa header'ına "Dışa Aktar" butonu ekle
-  3. Format seçici: CSV / JSON dropdown
-  4. Mevcut filtre durumunu export'a aktar
-  5. Dosya indirme: `Blob` + `URL.createObjectURL` + `<a download>`
-  6. i18n key: `exportDeliveries`, `exportCSV`, `exportJSON`, `exporting`
+  1. Sayfa header'ına "Dışa Aktar" butonu ekle
+  2. Format seçici: CSV / JSON dropdown
+  3. Mevcut filtre durumunu export'a aktar
+  4. Dosya indirme: `Blob` + `URL.createObjectURL` + `<a download>`
+  5. i18n key: `exportDeliveries`, `exportCSV`, `exportJSON`, `exporting`
 
-#### BF-04: Batch Replay Butonu Yok — Teslimatlar
+#### BF-03: Batch Replay UI Eksik — Teslimatlar
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/deliveries/page.tsx`
-- **Backend:** `POST /v1/webhooks/batch/replay` — toplu tekrar gönderme
-- **Sorun:** api.ts'de `webhooksApi.batchReplay` tanımlı değil, UI'da buton yok.
+- **Backend:** `webhooksApi.batchReplay` api.ts'de tanımlı ✅
+- **Sorun:** UI'da toplu replay butonu yok.
 - **Adımlar:**
-  1. `api.ts`'ye ekle:
-     ```typescript
-     batchReplay: (token: string, deliveryIds: string[]) =>
-       apiFetch<{ replayed: number }>('/webhooks/batch/replay', { method: 'POST', body: { delivery_ids: deliveryIds }, token }),
-     ```
-  2. Tablo satırlarına checkbox ekle
-  3. "Seçilenleri Tekrar Gönder" butonu (toplu işlem bar'ında)
-  4. ConfirmDialog: "X teslimat tekrar gönderilecek"
-  5. Progress göstergesi (başarı/hata sayısı)
-  6. i18n key: `batchReplay`, `batchReplayConfirm`, `replayProgress`
+  1. Tablo satırlarına checkbox ekle
+  2. "Seçilenleri Tekrar Gönder" butonu (toplu işlem bar'ında)
+  3. ConfirmDialog: "X teslimat tekrar gönderilecek"
+  4. Progress göstergesi (başarı/hata sayısı)
+  5. i18n key: `batchReplay`, `batchReplayConfirm`, `replayProgress`
+
+#### BF-04: Secret Rotasyonu UI Eksik — Endpoint'ler
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`
+- **Backend:** `endpointsApi.rotateSecret` api.ts'de tanımlı ✅
+- **Sorun:** UI'da secret rotasyon butonu yok.
+- **Adımlar:**
+  1. Endpoint kartına "Secret Yenile" butonu ekle
+  2. ConfirmDialog: "Secret yenilenecek, eski secret geçersiz olacak"
+  3. Yeni secret'ı göster (bir kez)
+  4. i18n key: `rotateSecret`, `rotateSecretConfirm`, `newSecret`
 
 ### 🎨 Erişilebilirlik
 
-#### E-01: type="button" Eksik Butonlar — Kontrol Paneli
-- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/page.tsx`
-- **Sorun:** Butonlarda `type="button"` yok. Form içinde yanlışlıkla submit olabilir.
-- **Adımlar:**
-  1. Tüm `<button` etiketlerine `type="button"` ekle (form submit butonları hariç)
-  2. `aria-label` ekle (emoji-only butonlar için)
-
-#### E-02: aria-label Eksik Butonlar — Endpoint'ler
+#### E-01: aria-label Eksik Butonlar — Endpoint'ler
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/endpoints/page.tsx`
-- **Sorun:** Emoji-only butonlarda aria-label yok.
-- **Adımlar:**
-  1. Her `<button`'a `aria-label={t('actionName')}` ekle
-  2. Silme butonu: `aria-label={t('deleteEndpoint')}`
-  3. Düzenleme butonu: `aria-label={t('editEndpoint')}`
+- **Durum:** Silme butonunda `aria-label={t('deleteTitle')}` var ✅, ayar butonunda `aria-label={t('settingsTitle')}` var ✅
+- **Sorun:** Bulk delete butonunda aria-label eksik olabilir.
 
 ### 🔴 Kod Kalitesi
 
@@ -509,11 +475,15 @@ interface SearchResult {
   2. Endpoints, alerts, transforms, schemas sayfalarına uygula
   3. i18n key: `noDataYet`, `emptyStateTitle`, `emptyStateDesc`
 
-### 🔒 Memory Leak
+### ✅ Düzeltildi
 
-#### ML-01: deliveries/[id] — setTimeout Cleanup Yok
+#### ~~ML-01: deliveries/[id] — setTimeout Cleanup Yok~~
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/deliveries/[id]/page.tsx`
-- **Sorun:** `setTimeout` kullanılıyor ama `clearTimeout` yok.
-- **Adımlar:**
-  1. useEffect içinde timer oluştur
-  2. Return'de `clearTimeout(timer)` ekle
+- **Durum:** ✅ DÜZELTİLDİ — `useRef` + `useEffect` cleanup pattern uygulandı
+- `timerRef.current = setTimeout(...)` → `useEffect(() => { return () => { if (timerRef.current) clearTimeout(timerRef.current); }; }, [])`
+
+#### ~~BF-01: Secret Rotasyonu api.ts'de Tanımlı Değil~~
+- **Durum:** ✅ DÜZELTİLDİ — `endpointsApi.rotateSecret` api.ts'ye eklendi (satır 212)
+
+#### ~~BF-04: Batch Replay api.ts'de Tanımlı Değil~~
+- **Durum:** ✅ DÜZELTİLDİ — `webhooksApi.batchReplay` api.ts'ye eklendi (satır 241)
