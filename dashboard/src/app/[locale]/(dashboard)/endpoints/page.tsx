@@ -23,6 +23,8 @@ export default function EndpointsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [rotatingId, setRotatingId] = useState<string | null>(null);
+  const [newSecret, setNewSecret] = useState<string | null>(null);
   const t = useTranslations('endpoints');
   const tc = useTranslations('common');
 
@@ -99,6 +101,20 @@ export default function EndpointsPage() {
       toast(err instanceof Error ? err.message : tc('error'), 'error');
     } finally {
       setTogglingId(null);
+    }
+  };
+
+  const handleRotateSecret = async (ep: Endpoint) => {
+    if (!token) return;
+    setRotatingId(ep.id);
+    try {
+      const data = await endpointsApi.rotateSecret(token, ep.id);
+      setNewSecret(data.secret);
+      toast(t('secretRotated', { defaultValue: 'Secret rotated successfully' }), 'success');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : tc('error'), 'error');
+    } finally {
+      setRotatingId(null);
     }
   };
 
@@ -279,6 +295,18 @@ export default function EndpointsPage() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
+                    onClick={() => handleRotateSecret(ep)}
+                    disabled={rotatingId === ep.id}
+                    className="text-gray-500 dark:text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 transition p-2"
+                    aria-label={t('rotateSecret', { defaultValue: 'Rotate Secret' })}
+                    title={t('rotateSecret', { defaultValue: 'Rotate Secret' })}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => router.push(`/endpoints/${ep.id}`)}
                     className="text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition p-2"
                     aria-label={t('settingsTitle')}
@@ -314,6 +342,41 @@ export default function EndpointsPage() {
         onConfirm={confirmDelete}
         onCancel={() => setDeleteId(null)}
       />
+
+      {/* New Secret Modal */}
+      {newSecret && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setNewSecret(null)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">🔑 {t('newSecret', { defaultValue: 'New Secret' })}</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+              {t('newSecretDesc', { defaultValue: 'Copy this secret now. It will not be shown again.' })}
+            </p>
+            <div className="bg-gray-100 dark:bg-slate-700 rounded-lg p-4 mb-4">
+              <code className="text-sm font-mono text-gray-900 dark:text-white break-all">{newSecret}</code>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(newSecret);
+                  toast(t('copied', { defaultValue: 'Copied!' }), 'success');
+                }}
+                className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition"
+              >
+                📋 {t('copy', { defaultValue: 'Copy' })}
+              </button>
+              <button
+                type="button"
+                onClick={() => setNewSecret(null)}
+                className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition"
+              >
+                {tc('close', { defaultValue: 'Close' })}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
