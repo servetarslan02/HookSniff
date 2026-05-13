@@ -1,16 +1,6 @@
-import dynamic from 'next/dynamic';
+'use client';
 
-const DashboardOverview = dynamic(
-  () => import('./DashboardOverview').then((m) => m.DashboardOverview),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-pulse text-gray-500 dark:text-slate-400">Loading dashboard…</div>
-      </div>
-    ),
-  }
-);
+import { DashboardOverview } from './DashboardOverview';
 
 export default function DashboardPage() {
   return <DashboardOverview />;
