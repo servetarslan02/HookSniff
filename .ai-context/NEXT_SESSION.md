@@ -24,7 +24,6 @@
 
 ### 🟢 Düşük
 4. **Widget drag-drop + chart time range** test
-5. **Grafana trial bitişi (20 Mayıs)** — Free tier geçiş
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
