@@ -3,6 +3,7 @@
 > **Bölüm:** Portal  
 > **İçerik:** Portal Özelleştirme, Portal Yönetim  
 > **İnceleme Tarihi:** 2026-05-12  
+> **Güncelleme:** 2026-05-13 (kod değişiklikleriyle eşleştirildi)  
 > **Kaynak Dosyalar:** `18-portal-ozellestir.md`, `19-portal.md`
 
 ---
@@ -16,8 +17,8 @@
 
 ## 1. Portal Özelleştir (Portal Customize)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/portal-customize/page.tsx`  
-> Route: `/dashboard/portal-customize`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/portal-customize/page.tsx`  
+> Route: `/portal-customize`
 
 ### Sayfa Yapısı
 - PortalConfig ayarları (renk, logo, font, dark mode)
@@ -67,8 +68,8 @@
 
 ## 2. Portal (Portal Manage)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/portal-manage/page.tsx`  
-> Route: `/dashboard/portal-manage`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/portal-manage/page.tsx`  
+> Route: `/portal-manage`
 
 ### Sayfa Yapısı
 - PortalProfile — Kullanıcı profili (email, plan, limit)
@@ -134,4 +135,4 @@
 - **Sorun:** portal-customize'a link yok.
 - **Adımlar:**
   1. "Portal Ayarlarını Düzenle" butonu ekle
-  2. `/dashboard/portal-customize` sayfasına yönlendir
+  2. `/portal-customize` sayfasına yönlendir

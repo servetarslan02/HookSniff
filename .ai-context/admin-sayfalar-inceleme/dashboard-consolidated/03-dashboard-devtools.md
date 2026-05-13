@@ -3,6 +3,7 @@
 > **Bölüm:** Developer Tools  
 > **İçerik:** Oyun Alanı, İmza Aracı, API İçe Aktarıcı, Webhook Oluşturucu, Simülatör  
 > **İnceleme Tarihi:** 2026-05-12/13  
+> **Güncelleme:** 2026-05-13 (kod değişiklikleriyle eşleştirildi)  
 > **Kaynak Dosyalar:** `09-oyun-alani.md`, `13-imza-araci.md`, `14-api-aktarici.md`, `15-webhook-olusturucu.md`, `31-simulator.md`
 
 ---
@@ -19,8 +20,8 @@
 
 ## 1. Oyun Alanı (Playground)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/playground/page.tsx`  
-> Route: `/dashboard/playground`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/playground/page.tsx`  
+> Route: `/playground`
 
 ### Sayfa Yapısı
 
@@ -103,8 +104,8 @@
 
 ## 2. İmza Aracı (Signature Verifier)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/signature-verifier/page.tsx`  
-> Route: `/dashboard/signature-verifier`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/signature-verifier/page.tsx`  
+> Route: `/signature-verifier`
 
 ### Sayfa Yapısı
 - Web Crypto API ile HMAC imza hesaplama
@@ -135,8 +136,8 @@
 
 ## 3. API İçe Aktarıcı (API Importer)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/api-importer/page.tsx`  
-> Route: `/dashboard/api-importer`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/api-importer/page.tsx`  
+> Route: `/api-importer`
 
 ### Sayfa Yapısı
 - SpecInputPanel — OpenAPI/Swagger spec girişi
@@ -165,8 +166,8 @@
 
 ## 4. Webhook Oluşturucu (Webhook Builder)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/webhook-builder/page.tsx`  
-> Route: `/dashboard/webhook-builder`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/webhook-builder/page.tsx`  
+> Route: `/webhook-builder`
 
 ### Sayfa Yapısı
 - Event type seçici + template'ler
@@ -206,7 +207,7 @@
 ## 5. Simülatör (Simulator)
 
 > Sayfa: ❌ OLUŞTURULMALI  
-> Route: `/dashboard/simulator`  
+> Route: `/simulator`  
 > Backend: `api/src/routes/simulator.rs` — mevcut
 
 ### Backend Durumu

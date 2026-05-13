@@ -3,6 +3,7 @@
 > **Bölüm:** İçerik Yönetimi  
 > **İçerik:** Dönüştürmeler, Gelen, Şemalar, Şablonlar  
 > **İnceleme Tarihi:** 2026-05-12  
+> **Güncelleme:** 2026-05-13 (kod değişiklikleriyle eşleştirildi)  
 > **Kaynak Dosyalar:** `11-donusturmeler.md`, `12-gelen.md`, `16-semalar.md`, `17-sablonlar.md`
 
 ---
@@ -18,8 +19,8 @@
 
 ## 1. Dönüştürmeler (Transforms)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/transforms/page.tsx`  
-> Route: `/dashboard/transforms`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/transforms/page.tsx`  
+> Route: `/transforms`
 
 ### Sayfa Yapısı
 
@@ -102,8 +103,8 @@
 
 ## 2. Gelen (Inbound)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/inbound/page.tsx`  
-> Route: `/dashboard/inbound`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/inbound/page.tsx`  
+> Route: `/inbound`
 
 ### Sayfa Yapısı
 
@@ -155,8 +156,8 @@
 
 ## 3. Şemalar (Schemas)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/schemas/page.tsx`  
-> Route: `/dashboard/schemas`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/schemas/page.tsx`  
+> Route: `/schemas`
 
 ### Sayfa Yapısı
 - Schema listesi (expandable)
@@ -208,8 +209,8 @@ interface Schema {
 
 ## 4. Şablonlar (Templates)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/templates/page.tsx`  
-> Route: `/dashboard/templates`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/templates/page.tsx`  
+> Route: `/templates`
 
 ### Sayfa Yapısı
 - Template listesi (grid görünümü)
@@ -221,11 +222,19 @@ interface Schema {
 - ✅ Empty state
 - ✅ Loading state
 - ✅ i18n desteği
+- ✅ Error handling: `.catch((err) => setError(...))` ile hata yakalama
+- ✅ Error banner + retry butonu
 
 ### Tespit Edilen Durumlar
 
+#### ✅ İyi Yönler
+- Template listeleme (grid)
+- Tag gösterimi
+- Empty state + error state
+- i18n desteği
+- Error handling düzeltildi: `.catch((err) => setError(...))` + error banner + retry ✅
+
 #### ⚠️ Potansiyel Sorunlar
-- **Catch bloğu boş** — `.catch(() => {})` hata yutuluyor
 - **Template detay sayfası yok** — Sadece listeleme
 - **Template kullanma butonu yok** — Sadece kart gösterimi
 
