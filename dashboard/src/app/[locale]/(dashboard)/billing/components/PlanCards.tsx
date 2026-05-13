@@ -70,6 +70,29 @@ const planDefaults = [
     ],
     popular: true,
   },
+  {
+    key: 'enterprise',
+    nameKey: 'plans.enterprise',
+    priceUsd: 0,
+    priceTry: 0,
+    period: '',
+    limitKey: 'plans.enterpriseLimit',
+    features: [
+      'Unlimited events/day',
+      'Unlimited applications',
+      'Unlimited endpoints',
+      'Unlimited event types',
+      'Unlimited subscriptions',
+      'Custom log retention',
+      'Custom pricing',
+      'SSO / SAML',
+      'Dedicated account manager',
+      '99.9% SLA guarantee',
+      'Custom integrations',
+      'On-premise option',
+    ],
+    popular: false,
+  },
 ];
 
 export function PlanCards({
@@ -85,12 +108,13 @@ export function PlanCards({
   const plans = planDefaults.map(p => ({
     ...p,
     price: p.key === 'developer' ? 0 : isTr ? p.priceTry : p.priceUsd,
+    isEnterprise: p.key === 'enterprise',
   }));
 
   return (
     <div>
       <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('currentPlan')}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {plans.map((plan) => {
           const isCurrent = plan.key === currentPlan;
           const isDowngrade = plans.findIndex((p) => p.key === currentPlan) > plans.indexOf(plan);
@@ -109,8 +133,14 @@ export function PlanCards({
               )}
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t(plan.nameKey)}</h3>
               <div className="mt-2 mb-4">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">{isTr ? `₺${plan.price.toLocaleString('tr-TR')}` : `$${plan.price}`}</span>
-                <span className="text-gray-500 dark:text-slate-400 text-sm">{plan.period}</span>
+                {plan.isEnterprise ? (
+                  <span className="text-3xl font-bold text-gray-900 dark:text-white">{t('customPricing', { defaultValue: 'Custom' })}</span>
+                ) : (
+                  <>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{isTr ? `₺${plan.price.toLocaleString('tr-TR')}` : `$${plan.price}`}</span>
+                    <span className="text-gray-500 dark:text-slate-400 text-sm">{plan.period}</span>
+                  </>
+                )}
               </div>
               <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t(plan.limitKey)}</p>
               <ul className="space-y-2 mb-6">
@@ -124,6 +154,13 @@ export function PlanCards({
                 <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
                   {t('currentPlanLabel')}
                 </div>
+              ) : plan.isEnterprise ? (
+                <button type="button"
+                  onClick={() => window.open('mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry', '_blank')}
+                  className="w-full py-2.5 rounded-xl text-sm font-medium bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 transition"
+                >
+                  {t('contactSales', { defaultValue: 'Contact Sales' })}
+                </button>
               ) : (
                 <button type="button"
                   onClick={() => onUpgrade(plan.key)}

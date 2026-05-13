@@ -619,7 +619,10 @@
     "amount": "Tutar",
     "plan": "Plan",
     "status": "Durum",
-    "invalidCheckoutUrl": "Geçersiz ödeme URL'si"
+    "invalidCheckoutUrl": "Geçersiz ödeme URL'si",
+    "contactSales": "Satış Ekibiyle İletişim",
+    "customPricing": "Özel Fiyat",
+    "mostPopular": "En Popüler"
   },
   "auth": {
     "login": "Giriş Yap",

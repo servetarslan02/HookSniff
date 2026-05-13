@@ -619,7 +619,10 @@
     "amount": "Amount",
     "plan": "Plan",
     "status": "Status",
-    "invalidCheckoutUrl": "Invalid checkout URL"
+    "invalidCheckoutUrl": "Invalid checkout URL",
+    "contactSales": "Contact Sales",
+    "customPricing": "Custom",
+    "mostPopular": "Most Popular"
   },
   "auth": {
     "login": "Log In",
