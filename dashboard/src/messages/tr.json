@@ -150,7 +150,9 @@
     "sectionAccount": "Hesap",
     "routing": "Yönlendirme",
     "applications": "Uygulamalar",
-    "serviceTokens": "Hizmet Jetonları"
+    "serviceTokens": "Hizmet Jetonları",
+    "overview": "Genel Bakış",
+    "live": "Canlı"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
@@ -3132,6 +3134,8 @@
     "event": "Olay",
     "time": "Zaman",
     "noEndpoints": "Bu uygulamada henüz endpoint yok",
-    "noDeliveries": "Henüz teslimat yok"
+    "searchPlaceholder": "Belirli bir uygulama arayın...",
+    "noDeliveries": "Henüz teslimat yok",
+    "statusLabel": "Durum"
   }
 }
