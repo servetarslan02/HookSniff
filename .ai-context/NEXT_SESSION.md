@@ -1,64 +1,43 @@
-# NEXT_SESSION.md — Oturum 141+
+# NEXT_SESSION.md — Oturum 142
 
-> Son güncelleme: 2026-05-13 14:50 GMT+8
+> Son güncelleme: 2026-05-13 18:59 GMT+8
 
 ## Kaldığımız Yer
-- **Hook0-style UI redesign: Sidebar + Applications kart grid tamamlandı** ✅
-- Login redirect zaten doğru (`/applications`)
-- Vercel deploy bloke — Servet'in manuel deploy yapması gerekiyor
+- **Hook0-style UI değişiklikleri geri alındı** ✅
+- Orijinal HookSniff tasarımı geri geldi (açık sidebar, mavi accent, collapsible sections)
+- Yeni özellikler korundu: applications sayfası, service-tokens sayfası
+- Sidebar'a applications + service-tokens eklendi
+- Build başarılı, GitHub'a push edildi
 
-## Yapılacaklar (Oturum 141)
+## Son Yapılan İş (Oturum 142)
+- 20 dosya orijinal haline geri döndürüldü
+- `AppSidebar.tsx` (Hook0 koyu sidebar) silindi
+- `globals.css`, `tailwind.config.js`, `next.config.js` orijinal haline döndü
+- Tüm admin sayfaları orijinal tasarımına geri döndü
+- Dashboard root page (`/`) geri yüklendi
+- i18n: applications + serviceTokens anahtarları eklendi
+- Build: 216 sayfa, başarılı ✅
+- GitHub: force push başarılı ✅
+
+## Yapılacaklar (Oturum 143+)
 
 ### 🔴 Kritik — Hemen
-1. **Vercel deploy tetikle** — Servet manuel deploy yapmalı
-   - Deploy bloke: "Deployment was blocked" (rate limit/hesap)
-   - 3+ commit deploy bekliyor:
-     - `f86445af` — middleware redirect loop fix
-     - `c7efbe55` — login redirect fix
-     - `3085273a` — Hook0-style sidebar + applications card grid
+1. **Vercel deploy kontrol et** — Force push sonrası Vercel otomatik deploy tetiklenmeli
 2. **Deploy sonrası test et:**
-   - Login → sidebar + applications kart grid görünmeli
+   - Login → orijinal sidebar görünmeli (açık tema)
+   - Applications sayfası çalışıyor mu
+   - Service Tokens sayfası çalışıyor mu
    - Mobil responsive kontrol
    - Tüm nav linkleri çalışıyor mu
 
-### 🟡 Orta — Kalan 10 Sayfa (Hook0 style)
-Bu sayfalar çalışıyor ama eski style (tablo layout, koyu sidebar yok):
-3. **Analytics** (~300 satır) — grafik widget'ları
-4. **Playground** (~900 satır) — test arayüzü
-5. **Billing** (~300 satır) — faturalandırma
-6. **Logs** (~200 satır) — loglar
-7. **Health** (~200 satır) — sağlık durumu
-8. **Alerts** (~300 satır) — uyarılar
-9. **Schemas** (~200 satır) — şemalar
-10. **Transforms** (~200 satır) — dönüşümler
-11. **Routing** (~200 satır) — yönlendirme
-12. **Inbound** (~200 satır) — gelen webhook'lar
-
-### 🔴 Yeni Sayfalar (Oluşturulacak)
-13. **Simulator** — webhook simülatörü
-14. **Stream** — gerçek zamanlı stream
-15. **Outbound IPs** — çıkış IP listesi
-16. **Devices** — cihaz yönetimi
+### 🟡 Orta — Dashboard İyileştirmeleri
+3. **Applications sayfası** — Hook0 tarzı kart grid, ama HookSniff tasarım dilinde iyileştirilebilir
+4. **Diğer sayfalar** — Mevcut haliyle çalışıyor, özel bir değişiklik gerekmiyor
 
 ### 🟢 Düşük
-17. **Grafana trial** — 20 Mayıs'ta bitiyor, alternatif plan gerekli
-18. **GitHub PAT + GCP key rotate** — Güvenlik
+5. **Grafana trial** — 20 Mayıs'ta bitiyor, alternatif plan gerekli
+6. **GitHub PAT + GCP key rotate** — Güvenlik
 
 ## Bilinen Sorunlar
-- Vercel deploy bloke (rate limit/hesap)
-- 10 müşteri sayfası hâlâ eski CSS class'larını kullanıyor
-- Applications kartları label'lar mock veri (API'de label field'ı yok)
-
-## Son Yapılan İşler
-
-### Oturum 140 (OpenClaw — Bugün)
-- Hook0 ekran görüntüleri analiz edildi
-- `AppSidebar.tsx` oluşturuldu (203 satır, koyu sidebar)
-- `layout.tsx` yeniden yazıldı (sidebar + top header)
-- `applications/page.tsx` tablo → kart grid dönüştürüldü
-- i18n: `nav.overview`, `nav.live`, `applications.searchPlaceholder` eklendi
-- Commit: 3085273a — main branch, push ✅
-
-### Oturum 139+ (Aynı gün)
-- Login redirect sorunu tespit ve düzeltme (3 dosya)
-- Commit: c7efbe55 — main branch
+- Vercel deploy durumu bilinmiyor (force push sonrası)
+- Applications sayfasında mock label'lar var (API'de label field'ı yok)
