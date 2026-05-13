@@ -6,6 +6,20 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+/* ─── Timeout-aware fetch helper ─── */
+const FETCH_TIMEOUT_MS = 15_000;
+
+async function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /* ─── Tab Types ─── */
 type PlaygroundTab = 'playground' | 'api';
 
@@ -68,7 +82,7 @@ export function PlaygroundPageContent() {
     setState('generating');
     setError('');
     try {
-      const res = await fetch('/api/playground/token', { method: 'POST' });
+      const res = await fetchWithTimeout('/api/playground/token', { method: 'POST' });
       const data = await res.json();
       if (data.success) {
         setToken(data.token);
@@ -107,7 +121,7 @@ export function PlaygroundPageContent() {
       const url = lastPoll
         ? `/api/playground/history/${token}?since=${encodeURIComponent(lastPoll)}`
         : `/api/playground/history/${token}`;
-      const res = await fetch(url);
+      const res = await fetchWithTimeout(url);
       const data = await res.json();
       if (data.success && data.data.length > 0) {
         setHistory((prev) => {
@@ -185,7 +199,7 @@ export function PlaygroundPageContent() {
 
     const start = Date.now();
     try {
-      const res = await fetch(webhookUrl, {
+      const res = await fetchWithTimeout(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-HookSniff-Event': sendEvent },
         body: sendPayload,
@@ -203,7 +217,7 @@ export function PlaygroundPageContent() {
   const handleClear = async () => {
     if (!token) return;
     try {
-      await fetch(`/api/playground/history/${token}`, { method: 'DELETE' });
+      await fetchWithTimeout(`/api/playground/history/${token}`, { method: 'DELETE' });
       setHistory([]);
       setSelectedRecord(null);
       setLastPoll('');
