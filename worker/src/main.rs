@@ -42,8 +42,10 @@ const DB_ACQUIRE_TIMEOUT_SECS: u64 = 30;
 const HTTP_TIMEOUT_SECS: u64 = 15;
 /// Maximum idle connections per host in HTTP pool
 const HTTP_POOL_MAX_IDLE_PER_HOST: usize = 20;
-/// Maximum concurrent HTTP deliveries
+/// Maximum concurrent HTTP deliveries (global)
 const DELIVERY_CONCURRENCY_LIMIT: usize = 25;
+/// Maximum concurrent deliveries per endpoint — prevents one slow endpoint from blocking all others
+const PER_ENDPOINT_CONCURRENCY_LIMIT: usize = 5;
 /// Circuit breaker: failures before opening
 const CIRCUIT_BREAKER_FAILURE_THRESHOLD: u32 = 5;
 /// Circuit breaker: cooldown period in seconds
@@ -218,8 +220,12 @@ async fn main() -> Result<()> {
         .build()?;
 
     // Concurrent delivery limit — prevents DDoS on target servers
-    // Max 10 HTTP deliveries at the same time
     let delivery_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(DELIVERY_CONCURRENCY_LIMIT));
+
+    // Per-endpoint concurrency limit — one slow endpoint can't block all others
+    // Each endpoint gets its own semaphore (max 5 concurrent deliveries per endpoint)
+    let endpoint_semaphores: std::sync::Arc<tokio::sync::Mutex<std::collections::HashMap<uuid::Uuid, std::sync::Arc<tokio::sync::Semaphore>>>> =
+        std::sync::Arc::new(tokio::sync::Mutex::new(std::collections::HashMap::new()));
 
     // HS-020: Circuit breaker — skip delivery for endpoints with consecutive failures
     // BUG-023: Persist state to Redis when REDIS_URL is set, survives restarts
@@ -254,7 +260,7 @@ async fn main() -> Result<()> {
     };
 
     tracing::info!("⚙️ Worker ready — polling webhook_queue every 1s (with LISTEN/NOTIFY)");
-    tracing::info!("🔒 Concurrent delivery limit: {}", DELIVERY_CONCURRENCY_LIMIT);
+    tracing::info!("🔒 Concurrent delivery limit: {} global, {} per endpoint", DELIVERY_CONCURRENCY_LIMIT, PER_ENDPOINT_CONCURRENCY_LIMIT);
     tracing::info!("⚡ Circuit breaker: {} failures → {}s cooldown", CIRCUIT_BREAKER_FAILURE_THRESHOLD, CIRCUIT_BREAKER_COOLDOWN_SECS);
 
     // Graceful shutdown: listen for SIGTERM/SIGINT
@@ -313,7 +319,7 @@ async fn main() -> Result<()> {
                     }
                 }
                 // Process immediately on NOTIFY (or after reconnect attempt)
-                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), circuit_breaker.clone(), throttle_manager.clone()).await {
+                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), endpoint_semaphores.clone(), circuit_breaker.clone(), throttle_manager.clone()).await {
                     Ok(processed) => {
                         if processed > 0 {
                             tracing::debug!("✅ Processed {} deliveries", processed);
@@ -326,7 +332,7 @@ async fn main() -> Result<()> {
             }
             _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {
                 // Fallback 1s poll — catches anything NOTIFY might have missed
-                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), circuit_breaker.clone(), throttle_manager.clone()).await {
+                match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), endpoint_semaphores.clone(), circuit_breaker.clone(), throttle_manager.clone()).await {
                     Ok(processed) => {
                         if processed > 0 {
                             tracing::debug!("✅ Processed {} deliveries (poll fallback)", processed);
@@ -431,6 +437,7 @@ async fn process_pending(
     http_client: &reqwest::Client,
     _cfg: &config::WorkerConfig,
     semaphore: std::sync::Arc<tokio::sync::Semaphore>,
+    endpoint_semaphores: std::sync::Arc<tokio::sync::Mutex<std::collections::HashMap<uuid::Uuid, std::sync::Arc<tokio::sync::Semaphore>>>>,
     circuit_breaker: circuit_breaker::CircuitBreaker,
     throttle_manager: throttle::ThrottleManager,
 ) -> Result<usize> {
@@ -482,11 +489,21 @@ async fn process_pending(
         let http_client = http_client.clone();
         let secret_map = secret_map.clone();
         let semaphore = semaphore.clone();
+        let endpoint_semaphores = endpoint_semaphores.clone();
         let cb = circuit_breaker.clone();
         let tm = throttle_manager.clone();
 
         let handle = tokio::spawn(async move {
-            // Acquire semaphore permit — limits concurrent HTTP deliveries
+            // Per-endpoint concurrency: get or create semaphore for this endpoint
+            let endpoint_permit = {
+                let mut map = endpoint_semaphores.lock().await;
+                let sem = map.entry(endpoint_id).or_insert_with(|| {
+                    std::sync::Arc::new(tokio::sync::Semaphore::new(PER_ENDPOINT_CONCURRENCY_LIMIT))
+                }).clone();
+                sem.acquire().await.expect("endpoint semaphore closed")
+            };
+
+            // Global concurrency limit
             let _permit = semaphore.acquire().await.expect("semaphore closed");
 
             let delivery_id = item.delivery_id;
