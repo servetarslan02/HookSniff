@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/lib/store';
 import { applicationsApi, type Application } from '@/lib/api';
 import { useTranslations } from 'next-intl';
@@ -8,7 +8,31 @@ import { Link } from '@/i18n/navigation';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 
-/* ─── Hook0-style: Applications tablosu ─── */
+/* ─── Hook0-style: Application card grid ─── */
+
+interface AppLabel {
+  text: string;
+  color: string;
+}
+
+function getAppLabels(app: Application): AppLabel[] {
+  const labels: AppLabel[] = [];
+  if (app.is_active) {
+    labels.push({ text: 'active', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' });
+  } else {
+    labels.push({ text: 'inactive', color: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' });
+  }
+  // Mock labels based on creation date
+  const created = new Date(app.created_at);
+  const daysSinceCreated = Math.floor((Date.now() - created.getTime()) / (1000 * 60 * 60 * 24));
+  if (daysSinceCreated < 7) {
+    labels.push({ text: 'new', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' });
+  }
+  if (app.endpoint_count > 5) {
+    labels.push({ text: 'production', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400' });
+  }
+  return labels;
+}
 
 export default function ApplicationsPage() {
   const { token } = useAuth();
@@ -21,6 +45,7 @@ export default function ApplicationsPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
   const t = useTranslations('applications');
   const tc = useTranslations('common');
 
@@ -31,6 +56,17 @@ export default function ApplicationsPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [token]);
+
+  const filteredApps = useMemo(() => {
+    if (!search.trim()) return apps;
+    const q = search.toLowerCase();
+    return apps.filter(
+      (app) =>
+        app.name.toLowerCase().includes(q) ||
+        app.id.toLowerCase().includes(q) ||
+        (app.description && app.description.toLowerCase().includes(q))
+    );
+  }, [apps, search]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +91,7 @@ export default function ApplicationsPage() {
     try {
       await applicationsApi.delete(token, deleteId);
       setApps((prev) => prev.filter((a) => a.id !== deleteId));
-      toast(t('deleted') || 'Uygulama silindi', 'success');
+      toast(t('deleted') || 'Application deleted', 'success');
     } catch (err: unknown) {
       toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToDelete'), 'error');
     } finally {
@@ -63,143 +99,227 @@ export default function ApplicationsPage() {
     }
   };
 
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
-        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
-        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-10 w-44 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+        </div>
+        <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[1, 2].map((i) => (
+            <div key={i} className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      {/* ── Başlık + Create ── */}
+      {/* ── Header ── */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('title') || 'Uygulamalar'}</h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            {t('subtitle') || 'Web kancalarınız için yalıtılmış ortam'}
-          </p>
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {t('title') || 'Applications'}
+          </h2>
+          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+            {apps.length}
+          </span>
         </div>
         <button
           type="button"
           onClick={() => setShowCreate(!showCreate)}
-          className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition"
+          className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition"
         >
-          + {t('create') || 'Uygulama oluştur'}
+          {t('create') || 'Create application'}
         </button>
+      </div>
+
+      {/* ── Search ── */}
+      <div className="relative">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t('searchPlaceholder') || 'Search for a specific application...'}
+          className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+        />
       </div>
 
       {/* ── Create Form ── */}
       {showCreate && (
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('create') || 'Uygulama oluştur'}</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+            {t('create') || 'Create application'}
+          </h3>
           {error && (
             <div className="mb-3 p-2 rounded bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm">{error}</div>
           )}
           <form onSubmit={handleCreate} className="space-y-3">
             <div>
               <label htmlFor="app-name" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                {t('nameLabel') || 'İsim'}
+                {t('nameLabel') || 'Name'}
               </label>
               <input
                 id="app-name"
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                placeholder={t('namePlaceholder') || 'Benim Uygulamam'}
+                placeholder={t('namePlaceholder') || 'My Application'}
                 required
-                className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
             <div>
               <label htmlFor="app-desc" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                {t('descriptionLabel') || 'Açıklama'}
+                {t('descriptionLabel') || 'Description'}
               </label>
               <input
                 id="app-desc"
                 type="text"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
-                placeholder={t('descriptionPlaceholder') || 'Opsiyonel açıklama'}
-                className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder={t('descriptionPlaceholder') || 'Optional description'}
+                className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={creating}
-                className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition disabled:opacity-60"
+                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-60"
               >
-                {creating ? (tc('creating') || 'Oluşturuluyor...') : (tc('create') || 'Oluştur')}
+                {creating ? (tc('creating') || 'Creating...') : (tc('create') || 'Create')}
               </button>
               <button
                 type="button"
                 onClick={() => { setShowCreate(false); setError(''); }}
                 className="px-4 py-2 text-gray-600 dark:text-gray-400 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
               >
-                {tc('cancel') || 'İptal'}
+                {tc('cancel') || 'Cancel'}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      {/* ── Tablo (Hook0 gibi) ── */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        {apps.length === 0 ? (
-          <div className="px-5 py-12 text-center">
-            <p className="text-gray-500 dark:text-gray-400 text-sm">{t('empty') || 'Henüz uygulama yok'}</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 dark:border-gray-700">
-                  <th className="text-left px-5 py-3 text-gray-500 dark:text-gray-400 font-medium">{t('nameLabel') || 'İsim'}</th>
-                  <th className="text-left px-5 py-3 text-gray-500 dark:text-gray-400 font-medium">ID</th>
-                  <th className="text-left px-5 py-3 text-gray-500 dark:text-gray-400 font-medium">{t('endpoints') || 'Endpoint\'ler'}</th>
-                  <th className="text-right px-5 py-3 text-gray-500 dark:text-gray-400 font-medium">{t('actions') || 'Eylemler'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {apps.map((app) => (
-                  <tr key={app.id} className="border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                    <td className="px-5 py-3">
-                      <Link href={`/applications/${app.id}`} className="text-gray-900 dark:text-white font-medium hover:underline">
-                        {app.name}
-                      </Link>
-                      {app.description && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{app.description}</p>
-                      )}
-                    </td>
-                    <td className="px-5 py-3 font-mono text-xs text-gray-500 dark:text-gray-400">{app.id}</td>
-                    <td className="px-5 py-3 text-gray-600 dark:text-gray-400">{app.endpoint_count}</td>
-                    <td className="px-5 py-3 text-right">
-                      <button
-                        type="button"
-                        onClick={() => setDeleteId(app.id)}
-                        className="text-gray-400 hover:text-red-600 transition"
-                        title={t('delete') || 'Sil'}
+      {/* ── Card Grid ── */}
+      {filteredApps.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 px-5 py-16 text-center">
+          <div className="text-4xl mb-3">📱</div>
+          <p className="text-gray-900 dark:text-white font-medium">
+            {search ? (tc('noResults') || 'No results found') : (t('empty') || 'No applications')}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {search
+              ? 'Try a different search term'
+              : (t('subtitle') || 'Create your first application to get started')}
+          </p>
+          {!search && (
+            <button
+              type="button"
+              onClick={() => setShowCreate(true)}
+              className="mt-4 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition"
+            >
+              {t('create') || 'Create application'}
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredApps.map((app) => {
+            const labels = getAppLabels(app);
+            return (
+              <div
+                key={app.id}
+                className="relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow"
+              >
+                {/* UUID */}
+                <p className="text-[11px] font-mono text-gray-400 dark:text-gray-500 mb-1 truncate">
+                  {app.id}
+                </p>
+
+                {/* Name */}
+                <Link
+                  href={`/applications/${app.id}`}
+                  className="text-base font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                >
+                  {app.name}
+                </Link>
+
+                {/* Description */}
+                {app.description && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                    {app.description}
+                  </p>
+                )}
+
+                {/* Labels */}
+                {labels.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {labels.map((label) => (
+                      <span
+                        key={label.text}
+                        className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full ${label.color}`}
                       >
-                        🗑
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                        {label.text}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Footer */}
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                  <Link
+                    href={`/deliveries`}
+                    className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+                  >
+                    See events →
+                  </Link>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {tc('created') || 'Created'} {formatDate(app.created_at)}
+                  </span>
+                </div>
+
+                {/* Delete button (small, top-right) */}
+                <button
+                  type="button"
+                  onClick={() => setDeleteId(app.id)}
+                  className="absolute top-4 right-4 p-1 text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 transition"
+                  title={t('delete') || 'Delete'}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <ConfirmDialog
         open={!!deleteId}
-        title={t('deleteTitle') || 'Uygulamayı sil'}
-        message={t('deleteConfirm') || 'Bu uygulamayı silmek istediğinize emin misiniz? Tüm endpoint ve teslimat kayıtları da silinecek.'}
-        confirmLabel={t('delete') || 'Sil'}
+        title={t('deleteTitle') || 'Delete application'}
+        message={t('deleteConfirm') || 'Are you sure you want to delete this application? All endpoints and delivery logs will be permanently removed.'}
+        confirmLabel={t('delete') || 'Delete'}
         variant="danger"
         onConfirm={confirmDelete}
         onCancel={() => setDeleteId(null)}
