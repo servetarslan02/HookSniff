@@ -3,6 +3,7 @@
 > **Bölüm:** Monitoring  
 > **İçerik:** Loglar, Sağlık, Uyarılar, Analitik, Stream  
 > **İnceleme Tarihi:** 2026-05-12/13  
+> **Güncelleme:** 2026-05-13 (kod değişiklikleriyle eşleştirildi)  
 > **Kaynak Dosyalar:** `04-loglar.md`, `06-saglik.md`, `07-uyarilar.md`, `10-analitik.md`, `32-stream.md`
 
 ---
@@ -19,8 +20,8 @@
 
 ## 1. Loglar (Logs)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/logs/page.tsx`  
-> Route: `/dashboard/logs`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/logs/page.tsx`  
+> Route: `/logs`
 
 ### Sayfa Yapısı
 
@@ -108,8 +109,8 @@
 
 ## 2. Sağlık (Health)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/health/page.tsx`  
-> Route: `/dashboard/health`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/health/page.tsx`  
+> Route: `/health`
 
 ### Sayfa Yapısı
 
@@ -205,8 +206,8 @@ interface EndpointHealth {
 
 ## 3. Uyarılar (Alerts)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/alerts/page.tsx`  
-> Route: `/dashboard/alerts`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/alerts/page.tsx`  
+> Route: `/alerts`
 
 ### Sayfa Yapısı
 
@@ -301,7 +302,7 @@ interface EndpointHealth {
 #### Backend'de Var, Frontend'de Yok
 | Özellik | Backend | Frontend | Durum |
 |---------|---------|----------|-------|
-| Alert düzenleme | `PUT /v1/alerts/{id}` (update_alert) | ❌ Düzenleme butonu yok | EKLENMELİ |
+| Alert düzenleme | `PUT /v1/alerts/{id}` (update_alert) | ❌ Düzenleme butonu yok | api.ts'de `alertsApi.update` tanımlı ✅, UI butonu EKLENMELİ |
 | Alert pause/resume | — (backend'de toggle endpoint'i yok) | ❌ Toggle yok | Backend'e eklenmeli |
 | Alert tetiklenme geçmişi | — (backend'de history endpoint'i yok) | ❌ Liste yok | Backend'e eklenmeli |
 
@@ -309,8 +310,8 @@ interface EndpointHealth {
 
 ## 4. Analitik (Analytics)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/analytics/page.tsx`  
-> Route: `/dashboard/analytics`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/analytics/page.tsx`  
+> Route: `/analytics`
 
 ### Sayfa Yapısı
 
@@ -468,7 +469,7 @@ interface EndpointHealth {
 #### BF-01: Alert Düzenleme Yok
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/alerts/page.tsx`
 - **Backend:** `PUT /v1/alerts/{id}` — alert güncelleme
-- **Sorun:** `alertsApi.update` api.ts'de tanımlı değil, düzenleme butonu yok.
+- **Durum:** `alertsApi.update` api.ts'de tanımlı ✅, düzenleme butonu UI'da yok.
 - **Adımlar:**
   1. `api.ts`'ye ekle:
      ```typescript
@@ -532,7 +533,8 @@ interface EndpointHealth {
 ### 🔴 Backend-Frontend Uyumsuzluğu (Uyarılar — Yapılacaklar)
 
 #### BF-U01: Alert Düzenleme
-- Backend: `PUT /v1/alerts/{id}` zaten var
+- Backend: `PUT /v1/alerts/{id}` zaten var ✅
+- api.ts'de `alertsApi.update` tanımlı ✅
 - Frontend: Her alert kartında "Düzenle" butonu → mevcut değerlerle form
 - Form: name, condition, threshold, channels (mevcut değerlerle dolu)
 
