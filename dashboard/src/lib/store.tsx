@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     // Verify session by calling /auth/me (cookie is sent automatically)
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
     fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
       .then((res) => {
         if (res.ok) return res.json();
@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [persistAuth]);
 
   const register = useCallback(async (email: string, password: string, name?: string) => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -141,7 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     // Call backend logout to clear HttpOnly cookie
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
     fetch(`${API_BASE}/auth/logout`, {
       method: 'POST',
       credentials: 'include',
