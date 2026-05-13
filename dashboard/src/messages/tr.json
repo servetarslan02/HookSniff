@@ -1293,7 +1293,8 @@
       "revenue": "Gelir",
       "system": "Sistem",
       "settingsNav": "Ayarlar",
-      "activityLog": "Aktivite Günlüğü"
+      "activityLog": "Aktivite Günlüğü",
+      "featureFlags": "Feature Flags"
     },
     "noActivity": "Henüz aktivite kaydı yok",
     "noAdminPrivileges": "Yönetici yetkiniz yok.",

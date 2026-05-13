@@ -377,7 +377,7 @@ interface Schema {
 
 #### BF-T01: Template Detay Sayfası
 - Backend: `GET /v1/templates/{id}` zaten var
-- Frontend: `/dashboard/templates/[id]` sayfası oluştur
+- Frontend: `/templates/[id]` sayfası oluştur
 - İçerik: Açıklama, tag'ler, şema yapısı, örnek payload
 
 #### BF-T02: Template Arama/Filtreleme
