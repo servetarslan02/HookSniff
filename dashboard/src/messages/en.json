@@ -1293,7 +1293,8 @@
       "revenue": "Revenue",
       "system": "System",
       "settingsNav": "Settings",
-      "activityLog": "Activity Log"
+      "activityLog": "Activity Log",
+      "featureFlags": "Feature Flags"
     },
     "noActivity": "No activity recorded yet",
     "noAdminPrivileges": "You don't have admin privileges.",

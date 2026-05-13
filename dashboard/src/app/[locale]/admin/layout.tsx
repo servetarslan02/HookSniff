@@ -11,6 +11,7 @@ const adminNavigation = [
   { nameKey: 'overview', href: '/admin', icon: '📊' },
   { nameKey: 'users', href: '/admin/users', icon: '👥' },
   { nameKey: 'revenue', href: '/admin/revenue', icon: '💰' },
+  { nameKey: 'featureFlags', href: '/admin/feature-flags', icon: '🚩' },
   { nameKey: 'system', href: '/admin/system', icon: '🖥️' },
   { nameKey: 'settingsNav', href: '/admin/settings', icon: '⚙️' },
   { nameKey: 'activityLog', href: '/admin/activity', icon: '📋' },

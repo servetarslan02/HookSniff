@@ -394,7 +394,7 @@ interface EndpointHealth {
 ## 5. Stream (Real-time Events)
 
 > Sayfa: ❌ OLUŞTURULMALI  
-> Route: `/dashboard/stream`  
+> Route: `/stream`  
 > Backend: `api/src/routes/stream.rs` — SSE mevcut
 
 ### Backend Durumu
