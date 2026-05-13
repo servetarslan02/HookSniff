@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type DragEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
+import { DashboardWidget, loadWidgetConfig, saveWidgetConfig, type WidgetConfig } from '@/components/DashboardWidget';
 import {
   statsApi,
   analyticsApi,
@@ -37,6 +38,10 @@ export default function DashboardPage() {
   const [recentDeliveries, setRecentDeliveries] = useState<Delivery[]>([]);
   const [endpointCount, setEndpointCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [widgets, setWidgets] = useState<WidgetConfig[]>(loadWidgetConfig);
+  const [showWidgetSettings, setShowWidgetSettings] = useState(false);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     if (!token) return;
@@ -64,6 +69,53 @@ export default function DashboardPage() {
     loadData();
   }, [loadData]);
 
+  // Widget management
+  const handleDragStart = useCallback((id: string) => (e: DragEvent) => {
+    setDragId(id);
+    e.dataTransfer.effectAllowed = 'move';
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    if (dragId && overId && dragId !== overId) {
+      setWidgets((prev) => {
+        const ids = prev.map((w) => w.id);
+        const fromIdx = ids.indexOf(dragId);
+        const toIdx = ids.indexOf(overId);
+        if (fromIdx === -1 || toIdx === -1) return prev;
+        const next = [...prev];
+        const [moved] = next.splice(fromIdx, 1);
+        next.splice(toIdx, 0, moved);
+        saveWidgetConfig(next);
+        return next;
+      });
+    }
+    setDragId(null);
+    setOverId(null);
+  }, [dragId, overId]);
+
+  const handleDragOver = useCallback((id: string) => (e: DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setOverId(id);
+  }, []);
+
+  const handleDrop = useCallback((_id: string) => (e: DragEvent) => {
+    e.preventDefault();
+    setOverId(null);
+  }, []);
+
+  const toggleWidget = useCallback((id: string) => {
+    setWidgets((prev) => {
+      const next = prev.map((w) => w.id === id ? { ...w, visible: !w.visible } : w);
+      saveWidgetConfig(next);
+      return next;
+    });
+  }, []);
+
+  const isWidgetVisible = useCallback((id: string) => {
+    return widgets.find((w) => w.id === id)?.visible ?? true;
+  }, [widgets]);
+
   const chartData = trendData?.buckets.map((b) => ({
     date: new Date(b.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
     successful: b.successful,
@@ -88,15 +140,68 @@ export default function DashboardPage() {
             {t('subtitle', { defaultValue: 'Overview of your webhook infrastructure' })}
           </p>
         </div>
-        <button
-          onClick={loadData}
-          className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition"
-        >
-          ↻ {tc('refresh', { defaultValue: 'Refresh' })}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowWidgetSettings(!showWidgetSettings)}
+            className={`px-3 py-2 text-sm font-medium rounded-xl border transition ${
+              showWidgetSettings
+                ? 'bg-brand-50 text-brand-700 border-brand-200 dark:bg-brand-900/20 dark:text-brand-400 dark:border-brand-800'
+                : 'text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700'
+            }`}
+            title={t('customizeWidgets', { defaultValue: 'Customize Widgets' })}
+          >
+            ⚙️
+          </button>
+          <button
+            onClick={loadData}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+          >
+            ↻ {tc('refresh', { defaultValue: 'Refresh' })}
+          </button>
+        </div>
       </div>
 
+      {/* Widget Settings Panel */}
+      {showWidgetSettings && (
+        <div className="glass-card p-4">
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">
+            {t('widgetSettings', { defaultValue: 'Widget Settings' })}
+          </h3>
+          <p className="text-xs text-gray-500 dark:text-slate-500 mb-3">
+            {t('widgetSettingsDesc', { defaultValue: 'Toggle widgets on/off. Drag the handle on each widget to reorder.' })}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {widgets.map((w) => (
+              <button
+                key={w.id}
+                onClick={() => toggleWidget(w.id)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition ${
+                  w.visible
+                    ? 'bg-brand-50 text-brand-700 border-brand-200 dark:bg-brand-900/20 dark:text-brand-400 dark:border-brand-800'
+                    : 'bg-gray-100 text-gray-500 border-gray-200 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700'
+                }`}
+              >
+                {w.visible ? '👁️' : '🚫'} {w.id.replace(/-/g, ' ')}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Stat Cards */}
+      {isWidgetVisible('stat-cards') && (
+        <DashboardWidget
+          id="stat-cards"
+          title={t('statCards', { defaultValue: 'Stat Cards' })}
+          dragHandleProps={{
+            onDragStart: handleDragStart('stat-cards'),
+            onDragEnd: handleDragEnd,
+            onDragOver: handleDragOver('stat-cards'),
+            onDrop: handleDrop('stat-cards'),
+            isDragging: dragId === 'stat-cards',
+            isOver: overId === 'stat-cards',
+          }}
+        >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           label={t('totalDeliveries', { defaultValue: 'Total Deliveries' })}
@@ -139,8 +244,23 @@ export default function DashboardPage() {
           }
         />
       </div>
+      </DashboardWidget>
+      )}
 
       {/* Charts Row */}
+      {isWidgetVisible('charts') && (
+        <DashboardWidget
+          id="charts"
+          title={t('charts', { defaultValue: 'Charts' })}
+          dragHandleProps={{
+            onDragStart: handleDragStart('charts'),
+            onDragEnd: handleDragEnd,
+            onDragOver: handleDragOver('charts'),
+            onDrop: handleDrop('charts'),
+            isDragging: dragId === 'charts',
+            isOver: overId === 'charts',
+          }}
+        >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <ChartCard
@@ -255,8 +375,23 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      </DashboardWidget>
+      )}
 
       {/* Recent Deliveries */}
+      {isWidgetVisible('recent-deliveries') && (
+        <DashboardWidget
+          id="recent-deliveries"
+          title={t('recentDeliveries', { defaultValue: 'Recent Deliveries' })}
+          dragHandleProps={{
+            onDragStart: handleDragStart('recent-deliveries'),
+            onDragEnd: handleDragEnd,
+            onDragOver: handleDragOver('recent-deliveries'),
+            onDrop: handleDrop('recent-deliveries'),
+            isDragging: dragId === 'recent-deliveries',
+            isOver: overId === 'recent-deliveries',
+          }}
+        >
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -326,6 +461,8 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+      </DashboardWidget>
+      )}
     </div>
   );
 }

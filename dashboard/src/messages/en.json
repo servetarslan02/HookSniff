@@ -206,7 +206,12 @@
       "7d": "7 Days",
       "30d": "30 Days"
     },
-    "webhookDashboard": "Webhook Dashboard"
+    "webhookDashboard": "Webhook Dashboard",
+    "customizeWidgets": "Customize Widgets",
+    "widgetSettings": "Widget Settings",
+    "widgetSettingsDesc": "Toggle widgets on/off. Drag the handle on each widget to reorder.",
+    "statCards": "Stat Cards",
+    "charts": "Charts"
   },
   "endpoints": {
     "title": "Endpoints",
