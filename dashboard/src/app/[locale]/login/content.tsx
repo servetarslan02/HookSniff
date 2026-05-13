@@ -49,12 +49,13 @@ function LoginForm() {
     }
     setLoading(true);
     try {
+      let user;
       if (mode === 'login') {
-        await login(email, password);
+        user = await login(email, password);
       } else {
-        await register(email, password, name || undefined);
+        user = await register(email, password, name || undefined);
       }
-      const redirectTo = searchParams.get('redirect') || '/applications';
+      const redirectTo = searchParams.get('redirect') || (user?.is_admin ? '/admin' : '/applications');
       router.push(redirectTo);
     } catch (err: unknown) {
       setError(getErrorMessage(err, tc('unknownError')) || tc('error'));
