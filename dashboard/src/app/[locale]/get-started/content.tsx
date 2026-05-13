@@ -437,7 +437,7 @@ hooksniff deliveries list --limit 10`}</code>
               <Link href="/login" className="px-8 py-3 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition">
                 {t('createFreeAccount')}
               </Link>
-              <Link href="/playground" className="px-8 py-3 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition">
+              <Link href="/devtools" className="px-8 py-3 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition">
                 {t('tryPlaygroundBtn')}
               </Link>
             </>
