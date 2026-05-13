@@ -20,7 +20,7 @@ hooksniff-common = { path = "../common" }
 # OpenTelemetry integration — Item 299: use workspace versions where possible
 opentelemetry.workspace = true
 opentelemetry_sdk.workspace = true
-opentelemetry-otlp = { version = "0.32", features = ["http-proto", "reqwest"] }
+opentelemetry-otlp = { version = "0.32", features = ["http-json", "reqwest"] }
 tonic = "0.14"
 tracing-opentelemetry.workspace = true
 
