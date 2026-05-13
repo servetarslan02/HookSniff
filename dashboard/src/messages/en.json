@@ -161,7 +161,17 @@
     "adminSettings": "Settings",
     "sectionUserPanel": "User Panel",
     "adminOverview": "Overview",
-    "userDashboard": "Dashboard"
+    "userDashboard": "Dashboard",
+    "core": "Core",
+    "monitoring": "Monitoring",
+    "devtools": "DevTools",
+    "contentMgmt": "Content",
+    "portalSection": "Portal",
+    "securitySection": "Security",
+    "routingConfig": "Routing",
+    "teamMgmt": "Team",
+    "billingOverview": "Billing",
+    "settingsSection": "Settings"
   },
   "dashboard": {
     "title": "Dashboard",
