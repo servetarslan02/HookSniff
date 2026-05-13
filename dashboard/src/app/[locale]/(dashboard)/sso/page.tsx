@@ -17,6 +17,7 @@ export default function SsoSettingsPage() {
   const [ssoUrl, setSsoUrl] = useState('');
   const [certificate, setCertificate] = useState('');
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [enabled, setEnabled] = useState(false);
 
@@ -65,6 +66,24 @@ export default function SsoSettingsPage() {
       toast(err instanceof Error ? err.message : t('saveFailed'), 'error');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleTest = async () => {
+    if (!token) return;
+    setTesting(true);
+    try {
+      const { ssoApi } = await import('@/lib/api');
+      const result = await ssoApi.testSso(token);
+      if (result.success) {
+        toast(result.message || t('testSuccess', { defaultValue: 'SSO connection test passed!' }), 'success');
+      } else {
+        toast(result.message || t('testFailed', { defaultValue: 'SSO test failed' }), 'error');
+      }
+    } catch (err) {
+      toast(err instanceof Error ? err.message : t('testFailed', { defaultValue: 'SSO test failed' }), 'error');
+    } finally {
+      setTesting(false);
     }
   };
 
@@ -226,13 +245,22 @@ export default function SsoSettingsPage() {
               <div className="w-11 h-6 bg-gray-300 dark:bg-slate-600 peer-focus:ring-2 peer-focus:ring-brand-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600" />
             </label>
           </div>
-          <button type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
-          >
-            {saving ? t('saving') : t('saveConfiguration')}
-          </button>
+          <div className="flex gap-3">
+            <button type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
+            >
+              {saving ? t('saving') : t('saveConfiguration')}
+            </button>
+            <button type="button"
+              onClick={handleTest}
+              disabled={testing}
+              className="px-6 py-3 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition disabled:opacity-50"
+            >
+              {testing ? t('testing', { defaultValue: 'Testing...' }) : t('testConnection', { defaultValue: '🧪 Test Connection' })}
+            </button>
+          </div>
         </div>
       )}
 
