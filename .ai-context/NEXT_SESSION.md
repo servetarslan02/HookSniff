@@ -1,19 +1,24 @@
-# NEXT_SESSION.md — Oturum 139+
+# NEXT_SESSION.md — Oturum 140+
 
-> Son güncelleme: 2026-05-13 07:15 GMT+8 (Oturum 138)
+> Son güncelleme: 2026-05-13 14:00 GMT+8 (Oturum 139+)
 
 ## Kaldığımız Yer
 - **Hook0-style UI redesign büyük ölçüde tamamlandı** ✅
-- Customer: 5 sekme (Dashboard, Applications, Service Tokens, Members, Settings)
-- Admin: 6 sekme (Overview, Users, Revenue, System, Activity, Settings)
-- Yeşil renk paleti, sade CSS
-- ~3800 satır kod azaltıldı
+- Login redirect sorunu düzeltildi (3 dosya) — deploy BEKLİYOR
+- Vercel deploy bloke — Servet'in manuel deploy yapması gerekiyor
 
-## Yapılacaklar (Oturum 139)
+## Yapılacaklar (Oturum 140)
 
-### 🔴 Kritik
-1. **Test URL assertion'ları** — Test dosyalarında `/dashboard/...` assertion'ları hâlâ eski yolu bekliyor
-2. **Cloud Build tetikle** — Son commit'ler deploy edilmeli
+### 🔴 Kritik — Hemen
+1. **Vercel deploy tetikle** — Servet manuel deploy yapmalı (Vercel Dashboard)
+   - Deploy bloke: "Deployment was blocked" (rate limit/hesap)
+   - 2 commit deploy bekliyor:
+     - `f86445af` — middleware redirect loop fix
+     - `c7efbe55` — login redirect fix (`/applications`)
+2. **Deploy sonrası test et:**
+   - Login → `/applications`'a yönlendirmeli
+   - OAuth callback → `/applications`'a yönlendirmeli
+   - Redirect loop hatası çözülmeli
 
 ### 🟡 Orta — Kalan Sayfalar (Hook0 style değil)
 Bu sayfalar çalışıyor ama eski style:
@@ -33,35 +38,28 @@ Bu sayfalar çalışıyor ama eski style:
 14. **GitHub PAT + GCP key rotate** — Güvenlik
 
 ## Bilinen Sorunlar
-- 10 müşteri sayfası hâlâ eski CSS class'larını kullanıyor (glass-card, hover-lift vb.) — çalışıyor ama Hook0 style değil
+- Vercel deploy bloke (rate limit/hesap)
+- Console'da redirect loop hatası (eski middleware deploy'u)
+- 10 müşteri sayfası hâlâ eski CSS class'larını kullanıyor
 - Test URL assertion'ları kırık
-- Grafana trial 20 Mayıs'ta bitiyor
 
-## Bu Oturumda Yapılanlar (Oturum 139 — OpenClaw)
-- **Vercel build hatası düzeltildi** ✅ (4 deneme gerekti)
-  - Hata: `ENOENT: page_client-reference-manifest.js` — Next.js bilinen bug (vercel/next.js#53569)
-  - Route group `(dashboard)` root page'i bu dosyayı üretmiyor
-  - Deneme 1: Server component wrapper → çalışmadı (NFT hâlâ referans veriyor)
-  - Deneme 2: `fix-manifests.js` post-build script → çalışmadı (NFT script'ten önce çalışıyor)
-  - Deneme 3: `FixManifestPlugin` webpack plugin → çalışmadı (NFT webpack emit'ten sonra)
-  - **Deneme 4 (çözüm):** `(dashboard)/page.tsx` tamamen kaldırıldı ✅
-    - Dashboard artık `/applications`'tan başlıyor
-    - Layout tab'ları güncellendi (ilk tab: Applications)
-    - `next.config.js` temizlendi (plugin kaldırıldı)
-    - Local build: 0 eksik manifest, 214 sayfa, hatasız
-  - Son commit: `b8e5c81f`
-- **Vercel rate limit** ⚠️ — 100 deploy/gün aşılmış, ~24 saat sıfırlanma
-- **Google 2FA ile Vercel'e giriş yapıldı**
+## Son Yapılan İşler
 
-## Bu Oturumda Yapılanlar (Oturum 138)
-- Hook0 ekran görüntüleri analiz edildi (9 screenshot)
-- Hook0 vs HookSniff karşılaştırması yapıldı
-- Sidebar kaldırıldı → üstte yatay tab menü (Hook0 style)
-- Applications sayfası oluşturuldu (CRUD)
-- 5 müşteri sayfası Hook0 style yeniden yazıldı
-- 6 admin sayfası Hook0 style yeniden yazıldı
-- Yeşil renk paleti uygulandı
-- CSS sadeleştirildi
-- i18n applications bölümü eklendi
-- Toplam ~3800 satır kod azaltıldı
-- 15+ commit push edildi
+### Oturum 139+ (Bugün — OpenClaw)
+- Login redirect sorunu tespit ve düzeltme
+  - `router.push("/")` → `router.push("/applications")`
+  - OAuth callback: `/${locale}/dashboard` → `/applications`
+  - Redirect param desteği eklendi
+- `.ai-context/2026-05-13.md` güncellendi
+
+### Oturum 139 (OpenClaw)
+- Vercel build hatası düzeltildi (4 deneme, ENOENT)
+- `(dashboard)/page.tsx` kaldırıldı
+- Dashboard `/applications`'tan başlıyor
+- Vercel rate limit aşıldı
+
+### Oturum 138
+- Hook0 ekran görüntüleri analiz edildi
+- Sidebar → yatay tab menü (Hook0 style)
+- 5 müşteri + 6 admin sayfası yeniden yazıldı
+- ~3800 satır kod azaltıldı
