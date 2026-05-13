@@ -56,9 +56,9 @@ export default function TeamPage() {
     if (selectedTeam) fetchMembers(selectedTeam.id);
   }, [selectedTeam, fetchMembers]);
 
-  const handleCreate = async (name: string, description?: string) => {
+  const handleCreate = async (name: string) => {
     if (!token) return;
-    await teamsApi.create(token, { name, description });
+    await teamsApi.create(token, { name });
     toast(t('teamCreated'), 'success');
     fetchTeams();
   };
