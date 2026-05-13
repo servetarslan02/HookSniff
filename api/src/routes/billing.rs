@@ -876,7 +876,7 @@ async fn process_webhook_result_with_event_id(
             provider_customer_id,
             provider_subscription_id,
         } => {
-            let webhook_limit = plan.max_webhooks_per_month() as i32;
+            let webhook_limit = plan.max_webhooks_per_month() as i64;
             let update_query = match provider {
                 "polar" => sqlx::query(
                     "UPDATE customers SET plan = $1, payment_provider = $2, \
@@ -947,7 +947,7 @@ async fn process_webhook_result_with_event_id(
             plan,
             status,
         } => {
-            let webhook_limit = plan.max_webhooks_per_month() as i32;
+            let webhook_limit = plan.max_webhooks_per_month() as i64;
 
             // HS-059: Clear grace period on successful renewal
             let query = match provider {
@@ -1022,7 +1022,7 @@ async fn process_webhook_result_with_event_id(
         WebhookResult::SubscriptionCanceled {
             provider_subscription_id,
         } => {
-            let free_limit = Plan::Developer.max_webhooks_per_month() as i32;
+            let free_limit = Plan::Developer.max_webhooks_per_month() as i64;
             let query = match provider {
                 "polar" => {
                     sqlx::query(
@@ -1144,7 +1144,7 @@ pub async fn process_expired_grace_periods(pool: &sqlx::PgPool) -> Result<u64, A
     let count = rows.len() as u64;
 
     for (customer_id, _plan) in &rows {
-        let free_limit = Plan::Developer.max_webhooks_per_month() as i32;
+        let free_limit = Plan::Developer.max_webhooks_per_month() as i64;
 
         sqlx::query(
             "UPDATE customers SET plan = 'free', webhook_limit = $1, \
