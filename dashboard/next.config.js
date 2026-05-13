@@ -73,69 +73,12 @@ const nextConfig = {
   },
   async rewrites() {
     return [
-      // Health (direct to Cloud Run, no /v1 prefix)
-      { source: '/api/health', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/health' },
-
-      // ── Cloud Run API routes (both base + wildcard) ──
-      // Auth
-      { source: '/api/auth', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth' },
-      { source: '/api/auth/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/:path*' },
-      // Endpoints
-      { source: '/api/endpoints', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints' },
-      { source: '/api/endpoints/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints/:path*' },
-      // Webhooks
-      { source: '/api/webhooks', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks' },
-      { source: '/api/webhooks/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/:path*' },
-      // Stats
-      { source: '/api/stats', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/stats' },
-      { source: '/api/stats/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/stats/:path*' },
-      // Billing
-      { source: '/api/billing', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing' },
-      { source: '/api/billing/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing/:path*' },
-      // Teams
-      { source: '/api/teams', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/teams' },
-      { source: '/api/teams/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/teams/:path*' },
-      // API Keys
-      { source: '/api/api-keys', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/api-keys' },
-      { source: '/api/api-keys/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/api-keys/:path*' },
-      // Settings
-      { source: '/api/settings', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/settings' },
-      { source: '/api/settings/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/settings/:path*' },
-      // Notifications
-      { source: '/api/notifications', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/notifications' },
-      { source: '/api/notifications/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/notifications/:path*' },
-      // Inbound
-      { source: '/api/inbound', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/inbound' },
-      { source: '/api/inbound/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/inbound/:path*' },
-      // Schemas
-      { source: '/api/schemas', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/schemas' },
-      { source: '/api/schemas/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/schemas/:path*' },
-      // Admin
-      { source: '/api/admin', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/admin' },
-      { source: '/api/admin/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/admin/:path*' },
-      // Alerts
-      { source: '/api/alerts', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/alerts' },
-      { source: '/api/alerts/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/alerts/:path*' },
-      // Custom Domains
-      { source: '/api/custom-domains', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/custom-domains' },
-      { source: '/api/custom-domains/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/custom-domains/:path*' },
-      // SSO
-      { source: '/api/sso', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/sso' },
-      { source: '/api/sso/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/sso/:path*' },
-      // Deliveries
-      { source: '/api/deliveries', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/deliveries' },
-      { source: '/api/deliveries/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/deliveries/:path*' },
-      // Service Tokens
-      { source: '/api/service-tokens', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/service-tokens' },
-      { source: '/api/service-tokens/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/service-tokens/:path*' },
-      // GDPR
-      { source: '/api/gdpr', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/gdpr' },
-      { source: '/api/gdpr/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/gdpr/:path*' },
-      // OAuth
-      { source: '/api/oauth/:path*', destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/oauth/:path*' },
-
-      // ── Local Next.js API routes (no rewrite — served by app/api/) ──
-      // /api/playground/*, /api/newsletter, /api/status are handled locally
+      {
+        source: '/api/health',
+        destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/health',
+      },
+      // No catch-all rewrite — NEXT_PUBLIC_API_URL points directly to Cloud Run
+      // Local API routes (playground, newsletter, status) are served by Next.js
     ];
   },
 };
