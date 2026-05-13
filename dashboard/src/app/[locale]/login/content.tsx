@@ -55,7 +55,7 @@ function LoginForm() {
       } else {
         user = await register(email, password, name || undefined);
       }
-      const redirectTo = searchParams.get('redirect') || (user?.is_admin ? '/admin' : '/applications');
+      const redirectTo = searchParams.get('redirect') || (user?.is_admin ? '/admin' : '/core');
       router.push(redirectTo);
     } catch (err: unknown) {
       setError(getErrorMessage(err, tc('unknownError')) || tc('error'));
