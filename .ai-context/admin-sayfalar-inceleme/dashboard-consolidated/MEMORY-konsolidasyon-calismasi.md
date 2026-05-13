@@ -144,8 +144,11 @@
 | 3 | ~~2FA Ayarları UI~~ | ✅ TAMAMLANDI — `TwoFactorSection.tsx` oluşturuldu, settings sayfasına eklendi |
 | 4 | ~~Endpoint Toggle~~ | ✅ TAMAMLANDI — endpoints sayfasına aktif/pasif toggle eklendi |
 | 5 | ~~Alert Düzenleme + Toggle~~ | ✅ TAMAMLANDI — alerts sayfasına edit modal + toggle eklendi |
-| 6 | Widget özelleştirme | Sürükle-bırak dashboard düzenleme |
-| 7 | Grafik zoom/drill-down | Chart library bağımlı |
+| 6 | ~~Secret Rotasyonu UI~~ | ✅ TAMAMLANDI — endpoints sayfasına rotate butonu + yeni secret modal eklendi |
+| 7 | ~~Batch Replay UI~~ | ✅ TAMAMLANDI — deliveries sayfasına checkbox + batch replay butonu eklendi |
+| 8 | ~~SSO Test Butonu~~ | ✅ TAMAMLANDI — SSO sayfasına test connection butonu eklendi |
+| 9 | Widget özelleştirme | Sürükle-bırak dashboard düzenleme |
+| 10 | Grafik zoom/drill-down | Chart library bağımlı |
 
 ### Build Doğrulama
 | # | İş | Açıklama |
