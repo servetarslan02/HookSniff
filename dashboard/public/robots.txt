@@ -6,3 +6,4 @@ Disallow: /api/
 
 Sitemap: https://hooksniff.vercel.app/sitemap.xml
 
+<!-- deploy trigger Wed May 13 11:43:41 PM CST 2026 -->
