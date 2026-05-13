@@ -8,6 +8,7 @@ import { ApiKeySection } from './components/ApiKeySection';
 import { NotificationSection } from './components/NotificationSection';
 import { PrivacyConsentSection } from './components/PrivacyConsentSection';
 import { DangerZoneSection } from './components/DangerZoneSection';
+import { TwoFactorSection } from './components/TwoFactorSection';
 
 export default function SettingsPage() {
   const { user, token, apiKey } = useAuth();
@@ -24,6 +25,7 @@ export default function SettingsPage() {
 
       <ProfileSection user={user} token={token} />
       <PasswordSection token={token} />
+      <TwoFactorSection />
       <ApiKeySection apiKey={apiKey} />
       <NotificationSection />
       <PrivacyConsentSection />
