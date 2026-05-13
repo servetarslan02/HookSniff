@@ -15,6 +15,13 @@
 3. Dashboard build testi: ✅ başarılı
 4. Site durumu kontrol: ✅ canlı, login çalışıyor
 
+## Oturum 152 — Bug Fixes
+5. **Arama sayfası bug fix** — Search sonuçlarında satıra tıklanınca `/deliveries?id=` (query param) yerine `/deliveries/[id]` (path segment) navigasyonu düzeltildi
+6. **Billing sayfası Enterprise planı eklendi** — PlanCards'ta sadece 3 plan gösteriyordu (Developer, Startup, Pro), Enterprise eksikti. 4 plan olarak güncellendi, Enterprise "Custom" fiyat ve "Contact Sales" butonu ile
+7. **i18n key'leri eklendi** — `contactSales`, `customPricing`, `mostPopular` billing section'a eklendi (en/tr)
+8. **Grid layout güncellendi** — 3-col → 4-col responsive grid
+9. Commit: `d279ece9`
+
 ## Yapılacaklar (Oturum 152)
 
 ### 🔴 Kritik
