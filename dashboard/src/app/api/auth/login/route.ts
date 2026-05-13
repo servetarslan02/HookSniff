@@ -21,8 +21,6 @@ export async function POST(request: NextRequest) {
     // Create response with the data
     const response = NextResponse.json(data);
 
-    // Set cookies on the dashboard domain (same-origin)
-    const isProd = process.env.NODE_ENV === 'production';
     const cookieOpts = [
       'Path=/',
       'HttpOnly',
