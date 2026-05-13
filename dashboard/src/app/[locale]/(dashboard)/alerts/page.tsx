@@ -29,6 +29,10 @@ export default function AlertsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editTarget, setEditTarget] = useState<AlertRule | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', condition: 'failure_rate', threshold: 10, channels: ['email'] as string[] });
+  const [saving, setSaving] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: '',
     condition: 'failure_rate',
@@ -88,6 +92,45 @@ export default function AlertsPage() {
       toast(t('testSent'), 'success');
     } catch (err) {
       toast(err instanceof Error ? err.message : t('testFailed'), 'error');
+    }
+  };
+
+  const toggleAlert = async (alert: AlertRule) => {
+    if (!token) return;
+    setTogglingId(alert.id);
+    try {
+      await alertsApi.update(token, alert.id, { is_active: !alert.is_active });
+      setAlerts((prev) => prev.map((a) => a.id === alert.id ? { ...a, is_active: !a.is_active } : a));
+      toast(alert.is_active ? 'Alert paused' : 'Alert activated', 'success');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Failed to toggle', 'error');
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  const openEdit = (alert: AlertRule) => {
+    setEditTarget(alert);
+    setEditForm({
+      name: alert.name,
+      condition: alert.condition,
+      threshold: alert.threshold,
+      channels: [...alert.channels],
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!token || !editTarget) return;
+    setSaving(true);
+    try {
+      await alertsApi.update(token, editTarget.id, editForm);
+      toast('Alert updated', 'success');
+      setEditTarget(null);
+      fetchAlerts();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Failed to update', 'error');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -217,6 +260,23 @@ export default function AlertsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  {/* Toggle */}
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={alert.is_active}
+                    onClick={() => toggleAlert(alert)}
+                    disabled={togglingId === alert.id}
+                    className={`relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${alert.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'} ${togglingId === alert.id ? 'opacity-60' : ''}`}
+                  >
+                    <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${alert.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
+                  </button>
+                  <button type="button"
+                    onClick={() => openEdit(alert)}
+                    className="px-3 py-1.5 text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 border border-brand-300 dark:border-brand-500/30 rounded-lg transition"
+                  >
+                    {t('edit', { defaultValue: 'Edit' })}
+                  </button>
                   <button type="button"
                     onClick={() => testAlert(alert.id)}
                     className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition"
@@ -244,6 +304,84 @@ export default function AlertsPage() {
         onConfirm={confirmDeleteAlert}
         onCancel={() => setDeleteId(null)}
       />
+
+      {/* Edit Modal */}
+      {editTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditTarget(null)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              {t('editAlert', { defaultValue: 'Edit Alert' })}: {editTarget.name}
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')}</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('condition')}</label>
+                <select
+                  value={editForm.condition}
+                  onChange={(e) => setEditForm({ ...editForm, condition: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
+                >
+                  <option value="failure_rate">{t('conditions.failureRate')}</option>
+                  <option value="latency">{t('conditions.latency')}</option>
+                  <option value="consecutive_failures">{t('conditions.consecutiveFailures')}</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('threshold')}</label>
+                <input
+                  type="number"
+                  value={editForm.threshold}
+                  onChange={(e) => setEditForm({ ...editForm, threshold: parseInt(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('channels')}</label>
+                <div className="flex gap-2">
+                  {['slack', 'email', 'webhook'].map((ch) => (
+                    <button
+                      key={ch}
+                      type="button"
+                      onClick={() => {
+                        setEditForm({
+                          ...editForm,
+                          channels: editForm.channels.includes(ch)
+                            ? editForm.channels.filter((c) => c !== ch)
+                            : [...editForm.channels, ch],
+                        });
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                        editForm.channels.includes(ch)
+                          ? 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400 border border-brand-300 dark:border-brand-500/30'
+                          : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 border border-gray-300 dark:border-slate-600'
+                      }`}
+                    >
+                      {CHANNEL_ICONS[ch]} {ch}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end mt-6">
+              <button type="button" onClick={() => setEditTarget(null)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+                {tc('cancel')}
+              </button>
+              <button type="button" onClick={handleSaveEdit} disabled={saving} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">
+                {saving ? tc('saving') : tc('save')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
