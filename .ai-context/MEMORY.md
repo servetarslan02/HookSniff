@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-13 07:45 GMT+8
+> Son güncelleme: 2026-05-13 08:22 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -638,3 +638,9 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - **Limit ~24 saat sonra sıfırlanır**
 - **Google 2FA ile Vercel'e giriş yapıldı** — servetarslan02@gmail.com
 - **Vercel projesi:** hooksniff-dash (Hobby plan)
+
+### Bu Oturum — 2026-05-13 08:16-08:22 GMT+8:
+
+1. **GitHub token yenilendi** — `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`
+2. **Dashboard redirect loop düzeltildi** — middleware'de locale prefix hatası
+3. **Vercel deploy tetiklenmedi** — token/hook süresi dolmuş, Servet müdahalesi gerekiyor
