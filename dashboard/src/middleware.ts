@@ -28,7 +28,11 @@ export default function middleware(request: NextRequest) {
     '/faq', '/changelog', '/customers', '/alternatives', '/providers',
     '/use-cases', '/webhooks', '/what-is-a-webhook', '/security',
     '/privacy', '/terms', '/status', '/newsletter', '/build-vs-buy',
-    '/get-started', '/startups', '/playground', '/health',
+    '/get-started', '/startups', '/health',
+    // Consolidated routes (public)
+    '/core', '/monitoring', '/devtools', '/content-mgmt', '/portal-section',
+    '/security-section', '/routing-config', '/team-mgmt', '/billing-overview',
+    '/settings-section',
   ];
   const isPublic = publicPaths.some((path) => withoutLocale.startsWith(path));
   if (!isPublic && !withoutLocale.startsWith('/admin')) {
