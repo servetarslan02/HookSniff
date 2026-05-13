@@ -881,51 +881,7 @@ func main() {
         </div>
       </div>
 
-      {/* Comparison */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
-        <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">🆚 Svix Play vs HookSniff Playground</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-slate-700">
-                <th className="text-left py-2 text-gray-500 dark:text-slate-500 font-medium">{t("feature")}</th>
-                <th className="text-center py-2 text-gray-500 dark:text-slate-500 font-medium">{t("svixPlay")}</th>
-                <th className="text-center py-2 text-gray-500 dark:text-slate-500 font-medium">HookSniff</th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-700 dark:text-slate-300">
-              {[
-                ['Unique URL (no signup)', '✅', '✅'],
-                ['Any HTTP method', '✅', '✅'],
-                ['Request inspection', '✅', '✅'],
-                ['API access', '✅', '✅'],
-                ['Sample payloads', '❌', '✅'],
-                ['HMAC signature display', '✅', '✅'],
-                ['force_status_code', '✅', '✅'],
-                ['echo_body', '✅', '✅'],
-                ['CLI integration', '✅', '❌'],
-                ['Custom headers', '❌', '✅'],
-                ['Rate limit', 'Unknown', '100/min'],
-              ].map(([feature, svix, hooksniff]) => (
-                <tr key={feature as string} className="border-b border-gray-100 dark:border-slate-700/50">
-                  <td className="py-2 text-xs">{feature}</td>
-                  <td className="py-2 text-center text-xs">{svix}</td>
-                  <td className="py-2 text-center text-xs">{hooksniff}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
 
-      {/* CTA */}
-      <div className="text-center p-6 bg-gradient-to-br from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-200 dark:border-brand-500/20">
-        <p className="text-gray-700 dark:text-slate-300 mb-2 text-sm font-medium">Need more than playground?</p>
-        <p className="text-gray-500 dark:text-slate-400 text-xs mb-4">Get reliable webhook delivery with retries, signatures, and analytics.</p>
-        <Link href="/login" className="inline-block px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">
-          Start free →
-        </Link>
-      </div>
     </div>
   );
 }
