@@ -9,14 +9,9 @@ pub struct Customer {
     pub api_key_hash: String,
     pub api_key_prefix: String,
     pub plan: String,
-    // TODO (Item 253): Change webhook_limit and webhook_count from i32 to i64
-    // to prevent overflow at 2.1B webhooks. Requires:
-    // 1. Migration: ALTER TABLE customers ALTER COLUMN webhook_limit TYPE BIGINT,
-    //               ALTER TABLE customers ALTER COLUMN webhook_count TYPE BIGINT;
-    // 2. Update all references in billing.rs, webhooks.rs, admin.rs, customer_portal.rs
-    // 3. Update Plan::max_webhooks_per_month() return type from u64 to match
     pub webhook_limit: i32,
-    pub webhook_count: i32,
+    /// Database column is BIGINT (migration 011) — use i64 to match
+    pub webhook_count: i64,
     pub created_at: DateTime<Utc>,
     pub password_hash: Option<String>,
     pub stripe_customer_id: Option<String>,
@@ -194,7 +189,7 @@ pub struct CustomerResponse {
     pub api_key: Option<String>, // Only returned on creation
     pub plan: String,
     pub webhook_limit: i32,
-    pub webhook_count: i32,
+    pub webhook_count: i64,
     pub is_admin: bool,
     pub created_at: DateTime<Utc>,
 }
@@ -605,11 +600,11 @@ mod tests {
     fn test_customer_max_webhook_values() {
         let mut c = make_customer();
         c.webhook_limit = i32::MAX;
-        c.webhook_count = i32::MAX;
+        c.webhook_count = i64::MAX;
         let json = serde_json::to_string(&c).unwrap();
         let deserialized: Customer = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.webhook_limit, i32::MAX);
-        assert_eq!(deserialized.webhook_count, i32::MAX);
+        assert_eq!(deserialized.webhook_count, i64::MAX);
     }
 
     #[test]
