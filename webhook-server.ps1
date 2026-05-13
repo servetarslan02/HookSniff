@@ -2,7 +2,7 @@
 # GitHub Actions'tan deploy isteği alıp Docker konteynerlerini güncelleyen server
 
 $port = 9999
-$deployToken = "your-secret-deploy-token-change-me"  # GitHub Secrets'te DEPLOY_TOKEN olarak ayarla
+$deployToken = "your-secret-deploy-token-change-me"  # Bu değeri GitHub Secrets'teki DEPLOY_TOKEN ile eşleştir
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")
