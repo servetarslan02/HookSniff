@@ -1,8 +1,8 @@
 import { getUserFriendlyMessage, extractErrorCode } from './error-catalog';
 
-// In production, "/api" is rewritten by Vercel to the GCP Cloud Run API (see vercel.json).
+// In production, "https://hooksniff-api-1046140057667.europe-west1.run.app/v1" is rewritten by Vercel to the GCP Cloud Run API (see vercel.json).
 // In development, point directly to the local API server.
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? "/api" : "http://localhost:3000/v1");
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? "https://hooksniff-api-1046140057667.europe-west1.run.app/v1" : "http://localhost:3000/v1");
 
 const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_RETRIES = 2;

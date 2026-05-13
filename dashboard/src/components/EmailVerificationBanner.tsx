@@ -17,7 +17,7 @@ export function EmailVerificationBanner() {
   useEffect(() => {
     if (!token || !user) return;
     const controller = new AbortController();
-    const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+    const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
     fetch(`${API}/auth/me`, { credentials: 'include', signal: controller.signal })
       .then((r) => r.json())
       .then((data) => setVerified(data.email_verified ?? true))
@@ -32,7 +32,7 @@ export function EmailVerificationBanner() {
   const handleResend = async () => {
     setSending(true);
     try {
-      const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+      const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
       const res = await fetch(`${API}/auth/resend-verification`, {
         method: 'POST',
         credentials: 'include',
