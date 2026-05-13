@@ -3,6 +3,7 @@
 > **Bölüm:** Ekip & Bildirimler  
 > **İçerik:** Ekip, Bildirimler, Uygulamalar, Cihazlar  
 > **İnceleme Tarihi:** 2026-05-12/13  
+> **Güncelleme:** 2026-05-13 (kod değişiklikleriyle eşleştirildi)  
 > **Kaynak Dosyalar:** `26-ekip.md`, `27-bildirimler.md`, `30-uygulamalar.md`, `34-cihazlar.md`
 
 ---
@@ -18,8 +19,8 @@
 
 ## 1. Ekip (Team)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/team/page.tsx`  
-> Route: `/dashboard/team`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/team/page.tsx`  
+> Route: `/team`
 
 ### Sayfa Yapısı
 - TeamList — Ekip listesi
@@ -60,8 +61,8 @@
 
 ## 2. Bildirimler (Notifications)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/notifications/page.tsx`  
-> Route: `/dashboard/notifications`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/notifications/page.tsx`  
+> Route: `/notifications`
 
 ### Sayfa Yapısı
 - Notification listesi
@@ -103,7 +104,7 @@
 ## 3. Uygulamalar (Applications)
 
 > Sayfa: ❌ OLUŞTURULMALI  
-> Route: `/dashboard/applications`  
+> Route: `/applications`  
 > Backend: `api/src/routes/applications.rs` — CRUD mevcut
 
 ### Backend Durumu
@@ -147,7 +148,7 @@
 ## 4. Cihazlar (Devices)
 
 > Sayfa: ❌ OLUŞTURULMALI  
-> Route: `/dashboard/devices`  
+> Route: `/devices`  
 > Backend: `api/src/routes/devices.rs` — mevcut
 
 ### Backend Durumu

@@ -3,6 +3,7 @@
 > **Bölüm:** Güvenlik  
 > **İçerik:** Hız Sınırı, Denetim Günlüğü, SSO/SAML, Çıkış IP'leri  
 > **İnceleme Tarihi:** 2026-05-12/13  
+> **Güncelleme:** 2026-05-13 (kod değişiklikleriyle eşleştirildi)  
 > **Kaynak Dosyalar:** `20-hiz-siniri.md`, `21-denetim-gunlugu.md`, `22-sso-saml.md`, `33-cikis-ip.md`
 
 ---
@@ -18,8 +19,8 @@
 
 ## 1. Hız Sınırı (Rate Limiting)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/rate-limiting/page.tsx`  
-> Route: `/dashboard/rate-limiting`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/rate-limiting/page.tsx`  
+> Route: `/rate-limiting`
 
 ### Sayfa Yapısı
 - RateLimitInfo — Endpoint bazlı limit bilgisi
@@ -63,8 +64,8 @@
 
 ## 2. Denetim Günlüğü (Audit Log)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/audit-log/page.tsx`  
-> Route: `/dashboard/audit-log`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/audit-log/page.tsx`  
+> Route: `/audit-log`
 
 ### Sayfa Yapısı
 - AuditEntry — Denetim kaydı
@@ -136,8 +137,8 @@
 
 ## 3. SSO / SAML
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/sso/page.tsx`  
-> Route: `/dashboard/sso`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/sso/page.tsx`  
+> Route: `/sso`
 
 ### Sayfa Yapısı
 - SAML ve OIDC provider desteği
@@ -183,7 +184,7 @@
 ## 4. Çıkış IP'leri (Outbound IPs)
 
 > Sayfa: ❌ OLUŞTURULMALI  
-> Route: `/dashboard/outbound-ips`  
+> Route: `/outbound-ips`  
 > Backend: `api/src/routes/outbound_ips.rs` — mevcut
 
 ### Backend Durumu
@@ -246,7 +247,7 @@
 #### BF-03: SSO Test Butonu Yok
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/sso/page.tsx`
 - **Backend:** `POST /v1/sso/test` — SSO bağlantı testi
-- **Sorun:** api.ts'de tanımlı değil, UI'da buton yok.
+- **Durum:** `ssoApi.testSso` api.ts'de tanımlı ✅, UI'da buton yok.
 - **Adımlar:**
   1. `api.ts`'ye ekle:
      ```typescript
