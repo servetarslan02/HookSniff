@@ -40,7 +40,7 @@ struct ProfileResponse {
     id: Uuid,
     email: String,
     plan: String,
-    webhook_limit: i32,
+    webhook_limit: i64,
     webhook_count: i64,
     created_at: String,
 }
@@ -174,7 +174,7 @@ async fn revoke_api_key(
 #[derive(serde::Serialize)]
 struct UsageResponse {
     webhooks_today: i64,
-    webhook_limit: i32,
+    webhook_limit: i64,
     endpoints_count: i64,
     success_rate: f64,
     plan: String,

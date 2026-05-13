@@ -9,7 +9,8 @@ pub struct Customer {
     pub api_key_hash: String,
     pub api_key_prefix: String,
     pub plan: String,
-    pub webhook_limit: i32,
+    /// Database column is BIGINT (migration 046) — use i64 to match
+    pub webhook_limit: i64,
     /// Database column is BIGINT (migration 011) — use i64 to match
     pub webhook_count: i64,
     pub created_at: DateTime<Utc>,
@@ -188,7 +189,7 @@ pub struct CustomerResponse {
     pub name: Option<String>,
     pub api_key: Option<String>, // Only returned on creation
     pub plan: String,
-    pub webhook_limit: i32,
+    pub webhook_limit: i64,
     pub webhook_count: i64,
     pub is_admin: bool,
     pub created_at: DateTime<Utc>,
@@ -599,11 +600,11 @@ mod tests {
     #[test]
     fn test_customer_max_webhook_values() {
         let mut c = make_customer();
-        c.webhook_limit = i32::MAX;
+        c.webhook_limit = i64::MAX;
         c.webhook_count = i64::MAX;
         let json = serde_json::to_string(&c).unwrap();
         let deserialized: Customer = serde_json::from_str(&json).unwrap();
-        assert_eq!(deserialized.webhook_limit, i32::MAX);
+        assert_eq!(deserialized.webhook_limit, i64::MAX);
         assert_eq!(deserialized.webhook_count, i64::MAX);
     }
 
