@@ -112,7 +112,7 @@ export function OnboardingWizard() {
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 3000);
     dismiss();
-    router.push("/");
+    router.push("/applications");
   };
 
   const handleCopy = async (text: string, id: string) => {

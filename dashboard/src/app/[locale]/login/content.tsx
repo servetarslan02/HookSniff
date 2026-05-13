@@ -54,7 +54,8 @@ function LoginForm() {
       } else {
         await register(email, password, name || undefined);
       }
-      router.push("/");
+      const redirectTo = searchParams.get('redirect') || '/applications';
+      router.push(redirectTo);
     } catch (err: unknown) {
       setError(getErrorMessage(err, tc('unknownError')) || tc('error'));
     } finally {
