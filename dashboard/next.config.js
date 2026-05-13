@@ -39,15 +39,6 @@ const nextConfig = {
       },
     ];
   },
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/applications',
-        permanent: false,
-      },
-    ];
-  },
 };
 
 module.exports = withNextIntl(nextConfig);
