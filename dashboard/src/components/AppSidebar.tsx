@@ -38,6 +38,7 @@ export function AppSidebar({ onClose }: { onClose?: () => void }) {
       items: [
         { name: t('dashboard') || 'Dashboard', href: '/', icon: '🏠' },
         { name: t('applications') || 'Applications', href: '/applications', icon: '📱' },
+        { name: t('serviceTokens') || 'Service Tokens', href: '/service-tokens', icon: '🔑' },
         { name: t('endpoints') || 'Endpoints', href: '/endpoints', icon: '🔗' },
         { name: 'Webhooks', href: '/webhooks', icon: '🪝' },
         { name: t('deliveries') || 'Deliveries', href: '/deliveries', icon: '📦' },
