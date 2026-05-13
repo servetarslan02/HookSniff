@@ -39,11 +39,11 @@ const DB_MAX_CONNECTIONS: u32 = 10;
 /// Database connection acquisition timeout
 const DB_ACQUIRE_TIMEOUT_SECS: u64 = 30;
 /// HTTP client request timeout
-const HTTP_TIMEOUT_SECS: u64 = 30;
+const HTTP_TIMEOUT_SECS: u64 = 15;
 /// Maximum idle connections per host in HTTP pool
-const HTTP_POOL_MAX_IDLE_PER_HOST: usize = 10;
+const HTTP_POOL_MAX_IDLE_PER_HOST: usize = 20;
 /// Maximum concurrent HTTP deliveries
-const DELIVERY_CONCURRENCY_LIMIT: usize = 10;
+const DELIVERY_CONCURRENCY_LIMIT: usize = 25;
 /// Circuit breaker: failures before opening
 const CIRCUIT_BREAKER_FAILURE_THRESHOLD: u32 = 5;
 /// Circuit breaker: cooldown period in seconds
