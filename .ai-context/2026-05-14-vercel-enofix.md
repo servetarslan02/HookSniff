@@ -50,3 +50,27 @@
 - [ ] Node.js version 24.x → 22.x (Vercel settings'den elle değiştirilmeli)
 - [ ] `vercel.json` root dosyasındaki buildCommand artık gereksiz (Vercel UI kullanıyor)
 - [ ] Dependabot PR'ları deploy limitini yiyor — tamamen kapatılabilir
+
+### UI Düzenlemeleri (02:47-03:00)
+1. **Sidebar'dan header'a kullanıcı bilgisi taşındı**
+   - Eski: sol altta user info + logout butonu
+   - Yeni: sağ üstte avatar, tıklanınca dropdown menü
+   
+2. **Dropdown menü içeriği:**
+   - Kullanıcı adı + email
+   - ⚙️ Settings
+   - 📖 Documentation
+   - 🔗 API Reference
+   - 🚪 Sign Out
+
+3. **Admin paneli:**
+   - ThemeToggle sidebar'dan header'a taşındı
+   
+4. **Arama çubuğu kaldırıldı** (dashboard header'dan)
+
+5. **Playground "Network error" düzeltildi:**
+   - Sorun: `next.config.js`'deki catch-all `/api/:path*` rewrite TÜM API isteklerini Cloud Run'a gönderiyordu
+   - `/api/playground/token`, `/api/newsletter`, `/api/status` local API route'ları hiç çalışmıyordu
+   - Çözüm: Catch-all kaldırıldı, her API path için explicit rewrite eklendi
+
+### Commit: `5c78d320`
