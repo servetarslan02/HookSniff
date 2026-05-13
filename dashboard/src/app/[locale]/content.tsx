@@ -456,7 +456,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{tPricing('title')}</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {plans.map((plan, i) => (
             <div key={i} className={`relative rounded-2xl p-8 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg flex flex-col ${
               plan.popular
