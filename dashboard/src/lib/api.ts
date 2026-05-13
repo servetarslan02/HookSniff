@@ -651,7 +651,7 @@ export const teamsApi = {
     apiFetch<Team[]>('/teams', { token }),
 
   create: (token: string, data: { name: string; description?: string }) =>
-    apiFetch<Team>('/teams', { method: 'POST', body: data, token }),
+    apiFetch<Team>('/teams', { method: 'POST', body: { name: data.name }, token }),
 
   get: (token: string, id: string) =>
     apiFetch<Team>(`/teams/${id}`, { token }),

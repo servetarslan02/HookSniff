@@ -10,12 +10,11 @@ export function CreateTeamModal({
 }: {
   open: boolean;
   onClose: () => void;
-  onCreate: (name: string, description?: string) => Promise<void>;
+  onCreate: (name: string) => Promise<void>;
 }) {
   const t = useTranslations('team');
   const tc = useTranslations('common');
   const [name, setName] = useState('');
-  const [desc, setDesc] = useState('');
   const [creating, setCreating] = useState(false);
 
   if (!open) return null;
@@ -24,9 +23,8 @@ export function CreateTeamModal({
     if (!name.trim()) return;
     setCreating(true);
     try {
-      await onCreate(name.trim(), desc || undefined);
+      await onCreate(name.trim());
       setName('');
-      setDesc('');
       onClose();
     } finally {
       setCreating(false);
@@ -47,17 +45,6 @@ export function CreateTeamModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={t('teamNamePlaceholder')}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 transition"
-            />
-          </div>
-          <div>
-            <label htmlFor="team-description" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('descriptionLabel')}</label>
-            <input
-              id="team-description"
-              type="text"
-              value={desc}
-              onChange={(e) => setDesc(e.target.value)}
-              placeholder={t('descPlaceholder')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 transition"
             />
           </div>
