@@ -681,3 +681,13 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **⚠️ Servet'in yapması gereken:** Cloud Build tetikle veya Cloud Run'ı yeniden deploy et
 - **API health:** ✅ sağlıklı (DB 36ms, queue boş, OTEL aktif)
 - **Dashboard:** ✅ canlı (https://hooksniff.vercel.app)
+
+## Oturum 152 DEVAM (2026-05-14 04:35 - 05:05 GMT+8) ✅
+- **DATABASE_ERROR debug** — 3dług type mismatch bulundu
+- **Sorun 1**: webhook_count i32→i64 (migration 011) — commit `e8e9f2f0`
+- **Sorun 2**: webhook_limit i32→i64 (migration 046) — commit `4ddce97a`  
+- **Sorun 3**: 4 eksik column migration — `016_missing_payment_columns.sql`
+- **Deploy**: Cloud Build tetiklendi (3 kez), en son commit `4ddce97a`
+- **Google hesabı girişi**: Backup code ile 2FA aşıldı
+- **GCP 3 aylık free trial**: $300 kredi, 90 gün. Free tier ürünler (Cloud Run, Neon, Upstash) süresiz ücretsiz
+- **Öğrenilen ders**: `migrations/` dizini root'ta, `api/migrations/` değil. sqlx BIGINT→i64 zorunlu
