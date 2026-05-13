@@ -49,7 +49,7 @@ export default function ApplicationDetailPage() {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500 dark:text-gray-400">{t('notFound') || 'Uygulama bulunamadı'}</p>
-        <Link href="/applications" className="text-green-600 hover:underline text-sm mt-2 inline-block">
+        <Link href="/team-mgmt" className="text-green-600 hover:underline text-sm mt-2 inline-block">
           ← {t('backToList') || 'Geri dön'}
         </Link>
       </div>
@@ -60,7 +60,7 @@ export default function ApplicationDetailPage() {
     <div className="space-y-4">
       {/* ── Başlık ── */}
       <div className="flex items-center gap-3">
-        <Link href="/applications" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+        <Link href="/team-mgmt" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
           ←
         </Link>
         <div>

@@ -352,25 +352,25 @@ export function DashboardOverview() {
             </h4>
             <div className="space-y-2">
               <Link
-                href="/endpoints"
+                href="/core"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 🔗 {t('manageEndpoints', { defaultValue: 'Manage Endpoints' })}
               </Link>
               <Link
-                href="/deliveries"
+                href="/core"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 📦 {t('viewDeliveries', { defaultValue: 'View Deliveries' })}
               </Link>
               <Link
-                href="/playground"
+                href="/devtools"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 🧪 {t('openPlayground', { defaultValue: 'Open Playground' })}
               </Link>
               <Link
-                href="/analytics"
+                href="/monitoring"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 📈 {t('viewAnalytics', { defaultValue: 'View Analytics' })}
@@ -402,7 +402,7 @@ export function DashboardOverview() {
             {t('recentDeliveries', { defaultValue: 'Recent Deliveries' })}
           </h3>
           <Link
-            href="/deliveries"
+            href="/core"
             className="text-sm text-brand-600 dark:text-brand-400 hover:underline font-medium"
           >
             {t('viewAll', { defaultValue: 'View all →' })}
@@ -422,7 +422,7 @@ export function DashboardOverview() {
               {t('noDeliveries', { defaultValue: 'No deliveries yet. Send your first webhook!' })}
             </p>
             <Link
-              href="/playground"
+              href="/devtools"
               className="inline-block mt-3 px-4 py-2 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-700 transition"
             >
               {t('tryPlayground', { defaultValue: 'Try Playground →' })}
