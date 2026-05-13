@@ -3196,5 +3196,16 @@
     "aiCap4": "Monitor endpoint health and performance",
     "quickStart": "Quick start",
     "quickStartDesc": "Generate a service token, then add it as HOOKSNIFF_API_TOKEN in your MCP config."
+  },
+  "featureFlags": {
+    "loadFailed": "Failed to load feature flags",
+    "created": "Feature flag created",
+    "createFailed": "Failed to create",
+    "updated": "Feature flag updated",
+    "updateFailed": "Failed to update",
+    "toggled": "Feature flag toggled",
+    "toggleFailed": "Failed to toggle",
+    "deleted": "Feature flag deleted",
+    "deleteFailed": "Failed to delete"
   }
 }
