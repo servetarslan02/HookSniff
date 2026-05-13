@@ -1285,6 +1285,17 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 50: Migration 049 — overage columns (allow_overage, overage_email_notification)
+    run_migration(
+        pool,
+        "049_overage_columns",
+        r#"
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS allow_overage BOOLEAN NOT NULL DEFAULT true;
+        ALTER TABLE customers ADD COLUMN IF NOT EXISTS overage_email_notification BOOLEAN NOT NULL DEFAULT true;
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
@@ -1397,7 +1408,7 @@ mod tests {
 
     #[test]
     fn test_migration_count() {
-        // Verify we have exactly 46 migrations (001 through 046)
+        // Verify we have exactly 49 migrations (001 through 049)
         // This catches accidentally skipped or duplicate migration steps
         let migration_names: Vec<&str> = vec![
             "001_initial_schema",
@@ -1446,8 +1457,11 @@ mod tests {
             "044_constraints_indexes",
             "045_indexes_triggers_constraints",
             "046_payment_failed_at",
+            "047_missing_performance_indexes",
+            "048_cancel_at_period_end",
+            "049_overage_columns",
         ];
-        assert_eq!(migration_names.len(), 46, "Expected exactly 46 migrations");
+        assert_eq!(migration_names.len(), 49, "Expected exactly 49 migrations");
 
         // Verify sequential numbering (no gaps)
         for (i, name) in migration_names.iter().enumerate() {
@@ -1510,6 +1524,9 @@ mod tests {
             "044_constraints_indexes",
             "045_indexes_triggers_constraints",
             "046_payment_failed_at",
+            "047_missing_performance_indexes",
+            "048_cancel_at_period_end",
+            "049_overage_columns",
         ];
         let mut sorted = migration_names.clone();
         sorted.dedup();
