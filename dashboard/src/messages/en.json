@@ -152,7 +152,13 @@
     "applications": "Applications",
     "serviceTokens": "Service Tokens",
     "sectionConfig": "Configuration",
-    "sso": "SSO"
+    "sso": "SSO",
+    "sectionAdmin": "Admin",
+    "adminUsers": "Users",
+    "adminRevenue": "Revenue",
+    "adminSystem": "System",
+    "adminActivity": "Activity",
+    "adminSettings": "Settings"
   },
   "dashboard": {
     "title": "Dashboard",

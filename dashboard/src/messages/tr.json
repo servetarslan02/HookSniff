@@ -152,7 +152,13 @@
     "applications": "Uygulamalar",
     "serviceTokens": "Hizmet Jetonları",
     "sectionConfig": "Yapılandırma",
-    "sso": "SSO"
+    "sso": "SSO",
+    "sectionAdmin": "Yönetim",
+    "adminUsers": "Kullanıcılar",
+    "adminRevenue": "Gelir",
+    "adminSystem": "Sistem",
+    "adminActivity": "Aktivite",
+    "adminSettings": "Ayarlar"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
