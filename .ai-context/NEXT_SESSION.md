@@ -18,14 +18,13 @@
 ## Oturum 154 — Öncelikli Görevler
 
 ### 🟡 Orta
-1. **Hook0-style kalan sayfalar** — Analytics, Playground, Billing, Logs, Health, Alerts, Schemas, Transforms, Routing, Inbound
-2. **Sidebar navigasyonu** kontrol
-3. **i18n eksikleri**
-4. **Worker compile hatası** — `sem` lifetime error (build 7823f87d'de worker compile başarısız)
+1. **Sidebar navigasyonu** kontrol
+2. **i18n eksikleri**
+3. **Worker compile hatası** — `sem` lifetime error (build 7823f87d'de worker compile başarısız)
 
 ### 🟢 Düşük
-5. **Widget drag-drop + chart time range** test
-6. **Grafana trial bitişi (20 Mayıs)** — Free tier geçiş
+4. **Widget drag-drop + chart time range** test
+5. **Grafana trial bitişi (20 Mayıs)** — Free tier geçiş
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
