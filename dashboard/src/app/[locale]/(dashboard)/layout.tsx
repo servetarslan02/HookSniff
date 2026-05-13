@@ -87,11 +87,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             label: t('sectionAdmin') || 'Yönetim',
             items: [
               { name: t('adminPanel') || 'Admin Panel', href: '/admin', icon: '⚡' },
-              { name: t('adminUsers') || 'Kullanıcılar', href: '/admin/users', icon: '👥' },
-              { name: t('adminRevenue') || 'Gelir', href: '/admin/revenue', icon: '💰' },
-              { name: t('adminSystem') || 'Sistem', href: '/admin/system', icon: '🖥️' },
-              { name: t('adminActivity') || 'Aktivite', href: '/admin/activity', icon: '📋' },
-              { name: t('adminSettings') || 'Ayarlar', href: '/admin/settings', icon: '⚙️' },
             ],
           },
         ]
