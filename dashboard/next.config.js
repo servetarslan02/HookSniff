@@ -39,6 +39,15 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/:locale',
+        destination: '/:locale/applications',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 module.exports = withNextIntl(nextConfig);
