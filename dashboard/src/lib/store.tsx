@@ -16,8 +16,8 @@ interface AuthContextType {
   token: string | null;
   apiKey: string | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (email: string, password: string, name?: string) => Promise<User>;
   logout: () => void;
   setApiKey: (key: string) => void;
 }
@@ -118,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json();
     const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
     persistAuth(u, data.customer.api_key);
+    return u;
   }, [persistAuth]);
 
   const register = useCallback(async (email: string, password: string, name?: string) => {
@@ -135,6 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json();
     const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
     persistAuth(u, data.customer.api_key);
+    return u;
   }, [persistAuth]);
 
   const logout = useCallback(async () => {
