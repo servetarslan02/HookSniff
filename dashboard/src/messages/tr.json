@@ -2553,7 +2553,8 @@
     "copied": "Kopyalandı!",
     "reactIntegration": "⚛️ React Entegrasyonu",
     "portalSaved": "Portal yapılandırması kaydedildi!",
-    "portalSaveFailed": "Portal yapılandırması kaydedilemedi"
+    "portalSaveFailed": "Portal yapılandırması kaydedilemedi",
+    "portalUrl": "Portal URL'si"
   },
   "retryPolicy": {
     "title": "🔄 Yeniden Deneme Politikası",
