@@ -124,9 +124,6 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             {t('userPanel') || 'Kullanıcı Paneli'}
           </Link>
         </div>
-        <div className="absolute bottom-4 left-0 right-0 px-6">
-          <ThemeToggle className="w-full" />
-        </div>
       </aside>
 
       {/* Main content */}
@@ -171,6 +168,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
+            <ThemeToggle />
             {/* Notification Bell */}
             <Link
               href="/admin/system"
