@@ -25,6 +25,8 @@ export default function DeliveriesPage() {
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [replayTarget, setReplayTarget] = useState<Delivery | null>(null);
   const [replaying, setReplaying] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [batchReplaying, setBatchReplaying] = useState(false);
   const t = useTranslations('deliveries');
   const tc = useTranslations('common');
   const perPage = 20;
@@ -70,6 +72,39 @@ export default function DeliveriesPage() {
 
   const totalPages = Math.ceil(total / perPage);
   const isSearching = search.length > 0;
+
+  const toggleSelect = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((d) => d.id)));
+    }
+  };
+
+  const handleBatchReplay = async () => {
+    if (!token || selectedIds.size === 0) return;
+    setBatchReplaying(true);
+    try {
+      const result = await webhooksApi.batchReplay(token, Array.from(selectedIds));
+      toast(`Replayed ${result.replayed || selectedIds.size} deliveries`, 'success');
+      setSelectedIds(new Set());
+      fetchData();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : tc('error'), 'error');
+    } finally {
+      setBatchReplaying(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -125,10 +160,41 @@ export default function DeliveriesPage() {
           </div>
         ) : (
           <>
+            {/* Batch Replay Bar */}
+            {selectedIds.size > 0 && (
+              <div className="px-6 py-3 flex items-center gap-3 bg-brand-50 dark:bg-brand-500/10 border-b border-brand-200 dark:border-brand-500/20">
+                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{selectedIds.size} selected</span>
+                <button
+                  type="button"
+                  onClick={handleBatchReplay}
+                  disabled={batchReplaying}
+                  className="px-4 py-1.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition disabled:opacity-50"
+                >
+                  {batchReplaying ? 'Replaying...' : `🔄 Batch Replay (${selectedIds.size})`}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedIds(new Set())}
+                  className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition"
+                >
+                  ✕ Clear
+                </button>
+              </div>
+            )}
+
             <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50/50 dark:bg-slate-800/50">
+                  <th className="px-3 py-3">
+                    <input
+                      type="checkbox"
+                      checked={filtered.length > 0 && selectedIds.size === filtered.length}
+                      onChange={toggleSelectAll}
+                      className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
+                      aria-label="Select all"
+                    />
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('event')}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</th>
@@ -140,7 +206,17 @@ export default function DeliveriesPage() {
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {filtered.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer" tabIndex={0} role="link" aria-label={`Delivery ${d.id.slice(0, 12)}`} onClick={() => router.push(`/deliveries/${d.id}`)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/deliveries/${d.id}`); } }}>
+                  <tr key={d.id} className={`hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer ${selectedIds.has(d.id) ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''}`} tabIndex={0} role="link" aria-label={`Delivery ${d.id.slice(0, 12)}`} onClick={() => router.push(`/deliveries/${d.id}`)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/deliveries/${d.id}`); } }}>
+                    <td className="px-3 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(d.id)}
+                        onChange={(e) => toggleSelect(d.id, e as unknown as React.MouseEvent)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
+                        aria-label={`Select ${d.id.slice(0, 12)}`}
+                      />
+                    </td>
                     <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 12)}…</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
