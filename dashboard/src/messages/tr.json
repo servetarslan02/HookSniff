@@ -2462,8 +2462,8 @@
   "schemasPage": {
     "title": "📋 Şemalar",
     "subtitle": "Olay şemalarını tanımlayın ve doğrulayın. Webhook'larınızın beklenen formatlara uygun olmasını sağlayın.",
-    "noSchemas": "Henüz şema kaydedilmedi",
-    "noSchemasDesc": "Webhook verilerinizi doğrulamaya başlamak için bir şema kaydedin."
+    "noSchemas": "Henüz şema oluşturulmadı",
+    "noSchemasDesc": "Şemalar, webhook payload'larınızın yapısını tanımlar. Örneğin bir 'order.created' olayının hangi alanları içermesi gerektiğini belirleyebilirsiniz. Şema tanımladığınızda, gelen webhook verileri otomatik olarak doğrulanır ve beklenen formata uymayan istekler reddedilir. Bu özellik opsiyoneldir — şama olmadan da webhook'lar normal şekilde çalışır."
   },
   "webhookBuilder": {
     "title": "🔧 Webhook Oluşturucu",
