@@ -237,6 +237,9 @@ export const webhooksApi = {
 
   batch: (token: string, data: { webhooks: Array<{ endpoint_id: string; event?: string; data: unknown }> }) =>
     apiFetch<{ deliveries: Delivery[] }>('/webhooks/batch', { method: 'POST', body: data, token }),
+
+  batchReplay: (token: string, ids: string[]) =>
+    apiFetch<{ replayed: number }>('/webhooks/batch-replay', { method: 'POST', body: { ids }, token }),
 };
 
 // Stats API
@@ -747,6 +750,48 @@ export const inboundApi = {
     apiFetch<InboundConfig>('/inbound/configs', { method: 'POST', body: data, token }),
 };
 
+// Two-Factor Authentication API
+export const twoFactorApi = {
+  enable: (token: string) =>
+    apiFetch<{ secret: string; qr_code: string; backup_codes: string[] }>('/auth/2fa/enable', { method: 'POST', token }),
+
+  confirm: (token: string, code: string) =>
+    apiFetch<{ success: boolean; backup_codes: string[] }>('/auth/2fa/confirm', { method: 'POST', body: { code }, token }),
+
+  disable: (token: string) =>
+    apiFetch<{ success: boolean }>('/auth/2fa/disable', { method: 'POST', token }),
+
+  getStatus: (token: string) =>
+    apiFetch<{ enabled: boolean; last_used_at?: string }>('/auth/2fa/status', { token }),
+};
+
+// Custom Domains API
+export const customDomainsApi = {
+  list: (token: string) =>
+    apiFetch<{ id: string; domain: string; status: string; verified: boolean }[]>('/custom-domains', { token }),
+
+  add: (token: string, data: { domain: string }) =>
+    apiFetch<{ id: string; domain: string; cname_target: string; txt_record: string }>('/custom-domains', { method: 'POST', body: data, token }),
+
+  verifyDomain: (token: string, domainId: string) =>
+    apiFetch<{ verified: boolean; message?: string; issues?: string[] }>(`/custom-domains/${domainId}/verify`, { method: 'POST', token }),
+
+  delete: (token: string, domainId: string) =>
+    apiFetch<{ success: boolean }>(`/custom-domains/${domainId}`, { method: 'DELETE', token }),
+};
+
+// SSO API
+export const ssoApi = {
+  getConfig: (token: string) =>
+    apiFetch<{ provider?: string; enabled?: boolean; metadata_url?: string; entity_id?: string; sso_url?: string; certificate_set?: boolean }>('/sso/config', { token }),
+
+  saveConfig: (token: string, data: Record<string, unknown>) =>
+    apiFetch<{ success: boolean }>('/sso/config', { method: 'POST', body: data, token }),
+
+  testSso: (token: string) =>
+    apiFetch<{ success: boolean; message: string; redirect_url?: string }>('/sso/test', { method: 'POST', token }),
+};
+
 // Transform types
 export interface TransformRule {
   id: string;
@@ -805,6 +850,9 @@ export const billingApiExtended = {
 export const billingApi = {
   getInvoices: (token: string) =>
     billingApiExtended.getInvoices(token),
+
+  getPortalUrl: (token: string) =>
+    apiFetch<{ url: string }>('/billing/portal', { token }),
 };
 
 // Analytics API
