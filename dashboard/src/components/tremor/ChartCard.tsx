@@ -46,6 +46,7 @@ export function ChartCard({
     { value: '24h', label: t('hours24') },
     { value: '7d', label: t('days7') },
     { value: '30d', label: t('days30') },
+    { value: '90d', label: t('days90', { defaultValue: '90d' }) },
   ];
 
   return (
