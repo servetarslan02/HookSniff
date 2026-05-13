@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-13 08:22 GMT+8
+> Son güncelleme: 2026-05-14 03:20 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -654,3 +654,12 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 1. **GitHub token yenilendi** — `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`
 2. **Dashboard redirect loop düzeltildi** — middleware'de locale prefix hatası
 3. **Vercel deploy tetiklenmedi** — token/hook süresi dolmuş, Servet müdahalesi gerekiyor
+
+## Oturum 151 (2026-05-14 03:16 - 03:20 GMT+8) ✅
+- **OpenClaw** — Servet ile yeni session başlatıldı
+- **Context yükleme** — .ai-context/ hafıza dosyaları okundu
+- **Dashboard build** — ✅ başarılı (216 sayfa)
+- **Site durumu** — ✅ canlı, login sayfası açılıyor
+- **Repo durumu** — temiz, son commit: `1fd27174` (hardcode Cloud Run API URL fallback)
+- **Vercel deploy** — Rate limit 24 saatte sıfırlanır, son commit'ler deploy olmuş olmalı
+- **Plan** — NEXT_SESSION.md güncellendi, sonraki oturum için hazır
