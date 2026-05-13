@@ -663,3 +663,21 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Repo durumu** — temiz, son commit: `1fd27174` (hardcode Cloud Run API URL fallback)
 - **Vercel deploy** — Rate limit 24 saatte sıfırlanır, son commit'ler deploy olmuş olmalı
 - **Plan** — NEXT_SESSION.md güncellendi, sonraki oturum için hazır
+
+## Oturum 152 (2026-05-14 04:17 - 04:35 GMT+8) ✅
+- **OpenClaw** — Servet ile database error debug çalışması
+- **Kritik bulgu:** Login/Register → DATABASE_ERROR (tüm auth endpoint'leri çökük)
+- **Sorun 1: webhook_count type mismatch**
+  - Migration 011'de `webhook_count` BIGINT yapılmış, struct'ta `i32` kalmış
+  - sqlx BIGINT→i32 okuyamıyor → DATABASE_ERROR
+  - Çözüm: Customer, CustomerResponse, ProfileResponse, AdminUserDetail'de `i32` → `i64`
+  - Commit: `e8e9f2f0`
+- **Sorun 2: 4 column migration'da yok**
+  - `stripe_subscription_id`, `payment_provider`, `polar_subscription_id`, `iyzico_subscription_id`
+  - Struct'ta var ama hiçbir migration'da yok → PostgreSQL "column does not exist" hatası
+  - Çözüm: Migration 016 eklendi
+  - Commit: `43b2270c`
+- **Deploy durumu:** GitHub Actions Docker Hub'a push yapıyor, Cloud Run deploy Cloud Build ile (manuel tetiklenmeli)
+- **⚠️ Servet'in yapması gereken:** Cloud Build tetikle veya Cloud Run'ı yeniden deploy et
+- **API health:** ✅ sağlıklı (DB 36ms, queue boş, OTEL aktif)
+- **Dashboard:** ✅ canlı (https://hooksniff.vercel.app)
