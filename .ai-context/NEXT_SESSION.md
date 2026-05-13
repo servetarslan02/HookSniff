@@ -1,12 +1,15 @@
 # NEXT_SESSION.md — Oturum 149
 
-> Son güncelleme: 2026-05-14 01:55 GMT+8
+> Son güncelleme: 2026-05-14 02:10 GMT+8
 
 ## Kaldığımız Yer
-- **ENOENT page_client-reference-manifest.js hatası düzeltildi** ✅
-- `next/dynamic` ile `ssr: false` kullanıldı — Vercel'de manifest dosyası sorunu bypass edildi
-- Push edilen commit: `1015bbbf` — Vercel deploy tetiklenmeli
-- Mevcut production: commit `1b55267` (eski)
+- **ENOENT page_client-reference-manifest.js — 2 farklı fix uygulandı** ✅
+- Fix 1: `next/dynamic` + `ssr: false` (commit `1015bbbf`) — başarısız
+- Fix 2: `'use client'` direct import (commit `5bf1b5a0`) — deploy edilemedi (rate limit)
+- **Vercel Hobby plan günlük 100 deploy limiti aşıldı** ❌
+- Mevcut production: `5ptc6DHK4` — Ready (commit `1b55267`)
+- Dependabot devre dışı bırakıldı (open-pull-requests-limit: 0)
+- 13 açık Dependabot PR'ı kapatıldı
 
 ## Son Yapılan İş (Oturum 149 — OpenClaw)
 1. Servet OpenClaw'a giriş yaptı, `.ai-context` hafıza sistemi okundu
@@ -22,15 +25,15 @@
 - **Çözüm:** Rate limit 24 saatte sıfırlanır. Yarın otomatik deploy olmalı.
 - **Ek:** dependabot PR'ları kapatılmalı — her biri ayrı deploy tetikliyor
 
-## Yapılacaklar (Oturum 149)
+## Yapılacaklar (Oturum 150)
 
 ### 🔴 Kritik
-1. **Deploy durumunu kontrol et** — rate limit sıfırlanmış mı?
-2. **Dependabot PR'larını kapat** — gereksiz deploy tetikliyorlar
-3. **bhanuprasad14 contributor** — GitHub Actions workflow'u silmiş, kontrol et
+1. **Deploy durumunu kontrol et** — rate limit 24 saatte sıfırlanır, otomatik deploy olmalı
+2. **`'use client'` fix deploy olmuş mu kontrol et** — commit `5bf1b5a0`
+3. **Eğer hala ENOENT hatası varsa** — postbuild workaround ekle veya route group yapısını değiştir
 
 ### 🟡 Orta
-4. **Vercel Deploy Hook oluştur** — rate limit'ten muaf manuel tetikleme
+4. **Dependabot kapalı kalacak** — manuel güncelleme yeterli
 5. **Grafana trial bitişi (20 Mayıs)** — Free tier otomatik geçiş
 
 ### 🟢 Düşük
