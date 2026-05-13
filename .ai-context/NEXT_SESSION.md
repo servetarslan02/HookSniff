@@ -1,43 +1,36 @@
-# NEXT_SESSION.md — Oturum 149
+# NEXT_SESSION.md — Oturum 152
 
-> Son güncelleme: 2026-05-14 02:10 GMT+8
+> Son güncelleme: 2026-05-14 03:20 GMT+8
 
 ## Kaldığımız Yer
-- **ENOENT page_client-reference-manifest.js — 2 farklı fix uygulandı** ✅
-- Fix 1: `next/dynamic` + `ssr: false` (commit `1015bbbf`) — başarısız
-- Fix 2: `'use client'` direct import (commit `5bf1b5a0`) — deploy edilemedi (rate limit)
-- **Vercel Hobby plan günlük 100 deploy limiti aşıldı** ❌
-- Mevcut production: `5ptc6DHK4` — Ready (commit `1b55267`)
-- Dependabot devre dışı bırakıldı (open-pull-requests-limit: 0)
-- 13 açık Dependabot PR'ı kapatıldı
+- **Oturum 151** — OpenClaw yeni session, repo clone, context yükleme
+- Dashboard build: ✅ başarılı (216 sayfa)
+- ENOENT fix: ✅ uygulanmış (commit `e0dd6027`)
+- Site canlı: https://hooksniff.vercel.app → login sayfası açılıyor
+- Repo temiz, son commit: `1fd27174` (hardcode Cloud Run API URL fallback)
 
-## Son Yapılan İş (Oturum 149 — OpenClaw)
-1. Servet OpenClaw'a giriş yaptı, `.ai-context` hafıza sistemi okundu
-2. ENOENT hatası teşhis edildi: `(dashboard)/page.tsx` → client component import → manifest eksik
-3. `next/dynamic` + `ssr: false` ile düzeltildi (1 dosya: `page.tsx`)
-4. Build testi başarılı (216 sayfa)
-5. Commit `1015bbbf` push edildi → Vercel deploy tetiklendi
-6. ⚠️ Servet GitHub token ve Google şifresini sohbette paylaştı — revoke önerildi
+## Son Yapılan İş (Oturum 151)
+1. Servet ile yeni OpenClaw session başlatıldı
+2. `.ai-context/` hafıza dosyaları okundu, context yüklendi
+3. Dashboard build testi: ✅ başarılı
+4. Site durumu kontrol: ✅ canlı, login çalışıyor
 
-## 🔴 Deploy Sorunu
-- **Sebep 1:** Vercel Hobby plan günlük deploy limiti dolmuş
-- **Sebep 2:** "AI Assistant" committer GitHub kullanıcısı değil → Vercel reddediyor
-- **Çözüm:** Rate limit 24 saatte sıfırlanır. Yarın otomatik deploy olmalı.
-- **Ek:** dependabot PR'ları kapatılmalı — her biri ayrı deploy tetikliyor
-
-## Yapılacaklar (Oturum 150)
+## Yapılacaklar (Oturum 152)
 
 ### 🔴 Kritik
-1. **Deploy durumunu kontrol et** — rate limit 24 saatte sıfırlanır, otomatik deploy olmalı
-2. **`'use client'` fix deploy olmuş mu kontrol et** — commit `5bf1b5a0`
-3. **Eğer hala ENOENT hatası varsa** — postbuild workaround ekle veya route group yapısını değiştir
+1. **Vercel deploy durumu** — Rate limit 24 saatte sıfırlanır, son commit'ler deploy olmuş mu kontrol et
+2. **Login → Dashboard akışı** — Giriş yapınca dashboard açılıyor mu test et (admin: servetarslan02@gmail.com / Alayci_165)
+3. **API sağlık kontrolü** — hooksniff-api-1046140057667.europe-west1.run.app endpoint'leri çalışıyor mu
 
 ### 🟡 Orta
-4. **Dependabot kapalı kalacak** — manuel güncelleme yeterli
-5. **Grafana trial bitişi (20 Mayıs)** — Free tier otomatik geçiş
+4. **Hook0-style kalan sayfalar** — Analytics, Playground, Billing, Logs, Health, Alerts, Schemas, Transforms, Routing, Inbound (~3000 satır, eski style)
+5. **Sidebar navigasyonu** — Dashboard sidebar menü yapısı kontrol
+6. **i18n eksikleri** — Türkçe çeviri eksikleri var mı
 
 ### 🟢 Düşük
-6. **Widget drag-drop + chart time range** — Önceki oturumda eklenmişti, test edilmedi
+7. **Widget drag-drop + chart time range** — Önceki oturumda eklenmişti, test edilmedi
+8. **Dependabot kapalı** — Manuel güncelleme yeterli
+9. **Grafana trial bitişi (20 Mayıs)** — Free tier otomatik geçiş
 
 ## Redirect Haritası (hatırlatma)
 | Eski Rota | Konsolide Rota |
@@ -52,4 +45,3 @@
 | /team, /notifications, /applications | /team-mgmt |
 | /api-keys, /billing | /billing-overview |
 | /settings, /service-tokens | /settings-section |
-# force-push-fix Thu May 14 01:02:31 AM CST 2026
