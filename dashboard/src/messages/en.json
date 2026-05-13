@@ -2462,8 +2462,8 @@
   "schemasPage": {
     "title": "📋 Schemas",
     "subtitle": "Define and validate event schemas. Ensure your webhooks conform to expected formats.",
-    "noSchemas": "No schemas registered yet",
-    "noSchemasDesc": "Register a schema to start validating your webhook payloads."
+    "noSchemas": "No schemas created yet",
+    "noSchemasDesc": "Schemas define the structure of your webhook payloads. For example, you can specify that an 'order.created' event must include fields like order_id (string), total (number), and currency (string). Once defined, incoming webhook data is automatically validated and requests that don't match the expected format are rejected. This feature is optional — webhooks work normally without schemas."
   },
   "webhookBuilder": {
     "title": "🔧 Webhook Builder",
