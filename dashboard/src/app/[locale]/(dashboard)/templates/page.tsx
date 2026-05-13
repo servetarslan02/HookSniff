@@ -18,16 +18,34 @@ export default function TemplatesPage() {
   const { token } = useAuth();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!token) return;
     apiFetch<{ templates: Template[] }>('/templates', { token })
       .then((res) => setTemplates(res.templates || []))
-      .catch(() => {})
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : tCommon('unknownError'));
+      })
       .finally(() => setLoading(false));
   }, [token]);
 
   if (loading) return <div className="p-8 text-gray-500 dark:text-slate-400">{tCommon('loading')}</div>;
+
+  if (error) {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
+        <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
+          <div className="text-4xl mb-3">⚠️</div>
+          <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error}</p>
+          <button type="button" onClick={() => { setError(''); setLoading(true); if (token) apiFetch<{ templates: Template[] }>('/templates', { token }).then((res) => setTemplates(res.templates || [])).catch((err: unknown) => setError(err instanceof Error ? err.message : tCommon('unknownError'))).finally(() => setLoading(false)); }} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
+            {tCommon('retry')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto">
