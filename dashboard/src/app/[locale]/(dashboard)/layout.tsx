@@ -1,7 +1,7 @@
 'use client';
 
+import { useState } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
-import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { AuthGuard } from '@/components/AuthGuard';
@@ -9,51 +9,73 @@ import { NotificationCenter } from '@/components/NotificationCenter';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
-
-/* ─── Hook0-style: Üstte yatay tab menü ─── */
+import { AppSidebar } from '@/components/AppSidebar';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const t = useTranslations('nav');
   const tc = useTranslations('common');
   const locale = useLocale();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
-  /* ── Hook0'ın 5 sekmesi ── */
-  const tabs = [
-    { name: t('applications') || 'Uygulamalar', href: '/applications', icon: '📱' },
-    { name: t('serviceTokens') || 'Hizmet Jetonları', href: '/api-keys', icon: '🔑' },
-    { name: t('team'), href: '/team', icon: '👥' },
-    { name: t('settings'), href: '/settings', icon: '⚙️' },
-  ];
-
-  const isActive = (href: string) =>
-    cleanPath === href || cleanPath.startsWith(href + '/');
-
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
-      {/* ─── Üst Header ─── */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        {/* Satır 1: Logo + Arama + Profil */}
-        <div className="flex items-center justify-between h-14 px-4 lg:px-6">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center space-x-2">
-              <span className="text-xl">🪝</span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">HookSniff</span>
-            </Link>
-            {/* Organizasyon adı (Hook0 gibi) */}
-            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-              {user?.name || user?.email?.split('@')[0] || 'Organizasyon'}
-            </span>
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
+      {/* ─── Desktop Sidebar ─── */}
+      <div className="hidden lg:flex lg:flex-shrink-0">
+        <AppSidebar />
+      </div>
+
+      {/* ─── Mobile Sidebar Overlay ─── */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div className="fixed inset-y-0 left-0 z-50 w-64">
+            <AppSidebar onClose={() => setSidebarOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* ─── Main Content Area ─── */}
+      <div className="flex flex-col flex-1 min-w-0">
+        {/* ─── Top Header Bar ─── */}
+        <header className="flex items-center justify-between h-14 px-4 lg:px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            {/* Hamburger (mobile) */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              aria-label={tc('openSidebar')}
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+
+            {/* Search */}
+            <div className="hidden sm:flex items-center">
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder={tc('search') + '...'}
+                  className="w-64 pl-10 pr-4 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center space-x-3">
             <NotificationCenter />
             <LanguageSwitcher />
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-medium">
+              <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium">
                 {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || '?'}
               </div>
               <span className="text-sm text-gray-700 dark:text-gray-300 hidden sm:block">
@@ -68,35 +90,16 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
           </div>
-        </div>
+        </header>
 
-        {/* Satır 2: Yatay Tab Menü (Hook0 gibi) */}
-        <nav className="flex items-center h-12 px-4 lg:px-6 space-x-1 overflow-x-auto">
-          {tabs.map((tab) => (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={clsx(
-                'flex items-center px-4 py-2 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap',
-                isActive(tab.href)
-                  ? 'text-green-600 border-b-2 border-green-600 dark:text-green-400 dark:border-green-400'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'
-              )}
-            >
-              <span className="mr-2">{tab.icon}</span>
-              {tab.name}
-            </Link>
-          ))}
-        </nav>
-      </header>
-
-      {/* ─── Ana İçerik ─── */}
-      <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-        <EmailVerificationBanner />
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
-      </main>
+        {/* ─── Page Content ─── */}
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <EmailVerificationBanner />
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
+        </main>
+      </div>
     </div>
   );
 }
