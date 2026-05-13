@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -11,6 +11,13 @@ interface WebhookField {
   key: string;
   value: string;
   type: 'string' | 'number' | 'boolean' | 'object' | 'array';
+}
+
+interface Endpoint {
+  id: string;
+  url: string;
+  description?: string;
+  is_active: boolean;
 }
 
 const TEMPLATES = {
@@ -49,6 +56,21 @@ export default function WebhookBuilderPage() {
   const [endpointId, setEndpointId] = useState('');
   const [sending, setSending] = useState(false);
   const [preview, setPreview] = useState('');
+  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
+  const [loadingEndpoints, setLoadingEndpoints] = useState(true);
+
+  // Fetch endpoints on mount
+  useEffect(() => {
+    if (!token) return;
+    setLoadingEndpoints(true);
+    apiFetch<{ data: Endpoint[] }>('/endpoints', { token })
+      .then((res) => {
+        setEndpoints(res.data || []);
+        if (res.data?.length === 1) setEndpointId(res.data[0].id);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingEndpoints(false));
+  }, [token]);
 
   const updatePreview = () => {
     const payload: Record<string, unknown> = {};
@@ -203,13 +225,32 @@ export default function WebhookBuilderPage() {
           {/* Send */}
           <div className="glass-card p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sendTo')}</h2>
-            <input
-              type="text"
-              value={endpointId}
-              onChange={(e) => setEndpointId(e.target.value)}
-              placeholder={t('endpointPlaceholder')}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm mb-3"
-            />
+            {loadingEndpoints ? (
+              <div className="flex items-center gap-2 py-3 text-gray-500 dark:text-slate-400 text-sm">
+                <div className="w-4 h-4 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+                {t('loadingEndpoints', { defaultValue: 'Loading endpoints...' })}
+              </div>
+            ) : endpoints.length === 0 ? (
+              <div className="py-3 text-center">
+                <p className="text-gray-500 dark:text-slate-400 text-sm mb-2">{t('noEndpoints', { defaultValue: 'No endpoints found. Create an endpoint first.' })}</p>
+                <a href="/core" className="text-sm text-brand-600 dark:text-brand-400 hover:underline">
+                  {t('goToCore', { defaultValue: 'Go to Core → Create Endpoint' })}
+                </a>
+              </div>
+            ) : (
+              <select
+                value={endpointId}
+                onChange={(e) => setEndpointId(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm mb-3"
+              >
+                <option value="">{t('selectEndpoint', { defaultValue: 'Select an endpoint...' })}</option>
+                {endpoints.map((ep) => (
+                  <option key={ep.id} value={ep.id}>
+                    {ep.description || ep.url} ({ep.id.slice(0, 8)}...)
+                  </option>
+                ))}
+              </select>
+            )}
             <button type="button"
               onClick={handleSend}
               disabled={sending || !endpointId}
