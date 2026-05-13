@@ -1,20 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTranslations, useLocale } from 'next-intl';
 
-/* ─── Hook0-style Admin: Üstte yatay tab menü ─── */
-
-const adminTabs = [
+const adminNavigation = [
   { nameKey: 'overview', href: '/admin', icon: '📊' },
   { nameKey: 'users', href: '/admin/users', icon: '👥' },
   { nameKey: 'revenue', href: '/admin/revenue', icon: '💰' },
   { nameKey: 'system', href: '/admin/system', icon: '🖥️' },
-  { nameKey: 'activityLog', href: '/admin/activity', icon: '📋' },
   { nameKey: 'settingsNav', href: '/admin/settings', icon: '⚙️' },
+  { nameKey: 'activityLog', href: '/admin/activity', icon: '📋' },
 ];
 
 function AdminShell({ children }: { children: React.ReactNode }) {
@@ -24,28 +23,30 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const locale = useLocale();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Item 61 — Set document title for admin pages
   useEffect(() => {
-    document.title = 'HookSniff — Admin Panel';
+    document.title = 'HookSniff — Webhook Teslimat Servisi';
   }, []);
 
   // Admin auth guard
   useEffect(() => {
     if (user && !user.is_admin) {
-      router.push('/');
+      router.push("/");
     }
   }, [user, router, locale]);
 
   if (!user?.is_admin) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-5xl mb-4">🔒</div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('accessDenied')}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('noAdminPrivileges')}</p>
+          <div className="text-6xl mb-4">🔒</div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("accessDenied")}</h2>
+          <p className="text-gray-500 dark:text-slate-400 mb-4">{t("noAdminPrivileges")}</p>
           <Link
-            href="/"
-            className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium rounded-lg hover:opacity-90 transition"
+            href={"/"}
+            className="inline-flex px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition"
           >
             {tc('backToDashboard')}
           </Link>
@@ -54,69 +55,160 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const isActive = (href: string) =>
-    href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
-
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
-      {/* ─── Üst Header ─── */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        {/* Satır 1: Logo + Admin Badge + Profil */}
-        <div className="flex items-center justify-between h-14 px-4 lg:px-6">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center space-x-2">
-              <span className="text-xl">🪝</span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">HookSniff</span>
-            </Link>
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
-              {t('adminBadge') || 'Admin'}
-            </span>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+      {/* Item 128 — Skip to content link */}
+      <a
+        href="#admin-main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-red-600 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+      >
+        {t('skipToContent')}
+      </a>
 
-          <div className="flex items-center space-x-3">
-            <Link
-              href="/"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition"
-            >
-              ← {tc('backToDashboard')}
-            </Link>
-            <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white text-sm font-medium">
-              {(user?.email?.charAt(0) || 'A').toUpperCase()}
-            </div>
-            <button
-              onClick={() => { logout(); router.push('/login'); }}
-              className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-              title={tc('logout')}
-            >
-              🚪
-            </button>
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Item 127 — Sidebar with ARIA landmark */}
+      <aside
+        aria-label={t('adminPanel')}
+        className={clsx(
+          'fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 z-40 transition-transform duration-200 md:translate-x-0',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-700">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500 to-purple-600 flex items-center justify-center text-white text-lg">
+            ⚡
+          </div>
+          <div>
+            <div className="font-bold text-gray-900 dark:text-white">{t("adminPanel")}</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">{t("management")}</div>
           </div>
         </div>
-
-        {/* Satır 2: Yatay Tab Menü (Hook0 gibi) */}
-        <nav className="flex items-center h-12 px-4 lg:px-6 space-x-1 overflow-x-auto">
-          {adminTabs.map((tab) => (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={clsx(
-                'flex items-center px-4 py-2 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap',
-                isActive(tab.href)
-                  ? 'text-red-600 border-b-2 border-red-600 dark:text-red-400 dark:border-red-400'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'
-              )}
-            >
-              <span className="mr-2">{tab.icon}</span>
-              {t(`nav.${tab.nameKey}`)}
-            </Link>
-          ))}
+        <nav className="px-3 py-4 space-y-1">
+          {adminNavigation.map((item) => {
+            const isActive =
+              item.href === '/admin'
+                ? pathname === '/admin'
+                : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.nameKey}
+                href={item.href}
+                onClick={() => setSidebarOpen(false)}
+                className={clsx(
+                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
+                  isActive
+                    ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'
+                    : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
+                )}
+              >
+                <span className="text-lg">{item.icon}</span>
+                {t(`nav.${item.nameKey}`)}
+              </Link>
+            );
+          })}
         </nav>
-      </header>
+        <div className="border-t border-gray-200 dark:border-slate-700 mx-3 mt-2 pt-3">
+          <Link
+            href={"/"}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
+          >
+            <span className="text-lg">←</span>
+            {tc('backToDashboard')}
+          </Link>
+        </div>
+        <div className="absolute bottom-4 left-0 right-0 px-6">
+          <ThemeToggle className="w-full" />
+        </div>
+      </aside>
 
-      {/* ─── Ana İçerik ─── */}
-      <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-        {children}
-      </main>
+      {/* Main content */}
+      <div className="md:pl-64">
+        {/* Item 127 — Top bar with ARIA landmark */}
+        <header role="banner" className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 -ml-2 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition"
+              aria-label={tc("openSidebar")}
+            >
+              <svg aria-hidden="true" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {adminNavigation.find((n) => n.href === pathname)?.nameKey ? t(`nav.${adminNavigation.find((n) => n.href === pathname)!.nameKey}`) : t('adminPanel')}
+              </h1>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400">
+                {t('adminBadge')}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {/* Global Quick Search */}
+            <div className="hidden md:block relative">
+              <input
+                type="text"
+                placeholder={t('quickSearch') || 'Search...'}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                    router.push(`/admin/users?search=${encodeURIComponent(e.currentTarget.value.trim())}`);
+                  }
+                }}
+                className="w-48 px-3 py-1.5 pl-9 text-sm border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                aria-label={t('quickSearch') || 'Search users'}
+              />
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            {/* Notification Bell */}
+            <Link
+              href="/admin/system"
+              className="relative p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition"
+              aria-label={t('notifications') || 'Notifications'}
+            >
+              <svg aria-hidden="true" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </Link>
+            {/* Profile Dropdown */}
+            <div className="relative group">
+              <button type="button" className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                  {(user?.email?.charAt(0) || 'A').toUpperCase()}
+                </div>
+              </button>
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <div className="px-4 py-2 border-b border-gray-100 dark:border-slate-700">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.email}</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">Admin</p>
+                </div>
+                <Link href={"/"} className="block px-4 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition">
+                  {tc('backToDashboard')}
+                </Link>
+                <button type="button"
+                  onClick={() => { logout(); router.push('/login'); }}
+                  className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+                >
+                  {tc('logout')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Item 127/128 — Page content with ARIA landmark and skip-to-content target */}
+        <main id="admin-main-content" role="main" className="p-4 md:p-8 page-enter">{children}</main>
+      </div>
     </div>
   );
 }
