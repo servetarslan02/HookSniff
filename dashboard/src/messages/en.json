@@ -455,6 +455,12 @@
     "roleOwner": "Owner",
     "roleAdmin": "Admin",
     "roleMember": "Member",
+    "roleViewer": "Viewer",
+    "roleEditor": "Editor",
+    "currentUser": "current user",
+    "inviteDesc": "Invite other members to your organization and assign them a role.",
+    "membersTitle": "Members",
+    "membersDesc": "Manage who has access to this organization and their permissions.",
     "removeBtn": "Remove"
   },
   "notifications": {

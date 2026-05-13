@@ -455,6 +455,12 @@
     "roleOwner": "Sahip",
     "roleAdmin": "Yönetici",
     "roleMember": "Üye",
+    "roleViewer": "Görüntüleyici",
+    "roleEditor": "Editör",
+    "currentUser": "mevcut kullanıcı",
+    "inviteDesc": "Organizasyonunuza başka üyeler davet edin ve onlara bir rol atayın.",
+    "membersTitle": "Üyeler",
+    "membersDesc": "Bu organizasyona kimin erişimi olduğunu ve izinlerini yönetin.",
     "removeBtn": "Kaldır"
   },
   "notifications": {
