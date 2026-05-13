@@ -3,6 +3,7 @@
 > **Bölüm:** Yönlendirme  
 > **İçerik:** Tekrar Politikası, Yönlendirme, Özel Alan Adı  
 > **İnceleme Tarihi:** 2026-05-12  
+> **Güncelleme:** 2026-05-13 (kod değişiklikleriyle eşleştirildi)  
 > **Kaynak Dosyalar:** `23-tekrar-politikasi.md`, `24-yonlendirme.md`, `25-ozel-alan-adi.md`
 
 ---
@@ -17,8 +18,8 @@
 
 ## 1. Tekrar Politikası (Retry Policy)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/retry-policy/page.tsx`  
-> Route: `/dashboard/retry-policy`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/retry-policy/page.tsx`  
+> Route: `/retry-policy`
 
 ### Sayfa Yapısı
 - RetrySettingsCard — Max attempts, initial delay, max delay
@@ -55,8 +56,8 @@
 
 ## 2. Yönlendirme (Routing)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/routing/page.tsx`  
-> Route: `/dashboard/routing`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/routing/page.tsx`  
+> Route: `/routing`
 
 ### Sayfa Yapısı
 - RoutingInfo — Endpoint bazlı routing bilgisi
@@ -99,8 +100,8 @@
 
 ## 3. Özel Alan Adı (Custom Domain)
 
-> Sayfa: `dashboard/src/app/[locale]/dashboard/custom-domain/page.tsx`  
-> Route: `/dashboard/custom-domain`
+> Sayfa: `dashboard/src/app/[locale]/(dashboard)/custom-domain/page.tsx`  
+> Route: `/custom-domain`
 
 ### Sayfa Yapısı
 - Domain ekleme formu
@@ -156,7 +157,7 @@
 #### BF-05: Domain Doğrulama Butonu Yok — Özel Alan Adı
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/custom-domain/page.tsx`
 - **Backend:** `POST /v1/custom-domains/{id}/verify` — DNS doğrulama
-- **Sorun:** api.ts'de tanımlı değil, UI'da buton yok.
+- **Durum:** `customDomainsApi.verifyDomain` api.ts'de tanımlı ✅, UI'da buton yok.
 - **Adımlar:**
   1. `api.ts`'ye ekle:
      ```typescript
