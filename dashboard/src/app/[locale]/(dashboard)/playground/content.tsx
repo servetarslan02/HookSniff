@@ -284,7 +284,7 @@ export function PlaygroundPageContent() {
         {/* Hero */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t("webhookPlayground")}</h1>
-          <p className="text-gray-600 dark:text-slate-400">Get a unique URL, send webhooks, inspect requests in real-time. No signup required.</p>
+          <p className="text-gray-600 dark:text-slate-400">{t("subtitle", { defaultValue: "Get a unique URL, send webhooks, inspect requests in real-time. No signup required." })}</p>
         </div>
 
         {/* Tabs */}
@@ -377,7 +377,7 @@ export function PlaygroundPageContent() {
                 <span>·</span>
                 <span>{history.length} request{history.length !== 1 ? 's' : ''} captured</span>
                 <span>·</span>
-                <span>Expires in 24h</span>
+                <span>{t("expiresIn", { defaultValue: "Expires in 24h" })}</span>
               </div>
             </div>
 
