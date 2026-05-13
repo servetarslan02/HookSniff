@@ -13,7 +13,7 @@ const PROVIDERS = [
   { id: 'generic', name: 'Generic', icon: '🔗', docs: '#' },
 ];
 
-const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
 
 export default function InboundPage() {
   const { token } = useAuth();
