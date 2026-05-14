@@ -940,8 +940,15 @@ async fn enable_2fa(
         .execute(&pool)
         .await?;
 
+    // Generate QR code URL via free API (no dependencies needed)
+    let qr_code_url = format!(
+        "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={}",
+        urlencoding::encode(&otpauth_url)
+    );
+
     Ok(Json(serde_json::json!({
         "secret": secret,
+        "qr_code": qr_code_url,
         "otpauth_url": otpauth_url,
         "message": "Scan the QR code in your authenticator app, then confirm with a TOTP code."
     })))
