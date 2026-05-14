@@ -846,3 +846,13 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Portal Usage eksik field'lar** — `api_calls_today`, `total_deliveries`, `delivered`, `failed` backend'de yoktu. Hepsi eklendi
 - **Test güncellendi** — `test_portal_usage_response_serialization` yeni field'larla
 - **Commit:** `51ecdf40` — main branch, push ✅
+
+## Oturum 159 Ek 4 — Security Düzeltmeleri (2026-05-15 03:50 - 03:56 GMT+8)
+- **Audit Log** — 4 uyumsuzluk düzeltildi:
+  1. `has_more` field eksikti → eklendi
+  2. Frontend `page` gönderiyor, backend `offset` bekliyordu → `page` param desteği eklendi
+  3. Frontend `timestamp`, `actor`, `actor_email` bekliyor, backend `created_at` döndürüyordu → hepsi eklendi
+  4. `actor` ve `actor_email` için customers tablosu ile JOIN eklendi
+- **Rate Limiting** — sağlam ✅
+- **SSO** — sağlam ✅
+- **Commit:** `bf83d660` — main branch, push ✅
