@@ -14,7 +14,7 @@ pub fn clean_database_url(database_url: &str) -> String {
 pub async fn create_pool(database_url: &str) -> Result<PgPool> {
     let clean_url = clean_database_url(database_url);
     let pool = PgPoolOptions::new()
-        .max_connections(20)
+        .max_connections(50)
         .connect(&clean_url)
         .await?;
 
