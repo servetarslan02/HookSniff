@@ -6,11 +6,16 @@ import { adminApi } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 
 interface SystemHealth {
-  database: { status: string; latency_ms: number };
-  redis: { status: string; latency_ms: number };
-  api: { status: string; uptime_seconds: number };
-  queue: { pending: number; processing: number; failed: number };
+  status?: string;
+  database?: { status: string; latency_ms: number };
+  redis?: { status: string; latency_ms: number };
+  api?: { status: string; uptime_seconds: number };
+  queue?: { pending: number; processing: number; failed: number };
   checks?: {
+    database?: { status: string; latency_ms: number };
+    queue?: { status: string; latency_ms: number; pending_count?: number };
+    redis?: { status: string; latency_ms: number };
+    last_delivery?: { status: string; last_delivered_at?: string };
     db_size?: { status: string; size?: string };
     recent_errors?: { status: string; errors?: Array<{ id: string; event?: string; error?: string; created_at: string }> };
     queue_detail?: { status: string; pending?: number; processing?: number; failed_last_hour?: number };
@@ -160,29 +165,31 @@ export default function AdminSystemPage() {
     {
       name: t('apiServer'),
       icon: '🚀',
-      status: health?.api?.status || 'unknown',
+      status: health?.api?.status || health?.status || 'unknown',
       detail: health?.api?.uptime_seconds ? `Uptime: ${formatUptime(health.api.uptime_seconds)}` : t('checking'),
       latency: null,
     },
     {
       name: t('database'),
       icon: '🐘',
-      status: health?.database?.status || 'unknown',
-      detail: health?.database?.latency_ms ? `Latency: ${health.database.latency_ms}ms` : t('checking'),
-      latency: health?.database?.latency_ms,
+      status: health?.checks?.database?.status || health?.database?.status || 'unknown',
+      detail: (health?.checks?.database?.latency_ms || health?.database?.latency_ms) ? `Latency: ${health?.checks?.database?.latency_ms || health?.database?.latency_ms}ms` : t('checking'),
+      latency: health?.checks?.database?.latency_ms || health?.database?.latency_ms,
     },
     {
       name: t('cache'),
       icon: '⚡',
-      status: health?.redis?.status || 'unknown',
-      detail: health?.redis?.latency_ms ? `Latency: ${health.redis.latency_ms}ms` : t('checking'),
-      latency: health?.redis?.latency_ms,
+      status: health?.checks?.redis?.status || health?.redis?.status || 'unknown',
+      detail: (health?.checks?.redis?.latency_ms || health?.redis?.latency_ms) ? `Latency: ${health?.checks?.redis?.latency_ms || health?.redis?.latency_ms}ms` : t('checking'),
+      latency: health?.checks?.redis?.latency_ms || health?.redis?.latency_ms,
     },
     {
       name: t('queue'),
       icon: '📬',
-      status: health?.queue ? (health.queue.failed > 10 ? 'degraded' : 'healthy') : 'unknown',
-      detail: health?.queue
+      status: health?.checks?.queue ? (health.checks.queue.pending_count ?? 0) > 100 ? 'degraded' : 'healthy' : health?.queue ? (health.queue.failed > 10 ? 'degraded' : 'healthy') : 'unknown',
+      detail: health?.checks?.queue
+        ? `${health.checks.queue.pending_count ?? 0} pending`
+        : health?.queue
         ? `${health.queue.pending} pending · ${health.queue.processing} processing · ${health.queue.failed} failed`
         : t('checking'),
       latency: null,
