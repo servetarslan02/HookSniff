@@ -129,7 +129,7 @@ async fn get_delivery_details(
             .collect(),
         signature_info: SignatureInfo {
             algorithm: "HMAC-SHA256".to_string(),
-            header_name: "webhook-signature".to_string(),
+            header_name: "X-HookSniff-Signature".to_string(),
             format: "v1,<base64(hmac)>".to_string(),
             secret_prefix: "whsec_".to_string(),
         },
@@ -209,7 +209,7 @@ mod tests {
             attempts: vec![],
             signature_info: SignatureInfo {
                 algorithm: "HMAC-SHA256".to_string(),
-                header_name: "webhook-signature".to_string(),
+                header_name: "X-HookSniff-Signature".to_string(),
                 format: "v1,<base64(hmac)>".to_string(),
                 secret_prefix: "whsec_".to_string(),
             },
@@ -270,13 +270,13 @@ mod tests {
     fn test_signature_info_serialize() {
         let si = SignatureInfo {
             algorithm: "HMAC-SHA256".to_string(),
-            header_name: "webhook-signature".to_string(),
+            header_name: "X-HookSniff-Signature".to_string(),
             format: "v1,<base64(hmac)>".to_string(),
             secret_prefix: "whsec_".to_string(),
         };
         let json = serde_json::to_value(&si).unwrap();
         assert_eq!(json["algorithm"], "HMAC-SHA256");
-        assert_eq!(json["header_name"], "webhook-signature");
+        assert_eq!(json["header_name"], "X-HookSniff-Signature");
         assert_eq!(json["format"], "v1,<base64(hmac)>");
         assert_eq!(json["secret_prefix"], "whsec_");
     }

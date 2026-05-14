@@ -146,9 +146,9 @@ async fn test_webhook(
         .post(&endpoint.url)
         .header("Content-Type", "application/json")
         // Standard Webhooks headers
-        .header("webhook-id", &msg_id)
-        .header("webhook-timestamp", &timestamp)
-        .header("webhook-signature", &signature)
+        .header("X-HookSniff-ID", &msg_id)
+        .header("X-HookSniff-Timestamp", &timestamp)
+        .header("X-HookSniff-Signature", &signature)
         // Test marker
         .header("X-HookSniff-Test", "true")
         .body(payload_str)
