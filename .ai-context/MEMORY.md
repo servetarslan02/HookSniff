@@ -840,3 +840,9 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Signature Verifier** — tamamen client-side (Web Crypto API) → sağlam ✅
 - **Build:** ✅ başarılı
 - **Commit:** `8025ad8b` — main branch, push ✅
+
+## Oturum 159 Ek 3 — Portal Düzeltmesi (2026-05-15 03:48 - 03:52 GMT+8)
+- **Portal Usage** — backend `webhooks_today` döndürüyordu, frontend `webhooks_used` bekliyordu. İsim düzeltildi
+- **Portal Usage eksik field'lar** — `api_calls_today`, `total_deliveries`, `delivered`, `failed` backend'de yoktu. Hepsi eklendi
+- **Test güncellendi** — `test_portal_usage_response_serialization` yeni field'larla
+- **Commit:** `51ecdf40` — main branch, push ✅
