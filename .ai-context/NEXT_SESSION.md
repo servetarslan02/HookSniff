@@ -1,19 +1,15 @@
-# NEXT_SESSION.md — 3 Kopuk API Düzeltildi
+# NEXT_SESSION.md — Observability Düzeltildi
 
-> Son güncelleme: 2026-05-15 03:32 GMT+8
+> Son güncelleme: 2026-05-15 03:40 GMT+8
 
 ## Yapılan (Oturum 159)
-- Frontend ↔ backend API karşılaştırması yapıldı
-- 3 kopuk API düzeltildi ve push edildi (`5a27afaf`):
-  1. `/auth/2fa/status` — backend'e eklendi
-  2. `/webhooks/batch-replay` → `/webhooks/batch/replay` — frontend path düzeltildi
-  3. `/inbound/configs` — backend'e CRUD endpoint'leri eklendi
+- 3 kopuk API düzeltildi: /auth/2fa/status, /webhooks/batch/replay, /inbound/configs
+- Observability: logs modal attempt verisi, analytics latency grafiği
 
 ## Sonraki Adımlar
-- Cloud Build tetikle (API deploy için) — Servet yapacak veya gcloud CLI ile
-- Dashboard build test et (`next build`)
-- 3 düzeltmenin production'da çalıştığını doğrula
-- GitHub token'ını iptal et ve yeni oluştur (güvenlik)
+- Cloud Build tetikle (API deploy) — Servet yapacak
+- Dashboard Vercel deploy otomatik tetiklenmeli (GitHub integration)
+- Production'da doğrula
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
