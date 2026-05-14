@@ -285,6 +285,8 @@ export interface Endpoint {
   signing_secret?: string;
   event_filter?: string[];
   custom_headers?: Record<string, string>;
+  application_id?: string;
+  format?: string;
 }
 
 export interface Delivery {
