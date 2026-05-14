@@ -214,7 +214,7 @@ async fn google_callback(
             .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
     );
 
-    let redirect_url = format!("{}/auth/callback", app_url);
+    let redirect_url = format!("{}/auth/callback?token={}&refresh={}", app_url, urlencoding::encode(&token), urlencoding::encode(&refresh_token_value));
     headers.insert(
         "location",
         axum::http::HeaderValue::from_str(&redirect_url)
@@ -333,7 +333,7 @@ async fn github_callback(
             .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
     );
 
-    let redirect_url = format!("{}/auth/callback", app_url);
+    let redirect_url = format!("{}/auth/callback?token={}&refresh={}", app_url, urlencoding::encode(&token), urlencoding::encode(&refresh_token_value));
     headers.insert(
         "location",
         axum::http::HeaderValue::from_str(&redirect_url)
