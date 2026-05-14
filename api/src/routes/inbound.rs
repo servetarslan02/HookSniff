@@ -22,7 +22,7 @@ use axum::body::Bytes;
 use axum::extract::{Extension, Path};
 use axum::http::HeaderMap;
 use axum::response::IntoResponse;
-use axum::routing::post;
+use axum::routing::{delete, get, post, put};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -36,6 +36,11 @@ use crate::models::endpoint::Endpoint;
 
 pub fn router() -> Router {
     Router::new()
+        .route("/configs", get(list_configs).post(create_config))
+        .route(
+            "/configs/{id}",
+            put(update_config).delete(delete_config),
+        )
         .route("/{provider}", post(handle_inbound))
         .route(
             "/{provider}/{endpoint_id}",
@@ -237,6 +242,114 @@ fn compute_hmac_raw(key: &[u8], data: &[u8]) -> Vec<u8> {
 
 fn compute_hmac_hex(key: &[u8], data: &[u8]) -> String {
     hex::encode(compute_hmac_raw(key, data))
+}
+
+// ── Config CRUD ──
+
+#[derive(Debug, Deserialize)]
+struct CreateConfigRequest {
+    provider: String,
+    secret: String,
+    endpoint_id: Option<Uuid>,
+    enabled: Option<bool>,
+}
+
+#[derive(Debug, Deserialize)]
+struct UpdateConfigRequest {
+    secret: Option<String>,
+    endpoint_id: Option<Option<Uuid>>,
+    enabled: Option<bool>,
+}
+
+/// GET /v1/inbound/configs — List inbound configs for the current customer
+async fn list_configs(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<Vec<InboundConfig>>, AppError> {
+    let configs = sqlx::query_as::<_, InboundConfig>(
+        "SELECT id, customer_id, provider, secret, endpoint_id, enabled, created_at FROM inbound_configs WHERE customer_id = $1 ORDER BY created_at DESC",
+    )
+    .bind(customer.id)
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(Json(configs))
+}
+
+/// POST /v1/inbound/configs — Create a new inbound config
+async fn create_config(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<CreateConfigRequest>,
+) -> Result<Json<InboundConfig>, AppError> {
+    let config = sqlx::query_as::<_, InboundConfig>(
+        "INSERT INTO inbound_configs (id, customer_id, provider, secret, endpoint_id, enabled, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id, customer_id, provider, secret, endpoint_id, enabled, created_at",
+    )
+    .bind(Uuid::new_v4())
+    .bind(customer.id)
+    .bind(&req.provider)
+    .bind(&req.secret)
+    .bind(req.endpoint_id)
+    .bind(req.enabled.unwrap_or(true))
+    .fetch_one(&pool)
+    .await?;
+
+    Ok(Json(config))
+}
+
+/// PUT /v1/inbound/configs/{id} — Update an inbound config
+async fn update_config(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+    Json(req): Json<UpdateConfigRequest>,
+) -> Result<Json<InboundConfig>, AppError> {
+    // Verify ownership
+    let existing = sqlx::query_as::<_, InboundConfig>(
+        "SELECT id, customer_id, provider, secret, endpoint_id, enabled, created_at FROM inbound_configs WHERE id = $1 AND customer_id = $2",
+    )
+    .bind(id)
+    .bind(customer.id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    let secret = req.secret.unwrap_or(existing.secret);
+    let endpoint_id = req.endpoint_id.unwrap_or(existing.endpoint_id);
+    let enabled = req.enabled.unwrap_or(existing.enabled);
+
+    let config = sqlx::query_as::<_, InboundConfig>(
+        "UPDATE inbound_configs SET secret = $1, endpoint_id = $2, enabled = $3 WHERE id = $4 RETURNING id, customer_id, provider, secret, endpoint_id, enabled, created_at",
+    )
+    .bind(&secret)
+    .bind(endpoint_id)
+    .bind(enabled)
+    .bind(id)
+    .fetch_one(&pool)
+    .await?;
+
+    Ok(Json(config))
+}
+
+/// DELETE /v1/inbound/configs/{id} — Delete an inbound config
+async fn delete_config(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let deleted = sqlx::query(
+        "DELETE FROM inbound_configs WHERE id = $1 AND customer_id = $2",
+    )
+    .bind(id)
+    .bind(customer.id)
+    .execute(&pool)
+    .await?;
+
+    if deleted.rows_affected() == 0 {
+        return Err(AppError::NotFound);
+    }
+
+    Ok(Json(serde_json::json!({"deleted": true})))
 }
 
 // ── Handlers ──
