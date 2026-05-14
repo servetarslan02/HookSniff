@@ -1,7 +1,7 @@
 # SDK Execution Plan — Aşama Aşama
 
 > Oluşturulma: 2026-05-15 07:50 GMT+8
-> Son güncelleme: 2026-05-15 08:00 GMT+8
+> Son güncelleme: 2026-05-15 08:15 GMT+8
 > Kural: Birini bitirmeden diğerine geçme. Tikle = bitti.
 
 ---
@@ -13,7 +13,7 @@
 | Aşama 1: OpenAPI Spec | ✅ | 100% |
 | Aşama 2: Wrapper + İmza | ✅ | 11/11 |
 | Aşama 3: Unit Testler | ✅ | 11/11 |
-| Aşama 4: Operasyonel | ⏳ | 0% |
+| Aşama 4: Operasyonel | ⏳ | 40% |
 
 ---
 
@@ -40,60 +40,67 @@
 
 ## ✅ AŞAMA 3 — Kalite ve Güvenilirlik
 
-- [x] Unit testler — Node.js (211), Python (77), Go, Rust (6 dosya), Ruby (170+), Java (209), Kotlin (179), PHP, C# (220), Elixir (21), Swift (10 dosya)
-- [x] CHANGELOG.md — her SDK için mevcut
+- [x] Unit testler — tüm dillerde mevcut
+- [x] CHANGELOG.md — her SDK'da var
 - [x] Webhook verification — tüm dillerde HMAC-SHA256, timing-safe
 
 ---
 
 ## 🔴 AŞAMA 4 — Operasyonel Mükemmellik
 
-### 4.1 CI/CD Pipeline
-- [ ] `.github/workflows/sdk-test.yml` — PR'da tüm SDK'ları test et
-- [ ] `.github/workflows/sdk-publish.yml` — tag'de publish
-- [ ] Her dil için build job (npm, pip, cargo, mvn, bundle, composer, dotnet, mix, swift)
+### 4.1 CI/CD Pipeline ✅
+- [x] `.github/workflows/sdk-tests.yml` — PR'da tüm SDK'ları test et (11 dil)
+- [x] `.github/workflows/sdk-publish.yml` — tag'de publish (11 dil, workflow_dispatch)
+- [x] Her dil için build job (npm, pip, cargo, mvn, bundle, composer, dotnet, mix, swift)
 
-### 4.2 Otomatik Versiyon Yönetimi
-- [ ] Semver convention belirle (0.x → 1.0.0 zamanlaması)
-- [ ] OpenAPI spec değişince SDK versiyonu otomatik art
-- [ ] Version bump script
+### 4.2 Versiyon Yönetimi ✅
+- [x] `scripts/bump-sdk-version.sh` — tüm SDK'ların versiyonunu güncelle
+- [x] `scripts/check-sdk-publish.sh` — publish durumunu kontrol et
+- [x] Publish durumu raporu: `PUBLISH-STATUS.md`
 
-### 4.3 SDK Dokümantasyon Sitesi
-- [ ] Platform seç: Docusaurus veya Mintlify
-- [ ] Her dil için Quick Start
-- [ ] Her dil için Full API Reference
-- [ ] Code examples (her endpoint için)
-- [ ] Migration guide (0.1.0 → 0.2.0 → 0.3.0 → 1.0.0)
-- [ ] Error handling guide
-- [ ] İmza doğrulama guide
+### 4.3 SDK Dokümantasyon Sitesi ⏳
+- [x] Docusaurus projesi: `docs-sdk/`
+- [x] Ana sayfa (intro)
+- [x] Node.js Quick Start (referans)
+- [x] Webhook Verification Guide (tüm diller)
+- [x] API Reference sayfası
+- [x] Sidebar yapısı (11 SDK + guides)
+- [ ] Python Quick Start
+- [ ] Go Quick Start
+- [ ] Rust Quick Start
+- [ ] Ruby Quick Start
+- [ ] Java Quick Start
+- [ ] Kotlin Quick Start
+- [ ] PHP Quick Start
+- [ ] C# Quick Start
+- [ ] Elixir Quick Start
+- [ ] Swift Quick Start
+- [ ] Error Handling Guide
+- [ ] Pagination Guide
+- [ ] Migration Guide (0.x → 1.0.0)
+- [ ] Deploy (Vercel/Netlify)
 - [ ] docs.hooksniff.dev domain
 
-### 4.4 Performance Benchmarking
+### 4.4 Performance Benchmarking ❌
 - [ ] Her SDK için benchmark script
 - [ ] İlk bağlantı süresi
 - [ ] Request/response latency
 - [ ] Memory usage
 - [ ] Bundle size (Node.js, Python)
-- [ ] Sonuçları dokümantasyona ekle
 
-### 4.5 Publish Durumu Kontrol
-- [ ] npm — hooksniff-sdk güncel mi?
-- [ ] PyPI — hooksniff güncel mi?
-- [ ] crates.io — hooksniff güncel mi?
-- [ ] RubyGems — hooksniff güncel mi?
-- [ ] Maven Central — hooksniff-sdk güncel mi?
-- [ ] NuGet — HookSniff güncel mi?
-- [ ] Hex.pm — hooksniff güncel mi?
-- [ ] Swift Package Index — HookSniff güncel mi?
+### 4.5 Publish ⏳
+- [x] Publish durumu kontrol edildi
+- [ ] npm → 0.4.0 publish (token gerekli)
+- [ ] crates.io → ilk publish (token gerekli)
+- [ ] RubyGems → 0.4.0 publish (token gerekli)
+- [ ] Maven Central → ilk publish (credentials gerekli)
+- [ ] NuGet → ilk publish (token gerekli)
+- [ ] Hex.pm → 0.4.0 publish (token gerekli)
 
 ---
 
-## 📝 Notlar
+## 📝 Servet'in Yapması Gerekenler
 
-### Kalite Kuralları
-1. Zero/minimum dependency (sadece native crypto + HTTP)
-2. Her dilin idiomlarına uygun kodlama
-3. Error handling: ApiException(statusCode, body, message)
-4. Timeout: configurable, default 30s
-5. Retry: exponential backoff + jitter
-6. User-Agent: `hooksniff-sdk/{version} ({lang})`
+1. **GitHub Secrets ekle** (PUBLISH-STATUS.md'deki token'lar)
+2. **Publish workflow tetikle** — GitHub Actions > SDK Publish > Run workflow
+3. **Domain ayarla** — docs.hooksniff.dev → Vercel/Netlify
