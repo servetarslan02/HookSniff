@@ -66,6 +66,15 @@
     "dismiss": "Kapat",
     "dismissError": "Hata kapat",
     "notifications": "Bildirimler",
+    "notificationsTitle": "Bildirimler",
+    "markAllRead": "Tümünü okundu işaretle",
+    "noNotifications": "Bildirim yok",
+    "viewAllNotifications": "Tüm bildirimleri gör →",
+    "acceptInvite": "Kabul Et",
+    "declineInvite": "Reddet",
+    "inviteAcceptedRedirect": "Ekip sayfasına yönlendiriliyor...",
+    "inviteAcceptFailed": "Davet kabul edilemedi",
+    "inviteDeclined": "Davet reddedildi",
     "toggleNav": "Gezintiyi aç/kapat",
     "deleteTransform": "Dönüşümü sil",
     "logo": "Logo",
@@ -471,6 +480,8 @@
     "membersCount": "{count} üye",
     "roleOwner": "Sahip",
     "roleAdmin": "Yönetici",
+    "roleEditor": "Editör",
+    "roleViewer": "Görüntüleyici",
     "roleMember": "Üye",
     "removeBtn": "Kaldır"
   },
@@ -500,7 +511,8 @@
     "typeWebhookFailed": "Webhook Başarısız",
     "typeAlerts": "Uyarılar",
     "typeSystem": "Sistem",
-    "typeBilling": "Faturalandırma"
+    "typeBilling": "Faturalandırma",
+    "typeTeamInvite": "Ekip Daveti"
   },
   "webhooks": {
     "title": "Webhooklar",
