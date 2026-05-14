@@ -12,10 +12,10 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/endpoints': '/core',
   '/deliveries': '/core',
   '/search': '/core',
-  '/logs': '/monitoring',
-  '/health': '/monitoring',
-  '/alerts': '/monitoring',
-  '/analytics': '/monitoring',
+  '/logs': '/observability',
+  '/health': '/observability',
+  '/alerts': '/observability',
+  '/analytics': '/observability',
   '/playground': '/devtools',
   '/signature-verifier': '/devtools',
   '/api-importer': '/devtools',
@@ -82,7 +82,7 @@ export default function middleware(request: NextRequest) {
     '/privacy', '/terms', '/status', '/newsletter', '/build-vs-buy',
     '/get-started', '/startups',
     // Consolidated dashboard routes
-    '/core', '/monitoring', '/devtools', '/content-mgmt', '/portal-section',
+    '/core', '/observability', '/devtools', '/content-mgmt', '/portal-section',
     '/security-section', '/routing-config', '/team-mgmt', '/billing-overview',
     '/settings-section',
   ];
