@@ -398,13 +398,16 @@ async fn invite_member(
         let team_name_str = team_name.map(|(n,)| n).unwrap_or_else(|| "a team".to_string());
         let inviter_name = customer.name.clone().unwrap_or_else(|| customer.email.clone());
 
+        let invite_link = format!("/team-mgmt?invite={}", token);
+
         let _ = sqlx::query(
             r#"INSERT INTO notifications (customer_id, type, title, message, link)
-               VALUES ($1, 'team_invite', $2, $3, '/team-mgmt')"#,
+               VALUES ($1, 'team_invite', $2, $3, $4)"#,
         )
         .bind(invited_customer_id)
         .bind(format!("{} seni {} ekibine davet etti", inviter_name, team_name_str))
         .bind(format!("Rol: {}. Daveti kabul etmek için tıklayın.", role))
+        .bind(&invite_link)
         .execute(&pool)
         .await;
     }

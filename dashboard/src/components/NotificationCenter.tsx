@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
-import { notificationsApi, type Notification } from '@/lib/api';
+import { notificationsApi, teamsApi, type Notification } from '@/lib/api';
 
 export function NotificationCenter() {
   const t = useTranslations('nav');
@@ -68,14 +68,31 @@ export function NotificationCenter() {
     }
   };
 
+  const extractInviteToken = (n: Notification): string | null => {
+    if (n.type !== 'team_invite' || !n.link) return null;
+    const match = n.link.match(/[?&]invite=([^&]+)/);
+    return match ? match[1] : null;
+  };
+
   const handleAcceptInvite = async (n: Notification) => {
     if (!token) return;
+    const inviteToken = extractInviteToken(n);
+    if (!inviteToken) {
+      // No token in link, just navigate to team page
+      router.push('/team-mgmt');
+      return;
+    }
     setAcceptingId(n.id);
     try {
-      await handleMarkAsRead(n.id);
+      await teamsApi.acceptInvite(token, inviteToken);
+      await notificationsApi.markAsRead(token, n.id);
+      setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
+      setUnreadCount((c) => Math.max(0, c - 1));
       router.push('/team-mgmt');
     } catch {
-      // ignore
+      // Mark as read anyway and redirect
+      await notificationsApi.markAsRead(token, n.id).catch(() => {});
+      router.push('/team-mgmt');
     } finally {
       setAcceptingId(null);
     }
@@ -146,7 +163,13 @@ export function NotificationCenter() {
                   key={n.id}
                   className={`px-4 py-3 border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition ${
                     !n.read ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''
-                  }`}
+                  } ${n.type !== 'team_invite' ? 'cursor-pointer' : ''}`}
+                  onClick={() => {
+                    if (n.type !== 'team_invite') {
+                      if (!n.read) handleMarkAsRead(n.id);
+                      if (n.link) router.push(n.link);
+                    }
+                  }}
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-base mt-0.5">{typeIcons[n.type] || '🔔'}</span>
