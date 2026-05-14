@@ -11,37 +11,30 @@
 - 2 backend 500 hatası bulundu
 - Rapor: `.ai-context/E2E-TEST-REPORT-2026-05-15.md`
 
-## 🔴 Acil — Bu Oturumda Yapılmalı
+## ✅ Yapılan Düzeltmeler
 
-### 1. `/v1/auth/2fa/status` 500 Hatası
-- **Sorun:** Settings sayfasındaki 2FA status endpoint'i 500 döndürüyor
-- **Dosya:** `api/src/routes/auth.rs` — `get_2fa_status` handler
-- **Etki:** 2FA bölümü tamamen çalışmıyor
+### 1. 2FA 500 Hatası ✅
+- `api/src/routes/auth.rs`: `last_used_at` → `created_at` (kolon tabloda yoktu)
+- Deploy sonrası Cloud Build ile test edilmeli
 
-### 2. `/monitoring` 404 Hatası
-- **Sorun:** Monitoring sayfası 404 döndürüyor
-- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/monitoring/page.tsx` — var mı kontrol et
-- **Etki:** Sidebar linki bozuk
+### 2. 13 Eksik i18n Key ✅
+- `en.json` ve `tr.json`'a eklendi:
+  - auth.verifyEmailSent
+  - billing.nextBilling, webhooksThisMonth, used
+  - settings.twoFactorAuth, twoFactorDesc, 2faDisabled, enable2fa
+  - docs, developer, startup, enterprise, unlimited
 
-### 3. i18n Eksik Key'ler (13 adet)
-- `auth.verifyEmailSent`
-- `billing.nextBilling`, `billing.webhooksThisMonth`, `billing.used`
-- `settings.twoFactorAuth`, `settings.twoFactorDesc`, `settings.2faDisabled`, `settings.enable2fa`
-- `docs.docs`, `docs.developer`, `docs.startup`, `docs.enterprise`, `docs.unlimited`
-- **Dosya:** `dashboard/src/messages/en.json` — key'leri ekle
+### 3. Fiyat Tutarsızlığı ✅
+- Doğru fiyatlar: Developer $0 / Startup $29 / Pro $49 / Enterprise Custom
+- Backend ile uyumlu (monthly_price_cents: 0/2900/4900/0)
 
-## 🟡 Orta — Sonraki Adımlar
+## 🟡 Sonraki Adımlar
 
 ### 4. `/api/status` 404
 - Status API route'u tanımlı değil
 - Ya Next.js API route oluştur ya da backend'den proxy et
 
-### 5. Fiyat Tutarsızlığı
-- Landing: $0/$29/$49/Custom
-- MEMORY.md: $0/$29/$99
-- Doğru fiyat ne? Servet'e sor veya düzelt
-
-### 6. Pending Deliveries (2 adet)
+### 5. Pending Deliveries (2 adet)
 - 13 Mayıs'tan kalma, 0 attempt
 - Worker neden işlemiyor?
 
