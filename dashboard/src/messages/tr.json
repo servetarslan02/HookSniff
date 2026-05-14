@@ -211,7 +211,27 @@
     "widgetSettings": "Widget Ayarları",
     "widgetSettingsDesc": "Widget aç/kapa. Yeniden sıralamak için her widget üzerindeki tutamaçları sürükleyin.",
     "statCards": "İstatistik Kartları",
-    "charts": "Grafikler"
+    "charts": "Grafikler",
+    "subtitle": "Webhook Teslimat Paneli",
+    "totalDeliveries": "Toplam Teslimat",
+    "activeEndpoints": "Aktif Uç Nokta",
+    "failedDeliveries": "Başarısız Teslimat",
+    "deliveryTrends": "Teslimat Eğilimleri",
+    "deliveryTrendsDesc": "Zaman içinde webhook teslimat performansı",
+    "quickStats": "Hızlı İstatistikler",
+    "quickActions": "Hızlı İşlemler",
+    "manageEndpoints": "Uç Noktaları Yönet",
+    "viewDeliveries": "Teslimatları Gör",
+    "openPlayground": "Oyun Alanını Aç",
+    "viewAnalytics": "Analitiği Gör",
+    "event": "Olay",
+    "status": "Durum",
+    "attempts": "Deneme",
+    "time": "Zaman",
+    "failedLabel": "Başarısız",
+    "tryPlayground": "Oyun Alanını Dene",
+    "recent-deliveries": "Son Teslimatlar",
+    "stat-cards": "İstatistik Kartları"
   },
   "endpoints": {
     "title": "Endpoint'ler",
@@ -1753,7 +1773,8 @@
   "chart": {
     "hours24": "24 Saat",
     "days7": "7 Gün",
-    "days30": "30 Gün"
+    "days30": "30 Gün",
+    "days90": "90 Gün"
   },
   "generic": "Genel",
   "active": "Aktif",
