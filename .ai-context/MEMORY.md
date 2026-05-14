@@ -864,3 +864,13 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Routing** — sağlam ✅ (interface'de fazla field var ama JSX'te kullanılmıyor)
 - **Custom Domain** — sağlam ✅
 - **Commit:** `a82fac73` — main branch, push ✅
+
+## Oturum 159 Ek 6 — Team Mgmt Düzeltmesi (2026-05-15 03:56 - 04:00 GMT+8)
+- **Notifications** — filter parametreleri eşleşmiyordu:
+  - Frontend `read` (true/false) ve `type` gönderiyordu
+  - Backend sadece `unread_only` kabul ediyordu
+  - `read` ve `type` parametreleri backend'e eklendi
+  - Dinamik WHERE clause ile filtreleme yapıldı
+- **Team** — sağlam ✅ (teamsApi zaten doğrulanmıştı)
+- **Applications** — sağlam ✅ (applicationsApi zaten doğrulanmıştı)
+- **Commit:** `912bd1a0` — main branch, push ✅
