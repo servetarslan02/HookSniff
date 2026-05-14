@@ -17,10 +17,22 @@
 | 9 | Gzip compression | -%60-70 transfer | ✅ |
 | 10 | Redis cache altyapısı | Hazır, handler'lara bağlanacak | ✅ |
 | 11 | DB pool (20→50) | Daha fazla paralel sorgu | ✅ |
+| 12 | Redis Cache (Auth) | DB yükü -%50, auth latency -%80 | ✅ |
+| 13 | Health Check Pool | Bağımsız health, ana pool'dan izole | ✅ |
+| 14 | Structured JSON Logging | Production'da JSON format | ✅ |
+| 15 | Cache-Control headers | CDN-friendly cache policy | ✅ |
+| 16 | ETag support | Conditional requests (304) | ✅ |
+| 17 | CORS expose headers | ETag, X-Trace-Id erişilebilir | ✅ |
 
 ## 📋 Kalan Optimizasyonlar
 
 ### Kısa Vade (1-2 oturum)
+
+#### CDN Cache Headers ✅ DONE (Oturum 163)
+- **Durum:** ✅ Cache-Control per endpoint category + ETag + CORS expose
+- **Yapılan:** Health=10s, Docs=1h, Auth=no-store, API=private/no-cache
+- **ETag:** SHA-256 weak ETag for GET health/docs/outbound-ips
+- **CORS:** X-Trace-Id, X-Request-Id, ETag exposed to browser
 
 #### 1. Redis Cache — Handler Entegrasyonu ✅ DONE (Oturum 162) ✅ DONE (Oturum 162)
 - **Durum:** ✅ auth_middleware + jwt_auth_middleware Redis cache entegre
@@ -40,11 +52,9 @@
 - **Etki:** Health check her zaman çalışır, ana pool'dan bağımsız
 - **Dosya:** `api/src/routes/health.rs`
 
-#### 4. Structured JSON Logging
-- **Durum:** tracing kullanılıyor ama JSON format değil
-- **Yapılacak:** `tracing-subscriber` JSON formatter ekle
-- **Etki:** Log parsing daha kolay, Grafana'da filtreleme
-- **Dosya:** `api/src/telemetry.rs`
+#### 4. Structured JSON Logging ✅ DONE (Oturum 163)
+- **Durum:** ✅ `APP_ENV=production` veya `LOG_FORMAT=json` ile otomatik JSON
+- **Dosya:** `api/src/telemetry.rs` — zaten implemente edilmiş
 
 ### Orta Vade (3-5 oturum)
 

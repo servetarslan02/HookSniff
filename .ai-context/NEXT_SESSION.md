@@ -1,47 +1,38 @@
 # NEXT_SESSION.md — Performance Work Devam
 
-> Son güncelleme: 2026-05-15 07:27 GMT+8
+> Son güncelleme: 2026-05-15 07:35 GMT+8
 
-## Yapılan (Bu Oturum — Oturum 162)
+## Yapılan (Bu Oturum — Oturum 163)
 
-### ✅ #1 Redis Cache → Auth Middleware
-- `auth_middleware`: Redis cache layer for API key validation (shared across instances)
-- `jwt_auth_middleware`: Redis cache for JWT customer lookup
-- API key delete/rotate: Redis cache invalidation
-- In-memory cache kept as fallback when Redis unavailable
-- 3-tier caching: Redis → in-memory → DB
+### ✅ #4 Structured JSON Logging — zaten implemente edilmiş
+- `api/src/telemetry.rs`: `APP_ENV=production` veya `LOG_FORMAT=json` ile otomatik JSON
+- `init_plain()` ve `init_otel()` fonksiyonlarında `use_json` branch'i mevcut
+- PERFORMANCE-ROADMAP güncellendi
 
-### ✅ #3 Health Check Ayrı Pool
-- `HealthPool` newtype (5 connections, independent of main pool)
-- `create_health_pool()` in db.rs (3s acquire timeout)
-- Health check handlers use separate pool
-- Falls back to main pool if health pool creation fails
+### ✅ CDN Cache Headers + ETag + CORS
+- **Cache-Control per endpoint category:**
+  - Health/metrics/status: `public, max-age=10, stale-while-revalidate=5`
+  - Docs: `public, max-age=3600, stale-while-revalidate=60`
+  - Auth: `no-store, no-cache, must-revalidate` + `pragma: no-cache`
+  - API: `private, no-cache, must-revalidate`
+- **ETag support:** SHA-256 weak ETag for GET requests (health, docs, outbound-ips)
+- **CORS expose headers:** X-Trace-Id, X-Request-Id, ETag — browser artık bu header'ları okuyabilir
+- **Vary header:** `Accept-Encoding, Authorization` eklendi
+- **Dosyalar:** `api/src/middleware/mod.rs`, `api/src/main.rs`
 
-### ✅ #4 Grafana Dashboard (zaten mevcut)
-- 6 dashboard zaten var (Webhook Monitoring, Service Health, SLO, Business, Security, Infrastructure)
-- Yeni "⚡ HookSniff — Performance" dashboard oluşturuldu (10 panel)
-- URL: https://hookrelay.grafana.net/d/hooksniff-performance/
-
-### ✅ #9 Clippy 0 Errors
-- 25 clippy hatası düzeltildi (12 dosya)
-- `cargo clippy -- -D warnings` → 0 errors, 0 warnings
-- `cargo test --lib` → 1065 passed, 0 failed
-
-### ✅ #2 Dashboard Code Splitting — zaten yapılmış (dynamic imports mevcut)
-
-### Commits
-- `7f48c6a6` — perf: Redis cache for auth middleware + health check pool
-- `0b544a79` — fix: clippy warnings — 0 errors, 0 warnings
+### Commits (Bu Oturum)
+- `pending` — perf: CDN cache headers, ETag support, CORS expose headers
 
 ## Kalan Performance Roadmap
 
 ### Kısa Vade
-- [ ] Structured JSON Logging — `tracing_subscriber::fmt::layer().json()` production'da aktif (telemetry.rs'de zaten var, `APP_ENV=production` ile çalışır)
+- [ ] Structured JSON Logging — ✅ DONE (zaten implemente edilmiş)
+- [ ] CDN Cache Headers — ✅ DONE (Cache-Control + ETag + CORS expose)
 
 ### Orta Vade
 - [ ] Background Job Queue (Redis)
 - [ ] Read Replica (Neon)
-- [ ] Cloud CDN headers
+- [ ] Cloud CDN headers (Cloudflare/Cloud Run seviyesinde)
 
 ### Büyük İş
 - [ ] WebSocket live updates
