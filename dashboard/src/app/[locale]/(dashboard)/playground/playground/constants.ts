@@ -1,5 +1,7 @@
+import { API_BASE as _API_BASE } from '@/lib/api';
+
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] as const;
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
+export const API_BASE = _API_BASE;
 
 export const ENDPOINT_PATHS: Record<string, string> = {
   'List Endpoints': '/endpoints',

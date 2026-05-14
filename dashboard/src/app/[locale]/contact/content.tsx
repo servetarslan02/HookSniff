@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
+import { API_BASE } from '@/lib/api';
 import Footer from '@/components/Footer';
 
 
@@ -16,8 +17,7 @@ export function ContactPageContent() {
     e.preventDefault();
     setStatus('sending');
     try {
-      const API = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
-      const res = await fetch(`${API}/contact`, {
+      const res = await fetch(`${API_BASE}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
