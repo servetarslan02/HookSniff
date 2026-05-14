@@ -172,7 +172,8 @@
     "teamMgmt": "Team",
     "billingOverview": "Billing",
     "settingsSection": "Settings",
-    "sectionMonitoring": "Monitoring"
+    "sectionMonitoring": "Monitoring",
+    "observability": "Observability"
   },
   "dashboard": {
     "title": "Dashboard",

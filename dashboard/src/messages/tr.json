@@ -172,7 +172,8 @@
     "teamMgmt": "Ekip",
     "billingOverview": "Faturalandırma",
     "settingsSection": "Ayarlar",
-    "sectionMonitoring": "İzleme"
+    "sectionMonitoring": "İzleme",
+    "observability": "İzleme"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
