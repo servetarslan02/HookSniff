@@ -53,6 +53,8 @@ pub struct ListParams {
     pub page: Option<i64>,
     pub per_page: Option<i64>,
     pub unread_only: Option<bool>,
+    pub read: Option<bool>,
+    pub r#type: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -75,49 +77,47 @@ async fn list_notifications(
     let offset = (page - 1) * per_page;
     let unread_only = params.unread_only.unwrap_or(false);
 
-    let (notifications, total) = if unread_only {
-        let notifs = sqlx::query_as::<_, Notification>(
-            r#"SELECT id, customer_id, type, title, message, is_read, link, created_at
-               FROM notifications
-               WHERE customer_id = $1 AND is_read = FALSE
-               ORDER BY created_at DESC
-               LIMIT $2 OFFSET $3"#,
-        )
-        .bind(customer.id)
-        .bind(per_page)
-        .bind(offset)
-        .fetch_all(&pool)
-        .await?;
+    // read=true → only read, read=false → only unread, unset → all
+    let read_filter = params.read;
+    let type_filter = params.r#type.as_deref();
 
-        let total: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM notifications WHERE customer_id = $1 AND is_read = FALSE",
-        )
-        .bind(customer.id)
-        .fetch_one(&pool)
-        .await?;
+    // Build WHERE clause
+    let mut where_clauses = vec!["customer_id = $1".to_string()];
+    let mut param_idx = 2;
 
-        (notifs, total.0)
-    } else {
-        let notifs = sqlx::query_as::<_, Notification>(
-            r#"SELECT id, customer_id, type, title, message, is_read, link, created_at
-               FROM notifications
-               WHERE customer_id = $1
-               ORDER BY created_at DESC
-               LIMIT $2 OFFSET $3"#,
-        )
-        .bind(customer.id)
-        .bind(per_page)
-        .bind(offset)
-        .fetch_all(&pool)
-        .await?;
+    if unread_only || read_filter == Some(false) {
+        where_clauses.push(format!("is_read = FALSE"));
+    } else if read_filter == Some(true) {
+        where_clauses.push(format!("is_read = TRUE"));
+    }
 
-        let total: (i64,) =
-            sqlx::query_as("SELECT COUNT(*) FROM notifications WHERE customer_id = $1")
-                .bind(customer.id)
-                .fetch_one(&pool)
-                .await?;
+    if type_filter.is_some() {
+        where_clauses.push(format!("type = ${}", param_idx));
+        param_idx += 1;
+    }
 
-        (notifs, total.0)
+    let where_sql = where_clauses.join(" AND ");
+
+    let (notifications, total) = {
+        let notif_sql = format!(
+            "SELECT id, customer_id, type, title, message, is_read, link, created_at FROM notifications WHERE {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
+            where_sql, param_idx, param_idx + 1
+        );
+        let mut notif_query = sqlx::query_as::<_, Notification>(&notif_sql).bind(customer.id);
+        if let Some(t) = type_filter {
+            notif_query = notif_query.bind(t);
+        }
+        notif_query = notif_query.bind(per_page).bind(offset);
+        let notifs = notif_query.fetch_all(&pool).await?;
+
+        let count_sql = format!("SELECT COUNT(*) FROM notifications WHERE {}", where_sql);
+        let mut count_query = sqlx::query_scalar::<_, i64>(&count_sql).bind(customer.id);
+        if let Some(t) = type_filter {
+            count_query = count_query.bind(t);
+        }
+        let total = count_query.fetch_one(&pool).await?;
+
+        (notifs, total)
     };
 
     let unread_count: (i64,) = sqlx::query_as(
