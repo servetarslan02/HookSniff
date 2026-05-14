@@ -92,12 +92,36 @@ pub struct DeliveryAttempt {
 #[derive(Debug, Serialize)]
 pub struct DeliveryAttemptResponse {
     pub id: Uuid,
+    pub delivery_id: Uuid,
     pub attempt_number: i32,
+    pub status: String,
     pub status_code: Option<i32>,
     pub response_body: Option<String>,
+    pub response_headers: Option<serde_json::Value>,
     pub duration_ms: Option<i32>,
     pub error_message: Option<String>,
     pub created_at: DateTime<Utc>,
+}
+
+impl DeliveryAttempt {
+    pub fn to_response(&self) -> DeliveryAttemptResponse {
+        let status = match self.status_code {
+            Some(code) if (200..300).contains(&code) => "delivered".to_string(),
+            _ => "failed".to_string(),
+        };
+        DeliveryAttemptResponse {
+            id: self.id,
+            delivery_id: self.delivery_id,
+            attempt_number: self.attempt_number,
+            status,
+            status_code: self.status_code,
+            response_body: self.response_body.clone(),
+            response_headers: self.response_headers.clone(),
+            duration_ms: self.duration_ms,
+            error_message: self.error_message.clone(),
+            created_at: self.created_at,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
