@@ -37,7 +37,8 @@ impl Plan {
         match s.to_lowercase().as_str() {
             "startup" => Plan::Startup,
             "pro" => Plan::Pro,
-            "enterprise" => Plan::Enterprise,
+            // Backward compat: old "business" maps to Enterprise
+            "enterprise" | "business" => Plan::Enterprise,
             // Backward compat: old "free" maps to Developer
             "free" | "developer" | _ => Plan::Developer,
         }

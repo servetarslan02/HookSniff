@@ -179,6 +179,7 @@ mod tests {
     fn test_api_key_info_serialize() {
         let info = ApiKeyInfo {
             id: Uuid::new_v4(),
+            name: Some("Production".to_string()),
             prefix: "hr_live_abc123...".to_string(),
             created_at: "2024-01-01T00:00:00Z".to_string(),
             last_used_at: Some("2024-01-02T00:00:00Z".to_string()),
@@ -194,6 +195,7 @@ mod tests {
     fn test_api_key_info_no_last_used() {
         let info = ApiKeyInfo {
             id: Uuid::new_v4(),
+            name: None,
             prefix: "hr_live_xyz...".to_string(),
             created_at: "2024-01-01T00:00:00Z".to_string(),
             last_used_at: None,
@@ -237,6 +239,6 @@ mod tests {
         // Prefix should be first 24 chars of the key
         let api_key = "hr_live_abc123def456ghi789";
         let prefix = &api_key[..24];
-        assert_eq!(prefix, "hr_live_abc123def456g");
+        assert_eq!(prefix, "hr_live_abc123def456ghi7");
     }
 }

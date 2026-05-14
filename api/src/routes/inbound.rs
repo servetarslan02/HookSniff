@@ -22,7 +22,7 @@ use axum::body::Bytes;
 use axum::extract::{Extension, Path};
 use axum::http::HeaderMap;
 use axum::response::IntoResponse;
-use axum::routing::{delete, get, post, put};
+use axum::routing::{get, post, put};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -978,7 +978,7 @@ mod tests {
         let sig = compute_hmac_hex(secret.as_bytes(), body);
 
         let mut headers = HeaderMap::new();
-        headers.insert("x-signature-256", HeaderValue::from_str(&sig).unwrap());
+        headers.insert("x-hooksniff-signature", HeaderValue::from_str(&sig).unwrap());
         let result = verify_generic(secret, &headers, body);
         assert!(result.is_ok());
     }
