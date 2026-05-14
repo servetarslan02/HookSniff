@@ -1,42 +1,31 @@
-# NEXT_SESSION.md — Oturum 155
+# NEXT_SESSION.md — Oturum 156
 
-> Son güncelleme: 2026-05-14 14:55 GMT+8
+> Son güncelleme: 2026-05-14 16:11 GMT+8
 
 ## Kaldığımız Yer
-- **Oturum 154** — Sidebar konsolidasyon düzeltmesi **TAMAMLANDI** ✅
-- **Sorun:** 30→10 konsolidasyon yapılmıştı ama commit `da065b49` ile sidebar tekrar eski tekil sayfalara döndürülmüştü
-- **Düzeltmeler:**
-  - Sidebar: 20 tekil link → 10 konsolide sayfa linki
-  - Middleware: 30 eski rota → konsolide rotalara 308 redirect eklendi
-  - publicPaths listesi temizlendi
-  - i18n: `sectionMonitoring` key eklendi (en/tr)
-  - Profile dropdown: `/settings` → `/settings-section`
-  - Build başarılı ✅, commit `79ef33f2`, push ✅
+- **Oturum 155** — Context yükleme + Cloud Build kontrolü **TAMAMLANDI** ✅
+- Tüm Cloud Build'ler başarılı (son 6 build ✅)
+- Worker `sem` lifetime hatası çözülmüş
+- API + Dashboard + Worker hepsi sağlıklı
 
-## Konsolide Sayfa Yapısı
-| # | Rota | İçerik |
-|---|------|--------|
-| 1 | `/core` | Dashboard + Endpoints + Deliveries + Search |
-| 2 | `/monitoring` | Logs + Health + Alerts + Analytics |
-| 3 | `/devtools` | Playground + Signature + API Importer + Webhook Builder |
-| 4 | `/content-mgmt` | Transforms + Inbound + Schemas + Templates |
-| 5 | `/portal-section` | Portal Customize + Portal Manage |
-| 6 | `/security-section` | Rate Limiting + Audit Log + SSO |
-| 7 | `/routing-config` | Retry Policy + Routing + Custom Domain |
-| 8 | `/team-mgmt` | Team + Notifications + Applications |
-| 9 | `/billing-overview` | API Keys + Billing |
-| 10 | `/settings-section` | Settings + Service Tokens |
+## Durum Özeti
+- **İlerleme:** 359/364 (%99) — 5 kalan hepsi Servet görevleri
+- **Site:** ✅ Canlı (hooksniff.vercel.app)
+- **API:** ✅ Çalışıyor (DB 36ms, Redis 234ms, Worker healthy)
+- **Cloud Build:** ✅ Son 6 deploy başarılı
 
-## Oturum 155 — Öncelikli Görevler
+## Oturum 156 — Öncelikli Görevler
 
-### 🟡 Orta
-1. **Vercel deploy kontrolü** — push edildi, deploy olunca kontrol et
-2. **Eski tekil sayfa dosyaları** — hâlâ duruyor, konsolide sayfalar import ediyor. Şimdilik sorun değil ama gelecekte temizlenebilir
-3. **Worker compile hatası** — `sem` lifetime error (build 7823f87d'de worker compile başarısız)
+### Servet Görevleri (5 kalan ⬜)
+1. Stripe payout + identity verification (Polar.sh)
+2. Domain DNS ayarları (hooksniff.is-a.dev → Resend domain)
+3. Dependabot PR'ları temizleme
+4. Vercel Node.js 24.x → 22.x düşürme
+5. Production test kullanıcı geri bildirimi
 
-### 🟢 Düşük
-4. **Widget drag-drop + chart time range** test
-5. **Hook0-style olmayan kalan sayfalar** — Analytics, Playground, Billing, Logs, Health, Alerts, Schemas, Transforms, Routing, Inbound (~3000 satır, çalışıyor ama eski style)
+### Opsiyonel İyileştirmeler
+1. Eski tekil sayfa dosyaları temizliği (konsolide sayfalar import ediyor)
+2. Hook0-style olmayan kalan sayfalar (~3000 satır, çalışıyor ama eski style)
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
