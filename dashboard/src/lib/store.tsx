@@ -144,9 +144,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(err.error?.message || 'Registration failed');
     }
     const data = await res.json();
-    const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
-    persistAuth(u, data.customer.api_key, data.token);
-    return u;
+    // Backend returns { message } for email-verification flow (no auto-login)
+    // or { token, customer } for direct registration
+    if (data.customer) {
+      const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
+      persistAuth(u, data.customer.api_key, data.token);
+      return u;
+    }
+    // Email verification flow — return a minimal user object
+    // The user must verify email and then log in
+    return { id: '', email, name, plan: 'developer' as const, is_admin: false };
   }, [persistAuth]);
 
   const logout = useCallback(async () => {

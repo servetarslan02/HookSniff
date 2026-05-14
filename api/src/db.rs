@@ -1355,6 +1355,16 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 55: Add email_on_weekly_digest to notification_preferences
+    run_migration(
+        pool,
+        "054_weekly_digest",
+        r#"
+        ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS email_on_weekly_digest BOOLEAN NOT NULL DEFAULT false;
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }

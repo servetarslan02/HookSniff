@@ -128,6 +128,7 @@ pub struct DeliverySummary {
     pub endpoint_id: Uuid,
     pub status: String,
     #[serde(alias = "event")]
+    #[serde(rename = "event")]
     pub event_type: Option<String>,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub attempt_count: i32,
