@@ -3207,6 +3207,7 @@
     "created": "Hizmet jetonu oluşturuldu!",
     "deleted": "Hizmet jetonu silindi",
     "noTokens": "Henüz hizmet jetonu yok. Başlamak için bir tane oluşturun.",
+    "tokenNotAvailable": "Token yalnızca oluşturma sırasında gösterilir. Gerekirse yeni bir token oluşturun.",
     "reveal": "Jetonu göster",
     "hide": "Jetonu gizle",
     "deleteTitle": "Hizmet Jetonunu Sil",
