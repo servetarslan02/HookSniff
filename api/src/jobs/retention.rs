@@ -83,8 +83,6 @@ async fn cleanup_webhook_queue(pool: &PgPool) -> Result<u64> {
 /// This ensures customers who signed up on the 15th get their count reset
 /// on the 15th of each month, not the 1st.
 pub async fn reset_monthly_webhook_counts(pool: &PgPool) -> Result<()> {
-    let _now = Utc::now();
-
     // Reset customers whose billing anniversary has arrived this month
     // and who haven't been reset yet this period.
     // Logic: created_at's day-of-month <= today AND last reset was before this period start
