@@ -911,3 +911,23 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - `queue`: pending/processing/failed from checks
   - `mockHealth` güncellendi (frontend)
 - **Commit:** `81d4444b` + `2aac8363` — main branch, push ✅
+
+## Oturum 160 (2026-05-15 04:24 - 04:35 GMT+8) ✅
+- **OpenClaw** — Servet ile kapsamlı API audit
+- **Kapsamlı analiz:** Tüm dashboard sayfaları (35+) backend route'ları ile karşılaştırıldı
+- **Bulunan sorunlar:** 4 kritik + 5 önemli uyumsuzluk
+- **Kritik düzeltmeler:**
+  1. billing/portal: GET→POST method mismatch (405 hatası)
+  2. delivery detail: yanlış endpoint kullanımı (/webhooks/{id} → /webhooks/{id}/details)
+  3. API keys: backend'de name alanı yoktu → eklendi
+  4. delivery attempts: status_code→computed status (delivered/failed)
+- **Önemli düzeltmeler:**
+  5. rate limits: endpoint_url + requests_per_minute eklendi
+  6. billing subscription: current_period_end eklendi
+  7. portal profile: name alanı eklendi
+  8. delivery attempts: delivery_id + response_headers response'a eklendi
+- **Rapor:** `.ai-context/API-AUDIT-2026-05-15.md` oluşturuldu
+- **Dashboard build:** ✅ başarılı (216 sayfa)
+- **Commit:** b010eb76 — main branch, push ✅
+- **7 dosya değişti, 179 satır eklendi, 11 satır silindi**
+- **Rust toolchain kurulu değil** — compile doğrulaması yapılamadı, Cloud Build ile doğrulanmalı
