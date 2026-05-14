@@ -43,6 +43,7 @@ pub struct AuditLogQuery {
     pub resource_type: Option<String>,
     pub limit: Option<i64>,
     pub offset: Option<i64>,
+    pub page: Option<i64>,
 }
 
 /// Audit log entry response
@@ -56,6 +57,9 @@ pub struct AuditEntry {
     pub ip_address: Option<String>,
     pub user_agent: Option<String>,
     pub created_at: DateTime<Utc>,
+    pub timestamp: DateTime<Utc>,
+    pub actor: String,
+    pub actor_email: String,
 }
 
 /// Paginated audit log response
@@ -65,6 +69,7 @@ pub struct AuditLogResponse {
     pub total: i64,
     pub limit: i64,
     pub offset: i64,
+    pub has_more: bool,
 }
 
 /// GET /audit-log — List audit log entries for the authenticated customer
@@ -74,7 +79,12 @@ async fn list_audit_entries(
     Query(query): Query<AuditLogQuery>,
 ) -> Result<Json<AuditLogResponse>, AppError> {
     let limit = query.limit.unwrap_or(50).min(200);
-    let offset = query.offset.unwrap_or(0);
+    // Support both page (1-indexed) and offset (0-indexed)
+    let offset = if let Some(page) = query.page {
+        (page.max(1) - 1) * limit
+    } else {
+        query.offset.unwrap_or(0)
+    };
 
     // Build dynamic query
     let mut where_clauses = vec!["customer_id = $1".to_string()];
@@ -102,12 +112,14 @@ async fn list_audit_entries(
     }
     let total = count_query.fetch_one(&pool).await?;
 
-    // Fetch entries
+    // Fetch entries with customer info
     let data_sql =
         format!(
-        "SELECT id, action, resource_type, resource_id, details, ip_address, user_agent, created_at
-         FROM audit_log WHERE {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
-        where_sql, param_index, param_index + 1
+        "SELECT a.id, a.action, a.resource_type, a.resource_id, a.details, a.ip_address, a.user_agent, a.created_at,
+                COALESCE(c.name, 'Unknown') as actor, COALESCE(c.email, 'unknown') as actor_email
+         FROM audit_log a LEFT JOIN customers c ON c.id = a.customer_id
+         WHERE a.{} ORDER BY a.created_at DESC LIMIT ${} OFFSET ${}",
+        where_sql.replace("customer_id", "a.customer_id").replace("action = ", "a.action = ").replace("resource_type = ", "a.resource_type = "), param_index, param_index + 1
     );
     let mut data_query = sqlx::query_as::<
         _,
@@ -120,6 +132,8 @@ async fn list_audit_entries(
             Option<String>,
             Option<String>,
             DateTime<Utc>,
+            String,
+            String,
         ),
     >(&data_sql)
     .bind(customer.id);
@@ -145,6 +159,8 @@ async fn list_audit_entries(
                 ip_address,
                 user_agent,
                 created_at,
+                actor,
+                actor_email,
             )| {
                 AuditEntry {
                     id,
@@ -154,6 +170,9 @@ async fn list_audit_entries(
                     details,
                     ip_address,
                     user_agent,
+                    timestamp: created_at,
+                    actor,
+                    actor_email,
                     created_at,
                 }
             },
@@ -165,6 +184,7 @@ async fn list_audit_entries(
         total,
         limit,
         offset,
+        has_more: offset + limit < total,
     }))
 }
 
@@ -178,6 +198,8 @@ type AuditLogRow = (
     Option<String>,
     Option<String>,
     DateTime<Utc>,
+    String,
+    String,
 );
 
 /// GET /audit-log/:id — Get a single audit log entry
@@ -187,15 +209,17 @@ async fn get_audit_entry(
     Path(entry_id): Path<Uuid>,
 ) -> Result<Json<AuditEntry>, AppError> {
     let row: Option<AuditLogRow> = sqlx::query_as(
-        "SELECT id, action, resource_type, resource_id, details, ip_address, user_agent, created_at
-         FROM audit_log WHERE id = $1 AND customer_id = $2",
+        "SELECT a.id, a.action, a.resource_type, a.resource_id, a.details, a.ip_address, a.user_agent, a.created_at,
+                COALESCE(c.name, 'Unknown') as actor, COALESCE(c.email, 'unknown') as actor_email
+         FROM audit_log a LEFT JOIN customers c ON c.id = a.customer_id
+         WHERE a.id = $1 AND a.customer_id = $2",
     )
     .bind(entry_id)
     .bind(customer.id)
     .fetch_optional(&pool)
     .await?;
 
-    let (id, action, resource_type, resource_id, details, ip_address, user_agent, created_at) =
+    let (id, action, resource_type, resource_id, details, ip_address, user_agent, created_at, actor, actor_email) =
         row.ok_or(AppError::NotFound)?;
 
     Ok(Json(AuditEntry {
@@ -206,6 +230,9 @@ async fn get_audit_entry(
         details,
         ip_address,
         user_agent,
+        timestamp: created_at,
+        actor,
+        actor_email,
         created_at,
     }))
 }
@@ -231,6 +258,7 @@ mod tests {
             resource_type: None,
             limit: None,
             offset: None,
+            page: None,
         };
         assert!(q.action.is_none());
         assert_eq!(q.limit.unwrap_or(50), 50);
@@ -248,10 +276,15 @@ mod tests {
             ip_address: Some("1.2.3.4".to_string()),
             user_agent: Some("Mozilla/5.0".to_string()),
             created_at: Utc::now(),
+            timestamp: Utc::now(),
+            actor: "Test User".to_string(),
+            actor_email: "test@example.com".to_string(),
         };
         let json = serde_json::to_value(&entry).unwrap();
         assert_eq!(json["action"], "endpoint.created");
         assert_eq!(json["resource_type"], "endpoint");
+        assert_eq!(json["actor"], "Test User");
+        assert_eq!(json["actor_email"], "test@example.com");
     }
 
     #[test]
@@ -261,9 +294,11 @@ mod tests {
             total: 0,
             limit: 50,
             offset: 0,
+            has_more: false,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["total"], 0);
         assert_eq!(json["limit"], 50);
+        assert_eq!(json["has_more"], false);
     }
 }
