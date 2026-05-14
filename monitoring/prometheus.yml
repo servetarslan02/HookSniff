@@ -16,12 +16,16 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  # ── HookSniff API ──
+  # ── HookSniff API (Cloud Run) ──
   - job_name: "hooksniff-api"
     metrics_path: "/metrics"
-    scrape_interval: 10s
+    scrape_interval: 30s
+    scheme: https
+    authorization:
+      type: Bearer
+      credentials: "1d4487405a247de66acd5a8775294334707bb9ac0ea3318c8fbd1508074bd28d"
     static_configs:
-      - targets: ["api:9090"]
+      - targets: ["hooksniff-api-1046140057667.europe-west1.run.app"]
         labels:
           service: "hooksniff-api"
           environment: "production"
