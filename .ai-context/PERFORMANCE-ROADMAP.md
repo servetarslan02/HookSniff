@@ -23,6 +23,8 @@
 | 15 | Cache-Control headers | CDN-friendly cache policy | ✅ |
 | 16 | ETag support | Conditional requests (304) | ✅ |
 | 17 | CORS expose headers | ETag, X-Trace-Id erişilebilir | ✅ |
+| 18 | Request timeout (25s) | Yavaş istemcilerden koruma | ✅ |
+| 19 | Request metrics middleware | Latency tracking, slow request logging | ✅ |
 
 ## 📋 Kalan Optimizasyonlar
 
