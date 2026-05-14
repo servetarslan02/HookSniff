@@ -28,6 +28,22 @@
 - Doğru fiyatlar: Developer $0 / Startup $29 / Pro $49 / Enterprise Custom
 - Backend ile uyumlu (monthly_price_cents: 0/2900/4900/0)
 
+### 4. API Cold Start Fix ✅
+- `cloudbuild.yaml`: API `--min-instances=0` → `--min-instances=1`
+- Sıcak instance her zaman hazır olacak
+- Maliyet: ~$10-15/ay ek Cloud Run maliyeti
+
+### 5. Delivery List Endpoint ✅
+- `/v1/webhooks?per_page=5&page=1` → `{"deliveries": [...], "total": 18}`
+- Frontend doğru parametreleri kullanıyor (`page`, `per_page`, `status`)
+- Test hatası benim yanlış `limit` parametresi kullanmamdandı
+
+### 6. E2E Stres Testi ✅
+- 10 endpoint oluşturuldu
+- 16 webhook gönderildi (16/16 başarılı)
+- 32 paralel istek: 60ms/istek
+- 16 dashboard sayfası: 87ms ort.
+
 ## 🟡 Sonraki Adımlar
 
 ### 4. `/api/status` 404
