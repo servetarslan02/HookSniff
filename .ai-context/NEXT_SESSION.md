@@ -33,6 +33,17 @@
 2. Dashboard'da organizasyon yönetimi sayfası (şu an sadece backend'de var)
 3. Service token için scope/permission sistemi (read-only, write, admin)
 
+### CSP Nonce Tam Uygulama (ÖNEMLİ)
+- **Sorun:** `headers()` layout.tsx'te kullanıldığında `clientReferenceManifest` Invariant hatası veriyor (Next.js 15 bug)
+- **Geçici çözüm:** `unsafe-inline` kullanılıyor — ideal değil
+- **Kalıcı çözüm:**
+  1. Layout'taki theme detection inline script'ini `/public/theme.js` dosyasına taşı
+  2. JSON-LD script'i `type="application/ld+json"` olduğu için CSP'den etkilenmez (data, executable script değil)
+  3. `script-src 'self'` yap — nonce veya `unsafe-inline` gerekmeyecek
+  4. Eğer inline script kalmazsa `unsafe-inline` kaldırılabilir
+- **Dosyalar:** `dashboard/src/app/[locale]/layout.tsx`, `dashboard/src/middleware.ts`
+- **Öncelik:** Orta — XSS korumasını güçlendirir ama acil değil
+
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
 - Demo: demo@hooksniff.com / Demo1234!
