@@ -17,8 +17,8 @@ export default function DevToolsPage() {
       tabs={[
         { key: 'playground', label: t('playground', { defaultValue: 'Playground' }), icon: '🧪', content: <PlaygroundPage /> },
         { key: 'signature', label: t('signatureTool', { defaultValue: 'Signature Tool' }), icon: '🔐', content: <SignatureVerifierPage /> },
-        { key: 'api-importer', label: t('apiImporter', { defaultValue: 'API Importer' }), icon: '📥', content: <ApiImporterPage /> },
         { key: 'webhook-builder', label: t('webhookBuilder', { defaultValue: 'Webhook Builder' }), icon: '🔧', content: <WebhookBuilderPage /> },
+        { key: 'api-importer', label: t('apiImporter', { defaultValue: 'API Importer' }), icon: '📥', content: <ApiImporterPage /> },
       ]}
     />
   );
