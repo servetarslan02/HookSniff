@@ -249,13 +249,13 @@ pub struct PortalOutcome {
 /// Wraps provider resolution so route handlers don't need to match on provider
 /// names themselves. Each method resolves the correct provider internally.
 pub struct BillingService {
-    pool: sqlx::PgPool,
+    _pool: sqlx::PgPool,
     cfg: Config,
 }
 
 impl BillingService {
     pub fn new(pool: sqlx::PgPool, cfg: Config) -> Self {
-        Self { pool, cfg }
+        Self { _pool: pool, cfg }
     }
 
     /// Create a checkout session for upgrading to a plan.
