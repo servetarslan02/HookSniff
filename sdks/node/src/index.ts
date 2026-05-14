@@ -36,6 +36,10 @@ import { Teams } from "./resources/teams";
 import { Search } from "./resources/search";
 import { Billing } from "./resources/billing";
 import { Health } from "./resources/health";
+import { Applications } from "./resources/applications";
+import { ServiceTokens } from "./resources/serviceTokens";
+import { Inbound } from "./resources/inbound";
+import { Admin } from "./resources/admin";
 
 const DEFAULT_BASE_URL = "https://hooksniff-api-1046140057667.europe-west1.run.app";
 
@@ -89,6 +93,18 @@ export class HookSniff {
   /** API health check */
   public readonly health: Health;
 
+  /** Application management (Hook0-style) */
+  public readonly applications: Applications;
+
+  /** Service token management */
+  public readonly serviceTokens: ServiceTokens;
+
+  /** Inbound webhook configs */
+  public readonly inbound: Inbound;
+
+  /** Admin-only endpoints (stats, users, settings, feature flags) */
+  public readonly admin: Admin;
+
   constructor(options: HookSniffOptions) {
     if (!options.apiKey) {
       throw new Error("HookSniff: apiKey is required");
@@ -112,6 +128,10 @@ export class HookSniff {
     this.search = new Search(this.ctx);
     this.billing = new Billing(this.ctx);
     this.health = new Health(this.ctx);
+    this.applications = new Applications(this.ctx);
+    this.serviceTokens = new ServiceTokens(this.ctx);
+    this.inbound = new Inbound(this.ctx);
+    this.admin = new Admin(this.ctx);
   }
 }
 

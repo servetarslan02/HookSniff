@@ -5,6 +5,7 @@ from hooksniff.api.api_keys_api import APIKeysApi
 from hooksniff.api.admin_api import AdminApi
 from hooksniff.api.alerts_api import AlertsApi
 from hooksniff.api.analytics_api import AnalyticsApi
+from hooksniff.api.applications_api import ApplicationsApi
 from hooksniff.api.audit_log_api import AuditLogApi
 from hooksniff.api.auth_api import AuthApi
 from hooksniff.api.billing_api import BillingApi
@@ -24,6 +25,7 @@ from hooksniff.api.outbound_ips_api import OutboundIPsApi
 from hooksniff.api.playground_api import PlaygroundApi
 from hooksniff.api.rate_limits_api import RateLimitsApi
 from hooksniff.api.routing_api import RoutingApi
+from hooksniff.api.service_tokens_api import ServiceTokensApi
 from hooksniff.api.sso_api import SSOApi
 from hooksniff.api.schemas_api import SchemasApi
 from hooksniff.api.search_api import SearchApi
