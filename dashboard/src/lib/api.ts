@@ -251,12 +251,12 @@ export const statsApi = {
 // Auth API
 export const authApi = {
   login: (email: string, password: string) =>
-    apiFetch<{ token: string; user: { id: string; email: string; name?: string; plan: string }; api_key: string }>('/auth/login', {
+    apiFetch<{ token: string; customer: { id: string; email: string; name?: string; plan: string; is_admin?: boolean }; api_key?: string }>('/auth/login', {
       method: 'POST',
       body: { email, password },
     }),
   register: (email: string, password: string, name?: string) =>
-    apiFetch<{ token: string; user: { id: string; email: string; name?: string; plan: string }; api_key: string }>('/auth/register', {
+    apiFetch<{ message?: string; token?: string; customer?: { id: string; email: string; name?: string; plan: string }; api_key?: string }>('/auth/register', {
       method: 'POST',
       body: { email, password, name },
     }),
