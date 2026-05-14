@@ -35,7 +35,7 @@ export default function middleware(request: NextRequest) {
     '/security-section', '/routing-config', '/team-mgmt', '/billing-overview',
     '/settings-section',
   ];
-  const isPublic = publicPaths.some((path) => withoutLocale.startsWith(path));
+  const isPublic = withoutLocale === '/' || publicPaths.some((path) => withoutLocale.startsWith(path));
   if (!isPublic && !withoutLocale.startsWith('/admin')) {
     const authCookie = request.cookies.get('hooksniff_token');
     const refreshCookie = request.cookies.get('hooksniff_refresh');
