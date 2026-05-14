@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { endpointsApi, inboundApi, type Endpoint, type InboundConfig } from '@/lib/api';
+import { endpointsApi, inboundApi, API_BASE, type Endpoint, type InboundConfig } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 
 const PROVIDERS = [
@@ -128,9 +128,9 @@ export default function InboundPage() {
             <div key={p.id} className="flex items-center gap-3">
               <span className="text-lg">{p.icon}</span>
               <code className="flex-1 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-950 text-xs font-mono text-gray-700 dark:text-slate-300">
-                POST {API}/inbound/{p.id}
+                POST {API_BASE}/inbound/{p.id}
               </code>
-              <button onClick={() => navigator.clipboard.writeText(`${API}/inbound/${p.id}`)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">{t('inbound.copy')}</button>
+              <button onClick={() => navigator.clipboard.writeText(`${API_BASE}/inbound/${p.id}`)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">{t('inbound.copy')}</button>
             </div>
           ))}
         </div>
