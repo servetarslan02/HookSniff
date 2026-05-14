@@ -44,6 +44,11 @@
 - 32 paralel istek: 60ms/istek
 - 16 dashboard sayfası: 87ms ort.
 
+### 7. Playground Network Error Fix ✅
+- Sorun: next-intl middleware API route'larını engelliyordu
+- `/api/playground/token`, `/api/status`, `/api/newsletter` → 404
+- Çözüm: middleware.ts'e `/api/` early return eklendi
+
 ## 🟡 Sonraki Adımlar
 
 ### 4. `/api/status` 404
