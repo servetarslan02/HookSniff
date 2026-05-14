@@ -34,8 +34,8 @@ export default function BillingPage() {
     billingApiExtended
       .getUsage(token)
       .then((data) => {
-        const used = data.deliveries_used ?? 0;
-        const limit = data.deliveries_limit ?? 10000;
+        const used = data.webhooks?.used ?? data.deliveries_used ?? 0;
+        const limit = data.webhooks?.limit ?? data.deliveries_limit ?? 10000;
         setUsageCount(used);
         setUsageLimit(limit);
 
