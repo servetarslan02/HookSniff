@@ -22,8 +22,8 @@
 
 ### Kısa Vade (1-2 oturum)
 
-#### 1. Redis Cache — Handler Entegrasyonu
-- **Durum:** Altyapı hazır, handler'larda kullanılacak
+#### 1. Redis Cache — Handler Entegrasyonu ✅ DONE (Oturum 162) ✅ DONE (Oturum 162)
+- **Durum:** ✅ auth_middleware + jwt_auth_middleware Redis cache entegre
 - **Yapılacak:** Auth middleware'de API key lookup cache'le (30sn TTL)
 - **Etki:** DB yükü -%50, auth latency -%80
 - **Dosya:** `api/src/middleware/mod.rs` — `auth_middleware` fonksiyonu
@@ -34,8 +34,8 @@
 - **Etki:** İlk yükleme -%20-30
 - **Dosya:** `dashboard/src/app/[locale]/(dashboard)/` altındaki sayfalar
 
-#### 3. Health Check Ayrı Pool
-- **Durum:** Mevcut health check ana pool'u kullanıyor
+#### 3. Health Check Ayrı Pool ✅ DONE (Oturum 162)
+- **Durum:** ✅ HealthPool newtype, 5 connections, 3s timeout
 - **Yapılacak:** Küçük ayrı pool (5 connection) health için
 - **Etki:** Health check her zaman çalışır, ana pool'dan bağımsız
 - **Dosya:** `api/src/routes/health.rs`
@@ -74,8 +74,8 @@
 - **Etki:** Real-time体验
 - **Dosya:** Yeni `api/src/routes/ws.rs` + dashboard WebSocket client
 
-#### 9. Metrics Dashboard (Grafana)
-- **Durum:** OTEL entegrasyonu var
+#### 9. Metrics Dashboard (Grafana) ✅ DONE (Oturum 162)
+- **Durum:** ✅ 7 dashboard mevcut + yeni Performance dashboard (10 panel)
 - **Yapılacak:** Custom Grafana panels (delivery latency, error rate, throughput)
 - **Etki:** Monitoring daha iyi
 - **Dosya:** Grafana dashboard JSON config
