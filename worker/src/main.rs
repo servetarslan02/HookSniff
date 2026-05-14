@@ -501,7 +501,7 @@ async fn process_pending(
                     std::sync::Arc::new(tokio::sync::Semaphore::new(PER_ENDPOINT_CONCURRENCY_LIMIT))
                 }).clone()
             };
-            let endpoint_permit = sem.acquire().await.expect("endpoint semaphore closed");
+            let _endpoint_permit = sem.acquire().await.expect("endpoint semaphore closed");
 
             // Global concurrency limit
             let _permit = semaphore.acquire().await.expect("semaphore closed");
