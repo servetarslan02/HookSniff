@@ -201,10 +201,43 @@ pub async fn metrics_middleware(
 }
 
 /// GET /metrics endpoint handler
+/// If METRICS_SECRET env var is set, requires `Authorization: Bearer <token>`.
+/// If METRICS_SECRET is not set, allows access (backward compat for dev).
 pub async fn metrics_handler(
     axum::extract::Extension(metrics): axum::extract::Extension<Arc<Metrics>>,
-) -> String {
-    metrics.render()
+    axum::extract::RawQuery(query): axum::extract::RawQuery,
+    headers: axum::http::HeaderMap,
+) -> Result<String, (axum::http::StatusCode, String)> {
+    // Check if METRICS_SECRET is configured
+    if let Ok(secret) = std::env::var("METRICS_SECRET") {
+        if !secret.is_empty() {
+            // Try Authorization header first
+            let token_from_header = headers
+                .get("authorization")
+                .and_then(|v| v.to_str().ok())
+                .and_then(|v| v.strip_prefix("Bearer "))
+                .unwrap_or("");
+
+            // Also support ?token= query param for Prometheus scrapers
+            let token_from_query = query
+                .as_ref()
+                .and_then(|q| {
+                    q.split('&')
+                        .find(|p| p.starts_with("token="))
+                        .and_then(|p| p.strip_prefix("token="))
+                })
+                .unwrap_or("");
+
+            if token_from_header != secret && token_from_query != secret {
+                return Err((
+                    axum::http::StatusCode::UNAUTHORIZED,
+                    "Unauthorized: invalid or missing metrics token".to_string(),
+                ));
+            }
+        }
+    }
+
+    Ok(metrics.render())
 }
 
 #[cfg(test)]

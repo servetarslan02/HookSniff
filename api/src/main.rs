@@ -306,7 +306,8 @@ async fn main() -> Result<()> {
         .layer(TraceLayer::new_for_http())
         .layer(tower_http::limit::RequestBodyLimitLayer::new(2 * 1024 * 1024)) // 2MB global body limit
         .layer(axum::middleware::from_fn(telemetry::trace_id_middleware))
-        .layer(axum::middleware::from_fn(middleware::request_id_middleware));
+        .layer(axum::middleware::from_fn(middleware::request_id_middleware))
+        .layer(axum::middleware::from_fn(middleware::security_headers_middleware));
 
     let addr = format!("0.0.0.0:{}", cfg.port);
     tracing::info!("🚀 HookSniff API running on port {}", cfg.port);
