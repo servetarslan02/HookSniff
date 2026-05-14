@@ -885,3 +885,13 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Subscription** — sağlam ✅
 - **Upgrade/Cancel** — sağlam ✅
 - **Commit:** `745f8013` — main branch, push ✅
+
+## Oturum 159 Ek 8 — Settings Section Düzeltmesi (2026-05-15 04:00 - 04:06 GMT+8)
+- **Notification Preferences** — `email_on_weekly_digest` backend'de yoktu, response'a eklendi (GET default + mevcut prefs)
+- **Auth Consent** — `/auth/consent` endpoint'i backend'de hiç yoktu:
+  - GET handler: customer_consents tablosundan consents JSON okur
+  - POST handler: consents JSON'ını upsert eder (ON CONFLICT merge)
+  - `customer_consents` tablosu: migration 053 ile eklendi (JSONB consents)
+- **2FA** — sağlam ✅ (bu oturumda `/auth/2fa/status` eklenmişti)
+- **Profile/Password/DangerZone** — API çağırmıyor, component-level ✅
+- **Commit:** `466ae4f0` — main branch, push ✅
