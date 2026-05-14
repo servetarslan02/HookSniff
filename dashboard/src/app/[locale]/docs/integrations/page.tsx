@@ -27,7 +27,7 @@ export default function IntegrationsPage() {
 // Verify both HookSniff AND Stripe signatures
 app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   // 1. Verify HookSniff signature
-  const hooksniffSig = req.headers['webhook-signature'];
+  const hooksniffSig = req.headers['x-hooksniff-signature'] || req.headers['webhook-signature'];
   if (!verifyHookSniffSignature(req.body, hooksniffSig, 'whsec_your_secret')) {
     return res.status(401).send('Invalid HookSniff signature');
   }
