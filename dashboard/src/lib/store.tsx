@@ -35,10 +35,13 @@ function toSlug(input: string): string {
     .slice(0, 50);
 }
 
-function setUsernameCookie(_username: string) {
+function setAuthCookie(token: string) {
+  // Set cookie for middleware auth check — 7 day expiry
+  document.cookie = `hooksniff_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
 }
 
-function clearUsernameCookie() {
+function clearAuthCookie() {
+  document.cookie = 'hooksniff_token=; path=/; max-age=0';
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -84,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setApiKeyState(null);
           setToken(savedToken);
           localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
-          setUsernameCookie(username);
+          setAuthCookie(savedToken);
         })
         .catch(() => {
           setUser(null);
@@ -92,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setApiKeyState(null);
           localStorage.removeItem(STORAGE_KEY);
           localStorage.removeItem('hooksniff_token');
+          clearAuthCookie();
         })
         .finally(() => setIsLoading(false));
     } else {
@@ -110,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('hooksniff_token', authToken);
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: userWithUsername }));
-    setUsernameCookie(slug);
+    if (authToken) setAuthCookie(authToken);
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -153,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setApiKeyState(null);
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem('hooksniff_token');
-    clearUsernameCookie();
+    clearAuthCookie();
   }, []);
 
   const setApiKey = useCallback((key: string) => {
