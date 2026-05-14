@@ -173,11 +173,15 @@ async fn revoke_api_key(
 /// Kullanım istatistikleri
 #[derive(serde::Serialize)]
 struct UsageResponse {
-    webhooks_today: i64,
+    webhooks_used: i64,
     webhook_limit: i64,
     endpoints_count: i64,
     success_rate: f64,
     plan: String,
+    api_calls_today: i64,
+    total_deliveries: i64,
+    delivered: i64,
+    failed: i64,
 }
 
 async fn get_usage(
@@ -204,15 +208,33 @@ async fn get_usage(
     .fetch_one(&pool)
     .await?;
 
+    let failed_count: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND status = 'failed' AND created_at > now() - interval '24 hours'"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    let total_deliveries: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
     let total = webhook_count.0.max(1);
     let success_rate = (success_count.0 as f64 / total as f64) * 100.0;
 
     Ok(Json(UsageResponse {
-        webhooks_today: webhook_count.0,
+        webhooks_used: webhook_count.0,
         webhook_limit: customer.webhook_limit,
         endpoints_count: endpoint_count.0,
         success_rate,
         plan: customer.plan,
+        api_calls_today: webhook_count.0,
+        total_deliveries: total_deliveries.0,
+        delivered: success_count.0,
+        failed: failed_count.0,
     }))
 }
 
@@ -424,17 +446,25 @@ mod tests {
     #[test]
     fn test_portal_usage_response_serialization() {
         let resp = UsageResponse {
-            webhooks_today: 42,
+            webhooks_used: 42,
             webhook_limit: 1000,
             endpoints_count: 5,
             success_rate: 99.5,
             plan: "pro".to_string(),
+            api_calls_today: 42,
+            total_deliveries: 500,
+            delivered: 498,
+            failed: 2,
         };
         let json = serde_json::to_value(&resp).unwrap();
-        assert_eq!(json["webhooks_today"], 42);
+        assert_eq!(json["webhooks_used"], 42);
         assert_eq!(json["webhook_limit"], 1000);
         assert_eq!(json["success_rate"], 99.5);
         assert_eq!(json["plan"], "pro");
+        assert_eq!(json["api_calls_today"], 42);
+        assert_eq!(json["total_deliveries"], 500);
+        assert_eq!(json["delivered"], 498);
+        assert_eq!(json["failed"], 2);
     }
 
     // ── Router construction ─────────────────────────────────
