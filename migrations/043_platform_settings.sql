@@ -2,7 +2,7 @@
 -- Stores global platform configuration managed by admin
 
 CREATE TABLE IF NOT EXISTS platform_settings (
-    key STRING PRIMARY KEY,
+    key TEXT PRIMARY KEY,
     value JSONB NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
