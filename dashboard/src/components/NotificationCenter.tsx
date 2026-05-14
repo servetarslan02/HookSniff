@@ -13,6 +13,7 @@ export function NotificationCenter() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchNotifications = useCallback(async () => {
@@ -67,11 +68,36 @@ export function NotificationCenter() {
     }
   };
 
+  const handleAcceptInvite = async (n: Notification) => {
+    if (!token) return;
+    setAcceptingId(n.id);
+    try {
+      await handleMarkAsRead(n.id);
+      router.push('/team-mgmt');
+    } catch {
+      // ignore
+    } finally {
+      setAcceptingId(null);
+    }
+  };
+
+  const handleDeclineInvite = async (n: Notification) => {
+    if (!token) return;
+    try {
+      await notificationsApi.deleteNotification(token, n.id);
+      setNotifications((prev) => prev.filter((x) => x.id !== n.id));
+      setUnreadCount((c) => Math.max(0, c - 1));
+    } catch {
+      // ignore
+    }
+  };
+
   const typeIcons: Record<string, string> = {
     webhook_failed: '🔴',
     alert: '⚠️',
     system: '🔔',
     billing: '💳',
+    team_invite: '👥',
   };
 
   return (
@@ -99,32 +125,28 @@ export function NotificationCenter() {
       {open && (
         <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 z-50 overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Notifications</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('notificationsTitle') || 'Notifications'}</h3>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
                 className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium transition"
               >
-                Mark all read
+                {t('markAllRead') || 'Mark all read'}
               </button>
             )}
           </div>
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="p-6 text-center text-gray-500 dark:text-slate-500 text-sm">
-                No notifications
+                {t('noNotifications') || 'No notifications'}
               </div>
             ) : (
               notifications.slice(0, 8).map((n) => (
                 <div
                   key={n.id}
-                  className={`px-4 py-3 border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer ${
+                  className={`px-4 py-3 border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition ${
                     !n.read ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''
                   }`}
-                  onClick={() => {
-                    if (!n.read) handleMarkAsRead(n.id);
-                    if (n.link) router.push(n.link);
-                  }}
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-base mt-0.5">{typeIcons[n.type] || '🔔'}</span>
@@ -132,12 +154,31 @@ export function NotificationCenter() {
                       <p className={`text-sm ${!n.read ? 'font-semibold text-gray-900 dark:text-white' : 'text-gray-600 dark:text-slate-400'}`}>
                         {n.title}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5 truncate">
+                      <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5">
                         {n.message}
                       </p>
                       <p className="text-[11px] text-gray-500 dark:text-slate-600 mt-1">
                         {new Date(n.created_at).toLocaleString()}
                       </p>
+
+                      {/* Team invite actions */}
+                      {n.type === 'team_invite' && !n.read && (
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => handleAcceptInvite(n)}
+                            disabled={acceptingId === n.id}
+                            className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition disabled:opacity-50"
+                          >
+                            {acceptingId === n.id ? '...' : (t('acceptInvite') || 'Kabul Et')}
+                          </button>
+                          <button
+                            onClick={() => handleDeclineInvite(n)}
+                            className="px-3 py-1 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg transition"
+                          >
+                            {t('declineInvite') || 'Reddet'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                     {!n.read && (
                       <div className="w-2 h-2 rounded-full bg-brand-500 flex-shrink-0 mt-2" />
@@ -153,7 +194,7 @@ export function NotificationCenter() {
               onClick={() => setOpen(false)}
               className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
             >
-              View all notifications →
+              {t('viewAllNotifications') || 'View all notifications →'}
             </Link>
           </div>
         </div>
