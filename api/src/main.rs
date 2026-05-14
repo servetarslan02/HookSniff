@@ -305,6 +305,7 @@ async fn main() -> Result<()> {
         })
         .layer(TraceLayer::new_for_http())
         .layer(tower_http::limit::RequestBodyLimitLayer::new(2 * 1024 * 1024)) // 2MB global body limit
+        .layer(tower_http::compression::CompressionLayer::new()) // gzip response compression
         .layer(axum::middleware::from_fn(telemetry::trace_id_middleware))
         .layer(axum::middleware::from_fn(middleware::request_id_middleware))
         .layer(axum::middleware::from_fn(middleware::security_headers_middleware));
