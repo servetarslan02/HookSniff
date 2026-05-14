@@ -32,6 +32,7 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
   const { login, register } = useAuth();
@@ -54,6 +55,12 @@ function LoginForm() {
         user = await login(email, password);
       } else {
         user = await register(email, password, name || undefined);
+        // Email verification flow — user needs to verify before login
+        if (user && !user.id) {
+          setSuccess(t('verifyEmailSent') || 'A verification email has been sent. Please check your inbox and verify your email before logging in.');
+          setLoading(false);
+          return;
+        }
       }
       const redirectTo = searchParams.get('redirect') || (user?.is_admin ? '/admin' : '/core');
       router.push(redirectTo);
@@ -89,6 +96,11 @@ function LoginForm() {
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-sm border border-red-200 dark:border-red-500/20">
               {error}
+            </div>
+          )}
+          {success && (
+            <div className="mb-4 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 text-sm border border-green-200 dark:border-green-500/20">
+              ✉️ {success}
             </div>
           )}
 
