@@ -60,15 +60,15 @@ pub fn verify_from_headers(
 ) -> Result<(), VerificationError> {
     let msg_id = get_header(headers, HEADER_WEBHOOK_ID)
         .or_else(|| get_header(headers, HEADER_SVIX_ID))
-        .ok_or(VerificationError::MissingHeader("webhook-id"))?;
+        .ok_or(VerificationError::MissingHeader("X-HookSniff-ID"))?;
 
     let msg_signature = get_header(headers, HEADER_WEBHOOK_SIGNATURE)
         .or_else(|| get_header(headers, HEADER_SVIX_SIGNATURE))
-        .ok_or(VerificationError::MissingHeader("webhook-signature"))?;
+        .ok_or(VerificationError::MissingHeader("X-HookSniff-Signature"))?;
 
     let msg_timestamp = get_header(headers, HEADER_WEBHOOK_TIMESTAMP)
         .or_else(|| get_header(headers, HEADER_SVIX_TIMESTAMP))
-        .ok_or(VerificationError::MissingHeader("webhook-timestamp"))?;
+        .ok_or(VerificationError::MissingHeader("X-HookSniff-Timestamp"))?;
 
     verify_standard_signature(secret, msg_id, msg_timestamp, msg_signature, body, tolerance_secs)
         .map_err(VerificationError::from)
