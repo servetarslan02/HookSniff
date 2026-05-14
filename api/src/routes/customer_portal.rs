@@ -398,6 +398,7 @@ mod tests {
         let resp = ProfileResponse {
             id: Uuid::new_v4(),
             email: "user@test.com".to_string(),
+            name: Some("Servet".to_string()),
             plan: "pro".to_string(),
             webhook_limit: 50_000,
             webhook_count: 100,

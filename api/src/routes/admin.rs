@@ -2293,7 +2293,7 @@ mod tests {
         };
         let json = serde_json::to_value(&d).unwrap();
         assert_eq!(json["status"], "delivered");
-        assert_eq!(json["event_type"], "order.created");
+        assert_eq!(json["event"], "order.created");
         assert_eq!(json["attempt_count"], 1);
     }
 
@@ -2308,10 +2308,10 @@ mod tests {
             attempt_count: 0,
         };
         let json = serde_json::to_value(&d).unwrap();
-        // Both "event_type" and "event" should work when deserializing
+        // Field is renamed to "event" via serde(rename)
         let json_str = json.to_string();
         let from_json: serde_json::Value = serde_json::from_str(&json_str).unwrap();
-        assert_eq!(from_json["event_type"], "user.signup");
+        assert_eq!(from_json["event"], "user.signup");
     }
 
     // ── UsageStats ──────────────────────────────────────────
