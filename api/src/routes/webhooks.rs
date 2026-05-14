@@ -246,7 +246,7 @@ async fn create_webhook(
             "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
         )
         .bind(customer.id)
-        .bind(customer.webhook_limit as i64)
+        .bind(customer.webhook_limit)
         .fetch_optional(&pool)
         .await?
     };
@@ -349,7 +349,7 @@ async fn batch_webhooks(
         )
         .bind(batch_count)
         .bind(customer.id)
-        .bind(customer.webhook_limit as i64)
+        .bind(customer.webhook_limit)
         .fetch_optional(&pool)
         .await?
     };
@@ -543,7 +543,7 @@ async fn replay_webhook(
             "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
         )
         .bind(customer.id)
-        .bind(customer.webhook_limit as i64)
+        .bind(customer.webhook_limit)
         .fetch_optional(&pool)
         .await?
     };
@@ -681,7 +681,7 @@ async fn batch_replay(
                 "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
             )
             .bind(customer.id)
-            .bind(customer.webhook_limit as i64)
+            .bind(customer.webhook_limit)
             .fetch_optional(&pool)
             .await?
         };

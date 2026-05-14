@@ -77,6 +77,7 @@ pub struct UserSummary {
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
+#[allow(dead_code)]
 fn default_role_summary() -> String { "member".to_string() }
 
 fn serialize_status<S: serde::Serializer>(is_active: &bool, s: S) -> Result<S::Ok, S::Error> {
@@ -1561,7 +1562,7 @@ async fn create_feature_flag(
 ) -> Result<impl IntoResponse, AppError> {
     require_admin_write(&customer)?;
 
-    let plans_json = serde_json::to_value(&body.enabled_for_plans.unwrap_or_default())?;
+    let plans_json = serde_json::to_value(body.enabled_for_plans.unwrap_or_default())?;
 
     let flag = sqlx::query_as::<_, FeatureFlag>(
         "INSERT INTO feature_flags (name, description, is_enabled, rollout_percentage, enabled_for_plans, created_by)

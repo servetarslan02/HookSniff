@@ -86,7 +86,7 @@ async fn send_limit_notification(
 ) -> Result<(), Box<dyn std::error::Error>> {
     let (subject, body) = match status {
         "approaching" => (
-            format!("⚠️ HookSniff: Event limitinizin %80'ine ulaştınız"),
+            "⚠️ HookSniff: Event limitinizin %80'ine ulaştınız".to_string(),
             format!(
                 "Merhaba,\n\nGünlük event limitinizin %80'ine ulaştınız.\n\
                  Mevcut kullanım: {}/{}\n\n\
@@ -96,7 +96,7 @@ async fn send_limit_notification(
             ),
         ),
         "at_limit" => (
-            format!("🔴 HookSniff: Günlük event limitinize ulaştınız"),
+            "🔴 HookSniff: Günlük event limitinize ulaştınız".to_string(),
             format!(
                 "Merhaba,\n\nGünlük event limitinize ulaştınız.\n\
                  Mevcut kullanım: {}/{}\n\n\
@@ -106,7 +106,7 @@ async fn send_limit_notification(
             ),
         ),
         "exceeded" => (
-            format!("💰 HookSniff: Event limiti aşıldı — overage ücreti uygulanıyor"),
+            "💰 HookSniff: Event limiti aşıldı — overage ücreti uygulanıyor".to_string(),
             format!(
                 "Merhaba,\n\nGünlük event limitinizi aştınız.\n\
                  Mevcut kullanım: {}/{}\n\n\
