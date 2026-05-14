@@ -2,17 +2,17 @@
 
 CREATE TABLE IF NOT EXISTS industry_packages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name STRING NOT NULL UNIQUE,
-    description STRING,
+    name TEXT NOT NULL UNIQUE,
+    description TEXT,
     config JSONB NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS webhook_templates (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name STRING NOT NULL,
-    description STRING,
-    industry STRING,
+    name TEXT NOT NULL,
+    description TEXT,
+    industry TEXT,
     config JSONB NOT NULL,
     downloads INT DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT now()
@@ -20,10 +20,10 @@ CREATE TABLE IF NOT EXISTS webhook_templates (
 
 CREATE TABLE IF NOT EXISTS marketplace_agents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name STRING NOT NULL,
-    description STRING,
-    author STRING,
-    version STRING DEFAULT '1.0.0',
+    name TEXT NOT NULL,
+    description TEXT,
+    author TEXT,
+    version TEXT DEFAULT '1.0.0',
     config JSONB NOT NULL,
     downloads INT DEFAULT 0,
     rating FLOAT DEFAULT 0,

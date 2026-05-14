@@ -5,12 +5,12 @@
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS payment_provider TEXT NOT NULL DEFAULT 'stripe';
 
 -- Polar.sh fields
-ALTER TABLE customers ADD COLUMN IF NOT EXISTS polar_customer_id STRING;
-ALTER TABLE customers ADD COLUMN IF NOT EXISTS polar_subscription_id STRING;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS polar_customer_id TEXT;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS polar_subscription_id TEXT;
 
 -- iyzico fields
-ALTER TABLE customers ADD COLUMN IF NOT EXISTS iyzico_customer_id STRING;
-ALTER TABLE customers ADD COLUMN IF NOT EXISTS iyzico_subscription_id STRING;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS iyzico_customer_id TEXT;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS iyzico_subscription_id TEXT;
 
 -- Index for provider lookups
 CREATE INDEX IF NOT EXISTS idx_customers_payment_provider ON customers(payment_provider);
