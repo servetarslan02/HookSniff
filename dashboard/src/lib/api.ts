@@ -239,7 +239,7 @@ export const webhooksApi = {
     apiFetch<{ deliveries: Delivery[] }>('/webhooks/batch', { method: 'POST', body: data, token }),
 
   batchReplay: (token: string, ids: string[]) =>
-    apiFetch<{ replayed: number }>('/webhooks/batch-replay', { method: 'POST', body: { ids }, token }),
+    apiFetch<{ replayed: number }>('/webhooks/batch/replay', { method: 'POST', body: { ids }, token }),
 };
 
 // Stats API

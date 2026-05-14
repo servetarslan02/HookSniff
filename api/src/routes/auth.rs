@@ -134,6 +134,7 @@ pub fn router() -> Router {
         .route("/2fa/enable", post(enable_2fa))
         .route("/2fa/confirm", post(confirm_2fa))
         .route("/2fa/disable", post(disable_2fa))
+        .route("/2fa/status", get(two_factor_status))
         // HS-261: Token revocation endpoints
         .route("/revoke-token", post(revoke_current_token))
         .route("/revoke-all-tokens", post(revoke_all_tokens))
@@ -1002,6 +1003,25 @@ async fn disable_2fa(
     Ok(Json(
         serde_json::json!({"message": "Two-factor authentication has been disabled."}),
     ))
+}
+
+/// GET /v1/auth/2fa/status — Return current 2FA status
+async fn two_factor_status(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let last_used_at: Option<String> = sqlx::query_scalar(
+        "SELECT to_char(last_used_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') FROM tfa_backup_codes WHERE customer_id = $1 ORDER BY last_used_at DESC LIMIT 1",
+    )
+    .bind(customer.id)
+    .fetch_optional(&pool)
+    .await?
+    .flatten();
+
+    Ok(Json(serde_json::json!({
+        "enabled": customer.totp_enabled,
+        "last_used_at": last_used_at,
+    })))
 }
 
 // ── Profile Endpoints ───────────────────────────────────────
