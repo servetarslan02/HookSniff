@@ -59,6 +59,7 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Resend: re_2DkZjzTP_EwBEfofj6WMoxvLmqT8UDMCZ (hooksniff-production) ✅
 - Resend Domain: hooksniff.is-a.dev → FAILED, onboarding@resend.dev kullanılabilir
 - Resend → Cloud Run'a RESEND_API_KEY eklendi ✅ (revision 00053)
+- METRICS_SECRET: 1d4487405a247de66acd5a8775294334707bb9ac0ea3318c8fbd1508074bd28d (Cloud Run revision 00150, /metrics endpoint auth)
 - db.rs testleri: 16/16 passed ✅
 
 ## Oturum 117 (2026-05-12 01:41 - 02:00 GMT+8) ✅
