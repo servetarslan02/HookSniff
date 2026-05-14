@@ -7,6 +7,7 @@ import {
   analyticsApi,
   type DeliveryTrendResponse,
   type SuccessRateData,
+  type LatencyTrendResponse,
 } from '@/lib/api';
 import {
   LazyAreaChart as AreaChart,
@@ -31,6 +32,7 @@ export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<TimeRange>('7d');
   const [trendData, setTrendData] = useState<DeliveryTrendResponse | null>(null);
   const [successRateData, setSuccessRateData] = useState<SuccessRateData | null>(null);
+  const [latencyData, setLatencyData] = useState<LatencyTrendResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const t = useTranslations('analytics');
@@ -40,13 +42,15 @@ export default function AnalyticsPage() {
     if (!token) return;
     setLoading(true);
     try {
-      const [trend, sr] = await Promise.all([
+      const [trend, sr, latency] = await Promise.all([
         analyticsApi.deliveryTrend(token, timeRange).catch(() => null),
         analyticsApi.successRate(token, timeRange).catch(() => null),
+        analyticsApi.latencyTrend(token, timeRange).catch(() => null),
       ]);
       if (trend) setTrendData(trend);
       if (sr) setSuccessRateData(sr);
-      if (!trend && !sr) toast(tc('error'), 'error');
+      if (latency) setLatencyData(latency);
+      if (!trend && !sr && !latency) toast(tc('error'), 'error');
     } catch (err) {
       toast(err instanceof Error ? err.message : tc('error'), 'error');
     } finally {
@@ -215,6 +219,67 @@ export default function AnalyticsPage() {
           </div>
         </ChartCard>
       </div>
+
+      {/* Latency Trend Chart */}
+      <ChartCard
+        title={t('latencyTrend', { defaultValue: 'Latency Trend' })}
+        subtitle={t('latencyTrendDesc', { defaultValue: 'Average and P95 response latency over time' })}
+        showTimeRange
+        timeRange={timeRange}
+        onTimeRangeChange={setTimeRange}
+      >
+        <div className="h-80">
+          {loading ? (
+            <div className="h-full flex items-center justify-center">
+              <div className="animate-pulse text-gray-500 dark:text-slate-500">{tc('loading')}</div>
+            </div>
+          ) : !latencyData || latencyData.buckets.length === 0 ? (
+            <div className="h-full flex items-center justify-center text-gray-500 dark:text-slate-500">
+              {tc('noResults')}
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={latencyData.buckets.map((b) => ({
+                  date: new Date(b.timestamp).toLocaleString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    ...(latencyData.range === '24h' ? { hour: '2-digit', minute: '2-digit' } : {}),
+                  }),
+                  avg: b.avg_ms,
+                  p95: b.p95_ms,
+                }))}
+                margin={{ top: 5, right: 10, left: -20, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id="latencyColorAvg" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="latencyColorP95" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-slate-700" />
+                <XAxis dataKey="date" className="text-xs" tick={{ fill: 'currentColor' }} tickLine={false} axisLine={false} />
+                <YAxis className="text-xs" tick={{ fill: 'currentColor' }} tickLine={false} axisLine={false} unit="ms" />
+                <Tooltip
+                  contentStyle={{
+                    background: 'var(--bg-secondary, #fff)',
+                    border: '1px solid var(--border-color, #e5e7eb)',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  }}
+                />
+                <Legend />
+                <Area type="monotone" dataKey="avg" stroke="#8b5cf6" fillOpacity={1} fill="url(#latencyColorAvg)" strokeWidth={2} name="Avg (ms)" />
+                <Area type="monotone" dataKey="p95" stroke="#f59e0b" fillOpacity={1} fill="url(#latencyColorP95)" strokeWidth={2} name="P95 (ms)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </ChartCard>
     </div>
   );
 }
