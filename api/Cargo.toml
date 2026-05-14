@@ -26,7 +26,7 @@ tracing-opentelemetry.workspace = true
 
 axum = { version = "0.8", features = ["macros", "ws"] }
 tower = { version = "0.5", features = ["util"] }
-tower-http = { version = "0.6", features = ["cors", "trace", "limit"] }
+tower-http = { version = "0.6", features = ["cors", "trace", "limit", "compression-gzip"] }
 sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls", "chrono", "uuid", "postgres", "json"] }
 dotenvy = "0.15"
 thiserror = "2"
