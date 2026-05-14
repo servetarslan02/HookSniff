@@ -902,3 +902,12 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Frontend `health.database`, `health.redis`, `health.api`, `health.queue` top-level'dan okuyordu → hepsi "checking" görünüyordu
   - SystemHealth interface güncellendi, component data `checks.*`'dan okuyor (fallback ile)
 - **Commit:** `8284a76d` — main branch, push ✅
+
+## Oturum 159 Ek 10 — Admin System Derin İnceleme (2026-05-15 04:11 - 04:16 GMT+8)
+- **Health endpoint response** — backend sadece `{status, checks:{...}}` döndürüyordu, frontend `database`, `redis`, `api`, `queue` top-level bekliyordu
+  - Backend güncellendi: top-level `database`, `redis`, `api`, `queue` field'ları eklendi
+  - `redis`: env kontrolü ile (not configured = healthy)
+  - `api`: status + uptime_seconds
+  - `queue`: pending/processing/failed from checks
+  - `mockHealth` güncellendi (frontend)
+- **Commit:** `81d4444b` + `2aac8363` — main branch, push ✅
