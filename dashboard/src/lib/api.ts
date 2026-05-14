@@ -403,17 +403,18 @@ export interface Team {
 
 export interface TeamMember {
   id: string;
-  user_id: string;
+  customer_id: string;
   email: string;
   name?: string;
-  role: 'owner' | 'admin' | 'member';
-  joined_at: string;
+  role: 'admin' | 'editor' | 'viewer';
+  invited_at: string;
+  joined_at: string | null;
 }
 
 // Notification types
 export interface Notification {
   id: string;
-  type: 'webhook_failed' | 'alert' | 'system' | 'billing';
+  type: 'webhook_failed' | 'alert' | 'system' | 'billing' | 'team_invite';
   title: string;
   message: string;
   read: boolean;
@@ -680,6 +681,9 @@ export const teamsApi = {
 
   updateRole: (token: string, teamId: string, memberId: string, role: string) =>
     apiFetch<{ success: boolean }>(`/teams/${teamId}/members/${memberId}/role`, { method: 'PUT', body: { role }, token }),
+
+  acceptInvite: (token: string, inviteToken: string) =>
+    apiFetch<{ team_id: string; role: string; message: string }>('/teams/accept-invite', { method: 'POST', body: { token: inviteToken }, token }),
 };
 
 // Notification API

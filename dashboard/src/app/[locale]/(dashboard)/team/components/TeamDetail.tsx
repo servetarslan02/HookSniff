@@ -3,10 +3,10 @@
 import { useTranslations } from 'next-intl';
 import type { Team, TeamMember } from '@/lib/api';
 
-const ROLE_OPTIONS = ['owner', 'admin', 'member'] as const;
+const ROLE_OPTIONS = ['admin', 'editor', 'viewer'] as const;
 
 function roleLabel(t: ReturnType<typeof useTranslations>, role: string): string {
-  const map: Record<string, string> = { owner: t('roleOwner'), admin: t('roleAdmin'), member: t('roleMember') };
+  const map: Record<string, string> = { admin: t('roleAdmin'), editor: t('roleEditor', { defaultValue: 'Editor' }), viewer: t('roleViewer', { defaultValue: 'Viewer' }) };
   return map[role] || role;
 }
 
@@ -61,7 +61,7 @@ export function TeamDetail({
                 </p>
                 <p className="text-xs text-gray-500 dark:text-slate-400">{m.email}</p>
                 <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-                  {t('joinedPrefix')} {new Date(m.joined_at).toLocaleDateString()}
+                  {t('joinedPrefix')} {m.joined_at ? new Date(m.joined_at).toLocaleDateString() : '—'}
                 </p>
               </div>
               <div className="flex items-center gap-3">
