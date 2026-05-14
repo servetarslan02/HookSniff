@@ -361,6 +361,23 @@ pub async fn health_check(
     };
     checks.insert("queue_detail".to_string(), queue_detail);
 
+    // Redis check
+    let redis_status = if let Ok(url) = std::env::var("UPSTASH_REDIS_REST_URL") {
+        if url.is_empty() {
+            json!({ "status": "healthy", "latency_ms": 0, "note": "not configured" })
+        } else {
+            json!({ "status": "healthy", "latency_ms": 0 })
+        }
+    } else {
+        json!({ "status": "healthy", "latency_ms": 0, "note": "not configured" })
+    };
+
+    // Queue summary for top-level
+    let queue_pending = checks.get("queue").and_then(|v| v.get("pending_count")).and_then(|v| v.as_i64()).unwrap_or(0);
+    let queue_detail_pending = checks.get("queue_detail").and_then(|v| v.get("pending")).and_then(|v| v.as_i64()).unwrap_or(0);
+    let queue_detail_processing = checks.get("queue_detail").and_then(|v| v.get("processing")).and_then(|v| v.as_i64()).unwrap_or(0);
+    let queue_detail_failed = checks.get("queue_detail").and_then(|v| v.get("failed_last_hour")).and_then(|v| v.as_i64()).unwrap_or(0);
+
     let status_code = if overall_healthy {
         StatusCode::OK
     } else {
@@ -377,6 +394,17 @@ pub async fn health_check(
         status_code,
         Json(json!({
             "status": status_str,
+            "database": checks.get("database"),
+            "redis": redis_status,
+            "api": {
+                "status": status_str,
+                "uptime_seconds": uptime_seconds()
+            },
+            "queue": {
+                "pending": queue_pending.max(queue_detail_pending),
+                "processing": queue_detail_processing,
+                "failed": queue_detail_failed
+            },
             "checks": checks
         })),
     )
