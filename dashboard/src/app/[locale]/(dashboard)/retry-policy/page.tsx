@@ -23,15 +23,19 @@ export default function RetryPolicyPage() {
   const fetchPolicy = useCallback(async () => {
     if (!token) return;
     try {
-      const data = await apiFetch<Array<{ max_attempts: number; base_delay_ms: number; max_delay_ms: number; multiplier: number }>>('/endpoints', { token });
+      const data = await apiFetch<Array<{ id: string; retry_policy?: { max_attempts?: number; backoff?: string; initial_delay_secs?: number; max_delay_secs?: number } }>>('/endpoints', { token });
       if (data.length > 0) {
         const first = data[0];
-        setPolicy({
-          ...DEFAULT_POLICY,
-          default_max_attempts: first.max_attempts,
-          default_initial_delay_secs: Math.round(first.base_delay_ms / 1000),
-          default_max_delay_secs: Math.round(first.max_delay_ms / 1000),
-        });
+        const rp = first.retry_policy;
+        if (rp) {
+          setPolicy({
+            ...DEFAULT_POLICY,
+            default_max_attempts: rp.max_attempts ?? DEFAULT_POLICY.default_max_attempts,
+            default_initial_delay_secs: rp.initial_delay_secs ?? DEFAULT_POLICY.default_initial_delay_secs,
+            default_max_delay_secs: rp.max_delay_secs ?? DEFAULT_POLICY.default_max_delay_secs,
+            default_backoff: (rp.backoff as 'exponential' | 'linear' | 'fixed') ?? DEFAULT_POLICY.default_backoff,
+          });
+        }
       }
     } catch {
       // Use defaults
@@ -54,9 +58,9 @@ export default function RetryPolicyPage() {
             method: 'PUT',
             body: {
               max_attempts: policy.default_max_attempts,
-              base_delay_ms: policy.default_initial_delay_secs * 1000,
-              max_delay_ms: policy.default_max_delay_secs * 1000,
-              multiplier: policy.default_backoff === 'exponential' ? 2.0 : policy.default_backoff === 'linear' ? 1.5 : 1.0,
+              backoff: policy.default_backoff,
+              initial_delay_secs: policy.default_initial_delay_secs,
+              max_delay_secs: policy.default_max_delay_secs,
             },
             token,
           });
