@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useAuth } from '@/lib/store';
+import { endpointsApi } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 
 export function SignatureCard({
@@ -25,13 +26,8 @@ export function SignatureCard({
     if (!token || !endpointId) return;
     setRotating(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1')}/endpoints/${endpointId}/rotate-secret`,
-        { method: 'POST', headers: {}, credentials: 'include' as const }
-      );
-      if (!res.ok) throw new Error(t('toastRotationFailed'));
-      const data = await res.json();
-      setNewSecret(data.signing_secret);
+      const data = await endpointsApi.rotateSecret(token, endpointId);
+      setNewSecret(data.secret);
       toast(t('toastSecretRotated'), 'success');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('toastRotationFailed');
