@@ -102,8 +102,12 @@ export default function ServiceTokensPage() {
     }
     if (!token) return;
     try {
-      const data = await apiFetch<{ token: string }>(`/service-tokens/${tokenId}/reveal`, { token });
-      setRevealedTokens((prev) => ({ ...prev, [tokenId]: data.token }));
+      const data = await apiFetch<{ token: string | null; message?: string }>(`/service-tokens/${tokenId}/reveal`, { token });
+      if (data.token) {
+        setRevealedTokens((prev) => ({ ...prev, [tokenId]: data.token! }));
+      } else {
+        toast(data.message || t('tokenNotAvailable'), 'info');
+      }
     } catch {
       toast(tc('failedToLoad'), 'error');
     }
