@@ -4,7 +4,7 @@ import { getErrorMessage } from '@/lib/errors';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
-import { webhooksApi, type Delivery } from '@/lib/api';
+import { webhooksApi, type Delivery, type DeliveryAttempt } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
 
@@ -20,6 +20,8 @@ export default function LogsPage() {
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Delivery | null>(null);
+  const [attempts, setAttempts] = useState<DeliveryAttempt[]>([]);
+  const [attemptsLoading, setAttemptsLoading] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [statusCounts, setStatusCounts] = useState<Record<StatusFilter, number>>({
     all: 0,
@@ -232,7 +234,17 @@ export default function LogsPage() {
                     <tr
                       key={d.id}
                       className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer"
-                      onClick={() => setSelected(d)}
+                      onClick={() => {
+                        setSelected(d);
+                        setAttempts([]);
+                        if (token) {
+                          setAttemptsLoading(true);
+                          webhooksApi.getAttempts(token, d.id)
+                            .then((a) => setAttempts(a))
+                            .catch(() => setAttempts([]))
+                            .finally(() => setAttemptsLoading(false));
+                        }
+                      }}
                     >
                       <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
                         {d.id.slice(0, 10)}…
@@ -355,36 +367,45 @@ export default function LogsPage() {
               <div className="pt-4 border-t border-gray-100 dark:border-slate-700">
                 <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('deliveryDetails')}</h4>
                 <div className="space-y-3">
-                  {Array.from({ length: selected.attempt_count }).map((_, i) => {
-                    const isLast = i === selected.attempt_count - 1;
-                    const isSuccess = selected.status === 'delivered';
-                    return (
-                      <div key={i} className="flex items-start gap-3">
+                  {attemptsLoading ? (
+                    <p className="text-sm text-gray-500 dark:text-slate-400">{tc('loading')}</p>
+                  ) : attempts.length > 0 ? (
+                    attempts.map((a) => (
+                      <div key={a.id} className="flex items-start gap-3">
                         <div
                           className={`mt-1 w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                            isLast && isSuccess
-                              ? 'bg-green-500'
-                              : isLast && !isSuccess
-                              ? 'bg-red-500'
-                              : 'bg-amber-400'
+                            a.status === 'delivered' ? 'bg-green-500' : 'bg-red-500'
                           }`}
                         />
-                        <div>
+                        <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            Attempt {i + 1}
-                            {isLast && isSuccess && ' ✓'}
+                            {t('attempt')} {a.attempt_number}
+                            {a.status === 'delivered' && ' ✓'}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-slate-400">
-                            {isLast
-                              ? isSuccess
-                                ? t('deliveredSuccessfully')
-                                : t('failedWillRetryBackoff')
-                              : t('retriedBackoff')}
-                          </p>
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                            {a.response_status && (
+                              <span className="text-xs text-gray-500 dark:text-slate-400">
+                                HTTP {a.response_status}
+                              </span>
+                            )}
+                            {a.duration_ms !== undefined && (
+                              <span className="text-xs text-gray-500 dark:text-slate-400">
+                                {a.duration_ms}ms
+                              </span>
+                            )}
+                            <span className="text-xs text-gray-500 dark:text-slate-400">
+                              {new Date(a.created_at).toLocaleString()}
+                            </span>
+                          </div>
+                          {a.error_message && (
+                            <p className="text-xs text-red-500 dark:text-red-400 mt-1 truncate">{a.error_message}</p>
+                          )}
                         </div>
                       </div>
-                    );
-                  })}
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500 dark:text-slate-400">{tc('noResults')}</p>
+                  )}
                 </div>
               </div>
             </div>
