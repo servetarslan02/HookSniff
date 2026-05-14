@@ -34,3 +34,4 @@
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
 - Demo: demo@hooksniff.com / Demo1234!
+# deploy trigger Fri May 15 03:07:43 AM CST 2026
