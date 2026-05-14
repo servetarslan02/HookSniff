@@ -872,7 +872,7 @@ async fn get_consent(
     .await?;
 
     let consents_map = match consents {
-        Some((val)) => val.0,
+        Some(val) => val.0,
         None => serde_json::json!({}),
     };
 

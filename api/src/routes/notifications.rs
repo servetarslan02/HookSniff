@@ -86,9 +86,9 @@ async fn list_notifications(
     let mut param_idx = 2;
 
     if unread_only || read_filter == Some(false) {
-        where_clauses.push(format!("is_read = FALSE"));
+        where_clauses.push("is_read = FALSE".to_string());
     } else if read_filter == Some(true) {
-        where_clauses.push(format!("is_read = TRUE"));
+        where_clauses.push("is_read = TRUE".to_string());
     }
 
     if type_filter.is_some() {

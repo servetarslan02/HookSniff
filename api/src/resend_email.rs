@@ -186,6 +186,7 @@ impl ResendEmailClient {
         self.send(to, &subject, &html).await
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn send_invoice_email(
         &self,
         to: &str,
