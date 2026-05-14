@@ -22,6 +22,7 @@ use hooksniff_api::rate_limit;
 use hooksniff_api::routes;
 use hooksniff_api::telemetry;
 use hooksniff_api::throttle;
+use hooksniff_api::cache;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -107,6 +108,24 @@ async fn main() -> Result<()> {
 
     let rate_limiter = rate_limit::create_rate_limiter().await;
     let throttle_manager = throttle::ThrottleManager::new();
+
+    // Redis cache layer (for API key validation, endpoint metadata, etc.)
+    let cache_layer = match std::env::var("REDIS_URL") {
+        Ok(url) => match cache::CacheLayer::new(&url, cache::API_KEY_TTL).await {
+            Ok(c) => {
+                tracing::info!("✅ Redis cache layer connected");
+                Some(c)
+            }
+            Err(e) => {
+                tracing::warn!("Redis cache unavailable ({e}), running without cache");
+                None
+            }
+        },
+        Err(_) => {
+            tracing::info!("REDIS_URL not set, running without cache");
+            None
+        }
+    };
 
     // Initialize email provider (Resend primary → GCloud fallback → None)
     let email_provider = email::EmailProvider::from_config(&cfg);
@@ -205,6 +224,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(cfg.clone()))
         .layer(axum::Extension(metrics.clone()))
         .layer(axum::Extension(email_provider))
+        .layer(axum::Extension(cache_layer))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg
                 .cors_origins
