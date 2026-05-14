@@ -1,10 +1,10 @@
 -- 003_routing: Smart routing columns for endpoints
 
 -- Routing strategy: round-robin (default), latency, failover
-ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS routing_strategy STRING NOT NULL DEFAULT 'round-robin';
+ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS routing_strategy TEXT NOT NULL DEFAULT 'round-robin';
 
 -- Fallback URL for automatic failover
-ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fallback_url STRING;
+ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS fallback_url TEXT;
 
 -- Latency tracking: rolling average response time in ms
 ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS avg_response_ms INT NOT NULL DEFAULT 0;
