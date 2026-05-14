@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
-import { adminApi, type RevenueResponse, type ChurnUser } from '@/lib/api';
+import { adminApi, API_BASE, type RevenueResponse, type ChurnUser } from '@/lib/api';
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
@@ -58,9 +58,8 @@ export default function AdminRevenuePage() {
   const handleExportCSV = async () => {
     if (!token) return;
     try {
-      const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
       const url = adminApi.exportRevenue(token, 12);
-      const res = await fetch(`${API}${url}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_BASE}${url}`, { headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) throw new Error('Export failed');
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);

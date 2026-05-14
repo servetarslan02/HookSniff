@@ -4,34 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
+import { adminApi, type PlatformSettings as AdminPlatformSettings } from '@/lib/api';
 
-interface PlatformSettings {
-  default_plan: string;
-  max_endpoints_free: number;
-  max_endpoints_pro: number;
-  max_webhooks_free: number;
-  max_webhooks_pro: number;
-  rate_limit_free: number;
-  rate_limit_pro: number;
-  retry_max_attempts: number;
-  retention_days_free: number;
-  retention_days_pro: number;
-  maintenance_mode: boolean;
-  signup_enabled: boolean;
-  plan_price_pro: number;
-  plan_price_business: number;
-  resend_api_key: string | null;
-  email_sender: string | null;
-  webhook_secret: string | null;
-  backup_retention_days: number;
-  global_rate_limit: number;
-  cors_origins: string | null;
-}
+type PlatformSettings = AdminPlatformSettings;
 
 interface AlertRule {
   id: string;
-  customer_id: string | null;
-  customer_email: string | null;
   name: string;
   condition: string;
   threshold: number;
@@ -94,65 +72,52 @@ export default function AdminSettingsPage() {
   });
   const [alertSaving, setAlertSaving] = useState(false);
 
-  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-
   // Fetch platform settings
   const fetchSettings = useCallback(async () => {
     if (!token) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API}/admin/settings`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSettings(data);
-      }
+      const data = await adminApi.getSettings(token);
+      setSettings(data);
     } catch {
       // Silently fall back to defaults
     } finally {
       setLoading(false);
     }
-  }, [token, API]);
+  }, [token]);
 
   // Fetch alert rules
   const fetchAlerts = useCallback(async () => {
     if (!token) return;
     try {
-      const res = await fetch(`${API}/admin/alerts`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data: AlertRule[] = await res.json();
-        setAlertRules(data);
+      const data = await adminApi.listAlerts(token);
+      setAlertRules(data);
 
-        // Map existing rules back to thresholds
-        const thresholds: Record<string, number> = {};
-        const channels: Record<string, boolean> = { email: false, slack: false, webhook: false };
+      // Map existing rules back to thresholds
+      const thresholds: Record<string, number> = {};
+      const channels: Record<string, boolean> = { email: false, slack: false, webhook: false };
 
-        for (const rule of data) {
-          if (rule.condition === 'failure_rate') {
-            thresholds.success_rate = rule.threshold;
-          } else if (rule.condition === 'latency') {
-            thresholds.latency = rule.threshold;
-          } else if (rule.condition === 'consecutive_failures') {
-            thresholds.consecutive_failures = rule.threshold;
-          }
-          // Merge channels from all rules
-          for (const ch of rule.channels) {
-            channels[ch] = true;
-          }
+      for (const rule of data) {
+        if (rule.condition === 'failure_rate') {
+          thresholds.success_rate = rule.threshold;
+        } else if (rule.condition === 'latency') {
+          thresholds.latency = rule.threshold;
+        } else if (rule.condition === 'consecutive_failures') {
+          thresholds.consecutive_failures = rule.threshold;
         }
-
-        if (Object.keys(thresholds).length > 0) {
-          setAlertThresholds((prev) => ({ ...prev, ...thresholds }));
+        for (const ch of rule.channels) {
+          channels[ch] = true;
         }
-        setAlertChannels((prev) => ({ ...prev, ...channels }));
       }
+
+      if (Object.keys(thresholds).length > 0) {
+        setAlertThresholds((prev) => ({ ...prev, ...thresholds }));
+      }
+      setAlertChannels((prev) => ({ ...prev, ...channels }));
     } catch {
       // Keep defaults
     }
-  }, [token, API]);
+  }, [token]);
 
   useEffect(() => {
     fetchSettings();
@@ -160,18 +125,11 @@ export default function AdminSettingsPage() {
   }, [fetchSettings, fetchAlerts]);
 
   const handleSave = async () => {
+    if (!token) return;
     setSaving(true);
     setShowSuccess(false);
     try {
-      const res = await fetch(`${API}/admin/settings`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(settings),
-      });
-      if (!res.ok) throw new Error(tc('error'));
+      await adminApi.updateSettings(token, settings);
       toast(t('settingsSaved'), 'success');
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
@@ -184,72 +142,36 @@ export default function AdminSettingsPage() {
 
   // Save alert thresholds as alert rules
   const handleAlertSave = async () => {
+    if (!token) return;
     setAlertSaving(true);
     try {
       const channels = Object.entries(alertChannels)
         .filter(([, enabled]) => enabled)
         .map(([ch]) => ch);
 
-      // Determine which rules exist and which need to be created
       const existingByCondition: Record<string, AlertRule> = {};
       for (const rule of alertRules) {
         existingByCondition[rule.condition] = rule;
       }
 
-      const promises: Promise<Response>[] = [];
+      const promises: Promise<unknown>[] = [];
 
       for (const [, config] of Object.entries(ALERT_CONDITIONS)) {
         const existing = existingByCondition[config.condition];
         const threshold = alertThresholds[config.condition === 'failure_rate' ? 'success_rate' : config.condition === 'latency' ? 'latency' : 'consecutive_failures'];
 
         if (existing) {
-          // Update existing rule
-          promises.push(
-            fetch(`${API}/admin/alerts/${existing.id}`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                threshold,
-                channels,
-                is_active: true,
-              }),
-            })
-          );
+          promises.push(adminApi.updateAlert(token, existing.id, { threshold, channels, is_active: true }));
         } else {
-          // Create new rule
-          promises.push(
-            fetch(`${API}/admin/alerts`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                name: `${config.condition} alert`,
-                condition: config.condition,
-                threshold,
-                channels,
-              }),
-            })
-          );
+          promises.push(adminApi.createAlert(token, { name: `${config.condition} alert`, condition: config.condition, threshold, channels }));
         }
       }
 
-      const results = await Promise.all(promises);
-      const allOk = results.every((r) => r.ok);
-
-      if (allOk) {
-        toast(t('alertSettingsSaved') || 'Alert settings saved', 'success');
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
-        // Refresh alert rules
-        await fetchAlerts();
-      } else {
-        throw new Error('Some alerts failed to save');
-      }
+      await Promise.all(promises);
+      toast(t('alertSettingsSaved') || 'Alert settings saved', 'success');
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      await fetchAlerts();
     } catch {
       toast(t('alertSettingsFailed') || 'Failed to save alert settings', 'error');
     } finally {

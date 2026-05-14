@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { API_BASE } from './api';
 
 interface User {
   id: string;
@@ -62,8 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-    // Verify session by calling /auth/me directly on Cloud Run
-    const API_BASE = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
+    // Verify session by calling /auth/me
     const savedToken = localStorage.getItem('hooksniff_token');
     if (savedToken) {
       fetch(`${API_BASE}/auth/me`, {
@@ -118,7 +118,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const API_BASE = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -135,7 +134,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [persistAuth]);
 
   const register = useCallback(async (email: string, password: string, name?: string) => {
-    const API_BASE = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

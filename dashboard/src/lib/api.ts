@@ -2,7 +2,7 @@ import { getUserFriendlyMessage, extractErrorCode } from './error-catalog';
 
 // In production, "https://hooksniff-api-1046140057667.europe-west1.run.app/v1" is rewritten by Vercel to the GCP Cloud Run API (see vercel.json).
 // In development, point directly to the local API server.
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? "https://hooksniff-api-1046140057667.europe-west1.run.app/v1" : "http://localhost:3000/v1");
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? "https://hooksniff-api-1046140057667.europe-west1.run.app/v1" : "http://localhost:3000/v1");
 
 const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_RETRIES = 2;
@@ -592,6 +592,19 @@ export const adminApi = {
 
   updateSettings: (token: string, settings: PlatformSettings) =>
     apiFetch<{ message: string }>('/admin/settings', { method: 'PUT', body: settings, token }),
+
+  // Admin Alerts (platform-wide)
+  listAlerts: (token: string) =>
+    apiFetch<AlertRuleAdmin[]>('/admin/alerts', { token }),
+
+  createAlert: (token: string, data: { name: string; condition: string; threshold: number; channels: string[] }) =>
+    apiFetch<AlertRuleAdmin>('/admin/alerts', { method: 'POST', body: data, token }),
+
+  updateAlert: (token: string, id: string, data: { threshold?: number; channels?: string[]; is_active?: boolean }) =>
+    apiFetch<AlertRuleAdmin>(`/admin/alerts/${id}`, { method: 'PUT', body: data, token }),
+
+  deleteAlert: (token: string, id: string) =>
+    apiFetch<{ success: boolean }>(`/admin/alerts/${id}`, { method: 'DELETE', token }),
 
   // Feature Flags
   listFeatureFlags: (token: string) =>

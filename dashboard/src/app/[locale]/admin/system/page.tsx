@@ -48,9 +48,9 @@ export default function AdminSystemPage() {
     try {
       setError(null);
       setErrorDetail(null);
-      const [res, alertsRes] = await Promise.all([
+      const [res, alertsData] = await Promise.all([
         fetch(`${API}/health`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API}/admin/alerts`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => null),
+        token ? adminApi.listAlerts(token).catch(() => []) : Promise.resolve([]),
       ]);
       if (res.ok) {
         setHealth(await res.json());
@@ -60,10 +60,7 @@ export default function AdminSystemPage() {
         setErrorDetail(errText || `HTTP ${res.status}`);
         setHealth(mockHealth);
       }
-      if (alertsRes?.ok) {
-        const alerts = await alertsRes.json();
-        setActiveAlerts(Array.isArray(alerts) ? alerts.filter((a: { is_active: boolean }) => a.is_active).length : 0);
-      }
+      setActiveAlerts(Array.isArray(alertsData) ? alertsData.filter((a) => a.is_active).length : 0);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(t('systemHealthDesc'));
