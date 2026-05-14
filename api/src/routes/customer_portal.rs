@@ -39,6 +39,7 @@ pub fn router() -> Router {
 struct ProfileResponse {
     id: Uuid,
     email: String,
+    name: Option<String>,
     plan: String,
     webhook_limit: i64,
     webhook_count: i64,
@@ -49,6 +50,7 @@ async fn get_profile(Extension(customer): Extension<Customer>) -> Json<ProfileRe
     Json(ProfileResponse {
         id: customer.id,
         email: customer.email.clone(),
+        name: customer.name.clone(),
         plan: customer.plan.clone(),
         webhook_limit: customer.webhook_limit,
         webhook_count: customer.webhook_count,
@@ -83,6 +85,7 @@ async fn update_profile(
     Ok(Json(ProfileResponse {
         id: customer.id,
         email: customer.email,
+        name: customer.name,
         plan: customer.plan,
         webhook_limit: customer.webhook_limit,
         webhook_count: customer.webhook_count,
