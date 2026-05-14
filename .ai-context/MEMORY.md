@@ -701,3 +701,44 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
   - Unit test güncellendi (46 → 49 migration)
 - **Deploy bekleniyor** — Cloud Build tetiklenmeli
 - **Commit:** pending push
+
+## Oturum 156 (2026-05-14 16:03 - 17:00 GMT+8) ✅
+- **OpenClaw** — Servet ile Service Tokens + API bağlantı kontrolü
+- **Context yükleme** — .ai-context/ hafıza dosyaları okundu, HookSniff repo klonlandı
+- **Cloud Build kontrolü** — Son 6 build başarılı (browser ile GCP Console'dan kontrol edildi)
+- **Worker hatası çözülmüş** — `sem` lifetime error artık yok, tüm build'ler geçiyor
+
+### Service Tokens Backend (feat)
+- **Problem:** Service Tokens sayfası `/service-tokens` çağrıyordu ama backend'de route yoktu
+- **Çözüm:**
+  - Migration 051: `service_tokens` tablosu (team_id, token_hash, token_prefix)
+  - `api/src/routes/service_tokens.rs`: CRUD routes (list, create, delete, reveal, update)
+  - `api/src/routes/mod.rs`: route kaydı + module export
+  - `api/src/middleware/mod.rs`: service token auth desteği (hash lookup + team owner resolve)
+  - Frontend: `tokenNotAvailable` i18n key (en/tr)
+  - Test: Tüm CRUD endpoint'leri başarılı ✅
+
+### Service Token Team Scoping (fix — güvenlik)
+- **Problem:** Service token → customer owner → TÜM API erişimi (güvenlik açığı)
+- **Çözüm:**
+  - `ServiceTokenScope { team_id }` middleware extension eklendi
+  - `list_endpoints`: team_id filtresi (service token ile sadece o takımın endpoint'leri)
+  - `create_endpoint`: otomatik team_id ataması
+  - `list_deliveries`: team endpoint'leri filtreli
+  - Migration 052: `endpoints.team_id` kolonu
+
+### Plan Yapısı Kararı
+- Servet onayladı: Plan ve limitler müşteri seviyesinde kalacak (A seçeneği)
+- Her organizasyon ayrı plan almaz, müşteri planı tüm organizasyonları kapsar
+
+### Oturum Notları
+- OpenClaw oturumları 1 saat sürüyor, context GitHub'da kalıcı
+- Servet teknik bilgi yok, ilk proje
+- Hedef: $500/ay gelir
+- GitHub token tek kullanımlık paylaşılıyor (güvenlik uyarısı yapıldı)
+- Build: dashboard ✅ (216 sayfa), Cloud Build deploy-on-push ile otomatik deploy
+
+### Commits
+- `3d124d19` — docs: NEXT_SESSION.md güncellendi
+- `7910d16d` — feat: service tokens backend
+- `951e8dac` — fix: service token team scoping
