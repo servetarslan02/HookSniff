@@ -171,7 +171,8 @@
     "routingConfig": "Yönlendirme",
     "teamMgmt": "Ekip",
     "billingOverview": "Faturalandırma",
-    "settingsSection": "Ayarlar"
+    "settingsSection": "Ayarlar",
+    "sectionMonitoring": "İzleme"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
