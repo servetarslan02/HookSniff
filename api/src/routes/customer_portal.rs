@@ -259,8 +259,8 @@ async fn get_notifications(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let prefs = sqlx::query_as::<_, (bool, bool, bool, Option<String>, Option<String>, Option<String>)>(
-        "SELECT email_on_failure, email_on_dead_letter, email_on_success, slack_webhook_url, discord_webhook_url, webhook_url FROM notification_preferences WHERE customer_id = $1"
+    let prefs = sqlx::query_as::<_, (bool, bool, bool, bool, Option<String>, Option<String>, Option<String>)>(
+        "SELECT email_on_failure, email_on_dead_letter, email_on_success, COALESCE(email_on_weekly_digest, false), slack_webhook_url, discord_webhook_url, webhook_url FROM notification_preferences WHERE customer_id = $1"
     )
     .bind(customer.id)
     .fetch_optional(&pool)
@@ -271,6 +271,7 @@ async fn get_notifications(
             email_on_failure,
             email_on_dead_letter,
             email_on_success,
+            email_on_weekly_digest,
             slack,
             discord,
             webhook,
@@ -278,7 +279,7 @@ async fn get_notifications(
             "email_on_failure": email_on_failure,
             "email_on_dead_letter": email_on_dead_letter,
             "email_on_success": email_on_success,
-            "email_on_weekly_digest": false,
+            "email_on_weekly_digest": email_on_weekly_digest,
             "slack_webhook_url": slack,
             "discord_webhook_url": discord,
             "webhook_url": webhook,
@@ -316,6 +317,10 @@ async fn update_notifications(
         .get("email_on_success")
         .and_then(|v| v.as_bool())
         .unwrap_or(false);
+    let email_on_weekly_digest = req
+        .get("email_on_weekly_digest")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
     let slack_webhook_url = req
         .get("slack_webhook_url")
         .and_then(|v| v.as_str())
@@ -346,12 +351,13 @@ async fn update_notifications(
     }
 
     sqlx::query(
-        r#"INSERT INTO notification_preferences (customer_id, email_on_failure, email_on_dead_letter, email_on_success, slack_webhook_url, discord_webhook_url, webhook_url, updated_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, now())
+        r#"INSERT INTO notification_preferences (customer_id, email_on_failure, email_on_dead_letter, email_on_success, email_on_weekly_digest, slack_webhook_url, discord_webhook_url, webhook_url, updated_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now())
            ON CONFLICT (customer_id) DO UPDATE SET
                email_on_failure = EXCLUDED.email_on_failure,
                email_on_dead_letter = EXCLUDED.email_on_dead_letter,
                email_on_success = EXCLUDED.email_on_success,
+               email_on_weekly_digest = EXCLUDED.email_on_weekly_digest,
                slack_webhook_url = EXCLUDED.slack_webhook_url,
                discord_webhook_url = EXCLUDED.discord_webhook_url,
                webhook_url = EXCLUDED.webhook_url,
@@ -361,6 +367,7 @@ async fn update_notifications(
     .bind(email_on_failure)
     .bind(email_on_dead_letter)
     .bind(email_on_success)
+    .bind(email_on_weekly_digest)
     .bind(&slack_webhook_url)
     .bind(&discord_webhook_url)
     .bind(&webhook_url)
