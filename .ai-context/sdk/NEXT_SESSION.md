@@ -1,27 +1,30 @@
 # SDK NEXT_SESSION.md — Sıradaki İş
 
-> Son güncelleme: 2026-05-15 07:50 GMT+8
+> Son güncelleme: 2026-05-15 08:15 GMT+8
 
-## Sıradaki: Rust Wrapper + İmza Doğrulama
+## Sıradaki: Quick Start Guides + Publish
 
-PLAN.md'deki "Dil 1: Rust" adımındayım.
+### 1. Quick Start Guides (PLAN.md 4.3)
+Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift için quick start sayfaları oluştur.
+Referans: `docs-sdk/docs/quickstart/node.md`
 
-### Yapılacaklar
-1. `sdks/rust/` mevcut kodu incele
-2. `sdks/rust/src/client.rs` — HookSniff wrapper yaz
-3. `sdks/rust/src/webhook.rs` — HMAC-SHA256 imza doğrulama yaz
-4. `sdks/rust/tests/` — unit testler yaz (20+)
-5. Cargo.toml güncelle
-6. `cargo build` + `cargo test`
-7. git commit + push
+### 2. Error Handling + Pagination Guides
+- `docs-sdk/docs/guides/error-handling.md`
+- `docs-sdk/docs/guides/pagination.md`
 
-### Referans Implementasyonlar
-- Node.js: `sdks/node/src/hooksniff.ts`, `sdks/node/src/webhook.ts`
-- Python: `sdks/python/hooksniff/client.py`, `sdks/python/hooksniff/webhook.py`
-- Go: `sdks/go/hooksniff.go`, `sdks/go/webhook.go`
+### 3. Publish Token'ları
+Servet'ten GitHub Secrets'a token ekle iste:
+- NPM_TOKEN, PYPI_TOKEN, CARGO_TOKEN, RUBYGEMS_TOKEN
+- MAVEN_USERNAME, MAVEN_PASSWORD, NUGET_TOKEN, HEX_TOKEN
 
-### Bitirince
-- PLAN.md'deki tikleri işaretle
-- Bu dosyayı sıradaki dil (Ruby) ile güncelle
-- MEMORY.md'yi güncelle
-- git push
+### 4. Publish Workflow Tetikle
+GitHub Actions > SDK Publish > Run workflow > `all`
+
+### 5. Deploy Docs Site
+`docs-sdk/` dizinini Vercel veya Netlify'e deploy et.
+
+## Dosya Konumları
+- Plan: `.ai-context/sdk/PLAN.md`
+- Memory: `.ai-context/sdk/MEMORY.md`
+- Docs: `docs-sdk/`
+- Publish Status: `.ai-context/sdk/PUBLISH-STATUS.md`
