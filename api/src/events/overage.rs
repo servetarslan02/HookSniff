@@ -1,7 +1,7 @@
 //! Daily event usage tracking and overage email notifications.
 
 use sqlx::PgPool;
-use uuid::Uuid;
+
 
 use crate::billing::Plan;
 use crate::models::customer::Customer;

@@ -287,29 +287,40 @@ pub async fn auth_middleware(
                 for (hash,) in &st_candidates {
                     if verify_api_key(&token, hash) {
                         // Service token auth: resolve the team owner as the customer + team_id
-                        let result: Option<(Customer, Uuid)> = sqlx::query_as(
-                            r#"
-                            SELECT c.*, t.id as team_id FROM customers c
-                            INNER JOIN teams t ON t.owner_id = c.id
-                            INNER JOIN service_tokens st ON st.team_id = t.id
-                            WHERE st.token_prefix = $1 AND st.token_hash = $2
-                            "#,
+                        // First get the team_id from the service token
+                        let team_id_opt: Option<Uuid> = sqlx::query_scalar(
+                            "SELECT t.id FROM teams t \
+                             INNER JOIN service_tokens st ON st.team_id = t.id \
+                             WHERE st.token_prefix = $1 AND st.token_hash = $2"
                         )
                         .bind(&prefix)
                         .bind(hash)
                         .fetch_optional(&*pool)
                         .await?;
-                        if let Some((c, team_id)) = result {
-                            found = Some(c);
-                            service_token_team = Some(team_id);
-                            // Update last_used_at
-                            let _ = sqlx::query(
-                                "UPDATE service_tokens SET last_used_at = NOW() WHERE token_prefix = $1 AND token_hash = $2"
+
+                        if let Some(team_id) = team_id_opt {
+                            // Then fetch the team owner as customer
+                            let customer = sqlx::query_as::<_, Customer>(
+                                "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification FROM customers c \
+                                 INNER JOIN teams t ON t.owner_id = c.id \
+                                 WHERE t.id = $1"
                             )
-                            .bind(&prefix)
-                            .bind(hash)
-                            .execute(&*pool)
-                            .await;
+                            .bind(team_id)
+                            .fetch_optional(&*pool)
+                            .await?;
+
+                            if let Some(c) = customer {
+                                found = Some(c);
+                                service_token_team = Some(team_id);
+                                // Update last_used_at
+                                let _ = sqlx::query(
+                                    "UPDATE service_tokens SET last_used_at = NOW() WHERE token_prefix = $1 AND token_hash = $2"
+                                )
+                                .bind(&prefix)
+                                .bind(hash)
+                                .execute(&*pool)
+                                .await;
+                            }
                         }
                         break;
                     }
