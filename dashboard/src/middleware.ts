@@ -46,11 +46,19 @@ export default function middleware(request: NextRequest) {
   const withoutLocale = pathname.replace(LOCALE_REGEX, '/');
 
   // Redirect old individual routes to consolidated routes
+  // IMPORTANT: Use the original pathname (with locale) for redirect URL
+  // to avoid breaking next-intl localePrefix:'never' routing
   const redirectTarget = ROUTE_REDIRECTS[withoutLocale];
   if (redirectTarget) {
+    // Preserve the original URL structure — just swap the path
+    const url = new URL(request.url);
+    // Reconstruct: keep the same origin + locale prefix (if any) + new path
     const localeMatch = pathname.match(LOCALE_REGEX);
-    const locale = localeMatch ? localeMatch[1] : '';
-    const url = new URL(`/${locale}${redirectTarget}`, request.url);
+    if (localeMatch) {
+      url.pathname = `/${localeMatch[1]}${redirectTarget}`;
+    } else {
+      url.pathname = redirectTarget;
+    }
     return NextResponse.redirect(url, 308);
   }
 
@@ -92,11 +100,13 @@ export default function middleware(request: NextRequest) {
   // Let next-intl handle locale routing
   const response = handleI18nRouting(request);
 
-  // Add CSP header
-  response.headers.set(
-    'Content-Security-Policy',
-    `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://hooksniff-api-1046140057667.europe-west1.run.app https://*.run.app https://*.vercel.app; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`
-  );
+  // Add CSP header (only if response is not a redirect)
+  if (!response.headers.get('location')) {
+    response.headers.set(
+      'Content-Security-Policy',
+      `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://hooksniff-api-1046140057667.europe-west1.run.app https://*.run.app https://*.vercel.app; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`
+    );
+  }
 
   return response;
 }
