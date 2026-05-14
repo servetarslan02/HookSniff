@@ -2536,7 +2536,8 @@
     "networkError": "Ağ hatası",
     "typeStr": "metin",
     "typeNum": "sayı",
-    "typeBool": "bool"
+    "typeBool": "bool",
+    "selectEndpoint": "Bir endpoint seçin"
   },
   "apiImporter": {
     "title": "📥 API Spec İçe Aktarıcı",
