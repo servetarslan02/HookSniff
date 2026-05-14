@@ -1,48 +1,64 @@
-# NEXT_SESSION.md — Oturum 158
+# NEXT_SESSION.md — Oturum 159
 
-> Son güncelleme: 2026-05-14 17:35 GMT+8
+> Son güncelleme: 2026-05-14 20:30 GMT+8
 
 ## Kaldığımız Yer
-- **Oturum 157** — Service Tokens deploy + migration fix **TAMAMLANDI** ✅
-- Cloud Build deploy hatası düzeltildi (Customer sqlx::Decode compile error)
-- Migration STRING → TEXT düzeltmesi yapıldı
+- **Oturum 158** — Team invite notifications + role fixes **TAMAMLANDI** ✅
 
 ## Son Yapılan Değişiklikler
-- `api/src/middleware/mod.rs` — Service token auth: tuple query → two separate queries
-- `api/src/events/overage.rs` — Unused import removed
-- `api/src/routes/applications.rs` — Unused imports removed
-- `migrations/001-006,009,043` — STRING → TEXT type fix
+### Commit 1: `0ed693c3` — feat: team invite notifications + role fix
+- `api/src/routes/teams.rs`: 
+  - `POST /v1/teams/accept-invite` endpoint eklendi
+  - `invite_member` fonksiyonu artık kayıtlı kullanıcıya bildirim gönderiyor
+  - `AcceptInviteRequest` struct eklendi
+  - `existing_customer` değişkeni `as_ref()` ile borrow edildi (notification için reuse)
+- `dashboard/src/components/NotificationCenter.tsx`: 
+  - `team_invite` tipi eklendi (👥 ikonu, Kabul Et / Reddet butonları)
+  - `useToast` import kaldırıldı (kullanılmıyordu)
+- `dashboard/src/lib/api.ts`:
+  - `TeamMember` interface düzeltildi: `user_id` → `customer_id`, roller `admin/editor/viewer`
+  - `acceptInvite` API metodu eklendi
+  - `Notification.type`'a `team_invite` eklendi
+- `dashboard/src/app/[locale]/(dashboard)/team/components/TeamDetail.tsx`:
+  - Rol seçenekleri: `owner/admin/member` → `admin/editor/viewer`
+  - `joined_at` null handling eklendi
+- `dashboard/src/app/[locale]/(dashboard)/team/page.tsx`:
+  - `currentRole` varsayılı: `member` → `viewer`
+  - İzin kontrolleri: `owner` → `admin`
+  - `user_id` → `customer_id`
+- `dashboard/src/messages/en.json` + `tr.json`:
+  - Bildirim anahtarları eklendi (acceptInvite, declineInvite, vb.)
+  - Rol etiketleri eklendi (roleEditor, roleViewer)
+
+### Commit 2: `45710134` — fix: team button error handling + role check
+- `handleCreate`: try/catch eklendi, API hatası toast gösteriyor
+- `handleInvite`: try/catch eklendi, API hatası toast gösteriyor
+- `handleRoleChange`: `'owner'` referansı `'admin'` olarak düzeltildi
+- `confirmRemoveMember`: hata yönetimi iyileştirildi
 
 ## Durum Özeti
-- **İlerleme:** 359/364 (%99) — 5 kalan hepsi Servet görevleri
 - **Site:** ✅ Canlı (hooksniff.vercel.app)
-- **API:** ✅ Çalışıyor
-- **Cloud Build:** ✅ Son build başarılı (commit 2ce662fd)
+- **API:** ✅ Çalışıyor (health check OK, DB 35ms)
+- **Build:** ✅ 216 sayfa, hatasız
+- **Cloud Build:** Backend deploy tetiklenmeli (teams.rs değişikliği var)
 
-## Oturum 158 — Öncelikli Görevler
+## Oturum 159 — Öncelikli Görevler
 
-### Servet Görevleri (5 kalan ⬜)
-1. Stripe payout + identity verification (Polar.sh)
-2. Domain DNS ayarları (hooksniff.is-a.dev → Resend domain)
-3. Dependabot PR'ları temizleme
-4. Vercel Node.js 24.x → 22.x düşürme
-5. Production test kullanıcı geri bildirimi
+### Servet'in Test Etmesi Gereken
+1. **Team sayfası butonları:** Invite, Remove, Role Change butonları çalışıyor mu?
+2. **Bildirimler:** Üye davet edildiğinde notification bell'de bildirim düşüyor mu?
+3. **Accept invite:** Bildirimden Kabul Et butonu çalışıyor mu?
 
 ###потенциел İyileştirmeler
-1. Endpoint create'de team_id atanıyor ama eski endpoint'lerde team_id NULL → migration ile mevcut endpoint'lere team_id atama
-2. Dashboard'da organizasyon yönetimi sayfası (şu an sadece backend'de var)
-3. Service token için scope/permission sistemi (read-only, write, admin)
+1. Davet token'ını notification data alanına sakla (şu an sadece team-mgmt sayfasına yönlendiriyor)
+2. Endpoint create'de team_id ataması (eski endpoint'lerde NULL)
+3. Dashboard'da organizasyon yönetimi sayfası
+4. Service token için scope/permission sistemi
 
 ### CSP Nonce Tam Uygulama (ÖNEMLİ)
-- **Sorun:** `headers()` layout.tsx'te kullanıldığında `clientReferenceManifest` Invariant hatası veriyor (Next.js 15 bug)
-- **Geçici çözüm:** `unsafe-inline` kullanılıyor — ideal değil
-- **Kalıcı çözüm:**
-  1. Layout'taki theme detection inline script'ini `/public/theme.js` dosyasına taşı
-  2. JSON-LD script'i `type="application/ld+json"` olduğu için CSP'den etkilenmez (data, executable script değil)
-  3. `script-src 'self'` yap — nonce veya `unsafe-inline` gerekmeyecek
-  4. Eğer inline script kalmazsa `unsafe-inline` kaldırılabilir
-- **Dosyalar:** `dashboard/src/app/[locale]/layout.tsx`, `dashboard/src/middleware.ts`
-- **Öncelik:** Orta — XSS korumasını güçlendirir ama acil değil
+- `headers()` layout.tsx'te kullanıldığında `clientReferenceManifest` Invariant hatası veriyor
+- Geçici çözüm: `unsafe-inline` kullanılıyor
+- Kalıcı çözüm: theme detection script'ini `/public/theme.js` dosyasına taşı
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
