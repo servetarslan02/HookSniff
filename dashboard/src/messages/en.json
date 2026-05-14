@@ -211,7 +211,27 @@
     "widgetSettings": "Widget Settings",
     "widgetSettingsDesc": "Toggle widgets on/off. Drag the handle on each widget to reorder.",
     "statCards": "Stat Cards",
-    "charts": "Charts"
+    "charts": "Charts",
+    "subtitle": "Webhook Delivery Dashboard",
+    "totalDeliveries": "Total Deliveries",
+    "activeEndpoints": "Active Endpoints",
+    "failedDeliveries": "Failed Deliveries",
+    "deliveryTrends": "Delivery Trends",
+    "deliveryTrendsDesc": "Webhook delivery performance over time",
+    "quickStats": "Quick Stats",
+    "quickActions": "Quick Actions",
+    "manageEndpoints": "Manage Endpoints",
+    "viewDeliveries": "View Deliveries",
+    "openPlayground": "Open Playground",
+    "viewAnalytics": "View Analytics",
+    "event": "Event",
+    "status": "Status",
+    "attempts": "Attempts",
+    "time": "Time",
+    "failedLabel": "Failed",
+    "tryPlayground": "Try Playground",
+    "recent-deliveries": "Recent Deliveries",
+    "stat-cards": "Stat Cards"
   },
   "endpoints": {
     "title": "Endpoints",
@@ -1753,7 +1773,8 @@
   "chart": {
     "hours24": "24 Hours",
     "days7": "7 Days",
-    "days30": "30 Days"
+    "days30": "30 Days",
+    "days90": "90 Days"
   },
   "generic": "Generic",
   "active": "Active",
