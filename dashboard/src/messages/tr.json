@@ -596,7 +596,11 @@
     "cookieAnalyticsDesc": "Hizmetimizi geliştirmek için anonim kullanım verileri toplamamıza izin verin.",
     "marketingEmails": "Pazarlama E-postaları",
     "marketingEmailsDesc": "Ürün güncellemeleri, ipuçları ve promosyon teklifleri alın.",
-    "consentWithdrawNote": "Onayınızı istediğiniz zaman bu ayarları kapatarak geri çekebilirsiniz. Değişiklikler hemen geçerli olur."
+    "consentWithdrawNote": "Onayınızı istediğiniz zaman bu ayarları kapatarak geri çekebilirsiniz. Değişiklikler hemen geçerli olur.",
+    "twoFactorAuth": "İki Faktörlü Doğrulama",
+    "twoFactorDesc": "TOTP tabanlı 2FA ile hesabınıza ekstra güvenlik katmanı ekleyin.",
+    "2faDisabled": "2FA şu anda devre dışı",
+    "enable2fa": "2FA Etkinleştir"
   },
   "billing": {
     "title": "Faturalandırma",
@@ -656,7 +660,10 @@
     "invalidCheckoutUrl": "Geçersiz ödeme URL'si",
     "contactSales": "Satış Ekibiyle İletişim",
     "customPricing": "Özel Fiyat",
-    "mostPopular": "En Popüler"
+    "mostPopular": "En Popüler",
+    "nextBilling": "Sonraki fatura tarihi",
+    "webhooksThisMonth": "Bu ayki webhook sayısı",
+    "used": "kullanıldı"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -687,7 +694,8 @@
     "consentRequired": "Kullanım Şartları ve Gizlilik Politikası'nı kabul etmelisiniz",
     "passwordWeak": "Zayıf",
     "passwordMedium": "Orta",
-    "passwordStrong": "Güçlü"
+    "passwordStrong": "Güçlü",
+    "verifyEmailSent": "Doğrulama e-postası gönderildi! Lütfen gelen kutunuzu kontrol edin."
   },
   "docs": {
     "gettingStarted": "Başlarken",
@@ -925,7 +933,12 @@
     "rubySdk": "Ruby SDK",
     "phpSdk": "PHP SDK",
     "elixirSdk": "Elixir SDK",
-    "csharpSdk": "C# SDK"
+    "csharpSdk": "C# SDK",
+    "docs": "Dokümantasyon",
+    "developer": "Geliştirici",
+    "startup": "Girişim",
+    "enterprise": "Kurumsal",
+    "unlimited": "Sınırsız"
   },
   "status": {
     "title": "HookSniff Durumu",
