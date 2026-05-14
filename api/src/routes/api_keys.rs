@@ -101,8 +101,16 @@ async fn create_api_key(
 async fn delete_api_key(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // Get the prefix before deleting for cache invalidation
+    let old_prefix: Option<(String,)> = sqlx::query_as("SELECT api_key_prefix FROM api_keys WHERE id = $1 AND customer_id = $2")
+        .bind(id)
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?;
+
     let result = sqlx::query("DELETE FROM api_keys WHERE id = $1 AND customer_id = $2")
         .bind(id)
         .bind(customer.id)
@@ -111,6 +119,11 @@ async fn delete_api_key(
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
+    }
+
+    // Invalidate Redis cache for the deleted key
+    if let (Some(ref c), Some((prefix,))) = (&cache, &old_prefix) {
+        c.invalidate("apikey", prefix).await;
     }
 
     // Audit log — API_KEY_DELETE
@@ -125,19 +138,18 @@ async fn delete_api_key(
 async fn rotate_api_key(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<CreateApiKeyResponse>, AppError> {
-    // Verify ownership
-    let existing: Option<(Uuid,)> =
-        sqlx::query_as("SELECT id FROM api_keys WHERE id = $1 AND customer_id = $2")
+    // Verify ownership and get old prefix for cache invalidation
+    let existing: Option<(Uuid, String)> =
+        sqlx::query_as("SELECT id, api_key_prefix FROM api_keys WHERE id = $1 AND customer_id = $2")
             .bind(id)
             .bind(customer.id)
             .fetch_optional(&pool)
             .await?;
 
-    if existing.is_none() {
-        return Err(AppError::NotFound);
-    }
+    let (_, old_prefix) = existing.ok_or(AppError::NotFound)?;
 
     let new_key = generate_api_key();
     let new_hash = hash_api_key(&new_key);
@@ -149,6 +161,11 @@ async fn rotate_api_key(
         .bind(id)
         .execute(&pool)
         .await?;
+
+    // Invalidate old prefix in Redis cache
+    if let Some(ref c) = cache {
+        c.invalidate("apikey", &old_prefix).await;
+    }
 
     tracing::info!("🔑 API key rotated for customer {}", customer.id);
 

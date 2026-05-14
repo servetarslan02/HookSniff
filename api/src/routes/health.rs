@@ -57,8 +57,9 @@ pub struct ComponentStatus {
 /// No authentication required so customers can check service status.
 /// Includes permissive CORS headers since this is a public status page.
 pub async fn system_status(
-    axum::extract::Extension(pool): axum::extract::Extension<sqlx::PgPool>,
+    axum::extract::Extension(health_pool): axum::extract::Extension<crate::db::HealthPool>,
 ) -> (StatusCode, axum::http::HeaderMap, Json<SystemStatus>) {
+    let pool = &health_pool.0;
     let mut headers = axum::http::HeaderMap::new();
     headers.insert(
         "Access-Control-Allow-Origin",
@@ -88,7 +89,7 @@ pub async fn system_status(
     // ── Database (PostgreSQL) ──
     let db_start = Instant::now();
     let db_status = match sqlx::query_scalar::<_, i32>("SELECT 1")
-        .fetch_one(&pool)
+        .fetch_one(pool)
         .await
     {
         Ok(_) => {
@@ -167,7 +168,7 @@ pub async fn system_status(
     let worker_status = match sqlx::query_scalar::<_, i64>(
         "SELECT COUNT(*) FROM webhook_queue WHERE status = 'processing' AND updated_at < NOW() - INTERVAL '5 minutes'"
     )
-    .fetch_one(&pool)
+    .fetch_one(pool)
     .await
     {
         Ok(stuck_count) => {
@@ -235,8 +236,9 @@ pub async fn system_status(
 /// - Returns detailed JSON with per-component health and latency
 /// - Returns HTTP 503 when any critical component is unhealthy
 pub async fn health_check(
-    axum::extract::Extension(pool): axum::extract::Extension<sqlx::PgPool>,
+    axum::extract::Extension(health_pool): axum::extract::Extension<crate::db::HealthPool>,
 ) -> (StatusCode, Json<Value>) {
+    let pool = &health_pool.0;
     let _start = Instant::now();
     let mut checks = serde_json::Map::new();
     let mut overall_healthy = true;
@@ -244,7 +246,7 @@ pub async fn health_check(
     // Database check — try a simple query
     let db_start = Instant::now();
     let db_status = match sqlx::query_scalar::<_, i32>("SELECT 1")
-        .fetch_one(&pool)
+        .fetch_one(pool)
         .await
     {
         Ok(_) => {
@@ -269,7 +271,7 @@ pub async fn health_check(
     let queue_status = match sqlx::query_scalar::<_, i64>(
         "SELECT COUNT(*) FROM webhook_queue WHERE status = 'pending'",
     )
-    .fetch_one(&pool)
+    .fetch_one(pool)
     .await
     {
         Ok(count) => {
@@ -297,7 +299,7 @@ pub async fn health_check(
     let last_delivery_status = match sqlx::query_scalar::<_, Option<chrono::DateTime<chrono::Utc>>>(
         "SELECT MAX(processed_at) FROM webhook_queue WHERE status = 'delivered'",
     )
-    .fetch_one(&pool)
+    .fetch_one(pool)
     .await
     {
         Ok(last_at) => {
@@ -319,7 +321,7 @@ pub async fn health_check(
     let db_size_status = match sqlx::query_scalar::<_, String>(
         "SELECT pg_size_pretty(pg_database_size(current_database()))",
     )
-    .fetch_one(&pool)
+    .fetch_one(pool)
     .await
     {
         Ok(size) => json!({ "status": "healthy", "size": size }),
@@ -331,7 +333,7 @@ pub async fn health_check(
     let recent_errors = match sqlx::query_as::<_, (String, Option<String>, Option<String>, chrono::DateTime<chrono::Utc>)>(
         "SELECT id::text, event, error_message, created_at FROM deliveries WHERE status = 'failed' ORDER BY created_at DESC LIMIT 10",
     )
-    .fetch_all(&pool)
+    .fetch_all(pool)
     .await
     {
         Ok(rows) => {
@@ -348,7 +350,7 @@ pub async fn health_check(
     let queue_detail = match sqlx::query_as::<_, (i64, i64, i64)>(
         "SELECT COUNT(*) FILTER (WHERE status = 'pending'), COUNT(*) FILTER (WHERE status = 'processing'), COUNT(*) FILTER (WHERE status = 'failed' AND created_at >= NOW() - INTERVAL '1 hour') FROM deliveries",
     )
-    .fetch_one(&pool)
+    .fetch_one(pool)
     .await
     {
         Ok((pending, processing, failed_1h)) => json!({
