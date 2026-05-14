@@ -271,7 +271,7 @@ mod tests {
         let json = serde_json::to_value(&info).unwrap();
         assert_eq!(json["name"], "Production");
         assert_eq!(json["token_prefix"], "hr_live_abc123def456");
-        assert!(json["last_used_at"].is_some());
+        assert!(!json["last_used_at"].is_null());
     }
 
     #[test]
