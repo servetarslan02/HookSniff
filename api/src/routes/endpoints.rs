@@ -34,13 +34,26 @@ pub fn router() -> Router {
 async fn list_endpoints(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
 ) -> Result<Json<Vec<EndpointResponse>>, AppError> {
-    let endpoints = sqlx::query_as::<_, Endpoint>(
-        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
-    )
-    .bind(customer.id)
-    .fetch_all(&pool)
-    .await?;
+    let endpoints = if let Some(Extension(scope)) = service_token {
+        // Service token: only return endpoints belonging to this team
+        sqlx::query_as::<_, Endpoint>(
+            "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE customer_id = $1 AND team_id = $2 ORDER BY created_at DESC LIMIT 500",
+        )
+        .bind(customer.id)
+        .bind(scope.team_id)
+        .fetch_all(&pool)
+        .await?
+    } else {
+        // JWT/API key: return all endpoints for this customer
+        sqlx::query_as::<_, Endpoint>(
+            "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
+        )
+        .bind(customer.id)
+        .fetch_all(&pool)
+        .await?
+    };
 
     Ok(Json(
         endpoints.into_iter().map(|e| e.to_response()).collect(),
@@ -50,6 +63,7 @@ async fn list_endpoints(
 async fn create_endpoint(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<CreateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
     // Check endpoint limit based on plan
@@ -132,8 +146,8 @@ async fn create_endpoint(
         .and_then(|rp| serde_json::to_value(rp).ok());
 
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        r#"INSERT INTO endpoints (customer_id, url, description, signing_secret, allowed_ips, event_filter, custom_headers, retry_policy, routing_strategy, fallback_url, application_id)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *"#,
+        r#"INSERT INTO endpoints (customer_id, url, description, signing_secret, allowed_ips, event_filter, custom_headers, retry_policy, routing_strategy, fallback_url, application_id, team_id)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *"#,
     )
     .bind(customer.id)
     .bind(&req.url)
@@ -146,6 +160,7 @@ async fn create_endpoint(
     .bind(req.routing_strategy.as_deref().unwrap_or("round-robin"))
     .bind(&req.fallback_url)
     .bind(req.application_id)
+    .bind(service_token.map(|s| s.0.team_id))
     .fetch_one(&pool)
     .await?;
 
