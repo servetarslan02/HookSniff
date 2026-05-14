@@ -278,6 +278,11 @@ async fn main() -> Result<()> {
                         axum::http::header::HeaderName::from_static("x-hooksniff-timestamp"),
                     ]))
                     .allow_credentials(true)
+                    .expose_headers([
+                        axum::http::header::HeaderName::from_static("x-trace-id"),
+                        axum::http::header::HeaderName::from_static("x-request-id"),
+                        axum::http::header::ETAG,
+                    ])
             } else if origins.is_empty() {
                 // Development — allow localhost only
                 let dev_origins: Vec<axum::http::HeaderValue> = [
@@ -311,6 +316,11 @@ async fn main() -> Result<()> {
                         axum::http::header::HeaderName::from_static("x-hooksniff-timestamp"),
                     ]))
                     .allow_credentials(true)
+                    .expose_headers([
+                        axum::http::header::HeaderName::from_static("x-trace-id"),
+                        axum::http::header::HeaderName::from_static("x-request-id"),
+                        axum::http::header::ETAG,
+                    ])
             } else {
                 CorsLayer::new()
                     .allow_origin(AllowOrigin::list(origins))
@@ -334,6 +344,11 @@ async fn main() -> Result<()> {
                         axum::http::header::HeaderName::from_static("x-hooksniff-timestamp"),
                     ]))
                     .allow_credentials(true)
+                    .expose_headers([
+                        axum::http::header::HeaderName::from_static("x-trace-id"),
+                        axum::http::header::HeaderName::from_static("x-request-id"),
+                        axum::http::header::ETAG,
+                    ])
             }
         })
         .layer(TraceLayer::new_for_http())
