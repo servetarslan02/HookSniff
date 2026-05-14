@@ -895,3 +895,10 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **2FA** — sağlam ✅ (bu oturumda `/auth/2fa/status` eklenmişti)
 - **Profile/Password/DangerZone** — API çağırmıyor, component-level ✅
 - **Commit:** `466ae4f0` — main branch, push ✅
+
+## Oturum 159 Ek 9 — Admin System Düzeltmesi (2026-05-15 04:09 - 04:12 GMT+8)
+- **Admin System Health** — response format uyumsuzluğu:
+  - Backend `{ status, checks: { database, queue, ... } }` nested döndürüyordu
+  - Frontend `health.database`, `health.redis`, `health.api`, `health.queue` top-level'dan okuyordu → hepsi "checking" görünüyordu
+  - SystemHealth interface güncellendi, component data `checks.*`'dan okuyor (fallback ile)
+- **Commit:** `8284a76d` — main branch, push ✅
