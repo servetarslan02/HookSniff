@@ -3207,6 +3207,7 @@
     "created": "Service token created!",
     "deleted": "Service token deleted",
     "noTokens": "No service tokens yet. Create one to get started.",
+    "tokenNotAvailable": "Token is only shown once at creation. Create a new token if needed.",
     "reveal": "Reveal token",
     "hide": "Hide token",
     "deleteTitle": "Delete Service Token",
