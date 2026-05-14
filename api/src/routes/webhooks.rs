@@ -158,7 +158,7 @@ async fn create_webhook(
 
     // Verify endpoint exists and belongs to customer
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
     )
     .bind(req.endpoint_id)
     .bind(customer.id)
@@ -349,7 +349,7 @@ async fn batch_webhooks(
         .collect();
 
     let endpoints: Vec<Endpoint> = sqlx::query_as::<_, Endpoint>(
-        "SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = ANY($1) AND customer_id = $2 AND is_active = true",
+        "SELECT * FROM endpoints WHERE id = ANY($1) AND customer_id = $2 AND is_active = true",
     )
     .bind(&endpoint_ids)
     .bind(customer.id)
@@ -498,7 +498,7 @@ async fn replay_webhook(
     .ok_or(AppError::NotFound)?;
 
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
     )
     .bind(original.endpoint_id)
     .bind(customer.id)
@@ -637,7 +637,7 @@ async fn batch_replay(
 
         // Get endpoint
         let endpoint = sqlx::query_as::<_, Endpoint>(
-            "SELECT id, customer_id, url, description, events, is_active, secret, failure_streak, created_at, updated_at, avg_response_ms, last_failure_at FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+            "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
         )
         .bind(original.endpoint_id)
         .bind(customer.id)
