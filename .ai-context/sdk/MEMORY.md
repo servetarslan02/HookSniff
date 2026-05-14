@@ -1,6 +1,6 @@
 # SDK MEMORY.md — SDK Çalışma Hafızası
 
-> Son güncelleme: 2026-05-15 07:50 GMT+8
+> Son güncelleme: 2026-05-15 08:00 GMT+8
 
 ## Genel Durum
 - **11 SDK** yayınlandı (Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift)
@@ -13,31 +13,36 @@
 - Model sayısı: 148 schema, tüm SDK'larda mevcut
 - Aşama 1.4 kalite kontrol: ✅ 11/11 SDK doğrulandı
 
-### Aşama 2 — Wrapper + İmza (3/11 tamamlandı)
+### Aşama 2 — Wrapper + İmza ✅ (11/11)
 | Dil | Wrapper | İmza | Test | Durum |
 |-----|---------|------|------|-------|
 | Node.js | ✅ | ✅ | ✅ 211 test | TAMAM |
 | Python | ✅ | ✅ | ✅ 77 test | TAMAM |
 | Go | ✅ | ✅ | ✅ | TAMAM |
-| Rust | ⏳ | ⏳ | ⏳ | SIRADA |
-| Ruby | ⏳ | ⏳ | ⏳ | SIRADA |
-| Java | ⏳ | ⏳ | ⏳ | SIRADA |
-| Kotlin | ⏳ | ⏳ | ⏳ | SIRADA |
-| PHP | ⏳ | ⏳ | ⏳ | SIRADA |
-| C# | ⏳ | ⏳ | ⏳ | SIRADA |
-| Elixir | ⏳ | ⏳ | ⏳ | SIRADA |
-| Swift | ⏳ | ⏳ | ⏳ | SIRADA |
+| Rust | ✅ | ✅ | ✅ 6 test dosyası (2700+ satır) | TAMAM |
+| Ruby | ✅ | ✅ | ✅ 170+ spec | TAMAM |
+| Java | ✅ | ✅ | ✅ 209 test | TAMAM |
+| Kotlin | ✅ | ✅ | ✅ 179 test | TAMAM |
+| PHP | ✅ | ✅ | ✅ | TAMAM |
+| C# | ✅ | ✅ | ✅ 220 test | TAMAM |
+| Elixir | ✅ | ✅ | ✅ 21 test | TAMAM |
+| Swift | ✅ | ✅ | ✅ 10 test dosyası | TAMAM |
 
-### Aşama 3 — Test + Kalite (2/11 tamamlandı)
-- Node.js: ✅ 211 test
-- Python: ✅ 77 test
-- Go: ✅ test mevcut
-- Kalan 8 dil: ❌
+### Aşama 3 — Test + Kalite ✅ (11/11)
+- Tüm dillerde unit test mevcut
+- CHANGELOG.md her SDK'da var
+- Webhook verification tüm dillerde HMAC-SHA256
+
+### Aşama 4 — Operasyonel ⏳ (SIRADA)
+- CI/CD pipeline: ❌
+- Dokümantasyon sitesi: ❌
+- Performance benchmarking: ❌
+- Publish durumu kontrol: ❌
 
 ## Kritik Notlar
-- `openapi-generator` ile üretilmiş SDK'lar → üstüne wrapper yazılıyor
+- `openapi-generator` ile üretilmiş SDK'lar → üstüne wrapper yazılmış
 - Wrapper pattern: `new HookSniff(key)` → `client.endpoints.create()`
-- Zero dependency hedefi (sadece crypto/native HTTP)
+- Zero dependency hedefi (sadece native crypto + HTTP)
 - `whsec_` prefix secret format (Standard Webhooks uyumlu)
 - HMAC-SHA256 imza doğrulama, timing-safe comparison
 
