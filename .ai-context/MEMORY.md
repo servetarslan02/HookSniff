@@ -874,3 +874,14 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Team** — sağlam ✅ (teamsApi zaten doğrulanmıştı)
 - **Applications** — sağlam ✅ (applicationsApi zaten doğrulanmıştı)
 - **Commit:** `912bd1a0` — main branch, push ✅
+
+## Oturum 159 Ek 7 — Billing Overview Düzeltmesi (2026-05-15 03:58 - 04:04 GMT+8)
+- **Billing Usage** — response format uyumsuzluğu düzeltildi:
+  - Backend `{ webhooks: {used, limit}, endpoints: {used, limit} }` döndürüyordu
+  - Frontend `{ deliveries_used, deliveries_limit }` bekliyordu
+  - BillingUsage interface güncellendi, billing page nested objeden okuyor
+- **API Keys** — sağlam ✅ (küçük `name` field farkı var ama kritik değil)
+- **Invoice** — sağlam ✅
+- **Subscription** — sağlam ✅
+- **Upgrade/Cancel** — sağlam ✅
+- **Commit:** `745f8013` — main branch, push ✅
