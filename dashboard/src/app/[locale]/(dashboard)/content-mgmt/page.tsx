@@ -15,10 +15,10 @@ export default function ContentMgmtPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'transforms', label: t('transforms', { defaultValue: 'Transforms' }), icon: '🔄', content: <TransformsPage /> },
-        { key: 'inbound', label: t('inbound', { defaultValue: 'Inbound' }), icon: '📨', content: <InboundPage /> },
         { key: 'schemas', label: t('schemas', { defaultValue: 'Schemas' }), icon: '📐', content: <SchemasPage /> },
         { key: 'templates', label: t('templates', { defaultValue: 'Templates' }), icon: '📄', content: <TemplatesPage /> },
+        { key: 'inbound', label: t('inbound', { defaultValue: 'Inbound' }), icon: '📨', content: <InboundPage /> },
+        { key: 'transforms', label: t('transforms', { defaultValue: 'Transforms' }), icon: '🔄', content: <TransformsPage /> },
       ]}
     />
   );
