@@ -151,20 +151,6 @@ impl Delivery {
     }
 }
 
-impl DeliveryAttempt {
-    pub fn to_response(self) -> DeliveryAttemptResponse {
-        DeliveryAttemptResponse {
-            id: self.id,
-            attempt_number: self.attempt_number,
-            status_code: self.status_code,
-            response_body: self.response_body,
-            duration_ms: self.duration_ms,
-            error_message: self.error_message,
-            created_at: self.created_at,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -455,9 +441,12 @@ mod tests {
     fn test_delivery_attempt_response_serialization() {
         let resp = DeliveryAttemptResponse {
             id: Uuid::new_v4(),
+            delivery_id: Uuid::new_v4(),
             attempt_number: 1,
+            status: "failed".to_string(),
             status_code: Some(200),
             response_body: None,
+            response_headers: None,
             duration_ms: None,
             error_message: None,
             created_at: Utc::now(),

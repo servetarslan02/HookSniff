@@ -237,7 +237,9 @@ mod tests {
     fn test_rate_limit_config_response_serialization() {
         let resp = RateLimitConfigResponse {
             endpoint_id: Uuid::new_v4(),
+            endpoint_url: "https://example.com/webhook".to_string(),
             requests_per_second: 50,
+            requests_per_minute: 3000,
             burst_size: 100,
             enabled: true,
             created_at: Utc::now(),

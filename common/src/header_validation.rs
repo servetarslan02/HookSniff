@@ -4,7 +4,7 @@
 /// `!#$%&'*+-.^_` ` ` |~`. No whitespace, colons, or control chars.
 ///
 /// Shared between api and worker to avoid duplication (Item 343).
-
+///
 /// Validate HTTP header name per RFC 7230 token rules.
 /// Returns Ok(()) if valid, Err with message if invalid.
 pub fn validate_header_name(name: &str) -> Result<(), String> {
