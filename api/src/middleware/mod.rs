@@ -740,6 +740,158 @@ mod tests {
         let cloned = key;
         assert!(cloned.0);
     }
+
+    // ── request_timeout_middleware ─────────────────────────────
+
+    #[tokio::test]
+    async fn test_timeout_middleware_fast_response() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use axum::middleware;
+        use axum::routing::get;
+        use axum::Router;
+        use tower::ServiceExt;
+
+        let app = Router::new()
+            .route("/fast", get(|| async { "ok" }))
+            .layer(middleware::from_fn(request_timeout_middleware));
+
+        let request = Request::builder().uri("/fast").body(Body::empty()).unwrap();
+        let response = app.oneshot(request).await.unwrap();
+        assert_eq!(response.status(), axum::http::StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_timeout_middleware_slow_response() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use axum::middleware;
+        use axum::routing::get;
+        use axum::Router;
+        use tower::ServiceExt;
+
+        // Temporarily set a very short timeout
+        std::env::set_var("REQUEST_TIMEOUT_SECS", "1");
+
+        let app = Router::new()
+            .route(
+                "/slow",
+                get(|| async {
+                    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                    "too late"
+                }),
+            )
+            .layer(middleware::from_fn(request_timeout_middleware));
+
+        let request = Request::builder().uri("/slow").body(Body::empty()).unwrap();
+        let response = app.oneshot(request).await.unwrap();
+        assert_eq!(response.status(), axum::http::StatusCode::REQUEST_TIMEOUT);
+
+        // Reset
+        std::env::remove_var("REQUEST_TIMEOUT_SECS");
+    }
+
+    // ── security_headers_middleware ────────────────────────────
+
+    #[tokio::test]
+    async fn test_security_headers_present() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use axum::middleware;
+        use axum::routing::get;
+        use axum::Router;
+        use tower::ServiceExt;
+
+        let app = Router::new()
+            .route("/test", get(|| async { "ok" }))
+            .layer(middleware::from_fn(security_headers_middleware));
+
+        let request = Request::builder().uri("/test").body(Body::empty()).unwrap();
+        let response = app.oneshot(request).await.unwrap();
+        let headers = response.headers();
+
+        assert_eq!(headers.get("x-content-type-options").unwrap(), "nosniff");
+        assert_eq!(headers.get("x-frame-options").unwrap(), "DENY");
+        assert!(headers.get("strict-transport-security").is_some());
+        assert!(headers.get("referrer-policy").is_some());
+        assert!(headers.get("vary").is_some());
+    }
+
+    #[tokio::test]
+    async fn test_cache_control_health_endpoint() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use axum::middleware;
+        use axum::routing::get;
+        use axum::Router;
+        use tower::ServiceExt;
+
+        let app = Router::new()
+            .route("/health", get(|| async { "ok" }))
+            .layer(middleware::from_fn(security_headers_middleware));
+
+        let request = Request::builder().uri("/health").body(Body::empty()).unwrap();
+        let response = app.oneshot(request).await.unwrap();
+        let cache = response.headers().get("cache-control").unwrap().to_str().unwrap();
+        assert!(cache.contains("public"));
+        assert!(cache.contains("max-age=10"));
+    }
+
+    #[tokio::test]
+    async fn test_cache_control_auth_endpoint() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use axum::middleware;
+        use axum::routing::get;
+        use axum::Router;
+        use tower::ServiceExt;
+
+        let app = Router::new()
+            .route("/v1/auth/login", get(|| async { "ok" }))
+            .layer(middleware::from_fn(security_headers_middleware));
+
+        let request = Request::builder().uri("/v1/auth/login").body(Body::empty()).unwrap();
+        let response = app.oneshot(request).await.unwrap();
+        let cache = response.headers().get("cache-control").unwrap().to_str().unwrap();
+        assert!(cache.contains("no-store"));
+        assert!(response.headers().get("pragma").is_some());
+    }
+}
+
+/// Request timeout middleware — aborts requests that take too long.
+///
+/// Cloud Run has a 30s request timeout. We use 25s to return a proper
+/// JSON error before the infrastructure kills the connection.
+///
+/// Only applies to request processing time, not response streaming.
+pub async fn request_timeout_middleware(request: Request, next: Next) -> Response {
+    let timeout_secs = std::env::var("REQUEST_TIMEOUT_SECS")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+        .unwrap_or(25);
+
+    match tokio::time::timeout(
+        std::time::Duration::from_secs(timeout_secs),
+        next.run(request),
+    )
+    .await
+    {
+        Ok(response) => response,
+        Err(_) => {
+            tracing::warn!("Request timed out after {timeout_secs}s");
+            use axum::response::IntoResponse;
+            let body = serde_json::json!({
+                "error": "request_timeout",
+                "message": format!("Request timed out after {timeout_secs} seconds")
+            });
+            (
+                axum::http::StatusCode::REQUEST_TIMEOUT,
+                [("content-type", "application/json")],
+                axum::body::Body::from(serde_json::to_string(&body).unwrap_or_default()),
+            )
+                .into_response()
+        }
+    }
 }
 
 /// Add standard security headers to all API responses.
