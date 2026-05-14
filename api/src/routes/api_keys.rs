@@ -19,6 +19,7 @@ pub fn router() -> Router {
 #[derive(Serialize)]
 struct ApiKeyInfo {
     id: Uuid,
+    name: Option<String>,
     prefix: String,
     created_at: String,
     last_used_at: Option<String>,
@@ -37,8 +38,8 @@ async fn list_api_keys(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<ApiKeyInfo>>, AppError> {
-    let keys = sqlx::query_as::<_, (Uuid, String, bool, chrono::DateTime<chrono::Utc>, Option<chrono::DateTime<chrono::Utc>>)>(
-        "SELECT id, api_key_prefix, is_active, created_at, last_used_at FROM api_keys WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100"
+    let keys = sqlx::query_as::<_, (Uuid, Option<String>, String, bool, chrono::DateTime<chrono::Utc>, Option<chrono::DateTime<chrono::Utc>>)>(
+        "SELECT id, name, api_key_prefix, is_active, created_at, last_used_at FROM api_keys WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100"
     )
     .bind(customer.id)
     .fetch_all(&pool)
@@ -47,8 +48,9 @@ async fn list_api_keys(
     Ok(Json(
         keys.into_iter()
             .map(
-                |(id, prefix, is_active, created_at, last_used)| ApiKeyInfo {
+                |(id, name, prefix, is_active, created_at, last_used)| ApiKeyInfo {
                     id,
+                    name,
                     prefix: format!("{}...", &prefix),
                     created_at: created_at.to_rfc3339(),
                     last_used_at: last_used.map(|t| t.to_rfc3339()),
