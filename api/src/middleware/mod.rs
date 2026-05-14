@@ -753,6 +753,9 @@ pub async fn security_headers_middleware(request: Request, next: Next) -> Respon
     let path = request.uri().path().to_string();
     let method = request.method().clone();
     let mut response = next.run(request).await;
+
+    // All header mutations in a scoped block to release borrow before ETag
+    {
     let headers = response.headers_mut();
 
     // Security headers
@@ -806,30 +809,31 @@ pub async fn security_headers_middleware(request: Request, next: Next) -> Respon
             "no-store, no-cache, must-revalidate".parse().unwrap(),
         );
     }
+    } // end scoped headers borrow
 
     // ETag support for GET requests (conditional requests → 304 Not Modified)
     // Only for cacheable endpoints, skip for auth and mutation methods
-    if method == axum::http::Method::GET
+    let should_etag = method == axum::http::Method::GET
         && (path.starts_with("/health")
             || path.starts_with("/v1/status")
             || path.starts_with("/v1/docs")
             || path.starts_with("/v1/outbound-ips"))
-    {
-        // If response already has an ETag, leave it
-        if !headers.contains_key("etag") {
-            // Generate weak ETag from response body SHA-256 (first 16 hex chars)
-            use sha2::{Sha256, Digest};
-            let body = axum::body::to_bytes(response.body_mut(), usize::MAX)
-                .await
-                .unwrap_or_default();
-            let mut hasher = Sha256::new();
-            hasher.update(&body);
-            let hash = format!("W/\"{}\"", &hex::encode(hasher.finalize())[..16]);
-            headers.insert("etag", hash.parse().unwrap());
+        && !response.headers().contains_key("etag");
 
-            // Reconstruct response with the original body
-            *response.body_mut() = axum::body::Body::from(body);
-        }
+    if should_etag {
+        use sha2::{Sha256, Digest};
+        // Take ownership of the body, replace with empty
+        let original_body = std::mem::replace(response.body_mut(), axum::body::Body::empty());
+        let body = axum::body::to_bytes(original_body, usize::MAX)
+            .await
+            .unwrap_or_default();
+        let mut hasher = Sha256::new();
+        hasher.update(&body);
+        let hash = format!("W/\"{}\"", &hex::encode(hasher.finalize())[..16]);
+        response.headers_mut().insert("etag", hash.parse().unwrap());
+
+        // Restore the body
+        *response.body_mut() = axum::body::Body::from(body);
     }
 
     response
