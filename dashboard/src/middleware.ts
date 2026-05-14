@@ -9,36 +9,47 @@ const LOCALE_REGEX = new RegExp(`^/(${routing.locales.join('|')})(/|$)`);
 
 // Route consolidation map: old individual routes → new consolidated routes
 const ROUTE_REDIRECTS: Record<string, string> = {
+  // Core section
   '/endpoints': '/core',
-  '/deliveries': '/core',
-  '/search': '/core',
-  '/logs': '/observability',
-  '/health': '/observability',
-  '/alerts': '/observability',
-  '/analytics': '/observability',
-  '/playground': '/devtools',
-  '/signature-verifier': '/devtools',
-  '/api-importer': '/devtools',
-  '/webhook-builder': '/devtools',
+  '/applications': '/core',
+  '/api-keys': '/core',
+  // Deliveries section
+  '/logs': '/deliveries',
+  '/search': '/deliveries',
+  // Content section
   '/transforms': '/content-mgmt',
   '/inbound': '/content-mgmt',
   '/schemas': '/content-mgmt',
   '/templates': '/content-mgmt',
-  '/portal-customize': '/portal-section',
-  '/portal-manage': '/portal-section',
+  // DevTools section
+  '/playground': '/devtools',
+  '/signature-verifier': '/devtools',
+  '/api-importer': '/devtools',
+  '/webhook-builder': '/devtools',
+  '/service-tokens': '/devtools',
+  // Observability section
+  '/health': '/observability',
+  '/alerts': '/observability',
+  '/analytics': '/observability',
+  // Security section
   '/rate-limiting': '/security-section',
   '/audit-log': '/security-section',
   '/sso': '/security-section',
+  // Routing section
   '/retry-policy': '/routing-config',
   '/routing': '/routing-config',
   '/custom-domain': '/routing-config',
-  '/team': '/team-mgmt',
-  '/notifications': '/team-mgmt',
-  '/applications': '/team-mgmt',
-  '/api-keys': '/billing-overview',
-  '/billing': '/billing-overview',
-  '/settings': '/settings-section',
-  '/service-tokens': '/settings-section',
+  // Account section
+  '/team': '/account',
+  '/notifications': '/account',
+  '/billing': '/account',
+  '/settings': '/account',
+  '/portal-customize': '/account',
+  '/portal-manage': '/account',
+  '/portal-section': '/account',
+  '/team-mgmt': '/account',
+  '/billing-overview': '/account',
+  '/settings-section': '/account',
 };
 
 export default function middleware(request: NextRequest) {

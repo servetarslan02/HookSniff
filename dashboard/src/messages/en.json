@@ -182,7 +182,9 @@
     "billingOverview": "Billing",
     "settingsSection": "Settings",
     "sectionMonitoring": "Monitoring",
-    "observability": "Observability"
+    "observability": "Observability",
+    "sectionContent": "Content",
+    "account": "Account"
   },
   "dashboard": {
     "title": "Dashboard",
