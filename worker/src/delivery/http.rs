@@ -95,7 +95,7 @@ pub async fn deliver_http(
     let duration_ms = start.elapsed().as_millis() as i32;
 
     match result {
-        Ok(response) => {
+        Ok(mut response) => {
             let status_code = response.status().as_u16() as i32;
             let resp_headers: serde_json::Value = serde_json::json!(response
                 .headers()
