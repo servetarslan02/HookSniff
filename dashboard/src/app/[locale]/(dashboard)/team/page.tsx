@@ -58,16 +58,26 @@ export default function TeamPage() {
 
   const handleCreate = async (name: string) => {
     if (!token) return;
-    await teamsApi.create(token, { name });
-    toast(t('teamCreated'), 'success');
-    fetchTeams();
+    try {
+      await teamsApi.create(token, { name });
+      toast(t('teamCreated'), 'success');
+      fetchTeams();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : t('failedToCreateTeam');
+      toast(msg, 'error');
+    }
   };
 
   const handleInvite = async (email: string, role: string) => {
     if (!token || !selectedTeam) return;
-    await teamsApi.inviteMember(token, selectedTeam.id, { email, role });
-    toast(t('invitationSent'), 'success');
-    fetchMembers(selectedTeam.id);
+    try {
+      await teamsApi.inviteMember(token, selectedTeam.id, { email, role });
+      toast(t('invitationSent'), 'success');
+      fetchMembers(selectedTeam.id);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : t('failedToInvite');
+      toast(msg, 'error');
+    }
   };
 
   const confirmRemoveMember = async () => {
@@ -76,15 +86,16 @@ export default function TeamPage() {
       await teamsApi.removeMember(token, selectedTeam.id, removeTarget);
       toast(t('memberRemoved'), 'success');
       fetchMembers(selectedTeam.id);
-    } catch {
-      toast(t('removeFailed'), 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : t('removeFailed');
+      toast(msg, 'error');
     }
     setRemoveTarget(null);
   };
 
   const handleRoleChange = async (memberId: string, newRole: string) => {
     if (!token || !selectedTeam) return;
-    if (memberId === user?.id && newRole !== 'owner') {
+    if (memberId === user?.id && newRole !== 'admin') {
       toast(t('cannotDemoteSelf'), 'error');
       return;
     }
@@ -92,8 +103,9 @@ export default function TeamPage() {
       await teamsApi.updateRole(token, selectedTeam.id, memberId, newRole);
       toast(t('roleUpdated'), 'success');
       fetchMembers(selectedTeam.id);
-    } catch {
-      toast(t("failedToUpdateRole"), "error");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : t('failedToUpdateRole');
+      toast(msg, 'error');
     }
   };
 
