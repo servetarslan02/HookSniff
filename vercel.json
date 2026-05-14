@@ -1,8 +1,8 @@
 {
-  "buildCommand": "cd dashboard && npm ci && npm run build && node -e \"const fs=require('fs');const p='.next/server/app/[locale]/(dashboard)/page_client-reference-manifest.js';if(!fs.existsSync(p)){console.log('Creating missing manifest:',p);fs.mkdirSync(require('path').dirname(p),{recursive:true});fs.writeFileSync(p,'module.exports={id:{},name:{},chunks:{}}');}\"",
-  "outputDirectory": "dashboard/.next",
+  "buildCommand": "npm ci && npm run build && node -e \"const fs=require('fs');const p='.next/server/app/[locale]/(dashboard)/page_client-reference-manifest.js';if(!fs.existsSync(p)){console.log('Creating missing manifest:',p);fs.mkdirSync(require('path').dirname(p),{recursive:true});fs.writeFileSync(p,'module.exports={id:{},name:{},chunks:{}}');}\"",
+  "outputDirectory": ".next",
   "framework": "nextjs",
-  "installCommand": "cd dashboard && npm install",
+  "installCommand": "npm ci",
   "rewrites": [
     { "source": "/api/health", "destination": "https://hooksniff-api-1046140057667.europe-west1.run.app/health" },
     { "source": "/api/playground/:path*", "destination": "/api/playground/:path*" },
