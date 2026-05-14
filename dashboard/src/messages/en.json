@@ -596,7 +596,11 @@
     "cookieAnalyticsDesc": "Allow us to collect anonymous usage data to improve our service.",
     "marketingEmails": "Marketing Emails",
     "marketingEmailsDesc": "Receive product updates, tips, and promotional offers.",
-    "consentWithdrawNote": "You can withdraw your consent at any time by toggling these settings off. Changes take effect immediately."
+    "consentWithdrawNote": "You can withdraw your consent at any time by toggling these settings off. Changes take effect immediately.",
+    "twoFactorAuth": "Two-Factor Authentication",
+    "twoFactorDesc": "Add an extra layer of security to your account with TOTP-based 2FA.",
+    "2faDisabled": "2FA is currently disabled",
+    "enable2fa": "Enable 2FA"
   },
   "billing": {
     "title": "Billing",
@@ -656,7 +660,10 @@
     "invalidCheckoutUrl": "Invalid checkout URL",
     "contactSales": "Contact Sales",
     "customPricing": "Custom",
-    "mostPopular": "Most Popular"
+    "mostPopular": "Most Popular",
+    "nextBilling": "Next billing date",
+    "webhooksThisMonth": "Webhooks this month",
+    "used": "used"
   },
   "auth": {
     "login": "Log In",
@@ -687,7 +694,8 @@
     "consentRequired": "You must agree to the Terms of Service and Privacy Policy",
     "passwordWeak": "Weak",
     "passwordMedium": "Medium",
-    "passwordStrong": "Strong"
+    "passwordStrong": "Strong",
+    "verifyEmailSent": "Verification email sent! Please check your inbox."
   },
   "docs": {
     "gettingStarted": "Getting Started",
@@ -925,7 +933,12 @@
     "rubySdk": "Ruby SDK",
     "phpSdk": "PHP SDK",
     "elixirSdk": "Elixir SDK",
-    "csharpSdk": "C# SDK"
+    "csharpSdk": "C# SDK",
+    "docs": "Documentation",
+    "developer": "Developer",
+    "startup": "Startup",
+    "enterprise": "Enterprise",
+    "unlimited": "Unlimited"
   },
   "status": {
     "title": "HookSniff Status",
