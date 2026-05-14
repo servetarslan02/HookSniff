@@ -858,6 +858,49 @@ mod tests {
     }
 }
 
+/// Request metrics middleware — records latency, status code, and method for every request.
+///
+/// Feeds into the global Metrics counters and logs slow requests (>5s).
+pub async fn request_metrics_middleware(request: Request, next: Next) -> Response {
+    let method = request.method().clone();
+    let path = request.uri().path().to_string();
+    let start = std::time::Instant::now();
+
+    let response = next.run(request).await;
+
+    let duration = start.elapsed();
+    let status = response.status().as_u16();
+
+    // Record API request in global metrics
+    if let Some(m) = crate::telemetry::metrics() {
+        m.record_api_request();
+    }
+
+    // Log slow requests
+    if duration.as_secs() >= 5 {
+        tracing::warn!(
+            method = %method,
+            path = %path,
+            status = status,
+            duration_ms = duration.as_millis(),
+            "⚠️ Slow request"
+        );
+    }
+
+    // Log 5xx errors at error level
+    if status >= 500 {
+        tracing::error!(
+            method = %method,
+            path = %path,
+            status = status,
+            duration_ms = duration.as_millis(),
+            "Server error"
+        );
+    }
+
+    response
+}
+
 /// Request timeout middleware — aborts requests that take too long.
 ///
 /// Cloud Run has a 30s request timeout. We use 25s to return a proper
