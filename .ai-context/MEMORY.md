@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-14 03:20 GMT+8
+> Son güncelleme: 2026-05-15 03:10 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -14,6 +14,54 @@
 - Türkiye, teknik bilgi yok, ilk proje
 - Hedef: $500/ay gelir, sonra şirket kur
 - Dil: Türkçe
+
+## Kritik Dersler — Vercel Deploy (2026-05-15)
+
+### 1. Vercel Root Directory Ayarı
+- **Vercel Project Settings → Build and Deployment → Root Directory = `dashboard`**
+- Bu yüzden build ortamı zaten `dashboard/` içinde başlıyor
+- `vercel.json`'daki tüm yollar `dashboard/`'a göre olmalı, kök dizine göre DEĞİL
+- ❌ `"buildCommand": "cd dashboard && npm run build"` → HATA (`cd: dashboard: No such file or directory`)
+- ✅ `"buildCommand": "npm run build"` → doğru (zaten dashboard içinde)
+
+### 2. vercel.json vs Vercel Project Settings
+- Vercel Project Settings (dashboard UI) → varsayılan ayarlar
+- `vercel.json` → bunları OVERRIDE eder
+- Eğer `vercel.json`'da tanımlıysa, Project Settings'i bypass eder
+- **Kural:** vercel.json ile Project Settings uyumlu olmalı
+
+### 3. Doğru vercel.json (Root Directory = dashboard)
+```json
+{
+  "buildCommand": "npm ci && npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm ci",
+  "framework": "nextjs"
+}
+```
+- `outputDirectory`: `.next` (NOT `dashboard/.next` — çünkü zaten dashboard içindeyiz)
+- `installCommand`: `npm ci` (npm install değil — daha güvenilir)
+- `buildCommand`: `cd dashboard` YOK
+
+### 4. Deploy Tetikleme Yöntemleri
+- **GitHub Integration** → push → otomatik deploy (EN GÜVENİLİR)
+- **Deploy Hook** → `curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_.../hook_..."` → ama günlük limit var
+- **Manual Redeploy** → Vercel dashboard → Deployments → ... → Redeploy
+- **GitHub Actions** → `vercel-deploy.yml` workflow'u (ama GitHub Actions dakika limiti var)
+
+### 5. GitHub Actions Limiti
+- Private repo = ücretsiz 2,000 dk/ay
+- Tüm workflow'lar 0 step ile failure oluyorsa → dakika limiti dolmuş
+- Çözüm: repo'yu public yap veya plan yükselt
+
+### 6. Vercel Deploy Limiti
+- Hobby plan = 100 deploy/gün
+- "Resource is limited - try again in 24 hours" → limit aşılmış
+- Deploy hook PENDING dönüyor ama deploy oluşmuyor
+
+### 7. Vercel Login (Google 2FA)
+- Servet'in Google hesabı 2FA gerektiriyor → telefona bildirim gidiyor
+- Vercel dashboard'a erişim gerektiğinde Servet'ten onay iste
 
 ## Çalışma Kuralları
 - Oturumlar 1 saat, yetişmeyebilir
