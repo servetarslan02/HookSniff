@@ -130,7 +130,7 @@ export default function QuickstartPage() {
       <section className="mb-10">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. Verify Signatures</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-3">
-          Every webhook includes an HMAC-SHA256 signature in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">X-HookSniff-Signature</code> header. Always verify it:
+          Every webhook includes an HMAC-SHA256 signature in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">webhook-signature</code> header. Always verify it:
         </p>
         <CodeBlock
           code={`import hmac, hashlib

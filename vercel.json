@@ -9,6 +9,21 @@
     { "source": "/api/newsletter", "destination": "/api/newsletter" },
     { "source": "/api/status", "destination": "/api/status" },
     { "source": "/api/:path*", "destination": "https://hooksniff-api-1046140057667.europe-west1.run.app/v1/:path*" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    },
+    {
+      "source": "/.env",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" }
+      ]
+    }
   ]
 }
 
