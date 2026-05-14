@@ -371,6 +371,7 @@ pub async fn health_check(
     } else {
         json!({ "status": "healthy", "latency_ms": 0, "note": "not configured" })
     };
+    checks.insert("redis".to_string(), redis_status.clone());
 
     // Queue summary for top-level
     let queue_pending = checks.get("queue").and_then(|v| v.get("pending_count")).and_then(|v| v.as_i64()).unwrap_or(0);
