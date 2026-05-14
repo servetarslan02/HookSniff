@@ -1,0 +1,243 @@
+name: SDK Publish
+
+on:
+  push:
+    tags:
+      - 'sdk-v*'
+  workflow_dispatch:
+    inputs:
+      language:
+        description: 'SDK to publish (node, python, go, rust, ruby, java, kotlin, php, csharp, elixir, swift, all)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - node
+          - python
+          - go
+          - rust
+          - ruby
+          - java
+          - kotlin
+          - php
+          - csharp
+          - elixir
+          - swift
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sdk-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # --- Determine which SDKs to publish ---
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            LANG="${{ github.event.inputs.language }}"
+            if [ "$LANG" = "all" ]; then
+              echo 'matrix={"sdk":["node","python","go","rust","ruby","java","kotlin","php","csharp","elixir","swift"]}' >> $GITHUB_OUTPUT
+            else
+              echo "matrix={\"sdk\":[\"$LANG\"]}" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo 'matrix={"sdk":["node","python","go","rust","ruby","java","kotlin","php","csharp","elixir","swift"]}' >> $GITHUB_OUTPUT
+          fi
+
+  # --- Node.js (npm) ---
+  publish-node:
+    needs: prepare
+    if: contains(fromJSON(needs.prepare.outputs.matrix).sdk, 'node')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/node
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm test
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # --- Python (PyPI) ---
+  publish-python:
+    needs: prepare
+    if: contains(fromJSON(needs.prepare.outputs.matrix).sdk, 'python')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install build twine
+      - run: python -m build
+      - run: python -m twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+  # --- Rust (crates.io) ---
+  publish-rust:
+    needs: prepare
+    if: contains(fromJSON(needs.prepare.outputs.matrix).sdk, 'rust')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test
+      - run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_TOKEN }}
+
+  # --- Ruby (RubyGems) ---
+  publish-ruby:
+    needs: prepare
+    if: contains(fromJSON(needs.prepare.outputs.matrix).sdk, 'ruby')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/ruby
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - run: bundle exec rspec
+      - run: gem build hooksniff.gemspec
+      - run: gem push hooksniff-*.gem
+        env:
+          GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_TOKEN }}
+
+  # --- Java (Maven Central) ---
+  publish-java:
+    needs: prepare
+    if: contains(fromJSON(needs.prepare.outputs.matrix).sdk, 'java')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/java
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - run: mvn test -B
+      - run: mvn deploy -B -DskipTests
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+  # --- Kotlin (Maven Central) ---
+  publish-kotlin:
+    needs: prepare
+    if: contains(fromJSON(needs.prepare.outputs.matrix).sdk, 'kotlin')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/kotlin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v3
+      - run: gradle test
+      - run: gradle publish
+        env:
+          ORG_GRADLE_PROJECT_mavenUsername: ${{ secrets.MAVEN_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenPassword: ${{ secrets.MAVEN_PASSWORD }}
+
+  # --- PHP (Packagist) ---
+  publish-php:
+    needs: prepare
+    if: contains(fromJSON(needs.prepare.outputs.matrix).sdk, 'php')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update Packagist
+        run: |
+          curl -X POST "https://packagist.org/api/update-package?username=hooksniff&apiToken=${{ secrets.PACKAGIST_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"repository":{"url":"https://github.com/servetarslan02/HookSniff"}}'
+
+  # --- C# (NuGet) ---
+  publish-csharp:
+    needs: prepare
+    if: contains(fromJSON(needs.prepare.outputs.matrix).sdk, 'csharp')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/csharp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet test --verbosity normal
+      - run: dotnet pack -c Release
+      - run: dotnet nuget push "src/HookSniff/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+
+  # --- Elixir (Hex.pm) ---
+  publish-elixir:
+    needs: prepare
+    if: contains(fromJSON(needs.prepare.outputs.matrix).sdk, 'elixir')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/elixir
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '27'
+          elixir-version: '1.18'
+      - run: mix deps.get
+      - run: mix test
+      - run: mix hex.publish --yes
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_TOKEN }}
+
+  # --- Swift (Swift Package Index — auto via git tag) ---
+  publish-swift:
+    needs: prepare
+    if: contains(fromJSON(needs.prepare.outputs.matrix).sdk, 'swift')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/swift
+    steps:
+      - uses: actions/checkout@v4
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: '5.10'
+      - run: swift test
+      - name: Tag triggers Swift Package Index update
+        run: echo "Swift Package Index auto-indexes from git tags. No manual publish needed."
