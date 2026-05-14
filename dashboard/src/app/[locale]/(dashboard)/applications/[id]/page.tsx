@@ -31,8 +31,13 @@ export default function ApplicationDetailPage() {
       webhooksApi.list(token, { page: 1 }).catch(() => ({ deliveries: [] })),
     ]).then(([a, e, d]) => {
       if (a) setApp(a);
-      setEndpoints(Array.isArray(e) ? e : []);
-      setDeliveries(d.deliveries || []);
+      // Filter endpoints and deliveries by this application
+      const allEndpoints = Array.isArray(e) ? e : [];
+      const appEndpoints = a ? allEndpoints.filter((ep) => ep.application_id === a.id) : allEndpoints;
+      setEndpoints(appEndpoints);
+      const allDeliveries = d.deliveries || [];
+      const appEndpointIds = new Set(appEndpoints.map((ep) => ep.id));
+      setDeliveries(a ? allDeliveries.filter((del) => appEndpointIds.has(del.endpoint_id)) : allDeliveries);
     }).finally(() => setLoading(false));
   }, [token, appId]);
 
