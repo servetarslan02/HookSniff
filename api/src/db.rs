@@ -1326,6 +1326,17 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
     )
     .await?;
 
+    // Step 53: Migration 052 — endpoints.team_id for organization-scoped access
+    run_migration(
+        pool,
+        "052_endpoints_team_id",
+        r#"
+        ALTER TABLE endpoints ADD COLUMN IF NOT EXISTS team_id UUID REFERENCES teams(id) ON DELETE SET NULL;
+        CREATE INDEX IF NOT EXISTS idx_endpoints_team ON endpoints(team_id) WHERE team_id IS NOT NULL;
+        "#,
+    )
+    .await?;
+
     tracing::info!("✅ All database migrations completed");
     Ok(())
 }
