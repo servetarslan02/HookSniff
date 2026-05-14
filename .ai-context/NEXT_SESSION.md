@@ -1,63 +1,29 @@
-# NEXT_SESSION.md — E2E Test Sonrası
+# NEXT_SESSION.md — Navigation Restructure Sonrası
 
-> Son güncelleme: 2026-05-15 05:25 GMT+8
+> Son güncelleme: 2026-05-15 06:10 GMT+8
 
-## Yapılan (Oturum 161 — E2E Test)
+## Yapılan (Oturum — Navigation Restructure)
 
-### Kapsamlı Müşteri Testi
-- 20+ sayfa tarandı (landing, admin, user panel, API)
-- 17 sayfa çalışıyor, 3 sayfa hatalı
-- 13 i18n eksik key tespit edildi
-- 2 backend 500 hatası bulundu
-- Rapor: `.ai-context/E2E-TEST-REPORT-2026-05-15.md`
+### NAV-RESTRUCTURE-PLAN.md — 8 Adım Tamamlandı ✅
 
-## ✅ Yapılan Düzeltmeler
+1. **layout.tsx** — Sidebar yeniden tanımlandı: 8 section (Core, Deliveries, Content, DevTools, Observability, Security, Routing, Account)
+2. **/core** — Applications + API Keys tab eklendi, Deliveries + Search kaldırıldı
+3. **/deliveries** — Yeni tabbed sayfa: Logs + Deliveries + Search (orijinal DeliveriesList.tsx'e taşındı)
+4. **/observability** — Logs tab kaldırıldı (3 tab kaldı: Health, Alerts, Analytics)
+5. **/account** — Yeni sayfa: Team + Notifications + Billing + Settings + Portal
+6. **middleware.ts** — Tüm route redirect'leri yeni yapısına göre güncellendi
+7. **i18n** — `sectionContent` ve `account` key'leri en.json + tr.json'a eklendi
+8. **Eski dosyalar** — Silinmedi, middleware redirect ile korunuyor
 
-### 1. 2FA 500 Hatası ✅
-- `api/src/routes/auth.rs`: `last_used_at` → `created_at` (kolon tabloda yoktu)
-- Deploy sonrası Cloud Build ile test edilmeli
+### Build Durumu
+- ✅ `npm run build` başarılı (216+ sayfa)
+- ✅ `git push` başarılı (commit c9c12dd5)
 
-### 2. 13 Eksik i18n Key ✅
-- `en.json` ve `tr.json`'a eklendi:
-  - auth.verifyEmailSent
-  - billing.nextBilling, webhooksThisMonth, used
-  - settings.twoFactorAuth, twoFactorDesc, 2faDisabled, enable2fa
-  - docs, developer, startup, enterprise, unlimited
-
-### 3. Fiyat Tutarsızlığı ✅
-- Doğru fiyatlar: Developer $0 / Startup $29 / Pro $49 / Enterprise Custom
-- Backend ile uyumlu (monthly_price_cents: 0/2900/4900/0)
-
-### 4. API Cold Start Fix ✅
-- `cloudbuild.yaml`: API `--min-instances=0` → `--min-instances=1`
-- Sıcak instance her zaman hazır olacak
-- Maliyet: ~$10-15/ay ek Cloud Run maliyeti
-
-### 5. Delivery List Endpoint ✅
-- `/v1/webhooks?per_page=5&page=1` → `{"deliveries": [...], "total": 18}`
-- Frontend doğru parametreleri kullanıyor (`page`, `per_page`, `status`)
-- Test hatası benim yanlış `limit` parametresi kullanmamdandı
-
-### 6. E2E Stres Testi ✅
-- 10 endpoint oluşturuldu
-- 16 webhook gönderildi (16/16 başarılı)
-- 32 paralel istek: 60ms/istek
-- 16 dashboard sayfası: 87ms ort.
-
-### 7. Playground Network Error Fix ✅
-- Sorun: next-intl middleware API route'larını engelliyordu
-- `/api/playground/token`, `/api/status`, `/api/newsletter` → 404
-- Çözüm: middleware.ts'e `/api/` early return eklendi
-
-## 🟡 Sonraki Adımlar
-
-### 4. `/api/status` 404
-- Status API route'u tanımlı değil
-- Ya Next.js API route oluştur ya da backend'den proxy et
-
-### 5. Pending Deliveries (2 adet)
-- 13 Mayıs'tan kalma, 0 attempt
-- Worker neden işlemiyor?
+## Sonraki Adımlar
+- Vercel deploy kontrol edilmeli
+- Eski section sayfaları (team-mgmt, billing-overview, settings-section, portal-section) redirect'ler çalışıyor mu test et
+- Service Tokens → /devtools redirect çalışıyor mu kontrol et
+- Sidebar'daki yeni menü yapısını görsel olarak doğrula
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
