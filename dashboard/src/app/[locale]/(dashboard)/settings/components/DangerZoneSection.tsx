@@ -15,14 +15,15 @@ export function DangerZoneSection() {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
   const [deletingAccount, setDeletingAccount] = useState(false);
 
   const handleDeleteAccount = async () => {
-    if (deleteConfirmText !== 'DELETE') return;
+    if (deleteConfirmText !== 'DELETE' || !deletePassword) return;
     setDeletingAccount(true);
     try {
-      const { api } = await import('@/lib/api');
-      await api.delete('/auth/account', token ?? undefined);
+      const { apiFetch } = await import('@/lib/api');
+      await apiFetch('/auth/account', { method: 'DELETE', body: { password: deletePassword }, token: token ?? undefined });
       logout();
       router.push('/');
     } catch (e: unknown) {
@@ -86,10 +87,20 @@ export function DangerZoneSection() {
               placeholder={t('deletePlaceholder')}
               className="w-full px-4 py-3 border border-red-300 dark:border-red-500/30 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white mb-4 focus:ring-2 focus:ring-red-500 focus:border-transparent"
             />
+            <p className="text-sm text-gray-700 dark:text-slate-300 mb-2">
+              {t('confirmPassword') || 'Enter your password to confirm'}
+            </p>
+            <input
+              type="password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              placeholder={t('passwordPlaceholder') || 'Password'}
+              className="w-full px-4 py-3 border border-red-300 dark:border-red-500/30 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white mb-4 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            />
             <div className="flex gap-3 justify-end">
               <button
                 type="button"
-                onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }}
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); setDeletePassword(''); }}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
               >
                 {tc('cancel')}
@@ -97,7 +108,7 @@ export function DangerZoneSection() {
               <button
                 type="button"
                 onClick={handleDeleteAccount}
-                disabled={deleteConfirmText !== 'DELETE' || deletingAccount}
+                disabled={deleteConfirmText !== 'DELETE' || !deletePassword || deletingAccount}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-40"
               >
                 {deletingAccount ? tc('deleting') : t('permanentlyDelete')}
