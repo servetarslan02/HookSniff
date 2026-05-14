@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { useToast } from '@/components/Toast';
+import { API_BASE } from '@/lib/api';
 
 function VerifyEmailContent() {
   const t = useTranslations('error');
@@ -22,8 +23,7 @@ function VerifyEmailContent() {
       return;
     }
 
-    const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-    fetch(`${API}/auth/verify-email`, {
+    fetch(`${API_BASE}/auth/verify-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
@@ -90,8 +90,7 @@ function VerifyEmailContent() {
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <button
                 onClick={async () => {
-                  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-                  await fetch(`${API}/auth/resend-verification`, { method: 'POST', credentials: 'include' });
+                  await fetch(`${API_BASE}/auth/resend-verification`, { method: 'POST', credentials: 'include' });
                   toast(tv('resendEmail'), 'success');
                 }}
                 className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition"

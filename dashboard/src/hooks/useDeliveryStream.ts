@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { API_BASE } from '@/lib/api';
 
 export interface DeliveryEvent {
   id: string;
@@ -37,7 +38,6 @@ export function useDeliveryStream({ token, enabled = true, onDelivery }: UseDeli
   const connect = useCallback(() => {
     if (!token || !enabled) return;
 
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1' : 'http://localhost:3000/v1');
     const url = `${API_BASE}/stream/deliveries`;
 
     // EventSource doesn't support custom headers, so we use fetch with ReadableStream
