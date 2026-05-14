@@ -49,6 +49,11 @@ tags:
   description: Subscription, usage, invoices, payment webhooks
 - name: Templates
   description: Webhook payload templates
+- name: Service Tokens
+  description: Manage service tokens for API access
+- name: Applications
+  description: Manage applications (group endpoints)
+  description: Webhook payload templates
 - name: Schemas
   description: JSON Schema registry and validation
 - name: Routing
@@ -3118,6 +3123,125 @@ components:
           format: uri
       required:
       - redirect_url
+    InboundConfig:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        customer_id:
+          $ref: '#/components/schemas/Uuid'
+        provider:
+          type: string
+          description: Provider name (stripe, github, shopify, generic)
+        secret:
+          type: string
+          description: Webhook signing secret
+        endpoint_id:
+          type: string
+          format: uuid
+          nullable: true
+        enabled:
+          type: boolean
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+    ServiceToken:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+          nullable: true
+        token_prefix:
+          type: string
+          description: Token prefix (first 24 chars + ...)
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+        is_active:
+          type: boolean
+    ServiceTokenCreateResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+          nullable: true
+        token:
+          type: string
+          description: Full token value (only shown once)
+        token_prefix:
+          type: string
+        message:
+          type: string
+    Application:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        customer_id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        endpoint_count:
+          type: integer
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+        updated_at:
+          $ref: '#/components/schemas/DateTime'
+    FeatureFlag:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_enabled:
+          type: boolean
+        rollout_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+        enabled_for_plans:
+          type: array
+          items:
+            type: string
+        created_by:
+          type: string
+          nullable: true
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+        updated_at:
+          $ref: '#/components/schemas/DateTime'
+    DeployInfo:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Semantic version from Cargo.toml
+        git_commit:
+          type: string
+          nullable: true
+          description: Git SHA of the deployed commit
+        build_time:
+          type: string
+          nullable: true
+          description: ISO 8601 build timestamp
+        environment:
+          type: string
+          description: Deployment environment (production, staging, etc.)
 security:
 - BearerAuth: []
 paths:
@@ -5839,3 +5963,559 @@ paths:
           description: Redirect to app with auth cookies set
         '400':
           description: Invalid or missing authorization code
+
+  # ── Auth: 2FA Status ──────────────────────────────────────────
+  /auth/2fa/status:
+    get:
+      tags:
+      - Auth
+      summary: Get 2FA status
+      description: Returns whether 2FA is enabled for the authenticated user
+      responses:
+        '200':
+          description: 2FA status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  last_used_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ── Auth: Consent ─────────────────────────────────────────────
+  /auth/consent:
+    get:
+      tags:
+      - Auth
+      summary: Get consent preferences
+      description: Returns the authenticated user's consent preferences
+      responses:
+        '200':
+          description: Consent preferences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  consents:
+                    type: object
+                    additionalProperties:
+                      type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags:
+      - Auth
+      summary: Update a consent preference
+      description: Sets a single consent key to true/false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                  description: Consent key (e.g. cookie_consent, marketing_consent)
+                value:
+                  type: boolean
+              required:
+              - key
+              - value
+      responses:
+        '200':
+          description: Consent updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          description: Missing key or value
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ── Inbound Configs ───────────────────────────────────────────
+  /inbound/configs:
+    get:
+      tags:
+      - Inbound
+      summary: List inbound webhook configs
+      description: Returns all inbound webhook configurations for the authenticated user
+      responses:
+        '200':
+          description: List of inbound configs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InboundConfig'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags:
+      - Inbound
+      summary: Create inbound webhook config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider:
+                  type: string
+                  description: Provider name (stripe, github, shopify, generic)
+                secret:
+                  type: string
+                  description: Webhook signing secret
+                endpoint_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Default target endpoint
+                enabled:
+                  type: boolean
+                  default: true
+              required:
+              - provider
+              - secret
+      responses:
+        '201':
+          description: Config created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundConfig'
+        '400':
+          description: Validation error
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /inbound/configs/{id}:
+    put:
+      tags:
+      - Inbound
+      summary: Update inbound config
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                secret:
+                  type: string
+                endpoint_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                enabled:
+                  type: boolean
+      responses:
+        '200':
+          description: Config updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundConfig'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Inbound
+      summary: Delete inbound config
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Config deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ── Service Tokens ────────────────────────────────────────────
+  /service-tokens:
+    get:
+      tags:
+      - Service Tokens
+      summary: List service tokens
+      description: Returns all service tokens for the authenticated user
+      responses:
+        '200':
+          description: List of service tokens
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceToken'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags:
+      - Service Tokens
+      summary: Create a service token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Token name
+              required:
+              - name
+      responses:
+        '201':
+          description: Token created (full token shown only once)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceTokenCreateResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /service-tokens/{id}:
+    put:
+      tags:
+      - Service Tokens
+      summary: Update service token
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Token updated
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Service Tokens
+      summary: Delete service token
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Token deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /service-tokens/{id}/reveal:
+    post:
+      tags:
+      - Service Tokens
+      summary: Reveal service token
+      description: Returns the full token value (only available once after creation, or via this endpoint)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Token revealed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    nullable: true
+                    description: Full token value (null if not available)
+                  message:
+                    type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ── Applications ──────────────────────────────────────────────
+  /applications:
+    get:
+      tags:
+      - Applications
+      summary: List applications
+      description: Returns all applications for the authenticated user
+      responses:
+        '200':
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags:
+      - Applications
+      summary: Create application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+              required:
+              - name
+      responses:
+        '201':
+          description: Application created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Validation error
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /applications/{id}:
+    get:
+      tags:
+      - Applications
+      summary: Get application
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Application details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+      - Applications
+      summary: Update application
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                is_active:
+                  type: boolean
+      responses:
+        '200':
+          description: Application updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Applications
+      summary: Delete application
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Application deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ── Admin: Feature Flags ──────────────────────────────────────
+  /admin/feature-flags:
+    get:
+      tags:
+      - Admin
+      summary: List feature flags
+      description: Admin-only. Returns all feature flags.
+      responses:
+        '200':
+          description: Feature flags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flags:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FeatureFlag'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags:
+      - Admin
+      summary: Create feature flag
+      description: Admin-only. Creates a new feature flag.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                is_enabled:
+                  type: boolean
+                  default: false
+                rollout_percentage:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                  default: 100
+                enabled_for_plans:
+                  type: array
+                  items:
+                    type: string
+              required:
+              - name
+      responses:
+        '201':
+          description: Feature flag created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlag'
+        '400':
+          description: Validation error
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /admin/feature-flags/{id}:
+    put:
+      tags:
+      - Admin
+      summary: Update feature flag
+      description: Admin-only. Updates a feature flag.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                is_enabled:
+                  type: boolean
+                rollout_percentage:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                enabled_for_plans:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Feature flag updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlag'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+      - Admin
+      summary: Delete feature flag
+      description: Admin-only. Deletes a feature flag.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '200':
+          description: Feature flag deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ── Admin: Deploy Info ────────────────────────────────────────
+  /admin/deploy-info:
+    get:
+      tags:
+      - Admin
+      summary: Get deploy info
+      description: Admin-only. Returns current deployment version and build info.
+      responses:
+        '200':
+          description: Deploy info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployInfo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
