@@ -23,10 +23,10 @@ export default function TeamPage() {
   const [removeTarget, setRemoveTarget] = useState<string | null>(null);
   const t = useTranslations('team');
 
-  const currentRole = members.find((m) => m.user_id === user?.id)?.role || 'member';
-  const canInvite = currentRole === 'owner' || currentRole === 'admin';
-  const canRemove = currentRole === 'owner' || currentRole === 'admin';
-  const canChangeRole = currentRole === 'owner';
+  const currentRole = members.find((m) => m.customer_id === user?.id)?.role || 'viewer';
+  const canInvite = currentRole === 'admin';
+  const canRemove = currentRole === 'admin';
+  const canChangeRole = currentRole === 'admin';
 
   const fetchTeams = useCallback(async () => {
     if (!token) return;

@@ -66,6 +66,15 @@
     "dismiss": "Dismiss",
     "dismissError": "Dismiss error",
     "notifications": "Notifications",
+    "notificationsTitle": "Notifications",
+    "markAllRead": "Mark all read",
+    "noNotifications": "No notifications",
+    "viewAllNotifications": "View all notifications →",
+    "acceptInvite": "Accept",
+    "declineInvite": "Decline",
+    "inviteAcceptedRedirect": "Redirecting to team page...",
+    "inviteAcceptFailed": "Failed to accept invite",
+    "inviteDeclined": "Invitation declined",
     "toggleNav": "Toggle navigation",
     "deleteTransform": "Delete transform",
     "logo": "Logo",
@@ -471,6 +480,8 @@
     "membersCount": "{count} members",
     "roleOwner": "Owner",
     "roleAdmin": "Admin",
+    "roleEditor": "Editor",
+    "roleViewer": "Viewer",
     "roleMember": "Member",
     "removeBtn": "Remove"
   },
@@ -500,7 +511,8 @@
     "typeWebhookFailed": "Webhook Failed",
     "typeAlerts": "Alerts",
     "typeSystem": "System",
-    "typeBilling": "Billing"
+    "typeBilling": "Billing",
+    "typeTeamInvite": "Team Invite"
   },
   "webhooks": {
     "title": "Webhooks",

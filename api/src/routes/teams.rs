@@ -13,6 +13,7 @@ use crate::models::customer::Customer;
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_teams).post(create_team))
+        .route("/accept-invite", post(accept_invite))
         .route("/{id}", get(get_team))
         .route("/{id}/invite", post(invite_member))
         .route("/{id}/members", get(list_members))
@@ -69,6 +70,12 @@ struct InviteRequest {
 #[serde(deny_unknown_fields)]
 pub struct ChangeRoleRequest {
     pub role: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AcceptInviteRequest {
+    pub token: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -326,7 +333,7 @@ async fn invite_member(
             .fetch_optional(&pool)
             .await?;
 
-    if let Some((cust_id,)) = existing_customer {
+    if let Some((cust_id,)) = existing_customer.as_ref() {
         let already_member: Option<(Uuid,)> =
             sqlx::query_as("SELECT id FROM team_members WHERE team_id = $1 AND customer_id = $2")
                 .bind(id)
@@ -379,13 +386,128 @@ async fn invite_member(
             Some(serde_json::json!({"email": &req.email, "role": role})), None, None).await;
     }
 
-    // Note: token is NOT returned in response — it's sent via email only
+    // Send in-app notification to the invited user (if registered)
+    if let Some((invited_customer_id,)) = existing_customer {
+        let team_name: Option<(String,)> =
+            sqlx::query_as("SELECT name FROM teams WHERE id = $1")
+                .bind(id)
+                .fetch_optional(&pool)
+                .await
+                .unwrap_or(None);
+
+        let team_name_str = team_name.map(|(n,)| n).unwrap_or_else(|| "a team".to_string());
+        let inviter_name = customer.name.clone().unwrap_or_else(|| customer.email.clone());
+
+        let _ = sqlx::query(
+            r#"INSERT INTO notifications (customer_id, type, title, message, link)
+               VALUES ($1, 'team_invite', $2, $3, '/team-mgmt')"#,
+        )
+        .bind(invited_customer_id)
+        .bind(format!("{} seni {} ekibine davet etti", inviter_name, team_name_str))
+        .bind(format!("Rol: {}. Daveti kabul etmek için tıklayın.", role))
+        .execute(&pool)
+        .await;
+    }
+
     Ok(Json(serde_json::json!({
         "id": invite.id,
         "email": invite.email,
         "role": invite.role,
         "expires_at": invite.expires_at,
         "message": "Invitation sent successfully"
+    })))
+}
+
+/// POST /v1/teams/accept-invite — Accept a team invitation
+async fn accept_invite(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<AcceptInviteRequest>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Find the invite by token
+    let invite = sqlx::query_as::<_, TeamInvite>(
+        "SELECT id, team_id, email, role, token, expires_at, created_at FROM team_invites WHERE token = $1",
+    )
+    .bind(&req.token)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    // Check expiry
+    if invite.expires_at < chrono::Utc::now() {
+        return Err(AppError::BadRequest("Invitation has expired".into()));
+    }
+
+    // Check email matches
+    if invite.email != customer.email {
+        return Err(AppError::Forbidden(
+            "This invitation was sent to a different email address".into(),
+        ));
+    }
+
+    // Check not already a member
+    let already_member: Option<(Uuid,)> =
+        sqlx::query_as("SELECT id FROM team_members WHERE team_id = $1 AND customer_id = $2")
+            .bind(invite.team_id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?;
+
+    if already_member.is_some() {
+        // Delete the invite since they're already in
+        let _ = sqlx::query("DELETE FROM team_invites WHERE id = $1")
+            .bind(invite.id)
+            .execute(&pool)
+            .await;
+        return Err(AppError::BadRequest(
+            "You are already a member of this team".into(),
+        ));
+    }
+
+    // Add as team member
+    sqlx::query(
+        "INSERT INTO team_members (team_id, customer_id, role, joined_at) VALUES ($1, $2, $3, NOW())",
+    )
+    .bind(invite.team_id)
+    .bind(customer.id)
+    .bind(&invite.role)
+    .execute(&pool)
+    .await?;
+
+    // Delete the invite
+    sqlx::query("DELETE FROM team_invites WHERE id = $1")
+        .bind(invite.id)
+        .execute(&pool)
+        .await?;
+
+    // Mark related notifications as read
+    let _ = sqlx::query(
+        r#"UPDATE notifications SET is_read = TRUE
+           WHERE customer_id = $1 AND type = 'team_invite' AND is_read = FALSE"#,
+    )
+    .bind(customer.id)
+    .execute(&pool)
+    .await;
+
+    tracing::info!(
+        "✅ {} accepted invite to team {}",
+        customer.id,
+        invite.team_id
+    );
+
+    // Audit log
+    {
+        let tid = invite.team_id.to_string();
+        let _ = crate::audit::log_action(
+            &pool, customer.id, "MEMBER_JOIN", "team", Some(&tid),
+            Some(serde_json::json!({"role": &invite.role})), None, None,
+        ).await;
+    }
+
+    Ok(Json(serde_json::json!({
+        "team_id": invite.team_id,
+        "role": invite.role,
+        "message": "Successfully joined the team"
     })))
 }
 
@@ -637,6 +759,22 @@ mod tests {
         let json = r#"{"role":"admin"}"#;
         let req: ChangeRoleRequest = serde_json::from_str(json).unwrap();
         assert_eq!(req.role, "admin");
+    }
+
+    // ── AcceptInviteRequest ──────────────────────────────────
+
+    #[test]
+    fn test_accept_invite_request_deserialization() {
+        let json = r#"{"token":"inv_abc123"}"#;
+        let req: AcceptInviteRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.token, "inv_abc123");
+    }
+
+    #[test]
+    fn test_accept_invite_request_missing_token() {
+        let json = r#"{}"#;
+        let result: Result<AcceptInviteRequest, _> = serde_json::from_str(json);
+        assert!(result.is_err());
     }
 
     // ── TeamResponse ────────────────────────────────────────
