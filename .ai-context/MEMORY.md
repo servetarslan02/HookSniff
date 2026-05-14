@@ -826,3 +826,9 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **3 dosya değişti, 135 satır eklendi, 2 satır silindi**
 - **Rust toolchain kurulu değildi** — compile doğrulaması yapılamadı, syntax kontrolü yeterli
 - **Güvenlik uyarısı:** Servet GitHub token'ını sohbette paylaştı, iptal etmesi söylendi
+
+## Oturum 159 Ek — Observability Düzeltmeleri (2026-05-15 03:36 - 03:40 GMT+8)
+- **Logs detail modal** — `webhooksApi.getAttempts()` bağlandı, gerçek attempt verisi gösteriliyor (HTTP status, duration, timestamp, error message)
+- **Analytics latency chart** — `analyticsApi.latencyTrend()` çağrıldı, avg (mor) + P95 (amber) grafik eklendi
+- **Build:** ✅ başarılı (216 sayfa)
+- **Commit:** `3c5a196c` — main branch, push ✅
