@@ -97,6 +97,13 @@ pub fn start_auth_cache_cleanup() {
 #[derive(Debug, Clone, Copy)]
 pub struct IsTestKey(pub bool);
 
+/// Indicates the request was authenticated via a service token (organization-level).
+/// Contains the team_id so handlers can scope resources to that organization.
+#[derive(Debug, Clone)]
+pub struct ServiceTokenScope {
+    pub team_id: Uuid,
+}
+
 /// Middleware that assigns a unique request ID to every request and adds it to tracing context
 pub async fn request_id_middleware(mut req: Request, next: Next) -> Response {
     let request_id = req
@@ -211,6 +218,7 @@ pub async fn auth_middleware(
     let token = extract_token(&req).ok_or(AppError::Unauthorized)?;
 
     let is_test = token.starts_with("hr_test_");
+    let mut service_token_team: Option<Uuid> = None;
     let customer = if token.starts_with("hr_live_") || token.starts_with("hr_test_") {
         // API key authentication — check cache first, then DB
         let prefix = token[..24.min(token.len())].to_string();
@@ -278,10 +286,10 @@ pub async fn auth_middleware(
 
                 for (hash,) in &st_candidates {
                     if verify_api_key(&token, hash) {
-                        // Service token auth: resolve the team owner as the customer
-                        let owner: Option<Customer> = sqlx::query_as(
+                        // Service token auth: resolve the team owner as the customer + team_id
+                        let result: Option<(Customer, Uuid)> = sqlx::query_as(
                             r#"
-                            SELECT c.* FROM customers c
+                            SELECT c.*, t.id as team_id FROM customers c
                             INNER JOIN teams t ON t.owner_id = c.id
                             INNER JOIN service_tokens st ON st.team_id = t.id
                             WHERE st.token_prefix = $1 AND st.token_hash = $2
@@ -291,8 +299,9 @@ pub async fn auth_middleware(
                         .bind(hash)
                         .fetch_optional(&*pool)
                         .await?;
-                        if let Some(c) = owner {
+                        if let Some((c, team_id)) = result {
                             found = Some(c);
+                            service_token_team = Some(team_id);
                             // Update last_used_at
                             let _ = sqlx::query(
                                 "UPDATE service_tokens SET last_used_at = NOW() WHERE token_prefix = $1 AND token_hash = $2"
@@ -333,6 +342,9 @@ pub async fn auth_middleware(
 
     req.extensions_mut().insert(customer);
     req.extensions_mut().insert(IsTestKey(is_test));
+    if let Some(team_id) = service_token_team {
+        req.extensions_mut().insert(ServiceTokenScope { team_id });
+    }
     Ok(next.run(req).await)
 }
 

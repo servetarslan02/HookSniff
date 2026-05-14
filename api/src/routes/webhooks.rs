@@ -52,16 +52,26 @@ struct ExportParams {
 async fn list_deliveries(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Query(params): Query<ListParams>,
 ) -> Result<Json<DeliveryListResponse>, AppError> {
     let page = params.page.unwrap_or(1).max(1);
     let per_page = params.per_page.unwrap_or(20).min(200);
     let offset = (page - 1) * per_page;
 
+    // Build team filter for service token scoping
+    let team_filter = if let Some(Extension(ref scope)) = service_token {
+        format!(" AND endpoint_id IN (SELECT id FROM endpoints WHERE team_id = '{}')", scope.team_id)
+    } else {
+        String::new()
+    };
+
     let (deliveries, total) = if let Some(status) = &params.status {
-        let deliveries = sqlx::query_as::<_, Delivery>(
-            "SELECT * FROM deliveries WHERE customer_id = $1 AND status = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4",
-        )
+        let query = format!(
+            "SELECT * FROM deliveries WHERE customer_id = $1 AND status = $2{} ORDER BY created_at DESC LIMIT $3 OFFSET $4",
+            team_filter
+        );
+        let deliveries = sqlx::query_as::<_, Delivery>(&query)
         .bind(customer.id)
         .bind(status)
         .bind(per_page)
@@ -69,9 +79,11 @@ async fn list_deliveries(
         .fetch_all(&pool)
         .await?;
 
-        let total: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND status = $2",
-        )
+        let total_query = format!(
+            "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND status = $2{}",
+            team_filter
+        );
+        let total: (i64,) = sqlx::query_as(&total_query)
         .bind(customer.id)
         .bind(status)
         .fetch_one(&pool)
@@ -79,17 +91,23 @@ async fn list_deliveries(
 
         (deliveries, total.0)
     } else {
-        let deliveries = sqlx::query_as::<_, Delivery>(
-            "SELECT * FROM deliveries WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
-        )
+        let query = format!(
+            "SELECT * FROM deliveries WHERE customer_id = $1{} ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+            team_filter
+        );
+        let deliveries = sqlx::query_as::<_, Delivery>(&query)
         .bind(customer.id)
         .bind(per_page)
         .bind(offset)
         .fetch_all(&pool)
         .await?;
 
+        let total_query = format!(
+            "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1{}",
+            team_filter
+        );
         let total: (i64,) =
-            sqlx::query_as("SELECT COUNT(*) FROM deliveries WHERE customer_id = $1")
+            sqlx::query_as(&total_query)
                 .bind(customer.id)
                 .fetch_one(&pool)
                 .await?;
