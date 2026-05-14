@@ -1,29 +1,25 @@
-# NEXT_SESSION.md — Oturum 157
+# NEXT_SESSION.md — Oturum 158
 
-> Son güncelleme: 2026-05-14 17:00 GMT+8
+> Son güncelleme: 2026-05-14 17:35 GMT+8
 
 ## Kaldığımız Yer
-- **Oturum 156** — Service Tokens backend + team scoping **TAMAMLANDI** ✅
-- Service Tokens CRUD çalışıyor (create, list, update name, delete, reveal)
-- Service token auth team-scoped (sadece o organizasyonun kaynakları)
-- Cloud Build deploy-on-push ile otomatik deploy
+- **Oturum 157** — Service Tokens deploy + migration fix **TAMAMLANDI** ✅
+- Cloud Build deploy hatası düzeltildi (Customer sqlx::Decode compile error)
+- Migration STRING → TEXT düzeltmesi yapıldı
+
+## Son Yapılan Değişiklikler
+- `api/src/middleware/mod.rs` — Service token auth: tuple query → two separate queries
+- `api/src/events/overage.rs` — Unused import removed
+- `api/src/routes/applications.rs` — Unused imports removed
+- `migrations/001-006,009,043` — STRING → TEXT type fix
 
 ## Durum Özeti
 - **İlerleme:** 359/364 (%99) — 5 kalan hepsi Servet görevleri
 - **Site:** ✅ Canlı (hooksniff.vercel.app)
 - **API:** ✅ Çalışıyor
-- **Service Tokens:** ✅ Aktif (team-scoped)
-- **Cloud Build:** ✅ Son build başarılı
+- **Cloud Build:** ✅ Son build başarılı (commit 2ce662fd)
 
-## Son Yapılan Değişiklikler
-- `migrations/051_service_tokens.sql` — service_tokens tablosu
-- `migrations/052_endpoints_team_id.sql` — endpoints.team_id kolonu
-- `api/src/routes/service_tokens.rs` — CRUD routes
-- `api/src/middleware/mod.rs` — ServiceTokenScope extension
-- `api/src/routes/endpoints.rs` — team-scoped list/create
-- `api/src/routes/webhooks.rs` — team-scoped deliveries
-
-## Oturum 157 — Öncelikli Görevler
+## Oturum 158 — Öncelikli Görevler
 
 ### Servet Görevleri (5 kalan ⬜)
 1. Stripe payout + identity verification (Polar.sh)
