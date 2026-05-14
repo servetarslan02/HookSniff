@@ -1,20 +1,19 @@
-# NEXT_SESSION.md — Vercel Deploy Düzeltildi
+# NEXT_SESSION.md — 3 Kopuk API Düzeltildi
 
-> Son güncelleme: 2026-05-15 03:10 GMT+8
+> Son güncelleme: 2026-05-15 03:32 GMT+8
 
-## Yapılan
-- Repo `aa10d81c`'e geri döndürüldü (7 saat önceki çalışan kod)
-- `vercel.json` düzeltildi: Root Directory `dashboard` olduğu için yollar güncellendi
-  - `cd dashboard &&` kaldırıldı buildCommand'den
-  - `outputDirectory`: `dashboard/.next` → `.next`
-  - `installCommand`: `npm install` → `npm ci`
-- GitHub integration yeniden tetiklendi → deploy başarılı ✅
-- Site canlı: https://hooksniff.vercel.app
+## Yapılan (Oturum 159)
+- Frontend ↔ backend API karşılaştırması yapıldı
+- 3 kopuk API düzeltildi ve push edildi (`5a27afaf`):
+  1. `/auth/2fa/status` — backend'e eklendi
+  2. `/webhooks/batch-replay` → `/webhooks/batch/replay` — frontend path düzeltildi
+  3. `/inbound/configs` — backend'e CRUD endpoint'leri eklendi
 
 ## Sonraki Adımlar
-- Site正常工作 kontrol et
-- GitHub Actions dakika limiti dolmuş → ya repo public yap ya da plan yükselt
-- Vercel deploy limiti (100/gün) dolmuş → 24 saat bekle
+- Cloud Build tetikle (API deploy için) — Servet yapacak veya gcloud CLI ile
+- Dashboard build test et (`next build`)
+- 3 düzeltmenin production'da çalıştığını doğrula
+- GitHub token'ını iptal et ve yeni oluştur (güvenlik)
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
