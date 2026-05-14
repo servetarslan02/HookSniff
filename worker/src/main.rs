@@ -222,7 +222,6 @@ async fn main() -> Result<()> {
         .pool_max_idle_per_host(HTTP_POOL_MAX_IDLE_PER_HOST)
         .tcp_keepalive(std::time::Duration::from_secs(60))
         .tcp_nodelay(true)
-        .http2_prior_knowledge()  // Prefer HTTP/2 when available
         .build()?;
 
     // Concurrent delivery limit — prevents DDoS on target servers
