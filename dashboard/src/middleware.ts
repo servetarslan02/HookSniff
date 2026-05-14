@@ -43,6 +43,12 @@ const ROUTE_REDIRECTS: Record<string, string> = {
 
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // NEVER process API routes through i18n middleware
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
   const withoutLocale = pathname.replace(LOCALE_REGEX, '/');
 
   // Block access to sensitive files
