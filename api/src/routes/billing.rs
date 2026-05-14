@@ -100,6 +100,8 @@ struct SubscriptionResponse {
     cancel_at_period_end: bool,
     /// Billing period: "monthly" or "annual"
     billing_period: String,
+    /// Current period end date (ISO 8601)
+    current_period_end: Option<String>,
 }
 
 async fn get_subscription(
@@ -118,6 +120,19 @@ async fn get_subscription(
         "active".to_string()
     };
 
+    // Calculate current_period_end: 1st of next month for paid plans
+    let current_period_end = if plan != Plan::Developer {
+        let now = chrono::Utc::now();
+        let next_month = if now.month() == 12 {
+            chrono::NaiveDate::from_ymd_opt(now.year() + 1, 1, 1)
+        } else {
+            chrono::NaiveDate::from_ymd_opt(now.year(), now.month() + 1, 1)
+        };
+        next_month.map(|d| d.and_hms_opt(0, 0, 0).unwrap().and_utc().to_rfc3339())
+    } else {
+        None
+    };
+
     Ok(Json(SubscriptionResponse {
         plan: plan.as_str().to_string(),
         status,
@@ -132,6 +147,7 @@ async fn get_subscription(
         monthly_price_kurus: plan.monthly_price_kurus(),
         cancel_at_period_end: customer.cancel_at_period_end,
         billing_period: "monthly".to_string(), // Default; annual tracked via provider
+        current_period_end,
     }))
 }
 
@@ -1246,6 +1262,7 @@ mod tests {
             monthly_price_kurus: 0,
             cancel_at_period_end: false,
             billing_period: "monthly".to_string(),
+            current_period_end: Some("2026-06-01T00:00:00+00:00".to_string()),
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["plan"], "pro");
@@ -1272,6 +1289,7 @@ mod tests {
             monthly_price_kurus: 0,
             cancel_at_period_end: false,
             billing_period: "monthly".to_string(),
+            current_period_end: None,
         };
         let _debug = format!("{:?}", resp);
     }
@@ -1519,6 +1537,7 @@ mod tests {
             monthly_price_kurus: 0,
             cancel_at_period_end: true,
             billing_period: "monthly".to_string(),
+            current_period_end: Some("2026-06-01T00:00:00+00:00".to_string()),
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["cancel_at_period_end"], true);
