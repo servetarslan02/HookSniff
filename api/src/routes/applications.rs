@@ -83,7 +83,7 @@ async fn create_application(
 ) -> Result<Json<ApplicationResponse>, AppError> {
     // Validate input
     req.validate()
-        .map_err(|e| AppError::BadRequest(e))?;
+        .map_err(AppError::BadRequest)?;
 
     // Plan-based limit check
     let plan = Plan::parse_str(&customer.plan);
@@ -139,7 +139,7 @@ async fn update_application(
 ) -> Result<Json<ApplicationResponse>, AppError> {
     // Validate input
     req.validate()
-        .map_err(|e| AppError::BadRequest(e))?;
+        .map_err(AppError::BadRequest)?;
 
     // Check ownership
     let existing = sqlx::query_as::<_, Application>(

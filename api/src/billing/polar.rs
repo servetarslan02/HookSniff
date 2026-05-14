@@ -139,7 +139,7 @@ struct CustomerSessionResponse {
     #[serde(default)]
     customer_portal_url: Option<String>,
     #[serde(default)]
-    id: Option<String>,
+    _id: Option<String>,
 }
 
 /// Polar.sh subscription object (from webhook data).
