@@ -212,24 +212,39 @@ async fn check_token_revocation(
 pub async fn auth_middleware(
     pool: axum::extract::Extension<PgPool>,
     cfg: axum::extract::Extension<crate::config::Config>,
+    cache: axum::extract::Extension<Option<crate::cache::CacheLayer>>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, AppError> {
     let token = extract_token(&req).ok_or(AppError::Unauthorized)?;
+    let cache = cache.0;
 
     let is_test = token.starts_with("hr_test_");
     let mut service_token_team: Option<Uuid> = None;
     let customer = if token.starts_with("hr_live_") || token.starts_with("hr_test_") {
-        // API key authentication — check cache first, then DB
+        // API key authentication — check Redis cache, then in-memory cache, then DB
         let prefix = token[..24.min(token.len())].to_string();
 
-        // HS-038i: Check cache WITHOUT holding lock across .await
-        let cached = {
+        // 1. Try Redis cache first (shared across instances)
+        let redis_cached: Option<Customer> = if let Some(ref c) = cache {
+            c.get("apikey", &prefix).await
+        } else {
+            None
+        };
+        if let Some(c) = redis_cached {
+            c
+        } else {
+        // 2. Try in-memory cache (fast, per-instance)
+        let mem_cached = {
             let cache = AUTH_CACHE.lock().await;
             cache.get(&prefix)
         };
 
-        if let Some(c) = cached {
+        if let Some(c) = mem_cached {
+            // Also populate Redis for other instances
+            if let Some(ref c2) = cache {
+                c2.set("apikey", &prefix, &c).await;
+            }
             c
         } else {
             // Cache miss — query DB (no lock held during async operations)
@@ -329,13 +344,17 @@ pub async fn auth_middleware(
 
             let customer = found.ok_or(AppError::Unauthorized)?;
 
-            // Cache the result (lock acquired only for insert, not held across .await)
+            // Cache the result in both Redis (shared) and in-memory (fast)
+            if let Some(ref c) = cache {
+                c.set("apikey", &prefix, &customer).await;
+            }
             {
-                let mut cache = AUTH_CACHE.lock().await;
-                cache.insert(prefix, customer.clone());
+                let mut mem_cache = AUTH_CACHE.lock().await;
+                mem_cache.insert(prefix, customer.clone());
             }
 
             customer
+        }
         }
     } else {
         // JWT token authentication
@@ -363,21 +382,38 @@ pub async fn auth_middleware(
 pub async fn jwt_auth_middleware(
     pool: axum::extract::Extension<PgPool>,
     cfg: axum::extract::Extension<crate::config::Config>,
+    cache: axum::extract::Extension<Option<crate::cache::CacheLayer>>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, AppError> {
     let token = extract_token(&req).ok_or(AppError::Unauthorized)?;
+    let cache = cache.0;
 
     let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
 
     // HS-261: Check if token has been revoked
     check_token_revocation(&pool, &claims).await?;
 
-    let customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification FROM customers WHERE id = $1")
-        .bind(claims.sub)
-        .fetch_optional(&*pool)
-        .await?
-        .ok_or(AppError::Unauthorized)?;
+    // Try Redis cache for JWT customer lookup (keyed by user ID)
+    let user_id_str = claims.sub.to_string();
+    let redis_cached: Option<Customer> = if let Some(ref c) = cache {
+        c.get("jwt_user", &user_id_str).await
+    } else {
+        None
+    };
+    let customer = if let Some(c) = redis_cached {
+        c
+    } else {
+        let c = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification FROM customers WHERE id = $1")
+            .bind(claims.sub)
+            .fetch_optional(&*pool)
+            .await?
+            .ok_or(AppError::Unauthorized)?;
+        if let Some(ref c2) = cache {
+            c2.set("jwt_user", &user_id_str, &c).await;
+        }
+        c
+    };
 
     req.extensions_mut().insert(customer);
     Ok(next.run(req).await)

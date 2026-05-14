@@ -22,6 +22,24 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool> {
     Ok(pool)
 }
 
+/// Create a small dedicated pool for health checks (5 connections).
+/// This pool is independent of the main pool so health checks always work
+/// even when the main pool is saturated.
+pub async fn create_health_pool(database_url: &str) -> Result<PgPool> {
+    let clean_url = clean_database_url(database_url);
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .acquire_timeout(std::time::Duration::from_secs(3))
+        .connect(&clean_url)
+        .await?;
+    Ok(pool)
+}
+
+/// Newtype wrapper for the health-check DB pool.
+/// Allows Axum to distinguish it from the main pool in route handlers.
+#[derive(Clone)]
+pub struct HealthPool(pub PgPool);
+
 /// Migration tracking table — records which migrations have been applied.
 /// Each migration has a unique name and is only run once.
 async fn ensure_migrations_table(pool: &PgPool) -> Result<()> {
