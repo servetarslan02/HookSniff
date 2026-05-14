@@ -28,6 +28,7 @@ pub mod routing;
 pub mod schemas;
 pub mod search;
 pub mod simulator;
+pub mod service_tokens;
 pub mod sso;
 pub mod stats;
 pub mod stream;
@@ -89,6 +90,7 @@ pub fn api_router() -> Router {
         .nest("/sso", sso::router())
         .nest("/custom-domains", custom_domains::router())
         .nest("/rate-limits", rate_limits::router())
+        .nest("/service-tokens", service_tokens::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     // Inbound webhooks — uses API key auth (not JWT), so external services can call it

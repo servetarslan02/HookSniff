@@ -267,6 +267,46 @@ pub async fn auth_middleware(
                 }
             }
 
+            // If not found in api_keys, try service_tokens (organization-level tokens)
+            if found.is_none() {
+                let st_candidates: Vec<(String,)> = sqlx::query_as(
+                    "SELECT token_hash FROM service_tokens WHERE token_prefix = $1 AND is_active = true",
+                )
+                .bind(&prefix)
+                .fetch_all(&*pool)
+                .await?;
+
+                for (hash,) in &st_candidates {
+                    if verify_api_key(&token, hash) {
+                        // Service token auth: resolve the team owner as the customer
+                        let owner: Option<Customer> = sqlx::query_as(
+                            r#"
+                            SELECT c.* FROM customers c
+                            INNER JOIN teams t ON t.owner_id = c.id
+                            INNER JOIN service_tokens st ON st.team_id = t.id
+                            WHERE st.token_prefix = $1 AND st.token_hash = $2
+                            "#,
+                        )
+                        .bind(&prefix)
+                        .bind(hash)
+                        .fetch_optional(&*pool)
+                        .await?;
+                        if let Some(c) = owner {
+                            found = Some(c);
+                            // Update last_used_at
+                            let _ = sqlx::query(
+                                "UPDATE service_tokens SET last_used_at = NOW() WHERE token_prefix = $1 AND token_hash = $2"
+                            )
+                            .bind(&prefix)
+                            .bind(hash)
+                            .execute(&*pool)
+                            .await;
+                        }
+                        break;
+                    }
+                }
+            }
+
             let customer = found.ok_or(AppError::Unauthorized)?;
 
             // Cache the result (lock acquired only for insert, not held across .await)
