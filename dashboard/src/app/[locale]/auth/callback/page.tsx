@@ -27,15 +27,31 @@ export default function AuthCallbackPage() {
       return;
     }
 
-    // The backend already set the HttpOnly cookie.
-    // Verify the session by calling /auth/me, then redirect.
+    // Check if token is passed in URL (from OAuth callback)
+    const token = params.get('token');
+    const refresh = params.get('refresh');
+
+    if (token) {
+      // Set cookies on Vercel domain
+      const cookieOpts = 'Path=/; HttpOnly; Secure; SameSite=Lax';
+      document.cookie = `hooksniff_token=${token}; ${cookieOpts}; Max-Age=${24 * 60 * 60}`;
+      if (refresh) {
+        document.cookie = `hooksniff_refresh=${refresh}; ${cookieOpts}; Max-Age=${30 * 24 * 60 * 60}`;
+      }
+      // Clean URL and redirect
+      window.history.replaceState({}, '', '/auth/callback');
+      router.replace('/core');
+      return;
+    }
+
+    // Fallback: verify session via /auth/me
     const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
     fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
       .then((res) => {
         if (res.ok) {
           // Session is valid — redirect to dashboard
           // The AuthProvider's mount effect will pick up the cookie
-          router.replace('/applications');
+          router.replace('/core');
         } else {
           setError(t('authFailed'));
         }
