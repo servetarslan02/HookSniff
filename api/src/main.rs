@@ -356,6 +356,7 @@ async fn main() -> Result<()> {
         .layer(tower_http::compression::CompressionLayer::new()) // gzip response compression
         .layer(axum::middleware::from_fn(telemetry::trace_id_middleware))
         .layer(axum::middleware::from_fn(middleware::request_id_middleware))
+        .layer(axum::middleware::from_fn(middleware::request_timeout_middleware))
         .layer(axum::middleware::from_fn(middleware::security_headers_middleware));
 
     let addr = format!("0.0.0.0:{}", cfg.port);
