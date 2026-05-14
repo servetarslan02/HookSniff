@@ -62,6 +62,7 @@ pub fn create_routes(
 pub fn api_router() -> Router {
     let protected = Router::new()
         .nest("/applications", applications::router())
+        .nest("/outbound-ips", outbound_ips::router())
         .nest("/endpoints", endpoints::router())
         .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
         .nest("/stream", stream::router())
@@ -109,7 +110,6 @@ pub fn api_router() -> Router {
         .nest("/auth", auth::router())
         .nest("/oauth", oauth::router())
         .nest("/contact", contact::router())
-        .nest("/outbound-ips", outbound_ips::router())
         .route(
             "/status",
             axum::routing::get(health::system_status).options(health::status_options),

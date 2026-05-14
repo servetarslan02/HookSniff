@@ -88,7 +88,7 @@ app = Flask(__name__)
 
 @app.route("/webhook", methods=["POST"])
 def handle_webhook():
-    signature = request.headers.get("X-HookSniff-Signature")
+    signature = request.headers.get("webhook-signature")
     if not hooksniff.verify_signature(
         payload=request.data,
         signature=signature,
