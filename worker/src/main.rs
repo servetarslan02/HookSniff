@@ -39,13 +39,15 @@ const DB_MAX_CONNECTIONS: u32 = 10;
 /// Database connection acquisition timeout
 const DB_ACQUIRE_TIMEOUT_SECS: u64 = 30;
 /// HTTP client request timeout
-const HTTP_TIMEOUT_SECS: u64 = 15;
+const HTTP_TIMEOUT_SECS: u64 = 10;
+/// HTTP client connection timeout
+const HTTP_CONNECT_TIMEOUT_SECS: u64 = 3;
 /// Maximum idle connections per host in HTTP pool
-const HTTP_POOL_MAX_IDLE_PER_HOST: usize = 20;
+const HTTP_POOL_MAX_IDLE_PER_HOST: usize = 30;
 /// Maximum concurrent HTTP deliveries (global)
-const DELIVERY_CONCURRENCY_LIMIT: usize = 25;
+const DELIVERY_CONCURRENCY_LIMIT: usize = 50;
 /// Maximum concurrent deliveries per endpoint — prevents one slow endpoint from blocking all others
-const PER_ENDPOINT_CONCURRENCY_LIMIT: usize = 5;
+const PER_ENDPOINT_CONCURRENCY_LIMIT: usize = 10;
 /// Circuit breaker: failures before opening
 const CIRCUIT_BREAKER_FAILURE_THRESHOLD: u32 = 5;
 /// Circuit breaker: cooldown period in seconds
@@ -213,10 +215,13 @@ async fn main() -> Result<()> {
     READY.store(true, std::sync::atomic::Ordering::Relaxed);
     tracing::info!("✅ Readiness probe: ready (DB connected)");
 
-    // HTTP client (shared, connection pooling)
+    // HTTP client (shared, connection pooling, optimized for low latency)
     let http_client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(HTTP_TIMEOUT_SECS))
+        .connect_timeout(std::time::Duration::from_secs(HTTP_CONNECT_TIMEOUT_SECS))
         .pool_max_idle_per_host(HTTP_POOL_MAX_IDLE_PER_HOST)
+        .tcp_keepalive(std::time::Duration::from_secs(60))
+        .tcp_nodelay(true)
         .build()?;
 
     // Concurrent delivery limit — prevents DDoS on target servers
