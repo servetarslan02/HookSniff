@@ -103,6 +103,18 @@ async fn main() -> Result<()> {
 
     let pool = db::create_pool(&cfg.database_url).await?;
 
+    // Health-check pool (5 connections, independent of main pool)
+    let health_pool = match db::create_health_pool(&cfg.database_url).await {
+        Ok(p) => {
+            tracing::info!("✅ Health check pool created (5 connections)");
+            db::HealthPool(p)
+        }
+        Err(e) => {
+            tracing::warn!("Health pool creation failed ({e}), using main pool");
+            db::HealthPool(pool.clone())
+        }
+    };
+
     // Initialize Prometheus metrics
     let metrics = std::sync::Arc::new(metrics::Metrics::new());
 
@@ -221,6 +233,7 @@ async fn main() -> Result<()> {
         // Middleware
         // CORS: restrict origins in production
         .layer(axum::Extension(pool.clone()))
+        .layer(axum::Extension(health_pool))
         .layer(axum::Extension(cfg.clone()))
         .layer(axum::Extension(metrics.clone()))
         .layer(axum::Extension(email_provider))
