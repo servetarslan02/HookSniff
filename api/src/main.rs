@@ -241,6 +241,7 @@ async fn main() -> Result<()> {
                         axum::http::header::HeaderName::from_static("x-api-key"),
                         axum::http::header::HeaderName::from_static("x-request-id"),
                         axum::http::header::HeaderName::from_static("x-webhook-id"),
+                        axum::http::header::HeaderName::from_static("x-hooksniff-signature"),
                         axum::http::header::HeaderName::from_static("x-webhook-signature"),
                         axum::http::header::HeaderName::from_static("x-webhook-timestamp"),
                     ]))
@@ -274,6 +275,7 @@ async fn main() -> Result<()> {
                         axum::http::header::HeaderName::from_static("x-api-key"),
                         axum::http::header::HeaderName::from_static("x-request-id"),
                         axum::http::header::HeaderName::from_static("x-webhook-id"),
+                        axum::http::header::HeaderName::from_static("x-hooksniff-signature"),
                         axum::http::header::HeaderName::from_static("x-webhook-signature"),
                         axum::http::header::HeaderName::from_static("x-webhook-timestamp"),
                     ]))
@@ -297,6 +299,7 @@ async fn main() -> Result<()> {
                         axum::http::header::HeaderName::from_static("x-api-key"),
                         axum::http::header::HeaderName::from_static("x-request-id"),
                         axum::http::header::HeaderName::from_static("x-webhook-id"),
+                        axum::http::header::HeaderName::from_static("x-hooksniff-signature"),
                         axum::http::header::HeaderName::from_static("x-webhook-signature"),
                         axum::http::header::HeaderName::from_static("x-webhook-timestamp"),
                     ]))

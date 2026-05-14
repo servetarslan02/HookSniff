@@ -199,9 +199,11 @@ fn verify_shopify(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), 
 }
 
 fn verify_generic(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &'static str> {
-    // Try common header names (Standard Webhooks spec: webhook-signature)
+    // Try common header names — X-HookSniff-Signature is our primary,
+    // also accept Standard Webhooks and common alternatives as fallbacks.
     let sig_header = headers
-        .get("webhook-signature")
+        .get("x-hooksniff-signature")
+        .or_else(|| headers.get("webhook-signature"))
         .or_else(|| headers.get("x-webhook-signature"))
         .or_else(|| headers.get("x-signature-256"))
         .or_else(|| headers.get("x-hub-signature-256"))

@@ -6,7 +6,7 @@ const MAX_HISTORY = 100;
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-Webhook-Event, webhook-signature, Svix-ID, Svix-Timestamp, Svix-Signature',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Webhook-Event, X-HookSniff-Signature, Svix-ID, Svix-Timestamp, Svix-Signature',
 };
 
 // Capture any HTTP method (GET, POST, PUT, DELETE, PATCH, etc.)

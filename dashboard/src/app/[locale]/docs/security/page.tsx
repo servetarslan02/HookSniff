@@ -14,7 +14,7 @@ export default function SecurityPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">HMAC-SHA256 Signature Verification</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Every webhook is signed using <strong>{t("standardWebhooks")}</strong> HMAC-SHA256. The signature is included in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">webhook-signature</code> header.
+          Every webhook is signed using <strong>{t("standardWebhooks")}</strong> HMAC-SHA256. The signature is included in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">X-HookSniff-Signature</code> header.
         </p>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Format: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">v1,{'{'}base64(hmac_signature){'}'}</code>
@@ -50,7 +50,7 @@ function verifyWebhookSignature(
 
 // Express middleware
 app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.headers['webhook-signature'] as string;
+  const signature = req.headers['X-HookSniff-Signature'] as string;
   const secret = 'whsec_your_signing_secret';
 
   if (!verifyWebhookSignature(req.body.toString(), signature, secret)) {
@@ -111,7 +111,7 @@ app = Flask(__name__)
 
 @app.route('/webhook', methods=['POST'])
 def handle_webhook():
-    signature = request.headers.get('webhook-signature', '')
+    signature = request.headers.get('X-HookSniff-Signature', '')
     secret = 'whsec_your_signing_secret'
 
     if not verify_webhook_signature(request.data, signature, secret):
