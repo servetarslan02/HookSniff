@@ -103,20 +103,18 @@ pub async fn deliver_http(
                 .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap_or("").to_string()))
                 .collect::<std::collections::HashMap<String, String>>());
 
-            // Read response body with size limit to prevent memory exhaustion
-            let body = match response.bytes().await {
-                Ok(bytes) => {
-                    if bytes.len() > MAX_RESPONSE_BODY_BYTES {
-                        let truncated = &bytes[..MAX_RESPONSE_BODY_BYTES];
-                        format!(
-                            "{}...[TRUNCATED: {} bytes total]",
-                            String::from_utf8_lossy(truncated),
-                            bytes.len()
-                        )
+            // Read only first chunk of response body (faster than reading full body)
+            // Most webhook endpoints return small JSON, but some return huge payloads
+            let body = match response.chunk().await {
+                Ok(Some(chunk)) => {
+                    let bytes = if chunk.len() > MAX_RESPONSE_BODY_BYTES {
+                        &chunk[..MAX_RESPONSE_BODY_BYTES]
                     } else {
-                        String::from_utf8_lossy(&bytes).to_string()
-                    }
+                        &chunk
+                    };
+                    String::from_utf8_lossy(bytes).to_string()
                 }
+                Ok(None) => String::new(),
                 Err(e) => format!("[Failed to read body: {}]", e),
             };
             let response_body = truncate_str(&body, 1000);
