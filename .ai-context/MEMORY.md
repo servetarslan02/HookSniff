@@ -743,3 +743,26 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - `3d124d19` — docs: NEXT_SESSION.md güncellendi
 - `7910d16d` — feat: service tokens backend
 - `951e8dac` — fix: service token team scoping
+
+## Oturum 158 (2026-05-14 19:47 - 20:31 GMT+8) ✅
+- **OpenClaw** — Servet ile OWASP 14 bulgu incelemesi + devtools düzeltmeleri
+- **OWASP 14 bulgu** — Önceki oturumlarda çözülmüş, Servet doğruladı
+- **Dashboard testleri** — npm install + vitest run çalıştırıldı, birçok test fail (eski mock'lar, store refactor sonrası)
+- **Lint** — Sadece warning'ler, hata yok ✅
+- **npm audit** — 0 vulnerability ✅
+- **Playground devtools düzeltmesi:**
+  - Duplike nav bar kaldırıldı (içerdeki "🪝 HookSniff / Playground" + dil seçici)
+  - Hero section kaldırıldı ("Webhook Playground" başlığı)
+  - İç tab'lar kaldırıldı ("Playground" / "API Access")
+  - ApiAccessSection component kaldırıldı (337 satır)
+  - Kullanılmayan state ve import'lar temizlendi
+  - Build başarılı, push edildi
+- **JWT HS256 vs RS256** — Açıklandı, HS256 yeterli (API key third party'ler için, JWT sadece dashboard)
+- **HMAC-SHA512** — Signature Tool'da var (müşteri test aracı), API sadece SHA256 kullanıyor
+- **Signature Tool test edildi** — Compute + Verify butonları düzgün çalışıyor ✅
+- **Applications limiti güncellendi:**
+  - Developer (Free): 1 → 3
+  - Startup: 1 → 10
+  - Pro/Enterprise: sınırsız (değişmedi)
+  - Test güncellendi, push edildi
+- **Rakip analizi** — Svix'de application limiti yok, Hook0'da free'de 1
