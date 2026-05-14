@@ -138,6 +138,7 @@ pub fn router() -> Router {
         // HS-261: Token revocation endpoints
         .route("/revoke-token", post(revoke_current_token))
         .route("/revoke-all-tokens", post(revoke_all_tokens))
+        .route("/consent", get(get_consent).post(update_consent))
         // GDPR endpoints
         .route("/export", get(export_data))
         .route("/account", axum::routing::delete(delete_account))
@@ -854,6 +855,54 @@ async fn revoke_all_tokens(
         "revoked": true,
         "message": "All access tokens have been revoked. You will need to log in again."
     })))
+}
+
+// ── Consent Endpoints ───────────────────────────────────────
+
+/// GET /v1/auth/consent — Get user consent preferences
+async fn get_consent(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let consents: Option<(serde_json::Value,)> = sqlx::query_as(
+        "SELECT consents FROM customer_consents WHERE customer_id = $1"
+    )
+    .bind(customer.id)
+    .fetch_optional(&pool)
+    .await?;
+
+    let consents_map = match consents {
+        Some((val)) => val.0,
+        None => serde_json::json!({}),
+    };
+
+    Ok(Json(serde_json::json!({ "consents": consents_map })))
+}
+
+/// POST /v1/auth/consent — Update a single consent preference
+async fn update_consent(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<serde_json::Value>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let key = req.get("key").and_then(|v| v.as_str()).ok_or(AppError::BadRequest("Missing 'key' field".into()))?;
+    let value = req.get("value").and_then(|v| v.as_bool()).ok_or(AppError::BadRequest("Missing 'value' field".into()))?;
+
+    // Upsert: merge into existing consents JSON
+    sqlx::query(
+        r#"INSERT INTO customer_consents (id, customer_id, consents, created_at, updated_at)
+           VALUES ($1, $2, $3, NOW(), NOW())
+           ON CONFLICT (customer_id) DO UPDATE SET
+             consents = customer_consents.consents || $3,
+             updated_at = NOW()"#,
+    )
+    .bind(Uuid::new_v4())
+    .bind(customer.id)
+    .bind(serde_json::json!({ key: value }))
+    .execute(&pool)
+    .await?;
+
+    Ok(Json(serde_json::json!({ "success": true })))
 }
 
 // ── 2FA Endpoints ───────────────────────────────────────────
