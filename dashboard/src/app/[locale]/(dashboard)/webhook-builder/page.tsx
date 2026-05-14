@@ -63,10 +63,10 @@ export default function WebhookBuilderPage() {
   useEffect(() => {
     if (!token) return;
     setLoadingEndpoints(true);
-    apiFetch<{ data: Endpoint[] }>('/endpoints', { token })
+    apiFetch<Endpoint[]>('/endpoints', { token })
       .then((res) => {
-        setEndpoints(res.data || []);
-        if (res.data?.length === 1) setEndpointId(res.data[0].id);
+        setEndpoints(res || []);
+        if (res?.length === 1) setEndpointId(res[0].id);
       })
       .catch(() => {})
       .finally(() => setLoadingEndpoints(false));
