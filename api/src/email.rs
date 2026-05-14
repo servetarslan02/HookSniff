@@ -5,20 +5,15 @@ use base64::Engine;
 use serde::Deserialize;
 
 /// Language for email templates. Defaults to Turkish (primary market).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum Language {
+    #[default]
     Tr,
     En,
 }
 
-impl Default for Language {
-    fn default() -> Self {
-        Self::Tr
-    }
-}
-
 impl Language {
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_lang(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "en" | "english" => Self::En,
             _ => Self::Tr,
@@ -467,6 +462,7 @@ impl EmailProvider {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn send_invoice_email(
         &self,
         to: &str,
@@ -516,6 +512,7 @@ impl EmailProvider {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn send_webhook_success_email(
         &self,
         to: &str,
@@ -869,6 +866,7 @@ impl GCloudEmailClient {
     }
 
     /// Send an invoice/receipt email.
+    #[allow(clippy::too_many_arguments)]
     pub async fn send_invoice_email(
         &self,
         to: &str,
@@ -893,6 +891,7 @@ impl GCloudEmailClient {
     }
 
     /// Notify user of a successful webhook delivery.
+    #[allow(clippy::too_many_arguments)]
     pub async fn send_webhook_success_email(
         &self,
         to: &str,

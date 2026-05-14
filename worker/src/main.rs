@@ -55,6 +55,7 @@ const CIRCUIT_BREAKER_COOLDOWN_SECS: u64 = 60;
 /// Zombie reaper check interval
 const ZOMBIE_REAPER_INTERVAL_SECS: u64 = 30;
 /// Queue poll batch size
+#[allow(dead_code)]
 const QUEUE_BATCH_SIZE: i32 = 50;
 /// Response body truncation limit for storage
 const RESPONSE_BODY_TRUNCATE_BYTES: usize = 500;
@@ -1043,6 +1044,7 @@ async fn commit_delivery_tx(
 }
 
 /// Record the delivery attempt in the delivery_attempts table.
+#[allow(clippy::too_many_arguments)]
 async fn record_delivery_attempt(
     tx: &mut sqlx::PgTransaction<'_>,
     delivery_id: uuid::Uuid,

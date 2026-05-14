@@ -198,8 +198,8 @@ fn validate_delivery_url(url: &str) -> Result<(), String> {
         }
     } else {
         // IPv4/hostname: strip userinfo (user@host), then port (:port)
-        let without_at = rest.split('@').last().unwrap_or(rest);
-        let host_end = without_at.find(|c: char| c == '/' || c == ':' || c == '?' || c == '#')
+        let without_at = rest.split('@').next_back().unwrap_or(rest);
+        let host_end = without_at.find(['/', ':', '?', '#'])
             .unwrap_or(without_at.len());
         &without_at[..host_end]
     };
