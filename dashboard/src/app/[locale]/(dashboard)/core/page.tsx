@@ -6,8 +6,8 @@ import { useTranslations } from 'next-intl';
 
 const DashboardOverview = dynamic(() => import('../DashboardOverview').then(mod => ({ default: mod.DashboardOverview })), { ssr: false });
 const EndpointsPage = dynamic(() => import('../endpoints/page'), { ssr: false });
-const DeliveriesPage = dynamic(() => import('../deliveries/page'), { ssr: false });
-const SearchPage = dynamic(() => import('../search/page'), { ssr: false });
+const ApplicationsPage = dynamic(() => import('../applications/page'), { ssr: false });
+const ApiKeysPage = dynamic(() => import('../api-keys/page'), { ssr: false });
 
 export default function CorePage() {
   const t = useTranslations('nav');
@@ -17,8 +17,8 @@ export default function CorePage() {
       tabs={[
         { key: 'overview', label: t('dashboard', { defaultValue: 'Dashboard' }), icon: '📊', content: <DashboardOverview /> },
         { key: 'endpoints', label: t('endpoints', { defaultValue: 'Endpoints' }), icon: '🔗', content: <EndpointsPage /> },
-        { key: 'deliveries', label: t('deliveries', { defaultValue: 'Deliveries' }), icon: '📦', content: <DeliveriesPage /> },
-        { key: 'search', label: t('search', { defaultValue: 'Search' }), icon: '🔍', content: <SearchPage /> },
+        { key: 'applications', label: t('applications', { defaultValue: 'Applications' }), icon: '📁', content: <ApplicationsPage /> },
+        { key: 'api-keys', label: t('apiKeys', { defaultValue: 'API Keys' }), icon: '🔑', content: <ApiKeysPage /> },
       ]}
     />
   );

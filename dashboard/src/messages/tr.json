@@ -182,7 +182,9 @@
     "billingOverview": "Faturalandırma",
     "settingsSection": "Ayarlar",
     "sectionMonitoring": "İzleme",
-    "observability": "İzleme"
+    "observability": "İzleme",
+    "sectionContent": "İçerik",
+    "account": "Hesap"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
