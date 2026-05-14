@@ -174,27 +174,25 @@ async fn latency_trend(
     Query(query): Query<AnalyticsQuery>,
 ) -> Result<Json<LatencyTrendResponse>, AppError> {
     let hours = query.interval_hours();
-    let bucket_hours = query.bucket_size_hours();
     let range_label = query.range.as_deref().unwrap_or("24h");
 
     let buckets: Vec<(chrono::NaiveDateTime, f64, f64)> = sqlx::query_as(
         r#"
         SELECT
-            date_trunc('hour', da.created_at) - (EXTRACT(HOUR FROM da.created_at)::int % $3) * INTERVAL '1 hour' AS bucket,
+            date_trunc('hour', da.created_at) AS bucket,
             COALESCE(AVG(da.duration_ms), 0)::FLOAT AS avg_ms,
             COALESCE(PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY da.duration_ms), 0)::FLOAT AS p95_ms
         FROM delivery_attempts da
         JOIN deliveries d ON d.id = da.delivery_id
         WHERE d.customer_id = $1
-          AND da.created_at >= now() - INTERVAL '1 hour' * $2
+          AND da.created_at >= now() - make_interval(hours => $2)
           AND da.duration_ms IS NOT NULL
-        GROUP BY bucket
+        GROUP BY date_trunc('hour', da.created_at)
         ORDER BY bucket ASC
         "#,
     )
     .bind(customer.id)
-    .bind(hours)
-    .bind(bucket_hours as i32)
+    .bind(hours as i32)
     .fetch_all(&pool)
     .await?;
 
@@ -204,12 +202,12 @@ async fn latency_trend(
         FROM delivery_attempts da
         JOIN deliveries d ON d.id = da.delivery_id
         WHERE d.customer_id = $1
-          AND da.created_at >= now() - INTERVAL '1 hour' * $2
+          AND da.created_at >= now() - make_interval(hours => $2)
           AND da.duration_ms IS NOT NULL
         "#,
     )
     .bind(customer.id)
-    .bind(hours)
+    .bind(hours as i32)
     .fetch_one(&pool)
     .await?;
 
