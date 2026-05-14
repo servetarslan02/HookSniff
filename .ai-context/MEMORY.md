@@ -856,3 +856,11 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Rate Limiting** — sağlam ✅
 - **SSO** — sağlam ✅
 - **Commit:** `bf83d660` — main branch, push ✅
+
+## Oturum 159 Ek 5 — Routing Config Düzeltmesi (2026-05-15 03:54 - 03:58 GMT+8)
+- **Retry Policy** — 2 sorun düzeltildi:
+  1. Fetch: `max_attempts`, `base_delay_ms` top-level'dan okunuyordu ama backend nested `retry_policy` objesi döndürüyordu → düzeltildi
+  2. Save: `base_delay_ms`, `max_delay_ms`, `multiplier` gönderiliyordu ama backend `backoff`, `initial_delay_secs`, `max_delay_secs` bekliyordu → düzeltildi
+- **Routing** — sağlam ✅ (interface'de fazla field var ama JSX'te kullanılmıyor)
+- **Custom Domain** — sağlam ✅
+- **Commit:** `a82fac73` — main branch, push ✅
