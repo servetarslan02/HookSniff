@@ -1,51 +1,53 @@
-# NEXT_SESSION.md — Yeni OpenClaw Oturumu
+# NEXT_SESSION.md — Performance Work Devam
 
-> Son güncelleme: 2026-05-15 06:59 GMT+8
-> Oturum: OpenClaw (yeni platform, ~1 saat oturum süresi)
+> Son güncelleme: 2026-05-15 07:27 GMT+8
 
-## Son Durum (Oturum 160 Sonrası)
+## Yapılan (Bu Oturum — Oturum 162)
 
-### Genel İlerleme: 359/364 (%99) — 5 kalan ⬜ (hepsi Servet görevleri)
+### ✅ #1 Redis Cache → Auth Middleware
+- `auth_middleware`: Redis cache layer for API key validation (shared across instances)
+- `jwt_auth_middleware`: Redis cache for JWT customer lookup
+- API key delete/rotate: Redis cache invalidation
+- In-memory cache kept as fallback when Redis unavailable
+- 3-tier caching: Redis → in-memory → DB
 
-### Son Commit: `50cf1f87` — Cloud Build fix (6 compile/test hatası düzeltildi)
+### ✅ #3 Health Check Ayrı Pool
+- `HealthPool` newtype (5 connections, independent of main pool)
+- `create_health_pool()` in db.rs (3s acquire timeout)
+- Health check handlers use separate pool
+- Falls back to main pool if health pool creation fails
 
-### Canlı Servisler
-- **Dashboard:** https://hooksniff.vercel.app ✅ (200)
-- **API:** https://hooksniff-api-1046140057667.europe-west1.run.app ✅ (çalışıyor)
-- **Worker:** https://hooksniff-worker-1046140057667.europe-west1.run.app ✅
+### ✅ #4 Grafana Dashboard (zaten mevcut)
+- 6 dashboard zaten var (Webhook Monitoring, Service Health, SLO, Business, Security, Infrastructure)
+- Yeni "⚡ HookSniff — Performance" dashboard oluşturuldu (10 panel)
+- URL: https://hookrelay.grafana.net/d/hooksniff-performance/
 
-### Son Yapılan İşler (Oturum 159-160)
-- 3 kopuk API düzeltildi (2fa/status, batch-replay, inbound/configs)
-- Observability: logs detail, analytics latency chart bağlandı
-- DevTools: webhook builder, playground, API importer, signature verifier fix
-- Portal usage response format düzeltildi
-- Audit log response format düzeltildi (has_more, page, timestamp, actor)
-- Retry policy, routing config, notifications filter fix
-- Billing usage response format fix
-- Notification preferences + auth consent backend eklendi
-- Admin system health response format fix
-- Kapsamlı API audit: 4 kritik + 5 önemli uyumsuzluk düzeltildi
+### ✅ #9 Clippy 0 Errors
+- 25 clippy hatası düzeltildi (12 dosya)
+- `cargo clippy -- -D warnings` → 0 errors, 0 warnings
+- `cargo test --lib` → 1065 passed, 0 failed
 
-### Servet'in Yapması Gereken (5 madde)
-- [ ] iyzico hesap aç (vergi levhası + banka hesabı)
-- [ ] Domain kararı (şimdilik hooksniff.vercel.app yeterli)
-- [ ] GCP SA key rotate
-- [ ] GitHub PAT rotate
-- [ ] Polar.sh Stripe payout + identity verification
+### ✅ #2 Dashboard Code Splitting — zaten yapılmış (dynamic imports mevcut)
 
-## Bu Oturumda Ne Yapılabilir?
+### Commits
+- `7f48c6a6` — perf: Redis cache for auth middleware + health check pool
+- `0b544a79` — fix: clippy warnings — 0 errors, 0 warnings
 
-### Öncelik 1: Kalan Hook0-style sayfalar
-Analytics, Playground, Billing, Logs, Health, Alerts, Schemas, Transforms, Routing, Inbound sayfaları hala eski style (~3000 satır). Hook0 minimal tasarımına geçirilebilir.
+## Kalan Performance Roadmap
 
-### Öncelik 2: Test düzeltmeleri
-Dashboard testleri eski mock'lar nedeniyle fail oluyor. Vitest testleri güncellenebilir.
+### Kısa Vade
+- [ ] Structured JSON Logging — `tracing_subscriber::fmt::layer().json()` production'da aktif (telemetry.rs'de zaten var, `APP_ENV=production` ile çalışır)
 
-### Öncelik 3: SDK publish
-npm, PyPI, crates.io'ya SDK publish işlemi yapılabilir.
+### Orta Vade
+- [ ] Background Job Queue (Redis)
+- [ ] Read Replica (Neon)
+- [ ] Cloud CDN headers
 
-### Öncelik 4: Cloud Build doğrulama
-Son commit'ler Cloud Build ile deploy edilmiş olmalı. GCP Console'dan kontrol edilmeli.
+### Büyük İş
+- [ ] WebSocket live updates
+- [ ] Edge Workers (Cloudflare)
+- [ ] Event Sourcing
+- [ ] Multi-Region DB
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
@@ -53,13 +55,4 @@ Son commit'ler Cloud Build ile deploy edilmiş olmalı. GCP Console'dan kontrol 
 - Dashboard: https://hooksniff.vercel.app
 - API: https://hooksniff-api-1046140057667.europe-west1.run.app
 - GCP: hooksniff-app projesi
-- Neon DB: ep-frosty-bar-al0hyt9d eu-central-1
-
-## Çalışma Kuralları
-- `.ai-context/` GitHub'da kalıcı hafıza — her oturum sonunda güncelle
-- Local dosyalar silinir, önemli bilgiler GitHub'a commit et
-- Rust compile + test zorunlu (gözle bakarak yetmez)
-- npm install çalıştır, yarım iş bırakma
-- Conventional commits kullan
-- Git email: servetarslan02@users.noreply.github.com
-- ⚠️ External servis ayarları için Servet'ten giriş bilgileri iste
+- Grafana: hookrelay.grafana.net
