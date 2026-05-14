@@ -1,38 +1,49 @@
-# NEXT_SESSION.md — API Audit 2 Tur Tamamlandı
+# NEXT_SESSION.md — E2E Test Sonrası
 
-> Son güncelleme: 2026-05-15 04:50 GMT+8
+> Son güncelleme: 2026-05-15 05:25 GMT+8
 
-## Yapılan (Oturum 160 — 2 Tur)
+## Yapılan (Oturum 161 — E2E Test)
 
-### 1. Tur: Genel API Uyumsuzlukları
-1. billing/portal: GET→POST (405 fix)
-2. delivery detail: /webhooks/{id}→/webhooks/{id}/details
-3. API keys: name alanı eklendi
-4. delivery attempts: computed status (delivered/failed)
-5. rate limits: endpoint_url + requests_per_minute
-6. billing subscription: current_period_end
-7. portal profile: name alanı
+### Kapsamlı Müşteri Testi
+- 20+ sayfa tarandı (landing, admin, user panel, API)
+- 17 sayfa çalışıyor, 3 sayfa hatalı
+- 13 i18n eksik key tespit edildi
+- 2 backend 500 hatası bulundu
+- Rapor: `.ai-context/E2E-TEST-REPORT-2026-05-15.md`
 
-### 2. Tur: Detaylı İnceleme
-8. Register: store crash→email verification flow handling
-9. 2FA Enable: qr_code eksik→qrserver.com QR URL
-10. Login content: register success message
-11. Admin DeliverySummary: event_type→event rename
-12. Notification weekly_digest: DB migration + handler
-13. authApi type: user→customer fix
+## 🔴 Acil — Bu Oturumda Yapılmalı
 
-### Toplam: 7 kritik + 6 önemli düzeltme, 37+ API doğrulandı
+### 1. `/v1/auth/2fa/status` 500 Hatası
+- **Sorun:** Settings sayfasındaki 2FA status endpoint'i 500 döndürüyor
+- **Dosya:** `api/src/routes/auth.rs` — `get_2fa_status` handler
+- **Etki:** 2FA bölümü tamamen çalışmıyor
 
-## Sonraki Adımlar
-- **Cloud Build tetikle** — Rust API değişiklikleri deploy edilmeli
-- Dashboard Vercel deploy otomatik tetiklenmeli
-- Production'da tüm sayfaları test et
-- 2FA enable/test et (QR code gösterimi)
-- Register akışını test et (email verification)
+### 2. `/monitoring` 404 Hatası
+- **Sorun:** Monitoring sayfası 404 döndürüyor
+- **Dosya:** `dashboard/src/app/[locale]/(dashboard)/monitoring/page.tsx` — var mı kontrol et
+- **Etki:** Sidebar linki bozuk
 
-## Kalan Düşük Öncelik
-- Admin system health: raw fetch→apiFetch (çalışıyor ama ideal değil)
-- Endpoint response: signing_secret kasıtlı çıkarılmış
+### 3. i18n Eksik Key'ler (13 adet)
+- `auth.verifyEmailSent`
+- `billing.nextBilling`, `billing.webhooksThisMonth`, `billing.used`
+- `settings.twoFactorAuth`, `settings.twoFactorDesc`, `settings.2faDisabled`, `settings.enable2fa`
+- `docs.docs`, `docs.developer`, `docs.startup`, `docs.enterprise`, `docs.unlimited`
+- **Dosya:** `dashboard/src/messages/en.json` — key'leri ekle
+
+## 🟡 Orta — Sonraki Adımlar
+
+### 4. `/api/status` 404
+- Status API route'u tanımlı değil
+- Ya Next.js API route oluştur ya da backend'den proxy et
+
+### 5. Fiyat Tutarsızlığı
+- Landing: $0/$29/$49/Custom
+- MEMORY.md: $0/$29/$99
+- Doğru fiyat ne? Servet'e sor veya düzelt
+
+### 6. Pending Deliveries (2 adet)
+- 13 Mayıs'tan kalma, 0 attempt
+- Worker neden işlemiyor?
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
