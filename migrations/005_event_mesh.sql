@@ -11,7 +11,7 @@
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS event_schemas (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name STRING NOT NULL,
+    name TEXT NOT NULL,
     version INT DEFAULT 1,
     schema JSONB NOT NULL,
     customer_id UUID REFERENCES customers(id),
@@ -35,7 +35,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_event_schemas_unique_version
 CREATE TABLE IF NOT EXISTS delivery_targets (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     endpoint_id UUID REFERENCES endpoints(id) ON DELETE CASCADE,
-    target_type STRING NOT NULL, -- 'http', 'ws', 'grpc', 'sqs', 'kafka', 'email'
+    target_type TEXT NOT NULL, -- 'http', 'ws', 'grpc', 'sqs', 'kafka', 'email'
     config JSONB NOT NULL,
     enabled BOOL DEFAULT true,
     created_at TIMESTAMPTZ DEFAULT now(),
@@ -54,7 +54,7 @@ CREATE INDEX IF NOT EXISTS idx_delivery_targets_endpoint
 CREATE TABLE IF NOT EXISTS fanout_rules (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID REFERENCES customers(id) ON DELETE CASCADE,
-    event_pattern STRING NOT NULL,       -- glob pattern: 'order.*', 'payment.completed'
+    event_pattern TEXT NOT NULL,       -- glob pattern: 'order.*', 'payment.completed'
     conditions JSONB,                     -- optional: {"field": "amount", "op": "gt", "value": 1000}
     target_ids UUID[] NOT NULL,           -- array of delivery_target IDs
     dead_letter_endpoint_id UUID,         -- per-fanout dead letter target
@@ -76,7 +76,7 @@ CREATE INDEX IF NOT EXISTS idx_fanout_rules_customer
 CREATE TABLE IF NOT EXISTS ws_subscriptions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID REFERENCES customers(id) ON DELETE CASCADE,
-    connection_id STRING NOT NULL UNIQUE,
+    connection_id TEXT NOT NULL UNIQUE,
     event_filters TEXT[] NOT NULL,        -- ['order.*', 'payment.completed']
     last_heartbeat TIMESTAMPTZ DEFAULT now(),
     metadata JSONB,
