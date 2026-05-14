@@ -4,8 +4,8 @@
 CREATE TABLE IF NOT EXISTS applications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
-    name STRING NOT NULL,
-    description STRING,
+    name TEXT NOT NULL,
+    description TEXT,
     is_active BOOL NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
