@@ -1,5 +1,5 @@
 use axum::extract::{Extension, Path};
-use axum::routing::{get, post, put};
+use axum::routing::get;
 use axum::{Json, Router};
 use sqlx::PgPool;
 use uuid::Uuid;
