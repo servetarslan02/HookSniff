@@ -2,10 +2,10 @@
 
 CREATE TABLE IF NOT EXISTS customers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email STRING NOT NULL UNIQUE,
-    api_key_hash STRING NOT NULL,
-    api_key_prefix STRING NOT NULL,
-    plan STRING NOT NULL DEFAULT 'free',
+    email TEXT NOT NULL UNIQUE,
+    api_key_hash TEXT NOT NULL,
+    api_key_prefix TEXT NOT NULL,
+    plan TEXT NOT NULL DEFAULT 'free',
     webhook_limit INT NOT NULL DEFAULT 10000,
     webhook_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS customers (
 CREATE TABLE IF NOT EXISTS endpoints (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
-    url STRING NOT NULL,
-    description STRING,
+    url TEXT NOT NULL,
+    description TEXT,
     is_active BOOL NOT NULL DEFAULT true,
-    signing_secret STRING NOT NULL,
+    signing_secret TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -26,13 +26,13 @@ CREATE TABLE IF NOT EXISTS deliveries (
     endpoint_id UUID NOT NULL REFERENCES endpoints(id) ON DELETE CASCADE,
     customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
     payload JSONB NOT NULL,
-    event_type STRING,
-    status STRING NOT NULL DEFAULT 'pending',
+    event_type TEXT,
+    status TEXT NOT NULL DEFAULT 'pending',
     attempt_count INT NOT NULL DEFAULT 0,
     max_attempts INT NOT NULL DEFAULT 3,
     last_attempt_at TIMESTAMPTZ,
     response_status INT,
-    response_body STRING,
+    response_body TEXT,
     next_retry_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS dead_letters (
     endpoint_id UUID NOT NULL REFERENCES endpoints(id),
     customer_id UUID NOT NULL REFERENCES customers(id),
     payload JSONB NOT NULL,
-    reason STRING,
+    reason TEXT,
     attempts INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
