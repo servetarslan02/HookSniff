@@ -34,7 +34,9 @@ pub fn router() -> Router {
 #[derive(Debug, Serialize)]
 pub struct RateLimitConfigResponse {
     pub endpoint_id: Uuid,
+    pub endpoint_url: String,
     pub requests_per_second: i32,
+    pub requests_per_minute: i32,
     pub burst_size: i32,
     pub enabled: bool,
     pub created_at: DateTime<Utc>,
@@ -74,8 +76,8 @@ async fn list_rate_limits(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<RateLimitConfigResponse>>, AppError> {
-    let rows = sqlx::query_as::<_, (Uuid, i32, i32, bool, DateTime<Utc>, DateTime<Utc>)>(
-        "SELECT r.endpoint_id, r.requests_per_second, r.burst_size, r.enabled, r.created_at, r.updated_at
+    let rows = sqlx::query_as::<_, (Uuid, String, i32, i32, bool, DateTime<Utc>, DateTime<Utc>)>(
+        "SELECT r.endpoint_id, e.url, r.requests_per_second, r.burst_size, r.enabled, r.created_at, r.updated_at
          FROM rate_limit_configs r
          INNER JOIN endpoints e ON e.id = r.endpoint_id
          WHERE e.customer_id = $1
@@ -88,10 +90,12 @@ async fn list_rate_limits(
     let configs = rows
         .into_iter()
         .map(
-            |(endpoint_id, requests_per_second, burst_size, enabled, created_at, updated_at)| {
+            |(endpoint_id, endpoint_url, requests_per_second, burst_size, enabled, created_at, updated_at)| {
                 RateLimitConfigResponse {
                     endpoint_id,
+                    endpoint_url,
                     requests_per_second,
+                    requests_per_minute: requests_per_second * 60,
                     burst_size,
                     enabled,
                     created_at,

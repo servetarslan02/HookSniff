@@ -16,7 +16,8 @@ use crate::middleware::idempotency;
 use crate::models::customer::Customer;
 use crate::models::delivery::{
     BatchError, BatchResponse, BatchWebhookRequest, CreateWebhookRequest, Delivery,
-    DeliveryAttempt, DeliveryListResponse, DeliveryResponse, ExportDelivery,
+    DeliveryAttempt, DeliveryAttemptResponse, DeliveryListResponse, DeliveryResponse,
+    ExportDelivery,
 };
 use crate::models::endpoint::{Endpoint, RetryPolicy};
 use crate::validation;
@@ -859,7 +860,7 @@ async fn get_delivery_attempts(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
-) -> Result<Json<Vec<DeliveryAttempt>>, AppError> {
+) -> Result<Json<Vec<DeliveryAttemptResponse>>, AppError> {
     let _delivery = sqlx::query_as::<_, Delivery>(
         "SELECT * FROM deliveries WHERE id = $1 AND customer_id = $2",
     )
@@ -876,7 +877,7 @@ async fn get_delivery_attempts(
     .fetch_all(&pool)
     .await?;
 
-    Ok(Json(attempts))
+    Ok(Json(attempts.iter().map(|a| a.to_response()).collect()))
 }
 
 #[cfg(test)]

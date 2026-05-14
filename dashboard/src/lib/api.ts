@@ -227,7 +227,7 @@ export const webhooksApi = {
     apiFetch<Delivery>("/webhooks", { method: "POST", body: data, token }),
 
   get: (token: string, id: string) =>
-    apiFetch<DeliveryDetail>(`/webhooks/${id}`, { token }),
+    apiFetch<DeliveryDetail>(`/webhooks/${id}/details`, { token }),
 
   getAttempts: (token: string, id: string) =>
     apiFetch<DeliveryAttempt[]>(`/webhooks/${id}/attempts`, { token }),
@@ -873,7 +873,7 @@ export const billingApi = {
     billingApiExtended.getInvoices(token),
 
   getPortalUrl: (token: string) =>
-    apiFetch<{ url: string }>('/billing/portal', { token }),
+    apiFetch<{ url: string }>('/billing/portal', { method: 'POST', token }),
 };
 
 // Analytics API
