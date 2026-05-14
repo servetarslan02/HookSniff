@@ -708,6 +708,7 @@ mod tests {
 
 /// Add standard security headers to all API responses.
 pub async fn security_headers_middleware(request: Request, next: Next) -> Response {
+    let path = request.uri().path().to_string();
     let mut response = next.run(request).await;
     let headers = response.headers_mut();
     headers.insert("x-content-type-options", "nosniff".parse().unwrap());
@@ -720,10 +721,25 @@ pub async fn security_headers_middleware(request: Request, next: Next) -> Respon
         "referrer-policy",
         "strict-origin-when-cross-origin".parse().unwrap(),
     );
-    headers.insert(
-        "cache-control",
-        "no-store, no-cache, must-revalidate".parse().unwrap(),
-    );
+
+    // Smart cache control: public endpoints cacheable, authenticated private
+    if path.starts_with("/health") || path.starts_with("/v1/status") || path.starts_with("/metrics") {
+        headers.insert(
+            "cache-control",
+            "public, max-age=10".parse().unwrap(),
+        );
+    } else if path.starts_with("/v1/") {
+        headers.insert(
+            "cache-control",
+            "private, no-cache".parse().unwrap(),
+        );
+    } else {
+        headers.insert(
+            "cache-control",
+            "no-store, no-cache, must-revalidate".parse().unwrap(),
+        );
+    }
+
     headers.insert("x-xss-protection", "1; mode=block".parse().unwrap());
     response
 }
