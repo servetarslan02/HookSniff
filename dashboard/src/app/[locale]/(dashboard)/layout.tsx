@@ -53,7 +53,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       key: 'monitoring',
       label: t('sectionMonitoring'),
       items: [
-        { name: t('monitoring'), href: '/monitoring', icon: '📡' },
+        { name: t('observability'), href: '/observability', icon: '📡' },
         { name: t('devtools'), href: '/devtools', icon: '🛠️' },
         { name: t('contentMgmt'), href: '/content-mgmt', icon: '📐' },
       ],
