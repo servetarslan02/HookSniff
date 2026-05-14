@@ -832,3 +832,11 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Analytics latency chart** — `analyticsApi.latencyTrend()` çağrıldı, avg (mor) + P95 (amber) grafik eklendi
 - **Build:** ✅ başarılı (216 sayfa)
 - **Commit:** `3c5a196c` — main branch, push ✅
+
+## Oturum 159 Ek 2 — DevTools Düzeltmeleri (2026-05-15 03:42 - 03:48 GMT+8)
+- **Webhook Builder** — endpoint listesi boştu, backend `[]` döndürüyor ama frontend `{data:[]}` bekliyordu. Format düzeltildi, endpoint'ler artık yükleniyor
+- **Playground (inner)** — `credentials:'include'` eklenmediği için cookie auth çalışmıyordu. Eklendi, page refresh sonrası bile API_calls çalışır
+- **API Importer** — client-side spec parsing + `endpointsApi.create()` → sağlam ✅
+- **Signature Verifier** — tamamen client-side (Web Crypto API) → sağlam ✅
+- **Build:** ✅ başarılı
+- **Commit:** `8025ad8b` — main branch, push ✅
