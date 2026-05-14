@@ -1,7 +1,7 @@
 //! Standard Webhooks verification middleware.
 //!
 //! Verifies incoming webhook requests using the Standard Webhooks spec.
-//! Checks `webhook-id`, `webhook-timestamp`, and `webhook-signature` headers.
+//! Checks `X-HookSniff-ID`, `X-HookSniff-Timestamp`, and `X-HookSniff-Signature` headers.
 
 use axum::{
     body::Body,
@@ -17,9 +17,9 @@ use crate::signing;
 /// Middleware that verifies Standard Webhooks signatures on incoming requests.
 ///
 /// Extracts the following headers:
-/// - `webhook-id`: The unique message ID
-/// - `webhook-timestamp`: Unix timestamp string
-/// - `webhook-signature`: `v1,<base64(hmac)>` signature(s)
+/// - `X-HookSniff-ID`: The unique message ID
+/// - `X-HookSniff-Timestamp`: Unix timestamp string
+/// - `X-HookSniff-Signature`: `v1,<base64(hmac)>` signature(s)
 ///
 /// The signing secret is expected to be available in request extensions
 /// (set by the endpoint resolution logic upstream).
@@ -27,19 +27,19 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
     // Extract Standard Webhooks headers
     let msg_id = req
         .headers()
-        .get("webhook-id")
+        .get("X-HookSniff-ID")
         .and_then(|v| v.to_str().ok())
         .map(|s| s.to_string());
 
     let timestamp = req
         .headers()
-        .get("webhook-timestamp")
+        .get("X-HookSniff-Timestamp")
         .and_then(|v| v.to_str().ok())
         .map(|s| s.to_string());
 
     let signature = req
         .headers()
-        .get("webhook-signature")
+        .get("X-HookSniff-Signature")
         .and_then(|v| v.to_str().ok())
         .map(|s| s.to_string());
 
@@ -179,7 +179,7 @@ mod tests {
                 Request::builder()
                     .method("POST")
                     .uri("/webhook")
-                    .header("webhook-id", "msg_123")
+                    .header("X-HookSniff-ID", "msg_123")
                     .header("content-type", "application/json")
                     .body(Body::from(r#"{"test": true}"#))
                     .unwrap(),
@@ -199,9 +199,9 @@ mod tests {
                 Request::builder()
                     .method("POST")
                     .uri("/webhook")
-                    .header("webhook-id", "msg_123")
-                    .header("webhook-timestamp", now.to_string())
-                    .header("webhook-signature", "v1,fakesig")
+                    .header("X-HookSniff-ID", "msg_123")
+                    .header("X-HookSniff-Timestamp", now.to_string())
+                    .header("X-HookSniff-Signature", "v1,fakesig")
                     .header("content-type", "application/json")
                     .body(Body::from(r#"{"test": true}"#))
                     .unwrap(),
@@ -228,9 +228,9 @@ mod tests {
                 Request::builder()
                     .method("POST")
                     .uri("/webhook")
-                    .header("webhook-id", msg_id)
-                    .header("webhook-timestamp", timestamp)
-                    .header("webhook-signature", &signature_header)
+                    .header("X-HookSniff-ID", msg_id)
+                    .header("X-HookSniff-Timestamp", timestamp)
+                    .header("X-HookSniff-Signature", &signature_header)
                     .header("content-type", "application/json")
                     .body(Body::from(body))
                     .unwrap(),
@@ -252,9 +252,9 @@ mod tests {
                 Request::builder()
                     .method("POST")
                     .uri("/webhook")
-                    .header("webhook-id", "msg_002")
-                    .header("webhook-timestamp", now.to_string())
-                    .header("webhook-signature", "v1,aW52YWxpZHNpZ25hdHVyZQ==") // base64("invalidsignature")
+                    .header("X-HookSniff-ID", "msg_002")
+                    .header("X-HookSniff-Timestamp", now.to_string())
+                    .header("X-HookSniff-Signature", "v1,aW52YWxpZHNpZ25hdHVyZQ==") // base64("invalidsignature")
                     .header("content-type", "application/json")
                     .body(Body::from(r#"{"test": true}"#))
                     .unwrap(),
@@ -281,9 +281,9 @@ mod tests {
                 Request::builder()
                     .method("POST")
                     .uri("/webhook")
-                    .header("webhook-id", msg_id)
-                    .header("webhook-timestamp", &now)
-                    .header("webhook-signature", &signature_header)
+                    .header("X-HookSniff-ID", msg_id)
+                    .header("X-HookSniff-Timestamp", &now)
+                    .header("X-HookSniff-Signature", &signature_header)
                     .header("content-type", "application/json")
                     .body(Body::from(body))
                     .unwrap(),
@@ -304,9 +304,9 @@ mod tests {
                 Request::builder()
                     .method("POST")
                     .uri("/webhook")
-                    .header("webhook-id", "msg_003")
-                    .header("webhook-timestamp", "not_a_number")
-                    .header("webhook-signature", "v1,fakesig")
+                    .header("X-HookSniff-ID", "msg_003")
+                    .header("X-HookSniff-Timestamp", "not_a_number")
+                    .header("X-HookSniff-Signature", "v1,fakesig")
                     .header("content-type", "application/json")
                     .body(Body::from(r#"{"test": true}"#))
                     .unwrap(),

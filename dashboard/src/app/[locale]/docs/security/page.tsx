@@ -126,7 +126,7 @@ def handle_webhook():
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("timestampValidation")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Always validate the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">webhook-timestamp</code> header to prevent replay attacks. Reject webhooks older than <strong>5 minutes</strong>:
+          Always validate the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">X-HookSniff-Timestamp</code> header to prevent replay attacks. Reject webhooks older than <strong>5 minutes</strong>:
         </p>
         <CodeBlock
           code={`function isTimestampValid(timestampHeader: string, toleranceSec = 300): boolean {
@@ -136,7 +136,7 @@ def handle_webhook():
 }
 
 // In your handler:
-const timestamp = req.headers['webhook-timestamp'] as string;
+const timestamp = req.headers['X-HookSniff-Timestamp'] as string;
 if (!isTimestampValid(timestamp)) {
   return res.status(401).json({ error: 'Timestamp expired' });
 }`}

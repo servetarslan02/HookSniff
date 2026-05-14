@@ -240,10 +240,9 @@ async fn main() -> Result<()> {
                         axum::http::header::ORIGIN,
                         axum::http::header::HeaderName::from_static("x-api-key"),
                         axum::http::header::HeaderName::from_static("x-request-id"),
-                        axum::http::header::HeaderName::from_static("x-webhook-id"),
+                        axum::http::header::HeaderName::from_static("x-hooksniff-id"),
                         axum::http::header::HeaderName::from_static("x-hooksniff-signature"),
-                        axum::http::header::HeaderName::from_static("x-webhook-signature"),
-                        axum::http::header::HeaderName::from_static("x-webhook-timestamp"),
+                        axum::http::header::HeaderName::from_static("x-hooksniff-timestamp"),
                     ]))
                     .allow_credentials(true)
             } else if origins.is_empty() {
@@ -274,10 +273,9 @@ async fn main() -> Result<()> {
                         axum::http::header::ORIGIN,
                         axum::http::header::HeaderName::from_static("x-api-key"),
                         axum::http::header::HeaderName::from_static("x-request-id"),
-                        axum::http::header::HeaderName::from_static("x-webhook-id"),
+                        axum::http::header::HeaderName::from_static("x-hooksniff-id"),
                         axum::http::header::HeaderName::from_static("x-hooksniff-signature"),
-                        axum::http::header::HeaderName::from_static("x-webhook-signature"),
-                        axum::http::header::HeaderName::from_static("x-webhook-timestamp"),
+                        axum::http::header::HeaderName::from_static("x-hooksniff-timestamp"),
                     ]))
                     .allow_credentials(true)
             } else {
@@ -298,10 +296,9 @@ async fn main() -> Result<()> {
                         axum::http::header::ORIGIN,
                         axum::http::header::HeaderName::from_static("x-api-key"),
                         axum::http::header::HeaderName::from_static("x-request-id"),
-                        axum::http::header::HeaderName::from_static("x-webhook-id"),
+                        axum::http::header::HeaderName::from_static("x-hooksniff-id"),
                         axum::http::header::HeaderName::from_static("x-hooksniff-signature"),
-                        axum::http::header::HeaderName::from_static("x-webhook-signature"),
-                        axum::http::header::HeaderName::from_static("x-webhook-timestamp"),
+                        axum::http::header::HeaderName::from_static("x-hooksniff-timestamp"),
                     ]))
                     .allow_credentials(true)
             }
