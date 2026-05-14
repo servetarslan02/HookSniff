@@ -79,6 +79,7 @@ ${Object.entries(headers)
       const res = await fetch(`${API_BASE}${path}`, {
         method,
         headers,
+        credentials: 'include',
         body: method !== 'GET' && body ? body : undefined,
       });
 
