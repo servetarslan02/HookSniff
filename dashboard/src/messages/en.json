@@ -2536,7 +2536,8 @@
     "networkError": "Network error",
     "typeStr": "str",
     "typeNum": "num",
-    "typeBool": "bool"
+    "typeBool": "bool",
+    "selectEndpoint": "Select an endpoint"
   },
   "apiImporter": {
     "title": "📥 API Spec Importer",
