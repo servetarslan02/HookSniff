@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { API_BASE } from '@/lib/api';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -532,10 +533,9 @@ export function StatusPageContent() {
     // 2. Try HookSniff API directly
     if (!loaded) {
       try {
-        const API = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
-        const res = await fetch(`${API}/status`, { signal: controller.signal, mode: 'cors' });
+        const res = await fetch(`${API_BASE}/status`, { signal: controller.signal, mode: 'cors' });
         clearTimeout(timeout);
         if (res.ok) {
           const json: StatusData = await res.json();

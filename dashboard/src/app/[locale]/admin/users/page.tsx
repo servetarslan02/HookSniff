@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { adminApi, type AdminUser } from '@/lib/api';
+import { adminApi, API_BASE, type AdminUser } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -70,8 +70,7 @@ export default function AdminUsersPage() {
     if (!token) return;
     try {
       const url = adminApi.exportUsers(token, { plan: planFilter || undefined, status: statusFilter || undefined });
-      const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-      const res = await fetch(`${API}${url}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_BASE}${url}`, { headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) throw new Error('Export failed');
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
