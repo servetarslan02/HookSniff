@@ -40,7 +40,7 @@ impl Plan {
             // Backward compat: old "business" maps to Enterprise
             "enterprise" | "business" => Plan::Enterprise,
             // Backward compat: old "free" maps to Developer
-            "free" | "developer" | _ => Plan::Developer,
+            _ => Plan::Developer,
         }
     }
 
