@@ -5,5 +5,3 @@ Disallow: /admin/
 Disallow: /api/
 
 Sitemap: https://hooksniff.vercel.app/sitemap.xml
-
-# deploy trigger Thu May 14 12:32:48 AM CST 2026

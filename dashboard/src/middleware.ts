@@ -45,6 +45,11 @@ export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const withoutLocale = pathname.replace(LOCALE_REGEX, '/');
 
+  // Block access to sensitive files
+  if (pathname.match(/\.(env|env\.\w+|git|htaccess|htpasswd|bak|old|log|sql|db)$/i) || pathname.startsWith('/.env')) {
+    return new NextResponse('Not Found', { status: 404 });
+  }
+
   // Redirect old individual routes to consolidated routes
   // IMPORTANT: Use the original pathname (with locale) for redirect URL
   // to avoid breaking next-intl localePrefix:'never' routing
@@ -100,12 +105,16 @@ export default function middleware(request: NextRequest) {
   // Let next-intl handle locale routing
   const response = handleI18nRouting(request);
 
-  // Add CSP header (only if response is not a redirect)
+  // Add CSP header with nonce-based script protection (only if response is not a redirect)
   if (!response.headers.get('location')) {
+    // Generate a per-request nonce for script-src
+    const nonce = crypto.randomUUID().replace(/-/g, '');
     response.headers.set(
       'Content-Security-Policy',
-      `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://hooksniff-api-1046140057667.europe-west1.run.app https://*.run.app https://*.vercel.app; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`
+      `default-src 'self'; script-src 'self' 'nonce-${nonce}' 'strict-dynamic'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://hooksniff-api-1046140057667.europe-west1.run.app https://*.run.app https://*.vercel.app; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`
     );
+    // Pass nonce to the app via request header for use in components
+    response.headers.set('x-nonce', nonce);
   }
 
   return response;

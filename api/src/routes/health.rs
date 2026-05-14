@@ -373,23 +373,11 @@ pub async fn health_check(
         "degraded"
     };
 
-    let otel_enabled = std::env::var("OTEL_ENABLED").unwrap_or_default() == "true";
-    let otel_endpoint = std::env::var("OTEL_EXPORTER_OTLP_ENDPOINT").unwrap_or_default();
-    let otel_headers_set = std::env::var("OTEL_EXPORTER_OTLP_HEADERS").unwrap_or_default();
-
     (
         status_code,
         Json(json!({
             "status": status_str,
-            "version": env!("CARGO_PKG_VERSION"),
-            "uptime_seconds": uptime_seconds(),
-            "checks": checks,
-            "otel": {
-                "enabled": otel_enabled,
-                "endpoint": otel_endpoint,
-                "headers_configured": !otel_headers_set.is_empty(),
-                "headers_length": otel_headers_set.len()
-            }
+            "checks": checks
         })),
     )
 }
