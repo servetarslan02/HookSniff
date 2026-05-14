@@ -171,7 +171,8 @@
     "routingConfig": "Routing",
     "teamMgmt": "Team",
     "billingOverview": "Billing",
-    "settingsSection": "Settings"
+    "settingsSection": "Settings",
+    "sectionMonitoring": "Monitoring"
   },
   "dashboard": {
     "title": "Dashboard",

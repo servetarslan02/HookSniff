@@ -7,9 +7,52 @@ const handleI18nRouting = createMiddleware(routing);
 // Match locale prefix WITH the trailing slash to avoid double-slash bug
 const LOCALE_REGEX = new RegExp(`^/(${routing.locales.join('|')})(/|$)`);
 
+// Route consolidation map: old individual routes → new consolidated routes
+const ROUTE_REDIRECTS: Record<string, string> = {
+  '/endpoints': '/core',
+  '/deliveries': '/core',
+  '/search': '/core',
+  '/logs': '/monitoring',
+  '/health': '/monitoring',
+  '/alerts': '/monitoring',
+  '/analytics': '/monitoring',
+  '/playground': '/devtools',
+  '/signature-verifier': '/devtools',
+  '/api-importer': '/devtools',
+  '/webhook-builder': '/devtools',
+  '/transforms': '/content-mgmt',
+  '/inbound': '/content-mgmt',
+  '/schemas': '/content-mgmt',
+  '/templates': '/content-mgmt',
+  '/portal-customize': '/portal-section',
+  '/portal-manage': '/portal-section',
+  '/rate-limiting': '/security-section',
+  '/audit-log': '/security-section',
+  '/sso': '/security-section',
+  '/retry-policy': '/routing-config',
+  '/routing': '/routing-config',
+  '/custom-domain': '/routing-config',
+  '/team': '/team-mgmt',
+  '/notifications': '/team-mgmt',
+  '/applications': '/team-mgmt',
+  '/api-keys': '/billing-overview',
+  '/billing': '/billing-overview',
+  '/settings': '/settings-section',
+  '/service-tokens': '/settings-section',
+};
+
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const withoutLocale = pathname.replace(LOCALE_REGEX, '/');
+
+  // Redirect old individual routes to consolidated routes
+  const redirectTarget = ROUTE_REDIRECTS[withoutLocale];
+  if (redirectTarget) {
+    const localeMatch = pathname.match(LOCALE_REGEX);
+    const locale = localeMatch ? localeMatch[1] : '';
+    const url = new URL(`/${locale}${redirectTarget}`, request.url);
+    return NextResponse.redirect(url, 308);
+  }
 
   // Auth check for admin routes
   if (withoutLocale.startsWith('/admin')) {
@@ -29,8 +72,8 @@ export default function middleware(request: NextRequest) {
     '/faq', '/changelog', '/customers', '/alternatives', '/providers',
     '/use-cases', '/webhooks', '/what-is-a-webhook', '/security',
     '/privacy', '/terms', '/status', '/newsletter', '/build-vs-buy',
-    '/get-started', '/startups', '/health', '/analytics', '/logs', '/alerts', '/endpoints', '/deliveries', '/search', '/playground', '/signature-verifier', '/api-importer', '/webhook-builder', '/transforms', '/inbound', '/schemas', '/templates', '/portal-customize', '/portal-manage', '/rate-limiting', '/audit-log', '/sso', '/retry-policy', '/routing', '/custom-domain', '/team', '/notifications', '/applications', '/api-keys', '/billing', '/settings', '/service-tokens',
-    // Consolidated routes (public)
+    '/get-started', '/startups',
+    // Consolidated dashboard routes
     '/core', '/monitoring', '/devtools', '/content-mgmt', '/portal-section',
     '/security-section', '/routing-config', '/team-mgmt', '/billing-overview',
     '/settings-section',
