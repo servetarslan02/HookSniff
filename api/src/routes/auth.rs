@@ -1067,7 +1067,7 @@ async fn two_factor_status(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let last_used_at: Option<String> = sqlx::query_scalar(
-        "SELECT to_char(last_used_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') FROM tfa_backup_codes WHERE customer_id = $1 ORDER BY last_used_at DESC LIMIT 1",
+        "SELECT to_char(created_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') FROM tfa_backup_codes WHERE customer_id = $1 AND used = true ORDER BY created_at DESC LIMIT 1",
     )
     .bind(customer.id)
     .fetch_optional(&pool)
