@@ -21,7 +21,10 @@
 - **Dosyalar:** `api/src/middleware/mod.rs`, `api/src/main.rs`
 
 ### Commits (Bu Oturum)
-- `pending` — perf: CDN cache headers, ETag support, CORS expose headers
+- `46cc2f65` — fix: ETag middleware borrow checker fix — cargo test 1065 passed, clippy 0 errors
+- `09afe8db` (rebased) — feat: request timeout middleware + security/cache headers tests
+- `127c2bde` — feat: request metrics middleware — latency tracking + slow request logging
+- `pending` — feat: request metrics middleware tests + dashboard build verified
 
 ## Kalan Performance Roadmap
 
