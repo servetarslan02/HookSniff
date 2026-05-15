@@ -10,8 +10,8 @@
 | Faz 2: Event System + Redis Streams | ✅ Tamamlandı | EventPublisher + Redis Streams |
 | Faz 3: WebSocket | ✅ Tamamlandı | WS endpoint + EventBridge |
 | Faz 4: Entegrasyon | ✅ Tamamlandı | useWebSocket + useRealtime |
-| Faz 5: Optimizasyon | ⬜ Başlamadı | |
-| Faz 6: Güvenlik | ⬜ Başlamadı | |
+| Faz 5: Optimizasyon | ✅ Tamamlandı | Sentry + VirtualTable + Bundle Analyzer |
+| Faz 6: Güvenlik | ✅ Tamamlandı | WS Metrics + Token Refresh |
 
 ## Mimari Karar: Redis Streams
 
@@ -98,6 +98,22 @@
 - [x] admin/layout.tsx: useRealtime + connection indicator (green/yellow/orange/red)
 - [x] dashboard/layout.tsx: useRealtime + connection indicator
 - [x] Fixed: admin layout missing token destructure
+
+## Faz 5: Optimizasyon ✅
+
+- [x] Sentry: client/server/edge config (sentry.client.config.ts, sentry.server.config.ts, sentry.edge.config.ts)
+- [x] Sentry: global-error.tsx (Sentry.captureException)
+- [x] Sentry: next.config.js plugin entegrasyonu
+- [x] VirtualTable component (@tanstack/react-virtual)
+- [x] Bundle analyzer: ANALYZE=true npm run build
+- [x] next.config.js: Sentry plugin + bundle analyzer
+- [x] Packages: @tanstack/react-virtual, @sentry/nextjs, @next/bundle-analyzer
+
+## Faz 6: Güvenlik & Dayanıklılık ✅
+
+- [x] ws/metrics.rs: WsMetrics struct (Prometheus)
+- [x] WS metrics: active_connections, total_connections, messages_sent, messages_received, connection_errors, evictions
+- [x] useWebSocket.ts: token refresh reconnect
 
 ## Hata Düzeltmeleri
 
