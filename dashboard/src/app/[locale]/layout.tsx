@@ -9,6 +9,7 @@ import { ToastProvider } from '@/components/Toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import Script from 'next/script';
 import { CookieConsent } from '@/components/CookieConsent';
 
 const inter = Inter({
@@ -168,6 +169,11 @@ export default async function LocaleLayout({
                 <CookieConsent />
                 <Analytics />
                 <SpeedInsights />
+                <Script
+                  defer
+                  src="https://static.cloudflareinsights.com/beacon.min.js"
+                  data-cf-beacon='{"token": "27a349759d954a7c84fe74ded3846abe"}'
+                />
               </ToastProvider>
             </AuthProvider>
           </ThemeProvider>
