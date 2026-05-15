@@ -105,6 +105,19 @@
 
 ---
 
+## Dosya Haritası (Güncel)
+
+```
+api/migrations/019_admin_upgrade.sql       ← ✅ Aşama 0
+api/src/routes/admin.rs                    ← ✅ Aşama 1+2+3+4+5 (+1465 satır, 33 endpoint)
+dashboard/src/lib/api.ts                   ← ✅ Aşama 1+2+3+4+5 (+26 fonksiyon)
+dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ Aşama 1+3+4+5 (9 sekme)
+dashboard/src/app/[locale]/admin/system/page.tsx ← ✅ Aşama 2 (5 monitoring section)
+dashboard/src/app/[locale]/admin/revenue/page.tsx ← ✅ Aşama 4+5 (metrics + cohort + refund)
+dashboard/src/app/[locale]/admin/alerts/page.tsx ← ✅ Aşama 6 (yeni sayfa, +369 satır)
+dashboard/src/app/[locale]/admin/layout.tsx ← ✅ Sidebar navigasyonu (8 link)
+```
+
 ## Ortam Notları
 
 - **Rust 1.95.0** kurulu (sub-agent tarafından) — bu ortamda kurulu değil, son oturumda kurulacak
@@ -122,6 +135,8 @@
 4. `invoices`/`payment_transactions` tabloları boş — Polar.sh webhook handler gerekli
 5. `applications` tablosu migration 013'te mevcut
 6. Admin mevcut: 23 route → şimdi 33 route (10 yeni eklendi)
+7. Alerts sayfası için yeni backend endpoint gerekmedi — mevcut CRUD yeterli
+8. Sidebar navigasyonu `layout.tsx`'teki `adminNavigation` dizisinde yönetiliyor
 7. `refunds` tablosu zaten migration 019'da mevcut — yeni migration gerekmedi
 8. `billing/refund.rs` modülü zaten var (14 gün pencere, provider cancel) — admin endpoint'leri bu modülü kullandı
 9. `billing/polar.rs` Polar.sh entegrasyonu zaten var — webhook handler da mevcut

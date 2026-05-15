@@ -111,12 +111,12 @@
 
 ```
 api/migrations/019_admin_upgrade.sql       ← ✅ Aşama 0
-api/src/routes/admin.rs                    ← ✅ Aşama 1+2+3+4+5 (+1465 satır, 33 endpoint)
+api/src/routes/admin.rs                    ← ✅ Aşama 1+2+3+4+5 (+1465 satır, 33 endpoint, mevcut alerts CRUD dahil)
 dashboard/src/lib/api.ts                   ← ✅ Aşama 1+2+3+4+5 (+26 fonksiyon)
 dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ Aşama 1+3+4+5 (9 sekme)
 dashboard/src/app/[locale]/admin/system/page.tsx ← ✅ Aşama 2 (5 monitoring section)
 dashboard/src/app/[locale]/admin/revenue/page.tsx ← ✅ Aşama 4+5 (metrics + cohort + refund)
-dashboard/src/app/[locale]/admin/alerts/page.tsx ← ⏳ Aşama 6 (yeni sayfa)
+dashboard/src/app/[locale]/admin/alerts/page.tsx ← ✅ Aşama 6 (yeni sayfa, +369 satır)
 ```
 
 ---
