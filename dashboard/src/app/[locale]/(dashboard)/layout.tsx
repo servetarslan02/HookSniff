@@ -11,6 +11,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { useRealtime } from '@/hooks/useRealtime';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -23,6 +24,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations('nav');
   const tc = useTranslations('common');
   const locale = useLocale();
+  const { connectionState } = useRealtime();
 
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
@@ -159,6 +161,17 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <NotificationCenter />
             <LanguageSwitcher />
             <ThemeToggle />
+            {/* Real-time connection indicator */}
+            <span
+              className={`w-2 h-2 rounded-full ${
+                connectionState === 'connected' ? 'bg-green-500 animate-pulse'
+                  : connectionState === 'connecting' ? 'bg-yellow-500 animate-pulse'
+                  : connectionState === 'fallback' ? 'bg-orange-500'
+                  : 'bg-red-500'
+              }`}
+              title={`WS: ${connectionState}`}
+              aria-label={`WebSocket: ${connectionState}`}
+            />
 
             {/* Profile dropdown */}
             <div className="relative" ref={profileRef}>
