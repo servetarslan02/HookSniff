@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/store';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTranslations, useLocale } from 'next-intl';
 import { notificationsApi } from '@/lib/api';
+import { useRealtime } from '@/hooks/useRealtime';
 
 const adminNavigation = [
   { nameKey: 'overview', href: '/admin', icon: '📊' },
@@ -23,12 +24,13 @@ const adminNavigation = [
 function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const locale = useLocale();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const { connectionState } = useRealtime();
 
   // Item 61 — Set document title for admin pages
   useEffect(() => {
@@ -160,6 +162,17 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400">
                 {t('adminBadge')}
               </span>
+              {/* Real-time connection indicator */}
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  connectionState === 'connected' ? 'bg-green-500 animate-pulse'
+                    : connectionState === 'connecting' ? 'bg-yellow-500 animate-pulse'
+                    : connectionState === 'fallback' ? 'bg-orange-500'
+                    : 'bg-red-500'
+                }`}
+                title={`WS: ${connectionState}`}
+                aria-label={`WebSocket: ${connectionState}`}
+              />
             </div>
           </div>
           <div className="flex items-center gap-3">
