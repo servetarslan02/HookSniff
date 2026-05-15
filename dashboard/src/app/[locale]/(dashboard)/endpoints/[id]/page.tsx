@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
-import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { endpointsApi, type Endpoint, type RetryPolicyConfig } from '@/lib/api';
+import { useEndpointDetail, useUpdateEndpoint } from '@/hooks/useDashboardData';
+import { endpointsApi, type RetryPolicyConfig } from '@/lib/api';
+import { useAuth } from '@/lib/store';
 import { RetryPolicyCard } from './components/RetryPolicyCard';
 import { SignatureCard } from './components/SignatureCard';
 import { RateLimitCard } from './components/RateLimitCard';
@@ -19,28 +20,9 @@ export default function EndpointSettingsPage() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const [endpoint, setEndpoint] = useState<Endpoint | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetchEndpoint = useCallback(async () => {
-    if (!token || !id) return;
-    try {
-      const ep = await endpointsApi.get(token, id);
-      if (!ep) {
-        toast(t('toastEndpointNotFound'), 'error');
-        router.push(`/endpoints`);
-        return;
-      }
-      setEndpoint(ep);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t('toastLoadFailed');
-      toast(msg, 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [token, id, toast, router, t]);
-
-  useEffect(() => { fetchEndpoint(); }, [fetchEndpoint]);
+  // React Query hooks
+  const { data: endpoint, isLoading, error } = useEndpointDetail(id);
+  const updateEndpointMutation = useUpdateEndpoint();
 
   const handleSaveRetryPolicy = async (policy: RetryPolicyConfig) => {
     if (!token || !id) return;
@@ -53,7 +35,7 @@ export default function EndpointSettingsPage() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="glass-card p-6 animate-pulse">
@@ -64,7 +46,21 @@ export default function EndpointSettingsPage() {
     );
   }
 
-  if (!endpoint) return null;
+  if (error || !endpoint) {
+    return (
+      <div className="space-y-6">
+        <div className="glass-card p-6">
+          <p className="text-red-600 dark:text-red-400">{t('toastEndpointNotFound') || 'Endpoint not found'}</p>
+          <button type="button"
+            onClick={() => router.push('/endpoints')}
+            className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            ← {t('back') || 'Back to endpoints'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

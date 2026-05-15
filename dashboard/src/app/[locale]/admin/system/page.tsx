@@ -1,133 +1,60 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/lib/store';
-import { adminApi, webhooksApi } from '@/lib/api';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
+import {
+  useSystemHealth,
+  useAdminAlerts,
+  useQueueStatus,
+  useFailedDeliveries,
+  useDeadLetters,
+  useRateLimitViolations,
+  useApiLatency,
+  useTestWebhook,
+  useBatchReplay,
+} from '@/hooks/useAdminData';
 
-interface SystemHealth {
-  status?: string;
-  database?: { status: string; latency_ms: number };
-  redis?: { status: string; latency_ms: number };
-  api?: { status: string; uptime_seconds: number };
-  queue?: { pending: number; processing: number; failed: number };
-  checks?: {
-    database?: { status: string; latency_ms: number };
-    queue?: { status: string; latency_ms: number; pending_count?: number };
-    redis?: { status: string; latency_ms: number };
-    last_delivery?: { status: string; last_delivered_at?: string };
-    db_size?: { status: string; size?: string };
-    recent_errors?: { status: string; errors?: Array<{ id: string; event?: string; error?: string; created_at: string }> };
-    queue_detail?: { status: string; pending?: number; processing?: number; failed_last_hour?: number };
-  };
-}
-
-// Item 94 — Fallback mock data when API is unreachable
-const mockHealth: SystemHealth = {
+const mockHealth = {
   status: 'unknown',
   database: { status: 'unknown', latency_ms: 0 },
   redis: { status: 'unknown', latency_ms: 0 },
   api: { status: 'unknown', uptime_seconds: 0 },
   queue: { pending: 0, processing: 0, failed: 0 },
-  checks: {
-    database: { status: 'unknown', latency_ms: 0 },
-    queue: { status: 'unknown', latency_ms: 0, pending_count: 0 },
-  },
 };
 
 export default function AdminSystemPage() {
-  const { token } = useAuth();
-  const [health, setHealth] = useState<SystemHealth | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [errorDetail, setErrorDetail] = useState<string | null>(null); // Item 100
-  const [activeAlerts, setActiveAlerts] = useState<number>(0);
   const t = useTranslations('admin');
-  const { toast } = useToast();
   const tc = useTranslations('common');
-  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+  const { toast } = useToast();
 
-  // Test Webhook state
+  // React Query hooks
+  const { data: health, isLoading, error: healthError, refetch: refetchHealth } = useSystemHealth();
+  const { data: alerts = [] } = useAdminAlerts();
+  const { data: queueStatus } = useQueueStatus();
+  const { data: failedData } = useFailedDeliveries({ limit: 20, since: '24h' });
+  const { data: deadLettersData } = useDeadLetters({ limit: 20 });
+  const { data: rlvData } = useRateLimitViolations({ limit: 20 });
+  const { data: latencyData } = useApiLatency({ period: '24h' });
+  const testWebhookMutation = useTestWebhook();
+  const batchReplayMutation = useBatchReplay();
+
+  const failedDeliveries = failedData?.deliveries ?? [];
+  const deadLetters = deadLettersData?.dead_letters ?? [];
+  const rateLimitViolations = rlvData?.violations ?? [];
+  const apiLatency = latencyData?.endpoints ?? [];
+  const activeAlerts = alerts.filter((a) => a.is_active).length;
+
+  // Local UI state
+  const [selectedFailed, setSelectedFailed] = useState<Set<string>>(new Set());
   const [testUrl, setTestUrl] = useState('');
   const [testEvent, setTestEvent] = useState('test.ping');
   const [testPayload, setTestPayload] = useState('{\n  "message": "Hello from HookSniff"\n}');
   const [testResult, setTestResult] = useState<{ status_code: number; response_body: string; duration_ms: number } | null>(null);
-  const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
 
-  // ── Aşama 2: System Monitoring state ──
-  const [queueStatus, setQueueStatus] = useState<{ pending: number; processing: number; failed: number; total: number; oldest_pending_at: string | null; failed_last_hour: number } | null>(null);
-  const [failedDeliveries, setFailedDeliveries] = useState<Array<{ id: string; customer_email: string | null; endpoint_url: string | null; event_type: string | null; attempt_count: number; response_status: number | null; error_message: string | null; created_at: string }>>([]);
-  const [deadLetters, setDeadLetters] = useState<Array<{ id: string; customer_email: string | null; endpoint_url: string | null; reason: string | null; attempts: number; created_at: string }>>([]);
-  const [selectedFailed, setSelectedFailed] = useState<Set<string>>(new Set());
-  const [batchReplaying, setBatchReplaying] = useState(false);
-  const [rateLimitViolations, setRateLimitViolations] = useState<Array<{ id: string; customer_email: string | null; ip: string | null; requests_count: number; limit_per_window: number; window_seconds: number; created_at: string }>>([]);
-  const [apiLatency, setApiLatency] = useState<Array<{ endpoint_id: string; url: string; total_deliveries: number; avg_latency_ms: number | null; p95_latency_ms: number | null; failed_count: number; error_rate: number }>>([]);
-  const [monitoringLoading, setMonitoringLoading] = useState(false);
-
-  const fetchHealth = useCallback(async () => {
-    try {
-      setError(null);
-      setErrorDetail(null);
-      const [res, alertsData] = await Promise.all([
-        fetch(`${API}/health`, { headers: { Authorization: `Bearer ${token}` } }),
-        token ? adminApi.listAlerts(token).catch(() => []) : Promise.resolve([]),
-      ]);
-      if (res.ok) {
-        setHealth(await res.json());
-      } else {
-        const errText = await res.text().catch(() => '');
-        setError(t('systemHealthDesc'));
-        setErrorDetail(errText || `HTTP ${res.status}`);
-        setHealth(mockHealth);
-      }
-      setActiveAlerts(Array.isArray(alertsData) ? alertsData.filter((a) => a.is_active).length : 0);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      setError(t('systemHealthDesc'));
-      setErrorDetail(msg); // Item 100
-      setHealth(mockHealth); // Item 94 — fallback
-    } finally {
-      setLoading(false);
-    }
-  }, [token, API, t]);
-
-  useEffect(() => {
-    fetchHealth();
-    const interval = setInterval(fetchHealth, 15000);
-    return () => clearInterval(interval);
-  }, [fetchHealth]);
-
-  // ── Aşama 2: Fetch monitoring data ──
-  const fetchMonitoring = useCallback(async () => {
-    if (!token) return;
-    setMonitoringLoading(true);
-    try {
-      const [queue, failed, dl, rlv, latency] = await Promise.all([
-        adminApi.getQueueStatus(token).catch(() => null),
-        adminApi.getFailedDeliveries(token, { limit: 20, since: '24h' }).catch(() => ({ deliveries: [], count: 0 })),
-        adminApi.getDeadLetters(token, { limit: 20 }).catch(() => ({ dead_letters: [], count: 0 })),
-        adminApi.getRateLimitViolations(token, { limit: 20 }).catch(() => ({ violations: [], count: 0 })),
-        adminApi.getApiLatency(token, { period: '24h' }).catch(() => ({ endpoints: [], period: '24h' })),
-      ]);
-      setQueueStatus(queue);
-      setFailedDeliveries(failed.deliveries || []);
-      setDeadLetters(dl.dead_letters || []);
-      setRateLimitViolations(rlv.violations || []);
-      setApiLatency(latency.endpoints || []);
-    } catch { /* silent */ }
-    finally { setMonitoringLoading(false); }
-  }, [token]);
-
-  useEffect(() => {
-    fetchMonitoring();
-  }, [fetchMonitoring]);
-
-  // Test Webhook handler
   const handleTestWebhook = async () => {
-    if (!token || !testUrl) return;
-    setTestLoading(true);
+    if (!testUrl) return;
     setTestError(null);
     setTestResult(null);
     try {
@@ -136,35 +63,27 @@ export default function AdminSystemPage() {
         payload = JSON.parse(testPayload);
       } catch {
         setTestError('Invalid JSON payload');
-        setTestLoading(false);
         return;
       }
-      const result = await adminApi.testWebhook(token, {
+      const result = await testWebhookMutation.mutateAsync({
         endpoint_url: testUrl,
         event_type: testEvent,
         payload,
       });
-      setTestResult(result);
+      setTestResult(result as { status_code: number; response_body: string; duration_ms: number });
     } catch (err) {
       setTestError(err instanceof Error ? err.message : t('testFailed'));
-    } finally {
-      setTestLoading(false);
     }
   };
 
   const handleBatchReplay = async () => {
-    if (!token || selectedFailed.size === 0) return;
-    setBatchReplaying(true);
+    if (selectedFailed.size === 0) return;
     try {
-      const ids = Array.from(selectedFailed);
-      await webhooksApi.batchReplay(token, ids);
-      toast(t('batchReplaySuccess') || t('batchReplaySuccess', { count: ids.length }), 'success');
+      await batchReplayMutation.mutateAsync(Array.from(selectedFailed));
+      toast(t('batchReplaySuccess') || 'Replayed successfully', 'success');
       setSelectedFailed(new Set());
-      fetchMonitoring();
     } catch (err) {
-      toast(err instanceof Error ? err.message : (t('batchReplayFailed') || t('batchReplayFailed')), 'error');
-    } finally {
-      setBatchReplaying(false);
+      toast(err instanceof Error ? err.message : (t('batchReplayFailed') || 'Replay failed'), 'error');
     }
   };
 
@@ -208,15 +127,16 @@ export default function AdminSystemPage() {
     return `${mins}m`;
   };
 
-  // Item 98 — Loading spinner
-  if (loading) {
+  const displayHealth = health || mockHealth;
+
+  // Loading state
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('systemHealth')}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('fetchingHealth')}</p>
         </div>
-        {/* Item 98 — Loading spinner */}
         <div className="flex flex-col items-center justify-center py-16">
           <div className="relative w-12 h-12 mb-4">
             <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-slate-700" />
@@ -240,32 +160,32 @@ export default function AdminSystemPage() {
     {
       name: t('apiServer'),
       icon: '🚀',
-      status: health?.api?.status || health?.status || 'unknown',
-      detail: health?.api?.uptime_seconds ? `Uptime: ${formatUptime(health.api.uptime_seconds)}` : t('checking'),
+      status: displayHealth?.api?.status || displayHealth?.status || 'unknown',
+      detail: displayHealth?.api?.uptime_seconds ? `Uptime: ${formatUptime(displayHealth.api.uptime_seconds)}` : t('checking'),
       latency: null,
     },
     {
       name: t('database'),
       icon: '🐘',
-      status: health?.checks?.database?.status || health?.database?.status || 'unknown',
-      detail: (health?.checks?.database?.latency_ms || health?.database?.latency_ms) ? `Latency: ${health?.checks?.database?.latency_ms || health?.database?.latency_ms}ms` : t('checking'),
-      latency: health?.checks?.database?.latency_ms || health?.database?.latency_ms,
+      status: displayHealth?.checks?.database?.status || displayHealth?.database?.status || 'unknown',
+      detail: (displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms) ? `Latency: ${displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms}ms` : t('checking'),
+      latency: displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms,
     },
     {
       name: t('cache'),
       icon: '⚡',
-      status: health?.checks?.redis?.status || health?.redis?.status || 'unknown',
-      detail: (health?.checks?.redis?.latency_ms || health?.redis?.latency_ms) ? `Latency: ${health?.checks?.redis?.latency_ms || health?.redis?.latency_ms}ms` : t('checking'),
-      latency: health?.checks?.redis?.latency_ms || health?.redis?.latency_ms,
+      status: displayHealth?.checks?.redis?.status || displayHealth?.redis?.status || 'unknown',
+      detail: (displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms) ? `Latency: ${displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms}ms` : t('checking'),
+      latency: displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms,
     },
     {
       name: t('queue'),
       icon: '📬',
-      status: health?.checks?.queue ? (health.checks.queue.pending_count ?? 0) > 100 ? 'degraded' : 'healthy' : health?.queue ? (health.queue.failed > 10 ? 'degraded' : 'healthy') : 'unknown',
-      detail: health?.checks?.queue
-        ? `${health.checks.queue.pending_count ?? 0} pending`
-        : health?.queue
-        ? `${health.queue.pending} pending · ${health.queue.processing} processing · ${health.queue.failed} failed`
+      status: displayHealth?.checks?.queue ? (displayHealth.checks.queue.pending_count ?? 0) > 100 ? 'degraded' : 'healthy' : displayHealth?.queue ? (displayHealth.queue.failed > 10 ? 'degraded' : 'healthy') : 'unknown',
+      detail: displayHealth?.checks?.queue
+        ? `${displayHealth.checks.queue.pending_count ?? 0} pending`
+        : displayHealth?.queue
+        ? `${displayHealth.queue.pending} pending · ${displayHealth.queue.processing} processing · ${displayHealth.queue.failed} failed`
         : t('checking'),
       latency: null,
     },
@@ -292,31 +212,29 @@ export default function AdminSystemPage() {
         </p>
       </div>
 
-      {/* Item 100 — Error detail banner */}
-      {error && (
+      {/* Error banner */}
+      {healthError && (
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-red-600 dark:text-red-400" aria-hidden="true">⚠️</span>
-              <span className="text-red-700 dark:text-red-400 text-sm font-medium">{error}</span>
+              <span className="text-red-700 dark:text-red-400 text-sm font-medium">{t('systemHealthDesc')}</span>
             </div>
             <button
               type="button"
-              onClick={fetchHealth}
+              onClick={() => refetchHealth()}
               className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
             >
               {tc('retry')}
             </button>
           </div>
-          {errorDetail && (
-            <p className="mt-2 text-xs text-red-600/80 dark:text-red-400/70 font-mono bg-red-100/50 dark:bg-red-500/5 rounded-xl px-3 py-2">
-              {t('errorDetails')}: {errorDetail}
-            </p>
-          )}
+          <p className="mt-2 text-xs text-red-600/80 dark:text-red-400/70 font-mono bg-red-100/50 dark:bg-red-500/5 rounded-xl px-3 py-2">
+            {t('errorDetails')}: {healthError.message || `HTTP error`}
+          </p>
         </div>
       )}
 
-      {/* Overall Status — Item 103: improved layout */}
+      {/* Overall Status */}
       <div className="glass-card p-6" aria-live="polite" aria-atomic="true">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
           <div className="flex items-center gap-3">
@@ -333,7 +251,7 @@ export default function AdminSystemPage() {
           </div>
           <button
             type="button"
-            onClick={fetchHealth}
+            onClick={() => refetchHealth()}
             className="self-start sm:self-auto sm:ml-auto text-xs px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
           >
             {tc('refresh')}
@@ -403,7 +321,6 @@ export default function AdminSystemPage() {
 
       {/* DB Size + Queue Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* DB Size */}
         {health?.checks?.db_size?.size && (
           <div className="glass-card p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">🐘 {t('databaseSize') || 'Database Size'}</h2>
@@ -411,7 +328,6 @@ export default function AdminSystemPage() {
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('currentDbUsage') || 'Current database usage'}</p>
           </div>
         )}
-        {/* Queue Details */}
         {health?.checks?.queue_detail && (
           <div className="glass-card p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">📬 {t('queueDetails') || 'Queue Details'}</h2>
@@ -459,12 +375,11 @@ export default function AdminSystemPage() {
         </div>
       )}
 
-      {/* Item 102 — Infrastructure table with proper header */}
+      {/* Infrastructure */}
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('infrastructure')}</h2>
         </div>
-        {/* Item 102 — Table header */}
         <div className="hidden md:grid md:grid-cols-3 gap-4 px-6 py-3 bg-gray-50 dark:bg-slate-800/30 border-b border-gray-200/50 dark:border-slate-700/50 text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
           <div>{t('infrastructureHeader')}</div>
           <div>{t('providerLabel')}</div>
@@ -481,8 +396,6 @@ export default function AdminSystemPage() {
         </div>
       </div>
 
-      {/* ═══ AŞAMA 2: System Monitoring ═══ */}
-
       {/* Queue Status */}
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
@@ -490,9 +403,6 @@ export default function AdminSystemPage() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📬 {t('queueStatus') || 'Queue Status'}</h2>
             <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('queueStatusDesc') || 'Webhook delivery queue depth'}</p>
           </div>
-          <button type="button" onClick={fetchMonitoring} className="text-xs px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition">
-            {tc('refresh')}
-          </button>
         </div>
         {queueStatus ? (
           <div className="p-6">
@@ -517,11 +427,11 @@ export default function AdminSystemPage() {
             )}
           </div>
         ) : (
-          <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">{monitoringLoading ? t('loading') || 'Loading...' : t('noData') || 'No data'}</div>
+          <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">{t('noData') || 'No data'}</div>
         )}
       </div>
 
-      {/* Failed Deliveries (last 24h) */}
+      {/* Failed Deliveries */}
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">❌ {t('failedDeliveries') || 'Failed Deliveries'} (24h)</h2>
@@ -530,10 +440,10 @@ export default function AdminSystemPage() {
               {selectedFailed.size > 0 && (
                 <button
                   onClick={handleBatchReplay}
-                  disabled={batchReplaying}
+                  disabled={batchReplayMutation.isPending}
                   className="px-3 py-1.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition disabled:opacity-60"
                 >
-                  {batchReplaying ? (t('replaying') || 'Replaying...') : `↩ ${t('replaySelected') || 'Replay Selected'} (${selectedFailed.size})`}
+                  {batchReplayMutation.isPending ? (t('replaying') || 'Replaying...') : `↩ ${t('replaySelected') || 'Replay Selected'} (${selectedFailed.size})`}
                 </button>
               )}
               <button
@@ -577,7 +487,7 @@ export default function AdminSystemPage() {
             </table>
           </div>
         ) : (
-          <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">{monitoringLoading ? t('loading') || 'Loading...' : '✅ ' + (t('noFailedDeliveries') || 'No failed deliveries in the last 24h')}</div>
+          <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">✅ {t('noFailedDeliveries') || 'No failed deliveries in the last 24h'}</div>
         )}
       </div>
 
@@ -615,7 +525,7 @@ export default function AdminSystemPage() {
             </table>
           </div>
         ) : (
-          <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">{monitoringLoading ? t('loading') || 'Loading...' : '✅ ' + (t('noDeadLetters') || 'No dead letters')}</div>
+          <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">✅ {t('noDeadLetters') || 'No dead letters'}</div>
         )}
       </div>
 
@@ -652,7 +562,7 @@ export default function AdminSystemPage() {
             </table>
           </div>
         ) : (
-          <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">{monitoringLoading ? t('loading') || 'Loading...' : '✅ ' + (t('noViolations') || 'No rate limit violations')}</div>
+          <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">✅ {t('noViolations') || 'No rate limit violations'}</div>
         )}
       </div>
 
@@ -693,7 +603,7 @@ export default function AdminSystemPage() {
             </table>
           </div>
         ) : (
-          <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">{monitoringLoading ? t('loading') || 'Loading...' : t('noData') || 'No data'}</div>
+          <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">{t('noData') || 'No data'}</div>
         )}
       </div>
 
@@ -750,20 +660,18 @@ export default function AdminSystemPage() {
           <button
             type="button"
             onClick={handleTestWebhook}
-            disabled={testLoading || !testUrl}
+            disabled={testWebhookMutation.isPending || !testUrl}
             className="px-6 py-2.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {testLoading ? t('testSending') : `🚀 ${t('sendTest')}`}
+            {testWebhookMutation.isPending ? t('testSending') : `🚀 ${t('sendTest')}`}
           </button>
 
-          {/* Test Error */}
           {testError && (
             <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4">
               <span className="text-red-700 dark:text-red-400 text-sm">{testError}</span>
             </div>
           )}
 
-          {/* Test Result */}
           {testResult && (
             <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2">
