@@ -5126,3 +5126,4 @@ mod tests {
         assert_eq!(json["retention_rate"], 70.0);
     }
 }
+
