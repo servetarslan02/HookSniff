@@ -146,7 +146,7 @@ export default function AdminSystemPage() {
       });
       setTestResult(result);
     } catch (err) {
-      setTestError(err instanceof Error ? err.message : 'Test failed');
+      setTestError(err instanceof Error ? err.message : t('testFailed'));
     } finally {
       setTestLoading(false);
     }
@@ -498,10 +498,10 @@ export default function AdminSystemPage() {
           <div className="p-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { label: 'Pending', value: queueStatus.pending, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-500/10' },
-                { label: 'Processing', value: queueStatus.processing, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-500/10' },
-                { label: 'Failed', value: queueStatus.failed, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-500/10' },
-                { label: 'Total', value: queueStatus.total, color: 'text-gray-900 dark:text-white', bg: 'bg-gray-50 dark:bg-slate-800' },
+                { label: t('queuePending'), value: queueStatus.pending, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-500/10' },
+                { label: t('queueProcessing'), value: queueStatus.processing, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-500/10' },
+                { label: t('queueFailed'), value: queueStatus.failed, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-500/10' },
+                { label: t('queueTotal'), value: queueStatus.total, color: 'text-gray-900 dark:text-white', bg: 'bg-gray-50 dark:bg-slate-800' },
               ].map((item) => (
                 <div key={item.label} className={`rounded-xl p-4 ${item.bg}`}>
                   <p className="text-xs text-gray-500 dark:text-slate-400">{item.label}</p>

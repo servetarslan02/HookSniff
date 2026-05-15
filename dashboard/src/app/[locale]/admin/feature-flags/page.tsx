@@ -10,6 +10,7 @@ export default function FeatureFlagsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('featureFlags');
+  const ta = useTranslations('admin');
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -192,7 +193,7 @@ export default function FeatureFlagsPage() {
                             ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
                             : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400'
                         }`}>
-                          {flag.is_enabled ? 'Active' : 'Inactive'}
+                          {flag.is_enabled ? ta('flagActive') : ta('flagInactive')}
                         </span>
                       </div>
                       {flag.description && (
