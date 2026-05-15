@@ -32,6 +32,7 @@ export default function PublicNavbar({ pageTitle }: PublicNavbarProps) {
         {/* Center: Nav links (hidden on small screens) */}
         <div className="hidden lg:flex items-center gap-4">
           <Link href="/get-started" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('getStarted')}</Link>
+          <Link href="/playground" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('playground')}</Link>
           <Link href="/pricing" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('pricing')}</Link>
           <Link href="/docs" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('docs')}</Link>
           <Link href="/status" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('status')}</Link>
