@@ -1,6 +1,6 @@
 # Real-Time Upgrade — Hafıza
 
-> Son güncelleme: 2026-05-16 05:04 GMT+8
+> Son güncelleme: 2026-05-16 05:15 GMT+8
 
 ## Proje Nedir?
 
@@ -36,12 +36,23 @@ HookSniff dashboard'unu polling tabanlı sistemden event-driven real-time sistem
 
 | Faz | Durum | Not |
 |-----|-------|-----|
-| Faz 1: React Query + Zod | ⬜ Başlamadı | |
+| Faz 1: React Query + Zod | ✅ Tamamlandı | Admin overview dönüştürüldü, hook'lar oluşturuldu |
 | Faz 2: Event System + Envelope | ⬜ Başlamadı | |
 | Faz 3: WebSocket + Connection Manager + Origin Validation + Graceful Shutdown | ⬜ Başlamadı | |
 | Faz 4: Entegrasyon + Fallback Polling | ⬜ Başlamadı | |
 | Faz 5: Optimizasyon + Bundle Analysis | ⬜ Başlamadı | |
 | Faz 6: Güvenlik & Dayanıklılık (Token refresh, Metrics, Stress test) | ⬜ Başlamadı | |
+
+## Faz 1 Yapılanlar (2026-05-16)
+
+- `@tanstack/react-query`, `@tanstack/react-query-devtools`, `zod` (v4) kuruldu
+- `providers.tsx` — QueryClient provider (staleTime: 5dk, gcTime: 10dk, retry: 2, exponential backoff)
+- `schemas/api.ts` — Zod schema'ları (Endpoint, Delivery, AdminStats, Revenue, AuditLog, FeatureFlag, DeployInfo, WsEvent)
+- `hooks/useAdminData.ts` — useAdminStats, useAdminRevenue, useAdminAuditLogs, useAdminFeatureFlags, useAdminDeployInfo, useAdminUsers, useAdminUserDetail, useUpdateUserPlan, useUpdateUserStatus
+- `hooks/useDashboardData.ts` — useEndpoints, useEndpointDetail, useWebhooks, useDashboardStats, useDeliveryTrend, useSuccessRate, useUpdateEndpoint, useDeleteEndpoint, useToggleEndpoint, useReplayDelivery
+- `admin/page.tsx` — useState+useEffect+fetch → React Query hook'ları
+- Eski auto-refresh polling kaldırıldı
+- Zod v4 uyumu: `z.record()` iki argüman alır
 
 ## Kritik Notlar
 
@@ -55,5 +66,11 @@ HookSniff dashboard'unu polling tabanlı sistemden event-driven real-time sistem
 - Graceful shutdown: SIGTERM → client'a server_shutdown mesajı
 - Fallback: WS max reconnect (10) → 30 sn polling
 - Token refresh: WS reconnect tetikler
-- **Origin validation:** Sadece dashboard.hooksniff.com ve localhost:3000
-- **Deploy sırası:** Backend önce, sonra frontend (zero-downtime)
+- Origin validation: Sadece dashboard.hooksniff.com ve localhost:3000
+- Deploy sırası: Backend önce, sonra frontend (zero-downtime)
+
+## Önceden Var Olan Hatalar (Bizim Değişikliklerden Bağımsız)
+
+- `billing/page.tsx:57` — `getInvoices` metodu yok
+- `team/page.tsx:39` — `fetchTeams` blok scope'dan önce kullanılıyor
+- `admin/layout.tsx:40` — `token` değişkeni destructured edilmemiş
