@@ -4,7 +4,7 @@
 > **Tahmini süre:** 16-22 saat (5-6 oturum)
 > **Başlangıç tarihi:** 2026-05-16
 > **Maliyet:** $0 (mevcut free tier yeterli)
-> **Versiyon:** v2 — Tüm eksikler giderildi
+> **Versiyon:** v2.1 — Tüm eksikler giderildi + Origin validation + Deploy sırası
 
 ---
 
@@ -862,7 +862,66 @@ EVENT_PUBLISHER_ENABLED=true
 - [ ] Tüm env var'lar eklendi
 - [ ] Graceful shutdown timeout: 10 sn
 
-### 3.5 Faz 3 Doğrulama
+
+### 3.5 WebSocket Origin Validation
+
+WS endpoint'ine yetkisiz domain'lerden bağlantı açılmasını önlemek için Origin header kontrolü.
+
+**Dosya:** `api/src/ws/handler.rs` (ws_handler'a ekle)
+
+```rust
+use axum::http::{HeaderMap, StatusCode};
+
+/// Origin header kontrolü — sadece izinli domain'ler
+fn validate_origin(headers: &HeaderMap) -> Result<(), StatusCode> {
+    let allowed_origins = [
+        "https://dashboard.hooksniff.com",
+        "http://localhost:3000",  // Development
+        "http://localhost:3001",  // Dev alternatif
+    ];
+
+    match headers.get("origin") {
+        Some(origin) => {
+            let origin_str = origin.to_str().unwrap_or("");
+            if allowed_origins.iter().any(|&o| o == origin_str) {
+                Ok(())
+            } else {
+                tracing::warn!(origin = origin_str, "Rejected WS connection: unauthorized origin");
+                Err(StatusCode::FORBIDDEN)
+            }
+        }
+        None => {
+            // Origin header yoksa reddet (WS handshake'te olmalı)
+            tracing::warn!("Rejected WS connection: missing origin header");
+            Err(StatusCode::BAD_REQUEST)
+        }
+    }
+}
+
+// ws_handler'da kullan:
+pub async fn ws_handler(
+    ws: WebSocketUpgrade,
+    headers: HeaderMap,
+    Extension(customer): Extension<Customer>,
+    Extension(publisher): Extension<EventPublisher>,
+    Extension(conn_manager): Extension<ConnectionManager>,
+) -> impl IntoResponse {
+    // Origin kontrolü
+    if let Err(status) = validate_origin(&headers) {
+        return (status, "Unauthorized origin").into_response();
+    }
+
+    ws.on_upgrade(move |socket| handle_socket(socket, customer, publisher, conn_manager))
+}
+```
+
+- [ ] `validate_origin()` fonksiyonu eklendi
+- [ ] İzinli origin listesi: `dashboard.hooksniff.com`, `localhost:3000`, `localhost:3001`
+- [ ] Origin header yoksa → 400 Bad Request
+- [ ] Yetkisiz origin → 403 Forbidden
+- [ ] Log: rejected connection'lar loglanıyor
+
+### 3.6 Faz 3 Doğrulama
 
 - [ ] `cargo check` — derleme hatası yok
 - [ ] WebSocket endpoint'i yanıt veriyor (`wscat -c ws://api/v1/ws`)
@@ -872,6 +931,7 @@ EVENT_PUBLISHER_ENABLED=true
 - [ ] Per-user limit çalışıyor (5. bağlantı reddediliyor)
 - [ ] Total limit çalışıyor (100. bağlantıda eviction)
 - [ ] Graceful shutdown çalışıyor (SIGTERM → client'a mesaj)
+- [ ] Origin validation çalışıyor (yetkisiz origin → 403)
 - [ ] Bağlantı koptuğunda temiz kapanıyor
 
 ---
@@ -1425,6 +1485,59 @@ export default function () {
 - [ ] Memory leak yok (WebSocket bağlantıları temizleniyor)
 
 ---
+
+
+## 🚢 Deploy Sırası (Zero-Downtime)
+
+> **Kural:** Backend her zaman önce deploy edilir, sonra frontend.
+
+### Neden Bu Sıra Önemli?
+
+```
+Senaryo 1: Frontend önce deploy ❌
+  Yeni frontend (WS) → eski backend (WS endpoint yok) → bağlantı hatası
+
+Senaryo 2: Backend önce deploy ✅
+  Eski frontend (polling) → yeni backend (WS endpoint var ama polling devam) → çalışır
+  Yeni frontend (WS) → yeni backend (WS endpoint var) → çalışır
+```
+
+### Deploy Adımları
+
+```
+1. Backend deploy (Cloud Run)
+   → WS_ENABLED=true env var'ı ekle
+   → cargo build → cloud run push
+   → Sağlık kontrolü: /v1/health endpoint
+
+2. Frontend deploy (Vercel)
+   → NEXT_PUBLIC_WS_URL env var'ı ekle
+   → npm run build → vercel push
+   → Sağlık kontrolü: dashboard açılıyor mu?
+
+3. Doğrulama
+   → Eski sekme: polling devam ediyor
+   → Yeni sekme: WS bağlantısı kuruluyor
+   → Fallback: WS başarısız → polling'e düşüyor
+```
+
+### Rollback Sırası (Tersi)
+
+```
+1. Frontend rollback (Vercel)
+   → git revert → vercel push
+
+2. Backend rollback (Cloud Run)
+   → WS_ENABLED=false → cloud run push
+   → git revert → cloud run push
+```
+
+### Kritik Not
+
+- Fallback polling mekanizması (Faz 4) bu senaryonun sigortası
+- Eski frontend yeni backend'e bağlandığında polling çalışmaya devam eder
+- Yeni frontend eski backend'e bağlandığında fallback polling'e düşer
+- Hiçbir durumda "boş ekran" veya "bağlantı hatası" görünmez
 
 ## Rollback Planı
 
