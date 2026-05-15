@@ -843,7 +843,7 @@ export const notificationsApi = {
   },
 
   getUnreadCount: (token: string) =>
-    apiFetch<{ count: number }>('/notifications/unread-count', { token }),
+    apiFetch<{ unread_count: number }>('/notifications/unread-count', { token }),
 
   markAsRead: (token: string, id: string) =>
     apiFetch<{ success: boolean }>(`/notifications/${id}/read`, { method: 'PUT', token }),
