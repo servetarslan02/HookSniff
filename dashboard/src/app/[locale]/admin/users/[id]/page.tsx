@@ -275,7 +275,7 @@ export default function AdminUserDetailPage() {
         ))}
       </div>
 
-      {activeTab === "overview" && (
+      {activeTab === "overview" && (<>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* User Info Card */}
         <div className="glass-card p-6">
@@ -590,7 +590,7 @@ export default function AdminUserDetailPage() {
           </div>
         </div>
       )}
-      )}
+      </>)}
 
       {/* ═══ TAB: Endpoints ═══ */}
       {activeTab === "endpoints" && (
