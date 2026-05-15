@@ -7,7 +7,6 @@ use anyhow::Result;
 use redis::aio::ConnectionManager;
 use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::Arc;
 use tokio::sync::broadcast;
 use tracing::{debug, warn};
 use uuid::Uuid;
