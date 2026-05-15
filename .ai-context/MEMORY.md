@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-15 22:25 GMT+8
+> Son güncelleme: 2026-05-16 03:59 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -83,7 +83,7 @@ HookSniff/
 | **Google Cloud Run** | ✅ Aktif | API + Worker deploy |
 | **Google Cloud Build** | ✅ Aktif | Otomatik deploy (push → build) |
 | **Polar.sh** | ✅ Aktif | Ödeme sistemi, Pro ($49) + Business ($149) |
-| **Resend** | ✅ Aktif | Email gönderimi, onboarding@resend.dev |
+| **Resend** | ✅ Aktif | Email gönderimi, onboarding@resend.dev (hooksniff.is-a.dev domain FAILED, default adres kullanılıyor) |
 | **Grafana Cloud** | ✅ Aktif | OTEL monitoring, hookrelay.grafana.net |
 | **Cloudflare R2** | ✅ Aktif | Dosya depolama, hooksniff-storage bucket |
 
@@ -98,16 +98,13 @@ HookSniff/
 - **Cache hit ratio:** 99.79% (mükemmel)
 - **Dead tuples:** 0 (autovacuum çalışıyor)
 
-### ⚠️ Kritik Bulgu: Seq Scan Fırtınası
-Bazı tablolarda index yerine full table scan yapılıyor:
-- `endpoints`: 72,720 seq scan vs 308 index scan 🔴
-- `customers`: 13,639 seq vs 1,241 idx 🔴
-- `notifications`: 9,952 seq vs 670 idx 🔴
-- `invoices`: 1,328 seq vs 55 idx 🔴
-- `webhook_queue`: 90,011 seq vs 83,438 idx 🟡
-- `deliveries`: 5,031 seq vs 2,372 idx 🟡
-
-**Çözüm:** Rust API'deki SELECT sorgularına WHERE clause eklenmesi + uygun index'lerin oluşturulması gerekiyor.
+### ✅ Seq Scan Fırtınası — ÇÖZÜLDÜ (Oturum 173, 2026-05-15)
+`018_seq_scan_indexes.sql` Neon DB'ye uygulandı — 9 index oluşturuldu:
+- `idx_customers_api_key_prefix`, `idx_endpoints_team_id`, `idx_endpoints_customer_active`
+- `idx_deliveries_customer_created_desc`, `idx_deliveries_cust_status_created`
+- `idx_notifications_customer_read`, `idx_invoices_status`, `idx_invoices_status_paid`
+- ANALYZE çalıştırıldı, planner istatistikleri güncellendi
+- Tablolar çok küçük (<40 row) olduğu için PostgreSQL hala seq scan tercih ediyor — tablolar büyüyünce index otomatik devreye girecek
 
 ### ✅ Yapılan Temizlik (2026-05-15)
 - 107 kullanılmayan index tespit edildi
@@ -296,17 +293,18 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 
 ## ⚠️ Bilinen Sorunlar
 
-1. **Seq scan fırtınası** — endpoints, customers, notifications tablolarında
+1. ~~Seq scan fırtınası~~ ✅ Çözüldü (Oturum 173, 9 index uygulandı)
 2. **Compute limiti aşılmış** — Neon Free tier 191.99 saat, 193.39 kullanılmış
 3. **920+ hardcoded İngilizce string** — dashboard'da Türkçe çeviri yapılacak
 4. **GitHub Actions dakikaları bitmiş** — CI failure, yenilenmeli
 5. **Grafana trial bitiyor** — 20 Mayıs'a kadar
+6. ~~Resend domain FAILED~~ ✅ Default adres (onboarding@resend.dev) ile çalışıyor
 
 ---
 
 ## 🎯 Kısa Vadeli Hedefler
 
-1. Seq scan düzeltmesi (performans)
+1. ~~Seq scan düzeltmesi (performans)~~ ✅ Tamamlandı
 2. i18n — 920+ string Türkçe'ye çevrilecek
 3. Güvenlik düzeltmeleri (P0 kalan maddeler)
 4. $500/ay gelir hedefi
