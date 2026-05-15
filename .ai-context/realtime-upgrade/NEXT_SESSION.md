@@ -1,42 +1,42 @@
 # Real-Time Upgrade — Sonraki Oturum
 
-> Son güncelleme: 2026-05-16 05:15 GMT+8
+> Son güncelleme: 2026-05-16 05:47 GMT+8
 
-## Sıradaki İş: Faz 1 (Devam) — Admin ve Dashboard Sayfaları
+## Hemen Oku
 
-Faz 1'in altyapısı tamamlandı (hook'lar, provider, schema'lar). Sıradaki iş:
+1. `.ai-context/realtime-upgrade/MEMORY.md` → proje hafızası
+2. `.ai-context/realtime-upgrade/PLAN.md` → plan (v3.0)
+3. Bu dosya → sıradaki iş
 
-### 1. Admin Sayfalarını Güncelle
+## Faz 1 Durumu: 🔄 %80
 
-- [ ] `admin/users/page.tsx` → `useAdminUsers()`
-- [ ] `admin/users/[id]/page.tsx` → `useAdminUserDetail()`
-- [ ] `admin/revenue/page.tsx` → `useAdminRevenue()`
-- [ ] `admin/system/page.tsx` → monitoring hook'ları
-- [ ] `admin/alerts/page.tsx` → alerts hook'u
-- [ ] `admin/settings/page.tsx` → settings hook'u
-- [ ] `admin/activity/page.tsx` → audit logs hook'u
+### ✅ Tamamlanan
+- React Query + Zod kuruldu (providers.tsx, schemas/api.ts)
+- 14 admin hook'u (hooks/useAdminData.ts)
+- 10 dashboard hook'u (hooks/useDashboardData.ts)
+- Dönüştürülen sayfalar: admin/page, activity, users, alerts, DashboardOverview, endpoints/page, deliveries/DeliveriesList
 
-### 2. Dashboard Sayfalarını Güncelle
+### ⬜ Kalan (Bu Oturum)
+- `admin/revenue/page.tsx` — 551 satır (6 API çağrısı)
+- `admin/system/page.tsx` — 801 satır (monitoring)
+- `admin/settings/page.tsx` — 701 satır (platform settings)
+- `(dashboard)/endpoints/[id]/page.tsx` — endpoint detail
 
-- [ ] `(dashboard)/core/page.tsx` → `useEndpoints()`
-- [ ] `(dashboard)/endpoints/[id]/page.tsx` → `useEndpointDetail()`
-- [ ] `(dashboard)/deliveries/page.tsx` → `useWebhooks()`
-
-### 3. Faz 1 Doğrulama
-
-- [ ] Dashboard açıldığında loading spinner görünmüyor (cache hit)
-- [ ] Sayfalar arası geçiş <100ms
-- [ ] React Query Devtools çalışıyor (development)
-- [ ] Build başarılı (önceden var olan hatalar hariç)
-- [ ] TypeScript hatası yok (bizim dosyalarda)
-
-### 4. Faz 2'ye Geçiş
-
-Faz 1 tüm sayfalar tamamlandıktan sonra → Faz 2: Event System (Rust backend)
-
-## Dikkat Edilecekler
-
-- Her sayfayı tek tek değiştir, hepsini birden değil
-- Mevcut `useState` + `useEffect` kodunu silmeden önce `useQuery`'yi ekle
+### Dikkat Edilecekler
 - Zod v4: `z.record(keySchema, valueSchema)` — iki argüman
-- Önceden var olan hataları düzeltme (billing, team, admin/layout) — ayrı PR
+- AdminUser: `role` ve `status` zorunlu
+- TimeBucket: `timestamp`, `successful`, `failed`, `total`
+- Git email: servetarslan02@gmail.com (GitHub ile eşleşmeli)
+
+## Faz 1 Bittikten Sonra
+
+Faz 2: Event System + Redis Streams
+- Plan v3.0'a göre: Redis Pub/Sub → Redis Streams
+- XADD ile event yaz, XREVRANGE ile son N event oku
+- Stream key: `hooksniff:events`
+- Upstash free tier ($0)
+
+## Kısa Kararlar (Bu Oturumda Alındı)
+- Redis Streams > Pub/Sub (persistence, deploy güvenliği)
+- Kafka/NATS: overkill ($0-100 kullanıcı için)
+- Kubernetes: overkill (Cloud Run yeterli)
