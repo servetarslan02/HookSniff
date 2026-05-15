@@ -1562,7 +1562,8 @@
       "dashboard": "Dashboard →",
       "getStarted": "Get Started",
       "login": "Log In",
-      "register": "Sign Up"
+      "register": "Sign Up",
+      "playground": "Playground"
     },
     "hero": {
       "uptime": "99.99% delivery uptime",
