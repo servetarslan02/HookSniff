@@ -73,7 +73,7 @@ pub async fn run(pool: PgPool) {
                 // Build OTLP payload
                 let now_ns = chrono::Utc::now().timestamp_nanos_opt().unwrap_or(0) as u64;
                 let metrics = vec![
-                    gauge("hooksniff_api_healthy", api_ok as f64, now_ns),
+                    gauge("hooksniff_api_healthy", if api_ok { 1.0 } else { 0.0 }, now_ns),
                     gauge("hooksniff_db_latency_ms", db_latency, now_ns),
                     gauge("hooksniff_queue_pending", queue_pending, now_ns),
                     gauge(
