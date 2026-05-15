@@ -1,19 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
-import { endpointsApi, type Endpoint } from '@/lib/api';
+import { endpointsApi } from '@/lib/api';
+import { useEndpoints, useDeleteEndpoint, useToggleEndpoint } from '@/hooks/useDashboardData';
 import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function EndpointsPage() {
   const { token } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
   const [newUrl, setNewUrl] = useState('');
   const [newDesc, setNewDesc] = useState('');
@@ -28,15 +29,10 @@ export default function EndpointsPage() {
   const t = useTranslations('endpoints');
   const tc = useTranslations('common');
 
-  useEffect(() => {
-    if (!token) return;
-    endpointsApi.list(token)
-      .then(setEndpoints)
-      .catch((err: unknown) => {
-        setError((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToLoad'));
-      })
-      .finally(() => setLoading(false));
-  }, [token]);
+  // React Query — replaces useEffect + useState + fetch
+  const { data: endpoints = [], isLoading, error: queryError } = useEndpoints();
+  const deleteEndpointMutation = useDeleteEndpoint();
+  const toggleEndpointMutation = useToggleEndpoint();
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,8 +40,8 @@ export default function EndpointsPage() {
     setCreating(true);
     setError('');
     try {
-      const ep = await endpointsApi.create(token, { url: newUrl, description: newDesc || undefined });
-      setEndpoints((prev) => [ep, ...prev]);
+      await endpointsApi.create(token, { url: newUrl, description: newDesc || undefined });
+      queryClient.invalidateQueries({ queryKey: ['endpoints'] });
       setNewUrl('');
       setNewDesc('');
       setShowCreate(false);
@@ -57,15 +53,30 @@ export default function EndpointsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token) return;
-    setDeleteId(id);
+    try {
+      await deleteEndpointMutation.mutateAsync(id);
+      setDeleteId(null);
+    } catch (err: unknown) {
+      toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToDelete'), 'error');
+    }
+  };
+
+  const handleToggle = async (id: string, currentState: boolean) => {
+    setTogglingId(id);
+    try {
+      await toggleEndpointMutation.mutateAsync({ id, is_active: !currentState });
+    } catch (err: unknown) {
+      toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToUpdate'), 'error');
+    } finally {
+      setTogglingId(null);
+    }
   };
 
   const confirmDelete = async () => {
     if (!token || !deleteId) return;
     try {
       await endpointsApi.delete(token, deleteId);
-      setEndpoints((prev) => prev.filter((ep) => ep.id !== deleteId));
+      queryClient.invalidateQueries({ queryKey: ['endpoints'] });
     } catch (err: unknown) {
       toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToDelete'), 'error');
     } finally {
@@ -90,21 +101,7 @@ export default function EndpointsPage() {
     }
   };
 
-  const handleToggleActive = async (ep: Endpoint) => {
-    if (!token) return;
-    setTogglingId(ep.id);
-    try {
-      await endpointsApi.update(token, ep.id, { is_active: !ep.is_active });
-      setEndpoints((prev) => prev.map((e) => e.id === ep.id ? { ...e, is_active: !e.is_active } : e));
-      toast(ep.is_active ? t('endpointDisabled') : t('endpointEnabled'), 'success');
-    } catch (err) {
-      toast(err instanceof Error ? err.message : tc('error'), 'error');
-    } finally {
-      setTogglingId(null);
-    }
-  };
-
-  const handleRotateSecret = async (ep: Endpoint) => {
+  const handleRotateSecret = async (ep: { id: string }) => {
     if (!token) return;
     setRotatingId(ep.id);
     try {
@@ -130,13 +127,13 @@ export default function EndpointsPage() {
         // Continue with remaining
       }
     }
-    setEndpoints((prev) => prev.filter((ep) => !selected.has(ep.id)));
+    queryClient.invalidateQueries({ queryKey: ['endpoints'] });
     setSelected(new Set());
     setBulkDeleting(false);
     toast(t('bulkDeleted', { count: deleted }), 'success');
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
@@ -149,12 +146,12 @@ export default function EndpointsPage() {
     );
   }
 
-  if (error && endpoints.length === 0) {
+  if (queryError && endpoints.length === 0) {
     return (
       <div className="glass-card p-12 text-center">
         <div className="text-4xl mb-3">⚠️</div>
-        <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error}</p>
-        <button type="button" onClick={() => { setError(''); setLoading(true); if (token) endpointsApi.list(token).then(setEndpoints).catch(() => {}).finally(() => setLoading(false)); }} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
+        <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error || tc('error')}</p>
+        <button type="button" onClick={() => queryClient.invalidateQueries({ queryKey: ['endpoints'] })} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
           {tc('retry')}
         </button>
       </div>
@@ -280,7 +277,7 @@ export default function EndpointsPage() {
                       type="button"
                       role="switch"
                       aria-checked={ep.is_active}
-                      onClick={() => handleToggleActive(ep)}
+                      onClick={() => handleToggle(ep.id, ep.is_active)}
                       disabled={togglingId === ep.id}
                       className={`relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${ep.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'} ${togglingId === ep.id ? 'opacity-60' : ''}`}
                       title={ep.is_active ? t('disable') : t('enable')}

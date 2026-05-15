@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, API_BASE, type AdminUser } from '@/lib/api';
+import { useAdminUsers, useUpdateUserPlan, useUpdateUserStatus } from '@/hooks/useAdminData';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -26,10 +27,7 @@ export default function AdminUsersPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const locale = useLocale();
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [planFilter, setPlanFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -49,6 +47,30 @@ export default function AdminUsersPage() {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const perPage = 20;
+
+  // Compute date range params
+  const dateParams = useMemo(() => {
+    if (!dateRange) return undefined;
+    const now = new Date();
+    const days = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : 90;
+    return new Date(now.getTime() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  }, [dateRange]);
+
+  // React Query — replaces fetchUsers + useState + useEffect
+  const { data, isLoading } = useAdminUsers({
+    page,
+    search: search || undefined,
+    plan: planFilter || undefined,
+    status: statusFilter || undefined,
+    created_after: dateParams,
+  });
+
+  // Mutations
+  const updatePlanMutation = useUpdateUserPlan();
+  const updateStatusMutation = useUpdateUserStatus();
+
+  const users = data?.users ?? [];
+  const total = data?.total ?? 0;
 
   const handleSort = (field: typeof sortField) => {
     if (sortField === field) {
@@ -96,85 +118,43 @@ export default function AdminUsersPage() {
     }
   };
 
-  const fetchUsers = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      // Calculate date range
-      let created_after: string | undefined;
-      const now = new Date();
-      if (dateRange === '7d') {
-        created_after = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      } else if (dateRange === '30d') {
-        created_after = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      } else if (dateRange === '90d') {
-        created_after = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      }
-
-      const data = await adminApi.listUsers(token, {
-        page,
-        search: search || undefined,
-        plan: planFilter || undefined,
-        status: statusFilter || undefined,
-        created_after,
-      });
-      setUsers(data.users || []);
-      setTotal(data.total || 0);
-    } catch {
-      toast(tc('error'), 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [token, page, search, planFilter, statusFilter, dateRange, toast, tc]);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    fetchUsers();
   };
 
   const handleChangePlan = async () => {
-    if (!planChangeTarget || !newPlan || !token) return;
+    if (!planChangeTarget || !newPlan) return;
     try {
-      await adminApi.updateUserPlan(token, planChangeTarget.id, newPlan);
+      await updatePlanMutation.mutateAsync({ userId: planChangeTarget.id, plan: newPlan });
       toast(t('planUpdated', { plan: newPlan }), 'success');
       setPlanChangeTarget(null);
-      fetchUsers();
     } catch {
       toast(tc('error'), 'error');
     }
   };
 
   const handleToggleStatus = async (user: AdminUser) => {
-    if (!token) return;
     if (user.status === 'active') {
-      // Show ban reason dialog
       setBanTarget(user);
       setBanReason('');
       return;
     }
-    // Unbanning - do directly
     try {
-      await adminApi.updateUserStatus(token, user.id, 'active');
+      await updateStatusMutation.mutateAsync({ userId: user.id, status: 'active' });
       toast(t('userActivated'), 'success');
-      fetchUsers();
     } catch {
       toast(tc('error'), 'error');
     }
   };
 
   const handleConfirmBan = async () => {
-    if (!token || !banTarget) return;
+    if (!banTarget) return;
     try {
-      await adminApi.updateUserStatus(token, banTarget.id, 'banned');
+      await updateStatusMutation.mutateAsync({ userId: banTarget.id, status: 'banned' });
       toast(t('userBanned'), 'success');
       setBanTarget(null);
       setBanReason('');
-      fetchUsers();
     } catch {
       toast(tc('error'), 'error');
     }
@@ -202,7 +182,7 @@ export default function AdminUsersPage() {
 
   // Bulk action handler
   const handleBulkAction = async () => {
-    if (!token || selectedIds.size === 0) return;
+    if (selectedIds.size === 0) return;
     setBulkProcessing(true);
     let successCount = 0;
     let failCount = 0;
@@ -212,13 +192,13 @@ export default function AdminUsersPage() {
       if (bulkAction === 'ban' || bulkAction === 'unban') {
         const status = bulkAction === 'ban' ? 'banned' : 'active';
         const results = await Promise.allSettled(
-          ids.map((id) => adminApi.updateUserStatus(token, id, status))
+          ids.map((id) => updateStatusMutation.mutateAsync({ userId: id, status }))
         );
         successCount = results.filter((r) => r.status === 'fulfilled').length;
         failCount = results.filter((r) => r.status === 'rejected').length;
       } else if (bulkAction === 'plan') {
         const results = await Promise.allSettled(
-          ids.map((id) => adminApi.updateUserPlan(token, id, bulkPlan))
+          ids.map((id) => updatePlanMutation.mutateAsync({ userId: id, plan: bulkPlan }))
         );
         successCount = results.filter((r) => r.status === 'fulfilled').length;
         failCount = results.filter((r) => r.status === 'rejected').length;
@@ -232,7 +212,6 @@ export default function AdminUsersPage() {
       }
       clearSelection();
       setBulkAction(null);
-      fetchUsers();
     } catch {
       toast(tc('error'), 'error');
     } finally {
@@ -400,7 +379,7 @@ export default function AdminUsersPage() {
 
       {/* Users Table */}
       <div className="glass-card overflow-hidden">
-        {loading ? (
+        {isLoading ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400 animate-pulse">
             {t('loadingUsers')}
           </div>
