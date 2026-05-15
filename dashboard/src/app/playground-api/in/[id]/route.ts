@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { playgroundLpush, playgroundLrange, getRedis } from '@/lib/redis';
+import { playgroundLpush, playgroundLrange, getRedis, checkRateLimit } from '@/lib/redis';
 
 const MAX_HISTORY = 100;
 
@@ -9,8 +9,36 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, X-Webhook-Event, X-HookSniff-Signature, Svix-ID, Svix-Timestamp, Svix-Signature',
 };
 
+function getClientIp(request: Request): string {
+  return (
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
+  );
+}
+
 // Capture any HTTP method (GET, POST, PUT, DELETE, PATCH, etc.)
 async function handleRequest(request: Request, id: string) {
+  const ip = getClientIp(request);
+
+  // Rate limit: 60 requests per minute per IP
+  const { allowed, remaining, retryAfter } = await checkRateLimit(ip, 'request');
+
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded', retry_after: retryAfter },
+      {
+        status: 429,
+        headers: {
+          ...corsHeaders,
+          'Retry-After': String(retryAfter),
+          'X-RateLimit-Limit': '60',
+          'X-RateLimit-Remaining': '0',
+        },
+      },
+    );
+  }
+
   try {
     // Read request details
     const method = request.method;
@@ -49,7 +77,7 @@ async function handleRequest(request: Request, id: string) {
       body_json: bodyJson,
       content_type: headers['content-type'] || null,
       content_length: body ? body.length : 0,
-      ip: headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown',
+      ip,
       user_agent: headers['user-agent'] || null,
       timestamp: new Date().toISOString(),
     };
@@ -58,9 +86,7 @@ async function handleRequest(request: Request, id: string) {
     const key = `play:history:${id}`;
     const existing = (await playgroundLrange(key, 0, MAX_HISTORY - 1)) as unknown[];
     if (existing.length >= MAX_HISTORY) {
-      // Trim to MAX_HISTORY - 1 before adding new
       await playgroundLpush(key, record, 86400);
-      // Trim excess
       const r = getRedis();
       if (r) {
         await r.ltrim(key, 0, MAX_HISTORY - 1);
@@ -80,8 +106,13 @@ async function handleRequest(request: Request, id: string) {
           echoBody === 'true' ? body : JSON.stringify({ error: `Forced status ${statusCode}` }),
           {
             status: statusCode,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          }
+            headers: {
+              'Content-Type': 'application/json',
+              'X-RateLimit-Limit': '60',
+              'X-RateLimit-Remaining': String(remaining),
+              ...corsHeaders,
+            },
+          },
         );
       }
     }
@@ -94,15 +125,17 @@ async function handleRequest(request: Request, id: string) {
           'Content-Type': 'application/json',
           'X-HookSniff-Playground': 'true',
           'X-HookSniff-Delivery-Id': record.id,
+          'X-RateLimit-Limit': '60',
+          'X-RateLimit-Remaining': String(remaining),
           ...corsHeaders,
         },
-      }
+      },
     );
   } catch (error) {
     console.error('Playground receive error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: corsHeaders },
     );
   }
 }

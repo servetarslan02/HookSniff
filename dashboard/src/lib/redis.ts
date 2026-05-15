@@ -80,3 +80,58 @@ export async function playgroundLrange(key: string, start = 0, stop = -1): Promi
   const existing = (await playgroundGet(key)) as unknown[] | null;
   return Array.isArray(existing) ? existing.slice(start, stop === -1 ? undefined : stop + 1) : [];
 }
+
+// ─── Rate Limiting (IP-based for public playground) ───
+
+/**
+ * Check and increment rate limit for an IP.
+ * Returns { allowed, remaining, retryAfter }
+ */
+export async function checkRateLimit(
+  ip: string,
+  action: 'token' | 'request',
+): Promise<{ allowed: boolean; remaining: number; retryAfter: number }> {
+  const limits = {
+    token: { max: 5, windowSec: 3600 },   // 5 tokens per hour per IP
+    request: { max: 60, windowSec: 60 },   // 60 requests per minute per IP
+  };
+
+  const { max, windowSec } = limits[action];
+  const key = `rl:${action}:${ip}`;
+
+  const r = getRedis();
+  if (r) {
+    try {
+      const current = await r.incr(key);
+      if (current === 1) {
+        await r.expire(key, windowSec);
+      }
+      const ttl = await r.ttl(key);
+      return {
+        allowed: current <= max,
+        remaining: Math.max(0, max - current),
+        retryAfter: ttl > 0 ? ttl : windowSec,
+      };
+    } catch {
+      // Redis error — allow request (fail open)
+      return { allowed: true, remaining: max, retryAfter: 0 };
+    }
+  }
+
+  // Fallback — in-memory rate limiting
+  const memKey = `rl:${action}:${ip}`;
+  const entry = memoryStore.get(memKey) as { count: number; expires: number } | undefined;
+  const now = Date.now();
+
+  if (!entry || now > entry.expires) {
+    memoryStore.set(memKey, { count: 1, expires: now + windowSec * 1000 });
+    return { allowed: true, remaining: max - 1, retryAfter: 0 };
+  }
+
+  entry.count++;
+  return {
+    allowed: entry.count <= max,
+    remaining: Math.max(0, max - entry.count),
+    retryAfter: Math.ceil((entry.expires - now) / 1000),
+  };
+}
