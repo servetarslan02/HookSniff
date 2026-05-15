@@ -98,12 +98,17 @@ Aşama başla
 
 | # | Konu | Ne Zaman |
 |---|------|----------|
-| 1 | `api_keys` tablosu aktif mi? | Aşama 0'dan önce |
-| 2 | Refund provider seçimi | Aşama 5'ten önce |
-| 3 | GDPR silme stratejisi | Aşama 7'den önce |
-| 4 | Bulk email kuyruk mu? | Aşama 7'den önce |
-| 5 | Communication log mekanizması | Aşama 3'ten önce |
-| 6 | Cohort analizi derinliği | Aşama 4'ten önce |
+| 1 | Refund provider seçimi | Aşama 5'ten önce |
+| 2 | GDPR silme stratejisi | Aşama 7'den önce |
+| 3 | Bulk email kuyruk mu? | Aşama 7'den önce |
+| 4 | Communication log mekanizması | Aşama 3'ten önce |
+| 5 | Cohort analizi derinliği | Aşama 4'ten önce |
+
+## ✅ Karar Verilen Noktalar
+
+| # | Konu | Karar | Tarih |
+|---|------|-------|-------|
+| 1 | `api_keys` tablosu | Zaten production'da mevcut. Admin panelinde API key yönetimi gereksiz — müşteri kendi key'ini yönetiyor. | 2026-05-15 |
 
 ---
 
