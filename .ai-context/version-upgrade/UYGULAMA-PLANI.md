@@ -433,12 +433,6 @@
 - [ ] Tüm dangerouslySetInnerHTML kullanımının sanitize edildiğini doğrula
 - [ ] `git commit -m "security: audit dangerouslySetInnerHTML usage"`
 
-### Servet Ek Görevler (TODO.md'den)
-- [ ] iyzico hesap aç (vergi levhası + banka hesabı gerekli)
-- [ ] Domain kararı (hooksniff.vercel.app yeterli şimdilik)
-- [ ] GCP SA key rotate (yeni key oluştur)
-- [ ] GitHub PAT rotate (yeni token oluştur)
-
 ### Landing Page
 - [ ] `landing/index.html` — statik HTML, bağımlılık yok
 - [ ] Google Fonts kullanıyor (Inter, JetBrains Mono) — CDN'den geliyor
