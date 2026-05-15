@@ -82,7 +82,6 @@ GET    /admin/deploy-info              → Deploy bilgisi (versiyon, commit)
 ### Eksikler
 - ❌ Müşterinin webhook'larını göremiyorum
 - ❌ Müşterinin endpoint'lerini göremiyorum
-- ❌ Müşterinin API key'lerini göremiyorum
 - ❌ Sistem geneli failed delivery'leri göremiyorum
 - ❌ Rate limit ihlali göremiyorum
 - ❌ Kullanıcı bazlı API usage göremiyorum
@@ -91,7 +90,7 @@ GET    /admin/deploy-info              → Deploy bilgisi (versiyon, commit)
 - ❌ GDPR veri dışa aktarma/silme yapamıyorum
 
 ### Veritabanı Tutarsızlıkları ⚠️
-- ⚠️ `api_keys` tablosu: `inbound.rs` dosyasında `SELECT key_hash, customer_id FROM api_keys WHERE api_key_prefix = $1` sorgusu var ama **hiçbir migration'da `api_keys` CREATE TABLE yok**. API key'ler `customers` tablosundaki `api_key_hash` / `api_key_prefix` kolonlarında tutuluyor. Bu ya bir migration eksikliği ya da inbound.rs'de dead code.
+- ⚠️ `api_keys` tablosu: Production'da aktif kullanılıyor (api_keys.rs CRUD + inbound.rs auth) ama migration'da yok. Ayrı bir migration ile eklenmeli — bu planın kapsamı dışında.
 - ⚠️ `invoices` tablosu (migration 009) var ama admin API'sinde hiç endpoint yok — fatura verileri görünmüyor.
 - ⚠️ `payment_transactions` tablosu (migration 009) var ama admin API'sinde hiç endpoint yok — ödeme geçmişi görünmüyor.
 - ⚠️ `rate_limit_configs` tablosu var ama ihlal log'ları tutulmuyor (`rate_limit_violations` tablosu yok).
@@ -221,7 +220,6 @@ GET    /admin/deploy-info              → Deploy bilgisi (versiyon, commit)
 | Overview | Profil, plan, kullanım istatistikleri | Mevcut |
 | **Endpoints** | Kullanıcının tüm endpoint'leri, URL'ler, aktif/pasif durumu, success rate | **YENİ** |
 | **Webhooks** | Kullanıcının tüm delivery'leri, filtreleme (status/event/date), arama | **YENİ** |
-| **API Keys** | Kullanıcının API key'leri (maskelenmiş), oluşturma tarihi, son kullanım | **YENİ** |
 | **Applications** | Kullanıcının uygulamaları, endpoint sayısı | **YENİ** |
 | **Usage** | API kullanım istatistikleri, grafikler, event dağılımı | **YENİ** |
 | Plan History | Plan değişiklik geçmişi | Mevcut |
@@ -301,17 +299,6 @@ Response: PaginatedResponse<DeliveryInfo> {
 // NOT: deliveries tablosunda sütun adı `event_type` (plan'ın eski versiyonunda `event` yazılmıştı)
 // `error_message` deliveries'da YOK — delivery_attempts tablosundan subquery ile çekilecek
 // `response_body` deliveries tablosunda mevcut
-
-// Kullanıcının API key'lerini listele
-GET /admin/users/{id}/api-keys
-Response: Vec<ApiKeyInfo> {
-    id, name, prefix, created_at, last_used_at, is_active
-}
-// NOT: api_keys tablosu yok! customers tablosundaki api_key_hash/api_key_prefix
-// kullanılıyor. inbound.rs'de api_keys tablosuna referans var ama migration yok.
-// Bu endpoint için iki seçenek:
-//   a) customers tablosundan api_key_prefix oku (tek key per user)
-//   b) api_keys tablosu için yeni migration yaz (multi-key support)
 
 // Kullanıcının uygulamalarını listele
 GET /admin/users/{id}/applications
@@ -534,28 +521,9 @@ CREATE TABLE IF NOT EXISTS rate_limit_violations (
 CREATE INDEX idx_rl_violations_created ON rate_limit_violations(created_at DESC);
 CREATE INDEX idx_rl_violations_customer ON rate_limit_violations(customer_id);
 
--- 6. api_keys tablosu tutarsızlığını çöz
--- Seçenek A: Tek key per user (mevcut yapı — customers.api_key_hash)
--- Seçenek B: Multi-key support (eğer inbound.rs'deki sorgu aktifse)
--- inbound.rs'de "SELECT key_hash, customer_id FROM api_keys WHERE api_key_prefix = $1"
--- sorgusu var. Bu sorgu aktif kullanılıyorsa tablo oluşturulmalı:
-CREATE TABLE IF NOT EXISTS api_keys (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
-    name TEXT,
-    key_hash TEXT NOT NULL,
-    api_key_prefix TEXT NOT NULL,
-    is_active BOOL NOT NULL DEFAULT true,
-    last_used_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-CREATE INDEX idx_api_keys_prefix ON api_keys(api_key_prefix);
-CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
--- KARAR GEREKLİ: inbound.rs'deki api_keys sorgusu aktif mi?
--- Eğer evet → bu tablo zaten gerekli, migration eksik
--- Eğer hayır → dead code, temizlenmeli
-
--- 7. Polar.sh webhook ile fatura kaydetme (invoices tablosunu doldurmak için)
+-- 6. Polar.sh webhook ile fatura kaydetme (invoices tablosunu doldurmak için)
+-- NOT: api_keys tablosu zaten production'da mevcut (api_keys.rs CRUD + inbound.rs auth)
+-- Migration'da yok ama ayrı migration ile eklenmeli — bu planın kapsamı dışında
 -- invoices ve payment_transactions tabloları migration 009'da var ama boş.
 -- Polar.sh webhook'u (invoice.created, payment.created) ile veri doldurulacak.
 -- Bu AŞAMA 5'te implemente edilecek.
@@ -604,12 +572,6 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
    ORDER BY d.created_at DESC
    LIMIT $3 OFFSET $4;
 
-   -- API Keys
-   SELECT id, name, api_key_prefix as prefix, created_at, last_used_at, is_active
-   FROM api_keys
-   WHERE customer_id = $1
-   ORDER BY created_at DESC;
-
    -- Applications
    SELECT id, name, description, created_at,
           (SELECT COUNT(*) FROM endpoints WHERE application_id = a.id) as endpoint_count
@@ -622,7 +584,6 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
    ```rust
    .route("/users/{id}/endpoints", get(admin_user_endpoints))
    .route("/users/{id}/webhooks", get(admin_user_webhooks))
-   .route("/users/{id}/api-keys", get(admin_user_api_keys))
    .route("/users/{id}/applications", get(admin_user_applications))
    .route("/users/{id}/usage", get(admin_user_usage))
    .route("/users/{id}/test-webhook", post(admin_user_test_webhook))
@@ -642,8 +603,6 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
      apiFetch(`/admin/users/${userId}/endpoints`, { token }),
    getUserWebhooks: (token: string, userId: string, params?: {status?: string, page?: number}) =>
      apiFetch(`/admin/users/${userId}/webhooks${qs}`, { token }),
-   getUserApiKeys: (token: string, userId: string) =>
-     apiFetch(`/admin/users/${userId}/api-keys`, { token }),
    ```
 
 ### AŞAMA 2: Sistem Geneli (1 oturum)
@@ -753,7 +712,6 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 - [ ] `customer_tags` tablosu CREATE TABLE
 - [ ] `communication_history` tablosu CREATE TABLE
 - [ ] `rate_limit_violations` tablosu CREATE TABLE
-- [ ] `api_keys` tablosu — KARAR: inbound.rs'deki sorgu aktif mi? Evetse CREATE TABLE
 - [ ] Overview pie chart bug fix (hardcoded pct → "No data")
 - [ ] Trend negatif bug fix (Math.abs → gerçek değer)
 - [ ] Profile dropdown bug fix (group-hover → click)
@@ -763,7 +721,6 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 ### Aşama 1 — Kullanıcı Kaynakları
 - [ ] `GET /admin/users/{id}/endpoints` — Backend endpoint
 - [ ] `GET /admin/users/{id}/webhooks` — Backend endpoint (filtre: status, event_type, since)
-- [ ] `GET /admin/users/{id}/api-keys` — Backend endpoint
 - [ ] `GET /admin/users/{id}/applications` — Backend endpoint
 - [ ] `GET /admin/users/{id}/usage` — Backend endpoint
 - [ ] `POST /admin/users/{id}/test-webhook` — Backend endpoint (per-user test webhook)
@@ -771,7 +728,6 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 - [ ] `admin.ts` — Yeni API fonksiyonları
 - [ ] `/admin/users/[id]` — Endpoints tab component
 - [ ] `/admin/users/[id]` — Webhooks tab component (filtre + arama + replay butonu)
-- [ ] `/admin/users/[id]` — API Keys tab component
 - [ ] `/admin/users/[id]` — Applications tab component
 - [ ] `/admin/users/[id]` — Usage tab component (grafikler)
 - [ ] `/admin/users/[id]` — Test webhook butonu (endpoint bazlı)
@@ -902,9 +858,8 @@ dashboard/src/app/[locale]/admin/
 
 | # | Konu | Seçenek A | Seçenek B | Tavsiye |
 |---|------|-----------|-----------|---------|
-| 1 | `api_keys` tablosu | Tablo oluştur (multi-key) | customers tablosundan oku (tek key) | inbound.rs'yi kontrol et — eğer sorgu aktifse tablo gerekli |
-| 2 | Refund provider | Polar.sh API | Manuel kayıt + admin takibi | Önce manuel, sonra Polar.sh entegrasyonu |
-| 3 | GDPR silme | Hard delete (CASCADE) | Soft delete (is_deleted + 30 gün) | Soft delete — geri dönüş mümkün olsun |
-| 4 | Bulk email | Anlık gönderim | Kuyruk (background worker) | Kuyruk — timeout riski var |
-| 5 | Communication log | Manuel kayıt | Otomatik (middleware) | Otomatik — mevcut aksiyonları intercept et |
-| 6 | Cohort analizi | Tam implementasyon | Basit tablo | Önce basit, sonra geliştir |
+| 1 | Refund provider | Polar.sh API | Manuel kayıt + admin takibi | Önce manuel, sonra Polar.sh entegrasyonu |
+| 2 | GDPR silme | Hard delete (CASCADE) | Soft delete (is_deleted + 30 gün) | Soft delete — geri dönüş mümkün olsun |
+| 3 | Bulk email | Anlık gönderim | Kuyruk (background worker) | Kuyruk — timeout riski var |
+| 4 | Communication log | Manuel kayıt | Otomatik (middleware) | Otomatik — mevcut aksiyonları intercept et |
+| 5 | Cohort analizi | Tam implementasyon | Basit tablo | Önce basit, sonra geliştir |
