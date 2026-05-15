@@ -292,11 +292,6 @@ export default function AdminOverviewPage() {
           label={t('totalUsers')}
           value={stats?.total_users?.toLocaleString() || '0'}
           icon={<span className="text-lg" aria-hidden="true">👥</span>}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label={t('totalUsers')}
-          value={stats?.total_users?.toLocaleString() || '0'}
-          icon={<span className="text-lg" aria-hidden="true">👥</span>}
           color="blue"
           trend={stats?.trends ? (() => {
             const diff = stats.total_users - stats.trends.total_users_yesterday;
