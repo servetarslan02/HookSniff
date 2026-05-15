@@ -1362,7 +1362,8 @@
       "settingsNav": "Ayarlar",
       "activityLog": "Aktivite Günlüğü",
       "featureFlags": "Feature Flags",
-      "alerts": "Uyarılar"
+      "alerts": "Uyarılar",
+      "email": "E-posta"
     },
     "noActivity": "Henüz aktivite kaydı yok",
     "noAdminPrivileges": "Yönetici yetkiniz yok.",
