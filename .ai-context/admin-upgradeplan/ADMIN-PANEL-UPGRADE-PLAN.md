@@ -12,6 +12,19 @@
 HookSniff admin paneli şu an sadece "gözlüyor" — müşteri destek veremiyor, müdahale edemiyor.
 Bu plan, admin panelini tam bir "operasyon merkezi" haline getirmeyi anlatıyor.
 
+### ⚠️ Uygulama Kuralları (ZORUNLU)
+
+1. **Sıralı ilerleme** — Aşamalar sırayla gidecek. Bir bitmeden diğerine geçilmez.
+2. **Her aşamadan sonra `cargo test`** — Rust testleri geçmeden aşama bitmiş sayılmaz.
+3. **Her aşamadan sonra `next build`** — Frontend build'i geçmeden aşama bitmiş sayılmaz.
+4. **Her aşamadan sonra checklist güncelle** — Biten maddeler `[x]` ile işaretlenir.
+5. **Her aşamadan sonra MEMORY.md güncelle** — Ne yapıldı, ne öğrenildi, sorunlar.
+6. **Her aşamadan sonra NEXT_SESSION.md güncelle** — Sıradaki işler netleşir.
+7. **Push zorunlu** — Her aşamanın sonunda `git commit` + `git push` yapılır.
+8. **Aşama tamamlandıysa `✅ TAMAMLANDI` yazılır** — Tarih ve not ile.
+
+Bunlar atlanamaz. Her aşama tek bir oturumda bitmeli ama bitmezse NEXT_SESSION.md'ye "yarıda kaldı" yazılır.
+
 **Referanslar:**
 - **Stripe Dashboard** — Admin olarak müşteri hesabını görme, refund, plan değiştirme
 - **Svix Application Portal** — Webhook delivery izleme, debug, retry
