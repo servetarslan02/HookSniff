@@ -1,6 +1,6 @@
 # 🧠 Admin Upgrade Plan — Hafıza
 
-> Son güncelleme: 2026-05-16 02:10 GMT+8
+> Son güncelleme: 2026-05-16 02:57 GMT+8
 
 ---
 
@@ -19,89 +19,88 @@
 
 ---
 
+## UI Düzenlemeleri (2026-05-16)
+
+### Overview Sayfası — Tab Yapısı
+- 4 tab: **📊 Genel Bakış** | **📋 Aktivite** | **💚 Sağlık** | **🏗️ Altyapı**
+- Genel Bakış: Stats cards, MRR/ARR, Users by Plan, Weekly Comparison
+- Aktivite: Recent Activity (Audit Log), Recent Signups, Quick Actions
+- Sağlık: Endpoint Status, Security Warnings, Uptime, Service Status
+- Altyapı: Feature Flags, Standard Webhooks, Deduplication, Last Deploy
+
+### Settings Sayfası — Tab Yapısı
+- 3 tab: **⚙️ Genel** | **📧 Email & Güvenlik** | **🚨 Uyarı & Retry**
+- Genel: General, Plan Limits, Plan Prices
+- Email & Güvenlik: Email Settings, Security, Backup
+- Uyarı & Retry: Retry Settings, Alert Thresholds
+
+### Sidebar Navigasyonu (Güncel)
+```
+📊 Genel Bakış
+👥 Kullanıcılar
+💰 Gelir
+🚩 Feature Flags
+🖥️ Sistem
+⚙️ Ayarlar
+📋 Aktivite Günlüğü
+🔔 Uyarılar
+📧 E-posta        ← ayrı sayfa (bulk email)
+📁 Kullanıcı Paneli
+```
+
+---
+
 ## Karar Verilen Noktalar
 
 | # | Konu | Karar | Tarih |
 |---|------|-------|-------|
 | 1 | `api_keys` tablosu | Production'da mevcut. Admin panelinde yönetim gereksiz. | 2026-05-15 |
-| 2 | Refund provider | Mevcut `billing/refund.rs` + `billing/polar.rs` kullanıldı. Admin panelinden manuel refund. | 2026-05-16 |
-
-## Karar Gereken Noktalar
-
-| # | Konu | Ne Zaman |
-|---|------|----------|
-| 1 | GDPR silme stratejisi | Aşama 7'den önce |
-| 2 | Bulk email kuyruk mu? | Aşama 7'den önce |
+| 2 | Refund provider | Mevcut `billing/refund.rs` + `billing/polar.rs` kullanıldı. | 2026-05-16 |
+| 3 | Bulk email | Ayrı `/admin/email` sayfasına taşındı (settings'den çıkarıldı). | 2026-05-16 |
+| 4 | GDPR export | Hassas alanlar (password_hash, api_key_hash, totp_secret) export'ta yok. | 2026-05-16 |
+| 5 | Overview yapısı | 4 tab'a ayrıldı (877 satır tek sayfa → organize). | 2026-05-16 |
+| 6 | Settings yapısı | 3 tab'a ayrıldı. | 2026-05-16 |
 
 ---
 
 ## Son Yapılan İş
 
-### Aşama 5 — Refund + Polar.sh (2026-05-16) ✅ TAMAMLANDI
+### Refactor — UI Düzenlemeleri (2026-05-16)
 
-**Backend (admin.rs — +345 satır):**
-- [x] `POST /admin/users/{id}/refund` — Admin refund oluştur (amount_cents, reason, currency)
-  - Kullanıcı var mı + plan kontrolü (free/developer reddedilir)
-  - Son paid invoice'ı bulur, amount'u invoice'ı aşamaz
-  - refunds tablosuna kayıt + invoice status → refunded + customer → free plan
-  - log_communication() + audit log
-- [x] `GET /admin/users/{id}/refunds` — Kullanıcının refund geçmişi (sayfalama)
-- [x] `GET /admin/refunds` — Sistem geneli refund listesi (status filtre + sayfalama)
-- [x] 8 yeni test (AdminRefundRequest, RefundQuery, RefundRow serialization)
+**Overview Tab Yapısı:**
+- [x] Tab navigation eklendi (4 tab)
+- [x] Section'lar tab'lara göre organize edildi
+- [x] Hidden class ile show/hide
+- [x] i18n: tr + en tab label'ları
 
-**Frontend (users/[id]/page.tsx — +141 satır):**
-- [x] Billing sekmesinde "Process Refund" butonu (sadece paid planlarda görünür)
-- [x] Refund onay dialogu (miktar USD + sebep textarea)
-- [x] Refund History tablosu (amount kırmızı, reason, status badge, provider, date)
-- [x] handleRefund() — validation + adminApi.refundUser + toast + tab refresh
+**Settings Tab Yapısı:**
+- [x] Tab navigation eklendi (3 tab)
+- [x] Section'lar tab'lara göre organize edildi
+- [x] i18n: tr + en tab label'ları
 
-**Frontend (revenue/page.tsx — +58 satır):**
-- [x] Sistem geneli Refund History section'ı (customer_id, amount, reason, status, date)
-- [x] getAllRefunds() entegrasyonu
+**Bulk Email Ayrı Sayfa:**
+- [x] `/admin/email` sayfası oluşturuldu
+- [x] Compose formu (plan/status filtre, subject, body)
+- [x] Sonuç gösterimi + session geçmişi
+- [x] Settings'den bulk email çıkarıldı
+- [x] Sidebar'a 📧 E-posta linki eklendi
 
-**API (api.ts — +21 satır):**
-- [x] refundUser(token, userId, amount_cents, reason, currency?)
-- [x] getUserRefunds(token, userId, params?)
-- [x] getAllRefunds(token, params?)
+**i18n Düzeltmeleri:**
+- [x] `nav.alerts` çevirisi eklendi (tr + en)
+- [x] `nav.email` çevirisi eklendi (tr + en)
+- [x] Tab label'ları eklendi
 
-**Router:**
-- [x] 3 yeni route eklendi (users/{id}/refund POST, users/{id}/refunds GET, refunds GET)
+**Bug Fix:**
+- [x] Duplicate Stats Cards section kaldırıldı
+- [x] Turbofish syntax hatası düzeltildi (`row.get::<i32>, _` → `row.get::<i32, _>`)
 
-**Git:**
-- [x] Commit: `3fbc6be8`
-- [x] Push: main → origin ✅
-
-### Aşama 4 — Fatura, Ödeme, Gelir Metrikleri (2026-05-16) ✅ TAMAMLANDI
-
-**Backend (admin.rs — +280 satır):**
-- [x] `GET /admin/users/{id}/invoices` — Fatura listesi (status filtre + sayfalama)
-- [x] `GET /admin/users/{id}/payments` — Ödeme geçmişi (sayfalama)
-- [x] `GET /admin/revenue/metrics` — ARPU, LTV, NRR, expansion revenue, churn rate, avg retention
-- [x] `GET /admin/revenue/cohorts` — Aylık cohort analizi (signup, active, retention, revenue)
-- [x] 6 yeni test (InvoiceQuery, PaymentQuery, CohortQuery, serialization)
-
-**Frontend:**
-- [x] Billing sekmesi (users/[id]): invoices tablosu (status badge, filtre), payments tablosu
-- [x] Revenue sayfası: ARPU, LTV, NRR, Expansion kartları + müşteri breakdown
-- [x] Revenue sayfası: Cohort analiz tablosu (retention bar, revenue)
-- [x] 5 yeni adminApi fonksiyonu (getUserInvoices, getUserPayments, getRevenueMetrics, getRevenueCohorts)
-
-### Aşama 3 — Müşteri İlişkileri (2026-05-16) ✅ TAMAMLANDI
-
-**Backend (admin.rs — +220 satır):**
-- [x] `POST /admin/users/{id}/notes` — Not ekle (communication_history'ye otomatik log)
-- [x] `GET /admin/users/{id}/notes` — Notları listele
-- [x] `POST /admin/users/{id}/tags` — Etiket ekle (UNIQUE constraint, upsert)
-- [x] `DELETE /admin/users/{id}/tags/{tag}` — Etiket kaldır
-- [x] `GET /admin/users/{id}/tags` — Etiketleri listele
-- [x] `GET /admin/users/{id}/communications` — İletişim geçmişi (type filtre + sayfalama)
-- [x] `log_communication()` helper — mevcut aksiyonlara otomatik log eklendi
-- [x] 7 yeni test
-
-**Frontend:**
-- [x] Notes & Tags sekmesi: tag CRUD, not listesi + ekleme
-- [x] Communications sekmesi: type badge, filtre dropdown, sayfalama
-- [x] 6 yeni adminApi fonksiyonu
+**Git Commits:**
+- `82ed4abb` — Settings tab yapısı
+- `7bfd2c7a` — Duplicate section fix
+- `cacd5275` — Turbofish syntax fix
+- `0846867f` — Bulk email ayrı sayfa
+- `b4a73c10` — i18n nav.alerts fix
+- `5b0add80` — Overview tab yapısı
 
 ---
 
@@ -109,21 +108,28 @@
 
 ```
 api/migrations/019_admin_upgrade.sql       ← ✅ Aşama 0
-api/src/routes/admin.rs                    ← ✅ Aşama 1+2+3+4+5 (+1465 satır, 33 endpoint)
-dashboard/src/lib/api.ts                   ← ✅ Aşama 1+2+3+4+5 (+26 fonksiyon)
-dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ Aşama 1+3+4+5 (9 sekme)
-dashboard/src/app/[locale]/admin/system/page.tsx ← ✅ Aşama 2 (5 monitoring section)
-dashboard/src/app/[locale]/admin/revenue/page.tsx ← ✅ Aşama 4+5 (metrics + cohort + refund)
-dashboard/src/app/[locale]/admin/alerts/page.tsx ← ✅ Aşama 6 (yeni sayfa, +369 satır)
-dashboard/src/app/[locale]/admin/layout.tsx ← ✅ Sidebar navigasyonu (8 link)
+api/src/routes/admin.rs                    ← ✅ Aşama 1-7 (+2000+ satır, 49 route, 64 test)
+dashboard/src/lib/api.ts                   ← ✅ Aşama 1-7 (+30+ adminApi fonksiyonu)
+dashboard/src/app/[locale]/admin/page.tsx  ← ✅ Overview (4 tab yapısı)
+dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ User detail (9 sekme + GDPR + Refund)
+dashboard/src/app/[locale]/admin/revenue/page.tsx ← ✅ Revenue (metrics + cohort + refund)
+dashboard/src/app/[locale]/admin/system/page.tsx ← ✅ System monitoring
+dashboard/src/app/[locale]/admin/alerts/page.tsx ← ✅ Alerts sayfası
+dashboard/src/app/[locale]/admin/email/page.tsx ← ✅ Bulk email sayfası
+dashboard/src/app/[locale]/admin/settings/page.tsx ← ✅ Settings (3 tab yapısı)
+dashboard/src/app/[locale]/admin/layout.tsx ← ✅ Sidebar (10 link)
+dashboard/src/messages/tr.json             ← ✅ Türkçe çeviriler
+dashboard/src/messages/en.json             ← ✅ İngilizce çeviriler
 ```
+
+---
 
 ## Ortam Notları
 
-- **Rust 1.95.0** kurulu (sub-agent tarafından) — bu ortamda kurulu değil, son oturumda kurulacak
-- `cargo check` ve `cargo test` çalışır durumda
-- `next build` için node_modules gerekli — bu ortamda install yasak
-- `cargo check` süresi: ~7 sn (cache ile), ilk çalışma ~2 dk
+- **Rust kurulu değil** — son oturumda kurulacak
+- `cargo test` ve `next build` atlandı
+- Vercel auto-deploy çalışıyor (GitHub webhook)
+- Google Cloud Build ayrı (Rust backend)
 
 ---
 
@@ -134,13 +140,13 @@ dashboard/src/app/[locale]/admin/layout.tsx ← ✅ Sidebar navigasyonu (8 link)
 3. `api_keys` tablosu migration'da yok ama `inbound.rs`'de aktif sorgu var
 4. `invoices`/`payment_transactions` tabloları boş — Polar.sh webhook handler gerekli
 5. `applications` tablosu migration 013'te mevcut
-6. Admin mevcut: 23 route → şimdi 49 route (26 yeni eklendi)
-7. GDPR delete hard delete kullanıyor (soft delete değil) — transaction ile
-8. Bulk email Resend API kullanıyor, 50'şer batch, 100ms delay
-9. GDPR delete'te admin koruması var: kendi kendini silemez, başka admin'i silemez
-7. Alerts sayfası için yeni backend endpoint gerekmedi — mevcut CRUD yeterli
-8. Sidebar navigasyonu `layout.tsx`'teki `adminNavigation` dizisinde yönetiliyor
-7. `refunds` tablosu zaten migration 019'da mevcut — yeni migration gerekmedi
-8. `billing/refund.rs` modülü zaten var (14 gün pencere, provider cancel) — admin endpoint'leri bu modülü kullandı
-9. `billing/polar.rs` Polar.sh entegrasyonu zaten var — webhook handler da mevcut
-10. JSX'te `&& (...)` içinde tek root element olmalı, birden fazla kardeş varsa `<>...</>` ile sar
+6. Admin: 49 route, 64 test, 58 async function
+7. `refunds` tablosu zaten migration 019'da mevcut
+8. `billing/refund.rs` modülü zaten var (14 gün pencere)
+9. `billing/polar.rs` Polar.sh entegrasyonu zaten var
+10. JSX'te `&& (...)` içinde tek root element olmalı, `<>...</>` ile sar
+11. Turbofish syntax: `row.get::<i32, _>` (virgül inside brackets)
+12. GDPR export'ta hassas alanlar çıkarılmalı
+13. Bulk email'de her kullanıcı için ayrı sorgu yerine SQL'de filtre
+14. Transaction kullanılmayan multi-step DB işlemleri tutarsızlık riski taşır
+15. Overview/Settings gibi büyük sayfalar tab'lara ayrılmalı
