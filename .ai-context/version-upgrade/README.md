@@ -17,6 +17,7 @@
 | `05-onerilen-siralama.md` | Adım adım uygulama planı |
 | `06-ek-bulgular.md` | GitHub Actions, CI/CD, SDK runtime'ları, MCP |
 | `07-derin-tarama.md` | Rust SDK, Edge Proxy, Monitoring, CLI, DevDeps |
+| `08-sdk-dil-detay.md` | Tüm SDK'ların dil/framework spesifik versiyonları |
 
 ---
 
@@ -33,6 +34,7 @@
 | GitHub Actions | 15 | 5 | **10 (major)** |
 | Docker images | 7 | 3 | **4 (Node 22, PostgreSQL 17)** |
 | Monitoring | 2 | 0 | **2 (Prometheus, Grafana)** |
+| SDK dilleri | 11 | 3 | **8 (Kotlin, Swift, Rust, Ruby major)** |
 | SDK runtimes | 6 | 3 | 3 (Go, Python, Ruby) |
 | Dev dependencies | 10 | 6 | 4 (jest-axe, eslint-plugin, etc.) |
 
