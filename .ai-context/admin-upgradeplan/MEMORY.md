@@ -15,7 +15,7 @@
 | 4 | Fatura, ödeme, gelir metrikleri | ✅ TAMAMLANDI | 2026-05-16 |
 | 5 | Refund + Polar.sh webhook handler | ✅ TAMAMLANDI | 2026-05-16 |
 | 6 | Alerts sayfası | ✅ TAMAMLANDI | 2026-05-16 |
-| 7 | Bulk email + GDPR | ⏳ İleride | |
+| 7 | Bulk email + GDPR | ✅ TAMAMLANDI | 2026-05-16 |
 
 ---
 
