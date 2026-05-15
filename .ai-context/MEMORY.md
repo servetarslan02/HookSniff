@@ -116,7 +116,14 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 
 ---
 
-## 🔧 Son Yapılan İşler (2026-05-15)
+## 🔧 Son Yapılan İşler
+
+### Oturum 168 — 2026-05-15 20:24 GMT+8
+1. **Navigation Restructure** — Önceki oturumlarda tamamlanmış (doğrulandı)
+2. **Güvenlik düzeltmeleri** — Tüm P0/P1 maddeleri zaten yapılmış (doğrulandı)
+3. **Seq Scan Index Migration** — `018_seq_scan_indexes.sql` oluşturuldu
+   - 6 yeni index: customers.api_key_prefix, endpoints.team_id, endpoints(customer_id, is_active), deliveries(customer_id, created_at DESC), deliveries(customer_id, status, created_at DESC), notifications(customer_id, is_read)
+4. **Oturum sonunda push edildi**
 
 ### Cloud Build Fix
 - **Hata:** `api/src/jobs/metrics_push.rs:76` — `bool as f64` cast (Rust E0606)

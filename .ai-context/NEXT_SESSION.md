@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-15 20:20 GMT+8 (Oturum 167)
+> Son güncelleme: 2026-05-15 20:45 GMT+8 (Oturum 168)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -17,6 +17,18 @@ Bu dosyayı ilk kez okuyorsan:
 
 ## ✅ Tamamlanan (Son Oturum — 2026-05-15)
 
+### Oturum 168: Seq Scan Index + Güvenlik Doğrulama ✅
+1. **Navigation Restructure doğrulandı** — zaten tamamlanmış (sidebar, /deliveries, /account, middleware redirect'leri)
+2. **Güvenlik düzeltmeleri doğrulandı** — HS-038f/g/h/j tümü zaten yapılmış
+3. **Seq Scan Index Migration** — `api/migrations/018_seq_scan_indexes.sql`
+   - `customers(api_key_prefix)` — inbound.rs sorguları
+   - `endpoints(team_id)` — webhooks.rs/endpoints.rs
+   - `endpoints(customer_id, is_active)` — yaygın endpoint sorgusu
+   - `deliveries(customer_id, created_at DESC)` — sıralı listeleme
+   - `deliveries(customer_id, status, created_at DESC)` — filtreli sorgular
+   - `notifications(customer_id, is_read)` — count sorguları
+4. **Oturum sonunda push edildi**
+
 ### Cloud Build Fix (Oturum 167) ✅
 1. **`bool as f64` hatası düzeltildi** — `api/src/jobs/metrics_push.rs:76`
    - `api_ok as f64` → `if api_ok { 1.0 } else { 0.0 }`
@@ -32,25 +44,21 @@ Bu dosyayı ilk kez okuyorsan:
 
 ## 📋 Sıradaki İşler
 
-### Öncelik 0 — Neon Seq Scan Optimizasyonu (EN KRİTİK)
+### Öncelik 0 — Neon Seq Scan Optimizasyonu (EN KRİTİK) ✅
 
-**Problem:** Bazı tablolarda PostgreSQL index yerine tüm tabloyu baştan sona okuyor (seq scan). Şu an 12 MB olduğu için sorun değil ama veri büyüyünce yavaşlayacak.
+**Problem:** Bazı tablolarda PostgreSQL index yerine tüm tabloyu baştan sona okuyor (seq scan).
 
-| Tablo | Seq Scan | Index Scan | Etki |
-|-------|----------|------------|------|
-| endpoints | 72,720 | 308 | 235x fazla okuma |
-| customers | 13,639 | 1,241 | 11x fazla okuma |
-| notifications | 9,952 | 670 | 15x fazla okuma |
-| invoices | 1,328 | 55 | 24x fazla okuma |
-| webhook_queue | 90,011 | 83,438 | ~1.1x (orta) |
-| deliveries | 5,031 | 2,372 | ~2x (orta) |
+**Çözüm (Oturum 168):**
+- `api/migrations/018_seq_scan_indexes.sql` oluşturuldu
+- 6 yeni index eklendi:
+  1. `customers(api_key_prefix)` — inbound.rs sorguları için
+  2. `endpoints(team_id)` — webhooks.rs/endpoints.rs sorguları için
+  3. `endpoints(customer_id, is_active)` — en yaygın endpoint sorgusu
+  4. `deliveries(customer_id, created_at DESC)` — sıralı listeleme
+  5. `deliveries(customer_id, status, created_at DESC)` — filtreli sorgular
+  6. `notifications(customer_id, is_read)` — count sorguları
 
-**Yapılacak:**
-1. `api/src/` altındaki Rust kodunda bu tabloları sorgulayan yerleri bul
-2. SELECT sorgularına uygun WHERE clause ekle (örn: `WHERE customer_id = $1`)
-3. Eksik index'leri oluştur
-4. `cargo test --lib` ile doğrula
-5. Cloud Build'de deploy et
+**Sonraki adım:** Migration'ı Neon DB'ye uygula (Cloud Build veya manuel)
 
 ### Öncelik 1 — Güvenlik (P0 kalan)
 | # | Görev | Durum | Dosya |
