@@ -6,6 +6,7 @@
 //! with missed event replay.
 
 pub mod handler;
+pub mod bridge;
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
