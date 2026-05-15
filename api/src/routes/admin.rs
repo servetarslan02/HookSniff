@@ -3475,7 +3475,6 @@ pub struct AdminDeleteDataRequest {
 pub struct BulkEmailResult {
     pub total_sent: i64,
     pub total_failed: i64,
-    pub skipped_free: i64,
 }
 
 // ── Handlers ──
@@ -3542,7 +3541,7 @@ async fn admin_export_user_data(
     .into_iter()
     .map(|row| serde_json::json!({
         "id": row.get::<Uuid, _>("id"),
-        "amount_cents": row.get::<i64>, _>("amount_cents"),
+        "amount_cents": row.get::<i64, _>("amount_cents"),
         "currency": row.get::<String, _>("currency"),
         "plan": row.get::<String, _>("plan"),
         "status": row.get::<String, _>("status"),
@@ -3596,9 +3595,9 @@ async fn admin_export_user_data(
         "id": row.get::<Uuid, _>("id"),
         "type": row.get::<String, _>("type"),
         "subject": row.get::<Option<String>, _>("subject"),
-        "details": row.get::<Option<serde_json::Value>>, _>("details"),
-        "admin_user_id": row.get::<Option<Uuid>>, _>("admin_user_id"),
-        "created_at": row.get::<chrono::DateTime<chrono::Utc>>, _>("created_at"),
+        "details": row.get::<Option<serde_json::Value>, _>("details"),
+        "admin_user_id": row.get::<Option<Uuid>, _>("admin_user_id"),
+        "created_at": row.get::<chrono::DateTime<chrono::Utc>, _>("created_at"),
     }))
     .collect();
 
@@ -3615,9 +3614,9 @@ async fn admin_export_user_data(
         "action": row.get::<String, _>("action"),
         "resource_type": row.get::<Option<String>, _>("resource_type"),
         "resource_id": row.get::<Option<String>, _>("resource_id"),
-        "details": row.get::<Option<serde_json::Value>>, _>("details"),
+        "details": row.get::<Option<serde_json::Value>, _>("details"),
         "ip_address": row.get::<Option<String>, _>("ip_address"),
-        "created_at": row.get::<chrono::DateTime<chrono::Utc>>, _>("created_at"),
+        "created_at": row.get::<chrono::DateTime<chrono::Utc>, _>("created_at"),
     }))
     .collect();
 
@@ -3654,6 +3653,7 @@ async fn admin_export_user_data(
             "is_active": user.is_active,
             "email_verified": user.email_verified,
             "created_at": user.created_at,
+            // Note: sensitive fields (password_hash, api_key_hash, totp_secret) intentionally excluded
         },
         "endpoints": endpoints,
         "deliveries": deliveries,
@@ -3830,6 +3830,9 @@ async fn admin_bulk_email(
     if let Some(ref plan) = req.plan_filter {
         bind_values.push(plan.clone());
         query.push_str(&format!(" AND plan = ${}", bind_values.len()));
+    } else {
+        // Default: exclude free/developer users
+        query.push_str(" AND plan NOT IN ('free', 'developer')");
     }
     if let Some(ref status) = req.status_filter {
         if status == "verified" {
@@ -3868,22 +3871,9 @@ async fn admin_bulk_email(
     let client = reqwest::Client::new();
     let mut sent = 0i64;
     let mut failed = 0i64;
-    let mut skipped = 0i64;
 
     for chunk in users.chunks(50) {
         for (user_id, email, name) in chunk {
-            // Skip free/developer users unless explicitly filtered
-            if req.plan_filter.is_none() {
-                let plan: Option<String> = sqlx::query_scalar("SELECT plan FROM customers WHERE id = $1")
-                    .bind(user_id)
-                    .fetch_optional(&pool)
-                    .await
-                    .unwrap_or(None);
-                if plan.as_deref() == Some("free") || plan.as_deref() == Some("developer") {
-                    skipped += 1;
-                    continue;
-                }
-            }
 
             let personalized_body = req.body
                 .replace("{name}", &name.as_deref().unwrap_or("User"))
@@ -3938,7 +3928,6 @@ async fn admin_bulk_email(
             "status_filter": &req.status_filter,
             "sent": sent,
             "failed": failed,
-            "skipped": skipped,
         })),
         None,
         None,
@@ -3948,8 +3937,7 @@ async fn admin_bulk_email(
     Ok(Json(serde_json::json!({
         "total_sent": sent,
         "total_failed": failed,
-        "skipped_free": skipped,
-        "message": format!("Bulk email complete: {} sent, {} failed, {} skipped", sent, failed, skipped),
+        "message": format!("Bulk email complete: {} sent, {} failed", sent, failed),
     })))
 }
 
@@ -5028,12 +5016,10 @@ mod tests {
         let result = BulkEmailResult {
             total_sent: 150,
             total_failed: 3,
-            skipped_free: 47,
         };
         let json = serde_json::to_value(&result).unwrap();
         assert_eq!(json["total_sent"], 150);
         assert_eq!(json["total_failed"], 3);
-        assert_eq!(json["skipped_free"], 47);
     }
 
     // ── Aşama 4: Revenue, Invoices, Payments ──────────────

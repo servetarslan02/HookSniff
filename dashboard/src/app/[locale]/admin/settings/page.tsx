@@ -78,7 +78,7 @@ export default function AdminSettingsPage() {
   const [bulkPlanFilter, setBulkPlanFilter] = useState('');
   const [bulkStatusFilter, setBulkStatusFilter] = useState('');
   const [bulkSending, setBulkSending] = useState(false);
-  const [bulkResult, setBulkResult] = useState<{ total_sent: number; total_failed: number; skipped_free: number; message: string } | null>(null);
+  const [bulkResult, setBulkResult] = useState<{ total_sent: number; total_failed: number; message: string } | null>(null);
 
   // Fetch platform settings
   const fetchSettings = useCallback(async () => {
@@ -743,7 +743,6 @@ export default function AdminSettingsPage() {
               <div className="flex gap-4 mt-2 text-xs text-green-600 dark:text-green-400">
                 <span>📤 {t('sent') || 'Sent'}: {bulkResult.total_sent}</span>
                 <span>❌ {t('failed') || 'Failed'}: {bulkResult.total_failed}</span>
-                <span>⏭️ {t('skipped') || 'Skipped'}: {bulkResult.skipped_free}</span>
               </div>
             </div>
           )}
