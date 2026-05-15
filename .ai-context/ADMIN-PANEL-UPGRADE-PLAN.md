@@ -816,6 +816,14 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 - [ ] Sidebar'a Alerts linki ekle
 - [ ] Build test + push
 
+### Aşama 7 — Bulk Email + GDPR (ileride)
+- [ ] `POST /admin/bulk-email` — Backend endpoint (kuyruk sistemi, batch 50'şer)
+- [ ] `GET /admin/users/{id}/export` — Backend endpoint (GDPR data export)
+- [ ] `DELETE /admin/users/{id}/data` — Backend endpoint (GDPR data delete)
+- [ ] `/admin/users/[id]` — Actions sekmesinde GDPR export/delete butonları
+- [ ] `/admin/settings` — Bulk email section (segment filtresi + gönderim)
+- [ ] Build test + push
+
 ---
 
 ## 7. Dosya Haritası
