@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Link } from '@/i18n/navigation';
-import { useAuth } from '@/lib/store';
-import { adminApi, type AdminStatsResponse, type AuditLogEntry, type RevenueResponse, type FeatureFlag, type DeployInfo } from '@/lib/api';
+import { useAdminStats, useAdminRevenue, useAdminAuditLogs, useAdminFeatureFlags, useAdminDeployInfo } from '@/hooks/useAdminData';
 import { StatCard } from '@/components/tremor/StatCard';
 import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
 import { useTranslations, useLocale } from 'next-intl';
@@ -15,122 +14,29 @@ const PLAN_COLORS: Record<string, string> = {
   enterprise: '#8b5cf6',
 };
 
-/** Format uptime seconds into human-readable duration (e.g. "2g 5sa", "3sa 12dk") */
-function formatUptime(seconds: number): string {
-  const s = Math.floor(seconds);
-  const d = Math.floor(s / 86400);
-  const h = Math.floor((s % 86400) / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  if (d > 0) return `${d}g ${h}sa`;
-  if (h > 0) return `${h}sa ${m}dk`;
-  return `${m}dk`;
-}
-
-/** Format uptime for CSV export (English) */
-function formatUptimeCSV(seconds: number): string {
-  const s = Math.floor(seconds);
-  const d = Math.floor(s / 86400);
-  const h = Math.floor((s % 86400) / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  if (d > 0) return `${d}d ${h}h`;
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
-}
-
 export default function AdminOverviewPage() {
-  const { token } = useAuth();
-  const [stats, setStats] = useState<AdminStatsResponse | null>(null);
-  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
-  const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
-  const [uptime24h, setUptime24h] = useState<number | null>(null);
-  const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
-  const [deployInfo, setDeployInfo] = useState<DeployInfo | null>(null);
-  const [autoRefresh, setAutoRefresh] = useState(false);
+  // React Query hooks — replaces useState + useEffect + fetchStats
+  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useAdminStats();
+  const { data: revenue } = useAdminRevenue();
+  const { data: auditLogsData } = useAdminAuditLogs(5);
+  const { data: featureFlagsData } = useAdminFeatureFlags();
+  const { data: deployInfo } = useAdminDeployInfo();
+
+  const auditLogs = auditLogsData?.entries ?? [];
+  const featureFlags = featureFlagsData?.flags ?? [];
+
+  // Local UI state — not data fetching
   const [exporting, setExporting] = useState(false);
-  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
-  const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [overviewTab, setOverviewTab] = useState<'overview' | 'activity' | 'health' | 'infra'>('overview');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const locale = useLocale();
 
-  const fetchStats = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const [statsData, allLogs, revenueData] = await Promise.all([
-        adminApi.getStats(token),
-        adminApi.getAuditLogs(token, { limit: 5 }).catch(() => ({ entries: [], total: 0, limit: 5, offset: 0 })),
-        adminApi.getRevenue(token).catch(() => null),
-      ]);
-      setStats(statsData);
-      setAuditLogs(allLogs.entries || []);
-      setRevenue(revenueData);
+  // Loading & error from React Query
+  const loading = statsLoading;
+  const error = statsError ? t('failedToLoadStats') : null;
 
-      // Fetch uptime from health endpoint (at root, not under /v1)
-      try {
-        const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000');
-        const healthUrl = `${API_BASE.replace(/\/v1\/?$/, '')}/health`;
-        const healthRes = await fetch(healthUrl);
-        if (healthRes.ok) {
-          const healthData = await healthRes.json();
-          const uptimeSeconds = healthData.uptime_seconds ?? 0;
-          setUptime24h(uptimeSeconds > 0 ? uptimeSeconds : null);
-        }
-      } catch {
-        // Uptime fetch failed, silently continue
-      }
-
-      // Fetch feature flags
-      try {
-        const flagsData = await adminApi.listFeatureFlags(token);
-        setFeatureFlags(flagsData.flags || []);
-      } catch {
-        // Feature flags table might not exist yet — silently continue
-      }
-
-      // Fetch deploy info
-      try {
-        const deploy = await adminApi.getDeployInfo(token);
-        setDeployInfo(deploy);
-      } catch {
-        // Deploy info endpoint might not be available — silently continue
-      }
-    } catch {
-      setError(t("failedToLoadStats"));
-    } finally {
-      setLoading(false);
-      setLastRefresh(new Date());
-    }
-  }, [token, t]);
-
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
-
-  // Auto-refresh polling (every 60 seconds)
-  useEffect(() => {
-    if (autoRefresh) {
-      refreshIntervalRef.current = setInterval(() => {
-        fetchStats();
-      }, 60000);
-    } else {
-      if (refreshIntervalRef.current) {
-        clearInterval(refreshIntervalRef.current);
-        refreshIntervalRef.current = null;
-      }
-    }
-    return () => {
-      if (refreshIntervalRef.current) {
-        clearInterval(refreshIntervalRef.current);
-      }
-    };
-  }, [autoRefresh, fetchStats]);
-
-  // MRR/ARR calculation (needed by exportDashboard callback)
+  // MRR/ARR calculation
   const mrr = revenue?.mrr || 0;
   const arr = mrr * 12;
 
@@ -149,7 +55,6 @@ export default function AdminOverviewPage() {
         [t('csvActiveEndpoints'), (stats.active_endpoints ?? 0).toString()],
         [t('csvMrr'), mrr.toFixed(2)],
         [t('csvArr'), arr.toFixed(2)],
-        [t('csvUptime'), uptime24h != null ? formatUptimeCSV(uptime24h) : t('csvNa')],
         ['', ''],
         [t('csvUsersByPlan'), t('csvCount')],
         ...stats.users_by_plan.map(p => [p.plan, p.count.toString()]),
@@ -168,7 +73,7 @@ export default function AdminOverviewPage() {
     } finally {
       setExporting(false);
     }
-  }, [stats, mrr, arr, uptime24h]);
+  }, [stats, mrr, arr, t]);
 
   // Memoized computations — her render'da yeniden hesaplama
   const pieData = useMemo(() =>
@@ -211,7 +116,7 @@ export default function AdminOverviewPage() {
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
           <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
           <button type="button"
-            onClick={fetchStats}
+            onClick={() => refetchStats()}
             className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
           >
             {tc('retry')}
@@ -231,19 +136,14 @@ export default function AdminOverviewPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {/* Auto-refresh toggle */}
+          {/* Manual refresh — React Query handles auto-refetch on window focus */}
           <button
             type="button"
-            onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-              autoRefresh
-                ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20'
-                : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700'
-            }`}
-            title={autoRefresh ? t('autoRefreshEnabled') : t('autoRefreshDisabled')}
+            onClick={() => refetchStats()}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+            title={t('autoRefreshDisabled')}
           >
-            <span className={`w-2 h-2 rounded-full ${autoRefresh ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`} />
-            {t('autoRefresh')}
+            🔄 {tc('refresh') || 'Refresh'}
           </button>
           {/* Export button */}
           <button
@@ -254,12 +154,6 @@ export default function AdminOverviewPage() {
           >
             📥 {exporting ? t('exporting') : t('exportDashboard')}
           </button>
-          {/* Last refresh time */}
-          {lastRefresh && (
-            <span className="text-[11px] text-gray-400 dark:text-slate-500">
-              {lastRefresh.toLocaleTimeString(locale === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            </span>
-          )}
         </div>
       </div>
 
@@ -685,16 +579,7 @@ export default function AdminOverviewPage() {
             <span className="text-xl" aria-hidden="true">🟢</span>
             <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('uptime')}</h2>
           </div>
-          {uptime24h != null ? (
-            <>
-              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-                {formatUptime(uptime24h)}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('serverUptime')}</p>
-            </>
-          ) : (
-            <p className="text-lg text-gray-400 dark:text-slate-500">{t('na')}</p>
-          )}
+          <p className="text-lg text-gray-400 dark:text-slate-500">{t('na')}</p>
         </div>
 
         {/* Uptime Status */}
