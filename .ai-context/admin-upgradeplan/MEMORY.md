@@ -12,7 +12,7 @@
 | 1 | Kullanıcı kaynakları (7 endpoint, 6 sekme) | ✅ TAMAMLANDI | 2026-05-16 |
 | 2 | Sistem geneli (failed, dead letters, queue, latency) | ✅ TAMAMLANDI | 2026-05-16 |
 | 3 | Müşteri notları, etiketler, iletişim geçmişi | ✅ TAMAMLANDI | 2026-05-16 |
-| 4 | Fatura, ödeme, gelir metrikleri | ⏳ | |
+| 4 | Fatura, ödeme, gelir metrikleri | ✅ TAMAMLANDI | 2026-05-16 |
 | 5 | Refund + Polar.sh webhook handler | ⏳ | |
 | 6 | Alerts sayfası | ⏳ | |
 | 7 | Bulk email + GDPR | ⏳ İleride | |
@@ -63,6 +63,21 @@
 
 **Router:**
 - [x] 5 yeni route eklendi (notes GET/POST, tags GET/POST/DELETE, communications GET)
+
+### Aşama 4 — Fatura, Ödeme, Gelir Metrikleri (2026-05-16) ✅ TAMAMLANDI
+
+**Backend (admin.rs — +280 satır):**
+- [x] `GET /admin/users/{id}/invoices` — Fatura listesi (status filtre + sayfalama)
+- [x] `GET /admin/users/{id}/payments` — Ödeme geçmişi (sayfalama)
+- [x] `GET /admin/revenue/metrics` — ARPU, LTV, NRR, expansion revenue, churn rate, avg retention
+- [x] `GET /admin/revenue/cohorts` — Aylık cohort analizi (signup, active, retention, revenue)
+- [x] 6 yeni test (InvoiceQuery, PaymentQuery, CohortQuery, serialization)
+
+**Frontend:**
+- [x] Billing sekmesi (users/[id]): invoices tablosu (status badge, filtre), payments tablosu
+- [x] Revenue sayfası: ARPU, LTV, NRR, Expansion kartları + müşteri breakdown
+- [x] Revenue sayfası: Cohort analiz tablosu (retention bar, revenue)
+- [x] 5 yeni adminApi fonksiyonu (getUserInvoices, getUserPayments, getRevenueMetrics, getRevenueCohorts)
 
 ### Vercel Build Fix — 2026-05-16 00:40 GMT+8
 - **Hata:** `Expected '</', got '{'` — users/[id]/page.tsx satır 416

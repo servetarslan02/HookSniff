@@ -36,7 +36,7 @@ export default function AdminUserDetailPage() {
   const [emailBody, setEmailBody] = useState('');
   const [emailSending, setEmailSending] = useState(false);
   // Aşama 1 — Tab sistemi
-  type TabKey = 'overview' | 'endpoints' | 'webhooks' | 'apikeys' | 'applications' | 'usage' | 'notes' | 'communications';
+  type TabKey = 'overview' | 'endpoints' | 'webhooks' | 'apikeys' | 'applications' | 'usage' | 'notes' | 'communications' | 'billing';
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
   const [userEndpoints, setUserEndpoints] = useState<Array<{ id: string; url: string; description: string | null; is_active: boolean; created_at: string; total_deliveries: number; last_delivery_at: string | null }>>([]);
   const [userWebhooks, setUserWebhooks] = useState<Array<{ id: string; endpoint_id: string; status: string; event: string | null; created_at: string; attempt_count: number; response_status: number | null; response_body: string | null; error_message: string | null }>>([]);
@@ -55,6 +55,12 @@ export default function AdminUserDetailPage() {
   const [commsTotal, setCommsTotal] = useState(0);
   const [commsPage, setCommsPage] = useState(1);
   const [commFilter, setCommFilter] = useState<string>('');
+  // Aşama 4 — Billing (Invoices + Payments)
+  const [userInvoices, setUserInvoices] = useState<Array<{ id: string; amount_cents: number; currency: string; plan: string; status: string; provider: string; provider_invoice_id: string | null; paid_at: string | null; created_at: string }>>([]);
+  const [invoicesTotal, setInvoicesTotal] = useState(0);
+  const [invoicesPage, setInvoicesPage] = useState(1);
+  const [invoiceFilter, setInvoiceFilter] = useState<string>('');
+  const [userPayments, setUserPayments] = useState<Array<{ id: string; amount_cents: number; currency: string; status: string; provider: string; provider_transaction_id: string | null; metadata: unknown; created_at: string }>>([]);
 
 
   // Tab değiştiğinde veri çek
@@ -101,6 +107,16 @@ export default function AdminUserDetailPage() {
           const data = await adminApi.getCommunications(token, id, { page: commsPage, per_page: 50, type: commFilter || undefined });
           setUserComms(data.communications || []);
           setCommsTotal(data.total || 0);
+          break;
+        }
+        case 'billing': {
+          const [invData, payData] = await Promise.all([
+            adminApi.getUserInvoices(token, id, { page: invoicesPage, per_page: 50, status: invoiceFilter || undefined }),
+            adminApi.getUserPayments(token, id, { per_page: 50 }),
+          ]);
+          setUserInvoices(invData.invoices || []);
+          setInvoicesTotal(invData.total || 0);
+          setUserPayments(payData.payments || []);
           break;
         }
       }
@@ -283,6 +299,7 @@ export default function AdminUserDetailPage() {
           { key: 'usage', label: '📈 ' + (t('usage') || 'Usage') },
           { key: 'notes', label: '📝 ' + (t('notes') || 'Notes & Tags') },
           { key: 'communications', label: '💬 ' + (t('communications') || 'Communications') },
+          { key: 'billing', label: '💰 ' + (t('billing') || 'Billing') },
         ] as { key: TabKey; label: string }[]).map((tab) => (
           <button
             key={tab.key}
@@ -954,6 +971,110 @@ export default function AdminUserDetailPage() {
               <button onClick={() => setCommsPage((p) => p + 1)} disabled={commsPage >= Math.ceil(commsTotal / 50)} className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-slate-800 disabled:opacity-40">→</button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ═══ TAB: Billing (Invoices + Payments) ═══ */}
+      {activeTab === "billing" && (
+        <div className="space-y-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💰 {t("billing") || "Billing"}</h2>
+
+          {/* Invoices */}
+          <div className="glass-card p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400">📄 {t("invoices") || "Invoices"}</h3>
+              <select
+                value={invoiceFilter}
+                onChange={(e) => { setInvoiceFilter(e.target.value); setInvoicesPage(1); }}
+                className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+              >
+                <option value="">{t("allStatuses") || "All Statuses"}</option>
+                <option value="paid">✅ Paid</option>
+                <option value="pending">⏳ Pending</option>
+                <option value="failed">❌ Failed</option>
+              </select>
+            </div>
+            {userInvoices.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-slate-800/50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("plan") || "Plan"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("amount") || "Amount"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("status") || "Status"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("provider") || "Provider"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("date") || "Date"}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+                    {userInvoices.map((inv) => (
+                      <tr key={inv.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white capitalize">{inv.plan}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{(inv.amount_cents / 100).toFixed(2)} {inv.currency.toUpperCase()}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                            inv.status === 'paid' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' :
+                            inv.status === 'pending' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
+                            'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                          }`}>{inv.status}</span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{inv.provider}</td>
+                        <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400 dark:text-slate-500">{t("noInvoices") || "No invoices yet"}</p>
+            )}
+            {invoicesTotal > 50 && (
+              <div className="flex justify-center gap-2 mt-4">
+                <button onClick={() => setInvoicesPage((p) => Math.max(1, p - 1))} disabled={invoicesPage === 1} className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-slate-800 disabled:opacity-40">←</button>
+                <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">{invoicesPage} / {Math.ceil(invoicesTotal / 50)}</span>
+                <button onClick={() => setInvoicesPage((p) => p + 1)} disabled={invoicesPage >= Math.ceil(invoicesTotal / 50)} className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-slate-800 disabled:opacity-40">→</button>
+              </div>
+            )}
+          </div>
+
+          {/* Payment Transactions */}
+          <div className="glass-card p-6">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4">💳 {t("payments") || "Payment Transactions"}</h3>
+            {userPayments.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-slate-800/50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("amount") || "Amount"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("status") || "Status"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("provider") || "Provider"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("transactionId") || "Transaction ID"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("date") || "Date"}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+                    {userPayments.map((pay) => (
+                      <tr key={pay.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{(pay.amount_cents / 100).toFixed(2)} {pay.currency.toUpperCase()}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                            pay.status === 'completed' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' :
+                            pay.status === 'pending' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
+                            'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                          }`}>{pay.status}</span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{pay.provider}</td>
+                        <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400 font-mono">{pay.provider_transaction_id || '—'}</td>
+                        <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{new Date(pay.created_at).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400 dark:text-slate-500">{t("noPayments") || "No payment transactions yet"}</p>
+            )}
+          </div>
         </div>
       )}
 
