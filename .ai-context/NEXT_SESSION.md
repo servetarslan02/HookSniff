@@ -221,3 +221,13 @@ postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-
 - **Tablo sayısı:** 60+ (çoğu boş)
 - **Index sayısı:** 149 (84'ü silindi)
 - **Cache hit ratio:** 99.79%
+
+### Oturum 175: Dashboard i18n Hardcoded String Temizliği ✅
+1. **5 dashboard component'i çevrildi** — DeliveryTrendChart, RecentDeliveriesTable, SuccessRateDonut, ActivityFeed, TimeRangeSelector
+2. **Playground content.tsx** — 15+ hardcoded string çevrildi
+3. **Webhooks CTA** — glossary, guides, main page çevrildi
+4. **DashboardOverview** — 34 gereksiz defaultValue kaldırıldı
+5. **22 dosyadan defaultValue temizlendi**
+6. **Türkçe çeviriler düzeltildi** — Dashboard → Kontrol Paneli, Playground → Oyun Alanı
+7. **Translation keys**: 2809 EN = 2809 TR (tam uyumlu)
+8. **Commit:** b2f9a8d — push edildi
