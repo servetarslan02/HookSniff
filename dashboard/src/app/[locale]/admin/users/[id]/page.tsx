@@ -36,7 +36,7 @@ export default function AdminUserDetailPage() {
   const [emailBody, setEmailBody] = useState('');
   const [emailSending, setEmailSending] = useState(false);
   // Aşama 1 — Tab sistemi
-  type TabKey = 'overview' | 'endpoints' | 'webhooks' | 'apikeys' | 'applications' | 'usage';
+  type TabKey = 'overview' | 'endpoints' | 'webhooks' | 'apikeys' | 'applications' | 'usage' | 'notes' | 'communications';
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
   const [userEndpoints, setUserEndpoints] = useState<Array<{ id: string; url: string; description: string | null; is_active: boolean; created_at: string; total_deliveries: number; last_delivery_at: string | null }>>([]);
   const [userWebhooks, setUserWebhooks] = useState<Array<{ id: string; endpoint_id: string; status: string; event: string | null; created_at: string; attempt_count: number; response_status: number | null; response_body: string | null; error_message: string | null }>>([]);
@@ -46,6 +46,15 @@ export default function AdminUserDetailPage() {
   const [userApiKeys, setUserApiKeys] = useState<Array<{ prefix: string; name: string; created_at: string; is_active: boolean }>>([]);
   const [userApps, setUserApps] = useState<Array<{ id: string; name: string; description: string | null; created_at: string; endpoint_count: number }>>([]);
   const [userUsage, setUserUsage] = useState<{ total_deliveries: number; successful: number; failed: number; pending: number; success_rate: number; endpoints_count: number; active_endpoints: number; last_30_days: number; last_7_days: number; top_events: Array<{ event: string | null; count: number }> } | null>(null);
+  // Aşama 3 — Notes, Tags, Communications
+  const [userNotes, setUserNotes] = useState<Array<{ id: string; customer_id: string; admin_user_id: string; content: string; created_at: string }>>([]);
+  const [userTags, setUserTags] = useState<Array<{ id: string; customer_id: string; tag: string; admin_user_id: string; created_at: string }>>([]);
+  const [newNote, setNewNote] = useState('');
+  const [newTag, setNewTag] = useState('');
+  const [userComms, setUserComms] = useState<Array<{ id: string; customer_id: string; type: string; subject: string | null; details: unknown; admin_user_id: string | null; created_at: string }>>([]);
+  const [commsTotal, setCommsTotal] = useState(0);
+  const [commsPage, setCommsPage] = useState(1);
+  const [commFilter, setCommFilter] = useState<string>('');
 
 
   // Tab değiştiğinde veri çek
@@ -77,6 +86,21 @@ export default function AdminUserDetailPage() {
         case 'usage': {
           const data = await adminApi.getUserUsage(token, id);
           setUserUsage(data);
+          break;
+        }
+        case 'notes': {
+          const [notesData, tagsData] = await Promise.all([
+            adminApi.getNotes(token, id),
+            adminApi.getTags(token, id),
+          ]);
+          setUserNotes(notesData.notes || []);
+          setUserTags(tagsData.tags || []);
+          break;
+        }
+        case 'communications': {
+          const data = await adminApi.getCommunications(token, id, { page: commsPage, per_page: 50, type: commFilter || undefined });
+          setUserComms(data.communications || []);
+          setCommsTotal(data.total || 0);
           break;
         }
       }
@@ -257,6 +281,8 @@ export default function AdminUserDetailPage() {
           { key: 'apikeys', label: '🔑 ' + (t('apiKeys') || 'API Keys') },
           { key: 'applications', label: '📱 ' + (t('applications') || 'Applications') },
           { key: 'usage', label: '📈 ' + (t('usage') || 'Usage') },
+          { key: 'notes', label: '📝 ' + (t('notes') || 'Notes & Tags') },
+          { key: 'communications', label: '💬 ' + (t('communications') || 'Communications') },
         ] as { key: TabKey; label: string }[]).map((tab) => (
           <button
             key={tab.key}
@@ -761,6 +787,173 @@ export default function AdminUserDetailPage() {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ═══ TAB: Notes & Tags ═══ */}
+      {activeTab === "notes" && (
+        <div className="space-y-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📝 {t("notesAndTags") || "Notes & Tags"}</h2>
+
+          {/* Tags Section */}
+          <div className="glass-card p-6">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-3">🏷️ {t("tags") || "Tags"}</h3>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {userTags.length > 0 ? userTags.map((tag) => (
+                <span key={tag.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300">
+                  {tag.tag}
+                  <button
+                    onClick={async () => {
+                      if (!token) return;
+                      try {
+                        await adminApi.removeTag(token, id, tag.tag);
+                        setUserTags((prev) => prev.filter((t) => t.id !== tag.id));
+                        toast(t("tagRemoved") || "Tag removed", "success");
+                      } catch { toast(t("tagRemoveFailed") || "Failed", "error"); }
+                    }}
+                    className="ml-1 text-brand-500 hover:text-red-500 transition"
+                  >✕</button>
+                </span>
+              )) : <span className="text-xs text-gray-400 dark:text-slate-500">{t("noTags") || "No tags yet"}</span>}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                placeholder={t("addTagPlaceholder") || "e.g. vip, at-risk, enterprise"}
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newTag.trim() && token) {
+                    adminApi.addTag(token, id, newTag.trim()).then((res) => {
+                      if (res.added) {
+                        setUserTags((prev) => [...prev, { id: Date.now().toString(), customer_id: id, tag: res.tag, admin_user_id: '', created_at: new Date().toISOString() }]);
+                      }
+                      setNewTag('');
+                      toast(res.message, "success");
+                    }).catch(() => toast(t("tagAddFailed") || "Failed", "error"));
+                  }
+                }}
+              />
+              <button
+                onClick={async () => {
+                  if (!token || !newTag.trim()) return;
+                  try {
+                    const res = await adminApi.addTag(token, id, newTag.trim());
+                    if (res.added) {
+                      setUserTags((prev) => [...prev, { id: Date.now().toString(), customer_id: id, tag: res.tag, admin_user_id: '', created_at: new Date().toISOString() }]);
+                    }
+                    setNewTag('');
+                    toast(res.message, "success");
+                  } catch { toast(t("tagAddFailed") || "Failed", "error"); }
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition"
+              >{t("addTag") || "Add Tag"}</button>
+            </div>
+          </div>
+
+          {/* Notes Section */}
+          <div className="glass-card p-6">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-3">📋 {t("notes") || "Notes"}</h3>
+            <div className="space-y-3 mb-4">
+              {userNotes.length > 0 ? userNotes.map((note) => (
+                <div key={note.id} className="p-3 bg-gray-50 dark:bg-slate-900/50 rounded-lg">
+                  <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{note.content}</p>
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{new Date(note.created_at).toLocaleString()}</p>
+                </div>
+              )) : <p className="text-sm text-gray-400 dark:text-slate-500">{t("noNotes") || "No notes yet"}</p>}
+            </div>
+            <div className="space-y-2">
+              <textarea
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                placeholder={t("addNotePlaceholder") || "Write a note about this customer..."}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition resize-none"
+              />
+              <button
+                onClick={async () => {
+                  if (!token || !newNote.trim()) return;
+                  try {
+                    const res = await adminApi.addNote(token, id, newNote.trim());
+                    setUserNotes((prev) => [res.note, ...prev]);
+                    setNewNote('');
+                    toast(t("noteAdded") || "Note added", "success");
+                  } catch { toast(t("noteAddFailed") || "Failed", "error"); }
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition"
+              >{t("addNote") || "Add Note"}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ TAB: Communications ═══ */}
+      {activeTab === "communications" && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💬 {t("communications") || "Communication History"}</h2>
+            <div className="flex gap-2">
+              <select
+                value={commFilter}
+                onChange={(e) => { setCommFilter(e.target.value); setCommsPage(1); }}
+                className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+              >
+                <option value="">{t("allTypes") || "All Types"}</option>
+                <option value="email">📧 Email</option>
+                <option value="impersonate">👤 Impersonate</option>
+                <option value="plan_change">📋 Plan Change</option>
+                <option value="ban">🚫 Ban/Activate</option>
+                <option value="note">📝 Note</option>
+                <option value="tag_added">🏷️ Tag Added</option>
+                <option value="tag_removed">🏷️ Tag Removed</option>
+              </select>
+            </div>
+          </div>
+
+          {userComms.length > 0 ? (
+            <div className="glass-card overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-50 dark:bg-slate-800/50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("type") || "Type"}</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("subject") || "Subject"}</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("details") || "Details"}</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("date") || "Date"}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+                  {userComms.map((comm) => (
+                    <tr key={comm.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          comm.type === 'email' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
+                          comm.type === 'impersonate' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' :
+                          comm.type === 'plan_change' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
+                          comm.type === 'ban' || comm.type === 'activated' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' :
+                          comm.type.startsWith('tag') ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300' :
+                          'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300'
+                        }`}>{comm.type}</span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{comm.subject || '—'}</td>
+                      <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400 max-w-xs truncate">{comm.details ? JSON.stringify(comm.details).slice(0, 100) : '—'}</td>
+                      <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{new Date(comm.created_at).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-slate-400">{t("noCommunications") || "No communication history yet"}</p>
+          )}
+
+          {commsTotal > 50 && (
+            <div className="flex justify-center gap-2">
+              <button onClick={() => setCommsPage((p) => Math.max(1, p - 1))} disabled={commsPage === 1} className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-slate-800 disabled:opacity-40">←</button>
+              <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">{commsPage} / {Math.ceil(commsTotal / 50)}</span>
+              <button onClick={() => setCommsPage((p) => p + 1)} disabled={commsPage >= Math.ceil(commsTotal / 50)} className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-slate-800 disabled:opacity-40">→</button>
+            </div>
+          )}
         </div>
       )}
 
