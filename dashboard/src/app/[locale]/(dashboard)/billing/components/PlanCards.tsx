@@ -115,7 +115,6 @@ export function PlanCards({
     ...p,
     price: p.key === 'developer' ? 0 : isAnnual ? p.yearlyPriceUsd : p.priceUsd,
     monthlyPrice: p.key === 'developer' ? 0 : p.priceUsd,
-    tlApprox: p.key === 'developer' ? 0 : Math.round((isAnnual ? p.yearlyPriceUsd : p.priceUsd) * 20.5),
     isEnterprise: p.key === 'enterprise',
   }));
 
@@ -199,9 +198,6 @@ export function PlanCards({
                         </span>
                       </div>
                     )}
-                    <div className="mt-1 text-xs text-gray-400 dark:text-slate-500">
-                      ~₺{plan.tlApprox.toLocaleString('tr-TR')} {t('approximate', { defaultValue: '(approx.)' })}
-                    </div>
                   </>
                 )}
               </div>
