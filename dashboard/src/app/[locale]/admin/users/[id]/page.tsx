@@ -72,6 +72,13 @@ export default function AdminUserDetailPage() {
   const [showGdprDeleteModal, setShowGdprDeleteModal] = useState(false);
   const [gdprDeleteReason, setGdprDeleteReason] = useState('');
   const [gdprDeleting, setGdprDeleting] = useState(false);
+  // Test Webhook
+  const [showTestWebhookModal, setShowTestWebhookModal] = useState(false);
+  const [testWebhookUrl, setTestWebhookUrl] = useState('');
+  const [testWebhookEvent, setTestWebhookEvent] = useState('');
+  const [testWebhookPayload, setTestWebhookPayload] = useState('{\n  "test": true\n}');
+  const [testWebhookSending, setTestWebhookSending] = useState(false);
+  const [testWebhookResult, setTestWebhookResult] = useState<{ status_code: number; response_body: string; duration_ms: number } | null>(null);
 
 
   // Tab değiştiğinde veri çek
@@ -266,6 +273,32 @@ export default function AdminUserDetailPage() {
     }
   };
 
+  const handleTestWebhook = async () => {
+    if (!token || !id || !testWebhookUrl.trim()) return;
+    let payload: Record<string, unknown>;
+    try {
+      payload = JSON.parse(testWebhookPayload);
+    } catch {
+      toast(t('invalidJson') || 'Invalid JSON payload', 'error');
+      return;
+    }
+    setTestWebhookSending(true);
+    setTestWebhookResult(null);
+    try {
+      const result = await adminApi.adminUserTestWebhook(token, id, {
+        endpoint_url: testWebhookUrl.trim(),
+        event_type: testWebhookEvent.trim() || undefined,
+        payload,
+      });
+      setTestWebhookResult(result);
+      toast(t('testWebhookSent') || 'Test webhook sent', 'success');
+    } catch {
+      toast(t('testWebhookFailed') || 'Test webhook failed', 'error');
+    } finally {
+      setTestWebhookSending(false);
+    }
+  };
+
   const handleGdprExport = async () => {
     if (!token || !id) return;
     setGdprExporting(true);
@@ -345,6 +378,17 @@ export default function AdminUserDetailPage() {
           <p className="text-sm text-gray-500 dark:text-slate-400">{t("userDetail")}</p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              // Pre-fill with user's first active endpoint URL
+              const activeEp = detail.endpoints?.find(e => e.is_active);
+              setTestWebhookUrl(activeEp?.url || '');
+              setShowTestWebhookModal(true);
+            }}
+            className="px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 rounded-xl text-sm font-medium hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 transition"
+          >
+            🪝 {t('testWebhook') || 'Test Webhook'}
+          </button>
           <button
             onClick={() => setShowEmailModal(true)}
             className="px-4 py-2 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 rounded-xl text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/20 transition"
@@ -1370,6 +1414,88 @@ export default function AdminUserDetailPage() {
                 className="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition disabled:opacity-60"
               >
                 {emailSending ? tc('saving') : t('send') || 'Send'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Test Webhook Modal */}
+      {showTestWebhookModal && detail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setShowTestWebhookModal(false); setTestWebhookResult(null); }} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              🪝 {t('testWebhook') || 'Test Webhook'}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+              {t('testWebhookDesc') || `Send a test webhook to ${detail.user.email}'s endpoint`}
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="tw-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('endpointUrl') || 'Endpoint URL'} *</label>
+                <input
+                  id="tw-url"
+                  type="url"
+                  value={testWebhookUrl}
+                  onChange={(e) => setTestWebhookUrl(e.target.value)}
+                  placeholder="https://example.com/webhook"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                />
+              </div>
+              <div>
+                <label htmlFor="tw-event" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('eventType') || 'Event Type'}</label>
+                <input
+                  id="tw-event"
+                  type="text"
+                  value={testWebhookEvent}
+                  onChange={(e) => setTestWebhookEvent(e.target.value)}
+                  placeholder="order.created"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                />
+              </div>
+              <div>
+                <label htmlFor="tw-payload" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('payload') || 'Payload'} (JSON)</label>
+                <textarea
+                  id="tw-payload"
+                  value={testWebhookPayload}
+                  onChange={(e) => setTestWebhookPayload(e.target.value)}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition resize-none"
+                />
+              </div>
+            </div>
+
+            {/* Result */}
+            {testWebhookResult && (
+              <div className="mt-4 p-3 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className={`text-sm font-medium ${testWebhookResult.status_code < 400 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                    HTTP {testWebhookResult.status_code}
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-slate-400">
+                    {testWebhookResult.duration_ms}ms
+                  </span>
+                </div>
+                <pre className="text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-32">
+                  {testWebhookResult.response_body}
+                </pre>
+              </div>
+            )}
+
+            <div className="flex gap-3 justify-end mt-4">
+              <button type="button"
+                onClick={() => { setShowTestWebhookModal(false); setTestWebhookResult(null); }}
+                className="px-4 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                {tc('cancel')}
+              </button>
+              <button type="button"
+                onClick={handleTestWebhook}
+                disabled={testWebhookSending || !testWebhookUrl.trim()}
+                className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition disabled:opacity-60"
+              >
+                {testWebhookSending ? (t('sending') || 'Sending...') : (t('sendTest') || 'Send Test')}
               </button>
             </div>
           </div>
