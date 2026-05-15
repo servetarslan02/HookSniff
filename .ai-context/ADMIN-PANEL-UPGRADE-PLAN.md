@@ -612,6 +612,8 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
    .route("/users/{id}/api-keys", get(admin_user_api_keys))
    .route("/users/{id}/applications", get(admin_user_applications))
    .route("/users/{id}/usage", get(admin_user_usage))
+   .route("/users/{id}/test-webhook", post(admin_user_test_webhook))
+   .route("/users/{id}/webhooks/{delivery_id}/replay", post(admin_user_replay_delivery))
    ```
 
 **Frontend (Next.js):**
@@ -751,12 +753,15 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 - [ ] `GET /admin/users/{id}/api-keys` — Backend endpoint
 - [ ] `GET /admin/users/{id}/applications` — Backend endpoint
 - [ ] `GET /admin/users/{id}/usage` — Backend endpoint
+- [ ] `POST /admin/users/{id}/test-webhook` — Backend endpoint (per-user test webhook)
+- [ ] `POST /admin/users/{id}/webhooks/{delivery_id}/replay` — Backend endpoint (per-user replay)
 - [ ] `admin.ts` — Yeni API fonksiyonları
 - [ ] `/admin/users/[id]` — Endpoints tab component
-- [ ] `/admin/users/[id]` — Webhooks tab component (filtre + arama)
+- [ ] `/admin/users/[id]` — Webhooks tab component (filtre + arama + replay butonu)
 - [ ] `/admin/users/[id]` — API Keys tab component
 - [ ] `/admin/users/[id]` — Applications tab component
 - [ ] `/admin/users/[id]` — Usage tab component (grafikler)
+- [ ] `/admin/users/[id]` — Test webhook butonu (endpoint bazlı)
 - [ ] Build test + push
 
 ### Aşama 2 — Sistem Geneli
