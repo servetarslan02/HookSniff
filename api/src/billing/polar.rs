@@ -397,8 +397,8 @@ impl PaymentProviderImpl for PolarProvider {
                     provider_subscription_id: sub.id.unwrap_or_default(),
                 })
             }
-            "order.created" => {
-                // Payment succeeded
+            "order.created" | "order.completed" => {
+                // Payment succeeded (order.created = legacy, order.completed = current Polar event)
                 let order = &event.data;
                 let tx_id = order
                     .get("id")
