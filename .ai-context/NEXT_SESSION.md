@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-15 20:45 GMT+8 (Oturum 168)
+> Son güncelleme: 2026-05-15 22:25 GMT+8 (Oturum 172)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -16,6 +16,15 @@ Bu dosyayı ilk kez okuyorsan:
 ---
 
 ## ✅ Tamamlanan (Son Oturum — 2026-05-15)
+
+### Oturum 172: GCP/Polar/QStash/Redis Doğrulama ✅
+1. **GCP Console** — Tarayıcıdan giriş yapıldı, tüm env var ve secret'lar doğrulandı
+2. **Polar.sh** — Pro ($49) ve Business ($99) ürünler mevcut, webhook doğru
+3. **GCP Secret Manager** — `polar-pro` ve `polar-business` ürün ID'leri güncellendi
+4. **QStash** — 4 env var Cloud Run'a eklendi (QSTASH_URL, TOKEN, SIGNING_KEY'ler)
+5. **Cloud Run Deploy** — hooksniff-api-00330-9g2 (22:12 GMT+8)
+6. **Upstash Redis** — Aslında çalışıyor (111K komut), "0 istek" yanıltıcı metrikti
+7. **Health Check** — Artık Redis'e gerçek PING yapıyor (eski: sadece URL kontrol)
 
 ### Oturum 168: Seq Scan Index + Güvenlik Doğrulama ✅
 1. **Navigation Restructure doğrulandı** — zaten tamamlanmış (sidebar, /deliveries, /account, middleware redirect'leri)
@@ -90,15 +99,68 @@ Bu dosyayı ilk kez okuyorsan:
 
 ---
 
+## 🔴 Kalan Kritik İşler (Oturum 172 sonrası)
+
+### Öncelik 0 — Servet'in Yapması Gereken (ACİL)
+| # | Görev | Durum | Not |
+|---|-------|-------|------|
+| 1 | Polar.sh "Go Live" | ⬜ | Test mode'dan çıkmak için Stripe identity verification gerekli |
+| 2 | Business → Enterprise | ⬜ | Polar'daki $99 ürünü sil veya "Enterprise" olarak yeniden adlandır |
+| 3 | Polar.sh Stripe verification | ⬜ | Ödeme almak için gerekli |
+
+### Öncelik 1 — Güvenlik (P0 kalan)
+| # | Görev | Durum | Dosya |
+|---|-------|-------|-------|
+| 4 | HS-038f: Timing attack — login hataları farklı mesajlar | ⬜ | auth.rs |
+| 5 | HS-038g: serde_json hata gösteriyor | ⬜ | error.rs |
+| 6 | HS-038h: Email enumeration — register mesajı | ⬜ | auth.rs |
+| 7 | HS-038j: rate_limit.rs unwrap() — panic riski | ⬜ | rate_limit.rs |
+
+### Öncelik 2 — i18n
+| # | Görev | Durum | Not |
+|---|-------|-------|------|
+| 8 | 920+ hardcoded İngilizce string → Türkçe | ⬜ | Birden fazla oturum |
+
+### Öncelik 3 — Performans
+| # | Görev | Durum | Not |
+|---|-------|-------|------|
+| 9 | Neon seq scan index migration uygula | ⬜ | 018_seq_scan_indexes.sql hazır |
+| 10 | Cloudflare Workers (Edge deploy) | 🔶 v1 yazıldı | Deploy için Servet: KV namespace oluştur |
+
+### Öncelik 4 — P2 Kalan
+| # | Görev | Durum | Not |
+|---|-------|-------|------|
+| 11 | HS-047: blog/[slug] 1922 satır mega component | ⬜ | Refactoring |
+| 12 | HS-065: 920+ hardcoded string (i18n) | ⬜ | Büyük iş |
+| 13 | HS-070: output:standalone | ⬜ | Vercelde gerekli değil |
+
+### Tamamlanan (Son 3 Oturum)
+- ✅ Navigation Restructure (Oturum 167-168)
+- ✅ Seq Scan Index Migration dosyası (Oturum 168)
+- ✅ Cloud Build Fix — bool as f64 (Oturum 167)
+- ✅ SSL Warning Fix (Oturum 167)
+- ✅ Neon Index Temizliği — 84 index silindi (Oturum 167)
+- ✅ Redis URL Fallback (Oturum 169)
+- ✅ Root Endpoint fix (Oturum 169)
+- ✅ QStash Entegrasyonu (Oturum 170)
+- ✅ R2 Storage Entegrasyonu (Oturum 171)
+- ✅ Health Check Redis PING fix (Oturum 172)
+- ✅ QStash env var'ları Cloud Run'a eklendi (Oturum 172)
+- ✅ Polar.sh secret'ları güncellendi (Oturum 172)
+
+---
+
 ## 👤 Servet Görevleri (Kullanıcıya ait manuel işler)
 
 | Görev | Durum | Not |
 |-------|-------|-----|
+| **Polar.sh Go Live** | 🔴 ACİL | Stripe identity verification → ödeme almak için |
+| **Business → Enterprise** | 🔴 ACİL | Polar'daki $99 ürünü sil veya yeniden adlandır |
 | iyzico hesap aç | ❌ | Vergi levhası + banka hesabı gerekli |
 | Domain kararı | ❌ | hooksniff.vercel.app yeterli şimdilik |
 | GitHub Actions dakikası | ❌ | CI bitmiş, yenilenmeli |
-| **Cloudflare Workers deploy** | ⚠️ | wrangler login + KV namespace oluştur |
-| Stripe payout + identity verification | ❌ | Polar.sh için gerekli |
+| Cloudflare Workers deploy | ⚠️ | wrangler login + KV namespace oluştur |
+| Neon seq scan migration | ⚠️ | 018_seq_scan_indexes.sql Neon DB'ye uygulanacak |
 
 ---
 
