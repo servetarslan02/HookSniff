@@ -124,8 +124,8 @@ Bu dosyayı ilk kez okuyorsan:
 | 12 | API: yearly checkout desteği | ✅ | PolarConfig, create_checkout, BillingService |
 | 13 | Dashboard: aylık/yıllık toggle | ✅ | PlanCards.tsx |
 | 14 | Dashboard: TL fiyat gösterimi | ✅ | Zaten mevcut, yearly ile entegre |
-| 15 | Cloud Run env var'ları ekle | ⬜ | 3 yeni yearly ürün ID'si |
-| 16 | Deploy + test | ⬜ | Cloud Build veya manuel |
+| 15 | Cloud Run env var'ları ekle | ✅ | 3 yearly ürün ID'si eklendi (Oturum 173) |
+| 16 | Deploy + test | ✅ | hooksniff-api-00340-crb, healthy (Oturum 173) |
 
 ### Öncelik 5 — P2 Kalan
 | # | Görev | Durum | Not |
