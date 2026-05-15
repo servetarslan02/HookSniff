@@ -134,7 +134,10 @@ dashboard/src/app/[locale]/admin/layout.tsx ← ✅ Sidebar navigasyonu (8 link)
 3. `api_keys` tablosu migration'da yok ama `inbound.rs`'de aktif sorgu var
 4. `invoices`/`payment_transactions` tabloları boş — Polar.sh webhook handler gerekli
 5. `applications` tablosu migration 013'te mevcut
-6. Admin mevcut: 23 route → şimdi 33 route (10 yeni eklendi)
+6. Admin mevcut: 23 route → şimdi 49 route (26 yeni eklendi)
+7. GDPR delete hard delete kullanıyor (soft delete değil) — transaction ile
+8. Bulk email Resend API kullanıyor, 50'şer batch, 100ms delay
+9. GDPR delete'te admin koruması var: kendi kendini silemez, başka admin'i silemez
 7. Alerts sayfası için yeni backend endpoint gerekmedi — mevcut CRUD yeterli
 8. Sidebar navigasyonu `layout.tsx`'teki `adminNavigation` dizisinde yönetiliyor
 7. `refunds` tablosu zaten migration 019'da mevcut — yeni migration gerekmedi
