@@ -78,7 +78,7 @@ export function PlaygroundPageContent() {
     setState('generating');
     setError('');
     try {
-      const res = await fetchWithTimeout('/api/playground/token', { method: 'POST' });
+      const res = await fetchWithTimeout('/playground-api/token', { method: 'POST' });
       const data = await res.json();
       if (data.success) {
         setToken(data.token);
@@ -115,8 +115,8 @@ export function PlaygroundPageContent() {
     if (!token) return;
     try {
       const url = lastPoll
-        ? `/api/playground/history/${token}?since=${encodeURIComponent(lastPoll)}`
-        : `/api/playground/history/${token}`;
+        ? `/playground-api/history/${token}?since=${encodeURIComponent(lastPoll)}`
+        : `/playground-api/history/${token}`;
       const res = await fetchWithTimeout(url);
       const data = await res.json();
       if (data.success && data.data.length > 0) {
@@ -203,7 +203,7 @@ export function PlaygroundPageContent() {
   const handleClear = async () => {
     if (!token) return;
     try {
-      await fetchWithTimeout(`/api/playground/history/${token}`, { method: 'DELETE' });
+      await fetchWithTimeout(`/playground-api/history/${token}`, { method: 'DELETE' });
       setHistory([]);
       setSelectedRecord(null);
       setLastPoll('');
