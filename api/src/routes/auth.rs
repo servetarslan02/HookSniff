@@ -156,6 +156,7 @@ async fn register(
     Extension(cfg): Extension<Config>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     Extension(email_provider): Extension<crate::email::EmailProvider>,
+    Extension(job_queue): Extension<Option<crate::jobs::job_queue::JobQueue>>,
     headers: HeaderMap,
     Json(req): Json<CreateCustomerRequest>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -229,23 +230,38 @@ async fn register(
         let _ = crate::audit::log_action(&pool, customer.id, "REGISTER", "auth", Some(&rid), None, Some(&ip), Some(&ua)).await;
     }
 
-    // Send welcome email + verification email (fire-and-forget)
+    // Send welcome email + verification email via job queue (survives restarts)
     {
-        let email_provider = email_provider.clone();
         let to = req.email.clone();
         let name = req.name.clone();
-        tokio::spawn(async move {
-            if let Err(e) = email_provider
-                .send_welcome_email(&to, name.as_deref(), crate::email::Language::Tr)
-                .await
-            {
-                tracing::warn!("Failed to send welcome email to {}: {:?}", to, e);
+        if let Some(ref queue) = job_queue {
+            let job = crate::jobs::job_queue::Job::Email {
+                to: to.clone(),
+                template: crate::jobs::job_queue::EmailTemplate::Welcome { name: name.clone() },
+                language: "tr".to_string(),
+            };
+            if let Err(e) = queue.enqueue(&job).await {
+                tracing::warn!("Failed to enqueue welcome email for {}: {:?}", to, e);
+                // Fallback to direct send
+                let ep = email_provider.clone();
+                tokio::spawn(async move {
+                    if let Err(e) = ep.send_welcome_email(&to, name.as_deref(), crate::email::Language::Tr).await {
+                        tracing::warn!("Failed to send welcome email to {}: {:?}", to, e);
+                    }
+                });
             }
-        });
+        } else {
+            let ep = email_provider.clone();
+            tokio::spawn(async move {
+                if let Err(e) = ep.send_welcome_email(&to, name.as_deref(), crate::email::Language::Tr).await {
+                    tracing::warn!("Failed to send welcome email to {}: {:?}", to, e);
+                }
+            });
+        }
     }
 
     // Auto-send verification email
-    send_verification_email_for_customer(&pool, &cfg, &email_provider, customer.id, &req.email)
+    send_verification_email_for_customer(&pool, &cfg, &email_provider, job_queue.as_ref(), customer.id, &req.email)
         .await;
 
     // HS-038h: Return same generic message for all registrations.
@@ -463,6 +479,7 @@ async fn forgot_password(
     Extension(cfg): Extension<Config>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     Extension(email_provider): Extension<crate::email::EmailProvider>,
+    Extension(job_queue): Extension<Option<crate::jobs::job_queue::JobQueue>>,
     headers: HeaderMap,
     Json(req): Json<ForgotPasswordRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -500,16 +517,33 @@ async fn forgot_password(
         let reset_url = format!("{}/reset-password?token={}", cfg.email_base_url, token);
 
         {
-            let email_provider = email_provider.clone();
             let to = email.clone();
-            tokio::spawn(async move {
-                if let Err(e) = email_provider
-                    .send_password_reset_email(&to, &reset_url, crate::email::Language::Tr)
-                    .await
-                {
-                    tracing::warn!("Failed to send password reset email to {}: {:?}", to, e);
+            if let Some(ref queue) = job_queue {
+                let job = crate::jobs::job_queue::Job::Email {
+                    to: to.clone(),
+                    template: crate::jobs::job_queue::EmailTemplate::PasswordReset {
+                        reset_url: reset_url.clone(),
+                    },
+                    language: "tr".to_string(),
+                };
+                if let Err(e) = queue.enqueue(&job).await {
+                    tracing::warn!("Failed to enqueue password reset email for {}: {:?}", to, e);
+                    // Fallback
+                    let ep = email_provider.clone();
+                    tokio::spawn(async move {
+                        if let Err(e) = ep.send_password_reset_email(&to, &reset_url, crate::email::Language::Tr).await {
+                            tracing::warn!("Failed to send password reset email to {}: {:?}", to, e);
+                        }
+                    });
                 }
-            });
+            } else {
+                let ep = email_provider.clone();
+                tokio::spawn(async move {
+                    if let Err(e) = ep.send_password_reset_email(&to, &reset_url, crate::email::Language::Tr).await {
+                        tracing::warn!("Failed to send password reset email to {}: {:?}", to, e);
+                    }
+                });
+            }
         }
 
         tracing::info!("📧 Password reset email sent to: {}", email);
@@ -643,6 +677,7 @@ async fn resend_verification(
     Extension(cfg): Extension<Config>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     Extension(email_provider): Extension<crate::email::EmailProvider>,
+    Extension(job_queue): Extension<Option<crate::jobs::job_queue::JobQueue>>,
     headers: HeaderMap,
     // Body is optional — if not provided, email is extracted from auth cookie
     body: Option<Json<ResendVerificationRequest>>,
@@ -684,7 +719,7 @@ async fn resend_verification(
 
     if let Some((customer_id, email, verified)) = customer {
         if !verified {
-            send_verification_email_for_customer(&pool, &cfg, &email_provider, customer_id, &email)
+            send_verification_email_for_customer(&pool, &cfg, &email_provider, job_queue.as_ref(), customer_id, &email)
                 .await;
         }
     }
@@ -1406,6 +1441,7 @@ async fn send_verification_email_for_customer(
     pool: &PgPool,
     cfg: &Config,
     email_provider: &crate::email::EmailProvider,
+    job_queue: Option<&crate::jobs::job_queue::JobQueue>,
     customer_id: Uuid,
     email: &str,
 ) {
@@ -1429,16 +1465,33 @@ async fn send_verification_email_for_customer(
 
     let verify_url = format!("{}/verify-email?token={}", cfg.email_base_url, token);
 
-    let email_provider = email_provider.clone();
     let to = email.to_string();
-    tokio::spawn(async move {
-        if let Err(e) = email_provider
-            .send_verification_email(&to, &verify_url, crate::email::Language::Tr)
-            .await
-        {
-            tracing::warn!("Failed to send verification email to {}: {:?}", to, e);
+    if let Some(queue) = job_queue {
+        let job = crate::jobs::job_queue::Job::Email {
+            to: to.clone(),
+            template: crate::jobs::job_queue::EmailTemplate::Verification {
+                verify_url: verify_url.clone(),
+            },
+            language: "tr".to_string(),
+        };
+        if let Err(e) = queue.enqueue(&job).await {
+            tracing::warn!("Failed to enqueue verification email for {}: {:?}", to, e);
+            // Fallback
+            let ep = email_provider.clone();
+            tokio::spawn(async move {
+                if let Err(e) = ep.send_verification_email(&to, &verify_url, crate::email::Language::Tr).await {
+                    tracing::warn!("Failed to send verification email to {}: {:?}", to, e);
+                }
+            });
         }
-    });
+    } else {
+        let ep = email_provider.clone();
+        tokio::spawn(async move {
+            if let Err(e) = ep.send_verification_email(&to, &verify_url, crate::email::Language::Tr).await {
+                tracing::warn!("Failed to send verification email to {}: {:?}", to, e);
+            }
+        });
+    }
 }
 
 /// Generate a TOTP secret (base32 encoded).
