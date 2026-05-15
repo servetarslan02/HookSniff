@@ -124,17 +124,22 @@ export default function DeliveriesPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
-        {['all', 'delivered', 'failed', 'pending'].map((f) => (
+        {[
+          { key: 'all', label: t('filterAll') },
+          { key: 'delivered', label: t('filterDelivered') },
+          { key: 'failed', label: t('filterFailed') },
+          { key: 'pending', label: t('filterPending') },
+        ].map((f) => (
           <button
-            key={f}
-            onClick={() => { setFilter(f); setPage(1); }}
+            key={f.key}
+            onClick={() => { setFilter(f.key); setPage(1); }}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
-              filter === f
+              filter === f.key
                 ? 'bg-gray-900 text-white'
                 : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
             }`}
           >
-            {f.charAt(0).toUpperCase() + f.slice(1)}
+            {f.label}
           </button>
         ))}
       </div>
@@ -145,7 +150,7 @@ export default function DeliveriesPage() {
           <div className="text-4xl mb-3">⚠️</div>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error}</p>
           <button type="button" onClick={fetchData} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
-            Retry
+            {tc('retry')}
           </button>
         </div>
       )}
@@ -163,21 +168,21 @@ export default function DeliveriesPage() {
             {/* Batch Replay Bar */}
             {selectedIds.size > 0 && (
               <div className="px-6 py-3 flex items-center gap-3 bg-brand-50 dark:bg-brand-500/10 border-b border-brand-200 dark:border-brand-500/20">
-                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{selectedIds.size} selected</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('selectedCount', { count: selectedIds.size })}</span>
                 <button
                   type="button"
                   onClick={handleBatchReplay}
                   disabled={batchReplaying}
                   className="px-4 py-1.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition disabled:opacity-50"
                 >
-                  {batchReplaying ? 'Replaying...' : `🔄 Batch Replay (${selectedIds.size})`}
+                  {batchReplaying ? t('batchReplaying') : t('batchReplay', { count: selectedIds.size })}
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedIds(new Set())}
                   className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition"
                 >
-                  ✕ Clear
+                  {t('clearSelection')}
                 </button>
               </div>
             )}
@@ -244,7 +249,7 @@ export default function DeliveriesPage() {
                         onClick={(e) => { e.stopPropagation(); router.push(`/deliveries/${d.id}`); }}
                         className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-300 text-sm font-medium"
                       >
-                        View Details
+                        {t('viewDetails')}
                       </button>
                     </td>
                   </tr>
@@ -310,7 +315,7 @@ export default function DeliveriesPage() {
                     <div key={i} className="flex items-start gap-3">
                       <div className="mt-1 w-2 h-2 rounded-full bg-brand-500 flex-shrink-0" />
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Attempt {i + 1}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{t('attemptN', { n: i + 1 })}</p>
                         <p className="text-xs text-gray-500 dark:text-slate-400">
                           {i === selected.attempt_count - 1
                             ? selected.status === 'delivered' ? t('deliveredSuccessfully') : t('failedWillRetry')
@@ -329,7 +334,7 @@ export default function DeliveriesPage() {
       <ConfirmDialog
         open={!!replayTarget}
         title={t('replayTitle')}
-        message={`Replay delivery ${replayTarget?.id.slice(0, 10)}… to the same endpoint?`}
+        message={t('replayConfirm', { id: replayTarget?.id.slice(0, 10) })}
         confirmLabel={t('replay')}
         onConfirm={handleReplay}
         onCancel={() => setReplayTarget(null)}

@@ -325,7 +325,18 @@
     "created": "Oluşturuldu",
     "closeDetails": "Detayları kapat",
     "status": "Durum",
-    "noResults": "Bu sayfada \"{search}\" ile eşleşen sonuç bulunamadı"
+    "noResults": "Bu sayfada \"{search}\" ile eşleşen sonuç bulunamadı",
+    "filterAll": "Tümü",
+    "filterDelivered": "Teslim Edildi",
+    "filterFailed": "Başarısız",
+    "filterPending": "Beklemede",
+    "retryBtn": "Tekrar Dene",
+    "selectedCount": "{count} seçili",
+    "batchReplaying": "Tekrar oynatılıyor...",
+    "batchReplay": "🔄 Toplu Tekrar Oynat ({count})",
+    "clearSelection": "✕ Temizle",
+    "viewDetails": "Detayları Gör",
+    "replayConfirm": "{id}… teslimatı aynı endpoint'e tekrar oynatılsın mı?"
   },
   "logs": {
     "title": "Webhook Logları",
