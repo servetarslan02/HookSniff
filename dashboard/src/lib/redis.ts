@@ -81,19 +81,19 @@ export async function playgroundLrange(key: string, start = 0, stop = -1): Promi
   return Array.isArray(existing) ? existing.slice(start, stop === -1 ? undefined : stop + 1) : [];
 }
 
-// ─── Rate Limiting (IP-based for public playground) ───
+// ─── Rate Limiting (Playground — herkes için sabit) ───
 
 /**
- * Check and increment rate limit for an IP.
- * Returns { allowed, remaining, retryAfter }
+ * Playground rate limit. Plan limitlerinden yemez.
+ * IP bazlı, herkes için aynı.
  */
 export async function checkRateLimit(
   ip: string,
   action: 'token' | 'request',
 ): Promise<{ allowed: boolean; remaining: number; retryAfter: number }> {
   const limits = {
-    token: { max: 5, windowSec: 3600 },   // 5 tokens per hour per IP
-    request: { max: 60, windowSec: 60 },   // 60 requests per minute per IP
+    token: { max: 10, windowSec: 3600 },   // Saatte 10 token
+    request: { max: 120, windowSec: 60 },   // Dakikada 120 istek
   };
 
   const { max, windowSec } = limits[action];

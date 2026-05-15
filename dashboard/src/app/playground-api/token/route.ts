@@ -32,7 +32,7 @@ export async function OPTIONS() {
 export async function POST(request: Request) {
   const ip = getClientIp(request);
 
-  // Rate limit: 5 tokens per hour per IP
+  // Rate limit: 10 tokens per hour per IP (plan limitlerinden yemez)
   const { allowed, remaining, retryAfter } = await checkRateLimit(ip, 'token');
 
   if (!allowed) {
