@@ -148,7 +148,9 @@ export const AdminUserSchema = z.object({
   email: z.string(),
   name: z.string().optional(),
   plan: z.string(),
-  is_active: z.boolean(),
+  role: z.string(),
+  status: z.enum(['active', 'banned']),
+  is_active: z.boolean().optional(),
   created_at: z.string(),
   total_deliveries: z.number().optional(),
   total_endpoints: z.number().optional(),
@@ -165,25 +167,19 @@ export const AdminUsersResponseSchema = z.object({
 
 // ── Admin User Detail Schema ──
 export const AdminUserDetailSchema = z.object({
-  id: z.string(),
-  email: z.string(),
-  name: z.string().optional(),
-  plan: z.string(),
-  is_active: z.boolean(),
-  is_admin: z.boolean().optional(),
-  created_at: z.string(),
-  total_deliveries: z.number().optional(),
-  total_endpoints: z.number().optional(),
-  api_keys: z
-    .array(
-      z.object({
-        prefix: z.string(),
-        name: z.string(),
-        created_at: z.string(),
-        is_active: z.boolean(),
-      })
-    )
-    .optional(),
+  user: AdminUserSchema,
+  endpoints: z.array(z.object({
+    id: z.string(),
+    url: z.string(),
+    is_active: z.boolean(),
+    created_at: z.string(),
+  })).optional(),
+  recent_deliveries: z.array(DeliverySchema).optional(),
+  usage_stats: z.object({
+    total_deliveries: z.number(),
+    success_rate: z.number(),
+    endpoints_count: z.number(),
+  }).optional(),
 });
 
 // ── Stats Response Schema ──
@@ -205,22 +201,24 @@ export const HealthResponseSchema = z.object({
 
 // ── Delivery Trend Schema ──
 export const DeliveryTrendSchema = z.object({
+  range: z.string().optional(),
   buckets: z.array(
     z.object({
-      time: z.string(),
-      delivered: z.number(),
+      timestamp: z.string(),
+      successful: z.number(),
       failed: z.number(),
-      pending: z.number(),
+      total: z.number(),
     })
   ),
 });
 
 // ── Success Rate Schema ──
 export const SuccessRateSchema = z.object({
-  rate: z.number(),
-  delivered: z.number(),
+  range: z.string().optional(),
+  successful: z.number(),
   failed: z.number(),
-  total: z.number(),
+  pending: z.number(),
+  success_rate: z.number(),
 });
 
 // ── WS Event Schema ──

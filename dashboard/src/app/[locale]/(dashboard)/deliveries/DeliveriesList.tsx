@@ -2,11 +2,12 @@
 
 import { getErrorMessage } from '@/lib/errors';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { webhooksApi, type Delivery } from '@/lib/api';
+import { useWebhooks, useReplayDelivery } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
@@ -15,11 +16,7 @@ export default function DeliveriesPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
-  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [filter, setFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Delivery | null>(null);
@@ -31,33 +28,25 @@ export default function DeliveriesPage() {
   const tc = useTranslations('common');
   const perPage = 20;
 
-  const fetchData = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    setError('');
-    try {
-      const data = await webhooksApi.list(token, {
-        page,
-        status: filter === 'all' ? undefined : filter,
-      });
-      setDeliveries(data.deliveries);
-      setTotal(data.total);
-    } catch (err: unknown) {
-      setError(getErrorMessage(err, tc('unknownError')) || tc('failedToLoadDeliveries'));
-    } finally {
-      setLoading(false);
-    }
-  }, [token, page, filter]);
+  // React Query — replaces fetchData + useState + useEffect
+  const { data, isLoading, error: queryError, refetch } = useWebhooks({
+    page,
+    status: filter === 'all' ? undefined : filter,
+  });
+  const replayMutation = useReplayDelivery();
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  const deliveries = data?.deliveries ?? [];
+  const total = data?.total ?? 0;
+  const loading = isLoading;
+  const error = queryError ? (getErrorMessage(queryError, tc('unknownError')) || tc('failedToLoadDeliveries')) : '';
 
   const handleReplay = async () => {
-    if (!replayTarget || !token) return;
+    if (!replayTarget) return;
     setReplaying(true);
     try {
-      await webhooksApi.replay(token, replayTarget.id);
+      await replayMutation.mutateAsync(replayTarget.id);
       toast(t('replaySuccess'), 'success');
-      fetchData();
+      setReplayTarget(null);
     } catch (err: unknown) {
       toast(getErrorMessage(err, tc('unknownError')) || tc('replayFailed'), 'error');
     } finally {
@@ -98,7 +87,7 @@ export default function DeliveriesPage() {
       const result = await webhooksApi.batchReplay(token, Array.from(selectedIds));
       toast(`Replayed ${result.replayed || selectedIds.size} deliveries`, 'success');
       setSelectedIds(new Set());
-      fetchData();
+      refetch();
     } catch (err) {
       toast(err instanceof Error ? err.message : tc('error'), 'error');
     } finally {
@@ -149,7 +138,7 @@ export default function DeliveriesPage() {
         <div className="glass-card p-6 text-center">
           <div className="text-4xl mb-3">⚠️</div>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error}</p>
-          <button type="button" onClick={fetchData} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
+          <button type="button" onClick={() => refetch()} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
             {tc('retry')}
           </button>
         </div>

@@ -18,7 +18,7 @@ export default function AdminOverviewPage() {
   // React Query hooks — replaces useState + useEffect + fetchStats
   const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useAdminStats();
   const { data: revenue } = useAdminRevenue();
-  const { data: auditLogsData } = useAdminAuditLogs(5);
+  const { data: auditLogsData } = useAdminAuditLogs({ limit: 5 });
   const { data: featureFlagsData } = useAdminFeatureFlags();
   const { data: deployInfo } = useAdminDeployInfo();
 
