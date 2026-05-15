@@ -32,6 +32,9 @@ pub struct PolarConfig {
     pub webhook_secret: String,
     pub product_pro: String,
     pub product_business: String,
+    pub product_startup_yearly: String,
+    pub product_pro_yearly: String,
+    pub product_business_yearly: String,
     pub base_url: String,
 }
 
@@ -57,15 +60,30 @@ impl PolarConfig {
                 .unwrap_or_else(|_| "ec5826ad-4a01-4146-b2d0-3b99eaf150a5".to_string()),
             product_business: std::env::var("POLAR_PRODUCT_BUSINESS")
                 .unwrap_or_else(|_| "e5b7d88a-7606-4963-a070-4102ca6405e2".to_string()),
+            product_startup_yearly: std::env::var("POLAR_PRODUCT_STARTUP_YEARLY")
+                .unwrap_or_else(|_| "ac15aa41-e1fa-468d-9ae7-b2bc271d9715".to_string()),
+            product_pro_yearly: std::env::var("POLAR_PRODUCT_PRO_YEARLY")
+                .unwrap_or_else(|_| "ffa27799-49f4-42d9-9cfa-2b4d3502642f".to_string()),
+            product_business_yearly: std::env::var("POLAR_PRODUCT_BUSINESS_YEARLY")
+                .unwrap_or_else(|_| "3accbb69-37eb-4128-b09f-04cf191e4147".to_string()),
             base_url,
         })
     }
 
-    fn product_id_for_plan(&self, plan: &Plan) -> Option<&str> {
-        match plan {
-            Plan::Pro => Some(&self.product_pro),
-            Plan::Enterprise => Some(&self.product_business),
-            _ => None,
+    fn product_id_for_plan(&self, plan: &Plan, yearly: bool) -> Option<&str> {
+        if yearly {
+            match plan {
+                Plan::Startup => Some(&self.product_startup_yearly),
+                Plan::Pro => Some(&self.product_pro_yearly),
+                Plan::Enterprise => Some(&self.product_business_yearly),
+                _ => None,
+            }
+        } else {
+            match plan {
+                Plan::Pro => Some(&self.product_pro),
+                Plan::Enterprise => Some(&self.product_business),
+                _ => None,
+            }
         }
     }
 }
@@ -174,10 +192,12 @@ impl PolarProvider {
 
     /// Determine plan from Polar product ID.
     fn determine_plan(&self, product_id: &str) -> Plan {
-        if product_id == self.config.product_business {
+        if product_id == self.config.product_business || product_id == self.config.product_business_yearly {
             Plan::Enterprise
-        } else if product_id == self.config.product_pro {
+        } else if product_id == self.config.product_pro || product_id == self.config.product_pro_yearly {
             Plan::Pro
+        } else if product_id == self.config.product_startup_yearly {
+            Plan::Startup
         } else {
             Plan::Developer
         }
@@ -258,10 +278,11 @@ impl PaymentProviderImpl for PolarProvider {
         customer_email: &str,
         plan: &Plan,
         app_url: &str,
+        yearly: bool,
     ) -> Result<CheckoutResult, AppError> {
         let product_id = self
             .config
-            .product_id_for_plan(plan)
+            .product_id_for_plan(plan, yearly)
             .ok_or_else(|| AppError::BadRequest("Invalid plan for Polar checkout".into()))?;
 
         let mut metadata = std::collections::HashMap::new();

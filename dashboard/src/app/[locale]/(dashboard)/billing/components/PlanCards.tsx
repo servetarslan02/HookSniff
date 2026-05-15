@@ -2,6 +2,7 @@
 
 import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
+import { useState } from 'react';
 
 const planDefaults = [
   {
@@ -9,7 +10,8 @@ const planDefaults = [
     nameKey: 'plans.developer',
     priceUsd: 0,
     priceTry: 0,
-    period: '/month',
+    yearlyPriceUsd: 0,
+    yearlyPriceTry: 0,
     limitKey: 'plans.developerLimit',
     features: [
       '100 events/day',
@@ -29,7 +31,8 @@ const planDefaults = [
     nameKey: 'plans.startup',
     priceUsd: 29,
     priceTry: 599,
-    period: '/month',
+    yearlyPriceUsd: 24.65,
+    yearlyPriceTry: 509,
     limitKey: 'plans.startupLimit',
     features: [
       '30,000 events/day',
@@ -52,7 +55,8 @@ const planDefaults = [
     nameKey: 'plans.pro',
     priceUsd: 49,
     priceTry: 999,
-    period: '/month',
+    yearlyPriceUsd: 41.65,
+    yearlyPriceTry: 849,
     limitKey: 'plans.proLimit',
     features: [
       '100,000 events/day',
@@ -75,7 +79,8 @@ const planDefaults = [
     nameKey: 'plans.enterprise',
     priceUsd: 0,
     priceTry: 0,
-    period: '',
+    yearlyPriceUsd: 0,
+    yearlyPriceTry: 0,
     limitKey: 'plans.enterpriseLimit',
     features: [
       'Unlimited events/day',
@@ -100,20 +105,59 @@ export function PlanCards({
   onUpgrade,
 }: {
   currentPlan: string;
-  onUpgrade: (planKey: string) => void;
+  onUpgrade: (planKey: string, billingPeriod: 'monthly' | 'annual') => void;
 }) {
   const t = useTranslations('billing');
   const locale = useLocale();
   const isTr = locale === 'tr';
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
+  const isAnnual = billingPeriod === 'annual';
+
   const plans = planDefaults.map(p => ({
     ...p,
-    price: p.key === 'developer' ? 0 : isTr ? p.priceTry : p.priceUsd,
+    price: p.key === 'developer' ? 0 : isTr
+      ? (isAnnual ? p.yearlyPriceTry : p.priceTry)
+      : (isAnnual ? p.yearlyPriceUsd : p.priceUsd),
+    monthlyPrice: p.key === 'developer' ? 0 : isTr ? p.priceTry : p.priceUsd,
     isEnterprise: p.key === 'enterprise',
   }));
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('currentPlan')}</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('currentPlan')}</h2>
+        {/* Billing period toggle */}
+        <div className="flex items-center gap-1 bg-gray-100 dark:bg-slate-800 rounded-xl p-1">
+          <button
+            type="button"
+            onClick={() => setBillingPeriod('monthly')}
+            className={clsx(
+              'px-4 py-1.5 rounded-lg text-sm font-medium transition',
+              !isAnnual
+                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
+            )}
+          >
+            {t('monthly', { defaultValue: 'Monthly' })}
+          </button>
+          <button
+            type="button"
+            onClick={() => setBillingPeriod('annual')}
+            className={clsx(
+              'px-4 py-1.5 rounded-lg text-sm font-medium transition relative',
+              isAnnual
+                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
+            )}
+          >
+            {t('annual', { defaultValue: 'Annual' })}
+            <span className="ml-1.5 inline-block px-1.5 py-0.5 text-[10px] font-bold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
+              -15%
+            </span>
+          </button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {plans.map((plan) => {
           const isCurrent = plan.key === currentPlan;
@@ -135,10 +179,29 @@ export function PlanCards({
               <div className="mt-2 mb-4">
                 {plan.isEnterprise ? (
                   <span className="text-3xl font-bold text-gray-900 dark:text-white">{t('customPricing', { defaultValue: 'Custom' })}</span>
+                ) : plan.key === 'developer' ? (
+                  <>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{isTr ? '₺0' : '$0'}</span>
+                    <span className="text-gray-500 dark:text-slate-400 text-sm">/month</span>
+                  </>
                 ) : (
                   <>
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{isTr ? `₺${plan.price.toLocaleString('tr-TR')}` : `$${plan.price}`}</span>
-                    <span className="text-gray-500 dark:text-slate-400 text-sm">{plan.period}</span>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                      {isTr ? `₺${plan.price.toLocaleString('tr-TR')}` : `$${plan.price}`}
+                    </span>
+                    <span className="text-gray-500 dark:text-slate-400 text-sm">
+                      {isAnnual ? '/month, billed annually' : '/month'}
+                    </span>
+                    {isAnnual && (
+                      <div className="mt-1">
+                        <span className="text-xs text-gray-400 dark:text-slate-500 line-through">
+                          {isTr ? `₺${plan.monthlyPrice.toLocaleString('tr-TR')}` : `$${plan.monthlyPrice}`}
+                        </span>
+                        <span className="ml-1.5 text-xs font-medium text-green-600 dark:text-green-400">
+                          {t('savePercent', { defaultValue: 'Save 15%' })}
+                        </span>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -163,7 +226,7 @@ export function PlanCards({
                 </button>
               ) : (
                 <button type="button"
-                  onClick={() => onUpgrade(plan.key)}
+                  onClick={() => onUpgrade(plan.key, billingPeriod)}
                   className={clsx(
                     'w-full py-2.5 rounded-xl text-sm font-medium transition',
                     plan.popular
