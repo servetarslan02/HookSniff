@@ -128,9 +128,17 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 3. **Deploy** — hooksniff-api, tüm servisler operational
 4. **Toplam oturum** — 6 deploy, 8 commit, 23 env var
 
+8. **QStash Env Var'ları** — Cloud Run'a 4 yeni env var eklendi
+   - `QSTASH_URL=https://qstash-eu-central-1.upstash.io`
+   - `QSTASH_TOKEN` (Upstash'ten alındı)
+   - `QSTASH_CURRENT_SIGNING_KEY` (sig_7sPnDhTM...)
+   - `QSTASH_NEXT_SIGNING_KEY` (sig_6qrNpb9Z...)
+   - Deploy: hooksniff-api-00330-9g2 (22:12 GMT+8)
+
 ### ⚠️ Servet'in Yapması Gereken
-- **Polar.sh ürün** — Pro/Business planları Polar.sh'da ürün olarak tanımlanmalı
+- **Polar.sh Go Live** — Test mode'dan çık, Stripe verification yap
 - **Dashboard i18n** — 920+ string Türkçe'ye çevrilecek
+- **Business → Enterprise** — Polar'daki $99 Business ürününü sil/Enterprise yap
 
 ### 📂 Aktif Servisler (2026-05-15)
 | Servis | Durum | Env Var |
