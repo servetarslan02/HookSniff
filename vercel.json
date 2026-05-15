@@ -5,9 +5,9 @@
   "installCommand": "npm ci",
   "rewrites": [
     { "source": "/api/health", "destination": "https://hooksniff-api-1046140057667.europe-west1.run.app/health" },
-    { "source": "/api/playground/:path*", "destination": "/api/playground/:path*" },
     { "source": "/api/newsletter", "destination": "/api/newsletter" },
     { "source": "/api/status", "destination": "/api/status" },
+    { "source": "/api/playground/:path*", "destination": "/api/playground/:path*" },
     { "source": "/api/:path*", "destination": "https://hooksniff-api-1046140057667.europe-west1.run.app/v1/:path*" }
   ],
   "headers": [
