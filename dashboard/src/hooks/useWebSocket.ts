@@ -143,6 +143,16 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     return () => window.removeEventListener('online', handleOnline);
   }, [state, connect]);
 
+  // Token refresh — reconnect when token changes
+  useEffect(() => {
+    if (token && wsRef.current?.readyState === WebSocket.OPEN) {
+      // Token yenilendi → yeniden bağlan
+      wsRef.current.close();
+      reconnectAttempts.current = 0;
+      connect();
+    }
+  }, [token, connect]);
+
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
     wsRef.current?.close();
