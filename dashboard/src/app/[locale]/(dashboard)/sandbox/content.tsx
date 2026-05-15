@@ -96,7 +96,7 @@ export function PlaygroundPageContent() {
       setError(tc('networkErrorCheck'));
       setState('error');
     }
-  }, []);
+  }, [tc]);
 
   /* ─── Restore from localStorage ─── */
 

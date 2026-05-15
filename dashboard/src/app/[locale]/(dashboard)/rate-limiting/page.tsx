@@ -65,7 +65,7 @@ export default function RateLimitingPage() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, tc, toast]);
 
   useEffect(() => { fetchStats(); }, [fetchStats]);
 

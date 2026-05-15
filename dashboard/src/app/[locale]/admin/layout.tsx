@@ -41,7 +41,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     notificationsApi.getUnreadCount(token).then((data) => {
       setUnreadCount(data.unread_count || 0);
     }).catch(() => {});
-  }, [token]);
+  }, []);
 
   // Admin auth guard
   useEffect(() => {
