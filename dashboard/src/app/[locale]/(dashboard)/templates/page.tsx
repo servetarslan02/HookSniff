@@ -30,6 +30,17 @@ export default function TemplatesPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
+  // Translate template name, description, and tags using template ID
+  const getTemplateName = (tpl: Template) => {
+    try { return t(`${tpl.id}_name`); } catch { return tpl.name; }
+  };
+  const getTemplateDesc = (tpl: Template) => {
+    try { return t(`${tpl.id}_desc`); } catch { return tpl.description || ''; }
+  };
+  const getTagLabel = (tag: string) => {
+    try { return t(`tag_${tag}`); } catch { return tag; }
+  };
+
   if (loading) return <div className="p-8 text-gray-500 dark:text-slate-400">{tCommon('loading')}</div>;
 
   if (error) {
@@ -62,11 +73,11 @@ export default function TemplatesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {templates.map((tpl) => (
             <div key={tpl.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-200 dark:border-slate-700 hover:border-purple-500 transition cursor-pointer">
-              <h3 className="font-semibold mb-1">{tpl.name}</h3>
-              <p className="text-sm text-gray-500 mb-3">{tpl.description}</p>
+              <h3 className="font-semibold mb-1">{getTemplateName(tpl)}</h3>
+              <p className="text-sm text-gray-500 mb-3">{getTemplateDesc(tpl)}</p>
               <div className="flex gap-2">
                 {(tpl.tags || []).map((tag: string) => (
-                  <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">{tag}</span>
+                  <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded">{getTagLabel(tag)}</span>
                 ))}
               </div>
             </div>
