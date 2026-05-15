@@ -21,7 +21,7 @@ function getClientIp(request: Request): string {
 async function handleRequest(request: Request, id: string) {
   const ip = getClientIp(request);
 
-  // Rate limit: 60 requests per minute per IP
+  // Rate limit: 120 istek/dakika per IP (plan limitlerinden yemez)
   const { allowed, remaining, retryAfter } = await checkRateLimit(ip, 'request');
 
   if (!allowed) {
