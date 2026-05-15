@@ -1,7 +1,7 @@
 # 🗂️ Navigation Restructure — Detaylı Uygulama Rehberi
 
 > **Tarih:** 2026-05-15
-> **Durum:** PLANLANAN — uygulanmadı
+> **Durum:** ✅ TAMAMLANDI — uygulandı (Oturum 167-168)
 > **Tahmini süre:** 2 oturum (1'er saat)
 
 ---
@@ -211,7 +211,7 @@ Dosya yolu pattern'i: `dashboard/src/app/[locale]/(dashboard)/SAYFA_ADI/page.tsx
 
 ## 4. Adım Adım Uygulama
 
-### ADIM 1: layout.tsx — Sidebar'ı yeniden tanımla
+### ADIM 1: layout.tsx — Sidebar'ı yeniden tanımla ✅
 
 **Dosya:** `dashboard/src/app/[locale]/(dashboard)/layout.tsx`
 
@@ -297,7 +297,7 @@ const sections = [
 
 ---
 
-### ADIM 2: /core sayfasını güncelle — Applications ve API Keys ekle
+### ADIM 2: /core sayfasını güncelle — Applications ve API Keys ekle ✅
 
 **Dosya:** `dashboard/src/app/[locale]/(dashboard)/core/page.tsx`
 
@@ -323,7 +323,7 @@ tabs={[
 
 ---
 
-### ADIM 3: Yeni /deliveries sayfası oluştur
+### ADIM 3: Yeni /deliveries sayfası oluştur ✅
 
 **Dosya:** `dashboard/src/app/[locale]/(dashboard)/deliveries/page.tsx` (YENİ DOSYA)
 
@@ -357,7 +357,7 @@ Eğer component'ler sayfa dosyasının içinde tanımlıysa, önce ayrı dosyala
 
 ---
 
-### ADIM 4: /observability sayfasını güncelle — Logs tab'ını çıkar
+### ADIM 4: /observability sayfasını güncelle — Logs tab'ını çıkar ✅
 
 **Dosya:** `dashboard/src/app/[locale]/(dashboard)/observability/page.tsx`
 
@@ -374,7 +374,7 @@ tabs={[
 
 ---
 
-### ADIM 5: Yeni /account sayfası oluştur
+### ADIM 5: Yeni /account sayfası oluştur ✅
 
 **Dosya:** `dashboard/src/app/[locale]/(dashboard)/account/page.tsx` (YENİ DOSYA)
 
@@ -408,7 +408,7 @@ export default function AccountPage() {
 
 ---
 
-### ADIM 6: Eski sayfaları redirect et
+### ADIM 6: Eski sayfaları redirect et ✅
 
 **Dosya:** `dashboard/src/middleware.ts`
 
@@ -456,7 +456,7 @@ const ROUTE_REDIRECTS: Record<string, string> = {
 
 ---
 
-### ADIM 7: i18n key'leri ekle
+### ADIM 7: i18n key'leri ekle ✅
 
 **Dosyalar:**
 - `dashboard/src/messages/en.json`
@@ -479,7 +479,7 @@ const ROUTE_REDIRECTS: Record<string, string> = {
 
 ---
 
-### ADIM 8: Eski dosyaları temizle (opsiyonel)
+### ADIM 8: Eski dosyaları temizle (opsiyonel) ✅
 
 Eğer component'ler ayrı dosyalarda export ediliyorsa, eski sayfa dosyaları silinebilir.
 Eğer component'ler sayfa dosyasının içinde tanımlıysa, önce ayrı dosyalara çıkarılmalı.
@@ -490,17 +490,17 @@ Eğer component'ler sayfa dosyasının içinde tanımlıysa, önce ayrı dosyala
 
 ## 5. Kontrol Listesi
 
-- [ ] layout.tsx → 8 section tanımlandı
-- [ ] /core → Applications + API Keys tab eklendi
-- [ ] /deliveries → Yeni sayfa oluşturuldu (Logs + Deliveries + Search)
-- [ ] /observability → Logs tab çıkarıldı (3 tab kaldı)
-- [ ] /account → Yeni sayfa oluşturuldu (Team + Notifications + Billing + Settings + Portal)
-- [ ] middleware.ts → Eski URL'ler yeni sayfalara redirect
-- [ ] en.json → Yeni nav key'leri eklendi
-- [ ] tr.json → Türkçe çeviriler eklendi
-- [ ] Local build test edildi (`npm run build`)
-- [ ] GitHub'a push edildi
-- [ ] Vercel deploy kontrol edildi
+- [x] layout.tsx → 8 section tanımlandı ✅
+- [x] /core → Applications + API Keys tab eklendi ✅
+- [x] /deliveries → Yeni sayfa oluşturuldu (Logs + Deliveries + Search) ✅
+- [x] /observability → Logs tab çıkarıldı (3 tab kaldı) ✅
+- [x] /account → Yeni sayfa oluşturuldu (Team + Notifications + Billing + Settings + Portal) ✅
+- [x] middleware.ts → Eski URL'ler yeni sayfalara redirect ✅
+- [x] en.json → Yeni nav key'leri eklendi ✅
+- [x] tr.json → Türkçe çeviriler eklendi ✅
+- [x] Local build test edildi (`npm run build`) ✅
+- [x] GitHub'a push edildi ✅
+- [x] Vercel deploy kontrol edildi ✅
 
 ---
 
