@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { type DeliveryTrendResponse } from '@/lib/api';
 
 interface DeliveryTrendChartProps {
@@ -8,10 +9,12 @@ interface DeliveryTrendChartProps {
 }
 
 export function DeliveryTrendChart({ data, loading }: DeliveryTrendChartProps) {
+  const t = useTranslations('dashboard');
+
   if (loading) {
     return (
       <div className="h-48 flex items-center justify-center">
-        <div className="animate-pulse text-sm text-gray-400 dark:text-slate-500">Loading chart...</div>
+        <div className="animate-pulse text-sm text-gray-400 dark:text-slate-500">{t('loadingShort')}</div>
       </div>
     );
   }
@@ -19,7 +22,7 @@ export function DeliveryTrendChart({ data, loading }: DeliveryTrendChartProps) {
   if (!data?.buckets?.length) {
     return (
       <div className="h-48 flex items-center justify-center">
-        <p className="text-sm text-gray-500 dark:text-slate-400">No delivery data yet</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400">{t('noDeliveryData')}</p>
       </div>
     );
   }

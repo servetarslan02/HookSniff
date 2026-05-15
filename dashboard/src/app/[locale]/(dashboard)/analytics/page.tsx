@@ -222,8 +222,8 @@ export default function AnalyticsPage() {
 
       {/* Latency Trend Chart */}
       <ChartCard
-        title={t('latencyTrend', { defaultValue: 'Latency Trend' })}
-        subtitle={t('latencyTrendDesc', { defaultValue: 'Average and P95 response latency over time' })}
+        title={t('latencyTrend')}
+        subtitle={t('latencyTrendDesc')}
         showTimeRange
         timeRange={timeRange}
         onTimeRangeChange={setTimeRange}

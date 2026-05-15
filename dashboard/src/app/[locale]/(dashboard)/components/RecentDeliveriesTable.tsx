@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { type Delivery } from '@/lib/api';
 import { Link } from '@/i18n/navigation';
 
@@ -9,6 +10,8 @@ interface RecentDeliveriesTableProps {
 }
 
 export function RecentDeliveriesTable({ deliveries, loading }: RecentDeliveriesTableProps) {
+  const t = useTranslations('dashboard');
+
   if (loading) {
     return (
       <div className="space-y-2 p-4">
@@ -22,7 +25,7 @@ export function RecentDeliveriesTable({ deliveries, loading }: RecentDeliveriesT
   if (!deliveries.length) {
     return (
       <div className="p-6 text-center text-sm text-gray-500 dark:text-slate-400">
-        No deliveries yet. Send your first webhook!
+        {t('noDeliveriesYet')}
       </div>
     );
   }
@@ -32,10 +35,10 @@ export function RecentDeliveriesTable({ deliveries, loading }: RecentDeliveriesT
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-100 dark:border-slate-800">
-            <th className="text-left py-2 px-4 font-medium text-gray-500 dark:text-slate-400">Event</th>
-            <th className="text-left py-2 px-4 font-medium text-gray-500 dark:text-slate-400">Status</th>
-            <th className="text-left py-2 px-4 font-medium text-gray-500 dark:text-slate-400">Time</th>
-            <th className="text-right py-2 px-4 font-medium text-gray-500 dark:text-slate-400">Action</th>
+            <th className="text-left py-2 px-4 font-medium text-gray-500 dark:text-slate-400">{t('event')}</th>
+            <th className="text-left py-2 px-4 font-medium text-gray-500 dark:text-slate-400">{t('status')}</th>
+            <th className="text-left py-2 px-4 font-medium text-gray-500 dark:text-slate-400">{t('time')}</th>
+            <th className="text-right py-2 px-4 font-medium text-gray-500 dark:text-slate-400">{t('action')}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 dark:divide-slate-800/50">
@@ -55,8 +58,8 @@ export function RecentDeliveriesTable({ deliveries, loading }: RecentDeliveriesT
                 {new Date(d.created_at).toLocaleString()}
               </td>
               <td className="py-2.5 px-4 text-right">
-                <Link href={`/servetarslan02/deliveries/${d.id}`} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">
-                  View →
+                <Link href={`/deliveries/${d.id}`} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">
+                  {t('view')}
                 </Link>
               </td>
             </tr>

@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 export type TimeRange = '24h' | '7d' | '30d';
 
 interface TimeRangeSelectorProps {
@@ -7,13 +9,15 @@ interface TimeRangeSelectorProps {
   onChange: (range: TimeRange) => void;
 }
 
-const options: { label: string; value: TimeRange }[] = [
-  { label: '24 Hours', value: '24h' },
-  { label: '7 Days', value: '7d' },
-  { label: '30 Days', value: '30d' },
-];
-
 export function TimeRangeSelector({ value, onChange }: TimeRangeSelectorProps) {
+  const t = useTranslations('dashboard');
+
+  const options: { label: string; value: TimeRange }[] = [
+    { label: t('timeRange24h'), value: '24h' },
+    { label: t('timeRange7d'), value: '7d' },
+    { label: t('timeRange30d'), value: '30d' },
+  ];
+
   return (
     <div className="flex items-center gap-1 rounded-lg bg-gray-100 dark:bg-slate-800 p-1">
       {options.map((opt) => (
