@@ -132,6 +132,7 @@ async fn create_webhook(
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
     Extension(is_test): Extension<crate::middleware::IsTestKey>,
+    Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     headers: axum::http::header::HeaderMap,
     Json(req): Json<CreateWebhookRequest>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
@@ -270,6 +271,16 @@ async fn create_webhook(
     .fetch_one(&pool)
     .await?;
 
+    // Publish DeliveryCreated event (best-effort)
+    if let Some(ref publisher) = event_publisher {
+        publisher.publish(crate::events::AppEvent::DeliveryCreated {
+            delivery_id: delivery.id,
+            endpoint_id: endpoint.id,
+            customer_id: customer.id,
+            event_type: req.event.clone(),
+        }).await.ok();
+    }
+
     // Test mode: mark as delivered immediately, skip real delivery
     if is_test.0 {
         sqlx::query(
@@ -330,6 +341,7 @@ async fn batch_webhooks(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
+    Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Json(req): Json<BatchWebhookRequest>,
 ) -> Result<Json<BatchResponse>, AppError> {
     if req.webhooks.len() > 100 {
@@ -476,6 +488,15 @@ async fn batch_webhooks(
                         error: "Failed to queue delivery".to_string(),
                     });
                 } else {
+                    // Publish DeliveryCreated event (best-effort)
+                    if let Some(ref publisher) = event_publisher {
+                        publisher.publish(crate::events::AppEvent::DeliveryCreated {
+                            delivery_id: delivery.id,
+                            endpoint_id: endpoint.id,
+                            customer_id: customer.id,
+                            event_type: webhook_req.event.clone(),
+                        }).await.ok();
+                    }
                     created_count += 1;
                     deliveries.push(delivery.to_response());
                 }
