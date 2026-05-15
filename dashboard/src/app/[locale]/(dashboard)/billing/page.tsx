@@ -47,7 +47,7 @@ export default function BillingPage() {
         // fallback to defaults
       })
       .finally(() => setLoadingUsage(false));
-  }, [token]);
+  }, [token, locale]);
 
   // Fetch real invoice data
   useEffect(() => {

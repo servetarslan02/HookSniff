@@ -58,7 +58,7 @@ export default function LogsPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, page, filter]);
+  }, [token, page, filter, tc]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
