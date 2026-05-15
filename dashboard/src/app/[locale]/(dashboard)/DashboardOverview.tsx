@@ -352,13 +352,13 @@ export function DashboardOverview() {
             </h4>
             <div className="space-y-2">
               <Link
-                href="/core"
+                href="/endpoints"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 🔗 {t('manageEndpoints')}
               </Link>
               <Link
-                href="/core"
+                href="/deliveries"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 📦 {t('viewDeliveries')}
@@ -402,7 +402,7 @@ export function DashboardOverview() {
             {t('recentDeliveries')}
           </h3>
           <Link
-            href="/core"
+            href="/deliveries"
             className="text-sm text-brand-600 dark:text-brand-400 hover:underline font-medium"
           >
             {t('viewAll')}
