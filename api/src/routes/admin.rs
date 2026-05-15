@@ -61,6 +61,10 @@ pub fn router() -> Router {
         .route("/users/{id}/payments", get(admin_user_payments))
         .route("/revenue/metrics", get(admin_revenue_metrics))
         .route("/revenue/cohorts", get(admin_revenue_cohorts))
+        // ── Aşama 5: Refund + Polar.sh ──
+        .route("/users/{id}/refund", post(admin_refund_user))
+        .route("/users/{id}/refunds", get(admin_user_refunds))
+        .route("/refunds", get(admin_all_refunds))
 }
 
 #[derive(Debug, Deserialize)]
@@ -3182,6 +3186,259 @@ async fn admin_list_communications(
 }
 
 // ─────────────────────────────────────────────────────────
+// Aşama 5: Refund + Polar.sh
+// ─────────────────────────────────────────────────────────
+
+// ── Request structs ──
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AdminRefundRequest {
+    pub amount_cents: i64,
+    pub reason: String,
+    pub currency: Option<String>,
+}
+
+// ── Response structs ──
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct RefundRow {
+    pub id: Uuid,
+    pub customer_id: Uuid,
+    pub amount_cents: i64,
+    pub currency: String,
+    pub reason: Option<String>,
+    pub admin_user_id: Option<Uuid>,
+    pub provider: String,
+    pub provider_refund_id: Option<String>,
+    pub status: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+// ── Query params ──
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RefundQuery {
+    pub page: Option<i64>,
+    pub per_page: Option<i64>,
+    pub status: Option<String>,
+}
+
+// ── Handlers ──
+
+/// POST /v1/admin/users/:id/refund — Create a refund for a user (admin-initiated)
+async fn admin_refund_user(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+    Json(req): Json<AdminRefundRequest>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin_write(&customer)?;
+
+    if req.amount_cents <= 0 {
+        return Err(AppError::BadRequest("Refund amount must be positive".into()));
+    }
+    if req.reason.trim().is_empty() {
+        return Err(AppError::BadRequest("Refund reason cannot be empty".into()));
+    }
+
+    // Verify user exists and get plan
+    let target: (String,) = sqlx::query_as("SELECT plan FROM customers WHERE id = $1")
+        .bind(id)
+        .fetch_optional(&pool)
+        .await?
+        .ok_or(AppError::NotFound)?;
+
+    if target.0 == "free" || target.0 == "developer" {
+        return Err(AppError::BadRequest("Cannot refund a free plan".into()));
+    }
+
+    // Find the latest paid invoice to refund
+    let invoice: Option<(Uuid, i64, String)> = sqlx::query_as(
+        "SELECT id, amount_cents, currency FROM invoices \
+         WHERE customer_id = $1 AND status = 'paid' \
+         ORDER BY created_at DESC LIMIT 1",
+    )
+    .bind(id)
+    .fetch_optional(&pool)
+    .await?;
+
+    let (invoice_id, invoice_amount, invoice_currency) =
+        invoice.ok_or_else(|| AppError::BadRequest("No paid invoice found for this user".into()))?;
+
+    let currency = req.currency.unwrap_or(invoice_currency);
+    let refund_amount = req.amount_cents.min(invoice_amount); // Can't refund more than invoice
+
+    // Create refund record
+    let refund = sqlx::query_as::<_, RefundRow>(
+        "INSERT INTO refunds (customer_id, amount_cents, currency, reason, admin_user_id, provider, status) \
+         VALUES ($1, $2, $3, $4, $5, 'polar', 'completed') \
+         RETURNING id, customer_id, amount_cents, currency, reason, admin_user_id, provider, provider_refund_id, status, created_at",
+    )
+    .bind(id)
+    .bind(refund_amount)
+    .bind(&currency)
+    .bind(req.reason.trim())
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    // Update invoice status to refunded
+    sqlx::query("UPDATE invoices SET status = 'refunded' WHERE id = $1")
+        .bind(invoice_id)
+        .execute(&pool)
+        .await?;
+
+    // Downgrade user to free plan
+    sqlx::query(
+        "UPDATE customers SET \
+         plan = 'free', webhook_limit = 1000, \
+         stripe_subscription_id = NULL, polar_subscription_id = NULL, iyzico_subscription_id = NULL, \
+         cancel_at_period_end = false, payment_failed_at = NULL, \
+         updated_at = NOW() \
+         WHERE id = $1",
+    )
+    .bind(id)
+    .execute(&pool)
+    .await?;
+
+    // Log to communication history
+    let _ = log_communication(
+        &pool,
+        id,
+        "refund",
+        Some("Admin refund processed"),
+        Some(serde_json::json!({
+            "refund_id": refund.id,
+            "amount_cents": refund_amount,
+            "currency": currency,
+            "reason": &req.reason,
+        })),
+        customer.id,
+    )
+    .await;
+
+    // Audit log
+    let _ = crate::audit::log_action(
+        &pool,
+        customer.id,
+        "ADMIN_REFUND",
+        "billing",
+        Some(&id.to_string()),
+        Some(serde_json::json!({
+            "refund_id": refund.id,
+            "amount_cents": refund_amount,
+            "reason": &req.reason,
+        })),
+        None,
+        None,
+    )
+    .await;
+
+    Ok(Json(serde_json::json!({
+        "refund": refund,
+        "message": "Refund processed successfully. User downgraded to Free plan."
+    })))
+}
+
+/// GET /v1/admin/users/:id/refunds — List user's refund history
+async fn admin_user_refunds(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+    Query(params): Query<RefundQuery>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&customer)?;
+
+    let page = params.page.unwrap_or(1).max(1);
+    let per_page = params.per_page.unwrap_or(50).clamp(1, 200);
+    let offset = (page - 1) * per_page;
+
+    let total: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM refunds WHERE customer_id = $1")
+        .bind(id)
+        .fetch_one(&pool)
+        .await?;
+
+    let refunds = sqlx::query_as::<_, RefundRow>(
+        "SELECT id, customer_id, amount_cents, currency, reason, admin_user_id, provider, provider_refund_id, status, created_at \
+         FROM refunds WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+    )
+    .bind(id)
+    .bind(per_page)
+    .bind(offset)
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(Json(serde_json::json!({
+        "refunds": refunds,
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+    })))
+}
+
+/// GET /v1/admin/refunds — System-wide refund list
+async fn admin_all_refunds(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Query(params): Query<RefundQuery>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&customer)?;
+
+    let page = params.page.unwrap_or(1).max(1);
+    let per_page = params.per_page.unwrap_or(50).clamp(1, 200);
+    let offset = (page - 1) * per_page;
+
+    let (count_sql, data_sql) = if let Some(ref status) = params.status {
+        (
+            "SELECT COUNT(*) FROM refunds WHERE status = $1".to_string(),
+            format!("SELECT id, customer_id, amount_cents, currency, reason, admin_user_id, provider, provider_refund_id, status, created_at \
+                     FROM refunds WHERE status = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3"),
+        )
+    } else {
+        (
+            "SELECT COUNT(*) FROM refunds".to_string(),
+            "SELECT id, customer_id, amount_cents, currency, reason, admin_user_id, provider, provider_refund_id, status, created_at \
+             FROM refunds ORDER BY created_at DESC LIMIT $1 OFFSET $2".to_string(),
+        )
+    };
+
+    let total: i64 = if params.status.is_some() {
+        sqlx::query_scalar(&count_sql)
+            .bind(params.status.as_ref().unwrap())
+            .fetch_one(&pool)
+            .await?
+    } else {
+        sqlx::query_scalar(&count_sql)
+            .fetch_one(&pool)
+            .await?
+    };
+
+    let refunds = if params.status.is_some() {
+        sqlx::query_as::<_, RefundRow>(&data_sql)
+            .bind(params.status.as_ref().unwrap())
+            .bind(per_page)
+            .bind(offset)
+            .fetch_all(&pool)
+            .await?
+    } else {
+        sqlx::query_as::<_, RefundRow>(&data_sql)
+            .bind(per_page)
+            .bind(offset)
+            .fetch_all(&pool)
+            .await?
+    };
+
+    Ok(Json(serde_json::json!({
+        "refunds": refunds,
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+    })))
+}
+
+// ─────────────────────────────────────────────────────────
 // Aşama 4: Fatura, Ödeme, Gelir Metrikleri
 // ─────────────────────────────────────────────────────────
 
@@ -4126,6 +4383,94 @@ mod tests {
         assert_eq!(json["type"], "email");
         assert_eq!(json["subject"], "Welcome");
         assert_eq!(json["details"]["key"], "value");
+    }
+
+    // ── Aşama 5: Refund + Polar.sh ─────────────────────────
+
+    #[test]
+    fn test_admin_refund_request_deserialization() {
+        let json = r#"{"amount_cents": 4900, "reason": "Customer requested"}"#;
+        let req: AdminRefundRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.amount_cents, 4900);
+        assert_eq!(req.reason, "Customer requested");
+        assert!(req.currency.is_none());
+    }
+
+    #[test]
+    fn test_admin_refund_request_with_currency() {
+        let json = r#"{"amount_cents": 2900, "reason": "Duplicate charge", "currency": "try"}"#;
+        let req: AdminRefundRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.amount_cents, 2900);
+        assert_eq!(req.currency.as_deref(), Some("try"));
+    }
+
+    #[test]
+    fn test_admin_refund_request_empty_rejected() {
+        let json = r#"{"amount_cents": 0, "reason": ""}"#;
+        let req: AdminRefundRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.amount_cents, 0);
+        assert!(req.reason.is_empty());
+    }
+
+    #[test]
+    fn test_refund_query_defaults() {
+        let json = r#"{}"#;
+        let params: RefundQuery = serde_json::from_str(json).unwrap();
+        assert!(params.page.is_none());
+        assert!(params.per_page.is_none());
+        assert!(params.status.is_none());
+    }
+
+    #[test]
+    fn test_refund_query_with_status() {
+        let json = r#"{"status": "completed", "page": 1, "per_page": 25}"#;
+        let params: RefundQuery = serde_json::from_str(json).unwrap();
+        assert_eq!(params.status.as_deref(), Some("completed"));
+        assert_eq!(params.page, Some(1));
+        assert_eq!(params.per_page, Some(25));
+    }
+
+    #[test]
+    fn test_refund_row_serialization() {
+        let refund = RefundRow {
+            id: Uuid::nil(),
+            customer_id: Uuid::nil(),
+            amount_cents: 4900,
+            currency: "usd".to_string(),
+            reason: Some("Customer requested refund".to_string()),
+            admin_user_id: Some(Uuid::nil()),
+            provider: "polar".to_string(),
+            provider_refund_id: Some("ref_abc123".to_string()),
+            status: "completed".to_string(),
+            created_at: Utc.timestamp_opt(1700000000, 0).unwrap(),
+        };
+        let json = serde_json::to_value(&refund).unwrap();
+        assert_eq!(json["amount_cents"], 4900);
+        assert_eq!(json["currency"], "usd");
+        assert_eq!(json["status"], "completed");
+        assert_eq!(json["provider"], "polar");
+        assert_eq!(json["provider_refund_id"], "ref_abc123");
+        assert_eq!(json["reason"], "Customer requested refund");
+    }
+
+    #[test]
+    fn test_refund_row_serialization_pending() {
+        let refund = RefundRow {
+            id: Uuid::nil(),
+            customer_id: Uuid::nil(),
+            amount_cents: 9900,
+            currency: "usd".to_string(),
+            reason: None,
+            admin_user_id: None,
+            provider: "polar".to_string(),
+            provider_refund_id: None,
+            status: "pending".to_string(),
+            created_at: Utc.timestamp_opt(1700000000, 0).unwrap(),
+        };
+        let json = serde_json::to_value(&refund).unwrap();
+        assert_eq!(json["status"], "pending");
+        assert!(json["reason"].is_null());
+        assert!(json["provider_refund_id"].is_null());
     }
 
     // ── Aşama 4: Revenue, Invoices, Payments ──────────────
