@@ -1388,6 +1388,8 @@
     "activity": "Activity",
     "health": "Health",
     "infrastructure": "Infrastructure",
+    "emailSecurity": "Email & Security",
+    "alertsRetry": "Alerts & Retry",
     "page": "Page",
     "partialDegradation": "Partial Degradation",
     "payload": "Payload",
