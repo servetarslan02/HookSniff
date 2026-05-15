@@ -29,6 +29,12 @@
    - `npm run build` ✅ — dashboard build başarılı
    - Commits: `59980806`, `44ea9acb`
 
+### Grafana + Cache Metrics (Oturum 166) ✅
+- **cache.rs:** Atomic hit/miss counters (`CACHE_HITS`, `CACHE_MISSES`), `cache_hit_rate()` fonksiyonu
+- **metrics.rs:** `cache_hits_total`, `cache_misses_total`, `cache_hit_rate_percent` Prometheus endpoint'inde
+- **Grafana dashboard:** 14 panel — API latency (p50/p95/p99), webhook delivery, DB query, queue latency, cache hit rate gauge, cache hits/misses rate, error rate by type, 5xx rate, request rate by method/status, success rate, active connections/endpoints, delivery by status pie chart
+- **Commit:** `264a804c`
+
 ## 📋 Kalan Performance Roadmap
 
 ### Orta Vade
