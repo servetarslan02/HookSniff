@@ -1362,7 +1362,8 @@
       "settingsNav": "Settings",
       "activityLog": "Activity Log",
       "featureFlags": "Feature Flags",
-      "alerts": "Alerts"
+      "alerts": "Alerts",
+      "email": "Email"
     },
     "noActivity": "No activity recorded yet",
     "noAdminPrivileges": "You don't have admin privileges.",
