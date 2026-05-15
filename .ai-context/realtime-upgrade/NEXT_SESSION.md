@@ -1,61 +1,42 @@
 # Real-Time Upgrade — Sonraki Oturum
 
-> Son güncelleme: 2026-05-16 04:58 GMT+8
+> Son güncelleme: 2026-05-16 05:15 GMT+8
 
-## Sıradaki İş: Faz 1 — React Query + Zod
+## Sıradaki İş: Faz 1 (Devam) — Admin ve Dashboard Sayfaları
 
-### Yapılacaklar
+Faz 1'in altyapısı tamamlandı (hook'lar, provider, schema'lar). Sıradaki iş:
 
-1. **Kurulum**
-   ```bash
-   cd dashboard
-   npm install @tanstack/react-query @tanstack/react-query-devtools zod
-   ```
+### 1. Admin Sayfalarını Güncelle
 
-2. **Zod Schema Tanımları**
-   - `dashboard/src/schemas/api.ts` oluştur
-   - Endpoint, Delivery, AdminStats, WsEvent schema'ları
-   - Tüm API response'ları Zod ile validate et
+- [ ] `admin/users/page.tsx` → `useAdminUsers()`
+- [ ] `admin/users/[id]/page.tsx` → `useAdminUserDetail()`
+- [ ] `admin/revenue/page.tsx` → `useAdminRevenue()`
+- [ ] `admin/system/page.tsx` → monitoring hook'ları
+- [ ] `admin/alerts/page.tsx` → alerts hook'u
+- [ ] `admin/settings/page.tsx` → settings hook'u
+- [ ] `admin/activity/page.tsx` → audit logs hook'u
 
-3. **QueryClient Provider**
-   - `dashboard/src/app/[locale]/layout.tsx` (veya `providers.tsx`)
-   - `QueryClient` oluştur (staleTime: 5dk, gcTime: 10dk, retry: 2, exponential backoff)
-   - `QueryClientProvider` + `ReactQueryDevtools` ekle
+### 2. Dashboard Sayfalarını Güncelle
 
-4. **Hook'ları oluştur**
-   - `dashboard/src/hooks/useAdminData.ts` — admin stats, revenue, audit logs, feature flags, deploy info, users, user detail
-   - `dashboard/src/hooks/useDashboardData.ts` — endpoints, endpoint detail, delivery trend, success rate
-   - Her hook'ta Zod validation var
+- [ ] `(dashboard)/core/page.tsx` → `useEndpoints()`
+- [ ] `(dashboard)/endpoints/[id]/page.tsx` → `useEndpointDetail()`
+- [ ] `(dashboard)/deliveries/page.tsx` → `useWebhooks()`
 
-5. **Admin sayfalarını güncelle**
-   - `admin/page.tsx` — useState+useEffect → useQuery
-   - `admin/users/page.tsx` — useAdminUsers()
-   - `admin/users/[id]/page.tsx` — useAdminUserDetail()
-   - `admin/revenue/page.tsx` — useAdminRevenue()
-   - `admin/system/page.tsx` — monitoring hook'ları
+### 3. Faz 1 Doğrulama
 
-6. **Dashboard sayfalarını güncelle**
-   - `(dashboard)/core/page.tsx` — useEndpoints()
-   - `(dashboard)/endpoints/[id]/page.tsx` — useEndpointDetail()
+- [ ] Dashboard açıldığında loading spinner görünmüyor (cache hit)
+- [ ] Sayfalar arası geçiş <100ms
+- [ ] React Query Devtools çalışıyor (development)
+- [ ] Build başarılı (önceden var olan hatalar hariç)
+- [ ] TypeScript hatası yok (bizim dosyalarda)
 
-7. **Optimistic updates ekle**
-   - useUpdateEndpoint()
-   - useUpdatePlan()
-   - useToggleStatus()
+### 4. Faz 2'ye Geçiş
 
-8. **Doğrulama**
-   - [ ] Dashboard açıldığında loading spinner görünmüyor (cache hit)
-   - [ ] Sayfalar arası geçiş <100ms
-   - [ ] React Query Devtools çalışıyor
-   - [ ] Zod validation çalışıyor (geçersiz veri → hata)
-   - [ ] Build başarılı
-   - [ ] TypeScript hatası yok
+Faz 1 tüm sayfalar tamamlandıktan sonra → Faz 2: Event System (Rust backend)
 
-### Dikkat Edilecekler
+## Dikkat Edilecekler
 
-- Mevcut `useState` + `useEffect` kodunu silmeden önce `useQuery`'yi ekle
 - Her sayfayı tek tek değiştir, hepsini birden değil
-- `loading` state'i yerine `isLoading` kullan
-- `error` state'i yerine `error` kullan
-- Auto-refresh polling'i kaldır (React Query otomatik yapıyor)
-- Zod validation hatalarını Sentry'ye gönder
+- Mevcut `useState` + `useEffect` kodunu silmeden önce `useQuery`'yi ekle
+- Zod v4: `z.record(keySchema, valueSchema)` — iki argüman
+- Önceden var olan hataları düzeltme (billing, team, admin/layout) — ayrı PR
