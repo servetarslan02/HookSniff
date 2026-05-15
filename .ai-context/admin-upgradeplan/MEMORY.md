@@ -52,12 +52,17 @@
 
 | # | Konu | Durum |
 |---|------|-------|
-| 1 | `api_keys` tablosu — inbound.rs'deki sorgu aktif mi? | ⏳ Kontrol edilecek |
-| 2 | Refund provider — Polar.sh API mi, manuel mi? | ⏳ Karar verilecek |
-| 3 | GDPR silme — hard delete mi, soft delete mi? | ⏳ Karar verilecek |
-| 4 | Bulk email — anlık mı, kuyruk mu? | ⏳ Karar verilecek |
-| 5 | Communication log — manuel mi, otomatik mi? | ⏳ Karar verilecek |
-| 6 | Cohort analizi — tam mı, basit mi? | ⏳ Karar verilecek |
+| 1 | Refund provider — Polar.sh API mi, manuel mi? | ⏳ Karar verilecek |
+| 2 | GDPR silme — hard delete mi, soft delete mi? | ⏳ Karar verilecek |
+| 3 | Bulk email — anlık mı, kuyruk mu? | ⏳ Karar verilecek |
+| 4 | Communication log — manuel mi, otomatik mi? | ⏳ Karar verilecek |
+| 5 | Cohort analizi — tam mı, basit mi? | ⏳ Karar verilecek |
+
+## Karar Verilen Noktalar
+
+| # | Konu | Karar | Tarih |
+|---|------|-------|-------|
+| 1 | `api_keys` tablosu | Zaten production'da mevcut, migration eksik. Admin panelinde API key yönetimi gereksiz — müşteri kendi key'ini yönetiyor. | 2026-05-15 |
 
 ---
 
