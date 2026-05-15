@@ -1562,7 +1562,8 @@
       "dashboard": "Panel →",
       "getStarted": "Başlayın",
       "login": "Giriş Yap",
-      "register": "Kayıt Ol"
+      "register": "Kayıt Ol",
+      "playground": "Playground"
     },
     "hero": {
       "uptime": "%99.99 teslimat uptime",
