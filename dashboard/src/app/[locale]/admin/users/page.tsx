@@ -69,7 +69,7 @@ export default function AdminUsersPage() {
   const updatePlanMutation = useUpdateUserPlan();
   const updateStatusMutation = useUpdateUserStatus();
 
-  const users = data?.users ?? [];
+  const users = useMemo(() => data?.users ?? [], [data?.users]);
   const total = data?.total ?? 0;
 
   const handleSort = (field: typeof sortField) => {

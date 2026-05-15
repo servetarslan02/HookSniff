@@ -56,7 +56,7 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, timeRange]);
+  }, [token, timeRange, tc, toast]);
 
   useEffect(() => {
     loadData();

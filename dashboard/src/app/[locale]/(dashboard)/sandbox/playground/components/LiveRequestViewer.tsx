@@ -32,7 +32,7 @@ export function LiveRequestViewer() {
     };
     poll();
     intervalRef.current = setInterval(poll, 3000);
-  }, []);
+  }, [locale]);
 
   const stopLive = useCallback(() => {
     setIsLive(false);

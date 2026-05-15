@@ -28,7 +28,7 @@ export default function TemplatesPage() {
         setError(err instanceof Error ? err.message : tCommon('unknownError'));
       })
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, tCommon]);
 
   // Translate template name, description, and tags using template ID
   const getTemplateName = (tpl: Template) => {
