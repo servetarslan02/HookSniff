@@ -19,6 +19,9 @@ pub struct Metrics {
     // ── Infrastructure metrics ──
     pub queue_publish_latency_seconds: Histogram,
     pub db_query_duration_seconds: Histogram,
+    // ── Cache metrics ──
+    pub cache_hits_total: IntCounterVec,
+    pub cache_misses_total: IntCounterVec,
 }
 
 impl Default for Metrics {
@@ -115,6 +118,19 @@ impl Metrics {
         )
         .expect("valid metric definition");
 
+        // ── Cache metrics ──
+        let cache_hits_total = IntCounterVec::new(
+            Opts::new("cache_hits_total", "Cache hits by resource type"),
+            &["resource"],
+        )
+        .expect("valid metric definition");
+
+        let cache_misses_total = IntCounterVec::new(
+            Opts::new("cache_misses_total", "Cache misses by resource type"),
+            &["resource"],
+        )
+        .expect("valid metric definition");
+
         registry
             .register(Box::new(http_requests_total.clone()))
             .expect("valid metric definition");
@@ -145,6 +161,12 @@ impl Metrics {
         registry
             .register(Box::new(db_query_duration_seconds.clone()))
             .expect("valid metric definition");
+        registry
+            .register(Box::new(cache_hits_total.clone()))
+            .expect("valid metric definition");
+        registry
+            .register(Box::new(cache_misses_total.clone()))
+            .expect("valid metric definition");
 
         Self {
             registry,
@@ -158,6 +180,8 @@ impl Metrics {
             active_endpoints,
             queue_publish_latency_seconds,
             db_query_duration_seconds,
+            cache_hits_total,
+            cache_misses_total,
         }
     }
 
@@ -168,7 +192,22 @@ impl Metrics {
         encoder
             .encode(&metric_families, &mut buffer)
             .expect("valid metric definition");
-        String::from_utf8(buffer).expect("prometheus output is valid UTF-8")
+        let mut output = String::from_utf8(buffer).expect("prometheus output is valid UTF-8");
+
+        // Append cache statistics from the cache module (atomic counters)
+        let (cache_hits, cache_misses) = crate::cache::cache_stats();
+        let cache_hit_rate = crate::cache::cache_hit_rate();
+        output.push_str("# HELP cache_hits_total Total cache hits\n");
+        output.push_str("# TYPE cache_hits_total counter\n");
+        output.push_str(&format!("cache_hits_total {{resource=\"all\"}} {cache_hits}\n"));
+        output.push_str("# HELP cache_misses_total Total cache misses\n");
+        output.push_str("# TYPE cache_misses_total counter\n");
+        output.push_str(&format!("cache_misses_total {{resource=\"all\"}} {cache_misses}\n"));
+        output.push_str("# HELP cache_hit_rate_percent Cache hit rate percentage\n");
+        output.push_str("# TYPE cache_hit_rate_percent gauge\n");
+        output.push_str(&format!("cache_hit_rate_percent {cache_hit_rate:.2}\n"));
+
+        output
     }
 }
 

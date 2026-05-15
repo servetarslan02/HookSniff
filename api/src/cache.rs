@@ -1,6 +1,32 @@
 use redis::aio::ConnectionManager;
 use serde::{de::DeserializeOwned, Serialize};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
+
+// ──────────────────────────────────────────────────────────────
+// Cache statistics — lightweight atomic counters
+// ──────────────────────────────────────────────────────────────
+
+static CACHE_HITS: AtomicU64 = AtomicU64::new(0);
+static CACHE_MISSES: AtomicU64 = AtomicU64::new(0);
+
+/// Get cache hit/miss statistics. Returns (hits, misses).
+pub fn cache_stats() -> (u64, u64) {
+    (
+        CACHE_HITS.load(Ordering::Relaxed),
+        CACHE_MISSES.load(Ordering::Relaxed),
+    )
+}
+
+/// Cache hit rate as a percentage (0.0 - 100.0).
+pub fn cache_hit_rate() -> f64 {
+    let (hits, misses) = cache_stats();
+    let total = hits + misses;
+    if total == 0 {
+        return 0.0;
+    }
+    (hits as f64 / total as f64) * 100.0
+}
 
 // ──────────────────────────────────────────────────────────────
 // Cache key format: hooksniff:{resource}:{id}
@@ -58,13 +84,23 @@ impl CacheLayer {
             .await
             .unwrap_or(None);
 
-        result.and_then(|s| match serde_json::from_str::<T>(&s) {
-            Ok(val) => Some(val),
-            Err(e) => {
-                tracing::warn!("Cache deserialization failed for key {key}: {e}");
+        match result {
+            Some(s) => match serde_json::from_str::<T>(&s) {
+                Ok(val) => {
+                    CACHE_HITS.fetch_add(1, Ordering::Relaxed);
+                    Some(val)
+                }
+                Err(e) => {
+                    CACHE_MISSES.fetch_add(1, Ordering::Relaxed);
+                    tracing::warn!("Cache deserialization failed for key {key}: {e}");
+                    None
+                }
+            },
+            None => {
+                CACHE_MISSES.fetch_add(1, Ordering::Relaxed);
                 None
             }
-        })
+        }
     }
 
     /// Set a cached value with the default TTL.
