@@ -4,6 +4,35 @@
 
 ---
 
+## ⚠️ Uygulama Kuralları (ZORUNLU)
+
+1. **Sıralı ilerleme** — Aşamalar sırayla gidecek. Bir bitmeden diğerine geçilmez.
+2. **Her aşamadan sonra `cargo test`** — Rust testleri geçmeden aşama bitmiş sayılmaz.
+3. **Her aşamadan sonra `next build`** — Frontend build'i geçmeden aşama bitmiş sayılmaz.
+4. **Her aşamadan sonra checklist güncelle** — Biten maddeler `[x]` ile işaretlenir.
+5. **Her aşamadan sonra MEMORY.md güncelle** — Ne yapıldı, ne öğrenildi, sorunlar.
+6. **Her aşamadan sonra NEXT_SESSION.md güncelle** — Sıradaki işler netleşir.
+7. **Push zorunlu** — Her aşamanın sonunda `git commit` + `git push` yapılır.
+8. **Aşama tamamlandıysa `✅ TAMAMLANDI` yazılır** — Tarih ve not ile.
+
+Bunlar atlanamaz. Her aşama tek bir oturumda bitmeli ama bitmezse NEXT_SESSION.md'ye "yarıda kaldı" yazılır.
+
+### Aşama Tamamlama Akışı
+```
+Aşama başla
+  → Kod yaz (backend + frontend)
+  → cargo test (geçmeli)
+  → next build (geçmeli)
+  → Checklist güncelle [x]
+  → MEMORY.md güncelle
+  → NEXT_SESSION.md güncelle
+  → git commit + push
+  → Aşama ✅ TAMAMLANDI
+  → Sonraki aşamaya geç
+```
+
+---
+
 ## ✅ Tamamlanan İşler
 
 ### Plan Hazırlığı (2026-05-15)
