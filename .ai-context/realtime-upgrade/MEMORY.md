@@ -1,6 +1,6 @@
 # Real-Time Upgrade — Hafıza
 
-> Son güncelleme: 2026-05-16 04:58 GMT+8
+> Son güncelleme: 2026-05-16 05:04 GMT+8
 
 ## Proje Nedir?
 
@@ -16,7 +16,7 @@ HookSniff dashboard'unu polling tabanlı sistemden event-driven real-time sistem
 ## Hedef Durum
 
 - **Frontend:** React Query (cache) + WebSocket (anlık veri) + Zod validation
-- **Backend:** Event system + Redis Pub/Sub + WebSocket endpoint + Connection Manager
+- **Backend:** Event system + Redis Pub/Sub + WebSocket endpoint + Connection Manager + Origin validation
 - **Real-time:** <100ms güncelleme + fallback polling + graceful shutdown
 - **Deploy:** Aynı (değişiklik yok)
 
@@ -32,13 +32,13 @@ HookSniff dashboard'unu polling tabanlı sistemden event-driven real-time sistem
 | Zod | Schema validation | $0 (açık kaynak) |
 | Prometheus | WS metrics | $0 (açık kaynak) |
 
-## Faz Durumları (v2)
+## Faz Durumları (v2.1)
 
 | Faz | Durum | Not |
 |-----|-------|-----|
 | Faz 1: React Query + Zod | ⬜ Başlamadı | |
 | Faz 2: Event System + Envelope | ⬜ Başlamadı | |
-| Faz 3: WebSocket + Connection Manager + Graceful Shutdown | ⬜ Başlamadı | |
+| Faz 3: WebSocket + Connection Manager + Origin Validation + Graceful Shutdown | ⬜ Başlamadı | |
 | Faz 4: Entegrasyon + Fallback Polling | ⬜ Başlamadı | |
 | Faz 5: Optimizasyon + Bundle Analysis | ⬜ Başlamadı | |
 | Faz 6: Güvenlik & Dayanıklılık (Token refresh, Metrics, Stress test) | ⬜ Başlamadı | |
@@ -55,3 +55,5 @@ HookSniff dashboard'unu polling tabanlı sistemden event-driven real-time sistem
 - Graceful shutdown: SIGTERM → client'a server_shutdown mesajı
 - Fallback: WS max reconnect (10) → 30 sn polling
 - Token refresh: WS reconnect tetikler
+- **Origin validation:** Sadece dashboard.hooksniff.com ve localhost:3000
+- **Deploy sırası:** Backend önce, sonra frontend (zero-downtime)
