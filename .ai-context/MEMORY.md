@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-16 04:05 GMT+8
+> Son güncelleme: 2026-05-16 04:17 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -319,6 +319,24 @@ HookSniff/
 2. **GitHub Actions** — Hala başarısız (billing issue, faturalandırma güncellenmeli)
 3. **GCP Console** — Servet'in Google hesabı ile giriş yapıldı (2FA onayı ile)
 4. **API Sağlığı** — Çalışıyor (healthy, DB 27ms, Redis configured)
+
+### Oturum 177 — 2026-05-16 04:17 GMT+8
+1. **Kullanılmayan API Fonksiyonları Analizi** ✅
+   - 44 kullanılmayan fonksiyon tespit edildi (admin-specific: sadece 1)
+   - 9 API object'in kullanılmayan methodları listelendi
+   - Gerçek eksikler: adminUserTestWebhook (buton yok), getUnreadCount (badge yok)
+2. **Test Webhook Butonu — User Detail Sayfası** ✅
+   - Header'a 🪝 "Test Webhook" butonu eklendi
+   - Modal: endpoint URL, event type, payload (JSON)
+   - Kullanıcının ilk aktif endpoint'i otomatik doldurulur
+   - Sonuç gösterimi: HTTP status, response body, duration
+3. **Notification Badge — Admin Layout** ✅
+   - 🔔 icon'a unread count badge eklendi (kırmızı, 99+ sınırı)
+   - notificationsApi.getUnreadCount ile gerçek zamanlı sayı
+4. **Type Mismatch Düzeltmesi** ✅
+   - Backend `{ unread_count }` döndürüyor, frontend `{ count }` bekliyordu
+   - api.ts tipi düzeltildi
+5. **Commit:** 46126b17 — push edildi
 
 ### Oturum 176 — 2026-05-16 04:05 GMT+8
 1. **Admin Panel Genel Bakış Sayfası İnceleme** ✅
