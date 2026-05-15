@@ -72,7 +72,7 @@ export default function PublicPlaygroundPage() {
       setError(tc('networkError'));
       setState('error');
     }
-  }, []);
+  }, [tc]);
 
   const pollHistory = useCallback(async () => {
     if (!token) return;
