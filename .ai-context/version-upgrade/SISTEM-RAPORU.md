@@ -154,6 +154,9 @@ Node 20 Nisan 2026'da EOL oluyor.
 | Redis auth (Helm) | ⚠️ Kapalı — açılmalı |
 | trivy-action pin | ⚠️ `@master` → versiyon pin gerekli |
 | cargo audit ignore | ⚠️ 8 güvenlik açığı ignore edilmiş |
+| SQL format! + user input | ⚠️ webhooks.rs:65 team_id doğrudan SQL'e giriyor |
+| dangerouslySetInnerHTML | ⚠️ 4 yerde kullanılıyor (sanitize var ama kontrol gerekli) |
+| Rust mega dosyalar | ⚠️ admin.rs 5130 satır, 10 dosya 1000+ satır |
 
 ### Ignore Edilen Güvenlik Açıkları (.cargo/audit.toml)
 
