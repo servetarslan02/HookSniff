@@ -33,5 +33,8 @@ CREATE INDEX IF NOT EXISTS idx_notifications_customer_read ON notifications(cust
 -- 7. webhook_queue(status, next_retry_at) — already exists but verify
 --    idx_webhook_queue_status covers this.
 
--- 8. invoices(customer_id) — already exists (idx_invoices_customer)
---    idx_invoices_customer_created also exists.
+-- 8. invoices(status) — admin queries use WHERE status = 'paid' without customer_id
+CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
+
+-- 9. invoices(status, paid_at) — admin queries filter by status + date range
+CREATE INDEX IF NOT EXISTS idx_invoices_status_paid ON invoices(status, paid_at);
