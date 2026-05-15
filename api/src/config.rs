@@ -1,6 +1,45 @@
 use anyhow::{Context, Result};
 use std::fmt;
 
+/// Resolve Redis URL from environment variables.
+///
+/// Priority:
+/// 1. `REDIS_URL` — explicit connection string (e.g. `rediss://default:password@host:port`)
+/// 2. Construct from `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`
+///    Upstash REST URL format: `https://host.upstash.io`
+///    → TCP URL: `rediss://default:<token>@host:6379`
+///
+/// Returns `None` if neither is available.
+pub fn resolve_redis_url() -> Option<String> {
+    // 1. Explicit REDIS_URL takes priority
+    if let Ok(url) = std::env::var("REDIS_URL") {
+        if !url.is_empty() {
+            return Some(url);
+        }
+    }
+
+    // 2. Construct from Upstash env vars
+    let rest_url = std::env::var("UPSTASH_REDIS_REST_URL").ok()?;
+    let token = std::env::var("UPSTASH_REDIS_REST_TOKEN").ok()?;
+
+    if rest_url.is_empty() || token.is_empty() {
+        return None;
+    }
+
+    // Parse host from REST URL: https://<host>.upstash.io → <host>.upstash.io
+    let host = rest_url
+        .trim_start_matches("https://")
+        .trim_start_matches("http://")
+        .trim_end_matches('/');
+
+    let redis_url = format!("rediss://default:{}@{}:6379", token, host);
+    tracing::info!(
+        "🔧 Redis URL constructed from UPSTASH_REDIS_REST_URL (host: {})",
+        host
+    );
+    Some(redis_url)
+}
+
 #[derive(Clone)]
 pub struct Config {
     pub port: u16,
