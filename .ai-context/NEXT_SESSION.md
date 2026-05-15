@@ -1,47 +1,59 @@
-# NEXT_SESSION.md — Performance Work Devam
+# NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-15 07:35 GMT+8
+> Son güncelleme: 2026-05-15 13:50 GMT+8 (Oturum 164)
 
-## Yapılan (Bu Oturum — Oturum 163)
+## ✅ Tamamlanan (Bu Oturum)
 
-### ✅ #4 Structured JSON Logging — zaten implemente edilmiş
-- `api/src/telemetry.rs`: `APP_ENV=production` veya `LOG_FORMAT=json` ile otomatik JSON
-- `init_plain()` ve `init_otel()` fonksiyonlarında `use_json` branch'i mevcut
-- PERFORMANCE-ROADMAP güncellendi
+### NAV-RESTRUCTURE-PLAN — ZATEN UYGULANMIŞ ✅
+- Sidebar: 8 section (Core, Content, Monitoring, Account + DevTools, Security, Routing, Observability)
+- /core: Dashboard + Endpoints + Applications + API Keys (4 tab)
+- /deliveries: Logs + Deliveries + Search (3 tab) — yeni sayfa oluşturulmuş
+- /observability: Health + Alerts + Analytics (3 tab — Logs çıkarılmış)
+- /account: Team + Notifications + Billing + Settings + Portal (5 tab) — yeni sayfa oluşturulmuş
+- middleware.ts: 35+ eski URL redirect
+- Build: ✅ 216 sayfa, hatasız
 
-### ✅ CDN Cache Headers + ETag + CORS
-- **Cache-Control per endpoint category:**
-  - Health/metrics/status: `public, max-age=10, stale-while-revalidate=5`
-  - Docs: `public, max-age=3600, stale-while-revalidate=60`
-  - Auth: `no-store, no-cache, must-revalidate` + `pragma: no-cache`
-  - API: `private, no-cache, must-revalidate`
-- **ETag support:** SHA-256 weak ETag for GET requests (health, docs, outbound-ips)
-- **CORS expose headers:** X-Trace-Id, X-Request-Id, ETag — browser artık bu header'ları okuyabilir
-- **Vary header:** `Accept-Encoding, Authorization` eklendi
-- **Dosyalar:** `api/src/middleware/mod.rs`, `api/src/main.rs`
+### Performance Roadmap — Kısa Vade TAMAM ✅
+- Structured JSON Logging — zaten implemente edilmiş
+- CDN Cache Headers + ETag + CORS — implemente edilmiş
+- Request Timeout Middleware — implemente edilmiş
+- Request Metrics Middleware — implemente edilmiş
 
-### Commits (Bu Oturum)
-- `46cc2f65` — fix: ETag middleware borrow checker fix — cargo test 1065 passed, clippy 0 errors
-- `09afe8db` (rebased) — feat: request timeout middleware + security/cache headers tests
-- `127c2bde` — feat: request metrics middleware — latency tracking + slow request logging
-- `pending` — feat: request metrics middleware tests + dashboard build verified
+## 📋 Kalan İşler (Orta Vade)
 
-## Kalan Performance Roadmap
+| # | Görev | Durum | Not |
+|---|-------|-------|-----|
+| 1 | Background Job Queue (Redis) | ❌ | Upstash Redis zaten bağlı, queue implementasyonu gerekli |
+| 2 | Read Replica (Neon) | ❌ | Neon free tier'da read replica desteklenmiyor |
+| 3 | Cloud CDN headers | ❌ | Cloudflare/Cloud Run seviyesinde yapılabilir |
+| 4 | WebSocket live updates | ❌ | Büyük iş, öncelik düşük |
+| 5 | Edge Workers (Cloudflare) | ❌ | Büyük iş, öncelik düşük |
+| 6 | Event Sourcing | ❌ | Büyük iş, öncelik düşük |
+| 7 | Multi-Region DB | ❌ | Büyük iş, maliyetli |
 
-### Kısa Vade
-- [ ] Structured JSON Logging — ✅ DONE (zaten implemente edilmiş)
-- [ ] CDN Cache Headers — ✅ DONE (Cache-Control + ETag + CORS expose)
+## 📋 Servet'in Yapması Gereken
 
-### Orta Vade
-- [ ] Background Job Queue (Redis)
-- [ ] Read Replica (Neon)
-- [ ] Cloud CDN headers (Cloudflare/Cloud Run seviyesinde)
+| Görev | Durum | Not |
+|-------|-------|-----|
+| iyzico hesap aç | ❌ | Vergi levhası + banka hesabı gerekli |
+| Domain kararı | ❌ | hooksniff.vercel.app yeterli şimdilik |
+| GitHub PAT yenile | ⚠️ | Token sohbette paylaşıldı, iptal et! |
+| Stripe payout + identity verification | ❌ | Polar.sh için gerekli |
 
-### Büyük İş
-- [ ] WebSocket live updates
-- [ ] Edge Workers (Cloudflare)
-- [ ] Event Sourcing
-- [ ] Multi-Region DB
+## 🎯 Önerilen Sonraki Adımlar
+
+### Öncelik 1: Background Job Queue
+- Upstash Redis zaten yapılandırılmış
+- Webhook delivery kuyruğu Redis'e taşınabilir
+- Retry logic zaten var, queue ile daha güvenilir olur
+
+### Öncelik 2: SDK Publish
+- npm, PyPI, crates.io'ya publish
+- Terraform Registry submit
+
+### Öncelik 3: Monitoring Alert Rules
+- Grafana Cloud alert rules kur
+- Başarısız delivery threshold uyarıları
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
