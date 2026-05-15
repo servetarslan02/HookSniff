@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-16 03:59 GMT+8
+> Son güncelleme: 2026-05-16 04:05 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -319,6 +319,33 @@ HookSniff/
 2. **GitHub Actions** — Hala başarısız (billing issue, faturalandırma güncellenmeli)
 3. **GCP Console** — Servet'in Google hesabı ile giriş yapıldı (2FA onayı ile)
 4. **API Sağlığı** — Çalışıyor (healthy, DB 27ms, Redis configured)
+
+### Oturum 176 — 2026-05-16 04:05 GMT+8
+1. **Admin Panel Genel Bakış Sayfası İnceleme** ✅
+   - Backend (admin.rs) + Frontend (admin/page.tsx, revenue/page.tsx, api.ts) tarandı
+   - 10 bulgu tespit edildi (4 hata, 4 göstermelik/eksik, 2 dikkat)
+2. **Alert Listesi Düzeltmesi** ✅
+   - `list_all_alerts`: `WHERE ar.customer_id = $1` kaldırıldı → tüm platform alert'leri
+   - `require_admin()` eklendi (tutarlılık)
+3. **Trend Göstergesi Düzeltmesi** ✅
+   - Mutlak sayı (`Math.abs(diff)`) yerine gerçek yüzde hesabı (`diff/prev * 100`)
+4. **Para Birimi Düzeltmesi** ✅
+   - `currencySymbol`: ₺ → $ (backend USD veriyor)
+   - Revenue sayfasındaki 7 hardcoded ₺ sembolü → $
+5. **RevenueResponse Tipi** ✅
+   - `collected_revenue` frontend tipine eklendi
+   - Revenue sayfasında "Collected Revenue" kartı eklendi
+6. **Security Warnings** ✅
+   - Hardcoded "uyarı yok" yerine dinamik veri (rate limit, failed deliveries, signup)
+7. **Feature Flags Boş Durum** ✅
+   - "Henüz yapılandırılmamış" mesajı + "Create flag" linki
+8. **Deploy Info Fallback** ✅
+   - git_commit/build_time yoksa "N/A" gösteriyor
+9. **formatUptime** ✅
+   - "s" → "sa" (saat/saniye karışıklığı önlendi)
+10. **Auto-refresh** ✅
+    - 30s → 60s (DB yükü azaltıldı)
+11. **Commit:** 3e4f1f5d — push edildi
 
 ### Oturum 175 — 2026-05-16 03:45 GMT+8
 1. **Dashboard i18n — Hardcoded String Temizliği** ✅
