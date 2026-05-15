@@ -1,9 +1,10 @@
-# 🚀 HookSniff Real-Time Architecture Upgrade Plan
+# 🚀 HookSniff Real-Time Architecture Upgrade Plan — v2 (Kusursuz)
 
 > **Hedef:** Polling tabanlı sistemi event-driven real-time sisteme çevir.
-> **Tahmini süre:** 13-19 saat (4-5 oturum)
+> **Tahmini süre:** 16-22 saat (5-6 oturum)
 > **Başlangıç tarihi:** 2026-05-16
 > **Maliyet:** $0 (mevcut free tier yeterli)
+> **Versiyon:** v2 — Tüm eksikler giderildi
 
 ---
 
@@ -17,8 +18,9 @@
 6. [Faz 3: WebSocket](#faz-3-websocket---real-time-bağlantı)
 7. [Faz 4: Entegrasyon](#faz-4-entegrasyon---her-şeyi-bağla)
 8. [Faz 5: Optimizasyon](#faz-5-optimizasyon---son-dokunuşlar)
-9. [Test Planı](#test-planı)
-10. [Rollback Planı](#rollback-planı)
+9. [Faz 6: Güvenlik & Dayanıklılık](#faz-6-güvenlik--dayanıklılık)
+10. [Test Planı](#test-planı)
+11. [Rollback Planı](#rollback-planı)
 
 ---
 
@@ -27,9 +29,10 @@
 ```
 FAZ 1: React Query          [⬜] → Cache + refetch + optimistic (2-3 saat)
 FAZ 2: Event System         [⬜] → Rust'ta event üretimi + Redis Pub/Sub (3-4 saat)
-FAZ 3: WebSocket            [⬜] → WS endpoint + connection manager (2-3 saat)
+FAZ 3: WebSocket            [⬜] → WS endpoint + connection manager (3-4 saat)
 FAZ 4: Entegrasyon          [⬜] → Frontend WS hook + React Query invalidate (2-3 saat)
 FAZ 5: Optimizasyon         [⬜] → Virtual lists, Sentry, route cache (2-3 saat)
+FAZ 6: Güvenlik & Dayanıklılık [⬜] → Auth, limit, fallback, validation (2-3 saat)
 ```
 
 ---
@@ -58,8 +61,8 @@ Dashboard (Next.js) → useEffect → API çağrısı → State → Render
 Dashboard (Next.js) → React Query (cache) ← WebSocket (anlık veri)
                        ↑                        ↑
                    0ms cache hit           Sunucu推送 (<100ms)
-                   Background refetch      Delta sync
-                   Offline desteği         Otomatik reconnect
+                   Background refetch      Delta sync + sequence ordering
+                   Offline desteği         Otomatik reconnect + fallback polling
 ```
 
 **Kazanımlar:**
@@ -79,12 +82,13 @@ Dashboard (Next.js) → React Query (cache) ← WebSocket (anlık veri)
 
 ```bash
 cd dashboard
-npm install @tanstack/react-query @tanstack/react-query-devtools
+npm install @tanstack/react-query @tanstack/react-query-devtools zod
 ```
 
 **Dosya:** `dashboard/package.json`
 - [ ] `@tanstack/react-query` eklendi
 - [ ] `@tanstack/react-query-devtools` eklendi (development)
+- [ ] `zod` eklendi (schema validation için)
 
 ### 1.2 QueryClient Provider
 
@@ -102,6 +106,7 @@ const queryClient = new QueryClient({
       gcTime: 10 * 60 * 1000,         // 10 dk garbage collection
       refetchOnWindowFocus: true,      // Pencere odaklanınca tazele
       retry: 2,                        // Hata olursa 2 kez dene
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   },
 });
@@ -122,8 +127,61 @@ export function Providers({ children }: { children: React.ReactNode }) {
 - [ ] Default stale time: 5 dakika
 - [ ] Default gc time: 10 dakika
 - [ ] `refetchOnWindowFocus: true`
+- [ ] Exponential backoff retry
 
-### 1.3 API Hook'ları Oluştur
+### 1.3 API Schema Validation (Zod)
+
+**Dosya:** `dashboard/src/schemas/api.ts` (YENİ)
+
+```tsx
+import { z } from 'zod';
+
+// ── Endpoint Schema ──
+export const EndpointSchema = z.object({
+  id: z.string().uuid(),
+  url: z.string().url(),
+  is_active: z.boolean(),
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime(),
+});
+export type Endpoint = z.infer<typeof EndpointSchema>;
+
+// ── Delivery Schema ──
+export const DeliverySchema = z.object({
+  id: z.string().uuid(),
+  endpoint_id: z.string().uuid(),
+  status: z.enum(['pending', 'processing', 'delivered', 'failed']),
+  event_type: z.string().nullable(),
+  created_at: z.string().datetime(),
+});
+export type Delivery = z.infer<typeof DeliverySchema>;
+
+// ── Admin Stats Schema ──
+export const AdminStatsSchema = z.object({
+  total_users: z.number().int().nonnegative(),
+  total_endpoints: z.number().int().nonnegative(),
+  total_deliveries: z.number().int().nonnegative(),
+  success_rate: z.number().min(0).max(100),
+});
+export type AdminStats = z.infer<typeof AdminStatsSchema>;
+
+// ── WS Event Schema ──
+export const WsEventSchema = z.object({
+  type: z.string(),
+  seq: z.number().int().optional(),  // sequence number for ordering
+  ts: z.number().int(),              // unix timestamp ms
+  data: z.record(z.unknown()),
+});
+export type WsEvent = z.infer<typeof WsEventSchema>;
+```
+
+- [ ] `EndpointSchema` tanımlandı
+- [ ] `DeliverySchema` tanımlandı
+- [ ] `AdminStatsSchema` tanımlandı
+- [ ] `WsEventSchema` tanımlandı (sequence + timestamp)
+- [ ] Tüm API response'ları Zod ile validate ediliyor
+
+### 1.4 API Hook'ları Oluştur
 
 **Dosya:** `dashboard/src/hooks/useAdminData.ts` (YENİ)
 
@@ -131,15 +189,24 @@ export function Providers({ children }: { children: React.ReactNode }) {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/lib/api';
 import { useAuth } from '@/lib/store';
+import { AdminStatsSchema, type AdminStats } from '@/schemas/api';
+
+// ── Schema-validated fetcher ──
+function validatedFetch<T>(fetcher: () => Promise<unknown>, schema: z.ZodType<T>) {
+  return async (): Promise<T> => {
+    const data = await fetcher();
+    return schema.parse(data); // Runtime validation
+  };
+}
 
 // ── Admin Stats ──
 export function useAdminStats() {
   const { token } = useAuth();
-  return useQuery({
+  return useQuery<AdminStats>({
     queryKey: ['admin', 'stats'],
-    queryFn: () => adminApi.getStats(token!),
+    queryFn: validatedFetch(() => adminApi.getStats(token!), AdminStatsSchema),
     enabled: !!token,
-    staleTime: 30_000, // 30 sn (admin verisi daha sık güncellenir)
+    staleTime: 30_000,
   });
 }
 
@@ -208,7 +275,7 @@ export function useAdminUserDetail(id: string) {
 
 ```tsx
 import { useQuery } from '@tanstack/react-query';
-import { endpointsApi, webhooksApi, analyticsApi } from '@/lib/api';
+import { endpointsApi, analyticsApi } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 
 export function useEndpoints() {
@@ -250,7 +317,7 @@ export function useSuccessRate(range = '24h') {
 }
 ```
 
-- [ ] `useAdminStats()` hook'u oluşturuldu
+- [ ] `useAdminStats()` hook'u oluşturuldu (Zod validated)
 - [ ] `useAdminRevenue()` hook'u oluşturuldu
 - [ ] `useAdminAuditLogs()` hook'u oluşturuldu
 - [ ] `useAdminFeatureFlags()` hook'u oluşturuldu
@@ -262,57 +329,27 @@ export function useSuccessRate(range = '24h') {
 - [ ] `useDeliveryTrend()` hook'u oluşturuldu
 - [ ] `useSuccessRate()` hook'u oluşturuldu
 
-### 1.4 Admin Overview Sayfasını Güncelle
+### 1.5 Admin Sayfalarını Güncelle
 
-**Dosya:** `dashboard/src/app/[locale]/admin/page.tsx`
-
-```tsx
-// ESKİ:
-const [stats, setStats] = useState(null);
-const [loading, setLoading] = useState(true);
-useEffect(() => { fetchStats(); }, [fetchStats]);
-
-// YENİ:
-const { data: stats, isLoading } = useAdminStats();
-const { data: revenue } = useAdminRevenue();
-const { data: auditLogs } = useAdminAuditLogs(5);
-const { data: featureFlags } = useAdminFeatureFlags();
-const { data: deployInfo } = useAdminDeployInfo();
-```
-
-- [ ] `useState` + `useEffect` → `useQuery` dönüşümü (stats)
-- [ ] `useState` + `useEffect` → `useQuery` dönüşümü (revenue)
-- [ ] `useState` + `useEffect` → `useQuery` dönüşümü (audit logs)
-- [ ] `useState` + `useEffect` → `useQuery` dönüşümü (feature flags)
-- [ ] `useState` + `useEffect` → `useQuery` dönüşümü (deploy info)
-- [ ] Loading state: `isLoading` kullan
-- [ ] Error state: `error` kullan
-- [ ] Manual refetch: `refetch()` kullan
-- [ ] Auto-refresh polling kaldırıldı (React Query otomatik yapıyor)
-
-### 1.5 Diğer Admin Sayfalarını Güncelle
-
-- [ ] `admin/users/page.tsx` → `useAdminUsers()`
-- [ ] `admin/users/[id]/page.tsx` → `useAdminUserDetail()`
-- [ ] `admin/revenue/page.tsx` → `useAdminRevenue()`
-- [ ] `admin/system/page.tsx` → monitoring hook'ları
-- [ ] `admin/alerts/page.tsx` → alerts hook'u
-- [ ] `admin/settings/page.tsx` → settings hook'u
-- [ ] `admin/activity/page.tsx` → audit logs hook'u
+- [ ] `admin/page.tsx` — useState+useEffect → useQuery (stats, revenue, audit logs, feature flags, deploy info)
+- [ ] `admin/users/page.tsx` — useAdminUsers()
+- [ ] `admin/users/[id]/page.tsx` — useAdminUserDetail()
+- [ ] `admin/revenue/page.tsx` — useAdminRevenue()
+- [ ] `admin/system/page.tsx` — monitoring hook'ları
+- [ ] `admin/alerts/page.tsx` — alerts hook'u
+- [ ] `admin/settings/page.tsx` — settings hook'u
+- [ ] `admin/activity/page.tsx` — audit logs hook'u
 
 ### 1.6 Dashboard Sayfalarını Güncelle
 
-- [ ] `(dashboard)/core/page.tsx` → `useEndpoints()`
-- [ ] `(dashboard)/endpoints/[id]/page.tsx` → `useEndpointDetail()`
+- [ ] `(dashboard)/core/page.tsx` → useEndpoints()
+- [ ] `(dashboard)/endpoints/[id]/page.tsx` → useEndpointDetail()
 - [ ] `(dashboard)/deliveries/page.tsx` → deliveries hook'u
 - [ ] `(dashboard)/notifications/page.tsx` → notifications hook'u
 
 ### 1.7 Optimistic Updates
 
-**Dosya:** Hook'lara optimistic update ekle
-
 ```tsx
-// Endpoint güncelleme — anlık UI tepkisi
 export function useUpdateEndpoint() {
   const queryClient = useQueryClient();
   const { token } = useAuth();
@@ -321,11 +358,8 @@ export function useUpdateEndpoint() {
     mutationFn: (data: { id: string; url: string }) =>
       endpointsApi.update(token!, data.id, { url: data.url }),
     onMutate: async (data) => {
-      // İptal et — eski veri üzerine yazmasın
       await queryClient.cancelQueries({ queryKey: ['endpoint', data.id] });
-      // Snapshot — rollback için
       const previous = queryClient.getQueryData(['endpoint', data.id]);
-      // Optimistic — hemen UI'ı güncelle
       queryClient.setQueryData(['endpoint', data.id], (old: unknown) => ({
         ...(old as Record<string, unknown>),
         url: data.url,
@@ -333,11 +367,9 @@ export function useUpdateEndpoint() {
       return { previous };
     },
     onError: (_err, data, context) => {
-      // Hata → rollback
       queryClient.setQueryData(['endpoint', data.id], context?.previous);
     },
     onSettled: (_data, _error, data) => {
-      // Her durumda → cache'i tazele
       queryClient.invalidateQueries({ queryKey: ['endpoint', data.id] });
       queryClient.invalidateQueries({ queryKey: ['endpoints'] });
     },
@@ -355,6 +387,7 @@ export function useUpdateEndpoint() {
 - [ ] Dashboard açıldığında loading spinner görünmüyor (cache hit)
 - [ ] Sayfalar arası geçiş <100ms
 - [ ] React Query Devtools çalışıyor (development)
+- [ ] Zod validation çalışıyor (geçersiz veri → hata yakalanıyor)
 - [ ] Stale veri arka planda güncelleniyor
 - [ ] Pencere odaklanınca veri tazeleniyor
 - [ ] Hata durumunda retry çalışıyor
@@ -368,19 +401,23 @@ export function useUpdateEndpoint() {
 > **Süre:** 3-4 saat
 > **Amaç:** Backend'de event üretimi ve Redis Pub/Sub'a yayınlama
 
-### 2.1 Event Tanımları
+### 2.1 Event Tanımları + Sequence Number
 
 **Dosya:** `api/src/events.rs` (YENİ)
 
 ```rust
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Arc;
+
+/// Global sequence counter (instance başına)
+static GLOBAL_SEQ: AtomicU64 = AtomicU64::new(0);
 
 /// Tüm sistem event'leri
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", content = "data")]
 pub enum AppEvent {
-    /// Yeni teslimat oluşturuldu
     DeliveryCreated {
         delivery_id: Uuid,
         endpoint_id: Uuid,
@@ -388,33 +425,28 @@ pub enum AppEvent {
         event_type: Option<String>,
         status: String,
     },
-    /// Teslimat durumu değişti
     DeliveryStatusChanged {
         delivery_id: Uuid,
         customer_id: Uuid,
         old_status: String,
         new_status: String,
     },
-    /// Kuyruk durumu değişti
     QueueUpdated {
         pending: i64,
         processing: i64,
         failed: i64,
     },
-    /// Yeni kullanıcı kaydoldu
     UserCreated {
         user_id: Uuid,
         email: String,
         plan: String,
     },
-    /// Alert tetiklendi
     AlertTriggered {
         alert_id: Uuid,
         customer_id: Uuid,
         name: String,
         condition: String,
     },
-    /// Endpoint durumu değişti
     EndpointStatusChanged {
         endpoint_id: Uuid,
         customer_id: Uuid,
@@ -423,7 +455,6 @@ pub enum AppEvent {
 }
 
 impl AppEvent {
-    /// Redis kanal adı
     pub fn channel(&self) -> &'static str {
         match self {
             Self::DeliveryCreated { .. } | Self::DeliveryStatusChanged { .. } => "deliveries",
@@ -434,83 +465,84 @@ impl AppEvent {
         }
     }
 }
+
+/// Wrap edilmiş event — sequence + timestamp + dedup ID
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EventEnvelope {
+    pub id: Uuid,              // Deduplication ID
+    pub seq: u64,              // Sequence number (ordering için)
+    pub ts: i64,               // Unix timestamp (ms)
+    pub event: AppEvent,
+}
+
+impl EventEnvelope {
+    pub fn new(event: AppEvent) -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            seq: GLOBAL_SEQ.fetch_add(1, Ordering::Relaxed),
+            ts: chrono::Utc::now().timestamp_millis(),
+            event,
+        }
+    }
+}
 ```
 
 - [ ] `AppEvent` enum'u tanımlandı
-- [ ] `DeliveryCreated` variant'ı
-- [ ] `DeliveryStatusChanged` variant'ı
-- [ ] `QueueUpdated` variant'ı
-- [ ] `UserCreated` variant'ı
-- [ ] `AlertTriggered` variant'ı
-- [ ] `EndpointStatusChanged` variant'ı
-- [ ] `channel()` methodu
+- [ ] `EventEnvelope` wrapper (id + seq + ts)
+- [ ] Global sequence counter (AtomicU64)
+- [ ] `Uuid::new_v4()` dedup ID
+- [ ] `chrono::Utc::now()` timestamp
 
 ### 2.2 Event Publisher (Redis Pub/Sub)
-
-**Dosya:** `api/src/events.rs` (devam)
 
 ```rust
 use redis::aio::Connection;
 use tokio::sync::broadcast;
 
-/// Event publisher — Redis Pub/Sub + broadcast
 pub struct EventPublisher {
     redis: redis::Client,
-    local_tx: broadcast::Sender<AppEvent>,
+    local_tx: broadcast::Sender<EventEnvelope>,
 }
 
 impl EventPublisher {
     pub fn new(redis_url: &str) -> Self {
         let client = redis::Client::open(redis_url).expect("Failed to create Redis client");
         let (local_tx, _) = broadcast::channel(1000);
-        Self {
-            redis: client,
-            local_tx,
-        }
+        Self { redis: client, local_tx }
     }
 
-    /// Event'i Redis'e yayınla
-    pub async fn publish(&self, event: &AppEvent) -> Result<(), Box<dyn std::error::Error>> {
+    /// Event'i Redis'e yayınla + local broadcast
+    pub async fn publish(&self, event: AppEvent) -> Result<(), Box<dyn std::error::Error>> {
+        let envelope = EventEnvelope::new(event);
         let mut conn = self.redis.get_async_connection().await?;
-        let payload = serde_json::to_string(event)?;
+        let payload = serde_json::to_string(&envelope)?;
+
+        // Redis Pub/Sub
         redis::cmd("PUBLISH")
-            .arg(event.channel())
+            .arg(envelope.event.channel())
             .arg(&payload)
             .execute_async(&mut conn)
             .await?;
+
         // Local broadcast (aynı instance'daki WS client'ları için)
-        let _ = self.local_tx.send(event.clone());
+        let _ = self.local_tx.send(envelope);
         Ok(())
     }
 
     /// Local broadcast receiver
-    pub fn subscribe(&self) -> broadcast::Receiver<AppEvent> {
+    pub fn subscribe(&self) -> broadcast::Receiver<EventEnvelope> {
         self.local_tx.subscribe()
     }
 }
 ```
 
 - [ ] `EventPublisher` struct'ı
-- [ ] `publish()` methodu — Redis PUBLISH
-- [ ] `subscribe()` methodu — local broadcast
+- [ ] `publish()` — Redis PUBLISH + local broadcast
+- [ ] `subscribe()` — local broadcast receiver
 - [ ] `main.rs`'de EventPublisher init
 - [ ] Redis connection pool
 
 ### 2.3 Event'leri Tetikle
-
-**Dosya:** `api/src/routes/webhooks.rs`
-
-```rust
-// Mevcut teslimat oluşturma koduna ekle:
-// Teslimat oluşturulduktan sonra:
-publisher.publish(&AppEvent::DeliveryCreated {
-    delivery_id: new_delivery.id,
-    endpoint_id,
-    customer_id,
-    event_type: event_type.clone(),
-    status: "pending".to_string(),
-}).await.ok(); // Hata olsa bile devam et
-```
 
 - [ ] `webhooks.rs` — `DeliveryCreated` event'i tetikleniyor
 - [ ] `deliveries.rs` — `DeliveryStatusChanged` event'i tetikleniyor
@@ -521,37 +553,143 @@ publisher.publish(&AppEvent::DeliveryCreated {
 
 ### 2.4 Config
 
-**Dosya:** `api/src/config.rs`
-
 ```rust
-// Mevcut Redis config'e ekle:
 pub event_publisher_enabled: bool,
 pub ws_enabled: bool,
 pub ws_max_connections: usize,
+pub ws_max_connections_per_user: usize,  // YENİ
+pub ws_heartbeat_interval_secs: u64,     // YENİ
+pub ws_shutdown_timeout_secs: u64,       // YENİ
 ```
 
 - [ ] `EVENT_PUBLISHER_ENABLED` env var
 - [ ] `WS_ENABLED` env var
 - [ ] `WS_MAX_CONNECTIONS` env var (default: 100)
+- [ ] `WS_MAX_CONNECTIONS_PER_USER` env var (default: 5)
+- [ ] `WS_HEARTBEAT_INTERVAL_SECS` env var (default: 30)
+- [ ] `WS_SHUTDOWN_TIMEOUT_SECS` env var (default: 10)
 
 ### 2.5 Faz 2 Doğrulama
 
 - [ ] `cargo check` — derleme hatası yok
 - [ ] `cargo test --lib` — testler geçiyor
 - [ ] Redis'e event yayınlanıyor (log'dan doğrula)
-- [ ] Event payload'ları doğru JSON formatında
+- [ ] Event envelope'ları doğru JSON formatında (id, seq, ts, event)
 - [ ] Hata durumunda mevcut işlev bozulmuyor (publish best-effort)
 
 ---
 
 ## Faz 3: WebSocket - Real-Time Bağlantı
 
-> **Süre:** 2-3 saat
-> **Amaç:** WebSocket endpoint'i oluştur, istemci bağlantılarını yönet
+> **Süre:** 3-4 saat
+> **Amaç:** WebSocket endpoint'i oluştur, connection management, graceful shutdown
 
-### 3.1 WebSocket Handler
+### 3.1 Connection Manager
 
-**Dosya:** `api/src/ws.rs` (YENİ)
+**Dosya:** `api/src/ws/connection_manager.rs` (YENİ)
+
+```rust
+use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use uuid::Uuid;
+
+/// Bağlantı bilgisi
+struct ConnectionInfo {
+    customer_id: Uuid,
+    connected_at: std::time::Instant,
+}
+
+/// WebSocket bağlantı yöneticisi
+pub struct ConnectionManager {
+    connections: Arc<RwLock<HashMap<Uuid, ConnectionInfo>>>,
+    max_total: usize,
+    max_per_user: usize,
+}
+
+impl ConnectionManager {
+    pub fn new(max_total: usize, max_per_user: usize) -> Self {
+        Self {
+            connections: Arc::new(RwLock::new(HashMap::new())),
+            max_total,
+            max_per_user,
+        }
+    }
+
+    /// Yeni bağlantı ekle — limit kontrolü ile
+    pub async fn add(&self, conn_id: Uuid, customer_id: Uuid) -> Result<(), ConnectionError> {
+        let mut conns = self.connections.write().await;
+
+        // Toplam limit kontrolü
+        if conns.len() >= self.max_total {
+            // En eski bağlantıyı at (LRU eviction)
+            if let Some(oldest_id) = conns.iter()
+                .min_by_key(|(_, info)| info.connected_at)
+                .map(|(id, _)| *id)
+            {
+                conns.remove(&oldest_id);
+                tracing::warn!(evicted = %oldest_id, "Connection limit reached, evicted oldest");
+            }
+        }
+
+        // Per-user limit kontrolü
+        let user_count = conns.values()
+            .filter(|info| info.customer_id == customer_id)
+            .count();
+
+        if user_count >= self.max_per_user {
+            // Bu kullanıcının en eski bağlantısını at
+            if let Some(oldest_id) = conns.iter()
+                .filter(|(_, info)| info.customer_id == customer_id)
+                .min_by_key(|(_, info)| info.connected_at)
+                .map(|(id, _)| *id)
+            {
+                conns.remove(&oldest_id);
+                tracing::warn!(evicted = %oldest_id, user = %customer_id, "Per-user limit reached");
+            }
+        }
+
+        conns.insert(conn_id, ConnectionInfo {
+            customer_id,
+            connected_at: std::time::Instant::now(),
+        });
+
+        Ok(())
+    }
+
+    /// Bağlantı kaldır
+    pub async fn remove(&self, conn_id: &Uuid) {
+        self.connections.write().await.remove(conn_id);
+    }
+
+    /// Aktif bağlantı sayısı
+    pub async fn count(&self) -> usize {
+        self.connections.read().await.len()
+    }
+
+    /// Belirli bir kullanıcının bağlantı sayısı
+    pub async fn user_count(&self, customer_id: &Uuid) -> usize {
+        self.connections.read().await.values()
+            .filter(|info| info.customer_id == *customer_id)
+            .count()
+    }
+}
+
+#[derive(Debug)]
+pub enum ConnectionError {
+    LimitReached,
+}
+```
+
+- [ ] `ConnectionManager` struct'ı
+- [ ] Per-user limit (max 5 bağlantı/kullanıcı)
+- [ ] Total limit (max 100 bağlantı)
+- [ ] LRU eviction (en eski bağlantı atılır)
+- [ ] `add()`, `remove()`, `count()`, `user_count()` methodları
+
+### 3.2 WebSocket Handler
+
+**Dosya:** `api/src/ws/handler.rs` (YENİ)
 
 ```rust
 use axum::{
@@ -562,17 +700,20 @@ use axum::{
 use futures::{SinkExt, StreamExt};
 use tokio::sync::broadcast;
 use uuid::Uuid;
+use tokio::time::{interval, Duration};
 
-use crate::events::{AppEvent, EventPublisher};
+use crate::events::{AppEvent, EventEnvelope, EventPublisher};
 use crate::models::customer::Customer;
+use crate::ws::connection_manager::ConnectionManager;
 
 /// WebSocket upgrade handler
 pub async fn ws_handler(
     ws: WebSocketUpgrade,
     Extension(customer): Extension<Customer>,
     Extension(publisher): Extension<EventPublisher>,
+    Extension(conn_manager): Extension<ConnectionManager>,
 ) -> impl IntoResponse {
-    ws.on_upgrade(move |socket| handle_socket(socket, customer, publisher))
+    ws.on_upgrade(move |socket| handle_socket(socket, customer, publisher, conn_manager))
 }
 
 /// WebSocket bağlantısını yönet
@@ -580,43 +721,88 @@ async fn handle_socket(
     socket: WebSocket,
     customer: Customer,
     publisher: EventPublisher,
+    conn_manager: ConnectionManager,
 ) {
+    let conn_id = Uuid::new_v4();
+
+    // Bağlantı ekle (limit kontrolü)
+    if conn_manager.add(conn_id, customer.id).await.is_err() {
+        tracing::warn!("Connection rejected for user {}", customer.id);
+        return;
+    }
+
     let (mut sender, mut receiver) = socket.split();
     let mut rx = publisher.subscribe();
 
-    // Keepalive task
-    let mut keepalive = tokio::time::interval(std::time::Duration::from_secs(30));
+    // Heartbeat interval
+    let mut heartbeat = interval(Duration::from_secs(30));
+    let mut last_pong = tokio::time::Instant::now();
 
-    loop {
-        tokio::select! {
-            // Event geldi → client'a gönder
-            Ok(event) = rx.recv() => {
-                // Sadece bu kullanıcıya ait event'leri gönder
-                if should_send_to_user(&event, &customer) {
-                    let msg = serde_json::to_string(&event).unwrap_or_default();
-                    if sender.send(Message::Text(msg)).await.is_err() {
-                        break; // Bağlantı koptu
+    // Graceful shutdown signal
+    let shutdown_signal = tokio::signal::ctrl_c();
+
+    // Shutdown mesajı
+    let shutdown_msg = serde_json::json!({
+        "type": "server_shutdown",
+        "msg": "Server is shutting down, please reconnect"
+    });
+
+    let result = tokio::select! {
+        // Ana mesaj döngüsü
+        _ = async {
+            loop {
+                tokio::select! {
+                    // Event geldi → client'a gönder
+                    Ok(envelope) = rx.recv() => {
+                        if should_send_to_user(&envelope.event, &customer) {
+                            let msg = serde_json::to_string(&envelope).unwrap_or_default();
+                            if sender.send(Message::Text(msg)).await.is_err() {
+                                break;
+                            }
+                        }
+                    }
+                    // Client'dan mesaj geldi
+                    msg = receiver.next() => {
+                        match msg {
+                            Some(Ok(Message::Close(_))) | None => break,
+                            Some(Ok(Message::Ping(data))) => {
+                                let _ = sender.send(Message::Pong(data)).await;
+                                last_pong = tokio::time::Instant::now();
+                            }
+                            Some(Ok(Message::Pong(_))) => {
+                                last_pong = tokio::time::Instant::now();
+                            }
+                            _ => {}
+                        }
+                    }
+                    // Heartbeat ping
+                    _ = heartbeat.tick() => {
+                        // 60 sn'den fazla pong yoksa bağlantıyı kes
+                        if last_pong.elapsed() > Duration::from_secs(60) {
+                            tracing::warn!(conn = %conn_id, "No pong received, closing");
+                            break;
+                        }
+                        if sender.send(Message::Ping(vec![].into())).await.is_err() {
+                            break;
+                        }
                     }
                 }
             }
-            // Client'dan mesaj geldi (şimdilik ignore)
-            msg = receiver.next() => {
-                match msg {
-                    Some(Ok(Message::Close(_))) | None => break,
-                    Some(Ok(Message::Ping(data))) => {
-                        let _ = sender.send(Message::Pong(data)).await;
-                    }
-                    _ => {} // Diğer mesajları ignore et
-                }
-            }
-            // Keepalive ping
-            _ = keepalive.tick() => {
-                if sender.send(Message::Ping(vec![].into())).await.is_err() {
-                    break;
-                }
-            }
+        } => {},
+
+        // Graceful shutdown
+        _ = shutdown_signal => {
+            tracing::info!("Shutdown signal received, closing WS connections");
+            let _ = sender.send(Message::Text(shutdown_msg.to_string())).await;
+            // Client'ın kapanması için kısa bir süre bekle
+            tokio::time::sleep(Duration::from_secs(2)).await;
+            let _ = sender.send(Message::Close(None)).await;
         }
-    }
+    };
+
+    // Bağlantıyı temizle
+    conn_manager.remove(&conn_id).await;
+    tracing::info!(conn = %conn_id, user = %customer.id, "WebSocket connection closed");
 }
 
 /// Bu event'i bu kullanıcıya göndermeli miyiz?
@@ -636,18 +822,16 @@ fn should_send_to_user(event: &AppEvent, customer: &Customer) -> bool {
 
 - [ ] `ws_handler()` — WebSocket upgrade
 - [ ] `handle_socket()` — mesaj döngüsü
-- [ ] Keepalive ping (30 sn)
+- [ ] Heartbeat ping (30 sn) + pong timeout (60 sn)
 - [ ] `should_send_to_user()` — event filtreleme
 - [ ] Admin: tüm event'leri görür
 - [ ] Normal kullanıcı: sadece kendi event'lerini görür
+- [ ] **Graceful shutdown** — SIGTERM'de client'a `server_shutdown` mesajı gönder
+- [ ] Connection cleanup (her durumda)
 
-### 3.2 Router'a Ekle
-
-**Dosya:** `api/src/routes/mod.rs`
+### 3.3 Router'a Ekle
 
 ```rust
-pub mod ws;
-
 // Router'a ekle:
 .route("/ws", get(ws::ws_handler))
 ```
@@ -656,12 +840,10 @@ pub mod ws;
 - [ ] `/v1/ws` endpoint'i tanımlandı
 - [ ] JWT auth middleware uygulanıyor
 
-### 3.3 Cloud Run Config
-
-**Dosya:** `cloudbuild.yaml` veya Cloud Run env var
+### 3.4 Cloud Run Config
 
 ```yaml
-# WebSocket için timeout artır
+# Cloud Run timeout
 --timeout=3600
 --max-instances=10
 ```
@@ -670,32 +852,36 @@ pub mod ws;
 ```
 WS_ENABLED=true
 WS_MAX_CONNECTIONS=100
+WS_MAX_CONNECTIONS_PER_USER=5
+WS_HEARTBEAT_INTERVAL_SECS=30
+WS_SHUTDOWN_TIMEOUT_SECS=10
 EVENT_PUBLISHER_ENABLED=true
 ```
 
 - [ ] Cloud Run timeout: 3600 sn
-- [ ] `WS_ENABLED` env var eklendi
-- [ ] `WS_MAX_CONNECTIONS` env var eklendi
-- [ ] `EVENT_PUBLISHER_ENABLED` env var eklendi
+- [ ] Tüm env var'lar eklendi
+- [ ] Graceful shutdown timeout: 10 sn
 
-### 3.4 Faz 3 Doğrulama
+### 3.5 Faz 3 Doğrulama
 
 - [ ] `cargo check` — derleme hatası yok
 - [ ] WebSocket endpoint'i yanıt veriyor (`wscat -c ws://api/v1/ws`)
 - [ ] JWT auth çalışıyor (token'suz bağlantı reddediliyor)
-- [ ] Keepalive ping çalışıyor (30 sn'de bir)
+- [ ] Heartbeat ping çalışıyor (30 sn'de bir)
+- [ ] Pong timeout çalışıyor (60 sn → bağlantı kesiliyor)
+- [ ] Per-user limit çalışıyor (5. bağlantı reddediliyor)
+- [ ] Total limit çalışıyor (100. bağlantıda eviction)
+- [ ] Graceful shutdown çalışıyor (SIGTERM → client'a mesaj)
 - [ ] Bağlantı koptuğunda temiz kapanıyor
-- [ ] Admin tüm event'leri alıyor
-- [ ] Normal kullanıcı sadece kendi event'lerini alıyor
 
 ---
 
 ## Faz 4: Entegrasyon - Her Şeyi Bağla
 
 > **Süre:** 2-3 saat
-> **Amaç:** Frontend'de WebSocket hook'u oluştur, React Query ile entegre et
+> **Amaç:** Frontend'de WebSocket hook'u, React Query entegrasyonu, fallback polling
 
-### 4.1 WebSocket Hook
+### 4.1 WebSocket Hook (Gelişmiş)
 
 **Dosya:** `dashboard/src/hooks/useWebSocket.ts` (YENİ)
 
@@ -703,29 +889,39 @@ EVENT_PUBLISHER_ENABLED=true
 'use client';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useAuth } from '@/lib/store';
-
-interface WsEvent {
-  type: string;
-  data: Record<string, unknown>;
-}
+import { WsEventSchema, type WsEvent } from '@/schemas/api';
+import { z } from 'zod';
 
 interface UseWebSocketOptions {
   enabled?: boolean;
   onEvent?: (event: WsEvent) => void;
+  onConnected?: () => void;
+  onDisconnected?: () => void;
+  maxReconnectAttempts?: number;
 }
+
+type ConnectionState = 'connecting' | 'connected' | 'disconnected' | 'fallback';
 
 export function useWebSocket(options: UseWebSocketOptions = {}) {
   const { token } = useAuth();
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttempts = useRef(0);
-  const [isConnected, setIsConnected] = useState(false);
+  const [state, setState] = useState<ConnectionState>('disconnected');
+  const lastSeqRef = useRef<number>(0); // Sıralama için son sequence
 
-  const { enabled = true, onEvent } = options;
+  const {
+    enabled = true,
+    onEvent,
+    onConnected,
+    onDisconnected,
+    maxReconnectAttempts = 10,
+  } = options;
 
   const connect = useCallback(() => {
     if (!token || !enabled) return;
 
+    setState('connecting');
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     const wsUrl = apiUrl.replace(/^http/, 'ws') + '/v1/ws';
 
@@ -733,8 +929,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     ws.onopen = () => {
       console.log('[WS] Connected');
-      setIsConnected(true);
+      setState('connected');
       reconnectAttempts.current = 0;
+      onConnected?.();
 
       // Auth mesajı gönder
       ws.send(JSON.stringify({ type: 'auth', token }));
@@ -742,21 +939,55 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     ws.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data) as WsEvent;
-        onEvent?.(data);
+        const raw = JSON.parse(event.data);
+
+        // Server shutdown mesajı
+        if (raw.type === 'server_shutdown') {
+          console.log('[WS] Server shutting down, reconnecting...');
+          ws.close();
+          return;
+        }
+
+        // Zod validation
+        const parsed = WsEventSchema.safeParse(raw);
+        if (!parsed.success) {
+          console.warn('[WS] Invalid event format:', parsed.error);
+          return;
+        }
+
+        // Sequence ordering — eski mesajları atla
+        if (parsed.data.seq && parsed.data.seq <= lastSeqRef.current) {
+          console.log('[WS] Skipping out-of-order message:', parsed.data.seq);
+          return;
+        }
+        if (parsed.data.seq) {
+          lastSeqRef.current = parsed.data.seq;
+        }
+
+        onEvent?.(parsed.data);
       } catch {
         // Parse hatası — ignore
       }
     };
 
-    ws.onclose = () => {
-      console.log('[WS] Disconnected');
-      setIsConnected(false);
+    ws.onclose = (event) => {
+      console.log('[WS] Disconnected', event.code, event.reason);
       wsRef.current = null;
+      onDisconnected?.();
 
-      // Exponential backoff reconnect
+      // Max reconnect attempts kontrolü
+      if (reconnectAttempts.current >= maxReconnectAttempts) {
+        console.warn('[WS] Max reconnect attempts reached, falling back to polling');
+        setState('fallback');
+        return;
+      }
+
+      setState('disconnected');
+
+      // Exponential backoff reconnect (1s → 2s → 4s → ... → 30s max)
       const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
       reconnectAttempts.current++;
+      console.log(`[WS] Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current})`);
       reconnectTimeoutRef.current = setTimeout(connect, delay);
     };
 
@@ -765,7 +996,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     };
 
     wsRef.current = ws;
-  }, [token, enabled, onEvent]);
+  }, [token, enabled, onEvent, onConnected, onDisconnected, maxReconnectAttempts]);
 
   useEffect(() => {
     connect();
@@ -775,29 +1006,49 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     };
   }, [connect]);
 
+  // Online/Offline detection
+  useEffect(() => {
+    const handleOnline = () => {
+      if (state === 'disconnected' || state === 'fallback') {
+        console.log('[WS] Network back online, reconnecting...');
+        reconnectAttempts.current = 0;
+        connect();
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [state, connect]);
+
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
     wsRef.current?.close();
     wsRef.current = null;
   }, []);
 
-  return { isConnected, disconnect };
+  return { state, isConnected: state === 'connected', disconnect };
 }
 ```
 
 - [ ] `useWebSocket()` hook'u
 - [ ] Bağlantı kurma (JWT auth)
 - [ ] Exponential backoff reconnect (1s → 2s → 4s → ... → 30s max)
-- [ ] Keepalive (tarayıcı built-in ping/pong)
-- [ ] `isConnected` state
+- [ ] Max reconnect attempts (10) → fallback modu
+- [ ] Heartbeat (tarayıcı built-in ping/pong)
+- [ ] `state` durumu (connecting/connected/disconnected/fallback)
 - [ ] `disconnect()` methodu
+- [ ] **Online/Offline detection** — `navigator.onLine` event'i
+- [ ] **Server shutdown handling** — `server_shutdown` mesajı → reconnect
+- [ ] **Sequence ordering** — eski mesajları atla
+- [ ] **Zod validation** — gelen mesajlar validate ediliyor
 
-### 4.2 React Query + WebSocket Entegrasyonu
+### 4.2 React Query + WebSocket Entegrasyonu + Fallback
 
 **Dosya:** `dashboard/src/hooks/useRealtime.ts` (YENİ)
 
 ```tsx
 'use client';
+import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useWebSocket } from './useWebSocket';
 import { useToast } from '@/components/Toast';
@@ -805,25 +1056,23 @@ import { useToast } from '@/components/Toast';
 export function useRealtime() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { isConnected } = useWebSocket({
+  const { state } = useWebSocket({
     onEvent: (event) => {
       switch (event.type) {
         case 'DeliveryCreated':
         case 'DeliveryStatusChanged':
-          // Teslimat cache'ini tazele
           queryClient.invalidateQueries({ queryKey: ['deliveries'] });
           queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
           queryClient.invalidateQueries({ queryKey: ['analytics'] });
           break;
 
         case 'QueueUpdated':
-          // Kuyruk cache'ini tazele
           queryClient.invalidateQueries({ queryKey: ['admin', 'queue'] });
           break;
 
         case 'UserCreated':
-          // Kullanıcı cache'ini tazele
           queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
           queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
           toast('🆕 Yeni kullanıcı kaydoldu', 'info');
@@ -840,9 +1089,35 @@ export function useRealtime() {
           break;
       }
     },
+    onConnected: () => {
+      // WS bağlandıysa polling'i durdur
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+      }
+    },
   });
 
-  return { isConnected };
+  // Fallback polling — WS bağlantısı yoksa
+  useEffect(() => {
+    if (state === 'fallback' || state === 'disconnected') {
+      console.log('[Realtime] WS unavailable, starting fallback polling (30s)');
+      pollingRef.current = setInterval(() => {
+        queryClient.invalidateQueries({ queryKey: ['deliveries'] });
+        queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+        queryClient.invalidateQueries({ queryKey: ['endpoints'] });
+      }, 30_000);
+    }
+
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+      }
+    };
+  }, [state, queryClient]);
+
+  return { connectionState: state };
 }
 ```
 
@@ -853,54 +1128,52 @@ export function useRealtime() {
 - [ ] `UserCreated` → cache invalidate + toast
 - [ ] `AlertTriggered` → cache invalidate + toast
 - [ ] `EndpointStatusChanged` → cache invalidate
+- [ ] **Fallback polling** — WS yoksa 30 sn'de bir polling
+- [ ] **Otomatik geçiş** — WS bağlanınca polling durur
 
 ### 4.3 Admin Layout'a Ekle
-
-**Dosya:** `dashboard/src/app/[locale]/admin/layout.tsx`
 
 ```tsx
 import { useRealtime } from '@/hooks/useRealtime';
 
 function AdminShell({ children }: { children: React.ReactNode }) {
-  const { isConnected } = useRealtime();
+  const { connectionState } = useRealtime();
 
-  // Bağlantı durumu göstergesi (isteğe bağlı)
-  // Header'da küçük bir indicator
+  return (
+    <div>
+      {/* Bağlantı durumu indicator'ı */}
+      <ConnectionIndicator state={connectionState} />
+      {children}
+    </div>
+  );
 }
 ```
 
 - [ ] `useRealtime()` admin layout'a eklendi
-- [ ] Bağlantı durumu indicator'ı (yeşil/kırmızı dot)
+- [ ] Bağlantı durumu indicator'ı (yeşil/sarı/kırmızı dot)
+- [ ] `ConnectionIndicator` bileşeni
 
 ### 4.4 Dashboard Layout'a Ekle
-
-**Dosya:** `dashboard/src/app/[locale]/(dashboard)/layout.tsx`
-
-```tsx
-import { useRealtime } from '@/hooks/useRealtime';
-
-function DashboardShell({ children }: { children: React.ReactNode }) {
-  const { isConnected } = useRealtime();
-  // ...
-}
-```
 
 - [ ] `useRealtime()` dashboard layout'a eklendi
 
 ### 4.5 Polling Kaldır
 
 - [ ] `admin/page.tsx` — `setInterval` polling kaldırıldı
-- [ ] `admin/system/page.tsx` — polling kaldırıldı (varsa)
-- [ ] `(dashboard)/health/page.tsx` — polling kaldırıldı (React Query refetch yeterli)
-- [ ] `sandbox/content.tsx` — polling kalabilir (gerçek zamanlı gerekli)
+- [ ] `admin/system/page.tsx` — polling kaldırıldı
+- [ ] `(dashboard)/health/page.tsx` — polling kaldırıldı
 
 ### 4.6 Faz 4 Doğrulama
 
-- [ ] Dashboard açıldığında WebSocket bağlantısı kuruluyor (console log)
+- [ ] Dashboard açıldığında WebSocket bağlantısı kuruluyor
 - [ ] Yeni teslimat olduğunda UI anlık güncelleniyor (<1 sn)
 - [ ] Yeni kullanıcı kaydolduğunda admin paneli güncelleniyor
 - [ ] Alert tetiklendiğinde toast mesajı gösteriliyor
 - [ ] Bağlantı koptuğunda otomatik reconnect oluyor
+- [ ] **Max reconnect denemesinden sonra fallback polling başlıyor**
+- [ ] **WS tekrar bağlanınca polling duruyor**
+- [ ] **Offline/Online detection çalışıyor**
+- [ ] **Sequence ordering — eski mesajlar atlanıyor**
 - [ ] Sayfalar arası geçiş <100ms (React Query cache)
 - [ ] Polling kaldırıldı, API çağrısı sayısı azaldı
 
@@ -909,7 +1182,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 ## Faz 5: Optimizasyon - Son Dokunuşlar
 
 > **Süre:** 2-3 saat
-> **Amaç:** Büyük listeler, hata takibi, route cache
+> **Amaç:** Büyük listeler, hata takibi, route cache, bundle optimization
 
 ### 5.1 TanStack Virtual — Büyük Listeler
 
@@ -917,8 +1190,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 cd dashboard
 npm install @tanstack/react-virtual
 ```
-
-**Dosya:** `dashboard/src/components/VirtualTable.tsx` (YENİ)
 
 - [ ] `@tanstack/react-virtual` kuruldu
 - [ ] `VirtualTable` bileşeni oluşturuldu
@@ -943,30 +1214,178 @@ npx @sentry/wizard -i nextjs
 
 ### 5.3 Route Segment Cache
 
-**Dosya:** `dashboard/src/app/[locale]/admin/page.tsx`
-
 ```tsx
 // Statik sayfalar için ISR
-export const revalidate = 30; // 30 saniye cache
+export const revalidate = 3600; // 1 saat
 ```
 
-- [ ] Docs sayfaları → `revalidate = 3600` (1 saat)
+- [ ] Docs sayfaları → `revalidate = 3600`
 - [ ] Landing page → `revalidate = 3600`
 - [ ] Pricing → `revalidate = 3600`
 - [ ] Admin → React Query (zaten cache'li)
 
 ### 5.4 Image Optimization
 
-- [ ] `<Image />` bileşenine geçiş (logo, avatar)
+- [ ] `<Image />` bileşenine geçiş
 - [ ] WebP formatı otomatik
 - [ ] Lazy loading
 
-### 5.5 Faz 5 Doğrulama
+### 5.5 Bundle Optimization
+
+- [ ] `@next/bundle-analyzer` kuruldu
+- [ ] Code splitting: admin sayfaları lazy load
+- [ ] Tree shaking: lodash → lodash-es
+- [ ] Dynamic import: ReactQueryDevtools (sadece dev)
+- [ ] WS hook'u dynamic import (sadece authenticated sayfalar)
+
+### 5.6 Faz 5 Doğrulama
 
 - [ ] 1000+ satırlık liste <200ms render
 - [ ] Sentry'de hata görünüyor
 - [ ] Statik sayfalar ISR ile servis ediliyor
 - [ ] Görseller optimize (WebP, lazy)
+- [ ] Bundle boyutu kontrol edildi (analyzer)
+
+---
+
+## Faz 6: Güvenlik & Dayanıklılık
+
+> **Süre:** 2-3 saat
+> **Amaç:** Token refresh, monitoring, stress test
+
+### 6.1 Token Refresh + WS Reconnect
+
+**Dosya:** `dashboard/src/hooks/useWebSocket.ts` (mevcut hook'a ekleme)
+
+```tsx
+// Token değiştiğinde reconnect
+useEffect(() => {
+  if (token && wsRef.current?.readyState === WebSocket.OPEN) {
+    // Token yenilendi → yeniden auth gönder
+    wsRef.current.send(JSON.stringify({ type: 'auth', token }));
+  }
+}, [token]);
+```
+
+- [ ] Token refresh'te WS reconnect
+- [ ] Expired token → 401 → refresh token akışı → WS reconnect
+- [ ] Refresh token da expired → login'e yönlendirme
+
+### 6.2 WS Monitoring Metrics
+
+**Dosya:** `api/src/ws/metrics.rs` (YENİ)
+
+```rust
+use prometheus::{IntGauge, IntCounter, Registry};
+
+pub struct WsMetrics {
+    pub active_connections: IntGauge,
+    pub total_connections: IntCounter,
+    pub messages_sent: IntCounter,
+    pub messages_received: IntCounter,
+    pub connection_errors: IntCounter,
+    pub evictions: IntCounter,
+}
+
+impl WsMetrics {
+    pub fn new(registry: &Registry) -> Self {
+        let metrics = Self {
+            active_connections: IntGauge::new("ws_active_connections", "Active WS connections").unwrap(),
+            total_connections: IntCounter::new("ws_total_connections", "Total WS connections").unwrap(),
+            messages_sent: IntCounter::new("ws_messages_sent", "WS messages sent").unwrap(),
+            messages_received: IntCounter::new("ws_messages_received", "WS messages received").unwrap(),
+            connection_errors: IntCounter::new("ws_connection_errors", "WS connection errors").unwrap(),
+            evictions: IntCounter::new("ws_evictions", "WS evictions").unwrap(),
+        };
+        registry.register(Box::new(metrics.active_connections.clone())).unwrap();
+        registry.register(Box::new(metrics.total_connections.clone())).unwrap();
+        registry.register(Box::new(metrics.messages_sent.clone())).unwrap();
+        registry.register(Box::new(metrics.messages_received.clone())).unwrap();
+        registry.register(Box::new(metrics.connection_errors.clone())).unwrap();
+        registry.register(Box::new(metrics.evictions.clone())).unwrap();
+        metrics
+    }
+}
+```
+
+- [ ] `WsMetrics` struct'ı (Prometheus)
+- [ ] `active_connections` gauge
+- [ ] `total_connections` counter
+- [ ] `messages_sent` counter
+- [ ] `messages_received` counter
+- [ ] `connection_errors` counter
+- [ ] `evictions` counter
+- [ ] `/metrics` endpoint'ine eklendi
+- [ ] Grafana dashboard'u (opsiyonel)
+
+### 6.3 Duplicate Message Prevention (Multi-Instance)
+
+Redis Pub/Sub'ta her subscriber her mesajı alır. Multi-instance'da duplicate olmaz çünkü:
+- Her WS client'ı kendi instance'ındaki EventPublisher'a subscribe
+- EventPublisher Redis'ten alıp local broadcast'e gönderiyor
+- **Ama** aynı event iki instance'da publish edilirse → duplicate
+
+**Çözüm:** Client-side dedup (sequence number)
+
+```tsx
+// useWebSocket.ts'te zaten var:
+if (parsed.data.seq && parsed.data.seq <= lastSeqRef.current) {
+  return; // Eski mesaj — atla
+}
+```
+
+- [ ] Client-side dedup (sequence number) ✅
+- [ ] Server-side dedup gerekmiyor (Redis Pub/Sub fan-out)
+
+### 6.4 Stress Test
+
+```bash
+# k6 ile WS stress test
+npm install -g k6
+```
+
+**Dosya:** `tests/ws_stress_test.js` (YENİ)
+
+```javascript
+import ws from 'k6/ws';
+import { check } from 'k6';
+
+export const options = {
+  stages: [
+    { duration: '30s', target: 50 },   // 50 bağlantıya çık
+    { duration: '1m', target: 100 },   // 100 bağlantı
+    { duration: '30s', target: 0 },    // Kapat
+  ],
+};
+
+export default function () {
+  const url = `wss://api/v1/ws`;
+  const res = ws.connect(url, function (socket) {
+    socket.on('open', () => socket.send(JSON.stringify({ type: 'auth', token: 'xxx' })));
+    socket.on('message', (data) => {
+      const msg = JSON.parse(data);
+      check(msg, { 'event has type': (m) => m.type !== undefined });
+    });
+    socket.on('close', () => console.log('closed'));
+  });
+
+  check(res, { 'status is 101': (r) => r && r.status === 101 });
+}
+```
+
+- [ ] k6 stress test scripti
+- [ ] 100 eşzamanlı bağlantı testi
+- [ ] Memory leak testi (1 saat açık bağlantı)
+- [ ] Reconnect testi (bağlantı kes → tekrar bağlan)
+
+### 6.5 Faz 6 Doğrulama
+
+- [ ] Token refresh'te WS reconnect çalışıyor
+- [ ] Expired token → refresh → reconnect akışı çalışıyor
+- [ ] Prometheus metrics endpoint'inde WS metrikleri görünüyor
+- [ ] Stress test: 100 bağlantı başarılı
+- [ ] Memory leak yok (1 saat test)
+- [ ] Duplicate mesaj yok (sequence ordering)
 
 ---
 
@@ -974,16 +1393,21 @@ export const revalidate = 30; // 30 saniye cache
 
 ### Unit Test
 
-- [ ] `EventPublisher::publish()` — Redis'e doğru kanalda publish
-- [ ] `should_send_to_user()` — filtreleme doğru çalışıyor
+- [ ] `EventEnvelope::new()` — seq, ts, id doğru
+- [ ] `should_send_to_user()` — filtreleme doğru
+- [ ] `ConnectionManager::add()` — limit kontrolü
+- [ ] `ConnectionManager::add()` — per-user limit
 - [ ] React Query hook'ları — cache, stale, refetch
+- [ ] Zod schema validation — geçerli/geçersiz veri
 
 ### Integration Test
 
 - [ ] WebSocket bağlantısı kuruluyor
-- [ ] Event → Redis → WebSocket → Client zinciri çalışıyor
+- [ ] Event → Redis → WebSocket → Client zinciri
 - [ ] Kopan bağlantı → otomatik reconnect
+- [ ] Max reconnect → fallback polling
 - [ ] JWT auth → yetkisiz bağlantı reddediliyor
+- [ ] Graceful shutdown → client'a mesaj
 
 ### E2E Test
 
@@ -991,6 +1415,7 @@ export const revalidate = 30; // 30 saniye cache
 - [ ] Webhook gönder → dashboard anlık güncelleniyor
 - [ ] Admin paneli → yeni kullanıcı → anlık güncelleme
 - [ ] Network kes → offline → tekrar bağlan → veri güncelleniyor
+- [ ] Token refresh → WS reconnect
 
 ### Performance Test
 
@@ -1014,7 +1439,7 @@ export const revalidate = 30; // 30 saniye cache
 ### Kademeli Rollback
 
 ```
-1. WS_ENABLED=false → WebSocket devre dışı, polling'e dön
+1. WS_ENABLED=false → WebSocket devre dışı, fallback polling aktif
 2. React Query → useState'e geri dön (sayfa bazında)
 3. Event system → publish() çağrılarını yorum satırı yap
 ```
@@ -1023,7 +1448,7 @@ export const revalidate = 30; // 30 saniye cache
 
 ```
 - Sentry: hata oranı artarsa alarm
-- Grafana: API latency artarsa alarm
+- Prometheus/Grafana: WS connection sayısı, message rate
 - Upstash: Redis komut sayısını izle
 - Cloud Run: instance sayısını izle
 ```
@@ -1036,26 +1461,32 @@ export const revalidate = 30; // 30 saniye cache
 
 | Dosya | Amaç |
 |-------|------|
-| `api/src/events.rs` | Event tanımları + publisher |
-| `api/src/ws.rs` | WebSocket handler |
+| `api/src/events.rs` | Event tanımları + envelope + publisher |
+| `api/src/ws/handler.rs` | WebSocket handler |
+| `api/src/ws/connection_manager.rs` | Connection limit + eviction |
+| `api/src/ws/metrics.rs` | Prometheus WS metrics |
+| `api/src/ws/mod.rs` | WS modülü |
+| `dashboard/src/schemas/api.ts` | Zod schema tanımları |
 | `dashboard/src/hooks/useAdminData.ts` | Admin React Query hook'ları |
 | `dashboard/src/hooks/useDashboardData.ts` | Dashboard React Query hook'ları |
-| `dashboard/src/hooks/useWebSocket.ts` | WebSocket hook |
-| `dashboard/src/hooks/useRealtime.ts` | React Query + WS entegrasyonu |
+| `dashboard/src/hooks/useWebSocket.ts` | WebSocket hook (gelişmiş) |
+| `dashboard/src/hooks/useRealtime.ts` | React Query + WS + fallback |
 | `dashboard/src/components/VirtualTable.tsx` | Virtual list bileşeni |
+| `dashboard/src/components/ConnectionIndicator.tsx` | WS durum indicator'ı |
+| `tests/ws_stress_test.js` | k6 stress test |
 
-### Değişecek Dosyalar
+### Deşecek Dosyalar
 
 | Dosya | Değişiklik |
 |-------|-----------|
-| `api/src/main.rs` | EventPublisher + WS route init |
+| `api/src/main.rs` | EventPublisher + WS route + metrics init |
 | `api/src/routes/mod.rs` | WS route ekleme |
 | `api/src/routes/webhooks.rs` | Event publish |
 | `api/src/routes/deliveries.rs` | Event publish |
 | `api/src/routes/auth.rs` | Event publish |
 | `api/src/routes/endpoints.rs` | Event publish |
 | `api/src/routes/alerts.rs` | Event publish |
-| `api/src/config.rs` | WS config |
+| `api/src/config.rs` | WS config + env var'lar |
 | `dashboard/src/app/[locale]/layout.tsx` | QueryClientProvider |
 | `dashboard/src/app/[locale]/admin/layout.tsx` | useRealtime |
 | `dashboard/src/app/[locale]/admin/page.tsx` | React Query |
@@ -1075,6 +1506,9 @@ export const revalidate = 30; // 30 saniye cache
 # Cloud Run
 WS_ENABLED=true
 WS_MAX_CONNECTIONS=100
+WS_MAX_CONNECTIONS_PER_USER=5
+WS_HEARTBEAT_INTERVAL_SECS=30
+WS_SHUTDOWN_TIMEOUT_SECS=10
 EVENT_PUBLISHER_ENABLED=true
 
 # Dashboard (Vercel)
@@ -1093,5 +1527,6 @@ SENTRY_DSN=https://xxx@sentry.io/xxx
 | Faz 3: WebSocket | ⬜ Bekliyor | — | — |
 | Faz 4: Entegrasyon | ⬜ Bekliyor | — | — |
 | Faz 5: Optimizasyon | ⬜ Bekliyor | — | — |
+| Faz 6: Güvenlik & Dayanıklılık | ⬜ Bekliyor | — | — |
 | Test | ⬜ Bekliyor | — | — |
 | Deploy | ⬜ Bekliyor | — | — |
