@@ -1,0 +1,331 @@
+/**
+ * HookSniff Edge Proxy — Cloudflare Worker
+ *
+ * Sits in front of the HookSniff API (Google Cloud Run) and provides:
+ * - Edge rate limiting (KV-based sliding window)
+ * - Edge caching for GET responses
+ * - Security headers
+ * - CORS preflight at the edge
+ * - Request forwarding with failover
+ */
+
+interface Env {
+  API_BASE: string;
+  ENVIRONMENT: string;
+  RATE_LIMIT_KV: KVNamespace;
+  EDGE_CACHE_KV: KVNamespace;
+}
+
+// ── Rate Limiting Config ──
+
+interface RateLimitConfig {
+  windowSec: number;
+  maxRequests: number;
+}
+
+const RATE_LIMITS: Record<string, RateLimitConfig> = {
+  // Auth endpoints — strict
+  '/v1/auth/login': { windowSec: 60, maxRequests: 10 },
+  '/v1/auth/register': { windowSec: 60, maxRequests: 5 },
+  '/v1/auth/forgot-password': { windowSec: 300, maxRequests: 3 },
+  '/v1/auth/verify-email': { windowSec: 60, maxRequests: 5 },
+  '/v1/auth/verify-2fa': { windowSec: 60, maxRequests: 5 },
+  // Webhook send — moderate
+  '/v1/webhooks': { windowSec: 60, maxRequests: 200 },
+  // API endpoints — generous
+  default: { windowSec: 60, maxRequests: 100 },
+};
+
+// ── Edge Cache Config ──
+
+const CACHE_CONFIG: Record<string, number> = {
+  '/health': 10,           // 10 seconds
+  '/v1/status': 10,
+  '/v1/docs': 3600,        // 1 hour
+  '/v1/outbound-ips': 300, // 5 minutes
+  '/v1/analytics': 30,     // 30 seconds
+};
+
+// ── Main Handler ──
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const method = request.method;
+    const clientIp = request.headers.get('CF-Connecting-IP') || 'unknown';
+
+    // 1. CORS preflight — handle at edge (no need to hit origin)
+    if (method === 'OPTIONS') {
+      return handleCors(request);
+    }
+
+    // 2. Block sensitive paths at edge
+    if (isBlockedPath(path)) {
+      return new Response('Not Found', { status: 404 });
+    }
+
+    // 3. Rate limiting (KV-based sliding window)
+    const rateLimitResult = await checkRateLimit(env, path, clientIp);
+    if (!rateLimitResult.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded',
+          retry_after: rateLimitResult.retryAfter,
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': String(rateLimitResult.retryAfter),
+            'X-RateLimit-Limit': String(rateLimitResult.limit),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': String(rateLimitResult.resetAt),
+            ...corsHeaders(),
+          },
+        }
+      );
+    }
+
+    // 4. Edge cache for GET requests
+    if (method === 'GET') {
+      const cacheTtl = getCacheTtl(path);
+      if (cacheTtl > 0) {
+        const cached = await env.EDGE_CACHE_KV.get(`cache:${path}`, 'json');
+        if (cached) {
+          const { body, headers: cachedHeaders, status, timestamp } = cached as {
+            body: string;
+            headers: Record<string, string>;
+            status: number;
+            timestamp: number;
+          };
+
+          // Check if cache is still fresh
+          if (Date.now() - timestamp < cacheTtl * 1000) {
+            return new Response(body, {
+              status,
+              headers: {
+                ...cachedHeaders,
+                'X-Cache': 'HIT',
+                'X-Cache-TTL': String(cacheTtl),
+                ...corsHeaders(),
+              },
+            });
+          }
+        }
+      }
+    }
+
+    // 5. Forward request to origin (Cloud Run API)
+    const originUrl = new URL(path, env.API_BASE);
+    originUrl.search = url.search;
+
+    const originRequest = new Request(originUrl.toString(), {
+      method,
+      headers: buildOriginHeaders(request),
+      body: method !== 'GET' && method !== 'HEAD' ? await request.clone().arrayBuffer() : undefined,
+    });
+
+    try {
+      const response = await fetch(originRequest);
+
+      // 6. Cache successful GET responses
+      if (method === 'GET' && response.ok) {
+        const cacheTtl = getCacheTtl(path);
+        if (cacheTtl > 0) {
+          const body = await response.clone().text();
+          const headers: Record<string, string> = {};
+          response.headers.forEach((v, k) => {
+            headers[k] = v;
+          });
+
+          ctx.waitUntil(
+            env.EDGE_CACHE_KV.put(
+              `cache:${path}`,
+              JSON.stringify({ body, headers, status: response.status, timestamp: Date.now() }),
+              { expirationTtl: cacheTtl + 10 } // KV TTL slightly longer than cache TTL
+            )
+          );
+        }
+      }
+
+      // 7. Build response with edge headers
+      const responseHeaders = new Headers(response.headers);
+      responseHeaders.set('X-Served-By', 'cloudflare-edge');
+      responseHeaders.set('X-Cache', 'MISS');
+
+      // Rate limit headers
+      responseHeaders.set('X-RateLimit-Limit', String(rateLimitResult.limit));
+      responseHeaders.set('X-RateLimit-Remaining', String(rateLimitResult.remaining));
+
+      // CORS
+      const cors = corsHeaders();
+      for (const [k, v] of Object.entries(cors)) {
+        responseHeaders.set(k, v);
+      }
+
+      // Security headers
+      responseHeaders.set('X-Content-Type-Options', 'nosniff');
+      responseHeaders.set('X-Frame-Options', 'DENY');
+      responseHeaders.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: responseHeaders,
+      });
+    } catch (err) {
+      // Origin unreachable — return cached response if available
+      if (method === 'GET') {
+        const cached = await env.EDGE_CACHE_KV.get(`cache:${path}`, 'json');
+        if (cached) {
+          const { body, headers: cachedHeaders, status } = cached as {
+            body: string;
+            headers: Record<string, string>;
+            status: number;
+          };
+          return new Response(body, {
+            status,
+            headers: {
+              ...cachedHeaders,
+              'X-Cache': 'STALE',
+              'X-Origin-Error': 'unreachable',
+              ...corsHeaders(),
+            },
+          });
+        }
+      }
+
+      return new Response(
+        JSON.stringify({ error: 'Service temporarily unavailable' }),
+        {
+          status: 503,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': '10',
+            ...corsHeaders(),
+          },
+        }
+      );
+    }
+  },
+};
+
+// ── Rate Limiting (KV-based sliding window) ──
+
+async function checkRateLimit(
+  env: Env,
+  path: string,
+  clientIp: string
+): Promise<{ allowed: boolean; limit: number; remaining: number; retryAfter: number; resetAt: number }> {
+  const config = RATE_LIMITS[path] || RATE_LIMITS.default;
+  const key = `rl:${clientIp}:${path}`;
+  const now = Math.floor(Date.now() / 1000);
+  const windowStart = now - config.windowSec;
+
+  try {
+    const stored = await env.RATE_LIMIT_KV.get(key, 'json');
+    let requests: number[] = stored ? (stored as number[]) : [];
+
+    // Remove expired entries
+    requests = requests.filter((t) => t > windowStart);
+
+    const remaining = config.maxRequests - requests.length;
+
+    if (remaining <= 0) {
+      const oldestInWindow = Math.min(...requests);
+      const retryAfter = oldestInWindow + config.windowSec - now;
+      return {
+        allowed: false,
+        limit: config.maxRequests,
+        remaining: 0,
+        retryAfter: Math.max(retryAfter, 1),
+        resetAt: oldestInWindow + config.windowSec,
+      };
+    }
+
+    // Add current request
+    requests.push(now);
+
+    // Store updated window (KV has eventual consistency, but good enough for rate limiting)
+    await env.RATE_LIMIT_KV.put(key, JSON.stringify(requests), {
+      expirationTtl: config.windowSec + 60,
+    });
+
+    return {
+      allowed: true,
+      limit: config.maxRequests,
+      remaining: remaining - 1,
+      retryAfter: 0,
+      resetAt: now + config.windowSec,
+    };
+  } catch {
+    // KV error — fail open (allow request)
+    return { allowed: true, limit: config.maxRequests, remaining: config.maxRequests, retryAfter: 0, resetAt: 0 };
+  }
+}
+
+// ── Helpers ──
+
+function getCacheTtl(path: string): number {
+  for (const [pattern, ttl] of Object.entries(CACHE_CONFIG)) {
+    if (path.startsWith(pattern) || path === pattern) {
+      return ttl;
+    }
+  }
+  return 0; // No cache by default
+}
+
+function isBlockedPath(path: string): boolean {
+  const blocked = [
+    '/.env', '/.git', '/.htaccess', '/.htpasswd',
+    '/admin', '/debug', '/.well-known/security.txt',
+  ];
+  return blocked.some((p) => path.startsWith(p));
+}
+
+function corsHeaders(): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Idempotency-Key, X-Request-Id',
+    'Access-Control-Expose-Headers': 'X-Request-Id, X-Trace-Id, ETag, X-RateLimit-Limit, X-RateLimit-Remaining, X-Cache',
+    'Access-Control-Max-Age': '86400',
+  };
+}
+
+function handleCors(request: Request): Response {
+  const origin = request.headers.get('Origin') || '*';
+  return new Response(null, {
+    status: 204,
+    headers: {
+      ...corsHeaders(),
+      'Access-Control-Allow-Origin': origin,
+    },
+  });
+}
+
+function buildOriginHeaders(request: Request): Headers {
+  const headers = new Headers(request.headers);
+
+  // Forward client IP to origin
+  const clientIp = request.headers.get('CF-Connecting-IP');
+  if (clientIp) {
+    headers.set('X-Forwarded-For', clientIp);
+    headers.set('X-Real-IP', clientIp);
+  }
+
+  // Forward CF ray ID for tracing
+  const rayId = request.headers.get('CF-Ray');
+  if (rayId) {
+    headers.set('X-CF-Ray', rayId);
+  }
+
+  // Remove hop-by-hop headers
+  headers.delete('cf-connecting-ip');
+  headers.delete('cf-ipcountry');
+  headers.delete('cf-ray');
+  headers.delete('cf-visitor');
+
+  return headers;
+}
