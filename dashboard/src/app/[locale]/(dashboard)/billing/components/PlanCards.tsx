@@ -35,18 +35,7 @@ const planDefaults = [
     yearlyPriceTry: 509,
     limitKey: 'plans.startupLimit',
     features: [
-      '30,000 events/day',
-      '1 application',
-      '50 endpoints',
-      '50 event types',
-      '300 subscriptions',
-      '14-day log retention',
-      'Never-blocked mode',
-      '$0.003/event overage',
-      'CloudEvents v1.0',
-      'Secret rotation',
-      'Dead letter queue',
-      'Email support',
+      '30kEventsDay', '1application', '50endpoints', '50eventTypes', '300subscriptions', '14dayLog', 'neverBlocked', '003overage', 'cloudevents', 'secretRotation', 'deadLetter', 'emailSupport',
     ],
     popular: false,
   },
@@ -59,18 +48,7 @@ const planDefaults = [
     yearlyPriceTry: 849,
     limitKey: 'plans.proLimit',
     features: [
-      '100,000 events/day',
-      'Unlimited applications',
-      '500 endpoints',
-      'Unlimited event types',
-      'Unlimited subscriptions',
-      '30-day log retention',
-      '$0.0001/event overage',
-      'FIFO ordered delivery',
-      'IP whitelisting',
-      'Analytics & graphs',
-      'Schema registry',
-      'Priority support',
+      '100kEventsDay', 'unlimitedApps', '500endpoints', 'unlimitedEventTypes', 'unlimitedSubs', '30dayLog', '0001overage', 'fifo', 'ipWhitelist', 'analytics', 'schemaRegistry', 'prioritySupport',
     ],
     popular: true,
   },
@@ -83,18 +61,7 @@ const planDefaults = [
     yearlyPriceTry: 0,
     limitKey: 'plans.enterpriseLimit',
     features: [
-      'Unlimited events/day',
-      'Unlimited applications',
-      'Unlimited endpoints',
-      'Unlimited event types',
-      'Unlimited subscriptions',
-      'Custom log retention',
-      'Custom pricing',
-      'SSO / SAML',
-      'Dedicated account manager',
-      '99.9% SLA guarantee',
-      'Custom integrations',
-      'On-premise option',
+      'unlimitedEvents', 'unlimitedApps', 'unlimitedEndpoints', 'unlimitedEventTypes', 'unlimitedSubs', 'customLog', 'customPricing', 'ssoSaml', 'accountManager', 'sla99', 'customIntegrations', 'onPremise',
     ],
     popular: false,
   },
@@ -205,7 +172,7 @@ export function PlanCards({
               <ul className="space-y-2 mb-6">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
-                    <span className="text-green-500">✓</span> {f}
+                    <span className="text-green-500">✓</span> {t(`features.${f}`)}
                   </li>
                 ))}
               </ul>

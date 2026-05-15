@@ -7,11 +7,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { alertsApi, type AlertRule } from '@/lib/api';
 
-const CONDITION_LABELS: Record<string, string> = {
-  failure_rate: 'Failure Rate >',
-  latency: 'Avg Latency >',
-  consecutive_failures: 'Consecutive Failures >',
-};
+
 
 const CHANNEL_ICONS: Record<string, string> = {
   slack: '💬',
@@ -22,6 +18,12 @@ const CHANNEL_ICONS: Record<string, string> = {
 export default function AlertsPage() {
   const t = useTranslations('alerts');
   const tc = useTranslations('common');
+  
+  const conditionLabels: Record<string, string> = {
+    failure_rate: t('conditionFailureRate'),
+    latency: t('conditionLatency'),
+    consecutive_failures: t('conditionConsecutive'),
+  };
   const { token } = useAuth();
   const { toast } = useToast();
   const [alerts, setAlerts] = useState<AlertRule[]>([]);
@@ -252,7 +254,7 @@ export default function AlertsPage() {
                     </span>
                   </div>
                   <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                    {CONDITION_LABELS[alert.condition] || alert.condition} {alert.threshold}
+                    {conditionLabels[alert.condition] || alert.condition} {alert.threshold}
                     {alert.condition === 'failure_rate' && '%'}
                     {alert.condition === 'latency' && 'ms'}
                     {' · '}
