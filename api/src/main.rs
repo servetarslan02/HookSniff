@@ -141,7 +141,7 @@ async fn main() -> Result<()> {
     };
 
     // Initialize QStash client (if QSTASH_TOKEN is set)
-    let qstash_client = match crate::qstash::QStashClient::from_env() {
+    let qstash_client = match hooksniff_api::qstash::QStashClient::from_env() {
         Some(client) => {
             tracing::info!("✅ QStash client initialized (reliable message delivery)");
             Some(client)
@@ -153,7 +153,7 @@ async fn main() -> Result<()> {
     };
 
     // Initialize R2 storage client (if CF_ACCOUNT_ID and CF_R2_TOKEN are set)
-    let r2_client = match crate::r2::R2Client::from_env() {
+    let r2_client = match hooksniff_api::r2::R2Client::from_env() {
         Some(client) => {
             tracing::info!("✅ R2 storage client initialized (dead letter archive)");
             Some(client)
