@@ -85,6 +85,10 @@ pub struct Config {
     pub fcm_server_key: Option<String>,
     /// Base URL for email links (password reset, verification)
     pub email_base_url: String,
+    /// QStash token for reliable message delivery (optional)
+    pub qstash_token: Option<String>,
+    /// QStash base URL (defaults to EU region)
+    pub qstash_url: Option<String>,
 }
 
 /// Custom Debug implementation that masks secret fields.
@@ -291,6 +295,8 @@ impl Config {
             fcm_server_key: std::env::var("FCM_SERVER_KEY").ok(),
             email_base_url: std::env::var("EMAIL_BASE_URL")
                 .unwrap_or_else(|_| "https://hooksniff.vercel.app".into()),
+            qstash_token: std::env::var("QSTASH_TOKEN").ok(),
+            qstash_url: std::env::var("QSTASH_URL").ok(),
         })
     }
 }
