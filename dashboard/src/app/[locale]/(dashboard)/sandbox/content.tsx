@@ -89,11 +89,11 @@ export function PlaygroundPageContent() {
         localStorage.setItem('hooksniff_playground_token', data.token);
         localStorage.setItem('hooksniff_playground_url', data.url);
       } else {
-        setError(data.error || tc('tokenGenFailed'));
+        setError(data.error || 'Failed to generate token');
         setState('error');
       }
     } catch {
-      setError(tc('networkErrorCheck'));
+      setError('Network error — check your connection');
       setState('error');
     }
   }, []);
