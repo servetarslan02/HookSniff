@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-15 20:20 GMT+8
+> Son güncelleme: 2026-05-15 20:45 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -117,6 +117,20 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 169 — 2026-05-15 20:45 GMT+8
+1. **Redis URL Fallback** — `config::resolve_redis_url()` fonksiyonu eklendi
+   - `REDIS_URL` yoksa `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`'dan otomatik `rediss://` URL'si oluşturur
+   - `main.rs`'de 3, `rate_limit.rs`'de 1, `health.rs`'de 2 yer güncellendi
+   - **Etki:** Redis "not configured" sorunu çözüldü — Cloud Run'da UPSTASH env var'ları set ise Redis otomatik bağlanacak
+2. **Root Endpoint** — `GET /` artık JSON döndürüyor (service info, version, docs link)
+3. **API v1 Health** — `/api/v1/health` alias eklendi (404 fix)
+4. **Polar order.completed** — `order.completed` event'i handler'a eklendi (`order.created` ile birlikte)
+5. **Commit:** 3cc09d56 — push edildi
+
+### ⚠️ Servet'in Yapması Gereken (Acil)
+- **Cloud Run ortam değişkenleri:** `RATE_LIMIT_STORE=redis` ve `REDIS_URL` (veya `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`) Cloud Run'da set edilmeli
+- Kod artık otomatik fallback yapıyor ama env var'ların Cloud Run'da tanımlı olması lazım
 
 ### Oturum 168 — 2026-05-15 20:24 GMT+8
 1. **Navigation Restructure** — Önceki oturumlarda tamamlanmış (doğrulandı)
