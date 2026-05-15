@@ -16,6 +16,7 @@
 | `04-altyapi.md` | Docker, Node.js, PostgreSQL güncellemeleri |
 | `05-onerilen-siralama.md` | Adım adım uygulama planı |
 | `06-ek-bulgular.md` | GitHub Actions, CI/CD, SDK runtime'ları, MCP |
+| `07-derin-tarama.md` | Rust SDK, Edge Proxy, Monitoring, CLI, DevDeps |
 
 ---
 
@@ -23,9 +24,17 @@
 
 | Kategori | Toplam | Güncel | Güncelleme Gerekli |
 |----------|--------|--------|--------------------|
-| Rust crates | 28 | 21 | 7 (patch seviyesi) |
-| NPM packages | 17 | 10 | 7 (3 major, 4 minor/patch) |
-| Altyapı | 5 | 3 | 2 (Node LTS, PostgreSQL) |
+| Rust crates (ana proje) | 28 | 27 | 1 (minor patch) |
+| Rust SDK | 10 | 7 | **3 (major uyumsuz)** |
+| NPM packages (dashboard) | 17 | 10 | 7 (5 major, 2 minor/patch) |
+| NPM packages (edge-proxy) | 4 | 1 | **3 (major)** |
+| NPM packages (docs-sdk) | 6 | 3 | **3 (React 19, Docusaurus)** |
+| NPM packages (CLI) | 1 | 0 | **1 (commander major)** |
+| GitHub Actions | 15 | 5 | **10 (major)** |
+| Docker images | 7 | 3 | **4 (Node 22, PostgreSQL 17)** |
+| Monitoring | 2 | 0 | **2 (Prometheus, Grafana)** |
+| SDK runtimes | 6 | 3 | 3 (Go, Python, Ruby) |
+| Dev dependencies | 10 | 6 | 4 (jest-axe, eslint-plugin, etc.) |
 
 ## Risk Dağılımı
 
