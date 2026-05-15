@@ -51,7 +51,27 @@ RL=$(echo "$DB_STATS" | python3 -c "import sys,json; print(json.load(sys.stdin).
 if [ "$D1H" -gt 0 ] 2>/dev/null; then SR1H=$(python3 -c "print(round($OK1H/$D1H*100,1))"); else SR1H="100.0"; fi
 if [ "$D24H" -gt 0 ] 2>/dev/null; then SR24H=$(python3 -c "print(round($OK24H/$D24H*100,1))"); else SR24H="100.0"; fi
 
-# 3. Push all metrics to Grafana Prometheus via OTLP
+# 3b. Fetch Prometheus /metrics from API for cache + detailed metrics
+METRICS_SECRET="${METRICS_SECRET:-1d4487405a247de66acd5a8775294334707bb9ac0ea3318c8fbd1508074bd28d}"
+PROM_METRICS=$(curl -sf --max-time 10 \
+  -H "Authorization: Bearer ${METRICS_SECRET}" \
+  "$API_URL/metrics" 2>/dev/null || echo "")
+
+# Extract cache metrics from Prometheus exposition format
+CACHE_HITS=$(echo "$PROM_METRICS" | grep '^cache_hits_total' | awk '{print $2}' | head -1)
+CACHE_MISSES=$(echo "$PROM_METRICS" | grep '^cache_misses_total' | awk '{print $2}' | head -1)
+CACHE_HIT_RATE=$(echo "$PROM_METRICS" | grep '^cache_hit_rate_percent' | awk '{print $2}' | head -1)
+ACTIVE_CONNS=$(echo "$PROM_METRICS" | grep '^active_connections ' | awk '{print $2}' | head -1)
+ACTIVE_EPS=$(echo "$PROM_METRICS" | grep '^active_endpoints ' | awk '{print $2}' | head -1)
+
+# Default to 0 if empty
+CACHE_HITS="${CACHE_HITS:-0}"
+CACHE_MISSES="${CACHE_MISSES:-0}"
+CACHE_HIT_RATE="${CACHE_HIT_RATE:-0}"
+ACTIVE_CONNS="${ACTIVE_CONNS:-0}"
+ACTIVE_EPS="${ACTIVE_EPS:-0}"
+
+# 4. Push all metrics to Grafana Prometheus via OTLP
 build_gauge() {
   local name=$1 value=$2
   echo "{\"name\":\"$name\",\"gauge\":{\"dataPoints\":[{\"timeUnixNano\":\"$NOW_NS\",\"asDouble\":$value}]}}"
@@ -87,7 +107,12 @@ $(build_gauge hooksniff_plan_enterprise $PE),
 $(build_gauge hooksniff_logins_1h $LI),
 $(build_gauge hooksniff_failed_actions_1h $FA),
 $(build_gauge hooksniff_audit_events_24h $AE),
-$(build_gauge hooksniff_rate_limited_1h $RL)
+$(build_gauge hooksniff_rate_limited_1h $RL),
+$(build_gauge hooksniff_cache_hits $CACHE_HITS),
+$(build_gauge hooksniff_cache_misses $CACHE_MISSES),
+$(build_gauge hooksniff_cache_hit_rate $CACHE_HIT_RATE),
+$(build_gauge hooksniff_active_connections $ACTIVE_CONNS),
+$(build_gauge hooksniff_active_endpoints_from_metrics $ACTIVE_EPS)
 ")
 
 curl -sf -X POST "$OTLP_URL" \
