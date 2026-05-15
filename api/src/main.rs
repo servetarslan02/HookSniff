@@ -18,6 +18,7 @@ use hooksniff_api::email;
 use hooksniff_api::jobs;
 use hooksniff_api::metrics;
 use hooksniff_api::middleware;
+use hooksniff_api::notifications;
 use hooksniff_api::rate_limit;
 use hooksniff_api::routes;
 use hooksniff_api::telemetry;
@@ -142,72 +143,158 @@ async fn main() -> Result<()> {
     // Initialize email provider (Resend primary → GCloud fallback → None)
     let email_provider = email::EmailProvider::from_config(&cfg);
 
-    // Spawn retention background job (runs every 24 hours)
-    let retention_pool = pool.clone();
+    // Initialize FCM client for push notifications
+    let fcm_client = notifications::FcmClient::from_config(&cfg);
+
+    // Initialize Redis job queue (if REDIS_URL is set)
+    let job_queue = match std::env::var("REDIS_URL") {
+        Ok(ref url) if !url.is_empty() => {
+            match jobs::job_queue::JobQueue::new(url).await {
+                Ok(q) => Some(q),
+                Err(e) => {
+                    tracing::warn!("Redis job queue unavailable ({}), falling back to tokio::spawn", e);
+                    None
+                }
+            }
+        }
+        _ => {
+            tracing::info!("REDIS_URL not set, using tokio::spawn for background jobs");
+            None
+        }
+    };
+
+    // Spawn job queue worker (processes email + notification jobs from Redis)
+    if let Some(ref queue) = job_queue {
+        let worker_queue = queue.clone();
+        let worker_email = email_provider.clone();
+        let worker_fcm = fcm_client.clone();
+        let worker_pool = pool.clone();
+        tokio::spawn(async move {
+            worker_queue
+                .process_jobs(worker_email, worker_fcm, worker_pool)
+                .await;
+        });
+
+        // Spawn delayed job processor (moves ready delayed jobs to main queue)
+        let _delayed_queue = queue.clone();
+        tokio::spawn(async move {
+            loop {
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                // We need a separate connection for delayed job processing
+                // The job_queue's internal conn is used by the worker, so we create a new one
+                if let Ok(url) = std::env::var("REDIS_URL") {
+                    if let Ok(client) = redis::Client::open(url.as_str()) {
+                        if let Ok(mut conn) = redis::aio::ConnectionManager::new(client).await {
+                            if let Err(e) = jobs::job_queue::process_delayed_jobs(&mut conn).await {
+                                tracing::warn!("Delayed job processor error: {:?}", e);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        tracing::info!("✅ Redis job queue worker started");
+    }
+
+    // Scheduled background jobs with distributed locks
+    // Only ONE instance runs each job (prevents duplicate work in multi-instance deployments)
+    let sched_pool = pool.clone();
+    let sched_queue = job_queue.clone();
     let retention_days = cfg.retention_days;
     tokio::spawn(async move {
         loop {
             tokio::time::sleep(std::time::Duration::from_secs(24 * 60 * 60)).await;
-            if let Err(e) = jobs::retention::run_retention(&retention_pool, retention_days).await {
-                tracing::error!("❌ Retention job failed: {:?}", e);
+
+            // Use Redis lock if available, otherwise run on every instance
+            let should_run = if let Some(ref queue) = sched_queue {
+                queue.try_acquire_lock("retention", 3600).await.unwrap_or(true)
+            } else {
+                true
+            };
+
+            if should_run {
+                if let Err(e) = jobs::retention::run_retention(&sched_pool, retention_days).await {
+                    tracing::error!("❌ Retention job failed: {:?}", e);
+                }
             }
         }
     });
 
-    // Spawn monthly webhook_count reset job
+    // Monthly webhook count reset (distributed lock: 1 hour TTL)
     let reset_pool = pool.clone();
+    let reset_queue = job_queue.clone();
     tokio::spawn(async move {
         loop {
             tokio::time::sleep(std::time::Duration::from_secs(24 * 60 * 60)).await;
-            if let Err(e) = jobs::retention::reset_monthly_webhook_counts(&reset_pool).await {
-                tracing::error!("❌ Monthly count reset failed: {:?}", e);
+
+            let should_run = if let Some(ref queue) = reset_queue {
+                queue.try_acquire_lock("monthly_reset", 3600).await.unwrap_or(true)
+            } else {
+                true
+            };
+
+            if should_run {
+                if let Err(e) = jobs::retention::reset_monthly_webhook_counts(&reset_pool).await {
+                    tracing::error!("❌ Monthly count reset failed: {:?}", e);
+                }
             }
         }
     });
 
-    // Spawn cleanup job for seen_webhooks + idempotency_keys (runs every 6 hours)
+    // Cleanup: seen_webhooks + idempotency_keys + revoked_tokens (every 6 hours, distributed lock)
     let cleanup_pool = pool.clone();
+    let cleanup_queue = job_queue.clone();
     tokio::spawn(async move {
         loop {
             tokio::time::sleep(std::time::Duration::from_secs(6 * 60 * 60)).await;
-            // Clean expired seen_webhooks
-            match sqlx::query("DELETE FROM seen_webhooks WHERE expires_at < now()")
-                .execute(&cleanup_pool)
-                .await
-            {
-                Ok(r) => {
-                    let deleted = r.rows_affected();
-                    if deleted > 0 {
-                        tracing::info!("🧹 Cleaned {} expired seen_webhooks", deleted);
+
+            let should_run = if let Some(ref queue) = cleanup_queue {
+                queue.try_acquire_lock("cleanup_6h", 1800).await.unwrap_or(true)
+            } else {
+                true
+            };
+
+            if should_run {
+                // Clean expired seen_webhooks
+                match sqlx::query("DELETE FROM seen_webhooks WHERE expires_at < now()")
+                    .execute(&cleanup_pool)
+                    .await
+                {
+                    Ok(r) => {
+                        let deleted = r.rows_affected();
+                        if deleted > 0 {
+                            tracing::info!("🧹 Cleaned {} expired seen_webhooks", deleted);
+                        }
                     }
+                    Err(e) => tracing::error!("❌ seen_webhooks cleanup failed: {:?}", e),
                 }
-                Err(e) => tracing::error!("❌ seen_webhooks cleanup failed: {:?}", e),
-            }
-            // Clean expired idempotency_keys
-            match sqlx::query("DELETE FROM idempotency_keys WHERE expires_at < now()")
-                .execute(&cleanup_pool)
-                .await
-            {
-                Ok(r) => {
-                    let deleted = r.rows_affected();
-                    if deleted > 0 {
-                        tracing::info!("🧹 Cleaned {} expired idempotency_keys", deleted);
+                // Clean expired idempotency_keys
+                match sqlx::query("DELETE FROM idempotency_keys WHERE expires_at < now()")
+                    .execute(&cleanup_pool)
+                    .await
+                {
+                    Ok(r) => {
+                        let deleted = r.rows_affected();
+                        if deleted > 0 {
+                            tracing::info!("🧹 Cleaned {} expired idempotency_keys", deleted);
+                        }
                     }
+                    Err(e) => tracing::error!("❌ idempotency_keys cleanup failed: {:?}", e),
                 }
-                Err(e) => tracing::error!("❌ idempotency_keys cleanup failed: {:?}", e),
-            }
-            // HS-261: Clean expired revoked_tokens
-            match sqlx::query("DELETE FROM revoked_tokens WHERE expires_at < now()")
-                .execute(&cleanup_pool)
-                .await
-            {
-                Ok(r) => {
-                    let deleted = r.rows_affected();
-                    if deleted > 0 {
-                        tracing::info!("🧹 Cleaned {} expired revoked_tokens", deleted);
+                // Clean expired revoked_tokens
+                match sqlx::query("DELETE FROM revoked_tokens WHERE expires_at < now()")
+                    .execute(&cleanup_pool)
+                    .await
+                {
+                    Ok(r) => {
+                        let deleted = r.rows_affected();
+                        if deleted > 0 {
+                            tracing::info!("🧹 Cleaned {} expired revoked_tokens", deleted);
+                        }
                     }
+                    Err(e) => tracing::error!("❌ revoked_tokens cleanup failed: {:?}", e),
                 }
-                Err(e) => tracing::error!("❌ revoked_tokens cleanup failed: {:?}", e),
             }
         }
     });
@@ -237,6 +324,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(cfg.clone()))
         .layer(axum::Extension(metrics.clone()))
         .layer(axum::Extension(email_provider))
+        .layer(axum::Extension(job_queue))
         .layer(axum::Extension(cache_layer))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg
