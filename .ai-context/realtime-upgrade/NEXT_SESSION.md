@@ -1,6 +1,6 @@
 # Real-Time Upgrade — Sonraki Oturum
 
-> Son güncelleme: 2026-05-16 05:55 GMT+8
+> Son güncelleme: 2026-05-16 06:10 GMT+8
 
 ## Hemen Oku
 
@@ -8,49 +8,37 @@
 2. `.ai-context/realtime-upgrade/PLAN.md` → plan (v3.0)
 3. Bu dosya → sıradaki iş
 
-## Faz 1 Durumu: ✅ %100 TAMAMLANDI
+## Faz 1: ✅ Tamamlandı
+## Faz 2: ✅ Tamamlandı
 
-### ✅ Tamamlanan (Tüm Sayfalar)
-- React Query + Zod kuruldu (providers.tsx, schemas/api.ts)
-- 14 admin hook'u + 16 yeni hook (hooks/useAdminData.ts)
-- 10 dashboard hook'u (hooks/useDashboardData.ts)
-- Tüm 11 sayfa dönüştürüldü:
-  - admin/page, activity, users, alerts, revenue, system, settings
-  - DashboardOverview, endpoints/page, endpoints/[id], deliveries/DeliveriesList
-
-## Sıradaki: Faz 2 — Event System + Redis Streams
+## Sıradaki: Faz 3 — WebSocket Real-Time Bağlantı
 
 ### Hedef
-Rust backend'de event üretim mekanizması kur + Redis Streams ile publish.
+WebSocket endpoint'i oluştur + EventPublisher'ı WS gateway'e bağla.
 
 ### Adımlar
-1. **Redis Streams writer** (Rust)
-   - `hooksniff:events` stream key'ine XADD ile event yaz
-   - Event tipleri: `delivery.created`, `delivery.completed`, `delivery.failed`, `endpoint.created`, `endpoint.updated`, `user.registered`
-   - Her event: `{ type, seq, ts, data }` formatında
+1. **WS endpoint** (`api/src/routes/ws.rs` veya mevcut `ws/handler.rs`)
+   - `/v1/ws` — WebSocket upgrade endpoint
+   - JWT auth zorunlu
+   - Event filtreleme (deliveries, endpoints, users, queue)
 
-2. **Event producer modülü**
-   - Delivery lifecycle'da (create, complete, fail) event üret
-   - Endpoint CRUD'da event üret
-   - User registration'da event üret
+2. **EventPublisher → WS bridge**
+   - `event_publisher.subscribe()` ile local broadcast receiver
+   - Her WS connection'a event推送
+   - `event_publisher.get_recent(N)` ile ilk yükleme
 
-3. **Upstash Redis bağlantısı**
-   - `REDIS_URL` env variable
-   - Connection pool (bb8-redis veya deadpool-redis)
-   - Retry logic
+3. **Frontend WS hook** (`dashboard/src/hooks/useWebSocket.ts`)
+   - WebSocket connection + auto-reconnect
+   - Event dinleme + React Query cache invalidation
+   - Fallback polling (WS bağlantısı yoksa)
 
-4. **Sequence number**
-   - Her event için monotonik seq numarası
-   - INCR ile Redis'ten al
+4. **Frontend entegrasyon**
+   - Dashboard sayfalarında WS hook kullanımı
+   - Real-time güncelleme: sayfa yenilemeden veri akışı
 
 ### Dikkat Edilecekler
-- Redis Streams > Pub/Sub (persistence, deploy güvenliği)
-- XADD ile mesaj Redis'te kalır
-- Consumer groups → multi-instance'da duplicate yok
-- Upstash free tier: $0, 256 MB
-- Stream key: `hooksniff:events`
-
-## Kısa Kararlar
-- Redis Streams > Pub/Sub (persistence, deploy güvenliği)
-- Kafka/NATS: overkill ($0-100 kullanıcı için)
-- Kubernetes: overkill (Cloud Run yeterli)
+- Mevcut `ws/` modülünü kullan (WsGateway, handler zaten var)
+- JWT auth: mevcut middleware'den token al
+- Max connections: 100 (config'den)
+- Heartbeat: 30 sn interval
+- Graceful shutdown: connection cleanup
