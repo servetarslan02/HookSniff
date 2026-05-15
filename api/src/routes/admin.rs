@@ -2027,15 +2027,15 @@ async fn list_all_alerts(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<AdminAlertRule>>, AppError> {
+    require_admin(&customer)?;
+
     let alerts = sqlx::query_as::<_, (Uuid, Option<Uuid>, Option<String>, String, String, i32, serde_json::Value, bool, chrono::DateTime<chrono::Utc>)>(
         r#"SELECT ar.id, ar.customer_id, c.email, ar.name, ar.condition, ar.threshold, ar.channels, ar.is_active, ar.created_at
            FROM alert_rules ar
            LEFT JOIN customers c ON ar.customer_id = c.id
-           WHERE ar.customer_id = $1
            ORDER BY ar.created_at DESC
            LIMIT 200"#
     )
-    .bind(customer.id)
     .fetch_all(&pool)
     .await?;
 
