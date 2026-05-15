@@ -6,21 +6,21 @@ import { adminApi, type AlertRuleAdmin } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 
-const CONDITIONS = [
-  { value: 'failure_rate', label: 'Failure Rate (%)', icon: '📉' },
-  { value: 'latency', label: 'Latency (ms)', icon: '⏱️' },
-  { value: 'consecutive_failures', label: 'Consecutive Failures', icon: '🔴' },
-];
-
-const CHANNELS = [
-  { value: 'email', label: 'Email', icon: '📧' },
-  { value: 'slack', label: 'Slack', icon: '💬' },
-  { value: 'webhook', label: 'Webhook', icon: '🔗' },
-];
-
 export default function AdminAlertsPage() {
   const { token } = useAuth();
   const t = useTranslations('admin');
+  
+  const CONDITIONS = [
+    { value: 'failure_rate', label: t('conditionFailureRate'), icon: '📉' },
+    { value: 'latency', label: t('conditionLatency'), icon: '⏱️' },
+    { value: 'consecutive_failures', label: t('conditionConsecutive'), icon: '🔴' },
+  ];
+
+  const CHANNELS = [
+    { value: 'email', label: t('channelEmail'), icon: '📧' },
+    { value: 'slack', label: t('channelSlack'), icon: '💬' },
+    { value: 'webhook', label: t('channelWebhook'), icon: '🔗' },
+  ];
   const { toast } = useToast();
 
   const [alerts, setAlerts] = useState<AlertRuleAdmin[]>([]);

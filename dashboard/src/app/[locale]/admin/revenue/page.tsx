@@ -71,7 +71,7 @@ export default function AdminRevenuePage() {
     try {
       const url = adminApi.exportRevenue(token, 12);
       const res = await fetch(`${API_BASE}${url}`, { headers: { Authorization: `Bearer ${token}` } });
-      if (!res.ok) throw new Error('Export failed');
+      if (!res.ok) throw new Error(t('exportFailed'));
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');

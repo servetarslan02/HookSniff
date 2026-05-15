@@ -6,23 +6,25 @@ import { adminApi } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 
-const PLAN_OPTIONS = [
-  { value: '', label: 'All Paid Plans' },
-  { value: 'startup', label: 'Startup' },
-  { value: 'pro', label: 'Pro' },
-  { value: 'enterprise', label: 'Enterprise' },
-  { value: 'free', label: 'Free (include free)' },
-];
 
-const STATUS_OPTIONS = [
-  { value: '', label: 'All Users' },
-  { value: 'verified', label: 'Verified Only' },
-  { value: 'unverified', label: 'Unverified Only' },
-];
 
 export default function AdminEmailPage() {
   const { token } = useAuth();
   const t = useTranslations('admin');
+  
+  const PLAN_OPTIONS = [
+    { value: '', label: t('emailAllPaid') },
+    { value: 'startup', label: 'Startup' },
+    { value: 'pro', label: 'Pro' },
+    { value: 'enterprise', label: 'Enterprise' },
+    { value: 'free', label: 'Free (include free)' },
+  ];
+
+  const STATUS_OPTIONS = [
+    { value: '', label: t('emailAllUsers') },
+    { value: 'verified', label: t('emailVerifiedOnly') },
+    { value: 'unverified', label: t('emailUnverifiedOnly') },
+  ];
   const { toast } = useToast();
 
   const [subject, setSubject] = useState('');
