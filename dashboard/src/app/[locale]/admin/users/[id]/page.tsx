@@ -35,6 +35,62 @@ export default function AdminUserDetailPage() {
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
   const [emailSending, setEmailSending] = useState(false);
+  // Aşama 1 — Tab sistemi
+  type TabKey = 'overview' | 'endpoints' | 'webhooks' | 'apikeys' | 'applications' | 'usage';
+  const [activeTab, setActiveTab] = useState<TabKey>('overview');
+  const [userEndpoints, setUserEndpoints] = useState<Array<{ id: string; url: string; description: string | null; is_active: boolean; created_at: string; total_deliveries: number; last_delivery_at: string | null }>>([]);
+  const [userWebhooks, setUserWebhooks] = useState<Array<{ id: string; endpoint_id: string; status: string; event: string | null; created_at: string; attempt_count: number; response_status: number | null; response_body: string | null; error_message: string | null }>>([]);
+  const [webhooksTotal, setWebhooksTotal] = useState(0);
+  const [webhooksPage, setWebhooksPage] = useState(1);
+  const [webhookFilter, setWebhookFilter] = useState<{ status?: string; event_type?: string }>({});
+  const [userApiKeys, setUserApiKeys] = useState<Array<{ prefix: string; name: string; created_at: string; is_active: boolean }>>([]);
+  const [userApps, setUserApps] = useState<Array<{ id: string; name: string; description: string | null; created_at: string; endpoint_count: number }>>([]);
+  const [userUsage, setUserUsage] = useState<{ total_deliveries: number; successful: number; failed: number; pending: number; success_rate: number; endpoints_count: number; active_endpoints: number; last_30_days: number; last_7_days: number; top_events: Array<{ event: string | null; count: number }> } | null>(null);
+  const [testWebhookUrl, setTestWebhookUrl] = useState('');
+  const [testWebhookEvent, setTestWebhookEvent] = useState('test.ping');
+  const [testWebhookResult, setTestWebhookResult] = useState<{ status_code: number; response_body: string; duration_ms: number } | null>(null);
+  const [testWebhookLoading, setTestWebhookLoading] = useState(false);
+
+  // Tab değiştiğinde veri çek
+  const fetchTabData = useCallback(async (tab: TabKey) => {
+    if (!token || !id) return;
+    try {
+      switch (tab) {
+        case 'endpoints': {
+          const data = await adminApi.getUserEndpoints(token, id);
+          setUserEndpoints(data.endpoints || []);
+          break;
+        }
+        case 'webhooks': {
+          const data = await adminApi.getUserWebhooks(token, id, { page: webhooksPage, per_page: 50, ...webhookFilter });
+          setUserWebhooks(data.webhooks || []);
+          setWebhooksTotal(data.total || 0);
+          break;
+        }
+        case 'apikeys': {
+          const data = await adminApi.getUserApiKeys(token, id);
+          setUserApiKeys(data.api_keys || []);
+          break;
+        }
+        case 'applications': {
+          const data = await adminApi.getUserApplications(token, id);
+          setUserApps(data.applications || []);
+          break;
+        }
+        case 'usage': {
+          const data = await adminApi.getUserUsage(token, id);
+          setUserUsage(data);
+          break;
+        }
+      }
+    } catch {
+      // silent fail for tab data
+    }
+  }, [token, id, webhooksPage, webhookFilter]);
+
+  useEffect(() => {
+    if (activeTab !== 'overview') fetchTabData(activeTab);
+  }, [activeTab, fetchTabData]);
 
   const fetchDetail = useCallback(async () => {
     if (!token || !id) return;
@@ -195,7 +251,31 @@ export default function AdminUserDetailPage() {
           </button>
         </div>
       </div>
+      {/* Tab Navigation */}
+      <div className="flex flex-wrap gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl">
+        {([
+          { key: 'overview', label: '📊 ' + (t('overview') || 'Overview') },
+          { key: 'endpoints', label: '🔗 ' + (t('endpoints') || 'Endpoints') },
+          { key: 'webhooks', label: '📦 ' + (t('webhooks') || 'Webhooks') },
+          { key: 'apikeys', label: '🔑 ' + (t('apiKeys') || 'API Keys') },
+          { key: 'applications', label: '📱 ' + (t('applications') || 'Applications') },
+          { key: 'usage', label: '📈 ' + (t('usage') || 'Usage') },
+        ] as { key: TabKey; label: string }[]).map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              activeTab === tab.key
+                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
+      {activeTab === "overview" && (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* User Info Card */}
         <div className="glass-card p-6">
@@ -505,6 +585,182 @@ export default function AdminUserDetailPage() {
                 ))
               ) : (
                 <p className="text-sm text-gray-500 dark:text-slate-400 text-center py-8">{t("noEndpoints")}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      )}
+
+      {/* ═══ TAB: Endpoints ═══ */}
+      {activeTab === "endpoints" && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">🔗 {t("endpoints") || "Endpoints"}</h2>
+          {userEndpoints.length > 0 ? (
+            <div className="glass-card overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-50/50 dark:bg-slate-800/50">
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">URL</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("status") || "Status"}</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("totalDeliveries") || "Deliveries"}</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("lastDelivery") || "Last Delivery"}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
+                    {userEndpoints.map((ep) => (
+                      <tr key={ep.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                        <td className="px-4 py-3 text-sm font-mono text-gray-900 dark:text-white truncate max-w-xs">{ep.url}</td>
+                        <td className="px-4 py-3"><span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${ep.is_active ? "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400"}`}>{ep.is_active ? t("active") || "Active" : t("inactive") || "Inactive"}</span></td>
+                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400">{ep.total_deliveries.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">{ep.last_delivery_at ? new Date(ep.last_delivery_at).toLocaleString() : "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-slate-400">{t("noEndpoints") || "No endpoints"}</p>
+          )}
+        </div>
+      )}
+
+      {/* ═══ TAB: Webhooks ═══ */}
+      {activeTab === "webhooks" && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📦 {t("webhooks") || "Webhooks"}</h2>
+            <div className="flex items-center gap-2">
+              <select value={webhookFilter.status || ""} onChange={(e) => { setWebhookFilter(f => ({ ...f, status: e.target.value || undefined })); setWebhooksPage(1); }} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
+                <option value="">{t("allStatuses") || "All Statuses"}</option>
+                <option value="delivered">Delivered</option>
+                <option value="failed">Failed</option>
+                <option value="pending">Pending</option>
+              </select>
+              <span className="text-sm text-gray-500 dark:text-slate-400">{webhooksTotal} {t("total") || "total"}</span>
+            </div>
+          </div>
+          {userWebhooks.length > 0 ? (
+            <div className="glass-card overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-50/50 dark:bg-slate-800/50">
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">ID</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("event") || "Event"}</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("status") || "Status"}</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("attempts") || "Attempts"}</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t("time") || "Time"}</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{tc("actions") || "Actions"}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
+                    {userWebhooks.map((d) => (
+                      <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer" onClick={() => handleViewDelivery(d.id)}>
+                        <td className="px-4 py-3 text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 10)}…</td>
+                        <td className="px-4 py-3"><span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">{d.event || "—"}</span></td>
+                        <td className="px-4 py-3"><StatusBadge status={d.status} /></td>
+                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400">{d.attempt_count}</td>
+                        <td className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">{new Date(d.created_at).toLocaleString()}</td>
+                        <td className="px-4 py-3"><div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}><button onClick={() => handleViewDelivery(d.id)} className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium">🔍</button><button onClick={async () => { if (!token) return; try { await adminApi.adminUserReplayDelivery(token, id, d.id); toast(t("replaySuccess") || "Replayed", "success"); fetchTabData("webhooks"); } catch { toast(t("replayFailed") || "Failed", "error"); } }} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">↩</button></div></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {webhooksTotal > 50 && (
+                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200/50 dark:border-slate-700/50">
+                  <button onClick={() => setWebhooksPage(p => Math.max(1, p - 1))} disabled={webhooksPage === 1} className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40">← {t("previous") || "Previous"}</button>
+                  <span className="text-sm text-gray-500 dark:text-slate-400">{t("page") || "Page"} {webhooksPage}</span>
+                  <button onClick={() => setWebhooksPage(p => p + 1)} disabled={userWebhooks.length < 50} className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40">{t("next") || "Next"} →</button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-slate-400">{t("noDeliveries") || "No deliveries"}</p>
+          )}
+        </div>
+      )}
+
+      {/* ═══ TAB: API Keys ═══ */}
+      {activeTab === "apikeys" && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">🔑 {t("apiKeys") || "API Keys"}</h2>
+          {userApiKeys.length > 0 ? (
+            <div className="glass-card p-6">
+              {userApiKeys.map((k, i) => (
+                <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{k.name}</p>
+                    <p className="text-sm font-mono text-gray-500 dark:text-slate-400">{k.prefix}••••••••</p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${k.is_active ? "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : "bg-gray-100 dark:bg-slate-800 text-gray-500"}`}>{k.is_active ? "Active" : "Inactive"}</span>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{new Date(k.created_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-slate-400">{t("noApiKeys") || "No API keys"}</p>
+          )}
+        </div>
+      )}
+
+      {/* ═══ TAB: Applications ═══ */}
+      {activeTab === "applications" && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📱 {t("applications") || "Applications"}</h2>
+          {userApps.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {userApps.map((app) => (
+                <div key={app.id} className="glass-card p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{app.name}</h3>
+                    <span className="text-xs text-gray-500 dark:text-slate-400">{app.endpoint_count} endpoints</span>
+                  </div>
+                  {app.description && <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{app.description}</p>}
+                  <p className="text-xs text-gray-400 dark:text-slate-500">{new Date(app.created_at).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-slate-400">{t("noApplications") || "No applications"}</p>
+          )}
+        </div>
+      )}
+
+      {/* ═══ TAB: Usage ═══ */}
+      {activeTab === "usage" && userUsage && (
+        <div className="space-y-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📈 {t("usageStats") || "Usage Statistics"}</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-white">{userUsage.total_deliveries.toLocaleString()}</p><p className="text-xs text-gray-500 dark:text-slate-400">{t("totalDeliveries") || "Total"}</p></div>
+            <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{userUsage.success_rate}%</p><p className="text-xs text-gray-500 dark:text-slate-400">{t("successRate") || "Success Rate"}</p></div>
+            <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-white">{userUsage.endpoints_count}</p><p className="text-xs text-gray-500 dark:text-slate-400">{t("endpoints") || "Endpoints"}</p></div>
+            <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{userUsage.last_7_days.toLocaleString()}</p><p className="text-xs text-gray-500 dark:textlate-400">{t("last7Days") || "Last 7 Days"}</p></div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="glass-card p-6">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-3">{t("deliveryBreakdown") || "Delivery Breakdown"}</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between"><span className="text-sm text-gray-600 dark:text-slate-400">{t("delivered") || "Delivered"}</span><span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{userUsage.successful.toLocaleString()}</span></div>
+                <div className="flex justify-between"><span className="text-sm text-gray-600 dark:text-slate-400">{t("failed") || "Failed"}</span><span className="text-sm font-semibold text-red-600 dark:text-red-400">{userUsage.failed.toLocaleString()}</span></div>
+                <div className="flex justify-between"><span className="text-sm text-gray-600 dark:text-slate-400">{t("pending") || "Pending"}</span><span className="text-sm font-semibold text-amber-600 dark:text-amber-400">{userUsage.pending.toLocaleString()}</span></div>
+              </div>
+            </div>
+            <div className="glass-card p-6">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-3">{t("topEvents") || "Top Events"}</h3>
+              {userUsage.top_events.length > 0 ? (
+                <div className="space-y-2">
+                  {userUsage.top_events.map((ev, i) => (
+                    <div key={i} className="flex justify-between items-center"><span className="text-sm text-gray-600 dark:text-slate-400 font-mono">{ev.event || "—"}</span><span className="text-sm font-semibold text-gray-900 dark:text-white">{ev.count.toLocaleString()}</span></div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-slate-400">{t("noData") || "No data"}</p>
               )}
             </div>
           </div>

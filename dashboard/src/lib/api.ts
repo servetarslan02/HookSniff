@@ -569,6 +569,36 @@ export const adminApi = {
     return apiFetch<UserAnalytics>(`/admin/users/${userId}/analytics${qs}`, { token });
   },
 
+  // Aşama 1 — Kullanıcı kaynakları
+  getUserEndpoints: (token: string, userId: string) =>
+    apiFetch<{ endpoints: Array<{ id: string; url: string; description: string | null; is_active: boolean; created_at: string; total_deliveries: number; last_delivery_at: string | null }> }>(`/admin/users/${userId}/endpoints`, { token }),
+
+  getUserWebhooks: (token: string, userId: string, params?: { page?: number; per_page?: number; status?: string; event_type?: string; since?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set("page", params.page.toString());
+    if (params?.per_page) searchParams.set("per_page", params.per_page.toString());
+    if (params?.status) searchParams.set("status", params.status);
+    if (params?.event_type) searchParams.set("event_type", params.event_type);
+    if (params?.since) searchParams.set("since", params.since);
+    const qs = searchParams.toString();
+    return apiFetch<{ webhooks: Array<{ id: string; endpoint_id: string; status: string; event: string | null; created_at: string; attempt_count: number; response_status: number | null; response_body: string | null; error_message: string | null }>; total: number; page: number; per_page: number }>(`/admin/users/${userId}/webhooks${qs ? `?${qs}` : ""}`, { token });
+  },
+
+  getUserApiKeys: (token: string, userId: string) =>
+    apiFetch<{ api_keys: Array<{ prefix: string; name: string; created_at: string; is_active: boolean }> }>(`/admin/users/${userId}/api-keys`, { token }),
+
+  getUserApplications: (token: string, userId: string) =>
+    apiFetch<{ applications: Array<{ id: string; name: string; description: string | null; created_at: string; endpoint_count: number }> }>(`/admin/users/${userId}/applications`, { token }),
+
+  getUserUsage: (token: string, userId: string) =>
+    apiFetch<{ total_deliveries: number; successful: number; failed: number; pending: number; success_rate: number; endpoints_count: number; active_endpoints: number; last_30_days: number; last_7_days: number; top_events: Array<{ event: string | null; count: number }> }>(`/admin/users/${userId}/usage`, { token }),
+
+  adminUserTestWebhook: (token: string, userId: string, data: { endpoint_url: string; event_type?: string; payload: Record<string, unknown> }) =>
+    apiFetch<{ status_code: number; response_body: string; duration_ms: number }>(`/admin/users/${userId}/test-webhook`, { method: "POST", body: data, token }),
+
+  adminUserReplayDelivery: (token: string, userId: string, deliveryId: string) =>
+    apiFetch<{ message: string; original_id: string; new_delivery_id: string }>(`/admin/users/${userId}/webhooks/${deliveryId}/replay`, { method: "POST", token }),
+
   testWebhook: (token: string, data: { endpoint_url: string; event_type: string; payload: Record<string, unknown> }) =>
     apiFetch<{ status_code: number; response_body: string; duration_ms: number }>(`/admin/test-webhook`, { method: 'POST', body: data, token }),
 
