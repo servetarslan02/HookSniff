@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-15 20:45 GMT+8
+> Son güncelleme: 2026-05-15 21:18 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -117,6 +117,20 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 170 — 2026-05-15 21:18 GMT+8
+1. **QStash Entegrasyonu** — `api/src/qstash.rs` modülü eklendi
+   - QStash client: webhook retry, email queue, scheduled jobs
+   - `QSTASH_TOKEN`, `QSTASH_URL`, `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY` config'e eklendi
+   - main.rs'de QStash client init + Extension layer
+2. **Cloud Run Env Var'ları** — QStash token'ları eklendi (4 env var)
+3. **Deploy** — hooksniff-api-00324-l97, tüm servisler operational
+4. **Upstash Redis** — bağlantıyı doğruladık, 194ms gecikme
+5. **Cloudflare** — bot koruması nedeniyle erişilemedi, R2 entegrasyonu ertelendi
+
+### ⚠️ Servet'in Yapması Gereken
+- **Cloudflare R2** — Manuel giriş gerekli (bot koruması). R2 bucket + API token oluştur.
+- **Polar.sh ürün** — Pro/Business planları Polar.sh'da ürün olarak tanımlanmalı
 
 ### Oturum 169 — 2026-05-15 20:45 GMT+8
 1. **Redis URL Fallback** — `config::resolve_redis_url()` fonksiyonu eklendi
