@@ -86,9 +86,9 @@ npm install @tanstack/react-query @tanstack/react-query-devtools zod
 ```
 
 **Dosya:** `dashboard/package.json`
-- [ ] `@tanstack/react-query` eklendi
-- [ ] `@tanstack/react-query-devtools` eklendi (development)
-- [ ] `zod` eklendi (schema validation için)
+- [x] `@tanstack/react-query` eklendi
+- [x] `@tanstack/react-query-devtools` eklendi (development)
+- [x] `zod` eklendi (schema validation için)
 
 ### 1.2 QueryClient Provider
 
@@ -121,13 +121,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 ```
 
-- [ ] `QueryClient` oluşturuldu
-- [ ] `QueryClientProvider` layout'a eklendi
-- [ ] `ReactQueryDevtools` eklendi (dev only)
-- [ ] Default stale time: 5 dakika
-- [ ] Default gc time: 10 dakika
-- [ ] `refetchOnWindowFocus: true`
-- [ ] Exponential backoff retry
+- [x] `QueryClient` oluşturuldu
+- [x] `QueryClientProvider` layout'a eklendi
+- [x] `ReactQueryDevtools` eklendi (dev only)
+- [x] Default stale time: 5 dakika
+- [x] Default gc time: 10 dakika
+- [x] `refetchOnWindowFocus: true`
+- [x] Exponential backoff retry
 
 ### 1.3 API Schema Validation (Zod)
 
@@ -175,11 +175,11 @@ export const WsEventSchema = z.object({
 export type WsEvent = z.infer<typeof WsEventSchema>;
 ```
 
-- [ ] `EndpointSchema` tanımlandı
-- [ ] `DeliverySchema` tanımlandı
-- [ ] `AdminStatsSchema` tanımlandı
-- [ ] `WsEventSchema` tanımlandı (sequence + timestamp)
-- [ ] Tüm API response'ları Zod ile validate ediliyor
+- [x] `EndpointSchema` tanımlandı
+- [x] `DeliverySchema` tanımlandı
+- [x] `AdminStatsSchema` tanımlandı
+- [x] `WsEventSchema` tanımlandı (sequence + timestamp)
+- [x] Tüm API response'ları Zod ile validate ediliyor
 
 ### 1.4 API Hook'ları Oluştur
 
@@ -317,35 +317,35 @@ export function useSuccessRate(range = '24h') {
 }
 ```
 
-- [ ] `useAdminStats()` hook'u oluşturuldu (Zod validated)
-- [ ] `useAdminRevenue()` hook'u oluşturuldu
-- [ ] `useAdminAuditLogs()` hook'u oluşturuldu
-- [ ] `useAdminFeatureFlags()` hook'u oluşturuldu
-- [ ] `useAdminDeployInfo()` hook'u oluşturuldu
-- [ ] `useAdminUsers()` hook'u oluşturuldu
-- [ ] `useAdminUserDetail()` hook'u oluşturuldu
-- [ ] `useEndpoints()` hook'u oluşturuldu
-- [ ] `useEndpointDetail()` hook'u oluşturuldu
-- [ ] `useDeliveryTrend()` hook'u oluşturuldu
-- [ ] `useSuccessRate()` hook'u oluşturuldu
+- [x] `useAdminStats()` hook'u oluşturuldu (Zod validated)
+- [x] `useAdminRevenue()` hook'u oluşturuldu
+- [x] `useAdminAuditLogs()` hook'u oluşturuldu
+- [x] `useAdminFeatureFlags()` hook'u oluşturuldu
+- [x] `useAdminDeployInfo()` hook'u oluşturuldu
+- [x] `useAdminUsers()` hook'u oluşturuldu
+- [x] `useAdminUserDetail()` hook'u oluşturuldu
+- [x] `useEndpoints()` hook'u oluşturuldu
+- [x] `useEndpointDetail()` hook'u oluşturuldu
+- [x] `useDeliveryTrend()` hook'u oluşturuldu
+- [x] `useSuccessRate()` hook'u oluşturuldu
 
 ### 1.5 Admin Sayfalarını Güncelle
 
-- [ ] `admin/page.tsx` — useState+useEffect → useQuery (stats, revenue, audit logs, feature flags, deploy info)
-- [ ] `admin/users/page.tsx` — useAdminUsers()
-- [ ] `admin/users/[id]/page.tsx` — useAdminUserDetail()
-- [ ] `admin/revenue/page.tsx` — useAdminRevenue()
-- [ ] `admin/system/page.tsx` — monitoring hook'ları
-- [ ] `admin/alerts/page.tsx` — alerts hook'u
-- [ ] `admin/settings/page.tsx` — settings hook'u
-- [ ] `admin/activity/page.tsx` — audit logs hook'u
+- [x] `admin/page.tsx` — useState+useEffect → useQuery (stats, revenue, audit logs, feature flags, deploy info)
+- [x] `admin/users/page.tsx` — useAdminUsers()
+- [ ] `admin/users/[id]/page.tsx` — useAdminUserDetail()  # sonraki oturum
+- [ ] `admin/revenue/page.tsx` — useAdminRevenue()  # sonraki oturum
+- [ ] `admin/system/page.tsx` — monitoring hook'ları  # sonraki oturum
+- [x] `admin/alerts/page.tsx` — alerts hook'u
+- [ ] `admin/settings/page.tsx` — settings hook'u  # sonraki oturum
+- [x] `admin/activity/page.tsx` — audit logs hook'u
 
 ### 1.6 Dashboard Sayfalarını Güncelle
 
-- [ ] `(dashboard)/core/page.tsx` → useEndpoints()
-- [ ] `(dashboard)/endpoints/[id]/page.tsx` → useEndpointDetail()
-- [ ] `(dashboard)/deliveries/page.tsx` → deliveries hook'u
-- [ ] `(dashboard)/notifications/page.tsx` → notifications hook'u
+- [x] `(dashboard)/core/page.tsx` → useEndpoints()
+- [ ] `(dashboard)/endpoints/[id]/page.tsx` → useEndpointDetail()  # sonraki oturum
+- [x] `(dashboard)/deliveries/page.tsx` → deliveries hook'u
+- [ ] `(dashboard)/notifications/page.tsx` → notifications hook'u  # sonraki oturum
 
 ### 1.7 Optimistic Updates
 
@@ -377,10 +377,10 @@ export function useUpdateEndpoint() {
 }
 ```
 
-- [ ] `useUpdateEndpoint()` — optimistic update
-- [ ] `useUpdatePlan()` — optimistic update
-- [ ] `useToggleStatus()` — optimistic update
-- [ ] `useReplayDelivery()` — optimistic update
+- [x] `useUpdateEndpoint()` — optimistic update
+- [x] `useUpdatePlan()` — optimistic update
+- [x] `useToggleStatus()` — optimistic update
+- [x] `useReplayDelivery()` — optimistic update
 
 ### 1.8 Faz 1 Doğrulama
 
@@ -1635,7 +1635,7 @@ SENTRY_DSN=https://xxx@sentry.io/xxx
 
 | Faz | Durum | Başlangıç | Bitiş |
 |-----|-------|-----------|-------|
-| Faz 1: React Query | ⬜ Bekliyor | — | — |
+| Faz 1: React Query | 🔄 %80 | 2026-05-16 | — |
 | Faz 2: Event System | ⬜ Bekliyor | — | — |
 | Faz 3: WebSocket | ⬜ Bekliyor | — | — |
 | Faz 4: Entegrasyon | ⬜ Bekliyor | — | — |
