@@ -633,7 +633,7 @@ export const adminApi = {
   createAlert: (token: string, data: { name: string; condition: string; threshold: number; channels: string[] }) =>
     apiFetch<AlertRuleAdmin>('/admin/alerts', { method: 'POST', body: data, token }),
 
-  updateAlert: (token: string, id: string, data: { threshold?: number; channels?: string[]; is_active?: boolean }) =>
+  updateAlert: (token: string, id: string, data: { name?: string; condition?: string; threshold?: number; channels?: string[]; is_active?: boolean }) =>
     apiFetch<AlertRuleAdmin>(`/admin/alerts/${id}`, { method: 'PUT', body: data, token }),
 
   deleteAlert: (token: string, id: string) =>
