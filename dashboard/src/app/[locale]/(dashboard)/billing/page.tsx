@@ -106,7 +106,10 @@ export default function BillingPage() {
     }
   };
 
-  const handleUpgrade = (planKey: string) => {
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
+
+  const handleUpgrade = (planKey: string, period: 'monthly' | 'annual' = 'monthly') => {
+    setBillingPeriod(period);
     setShowUpgradeModal(planKey);
   };
 
@@ -114,7 +117,7 @@ export default function BillingPage() {
     if (!showUpgradeModal || !token) return;
     setUpgrading(true);
     try {
-      const result = await billingApiExtended.upgrade(token, showUpgradeModal);
+      const result = await billingApiExtended.upgrade(token, showUpgradeModal, billingPeriod);
       if (result.checkout_url) {
         const url = new URL(result.checkout_url);
         const trustedHosts = ['polar.sh', 'checkout.polar.sh', 'pay.stripe.com', 'sandbox-api.iyzipay.com', 'api.iyzipay.com'];
