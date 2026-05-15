@@ -36,13 +36,6 @@ const nextConfig = {
         source: '/api/health',
         destination: 'https://hooksniff-edge-proxy.servetarslan02.workers.dev/health',
       },
-      // Playground routes — must be explicit to avoid [locale] segment catching "api"
-      { source: '/api/playground/token', destination: '/api/playground/token' },
-      { source: '/api/playground/in/:id', destination: '/api/playground/in/:id' },
-      { source: '/api/playground/history/:id', destination: '/api/playground/history/:id' },
-      // Newsletter & status
-      { source: '/api/newsletter', destination: '/api/newsletter' },
-      { source: '/api/status', destination: '/api/status' },
     ];
   },
 };
