@@ -1037,3 +1037,11 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Test:** /health 200 OK, X-Served-By: cloudflare-edge, rate limiting aktif
 - **Sonraki adım:** DNS ayarı (api.hooksniff.com → worker) — Servet'in yapması gereken
 - **Deploy method:** wrangler CLI + CLOUDFLARE_API_TOKEN env var
+
+## Oturum 167 Ek 2 — OTLP URL Fix + Deploy (2026-05-15 19:30 GMT+8)
+- **OTLP URL düzeltmesi:** `trim_end_matches("/otlp")` kaldırıldı → `/otlp/v1/metrics` doğru format
+- **Commit:** `e987d715` — push edildi
+- **Cloud Build:** 2 build çalışıyor (fd130e67 + 25239891)
+- **Grafana test:** hooksniff_test_metric = 42 ✅ (manüel OTLP push çalıştı)
+- **Grafana Prometheus UID:** `grafanacloud-prom` (grafanacloud-hookrelay-prom DEĞİL)
+- **Deploy sonrası:** metrics_push job 60sn'de bir Grafana'ya metric push edecek
