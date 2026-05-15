@@ -158,11 +158,11 @@ export default function AdminSystemPage() {
     try {
       const ids = Array.from(selectedFailed);
       await webhooksApi.batchReplay(token, ids);
-      toast(t('batchReplaySuccess') || `${ids.length} deliveries replayed`, 'success');
+      toast(t('batchReplaySuccess') || t('batchReplaySuccess', { count: ids.length }), 'success');
       setSelectedFailed(new Set());
       fetchMonitoring();
     } catch (err) {
-      toast(err instanceof Error ? err.message : (t('batchReplayFailed') || 'Batch replay failed'), 'error');
+      toast(err instanceof Error ? err.message : (t('batchReplayFailed') || t('batchReplayFailed')), 'error');
     } finally {
       setBatchReplaying(false);
     }

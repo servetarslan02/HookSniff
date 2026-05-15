@@ -151,10 +151,10 @@ export default function AdminOverviewPage() {
         [t('csvArr'), arr.toFixed(2)],
         [t('csvUptime'), uptime24h != null ? formatUptimeCSV(uptime24h) : t('csvNa')],
         ['', ''],
-        ['Users by Plan', 'Count'],
+        [t('csvUsersByPlan'), t('csvCount')],
         ...stats.users_by_plan.map(p => [p.plan, p.count.toString()]),
         ['', ''],
-        ['Recent Signups', ''],
+        [t('csvRecentSignups'), ''],
         ...stats.recent_signups.map(u => [u.email, u.plan]),
       ];
       const csv = rows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(',')).join('\n');
