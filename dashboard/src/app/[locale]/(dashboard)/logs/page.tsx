@@ -88,7 +88,7 @@ export default function LogsPage() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-            Full delivery history with status and response details
+            {t('subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
