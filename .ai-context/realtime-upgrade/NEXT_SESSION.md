@@ -1,22 +1,24 @@
 # Real-Time Upgrade — Sonraki Oturum
 
-> Son güncelleme: 2026-05-16 06:22 GMT+8
+> Son güncelleme: 2026-05-16 06:32 GMT+8
 
-## Tamamlanan Fazlar
+## ✅ TÜM FAZLAR TAMAMLANDI
 
-- ✅ Faz 1: React Query + Zod (11/11 sayfa)
-- ✅ Faz 2: Event System + Redis Streams
-- ✅ Faz 3: WebSocket endpoint + EventBridge
-- ✅ Faz 4: Frontend entegrasyon (useWebSocket + useRealtime)
+| Faz | Durum |
+|-----|-------|
+| Faz 1: React Query + Zod | ✅ |
+| Faz 2: Event System + Redis Streams | ✅ |
+| Faz 3: WebSocket | ✅ |
+| Faz 4: Frontend Entegrasyon | ✅ |
+| Faz 5: Optimizasyon | ✅ |
+| Faz 6: Güvenlik & Dayanıklılık | ✅ |
 
-## Sıradaki: Faz 5 — Optimizasyon
+## Sıradaki: Test & Deploy
 
-### Adımlar
-1. **TanStack Virtual** — büyük listeler için virtual scrolling
-2. **Sentry** — hata takibi
-3. **Route cache** — ISR statik sayfalar
-
-### Dikkat Edilecekler
-- `@tanstack/react-virtual` kurulumu gerekli
-- `@sentry/nextjs` kurulumu gerekli
-- npm install komutlarını kullanıcıya söyle (sandbox'ta node_modules yok)
+- [ ] `cargo check` — Rust derleme kontrolü
+- [ ] `npm run build` — Next.js build kontrolü
+- [ ] Sentry DSN env var ekle (`NEXT_PUBLIC_SENTRY_DSN`)
+- [ ] WS env var'ları ekle (WS_ENABLED, WS_MAX_CONNECTIONS, vb.)
+- [ ] Vercel deploy
+- [ ] Cloud Run deploy
+- [ ] Smoke test: dashboard aç, WS bağlantısı kontrol et
