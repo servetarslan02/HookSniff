@@ -2922,6 +2922,7 @@ pub struct CommunicationEntry {
     pub id: Uuid,
     pub customer_id: Uuid,
     #[sqlx(rename = "type")]
+    #[serde(rename = "type")]
     pub comm_type: String,
     pub subject: Option<String>,
     pub details: Option<serde_json::Value>,
