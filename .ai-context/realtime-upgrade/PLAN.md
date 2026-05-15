@@ -4,7 +4,7 @@
 > **Tahmini süre:** 16-22 saat (5-6 oturum)
 > **Başlangıç tarihi:** 2026-05-16
 > **Maliyet:** $0 (mevcut free tier yeterli)
-> **Versiyon:** v2.1 — Tüm eksikler giderildi + Origin validation + Deploy sırası
+> **Versiyon:** v3.0 — Redis Streams migration — Tüm eksikler giderildi + Origin validation + Deploy sırası
 
 ---
 
@@ -28,7 +28,7 @@
 
 ```
 FAZ 1: React Query          [🔄] → Cache + refetch + optimistic (2-3 saat)
-FAZ 2: Event System         [⬜] → Rust'ta event üretimi + Redis Pub/Sub (3-4 saat)
+FAZ 2: Event System         [⬜] → Rust'ta event üretimi + Redis Streams (3-4 saat)
 FAZ 3: WebSocket            [⬜] → WS endpoint + connection manager (3-4 saat)
 FAZ 4: Entegrasyon          [⬜] → Frontend WS hook + React Query invalidate (2-3 saat)
 FAZ 5: Optimizasyon         [⬜] → Virtual lists, Sentry, route cache (2-3 saat)
@@ -399,7 +399,7 @@ export function useUpdateEndpoint() {
 ## Faz 2: Event System - Rust Backend
 
 > **Süre:** 3-4 saat
-> **Amaç:** Backend'de event üretimi ve Redis Pub/Sub'a yayınlama
+> **Amaç:** Backend'de event üretimi ve Redis Streams'e yazma
 
 ### 2.1 Event Tanımları + Sequence Number
 
@@ -493,34 +493,50 @@ impl EventEnvelope {
 - [ ] `Uuid::new_v4()` dedup ID
 - [ ] `chrono::Utc::now()` timestamp
 
-### 2.2 Event Publisher (Redis Pub/Sub)
+### 2.2 Event Publisher (Redis Streams)
 
 ```rust
 use redis::aio::Connection;
 use tokio::sync::broadcast;
+use std::sync::Arc;
 
+/// Redis Streams tabanlı event publisher
 pub struct EventPublisher {
     redis: redis::Client,
     local_tx: broadcast::Sender<EventEnvelope>,
+    stream_key: String,
 }
 
 impl EventPublisher {
     pub fn new(redis_url: &str) -> Self {
         let client = redis::Client::open(redis_url).expect("Failed to create Redis client");
         let (local_tx, _) = broadcast::channel(1000);
-        Self { redis: client, local_tx }
+        Self {
+            redis: client,
+            local_tx,
+            stream_key: "hooksniff:events".to_string(),
+        }
     }
 
-    /// Event'i Redis'e yayınla + local broadcast
+    /// Event'i Redis Streams'e yaz + local broadcast
     pub async fn publish(&self, event: AppEvent) -> Result<(), Box<dyn std::error::Error>> {
         let envelope = EventEnvelope::new(event);
         let mut conn = self.redis.get_async_connection().await?;
         let payload = serde_json::to_string(&envelope)?;
 
-        // Redis Pub/Sub
-        redis::cmd("PUBLISH")
+        // Redis Streams — XADD hooksniff:events * type <type> data <payload>
+        // "*" = auto-generated ID (timestamp-based)
+        redis::cmd("XADD")
+            .arg(&self.stream_key)
+            .arg("*")  // Auto ID
+            .arg("type")
+            .arg(envelope.event.event_type())
+            .arg("channel")
             .arg(envelope.event.channel())
+            .arg("data")
             .arg(&payload)
+            .arg("seq")
+            .arg(envelope.seq.to_string())
             .execute_async(&mut conn)
             .await?;
 
@@ -529,18 +545,48 @@ impl EventPublisher {
         Ok(())
     }
 
-    /// Local broadcast receiver
+    /// Local broadcast receiver (anlık WS推送 için)
     pub fn subscribe(&self) -> broadcast::Receiver<EventEnvelope> {
         self.local_tx.subscribe()
+    }
+
+    /// Son N eventi getir (ilk yükleme / reconnect sonrası)
+    pub async fn get_recent(&self, count: usize) -> Result<Vec<EventEnvelope>, Box<dyn std::error::Error>> {
+        let mut conn = self.redis.get_async_connection().await?;
+        // XREVRANGE hooksniff:events + - COUNT <count>
+        let result: Vec<(String, Vec<String>)> = redis::cmd("XREVRANGE")
+            .arg(&self.stream_key)
+            .arg("+")
+            .arg("-")
+            .arg("COUNT")
+            .arg(count)
+            .query_async(&mut conn)
+            .await?;
+
+        let mut events = Vec::new();
+        for (_id, fields) in result {
+            // fields: ["type", "...", "channel", "...", "data", "...", "seq", "..."]
+            if let Some(data_idx) = fields.iter().position(|f| f == "data") {
+                if let Some(json) = fields.get(data_idx + 1) {
+                    if let Ok(envelope) = serde_json::from_str::<EventEnvelope>(json) {
+                        events.push(envelope);
+                    }
+                }
+            }
+        }
+        events.reverse(); // Eski → yeni sırala
+        Ok(events)
     }
 }
 ```
 
-- [ ] `EventPublisher` struct'ı
-- [ ] `publish()` — Redis PUBLISH + local broadcast
-- [ ] `subscribe()` — local broadcast receiver
+- [ ] `EventPublisher` struct'ı (Redis Streams tabanlı)
+- [ ] `publish()` — XADD ile Redis Streams'e yaz + local broadcast
+- [ ] `subscribe()` — local broadcast receiver (anlık推送)
+- [ ] `get_recent()` — XREVRANGE ile son N event (ilk yükleme)
 - [ ] `main.rs`'de EventPublisher init
 - [ ] Redis connection pool
+- [ ] Stream key: `hooksniff:events`
 
 ### 2.3 Event'leri Tetikle
 
@@ -573,7 +619,7 @@ pub ws_shutdown_timeout_secs: u64,       // YENİ
 
 - [ ] `cargo check` — derleme hatası yok
 - [ ] `cargo test --lib` — testler geçiyor
-- [ ] Redis'e event yayınlanıyor (log'dan doğrula)
+- [ ] Redis Streams'e event yazılıyor (XADD log'dan doğrula)
 - [ ] Event envelope'ları doğru JSON formatında (id, seq, ts, event)
 - [ ] Hata durumunda mevcut işlev bozulmuyor (publish best-effort)
 
@@ -1380,12 +1426,16 @@ impl WsMetrics {
 
 ### 6.3 Duplicate Message Prevention (Multi-Instance)
 
-Redis Pub/Sub'ta her subscriber her mesajı alır. Multi-instance'da duplicate olmaz çünkü:
-- Her WS client'ı kendi instance'ındaki EventPublisher'a subscribe
-- EventPublisher Redis'ten alıp local broadcast'e gönderiyor
-- **Ama** aynı event iki instance'da publish edilirse → duplicate
+Redis Streams'te consumer group kullanarak multi-instance'da duplicate önlenir:
+- Her instance aynı consumer group'a üye
+- Her mesaj bir instance'a gider (XREADGROUP)
+- XACK ile onaylanır
+- **Artık client-side dedup gereksiz** (Streams kendi ID'sini veriyor)
 
-**Çözüm:** Client-side dedup (sequence number)
+**Ama** local broadcast hâlâ aynı instance içinde çalışır — bu doğru, çünkü:
+- Instance A'daki event → XADD → Instance B'deki XREADGROUP → WS client
+- Instance A'daki event → local broadcast → Instance A'daki WS client (anlık)
+- İki farklı mekanizma, iki farklı amaç: biri cross-instance, diğeri same-instance anlık推送
 
 ```tsx
 // useWebSocket.ts'te zaten var:
@@ -1394,8 +1444,8 @@ if (parsed.data.seq && parsed.data.seq <= lastSeqRef.current) {
 }
 ```
 
-- [ ] Client-side dedup (sequence number) ✅
-- [ ] Server-side dedup gerekmiyor (Redis Pub/Sub fan-out)
+- [ ] Redis Streams consumer groups — server-side dedup ✅
+- [ ] Client-side dedup gereksiz (Streams ID-based ordering)
 
 ### 6.4 Stress Test
 
@@ -1623,6 +1673,7 @@ WS_MAX_CONNECTIONS_PER_USER=5
 WS_HEARTBEAT_INTERVAL_SECS=30
 WS_SHUTDOWN_TIMEOUT_SECS=10
 EVENT_PUBLISHER_ENABLED=true
+REDIS_STREAM_KEY=hooksniff:events
 
 # Dashboard (Vercel)
 NEXT_PUBLIC_WS_URL=wss://hooksniff-api-1046140057667.europe-west1.run.app/v1/ws
