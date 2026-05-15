@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/lib/store';
-import { adminApi, type AlertRuleAdmin } from '@/lib/api';
+import { useState } from 'react';
+import { useAdminAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert } from '@/hooks/useAdminData';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
+import type { AlertRuleAdmin } from '@/lib/api';
 
 export default function AdminAlertsPage() {
-  const { token } = useAuth();
   const t = useTranslations('admin');
   
   const CONDITIONS = [
@@ -23,8 +22,12 @@ export default function AdminAlertsPage() {
   ];
   const { toast } = useToast();
 
-  const [alerts, setAlerts] = useState<AlertRuleAdmin[]>([]);
-  const [loading, setLoading] = useState(true);
+  // React Query hooks
+  const { data: alerts = [], isLoading } = useAdminAlerts();
+  const createMutation = useCreateAlert();
+  const updateMutation = useUpdateAlert();
+  const deleteMutation = useDeleteAlert();
+
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -36,23 +39,6 @@ export default function AdminAlertsPage() {
   const [formCondition, setFormCondition] = useState('failure_rate');
   const [formThreshold, setFormThreshold] = useState('10');
   const [formChannels, setFormChannels] = useState<string[]>(['email']);
-
-  const fetchAlerts = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const data = await adminApi.listAlerts(token);
-      setAlerts(Array.isArray(data) ? data : []);
-    } catch {
-      toast(t('failedToLoadAlerts') || t('failedToLoadAlerts'), 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [token, t, toast]);
-
-  useEffect(() => {
-    fetchAlerts();
-  }, [fetchAlerts]);
 
   const filteredAlerts = alerts.filter((a) => {
     if (filter === 'active') return a.is_active;
@@ -81,7 +67,7 @@ export default function AdminAlertsPage() {
   };
 
   const handleSave = async () => {
-    if (!token || !formName.trim() || !formThreshold) return;
+    if (!formName.trim() || !formThreshold) return;
     const threshold = parseInt(formThreshold);
     if (isNaN(threshold) || threshold <= 0) {
       toast(t('invalidThreshold') || t('invalidThreshold'), 'error');
@@ -90,15 +76,13 @@ export default function AdminAlertsPage() {
     setSaving(true);
     try {
       if (editingId) {
-        await adminApi.updateAlert(token, editingId, {
-          name: formName.trim(),
-          condition: formCondition,
-          threshold,
-          channels: formChannels,
+        await updateMutation.mutateAsync({
+          id: editingId,
+          data: { name: formName.trim(), condition: formCondition, threshold, channels: formChannels },
         });
         toast(t('alertUpdated') || t('alertUpdated'), 'success');
       } else {
-        await adminApi.createAlert(token, {
+        await createMutation.mutateAsync({
           name: formName.trim(),
           condition: formCondition,
           threshold,
@@ -107,7 +91,6 @@ export default function AdminAlertsPage() {
         toast(t('alertCreated') || t('alertCreated'), 'success');
       }
       resetForm();
-      fetchAlerts();
     } catch {
       toast(t('alertSaveFailed') || t('alertSaveFailed'), 'error');
     } finally {
@@ -116,21 +99,17 @@ export default function AdminAlertsPage() {
   };
 
   const handleToggle = async (alert: AlertRuleAdmin) => {
-    if (!token) return;
     try {
-      await adminApi.updateAlert(token, alert.id, { is_active: !alert.is_active });
-      setAlerts((prev) => prev.map((a) => a.id === alert.id ? { ...a, is_active: !a.is_active } : a));
+      await updateMutation.mutateAsync({ id: alert.id, data: { is_active: !alert.is_active } });
     } catch {
       toast(t('alertToggleFailed') || t('alertToggleFailed'), 'error');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!token) return;
     setDeleting(id);
     try {
-      await adminApi.deleteAlert(token, id);
-      setAlerts((prev) => prev.filter((a) => a.id !== id));
+      await deleteMutation.mutateAsync(id);
       toast(t('alertDeleted') || t('alertDeleted'), 'success');
     } catch {
       toast(t('alertDeleteFailed') || t('alertDeleteFailed'), 'error');
@@ -143,7 +122,7 @@ export default function AdminAlertsPage() {
     setFormChannels((prev) => prev.includes(ch) ? prev.filter((c) => c !== ch) : [...prev, ch]);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
