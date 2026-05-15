@@ -32,9 +32,12 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   '/v1/auth/verify-2fa': { windowSec: 60, maxRequests: 5 },
   // Webhook send — moderate
   '/v1/webhooks': { windowSec: 60, maxRequests: 200 },
-  // API endpoints — generous
+  // API endpoints — authenticated gets higher limits
   default: { windowSec: 60, maxRequests: 100 },
 };
+
+// Authenticated users (API key or Bearer token) get 5x the default limit
+const AUTH_MULTIPLIER = 5;
 
 // ── Edge Cache Config ──
 
@@ -66,7 +69,8 @@ export default {
     }
 
     // 3. Rate limiting (KV-based sliding window)
-    const rateLimitResult = await checkRateLimit(env, path, clientIp);
+    const isAuthenticated = request.headers.has('Authorization') || request.headers.has('X-API-Key');
+    const rateLimitResult = await checkRateLimit(env, path, clientIp, isAuthenticated);
     if (!rateLimitResult.allowed) {
       return new Response(
         JSON.stringify({
@@ -88,10 +92,11 @@ export default {
     }
 
     // 4. Edge cache for GET requests
+    const cacheKey = url.search ? `cache:${path}?${url.searchParams.toString()}` : `cache:${path}`;
     if (method === 'GET') {
       const cacheTtl = getCacheTtl(path);
       if (cacheTtl > 0) {
-        const cached = await env.EDGE_CACHE_KV.get(`cache:${path}`, 'json');
+        const cached = await env.EDGE_CACHE_KV.get(cacheKey, 'json');
         if (cached) {
           const { body, headers: cachedHeaders, status, timestamp } = cached as {
             body: string;
@@ -141,7 +146,7 @@ export default {
 
           ctx.waitUntil(
             env.EDGE_CACHE_KV.put(
-              `cache:${path}`,
+              cacheKey,
               JSON.stringify({ body, headers, status: response.status, timestamp: Date.now() }),
               { expirationTtl: cacheTtl + 10 } // KV TTL slightly longer than cache TTL
             )
@@ -153,6 +158,17 @@ export default {
       const responseHeaders = new Headers(response.headers);
       responseHeaders.set('X-Served-By', 'cloudflare-edge');
       responseHeaders.set('X-Cache', 'MISS');
+
+      // Forward X-Request-Id from origin (API generates unique IDs)
+      const requestId = response.headers.get('X-Request-Id');
+      if (requestId) {
+        responseHeaders.set('X-Request-Id', requestId);
+      }
+      // Also forward X-Trace-Id if present
+      const traceId = response.headers.get('X-Trace-Id');
+      if (traceId) {
+        responseHeaders.set('X-Trace-Id', traceId);
+      }
 
       // Rate limit headers
       responseHeaders.set('X-RateLimit-Limit', String(rateLimitResult.limit));
@@ -216,9 +232,15 @@ export default {
 async function checkRateLimit(
   env: Env,
   path: string,
-  clientIp: string
+  clientIp: string,
+  isAuthenticated: boolean
 ): Promise<{ allowed: boolean; limit: number; remaining: number; retryAfter: number; resetAt: number }> {
-  const config = RATE_LIMITS[path] || RATE_LIMITS.default;
+  const baseConfig = RATE_LIMITS[path] || RATE_LIMITS.default;
+  // Authenticated users get higher limits (except auth endpoints — same limits for security)
+  const isAuthEndpoint = path.startsWith('/v1/auth/');
+  const config: RateLimitConfig = (isAuthenticated && !isAuthEndpoint)
+    ? { windowSec: baseConfig.windowSec, maxRequests: baseConfig.maxRequests * AUTH_MULTIPLIER }
+    : baseConfig;
   const key = `rl:${clientIp}:${path}`;
   const now = Math.floor(Date.now() / 1000);
   const windowStart = now - config.windowSec;
@@ -279,7 +301,7 @@ function getCacheTtl(path: string): number {
 function isBlockedPath(path: string): boolean {
   const blocked = [
     '/.env', '/.git', '/.htaccess', '/.htpasswd',
-    '/admin', '/debug', '/.well-known/security.txt',
+    '/admin', '/debug',
   ];
   return blocked.some((p) => path.startsWith(p));
 }
