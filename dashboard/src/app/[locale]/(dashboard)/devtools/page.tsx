@@ -11,7 +11,7 @@ const tabSkeleton = (
   </div>
 );
 
-const PlaygroundPage = dynamic(() => import('../playground/page'), { ssr: false, loading: () => tabSkeleton });
+const PlaygroundPage = dynamic(() => import('../sandbox/page'), { ssr: false, loading: () => tabSkeleton });
 const SignatureVerifierPage = dynamic(() => import('../signature-verifier/page'), { ssr: false, loading: () => tabSkeleton });
 const ApiImporterPage = dynamic(() => import('../api-importer/page'), { ssr: false, loading: () => tabSkeleton });
 const WebhookBuilderPage = dynamic(() => import('../webhook-builder/page'), { ssr: false, loading: () => tabSkeleton });
