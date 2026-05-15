@@ -34,7 +34,7 @@ Bu plan, admin panelini tam bir "operasyon merkezi" haline getirmeyi anlatıyor.
 /admin/activity       → Audit log
 ```
 
-### Admin API (23 endpoint)
+### Admin API (23 route → 28 HTTP endpoint)
 ```
 GET    /admin/stats                    → Sistem istatistikleri
 GET    /admin/users                    → Kullanıcı listesi
@@ -59,6 +59,11 @@ GET    /admin/alerts                   → Alert listesi
 POST   /admin/alerts                   → Alert oluştur
 PUT    /admin/alerts/{id}              → Alert güncelle
 DELETE /admin/alerts/{id}              → Alert sil
+GET    /admin/feature-flags            → Feature flag listesi
+POST   /admin/feature-flags            → Feature flag oluştur
+PUT    /admin/feature-flags/{id}       → Feature flag güncelle
+DELETE /admin/feature-flags/{id}       → Feature flag sil
+GET    /admin/deploy-info              → Deploy bilgisi (versiyon, commit)
 ```
 
 ### Eksikler
@@ -256,9 +261,12 @@ Response: Vec<EndpointInfo> {
 // Kullanıcının webhook'larını listele
 GET /admin/users/{id}/webhooks?page=1&per_page=50&status=failed&event=order.created&since=7d
 Response: PaginatedResponse<DeliveryInfo> {
-    id, endpoint_id, event, status, attempt_count,
-    response_status, created_at, error_message
+    id, endpoint_id, event_type, status, attempt_count,
+    response_status, created_at, response_body, error_message
 }
+// NOT: deliveries tablosunda sütun adı `event_type` (plan'ın eski versiyonunda `event` yazılmıştı)
+// `error_message` deliveries'da YOK — delivery_attempts tablosundan subquery ile çekilecek
+// `response_body` deliveries tablosunda mevcut
 
 // Kullanıcının API key'lerini listele
 GET /admin/users/{id}/api-keys
@@ -369,9 +377,10 @@ Response: Vec<CommunicationEntry> {
 // Global failed deliveries
 GET /admin/deliveries/failed?limit=50&since=24h&user_id=xxx
 Response: Vec<FailedDelivery> {
-    id, user_id, user_email, endpoint_url, event,
-    error_message, attempt_count, created_at
+    id, user_id, user_email, endpoint_url, event_type,
+    response_body, error_message, attempt_count, created_at
 }
+// error_message: delivery_attempts tablosundan subquery ile
 
 // Rate limit violations
 GET /admin/rate-limit-violations?limit=50
@@ -537,16 +546,19 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
    ORDER BY e.created_at DESC;
 
    -- Webhooks (with filters)
-   SELECT id, endpoint_id, event_type, status, attempt_count,
-          response_status, created_at, error_message
-   FROM deliveries
-   WHERE customer_id = $1
-   AND ($2::text IS NULL OR status = $2)
-   ORDER BY created_at DESC
+   -- NOT: error_message delivery_attempts tablosunda, deliveries'da yok
+   SELECT d.id, d.endpoint_id, d.event_type, d.status, d.attempt_count,
+          d.response_status, d.created_at, d.response_body,
+          (SELECT da.error_message FROM delivery_attempts da
+           WHERE da.delivery_id = d.id ORDER BY da.attempt_number DESC LIMIT 1) as error_message
+   FROM deliveries d
+   WHERE d.customer_id = $1
+   AND ($2::text IS NULL OR d.status = $2)
+   ORDER BY d.created_at DESC
    LIMIT $3 OFFSET $4;
 
    -- API Keys
-   SELECT id, name, prefix, created_at, last_used_at, is_active
+   SELECT id, name, api_key_prefix as prefix, created_at, last_used_at, is_active
    FROM api_keys
    WHERE customer_id = $1
    ORDER BY created_at DESC;
