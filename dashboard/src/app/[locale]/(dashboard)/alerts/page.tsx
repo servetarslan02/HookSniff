@@ -20,9 +20,9 @@ export default function AlertsPage() {
   const tc = useTranslations('common');
   
   const conditionLabels: Record<string, string> = {
-    failure_rate: t('conditionFailureRate'),
-    latency: t('conditionLatency'),
-    consecutive_failures: t('conditionConsecutive'),
+    failure_rate: 'Failure Rate >',
+    latency: 'Avg Latency >',
+    consecutive_failures: 'Consecutive Failures >',
   };
   const { token } = useAuth();
   const { toast } = useToast();
