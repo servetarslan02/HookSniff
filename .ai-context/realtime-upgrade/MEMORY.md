@@ -11,7 +11,7 @@
 | Faz 3: WebSocket | ✅ Tamamlandı | WS endpoint + EventBridge |
 | Faz 4: Entegrasyon | ✅ Tamamlandı | useWebSocket + useRealtime |
 | Faz 5: Optimizasyon | ✅ Tamamlandı | Sentry + VirtualTable + Bundle Analyzer |
-| Faz 6: Güvenlik | ✅ Tamamlandı | WS Metrics + Token Refresh |
+| Faz 6: Güvenlik | 🔄 %60 | Token Refresh + WS Metrics yapıldı, Stress Test eksik |
 
 ## Mimari Karar: Redis Streams
 
@@ -109,11 +109,14 @@
 - [x] next.config.js: Sentry plugin + bundle analyzer
 - [x] Packages: @tanstack/react-virtual, @sentry/nextjs, @next/bundle-analyzer
 
-## Faz 6: Güvenlik & Dayanıklılık ✅
+## Faz 6: Güvenlik & Dayanıklılık 🔄 %60
 
 - [x] ws/metrics.rs: WsMetrics struct (Prometheus)
 - [x] WS metrics: active_connections, total_connections, messages_sent, messages_received, connection_errors, evictions
 - [x] useWebSocket.ts: token refresh reconnect
+- [x] Duplicate prevention: seq ordering (zaten var)
+- [ ] Stress test (k6 gerekli — tests/ws_stress_test.js oluşturulmadı)
+- [ ] Faz 6 doğrulama (test edilmedi)
 
 ## Hata Düzeltmeleri
 

@@ -6,7 +6,7 @@
 > **Bitiş tarihi:** 2026-05-16
 > **Maliyet:** $0 (mevcut free tier yeterli)
 > **Versiyon:** v3.0 — Redis Streams migration — Tüm eksikler giderildi + Origin validation + Deploy sırası
-> **Durum:** ✅ TAMAMLANDI
+> **Durum:** 🔄 %90 — Faz 6 Stress Test eksik
 
 ---
 
@@ -34,7 +34,7 @@ FAZ 2: Event System         [✅] → Rust'ta event üretimi + Redis Streams —
 FAZ 3: WebSocket            [✅] → WS endpoint + connection manager — TAMAMLANDI
 FAZ 4: Entegrasyon          [✅] → Frontend WS hook + React Query invalidate — TAMAMLANDI
 FAZ 5: Optimizasyon         [✅] → Virtual lists, Sentry, route cache — TAMAMLANDI
-FAZ 6: Güvenlik & Dayanıklılık [✅] → Auth, limit, fallback, validation — TAMAMLANDI
+FAZ 6: Güvenlik & Dayanıklılık [🔄] → Token Refresh + WS Metrics done, Stress Test eksik (%60)
 ```
 
 ---
@@ -1693,6 +1693,6 @@ SENTRY_DSN=https://xxx@sentry.io/xxx
 | Faz 3: WebSocket | ✅ Tamamlandı | 2026-05-16 | 2026-05-16 |
 | Faz 4: Entegrasyon | ✅ Tamamlandı | 2026-05-16 | 2026-05-16 |
 | Faz 5: Optimizasyon | ✅ Tamamlandı | 2026-05-16 | 2026-05-16 |
-| Faz 6: Güvenlik & Dayanıklılık | ✅ Tamamlandı | 2026-05-16 | 2026-05-16 |
+| Faz 6: Güvenlik & Dayanıklılık | 🔄 %60 | 2026-05-16 | — |
 | Test | ⬜ Bekliyor | — | — |
 | Deploy | ⬜ Bekliyor | — | — |
