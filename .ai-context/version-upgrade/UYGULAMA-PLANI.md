@@ -418,6 +418,27 @@
 - [ ] Hala gerekli olmayan ignore'ları kaldır
 - [ ] `git commit -m "security: review and clean cargo audit ignores"`
 
+### SQL Injection Kontrol
+- [ ] `api/src/routes/webhooks.rs:65` — `scope.team_id` doğrudan `format!` ile SQL'e giriyor
+- [ ] Bu SQL injection riski mi? (team_id UUID olmalı ama kontrol et)
+- [ ] Gerekirse `$1` bind parametresi kullan
+- [ ] `grep -rn "format!.*SELECT\|format!.*INSERT" api/src/` — diğer format! SQL'leri kontrol et
+- [ ] `git commit -m "security: fix potential SQL injection in webhooks.rs"`
+
+### dangerouslySetInnerHTML Kontrol
+- [ ] `dashboard/src/app/[locale]/layout.tsx` — 2 yerde (JSON-LD, theme script)
+- [ ] `dashboard/src/app/[locale]/blog/[slug]/page.tsx` — 2 yerde (CSS, syntax highlighting)
+- [ ] `dashboard/src/lib/sanitize.ts` — allowlist sanitizer var, kontrol et
+- [ ] DOMPurify yüklü mü? (`package.json`'da `dompurify` var ✅)
+- [ ] Tüm dangerouslySetInnerHTML kullanımının sanitize edildiğini doğrula
+- [ ] `git commit -m "security: audit dangerouslySetInnerHTML usage"`
+
+### Servet Ek Görevler (TODO.md'den)
+- [ ] iyzico hesap aç (vergi levhası + banka hesabı gerekli)
+- [ ] Domain kararı (hooksniff.vercel.app yeterli şimdilik)
+- [ ] GCP SA key rotate (yeni key oluştur)
+- [ ] GitHub PAT rotate (yeni token oluştur)
+
 ### Landing Page
 - [ ] `landing/index.html` — statik HTML, bağımlılık yok
 - [ ] Google Fonts kullanıyor (Inter, JetBrains Mono) — CDN'den geliyor
