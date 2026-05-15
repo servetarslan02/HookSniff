@@ -28,46 +28,6 @@ pub struct Delivery {
     pub is_test: bool,
 }
 
-/// Lightweight delivery struct for list queries.
-/// Excludes `payload` (up to 256KB) and `response_body` to reduce DB bandwidth.
-#[derive(Debug, Clone, sqlx::FromRow)]
-pub struct DeliveryListRow {
-    pub id: Uuid,
-    pub endpoint_id: Uuid,
-    pub customer_id: Uuid,
-    pub event_type: Option<String>,
-    pub status: String,
-    pub attempt_count: i32,
-    pub max_attempts: i32,
-    pub last_attempt_at: Option<DateTime<Utc>>,
-    pub response_status: Option<i32>,
-    pub next_retry_at: Option<DateTime<Utc>>,
-    pub replay_count: i32,
-    pub created_at: DateTime<Utc>,
-    pub sequence_num: Option<i64>,
-    pub fifo_group_id: Option<String>,
-    pub updated_at: DateTime<Utc>,
-    pub error_message: Option<String>,
-    #[sqlx(default)]
-    pub is_test: bool,
-}
-
-impl DeliveryListRow {
-    pub fn to_response(&self) -> DeliveryResponse {
-        DeliveryResponse {
-            id: self.id,
-            endpoint_id: self.endpoint_id,
-            event: self.event_type.clone(),
-            status: self.status.clone(),
-            attempt_count: self.attempt_count,
-            response_status: self.response_status,
-            replay_count: Some(self.replay_count),
-            created_at: self.created_at,
-            is_test: Some(self.is_test),
-        }
-    }
-}
-
 #[derive(Debug, Deserialize)]
 pub struct CreateWebhookRequest {
     pub endpoint_id: Uuid,
