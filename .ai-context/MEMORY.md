@@ -126,6 +126,24 @@ Bazı tablolarda index yerine full table scan yapılıyor:
    - PostgreSQL küçük tablolarda otomatik seq scan tercih eder — tablolar büyüyünce index kullanılacak
    - ANALYZE çalıştırıldı, planner istatistikleri güncellendi
    - **9 index doğrulandı**: idx_customers_api_key_prefix, idx_endpoints_team_id, idx_endpoints_customer_active, idx_deliveries_customer_created_desc, idx_deliveries_cust_status_created, idx_notifications_customer_read, idx_invoices_status, idx_invoices_status_paid
+2. **Polar.sh Business → Enterprise** ✅
+   - Ürün adı "HookSniff Enterprise" olarak değiştirildi (Polar API PATCH)
+   - $99/ay, ID: `e5b7d88a-7606-4963-a070-4102ca6405e2`
+3. **Yıllık Planlar Oluşturuldu** ✅
+   - Startup Yearly: $295.80/yıl ($24.65/ay) — ID: `ac15aa41-e1fa-468d-9ae7-b2bc271d9715`
+   - Pro Yearly: $499.80/yıl ($41.65/ay) — ID: `ffa27799-49f4-42d9-9cfa-2b4d3502642f`
+   - Enterprise Yearly: $1,009.80/yıl ($84.15/ay) — ID: `3accbb69-37eb-4128-b09f-04cf191e4147`
+4. **Rust API Güncellendi** ✅
+   - `PolarConfig`: 3 yeni yearly ürün ID'si (env var + fallback)
+   - `product_id_for_plan(plan, yearly)` — yearly parametresi eklendi
+   - `determine_plan()` — yıllık ürün ID'lerini tanıyor
+   - `create_checkout()` trait + implementasyon: `yearly: bool` parametresi
+   - `BillingService::checkout()` — yearly parametresi eklendi
+   - `upgrade_plan` route handler — `billing_period: "annual"` desteği
+5. **Dashboard Güncellendi** ✅
+   - `PlanCards.tsx`: Aylık/Yıllık toggle, -15% badge, TL fiyat gösterimi
+   - `page.tsx`: `handleUpgrade(planKey, billingPeriod)` güncellendi
+   - `api.ts`: `upgrade()` fonksiyonuna `billing_period` parametresi eklendi
 
 ### Oturum 172 — 2026-05-15 22:25 GMT+8
 1. **GCP Console Tarayıcı Erişimi** — Google hesabıyla giriş yapıldı (servetarslan02@gmail.com / uku_21700987)
@@ -193,7 +211,7 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 | Neon PostgreSQL | ✅ Aktif | DATABASE_URL (secret) |
 | Grafana OTEL | ✅ Aktif | OTEL_ENABLED, OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_HEADERS |
 | Resend Email | ✅ Aktif | RESEND_API_KEY (secret) |
-| Polar.sh Billing | ✅ Aktif | POLAR_ACCESS_TOKEN, POLAR_WEBHOOK_SECRET |
+| Polar.sh Billing | ✅ Aktif | POLAR_ACCESS_TOKEN, POLAR_WEBHOOK_SECRET, POLAR_PRODUCT_PRO, POLAR_PRODUCT_BUSINESS, POLAR_PRODUCT_STARTUP_YEARLY, POLAR_PRODUCT_PRO_YEARLY, POLAR_PRODUCT_BUSINESS_YEARLY |
 
 ### Oturum 170 — 2026-05-15 21:18 GMT+8
 1. **QStash Entegrasyonu** — `api/src/qstash.rs` modülü eklendi
