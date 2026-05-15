@@ -55,6 +55,7 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'general' | 'email' | 'alerts'>('general');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
 
@@ -234,6 +235,29 @@ export default function AdminSettingsPage() {
         </div>
       )}
 
+      {/* ── Tab Navigation ── */}
+      <div className="flex gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl w-fit">
+        {([
+          { key: 'general', icon: '⚙️', label: t('general') || 'General' },
+          { key: 'email', icon: '📧', label: t('emailSecurity') || 'Email & Security' },
+          { key: 'alerts', icon: '🚨', label: t('alertsRetry') || 'Alerts & Retry' },
+        ] as const).map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setSettingsTab(tab.key)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+              settingsTab === tab.key
+                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
+            }`}
+          >
+            <span className="text-xs">{tab.icon}</span>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ═══ TAB: General ═══ */}
       {/* General */}
       <div className="glass-card p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('general')}</h2>
@@ -294,7 +318,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Plan Limits */}
-      <div className="glass-card p-6">
+      <div className={`glass-card p-6 ${settingsTab !== 'general' ? 'hidden' : ''}`}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('planLimits')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -407,7 +431,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Plan Prices */}
-      <div className="glass-card p-6">
+      <div className={`glass-card p-6 ${settingsTab !== 'general' ? 'hidden' : ''}`}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💰 {t('planPrices') || 'Plan Prices'}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('planPricesDesc') || 'Monthly prices used for revenue calculations.'}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -441,7 +465,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Email Settings */}
-      <div className="glass-card p-6">
+      <div className={`glass-card p-6 ${settingsTab !== 'email' ? 'hidden' : ''}`}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📧 {t('emailSettings') || 'Email Settings'}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('emailSettingsDesc') || 'Configure email delivery via Resend.'}</p>
         <div className="space-y-4">
@@ -471,7 +495,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Webhook & Security Settings */}
-      <div className="glass-card p-6">
+      <div className={`glass-card p-6 ${settingsTab !== 'email' ? 'hidden' : ''}`}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🔐 {t('securitySettings') || 'Security & Webhook Settings'}</h2>
         <div className="space-y-4">
           <div>
@@ -514,7 +538,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Backup Settings */}
-      <div className="glass-card p-6">
+      <div className={`glass-card p-6 ${settingsTab !== 'email' ? 'hidden' : ''}`}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💾 {t('backupSettings') || 'Backup Settings'}</h2>
         <div>
           <label htmlFor="backup_retention" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('backupRetention') || 'Backup Retention (days)'}</label>
@@ -532,7 +556,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Retry Settings */}
-      <div className="glass-card p-6">
+      <div className={`glass-card p-6 ${settingsTab !== 'alerts' ? 'hidden' : ''}`}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('retrySettings')}</h2>
         <div>
           <label htmlFor="retry_max_attempts" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('maxRetryAttempts')} <span className="text-red-500">*</span></label>
@@ -550,7 +574,7 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Alert Thresholds — connected to backend */}
-      <div className="glass-card p-6">
+      <div className={`glass-card p-6 ${settingsTab !== 'alerts' ? 'hidden' : ''}`}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🚨 {t('alertThresholds')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('alertThresholdsDesc')}</p>
 
