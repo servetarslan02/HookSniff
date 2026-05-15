@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-16 04:05 GMT+8 (Oturum 176)
+> Son güncelleme: 2026-05-16 04:17 GMT+8 (Oturum 177)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -221,6 +221,13 @@ postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-
 - **Tablo sayısı:** 60+ (çoğu boş)
 - **Index sayısı:** 149 (84'ü silindi)
 - **Cache hit ratio:** 99.79%
+
+### Oturum 177: Test Webhook + Notification Badge ✅
+1. **Test Webhook butonu** — user detail sayfasına eklendi (modal + sonuç gösterimi)
+2. **Notification badge** — admin layout'ta unread count kırmızı badge
+3. **Type mismatch** — getUnreadCount backend/frontend uyumsuzluğu düzeltildi
+4. **Kullanılmayan API analizi** — 44 fonksiyon, sadece 1 admin-specific eksik
+5. **Commit:** 46126b17
 
 ### Oturum 176: Admin Panel Genel Bakış Düzeltmeleri ✅
 1. **Alert listesi** — admin tüm platform alert'lerini görüyor
