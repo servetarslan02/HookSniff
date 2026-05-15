@@ -1,12 +1,12 @@
 # Real-Time Upgrade — Hafıza
 
-> Son güncelleme: 2026-05-16 05:43 GMT+8
+> Son güncelleme: 2026-05-16 05:55 GMT+8
 
 ## Faz Durumları
 
 | Faz | Durum | Not |
 |-----|-------|-----|
-| Faz 1: React Query + Zod | 🔄 %80 tamamlandı | 7/11 sayfa dönüştürüldü |
+| Faz 1: React Query + Zod | ✅ %100 tamamlandı | 11/11 sayfa dönüştürüldü |
 | Faz 2: Event System + Redis Streams | ⬜ Başlamadı | Plan v3.0 — Pub/Sub → Streams |
 | Faz 3: WebSocket | ⬜ Başlamadı | |
 | Faz 4: Entegrasyon | ⬜ Başlamadı | |
@@ -38,3 +38,12 @@
 - Zod v4: `z.record(keySchema, valueSchema)` — iki argüman
 - AdminUser: `role` ve `status` zorunlu
 - Git email: servetarslan02@gmail.com
+
+## Faz 1 Tamamlanan İşler (Son Oturum)
+
+- `admin/revenue/page.tsx` → React Query (useAdminRevenue, useAdminRevenueMetrics, useAdminRevenueCohorts, useAdminRefunds, useAdminChurn, useAdminSettings)
+- `admin/system/page.tsx` → React Query (useSystemHealth, useQueueStatus, useFailedDeliveries, useDeadLetters, useRateLimitViolations, useApiLatency, useTestWebhook, useBatchReplay)
+- `admin/settings/page.tsx` → React Query (useAdminSettings, useUpdateSettings, useAdminAlerts, useCreateAlert, useUpdateAlert)
+- `endpoints/[id]/page.tsx` → React Query (useEndpointDetail, useUpdateEndpoint)
+- 12 yeni Zod şeması eklendi (SystemHealth, QueueStatus, RevenueMetrics, Cohort, Refund, PlatformSettings, AlertRule, FailedDeliveries, DeadLetters, RateLimitViolations, ApiLatency)
+- 16 yeni React Query hook'u eklendi (useAdminData.ts)
