@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
-import { billingApi, billingApiExtended, type Invoice } from '@/lib/api';
+import { billingApiExtended, type Invoice } from '@/lib/api';
 import { UsageChart, type UsageChartData } from './components/UsageChart';
 import { PlanCards } from './components/PlanCards';
 import { InvoiceTable } from './components/InvoiceTable';
@@ -53,7 +53,7 @@ export default function BillingPage() {
   useEffect(() => {
     if (!token) return;
     setLoadingInvoices(true);
-    billingApi
+    billingApiExtended
       .getInvoices(token)
       .then((data) => setInvoices(data))
       .catch(() => {
