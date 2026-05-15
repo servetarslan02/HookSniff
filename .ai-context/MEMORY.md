@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-16 04:28 GMT+8
+> Son güncelleme: 2026-05-16 04:46 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -319,6 +319,17 @@ HookSniff/
 2. **GitHub Actions** — Hala başarısız (billing issue, faturalandırma güncellenmeli)
 3. **GCP Console** — Servet'in Google hesabı ile giriş yapıldı (2FA onayı ile)
 4. **API Sağlığı** — Çalışıyor (healthy, DB 27ms, Redis configured)
+
+### Oturum 180 — 2026-05-16 04:46 GMT+8
+1. **Kullanılmayan API Temizliği** ✅ (Oturum 179)
+   - 48 satır silindi, 0 kullanılmayan method
+2. **Real-Time Architecture Upgrade Plan** ✅
+   - `.ai-context/REALTIME-UPGRADE-PLAN.md` oluşturuldu
+   - 5 faz: React Query, Event System, WebSocket, Entegrasyon, Optimizasyon
+   - 13-19 saat tahmini süre
+   - Detaylı checklist, rollback planı, test planı
+   - $0 maliyet (mevcut free tier yeterli)
+3. **Commit:** dfe34438 — push edildi
 
 ### Oturum 179 — 2026-05-16 04:28 GMT+8
 1. **Kullanılmayan API Fonksiyonları Temizliği** ✅
