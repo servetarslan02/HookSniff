@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { teamsApi, type Team, type TeamMember } from '@/lib/api';
@@ -22,6 +23,20 @@ export default function TeamPage() {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<string | null>(null);
   const t = useTranslations('team');
+  const searchParams = useSearchParams();
+
+  // Auto-accept invite if invite_token is in URL
+  useEffect(() => {
+    const inviteToken = searchParams.get('invite_token');
+    if (!inviteToken || !token) return;
+    teamsApi.acceptInvite(token, inviteToken).then((result) => {
+      toast(t('inviteAccepted') || `Invite accepted! Joined team as ${result.role}`, 'success');
+      fetchTeams();
+    }).catch((err) => {
+      const msg = err instanceof Error ? err.message : (t('inviteAcceptFailed') || 'Failed to accept invite');
+      toast(msg, 'error');
+    });
+  }, [searchParams, token, toast, t, fetchTeams]);
 
   const currentRole = members.find((m) => m.customer_id === user?.id)?.role || 'viewer';
   const canInvite = currentRole === 'admin';
