@@ -342,7 +342,78 @@
 
 ---
 
-## Faz 20: Servet'in Yapması Gereken
+## Faz 20: Kod Kalitesi Temizliği
+
+### console.log Temizliği (Dashboard)
+- [ ] `grep -rn "console.log\|console.error\|console.warn" dashboard/src/ --include="*.ts" --include="*.tsx"` — 24 tane var
+- [ ] Development-only olanları `if (process.env.NODE_ENV === 'development')` ile sar
+- [ ] Gereksiz olanları sil
+- [ ] `npm run build` — build kontrol
+- [ ] `git commit -m "chore: clean up console.log in production code"`
+
+### any Tipi Temizliği (Dashboard)
+- [ ] `grep -rn ": any\|as any\|<any>" dashboard/src/ --include="*.ts" --include="*.tsx"` — 11 tane var
+- [ ] Her biri için doğru tipi belirle ve değiştir
+- [ ] `npx tsc --noEmit` — tip kontrolü
+- [ ] `git commit -m "fix: remove any types for better type safety"`
+
+### dead_code Temizliği (Rust)
+- [ ] `grep -rn "#\[allow(dead_code)\]" api/src/ worker/src/` — 11 tane var
+- [ ] Kullanılmayan fonksiyon/struct'ları sil veya kullan
+- [ ] `#[allow(dead_code)]` attribute'larını kaldır
+- [ ] `cargo check --workspace` — derleme kontrol
+- [ ] `git commit -m "chore: remove dead code"`
+
+### unwrap() Azaltma (Rust)
+- [ ] `grep -rn "\.unwrap()\|\.expect(" api/src/ worker/src/ --include="*.rs" | grep -v test` — 816 tane var
+- [ ] Kritik path'lerdeki unwrap'ları `?` operator veya `unwrap_or_else` ile değiştir:
+  - [ ] `api/src/config.rs` — config parsing
+  - [ ] `api/src/db.rs` — database operations
+  - [ ] `api/src/auth.rs` — authentication
+  - [ ] `api/src/routes/` — route handlers (en azından ana akışlar)
+- [ ] `cargo test --workspace` — test çalıştır
+- [ ] `git commit -m "fix: replace unwrap() with proper error handling in critical paths"`
+
+---
+
+## Faz 21: Test Kapsamı
+
+### E2E Test Ekleme
+- [ ] `dashboard/e2e/` klasöründe en az 5 temel E2E test yaz:
+  - [ ] Login akışı (giriş → dashboard)
+  - [ ] Endpoint oluşturma
+  - [ ] Webhook gönderme
+  - [ ] Dashboard sayfa yüklenme
+  - [ ] Dil değiştirme
+- [ ] `npm run test:visual` — test çalıştır
+- [ ] `git commit -m "test: add critical E2E tests"`
+
+---
+
+## Faz 22: Ek Düzeltmeler
+
+### Dashboard tsconfig.target
+- [ ] `dashboard/tsconfig.json`: `"target": "ES2017"` → `"ES2022"`
+- [ ] `npm run build` — build kontrol
+- [ ] `git commit -m "chore: update tsconfig target to ES2022"`
+
+### MCP Server Node Engine
+- [ ] `mcp/package.json`: `"node": ">=18"` → `">=20"`
+- [ ] `git commit -m "chore: bump MCP server minimum Node to 20"`
+
+### Vendor Patch Kontrol
+- [ ] `vendor/tracing-opentelemetry/` — upstream ile diff kontrol et
+- [ ] Eğer upstream'de fix varsa vendor'ı kaldır, yoksa dokunma
+- [ ] `git commit -m "chore: verify vendor patch status"` (gerekirse)
+
+### Neon Compute Limiti
+- [ ] Neon Console'a git: https://console.neon.tech
+- [ ] Compute usage kontrol et
+- [ ] Gerekirse Pro plan'a geç ($19/ay) veya usage-based billing aç
+
+---
+
+## Faz 23: Servet'in Yapması Gereken
 
 - [ ] Polar.sh Go Live — Stripe identity verification
 - [ ] GitHub Actions billing — dakikaları yenile
