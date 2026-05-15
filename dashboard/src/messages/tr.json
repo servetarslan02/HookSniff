@@ -1388,6 +1388,8 @@
     "activity": "Aktivite",
     "health": "Sağlık",
     "infrastructure": "Altyapı",
+    "emailSecurity": "Email & Güvenlik",
+    "alertsRetry": "Uyarı & Retry",
     "page": "Sayfa",
     "partialDegradation": "Kısmi Bozulma",
     "payload": "Payload",
