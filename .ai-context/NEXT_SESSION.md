@@ -47,7 +47,7 @@
 ### Öncelik 3 — Performance (Kalan)
 | # | Görev | Durum | Not |
 |---|-------|-------|-----|
-| 7 | Cloudflare Workers (Edge deploy) | ❌ | Büyük iş, 5+ oturum |
+| 7 | Cloudflare Workers (Edge deploy) | 🔶 v1 yazıldı | Deploy için Servet: KV namespace oluştur + wrangler login |
 | 8 | Read Replica (Neon) | ❌ | Free tier desteklemiyor |
 
 ### Öncelik 4 — P2 Kalan
@@ -65,6 +65,7 @@
 | iyzico hesap aç | ❌ | Vergi levhası + banka hesabı gerekli |
 | Domain kararı | ❌ | hooksniff.vercel.app yeterli şimdilik |
 | GitHub Actions dakikası | ❌ | CI bitmiş, yenilenmeli |
+| **Cloudflare Workers deploy** | ⚠️ | wrangler login + KV namespace oluştur |
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
