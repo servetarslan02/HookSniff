@@ -95,6 +95,9 @@ pub struct Config {
     pub cf_r2_token: Option<String>,
     /// R2 bucket name (default: hooksniff-storage)
     pub cf_r2_bucket: Option<String>,
+    /// Enable the event publisher (Redis Streams + local broadcast).
+    /// Default: true. Set EVENT_PUBLISHER_ENABLED=false to disable.
+    pub event_publisher_enabled: bool,
 }
 
 /// Custom Debug implementation that masks secret fields.
@@ -162,6 +165,7 @@ impl fmt::Debug for Config {
                 &self.fcm_server_key.as_ref().map(|_| "[REDACTED]"),
             )
             .field("email_base_url", &self.email_base_url)
+            .field("event_publisher_enabled", &self.event_publisher_enabled)
             .finish()
     }
 }
@@ -306,6 +310,9 @@ impl Config {
             cf_account_id: std::env::var("CF_ACCOUNT_ID").ok(),
             cf_r2_token: std::env::var("CF_R2_TOKEN").ok(),
             cf_r2_bucket: std::env::var("CF_R2_BUCKET").ok(),
+            event_publisher_enabled: std::env::var("EVENT_PUBLISHER_ENABLED")
+                .map(|v| v != "false" && v != "0")
+                .unwrap_or(true),
         })
     }
 }
@@ -432,6 +439,7 @@ mod tests {
             cf_account_id: None,
             cf_r2_token: None,
             cf_r2_bucket: None,
+            event_publisher_enabled: true,
         };
         assert!(cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -471,6 +479,7 @@ mod tests {
             cf_account_id: None,
             cf_r2_token: None,
             cf_r2_bucket: None,
+            event_publisher_enabled: true,
         };
         assert!(cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -510,6 +519,7 @@ mod tests {
             cf_account_id: None,
             cf_r2_token: None,
             cf_r2_bucket: None,
+            event_publisher_enabled: true,
         };
         assert!(!cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -549,6 +559,7 @@ mod tests {
             cf_account_id: None,
             cf_r2_token: None,
             cf_r2_bucket: None,
+            event_publisher_enabled: true,
         };
         assert!(!cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -588,6 +599,7 @@ mod tests {
             cf_account_id: None,
             cf_r2_token: None,
             cf_r2_bucket: None,
+            event_publisher_enabled: true,
         };
         assert!(!cfg.is_production());
     }
@@ -621,6 +633,7 @@ mod tests {
             "NOTIFY_EMAIL",
             "FCM_SERVER_KEY",
             "EMAIL_BASE_URL",
+            "EVENT_PUBLISHER_ENABLED",
         ];
         for var in &vars {
             std::env::remove_var(var);
@@ -924,6 +937,7 @@ mod tests {
             cf_account_id: None,
             cf_r2_token: None,
             cf_r2_bucket: None,
+            event_publisher_enabled: true,
         };
         let cfg2 = cfg.clone();
         assert_eq!(cfg2.port, 3000);
@@ -963,6 +977,7 @@ mod tests {
             cf_account_id: None,
             cf_r2_token: None,
             cf_r2_bucket: None,
+            event_publisher_enabled: true,
         };
         let dbg = format!("{:?}", cfg);
         assert!(dbg.contains("Config"));
