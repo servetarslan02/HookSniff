@@ -55,7 +55,7 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, page, typeFilter, readFilter, toast]);
+  }, [token, page, typeFilter, readFilter, toast, t]);
 
   useEffect(() => {
     fetchNotifications();

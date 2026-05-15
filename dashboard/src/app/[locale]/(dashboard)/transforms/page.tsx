@@ -33,7 +33,7 @@ export default function TransformsPage() {
     endpointsApi.list(token).then(setEndpoints).catch((err) => {
       setError(err instanceof Error ? err.message : tc('failedToLoadEndpoints'));
     });
-  }, [token]);
+  }, [token, tc]);
 
   const loadRules = useCallback(async (endpointId: string) => {
     if (!token || !endpointId) return;
@@ -44,7 +44,7 @@ export default function TransformsPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : tc('failedToLoadTransforms'));
     } finally { setLoading(false); }
-  }, [token]);
+  }, [token, tc]);
 
   useEffect(() => { if (selectedEndpoint) loadRules(selectedEndpoint); }, [selectedEndpoint, loadRules]);
 

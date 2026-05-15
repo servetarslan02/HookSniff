@@ -143,7 +143,7 @@ export default function AdminUserDetailPage() {
     } catch {
       // silent fail for tab data
     }
-  }, [token, id, webhooksPage, webhookFilter]);
+  }, [token, id, webhooksPage, webhookFilter, commFilter, commsPage, invoiceFilter, invoicesPage]);
 
   useEffect(() => {
     if (activeTab !== 'overview') fetchTabData(activeTab);
@@ -167,7 +167,7 @@ export default function AdminUserDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, id, toast]);
+  }, [token, id, toast, t]);
 
   useEffect(() => {
     fetchDetail();

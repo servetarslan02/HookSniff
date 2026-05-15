@@ -59,7 +59,7 @@ export default function AuthCallbackPage() {
       .catch(() => {
         setError(t('networkError'));
       });
-  }, [router]);
+  }, [router, t]);
 
   if (error) {
     return (
