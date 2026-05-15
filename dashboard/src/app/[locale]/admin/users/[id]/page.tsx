@@ -240,12 +240,12 @@ export default function AdminUserDetailPage() {
     setEmailSending(true);
     try {
       await adminApi.sendUserEmail(token, id, emailSubject, emailBody);
-      toast(t('emailSent') || 'Email sent successfully', 'success');
+      toast(t('emailSent') || t('emailSent'), 'success');
       setShowEmailModal(false);
       setEmailSubject('');
       setEmailBody('');
     } catch {
-      toast(t('emailSendFailed') || 'Failed to send email', 'error');
+      toast(t('emailSendFailed') || t('emailSendFailed'), 'error');
     } finally {
       setEmailSending(false);
     }
@@ -255,19 +255,19 @@ export default function AdminUserDetailPage() {
     if (!token || !id || !refundAmount || !refundReason.trim()) return;
     const amountCents = Math.round(parseFloat(refundAmount) * 100);
     if (isNaN(amountCents) || amountCents <= 0) {
-      toast(t('invalidAmount') || 'Invalid refund amount', 'error');
+      toast(t('invalidAmount') || t('invalidAmount'), 'error');
       return;
     }
     setRefundProcessing(true);
     try {
       await adminApi.refundUser(token, id, amountCents, refundReason.trim());
-      toast(t('refundSuccess') || 'Refund processed. User downgraded to Free.', 'success');
+      toast(t('refundSuccess') || t('refundSuccess'), 'success');
       setShowRefundModal(false);
       setRefundAmount('');
       setRefundReason('');
       fetchTabData('billing');
     } catch {
-      toast(t('refundFailed') || 'Refund failed', 'error');
+      toast(t('refundFailed') || t('refundFailed'), 'error');
     } finally {
       setRefundProcessing(false);
     }
@@ -279,7 +279,7 @@ export default function AdminUserDetailPage() {
     try {
       payload = JSON.parse(testWebhookPayload);
     } catch {
-      toast(t('invalidJson') || 'Invalid JSON payload', 'error');
+      toast(t('invalidJson') || t('invalidJson'), 'error');
       return;
     }
     setTestWebhookSending(true);
@@ -291,9 +291,9 @@ export default function AdminUserDetailPage() {
         payload,
       });
       setTestWebhookResult(result);
-      toast(t('testWebhookSent') || 'Test webhook sent', 'success');
+      toast(t('testWebhookSent') || t('testWebhookSent'), 'success');
     } catch {
-      toast(t('testWebhookFailed') || 'Test webhook failed', 'error');
+      toast(t('testWebhookFailed') || t('testWebhookFailed'), 'error');
     } finally {
       setTestWebhookSending(false);
     }
@@ -311,9 +311,9 @@ export default function AdminUserDetailPage() {
       a.download = `gdpr-export-${id.slice(0, 8)}-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast(t('gdprExportSuccess') || 'Data exported successfully', 'success');
+      toast(t('gdprExportSuccess') || t('gdprExportSuccess'), 'success');
     } catch {
-      toast(t('gdprExportFailed') || 'Export failed', 'error');
+      toast(t('gdprExportFailed') || t('gdprExportFailed'), 'error');
     } finally {
       setGdprExporting(false);
     }
@@ -324,12 +324,12 @@ export default function AdminUserDetailPage() {
     setGdprDeleting(true);
     try {
       await adminApi.deleteUserData(token, id, gdprDeleteReason.trim());
-      toast(t('gdprDeleteSuccess') || 'All user data deleted. Account downgraded to Free.', 'success');
+      toast(t('gdprDeleteSuccess') || t('gdprDeleteSuccess'), 'success');
       setShowGdprDeleteModal(false);
       setGdprDeleteReason('');
       fetchTabData('billing');
     } catch {
-      toast(t('gdprDeleteFailed') || 'Data deletion failed', 'error');
+      toast(t('gdprDeleteFailed') || t('gdprDeleteFailed'), 'error');
     } finally {
       setGdprDeleting(false);
     }
@@ -790,9 +790,9 @@ export default function AdminUserDetailPage() {
             <div className="flex items-center gap-2">
               <select value={webhookFilter.status || ""} onChange={(e) => { setWebhookFilter(f => ({ ...f, status: e.target.value || undefined })); setWebhooksPage(1); }} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
                 <option value="">{t("allStatuses") || "All Statuses"}</option>
-                <option value="delivered">Delivered</option>
-                <option value="failed">Failed</option>
-                <option value="pending">Pending</option>
+                <option value="delivered">{t('statusDelivered')}</option>
+                <option value="failed">{t('statusFailed')}</option>
+                <option value="pending">{t('statusPending')}</option>
               </select>
               <span className="text-sm text-gray-500 dark:text-slate-400">{webhooksTotal} {t("total") || "total"}</span>
             </div>
