@@ -9,8 +9,11 @@ if (!DATABASE_URL) {
 }
 
 async function runMigrations() {
+  // Strip sslmode from connection string to avoid pg SSL mode warning
+  // (ssl is configured via the ssl option below)
+  const cleanUrl = DATABASE_URL.replace(/[?&]sslmode=[^&]*/g, '').replace(/\?$/, '');
   const client = new Client({ 
-    connectionString: DATABASE_URL,
+    connectionString: cleanUrl,
     ssl: { rejectUnauthorized: false }
   });
 
