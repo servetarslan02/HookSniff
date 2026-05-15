@@ -940,3 +940,17 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Son commit:** `50cf1f87` — Cloud Build fix (6 compile/test hatası)
 - **Genel ilerleme:** 359/364 (%99) — 5 kalan (hepsi Servet görevleri)
 - **NEXT_SESSION.md güncellendi**
+
+## Oturum 165 (2026-05-15 13:46 - 14:10 GMT+8) ✅
+- **OpenClaw** — Servet ile background job queue çalışması
+- **NAV-RESTRUCTURE-PLAN** — zaten uygulanmış, doğrulandı ✅
+- **Background Job Queue (Redis):**
+  - `api/src/jobs/job_queue.rs` — Redis LPUSH/BRPOP job queue
+  - Job tipleri: Email (5 template), Notification (FCM), ScheduledCleanup
+  - Distributed locks: `SET NX EX` ile scheduled job deduplication
+  - Delayed retry: exponential backoff, Redis sorted set
+  - auth.rs: register, forgot_password, resend_verification → job queue + fallback
+  - main.rs: retention, monthly_reset, cleanup_6h → distributed lock
+- **Build:** cargo test 1072 passed, clippy 0 warnings, dashboard 216 pages ✅
+- **Commits:** `becd6509` (feat), `d65f0ccf` (docs)
+- **GitHub PAT:** Servet sohbette paylaştı, yenilemesi söylendi
