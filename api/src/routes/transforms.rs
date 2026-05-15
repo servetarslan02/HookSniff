@@ -12,6 +12,7 @@ use crate::transform::{self, CreateTransformRuleRequest, TransformRule, Transfor
 /// Lightweight struct for endpoint ownership verification.
 /// Avoids SELECT * — only fetches the columns needed for the check.
 #[derive(Debug, sqlx::FromRow)]
+#[allow(dead_code)] // Fields populated by sqlx but only existence is checked
 struct EndpointOwnerCheck {
     id: uuid::Uuid,
     customer_id: uuid::Uuid,
