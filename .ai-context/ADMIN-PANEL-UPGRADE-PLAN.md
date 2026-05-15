@@ -1,8 +1,9 @@
 # 🔧 Admin Panel Upgrade Plan — Detaylı Uygulama Rehberi
 
 > **Tarih:** 2026-05-15
+> **Güncelleme:** 2026-05-15 (Kapsamlı inceleme sonrası eksikler eklendi)
 > **Durum:** PLANLANAN — uygulanmadı
-> **Tahmini süre:** 3-4 oturum (1'er saat)
+> **Tahmini süre:** 5-6 oturum (1'er saat)
 
 ---
 
@@ -71,6 +72,37 @@ DELETE /admin/alerts/{id}              → Alert sil
 - ❌ Bulk email gönderemiyorum
 - ❌ GDPR veri dışa aktarma/silme yapamıyorum
 
+### Veritabanı Tutarsızlıkları ⚠️
+- ⚠️ `api_keys` tablosu: `inbound.rs` dosyasında `SELECT key_hash, customer_id FROM api_keys WHERE api_key_prefix = $1` sorgusu var ama **hiçbir migration'da `api_keys` CREATE TABLE yok**. API key'ler `customers` tablosundaki `api_key_hash` / `api_key_prefix` kolonlarında tutuluyor. Bu ya bir migration eksikliği ya da inbound.rs'de dead code.
+- ⚠️ `invoices` tablosu (migration 009) var ama admin API'sinde hiç endpoint yok — fatura verileri görünmüyor.
+- ⚠️ `payment_transactions` tablosu (migration 009) var ama admin API'sinde hiç endpoint yok — ödeme geçmişi görünmüyor.
+- ⚠️ `rate_limit_configs` tablosu var ama ihlal log'ları tutulmuyor (`rate_limit_violations` tablosu yok).
+
+### Eksik — Müşteri İlişkileri Yönetimi
+- ❌ **Müşteri notları** — Admin müşteri hakkında not yazamıyor (ör: "Enterprise'a geçmek istiyor, 2 hafta sonra ara")
+- ❌ **Müşteri etiketleri/label'ları** — VIP, at-risk, churn-risk, enterprise-ready gibi etiketler yok
+- ❌ **İletişim geçmişi** — Müşteriye ne zaman email gönderildi, ne zaman impersonate edildi, ne zaman refund yapıldı → tek bir yerde görünmüyor
+- ❌ **Müşteri segmentasyonu** — "Son 30 günde 1000+ delivery yapan pro müşteriler" gibi sorgular yapılamıyor
+- ❌ **Müşteri sağlık skoru** — Kullanım trendi düşen, endpoint'leri pasif, ödeme sorunu olan müşteriler otomatik tespit edilemiyor
+
+### Eksik — Gelir & Fatura Yönetimi
+- ❌ **Fatura görüntüleme** — `invoices` tablosu var ama admin panelinde fatura listesi/detayı yok
+- ❌ **Ödeme geçmişi** — `payment_transactions` tablosu var ama admin panelinde görünmüyor
+- ❌ **Refund tracking** — Yapılan iadelerin kaydı tutulmuyor (refunds tablosu yok)
+- ❌ **ARPU** (Average Revenue Per User) — Hesaplanmıyor
+- ❌ **LTV** (Customer Lifetime Value) — Hesaplanmıyor
+- ❌ **NRR** (Net Revenue Retention) — Hesaplanmıyor
+- ❌ **Expansion Revenue** — Plan yükseltmelerden gelen ek gelir ayrı gösterilmiyor
+- ❌ **Cohort analizi** — Aylık müşteri cohort gelir karşılaştırması yok
+- ❌ **Gelir projeksiyonu** — 3/6/12 aylık tahmini gelir grafiği yok
+- ❌ **Promosyon/kupon yönetimi** — İndirim kuponu oluşturma ve takibi yok
+
+### Eksik — Operasyonel
+- ❌ **Maintenance mode toggle** — Settings'de bahsedilmiş ama API endpoint'i yok, sadece UI var
+- ❌ **Bulk email queue** — Toplu email gönderimi kuyruğa alınmıyor, anlık gönderim deneniyor (büyük listelerde timeout riski)
+- ❌ **Admin action audit logging** — Yeni eklenecek aksiyonlar (refund, GDPR delete, bulk email) için audit log kaydı zorunlu
+- ❌ **Customer dashboard view** — Admin müşterinin gözünden dashboard'u göremiyor (impersonate var ama token ile, "view as" modu daha güvenli)
+
 ---
 
 ## 2. Rakip Analizi — Diğer Admin Panelleri Ne Yapıyor?
@@ -102,6 +134,27 @@ DELETE /admin/alerts/{id}              → Alert sil
 - ✅ Audit log for all admin actions
 - ✅ Role-based access (support, ops, admin)
 
+### Hookdeck (Webhook Platform — Açık Kaynak Rakip)
+- ✅ Multi-tenant müşteri yönetimi
+- ✅ Application portal (müşteri self-servis)
+- ✅ Delivery failure alerts
+- ✅ Automatic + manual retries
+- ✅ Event fanout (tek mesaj → çoklu endpoint)
+- ✅ Deduplication (tekrarlayan event filtreleme)
+- ✅ Quick filters (tek tıkla filtre)
+
+### Hook0 (Açık Kaynak Webhook Platform)
+- ✅ Event types katalog (dot-notation hiyerarşi)
+- ✅ Subscription yönetimi (endpoint abonelikleri)
+- ✅ Custom retry schedules
+- ✅ Event log + replay
+
+### Convoy (Enterprise Açık Kaynak)
+- ✅ Circuit breaker (endpoint sağlık takibi)
+- ✅ Tenant bazlı rate limiting
+- ✅ Signature verification
+- ✅ Slack/email alerting entegrasyonu
+
 ---
 
 ## 3. Yeni Admin Panel Yapısı
@@ -116,6 +169,7 @@ DELETE /admin/alerts/{id}              → Alert sil
 🚩 Feature Flags
 ⚙️ Settings
 📋 Activity Log
+🆕 🔔 Alerts (ayrı sayfa — mevcut ama sidebar'da yok)
 ```
 
 ### 3.2 Detaylı Sayfa İçerikleri
@@ -137,20 +191,31 @@ DELETE /admin/alerts/{id}              → Alert sil
 | Sekme | İçerik | Yeni mi? |
 |-------|--------|----------|
 | Overview | Profil, plan, kullanım istatistikleri | Mevcut |
-| **Endpoints** | Kullanıcının tüm endpoint'leri, URL'ler, aktif/pasif durumu | **YENİ** |
-| **Webhooks** | Kullanıcının tüm delivery'leri, filtreleme, arama | **YENİ** |
-| **API Keys** | Kullanıcının API key'leri (maskelenmiş), oluşturma tarihi | **YENİ** |
-| **Applications** | Kullanıcının uygulamaları | **YENİ** |
-| **Usage** | API kullanım istatistikleri, grafikler | **YENİ** |
+| **Endpoints** | Kullanıcının tüm endpoint'leri, URL'ler, aktif/pasif durumu, success rate | **YENİ** |
+| **Webhooks** | Kullanıcının tüm delivery'leri, filtreleme (status/event/date), arama | **YENİ** |
+| **API Keys** | Kullanıcının API key'leri (maskelenmiş), oluşturma tarihi, son kullanım | **YENİ** |
+| **Applications** | Kullanıcının uygulamaları, endpoint sayısı | **YENİ** |
+| **Usage** | API kullanım istatistikleri, grafikler, event dağılımı | **YENİ** |
 | Plan History | Plan değişiklik geçmişi | Mevcut |
-| **Billing** | Fatura geçmişi, ödeme durumu | **YENİ** |
-| **Actions** | Email gönder, refund, hesap silme | **YENİ** |
+| **Billing** | Fatura geçmişi (`invoices` tablosu), ödeme durumu (`payment_transactions`), refund geçmişi | **YENİ** |
+| **Notes & Tags** | Admin notları, müşteri etiketleri (VIP, at-risk, enterprise-ready) | **YENİ** |
+| **Communication** | Tüm etkileşim geçmişi (email, impersonate, refund, plan change) | **YENİ** |
+| **Actions** | Email gönder, refund, test webhook, GDPR export/delete, hesap silme | **YENİ** |
 
 #### 💰 Revenue (`/admin/revenue`)
 **Mevcut:** Aylık gelir, plan bazlı gelir, churn
 **Eklenecek:**
-- Refund geçmişi
-- Fatura detayları (tek tek inceleme)
+- **MRR kartı** — Monthly Recurring Revenue (₺) — ✅ Mevcut (Overview'de)
+- **ARR kartı** — Annual Recurring Revenue (₺) — ✅ Mevcut (Overview'de)
+- **ARPU kartı** — Average Revenue Per User (₺) — **YENİ**
+- **LTV kartı** — Customer Lifetime Value (₺) — **YENİ**
+- **NRR** — Net Revenue Retention (%) — **YENİ**
+- **Expansion Revenue** — Plan yükseltmelerden gelen ek gelir — **YENİ**
+- Refund geçmişi — **YENİ**
+- Fatura detayları (tek tek inceleme) — **YENİ** (`invoices` tablosundan okunacak)
+- Ödeme geçmişi — **YENİ** (`payment_transactions` tablosundan okunacak)
+- Gelir projeksiyonu (3/6/12 ay tahmini) — **YENİ**
+- Cohort analizi (aylık müşteri cohort karşılaştırması) — **YENİ**
 
 #### 🖥️ System (`/admin/system`)
 **Mevcut:** DB, Redis, API, queue sağlık durumu
@@ -189,7 +254,7 @@ Response: Vec<EndpointInfo> {
 }
 
 // Kullanıcının webhook'larını listele
-GET /admin/users/{id}/webhooks?page=1&per_page=50&status=failed
+GET /admin/users/{id}/webhooks?page=1&per_page=50&status=failed&event=order.created&since=7d
 Response: PaginatedResponse<DeliveryInfo> {
     id, endpoint_id, event, status, attempt_count,
     response_status, created_at, error_message
@@ -200,6 +265,11 @@ GET /admin/users/{id}/api-keys
 Response: Vec<ApiKeyInfo> {
     id, name, prefix, created_at, last_used_at, is_active
 }
+// NOT: api_keys tablosu yok! customers tablosundaki api_key_hash/api_key_prefix
+// kullanılıyor. inbound.rs'de api_keys tablosuna referans var ama migration yok.
+// Bu endpoint için iki seçenek:
+//   a) customers tablosundan api_key_prefix oku (tek key per user)
+//   b) api_keys tablosu için yeni migration yaz (multi-key support)
 
 // Kullanıcının uygulamalarını listele
 GET /admin/users/{id}/applications
@@ -213,6 +283,22 @@ Response: UsageStats {
     total_deliveries, success_rate, failed_count,
     api_calls, bandwidth_bytes, top_events
 }
+
+// Kullanıcının faturalarını listele
+GET /admin/users/{id}/invoices
+Response: Vec<InvoiceInfo> {
+    id, amount_cents, currency, plan, status, provider,
+    provider_invoice_id, paid_at, created_at
+}
+// Kaynak: invoices tablosu (migration 009)
+
+// Kullanıcının ödeme geçmişini listele
+GET /admin/users/{id}/payments
+Response: Vec<PaymentInfo> {
+    id, amount_cents, currency, status, provider,
+    provider_transaction_id, created_at
+}
+// Kaynak: payment_transactions tablosu (migration 009)
 ```
 
 ### 4.2 Admin Aksiyonları
@@ -222,6 +308,9 @@ Response: UsageStats {
 POST /admin/users/{id}/refund
 Body: { amount_cents: 2900, reason: "Customer request" }
 Response: { refund_id, status, amount }
+// YENİ TABLO GEREKLİ: refunds (id, customer_id, amount_cents, reason,
+//   admin_user_id, provider_refund_id, status, created_at)
+// Polar.sh refund API entegrasyonu + audit log kaydı zorunlu
 
 // Kullanıcıya test webhook gönder
 POST /admin/users/{id}/test-webhook
@@ -235,22 +324,50 @@ Response: { new_delivery_id, status }
 // Bulk email
 POST /admin/bulk-email
 Body: { subject, body, filter: { plan: "pro", status: "active" } }
-Response: { sent_count, failed_count }
+Response: { job_id, estimated_count }
+// NOT: Anlık gönderim yerine kuyruk sistemi gerekli (background worker)
+// Rate limit: Dakikada max 100 email, batch 50'şer
+// Audit log zorunlu
 
 // Kullanıcı verisini dışa aktarma (GDPR)
 GET /admin/users/{id}/export
 Response: JSON file download
+// İçerik: customer profile, endpoints, deliveries, api_keys, applications,
+//   invoices, payment_transactions, audit_log (kullanıcıya ait olanlar)
 
 // Kullanıcı verisini silme (GDPR)
 DELETE /admin/users/{id}/data
 Response: { deleted_records, status }
+// Soft delete önerisi: customers.is_deleted = true, veriler 30 gün sonra temizlenir
+// Hard delete: CASCADE ile tüm ilişkili kayıtlar silinir
+// İade edilemez → onay dialogu + audit log zorunlu
+
+// Müşteri notu ekleme
+POST /admin/users/{id}/notes
+Body: { content: "Enterprise'a geçmek istiyor" }
+Response: { id, content, admin_email, created_at }
+// YENİ TABLO: customer_notes
+
+// Müşteri etiketi ekleme/çıkarma
+POST /admin/users/{id}/tags
+Body: { tag: "vip" }
+DELETE /admin/users/{id}/tags/{tag}
+// YENİ TABLO: customer_tags
+
+// İletişim geçmişi
+GET /admin/users/{id}/communications
+Response: Vec<CommunicationEntry> {
+    type, subject, details, admin_email, created_at
+}
+// YENİ TABLO: communication_history (otomatik kayıt: email, impersonate,
+//   refund, plan change, ban, GDPR action)
 ```
 
 ### 4.3 Sistem Geneli
 
 ```rust
 // Global failed deliveries
-GET /admin/deliveries/failed?limit=50&since=24h
+GET /admin/deliveries/failed?limit=50&since=24h&user_id=xxx
 Response: Vec<FailedDelivery> {
     id, user_id, user_email, endpoint_url, event,
     error_message, attempt_count, created_at
@@ -262,17 +379,137 @@ Response: Vec<RateLimitViolation> {
     user_id, user_email, endpoint_id, ip,
     requests_count, limit, window, timestamp
 }
+// YENİ TABLO: rate_limit_violations (id, customer_id, endpoint_id, ip,
+//   requests_count, limit_per_window, window_seconds, created_at)
+// NOT: rate_limit_configs tablosu var ama ihlal log'ları tutulmuyor
 
 // API latency
 GET /admin/api-latency?period=24h
 Response: Vec<EndpointLatency> {
     endpoint, method, avg_ms, p95_ms, p99_ms, error_rate
 }
+
+// Refund listesi (tüm müşteriler)
+GET /admin/refunds?limit=50
+Response: Vec<RefundEntry> {
+    id, customer_id, customer_email, amount_cents, reason,
+    admin_email, status, created_at
+}
+// Kaynak: refunds tablosu (yeni oluşturulacak)
+
+// Fatura listesi (tüm müşteriler)
+GET /admin/invoices?limit=50&status=failed
+Response: Vec<InvoiceEntry> {
+    id, customer_id, customer_email, amount_cents, plan,
+    status, provider, paid_at, created_at
+}
+// Kaynak: invoices tablosu (migration 009 — mevcut)
+
+// Müşteri segmentasyonu
+GET /admin/segments
+POST /admin/segments
+Body: { name: "High-volume Pro", filter: { plan: "pro", min_deliveries: 1000 } }
+Response: { segment_id, user_count, users: [...] }
+// Opsiyonel — ilk aşamada basit filtre, ileride kayıtlı segment
 ```
 
 ---
 
 ## 5. Adım Adım Uygulama
+
+### AŞAMA 0: Veritabanı Hazırlığı (0.5 oturum) — YENİ
+
+**Hedef:** Eksik tabloları oluştur, tutarsızlıkları çöz.
+
+**Yeni Migration: `019_admin_upgrade.sql`**
+
+```sql
+-- 1. Refund tracking
+CREATE TABLE IF NOT EXISTS refunds (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    amount_cents BIGINT NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'usd',
+    reason TEXT,
+    admin_user_id UUID,
+    provider TEXT NOT NULL DEFAULT 'polar',
+    provider_refund_id TEXT,
+    status TEXT NOT NULL DEFAULT 'pending', -- pending, completed, failed
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_refunds_customer ON refunds(customer_id);
+CREATE INDEX idx_refunds_created ON refunds(created_at DESC);
+
+-- 2. Customer notes
+CREATE TABLE IF NOT EXISTS customer_notes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    admin_user_id UUID NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_customer_notes_customer ON customer_notes(customer_id);
+
+-- 3. Customer tags
+CREATE TABLE IF NOT EXISTS customer_tags (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    tag TEXT NOT NULL,
+    admin_user_id UUID NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE(customer_id, tag)
+);
+CREATE INDEX idx_customer_tags_customer ON customer_tags(customer_id);
+CREATE INDEX idx_customer_tags_tag ON customer_tags(tag);
+
+-- 4. Communication history (otomatik kayıt)
+CREATE TABLE IF NOT EXISTS communication_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    type TEXT NOT NULL, -- email, impersonate, refund, plan_change, ban, gdpr_export, gdpr_delete
+    subject TEXT,
+    details JSONB,
+    admin_user_id UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_comm_history_customer ON communication_history(customer_id);
+CREATE INDEX idx_comm_history_type ON communication_history(type);
+
+-- 5. Rate limit violations (logging)
+CREATE TABLE IF NOT EXISTS rate_limit_violations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
+    endpoint_id UUID REFERENCES endpoints(id) ON DELETE SET NULL,
+    ip TEXT,
+    requests_count INT NOT NULL,
+    limit_per_window INT NOT NULL,
+    window_seconds INT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_rl_violations_created ON rate_limit_violations(created_at DESC);
+CREATE INDEX idx_rl_violations_customer ON rate_limit_violations(customer_id);
+
+-- 6. api_keys tablosu tutarsızlığını çöz
+-- Seçenek A: Tek key per user (mevcut yapı — customers.api_key_hash)
+-- Seçenek B: Multi-key support (eğer inbound.rs'deki sorgu aktifse)
+-- inbound.rs'de "SELECT key_hash, customer_id FROM api_keys WHERE api_key_prefix = $1"
+-- sorgusu var. Bu sorgu aktif kullanılıyorsa tablo oluşturulmalı:
+CREATE TABLE IF NOT EXISTS api_keys (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    name TEXT,
+    key_hash TEXT NOT NULL,
+    api_key_prefix TEXT NOT NULL,
+    is_active BOOL NOT NULL DEFAULT true,
+    last_used_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_api_keys_prefix ON api_keys(api_key_prefix);
+CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
+-- KARAR GEREKLİ: inbound.rs'deki api_keys sorgusu aktif mi?
+-- Eğer evet → bu tablo zaten gerekli, migration eksik
+-- Eğer hayır → dead code, temizlenmeli
+```
 
 ### AŞAMA 1: Kullanıcı Kaynakları (1-2 oturum)
 
@@ -374,38 +611,124 @@ Response: Vec<EndpointLatency> {
 4. System sayfasına yeni section'lar ekle
 5. Failed deliveries tablosu, rate limit violation listesi, latency grafikleri
 
+### AŞAMA 4: Müşteri İlişkileri (1 oturum) — YENİ
+
+**Hedef:** Admin müşteri hakkında not yazabilsin, etiketleyebilsin, geçmişi görebilsin.
+
+**Backend:**
+1. `POST /admin/users/{id}/notes` — Not ekle
+2. `GET /admin/users/{id}/notes` — Notları listele
+3. `POST /admin/users/{id}/tags` — Etiket ekle
+4. `DELETE /admin/users/{id}/tags/{tag}` — Etiket kaldır
+5. `GET /admin/users/{id}/communications` — İletişim geçmişini listele
+6. Mevcut aksiyonları `communication_history` tablosuna otomatik logla:
+   - Email gönderildiğinde → `type: 'email'`
+   - Impersonate edildiğinde → `type: 'impersonate'`
+   - Plan değiştirildiğinde → `type: 'plan_change'`
+   - Ban/activate edildiğinde → `type: 'ban'`
+
+**Frontend:**
+7. User detail sayfasına "Notes & Tags" sekmesi
+8. User detail sayfasına "Communication" sekmesi
+9. Etiket renkleri: VIP=gold, at-risk=red, enterprise=purple, churn-risk=orange
+
+### AŞAMA 5: Fatura & Ödeme Yönetimi (0.5 oturum) — YENİ
+
+**Hedef:** Admin fatura ve ödeme geçmişini görebilsin.
+
+**Backend:**
+1. `GET /admin/users/{id}/invoices` — Kullanıcının faturaları (invoices tablosundan)
+2. `GET /admin/users/{id}/payments` — Kullanıcının ödemeleri (payment_transactions tablosundan)
+3. `GET /admin/invoices` — Tüm faturalar (sistem geneli)
+
+**Frontend:**
+4. User detail sayfasına "Billing" sekmesi
+5. Revenue sayfasına fatura listesi section'ı
+
+### AŞAMA 6: Gelir Metrikleri (0.5 oturum) — YENİ
+
+**Hedef:** ARPU, LTV, NRR, Expansion Revenue, Cohort analizi.
+
+**Backend:**
+1. Revenue API'sine yeni metrikler ekle:
+   - ARPU = MRR / toplam ücretli kullanıcı
+   - LTV = ARPU / churn_rate
+   - NRR = (dönem başı MRR + expansion - contraction - churn) / dönem başı MRR
+   - Expansion Revenue = plan yükseltmelerden gelen ek gelir
+
+**Frontend:**
+2. Revenue sayfasına yeni kartlar ekle
+3. Cohort analizi tablosu (opsiyonel — ilk aşamada basit)
+
 ---
 
 ## 6. Kontrol Listesi
 
+### Aşama 0 — Veritabanı Hazırlığı
+- [ ] `019_admin_upgrade.sql` migration yaz
+- [ ] `refunds` tablosu CREATE TABLE
+- [ ] `customer_notes` tablosu CREATE TABLE
+- [ ] `customer_tags` tablosu CREATE TABLE
+- [ ] `communication_history` tablosu CREATE TABLE
+- [ ] `rate_limit_violations` tablosu CREATE TABLE
+- [ ] `api_keys` tablosu — KARAR: inbound.rs'deki sorgu aktif mi? Evetse CREATE TABLE
+- [ ] `cargo test` ile doğrula
+
 ### Aşama 1 — Kullanıcı Kaynakları
 - [ ] `GET /admin/users/{id}/endpoints` — Backend endpoint
-- [ ] `GET /admin/users/{id}/webhooks` — Backend endpoint
+- [ ] `GET /admin/users/{id}/webhooks` — Backend endpoint (filtre: status, event, since)
 - [ ] `GET /admin/users/{id}/api-keys` — Backend endpoint
 - [ ] `GET /admin/users/{id}/applications` — Backend endpoint
 - [ ] `GET /admin/users/{id}/usage` — Backend endpoint
+- [ ] `GET /admin/users/{id}/invoices` — Backend endpoint
+- [ ] `GET /admin/users/{id}/payments` — Backend endpoint
 - [ ] `admin.ts` — Yeni API fonksiyonları
 - [ ] `/admin/users/[id]` — Endpoints tab component
-- [ ] `/admin/users/[id]` — Webhooks tab component
+- [ ] `/admin/users/[id]` — Webhooks tab component (filtre + arama)
 - [ ] `/admin/users/[id]` — API Keys tab component
 - [ ] `/admin/users/[id]` — Applications tab component
-- [ ] `/admin/users/[id]` — Usage tab component
+- [ ] `/admin/users/[id]` — Usage tab component (grafikler)
 - [ ] Build test + push
 
 ### Aşama 2 — Admin Aksiyonları
-- [ ] `POST /admin/users/{id}/refund` — Backend endpoint
+- [ ] `POST /admin/users/{id}/refund` — Backend endpoint + Polar.sh entegrasyonu
 - [ ] `POST /admin/users/{id}/test-webhook` — Backend endpoint
 - [ ] `POST /admin/users/{id}/webhooks/{id}/replay` — Backend endpoint
 - [ ] `/admin/users/[id]` — Actions tab component
+- [ ] Refund formu + onay dialogu
 - [ ] Build test + push
 
 ### Aşama 3 — Sistem Geneli
 - [ ] `GET /admin/deliveries/failed` — Backend endpoint
 - [ ] `GET /admin/rate-limit-violations` — Backend endpoint
 - [ ] `GET /admin/api-latency` — Backend endpoint
+- [ ] `GET /admin/invoices` — Backend endpoint (sistem geneli faturalar)
+- [ ] `GET /admin/refunds` — Backend endpoint (sistem geneli iadeler)
 - [ ] `/admin/system` — Failed deliveries section
 - [ ] `/admin/system` — Rate limit violations section
 - [ ] `/admin/system` — API latency section
+- [ ] Build test + push
+
+### Aşama 4 — Müşteri İlişkileri
+- [ ] `POST /admin/users/{id}/notes` — Backend endpoint
+- [ ] `GET /admin/users/{id}/notes` — Backend endpoint
+- [ ] `POST /admin/users/{id}/tags` — Backend endpoint
+- [ ] `DELETE /admin/users/{id}/tags/{tag}` — Backend endpoint
+- [ ] `GET /admin/users/{id}/communications` — Backend endpoint
+- [ ] Mevcut aksiyonları communication_history'ye otomatik loglama
+- [ ] `/admin/users/[id]` — Notes & Tags sekmesi
+- [ ] `/admin/users/[id]` — Communication sekmesi
+- [ ] Build test + push
+
+### Aşama 5 — Fatura & Ödeme
+- [ ] `/admin/users/[id]` — Billing sekmesi (fatura + ödeme geçmişi)
+- [ ] `/admin/revenue` — Fatura listesi section'ı
+- [ ] Build test + push
+
+### Aşama 6 — Gelir Metrikleri
+- [ ] Revenue API'sine ARPU, LTV, NRR, Expansion Revenue ekle
+- [ ] `/admin/revenue` — Yeni metrik kartları
+- [ ] Cohort analizi tablosu (opsiyonel)
 - [ ] Build test + push
 
 ---
@@ -413,13 +736,15 @@ Response: Vec<EndpointLatency> {
 ## 7. Dosya Haritası
 
 ```
-api/src/routes/admin.rs                    ← YENİ endpoint'ler eklenecek
+api/migrations/019_admin_upgrade.sql      ← YENİ migration (6 tablo)
+api/src/routes/admin.rs                    ← YENİ endpoint'ler eklenecek (~15 yeni fonksiyon)
 dashboard/src/lib/api.ts                   ← YENİ adminApi fonksiyonları
 dashboard/src/app/[locale]/admin/
-├── page.tsx                               ← Overview güncellenecek
+├── page.tsx                               ← Overview güncellenecek (failed deliveries, alerts)
 ├── users/page.tsx                         ← Mevcut (değişmez)
-├── users/[id]/page.tsx                    ← YENİ tab'lar eklenecek
+├── users/[id]/page.tsx                    ← YENİ tab'lar eklenecek (9 yeni sekme)
 ├── system/page.tsx                        ← YENİ section'lar eklenecek
+├── revenue/page.tsx                       ← YENİ metrik kartları + fatura listesi
 └── (diğer sayfalar değişmez)
 ```
 
@@ -434,6 +759,11 @@ dashboard/src/app/[locale]/admin/
 | Admin yetki kontrolü | Her endpoint'te `is_admin` kontrolü |
 | GDPR silme geri alınamaz | Soft delete, onay dialogu |
 | SQL injection | Parametrize query (zaten var) |
+| `api_keys` tablo tutarsızlığı | inbound.rs'deki sorguyu kontrol et, karar ver |
+| Bulk email timeout | Kuyruk sistemi (background worker), batch 50'şer |
+| Refund mükerrer gönderim | Idempotency key + provider_refund_id unique constraint |
+| Communication history boyutu | Eski kayıtları arşivle (>90 gün), index'le |
+| Fatura tablosu boş | Migration 009'da tablo var ama veri dolduran cron yok → webhook ile fatura kaydet |
 
 ---
 
@@ -441,6 +771,7 @@ dashboard/src/app/[locale]/admin/
 
 | Sıra | Özellik | Neden |
 |------|---------|-------|
+| 0 | **Veritabanı migration** | Temel — diğer her şey bunun üzerine kurulur |
 | 1 | Kullanıcı endpoint'lerini görme | Müşteri destek için en çok lazım olan |
 | 2 | Kullanıcı webhook'larını görme | "Webhook'larım gelmiyor" sorunu |
 | 3 | Test webhook gönderme | Debug için kritik |
@@ -449,5 +780,22 @@ dashboard/src/app/[locale]/admin/
 | 6 | Global failed deliveries | Sistem geneli izleme |
 | 7 | Rate limit violations | Güvenlik |
 | 8 | Refund | Müşteri memnuniyeti |
-| 9 | Bulk email | Operasyon |
-| 10 | GDPR tools | Uyumluluk |
+| 9 | Müşteri notları + etiketleri | Operasyonel verimlilik |
+| 10 | Fatura + ödeme geçmişi | Finans |
+| 11 | İletişim geçmişi | Müşteri ilişkileri |
+| 12 | Bulk email | Operasyon |
+| 13 | GDPR tools | Uyumluluk |
+| 14 | ARPU, LTV, NRR metrikleri | Büyüme takibi |
+
+---
+
+## 10. Karar Gereken Noktalar ⚠️
+
+| # | Konu | Seçenek A | Seçenek B | Tavsiye |
+|---|------|-----------|-----------|---------|
+| 1 | `api_keys` tablosu | Tablo oluştur (multi-key) | customers tablosundan oku (tek key) | inbound.rs'yi kontrol et — eğer sorgu aktifse tablo gerekli |
+| 2 | Refund provider | Polar.sh API | Manuel kayıt + admin takibi | Önce manuel, sonra Polar.sh entegrasyonu |
+| 3 | GDPR silme | Hard delete (CASCADE) | Soft delete (is_deleted + 30 gün) | Soft delete — geri dönüş mümkün olsun |
+| 4 | Bulk email | Anlık gönderim | Kuyruk (background worker) | Kuyruk — timeout riski var |
+| 5 | Communication log | Manuel kayıt | Otomatik (middleware) | Otomatik — mevcut aksiyonları intercept et |
+| 6 | Cohort analizi | Tam implementasyon | Basit tablo | Önce basit, sonra geliştir |
