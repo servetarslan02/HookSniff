@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-16 04:20 GMT+8
+> Son güncelleme: 2026-05-16 04:28 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -319,6 +319,14 @@ HookSniff/
 2. **GitHub Actions** — Hala başarısız (billing issue, faturalandırma güncellenmeli)
 3. **GCP Console** — Servet'in Google hesabı ile giriş yapıldı (2FA onayı ile)
 4. **API Sağlığı** — Çalışıyor (healthy, DB 27ms, Redis configured)
+
+### Oturum 179 — 2026-05-16 04:28 GMT+8
+1. **Kullanılmayan API Fonksiyonları Temizliği** ✅
+   - 12 kullanılmayan method → 0
+   - Silinen: webhooksApi.batch, authApi.login/register, teamsApi.get, customDomainsApi (tamamen), ssoApi.getConfig/saveConfig, billingApiExtended.getInvoices, billingApi (tamamen)
+   - billing/page.tsx: billingApi → billingApiExtended迁移
+   - 48 satır silindi
+2. **Commit:** 071cb10e — push edildi
 
 ### Oturum 178 — 2026-05-16 04:20 GMT+8
 1. **teamsApi.acceptInvite — Davet Kabul Akışı** ✅
