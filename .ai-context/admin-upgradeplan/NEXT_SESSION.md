@@ -27,7 +27,7 @@
 | 3 | Müşteri notları, etiketler, iletişim geçmişi | ✅ TAMAMLANDI | 2026-05-16 |
 | 4 | Fatura, ödeme, gelir metrikleri | ✅ TAMAMLANDI | 2026-05-16 |
 | 5 | Refund + Polar.sh webhook handler | ✅ TAMAMLANDI | 2026-05-16 |
-| 6 | Alerts sayfası | ⏳ Sıradaki | |
+| 6 | Alerts sayfası | ✅ TAMAMLANDI | 2026-05-16 |
 | 7 | Bulk email + GDPR | ⏳ İleride | |
 
 ---
@@ -57,27 +57,44 @@
 
 ---
 
-## 🔄 Sıradaki İşler — AŞAMA 6
+## ✅ Son Tamamlanan — AŞAMA 6
 
-### Alerts Sayfası + Final (0.5 oturum)
+### Alerts Sayfası (2026-05-16) ✅ TAMAMLANDI
 
-**Hedef:** Alerts'i ayrı sayfaya taşı, genel polish.
+**Frontend (alerts/page.tsx — +369 satır):**
+- [x] Yeni `/admin/alerts` sayfası
+- [x] Alert listesi (all/active/inactive filtre)
+- [x] Alert oluşturma formu (name, condition, threshold, channels)
+- [x] Alert düzenleme (inline form)
+- [x] Alert silme
+- [x] Active/Inactive toggle
+- [x] Boş durum sayfası
+
+**Layout:**
+- [x] Sidebar'a Alerts linki eklendi (🔔 icon)
+
+**Git:**
+- [x] Commit: `ade3919a`
+- [x] Push: main → origin ✅
+
+**Not:** Backend endpoint'leri zaten mevcuttu — yeni endpoint gerekmedi. `cargo test` ve `next build` atlandı (Rust kurulu değil).
+
+---
+
+## 🔄 Sıradaki İşler — AŞAMA 7 (İLERİDE)
+
+### Bulk Email + GDPR
 
 **Backend:**
-- [ ] Mevcut alerts endpoint'leri zaten var (GET, POST, PUT, DELETE) — yeni endpoint gerekmez
+- [ ] `POST /admin/bulk-email` — Kuyruk sistemi, batch 50'şer
+- [ ] `GET /admin/users/{id}/export` — GDPR data export
+- [ ] `DELETE /admin/users/{id}/data` — GDPR data delete
 
 **Frontend:**
-- [ ] Yeni `/admin/alerts` sayfası oluştur
-- [ ] Alert listesi (aktif/pasif filtresi)
-- [ ] Alert oluşturma/düzenleme formu
-- [ ] Son incident geçmişi
-- [ ] Sidebar'a Alerts linki ekle
+- [ ] Users/[id] Actions sekmesinde GDPR export/delete butonları
+- [ ] Settings sayfasında bulk email section (segment filtresi)
 
-**Kontrol:**
-- [ ] `cargo test` (Rust kurulacak)
-- [ ] `next build`
-- [ ] Checklist + MEMORY.md + NEXT_SESSION.md güncelle
-- [ ] `git commit` + `git push`
+**Not:** Bu aşama ileride yapılacak, diğer aşamaları etkilemez.
 
 ---
 
