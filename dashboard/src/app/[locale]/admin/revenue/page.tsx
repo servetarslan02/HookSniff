@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/lib/store';
-import { adminApi, API_BASE, type RevenueResponse, type ChurnUser } from '@/lib/api';
+import { useState } from 'react';
+import { useAdminRevenue, useAdminRevenueMetrics, useAdminRevenueCohorts, useAdminRefunds, useAdminChurn, useAdminSettings } from '@/hooks/useAdminData';
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
+import { adminApi, API_BASE } from '@/lib/api';
+import { useAuth } from '@/lib/store';
 
 const PLAN_COLORS: Record<string, string> = {
   developer: '#94a3b8',
@@ -18,53 +19,32 @@ const PLAN_COLORS: Record<string, string> = {
 
 type DateRange = '7d' | '30d' | '90d' | '12m' | 'all';
 
+const DATE_RANGE_OPTIONS: { value: DateRange; labelKey: string }[] = [
+  { value: '7d', labelKey: 'last7Days' },
+  { value: '30d', labelKey: 'last30Days' },
+  { value: '90d', labelKey: 'last90Days' },
+  { value: '12m', labelKey: 'last12Months' },
+  { value: 'all', labelKey: 'allTime' },
+];
+
 export default function AdminRevenuePage() {
   const { token } = useAuth();
-  const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
-  const [churnUsers, setChurnUsers] = useState<ChurnUser[]>([]);
-  const [planPrices, setPlanPrices] = useState<{ pro: number; business: number }>({ pro: 29, business: 99 });
-  const [revenueMetrics, setRevenueMetrics] = useState<{ mrr: number; arr: number; arpu: number; ltv: number; nrr: number; expansion_revenue: number; total_customers: number; paying_customers: number; churn_rate: number; avg_months_retained: number } | null>(null);
-  const [cohorts, setCohorts] = useState<Array<{ cohort_month: string; customers_signed_up: number; customers_active: number; total_revenue_cents: number; retention_rate: number }>>([]);
-  const [allRefunds, setAllRefunds] = useState<Array<{ id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; status: string; created_at: string }>>([]);
-  const [refundsTotal, setRefundsTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data: revenue, isLoading, error, refetch } = useAdminRevenue();
+  const { data: revenueMetrics } = useAdminRevenueMetrics();
+  const { data: cohortsData } = useAdminRevenueCohorts(12);
+  const { data: refundsData } = useAdminRefunds({ per_page: 50 });
+  const { data: churnUsers = [] } = useAdminChurn();
+  const { data: settings } = useAdminSettings();
+
   const [dateRange, setDateRange] = useState<DateRange>('12m');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const { toast } = useToast();
 
-  const fetchRevenue = useCallback(async (isRefresh = false) => {
-    if (!token) return;
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
-    setError(null);
-    try {
-      const [revenueData, churnData, settings, metricsData, cohortsData, refundsData] = await Promise.all([
-        adminApi.getRevenue(token),
-        adminApi.getChurn(token).catch(() => ({ users: [] })),
-        adminApi.getSettings(token).catch(() => null),
-        adminApi.getRevenueMetrics(token).catch(() => null),
-        adminApi.getRevenueCohorts(token, 12).catch(() => null),
-        adminApi.getAllRefunds(token, { per_page: 50 }).catch(() => ({ refunds: [], total: 0 })),
-      ]);
-      setRevenue(revenueData);
-      setChurnUsers(churnData.users || []);
-      if (settings) {
-        setPlanPrices({ pro: settings.plan_price_pro, business: settings.plan_price_business });
-      }
-      if (metricsData) setRevenueMetrics(metricsData);
-      if (cohortsData) setCohorts(cohortsData.cohorts || []);
-      setAllRefunds(refundsData.refunds || []);
-      setRefundsTotal(refundsData.total || 0);
-    } catch {
-      setError(t("failedToLoadRevenue"));
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [token, t]);
+  const cohorts = cohortsData?.cohorts ?? [];
+  const allRefunds = refundsData?.refunds ?? [];
+  const refundsTotal = refundsData?.total ?? 0;
+  const planPrices = { pro: settings?.plan_price_pro ?? 29, business: settings?.plan_price_business ?? 99 };
 
   const handleExportCSV = async () => {
     if (!token) return;
@@ -83,18 +63,6 @@ export default function AdminRevenuePage() {
       toast(tc('error'), 'error');
     }
   };
-
-  useEffect(() => {
-    fetchRevenue();
-  }, [fetchRevenue]);
-
-  const DATE_RANGE_OPTIONS: { value: DateRange; labelKey: string }[] = [
-    { value: '7d', labelKey: 'last7Days' },
-    { value: '30d', labelKey: 'last30Days' },
-    { value: '90d', labelKey: 'last90Days' },
-    { value: '12m', labelKey: 'last12Months' },
-    { value: 'all', labelKey: 'allTime' },
-  ];
 
   // Filter monthly data based on date range
   const allMonthlyData = revenue?.monthly_revenue || [];
@@ -121,7 +89,7 @@ export default function AdminRevenuePage() {
     count: item.count,
   })) || [];
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div>
@@ -139,9 +107,9 @@ export default function AdminRevenuePage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('revenue')}</h1>
         </div>
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
-          <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
+          <span className="text-red-700 dark:text-red-400 text-sm">{t("failedToLoadRevenue")}</span>
           <button type="button"
-            onClick={() => fetchRevenue()}
+            onClick={() => refetch()}
             className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
           >
             {tc('retry')}
@@ -177,15 +145,14 @@ export default function AdminRevenuePage() {
             ))}
           </select>
           <button type="button"
-            onClick={() => fetchRevenue(true)}
-            disabled={refreshing}
+            onClick={() => refetch()}
             aria-label={t('refreshData')}
-            className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition disabled:opacity-50 flex items-center gap-1.5"
+            className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition flex items-center gap-1.5"
           >
-            <svg className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            {refreshing ? t('refreshing') : t('refreshData')}
+            {t('refreshData')}
           </button>
         </div>
       </div>
@@ -231,7 +198,7 @@ export default function AdminRevenuePage() {
         </button>
       </div>
 
-      {/* Aşama 4 — Advanced Metrics */}
+      {/* Advanced Metrics */}
       {revenueMetrics && (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatCard
@@ -521,7 +488,7 @@ export default function AdminRevenuePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                {churnUsers.map((u, index) => (
+                {churnUsers.map((u: { id: string; email: string; name?: string; plan: string; amount: number; churn_date: string }, index: number) => (
                   <tr key={u.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-gray-100 dark:hover:bg-gray-700 transition`}>
                     <td className="px-4 sm:px-6 py-4 text-sm text-gray-900 dark:text-white">{u.email}</td>
                     <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 dark:text-slate-400">{u.name || '—'}</td>
