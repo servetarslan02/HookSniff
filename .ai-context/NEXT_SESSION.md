@@ -17,6 +17,14 @@ Bu dosyayı ilk kez okuyorsan:
 
 ## ✅ Tamamlanan (Son Oturum — 2026-05-15)
 
+### Oturum 173: Neon Seq Scan Index Migration ✅
+1. **018_seq_scan_indexes.sql uygulandı** — 8 CREATE INDEX IF NOT EXISTS
+2. **Neon HTTP API** — psql yok, Node.js https modülü ile bağlanıldı
+3. **ANALYZE** — customers, endpoints, deliveries, notifications, invoices, webhook_queue
+4. **9 index doğrulandı** — pg_indexes sorgusu ile
+5. **Tablo boyutları**: 24 customers, 22 endpoints, 36 deliveries, 2 notifications, 0 invoices
+6. **Not**: Tablolar küçük olduğu için PostgreSQL seq scan tercih ediyor — büyüyünce index kullanılır
+
 ### Oturum 172: GCP/Polar/QStash/Redis Doğrulama ✅
 1. **GCP Console** — Tarayıcıdan giriş yapıldı, tüm env var ve secret'lar doğrulandı
 2. **Polar.sh** — Pro ($49) ve Business ($99) ürünler mevcut, webhook doğru
@@ -69,6 +77,8 @@ Bu dosyayı ilk kez okuyorsan:
 
 **Sonraki adım:** Migration'ı Neon DB'ye uygula (Cloud Build veya manuel)
 
+**✅ UYGULANDI (Oturum 173, 2026-05-15):** Neon HTTP API ile 8 index oluşturuldu, ANALYZE çalıştırıldı. Tablolar küçük (<40 row) olduğu için PostgreSQL hala seq scan tercih ediyor — tablolar büyüyünce index otomatik kullanılacak.
+
 ### Öncelik 1 — Güvenlik (P0 kalan)
 | # | Görev | Durum | Dosya |
 |---|-------|-------|-------|
@@ -76,26 +86,6 @@ Bu dosyayı ilk kez okuyorsan:
 | 2 | HS-038g: serde_json hata gösteriyor | ⬜ | error.rs |
 | 3 | HS-038h: Email enumeration — register mesajı | ⬜ | auth.rs |
 | 4 | HS-038j: rate_limit.rs unwrap() — panic riski | ⬜ | rate_limit.rs |
-
-### Öncelik 2 — i18n Büyük İş
-| # | Görev | Durum | Not |
-|---|-------|-------|-----|
-| 5 | 920+ hardcoded İngilizce string → Türkçe | ⬜ | Birden fazla oturum |
-| 6 | HS-068: Türkçe çeviri hataları | ⬜ | |
-
-### Öncelik 3 — Performance (Kalan)
-| # | Görev | Durum | Not |
-|---|-------|-------|-----|
-| 7 | Cloudflare Workers (Edge deploy) | 🔶 v1 yazıldı | Deploy için Servet: KV namespace oluştur + wrangler login |
-| 8 | Read Replica (Neon) | ❌ | Free tier desteklemiyor |
-
-### Öncelik 4 — P2 Kalan
-| # | Görev | Durum | Not |
-|---|-------|-------|-----|
-| 9 | HS-047: blog/[slug] 1922 satır mega component | ⬜ | Refactoring |
-| 10 | HS-065: 920+ hardcoded string (i18n) | ⬜ | Büyük iş |
-| 11 | HS-070: output:standalone | ⬜ | Vercelde gerekli değil |
-| 12 | HS-071: HSTS header | ✅ | Zaten mevcut |
 
 ---
 
@@ -124,7 +114,7 @@ Bu dosyayı ilk kez okuyorsan:
 ### Öncelik 3 — Performans
 | # | Görev | Durum | Not |
 |---|-------|-------|------|
-| 9 | Neon seq scan index migration uygula | ⬜ | 018_seq_scan_indexes.sql hazır |
+| 9 | Neon seq scan index migration uygula | ✅ | Oturum 173'te uygulandı |
 | 10 | Cloudflare Workers (Edge deploy) | 🔶 v1 yazıldı | Deploy için Servet: KV namespace oluştur |
 
 ### Öncelik 4 — P2 Kalan
@@ -137,6 +127,7 @@ Bu dosyayı ilk kez okuyorsan:
 ### Tamamlanan (Son 3 Oturum)
 - ✅ Navigation Restructure (Oturum 167-168)
 - ✅ Seq Scan Index Migration dosyası (Oturum 168)
+- ✅ Seq Scan Index Migration uygulandı (Oturum 173)
 - ✅ Cloud Build Fix — bool as f64 (Oturum 167)
 - ✅ SSL Warning Fix (Oturum 167)
 - ✅ Neon Index Temizliği — 84 index silindi (Oturum 167)
@@ -160,7 +151,7 @@ Bu dosyayı ilk kez okuyorsan:
 | Domain kararı | ❌ | hooksniff.vercel.app yeterli şimdilik |
 | GitHub Actions dakikası | ❌ | CI bitmiş, yenilenmeli |
 | Cloudflare Workers deploy | ⚠️ | wrangler login + KV namespace oluştur |
-| Neon seq scan migration | ⚠️ | 018_seq_scan_indexes.sql Neon DB'ye uygulanacak |
+| Neon seq scan migration | ✅ | Oturum 173'te uygulandı |
 
 ---
 
