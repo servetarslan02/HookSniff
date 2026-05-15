@@ -24,6 +24,7 @@ use hooksniff_api::routes;
 use hooksniff_api::telemetry;
 use hooksniff_api::throttle;
 use hooksniff_api::cache;
+use hooksniff_api::events;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -138,6 +139,21 @@ async fn main() -> Result<()> {
             tracing::info!("Redis URL not configured (REDIS_URL or UPSTASH_REDIS_REST_URL), running without cache");
             None
         }
+    };
+
+    // Initialize event publisher (Redis Streams + local broadcast)
+    let event_publisher = if cfg.event_publisher_enabled {
+        let redis_url = config::resolve_redis_url();
+        let publisher = events::EventPublisher::new(redis_url.as_deref()).await;
+        if publisher.has_redis() {
+            tracing::info!("✅ Event publisher initialized (Redis Streams)");
+        } else {
+            tracing::info!("✅ Event publisher initialized (local broadcast only — no Redis)");
+        }
+        Some(publisher)
+    } else {
+        tracing::info!("Event publisher disabled (EVENT_PUBLISHER_ENABLED=false)");
+        None
     };
 
     // Initialize QStash client (if QSTASH_TOKEN is set)
@@ -371,6 +387,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(email_provider))
         .layer(axum::Extension(job_queue))
         .layer(axum::Extension(cache_layer))
+        .layer(axum::Extension(event_publisher))
         .layer(axum::Extension(qstash_client))
         .layer(axum::Extension(r2_client))
         .layer({
