@@ -51,6 +51,7 @@ export default function AdminOverviewPage() {
   const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [overviewTab, setOverviewTab] = useState<'overview' | 'activity' | 'health' | 'infra'>('overview');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const locale = useLocale();
@@ -262,7 +263,35 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
+      {/* ── Tab Navigation ── */}
+      <div className="flex gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl w-fit">
+        {([
+          { key: 'overview', icon: '📊', label: t('overview') || 'Overview' },
+          { key: 'activity', icon: '📋', label: t('activity') || 'Activity' },
+          { key: 'health', icon: '💚', label: t('health') || 'Health' },
+          { key: 'infra', icon: '🏗️', label: t('infrastructure') || 'Infrastructure' },
+        ] as const).map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setOverviewTab(tab.key)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+              overviewTab === tab.key
+                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
+            }`}
+          >
+            <span className="text-xs">{tab.icon}</span>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* ── Stats Cards ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          label={t('totalUsers')}
+          value={stats?.total_users?.toLocaleString() || '0'}
+          icon={<span className="text-lg" aria-hidden="true">👥</span>}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label={t('totalUsers')}
@@ -322,8 +351,8 @@ export default function AdminOverviewPage() {
         />
       </div>
 
-      {/* ── MRR / ARR Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* ── MRR / ARR Cards (Overview tab) ── */}
+      <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${overviewTab !== 'overview' ? 'hidden' : ''}`}>
         <div className="glass-card p-6 border-l-4 border-violet-500">
           <div className="flex items-center gap-3 mb-2">
             <span className="text-2xl" aria-hidden="true">💎</span>
@@ -363,8 +392,8 @@ export default function AdminOverviewPage() {
         </div>
       )}
 
-      {/* ── Endpoint Status + Security Warnings ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* ── Endpoint Status + Security Warnings (Health) ── */}
+      <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 ${overviewTab !== 'health' ? 'hidden' : ''}`}>
         {/* Endpoint Status */}
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
@@ -422,8 +451,8 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* ── Charts + Activity ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* ── Users by Plan (Overview tab) ── */}
+      <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 ${overviewTab !== 'overview' ? 'hidden' : ''}`}>
         {/* Users by Plan Chart */}
         <div className="glass-card p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('usersByPlan')}</h2>
@@ -497,7 +526,10 @@ export default function AdminOverviewPage() {
           )}
         </div>
 
-        {/* Recent Activity (Audit Log) */}
+      </div>
+
+      {/* ── Recent Activity (Activity tab) ── */}
+      <div className={`${overviewTab !== 'activity' ? 'hidden' : ''}`}>
         <div className="glass-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('recentActivity')}</h2>
@@ -533,8 +565,8 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* ── Recent Signups + Quick Actions ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* ── Recent Signups + Quick Actions (Activity tab) ── */}
+      <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 ${overviewTab !== 'activity' ? 'hidden' : ''}`}>
         {/* Recent Signups */}
         <div className="glass-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
@@ -618,8 +650,8 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* ── Uptime + Feature Flags ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* ── Uptime + Service Status (Health tab) ── */}
+      <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${overviewTab !== 'health' ? 'hidden' : ''}`}>
         {/* Uptime */}
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-2">
@@ -649,8 +681,10 @@ export default function AdminOverviewPage() {
           </p>
           <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('basedOnHealthCheck')}</p>
         </div>
+      </div>
 
-        {/* Feature Flags */}
+      {/* ── Feature Flags (Infrastructure tab) ── */}
+      <div className={`${overviewTab !== 'infra' ? 'hidden' : ''}`}>
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xl" aria-hidden="true">🚩</span>
@@ -676,12 +710,11 @@ export default function AdminOverviewPage() {
             </div>
           )}
         </div>
-
       </div>
 
-      {/* ── Weekly Comparison ── */}
+      {/* ── Weekly Comparison (Overview tab) ── */}
       {stats?.trends && (
-        <div className="glass-card p-6">
+        <div className={`glass-card p-6 ${overviewTab !== 'overview' ? 'hidden' : ''}`}>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('weekComparison')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {/* Users comparison */}
@@ -727,8 +760,8 @@ export default function AdminOverviewPage() {
         </div>
       )}
 
-      {/* ── Standard Webhooks + Deduplication ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* ── Standard Webhooks + Deduplication (Infrastructure tab) ── */}
+      <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 ${overviewTab !== 'infra' ? 'hidden' : ''}`}>
         {/* Standard Webhooks */}
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -832,8 +865,8 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* ── Last Deploy ── */}
-      <div className="glass-card p-6">
+      {/* ── Last Deploy (Infrastructure tab) ── */}
+      <div className={`glass-card p-6 ${overviewTab !== 'infra' ? 'hidden' : ''}`}>
         <div className="flex items-center gap-2 mb-4">
           <span className="text-xl" aria-hidden="true">🚀</span>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('lastDeploy')}</h2>
