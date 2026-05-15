@@ -96,7 +96,7 @@ export default function EndpointsPage() {
     try {
       await endpointsApi.update(token, ep.id, { is_active: !ep.is_active });
       setEndpoints((prev) => prev.map((e) => e.id === ep.id ? { ...e, is_active: !e.is_active } : e));
-      toast(ep.is_active ? t('endpointDisabled', { defaultValue: 'Endpoint disabled' }) : t('endpointEnabled', { defaultValue: 'Endpoint enabled' }), 'success');
+      toast(ep.is_active ? t('endpointDisabled') : t('endpointEnabled'), 'success');
     } catch (err) {
       toast(err instanceof Error ? err.message : tc('error'), 'error');
     } finally {
@@ -110,7 +110,7 @@ export default function EndpointsPage() {
     try {
       const data = await endpointsApi.rotateSecret(token, ep.id);
       setNewSecret(data.secret);
-      toast(t('secretRotated', { defaultValue: 'Secret rotated successfully' }), 'success');
+      toast(t('secretRotated'), 'success');
     } catch (err) {
       toast(err instanceof Error ? err.message : tc('error'), 'error');
     } finally {
@@ -283,7 +283,7 @@ export default function EndpointsPage() {
                       onClick={() => handleToggleActive(ep)}
                       disabled={togglingId === ep.id}
                       className={`relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${ep.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'} ${togglingId === ep.id ? 'opacity-60' : ''}`}
-                      title={ep.is_active ? t('disable', { defaultValue: 'Disable' }) : t('enable', { defaultValue: 'Enable' })}
+                      title={ep.is_active ? t('disable') : t('enable')}
                     >
                       <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${ep.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
                     </button>
@@ -298,8 +298,8 @@ export default function EndpointsPage() {
                     onClick={() => handleRotateSecret(ep)}
                     disabled={rotatingId === ep.id}
                     className="text-gray-500 dark:text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 transition p-2"
-                    aria-label={t('rotateSecret', { defaultValue: 'Rotate Secret' })}
-                    title={t('rotateSecret', { defaultValue: 'Rotate Secret' })}
+                    aria-label={t('rotateSecret')}
+                    title={t('rotateSecret')}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -348,9 +348,9 @@ export default function EndpointsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setNewSecret(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">🔑 {t('newSecret', { defaultValue: 'New Secret' })}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">🔑 {t('newSecret')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              {t('newSecretDesc', { defaultValue: 'Copy this secret now. It will not be shown again.' })}
+              {t('newSecretDesc')}
             </p>
             <div className="bg-gray-100 dark:bg-slate-700 rounded-lg p-4 mb-4">
               <code className="text-sm font-mono text-gray-900 dark:text-white break-all">{newSecret}</code>
@@ -360,18 +360,18 @@ export default function EndpointsPage() {
                 type="button"
                 onClick={() => {
                   navigator.clipboard.writeText(newSecret);
-                  toast(t('copied', { defaultValue: 'Copied!' }), 'success');
+                  toast(t('copied'), 'success');
                 }}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition"
               >
-                📋 {t('copy', { defaultValue: 'Copy' })}
+                📋 {t('copy')}
               </button>
               <button
                 type="button"
                 onClick={() => setNewSecret(null)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition"
               >
-                {tc('close', { defaultValue: 'Close' })}
+                {tc('close')}
               </button>
             </div>
           </div>

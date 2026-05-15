@@ -76,12 +76,12 @@ export default function SsoSettingsPage() {
       const { ssoApi } = await import('@/lib/api');
       const result = await ssoApi.testSso(token);
       if (result.success) {
-        toast(result.message || t('testSuccess', { defaultValue: 'SSO connection test passed!' }), 'success');
+        toast(result.message || t('testSuccess'), 'success');
       } else {
-        toast(result.message || t('testFailed', { defaultValue: 'SSO test failed' }), 'error');
+        toast(result.message || t('testFailed'), 'error');
       }
     } catch (err) {
-      toast(err instanceof Error ? err.message : t('testFailed', { defaultValue: 'SSO test failed' }), 'error');
+      toast(err instanceof Error ? err.message : t('testFailed'), 'error');
     } finally {
       setTesting(false);
     }
@@ -258,7 +258,7 @@ export default function SsoSettingsPage() {
               disabled={testing}
               className="px-6 py-3 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition disabled:opacity-50"
             >
-              {testing ? t('testing', { defaultValue: 'Testing...' }) : t('testConnection', { defaultValue: '🧪 Test Connection' })}
+              {testing ? t('testing') : t('testConnection')}
             </button>
           </div>
         </div>

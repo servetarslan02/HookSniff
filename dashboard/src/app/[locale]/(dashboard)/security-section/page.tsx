@@ -25,9 +25,9 @@ export default function SecuritySectionPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'rate-limiting', label: t('rateLimiting', { defaultValue: 'Rate Limiting' }), icon: '⏱️', content: <RateLimitingPage /> },
-        { key: 'audit-log', label: t('auditLog', { defaultValue: 'Audit Log' }), icon: '📜', content: <AuditLogPage /> },
-        { key: 'sso', label: t('sso', { defaultValue: 'SSO' }), icon: '🔒', content: <SsoPage /> },
+        { key: 'rate-limiting', label: t('rateLimiting'), icon: '⏱️', content: <RateLimitingPage /> },
+        { key: 'audit-log', label: t('auditLog'), icon: '📜', content: <AuditLogPage /> },
+        { key: 'sso', label: t('sso'), icon: '🔒', content: <SsoPage /> },
       ]}
     />
   );
