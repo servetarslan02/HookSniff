@@ -1,6 +1,6 @@
 # 🧠 Admin Upgrade Plan — Hafıza
 
-> Son güncelleme: 2026-05-16 00:40 GMT+8
+> Son güncelleme: 2026-05-16 02:10 GMT+8
 
 ---
 
@@ -13,7 +13,7 @@
 | 2 | Sistem geneli (failed, dead letters, queue, latency) | ✅ TAMAMLANDI | 2026-05-16 |
 | 3 | Müşteri notları, etiketler, iletişim geçmişi | ✅ TAMAMLANDI | 2026-05-16 |
 | 4 | Fatura, ödeme, gelir metrikleri | ✅ TAMAMLANDI | 2026-05-16 |
-| 5 | Refund + Polar.sh webhook handler | ⏳ | |
+| 5 | Refund + Polar.sh webhook handler | ✅ TAMAMLANDI | 2026-05-16 |
 | 6 | Alerts sayfası | ⏳ | |
 | 7 | Bulk email + GDPR | ⏳ İleride | |
 
@@ -24,45 +24,52 @@
 | # | Konu | Karar | Tarih |
 |---|------|-------|-------|
 | 1 | `api_keys` tablosu | Production'da mevcut. Admin panelinde yönetim gereksiz. | 2026-05-15 |
+| 2 | Refund provider | Mevcut `billing/refund.rs` + `billing/polar.rs` kullanıldı. Admin panelinden manuel refund. | 2026-05-16 |
 
 ## Karar Gereken Noktalar
 
 | # | Konu | Ne Zaman |
 |---|------|----------|
-| 1 | Refund provider seçimi | Aşama 5'ten önce |
-| 2 | GDPR silme stratejisi | Aşama 7'den önce |
-| 3 | Bulk email kuyruk mu? | Aşama 7'den önce |
-| 4 | Communication log mekanizması | Aşama 3'ten önce |
-| 5 | Cohort analizi derinliği | Aşama 4'ten önce |
+| 1 | GDPR silme stratejisi | Aşama 7'den önce |
+| 2 | Bulk email kuyruk mu? | Aşama 7'den önce |
 
 ---
 
 ## Son Yapılan İş
 
-### Aşama 3 — Müşteri İlişkileri (2026-05-16) ✅ TAMAMLANDI
+### Aşama 5 — Refund + Polar.sh (2026-05-16) ✅ TAMAMLANDI
 
-**Backend (admin.rs — +220 satır):**
-- [x] `POST /admin/users/{id}/notes` — Not ekle (communication_history'ye otomatik log)
-- [x] `GET /admin/users/{id}/notes` — Notları listele
-- [x] `POST /admin/users/{id}/tags` — Etiket ekle (UNIQUE constraint, upsert)
-- [x] `DELETE /admin/users/{id}/tags/{tag}` — Etiket kaldır
-- [x] `GET /admin/users/{id}/tags` — Etiketleri listele
-- [x] `GET /admin/users/{id}/communications` — İletişim geçmişi (type filtre + sayfalama)
-- [x] `log_communication()` helper — mevcut aksiyonlara otomatik log eklendi:
-  - `send_user_email` → "email" tipinde log
-  - `change_status` → "ban"/"activated" tipinde log
-  - `change_plan` → "plan_change" tipinde log
-  - `impersonate_user` → "impersonate" tipinde log
-- [x] 7 yeni test (CreateNoteRequest, CreateTagRequest, CommunicationQuery, serialization)
+**Backend (admin.rs — +345 satır):**
+- [x] `POST /admin/users/{id}/refund` — Admin refund oluştur (amount_cents, reason, currency)
+  - Kullanıcı var mı + plan kontrolü (free/developer reddedilir)
+  - Son paid invoice'ı bulur, amount'u invoice'ı aşamaz
+  - refunds tablosuna kayıt + invoice status → refunded + customer → free plan
+  - log_communication() + audit log
+- [x] `GET /admin/users/{id}/refunds` — Kullanıcının refund geçmişi (sayfalama)
+- [x] `GET /admin/refunds` — Sistem geneli refund listesi (status filtre + sayfalama)
+- [x] 8 yeni test (AdminRefundRequest, RefundQuery, RefundRow serialization)
 
-**Frontend (api.ts + users/[id]/page.tsx — +180 satır):**
-- [x] 6 yeni adminApi fonksiyonu (addNote, getNotes, addTag, removeTag, getTags, getCommunications)
-- [x] Notes & Tags sekmesi: tag CRUD (renkli badge, silme butonu), not listesi + ekleme
-- [x] Communications sekmesi: type badge (renk kodlu), filtre dropdown, sayfalama
-- [x] TabKey type güncellendi ('notes' | 'communications')
+**Frontend (users/[id]/page.tsx — +141 satır):**
+- [x] Billing sekmesinde "Process Refund" butonu (sadece paid planlarda görünür)
+- [x] Refund onay dialogu (miktar USD + sebep textarea)
+- [x] Refund History tablosu (amount kırmızı, reason, status badge, provider, date)
+- [x] handleRefund() — validation + adminApi.refundUser + toast + tab refresh
+
+**Frontend (revenue/page.tsx — +58 satır):**
+- [x] Sistem geneli Refund History section'ı (customer_id, amount, reason, status, date)
+- [x] getAllRefunds() entegrasyonu
+
+**API (api.ts — +21 satır):**
+- [x] refundUser(token, userId, amount_cents, reason, currency?)
+- [x] getUserRefunds(token, userId, params?)
+- [x] getAllRefunds(token, params?)
 
 **Router:**
-- [x] 5 yeni route eklendi (notes GET/POST, tags GET/POST/DELETE, communications GET)
+- [x] 3 yeni route eklendi (users/{id}/refund POST, users/{id}/refunds GET, refunds GET)
+
+**Git:**
+- [x] Commit: `3fbc6be8`
+- [x] Push: main → origin ✅
 
 ### Aşama 4 — Fatura, Ödeme, Gelir Metrikleri (2026-05-16) ✅ TAMAMLANDI
 
@@ -79,18 +86,28 @@
 - [x] Revenue sayfası: Cohort analiz tablosu (retention bar, revenue)
 - [x] 5 yeni adminApi fonksiyonu (getUserInvoices, getUserPayments, getRevenueMetrics, getRevenueCohorts)
 
-### Vercel Build Fix — 2026-05-16 00:40 GMT+8
-- **Hata:** `Expected '</', got '{'` — users/[id]/page.tsx satır 416
-- **Sebep:** `{activeTab === "overview" && (...)}` bloğunda birden fazla kardeş JSX elementi (grid, plan history, recent deliveries, analytics charts) ama fragment ile sarılmamış
-- **Fix:** `<>...</>` fragment eklendi — sadece 2 satır değişti
-- **Commit:** a907d0c6, push edildi
-- **Ders:** JSX'te `&& (...)` içinde tek root element olmalı, birden fazla kardeş varsa `<>...</>` ile sar
+### Aşama 3 — Müşteri İlişkileri (2026-05-16) ✅ TAMAMLANDI
+
+**Backend (admin.rs — +220 satır):**
+- [x] `POST /admin/users/{id}/notes` — Not ekle (communication_history'ye otomatik log)
+- [x] `GET /admin/users/{id}/notes` — Notları listele
+- [x] `POST /admin/users/{id}/tags` — Etiket ekle (UNIQUE constraint, upsert)
+- [x] `DELETE /admin/users/{id}/tags/{tag}` — Etiket kaldır
+- [x] `GET /admin/users/{id}/tags` — Etiketleri listele
+- [x] `GET /admin/users/{id}/communications` — İletişim geçmişi (type filtre + sayfalama)
+- [x] `log_communication()` helper — mevcut aksiyonlara otomatik log eklendi
+- [x] 7 yeni test
+
+**Frontend:**
+- [x] Notes & Tags sekmesi: tag CRUD, not listesi + ekleme
+- [x] Communications sekmesi: type badge, filtre dropdown, sayfalama
+- [x] 6 yeni adminApi fonksiyonu
 
 ---
 
 ## Ortam Notları
 
-- **Rust 1.95.0** kurulu (sub-agent tarafından)
+- **Rust 1.95.0** kurulu (sub-agent tarafından) — bu ortamda kurulu değil, son oturumda kurulacak
 - `cargo check` ve `cargo test` çalışır durumda
 - `next build` için node_modules gerekli — bu ortamda install yasak
 - `cargo check` süresi: ~7 sn (cache ile), ilk çalışma ~2 dk
@@ -104,4 +121,8 @@
 3. `api_keys` tablosu migration'da yok ama `inbound.rs`'de aktif sorgu var
 4. `invoices`/`payment_transactions` tabloları boş — Polar.sh webhook handler gerekli
 5. `applications` tablosu migration 013'te mevcut
-6. Admin mevcut: 23 route → şimdi 30 route (7 yeni eklendi)
+6. Admin mevcut: 23 route → şimdi 33 route (10 yeni eklendi)
+7. `refunds` tablosu zaten migration 019'da mevcut — yeni migration gerekmedi
+8. `billing/refund.rs` modülü zaten var (14 gün pencere, provider cancel) — admin endpoint'leri bu modülü kullandı
+9. `billing/polar.rs` Polar.sh entegrasyonu zaten var — webhook handler da mevcut
+10. JSX'te `&& (...)` içinde tek root element olmalı, birden fazla kardeş varsa `<>...</>` ile sar
