@@ -69,7 +69,7 @@ export default function PublicPlaygroundPage() {
         setState('error');
       }
     } catch {
-      setError('Network error — please try again');
+      setError(tc('networkError'));
       setState('error');
     }
   }, []);
