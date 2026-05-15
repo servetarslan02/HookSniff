@@ -153,7 +153,7 @@ impl EventPublisher {
                 .arg("seq")
                 .arg(envelope.seq.to_string());
 
-            match cmd.execute_async(conn).await {
+            match cmd.exec_async(conn).await {
                 Ok(()) => {
                     debug!("Event published to Redis Streams: {}", envelope.event.event_type());
                 }
