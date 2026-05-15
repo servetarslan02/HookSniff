@@ -7,8 +7,16 @@ use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
-use crate::models::endpoint::Endpoint;
 use crate::transform::{self, CreateTransformRuleRequest, TransformRule, TransformRuleConfig};
+
+/// Lightweight struct for endpoint ownership verification.
+/// Avoids SELECT * — only fetches the columns needed for the check.
+#[derive(Debug, sqlx::FromRow)]
+struct EndpointOwnerCheck {
+    id: uuid::Uuid,
+    customer_id: uuid::Uuid,
+    is_active: bool,
+}
 
 pub fn router() -> Router {
     Router::new()
@@ -24,7 +32,7 @@ async fn list_rules(
 ) -> Result<Json<Vec<TransformRule>>, AppError> {
     // Verify endpoint ownership
     let _ =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, EndpointOwnerCheck>("SELECT id, customer_id, is_active FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(endpoint_id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -43,7 +51,7 @@ async fn create_rule(
 ) -> Result<Json<TransformRule>, AppError> {
     // Verify endpoint ownership
     let _ =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, EndpointOwnerCheck>("SELECT id, customer_id, is_active FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(endpoint_id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -62,7 +70,7 @@ async fn update_rule(
 ) -> Result<Json<TransformRule>, AppError> {
     // Verify endpoint ownership
     let _ =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, EndpointOwnerCheck>("SELECT id, customer_id, is_active FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(endpoint_id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -80,7 +88,7 @@ async fn delete_rule(
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Verify endpoint ownership
     let _ =
-        sqlx::query_as::<_, Endpoint>("SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as::<_, EndpointOwnerCheck>("SELECT id, customer_id, is_active FROM endpoints WHERE id = $1 AND customer_id = $2")
             .bind(endpoint_id)
             .bind(customer.id)
             .fetch_optional(&pool)
