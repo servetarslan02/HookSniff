@@ -1003,3 +1003,17 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Grafana Cloud metric isimleri** — API /metrics (Prometheus) ≠ Grafana Cloud (OTLP). Dashboard hooksniff_* prefixli metriclerle eşleşmeli
 - **monitor.sh** — Grafana Clouda metric push mekanizması, API /metrics endpointinden ek metricleri çekip OTLP ile push ediyor
 
+
+## Oturum 167 (2026-05-15 19:21 - 19:30 GMT+8) ✅
+- **OpenClaw** — Servet ile Grafana no data düzeltmesi
+- **Sorun:** Grafana dashboard'da tüm paneller "no data" gösteriyordu
+- **Root cause:** `monitor.sh` script'i hiçbir yerde çalışmıyordu (crontab yok, systemd timer yok)
+- **Çözüm:** API'ye dahili metric push job eklendi
+  - `api/src/jobs/metrics_push.rs` — her 60 saniyede bir Grafana Cloud'a OTLP ile metric push
+  - DB stats (deliveries, customers, endpoints, plan dağılımı) + cache metrics + health stats
+  - External cron'a gerek kalmadı, API process içinde çalışır
+  - `api/src/jobs/mod.rs`: metrics_push modülü eklendi
+  - `api/src/main.rs`: metrics_push job spawn edildi
+- **Deploy bekleniyor:** Cloud Build tetiklenmeli
+- **Commit:** `d10b81de` — main branch, push ✅
+- **3 dosya değişti, 440 satır eklendi**
