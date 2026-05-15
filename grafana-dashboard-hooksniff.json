@@ -1,117 +1,174 @@
 {
   "dashboard": {
     "title": "HookSniff Performance",
-    "tags": ["hooksniff", "webhooks"],
+    "tags": ["hooksniff", "webhooks", "performance"],
     "timezone": "browser",
     "refresh": "30s",
+    "time": { "from": "now-1h", "to": "now" },
     "panels": [
       {
-        "title": "API Response Time",
+        "title": "API Response Time (p50 / p95 / p99)",
         "type": "timeseries",
         "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
         "targets": [
-          {
-            "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))",
-            "legendFormat": "p50"
-          },
-          {
-            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
-            "legendFormat": "p95"
-          },
-          {
-            "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))",
-            "legendFormat": "p99"
-          }
+          { "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))", "legendFormat": "p50" },
+          { "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))", "legendFormat": "p95" },
+          { "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))", "legendFormat": "p99" }
         ],
-        "fieldConfig": {
-          "defaults": { "unit": "s" }
-        }
+        "fieldConfig": { "defaults": { "unit": "s", "custom": { "fillOpacity": 10 } } }
       },
       {
-        "title": "Request Rate",
+        "title": "Request Rate by Status",
         "type": "timeseries",
         "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
         "targets": [
-          {
-            "expr": "sum(rate(http_requests_total[5m])) by (status)",
-            "legendFormat": "{{status}}"
-          }
+          { "expr": "sum(rate(http_requests_total[5m])) by (status)", "legendFormat": "{{status}}" }
         ],
-        "fieldConfig": {
-          "defaults": { "unit": "reqps" }
-        }
+        "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } } }
       },
       {
-        "title": "Webhook Delivery Latency",
+        "title": "Webhook Delivery Latency (p50 / p95)",
         "type": "timeseries",
         "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
         "targets": [
-          {
-            "expr": "histogram_quantile(0.50, rate(webhook_delivery_duration_seconds_bucket[5m]))",
-            "legendFormat": "p50"
-          },
-          {
-            "expr": "histogram_quantile(0.95, rate(webhook_delivery_duration_seconds_bucket[5m]))",
-            "legendFormat": "p95"
-          }
+          { "expr": "histogram_quantile(0.50, rate(webhook_delivery_duration_seconds_bucket[5m]))", "legendFormat": "p50" },
+          { "expr": "histogram_quantile(0.95, rate(webhook_delivery_duration_seconds_bucket[5m]))", "legendFormat": "p95" }
         ],
-        "fieldConfig": {
-          "defaults": { "unit": "s" }
-        }
+        "fieldConfig": { "defaults": { "unit": "s", "custom": { "fillOpacity": 10 } } }
       },
       {
         "title": "Webhook Success Rate",
         "type": "gauge",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
         "targets": [
-          {
-            "expr": "sum(rate(webhook_deliveries_total{status=\"delivered\"}[1h])) / sum(rate(webhook_deliveries_total[1h])) * 100",
-            "legendFormat": "Success Rate"
-          }
+          { "expr": "sum(rate(webhook_deliveries_total{status=\"delivered\"}[1h])) / sum(rate(webhook_deliveries_total[1h])) * 100", "legendFormat": "Success %" }
         ],
         "fieldConfig": {
           "defaults": {
-            "unit": "percent",
-            "min": 0,
-            "max": 100,
-            "thresholds": {
-              "steps": [
-                { "value": 0, "color": "red" },
-                { "value": 90, "color": "yellow" },
-                { "value": 99, "color": "green" }
-              ]
-            }
+            "unit": "percent", "min": 0, "max": 100,
+            "thresholds": { "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "yellow", "value": 90 },
+              { "color": "green", "value": 99 }
+            ] }
           }
         }
       },
       {
-        "title": "Database Connection Pool",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+        "title": "Redis Cache Hit Rate",
+        "type": "gauge",
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 },
         "targets": [
-          {
-            "expr": "db_connections_active",
-            "legendFormat": "Active"
-          },
-          {
-            "expr": "db_connections_idle",
-            "legendFormat": "Idle"
+          { "expr": "cache_hit_rate_percent", "legendFormat": "Hit Rate %" }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent", "min": 0, "max": 100,
+            "thresholds": { "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 80 }
+            ] }
           }
+        }
+      },
+      {
+        "title": "Active Connections",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 12 },
+        "targets": [
+          { "expr": "active_connections", "legendFormat": "Connections" }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": { "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 100 }
+            ] }
+          }
+        }
+      },
+      {
+        "title": "Active Endpoints",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 12 },
+        "targets": [
+          { "expr": "active_endpoints", "legendFormat": "Endpoints" }
         ]
       },
       {
-        "title": "Error Rate by Endpoint",
+        "title": "DB Query Latency (p50 / p95)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+        "targets": [
+          { "expr": "histogram_quantile(0.50, rate(db_query_duration_seconds_bucket[5m]))", "legendFormat": "p50" },
+          { "expr": "histogram_quantile(0.95, rate(db_query_duration_seconds_bucket[5m]))", "legendFormat": "p95" }
+        ],
+        "fieldConfig": { "defaults": { "unit": "s", "custom": { "fillOpacity": 10 } } }
+      },
+      {
+        "title": "Queue Publish Latency (p95)",
         "type": "timeseries",
         "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
         "targets": [
-          {
-            "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (path)",
-            "legendFormat": "{{path}}"
-          }
+          { "expr": "histogram_quantile(0.95, rate(queue_publish_latency_seconds_bucket[5m]))", "legendFormat": "p95" }
+        ],
+        "fieldConfig": { "defaults": { "unit": "s", "custom": { "fillOpacity": 10 } } }
+      },
+      {
+        "title": "Cache Hits vs Misses",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+        "targets": [
+          { "expr": "rate(cache_hits_total[5m])", "legendFormat": "Hits/s" },
+          { "expr": "rate(cache_misses_total[5m])", "legendFormat": "Misses/s" }
+        ],
+        "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20 } } }
+      },
+      {
+        "title": "Error Rate by Type",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+        "targets": [
+          { "expr": "sum(rate(error_count[5m])) by (error_type)", "legendFormat": "{{error_type}}" }
+        ],
+        "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20 } } }
+      },
+      {
+        "title": "Request Rate by Method",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+        "targets": [
+          { "expr": "sum(rate(http_requests_total[5m])) by (method)", "legendFormat": "{{method}}" }
+        ],
+        "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } } }
+      },
+      {
+        "title": "5xx Error Rate",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+        "targets": [
+          { "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m])) * 100", "legendFormat": "5xx %" }
         ],
         "fieldConfig": {
-          "defaults": { "unit": "reqps" }
+          "defaults": {
+            "unit": "percent", "custom": { "fillOpacity": 10 },
+            "thresholds": { "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ] }
+          }
         }
+      },
+      {
+        "title": "Delivery Count by Status",
+        "type": "piechart",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
+        "targets": [
+          { "expr": "sum(webhook_deliveries_total) by (status)", "legendFormat": "{{status}}" }
+        ]
       }
     ]
   }
