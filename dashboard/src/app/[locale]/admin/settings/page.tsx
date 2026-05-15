@@ -72,6 +72,14 @@ export default function AdminSettingsPage() {
   });
   const [alertSaving, setAlertSaving] = useState(false);
 
+  // Bulk email state
+  const [bulkSubject, setBulkSubject] = useState('');
+  const [bulkBody, setBulkBody] = useState('');
+  const [bulkPlanFilter, setBulkPlanFilter] = useState('');
+  const [bulkStatusFilter, setBulkStatusFilter] = useState('');
+  const [bulkSending, setBulkSending] = useState(false);
+  const [bulkResult, setBulkResult] = useState<{ total_sent: number; total_failed: number; skipped_free: number; message: string } | null>(null);
+
   // Fetch platform settings
   const fetchSettings = useCallback(async () => {
     if (!token) return;
@@ -176,6 +184,27 @@ export default function AdminSettingsPage() {
       toast(t('alertSettingsFailed') || 'Failed to save alert settings', 'error');
     } finally {
       setAlertSaving(false);
+    }
+  };
+
+  // Send bulk email
+  const handleBulkEmail = async () => {
+    if (!token || !bulkSubject.trim() || !bulkBody.trim()) return;
+    setBulkSending(true);
+    setBulkResult(null);
+    try {
+      const result = await adminApi.sendBulkEmail(token, {
+        subject: bulkSubject.trim(),
+        body: bulkBody.trim(),
+        ...(bulkPlanFilter ? { plan_filter: bulkPlanFilter } : {}),
+        ...(bulkStatusFilter ? { status_filter: bulkStatusFilter } : {}),
+      });
+      setBulkResult(result);
+      toast(result.message, 'success');
+    } catch {
+      toast(t('bulkEmailFailed') || 'Bulk email failed', 'error');
+    } finally {
+      setBulkSending(false);
     }
   };
 
@@ -651,6 +680,80 @@ export default function AdminSettingsPage() {
             className="px-6 py-3 bg-orange-600 dark:bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 dark:hover:bg-orange-700 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition disabled:opacity-60"
           >
             {alertSaving ? tc('saving') : (t('saveAlertSettings') || '🚨 Save Alert Settings')}
+          </button>
+        </div>
+      </div>
+
+      {/* Bulk Email */}
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">📧 {t('bulkEmail') || 'Bulk Email'}</h2>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('bulkEmailDesc') || 'Send email to multiple users at once. Free/developer users are skipped unless explicitly filtered.'}</p>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('planFilter') || 'Plan Filter'}</label>
+              <select
+                value={bulkPlanFilter}
+                onChange={(e) => setBulkPlanFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
+              >
+                <option value="">{t('allPaidPlans') || 'All Paid Plans'}</option>
+                <option value="startup">Startup</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+                <option value="free">Free (include free)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('statusFilter') || 'Email Status Filter'}</label>
+              <select
+                value={bulkStatusFilter}
+                onChange={(e) => setBulkStatusFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
+              >
+                <option value="">{t('allUsers') || 'All Users'}</option>
+                <option value="verified">Verified Only</option>
+                <option value="unverified">Unverified Only</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('subject') || 'Subject'} *</label>
+            <input
+              type="text"
+              value={bulkSubject}
+              onChange={(e) => setBulkSubject(e.target.value)}
+              placeholder={t('bulkSubjectPlaceholder') || 'e.g. New feature announcement'}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('body') || 'Body'} * <span className="text-xs text-gray-400">{'{name}'} {'{email}'} {t('supported') || 'supported'}</span></label>
+            <textarea
+              value={bulkBody}
+              onChange={(e) => setBulkBody(e.target.value)}
+              placeholder={t('bulkBodyPlaceholder') || 'Hello {name},\n\nWe wanted to share some exciting news...'}
+              rows={6}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+            />
+          </div>
+          {bulkResult && (
+            <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-xl p-4">
+              <p className="text-sm text-green-700 dark:text-green-400 font-medium">✅ {bulkResult.message}</p>
+              <div className="flex gap-4 mt-2 text-xs text-green-600 dark:text-green-400">
+                <span>📤 {t('sent') || 'Sent'}: {bulkResult.total_sent}</span>
+                <span>❌ {t('failed') || 'Failed'}: {bulkResult.total_failed}</span>
+                <span>⏭️ {t('skipped') || 'Skipped'}: {bulkResult.skipped_free}</span>
+              </div>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={handleBulkEmail}
+            disabled={bulkSending || !bulkSubject.trim() || !bulkBody.trim()}
+            className="px-6 py-3 bg-blue-600 dark:bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 dark:hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition disabled:opacity-60"
+          >
+            {bulkSending ? (t('sending') || 'Sending...') : `📧 ${t('sendBulkEmail') || 'Send Bulk Email'}`}
           </button>
         </div>
       </div>

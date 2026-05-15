@@ -67,6 +67,11 @@ export default function AdminUserDetailPage() {
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
   const [refundProcessing, setRefundProcessing] = useState(false);
+  // Aşama 7 — GDPR
+  const [gdprExporting, setGdprExporting] = useState(false);
+  const [showGdprDeleteModal, setShowGdprDeleteModal] = useState(false);
+  const [gdprDeleteReason, setGdprDeleteReason] = useState('');
+  const [gdprDeleting, setGdprDeleting] = useState(false);
 
 
   // Tab değiştiğinde veri çek
@@ -258,6 +263,42 @@ export default function AdminUserDetailPage() {
       toast(t('refundFailed') || 'Refund failed', 'error');
     } finally {
       setRefundProcessing(false);
+    }
+  };
+
+  const handleGdprExport = async () => {
+    if (!token || !id) return;
+    setGdprExporting(true);
+    try {
+      const data = await adminApi.exportUserData(token, id);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `gdpr-export-${id.slice(0, 8)}-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast(t('gdprExportSuccess') || 'Data exported successfully', 'success');
+    } catch {
+      toast(t('gdprExportFailed') || 'Export failed', 'error');
+    } finally {
+      setGdprExporting(false);
+    }
+  };
+
+  const handleGdprDelete = async () => {
+    if (!token || !id || !gdprDeleteReason.trim()) return;
+    setGdprDeleting(true);
+    try {
+      await adminApi.deleteUserData(token, id, gdprDeleteReason.trim());
+      toast(t('gdprDeleteSuccess') || 'All user data deleted. Account downgraded to Free.', 'success');
+      setShowGdprDeleteModal(false);
+      setGdprDeleteReason('');
+      fetchTabData('billing');
+    } catch {
+      toast(t('gdprDeleteFailed') || 'Data deletion failed', 'error');
+    } finally {
+      setGdprDeleting(false);
     }
   };
 
@@ -1153,6 +1194,76 @@ export default function AdminUserDetailPage() {
             ) : (
               <p className="text-sm text-gray-400 dark:text-slate-500">{t("noRefunds") || "No refunds yet"}</p>
             )}
+          </div>
+
+          {/* GDPR Data Management */}
+          <div className="glass-card p-6 border-2 border-amber-200 dark:border-amber-500/30">
+            <h3 className="text-sm font-medium text-amber-700 dark:text-amber-400 mb-2">🔐 {t("gdprDataManagement") || "GDPR Data Management"}</h3>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">
+              {t("gdprDesc") || "Export or permanently delete all user data per GDPR requirements."}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleGdprExport}
+                disabled={gdprExporting}
+                className="px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {gdprExporting ? (t('exporting') || 'Exporting...') : `📦 ${t('exportData') || 'Export All Data'}`}
+              </button>
+              <button
+                onClick={() => setShowGdprDeleteModal(true)}
+                className="px-4 py-2 text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition-colors"
+              >
+                🗑️ {t('deleteAllData') || 'Delete All Data'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* GDPR Delete Modal */}
+      {showGdprDeleteModal && detail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowGdprDeleteModal(false)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">
+              🗑️ {t('deleteAllData') || 'Delete All User Data'}
+            </h3>
+            <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg p-3 mb-4">
+              <p className="text-sm text-red-700 dark:text-red-400 font-medium">⚠️ {t('gdprDeleteWarning') || 'This action is permanent and cannot be undone.'}</p>
+              <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                {t('gdprDeleteDesc') || 'All endpoints, deliveries, invoices, notes, tags, and communication history will be deleted. The account will be downgraded to Free.'}
+              </p>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+              {t('deletingDataFor', { email: detail.user.email }) || `Deleting data for: ${detail.user.email}`}
+            </p>
+            <div>
+              <label htmlFor="gdpr-reason" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('reason') || 'Reason'} *</label>
+              <textarea
+                id="gdpr-reason"
+                value={gdprDeleteReason}
+                onChange={(e) => setGdprDeleteReason(e.target.value)}
+                placeholder={t('gdprReasonPlaceholder') || 'e.g. User requested via support ticket #1234'}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => { setShowGdprDeleteModal(false); setGdprDeleteReason(''); }}
+                className="px-4 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                {t('cancel') || 'Cancel'}
+              </button>
+              <button
+                onClick={handleGdprDelete}
+                disabled={gdprDeleting || !gdprDeleteReason.trim()}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+              >
+                {gdprDeleting ? (t('deleting') || 'Deleting...') : (t('confirmDelete') || 'Permanently Delete All Data')}
+              </button>
+            </div>
           </div>
         </div>
       )}

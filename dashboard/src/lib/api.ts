@@ -756,6 +756,16 @@ export const adminApi = {
     const qs = searchParams.toString();
     return apiFetch<{ refunds: Array<{ id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; admin_user_id: string | null; provider: string; provider_refund_id: string | null; status: string; created_at: string }>; total: number; page: number; per_page: number }>(`/admin/refunds${qs ? `?${qs}` : ''}`, { token });
   },
+
+  // Aşama 7 — GDPR + Bulk Email
+  exportUserData: (token: string, userId: string) =>
+    apiFetch<{ export_date: string; account: { id: string; email: string; name: string | null; plan: string; is_active: boolean; email_verified: boolean; created_at: string }; endpoints: unknown[]; deliveries: unknown[]; invoices: unknown[]; notes: unknown[]; tags: unknown[]; communications: unknown[]; audit_logs: unknown[] }>(`/admin/users/${userId}/export`, { token }),
+
+  deleteUserData: (token: string, userId: string, reason: string) =>
+    apiFetch<{ message: string; deleted_at: string }>(`/admin/users/${userId}/data`, { method: 'DELETE', body: { confirm: true, reason }, token }),
+
+  sendBulkEmail: (token: string, data: { subject: string; body: string; plan_filter?: string; status_filter?: string }) =>
+    apiFetch<{ total_sent: number; total_failed: number; skipped_free: number; message: string }>(`/admin/bulk-email`, { method: 'POST', body: data, token }),
 };
 
 export interface FeatureFlag {
