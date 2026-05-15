@@ -53,6 +53,7 @@ const samplePayloads = [
 
 export function PlaygroundPageContent() {
   const t = useTranslations('playgroundPublic');
+  const tc = useTranslations('common');
   // State
   const [state, setState] = useState<PlaygroundState>('idle');
   const [token, setToken] = useState('');
@@ -88,11 +89,11 @@ export function PlaygroundPageContent() {
         localStorage.setItem('hooksniff_playground_token', data.token);
         localStorage.setItem('hooksniff_playground_url', data.url);
       } else {
-        setError(data.error || 'Failed to generate token');
+        setError(data.error || tc('tokenGenFailed'));
         setState('error');
       }
     } catch {
-      setError('Network error — check your connection');
+      setError(tc('networkErrorCheck'));
       setState('error');
     }
   }, []);
