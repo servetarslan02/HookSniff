@@ -46,7 +46,7 @@ export default function FeatureFlagsPage() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, t, toast]);
 
   useEffect(() => { fetchFlags(); }, [fetchFlags]);
 
