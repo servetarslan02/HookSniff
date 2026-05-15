@@ -411,6 +411,27 @@
 - [ ] Compute usage kontrol et
 - [ ] Gerekirse Pro plan'a geç ($19/ay) veya usage-based billing aç
 
+### Güvenlik Açıkları (cargo audit)
+- [ ] `.cargo/audit.toml` — 8 ignore edilmiş RUSTSEC var
+- [ ] `cargo audit` çalıştır — mevcut durumu kontrol et
+- [ ] sqlx güncelleme sonrası ignore'ları tekrar kontrol et
+- [ ] Hala gerekli olmayan ignore'ları kaldır
+- [ ] `git commit -m "security: review and clean cargo audit ignores"`
+
+### Landing Page
+- [ ] `landing/index.html` — statik HTML, bağımlılık yok
+- [ ] Google Fonts kullanıyor (Inter, JetBrains Mono) — CDN'den geliyor
+- [ ] Versiyon güncellemesi gerekmiyor ✅
+
+### Portal Widget
+- [ ] `portal/embed.js` — vanilla JS, bağımlılık yok
+- [ ] Versiyon güncellemesi gerekmiyor ✅
+
+### Load Test Scriptleri
+- [ ] `tests/load/` — 8 k6 script var
+- [ ] k6 kurulu değil — `brew install k6` veya `docker pull grafana/k6`
+- [ ] Load testleri çalıştır (opsiyonel, deploy sonrası)
+
 ---
 
 ## Faz 23: Servet'in Yapması Gereken
