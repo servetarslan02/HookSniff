@@ -56,7 +56,7 @@ export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // NEVER process API routes through i18n middleware
-  if (pathname.startsWith('/api/')) {
+  if (pathname.startsWith('/api/') || pathname.startsWith('/playground-api/')) {
     return NextResponse.next();
   }
 
