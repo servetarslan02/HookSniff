@@ -307,6 +307,7 @@ impl PaymentProviderImpl for IyzicoProvider {
         customer_email: &str,
         plan: &Plan,
         app_url: &str,
+        _yearly: bool,
     ) -> Result<CheckoutResult, AppError> {
         let price_kurus = self
             .config
