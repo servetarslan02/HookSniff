@@ -32,13 +32,13 @@ pub async fn run(pool: PgPool) {
             std::env::var("GRAFANA_OTLP_TOKEN"),
         ) {
             use base64::Engine;
-            let encoded =
-                base64::engine::general_purpose::STANDARD.encode(format!("{}:{}", inst_id, token));
+            let encoded = base64::engine::general_purpose::STANDARD
+                .encode(format!("{}:{}", inst_id, token));
             auth_header = format!("Basic {}", encoded);
         }
     }
 
-    let otlp_url = format!("{}/v1/metrics", otlp_endpoint.trim_end_matches("/otlp").trim_end_matches('/'));
+    let otlp_url = format!("{}/v1/metrics", otlp_endpoint.trim_end_matches('/'));
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(15))
         .build()
