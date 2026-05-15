@@ -15,6 +15,7 @@ const adminNavigation = [
   { nameKey: 'system', href: '/admin/system', icon: '🖥️' },
   { nameKey: 'settingsNav', href: '/admin/settings', icon: '⚙️' },
   { nameKey: 'activityLog', href: '/admin/activity', icon: '📋' },
+  { nameKey: 'alerts', href: '/admin/alerts', icon: '🔔' },
 ];
 
 function AdminShell({ children }: { children: React.ReactNode }) {
