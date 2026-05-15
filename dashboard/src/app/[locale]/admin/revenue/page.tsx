@@ -25,6 +25,8 @@ export default function AdminRevenuePage() {
   const [planPrices, setPlanPrices] = useState<{ pro: number; business: number }>({ pro: 29, business: 99 });
   const [revenueMetrics, setRevenueMetrics] = useState<{ mrr: number; arr: number; arpu: number; ltv: number; nrr: number; expansion_revenue: number; total_customers: number; paying_customers: number; churn_rate: number; avg_months_retained: number } | null>(null);
   const [cohorts, setCohorts] = useState<Array<{ cohort_month: string; customers_signed_up: number; customers_active: number; total_revenue_cents: number; retention_rate: number }>>([]);
+  const [allRefunds, setAllRefunds] = useState<Array<{ id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; status: string; created_at: string }>>([]);
+  const [refundsTotal, setRefundsTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,12 +41,13 @@ export default function AdminRevenuePage() {
     else setLoading(true);
     setError(null);
     try {
-      const [revenueData, churnData, settings, metricsData, cohortsData] = await Promise.all([
+      const [revenueData, churnData, settings, metricsData, cohortsData, refundsData] = await Promise.all([
         adminApi.getRevenue(token),
         adminApi.getChurn(token).catch(() => ({ users: [] })),
         adminApi.getSettings(token).catch(() => null),
         adminApi.getRevenueMetrics(token).catch(() => null),
         adminApi.getRevenueCohorts(token, 12).catch(() => null),
+        adminApi.getAllRefunds(token, { per_page: 50 }).catch(() => ({ refunds: [], total: 0 })),
       ]);
       setRevenue(revenueData);
       setChurnUsers(churnData.users || []);
@@ -53,6 +56,8 @@ export default function AdminRevenuePage() {
       }
       if (metricsData) setRevenueMetrics(metricsData);
       if (cohortsData) setCohorts(cohortsData.cohorts || []);
+      setAllRefunds(refundsData.refunds || []);
+      setRefundsTotal(refundsData.total || 0);
     } catch {
       setError(t("failedToLoadRevenue"));
     } finally {
@@ -440,6 +445,57 @@ export default function AdminRevenuePage() {
           </div>
         </div>
       )}
+
+      {/* Refund History */}
+      <div className="glass-card overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('refundHistory') || 'Refund History'}</h2>
+            {refundsTotal > 0 && (
+              <span className="text-sm text-gray-500 dark:text-slate-400">{refundsTotal} {t('total') || 'total'}</span>
+            )}
+          </div>
+        </div>
+        {allRefunds.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50/50 dark:bg-slate-800/50">
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{tc('email')}</th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('amount')}</th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('reason') || 'Reason'}</th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('status')}</th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('date')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
+                {allRefunds.map((ref, index) => (
+                  <tr key={ref.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-gray-100 dark:hover:bg-gray-700 transition`}>
+                    <td className="px-4 sm:px-6 py-4 text-sm text-gray-900 dark:text-white font-mono text-xs">{ref.customer_id.slice(0, 8)}...</td>
+                    <td className="px-4 sm:px-6 py-4 text-sm font-medium text-red-600 dark:text-red-400">-{(ref.amount_cents / 100).toFixed(2)} {ref.currency.toUpperCase()}</td>
+                    <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 dark:text-slate-400 max-w-xs truncate">{ref.reason || '—'}</td>
+                    <td className="px-4 sm:px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        ref.status === 'completed' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' :
+                        ref.status === 'pending' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
+                        'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                      }`}>{ref.status}</span>
+                    </td>
+                    <td className="px-4 sm:px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
+                      {new Date(ref.created_at).toLocaleDateString('tr-TR')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="px-6 py-8 text-center">
+            <div className="text-3xl mb-2" aria-hidden="true">💸</div>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noRefunds') || 'No refunds yet'}</p>
+          </div>
+        )}
+      </div>
 
       {/* Churn Analysis */}
       <div className="glass-card overflow-hidden">
