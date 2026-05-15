@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-15 21:18 GMT+8
+> Son güncelleme: 2026-05-15 21:26 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -117,6 +117,31 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 171 — 2026-05-15 21:26 GMT+8
+1. **R2 Storage Entegrasyonu** — `api/src/r2.rs` modülü eklendi
+   - Cloudflare R2 API ile dead letter arşivleme
+   - `CF_ACCOUNT_ID`, `CF_R2_TOKEN`, `CF_R2_BUCKET` config'e eklendi
+   - R2 bucket "hooksniff-storage" mevcut, test upload başarılı
+   - main.rs'de R2 client init + Extension layer
+2. **Cloud Run Env Var'ları** — R2 token'ları eklendi (3 env var)
+3. **Deploy** — hooksniff-api, tüm servisler operational
+4. **Toplam oturum** — 6 deploy, 8 commit, 23 env var
+
+### ⚠️ Servet'in Yapması Gereken
+- **Polar.sh ürün** — Pro/Business planları Polar.sh'da ürün olarak tanımlanmalı
+- **Dashboard i18n** — 920+ string Türkçe'ye çevrilecek
+
+### 📂 Aktif Servisler (2026-05-15)
+| Servis | Durum | Env Var |
+|--------|-------|---------|
+| Upstash Redis | ✅ Aktif | UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN |
+| Upstash QStash | ✅ Aktif | QSTASH_URL, QSTASH_TOKEN, QSTASH_CURRENT_SIGNING_KEY, QSTASH_NEXT_SIGNING_KEY |
+| Cloudflare R2 | ✅ Aktif | CF_ACCOUNT_ID, CF_R2_TOKEN, CF_R2_BUCKET |
+| Neon PostgreSQL | ✅ Aktif | DATABASE_URL (secret) |
+| Grafana OTEL | ✅ Aktif | OTEL_ENABLED, OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_HEADERS |
+| Resend Email | ✅ Aktif | RESEND_API_KEY (secret) |
+| Polar.sh Billing | ✅ Aktif | POLAR_ACCESS_TOKEN, POLAR_WEBHOOK_SECRET |
 
 ### Oturum 170 — 2026-05-15 21:18 GMT+8
 1. **QStash Entegrasyonu** — `api/src/qstash.rs` modülü eklendi
