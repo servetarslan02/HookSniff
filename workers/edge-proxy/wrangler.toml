@@ -1,0 +1,33 @@
+name = "hooksniff-edge-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+# ── Environment ──
+[vars]
+API_BASE = "https://hooksniff-api-1046140057667.europe-west1.run.app"
+ENVIRONMENT = "production"
+
+# ── KV Namespaces (for rate limiting & edge caching) ──
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "placeholder-create-via-wrangler"
+
+[[kv_namespaces]]
+binding = "EDGE_CACHE_KV"
+id = "placeholder-create-via-wrangler"
+
+# ── Durable Objects (for distributed rate limiting) ──
+# [durable_objects]
+# bindings = [{name = "RATE_LIMITER", class_name = "RateLimiter"}]
+
+# ── Routes (all API traffic through edge) ──
+# Uncomment after DNS setup:
+# routes = [
+#   { pattern = "api.hooksniff.com/*", zone_name = "hooksniff.com" }
+# ]
+
+# ── Custom domains ──
+# [env.production]
+# routes = [
+#   { pattern = "api.hooksniff.com/*", zone_name = "hooksniff.com" }
+# ]
