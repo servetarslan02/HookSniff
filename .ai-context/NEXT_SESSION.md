@@ -1,69 +1,80 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-15 18:48 GMT+8 (Oturum 166)
+> Son güncelleme: 2026-05-15 19:10 GMT+8 (Oturum 166)
 
 ## ✅ Tamamlanan (Bu Oturum)
 
 ### Performance Optimizations (Oturum 166) ✅
 1. **SELECT * → spesifik kolonlar (list queries)**
-   - `DeliveryListRow` yeni struct: payload + response_body hariç (256KB'a kadar tasarruf/satır)
-   - `webhooks.rs`: list endpoint'leri artık `DeliveryListRow` kullanıyor
-   - `transforms.rs`: ownership check → `EndpointOwnerCheck` (3 kolon vs 27)
-   - Tek kayıt fetch'leri (replay, detail) hâlâ `SELECT *` → doğru
+   - `DeliveryListRow`: payload + response_body hariç (~256KB/satır tasarruf)
+   - `transforms.rs`: `EndpointOwnerCheck` (3 kolon vs 27)
 
-2. **Dashboard loading skeletons (7 sayfa)**
-   - `loading.tsx`: Shared skeleton — tab bar + stat cards + table rows
-   - `core/page.tsx`: dynamic() → loading skeleton ile
-   - `deliveries/page.tsx`: dynamic() → loading skeleton ile
-   - `account/page.tsx`: dynamic() → loading skeleton ile
-   - `observability/page.tsx`: dynamic() → loading skeleton ile
-   - `devtools/page.tsx`: dynamic() → loading skeleton ile
-   - `content-mgmt/page.tsx`: dynamic() → loading skeleton ile
-   - `security-section/page.tsx`: dynamic() → loading skeleton ile
-   - `routing-config/page.tsx`: dynamic() → loading skeleton ile
+2. **Dashboard loading skeletons (8 sayfa)**
+   - `loading.tsx` + 8 dynamic() loading skeleton
 
-3. **Doğrulama**
-   - `cargo check` ✅ — 0 error
-   - `cargo test --lib` ✅ — 1072 passed, 0 failed
-   - `cargo clippy --workspace` ✅ — 0 uyarı
-   - `npm run build` ✅ — dashboard build başarılı
-   - Commits: `59980806`, `44ea9acb`
+3. **Redis cache metrics**
+   - `cache.rs`: atomic hit/miss counters + `cache_hit_rate()`
+   - `metrics.rs`: Prometheus outputta cache metricleri
 
-### Grafana + Cache Metrics (Oturum 166) ✅
-- **cache.rs:** Atomic hit/miss counters (`CACHE_HITS`, `CACHE_MISSES`), `cache_hit_rate()` fonksiyonu
-- **metrics.rs:** `cache_hits_total`, `cache_misses_total`, `cache_hit_rate_percent` Prometheus endpoint'inde
-- **Grafana dashboard:** 14 panel — API latency (p50/p95/p99), webhook delivery, DB query, queue latency, cache hit rate gauge, cache hits/misses rate, error rate by type, 5xx rate, request rate by method/status, success rate, active connections/endpoints, delivery by status pie chart
-- **Commit:** `264a804c`
+4. **Grafana Performance Dashboard (14 panel)**
+   - hookrelay.grafana.net — deployed (version 3)
+   - `monitor.sh`: /metrics endpointinden cache metricleri çekip OTLP ile push
 
-## 📋 Kalan Performance Roadmap
+5. **Rust toolchain kuruldu** — rustc 1.95.0, cargo 1.95.0
 
-### Orta Vade
+### Doğrulama
+- `cargo check` ✅ — 0 error
+- `cargo test --lib` ✅ — 1072 passed, 0 failed
+- `cargo clippy --workspace` ✅ — 0 uyarı
+- `npm run build` ✅ — dashboard build başarılı
+
+## 📋 Sıradaki İşler
+
+### Öncelik 1 — Güvenlik (P0 kalan)
 | # | Görev | Durum | Not |
 |---|-------|-------|-----|
-| 1 | Background Job Queue | ✅ | Oturum 165 |
-| 2 | SELECT * optimizasyonu | ✅ | Oturum 166 — list queries |
-| 3 | Dashboard loading states | ✅ | Oturum 166 — 8 sayfa skeleton |
-| 4 | Read Replica (Neon) | ❌ | Neon free tier'da read replica desteklenmiyor |
-| 5 | Cloud CDN headers | ✅ | Oturum 163 |
+| 1 | HS-038f: Timing attack — login hataları farklı mesajlar | ⬜ | auth.rs |
+| 2 | HS-038g: serde_json hata gösteriyor | ⬜ | error.rs |
+| 3 | HS-038h: Email enumeration — register mesajı | ⬜ | auth.rs |
+| 4 | HS-038j: rate_limit.rs unwrap() — panic riski | ⬜ | rate_limit.rs |
 
-### Büyük İş
+### Öncelik 2 — i18n Büyük İş
 | # | Görev | Durum | Not |
 |---|-------|-------|-----|
-| 6 | WebSocket live updates | ❌ | Büyük iş, öncelik düşük |
-| 7 | Edge Workers (Cloudflare) | ❌ | Büyük iş, öncelik düşük |
-| 8 | Event Sourcing | ❌ | Büyük iş, öncelik düşük |
-| 9 | Multi-Region DB | ❌ | Büyük iş, maliyetli |
+| 5 | 920+ hardcoded İngilizce string → Türkçe | ⬜ | Birden fazla oturum |
+| 6 | HS-068: Türkçe çeviri hataları | ⬜ | |
 
-## 📋 Servet'in Yapması Gereken
+### Öncelik 3 — Performance (Kalan)
+| # | Görev | Durum | Not |
+|---|-------|-------|-----|
+| 7 | Cloudflare Workers (Edge deploy) | ❌ | Büyük iş, 5+ oturum |
+| 8 | Read Replica (Neon) | ❌ | Free tier desteklemiyor |
 
+### Öncelik 4 — P2 Kalan
+| # | Görev | Durum | Not |
+|---|-------|-------|-----|
+| 9 | HS-047: blog/[slug] 1922 satır mega component | ⬜ | Refactoring |
+| 10 | HS-065: 920+ hardcoded string (i18n) | ⬜ | Büyük iş |
+| 11 | HS-070: output:standalone | ⬜ | Vercelde gerekli değil |
+| 12 | HS-071: HSTS header | ✅ | Zaten mevcut |
+
+### Servet Görevleri
 | Görev | Durum | Not |
 |-------|-------|-----|
 | GitHub PAT yenile | ⚠️ | Token sohbette paylaşıldı, iptal et! |
 | iyzico hesap aç | ❌ | Vergi levhası + banka hesabı gerekli |
 | Domain kararı | ❌ | hooksniff.vercel.app yeterli şimdilik |
+| GitHub Actions dakikası | ❌ | CI bitmiş, yenilenmeli |
 
 ## Hesap Bilgileri
 - Admin: servetarslan02@gmail.com / Alayci_165
 - Demo: demo@hooksniff.com / Demo1234!
 - Dashboard: https://hooksniff.vercel.app
 - API: https://hooksniff-api-1046140057667.europe-west1.run.app
+- Grafana: https://hookrelay.grafana.net
+
+## Kritik Notlar
+- **Rust toolchain kurulu** — bu makinede `source $HOME/.cargo/env` ile cargo çalışır
+- **GitHub Actions dakikaları bitmiş** — CI failure, push edilen kod doğrulanamıyor
+- **Grafana Cloud ≠ API /metrics** — Dashboard hooksniff_* prefixli metricleri kullanıyor (OTLP)
+- **monitor.sh** — her dakika çalışıp API /metrics endpointinden cache metricleri çekip Grafana Clouda push ediyor
