@@ -89,6 +89,12 @@ pub struct Config {
     pub qstash_token: Option<String>,
     /// QStash base URL (defaults to EU region)
     pub qstash_url: Option<String>,
+    /// Cloudflare account ID for R2 storage (optional)
+    pub cf_account_id: Option<String>,
+    /// Cloudflare R2 API token (optional)
+    pub cf_r2_token: Option<String>,
+    /// R2 bucket name (default: hooksniff-storage)
+    pub cf_r2_bucket: Option<String>,
 }
 
 /// Custom Debug implementation that masks secret fields.
@@ -297,6 +303,9 @@ impl Config {
                 .unwrap_or_else(|_| "https://hooksniff.vercel.app".into()),
             qstash_token: std::env::var("QSTASH_TOKEN").ok(),
             qstash_url: std::env::var("QSTASH_URL").ok(),
+            cf_account_id: std::env::var("CF_ACCOUNT_ID").ok(),
+            cf_r2_token: std::env::var("CF_R2_TOKEN").ok(),
+            cf_r2_bucket: std::env::var("CF_R2_BUCKET").ok(),
         })
     }
 }
