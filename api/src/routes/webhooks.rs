@@ -16,8 +16,8 @@ use crate::middleware::idempotency;
 use crate::models::customer::Customer;
 use crate::models::delivery::{
     BatchError, BatchResponse, BatchWebhookRequest, CreateWebhookRequest, Delivery,
-    DeliveryAttempt, DeliveryAttemptResponse, DeliveryListResponse, DeliveryListRow,
-    DeliveryResponse, ExportDelivery,
+    DeliveryAttempt, DeliveryAttemptResponse, DeliveryListResponse, DeliveryResponse,
+    ExportDelivery,
 };
 use crate::models::endpoint::{Endpoint, RetryPolicy};
 use crate::validation;
@@ -67,15 +67,12 @@ async fn list_deliveries(
         String::new()
     };
 
-    // Performance: select only columns needed for list view (skip payload + response_body)
-    const LIST_COLUMNS: &str = "id, endpoint_id, customer_id, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test";
-
     let (deliveries, total) = if let Some(status) = &params.status {
         let query = format!(
-            "SELECT {} FROM deliveries WHERE customer_id = $1 AND status = $2{} ORDER BY created_at DESC LIMIT $3 OFFSET $4",
-            LIST_COLUMNS, team_filter
+            "SELECT * FROM deliveries WHERE customer_id = $1 AND status = $2{} ORDER BY created_at DESC LIMIT $3 OFFSET $4",
+            team_filter
         );
-        let deliveries = sqlx::query_as::<_, DeliveryListRow>(&query)
+        let deliveries = sqlx::query_as::<_, Delivery>(&query)
         .bind(customer.id)
         .bind(status)
         .bind(per_page)
@@ -96,10 +93,10 @@ async fn list_deliveries(
         (deliveries, total.0)
     } else {
         let query = format!(
-            "SELECT {} FROM deliveries WHERE customer_id = $1{} ORDER BY created_at DESC LIMIT $2 OFFSET $3",
-            LIST_COLUMNS, team_filter
+            "SELECT * FROM deliveries WHERE customer_id = $1{} ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+            team_filter
         );
-        let deliveries = sqlx::query_as::<_, DeliveryListRow>(&query)
+        let deliveries = sqlx::query_as::<_, Delivery>(&query)
         .bind(customer.id)
         .bind(per_page)
         .bind(offset)
