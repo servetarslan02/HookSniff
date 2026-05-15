@@ -93,7 +93,7 @@ export function PlaygroundPageContent() {
         setState('error');
       }
     } catch {
-      setError('Network error — check your connection');
+      setError(tc('networkErrorCheck'));
       setState('error');
     }
   }, []);

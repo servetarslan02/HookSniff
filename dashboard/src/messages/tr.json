@@ -118,7 +118,9 @@
     "pagination": "Sayfalama",
     "invalidCheckoutUrl": "Geçersiz ödeme URL'si",
     "tokenGenFailed": "Token oluşturulamadı",
-    "networkErrorCheck": "Ağ hatası — bağlantınızı kontrol edin"
+    "networkErrorCheck": "Ağ hatası — bağlantınızı kontrol edin",
+    "placeholderSearch": "Ara...",
+    "placeholderEmail": "siz@ornek.com"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -338,7 +340,8 @@
     "batchReplay": "🔄 Toplu Tekrar Oynat ({count})",
     "clearSelection": "✕ Temizle",
     "viewDetails": "Detayları Gör",
-    "replayConfirm": "{id}… teslimatı aynı endpoint'e tekrar oynatılsın mı?"
+    "replayConfirm": "{id}… teslimatı aynı endpoint'e tekrar oynatılsın mı?",
+    "selectAll": "Tümünü seç"
   },
   "logs": {
     "title": "Webhook Logları",
@@ -425,7 +428,8 @@
     "testFailed": "Test başarısız — endpoint URL'sini kontrol edin",
     "conditionFailureRate": "Failure Rate >",
     "conditionLatency": "Avg Latency >",
-    "conditionConsecutive": "Consecutive Failures >"
+    "conditionConsecutive": "Consecutive Failures >",
+    "alertUpdated": "Alarm güncellendi"
   },
   "playground": {
     "title": "API Playground",
@@ -1065,7 +1069,16 @@
     "poweredBy": "HookSniff monitoring tarafından desteklenmektedir • Veriler 30 saniyede bir yenilenir",
     "affects": "Etkilenen: {components}",
     "resolvedAt": "{time} çözüldü",
-    "portUrl": "Portal URL"
+    "portUrl": "Portal URL",
+    "labelOperational": "Çalışıyor",
+    "labelDegraded": "Bozulmuş",
+    "labelUnhealthy": "Sağlıksız",
+    "labelDown": "Çalışmıyor",
+    "labelInvestigating": "İnceleniyor",
+    "labelIdentified": "Tanımlandı",
+    "labelMonitoring": "İzleniyor",
+    "labelResolved": "Çözüldü",
+    "labelUnknown": "Bilinmiyor"
   },
   "terms": {
     "title": "Hizmet Şartları",
@@ -3031,7 +3044,32 @@
     "joinThousands": "HookSniff ile başlayın",
     "talkToUs": "Bizimle konuşun",
     "builtOn": "Güvenilir altyapı üzerine inşa edildi",
-    "backToList": "← Müşterilere dön"
+    "backToList": "← Müşterilere dön",
+    "metricEngineeringTime": "Tasarruf edilen mühendislik süresi",
+    "metricInfraCost": "Altyapı maliyeti",
+    "metricEventLoss": "Olay kayıp oranı",
+    "metricDeliveryLatency": "Teslimat gecikmesi",
+    "metricPollingEliminated": "Polling ortadan kaldırıldı",
+    "metricAgentComm": "Ajan iletişim kaybı",
+    "metricComputeCost": "Hesaplama maliyeti",
+    "metricScaleCapacity": "Kapasite ölçekleme",
+    "metricMonthlyCost": "Aylık maliyet",
+    "metricIntegrationTime": "Entegrasyon süresi",
+    "metricSatisfaction": "Müşteri memnuniyeti",
+    "metricEngEffort": "Mühendislik çabası",
+    "metricNoShow": "Gelmememe oranı",
+    "metricDataRegion": "Veri bölgesi",
+    "metricCompliance": "Uyumluluk durumu",
+    "metricMissedNotif": "Kaçırılan bildirimler",
+    "metricIntegrationReq": "Entegrasyon istekleri",
+    "metricTimeToFirst": "İlk webhook süresi",
+    "metricSupportTickets": "Destek biletleri",
+    "metricFraudLatency": "Dolandırıcılık uyarısı gecikmesi",
+    "metricAuditCompliance": "Denetim uyumluluğu",
+    "metricReconciliation": "Uzlaştırma hataları",
+    "metricTestsPassing": "Geçen testler",
+    "metricDeliveryRate": "Teslimat oranı",
+    "metricLanguages": "Desteklenen diller"
   },
   "providers": {
     "title": "Sağlayıcılar",
@@ -3142,7 +3180,23 @@
     "keyMetrics": "Anahtar metrikler",
     "allIndustries": "Tüm sektörler",
     "startForFree": "Ücretsiz başla →",
-    "talkToUs": "Bize ulaşın →"
+    "talkToUs": "Bize ulaşın →",
+    "eventsProcessedDay": "İşlenen event/gün",
+    "orderedDelivery": "Sıralı teslimat (FIFO)",
+    "retryOnFailure": "Başarısızlıkta tekrar dene",
+    "multiEndpoint": "Çoklu endpoint",
+    "deliveryGuarantee": "Teslimat garantisi",
+    "signature": "İmza",
+    "latencyP99": "Gecikme (p99)",
+    "cloudevents": "CloudEvents",
+    "eventDriven": "Olay odaklı",
+    "schemaRegistry": "Şema kayıt defteri",
+    "embeddablePortal": "Gömülebilir portal",
+    "openSource": "Açık kaynak",
+    "auditTrail": "Denetim izi",
+    "avgDeliveryLatency": "Ort. teslimat gecikmesi",
+    "deliverySuccessRate": "Teslimat başarı oranı",
+    "freeTierEvents": "Ücretsiz katman eventleri"
   },
   "whatIsWebhook": {
     "simpleExplanation": "Basit Açıklama",

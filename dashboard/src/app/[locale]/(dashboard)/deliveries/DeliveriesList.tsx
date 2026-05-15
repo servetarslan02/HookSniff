@@ -197,7 +197,7 @@ export default function DeliveriesPage() {
                       checked={filtered.length > 0 && selectedIds.size === filtered.length}
                       onChange={toggleSelectAll}
                       className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
-                      aria-label="Select all"
+                      aria-label={t('selectAll')}
                     />
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</th>
