@@ -235,8 +235,6 @@ export const webhooksApi = {
   replay: (token: string, id: string) =>
     apiFetch<Delivery>(`/webhooks/${id}/replay`, { method: 'POST', token }),
 
-  batch: (token: string, data: { webhooks: Array<{ endpoint_id: string; event?: string; data: unknown }> }) =>
-    apiFetch<{ deliveries: Delivery[] }>('/webhooks/batch', { method: 'POST', body: data, token }),
 
   batchReplay: (token: string, ids: string[]) =>
     apiFetch<{ replayed: number }>('/webhooks/batch/replay', { method: 'POST', body: { ids }, token }),
@@ -249,18 +247,6 @@ export const statsApi = {
 };
 
 // Auth API
-export const authApi = {
-  login: (email: string, password: string) =>
-    apiFetch<{ token: string; customer: { id: string; email: string; name?: string; plan: string; is_admin?: boolean }; api_key?: string }>('/auth/login', {
-      method: 'POST',
-      body: { email, password },
-    }),
-  register: (email: string, password: string, name?: string) =>
-    apiFetch<{ message?: string; token?: string; customer?: { id: string; email: string; name?: string; plan: string }; api_key?: string }>('/auth/register', {
-      method: 'POST',
-      body: { email, password, name },
-    }),
-};
 
 // Generic API client (axios-style wrapper — returns { data } for compatibility)
 export const api = {
@@ -812,9 +798,6 @@ export const teamsApi = {
   create: (token: string, data: { name: string; description?: string }) =>
     apiFetch<Team>('/teams', { method: 'POST', body: { name: data.name }, token }),
 
-  get: (token: string, id: string) =>
-    apiFetch<Team>(`/teams/${id}`, { token }),
-
   listMembers: (token: string, teamId: string) =>
     apiFetch<TeamMember[]>(`/teams/${teamId}/members`, { token }),
 
@@ -928,28 +911,9 @@ export const twoFactorApi = {
 };
 
 // Custom Domains API
-export const customDomainsApi = {
-  list: (token: string) =>
-    apiFetch<{ id: string; domain: string; status: string; verified: boolean }[]>('/custom-domains', { token }),
-
-  add: (token: string, data: { domain: string }) =>
-    apiFetch<{ id: string; domain: string; cname_target: string; txt_record: string }>('/custom-domains', { method: 'POST', body: data, token }),
-
-  verifyDomain: (token: string, domainId: string) =>
-    apiFetch<{ verified: boolean; message?: string; issues?: string[] }>(`/custom-domains/${domainId}/verify`, { method: 'POST', token }),
-
-  delete: (token: string, domainId: string) =>
-    apiFetch<{ success: boolean }>(`/custom-domains/${domainId}`, { method: 'DELETE', token }),
-};
 
 // SSO API
 export const ssoApi = {
-  getConfig: (token: string) =>
-    apiFetch<{ provider?: string; enabled?: boolean; metadata_url?: string; entity_id?: string; sso_url?: string; certificate_set?: boolean }>('/sso/config', { token }),
-
-  saveConfig: (token: string, data: Record<string, unknown>) =>
-    apiFetch<{ success: boolean }>('/sso/config', { method: 'POST', body: data, token }),
-
   testSso: (token: string) =>
     apiFetch<{ success: boolean; message: string; redirect_url?: string }>('/sso/test', { method: 'POST', token }),
 };
@@ -999,9 +963,6 @@ export interface BillingSubscription {
 
 // Extended Billing API
 export const billingApiExtended = {
-  getInvoices: (token: string) =>
-    apiFetch<Invoice[]>('/billing/invoices', { token }),
-
   getUsage: (token?: string) =>
     apiFetch<BillingUsage>('/billing/usage', { token }),
 
@@ -1010,15 +971,6 @@ export const billingApiExtended = {
 
   upgrade: (token: string, plan: string, billingPeriod?: string) =>
     apiFetch<{ success: boolean; checkout_url?: string }>('/billing/upgrade', { method: 'POST', body: { plan, provider: 'polar', billing_period: billingPeriod || 'monthly' }, token }),
-};
-
-// Billing API — delegates to billingApiExtended to avoid duplication (Item 157)
-export const billingApi = {
-  getInvoices: (token: string) =>
-    billingApiExtended.getInvoices(token),
-
-  getPortalUrl: (token: string) =>
-    apiFetch<{ url: string }>('/billing/portal', { method: 'POST', token }),
 };
 
 // Analytics API
