@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-16 04:17 GMT+8
+> Son güncelleme: 2026-05-16 04:20 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -319,6 +319,22 @@ HookSniff/
 2. **GitHub Actions** — Hala başarısız (billing issue, faturalandırma güncellenmeli)
 3. **GCP Console** — Servet'in Google hesabı ile giriş yapıldı (2FA onayı ile)
 4. **API Sağlığı** — Çalışıyor (healthy, DB 27ms, Redis configured)
+
+### Oturum 178 — 2026-05-16 04:20 GMT+8
+1. **teamsApi.acceptInvite — Davet Kabul Akışı** ✅
+   - Team sayfasına `invite_token` query param desteği eklendi
+   - URL'de `?invite_token=xxx` varsa otomatik `acceptInvite` çağrılır
+   - Başarı/hata mesajı gösterilir
+2. **applicationsApi.update — Uygulama Düzenleme** ✅
+   - Her uygulama kartına ✏️ edit butonu eklendi
+   - Modal: isim ve açıklama düzenleme
+   - `applicationsApi.update` çağrısı
+3. **webhooksApi.batchReplay — Toplu Replay** ✅
+   - Admin system page failed deliveries tablosuna checkbox eklendi
+   - Select All / Deselect All butonu
+   - "Replay Selected" butonu ile toplu replay
+   - `webhooksApi.batchReplay` çağrısı
+4. **Commit:** 63f470a0 — push edildi
 
 ### Oturum 177 — 2026-05-16 04:17 GMT+8
 1. **Kullanılmayan API Fonksiyonları Analizi** ✅
