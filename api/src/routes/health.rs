@@ -363,11 +363,26 @@ pub async fn health_check(
     };
     checks.insert("queue_detail".to_string(), queue_detail);
 
-    // Redis check
-    let redis_status = if crate::config::resolve_redis_url().is_some() {
-        json!({ "status": "healthy", "latency_ms": 0, "note": "configured" })
-    } else {
-        json!({ "status": "healthy", "latency_ms": 0, "note": "not configured" })
+    // Redis check — actually PING Redis to verify connectivity
+    let redis_status = match crate::config::resolve_redis_url() {
+        Some(ref url) => {
+            let redis_start = Instant::now();
+            match redis::Client::open(url.as_str()) {
+                Ok(client) => match redis::aio::ConnectionManager::new(client).await {
+                    Ok(mut conn) => {
+                        let ping: Result<String, _> = redis::cmd("PING").query_async(&mut conn).await;
+                        let latency = redis_start.elapsed().as_millis() as i64;
+                        match ping {
+                            Ok(_) => json!({ "status": "healthy", "latency_ms": latency, "note": "connected" }),
+                            Err(e) => json!({ "status": "unhealthy", "latency_ms": latency, "note": format!("PING failed: {e}") }),
+                        }
+                    }
+                    Err(e) => json!({ "status": "unhealthy", "latency_ms": 0, "note": format!("connection failed: {e}") }),
+                },
+                Err(e) => json!({ "status": "unhealthy", "latency_ms": 0, "note": format!("client error: {e}") }),
+            }
+        }
+        None => json!({ "status": "healthy", "latency_ms": 0, "note": "not configured" }),
     };
     checks.insert("redis".to_string(), redis_status.clone());
 
