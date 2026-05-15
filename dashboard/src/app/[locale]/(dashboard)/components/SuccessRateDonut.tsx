@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { type SuccessRateData } from '@/lib/api';
 
 interface SuccessRateDonutProps {
@@ -8,10 +9,12 @@ interface SuccessRateDonutProps {
 }
 
 export function SuccessRateDonut({ data, loading }: SuccessRateDonutProps) {
+  const t = useTranslations('dashboard');
+
   if (loading) {
     return (
       <div className="h-48 flex items-center justify-center">
-        <div className="animate-pulse text-sm text-gray-400 dark:text-slate-500">Loading...</div>
+        <div className="animate-pulse text-sm text-gray-400 dark:text-slate-500">{t('loadingShort')}</div>
       </div>
     );
   }
@@ -36,7 +39,7 @@ export function SuccessRateDonut({ data, loading }: SuccessRateDonutProps) {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className={`text-2xl font-bold ${color}`}>{rate.toFixed(1)}%</span>
-          <span className="text-xs text-gray-500 dark:text-slate-400">success</span>
+          <span className="text-xs text-gray-500 dark:text-slate-400">{t('successLabel')}</span>
         </div>
       </div>
     </div>

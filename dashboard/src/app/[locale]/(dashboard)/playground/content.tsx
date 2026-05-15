@@ -259,12 +259,12 @@ export function PlaygroundPageContent() {
         {state === 'idle' && (
           <div className="max-w-md mx-auto text-center py-16">
             <span className="text-6xl mb-4 block">🧪</span>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Test webhooks in real-time</h2>
-            <p className="text-gray-600 dark:text-slate-400 mb-6">Get a unique URL that captures any HTTP request. Inspect headers, body, and signatures.</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('idleTitle')}</h2>
+            <p className="text-gray-600 dark:text-slate-400 mb-6">{t('idleDesc')}</p>
             <button onClick={generateToken} className="px-8 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">
-              Generate Webhook URL →
+              {t('generateUrl')}
             </button>
-            <p className="text-xs text-gray-500 dark:text-slate-500 mt-3">Free forever · No signup · Works with any service</p>
+            <p className="text-xs text-gray-500 dark:text-slate-500 mt-3">{t('freeForever')}</p>
           </div>
         )}
 
@@ -272,7 +272,7 @@ export function PlaygroundPageContent() {
         {state === 'generating' && (
           <div className="max-w-md mx-auto text-center py-16">
             <div className="w-10 h-10 border-2 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-slate-400">Generating your unique URL...</p>
+            <p className="text-gray-600 dark:text-slate-400">{t('generatingUrl')}</p>
           </div>
         )}
 
@@ -282,7 +282,7 @@ export function PlaygroundPageContent() {
             <span className="text-5xl mb-4 block">⚠️</span>
             <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
             <button onClick={generateToken} className="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">
-              Try Again
+              {t('tryAgain')}
             </button>
           </div>
         )}
@@ -298,18 +298,18 @@ export function PlaygroundPageContent() {
                   <span className="truncate">{webhookUrl}</span>
                 </div>
                 <button onClick={handleCopy} className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${copied ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'}`}>
-                  {copied ? '✓ Copied' : 'Copy'}
+                  {copied ? t('copied') : t('copy')}
                 </button>
                 <button onClick={handleNewSession} className="px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
-                  New
+                  {t('newSession')}
                 </button>
               </div>
               <div className="flex items-center gap-4 mt-3 text-xs text-gray-500 dark:text-slate-500">
-                <span>{polling ? '🟢 Polling every 2s' : '⚪ Not polling'}</span>
+                <span>{polling ? t('polling') : t('notPolling')}</span>
                 <span>·</span>
-                <span>{history.length} request{history.length !== 1 ? 's' : ''} captured</span>
+                <span>{t('requestsCaptured', { count: history.length })}</span>
                 <span>·</span>
-                <span>{t("expiresIn", { defaultValue: "Expires in 24h" })}</span>
+                <span>{t("expiresIn")}</span>
               </div>
             </div>
 
@@ -333,15 +333,15 @@ export function PlaygroundPageContent() {
                 </div>
                 <div className="flex items-end">
                   <button onClick={handleSend} disabled={sending} className="w-full py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors">
-                    {sending ? 'Sending...' : 'Send →'}
+                    {sending ? t('sending') : t('sendBtn')}
                   </button>
                 </div>
               </div>
               {sendResult && (
                 <div className={`mt-3 px-3 py-2 rounded-lg text-sm ${sendResult.status >= 200 && sendResult.status < 300 ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'}`}>
                   {sendResult.status === 0 && sendResult.time === 0
-                    ? '⚠️ Invalid JSON — check your payload'
-                    : `Status: ${sendResult.status} · ${sendResult.time}ms`}
+                    ? t('invalidJson')
+                    : t('statusTime', { status: sendResult.status, time: sendResult.time })}
                 </div>
               )}
             </div>
@@ -350,7 +350,7 @@ export function PlaygroundPageContent() {
               {/* Left: Request List */}
               <div className="lg:col-span-2 space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">Requests ({history.length})</h3>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">{t('requestHistory')} ({history.length})</h3>
                   {history.length > 0 && (
                     <button onClick={handleClear} className="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400">{t("clearAll")}</button>
                   )}
@@ -425,7 +425,7 @@ export function PlaygroundPageContent() {
                     {/* Signature */}
                     {selectedRecord.headers['svix-signature'] || selectedRecord.headers['x-hooksniff-signature'] ? (
                       <div className="p-3 bg-brand-50 dark:bg-brand-500/10 rounded-lg border border-brand-200 dark:border-brand-500/20">
-                        <h4 className="text-xs font-bold text-gray-900 dark:text-white mb-1">🔐 Webhook Signature</h4>
+                        <h4 className="text-xs font-bold text-gray-900 dark:text-white mb-1">🔐 Webhook {t('signature')}</h4>
                         <p className="text-xs font-mono text-gray-600 dark:text-slate-400 break-all">
                           {selectedRecord.headers['svix-signature'] || selectedRecord.headers['x-hooksniff-signature']}
                         </p>
@@ -451,24 +451,24 @@ export function PlaygroundPageContent() {
             {/* Info */}
             <div className="grid md:grid-cols-3 gap-4">
               <div className="p-4 bg-blue-50 dark:bg-blue-500/10 rounded-lg border border-blue-200 dark:border-blue-500/20">
-                <h4 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">💡 Works with any service</h4>
-                <p className="text-xs text-blue-700 dark:text-blue-400">Stripe, GitHub, Shopify, Slack — if it sends HTTP requests, this captures it.</p>
+                <h4 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">💡 {t('worksAnyService')}</h4>
+                <p className="text-xs text-blue-700 dark:text-blue-400">{t('worksAnyServiceDesc')}</p>
               </div>
               <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg border border-emerald-200 dark:border-emerald-500/20">
-                <h4 className="text-sm font-medium text-emerald-900 dark:text-emerald-300 mb-1">🔒 Secure by default</h4>
-                <p className="text-xs text-emerald-700 dark:text-emerald-400">HTTPS included. Signatures captured. Data expires in 24 hours automatically.</p>
+                <h4 className="text-sm font-medium text-emerald-900 dark:text-emerald-300 mb-1">🔒 {t('secureDefault')}</h4>
+                <p className="text-xs text-emerald-700 dark:text-emerald-400">{t('secureDefaultDesc')}</p>
               </div>
               <div className="p-4 bg-purple-50 dark:bg-purple-500/10 rounded-lg border border-purple-200 dark:border-purple-500/20">
-                <h4 className="text-sm font-medium text-purple-900 dark:text-purple-300 mb-1">⚡ Real-time</h4>
-                <p className="text-xs text-purple-700 dark:text-purple-400">Polls every 2 seconds. New requests appear instantly in the list.</p>
+                <h4 className="text-sm font-medium text-purple-900 dark:text-purple-300 mb-1">⚡ {t('realtime')}</h4>
+                <p className="text-xs text-purple-700 dark:text-purple-400">{t('realtimeDesc')}</p>
               </div>
             </div>
 
             {/* CTA */}
             <div className="text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
-              <p className="text-gray-600 dark:text-slate-400 mb-4">Like what you see? Sign up and send webhooks for real.</p>
+              <p className="text-gray-600 dark:text-slate-400 mb-4">{t('likeSignup')}</p>
               <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">
-                Start for free →
+                {t('startFree')}
               </Link>
             </div>
           </div>

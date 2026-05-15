@@ -25,9 +25,9 @@ export default function RoutingConfigPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'retry-policy', label: t('retryPolicy', { defaultValue: 'Retry Policy' }), icon: '🔁', content: <RetryPolicyPage /> },
-        { key: 'routing', label: t('routing', { defaultValue: 'Routing' }), icon: '🔀', content: <RoutingPage /> },
-        { key: 'custom-domain', label: t('customDomain', { defaultValue: 'Custom Domain' }), icon: '🌐', content: <CustomDomainPage /> },
+        { key: 'retry-policy', label: t('retryPolicy'), icon: '🔁', content: <RetryPolicyPage /> },
+        { key: 'routing', label: t('routing'), icon: '🔀', content: <RoutingPage /> },
+        { key: 'custom-domain', label: t('customDomain'), icon: '🌐', content: <CustomDomainPage /> },
       ]}
     />
   );

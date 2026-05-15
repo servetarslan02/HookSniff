@@ -26,10 +26,10 @@ export default function CorePage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'overview', label: t('dashboard', { defaultValue: 'Dashboard' }), icon: '📊', content: <DashboardOverview /> },
-        { key: 'endpoints', label: t('endpoints', { defaultValue: 'Endpoints' }), icon: '🔗', content: <EndpointsPage /> },
-        { key: 'applications', label: t('applications', { defaultValue: 'Applications' }), icon: '📁', content: <ApplicationsPage /> },
-        { key: 'api-keys', label: t('apiKeys', { defaultValue: 'API Keys' }), icon: '🔑', content: <ApiKeysPage /> },
+        { key: 'overview', label: t('dashboard'), icon: '📊', content: <DashboardOverview /> },
+        { key: 'endpoints', label: t('endpoints'), icon: '🔗', content: <EndpointsPage /> },
+        { key: 'applications', label: t('applications'), icon: '📁', content: <ApplicationsPage /> },
+        { key: 'api-keys', label: t('apiKeys'), icon: '🔑', content: <ApiKeysPage /> },
       ]}
     />
   );

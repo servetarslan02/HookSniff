@@ -275,7 +275,7 @@ export default function AlertsPage() {
                     onClick={() => openEdit(alert)}
                     className="px-3 py-1.5 text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 border border-brand-300 dark:border-brand-500/30 rounded-lg transition"
                   >
-                    {t('edit', { defaultValue: 'Edit' })}
+                    {t('edit')}
                   </button>
                   <button type="button"
                     onClick={() => testAlert(alert.id)}
@@ -311,7 +311,7 @@ export default function AlertsPage() {
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditTarget(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {t('editAlert', { defaultValue: 'Edit Alert' })}: {editTarget.name}
+              {t('editAlert')}: {editTarget.name}
             </h3>
             <div className="space-y-4">
               <div>

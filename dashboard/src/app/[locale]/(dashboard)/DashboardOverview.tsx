@@ -136,9 +136,9 @@ export function DashboardOverview() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title', { defaultValue: 'Dashboard' })}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-            {t('subtitle', { defaultValue: 'Overview of your webhook infrastructure' })}
+            {t('subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -149,7 +149,7 @@ export function DashboardOverview() {
                 ? 'bg-brand-50 text-brand-700 border-brand-200 dark:bg-brand-900/20 dark:text-brand-400 dark:border-brand-800'
                 : 'text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700'
             }`}
-            title={t('customizeWidgets', { defaultValue: 'Customize Widgets' })}
+            title={t('customizeWidgets')}
           >
             ⚙️
           </button>
@@ -157,7 +157,7 @@ export function DashboardOverview() {
             onClick={loadData}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition"
           >
-            ↻ {tc('refresh', { defaultValue: 'Refresh' })}
+            ↻ {tc('refresh')}
           </button>
         </div>
       </div>
@@ -166,10 +166,10 @@ export function DashboardOverview() {
       {showWidgetSettings && (
         <div className="glass-card p-4">
           <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">
-            {t('widgetSettings', { defaultValue: 'Widget Settings' })}
+            {t('widgetSettings')}
           </h3>
           <p className="text-xs text-gray-500 dark:text-slate-500 mb-3">
-            {t('widgetSettingsDesc', { defaultValue: 'Toggle widgets on/off. Drag the handle on each widget to reorder.' })}
+            {t('widgetSettingsDesc')}
           </p>
           <div className="flex flex-wrap gap-2">
             {widgets.map((w) => (
@@ -193,7 +193,7 @@ export function DashboardOverview() {
       {isWidgetVisible('stat-cards') && (
         <DashboardWidget
           id="stat-cards"
-          title={t('statCards', { defaultValue: 'Stat Cards' })}
+          title={t('statCards')}
           dragHandleProps={{
             onDragStart: handleDragStart('stat-cards'),
             onDragEnd: handleDragEnd,
@@ -205,7 +205,7 @@ export function DashboardOverview() {
         >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          label={t('totalDeliveries', { defaultValue: 'Total Deliveries' })}
+          label={t('totalDeliveries')}
           value={loading ? '—' : (stats?.total_deliveries?.toLocaleString() ?? '0')}
           color="blue"
           icon={
@@ -215,7 +215,7 @@ export function DashboardOverview() {
           }
         />
         <StatCard
-          label={t('successRate', { defaultValue: 'Success Rate' })}
+          label={t('successRate')}
           value={loading ? '—' : `${successRate.toFixed(1)}%`}
           color={successRate >= 95 ? 'emerald' : successRate >= 80 ? 'amber' : 'red'}
           icon={
@@ -225,7 +225,7 @@ export function DashboardOverview() {
           }
         />
         <StatCard
-          label={t('activeEndpoints', { defaultValue: 'Active Endpoints' })}
+          label={t('activeEndpoints')}
           value={loading ? '—' : endpointCount.toString()}
           color="violet"
           icon={
@@ -235,7 +235,7 @@ export function DashboardOverview() {
           }
         />
         <StatCard
-          label={t('failedDeliveries', { defaultValue: 'Failed Deliveries' })}
+          label={t('failedDeliveries')}
           value={loading ? '—' : (stats?.failed?.toLocaleString() ?? '0')}
           color="red"
           icon={
@@ -252,7 +252,7 @@ export function DashboardOverview() {
       {isWidgetVisible('charts') && (
         <DashboardWidget
           id="charts"
-          title={t('charts', { defaultValue: 'Charts' })}
+          title={t('charts')}
           dragHandleProps={{
             onDragStart: handleDragStart('charts'),
             onDragEnd: handleDragEnd,
@@ -265,8 +265,8 @@ export function DashboardOverview() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <ChartCard
-            title={t('deliveryTrends', { defaultValue: 'Delivery Trends' })}
-            subtitle={t('deliveryTrendsDesc', { defaultValue: 'Successful vs failed deliveries over time' })}
+            title={t('deliveryTrends')}
+            subtitle={t('deliveryTrendsDesc')}
             showTimeRange
             timeRange={timeRange}
             onTimeRangeChange={setTimeRange}
@@ -278,7 +278,7 @@ export function DashboardOverview() {
                 </div>
               ) : chartData.length === 0 ? (
                 <div className="h-full flex items-center justify-center text-gray-500 dark:text-slate-500">
-                  {tc('noResults', { defaultValue: 'No data available' })}
+                  {tc('noResults')}
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
@@ -316,7 +316,7 @@ export function DashboardOverview() {
         {/* Quick Stats Summary */}
         <div className="glass-card p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {t('quickStats', { defaultValue: 'Quick Stats' })}
+            {t('quickStats')}
           </h3>
           {loading ? (
             <div className="space-y-4 animate-pulse">
@@ -327,19 +327,19 @@ export function DashboardOverview() {
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-slate-700">
-                <span className="text-sm text-gray-600 dark:text-slate-400">{t('delivered', { defaultValue: 'Delivered' })}</span>
+                <span className="text-sm text-gray-600 dark:text-slate-400">{t('delivered')}</span>
                 <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{stats?.delivered?.toLocaleString() ?? 0}</span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-slate-700">
-                <span className="text-sm text-gray-600 dark:text-slate-400">{t('pending', { defaultValue: 'Pending' })}</span>
+                <span className="text-sm text-gray-600 dark:text-slate-400">{t('pending')}</span>
                 <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">{stats?.pending?.toLocaleString() ?? 0}</span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-slate-700">
-                <span className="text-sm text-gray-600 dark:text-slate-400">{t('failedLabel', { defaultValue: 'Failed' })}</span>
+                <span className="text-sm text-gray-600 dark:text-slate-400">{t('failedLabel')}</span>
                 <span className="text-sm font-semibold text-red-600 dark:text-red-400">{stats?.failed?.toLocaleString() ?? 0}</span>
               </div>
               <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-gray-600 dark:text-slate-400">{t('endpoints', { defaultValue: 'Endpoints' })}</span>
+                <span className="text-sm text-gray-600 dark:text-slate-400">{t('endpoints')}</span>
                 <span className="text-sm font-semibold text-gray-900 dark:text-white">{endpointCount}</span>
               </div>
             </div>
@@ -348,32 +348,32 @@ export function DashboardOverview() {
           {/* Quick Links */}
           <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-700">
             <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-3">
-              {t('quickActions', { defaultValue: 'Quick Actions' })}
+              {t('quickActions')}
             </h4>
             <div className="space-y-2">
               <Link
                 href="/core"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
-                🔗 {t('manageEndpoints', { defaultValue: 'Manage Endpoints' })}
+                🔗 {t('manageEndpoints')}
               </Link>
               <Link
                 href="/core"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
-                📦 {t('viewDeliveries', { defaultValue: 'View Deliveries' })}
+                📦 {t('viewDeliveries')}
               </Link>
               <Link
                 href="/devtools"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
-                🧪 {t('openPlayground', { defaultValue: 'Open Playground' })}
+                🧪 {t('openPlayground')}
               </Link>
               <Link
                 href="/monitoring"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
-                📈 {t('viewAnalytics', { defaultValue: 'View Analytics' })}
+                📈 {t('viewAnalytics')}
               </Link>
             </div>
           </div>
@@ -386,7 +386,7 @@ export function DashboardOverview() {
       {isWidgetVisible('recent-deliveries') && (
         <DashboardWidget
           id="recent-deliveries"
-          title={t('recentDeliveries', { defaultValue: 'Recent Deliveries' })}
+          title={t('recentDeliveries')}
           dragHandleProps={{
             onDragStart: handleDragStart('recent-deliveries'),
             onDragEnd: handleDragEnd,
@@ -399,13 +399,13 @@ export function DashboardOverview() {
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {t('recentDeliveries', { defaultValue: 'Recent Deliveries' })}
+            {t('recentDeliveries')}
           </h3>
           <Link
             href="/core"
             className="text-sm text-brand-600 dark:text-brand-400 hover:underline font-medium"
           >
-            {t('viewAll', { defaultValue: 'View all →' })}
+            {t('viewAll')}
           </Link>
         </div>
 
@@ -419,13 +419,13 @@ export function DashboardOverview() {
           <div className="text-center py-8">
             <span className="text-4xl mb-3 block">📭</span>
             <p className="text-gray-500 dark:text-slate-500 text-sm">
-              {t('noDeliveries', { defaultValue: 'No deliveries yet. Send your first webhook!' })}
+              {t('noDeliveries')}
             </p>
             <Link
               href="/devtools"
               className="inline-block mt-3 px-4 py-2 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-700 transition"
             >
-              {t('tryPlayground', { defaultValue: 'Try Playground →' })}
+              {t('tryPlayground')}
             </Link>
           </div>
         ) : (
@@ -434,10 +434,10 @@ export function DashboardOverview() {
               <thead>
                 <tr className="border-b border-gray-200 dark:border-slate-700">
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">ID</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('event', { defaultValue: 'Event' })}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('status', { defaultValue: 'Status' })}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('attempts', { defaultValue: 'Attempts' })}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('time', { defaultValue: 'Time' })}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('event')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('status')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('attempts')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('time')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">

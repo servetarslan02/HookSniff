@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { type Delivery } from '@/lib/api';
 
 interface ActivityFeedProps {
@@ -8,6 +9,8 @@ interface ActivityFeedProps {
 }
 
 export function ActivityFeed({ deliveries, loading }: ActivityFeedProps) {
+  const t = useTranslations('dashboard');
+
   if (loading) {
     return (
       <div className="space-y-3 p-4">
@@ -24,7 +27,7 @@ export function ActivityFeed({ deliveries, loading }: ActivityFeedProps) {
   if (!deliveries.length) {
     return (
       <div className="p-6 text-center text-sm text-gray-500 dark:text-slate-400">
-        No recent activity
+        {t('noRecentActivity')}
       </div>
     );
   }
