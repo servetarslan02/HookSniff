@@ -6,6 +6,7 @@ use axum::{Json, Router};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use sqlx::Row;
 use uuid::Uuid;
 
 use crate::auth::jwt;
