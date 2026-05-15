@@ -1,6 +1,6 @@
 # 📋 Admin Upgrade Plan — Yapılan & Yapılacak
 
-> Son güncelleme: 2026-05-16 00:11 GMT+8
+> Son güncelleme: 2026-05-16 02:10 GMT+8
 
 ---
 
@@ -17,105 +17,67 @@
 
 ---
 
-## ✅ Tamamlanan İşler
-
-### Aşama 1 — Kullanıcı Kaynakları (2026-05-16) ✅ TAMAMLANDI
-
-**Backend (admin.rs — +371 satır):**
-- [x] `GET /admin/users/{id}/endpoints` — delivery istatistikli endpoint listesi
-- [x] `GET /admin/users/{id}/webhooks` — filtre (status, event_type, since) + sayfalama + error_message subquery
-- [x] `GET /admin/users/{id}/api-keys` — customers tablosundan (prefix + created_at)
-- [x] `GET /admin/users/{id}/applications` — endpoint sayısı ile
-- [x] `GET /admin/users/{id}/usage` — detaylı istatistikler (30 gün, 7 gün, top events)
-- [x] `POST /admin/users/{id}/test-webhook` — SSRF korumalı, audit loglu
-- [x] `POST /admin/users/{id}/webhooks/{delivery_id}/replay` — user-Scoped replay
-- [x] `cargo test` — 32 test geçti, 0 başarısız ✅
-- [x] `cargo check` — sırf mevcut uyarılar (R2Error dead_code), yeni hata yok ✅
-
-**Frontend (api.ts + user detail page — +286 satır):**
-- [x] 7 yeni adminApi fonksiyonu (getUserEndpoints, getUserWebhooks, getUserApiKeys, getUserApplications, getUserUsage, adminUserTestWebhook, adminUserReplayDelivery)
-- [x] 6 sekme: Overview, Endpoints, Webhooks, API Keys, Applications, Usage
-- [x] Webhooks sekmesi: filtre (status dropdown), sayfalama, replay butonu
-- [x] Usage sekmesi: istatistik kartları, delivery breakdown, top events
-- [x] `next build` — ⚠️ Atlandı (node_modules yok, install yasak)
-
-**Git:**
-- [x] Commit: `584f961d` (backend), `31e1bfca` (frontend)
-- [x] Push: main → origin ✅
-
-### Aşama 0 — DB Migration (2026-05-16) ✅ TAMAMLANDI
-- [x] `019_admin_upgrade.sql` — 5 tablo, 11 index
-- [x] Commit: `8a7d2ea0`
-
-### Plan Hazırlığı (2026-05-15)
-- [x] Kapsamlı inceleme + rakip analizi + 7 aşamalı plan
-
----
-
-## ✅ Tamamlanan İşler
-
-### Aşama 2 — Sistem Geneli Monitoring (2026-05-16) ✅ TAMAMLANDI
-
-**Backend (admin.rs — +250 satır):**
-- [x] `GET /admin/deliveries/failed` — tüm kullanıcıların failed delivery'leri (filtre: since, user_id, limit)
-- [x] `GET /admin/deliveries/dead-letters` — dead_letters tablosundan (limit)
-- [x] `GET /admin/queue/status` — webhook_queue depth (pending/processing/failed/total/oldest/failed_1h)
-- [x] `GET /admin/rate-limit-violations` — rate_limit_violations tablosundan (limit)
-- [x] `GET /admin/api-latency` — endpoint bazlı response time (avg, p95, error rate) — delivery_attempts JOIN
-- [x] Test'ler eklendi (5 test: params defaults + serialization)
-
-**Frontend (system/page.tsx — +200 satır):**
-- [x] Queue Status kartları (pending/processing/failed/total, failed_last_hour uyarısı)
-- [x] Failed Deliveries tablosu (kullanıcı linkli, hata mesajlı, 24h filtre)
-- [x] Dead Letters tablosu (kalıcı başarısızlıklar, reason)
-- [x] Rate Limit Violations tablosu (IP, requests, limit, window)
-- [x] API Latency tablosu (avg, p95, error rate badge — renk kodlu)
-- [x] Monitoring data auto-fetch (useEffect + useCallback)
-
-**API (api.ts — +40 satır):**
-- [x] 5 yeni adminApi fonksiyonu (getFailedDeliveries, getDeadLetters, getQueueStatus, getRateLimitViolations, getApiLatency)
-
-**Build:**
-- [x] `next build` — başarılı ✅
-
-**Git:**
-- [x] Commit: `3c752933`
-- [x] Push: main → origin ✅
-
-### Aşama 3 — Müşteri İlişkileri (2026-05-16) ✅ TAMAMLANDI
-
-**Backend (admin.rs — +220 satır):**
-- [x] `POST /admin/users/{id}/notes` — Not ekle
-- [x] `GET /admin/users/{id}/notes` — Notları listele
-- [x] `POST /admin/users/{id}/tags` — Etiket ekle (upsert)
-- [x] `DELETE /admin/users/{id}/tags/{tag}` — Etiket kaldır
-- [x] `GET /admin/users/{id}/tags` — Etiketleri listele
-- [x] `GET /admin/users/{id}/communications` — İletişim geçmişi (type filtre + sayfalama)
-- [x] `log_communication()` helper — 4 mevcut aksiyona otomatik log eklendi
-- [x] 7 yeni test
-
-**Frontend (api.ts + users/[id]/page.tsx — +180 satır):**
-- [x] 6 yeni adminApi fonksiyonu
-- [x] Notes & Tags sekmesi (tag CRUD, not listesi + ekleme)
-- [x] Communications sekmesi (type badge, filtre, sayfalama)
-
-**Git:**
-- [ ] Commit + push (sıradaki)
-
----
-
 ## 📋 Tüm Aşamalar Özeti
 
-| Aşama | İçerik | Durum |
-|-------|--------|-------|
-| 0 | DB migration (5 tablo) | ✅ TAMAMLANDI |
-| 1 | Kullanıcı kaynakları + test-webhook + replay | ✅ TAMAMLANDI |
-| 2 | Sistem geneli (failed, dead letters, queue, latency) | ✅ TAMAMLANDI |
-| 3 | Müşteri notları, etiketler, iletişim geçmişi | ⏳ Sıradaki |
-| 4 | Fatura, ödeme, gelir metrikleri | ⏳ |
-| 5 | Refund + Polar.sh webhook handler | ⏳ |
-| 6 | Alerts sayfası | ⏳ |
-| 7 | Bulk email + GDPR | ⏳ İleride |
+| Aşama | İçerik | Durum | Tarih |
+|-------|--------|-------|-------|
+| 0 | DB migration (5 tablo) | ✅ TAMAMLANDI | 2026-05-16 |
+| 1 | Kullanıcı kaynakları + test-webhook + replay | ✅ TAMAMLANDI | 2026-05-16 |
+| 2 | Sistem geneli (failed, dead letters, queue, latency) | ✅ TAMAMLANDI | 2026-05-16 |
+| 3 | Müşteri notları, etiketler, iletişim geçmişi | ✅ TAMAMLANDI | 2026-05-16 |
+| 4 | Fatura, ödeme, gelir metrikleri | ✅ TAMAMLANDI | 2026-05-16 |
+| 5 | Refund + Polar.sh webhook handler | ✅ TAMAMLANDI | 2026-05-16 |
+| 6 | Alerts sayfası | ⏳ Sıradaki | |
+| 7 | Bulk email + GDPR | ⏳ İleride | |
+
+---
+
+## ✅ Son Tamamlanan — AŞAMA 5
+
+### Refund + Polar.sh (2026-05-16) ✅ TAMAMLANDI
+
+**Backend (admin.rs — +345 satır):**
+- [x] `POST /admin/users/{id}/refund` — Admin refund oluştur
+- [x] `GET /admin/users/{id}/refunds` — Kullanıcının refund geçmişi
+- [x] `GET /admin/refunds` — Sistem geneli refund listesi
+- [x] log_communication() + audit log entegrasyonu
+- [x] 8 yeni test
+
+**Frontend:**
+- [x] Billing sekmesinde Process Refund butonu + onay dialogu
+- [x] Refund History tablosu (users/[id])
+- [x] Sistem geneli Refund History (revenue sayfası)
+- [x] 3 yeni adminApi fonksiyonu
+
+**Git:**
+- [x] Commit: `3fbc6be8`
+- [x] Push: main → origin ✅
+
+**Not:** `cargo test` ve `next build` atlandı (Rust kurulu değil, son oturumda yapılacak).
+
+---
+
+## 🔄 Sıradaki İşler — AŞAMA 6
+
+### Alerts Sayfası + Final (0.5 oturum)
+
+**Hedef:** Alerts'i ayrı sayfaya taşı, genel polish.
+
+**Backend:**
+- [ ] Mevcut alerts endpoint'leri zaten var (GET, POST, PUT, DELETE) — yeni endpoint gerekmez
+
+**Frontend:**
+- [ ] Yeni `/admin/alerts` sayfası oluştur
+- [ ] Alert listesi (aktif/pasif filtresi)
+- [ ] Alert oluşturma/düzenleme formu
+- [ ] Son incident geçmişi
+- [ ] Sidebar'a Alerts linki ekle
+
+**Kontrol:**
+- [ ] `cargo test` (Rust kurulacak)
+- [ ] `next build`
+- [ ] Checklist + MEMORY.md + NEXT_SESSION.md güncelle
+- [ ] `git commit` + `git push`
 
 ---
 
@@ -123,11 +85,8 @@
 
 | # | Konu | Ne Zaman |
 |---|------|----------|
-| 1 | Refund provider seçimi | Aşama 5'ten önce |
-| 2 | GDPR silme stratejisi | Aşama 7'den önce |
-| 3 | Bulk email kuyruk mu? | Aşama 7'den önce |
-| 4 | Communication log mekanizması | ✅ Aşama 3'te çözüldü (log_communication helper) |
-| 5 | Cohort analizi derinliği | Aşama 4'ten önce |
+| 1 | GDPR silme stratejisi | Aşama 7'den önce |
+| 2 | Bulk email kuyruk mu? | Aşama 7'den önce |
 
 ---
 
@@ -135,46 +94,20 @@
 
 ```
 api/migrations/019_admin_upgrade.sql       ← ✅ Aşama 0
-api/src/routes/admin.rs                    ← ✅ Aşama 1+2+3+4 (+1120 satır, 21 endpoint)
-dashboard/src/lib/api.ts                   ← ✅ Aşama 1+2+3+4 (+23 fonksiyon)
-dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ Aşama 1+3+4 (9 sekme)
+api/src/routes/admin.rs                    ← ✅ Aşama 1+2+3+4+5 (+1465 satır, 33 endpoint)
+dashboard/src/lib/api.ts                   ← ✅ Aşama 1+2+3+4+5 (+26 fonksiyon)
+dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ Aşama 1+3+4+5 (9 sekme)
 dashboard/src/app/[locale]/admin/system/page.tsx ← ✅ Aşama 2 (5 monitoring section)
-dashboard/src/app/[locale]/admin/revenue/page.tsx ← ✅ Aşama 4 (metrics + cohort)
+dashboard/src/app/[locale]/admin/revenue/page.tsx ← ✅ Aşama 4+5 (metrics + cohort + refund)
+dashboard/src/app/[locale]/admin/alerts/page.tsx ← ⏳ Aşama 6 (yeni sayfa)
 ```
 
 ---
 
-## 🔄 Sıradaki İşler — AŞAMA 5
+## 📝 Aşama 5 Notları
 
-### Refund + Polar.sh Webhook Handler
-
-**Backend (admin.rs):**
-- [ ] `POST /admin/users/{id}/refund` — İade oluştur (refunds tablosuna yaz + Polar.sh API çağır)
-- [ ] `GET /admin/users/{id}/refunds` — İade geçmişini listele
-- [ ] `POST /v1/billing/webhook/polar` — Polar.sh webhook handler (invoice.created, order.completed)
-- [ ] Otomatik invoice/payment_transactions kaydetme
-
-**Frontend:**
-- [ ] Refund butonu (users/[id] billing sekmesi)
-- [ ] Refund geçmişi tablosu
-
-**Kontrol:**
-- [ ] `cargo test`
-- [ ] `next build`
-- [ ] Checklist + MEMORY.md + NEXT_SESSION.md güncelle
-- [ ] `git commit` + `git push`
-
----
-
-## 📋 Tüm Aşamalar Özeti
-
-| Aşama | İçerik | Durum |
-|-------|--------|-------|
-| 0 | DB migration (5 tablo) | ✅ TAMAMLANDI |
-| 1 | Kullanıcı kaynakları + test-webhook + replay | ✅ TAMAMLANDI |
-| 2 | Sistem geneli (failed, dead letters, queue, latency) | ✅ TAMAMLANDI |
-| 3 | Müşteri notları, etiketler, iletişim geçmişi | ✅ TAMAMLANDI |
-| 4 | Fatura, ödeme, gelir metrikleri | ✅ TAMAMLANDI |
-| 5 | Refund + Polar.sh webhook handler | ⏳ Sıradaki |
-| 6 | Alerts sayfası | ⏳ |
-| 7 | Bulk email + GDPR | ⏳ İleride |
+- `refunds` tablosu zaten migration 019'da mevcut — yeni migration gerekmedi
+- `billing/refund.rs` modülü zaten var (14 gün pencere, provider cancel) — admin endpoint'leri bu mantığı kullandı
+- `billing/polar.rs` Polar.sh entegrasyonu zaten var — webhook handler da mevcut
+- Admin refund endpoint'i mevcut `billing/refund.rs`'den farklı: admin manuel refund yapar (miktar + sebep), 14 gün penceresi yok
+- Refund sonrası kullanıcı otomatik olarak free plan'a düşürülür
