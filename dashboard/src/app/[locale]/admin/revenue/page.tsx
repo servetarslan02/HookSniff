@@ -194,7 +194,7 @@ export default function AdminRevenuePage() {
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           label={t('mrr')}
-          value={`₺${(revenue?.mrr || 0).toLocaleString()}`}
+          value={`$${(revenue?.mrr || 0).toLocaleString()}`}
           icon={<span className="text-lg" aria-hidden="true">💰</span>}
           color="violet"
           trend={revenue?.mrr_trend != null && revenue.mrr_trend !== 0 ? {
@@ -205,8 +205,14 @@ export default function AdminRevenuePage() {
         />
         <StatCard
           label={t('totalRevenueLabel')}
-          value={`₺${(revenue?.monthly_revenue?.reduce((sum, m) => sum + m.revenue, 0) || 0).toLocaleString()}`}
+          value={`$${(revenue?.monthly_revenue?.reduce((sum, m) => sum + m.revenue, 0) || 0).toLocaleString()}`}
           icon={<span className="text-lg" aria-hidden="true">📈</span>}
+          color="emerald"
+        />
+        <StatCard
+          label={t('collectedRevenue') || 'Collected Revenue'}
+          value={`$${(revenue?.collected_revenue || 0).toLocaleString()}`}
+          icon={<span className="text-lg" aria-hidden="true">🏦</span>}
           color="emerald"
         />
         <StatCard
@@ -298,7 +304,7 @@ export default function AdminRevenuePage() {
                     <YAxis
                       tick={{ fontSize: 11 }}
                       className="text-gray-500 dark:text-slate-400"
-                      tickFormatter={(v) => `₺${v}`}
+                      tickFormatter={(v) => `$${v}`}
                       width={50}
                     />
                     <Tooltip
@@ -309,7 +315,7 @@ export default function AdminRevenuePage() {
                         color: 'white',
                         fontSize: '12px',
                       }}
-                      formatter={(value: number) => [`₺${value.toLocaleString()}`, t("revenue")]}
+                      formatter={(value: number) => [`$${value.toLocaleString()}`, t("revenue")]}
                     />
                     <Bar
                       dataKey="revenue"
@@ -357,7 +363,7 @@ export default function AdminRevenuePage() {
                           color: 'white',
                           fontSize: '12px',
                         }}
-                        formatter={(value: number) => [`₺${value.toLocaleString()}`, t("revenue")]}
+                        formatter={(value: number) => [`$${value.toLocaleString()}`, t("revenue")]}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -376,7 +382,7 @@ export default function AdminRevenuePage() {
                       </div>
                       <div className="text-right">
                         <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                          ₺{entry.value.toLocaleString()}
+                          ${entry.value.toLocaleString()}
                         </span>
                         <span className="text-xs text-gray-500 dark:text-slate-400 ml-1">
                           ({entry.count} {t('users')})
@@ -524,7 +530,7 @@ export default function AdminRevenuePage() {
                         {u.plan}
                       </span>
                     </td>
-                    <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 dark:text-slate-400">₺{u.amount.toLocaleString()}</td>
+                    <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 dark:text-slate-400">${u.amount.toLocaleString()}</td>
                     <td className="px-4 sm:px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
                       {new Date(u.churn_date).toLocaleDateString('tr-TR')}
                     </td>
