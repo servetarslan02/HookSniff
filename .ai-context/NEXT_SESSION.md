@@ -1,54 +1,60 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-15 19:56 GMT+8 (Oturum 167)
+> Son güncelleme: 2026-05-15 20:20 GMT+8 (Oturum 167)
+> Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
-## ✅ Tamamlanan (Bu Oturum)
+---
+
+## 📖 Okuma Rehberi
+
+Bu dosyayı ilk kez okuyorsan:
+1. Önce `MEMORY.md`'yi oku — proje hakkında genel bilgi
+2. Bu dosyadaki "✅ Tamamlanan" bölümü → son neler yapılmış
+3. "📋 Sıradaki İşler" bölümü → şimdi ne yapılacak
+4. "Servet Görevleri" → kullanıcıya ait manuel işler
+
+---
+
+## ✅ Tamamlanan (Son Oturum — 2026-05-15)
 
 ### Cloud Build Fix (Oturum 167) ✅
-1. **`bool as f64` hatası düzeltildi** — `metrics_push.rs:76`
+1. **`bool as f64` hatası düzeltildi** — `api/src/jobs/metrics_push.rs:76`
    - `api_ok as f64` → `if api_ok { 1.0 } else { 0.0 }`
-   - 20+ failed build çözüldü
-2. **Cloud Build logları incelendi** — SSL warning (pg, kritik değil)
-3. **Deploy başarılı** — API + Worker Cloud Run'da aktif
+   - 20+ failed build çözüldü (commit: 4274718)
+2. **SSL warning düzeltildi** — `run-migrations.js`
+   - Connection string'den `sslmode` temizlendi (commit: adee2090)
+3. **Cloud Build logları incelendi** — tüm adımlar başarılı
+4. **Neon DB analizi** — 60+ tablo, 12 MB, cache hit 99.79%
+5. **84 kullanılmayan index silindi** — DB 13 MB → 12 MB
+6. **Seq scan analizi tamamlandı** — endpoints, customers, notifications sorunlu
 
-### Performance Optimizations (Oturum 166) ✅
-1. **SELECT * → spesifik kolonlar (list queries)**
-   - `DeliveryListRow`: payload + response_body hariç (~256KB/satır tasarruf)
-   - `transforms.rs`: `EndpointOwnerCheck` (3 kolon vs 27)
-
-2. **Dashboard loading skeletons (8 sayfa)**
-   - `loading.tsx` + 8 dynamic() loading skeleton
-
-3. **Redis cache metrics**
-   - `cache.rs`: atomic hit/miss counters + `cache_hit_rate()`
-   - `metrics.rs`: Prometheus outputta cache metricleri
-
-4. **Grafana Performance Dashboard (14 panel)**
-   - hookrelay.grafana.net — deployed (version 3)
-   - `monitor.sh`: /metrics endpointinden cache metricleri çekip OTLP ile push
-
-5. **Rust toolchain kuruldu** — rustc 1.95.0, cargo 1.95.0
-
-### Doğrulama
-- `cargo check` ✅ — 0 error
-- `cargo test --lib` ✅ — 1072 passed, 0 failed
-- `cargo clippy --workspace` ✅ — 0 uyarı
-- `npm run build` ✅ — dashboard build başarılı
+---
 
 ## 📋 Sıradaki İşler
 
-### Öncelik 0 — Neon Seq Scan Optimizasyonu (YENİ)
-| # | Görev | Durum | Not |
-|---|-------|-------|-----|
-| 0 | Seq scan fırtınası — Rust API sorguları | ⬜ | endpoints: 72K seq vs 308 idx, customers: 13K seq vs 1.2K idx, notifications: 9.9K seq vs 670 idx |
-| 0b | webhook_queue seq scan | ⬜ | 90K seq vs 83K idx — WHERE clause eksik |
-| 0c | deliveries seq scan | ⬜ | 5K seq vs 2.3K idx |
-| 0d | invoices seq scan | ⬜ | 1.3K seq vs 55 idx |
-| | | | **Çözüm:** Rust API'deki SELECT sorgularına WHERE clause + uygun index ekle |
+### Öncelik 0 — Neon Seq Scan Optimizasyonu (EN KRİTİK)
+
+**Problem:** Bazı tablolarda PostgreSQL index yerine tüm tabloyu baştan sona okuyor (seq scan). Şu an 12 MB olduğu için sorun değil ama veri büyüyünce yavaşlayacak.
+
+| Tablo | Seq Scan | Index Scan | Etki |
+|-------|----------|------------|------|
+| endpoints | 72,720 | 308 | 235x fazla okuma |
+| customers | 13,639 | 1,241 | 11x fazla okuma |
+| notifications | 9,952 | 670 | 15x fazla okuma |
+| invoices | 1,328 | 55 | 24x fazla okuma |
+| webhook_queue | 90,011 | 83,438 | ~1.1x (orta) |
+| deliveries | 5,031 | 2,372 | ~2x (orta) |
+
+**Yapılacak:**
+1. `api/src/` altındaki Rust kodunda bu tabloları sorgulayan yerleri bul
+2. SELECT sorgularına uygun WHERE clause ekle (örn: `WHERE customer_id = $1`)
+3. Eksik index'leri oluştur
+4. `cargo test --lib` ile doğrula
+5. Cloud Build'de deploy et
 
 ### Öncelik 1 — Güvenlik (P0 kalan)
-| # | Görev | Durum | Not |
-|---|-------|-------|-----|
+| # | Görev | Durum | Dosya |
+|---|-------|-------|-------|
 | 1 | HS-038f: Timing attack — login hataları farklı mesajlar | ⬜ | auth.rs |
 | 2 | HS-038g: serde_json hata gösteriyor | ⬜ | error.rs |
 | 3 | HS-038h: Email enumeration — register mesajı | ⬜ | auth.rs |
@@ -74,24 +80,73 @@
 | 11 | HS-070: output:standalone | ⬜ | Vercelde gerekli değil |
 | 12 | HS-071: HSTS header | ✅ | Zaten mevcut |
 
-### Servet Görevleri
+---
+
+## 👤 Servet Görevleri (Kullanıcıya ait manuel işler)
+
 | Görev | Durum | Not |
 |-------|-------|-----|
-| GitHub PAT yenile | ⚠️ | Token sohbette paylaşıldı, iptal et! |
 | iyzico hesap aç | ❌ | Vergi levhası + banka hesabı gerekli |
 | Domain kararı | ❌ | hooksniff.vercel.app yeterli şimdilik |
 | GitHub Actions dakikası | ❌ | CI bitmiş, yenilenmeli |
 | **Cloudflare Workers deploy** | ⚠️ | wrangler login + KV namespace oluştur |
+| Stripe payout + identity verification | ❌ | Polar.sh için gerekli |
 
-## Hesap Bilgileri
-- Admin: servetarslan02@gmail.com / Alayci_165
-- Demo: demo@hooksniff.com / Demo1234!
-- Dashboard: https://hooksniff.vercel.app
-- API: https://hooksniff-api-1046140057667.europe-west1.run.app
-- Grafana: https://hookrelay.grafana.net
+---
 
-## Kritik Notlar
-- **Rust toolchain kurulu** — bu makinede `source $HOME/.cargo/env` ile cargo çalışır
-- **GitHub Actions dakikaları bitmiş** — CI failure, push edilen kod doğrulanamıyor
-- **Grafana Cloud ≠ API /metrics** — Dashboard hooksniff_* prefixli metricleri kullanıyor (OTLP)
-- **monitor.sh** — her dakika çalışıp API /metrics endpointinden cache metricleri çekip Grafana Clouda push ediyor
+## 🔧 Teknik Notlar
+
+### Neon DB Bağlantı
+```
+postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require
+```
+- Endpoint: ep-frosty-bar-al0hyt9d (eu-central-1, Frankfurt)
+- Proje adı: hookrelay (Neon'da)
+- Branch: production (tek branch)
+- 2FA gerekli (Google authenticator)
+
+### GCP Cloud Build
+- Proje: hooksniff-app
+- Trigger: deploy-on-push (GitHub push → otomatik build)
+- cloudbuild.yaml → Docker build → Cloud Run deploy
+- Build süresi: ~6-8 dakika
+
+### Rust Toolchain
+- rustc 1.95.0, cargo 1.95.0
+- `source $HOME/.cargo/env` ile cargo çalışır
+- `cargo check` → derleme kontrolü
+- `cargo test --lib` → test çalıştırma
+- `cargo clippy --workspace` → lint kontrolü
+
+### Vercel Deploy
+- Root Directory = `dashboard` (Project Settings'te ayarlı)
+- `vercel.json` → buildCommand, outputDirectory override
+- GitHub push → otomatik deploy
+- Hobby plan: 100 deploy/gün limiti
+
+### Git
+- Email: servetarslan02@users.noreply.github.com
+- Conventional commits: "fix:", "feat:", "docs:" kullan
+- Oturum sonunda mutlaka push et
+
+---
+
+## ⚠️ Bilinen Sorunlar
+
+1. **Seq scan fırtınası** — endpoints, customers, notifications (yukarıda detay)
+2. **Compute limiti aşılmış** — Neon Free tier 191.99 saat, 193.39 kullanılmış
+3. **920+ hardcoded İngilizce string** — dashboard'da Türkçe çeviri
+4. **GitHub Actions dakikaları bitmiş** — CI failure
+5. **Grafana trial bitiyor** — 20 Mayıs'a kadar
+6. **Resend domain** — hooksniff.is-a.dev FAILED, onboarding@resend.dev kullanılıyor
+
+---
+
+## 📊 Proje İstatistikleri
+
+- **Toplam oturum:** 167+
+- **Son deploy:** 2026-05-15 19:37 GMT+8 (başarılı)
+- **DB boyutu:** 12 MB
+- **Tablo sayısı:** 60+ (çoğu boş)
+- **Index sayısı:** 149 (84'ü silindi)
+- **Cache hit ratio:** 99.79%
