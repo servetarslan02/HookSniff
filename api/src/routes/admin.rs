@@ -3270,6 +3270,9 @@ async fn admin_refund_user(
     let currency = req.currency.unwrap_or(invoice_currency);
     let refund_amount = req.amount_cents.min(invoice_amount); // Can't refund more than invoice
 
+    // DB transaction: refund + invoice update + customer downgrade (atomic)
+    let mut tx = pool.begin().await?;
+
     // Create refund record
     let refund = sqlx::query_as::<_, RefundRow>(
         "INSERT INTO refunds (customer_id, amount_cents, currency, reason, admin_user_id, provider, status) \
@@ -3281,13 +3284,13 @@ async fn admin_refund_user(
     .bind(&currency)
     .bind(req.reason.trim())
     .bind(customer.id)
-    .fetch_one(&pool)
+    .fetch_one(&mut *tx)
     .await?;
 
     // Update invoice status to refunded
     sqlx::query("UPDATE invoices SET status = 'refunded' WHERE id = $1")
         .bind(invoice_id)
-        .execute(&pool)
+        .execute(&mut *tx)
         .await?;
 
     // Downgrade user to free plan
@@ -3300,8 +3303,10 @@ async fn admin_refund_user(
          WHERE id = $1",
     )
     .bind(id)
-    .execute(&pool)
+    .execute(&mut *tx)
     .await?;
+
+    tx.commit().await?;
 
     // Log to communication history
     let _ = log_communication(
