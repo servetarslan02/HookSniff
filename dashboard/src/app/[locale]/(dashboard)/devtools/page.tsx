@@ -4,17 +4,10 @@ import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
 
-const tabSkeleton = (
-  <div className="animate-pulse space-y-4">
-    <div className="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl" />
-    <div className="h-64 bg-gray-200 dark:bg-slate-700 rounded-xl" />
-  </div>
-);
-
-const PlaygroundPage = dynamic(() => import('../playground/page'), { ssr: false, loading: () => tabSkeleton });
-const SignatureVerifierPage = dynamic(() => import('../signature-verifier/page'), { ssr: false, loading: () => tabSkeleton });
-const ApiImporterPage = dynamic(() => import('../api-importer/page'), { ssr: false, loading: () => tabSkeleton });
-const WebhookBuilderPage = dynamic(() => import('../webhook-builder/page'), { ssr: false, loading: () => tabSkeleton });
+const PlaygroundPage = dynamic(() => import('../playground/page'), { ssr: false });
+const SignatureVerifierPage = dynamic(() => import('../signature-verifier/page'), { ssr: false });
+const ApiImporterPage = dynamic(() => import('../api-importer/page'), { ssr: false });
+const WebhookBuilderPage = dynamic(() => import('../webhook-builder/page'), { ssr: false });
 
 export default function DevToolsPage() {
   const t = useTranslations('nav');
