@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminApi } from '@/lib/api';
+import { adminApi, webhooksApi } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import {
   AdminStatsSchema,
@@ -11,9 +11,21 @@ import {
   DeployInfoSchema,
   AdminUsersResponseSchema,
   AdminUserDetailSchema,
+  SystemHealthSchema,
+  QueueStatusSchema,
+  RevenueMetricsSchema,
+  RevenueCohortsResponseSchema,
+  RefundsResponseSchema,
+  PlatformSettingsSchema,
+  AlertRuleSchema,
+  FailedDeliveriesResponseSchema,
+  DeadLettersResponseSchema,
+  RateLimitViolationsResponseSchema,
+  ApiLatencyResponseSchema,
   type AdminStatsValidated,
   type RevenueValidated,
   type DeployInfoValidated,
+  type SystemHealthValidated,
 } from '@/schemas/api';
 import type { AlertRuleAdmin } from '@/lib/api';
 
@@ -209,6 +221,171 @@ export function useDeleteAlert() {
     mutationFn: (id: string) => adminApi.deleteAlert(token!, id),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });
+    },
+  });
+}
+
+// ── Admin Revenue Metrics ──
+export function useAdminRevenueMetrics() {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'revenue-metrics'],
+    queryFn: validated(() => adminApi.getRevenueMetrics(token!), RevenueMetricsSchema),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+}
+
+// ── Admin Revenue Cohorts ──
+export function useAdminRevenueCohorts(months = 12) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'revenue-cohorts', months],
+    queryFn: validated(() => adminApi.getRevenueCohorts(token!, months), RevenueCohortsResponseSchema),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+}
+
+// ── Admin All Refunds ──
+export function useAdminRefunds(params?: { per_page?: number }) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'refunds', params],
+    queryFn: validated(() => adminApi.getAllRefunds(token!, params), RefundsResponseSchema),
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+// ── Admin Churn Users ──
+export function useAdminChurn() {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'churn'],
+    queryFn: async () => {
+      const data = await adminApi.getChurn(token!);
+      return data?.users ?? [];
+    },
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+}
+
+// ── Admin Platform Settings ──
+export function useAdminSettings() {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'settings'],
+    queryFn: validated(() => adminApi.getSettings(token!), PlatformSettingsSchema),
+    enabled: !!token,
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useUpdateSettings() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: Record<string, unknown>) => adminApi.updateSettings(token!, data),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'settings'] });
+    },
+  });
+}
+
+// ── System Health ──
+export function useSystemHealth() {
+  const { token } = useAuth();
+  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
+  return useQuery<SystemHealthValidated>({
+    queryKey: ['admin', 'system-health'],
+    queryFn: async () => {
+      const res = await fetch(`${API}/health`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return SystemHealthSchema.parse(await res.json());
+    },
+    enabled: !!token,
+    refetchInterval: 15_000,
+    staleTime: 10_000,
+  });
+}
+
+// ── Queue Status ──
+export function useQueueStatus() {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'queue-status'],
+    queryFn: validated(() => adminApi.getQueueStatus(token!), QueueStatusSchema),
+    enabled: !!token,
+    staleTime: 15_000,
+  });
+}
+
+// ── Failed Deliveries ──
+export function useFailedDeliveries(params?: { limit?: number; since?: string }) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'failed-deliveries', params],
+    queryFn: validated(() => adminApi.getFailedDeliveries(token!, params), FailedDeliveriesResponseSchema),
+    enabled: !!token,
+    staleTime: 15_000,
+  });
+}
+
+// ── Dead Letters ──
+export function useDeadLetters(params?: { limit?: number }) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'dead-letters', params],
+    queryFn: validated(() => adminApi.getDeadLetters(token!, params), DeadLettersResponseSchema),
+    enabled: !!token,
+    staleTime: 15_000,
+  });
+}
+
+// ── Rate Limit Violations ──
+export function useRateLimitViolations(params?: { limit?: number }) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'rate-limit-violations', params],
+    queryFn: validated(() => adminApi.getRateLimitViolations(token!, params), RateLimitViolationsResponseSchema),
+    enabled: !!token,
+    staleTime: 15_000,
+  });
+}
+
+// ── API Latency ──
+export function useApiLatency(params?: { period?: string }) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'api-latency', params],
+    queryFn: validated(() => adminApi.getApiLatency(token!, params), ApiLatencyResponseSchema),
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+// ── Test Webhook Mutation ──
+export function useTestWebhook() {
+  const { token } = useAuth();
+  return useMutation({
+    mutationFn: (data: { endpoint_url: string; event_type: string; payload: Record<string, unknown> }) =>
+      adminApi.testWebhook(token!, data),
+  });
+}
+
+// ── Batch Replay Mutation ──
+export function useBatchReplay() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: string[]) => webhooksApi.batchReplay(token!, ids),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'failed-deliveries'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'dead-letters'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'queue-status'] });
     },
   });
 }

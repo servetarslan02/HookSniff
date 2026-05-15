@@ -229,3 +229,181 @@ export const WsEventSchema = z.object({
   data: z.record(z.string(), z.unknown()),
 });
 export type WsEvent = z.infer<typeof WsEventSchema>;
+
+// ── System Health Schema ──
+export const SystemHealthSchema = z.object({
+  status: z.string().optional(),
+  database: z.object({ status: z.string(), latency_ms: z.number() }).optional(),
+  redis: z.object({ status: z.string(), latency_ms: z.number() }).optional(),
+  api: z.object({ status: z.string(), uptime_seconds: z.number() }).optional(),
+  queue: z.object({ pending: z.number(), processing: z.number(), failed: z.number() }).optional(),
+  checks: z.object({
+    database: z.object({ status: z.string(), latency_ms: z.number() }).optional(),
+    queue: z.object({ status: z.string(), latency_ms: z.number(), pending_count: z.number().optional() }).optional(),
+    redis: z.object({ status: z.string(), latency_ms: z.number() }).optional(),
+    last_delivery: z.object({ status: z.string(), last_delivered_at: z.string().optional() }).optional(),
+    db_size: z.object({ status: z.string(), size: z.string().optional() }).optional(),
+    recent_errors: z.object({
+      status: z.string(),
+      errors: z.array(z.object({
+        id: z.string(),
+        event: z.string().optional(),
+        error: z.string().optional(),
+        created_at: z.string(),
+      })).optional(),
+    }).optional(),
+    queue_detail: z.object({
+      status: z.string(),
+      pending: z.number().optional(),
+      processing: z.number().optional(),
+      failed_last_hour: z.number().optional(),
+    }).optional(),
+  }).optional(),
+});
+export type SystemHealthValidated = z.infer<typeof SystemHealthSchema>;
+
+// ── Queue Status Schema ──
+export const QueueStatusSchema = z.object({
+  pending: z.number(),
+  processing: z.number(),
+  failed: z.number(),
+  total: z.number(),
+  oldest_pending_at: z.string().nullable().optional(),
+  failed_last_hour: z.number(),
+});
+
+// ── Revenue Metrics Schema ──
+export const RevenueMetricsSchema = z.object({
+  mrr: z.number(),
+  arr: z.number(),
+  arpu: z.number(),
+  ltv: z.number(),
+  nrr: z.number(),
+  expansion_revenue: z.number(),
+  total_customers: z.number(),
+  paying_customers: z.number(),
+  churn_rate: z.number(),
+  avg_months_retained: z.number(),
+});
+
+// ── Cohort Schema ──
+export const CohortSchema = z.object({
+  cohort_month: z.string(),
+  customers_signed_up: z.number(),
+  customers_active: z.number(),
+  total_revenue_cents: z.number(),
+  retention_rate: z.number(),
+});
+
+// ── Revenue Cohorts Response Schema ──
+export const RevenueCohortsResponseSchema = z.object({
+  cohorts: z.array(CohortSchema),
+});
+
+// ── Refund Schema ──
+export const RefundSchema = z.object({
+  id: z.string(),
+  customer_id: z.string(),
+  amount_cents: z.number(),
+  currency: z.string(),
+  reason: z.string().nullable().optional(),
+  status: z.string(),
+  created_at: z.string(),
+});
+
+// ── Refunds Response Schema ──
+export const RefundsResponseSchema = z.object({
+  refunds: z.array(RefundSchema),
+  total: z.number(),
+});
+
+// ── Platform Settings Schema ──
+export const PlatformSettingsSchema = z.object({
+  default_plan: z.string(),
+  max_endpoints_free: z.number(),
+  max_endpoints_pro: z.number(),
+  max_webhooks_free: z.number(),
+  max_webhooks_pro: z.number(),
+  rate_limit_free: z.number(),
+  rate_limit_pro: z.number(),
+  retry_max_attempts: z.number(),
+  retention_days_free: z.number(),
+  retention_days_pro: z.number(),
+  maintenance_mode: z.boolean(),
+  signup_enabled: z.boolean(),
+  plan_price_pro: z.number(),
+  plan_price_business: z.number(),
+  resend_api_key: z.string().nullable().optional(),
+  email_sender: z.string().nullable().optional(),
+  webhook_secret: z.string().nullable().optional(),
+  backup_retention_days: z.number(),
+  global_rate_limit: z.number(),
+  cors_origins: z.string().nullable().optional(),
+});
+
+// ── Alert Rule Schema ──
+export const AlertRuleSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  condition: z.string(),
+  threshold: z.number(),
+  channels: z.array(z.string()),
+  is_active: z.boolean(),
+  created_at: z.string(),
+});
+
+// ── Failed Deliveries Response Schema ──
+export const FailedDeliveriesResponseSchema = z.object({
+  deliveries: z.array(z.object({
+    id: z.string(),
+    customer_email: z.string().nullable().optional(),
+    endpoint_url: z.string().nullable().optional(),
+    event_type: z.string().nullable().optional(),
+    attempt_count: z.number(),
+    response_status: z.number().nullable().optional(),
+    error_message: z.string().nullable().optional(),
+    created_at: z.string(),
+  })),
+  count: z.number(),
+});
+
+// ── Dead Letters Response Schema ──
+export const DeadLettersResponseSchema = z.object({
+  dead_letters: z.array(z.object({
+    id: z.string(),
+    customer_email: z.string().nullable().optional(),
+    endpoint_url: z.string().nullable().optional(),
+    reason: z.string().nullable().optional(),
+    attempts: z.number(),
+    created_at: z.string(),
+  })),
+  count: z.number(),
+});
+
+// ── Rate Limit Violations Response Schema ──
+export const RateLimitViolationsResponseSchema = z.object({
+  violations: z.array(z.object({
+    id: z.string(),
+    customer_email: z.string().nullable().optional(),
+    ip: z.string().nullable().optional(),
+    requests_count: z.number(),
+    limit_per_window: z.number(),
+    window_seconds: z.number(),
+    created_at: z.string(),
+  })),
+  count: z.number(),
+});
+
+// ── API Latency Response Schema ──
+export const ApiLatencyResponseSchema = z.object({
+  endpoints: z.array(z.object({
+    endpoint_id: z.string(),
+    url: z.string(),
+    total_deliveries: z.number(),
+    avg_latency_ms: z.number().nullable().optional(),
+    p95_latency_ms: z.number().nullable().optional(),
+    failed_count: z.number(),
+    error_rate: z.number(),
+  })),
+  period: z.string(),
+});
