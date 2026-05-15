@@ -765,7 +765,7 @@ export const adminApi = {
     apiFetch<{ message: string; deleted_at: string }>(`/admin/users/${userId}/data`, { method: 'DELETE', body: { confirm: true, reason }, token }),
 
   sendBulkEmail: (token: string, data: { subject: string; body: string; plan_filter?: string; status_filter?: string }) =>
-    apiFetch<{ total_sent: number; total_failed: number; skipped_free: number; message: string }>(`/admin/bulk-email`, { method: 'POST', body: data, token }),
+    apiFetch<{ total_sent: number; total_failed: number; message: string }>(`/admin/bulk-email`, { method: 'POST', body: data, token }),
 };
 
 export interface FeatureFlag {
