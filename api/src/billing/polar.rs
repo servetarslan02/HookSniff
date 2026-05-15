@@ -558,6 +558,9 @@ mod tests {
             webhook_secret: "test_webhook_secret".to_string(),
             product_pro: "prod_pro_123".to_string(),
             product_business: "prod_biz_456".to_string(),
+            product_pro_yearly: "prod_pro_yearly_123".to_string(),
+            product_business_yearly: "prod_biz_yearly_456".to_string(),
+            product_startup_yearly: "prod_startup_yearly_789".to_string(),
             base_url: "https://sandbox-api.polar.sh".to_string(),
         }
     }
@@ -567,14 +570,14 @@ mod tests {
     #[test]
     fn product_id_for_plan_pro() {
         let config = test_config();
-        assert_eq!(config.product_id_for_plan(&Plan::Pro), Some("prod_pro_123"));
+        assert_eq!(config.product_id_for_plan(&Plan::Pro, false), Some("prod_pro_123"));
     }
 
     #[test]
     fn product_id_for_plan_business() {
         let config = test_config();
         assert_eq!(
-            config.product_id_for_plan(&Plan::Enterprise),
+            config.product_id_for_plan(&Plan::Enterprise, false),
             Some("prod_biz_456")
         );
     }
@@ -582,13 +585,13 @@ mod tests {
     #[test]
     fn product_id_for_plan_free_returns_none() {
         let config = test_config();
-        assert_eq!(config.product_id_for_plan(&Plan::Developer), None);
+        assert_eq!(config.product_id_for_plan(&Plan::Developer, false), None);
     }
 
     #[test]
     fn product_id_for_plan_enterprise_returns_business_product() {
         let config = test_config();
-        assert_eq!(config.product_id_for_plan(&Plan::Enterprise), Some("prod_biz_456"));
+        assert_eq!(config.product_id_for_plan(&Plan::Enterprise, false), Some("prod_biz_456"));
     }
 
     // ── PolarProvider::determine_plan ──────────────────────────
