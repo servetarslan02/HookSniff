@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-16 03:59 GMT+8 (Oturum 175)
+> Son güncelleme: 2026-05-16 04:05 GMT+8 (Oturum 176)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -221,6 +221,18 @@ postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-
 - **Tablo sayısı:** 60+ (çoğu boş)
 - **Index sayısı:** 149 (84'ü silindi)
 - **Cache hit ratio:** 99.79%
+
+### Oturum 176: Admin Panel Genel Bakış Düzeltmeleri ✅
+1. **Alert listesi** — admin tüm platform alert'lerini görüyor
+2. **Trend göstergesi** — gerçek yüzde hesabı
+3. **Para birimi** — ₺ → $ (backend USD)
+4. **RevenueResponse** — collected_revenue eklendi
+5. **Security Warnings** — dinamik veri
+6. **Feature Flags** — boş durum mesajı
+7. **Deploy Info** — N/A fallback
+8. **formatUptime** — "s" → "sa"
+9. **Auto-refresh** — 30s → 60s
+10. **Commit:** 3e4f1f5d
 
 ### Oturum 175: Dashboard i18n Hardcoded String Temizliği ✅
 1. **5 dashboard component'i çevrildi** — DeliveryTrendChart, RecentDeliveriesTable, SuccessRateDonut, ActivityFeed, TimeRangeSelector
