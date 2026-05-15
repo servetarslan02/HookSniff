@@ -117,7 +117,17 @@ Bu dosyayı ilk kez okuyorsan:
 | 9 | Neon seq scan index migration uygula | ✅ | Oturum 173'te uygulandı |
 | 10 | Cloudflare Workers (Edge deploy) | 🔶 v1 yazıldı | Deploy için Servet: KV namespace oluştur |
 
-### Öncelik 4 — P2 Kalan
+### Öncelik 4 — Yıllık Planlar (Oturum 173)
+| # | Görev | Durum | Not |
+|---|-------|-------|------|
+| 11 | Polar.sh yıllık ürünler | ✅ | 3 ürün oluşturuldu |
+| 12 | API: yearly checkout desteği | ✅ | PolarConfig, create_checkout, BillingService |
+| 13 | Dashboard: aylık/yıllık toggle | ✅ | PlanCards.tsx |
+| 14 | Dashboard: TL fiyat gösterimi | ✅ | Zaten mevcut, yearly ile entegre |
+| 15 | Cloud Run env var'ları ekle | ⬜ | 3 yeni yearly ürün ID'si |
+| 16 | Deploy + test | ⬜ | Cloud Build veya manuel |
+
+### Öncelik 5 — P2 Kalan
 | # | Görev | Durum | Not |
 |---|-------|-------|------|
 | 11 | HS-047: blog/[slug] 1922 satır mega component | ⬜ | Refactoring |

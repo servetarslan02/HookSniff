@@ -396,7 +396,7 @@ async fn upgrade_plan(
     }
 
     let result = billing_svc
-        .checkout(&customer, &new_plan, Some(&provider_name))
+        .checkout(&customer, &new_plan, Some(&provider_name), req.billing_period.as_deref() == Some("annual"))
         .await?;
 
     // Item 259: Validate checkout URL server-side before returning to client

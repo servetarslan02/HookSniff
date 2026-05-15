@@ -865,8 +865,8 @@ export const billingApiExtended = {
   getSubscription: (token?: string) =>
     apiFetch<BillingSubscription>('/billing/subscription', { token }),
 
-  upgrade: (token: string, plan: string) =>
-    apiFetch<{ success: boolean; checkout_url?: string }>('/billing/upgrade', { method: 'POST', body: { plan, provider: 'polar' }, token }),
+  upgrade: (token: string, plan: string, billingPeriod?: string) =>
+    apiFetch<{ success: boolean; checkout_url?: string }>('/billing/upgrade', { method: 'POST', body: { plan, provider: 'polar', billing_period: billingPeriod || 'monthly' }, token }),
 };
 
 // Billing API — delegates to billingApiExtended to avoid duplication (Item 157)
