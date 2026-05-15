@@ -935,6 +935,11 @@ mod tests {
             notify_email: None,
             fcm_server_key: None,
             email_base_url: "https://example.com".into(),
+            qstash_token: None,
+            qstash_url: None,
+            cf_account_id: None,
+            cf_r2_token: None,
+            cf_r2_bucket: None,
         }
     }
 

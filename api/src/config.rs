@@ -427,6 +427,11 @@ mod tests {
             notify_email: None,
             fcm_server_key: None,
             email_base_url: String::new(),
+            qstash_token: None,
+            qstash_url: None,
+            cf_account_id: None,
+            cf_r2_token: None,
+            cf_r2_bucket: None,
         };
         assert!(cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -461,6 +466,11 @@ mod tests {
             notify_email: None,
             fcm_server_key: None,
             email_base_url: String::new(),
+            qstash_token: None,
+            qstash_url: None,
+            cf_account_id: None,
+            cf_r2_token: None,
+            cf_r2_bucket: None,
         };
         assert!(cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -495,6 +505,11 @@ mod tests {
             notify_email: None,
             fcm_server_key: None,
             email_base_url: String::new(),
+            qstash_token: None,
+            qstash_url: None,
+            cf_account_id: None,
+            cf_r2_token: None,
+            cf_r2_bucket: None,
         };
         assert!(!cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -529,6 +544,11 @@ mod tests {
             notify_email: None,
             fcm_server_key: None,
             email_base_url: String::new(),
+            qstash_token: None,
+            qstash_url: None,
+            cf_account_id: None,
+            cf_r2_token: None,
+            cf_r2_bucket: None,
         };
         assert!(!cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -563,6 +583,11 @@ mod tests {
             notify_email: None,
             fcm_server_key: None,
             email_base_url: String::new(),
+            qstash_token: None,
+            qstash_url: None,
+            cf_account_id: None,
+            cf_r2_token: None,
+            cf_r2_bucket: None,
         };
         assert!(!cfg.is_production());
     }
@@ -894,6 +919,11 @@ mod tests {
             notify_email: None,
             fcm_server_key: None,
             email_base_url: "https://test.com".into(),
+            qstash_token: None,
+            qstash_url: None,
+            cf_account_id: None,
+            cf_r2_token: None,
+            cf_r2_bucket: None,
         };
         let cfg2 = cfg.clone();
         assert_eq!(cfg2.port, 3000);
@@ -928,6 +958,11 @@ mod tests {
             notify_email: None,
             fcm_server_key: None,
             email_base_url: "https://test.com".into(),
+            qstash_token: None,
+            qstash_url: None,
+            cf_account_id: None,
+            cf_r2_token: None,
+            cf_r2_bucket: None,
         };
         let dbg = format!("{:?}", cfg);
         assert!(dbg.contains("Config"));

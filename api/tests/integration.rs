@@ -145,7 +145,7 @@ fn test_plan_limits() {
     use hooksniff_api::billing::Plan;
 
     // Free plan limits
-    let free = Plan::Free;
+    let free = Plan::Developer;
     assert_eq!(free.max_webhooks_per_month(), 10_000);
     assert_eq!(free.max_endpoints(), 5);
     assert_eq!(free.max_requests_per_minute(), 100);
@@ -161,7 +161,7 @@ fn test_plan_limits() {
     assert_eq!(pro.monthly_price_cents(), 2900);
 
     // Business plan limits
-    let biz = Plan::Business;
+    let biz = Plan::Enterprise;
     assert_eq!(biz.max_webhooks_per_month(), 500_000);
     assert_eq!(biz.max_endpoints(), 500);
     assert_eq!(biz.max_requests_per_minute(), 10_000);
@@ -173,12 +173,12 @@ fn test_plan_limits() {
 fn test_plan_parse_str() {
     use hooksniff_api::billing::Plan;
 
-    assert_eq!(Plan::parse_str("free"), Plan::Free);
-    assert_eq!(Plan::parse_str("FREE"), Plan::Free);
+    assert_eq!(Plan::parse_str("free"), Plan::Developer);
+    assert_eq!(Plan::parse_str("FREE"), Plan::Developer);
     assert_eq!(Plan::parse_str("pro"), Plan::Pro);
     assert_eq!(Plan::parse_str("PRO"), Plan::Pro);
-    assert_eq!(Plan::parse_str("business"), Plan::Business);
-    assert_eq!(Plan::parse_str("unknown"), Plan::Free); // default to free
+    assert_eq!(Plan::parse_str("business"), Plan::Enterprise);
+    assert_eq!(Plan::parse_str("unknown"), Plan::Developer); // default to free
 }
 
 #[test]
@@ -187,7 +187,7 @@ fn test_usage_calculations() {
 
     let usage = Usage {
         customer_id: "test".to_string(),
-        plan: Plan::Free,
+        plan: Plan::Developer,
         webhooks_today: 5_000,
         api_calls_today: 100,
         endpoints_count: 3,
@@ -207,7 +207,7 @@ fn test_usage_limit_exceeded() {
 
     let usage = Usage {
         customer_id: "test".to_string(),
-        plan: Plan::Free,
+        plan: Plan::Developer,
         webhooks_today: 10_000,
         api_calls_today: 100,
         endpoints_count: 5,
@@ -416,12 +416,8 @@ fn test_api_key_format() {
 fn test_plan_serialization() {
     use hooksniff_api::billing::Plan;
 
-    assert_eq!(serde_json::to_string(&Plan::Free).unwrap(), "\"free\"");
+    assert_eq!(serde_json::to_string(&Plan::Developer).unwrap(), "\"developer\"");
     assert_eq!(serde_json::to_string(&Plan::Pro).unwrap(), "\"pro\"");
-    assert_eq!(
-        serde_json::to_string(&Plan::Business).unwrap(),
-        "\"business\""
-    );
     assert_eq!(
         serde_json::to_string(&Plan::Enterprise).unwrap(),
         "\"enterprise\""
@@ -628,9 +624,9 @@ fn test_notification_preferences_defaults() {
 fn test_rate_limit_plan_limits() {
     use hooksniff_api::billing::Plan;
 
-    let free = Plan::Free;
+    let free = Plan::Developer;
     let pro = Plan::Pro;
-    let business = Plan::Business;
+    let business = Plan::Enterprise;
 
     assert!(free.max_requests_per_minute() < pro.max_requests_per_minute());
     assert!(pro.max_requests_per_minute() < business.max_requests_per_minute());
