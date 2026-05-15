@@ -1,6 +1,6 @@
 # Real-Time Upgrade — Hafıza
 
-> Son güncelleme: 2026-05-16 05:55 GMT+8
+> Son güncelleme: 2026-05-16 06:12 GMT+8
 
 ## Faz Durumları
 
@@ -39,17 +39,46 @@
 - AdminUser: `role` ve `status` zorunlu
 - Git email: servetarslan02@gmail.com
 
-## Faz 1 Tamamlanan İşler (Önceki Oturum)
+## Faz 1 Tamamlanan İşler
 
-- 11/11 sayfa React Query + Zod'a dönüştürüldü
-- 12 yeni Zod şeması, 16 yeni React Query hook'u
+- [x] React Query + Zod kuruldu (providers.tsx, schemas/api.ts)
+- [x] 14 admin hook'u + 16 yeni hook (hooks/useAdminData.ts)
+- [x] 10 dashboard hook'u (hooks/useDashboardData.ts)
+- [x] 11/11 sayfa dönüştürüldü:
+  - [x] admin/page.tsx
+  - [x] admin/activity/page.tsx
+  - [x] admin/users/page.tsx
+  - [x] admin/alerts/page.tsx
+  - [x] admin/revenue/page.tsx
+  - [x] admin/system/page.tsx
+  - [x] admin/settings/page.tsx
+  - [x] DashboardOverview (page.tsx)
+  - [x] endpoints/page.tsx
+  - [x] endpoints/[id]/page.tsx
+  - [x] deliveries/DeliveriesList.tsx
+- [x] 12 yeni Zod şeması eklendi (schemas/api.ts)
+- [x] ESLint exhaustive-deps uyarıları düzeltildi (14 dosya)
+- [x] billing/page.tsx: getInvoices API metodu eklendi
+- [x] playground/page.tsx: useCallback deps düzeltildi
 
-## Faz 2 Tamamlanan İşler (Bu Oturum)
+## Faz 2 Tamamlanan İşler
 
-- `events/publisher.rs`: EventPublisher (XADD + XREVRANGE + local broadcast)
-- AppEvent enum: DeliveryCreated, DeliveryStatusChanged, QueueUpdated, UserCreated, EndpointStatusChanged
-- EventEnvelope: id (UUID v4), seq (AtomicU64), ts (millis), event
-- main.rs: EventPublisher init + Extension layer
-- webhooks.rs: DeliveryCreated event tetikleme (tekli + batch)
-- config.rs: EVENT_PUBLISHER_ENABLED env var
-- Best-effort publish (.ok()), graceful degradation
+- [x] events/publisher.rs: EventPublisher struct (Clone, Send, Sync)
+- [x] AppEvent enum: DeliveryCreated, DeliveryStatusChanged, QueueUpdated, UserCreated, EndpointStatusChanged
+- [x] EventEnvelope: id (UUID v4), seq (AtomicU64), ts (millis), event
+- [x] EventPublisher::new() — Redis ConnectionManager + broadcast channel
+- [x] EventPublisher::publish() — XADD + local broadcast
+- [x] EventPublisher::subscribe() — broadcast receiver
+- [x] EventPublisher::get_recent() — XREVRANGE
+- [x] main.rs: EventPublisher init + Extension layer
+- [x] config.rs: EVENT_PUBLISHER_ENABLED env var
+- [x] webhooks.rs: create_webhook → DeliveryCreated event
+- [x] webhooks.rs: batch_webhooks → DeliveryCreated event (her delivery için)
+- [x] Best-effort publish (.ok()), graceful degradation
+
+## Hata Düzeltmeleri
+
+- [x] billing/page.tsx: billingApiExtended.getInvoices() eksikti → api.ts'ye eklendi
+- [x] playground/page.tsx: useCallback [tc] dependency eksikti → düzeltildi
+- [x] 14 dosyada ESLint exhaustive-deps uyarıları → toplu düzeltme
+- [x] events/mod.rs: AppEvent/EventEnvelope tekrarı kaldırıldı (publisher.rs'de tanımlı)
