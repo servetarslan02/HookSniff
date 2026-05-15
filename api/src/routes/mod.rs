@@ -36,6 +36,7 @@ pub mod teams;
 pub mod templates;
 pub mod transforms;
 pub mod webhooks;
+pub mod ws;
 
 use axum::middleware as axum_middleware;
 use axum::Router;
@@ -92,6 +93,7 @@ pub fn api_router() -> Router {
         .nest("/custom-domains", custom_domains::router())
         .nest("/rate-limits", rate_limits::router())
         .nest("/service-tokens", service_tokens::router())
+        .nest("/ws", ws::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     // Inbound webhooks — uses API key auth (not JWT), so external services can call it
