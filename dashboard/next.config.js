@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
 const createNextIntlPlugin = require('next-intl/plugin');
+const { withSentryConfig } = require('@sentry/nextjs');
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig = {
-  // output: 'standalone' — REMOVED: Vercel handles its own serverless bundling.
-  // outputFileTracingRoot — REMOVED: was causing pages to be missing on Vercel serverless.
   reactStrictMode: true,
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -22,14 +21,9 @@ const nextConfig = {
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-        // CSP is set by middleware (src/middleware.ts) with per-request nonce.
-        // Do NOT duplicate Content-Security-Policy here — it would override the nonce.
       ],
     }];
   },
-  // Redirects removed — they conflict with next-intl locale routing.
-  // Sidebar links already point to consolidated pages (core, monitoring, devtools, etc.)
-  // Old pages (endpoints, deliveries, logs, health, etc.) are still accessible via direct URL.
   async rewrites() {
     return [
       {
@@ -40,7 +34,17 @@ const nextConfig = {
   },
 };
 
-module.exports = withNextIntl(nextConfig);
-// Build cache invalidation — Wed May 14 01:03 AM CST 2026
+// Bundle analyzer — ANALYZE=true npm run build
+const withBundleAnalyzer = process.env.ANALYZE === 'true'
+  ? require('@next/bundle-analyzer')({ enabled: true })
+  : (config) => config;
 
-// deploy trigger Thu May 14 03:05:08 AM CST 2026
+module.exports = withSentryConfig(withBundleAnalyzer(withNextIntl(nextConfig)), {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+  automaticVercelMonitors: true,
+});
