@@ -82,6 +82,26 @@
 - [x] Commit: `3c752933`
 - [x] Push: main → origin ✅
 
+### Aşama 3 — Müşteri İlişkileri (2026-05-16) ✅ TAMAMLANDI
+
+**Backend (admin.rs — +220 satır):**
+- [x] `POST /admin/users/{id}/notes` — Not ekle
+- [x] `GET /admin/users/{id}/notes` — Notları listele
+- [x] `POST /admin/users/{id}/tags` — Etiket ekle (upsert)
+- [x] `DELETE /admin/users/{id}/tags/{tag}` — Etiket kaldır
+- [x] `GET /admin/users/{id}/tags` — Etiketleri listele
+- [x] `GET /admin/users/{id}/communications` — İletişim geçmişi (type filtre + sayfalama)
+- [x] `log_communication()` helper — 4 mevcut aksiyona otomatik log eklendi
+- [x] 7 yeni test
+
+**Frontend (api.ts + users/[id]/page.tsx — +180 satır):**
+- [x] 6 yeni adminApi fonksiyonu
+- [x] Notes & Tags sekmesi (tag CRUD, not listesi + ekleme)
+- [x] Communications sekmesi (type badge, filtre, sayfalama)
+
+**Git:**
+- [ ] Commit + push (sıradaki)
+
 ---
 
 ## 📋 Tüm Aşamalar Özeti
@@ -106,7 +126,7 @@
 | 1 | Refund provider seçimi | Aşama 5'ten önce |
 | 2 | GDPR silme stratejisi | Aşama 7'den önce |
 | 3 | Bulk email kuyruk mu? | Aşama 7'den önce |
-| 4 | Communication log mekanizması | Aşama 3'ten önce |
+| 4 | Communication log mekanizması | ✅ Aşama 3'te çözüldü (log_communication helper) |
 | 5 | Cohort analizi derinliği | Aşama 4'ten önce |
 
 ---
@@ -115,33 +135,47 @@
 
 ```
 api/migrations/019_admin_upgrade.sql       ← ✅ Aşama 0
-api/src/routes/admin.rs                    ← ✅ Aşama 1+2 (+620 satır, 12 endpoint)
-dashboard/src/lib/api.ts                   ← ✅ Aşama 1+2 (+12 fonksiyon)
-dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ Aşama 1 (6 sekme)
+api/src/routes/admin.rs                    ← ✅ Aşama 1+2+3 (+840 satır, 17 endpoint)
+dashboard/src/lib/api.ts                   ← ✅ Aşama 1+2+3 (+18 fonksiyon)
+dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ Aşama 1+3 (8 sekme)
 dashboard/src/app/[locale]/admin/system/page.tsx ← ✅ Aşama 2 (5 monitoring section)
 ```
 
 ---
 
-## 🔄 Sıradaki İşler — AŞAMA 3
+## 🔄 Sıradaki İşler — AŞAMA 4
 
-### Müşteri İlişkileri Yönetimi
+### Fatura, Ödeme, Gelir Metrikleri
 
 **Backend (admin.rs):**
-- [ ] `POST /admin/users/{id}/notes` — Not ekle
-- [ ] `GET /admin/users/{id}/notes` — Notları listele
-- [ ] `POST /admin/users/{id}/tags` — Etiket ekle
-- [ ] `DELETE /admin/users/{id}/tags/{tag}` — Etiket kaldır
-- [ ] `GET /admin/users/{id}/communications` — İletişim geçmişini listele
+- [ ] `GET /admin/users/{id}/invoices` — Fatura listesi
+- [ ] `GET /admin/users/{id}/payments` — Ödeme geçmişi
+- [ ] `GET /admin/revenue/metrics` — ARPU, LTV, NRR, expansion revenue
+- [ ] `GET /admin/revenue/cohorts` — Cohort analizi
 - [ ] Mevcut aksiyonları communication_history tablosuna otomatik logla
 
-**Frontend (users/[id]/page.tsx):**
-- [ ] Notes & Tags sekmesi
-- [ ] Communication sekmesi
-- [ ] Etiket renkleri: VIP=gold, at-risk=red, enterprise=purple
+**Frontend:**
+- [ ] Invoices sekmesi (users/[id])
+- [ ] Revenue metrics sayfası (/admin/revenue)
+- [ ] Cohort analiz tablosu
 
 **Kontrol:**
 - [ ] `cargo test`
 - [ ] `next build`
 - [ ] Checklist + MEMORY.md + NEXT_SESSION.md güncelle
 - [ ] `git commit` + `git push`
+
+---
+
+## 📋 Tüm Aşamalar Özeti
+
+| Aşama | İçerik | Durum |
+|-------|--------|-------|
+| 0 | DB migration (5 tablo) | ✅ TAMAMLANDI |
+| 1 | Kullanıcı kaynakları + test-webhook + replay | ✅ TAMAMLANDI |
+| 2 | Sistem geneli (failed, dead letters, queue, latency) | ✅ TAMAMLANDI |
+| 3 | Müşteri notları, etiketler, iletişim geçmişi | ✅ TAMAMLANDI |
+| 4 | Fatura, ödeme, gelir metrikleri | ⏳ Sıradaki |
+| 5 | Refund + Polar.sh webhook handler | ⏳ |
+| 6 | Alerts sayfası | ⏳ |
+| 7 | Bulk email + GDPR | ⏳ İleride |

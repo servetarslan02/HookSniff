@@ -684,6 +684,31 @@ export const adminApi = {
     if (params?.period) qs.set('period', params.period);
     return apiFetch<{ endpoints: Array<{ endpoint_id: string; url: string; total_deliveries: number; avg_latency_ms: number | null; p95_latency_ms: number | null; failed_count: number; error_rate: number }>; period: string }>(`/admin/api-latency?${qs}`, { token });
   },
+
+  // Aşama 3 — Müşteri İlişkileri (Notes, Tags, Communications)
+  addNote: (token: string, userId: string, content: string) =>
+    apiFetch<{ note: { id: string; customer_id: string; admin_user_id: string; content: string; created_at: string }; message: string }>(`/admin/users/${userId}/notes`, { method: 'POST', body: { content }, token }),
+
+  getNotes: (token: string, userId: string) =>
+    apiFetch<{ notes: Array<{ id: string; customer_id: string; admin_user_id: string; content: string; created_at: string }>; total: number }>(`/admin/users/${userId}/notes`, { token }),
+
+  addTag: (token: string, userId: string, tag: string) =>
+    apiFetch<{ tag: string; added: boolean; message: string }>(`/admin/users/${userId}/tags`, { method: 'POST', body: { tag }, token }),
+
+  removeTag: (token: string, userId: string, tag: string) =>
+    apiFetch<{ tag: string; removed: boolean; message: string }>(`/admin/users/${userId}/tags/${tag}`, { method: 'DELETE', token }),
+
+  getTags: (token: string, userId: string) =>
+    apiFetch<{ tags: Array<{ id: string; customer_id: string; tag: string; admin_user_id: string; created_at: string }>; total: number }>(`/admin/users/${userId}/tags`, { token }),
+
+  getCommunications: (token: string, userId: string, params?: { type?: string; page?: number; per_page?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.type) searchParams.set('type', params.type);
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.per_page) searchParams.set('per_page', params.per_page.toString());
+    const qs = searchParams.toString();
+    return apiFetch<{ communications: Array<{ id: string; customer_id: string; type: string; subject: string | null; details: unknown; admin_user_id: string | null; created_at: string }>; total: number; page: number; per_page: number }>(`/admin/users/${userId}/communications${qs ? `?${qs}` : ''}`, { token });
+  },
 };
 
 export interface FeatureFlag {
