@@ -5,7 +5,7 @@
 
 use std::sync::Arc;
 use tokio::sync::broadcast;
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 
 use crate::events::{EventEnvelope, EventPublisher};
 use super::{WsGateway, WsEvent};
