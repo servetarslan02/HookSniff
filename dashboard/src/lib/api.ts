@@ -971,6 +971,9 @@ export const billingApiExtended = {
 
   upgrade: (token: string, plan: string, billingPeriod?: string) =>
     apiFetch<{ success: boolean; checkout_url?: string }>('/billing/upgrade', { method: 'POST', body: { plan, provider: 'polar', billing_period: billingPeriod || 'monthly' }, token }),
+
+  getInvoices: (token: string) =>
+    apiFetch<Invoice[]>('/billing/invoices', { token }),
 };
 
 // Analytics API
