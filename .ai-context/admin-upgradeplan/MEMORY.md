@@ -10,7 +10,7 @@
 |-------|--------|-------|-------|
 | 0 | DB migration (5 tablo, 11 index) | ✅ TAMAMLANDI | 2026-05-16 |
 | 1 | Kullanıcı kaynakları (7 endpoint, 6 sekme) | ✅ TAMAMLANDI | 2026-05-16 |
-| 2 | Sistem geneli (failed, dead letters, queue, latency) | ⏳ Sıradaki | |
+| 2 | Sistem geneli (failed, dead letters, queue, latency) | ✅ TAMAMLANDI | 2026-05-16 |
 | 3 | Müşteri notları, etiketler, iletişim geçmişi | ⏳ | |
 | 4 | Fatura, ödeme, gelir metrikleri | ⏳ | |
 | 5 | Refund + Polar.sh webhook handler | ⏳ | |
