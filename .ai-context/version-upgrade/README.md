@@ -15,6 +15,7 @@
 | `03-dashboard-major.md` | Next.js 16, Tailwind 4, TS 6, recharts 3, ESLint 10 |
 | `04-altyapi.md` | Docker, Node.js, PostgreSQL güncellemeleri |
 | `05-onerilen-siralama.md` | Adım adım uygulama planı |
+| `06-ek-bulgular.md` | GitHub Actions, CI/CD, SDK runtime'ları, MCP |
 
 ---
 
