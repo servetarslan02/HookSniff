@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
-import { useAuth } from '@/lib/store';
-import { adminApi, type AuditLogEntry } from '@/lib/api';
+import { useAdminAuditLogs } from '@/hooks/useAdminData';
 import { useTranslations } from 'next-intl';
 
 const ACTION_COLORS: Record<string, string> = {
@@ -48,41 +47,22 @@ const KNOWN_ACTIONS = [
   '2FA_DISABLE',
 ];
 
+const perPage = 20;
+
 export default function AdminActivityPage() {
-  const { token } = useAuth();
-  const [entries, setEntries] = useState<AuditLogEntry[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [actionFilter, setActionFilter] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const t = useTranslations('admin');
   const tc = useTranslations('common');
-  const perPage = 20;
 
-  const fetchLogs = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await adminApi.getAuditLogs(token, {
-        limit: perPage,
-        offset: (page - 1) * perPage,
-        action: actionFilter || undefined,
-      });
-      setEntries(data.entries || []);
-      setTotal(data.total || 0);
-    } catch {
-      setError(tc('error'));
-    } finally {
-      setLoading(false);
-    }
-  }, [token, page, actionFilter, tc]);
+  const { data, isLoading, error, refetch } = useAdminAuditLogs({
+    limit: perPage,
+    offset: (page - 1) * perPage,
+    action: actionFilter || undefined,
+  });
 
-  useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
-
+  const entries = data?.entries ?? [];
+  const total = data?.total ?? 0;
   const totalPages = Math.ceil(total / perPage);
 
   const formatAction = (action: string) => {
@@ -140,7 +120,7 @@ export default function AdminActivityPage() {
 
       {/* Activity List */}
       <div className="glass-card overflow-hidden">
-        {loading ? (
+        {isLoading ? (
           <div className="p-12 text-center">
             <div className="relative w-12 h-12 mx-auto mb-4">
               <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-slate-700" />
@@ -151,9 +131,9 @@ export default function AdminActivityPage() {
         ) : error ? (
           <div className="p-6">
             <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
-              <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
+              <span className="text-red-700 dark:text-red-400 text-sm">{tc('error')}</span>
               <button type="button"
-                onClick={fetchLogs}
+                onClick={() => refetch()}
                 className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
               >
                 {tc('retry')}
