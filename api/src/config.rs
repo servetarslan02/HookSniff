@@ -98,6 +98,16 @@ pub struct Config {
     /// Enable the event publisher (Redis Streams + local broadcast).
     /// Default: true. Set EVENT_PUBLISHER_ENABLED=false to disable.
     pub event_publisher_enabled: bool,
+    /// Enable WebSocket endpoint. Default: true.
+    pub ws_enabled: bool,
+    /// Maximum concurrent WebSocket connections. Default: 100.
+    pub ws_max_connections: usize,
+    /// Maximum WebSocket connections per user. Default: 5.
+    pub ws_max_connections_per_user: usize,
+    /// WebSocket heartbeat interval in seconds. Default: 30.
+    pub ws_heartbeat_interval_secs: u64,
+    /// WebSocket graceful shutdown timeout in seconds. Default: 10.
+    pub ws_shutdown_timeout_secs: u64,
 }
 
 /// Custom Debug implementation that masks secret fields.
@@ -166,6 +176,11 @@ impl fmt::Debug for Config {
             )
             .field("email_base_url", &self.email_base_url)
             .field("event_publisher_enabled", &self.event_publisher_enabled)
+            .field("ws_enabled", &self.ws_enabled)
+            .field("ws_max_connections", &self.ws_max_connections)
+            .field("ws_max_connections_per_user", &self.ws_max_connections_per_user)
+            .field("ws_heartbeat_interval_secs", &self.ws_heartbeat_interval_secs)
+            .field("ws_shutdown_timeout_secs", &self.ws_shutdown_timeout_secs)
             .finish()
     }
 }
@@ -313,6 +328,25 @@ impl Config {
             event_publisher_enabled: std::env::var("EVENT_PUBLISHER_ENABLED")
                 .map(|v| v != "false" && v != "0")
                 .unwrap_or(true),
+            ws_enabled: std::env::var("WS_ENABLED")
+                .map(|v| v != "false" && v != "0")
+                .unwrap_or(true),
+            ws_max_connections: std::env::var("WS_MAX_CONNECTIONS")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(100),
+            ws_max_connections_per_user: std::env::var("WS_MAX_CONNECTIONS_PER_USER")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(5),
+            ws_heartbeat_interval_secs: std::env::var("WS_HEARTBEAT_INTERVAL_SECS")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(30),
+            ws_shutdown_timeout_secs: std::env::var("WS_SHUTDOWN_TIMEOUT_SECS")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(10),
         })
     }
 }
@@ -440,6 +474,11 @@ mod tests {
             cf_r2_token: None,
             cf_r2_bucket: None,
             event_publisher_enabled: true,
+            ws_enabled: true,
+            ws_max_connections: 100,
+            ws_max_connections_per_user: 5,
+            ws_heartbeat_interval_secs: 30,
+            ws_shutdown_timeout_secs: 10,
         };
         assert!(cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -480,6 +519,11 @@ mod tests {
             cf_r2_token: None,
             cf_r2_bucket: None,
             event_publisher_enabled: true,
+            ws_enabled: true,
+            ws_max_connections: 100,
+            ws_max_connections_per_user: 5,
+            ws_heartbeat_interval_secs: 30,
+            ws_shutdown_timeout_secs: 10,
         };
         assert!(cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -520,6 +564,11 @@ mod tests {
             cf_r2_token: None,
             cf_r2_bucket: None,
             event_publisher_enabled: true,
+            ws_enabled: true,
+            ws_max_connections: 100,
+            ws_max_connections_per_user: 5,
+            ws_heartbeat_interval_secs: 30,
+            ws_shutdown_timeout_secs: 10,
         };
         assert!(!cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -560,6 +609,11 @@ mod tests {
             cf_r2_token: None,
             cf_r2_bucket: None,
             event_publisher_enabled: true,
+            ws_enabled: true,
+            ws_max_connections: 100,
+            ws_max_connections_per_user: 5,
+            ws_heartbeat_interval_secs: 30,
+            ws_shutdown_timeout_secs: 10,
         };
         assert!(!cfg.is_production());
         std::env::remove_var("APP_ENV");
@@ -600,6 +654,11 @@ mod tests {
             cf_r2_token: None,
             cf_r2_bucket: None,
             event_publisher_enabled: true,
+            ws_enabled: true,
+            ws_max_connections: 100,
+            ws_max_connections_per_user: 5,
+            ws_heartbeat_interval_secs: 30,
+            ws_shutdown_timeout_secs: 10,
         };
         assert!(!cfg.is_production());
     }
@@ -634,6 +693,11 @@ mod tests {
             "FCM_SERVER_KEY",
             "EMAIL_BASE_URL",
             "EVENT_PUBLISHER_ENABLED",
+            "WS_ENABLED",
+            "WS_MAX_CONNECTIONS",
+            "WS_MAX_CONNECTIONS_PER_USER",
+            "WS_HEARTBEAT_INTERVAL_SECS",
+            "WS_SHUTDOWN_TIMEOUT_SECS",
         ];
         for var in &vars {
             std::env::remove_var(var);
@@ -938,6 +1002,11 @@ mod tests {
             cf_r2_token: None,
             cf_r2_bucket: None,
             event_publisher_enabled: true,
+            ws_enabled: true,
+            ws_max_connections: 100,
+            ws_max_connections_per_user: 5,
+            ws_heartbeat_interval_secs: 30,
+            ws_shutdown_timeout_secs: 10,
         };
         let cfg2 = cfg.clone();
         assert_eq!(cfg2.port, 3000);
@@ -978,6 +1047,11 @@ mod tests {
             cf_r2_token: None,
             cf_r2_bucket: None,
             event_publisher_enabled: true,
+            ws_enabled: true,
+            ws_max_connections: 100,
+            ws_max_connections_per_user: 5,
+            ws_heartbeat_interval_secs: 30,
+            ws_shutdown_timeout_secs: 10,
         };
         let dbg = format!("{:?}", cfg);
         assert!(dbg.contains("Config"));
