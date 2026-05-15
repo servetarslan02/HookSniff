@@ -25,6 +25,7 @@ use hooksniff_api::telemetry;
 use hooksniff_api::throttle;
 use hooksniff_api::cache;
 use hooksniff_api::events;
+use hooksniff_api::ws;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -155,6 +156,20 @@ async fn main() -> Result<()> {
         tracing::info!("Event publisher disabled (EVENT_PUBLISHER_ENABLED=false)");
         None
     };
+
+    // Initialize WebSocket gateway
+    let ws_gateway = std::sync::Arc::new(hooksniff_api::ws::WsGateway::new(
+        cfg.jwt_secret.clone(),
+    ));
+
+    // Start EventPublisher → WsGateway bridge
+    if let Some(ref publisher) = event_publisher {
+        let _bridge = hooksniff_api::ws::bridge::EventBridge::start(
+            publisher.clone(),
+            ws_gateway.clone(),
+        );
+        tracing::info!("✅ Event bridge started (EventPublisher → WsGateway)");
+    }
 
     // Initialize QStash client (if QSTASH_TOKEN is set)
     let qstash_client = match hooksniff_api::qstash::QStashClient::from_env() {
@@ -388,6 +403,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(job_queue))
         .layer(axum::Extension(cache_layer))
         .layer(axum::Extension(event_publisher))
+        .layer(axum::Extension(ws_gateway))
         .layer(axum::Extension(qstash_client))
         .layer(axum::Extension(r2_client))
         .layer({
