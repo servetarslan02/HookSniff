@@ -1,6 +1,6 @@
 # Real-Time Upgrade — Sonraki Oturum
 
-> Son güncelleme: 2026-05-16 06:12 GMT+8
+> Son güncelleme: 2026-05-16 06:18 GMT+8
 
 ## Hemen Oku
 
@@ -12,20 +12,25 @@
 
 - ✅ Faz 1: React Query + Zod (11/11 sayfa)
 - ✅ Faz 2: Event System + Redis Streams
+- ✅ Faz 3: WebSocket endpoint + EventBridge
 
-## Sıradaki: Faz 3 — WebSocket Real-Time Bağlantı
+## Sıradaki: Faz 4 — Entegrasyon
 
 ### Hedef
-WebSocket endpoint'i oluştur + EventPublisher'ı WS gateway'e bağla.
+Frontend'de WebSocket hook'u, React Query entegrasyonu, fallback polling.
 
 ### Adımlar
-1. **WS endpoint** — `/v1/ws` WebSocket upgrade
-2. **EventPublisher → WS bridge** — subscribe + get_recent
-3. **Frontend WS hook** — useWebSocket.ts
-4. **Frontend entegrasyon** — React Query cache invalidation
+1. **useWebSocket hook** (`dashboard/src/hooks/useWebSocket.ts`)
+   - WebSocket connection + auto-reconnect
+   - Event dinleme + React Query cache invalidation
+   - Fallback polling (WS bağlantısı yoksa)
+
+2. **Frontend entegrasyon**
+   - Dashboard sayfalarında WS hook kullanımı
+   - Real-time güncelleme: sayfa yenilemeden veri akışı
 
 ### Dikkat Edilecekler
-- Mevcut `ws/` modülünü kullan (WsGateway, handler zaten var)
-- JWT auth zorunlu
-- Max connections: 100
-- Heartbeat: 30 sn
+- WS endpoint: `/v1/ws` (JWT auth gerekli)
+- Auto-reconnect: exponential backoff
+- Fallback: WS başarısızsa mevcut polling'e dön
+- React Query: `queryClient.invalidateQueries()` ile cache temizleme
