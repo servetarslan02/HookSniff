@@ -50,12 +50,16 @@ export function useAdminRevenue() {
 }
 
 // ── Admin Audit Logs ──
-export function useAdminAuditLogs(limit = 5) {
+export function useAdminAuditLogs(params?: {
+  limit?: number;
+  offset?: number;
+  action?: string;
+}) {
   const { token } = useAuth();
   return useQuery({
-    queryKey: ['admin', 'audit-logs', limit],
+    queryKey: ['admin', 'audit-logs', params],
     queryFn: validated(
-      () => adminApi.getAuditLogs(token!, { limit }),
+      () => adminApi.getAuditLogs(token!, params),
       AuditLogResponseSchema
     ),
     enabled: !!token,
@@ -94,6 +98,7 @@ export function useAdminUsers(params?: {
   search?: string;
   plan?: string;
   status?: string;
+  created_after?: string;
 }) {
   const { token } = useAuth();
   return useQuery({

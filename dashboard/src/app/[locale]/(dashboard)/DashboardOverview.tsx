@@ -1,19 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback, type DragEvent } from 'react';
+import { useState, useCallback, type DragEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/store';
-import { useToast } from '@/components/Toast';
 import { DashboardWidget, loadWidgetConfig, saveWidgetConfig, type WidgetConfig } from '@/components/DashboardWidget';
-import {
-  statsApi,
-  analyticsApi,
-  webhooksApi,
-  endpointsApi,
-  type StatsResponse,
-  type DeliveryTrendResponse,
-  type Delivery,
-} from '@/lib/api';
+import { useDashboardStats, useDeliveryTrend, useWebhooks, useEndpoints } from '@/hooks/useDashboardData';
 import {
   LazyAreaChart as AreaChart,
   Area,
@@ -28,47 +18,24 @@ import { ChartCard } from '@/components/tremor/ChartCard';
 import { Link } from '@/i18n/navigation';
 
 export function DashboardOverview() {
-  const { token } = useAuth();
-  const { toast } = useToast();
   const t = useTranslations('dashboard');
   const tc = useTranslations('common');
 
-  const [stats, setStats] = useState<StatsResponse | null>(null);
-  const [trendData, setTrendData] = useState<DeliveryTrendResponse | null>(null);
-  const [recentDeliveries, setRecentDeliveries] = useState<Delivery[]>([]);
-  const [endpointCount, setEndpointCount] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [widgets, setWidgets] = useState<WidgetConfig[]>(loadWidgetConfig);
   const [showWidgetSettings, setShowWidgetSettings] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | '90d'>('7d');
 
-  const loadData = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const [statsRes, trendRes, deliveriesRes, endpointsRes] = await Promise.allSettled([
-        statsApi.get(token),
-        analyticsApi.deliveryTrend(token, timeRange),
-        webhooksApi.list(token, { page: 1 }),
-        endpointsApi.list(token),
-      ]);
+  // React Query — replaces loadData + useState + useEffect
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useDashboardStats();
+  const { data: trendData } = useDeliveryTrend(timeRange);
+  const { data: deliveriesData } = useWebhooks({ page: 1 });
+  const { data: endpoints } = useEndpoints();
 
-      if (statsRes.status === 'fulfilled') setStats(statsRes.value);
-      if (trendRes.status === 'fulfilled') setTrendData(trendRes.value);
-      if (deliveriesRes.status === 'fulfilled') setRecentDeliveries(deliveriesRes.value.deliveries.slice(0, 5));
-      if (endpointsRes.status === 'fulfilled') setEndpointCount(endpointsRes.value.length);
-    } catch {
-      toast(tc('error'), 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [token, timeRange]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const recentDeliveries = deliveriesData?.deliveries?.slice(0, 5) ?? [];
+  const endpointCount = endpoints?.length ?? 0;
+  const loading = statsLoading;
 
   // Widget management
   const handleDragStart = useCallback((id: string) => (e: DragEvent) => {
@@ -154,7 +121,7 @@ export function DashboardOverview() {
             ⚙️
           </button>
           <button
-            onClick={loadData}
+            onClick={() => refetchStats()}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition"
           >
             ↻ {tc('refresh')}
