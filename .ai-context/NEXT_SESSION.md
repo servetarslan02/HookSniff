@@ -1,8 +1,15 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-15 19:10 GMT+8 (Oturum 166)
+> Son güncelleme: 2026-05-15 19:56 GMT+8 (Oturum 167)
 
 ## ✅ Tamamlanan (Bu Oturum)
+
+### Cloud Build Fix (Oturum 167) ✅
+1. **`bool as f64` hatası düzeltildi** — `metrics_push.rs:76`
+   - `api_ok as f64` → `if api_ok { 1.0 } else { 0.0 }`
+   - 20+ failed build çözüldü
+2. **Cloud Build logları incelendi** — SSL warning (pg, kritik değil)
+3. **Deploy başarılı** — API + Worker Cloud Run'da aktif
 
 ### Performance Optimizations (Oturum 166) ✅
 1. **SELECT * → spesifik kolonlar (list queries)**
