@@ -31,7 +31,7 @@ export async function POST() {
     return NextResponse.json({
       success: true,
       token,
-      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://hooksniff.vercel.app'}/api/playground/in/${token}`,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://hooksniff.vercel.app'}/playground-api/in/${token}`,
       expires_in: '24 hours',
     }, { headers: corsHeaders });
   } catch (error) {
