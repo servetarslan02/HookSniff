@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 const planDefaults = [
@@ -108,17 +108,14 @@ export function PlanCards({
   onUpgrade: (planKey: string, billingPeriod: 'monthly' | 'annual') => void;
 }) {
   const t = useTranslations('billing');
-  const locale = useLocale();
-  const isTr = locale === 'tr';
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const isAnnual = billingPeriod === 'annual';
 
   const plans = planDefaults.map(p => ({
     ...p,
-    price: p.key === 'developer' ? 0 : isTr
-      ? (isAnnual ? p.yearlyPriceTry : p.priceTry)
-      : (isAnnual ? p.yearlyPriceUsd : p.priceUsd),
-    monthlyPrice: p.key === 'developer' ? 0 : isTr ? p.priceTry : p.priceUsd,
+    price: p.key === 'developer' ? 0 : isAnnual ? p.yearlyPriceUsd : p.priceUsd,
+    monthlyPrice: p.key === 'developer' ? 0 : p.priceUsd,
+    tlApprox: p.key === 'developer' ? 0 : Math.round((isAnnual ? p.yearlyPriceUsd : p.priceUsd) * 20.5),
     isEnterprise: p.key === 'enterprise',
   }));
 
@@ -181,13 +178,13 @@ export function PlanCards({
                   <span className="text-3xl font-bold text-gray-900 dark:text-white">{t('customPricing', { defaultValue: 'Custom' })}</span>
                 ) : plan.key === 'developer' ? (
                   <>
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{isTr ? '₺0' : '$0'}</span>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">$0</span>
                     <span className="text-gray-500 dark:text-slate-400 text-sm">/month</span>
                   </>
                 ) : (
                   <>
                     <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {isTr ? `₺${plan.price.toLocaleString('tr-TR')}` : `$${plan.price}`}
+                      ${plan.price}
                     </span>
                     <span className="text-gray-500 dark:text-slate-400 text-sm">
                       {isAnnual ? '/month, billed annually' : '/month'}
@@ -195,13 +192,16 @@ export function PlanCards({
                     {isAnnual && (
                       <div className="mt-1">
                         <span className="text-xs text-gray-400 dark:text-slate-500 line-through">
-                          {isTr ? `₺${plan.monthlyPrice.toLocaleString('tr-TR')}` : `$${plan.monthlyPrice}`}
+                          ${plan.monthlyPrice}
                         </span>
                         <span className="ml-1.5 text-xs font-medium text-green-600 dark:text-green-400">
                           {t('savePercent', { defaultValue: 'Save 15%' })}
                         </span>
                       </div>
                     )}
+                    <div className="mt-1 text-xs text-gray-400 dark:text-slate-500">
+                      ~₺{plan.tlApprox.toLocaleString('tr-TR')} {t('approximate', { defaultValue: '(approx.)' })}
+                    </div>
                   </>
                 )}
               </div>
