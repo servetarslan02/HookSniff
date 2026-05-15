@@ -10,11 +10,11 @@ ENVIRONMENT = "production"
 # ── KV Namespaces (for rate limiting & edge caching) ──
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
-id = "placeholder-create-via-wrangler"
+id = "3f97bfb0219e4625a9315fc30086ac96"
 
 [[kv_namespaces]]
 binding = "EDGE_CACHE_KV"
-id = "placeholder-create-via-wrangler"
+id = "f554e503fcbe4d548b8df187456078b3"
 
 # ── Durable Objects (for distributed rate limiting) ──
 # [durable_objects]
