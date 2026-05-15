@@ -7,41 +7,30 @@
     "time": { "from": "now-1h", "to": "now" },
     "panels": [
       {
-        "title": "API Response Time (p50 / p95 / p99)",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "title": "API Health",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
         "targets": [
-          { "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))", "legendFormat": "p50" },
-          { "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))", "legendFormat": "p95" },
-          { "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))", "legendFormat": "p99" }
+          { "expr": "hooksniff_api_healthy", "legendFormat": "Healthy" }
         ],
-        "fieldConfig": { "defaults": { "unit": "s", "custom": { "fillOpacity": 10 } } }
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": { "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "green", "value": 1 }
+            ] },
+            "mappings": [
+              { "type": "value", "options": { "0": { "text": "Down", "color": "red" }, "1": { "text": "Healthy", "color": "green" } } }
+            ]
+          }
+        }
       },
       {
-        "title": "Request Rate by Status",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
-        "targets": [
-          { "expr": "sum(rate(http_requests_total[5m])) by (status)", "legendFormat": "{{status}}" }
-        ],
-        "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } } }
-      },
-      {
-        "title": "Webhook Delivery Latency (p50 / p95)",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-        "targets": [
-          { "expr": "histogram_quantile(0.50, rate(webhook_delivery_duration_seconds_bucket[5m]))", "legendFormat": "p50" },
-          { "expr": "histogram_quantile(0.95, rate(webhook_delivery_duration_seconds_bucket[5m]))", "legendFormat": "p95" }
-        ],
-        "fieldConfig": { "defaults": { "unit": "s", "custom": { "fillOpacity": 10 } } }
-      },
-      {
-        "title": "Webhook Success Rate",
+        "title": "Success Rate (1h)",
         "type": "gauge",
-        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
         "targets": [
-          { "expr": "sum(rate(webhook_deliveries_total{status=\"delivered\"}[1h])) / sum(rate(webhook_deliveries_total[1h])) * 100", "legendFormat": "Success %" }
+          { "expr": "hooksniff_success_rate_1h", "legendFormat": "Success %" }
         ],
         "fieldConfig": {
           "defaults": {
@@ -57,9 +46,9 @@
       {
         "title": "Redis Cache Hit Rate",
         "type": "gauge",
-        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 },
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
         "targets": [
-          { "expr": "cache_hit_rate_percent", "legendFormat": "Hit Rate %" }
+          { "expr": "hooksniff_cache_hit_rate", "legendFormat": "Hit Rate %" }
         ],
         "fieldConfig": {
           "defaults": {
@@ -75,9 +64,9 @@
       {
         "title": "Active Connections",
         "type": "stat",
-        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 12 },
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
         "targets": [
-          { "expr": "active_connections", "legendFormat": "Connections" }
+          { "expr": "hooksniff_active_connections", "legendFormat": "Connections" }
         ],
         "fieldConfig": {
           "defaults": {
@@ -90,84 +79,112 @@
         }
       },
       {
-        "title": "Active Endpoints",
-        "type": "stat",
-        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 12 },
+        "title": "Deliveries (1h vs 24h)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
         "targets": [
-          { "expr": "active_endpoints", "legendFormat": "Endpoints" }
-        ]
+          { "expr": "hooksniff_deliveries_1h", "legendFormat": "Total 1h" },
+          { "expr": "hooksniff_delivered_1h", "legendFormat": "Delivered 1h" },
+          { "expr": "hooksniff_failed_1h", "legendFormat": "Failed 1h" }
+        ],
+        "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20 } } }
       },
       {
-        "title": "DB Query Latency (p50 / p95)",
+        "title": "Queue Status",
         "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
         "targets": [
-          { "expr": "histogram_quantile(0.50, rate(db_query_duration_seconds_bucket[5m]))", "legendFormat": "p50" },
-          { "expr": "histogram_quantile(0.95, rate(db_query_duration_seconds_bucket[5m]))", "legendFormat": "p95" }
+          { "expr": "hooksniff_queue_pending", "legendFormat": "Pending" },
+          { "expr": "hooksniff_queue_processing", "legendFormat": "Processing" },
+          { "expr": "hooksniff_queue_delivered", "legendFormat": "Delivered" }
         ],
-        "fieldConfig": { "defaults": { "unit": "s", "custom": { "fillOpacity": 10 } } }
+        "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20 } } }
       },
       {
-        "title": "Queue Publish Latency (p95)",
+        "title": "DB Latency (ms)",
         "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
         "targets": [
-          { "expr": "histogram_quantile(0.95, rate(queue_publish_latency_seconds_bucket[5m]))", "legendFormat": "p95" }
+          { "expr": "hooksniff_db_latency_ms", "legendFormat": "DB Latency" }
         ],
-        "fieldConfig": { "defaults": { "unit": "s", "custom": { "fillOpacity": 10 } } }
+        "fieldConfig": { "defaults": { "unit": "ms", "custom": { "fillOpacity": 10 } } }
+      },
+      {
+        "title": "Queue Latency (ms)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+        "targets": [
+          { "expr": "hooksniff_queue_latency_ms", "legendFormat": "Queue Latency" }
+        ],
+        "fieldConfig": { "defaults": { "unit": "ms", "custom": { "fillOpacity": 10 } } }
       },
       {
         "title": "Cache Hits vs Misses",
         "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
         "targets": [
-          { "expr": "rate(cache_hits_total[5m])", "legendFormat": "Hits/s" },
-          { "expr": "rate(cache_misses_total[5m])", "legendFormat": "Misses/s" }
+          { "expr": "hooksniff_cache_hits", "legendFormat": "Hits" },
+          { "expr": "hooksniff_cache_misses", "legendFormat": "Misses" }
         ],
         "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20 } } }
       },
       {
-        "title": "Error Rate by Type",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+        "title": "Rate Limited Requests (1h)",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 20 },
         "targets": [
-          { "expr": "sum(rate(error_count[5m])) by (error_type)", "legendFormat": "{{error_type}}" }
-        ],
-        "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20 } } }
-      },
-      {
-        "title": "Request Rate by Method",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
-        "targets": [
-          { "expr": "sum(rate(http_requests_total[5m])) by (method)", "legendFormat": "{{method}}" }
-        ],
-        "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } } }
-      },
-      {
-        "title": "5xx Error Rate",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
-        "targets": [
-          { "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m])) * 100", "legendFormat": "5xx %" }
+          { "expr": "hooksniff_rate_limited_1h", "legendFormat": "Rate Limited" }
         ],
         "fieldConfig": {
           "defaults": {
-            "unit": "percent", "custom": { "fillOpacity": 10 },
             "thresholds": { "steps": [
               { "color": "green", "value": 0 },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 5 }
+              { "color": "yellow", "value": 10 },
+              { "color": "red", "value": 100 }
             ] }
           }
         }
       },
       {
-        "title": "Delivery Count by Status",
-        "type": "piechart",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
+        "title": "Failed Actions (1h)",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 20 },
         "targets": [
-          { "expr": "sum(webhook_deliveries_total) by (status)", "legendFormat": "{{status}}" }
+          { "expr": "hooksniff_failed_actions_1h", "legendFormat": "Failed Actions" }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": { "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 50 }
+            ] }
+          }
+        }
+      },
+      {
+        "title": "Endpoints & Customers",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 12, "x": 0, "y": 24 },
+        "targets": [
+          { "expr": "hooksniff_endpoints_total", "legendFormat": "Total Endpoints" },
+          { "expr": "hooksniff_customers_total", "legendFormat": "Total Customers" }
+        ]
+      },
+      {
+        "title": "New Signups (24h)",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 24 },
+        "targets": [
+          { "expr": "hooksniff_customers_new_24h", "legendFormat": "New Customers" }
+        ]
+      },
+      {
+        "title": "Active Users (24h)",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 24 },
+        "targets": [
+          { "expr": "hooksniff_active_users_24h", "legendFormat": "Active Users" }
         ]
       }
     ]
