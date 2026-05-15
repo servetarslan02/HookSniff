@@ -37,6 +37,15 @@
 
 ## 📋 Sıradaki İşler
 
+### Öncelik 0 — Neon Seq Scan Optimizasyonu (YENİ)
+| # | Görev | Durum | Not |
+|---|-------|-------|-----|
+| 0 | Seq scan fırtınası — Rust API sorguları | ⬜ | endpoints: 72K seq vs 308 idx, customers: 13K seq vs 1.2K idx, notifications: 9.9K seq vs 670 idx |
+| 0b | webhook_queue seq scan | ⬜ | 90K seq vs 83K idx — WHERE clause eksik |
+| 0c | deliveries seq scan | ⬜ | 5K seq vs 2.3K idx |
+| 0d | invoices seq scan | ⬜ | 1.3K seq vs 55 idx |
+| | | | **Çözüm:** Rust API'deki SELECT sorgularına WHERE clause + uygun index ekle |
+
 ### Öncelik 1 — Güvenlik (P0 kalan)
 | # | Görev | Durum | Not |
 |---|-------|-------|-----|
