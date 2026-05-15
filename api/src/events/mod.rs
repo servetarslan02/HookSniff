@@ -2,11 +2,16 @@
 //!
 //! Provides CloudEvents v1.0 support and an event type registry
 //! with the naming convention: `com.hooksniff.<category>.<action>`
+//!
+//! Also provides the `EventPublisher` for real-time event distribution
+//! via Redis Streams and local broadcast (WebSocket push).
 
 pub mod cloudevents;
 pub mod overage;
+pub mod publisher;
 
 pub use cloudevents::CloudEvent;
+pub use publisher::{AppEvent, EventEnvelope, EventPublisher};
 
 /// Event type registry with naming convention: `com.hooksniff.<category>.<action>`
 ///
