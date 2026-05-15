@@ -27,7 +27,7 @@
 ## Genel Bakış
 
 ```
-FAZ 1: React Query          [⬜] → Cache + refetch + optimistic (2-3 saat)
+FAZ 1: React Query          [🔄] → Cache + refetch + optimistic (2-3 saat)
 FAZ 2: Event System         [⬜] → Rust'ta event üretimi + Redis Pub/Sub (3-4 saat)
 FAZ 3: WebSocket            [⬜] → WS endpoint + connection manager (3-4 saat)
 FAZ 4: Entegrasyon          [⬜] → Frontend WS hook + React Query invalidate (2-3 saat)
