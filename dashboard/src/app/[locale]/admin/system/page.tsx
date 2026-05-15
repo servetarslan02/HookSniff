@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
-import { adminApi } from '@/lib/api';
+import { adminApi, webhooksApi } from '@/lib/api';
 import { useTranslations } from 'next-intl';
+import { useToast } from '@/components/Toast';
 
 interface SystemHealth {
   status?: string;
@@ -43,6 +44,7 @@ export default function AdminSystemPage() {
   const [errorDetail, setErrorDetail] = useState<string | null>(null); // Item 100
   const [activeAlerts, setActiveAlerts] = useState<number>(0);
   const t = useTranslations('admin');
+  const { toast } = useToast();
   const tc = useTranslations('common');
   const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
 
@@ -58,6 +60,8 @@ export default function AdminSystemPage() {
   const [queueStatus, setQueueStatus] = useState<{ pending: number; processing: number; failed: number; total: number; oldest_pending_at: string | null; failed_last_hour: number } | null>(null);
   const [failedDeliveries, setFailedDeliveries] = useState<Array<{ id: string; customer_email: string | null; endpoint_url: string | null; event_type: string | null; attempt_count: number; response_status: number | null; error_message: string | null; created_at: string }>>([]);
   const [deadLetters, setDeadLetters] = useState<Array<{ id: string; customer_email: string | null; endpoint_url: string | null; reason: string | null; attempts: number; created_at: string }>>([]);
+  const [selectedFailed, setSelectedFailed] = useState<Set<string>>(new Set());
+  const [batchReplaying, setBatchReplaying] = useState(false);
   const [rateLimitViolations, setRateLimitViolations] = useState<Array<{ id: string; customer_email: string | null; ip: string | null; requests_count: number; limit_per_window: number; window_seconds: number; created_at: string }>>([]);
   const [apiLatency, setApiLatency] = useState<Array<{ endpoint_id: string; url: string; total_deliveries: number; avg_latency_ms: number | null; p95_latency_ms: number | null; failed_count: number; error_rate: number }>>([]);
   const [monitoringLoading, setMonitoringLoading] = useState(false);
@@ -145,6 +149,39 @@ export default function AdminSystemPage() {
       setTestError(err instanceof Error ? err.message : 'Test failed');
     } finally {
       setTestLoading(false);
+    }
+  };
+
+  const handleBatchReplay = async () => {
+    if (!token || selectedFailed.size === 0) return;
+    setBatchReplaying(true);
+    try {
+      const ids = Array.from(selectedFailed);
+      await webhooksApi.batchReplay(token, ids);
+      toast(t('batchReplaySuccess') || `${ids.length} deliveries replayed`, 'success');
+      setSelectedFailed(new Set());
+      fetchMonitoring();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : (t('batchReplayFailed') || 'Batch replay failed'), 'error');
+    } finally {
+      setBatchReplaying(false);
+    }
+  };
+
+  const toggleFailedSelect = (id: string) => {
+    setSelectedFailed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedFailed.size === failedDeliveries.length) {
+      setSelectedFailed(new Set());
+    } else {
+      setSelectedFailed(new Set(failedDeliveries.map((d) => d.id)));
     }
   };
 
@@ -486,14 +523,34 @@ export default function AdminSystemPage() {
 
       {/* Failed Deliveries (last 24h) */}
       <div className="glass-card overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
+        <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">❌ {t('failedDeliveries') || 'Failed Deliveries'} (24h)</h2>
+          {failedDeliveries.length > 0 && (
+            <div className="flex items-center gap-2">
+              {selectedFailed.size > 0 && (
+                <button
+                  onClick={handleBatchReplay}
+                  disabled={batchReplaying}
+                  className="px-3 py-1.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition disabled:opacity-60"
+                >
+                  {batchReplaying ? (t('replaying') || 'Replaying...') : `↩ ${t('replaySelected') || 'Replay Selected'} (${selectedFailed.size})`}
+                </button>
+              )}
+              <button
+                onClick={toggleSelectAll}
+                className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+              >
+                {selectedFailed.size === failedDeliveries.length ? (t('deselectAll') || 'Deselect All') : (t('selectAll') || 'Select All')}
+              </button>
+            </div>
+          )}
         </div>
         {failedDeliveries.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50/50 dark:bg-slate-800/50">
+                  <th scope="col" className="px-4 py-3 text-left"><input type="checkbox" checked={selectedFailed.size === failedDeliveries.length && failedDeliveries.length > 0} onChange={toggleSelectAll} className="rounded" /></th>
                   <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">ID</th>
                   <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('user') || 'User'}</th>
                   <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('endpoint') || 'Endpoint'}</th>
@@ -505,7 +562,8 @@ export default function AdminSystemPage() {
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {failedDeliveries.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                  <tr key={d.id} className={`hover:bg-gray-50 dark:hover:bg-slate-800/50 transition ${selectedFailed.has(d.id) ? 'bg-emerald-50/50 dark:bg-emerald-500/5' : ''}`}>
+                    <td className="px-4 py-3"><input type="checkbox" checked={selectedFailed.has(d.id)} onChange={() => toggleFailedSelect(d.id)} className="rounded" /></td>
                     <td className="px-4 py-3 text-xs font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 8)}…</td>
                     <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{d.customer_email || '—'}</td>
                     <td className="px-4 py-3 text-xs font-mono text-gray-600 dark:text-slate-400 max-w-[200px] truncate">{d.endpoint_url || '—'}</td>

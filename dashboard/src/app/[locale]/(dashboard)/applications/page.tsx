@@ -45,6 +45,10 @@ export default function ApplicationsPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editApp, setEditApp] = useState<Application | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editDesc, setEditDesc] = useState('');
+  const [editing, setEditing] = useState(false);
   const [search, setSearch] = useState('');
   const t = useTranslations('applications');
   const tc = useTranslations('common');
@@ -83,6 +87,22 @@ export default function ApplicationsPage() {
       setError((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToCreate'));
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token || !editApp || !editName.trim()) return;
+    setEditing(true);
+    try {
+      const updated = await applicationsApi.update(token, editApp.id, { name: editName.trim(), description: editDesc.trim() || undefined });
+      setApps((prev) => prev.map((a) => a.id === editApp.id ? { ...a, ...updated } : a));
+      setEditApp(null);
+      toast(t('updated') || 'Application updated', 'success');
+    } catch (err: unknown) {
+      toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToUpdate'), 'error');
+    } finally {
+      setEditing(false);
     }
   };
 
@@ -298,20 +318,71 @@ export default function ApplicationsPage() {
                   </span>
                 </div>
 
-                {/* Delete button (small, top-right) */}
-                <button
-                  type="button"
-                  onClick={() => setDeleteId(app.id)}
-                  className="absolute top-4 right-4 p-1 text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 transition"
-                  title={t('delete') || 'Delete'}
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+                {/* Action buttons (small, top-right) */}
+                <div className="absolute top-4 right-4 flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => { setEditApp(app); setEditName(app.name); setEditDesc(app.description || ''); }}
+                    className="p-1 text-gray-300 hover:text-indigo-500 dark:text-gray-600 dark:hover:text-indigo-400 transition"
+                    title={t('edit') || 'Edit'}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeleteId(app.id)}
+                    className="p-1 text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 transition"
+                    title={t('delete') || 'Delete'}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* ── Edit Modal ── */}
+      {editApp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditApp(null)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              ✏️ {t('editApp') || 'Edit Application'}
+            </h3>
+            <form onSubmit={handleEdit} className="space-y-4">
+              <div>
+                <label htmlFor="edit-name" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('nameLabel') || 'Name'}</label>
+                <input
+                  id="edit-name"
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                />
+              </div>
+              <div>
+                <label htmlFor="edit-desc" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('descriptionLabel') || 'Description'}</label>
+                <input
+                  id="edit-desc"
+                  type="text"
+                  value={editDesc}
+                  onChange={(e) => setEditDesc(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                />
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button type="button" onClick={() => setEditApp(null)} className="px-4 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition">{tc('cancel')}</button>
+                <button type="submit" disabled={editing || !editName.trim()} className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition disabled:opacity-60">{editing ? (tc('saving') || 'Saving...') : (tc('save') || 'Save')}</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
