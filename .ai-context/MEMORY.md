@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-15 19:10 GMT+8
+> Son güncelleme: 2026-05-15 19:56 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -109,6 +109,14 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - Resend → Cloud Run'a RESEND_API_KEY eklendi ✅ (revision 00053)
 - METRICS_SECRET: 1d4487405a247de66acd5a8775294334707bb9ac0ea3318c8fbd1508074bd28d (Cloud Run revision 00150, /metrics endpoint auth)
 - db.rs testleri: 16/16 passed ✅
+
+## Cloud Build Fix (2026-05-15 19:37 GMT+8)
+- **Hata:** `api/src/jobs/metrics_push.rs:76` — `bool as f64` cast (Rust E0606)
+- **Fix:** `api_ok as f64` → `if api_ok { 1.0 } else { 0.0 }`
+- **Commit:** 4274718 — push edildi, tüm build'ler yeşil
+- **Etki:** 20+ failed build çözüldü (15:11-18:16 arası retry fırtınası)
+- **SSL Warning:** pg library, migrations step — kritik değil, düzeltilmeli
+- **Deploy:** API + Worker Cloud Run'da aktif
 
 ## Oturum 117 (2026-05-12 01:41 - 02:00 GMT+8) ✅
 - **OpenClaw on üçüncü oturum** — Servet ile Python SDK kalite çalışması
