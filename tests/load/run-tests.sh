@@ -136,6 +136,26 @@ case "${1:-all}" in
         start_receiver
         run_test "api_stress" "${SCRIPT_DIR}/k6_api_stress.js" "API stress test (5min)"
         ;;
+    ws)
+        start_receiver
+        run_test "ws_stress" "${SCRIPT_DIR}/k6_ws_stress.js" "WebSocket stress test (100 connections)" -e "MODE=stress"
+        ;;
+    ws-memory)
+        start_receiver
+        run_test "ws_memory" "${SCRIPT_DIR}/k6_ws_stress.js" "WebSocket memory leak test (10min)" -e "MODE=memory"
+        ;;
+    ws-reconnect)
+        start_receiver
+        run_test "ws_reconnect" "${SCRIPT_DIR}/k6_ws_stress.js" "WebSocket reconnect test" -e "MODE=reconnect"
+        ;;
+    integration)
+        start_receiver
+        run_test "ws_integration" "${SCRIPT_DIR}/../integration/ws_integration_test.js" "WS integration test" || true
+        ;;
+    e2e)
+        start_receiver
+        run_test "e2e" "${SCRIPT_DIR}/../integration/e2e_test.js" "End-to-end test suite" || true
+        ;;
     all)
         start_receiver
         run_test "smoke" "${SCRIPT_DIR}/smoke_test.js" "Quick health check" || true
@@ -143,10 +163,16 @@ case "${1:-all}" in
         run_test "webhook_flow" "${SCRIPT_DIR}/k6_webhook_flow.js" "End-to-end webhook delivery" || true
         sleep 5
         run_test "api_stress" "${SCRIPT_DIR}/k6_api_stress.js" "API stress test" || true
+        sleep 5
+        run_test "ws_stress" "${SCRIPT_DIR}/k6_ws_stress.js" "WebSocket stress test" -e "MODE=stress" || true
+        sleep 5
+        run_test "ws_integration" "${SCRIPT_DIR}/../integration/ws_integration_test.js" "WS integration test" || true
+        sleep 5
+        run_test "e2e" "${SCRIPT_DIR}/../integration/e2e_test.js" "End-to-end test suite" || true
         generate_report
         ;;
     *)
-        echo "Usage: $0 {smoke|flow|stress|all}"
+        echo "Usage: $0 {smoke|flow|stress|ws|ws-memory|ws-reconnect|integration|e2e|all}"
         echo ""
         echo "Environment:"
         echo "  BASE_URL      API base URL (default: http://localhost:3000)"
