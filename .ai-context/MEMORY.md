@@ -144,6 +144,10 @@ Bazı tablolarda index yerine full table scan yapılıyor:
    - `PlanCards.tsx`: Aylık/Yıllık toggle, -15% badge, TL fiyat gösterimi
    - `page.tsx`: `handleUpgrade(planKey, billingPeriod)` güncellendi
    - `api.ts`: `upgrade()` fonksiyonuna `billing_period` parametresi eklendi
+6. **Cloud Run Deploy** ✅
+   - 3 yeni yearly env var eklendi: POLAR_PRODUCT_STARTUP_YEARLY, POLAR_PRODUCT_PRO_YEARLY, POLAR_PRODUCT_BUSINESS_YEARLY
+   - Revision: hooksniff-api-00340-crb (23:16 GMT+8)
+   - Health: healthy, DB: healthy, Redis: healthy
 
 ### Oturum 172 — 2026-05-15 22:25 GMT+8
 1. **GCP Console Tarayıcı Erişimi** — Google hesabıyla giriş yapıldı (servetarslan02@gmail.com / uku_21700987)
