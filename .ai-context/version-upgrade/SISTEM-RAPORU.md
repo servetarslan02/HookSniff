@@ -153,6 +153,22 @@ Node 20 Nisan 2026'da EOL oluyor.
 | `unsafe` Rust bloku | ✅ 0 tane |
 | Redis auth (Helm) | ⚠️ Kapalı — açılmalı |
 | trivy-action pin | ⚠️ `@master` → versiyon pin gerekli |
+| cargo audit ignore | ⚠️ 8 güvenlik açığı ignore edilmiş |
+
+### Ignore Edilen Güvenlik Açıkları (.cargo/audit.toml)
+
+| ID | Paket | Sorun | Durum |
+|----|-------|-------|-------|
+| RUSTSEC-2026-0099 | rustls-webpki | Name constraints | sqlx transitive |
+| RUSTSEC-2026-0104 | rustls-webpki | CRL parsing panic | sqlx transitive |
+| RUSTSEC-2026-0098 | rustls-webpki | URI name constraints | sqlx transitive |
+| RUSTSEC-2024-0437 | protobuf | Crash | prometheus transitive |
+| RUSTSEC-2024-0363 | sqlx | Binary protocol misinterpretation | sqlx direct |
+| RUSTSEC-2024-0436 | paste | Unmaintained | sqlx transitive |
+| RUSTSEC-2025-0134 | rustls-pemfile | Unmaintained | sqlx transitive |
+| RUSTSEC-2023-0071 | rsa | Marvin Attack | sqlx-mysql transitive |
+
+**Not:** Çoğu sqlx transitive dependency. sqlx güncellendiğinde düzelmesi beklenir.
 
 ---
 
