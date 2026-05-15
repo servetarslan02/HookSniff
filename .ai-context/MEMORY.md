@@ -321,3 +321,27 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 2. **GitHub Actions** — Hala başarısız (billing issue, faturalandırma güncellenmeli)
 3. **GCP Console** — Servet'in Google hesabı ile giriş yapıldı (2FA onayı ile)
 4. **API Sağlığı** — Çalışıyor (healthy, DB 27ms, Redis configured)
+
+### Oturum 175 — 2026-05-16 03:45 GMT+8
+1. **Dashboard i18n — Hardcoded String Temizliği** ✅
+   - 5 dashboard component'indeki hardcoded İngilizce stringler çevrildi:
+     - `DeliveryTrendChart.tsx`: "Loading chart...", "No delivery data yet"
+     - `RecentDeliveriesTable.tsx`: "Event", "Status", "Time", "Action", "View →"
+     - `SuccessRateDonut.tsx`: "Loading...", "success"
+     - `ActivityFeed.tsx`: "No recent activity"
+     - `TimeRangeSelector.tsx`: "24 Hours", "7 Days", "30 Days"
+   - `playground/content.tsx`: 15+ hardcoded string çevrildi (idle state, generating, error, CTA, info boxes)
+   - Webhooks CTA sections: glossary, guides, main page çevrildi
+   - `DashboardOverview.tsx`: 34 gereksiz `defaultValue` parametresi kaldırıldı
+   - 22 dosyadan `defaultValue` temizlendi (account, billing, sso, devtools, endpoints, alerts, vb.)
+2. **Türkçe Çeviri Düzeltmeleri** ✅
+   - "Dashboard" → "Kontrol Paneli" (nav, getStarted, onboarding bölümleri)
+   - "Playground" → "Oyun Alanı" (getStarted, playgroundPublic bölümleri)
+   - `playgroundPublic`: 15 yeni çeviri eklendi (idleTitle, idleDesc, generateUrl, vb.)
+   - `webhooks`: 7 yeni CTA çeviri eklendi (readyTitle, readyDesc, startFree, vb.)
+   - `dashboard`: 10 yeni component çeviri eklendi (noDeliveryData, action, view, vb.)
+3. **Translation Key Durumu** ✅
+   - `en.json`: 2809 key
+   - `tr.json`: 2809 key (tam uyumlu, 0 eksik)
+   - `defaultValue` parametreleri kaldırıldı — artık doğrudan translation key kullanılıyor
+4. **Commit:** b2f9a8d — push edildi
