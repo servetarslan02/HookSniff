@@ -116,7 +116,7 @@ pub async fn system_status(
     components.push(db_status);
 
     // ── Redis (optional — healthy if not configured) ──
-    let redis_url = std::env::var("REDIS_URL").ok();
+    let redis_url = crate::config::resolve_redis_url();
     if let Some(ref url) = redis_url {
         let redis_start = Instant::now();
         let redis_status = match redis::Client::open(url.as_str()) {
@@ -364,12 +364,8 @@ pub async fn health_check(
     checks.insert("queue_detail".to_string(), queue_detail);
 
     // Redis check
-    let redis_status = if let Ok(url) = std::env::var("UPSTASH_REDIS_REST_URL") {
-        if url.is_empty() {
-            json!({ "status": "healthy", "latency_ms": 0, "note": "not configured" })
-        } else {
-            json!({ "status": "healthy", "latency_ms": 0 })
-        }
+    let redis_status = if crate::config::resolve_redis_url().is_some() {
+        json!({ "status": "healthy", "latency_ms": 0, "note": "configured" })
     } else {
         json!({ "status": "healthy", "latency_ms": 0, "note": "not configured" })
     };
