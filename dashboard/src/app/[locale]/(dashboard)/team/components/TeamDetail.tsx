@@ -6,7 +6,7 @@ import type { Team, TeamMember } from '@/lib/api';
 const ROLE_OPTIONS = ['admin', 'editor', 'viewer'] as const;
 
 function roleLabel(t: ReturnType<typeof useTranslations>, role: string): string {
-  const map: Record<string, string> = { admin: t('roleAdmin'), editor: t('roleEditor', { defaultValue: 'Editor' }), viewer: t('roleViewer', { defaultValue: 'Viewer' }) };
+  const map: Record<string, string> = { admin: t('roleAdmin'), editor: t('roleEditor'), viewer: t('roleViewer') };
   return map[role] || role;
 }
 
