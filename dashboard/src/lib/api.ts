@@ -735,6 +735,27 @@ export const adminApi = {
     const qs = months ? `?months=${months}` : '';
     return apiFetch<{ cohorts: Array<{ cohort_month: string; customers_signed_up: number; customers_active: number; total_revenue_cents: number; retention_rate: number }>; months: number }>(`/admin/revenue/cohorts${qs}`, { token });
   },
+
+  // Aşama 5 — Refund + Polar.sh
+  refundUser: (token: string, userId: string, amount_cents: number, reason: string, currency?: string) =>
+    apiFetch<{ refund: { id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; status: string; created_at: string }; message: string }>(`/admin/users/${userId}/refund`, { method: 'POST', body: { amount_cents, reason, ...(currency ? { currency } : {}) }, token }),
+
+  getUserRefunds: (token: string, userId: string, params?: { page?: number; per_page?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.per_page) searchParams.set('per_page', params.per_page.toString());
+    const qs = searchParams.toString();
+    return apiFetch<{ refunds: Array<{ id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; admin_user_id: string | null; provider: string; provider_refund_id: string | null; status: string; created_at: string }>; total: number; page: number; per_page: number }>(`/admin/users/${userId}/refunds${qs ? `?${qs}` : ''}`, { token });
+  },
+
+  getAllRefunds: (token: string, params?: { page?: number; per_page?: number; status?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.per_page) searchParams.set('per_page', params.per_page.toString());
+    if (params?.status) searchParams.set('status', params.status);
+    const qs = searchParams.toString();
+    return apiFetch<{ refunds: Array<{ id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; admin_user_id: string | null; provider: string; provider_refund_id: string | null; status: string; created_at: string }>; total: number; page: number; per_page: number }>(`/admin/refunds${qs ? `?${qs}` : ''}`, { token });
+  },
 };
 
 export interface FeatureFlag {

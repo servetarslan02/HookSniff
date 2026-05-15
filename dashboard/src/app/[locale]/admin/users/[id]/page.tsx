@@ -61,6 +61,12 @@ export default function AdminUserDetailPage() {
   const [invoicesPage, setInvoicesPage] = useState(1);
   const [invoiceFilter, setInvoiceFilter] = useState<string>('');
   const [userPayments, setUserPayments] = useState<Array<{ id: string; amount_cents: number; currency: string; status: string; provider: string; provider_transaction_id: string | null; metadata: unknown; created_at: string }>>([]);
+  // Aşama 5 — Refund
+  const [userRefunds, setUserRefunds] = useState<Array<{ id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; admin_user_id: string | null; provider: string; provider_refund_id: string | null; status: string; created_at: string }>>([]);
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refundAmount, setRefundAmount] = useState('');
+  const [refundReason, setRefundReason] = useState('');
+  const [refundProcessing, setRefundProcessing] = useState(false);
 
 
   // Tab değiştiğinde veri çek
@@ -110,13 +116,15 @@ export default function AdminUserDetailPage() {
           break;
         }
         case 'billing': {
-          const [invData, payData] = await Promise.all([
+          const [invData, payData, refData] = await Promise.all([
             adminApi.getUserInvoices(token, id, { page: invoicesPage, per_page: 50, status: invoiceFilter || undefined }),
             adminApi.getUserPayments(token, id, { per_page: 50 }),
+            adminApi.getUserRefunds(token, id, { per_page: 50 }),
           ]);
           setUserInvoices(invData.invoices || []);
           setInvoicesTotal(invData.total || 0);
           setUserPayments(payData.payments || []);
+          setUserRefunds(refData.refunds || []);
           break;
         }
       }
@@ -228,6 +236,28 @@ export default function AdminUserDetailPage() {
       toast(t('emailSendFailed') || 'Failed to send email', 'error');
     } finally {
       setEmailSending(false);
+    }
+  };
+
+  const handleRefund = async () => {
+    if (!token || !id || !refundAmount || !refundReason.trim()) return;
+    const amountCents = Math.round(parseFloat(refundAmount) * 100);
+    if (isNaN(amountCents) || amountCents <= 0) {
+      toast(t('invalidAmount') || 'Invalid refund amount', 'error');
+      return;
+    }
+    setRefundProcessing(true);
+    try {
+      await adminApi.refundUser(token, id, amountCents, refundReason.trim());
+      toast(t('refundSuccess') || 'Refund processed. User downgraded to Free.', 'success');
+      setShowRefundModal(false);
+      setRefundAmount('');
+      setRefundReason('');
+      fetchTabData('billing');
+    } catch {
+      toast(t('refundFailed') || 'Refund failed', 'error');
+    } finally {
+      setRefundProcessing(false);
     }
   };
 
@@ -974,10 +1004,20 @@ export default function AdminUserDetailPage() {
         </div>
       )}
 
-      {/* ═══ TAB: Billing (Invoices + Payments) ═══ */}
+      {/* ═══ TAB: Billing (Invoices + Payments + Refunds) ═══ */}
       {activeTab === "billing" && (
         <div className="space-y-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💰 {t("billing") || "Billing"}</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💰 {t("billing") || "Billing"}</h2>
+            {detail && detail.user.plan !== 'free' && detail.user.plan !== 'developer' && (
+              <button
+                onClick={() => setShowRefundModal(true)}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+              >
+                💸 {t("processRefund") || "Process Refund"}
+              </button>
+            )}
+          </div>
 
           {/* Invoices */}
           <div className="glass-card p-6">
@@ -1074,6 +1114,101 @@ export default function AdminUserDetailPage() {
             ) : (
               <p className="text-sm text-gray-400 dark:text-slate-500">{t("noPayments") || "No payment transactions yet"}</p>
             )}
+          </div>
+
+          {/* Refund History */}
+          <div className="glass-card p-6">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4">💸 {t("refundHistory") || "Refund History"}</h3>
+            {userRefunds.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-slate-800/50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("amount") || "Amount"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("reason") || "Reason"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("status") || "Status"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("provider") || "Provider"}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("date") || "Date"}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+                    {userRefunds.map((ref) => (
+                      <tr key={ref.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                        <td className="px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400">-{(ref.amount_cents / 100).toFixed(2)} {ref.currency.toUpperCase()}</td>
+                        <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 max-w-xs truncate">{ref.reason || '—'}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                            ref.status === 'completed' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' :
+                            ref.status === 'pending' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
+                            'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                          }`}>{ref.status}</span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{ref.provider}</td>
+                        <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{new Date(ref.created_at).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400 dark:text-slate-500">{t("noRefunds") || "No refunds yet"}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Refund Modal */}
+      {showRefundModal && detail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowRefundModal(false)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              💸 {t('processRefund') || 'Process Refund'}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+              {t('refundFor', { email: detail.user.email }) || `Refund for ${detail.user.email} (${detail.user.plan} plan)`}
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="refund-amount" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('amount') || 'Amount'} (USD)</label>
+                <input
+                  id="refund-amount"
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  value={refundAmount}
+                  onChange={(e) => setRefundAmount(e.target.value)}
+                  placeholder="49.00"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label htmlFor="refund-reason" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('reason') || 'Reason'}</label>
+                <textarea
+                  id="refund-reason"
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  placeholder={t('refundReasonPlaceholder') || 'Customer requested refund...'}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setShowRefundModal(false)}
+                className="px-4 py-2 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                {t('cancel') || 'Cancel'}
+              </button>
+              <button
+                onClick={handleRefund}
+                disabled={refundProcessing || !refundAmount || !refundReason.trim()}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+              >
+                {refundProcessing ? (t('processing') || 'Processing...') : (t('confirmRefund') || 'Confirm Refund')}
+              </button>
+            </div>
           </div>
         </div>
       )}
