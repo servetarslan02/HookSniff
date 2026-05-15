@@ -1,6 +1,6 @@
 # 🧠 Admin Upgrade Plan — Hafıza
 
-> Son güncelleme: 2026-05-16 00:11 GMT+8
+> Son güncelleme: 2026-05-16 00:40 GMT+8
 
 ---
 
@@ -34,6 +34,17 @@
 | 3 | Bulk email kuyruk mu? | Aşama 7'den önce |
 | 4 | Communication log mekanizması | Aşama 3'ten önce |
 | 5 | Cohort analizi derinliği | Aşama 4'ten önce |
+
+---
+
+## Son Yapılan İş
+
+### Vercel Build Fix — 2026-05-16 00:40 GMT+8
+- **Hata:** `Expected '</', got '{'` — users/[id]/page.tsx satır 416
+- **Sebep:** `{activeTab === "overview" && (...)}` bloğunda birden fazla kardeş JSX elementi (grid, plan history, recent deliveries, analytics charts) ama fragment ile sarılmamış
+- **Fix:** `<>...</>` fragment eklendi — sadece 2 satır değişti
+- **Commit:** a907d0c6, push edildi
+- **Ders:** JSX'te `&& (...)` içinde tek root element olmalı, birden fazla kardeş varsa `<>...</>` ile sar
 
 ---
 
