@@ -56,7 +56,7 @@ export default function AdminEmailPage() {
       }, ...prev].slice(0, 10));
       toast(res.message, 'success');
     } catch {
-      toast(t('bulkEmailFailed') || 'Bulk email failed', 'error');
+      toast(t('bulkEmailFailed') || t('bulkEmailFailed'), 'error');
     } finally {
       setSending(false);
     }

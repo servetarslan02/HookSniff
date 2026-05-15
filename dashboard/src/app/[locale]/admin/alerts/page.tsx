@@ -44,7 +44,7 @@ export default function AdminAlertsPage() {
       const data = await adminApi.listAlerts(token);
       setAlerts(Array.isArray(data) ? data : []);
     } catch {
-      toast(t('failedToLoadAlerts') || 'Failed to load alerts', 'error');
+      toast(t('failedToLoadAlerts') || t('failedToLoadAlerts'), 'error');
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ export default function AdminAlertsPage() {
     if (!token || !formName.trim() || !formThreshold) return;
     const threshold = parseInt(formThreshold);
     if (isNaN(threshold) || threshold <= 0) {
-      toast(t('invalidThreshold') || 'Threshold must be a positive number', 'error');
+      toast(t('invalidThreshold') || t('invalidThreshold'), 'error');
       return;
     }
     setSaving(true);
@@ -96,7 +96,7 @@ export default function AdminAlertsPage() {
           threshold,
           channels: formChannels,
         });
-        toast(t('alertUpdated') || 'Alert updated', 'success');
+        toast(t('alertUpdated') || t('alertUpdated'), 'success');
       } else {
         await adminApi.createAlert(token, {
           name: formName.trim(),
@@ -104,12 +104,12 @@ export default function AdminAlertsPage() {
           threshold,
           channels: formChannels,
         });
-        toast(t('alertCreated') || 'Alert created', 'success');
+        toast(t('alertCreated') || t('alertCreated'), 'success');
       }
       resetForm();
       fetchAlerts();
     } catch {
-      toast(t('alertSaveFailed') || 'Failed to save alert', 'error');
+      toast(t('alertSaveFailed') || t('alertSaveFailed'), 'error');
     } finally {
       setSaving(false);
     }
@@ -121,7 +121,7 @@ export default function AdminAlertsPage() {
       await adminApi.updateAlert(token, alert.id, { is_active: !alert.is_active });
       setAlerts((prev) => prev.map((a) => a.id === alert.id ? { ...a, is_active: !a.is_active } : a));
     } catch {
-      toast(t('alertToggleFailed') || 'Failed to toggle alert', 'error');
+      toast(t('alertToggleFailed') || t('alertToggleFailed'), 'error');
     }
   };
 
@@ -131,9 +131,9 @@ export default function AdminAlertsPage() {
     try {
       await adminApi.deleteAlert(token, id);
       setAlerts((prev) => prev.filter((a) => a.id !== id));
-      toast(t('alertDeleted') || 'Alert deleted', 'success');
+      toast(t('alertDeleted') || t('alertDeleted'), 'success');
     } catch {
-      toast(t('alertDeleteFailed') || 'Failed to delete alert', 'error');
+      toast(t('alertDeleteFailed') || t('alertDeleteFailed'), 'error');
     } finally {
       setDeleting(null);
     }
