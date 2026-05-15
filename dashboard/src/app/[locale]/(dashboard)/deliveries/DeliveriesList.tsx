@@ -334,7 +334,7 @@ export default function DeliveriesPage() {
       <ConfirmDialog
         open={!!replayTarget}
         title={t('replayTitle')}
-        message={t('replayConfirm', { id: replayTarget?.id.slice(0, 10) })}
+        message={t('replayConfirm', { id: replayTarget!.id.slice(0, 10) })}
         confirmLabel={t('replay')}
         onConfirm={handleReplay}
         onCancel={() => setReplayTarget(null)}
