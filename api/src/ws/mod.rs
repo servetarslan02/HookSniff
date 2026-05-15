@@ -7,6 +7,7 @@
 
 pub mod handler;
 pub mod bridge;
+pub mod metrics;
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
