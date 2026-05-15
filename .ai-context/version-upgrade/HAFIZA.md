@@ -32,7 +32,6 @@
 - SQL injection riski: webhooks.rs:65 team_id doğrudan format! ile SQL'e giriyor
 - 4 dangerouslySetInnerHTML kullanımı (sanitize var ama kontrol gerekli)
 - admin.rs 5130 satır (bölünmeli)
-- Servet ek görevler: iyzico, domain, GCP SA key rotate, GitHub PAT rotate
 
 ## Servet'in Yapması Gereken
 
