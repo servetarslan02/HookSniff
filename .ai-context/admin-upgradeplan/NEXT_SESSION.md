@@ -135,29 +135,28 @@
 
 ```
 api/migrations/019_admin_upgrade.sql       ← ✅ Aşama 0
-api/src/routes/admin.rs                    ← ✅ Aşama 1+2+3 (+840 satır, 17 endpoint)
-dashboard/src/lib/api.ts                   ← ✅ Aşama 1+2+3 (+18 fonksiyon)
-dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ Aşama 1+3 (8 sekme)
+api/src/routes/admin.rs                    ← ✅ Aşama 1+2+3+4 (+1120 satır, 21 endpoint)
+dashboard/src/lib/api.ts                   ← ✅ Aşama 1+2+3+4 (+23 fonksiyon)
+dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ Aşama 1+3+4 (9 sekme)
 dashboard/src/app/[locale]/admin/system/page.tsx ← ✅ Aşama 2 (5 monitoring section)
+dashboard/src/app/[locale]/admin/revenue/page.tsx ← ✅ Aşama 4 (metrics + cohort)
 ```
 
 ---
 
-## 🔄 Sıradaki İşler — AŞAMA 4
+## 🔄 Sıradaki İşler — AŞAMA 5
 
-### Fatura, Ödeme, Gelir Metrikleri
+### Refund + Polar.sh Webhook Handler
 
 **Backend (admin.rs):**
-- [ ] `GET /admin/users/{id}/invoices` — Fatura listesi
-- [ ] `GET /admin/users/{id}/payments` — Ödeme geçmişi
-- [ ] `GET /admin/revenue/metrics` — ARPU, LTV, NRR, expansion revenue
-- [ ] `GET /admin/revenue/cohorts` — Cohort analizi
-- [ ] Mevcut aksiyonları communication_history tablosuna otomatik logla
+- [ ] `POST /admin/users/{id}/refund` — İade oluştur (refunds tablosuna yaz + Polar.sh API çağır)
+- [ ] `GET /admin/users/{id}/refunds` — İade geçmişini listele
+- [ ] `POST /v1/billing/webhook/polar` — Polar.sh webhook handler (invoice.created, order.completed)
+- [ ] Otomatik invoice/payment_transactions kaydetme
 
 **Frontend:**
-- [ ] Invoices sekmesi (users/[id])
-- [ ] Revenue metrics sayfası (/admin/revenue)
-- [ ] Cohort analiz tablosu
+- [ ] Refund butonu (users/[id] billing sekmesi)
+- [ ] Refund geçmişi tablosu
 
 **Kontrol:**
 - [ ] `cargo test`
@@ -175,7 +174,7 @@ dashboard/src/app/[locale]/admin/system/page.tsx ← ✅ Aşama 2 (5 monitoring 
 | 1 | Kullanıcı kaynakları + test-webhook + replay | ✅ TAMAMLANDI |
 | 2 | Sistem geneli (failed, dead letters, queue, latency) | ✅ TAMAMLANDI |
 | 3 | Müşteri notları, etiketler, iletişim geçmişi | ✅ TAMAMLANDI |
-| 4 | Fatura, ödeme, gelir metrikleri | ⏳ Sıradaki |
-| 5 | Refund + Polar.sh webhook handler | ⏳ |
+| 4 | Fatura, ödeme, gelir metrikleri | ✅ TAMAMLANDI |
+| 5 | Refund + Polar.sh webhook handler | ⏳ Sıradaki |
 | 6 | Alerts sayfası | ⏳ |
 | 7 | Bulk email + GDPR | ⏳ İleride |
