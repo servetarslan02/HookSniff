@@ -325,7 +325,18 @@
     "created": "Created",
     "closeDetails": "Close details",
     "status": "Status",
-    "noResults": "No results matching \"{search}\" on this page"
+    "noResults": "No results matching \"{search}\" on this page",
+    "filterAll": "All",
+    "filterDelivered": "Delivered",
+    "filterFailed": "Failed",
+    "filterPending": "Pending",
+    "retryBtn": "Retry",
+    "selectedCount": "{count} selected",
+    "batchReplaying": "Replaying...",
+    "batchReplay": "🔄 Batch Replay ({count})",
+    "clearSelection": "✕ Clear",
+    "viewDetails": "View Details",
+    "replayConfirm": "Replay delivery {id}… to the same endpoint?"
   },
   "logs": {
     "title": "Webhook Logs",
