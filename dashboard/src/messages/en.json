@@ -118,7 +118,9 @@
     "pagination": "Pagination",
     "invalidCheckoutUrl": "Invalid checkout URL",
     "tokenGenFailed": "Failed to generate token",
-    "networkErrorCheck": "Network error — check your connection"
+    "networkErrorCheck": "Network error — check your connection",
+    "placeholderSearch": "Search...",
+    "placeholderEmail": "you@example.com"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -338,7 +340,8 @@
     "batchReplay": "🔄 Batch Replay ({count})",
     "clearSelection": "✕ Clear",
     "viewDetails": "View Details",
-    "replayConfirm": "Replay delivery {id}… to the same endpoint?"
+    "replayConfirm": "Replay delivery {id}… to the same endpoint?",
+    "selectAll": "Select all"
   },
   "logs": {
     "title": "Webhook Logs",
@@ -425,7 +428,8 @@
     "testFailed": "Test failed — check endpoint URL and try again",
     "conditionFailureRate": "Failure Rate >",
     "conditionLatency": "Avg Latency >",
-    "conditionConsecutive": "Consecutive Failures >"
+    "conditionConsecutive": "Consecutive Failures >",
+    "alertUpdated": "Alert updated"
   },
   "playground": {
     "title": "API Playground",
@@ -1065,7 +1069,16 @@
     "poweredBy": "Powered by HookSniff monitoring • Data refreshes every 30 seconds",
     "affects": "Affects: {components}",
     "resolvedAt": "Resolved {time}",
-    "portUrl": "Portal URL"
+    "portUrl": "Portal URL",
+    "labelOperational": "Operational",
+    "labelDegraded": "Degraded",
+    "labelUnhealthy": "Unhealthy",
+    "labelDown": "Down",
+    "labelInvestigating": "Investigating",
+    "labelIdentified": "Identified",
+    "labelMonitoring": "Monitoring",
+    "labelResolved": "Resolved",
+    "labelUnknown": "Unknown"
   },
   "terms": {
     "title": "Terms of Service",
@@ -3031,7 +3044,32 @@
     "joinThousands": "Join thousands of developers",
     "talkToUs": "Talk to us",
     "builtOn": "Built on trusted infrastructure",
-    "backToList": "← Back to customers"
+    "backToList": "← Back to customers",
+    "metricEngineeringTime": "Engineering time saved",
+    "metricInfraCost": "Infrastructure cost",
+    "metricEventLoss": "Event loss rate",
+    "metricDeliveryLatency": "Delivery latency",
+    "metricPollingEliminated": "Polling eliminated",
+    "metricAgentComm": "Agent communication loss",
+    "metricComputeCost": "Compute cost",
+    "metricScaleCapacity": "Scale capacity",
+    "metricMonthlyCost": "Monthly cost",
+    "metricIntegrationTime": "Integration time",
+    "metricSatisfaction": "Customer satisfaction",
+    "metricEngEffort": "Engineering effort",
+    "metricNoShow": "No-show rate",
+    "metricDataRegion": "Data region",
+    "metricCompliance": "Compliance status",
+    "metricMissedNotif": "Missed notifications",
+    "metricIntegrationReq": "Integration requests",
+    "metricTimeToFirst": "Time to first webhook",
+    "metricSupportTickets": "Support tickets",
+    "metricFraudLatency": "Fraud alert latency",
+    "metricAuditCompliance": "Audit compliance",
+    "metricReconciliation": "Reconciliation errors",
+    "metricTestsPassing": "Tests passing",
+    "metricDeliveryRate": "Delivery rate",
+    "metricLanguages": "Languages supported"
   },
   "providers": {
     "title": "Providers",
@@ -3142,7 +3180,23 @@
     "keyMetrics": "Key metrics",
     "allIndustries": "All industries",
     "startForFree": "Start for free →",
-    "talkToUs": "Talk to us →"
+    "talkToUs": "Talk to us →",
+    "eventsProcessedDay": "Events processed/day",
+    "orderedDelivery": "Ordered delivery (FIFO)",
+    "retryOnFailure": "Retry on failure",
+    "multiEndpoint": "Multi-endpoint",
+    "deliveryGuarantee": "Delivery guarantee",
+    "signature": "Signature",
+    "latencyP99": "Latency (p99)",
+    "cloudevents": "CloudEvents",
+    "eventDriven": "Event-driven",
+    "schemaRegistry": "Schema registry",
+    "embeddablePortal": "Embeddable portal",
+    "openSource": "Open source",
+    "auditTrail": "Audit trail",
+    "avgDeliveryLatency": "Avg delivery latency",
+    "deliverySuccessRate": "Delivery success rate",
+    "freeTierEvents": "Free tier events"
   },
   "whatIsWebhook": {
     "simpleExplanation": "The Simple Explanation",
