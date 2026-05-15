@@ -3526,7 +3526,7 @@ async fn admin_export_user_data(
         "endpoint_id": row.get::<Uuid, _>("endpoint_id"),
         "event_type": row.get::<Option<String>, _>("event_type"),
         "status": row.get::<String, _>("status"),
-        "attempt_count": row.get::<i32>, _>("attempt_count"),
+        "attempt_count": row.get::<i32, _>("attempt_count"),
         "created_at": row.get::<chrono::DateTime<chrono::Utc>, _>("created_at"),
     }))
     .collect();
