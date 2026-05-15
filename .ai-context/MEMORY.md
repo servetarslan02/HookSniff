@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-15 21:26 GMT+8
+> Son güncelleme: 2026-05-15 22:25 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -117,6 +117,41 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 172 — 2026-05-15 22:25 GMT+8
+1. **GCP Console Tarayıcı Erişimi** — Google hesabıyla giriş yapıldı (servetarslan02@gmail.com / uku_21700987)
+2. **Cloud Run Env Var Kontrolü** — 13 env var + 12 secret doğrulandı
+   - `RATE_LIMIT_STORE=redis` ✅ aktif
+   - `REDIS_URL` → upstash-redis-url secret'ına bağlı ✅
+   - `POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET` → polar-token, polar-webhook ✅
+3. **API Health Check** — Tüm bileşenler sağlıklı
+   - Database: 24ms latency ✅
+   - Redis: "configured" ama aslında PING yapmıyor → düzeltildi
+   - Queue: 0 failed, 10 pending ✅
+4. **Polar.sh Ürünleri Doğrulandı** — Ürünler zaten mevcut
+   - HookSniff Pro: $49/mo (ID: `ec5826ad-4a01-4146-b2d0-3b99eaf150a5`)
+   - HookSniff Business: $99/mo (ID: `e5b7d88a-7606-4963-a070-4102ca6405e2`)
+   - ⚠️ Servet: Business yok, Enterprise var (satıcıyla iletişim)
+5. **Polar.sh Webhook Doğrulandı** — URL doğru指向 ediyor
+   - `https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing/webhook/polar`
+6. **GCP Secret Manager Güncellendi**
+   - `polar-pro` → Version 2: `ec5826ad-4a01-4146-b2d0-3b99eaf150a5`
+   - `polar-business` → Version 2: `e5b7d88a-7606-4963-a070-4102ca6405e2`
+7. **QStash Env Var'ları Cloud Run'a Eklendi** — 4 yeni env var
+   - `QSTASH_URL=https://qstash-eu-central-1.upstash.io`
+   - `QSTASH_TOKEN` (Upstash'ten alındı)
+   - `QSTASH_CURRENT_SIGNING_KEY`
+   - `QSTASH_NEXT_SIGNING_KEY`
+   - Deploy: hooksniff-api-00330-9g2 (22:12 GMT+8)
+8. **Upstash Redis Doğrulandı** — Aslında çalışıyor!
+   - 111K komut kullanılmış (60K yazma, 51K okuma)
+   - Port 6379 açık, TLS enabled
+   - "0 istek" yanıltıcı metrikmiş
+9. **Health Check Düzeltmesi** — `/health` endpoint'i artık Redis'e gerçek PING yapıyor
+   - Eski: `"latency_ms": 0, "note": "configured"` (sahte)
+   - Yeni: `"latency_ms": 5, "note": "connected"` (gerçek)
+10. **NEXT-SESSION-PROMPT.md güncellendi** — Google Cloud credentials eklendi
+11. **Polar.sh Hesap Durumu** — Test mode, Go Live gerekli
 
 ### Oturum 171 — 2026-05-15 21:26 GMT+8
 1. **R2 Storage Entegrasyonu** — `api/src/r2.rs` modülü eklendi
