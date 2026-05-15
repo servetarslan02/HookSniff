@@ -23,6 +23,8 @@ export default function AdminRevenuePage() {
   const [revenue, setRevenue] = useState<RevenueResponse | null>(null);
   const [churnUsers, setChurnUsers] = useState<ChurnUser[]>([]);
   const [planPrices, setPlanPrices] = useState<{ pro: number; business: number }>({ pro: 29, business: 99 });
+  const [revenueMetrics, setRevenueMetrics] = useState<{ mrr: number; arr: number; arpu: number; ltv: number; nrr: number; expansion_revenue: number; total_customers: number; paying_customers: number; churn_rate: number; avg_months_retained: number } | null>(null);
+  const [cohorts, setCohorts] = useState<Array<{ cohort_month: string; customers_signed_up: number; customers_active: number; total_revenue_cents: number; retention_rate: number }>>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,16 +39,20 @@ export default function AdminRevenuePage() {
     else setLoading(true);
     setError(null);
     try {
-      const [revenueData, churnData, settings] = await Promise.all([
+      const [revenueData, churnData, settings, metricsData, cohortsData] = await Promise.all([
         adminApi.getRevenue(token),
         adminApi.getChurn(token).catch(() => ({ users: [] })),
         adminApi.getSettings(token).catch(() => null),
+        adminApi.getRevenueMetrics(token).catch(() => null),
+        adminApi.getRevenueCohorts(token, 12).catch(() => null),
       ]);
       setRevenue(revenueData);
       setChurnUsers(churnData.users || []);
       if (settings) {
         setPlanPrices({ pro: settings.plan_price_pro, business: settings.plan_price_business });
       }
+      if (metricsData) setRevenueMetrics(metricsData);
+      if (cohortsData) setCohorts(cohortsData.cohorts || []);
     } catch {
       setError(t("failedToLoadRevenue"));
     } finally {
@@ -214,6 +220,47 @@ export default function AdminRevenuePage() {
         </button>
       </div>
 
+      {/* Aşama 4 — Advanced Metrics */}
+      {revenueMetrics && (
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <StatCard
+            label={t('arpu') || 'ARPU'}
+            value={`$${revenueMetrics.arpu.toFixed(2)}`}
+            icon={<span className="text-lg" aria-hidden="true">👤</span>}
+            color="blue"
+          />
+          <StatCard
+            label={t('ltv') || 'LTV'}
+            value={`$${revenueMetrics.ltv.toFixed(2)}`}
+            icon={<span className="text-lg" aria-hidden="true">🏆</span>}
+            color="amber"
+          />
+          <StatCard
+            label={t('nrr') || 'NRR'}
+            value={`${revenueMetrics.nrr.toFixed(1)}%`}
+            icon={<span className="text-lg" aria-hidden="true">🔄</span>}
+            color={revenueMetrics.nrr >= 100 ? 'emerald' : 'red'}
+          />
+          <StatCard
+            label={t('expansionRevenue') || 'Expansion'}
+            value={`$${revenueMetrics.expansion_revenue.toFixed(2)}`}
+            icon={<span className="text-lg" aria-hidden="true">🚀</span>}
+            color="violet"
+          />
+        </div>
+      )}
+
+      {/* Customer Breakdown */}
+      {revenueMetrics && (
+        <div className="glass-card p-4 flex flex-wrap items-center gap-6 text-sm">
+          <span className="text-gray-500 dark:text-slate-400 font-medium">👥 {t('customers') || 'Customers'}:</span>
+          <span className="text-gray-900 dark:text-white"><strong>{revenueMetrics.total_customers}</strong> {t('total') || 'total'}</span>
+          <span className="text-emerald-600 dark:text-emerald-400"><strong>{revenueMetrics.paying_customers}</strong> {t('paying') || 'paying'}</span>
+          <span className="text-amber-600 dark:text-amber-400">{t('avgRetention') || 'Avg retention'}: <strong>{revenueMetrics.avg_months_retained.toFixed(1)}</strong> {t('months') || 'mo'}</span>
+          <span className="text-red-600 dark:text-red-400">{t('churnRate') || 'Churn'}: <strong>{revenueMetrics.churn_rate.toFixed(1)}%</strong></span>
+        </div>
+      )}
+
       {/* Plan Prices Info */}
       <div className="glass-card p-4 flex flex-wrap items-center gap-4 text-sm">
         <span className="text-gray-500 dark:text-slate-400 font-medium">💰 {t('planPrices') || 'Plan Prices'}:</span>
@@ -347,6 +394,50 @@ export default function AdminRevenuePage() {
           <p className="text-sm text-gray-500 dark:text-slate-400 max-w-md mx-auto">
             {t('revenueDesc')}
           </p>
+        </div>
+      )}
+
+      {/* Cohort Analysis */}
+      {cohorts.length > 0 && (
+        <div className="glass-card overflow-hidden">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📊 {t('cohortAnalysis') || 'Cohort Analysis'}</h2>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('cohortDesc') || 'Monthly customer cohorts — signups, retention, and revenue'}</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50/50 dark:bg-slate-800/50">
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('cohort') || 'Cohort'}</th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('signedUp') || 'Signed Up'}</th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('active') || 'Active'}</th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('retention') || 'Retention'}</th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('revenue') || 'Revenue'}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
+                {cohorts.map((c) => (
+                  <tr key={c.cohort_month} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                    <td className="px-4 sm:px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">{c.cohort_month}</td>
+                    <td className="px-4 sm:px-6 py-3 text-sm text-gray-600 dark:text-slate-400">{c.customers_signed_up}</td>
+                    <td className="px-4 sm:px-6 py-3 text-sm text-gray-600 dark:text-slate-400">{c.customers_active}</td>
+                    <td className="px-4 sm:px-6 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${c.retention_rate >= 70 ? 'bg-emerald-500' : c.retention_rate >= 40 ? 'bg-amber-500' : 'bg-red-500'}`}
+                            style={{ width: `${Math.min(c.retention_rate, 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-600 dark:text-slate-400">{c.retention_rate}%</span>
+                      </div>
+                    </td>
+                    <td className="px-4 sm:px-6 py-3 text-sm text-gray-600 dark:text-slate-400">${(c.total_revenue_cents / 100).toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
