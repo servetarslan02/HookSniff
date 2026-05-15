@@ -27,7 +27,7 @@ Bu dosyayı ilk kez okuyorsan:
 
 ### Oturum 172: GCP/Polar/QStash/Redis Doğrulama ✅
 1. **GCP Console** — Tarayıcıdan giriş yapıldı, tüm env var ve secret'lar doğrulandı
-2. **Polar.sh** — Pro ($49) ve Business ($99) ürünler mevcut, webhook doğru
+2. **Polar.sh** — Pro ($49) ve Enterprise ($99) ürünler mevcut, webhook doğru
 3. **GCP Secret Manager** — `polar-pro` ve `polar-business` ürün ID'leri güncellendi
 4. **QStash** — 4 env var Cloud Run'a eklendi (QSTASH_URL, TOKEN, SIGNING_KEY'ler)
 5. **Cloud Run Deploy** — hooksniff-api-00330-9g2 (22:12 GMT+8)
@@ -95,7 +95,7 @@ Bu dosyayı ilk kez okuyorsan:
 | # | Görev | Durum | Not |
 |---|-------|-------|------|
 | 1 | Polar.sh "Go Live" | ⬜ | Test mode'dan çıkmak için Stripe identity verification gerekli |
-| 2 | Business → Enterprise | ⬜ | Polar'daki $99 ürünü sil veya "Enterprise" olarak yeniden adlandır |
+| 2 | Business → Enterprise | ✅ | Polar'da ürün adı "HookSniff Enterprise" olarak değiştirildi |
 | 3 | Polar.sh Stripe verification | ⬜ | Ödeme almak için gerekli |
 
 ### Öncelik 1 — Güvenlik (P0 kalan)
@@ -146,7 +146,7 @@ Bu dosyayı ilk kez okuyorsan:
 | Görev | Durum | Not |
 |-------|-------|-----|
 | **Polar.sh Go Live** | 🔴 ACİL | Stripe identity verification → ödeme almak için |
-| **Business → Enterprise** | 🔴 ACİL | Polar'daki $99 ürünü sil veya yeniden adlandır |
+| **Business → Enterprise** | ✅ | Polar'da ürün adı değiştirildi (Oturum 173) |
 | iyzico hesap aç | ❌ | Vergi levhası + banka hesabı gerekli |
 | Domain kararı | ❌ | hooksniff.vercel.app yeterli şimdilik |
 | GitHub Actions dakikası | ❌ | CI bitmiş, yenilenmeli |

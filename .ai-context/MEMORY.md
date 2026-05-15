@@ -139,8 +139,8 @@ Bazı tablolarda index yerine full table scan yapılıyor:
    - Queue: 0 failed, 10 pending ✅
 4. **Polar.sh Ürünleri Doğrulandı** — Ürünler zaten mevcut
    - HookSniff Pro: $49/mo (ID: `ec5826ad-4a01-4146-b2d0-3b99eaf150a5`)
-   - HookSniff Business: $99/mo (ID: `e5b7d88a-7606-4963-a070-4102ca6405e2`)
-   - ⚠️ Servet: Business yok, Enterprise var (satıcıyla iletişim)
+   - HookSniff Enterprise: $99/mo (ID: `e5b7d88a-7606-4963-a070-4102ca6405e2`)
+   - ✅ Ürün adı "Business" → "Enterprise" olarak değiştirildi (Oturum 173)
 5. **Polar.sh Webhook Doğrulandı** — URL doğru指向 ediyor
    - `https://hooksniff-api-1046140057667.europe-west1.run.app/v1/billing/webhook/polar`
 6. **GCP Secret Manager Güncellendi**
@@ -182,7 +182,7 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 ### ⚠️ Servet'in Yapması Gereken
 - **Polar.sh Go Live** — Test mode'dan çık, Stripe verification yap
 - **Dashboard i18n** — 920+ string Türkçe'ye çevrilecek
-- **Business → Enterprise** — Polar'daki $99 Business ürününü sil/Enterprise yap
+- **Business → Enterprise** — ✅ Polar'da ürün adı değiştirildi (Oturum 173)
 
 ### 📂 Aktif Servisler (2026-05-15)
 | Servis | Durum | Env Var |
