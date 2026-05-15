@@ -140,6 +140,18 @@ async fn main() -> Result<()> {
         }
     };
 
+    // Initialize QStash client (if QSTASH_TOKEN is set)
+    let qstash_client = match crate::qstash::QStashClient::from_env() {
+        Some(client) => {
+            tracing::info!("✅ QStash client initialized (reliable message delivery)");
+            Some(client)
+        }
+        None => {
+            tracing::info!("QSTASH_TOKEN not set, QStash disabled");
+            None
+        }
+    };
+
     // Initialize email provider (Resend primary → GCloud fallback → None)
     let email_provider = email::EmailProvider::from_config(&cfg);
 
@@ -347,6 +359,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(email_provider))
         .layer(axum::Extension(job_queue))
         .layer(axum::Extension(cache_layer))
+        .layer(axum::Extension(qstash_client))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg
                 .cors_origins
