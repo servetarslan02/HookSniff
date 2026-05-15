@@ -46,10 +46,7 @@ export default function AdminUserDetailPage() {
   const [userApiKeys, setUserApiKeys] = useState<Array<{ prefix: string; name: string; created_at: string; is_active: boolean }>>([]);
   const [userApps, setUserApps] = useState<Array<{ id: string; name: string; description: string | null; created_at: string; endpoint_count: number }>>([]);
   const [userUsage, setUserUsage] = useState<{ total_deliveries: number; successful: number; failed: number; pending: number; success_rate: number; endpoints_count: number; active_endpoints: number; last_30_days: number; last_7_days: number; top_events: Array<{ event: string | null; count: number }> } | null>(null);
-  const [testWebhookUrl, setTestWebhookUrl] = useState('');
-  const [testWebhookEvent, setTestWebhookEvent] = useState('test.ping');
-  const [testWebhookResult, setTestWebhookResult] = useState<{ status_code: number; response_body: string; duration_ms: number } | null>(null);
-  const [testWebhookLoading, setTestWebhookLoading] = useState(false);
+
 
   // Tab değiştiğinde veri çek
   const fetchTabData = useCallback(async (tab: TabKey) => {
