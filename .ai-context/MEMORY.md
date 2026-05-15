@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-15 03:10 GMT+8
+> Son güncelleme: 2026-05-15 19:10 GMT+8
 
 ## Çalışma Platformu
 - **OpenClaw** — yeni platform, oturumlar 1 saat
@@ -954,3 +954,52 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Build:** cargo test 1072 passed, clippy 0 warnings, dashboard 216 pages ✅
 - **Commits:** `becd6509` (feat), `d65f0ccf` (docs)
 - **GitHub PAT:** Servet sohbette paylaştı, yenilemesi söylendi
+
+## Oturum 166 (2026-05-15 18:31 - 19:10 GMT+8) ✅
+- **OpenClaw** — Servet ile performans optimizasyonları + Grafana
+- **Rust kuruldu** — `rustup` ile (servet onayı ile), rustc 1.95.0
+
+### 1. SELECT * → Spesifik Kolonlar ✅
+- `DeliveryListRow` yeni struct: payload + response_body hariç (256KB/a kadar tasarruf/satır)
+- `webhooks.rs`: list endpointleri `DeliveryListRow` kullanıyor, `LIST_COLUMNS` sabiti
+- `transforms.rs`: ownership check → `EndpointOwnerCheck` (3 kolon vs 27)
+- Tek kayıt fetchleri (replay, detail) hâlâ SELECT * → doğru (tüm field gerekli)
+
+### 2. Dashboard Loading Skeletons ✅
+- `loading.tsx`: Shared skeleton — tab bar + stat cards + table rows
+- 8 sayfa dynamic() loading skeleton eklendi: core, deliveries, account, observability, devtools, content-mgmt, security-section, routing-config
+
+### 3. Redis Cache Metrics ✅
+- `cache.rs`: `CACHE_HITS` / `CACHE_MISSES` atomic counters, `cache_stats()`, `cache_hit_rate()`
+- `metrics.rs`: `cache_hits_total`, `cache_misses_total`, `cache_hit_rate_percent` Prometheus outputta
+- `/metrics` endpointinde cache metricleri expose edildi
+
+### 4. Grafana Dashboard Deploy ✅
+- `grafana-dashboard-hooksniff.json`: 14 panel (hooksniff_* metricleri ile uyumlu)
+- **hookrelay.grafana.net** — version 3 olarak deploy edildi
+- Paneller: API health, success rate, cache hit rate, connections, deliveries, queue status, DB latency, queue latency, cache hits/misses, rate limited, failed actions, endpoints/customers, new signups, active users
+
+### 5. monitor.sh Cache Metrics ✅
+- `/metrics` endpointinden cache_hits, cache_misses, cache_hit_rate çekiliyor
+- OTLP ile Grafana Clouda push ediliyor (hooksniff_cache_hits, hooksniff_cache_misses, hooksniff_cache_hit_rate)
+
+### Doğrulama
+- `cargo check` ✅ — 0 error
+- `cargo test --lib` ✅ — 1072 passed, 0 failed
+- `cargo clippy --workspace` ✅ — 0 uyarı
+- `npm run build` ✅ — dashboard build başarılı
+
+### Commits
+- `59980806` — perf: SELECT * + dashboard loading skeletons
+- `44ea9acb` — fix: suppress dead_code warning
+- `c5884768` — docs: NEXT_SESSION.md
+- `264a804c` — feat: Redis cache metrics + Grafana dashboard
+- `1c266cd3` — docs: NEXT_SESSION.md cache metrics
+- `cf9ee822` — feat: deploy Grafana dashboard + monitor.sh cache metrics
+
+### Dersler
+- **GitHub Actions dakikaları bitmiş** — CI çalışmıyor, push edilen kod doğrulanamıyor
+- **Rust kontrolü zorunlu** — Servetin kuralı: compile/test yapmadan push yok
+- **Grafana Cloud metric isimleri** — API /metrics (Prometheus) ≠ Grafana Cloud (OTLP). Dashboard hooksniff_* prefixli metriclerle eşleşmeli
+- **monitor.sh** — Grafana Clouda metric push mekanizması, API /metrics endpointinden ek metricleri çekip OTLP ile push ediyor
+
