@@ -1,36 +1,22 @@
 # Real-Time Upgrade — Sonraki Oturum
 
-> Son güncelleme: 2026-05-16 06:18 GMT+8
-
-## Hemen Oku
-
-1. `.ai-context/realtime-upgrade/MEMORY.md` → proje hafızası
-2. `.ai-context/realtime-upgrade/PLAN.md` → plan (v3.0)
-3. Bu dosya → sıradaki iş
+> Son güncelleme: 2026-05-16 06:22 GMT+8
 
 ## Tamamlanan Fazlar
 
 - ✅ Faz 1: React Query + Zod (11/11 sayfa)
 - ✅ Faz 2: Event System + Redis Streams
 - ✅ Faz 3: WebSocket endpoint + EventBridge
+- ✅ Faz 4: Frontend entegrasyon (useWebSocket + useRealtime)
 
-## Sıradaki: Faz 4 — Entegrasyon
-
-### Hedef
-Frontend'de WebSocket hook'u, React Query entegrasyonu, fallback polling.
+## Sıradaki: Faz 5 — Optimizasyon
 
 ### Adımlar
-1. **useWebSocket hook** (`dashboard/src/hooks/useWebSocket.ts`)
-   - WebSocket connection + auto-reconnect
-   - Event dinleme + React Query cache invalidation
-   - Fallback polling (WS bağlantısı yoksa)
-
-2. **Frontend entegrasyon**
-   - Dashboard sayfalarında WS hook kullanımı
-   - Real-time güncelleme: sayfa yenilemeden veri akışı
+1. **TanStack Virtual** — büyük listeler için virtual scrolling
+2. **Sentry** — hata takibi
+3. **Route cache** — ISR statik sayfalar
 
 ### Dikkat Edilecekler
-- WS endpoint: `/v1/ws` (JWT auth gerekli)
-- Auto-reconnect: exponential backoff
-- Fallback: WS başarısızsa mevcut polling'e dön
-- React Query: `queryClient.invalidateQueries()` ile cache temizleme
+- `@tanstack/react-virtual` kurulumu gerekli
+- `@sentry/nextjs` kurulumu gerekli
+- npm install komutlarını kullanıcıya söyle (sandbox'ta node_modules yok)
