@@ -10,12 +10,12 @@ steps:
 
   # Build API image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-f', 'Dockerfile.api', '-t', 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest', '.']
+    args: ['build', '--no-cache', '-f', 'Dockerfile.api', '-t', 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest', '.']
     id: 'build-api'
 
   # Build Worker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-f', 'Dockerfile.worker', '-t', 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/worker:latest', '.']
+    args: ['build', '--no-cache', '-f', 'Dockerfile.worker', '-t', 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/worker:latest', '.']
     id: 'build-worker'
 
   # Push both images
