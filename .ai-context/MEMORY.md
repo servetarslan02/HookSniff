@@ -118,6 +118,15 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 
 ## 🔧 Son Yapılan İşler
 
+### Oturum 174 — 2026-05-16 01:20 GMT+8
+1. **Admin Panel Aşama 3 — Müşteri İlişkileri** ✅
+   - Backend: 6 yeni endpoint (notes CRUD, tags CRUD, communications list)
+   - `log_communication()` helper: 4 mevcut aksiyona otomatik iletişim logu eklendi
+   - Frontend: Notes & Tags sekmesi, Communications sekmesi (filtre + sayfalama)
+   - api.ts: 6 yeni adminApi fonksiyonu
+   - 7 yeni test eklendi
+   - Toplam: ~400 yeni satır (backend + frontend)
+
 ### Oturum 173 — 2026-05-15 22:32 GMT+8
 1. **Neon Seq Scan Index Migration Uygulandı** ✅
    - `018_seq_scan_indexes.sql` Neon DB'ye uygulandı (8 CREATE INDEX)
