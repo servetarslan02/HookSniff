@@ -123,8 +123,8 @@ async fn main() -> Result<()> {
     let throttle_manager = throttle::ThrottleManager::new();
 
     // Redis cache layer (for API key validation, endpoint metadata, etc.)
-    let cache_layer = match std::env::var("REDIS_URL") {
-        Ok(url) => match cache::CacheLayer::new(&url, cache::API_KEY_TTL).await {
+    let cache_layer = match config::resolve_redis_url() {
+        Some(url) => match cache::CacheLayer::new(&url, cache::API_KEY_TTL).await {
             Ok(c) => {
                 tracing::info!("✅ Redis cache layer connected");
                 Some(c)
@@ -134,8 +134,8 @@ async fn main() -> Result<()> {
                 None
             }
         },
-        Err(_) => {
-            tracing::info!("REDIS_URL not set, running without cache");
+        None => {
+            tracing::info!("Redis URL not configured (REDIS_URL or UPSTASH_REDIS_REST_URL), running without cache");
             None
         }
     };
@@ -146,9 +146,9 @@ async fn main() -> Result<()> {
     // Initialize FCM client for push notifications
     let fcm_client = notifications::FcmClient::from_config(&cfg);
 
-    // Initialize Redis job queue (if REDIS_URL is set)
-    let job_queue = match std::env::var("REDIS_URL") {
-        Ok(ref url) if !url.is_empty() => {
+    // Initialize Redis job queue (if Redis URL is available)
+    let job_queue = match config::resolve_redis_url() {
+        Some(ref url) if !url.is_empty() => {
             match jobs::job_queue::JobQueue::new(url).await {
                 Ok(q) => Some(q),
                 Err(e) => {
@@ -158,7 +158,7 @@ async fn main() -> Result<()> {
             }
         }
         _ => {
-            tracing::info!("REDIS_URL not set, using tokio::spawn for background jobs");
+            tracing::info!("Redis URL not configured, using tokio::spawn for background jobs");
             None
         }
     };
@@ -182,7 +182,7 @@ async fn main() -> Result<()> {
                 tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                 // We need a separate connection for delayed job processing
                 // The job_queue's internal conn is used by the worker, so we create a new one
-                if let Ok(url) = std::env::var("REDIS_URL") {
+                if let Some(ref url) = config::resolve_redis_url() {
                     if let Ok(client) = redis::Client::open(url.as_str()) {
                         if let Ok(mut conn) = redis::aio::ConnectionManager::new(client).await {
                             if let Err(e) = jobs::job_queue::process_delayed_jobs(&mut conn).await {
@@ -309,8 +309,23 @@ async fn main() -> Result<()> {
     middleware::start_auth_cache_cleanup();
 
     let app = Router::new()
+        // Root — service info
+        .route(
+            "/",
+            get(|| async {
+                axum::Json(serde_json::json!({
+                    "service": "HookSniff",
+                    "version": env!("CARGO_PKG_VERSION"),
+                    "status": "running",
+                    "docs": "/v1/docs",
+                    "health": "/health"
+                }))
+            }),
+        )
         // Health check
         .route("/health", get(routes::health::health_check))
+        // API v1 health alias (some clients check /api/v1/health)
+        .route("/api/v1/health", get(routes::health::health_check))
         // Metrics (Prometheus)
         .route("/metrics", get(metrics::metrics_handler))
         // API v1
