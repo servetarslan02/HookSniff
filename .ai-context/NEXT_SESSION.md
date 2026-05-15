@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-15 22:25 GMT+8 (Oturum 172)
+> Son güncelleme: 2026-05-16 03:59 GMT+8 (Oturum 175)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -204,12 +204,12 @@ postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-
 
 ## ⚠️ Bilinen Sorunlar
 
-1. **Seq scan fırtınası** — endpoints, customers, notifications (yukarıda detay)
+1. ~~Seq scan fırtınası~~ ✅ Çözüldü (Oturum 173, 9 index uygulandı)
 2. **Compute limiti aşılmış** — Neon Free tier 191.99 saat, 193.39 kullanılmış
 3. **920+ hardcoded İngilizce string** — dashboard'da Türkçe çeviri
 4. **GitHub Actions dakikaları bitmiş** — CI failure
 5. **Grafana trial bitiyor** — 20 Mayıs'a kadar
-6. **Resend domain** — hooksniff.is-a.dev FAILED, onboarding@resend.dev kullanılıyor
+6. ~~Resend domain FAILED~~ ✅ Default adres (onboarding@resend.dev) ile çalışıyor
 
 ---
 
