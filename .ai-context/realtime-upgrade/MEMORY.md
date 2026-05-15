@@ -8,7 +8,7 @@
 |-----|-------|-----|
 | Faz 1: React Query + Zod | ✅ %100 tamamlandı | 11/11 sayfa dönüştürüldü |
 | Faz 2: Event System + Redis Streams | ✅ Tamamlandı | EventPublisher + Redis Streams |
-| Faz 3: WebSocket | ⬜ Başlamadı | |
+| Faz 3: WebSocket | ✅ Tamamlandı | WS endpoint + EventBridge |
 | Faz 4: Entegrasyon | ⬜ Başlamadı | |
 | Faz 5: Optimizasyon | ⬜ Başlamadı | |
 | Faz 6: Güvenlik | ⬜ Başlamadı | |
@@ -75,6 +75,15 @@
 - [x] webhooks.rs: create_webhook → DeliveryCreated event
 - [x] webhooks.rs: batch_webhooks → DeliveryCreated event (her delivery için)
 - [x] Best-effort publish (.ok()), graceful degradation
+
+## Faz 3 Tamamlanan İşler
+
+- [x] ws/bridge.rs: EventPublisher → WsGateway bridge (background task)
+- [x] routes/ws.rs: /v1/ws WebSocket upgrade endpoint
+- [x] Origin validation: hooksniff.vercel.app + localhost
+- [x] main.rs: WsGateway init + EventBridge start + Extension layer
+- [x] routes/mod.rs: /ws route added to protected router
+- [x] JWT auth middleware (mevcut) WS endpoint'ine uygulanıyor
 
 ## Hata Düzeltmeleri
 
