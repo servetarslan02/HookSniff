@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/lib/store';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
-import { adminApi, type PlatformSettings as AdminPlatformSettings } from '@/lib/api';
-
-type PlatformSettings = AdminPlatformSettings;
+import { useAdminSettings, useUpdateSettings, useAdminAlerts, useCreateAlert, useUpdateAlert } from '@/hooks/useAdminData';
+import type { PlatformSettings } from '@/lib/api';
 
 interface AlertRule {
   id: string;
@@ -41,7 +39,6 @@ const defaultSettings: PlatformSettings = {
   cors_origins: null,
 };
 
-// Map frontend threshold keys to backend alert conditions
 const ALERT_CONDITIONS: Record<string, { condition: string; label: string; unit: string; direction: 'below' | 'above'; default: number }> = {
   success_rate: { condition: 'failure_rate', label: 'successRateThreshold', unit: '%', direction: 'below', default: 95 },
   latency: { condition: 'latency', label: 'latencyThreshold', unit: 'ms', direction: 'above', default: 5000 },
@@ -49,18 +46,21 @@ const ALERT_CONDITIONS: Record<string, { condition: string; label: string; unit:
 };
 
 export default function AdminSettingsPage() {
-  const { token } = useAuth();
   const { toast } = useToast();
-  const [settings, setSettings] = useState<PlatformSettings>(defaultSettings);
-  const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [settingsTab, setSettingsTab] = useState<'general' | 'email' | 'alerts'>('general');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
 
-  // Alert state
-  const [alertRules, setAlertRules] = useState<AlertRule[]>([]);
+  // React Query hooks
+  const { data: settingsData, isLoading } = useAdminSettings();
+  const updateSettingsMutation = useUpdateSettings();
+  const { data: alertRules = [] } = useAdminAlerts();
+  const createAlertMutation = useCreateAlert();
+  const updateAlertMutation = useUpdateAlert();
+
+  // Local UI state
+  const [settings, setSettings] = useState<PlatformSettings>(defaultSettings);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'general' | 'email' | 'alerts'>('general');
   const [alertThresholds, setAlertThresholds] = useState<Record<string, number>>({
     success_rate: 95,
     latency: 5000,
@@ -71,43 +71,24 @@ export default function AdminSettingsPage() {
     slack: false,
     webhook: false,
   });
-  const [alertSaving, setAlertSaving] = useState(false);
 
-
-
-  // Fetch platform settings
-  const fetchSettings = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const data = await adminApi.getSettings(token);
-      setSettings(data);
-    } catch {
-      // Silently fall back to defaults
-    } finally {
-      setLoading(false);
+  // Sync fetched settings into local state
+  useEffect(() => {
+    if (settingsData) {
+      setSettings(settingsData as unknown as PlatformSettings);
     }
-  }, [token]);
+  }, [settingsData]);
 
-  // Fetch alert rules
-  const fetchAlerts = useCallback(async () => {
-    if (!token) return;
-    try {
-      const data = await adminApi.listAlerts(token);
-      setAlertRules(data);
-
-      // Map existing rules back to thresholds
+  // Sync alert rules back to thresholds
+  useEffect(() => {
+    if (alertRules.length > 0) {
       const thresholds: Record<string, number> = {};
       const channels: Record<string, boolean> = { email: false, slack: false, webhook: false };
 
-      for (const rule of data) {
-        if (rule.condition === 'failure_rate') {
-          thresholds.success_rate = rule.threshold;
-        } else if (rule.condition === 'latency') {
-          thresholds.latency = rule.threshold;
-        } else if (rule.condition === 'consecutive_failures') {
-          thresholds.consecutive_failures = rule.threshold;
-        }
+      for (const rule of alertRules) {
+        if (rule.condition === 'failure_rate') thresholds.success_rate = rule.threshold;
+        else if (rule.condition === 'latency') thresholds.latency = rule.threshold;
+        else if (rule.condition === 'consecutive_failures') thresholds.consecutive_failures = rule.threshold;
         for (const ch of rule.channels) {
           channels[ch] = true;
         }
@@ -117,36 +98,21 @@ export default function AdminSettingsPage() {
         setAlertThresholds((prev) => ({ ...prev, ...thresholds }));
       }
       setAlertChannels((prev) => ({ ...prev, ...channels }));
-    } catch {
-      // Keep defaults
     }
-  }, [token]);
-
-  useEffect(() => {
-    fetchSettings();
-    fetchAlerts();
-  }, [fetchSettings, fetchAlerts]);
+  }, [alertRules]);
 
   const handleSave = async () => {
-    if (!token) return;
-    setSaving(true);
-    setShowSuccess(false);
     try {
-      await adminApi.updateSettings(token, settings);
+      await updateSettingsMutation.mutateAsync(settings as unknown as Record<string, unknown>);
       toast(t('settingsSaved'), 'success');
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch {
       toast(t('settingsSaveFailed'), 'error');
-    } finally {
-      setSaving(false);
     }
   };
 
-  // Save alert thresholds as alert rules
   const handleAlertSave = async () => {
-    if (!token) return;
-    setAlertSaving(true);
     try {
       const channels = Object.entries(alertChannels)
         .filter(([, enabled]) => enabled)
@@ -154,7 +120,7 @@ export default function AdminSettingsPage() {
 
       const existingByCondition: Record<string, AlertRule> = {};
       for (const rule of alertRules) {
-        existingByCondition[rule.condition] = rule;
+        existingByCondition[rule.condition] = rule as AlertRule;
       }
 
       const promises: Promise<unknown>[] = [];
@@ -164,9 +130,9 @@ export default function AdminSettingsPage() {
         const threshold = alertThresholds[config.condition === 'failure_rate' ? 'success_rate' : config.condition === 'latency' ? 'latency' : 'consecutive_failures'];
 
         if (existing) {
-          promises.push(adminApi.updateAlert(token, existing.id, { threshold, channels, is_active: true }));
+          promises.push(updateAlertMutation.mutateAsync({ id: existing.id, data: { threshold, channels, is_active: true } }));
         } else {
-          promises.push(adminApi.createAlert(token, { name: `${config.condition} alert`, condition: config.condition, threshold, channels }));
+          promises.push(createAlertMutation.mutateAsync({ name: `${config.condition} alert`, condition: config.condition, threshold, channels }));
         }
       }
 
@@ -174,11 +140,8 @@ export default function AdminSettingsPage() {
       toast(t('alertSettingsSaved') || 'Alert settings saved', 'success');
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
-      await fetchAlerts();
     } catch {
       toast(t('alertSettingsFailed') || 'Failed to save alert settings', 'error');
-    } finally {
-      setAlertSaving(false);
     }
   };
 
@@ -196,7 +159,7 @@ export default function AdminSettingsPage() {
   };
 
   // Loading state
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-8 max-w-3xl">
         <div>
@@ -235,7 +198,7 @@ export default function AdminSettingsPage() {
         </div>
       )}
 
-      {/* ── Tab Navigation ── */}
+      {/* Tab Navigation */}
       <div className="flex gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl w-fit">
         {([
           { key: 'general', icon: '⚙️', label: t('general') || 'General' },
@@ -257,7 +220,6 @@ export default function AdminSettingsPage() {
         ))}
       </div>
 
-      {/* ═══ TAB: General ═══ */}
       {/* General */}
       <div className="glass-card p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('general')}</h2>
@@ -326,51 +288,19 @@ export default function AdminSettingsPage() {
             <div className="space-y-3">
               <div>
                 <label htmlFor="max_endpoints_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')} <span className="text-red-500">*</span></label>
-                <input
-                  id="max_endpoints_free"
-                  type="number"
-                  min={1}
-                  max={999}
-                  value={settings.max_endpoints_free}
-                  onChange={(e) => update('max_endpoints_free', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
+                <input id="max_endpoints_free" type="number" min={1} max={999} value={settings.max_endpoints_free} onChange={(e) => update('max_endpoints_free', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               </div>
               <div>
                 <label htmlFor="max_webhooks_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxWebhooksMonth')} <span className="text-red-500">*</span></label>
-                <input
-                  id="max_webhooks_free"
-                  type="number"
-                  min={0}
-                  max={9999999}
-                  value={settings.max_webhooks_free}
-                  onChange={(e) => update('max_webhooks_free', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
+                <input id="max_webhooks_free" type="number" min={0} max={9999999} value={settings.max_webhooks_free} onChange={(e) => update('max_webhooks_free', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               </div>
               <div>
                 <label htmlFor="rate_limit_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('rateLimitReqMin')} <span className="text-red-500">*</span></label>
-                <input
-                  id="rate_limit_free"
-                  type="number"
-                  min={1}
-                  max={100000}
-                  value={settings.rate_limit_free}
-                  onChange={(e) => update('rate_limit_free', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
+                <input id="rate_limit_free" type="number" min={1} max={100000} value={settings.rate_limit_free} onChange={(e) => update('rate_limit_free', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               </div>
               <div>
                 <label htmlFor="retention_days_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('retentionDays')} <span className="text-red-500">*</span></label>
-                <input
-                  id="retention_days_free"
-                  type="number"
-                  min={1}
-                  max={365}
-                  value={settings.retention_days_free}
-                  onChange={(e) => update('retention_days_free', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
+                <input id="retention_days_free" type="number" min={1} max={365} value={settings.retention_days_free} onChange={(e) => update('retention_days_free', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               </div>
             </div>
           </div>
@@ -379,51 +309,19 @@ export default function AdminSettingsPage() {
             <div className="space-y-3">
               <div>
                 <label htmlFor="max_endpoints_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')} <span className="text-red-500">*</span></label>
-                <input
-                  id="max_endpoints_pro"
-                  type="number"
-                  min={1}
-                  max={999}
-                  value={settings.max_endpoints_pro}
-                  onChange={(e) => update('max_endpoints_pro', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
+                <input id="max_endpoints_pro" type="number" min={1} max={999} value={settings.max_endpoints_pro} onChange={(e) => update('max_endpoints_pro', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               </div>
               <div>
                 <label htmlFor="max_webhooks_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxWebhooksMonth')} <span className="text-red-500">*</span></label>
-                <input
-                  id="max_webhooks_pro"
-                  type="number"
-                  min={0}
-                  max={9999999}
-                  value={settings.max_webhooks_pro}
-                  onChange={(e) => update('max_webhooks_pro', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
+                <input id="max_webhooks_pro" type="number" min={0} max={9999999} value={settings.max_webhooks_pro} onChange={(e) => update('max_webhooks_pro', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               </div>
               <div>
                 <label htmlFor="rate_limit_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('rateLimitReqMin')} <span className="text-red-500">*</span></label>
-                <input
-                  id="rate_limit_pro"
-                  type="number"
-                  min={1}
-                  max={100000}
-                  value={settings.rate_limit_pro}
-                  onChange={(e) => update('rate_limit_pro', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
+                <input id="rate_limit_pro" type="number" min={1} max={100000} value={settings.rate_limit_pro} onChange={(e) => update('rate_limit_pro', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               </div>
               <div>
                 <label htmlFor="retention_days_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('retentionDays')} <span className="text-red-500">*</span></label>
-                <input
-                  id="retention_days_pro"
-                  type="number"
-                  min={1}
-                  max={365}
-                  value={settings.retention_days_pro}
-                  onChange={(e) => update('retention_days_pro', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-                />
+                <input id="retention_days_pro" type="number" min={1} max={365} value={settings.retention_days_pro} onChange={(e) => update('retention_days_pro', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               </div>
             </div>
           </div>
@@ -437,29 +335,11 @@ export default function AdminSettingsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="plan_price_pro" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('proPlan')} ($) <span className="text-red-500">*</span></label>
-            <input
-              id="plan_price_pro"
-              type="number"
-              min={0}
-              max={99999}
-              step={0.01}
-              value={settings.plan_price_pro}
-              onChange={(e) => update('plan_price_pro', parseFloat(e.target.value) || 0)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
+            <input id="plan_price_pro" type="number" min={0} max={99999} step={0.01} value={settings.plan_price_pro} onChange={(e) => update('plan_price_pro', parseFloat(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
           </div>
           <div>
             <label htmlFor="plan_price_business" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('businessPlan')} ($) <span className="text-red-500">*</span></label>
-            <input
-              id="plan_price_business"
-              type="number"
-              min={0}
-              max={99999}
-              step={0.01}
-              value={settings.plan_price_business}
-              onChange={(e) => update('plan_price_business', parseFloat(e.target.value) || 0)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
+            <input id="plan_price_business" type="number" min={0} max={99999} step={0.01} value={settings.plan_price_business} onChange={(e) => update('plan_price_business', parseFloat(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
           </div>
         </div>
       </div>
@@ -471,67 +351,31 @@ export default function AdminSettingsPage() {
         <div className="space-y-4">
           <div>
             <label htmlFor="resend_api_key" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Resend API Key</label>
-            <input
-              id="resend_api_key"
-              type="password"
-              value={settings.resend_api_key || ''}
-              onChange={(e) => update('resend_api_key', e.target.value || null)}
-              placeholder="re_..."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
+            <input id="resend_api_key" type="password" value={settings.resend_api_key || ''} onChange={(e) => update('resend_api_key', e.target.value || null)} placeholder="re_..." className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
           </div>
           <div>
             <label htmlFor="email_sender" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('senderAddress') || 'Sender Address'}</label>
-            <input
-              id="email_sender"
-              type="email"
-              value={settings.email_sender || ''}
-              onChange={(e) => update('email_sender', e.target.value || null)}
-              placeholder="noreply@hooksniff.dev"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
+            <input id="email_sender" type="email" value={settings.email_sender || ''} onChange={(e) => update('email_sender', e.target.value || null)} placeholder="noreply@hooksniff.dev" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
           </div>
         </div>
       </div>
 
-      {/* Webhook & Security Settings */}
+      {/* Security Settings */}
       <div className={`glass-card p-6 ${settingsTab !== 'email' ? 'hidden' : ''}`}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🔐 {t('securitySettings') || 'Security & Webhook Settings'}</h2>
         <div className="space-y-4">
           <div>
             <label htmlFor="webhook_secret" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('webhookSecret') || 'Default Webhook Secret'}</label>
-            <input
-              id="webhook_secret"
-              type="password"
-              value={settings.webhook_secret || ''}
-              onChange={(e) => update('webhook_secret', e.target.value || null)}
-              placeholder="whsec_..."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
+            <input id="webhook_secret" type="password" value={settings.webhook_secret || ''} onChange={(e) => update('webhook_secret', e.target.value || null)} placeholder="whsec_..." className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('webhookSecretDesc') || 'Default signing secret for webhook payloads.'}</p>
           </div>
           <div>
             <label htmlFor="global_rate_limit" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('globalRateLimit') || 'Global API Rate Limit (req/min)'}</label>
-            <input
-              id="global_rate_limit"
-              type="number"
-              min={10}
-              max={100000}
-              value={settings.global_rate_limit}
-              onChange={(e) => update('global_rate_limit', parseInt(e.target.value) || 1000)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
+            <input id="global_rate_limit" type="number" min={10} max={100000} value={settings.global_rate_limit} onChange={(e) => update('global_rate_limit', parseInt(e.target.value) || 1000)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
           </div>
           <div>
             <label htmlFor="cors_origins" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('corsOrigins') || 'Allowed CORS Origins'}</label>
-            <input
-              id="cors_origins"
-              type="text"
-              value={settings.cors_origins || ''}
-              onChange={(e) => update('cors_origins', e.target.value || null)}
-              placeholder="https://hooksniff.vercel.app, https://app.example.com"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            />
+            <input id="cors_origins" type="text" value={settings.cors_origins || ''} onChange={(e) => update('cors_origins', e.target.value || null)} placeholder="https://hooksniff.vercel.app, https://app.example.com" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('corsOriginsDesc') || 'Comma-separated list of allowed origins. Leave empty for default.'}</p>
           </div>
         </div>
@@ -542,15 +386,7 @@ export default function AdminSettingsPage() {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💾 {t('backupSettings') || 'Backup Settings'}</h2>
         <div>
           <label htmlFor="backup_retention" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('backupRetention') || 'Backup Retention (days)'}</label>
-          <input
-            id="backup_retention"
-            type="number"
-            min={1}
-            max={365}
-            value={settings.backup_retention_days}
-            onChange={(e) => update('backup_retention_days', parseInt(e.target.value) || 30)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-          />
+          <input id="backup_retention" type="number" min={1} max={365} value={settings.backup_retention_days} onChange={(e) => update('backup_retention_days', parseInt(e.target.value) || 30)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
           <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('backupRetentionDesc') || 'Number of days to keep database backups.'}</p>
         </div>
       </div>
@@ -560,25 +396,16 @@ export default function AdminSettingsPage() {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('retrySettings')}</h2>
         <div>
           <label htmlFor="retry_max_attempts" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('maxRetryAttempts')} <span className="text-red-500">*</span></label>
-          <input
-            id="retry_max_attempts"
-            type="number"
-            value={settings.retry_max_attempts}
-            onChange={(e) => update('retry_max_attempts', parseInt(e.target.value) || 0)}
-            min={0}
-            max={10}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-          />
+          <input id="retry_max_attempts" type="number" value={settings.retry_max_attempts} onChange={(e) => update('retry_max_attempts', parseInt(e.target.value) || 0)} min={0} max={10} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
           <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('retryDesc')}</p>
         </div>
       </div>
 
-      {/* Alert Thresholds — connected to backend */}
+      {/* Alert Thresholds */}
       <div className={`glass-card p-6 ${settingsTab !== 'alerts' ? 'hidden' : ''}`}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🚨 {t('alertThresholds')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('alertThresholdsDesc')}</p>
 
-        {/* Status indicator */}
         {alertRules.length > 0 && (
           <div className="mb-4 flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
             <span className="w-2 h-2 rounded-full bg-green-500" />
@@ -591,15 +418,7 @@ export default function AdminSettingsPage() {
             <label htmlFor="alert_success_rate" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('successRateThreshold')}</label>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500 dark:text-slate-400">{t('below')}</span>
-              <input
-                id="alert_success_rate"
-                type="number"
-                min={0}
-                max={100}
-                value={alertThresholds.success_rate}
-                onChange={(e) => updateAlertThreshold('success_rate', parseInt(e.target.value) || 0)}
-                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-              />
+              <input id="alert_success_rate" type="number" min={0} max={100} value={alertThresholds.success_rate} onChange={(e) => updateAlertThreshold('success_rate', parseInt(e.target.value) || 0)} className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               <span className="text-sm text-gray-500 dark:text-slate-400">%</span>
             </div>
           </div>
@@ -607,15 +426,7 @@ export default function AdminSettingsPage() {
             <label htmlFor="alert_latency" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('latencyThreshold')}</label>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500 dark:text-slate-400">{t('above')}</span>
-              <input
-                id="alert_latency"
-                type="number"
-                min={0}
-                max={60000}
-                value={alertThresholds.latency}
-                onChange={(e) => updateAlertThreshold('latency', parseInt(e.target.value) || 0)}
-                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-              />
+              <input id="alert_latency" type="number" min={0} max={60000} value={alertThresholds.latency} onChange={(e) => updateAlertThreshold('latency', parseInt(e.target.value) || 0)} className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               <span className="text-sm text-gray-500 dark:text-slate-400">ms</span>
             </div>
           </div>
@@ -623,15 +434,7 @@ export default function AdminSettingsPage() {
             <label htmlFor="alert_failed" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('failedDeliveryThreshold')}</label>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500 dark:text-slate-400">{t('above')}</span>
-              <input
-                id="alert_failed"
-                type="number"
-                min={0}
-                max={10000}
-                value={alertThresholds.consecutive_failures}
-                onChange={(e) => updateAlertThreshold('consecutive_failures', parseInt(e.target.value) || 0)}
-                className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-              />
+              <input id="alert_failed" type="number" min={0} max={10000} value={alertThresholds.consecutive_failures} onChange={(e) => updateAlertThreshold('consecutive_failures', parseInt(e.target.value) || 0)} className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
               <span className="text-sm text-gray-500 dark:text-slate-400">{t('perHour')}</span>
             </div>
           </div>
@@ -640,48 +443,32 @@ export default function AdminSettingsPage() {
           <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('notificationChannels')}</h3>
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={alertChannels.email}
-                onChange={() => toggleChannel('email')}
-                className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
-              />
+              <input type="checkbox" checked={alertChannels.email} onChange={() => toggleChannel('email')} className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
               <span className="text-sm text-gray-700 dark:text-slate-300">📧 Email</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={alertChannels.slack}
-                onChange={() => toggleChannel('slack')}
-                className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
-              />
+              <input type="checkbox" checked={alertChannels.slack} onChange={() => toggleChannel('slack')} className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
               <span className="text-sm text-gray-700 dark:text-slate-300">💬 Slack</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={alertChannels.webhook}
-                onChange={() => toggleChannel('webhook')}
-                className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
-              />
+              <input type="checkbox" checked={alertChannels.webhook} onChange={() => toggleChannel('webhook')} className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
               <span className="text-sm text-gray-700 dark:text-slate-300">🔗 Webhook</span>
             </label>
           </div>
         </div>
 
-        {/* Alert Save Button */}
         <div className="mt-6 flex items-center gap-3 justify-end">
           <button type="button"
             onClick={handleAlertSave}
-            disabled={alertSaving}
+            disabled={createAlertMutation.isPending || updateAlertMutation.isPending}
             className="px-6 py-3 bg-orange-600 dark:bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 dark:hover:bg-orange-700 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition disabled:opacity-60"
           >
-            {alertSaving ? tc('saving') : (t('saveAlertSettings') || '🚨 Save Alert Settings')}
+            {(createAlertMutation.isPending || updateAlertMutation.isPending) ? tc('saving') : (t('saveAlertSettings') || '🚨 Save Alert Settings')}
           </button>
         </div>
       </div>
 
-      {/* Save button for platform settings */}
+      {/* Save button */}
       <div className="flex items-center gap-3 justify-end">
         {showSuccess && (
           <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
@@ -690,10 +477,10 @@ export default function AdminSettingsPage() {
         )}
         <button type="button"
           onClick={handleSave}
-          disabled={saving}
+          disabled={updateSettingsMutation.isPending}
           className="px-6 py-3 bg-red-600 dark:bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 dark:hover:bg-red-700 focus:ring-2 focus:ring-red-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition disabled:opacity-60"
         >
-          {saving ? tc('saving') : t('saveSettings')}
+          {updateSettingsMutation.isPending ? tc('saving') : t('saveSettings')}
         </button>
       </div>
     </div>
