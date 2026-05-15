@@ -57,6 +57,7 @@ export default {
     const path = url.pathname;
     const method = request.method;
     const clientIp = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const origin = request.headers.get('Origin');
 
     // 1. CORS preflight — handle at edge (no need to hit origin)
     if (method === 'OPTIONS') {
@@ -85,7 +86,7 @@ export default {
             'X-RateLimit-Limit': String(rateLimitResult.limit),
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': String(rateLimitResult.resetAt),
-            ...corsHeaders(),
+            ...corsHeaders(origin),
           },
         }
       );
@@ -113,7 +114,7 @@ export default {
                 ...cachedHeaders,
                 'X-Cache': 'HIT',
                 'X-Cache-TTL': String(cacheTtl),
-                ...corsHeaders(),
+                ...corsHeaders(origin),
               },
             });
           }
@@ -175,7 +176,7 @@ export default {
       responseHeaders.set('X-RateLimit-Remaining', String(rateLimitResult.remaining));
 
       // CORS
-      const cors = corsHeaders();
+      const cors = corsHeaders(origin);
       for (const [k, v] of Object.entries(cors)) {
         responseHeaders.set(k, v);
       }
@@ -206,7 +207,7 @@ export default {
               ...cachedHeaders,
               'X-Cache': 'STALE',
               'X-Origin-Error': 'unreachable',
-              ...corsHeaders(),
+              ...corsHeaders(origin),
             },
           });
         }
@@ -219,7 +220,7 @@ export default {
           headers: {
             'Content-Type': 'application/json',
             'Retry-After': '10',
-            ...corsHeaders(),
+            ...corsHeaders(origin),
           },
         }
       );
@@ -306,13 +307,14 @@ function isBlockedPath(path: string): boolean {
   return blocked.some((p) => path.startsWith(p));
 }
 
-function corsHeaders(): Record<string, string> {
+function corsHeaders(origin?: string | null): Record<string, string> {
   return {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': origin || '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, Idempotency-Key, X-Request-Id',
     'Access-Control-Expose-Headers': 'X-Request-Id, X-Trace-Id, ETag, X-RateLimit-Limit, X-RateLimit-Remaining, X-Cache',
     'Access-Control-Max-Age': '86400',
+    'Access-Control-Allow-Credentials': 'true',
   };
 }
 
@@ -320,10 +322,7 @@ function handleCors(request: Request): Response {
   const origin = request.headers.get('Origin') || '*';
   return new Response(null, {
     status: 204,
-    headers: {
-      ...corsHeaders(),
-      'Access-Control-Allow-Origin': origin,
-    },
+    headers: corsHeaders(origin),
   });
 }
 
