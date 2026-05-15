@@ -392,6 +392,7 @@ export interface RevenueResponse {
   mrr: number;
   churn_rate: number;
   mrr_trend: number;
+  collected_revenue: number;
 }
 
 // Team types
