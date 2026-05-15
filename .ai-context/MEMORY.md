@@ -1017,3 +1017,15 @@ Tüm servisler yapılandırıldı, `.env` dosyalarında 0 placeholder kaldı.
 - **Deploy bekleniyor:** Cloud Build tetiklenmeli
 - **Commit:** `d10b81de` — main branch, push ✅
 - **3 dosya değişti, 440 satır eklendi**
+
+## Oturum 167 Ek — Cloudflare Edge Proxy Deploy (2026-05-15 19:38 GMT+8) ✅
+- **Cloudflare Edge Proxy** deploy edildi
+- **Worker URL:** https://hooksniff-edge-proxy.servetarslan02.workers.dev
+- **KV Namespaces:** RATE_LIMIT_KV (3f97bfb0...) + EDGE_CACHE_KV (f554e503...)
+- **API Token:** cfut_ZKEi1prPFJTkWDVahUgWqCEHGtjHfjgy3DAkYbLj44505cce (Workers Scripts+KV+R2 Edit)
+- **Rolled Token:** cfut_73ySiAJzFjdqTDA8i4kaCNMasRL6ku0xH1vEP81zd027f4fb (eski Agent Token, Workers izni yok)
+- **Yanlış Token:** cfut_RJwGT1mGHkxD2TUJosVygcaI4rvpY8PH6nLHCMIw952c9cfc (sadece Workers Scripts, KV yok)
+- **Cloudflare Account:** 2a7ee86912c49fd36cff048204c37f70 (servetarslan02@gmail.com)
+- **Test:** /health 200 OK, X-Served-By: cloudflare-edge, rate limiting aktif
+- **Sonraki adım:** DNS ayarı (api.hooksniff.com → worker) — Servet'in yapması gereken
+- **Deploy method:** wrangler CLI + CLOUDFLARE_API_TOKEN env var
