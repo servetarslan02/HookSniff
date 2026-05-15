@@ -1,39 +1,52 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-15 14:10 GMT+8 (Oturum 165)
+> Son güncelleme: 2026-05-15 18:48 GMT+8 (Oturum 166)
 
 ## ✅ Tamamlanan (Bu Oturum)
 
-### Background Job Queue (Redis) ✅
-- **Yeni dosya:** `api/src/jobs/job_queue.rs` — Redis LPUSH/BRPOP job queue
-- **Job tipleri:**
-  - Email (welcome, verification, password reset, invoice, webhook success)
-  - Notification (FCM push)
-  - ScheduledCleanup (distributed lock ile)
-- **Distributed locks:** Scheduled job'lar sadece 1 instance tarafından çalıştırılır
-- **Delayed retry:** Exponential backoff (2^n saniye), Redis sorted set ile
-- **Fallback:** Redis yoksa `tokio::spawn` kullanır
-- **auth.rs:** register, forgot_password, resend_verification → job queue
-- **main.rs:** retention, monthly_reset, cleanup_6h → distributed lock
-- **Test:** 1072 test geçti, clippy 0 uyarı
-- **Commit:** `becd6509`
+### Performance Optimizations (Oturum 166) ✅
+1. **SELECT * → spesifik kolonlar (list queries)**
+   - `DeliveryListRow` yeni struct: payload + response_body hariç (256KB'a kadar tasarruf/satır)
+   - `webhooks.rs`: list endpoint'leri artık `DeliveryListRow` kullanıyor
+   - `transforms.rs`: ownership check → `EndpointOwnerCheck` (3 kolon vs 27)
+   - Tek kayıt fetch'leri (replay, detail) hâlâ `SELECT *` → doğru
+
+2. **Dashboard loading skeletons (7 sayfa)**
+   - `loading.tsx`: Shared skeleton — tab bar + stat cards + table rows
+   - `core/page.tsx`: dynamic() → loading skeleton ile
+   - `deliveries/page.tsx`: dynamic() → loading skeleton ile
+   - `account/page.tsx`: dynamic() → loading skeleton ile
+   - `observability/page.tsx`: dynamic() → loading skeleton ile
+   - `devtools/page.tsx`: dynamic() → loading skeleton ile
+   - `content-mgmt/page.tsx`: dynamic() → loading skeleton ile
+   - `security-section/page.tsx`: dynamic() → loading skeleton ile
+   - `routing-config/page.tsx`: dynamic() → loading skeleton ile
+
+3. **Doğrulama**
+   - `cargo check` ✅ — 0 error
+   - `cargo test --lib` ✅ — 1072 passed, 0 failed
+   - `cargo clippy --workspace` ✅ — 0 uyarı
+   - `npm run build` ✅ — dashboard build başarılı
+   - Commits: `59980806`, `44ea9acb`
 
 ## 📋 Kalan Performance Roadmap
 
 ### Orta Vade
 | # | Görev | Durum | Not |
 |---|-------|-------|-----|
-| 1 | Background Job Queue | ✅ | Redis LPUSH/BRPOP + distributed lock |
-| 2 | Read Replica (Neon) | ❌ | Neon free tier'da read replica desteklenmiyor |
-| 3 | Cloud CDN headers | ❌ | Cloudflare/Cloud Run seviyesinde yapılabilir |
+| 1 | Background Job Queue | ✅ | Oturum 165 |
+| 2 | SELECT * optimizasyonu | ✅ | Oturum 166 — list queries |
+| 3 | Dashboard loading states | ✅ | Oturum 166 — 8 sayfa skeleton |
+| 4 | Read Replica (Neon) | ❌ | Neon free tier'da read replica desteklenmiyor |
+| 5 | Cloud CDN headers | ✅ | Oturum 163 |
 
 ### Büyük İş
 | # | Görev | Durum | Not |
 |---|-------|-------|-----|
-| 4 | WebSocket live updates | ❌ | Büyük iş, öncelik düşük |
-| 5 | Edge Workers (Cloudflare) | ❌ | Büyük iş, öncelik düşük |
-| 6 | Event Sourcing | ❌ | Büyük iş, öncelik düşük |
-| 7 | Multi-Region DB | ❌ | Büyük iş, maliyetli |
+| 6 | WebSocket live updates | ❌ | Büyük iş, öncelik düşük |
+| 7 | Edge Workers (Cloudflare) | ❌ | Büyük iş, öncelik düşük |
+| 8 | Event Sourcing | ❌ | Büyük iş, öncelik düşük |
+| 9 | Multi-Region DB | ❌ | Büyük iş, maliyetli |
 
 ## 📋 Servet'in Yapması Gereken
 
