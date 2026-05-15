@@ -68,10 +68,10 @@ await hs.webhooks.send({
 });`,
     },
     metrics: [
-      { label: 'Avg delivery latency', value: '<200ms' },
-      { label: 'Delivery success rate', value: '99.97%' },
+      { label: t('avgDeliveryLatency'), value: '<200ms' },
+      { label: t('deliverySuccessRate'), value: '99.97%' },
       { label: 'SDKs available', value: '11' },
-      { label: 'Free tier events', value: '1,000/mo' },
+      { label: t('freeTierEvents'), value: '1,000/mo' },
     ],
   },
   {
@@ -121,10 +121,10 @@ hs.webhooks.send(
 )`,
     },
     metrics: [
-      { label: 'Events processed/day', value: '50K+' },
-      { label: 'Ordered delivery (FIFO)', value: '✅' },
-      { label: 'Retry on failure', value: '5x / 24h' },
-      { label: 'Multi-endpoint', value: '✅' },
+      { label: t('eventsProcessedDay'), value: '50K+' },
+      { label: t('orderedDelivery'), value: '✅' },
+      { label: t('retryOnFailure'), value: '5x / 24h' },
+      { label: t('multiEndpoint'), value: '✅' },
     ],
   },
   {
@@ -174,10 +174,10 @@ await hs.webhooks.send({
 });`,
     },
     metrics: [
-      { label: 'Delivery guarantee', value: 'Zero loss' },
-      { label: 'Signature', value: 'HMAC-SHA256' },
-      { label: 'Latency (p99)', value: '<200ms' },
-      { label: 'CloudEvents', value: 'v1.0' },
+      { label: t('deliveryGuarantee'), value: 'Zero loss' },
+      { label: t('signature'), value: 'HMAC-SHA256' },
+      { label: t('latencyP99'), value: '<200ms' },
+      { label: t('cloudevents'), value: 'v1.0' },
     ],
   },
   {
@@ -227,10 +227,10 @@ hs.webhooks.send(
 )`,
     },
     metrics: [
-      { label: 'Event-driven', value: '✅' },
+      { label: t('eventDriven'), value: '✅' },
       { label: 'MCP compatible', value: '✅' },
-      { label: 'CloudEvents', value: 'v1.0' },
-      { label: 'Schema registry', value: '✅' },
+      { label: t('cloudevents'), value: 'v1.0' },
+      { label: t('schemaRegistry'), value: '✅' },
     ],
   },
   {
@@ -288,8 +288,8 @@ func main() {
     metrics: [
       { label: 'SDKs', value: '11 languages' },
       { label: 'Playground', value: '✅' },
-      { label: 'Embeddable portal', value: '✅' },
-      { label: 'Open source', value: '✅' },
+      { label: t('embeddablePortal'), value: '✅' },
+      { label: t('openSource'), value: '✅' },
     ],
   },
   {
@@ -340,9 +340,9 @@ await hs.Webhooks.SendAsync(new WebhookRequest
 });`,
     },
     metrics: [
-      { label: 'Audit trail', value: 'Complete' },
+      { label: t('auditTrail'), value: 'Complete' },
       { label: 'Data region', value: 'EU (Frankfurt)' },
-      { label: 'Signature', value: 'HMAC-SHA256' },
+      { label: t('signature'), value: 'HMAC-SHA256' },
       { label: 'GDPR', value: 'Compliant' },
     ],
   },

@@ -138,9 +138,9 @@ const techLogos = [
 
 const stats = [
   { value: '11', label: 'SDKs published' },
-  { value: '1,378', label: 'Tests passing' },
-  { value: '99.97%', label: 'Delivery rate' },
-  { value: '8', label: 'Languages supported' },
+  { value: '1,378', label: t('metricTestsPassing') },
+  { value: '99.97%', label: t('metricDeliveryRate') },
+  { value: '8', label: t('metricLanguages') },
 ];
 
 export function CustomersPageContent() {

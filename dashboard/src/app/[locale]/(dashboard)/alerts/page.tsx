@@ -126,7 +126,7 @@ export default function AlertsPage() {
     setSaving(true);
     try {
       await alertsApi.update(token, editTarget.id, editForm);
-      toast('Alert updated', 'success');
+      toast(t('alertUpdated'), 'success');
       setEditTarget(null);
       fetchAlerts();
     } catch (err) {
