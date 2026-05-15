@@ -27,11 +27,11 @@ export default function AccountPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'team', label: t('team', { defaultValue: 'Team' }), icon: '👥', content: <TeamPage /> },
-        { key: 'notifications', label: t('notifications', { defaultValue: 'Notifications' }), icon: '🔔', content: <NotificationsPage /> },
-        { key: 'billing', label: t('billing', { defaultValue: 'Billing' }), icon: '💳', content: <BillingPage /> },
-        { key: 'settings', label: t('settings', { defaultValue: 'Settings' }), icon: '⚙️', content: <SettingsPage /> },
-        { key: 'portal', label: t('portal', { defaultValue: 'Portal' }), icon: '🖼️', content: <PortalManagePage /> },
+        { key: 'team', label: t('team'), icon: '👥', content: <TeamPage /> },
+        { key: 'notifications', label: t('notifications'), icon: '🔔', content: <NotificationsPage /> },
+        { key: 'billing', label: t('billing'), icon: '💳', content: <BillingPage /> },
+        { key: 'settings', label: t('settings'), icon: '⚙️', content: <SettingsPage /> },
+        { key: 'portal', label: t('portal'), icon: '🖼️', content: <PortalManagePage /> },
       ]}
     />
   );

@@ -115,9 +115,9 @@ export function TwoFactorSection() {
   return (
     <>
       <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">🔐 {t('twoFactorAuth', { defaultValue: 'Two-Factor Authentication' })}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">🔐 {t('twoFactorAuth')}</h3>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">
-          {t('twoFactorDesc', { defaultValue: 'Add an extra layer of security to your account' })}
+          {t('twoFactorDesc')}
         </p>
 
         <div className="flex items-center justify-between">
@@ -125,8 +125,8 @@ export function TwoFactorSection() {
             <span className={`w-3 h-3 rounded-full ${enabled ? 'bg-emerald-500' : 'bg-gray-400 dark:bg-slate-600'}`} />
             <span className="text-sm font-medium text-gray-900 dark:text-white">
               {enabled
-                ? t('2faEnabled', { defaultValue: '2FA is enabled' })
-                : t('2faDisabled', { defaultValue: '2FA is disabled' })}
+                ? t('2faEnabled')
+                : t('2faDisabled')}
             </span>
           </div>
 
@@ -136,7 +136,7 @@ export function TwoFactorSection() {
               onClick={() => setShowDisable(true)}
               className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 rounded-xl hover:bg-red-100 dark:hover:bg-red-500/20 transition"
             >
-              {t('disable2fa', { defaultValue: 'Disable 2FA' })}
+              {t('disable2fa')}
             </button>
           ) : (
             <button
@@ -145,7 +145,7 @@ export function TwoFactorSection() {
               disabled={enabling}
               className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50"
             >
-              {enabling ? tc('loading') : t('enable2fa', { defaultValue: 'Enable 2FA' })}
+              {enabling ? tc('loading') : t('enable2fa')}
             </button>
           )}
         </div>
@@ -159,10 +159,10 @@ export function TwoFactorSection() {
             {step === 'qr' && (
               <>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  {t('scanQrCode', { defaultValue: 'Scan QR Code' })}
+                  {t('scanQrCode')}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-                  {t('scanQrDesc', { defaultValue: 'Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)' })}
+                  {t('scanQrDesc')}
                 </p>
 
                 {/* QR Code */}
@@ -178,7 +178,7 @@ export function TwoFactorSection() {
 
                 {/* Manual secret */}
                 <div className="mb-4">
-                  <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('manualSecret', { defaultValue: 'Or enter this key manually:' })}</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('manualSecret')}</p>
                   <code className="block px-3 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm font-mono text-gray-900 dark:text-white break-all">
                     {secret}
                   </code>
@@ -189,7 +189,7 @@ export function TwoFactorSection() {
                   onClick={() => setStep('verify')}
                   className="w-full py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
                 >
-                  {t('next', { defaultValue: 'Next' })} →
+                  {t('next')} →
                 </button>
               </>
             )}
@@ -197,10 +197,10 @@ export function TwoFactorSection() {
             {step === 'verify' && (
               <>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  {t('enterTotpCode', { defaultValue: 'Enter Verification Code' })}
+                  {t('enterTotpCode')}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-                  {t('enterTotpDesc', { defaultValue: 'Enter the 6-digit code from your authenticator app' })}
+                  {t('enterTotpDesc')}
                 </p>
 
                 <input
@@ -219,7 +219,7 @@ export function TwoFactorSection() {
                     onClick={() => setStep('qr')}
                     className="flex-1 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition"
                   >
-                    ← {tc('back', { defaultValue: 'Back' })}
+                    ← {tc('back')}
                   </button>
                   <button
                     type="button"
@@ -227,7 +227,7 @@ export function TwoFactorSection() {
                     disabled={enabling || totpCode.length !== 6}
                     className="flex-1 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50"
                   >
-                    {enabling ? tc('saving') : t('verify', { defaultValue: 'Verify' })}
+                    {enabling ? tc('saving') : t('verify')}
                   </button>
                 </div>
               </>
@@ -236,10 +236,10 @@ export function TwoFactorSection() {
             {step === 'done' && (
               <>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  ✅ {t('2faEnabledSuccess', { defaultValue: '2FA Enabled!' })}
+                  ✅ {t('2faEnabledSuccess')}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-                  {t('backupCodesDesc', { defaultValue: 'Save these backup codes in a safe place. You can use them if you lose access to your authenticator app.' })}
+                  {t('backupCodesDesc')}
                 </p>
 
                 <div className="bg-gray-100 dark:bg-slate-700 rounded-lg p-4 mb-4">
@@ -255,7 +255,7 @@ export function TwoFactorSection() {
                   onClick={handleCloseEnable}
                   className="w-full py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
                 >
-                  {tc('done', { defaultValue: 'Done' })}
+                  {tc('done')}
                 </button>
               </>
             )}
@@ -269,10 +269,10 @@ export function TwoFactorSection() {
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDisable(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {t('disable2fa', { defaultValue: 'Disable 2FA' })}
+              {t('disable2fa')}
             </h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              {t('disable2faDesc', { defaultValue: 'Enter your TOTP code to disable two-factor authentication.' })}
+              {t('disable2faDesc')}
             </p>
 
             <input
@@ -299,7 +299,7 @@ export function TwoFactorSection() {
                 disabled={disabling || disableCode.length !== 6}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-50"
               >
-                {disabling ? tc('saving') : t('disable2fa', { defaultValue: 'Disable 2FA' })}
+                {disabling ? tc('saving') : t('disable2fa')}
               </button>
             </div>
           </div>

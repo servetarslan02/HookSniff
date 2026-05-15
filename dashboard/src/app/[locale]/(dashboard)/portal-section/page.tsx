@@ -13,8 +13,8 @@ export default function PortalSectionPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'customize', label: t('portalCustomize', { defaultValue: 'Customize' }), icon: '🎨', content: <PortalCustomizePage /> },
-        { key: 'manage', label: t('portalManage', { defaultValue: 'Portal' }), icon: '🖼️', content: <PortalManagePage /> },
+        { key: 'customize', label: t('portalCustomize'), icon: '🎨', content: <PortalCustomizePage /> },
+        { key: 'manage', label: t('portalManage'), icon: '🖼️', content: <PortalManagePage /> },
       ]}
     />
   );

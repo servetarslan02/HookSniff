@@ -134,7 +134,7 @@ export function PlanCards({
                 : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
             )}
           >
-            {t('monthly', { defaultValue: 'Monthly' })}
+            {t('monthly')}
           </button>
           <button
             type="button"
@@ -146,7 +146,7 @@ export function PlanCards({
                 : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
             )}
           >
-            {t('annual', { defaultValue: 'Annual' })}
+            {t('annual')}
             <span className="ml-1.5 inline-block px-1.5 py-0.5 text-[10px] font-bold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
               -15%
             </span>
@@ -174,7 +174,7 @@ export function PlanCards({
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t(plan.nameKey)}</h3>
               <div className="mt-2 mb-4">
                 {plan.isEnterprise ? (
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">{t('customPricing', { defaultValue: 'Custom' })}</span>
+                  <span className="text-3xl font-bold text-gray-900 dark:text-white">{t('customPricing')}</span>
                 ) : plan.key === 'developer' ? (
                   <>
                     <span className="text-3xl font-bold text-gray-900 dark:text-white">$0</span>
@@ -194,7 +194,7 @@ export function PlanCards({
                           ${plan.monthlyPrice}
                         </span>
                         <span className="ml-1.5 text-xs font-medium text-green-600 dark:text-green-400">
-                          {t('savePercent', { defaultValue: 'Save 15%' })}
+                          {t('savePercent')}
                         </span>
                       </div>
                     )}
@@ -218,7 +218,7 @@ export function PlanCards({
                   onClick={() => window.open('mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry', '_blank')}
                   className="w-full py-2.5 rounded-xl text-sm font-medium bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 transition"
                 >
-                  {t('contactSales', { defaultValue: 'Contact Sales' })}
+                  {t('contactSales')}
                 </button>
               ) : (
                 <button type="button"

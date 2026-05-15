@@ -228,13 +228,13 @@ export default function WebhookBuilderPage() {
             {loadingEndpoints ? (
               <div className="flex items-center gap-2 py-3 text-gray-500 dark:text-slate-400 text-sm">
                 <div className="w-4 h-4 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
-                {t('loadingEndpoints', { defaultValue: 'Loading endpoints...' })}
+                {t('loadingEndpoints')}
               </div>
             ) : endpoints.length === 0 ? (
               <div className="py-3 text-center">
-                <p className="text-gray-500 dark:text-slate-400 text-sm mb-2">{t('noEndpoints', { defaultValue: 'No endpoints found. Create an endpoint first.' })}</p>
+                <p className="text-gray-500 dark:text-slate-400 text-sm mb-2">{t('noEndpoints')}</p>
                 <a href="/core" className="text-sm text-brand-600 dark:text-brand-400 hover:underline">
-                  {t('goToCore', { defaultValue: 'Go to Core → Create Endpoint' })}
+                  {t('goToCore')}
                 </a>
               </div>
             ) : (
@@ -243,7 +243,7 @@ export default function WebhookBuilderPage() {
                 onChange={(e) => setEndpointId(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm mb-3"
               >
-                <option value="">{t('selectEndpoint', { defaultValue: 'Select an endpoint...' })}</option>
+                <option value="">{t('selectEndpoint')}</option>
                 {endpoints.map((ep) => (
                   <option key={ep.id} value={ep.id}>
                     {ep.description || ep.url} ({ep.id.slice(0, 8)}...)
