@@ -2,13 +2,12 @@
 //!
 //! GET /v1/ws — WebSocket upgrade with JWT auth
 
-use axum::extract::ws::{WebSocketUpgrade};
-use axum::extract::{Extension, Query};
+use axum::extract::ws::WebSocketUpgrade;
+use axum::extract::Extension;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Router;
-use serde::Deserialize;
 use std::sync::Arc;
 
 use crate::models::customer::Customer;
@@ -17,11 +16,6 @@ use crate::ws::handler::{handle_connection, WsHandlerConfig};
 
 pub fn router() -> Router {
     Router::new().route("/", get(ws_handler))
-}
-
-#[derive(Deserialize)]
-pub struct WsQueryParams {
-    pub token: Option<String>,
 }
 
 /// WebSocket upgrade handler with JWT auth and origin validation.
