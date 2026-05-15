@@ -118,6 +118,15 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 
 ## 🔧 Son Yapılan İşler
 
+### Oturum 173 — 2026-05-15 22:32 GMT+8
+1. **Neon Seq Scan Index Migration Uygulandı** ✅
+   - `018_seq_scan_indexes.sql` Neon DB'ye uygulandı (8 CREATE INDEX)
+   - Neon HTTP API ile (psql yok, Node.js https modülü)
+   - Tablo boyutları çok küçük (24 customers, 22 endpoints, 36 deliveries, 2 notifications)
+   - PostgreSQL küçük tablolarda otomatik seq scan tercih eder — tablolar büyüyünce index kullanılacak
+   - ANALYZE çalıştırıldı, planner istatistikleri güncellendi
+   - **9 index doğrulandı**: idx_customers_api_key_prefix, idx_endpoints_team_id, idx_endpoints_customer_active, idx_deliveries_customer_created_desc, idx_deliveries_cust_status_created, idx_notifications_customer_read, idx_invoices_status, idx_invoices_status_paid
+
 ### Oturum 172 — 2026-05-15 22:25 GMT+8
 1. **GCP Console Tarayıcı Erişimi** — Google hesabıyla giriş yapıldı (servetarslan02@gmail.com / uku_21700987)
 2. **Cloud Run Env Var Kontrolü** — 13 env var + 12 secret doğrulandı

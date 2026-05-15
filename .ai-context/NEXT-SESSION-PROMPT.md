@@ -59,6 +59,12 @@ git add -A && git commit -m "feat: ..." && git push origin main
 - Türkçe konuş, teknik terimleri açıkla
 - Emin olmadığın şeyleri yapma, sor
 
+## Oturum 173 — Neon DB Bağlantı
+- Neon HTTP API endpoint: `https://ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/sql`
+- Header: `Neon-Connection-String: postgresql://neondb_owner:npg_HUw5KmSC2nQL@...`
+- psql yok, Node.js https modülü ile SQL çalıştır
+- Neon free tier compute limiti aşılmış olabilir — bağlantılarda timeout olursa bekle
+
 ## Proje Yapısı
 - API: Rust + Axum (api/ klasörü)
 - Dashboard: Next.js 15 (dashboard/ klasörü)
