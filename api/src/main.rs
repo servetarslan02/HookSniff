@@ -299,6 +299,12 @@ async fn main() -> Result<()> {
         }
     });
 
+    // Metrics push job: push business metrics to Grafana Cloud every 60s (replaces monitor.sh)
+    let metrics_pool = pool.clone();
+    tokio::spawn(async move {
+        jobs::metrics_push::run(metrics_pool).await;
+    });
+
     // Start auth cache cleanup (evicts expired entries every 60s)
     middleware::start_auth_cache_cleanup();
 
