@@ -152,6 +152,18 @@ async fn main() -> Result<()> {
         }
     };
 
+    // Initialize R2 storage client (if CF_ACCOUNT_ID and CF_R2_TOKEN are set)
+    let r2_client = match crate::r2::R2Client::from_env() {
+        Some(client) => {
+            tracing::info!("✅ R2 storage client initialized (dead letter archive)");
+            Some(client)
+        }
+        None => {
+            tracing::info!("CF_ACCOUNT_ID/CF_R2_TOKEN not set, R2 storage disabled");
+            None
+        }
+    };
+
     // Initialize email provider (Resend primary → GCloud fallback → None)
     let email_provider = email::EmailProvider::from_config(&cfg);
 
@@ -360,6 +372,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(job_queue))
         .layer(axum::Extension(cache_layer))
         .layer(axum::Extension(qstash_client))
+        .layer(axum::Extension(r2_client))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg
                 .cors_origins
