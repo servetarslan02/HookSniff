@@ -102,11 +102,21 @@ GET    /admin/deploy-info              → Deploy bilgisi (versiyon, commit)
 - ❌ **Gelir projeksiyonu** — 3/6/12 aylık tahmini gelir grafiği yok
 - ❌ **Promosyon/kupon yönetimi** — İndirim kuponu oluşturma ve takibi yok
 
+### Mevcut Bug'lar (Düzeltilecek) 🐛
+- 🐛 **Overview pie chart hardcoded** — Veri yoksa `pct: 60, 30, 10` statik gösteriyor → yanıltıcı
+- 🐛 **Trend negatif gösterimi** — `Math.abs(diff)` kullanıldığı için negatif trend pozitif görünüyor
+- 🐛 **Profile dropdown hover** — `group-hover` ile açılıyor, mobilde touch cihazlarda çalışmıyor
+- 🐛 **Quick Search kapsamı** — Sadece kullanıcı arıyor, endpoint/delivery/event aramıyor
+- 🐛 **Currency hardcoded** — ₺ hardcoded, uluslararası destek yok
+
 ### Eksik — Operasyonel
 - ❌ **Maintenance mode toggle** — Settings'de bahsedilmiş ama API endpoint'i yok, sadece UI var
 - ❌ **Bulk email queue** — Toplu email gönderimi kuyruğa alınmıyor, anlık gönderim deneniyor (büyük listelerde timeout riski)
 - ❌ **Admin action audit logging** — Yeni eklenecek aksiyonlar (refund, GDPR delete, bulk email) için audit log kaydı zorunlu
 - ❌ **Customer dashboard view** — Admin müşterinin gözünden dashboard'u göremiyor (impersonate var ama token ile, "view as" modu daha güvenli)
+- ❌ **invoices/payment_transactions boş** — Tablolar var ama veri dolduran mekanizma yok (Polar.sh webhook ile fatura kaydetme gerekli)
+- ❌ **webhook_queue izleme** — Tablo var (migration 009) ama admin panelinde queue depth görünmüyor
+- ❌ **dead_letters izleme** — Tablo var (migration 001) ama admin panelinde kalıcı başarısızlıklar görünmüyor
 
 ---
 
@@ -172,9 +182,9 @@ GET    /admin/deploy-info              → Deploy bilgisi (versiyon, commit)
 💰 Revenue
 🖥️ System
 🚩 Feature Flags
+🔔 Alerts          ← YENİ sayfa (API'de CRUD var, ayrı sayfa yok)
 ⚙️ Settings
 📋 Activity Log
-🆕 🔔 Alerts (ayrı sayfa — mevcut ama sidebar'da yok)
 ```
 
 ### 3.2 Detaylı Sayfa İçerikleri
@@ -223,15 +233,26 @@ GET    /admin/deploy-info              → Deploy bilgisi (versiyon, commit)
 - Cohort analizi (aylık müşteri cohort karşılaştırması) — **YENİ**
 
 #### 🖥️ System (`/admin/system`)
-**Mevcut:** DB, Redis, API, queue sağlık durumu
+**Mevcut:** DB, Redis, API, queue sağlık durumu, test webhook console (15sn auto-refresh)
 **Eklenecek:**
 - **Global Failed Deliveries** — Tüm kullanıcıların başarısız delivery'leri
+- **Dead Letters** — Kalıcı olarak başarısız olmuş delivery'ler (`dead_letters` tablosu — migration 001)
+- **Queue Depth** — Kuyrukta bekleyen/failed webhook'lar (`webhook_queue` tablosu — migration 009)
 - **Rate Limit Violations** — Son ihlaller
 - **API Latency** — Endpoint bazlı response time
 - **Deploy History** — Son deploy'lar, versiyon
 
 #### 🚩 Feature Flags (`/admin/feature-flags`)
-**Mevcut:** CRUD — değişiklik yok
+**Mevcut:** CRUD (GET, POST, PUT, DELETE) — değişiklik yok
+**Not:** Planın eski versiyonunda atlanmış ama API'de mevcut. Sidebar'da doğru şekilde listeleniyor.
+
+#### 🔔 Alerts (`/admin/alerts`) — YENİ SAYFA
+**Mevcut:** API'de CRUD endpoint'leri var ama ayrı sayfası yok (Overview'de sayılıyor)
+**Eklenecek:**
+- Alert listesi (aktif/pasif filtresi)
+- Alert oluşturma formu (şartlar, eşikler, bildirim kanalı)
+- Alert düzenleme/silme
+- Son incident geçmişi
 
 #### ⚙️ Settings (`/admin/settings`)
 **Mevcut:** Platform ayarları
@@ -426,9 +447,11 @@ Response: { segment_id, user_count, users: [...] }
 
 ## 5. Adım Adım Uygulama
 
-### AŞAMA 0: Veritabanı Hazırlığı (0.5 oturum) — YENİ
+> **Sıralama mantığı:** Bağımsız ve hızlı kazanımlar önce, Polar.sh bağımlılığı olan refund en sonda.
 
-**Hedef:** Eksik tabloları oluştur, tutarsızlıkları çöz.
+### AŞAMA 0: Veritabanı Hazırlığı + Bug Fix (1 oturum)
+
+**Hedef:** Eksik tabloları oluştur, mevcut bug'ları düzelt.
 
 **Yeni Migration: `019_admin_upgrade.sql`**
 
@@ -518,7 +541,18 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 -- KARAR GEREKLİ: inbound.rs'deki api_keys sorgusu aktif mi?
 -- Eğer evet → bu tablo zaten gerekli, migration eksik
 -- Eğer hayır → dead code, temizlenmeli
+
+-- 7. Polar.sh webhook ile fatura kaydetme (invoices tablosunu doldurmak için)
+-- invoices ve payment_transactions tabloları migration 009'da var ama boş.
+-- Polar.sh webhook'u (invoice.created, payment.created) ile veri doldurulacak.
+-- Bu AŞAMA 5'te implemente edilecek.
 ```
+
+**Bug Fix'ler:**
+- Overview pie chart: Veri yoksa placeholder gösterme, "No data" mesajı
+- Trend negatif: `Math.abs(diff)` yerine gerçek negatif değeri göster
+- Profile dropdown: `group-hover` → `click` event (mobil uyumluluk)
+- Currency: ₺ hardcoded → platform_settings'den oku (dinamik)
 
 ### AŞAMA 1: Kullanıcı Kaynakları (1-2 oturum)
 
@@ -597,35 +631,28 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
      apiFetch(`/admin/users/${userId}/api-keys`, { token }),
    ```
 
-### AŞAMA 2: Admin Aksiyonları (1 oturum)
+### AŞAMA 2: Sistem Geneli (1 oturum)
 
-**Hedef:** Admin müşteri adına aksiyon yapabilsin.
-
-**Backend:**
-1. `POST /admin/users/{id}/refund` — Polar.sh API ile entegrasyon
-2. `POST /admin/users/{id}/test-webhook` — Mevcut webhook gönderme mantığını kullan
-3. `POST /admin/users/{id}/webhooks/{delivery_id}/replay` — Mevcut replay mantığını kullan
-
-**Frontend:**
-4. Kullanıcı detay sayfasına "Actions" sekmesi ekle
-5. Refund formu, test webhook butonu, replay butonu
-
-### AŞAMA 3: Sistem Geneli (1 oturum)
-
-**Hedef:** Admin sistem geneli sorunları görebilsin.
+**Hedef:** Admin sistem geneli sorunları görebilsin. (Bağımsız — AŞAMA 1'den sonra yapılabilir)
 
 **Backend:**
 1. `GET /admin/deliveries/failed` — Tüm kullanıcıların failed delivery'leri
-2. `GET /admin/rate-limit-violations` — Rate limit ihlalleri
-3. `GET /admin/api-latency` — API performans metrikleri
+2. `GET /admin/deliveries/dead-letters` — Kalıcı başarısızlıklar (`dead_letters` tablosundan)
+3. `GET /admin/queue/status` — Queue depth (`webhook_queue` tablosundan: pending/failed sayısı)
+4. `GET /admin/rate-limit-violations` — Rate limit ihlalleri
+5. `GET /admin/api-latency` — API performans metrikleri
 
 **Frontend:**
-4. System sayfasına yeni section'lar ekle
-5. Failed deliveries tablosu, rate limit violation listesi, latency grafikleri
+6. System sayfasına yeni section'lar ekle:
+   - Failed deliveries tablosu (kullanıcı linkli)
+   - Dead letters tablosu (en kritik — kalıcı hatalar)
+   - Queue depth göstergesi (pending/processing/failed)
+   - Rate limit violation listesi
+   - Latency grafikleri
 
-### AŞAMA 4: Müşteri İlişkileri (1 oturum) — YENİ
+### AŞAMA 3: Müşteri İlişkileri (1 oturum)
 
-**Hedef:** Admin müşteri hakkında not yazabilsin, etiketleyebilsin, geçmişi görebilsin.
+**Hedef:** Admin müşteri hakkında not yazabilsin, etiketleyebilsin, geçmişi görebilsin. (Bağımsız)
 
 **Backend:**
 1. `POST /admin/users/{id}/notes` — Not ekle
@@ -644,39 +671,67 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 8. User detail sayfasına "Communication" sekmesi
 9. Etiket renkleri: VIP=gold, at-risk=red, enterprise=purple, churn-risk=orange
 
-### AŞAMA 5: Fatura & Ödeme Yönetimi (0.5 oturum) — YENİ
+### AŞAMA 4: Fatura, Ödeme & Gelir Metrikleri (1 oturum)
 
-**Hedef:** Admin fatura ve ödeme geçmişini görebilsin.
+**Hedef:** Admin fatura/ödeme geçmişini görebilsin + gelir metrikleri. (Bağımsız)
 
 **Backend:**
 1. `GET /admin/users/{id}/invoices` — Kullanıcının faturaları (invoices tablosundan)
 2. `GET /admin/users/{id}/payments` — Kullanıcının ödemeleri (payment_transactions tablosundan)
 3. `GET /admin/invoices` — Tüm faturalar (sistem geneli)
-
-**Frontend:**
-4. User detail sayfasına "Billing" sekmesi
-5. Revenue sayfasına fatura listesi section'ı
-
-### AŞAMA 6: Gelir Metrikleri (0.5 oturum) — YENİ
-
-**Hedef:** ARPU, LTV, NRR, Expansion Revenue, Cohort analizi.
-
-**Backend:**
-1. Revenue API'sine yeni metrikler ekle:
+4. Revenue API'sine yeni metrikler ekle:
    - ARPU = MRR / toplam ücretli kullanıcı
    - LTV = ARPU / churn_rate
    - NRR = (dönem başı MRR + expansion - contraction - churn) / dönem başı MRR
    - Expansion Revenue = plan yükseltmelerden gelen ek gelir
 
 **Frontend:**
-2. Revenue sayfasına yeni kartlar ekle
-3. Cohort analizi tablosu (opsiyonel — ilk aşamada basit)
+5. User detail sayfasına "Billing" sekmesi (fatura + ödeme geçmişi)
+6. Revenue sayfasına fatura listesi section'ı
+7. Revenue sayfasına yeni metrik kartları (ARPU, LTV, NRR, Expansion Revenue)
+8. Cohort analizi tablosu (opsiyonel — ilk aşamada basit)
+
+### AŞAMA 5: Refund + Polar.sh Entegrasyonu (1 oturum) — EN SONA BIRAKILDI
+
+**Hedef:** Admin müşteriye iade yapabilsin. (Polar.sh bağımlılığı var — riskli)
+
+**Backend:**
+1. `POST /admin/users/{id}/refund` — Polar.sh refund API entegrasyonu
+   - Polar.sh docs'dan refund endpoint'ini kontrol et
+   - Idempotency key ile mükerrer gönderimi engelle
+   - `refunds` tablosuna kayıt + audit log
+2. `GET /admin/refunds` — Sistem geneli refund listesi
+3. Polar.sh webhook handler:
+   - `invoice.created` → `invoices` tablosuna kaydet
+   - `payment.created` → `payment_transactions` tablosuna kaydet
+   - `refund.created` → `refunds` tablosunu güncelle
+
+**Frontend:**
+4. User detail sayfasına "Actions" sekmesinde refund formu
+5. Onay dialogu (miktar + sebep)
+6. Revenue sayfasına refund geçmişi section'ı
+
+**Risk:** Polar.sh API entegrasyonu beklenenden uzun sürebilir. Bu aşama ertelenirse diğer aşamaları etkilemez.
+
+### AŞAMA 6: Alerts Sayfası + Final (0.5 oturum)
+
+**Hedef:** Alerts'i ayrı sayfaya taşı, genel polish.
+
+**Backend:**
+1. Mevcut alerts endpoint'leri zaten var (GET, POST, PUT, DELETE) — yeni endpoint gerekmez
+
+**Frontend:**
+2. Yeni `/admin/alerts` sayfası oluştur
+3. Alert listesi (aktif/pasif filtresi)
+4. Alert oluşturma/düzenleme formu
+5. Son incident geçmişi
+6. Sidebar'a Alerts linki ekle
 
 ---
 
 ## 6. Kontrol Listesi
 
-### Aşama 0 — Veritabanı Hazırlığı
+### Aşama 0 — Veritabanı + Bug Fix
 - [ ] `019_admin_upgrade.sql` migration yaz
 - [ ] `refunds` tablosu CREATE TABLE
 - [ ] `customer_notes` tablosu CREATE TABLE
@@ -684,16 +739,18 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 - [ ] `communication_history` tablosu CREATE TABLE
 - [ ] `rate_limit_violations` tablosu CREATE TABLE
 - [ ] `api_keys` tablosu — KARAR: inbound.rs'deki sorgu aktif mi? Evetse CREATE TABLE
+- [ ] Overview pie chart bug fix (hardcoded pct → "No data")
+- [ ] Trend negatif bug fix (Math.abs → gerçek değer)
+- [ ] Profile dropdown bug fix (group-hover → click)
+- [ ] Currency bug fix (₺ hardcoded → platform_settings'den oku)
 - [ ] `cargo test` ile doğrula
 
 ### Aşama 1 — Kullanıcı Kaynakları
 - [ ] `GET /admin/users/{id}/endpoints` — Backend endpoint
-- [ ] `GET /admin/users/{id}/webhooks` — Backend endpoint (filtre: status, event, since)
+- [ ] `GET /admin/users/{id}/webhooks` — Backend endpoint (filtre: status, event_type, since)
 - [ ] `GET /admin/users/{id}/api-keys` — Backend endpoint
 - [ ] `GET /admin/users/{id}/applications` — Backend endpoint
 - [ ] `GET /admin/users/{id}/usage` — Backend endpoint
-- [ ] `GET /admin/users/{id}/invoices` — Backend endpoint
-- [ ] `GET /admin/users/{id}/payments` — Backend endpoint
 - [ ] `admin.ts` — Yeni API fonksiyonları
 - [ ] `/admin/users/[id]` — Endpoints tab component
 - [ ] `/admin/users/[id]` — Webhooks tab component (filtre + arama)
@@ -702,26 +759,20 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 - [ ] `/admin/users/[id]` — Usage tab component (grafikler)
 - [ ] Build test + push
 
-### Aşama 2 — Admin Aksiyonları
-- [ ] `POST /admin/users/{id}/refund` — Backend endpoint + Polar.sh entegrasyonu
-- [ ] `POST /admin/users/{id}/test-webhook` — Backend endpoint
-- [ ] `POST /admin/users/{id}/webhooks/{id}/replay` — Backend endpoint
-- [ ] `/admin/users/[id]` — Actions tab component
-- [ ] Refund formu + onay dialogu
-- [ ] Build test + push
-
-### Aşama 3 — Sistem Geneli
+### Aşama 2 — Sistem Geneli
 - [ ] `GET /admin/deliveries/failed` — Backend endpoint
+- [ ] `GET /admin/deliveries/dead-letters` — Backend endpoint
+- [ ] `GET /admin/queue/status` — Backend endpoint
 - [ ] `GET /admin/rate-limit-violations` — Backend endpoint
 - [ ] `GET /admin/api-latency` — Backend endpoint
-- [ ] `GET /admin/invoices` — Backend endpoint (sistem geneli faturalar)
-- [ ] `GET /admin/refunds` — Backend endpoint (sistem geneli iadeler)
 - [ ] `/admin/system` — Failed deliveries section
+- [ ] `/admin/system` — Dead letters section
+- [ ] `/admin/system` — Queue depth göstergesi
 - [ ] `/admin/system` — Rate limit violations section
 - [ ] `/admin/system` — API latency section
 - [ ] Build test + push
 
-### Aşama 4 — Müşteri İlişkileri
+### Aşama 3 — Müşteri İlişkileri
 - [ ] `POST /admin/users/{id}/notes` — Backend endpoint
 - [ ] `GET /admin/users/{id}/notes` — Backend endpoint
 - [ ] `POST /admin/users/{id}/tags` — Backend endpoint
@@ -732,15 +783,32 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 - [ ] `/admin/users/[id]` — Communication sekmesi
 - [ ] Build test + push
 
-### Aşama 5 — Fatura & Ödeme
+### Aşama 4 — Fatura, Ödeme & Gelir Metrikleri
+- [ ] `GET /admin/users/{id}/invoices` — Backend endpoint
+- [ ] `GET /admin/users/{id}/payments` — Backend endpoint
+- [ ] `GET /admin/invoices` — Backend endpoint (sistem geneli)
+- [ ] Revenue API'sine ARPU, LTV, NRR, Expansion Revenue ekle
 - [ ] `/admin/users/[id]` — Billing sekmesi (fatura + ödeme geçmişi)
 - [ ] `/admin/revenue` — Fatura listesi section'ı
-- [ ] Build test + push
-
-### Aşama 6 — Gelir Metrikleri
-- [ ] Revenue API'sine ARPU, LTV, NRR, Expansion Revenue ekle
 - [ ] `/admin/revenue` — Yeni metrik kartları
 - [ ] Cohort analizi tablosu (opsiyonel)
+- [ ] Build test + push
+
+### Aşama 5 — Refund + Polar.sh
+- [ ] Polar.sh refund API entegrasyonu — docs kontrol + test
+- [ ] `POST /admin/users/{id}/refund` — Backend endpoint
+- [ ] `GET /admin/refunds` — Backend endpoint (sistem geneli)
+- [ ] Polar.sh webhook handler (invoice.created, payment.created, refund.created)
+- [ ] `/admin/users/[id]` — Actions sekmesinde refund formu + onay dialogu
+- [ ] `/admin/revenue` — Refund geçmişi section'ı
+- [ ] Build test + push
+
+### Aşama 6 — Alerts Sayfası + Final
+- [ ] `/admin/alerts` — Yeni sayfa oluştur
+- [ ] Alert listesi (aktif/pasif filtresi)
+- [ ] Alert oluşturma/düzenleme formu
+- [ ] Son incident geçmişi
+- [ ] Sidebar'a Alerts linki ekle
 - [ ] Build test + push
 
 ---
@@ -749,14 +817,15 @@ CREATE INDEX idx_api_keys_customer ON api_keys(customer_id);
 
 ```
 api/migrations/019_admin_upgrade.sql      ← YENİ migration (6 tablo)
-api/src/routes/admin.rs                    ← YENİ endpoint'ler eklenecek (~15 yeni fonksiyon)
+api/src/routes/admin.rs                    ← YENİ endpoint'ler eklenecek (~18 yeni fonksiyon)
 dashboard/src/lib/api.ts                   ← YENİ adminApi fonksiyonları
 dashboard/src/app/[locale]/admin/
-├── page.tsx                               ← Overview güncellenecek (failed deliveries, alerts)
+├── page.tsx                               ← Overview: bug fix + failed deliveries/alerts
 ├── users/page.tsx                         ← Mevcut (değişmez)
 ├── users/[id]/page.tsx                    ← YENİ tab'lar eklenecek (9 yeni sekme)
-├── system/page.tsx                        ← YENİ section'lar eklenecek
-├── revenue/page.tsx                       ← YENİ metrik kartları + fatura listesi
+├── system/page.tsx                        ← YENİ section'lar (dead letters, queue depth, latency)
+├── revenue/page.tsx                       ← YENİ metrik kartları + fatura listesi + refund geçmişi
+├── alerts/page.tsx                        ← YENİ sayfa
 └── (diğer sayfalar değişmez)
 ```
 
@@ -766,7 +835,7 @@ dashboard/src/app/[locale]/admin/
 
 | Risk | Çözüm |
 |------|-------|
-| Polar.sh refund API entegrasyonu | Polar.sh docs kontrol et, test et |
+| Polar.sh refund API entegrasyonu | Polar.sh docs kontrol et, test et; AŞAMA 5 en sonda — diğer aşamaları etkilemez |
 | Büyük veri seti yavaşlık | Pagination, limit, index |
 | Admin yetki kontrolü | Her endpoint'te `is_admin` kontrolü |
 | GDPR silme geri alınamaz | Soft delete, onay dialogu |
@@ -775,29 +844,31 @@ dashboard/src/app/[locale]/admin/
 | Bulk email timeout | Kuyruk sistemi (background worker), batch 50'şer |
 | Refund mükerrer gönderim | Idempotency key + provider_refund_id unique constraint |
 | Communication history boyutu | Eski kayıtları arşivle (>90 gün), index'le |
-| Fatura tablosu boş | Migration 009'da tablo var ama veri dolduran cron yok → webhook ile fatura kaydet |
+| Fatura tablosu boş | Polar.sh webhook handler ekle (AŞAMA 5) |
+| Dead letters büyüyor | TTL policy — 30 gün sonra otomatik temizle |
 
 ---
 
 ## 9. Öncelik Sırası
 
-| Sıra | Özellik | Neden |
-|------|---------|-------|
-| 0 | **Veritabanı migration** | Temel — diğer her şey bunun üzerine kurulur |
-| 1 | Kullanıcı endpoint'lerini görme | Müşteri destek için en çok lazım olan |
-| 2 | Kullanıcı webhook'larını görme | "Webhook'larım gelmiyor" sorunu |
-| 3 | Test webhook gönderme | Debug için kritik |
-| 4 | Failed delivery replay | Müşteri adına retry |
-| 5 | Kullanıcı API key'leri | Key kaybı durumu |
-| 6 | Global failed deliveries | Sistem geneli izleme |
-| 7 | Rate limit violations | Güvenlik |
-| 8 | Refund | Müşteri memnuniyeti |
-| 9 | Müşteri notları + etiketleri | Operasyonel verimlilik |
-| 10 | Fatura + ödeme geçmişi | Finans |
-| 11 | İletişim geçmişi | Müşteri ilişkileri |
-| 12 | Bulk email | Operasyon |
-| 13 | GDPR tools | Uyumluluk |
-| 14 | ARPU, LTV, NRR metrikleri | Büyüme takibi |
+| Sıra | Özellik | Neden | Aşama |
+|------|---------|-------|-------|
+| 0 | **Veritabanı migration + bug fix** | Temel — diğer her şey bunun üzerine kurulur | 0 |
+| 1 | Kullanıcı endpoint'lerini görme | Müşteri destek için en çok lazım olan | 1 |
+| 2 | Kullanıcı webhook'larını görme | "Webhook'larım gelmiyor" sorunu | 1 |
+| 3 | Kullanıcı API key'leri | Key kaybı durumu | 1 |
+| 4 | Global failed deliveries | Sistem geneli izleme | 2 |
+| 5 | Dead letters | Kalıcı başarısızlıklar — en kritik veri | 2 |
+| 6 | Queue depth | Kuyruk sağlığı | 2 |
+| 7 | Rate limit violations | Güvenlik | 2 |
+| 8 | Müşteri notları + etiketleri | Operasyonel verimlilik | 3 |
+| 9 | İletişim geçmişi | Müşteri ilişkileri | 3 |
+| 10 | Fatura + ödeme geçmişi | Finans | 4 |
+| 11 | ARPU, LTV, NRR metrikleri | Büyüme takibi | 4 |
+| 12 | Refund | Müşteri memnuniyeti (Polar.sh bağımlı) | 5 |
+| 13 | Alerts sayfası | Operasyon | 6 |
+| 14 | Bulk email | Operasyon | — (ileride) |
+| 15 | GDPR tools | Uyumluluk | — (ileride) |
 
 ---
 
