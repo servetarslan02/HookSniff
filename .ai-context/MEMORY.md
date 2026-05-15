@@ -227,3 +227,14 @@ Bazı tablolarda index yerine full table scan yapılıyor:
 2. i18n — 920+ string Türkçe'ye çevrilecek
 3. Güvenlik düzeltmeleri (P0 kalan maddeler)
 4. $500/ay gelir hedefi
+
+### Oturum 171 — 2026-05-15 21:28 GMT+8
+1. **Cloud Build Hata Analizi** — Tüm son deploy'lar başarısız (9:11 PM'den itibaren)
+   - Hata: `cannot find 'qstash' in 'crate'` + `cannot find 'r2' in 'crate'`
+   - Sebep: `main.rs`'de `crate::qstash` ve `crate::r2` kullanılmış ama Rust 2021 edition'da main.rs ayrı binary crate
+   - Fix: `crate::qstash` → `hooksniff_api::qstash`, `crate::r2` → `hooksniff_api::r2`
+   - Ek: `cloudbuild.yaml`'a `--no-cache` eklendi (Docker layer cache sorunu önlemi)
+   - Commit: 97b4ec3f
+2. **GitHub Actions** — Hala başarısız (billing issue, faturalandırma güncellenmeli)
+3. **GCP Console** — Servet'in Google hesabı ile giriş yapıldı (2FA onayı ile)
+4. **API Sağlığı** — Çalışıyor (healthy, DB 27ms, Redis configured)
