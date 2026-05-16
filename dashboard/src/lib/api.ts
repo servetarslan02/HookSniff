@@ -265,6 +265,57 @@ export const api = {
 
   getEndpointHealth: (token?: string) =>
     apiFetch<EndpointHealthResponse[]>('/endpoint-health', { token: token || undefined }),
+
+  getApiKeys: (token: string) =>
+    apiFetch<ApiKeyResponse[]>('/api-keys', { token }),
+  createApiKey: (token: string, name: string) =>
+    apiFetch<{ key: string }>('/api-keys', { method: 'POST', body: { name }, token }),
+  deleteApiKey: (token: string, id: string) =>
+    apiFetch(`/api-keys/${id}`, { method: 'DELETE', token }),
+  rotateApiKey: (token: string, id: string) =>
+    apiFetch<{ key: string }>(`/api-keys/${id}/rotate`, { method: 'POST', token }),
+
+  getPortalConfig: (token: string) =>
+    apiFetch<PortalConfigResponse>('/portal/config', { token }),
+  getPortalEmbedCode: (token: string) =>
+    apiFetch<PortalEmbedCodeResponse>('/portal/embed-code', { token }),
+  updatePortalConfig: (token: string, config: Partial<PortalConfigResponse>) =>
+    apiFetch('/portal/config', { method: 'POST', body: config, token }),
+  getPortalProfile: (token: string) =>
+    apiFetch<PortalProfileResponse>('/portal/me', { token }),
+  getPortalUsage: (token: string) =>
+    apiFetch<PortalUsageResponse>('/portal/usage', { token }),
+
+  getRateLimits: (token: string) =>
+    apiFetch<RateLimitResponse[]>('/rate-limits', { token }),
+  setRateLimit: (token: string, endpointId: string, config: { requests_per_second: number; burst_size: number; enabled: boolean }) =>
+    apiFetch(`/rate-limits/${endpointId}`, { method: 'POST', body: config, token }),
+  deleteRateLimit: (token: string, endpointId: string) =>
+    apiFetch(`/rate-limits/${endpointId}`, { method: 'DELETE', token }),
+
+  getSchemas: (token: string) =>
+    apiFetch<SchemaRegistryListResponse>('/schemas', { token }),
+
+  search: (token: string, params: Record<string, string>) => {
+    const qs = new URLSearchParams(params).toString();
+    return apiFetch<SearchResponseData>(`/search${qs ? `?${qs}` : ''}`, { token });
+  },
+
+  getServiceTokens: (token: string) =>
+    apiFetch<ServiceTokenResponse[]>('/service-tokens', { token }),
+  createServiceToken: (token: string, name: string) =>
+    apiFetch<ServiceTokenResponse>('/service-tokens', { method: 'POST', body: { name }, token }),
+  deleteServiceToken: (token: string, id: string) =>
+    apiFetch(`/service-tokens/${id}`, { method: 'DELETE', token }),
+  revealServiceToken: (token: string, id: string) =>
+    apiFetch<{ token: string | null; message?: string }>(`/service-tokens/${id}/reveal`, { method: 'POST', token }),
+  updateServiceToken: (token: string, id: string, body: { name?: string; is_active?: boolean }) =>
+    apiFetch(`/service-tokens/${id}`, { method: 'PUT', body, token }),
+
+  getTemplates: (token: string, industry?: string) => {
+    const qs = industry ? `?industry=${industry}` : '';
+    return apiFetch<TemplateListResponse>(`/templates${qs}`, { token });
+  },
 };
 
 // Types
@@ -514,6 +565,110 @@ export interface EndpointHealthResponse {
   consecutive_failures: number;
   last_failure_at: string | null;
   uptime_24h: number;
+}
+
+export interface ApiKeyResponse {
+  id: string;
+  name: string | null;
+  api_key_prefix: string;
+  is_active: boolean;
+  created_at: string;
+  last_used_at: string | null;
+}
+
+export interface PortalConfigResponse {
+  id?: string;
+  company_name?: string;
+  logo_url?: string | null;
+  primary_color?: string;
+  font_family?: string;
+  dark_mode?: boolean;
+  show_events?: boolean;
+  show_deliveries?: boolean;
+  allowed_events?: string[];
+  custom_css?: string;
+}
+
+export interface PortalEmbedCodeResponse {
+  iframe?: string;
+  portal_url?: string;
+  react?: string;
+  script?: string;
+}
+
+export interface PortalProfileResponse {
+  id: string;
+  email: string;
+  name: string | null;
+  plan: string;
+  created_at: string;
+}
+
+export interface PortalUsageResponse {
+  total_deliveries: number;
+  total_endpoints: number;
+  success_rate: number;
+  period_start: string;
+  period_end: string;
+}
+
+export interface RateLimitResponse {
+  endpoint_id: string;
+  requests_per_second: number;
+  burst_size: number;
+  enabled: boolean;
+}
+
+export interface SchemaRegistryItem {
+  id: string;
+  name: string;
+  description: string | null;
+  schema: unknown;
+  version: number;
+  created_at: string;
+}
+
+export interface SchemaRegistryListResponse {
+  schemas: SchemaRegistryItem[];
+}
+
+export interface SearchResult {
+  id: string;
+  event: string | null;
+  status: string;
+  attempt_count: number;
+  response_status: number | null;
+  created_at: string;
+  endpoint_url: string;
+}
+
+export interface SearchResponseData {
+  deliveries: SearchResult[];
+  total: number;
+  page: number;
+  per_page: number;
+  query: string;
+}
+
+export interface ServiceTokenResponse {
+  id: string;
+  name: string;
+  token_prefix: string;
+  created_at: string;
+  last_used_at: string | null;
+}
+
+export interface TemplateItem {
+  id: string;
+  name: string;
+  description: string;
+  industry?: string;
+  event_types: string[];
+  endpoint_count?: number;
+}
+
+export interface TemplateListResponse {
+  templates: TemplateItem[];
 }
 
 export interface UserAnalytics {
