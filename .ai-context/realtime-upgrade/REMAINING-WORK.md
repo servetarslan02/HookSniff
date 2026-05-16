@@ -53,9 +53,9 @@
 | # | İş | Durum | Detay |
 |---|-----|-------|-------|
 | 1 | **Cloud Run API deploy** | ⏳ Bekliyor | cloudbuild.yaml güncellendi (Sentry OTLP) ama yeni build tetiklenmedi. GCP Console → Cloud Build → Triggers → Run |
-| 2 | **Sentry auth token** | ⏳ Bekliyor | Mevcut token scope'ları yetersiz (403). Yeni token gerekli: `org:read`, `project:releases`, `project:write` |
-| 3 | **Sentry alert rules** | ⏳ Bekliyor | Yeni hata bildirimi, yüksek hata oranı, performance regression. Token yenilendikten sonra API'den oluşturulabilir |
-| 4 | **Sentry Vercel integration** | ⏳ Bekliyor | Sentry dashboard → Settings → Integrations → Vercel → Add Installation (OAuth flow, browser gerekli) |
+| 2 | **Sentry auth token** | ✅ Tamamlandı | `hooksniff-otel` — scopes: `org:read, project:read, project:releases, project:write` |
+| 3 | **Sentry alert rules** | ⏳ Kısmen | Yeni hata bildirimi ✅ oluşturuldu. Yüksek hata oranı + performance regression eksik |
+| 4 | **Sentry Vercel integration** | ✅ Tamamlandı | hooksniff-dash → javascript-nextjs eşleştirildi |
 | 5 | **Sentry team member** | ⏳ Bekliyor | servetarslan02@gmail.com eklenecek. Alert routing için gerekli |
 | 6 | **Sentry release tracking** | ⏳ Bekliyor | Vercel integration bağlandıktan sonra otomatik çalışacak |
 

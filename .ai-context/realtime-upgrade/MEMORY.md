@@ -75,6 +75,20 @@ getAuditLog, getEndpointHealth, getApiKeys, createApiKey, deleteApiKey, rotateAp
 ## Sonraki Adımlar
 
 1. ~~portal-customize, portal-manage, webhook-builder, webhooks/new sayfalarını geçir~~ ✅
-2. `node_modules` kurulumu + `npx tsc --noEmit` TypeScript kontrolü
+2. ~~node_modules kurulumu + npx tsc --noEmit TypeScript kontrolü~~ ✅
 3. Vercel + Cloud Run deploy kontrolü
 4. Faz 6 stress test (k6) — opsiyonel
+
+## Sentry & Deploy (2026-05-17 Oturum)
+
+### ✅ Yapılanlar
+- Sentry auth token oluşturuldu: `hooksniff-otel`
+  - Scopes: `org:read, project:read, project:releases, project:write`
+  - Token: `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`
+- Alert rule oluşturuldu: "Notify Suggested Assignees" (yeni hata, çözüm, eskalasyon)
+- Vercel integration kuruldu: hooksniff-dash → javascript-nextjs
+
+### ⏳ Kalan
+- Sentry team member: servetarslan02@gmail.com eklenecek
+- Yüksek hata oranı + performance regression alert'leri
+- Cloud Run API deploy (GCP Console manuel)
