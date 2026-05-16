@@ -39,8 +39,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     }
 
     setState('connecting');
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-    const wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws';
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL
+      || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1').replace(/^http/, 'ws') + '/ws';
     const connectStart = Date.now();
 
     const ws = new WebSocket(`${wsUrl}?token=${encodeURIComponent(token)}`);
