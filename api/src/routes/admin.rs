@@ -1415,7 +1415,11 @@ async fn test_webhook(
         return Err(AppError::BadRequest(format!("URL not allowed: {}", e)));
     }
 
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(10))
+        .connect_timeout(std::time::Duration::from_secs(5))
+        .build()
+        .unwrap_or_else(|_| reqwest::Client::new());
     let start = std::time::Instant::now();
 
     let mut request = client
@@ -2709,7 +2713,12 @@ async fn admin_failed_deliveries(
     let rows = if let Some(uid) = params.user_id {
         sqlx::query_as::<_, FailedDeliveryRow>(&format!(
             r#"SELECT d.id, d.customer_id, d.endpoint_id, d.event_type, d.status,
-                d.attempt_count, d.response_status, d.response_body, d.created_at,
+                d.attempt_count, d.response_status,
+                CASE WHEN LENGTH(d.response_body) > 4096
+                    THEN LEFT(d.response_body, 4096) || '...[truncated]'
+                    ELSE d.response_body
+                END as response_body,
+                d.created_at,
                 (SELECT da.error_message FROM delivery_attempts da
                  WHERE da.delivery_id = d.id ORDER BY da.attempt_number DESC LIMIT 1) as error_message,
                 c.email as customer_email,
@@ -2729,7 +2738,12 @@ async fn admin_failed_deliveries(
     } else {
         sqlx::query_as::<_, FailedDeliveryRow>(&format!(
             r#"SELECT d.id, d.customer_id, d.endpoint_id, d.event_type, d.status,
-                d.attempt_count, d.response_status, d.response_body, d.created_at,
+                d.attempt_count, d.response_status,
+                CASE WHEN LENGTH(d.response_body) > 4096
+                    THEN LEFT(d.response_body, 4096) || '...[truncated]'
+                    ELSE d.response_body
+                END as response_body,
+                d.created_at,
                 (SELECT da.error_message FROM delivery_attempts da
                  WHERE da.delivery_id = d.id ORDER BY da.attempt_number DESC LIMIT 1) as error_message,
                 c.email as customer_email,
@@ -2755,6 +2769,7 @@ async fn admin_failed_deliveries(
 #[derive(Debug, Deserialize)]
 pub struct DeadLetterParams {
     pub limit: Option<i64>,
+    pub since: Option<String>,
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -2780,8 +2795,16 @@ async fn admin_dead_letters(
     require_admin(&customer)?;
 
     let limit = params.limit.unwrap_or(50).min(200);
+    let since = params.since.as_deref().unwrap_or("24h");
+    let interval = match since {
+        "1h" => "1 hour",
+        "24h" => "24 hours",
+        "7d" => "7 days",
+        "30d" => "30 days",
+        _ => "24 hours",
+    };
 
-    let rows = sqlx::query_as::<_, DeadLetterRow>(
+    let rows = sqlx::query_as::<_, DeadLetterRow>(&format!(
         r#"SELECT dl.id, dl.delivery_id, dl.endpoint_id, dl.customer_id,
             dl.payload, dl.reason, dl.attempts, dl.created_at,
             c.email as customer_email,
@@ -2789,8 +2812,9 @@ async fn admin_dead_letters(
         FROM dead_letters dl
         LEFT JOIN customers c ON c.id = dl.customer_id
         LEFT JOIN endpoints e ON e.id = dl.endpoint_id
-        ORDER BY dl.created_at DESC LIMIT $1"#
-    )
+        WHERE dl.created_at >= NOW() - INTERVAL '{}'
+        ORDER BY dl.created_at DESC LIMIT $1"#, interval
+    ))
     .bind(limit)
     .fetch_all(&pool)
     .await?;
@@ -2818,37 +2842,25 @@ async fn admin_queue_status(
 ) -> Result<Json<QueueStatus>, AppError> {
     require_admin(&customer)?;
 
-    let pending: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'pending'"
-    ).fetch_one(&pool).await?;
-
-    let processing: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'processing'"
-    ).fetch_one(&pool).await?;
-
-    let failed: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'failed'"
-    ).fetch_one(&pool).await?;
-
-    let total: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_queue"
-    ).fetch_one(&pool).await?;
-
-    let oldest: (Option<DateTime<Utc>>,) = sqlx::query_as(
-        "SELECT MIN(created_at) FROM webhook_queue WHERE status = 'pending'"
-    ).fetch_one(&pool).await?;
-
-    let failed_1h: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'failed' AND updated_at >= NOW() - INTERVAL '1 hour'"
+    // Single query instead of 6 separate COUNT(*) queries
+    let row: (i64, i64, i64, i64, Option<DateTime<Utc>>, i64) = sqlx::query_as(
+        "SELECT
+            COUNT(*) FILTER (WHERE status = 'pending'),
+            COUNT(*) FILTER (WHERE status = 'processing'),
+            COUNT(*) FILTER (WHERE status = 'failed'),
+            COUNT(*),
+            MIN(created_at) FILTER (WHERE status = 'pending'),
+            COUNT(*) FILTER (WHERE status = 'failed' AND updated_at >= NOW() - INTERVAL '1 hour')
+        FROM webhook_queue"
     ).fetch_one(&pool).await?;
 
     Ok(Json(QueueStatus {
-        pending: pending.0,
-        processing: processing.0,
-        failed: failed.0,
-        total: total.0,
-        oldest_pending_at: oldest.0,
-        failed_last_hour: failed_1h.0,
+        pending: row.0,
+        processing: row.1,
+        failed: row.2,
+        total: row.3,
+        oldest_pending_at: row.4,
+        failed_last_hour: row.5,
     }))
 }
 
