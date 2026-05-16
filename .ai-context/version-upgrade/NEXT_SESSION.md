@@ -1,15 +1,18 @@
 # Next Session — Version Upgrade
 
-> Son güncelleme: 2026-05-17 06:30 GMT+8
+> Son güncelleme: 2026-05-17 07:35 GMT+8
 
 ---
 
-## Tamamlanan
-- Faz 1-15, 16, 17, 20, 22 — tüm dashboard/SDK/GitHub Actions/Docker güncellemeleri
-- Rust: cargo check başarılı (2 compile hatası düzeltildi)
-- Rust: cargo test compile düzeltmeleri (6 hata) — DeadLetterParams, RateLimitViolationParams, ExportUsersParams, AdminAuditEntry, RefundRow, CreateAlertRequest, Config, alerts.rs clone fix
-- Swap 5GB eklendi, Rust 1.95.0 kuruldu
-- Main'e merge edildi, push edildi
+## Tamamlanan (Bu Oturum)
+- unwrap() temizliği: 47 production unwrap düzeltildi (11 dosya)
+  - Pattern: `unwrap()` → `expect()`, `HeaderValue::from_static()`, `if let Some()`
+  - 938 test unwrap dokunulmadı (kabul edilebilir)
+- ai-context/version-upgrade dosyaları oluşturuldu/güncellendi
+- Neon DB kontrol: 13 MB, 16 aktif bağlantı — sorun yok
+- Vendor patch kontrol: tracing-opentelemetry v0.32.1 — sadece reproducibility, özel patch yok
+- Dead code inceleme: 11 #[allow(dead_code)] — hepsi mevcut (monitoring/sqlx gereksinimi)
+- console.log/any tipleri inceleme: production'da sorunlu yok
 
 ## Hemen Yap (ÖNCELİKLI)
 
@@ -20,10 +23,22 @@
 - Chart'lar çalışıyor mu? (recharts 3)
 - Dil değiştirme (TR/EN)
 
-### 3. Kalan Fazlar
-- Faz 20: unwrap() temizliği (816 tane, kritik path'ler)
-- Faz 21: E2E test ekleme
-- cargo audit ignore'ları kontrol
+### 2. Faz 19: Merge & Deploy
+- `git checkout main` → merge → push → Cloud Build deploy
+
+## Kalan İşler
+
+### Faz 21: E2E Test
+- 5 temel E2E test yaz (login, endpoint, webhook, sayfa yükleme, dil)
+
+### Faz 23: Servet Görevleri
+- Polar.sh Go Live — Stripe identity verification
+- GitHub Actions billing — dakikaları yenile
+- Grafana trial — 20 Mayıs'ta bitiyor
+- Render API key kontrol — mevcut key çalışmıyor (Unauthorized)
+
+### cargo audit ignore'ları
+- 8 tane RUSTSEC ignore var, kontrol gerekli
 
 ## Kurallar
 - Swap kurulu (5GB), Rust kurulu (1.95.0)
