@@ -1788,7 +1788,18 @@
     "errorRate": "Error Rate",
     "replaying": "Replaying...",
     "replaySelected": "Replay Selected",
-    "deselectAll": "Deselect All"
+    "deselectAll": "Deselect All",
+    "bulkActionConfirm": "This will affect {count} user(s).",
+    "bulkBan": "Ban Selected",
+    "bulkChangePlan": "Change Plan",
+    "bulkUnban": "Unban Selected",
+    "selectedCount": "{count} selected",
+    "cancel": "Cancel",
+    "date": "Date",
+    "headers": "Headers",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "viewDetails": "View Details"
   },
   "landing": {
     "nav": {
