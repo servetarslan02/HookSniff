@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
@@ -22,6 +22,7 @@ export default function FeatureFlagsPage() {
   const flags = data?.flags ?? [];
   const createMutation = useCreateFeatureFlag();
   const updateMutation = useUpdateFeatureFlag();
+  const toggleMutation = useUpdateFeatureFlag();
   const deleteMutation = useDeleteFeatureFlag();
 
   const [showCreate, setShowCreate] = useState(false);
@@ -44,13 +45,29 @@ export default function FeatureFlagsPage() {
 
   const PLAN_OPTIONS = ['developer', 'startup', 'pro', 'enterprise'];
 
+  // Close modals on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (showCreate) setShowCreate(false);
+      else if (editTarget) setEditTarget(null);
+      else if (deleteTarget) setDeleteTarget(null);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showCreate, editTarget, deleteTarget]);
+
   /* ─── Create ─── */
   const handleCreate = async () => {
-    if (!token || !newName.trim()) return;
+    if (!token) return;
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    if (trimmed.length > 100) { toast(t('nameTooLong'), 'error'); return; }
+    if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) { toast(t('nameInvalid'), 'error'); return; }
     try {
       await createMutation.mutateAsync({
-        name: newName.trim(),
-        description: newDesc || undefined,
+        name: trimmed,
+        description: newDesc.trim() || null,
         is_enabled: newEnabled,
         rollout_percentage: newRollout,
         enabled_for_plans: newPlans,
@@ -84,7 +101,7 @@ export default function FeatureFlagsPage() {
         id: editTarget.id,
         data: {
           name: editName,
-          description: editDesc || undefined,
+          description: editDesc.trim() || null,
           is_enabled: editEnabled,
           rollout_percentage: editRollout,
           enabled_for_plans: editPlans,
@@ -98,12 +115,16 @@ export default function FeatureFlagsPage() {
   };
 
   /* ─── Quick Toggle ─── */
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+
   const handleToggle = (flag: FeatureFlagValidated) => {
-    if (!token) return;
-    updateMutation.mutate(
+    if (!token || togglingId) return;
+    setTogglingId(flag.id);
+    toggleMutation.mutate(
       { id: flag.id, data: { is_enabled: !flag.is_enabled } },
       {
         onError: () => toast(t('updateFailed'), 'error'),
+        onSettled: () => setTogglingId(null),
       },
     );
   };
@@ -162,14 +183,22 @@ export default function FeatureFlagsPage() {
                       type="button"
                       role="switch"
                       aria-checked={flag.is_enabled}
+                      aria-busy={togglingId === flag.id}
+                      disabled={togglingId !== null}
                       onClick={() => handleToggle(flag)}
                       className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${
                         flag.is_enabled ? 'bg-emerald-600' : 'bg-gray-300 dark:bg-slate-600'
-                      }`}
+                      } ${togglingId === flag.id ? 'opacity-60 cursor-wait' : ''} ${togglingId && togglingId !== flag.id ? 'opacity-40 cursor-not-allowed' : ''}`}
                     >
-                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                        flag.is_enabled ? 'translate-x-5' : 'translate-x-0'
-                      }`} />
+                      {togglingId === flag.id ? (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      ) : (
+                        <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                          flag.is_enabled ? 'translate-x-5' : 'translate-x-0'
+                        }`} />
+                      )}
                     </button>
 
                     {/* Info */}
@@ -276,7 +305,8 @@ export default function FeatureFlagsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')}</label>
-                <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono" />
+                <input type="text" value={editName} disabled className="w-full px-3 py-2 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-500 dark:text-slate-500 text-sm font-mono cursor-not-allowed" />
+                <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{t('nameImmutable')}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('description')}</label>
