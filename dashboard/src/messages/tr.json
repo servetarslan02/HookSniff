@@ -1816,7 +1816,9 @@
     "planPrices": "Plan Fiyatları",
     "signedUp": "Kayıt Olan",
     "retention": "Tutma Oranı",
-    "last12Months": "Son 12 ay"
+    "last12Months": "Son 12 ay",
+    "save": "Kaydet",
+    "delete": "Sil"
   },
   "landing": {
     "nav": {
@@ -3650,6 +3652,26 @@
     "toggled": "Feature flag durumu değiştirildi",
     "toggleFailed": "Durum değiştirme başarısız",
     "deleted": "Feature flag silindi",
-    "deleteFailed": "Silme başarısız"
+    "deleteFailed": "Silme başarısız",
+    "pageTitle": "Feature Flagları",
+    "pageDesc": "Feature flagları, rollout'lar ve plana özel özellikleri yönetin",
+    "createFlag": "Flag Oluştur",
+    "createTitle": "Feature Flag Oluştur",
+    "editTitle": "Düzenle",
+    "deleteTitle": "Feature Flag Sil",
+    "deleteConfirm": "{name} silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+    "name": "İsim",
+    "description": "Açıklama",
+    "enabled": "Etkin",
+    "rollout": "yayın",
+    "rolloutLabel": "Yayın: {pct}%",
+    "plansLabel": "Planlar (boş = tümü)",
+    "allPlans": "tüm planlar",
+    "loading": "Yükleniyor...",
+    "emptyState": "Henüz feature flag yok. İlk flagınızı oluşturun!",
+    "namePlaceholder": "ozellik_adi",
+    "descPlaceholder": "Bu flag ne yapar?",
+    "creating": "Oluşturuluyor...",
+    "saving": "Kaydediliyor..."
   }
 }
