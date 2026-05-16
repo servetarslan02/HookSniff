@@ -260,19 +260,19 @@ export const api = {
 export interface Endpoint {
   id: string;
   url: string;
-  description?: string;
+  description?: string | null;
   is_active: boolean;
   created_at: string;
-  routing_strategy?: string;
-  fallback_url?: string;
-  avg_response_ms?: number;
-  failure_streak?: number;
-  retry_policy?: RetryPolicyConfig;
-  signing_secret?: string;
-  event_filter?: string[];
-  custom_headers?: Record<string, string>;
-  application_id?: string;
-  format?: string;
+  routing_strategy?: string | null;
+  fallback_url?: string | null;
+  avg_response_ms?: number | null;
+  failure_streak?: number | null;
+  retry_policy?: RetryPolicyConfig | null;
+  signing_secret?: string | null;
+  event_filter?: string[] | null;
+  custom_headers?: Record<string, string> | null;
+  application_id?: string | null;
+  format?: string | null;
 }
 
 export interface Delivery {
@@ -358,11 +358,15 @@ export interface AdminUsersResponse {
 export interface AdminUser {
   id: string;
   email: string;
-  name?: string;
+  name?: string | null;
   plan: string;
   role: string;
   status: 'active' | 'banned';
   created_at: string;
+  is_active?: boolean | null;
+  is_admin?: boolean | null;
+  total_deliveries?: number | null;
+  total_endpoints?: number | null;
 }
 
 export interface AdminUserDetail {
