@@ -1,59 +1,54 @@
 # Next Session — Version Upgrade
 
-> Son güncelleme: 2026-05-16 06:30 GMT+8
+> Son güncelleme: 2026-05-17 05:50 GMT+8
 
 ---
 
-## Hemen Yap
+## Tamamlanan (Faz 1-15 + Faz 22)
 
-1. `SISTEM-RAPORU.md` oku — ne var ne yok
-2. `UYGULAMA-PLANI.md` oku — 23 faz, 201 madde
-3. `HAFIZA.md` oku — önceki oturumda ne yapıldı
-4. Kaldığın yerden devat et
+14 commit, `upgrade/system-updates` branch'inde:
+- TypeScript 6.0.3, ESLint 10.4.0, recharts 3.8.1
+- Tailwind 4 (134 dosya auto-migration)
+- Next.js 16.2.6 + React 19.2.6
+- GitHub Actions (tüm workflow'lar)
+- Docker (Node 22, PostgreSQL 17)
+- Dependabot açıldı (limit: 3)
+- Monitoring (Prometheus v3.11.3, Grafana 13.0.1)
+- Edge proxy, 11 SDK, docs-sdk, CLI, Helm
+- tsconfig ES2022, MCP Node 20
 
-## Nereden Başla?
+## Sıradaki İşler
 
-`UYGULAMA-PLANI.md`'deki tik atılmamış ilk faz'dan başla.
+### 1. Faz 18: Final Test
+- [ ] Vercel deploy'da dashboard'u aç
+- [ ] Login ol (demo@hooksniff.com / Demo1234!)
+- [ ] Sayfaları gez (deliveries, endpoints, admin, revenue)
+- [ ] Chart'lar çalışıyor mu? (recharts 3)
+- [ ] Dil değiştirme çalışıyor mu? (TR/EN)
+- [ ] Mobil görünüm doğru mu?
 
-Şu anki durum: **Faz 1 — Hazırlık** (hiçbir şey yapılmadı)
+### 2. Faz 19: Merge & Deploy
+- [ ] `git checkout main && git merge upgrade/system-updates`
+- [ ] `git push origin main`
+- [ ] Cloud Build deploy'unu bekle (6-8 dk)
+- [ ] API health check
 
-```
-- [ ] Git branch oluştur: `upgrade/system-updates`
-- [ ] Mevcut durumu test et: `cargo check --workspace && cd dashboard && npm run build`
-- [ ] Neon DB backup al
-```
+### 3. Faz 20: Kod Kalitesi
+- [ ] console.log temizliği (24 tane)
+- [ ] any tipi temizliği (11 tane)
+- [ ] unwrap() azaltma (816 tane, kritik path'ler)
 
-## Sıralama (ÖNEMLİ!)
+### 4. Faz 21: Test Kapsamı
+- [ ] E2E test ekleme (en az 5 temel test)
 
-Sırayla git, atlama:
-
-1. Faz 1: Hazırlık
-2. Faz 2: Minor/Patch
-3. Faz 3: TypeScript 6
-4. Faz 4: ESLint 10
-5. Faz 5: recharts 3
-6. Faz 6: Tailwind 4
-7. Faz 7: Next.js 16
-8. Faz 8-23: Geri kalanı
-
-Her fazdan sonra:
-- `npm run build` veya `cargo check` çalıştır
-- Test et
-- Commit + push
-- Sonraki faza geç
+### 5. Faz 23: Servet Görevleri
+- [ ] Polar.sh Go Live
+- [ ] GitHub Actions billing
+- [ ] Grafana trial kararı
 
 ## Kurallar
 
-- Tek seferde tüm güncellelemeleri yapma
-- Her adımda test et
-- Emin değilsen sor
-- `UYGULAMA-PLANI.md`'deki tikleri güncelle `[ ]` → `[x]`
-- `HAFIZA.md`'yi güncelle (ne yapıldı, ne kaldı)
-- Oturum sonunda push et
-
-## Hesap Bilgileri
-
-- Admin: servetarslan02@gmail.com / Alayci_165
-- Dashboard: https://hooksniff.vercel.app
-- API: https://hooksniff-api-1046140057667.europe-west1.run.app
-- Repo: https://github.com/servetarslan02/HookSniff
+- Test çalıştırma (npm test) — sadece Vercel deploy'da doğrula
+- `npm run build` de çalıştırma (kullanıcı istemedi)
+- Her adımda commit + push
+- Türkçe konuş
