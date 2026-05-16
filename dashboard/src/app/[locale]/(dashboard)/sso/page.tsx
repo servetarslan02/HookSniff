@@ -1,16 +1,19 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
+import { useSsoConfig } from '@/hooks/useDashboardData';
 
 /* ─── SSO/SAML Configuration Page ─── */
 export default function SsoSettingsPage() {
   const t = useTranslations('sso');
   const { token } = useAuth();
   const { toast } = useToast();
+  const { data: ssoConfig, isLoading: loading } = useSsoConfig();
+
   const [provider, setProvider] = useState<'saml' | 'oidc'>('saml');
   const [metadata, setMetadata] = useState('');
   const [entityId, setEntityId] = useState('');
@@ -18,29 +21,19 @@ export default function SsoSettingsPage() {
   const [certificate, setCertificate] = useState('');
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [enabled, setEnabled] = useState(false);
 
-  const fetchConfig = useCallback(async () => {
-    if (!token) return;
-    try {
-      const data = await apiFetch<{ provider?: string; enabled?: boolean; metadata_url?: string; entity_id?: string; sso_url?: string; certificate_set?: boolean; issuer_url?: string; client_id?: string; client_secret_set?: boolean }>('/sso/config', { token });
-      if (data.provider) {
-        setProvider(data.provider as 'saml' | 'oidc');
-        setEnabled(data.enabled || false);
-        setMetadata(data.metadata_url || data.issuer_url || '');
-        setEntityId(data.entity_id || data.client_id || '');
-        setSsoUrl(data.sso_url || '');
-        // certificate_set tells us if one exists, but we don't load it
-      }
-    } catch {
-      // Config may not exist yet — use defaults
-    } finally {
-      setLoading(false);
+  // Populate form fields when config loads
+  useEffect(() => {
+    if (ssoConfig?.provider) {
+      setProvider(ssoConfig.provider as 'saml' | 'oidc');
+      setEnabled(ssoConfig.enabled || false);
+      setMetadata(ssoConfig.metadata_url || ssoConfig.issuer_url || '');
+      setEntityId(ssoConfig.entity_id || ssoConfig.client_id || '');
+      setSsoUrl(ssoConfig.sso_url || '');
+      // certificate_set tells us if one exists, but we don't load it
     }
-  }, [token]);
-
-  useEffect(() => { fetchConfig(); }, [fetchConfig]);
+  }, [ssoConfig]);
 
   const handleSave = async () => {
     if (!token) return;

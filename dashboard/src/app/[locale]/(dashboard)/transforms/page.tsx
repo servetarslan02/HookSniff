@@ -1,22 +1,22 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { endpointsApi, transformsApi, type Endpoint, type TransformRule } from '@/lib/api';
+import { useEndpoints, useTransformRules, useCreateTransformRule, useDeleteTransformRule } from '@/hooks/useDashboardData';
+import type { TransformRuleValidated } from '@/schemas/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function TransformsPage() {
   const t = useTranslations('transforms');
-  const tc = useTranslations('common');
-  const { token } = useAuth();
   const { toast } = useToast();
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
+
+  const { data: endpoints = [] } = useEndpoints();
   const [selectedEndpoint, setSelectedEndpoint] = useState('');
-  const [rules, setRules] = useState<TransformRule[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [_error, setError] = useState<string | null>(null);
+  const { data: rules = [], isLoading: loading } = useTransformRules(selectedEndpoint);
+  const createMutation = useCreateTransformRule();
+  const deleteMutation = useDeleteTransformRule();
+
   const [showCreate, setShowCreate] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
@@ -28,29 +28,9 @@ export default function TransformsPage() {
   const [enrichKey, setEnrichKey] = useState('');
   const [enrichValue, setEnrichValue] = useState('');
 
-  useEffect(() => {
-    if (!token) return;
-    endpointsApi.list(token).then(setEndpoints).catch((err) => {
-      setError(err instanceof Error ? err.message : tc('failedToLoadEndpoints'));
-    });
-  }, [token, tc]);
-
-  const loadRules = useCallback(async (endpointId: string) => {
-    if (!token || !endpointId) return;
-    try {
-      setError(null);
-      const data = await transformsApi.list(token, endpointId);
-      setRules(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : tc('failedToLoadTransforms'));
-    } finally { setLoading(false); }
-  }, [token, tc]);
-
-  useEffect(() => { if (selectedEndpoint) loadRules(selectedEndpoint); }, [selectedEndpoint, loadRules]);
-
   const handleCreate = async () => {
-    if (!token || !selectedEndpoint) return;
-    const rule: TransformRule['rule_json'] = {};
+    if (!selectedEndpoint) return;
+    const rule: TransformRuleValidated['rule_json'] = {};
 
     if (filterInclude) rule.filter = { include: filterInclude.split(',').map(s => s.trim()) };
     if (filterExclude) rule.filter = { ...rule.filter, exclude: filterExclude.split(',').map(s => s.trim()) };
@@ -58,27 +38,29 @@ export default function TransformsPage() {
     if (enrichKey && enrichValue) rule.enrich = { fields: { [enrichKey.trim()]: enrichValue.trim() } };
 
     try {
-      await transformsApi.create(token, selectedEndpoint, { rule });
+      await createMutation.mutateAsync({ endpointId: selectedEndpoint, rule });
       toast(t('created'), 'success');
-      loadRules(selectedEndpoint);
       setShowCreate(false);
       setFilterInclude(''); setFilterExclude('');
       setMapSource(''); setMapTarget('');
       setEnrichKey(''); setEnrichValue('');
-    } catch { toast(t('createFailed'), 'error'); }
+    } catch {
+      toast(t('createFailed'), 'error');
+    }
   };
 
-  const handleDelete = async (ruleId: string) => {
+  const handleDelete = (ruleId: string) => {
     setDeleteTarget(ruleId);
   };
 
   const confirmDelete = async () => {
-    if (!token || !selectedEndpoint || !deleteTarget) return;
+    if (!selectedEndpoint || !deleteTarget) return;
     try {
-      await transformsApi.delete(token, selectedEndpoint, deleteTarget);
-      setRules(prev => prev.filter(r => r.id !== deleteTarget));
+      await deleteMutation.mutateAsync({ endpointId: selectedEndpoint, ruleId: deleteTarget });
       toast(t('deleted'), 'info');
-    } catch { toast(t('deleteFailed'), 'error'); }
+    } catch {
+      toast(t('deleteFailed'), 'error');
+    }
     setDeleteTarget(null);
   };
 
@@ -139,7 +121,7 @@ export default function TransformsPage() {
               <label htmlFor="transform-enrich-value" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('enrichValue')}</label>
               <input id="transform-enrich-value" value={enrichValue} onChange={e => setEnrichValue(e.target.value)} placeholder="hooksniff" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
             </div>
-            <button type="button" onClick={handleCreate} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition">{t('create')}</button>
+            <button type="button" onClick={handleCreate} disabled={createMutation.isPending} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50">{t('create')}</button>
           </div>
         </div>
       )}

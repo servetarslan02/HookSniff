@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { alertsApi, type AlertRule } from '@/lib/api';
-
-
+import { useAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert, useTestAlert } from '@/hooks/useDashboardData';
 
 const CHANNEL_ICONS: Record<string, string> = {
   slack: '💬',
@@ -18,22 +17,27 @@ const CHANNEL_ICONS: Record<string, string> = {
 export default function AlertsPage() {
   const t = useTranslations('alerts');
   const tc = useTranslations('common');
-  
+  const { token } = useAuth();
+  const { toast } = useToast();
+
   const conditionLabels: Record<string, string> = {
     failure_rate: 'Failure Rate >',
     latency: 'Avg Latency >',
     consecutive_failures: 'Consecutive Failures >',
   };
-  const { token } = useAuth();
-  const { toast } = useToast();
-  const [alerts, setAlerts] = useState<AlertRule[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  // React Query hooks for data fetching
+  const { data: alerts = [], isLoading: loading } = useAlerts();
+  const createAlertMutation = useCreateAlert();
+  const updateAlertMutation = useUpdateAlert();
+  const deleteAlertMutation = useDeleteAlert();
+  const testAlertMutation = useTestAlert();
+
+  // UI state (kept as useState)
   const [showCreate, setShowCreate] = useState(false);
-  const [creating, setCreating] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<AlertRule | null>(null);
   const [editForm, setEditForm] = useState({ name: '', condition: 'failure_rate', threshold: 10, channels: ['email'] as string[] });
-  const [saving, setSaving] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: '',
@@ -42,44 +46,21 @@ export default function AlertsPage() {
     channels: ['email'] as string[],
   });
 
-  const fetchAlerts = useCallback(async () => {
-    if (!token) return;
-    try {
-      const data = await alertsApi.list(token);
-      setAlerts(data);
-    } catch (err) {
-      toast(err instanceof Error ? err.message : t('fetchFailed'), 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [token, toast, t]);
-
-  useEffect(() => { fetchAlerts(); }, [fetchAlerts]);
-
   const createAlert = async () => {
     if (!token) return;
-    setCreating(true);
     try {
-      await alertsApi.create(token, form);
+      await createAlertMutation.mutateAsync(form);
       setShowCreate(false);
       setForm({ name: '', condition: 'failure_rate', threshold: 10, channels: ['email'] });
-      fetchAlerts();
     } catch (err) {
       toast(err instanceof Error ? err.message : t('createFailed'), 'error');
-    } finally {
-      setCreating(false);
     }
-  };
-
-  const deleteAlert = (id: string) => {
-    setDeleteId(id);
   };
 
   const confirmDeleteAlert = async () => {
-    if (!deleteId || !token) return;
+    if (!deleteId) return;
     try {
-      await alertsApi.delete(token, deleteId);
-      fetchAlerts();
+      await deleteAlertMutation.mutateAsync(deleteId);
     } catch (err) {
       toast(err instanceof Error ? err.message : t('deleteFailed'), 'error');
     } finally {
@@ -88,9 +69,8 @@ export default function AlertsPage() {
   };
 
   const testAlert = async (id: string) => {
-    if (!token) return;
     try {
-      await alertsApi.test(token, id);
+      await testAlertMutation.mutateAsync(id);
       toast(t('testSent'), 'success');
     } catch (err) {
       toast(err instanceof Error ? err.message : t('testFailed'), 'error');
@@ -101,8 +81,10 @@ export default function AlertsPage() {
     if (!token) return;
     setTogglingId(alert.id);
     try {
-      await alertsApi.update(token, alert.id, { is_active: !alert.is_active });
-      setAlerts((prev) => prev.map((a) => a.id === alert.id ? { ...a, is_active: !a.is_active } : a));
+      await updateAlertMutation.mutateAsync({
+        id: alert.id,
+        data: { is_active: !alert.is_active },
+      });
       toast(alert.is_active ? 'Alert paused' : 'Alert activated', 'success');
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Failed to toggle', 'error');
@@ -122,17 +104,13 @@ export default function AlertsPage() {
   };
 
   const handleSaveEdit = async () => {
-    if (!token || !editTarget) return;
-    setSaving(true);
+    if (!editTarget) return;
     try {
-      await alertsApi.update(token, editTarget.id, editForm);
+      await updateAlertMutation.mutateAsync({ id: editTarget.id, data: editForm });
       toast(t('alertUpdated'), 'success');
       setEditTarget(null);
-      fetchAlerts();
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Failed to update', 'error');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -221,10 +199,10 @@ export default function AlertsPage() {
           <div className="mt-4 flex justify-end">
             <button type="button"
               onClick={createAlert}
-              disabled={creating || !form.name}
+              disabled={createAlertMutation.isPending || !form.name}
               className="px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60"
             >
-              {creating ? tc('creating') : t('create')}
+              {createAlertMutation.isPending ? tc('creating') : t('create')}
             </button>
           </div>
         </div>
@@ -286,7 +264,7 @@ export default function AlertsPage() {
                     {t('test')}
                   </button>
                   <button type="button"
-                    onClick={() => deleteAlert(alert.id)}
+                    onClick={() => setDeleteId(alert.id)}
                     className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-500/30 rounded-lg transition"
                   >
                     {t('delete')}
@@ -377,8 +355,8 @@ export default function AlertsPage() {
               <button type="button" onClick={() => setEditTarget(null)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
                 {tc('cancel')}
               </button>
-              <button type="button" onClick={handleSaveEdit} disabled={saving} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">
-                {saving ? tc('saving') : tc('save')}
+              <button type="button" onClick={handleSaveEdit} disabled={updateAlertMutation.isPending} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">
+                {updateAlertMutation.isPending ? tc('saving') : tc('save')}
               </button>
             </div>
           </div>

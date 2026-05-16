@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useAuth } from '@/lib/store';
-import { applicationsApi, endpointsApi, webhooksApi, type Application, type Endpoint, type Delivery } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { useApplicationDetail } from '@/hooks/useDashboardData';
 
 /* ─── Hook0-style: Application detay — içinde endpoint'ler + teslimatlar ─── */
 
@@ -13,33 +12,17 @@ type Tab = 'endpoints' | 'deliveries';
 
 export default function ApplicationDetailPage() {
   const params = useParams();
-  const { token } = useAuth();
-  const [app, setApp] = useState<Application | null>(null);
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
-  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
-  const [activeTab, setActiveTab] = useState<Tab>('endpoints');
-  const [loading, setLoading] = useState(true);
   const t = useTranslations('applications');
+  const [activeTab, setActiveTab] = useState<Tab>('endpoints');
 
   const appId = params.id as string;
 
-  useEffect(() => {
-    if (!token || !appId) return;
-    Promise.all([
-      applicationsApi.get(token, appId).catch(() => null),
-      endpointsApi.list(token).catch(() => []),
-      webhooksApi.list(token, { page: 1 }).catch(() => ({ deliveries: [] })),
-    ]).then(([a, e, d]) => {
-      if (a) setApp(a);
-      // Filter endpoints and deliveries by this application
-      const allEndpoints = Array.isArray(e) ? e : [];
-      const appEndpoints = a ? allEndpoints.filter((ep) => ep.application_id === a.id) : allEndpoints;
-      setEndpoints(appEndpoints);
-      const allDeliveries = d.deliveries || [];
-      const appEndpointIds = new Set(appEndpoints.map((ep) => ep.id));
-      setDeliveries(a ? allDeliveries.filter((del) => appEndpointIds.has(del.endpoint_id)) : allDeliveries);
-    }).finally(() => setLoading(false));
-  }, [token, appId]);
+  // React Query hook for data fetching
+  const { data, isLoading: loading } = useApplicationDetail(appId);
+
+  const app = data?.app ?? null;
+  const endpoints = data?.endpoints ?? [];
+  const deliveries = data?.deliveries ?? [];
 
   if (loading) {
     return (

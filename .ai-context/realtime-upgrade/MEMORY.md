@@ -142,3 +142,38 @@
 | e78a13fc | feat: WS config env var'ları |
 | 3283abc7 | Faz 4: useWebSocket + useRealtime |
 | 362833a5 | fix: unused imports cleanup |
+
+## React Query Dönüşüm — Tam Sayfa Listesi (2026-05-16)
+
+### İlk 11 sayfa (Oturum 183)
+admin/page.tsx, admin/activity, admin/users, admin/alerts, admin/revenue, admin/system, admin/settings, DashboardOverview, endpoints, endpoints/[id], deliveries/DeliveriesList — ✅ TAMAMLANDI
+
+### batch-1 (5 sayfa)
+- admin/email — ⏭️ Form-only
+- admin/feature-flags — ✅
+- deliveries/[id] — ✅
+- logs — ✅
+- notifications — ✅
+
+### batch-2 (5 sayfa)
+- billing — ✅
+- applications — ✅
+- applications/[id] — ✅
+- alerts — ✅
+- team — ✅
+
+### batch-3 (3 sayfa)
+- transforms — ✅
+- sso — ✅
+- inbound — ✅
+
+### admin-user-detail (1 sayfa)
+- admin/users/[id] — ✅ (31 API → React Query)
+
+## WebSocket Bug Fix'leri (2026-05-16)
+1. Zod .optional() → .nullish() — Admin stats, deliveries, audit logs, deploy info
+2. replayTarget null crash — DeliveriesList.tsx
+3. WS auth 401 — extract_token() query param desteği
+4. WS hep sarı — Cloud Run timeout 300→3600 + WS env var'ları
+5. WS quick failure — 3sn'den kısa kapanmalarda erken fallback
+6. URL-driven state — 4 sayfada tab/filter/page URL'ye bağlandı
