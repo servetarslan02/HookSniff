@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:30 GMT+8 (Oturum 189)
+> Son güncelleme: 2026-05-17 05:35 GMT+8 (Oturum 190)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,16 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 190 — 2026-05-17 05:35 GMT+8
+1. **Feature Flags UI Entegrasyonu** ✅
+   - **Backend:** `GET /v1/feature-flags` — public endpoint, auth gerekmez
+   - **Frontend hook'ları:** `useFeatureFlags()` + `useIsFeatureEnabled(name)`
+   - **Deliveries sayfası:** Batch replay butonu + checkbox'lar `bulk_replay` flag devre dışıysa gizli
+   - **Endpoint detail sayfası:** Retry policy kartı `custom_retry_schedules` flag devre dışıysa gizli
+   - **StatusBadge:** `cached` (dedup) ve `filtered` (event filter) status'ları eklendi
+   - **GDPR:** Admin panelinde zaten mevcut, kullanıcı panelinde gerekmiyor
+   - Commit: 04f29adf — push edildi
 
 ### Oturum 189 — 2026-05-17 05:30 GMT+8
 1. **custom_retry_schedules Flag Bağlantısı** ✅
