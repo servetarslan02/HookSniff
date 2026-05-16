@@ -4036,7 +4036,7 @@ async fn admin_user_invoices(
     let per_page = params.per_page.unwrap_or(50).clamp(1, 200);
     let offset = (page - 1) * per_page;
 
-    let (count_sql, data_sql) = if let Some(_status) = params.status {
+    let (count_sql, data_sql) = if let Some(ref _status) = params.status {
         (
             "SELECT COUNT(*) FROM invoices WHERE customer_id = $1 AND status = $2".to_string(),
             format!("SELECT id, customer_id, amount_cents, currency, plan, status, provider, provider_invoice_id, paid_at, created_at FROM invoices WHERE customer_id = $1 AND status = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4"),
