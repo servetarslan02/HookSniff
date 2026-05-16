@@ -2051,7 +2051,10 @@ async fn get_settings(
             .await?;
 
     if let Some((value,)) = row {
-        if let Ok(settings) = serde_json::from_value::<PlatformSettings>(value) {
+        if let Ok(mut settings) = serde_json::from_value::<PlatformSettings>(value) {
+            // Never expose sensitive fields to frontend
+            settings.resend_api_key = settings.resend_api_key.map(|_| "***".to_string());
+            settings.webhook_secret = settings.webhook_secret.map(|_| "***".to_string());
             return Ok(Json(settings));
         }
     }
@@ -2067,7 +2070,45 @@ async fn update_settings(
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin_write(&customer)?;
 
-    let value = serde_json::to_value(&settings)
+    // Validate settings values
+    if settings.max_endpoints_free < 1 || settings.max_endpoints_pro < 1 {
+        return Err(AppError::BadRequest("max_endpoints must be at least 1".into()));
+    }
+    if settings.max_webhooks_free < 0 || settings.max_webhooks_pro < 0 {
+        return Err(AppError::BadRequest("max_webhooks cannot be negative".into()));
+    }
+    if settings.rate_limit_free < 1 || settings.rate_limit_pro < 1 {
+        return Err(AppError::BadRequest("rate_limit must be at least 1".into()));
+    }
+    if settings.retention_days_free < 1 || settings.retention_days_pro < 1 {
+        return Err(AppError::BadRequest("retention_days must be at least 1".into()));
+    }
+    if settings.retry_max_attempts < 0 || settings.retry_max_attempts > 10 {
+        return Err(AppError::BadRequest("retry_max_attempts must be 0-10".into()));
+    }
+    if settings.plan_price_pro < 0.0 || settings.plan_price_business < 0.0 {
+        return Err(AppError::BadRequest("plan prices cannot be negative".into()));
+    }
+
+    // Mask sensitive fields — don't overwrite with "***" placeholder
+    let mut saved_settings = settings;
+    // Fetch current values to preserve real secrets
+    let current: Option<(serde_json::Value,)> =
+        sqlx::query_as("SELECT value FROM platform_settings WHERE key = 'main'")
+            .fetch_optional(&pool)
+            .await?;
+    if let Some((value,)) = current {
+        if let Ok(current_settings) = serde_json::from_value::<PlatformSettings>(value) {
+            if saved_settings.resend_api_key.as_deref() == Some("***") {
+                saved_settings.resend_api_key = current_settings.resend_api_key;
+            }
+            if saved_settings.webhook_secret.as_deref() == Some("***") {
+                saved_settings.webhook_secret = current_settings.webhook_secret;
+            }
+        }
+    }
+
+    let value = serde_json::to_value(&saved_settings)
         .map_err(|e| AppError::BadRequest(format!("Invalid settings: {}", e)))?;
 
     sqlx::query(
@@ -2182,8 +2223,9 @@ async fn create_platform_alert(
     }
 
     let channels_json = serde_json::json!(req.channels);
-    // Use admin's own customer_id (or explicitly provided one)
-    let target_customer_id = req.customer_id.unwrap_or(customer.id);
+    // Platform alerts (admin-created) should have NULL customer_id
+    // Only use explicitly provided customer_id for user-specific alerts
+    let target_customer_id: Option<Uuid> = req.customer_id;
 
     let alert = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, String, i32, serde_json::Value, bool, chrono::DateTime<chrono::Utc>)>(
         "INSERT INTO alert_rules (customer_id, name, condition, threshold, channels, is_active)

@@ -1357,6 +1357,7 @@
     "failedInLastHour": "{count} failed in the last hour",
     "oldestPending": "Oldest pending",
     "healthCheckFailed": "Health check failed",
+    "alertSettingsPartialFail": "Some alerts failed to save",
     "autoRefreshDisabled": "Auto-refresh disabled",
     "autoRefreshEnabled": "Auto-refresh enabled",
     "backToUsers": "← Back to Users",
