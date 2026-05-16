@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter, usePathname } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { notificationsApi, type Notification } from '@/lib/api';
@@ -28,12 +30,15 @@ const TYPE_I18N_MAP: Record<string, string> = {
 export default function NotificationsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+  const typeFilter = (searchParams.get('type') || 'all') as NotifType;
+  const readFilter = (searchParams.get('read') || 'all') as 'all' | 'read' | 'unread';
   const [loading, setLoading] = useState(true);
-  const [typeFilter, setTypeFilter] = useState<NotifType>('all');
-  const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>('all');
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const t = useTranslations('notifications');
   const tc = useTranslations('common');
@@ -126,8 +131,12 @@ export default function NotificationsPage() {
             <button
               key={notifType}
               onClick={() => {
-                setTypeFilter(notifType);
-                setPage(1);
+                const params = new URLSearchParams(searchParams.toString());
+                params.delete('page');
+                if (notifType === 'all') params.delete('type');
+                else params.set('type', notifType);
+                const qs = params.toString();
+                router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
               }}
               className={`px-3 py-1.5 rounded-xl text-sm font-medium transition ${
                 typeFilter === notifType
@@ -144,8 +153,12 @@ export default function NotificationsPage() {
             <button
               key={f}
               onClick={() => {
-                setReadFilter(f);
-                setPage(1);
+                const params = new URLSearchParams(searchParams.toString());
+                params.delete('page');
+                if (f === 'all') params.delete('read');
+                else params.set('read', f);
+                const qs = params.toString();
+                router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
               }}
               className={`px-3 py-1.5 rounded-xl text-sm font-medium transition ${
                 readFilter === f
@@ -234,7 +247,11 @@ export default function NotificationsPage() {
                 </span>
                 <div className="flex gap-2">
                   <button type="button"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.set('page', String(Math.max(1, page - 1)));
+                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                    }}
                     disabled={page === 1}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                   >
@@ -244,7 +261,11 @@ export default function NotificationsPage() {
                     {tc('pageOf', { page, totalPages })}
                   </span>
                   <button type="button"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.set('page', String(Math.min(totalPages, page + 1)));
+                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                    }}
                     disabled={page >= totalPages}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                   >
