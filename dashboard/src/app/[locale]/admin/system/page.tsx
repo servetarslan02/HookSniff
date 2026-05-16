@@ -127,9 +127,12 @@ export default function AdminSystemPage() {
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
-    if (days > 0) return `${days}d ${hours}h ${mins}m`;
-    if (hours > 0) return `${hours}h ${mins}m`;
-    return `${mins}m`;
+    const d = t('uptimeDays') || 'd';
+    const h = t('uptimeHours') || 'h';
+    const m = t('uptimeMinutes') || 'm';
+    if (days > 0) return `${days}${d} ${hours}${h} ${mins}${m}`;
+    if (hours > 0) return `${hours}${h} ${mins}${m}`;
+    return `${mins}${m}`;
   };
 
   const displayHealth = health || mockHealth;
@@ -193,7 +196,7 @@ export default function AdminSystemPage() {
         : displayHealth?.queue
         ? `${displayHealth.queue.pending} pending · ${displayHealth.queue.processing} processing · ${displayHealth.queue.failed} failed`
         : t('checking'),
-      latency: null,
+      latency: displayHealth?.checks?.queue?.latency_ms ?? null,
     },
   ];
 
