@@ -540,6 +540,7 @@
     "failedToLoad": "Failed to load notifications",
     "failedToMarkRead": "Failed to mark as read",
     "failedToMarkAllRead": "Failed to mark all as read",
+    "viewDetails": "View Details",
     "typeAll": "All",
     "typeWebhookFailed": "Webhook Failed",
     "typeAlerts": "Alerts",
