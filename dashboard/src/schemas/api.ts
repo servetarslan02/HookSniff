@@ -4,13 +4,13 @@ import { z } from 'zod';
 export const EndpointSchema = z.object({
   id: z.string(),
   url: z.string().url(),
-  description: z.string().optional(),
+  description: z.string().nullish(),
   is_active: z.boolean(),
   created_at: z.string(),
-  routing_strategy: z.string().optional(),
-  fallback_url: z.string().optional(),
-  avg_response_ms: z.number().optional(),
-  failure_streak: z.number().optional(),
+  routing_strategy: z.string().nullish(),
+  fallback_url: z.string().nullish(),
+  avg_response_ms: z.number().nullish(),
+  failure_streak: z.number().nullish(),
   retry_policy: z
     .object({
       max_attempts: z.number(),
@@ -18,12 +18,13 @@ export const EndpointSchema = z.object({
       initial_delay_secs: z.number(),
       max_delay_secs: z.number(),
     })
-    .optional(),
-  signing_secret: z.string().optional(),
-  event_filter: z.array(z.string()).optional(),
-  custom_headers: z.record(z.string(), z.string()).optional(),
-  application_id: z.string().optional(),
-  format: z.string().optional(),
+    .nullish(),
+  signing_secret: z.string().nullish(),
+  allowed_ips: z.array(z.string()).nullish(),
+  event_filter: z.array(z.string()).nullish(),
+  custom_headers: z.record(z.string(), z.string()).nullish(),
+  application_id: z.string().nullish(),
+  format: z.string().nullish(),
 });
 export type EndpointValidated = z.infer<typeof EndpointSchema>;
 
@@ -150,14 +151,15 @@ export type DeployInfoValidated = z.infer<typeof DeployInfoSchema>;
 export const AdminUserSchema = z.object({
   id: z.string(),
   email: z.string(),
-  name: z.string().optional(),
+  name: z.string().nullish(),
   plan: z.string(),
   role: z.string(),
   status: z.enum(['active', 'banned']),
-  is_active: z.boolean().optional(),
+  is_active: z.boolean().nullish(),
+  is_admin: z.boolean().nullish(),
   created_at: z.string(),
-  total_deliveries: z.number().optional(),
-  total_endpoints: z.number().optional(),
+  total_deliveries: z.number().nullish(),
+  total_endpoints: z.number().nullish(),
 });
 export type AdminUserValidated = z.infer<typeof AdminUserSchema>;
 
