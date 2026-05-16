@@ -1361,6 +1361,8 @@
     "uptimeDays": "g",
     "uptimeHours": "s",
     "uptimeMinutes": "dk",
+    "confirmDeleteAlert": "\"{name}\" alertini silmek istediğinize emin misiniz?",
+    "selectChannel": "En az bir bildirim kanalı seçin",
     "autoRefreshDisabled": "Otomatik yenileme devre dışı",
     "autoRefreshEnabled": "Otomatik yenileme etkin",
     "backToUsers": "← Kullanıcılara Dön",
