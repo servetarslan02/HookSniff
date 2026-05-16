@@ -5,6 +5,7 @@ import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations, useLocale } from 'next-intl';
 import { notificationsApi } from '@/lib/api';
 import { useRealtime } from '@/hooks/useRealtime';
@@ -194,6 +195,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               </svg>
             </div>
             <ThemeToggle />
+            <LanguageSwitcher />
             {/* Notification Bell */}
             <Link
               href="/admin/system"
