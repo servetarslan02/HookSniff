@@ -142,6 +142,13 @@ async fn main() -> Result<()> {
         }
     };
 
+    // Feature flag service (loads from DB, refreshes every 60s)
+    let feature_flag_service = feature_flags::FeatureFlagService::new(pool.clone()).await;
+    let ffs_clone = feature_flag_service.clone();
+    tokio::spawn(async move {
+        feature_flags::feature_flag_refresher(ffs_clone).await;
+    });
+
     // Initialize event publisher (Redis Streams + local broadcast)
     let event_publisher = if cfg.event_publisher_enabled {
         let redis_url = config::resolve_redis_url();
@@ -404,6 +411,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(email_provider))
         .layer(axum::Extension(job_queue))
         .layer(axum::Extension(cache_layer))
+        .layer(axum::Extension(feature_flag_service))
         .layer(axum::Extension(event_publisher))
         .layer(axum::Extension(ws_gateway))
         .layer(axum::Extension(qstash_client))

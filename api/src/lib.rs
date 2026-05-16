@@ -12,6 +12,7 @@ pub mod db;
 pub mod email;
 pub mod error;
 pub mod events;
+pub mod feature_flags;
 pub mod http_client;
 pub mod fifo;
 pub mod industry;
