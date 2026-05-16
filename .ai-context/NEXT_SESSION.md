@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-17 03:52 GMT+8 (Oturum 179)
+> Son güncelleme: 2026-05-17 06:50 GMT+8 (Oturum — Email Deep Fix)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -16,6 +16,25 @@ Bu dosyayı ilk kez okuyorsan:
 ---
 
 ## ✅ Tamamlanan (Son Oturum — 2026-05-17)
+
+### Email Deep Fix: Admin Email Sayfası 16 Fix ✅ (2026-05-17 06:50)
+1. **Bulk email text → html** — Resend API doğru format
+2. **Manuel reqwest → EmailProvider** — her iki handler (retry logic dahil)
+3. **body_preview UTF-8 panic** — chars().take(200) ile güvenli dilimleme
+4. **deny_unknown_fields kaldırıldı** — SendEmailRequest + BulkEmailRequest
+5. **Contact form XSS escape** — escape_html() helper
+6. **Contact form validate_email()** — güçlü email doğrulama
+7. **Contact form subject limit** — 200 karakter
+8. **Admin email rate limiting** — tekli 20/dk, bulk 5/saat
+9. **EmailProvider::is_configured()** — None durumunda hata
+10. **Language::from_accept_language()** — dinamik dil algılama
+11. **auth.rs 4 handler** — welcome, verification, password_reset, resend_verify
+12. **18 translation key** — EN + TR (bulkEmail, compose, planFilter vb.)
+13. **Doğrulama modalı** — bulk email yanlışlıkla gönderim engeli
+14. **t('supported') → t('bulkEmailPlaceholders')** — namespace fix
+15. **Çift fallback kaldırıldı** — t('bulkEmailFailed') || t('bulkEmailFailed')
+16. **Subject/body length validation** — 500/100KB limit
+- **Commit:** d848f821, 22d520fc
 
 ### Oturum 179: Redis Cache + Edge Cache TTL ✅
 1. **Health check Redis cache** — 30sn TTL, DB + Redis PING azaltıldı
