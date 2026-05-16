@@ -1578,8 +1578,8 @@
     "serviceStatus": "Service Status",
     "settingsLoaded": "Settings loaded",
     "settingsNav": "Settings",
-    "settingsSaveFailed": "Failed to save settings",
-    "settingsSaved": "Settings saved",
+    "settingsSaveFailed": "Failed to save plan settings",
+    "settingsSaved": "Plan settings saved!",
     "signupsDesc": "Allow new user registrations",
     "signupsEnabled": "Signups Enabled",
     "skipToContent": "Skip to content",
@@ -1850,7 +1850,14 @@
     "retention": "Retention",
     "last12Months": "Last 12 months",
     "save": "Save",
-    "delete": "Delete"
+    "delete": "Delete",
+    "planManagement": "Plan Management",
+    "planManagementDesc": "Configure plan prices and limits. Changes sync to Polar.",
+    "editPlans": "Edit Plans",
+    "freePlanLimits": "Free Plan Limits",
+    "maxWebhooks": "Max Webhooks/mo",
+    "rateLimit": "Rate Limit/min",
+    "polarSyncInfo": "Price changes here update the platform. Polar products should be updated to match."
   },
   "landing": {
     "nav": {
