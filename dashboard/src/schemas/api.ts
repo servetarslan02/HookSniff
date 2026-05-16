@@ -112,8 +112,10 @@ export type AuditLogEntryValidated = z.infer<typeof AuditLogEntrySchema>;
 export const AuditLogResponseSchema = z.object({
   entries: z.array(AuditLogEntrySchema),
   total: z.number(),
-  limit: z.number(),
-  offset: z.number(),
+  page: z.number().optional(),
+  per_page: z.number().optional(),
+  limit: z.number().optional(),
+  offset: z.number().optional(),
 });
 
 // ── Feature Flag Schema ──

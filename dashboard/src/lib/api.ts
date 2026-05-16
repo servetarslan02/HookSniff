@@ -642,6 +642,9 @@ export const adminApi = {
   getDeployInfo: (token: string) =>
     apiFetch<DeployInfo>('/admin/deploy-info', { token }),
 
+  getSystemHealth: (token: string) =>
+    apiFetch<Record<string, unknown>>('/health', { token }),
+
   // ── Aşama 2: System Monitoring ──
   getFailedDeliveries: (token: string, params?: { limit?: number; since?: string; user_id?: string }) => {
     const qs = new URLSearchParams();
