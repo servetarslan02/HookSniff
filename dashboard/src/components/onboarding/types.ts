@@ -21,12 +21,12 @@ export function loadState(): OnboardingState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
-  } catch {}
+  } catch { /* ignored */ }
   return { dismissed: false, currentStep: 0, completedSteps: [], useCase: '', endpointCreated: false, firstWebhookSent: false };
 }
 
 export function saveState(state: OnboardingState) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* ignored */ }
 }
 
 export const SDKS = [

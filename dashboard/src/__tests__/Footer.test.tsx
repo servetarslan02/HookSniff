@@ -24,8 +24,7 @@ vi.mock('next-intl', () => ({
 // Mock i18n navigation Link
 vi.mock('@/i18n/navigation', () => ({
   Link: ({ href, children, ...props }: any) => {
-    const React = require('react');
-    return React.createElement('a', { href, ...props }, children);
+    return <a href={href} {...props}>{children}</a>;
   },
 }));
 
