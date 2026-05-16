@@ -22,6 +22,7 @@ let globalListeners: Set<(state: ConnectionState) => void> = new Set();
 let globalMessageListeners: Set<(event: WsEvent) => void> = new Set();
 let globalLastSeq = 0;
 let fallbackActive = false;
+let globalTokenGetter: (() => string | null) | null = null;
 
 function notifyState(state: ConnectionState) {
   globalState = state;
@@ -30,6 +31,27 @@ function notifyState(state: ConnectionState) {
 
 function notifyEvent(event: WsEvent) {
   globalMessageListeners.forEach(fn => fn(event));
+}
+
+/** Refresh the JWT token via the API refresh endpoint */
+async function refreshAccessToken(): Promise<string | null> {
+  try {
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/v1';
+    const res = await fetch(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.token) {
+      // Update the store
+      localStorage.setItem('hooksniff_token', data.token);
+      return data.token;
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 function scheduleReconnect(token: string, maxAttempts: number) {
@@ -107,7 +129,7 @@ function connectGlobal(token: string, maxAttempts: number) {
     }
   };
 
-  ws.onclose = (event) => {
+  ws.onclose = async (event) => {
     const connectDuration = Date.now() - connectStart;
     console.log('[WS] Disconnected', {
       code: event.code,
@@ -116,6 +138,19 @@ function connectGlobal(token: string, maxAttempts: number) {
       duration: `${connectDuration}ms`,
     });
     globalWs = null;
+
+    // If connection lasted > 10s, it was a real connection that dropped
+    // (likely token expiry). Try to refresh the token first.
+    if (connectDuration > 10000 && globalTokenGetter) {
+      console.log('[WS] Long-lived connection dropped, attempting token refresh...');
+      const newToken = await refreshAccessToken();
+      if (newToken) {
+        console.log('[WS] Token refreshed, reconnecting with new token');
+        globalReconnectAttempts = 0;
+        connectGlobal(newToken, maxAttempts);
+        return;
+      }
+    }
 
     // Quick failure detection — but only add +1 (not +2)
     const isQuickFailure = connectDuration < 3000 && !event.wasClean;
@@ -155,6 +190,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     onDisconnected,
     maxReconnectAttempts = 5,
   } = options;
+
+  // Store token getter for refresh
+  useEffect(() => {
+    globalTokenGetter = () => token;
+  }, [token]);
 
   // Register state listener
   useEffect(() => {
