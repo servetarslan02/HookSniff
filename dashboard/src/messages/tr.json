@@ -540,6 +540,7 @@
     "failedToLoad": "Bildirimler yüklenemedi",
     "failedToMarkRead": "Okundu olarak işaretlenemedi",
     "failedToMarkAllRead": "Tümü okundu olarak işaretlenemedi",
+    "viewDetails": "Detayları Gör",
     "typeAll": "Tümü",
     "typeWebhookFailed": "Webhook Başarısız",
     "typeAlerts": "Uyarılar",
