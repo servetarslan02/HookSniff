@@ -28,11 +28,11 @@
 ## FAZ 2: Event System — Eksikler
 
 ### Event Tetiklenmeyen Route'lar
-- [ ] 13. `auth.rs` → UserCreated event'i tetiklenmiyor
-- [ ] 14. `endpoints.rs` → EndpointStatusChanged event'i tetiklenmiyor
-- [ ] 15. `alerts.rs` → AlertTriggered event'i tetiklenmiyor
-- [ ] 16. `delivery_details.rs` → DeliveryStatusChanged event'i tetiklenmiyor
-- [ ] 17. `applications.rs` → Application event'leri yok
+- [x] 13. `auth.rs` → UserCreated event'i tetikleniyor ✅
+- [x] 14. `endpoints.rs` → EndpointCreated/Updated/Deleted/StatusChanged tetikleniyor ✅
+- [ ] 15. `alerts.rs` → AlertTriggered — background worker yok, iptal
+- [ ] 16. `delivery_details.rs` → read-only route, event tetiklemiyor (worker'da olmalı)
+- [ ] 17. `applications.rs` → Application event'leri yok (AppEvent enum'a eklenmeli)
 
 ---
 
@@ -45,7 +45,7 @@
 
 ## FAZ 4: Entegrasyon — Eksikler
 
-- [ ] 20. Fallback polling — useRealtime.ts'te WS yoksa 30sn polling eksik
+- [x] 20. Fallback polling — useRealtime.ts'te 30sn polling mevcut ✅
 - [ ] 21. Toast bildirimleri — UserCreated ve AlertTriggered için toast eksik
 - [ ] 22. useDeliveryStream (SSE) hiçbir yerde kullanılmıyor
 
