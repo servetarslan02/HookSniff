@@ -413,3 +413,324 @@ export const ApiLatencyResponseSchema = z.object({
   })),
   period: z.string(),
 });
+
+// ── Application Schema ──
+export const ApplicationSchema = z.object({
+  id: z.string(),
+  customer_id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  is_active: z.boolean(),
+  endpoint_count: z.number(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+export type ApplicationValidated = z.infer<typeof ApplicationSchema>;
+
+// ── Invoice Schema ──
+export const InvoiceSchema = z.object({
+  id: z.string(),
+  date: z.string(),
+  amount: z.number(),
+  status: z.enum(['paid', 'pending', 'failed']),
+  plan: z.string(),
+});
+export type InvoiceValidated = z.infer<typeof InvoiceSchema>;
+
+// ── Billing Usage Schema ──
+export const BillingUsageSchema = z.object({
+  deliveries_used: z.number(),
+  deliveries_limit: z.number(),
+  endpoints_count: z.number(),
+  endpoints_limit: z.number(),
+  webhooks: z.object({
+    used: z.number(),
+    limit: z.number(),
+    remaining: z.number(),
+  }).optional(),
+  endpoints: z.object({
+    used: z.number(),
+    limit: z.number(),
+    remaining: z.number(),
+  }).optional(),
+  plan: z.string().optional(),
+});
+export type BillingUsageValidated = z.infer<typeof BillingUsageSchema>;
+
+// ── Team Schema ──
+export const TeamSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  created_at: z.string().optional(),
+  member_count: z.number().optional(),
+});
+export type TeamValidated = z.infer<typeof TeamSchema>;
+
+// ── Team Member Schema ──
+export const TeamMemberSchema = z.object({
+  id: z.string(),
+  customer_id: z.string(),
+  team_id: z.string(),
+  email: z.string(),
+  name: z.string().nullish(),
+  role: z.string(),
+  joined_at: z.string().optional(),
+});
+export type TeamMemberValidated = z.infer<typeof TeamMemberSchema>;
+
+// ── Alerts Response Schema ──
+export const AlertsListResponseSchema = z.array(AlertRuleSchema);
+export type AlertsListResponseValidated = z.infer<typeof AlertsListResponseSchema>;
+
+// ── Transform Rule Schema ──
+export const TransformRuleSchema = z.object({
+  id: z.string(),
+  endpoint_id: z.string(),
+  rule_json: z.object({
+    filter: z.object({
+      include: z.array(z.string()).optional(),
+      exclude: z.array(z.string()).optional(),
+    }).optional(),
+    mappings: z.array(z.object({
+      source: z.string(),
+      target: z.string(),
+    })).optional(),
+    enrich: z.object({
+      fields: z.record(z.string(), z.unknown()),
+    }).optional(),
+  }),
+  created_at: z.string(),
+});
+export type TransformRuleValidated = z.infer<typeof TransformRuleSchema>;
+
+// ── Inbound Config Schema ──
+export const InboundConfigSchema = z.object({
+  id: z.string(),
+  provider: z.string(),
+  endpoint_id: z.string().nullable(),
+  enabled: z.boolean(),
+  secret: z.string(),
+  created_at: z.string(),
+});
+export type InboundConfigValidated = z.infer<typeof InboundConfigSchema>;
+
+// ── SSO Config Schema ──
+export const SsoConfigSchema = z.object({
+  provider: z.string().optional(),
+  enabled: z.boolean().optional(),
+  metadata_url: z.string().optional(),
+  entity_id: z.string().optional(),
+  sso_url: z.string().optional(),
+  certificate_set: z.boolean().optional(),
+  issuer_url: z.string().optional(),
+  client_id: z.string().optional(),
+  client_secret_set: z.boolean().optional(),
+});
+export type SsoConfigValidated = z.infer<typeof SsoConfigSchema>;
+
+// ── Admin User Detail Schemas (for /admin/users/[id] page) ──
+
+export const UserEndpointsResponseSchema = z.object({
+  endpoints: z.array(z.object({
+    id: z.string(),
+    url: z.string(),
+    description: z.string().nullable(),
+    is_active: z.boolean(),
+    created_at: z.string(),
+    total_deliveries: z.number(),
+    last_delivery_at: z.string().nullable(),
+  })),
+});
+
+export const UserWebhooksResponseSchema = z.object({
+  webhooks: z.array(z.object({
+    id: z.string(),
+    endpoint_id: z.string(),
+    status: z.string(),
+    event: z.string().nullable(),
+    created_at: z.string(),
+    attempt_count: z.number(),
+    response_status: z.number().nullable(),
+    response_body: z.string().nullable(),
+    error_message: z.string().nullable(),
+  })),
+  total: z.number(),
+  page: z.number(),
+  per_page: z.number(),
+});
+
+export const UserApiKeysResponseSchema = z.object({
+  api_keys: z.array(z.object({
+    prefix: z.string(),
+    name: z.string(),
+    created_at: z.string(),
+    is_active: z.boolean(),
+  })),
+});
+
+export const UserApplicationsResponseSchema = z.object({
+  applications: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string().nullable(),
+    created_at: z.string(),
+    endpoint_count: z.number(),
+  })),
+});
+
+export const UserUsageResponseSchema = z.object({
+  total_deliveries: z.number(),
+  successful: z.number(),
+  failed: z.number(),
+  pending: z.number(),
+  success_rate: z.number(),
+  endpoints_count: z.number(),
+  active_endpoints: z.number(),
+  last_30_days: z.number(),
+  last_7_days: z.number(),
+  top_events: z.array(z.object({
+    event: z.string().nullable(),
+    count: z.number(),
+  })),
+});
+
+export const UserAnalyticsResponseSchema = z.object({
+  daily_deliveries: z.array(z.object({
+    date: z.string(),
+    success: z.number(),
+    failed: z.number(),
+  })).optional(),
+  top_events: z.array(z.object({
+    event: z.string().nullable(),
+    count: z.number(),
+  })).optional(),
+  endpoint_health: z.array(z.object({
+    url: z.string(),
+    success_rate: z.number(),
+    avg_latency_ms: z.number(),
+  })).optional(),
+});
+
+export const UserPlanHistoryResponseSchema = z.object({
+  history: z.array(z.object({
+    action: z.string(),
+    details: z.record(z.string(), z.unknown()),
+    created_at: z.string(),
+  })),
+});
+
+export const NotesResponseSchema = z.object({
+  notes: z.array(z.object({
+    id: z.string(),
+    customer_id: z.string(),
+    admin_user_id: z.string(),
+    content: z.string(),
+    created_at: z.string(),
+  })),
+  total: z.number(),
+});
+
+export const TagsResponseSchema = z.object({
+  tags: z.array(z.object({
+    id: z.string(),
+    customer_id: z.string(),
+    tag: z.string(),
+    admin_user_id: z.string(),
+    created_at: z.string(),
+  })),
+  total: z.number(),
+});
+
+export const CommunicationsResponseSchema = z.object({
+  communications: z.array(z.object({
+    id: z.string(),
+    customer_id: z.string(),
+    type: z.string(),
+    subject: z.string().nullable(),
+    details: z.unknown(),
+    admin_user_id: z.string().nullable(),
+    created_at: z.string(),
+  })),
+  total: z.number(),
+  page: z.number(),
+  per_page: z.number(),
+});
+
+export const UserInvoicesResponseSchema = z.object({
+  invoices: z.array(z.object({
+    id: z.string(),
+    customer_id: z.string(),
+    amount_cents: z.number(),
+    currency: z.string(),
+    plan: z.string(),
+    status: z.string(),
+    provider: z.string(),
+    provider_invoice_id: z.string().nullable(),
+    paid_at: z.string().nullable(),
+    created_at: z.string(),
+  })),
+  total: z.number(),
+  page: z.number(),
+  per_page: z.number(),
+});
+
+export const UserPaymentsResponseSchema = z.object({
+  payments: z.array(z.object({
+    id: z.string(),
+    customer_id: z.string(),
+    amount_cents: z.number(),
+    currency: z.string(),
+    status: z.string(),
+    provider: z.string(),
+    provider_transaction_id: z.string().nullable(),
+    metadata: z.unknown(),
+    created_at: z.string(),
+  })),
+  total: z.number(),
+  page: z.number(),
+  per_page: z.number(),
+});
+
+export const UserRefundsResponseSchema = z.object({
+  refunds: z.array(z.object({
+    id: z.string(),
+    customer_id: z.string(),
+    amount_cents: z.number(),
+    currency: z.string(),
+    reason: z.string().nullable(),
+    admin_user_id: z.string().nullable(),
+    provider: z.string(),
+    provider_refund_id: z.string().nullable(),
+    status: z.string(),
+    created_at: z.string(),
+  })),
+  total: z.number(),
+  page: z.number(),
+  per_page: z.number(),
+});
+
+export const DeliveryDetailResponseSchema = z.object({
+  id: z.string(),
+  endpoint_id: z.string(),
+  event: z.string().nullable().optional(),
+  status: z.string(),
+  attempt_count: z.number(),
+  response_status: z.number().nullable().optional(),
+  response_body: z.string().nullable().optional(),
+  error_message: z.string().nullable().optional(),
+  created_at: z.string(),
+  endpoint_url: z.string().nullable().optional(),
+  request_body: z.unknown().nullable().optional(),
+  request_headers: z.record(z.string(), z.string()).nullable().optional(),
+});
+
+export const DeliveryAttemptResponseSchema = z.object({
+  id: z.string(),
+  attempt_number: z.number(),
+  status: z.string(),
+  response_status: z.number().nullable().optional(),
+  response_body: z.string().nullable().optional(),
+  error_message: z.string().nullable().optional(),
+  duration_ms: z.number().nullable().optional(),
+  created_at: z.string(),
+});

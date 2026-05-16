@@ -1,233 +1,188 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
-import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { adminApi, webhooksApi, type AdminUserDetail, type UserAnalytics, type DeliveryDetail, type DeliveryAttempt } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
 import { useTranslations, useLocale } from 'next-intl';
+import {
+  useAdminUserDetail,
+  useAdminUserAnalytics,
+  useAdminUserPlanHistory,
+  useAdminUserEndpoints,
+  useAdminUserWebhooks,
+  useAdminUserApiKeys,
+  useAdminUserApplications,
+  useAdminUserUsage,
+  useAdminUserNotes,
+  useAdminUserTags,
+  useAdminUserCommunications,
+  useAdminUserInvoices,
+  useAdminUserPayments,
+  useAdminUserRefunds,
+  useDeliveryDetail,
+  useDeliveryAttempts,
+  useUpdateUserPlan,
+  useUpdateUserStatus,
+  useAdminSendEmail,
+  useAdminImpersonate,
+  useAdminRefundUser,
+  useAdminGdprExport,
+  useAdminGdprDelete,
+  useAdminUserTestWebhook,
+  useAdminAddNote,
+  useAdminAddTag,
+  useAdminRemoveTag,
+  useAdminReplayDelivery,
+} from '@/hooks/useAdminData';
 
 const PLAN_OPTIONS = ['developer', 'startup', 'pro', 'enterprise'];
 
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const locale = useLocale();
-  const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const t = useTranslations('admin');
   const tc = useTranslations('common');
-  const [detail, setDetail] = useState<AdminUserDetail | null>(null);
-  const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  // ── Data queries ──
+  const { data: detail, isLoading: loading } = useAdminUserDetail(id);
+  const { data: analytics } = useAdminUserAnalytics(id, 30);
+  const { data: planHistoryData } = useAdminUserPlanHistory(id);
+
+  // ── Tab state ──
+  type TabKey = 'overview' | 'endpoints' | 'webhooks' | 'apikeys' | 'applications' | 'usage' | 'notes' | 'communications' | 'billing';
+  const [activeTab, setActiveTab] = useState<TabKey>('overview');
+
+  // ── Plan selector ──
   const [newPlan, setNewPlan] = useState('');
-  // Delivery detail modal
-  const [deliveryDetail, setDeliveryDetail] = useState<DeliveryDetail | null>(null);
-  const [deliveryAttempts, setDeliveryAttempts] = useState<DeliveryAttempt[]>([]);
-  const [deliveryLoading, setDeliveryLoading] = useState(false);
-  // Plan history
-  const [planHistory, setPlanHistory] = useState<Array<{ action: string; details: Record<string, unknown>; created_at: string }>>([]);
-  // Email modal
+  useEffect(() => {
+    if (detail?.user?.plan) setNewPlan(detail.user.plan);
+  }, [detail?.user?.plan]);
+
+  // ── Tab-specific queries (only enabled when tab is active) ──
+  const { data: endpointsData } = useAdminUserEndpoints(id);
+  const [webhooksPage, setWebhooksPage] = useState(1);
+  const [webhookFilter, setWebhookFilter] = useState<{ status?: string; event_type?: string }>({});
+  const { data: webhooksData } = useAdminUserWebhooks(id, { page: webhooksPage, per_page: 50, ...webhookFilter });
+  const { data: apiKeysData } = useAdminUserApiKeys(id);
+  const { data: appsData } = useAdminUserApplications(id);
+  const { data: usageData } = useAdminUserUsage(id);
+  const { data: notesData } = useAdminUserNotes(id);
+  const { data: tagsData } = useAdminUserTags(id);
+  const [commsPage, setCommsPage] = useState(1);
+  const [commFilter, setCommFilter] = useState<string>('');
+  const { data: commsData } = useAdminUserCommunications(id, { page: commsPage, per_page: 50, type: commFilter || undefined });
+  const [invoicesPage, setInvoicesPage] = useState(1);
+  const [invoiceFilter, setInvoiceFilter] = useState<string>('');
+  const { data: invoicesData } = useAdminUserInvoices(id, { page: invoicesPage, per_page: 50, status: invoiceFilter || undefined });
+  const { data: paymentsData } = useAdminUserPayments(id, 50);
+  const { data: refundsData } = useAdminUserRefunds(id, 50);
+
+  // ── Delivery detail modal ──
+  const [selectedDeliveryId, setSelectedDeliveryId] = useState<string | null>(null);
+  const { data: deliveryDetail, isLoading: deliveryLoading } = useDeliveryDetail(selectedDeliveryId);
+  const { data: deliveryAttemptsData } = useDeliveryAttempts(selectedDeliveryId);
+
+  // ── Email modal ──
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
-  const [emailSending, setEmailSending] = useState(false);
-  // Aşama 1 — Tab sistemi
-  type TabKey = 'overview' | 'endpoints' | 'webhooks' | 'apikeys' | 'applications' | 'usage' | 'notes' | 'communications' | 'billing';
-  const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  const [userEndpoints, setUserEndpoints] = useState<Array<{ id: string; url: string; description: string | null; is_active: boolean; created_at: string; total_deliveries: number; last_delivery_at: string | null }>>([]);
-  const [userWebhooks, setUserWebhooks] = useState<Array<{ id: string; endpoint_id: string; status: string; event: string | null; created_at: string; attempt_count: number; response_status: number | null; response_body: string | null; error_message: string | null }>>([]);
-  const [webhooksTotal, setWebhooksTotal] = useState(0);
-  const [webhooksPage, setWebhooksPage] = useState(1);
-  const [webhookFilter, setWebhookFilter] = useState<{ status?: string; event_type?: string }>({});
-  const [userApiKeys, setUserApiKeys] = useState<Array<{ prefix: string; name: string; created_at: string; is_active: boolean }>>([]);
-  const [userApps, setUserApps] = useState<Array<{ id: string; name: string; description: string | null; created_at: string; endpoint_count: number }>>([]);
-  const [userUsage, setUserUsage] = useState<{ total_deliveries: number; successful: number; failed: number; pending: number; success_rate: number; endpoints_count: number; active_endpoints: number; last_30_days: number; last_7_days: number; top_events: Array<{ event: string | null; count: number }> } | null>(null);
-  // Aşama 3 — Notes, Tags, Communications
-  const [userNotes, setUserNotes] = useState<Array<{ id: string; customer_id: string; admin_user_id: string; content: string; created_at: string }>>([]);
-  const [userTags, setUserTags] = useState<Array<{ id: string; customer_id: string; tag: string; admin_user_id: string; created_at: string }>>([]);
+
+  // ── Notes/Tags form state ──
   const [newNote, setNewNote] = useState('');
   const [newTag, setNewTag] = useState('');
-  const [userComms, setUserComms] = useState<Array<{ id: string; customer_id: string; type: string; subject: string | null; details: unknown; admin_user_id: string | null; created_at: string }>>([]);
-  const [commsTotal, setCommsTotal] = useState(0);
-  const [commsPage, setCommsPage] = useState(1);
-  const [commFilter, setCommFilter] = useState<string>('');
-  // Aşama 4 — Billing (Invoices + Payments)
-  const [userInvoices, setUserInvoices] = useState<Array<{ id: string; amount_cents: number; currency: string; plan: string; status: string; provider: string; provider_invoice_id: string | null; paid_at: string | null; created_at: string }>>([]);
-  const [invoicesTotal, setInvoicesTotal] = useState(0);
-  const [invoicesPage, setInvoicesPage] = useState(1);
-  const [invoiceFilter, setInvoiceFilter] = useState<string>('');
-  const [userPayments, setUserPayments] = useState<Array<{ id: string; amount_cents: number; currency: string; status: string; provider: string; provider_transaction_id: string | null; metadata: unknown; created_at: string }>>([]);
-  // Aşama 5 — Refund
-  const [userRefunds, setUserRefunds] = useState<Array<{ id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; admin_user_id: string | null; provider: string; provider_refund_id: string | null; status: string; created_at: string }>>([]);
+
+  // ── Refund modal ──
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
-  const [refundProcessing, setRefundProcessing] = useState(false);
-  // Aşama 7 — GDPR
-  const [gdprExporting, setGdprExporting] = useState(false);
+
+  // ── GDPR state ──
   const [showGdprDeleteModal, setShowGdprDeleteModal] = useState(false);
   const [gdprDeleteReason, setGdprDeleteReason] = useState('');
-  const [gdprDeleting, setGdprDeleting] = useState(false);
-  // Test Webhook
+
+  // ── Test Webhook modal ──
   const [showTestWebhookModal, setShowTestWebhookModal] = useState(false);
   const [testWebhookUrl, setTestWebhookUrl] = useState('');
   const [testWebhookEvent, setTestWebhookEvent] = useState('');
   const [testWebhookPayload, setTestWebhookPayload] = useState('{\n  "test": true\n}');
-  const [testWebhookSending, setTestWebhookSending] = useState(false);
   const [testWebhookResult, setTestWebhookResult] = useState<{ status_code: number; response_body: string; duration_ms: number } | null>(null);
 
+  // ── Mutations ──
+  const updatePlanMutation = useUpdateUserPlan();
+  const updateStatusMutation = useUpdateUserStatus();
+  const sendEmailMutation = useAdminSendEmail();
+  const impersonateMutation = useAdminImpersonate();
+  const refundMutation = useAdminRefundUser();
+  const gdprExportMutation = useAdminGdprExport();
+  const gdprDeleteMutation = useAdminGdprDelete();
+  const testWebhookMutation = useAdminUserTestWebhook();
+  const addNoteMutation = useAdminAddNote();
+  const addTagMutation = useAdminAddTag();
+  const removeTagMutation = useAdminRemoveTag();
+  const replayDeliveryMutation = useAdminReplayDelivery();
 
-  // Tab değiştiğinde veri çek
-  const fetchTabData = useCallback(async (tab: TabKey) => {
-    if (!token || !id) return;
-    try {
-      switch (tab) {
-        case 'endpoints': {
-          const data = await adminApi.getUserEndpoints(token, id);
-          setUserEndpoints(data.endpoints || []);
-          break;
-        }
-        case 'webhooks': {
-          const data = await adminApi.getUserWebhooks(token, id, { page: webhooksPage, per_page: 50, ...webhookFilter });
-          setUserWebhooks(data.webhooks || []);
-          setWebhooksTotal(data.total || 0);
-          break;
-        }
-        case 'apikeys': {
-          const data = await adminApi.getUserApiKeys(token, id);
-          setUserApiKeys(data.api_keys || []);
-          break;
-        }
-        case 'applications': {
-          const data = await adminApi.getUserApplications(token, id);
-          setUserApps(data.applications || []);
-          break;
-        }
-        case 'usage': {
-          const data = await adminApi.getUserUsage(token, id);
-          setUserUsage(data);
-          break;
-        }
-        case 'notes': {
-          const [notesData, tagsData] = await Promise.all([
-            adminApi.getNotes(token, id),
-            adminApi.getTags(token, id),
-          ]);
-          setUserNotes(notesData.notes || []);
-          setUserTags(tagsData.tags || []);
-          break;
-        }
-        case 'communications': {
-          const data = await adminApi.getCommunications(token, id, { page: commsPage, per_page: 50, type: commFilter || undefined });
-          setUserComms(data.communications || []);
-          setCommsTotal(data.total || 0);
-          break;
-        }
-        case 'billing': {
-          const [invData, payData, refData] = await Promise.all([
-            adminApi.getUserInvoices(token, id, { page: invoicesPage, per_page: 50, status: invoiceFilter || undefined }),
-            adminApi.getUserPayments(token, id, { per_page: 50 }),
-            adminApi.getUserRefunds(token, id, { per_page: 50 }),
-          ]);
-          setUserInvoices(invData.invoices || []);
-          setInvoicesTotal(invData.total || 0);
-          setUserPayments(payData.payments || []);
-          setUserRefunds(refData.refunds || []);
-          break;
-        }
-      }
-    } catch {
-      // silent fail for tab data
-    }
-  }, [token, id, webhooksPage, webhookFilter, commFilter, commsPage, invoiceFilter, invoicesPage]);
+  // ── Derived data ──
+  const planHistory = planHistoryData?.history ?? [];
+  const userEndpoints = endpointsData?.endpoints ?? [];
+  const userWebhooks = webhooksData?.webhooks ?? [];
+  const webhooksTotal = webhooksData?.total ?? 0;
+  const userApiKeys = apiKeysData?.api_keys ?? [];
+  const userApps = appsData?.applications ?? [];
+  const userUsage = usageData ?? null;
+  const userNotes = notesData?.notes ?? [];
+  const userTags = tagsData?.tags ?? [];
+  const userComms = commsData?.communications ?? [];
+  const commsTotal = commsData?.total ?? 0;
+  const userInvoices = invoicesData?.invoices ?? [];
+  const invoicesTotal = invoicesData?.total ?? 0;
+  const userPayments = paymentsData?.payments ?? [];
+  const userRefunds = refundsData?.refunds ?? [];
+  const deliveryAttempts = deliveryAttemptsData ?? [];
 
-  useEffect(() => {
-    if (activeTab !== 'overview') fetchTabData(activeTab);
-  }, [activeTab, fetchTabData]);
-
-  const fetchDetail = useCallback(async () => {
-    if (!token || !id) return;
-    setLoading(true);
-    try {
-      const [detailData, analyticsData, planHistoryData] = await Promise.all([
-        adminApi.getUserDetail(token, id),
-        adminApi.getUserAnalytics(token, id, 30).catch(() => null),
-        adminApi.getUserPlanHistory(token, id).catch(() => ({ history: [] })),
-      ]);
-      setDetail(detailData);
-      setAnalytics(analyticsData);
-      setNewPlan(detailData.user.plan);
-      setPlanHistory(planHistoryData.history || []);
-    } catch {
-      toast(t("failedToLoadDetails"), "error");
-    } finally {
-      setLoading(false);
-    }
-  }, [token, id, toast, t]);
-
-  useEffect(() => {
-    fetchDetail();
-  }, [fetchDetail]);
-
+  // ── Handlers ──
   const handleUpdatePlan = async () => {
-    if (!token || !id || !newPlan) return;
+    if (!id || !newPlan) return;
     try {
-      await adminApi.updateUserPlan(token, id, newPlan);
+      await updatePlanMutation.mutateAsync({ userId: id, plan: newPlan });
       toast(t("planUpdated", { plan: newPlan }), "success");
-      fetchDetail();
     } catch {
       toast(t("failedToUpdatePlan"), "error");
     }
   };
 
   const handleToggleStatus = async () => {
-    if (!token || !id || !detail) return;
+    if (!id || !detail) return;
     const newStatus = detail.user.status === 'active' ? 'banned' : 'active';
     try {
-      await adminApi.updateUserStatus(token, id, newStatus);
+      await updateStatusMutation.mutateAsync({ userId: id, status: newStatus as 'active' | 'banned' });
       toast(newStatus === "banned" ? t("userBanned") : t("userActivated"), "success");
-      fetchDetail();
     } catch {
       toast(t("failedToUpdateStatus"), "error");
     }
   };
 
   const handleReplay = async (deliveryId: string) => {
-    if (!token) return;
     try {
-      await adminApi.replayDelivery(token, deliveryId);
+      await replayDeliveryMutation.mutateAsync({ userId: id, deliveryId });
       toast(t("replaySuccess"), "success");
-      fetchDetail();
     } catch {
       toast(t("replayFailed"), "error");
     }
   };
 
-  const handleViewDelivery = async (deliveryId: string) => {
-    if (!token) return;
-    setDeliveryLoading(true);
-    try {
-      const [detail, attempts] = await Promise.all([
-        webhooksApi.get(token, deliveryId),
-        webhooksApi.getAttempts(token, deliveryId).catch(() => []),
-      ]);
-      setDeliveryDetail(detail);
-      setDeliveryAttempts(attempts);
-    } catch {
-      toast(tc('error'), 'error');
-    } finally {
-      setDeliveryLoading(false);
-    }
+  const handleViewDelivery = (deliveryId: string) => {
+    setSelectedDeliveryId(deliveryId);
   };
 
   const handleImpersonate = async () => {
-    if (!token || !id || !detail) return;
+    if (!id || !detail) return;
     try {
-      const result = await adminApi.impersonateUser(token, id);
+      const result = await impersonateMutation.mutateAsync(id);
       window.open(`/${locale}/dashboard?impersonate_token=${result.token}`, '_blank');
       toast(t('impersonating') + `: ${detail.user.email}`, 'success');
     } catch {
@@ -236,45 +191,38 @@ export default function AdminUserDetailPage() {
   };
 
   const handleSendEmail = async () => {
-    if (!token || !id || !emailSubject.trim() || !emailBody.trim()) return;
-    setEmailSending(true);
+    if (!id || !emailSubject.trim() || !emailBody.trim()) return;
     try {
-      await adminApi.sendUserEmail(token, id, emailSubject, emailBody);
+      await sendEmailMutation.mutateAsync({ userId: id, subject: emailSubject, body: emailBody });
       toast(t('emailSent') || t('emailSent'), 'success');
       setShowEmailModal(false);
       setEmailSubject('');
       setEmailBody('');
     } catch {
       toast(t('emailSendFailed') || t('emailSendFailed'), 'error');
-    } finally {
-      setEmailSending(false);
     }
   };
 
   const handleRefund = async () => {
-    if (!token || !id || !refundAmount || !refundReason.trim()) return;
+    if (!id || !refundAmount || !refundReason.trim()) return;
     const amountCents = Math.round(parseFloat(refundAmount) * 100);
     if (isNaN(amountCents) || amountCents <= 0) {
       toast(t('invalidAmount') || t('invalidAmount'), 'error');
       return;
     }
-    setRefundProcessing(true);
     try {
-      await adminApi.refundUser(token, id, amountCents, refundReason.trim());
+      await refundMutation.mutateAsync({ userId: id, amountCents, reason: refundReason.trim() });
       toast(t('refundSuccess') || t('refundSuccess'), 'success');
       setShowRefundModal(false);
       setRefundAmount('');
       setRefundReason('');
-      fetchTabData('billing');
     } catch {
       toast(t('refundFailed') || t('refundFailed'), 'error');
-    } finally {
-      setRefundProcessing(false);
     }
   };
 
   const handleTestWebhook = async () => {
-    if (!token || !id || !testWebhookUrl.trim()) return;
+    if (!id || !testWebhookUrl.trim()) return;
     let payload: Record<string, unknown>;
     try {
       payload = JSON.parse(testWebhookPayload);
@@ -282,28 +230,27 @@ export default function AdminUserDetailPage() {
       toast(t('invalidJson') || t('invalidJson'), 'error');
       return;
     }
-    setTestWebhookSending(true);
     setTestWebhookResult(null);
     try {
-      const result = await adminApi.adminUserTestWebhook(token, id, {
-        endpoint_url: testWebhookUrl.trim(),
-        event_type: testWebhookEvent.trim() || undefined,
-        payload,
+      const result = await testWebhookMutation.mutateAsync({
+        userId: id,
+        data: {
+          endpoint_url: testWebhookUrl.trim(),
+          event_type: testWebhookEvent.trim() || undefined,
+          payload,
+        },
       });
       setTestWebhookResult(result);
       toast(t('testWebhookSent') || t('testWebhookSent'), 'success');
     } catch {
       toast(t('testWebhookFailed') || t('testWebhookFailed'), 'error');
-    } finally {
-      setTestWebhookSending(false);
     }
   };
 
   const handleGdprExport = async () => {
-    if (!token || !id) return;
-    setGdprExporting(true);
+    if (!id) return;
     try {
-      const data = await adminApi.exportUserData(token, id);
+      const data = await gdprExportMutation.mutateAsync(id);
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -314,27 +261,22 @@ export default function AdminUserDetailPage() {
       toast(t('gdprExportSuccess') || t('gdprExportSuccess'), 'success');
     } catch {
       toast(t('gdprExportFailed') || t('gdprExportFailed'), 'error');
-    } finally {
-      setGdprExporting(false);
     }
   };
 
   const handleGdprDelete = async () => {
-    if (!token || !id || !gdprDeleteReason.trim()) return;
-    setGdprDeleting(true);
+    if (!id || !gdprDeleteReason.trim()) return;
     try {
-      await adminApi.deleteUserData(token, id, gdprDeleteReason.trim());
+      await gdprDeleteMutation.mutateAsync({ userId: id, reason: gdprDeleteReason.trim() });
       toast(t('gdprDeleteSuccess') || t('gdprDeleteSuccess'), 'success');
       setShowGdprDeleteModal(false);
       setGdprDeleteReason('');
-      fetchTabData('billing');
     } catch {
       toast(t('gdprDeleteFailed') || t('gdprDeleteFailed'), 'error');
-    } finally {
-      setGdprDeleting(false);
     }
   };
 
+  // ── Loading / Not found ──
   if (loading) {
     return (
       <div className="space-y-6">
@@ -380,7 +322,6 @@ export default function AdminUserDetailPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => {
-              // Pre-fill with user's first active endpoint URL
               const activeEp = detail.endpoints?.find(e => e.is_active);
               setTestWebhookUrl(activeEp?.url || '');
               setShowTestWebhookModal(true);
@@ -665,9 +606,9 @@ export default function AdminUserDetailPage() {
           <div className="glass-card p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("dailyDeliveries")}</h2>
             <div className="h-48">
-              {analytics.daily_deliveries?.length > 0 ? (
+              {(analytics.daily_deliveries?.length ?? 0) > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analytics.daily_deliveries.slice(-14)}>
+                  <BarChart data={analytics.daily_deliveries!.slice(-14)}>
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
                     <YAxis tick={{ fontSize: 10 }} />
@@ -688,11 +629,11 @@ export default function AdminUserDetailPage() {
           <div className="glass-card p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("eventDistribution")}</h2>
             <div className="h-48">
-              {analytics.top_events?.length > 0 ? (
+              {(analytics.top_events?.length ?? 0) > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={analytics.top_events}
+                      data={analytics.top_events!}
                       dataKey="count"
                       nameKey="event"
                       cx="50%"
@@ -701,7 +642,7 @@ export default function AdminUserDetailPage() {
                       outerRadius={60}
                       paddingAngle={4}
                     >
-                      {analytics.top_events.map((_, i) => (
+                      {analytics.top_events!.map((_, i) => (
                         <Cell key={i} fill={['#4c6ef5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][i % 5]} />
                       ))}
                     </Pie>
@@ -720,8 +661,8 @@ export default function AdminUserDetailPage() {
           <div className="glass-card p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("endpointHealth")}</h2>
             <div className="space-y-3">
-              {analytics.endpoint_health?.length > 0 ? (
-                analytics.endpoint_health.map((ep, i) => (
+              {(analytics.endpoint_health?.length ?? 0) > 0 ? (
+                analytics.endpoint_health!.map((ep, i) => (
                   <div key={i} className="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
                     <p className="text-xs font-mono text-gray-900 dark:text-white truncate">{ep.url}</p>
                     <div className="flex items-center gap-3 mt-2">
@@ -819,7 +760,7 @@ export default function AdminUserDetailPage() {
                         <td className="px-4 py-3"><StatusBadge status={d.status} /></td>
                         <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400">{d.attempt_count}</td>
                         <td className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">{new Date(d.created_at).toLocaleString()}</td>
-                        <td className="px-4 py-3"><div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}><button onClick={() => handleViewDelivery(d.id)} className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium">🔍</button><button onClick={async () => { if (!token) return; try { await adminApi.adminUserReplayDelivery(token, id, d.id); toast(t("replaySuccess") || "Replayed", "success"); fetchTabData("webhooks"); } catch { toast(t("replayFailed") || "Failed", "error"); } }} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">↩</button></div></td>
+                        <td className="px-4 py-3"><div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}><button onClick={() => handleViewDelivery(d.id)} className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium">🔍</button><button onClick={() => handleReplay(d.id)} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">↩</button></div></td>
                       </tr>
                     ))}
                   </tbody>
@@ -895,7 +836,7 @@ export default function AdminUserDetailPage() {
             <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-white">{userUsage.total_deliveries.toLocaleString()}</p><p className="text-xs text-gray-500 dark:text-slate-400">{t("totalDeliveries") || "Total"}</p></div>
             <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{userUsage.success_rate}%</p><p className="text-xs text-gray-500 dark:text-slate-400">{t("successRate") || "Success Rate"}</p></div>
             <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-white">{userUsage.endpoints_count}</p><p className="text-xs text-gray-500 dark:text-slate-400">{t("endpoints") || "Endpoints"}</p></div>
-            <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{userUsage.last_7_days.toLocaleString()}</p><p className="text-xs text-gray-500 dark:textlate-400">{t("last7Days") || "Last 7 Days"}</p></div>
+            <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{userUsage.last_7_days.toLocaleString()}</p><p className="text-xs text-gray-500 dark:text-slate-400">{t("last7Days") || "Last 7 Days"}</p></div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="glass-card p-6">
@@ -936,10 +877,8 @@ export default function AdminUserDetailPage() {
                   {tag.tag}
                   <button
                     onClick={async () => {
-                      if (!token) return;
                       try {
-                        await adminApi.removeTag(token, id, tag.tag);
-                        setUserTags((prev) => prev.filter((t) => t.id !== tag.id));
+                        await removeTagMutation.mutateAsync({ userId: id, tag: tag.tag });
                         toast(t("tagRemoved") || "Tag removed", "success");
                       } catch { toast(t("tagRemoveFailed") || "Failed", "error"); }
                     }}
@@ -956,25 +895,21 @@ export default function AdminUserDetailPage() {
                 placeholder={t("addTagPlaceholder") || "e.g. vip, at-risk, enterprise"}
                 className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && newTag.trim() && token) {
-                    adminApi.addTag(token, id, newTag.trim()).then((res) => {
-                      if (res.added) {
-                        setUserTags((prev) => [...prev, { id: Date.now().toString(), customer_id: id, tag: res.tag, admin_user_id: '', created_at: new Date().toISOString() }]);
-                      }
-                      setNewTag('');
-                      toast(res.message, "success");
-                    }).catch(() => toast(t("tagAddFailed") || "Failed", "error"));
+                  if (e.key === 'Enter' && newTag.trim()) {
+                    addTagMutation.mutateAsync({ userId: id, tag: newTag.trim() })
+                      .then((res) => {
+                        setNewTag('');
+                        toast(res.message, "success");
+                      })
+                      .catch(() => toast(t("tagAddFailed") || "Failed", "error"));
                   }
                 }}
               />
               <button
                 onClick={async () => {
-                  if (!token || !newTag.trim()) return;
+                  if (!newTag.trim()) return;
                   try {
-                    const res = await adminApi.addTag(token, id, newTag.trim());
-                    if (res.added) {
-                      setUserTags((prev) => [...prev, { id: Date.now().toString(), customer_id: id, tag: res.tag, admin_user_id: '', created_at: new Date().toISOString() }]);
-                    }
+                    const res = await addTagMutation.mutateAsync({ userId: id, tag: newTag.trim() });
                     setNewTag('');
                     toast(res.message, "success");
                   } catch { toast(t("tagAddFailed") || "Failed", "error"); }
@@ -1005,10 +940,9 @@ export default function AdminUserDetailPage() {
               />
               <button
                 onClick={async () => {
-                  if (!token || !newNote.trim()) return;
+                  if (!newNote.trim()) return;
                   try {
-                    const res = await adminApi.addNote(token, id, newNote.trim());
-                    setUserNotes((prev) => [res.note, ...prev]);
+                    await addNoteMutation.mutateAsync({ userId: id, content: newNote.trim() });
                     setNewNote('');
                     toast(t("noteAdded") || "Note added", "success");
                   } catch { toast(t("noteAddFailed") || "Failed", "error"); }
@@ -1249,10 +1183,10 @@ export default function AdminUserDetailPage() {
             <div className="flex gap-3">
               <button
                 onClick={handleGdprExport}
-                disabled={gdprExporting}
+                disabled={gdprExportMutation.isPending}
                 className="px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded-lg transition-colors disabled:opacity-50"
               >
-                {gdprExporting ? (t('exporting') || 'Exporting...') : `📦 ${t('exportData') || 'Export All Data'}`}
+                {gdprExportMutation.isPending ? (t('exporting') || 'Exporting...') : `📦 ${t('exportData') || 'Export All Data'}`}
               </button>
               <button
                 onClick={() => setShowGdprDeleteModal(true)}
@@ -1302,10 +1236,10 @@ export default function AdminUserDetailPage() {
               </button>
               <button
                 onClick={handleGdprDelete}
-                disabled={gdprDeleting || !gdprDeleteReason.trim()}
+                disabled={gdprDeleteMutation.isPending || !gdprDeleteReason.trim()}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
               >
-                {gdprDeleting ? (t('deleting') || 'Deleting...') : (t('confirmDelete') || 'Permanently Delete All Data')}
+                {gdprDeleteMutation.isPending ? (t('deleting') || 'Deleting...') : (t('confirmDelete') || 'Permanently Delete All Data')}
               </button>
             </div>
           </div>
@@ -1358,10 +1292,10 @@ export default function AdminUserDetailPage() {
               </button>
               <button
                 onClick={handleRefund}
-                disabled={refundProcessing || !refundAmount || !refundReason.trim()}
+                disabled={refundMutation.isPending || !refundAmount || !refundReason.trim()}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
               >
-                {refundProcessing ? (t('processing') || 'Processing...') : (t('confirmRefund') || 'Confirm Refund')}
+                {refundMutation.isPending ? (t('processing') || 'Processing...') : (t('confirmRefund') || 'Confirm Refund')}
               </button>
             </div>
           </div>
@@ -1410,10 +1344,10 @@ export default function AdminUserDetailPage() {
               </button>
               <button type="button"
                 onClick={handleSendEmail}
-                disabled={emailSending || !emailSubject.trim() || !emailBody.trim()}
+                disabled={sendEmailMutation.isPending || !emailSubject.trim() || !emailBody.trim()}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition disabled:opacity-60"
               >
-                {emailSending ? tc('saving') : t('send') || 'Send'}
+                {sendEmailMutation.isPending ? tc('saving') : t('send') || 'Send'}
               </button>
             </div>
           </div>
@@ -1492,10 +1426,10 @@ export default function AdminUserDetailPage() {
               </button>
               <button type="button"
                 onClick={handleTestWebhook}
-                disabled={testWebhookSending || !testWebhookUrl.trim()}
+                disabled={testWebhookMutation.isPending || !testWebhookUrl.trim()}
                 className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition disabled:opacity-60"
               >
-                {testWebhookSending ? (t('sending') || 'Sending...') : (t('sendTest') || 'Send Test')}
+                {testWebhookMutation.isPending ? (t('sending') || 'Sending...') : (t('sendTest') || 'Send Test')}
               </button>
             </div>
           </div>
@@ -1503,16 +1437,16 @@ export default function AdminUserDetailPage() {
       )}
 
       {/* Delivery Detail Modal */}
-      {deliveryDetail && (
+      {selectedDeliveryId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setDeliveryDetail(null); setDeliveryAttempts([]); }} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedDeliveryId(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 🔍 {t("deliveryDetails") || "Delivery Details"}
               </h3>
               <button type="button"
-                onClick={() => { setDeliveryDetail(null); setDeliveryAttempts([]); }}
+                onClick={() => setSelectedDeliveryId(null)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition"
               >
                 ✕
@@ -1521,7 +1455,7 @@ export default function AdminUserDetailPage() {
 
             {deliveryLoading ? (
               <div className="py-8 text-center text-gray-500 dark:text-slate-400">{tc('loading')}</div>
-            ) : (
+            ) : deliveryDetail ? (
               <div className="space-y-4">
                 {/* Basic Info */}
                 <div className="grid grid-cols-2 gap-4">
@@ -1609,7 +1543,7 @@ export default function AdminUserDetailPage() {
                   </div>
                 )}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       )}

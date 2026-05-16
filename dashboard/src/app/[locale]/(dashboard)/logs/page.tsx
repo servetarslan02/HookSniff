@@ -1,14 +1,13 @@
 'use client';
 
-import { getErrorMessage } from '@/lib/errors';
-
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
-import { webhooksApi, type Delivery, type DeliveryAttempt } from '@/lib/api';
+import { type Delivery, type DeliveryAttempt, webhooksApi } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
+import { useDeliveryLogs } from '@/hooks/useDashboardData';
 
 type StatusFilter = 'all' | 'delivered' | 'failed' | 'pending';
 
@@ -17,62 +16,26 @@ export default function LogsPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
-  const [total, setTotal] = useState(0);
   const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
   const filter = (searchParams.get('status') || 'all') as StatusFilter;
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [attempts, setAttempts] = useState<DeliveryAttempt[]>([]);
   const [attemptsLoading, setAttemptsLoading] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
-  const [statusCounts, setStatusCounts] = useState<Record<StatusFilter, number>>({
-    all: 0,
-    delivered: 0,
-    failed: 0,
-    pending: 0,
-  });
   const t = useTranslations('logs');
   const tc = useTranslations('common');
   const perPage = 20;
 
-  const fetchData = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    setError('');
-    try {
-      // Fetch current page data + total counts for each status in parallel
-      const [data, deliveredData, failedData, pendingData] = await Promise.all([
-        webhooksApi.list(token, { page, status: filter === 'all' ? undefined : filter }),
-        webhooksApi.list(token, { page: 1, status: 'delivered' }).catch(() => ({ total: 0, deliveries: [] })),
-        webhooksApi.list(token, { page: 1, status: 'failed' }).catch(() => ({ total: 0, deliveries: [] })),
-        webhooksApi.list(token, { page: 1, status: 'pending' }).catch(() => ({ total: 0, deliveries: [] })),
-      ]);
-      setDeliveries(data.deliveries);
-      setTotal(data.total);
-      setStatusCounts({
-        all: data.total,
-        delivered: deliveredData.total,
-        failed: failedData.total,
-        pending: pendingData.total,
-      });
-    } catch (err: unknown) {
-      setError(getErrorMessage(err, tc('unknownError')) || tc('failedToLoadLogs'));
-    } finally {
-      setLoading(false);
-    }
-  }, [token, page, filter, tc]);
+  const { data, isLoading, error, refetch } = useDeliveryLogs({
+    page,
+    status: filter === 'all' ? undefined : filter,
+    refetchInterval: autoRefresh ? 5000 : undefined,
+  });
 
-  useEffect(() => { fetchData(); }, [fetchData]);
-
-  // Auto-refresh
-  useEffect(() => {
-    if (!autoRefresh) return;
-    const interval = setInterval(fetchData, 5000);
-    return () => clearInterval(interval);
-  }, [autoRefresh, fetchData]);
+  const deliveries = data?.deliveries ?? [];
+  const total = data?.total ?? 0;
+  const statusCounts = data?.statusCounts ?? { all: 0, delivered: 0, failed: 0, pending: 0 };
 
   const filtered = deliveries.filter(
     (d) =>
@@ -83,8 +46,6 @@ export default function LogsPage() {
   );
 
   const totalPages = Math.ceil(total / perPage);
-
-  // statusCounts now fetched from API (total counts, not just current page)
 
   return (
     <div className="space-y-6">
@@ -109,7 +70,7 @@ export default function LogsPage() {
             {autoRefresh ? tc('live') : tc('autoRefresh')}
           </button>
           <button type="button"
-            onClick={fetchData}
+            onClick={() => refetch()}
             className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
           >
             ↻ Refresh
@@ -180,9 +141,9 @@ export default function LogsPage() {
       {error && (
         <div className="glass-card p-6 text-center">
           <div className="text-4xl mb-3">⚠️</div>
-          <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error}</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error.message}</p>
           <button type="button"
-            onClick={fetchData}
+            onClick={() => refetch()}
             className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
           >
             Retry
@@ -192,7 +153,7 @@ export default function LogsPage() {
 
       {/* Table */}
       <div className="glass-card overflow-hidden">
-        {loading ? (
+        {isLoading ? (
           <div className="p-12 text-center">
             <div className="inline-flex items-center gap-2 text-gray-500 dark:text-slate-500">
               <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">

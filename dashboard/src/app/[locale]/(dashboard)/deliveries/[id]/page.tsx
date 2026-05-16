@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
-import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { webhooksApi, type DeliveryDetail, type DeliveryAttempt } from '@/lib/api';
+import { useDeliveryDetail, useDeliveryAttempts, useReplayWebhook } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { DeliveryOverviewCards } from './components/DeliveryOverviewCards';
 import { DeliveryInfoPanel } from './components/DeliveryInfoPanel';
@@ -16,14 +15,13 @@ import { AttemptTimeline } from './components/AttemptTimeline';
 export default function DeliveryDetailPage() {
   const t = useTranslations('deliveryDetail');
   const { id } = useParams<{ id: string }>();
-  const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
-  const [delivery, setDelivery] = useState<DeliveryDetail | null>(null);
-  const [attempts, setAttempts] = useState<DeliveryAttempt[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [replaying, setReplaying] = useState(false);
+
+  const { data: delivery, isLoading, error, refetch } = useDeliveryDetail(id);
+  const { data: attempts = [] } = useDeliveryAttempts(id);
+  const replayMutation = useReplayWebhook();
+
   const [showReplayConfirm, setShowReplayConfirm] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -34,39 +32,15 @@ export default function DeliveryDetailPage() {
     };
   }, []);
 
-  const fetchData = useCallback(async () => {
-    if (!token || !id) return;
-    setLoading(true);
-    setError('');
-    try {
-      const [detail, attemptList] = await Promise.all([
-        webhooksApi.get(token, id),
-        webhooksApi.getAttempts(token, id).catch(() => [] as DeliveryAttempt[]),
-      ]);
-      setDelivery(detail);
-      setAttempts(attemptList);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t('loadFailed');
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, [token, id, t]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
-
   const handleReplay = async () => {
-    if (!token || !id) return;
-    setReplaying(true);
+    if (!id) return;
     try {
-      await webhooksApi.replay(token, id);
+      await replayMutation.mutateAsync(id);
       toast(t('toastReplaySuccess'), 'success');
-      fetchData();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : t('toastReplayFailed');
       toast(message, 'error');
     } finally {
-      setReplaying(false);
       setShowReplayConfirm(false);
     }
   };
@@ -82,7 +56,7 @@ export default function DeliveryDetailPage() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="glass-card p-6 animate-pulse">
@@ -109,10 +83,10 @@ export default function DeliveryDetailPage() {
       <div className="glass-card p-12 text-center">
         <div className="text-5xl mb-4">⚠️</div>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('loadFailed')}</h2>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{error}</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{error.message}</p>
         <div className="flex items-center justify-center gap-3">
           <button type="button"
-            onClick={fetchData}
+            onClick={() => refetch()}
             className="bg-brand-600 dark:bg-brand-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
           >
             {t('tryAgain')}
@@ -180,7 +154,7 @@ export default function DeliveryDetailPage() {
         confirmLabel={t('replayConfirm')}
         onConfirm={handleReplay}
         onCancel={() => setShowReplayConfirm(false)}
-        loading={replaying}
+        loading={replayMutation.isPending}
       />
     </div>
   );
