@@ -41,9 +41,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     setState('connecting');
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL
       || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1').replace(/^http/, 'ws') + '/ws';
+    const fullUrl = `${wsUrl}?token=${encodeURIComponent(token)}`;
     const connectStart = Date.now();
 
-    const ws = new WebSocket(`${wsUrl}?token=${encodeURIComponent(token)}`);
+    console.log('[WS] Connecting to:', wsUrl.replace(/^(wss?:\/\/[^/]+).*/, '$1/...'));
+    const ws = new WebSocket(fullUrl);
 
     ws.onopen = () => {
       console.log('[WS] Connected');
@@ -95,7 +97,13 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     ws.onclose = (event) => {
       const connectDuration = Date.now() - connectStart;
-      console.log('[WS] Disconnected', event.code, event.reason, `(${connectDuration}ms)`);
+      console.log('[WS] Disconnected', {
+        code: event.code,
+        reason: event.reason || 'no reason',
+        wasClean: event.wasClean,
+        duration: `${connectDuration}ms`,
+        url: wsUrl.replace(/^(wss?:\/\/[^/]+).*/, '$1/...'),
+      });
       wsRef.current = null;
       onDisconnected?.();
 
