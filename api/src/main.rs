@@ -25,7 +25,7 @@ use hooksniff_api::telemetry;
 use hooksniff_api::throttle;
 use hooksniff_api::cache;
 use hooksniff_api::events;
-use hooksniff_api::ws;
+use hooksniff_api::feature_flags;
 
 #[tokio::main]
 async fn main() -> Result<()> {
