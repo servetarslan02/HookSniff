@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:20 GMT+8 (Oturum 187)
+> Son güncelleme: 2026-05-17 05:25 GMT+8 (Oturum 188)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,22 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 188 — 2026-05-17 05:25 GMT+8
+1. **Feature Flags → Uygulama Bağlantısı** ✅
+   - **FeatureFlagService oluşturuldu** (`api/src/feature_flags.rs`)
+     - In-memory cache + 60sn DB refresh
+     - `is_enabled(flag_name)` — basit kontrol
+     - `is_enabled_for(flag_name, plan, customer_hash)` — plan + rollout desteği
+     - Background refresher task
+   - **Migration 020** — `payload_hash` column + trigger + index
+   - **Flag bağlantıları:**
+     - `deduplication`: Webhook ingestion'da content-based duplicate detection (SHA-256, 60s pencere)
+     - `bulk_replay`: Batch replay endpoint'i flag'e bağlandı (devre dışı = 400)
+     - `gdpr_data_deletion`: GDPR export + delete endpoint'leri flag'e bağlandı
+     - `standard_webhooks`: Worker zaten her iki header'ı gönderiyor (değişiklik gerekmedi)
+     - `custom_retry_schedules`: Gelecek için planlandı (UI gerekli)
+   - Commit: 66356f65 — push edildi
 
 ### Oturum 187 — 2026-05-17 05:20 GMT+8
 1. **API Bağlantı Taraması** ✅
