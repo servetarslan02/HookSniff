@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:35 GMT+8 (Oturum 190)
+> Son güncelleme: 2026-05-17 05:44 GMT+8 (Oturum 191)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,23 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 191 — 2026-05-17 05:44 GMT+8
+1. **Feature Flags Sayfası Derin İnceleme + 9 Bug Fix** ✅
+   - **Frontend düzeltmeleri:**
+     - Description boş string → null (DB'de "" yerine NULL kaydediliyor)
+     - Toggle için ayrı mutation (eş zamanlı toggle çakışması önlendi)
+     - Toggle loading indicator (spinner + disabled state)
+     - Modal Escape tuşu ile kapanma
+     - Edit modal'da flag ismi readonly (kod referansları kopmasın diye)
+     - Frontend name validasyonu (100 char, alphanumeric/_/-)
+     - Admin mutation'lar public feature-flags cache'ini de invalidate ediyor
+   - **Backend düzeltmeleri:**
+     - Create: name trim + uzunluk kontrolü + duplicate check
+     - Update: name trim + validasyon
+     - Update: description empty string → NULL dönüşümü
+   - **Translation:** 3 yeni key (nameImmutable, nameTooLong, nameInvalid) EN+TR
+   - Commit: 9b433175 — push edildi
 
 ### Oturum 190 — 2026-05-17 05:35 GMT+8
 1. **Feature Flags UI Entegrasyonu** ✅
