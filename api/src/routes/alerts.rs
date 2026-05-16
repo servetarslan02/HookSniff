@@ -300,16 +300,30 @@ async fn delete_alert(
 async fn test_alert(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    // Verify ownership
-    let _alert: (Uuid,) =
-        sqlx::query_as("SELECT id FROM alert_rules WHERE id = $1 AND customer_id = $2")
-            .bind(id)
-            .bind(customer.id)
-            .fetch_optional(&pool)
-            .await?
-            .ok_or(AppError::NotFound)?;
+    // Verify ownership and fetch alert details
+    let alert = sqlx::query_as::<_, AlertRule>(
+        "SELECT id, name, condition, threshold, channels, is_active, created_at::text          FROM alert_rules WHERE id = $1 AND customer_id = $2",
+    )
+    .bind(id)
+    .bind(customer.id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    // Publish AlertTriggered event (best-effort)
+    if let Some(ref publisher) = event_publisher {
+        if let Err(e) = publisher.publish(crate::events::AppEvent::AlertTriggered {
+            alert_id: alert.id,
+            customer_id: customer.id,
+            name: alert.name.clone(),
+            condition: alert.condition.clone(),
+        }).await {
+            tracing::warn!("Failed to publish AlertTriggered event: {:?}", e);
+        }
+    }
 
     // Send test notification
     Ok(Json(serde_json::json!({
