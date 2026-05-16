@@ -6,6 +6,15 @@ use crate::email::EmailProvider;
 /// Maximum contact form submissions per IP per hour.
 const CONTACT_RATE_LIMIT: u32 = 5;
 
+/// Escape HTML special characters to prevent injection.
+fn escape_html(s: &str) -> String {
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&#x27;")
+}
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ContactRequest {
@@ -49,13 +58,13 @@ pub async fn handle_contact(
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    // Basic email validation
-    if !body.email.contains('@') || !body.email.contains('.') {
+    // Proper email validation
+    if crate::validation::validate_email(&body.email).is_err() {
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    // Rate limit: max 5000 chars for message
-    if body.message.len() > 5000 {
+    // Rate limit: max 5000 chars for message, 200 for subject
+    if body.message.len() > 5000 || body.subject.len() > 200 {
         return Err(StatusCode::BAD_REQUEST);
     }
 
@@ -69,6 +78,11 @@ pub async fn handle_contact(
 
     // Send email via configured provider (Resend or GCloud)
     // Notify admin about the contact form submission
+    let safe_name = escape_html(&body.name);
+    let safe_email = escape_html(&body.email);
+    let safe_subject = escape_html(&body.subject);
+    let safe_message = escape_html(&body.message);
+
     let admin_html = format!(
         r#"<!DOCTYPE html>
 <html>
@@ -85,7 +99,7 @@ pub async fn handle_contact(
   <p style="margin-top: 24px; color: #6b7280; font-size: 13px;">— HookSniff Contact System</p>
 </body>
 </html>"#,
-        body.name, body.email, body.subject, body.message
+        safe_name, safe_email, safe_subject, safe_message
     );
 
     // Send to admin (use config notify_email, fallback to env var)
@@ -118,7 +132,7 @@ pub async fn handle_contact(
   <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
 </body>
 </html>"#,
-        body.name, body.subject
+        safe_name, safe_subject
     );
 
     if let Err(e) = email_provider
