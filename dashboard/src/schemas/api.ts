@@ -119,6 +119,25 @@ export const AuditLogResponseSchema = z.object({
   offset: z.number().optional(),
 });
 
+// ── Endpoint Health Schema ──
+export const EndpointHealthSchema = z.object({
+  id: z.string(),
+  url: z.string(),
+  description: z.string().nullable(),
+  is_active: z.boolean(),
+  health_status: z.string(),
+  success_rate: z.number(),
+  avg_response_ms: z.number(),
+  p95_response_ms: z.number(),
+  total_deliveries: z.number(),
+  successful: z.number(),
+  failed: z.number(),
+  consecutive_failures: z.number(),
+  last_failure_at: z.string().nullable(),
+  uptime_24h: z.number(),
+});
+export type EndpointHealthValidated = z.infer<typeof EndpointHealthSchema>;
+
 // ── Feature Flag Schema ──
 export const FeatureFlagSchema = z.object({
   id: z.string(),

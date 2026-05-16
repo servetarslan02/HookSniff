@@ -1,24 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/store';
-import { apiFetch } from '@/lib/api';
+import { useAuditLogs } from '@/hooks/useDashboardData';
 
 /* ─── Types ─── */
-interface AuditEntry {
-  id: string;
-  timestamp: string;
-  actor: string;
-  actor_email: string;
-  action: string;
-  resource_type: string;
-  resource_id: string;
-  details: string;
-  ip_address: string;
-  user_agent: string;
-}
-
 const ACTION_ICONS: Record<string, string> = {
   'auth.login': '🔑',
   'auth.logout': '👋',
@@ -41,40 +27,14 @@ const ACTION_ICONS: Record<string, string> = {
 
 export default function AuditLogPage() {
   const t = useTranslations('auditLog');
-  const { token } = useAuth();
-  const [entries, setEntries] = useState<AuditEntry[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
 
-  const fetchEntries = useCallback(async (p: number = 1) => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ page: p.toString(), limit: '50' });
-      if (filter) params.set('action', filter);
-      try {
-        const data = await apiFetch<{ entries: AuditEntry[]; has_more: boolean }>(`/audit-log?${params}`, { token });
-        setEntries(p === 1 ? data.entries : (prev) => [...prev, ...data.entries]);
-        setHasMore(data.has_more);
-      } catch {
-        // Endpoint may not exist — show empty state
-        setEntries([]);
-        setHasMore(false);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [token, filter]);
+  const { data, isLoading, isFetching } = useAuditLogs({ page, limit: 50, action: filter || undefined });
+  const entries = data?.entries ?? [];
+  const hasMore = data?.has_more ?? false;
 
-  useEffect(() => { fetchEntries(1); }, [fetchEntries]);
-
-  const loadMore = () => {
-    const next = page + 1;
-    setPage(next);
-    fetchEntries(next);
-  };
+  const loadMore = () => setPage((p) => p + 1);
 
   return (
     <div className="space-y-8">
@@ -103,7 +63,7 @@ export default function AuditLogPage() {
       </div>
 
       {/* Entries */}
-      {loading && entries.length === 0 ? (
+      {isLoading && entries.length === 0 ? (
         <div className="glass-card p-12 text-center">
           <div className="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-4" />
           <p className="text-gray-500 dark:text-slate-400">{t('loading')}</p>
@@ -157,9 +117,10 @@ export default function AuditLogPage() {
             <div className="p-4 text-center border-t border-gray-200/50 dark:border-slate-700/50">
               <button
                 onClick={loadMore}
-                className="px-6 py-2 text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
+                disabled={isFetching}
+                className="px-6 py-2 text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium disabled:opacity-50"
               >
-                {t('loadMore')}
+                {isFetching ? t('loading') : t('loadMore')}
               </button>
             </div>
           )}
