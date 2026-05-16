@@ -833,10 +833,10 @@ export const adminApi = {
   listFeatureFlags: (token: string) =>
     apiFetch<{ flags: FeatureFlag[] }>('/admin/feature-flags', { token }),
 
-  createFeatureFlag: (token: string, data: { name: string; description?: string; is_enabled?: boolean; rollout_percentage?: number; enabled_for_plans?: string[] }) =>
+  createFeatureFlag: (token: string, data: { name: string; description?: string | null; is_enabled?: boolean; rollout_percentage?: number; enabled_for_plans?: string[] }) =>
     apiFetch<FeatureFlag>('/admin/feature-flags', { method: 'POST', body: data, token }),
 
-  updateFeatureFlag: (token: string, id: string, data: { name?: string; description?: string; is_enabled?: boolean; rollout_percentage?: number; enabled_for_plans?: string[] }) =>
+  updateFeatureFlag: (token: string, id: string, data: { name?: string; description?: string | null; is_enabled?: boolean; rollout_percentage?: number; enabled_for_plans?: string[] }) =>
     apiFetch<FeatureFlag>(`/admin/feature-flags/${id}`, { method: 'PUT', body: data, token }),
 
   deleteFeatureFlag: (token: string, id: string) =>
@@ -857,18 +857,20 @@ export const adminApi = {
     return apiFetch<{ deliveries: Array<{ id: string; customer_id: string; endpoint_id: string; event_type: string | null; status: string; attempt_count: number; response_status: number | null; response_body: string | null; created_at: string; error_message: string | null; customer_email: string | null; endpoint_url: string | null }>; count: number }>(`/admin/deliveries/failed?${qs}`, { token });
   },
 
-  getDeadLetters: (token: string, params?: { limit?: number }) => {
+  getDeadLetters: (token: string, params?: { limit?: number; since?: string }) => {
     const qs = new URLSearchParams();
     if (params?.limit) qs.set('limit', params.limit.toString());
+    if (params?.since) qs.set('since', params.since);
     return apiFetch<{ dead_letters: Array<{ id: string; delivery_id: string; endpoint_id: string; customer_id: string; payload: unknown; reason: string | null; attempts: number; created_at: string; customer_email: string | null; endpoint_url: string | null }>; count: number }>(`/admin/deliveries/dead-letters?${qs}`, { token });
   },
 
   getQueueStatus: (token: string) =>
     apiFetch<{ pending: number; processing: number; failed: number; total: number; oldest_pending_at: string | null; failed_last_hour: number }>('/admin/queue/status', { token }),
 
-  getRateLimitViolations: (token: string, params?: { limit?: number }) => {
+  getRateLimitViolations: (token: string, params?: { limit?: number; since?: string }) => {
     const qs = new URLSearchParams();
     if (params?.limit) qs.set('limit', params.limit.toString());
+    if (params?.since) qs.set('since', params.since);
     return apiFetch<{ violations: Array<{ id: string; customer_id: string | null; endpoint_id: string | null; ip: string | null; requests_count: number; limit_per_window: number; window_seconds: number; created_at: string; customer_email: string | null }>; count: number }>(`/admin/rate-limit-violations?${qs}`, { token });
   },
 
