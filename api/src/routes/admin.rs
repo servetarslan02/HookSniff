@@ -1912,7 +1912,7 @@ async fn notify_sdk_update(
         .map(|u| format!("• {} {} → {}", u.sdk, u.local_version, u.published_version))
         .collect();
     let message = format!(
-        "Aşağıdaki SDK'lar için yeni versiyon yayınlandı:\n{}\n\nGüncellemek için \"güncelle\" yazın.",
+        "Aşağıdaki SDK'lar için yeni versiyon yayınlandı:\n{}\n\nDetaylar için bildirime tıklayın.",
         details.join("\n")
     );
 
@@ -1922,15 +1922,20 @@ async fn notify_sdk_update(
             .fetch_all(&pool)
             .await?;
 
+    // Build notification link with SDK details
+    let sdk_list: Vec<String> = req.updates.iter().map(|u| format!("{}:{}", u.sdk, u.published_version)).collect();
+    let link = format!("/settings?sdk_updates={}", sdk_list.join(","));
+
     let mut count = 0;
     for (admin_id,) in &admins {
         sqlx::query(
             r#"INSERT INTO notifications (customer_id, type, title, message, is_read, link)
-               VALUES ($1, 'system', $2, $3, FALSE, '/admin')"#,
+               VALUES ($1, 'system', $2, $3, FALSE, $4)"#,
         )
         .bind(admin_id)
         .bind(&title)
         .bind(&message)
+        .bind(&link)
         .execute(&pool)
         .await?;
         count += 1;
