@@ -13,6 +13,8 @@ interface UseWebSocketOptions {
 
 type ConnectionState = 'connecting' | 'connected' | 'disconnected' | 'fallback';
 
+const wsDebug = process.env.NODE_ENV === 'development' ? console.log : () => {};
+
 // Global singleton — prevent multiple WS connections across components
 let globalWs: WebSocket | null = null;
 let globalState: ConnectionState = 'disconnected';
@@ -70,7 +72,7 @@ function scheduleReconnect(token: string, maxAttempts: number) {
   // Exponential backoff: 2s → 4s → 8s → 16s → 30s max
   const delay = Math.min(2000 * Math.pow(2, globalReconnectAttempts), 30000);
   globalReconnectAttempts++;
-  console.log(`[WS] Reconnecting in ${delay}ms (attempt ${globalReconnectAttempts}/${maxAttempts})`);
+  wsDebug(`[WS] Reconnecting in ${delay}ms (attempt ${globalReconnectAttempts}/${maxAttempts})`);
   globalReconnectTimer = setTimeout(() => connectGlobal(token, maxAttempts), delay);
 }
 
@@ -87,12 +89,12 @@ function connectGlobal(token: string, maxAttempts: number) {
   const fullUrl = `${wsUrl}?token=${encodeURIComponent(token)}`;
   const connectStart = Date.now();
 
-  console.log('[WS] Connecting to:', wsUrl.replace(/^(wss?:\/\/[^/]+).*/, '$1/...'));
+  wsDebug('[WS] Connecting to:', wsUrl.replace(/^(wss?:\/\/[^/]+).*/, '$1/...'));
   const ws = new WebSocket(fullUrl);
   globalWs = ws;
 
   ws.onopen = () => {
-    console.log('[WS] Connected');
+    wsDebug('[WS] Connected');
     globalReconnectAttempts = 0;
     fallbackActive = false;
     notifyState('connected');
@@ -101,10 +103,10 @@ function connectGlobal(token: string, maxAttempts: number) {
     // This prevents the connection from ever dropping due to token expiry
     if (globalRefreshTimer) clearTimeout(globalRefreshTimer);
     globalRefreshTimer = setTimeout(async () => {
-      console.log('[WS] Proactive token refresh (before expiry)');
+      wsDebug('[WS] Proactive token refresh (before expiry)');
       const newToken = await refreshAccessToken();
       if (newToken && globalWs) {
-        console.log('[WS] Token refreshed, reconnecting proactively');
+        wsDebug('[WS] Token refreshed, reconnecting proactively');
         globalReconnectAttempts = 0;
         globalWs.close();
         connectGlobal(newToken, maxAttempts);
@@ -117,7 +119,7 @@ function connectGlobal(token: string, maxAttempts: number) {
       const raw = JSON.parse(event.data);
 
       if (raw.type === 'server_shutdown') {
-        console.log('[WS] Server shutting down, reconnecting...');
+        wsDebug('[WS] Server shutting down, reconnecting...');
         ws.close();
         return;
       }
@@ -146,7 +148,7 @@ function connectGlobal(token: string, maxAttempts: number) {
 
   ws.onclose = async (event) => {
     const connectDuration = Date.now() - connectStart;
-    console.log('[WS] Disconnected', {
+    wsDebug('[WS] Disconnected', {
       code: event.code,
       reason: event.reason || 'no reason',
       wasClean: event.wasClean,
@@ -157,10 +159,10 @@ function connectGlobal(token: string, maxAttempts: number) {
     // If connection lasted > 10s, it was a real connection that dropped
     // (likely token expiry). Try to refresh the token first.
     if (connectDuration > 10000 && globalTokenGetter) {
-      console.log('[WS] Long-lived connection dropped, attempting token refresh...');
+      wsDebug('[WS] Long-lived connection dropped, attempting token refresh...');
       const newToken = await refreshAccessToken();
       if (newToken) {
-        console.log('[WS] Token refreshed, reconnecting with new token');
+        wsDebug('[WS] Token refreshed, reconnecting with new token');
         globalReconnectAttempts = 0;
         connectGlobal(newToken, maxAttempts);
         return;
@@ -261,7 +263,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   useEffect(() => {
     const handleOnline = () => {
       if (globalState === 'disconnected' || globalState === 'fallback') {
-        console.log('[WS] Network back online, reconnecting...');
+        wsDebug('[WS] Network back online, reconnecting...');
         globalReconnectAttempts = 0;
         fallbackActive = false;
         if (token) connectGlobal(token, maxReconnectAttempts);
