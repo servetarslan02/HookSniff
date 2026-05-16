@@ -95,6 +95,16 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+          {/* Admin Panel link — only for admin users */}
+          {user?.is_admin && (
+            <Link
+              href="/admin"
+              className="flex items-center px-3 py-2 mb-3 text-sm font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
+            >
+              <span className="mr-3">⚡</span>
+              {t('adminPanel') || 'Admin Panel'}
+            </Link>
+          )}
           {sections.map((section) => (
             <div key={section.key} className="mb-2">
               <button
