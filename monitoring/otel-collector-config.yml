@@ -1,5 +1,5 @@
 # OpenTelemetry Collector configuration for HookSniff
-# Receives traces via OTLP and exports to Jaeger
+# Receives traces via OTLP and exports to Sentry
 
 receivers:
   otlp:
@@ -24,17 +24,10 @@ processors:
         - 'attributes["http.target"] == "/metrics"'
 
 exporters:
-  # Export to Jaeger (local)
-  otlp/jaeger:
-    endpoint: jaeger:4317
-    tls:
-      insecure: true
-
-  # Export to Grafana Cloud (production)
-  # Auth: Basic base64(<instance_id>:<glc_token>)
-  # Set OTEL_AUTH_HEADER env var to: Basic <base64_encoded_credentials>
-  otlphttp/grafana:
-    endpoint: https://otlp-gateway-prod-eu-west-2.grafana.net/otlp
+  # Export to Sentry via OTLP
+  # Auth: Bearer <SENTRY_AUTH_TOKEN>
+  otlphttp/sentry:
+    endpoint: https://o4511400113471488.ingest.de.sentry.io/api/4511400117010512/integration/otlp
     headers:
       authorization: "${env:OTEL_AUTH_HEADER}"
 
@@ -47,14 +40,14 @@ service:
     traces:
       receivers: [otlp]
       processors: [filter, batch]
-      exporters: [otlp/jaeger, otlphttp/grafana, debug]
+      exporters: [otlphttp/sentry]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlphttp/grafana]
+      exporters: [otlphttp/sentry]
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlphttp/grafana]
+      exporters: [otlphttp/sentry]
 
   extensions: []
