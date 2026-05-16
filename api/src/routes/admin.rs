@@ -3277,6 +3277,7 @@ pub struct AdminRefundRequest {
 pub struct RefundRow {
     pub id: Uuid,
     pub customer_id: Uuid,
+    pub email: String,
     pub amount_cents: i64,
     pub currency: String,
     pub reason: Option<String>,
@@ -3438,8 +3439,8 @@ async fn admin_user_refunds(
         .await?;
 
     let refunds = sqlx::query_as::<_, RefundRow>(
-        "SELECT id, customer_id, amount_cents, currency, reason, admin_user_id, provider, provider_refund_id, status, created_at \
-         FROM refunds WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+        "SELECT r.id, r.customer_id, c.email, r.amount_cents, r.currency, r.reason, r.admin_user_id, r.provider, r.provider_refund_id, r.status, r.created_at \
+         FROM refunds r JOIN customers c ON c.id = r.customer_id WHERE r.customer_id = $1 ORDER BY r.created_at DESC LIMIT $2 OFFSET $3",
     )
     .bind(id)
     .bind(per_page)
@@ -3470,14 +3471,14 @@ async fn admin_all_refunds(
     let (count_sql, data_sql) = if let Some(ref _status) = params.status {
         (
             "SELECT COUNT(*) FROM refunds WHERE status = $1".to_string(),
-            format!("SELECT id, customer_id, amount_cents, currency, reason, admin_user_id, provider, provider_refund_id, status, created_at \
-                     FROM refunds WHERE status = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3"),
+            "SELECT r.id, r.customer_id, c.email, r.amount_cents, r.currency, r.reason, r.admin_user_id, r.provider, r.provider_refund_id, r.status, r.created_at \
+             FROM refunds r JOIN customers c ON c.id = r.customer_id WHERE r.status = $1 ORDER BY r.created_at DESC LIMIT $2 OFFSET $3".to_string(),
         )
     } else {
         (
             "SELECT COUNT(*) FROM refunds".to_string(),
-            "SELECT id, customer_id, amount_cents, currency, reason, admin_user_id, provider, provider_refund_id, status, created_at \
-             FROM refunds ORDER BY created_at DESC LIMIT $1 OFFSET $2".to_string(),
+            "SELECT r.id, r.customer_id, c.email, r.amount_cents, r.currency, r.reason, r.admin_user_id, r.provider, r.provider_refund_id, r.status, r.created_at \
+             FROM refunds r JOIN customers c ON c.id = r.customer_id ORDER BY r.created_at DESC LIMIT $1 OFFSET $2".to_string(),
         )
     };
 
@@ -4269,7 +4270,8 @@ async fn admin_revenue_metrics(
            JOIN customers c ON c.id = i.customer_id
            WHERE i.status = 'paid'
              AND i.paid_at >= DATE_TRUNC('month', NOW())
-             AND c.plan IN ('pro', 'enterprise')"#
+             AND c.plan IN ('pro', 'enterprise')
+             AND c.created_at < DATE_TRUNC('month', NOW()) - INTERVAL '1 month'"#
     )
     .fetch_one(&pool)
     .await?;
