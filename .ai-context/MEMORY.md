@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:15 GMT+8 (Oturum 186)
+> Son güncelleme: 2026-05-17 05:20 GMT+8 (Oturum 187)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,20 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 187 — 2026-05-17 05:20 GMT+8
+1. **API Bağlantı Taraması** ✅
+   - **Tüm adminApi method'ları kontrol edildi** (112 method) — hepsi backend'de mevcut
+   - **Tüm hook → API bağlantıları kontrol edildi** (50+ hook) — hepsi doğru bağlı
+   - **Tüm frontend API path'leri backend route'ları ile eşleştirildi** — uyumlu
+   - **Zod schema'lar backend response'ları ile karşılaştırıldı** — uyumlu
+   - **Bulunan sorun:** `UserRefundsResponseSchema`'da `email` field eksik → eklendi
+   - **Email page** — `sendBulkEmail` doğru bağlı ✅
+   - **System page** — tüm hook'lar doğru bağlı ✅
+   - **Feature flags page** — CRUD doğru ✅
+   - **Batch replay** — `webhooksApi.batchReplay` doğru bağlı ✅
+   - **Delivery detail/attempts** — doğru bağlı ✅
+   - Commit: 0bc0d60f — push edildi
 
 ### Oturum 186 — 2026-05-17 05:15 GMT+8
 1. **Feature Flags Sayfası Derin Tarama** ✅
