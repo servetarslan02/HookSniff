@@ -37,6 +37,13 @@ export function useRealtime() {
         queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
         break;
 
+      case 'application.created':
+      case 'application.updated':
+      case 'application.deleted':
+        queryClient.invalidateQueries({ queryKey: ['applications'] });
+        queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+        break;
+
       case 'alert.triggered':
         queryClient.invalidateQueries({ queryKey: ['alerts'] });
         queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });

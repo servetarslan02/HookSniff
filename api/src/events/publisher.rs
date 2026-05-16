@@ -64,6 +64,19 @@ pub enum AppEvent {
         name: String,
         condition: String,
     },
+    ApplicationCreated {
+        application_id: Uuid,
+        customer_id: Uuid,
+        name: String,
+    },
+    ApplicationUpdated {
+        application_id: Uuid,
+        customer_id: Uuid,
+    },
+    ApplicationDeleted {
+        application_id: Uuid,
+        customer_id: Uuid,
+    },
 }
 
 impl AppEvent {
@@ -77,6 +90,9 @@ impl AppEvent {
             | Self::EndpointDeleted { .. }
             | Self::EndpointStatusChanged { .. } => "endpoints",
             Self::AlertTriggered { .. } => "alerts",
+            Self::ApplicationCreated { .. }
+            | Self::ApplicationUpdated { .. }
+            | Self::ApplicationDeleted { .. } => "applications",
         }
     }
 
@@ -91,6 +107,9 @@ impl AppEvent {
             Self::EndpointDeleted { .. } => "endpoint.deleted",
             Self::EndpointStatusChanged { .. } => "endpoint.status_changed",
             Self::AlertTriggered { .. } => "alert.triggered",
+            Self::ApplicationCreated { .. } => "application.created",
+            Self::ApplicationUpdated { .. } => "application.updated",
+            Self::ApplicationDeleted { .. } => "application.deleted",
         }
     }
 }
