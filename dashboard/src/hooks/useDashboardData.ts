@@ -24,9 +24,6 @@ import {
   BillingUsageSchema,
   InvoiceSchema,
   ApplicationSchema,
-  AlertsListResponseSchema,
-  TeamSchema,
-  TeamMemberSchema,
   TransformRuleSchema,
   InboundConfigSchema,
   SsoConfigSchema,
@@ -39,15 +36,12 @@ import {
   PortalUsageSchema,
   RateLimitSchema,
   SchemaRegistryListSchema,
-  SearchResponseSchema,
   ServiceTokenSchema,
   TemplateListSchema,
   type EndpointValidated,
   type BillingUsageValidated,
   type InvoiceValidated,
   type ApplicationValidated,
-  type TeamValidated,
-  type TeamMemberValidated,
   type TransformRuleValidated,
   type InboundConfigValidated,
   type SsoConfigValidated,
@@ -292,7 +286,7 @@ export function useAlerts() {
   return useQuery<AlertRule[]>({
     queryKey: ['alerts'],
     queryFn: async () => {
-      const data = await alertsApi.list(token);
+      const data = await alertsApi.list(token!);
       return Array.isArray(data) ? data : [];
     },
     enabled: !!token,
@@ -305,7 +299,7 @@ export function useCreateAlert() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: { name: string; condition: string; threshold: number; channels: string[] }) =>
-      alertsApi.create(token, data),
+      alertsApi.create(token!, data),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['alerts'] });
     },
@@ -317,7 +311,7 @@ export function useUpdateAlert() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<{ name: string; condition: string; threshold: number; channels: string[]; is_active: boolean }> }) =>
-      alertsApi.update(token, id, data),
+      alertsApi.update(token!, id, data),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['alerts'] });
     },
@@ -328,7 +322,7 @@ export function useDeleteAlert() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => alertsApi.delete(token, id),
+    mutationFn: (id: string) => alertsApi.delete(token!, id),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['alerts'] });
     },
@@ -338,14 +332,14 @@ export function useDeleteAlert() {
 export function useTestAlert() {
   const { token } = useAuth();
   return useMutation({
-    mutationFn: (id: string) => alertsApi.test(token, id),
+    mutationFn: (id: string) => alertsApi.test(token!, id),
   });
 }
 
 // ── Teams ──
 export function useTeams() {
   const { token } = useAuth();
-  return useQuery<TeamValidated[]>({
+  return useQuery<Team[]>({
     queryKey: ['teams'],
     queryFn: async () => {
       const data = await teamsApi.list(token!);
@@ -358,7 +352,7 @@ export function useTeams() {
 
 export function useTeamMembers(teamId: string | null) {
   const { token } = useAuth();
-  return useQuery<TeamMemberValidated[]>({
+  return useQuery<TeamMember[]>({
     queryKey: ['teams', teamId, 'members'],
     queryFn: async () => {
       const data = await teamsApi.listMembers(token!, teamId!);
