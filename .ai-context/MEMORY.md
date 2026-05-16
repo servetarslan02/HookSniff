@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:44 GMT+8 (Oturum 191)
+> Son güncelleme: 2026-05-17 05:50 GMT+8 (Oturum 192)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,23 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 192 — 2026-05-17 05:50 GMT+8
+1. **Feature Flags Derin Katman 2 — 11 Fix** ✅
+   - **Backend (feature_flags.rs):**
+     - `hash_customer_id`: DefaultHasher → FNV-1a (restart'ta stabil)
+     - `is_enabled()`: artık rollout=100% gerektiriyor (eski: rollout yok sayıyordu)
+     - `is_flag_active()`: yeni method, admin display için (rollout yok sayar)
+     - `enabled_for_plans`: bozuk JSON → fail-closed (eski: fail-open)
+     - `all()`: isme göre sıralı dönüyor (eski: HashMap rastgele sıra)
+     - `feature_flag_refresher`: DB hatası exponential backoff (max 5dk)
+   - **Frontend:**
+     - Create/save/delete'de double-submit koruması
+     - Edit modal: name gönderilmiyor (readonly, gereksiz backend yükü)
+     - Admin overview: flag rollout % gösterimi (amber dot)
+     - Admin overview: description regex hack kaldırıldı
+     - Feature flags staleTime: 5dk → 30sn
+   - Commit: 88033155 — push edildi
 
 ### Oturum 191 — 2026-05-17 05:44 GMT+8
 1. **Feature Flags Sayfası Derin İnceleme + 9 Bug Fix** ✅
