@@ -20,13 +20,13 @@ jobs:
   scan-api:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build API image
         run: docker build -t hooksniff-api -f Dockerfile.api .
 
       - name: Run Trivy (API)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'hooksniff-api'
           format: 'sarif'
@@ -42,13 +42,13 @@ jobs:
   scan-worker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build Worker image
         run: docker build -t hooksniff-worker -f Dockerfile.worker .
 
       - name: Run Trivy (Worker)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'hooksniff-worker'
           format: 'sarif'
@@ -64,13 +64,13 @@ jobs:
   scan-dashboard:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build Dashboard image
         run: docker build -t hooksniff-dashboard -f Dockerfile.dashboard .
 
       - name: Run Trivy (Dashboard)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'hooksniff-dashboard'
           format: 'sarif'
