@@ -106,6 +106,41 @@ fn convert_to_ws_event(envelope: &EventEnvelope) -> WsEvent {
                 "plan": plan,
             }),
         ),
+        crate::events::AppEvent::EndpointCreated {
+            endpoint_id,
+            customer_id,
+            url,
+        } => (
+            "endpoint.created".to_string(),
+            String::new(),
+            endpoint_id.to_string(),
+            serde_json::json!({
+                "customer_id": customer_id,
+                "url": url,
+            }),
+        ),
+        crate::events::AppEvent::EndpointUpdated {
+            endpoint_id,
+            customer_id,
+        } => (
+            "endpoint.updated".to_string(),
+            String::new(),
+            endpoint_id.to_string(),
+            serde_json::json!({
+                "customer_id": customer_id,
+            }),
+        ),
+        crate::events::AppEvent::EndpointDeleted {
+            endpoint_id,
+            customer_id,
+        } => (
+            "endpoint.deleted".to_string(),
+            String::new(),
+            endpoint_id.to_string(),
+            serde_json::json!({
+                "customer_id": customer_id,
+            }),
+        ),
         crate::events::AppEvent::EndpointStatusChanged {
             endpoint_id,
             customer_id,
@@ -117,6 +152,22 @@ fn convert_to_ws_event(envelope: &EventEnvelope) -> WsEvent {
             serde_json::json!({
                 "customer_id": customer_id,
                 "is_active": is_active,
+            }),
+        ),
+        crate::events::AppEvent::AlertTriggered {
+            alert_id,
+            customer_id,
+            name,
+            condition,
+        } => (
+            "alert.triggered".to_string(),
+            String::new(),
+            String::new(),
+            serde_json::json!({
+                "alert_id": alert_id,
+                "customer_id": customer_id,
+                "name": name,
+                "condition": condition,
             }),
         ),
     };
