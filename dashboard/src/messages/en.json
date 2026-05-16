@@ -1814,7 +1814,9 @@
     "nrr": "NRR",
     "paying": "paying",
     "planPrices": "Plan Prices",
-    "signedUp": "Signed Up"
+    "signedUp": "Signed Up",
+    "retention": "Retention",
+    "last12Months": "Last 12 months"
   },
   "landing": {
     "nav": {
