@@ -186,7 +186,7 @@ pub struct SendEmailRequest {
     pub body: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SystemStats {
     pub total_users: i64,
     pub total_deliveries: i64,
@@ -200,7 +200,7 @@ pub struct SystemStats {
     pub trends: StatsTrends,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StatsTrends {
     pub total_users_yesterday: i64,
     pub total_deliveries_yesterday: i64,
@@ -210,13 +210,13 @@ pub struct StatsTrends {
     pub active_webhooks: i64,
 }
 
-#[derive(Debug, Serialize, sqlx::FromRow)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct PlanCount {
     pub plan: String,
     pub count: i64,
 }
 
-#[derive(Debug, Serialize, sqlx::FromRow)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct RecentSignup {
     pub id: Uuid,
     pub email: String,
@@ -225,20 +225,20 @@ pub struct RecentSignup {
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
-#[derive(Debug, Serialize, sqlx::FromRow)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct RevenueRow {
     pub month: String,
     pub revenue: f64,
 }
 
-#[derive(Debug, Serialize, sqlx::FromRow)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct RevenueByPlan {
     pub plan: String,
     pub revenue: f64,
     pub count: i64,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RevenueResponse {
     pub monthly_revenue: Vec<RevenueRow>,
     pub revenue_by_plan: Vec<RevenueByPlan>,
@@ -692,11 +692,20 @@ async fn change_status(
 }
 
 /// GET /v1/admin/stats — System-wide stats
+/// Cached in Redis for 60 seconds to reduce DB load.
 async fn system_stats(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(cache_layer): Extension<Option<crate::cache::CacheLayer>>,
 ) -> Result<Json<SystemStats>, AppError> {
     require_admin(&customer)?;
+
+    // Try to serve from Redis cache first
+    if let Some(ref cache) = cache_layer {
+        if let Some(cached) = cache.get::<SystemStats>("admin_stats", "all").await {
+            return Ok(Json(cached));
+        }
+    }
 
     let total_users: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM customers")
         .fetch_one(&pool)
@@ -779,7 +788,7 @@ async fn system_stats(
             .fetch_one(&pool)
             .await?;
 
-    Ok(Json(SystemStats {
+    let stats = SystemStats {
         total_users: total_users.0,
         total_deliveries: total_deliveries.0,
         total_revenue: revenue.0.unwrap_or(0.0),
@@ -795,15 +804,31 @@ async fn system_stats(
             active_users_yesterday: active_yesterday.0,
             active_webhooks: active_webhooks.0,
         },
-    }))
+    };
+
+    // Cache the stats for 60 seconds
+    if let Some(ref cache) = cache_layer {
+        let _ = cache.set_with_ttl("admin_stats", "all", &stats, std::time::Duration::from_secs(60)).await;
+    }
+
+    Ok(Json(stats))
 }
 
 /// GET /v1/admin/revenue — Full revenue response with monthly, by-plan, MRR, and churn
+/// Cached in Redis for 60 seconds to reduce DB load.
 async fn revenue_by_month(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(cache_layer): Extension<Option<crate::cache::CacheLayer>>,
 ) -> Result<Json<RevenueResponse>, AppError> {
     require_admin(&customer)?;
+
+    // Try to serve from Redis cache first
+    if let Some(ref cache) = cache_layer {
+        if let Some(cached) = cache.get::<RevenueResponse>("admin_revenue", "all").await {
+            return Ok(Json(cached));
+        }
+    }
 
     // Item 252: Use actual invoice data instead of plan price estimates.
     // 1. Monthly revenue (last 12 months) from actual paid invoices
@@ -892,14 +917,21 @@ async fn revenue_by_month(
     .fetch_one(&pool)
     .await?;
 
-    Ok(Json(RevenueResponse {
+    let revenue_response = RevenueResponse {
         monthly_revenue,
         revenue_by_plan,
         mrr: mrr.0.unwrap_or(0.0),
         churn_rate,
         mrr_trend,
         collected_revenue: collected_revenue.0.unwrap_or(0.0),
-    }))
+    };
+
+    // Cache for 60 seconds
+    if let Some(ref cache) = cache_layer {
+        let _ = cache.set_with_ttl("admin_revenue", "all", &revenue_response, std::time::Duration::from_secs(60)).await;
+    }
+
+    Ok(Json(revenue_response))
 }
 
 // ─────────────────────────────────────────────────────────

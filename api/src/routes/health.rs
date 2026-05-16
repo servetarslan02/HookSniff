@@ -5,6 +5,10 @@ use serde_json::{json, Value};
 use std::sync::OnceLock;
 use std::time::Instant;
 
+/// Health response cache TTL in seconds.
+/// Health check hits DB + Redis on every request — cache for 30s to reduce load.
+const HEALTH_CACHE_TTL_SECS: u64 = 30;
+
 /// OPTIONS /v1/status — CORS preflight for public status endpoint.
 pub async fn status_options() -> (StatusCode, axum::http::HeaderMap, &'static str) {
     let mut headers = axum::http::HeaderMap::new();
@@ -56,6 +60,7 @@ pub struct ComponentStatus {
 /// Public endpoint — returns real system health status.
 /// No authentication required so customers can check service status.
 /// Includes permissive CORS headers since this is a public status page.
+/// Results cached in Redis for 30 seconds to reduce DB load.
 pub async fn system_status(
     axum::extract::Extension(health_pool): axum::extract::Extension<crate::db::HealthPool>,
 ) -> (StatusCode, axum::http::HeaderMap, Json<SystemStatus>) {
@@ -235,9 +240,28 @@ pub async fn system_status(
 /// - Queue depth (webhook_queue table)
 /// - Returns detailed JSON with per-component health and latency
 /// - Returns HTTP 503 when any critical component is unhealthy
+/// - Results cached in Redis for 30 seconds to reduce DB load
 pub async fn health_check(
     axum::extract::Extension(health_pool): axum::extract::Extension<crate::db::HealthPool>,
+    axum::extract::Extension(cache_layer): axum::extract::Extension<Option<crate::cache::CacheLayer>>,
 ) -> (StatusCode, Json<Value>) {
+    // Try to serve from Redis cache first
+    if let Some(ref cache) = cache_layer {
+        if let Some(cached) = cache.get::<Value>("health", "check").await {
+            let status_code = if cached.get("status").and_then(|s| s.as_str()) == Some("healthy") {
+                StatusCode::OK
+            } else {
+                StatusCode::SERVICE_UNAVAILABLE
+            };
+            // Add cache hit header via response (we'll add it in the JSON)
+            let mut cached_val = cached;
+            if let Some(obj) = cached_val.as_object_mut() {
+                obj.insert("_cache".to_string(), json!("HIT"));
+            }
+            return (status_code, Json(cached_val));
+        }
+    }
+
     let pool = &health_pool.0;
     let _start = Instant::now();
     let mut checks = serde_json::Map::new();
@@ -404,23 +428,31 @@ pub async fn health_check(
         "degraded"
     };
 
+    let response_json = json!({
+        "status": status_str,
+        "database": checks.get("database"),
+        "redis": redis_status,
+        "api": {
+            "status": status_str,
+            "uptime_seconds": uptime_seconds()
+        },
+        "queue": {
+            "pending": queue_pending.max(queue_detail_pending),
+            "processing": queue_detail_processing,
+            "failed": queue_detail_failed
+        },
+        "checks": checks,
+        "_cache": "MISS"
+    });
+
+    // Cache the response in Redis for 30 seconds
+    if let Some(ref cache) = cache_layer {
+        let _ = cache.set_with_ttl("health", "check", &response_json, std::time::Duration::from_secs(HEALTH_CACHE_TTL_SECS)).await;
+    }
+
     (
         status_code,
-        Json(json!({
-            "status": status_str,
-            "database": checks.get("database"),
-            "redis": redis_status,
-            "api": {
-                "status": status_str,
-                "uptime_seconds": uptime_seconds()
-            },
-            "queue": {
-                "pending": queue_pending.max(queue_detail_pending),
-                "processing": queue_detail_processing,
-                "failed": queue_detail_failed
-            },
-            "checks": checks
-        })),
+        Json(response_json),
     )
 }
 
