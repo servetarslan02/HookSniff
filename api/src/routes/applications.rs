@@ -79,6 +79,7 @@ async fn get_application(
 async fn create_application(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Json(req): Json<CreateApplicationRequest>,
 ) -> Result<Json<ApplicationResponse>, AppError> {
     // Validate input
@@ -127,6 +128,17 @@ async fn create_application(
     .fetch_one(&pool)
     .await?;
 
+    // Publish ApplicationCreated event (best-effort)
+    if let Some(ref publisher) = event_publisher {
+        if let Err(e) = publisher.publish(crate::events::AppEvent::ApplicationCreated {
+            application_id: app.id,
+            customer_id: customer.id,
+            name: app.name.clone(),
+        }).await {
+            tracing::warn!("Failed to publish ApplicationCreated event: {:?}", e);
+        }
+    }
+
     Ok(Json(app.to_response(0)))
 }
 
@@ -134,6 +146,7 @@ async fn create_application(
 async fn update_application(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateApplicationRequest>,
 ) -> Result<Json<ApplicationResponse>, AppError> {
@@ -195,6 +208,16 @@ async fn update_application(
     .fetch_one(&pool)
     .await?;
 
+    // Publish ApplicationUpdated event (best-effort)
+    if let Some(ref publisher) = event_publisher {
+        if let Err(e) = publisher.publish(crate::events::AppEvent::ApplicationUpdated {
+            application_id: updated.id,
+            customer_id: customer.id,
+        }).await {
+            tracing::warn!("Failed to publish ApplicationUpdated event: {:?}", e);
+        }
+    }
+
     Ok(Json(updated.to_response(count.0)))
 }
 
@@ -203,6 +226,7 @@ async fn update_application(
 async fn delete_application(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let result = sqlx::query(
@@ -215,6 +239,16 @@ async fn delete_application(
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
+    }
+
+    // Publish ApplicationDeleted event (best-effort)
+    if let Some(ref publisher) = event_publisher {
+        if let Err(e) = publisher.publish(crate::events::AppEvent::ApplicationDeleted {
+            application_id: id,
+            customer_id: customer.id,
+        }).await {
+            tracing::warn!("Failed to publish ApplicationDeleted event: {:?}", e);
+        }
     }
 
     Ok(Json(serde_json::json!({
