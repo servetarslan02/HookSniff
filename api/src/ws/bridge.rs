@@ -170,6 +170,44 @@ fn convert_to_ws_event(envelope: &EventEnvelope) -> WsEvent {
                 "condition": condition,
             }),
         ),
+        crate::events::AppEvent::ApplicationCreated {
+            application_id,
+            customer_id,
+            name,
+        } => (
+            "application.created".to_string(),
+            String::new(),
+            String::new(),
+            serde_json::json!({
+                "application_id": application_id,
+                "customer_id": customer_id,
+                "name": name,
+            }),
+        ),
+        crate::events::AppEvent::ApplicationUpdated {
+            application_id,
+            customer_id,
+        } => (
+            "application.updated".to_string(),
+            String::new(),
+            String::new(),
+            serde_json::json!({
+                "application_id": application_id,
+                "customer_id": customer_id,
+            }),
+        ),
+        crate::events::AppEvent::ApplicationDeleted {
+            application_id,
+            customer_id,
+        } => (
+            "application.deleted".to_string(),
+            String::new(),
+            String::new(),
+            serde_json::json!({
+                "application_id": application_id,
+                "customer_id": customer_id,
+            }),
+        ),
     };
 
     WsEvent {

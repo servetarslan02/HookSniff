@@ -3400,7 +3400,7 @@ async fn admin_all_refunds(
     let per_page = params.per_page.unwrap_or(50).clamp(1, 200);
     let offset = (page - 1) * per_page;
 
-    let (count_sql, data_sql) = if let Some(_status) = params.status {
+    let (count_sql, data_sql) = if let Some(ref _status) = params.status {
         (
             "SELECT COUNT(*) FROM refunds WHERE status = $1".to_string(),
             format!("SELECT id, customer_id, amount_cents, currency, reason, admin_user_id, provider, provider_refund_id, status, created_at \
