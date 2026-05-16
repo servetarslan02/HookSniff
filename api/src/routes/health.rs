@@ -408,10 +408,11 @@ pub async fn health_check(
         }
         None => json!({ "status": "healthy", "latency_ms": 0, "note": "not configured" }),
     };
-    // Mark unhealthy if Redis is configured but failing
+    // Redis is optional — log warning if failing but don't mark system unhealthy
+    // Redis is used for caching/queue, not core functionality
     if let Some(status) = redis_status.get("status").and_then(|s| s.as_str()) {
         if status == "unhealthy" {
-            overall_healthy = false;
+            tracing::warn!("Redis health check failed — system operational but degraded");
         }
     }
     checks.insert("redis".to_string(), redis_status.clone());

@@ -150,7 +150,6 @@ async fn create_alert(
 }
 
 #[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
 struct UpdateAlertRequest {
     name: Option<String>,
     condition: Option<String>,
