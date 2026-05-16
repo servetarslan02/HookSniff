@@ -2659,9 +2659,9 @@ async fn admin_user_test_webhook(
 
     // Log to audit
     let _ = crate::audit::log_action(
-        &pool, customer.id, "admin.test_webhook", "customer",
+        &pool, customer.id, "ADMIN_TEST_WEBHOOK", "customer",
         Some(&id.to_string()),
-        Some(serde_json::json!({ "target_url": req.endpoint_url, "admin_email": customer.email })),
+        Some(serde_json::json!({ "target_url": req.endpoint_url })),
         None, None,
     ).await;
 
