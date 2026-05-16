@@ -21,6 +21,21 @@ import {
   DeadLettersResponseSchema,
   RateLimitViolationsResponseSchema,
   ApiLatencyResponseSchema,
+  UserEndpointsResponseSchema,
+  UserWebhooksResponseSchema,
+  UserApiKeysResponseSchema,
+  UserApplicationsResponseSchema,
+  UserUsageResponseSchema,
+  UserAnalyticsResponseSchema,
+  UserPlanHistoryResponseSchema,
+  NotesResponseSchema,
+  TagsResponseSchema,
+  CommunicationsResponseSchema,
+  UserInvoicesResponseSchema,
+  UserPaymentsResponseSchema,
+  UserRefundsResponseSchema,
+  DeliveryDetailResponseSchema,
+  DeliveryAttemptResponseSchema,
   type AdminStatsValidated,
   type RevenueValidated,
   type DeployInfoValidated,
@@ -373,6 +388,62 @@ export function useTestWebhook() {
   });
 }
 
+// ── Feature Flag Mutations ──
+
+export function useCreateFeatureFlag() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      name: string;
+      description?: string;
+      is_enabled?: boolean;
+      rollout_percentage?: number;
+      enabled_for_plans?: string[];
+    }) => adminApi.createFeatureFlag(token!, data),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
+    },
+  });
+}
+
+export function useUpdateFeatureFlag() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: {
+        name?: string;
+        description?: string;
+        is_enabled?: boolean;
+        rollout_percentage?: number;
+        enabled_for_plans?: string[];
+      };
+    }) => adminApi.updateFeatureFlag(token!, id, data),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
+    },
+  });
+}
+
+export function useDeleteFeatureFlag() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => adminApi.deleteFeatureFlag(token!, id),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
+    },
+  });
+}
+
 // ── Batch Replay Mutation ──
 export function useBatchReplay() {
   const { token } = useAuth();
@@ -383,6 +454,354 @@ export function useBatchReplay() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'failed-deliveries'] });
       queryClient.invalidateQueries({ queryKey: ['admin', 'dead-letters'] });
       queryClient.invalidateQueries({ queryKey: ['admin', 'queue-status'] });
+    },
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// Admin User Detail Page — Queries
+// ════════════════════════════════════════════════════════════════
+
+// ── User Analytics ──
+export function useAdminUserAnalytics(userId: string, days = 30) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'analytics', days],
+    queryFn: validated(
+      () => adminApi.getUserAnalytics(token!, userId, days),
+      UserAnalyticsResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 60_000,
+  });
+}
+
+// ── User Plan History ──
+export function useAdminUserPlanHistory(userId: string) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'plan-history'],
+    queryFn: validated(
+      () => adminApi.getUserPlanHistory(token!, userId),
+      UserPlanHistoryResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 30_000,
+  });
+}
+
+// ── User Endpoints ──
+export function useAdminUserEndpoints(userId: string) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'endpoints'],
+    queryFn: validated(
+      () => adminApi.getUserEndpoints(token!, userId),
+      UserEndpointsResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 30_000,
+  });
+}
+
+// ── User Webhooks (paginated) ──
+export function useAdminUserWebhooks(
+  userId: string,
+  params?: { page?: number; per_page?: number; status?: string; event_type?: string }
+) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'webhooks', params],
+    queryFn: validated(
+      () => adminApi.getUserWebhooks(token!, userId, params),
+      UserWebhooksResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 15_000,
+  });
+}
+
+// ── User API Keys ──
+export function useAdminUserApiKeys(userId: string) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'api-keys'],
+    queryFn: validated(
+      () => adminApi.getUserApiKeys(token!, userId),
+      UserApiKeysResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 30_000,
+  });
+}
+
+// ── User Applications ──
+export function useAdminUserApplications(userId: string) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'applications'],
+    queryFn: validated(
+      () => adminApi.getUserApplications(token!, userId),
+      UserApplicationsResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 30_000,
+  });
+}
+
+// ── User Usage ──
+export function useAdminUserUsage(userId: string) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'usage'],
+    queryFn: validated(
+      () => adminApi.getUserUsage(token!, userId),
+      UserUsageResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 30_000,
+  });
+}
+
+// ── User Notes ──
+export function useAdminUserNotes(userId: string) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'notes'],
+    queryFn: validated(
+      () => adminApi.getNotes(token!, userId),
+      NotesResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 15_000,
+  });
+}
+
+// ── User Tags ──
+export function useAdminUserTags(userId: string) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'tags'],
+    queryFn: validated(
+      () => adminApi.getTags(token!, userId),
+      TagsResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 15_000,
+  });
+}
+
+// ── User Communications (paginated) ──
+export function useAdminUserCommunications(
+  userId: string,
+  params?: { page?: number; per_page?: number; type?: string }
+) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'communications', params],
+    queryFn: validated(
+      () => adminApi.getCommunications(token!, userId, params),
+      CommunicationsResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 15_000,
+  });
+}
+
+// ── User Invoices (paginated) ──
+export function useAdminUserInvoices(
+  userId: string,
+  params?: { page?: number; per_page?: number; status?: string }
+) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'invoices', params],
+    queryFn: validated(
+      () => adminApi.getUserInvoices(token!, userId, params),
+      UserInvoicesResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 30_000,
+  });
+}
+
+// ── User Payments ──
+export function useAdminUserPayments(userId: string, perPage = 50) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'payments', perPage],
+    queryFn: validated(
+      () => adminApi.getUserPayments(token!, userId, { per_page: perPage }),
+      UserPaymentsResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 30_000,
+  });
+}
+
+// ── User Refunds ──
+export function useAdminUserRefunds(userId: string, perPage = 50) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'user', userId, 'refunds', perPage],
+    queryFn: validated(
+      () => adminApi.getUserRefunds(token!, userId, { per_page: perPage }),
+      UserRefundsResponseSchema
+    ),
+    enabled: !!token && !!userId,
+    staleTime: 30_000,
+  });
+}
+
+// ── Delivery Detail (for modal) ──
+export function useDeliveryDetail(deliveryId: string | null) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'delivery', deliveryId],
+    queryFn: validated(
+      () => webhooksApi.get(token!, deliveryId!),
+      DeliveryDetailResponseSchema
+    ),
+    enabled: !!token && !!deliveryId,
+    staleTime: 10_000,
+  });
+}
+
+// ── Delivery Attempts (for modal) ──
+export function useDeliveryAttempts(deliveryId: string | null) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'delivery', deliveryId, 'attempts'],
+    queryFn: async () => {
+      const data = await webhooksApi.getAttempts(token!, deliveryId!);
+      return DeliveryAttemptResponseSchema.array().parse(data);
+    },
+    enabled: !!token && !!deliveryId,
+    staleTime: 10_000,
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// Admin User Detail Page — Mutations
+// ════════════════════════════════════════════════════════════════
+
+// ── Send Email to User ──
+export function useAdminSendEmail() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, subject, body }: { userId: string; subject: string; body: string }) =>
+      adminApi.sendUserEmail(token!, userId, subject, body),
+    onSettled: (_data, _err, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'communications'] });
+    },
+  });
+}
+
+// ── Impersonate User ──
+export function useAdminImpersonate() {
+  const { token } = useAuth();
+  return useMutation({
+    mutationFn: (userId: string) => adminApi.impersonateUser(token!, userId),
+  });
+}
+
+// ── Refund User ──
+export function useAdminRefundUser() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, amountCents, reason, currency }: {
+      userId: string; amountCents: number; reason: string; currency?: string;
+    }) => adminApi.refundUser(token!, userId, amountCents, reason, currency),
+    onSettled: (_data, _err, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'refunds'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'invoices'] });
+    },
+  });
+}
+
+// ── GDPR Export ──
+export function useAdminGdprExport() {
+  const { token } = useAuth();
+  return useMutation({
+    mutationFn: (userId: string) => adminApi.exportUserData(token!, userId),
+  });
+}
+
+// ── GDPR Delete ──
+export function useAdminGdprDelete() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, reason }: { userId: string; reason: string }) =>
+      adminApi.deleteUserData(token!, userId, reason),
+    onSettled: (_data, _err, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId] });
+    },
+  });
+}
+
+// ── Test Webhook (per-user) ──
+export function useAdminUserTestWebhook() {
+  const { token } = useAuth();
+  return useMutation({
+    mutationFn: ({ userId, data }: {
+      userId: string;
+      data: { endpoint_url: string; event_type?: string; payload: Record<string, unknown> };
+    }) => adminApi.adminUserTestWebhook(token!, userId, data),
+  });
+}
+
+// ── Add Note ──
+export function useAdminAddNote() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, content }: { userId: string; content: string }) =>
+      adminApi.addNote(token!, userId, content),
+    onSettled: (_data, _err, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'notes'] });
+    },
+  });
+}
+
+// ── Add Tag ──
+export function useAdminAddTag() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, tag }: { userId: string; tag: string }) =>
+      adminApi.addTag(token!, userId, tag),
+    onSettled: (_data, _err, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'tags'] });
+    },
+  });
+}
+
+// ── Remove Tag ──
+export function useAdminRemoveTag() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, tag }: { userId: string; tag: string }) =>
+      adminApi.removeTag(token!, userId, tag),
+    onSettled: (_data, _err, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'tags'] });
+    },
+  });
+}
+
+// ── Replay Delivery (per-user) ──
+export function useAdminReplayDelivery() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, deliveryId }: { userId: string; deliveryId: string }) =>
+      adminApi.adminUserReplayDelivery(token!, userId, deliveryId),
+    onSettled: (_data, _err, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId, 'webhooks'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', vars.userId] });
     },
   });
 }

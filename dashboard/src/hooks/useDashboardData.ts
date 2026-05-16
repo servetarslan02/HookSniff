@@ -1,7 +1,14 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { endpointsApi, webhooksApi, analyticsApi, statsApi, type Endpoint, type RetryPolicyConfig } from '@/lib/api';
+import {
+  endpointsApi, webhooksApi, analyticsApi, statsApi,
+  billingApiExtended, applicationsApi, alertsApi, teamsApi,
+  transformsApi, inboundApi, notificationsApi, apiFetch,
+  type Endpoint, type RetryPolicyConfig,
+  type AlertRule, type Team, type TeamMember,
+  type DeliveryDetail, type DeliveryAttempt, type NotificationListResponse,
+} from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import {
   EndpointSchema,
@@ -9,7 +16,24 @@ import {
   StatsResponseSchema,
   DeliveryTrendSchema,
   SuccessRateSchema,
+  BillingUsageSchema,
+  InvoiceSchema,
+  ApplicationSchema,
+  AlertsListResponseSchema,
+  TeamSchema,
+  TeamMemberSchema,
+  TransformRuleSchema,
+  InboundConfigSchema,
+  SsoConfigSchema,
   type EndpointValidated,
+  type BillingUsageValidated,
+  type InvoiceValidated,
+  type ApplicationValidated,
+  type TeamValidated,
+  type TeamMemberValidated,
+  type TransformRuleValidated,
+  type InboundConfigValidated,
+  type SsoConfigValidated,
 } from '@/schemas/api';
 
 // ── Schema-validated fetcher wrapper ──
@@ -182,6 +206,496 @@ export function useReplayDelivery() {
     mutationFn: (id: string) => webhooksApi.replay(token!, id),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['webhooks'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+    },
+  });
+}
+
+// ── Billing Usage ──
+export function useBillingUsage() {
+  const { token } = useAuth();
+  return useQuery<BillingUsageValidated>({
+    queryKey: ['billing', 'usage'],
+    queryFn: validated(() => billingApiExtended.getUsage(token!), BillingUsageSchema),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+}
+
+// ── Billing Invoices ──
+export function useBillingInvoices() {
+  const { token } = useAuth();
+  return useQuery<InvoiceValidated[]>({
+    queryKey: ['billing', 'invoices'],
+    queryFn: validated(() => billingApiExtended.getInvoices(token!), InvoiceSchema.array()),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+}
+
+// ── Applications List ──
+export function useApplications() {
+  const { token } = useAuth();
+  return useQuery<ApplicationValidated[]>({
+    queryKey: ['applications'],
+    queryFn: validated(() => applicationsApi.list(token!), ApplicationSchema.array()),
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+// ── Application Detail (app + endpoints + deliveries) ──
+export function useApplicationDetail(id: string) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['application', id],
+    queryFn: async () => {
+      const [app, allEndpoints, deliveriesResp] = await Promise.all([
+        applicationsApi.get(token!, id),
+        endpointsApi.list(token!).catch(() => []),
+        webhooksApi.list(token!, { page: 1 }).catch(() => ({ deliveries: [] })),
+      ]);
+      const appEndpoints = allEndpoints.filter(
+        (ep) => ep.application_id === app.id
+      );
+      const appEndpointIds = new Set(appEndpoints.map((ep) => ep.id));
+      const appDeliveries = (deliveriesResp.deliveries || []).filter(
+        (del) => appEndpointIds.has(del.endpoint_id)
+      );
+      return { app, endpoints: appEndpoints, deliveries: appDeliveries };
+    },
+    enabled: !!token && !!id,
+    staleTime: 15_000,
+  });
+}
+
+// ── User Alerts ──
+export function useAlerts() {
+  const { token } = useAuth();
+  return useQuery<AlertRule[]>({
+    queryKey: ['alerts'],
+    queryFn: async () => {
+      const data = await alertsApi.list(token);
+      return Array.isArray(data) ? data : [];
+    },
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+export function useCreateAlert() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name: string; condition: string; threshold: number; channels: string[] }) =>
+      alertsApi.create(token, data),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['alerts'] });
+    },
+  });
+}
+
+export function useUpdateAlert() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<{ name: string; condition: string; threshold: number; channels: string[]; is_active: boolean }> }) =>
+      alertsApi.update(token, id, data),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['alerts'] });
+    },
+  });
+}
+
+export function useDeleteAlert() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => alertsApi.delete(token, id),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['alerts'] });
+    },
+  });
+}
+
+export function useTestAlert() {
+  const { token } = useAuth();
+  return useMutation({
+    mutationFn: (id: string) => alertsApi.test(token, id),
+  });
+}
+
+// ── Teams ──
+export function useTeams() {
+  const { token } = useAuth();
+  return useQuery<TeamValidated[]>({
+    queryKey: ['teams'],
+    queryFn: async () => {
+      const data = await teamsApi.list(token!);
+      return Array.isArray(data) ? data : [];
+    },
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+export function useTeamMembers(teamId: string | null) {
+  const { token } = useAuth();
+  return useQuery<TeamMemberValidated[]>({
+    queryKey: ['teams', teamId, 'members'],
+    queryFn: async () => {
+      const data = await teamsApi.listMembers(token!, teamId!);
+      return Array.isArray(data) ? data : [];
+    },
+    enabled: !!token && !!teamId,
+    staleTime: 15_000,
+  });
+}
+
+export function useCreateTeam() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name: string }) => teamsApi.create(token!, data),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+    },
+  });
+}
+
+export function useInviteTeamMember() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ teamId, data }: { teamId: string; data: { email: string; role: string } }) =>
+      teamsApi.inviteMember(token!, teamId, data),
+    onSettled: (_data, _error, { teamId }) => {
+      queryClient.invalidateQueries({ queryKey: ['teams', teamId, 'members'] });
+    },
+  });
+}
+
+export function useRemoveTeamMember() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ teamId, memberId }: { teamId: string; memberId: string }) =>
+      teamsApi.removeMember(token!, teamId, memberId),
+    onSettled: (_data, _error, { teamId }) => {
+      queryClient.invalidateQueries({ queryKey: ['teams', teamId, 'members'] });
+    },
+  });
+}
+
+export function useUpdateTeamMemberRole() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ teamId, memberId, role }: { teamId: string; memberId: string; role: string }) =>
+      teamsApi.updateRole(token!, teamId, memberId, role),
+    onSettled: (_data, _error, { teamId }) => {
+      queryClient.invalidateQueries({ queryKey: ['teams', teamId, 'members'] });
+    },
+  });
+}
+
+export function useAcceptTeamInvite() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (inviteToken: string) => teamsApi.acceptInvite(token!, inviteToken),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+    },
+  });
+}
+
+// ── Transform Rules ──
+export function useTransformRules(endpointId: string) {
+  const { token } = useAuth();
+  return useQuery<TransformRuleValidated[]>({
+    queryKey: ['transforms', endpointId],
+    queryFn: validated(
+      () => transformsApi.list(token!, endpointId),
+      TransformRuleSchema.array()
+    ),
+    enabled: !!token && !!endpointId,
+    staleTime: 15_000,
+  });
+}
+
+export function useCreateTransformRule() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ endpointId, rule }: { endpointId: string; rule: TransformRuleValidated['rule_json'] }) =>
+      transformsApi.create(token!, endpointId, { rule }),
+    onSettled: (_data, _error, { endpointId }) => {
+      queryClient.invalidateQueries({ queryKey: ['transforms', endpointId] });
+    },
+  });
+}
+
+export function useDeleteTransformRule() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ endpointId, ruleId }: { endpointId: string; ruleId: string }) =>
+      transformsApi.delete(token!, endpointId, ruleId),
+    onSettled: (_data, _error, { endpointId }) => {
+      queryClient.invalidateQueries({ queryKey: ['transforms', endpointId] });
+    },
+  });
+}
+
+// ── Inbound Configs ──
+export function useInboundConfigs() {
+  const { token } = useAuth();
+  return useQuery<InboundConfigValidated[]>({
+    queryKey: ['inbound-configs'],
+    queryFn: validated(
+      () => inboundApi.listConfigs(token!),
+      InboundConfigSchema.array()
+    ),
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+export function useCreateInboundConfig() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { provider: string; endpoint_id?: string | null; secret: string }) =>
+      inboundApi.createConfig(token!, data),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['inbound-configs'] });
+    },
+  });
+}
+
+// ── SSO Config ──
+export function useSsoConfig() {
+  const { token } = useAuth();
+  return useQuery<SsoConfigValidated>({
+    queryKey: ['sso-config'],
+    queryFn: validated(
+      () => apiFetch<SsoConfigValidated>('/sso/config', { token: token! }),
+      SsoConfigSchema
+    ),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+}
+
+// ── Delivery Detail ──
+export function useDeliveryDetail(id: string) {
+  const { token } = useAuth();
+  return useQuery<DeliveryDetail>({
+    queryKey: ['delivery', id],
+    queryFn: () => webhooksApi.get(token!, id),
+    enabled: !!token && !!id,
+    staleTime: 15_000,
+  });
+}
+
+// ── Delivery Attempts ──
+export function useDeliveryAttempts(id: string) {
+  const { token } = useAuth();
+  return useQuery<DeliveryAttempt[]>({
+    queryKey: ['delivery', id, 'attempts'],
+    queryFn: async () => {
+      try {
+        return await webhooksApi.getAttempts(token!, id);
+      } catch {
+        return [] as DeliveryAttempt[];
+      }
+    },
+    enabled: !!token && !!id,
+    staleTime: 15_000,
+  });
+}
+
+// ── Delivery Logs (with status counts) ──
+export function useDeliveryLogs(params: {
+  page?: number;
+  status?: string;
+  refetchInterval?: number;
+}) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['delivery-logs', params],
+    queryFn: async () => {
+      const [data, deliveredData, failedData, pendingData] = await Promise.all([
+        webhooksApi.list(token!, {
+          page: params.page,
+          status: params.status === 'all' ? undefined : params.status,
+        }),
+        webhooksApi.list(token!, { page: 1, status: 'delivered' }).catch(() => ({ total: 0, deliveries: [] })),
+        webhooksApi.list(token!, { page: 1, status: 'failed' }).catch(() => ({ total: 0, deliveries: [] })),
+        webhooksApi.list(token!, { page: 1, status: 'pending' }).catch(() => ({ total: 0, deliveries: [] })),
+      ]);
+      return {
+        deliveries: data.deliveries,
+        total: data.total,
+        statusCounts: {
+          all: data.total,
+          delivered: deliveredData.total,
+          failed: failedData.total,
+          pending: pendingData.total,
+        },
+      };
+    },
+    enabled: !!token,
+    staleTime: 15_000,
+    refetchInterval: params.refetchInterval ?? false,
+  });
+}
+
+// ── Notifications ──
+export function useNotifications(params?: {
+  page?: number;
+  type?: string;
+  read?: boolean;
+}) {
+  const { token } = useAuth();
+  return useQuery<NotificationListResponse>({
+    queryKey: ['notifications', params],
+    queryFn: () =>
+      notificationsApi.list(token!, {
+        page: params?.page,
+        type: params?.type,
+        read: params?.read,
+      }),
+    enabled: !!token,
+    staleTime: 15_000,
+  });
+}
+
+// ── Notification Mutations ──
+
+export function useMarkNotificationAsRead() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => notificationsApi.markAsRead(token!, id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['notifications'] });
+      const previous = queryClient.getQueriesData<NotificationListResponse>({
+        queryKey: ['notifications'],
+      });
+      queryClient.setQueriesData<NotificationListResponse>(
+        { queryKey: ['notifications'] },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            notifications: old.notifications.map((n) =>
+              n.id === id ? { ...n, read: true } : n
+            ),
+          };
+        }
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) {
+        for (const [key, data] of context.previous) {
+          queryClient.setQueryData(key, data);
+        }
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+}
+
+export function useMarkAllNotificationsAsRead() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => notificationsApi.markAllAsRead(token!),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['notifications'] });
+      const previous = queryClient.getQueriesData<NotificationListResponse>({
+        queryKey: ['notifications'],
+      });
+      queryClient.setQueriesData<NotificationListResponse>(
+        { queryKey: ['notifications'] },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            notifications: old.notifications.map((n) => ({ ...n, read: true })),
+          };
+        }
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        for (const [key, data] of context.previous) {
+          queryClient.setQueryData(key, data);
+        }
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+}
+
+export function useDeleteNotification() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => notificationsApi.deleteNotification(token!, id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['notifications'] });
+      const previous = queryClient.getQueriesData<NotificationListResponse>({
+        queryKey: ['notifications'],
+      });
+      queryClient.setQueriesData<NotificationListResponse>(
+        { queryKey: ['notifications'] },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            notifications: old.notifications.filter((n) => n.id !== id),
+            total: old.total - 1,
+          };
+        }
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) {
+        for (const [key, data] of context.previous) {
+          queryClient.setQueryData(key, data);
+        }
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+}
+
+export function useReplayWebhook() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => webhooksApi.replay(token!, id),
+    onSettled: (_data, _error, id) => {
+      queryClient.invalidateQueries({ queryKey: ['delivery', id] });
+      queryClient.invalidateQueries({ queryKey: ['delivery', id, 'attempts'] });
+      queryClient.invalidateQueries({ queryKey: ['webhooks'] });
+      queryClient.invalidateQueries({ queryKey: ['delivery-logs'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
   });

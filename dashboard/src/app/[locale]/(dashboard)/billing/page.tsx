@@ -2,13 +2,14 @@
 
 import { getErrorMessage } from '@/lib/errors';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
-import { billingApiExtended, type Invoice } from '@/lib/api';
+import { billingApiExtended } from '@/lib/api';
+import { useBillingUsage, useBillingInvoices } from '@/hooks/useDashboardData';
 import { UsageChart, type UsageChartData } from './components/UsageChart';
 import { PlanCards } from './components/PlanCards';
 import { InvoiceTable } from './components/InvoiceTable';
@@ -21,53 +22,34 @@ export default function BillingPage() {
   const locale = useLocale();
   const router = useRouter();
   const currentPlan = user?.plan || 'developer';
-  const [usageCount, setUsageCount] = useState(0);
-  const [usageLimit, setUsageLimit] = useState(10000);
-  const [chartData, setChartData] = useState<UsageChartData[]>([]);
-  const [loadingUsage, setLoadingUsage] = useState(true);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [loadingInvoices, setLoadingInvoices] = useState(true);
 
-  // Fetch real usage data
-  useEffect(() => {
-    if (!token) return;
-    billingApiExtended
-      .getUsage(token)
-      .then((data) => {
-        const used = data.webhooks?.used ?? data.deliveries_used ?? 0;
-        const limit = data.webhooks?.limit ?? data.deliveries_limit ?? 10000;
-        setUsageCount(used);
-        setUsageLimit(limit);
+  // React Query hooks for data fetching
+  const { data: usageData, isLoading: loadingUsage } = useBillingUsage();
+  const { data: invoices, isLoading: loadingInvoices } = useBillingInvoices();
 
+  // Derived values from usage data
+  const usageCount = usageData
+    ? usageData.webhooks?.used ?? usageData.deliveries_used ?? 0
+    : 0;
+  const usageLimit = usageData
+    ? usageData.webhooks?.limit ?? usageData.deliveries_limit ?? 10000
+    : 10000;
+
+  // Build chart data from usage
+  const chartData: UsageChartData[] = usageData
+    ? (() => {
         const now = new Date();
         const monthLabel = now.toLocaleString(locale, { month: 'short' });
-        setChartData([{ month: monthLabel, count: used }]);
-      })
-      .catch(() => {
-        // fallback to defaults
-      })
-      .finally(() => setLoadingUsage(false));
-  }, [token, locale]);
-
-  // Fetch real invoice data
-  useEffect(() => {
-    if (!token) return;
-    setLoadingInvoices(true);
-    billingApiExtended
-      .getInvoices(token)
-      .then((data) => setInvoices(data))
-      .catch(() => {
-        // fallback to empty list
-      })
-      .finally(() => setLoadingInvoices(false));
-  }, [token]);
+        return [{ month: monthLabel, count: usageCount }];
+      })()
+    : [];
 
   const usagePercent = usageLimit > 0 ? Math.round((usageCount / usageLimit) * 100) : 0;
 
+  // UI state (kept as useState)
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState<string | null>(null);
   const [upgrading, setUpgrading] = useState(false);
-
   const [cancelling, setCancelling] = useState(false);
   const upgradeModalRef = useRef<HTMLDivElement>(null);
   const cancelModalRef = useRef<HTMLDivElement>(null);
@@ -82,7 +64,6 @@ export default function BillingPage() {
       }
     };
     document.addEventListener('keydown', handler);
-    // Focus the modal
     const modalRef = showUpgradeModal ? upgradeModalRef : cancelModalRef;
     modalRef.current?.focus();
     return () => document.removeEventListener('keydown', handler);
@@ -228,7 +209,7 @@ export default function BillingPage() {
       <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} />
 
       {/* Invoice History */}
-      <InvoiceTable invoices={invoices} loading={loadingInvoices} />
+      <InvoiceTable invoices={invoices ?? []} loading={loadingInvoices} />
 
       {/* Upgrade Confirmation Modal */}
       {showUpgradeModal && (
