@@ -213,7 +213,7 @@ async fn deliver_email(
     let sa_json = {
         // Try cache first — clone value and drop guard before any await
         let cached_val = {
-            let cached = cache.read().unwrap();
+            let cached = cache.read().expect("RwLock poisoned");
             cached.clone()
         };
         if let Some((ref path, ref json)) = cached_val {
@@ -223,7 +223,7 @@ async fn deliver_email(
                 // Path changed — re-read
                 match tokio::fs::read_to_string(&sa_path).await {
                     Ok(json) => {
-                        let mut w = cache.write().unwrap();
+                        let mut w = cache.write().expect("RwLock poisoned");
                         *w = Some((sa_path.clone(), json.clone()));
                         json
                     }
@@ -245,7 +245,7 @@ async fn deliver_email(
             let _ = &cache;
             match tokio::fs::read_to_string(&sa_path).await {
                 Ok(json) => {
-                    let mut w = cache.write().unwrap();
+                    let mut w = cache.write().expect("RwLock poisoned");
                     *w = Some((sa_path.clone(), json.clone()));
                     json
                 }
@@ -284,7 +284,7 @@ async fn deliver_email(
     // Build OAuth2 JWT and exchange for access token
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
+        .expect("system clock is after UNIX epoch")
         .as_secs();
 
     let client_email = sa_key["client_email"].as_str().unwrap_or("");

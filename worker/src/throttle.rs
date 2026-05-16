@@ -27,7 +27,7 @@ impl Default for EndpointThrottle {
     fn default() -> Self {
         let now_ms = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
+            .expect("system clock is after UNIX epoch")
             .as_millis() as u64;
         Self {
             attempt_count: 0,
@@ -169,7 +169,7 @@ impl ThrottleManager {
                 Err(_) => return,
             };
 
-            let mut conn = self.redis.as_ref().unwrap().clone();
+            let mut conn = self.redis.as_ref().expect("redis connection required for persistence").clone();
             let ttl_secs = self.config.window_secs * 3; // Auto-expire stale entries
             let result: Result<(), redis::RedisError> = redis::cmd("SETEX")
                 .arg(&key)
@@ -189,7 +189,7 @@ impl ThrottleManager {
     pub async fn check_allowed(&self, endpoint_id: Uuid) -> Result<(), std::time::Duration> {
         let now_ms = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
+            .expect("system clock is after UNIX epoch")
             .as_millis() as u64;
 
         let throttles = self.throttles.read().await;
@@ -207,7 +207,7 @@ impl ThrottleManager {
     pub async fn record_attempt(&self, endpoint_id: Uuid) {
         let now_ms = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
+            .expect("system clock is after UNIX epoch")
             .as_millis() as u64;
 
         let window_ms = self.config.window_secs * 1000;

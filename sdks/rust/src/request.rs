@@ -77,7 +77,7 @@ impl HookSniffRequest {
     }
 
     pub fn set_body<T: Serialize>(&mut self, value: &T) {
-        self.body = Some(serde_json::to_string(value).unwrap());
+        self.body = Some(serde_json::to_string(value).expect("serialization failed"));
     }
 
     /// Send the request and deserialize the response.
