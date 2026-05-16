@@ -29,6 +29,10 @@ id = "f554e503fcbe4d548b8df187456078b3"
 #   { pattern = "api.hooksniff.com/*", zone_name = "hooksniff.com" }
 # ]
 
+# ── Keep-alive cron (every 5 min) ──
+[triggers]
+crons = ["*/5 * * * *"]
+
 # ── Custom domains ──
 # [env.production]
 # routes = [
