@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useEndpointDetail } from '@/hooks/useDashboardData';
 import { endpointsApi, type RetryPolicyConfig } from '@/lib/api';
 import { useAuth } from '@/lib/store';
+import { useIsFeatureEnabled } from '@/hooks/useAdminData';
 import { RetryPolicyCard } from './components/RetryPolicyCard';
 import { SignatureCard } from './components/SignatureCard';
 import { RateLimitCard } from './components/RateLimitCard';
@@ -18,6 +19,7 @@ export default function EndpointSettingsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
+  const customRetryEnabled = useIsFeatureEnabled('custom_retry_schedules');
 
   // React Query hooks
   const { data: endpoint, isLoading, error } = useEndpointDetail(id);
@@ -77,13 +79,15 @@ export default function EndpointSettingsPage() {
         </div>
       </div>
 
-      <RetryPolicyCard
-        initialMaxAttempts={endpoint.retry_policy?.max_attempts ?? 5}
-        initialBackoff={endpoint.retry_policy?.backoff ?? 'exponential'}
-        initialDelay={endpoint.retry_policy?.initial_delay_secs ?? 10}
-        initialMaxDelay={endpoint.retry_policy?.max_delay_secs ?? 3600}
-        onSave={handleSaveRetryPolicy}
-      />
+      {customRetryEnabled && (
+        <RetryPolicyCard
+          initialMaxAttempts={endpoint.retry_policy?.max_attempts ?? 5}
+          initialBackoff={endpoint.retry_policy?.backoff ?? 'exponential'}
+          initialDelay={endpoint.retry_policy?.initial_delay_secs ?? 10}
+          initialMaxDelay={endpoint.retry_policy?.max_delay_secs ?? 3600}
+          onSave={handleSaveRetryPolicy}
+        />
+      )}
 
       <SignatureCard
         endpointId={id}
