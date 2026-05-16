@@ -3672,6 +3672,9 @@
     "namePlaceholder": "ozellik_adi",
     "descPlaceholder": "Bu flag ne yapar?",
     "creating": "Oluşturuluyor...",
-    "saving": "Kaydediliyor..."
+    "saving": "Kaydediliyor...",
+    "nameImmutable": "Flag adı oluşturulduktan sonra değiştirilemez",
+    "nameTooLong": "Flag adı 100 karakterden kısa olmalı",
+    "nameInvalid": "Flag adı sadece harf, rakam, alt çizgi veya tire içerebilir"
   }
 }

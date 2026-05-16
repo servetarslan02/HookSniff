@@ -833,10 +833,10 @@ export const adminApi = {
   listFeatureFlags: (token: string) =>
     apiFetch<{ flags: FeatureFlag[] }>('/admin/feature-flags', { token }),
 
-  createFeatureFlag: (token: string, data: { name: string; description?: string; is_enabled?: boolean; rollout_percentage?: number; enabled_for_plans?: string[] }) =>
+  createFeatureFlag: (token: string, data: { name: string; description?: string | null; is_enabled?: boolean; rollout_percentage?: number; enabled_for_plans?: string[] }) =>
     apiFetch<FeatureFlag>('/admin/feature-flags', { method: 'POST', body: data, token }),
 
-  updateFeatureFlag: (token: string, id: string, data: { name?: string; description?: string; is_enabled?: boolean; rollout_percentage?: number; enabled_for_plans?: string[] }) =>
+  updateFeatureFlag: (token: string, id: string, data: { name?: string; description?: string | null; is_enabled?: boolean; rollout_percentage?: number; enabled_for_plans?: string[] }) =>
     apiFetch<FeatureFlag>(`/admin/feature-flags/${id}`, { method: 'PUT', body: data, token }),
 
   deleteFeatureFlag: (token: string, id: string) =>

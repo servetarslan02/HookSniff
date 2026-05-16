@@ -401,13 +401,14 @@ export function useCreateFeatureFlag() {
   return useMutation({
     mutationFn: (data: {
       name: string;
-      description?: string;
+      description?: string | null;
       is_enabled?: boolean;
       rollout_percentage?: number;
       enabled_for_plans?: string[];
     }) => adminApi.createFeatureFlag(token!, data),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
+      queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
     },
   });
 }
@@ -424,7 +425,7 @@ export function useUpdateFeatureFlag() {
       id: string;
       data: {
         name?: string;
-        description?: string;
+        description?: string | null;
         is_enabled?: boolean;
         rollout_percentage?: number;
         enabled_for_plans?: string[];
@@ -432,6 +433,7 @@ export function useUpdateFeatureFlag() {
     }) => adminApi.updateFeatureFlag(token!, id, data),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
+      queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
     },
   });
 }
@@ -444,6 +446,7 @@ export function useDeleteFeatureFlag() {
     mutationFn: (id: string) => adminApi.deleteFeatureFlag(token!, id),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
+      queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
     },
   });
 }
