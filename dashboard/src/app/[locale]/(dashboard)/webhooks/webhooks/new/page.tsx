@@ -2,30 +2,23 @@
 
 import { getErrorMessage } from '@/lib/errors';
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/store';
+import { useState } from 'react';
 import { useToast } from '@/components/Toast';
-import { webhooksApi, endpointsApi, type Endpoint } from '@/lib/api';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
+import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
 
 export default function SendWebhookPage() {
-  const { token } = useAuth();
   const { toast } = useToast();
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
+  const { data: endpoints = [], isLoading: loadingEndpoints } = useEndpoints();
+  const createWebhook = useCreateWebhook();
   const [endpointId, setEndpointId] = useState('');
   const [eventType, setEventType] = useState('');
   const [payload, setPayload] = useState('{\n  "message": "Hello from HookSniff!"\n}');
-  const [sending, setSending] = useState(false);
   const [response, setResponse] = useState<unknown>(null);
   const [jsonError, setJsonError] = useState('');
   const t = useTranslations('webhooks');
   const tc = useTranslations('common');
-
-  useEffect(() => {
-    if (!token) return;
-    endpointsApi.list(token).then(setEndpoints).catch(() => {});
-  }, [token]);
 
   const validateJson = (val: string) => {
     try {
@@ -36,30 +29,29 @@ export default function SendWebhookPage() {
     }
   };
 
-  const handleSend = async () => {
-    if (!token || !endpointId) return;
+  const handleSend = () => {
+    if (!endpointId) return;
+    let parsed: unknown;
     try {
-      JSON.parse(payload);
+      parsed = JSON.parse(payload);
     } catch {
       toast(t('invalidJson'), 'error');
       return;
     }
-    setSending(true);
     setResponse(null);
-    try {
-      const res = await webhooksApi.create(token, {
-        endpoint_id: endpointId,
-        event: eventType || undefined,
-        data: JSON.parse(payload),
-      });
-      setResponse(res);
-      toast(t('sendSuccess'), 'success');
-    } catch (err: unknown) {
-      setResponse({ error: getErrorMessage(err, tc('unknownError')) });
-      toast(t('sendFailed'), 'error');
-    } finally {
-      setSending(false);
-    }
+    createWebhook.mutate(
+      { endpoint_id: endpointId, event: eventType || undefined, data: parsed },
+      {
+        onSuccess: (res) => {
+          setResponse(res);
+          toast(t('sendSuccess'), 'success');
+        },
+        onError: (err: unknown) => {
+          setResponse({ error: getErrorMessage(err, tc('unknownError')) });
+          toast(t('sendFailed'), 'error');
+        },
+      }
+    );
   };
 
   return (
@@ -107,10 +99,10 @@ export default function SendWebhookPage() {
             </div>
             <button type="button"
               onClick={handleSend}
-              disabled={sending || !endpointId || !!jsonError}
+              disabled={createWebhook.isPending || !endpointId || !!jsonError}
               className="w-full bg-brand-600 dark:bg-brand-500 text-white py-3 rounded-xl font-semibold hover:bg-brand-700 dark:hover:bg-brand-600 transition disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              {sending ? <><LoadingSpinner size="sm" /> {tc('sending')}</> : t('sendWebhook')}
+              {createWebhook.isPending ? <><LoadingSpinner size="sm" /> {tc('sending')}</> : t('sendWebhook')}
             </button>
           </div>
         </div>
