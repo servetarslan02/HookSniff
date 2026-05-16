@@ -193,12 +193,14 @@ export default function AdminRevenuePage() {
     if (!token || !settings) return;
     setSavingPlans(true);
     try {
-      await updateSettingsMutation.mutateAsync({
+      const result = await updateSettingsMutation.mutateAsync({
         token,
         settings: { ...settings, ...planForm },
       });
-      toast(t('settingsSaved') || 'Plan settings saved!', 'success');
+      toast(t('settingsSaved') || 'Plan settings saved! Prices syncing to Polar...', 'success');
       setEditingPlans(false);
+      // Invalidate to pick up any Polar sync results
+      queryClient.invalidateQueries({ queryKey: ['admin-settings'] });
     } catch {
       toast(t('settingsSaveFailed') || 'Failed to save plan settings', 'error');
     } finally {
@@ -529,10 +531,10 @@ export default function AdminRevenuePage() {
           </div>
 
           {/* ── Polar Sync Info ── */}
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
             <span className="text-lg">🔗</span>
-            <p className="text-xs text-amber-700 dark:text-amber-400">
-              {t('polarSyncInfo') || 'Price changes here update the platform. Polar products should be updated to match.'}
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">
+              {t('polarSyncActive') || 'Prices auto-sync to Polar on save. Product IDs must be configured in POLAR_PRODUCT_* env vars.'}
             </p>
           </div>
         </div>
