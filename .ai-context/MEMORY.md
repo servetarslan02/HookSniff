@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:50 GMT+8 (Oturum 192)
+> Son güncelleme: 2026-05-17 05:54 GMT+8 (Oturum 193)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,21 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 193 — 2026-05-17 05:54 GMT+8
+1. **System Sayfası Derin İnceleme + 13 Fix** ✅
+   - **Backend:**
+     - Test webhook: 10sn timeout + 5sn connect timeout (sonsuz askıda kalıyordu)
+     - Queue status: 6 COUNT sorgusu → 1 sorgu with FILTER (6x daha az DB roundtrip)
+     - Dead letters: `since` time filter eklendi (1h/24h/7d/30d)
+     - Failed deliveries: response_body DB seviyesinde 4KB'a truncate edildi
+   - **Frontend:**
+     - Infrastructure: Oracle Cloud ARM → Google Cloud Run (doğru bilgi)
+     - Health error state: API hatasında allOk=false (yanlış "operational" gösteriyordu)
+     - refetchInterval: 15sn → 30sn (Redis cache TTL ile uyumlu, DB yükü yarıya indi)
+     - Dead letters: since='24h' parametresi gönderiliyor
+     - Translation: autoRefresh30s key eklendi (EN+TR)
+   - Commit: caa957e9 — push edildi
 
 ### Oturum 192 — 2026-05-17 05:50 GMT+8
 1. **Feature Flags Derin Katman 2 — 11 Fix** ✅
