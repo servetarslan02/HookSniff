@@ -104,7 +104,7 @@ export async function POST(request: Request) {
     // TODO: Production — send confirmation email (double opt-in)
     // TODO: Production — send welcome email
 
-    console.log(`[Newsletter] New subscriber: ${normalizedEmail} (total: ${subscribers.size})`); // dev only
+    if (process.env.NODE_ENV === 'development') console.log(`[Newsletter] New subscriber: ${normalizedEmail} (total: ${subscribers.size})`); // dev only
 
     return NextResponse.json({
       success: true,
