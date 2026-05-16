@@ -59,7 +59,7 @@
 - [ ] 23. NEXT_PUBLIC_SENTRY_DSN env var ayarlanmamış
 - [ ] 24. Sentry test hatası gönderilip doğrulanmamış
 - [ ] 25. VirtualTable — admin users, deliveries, audit-log sayfalarına uygulanmalı
-- [ ] 26. ISR (revalidate = 3600) statik sayfalara uygulanmamış
+- [x] 26. ISR (revalidate = 3600) statik sayfalara uygulandı ✅ (blog, pricing, changelog, faq, status, contact, get-started + slug pages)
 - [ ] 27. Image optimization kontrol edilmedi
 - [ ] 28. Code splitting / lazy loading kontrol edilmedi
 
