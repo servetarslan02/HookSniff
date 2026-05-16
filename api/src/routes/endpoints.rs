@@ -63,6 +63,7 @@ async fn list_endpoints(
 async fn create_endpoint(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<CreateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
@@ -170,6 +171,17 @@ async fn create_endpoint(
         { let _ = crate::audit::log_action(&pool, customer.id, "ENDPOINT_CREATE", "endpoint", Some(&eid), None, None, None).await; }
     }
 
+    // Publish EndpointCreated event (best-effort)
+    if let Some(ref publisher) = event_publisher {
+        if let Err(e) = publisher.publish(crate::events::AppEvent::EndpointCreated {
+            endpoint_id: endpoint.id,
+            customer_id: customer.id,
+            url: endpoint.url.clone(),
+        }).await {
+            tracing::warn!("Failed to publish EndpointCreated event: {:?}", e);
+        }
+    }
+
     Ok(Json(endpoint.to_response()))
 }
 
@@ -192,6 +204,7 @@ async fn get_endpoint(
 async fn delete_endpoint(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let result = sqlx::query("DELETE FROM endpoints WHERE id = $1 AND customer_id = $2")
@@ -208,6 +221,16 @@ async fn delete_endpoint(
     {
         let eid = id.to_string();
         { let _ = crate::audit::log_action(&pool, customer.id, "ENDPOINT_DELETE", "endpoint", Some(&eid), None, None, None).await; }
+    }
+
+    // Publish EndpointDeleted event (best-effort)
+    if let Some(ref publisher) = event_publisher {
+        if let Err(e) = publisher.publish(crate::events::AppEvent::EndpointDeleted {
+            endpoint_id: id,
+            customer_id: customer.id,
+        }).await {
+            tracing::warn!("Failed to publish EndpointDeleted event: {:?}", e);
+        }
     }
 
     Ok(Json(serde_json::json!({"deleted": true})))
@@ -232,6 +255,7 @@ pub struct UpdateEndpointRequest {
 async fn update_endpoint(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
@@ -324,6 +348,26 @@ async fn update_endpoint(
     {
         let eid = endpoint.id.to_string();
         { let _ = crate::audit::log_action(&pool, customer.id, "ENDPOINT_UPDATE", "endpoint", Some(&eid), None, None, None).await; }
+    }
+
+    // Publish EndpointUpdated event (best-effort)
+    if let Some(ref publisher) = event_publisher {
+        // If is_active was toggled, publish status change event
+        if req.is_active.is_some() {
+            if let Err(e) = publisher.publish(crate::events::AppEvent::EndpointStatusChanged {
+                endpoint_id: endpoint.id,
+                customer_id: customer.id,
+                is_active: endpoint.is_active,
+            }).await {
+                tracing::warn!("Failed to publish EndpointStatusChanged event: {:?}", e);
+            }
+        }
+        if let Err(e) = publisher.publish(crate::events::AppEvent::EndpointUpdated {
+            endpoint_id: endpoint.id,
+            customer_id: customer.id,
+        }).await {
+            tracing::warn!("Failed to publish EndpointUpdated event: {:?}", e);
+        }
     }
 
     Ok(Json(endpoint.to_response()))
