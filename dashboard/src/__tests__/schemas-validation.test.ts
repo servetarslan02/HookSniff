@@ -72,7 +72,7 @@ describe('EndpointSchema', () => {
       fallback_url: 'https://fallback.com',
       avg_response_ms: 150,
       failure_streak: 0,
-      retry_policy: { max_retries: 3, backoff_ms: 1000 },
+      retry_policy: { max_attempts: 3, backoff: 'exponential', initial_delay_secs: 10, max_delay_secs: 3600 },
       signing_secret: 'whsec_abc123',
       event_filter: ['order.created'],
       custom_headers: { 'X-Custom': 'value' },
