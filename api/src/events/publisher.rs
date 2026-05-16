@@ -40,10 +40,29 @@ pub enum AppEvent {
         email: String,
         plan: String,
     },
+    EndpointCreated {
+        endpoint_id: Uuid,
+        customer_id: Uuid,
+        url: String,
+    },
+    EndpointUpdated {
+        endpoint_id: Uuid,
+        customer_id: Uuid,
+    },
+    EndpointDeleted {
+        endpoint_id: Uuid,
+        customer_id: Uuid,
+    },
     EndpointStatusChanged {
         endpoint_id: Uuid,
         customer_id: Uuid,
         is_active: bool,
+    },
+    AlertTriggered {
+        alert_id: Uuid,
+        customer_id: Uuid,
+        name: String,
+        condition: String,
     },
 }
 
@@ -53,7 +72,11 @@ impl AppEvent {
             Self::DeliveryCreated { .. } | Self::DeliveryStatusChanged { .. } => "deliveries",
             Self::QueueUpdated { .. } => "queue",
             Self::UserCreated { .. } => "users",
-            Self::EndpointStatusChanged { .. } => "endpoints",
+            Self::EndpointCreated { .. }
+            | Self::EndpointUpdated { .. }
+            | Self::EndpointDeleted { .. }
+            | Self::EndpointStatusChanged { .. } => "endpoints",
+            Self::AlertTriggered { .. } => "alerts",
         }
     }
 
@@ -63,7 +86,11 @@ impl AppEvent {
             Self::DeliveryStatusChanged { .. } => "delivery.status_changed",
             Self::QueueUpdated { .. } => "queue.updated",
             Self::UserCreated { .. } => "user.created",
+            Self::EndpointCreated { .. } => "endpoint.created",
+            Self::EndpointUpdated { .. } => "endpoint.updated",
+            Self::EndpointDeleted { .. } => "endpoint.deleted",
             Self::EndpointStatusChanged { .. } => "endpoint.status_changed",
+            Self::AlertTriggered { .. } => "alert.triggered",
         }
     }
 }
