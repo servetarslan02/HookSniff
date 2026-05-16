@@ -23,6 +23,7 @@ let globalMessageListeners: Set<(event: WsEvent) => void> = new Set();
 let globalLastSeq = 0;
 let fallbackActive = false;
 let globalTokenGetter: (() => string | null) | null = null;
+let globalRefreshTimer: NodeJS.Timeout | null = null;
 
 function notifyState(state: ConnectionState) {
   globalState = state;
@@ -95,6 +96,20 @@ function connectGlobal(token: string, maxAttempts: number) {
     globalReconnectAttempts = 0;
     fallbackActive = false;
     notifyState('connected');
+
+    // Proactive token refresh — renew 2 min before expiry (token is 15min)
+    // This prevents the connection from ever dropping due to token expiry
+    if (globalRefreshTimer) clearTimeout(globalRefreshTimer);
+    globalRefreshTimer = setTimeout(async () => {
+      console.log('[WS] Proactive token refresh (before expiry)');
+      const newToken = await refreshAccessToken();
+      if (newToken && globalWs) {
+        console.log('[WS] Token refreshed, reconnecting proactively');
+        globalReconnectAttempts = 0;
+        globalWs.close();
+        connectGlobal(newToken, maxAttempts);
+      }
+    }, 13 * 60 * 1000); // 13 minutes (2 min before 15min expiry)
   };
 
   ws.onmessage = (event) => {
@@ -170,6 +185,10 @@ function disconnectGlobal() {
   if (globalReconnectTimer) {
     clearTimeout(globalReconnectTimer);
     globalReconnectTimer = null;
+  }
+  if (globalRefreshTimer) {
+    clearTimeout(globalRefreshTimer);
+    globalRefreshTimer = null;
   }
   if (globalWs) {
     globalWs.close();
