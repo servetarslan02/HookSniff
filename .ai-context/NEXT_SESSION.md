@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-16 04:17 GMT+8 (Oturum 177)
+> Son güncelleme: 2026-05-17 03:38 GMT+8 (Oturum 178)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -15,7 +15,17 @@ Bu dosyayı ilk kez okuyorsan:
 
 ---
 
-## ✅ Tamamlanan (Son Oturum — 2026-05-15)
+## ✅ Tamamlanan (Son Oturum — 2026-05-17)
+
+### Oturum 178: Audit Log Fix + Global Deploy + Benchmark ✅
+1. **Audit Log 500 düzeltildi** — `WHERE a.a.customer_id` çift alias bug'ı
+2. **React #31 crash düzeltildi** — `details` JSONB field render fix
+3. **Audit Log hızlandırıldı** — COUNT(*) kaldırıldı, LIMIT+1 tekniği
+4. **Cloud Build 4 region'a deploy** — eu-west3, me-west1, us-central1 eklendi
+5. **Edge proxy deploy edildi** — Cloudflare Workers (cfut token)
+6. **`/devices` 500 düzeltildi** — `device_tokens` tablo migration eklendi
+7. **Global benchmark yapıldı** — tüm endpointler 300-700ms (Asya'dan)
+8. **Gerçek bulgu:** `/sso`, `/analytics`, `/routing` aslında çalışıyor (farklı URL'ler)
 
 ### Oturum 173: Neon Seq Scan Index Migration ✅
 1. **018_seq_scan_indexes.sql uygulandı** — 8 CREATE INDEX IF NOT EXISTS
@@ -97,6 +107,15 @@ Bu dosyayı ilk kez okuyorsan:
 | 1 | Polar.sh "Go Live" | ⬜ | Test mode'dan çıkmak için Stripe identity verification gerekli |
 | 2 | Business → Enterprise | ✅ | Polar'da ürün adı "HookSniff Enterprise" olarak değiştirildi |
 | 3 | Polar.sh Stripe verification | ⬜ | Ödeme almak için gerekli |
+
+### Öncelik 1 — Performans & Stabilite (Oturum 178 sonrası)
+| # | Görev | Durum | Not |
+|---|-------|-------|------|
+| 4 | Audit Log performans | ✅ | COUNT(*) kaldırıldı, LIMIT+1 tekniği |
+| 5 | 4 region deploy | ✅ | Cloud Build güncellendi |
+| 6 | Edge proxy routing | ✅ | Multi-region restore edildi |
+| 7 | device_tokens tablo | ✅ | Migration 019 eklendi |
+| 8 | Audit Log React crash | ✅ | details JSON render fix |
 
 ### Öncelik 1 — Güvenlik (P0 kalan)
 | # | Görev | Durum | Dosya |
