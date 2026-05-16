@@ -58,7 +58,7 @@ impl PolarConfig {
             access_token,
             webhook_secret,
             product_startup: std::env::var("POLAR_PRODUCT_STARTUP")
-                .unwrap_or_default(),
+                .unwrap_or_else(|_| "c6e90bf0-4e5d-44cb-8eeb-4aafa8591ebf".to_string()),
             product_pro: std::env::var("POLAR_PRODUCT_PRO")
                 .unwrap_or_else(|_| "ec5826ad-4a01-4146-b2d0-3b99eaf150a5".to_string()),
             product_business: std::env::var("POLAR_PRODUCT_BUSINESS")
