@@ -17,7 +17,7 @@ const PLAN_COLORS: Record<string, string> = {
 
 export default function AdminOverviewPage() {
   // React Query hooks — replaces useState + useEffect + fetchStats
-  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats, isFetching: statsFetching } = useAdminStats();
+  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useAdminStats();
   const { data: revenue, refetch: refetchRevenue } = useAdminRevenue();
   const { data: auditLogsData, refetch: refetchAuditLogs } = useAdminAuditLogs({ limit: 5 });
   const { data: featureFlagsData, refetch: refetchFeatureFlags } = useAdminFeatureFlags();
