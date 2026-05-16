@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/store';
+import { useState } from 'react';
 import { useToast } from '@/components/Toast';
-import { endpointsApi, inboundApi, API_BASE, type Endpoint, type InboundConfig } from '@/lib/api';
+import { API_BASE } from '@/lib/api';
 import { useTranslations } from 'next-intl';
+import { useEndpoints, useInboundConfigs, useCreateInboundConfig } from '@/hooks/useDashboardData';
 
 const PROVIDERS = [
   { id: 'stripe', name: 'Stripe', icon: '💳', docs: 'https://stripe.com/docs/webhooks' },
@@ -14,39 +14,28 @@ const PROVIDERS = [
 ];
 
 export default function InboundPage() {
-  const { token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations();
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
-  const [configs, setConfigs] = useState<InboundConfig[]>([]);
+
+  const { data: endpoints = [] } = useEndpoints();
+  const { data: configs = [] } = useInboundConfigs();
+  const createMutation = useCreateInboundConfig();
+
   const [showCreate, setShowCreate] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState('');
   const [selectedEndpoint, setSelectedEndpoint] = useState('');
   const [webhookSecret, setWebhookSecret] = useState('');
 
-  useEffect(() => {
-    if (!token) return;
-    Promise.all([
-      endpointsApi.list(token).catch(() => []),
-      inboundApi.listConfigs(token).catch(() => []),
-    ]).then(([eps, cfgs]) => {
-      setEndpoints(eps);
-      setConfigs(cfgs);
-    });
-  }, [token]);
-
   const handleCreate = async () => {
-    if (!token || !selectedProvider) return;
+    if (!selectedProvider) return;
     try {
-      await inboundApi.createConfig(token, {
+      await createMutation.mutateAsync({
         provider: selectedProvider,
         endpoint_id: selectedEndpoint || null,
         secret: webhookSecret,
       });
       toast(t('configCreated'), 'success');
       setShowCreate(false);
-      const cfgs = await inboundApi.listConfigs(token).catch(() => []);
-      setConfigs(cfgs);
     } catch {
       toast(t('configFailed'), 'error');
     }
@@ -112,7 +101,7 @@ export default function InboundPage() {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={handleCreate} className="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">{t('inbound.save')}</button>
+                <button onClick={handleCreate} disabled={createMutation.isPending} className="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50">{t('inbound.save')}</button>
                 <button onClick={() => setShowCreate(false)} className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-700 transition">{t('inbound.cancel')}</button>
               </div>
             </>

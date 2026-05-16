@@ -1,12 +1,16 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
-import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { notificationsApi, type Notification } from '@/lib/api';
 import { useTranslations } from 'next-intl';
+import {
+  useNotifications,
+  useMarkNotificationAsRead,
+  useMarkAllNotificationsAsRead,
+  useDeleteNotification,
+} from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
 
 type NotifType = 'all' | 'webhook_failed' | 'alert' | 'system' | 'billing';
@@ -28,75 +32,52 @@ const TYPE_I18N_MAP: Record<string, string> = {
 };
 
 export default function NotificationsPage() {
-  const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [total, setTotal] = useState(0);
   const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
   const typeFilter = (searchParams.get('type') || 'all') as NotifType;
   const readFilter = (searchParams.get('read') || 'all') as 'all' | 'read' | 'unread';
-  const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const t = useTranslations('notifications');
   const tc = useTranslations('common');
   const perPage = 20;
 
-  const fetchNotifications = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const data = await notificationsApi.list(token, {
-        page,
-        type: typeFilter === 'all' ? undefined : typeFilter,
-        read: readFilter === 'all' ? undefined : readFilter === 'read',
-      });
-      setNotifications(data.notifications || []);
-      setTotal(data.total || 0);
-    } catch {
-      toast(t("failedToLoad"), "error");
-    } finally {
-      setLoading(false);
-    }
-  }, [token, page, typeFilter, readFilter, toast, t]);
+  const { data, isLoading } = useNotifications({
+    page,
+    type: typeFilter === 'all' ? undefined : typeFilter,
+    read: readFilter === 'all' ? undefined : readFilter === 'read',
+  });
 
-  useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+  const notifications = data?.notifications ?? [];
+  const total = data?.total ?? 0;
 
-  const handleMarkAsRead = async (id: string) => {
-    if (!token) return;
-    try {
-      await notificationsApi.markAsRead(token, id);
-      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-    } catch {
-      toast(t("failedToMarkRead"), "error");
-    }
+  const markAsReadMutation = useMarkNotificationAsRead();
+  const markAllAsReadMutation = useMarkAllNotificationsAsRead();
+  const deleteMutation = useDeleteNotification();
+
+  const handleMarkAsRead = (id: string) => {
+    markAsReadMutation.mutate(id);
   };
 
   const handleMarkAllAsRead = async () => {
-    if (!token) return;
     try {
-      await notificationsApi.markAllAsRead(token);
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      await markAllAsReadMutation.mutateAsync();
       toast(t('allReadSuccess'), 'success');
     } catch {
       toast(t("failedToMarkAllRead"), "error");
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     setDeleteTarget(id);
   };
 
   const confirmDelete = async () => {
-    if (!token || !deleteTarget) return;
+    if (!deleteTarget) return;
     try {
-      await notificationsApi.deleteNotification(token, deleteTarget);
-      setNotifications((prev) => prev.filter((n) => n.id !== deleteTarget));
-      setTotal((t) => t - 1);
+      await deleteMutation.mutateAsync(deleteTarget);
       toast(t('deleted'), 'success');
     } catch {
       toast(t('deleteFailed'), 'error');
@@ -174,7 +155,7 @@ export default function NotificationsPage() {
 
       {/* Notification List */}
       <div className="glass-card overflow-hidden">
-        {loading ? (
+        {isLoading ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-500 animate-pulse">
             {t('loadingNotifications')}
           </div>
