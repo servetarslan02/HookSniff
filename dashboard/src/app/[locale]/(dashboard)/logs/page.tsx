@@ -3,6 +3,8 @@
 import { getErrorMessage } from '@/lib/errors';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter, usePathname } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { webhooksApi, type Delivery, type DeliveryAttempt } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -12,12 +14,15 @@ type StatusFilter = 'all' | 'delivered' | 'failed' | 'pending';
 
 export default function LogsPage() {
   const { token } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+  const filter = (searchParams.get('status') || 'all') as StatusFilter;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filter, setFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [attempts, setAttempts] = useState<DeliveryAttempt[]>([]);
@@ -141,8 +146,12 @@ export default function LogsPage() {
             <button
               key={f}
               onClick={() => {
-                setFilter(f);
-                setPage(1);
+                const params = new URLSearchParams(searchParams.toString());
+                params.delete('page');
+                if (f === 'all') params.delete('status');
+                else params.set('status', f);
+                const qs = params.toString();
+                router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
               }}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition ${
                 filter === f
@@ -309,7 +318,11 @@ export default function LogsPage() {
                 </span>
                 <nav aria-label={tc('pagination')} className="flex items-center gap-2">
                   <button type="button"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.set('page', String(Math.max(1, page - 1)));
+                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                    }}
                     disabled={page === 1}
                     aria-label={tc('previous')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 text-gray-700 dark:text-slate-300 transition"
@@ -320,7 +333,11 @@ export default function LogsPage() {
                     {tc('pageOf', { page, totalPages })}
                   </span>
                   <button type="button"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.set('page', String(Math.min(totalPages, page + 1)));
+                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                    }}
                     disabled={page >= totalPages}
                     aria-label={tc('next')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 text-gray-700 dark:text-slate-300 transition"
