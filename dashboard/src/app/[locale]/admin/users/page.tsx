@@ -494,7 +494,7 @@ export default function AdminUsersPage() {
                         <StatusBadge status={u.status} />
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
-                        {new Date(u.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                        {new Date(u.created_at).toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
