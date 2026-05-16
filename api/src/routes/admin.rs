@@ -1415,7 +1415,11 @@ async fn test_webhook(
         return Err(AppError::BadRequest(format!("URL not allowed: {}", e)));
     }
 
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(10))
+        .connect_timeout(std::time::Duration::from_secs(5))
+        .build()
+        .unwrap_or_else(|_| reqwest::Client::new());
     let start = std::time::Instant::now();
 
     let mut request = client
@@ -1694,6 +1698,24 @@ async fn create_feature_flag(
 ) -> Result<impl IntoResponse, AppError> {
     require_admin_write(&customer)?;
 
+    // Validate and sanitize name
+    let name = body.name.trim();
+    if name.is_empty() || name.len() > 100 {
+        return Err(AppError::BadRequest("Flag name must be 1-100 characters".into()));
+    }
+    if !name.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '-') {
+        return Err(AppError::BadRequest("Flag name may only contain alphanumeric, underscore, or hyphen".into()));
+    }
+
+    // Check for duplicate name
+    let exists = sqlx::query_scalar::<_, bool>("SELECT EXISTS(SELECT 1 FROM feature_flags WHERE name = $1)")
+        .bind(name)
+        .fetch_one(&pool)
+        .await?;
+    if exists {
+        return Err(AppError::BadRequest(format!("Flag '{}' already exists", name)));
+    }
+
     let plans_json = serde_json::to_value(body.enabled_for_plans.unwrap_or_default())?;
 
     let flag = sqlx::query_as::<_, FeatureFlag>(
@@ -1701,7 +1723,7 @@ async fn create_feature_flag(
          VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING id, name, description, is_enabled, rollout_percentage, enabled_for_plans, created_by, created_at, updated_at"
     )
-    .bind(&body.name)
+    .bind(name)
     .bind(&body.description)
     .bind(body.is_enabled.unwrap_or(false))
     .bind(body.rollout_percentage.unwrap_or(100))
@@ -1732,8 +1754,28 @@ async fn update_feature_flag(
     .await?
     .ok_or(AppError::NotFound)?;
 
-    let new_name = body.name.as_deref().unwrap_or(&current.name);
-    let new_desc: Option<String> = body.description.or_else(|| current.description.clone());
+    // Name: use provided (trimmed) or keep current
+    let new_name = match body.name {
+        Some(ref n) => {
+            let trimmed = n.trim();
+            if trimmed.is_empty() || trimmed.len() > 100 {
+                return Err(AppError::BadRequest("Flag name must be 1-100 characters".into()));
+            }
+            if !trimmed.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '-') {
+                return Err(AppError::BadRequest("Flag name may only contain alphanumeric, underscore, or hyphen".into()));
+            }
+            trimmed.to_string()
+        }
+        None => current.name.clone(),
+    };
+
+    // Description: explicit null clears it, None keeps current
+    let new_desc: Option<String> = match body.description {
+        Some(d) if d.trim().is_empty() => None,
+        Some(d) => Some(d),
+        None => current.description.clone(),
+    };
+
     let new_enabled = body.is_enabled.unwrap_or(current.is_enabled);
     let new_pct = body.rollout_percentage.unwrap_or(current.rollout_percentage);
     let new_plans = if let Some(ref plans) = body.enabled_for_plans {
@@ -1747,7 +1789,7 @@ async fn update_feature_flag(
          WHERE id = $6
          RETURNING id, name, description, is_enabled, rollout_percentage, enabled_for_plans, created_by, created_at, updated_at"
     )
-    .bind(new_name)
+    .bind(&new_name)
     .bind(new_desc)
     .bind(new_enabled)
     .bind(new_pct)
@@ -2671,7 +2713,12 @@ async fn admin_failed_deliveries(
     let rows = if let Some(uid) = params.user_id {
         sqlx::query_as::<_, FailedDeliveryRow>(&format!(
             r#"SELECT d.id, d.customer_id, d.endpoint_id, d.event_type, d.status,
-                d.attempt_count, d.response_status, d.response_body, d.created_at,
+                d.attempt_count, d.response_status,
+                CASE WHEN LENGTH(d.response_body) > 4096
+                    THEN LEFT(d.response_body, 4096) || '...[truncated]'
+                    ELSE d.response_body
+                END as response_body,
+                d.created_at,
                 (SELECT da.error_message FROM delivery_attempts da
                  WHERE da.delivery_id = d.id ORDER BY da.attempt_number DESC LIMIT 1) as error_message,
                 c.email as customer_email,
@@ -2691,7 +2738,12 @@ async fn admin_failed_deliveries(
     } else {
         sqlx::query_as::<_, FailedDeliveryRow>(&format!(
             r#"SELECT d.id, d.customer_id, d.endpoint_id, d.event_type, d.status,
-                d.attempt_count, d.response_status, d.response_body, d.created_at,
+                d.attempt_count, d.response_status,
+                CASE WHEN LENGTH(d.response_body) > 4096
+                    THEN LEFT(d.response_body, 4096) || '...[truncated]'
+                    ELSE d.response_body
+                END as response_body,
+                d.created_at,
                 (SELECT da.error_message FROM delivery_attempts da
                  WHERE da.delivery_id = d.id ORDER BY da.attempt_number DESC LIMIT 1) as error_message,
                 c.email as customer_email,
@@ -2717,6 +2769,7 @@ async fn admin_failed_deliveries(
 #[derive(Debug, Deserialize)]
 pub struct DeadLetterParams {
     pub limit: Option<i64>,
+    pub since: Option<String>,
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -2742,17 +2795,26 @@ async fn admin_dead_letters(
     require_admin(&customer)?;
 
     let limit = params.limit.unwrap_or(50).min(200);
+    let since = params.since.as_deref().unwrap_or("24h");
+    let interval = match since {
+        "1h" => "1 hour",
+        "24h" => "24 hours",
+        "7d" => "7 days",
+        "30d" => "30 days",
+        _ => "24 hours",
+    };
 
-    let rows = sqlx::query_as::<_, DeadLetterRow>(
+    let rows = sqlx::query_as::<_, DeadLetterRow>(&format!(
         r#"SELECT dl.id, dl.delivery_id, dl.endpoint_id, dl.customer_id,
-            dl.payload, dl.reason, dl.attempts, dl.created_at,
+            '{}'::jsonb as payload, dl.reason, dl.attempts, dl.created_at,
             c.email as customer_email,
             e.url as endpoint_url
         FROM dead_letters dl
         LEFT JOIN customers c ON c.id = dl.customer_id
         LEFT JOIN endpoints e ON e.id = dl.endpoint_id
-        ORDER BY dl.created_at DESC LIMIT $1"#
-    )
+        WHERE dl.created_at >= NOW() - INTERVAL '{}'
+        ORDER BY dl.created_at DESC LIMIT $1"#, interval
+    ))
     .bind(limit)
     .fetch_all(&pool)
     .await?;
@@ -2780,43 +2842,32 @@ async fn admin_queue_status(
 ) -> Result<Json<QueueStatus>, AppError> {
     require_admin(&customer)?;
 
-    let pending: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'pending'"
-    ).fetch_one(&pool).await?;
-
-    let processing: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'processing'"
-    ).fetch_one(&pool).await?;
-
-    let failed: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'failed'"
-    ).fetch_one(&pool).await?;
-
-    let total: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_queue"
-    ).fetch_one(&pool).await?;
-
-    let oldest: (Option<DateTime<Utc>>,) = sqlx::query_as(
-        "SELECT MIN(created_at) FROM webhook_queue WHERE status = 'pending'"
-    ).fetch_one(&pool).await?;
-
-    let failed_1h: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_queue WHERE status = 'failed' AND updated_at >= NOW() - INTERVAL '1 hour'"
+    // Single query instead of 6 separate COUNT(*) queries
+    let row: (i64, i64, i64, i64, Option<DateTime<Utc>>, i64) = sqlx::query_as(
+        "SELECT
+            COUNT(*) FILTER (WHERE status = 'pending'),
+            COUNT(*) FILTER (WHERE status = 'processing'),
+            COUNT(*) FILTER (WHERE status = 'failed'),
+            COUNT(*),
+            MIN(created_at) FILTER (WHERE status = 'pending'),
+            COUNT(*) FILTER (WHERE status = 'failed' AND updated_at >= NOW() - INTERVAL '1 hour')
+        FROM webhook_queue"
     ).fetch_one(&pool).await?;
 
     Ok(Json(QueueStatus {
-        pending: pending.0,
-        processing: processing.0,
-        failed: failed.0,
-        total: total.0,
-        oldest_pending_at: oldest.0,
-        failed_last_hour: failed_1h.0,
+        pending: row.0,
+        processing: row.1,
+        failed: row.2,
+        total: row.3,
+        oldest_pending_at: row.4,
+        failed_last_hour: row.5,
     }))
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RateLimitViolationParams {
     pub limit: Option<i64>,
+    pub since: Option<String>,
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -2841,15 +2892,24 @@ async fn admin_rate_limit_violations(
     require_admin(&customer)?;
 
     let limit = params.limit.unwrap_or(50).min(200);
+    let since = params.since.as_deref().unwrap_or("24h");
+    let interval = match since {
+        "1h" => "1 hour",
+        "24h" => "24 hours",
+        "7d" => "7 days",
+        "30d" => "30 days",
+        _ => "24 hours",
+    };
 
-    let rows = sqlx::query_as::<_, RateLimitViolationRow>(
+    let rows = sqlx::query_as::<_, RateLimitViolationRow>(&format!(
         r#"SELECT rv.id, rv.customer_id, rv.endpoint_id, rv.ip,
             rv.requests_count, rv.limit_per_window, rv.window_seconds, rv.created_at,
             c.email as customer_email
         FROM rate_limit_violations rv
         LEFT JOIN customers c ON c.id = rv.customer_id
-        ORDER BY rv.created_at DESC LIMIT $1"#
-    )
+        WHERE rv.created_at >= NOW() - INTERVAL '{}'
+        ORDER BY rv.created_at DESC LIMIT $1"#, interval
+    ))
     .bind(limit)
     .fetch_all(&pool)
     .await?;
