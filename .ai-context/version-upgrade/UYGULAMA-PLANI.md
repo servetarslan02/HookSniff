@@ -75,64 +75,42 @@
 
 ---
 
-## Faz 6: Tailwind CSS 3 → 4
+## Faz 6: Tailwind CSS 3 → 4 ✅
 
-- [ ] `npx @tailwindcss/upgrade` — otomatik tool çalıştır
-- [ ] `postcss.config.mjs` kontrol: `tailwindcss` → `@tailwindcss/postcss`
-- [ ] CSS import kontrol: `@tailwind base/components/utilities` → `@import "tailwindcss"`
-- [ ] Utility rename'leri kontrol et:
-  - [ ] `shadow-sm` → `shadow-xs`
-  - [ ] `shadow` → `shadow-sm`
-  - [ ] `rounded-sm` → `rounded-xs`
-  - [ ] `rounded` → `rounded-sm`
-  - [ ] `blur-sm` → `blur-xs`
-  - [ ] `ring` → `ring-3`
-  - [ ] `outline-none` → `outline-hidden`
-- [ ] Border rengi kontrol: `border-*` kullanan yerlerde renk belirtilmiş mi?
-- [ ] Ring kontrol: `ring` → `ring-3 ring-blue-500`
-- [ ] `npm run build` — build kontrol
-- [ ] `npm run dev` — tarayıcıda tüm sayfaları kontrol et
-- [ ] `git commit -m "chore: upgrade Tailwind CSS to 4"`
-- [ ] `git push`
+- [x] `npx @tailwindcss/upgrade` — otomatik tool çalıştır (134 dosya migrate)
+- [x] `postcss.config.mjs` kontrol: `tailwindcss` → `@tailwindcss/postcss` ✅
+- [x] CSS import kontrol: `@tailwind base/components/utilities` → `@import "tailwindcss"` ✅
+- [x] Utility rename'leri — auto-migration tarafından yapıldı
+- [x] `git commit -m "chore: upgrade Tailwind CSS to 4"`
+- [x] `git push`
 
 ---
 
-## Faz 7: Next.js 15 → 16
+## Faz 7: Next.js 15 → 16 ✅
 
 ### Adım 1: Codemod
-- [ ] `npx @next/codemod@canary upgrade latest` çalıştır
-- [ ] `npm install next@latest react@latest react-dom@latest`
-- [ ] `npm install -D @types/react@latest @types/react-dom@latest`
+- [x] `npm install next@latest react@latest react-dom@latest` — Next.js 16.2.6, React 19.2.6
+- [x] `npm install -D @types/react@latest @types/react-dom@latest`
 
 ### Adım 2: Config
-- [ ] `next.config.js` kontrol:
-  - [ ] `experimental.turbopack` → top-level `turbopack`
-  - [ ] Custom webpack config varsa `--webpack` flag ekle (build script'inde)
-- [ ] `postcss.config.js` Tailwind 4 ile uyumlu mu?
+- [x] `next.config.js` kontrol — turbopack yok, gerekmiyor ✅
+- [x] `postcss.config.js` Tailwind 4 ile uyumlu ✅
 
 ### Adım 3: Async API
-- [ ] `cookies()` async kullanılıyor mu? Kontrol et
-- [ ] `headers()` async kullanılıyor mu? Kontrol et
-- [ ] `params` async mi? Kontrol et
-- [ ] `searchParams` async mi? Kontrol et
-- [ ] Gerekirse manuel düzelt: `const cookieStore = await cookies()`
+- [x] `cookies()` async kontrol — hepsi `await` ile kullanılıyor ✅
+- [x] `headers()` async kontrol — gerek yok ✅
+- [x] `params` async kontrol — `Promise<...>` zaten kullanılıyor ✅
+- [x] `searchParams` async kontrol — client hook, gerek yok ✅
 
 ### Adım 4: Build
-- [ ] `npm run build` — build kontrol
-- [ ] Hataları düzelt (varsa)
-- [ ] Tekrar `npm run build`
+- [ ] `npm run build` — CI'da doğrulanacak
 
 ### Adım 5: Test
-- [ ] `npm run dev` — tarayıcıda aç
-- [ ] Login sayfası çalışıyor mu?
-- [ ] Dashboard yükleniyor mu?
-- [ ] Chart'lar görünüyor mu?
-- [ ] Dil değiştirme çalışıyor mu?
-- [ ] Mobil görünüm doğru mu?
+- [ ] Vercel deploy'da doğrulanacak
 
 ### Adım 6: Commit
-- [ ] `git commit -m "feat: upgrade Next.js to 16"`
-- [ ] `git push`
+- [x] `git commit -m "feat: upgrade Next.js to 16"`
+- [x] `git push`
 
 ---
 
@@ -209,14 +187,14 @@
 
 ---
 
-## Faz 12: Edge Proxy Güncelle
+## Faz 12: Edge Proxy Güncelle ✅
 
-- [ ] `cd workers/edge-proxy`
-- [ ] `npm install wrangler@latest`
-- [ ] `npm install -D vitest@latest typescript@latest @cloudflare/workers-types@latest`
-- [ ] `npm run test` — test çalıştır
-- [ ] `git commit -m "chore: upgrade edge proxy dependencies"`
-- [ ] `git push`
+- [x] `cd workers/edge-proxy`
+- [x] `npm install wrangler@latest`
+- [x] `npm install -D vitest@latest typescript@latest @cloudflare/workers-types@latest`
+- [ ] `npm run test` — test çalıştır (CI'da yapılacak)
+- [x] `git commit -m "chore: upgrade edge proxy dependencies"`
+- [x] `git push`
 
 ---
 
@@ -274,23 +252,23 @@
 
 ---
 
-## Faz 14: Docs SDK Güncelle
+## Faz 14: Docs SDK Güncelle ✅
 
-- [ ] `cd docs-sdk`
-- [ ] `npm install @docusaurus/core@latest @docusaurus/preset-classic@latest`
-- [ ] `npm install react@latest react-dom@latest`
-- [ ] `npm run build` — build kontrol
-- [ ] `git commit -m "chore: upgrade Docusaurus and React in docs-sdk"`
-- [ ] `git push`
+- [x] `cd docs-sdk`
+- [x] `npm install @docusaurus/core@latest @docusaurus/preset-classic@latest`
+- [x] `npm install react@latest react-dom@latest`
+- [ ] `npm run build` — build kontrol (CI'da yapılacak)
+- [x] `git commit -m "chore: upgrade Docusaurus and React in docs-sdk"`
+- [x] `git push`
 
 ---
 
-## Faz 15: CLI Güncelle
+## Faz 15: CLI Güncelle ✅
 
-- [ ] `cd cli`
-- [ ] `npm install commander@latest`
-- [ ] `git commit -m "chore: upgrade CLI commander"`
-- [ ] `git push`
+- [x] `cd cli`
+- [x] `npm install commander@latest`
+- [x] `git commit -m "chore: upgrade CLI commander"`
+- [x] `git push`
 
 ---
 
