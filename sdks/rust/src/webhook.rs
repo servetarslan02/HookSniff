@@ -95,7 +95,7 @@ pub fn verify_signature(
 
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
+        .expect("system clock is after UNIX epoch")
         .as_secs();
 
     if now.abs_diff(timestamp) > TIMESTAMP_TOLERANCE_SECONDS {

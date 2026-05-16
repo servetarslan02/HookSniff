@@ -3583,9 +3583,9 @@ async fn admin_all_refunds(
         )
     };
 
-    let total: i64 = if params.status.is_some() {
+    let total: i64 = if let Some(ref status) = params.status {
         sqlx::query_scalar(&count_sql)
-            .bind(params.status.as_ref().unwrap())
+            .bind(status)
             .fetch_one(&pool)
             .await?
     } else {
@@ -3594,9 +3594,9 @@ async fn admin_all_refunds(
             .await?
     };
 
-    let refunds = if params.status.is_some() {
+    let refunds = if let Some(ref status) = params.status {
         sqlx::query_as::<_, RefundRow>(&data_sql)
-            .bind(params.status.as_ref().unwrap())
+            .bind(status)
             .bind(per_page)
             .bind(offset)
             .fetch_all(&pool)
@@ -4231,16 +4231,16 @@ async fn admin_user_invoices(
         )
     };
 
-    let total: i64 = if params.status.is_some() {
-        sqlx::query_scalar(&count_sql).bind(id).bind(params.status.as_ref().unwrap()).fetch_one(&pool).await?
+    let total: i64 = if let Some(ref status) = params.status {
+        sqlx::query_scalar(&count_sql).bind(id).bind(status).fetch_one(&pool).await?
     } else {
         sqlx::query_scalar(&count_sql).bind(id).fetch_one(&pool).await?
     };
 
-    let invoices = if params.status.is_some() {
+    let invoices = if let Some(ref status) = params.status {
         sqlx::query_as::<_, InvoiceRow>(&data_sql)
             .bind(id)
-            .bind(params.status.as_ref().unwrap())
+            .bind(status)
             .bind(per_page)
             .bind(offset)
             .fetch_all(&pool)

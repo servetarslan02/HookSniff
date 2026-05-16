@@ -1,7 +1,7 @@
 pub mod idempotency;
 pub mod webhook_verify;
 
-use axum::{extract::Request, http::header::AUTHORIZATION, middleware::Next, response::Response};
+use axum::{extract::Request, http::header::{HeaderValue, AUTHORIZATION}, middleware::Next, response::Response};
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
@@ -965,20 +965,20 @@ pub async fn security_headers_middleware(request: Request, next: Next) -> Respon
     let headers = response.headers_mut();
 
     // Security headers
-    headers.insert("x-content-type-options", "nosniff".parse().unwrap());
-    headers.insert("x-frame-options", "DENY".parse().unwrap());
+    headers.insert("x-content-type-options", HeaderValue::from_static("nosniff"));
+    headers.insert("x-frame-options", HeaderValue::from_static("DENY"));
     headers.insert(
         "strict-transport-security",
-        "max-age=31536000; includeSubDomains".parse().unwrap(),
+        HeaderValue::from_static("max-age=31536000; includeSubDomains"),
     );
     headers.insert(
         "referrer-policy",
-        "strict-origin-when-cross-origin".parse().unwrap(),
+        HeaderValue::from_static("strict-origin-when-cross-origin"),
     );
-    headers.insert("x-xss-protection", "1; mode=block".parse().unwrap());
+    headers.insert("x-xss-protection", HeaderValue::from_static("1; mode=block"));
 
     // Vary: Accept-Encoding for proper CDN caching of compressed responses
-    headers.insert("vary", "Accept-Encoding, Authorization".parse().unwrap());
+    headers.insert("vary", HeaderValue::from_static("Accept-Encoding, Authorization"));
 
     // Smart cache control per path category
     if path.starts_with("/health") || path.starts_with("/v1/status") || path.starts_with("/metrics")
@@ -986,33 +986,33 @@ pub async fn security_headers_middleware(request: Request, next: Next) -> Respon
         // Health/metrics: public, short TTL (CDN can cache briefly)
         headers.insert(
             "cache-control",
-            "public, max-age=10, stale-while-revalidate=5".parse().unwrap(),
+            HeaderValue::from_static("public, max-age=10, stale-while-revalidate=5"),
         );
     } else if path.starts_with("/v1/docs") || path.starts_with("/swagger") {
         // API docs: public, longer TTL (changes rarely)
         headers.insert(
             "cache-control",
-            "public, max-age=3600, stale-while-revalidate=60".parse().unwrap(),
+            HeaderValue::from_static("public, max-age=3600, stale-while-revalidate=60"),
         );
     } else if path.starts_with("/v1/auth") {
         // Auth endpoints: never cache (tokens, sessions)
         headers.insert(
             "cache-control",
-            "no-store, no-cache, must-revalidate".parse().unwrap(),
+            HeaderValue::from_static("no-store, no-cache, must-revalidate"),
         );
         // Prevent auth responses from being cached by CDN
-        headers.insert("pragma", "no-cache".parse().unwrap());
+        headers.insert("pragma", HeaderValue::from_static("no-cache"));
     } else if path.starts_with("/v1/") {
         // API endpoints: private, revalidate
         headers.insert(
             "cache-control",
-            "private, no-cache, must-revalidate".parse().unwrap(),
+            HeaderValue::from_static("private, no-cache, must-revalidate"),
         );
     } else {
         // Default: no-store
         headers.insert(
             "cache-control",
-            "no-store, no-cache, must-revalidate".parse().unwrap(),
+            HeaderValue::from_static("no-store, no-cache, must-revalidate"),
         );
     }
     } // end scoped headers borrow
@@ -1036,7 +1036,7 @@ pub async fn security_headers_middleware(request: Request, next: Next) -> Respon
         let mut hasher = Sha256::new();
         hasher.update(&body);
         let hash = format!("W/\"{}\"", &hex::encode(hasher.finalize())[..16]);
-        response.headers_mut().insert("etag", hash.parse().unwrap());
+        response.headers_mut().insert("etag", HeaderValue::try_from(&hash).expect("etag hash is valid header value"));
 
         // Restore the body
         *response.body_mut() = axum::body::Body::from(body);
