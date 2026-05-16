@@ -323,8 +323,8 @@ export function useSystemHealth() {
       return SystemHealthSchema.parse(data);
     },
     enabled: !!token,
-    refetchInterval: 15_000,
-    staleTime: 10_000,
+    refetchInterval: 30_000,
+    staleTime: 15_000,
   });
 }
 
@@ -351,7 +351,7 @@ export function useFailedDeliveries(params?: { limit?: number; since?: string })
 }
 
 // ── Dead Letters ──
-export function useDeadLetters(params?: { limit?: number }) {
+export function useDeadLetters(params?: { limit?: number; since?: string }) {
   const { token } = useAuth();
   return useQuery({
     queryKey: ['admin', 'dead-letters', params],
