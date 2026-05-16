@@ -58,25 +58,25 @@
 - [x] `scripts/check-sdk-publish.sh` — publish durumunu kontrol et
 - [x] Publish durumu raporu: `PUBLISH-STATUS.md`
 
-### 4.3 SDK Dokümantasyon Sitesi ⏳
+### 4.3 SDK Dokümantasyon Sitesi ✅
 - [x] Docusaurus projesi: `docs-sdk/`
 - [x] Ana sayfa (intro)
 - [x] Node.js Quick Start (referans)
 - [x] Webhook Verification Guide (tüm diller)
 - [x] API Reference sayfası
 - [x] Sidebar yapısı (11 SDK + guides)
-- [ ] Python Quick Start
-- [ ] Go Quick Start
-- [ ] Rust Quick Start
-- [ ] Ruby Quick Start
-- [ ] Java Quick Start
-- [ ] Kotlin Quick Start
-- [ ] PHP Quick Start
-- [ ] C# Quick Start
-- [ ] Elixir Quick Start
-- [ ] Swift Quick Start
-- [ ] Error Handling Guide
-- [ ] Pagination Guide
+- [x] Python Quick Start
+- [x] Go Quick Start
+- [x] Rust Quick Start
+- [x] Ruby Quick Start
+- [x] Java Quick Start
+- [x] Kotlin Quick Start
+- [x] PHP Quick Start
+- [x] C# Quick Start
+- [x] Elixir Quick Start
+- [x] Swift Quick Start
+- [x] Error Handling Guide
+- [x] Pagination Guide
 - [ ] Migration Guide (0.x → 1.0.0)
 - [ ] Deploy (Vercel/Netlify)
 - [ ] docs.hooksniff.dev domain
