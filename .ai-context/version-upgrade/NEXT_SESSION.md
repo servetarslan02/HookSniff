@@ -1,6 +1,6 @@
 # Next Session — Version Upgrade
 
-> Son güncelleme: 2026-05-17 03:56 GMT+8
+> Son güncelleme: 2026-05-17 04:35 GMT+8
 
 ---
 
@@ -12,20 +12,20 @@
 
 ## Nereden Başla?
 
-**Branch:** `upgrade/system-updates` (zaten var, 9 commit pushed)
+**Branch:** `upgrade/system-updates` (13 commit pushed)
 
-Sıradaki fazlar (npm install gerektirir, Servet onayı ile):
+Sıradaki fazlar:
 
 ```
-- [ ] Faz 2 Dashboard: npm update (dikkatli ol, memory limiti var)
-- [ ] Faz 3: TypeScript 6
-- [ ] Faz 4: ESLint 10
-- [ ] Faz 5: recharts 3
-- [ ] Faz 6: Tailwind 4
-- [ ] Faz 7: Next.js 16
+- [ ] Faz 2 Dashboard NPM: next-intl, vitest, dompurify minor patches
+- [ ] Faz 6: Tailwind 4 (npx @tailwindcss/upgrade)
+- [ ] Faz 7: Next.js 16 (codemod + async API'lar)
+- [ ] Faz 12: Edge Proxy güncelleme
+- [ ] Faz 14-15: Docs SDK, CLI
+- [ ] Faz 17-23: Kalan düzeltmeler
 ```
 
-**ÖNEMLİ:** npm install/çalıştırma Servet'in uyarısı — memory limiti yüzünden çöküyor. CI'da yapılmalı veya dikkatli olunmalı.
+**Swap dosyası aktif:** `swapon /swapfile` (2 GB) — npm install çalışır.
 
 ## Sıralama (ÖNEMLİ!)
 
