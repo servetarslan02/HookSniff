@@ -100,16 +100,8 @@ async fn list_audit_entries(
 
     let where_sql = where_clauses.join(" AND ");
 
-    // Count total
-    let count_sql = format!("SELECT COUNT(*) FROM audit_log WHERE {}", where_sql);
-    let mut count_query = sqlx::query_scalar::<_, i64>(&count_sql).bind(customer.id);
-    if let Some(ref action) = query.action {
-        count_query = count_query.bind(action);
-    }
-    if let Some(ref resource_type) = query.resource_type {
-        count_query = count_query.bind(resource_type);
-    }
-    let total = count_query.fetch_one(&pool).await?;
+    // Fetch limit+1 rows to detect has_more (avoids separate COUNT query)
+    let fetch_limit = limit + 1;
 
     // Fetch entries with customer info
     // NOTE: where_sql already uses unqualified column names; the `a.` alias
@@ -144,9 +136,11 @@ async fn list_audit_entries(
     if let Some(ref resource_type) = query.resource_type {
         data_query = data_query.bind(resource_type);
     }
-    data_query = data_query.bind(limit).bind(offset);
+    data_query = data_query.bind(fetch_limit).bind(offset);
 
-    let rows = data_query.fetch_all(&pool).await?;
+    let mut rows = data_query.fetch_all(&pool).await?;
+    let has_more = rows.len() > limit as usize;
+    rows.truncate(limit as usize);
 
     let entries = rows
         .into_iter()
@@ -182,10 +176,10 @@ async fn list_audit_entries(
 
     Ok(Json(AuditLogResponse {
         entries,
-        total,
+        total: 0, // Not computed — use has_more for pagination
         limit,
         offset,
-        has_more: offset + limit < total,
+        has_more,
     }))
 }
 
