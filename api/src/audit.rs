@@ -39,7 +39,12 @@ pub async fn log_action(
         let s = d.to_string();
         if s.len() > 8192 {
             tracing::warn!("Audit log details truncated for action '{}' ({} bytes > 8KB)", action, s.len());
-            serde_json::json!({ "_truncated": true, "_original_bytes": s.len(), "preview": &s[..4096] })
+            // Safe UTF-8 truncation — find nearest char boundary before 4096
+            let mut end = 4096.min(s.len());
+            while end > 0 && !s.is_char_boundary(end) {
+                end -= 1;
+            }
+            serde_json::json!({ "_truncated": true, "_original_bytes": s.len(), "preview": &s[..end] })
         } else {
             d
         }
