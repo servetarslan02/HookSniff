@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 03:52 GMT+8 (Oturum 179)
+> Son güncelleme: 2026-05-17 04:45 GMT+8 (Oturum 180)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,14 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 180 — 2026-05-17 04:45 GMT+8
+1. **Admin i18n — Overview & Users Sayfaları** ✅
+   - Users page: 5 eksik key eklendi (bulkActionConfirm, bulkBan, bulkChangePlan, bulkUnban, selectedCount)
+   - User detail page: 6 eksik key eklendi (cancel, date, headers, invoices, payments, viewDetails)
+   - EN ve TR dosyalarına eşit ekleme yapıldı
+   - Hardcoded İngilizce string kontrolü: temiz ✅
+   - Commit: d40a9ff5 — push edildi
 
 ### Oturum 179 — 2026-05-17 03:52 GMT+8
 1. **Health Check Redis Cache** ✅ — 30sn cache, DB + Redis PING azaltıldı
