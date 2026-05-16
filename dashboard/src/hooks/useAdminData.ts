@@ -104,7 +104,7 @@ export function useAdminFeatureFlags() {
       FeatureFlagsResponseSchema
     ),
     enabled: !!token,
-    staleTime: 5 * 60_000,
+    staleTime: 30_000,
   });
 }
 
