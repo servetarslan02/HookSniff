@@ -16,7 +16,7 @@ export function RecentDeliveriesTable({ deliveries, loading }: RecentDeliveriesT
     return (
       <div className="space-y-2 p-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse h-10 bg-gray-100 dark:bg-slate-800 rounded" />
+          <div key={i} className="animate-pulse h-10 bg-gray-100 dark:bg-slate-800 rounded-sm" />
         ))}
       </div>
     );

@@ -246,7 +246,7 @@ export default function DeliveriesPage() {
                         type="checkbox"
                         checked={filtered.length > 0 && selectedIds.size === filtered.length}
                         onChange={toggleSelectAll}
-                        className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
+                        className="w-4 h-4 rounded-sm text-brand-600 focus:ring-brand-500"
                         aria-label={t('selectAll')}
                       />
                     </div>
@@ -277,7 +277,7 @@ export default function DeliveriesPage() {
                         checked={selectedIds.has(d.id)}
                         onChange={(e) => toggleSelect(d.id, e as unknown as React.MouseEvent)}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
+                        className="w-4 h-4 rounded-sm text-brand-600 focus:ring-brand-500"
                         aria-label={`Select ${d.id.slice(0, 12)}`}
                       />
                     </div>
@@ -355,7 +355,7 @@ export default function DeliveriesPage() {
       {/* Detail Modal */}
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => setSelected(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" aria-hidden="true" onClick={() => setSelected(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80dvh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('details')}</h3>
@@ -376,7 +376,7 @@ export default function DeliveriesPage() {
                 <div className="space-y-3">
                   {Array.from({ length: selected.attempt_count }).map((_, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <div className="mt-1 w-2 h-2 rounded-full bg-brand-500 flex-shrink-0" />
+                      <div className="mt-1 w-2 h-2 rounded-full bg-brand-500 shrink-0" />
                       <div>
                         <p className="text-sm font-medium text-gray-900 dark:text-white">{t('attemptN', { n: i + 1 })}</p>
                         <p className="text-xs text-gray-500 dark:text-slate-400">

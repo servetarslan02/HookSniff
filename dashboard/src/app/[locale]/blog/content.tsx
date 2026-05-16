@@ -113,7 +113,7 @@ export function BlogPageContent() {
         </div>
 
         {/* Newsletter */}
-        <div className="bg-gradient-to-r from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20 p-6 mb-10">
+        <div className="bg-linear-to-r from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20 p-6 mb-10">
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <div className="flex-1">
               <h3 className="font-semibold text-gray-900 dark:text-white">{t("subscribe")}</h3>
@@ -125,7 +125,7 @@ export function BlogPageContent() {
                 placeholder="you@example.com"
                 value={newsletterEmail}
                 onChange={(e) => setNewsletterEmail(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none w-64"
+                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-hidden w-64"
               />
               <button
                 type="submit"
@@ -154,7 +154,7 @@ export function BlogPageContent() {
               placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+              className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-hidden"
             />
             {searchQuery && (
               <button
@@ -193,7 +193,7 @@ export function BlogPageContent() {
         {/* Featured Post */}
         {currentPage === 1 && activeCategory === 'catAll' && !searchQuery && filteredPosts.filter((p) => p.featured).map((post) => (
           <Link key={post.slug} href={`/blog/${post.slug}`} className="block group mb-8">
-            <article className="bg-gradient-to-br from-white to-gray-50 dark:from-slate-900 dark:to-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-700 p-8 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
+            <article className="bg-linear-to-br from-white to-gray-50 dark:from-slate-900 dark:to-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-700 p-8 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-xs font-medium bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 px-2.5 py-1 rounded-full">⭐ {t('featured')}</span>
                 <span className="text-xs font-medium bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-2.5 py-1 rounded-full">{t(post.categoryKey)}</span>
@@ -205,7 +205,7 @@ export function BlogPageContent() {
               <p className="text-gray-600 dark:text-slate-400 leading-relaxed text-lg">{t(post.excerptKey)}</p>
               <div className="flex gap-2 mt-4">
                 {post.tags.map(tag => (
-                  <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 px-2 py-0.5 rounded">#{tag}</span>
+                  <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 px-2 py-0.5 rounded-sm">#{tag}</span>
                 ))}
               </div>
             </article>
@@ -230,7 +230,7 @@ export function BlogPageContent() {
                 <p className="text-gray-600 dark:text-slate-400 leading-relaxed text-sm">{t(post.excerptKey)}</p>
                 <div className="flex gap-2 mt-3">
                   {post.tags.map(tag => (
-                    <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 px-2 py-0.5 rounded">#{tag}</span>
+                    <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 px-2 py-0.5 rounded-sm">#{tag}</span>
                   ))}
                 </div>
               </article>

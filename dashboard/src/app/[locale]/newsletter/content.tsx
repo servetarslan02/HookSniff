@@ -140,7 +140,7 @@ export function NewsletterPageContent() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-hidden"
               />
               <button
                 type="submit"
@@ -300,7 +300,7 @@ export function NewsletterPageContent() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Who writes this?</h2>
           <div className="max-w-lg mx-auto flex items-start gap-4 p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold shrink-0">
+            <div className="w-12 h-12 rounded-full bg-linear-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold shrink-0">
               S
             </div>
             <div>
@@ -359,7 +359,7 @@ export function NewsletterPageContent() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center p-8 bg-gradient-to-br from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-200 dark:border-brand-500/20">
+        <div className="text-center p-8 bg-linear-to-br from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-200 dark:border-brand-500/20">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ready to stay in the loop?</h3>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">Join 500+ developers getting webhook insights.</p>
           {status !== 'success' && (
@@ -370,7 +370,7 @@ export function NewsletterPageContent() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-hidden"
               />
               <button
                 type="submit"

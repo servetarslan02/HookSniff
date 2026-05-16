@@ -247,9 +247,9 @@ export default function AlertsPage() {
                     aria-checked={alert.is_active}
                     onClick={() => toggleAlert(alert)}
                     disabled={togglingId === alert.id}
-                    className={`relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${alert.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'} ${togglingId === alert.id ? 'opacity-60' : ''}`}
+                    className={`relative w-10 h-5 rounded-full transition-colors duration-200 shrink-0 ${alert.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'} ${togglingId === alert.id ? 'opacity-60' : ''}`}
                   >
-                    <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${alert.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
+                    <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-xs transition-transform duration-200 ${alert.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
                   </button>
                   <button type="button"
                     onClick={() => openEdit(alert)}
@@ -288,7 +288,7 @@ export default function AlertsPage() {
       {/* Edit Modal */}
       {editTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditTarget(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setEditTarget(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               {t('editAlert')}: {editTarget.name}

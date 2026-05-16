@@ -31,7 +31,7 @@ export default function RoutingPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {ep.routing_strategy && (
-                      <span className="px-2 py-0.5 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 rounded text-xs">{ep.routing_strategy}</span>
+                      <span className="px-2 py-0.5 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 rounded-sm text-xs">{ep.routing_strategy}</span>
                     )}
                     <span className={`px-2 py-0.5 rounded-full text-xs ${ep.is_active ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'}`}>
                       {ep.is_active ? tc('active') : tc('inactive')}

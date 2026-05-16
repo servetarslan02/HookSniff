@@ -121,7 +121,7 @@ export function ChangelogPageContent() {
           ) : (
             <>
               <form onSubmit={handleSubscribe} className="flex gap-2">
-                <input type="email" placeholder={t('emailPlaceholder')} value={email} onChange={(e) => setEmail(e.target.value)} className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" required />
+                <input type="email" placeholder={t('emailPlaceholder')} value={email} onChange={(e) => setEmail(e.target.value)} className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-hidden" required />
                 <button type="submit" className="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors shrink-0">{t("subscribe")}</button>
               </form>
               {subscribeError && <p className="text-xs text-red-500 dark:text-red-400 mt-2 text-center">{subscribeError}</p>}

@@ -60,7 +60,7 @@ export function KeyList({
                   {key.name && (
                     <span className="text-sm font-medium text-gray-900 dark:text-white">{key.name}</span>
                   )}
-                  <code className="text-sm font-mono text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                  <code className="text-sm font-mono text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded-sm">
                     {key.prefix}…
                   </code>
                   <span

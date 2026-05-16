@@ -38,7 +38,7 @@ export default function SdkTabs({ tabs }: { tabs: Tab[] }) {
         <div className="flex-1" />
         <button
           onClick={handleCopy}
-          className="mr-2 px-2 py-1 text-xs font-medium rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
+          className="mr-2 px-2 py-1 text-xs font-medium rounded-sm bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
         >
           {copied ? `✓ ${t('copied')}` : t('copy')}
         </button>

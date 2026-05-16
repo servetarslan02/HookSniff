@@ -138,8 +138,8 @@ export default function EndpointsPage() {
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="glass-card p-6 animate-pulse">
-            <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/4 mb-3"></div>
-            <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/4 mb-3"></div>
+            <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2"></div>
           </div>
         ))}
       </div>
@@ -238,7 +238,7 @@ export default function EndpointsPage() {
                   type="checkbox"
                   checked={selected.size === endpoints.length && endpoints.length > 0}
                   onChange={toggleSelectAll}
-                  className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
+                  className="w-4 h-4 rounded-sm text-brand-600 focus:ring-brand-500"
                 />
                 <span className="text-sm text-gray-600 dark:text-slate-400">{t('selectAllLabel', { count: endpoints.length })}</span>
               </label>
@@ -264,7 +264,7 @@ export default function EndpointsPage() {
                     type="checkbox"
                     checked={selected.has(ep.id)}
                     onChange={() => toggleSelect(ep.id)}
-                    className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 mt-1 mr-3"
+                    className="w-4 h-4 rounded-sm text-brand-600 focus:ring-brand-500 mt-1 mr-3"
                   />
                 )}
                 <div className="flex-1">
@@ -279,10 +279,10 @@ export default function EndpointsPage() {
                       aria-checked={ep.is_active}
                       onClick={() => handleToggle(ep.id, ep.is_active)}
                       disabled={togglingId === ep.id}
-                      className={`relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${ep.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'} ${togglingId === ep.id ? 'opacity-60' : ''}`}
+                      className={`relative w-10 h-5 rounded-full transition-colors duration-200 shrink-0 ${ep.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'} ${togglingId === ep.id ? 'opacity-60' : ''}`}
                       title={ep.is_active ? t('disable') : t('enable')}
                     >
-                      <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${ep.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
+                      <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-xs transition-transform duration-200 ${ep.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
                     </button>
                     <span className="text-xs text-gray-500 dark:text-slate-400">{ep.is_active ? t('active') : t('inactive')}</span>
                   </div>
@@ -343,7 +343,7 @@ export default function EndpointsPage() {
       {/* New Secret Modal */}
       {newSecret && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setNewSecret(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setNewSecret(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">🔑 {t('newSecret')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">

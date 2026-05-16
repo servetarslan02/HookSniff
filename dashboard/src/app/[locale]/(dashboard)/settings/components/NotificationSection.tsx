@@ -89,8 +89,8 @@ export function NotificationSection() {
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center justify-between py-3">
               <div>
-                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-40 mb-2" />
-                <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-64" />
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-40 mb-2" />
+                <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded-sm w-64" />
               </div>
               <div className="w-11 h-6 bg-gray-200 dark:bg-slate-700 rounded-full" />
             </div>

@@ -112,7 +112,7 @@ export default function CustomDomainPage() {
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {dnsRecords.map((rec, i) => (
                   <tr key={i}>
-                    <td className="px-4 py-3"><span className="font-mono text-sm bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded">{rec.type}</span></td>
+                    <td className="px-4 py-3"><span className="font-mono text-sm bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-sm">{rec.type}</span></td>
                     <td className="px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">{rec.name}</td>
                     <td className="px-4 py-3 font-mono text-sm text-gray-600 dark:text-slate-400 break-all">{rec.value}</td>
                     <td className="px-4 py-3">
@@ -160,7 +160,7 @@ export default function CustomDomainPage() {
             { step: '3', title: t('step3Title'), desc: t('step3Desc') },
           ].map((item) => (
             <div key={item.step} className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm shrink-0">
                 {item.step}
               </div>
               <div>

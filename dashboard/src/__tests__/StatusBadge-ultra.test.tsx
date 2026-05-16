@@ -137,7 +137,7 @@ describe('StatusBadge-ultra', () => {
   });
 
   // Test 18: Has ring styling
-  it('has ring styling', () => {
+  it('has ring-3 styling', () => {
     const { container } = render(<StatusBadge status="delivered" />);
     const badge = container.querySelector('span')!;
     expect(badge.className).toContain('ring-1');

@@ -92,7 +92,7 @@ export default function ConfirmDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/40 backdrop-blur-xs"
         onClick={onCancel}
         aria-hidden="true"
       />
@@ -102,7 +102,7 @@ export default function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         tabIndex={-1}
-        className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6 outline-none"
+        className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6 outline-hidden"
       >
         <h3 id="confirm-dialog-title" className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
           {title}

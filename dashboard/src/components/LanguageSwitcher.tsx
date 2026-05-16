@@ -41,7 +41,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
         aria-label={t("switchLanguage")}
       >
-        <span className="text-lg font-semibold text-xs bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">{current.code.toUpperCase()}</span>
+        <span className="text-lg font-semibold text-xs bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded-sm">{current.code.toUpperCase()}</span>
         <span className="hidden sm:inline">{current.name}</span>
         <svg
           className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`}
@@ -65,7 +65,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
                   : 'text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700'
               }`}
             >
-              <span className="text-xs font-semibold bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">{lang.code.toUpperCase()}</span>
+              <span className="text-xs font-semibold bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded-sm">{lang.code.toUpperCase()}</span>
               <span>{lang.name}</span>
               {lang.code === locale && (
                 <svg className="w-4 h-4 ml-auto text-brand-500" fill="currentColor" viewBox="0 0 20 20">

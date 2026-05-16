@@ -33,7 +33,7 @@ cd HookSniff
 make self-host`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          This command copies <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">.env.example</code> → <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">.env</code>, builds Docker images, starts all services, and runs health checks.
+          This command copies <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">.env.example</code> → <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">.env</code>, builds Docker images, starts all services, and runs health checks.
         </p>
       </section>
 
@@ -63,7 +63,7 @@ make self-host`}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("environmentVariables")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Configure via <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">.env</code> file:
+          Configure via <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">.env</code> file:
         </p>
         <CodeBlock
           code={`# Database (don't change if using Docker PostgreSQL)
@@ -83,7 +83,7 @@ API_BASE_URL=http://localhost:3000
 DASHBOARD_URL=http://localhost:3001`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          Generate secrets: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">make generate-secret</code>
+          Generate secrets: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">make generate-secret</code>
         </p>
       </section>
 

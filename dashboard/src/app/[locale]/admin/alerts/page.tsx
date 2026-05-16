@@ -126,8 +126,8 @@ export default function AdminAlertsPage() {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-48 mb-2" />
-          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-64" />
+          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded-sm w-48 mb-2" />
+          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-64" />
         </div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (

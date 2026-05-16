@@ -25,7 +25,7 @@ export default function EventTypesPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">What Are Event Types?</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Event types are string identifiers that describe what happened. They follow a <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">resource.action</code> pattern:
+          Event types are string identifiers that describe what happened. They follow a <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">resource.action</code> pattern:
         </p>
         <div className="grid grid-cols-2 gap-3 mb-4">
           {[
@@ -44,7 +44,7 @@ export default function EventTypesPage() {
           ))}
         </div>
         <p className="text-gray-600 dark:text-slate-400">
-          You can use any string format, but <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">resource.action</code> is recommended for consistency.
+          You can use any string format, but <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">resource.action</code> is recommended for consistency.
         </p>
       </section>
 
@@ -65,7 +65,7 @@ export default function EventTypesPage() {
   }'`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          The event type <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order.created</code> is now available for filtering and search.
+          The event type <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.created</code> is now available for filtering and search.
         </p>
       </section>
 
@@ -73,7 +73,7 @@ export default function EventTypesPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("filteringByEvent")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Configure endpoints to only receive specific event types using the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">event_filter</code> field:
+          Configure endpoints to only receive specific event types using the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">event_filter</code> field:
         </p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \\
@@ -89,9 +89,9 @@ export default function EventTypesPage() {
           Supported filter patterns:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order.created</code> — Exact match</li>
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order.*</code> — Wildcard (all order events)</li>
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">*</code> — All events (default)</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.created</code> — Exact match</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.*</code> — Wildcard (all order events)</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">*</code> — All events (default)</li>
         </ul>
       </section>
 
@@ -128,7 +128,7 @@ export default function EventTypesPage() {
 }`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          When a schema is defined, payloads that don't match are rejected with a <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">400 Bad Request</code> error.
+          When a schema is defined, payloads that don't match are rejected with a <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">400 Bad Request</code> error.
         </p>
       </section>
     </article>
