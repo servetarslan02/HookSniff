@@ -225,6 +225,23 @@ export default {
       );
     }
   },
+
+  // Keep-alive: ping all regional Cloud Run instances every 5 min
+  // to prevent cold starts (Cloud Run scales to 0 after ~15 min idle)
+  async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext) {
+    const regions = [env.API_BASE, env.API_BASE_EU, env.API_BASE_ME, env.API_BASE_US].filter(Boolean);
+    const results = await Promise.allSettled(
+      regions.map(async (base) => {
+        const url = `${base}/health`;
+        const res = await fetch(url, { method: 'GET' });
+        return { region: base, status: res.status };
+      })
+    );
+    const summary = results.map((r) =>
+      r.status === 'fulfilled' ? `${r.value.region.split('.')[0]}:${r.value.status}` : 'fail'
+    );
+    console.log(`[KeepAlive] ${summary.join(' | ')}`);
+  },
 };
 
 // ── Rate Limiting (KV-based sliding window) ──
