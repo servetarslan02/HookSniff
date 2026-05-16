@@ -569,7 +569,7 @@ export default function AdminRevenuePage() {
                         color: 'white',
                         fontSize: '12px',
                       }}
-                      formatter={(value: number) => [`$${value.toLocaleString()}`, t("revenue")]}
+                      formatter={(value) => [`$${Number(value).toLocaleString()}`, t("revenue")]}
                     />
                     <Bar
                       dataKey="revenue"
@@ -617,7 +617,7 @@ export default function AdminRevenuePage() {
                           color: 'white',
                           fontSize: '12px',
                         }}
-                        formatter={(value: number) => [`$${value.toLocaleString()}`, t("revenue")]}
+                        formatter={(value) => [`$${Number(value).toLocaleString()}`, t("revenue")]}
                       />
                     </PieChart>
                   </ResponsiveContainer>

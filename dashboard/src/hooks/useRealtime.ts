@@ -1,5 +1,5 @@
-const rtDebug = process.env.NODE_ENV === 'development' ? console.log : () => {};
 'use client';
+const rtDebug = process.env.NODE_ENV === 'development' ? console.log : () => {};
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useWebSocket } from './useWebSocket';
