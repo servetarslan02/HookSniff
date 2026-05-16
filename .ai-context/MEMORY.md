@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 04:58 GMT+8 (Oturum 182)
+> Son güncelleme: 2026-05-17 05:00 GMT+8 (Oturum 183)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,16 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 183 — 2026-05-17 05:00 GMT+8
+1. **Revenue Derin Araştırma — 6 Bulgu Daha** ✅
+   - `paying_customers`: `plan != 'free'` → `plan NOT IN ('free','developer')` (eski sorgu tüm kullanıcıları sayıyordu)
+   - `expansion_revenue`: `startup` planı filtreye eklendi (sadece pro/enterprise sayılıyordu)
+   - `export_revenue_csv`: `generate_series(0, 11)` → `generate_series(0, $1 - 1)` (months parametresi artık kullanılıyor)
+   - Date range filtreleme: mevcut ay artık her zaman gösteriliyor (7d/30d seçiliyken gizleniyordu)
+   - `last12Months` key eklendi (EN+TR)
+   - `retention` key eklendi (EN+TR)
+   - Commit: 99c0fe59 — push edildi
 
 ### Oturum 182 — 2026-05-17 04:58 GMT+8
 1. **Churn Amount Düzeltmesi** ✅
