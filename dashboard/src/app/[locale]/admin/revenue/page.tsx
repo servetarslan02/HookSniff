@@ -69,6 +69,7 @@ export default function AdminRevenuePage() {
   const monthlyData = (() => {
     if (dateRange === 'all') return allMonthlyData;
     const now = new Date();
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     let cutoff: Date;
     switch (dateRange) {
       case '7d': cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); break;
@@ -78,8 +79,12 @@ export default function AdminRevenuePage() {
       default: return allMonthlyData;
     }
     return allMonthlyData.filter((m) => {
-      const d = new Date(m.month);
-      return d >= cutoff;
+      // Always include current month (it has partial data)
+      if (m.month === currentMonth) return true;
+      // For other months, check if month end is after cutoff
+      const d = new Date(m.month + '-01');
+      const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+      return monthEnd >= cutoff;
     });
   })();
 
