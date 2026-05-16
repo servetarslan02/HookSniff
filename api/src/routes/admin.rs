@@ -4202,14 +4202,20 @@ async fn admin_revenue_metrics(
     let arpu = if paying_customers > 0 { mrr_val / paying_customers as f64 } else { 0.0 };
 
     // Average months retained — avg time between first and last invoice per customer
+    // Includes single-invoice customers (0 months retained for them)
     let avg_months: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(AVG(EXTRACT(EPOCH FROM (MAX(paid_at) - MIN(paid_at))) / 2592000.0), 0.0)
+        r#"SELECT COALESCE(AVG(
+             CASE WHEN COUNT(*) > 1
+               THEN EXTRACT(EPOCH FROM (MAX(paid_at) - MIN(paid_at))) / 2592000.0
+               ELSE 0.0
+             END
+           ), 0.0)
            FROM invoices WHERE status = 'paid'
-           GROUP BY customer_id HAVING COUNT(*) > 1"#
+           GROUP BY customer_id"#
     )
     .fetch_one(&pool)
     .await?;
-    let avg_months_val = avg_months.0.unwrap_or(0.0).max(1.0);
+    let avg_months_val = avg_months.0.unwrap_or(0.0);
 
     // LTV — ARPU * avg months retained
     let ltv = arpu * avg_months_val;
@@ -4230,18 +4236,25 @@ async fn admin_revenue_metrics(
         0.0
     };
 
-    // NRR — revenue from existing customers this month vs last month
+    // NRR — revenue from existing customers (created before this month) this month vs last month
     let current_month_rev: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0)
-           FROM invoices WHERE status = 'paid' AND paid_at >= DATE_TRUNC('month', NOW())"#
+        r#"SELECT COALESCE(SUM(i.amount_cents::double precision / 100.0), 0.0)
+           FROM invoices i
+           JOIN customers c ON c.id = i.customer_id
+           WHERE i.status = 'paid'
+             AND i.paid_at >= DATE_TRUNC('month', NOW())
+             AND c.created_at < DATE_TRUNC('month', NOW())"#
     )
     .fetch_one(&pool)
     .await?;
     let last_month_rev: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0)
-           FROM invoices WHERE status = 'paid'
-             AND paid_at >= DATE_TRUNC('month', NOW() - INTERVAL '1 month')
-             AND paid_at < DATE_TRUNC('month', NOW())"#
+        r#"SELECT COALESCE(SUM(i.amount_cents::double precision / 100.0), 0.0)
+           FROM invoices i
+           JOIN customers c ON c.id = i.customer_id
+           WHERE i.status = 'paid'
+             AND i.paid_at >= DATE_TRUNC('month', NOW() - INTERVAL '1 month')
+             AND i.paid_at < DATE_TRUNC('month', NOW())
+             AND c.created_at < DATE_TRUNC('month', NOW() - INTERVAL '1 month')"#
     )
     .fetch_one(&pool)
     .await?;
@@ -4292,19 +4305,24 @@ async fn admin_revenue_cohorts(
         r#"WITH cohort_base AS (
              SELECT
                TO_CHAR(DATE_TRUNC('month', c.created_at), 'YYYY-MM') as cohort_month,
-               c.id as customer_id
+               c.id as customer_id,
+               DATE_TRUNC('month', c.created_at) as cohort_start
              FROM customers c
              WHERE c.created_at >= NOW() - ($1 || ' months')::interval
            ),
            cohort_revenue AS (
              SELECT
-               TO_CHAR(DATE_TRUNC('month', cb.created_at), 'YYYY-MM') as cohort_month,
+               cb.cohort_month,
                COUNT(DISTINCT cb.customer_id) as customers_signed_up,
                COUNT(DISTINCT CASE WHEN i.paid_at >= NOW() - INTERVAL '30 days' THEN cb.customer_id END) as customers_active,
-               COALESCE(SUM(i.amount_cents), 0) as total_revenue_cents
+               COALESCE(SUM(
+                 CASE WHEN i.paid_at >= cb.cohort_start
+                   AND i.paid_at < cb.cohort_start + INTERVAL '1 month'
+                 THEN i.amount_cents ELSE 0 END
+               ), 0) as total_revenue_cents
              FROM cohort_base cb
              LEFT JOIN invoices i ON i.customer_id = cb.customer_id AND i.status = 'paid'
-             GROUP BY TO_CHAR(DATE_TRUNC('month', cb.created_at), 'YYYY-MM')
+             GROUP BY cb.cohort_month
            )
            SELECT
              cohort_month,
