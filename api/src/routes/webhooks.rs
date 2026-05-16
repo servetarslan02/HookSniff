@@ -12,6 +12,7 @@ use uuid::Uuid;
 use crate::config::Config;
 use crate::db;
 use crate::error::AppError;
+use crate::feature_flags::FeatureFlagService;
 use crate::middleware::idempotency;
 use crate::models::customer::Customer;
 use crate::models::delivery::{
@@ -133,6 +134,7 @@ async fn create_webhook(
     Extension(cfg): Extension<Config>,
     Extension(is_test): Extension<crate::middleware::IsTestKey>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    Extension(feature_flags): Extension<FeatureFlagService>,
     headers: axum::http::header::HeaderMap,
     Json(req): Json<CreateWebhookRequest>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
@@ -160,6 +162,43 @@ async fn create_webhook(
                     is_test: None,
                 }),
             ));
+        }
+    }
+
+    // Content-based deduplication (when feature flag is enabled)
+    if feature_flags.is_enabled("deduplication").await {
+        let content_hash = idempotency::compute_body_hash(&req.data);
+        let dedup_window = chrono::Duration::seconds(60); // 60s dedup window
+        let cutoff = Utc::now() - dedup_window;
+
+        let duplicate = sqlx::query_as::<_, (Uuid, String, chrono::DateTime<Utc>)>(
+            "SELECT id, status, created_at FROM deliveries \
+             WHERE endpoint_id = $1 AND customer_id = $2 AND payload_hash = $3 \
+             AND created_at >= $4 ORDER BY created_at DESC LIMIT 1"
+        )
+        .bind(req.endpoint_id)
+        .bind(customer.id)
+        .bind(&content_hash)
+        .bind(cutoff)
+        .fetch_optional(&pool)
+        .await?;
+
+        if let Some((dup_id, dup_status, dup_created)) = duplicate {
+            tracing::info!(
+                "🔁 Dedup: returning existing delivery {} for content hash (flag enabled)",
+                dup_id
+            );
+            return Ok(Json(DeliveryResponse {
+                id: dup_id,
+                endpoint_id: req.endpoint_id,
+                event: req.event,
+                status: dup_status,
+                attempt_count: 0,
+                response_status: None,
+                replay_count: Some(0),
+                created_at: dup_created,
+                is_test: None,
+            }));
         }
     }
 
@@ -649,8 +688,14 @@ async fn batch_replay(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(_cfg): Extension<Config>,
+    Extension(feature_flags): Extension<FeatureFlagService>,
     Json(req): Json<BatchReplayRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // Gate behind bulk_replay feature flag
+    if !feature_flags.is_enabled("bulk_replay").await {
+        return Err(AppError::BadRequest("Bulk replay is not enabled. Contact support to enable this feature.".into()));
+    }
+
     if req.delivery_ids.is_empty() {
         return Err(AppError::BadRequest("Please provide at least one delivery ID to replay".into()));
     }
