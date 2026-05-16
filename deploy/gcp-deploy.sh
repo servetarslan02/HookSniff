@@ -38,7 +38,7 @@ error() { echo -e "${RED}❌ $1${NC}"; exit 1; }
 
 # ── Konfigürasyon ──
 PROJECT_ID="hooksniff-app"
-REGION="europe-west1"  # Avrupa (düşük gecikme için Türkiye'ye yakın)
+REGION="europe-west3"  # Frankfurt — Türkiye'ye ~100ms (europe-west1 yerine)
 API_SERVICE="hooksniff-api"
 WORKER_SERVICE="hooksniff-worker"
 REPO="hooksniff"
