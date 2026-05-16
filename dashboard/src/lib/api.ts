@@ -701,7 +701,7 @@ export const adminApi = {
   getStats: (token: string) =>
     apiFetch<AdminStatsResponse>('/admin/stats', { token }),
 
-  listUsers: (token: string, params?: { page?: number; search?: string; plan?: string; status?: string; created_after?: string; created_before?: string }) => {
+  listUsers: (token: string, params?: { page?: number; search?: string; plan?: string; status?: string; created_after?: string; created_before?: string; sort_field?: string; sort_dir?: string }) => {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set('page', params.page.toString());
     if (params?.search) searchParams.set('search', params.search);
@@ -709,6 +709,8 @@ export const adminApi = {
     if (params?.status) searchParams.set('status', params.status);
     if (params?.created_after) searchParams.set('created_after', params.created_after);
     if (params?.created_before) searchParams.set('created_before', params.created_before);
+    if (params?.sort_field) searchParams.set('sort_field', params.sort_field);
+    if (params?.sort_dir) searchParams.set('sort_dir', params.sort_dir);
     const qs = searchParams.toString();
     return apiFetch<AdminUsersResponse>(`/admin/users${qs ? `?${qs}` : ''}`, { token });
   },
@@ -725,8 +727,8 @@ export const adminApi = {
   sendUserEmail: (token: string, id: string, subject: string, body: string) =>
     apiFetch<{ message: string }>(`/admin/users/${id}/send-email`, { method: 'POST', body: { subject, body }, token }),
 
-  updateUserStatus: (token: string, id: string, status: 'active' | 'banned') =>
-    apiFetch<{ success: boolean }>(`/admin/users/${id}/status`, { method: 'PUT', body: { is_active: status === 'active' }, token }),
+  updateUserStatus: (token: string, id: string, status: 'active' | 'banned', reason?: string) =>
+    apiFetch<{ success: boolean }>(`/admin/users/${id}/status`, { method: 'PUT', body: { is_active: status === 'active', reason }, token }),
 
   getRevenue: (token: string) =>
     apiFetch<RevenueResponse>('/admin/revenue', { token }),
@@ -792,11 +794,12 @@ export const adminApi = {
   getChurn: (token: string) =>
     apiFetch<{ users: ChurnUser[] }>('/admin/churn', { token }),
 
-  exportUsers: (_token: string, params?: { format?: string; plan?: string; status?: string }) => {
+  exportUsers: (_token: string, params?: { format?: string; plan?: string; status?: string; created_after?: string }) => {
     const searchParams = new URLSearchParams();
     searchParams.set('format', params?.format || 'csv');
     if (params?.plan) searchParams.set('plan', params.plan);
     if (params?.status) searchParams.set('status', params.status);
+    if (params?.created_after) searchParams.set('created_after', params.created_after);
     return `/admin/users/export?${searchParams.toString()}`;
   },
 
