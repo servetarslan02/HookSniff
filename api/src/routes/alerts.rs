@@ -59,8 +59,9 @@ async fn list_alerts(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<AlertRule>>, AppError> {
+    // Show both user's own alerts AND platform-level alerts (customer_id IS NULL)
     let alerts = sqlx::query_as::<_, (Uuid, String, String, i32, serde_json::Value, bool, chrono::DateTime<chrono::Utc>)>(
-        "SELECT id, name, condition, threshold, channels, is_active, created_at FROM alert_rules WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100"
+        "SELECT id, name, condition, threshold, channels, is_active, created_at FROM alert_rules WHERE customer_id = $1 OR customer_id IS NULL ORDER BY created_at DESC LIMIT 100"
     )
     .bind(customer.id)
     .fetch_all(&pool)
@@ -326,10 +327,22 @@ async fn test_alert(
         }
     }
 
-    // Send test notification
+    // Log the test alert trigger for debugging
+    tracing::info!("🔔 Test alert triggered: '{}' (condition: {}, customer: {})", alert_name, alert_condition, customer.id);
+
+    // Create an in-app notification for the user
+    let _ = sqlx::query(
+        "INSERT INTO notifications (customer_id, title, body, is_read) VALUES ($1, $2, $3, false)"
+    )
+    .bind(customer.id)
+    .bind(format!("🚨 Test Alert: {}", alert_name))
+    .bind(format!("Condition '{}' would be evaluated. This is a test notification.", alert_condition))
+    .execute(&pool)
+    .await;
+
     Ok(Json(serde_json::json!({
         "success": true,
-        "message": "Test alert sent. Check your notification channels."
+        "message": "Test alert sent. Check your notification inbox."
     })))
 }
 
