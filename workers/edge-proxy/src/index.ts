@@ -68,8 +68,8 @@ const AUTH_MULTIPLIER = 5;
 // ── Edge Cache Config ──
 
 const CACHE_CONFIG: Record<string, number> = {
-  '/health': 10,           // 10 seconds
-  '/v1/status': 10,
+  '/health': 60,           // 1 minute (cached in Redis too)
+  '/v1/status': 60,        // 1 minute
   '/v1/docs': 3600,        // 1 hour
   '/v1/outbound-ips': 300, // 5 minutes
   '/v1/analytics': 30,     // 30 seconds
