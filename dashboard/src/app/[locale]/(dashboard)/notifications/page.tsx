@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, usePathname } from '@/i18n/navigation';
+import { useRouter, usePathname, Link } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
@@ -198,6 +198,16 @@ export default function NotificationsPage() {
                           {n.type.replace('_', ' ')}
                         </span>
                       </div>
+                      {n.link && (
+                        <div className="mt-2">
+                          <Link
+                            href={n.link}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-500/20 transition"
+                          >
+                            {t('viewDetails') || 'View Details'} →
+                          </Link>
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {!n.read && (
