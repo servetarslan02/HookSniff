@@ -17,6 +17,22 @@ const ACTION_COLORS: Record<string, string> = {
   PASSWORD_CHANGE: 'bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400',
   '2FA_ENABLE': 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400',
   '2FA_DISABLE': 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
+  SETTINGS_UPDATE: 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400',
+  FEATURE_FLAG_CREATE: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+  FEATURE_FLAG_UPDATE: 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400',
+  FEATURE_FLAG_DELETE: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
+  FEATURE_FLAG_LIST: 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300',
+  ALERT_CREATE: 'bg-orange-100 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400',
+  ALERT_UPDATE: 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400',
+  ALERT_DELETE: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
+  DELIVERY_REPLAY: 'bg-cyan-100 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400',
+  USER_PLAN_CHANGE: 'bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400',
+  USER_STATUS_CHANGE: 'bg-pink-100 dark:bg-pink-500/10 text-pink-700 dark:text-pink-400',
+  USER_EMAIL_SEND: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400',
+  USER_GDPR_EXPORT: 'bg-teal-100 dark:bg-teal-500/10 text-teal-700 dark:text-teal-400',
+  USER_GDPR_DELETE: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
+  ADMIN_TEST_WEBHOOK: 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300',
+  BULK_REPLAY: 'bg-cyan-100 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400',
 };
 
 const ACTION_ICONS: Record<string, string> = {
@@ -31,6 +47,22 @@ const ACTION_ICONS: Record<string, string> = {
   PASSWORD_CHANGE: '🔒',
   '2FA_ENABLE': '🛡️',
   '2FA_DISABLE': '🛡️',
+  SETTINGS_UPDATE: '⚙️',
+  FEATURE_FLAG_CREATE: '🚩',
+  FEATURE_FLAG_UPDATE: '🚩',
+  FEATURE_FLAG_DELETE: '🚩',
+  FEATURE_FLAG_LIST: '🚩',
+  ALERT_CREATE: '🚨',
+  ALERT_UPDATE: '🚨',
+  ALERT_DELETE: '🚨',
+  DELIVERY_REPLAY: '↩️',
+  USER_PLAN_CHANGE: '💳',
+  USER_STATUS_CHANGE: '👤',
+  USER_EMAIL_SEND: '📧',
+  USER_GDPR_EXPORT: '📤',
+  USER_GDPR_DELETE: '🗑️',
+  ADMIN_TEST_WEBHOOK: '🧪',
+  BULK_REPLAY: '↩️',
 };
 
 const KNOWN_ACTIONS = [
@@ -45,6 +77,22 @@ const KNOWN_ACTIONS = [
   'PASSWORD_CHANGE',
   '2FA_ENABLE',
   '2FA_DISABLE',
+  'SETTINGS_UPDATE',
+  'FEATURE_FLAG_CREATE',
+  'FEATURE_FLAG_UPDATE',
+  'FEATURE_FLAG_DELETE',
+  'FEATURE_FLAG_LIST',
+  'ALERT_CREATE',
+  'ALERT_UPDATE',
+  'ALERT_DELETE',
+  'DELIVERY_REPLAY',
+  'USER_PLAN_CHANGE',
+  'USER_STATUS_CHANGE',
+  'USER_EMAIL_SEND',
+  'USER_GDPR_EXPORT',
+  'USER_GDPR_DELETE',
+  'ADMIN_TEST_WEBHOOK',
+  'BULK_REPLAY',
 ];
 
 const perPage = 20;
@@ -182,8 +230,8 @@ export default function AdminActivityPage() {
 
                   {/* Admin */}
                   <div className="md:col-span-2">
-                    <span className="text-sm font-mono text-gray-600 dark:text-slate-400">
-                      {entry.customer_id?.slice(0, 8)}…
+                    <span className="text-sm text-gray-900 dark:text-white">
+                      {entry.customer_email || entry.customer_id?.slice(0, 8) + '…'}
                     </span>
                   </div>
 
