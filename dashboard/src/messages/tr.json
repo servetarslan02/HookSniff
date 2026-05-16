@@ -1578,8 +1578,8 @@
     "serviceStatus": "Hizmet Durumu",
     "settingsLoaded": "Ayarlar yüklendi",
     "settingsNav": "Ayarlar",
-    "settingsSaveFailed": "Ayarlar kaydedilemedi",
-    "settingsSaved": "Ayarlar kaydedildi",
+    "settingsSaveFailed": "Plan ayarları kaydedilemedi",
+    "settingsSaved": "Plan ayarları kaydedildi!",
     "signupsDesc": "Yeni kullanıcı kayıtlarına izin ver",
     "signupsEnabled": "Kayıtlar Etkin",
     "skipToContent": "İçeriğe atla",
@@ -1850,7 +1850,14 @@
     "retention": "Tutma Oranı",
     "last12Months": "Son 12 ay",
     "save": "Kaydet",
-    "delete": "Sil"
+    "delete": "Sil",
+    "planManagement": "Plan Yönetimi",
+    "planManagementDesc": "Plan fiyatlarını ve limitlerini buradan ayarlayın. Değişiklikler Polar ile eşitlenir.",
+    "editPlans": "Planları Düzenle",
+    "freePlanLimits": "Ücretsiz Plan Limitleri",
+    "maxWebhooks": "Maks Webhook/ay",
+    "rateLimit": "Hız Limiti/dk",
+    "polarSyncInfo": "Fiyat değişiklikleri platformu günceller. Polar ürünlerinin de eşleştirilmesi gerekir."
   },
   "landing": {
     "nav": {

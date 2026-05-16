@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useAdminRevenue, useAdminRevenueMetrics, useAdminRevenueCohorts, useAdminRefunds, useAdminChurn, useAdminSettings } from '@/hooks/useAdminData';
+import { useState, useEffect } from 'react';
+import { useAdminRevenue, useAdminRevenueMetrics, useAdminRevenueCohorts, useAdminRefunds, useAdminChurn, useAdminSettings, useUpdateSettings } from '@/hooks/useAdminData';
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
@@ -9,6 +9,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { adminApi, API_BASE } from '@/lib/api';
 import { useAuth } from '@/lib/store';
+import { useQueryClient } from '@tanstack/react-query';
 
 const PLAN_COLORS: Record<string, string> = {
   developer: '#94a3b8',
@@ -27,6 +28,56 @@ const DATE_RANGE_OPTIONS: { value: DateRange; labelKey: string }[] = [
   { value: 'all', labelKey: 'allTime' },
 ];
 
+// ── Inline helper components for plan editing ──
+function PlanLimitRow({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <span className="text-xs text-gray-600 dark:text-slate-400">{label}</span>
+      <input
+        type="number"
+        min="0"
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-20 px-2 py-1 text-sm font-semibold text-gray-900 dark:text-white bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg text-right focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+      />
+    </div>
+  );
+}
+
+function LimitCard({ label, free, pro, editing, field, form, setForm, unit }: {
+  label: string; free: number; pro: number; editing: boolean; field: string;
+  form: Record<string, number>; setForm: (f: Record<string, number>) => void; unit?: string;
+}) {
+  return (
+    <div className="rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 p-3">
+      <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{label}</p>
+      {editing ? (
+        <div className="space-y-1">
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-gray-400 dark:text-slate-500 w-8">Free</span>
+            <input
+              type="number"
+              min="0"
+              value={free}
+              onChange={(e) => setForm({ ...form, [field]: Number(e.target.value) })}
+              className="w-full px-2 py-1 text-sm font-bold text-gray-900 dark:text-white bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg text-right focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+            />
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-gray-400 dark:text-slate-500 w-8">Pro</span>
+            <span className="text-sm font-bold text-blue-600 dark:text-blue-400 text-right w-full">{pro.toLocaleString()}{unit || ''}</span>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-0.5">
+          <p className="text-lg font-bold text-gray-900 dark:text-white">{free.toLocaleString()}{unit || ''}</p>
+          <p className="text-[10px] text-gray-400 dark:text-slate-500">Pro: {pro.toLocaleString()}{unit || ''}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminRevenuePage() {
   const { token } = useAuth();
   const { data: revenue, isLoading, error, refetch } = useAdminRevenue();
@@ -35,6 +86,8 @@ export default function AdminRevenuePage() {
   const { data: refundsData } = useAdminRefunds({ per_page: 50 });
   const { data: churnUsers = [] } = useAdminChurn();
   const { data: settings } = useAdminSettings();
+  const updateSettingsMutation = useUpdateSettings();
+  const queryClient = useQueryClient();
 
   const [dateRange, setDateRange] = useState<DateRange>('12m');
   const t = useTranslations('admin');
@@ -46,6 +99,57 @@ export default function AdminRevenuePage() {
   const allRefunds = refundsData?.refunds ?? [];
   const refundsTotal = refundsData?.total ?? 0;
   const planPrices = { pro: settings?.plan_price_pro ?? 29, business: settings?.plan_price_business ?? 99 };
+
+  // ── Plan Management State ──
+  const [editingPlans, setEditingPlans] = useState(false);
+  const [planForm, setPlanForm] = useState({
+    plan_price_pro: settings?.plan_price_pro ?? 29,
+    plan_price_business: settings?.plan_price_business ?? 99,
+    max_endpoints_free: settings?.max_endpoints_free ?? 5,
+    max_endpoints_pro: settings?.max_endpoints_pro ?? 50,
+    max_webhooks_free: settings?.max_webhooks_free ?? 10000,
+    max_webhooks_pro: settings?.max_webhooks_pro ?? 50000,
+    rate_limit_free: settings?.rate_limit_free ?? 100,
+    rate_limit_pro: settings?.rate_limit_pro ?? 1000,
+    retention_days_free: settings?.retention_days_free ?? 7,
+    retention_days_pro: settings?.retention_days_pro ?? 30,
+  });
+  const [savingPlans, setSavingPlans] = useState(false);
+
+  // Sync form when settings load
+  useEffect(() => {
+    if (settings) {
+      setPlanForm({
+        plan_price_pro: settings.plan_price_pro,
+        plan_price_business: settings.plan_price_business,
+        max_endpoints_free: settings.max_endpoints_free,
+        max_endpoints_pro: settings.max_endpoints_pro,
+        max_webhooks_free: settings.max_webhooks_free,
+        max_webhooks_pro: settings.max_webhooks_pro,
+        rate_limit_free: settings.rate_limit_free,
+        rate_limit_pro: settings.rate_limit_pro,
+        retention_days_free: settings.retention_days_free,
+        retention_days_pro: settings.retention_days_pro,
+      });
+    }
+  }, [settings]);
+
+  const handleSavePlans = async () => {
+    if (!token || !settings) return;
+    setSavingPlans(true);
+    try {
+      await updateSettingsMutation.mutateAsync({
+        token,
+        settings: { ...settings, ...planForm },
+      });
+      toast(t('settingsSaved') || 'Plan settings saved!', 'success');
+      setEditingPlans(false);
+    } catch {
+      toast(t('settingsSaveFailed') || 'Failed to save plan settings', 'error');
+    } finally {
+      setSavingPlans(false);
+    }
+  };
 
   const handleExportCSV = async () => {
     if (!token) return;
@@ -245,16 +349,124 @@ export default function AdminRevenuePage() {
         </div>
       )}
 
-      {/* Plan Prices Info */}
-      <div className="glass-card p-4 flex flex-wrap items-center gap-4 text-sm">
-        <span className="text-gray-500 dark:text-slate-400 font-medium">💰 {t('planPrices') || 'Plan Prices'}:</span>
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-medium">
-          {t('proPlan') || 'Pro'}: ${planPrices.pro}/mo
-        </span>
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400 text-xs font-medium">
-          {t('businessPlan') || 'Business'}: ${planPrices.business}/mo
-        </span>
-        <span className="text-xs text-gray-400 dark:text-slate-500">{t('configurableFromSettings') || 'Configurable from Settings'}</span>
+      {/* ── Plan Management (Prices + Limits) ── */}
+      <div className="glass-card overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💰 {t('planManagement') || 'Plan Management'}</h2>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('planManagementDesc') || 'Configure plan prices and limits. Changes sync to Polar.'}</p>
+          </div>
+          {!editingPlans ? (
+            <button
+              type="button"
+              onClick={() => setEditingPlans(true)}
+              className="px-3 py-1.5 text-sm font-medium rounded-lg bg-brand-600 text-white hover:bg-brand-700 transition"
+            >
+              {t('editPlans') || 'Edit Plans'}
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingPlans(false)}
+                className="px-3 py-1.5 text-sm font-medium rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-300 dark:hover:bg-slate-600 transition"
+              >
+                {tc('cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleSavePlans}
+                disabled={savingPlans}
+                className="px-3 py-1.5 text-sm font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition disabled:opacity-50"
+              >
+                {savingPlans ? (tc('saving') || 'Saving...') : (tc('save') || 'Save')}
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="p-4 sm:p-6 space-y-6">
+          {/* ── Prices ── */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t('planPrices') || 'Plan Prices'}</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Pro */}
+              <div className="rounded-xl border border-blue-200 dark:border-blue-500/20 bg-blue-50/50 dark:bg-blue-500/5 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="w-3 h-3 rounded-full bg-blue-500" />
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{t('proPlan') || 'Pro'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg text-gray-500 dark:text-slate-400">$</span>
+                  {editingPlans ? (
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={planForm.plan_price_pro}
+                      onChange={(e) => setPlanForm({ ...planForm, plan_price_pro: Number(e.target.value) })}
+                      className="w-24 px-3 py-2 text-2xl font-bold text-gray-900 dark:text-white bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                    />
+                  ) : (
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{planForm.plan_price_pro}</span>
+                  )}
+                  <span className="text-sm text-gray-500 dark:text-slate-400">/mo</span>
+                </div>
+                {editingPlans && (
+                  <div className="mt-3 space-y-2">
+                    <PlanLimitRow label={t('maxEndpoints') || 'Max Endpoints'} value={planForm.max_endpoints_pro} onChange={(v) => setPlanForm({ ...planForm, max_endpoints_pro: v })} />
+                    <PlanLimitRow label={t('maxWebhooks') || 'Max Webhooks/mo'} value={planForm.max_webhooks_pro} onChange={(v) => setPlanForm({ ...planForm, max_webhooks_pro: v })} />
+                    <PlanLimitRow label={t('rateLimit') || 'Rate Limit/min'} value={planForm.rate_limit_pro} onChange={(v) => setPlanForm({ ...planForm, rate_limit_pro: v })} />
+                    <PlanLimitRow label={t('retentionDays') || 'Retention (days)'} value={planForm.retention_days_pro} onChange={(v) => setPlanForm({ ...planForm, retention_days_pro: v })} />
+                  </div>
+                )}
+              </div>
+
+              {/* Business */}
+              <div className="rounded-xl border border-violet-200 dark:border-violet-500/20 bg-violet-50/50 dark:bg-violet-500/5 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="w-3 h-3 rounded-full bg-violet-500" />
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{t('businessPlan') || 'Business'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg text-gray-500 dark:text-slate-400">$</span>
+                  {editingPlans ? (
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={planForm.plan_price_business}
+                      onChange={(e) => setPlanForm({ ...planForm, plan_price_business: Number(e.target.value) })}
+                      className="w-24 px-3 py-2 text-2xl font-bold text-gray-900 dark:text-white bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                    />
+                  ) : (
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{planForm.plan_price_business}</span>
+                  )}
+                  <span className="text-sm text-gray-500 dark:text-slate-400">/mo</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Free Plan Limits (always visible) ── */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t('freePlanLimits') || 'Free Plan Limits'}</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <LimitCard label={t('maxEndpoints') || 'Endpoints'} free={planForm.max_endpoints_free} pro={planForm.max_endpoints_pro} editing={editingPlans} field="max_endpoints_free" form={planForm} setForm={setPlanForm} />
+              <LimitCard label={t('maxWebhooks') || 'Webhooks/mo'} free={planForm.max_webhooks_free} pro={planForm.max_webhooks_pro} editing={editingPlans} field="max_webhooks_free" form={planForm} setForm={setPlanForm} />
+              <LimitCard label={t('rateLimit') || 'Rate/min'} free={planForm.rate_limit_free} pro={planForm.rate_limit_pro} editing={editingPlans} field="rate_limit_free" form={planForm} setForm={setPlanForm} />
+              <LimitCard label={t('retentionDays') || 'Retention'} free={planForm.retention_days_free} pro={planForm.retention_days_pro} editing={editingPlans} field="retention_days_free" form={planForm} setForm={setPlanForm} unit="d" />
+            </div>
+          </div>
+
+          {/* ── Polar Sync Info ── */}
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+            <span className="text-lg">🔗</span>
+            <p className="text-xs text-amber-700 dark:text-amber-400">
+              {t('polarSyncInfo') || 'Price changes here update the platform. Polar products should be updated to match.'}
+            </p>
+          </div>
+        </div>
       </div>
 
       {hasRevenueData ? (
