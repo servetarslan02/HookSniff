@@ -548,11 +548,7 @@ export default function AdminSettingsPage() {
             <button
               type="button"
               onClick={() => {
-                import('@tanstack/react-query').then(({ useQueryClient }) => {
-                  alert('Use the React Query Devtools panel to clear cache.');
-                }).catch(() => {
-                  alert('React Query Devtools not available.');
-                });
+                alert('Use the React Query Devtools panel (bottom-left) to clear cache.');
               }}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-lg transition"
             >
