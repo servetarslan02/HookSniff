@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAdminAuditLogs } from '@/hooks/useAdminData';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 const ACTION_COLORS: Record<string, string> = {
   LOGIN: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400',
@@ -132,6 +132,7 @@ export default function AdminActivityPage() {
   const [actionFilter, setActionFilter] = useState('');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
+  const locale = useLocale();
 
   const { data, isLoading, error, refetch } = useAdminAuditLogs({
     limit: perPage,
@@ -268,7 +269,7 @@ export default function AdminActivityPage() {
                   {/* Timestamp */}
                   <div className="md:col-span-2">
                     <span className="text-sm text-gray-500 dark:text-slate-400">
-                      {new Date(entry.created_at).toLocaleString('tr-TR', {
+                      {new Date(entry.created_at).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US', {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',

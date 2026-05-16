@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import {
   useSystemHealth,
@@ -30,6 +30,7 @@ const mockHealth = {
 
 export default function AdminSystemPage() {
   const t = useTranslations('admin');
+  const locale = useLocale();
   const tc = useTranslations('common');
   const { toast } = useToast();
 
@@ -267,7 +268,7 @@ export default function AdminSystemPage() {
           </button>
         </div>
         <p className="text-sm text-gray-500 dark:text-slate-400">
-          {t('lastChecked', { time: new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · {t('autoRefresh30s')}
+          {t('lastChecked', { time: new Intl.DateTimeFormat(locale === 'tr' ? 'tr-TR' : 'en-US', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · {t('autoRefresh30s')}
         </p>
       </div>
 
@@ -375,7 +376,7 @@ export default function AdminSystemPage() {
                     <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">{err.error || 'Unknown error'}</p>
                   </div>
                   <span className="text-xs text-gray-500 dark:text-slate-400">
-                    {new Date(err.created_at).toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(err.created_at).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               </div>
