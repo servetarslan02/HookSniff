@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-16 19:45 GMT+8
+> Son güncelleme: 2026-05-17 03:38 GMT+8 (Oturum 178)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -390,6 +390,34 @@ HookSniff/
    - Backend `{ unread_count }` döndürüyor, frontend `{ count }` bekliyordu
    - api.ts tipi düzeltildi
 5. **Commit:** 46126b17 — push edildi
+
+### Oturum 178 — 2026-05-17 03:38 GMT+8
+1. **Audit Log 500 Hatası** ✅
+   - Sebep: `WHERE a.{}` + `replace("customer_id","a.customer_id")` → `a.a.customer_id` (çift alias)
+   - Fix: `WHERE a.{}` → `WHERE {}`
+   - Ek: `#[serde(deny_unknown_fields)]` kaldırıldı
+2. **Audit Log React #31 Crash** ✅
+   - Sebep: `details` JSONB field object olarak render ediliyordu
+   - Fix: `typeof details === 'string' ? details : JSON.stringify(details)`
+3. **Audit Log Yavaş Yükleme (COUNT*)** ✅
+   - Her istekte `SELECT COUNT(*) FROM audit_log` çalışıyordu
+   - Fix: LIMIT+1 tekniği ile tek sorgu (COUNT kaldırıldı)
+   - `has_more` = `rows.len() > limit`
+4. **Global Deploy (4 Region)** ✅
+   - Cloud Build sadece europe-west1'e deploy yapıyordu
+   - Diğer 3 region (eu-west3, me-west1, us-central1) eski kod çalıştırıyordu
+   - Fix: cloudbuild.yaml'a 3 region daha eklendi
+5. **Edge Proxy Deploy** ✅
+   - Multi-region routing restore edildi
+   - Cloudflare Workers'a deploy edildi (cfut token ile)
+6. **`/devices` 500 Hatası** ✅
+   - Sebep: `device_tokens` tablosu yoktu (migration eksik)
+   - Fix: `api/migrations/019_device_tokens.sql` oluşturuldu
+7. **Global Benchmark** ✅
+   - Tüm endpointler 300-700ms arası (Asya'dan ölçüm)
+   - Türkiye'den gerçek değer: ~350-500ms
+   - `/sso`, `/analytics`, `/routing` → aslında çalışıyor (farklı URL)
+8. **Commits:** 5 adet push edildi
 
 ### Oturum 176 — 2026-05-16 04:05 GMT+8
 1. **Admin Panel Genel Bakış Sayfası İnceleme** ✅
