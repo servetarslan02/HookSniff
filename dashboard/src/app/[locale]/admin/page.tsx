@@ -680,8 +680,11 @@ export default function AdminOverviewPage() {
               <div className="mt-3 space-y-1">
                 {featureFlags.slice(0, 3).map(f => (
                   <div key={f.id} className="flex items-center gap-2 text-xs">
-                    <span className={`w-2 h-2 rounded-full ${f.is_enabled ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                    <span className={`w-2 h-2 rounded-full ${f.is_enabled ? (f.rollout_percentage ?? 100) >= 100 ? 'bg-emerald-500' : 'bg-amber-500' : 'bg-gray-400'}`} />
                     <span className="text-gray-600 dark:text-slate-400 truncate">{f.name}</span>
+                    {f.is_enabled && (f.rollout_percentage ?? 100) < 100 && (
+                      <span className="text-amber-500 dark:text-amber-400">({f.rollout_percentage}%)</span>
+                    )}
                   </div>
                 ))}
                 {featureFlags.length > 3 && (
@@ -820,7 +823,7 @@ export default function AdminOverviewPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-slate-400">{t('filteredEvents')}</span>
                   <span className={`text-lg font-bold ${isEnabled ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-slate-500'}`}>
-                    {isEnabled ? (dedupFlag?.description?.match(/\d+/)?.[0] || '0') : '0'}
+                    {isEnabled ? '—' : '0'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">

@@ -104,7 +104,7 @@ export function useAdminFeatureFlags() {
       FeatureFlagsResponseSchema
     ),
     enabled: !!token,
-    staleTime: 5 * 60_000,
+    staleTime: 30_000,
   });
 }
 
@@ -323,8 +323,8 @@ export function useSystemHealth() {
       return SystemHealthSchema.parse(data);
     },
     enabled: !!token,
-    refetchInterval: 15_000,
-    staleTime: 10_000,
+    refetchInterval: 30_000,
+    staleTime: 15_000,
   });
 }
 
@@ -351,7 +351,7 @@ export function useFailedDeliveries(params?: { limit?: number; since?: string })
 }
 
 // ── Dead Letters ──
-export function useDeadLetters(params?: { limit?: number }) {
+export function useDeadLetters(params?: { limit?: number; since?: string }) {
   const { token } = useAuth();
   return useQuery({
     queryKey: ['admin', 'dead-letters', params],
@@ -362,7 +362,7 @@ export function useDeadLetters(params?: { limit?: number }) {
 }
 
 // ── Rate Limit Violations ──
-export function useRateLimitViolations(params?: { limit?: number }) {
+export function useRateLimitViolations(params?: { limit?: number; since?: string }) {
   const { token } = useAuth();
   return useQuery({
     queryKey: ['admin', 'rate-limit-violations', params],
@@ -401,13 +401,14 @@ export function useCreateFeatureFlag() {
   return useMutation({
     mutationFn: (data: {
       name: string;
-      description?: string;
+      description?: string | null;
       is_enabled?: boolean;
       rollout_percentage?: number;
       enabled_for_plans?: string[];
     }) => adminApi.createFeatureFlag(token!, data),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
+      queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
     },
   });
 }
@@ -424,7 +425,7 @@ export function useUpdateFeatureFlag() {
       id: string;
       data: {
         name?: string;
-        description?: string;
+        description?: string | null;
         is_enabled?: boolean;
         rollout_percentage?: number;
         enabled_for_plans?: string[];
@@ -432,6 +433,7 @@ export function useUpdateFeatureFlag() {
     }) => adminApi.updateFeatureFlag(token!, id, data),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
+      queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
     },
   });
 }
@@ -444,6 +446,7 @@ export function useDeleteFeatureFlag() {
     mutationFn: (id: string) => adminApi.deleteFeatureFlag(token!, id),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'feature-flags'] });
+      queryClient.invalidateQueries({ queryKey: ['feature-flags'] });
     },
   });
 }
