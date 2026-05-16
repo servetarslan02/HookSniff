@@ -297,13 +297,11 @@ export function useUpdateSettings() {
 // ── System Health ──
 export function useSystemHealth() {
   const { token } = useAuth();
-  const API = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
   return useQuery<SystemHealthValidated>({
     queryKey: ['admin', 'system-health'],
     queryFn: async () => {
-      const res = await fetch(`${API}/health`, { headers: { Authorization: `Bearer ${token}` } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return SystemHealthSchema.parse(await res.json());
+      const data = await adminApi.getSystemHealth(token!);
+      return SystemHealthSchema.parse(data);
     },
     enabled: !!token,
     refetchInterval: 15_000,
