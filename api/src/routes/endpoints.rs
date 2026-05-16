@@ -7,6 +7,7 @@ use uuid::Uuid;
 
 use crate::billing::Plan;
 use crate::error::AppError;
+use crate::feature_flags::FeatureFlagService;
 use crate::models::customer::Customer;
 use crate::models::endpoint::{CreateEndpointRequest, Endpoint, EndpointResponse, RetryPolicy};
 
@@ -64,9 +65,17 @@ async fn create_endpoint(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    Extension(feature_flags): Extension<FeatureFlagService>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<CreateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
+    // Gate custom retry schedules behind feature flag
+    let retry_policy_json = if feature_flags.is_enabled("custom_retry_schedules").await {
+        req.retry_policy.and_then(|rp| serde_json::to_value(rp).ok())
+    } else {
+        None // Ignore custom retry policy if flag is disabled
+    };
+
     // Check endpoint limit based on plan
     let plan = Plan::parse_str(&customer.plan);
     let endpoint_count: (i64,) =
@@ -140,11 +149,6 @@ async fn create_endpoint(
     // Convert allowed_ips to JSON
     let allowed_ips_json: Option<serde_json::Value> =
         req.allowed_ips.map(|ips| serde_json::json!(ips));
-
-    // Convert retry_policy to JSON
-    let retry_policy_json: Option<serde_json::Value> = req
-        .retry_policy
-        .and_then(|rp| serde_json::to_value(rp).ok());
 
     let endpoint = sqlx::query_as::<_, Endpoint>(
         r#"INSERT INTO endpoints (customer_id, url, description, signing_secret, allowed_ips, event_filter, custom_headers, retry_policy, routing_strategy, fallback_url, application_id, team_id)
@@ -256,9 +260,17 @@ async fn update_endpoint(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    Extension(feature_flags): Extension<FeatureFlagService>,
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
+    // Gate custom retry schedules behind feature flag
+    let retry_policy_json = if feature_flags.is_enabled("custom_retry_schedules").await {
+        req.retry_policy.and_then(|rp| serde_json::to_value(rp).ok())
+    } else {
+        None
+    };
+
     // Verify ownership
     let _existing =
         sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2")
@@ -306,10 +318,6 @@ async fn update_endpoint(
             ));
         }
     }
-
-    let retry_policy_json: Option<serde_json::Value> = req
-        .retry_policy
-        .and_then(|rp| serde_json::to_value(rp).ok());
 
     let allowed_ips_json: Option<serde_json::Value> =
         req.allowed_ips.map(|ips| serde_json::json!(ips));
@@ -377,9 +385,15 @@ async fn update_endpoint(
 async fn update_retry_policy(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(feature_flags): Extension<FeatureFlagService>,
     Path(id): Path<Uuid>,
     Json(policy): Json<RetryPolicy>,
 ) -> Result<Json<EndpointResponse>, AppError> {
+    // Gate behind custom_retry_schedules feature flag
+    if !feature_flags.is_enabled("custom_retry_schedules").await {
+        return Err(AppError::BadRequest("Custom retry schedules are not enabled. Contact support to enable this feature.".into()));
+    }
+
     // Verify ownership
     let _ =
         sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2")
