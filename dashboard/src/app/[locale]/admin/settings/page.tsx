@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useAdminSettings, useUpdateSettings, useAdminAlerts, useCreateAlert, useUpdateAlert } from '@/hooks/useAdminData';
+import { useQueryClient } from '@tanstack/react-query';
 import type { PlatformSettings } from '@/lib/api';
 
 interface AlertRule {
@@ -51,6 +52,7 @@ export default function AdminSettingsPage() {
   const tc = useTranslations('common');
 
   // React Query hooks
+  const queryClient = useQueryClient();
   const { data: settingsData, isLoading } = useAdminSettings();
   const updateSettingsMutation = useUpdateSettings();
   const { data: alertRules = [] } = useAdminAlerts();
@@ -102,6 +104,7 @@ export default function AdminSettingsPage() {
   }, [alertRules]);
 
   const handleSave = async () => {
+    if (updateSettingsMutation.isPending) return;
     try {
       await updateSettingsMutation.mutateAsync(settings as unknown as Record<string, unknown>);
       toast(t('settingsSaved'), 'success');
@@ -113,6 +116,7 @@ export default function AdminSettingsPage() {
   };
 
   const handleAlertSave = async () => {
+    if (createAlertMutation.isPending || updateAlertMutation.isPending) return;
     try {
       const channels = Object.entries(alertChannels)
         .filter(([, enabled]) => enabled)
@@ -136,8 +140,13 @@ export default function AdminSettingsPage() {
         }
       }
 
-      await Promise.all(promises);
-      toast(t('alertSettingsSaved') || 'Alert settings saved', 'success');
+      const results = await Promise.allSettled(promises);
+      const failures = results.filter(r => r.status === 'rejected');
+      if (failures.length > 0) {
+        toast(t('alertSettingsPartialFail') || `${failures.length} alert(s) failed to save`, 'error');
+      } else {
+        toast(t('alertSettingsSaved') || 'Alert settings saved', 'success');
+      }
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch {
@@ -505,12 +514,11 @@ export default function AdminSettingsPage() {
                 try {
                   throw new Error('[HookSniff] Sentry test error from admin settings');
                 } catch (e) {
-                  // Dynamically import Sentry to avoid bundling in dev
                   import('@sentry/nextjs').then((Sentry) => {
                     Sentry.captureException(e);
-                    alert('Test error sent to Sentry! Check your Sentry dashboard.');
+                    toast('Test error sent to Sentry', 'success');
                   }).catch(() => {
-                    alert('Sentry not available in this environment.');
+                    toast('Sentry not available in this environment', 'error');
                   });
                 }
               }}
@@ -531,7 +539,7 @@ export default function AdminSettingsPage() {
               onClick={() => {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
                 const wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws';
-                alert(`WS URL: ${wsUrl}\nAPI URL: ${apiUrl}`);
+                toast(`WS: ${wsUrl}`, 'info');
               }}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-lg transition"
             >
@@ -548,7 +556,8 @@ export default function AdminSettingsPage() {
             <button
               type="button"
               onClick={() => {
-                alert('Use the React Query Devtools panel (bottom-left) to clear cache.');
+                queryClient.clear();
+                toast('React Query cache cleared', 'success');
               }}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-lg transition"
             >

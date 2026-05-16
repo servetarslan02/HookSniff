@@ -693,6 +693,7 @@ export interface AlertRuleAdmin {
   threshold: number;
   channels: string[];
   is_active: boolean;
+  customer_id?: string | null;
   created_at: string;
 }
 

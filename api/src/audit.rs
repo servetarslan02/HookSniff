@@ -21,6 +21,8 @@ use uuid::Uuid;
 ///
 /// Returns `Ok(())` on success. Callers should use `let _ =` to make audit
 /// logging best-effort (audit failures must not break the main operation).
+///
+/// Details field is truncated to 8KB to prevent unbounded growth.
 #[allow(clippy::too_many_arguments)]
 pub async fn log_action(
     pool: &PgPool,
@@ -32,7 +34,18 @@ pub async fn log_action(
     ip_address: Option<&str>,
     user_agent: Option<&str>,
 ) -> Result<(), sqlx::Error> {
-    sqlx::query(
+    // Truncate details to 8KB to prevent unbounded JSONB growth
+    let truncated_details = details.map(|d| {
+        let s = d.to_string();
+        if s.len() > 8192 {
+            tracing::warn!("Audit log details truncated for action '{}' ({} bytes > 8KB)", action, s.len());
+            serde_json::json!({ "_truncated": true, "_original_bytes": s.len(), "preview": &s[..4096] })
+        } else {
+            d
+        }
+    });
+
+    let result = sqlx::query(
         "INSERT INTO audit_log (customer_id, action, resource_type, resource_id, details, ip_address, user_agent)
          VALUES ($1, $2, $3, $4, $5, $6, $7)",
     )
@@ -40,13 +53,19 @@ pub async fn log_action(
     .bind(action)
     .bind(resource_type)
     .bind(resource_id)
-    .bind(details)
+    .bind(truncated_details)
     .bind(ip_address)
     .bind(user_agent)
     .execute(pool)
-    .await?;
+    .await;
 
-    Ok(())
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            tracing::error!("Audit log failed for action '{}': {e}", action);
+            Err(e)
+        }
+    }
 }
 
 #[cfg(test)]
