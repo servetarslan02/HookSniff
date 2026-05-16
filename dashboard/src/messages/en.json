@@ -1816,7 +1816,9 @@
     "planPrices": "Plan Prices",
     "signedUp": "Signed Up",
     "retention": "Retention",
-    "last12Months": "Last 12 months"
+    "last12Months": "Last 12 months",
+    "save": "Save",
+    "delete": "Delete"
   },
   "landing": {
     "nav": {
@@ -3650,6 +3652,26 @@
     "toggled": "Feature flag toggled",
     "toggleFailed": "Failed to toggle",
     "deleted": "Feature flag deleted",
-    "deleteFailed": "Failed to delete"
+    "deleteFailed": "Failed to delete",
+    "pageTitle": "Feature Flags",
+    "pageDesc": "Manage feature flags, rollouts, and plan-specific features",
+    "createFlag": "Create Flag",
+    "createTitle": "Create Feature Flag",
+    "editTitle": "Edit",
+    "deleteTitle": "Delete Feature Flag",
+    "deleteConfirm": "Are you sure you want to delete {name}? This cannot be undone.",
+    "name": "Name",
+    "description": "Description",
+    "enabled": "Enabled",
+    "rollout": "rollout",
+    "rolloutLabel": "Rollout: {pct}%",
+    "plansLabel": "Plans (empty = all)",
+    "allPlans": "all plans",
+    "loading": "Loading...",
+    "emptyState": "No feature flags yet. Create your first one!",
+    "namePlaceholder": "my_feature",
+    "descPlaceholder": "What does this flag do?",
+    "creating": "Creating...",
+    "saving": "Saving..."
   }
 }
