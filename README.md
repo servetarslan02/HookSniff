@@ -8,6 +8,8 @@
 
 **Reliable webhook delivery for developers.**
 
+> Last updated: 2026-05-17 — Email (Resend) + Redis cache active
+
 Send webhooks. We deliver them. If they fail, we retry. Simple.
 
 ---
