@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { apiFetch } from '@/lib/api';
+import { usePortalConfig, usePortalEmbedCode, useUpdatePortalConfig } from '@/hooks/useDashboardData';
+import type { PortalConfigResponse } from '@/lib/api';
 import type { PortalConfig } from './types';
 import { DEFAULT_CONFIG, FONT_OPTIONS } from './types';
 import { PortalPreview } from './components/PortalPreview';
@@ -12,56 +12,35 @@ import { EmbedCodePanel } from './components/EmbedCodePanel';
 
 export default function PortalCustomizationPage() {
   const t = useTranslations('portalCustomize');
-  const { token } = useAuth();
   const { toast } = useToast();
+  const { data: configData, isLoading } = usePortalConfig();
+  const { data: embedData } = usePortalEmbedCode();
+  const updateConfig = useUpdatePortalConfig();
+
   const [config, setConfig] = useState<PortalConfig>(DEFAULT_CONFIG);
-  const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [newEvent, setNewEvent] = useState('');
-  const [embedCode, setEmbedCode] = useState('');
-  const [portalUrl, setPortalUrl] = useState('');
 
-  const fetchConfig = useCallback(async () => {
-    if (!token) return;
-    try {
-      const [data, embedData] = await Promise.all([
-        apiFetch<{ id?: string; company_name?: string; logo_url?: string; primary_color?: string; font_family?: string; dark_mode?: boolean; show_events?: boolean; show_deliveries?: boolean; allowed_events?: string[]; custom_css?: string }>('/portal/config', { token }),
-        apiFetch<{ iframe?: string; portal_url?: string; react?: string; script?: string }>('/portal/embed-code', { token }).catch(() => null),
-      ]);
+  // Sync fetched data into local state
+  useEffect(() => {
+    if (configData) {
       setConfig({
-        primary_color: data.primary_color || '#6366f1',
-        logo_url: data.logo_url || '',
-        company_name: data.company_name || '',
-        font_family: data.font_family || 'Inter',
-        dark_mode: data.dark_mode ?? false,
-        show_events: data.show_events ?? true,
-        show_deliveries: data.show_deliveries ?? true,
-        allowed_events: data.allowed_events || [],
+        primary_color: configData.primary_color || '#6366f1',
+        logo_url: configData.logo_url || '',
+        company_name: configData.company_name || '',
+        font_family: configData.font_family || 'Inter',
+        dark_mode: configData.dark_mode ?? false,
+        show_events: configData.show_events ?? true,
+        show_deliveries: configData.show_deliveries ?? true,
+        allowed_events: configData.allowed_events || [],
       });
-      if (embedData) {
-        setEmbedCode(embedData.iframe || '');
-        setPortalUrl(embedData.portal_url || '');
-      }
-    } catch {
-      // Use defaults
-    } finally {
-      setLoading(false);
     }
-  }, [token]);
+  }, [configData]);
 
-  useEffect(() => { fetchConfig(); }, [fetchConfig]);
-
-  const handleSave = async () => {
-    if (!token) return;
-    setSaving(true);
-    try {
-      await apiFetch('/portal/config', { method: 'POST', body: config, token });
-      toast(t('portalSaved'), 'success');
-    } catch (err) {
-      toast(err instanceof Error ? err.message : t('portalSaveFailed'), 'error');
-    } finally {
-      setSaving(false);
-    }
+  const handleSave = () => {
+    updateConfig.mutate(config as Partial<PortalConfigResponse>, {
+      onSuccess: () => toast(t('portalSaved'), 'success'),
+      onError: (err) => toast(err instanceof Error ? err.message : t('portalSaveFailed'), 'error'),
+    });
   };
 
   const addEvent = () => {
@@ -78,7 +57,7 @@ export default function PortalCustomizationPage() {
     setConfig({ ...config, allowed_events: config.allowed_events.filter((e) => e !== event) });
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="glass-card p-6 animate-pulse">
@@ -101,10 +80,10 @@ export default function PortalCustomizationPage() {
         </div>
         <button type="button"
           onClick={handleSave}
-          disabled={saving}
+          disabled={updateConfig.isPending}
           className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
         >
-          {saving ? t('saving') : t('saveChanges')}
+          {updateConfig.isPending ? t('saving') : t('saveChanges')}
         </button>
       </div>
 
@@ -277,7 +256,11 @@ export default function PortalCustomizationPage() {
         {/* Preview Panel */}
         <div className="space-y-6">
           <PortalPreview config={config} />
-          <EmbedCodePanel config={config} embedCode={embedCode} portalUrl={portalUrl} />
+          <EmbedCodePanel
+            config={config}
+            embedCode={embedData?.iframe || ''}
+            portalUrl={embedData?.portal_url || ''}
+          />
         </div>
       </div>
     </div>

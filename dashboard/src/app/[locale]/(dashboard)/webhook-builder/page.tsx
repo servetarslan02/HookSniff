@@ -1,23 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { apiFetch } from '@/lib/api';
+import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
 
 /* ─── Webhook Builder — Visual webhook creator ─── */
 interface WebhookField {
   key: string;
   value: string;
   type: 'string' | 'number' | 'boolean' | 'object' | 'array';
-}
-
-interface Endpoint {
-  id: string;
-  url: string;
-  description?: string;
-  is_active: boolean;
 }
 
 const TEMPLATES = {
@@ -49,28 +41,14 @@ const TEMPLATES = {
 export default function WebhookBuilderPage() {
   const t = useTranslations('webhookBuilder');
   const tc = useTranslations('common');
-  const { token } = useAuth();
   const { toast } = useToast();
+  const { data: endpoints = [], isLoading: loadingEndpoints } = useEndpoints();
+  const createWebhook = useCreateWebhook();
+
   const [eventType, setEventType] = useState('order.created');
   const [fields, setFields] = useState<WebhookField[]>(TEMPLATES['order.created'].fields);
   const [endpointId, setEndpointId] = useState('');
-  const [sending, setSending] = useState(false);
   const [preview, setPreview] = useState('');
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
-  const [loadingEndpoints, setLoadingEndpoints] = useState(true);
-
-  // Fetch endpoints on mount
-  useEffect(() => {
-    if (!token) return;
-    setLoadingEndpoints(true);
-    apiFetch<Endpoint[]>('/endpoints', { token })
-      .then((res) => {
-        setEndpoints(res || []);
-        if (res?.length === 1) setEndpointId(res[0].id);
-      })
-      .catch(() => {})
-      .finally(() => setLoadingEndpoints(false));
-  }, [token]);
 
   const updatePreview = () => {
     const payload: Record<string, unknown> = {};
@@ -106,32 +84,26 @@ export default function WebhookBuilderPage() {
     setFields(updated);
   };
 
-  const handleSend = async () => {
-    if (!token || !endpointId) {
+  const handleSend = () => {
+    if (!endpointId) {
       toast(t('selectEndpointFirst'), 'error');
       return;
     }
-    setSending(true);
-    try {
-      const payload: Record<string, unknown> = {};
-      fields.forEach((f) => {
-        if (f.key) {
-          if (f.type === 'number') payload[f.key] = parseFloat(f.value) || 0;
-          else if (f.type === 'boolean') payload[f.key] = f.value === 'true';
-          else payload[f.key] = f.value;
-        }
-      });
-      await apiFetch('/webhooks', {
-        method: 'POST',
-        body: { endpoint_id: endpointId, event: eventType, data: payload },
-        token: token || undefined,
-      });
-      toast(t('webhookSent'), 'success');
-    } catch (err) {
-      toast(err instanceof Error ? err.message : t('sendFailed'), 'error');
-    } finally {
-      setSending(false);
-    }
+    const payload: Record<string, unknown> = {};
+    fields.forEach((f) => {
+      if (f.key) {
+        if (f.type === 'number') payload[f.key] = parseFloat(f.value) || 0;
+        else if (f.type === 'boolean') payload[f.key] = f.value === 'true';
+        else payload[f.key] = f.value;
+      }
+    });
+    createWebhook.mutate(
+      { endpoint_id: endpointId, event: eventType, data: payload },
+      {
+        onSuccess: () => toast(t('webhookSent'), 'success'),
+        onError: (err) => toast(err instanceof Error ? err.message : t('sendFailed'), 'error'),
+      }
+    );
   };
 
   return (
@@ -253,10 +225,10 @@ export default function WebhookBuilderPage() {
             )}
             <button type="button"
               onClick={handleSend}
-              disabled={sending || !endpointId}
+              disabled={createWebhook.isPending || !endpointId}
               className="w-full px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
             >
-              {sending ? t('sending') : t('sendWebhook')}
+              {createWebhook.isPending ? t('sending') : t('sendWebhook')}
             </button>
           </div>
         </div>
