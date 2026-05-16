@@ -13,8 +13,10 @@ export const EndpointSchema = z.object({
   failure_streak: z.number().optional(),
   retry_policy: z
     .object({
-      max_retries: z.number(),
-      backoff_ms: z.number(),
+      max_attempts: z.number(),
+      backoff: z.string(),
+      initial_delay_secs: z.number(),
+      max_delay_secs: z.number(),
     })
     .optional(),
   signing_secret: z.string().optional(),
