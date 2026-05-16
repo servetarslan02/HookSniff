@@ -1,27 +1,31 @@
 # Next Session — Version Upgrade
 
-> Son güncelleme: 2026-05-16 06:30 GMT+8
+> Son güncelleme: 2026-05-17 03:56 GMT+8
 
 ---
 
 ## Hemen Yap
 
-1. `SISTEM-RAPORU.md` oku — ne var ne yok
-2. `UYGULAMA-PLANI.md` oku — 23 faz, 201 madde
-3. `HAFIZA.md` oku — önceki oturumda ne yapıldı
-4. Kaldığın yerden devat et
+1. `HAFIZA.md` oku — önceki oturumda ne yapıldı
+2. `UYGULAMA-PLANI.md` oku — tik atılmış yerleri kontrol et
+3. Kaldığın yerden devam et
 
 ## Nereden Başla?
 
-`UYGULAMA-PLANI.md`'deki tik atılmamış ilk faz'dan başla.
+**Branch:** `upgrade/system-updates` (zaten var, 9 commit pushed)
 
-Şu anki durum: **Faz 1 — Hazırlık** (hiçbir şey yapılmadı)
+Sıradaki fazlar (npm install gerektirir, Servet onayı ile):
 
 ```
-- [ ] Git branch oluştur: `upgrade/system-updates`
-- [ ] Mevcut durumu test et: `cargo check --workspace && cd dashboard && npm run build`
-- [ ] Neon DB backup al
+- [ ] Faz 2 Dashboard: npm update (dikkatli ol, memory limiti var)
+- [ ] Faz 3: TypeScript 6
+- [ ] Faz 4: ESLint 10
+- [ ] Faz 5: recharts 3
+- [ ] Faz 6: Tailwind 4
+- [ ] Faz 7: Next.js 16
 ```
+
+**ÖNEMLİ:** npm install/çalıştırma Servet'in uyarısı — memory limiti yüzünden çöküyor. CI'da yapılmalı veya dikkatli olunmalı.
 
 ## Sıralama (ÖNEMLİ!)
 
