@@ -2293,7 +2293,7 @@ async fn update_alert_admin(
             channels = COALESCE($4, channels),
             is_active = COALESCE($5, is_active),
             updated_at = NOW()
-         WHERE id = $6 AND customer_id = $7
+         WHERE id = $6 AND (customer_id = $7 OR customer_id IS NULL)
          RETURNING id, customer_id, name, condition, threshold, channels, is_active, created_at"
     )
     .bind(req.name.as_deref())
@@ -2332,7 +2332,8 @@ async fn delete_alert_admin(
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin_write(&customer)?;
-    let result = sqlx::query("DELETE FROM alert_rules WHERE id = $1 AND customer_id = $2")
+    // Allow deleting both platform alerts (customer_id IS NULL) and user alerts
+    let result = sqlx::query("DELETE FROM alert_rules WHERE id = $1 AND (customer_id = $2 OR customer_id IS NULL)")
         .bind(id)
         .bind(customer.id)
         .execute(&pool)
