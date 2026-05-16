@@ -1351,6 +1351,12 @@
     "auditLog": "Audit Log",
     "autoRefresh": "Auto-refresh",
     "autoRefresh15s": "Auto-refresh every 15s",
+    "autoRefresh30s": "Auto-refresh every 30s",
+    "uptimeLabel": "Uptime",
+    "latencyLabel": "Latency",
+    "failedInLastHour": "{count} failed in the last hour",
+    "oldestPending": "Oldest pending",
+    "healthCheckFailed": "Health check failed",
     "autoRefreshDisabled": "Auto-refresh disabled",
     "autoRefreshEnabled": "Auto-refresh enabled",
     "backToUsers": "← Back to Users",
@@ -3672,6 +3678,9 @@
     "namePlaceholder": "my_feature",
     "descPlaceholder": "What does this flag do?",
     "creating": "Creating...",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "nameImmutable": "Flag name cannot be changed after creation",
+    "nameTooLong": "Flag name must be 100 characters or less",
+    "nameInvalid": "Flag name may only contain letters, numbers, underscore, or hyphen"
   }
 }

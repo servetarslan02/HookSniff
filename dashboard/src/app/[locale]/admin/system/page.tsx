@@ -38,8 +38,8 @@ export default function AdminSystemPage() {
   const { data: alerts = [] } = useAdminAlerts();
   const { data: queueStatus } = useQueueStatus();
   const { data: failedData } = useFailedDeliveries({ limit: 20, since: '24h' });
-  const { data: deadLettersData } = useDeadLetters({ limit: 20 });
-  const { data: rlvData } = useRateLimitViolations({ limit: 20 });
+  const { data: deadLettersData } = useDeadLetters({ limit: 20, since: '24h' });
+  const { data: rlvData } = useRateLimitViolations({ limit: 20, since: '24h' });
   const { data: latencyData } = useApiLatency({ period: '24h' });
   const testWebhookMutation = useTestWebhook();
   const batchReplayMutation = useBatchReplay();
@@ -133,6 +133,7 @@ export default function AdminSystemPage() {
   };
 
   const displayHealth = health || mockHealth;
+  const isHealthError = !!healthError;
 
   // Loading state
   if (isLoading) {
@@ -166,21 +167,21 @@ export default function AdminSystemPage() {
       name: t('apiServer'),
       icon: '🚀',
       status: displayHealth?.api?.status || displayHealth?.status || 'unknown',
-      detail: displayHealth?.api?.uptime_seconds ? `Uptime: ${formatUptime(displayHealth.api.uptime_seconds)}` : t('checking'),
+      detail: displayHealth?.api?.uptime_seconds ? `${t('uptimeLabel') || 'Uptime'}: ${formatUptime(displayHealth.api.uptime_seconds)}` : t('checking'),
       latency: null,
     },
     {
       name: t('database'),
       icon: '🐘',
       status: displayHealth?.checks?.database?.status || displayHealth?.database?.status || 'unknown',
-      detail: (displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms) ? `Latency: ${displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms}ms` : t('checking'),
+      detail: (displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms) ? `${t('latencyLabel') || 'Latency'}: ${displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms}ms` : t('checking'),
       latency: displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms,
     },
     {
       name: t('cache'),
       icon: '⚡',
       status: displayHealth?.checks?.redis?.status || displayHealth?.redis?.status || 'unknown',
-      detail: (displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms) ? `Latency: ${displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms}ms` : t('checking'),
+      detail: (displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms) ? `${t('latencyLabel') || 'Latency'}: ${displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms}ms` : t('checking'),
       latency: displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms,
     },
     {
@@ -196,16 +197,16 @@ export default function AdminSystemPage() {
     },
   ];
 
-  const allOk = services.every(s => s.status === 'healthy' || s.status === 'connected' || s.status === 'ok');
-  const someDegraded = services.some(s => s.status === 'degraded' || s.status === 'slow');
+  const allOk = !isHealthError && services.every(s => s.status === 'healthy' || s.status === 'connected' || s.status === 'ok');
+  const someDegraded = isHealthError || services.some(s => s.status === 'degraded' || s.status === 'slow');
 
   const infrastructureItems = [
-    { label: t('apiServer'), value: 'Oracle Cloud ARM', detail: '4 OCPU, 24 GB RAM' },
-    { label: t('database'), value: 'Neon PostgreSQL', detail: 'Serverless, 0.5 GB' },
-    { label: t('cache'), value: 'Upstash Redis', detail: 'Serverless, 256 MB' },
-    { label: t('cdn'), value: 'Cloudflare', detail: 'DNS, SSL, DDoS' },
-    { label: t('dashboard'), value: 'Vercel', detail: 'Next.js 15' },
-    { label: t('monitoring'), value: 'Grafana Cloud', detail: 'OpenTelemetry' },
+    { label: t('apiServer'), value: 'Google Cloud Run', detail: 'Serverless, auto-scaling' },
+    { label: t('database'), value: 'Neon PostgreSQL', detail: 'Serverless, Free tier' },
+    { label: t('cache'), value: 'Upstash Redis', detail: 'Serverless, Free tier' },
+    { label: t('cdn'), value: 'Cloudflare Workers', detail: 'Edge proxy, DNS, SSL' },
+    { label: t('dashboard'), value: 'Vercel', detail: 'Next.js 15, Hobby plan' },
+    { label: t('monitoring'), value: 'Grafana Cloud', detail: 'OpenTelemetry, Free tier' },
   ];
 
   return (
@@ -223,7 +224,7 @@ export default function AdminSystemPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-red-600 dark:text-red-400" aria-hidden="true">⚠️</span>
-              <span className="text-red-700 dark:text-red-400 text-sm font-medium">{t('systemHealthDesc')}</span>
+              <span className="text-red-700 dark:text-red-400 text-sm font-medium">{t('healthCheckFailed') || 'Health check failed'}</span>
             </div>
             <button
               type="button"
@@ -263,7 +264,7 @@ export default function AdminSystemPage() {
           </button>
         </div>
         <p className="text-sm text-gray-500 dark:text-slate-400">
-          {t('lastChecked', { time: new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · {t('autoRefresh15s')}
+          {t('lastChecked', { time: new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · {t('autoRefresh30s')}
         </p>
       </div>
 
@@ -425,10 +426,10 @@ export default function AdminSystemPage() {
               ))}
             </div>
             {queueStatus.failed_last_hour > 0 && (
-              <p className="mt-3 text-sm text-red-600 dark:text-red-400">⚠️ {queueStatus.failed_last_hour} failed in the last hour</p>
+              <p className="mt-3 text-sm text-red-600 dark:text-red-400">⚠️ {t('failedInLastHour', { count: queueStatus.failed_last_hour })}</p>
             )}
             {queueStatus.oldest_pending_at && (
-              <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">Oldest pending: {new Date(queueStatus.oldest_pending_at).toLocaleString()}</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">{t('oldestPending')}: {new Date(queueStatus.oldest_pending_at).toLocaleString()}</p>
             )}
           </div>
         ) : (

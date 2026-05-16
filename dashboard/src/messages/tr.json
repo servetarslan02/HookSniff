@@ -1351,6 +1351,12 @@
     "auditLog": "İşlem Geçmişi",
     "autoRefresh": "Otomatik yenileme",
     "autoRefresh15s": "Her 15 saniyede otomatik yenileme",
+    "autoRefresh30s": "Her 30 saniyede otomatik yenileme",
+    "uptimeLabel": "Çalışma süresi",
+    "latencyLabel": "Gecikme",
+    "failedInLastHour": "Son 1 saatte {count} başarısız",
+    "oldestPending": "En eski bekleyen",
+    "healthCheckFailed": "Sağlık kontrolü başarısız",
     "autoRefreshDisabled": "Otomatik yenileme devre dışı",
     "autoRefreshEnabled": "Otomatik yenileme etkin",
     "backToUsers": "← Kullanıcılara Dön",
@@ -3672,6 +3678,9 @@
     "namePlaceholder": "ozellik_adi",
     "descPlaceholder": "Bu flag ne yapar?",
     "creating": "Oluşturuluyor...",
-    "saving": "Kaydediliyor..."
+    "saving": "Kaydediliyor...",
+    "nameImmutable": "Flag adı oluşturulduktan sonra değiştirilemez",
+    "nameTooLong": "Flag adı 100 karakterden kısa olmalı",
+    "nameInvalid": "Flag adı sadece harf, rakam, alt çizgi veya tire içerebilir"
   }
 }
