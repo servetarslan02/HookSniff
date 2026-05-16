@@ -1788,7 +1788,18 @@
     "errorRate": "Hata Oranı",
     "replaying": "Tekrar oynatılıyor...",
     "replaySelected": "Seçilenleri Tekrar Oynat",
-    "deselectAll": "Tüm Seçimi Kaldır"
+    "deselectAll": "Tüm Seçimi Kaldır",
+    "bulkActionConfirm": "Bu işlem {count} kullanıcıyı etkileyecek.",
+    "bulkBan": "Seçilenleri Yasakla",
+    "bulkChangePlan": "Plan Değiştir",
+    "bulkUnban": "Seçilenlerin Yasağını Kaldır",
+    "selectedCount": "{count} seçildi",
+    "cancel": "İptal",
+    "date": "Tarih",
+    "headers": "Başlıklar",
+    "invoices": "Faturalar",
+    "payments": "Ödemeler",
+    "viewDetails": "Detayları Gör"
   },
   "landing": {
     "nav": {
