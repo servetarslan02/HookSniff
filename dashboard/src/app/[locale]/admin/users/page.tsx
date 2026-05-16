@@ -63,6 +63,8 @@ export default function AdminUsersPage() {
     plan: planFilter || undefined,
     status: statusFilter || undefined,
     created_after: dateParams,
+    sort_field: sortField,
+    sort_dir: sortDir,
   });
 
   // Mutations
@@ -79,19 +81,20 @@ export default function AdminUsersPage() {
       setSortField(field);
       setSortDir('asc');
     }
+    setPage(1); // Reset to first page when sorting changes
   };
 
-  const sortedUsers = useMemo(() => [...users].sort((a, b) => {
-    const aVal = a[sortField] || '';
-    const bVal = b[sortField] || '';
-    const cmp = String(aVal).localeCompare(String(bVal));
-    return sortDir === 'asc' ? cmp : -cmp;
-  }), [users, sortField, sortDir]);
+  // Backend handles sorting now, no need for frontend sort
+  const sortedUsers = users;
 
   const handleExportCSV = async () => {
     if (!token) return;
     try {
-      const url = adminApi.exportUsers(token, { plan: planFilter || undefined, status: statusFilter || undefined });
+      const url = adminApi.exportUsers(token, {
+        plan: planFilter || undefined,
+        status: statusFilter || undefined,
+        created_after: dateParams || undefined,
+      });
       const res = await fetch(`${API_BASE}${url}`, { headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) throw new Error(t('exportFailed'));
       const blob = await res.blob();
@@ -110,8 +113,11 @@ export default function AdminUsersPage() {
     if (!token) return;
     try {
       const result = await adminApi.impersonateUser(token, user.id);
-      // Open impersonated session in new tab
-      window.open(`/${locale}/dashboard?impersonate_token=${result.token}`, '_blank');
+      // Store token in sessionStorage (more secure than URL params)
+      const sessionKey = `impersonate_token_${Date.now()}`;
+      sessionStorage.setItem(sessionKey, result.token);
+      // Open with session key instead of token in URL
+      window.open(`/${locale}/dashboard?impersonate_session=${sessionKey}`, '_blank');
       toast(t('impersonating') + `: ${user.email}`, 'success');
     } catch {
       toast(tc('error'), 'error');
@@ -151,7 +157,11 @@ export default function AdminUsersPage() {
   const handleConfirmBan = async () => {
     if (!banTarget) return;
     try {
-      await updateStatusMutation.mutateAsync({ userId: banTarget.id, status: 'banned' });
+      await updateStatusMutation.mutateAsync({
+        userId: banTarget.id,
+        status: 'banned',
+        reason: banReason.trim() || undefined,
+      });
       toast(t('userBanned'), 'success');
       setBanTarget(null);
       setBanReason('');
@@ -185,7 +195,7 @@ export default function AdminUsersPage() {
     if (selectedIds.size === 0) return;
     setBulkProcessing(true);
     let successCount = 0;
-    let failCount = 0;
+    const errors: string[] = [];
     const ids = Array.from(selectedIds);
 
     try {
@@ -194,21 +204,32 @@ export default function AdminUsersPage() {
         const results = await Promise.allSettled(
           ids.map((id) => updateStatusMutation.mutateAsync({ userId: id, status }))
         );
-        successCount = results.filter((r) => r.status === 'fulfilled').length;
-        failCount = results.filter((r) => r.status === 'rejected').length;
+        results.forEach((r, i) => {
+          if (r.status === 'fulfilled') {
+            successCount++;
+          } else {
+            errors.push(`${ids[i].slice(0, 8)}: ${r.reason?.message || 'Unknown error'}`);
+          }
+        });
       } else if (bulkAction === 'plan') {
         const results = await Promise.allSettled(
           ids.map((id) => updatePlanMutation.mutateAsync({ userId: id, plan: bulkPlan }))
         );
-        successCount = results.filter((r) => r.status === 'fulfilled').length;
-        failCount = results.filter((r) => r.status === 'rejected').length;
+        results.forEach((r, i) => {
+          if (r.status === 'fulfilled') {
+            successCount++;
+          } else {
+            errors.push(`${ids[i].slice(0, 8)}: ${r.reason?.message || 'Unknown error'}`);
+          }
+        });
       }
 
       if (successCount > 0) {
         toast(t('bulkActionSuccess', { count: successCount }) || `${successCount} user(s) updated`, 'success');
       }
-      if (failCount > 0) {
-        toast(t('bulkActionFailed', { count: failCount }) || `${failCount} failed`, 'error');
+      if (errors.length > 0) {
+        const errorSummary = errors.slice(0, 3).join('; ') + (errors.length > 3 ? ` (+${errors.length - 3} more)` : '');
+        toast(t('bulkActionFailed', { count: errors.length }) + `: ${errorSummary}`, 'error');
       }
       clearSelection();
       setBulkAction(null);
@@ -518,7 +539,7 @@ export default function AdminUsersPage() {
                 <span className="text-sm text-gray-500 dark:text-slate-400">
                   {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
                 </span>
-                <div className="flex gap-2">
+                <div className="flex gap-1">
                   <button type="button"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
@@ -526,9 +547,33 @@ export default function AdminUsersPage() {
                   >
                     {tc('previous')}
                   </button>
-                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">
-                    {tc('pageOf', { page, totalPages })}
-                  </span>
+                  {/* Page numbers */}
+                  {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                    let pageNum: number;
+                    if (totalPages <= 7) {
+                      pageNum = i + 1;
+                    } else if (page <= 4) {
+                      pageNum = i + 1;
+                    } else if (page >= totalPages - 3) {
+                      pageNum = totalPages - 6 + i;
+                    } else {
+                      pageNum = page - 3 + i;
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => setPage(pageNum)}
+                        className={`px-3 py-1.5 rounded-lg text-sm border transition ${
+                          page === pageNum
+                            ? 'bg-red-600 text-white border-red-600'
+                            : 'border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
                   <button type="button"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}

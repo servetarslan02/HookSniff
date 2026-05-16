@@ -126,6 +126,8 @@ export function useAdminUsers(params?: {
   plan?: string;
   status?: string;
   created_after?: string;
+  sort_field?: string;
+  sort_dir?: string;
 }) {
   const { token } = useAuth();
   return useQuery({
@@ -177,10 +179,12 @@ export function useUpdateUserStatus() {
     mutationFn: ({
       userId,
       status,
+      reason,
     }: {
       userId: string;
       status: 'active' | 'banned';
-    }) => adminApi.updateUserStatus(token!, userId, status),
+      reason?: string;
+    }) => adminApi.updateUserStatus(token!, userId, status, reason),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
     },
