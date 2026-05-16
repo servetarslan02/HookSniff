@@ -2806,7 +2806,7 @@ async fn admin_dead_letters(
 
     let rows = sqlx::query_as::<_, DeadLetterRow>(&format!(
         r#"SELECT dl.id, dl.delivery_id, dl.endpoint_id, dl.customer_id,
-            dl.payload, dl.reason, dl.attempts, dl.created_at,
+            '{}'::jsonb as payload, dl.reason, dl.attempts, dl.created_at,
             c.email as customer_email,
             e.url as endpoint_url
         FROM dead_letters dl
@@ -2867,6 +2867,7 @@ async fn admin_queue_status(
 #[derive(Debug, Deserialize)]
 pub struct RateLimitViolationParams {
     pub limit: Option<i64>,
+    pub since: Option<String>,
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -2891,15 +2892,24 @@ async fn admin_rate_limit_violations(
     require_admin(&customer)?;
 
     let limit = params.limit.unwrap_or(50).min(200);
+    let since = params.since.as_deref().unwrap_or("24h");
+    let interval = match since {
+        "1h" => "1 hour",
+        "24h" => "24 hours",
+        "7d" => "7 days",
+        "30d" => "30 days",
+        _ => "24 hours",
+    };
 
-    let rows = sqlx::query_as::<_, RateLimitViolationRow>(
+    let rows = sqlx::query_as::<_, RateLimitViolationRow>(&format!(
         r#"SELECT rv.id, rv.customer_id, rv.endpoint_id, rv.ip,
             rv.requests_count, rv.limit_per_window, rv.window_seconds, rv.created_at,
             c.email as customer_email
         FROM rate_limit_violations rv
         LEFT JOIN customers c ON c.id = rv.customer_id
-        ORDER BY rv.created_at DESC LIMIT $1"#
-    )
+        WHERE rv.created_at >= NOW() - INTERVAL '{}'
+        ORDER BY rv.created_at DESC LIMIT $1"#, interval
+    ))
     .bind(limit)
     .fetch_all(&pool)
     .await?;

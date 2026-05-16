@@ -867,9 +867,10 @@ export const adminApi = {
   getQueueStatus: (token: string) =>
     apiFetch<{ pending: number; processing: number; failed: number; total: number; oldest_pending_at: string | null; failed_last_hour: number }>('/admin/queue/status', { token }),
 
-  getRateLimitViolations: (token: string, params?: { limit?: number }) => {
+  getRateLimitViolations: (token: string, params?: { limit?: number; since?: string }) => {
     const qs = new URLSearchParams();
     if (params?.limit) qs.set('limit', params.limit.toString());
+    if (params?.since) qs.set('since', params.since);
     return apiFetch<{ violations: Array<{ id: string; customer_id: string | null; endpoint_id: string | null; ip: string | null; requests_count: number; limit_per_window: number; window_seconds: number; created_at: string; customer_email: string | null }>; count: number }>(`/admin/rate-limit-violations?${qs}`, { token });
   },
 
