@@ -20,25 +20,10 @@ interface Env {
 }
 
 // ── Region Routing ──
-// Route users to the nearest Cloud Run region based on Cloudflare's CF-Country header
-function getNearestApiBase(env: Env, country?: string | null): string {
-  if (!country) return env.API_BASE; // fallback to default
-
-  const c = country.toUpperCase();
-
-  // Middle East countries → me-west1 (Tel Aviv)
-  const meCountries = ['IL', 'TR', 'SA', 'AE', 'QA', 'KW', 'BH', 'OM', 'JO', 'LB', 'IQ', 'EG', 'IR'];
-  if (meCountries.includes(c)) return env.API_BASE_ME || env.API_BASE;
-
-  // Europe countries → europe-west3 (Frankfurt)
-  const euCountries = ['DE', 'FR', 'GB', 'IT', 'ES', 'NL', 'PL', 'SE', 'NO', 'DK', 'FI', 'AT', 'CH', 'BE', 'IE', 'PT', 'GR', 'CZ', 'RO', 'HU', 'BG', 'HR', 'SK', 'SI', 'LT', 'LV', 'EE', 'LU', 'CY', 'MT'];
-  if (euCountries.includes(c)) return env.API_BASE_EU || env.API_BASE;
-
-  // Americas → us-central1 (Iowa)
-  const usCountries = ['US', 'CA', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE', 'VE'];
-  if (usCountries.includes(c)) return env.API_BASE_US || env.API_BASE;
-
-  // Asia-Pacific & others → europe-west1 (default)
+// Route all traffic to europe-west1 (the only region with min-instances=1).
+// Other regions (me-west1, europe-west3, us-central1) don't have min-instances
+// and cause 1-2 min cold starts. Re-enable multi-region when all regions are deployed.
+function getNearestApiBase(env: Env, _country?: string | null): string {
   return env.API_BASE;
 }
 
@@ -224,23 +209,6 @@ export default {
         }
       );
     }
-  },
-
-  // Keep-alive: ping all regional Cloud Run instances every 5 min
-  // to prevent cold starts (Cloud Run scales to 0 after ~15 min idle)
-  async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext) {
-    const regions = [env.API_BASE, env.API_BASE_EU, env.API_BASE_ME, env.API_BASE_US].filter(Boolean);
-    const results = await Promise.allSettled(
-      regions.map(async (base) => {
-        const url = `${base}/health`;
-        const res = await fetch(url, { method: 'GET' });
-        return { region: base, status: res.status };
-      })
-    );
-    const summary = results.map((r) =>
-      r.status === 'fulfilled' ? `${r.value.region.split('.')[0]}:${r.value.status}` : 'fail'
-    );
-    console.log(`[KeepAlive] ${summary.join(' | ')}`);
   },
 };
 
