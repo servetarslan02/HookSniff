@@ -68,10 +68,10 @@ await hs.webhooks.send({
 });`,
     },
     metrics: [
-      { label: t('avgDeliveryLatency'), value: '<200ms' },
-      { label: t('deliverySuccessRate'), value: '99.97%' },
+      { label: 'avgDeliveryLatency', value: '<200ms' },
+      { label: 'deliverySuccessRate', value: '99.97%' },
       { label: 'SDKs available', value: '11' },
-      { label: t('freeTierEvents'), value: '1,000/mo' },
+      { label: 'freeTierEvents', value: '1,000/mo' },
     ],
   },
   {
@@ -121,10 +121,10 @@ hs.webhooks.send(
 )`,
     },
     metrics: [
-      { label: t('eventsProcessedDay'), value: '50K+' },
-      { label: t('orderedDelivery'), value: '✅' },
-      { label: t('retryOnFailure'), value: '5x / 24h' },
-      { label: t('multiEndpoint'), value: '✅' },
+      { label: 'eventsProcessedDay', value: '50K+' },
+      { label: 'orderedDelivery', value: '✅' },
+      { label: 'retryOnFailure', value: '5x / 24h' },
+      { label: 'multiEndpoint', value: '✅' },
     ],
   },
   {
@@ -174,10 +174,10 @@ await hs.webhooks.send({
 });`,
     },
     metrics: [
-      { label: t('deliveryGuarantee'), value: 'Zero loss' },
-      { label: t('signature'), value: 'HMAC-SHA256' },
-      { label: t('latencyP99'), value: '<200ms' },
-      { label: t('cloudevents'), value: 'v1.0' },
+      { label: 'deliveryGuarantee', value: 'Zero loss' },
+      { label: 'signature', value: 'HMAC-SHA256' },
+      { label: 'latencyP99', value: '<200ms' },
+      { label: 'cloudevents', value: 'v1.0' },
     ],
   },
   {
@@ -227,10 +227,10 @@ hs.webhooks.send(
 )`,
     },
     metrics: [
-      { label: t('eventDriven'), value: '✅' },
+      { label: 'eventDriven', value: '✅' },
       { label: 'MCP compatible', value: '✅' },
-      { label: t('cloudevents'), value: 'v1.0' },
-      { label: t('schemaRegistry'), value: '✅' },
+      { label: 'cloudevents', value: 'v1.0' },
+      { label: 'schemaRegistry', value: '✅' },
     ],
   },
   {
@@ -288,8 +288,8 @@ func main() {
     metrics: [
       { label: 'SDKs', value: '11 languages' },
       { label: 'Playground', value: '✅' },
-      { label: t('embeddablePortal'), value: '✅' },
-      { label: t('openSource'), value: '✅' },
+      { label: 'embeddablePortal', value: '✅' },
+      { label: 'openSource', value: '✅' },
     ],
   },
   {
@@ -340,9 +340,9 @@ await hs.Webhooks.SendAsync(new WebhookRequest
 });`,
     },
     metrics: [
-      { label: t('auditTrail'), value: 'Complete' },
+      { label: 'auditTrail', value: 'Complete' },
       { label: 'Data region', value: 'EU (Frankfurt)' },
-      { label: t('signature'), value: 'HMAC-SHA256' },
+      { label: 'signature', value: 'HMAC-SHA256' },
       { label: 'GDPR', value: 'Compliant' },
     ],
   },
@@ -497,7 +497,7 @@ export function UseCasesPageContent() {
               <div className="space-y-4">
                 {current.metrics.map((m) => (
                   <div key={m.label} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-slate-400">{m.label}</span>
+                    <span className="text-sm text-gray-600 dark:text-slate-400">{t(m.label)}</span>
                     <span className="text-sm font-semibold text-gray-900 dark:text-white">{m.value}</span>
                   </div>
                 ))}

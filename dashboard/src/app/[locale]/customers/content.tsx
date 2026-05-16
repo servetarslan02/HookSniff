@@ -138,9 +138,9 @@ const techLogos = [
 
 const stats = [
   { value: '11', label: 'SDKs published' },
-  { value: '1,378', label: t('metricTestsPassing') },
-  { value: '99.97%', label: t('metricDeliveryRate') },
-  { value: '8', label: t('metricLanguages') },
+  { value: '1,378', label: 'metricTestsPassing' },
+  { value: '99.97%', label: 'metricDeliveryRate' },
+  { value: '8', label: 'metricLanguages' },
 ];
 
 export function CustomersPageContent() {
@@ -178,7 +178,7 @@ export function CustomersPageContent() {
           {stats.map((s) => (
             <div key={s.label} className="text-center p-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
               <p className="text-3xl font-bold text-brand-600 dark:text-brand-400">{s.value}</p>
-              <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">{s.label}</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">{t(s.label)}</p>
             </div>
           ))}
         </div>

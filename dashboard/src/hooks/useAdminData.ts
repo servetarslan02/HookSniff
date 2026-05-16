@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminApi, webhooksApi } from '@/lib/api';
+import { adminApi, webhooksApi, type PlatformSettings } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import {
   AdminStatsSchema,
@@ -17,7 +17,6 @@ import {
   RevenueCohortsResponseSchema,
   RefundsResponseSchema,
   PlatformSettingsSchema,
-  AlertRuleSchema,
   FailedDeliveriesResponseSchema,
   DeadLettersResponseSchema,
   RateLimitViolationsResponseSchema,
@@ -288,7 +287,7 @@ export function useUpdateSettings() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Record<string, unknown>) => adminApi.updateSettings(token!, data),
+    mutationFn: (data: Partial<PlatformSettings>) => adminApi.updateSettings(token!, data as PlatformSettings),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'settings'] });
     },

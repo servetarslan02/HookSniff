@@ -185,7 +185,7 @@ export const applicationsApi = {
 // Endpoint API
 export interface RetryPolicyConfig {
   max_attempts: number;
-  backoff: 'exponential' | 'linear' | 'fixed';
+  backoff: string;
   initial_delay_secs: number;
   max_delay_secs: number;
 }
