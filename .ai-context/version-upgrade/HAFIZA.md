@@ -33,10 +33,9 @@
 - [x] Faz 17: is-a.dev ✅ (kullanılmıyor — silindi)
 - [x] Faz 20: Kod Kalitesi ✅ (console.log wrapping + unwrap() temizliği — 47 production unwrap düzeltildi)
 - [x] Faz 22: Ek Düzeltmeler ✅ (tsconfig ES2022, MCP Node 20, SQL injection fix, dangerouslySetInnerHTML audit)
-- [ ] Faz 18: Final Test (Vercel deploy'da)
-- [ ] Faz 19: Merge & Deploy
-- [ ] Faz 21: E2E Test
-- [ ] dead_code temizliği (11 tane — mevcut #[allow(dead_code)]'ler korundu, monitoring/sqlx gereksinimi)
+- [x] Faz 18: Final Test ✅ (Vercel deploy kontrol — tüm sayfalar 200, login/pricing/dashboard OK)
+- [x] Faz 19: Merge & Deploy ✅ (main branch'de, unwrap + E2E push edildi)
+- [x] Faz 21: E2E Test ✅ (6 test suite, 257 satır — login, endpoints, dashboard, i18n, responsive, public pages)
 - [ ] cargo audit ignore'ları (8 tane RUSTSEC)
 
 ## Kalan İşler (Bir Sonraki Oturum)
