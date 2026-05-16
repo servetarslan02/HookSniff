@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:05 GMT+8 (Oturum 184)
+> Son güncelleme: 2026-05-17 05:10 GMT+8 (Oturum 185)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,23 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 185 — 2026-05-17 05:10 GMT+8
+1. **Overview + Users + User Detail Derin Tarama** ✅
+   - **Overview**: Hardcoded "99.9%" uptime kaldırıldı (gerçek tracking yok → N/A gösteriliyor)
+   - **User Detail**: 12 redundant `toast(t('x') || t('x'))` düzeltildi
+   - **Kontrol edilen:**
+     - Tüm translation key'leri mevcut ✅
+     - API endpoint'leri doğru çalışıyor ✅
+     - Zod schema'lar backend ile uyumlu ✅
+     - Sorting/filtering backend'de yapılıyor ✅
+     - CSV export doğru çalışıyor ✅
+     - Impersonate akışı doğru ✅
+     - GDPR export/delete doğru ✅
+     - Bulk actions doğru çalışıyor ✅
+     - Plan options doğru ✅
+     - Hardcoded string yok ✅
+   - Commit: 383a6bfd — push edildi
 
 ### Oturum 184 — 2026-05-17 05:05 GMT+8
 1. **3 Bilinen Limitasyon Düzeltildi** ✅
