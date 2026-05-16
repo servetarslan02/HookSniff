@@ -138,7 +138,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
       return res.json();
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === 'AbortError') {
-        throw new Error('Request timed out. Please try again.');
+        throw new Error('Request timed out. Please try again.', { cause: err });
       }
       lastError = err;
       // Don't retry non-network errors (already parsed API errors)
