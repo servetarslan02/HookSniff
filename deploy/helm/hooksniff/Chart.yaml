@@ -2,8 +2,8 @@ apiVersion: v2
 name: hooksniff
 description: HookSniff - Reliable webhook delivery for developers
 type: application
-version: 0.1.0
-appVersion: "1.0.0"
+version: 0.4.0
+appVersion: "0.4.0"
 keywords:
   - webhook
   - hooksniff
