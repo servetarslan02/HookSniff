@@ -4896,6 +4896,7 @@ mod tests {
         let entry = AdminAuditEntry {
             id: Uuid::new_v4(),
             customer_id: Uuid::new_v4(),
+            customer_email: Some("admin@example.com".to_string()),
             action: "LOGIN".to_string(),
             resource_type: "auth".to_string(),
             resource_id: None,
@@ -4917,6 +4918,7 @@ mod tests {
             format: None,
             plan: None,
             status: None,
+            created_after: None,
         };
         assert!(params.format.is_none());
         assert!(params.plan.is_none());
@@ -4972,13 +4974,13 @@ mod tests {
 
     #[test]
     fn test_dead_letter_params_defaults() {
-        let params = DeadLetterParams { limit: None };
+        let params = DeadLetterParams { limit: None, since: None };
         assert!(params.limit.is_none());
     }
 
     #[test]
     fn test_rate_limit_violation_params_defaults() {
-        let params = RateLimitViolationParams { limit: None };
+        let params = RateLimitViolationParams { limit: None, since: None };
         assert!(params.limit.is_none());
     }
 
@@ -5141,6 +5143,7 @@ mod tests {
         let refund = RefundRow {
             id: Uuid::nil(),
             customer_id: Uuid::nil(),
+            email: "user@example.com".to_string(),
             amount_cents: 4900,
             currency: "usd".to_string(),
             reason: Some("Customer requested refund".to_string()),
@@ -5164,6 +5167,7 @@ mod tests {
         let refund = RefundRow {
             id: Uuid::nil(),
             customer_id: Uuid::nil(),
+            email: "user@example.com".to_string(),
             amount_cents: 9900,
             currency: "usd".to_string(),
             reason: None,

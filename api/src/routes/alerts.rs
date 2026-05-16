@@ -319,8 +319,8 @@ async fn test_alert(
         if let Err(e) = publisher.publish(crate::events::AppEvent::AlertTriggered {
             alert_id,
             customer_id: customer.id,
-            name: alert_name,
-            condition: alert_condition,
+            name: alert_name.clone(),
+            condition: alert_condition.clone(),
         }).await {
             tracing::warn!("Failed to publish AlertTriggered event: {:?}", e);
         }
@@ -404,7 +404,6 @@ mod tests {
         assert_eq!(req.condition, "failure_rate");
         assert_eq!(req.threshold, 5);
         assert_eq!(req.channels, vec!["slack", "email"]);
-        assert!(req._endpoint_id.is_none());
     }
 
     #[test]
@@ -417,7 +416,7 @@ mod tests {
             "_endpoint_id":"11111111-1111-1111-1111-111111111111"
         }"#;
         let req: CreateAlertRequest = serde_json::from_str(json).unwrap();
-        assert!(req._endpoint_id.is_some());
+        assert_eq!(req.name, "Endpoint latency");
     }
 
     #[test]

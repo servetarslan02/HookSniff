@@ -958,6 +958,12 @@ mod tests {
             cf_account_id: None,
             cf_r2_token: None,
             cf_r2_bucket: None,
+            event_publisher_enabled: true,
+            ws_enabled: true,
+            ws_max_connections: 100,
+            ws_max_connections_per_user: 5,
+            ws_heartbeat_interval_secs: 30,
+            ws_shutdown_timeout_secs: 10,
         }
     }
 
