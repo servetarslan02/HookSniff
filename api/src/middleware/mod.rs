@@ -137,7 +137,7 @@ pub async fn request_id_middleware(mut req: Request, next: Next) -> Response {
 /// 2. JWT token: `Authorization: Bearer eyJ...` — verifies JWT and loads customer by `sub` claim
 ///
 /// Test keys (hr_test_*) are marked and can be checked downstream to skip real delivery.
-/// Extract token from request: first try Authorization header, then try cookie.
+/// Extract token from request: first try Authorization header, then try cookie, then try query param (for WebSocket).
 /// Skips non-token Authorization values (e.g. "Bearer cookie" from frontend cookie mode).
 fn extract_token(req: &Request) -> Option<String> {
     // Try Authorization header first — but only if it looks like a real token
@@ -161,6 +161,17 @@ fn extract_token(req: &Request) -> Option<String> {
             if let Some(value) = cookie.strip_prefix(&format!("{}=", AUTH_COOKIE_NAME)) {
                 if !value.is_empty() {
                     return Some(value.to_string());
+                }
+            }
+        }
+    }
+    // Try query parameter (for WebSocket connections — browser can't set WS headers)
+    if let Some(query) = req.uri().query() {
+        for pair in query.split('&') {
+            if let Some(value) = pair.strip_prefix("token=") {
+                let decoded = urlencoding::decode(value).unwrap_or_default();
+                if !decoded.is_empty() {
+                    return Some(decoded.to_string());
                 }
             }
         }
