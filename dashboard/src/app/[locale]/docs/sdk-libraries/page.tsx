@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape -- Code examples contain intentional escapes (Elixir, Ruby, etc.) */
 import { useTranslations } from 'next-intl';
 
 // Force SSR — SSG output was missing on Vercel for this page

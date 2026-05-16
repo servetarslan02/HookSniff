@@ -1,7 +1,5 @@
-# Dependabot — DEVRE DIŞI bırakıldı (Oturum 149)
-# Sebep: Vercel Hobby plan günlük 100 deploy limiti aşıldı
-# Her PR ayrı deploy tetikliyordu. Manuel güncellemeler yeterli.
-# Tekrar açmak için: open-pull-requests-limit değerlerini 3 yap
+# Dependabot — Aktif (limit: 3 PR)
+# Not: Vercel Hobby plan günlük 100 deploy limiti var, dikkatli olun.
 version: 2
 updates:
   # Rust (API + Worker)
