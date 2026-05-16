@@ -1857,7 +1857,9 @@
     "freePlanLimits": "Ücretsiz Plan Limitleri",
     "maxWebhooks": "Maks Webhook/ay",
     "rateLimit": "Hız Limiti/dk",
-    "polarSyncInfo": "Fiyat değişiklikleri platformu günceller. Polar ürünlerinin de eşleştirilmesi gerekir."
+    "polarSyncInfo": "Fiyat değişiklikleri platformu günceller. Polar ürünlerinin de eşleştirilmesi gerekir.",
+    "planPricesMoved": "Plan fiyatları ve limitleri artık Revenue sayfasından yönetiliyor.",
+    "goToRevenue": "Revenue'ye Git"
   },
   "landing": {
     "nav": {
