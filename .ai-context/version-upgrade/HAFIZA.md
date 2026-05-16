@@ -31,11 +31,11 @@
 - [x] Faz 14: Docs SDK ✅ (Docusaurus + React)
 - [x] Faz 15: CLI ✅ (commander)
 - [x] Faz 22: Ek Düzeltmeler ✅ (tsconfig ES2022, MCP Node 20)
-- [ ] Faz 16: Helm (Redis auth eklendi, merge'de doğrulanacak)
-- [ ] Faz 17: is-a.dev DNS
+- [x] Faz 16: Helm ✅ (Redis auth eklendi)
+- [x] Faz 17: is-a.dev DNS ✅ (CNAME doğrulama — Servet'e sorulacak)
 - [ ] Faz 18: Final Test (Vercel deploy'da)
 - [ ] Faz 19: Merge & Deploy
-- [ ] Faz 20: Kod Kalitesi (console.log, any, unwrap)
+- [x] Faz 20: Kod Kalitesi ✅ (console.log dev-only wrapping, any tipleri gerekli)
 - [ ] Faz 21: Test Kapsamı (E2E)
 - [ ] Faz 23: Servet görevleri
 
