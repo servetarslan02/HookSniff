@@ -753,3 +753,118 @@ export const DeliveryAttemptResponseSchema = z.object({
   duration_ms: z.number().nullable().optional(),
   created_at: z.string(),
 });
+
+// ── Latency Trend Schema ──
+export const LatencyBucketSchema = z.object({
+  ts: z.string(),
+  avg_ms: z.number(),
+  p95_ms: z.number(),
+});
+export const LatencyTrendSchema = z.object({
+  buckets: z.array(LatencyBucketSchema),
+});
+
+// ── API Key Schema ──
+export const ApiKeySchema = z.object({
+  id: z.string(),
+  name: z.string().nullable(),
+  api_key_prefix: z.string(),
+  is_active: z.boolean(),
+  created_at: z.string(),
+  last_used_at: z.string().nullable(),
+});
+
+// ── Portal Config Schema ──
+export const PortalConfigSchema = z.object({
+  id: z.string().optional(),
+  company_name: z.string().optional(),
+  logo_url: z.string().nullable().optional(),
+  primary_color: z.string().optional(),
+  font_family: z.string().optional(),
+  dark_mode: z.boolean().optional(),
+  show_events: z.boolean().optional(),
+  show_deliveries: z.boolean().optional(),
+  allowed_events: z.array(z.string()).optional(),
+  custom_css: z.string().optional(),
+});
+export const PortalEmbedCodeSchema = z.object({
+  iframe: z.string().optional(),
+  portal_url: z.string().optional(),
+  react: z.string().optional(),
+  script: z.string().optional(),
+});
+export const PortalProfileSchema = z.object({
+  id: z.string(),
+  email: z.string(),
+  name: z.string().nullable(),
+  plan: z.string(),
+  created_at: z.string(),
+});
+export const PortalUsageSchema = z.object({
+  total_deliveries: z.number(),
+  total_endpoints: z.number(),
+  success_rate: z.number(),
+  period_start: z.string(),
+  period_end: z.string(),
+});
+
+// ── Rate Limit Schema ──
+export const RateLimitSchema = z.object({
+  endpoint_id: z.string(),
+  requests_per_second: z.number(),
+  burst_size: z.number(),
+  enabled: z.boolean(),
+});
+
+// ── Schema Registry Schema ──
+export const SchemaRegistryItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  schema: z.any(),
+  version: z.number(),
+  created_at: z.string(),
+});
+export const SchemaRegistryListSchema = z.object({
+  schemas: z.array(SchemaRegistryItemSchema),
+});
+
+// ── Search Schema ──
+export const SearchResultSchema = z.object({
+  id: z.string(),
+  event: z.string().nullable(),
+  status: z.string(),
+  attempt_count: z.number(),
+  response_status: z.number().nullable(),
+  created_at: z.string(),
+  endpoint_url: z.string(),
+});
+export const SearchResponseSchema = z.object({
+  deliveries: z.array(SearchResultSchema),
+  total: z.number(),
+  page: z.number(),
+  per_page: z.number(),
+  query: z.string(),
+});
+
+// ── Service Token Schema ──
+export const ServiceTokenSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  token_prefix: z.string(),
+  created_at: z.string(),
+  last_used_at: z.string().nullable(),
+});
+
+// ── Template Schema ──
+export const TemplateSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  industry: z.string().optional(),
+  event_types: z.array(z.string()),
+  endpoint_count: z.number().optional(),
+});
+export const TemplateListSchema = z.object({
+  templates: z.array(TemplateSchema),
+});
