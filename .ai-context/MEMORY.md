@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:25 GMT+8 (Oturum 188)
+> Son güncelleme: 2026-05-17 05:30 GMT+8 (Oturum 189)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,19 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 189 — 2026-05-17 05:30 GMT+8
+1. **custom_retry_schedules Flag Bağlantısı** ✅
+   - `create_endpoint`: Flag devre dışıysa custom retry_policy yok sayılır
+   - `update_endpoint`: Flag devre dışıysa custom retry_policy yok sayılır
+   - `update_retry_policy`: Flag devre dışıysa 400 hatası döner
+   - **Tüm 5 flag artık tam bağlı:**
+     - `deduplication` ✅
+     - `bulk_replay` ✅
+     - `gdpr_data_deletion` ✅
+     - `standard_webhooks` ✅
+     - `custom_retry_schedules` ✅
+   - Commit: a8e6f552 — push edildi
 
 ### Oturum 188 — 2026-05-17 05:25 GMT+8
 1. **Feature Flags → Uygulama Bağlantısı** ✅
