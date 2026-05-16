@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm ci && npm run build && sh scripts/fix-manifest.sh",
+  "buildCommand": "rm -rf .next && npm ci && npm run build && sh scripts/fix-manifest.sh",
   "outputDirectory": ".next",
   "framework": "nextjs",
   "installCommand": "npm ci",
