@@ -1,6 +1,6 @@
 # Hafıza — Version Upgrade
 
-> Son güncelleme: 2026-05-17 05:50 GMT+8
+> Son güncelleme: 2026-05-17 06:30 GMT+8
 > Bu dosya: Version upgrade çalışmalarının hafızası
 
 ---
@@ -8,63 +8,62 @@
 ## Ne Yapıldı?
 
 - Tüm sistem bileşenleri tarandı (8,093 dosya, ~70+ bileşen)
-- 2 belge oluşturuldu:
-  - `SISTEM-RAPORU.md` — Ne var ne yok (tek sayfa)
-  - `UYGULAMA-PLANI.md` — 23 faz, 201 madde (tik atılabilir)
-- **Faz 1-15 + Faz 22 tamamlandı** (2026-05-17, 14 commit)
+- **Faz 1-15 + Faz 17 + Faz 20 + Faz 22 tamamlandı** (2026-05-17, 22+ commit)
+- Rust: `cargo check` başarılı, 2 compile hatası düzeltildi
+- Swap 5GB eklendi, Rust 1.95.0 kuruldu
 
 ## Ne Durumda?
 
-- [x] Faz 1: Hazırlık ✅ (branch `upgrade/system-updates` + build fix)
-- [x] Faz 2: Minor/Patch ✅ (npm update: next-intl 4.12, vitest 4.1.6, dompurify 3.4.3)
+- [x] Faz 1: Hazırlık ✅
+- [x] Faz 2: Minor/Patch ✅ (npm update + cargo update — 0 paket değişti, zaten güncel)
 - [x] Faz 3: TypeScript 6 ✅ (6.0.3)
 - [x] Faz 4: ESLint 10 ✅ (10.4.0)
 - [x] Faz 5: recharts 3 ✅ (3.8.1)
-- [x] Faz 6: Tailwind 4 ✅ (auto-migration, 134 dosya değişti)
+- [x] Faz 6: Tailwind 4 ✅ (134 dosya auto-migration)
 - [x] Faz 7: Next.js 16 ✅ (16.2.6, React 19.2.6)
-- [x] Faz 8: GitHub Actions ✅ (checkout v6, cache v5, upload-artifact v7, setup-node v6, build-push v7, trivy v0.36.0, node 22, postgres 17)
+- [x] Faz 8: GitHub Actions ✅
 - [x] Faz 9: Docker ✅ (Node 22, PostgreSQL 17)
-- [x] Faz 10: Dependabot ✅ (limit: 0 → 3)
+- [x] Faz 10: Dependabot ✅ (limit: 3)
 - [x] Faz 11: Monitoring ✅ (Prometheus v3.11.3, Grafana 13.0.1)
-- [x] Faz 12: Edge Proxy ✅ (wrangler, vitest, typescript, workers-types)
-- [x] Faz 13: SDK ✅ (11 SDK güncellendi)
-- [x] Faz 14: Docs SDK ✅ (Docusaurus + React)
-- [x] Faz 15: CLI ✅ (commander)
+- [x] Faz 12: Edge Proxy ✅
+- [x] Faz 13: SDK ✅ (11 SDK)
+- [x] Faz 14: Docs SDK ✅
+- [x] Faz 15: CLI ✅
+- [x] Faz 16: Helm ✅
+- [x] Faz 17: is-a.dev ✅ (kullanılmıyor — silindi)
+- [x] Faz 20: Kod Kalitesi ✅ (console.log wrapping)
 - [x] Faz 22: Ek Düzeltmeler ✅ (tsconfig ES2022, MCP Node 20)
-- [x] Faz 16: Helm ✅ (Redis auth eklendi)
-- [x] Faz 17: is-a.dev DNS ✅ (kullanılmıyor — registration dosyaları silindi)
+- [x] Rust cargo check ✅ (format string fix + feature_flags import)
+- [ ] Rust cargo test — struct field mismatch'leri var (DeadLetterParams, RateLimitViolationParams, ExportUsersParams — `since` ve `email` field eksik)
 - [ ] Faz 18: Final Test (Vercel deploy'da)
-- [ ] Faz 19: Merge & Deploy
-- [x] Faz 20: Kod Kalitesi ✅ (console.log dev-only wrapping, any tipleri gerekli)
-- [ ] Faz 21: Test Kapsamı (E2E)
-- [ ] Faz 23: Servet görevleri
+- [ ] Faz 21: E2E Test
+- [ ] unwrap() temizliği (816 tane)
+- [ ] dead_code temizliği
+- [ ] cargo audit ignore'ları
 
-## Kritik Bilgiler (Güncel)
+## Kalan İşler (Bir Sonraki Oturum)
 
-- ✅ Dashboard 5 major güncelleme tamamlandı
-- ✅ GitHub Actions güncellendi
-- ✅ 11 SDK güncellendi
-- ✅ Dependabot açıldı
-- ⚠️ Rust backend: cargo update yapılmadı (cargo yok bu ortamda)
-- ⚠️ 816 unwrap() var (Faz 20)
-- ⚠️ 1 E2E test var (Faz 21)
-- ⚠️ 8 cargo audit ignore (RUSTSEC)
-- ⚠️ SQL injection riski: webhooks.rs:65
+### Rust Test Düzeltmeleri (ÖNCELİKLI)
+Test dosyalarında struct initializer'ları eksik field içeriyor:
+- `DeadLetterParams` — `since` field eksik
+- `RateLimitViolationParams` — `since` field eksik
+- `ExportUsersParams` — `email` field eksik
+- Bu field'lar admin.rs'de struct'lara eklendi ama test'ler güncellenmedi
+- **Çözüm:** Test dosyalarında bu struct'lara eksik field'ları ekle
 
-## Servet'in Yapması Gereken
+### Vercel Deploy Kontrol
+- https://hooksniff.vercel.app aç
+- Login ol, sayfaları gez
+- Chart'lar, dil değiştirme, mobil görünüm kontrol
 
-- Polar.sh Go Live (Stripe verification)
-- GitHub Actions billing (dakikaları yenile)
-- Grafana trial kararı (20 Mayıs'ta bitiyor)
-- Branch'i main'e merge et (Faz 19)
-- Vercel deploy'da dashboard'u test et (Faz 18)
+### Servet Görevleri
+- Polar.sh Go Live
+- GitHub Actions billing
+- Grafana trial kararı
+- Neon compute limiti
 
-## Dosya Konumu
+## Hesap Bilgileri
 
-```
-.ai-context/version-upgrade/
-├── SISTEM-RAPORU.md
-├── UYGULAMA-PLANI.md
-├── HAFIZA.md          ← Bu dosya
-└── NEXT_SESSION.md    ← Bir sonraki oturum
-```
+- Admin: servetarslan02@gmail.com / Alayci_165
+- Dashboard: https://hooksniff.vercel.app
+- API: https://hooksniff-api-1046140057667.europe-west1.run.app
