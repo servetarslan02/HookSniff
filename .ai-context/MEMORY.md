@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:55 GMT+8 (Oturum 191)
+> Son güncelleme: 2026-05-17 06:05 GMT+8 (Oturum 195)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,54 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 195 — 2026-05-17 06:05 GMT+8
+1. **Settings Sayfası Derin İnceleme + 13 Fix** ✅
+   - **Backend:**
+     - API key & webhook secret maskeleniyor (GET response'unda gerçek değer dönmüyordu)
+     - Settings update: tüm sayısal alanlar validate ediliyor (negatif değer engeli)
+     - Settings update: frontend '***' gönderdiğinde gerçek secret korunuyor
+     - Alert oluşturma: platform alert'leri için NULL customer_id
+   - **Frontend:**
+     - Settings save ve alert save'de double-submit koruması
+     - Alert save: Promise.all → Promise.allSettled (kısmi hata raporu)
+     - Dev Tools: alert() → toast() (Sentry test, WS status)
+     - Dev Tools: "Clear Cache" butonu artık gerçekten cache temizliyor
+     - Translation: alertSettingsPartialFail key (EN+TR)
+   - Commit: e5d7bfc5 — push edildi
+
+### Oturum 194 — 2026-05-17 06:00 GMT+8
+1. **System Sayfası 3. Katman — 10 Fix** ✅
+   - `queue_detail` sorgusu `deliveries` → `webhook_queue` (yanlış tablo!)
+   - `overall_healthy` artık Redis hatasını da dikkate alıyor
+   - Health cache: sadece sağlıklı response cache'leniyor
+   - Dead letters: payload frontend'e gönderilmiyor
+   - Rate limit violations: `since` time filter eklendi
+   - Error banner: doğru mesaj
+   - Queue status: hardcoded EN → translation key'ler
+   - Translation: 6 yeni key (EN+TR)
+   - Commit: f8f52dc4
+
+### Oturum 193 — 2026-05-17 05:54 GMT+8
+1. **System Sayfası 2. Katman — 13 Fix** ✅
+   - Test webhook: 10sn timeout + 5sn connect timeout
+   - Queue status: 6 COUNT → 1 sorgu with FILTER
+   - Dead letters: `since` time filter eklendi
+   - Failed deliveries: response_body 4KB truncate
+   - Infrastructure: Oracle Cloud ARM → Google Cloud Run
+   - Health error state: allOk=false on error
+   - refetchInterval: 15sn → 30sn
+   - Commit: caa957e9
+
+### Oturum 192 — 2026-05-17 05:50 GMT+8
+1. **Feature Flags Derin Katman 2 — 11 Fix** ✅
+   - FNV-1a hash (DefaultHasher restart'ta stabil değildi)
+   - is_enabled() rollout=100% gerektiriyor
+   - enabled_for_plans: fail-closed (bozuk JSON)
+   - all() sıralı dönüyor (HashMap rastgele)
+   - feature_flag_refresher: exponential backoff
+   - Double-submit koruması, staleTime 30sn
+   - Commit: 88033155
 
 ### Oturum 191 — 2026-05-17 05:55 GMT+8
 1. **Version Upgrade — Faz 1-15 + Faz 22** ✅ (14 commit, branch: `upgrade/system-updates`)

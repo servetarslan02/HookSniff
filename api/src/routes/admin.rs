@@ -1528,11 +1528,13 @@ pub struct AdminAuditLogResponse {
 pub struct AdminAuditEntry {
     pub id: Uuid,
     pub customer_id: Uuid,
+    pub customer_email: Option<String>,
     pub action: String,
     pub resource_type: String,
     pub resource_id: Option<String>,
     pub details: Option<serde_json::Value>,
     pub ip_address: Option<String>,
+    #[serde(skip_serializing)]
     pub user_agent: Option<String>,
     pub created_at: DateTime<Utc>,
 }
@@ -1549,16 +1551,16 @@ async fn admin_audit_logs(
     let per_page = query.per_page.unwrap_or(50).clamp(1, 200);
     let offset = (page - 1) * per_page;
 
-    // Build dynamic WHERE
+    // Build dynamic WHERE (with table alias for JOIN)
     let mut conditions: Vec<String> = Vec::new();
     let mut bind_idx = 1;
 
     if query.action.is_some() {
-        conditions.push(format!("action = ${}", bind_idx));
+        conditions.push(format!("a.action = ${}", bind_idx));
         bind_idx += 1;
     }
     if query.admin_id.is_some() {
-        conditions.push(format!("customer_id = ${}", bind_idx));
+        conditions.push(format!("a.customer_id = ${}", bind_idx));
         bind_idx += 1;
     }
 
@@ -1569,7 +1571,7 @@ async fn admin_audit_logs(
     };
 
     // Count
-    let count_sql = format!("SELECT COUNT(*) FROM audit_log {}", where_clause);
+    let count_sql = format!("SELECT COUNT(*) FROM audit_log a {}", where_clause);
     let mut count_q = sqlx::query_scalar::<_, i64>(&count_sql);
     if let Some(ref action) = query.action {
         count_q = count_q.bind(action);
@@ -1579,10 +1581,10 @@ async fn admin_audit_logs(
     }
     let total = count_q.fetch_one(&pool).await?;
 
-    // Data
+    // Data — join with customers for email, skip user_agent (not displayed)
     let data_sql = format!(
-        "SELECT id, customer_id, action, resource_type, resource_id, details, ip_address, user_agent, created_at \
-         FROM audit_log {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
+        "SELECT a.id, a.customer_id, c.email, a.action, a.resource_type, a.resource_id, a.details, a.ip_address, a.created_at \
+         FROM audit_log a LEFT JOIN customers c ON c.id = a.customer_id {} ORDER BY a.created_at DESC LIMIT ${} OFFSET ${}",
         where_clause, bind_idx, bind_idx + 1
     );
 
@@ -1591,11 +1593,11 @@ async fn admin_audit_logs(
         (
             Uuid,
             Uuid,
+            Option<String>,
             String,
             String,
             Option<String>,
             Option<serde_json::Value>,
-            Option<String>,
             Option<String>,
             DateTime<Utc>,
         ),
@@ -1614,16 +1616,17 @@ async fn admin_audit_logs(
     let entries = rows
         .into_iter()
         .map(
-            |(id, customer_id, action, resource_type, resource_id, details, ip_address, user_agent, created_at)| {
+            |(id, customer_id, customer_email, action, resource_type, resource_id, details, ip_address, created_at)| {
                 AdminAuditEntry {
                     id,
                     customer_id,
+                    customer_email,
                     action,
                     resource_type,
                     resource_id,
                     details,
                     ip_address,
-                    user_agent,
+                    user_agent: None,
                     created_at,
                 }
             },
@@ -2051,7 +2054,10 @@ async fn get_settings(
             .await?;
 
     if let Some((value,)) = row {
-        if let Ok(settings) = serde_json::from_value::<PlatformSettings>(value) {
+        if let Ok(mut settings) = serde_json::from_value::<PlatformSettings>(value) {
+            // Never expose sensitive fields to frontend
+            settings.resend_api_key = settings.resend_api_key.map(|_| "***".to_string());
+            settings.webhook_secret = settings.webhook_secret.map(|_| "***".to_string());
             return Ok(Json(settings));
         }
     }
@@ -2067,7 +2073,45 @@ async fn update_settings(
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin_write(&customer)?;
 
-    let value = serde_json::to_value(&settings)
+    // Validate settings values
+    if settings.max_endpoints_free < 1 || settings.max_endpoints_pro < 1 {
+        return Err(AppError::BadRequest("max_endpoints must be at least 1".into()));
+    }
+    if settings.max_webhooks_free < 0 || settings.max_webhooks_pro < 0 {
+        return Err(AppError::BadRequest("max_webhooks cannot be negative".into()));
+    }
+    if settings.rate_limit_free < 1 || settings.rate_limit_pro < 1 {
+        return Err(AppError::BadRequest("rate_limit must be at least 1".into()));
+    }
+    if settings.retention_days_free < 1 || settings.retention_days_pro < 1 {
+        return Err(AppError::BadRequest("retention_days must be at least 1".into()));
+    }
+    if settings.retry_max_attempts < 0 || settings.retry_max_attempts > 10 {
+        return Err(AppError::BadRequest("retry_max_attempts must be 0-10".into()));
+    }
+    if settings.plan_price_pro < 0.0 || settings.plan_price_business < 0.0 {
+        return Err(AppError::BadRequest("plan prices cannot be negative".into()));
+    }
+
+    // Mask sensitive fields — don't overwrite with "***" placeholder
+    let mut saved_settings = settings;
+    // Fetch current values to preserve real secrets
+    let current: Option<(serde_json::Value,)> =
+        sqlx::query_as("SELECT value FROM platform_settings WHERE key = 'main'")
+            .fetch_optional(&pool)
+            .await?;
+    if let Some((value,)) = current {
+        if let Ok(current_settings) = serde_json::from_value::<PlatformSettings>(value) {
+            if saved_settings.resend_api_key.as_deref() == Some("***") {
+                saved_settings.resend_api_key = current_settings.resend_api_key;
+            }
+            if saved_settings.webhook_secret.as_deref() == Some("***") {
+                saved_settings.webhook_secret = current_settings.webhook_secret;
+            }
+        }
+    }
+
+    let value = serde_json::to_value(&saved_settings)
         .map_err(|e| AppError::BadRequest(format!("Invalid settings: {}", e)))?;
 
     sqlx::query(
@@ -2182,8 +2226,9 @@ async fn create_platform_alert(
     }
 
     let channels_json = serde_json::json!(req.channels);
-    // Use admin's own customer_id (or explicitly provided one)
-    let target_customer_id = req.customer_id.unwrap_or(customer.id);
+    // Platform alerts (admin-created) should have NULL customer_id
+    // Only use explicitly provided customer_id for user-specific alerts
+    let target_customer_id: Option<Uuid> = req.customer_id;
 
     let alert = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, String, i32, serde_json::Value, bool, chrono::DateTime<chrono::Utc>)>(
         "INSERT INTO alert_rules (customer_id, name, condition, threshold, channels, is_active)
@@ -2248,7 +2293,7 @@ async fn update_alert_admin(
             channels = COALESCE($4, channels),
             is_active = COALESCE($5, is_active),
             updated_at = NOW()
-         WHERE id = $6 AND customer_id = $7
+         WHERE id = $6 AND (customer_id = $7 OR customer_id IS NULL)
          RETURNING id, customer_id, name, condition, threshold, channels, is_active, created_at"
     )
     .bind(req.name.as_deref())
@@ -2287,7 +2332,8 @@ async fn delete_alert_admin(
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin_write(&customer)?;
-    let result = sqlx::query("DELETE FROM alert_rules WHERE id = $1 AND customer_id = $2")
+    // Allow deleting both platform alerts (customer_id IS NULL) and user alerts
+    let result = sqlx::query("DELETE FROM alert_rules WHERE id = $1 AND (customer_id = $2 OR customer_id IS NULL)")
         .bind(id)
         .bind(customer.id)
         .execute(&pool)
@@ -2614,9 +2660,9 @@ async fn admin_user_test_webhook(
 
     // Log to audit
     let _ = crate::audit::log_action(
-        &pool, customer.id, "admin.test_webhook", "customer",
+        &pool, customer.id, "ADMIN_TEST_WEBHOOK", "customer",
         Some(&id.to_string()),
-        Some(serde_json::json!({ "target_url": req.endpoint_url, "admin_email": customer.email })),
+        Some(serde_json::json!({ "target_url": req.endpoint_url })),
         None, None,
     ).await;
 
