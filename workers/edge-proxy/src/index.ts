@@ -13,6 +13,7 @@ interface Env {
   API_BASE: string;
   API_BASE_EU: string;
   API_BASE_ME: string;
+  API_BASE_US: string;
   ENVIRONMENT: string;
   RATE_LIMIT_KV: KVNamespace;
   EDGE_CACHE_KV: KVNamespace;
@@ -23,19 +24,21 @@ interface Env {
 function getNearestApiBase(env: Env, country?: string | null): string {
   if (!country) return env.API_BASE; // fallback to default
 
+  const c = country.toUpperCase();
+
   // Middle East countries → me-west1 (Tel Aviv)
   const meCountries = ['IL', 'TR', 'SA', 'AE', 'QA', 'KW', 'BH', 'OM', 'JO', 'LB', 'IQ', 'EG', 'IR'];
-  if (meCountries.includes(country.toUpperCase())) {
-    return env.API_BASE_ME || env.API_BASE;
-  }
+  if (meCountries.includes(c)) return env.API_BASE_ME || env.API_BASE;
 
   // Europe countries → europe-west3 (Frankfurt)
   const euCountries = ['DE', 'FR', 'GB', 'IT', 'ES', 'NL', 'PL', 'SE', 'NO', 'DK', 'FI', 'AT', 'CH', 'BE', 'IE', 'PT', 'GR', 'CZ', 'RO', 'HU', 'BG', 'HR', 'SK', 'SI', 'LT', 'LV', 'EE', 'LU', 'CY', 'MT'];
-  if (euCountries.includes(country.toUpperCase())) {
-    return env.API_BASE_EU || env.API_BASE;
-  }
+  if (euCountries.includes(c)) return env.API_BASE_EU || env.API_BASE;
 
-  // Default → europe-west1 (Belgium)
+  // Americas → us-central1 (Iowa)
+  const usCountries = ['US', 'CA', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE', 'VE'];
+  if (usCountries.includes(c)) return env.API_BASE_US || env.API_BASE;
+
+  // Asia-Pacific & others → europe-west1 (default)
   return env.API_BASE;
 }
 
