@@ -30,6 +30,7 @@ type HmacSha256 = Hmac<Sha256>;
 pub struct PolarConfig {
     pub access_token: String,
     pub webhook_secret: String,
+    pub product_startup: String,
     pub product_pro: String,
     pub product_business: String,
     pub product_startup_yearly: String,
@@ -56,6 +57,8 @@ impl PolarConfig {
         Some(Self {
             access_token,
             webhook_secret,
+            product_startup: std::env::var("POLAR_PRODUCT_STARTUP")
+                .unwrap_or_default(),
             product_pro: std::env::var("POLAR_PRODUCT_PRO")
                 .unwrap_or_else(|_| "ec5826ad-4a01-4146-b2d0-3b99eaf150a5".to_string()),
             product_business: std::env::var("POLAR_PRODUCT_BUSINESS")
@@ -80,11 +83,79 @@ impl PolarConfig {
             }
         } else {
             match plan {
+                Plan::Startup => Some(&self.product_startup),
                 Plan::Pro => Some(&self.product_pro),
                 Plan::Enterprise => Some(&self.product_business),
                 _ => None,
             }
         }
+    }
+
+    /// Update a Polar product's price via API.
+    /// Returns Ok(()) on success, or logs error and continues.
+    pub async fn update_product_price(
+        &self,
+        product_id: &str,
+        price_cents: u64,
+        currency: &str,
+    ) -> Result<(), String> {
+        if product_id.is_empty() {
+            return Err("Product ID not configured".into());
+        }
+
+        // Polar API: PATCH /v1/products/{id} with prices array
+        let body = serde_json::json!({
+            "prices": [{
+                "price_type": "fixed",
+                "price_amount": price_cents,
+                "currency": currency.to_uppercase(),
+            }]
+        });
+
+        let resp = self
+            .client
+            .patch(format!("{}/v1/products/{}", self.config.base_url, product_id))
+            .header("Authorization", format!("Bearer {}", self.config.access_token))
+            .header("Content-Type", "application/json")
+            .json(&body)
+            .send()
+            .await
+            .map_err(|e| format!("Polar request failed: {}", e))?;
+
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            return Err(format!("Polar API error ({}): {}", status, body));
+        }
+
+        Ok(())
+    }
+
+    /// Sync all plan prices to Polar.
+    /// Called from admin settings update.
+    pub async fn sync_prices_to_polar(
+        &self,
+        startup_price: f64,
+        pro_price: f64,
+        enterprise_price: f64,
+    ) -> Vec<(String, Result<(), String>)> {
+        let plans = [
+            ("startup", &self.config.product_startup, startup_price),
+            ("pro", &self.config.product_pro, pro_price),
+            ("enterprise", &self.config.product_business, enterprise_price),
+        ];
+
+        let mut results = Vec::new();
+        for (name, product_id, price) in plans {
+            if product_id.is_empty() {
+                results.push((name.to_string(), Err("Product ID not configured".into())));
+                continue;
+            }
+            let cents = (price * 100.0).round() as u64;
+            let result = self.update_product_price(product_id, cents, "USD").await;
+            results.push((name.to_string(), result));
+        }
+        results
     }
 }
 
@@ -556,6 +627,7 @@ mod tests {
         PolarConfig {
             access_token: "test_token".to_string(),
             webhook_secret: "test_webhook_secret".to_string(),
+            product_startup: "prod_startup_789".to_string(),
             product_pro: "prod_pro_123".to_string(),
             product_business: "prod_biz_456".to_string(),
             product_pro_yearly: "prod_pro_yearly_123".to_string(),

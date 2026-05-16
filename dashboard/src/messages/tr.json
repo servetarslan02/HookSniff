@@ -1860,7 +1860,8 @@
     "polarSyncInfo": "Fiyat değişiklikleri platformu günceller. Polar ürünlerinin de eşleştirilmesi gerekir.",
     "planPricesMoved": "Plan fiyatları ve limitleri artık Revenue sayfasından yönetiliyor.",
     "goToRevenue": "Revenue'ye Git",
-    "popular": "Popüler"
+    "popular": "Popüler",
+    "polarSyncActive": "Fiyatlar kayıt edildiğinde Polar'a otomatik eşitlenir. Product ID'ler POLAR_PRODUCT_* env değişkenlerinde tanımlı olmalı."
   },
   "landing": {
     "nav": {
