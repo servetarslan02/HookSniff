@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
-import { useEndpointDetail, useUpdateEndpoint } from '@/hooks/useDashboardData';
+import { useEndpointDetail } from '@/hooks/useDashboardData';
 import { endpointsApi, type RetryPolicyConfig } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { RetryPolicyCard } from './components/RetryPolicyCard';
@@ -21,8 +21,6 @@ export default function EndpointSettingsPage() {
 
   // React Query hooks
   const { data: endpoint, isLoading, error } = useEndpointDetail(id);
-  const updateEndpointMutation = useUpdateEndpoint();
-
   const handleSaveRetryPolicy = async (policy: RetryPolicyConfig) => {
     if (!token || !id) return;
     try {
