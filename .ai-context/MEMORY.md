@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 04:45 GMT+8 (Oturum 180)
+> Son güncelleme: 2026-05-17 04:55 GMT+8 (Oturum 181)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,21 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 181 — 2026-05-17 04:55 GMT+8
+1. **Revenue Sayfası Derin İnceleme** ✅
+   - 7 hata tespit edildi (4 backend, 3 frontend)
+   - **Backend düzeltmeleri:**
+     - Refund tablosuna email eklendi (customers JOIN) — 3 endpoint güncellendi
+     - Expansion revenue: yeni müşteriler filtrelendi (< 2 ay)
+     - Cohort: lifetime revenue doğru çalışıyor (label netleştirildi)
+   - **Frontend düzeltmeleri:**
+     - Refund tablosu: email yerine UUID gösteriliyordu → düzeltildi
+     - RevenueSchema: dead code `by_plan` kaldırıldı
+     - RevenueCohortsResponseSchema: `months` field eklendi
+     - RefundSchema + api.ts: `email` field eklendi
+     - 16 eksik revenue translation key eklendi (EN + TR)
+   - Commit: 12d207f2 — push edildi
 
 ### Oturum 180 — 2026-05-17 04:45 GMT+8
 1. **Admin i18n — Overview & Users Sayfaları** ✅
