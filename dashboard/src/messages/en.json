@@ -1351,6 +1351,7 @@
     "auditLog": "Audit Log",
     "autoRefresh": "Auto-refresh",
     "autoRefresh15s": "Auto-refresh every 15s",
+    "autoRefresh30s": "Auto-refresh every 30s",
     "autoRefreshDisabled": "Auto-refresh disabled",
     "autoRefreshEnabled": "Auto-refresh enabled",
     "backToUsers": "← Back to Users",

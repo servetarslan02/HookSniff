@@ -38,7 +38,7 @@ export default function AdminSystemPage() {
   const { data: alerts = [] } = useAdminAlerts();
   const { data: queueStatus } = useQueueStatus();
   const { data: failedData } = useFailedDeliveries({ limit: 20, since: '24h' });
-  const { data: deadLettersData } = useDeadLetters({ limit: 20 });
+  const { data: deadLettersData } = useDeadLetters({ limit: 20, since: '24h' });
   const { data: rlvData } = useRateLimitViolations({ limit: 20 });
   const { data: latencyData } = useApiLatency({ period: '24h' });
   const testWebhookMutation = useTestWebhook();
@@ -133,6 +133,7 @@ export default function AdminSystemPage() {
   };
 
   const displayHealth = health || mockHealth;
+  const isHealthError = !!healthError;
 
   // Loading state
   if (isLoading) {
@@ -196,16 +197,16 @@ export default function AdminSystemPage() {
     },
   ];
 
-  const allOk = services.every(s => s.status === 'healthy' || s.status === 'connected' || s.status === 'ok');
-  const someDegraded = services.some(s => s.status === 'degraded' || s.status === 'slow');
+  const allOk = !isHealthError && services.every(s => s.status === 'healthy' || s.status === 'connected' || s.status === 'ok');
+  const someDegraded = isHealthError || services.some(s => s.status === 'degraded' || s.status === 'slow');
 
   const infrastructureItems = [
-    { label: t('apiServer'), value: 'Oracle Cloud ARM', detail: '4 OCPU, 24 GB RAM' },
-    { label: t('database'), value: 'Neon PostgreSQL', detail: 'Serverless, 0.5 GB' },
-    { label: t('cache'), value: 'Upstash Redis', detail: 'Serverless, 256 MB' },
-    { label: t('cdn'), value: 'Cloudflare', detail: 'DNS, SSL, DDoS' },
-    { label: t('dashboard'), value: 'Vercel', detail: 'Next.js 15' },
-    { label: t('monitoring'), value: 'Grafana Cloud', detail: 'OpenTelemetry' },
+    { label: t('apiServer'), value: 'Google Cloud Run', detail: 'Serverless, auto-scaling' },
+    { label: t('database'), value: 'Neon PostgreSQL', detail: 'Serverless, Free tier' },
+    { label: t('cache'), value: 'Upstash Redis', detail: 'Serverless, Free tier' },
+    { label: t('cdn'), value: 'Cloudflare Workers', detail: 'Edge proxy, DNS, SSL' },
+    { label: t('dashboard'), value: 'Vercel', detail: 'Next.js 15, Hobby plan' },
+    { label: t('monitoring'), value: 'Grafana Cloud', detail: 'OpenTelemetry, Free tier' },
   ];
 
   return (
@@ -263,7 +264,7 @@ export default function AdminSystemPage() {
           </button>
         </div>
         <p className="text-sm text-gray-500 dark:text-slate-400">
-          {t('lastChecked', { time: new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · {t('autoRefresh15s')}
+          {t('lastChecked', { time: new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · {t('autoRefresh30s')}
         </p>
       </div>
 

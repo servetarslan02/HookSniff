@@ -857,9 +857,10 @@ export const adminApi = {
     return apiFetch<{ deliveries: Array<{ id: string; customer_id: string; endpoint_id: string; event_type: string | null; status: string; attempt_count: number; response_status: number | null; response_body: string | null; created_at: string; error_message: string | null; customer_email: string | null; endpoint_url: string | null }>; count: number }>(`/admin/deliveries/failed?${qs}`, { token });
   },
 
-  getDeadLetters: (token: string, params?: { limit?: number }) => {
+  getDeadLetters: (token: string, params?: { limit?: number; since?: string }) => {
     const qs = new URLSearchParams();
     if (params?.limit) qs.set('limit', params.limit.toString());
+    if (params?.since) qs.set('since', params.since);
     return apiFetch<{ dead_letters: Array<{ id: string; delivery_id: string; endpoint_id: string; customer_id: string; payload: unknown; reason: string | null; attempts: number; created_at: string; customer_email: string | null; endpoint_url: string | null }>; count: number }>(`/admin/deliveries/dead-letters?${qs}`, { token });
   },
 
