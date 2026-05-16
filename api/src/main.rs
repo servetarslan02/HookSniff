@@ -381,6 +381,8 @@ async fn main() -> Result<()> {
         .route("/health", get(routes::health::health_check))
         // API v1 health alias (some clients check /api/v1/health)
         .route("/api/v1/health", get(routes::health::health_check))
+        // v1 health alias (edge proxy forwards /v1/health)
+        .route("/v1/health", get(routes::health::health_check))
         // Metrics (Prometheus)
         .route("/metrics", get(metrics::metrics_handler))
         // API v1
