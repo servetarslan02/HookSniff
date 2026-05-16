@@ -168,7 +168,7 @@ export function TwoFactorSection() {
                 {/* QR Code */}
                 <div className="flex justify-center mb-4">
                   {qrCode ? (
-                    /* eslint-disable-next-line @next/next/no-img-element -- QR data URI, next/image unsupported */
+                     
                     <img src={qrCode} alt="2FA QR Code" className="w-48 h-48 rounded-lg" />
                   ) : (
                     <div className="w-48 h-48 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center text-gray-500 dark:text-slate-400 text-sm">

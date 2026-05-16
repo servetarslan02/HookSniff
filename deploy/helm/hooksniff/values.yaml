@@ -61,7 +61,7 @@ postgresql:
 redis:
   enabled: true
   auth:
-    enabled: false
+    enabled: true
   master:
     persistence:
       enabled: true

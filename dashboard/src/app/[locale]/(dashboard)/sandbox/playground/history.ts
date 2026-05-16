@@ -31,6 +31,6 @@ export function saveHistory(history: PlaygroundRequest[]) {
     }
   } catch {
     // localStorage full — clear history
-    try { localStorage.removeItem(HISTORY_KEY); } catch {}
+    try { localStorage.removeItem(HISTORY_KEY); } catch { /* cleanup failed */ }
   }
 }
