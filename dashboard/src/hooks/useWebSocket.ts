@@ -13,169 +13,207 @@ interface UseWebSocketOptions {
 
 type ConnectionState = 'connecting' | 'connected' | 'disconnected' | 'fallback';
 
+// Global singleton — prevent multiple WS connections across components
+let globalWs: WebSocket | null = null;
+let globalState: ConnectionState = 'disconnected';
+let globalReconnectAttempts = 0;
+let globalReconnectTimer: NodeJS.Timeout | null = null;
+let globalListeners: Set<(state: ConnectionState) => void> = new Set();
+let globalMessageListeners: Set<(event: WsEvent) => void> = new Set();
+let globalLastSeq = 0;
+let fallbackActive = false;
+
+function notifyState(state: ConnectionState) {
+  globalState = state;
+  globalListeners.forEach(fn => fn(state));
+}
+
+function notifyEvent(event: WsEvent) {
+  globalMessageListeners.forEach(fn => fn(event));
+}
+
+function scheduleReconnect(token: string, maxAttempts: number) {
+  if (globalReconnectTimer) clearTimeout(globalReconnectTimer);
+
+  if (globalReconnectAttempts >= maxAttempts) {
+    console.warn('[WS] Max reconnect attempts reached, falling back to polling');
+    notifyState('fallback');
+    fallbackActive = true;
+    return;
+  }
+
+  notifyState('disconnected');
+
+  // Exponential backoff: 2s → 4s → 8s → 16s → 30s max
+  const delay = Math.min(2000 * Math.pow(2, globalReconnectAttempts), 30000);
+  globalReconnectAttempts++;
+  console.log(`[WS] Reconnecting in ${delay}ms (attempt ${globalReconnectAttempts}/${maxAttempts})`);
+  globalReconnectTimer = setTimeout(() => connectGlobal(token, maxAttempts), delay);
+}
+
+function connectGlobal(token: string, maxAttempts: number) {
+  if (!token) return;
+  if (globalWs) {
+    globalWs.close();
+    globalWs = null;
+  }
+
+  notifyState('connecting');
+  const wsUrl = process.env.NEXT_PUBLIC_WS_URL
+    || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1').replace(/^http/, 'ws') + '/ws';
+  const fullUrl = `${wsUrl}?token=${encodeURIComponent(token)}`;
+  const connectStart = Date.now();
+
+  console.log('[WS] Connecting to:', wsUrl.replace(/^(wss?:\/\/[^/]+).*/, '$1/...'));
+  const ws = new WebSocket(fullUrl);
+  globalWs = ws;
+
+  ws.onopen = () => {
+    console.log('[WS] Connected');
+    globalReconnectAttempts = 0;
+    fallbackActive = false;
+    notifyState('connected');
+  };
+
+  ws.onmessage = (event) => {
+    try {
+      const raw = JSON.parse(event.data);
+
+      if (raw.type === 'server_shutdown') {
+        console.log('[WS] Server shutting down, reconnecting...');
+        ws.close();
+        return;
+      }
+
+      if (raw.type === 'ping') {
+        ws.send(JSON.stringify({ type: 'ping' }));
+        return;
+      }
+
+      const parsed = WsEventSchema.safeParse(raw);
+      if (!parsed.success) {
+        if (raw.event_type && raw.payload) {
+          notifyEvent(raw as WsEvent);
+        }
+        return;
+      }
+
+      if (parsed.data.seq && parsed.data.seq <= globalLastSeq) return;
+      if (parsed.data.seq) globalLastSeq = parsed.data.seq;
+
+      notifyEvent(parsed.data);
+    } catch {
+      // ignore
+    }
+  };
+
+  ws.onclose = (event) => {
+    const connectDuration = Date.now() - connectStart;
+    console.log('[WS] Disconnected', {
+      code: event.code,
+      reason: event.reason || 'no reason',
+      wasClean: event.wasClean,
+      duration: `${connectDuration}ms`,
+    });
+    globalWs = null;
+
+    // Quick failure detection — but only add +1 (not +2)
+    const isQuickFailure = connectDuration < 3000 && !event.wasClean;
+    if (isQuickFailure) {
+      globalReconnectAttempts += 1;
+    }
+
+    scheduleReconnect(token, maxAttempts);
+  };
+
+  ws.onerror = () => {
+    // onclose will fire after this
+  };
+}
+
+function disconnectGlobal() {
+  if (globalReconnectTimer) {
+    clearTimeout(globalReconnectTimer);
+    globalReconnectTimer = null;
+  }
+  if (globalWs) {
+    globalWs.close();
+    globalWs = null;
+  }
+  globalReconnectAttempts = 0;
+  fallbackActive = false;
+  notifyState('disconnected');
+}
+
 export function useWebSocket(options: UseWebSocketOptions = {}) {
   const { token } = useAuth();
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const reconnectAttempts = useRef(0);
-  const [state, setState] = useState<ConnectionState>('disconnected');
-  const lastSeqRef = useRef<number>(0);
-
+  const [state, setState] = useState<ConnectionState>(globalState);
   const {
     enabled = true,
     onEvent,
     onConnected,
     onDisconnected,
-    maxReconnectAttempts = 10,
+    maxReconnectAttempts = 5,
   } = options;
 
-  const connect = useCallback(() => {
+  // Register state listener
+  useEffect(() => {
+    const handler = (s: ConnectionState) => setState(s);
+    globalListeners.add(handler);
+    setState(globalState); // Sync immediately
+    return () => { globalListeners.delete(handler); };
+  }, []);
+
+  // Register message listener
+  useEffect(() => {
+    if (!onEvent) return;
+    globalMessageListeners.add(onEvent);
+    return () => { globalMessageListeners.delete(onEvent); };
+  }, [onEvent]);
+
+  // Track connected/disconnected callbacks
+  const onConnectedRef = useRef(onConnected);
+  onConnectedRef.current = onConnected;
+  const onDisconnectedRef = useRef(onDisconnected);
+  onDisconnectedRef.current = onDisconnected;
+
+  // Start connection
+  useEffect(() => {
     if (!token || !enabled) return;
 
-    // Close existing connection
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
+    // Only connect if not already connected/connecting
+    if (globalState === 'disconnected' || (globalState === 'fallback' && !fallbackActive)) {
+      globalReconnectAttempts = 0;
+      fallbackActive = false;
+      connectGlobal(token, maxReconnectAttempts);
     }
 
-    setState('connecting');
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL
-      || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1').replace(/^http/, 'ws') + '/ws';
-    const fullUrl = `${wsUrl}?token=${encodeURIComponent(token)}`;
-    const connectStart = Date.now();
+    // If already connected, fire onConnected
+    if (globalState === 'connected') {
+      onConnectedRef.current?.();
+    }
 
-    console.log('[WS] Connecting to:', wsUrl.replace(/^(wss?:\/\/[^/]+).*/, '$1/...'));
-    const ws = new WebSocket(fullUrl);
-
-    ws.onopen = () => {
-      console.log('[WS] Connected');
-      setState('connected');
-      reconnectAttempts.current = 0;
-      onConnected?.();
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const raw = JSON.parse(event.data);
-
-        // Server shutdown mesajı
-        if (raw.type === 'server_shutdown') {
-          console.log('[WS] Server shutting down, reconnecting...');
-          ws.close();
-          return;
-        }
-
-        // Ping mesajı — pong gönder
-        if (raw.type === 'ping') {
-          ws.send(JSON.stringify({ type: 'ping' }));
-          return;
-        }
-
-        // Zod validation
-        const parsed = WsEventSchema.safeParse(raw);
-        if (!parsed.success) {
-          // WsEvent formatında değilse, raw olarak işle
-          if (raw.event_type && raw.payload) {
-            onEvent?.(raw as WsEvent);
-          }
-          return;
-        }
-
-        // Sequence ordering — eski mesajları atla
-        if (parsed.data.seq && parsed.data.seq <= lastSeqRef.current) {
-          return;
-        }
-        if (parsed.data.seq) {
-          lastSeqRef.current = parsed.data.seq;
-        }
-
-        onEvent?.(parsed.data);
-      } catch {
-        // Parse hatası — ignore
-      }
-    };
-
-    ws.onclose = (event) => {
-      const connectDuration = Date.now() - connectStart;
-      console.log('[WS] Disconnected', {
-        code: event.code,
-        reason: event.reason || 'no reason',
-        wasClean: event.wasClean,
-        duration: `${connectDuration}ms`,
-        url: wsUrl.replace(/^(wss?:\/\/[^/]+).*/, '$1/...'),
-      });
-      wsRef.current = null;
-      onDisconnected?.();
-
-      // Quick failure detection — if connection fails within 3s, it's likely
-      // that WS is not supported (e.g. proxy, Cloud Run cold start).
-      // Fall back to polling after 3 quick failures instead of 10.
-      const isQuickFailure = connectDuration < 3000 && !event.wasClean;
-      if (isQuickFailure) {
-        reconnectAttempts.current += 2; // Fast-track to fallback
-      }
-
-      // Max reconnect attempts kontrolü
-      if (reconnectAttempts.current >= maxReconnectAttempts) {
-        console.warn('[WS] Max reconnect attempts reached, falling back to polling');
-        setState('fallback');
-        return;
-      }
-
-      setState('disconnected');
-
-      // Exponential backoff reconnect (1s → 2s → 4s → ... → 30s max)
-      const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
-      reconnectAttempts.current++;
-      console.log(`[WS] Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current})`);
-      reconnectTimeoutRef.current = setTimeout(connect, delay);
-    };
-
-    ws.onerror = (err) => {
-      console.error('[WS] Error:', err);
-    };
-
-    wsRef.current = ws;
-  }, [token, enabled, onEvent, onConnected, onDisconnected, maxReconnectAttempts]);
-
-  useEffect(() => {
-    connect();
     return () => {
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      wsRef.current?.close();
-      wsRef.current = null;
+      // Don't disconnect on unmount — other components may be listening
     };
-  }, [connect]);
+  }, [token, enabled, maxReconnectAttempts]);
 
   // Online/Offline detection
   useEffect(() => {
     const handleOnline = () => {
-      if (state === 'disconnected' || state === 'fallback') {
+      if (globalState === 'disconnected' || globalState === 'fallback') {
         console.log('[WS] Network back online, reconnecting...');
-        reconnectAttempts.current = 0;
-        connect();
+        globalReconnectAttempts = 0;
+        fallbackActive = false;
+        if (token) connectGlobal(token, maxReconnectAttempts);
       }
     };
-
     window.addEventListener('online', handleOnline);
     return () => window.removeEventListener('online', handleOnline);
-  }, [state, connect]);
-
-  // Token refresh — reconnect when token changes
-  useEffect(() => {
-    if (token && wsRef.current?.readyState === WebSocket.OPEN) {
-      // Token yenilendi → yeniden bağlan
-      wsRef.current.close();
-      reconnectAttempts.current = 0;
-      connect();
-    }
-  }, [token, connect]);
+  }, [token, maxReconnectAttempts]);
 
   const disconnect = useCallback(() => {
-    if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-    wsRef.current?.close();
-    wsRef.current = null;
-    setState('disconnected');
+    disconnectGlobal();
   }, []);
 
   return { state, isConnected: state === 'connected', disconnect };
