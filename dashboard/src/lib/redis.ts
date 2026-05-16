@@ -19,7 +19,7 @@ export function getRedis(): Redis | null {
 }
 
 // In-memory fallback for local dev without Redis
-const memoryStore = new Map<string, { data: unknown; expires: number }>();
+const memoryStore = new Map<string, { data?: unknown; count?: number; expires: number }>();
 
 export async function playgroundGet(key: string): Promise<unknown | null> {
   const r = getRedis();
