@@ -1860,7 +1860,8 @@
     "polarSyncInfo": "Price changes here update the platform. Polar products should be updated to match.",
     "planPricesMoved": "Plan prices and limits are now managed from the Revenue page.",
     "goToRevenue": "Go to Revenue",
-    "popular": "Popular"
+    "popular": "Popular",
+    "polarSyncActive": "Prices auto-sync to Polar on save. Product IDs must be configured in POLAR_PRODUCT_* env vars."
   },
   "landing": {
     "nav": {
