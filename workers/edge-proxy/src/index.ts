@@ -11,9 +11,32 @@
 
 interface Env {
   API_BASE: string;
+  API_BASE_EU: string;
+  API_BASE_ME: string;
   ENVIRONMENT: string;
   RATE_LIMIT_KV: KVNamespace;
   EDGE_CACHE_KV: KVNamespace;
+}
+
+// ── Region Routing ──
+// Route users to the nearest Cloud Run region based on Cloudflare's CF-Country header
+function getNearestApiBase(env: Env, country?: string | null): string {
+  if (!country) return env.API_BASE; // fallback to default
+
+  // Middle East countries → me-west1 (Tel Aviv)
+  const meCountries = ['IL', 'TR', 'SA', 'AE', 'QA', 'KW', 'BH', 'OM', 'JO', 'LB', 'IQ', 'EG', 'IR'];
+  if (meCountries.includes(country.toUpperCase())) {
+    return env.API_BASE_ME || env.API_BASE;
+  }
+
+  // Europe countries → europe-west3 (Frankfurt)
+  const euCountries = ['DE', 'FR', 'GB', 'IT', 'ES', 'NL', 'PL', 'SE', 'NO', 'DK', 'FI', 'AT', 'CH', 'BE', 'IE', 'PT', 'GR', 'CZ', 'RO', 'HU', 'BG', 'HR', 'SK', 'SI', 'LT', 'LV', 'EE', 'LU', 'CY', 'MT'];
+  if (euCountries.includes(country.toUpperCase())) {
+    return env.API_BASE_EU || env.API_BASE;
+  }
+
+  // Default → europe-west1 (Belgium)
+  return env.API_BASE;
 }
 
 // ── Rate Limiting Config ──
@@ -110,8 +133,10 @@ export default {
       }
     }
 
-    // 5. Forward request to origin (Cloud Run API)
-    const originUrl = new URL(path, env.API_BASE);
+    // 5. Forward request to nearest origin (geo-routed Cloud Run)
+    const country = request.headers.get('CF-IPCountry');
+    const apiBase = getNearestApiBase(env, country);
+    const originUrl = new URL(path, apiBase);
     originUrl.search = url.search;
 
     const originRequest = new Request(originUrl.toString(), {
