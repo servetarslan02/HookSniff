@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter, usePathname } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useAdminStats, useAdminRevenue, useAdminAuditLogs, useAdminFeatureFlags, useAdminDeployInfo } from '@/hooks/useAdminData';
 import { StatCard } from '@/components/tremor/StatCard';
 import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
@@ -27,7 +28,18 @@ export default function AdminOverviewPage() {
 
   // Local UI state — not data fetching
   const [exporting, setExporting] = useState(false);
-  const [overviewTab, setOverviewTab] = useState<'overview' | 'activity' | 'health' | 'infra'>('overview');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const overviewTab = (searchParams.get('tab') || 'overview') as 'overview' | 'activity' | 'health' | 'infra';
+
+  const setOverviewTab = useCallback((tab: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (tab === 'overview') params.delete('tab');
+    else params.set('tab', tab);
+    const qs = params.toString();
+    router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
+  }, [searchParams, router, pathname]);
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const locale = useLocale();
