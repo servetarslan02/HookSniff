@@ -58,7 +58,7 @@ async fn main() -> Result<()> {
         );
     } else {
         // Validate the key format (must be 64 hex chars = 32 bytes)
-        let key_hex = std::env::var("ENCRYPTION_KEY").unwrap();
+        let key_hex = std::env::var("ENCRYPTION_KEY").expect("ENCRYPTION_KEY already validated as present");
         if hex::decode(&key_hex).map(|b| b.len() != 32).unwrap_or(true) {
             anyhow::bail!(
                 "🚫 ENCRYPTION_KEY must be exactly 32 bytes (64 hex characters). \

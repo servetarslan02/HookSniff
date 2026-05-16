@@ -174,7 +174,7 @@ impl CircuitBreaker {
                                 .map(|ms| {
                                     let now_ms = std::time::SystemTime::now()
                                         .duration_since(std::time::UNIX_EPOCH)
-                                        .unwrap()
+                                        .expect("system clock is after UNIX epoch")
                                         .as_millis() as u64;
                                     let elapsed_ms = now_ms.saturating_sub(ms);
                                     std::time::Instant::now() - std::time::Duration::from_millis(elapsed_ms)
@@ -220,7 +220,7 @@ impl CircuitBreaker {
                     };
                     let now_epoch = std::time::SystemTime::now()
                         .duration_since(std::time::UNIX_EPOCH)
-                        .unwrap()
+                        .expect("system clock is after UNIX epoch")
                         .as_millis() as u64;
                     Some(now_epoch.saturating_sub(elapsed))
                 }
@@ -241,7 +241,7 @@ impl CircuitBreaker {
             };
 
             // Fire-and-forget with error logging — don't block delivery
-            let mut conn = self.redis.as_ref().unwrap().clone();
+            let mut conn = self.redis.as_ref().expect("redis connection required for persistence").clone();
             let ttl_secs = self.config.cooldown_secs * 3; // Auto-expire stale entries
             let result: Result<(), redis::RedisError> = redis::cmd("SETEX")
                 .arg(&key)

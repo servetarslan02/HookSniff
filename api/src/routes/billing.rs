@@ -128,7 +128,7 @@ async fn get_subscription(
         } else {
             chrono::NaiveDate::from_ymd_opt(now.year(), now.month() + 1, 1)
         };
-        next_month.map(|d| d.and_hms_opt(0, 0, 0).unwrap().and_utc().to_rfc3339())
+        next_month.map(|d| d.and_hms_opt(0, 0, 0).expect("midnight is valid time").and_utc().to_rfc3339())
     } else {
         None
     };
