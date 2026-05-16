@@ -3672,6 +3672,9 @@
     "namePlaceholder": "my_feature",
     "descPlaceholder": "What does this flag do?",
     "creating": "Creating...",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "nameImmutable": "Flag name cannot be changed after creation",
+    "nameTooLong": "Flag name must be 100 characters or less",
+    "nameInvalid": "Flag name may only contain letters, numbers, underscore, or hyphen"
   }
 }
