@@ -1480,29 +1480,24 @@ async fn churn_report(
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&customer)?;
 
-    let settings = fetch_platform_settings(&pool).await;
-
     let churned = sqlx::query_as::<_, ChurnedUser>(
-        &format!(
-            r#"SELECT
-            id,
-            email,
-            name,
-            plan,
-            CASE plan
-                WHEN 'pro' THEN {pro}
-                WHEN 'enterprise' THEN {biz}
-                ELSE 0.0
-            END as amount,
-            updated_at as churn_date
-        FROM customers
-        WHERE is_active = FALSE
-          AND updated_at >= NOW() - INTERVAL '30 days'
-        ORDER BY updated_at DESC
+        r#"SELECT
+            c.id,
+            c.email,
+            c.name,
+            c.plan,
+            COALESCE(inv.total_paid, 0.0) as amount,
+            c.updated_at as churn_date
+        FROM customers c
+        LEFT JOIN LATERAL (
+            SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) as total_paid
+            FROM invoices
+            WHERE customer_id = c.id AND status = 'paid'
+        ) inv ON TRUE
+        WHERE c.is_active = FALSE
+          AND c.updated_at >= NOW() - INTERVAL '30 days'
+        ORDER BY c.updated_at DESC
         LIMIT 1000"#,
-            pro = settings.plan_price_pro,
-            biz = settings.plan_price_business,
-        ),
     )
     .fetch_all(&pool)
     .await?;
