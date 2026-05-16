@@ -288,7 +288,7 @@ export function DashboardOverview() {
           {loading ? (
             <div className="space-y-4 animate-pulse">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-10 bg-gray-200 dark:bg-slate-700 rounded" />
+                <div key={i} className="h-10 bg-gray-200 dark:bg-slate-700 rounded-sm" />
               ))}
             </div>
           ) : (

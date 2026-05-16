@@ -14,10 +14,10 @@ export default function SecurityPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">HMAC-SHA256 Signature Verification</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Every webhook is signed using <strong>{t("standardWebhooks")}</strong> HMAC-SHA256. The signature is included in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">X-HookSniff-Signature</code> header.
+          Every webhook is signed using <strong>{t("standardWebhooks")}</strong> HMAC-SHA256. The signature is included in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Signature</code> header.
         </p>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Format: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">v1,{'{'}base64(hmac_signature){'}'}</code>
+          Format: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">v1,{'{'}base64(hmac_signature){'}'}</code>
         </p>
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Node.js Verification</h3>
@@ -126,7 +126,7 @@ def handle_webhook():
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("timestampValidation")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Always validate the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">X-HookSniff-Timestamp</code> header to prevent replay attacks. Reject webhooks older than <strong>5 minutes</strong>:
+          Always validate the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Timestamp</code> header to prevent replay attacks. Reject webhooks older than <strong>5 minutes</strong>:
         </p>
         <CodeBlock
           code={`function isTimestampValid(timestampHeader: string, toleranceSec = 300): boolean {
@@ -162,7 +162,7 @@ curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/outbound-ips`}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("tlsEnforcement")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          HookSniff only delivers webhooks to <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">https://</code> endpoints. HTTP endpoints are rejected unless explicitly allowed. All API communication is encrypted via TLS.
+          HookSniff only delivers webhooks to <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">https://</code> endpoints. HTTP endpoints are rejected unless explicitly allowed. All API communication is encrypted via TLS.
         </p>
       </section>
 
@@ -173,11 +173,11 @@ curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/outbound-ips`}
           HookSniff blocks webhook delivery to internal/private networks to prevent SSRF attacks:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">localhost</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">127.0.0.1</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">::1</code></li>
-          <li>Private IP ranges: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">10.*</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">172.16-31.*</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">192.168.*</code></li>
-          <li>Link-local: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">169.254.*</code></li>
-          <li>Internal domains: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">*.local</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">*.internal</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">*.localhost</code></li>
-          <li>Hex-encoded IPs: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">0x7f000001</code></li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">localhost</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">127.0.0.1</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">::1</code></li>
+          <li>Private IP ranges: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">10.*</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">172.16-31.*</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">192.168.*</code></li>
+          <li>Link-local: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">169.254.*</code></li>
+          <li>Internal domains: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">*.local</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">*.internal</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">*.localhost</code></li>
+          <li>Hex-encoded IPs: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">0x7f000001</code></li>
         </ul>
       </section>
     </article>

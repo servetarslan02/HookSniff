@@ -177,7 +177,7 @@ export function GetStartedPageContent() {
   const sdkKeys = Object.keys(SDK_EXAMPLES) as SdkKey[];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-brand-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-brand-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950">
       <PublicNavbar pageTitle={t('title')} />
 
       {/* Hero */}
@@ -298,7 +298,7 @@ export function GetStartedPageContent() {
             <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4">
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">⚡ {t('viaApi')}</h4>
               <p className="text-sm text-gray-500 dark:text-slate-400">
-                {t('viaApiDesc')} <code className="text-xs bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">/v1/endpoints</code>.
+                {t('viaApiDesc')} <code className="text-xs bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded-sm">/v1/endpoints</code>.
               </p>
             </div>
           </div>
@@ -373,7 +373,7 @@ export function GetStartedPageContent() {
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{cat.category}</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {cat.events.map((ev) => (
-                    <code key={ev} className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 px-2 py-1 rounded">
+                    <code key={ev} className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 px-2 py-1 rounded-sm">
                       {ev}
                     </code>
                   ))}

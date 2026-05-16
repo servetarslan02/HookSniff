@@ -222,7 +222,7 @@ function UptimeCalendar({ history }: { history: HistoryDay[] }) {
         {history.map((day) => (
           <div
             key={day.date}
-            className={`w-3 h-3 rounded-sm cursor-pointer hover:ring-1 hover:ring-white/50 transition-all ${uptimeCalendarColor(day.uptime)}`}
+            className={`w-3 h-3 rounded-xs cursor-pointer hover:ring-1 hover:ring-white/50 transition-all ${uptimeCalendarColor(day.uptime)}`}
             onMouseEnter={(e) => {
               setHoveredDay(day);
               setTooltipPos({ x: e.clientX, y: e.clientY });
@@ -253,12 +253,12 @@ function UptimeCalendar({ history }: { history: HistoryDay[] }) {
       <div className="flex items-center gap-3 mt-2 text-[10px] text-gray-500 dark:text-slate-500">
         <span>100%</span>
         <div className="flex gap-0.5">
-          <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500" />
-          <div className="w-2.5 h-2.5 rounded-sm bg-lime-500" />
-          <div className="w-2.5 h-2.5 rounded-sm bg-yellow-500" />
-          <div className="w-2.5 h-2.5 rounded-sm bg-orange-500" />
-          <div className="w-2.5 h-2.5 rounded-sm bg-red-500" />
-          <div className="w-2.5 h-2.5 rounded-sm bg-gray-600" />
+          <div className="w-2.5 h-2.5 rounded-xs bg-emerald-500" />
+          <div className="w-2.5 h-2.5 rounded-xs bg-lime-500" />
+          <div className="w-2.5 h-2.5 rounded-xs bg-yellow-500" />
+          <div className="w-2.5 h-2.5 rounded-xs bg-orange-500" />
+          <div className="w-2.5 h-2.5 rounded-xs bg-red-500" />
+          <div className="w-2.5 h-2.5 rounded-xs bg-gray-600" />
         </div>
         <span>0%</span>
         <span className="ml-2">{t("noData")}</span>
@@ -290,7 +290,7 @@ function UptimeBar({ history }: { history: HistoryDay[] }) {
         {last30.map((day) => (
           <div
             key={day.date}
-            className={`flex-1 rounded-sm transition-all hover:opacity-80 cursor-help ${uptimeColor(day.uptime)}`}
+            className={`flex-1 rounded-xs transition-all hover:opacity-80 cursor-help ${uptimeColor(day.uptime)}`}
             title={`${formatDate(day.date)}: ${day.uptime.toFixed(2)}%`}
           />
         ))}
@@ -391,7 +391,7 @@ function IncidentLog({ incidents }: { incidents: Incident[] }) {
                   <div className="flex items-center gap-3">
                     <span className={`w-2 h-2 rounded-full ${inc.severity === 'critical' ? 'bg-red-500' : inc.severity === 'major' ? 'bg-orange-500' : 'bg-yellow-500'}`} />
                     <span className="font-medium text-gray-900 dark:text-white text-sm">{inc.title}</span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${inc.severity === 'critical' ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400' : inc.severity === 'major' ? 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'}`}>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-medium ${inc.severity === 'critical' ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400' : inc.severity === 'major' ? 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'}`}>
                       {inc.severity}
                     </span>
                   </div>
@@ -646,14 +646,14 @@ export function StatusPageContent() {
 
         {/* 90-Day Uptime Calendar */}
         {history.length > 0 && (
-          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs p-6 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('uptimeLast90Days')}</h2>
             <UptimeCalendar history={history.slice(-90)} />
           </div>
         )}
 
         {/* 30-Day Uptime Bar */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("overallUptime")}</h2>
           {history.length > 0 ? (
             <UptimeBar history={history} />
@@ -665,7 +665,7 @@ export function StatusPageContent() {
               </div>
               <div className="flex gap-0.5 h-8">
                 {Array.from({ length: 30 }).map((_, i) => (
-                  <div key={i} className={`flex-1 rounded-sm ${uptimeColor(data.uptime_30d)} transition-all hover:opacity-80`} title={`Day ${30 - i}: ${data.uptime_30d}%`} />
+                  <div key={i} className={`flex-1 rounded-xs ${uptimeColor(data.uptime_30d)} transition-all hover:opacity-80`} title={`Day ${30 - i}: ${data.uptime_30d}%`} />
                 ))}
               </div>
             </div>
@@ -673,7 +673,7 @@ export function StatusPageContent() {
         </div>
 
         {/* Components */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("components")}</h2>
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
             {enrichedComponents.map((comp) => (
@@ -687,13 +687,13 @@ export function StatusPageContent() {
         </div>
 
         {/* Incidents */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("incidentHistory")}</h2>
           <IncidentLog incidents={incidents} />
         </div>
 
         {/* Maintenance */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("scheduledMaintenance")}</h2>
           <MaintenanceSection maintenance={maintenance} />
         </div>

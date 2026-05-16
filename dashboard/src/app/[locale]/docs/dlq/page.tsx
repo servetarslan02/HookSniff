@@ -50,10 +50,10 @@ export default function DlqPage() {
           Common failure reasons:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>Endpoint returning <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">5xx</code> errors consistently</li>
+          <li>Endpoint returning <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">5xx</code> errors consistently</li>
           <li>Endpoint unreachable (DNS failure, connection timeout)</li>
           <li>{t("tlsIssues")}</li>
-          <li>Endpoint returning <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">4xx</code> errors (client-side issue)</li>
+          <li>Endpoint returning <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">4xx</code> errors (client-side issue)</li>
         </ul>
       </section>
 

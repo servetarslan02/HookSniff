@@ -1,6 +1,258 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-brand-50: #f0f4ff;
+  --color-brand-100: #dbe4ff;
+  --color-brand-200: #bac8ff;
+  --color-brand-300: #91a7ff;
+  --color-brand-400: #748ffc;
+  --color-brand-500: #5c7cfa;
+  --color-brand-600: #4c6ef5;
+  --color-brand-700: #4263eb;
+  --color-brand-800: #3b5bdb;
+  --color-brand-900: #364fc7;
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), Fira Code, monospace;
+
+  --animate-gradient-shift: gradient-shift 8s ease infinite;
+  --animate-fade-in-up: fade-in-up 0.5s ease-out;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s ease-in-out infinite;
+  --animate-count-up: count-up 1s ease-out;
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+
+  @keyframes gradient-shift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 20px rgba(76, 110, 245, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(76, 110, 245, 0.6);
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility glass-card {
+  @apply rounded-2xl shadow-xs transition-all duration-300;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  .dark & {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: #1e293b;
+    border-color: rgba(71, 85, 105, 0.6);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+}
+
+@utility dark {
+  & .glass-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: #1e293b;
+    border-color: rgba(71, 85, 105, 0.6);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  & .gradient-text {
+    @apply from-brand-400 to-purple-400;
+  }
+
+  & .hover-lift:hover {
+    box-shadow: 0 4px 20px rgba(76, 110, 245, 0.15);
+  }
+
+  & *:focus-visible {
+    ring-offset-color: #0f172a;
+  }
+
+  & .skeleton-shimmer::after {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  & .typewriter-cursor::after {
+    @apply text-brand-400;
+  }
+}
+
+@utility gradient-text {
+  @apply bg-clip-text text-transparent bg-linear-to-r from-brand-600 to-purple-600;
+
+  .dark & {
+    @apply from-brand-400 to-purple-400;
+  }
+}
+
+@utility hover-lift {
+  @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+
+  .dark &:hover {
+    box-shadow: 0 4px 20px rgba(76, 110, 245, 0.15);
+  }
+}
+
+@utility status-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+@utility btn-ripple {
+  /* Button ripple effect */
+  @apply relative overflow-hidden;
+
+  &::after {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-500;
+    background: radial-gradient(
+      circle at var(--ripple-x, 50%) var(--ripple-y, 50%),
+      rgba(255, 255, 255, 0.3) 0%,
+      transparent 60%
+    );
+  }
+
+  &:active::after {
+    @apply opacity-100;
+    transition: opacity 0s;
+  }
+}
+
+@utility card-tilt {
+  /* Card 3D tilt */
+  @apply transition-transform duration-300;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+
+  &:hover {
+    transform: rotateX(2deg) rotateY(-2deg) scale(1.01);
+  }
+}
+
+@utility skeleton-shimmer {
+  /* Shimmer skeleton */
+  @apply relative overflow-hidden;
+
+  &::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  .dark &::after {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+  }
+}
+
+@utility btn-glow {
+  /* Glow button */
+  @apply relative;
+
+  &::before {
+    content: '';
+    @apply absolute -inset-1 rounded-2xl opacity-0 transition-opacity duration-300 blur-md;
+    background: var(--brand-gradient);
+  }
+
+  &:hover::before {
+    @apply opacity-50;
+  }
+}
+
+@utility typewriter-cursor {
+  /* Typewriter cursor */
+  &::after {
+    content: '|';
+    @apply text-brand-500 animate-pulse ml-0.5;
+  }
+
+  .dark &::after {
+    @apply text-brand-400;
+  }
+}
 
 @layer base {
   :root {
@@ -36,131 +288,11 @@
 }
 
 @layer components {
-  .glass-card {
-    @apply rounded-2xl shadow-sm transition-all duration-300;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-card);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-  }
-
-  .dark .glass-card {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: #1e293b;
-    border-color: rgba(71, 85, 105, 0.6);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  }
-
-  .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-purple-600;
-  }
-
-  .dark .gradient-text {
-    @apply from-brand-400 to-purple-400;
-  }
-
-  .hover-lift {
-    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
-  }
-
-  .dark .hover-lift:hover {
-    box-shadow: 0 4px 20px rgba(76, 110, 245, 0.15);
-  }
-
-  .status-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  /* Button ripple effect */
-  .btn-ripple {
-    @apply relative overflow-hidden;
-  }
-
-  .btn-ripple::after {
-    content: '';
-    @apply absolute inset-0 opacity-0 transition-opacity duration-500;
-    background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255,255,255,0.3) 0%, transparent 60%);
-  }
-
-  .btn-ripple:active::after {
-    @apply opacity-100;
-    transition: opacity 0s;
-  }
-
-  /* Card 3D tilt */
-  .card-tilt {
-    @apply transition-transform duration-300;
-    transform-style: preserve-3d;
-    perspective: 1000px;
-  }
-
-  .card-tilt:hover {
-    transform: rotateX(2deg) rotateY(-2deg) scale(1.01);
-  }
 
   /* Focus rings */
   *:focus-visible {
-    @apply outline-none ring-2 ring-brand-500 ring-offset-2;
+    @apply outline-hidden ring-2 ring-brand-500 ring-offset-2;
     ring-offset-color: var(--bg-secondary);
-  }
-
-  .dark *:focus-visible {
-    ring-offset-color: #0f172a;
-  }
-
-  /* Shimmer skeleton */
-  .skeleton-shimmer {
-    @apply relative overflow-hidden;
-  }
-
-  .skeleton-shimmer::after {
-    content: '';
-    @apply absolute inset-0;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.4) 50%,
-      transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s ease-in-out infinite;
-  }
-
-  .dark .skeleton-shimmer::after {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.08) 50%,
-      transparent 100%
-    );
-    background-size: 200% 100%;
-  }
-
-  /* Glow button */
-  .btn-glow {
-    @apply relative;
-  }
-
-  .btn-glow::before {
-    content: '';
-    @apply absolute -inset-1 rounded-2xl opacity-0 transition-opacity duration-300 blur-md;
-    background: var(--brand-gradient);
-  }
-
-  .btn-glow:hover::before {
-    @apply opacity-50;
-  }
-
-  /* Typewriter cursor */
-  .typewriter-cursor::after {
-    content: '|';
-    @apply text-brand-500 animate-pulse ml-0.5;
-  }
-
-  .dark .typewriter-cursor::after {
-    @apply text-brand-400;
   }
 }
 

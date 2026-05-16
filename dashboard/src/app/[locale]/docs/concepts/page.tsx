@@ -29,8 +29,8 @@ export default function ConceptsPage() {
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400 mb-4">
           <li><strong>URL</strong> — The target URL that receives webhook POST requests</li>
-          <li><strong>{t("events")}</strong> — Optional event filter (e.g., only deliver <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order.created</code> events)</li>
-          <li><strong>{t("signingSecret")}</strong> — HMAC-SHA256 secret for payload verification (<code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">whsec_</code> prefix)</li>
+          <li><strong>{t("events")}</strong> — Optional event filter (e.g., only deliver <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.created</code> events)</li>
+          <li><strong>{t("signingSecret")}</strong> — HMAC-SHA256 secret for payload verification (<code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">whsec_</code> prefix)</li>
           <li><strong>{t("status")}</strong> — Active or inactive; inactive endpoints skip delivery</li>
         </ul>
         <CodeBlock
@@ -53,9 +53,9 @@ export default function ConceptsPage() {
           A <strong>webhook</strong> is an event you send via the API. A <strong>delivery</strong> is the attempt to deliver that webhook to an endpoint.
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400 mb-4">
-          <li><strong>{t("eventTypes")}</strong> — String identifiers like <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order.created</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">user.updated</code></li>
+          <li><strong>{t("eventTypes")}</strong> — String identifiers like <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.created</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">user.updated</code></li>
           <li><strong>{t("payloads")}</strong> — JSON data sent as the request body</li>
-          <li><strong>{t("deliveryStatus")}</strong> — <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">pending</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">delivered</code>, or <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">failed</code></li>
+          <li><strong>{t("deliveryStatus")}</strong> — <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">pending</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">delivered</code>, or <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">failed</code></li>
           <li><strong>{t("attemptTracking")}</strong> — Each delivery attempt is recorded with status code, response body, and duration</li>
         </ul>
       </section>
@@ -108,7 +108,7 @@ export default function ConceptsPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("apiKeys")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          API keys authenticate your requests. Keys use the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">hr_live_</code> prefix and are sent via Bearer auth:
+          API keys authenticate your requests. Keys use the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hr_live_</code> prefix and are sent via Bearer auth:
         </p>
         <CodeBlock
           code={`Authorization: Bearer hr_live_abc123xyz789`}

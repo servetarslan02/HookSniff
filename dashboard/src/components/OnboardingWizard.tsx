@@ -126,12 +126,12 @@ export function OnboardingWizard() {
   return (
     <>
       {showConfetti && <Confetti />}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden">
           {/* Progress bar */}
           <div className="h-1.5 bg-gray-100 dark:bg-slate-800">
             <div
-              className="h-full bg-gradient-to-r from-brand-500 to-purple-500 transition-all duration-500 ease-out"
+              className="h-full bg-linear-to-r from-brand-500 to-purple-500 transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -226,7 +226,7 @@ export function OnboardingWizard() {
                     <span className="text-xs text-gray-500 uppercase tracking-wider">{t("installCommand")}</span>
                     <button
                       onClick={() => handleCopy(SDKS.find(s => s.id === selectedSdk)?.install || '', 'install')}
-                      className="px-2 py-1 text-xs font-medium rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
+                      className="px-2 py-1 text-xs font-medium rounded-sm bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
                     >
                       {copied === 'install' ? '✓ Kopyalandı!' : 'Kopyala'}
                     </button>
@@ -289,7 +289,7 @@ export function OnboardingWizard() {
                     <span className="text-xs text-gray-500 uppercase tracking-wider">{t("testCommand")}</span>
                     <button
                       onClick={() => handleCopy(`curl -X POST https://api.hooksniff.dev/v1/webhooks \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"endpoint_id":"ep_YOUR_ID","event":"test.ping","data":{"hello":"world"}}'`, 'test')}
-                      className="px-2 py-1 text-xs font-medium rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
+                      className="px-2 py-1 text-xs font-medium rounded-sm bg-gray-700 text-gray-300 hover:bg-gray-600 transition"
                     >
                       {copied === 'test' ? '✓ Kopyalandı!' : 'Kopyala'}
                     </button>

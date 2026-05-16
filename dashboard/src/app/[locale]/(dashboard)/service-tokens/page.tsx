@@ -79,7 +79,7 @@ export default function ServiceTokensPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse" />
         <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
         <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
       </div>
@@ -101,7 +101,7 @@ export default function ServiceTokensPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -120,7 +120,7 @@ export default function ServiceTokensPage() {
                   <td className="px-6 py-3">
                     {editingId === tok.id ? (
                       <div className="flex items-center gap-2">
-                        <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent" autoFocus onKeyDown={(e) => { if (e.key === 'Enter') handleEditSave(); if (e.key === 'Escape') setEditingId(null); }} />
+                        <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="px-2 py-1 text-sm rounded-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent" autoFocus onKeyDown={(e) => { if (e.key === 'Enter') handleEditSave(); if (e.key === 'Escape') setEditingId(null); }} />
                         <button onClick={handleEditSave} disabled={updateToken.isPending} className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-medium">{updateToken.isPending ? tc('saving') : tc('save')}</button>
                         <button onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs">{tc('cancel')}</button>
                       </div>
@@ -130,7 +130,7 @@ export default function ServiceTokensPage() {
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex items-center gap-2">
-                      <code className="text-xs font-mono text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded select-all">{revealedTokens[tok.id] || tok.token_prefix || '••••••••••••••••'}</code>
+                      <code className="text-xs font-mono text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-sm select-all">{revealedTokens[tok.id] || tok.token_prefix || '••••••••••••••••'}</code>
                       <button onClick={() => handleReveal(tok.id)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={revealedTokens[tok.id] ? t('hide') : t('reveal')}>👁</button>
                       <button onClick={() => handleCopy(revealedTokens[tok.id] || tok.token_prefix || '')} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={tc('copyToClipboard')}>📋</button>
                     </div>
@@ -153,7 +153,7 @@ export default function ServiceTokensPage() {
       </div>
 
       {showCreate && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('createTitle')}</h3>
           <form onSubmit={handleCreate} className="flex items-end gap-3">
             <div className="flex-1">
@@ -166,7 +166,7 @@ export default function ServiceTokensPage() {
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('quickRef')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('quickRefDesc')}</p>
         <div className="flex items-center gap-3">

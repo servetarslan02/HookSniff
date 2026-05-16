@@ -130,7 +130,7 @@ export default function TransformsPage() {
       {!selectedEndpoint ? (
         <div className="glass-card p-12 text-center text-gray-500 dark:text-slate-400">{t('selectEndpointHint')}</div>
       ) : loading ? (
-        <div className="glass-card p-6 animate-pulse"><div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2" /></div>
+        <div className="glass-card p-6 animate-pulse"><div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2" /></div>
       ) : rules.length === 0 ? (
         <div className="glass-card p-12 text-center text-gray-500 dark:text-slate-400">{t('empty')}</div>
       ) : (
@@ -141,7 +141,7 @@ export default function TransformsPage() {
                 <div className="space-y-2 flex-1">
                   {rule.rule_json.filter && (
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-medium">{t('filterTag')}</span>
+                      <span className="px-2 py-0.5 rounded-sm bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-medium">{t('filterTag')}</span>
                       <code className="text-xs font-mono text-gray-600 dark:text-slate-400">
                         {rule.rule_json.filter.include && `include: ${rule.rule_json.filter.include.join(', ')}`}
                         {rule.rule_json.filter.exclude && `exclude: ${rule.rule_json.filter.exclude.join(', ')}`}
@@ -150,13 +150,13 @@ export default function TransformsPage() {
                   )}
                   {rule.rule_json.mappings?.map((m, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 text-xs font-medium">{t('mapTag')}</span>
+                      <span className="px-2 py-0.5 rounded-sm bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 text-xs font-medium">{t('mapTag')}</span>
                       <code className="text-xs font-mono text-gray-600 dark:text-slate-400">{m.source} → {m.target}</code>
                     </div>
                   ))}
                   {rule.rule_json.enrich && (
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 text-xs font-medium">{t('enrichTag')}</span>
+                      <span className="px-2 py-0.5 rounded-sm bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 text-xs font-medium">{t('enrichTag')}</span>
                       <code className="text-xs font-mono text-gray-600 dark:text-slate-400">{JSON.stringify(rule.rule_json.enrich.fields)}</code>
                     </div>
                   )}

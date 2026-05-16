@@ -68,7 +68,7 @@ export default function ApiKeysPage() {
       {revealedKey && (
         <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-xl p-4">
           <p className="text-sm text-green-800 dark:text-green-300 mb-2">{t('keyCreated')}</p>
-          <code className="text-sm font-mono bg-green-100 dark:bg-green-500/20 px-3 py-1 rounded select-all">{revealedKey}</code>
+          <code className="text-sm font-mono bg-green-100 dark:bg-green-500/20 px-3 py-1 rounded-sm select-all">{revealedKey}</code>
           <button onClick={() => setRevealedKey(null)} className="ml-3 text-sm text-green-700 dark:text-green-400 underline">{tc('close')}</button>
         </div>
       )}

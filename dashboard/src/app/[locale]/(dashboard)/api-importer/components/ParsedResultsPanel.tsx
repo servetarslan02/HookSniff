@@ -96,7 +96,7 @@ export function ParsedResultsPanel({
                 type="checkbox"
                 checked={ep.selected}
                 onChange={() => onToggleEndpoint(i)}
-                className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
+                className="w-4 h-4 rounded-sm text-brand-600 focus:ring-brand-500"
               />
               <span className={`px-2 py-0.5 rounded text-xs font-mono font-medium ${
                 ep.method === 'GET' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400' :

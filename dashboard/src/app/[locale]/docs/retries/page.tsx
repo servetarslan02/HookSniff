@@ -55,13 +55,13 @@ export default function RetriesPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">What Counts as a Failure?</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>HTTP status code <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">4xx</code> or <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">5xx</code></li>
+          <li>HTTP status code <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">4xx</code> or <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">5xx</code></li>
           <li>Connection timeout (30 seconds default)</li>
           <li>{t("dnsFailure")}</li>
           <li>{t("tlsHandshakeFailure")}</li>
         </ul>
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          Only <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">2xx</code> responses are considered successful.
+          Only <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">2xx</code> responses are considered successful.
         </p>
       </section>
 
@@ -120,7 +120,7 @@ export default function RetriesPage() {
           When max attempts are exhausted:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>Delivery status is set to <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">failed</code></li>
+          <li>Delivery status is set to <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">failed</code></li>
           <li>All attempt details (status codes, errors, timestamps) are preserved</li>
           <li>{t("originalRetained")}</li>
           <li>DLQ entries are retained for 30 days by default</li>

@@ -389,7 +389,7 @@ export function UseCasesPageContent() {
               onClick={() => setActiveCase(uc.id)}
               className={`px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-all ${
                 activeCase === uc.id
-                  ? 'bg-brand-600 text-white shadow-sm'
+                  ? 'bg-brand-600 text-white shadow-xs'
                   : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40'
               }`}
             >
@@ -444,7 +444,7 @@ export function UseCasesPageContent() {
               <div className="space-y-2">
                 {current.events.map((ev) => (
                   <div key={ev.name} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                    <code className="text-sm font-mono text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-2 py-0.5 rounded shrink-0">
+                    <code className="text-sm font-mono text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-2 py-0.5 rounded-sm shrink-0">
                       {ev.name}
                     </code>
                     <span className="text-sm text-gray-600 dark:text-slate-400">{ev.desc}</span>
@@ -505,7 +505,7 @@ export function UseCasesPageContent() {
             </div>
 
             {/* Quick Start */}
-            <div className="bg-gradient-to-br from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20 p-6">
+            <div className="bg-linear-to-br from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20 p-6">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Get started in 5 minutes</h3>
               <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">
                 Sign up, create an endpoint, and send your first webhook. No credit card required.

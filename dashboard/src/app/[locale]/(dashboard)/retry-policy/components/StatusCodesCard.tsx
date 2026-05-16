@@ -32,7 +32,7 @@ export function StatusCodesCard({
               type="checkbox"
               checked={selectedCodes.includes(sc.code)}
               onChange={() => onToggle(sc.code)}
-              className="w-4 h-4 rounded text-brand-600"
+              className="w-4 h-4 rounded-sm text-brand-600"
             />
             <span className="text-sm text-gray-700 dark:text-slate-300">{sc.label}</span>
           </label>

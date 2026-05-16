@@ -163,11 +163,11 @@ export default function FeatureFlagsPage() {
                       role="switch"
                       aria-checked={flag.is_enabled}
                       onClick={() => handleToggle(flag)}
-                      className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${
+                      className={`relative w-11 h-6 rounded-full transition-colors duration-200 shrink-0 ${
                         flag.is_enabled ? 'bg-emerald-600' : 'bg-gray-300 dark:bg-slate-600'
                       }`}
                     >
-                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform duration-200 ${
                         flag.is_enabled ? 'translate-x-5' : 'translate-x-0'
                       }`} />
                     </button>
@@ -226,7 +226,7 @@ export default function FeatureFlagsPage() {
       {/* ─── Create Modal ─── */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreate(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowCreate(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createTitle')}</h3>
             <div className="space-y-4">
@@ -241,7 +241,7 @@ export default function FeatureFlagsPage() {
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('enabled')}</label>
                 <button type="button" role="switch" aria-checked={newEnabled} onClick={() => setNewEnabled(!newEnabled)} className={`relative w-11 h-6 rounded-full transition-colors ${newEnabled ? 'bg-emerald-600' : 'bg-gray-300 dark:bg-slate-600'}`}>
-                  <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${newEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                  <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform ${newEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
               <div>
@@ -270,7 +270,7 @@ export default function FeatureFlagsPage() {
       {/* ─── Edit Modal ─── */}
       {editTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditTarget(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setEditTarget(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('editTitle')}: {editTarget.name}</h3>
             <div className="space-y-4">
@@ -285,7 +285,7 @@ export default function FeatureFlagsPage() {
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('enabled')}</label>
                 <button type="button" role="switch" aria-checked={editEnabled} onClick={() => setEditEnabled(!editEnabled)} className={`relative w-11 h-6 rounded-full transition-colors ${editEnabled ? 'bg-emerald-600' : 'bg-gray-300 dark:bg-slate-600'}`}>
-                  <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${editEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                  <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform ${editEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
               <div>
@@ -314,7 +314,7 @@ export default function FeatureFlagsPage() {
       {/* ─── Delete Confirm Modal ─── */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setDeleteTarget(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('deleteTitle')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">

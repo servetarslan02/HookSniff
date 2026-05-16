@@ -75,7 +75,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Item 128 — Skip to content link */}
       <a
         href="#admin-main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-red-600 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-100 focus:px-4 focus:py-2 focus:bg-red-600 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-red-400"
       >
         {t('skipToContent')}
       </a>
@@ -83,7 +83,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-xs md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -97,7 +97,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-700">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500 to-purple-600 flex items-center justify-center text-white text-lg">
+          <div className="w-9 h-9 rounded-lg bg-linear-to-br from-red-500 to-purple-600 flex items-center justify-center text-white text-lg">
             ⚡
           </div>
           <div>
@@ -212,7 +212,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             {/* Profile Dropdown */}
             <div className="relative group">
               <button type="button" className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-8 h-8 rounded-full bg-linear-to-br from-red-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
                   {(user?.email?.charAt(0) || 'A').toUpperCase()}
                 </div>
               </button>

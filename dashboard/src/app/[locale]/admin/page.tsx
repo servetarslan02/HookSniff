@@ -133,8 +133,8 @@ export default function AdminOverviewPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="glass-card p-6 animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2 mb-4" />
-              <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-3/4" />
+              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2 mb-4" />
+              <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded-sm w-3/4" />
             </div>
           ))}
         </div>
@@ -211,7 +211,7 @@ export default function AdminOverviewPage() {
             onClick={() => setOverviewTab(tab.key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
               overviewTab === tab.key
-                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
                 : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
             }`}
           >
