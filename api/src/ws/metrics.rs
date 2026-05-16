@@ -19,52 +19,52 @@ impl WsMetrics {
                 "ws_active_connections",
                 "Active WebSocket connections",
             )
-            .unwrap(),
+            .expect("valid metric name"),
             total_connections: IntCounter::new(
                 "ws_total_connections_total",
                 "Total WebSocket connections established",
             )
-            .unwrap(),
+            .expect("valid metric name"),
             messages_sent: IntCounter::new(
                 "ws_messages_sent_total",
                 "Total WebSocket messages sent to clients",
             )
-            .unwrap(),
+            .expect("valid metric name"),
             messages_received: IntCounter::new(
                 "ws_messages_received_total",
                 "Total WebSocket messages received from clients",
             )
-            .unwrap(),
+            .expect("valid metric name"),
             connection_errors: IntCounter::new(
                 "ws_connection_errors_total",
                 "Total WebSocket connection errors",
             )
-            .unwrap(),
+            .expect("valid metric name"),
             evictions: IntCounter::new(
                 "ws_evictions_total",
                 "Total WebSocket connection evictions (limit reached)",
             )
-            .unwrap(),
+            .expect("valid metric name"),
         };
 
         registry
             .register(Box::new(metrics.active_connections.clone()))
-            .unwrap();
+            .expect("register ws_active_connections");
         registry
             .register(Box::new(metrics.total_connections.clone()))
-            .unwrap();
+            .expect("register ws_total_connections_total");
         registry
             .register(Box::new(metrics.messages_sent.clone()))
-            .unwrap();
+            .expect("register ws_messages_sent_total");
         registry
             .register(Box::new(metrics.messages_received.clone()))
-            .unwrap();
+            .expect("register ws_messages_received_total");
         registry
             .register(Box::new(metrics.connection_errors.clone()))
-            .unwrap();
+            .expect("register ws_connection_errors_total");
         registry
             .register(Box::new(metrics.evictions.clone()))
-            .unwrap();
+            .expect("register ws_evictions_total");
 
         metrics
     }
