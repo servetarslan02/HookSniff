@@ -27,17 +27,20 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_resource ON audit_log(resource_type, re
 -- ──────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS alert_rules (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    customer_id UUID REFERENCES customers(id) ON DELETE CASCADE, -- NULL = platform-level alert
     name VARCHAR(200) NOT NULL,
     condition VARCHAR(50) NOT NULL,
     threshold INTEGER NOT NULL,
     channels JSONB NOT NULL DEFAULT '["email"]',
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    last_triggered_at TIMESTAMPTZ,
+    cooldown_minutes INTEGER NOT NULL DEFAULT 15,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_alert_rules_customer ON alert_rules(customer_id);
+CREATE INDEX IF NOT EXISTS idx_alert_rules_active ON alert_rules(is_active) WHERE is_active = TRUE;
 
 -- ──────────────────────────────────────────────────────────────
 -- 3. notifications — User notification inbox

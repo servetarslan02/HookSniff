@@ -302,6 +302,11 @@ export default function AdminAlertsPage() {
                       }`}>
                         {alert.is_active ? (t('active') || 'Active') : (t('inactive') || 'Inactive')}
                       </span>
+                      {!alert.customer_id && (
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400">
+                          🌐 {t('platform') || 'Platform'}
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                       {cond?.label || alert.condition} {t('threshold') || 'threshold'}: {alert.threshold}
