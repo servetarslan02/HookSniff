@@ -1,51 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useAuth } from '@/lib/store';
-import { apiFetch } from '@/lib/api';
-
-interface PortalProfile {
-  id: string;
-  email: string;
-  name?: string;
-  plan: string;
-  webhook_limit?: number;
-  webhook_count?: number;
-  created_at: string;
-}
-
-interface PortalUsage {
-  webhooks_used?: number;
-  api_calls_today?: number;
-  total_deliveries: number;
-  delivered: number;
-  failed: number;
-  success_rate: number;
-  endpoints_count: number;
-}
+import { usePortalProfile, usePortalUsage } from '@/hooks/useDashboardData';
 
 export default function PortalPage() {
   const t = useTranslations('portal');
   const locale = useLocale();
-  const { token } = useAuth();
-  const [profile, setProfile] = useState<PortalProfile | null>(null);
-  const [usage, setUsage] = useState<PortalUsage | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: profile, isLoading: profileLoading, error: profileError } = usePortalProfile();
+  const { data: usage, isLoading: usageLoading } = usePortalUsage();
 
-  useEffect(() => {
-    if (!token) return;
-    Promise.all([
-      apiFetch<PortalProfile>('/portal/me', { token }),
-      apiFetch<PortalUsage>('/portal/usage', { token }),
-    ])
-      .then(([p, u]) => { setProfile(p); setUsage(u); })
-      .catch((err) => {
-        setError(err instanceof Error ? err.message : t('failedToLoad'));
-      })
-      .finally(() => setLoading(false));
-  }, [token, t]);
+  const loading = profileLoading || usageLoading;
+  const error = profileError;
 
   if (loading) return <div className="p-8 text-gray-500 dark:text-slate-400">{t('loading')}</div>;
 
@@ -54,7 +19,7 @@ export default function PortalPage() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
         <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400">
-          {error}
+          {error instanceof Error ? error.message : t('failedToLoad')}
         </div>
       </div>
     );
@@ -80,10 +45,6 @@ export default function PortalPage() {
               <p className="text-sm text-gray-500 dark:text-slate-400">{t('memberSince')}</p>
               <p className="font-medium">{new Date(profile.created_at).toLocaleDateString(locale)}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-slate-400">{t('webhookLimit')}</p>
-              <p className="font-medium">{t('perMonth', { limit: profile.webhook_limit?.toLocaleString() ?? '0' })}</p>
-            </div>
           </div>
         </div>
       )}
@@ -94,15 +55,15 @@ export default function PortalPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <p className="text-sm text-gray-500 dark:text-slate-400">{t('webhooksUsed')}</p>
-              <p className="text-2xl font-bold text-purple-500">{usage.webhooks_used?.toLocaleString() || 0}</p>
+              <p className="text-2xl font-bold text-purple-500">{usage.total_deliveries?.toLocaleString() || 0}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-slate-400">{t('endpoints')}</p>
-              <p className="text-2xl font-bold">{usage.endpoints_count || 0}</p>
+              <p className="text-2xl font-bold">{usage.total_endpoints || 0}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-slate-400">{t('apiCallsToday')}</p>
-              <p className="text-2xl font-bold">{usage.api_calls_today?.toLocaleString() || 0}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">{t('successRate')}</p>
+              <p className="text-2xl font-bold">{usage.success_rate?.toFixed(1) || 0}%</p>
             </div>
           </div>
         </div>
