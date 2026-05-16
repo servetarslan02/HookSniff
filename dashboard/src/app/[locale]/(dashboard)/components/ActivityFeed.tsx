@@ -17,7 +17,7 @@ export function ActivityFeed({ deliveries, loading }: ActivityFeedProps) {
         {[1, 2, 3].map((i) => (
           <div key={i} className="animate-pulse flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-gray-200 dark:bg-slate-700" />
-            <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded flex-1" />
+            <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm flex-1" />
           </div>
         ))}
       </div>

@@ -106,8 +106,8 @@ export function TwoFactorSection() {
   if (loading) {
     return (
       <div className="glass-card p-6 animate-pulse">
-        <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-4" />
-        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2" />
+        <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/3 mb-4" />
+        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2" />
       </div>
     );
   }
@@ -154,7 +154,7 @@ export function TwoFactorSection() {
       {/* ─── Enable Modal ─── */}
       {showEnable && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={handleCloseEnable} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={handleCloseEnable} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
             {step === 'qr' && (
               <>
@@ -267,7 +267,7 @@ export function TwoFactorSection() {
       {/* ─── Disable Modal ─── */}
       {showDisable && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDisable(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowDisable(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('disable2fa')}

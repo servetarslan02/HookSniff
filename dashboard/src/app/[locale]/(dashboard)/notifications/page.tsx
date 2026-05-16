@@ -199,7 +199,7 @@ export default function NotificationsPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-2 shrink-0">
                       {!n.read && (
                         <button type="button"
                           onClick={() => handleMarkAsRead(n.id)}

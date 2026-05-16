@@ -2,7 +2,7 @@ export default function Loading() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-2xl animate-pulse">
+        <div className="w-12 h-12 rounded-lg bg-linear-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-2xl animate-pulse">
           🪝
         </div>
         <div className="flex gap-1">

@@ -41,7 +41,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={{ toast: addToast }}>
       {children}
       <div
-        className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2"
+        className="fixed bottom-6 right-6 z-100 flex flex-col gap-2"
         role="alert"
         aria-live="assertive"
         aria-atomic="false"
@@ -60,7 +60,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <span className="flex-1">{toast.message}</span>
             <button
               onClick={() => dismiss(toast.id)}
-              className="flex-shrink-0 ml-2 opacity-70 hover:opacity-100 transition-opacity"
+              className="shrink-0 ml-2 opacity-70 hover:opacity-100 transition-opacity"
               aria-label="Dismiss"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">

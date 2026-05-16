@@ -36,7 +36,7 @@ export default function IdempotencyPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("idempotencyKeys")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Pass an <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">Idempotency-Key</code> header with your webhook requests:
+          Pass an <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">Idempotency-Key</code> header with your webhook requests:
         </p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \\
@@ -53,9 +53,9 @@ export default function IdempotencyPage() {
           The key should be a unique string per logical operation. Common patterns:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">order-{`{id}`}-created</code> — For order events</li>
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">payment-{`{id}`}-succeeded</code> — For payment events</li>
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">user-{`{id}`}-signup-{`{timestamp}`}</code> — For user events</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order-{`{id}`}-created</code> — For order events</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">payment-{`{id}`}-succeeded</code> — For payment events</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">user-{`{id}`}-signup-{`{timestamp}`}</code> — For user events</li>
         </ul>
       </section>
 

@@ -85,7 +85,7 @@ export function TestWebhookCard({
         )}
       </div>
       <div className="mt-3 text-xs text-gray-500 dark:text-slate-500">
-        {t('payloadLabel')} <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{"{"}&quot;event&quot;: &quot;test.ping&quot;, &quot;data&quot;: {"{"}&quot;message&quot;: &quot;Hello from HookSniff! 🪝&quot;{"}"}{"}"}</code>
+        {t('payloadLabel')} <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm">{"{"}&quot;event&quot;: &quot;test.ping&quot;, &quot;data&quot;: {"{"}&quot;message&quot;: &quot;Hello from HookSniff! 🪝&quot;{"}"}{"}"}</code>
       </div>
     </div>
   );

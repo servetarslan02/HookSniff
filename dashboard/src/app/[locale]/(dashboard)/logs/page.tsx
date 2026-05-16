@@ -116,7 +116,7 @@ export default function LogsPage() {
               }}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition ${
                 filter === f
-                  ? 'bg-gray-900 dark:bg-brand-600 text-white shadow-sm'
+                  ? 'bg-gray-900 dark:bg-brand-600 text-white shadow-xs'
                   : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
               }`}
             >
@@ -315,7 +315,7 @@ export default function LogsPage() {
       {/* Detail Modal */}
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => setSelected(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" aria-hidden="true" onClick={() => setSelected(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80dvh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('deliveryDetails')}</h3>
@@ -351,7 +351,7 @@ export default function LogsPage() {
                     attempts.map((a) => (
                       <div key={a.id} className="flex items-start gap-3">
                         <div
-                          className={`mt-1 w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                          className={`mt-1 w-2.5 h-2.5 rounded-full shrink-0 ${
                             a.status === 'delivered' ? 'bg-green-500' : 'bg-red-500'
                           }`}
                         />

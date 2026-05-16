@@ -120,12 +120,12 @@ export function Onboarding({ onComplete }: { onComplete?: () => void }) {
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
         {/* Progress bar */}
         <div className="h-1 bg-gray-100 dark:bg-slate-800">
           <div
-            className="h-full bg-gradient-to-r from-brand-500 to-purple-500 transition-all duration-500 ease-out"
+            className="h-full bg-linear-to-r from-brand-500 to-purple-500 transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>

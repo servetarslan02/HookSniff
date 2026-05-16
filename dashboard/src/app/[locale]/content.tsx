@@ -175,7 +175,7 @@ function DashboardPreview() {
   const tHero = useTranslations('landing.hero');
   return (
     <div className="relative max-w-3xl mx-auto mt-12">
-      <div className="absolute -inset-4 bg-gradient-to-r from-brand-500/20 to-purple-500/20 rounded-3xl blur-2xl" />
+      <div className="absolute -inset-4 bg-linear-to-r from-brand-500/20 to-purple-500/20 rounded-3xl blur-2xl" />
       <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-brand-500/10 border border-gray-200 dark:border-slate-700 overflow-hidden">
         <div className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
           <div className="flex gap-1.5">
@@ -262,7 +262,7 @@ function HowItWorks() {
         <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto">{t('subtitle')}</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-        <div className="hidden md:block absolute top-10 left-[16.6%] right-[16.6%] h-0.5 bg-gradient-to-r from-brand-300 via-purple-300 to-brand-300 dark:from-brand-700 dark:via-purple-700 dark:to-brand-700 opacity-100 dark:opacity-60 z-0" />
+        <div className="hidden md:block absolute top-10 left-[16.6%] right-[16.6%] h-0.5 bg-linear-to-r from-brand-300 via-purple-300 to-brand-300 dark:from-brand-700 dark:via-purple-700 dark:to-brand-700 opacity-100 dark:opacity-60 z-0" />
         {steps.map((step, i) => (
           <div key={i} className="relative flex flex-col items-center text-center">
             <div className="w-20 h-20 rounded-2xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-6 relative z-10 border border-brand-100 dark:border-brand-500/20">
@@ -316,7 +316,7 @@ export function HomeContent() {
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-xl">🪝</div>
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-xl">🪝</div>
             <span className="text-xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </div>
           {/* Desktop nav */}
@@ -461,7 +461,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
             <div key={i} className={`relative rounded-2xl p-8 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg flex flex-col ${
               plan.popular
                 ? 'bg-white dark:bg-slate-800 border-2 border-brand-500 dark:border-brand-400 shadow-lg dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
-                : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg'
+                : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xs dark:shadow-lg'
             }`}>
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-600 dark:bg-brand-500 text-white px-4 py-1 rounded-full text-sm font-medium shadow-md">
@@ -499,7 +499,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
                 className={`w-full py-3 rounded-xl font-medium transition cursor-pointer ${
                   plan.popular
                     ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600 shadow-md'
-                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-sm'
+                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-xs'
                 }`}
               >
                 {plan.cta}

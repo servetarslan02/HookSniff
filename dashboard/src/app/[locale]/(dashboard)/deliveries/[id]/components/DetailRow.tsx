@@ -20,7 +20,7 @@ export function DetailRow({
   const t = useTranslations('deliveryDetail');
   return (
     <div className="flex items-center justify-between gap-4">
-      <span className="text-sm text-gray-500 dark:text-slate-400 flex-shrink-0">{label}</span>
+      <span className="text-sm text-gray-500 dark:text-slate-400 shrink-0">{label}</span>
       <div className="flex items-center gap-2 min-w-0">
         <span className={`text-sm text-gray-900 dark:text-white truncate ${mono ? 'font-mono text-xs' : ''}`}>
           {value}
@@ -28,7 +28,7 @@ export function DetailRow({
         {copyable && onCopy && (
           <button type="button"
             onClick={onCopy}
-            className="flex-shrink-0 p-1 rounded text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
+            className="shrink-0 p-1 rounded-sm text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition"
             title={t('copyTitle')}
           >
             {copied ? (

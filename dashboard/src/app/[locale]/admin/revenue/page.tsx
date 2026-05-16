@@ -136,7 +136,7 @@ export default function AdminRevenuePage() {
             {t('revenueDesc')}
           </p>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <label htmlFor="date-range" className="sr-only">{t('dateRange')}</label>
           <select
             id="date-range"
@@ -346,7 +346,7 @@ export default function AdminRevenuePage() {
                     <div key={entry.name} className="flex items-center justify-between" role="listitem">
                       <div className="flex items-center gap-2">
                         <div
-                          className="w-3 h-3 rounded-full flex-shrink-0"
+                          className="w-3 h-3 rounded-full shrink-0"
                           style={{ backgroundColor: PLAN_COLORS[entry.name.toLowerCase()] || '#94a3b8' }}
                           aria-hidden="true"
                         />

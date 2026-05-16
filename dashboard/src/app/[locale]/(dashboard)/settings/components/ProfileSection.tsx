@@ -62,7 +62,7 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
 
       <form onSubmit={handleProfileSave} className="space-y-4">
         <div className="flex items-center gap-4 mb-2">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
+          <div className="w-16 h-16 rounded-full bg-linear-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
             {(profileName || user?.email || 'U')[0].toUpperCase()}
           </div>
           <div>

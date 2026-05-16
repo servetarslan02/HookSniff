@@ -253,7 +253,7 @@ describe('ToastProvider + useToast - Ultra Coverage', () => {
     expect(alert!.className).toContain('fixed');
     expect(alert!.className).toContain('bottom-6');
     expect(alert!.className).toContain('right-6');
-    expect(alert!.className).toContain('z-[100]');
+    expect(alert!.className).toContain('z-100');
   });
 
   it('success toast has rounded-xl styling', async () => {

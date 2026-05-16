@@ -61,8 +61,8 @@ export default function PortalCustomizationPage() {
     return (
       <div className="space-y-6">
         <div className="glass-card p-6 animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-4" />
-          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2" />
+          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/3 mb-4" />
+          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2" />
         </div>
       </div>
     );
@@ -160,7 +160,7 @@ export default function PortalCustomizationPage() {
                   <div className="text-xs text-gray-500 dark:text-slate-400">{t('darkModeDesc')}</div>
                 </div>
                 <div className={`w-11 h-6 rounded-full transition-colors ${config.dark_mode ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
-                  <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.dark_mode ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
+                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${config.dark_mode ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
                   <input
                     role="switch"
                     aria-checked={config.dark_mode}
@@ -177,7 +177,7 @@ export default function PortalCustomizationPage() {
                   <div className="text-xs text-gray-500 dark:text-slate-400">{t('showEventsDesc')}</div>
                 </div>
                 <div className={`w-11 h-6 rounded-full transition-colors ${config.show_events ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
-                  <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.show_events ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
+                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${config.show_events ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
                   <input
                     role="switch"
                     aria-checked={config.show_events}
@@ -194,7 +194,7 @@ export default function PortalCustomizationPage() {
                   <div className="text-xs text-gray-500 dark:text-slate-400">{t('showDeliveriesDesc')}</div>
                 </div>
                 <div className={`w-11 h-6 rounded-full transition-colors ${config.show_deliveries ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
-                  <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${config.show_deliveries ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
+                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${config.show_deliveries ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
                   <input
                     role="switch"
                     aria-checked={config.show_deliveries}

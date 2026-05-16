@@ -356,7 +356,7 @@ export default function AdminUsersPage() {
       {/* Bulk Action Confirm Modal */}
       {bulkAction && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setBulkAction(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setBulkAction(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {bulkAction === 'ban' ? t('bulkBan') || 'Ban Selected' :
@@ -422,7 +422,7 @@ export default function AdminUsersPage() {
                         checked={sortedUsers.length > 0 && selectedIds.size === sortedUsers.length}
                         onChange={toggleSelectAll}
                         aria-label={t('selectAll') || 'Select all'}
-                        className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
+                        className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
                       />
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('id')}</th>
@@ -463,7 +463,7 @@ export default function AdminUsersPage() {
                           checked={selectedIds.has(u.id)}
                           onChange={() => toggleSelect(u.id)}
                           aria-label={`Select ${u.email}`}
-                          className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
+                          className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
                         />
                       </td>
                       <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
@@ -471,7 +471,7 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-linear-to-br from-red-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                             {(u.name || u.email)?.charAt(0).toUpperCase() || '?'}
                           </div>
                           <span className="text-sm text-gray-900 dark:text-white">{u.email}</span>
@@ -593,7 +593,7 @@ export default function AdminUsersPage() {
       {/* Ban Reason Modal */}
       {banTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setBanTarget(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setBanTarget(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               🚫 {t('banUser')}
@@ -635,7 +635,7 @@ export default function AdminUsersPage() {
       {/* Plan Change Modal */}
       {planChangeTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setPlanChangeTarget(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setPlanChangeTarget(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('changePlan')}
