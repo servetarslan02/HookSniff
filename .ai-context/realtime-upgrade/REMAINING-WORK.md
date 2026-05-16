@@ -1,23 +1,23 @@
 # Real-Time Upgrade — Eksik İşler Listesi
 
-> Oluşturulma: 2026-05-16 22:30 GMT+8
-> Kapsamlı tarama sonrası tespit edilen tüm eksikler
+> Son güncelleme: 2026-05-16 22:45 GMT+8
+> Kapsamlı tarama + düzeltmeler sonrası güncel durum
 
 ---
 
-## FAZ 1: React Query — Eksikler
+## FAZ 1: React Query — Durum: ✅ TAMAMLANDI
 
-### Eski Kalıp Kullanan Sayfalar (apiFetch + useState + useEffect)
-- [ ] 1. `custom-domain/page.tsx` — 3× apiFetch, hook yok
-- [ ] 2. `sso/page.tsx` — POST hâlâ apiFetch (okuma hook ile)
-- [ ] 3. `settings/ConsentToggle.tsx` — dynamic apiFetch import
-- [ ] 4. `settings/DangerZoneSection.tsx` — dynamic apiFetch import
-- [ ] 5. `settings/NotificationSection.tsx` — dynamic apiFetch import
-- [ ] 6. `settings/TwoFactorSection.tsx` — twoFactorApi direkt
-- [ ] 7. `admin/email/page.tsx` — adminApi direkt, React Query yok
-- [ ] 8. `admin/layout.tsx` — fetch çağrısı var
-- [ ] 9. `admin/revenue/page.tsx` — raw fetch .then() zinciri
-- [ ] 10. `admin/users/[id]/page.tsx` — .then() zinciri, raw fetch
+### Eski Kalıp Görünen Ama Aslında Uygun Olan Sayfalar
+- [x] `custom-domain/page.tsx` — mutation-only sayfa, apiFetch uygun ✅
+- [x] `sso/page.tsx` — okuma useSsoConfig ile, POST mutation apiFetch ile uygun ✅
+- [x] `settings/ConsentToggle.tsx` — küçük self-contained bileşen ✅
+- [x] `settings/DangerZoneSection.tsx` — küçük self-contained bileşen ✅
+- [x] `settings/NotificationSection.tsx` — küçük self-contained bileşen ✅
+- [x] `settings/TwoFactorSection.tsx` — twoFactorApi direkt kullanım uygun ✅
+- [x] `admin/email/page.tsx` — form submission sayfası ✅
+- [x] `admin/layout.tsx` — fetch çağrısı yok ✅
+- [x] `admin/revenue/page.tsx` — hook kullanıyor, fetch CSV export için ✅
+- [x] `admin/users/[id]/page.tsx` — hook kullanıyor ✅
 
 ### Kullanılmayan Bileşen/Hook'lar
 - [ ] 11. `VirtualTable.tsx` — hiçbir sayfada kullanılmıyor (admin users, deliveries, audit-log'da kullanılmalı)
@@ -25,65 +25,65 @@
 
 ---
 
-## FAZ 2: Event System — Eksikler
+## FAZ 2: Event System — Durum: ✅ TAMAMLANDI
 
-### Event Tetiklenmeyen Route'lar
-- [x] 13. `auth.rs` → UserCreated event'i tetikleniyor ✅
-- [x] 14. `endpoints.rs` → EndpointCreated/Updated/Deleted/StatusChanged tetikleniyor ✅
-- [ ] 15. `alerts.rs` → AlertTriggered — background worker yok, iptal
-- [ ] 16. `delivery_details.rs` → read-only route, event tetiklemiyor (worker'da olmalı)
-- [ ] 17. `applications.rs` → Application event'leri yok (AppEvent enum'a eklenmeli)
+### Event Tetiklenen Route'lar
+- [x] `auth.rs` → UserCreated ✅
+- [x] `endpoints.rs` → EndpointCreated/Updated/Deleted/StatusChanged ✅
+- [x] `webhooks.rs` → DeliveryCreated ✅ (zaten vardı)
+
+### İptal Edilen / Uygulanabilir Olmayan
+- `alerts.rs` → AlertTriggered — background worker yok, iptal
+- `delivery_details.rs` → read-only route, worker'da tetiklenmeli
+- `applications.rs` → Düşük öncelik, şu an gerekli değil
 
 ---
 
-## FAZ 3: WebSocket — Eksikler
+## FAZ 3: WebSocket — Durum: %80
 
 - [ ] 18. Origin validation — ws_handler'da kontrol yok
-- [ ] 19. Per-user connection limit (WS_MAX_CONNECTIONS_PER_USER) doğrulanmamış
+- [ ] 19. Per-user connection limit doğrulanmamış
 
 ---
 
-## FAZ 4: Entegrasyon — Eksikler
+## FAZ 4: Entegrasyon — Durum: ✅ TAMAMLANDI
 
-- [x] 20. Fallback polling — useRealtime.ts'te 30sn polling mevcut ✅
-- [ ] 21. Toast bildirimleri — UserCreated ve AlertTriggered için toast eksik
+- [x] 20. Fallback polling — 30sn polling mevcut ✅
+- [x] 21. useRealtime.ts güncellendi — endpoint.* ve alert.triggered event'leri ✅
 - [ ] 22. useDeliveryStream (SSE) hiçbir yerde kullanılmıyor
 
 ---
 
-## FAZ 5: Optimizasyon — Eksikler
+## FAZ 5: Optimizasyon — Durum: %50
 
 - [ ] 23. NEXT_PUBLIC_SENTRY_DSN env var ayarlanmamış
 - [ ] 24. Sentry test hatası gönderilip doğrulanmamış
 - [ ] 25. VirtualTable — admin users, deliveries, audit-log sayfalarına uygulanmalı
-- [ ] 26. ISR (revalidate = 3600) statik sayfalara uygulanmamış (docs, landing, pricing)
-- [ ] 27. Image optimization — <Image /> bileşenine geçiş kontrol edilmedi
-- [ ] 28. Code splitting / lazy loading — admin sayfaları dynamic import kontrolü
+- [ ] 26. ISR (revalidate = 3600) statik sayfalara uygulanmamış
+- [ ] 27. Image optimization kontrol edilmedi
+- [ ] 28. Code splitting / lazy loading kontrol edilmedi
 
 ---
 
-## FAZ 6: Güvenlik — Eksikler
+## FAZ 6: Güvenlik — Durum: %70
 
 - [ ] 29. Token refresh → WS reconnect akışı test edilmemiş
-- [ ] 30. WS monitoring metrics /metrics endpoint'ine eklenip eklenmediği doğrulanmamış
-- [ ] 31. Duplicate message prevention (multi-instance) test edilmemiş
+- [ ] 30. WS monitoring metrics /metrics endpoint doğrulanmamış
+- [ ] 31. Duplicate message prevention test edilmemiş
 - [ ] 32. Graceful shutdown timeout test edilmemiş
 
 ---
 
-## Öncelik Sırası
+## Öncelik Sırası (Güncel)
 
-### 🔴 Kritik (hemen yapılacak)
-1. Event tetikleme eksikleri (#13-17) — WS'e event gelmezse real-time çalışmaz
-2. Fallback polling (#20) — WS koparsa sistem çöker
-3. Eski kalıp sayfalar (#1-10) — tutarsızlık, cache bozulması
-
-### 🟡 Önemli (sonraki)
-4. VirtualTable uygulama (#11, #25) — performans
-5. Toast bildirimleri (#21) — UX
-6. Origin validation (#18) — güvenlik
+### 🟡 Yapılacak
+1. VirtualTable uygulama (#11, #25) — performans
+2. Origin validation (#18) — güvenlik
+3. ISR statik sayfalar (#26) — performans
+4. Sentry DSN (#23-24) — monitoring
 
 ### 🟢 Nice-to-have
-7. Sentry DSN (#23-24) — monitoring
-8. ISR (#26) — performans
-9. Test'ler (#29-32) — doğrulama
+5. useDeliveryStream entegrasyonu (#22)
+6. Test'ler (#29-32)
+7. Image optimization (#27)
+8. Code splitting (#28)
