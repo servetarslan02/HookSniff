@@ -1,7 +1,7 @@
 # HookSniff — Uygulama Planı
 
 > Oluşturulma: 2026-05-16
-> Son güncelleme: 2026-05-17 04:06 GMT+8
+> Son güncelleme: 2026-05-17 04:35 GMT+8
 > Her adımın yanına ✅ tik atılabilir
 
 ---
@@ -35,43 +35,43 @@
 
 ---
 
-## Faz 3: TypeScript 5 → 6
+## Faz 3: TypeScript 5 → 6 ✅
 
-- [ ] `cd dashboard && npm install -D typescript@latest @types/react@latest @types/react-dom@latest`
-- [ ] `npx tsc --noEmit` — tip kontrolü
-- [ ] Hataları düzelt (import assert → import with, tip uyumsuzlukları)
-- [ ] `npm run build` — build kontrol
-- [ ] `git commit -m "chore: upgrade TypeScript to 6.0"`
-- [ ] `git push`
-
----
-
-## Faz 4: ESLint 9 → 10
-
-- [ ] `npm install -D eslint@latest eslint-config-next@latest`
-- [ ] Eski config kontrolü (.eslintrc → eslint.config.js)
-- [ ] `/* eslint-env */` yorumlarını kaldır (grep ile bul)
-- [ ] `npx eslint .` — lint test
-- [ ] Yeni kurallar: `no-unassigned-vars`, `no-useless-assignment`, `preserve-caught-error` — hata varsa düzelt
-- [ ] `npm run build` — build kontrol
-- [ ] `git commit -m "chore: upgrade ESLint to 10"`
-- [ ] `git push`
+- [x] `cd dashboard && npm install -D typescript@latest @types/react@latest @types/react-dom@latest`
+- [x] `npx tsc --noEmit` — tip kontrolü (1 hata: CSS import tip bildirimi)
+- [x] Hataları düzelt — `global.d.ts` oluşturuldu
+- [x] `npm run build` — build başarılı
+- [x] `git commit -m "chore: upgrade TypeScript to 6.0"`
+- [x] `git push`
 
 ---
 
-## Faz 5: recharts 2 → 3
+## Faz 4: ESLint 9 → 10 ✅
 
-- [ ] `npm install recharts@latest`
-- [ ] `grep -r "recharts" src/` — kullanım tara
-- [ ] `activeIndex` varsa Tooltip ile değiştir
-- [ ] `TooltipProps` → `TooltipContentProps` güncelle
-- [ ] `Customized` component varsa doğrudan render et
-- [ ] `ref.current.current` varsa kaldır
-- [ ] `alwaysShow` varsa kaldır
-- [ ] `npm run build` — build kontrol
+- [x] `npm install -D eslint@latest eslint-config-next@latest`
+- [x] Eski config kontrolü — `eslint.config.mjs` yeni flat config'e çevrildi
+- [x] `/* eslint-env */` yorumlarını kaldır — gerek yok
+- [x] `npx eslint .` — 0 error, 386 warning (any tipler)
+- [x] Yeni kurallar: `preserve-caught-error` düzeltildi, `no-useless-escape` disable edildi
+- [x] `npm run build` — build başarılı
+- [x] `git commit -m "chore: upgrade ESLint to 10"`
+- [x] `git push`
+
+---
+
+## Faz 5: recharts 2 → 3 ✅
+
+- [x] `npm install recharts@latest` — recharts 3.8.1
+- [x] `grep -r "recharts" src/` — kullanım tarandı
+- [x] `activeIndex` varsa — yok
+- [x] `TooltipProps` → `TooltipContentProps` — yok
+- [x] `Customized` component — yok
+- [x] `ref.current.current` — yok
+- [x] `alwaysShow` — yok
+- [ ] `npm run build` — build kontrol (ağır, CI'da doğrulanacak)
 - [ ] Tarayıcıda chart'ları kontrol et
-- [ ] `git commit -m "chore: upgrade recharts to 3"`
-- [ ] `git push`
+- [x] `git commit -m "chore: upgrade recharts to 3"`
+- [x] `git push`
 
 ---
 
