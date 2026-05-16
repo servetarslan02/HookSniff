@@ -105,6 +105,10 @@ export default function AdminUserDetailPage() {
   const [showGdprDeleteModal, setShowGdprDeleteModal] = useState(false);
   const [gdprDeleteReason, setGdprDeleteReason] = useState('');
 
+  // ── Ban reason state ──
+  const [showBanModal, setShowBanModal] = useState(false);
+  const [banReason, setBanReason] = useState('');
+
   // ── Test Webhook modal ──
   const [showTestWebhookModal, setShowTestWebhookModal] = useState(false);
   const [testWebhookUrl, setTestWebhookUrl] = useState('');
@@ -157,10 +161,32 @@ export default function AdminUserDetailPage() {
 
   const handleToggleStatus = async () => {
     if (!id || !detail) return;
-    const newStatus = detail.user.status === 'active' ? 'banned' : 'active';
+    if (detail.user.status === 'active') {
+      // Show ban reason modal
+      setShowBanModal(true);
+      setBanReason('');
+      return;
+    }
+    // Activate user
     try {
-      await updateStatusMutation.mutateAsync({ userId: id, status: newStatus as 'active' | 'banned' });
-      toast(newStatus === "banned" ? t("userBanned") : t("userActivated"), "success");
+      await updateStatusMutation.mutateAsync({ userId: id, status: 'active' });
+      toast(t("userActivated"), "success");
+    } catch {
+      toast(t("failedToUpdateStatus"), "error");
+    }
+  };
+
+  const handleConfirmBan = async () => {
+    if (!id) return;
+    try {
+      await updateStatusMutation.mutateAsync({
+        userId: id,
+        status: 'banned',
+        reason: banReason.trim() || undefined,
+      });
+      toast(t("userBanned"), "success");
+      setShowBanModal(false);
+      setBanReason('');
     } catch {
       toast(t("failedToUpdateStatus"), "error");
     }
@@ -183,7 +209,11 @@ export default function AdminUserDetailPage() {
     if (!id || !detail) return;
     try {
       const result = await impersonateMutation.mutateAsync(id);
-      window.open(`/${locale}/dashboard?impersonate_token=${result.token}`, '_blank');
+      // Store token in sessionStorage (more secure than URL params)
+      const sessionKey = `impersonate_token_${Date.now()}`;
+      sessionStorage.setItem(sessionKey, result.token);
+      // Open with session key instead of token in URL
+      window.open(`/${locale}/dashboard?impersonate_session=${sessionKey}`, '_blank');
       toast(t('impersonating') + `: ${detail.user.email}`, 'success');
     } catch {
       toast(tc('error'), 'error');
@@ -1193,6 +1223,48 @@ export default function AdminUserDetailPage() {
                 className="px-4 py-2 text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition-colors"
               >
                 🗑️ {t('deleteAllData') || 'Delete All Data'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ban Reason Modal */}
+      {showBanModal && detail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowBanModal(false)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              🚫 {t('banUser')}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+              {t('banUserConfirm', { email: detail.user.email }) || `Are you sure you want to ban ${detail.user.email}?`}
+            </p>
+            <div className="mb-4">
+              <label htmlFor="ban-reason-detail" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
+                {t('banReason') || 'Reason (optional)'}
+              </label>
+              <textarea
+                id="ban-reason-detail"
+                value={banReason}
+                onChange={(e) => setBanReason(e.target.value)}
+                rows={3}
+                placeholder={t('banReasonPlaceholder') || 'Enter reason for banning this user...'}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent transition resize-none"
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button type="button"
+                onClick={() => setShowBanModal(false)}
+                className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+              >
+                {tc('cancel')}
+              </button>
+              <button type="button"
+                onClick={handleConfirmBan}
+                className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition"
+              >
+                {t('banUser') || 'Ban User'}
               </button>
             </div>
           </div>
