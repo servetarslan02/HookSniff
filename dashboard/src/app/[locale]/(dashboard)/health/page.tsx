@@ -1,26 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/lib/store';
-import { apiFetch } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-
-interface EndpointHealth {
-  id: string;
-  url: string;
-  description: string | null;
-  is_active: boolean;
-  health_status: string;
-  success_rate: number;
-  avg_response_ms: number;
-  p95_response_ms: number;
-  total_deliveries: number;
-  successful: number;
-  failed: number;
-  consecutive_failures: number;
-  last_failure_at: string | null;
-  uptime_24h: number;
-}
+import { useEndpointHealth } from '@/hooks/useDashboardData';
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: string }> = {
   healthy: { color: 'text-green-700 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/20', labelKey: 'healthy' },
@@ -29,30 +10,10 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: strin
 };
 
 export default function EndpointHealthPage() {
-  const { token } = useAuth();
-  const [endpoints, setEndpoints] = useState<EndpointHealth[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const t = useTranslations('health');
   const tc = useTranslations('common');
 
-  const fetchHealth = useCallback(async () => {
-    try {
-      setError(null);
-      const data = await apiFetch<EndpointHealth[]>('/endpoint-health', { token: token || undefined });
-      setEndpoints(data);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : t('failedToLoad'));
-    } finally {
-      setLoading(false);
-    }
-  }, [token, t]);
-
-  useEffect(() => {
-    fetchHealth();
-    const interval = setInterval(fetchHealth, 30000); // Refresh every 30s
-    return () => clearInterval(interval);
-  }, [fetchHealth]);
+  const { data: endpoints = [], isLoading, error, refetch } = useEndpointHealth();
 
   return (
     <div className="space-y-8">
@@ -66,9 +27,9 @@ export default function EndpointHealthPage() {
       {/* Error banner */}
       {error && (
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
-          <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
+          <span className="text-red-700 dark:text-red-400 text-sm">{error instanceof Error ? error.message : t('failedToLoad')}</span>
           <button
-            onClick={fetchHealth}
+            onClick={() => refetch()}
             className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
           >
             {tc('retry') || 'Retry'}
@@ -107,7 +68,7 @@ export default function EndpointHealthPage() {
 
       {/* Endpoint List */}
       <div className="glass-card overflow-hidden">
-        {loading ? (
+        {isLoading ? (
           <div className="p-8 text-center text-gray-500 dark:text-slate-400">{tc('loading')}</div>
         ) : endpoints.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400">

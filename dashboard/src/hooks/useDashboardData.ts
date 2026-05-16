@@ -2,12 +2,13 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  endpointsApi, webhooksApi, analyticsApi, statsApi,
+  api, endpointsApi, webhooksApi, analyticsApi, statsApi,
   billingApiExtended, applicationsApi, alertsApi, teamsApi,
   transformsApi, inboundApi, notificationsApi, apiFetch,
   type Endpoint, type RetryPolicyConfig,
   type AlertRule, type Team, type TeamMember,
   type DeliveryDetail, type DeliveryAttempt, type NotificationListResponse,
+  type AuditLogEntryResponse, type EndpointHealthResponse,
 } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import {
@@ -25,6 +26,7 @@ import {
   TransformRuleSchema,
   InboundConfigSchema,
   SsoConfigSchema,
+  EndpointHealthSchema,
   type EndpointValidated,
   type BillingUsageValidated,
   type InvoiceValidated,
@@ -698,5 +700,31 @@ export function useReplayWebhook() {
       queryClient.invalidateQueries({ queryKey: ['delivery-logs'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
+  });
+}
+
+// ── Audit Log ──
+export function useAuditLogs(params?: { page?: number; limit?: number; action?: string }) {
+  const { token } = useAuth();
+  return useQuery<{ entries: AuditLogEntryResponse[]; has_more: boolean }>({
+    queryKey: ['audit-log', params],
+    queryFn: () => api.getAuditLog(token!, params),
+    enabled: !!token,
+    staleTime: 15_000,
+  });
+}
+
+// ── Endpoint Health ──
+export function useEndpointHealth() {
+  const { token } = useAuth();
+  return useQuery<EndpointHealthResponse[]>({
+    queryKey: ['endpoint-health'],
+    queryFn: validated(
+      () => api.getEndpointHealth(token || undefined),
+      EndpointHealthSchema.array()
+    ),
+    enabled: true,
+    staleTime: 15_000,
+    refetchInterval: 30_000,
   });
 }
