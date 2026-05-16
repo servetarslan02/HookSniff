@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-16 18:24 GMT+8
+> Son güncelleme: 2026-05-16 19:45 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -319,6 +319,15 @@ HookSniff/
 2. **GitHub Actions** — Hala başarısız (billing issue, faturalandırma güncellenmeli)
 3. **GCP Console** — Servet'in Google hesabı ile giriş yapıldı (2FA onayı ile)
 4. **API Sağlığı** — Çalışıyor (healthy, DB 27ms, Redis configured)
+
+### Oturum 182 — 2026-05-16 19:45 GMT+8
+1. **Vercel Build Hataları Düzeltildi** ✅
+   - **TwoFactorSection.tsx JSX parse error**: `{/* comment */}` self-closing tag'den sonra kaldırıldı, satır üzerine taşındı
+   - **Endpoint interface null uyumsuzluğu**: `.nullish()` ile uyumlu hale getirildi (`| null` eklendi)
+   - **AdminUser interface null uyumsuzluğu**: Aynı düzeltme + eksik field'lar eklendi (`is_active`, `is_admin`, `total_deliveries`, `total_endpoints`)
+   - 2 dosya değişti, 18 satır eklendi, 13 satır silindi
+   - Commit: b00f8e60
+2. **Build doğrulandı** ✅ — `next build` başarılı, 27.4s, 0 hata
 
 ### Oturum 181 — 2026-05-16 18:24 GMT+8
 1. **Admin Panel Hataları Düzeltildi** ✅
