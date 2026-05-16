@@ -10,7 +10,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 3
     labels:
       - "dependencies"
       - "security"
@@ -21,7 +21,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 3
     labels:
       - "dependencies"
       - "security"
@@ -32,7 +32,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 3
     labels:
       - "dependencies"
       - "ci"
