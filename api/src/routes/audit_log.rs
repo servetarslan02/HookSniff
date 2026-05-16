@@ -37,7 +37,6 @@ pub fn router() -> Router {
 
 /// Query parameters for listing audit log entries
 #[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
 pub struct AuditLogQuery {
     pub action: Option<String>,
     pub resource_type: Option<String>,
@@ -113,12 +112,14 @@ async fn list_audit_entries(
     let total = count_query.fetch_one(&pool).await?;
 
     // Fetch entries with customer info
+    // NOTE: where_sql already uses unqualified column names; the `a.` alias
+    // is applied here so we must NOT also prefix in the replace() chain.
     let data_sql =
         format!(
         "SELECT a.id, a.action, a.resource_type, a.resource_id, a.details, a.ip_address, a.user_agent, a.created_at,
                 COALESCE(c.name, 'Unknown') as actor, COALESCE(c.email, 'unknown') as actor_email
          FROM audit_log a LEFT JOIN customers c ON c.id = a.customer_id
-         WHERE a.{} ORDER BY a.created_at DESC LIMIT ${} OFFSET ${}",
+         WHERE {} ORDER BY a.created_at DESC LIMIT ${} OFFSET ${}",
         where_sql.replace("customer_id", "a.customer_id").replace("action = ", "a.action = ").replace("resource_type = ", "a.resource_type = "), param_index, param_index + 1
     );
     let mut data_query = sqlx::query_as::<
