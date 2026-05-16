@@ -254,6 +254,17 @@ export const api = {
   post: async <T = unknown>(path: string, body?: unknown, token?: string) => ({ data: await apiFetch<T>(path, { method: 'POST', body, token }) }),
   put: async <T = unknown>(path: string, body?: unknown, token?: string) => ({ data: await apiFetch<T>(path, { method: 'PUT', body, token }) }),
   delete: async <T = unknown>(path: string, token?: string) => ({ data: await apiFetch<T>(path, { method: 'DELETE', token }) }),
+
+  getAuditLog: (token: string, params?: { page?: number; limit?: number; action?: string }) => {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set('page', params.page.toString());
+    if (params?.limit) qs.set('limit', params.limit.toString());
+    if (params?.action) qs.set('action', params.action);
+    return apiFetch<{ entries: AuditLogEntryResponse[]; has_more: boolean }>(`/audit-log${qs.toString() ? `?${qs}` : ''}`, { token });
+  },
+
+  getEndpointHealth: (token?: string) =>
+    apiFetch<EndpointHealthResponse[]>('/endpoint-health', { token: token || undefined }),
 };
 
 // Types
@@ -473,6 +484,36 @@ export interface AuditLogResponse {
   total: number;
   page: number;
   per_page: number;
+}
+
+export interface AuditLogEntryResponse {
+  id: string;
+  timestamp: string;
+  actor: string;
+  actor_email: string;
+  action: string;
+  resource_type: string;
+  resource_id: string;
+  details: string;
+  ip_address: string;
+  user_agent: string;
+}
+
+export interface EndpointHealthResponse {
+  id: string;
+  url: string;
+  description: string | null;
+  is_active: boolean;
+  health_status: string;
+  success_rate: number;
+  avg_response_ms: number;
+  p95_response_ms: number;
+  total_deliveries: number;
+  successful: number;
+  failed: number;
+  consecutive_failures: number;
+  last_failure_at: string | null;
+  uptime_24h: number;
 }
 
 export interface UserAnalytics {
