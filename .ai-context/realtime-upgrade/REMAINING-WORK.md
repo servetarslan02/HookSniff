@@ -39,10 +39,10 @@
 
 ---
 
-## FAZ 3: WebSocket — Durum: %80
+## FAZ 3: WebSocket — Durum: ✅ TAMAMLANDI
 
-- [ ] 18. Origin validation — ws_handler'da kontrol yok
-- [ ] 19. Per-user connection limit doğrulanmamış
+- [x] 18. Origin validation — ws_handler'da validate_origin() mevcut ✅
+- [x] 19. Per-user connection limit — WsGateway max_connections mevcut ✅
 
 ---
 
@@ -54,12 +54,12 @@
 
 ---
 
-## FAZ 5: Optimizasyon — Durum: %50
+## FAZ 5: Optimizasyon — Durum: %75
 
 - [ ] 23. NEXT_PUBLIC_SENTRY_DSN env var ayarlanmamış
 - [ ] 24. Sentry test hatası gönderilip doğrulanmamış
-- [ ] 25. VirtualTable — admin users, deliveries, audit-log sayfalarına uygulanmalı
-- [x] 26. ISR (revalidate = 3600) statik sayfalara uygulandı ✅ (blog, pricing, changelog, faq, status, contact, get-started + slug pages)
+- [ ] 25. VirtualTable — admin users, deliveries, audit-log sayfalarına uygulanmalı (pagination var, düşük öncelik)
+- [x] 26. ISR (revalidate = 3600) statik sayfalara uygulandı ✅ (home, blog, pricing, changelog, faq, status, contact, get-started, newsletter, use-cases + slug pages)
 - [ ] 27. Image optimization kontrol edilmedi
 - [ ] 28. Code splitting / lazy loading kontrol edilmedi
 
@@ -77,13 +77,13 @@
 ## Öncelik Sırası (Güncel)
 
 ### 🟡 Yapılacak
-1. VirtualTable uygulama (#11, #25) — performans
-2. Origin validation (#18) — güvenlik
-3. ISR statik sayfalar (#26) — performans
-4. Sentry DSN (#23-24) — monitoring
+1. ~~VirtualTable uygulama (#11, #25) — performans~~ Pagination var, düşük öncelik
+2. ~~Origin validation (#18) — güvenlik~~ Zaten var ✅
+3. ~~ISR statik sayfalar (#26) — performans~~ Yapıldı ✅
+4. Sentry DSN (#23-24) — monitoring (kullanıcı DSN sağlamalı)
 
 ### 🟢 Nice-to-have
-5. useDeliveryStream entegrasyonu (#22)
+5. useDeliveryStream entegrasyonu (#22) — WS varken redundant
 6. Test'ler (#29-32)
 7. Image optimization (#27)
 8. Code splitting (#28)
