@@ -1135,7 +1135,7 @@ async fn export_revenue_csv(
     let months = params.months.unwrap_or(12).clamp(1, 60);
 
     // Item 252: Use actual invoice data for revenue export
-    let all_rows = sqlx::query_as::<_, RevenueRow>(
+    let rows = sqlx::query_as::<_, RevenueRow>(
         r#"SELECT
             TO_CHAR(DATE_TRUNC('month', NOW()) - (n || ' months')::interval, 'YYYY-MM') as month,
             COALESCE(
@@ -1146,19 +1146,12 @@ async fn export_revenue_csv(
                    AND paid_at < DATE_TRUNC('month', NOW()) - ((n - 1) || ' months')::interval),
                 0.0
             ) as revenue
-        FROM generate_series(0, 11) as n
+        FROM generate_series(0, $1 - 1) as n
         ORDER BY month"#,
     )
+    .bind(months)
     .fetch_all(&pool)
     .await?;
-
-    // Trim to requested number of months
-    let skip = if all_rows.len() > months as usize {
-        all_rows.len() - months as usize
-    } else {
-        0
-    };
-    let rows: Vec<RevenueRow> = all_rows.into_iter().skip(skip).collect();
 
     let mut csv = String::from("month,revenue\n");
     for row in &rows {
@@ -4188,7 +4181,7 @@ async fn admin_revenue_metrics(
     let total_customers: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM customers")
         .fetch_one(&pool)
         .await?;
-    let paying_customers: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM customers WHERE plan != 'free'")
+    let paying_customers: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM customers WHERE plan NOT IN ('free', 'developer')")
         .fetch_one(&pool)
         .await?;
 
@@ -4265,7 +4258,7 @@ async fn admin_revenue_metrics(
            JOIN customers c ON c.id = i.customer_id
            WHERE i.status = 'paid'
              AND i.paid_at >= DATE_TRUNC('month', NOW())
-             AND c.plan IN ('pro', 'enterprise')
+             AND c.plan IN ('startup', 'pro', 'enterprise')
              AND c.created_at < DATE_TRUNC('month', NOW()) - INTERVAL '1 month'"#
     )
     .fetch_one(&pool)

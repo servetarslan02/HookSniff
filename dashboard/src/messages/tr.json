@@ -1814,7 +1814,9 @@
     "nrr": "NRR",
     "paying": "ödemeli",
     "planPrices": "Plan Fiyatları",
-    "signedUp": "Kayıt Olan"
+    "signedUp": "Kayıt Olan",
+    "retention": "Tutma Oranı",
+    "last12Months": "Son 12 ay"
   },
   "landing": {
     "nav": {
