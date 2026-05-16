@@ -29,9 +29,17 @@ export function useRealtime() {
         queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
         break;
 
+      case 'endpoint.created':
+      case 'endpoint.updated':
+      case 'endpoint.deleted':
       case 'endpoint.status_changed':
         queryClient.invalidateQueries({ queryKey: ['endpoints'] });
         queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+        break;
+
+      case 'alert.triggered':
+        queryClient.invalidateQueries({ queryKey: ['alerts'] });
+        queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });
         break;
 
       default:
