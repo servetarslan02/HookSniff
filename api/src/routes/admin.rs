@@ -12,6 +12,7 @@ use uuid::Uuid;
 use crate::auth::jwt;
 use crate::config::Config;
 use crate::error::AppError;
+use crate::feature_flags::FeatureFlagService;
 use crate::models::customer::Customer;
 
 pub fn router() -> Router {
@@ -3540,9 +3541,15 @@ pub struct BulkEmailResult {
 async fn admin_export_user_data(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(feature_flags): Extension<FeatureFlagService>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&customer)?;
+
+    // Gate behind gdpr_data_deletion feature flag (export is part of GDPR)
+    if !feature_flags.is_enabled("gdpr_data_deletion").await {
+        return Err(AppError::BadRequest("GDPR data export is not enabled. Contact support to enable this feature.".into()));
+    }
 
     // Get target user
     let user = sqlx::query_as::<_, Customer>(
@@ -3726,10 +3733,16 @@ async fn admin_export_user_data(
 async fn admin_delete_user_data(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(feature_flags): Extension<FeatureFlagService>,
     Path(id): Path<Uuid>,
     Json(req): Json<AdminDeleteDataRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin_write(&customer)?;
+
+    // Gate behind gdpr_data_deletion feature flag
+    if !feature_flags.is_enabled("gdpr_data_deletion").await {
+        return Err(AppError::BadRequest("GDPR data deletion is not enabled. Contact support to enable this feature.".into()));
+    }
 
     if !req.confirm {
         return Err(AppError::BadRequest("confirm must be true to delete user data".into()));
