@@ -1857,7 +1857,9 @@
     "freePlanLimits": "Free Plan Limits",
     "maxWebhooks": "Max Webhooks/mo",
     "rateLimit": "Rate Limit/min",
-    "polarSyncInfo": "Price changes here update the platform. Polar products should be updated to match."
+    "polarSyncInfo": "Price changes here update the platform. Polar products should be updated to match.",
+    "planPricesMoved": "Plan prices and limits are now managed from the Revenue page.",
+    "goToRevenue": "Go to Revenue"
   },
   "landing": {
     "nav": {
