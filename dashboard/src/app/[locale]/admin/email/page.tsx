@@ -32,13 +32,15 @@ export default function AdminEmailPage() {
   const [planFilter, setPlanFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [sending, setSending] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [result, setResult] = useState<{ total_sent: number; total_failed: number; message: string } | null>(null);
   const [history, setHistory] = useState<Array<{ subject: string; sent: number; failed: number; date: string; plan: string }>>([]);
 
-  const handleSend = useCallback(async () => {
+  const executeSend = useCallback(async () => {
     if (!token || !subject.trim() || !body.trim()) return;
     setSending(true);
     setResult(null);
+    setShowConfirm(false);
     try {
       const res = await adminApi.sendBulkEmail(token, {
         subject: subject.trim(),
@@ -56,11 +58,16 @@ export default function AdminEmailPage() {
       }, ...prev].slice(0, 10));
       toast(res.message, 'success');
     } catch {
-      toast(t('bulkEmailFailed') || t('bulkEmailFailed'), 'error');
+      toast(t('bulkEmailFailed'), 'error');
     } finally {
       setSending(false);
     }
   }, [token, subject, body, planFilter, statusFilter, t, toast]);
+
+  const handleSendClick = useCallback(() => {
+    if (!subject.trim() || !body.trim()) return;
+    setShowConfirm(true);
+  }, [subject, body]);
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -114,7 +121,7 @@ export default function AdminEmailPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
-              {t('body') || 'Body'} * <span className="text-xs text-gray-400 font-normal">{'{name}'} {'{email}'} {t('supported') || 'placeholders supported'}</span>
+              {t('body') || 'Body'} * <span className="text-xs text-gray-400 font-normal">{'{name}'} {'{email}'} {t('bulkEmailPlaceholders') || 'placeholders supported'}</span>
             </label>
             <textarea
               value={body}
@@ -129,7 +136,7 @@ export default function AdminEmailPage() {
               {t('bulkEmailNote') || 'Emails are sent in batches of 50. Max 5000 recipients per send.'}
             </p>
             <button
-              onClick={handleSend}
+              onClick={handleSendClick}
               disabled={sending || !subject.trim() || !body.trim()}
               className="px-6 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
             >
@@ -138,6 +145,43 @@ export default function AdminEmailPage() {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              ⚠️ {t('bulkEmailConfirmTitle') || 'Confirm Bulk Email'}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-slate-300 mb-1">
+              {t('bulkEmailConfirmDesc') || 'You are about to send an email to all matching users. This action cannot be undone.'}
+            </p>
+            <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-3 mb-4">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{subject}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                {planFilter ? `${t('planFilter')}: ${planFilter}` : t('emailAllPaid') || 'All Paid Plans'}
+                {' · '}
+                {statusFilter ? `${t('statusFilter')}: ${statusFilter}` : t('emailAllUsers') || 'All Users'}
+              </p>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl transition-colors"
+              >
+                {t('bulkEmailConfirmCancel') || 'Cancel'}
+              </button>
+              <button
+                onClick={executeSend}
+                disabled={sending}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl transition-colors"
+              >
+                {sending ? (t('sending') || 'Sending...') : (t('bulkEmailConfirmSend') || 'Yes, Send')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Result */}
       {result && (

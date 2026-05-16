@@ -187,7 +187,6 @@ pub struct StatusRequest {
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
 pub struct SendEmailRequest {
     pub subject: String,
     pub body: String,
@@ -594,10 +593,34 @@ async fn user_plan_history(
 async fn send_user_email(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(email): Extension<crate::email::EmailProvider>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     Path(id): Path<Uuid>,
     Json(req): Json<SendEmailRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin_write(&customer)?;
+
+    // Check if email provider is configured
+    if !email.is_configured() {
+        return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY or GCP_SA_JSON environment variable.".into()));
+    }
+
+    // Rate limit: max 20 single emails per admin per minute
+    let rl_key = format!("admin_email:{}", customer.id);
+    if !rate_limiter.check(&rl_key, 20).await {
+        return Err(AppError::RateLimitExceeded);
+    }
+
+    // Validate subject/body length
+    if req.subject.trim().is_empty() {
+        return Err(AppError::BadRequest("Email subject cannot be empty".into()));
+    }
+    if req.subject.len() > 500 {
+        return Err(AppError::BadRequest("Email subject too long (max 500 chars)".into()));
+    }
+    if req.body.len() > 100_000 {
+        return Err(AppError::BadRequest("Email body too long (max 100KB)".into()));
+    }
 
     // Get target user
     let user: Option<(String, Option<String>)> =
@@ -606,34 +629,11 @@ async fn send_user_email(
             .fetch_optional(&pool)
             .await?;
 
-    let (email, _name) = user.ok_or(AppError::NotFound)?;
+    let (email_addr, _name) = user.ok_or(AppError::NotFound)?;
 
-    // Get settings for Resend config
-    let settings = fetch_platform_settings(&pool).await;
-
-    let api_key = settings.resend_api_key.as_ref()
-        .ok_or_else(|| AppError::BadRequest("Resend API key not configured".into()))?;
-    let sender = settings.email_sender.as_deref().unwrap_or("noreply@resend.dev");
-
-    // Send via Resend API
-    let client = reqwest::Client::new();
-    let resp = client
-        .post("https://api.resend.com/emails")
-        .header("Authorization", format!("Bearer {}", api_key))
-        .json(&serde_json::json!({
-            "from": sender,
-            "to": [email],
-            "subject": req.subject,
-            "text": req.body,
-        }))
-        .send()
-        .await
+    // Send via EmailProvider (uses Resend or GCloud, configured via env vars)
+    email.send_contact_email(&email_addr, &req.subject, &req.body).await
         .map_err(|e| AppError::BadRequest(format!("Failed to send email: {}", e)))?;
-
-    if !resp.status().is_success() {
-        let err_text = resp.text().await.unwrap_or_default();
-        return Err(AppError::BadRequest(format!("Email send failed: {}", err_text)));
-    }
 
     // Log to audit
     let _ = crate::audit::log_action(
@@ -654,7 +654,7 @@ async fn send_user_email(
         id,
         "email",
         Some(&req.subject),
-        Some(serde_json::json!({ "subject": req.subject, "body_preview": &req.body[..req.body.len().min(200)] })),
+        Some(serde_json::json!({ "subject": req.subject, "body_preview": req.body.chars().take(200).collect::<String>() })),
         customer.id,
     )
     .await;
@@ -3618,7 +3618,6 @@ async fn admin_all_refunds(
 // ── Request structs ──
 
 #[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
 pub struct BulkEmailRequest {
     pub subject: String,
     pub body: String,
@@ -3982,9 +3981,25 @@ async fn admin_delete_user_data(
 async fn admin_bulk_email(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Extension(email): Extension<crate::email::EmailProvider>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     Json(req): Json<BulkEmailRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     require_admin_write(&customer)?;
+
+    // Check if email provider is configured
+    if !email.is_configured() {
+        return Err(AppError::BadRequest("Email provider not configured. Set RESEND_API_KEY or GCP_SA_JSON environment variable.".into()));
+    }
+
+    // Rate limit: max 5 bulk emails per admin per hour
+    let rl_key = format!("admin_bulk_email:{}", customer.id);
+    let rl_result = rate_limiter
+        .check_with_window(&rl_key, 5, 3600)
+        .await;
+    if !rl_result.allowed {
+        return Err(AppError::RateLimitExceeded);
+    }
 
     if req.subject.trim().is_empty() {
         return Err(AppError::BadRequest("Email subject cannot be empty".into()));
@@ -3992,12 +4007,12 @@ async fn admin_bulk_email(
     if req.body.trim().is_empty() {
         return Err(AppError::BadRequest("Email body cannot be empty".into()));
     }
-
-    // Get Resend API key from settings
-    let settings = fetch_platform_settings(&pool).await;
-    let api_key = settings.resend_api_key.as_ref()
-        .ok_or_else(|| AppError::BadRequest("Resend API key not configured".into()))?;
-    let sender = settings.email_sender.as_deref().unwrap_or("noreply@resend.dev");
+    if req.subject.len() > 500 {
+        return Err(AppError::BadRequest("Email subject too long (max 500 chars)".into()));
+    }
+    if req.body.len() > 100_000 {
+        return Err(AppError::BadRequest("Email body too long (max 100KB)".into()));
+    }
 
     // Build user query based on filters
     let mut query = "SELECT id, email, name FROM customers WHERE is_active = true".to_string();
@@ -4043,32 +4058,19 @@ async fn admin_bulk_email(
         })));
     }
 
-    // Send emails in batches of 50
-    let client = reqwest::Client::new();
+    // Send emails in batches of 50 via EmailProvider
     let mut sent = 0i64;
     let mut failed = 0i64;
 
     for chunk in users.chunks(50) {
-        for (user_id, email, name) in chunk {
+        for (user_id, email_addr, name) in chunk {
 
             let personalized_body = req.body
                 .replace("{name}", &name.as_deref().unwrap_or("User"))
-                .replace("{email}", email);
+                .replace("{email}", email_addr);
 
-            let resp = client
-                .post("https://api.resend.com/emails")
-                .header("Authorization", format!("Bearer {}", api_key))
-                .json(&serde_json::json!({
-                    "from": sender,
-                    "to": [email],
-                    "subject": req.subject,
-                    "text": personalized_body,
-                }))
-                .send()
-                .await;
-
-            match resp {
-                Ok(r) if r.status().is_success() => {
+            match email.send_contact_email(email_addr, &req.subject, &personalized_body).await {
+                Ok(_) => {
                     sent += 1;
                     // Log each email
                     let _ = log_communication(
@@ -4081,7 +4083,7 @@ async fn admin_bulk_email(
                     )
                     .await;
                 }
-                _ => {
+                Err(_) => {
                     failed += 1;
                 }
             }
