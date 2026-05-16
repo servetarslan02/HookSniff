@@ -1528,11 +1528,13 @@ pub struct AdminAuditLogResponse {
 pub struct AdminAuditEntry {
     pub id: Uuid,
     pub customer_id: Uuid,
+    pub customer_email: Option<String>,
     pub action: String,
     pub resource_type: String,
     pub resource_id: Option<String>,
     pub details: Option<serde_json::Value>,
     pub ip_address: Option<String>,
+    #[serde(skip_serializing)]
     pub user_agent: Option<String>,
     pub created_at: DateTime<Utc>,
 }
@@ -1549,16 +1551,16 @@ async fn admin_audit_logs(
     let per_page = query.per_page.unwrap_or(50).clamp(1, 200);
     let offset = (page - 1) * per_page;
 
-    // Build dynamic WHERE
+    // Build dynamic WHERE (with table alias for JOIN)
     let mut conditions: Vec<String> = Vec::new();
     let mut bind_idx = 1;
 
     if query.action.is_some() {
-        conditions.push(format!("action = ${}", bind_idx));
+        conditions.push(format!("a.action = ${}", bind_idx));
         bind_idx += 1;
     }
     if query.admin_id.is_some() {
-        conditions.push(format!("customer_id = ${}", bind_idx));
+        conditions.push(format!("a.customer_id = ${}", bind_idx));
         bind_idx += 1;
     }
 
@@ -1569,7 +1571,7 @@ async fn admin_audit_logs(
     };
 
     // Count
-    let count_sql = format!("SELECT COUNT(*) FROM audit_log {}", where_clause);
+    let count_sql = format!("SELECT COUNT(*) FROM audit_log a {}", where_clause);
     let mut count_q = sqlx::query_scalar::<_, i64>(&count_sql);
     if let Some(ref action) = query.action {
         count_q = count_q.bind(action);
@@ -1579,10 +1581,10 @@ async fn admin_audit_logs(
     }
     let total = count_q.fetch_one(&pool).await?;
 
-    // Data
+    // Data — join with customers for email, skip user_agent (not displayed)
     let data_sql = format!(
-        "SELECT id, customer_id, action, resource_type, resource_id, details, ip_address, user_agent, created_at \
-         FROM audit_log {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
+        "SELECT a.id, a.customer_id, c.email, a.action, a.resource_type, a.resource_id, a.details, a.ip_address, a.created_at \
+         FROM audit_log a LEFT JOIN customers c ON c.id = a.customer_id {} ORDER BY a.created_at DESC LIMIT ${} OFFSET ${}",
         where_clause, bind_idx, bind_idx + 1
     );
 
@@ -1591,11 +1593,11 @@ async fn admin_audit_logs(
         (
             Uuid,
             Uuid,
+            Option<String>,
             String,
             String,
             Option<String>,
             Option<serde_json::Value>,
-            Option<String>,
             Option<String>,
             DateTime<Utc>,
         ),
@@ -1614,16 +1616,17 @@ async fn admin_audit_logs(
     let entries = rows
         .into_iter()
         .map(
-            |(id, customer_id, action, resource_type, resource_id, details, ip_address, user_agent, created_at)| {
+            |(id, customer_id, customer_email, action, resource_type, resource_id, details, ip_address, created_at)| {
                 AdminAuditEntry {
                     id,
                     customer_id,
+                    customer_email,
                     action,
                     resource_type,
                     resource_id,
                     details,
                     ip_address,
-                    user_agent,
+                    user_agent: None,
                     created_at,
                 }
             },
