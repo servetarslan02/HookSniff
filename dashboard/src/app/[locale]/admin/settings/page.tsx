@@ -211,7 +211,7 @@ export default function AdminSettingsPage() {
             onClick={() => setSettingsTab(tab.key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
               settingsTab === tab.key
-                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
                 : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
             }`}
           >
@@ -239,7 +239,7 @@ export default function AdminSettingsPage() {
                 settings.maintenance_mode ? 'bg-red-600' : 'bg-gray-300 dark:bg-slate-600'
               }`}
             >
-              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform duration-200 ${
                 settings.maintenance_mode ? 'translate-x-5' : 'translate-x-0'
               }`} />
             </button>
@@ -258,7 +258,7 @@ export default function AdminSettingsPage() {
                 settings.signup_enabled ? 'bg-green-600' : 'bg-gray-300 dark:bg-slate-600'
               }`}
             >
-              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform duration-200 ${
                 settings.signup_enabled ? 'translate-x-5' : 'translate-x-0'
               }`} />
             </button>
@@ -444,15 +444,15 @@ export default function AdminSettingsPage() {
           <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('notificationChannels')}</h3>
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={alertChannels.email} onChange={() => toggleChannel('email')} className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
+              <input type="checkbox" checked={alertChannels.email} onChange={() => toggleChannel('email')} className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
               <span className="text-sm text-gray-700 dark:text-slate-300">📧 Email</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={alertChannels.slack} onChange={() => toggleChannel('slack')} className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
+              <input type="checkbox" checked={alertChannels.slack} onChange={() => toggleChannel('slack')} className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
               <span className="text-sm text-gray-700 dark:text-slate-300">💬 Slack</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={alertChannels.webhook} onChange={() => toggleChannel('webhook')} className="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
+              <input type="checkbox" checked={alertChannels.webhook} onChange={() => toggleChannel('webhook')} className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
               <span className="text-sm text-gray-700 dark:text-slate-300">🔗 Webhook</span>
             </label>
           </div>

@@ -21,7 +21,7 @@ export default function ApiReferencePage() {
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('apiReference')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Complete reference for the HookSniff REST API. Base URL: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">https://hooksniff-api-1046140057667.europe-west1.run.app/v1</code>
+        Complete reference for the HookSniff REST API. Base URL: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">https://hooksniff-api-1046140057667.europe-west1.run.app/v1</code>
       </p>
 
       {/* Endpoints API */}
@@ -224,7 +224,7 @@ function ApiMethod({
   return (
     <div className="mb-8 p-6 border border-gray-200 dark:border-slate-700 rounded-xl">
       <div className="flex items-center gap-3 mb-3">
-        <span className={`px-2 py-0.5 rounded text-xs font-bold ${methodColors[method] || ''}`}>
+        <span className={`px-2 py-0.5 rounded-sm text-xs font-bold ${methodColors[method] || ''}`}>
           {method}
         </span>
         <code className="font-mono text-sm text-gray-900 dark:text-white">{path}</code>

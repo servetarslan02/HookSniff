@@ -42,7 +42,7 @@ export default function TemplatesPage() {
               {tpl.event_types && tpl.event_types.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {tpl.event_types.map((ev) => (
-                    <span key={ev} className="px-2 py-0.5 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 rounded text-xs">{ev}</span>
+                    <span key={ev} className="px-2 py-0.5 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 rounded-sm text-xs">{ev}</span>
                   ))}
                 </div>
               )}

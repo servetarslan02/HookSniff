@@ -21,7 +21,7 @@ export function PortalPreview({ config }: { config: PortalConfig }) {
         >
           <div className="flex items-center gap-3">
             {config.logo_url ? (
-              <Image src={config.logo_url} alt={t("logo")} width={32} height={32} className="w-8 h-8 rounded" />
+              <Image src={config.logo_url} alt={t("logo")} width={32} height={32} className="w-8 h-8 rounded-sm" />
             ) : (
               <span className="text-2xl">🪝</span>
             )}
@@ -43,10 +43,10 @@ export function PortalPreview({ config }: { config: PortalConfig }) {
               <div className={`p-4 rounded-xl ${config.dark_mode ? 'bg-slate-800' : 'bg-gray-50'}`}>
                 <div className="text-sm font-medium mb-2">{t('eventSubscriptions')}</div>
                 <div className="flex gap-2">
-                  <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: config.primary_color + '20', color: config.primary_color }}>
+                  <span className="text-xs px-2 py-1 rounded-sm" style={{ backgroundColor: config.primary_color + '20', color: config.primary_color }}>
                     order.created
                   </span>
-                  <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: config.primary_color + '20', color: config.primary_color }}>
+                  <span className="text-xs px-2 py-1 rounded-sm" style={{ backgroundColor: config.primary_color + '20', color: config.primary_color }}>
                     payment.completed
                   </span>
                 </div>

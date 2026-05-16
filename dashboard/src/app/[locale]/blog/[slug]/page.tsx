@@ -93,7 +93,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       <article className={`max-w-3xl mx-auto px-6 py-16 ${hasTOC ? 'lg:mr-64' : ''}`}>
         {/* Cover Image / Gradient Header */}
-        <div className={`relative rounded-xl bg-gradient-to-br ${gradient} p-8 mb-8 overflow-hidden`}>
+        <div className={`relative rounded-xl bg-linear-to-br ${gradient} p-8 mb-8 overflow-hidden`}>
           <div className="absolute inset-0 opacity-10">
             <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -105,7 +105,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </svg>
           </div>
           <div className="relative z-10">
-            <span className="inline-block text-xs font-medium bg-white/20 text-white px-3 py-1 rounded-full backdrop-blur-sm mb-4">
+            <span className="inline-block text-xs font-medium bg-white/20 text-white px-3 py-1 rounded-full backdrop-blur-xs mb-4">
               {post.category}
             </span>
             <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">{post.title}</h1>
@@ -129,7 +129,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </div>
           <div className="flex gap-2">
             {post.tags.map(tag => (
-              <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 px-2 py-0.5 rounded">#{tag}</span>
+              <span key={tag} className="text-xs bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 px-2 py-0.5 rounded-sm">#{tag}</span>
             ))}
           </div>
         </div>

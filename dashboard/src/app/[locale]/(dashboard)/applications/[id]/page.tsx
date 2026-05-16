@@ -27,8 +27,8 @@ export default function ApplicationDetailPage() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse"></div>
-        <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-sm w-1/4 animate-pulse"></div>
+        <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse"></div>
       </div>
     );
   }
@@ -139,7 +139,7 @@ export default function ApplicationDetailPage() {
                     <tr key={d.id} className="border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30">
                       <td className="px-5 py-3 font-mono text-xs text-gray-500 dark:text-gray-400">{d.id.slice(0, 8)}…</td>
                       <td className="px-5 py-3">
-                        <span className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-700 dark:text-gray-300">
+                        <span className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-sm text-gray-700 dark:text-gray-300">
                           {d.event || '—'}
                         </span>
                       </td>

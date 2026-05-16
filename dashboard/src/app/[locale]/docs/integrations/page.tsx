@@ -19,7 +19,7 @@ export default function IntegrationsPage() {
         <ol className="space-y-3 text-gray-600 dark:text-slate-400 mb-4">
           <li><strong>1.</strong> Create an endpoint in HookSniff pointing to your server</li>
           <li><strong>2.</strong> In Stripe Dashboard → Developers → Webhooks, set the endpoint URL to your HookSniff inbound proxy</li>
-          <li><strong>3.</strong> Select the events you want to receive (e.g., <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">payment_intent.succeeded</code>)</li>
+          <li><strong>3.</strong> Select the events you want to receive (e.g., <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">payment_intent.succeeded</code>)</li>
           <li><strong>4.</strong> Verify Stripe's signature in your handler alongside HookSniff's signature</li>
         </ol>
         <CodeBlock
@@ -58,7 +58,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
           <li><strong>1.</strong> Create a HookSniff endpoint for your GitHub webhook receiver</li>
           <li><strong>2.</strong> In GitHub repo → Settings → Webhooks → Add webhook</li>
           <li><strong>3.</strong> Set Payload URL to your HookSniff inbound proxy URL</li>
-          <li><strong>4.</strong> Set Content type to <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">application/json</code></li>
+          <li><strong>4.</strong> Set Content type to <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">application/json</code></li>
           <li><strong>5.</strong> Enter your secret and select events</li>
         </ol>
         <CodeBlock
@@ -83,8 +83,8 @@ function verifyGitHubSignature(payload: string, signature: string, secret: strin
           <li><strong>1.</strong> Create a HookSniff endpoint for your Shopify webhook handler</li>
           <li><strong>2.</strong> In Shopify Admin → Settings → Notifications → Webhooks</li>
           <li><strong>3.</strong> Set the URL to your HookSniff inbound proxy</li>
-          <li><strong>4.</strong> Choose events (e.g., <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">orders/create</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">inventory_levels/update</code>)</li>
-          <li><strong>5.</strong> Verify the HMAC header (<code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">X-Shopify-Hmac-SHA256</code>)</li>
+          <li><strong>4.</strong> Choose events (e.g., <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">orders/create</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">inventory_levels/update</code>)</li>
+          <li><strong>5.</strong> Verify the HMAC header (<code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-Shopify-Hmac-SHA256</code>)</li>
         </ol>
       </section>
 

@@ -129,7 +129,7 @@ export default function ApplicationsPage() {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse" />
           <div className="h-10 w-44 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
         </div>
         <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
@@ -184,7 +184,7 @@ export default function ApplicationsPage() {
             {t('create') || 'Create application'}
           </h3>
           {error && (
-            <div className="mb-3 p-2 rounded bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm">{error}</div>
+            <div className="mb-3 p-2 rounded-sm bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm">{error}</div>
           )}
           <form onSubmit={handleCreate} className="space-y-3">
             <div>
@@ -344,7 +344,7 @@ export default function ApplicationsPage() {
       {/* ── Edit Modal ── */}
       {editApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditApp(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setEditApp(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               ✏️ {t('editApp') || 'Edit Application'}

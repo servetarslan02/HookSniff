@@ -76,10 +76,10 @@ export default function ArchitecturePage() {
             </p>
             <ul className="space-y-1 text-sm text-gray-600 dark:text-slate-400">
               <li>• PostgreSQL via SQLx (Neon in production)</li>
-              <li>• PostgreSQL-based queue (<code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded text-xs">webhook_queue</code> table)</li>
-              <li>• API keys (<code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded text-xs">hr_live_*</code>) + JWT auth</li>
+              <li>• PostgreSQL-based queue (<code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded-sm text-xs">webhook_queue</code> table)</li>
+              <li>• API keys (<code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded-sm text-xs">hr_live_*</code>) + JWT auth</li>
               <li>• SSRF protection, payload validation</li>
-              <li>• Prometheus metrics at <code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded text-xs">/metrics</code></li>
+              <li>• Prometheus metrics at <code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded-sm text-xs">/metrics</code></li>
             </ul>
           </div>
 
@@ -117,8 +117,8 @@ export default function ArchitecturePage() {
             </p>
             <ul className="space-y-1 text-sm text-gray-600 dark:text-slate-400">
               <li>• Customers, endpoints, deliveries, attempts</li>
-              <li>• <code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded text-xs">webhook_queue</code> table for async delivery</li>
-              <li>• SSL required (<code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded text-xs">sslmode=require</code>)</li>
+              <li>• <code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded-sm text-xs">webhook_queue</code> table for async delivery</li>
+              <li>• SSL required (<code className="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded-sm text-xs">sslmode=require</code>)</li>
             </ul>
           </div>
         </div>
@@ -156,7 +156,7 @@ export default function ArchitecturePage() {
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">1. Webhook Ingestion</h3>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          When you send a webhook via <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">POST /v1/webhooks</code>:
+          When you send a webhook via <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">POST /v1/webhooks</code>:
         </p>
         <ol className="space-y-2 text-gray-600 dark:text-slate-400 mb-6">
           <li>1. Authenticate (API key → customer lookup)</li>
@@ -164,8 +164,8 @@ export default function ArchitecturePage() {
           <li>3. Validate event type format and JSON payload depth</li>
           <li>4. Check payload size (≤ 1 MB) and rate limits</li>
           <li>5. Verify endpoint exists, is active, matches event filter</li>
-          <li>6. Insert into <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">deliveries</code> table (status: pending)</li>
-          <li>7. Insert into <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">webhook_queue</code> for async processing</li>
+          <li>6. Insert into <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">deliveries</code> table (status: pending)</li>
+          <li>7. Insert into <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">webhook_queue</code> for async processing</li>
           <li>8. Return 200 with delivery ID</li>
         </ol>
 
@@ -174,7 +174,7 @@ export default function ArchitecturePage() {
           The Worker polls the queue and delivers webhooks:
         </p>
         <ol className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>1. Poll <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">webhook_queue</code> for pending deliveries</li>
+          <li>1. Poll <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">webhook_queue</code> for pending deliveries</li>
           <li>2. Look up endpoint URL + signing secret</li>
           <li>3. Build HTTP request with Standard Webhooks headers</li>
           <li>4. Send with 30s timeout</li>

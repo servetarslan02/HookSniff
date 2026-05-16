@@ -311,8 +311,8 @@ export default function AdminUserDetailPage() {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-48 mb-2" />
-          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-32" />
+          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded-sm w-48 mb-2" />
+          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-32" />
         </div>
       </div>
     );
@@ -392,7 +392,7 @@ export default function AdminUserDetailPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
               activeTab === tab.key
-                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
                 : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -1232,7 +1232,7 @@ export default function AdminUserDetailPage() {
       {/* Ban Reason Modal */}
       {showBanModal && detail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowBanModal(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowBanModal(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               🚫 {t('banUser')}
@@ -1274,7 +1274,7 @@ export default function AdminUserDetailPage() {
       {/* GDPR Delete Modal */}
       {showGdprDeleteModal && detail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowGdprDeleteModal(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowGdprDeleteModal(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">
               🗑️ {t('deleteAllData') || 'Delete All User Data'}
@@ -1321,7 +1321,7 @@ export default function AdminUserDetailPage() {
       {/* Refund Modal */}
       {showRefundModal && detail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowRefundModal(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowRefundModal(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               💸 {t('processRefund') || 'Process Refund'}
@@ -1377,7 +1377,7 @@ export default function AdminUserDetailPage() {
       {/* Email Modal */}
       {showEmailModal && detail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowEmailModal(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowEmailModal(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               📧 {t('sendEmail') || 'Send Email'}
@@ -1429,7 +1429,7 @@ export default function AdminUserDetailPage() {
       {/* Test Webhook Modal */}
       {showTestWebhookModal && detail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setShowTestWebhookModal(false); setTestWebhookResult(null); }} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => { setShowTestWebhookModal(false); setTestWebhookResult(null); }} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               🪝 {t('testWebhook') || 'Test Webhook'}
@@ -1511,7 +1511,7 @@ export default function AdminUserDetailPage() {
       {/* Delivery Detail Modal */}
       {selectedDeliveryId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedDeliveryId(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setSelectedDeliveryId(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -1605,7 +1605,7 @@ export default function AdminUserDetailPage() {
                             <p className="text-xs text-red-600 dark:text-red-400 mt-1">{a.error_message}</p>
                           )}
                           {a.response_body && (
-                            <pre className="mt-2 p-2 bg-gray-100 dark:bg-slate-800 rounded text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-24">
+                            <pre className="mt-2 p-2 bg-gray-100 dark:bg-slate-800 rounded-sm text-xs font-mono text-gray-700 dark:text-slate-300 overflow-x-auto max-h-24">
                               {a.response_body}
                             </pre>
                           )}

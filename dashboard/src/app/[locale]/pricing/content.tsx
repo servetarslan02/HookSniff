@@ -22,7 +22,7 @@ function RoiCalculator() {
   const savingsPercent = svixCost > 0 ? Math.round((savingsVsSvix / svixCost) * 100) : 0;
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg p-6 md:p-8">
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs dark:shadow-lg p-6 md:p-8">
       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">💰 {t('roiTitle')}</h3>
       <p className="text-sm text-gray-600 dark:text-slate-400 mb-6">{t('roiDesc')}</p>
 
@@ -110,10 +110,10 @@ export function PricingPageContent() {
   const getPeriodLabel = () => billingPeriod === 'annual' ? t('billedAnnually') : t('month');
 
   const planData = [
-    { key: 'developer', ctaStyle: 'outline', popular: false },
-    { key: 'startup', ctaStyle: 'outline', popular: false },
+    { key: 'developer', ctaStyle: 'outline-solid', popular: false },
+    { key: 'startup', ctaStyle: 'outline-solid', popular: false },
     { key: 'pro', ctaStyle: 'filled', popular: true },
-    { key: 'enterprise', ctaStyle: 'outline', popular: false },
+    { key: 'enterprise', ctaStyle: 'outline-solid', popular: false },
   ];
 
   const featureKeys: Record<string, string[]> = {
@@ -210,7 +210,7 @@ export function PricingPageContent() {
               onClick={() => setBillingPeriod('monthly')}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
                 billingPeriod === 'monthly'
-                  ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                  ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
                   : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
@@ -220,7 +220,7 @@ export function PricingPageContent() {
               onClick={() => setBillingPeriod('annual')}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer flex items-center gap-2 ${
                 billingPeriod === 'annual'
-                  ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                  ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
                   : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
@@ -240,7 +240,7 @@ export function PricingPageContent() {
               className={`relative rounded-xl p-6 transition-all duration-300 hover:shadow-lg flex flex-col ${
                 plan.popular
                   ? 'bg-white dark:bg-slate-800 border-2 border-brand-400 dark:border-brand-500 shadow-lg dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
-                  : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg'
+                  : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xs dark:shadow-lg'
               }`}
             >
               {plan.popular && (
@@ -289,7 +289,7 @@ export function PricingPageContent() {
                 className={`block w-full text-center py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                   plan.ctaStyle === 'filled'
                     ? 'bg-brand-600 hover:bg-brand-700 text-white shadow-md'
-                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-sm'
+                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-xs'
                 }`}
               >
                 {plan.key === 'enterprise' ? t('contactSales') : t('getStarted')}
@@ -316,7 +316,7 @@ export function PricingPageContent() {
         {/* Comparison Table */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">{t('compareTitle')}</h2>
-          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden shadow-sm dark:shadow-lg">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden shadow-xs dark:shadow-lg">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -410,7 +410,7 @@ export function PricingPageContent() {
         </div>
 
         {/* Build vs Buy */}
-        <div className="mb-16 p-6 md:p-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg">
+        <div className="mb-16 p-6 md:p-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs dark:shadow-lg">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">{t('buildVsBuy')}</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
@@ -441,7 +441,7 @@ export function PricingPageContent() {
         </div>
 
         {/* Startup Discount */}
-        <div className="mb-16 text-center p-8 bg-gradient-to-r from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20">
+        <div className="mb-16 text-center p-8 bg-linear-to-r from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">🚀 {t('startupTitle')}</h2>
           <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto mb-4">
             {t('startupDesc')}

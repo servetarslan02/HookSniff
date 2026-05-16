@@ -320,7 +320,7 @@ export function PlaygroundPageContent() {
               <div className="grid md:grid-cols-4 gap-3">
                 <div>
                   <label className="block text-xs text-gray-500 dark:text-slate-500 mb-1">{t("eventType")}</label>
-                  <input type="text" value={sendEvent} onChange={(e) => setSendEvent(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" />
+                  <input type="text" value={sendEvent} onChange={(e) => setSendEvent(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-hidden" />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-xs text-gray-500 dark:text-slate-500 mb-1">{t("quickSamples")}</label>
@@ -373,7 +373,7 @@ export function PlaygroundPageContent() {
                         className={`w-full text-left p-3 rounded-lg border transition-colors ${selectedRecord?.id === record.id ? 'bg-brand-50 dark:bg-brand-500/10 border-brand-300 dark:border-brand-500/40' : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:border-brand-200 dark:hover:border-brand-500/20'}`}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`px-1.5 py-0.5 rounded text-xs font-mono font-bold ${record.method === 'POST' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : record.method === 'GET' ? 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300'}`}>
+                          <span className={`px-1.5 py-0.5 rounded-sm text-xs font-mono font-bold ${record.method === 'POST' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : record.method === 'GET' ? 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300'}`}>
                             {record.method}
                           </span>
                           <span className="text-xs text-gray-500 dark:text-slate-500 truncate font-mono">{record.path}</span>
@@ -400,7 +400,7 @@ export function PlaygroundPageContent() {
                   <div className="space-y-4">
                     {/* Meta */}
                     <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                      <span className={`px-2 py-1 rounded text-xs font-mono font-bold ${selectedRecord.method === 'POST' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400'}`}>
+                      <span className={`px-2 py-1 rounded-sm text-xs font-mono font-bold ${selectedRecord.method === 'POST' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400'}`}>
                         {selectedRecord.method}
                       </span>
                       <span className="text-sm font-mono text-gray-700 dark:text-slate-300 truncate">{selectedRecord.path}</span>

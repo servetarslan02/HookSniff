@@ -152,8 +152,8 @@ export default function AdminSystemPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="glass-card p-6 animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-4" />
-              <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/2" />
+              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/3 mb-4" />
+              <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2" />
             </div>
           ))}
         </div>
@@ -465,7 +465,7 @@ export default function AdminSystemPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                  <th scope="col" className="px-4 py-3 text-left"><input type="checkbox" checked={selectedFailed.size === failedDeliveries.length && failedDeliveries.length > 0} onChange={toggleSelectAll} className="rounded" /></th>
+                  <th scope="col" className="px-4 py-3 text-left"><input type="checkbox" checked={selectedFailed.size === failedDeliveries.length && failedDeliveries.length > 0} onChange={toggleSelectAll} className="rounded-sm" /></th>
                   <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">ID</th>
                   <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('user') || 'User'}</th>
                   <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('endpoint') || 'Endpoint'}</th>
@@ -478,7 +478,7 @@ export default function AdminSystemPage() {
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {failedDeliveries.map((d) => (
                   <tr key={d.id} className={`hover:bg-gray-50 dark:hover:bg-slate-800/50 transition ${selectedFailed.has(d.id) ? 'bg-emerald-50/50 dark:bg-emerald-500/5' : ''}`}>
-                    <td className="px-4 py-3"><input type="checkbox" checked={selectedFailed.has(d.id)} onChange={() => toggleFailedSelect(d.id)} className="rounded" /></td>
+                    <td className="px-4 py-3"><input type="checkbox" checked={selectedFailed.has(d.id)} onChange={() => toggleFailedSelect(d.id)} className="rounded-sm" /></td>
                     <td className="px-4 py-3 text-xs font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 8)}…</td>
                     <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{d.customer_email || '—'}</td>
                     <td className="px-4 py-3 text-xs font-mono text-gray-600 dark:text-slate-400 max-w-[200px] truncate">{d.endpoint_url || '—'}</td>

@@ -34,7 +34,7 @@ function FAQAccordion({ question, answer }: { question: string; answer: string }
       >
         <span className="font-medium text-gray-900 dark:text-white pr-4">{question}</span>
         <svg
-          className={`w-5 h-5 text-gray-500 dark:text-slate-500 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-gray-500 dark:text-slate-500 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
           fill="none" stroke="currentColor" viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

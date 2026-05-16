@@ -71,7 +71,7 @@ export function ChartCard({
                   onClick={() => onTimeRangeChange(value)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                     timeRange === value
-                      ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm'
+                      ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
                       : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
                   }`}
                 >
