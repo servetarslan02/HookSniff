@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:54 GMT+8 (Oturum 193)
+> Son güncelleme: 2026-05-17 06:00 GMT+8 (Oturum 194)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,22 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 194 — 2026-05-17 06:00 GMT+8
+1. **System Sayfası 3. Katman — 10 Fix** ✅
+   - **Backend:**
+     - `queue_detail` sorgusu `deliveries` → `webhook_queue` (yanlış tablo!)
+     - `overall_healthy` artık Redis hatasını da dikkate alıyor
+     - Health cache: sadece sağlıklı response cache'leniyor (unhealthy 30sn cache'leniyordu)
+     - Dead letters: payload frontend'e gönderilmiyor (kullanılmıyor, bandwidth israfı)
+     - Rate limit violations: `since` time filter eklendi
+   - **Frontend:**
+     - Error banner: doğru mesaj (systemHealthDesc yerine healthCheckFailed)
+     - Queue status: hardcoded EN string'ler → translation key'ler
+     - Service cards: Uptime/Latency label'ları → translation key'ler
+     - Rate limit violations: since='24h' parametresi
+     - Translation: 6 yeni key (EN+TR)
+   - Commit: f8f52dc4 — push edildi
 
 ### Oturum 193 — 2026-05-17 05:54 GMT+8
 1. **System Sayfası Derin İnceleme + 13 Fix** ✅
