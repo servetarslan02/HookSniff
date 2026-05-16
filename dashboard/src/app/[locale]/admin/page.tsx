@@ -17,17 +17,37 @@ const PLAN_COLORS: Record<string, string> = {
 
 export default function AdminOverviewPage() {
   // React Query hooks — replaces useState + useEffect + fetchStats
-  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useAdminStats();
-  const { data: revenue } = useAdminRevenue();
-  const { data: auditLogsData } = useAdminAuditLogs({ limit: 5 });
-  const { data: featureFlagsData } = useAdminFeatureFlags();
-  const { data: deployInfo } = useAdminDeployInfo();
-  const { data: rateLimitData } = useRateLimitViolations({ limit: 1 });
-  const { data: failedDeliveriesData } = useFailedDeliveries({ limit: 1 });
-  const { data: queueStatus } = useQueueStatus();
+  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats, isFetching: statsFetching } = useAdminStats();
+  const { data: revenue, refetch: refetchRevenue } = useAdminRevenue();
+  const { data: auditLogsData, refetch: refetchAuditLogs } = useAdminAuditLogs({ limit: 5 });
+  const { data: featureFlagsData, refetch: refetchFeatureFlags } = useAdminFeatureFlags();
+  const { data: deployInfo, refetch: refetchDeployInfo } = useAdminDeployInfo();
+  const { data: rateLimitData, refetch: refetchRateLimit } = useRateLimitViolations({ limit: 1 });
+  const { data: failedDeliveriesData, refetch: refetchFailed } = useFailedDeliveries({ limit: 1 });
+  const { data: queueStatus, refetch: refetchQueue } = useQueueStatus();
 
   const auditLogs = auditLogsData?.entries ?? [];
   const featureFlags = featureFlagsData?.flags ?? [];
+
+  // Refresh all data
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefreshAll = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        refetchStats(),
+        refetchRevenue(),
+        refetchAuditLogs(),
+        refetchFeatureFlags(),
+        refetchDeployInfo(),
+        refetchRateLimit(),
+        refetchFailed(),
+        refetchQueue(),
+      ]);
+    } finally {
+      setTimeout(() => setRefreshing(false), 500); // Min 500ms feedback
+    }
+  };
 
   // Local UI state — not data fetching
   const [exporting, setExporting] = useState(false);
@@ -151,14 +171,20 @@ export default function AdminOverviewPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {/* Manual refresh — React Query handles auto-refetch on window focus */}
+          {/* Manual refresh — refreshes all data */}
           <button
             type="button"
-            onClick={() => refetchStats()}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
-            title={t('autoRefreshDisabled')}
+            onClick={handleRefreshAll}
+            disabled={refreshing}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition ${
+              refreshing
+                ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30'
+                : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700'
+            }`}
+            title={refreshing ? (t('refreshing') || 'Refreshing...') : (t('refreshAll') || 'Refresh all data')}
           >
-            🔄 {tc('refresh') || 'Refresh'}
+            <span className={`inline-block transition-transform duration-500 ${refreshing ? 'animate-spin' : ''}`}>🔄</span>
+            {refreshing ? (t('refreshing') || 'Refreshing...') : (tc('refresh') || 'Refresh')}
           </button>
           {/* Export button */}
           <button
