@@ -189,7 +189,7 @@ export function CustomersPageContent() {
           <div className="flex flex-wrap justify-center gap-6">
             {techLogos.map((t) => (
               <div key={t.name} className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-100 to-blue-100 dark:from-brand-900/30 dark:to-blue-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-bold">
+                <div className="w-8 h-8 rounded-full bg-linear-to-br from-brand-100 to-blue-100 dark:from-brand-900/30 dark:to-blue-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-bold">
                   {t.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
                 </div>
                 <div>

@@ -30,7 +30,7 @@ export function DelayPreviewCard({ policy }: { policy: GlobalRetryPolicy }) {
             <span className="text-sm text-gray-500 dark:text-slate-400 w-20">{t('attempt', { n: i + 1 })}</span>
             <div className="flex-1 bg-gray-100 dark:bg-slate-800 rounded-full h-6 overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-brand-500 to-purple-500 rounded-full transition-all"
+                className="h-full bg-linear-to-r from-brand-500 to-purple-500 rounded-full transition-all"
                 style={{ width: `${Math.min((delay / policy.default_max_delay_secs) * 100, 100)}%` }}
               />
             </div>

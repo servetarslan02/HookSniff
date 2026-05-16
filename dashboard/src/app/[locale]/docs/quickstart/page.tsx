@@ -94,7 +94,7 @@ export default function QuickstartPage() {
       <section className="mb-10">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Get Your API Key</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-3">
-          Sign up at <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">hooksniff.vercel.app</code> and grab your API key from the dashboard settings. Keys are prefixed with <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">hr_live_</code>.
+          Sign up at <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hooksniff.vercel.app</code> and grab your API key from the dashboard settings. Keys are prefixed with <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hr_live_</code>.
         </p>
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
           <p className="text-sm text-yellow-800 dark:text-yellow-300">
@@ -130,7 +130,7 @@ export default function QuickstartPage() {
       <section className="mb-10">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. Verify Signatures</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-3">
-          Every webhook includes an HMAC-SHA256 signature in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-sm">X-HookSniff-Signature</code> header. Always verify it:
+          Every webhook includes an HMAC-SHA256 signature in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Signature</code> header. Always verify it:
         </p>
         <CodeBlock
           code={`import hmac, hashlib

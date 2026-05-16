@@ -350,7 +350,7 @@ describe('FAQPage - Extended Tests', () => {
     expect(accordion).toBeTruthy();
   });
 
-  it('accordion has rounded corners', () => {
+  it('accordion has rounded-sm corners', () => {
     const { container } = render(React.createElement(FAQPage));
     const accordion = container.querySelector('.rounded-xl');
     expect(accordion).toBeTruthy();

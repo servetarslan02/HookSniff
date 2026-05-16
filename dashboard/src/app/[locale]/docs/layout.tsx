@@ -65,7 +65,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       <nav className="border-b border-gray-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg">
+            <div className="w-9 h-9 rounded-lg bg-linear-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg">
               🪝
             </div>
             <span className="text-lg font-bold text-gray-900 dark:text-white">HookSniff</span>
@@ -85,7 +85,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
       <div className="max-w-7xl mx-auto px-6 py-8 flex gap-12">
         {/* Sidebar */}
-        <aside className="w-56 flex-shrink-0">
+        <aside className="w-56 shrink-0">
           <nav className="sticky top-24">
             {sidebarNav.map((group) => (
               <div key={group.title} className="mb-6">

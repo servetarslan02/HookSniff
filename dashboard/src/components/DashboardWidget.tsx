@@ -41,7 +41,7 @@ export function DashboardWidget({ id, title, children, dragHandleProps, classNam
     >
       {dragHandleProps && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="flex items-center gap-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full px-2 py-1 shadow-sm cursor-grab active:cursor-grabbing">
+          <div className="flex items-center gap-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full px-2 py-1 shadow-xs cursor-grab active:cursor-grabbing">
             <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="9" cy="5" r="1.5" />
               <circle cx="15" cy="5" r="1.5" />

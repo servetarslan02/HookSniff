@@ -65,7 +65,7 @@ export function SetupChecklist() {
         <div className="flex items-center gap-3">
           <div className="w-20 h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-brand-500 to-green-500 transition-all duration-500"
+              className="h-full bg-linear-to-r from-brand-500 to-green-500 transition-all duration-500"
               style={{ width: `${percentage}%` }}
             />
           </div>

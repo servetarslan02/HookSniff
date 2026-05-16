@@ -94,7 +94,7 @@ export function AboutPageContent() {
         </div>
 
         {/* CTA */}
-        <div className="text-center bg-gradient-to-r from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20 p-8">
+        <div className="text-center bg-linear-to-r from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20 p-8">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">{t('about.readyToStart')}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-6">{t('cta')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
