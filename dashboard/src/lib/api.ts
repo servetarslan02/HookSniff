@@ -748,9 +748,6 @@ export const adminApi = {
     return apiFetch<AuditLogResponse>(`/admin/audit-logs${qs ? `?${qs}` : ''}`, { token });
   },
 
-  replayDelivery: (token: string, deliveryId: string) =>
-    apiFetch<{ message: string }>(`/admin/deliveries/${deliveryId}/replay`, { method: 'POST', token }),
-
   impersonateUser: (token: string, userId: string) =>
     apiFetch<{ token: string; expires_in: number }>(`/admin/users/${userId}/impersonate`, { method: 'POST', token }),
 
