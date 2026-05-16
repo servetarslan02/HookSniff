@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/store';
 import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
-import { alertsApi, type AlertRule } from '@/lib/api';
+import type { AlertRule } from '@/lib/api';
 import { useAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert, useTestAlert } from '@/hooks/useDashboardData';
 
 const CHANNEL_ICONS: Record<string, string> = {

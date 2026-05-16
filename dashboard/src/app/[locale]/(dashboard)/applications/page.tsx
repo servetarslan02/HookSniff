@@ -73,7 +73,7 @@ export default function ApplicationsPage() {
     setCreating(true);
     setError('');
     try {
-      const app = await applicationsApi.create(token, { name: newName, description: newDesc || undefined });
+      await applicationsApi.create(token, { name: newName, description: newDesc || undefined });
       // Note: React Query will refetch on next mount; for immediate UI update we'd need queryClient
       setNewName('');
       setNewDesc('');
