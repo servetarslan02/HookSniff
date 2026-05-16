@@ -39,7 +39,7 @@ export default function AdminSystemPage() {
   const { data: queueStatus } = useQueueStatus();
   const { data: failedData } = useFailedDeliveries({ limit: 20, since: '24h' });
   const { data: deadLettersData } = useDeadLetters({ limit: 20, since: '24h' });
-  const { data: rlvData } = useRateLimitViolations({ limit: 20 });
+  const { data: rlvData } = useRateLimitViolations({ limit: 20, since: '24h' });
   const { data: latencyData } = useApiLatency({ period: '24h' });
   const testWebhookMutation = useTestWebhook();
   const batchReplayMutation = useBatchReplay();
@@ -167,21 +167,21 @@ export default function AdminSystemPage() {
       name: t('apiServer'),
       icon: '🚀',
       status: displayHealth?.api?.status || displayHealth?.status || 'unknown',
-      detail: displayHealth?.api?.uptime_seconds ? `Uptime: ${formatUptime(displayHealth.api.uptime_seconds)}` : t('checking'),
+      detail: displayHealth?.api?.uptime_seconds ? `${t('uptimeLabel') || 'Uptime'}: ${formatUptime(displayHealth.api.uptime_seconds)}` : t('checking'),
       latency: null,
     },
     {
       name: t('database'),
       icon: '🐘',
       status: displayHealth?.checks?.database?.status || displayHealth?.database?.status || 'unknown',
-      detail: (displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms) ? `Latency: ${displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms}ms` : t('checking'),
+      detail: (displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms) ? `${t('latencyLabel') || 'Latency'}: ${displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms}ms` : t('checking'),
       latency: displayHealth?.checks?.database?.latency_ms || displayHealth?.database?.latency_ms,
     },
     {
       name: t('cache'),
       icon: '⚡',
       status: displayHealth?.checks?.redis?.status || displayHealth?.redis?.status || 'unknown',
-      detail: (displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms) ? `Latency: ${displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms}ms` : t('checking'),
+      detail: (displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms) ? `${t('latencyLabel') || 'Latency'}: ${displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms}ms` : t('checking'),
       latency: displayHealth?.checks?.redis?.latency_ms || displayHealth?.redis?.latency_ms,
     },
     {
@@ -224,7 +224,7 @@ export default function AdminSystemPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-red-600 dark:text-red-400" aria-hidden="true">⚠️</span>
-              <span className="text-red-700 dark:text-red-400 text-sm font-medium">{t('systemHealthDesc')}</span>
+              <span className="text-red-700 dark:text-red-400 text-sm font-medium">{t('healthCheckFailed') || 'Health check failed'}</span>
             </div>
             <button
               type="button"
@@ -426,10 +426,10 @@ export default function AdminSystemPage() {
               ))}
             </div>
             {queueStatus.failed_last_hour > 0 && (
-              <p className="mt-3 text-sm text-red-600 dark:text-red-400">⚠️ {queueStatus.failed_last_hour} failed in the last hour</p>
+              <p className="mt-3 text-sm text-red-600 dark:text-red-400">⚠️ {t('failedInLastHour', { count: queueStatus.failed_last_hour })}</p>
             )}
             {queueStatus.oldest_pending_at && (
-              <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">Oldest pending: {new Date(queueStatus.oldest_pending_at).toLocaleString()}</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">{t('oldestPending')}: {new Date(queueStatus.oldest_pending_at).toLocaleString()}</p>
             )}
           </div>
         ) : (
