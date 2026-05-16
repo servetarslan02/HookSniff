@@ -34,7 +34,7 @@
 - [x] Faz 20: Kod Kalitesi ✅ (console.log wrapping)
 - [x] Faz 22: Ek Düzeltmeler ✅ (tsconfig ES2022, MCP Node 20)
 - [x] Rust cargo check ✅ (format string fix + feature_flags import)
-- [ ] Rust cargo test — struct field mismatch'leri var (DeadLetterParams, RateLimitViolationParams, ExportUsersParams — `since` ve `email` field eksik)
+- [x] Rust cargo test — struct field mismatch'leri düzeltildi (DeadLetterParams, RateLimitViolationParams, ExportUsersParams, AdminAuditEntry, RefundRow, CreateAlertRequest, Config) ✅ (2026-05-17, commit 1ecd972a)
 - [ ] Faz 18: Final Test (Vercel deploy'da)
 - [ ] Faz 21: E2E Test
 - [ ] unwrap() temizliği (816 tane)
