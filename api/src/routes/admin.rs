@@ -2104,16 +2104,16 @@ async fn update_settings(
     require_admin_write(&customer)?;
 
     // Validate settings values
-    if settings.max_endpoints_free < 1 || settings.max_endpoints_pro < 1 {
+    if settings.max_endpoints_free < 1 || settings.max_endpoints_startup < 1 || settings.max_endpoints_pro < 1 || settings.max_endpoints_enterprise < 1 {
         return Err(AppError::BadRequest("max_endpoints must be at least 1".into()));
     }
-    if settings.max_webhooks_free < 0 || settings.max_webhooks_pro < 0 {
+    if settings.max_webhooks_free < 0 || settings.max_webhooks_startup < 0 || settings.max_webhooks_pro < 0 || settings.max_webhooks_enterprise < 0 {
         return Err(AppError::BadRequest("max_webhooks cannot be negative".into()));
     }
-    if settings.rate_limit_free < 1 || settings.rate_limit_pro < 1 {
+    if settings.rate_limit_free < 1 || settings.rate_limit_startup < 1 || settings.rate_limit_pro < 1 || settings.rate_limit_enterprise < 1 {
         return Err(AppError::BadRequest("rate_limit must be at least 1".into()));
     }
-    if settings.retention_days_free < 1 || settings.retention_days_pro < 1 {
+    if settings.retention_days_free < 1 || settings.retention_days_startup < 1 || settings.retention_days_pro < 1 || settings.retention_days_enterprise < 1 {
         return Err(AppError::BadRequest("retention_days must be at least 1".into()));
     }
     if settings.retry_max_attempts < 0 || settings.retry_max_attempts > 10 {
@@ -2154,6 +2154,26 @@ async fn update_settings(
     .await?;
 
     tracing::info!("✅ Admin updated platform settings");
+
+    // Sync plan prices to Polar (fire-and-forget, don't block response)
+    let startup_price = saved_settings.plan_price_startup;
+    let pro_price = saved_settings.plan_price_pro;
+    let enterprise_price = saved_settings.plan_price_enterprise;
+    tokio::spawn(async move {
+        match crate::billing::polar::PolarConfig::from_env() {
+            Some(config) => {
+                let provider = crate::billing::polar::PolarProvider::new(config);
+                let results = provider.sync_prices_to_polar(startup_price, pro_price, enterprise_price).await;
+                for (plan, result) in &results {
+                    match result {
+                        Ok(()) => tracing::info!("Polar sync: {} price updated", plan),
+                        Err(e) => tracing::warn!("Polar sync: {} failed — {}", plan, e),
+                    }
+                }
+            }
+            None => tracing::debug!("Polar not configured, skipping price sync"),
+        }
+    });
 
     Ok(Json(serde_json::json!({
         "message": "Settings updated",
