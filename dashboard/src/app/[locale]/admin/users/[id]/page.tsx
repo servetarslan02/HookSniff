@@ -224,12 +224,12 @@ export default function AdminUserDetailPage() {
     if (!id || !emailSubject.trim() || !emailBody.trim()) return;
     try {
       await sendEmailMutation.mutateAsync({ userId: id, subject: emailSubject, body: emailBody });
-      toast(t('emailSent') || t('emailSent'), 'success');
+      toast(t('emailSent'), 'success');
       setShowEmailModal(false);
       setEmailSubject('');
       setEmailBody('');
     } catch {
-      toast(t('emailSendFailed') || t('emailSendFailed'), 'error');
+      toast(t('emailSendFailed'), 'error');
     }
   };
 
@@ -237,17 +237,17 @@ export default function AdminUserDetailPage() {
     if (!id || !refundAmount || !refundReason.trim()) return;
     const amountCents = Math.round(parseFloat(refundAmount) * 100);
     if (isNaN(amountCents) || amountCents <= 0) {
-      toast(t('invalidAmount') || t('invalidAmount'), 'error');
+      toast(t('invalidAmount'), 'error');
       return;
     }
     try {
       await refundMutation.mutateAsync({ userId: id, amountCents, reason: refundReason.trim() });
-      toast(t('refundSuccess') || t('refundSuccess'), 'success');
+      toast(t('refundSuccess'), 'success');
       setShowRefundModal(false);
       setRefundAmount('');
       setRefundReason('');
     } catch {
-      toast(t('refundFailed') || t('refundFailed'), 'error');
+      toast(t('refundFailed'), 'error');
     }
   };
 
@@ -257,7 +257,7 @@ export default function AdminUserDetailPage() {
     try {
       payload = JSON.parse(testWebhookPayload);
     } catch {
-      toast(t('invalidJson') || t('invalidJson'), 'error');
+      toast(t('invalidJson'), 'error');
       return;
     }
     setTestWebhookResult(null);
@@ -271,9 +271,9 @@ export default function AdminUserDetailPage() {
         },
       });
       setTestWebhookResult(result);
-      toast(t('testWebhookSent') || t('testWebhookSent'), 'success');
+      toast(t('testWebhookSent'), 'success');
     } catch {
-      toast(t('testWebhookFailed') || t('testWebhookFailed'), 'error');
+      toast(t('testWebhookFailed'), 'error');
     }
   };
 
@@ -288,9 +288,9 @@ export default function AdminUserDetailPage() {
       a.download = `gdpr-export-${id.slice(0, 8)}-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast(t('gdprExportSuccess') || t('gdprExportSuccess'), 'success');
+      toast(t('gdprExportSuccess'), 'success');
     } catch {
-      toast(t('gdprExportFailed') || t('gdprExportFailed'), 'error');
+      toast(t('gdprExportFailed'), 'error');
     }
   };
 
@@ -298,11 +298,11 @@ export default function AdminUserDetailPage() {
     if (!id || !gdprDeleteReason.trim()) return;
     try {
       await gdprDeleteMutation.mutateAsync({ userId: id, reason: gdprDeleteReason.trim() });
-      toast(t('gdprDeleteSuccess') || t('gdprDeleteSuccess'), 'success');
+      toast(t('gdprDeleteSuccess'), 'success');
       setShowGdprDeleteModal(false);
       setGdprDeleteReason('');
     } catch {
-      toast(t('gdprDeleteFailed') || t('gdprDeleteFailed'), 'error');
+      toast(t('gdprDeleteFailed'), 'error');
     }
   };
 
