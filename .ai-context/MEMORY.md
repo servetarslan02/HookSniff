@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:00 GMT+8 (Oturum 183)
+> Son güncelleme: 2026-05-17 05:05 GMT+8 (Oturum 184)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,17 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 184 — 2026-05-17 05:05 GMT+8
+1. **3 Bilinen Limitasyon Düzeltildi** ✅
+   - **NRR**: Sadece mevcut müşterilerin revenue'su sayılıyor (yeni müşteriler hariç)
+     - Bu ay: `c.created_at < DATE_TRUNC('month', NOW())`
+     - Geçen ay: `c.created_at < DATE_TRUNC('month', NOW() - INTERVAL '1 month')`
+   - **Cohort revenue**: Sadece cohort ayına ait faturalar sayılıyor (lifetime değil)
+     - `CASE WHEN i.paid_at >= cb.cohort_start AND i.paid_at < cb.cohort_start + INTERVAL '1 month'`
+   - **Avg months retained**: Tek faturalı müşteriler dahil (0 ay), `.max(1.0)` kaldırıldı
+     - `CASE WHEN COUNT(*) > 1 THEN ... ELSE 0.0 END`
+   - Commit: 676d13a0 — push edildi
 
 ### Oturum 183 — 2026-05-17 05:00 GMT+8
 1. **Revenue Derin Araştırma — 6 Bulgu Daha** ✅
