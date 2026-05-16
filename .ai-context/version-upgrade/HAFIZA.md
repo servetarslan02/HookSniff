@@ -32,7 +32,7 @@
 - [x] Faz 15: CLI ✅ (commander)
 - [x] Faz 22: Ek Düzeltmeler ✅ (tsconfig ES2022, MCP Node 20)
 - [x] Faz 16: Helm ✅ (Redis auth eklendi)
-- [x] Faz 17: is-a.dev DNS ✅ (CNAME doğrulama — Servet'e sorulacak)
+- [x] Faz 17: is-a.dev DNS ✅ (kullanılmıyor — registration dosyaları silindi)
 - [ ] Faz 18: Final Test (Vercel deploy'da)
 - [ ] Faz 19: Merge & Deploy
 - [x] Faz 20: Kod Kalitesi ✅ (console.log dev-only wrapping, any tipleri gerekli)
