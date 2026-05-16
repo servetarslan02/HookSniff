@@ -20,6 +20,12 @@ export default function AdminAlertsPage() {
     { value: 'slack', label: t('channelSlack'), icon: '💬' },
     { value: 'webhook', label: t('channelWebhook'), icon: '🔗' },
   ];
+
+  const CONDITION_DEFAULTS: Record<string, number> = {
+    failure_rate: 95,
+    latency: 5000,
+    consecutive_failures: 10,
+  };
   const { toast } = useToast();
 
   // React Query hooks
@@ -33,6 +39,7 @@ export default function AdminAlertsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -67,10 +74,12 @@ export default function AdminAlertsPage() {
   };
 
   const handleSave = async () => {
+    if (saving) return;
     if (!formName.trim() || !formThreshold) return;
+    if (formChannels.length === 0) { toast(t('selectChannel') || 'Select at least one channel', 'error'); return; }
     const threshold = parseInt(formThreshold);
     if (isNaN(threshold) || threshold <= 0) {
-      toast(t('invalidThreshold') || t('invalidThreshold'), 'error');
+      toast(t('invalidThreshold') || 'Threshold must be positive', 'error');
       return;
     }
     setSaving(true);
@@ -99,20 +108,25 @@ export default function AdminAlertsPage() {
   };
 
   const handleToggle = async (alert: AlertRuleAdmin) => {
+    if (togglingId) return;
+    setTogglingId(alert.id);
     try {
       await updateMutation.mutateAsync({ id: alert.id, data: { is_active: !alert.is_active } });
     } catch {
-      toast(t('alertToggleFailed') || t('alertToggleFailed'), 'error');
+      toast(t('alertToggleFailed') || 'Failed to toggle alert', 'error');
+    } finally {
+      setTogglingId(null);
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(t('confirmDeleteAlert', { name }) || `Delete alert "${name}"?`)) return;
     setDeleting(id);
     try {
       await deleteMutation.mutateAsync(id);
-      toast(t('alertDeleted') || t('alertDeleted'), 'success');
+      toast(t('alertDeleted') || 'Alert deleted', 'success');
     } catch {
-      toast(t('alertDeleteFailed') || t('alertDeleteFailed'), 'error');
+      toast(t('alertDeleteFailed') || 'Failed to delete alert', 'error');
     } finally {
       setDeleting(null);
     }
@@ -197,7 +211,14 @@ export default function AdminAlertsPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('condition') || 'Condition'}</label>
               <select
                 value={formCondition}
-                onChange={(e) => setFormCondition(e.target.value)}
+                onChange={(e) => {
+                  const newCondition = e.target.value;
+                  setFormCondition(newCondition);
+                  // Update threshold to a sensible default for the new condition
+                  if (!editingId && CONDITION_DEFAULTS[newCondition]) {
+                    setFormThreshold(CONDITION_DEFAULTS[newCondition].toString());
+                  }
+                }}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
               >
                 {CONDITIONS.map((c) => (
@@ -295,14 +316,15 @@ export default function AdminAlertsPage() {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => handleToggle(alert)}
+                    disabled={togglingId === alert.id}
                     className={`p-2 rounded-lg transition-colors ${
                       alert.is_active
                         ? 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
                         : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700'
-                    }`}
+                    } ${togglingId === alert.id ? 'opacity-50 cursor-wait' : ''}`}
                     title={alert.is_active ? (t('deactivate') || 'Deactivate') : (t('activate') || 'Activate')}
                   >
-                    {alert.is_active ? '✅' : '⏸️'}
+                    {togglingId === alert.id ? '⏳' : alert.is_active ? '✅' : '⏸️'}
                   </button>
                   <button
                     onClick={() => openEdit(alert)}
@@ -312,7 +334,7 @@ export default function AdminAlertsPage() {
                     ✏️
                   </button>
                   <button
-                    onClick={() => handleDelete(alert.id)}
+                    onClick={() => handleDelete(alert.id, alert.name)}
                     disabled={deleting === alert.id}
                     className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-40"
                     title={t('delete') || 'Delete'}

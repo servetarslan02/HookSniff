@@ -1361,6 +1361,8 @@
     "uptimeDays": "d",
     "uptimeHours": "h",
     "uptimeMinutes": "m",
+    "confirmDeleteAlert": "Delete alert \"{name}\"?",
+    "selectChannel": "Select at least one notification channel",
     "autoRefreshDisabled": "Auto-refresh disabled",
     "autoRefreshEnabled": "Auto-refresh enabled",
     "backToUsers": "← Back to Users",
