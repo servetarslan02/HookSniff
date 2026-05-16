@@ -60,62 +60,65 @@ async fn list_deliveries(
     let per_page = params.per_page.unwrap_or(20).min(200);
     let offset = (page - 1) * per_page;
 
-    // Build team filter for service token scoping
-    let team_filter = if let Some(Extension(ref scope)) = service_token {
-        format!(" AND endpoint_id IN (SELECT id FROM endpoints WHERE team_id = '{}')", scope.team_id)
-    } else {
-        String::new()
-    };
-
     // Performance: select only columns needed for list view (skip payload + response_body)
     const LIST_COLUMNS: &str = "id, endpoint_id, customer_id, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test";
 
+    // Team filter: use subquery with bind parameter for safety
+    let team_id_filter: Option<Uuid> = service_token.as_ref().map(|s| s.team_id);
+
     let (deliveries, total) = if let Some(status) = &params.status {
-        let query = format!(
-            "SELECT {} FROM deliveries WHERE customer_id = $1 AND status = $2{} ORDER BY created_at DESC LIMIT $3 OFFSET $4",
-            LIST_COLUMNS, team_filter
-        );
-        let deliveries = sqlx::query_as::<_, DeliveryListRow>(&query)
-        .bind(customer.id)
-        .bind(status)
-        .bind(per_page)
-        .bind(offset)
-        .fetch_all(&pool)
-        .await?;
+        let (query, total_query) = if let Some(_tid) = team_id_filter {
+            (
+                format!("SELECT {} FROM deliveries WHERE customer_id = $1 AND status = $2 AND endpoint_id IN (SELECT id FROM endpoints WHERE team_id = $3) ORDER BY created_at DESC LIMIT $4 OFFSET $5", LIST_COLUMNS),
+                "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND status = $2 AND endpoint_id IN (SELECT id FROM endpoints WHERE team_id = $3)".to_string(),
+            )
+        } else {
+            (
+                format!("SELECT {} FROM deliveries WHERE customer_id = $1 AND status = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4", LIST_COLUMNS),
+                "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND status = $2".to_string(),
+            )
+        };
 
-        let total_query = format!(
-            "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND status = $2{}",
-            team_filter
-        );
-        let total: (i64,) = sqlx::query_as(&total_query)
-        .bind(customer.id)
-        .bind(status)
-        .fetch_one(&pool)
-        .await?;
+        let mut q = sqlx::query_as::<_, DeliveryListRow>(&query)
+            .bind(customer.id)
+            .bind(status);
+        let mut tq = sqlx::query_as(&total_query)
+            .bind(customer.id)
+            .bind(status);
 
+        if let Some(_tid) = team_id_filter {
+            q = q.bind(_tid);
+            tq = tq.bind(_tid);
+        }
+
+        let deliveries = q.bind(per_page).bind(offset).fetch_all(&pool).await?;
+        let total: (i64,) = tq.fetch_one(&pool).await?;
         (deliveries, total.0)
     } else {
-        let query = format!(
-            "SELECT {} FROM deliveries WHERE customer_id = $1{} ORDER BY created_at DESC LIMIT $2 OFFSET $3",
-            LIST_COLUMNS, team_filter
-        );
-        let deliveries = sqlx::query_as::<_, DeliveryListRow>(&query)
-        .bind(customer.id)
-        .bind(per_page)
-        .bind(offset)
-        .fetch_all(&pool)
-        .await?;
+        let (query, total_query) = if let Some(_tid) = team_id_filter {
+            (
+                format!("SELECT {} FROM deliveries WHERE customer_id = $1 AND endpoint_id IN (SELECT id FROM endpoints WHERE team_id = $2) ORDER BY created_at DESC LIMIT $3 OFFSET $4", LIST_COLUMNS),
+                "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND endpoint_id IN (SELECT id FROM endpoints WHERE team_id = $2)".to_string(),
+            )
+        } else {
+            (
+                format!("SELECT {} FROM deliveries WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3", LIST_COLUMNS),
+                "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1".to_string(),
+            )
+        };
 
-        let total_query = format!(
-            "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1{}",
-            team_filter
-        );
-        let total: (i64,) =
-            sqlx::query_as(&total_query)
-                .bind(customer.id)
-                .fetch_one(&pool)
-                .await?;
+        let mut q = sqlx::query_as::<_, DeliveryListRow>(&query)
+            .bind(customer.id);
+        let mut tq = sqlx::query_as(&total_query)
+            .bind(customer.id);
 
+        if let Some(_tid) = team_id_filter {
+            q = q.bind(_tid);
+            tq = tq.bind(_tid);
+        }
+
+        let deliveries = q.bind(per_page).bind(offset).fetch_all(&pool).await?;
+        let total: (i64,) = tq.fetch_one(&pool).await?;
         (deliveries, total.0)
     };
 
