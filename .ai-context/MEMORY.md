@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-16 04:46 GMT+8
+> Son güncelleme: 2026-05-16 18:24 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -319,6 +319,15 @@ HookSniff/
 2. **GitHub Actions** — Hala başarısız (billing issue, faturalandırma güncellenmeli)
 3. **GCP Console** — Servet'in Google hesabı ile giriş yapıldı (2FA onayı ile)
 4. **API Sağlığı** — Çalışıyor (healthy, DB 27ms, Redis configured)
+
+### Oturum 181 — 2026-05-16 18:24 GMT+8
+1. **Admin Panel Hataları Düzeltildi** ✅
+   - **AuditLogResponseSchema uyumsuzluğu**: Backend `page`/`per_page` döndürüyor, frontend `limit`/`offset` bekliyordu → schema düzeltildi
+   - **useSystemHealth API URL**: Farklı base URL (`/api`) kullanıyordu, diğer tüm hook'lar edge proxy kullanıyor → `adminApi.getSystemHealth` metoduna yönlendirildi
+   - **api.ts**: `getSystemHealth` metodu eklendi (diğer adminApi metodlarıyla aynı pattern)
+   - 3 dosya değişti, 9 satır eklendi, 6 satır silindi
+   - Commit: f75b52aa
+2. **Build doğrulandı** ✅ — `next build` başarılı, 0 hata
 
 ### Oturum 180 — 2026-05-16 04:46 GMT+8
 1. **Kullanılmayan API Temizliği** ✅ (Oturum 179)
