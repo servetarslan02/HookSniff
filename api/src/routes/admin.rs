@@ -1917,8 +1917,9 @@ async fn notify_sdk_update(
     );
 
     // Find all admin users
-    let admins: Vec<(Uuid,)> =
-        sqlx::query_as("SELECT id FROM customers WHERE is_admin = TRUE AND is_active = TRUE")
+    // SDK güncellemesi tüm aktif kullanıcıları ilgilendirir
+    let users: Vec<(Uuid,)> =
+        sqlx::query_as("SELECT id FROM customers WHERE is_active = TRUE")
             .fetch_all(&pool)
             .await?;
 
@@ -1927,12 +1928,12 @@ async fn notify_sdk_update(
     let link = format!("/settings?sdk_updates={}", sdk_list.join(","));
 
     let mut count = 0;
-    for (admin_id,) in &admins {
+    for (user_id,) in &users {
         sqlx::query(
             r#"INSERT INTO notifications (customer_id, type, title, message, is_read, link)
                VALUES ($1, 'system', $2, $3, FALSE, $4)"#,
         )
-        .bind(admin_id)
+        .bind(user_id)
         .bind(&title)
         .bind(&message)
         .bind(&link)
@@ -1941,10 +1942,10 @@ async fn notify_sdk_update(
         count += 1;
     }
 
-    tracing::info!("📢 SDK update notification sent to {} admins", count);
+    tracing::info!("📢 SDK update notification sent to {} users", count);
 
     Ok(Json(serde_json::json!({
-        "message": format!("Notification sent to {} admin(s)", count),
+        "message": format!("Notification sent to {} user(s)", count),
         "title": title,
         "updates_count": req.updates.len(),
     })))
