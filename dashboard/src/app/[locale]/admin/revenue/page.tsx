@@ -5,7 +5,7 @@ import { useAdminRevenue, useAdminRevenueMetrics, useAdminRevenueCohorts, useAdm
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { adminApi, API_BASE } from '@/lib/api';
 import { useAuth } from '@/lib/store';
@@ -39,6 +39,7 @@ export default function AdminRevenuePage() {
   const [dateRange, setDateRange] = useState<DateRange>('12m');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
+  const locale = useLocale();
   const { toast } = useToast();
 
   const cohorts = cohortsData?.cohorts ?? [];
@@ -460,7 +461,7 @@ export default function AdminRevenuePage() {
                       }`}>{ref.status}</span>
                     </td>
                     <td className="px-4 sm:px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
-                      {new Date(ref.created_at).toLocaleDateString('tr-TR')}
+                      {new Date(ref.created_at).toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US')}
                     </td>
                   </tr>
                 ))}
@@ -504,7 +505,7 @@ export default function AdminRevenuePage() {
                     </td>
                     <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 dark:text-slate-400">${u.amount.toLocaleString()}</td>
                     <td className="px-4 sm:px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
-                      {new Date(u.churn_date).toLocaleDateString('tr-TR')}
+                      {new Date(u.churn_date).toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US')}
                     </td>
                   </tr>
                 ))}
