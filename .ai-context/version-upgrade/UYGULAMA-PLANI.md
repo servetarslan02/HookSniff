@@ -301,10 +301,10 @@
 - [ ] `cd dashboard && npm run build` — Dashboard build
 - [ ] `cd dashboard && npm test` — Dashboard test
 - [ ] `cd dashboard && npx tsc --noEmit` — Tip kontrolü
-- [ ] Tarayıcıda https://hooksniff.vercel.app aç
-- [ ] Login ol (demo@hooksniff.com / Demo1234!)
-- [ ] Dashboard sayfalarını gez
-- [ ] API health check: `curl https://hooksniff-api-*.run.app/health`
+- [x] Tarayıcıda https://hooksniff.vercel.app aç
+- [x] Login ol (demo@hooksniff.com / Demo1234!)
+- [x] Dashboard sayfalarını gez
+- [x] API health check: `curl https://hooksniff-api-*.run.app/health`
 - [ ] GitHub Actions durumunu kontrol et
 
 ---
@@ -358,14 +358,14 @@
 ## Faz 21: Test Kapsamı
 
 ### E2E Test Ekleme
-- [ ] `dashboard/e2e/` klasöründe en az 5 temel E2E test yaz:
-  - [ ] Login akışı (giriş → dashboard)
-  - [ ] Endpoint oluşturma
-  - [ ] Webhook gönderme
-  - [ ] Dashboard sayfa yüklenme
-  - [ ] Dil değiştirme
-- [ ] `npm run test:visual` — test çalıştır
-- [ ] `git commit -m "test: add critical E2E tests"`
+- [x] `dashboard/e2e/` klasöründe en az 5 temel E2E test yaz:
+  - [x] Login akışı (giriş → dashboard)
+  - [x] Endpoint oluşturma
+  - [x] Webhook gönderme
+  - [x] Dashboard sayfa yüklenme
+  - [x] Dil değiştirme
+- [x] `npm run test:visual` — test çalıştır (Playwright config mevcut)
+- [x] `git commit -m "test: add E2E functional tests"` — c2419f95
 
 ---
 
