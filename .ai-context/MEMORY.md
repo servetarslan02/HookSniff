@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:10 GMT+8 (Oturum 185)
+> Son güncelleme: 2026-05-17 05:15 GMT+8 (Oturum 186)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,23 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 186 — 2026-05-17 05:15 GMT+8
+1. **Feature Flags Sayfası Derin Tarama** ✅
+   - **Frontend düzeltmeleri:**
+     - 13 hardcoded İngilizce string → t() key (pageTitle, createFlag, editTitle, deleteTitle, vb.)
+     - 7 modal label/placeholder → t() key (name, description, enabled, rolloutLabel, plansLabel)
+     - Toggle mutation'a error handler eklendi
+     - 20 yeni featureFlags translation key eklendi (EN+TR)
+     - admin section'a save + delete key eklendi
+   - **Backend düzeltmesi:**
+     - `create_feature_flag`: `rollout_percentage` default 0 → 100 (frontend ile uyumlu)
+   - **Kontrol edilen:**
+     - Zod schema backend ile uyumlu ✅
+     - enabled_for_plans JSONB serialize doğru ✅
+     - CRUD endpoint'leri doğru ✅
+     - Audit log doğru ✅
+   - Commit: 0b3c131f — push edildi
 
 ### Oturum 185 — 2026-05-17 05:10 GMT+8
 1. **Overview + Users + User Detail Derin Tarama** ✅
