@@ -32,10 +32,10 @@ export type EndpointValidated = z.infer<typeof EndpointSchema>;
 export const DeliverySchema = z.object({
   id: z.string(),
   endpoint_id: z.string(),
-  event: z.string().optional(),
+  event: z.string().nullish(),
   status: z.enum(['pending', 'delivered', 'failed']),
   attempt_count: z.number(),
-  response_status: z.number().optional(),
+  response_status: z.number().nullish(),
   created_at: z.string(),
 });
 export type DeliveryValidated = z.infer<typeof DeliverySchema>;
@@ -66,7 +66,7 @@ export const AdminStatsSchema = z.object({
     z.object({
       id: z.string(),
       email: z.string(),
-      name: z.string().optional(),
+      name: z.string().nullish(),
       plan: z.string(),
       created_at: z.string(),
     })
@@ -101,10 +101,10 @@ export const AuditLogEntrySchema = z.object({
   user_id: z.string().optional(),
   action: z.string(),
   resource_type: z.string(),
-  resource_id: z.string().optional(),
-  details: z.record(z.string(), z.unknown()).optional(),
-  ip_address: z.string().optional(),
-  user_agent: z.string().optional(),
+  resource_id: z.string().nullish(),
+  details: z.record(z.string(), z.unknown()).nullish(),
+  ip_address: z.string().nullish(),
+  user_agent: z.string().nullish(),
   created_at: z.string(),
 });
 export type AuditLogEntryValidated = z.infer<typeof AuditLogEntrySchema>;
@@ -141,8 +141,8 @@ export const FeatureFlagsResponseSchema = z.object({
 // ── Deploy Info Schema ──
 export const DeployInfoSchema = z.object({
   version: z.string(),
-  git_commit: z.string().optional(),
-  build_time: z.string().optional(),
+  git_commit: z.string().nullish(),
+  build_time: z.string().nullish(),
   environment: z.string(),
 });
 export type DeployInfoValidated = z.infer<typeof DeployInfoSchema>;
