@@ -84,6 +84,10 @@ pub struct PaginationParams {
     pub created_after: Option<String>,
     /// Filter users created before this date (ISO 8601, e.g. "2024-12-31")
     pub created_before: Option<String>,
+    /// Sort field: email, name, plan, status, created_at
+    pub sort_field: Option<String>,
+    /// Sort direction: asc or desc (default: desc)
+    pub sort_dir: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -177,6 +181,8 @@ pub struct PlanRequest {
 #[serde(deny_unknown_fields)]
 pub struct StatusRequest {
     pub is_active: bool,
+    #[serde(default)]
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -311,9 +317,23 @@ async fn list_users(
         format!("WHERE {}", conditions.join(" AND "))
     };
 
+    // Build ORDER BY clause
+    let allowed_sort_fields = ["email", "name", "plan", "status", "created_at"];
+    let sort_field = params.sort_field.as_deref().unwrap_or("created_at");
+    let sort_field = if allowed_sort_fields.contains(&sort_field) {
+        // Map "status" to "is_active" for database column
+        if sort_field == "status" { "is_active" } else { sort_field }
+    } else {
+        "created_at"
+    };
+    let sort_dir = match params.sort_dir.as_deref() {
+        Some("asc") => "ASC",
+        _ => "DESC",
+    };
+
     let base_query = format!(
-        "SELECT id, email, name, plan, COALESCE(role, 'member') as role, is_active, is_admin, created_at FROM customers {} ORDER BY created_at DESC",
-        where_clause
+        "SELECT id, email, name, plan, COALESCE(role, 'member') as role, is_active, is_admin, created_at FROM customers {} ORDER BY {} {}",
+        where_clause, sort_field, sort_dir
     );
     let count_query = format!("SELECT COUNT(*) FROM customers {}", where_clause);
 
@@ -672,15 +692,19 @@ async fn change_status(
     } else {
         "deactivated"
     };
-    tracing::info!("✅ Admin {} user {}", status, id);
+    tracing::info!("✅ Admin {} user {} (reason: {:?})", status, id, req.reason);
 
-    // Log to communication history
+    // Log to communication history with reason
+    let details = serde_json::json!({
+        "is_active": req.is_active,
+        "reason": req.reason,
+    });
     let _ = log_communication(
         &pool,
         id,
         if req.is_active { "activated" } else { "ban" },
-        Some(&format!("User {}", status)),
-        Some(serde_json::json!({ "is_active": req.is_active })),
+        Some(&format!("User {}{}", status, req.reason.as_deref().map(|r| format!(": {}", r)).unwrap_or_default())),
+        Some(details),
         customer.id,
     )
     .await;
@@ -994,6 +1018,7 @@ pub struct ExportUsersParams {
     pub format: Option<String>,
     pub plan: Option<String>,
     pub status: Option<String>,
+    pub created_after: Option<String>,
 }
 
 /// GET /v1/admin/users/export — Export users as CSV
@@ -1019,6 +1044,10 @@ async fn export_users_csv(
     }
     if params.status.is_some() {
         conditions.push(format!("is_active = ${}", bind_idx));
+        bind_idx += 1;
+    }
+    if params.created_after.is_some() {
+        conditions.push(format!("created_at >= ${}", bind_idx));
         let _ = bind_idx;
     }
 
@@ -1043,6 +1072,12 @@ async fn export_users_csv(
     if let Some(ref status) = params.status {
         let is_active = status == "active";
         query = query.bind(is_active);
+    }
+    if let Some(ref created_after) = params.created_after {
+        if let Ok(date) = chrono::NaiveDate::parse_from_str(created_after, "%Y-%m-%d") {
+            let datetime = date.and_hms_opt(0, 0, 0).unwrap_or_default();
+            query = query.bind(datetime);
+        }
     }
 
     let rows = query.fetch_all(&pool).await?;
