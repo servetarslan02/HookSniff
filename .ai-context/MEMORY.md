@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 04:55 GMT+8 (Oturum 181)
+> Son güncelleme: 2026-05-17 04:58 GMT+8 (Oturum 182)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,13 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 182 — 2026-05-17 04:58 GMT+8
+1. **Churn Amount Düzeltmesi** ✅
+   - Eski: `CASE plan WHEN 'pro' THEN 29 WHEN 'enterprise' THEN 99` (hardcoded plan fiyatı)
+   - Yeni: `LEFT JOIN LATERAL (SELECT SUM(amount_cents) FROM invoices WHERE status='paid')` (gerçek ödenen tutar)
+   - `fetch_platform_settings` kaldırıldı (artık gerek yok)
+   - Commit: 288c46e3 — push edildi
 
 ### Oturum 181 — 2026-05-17 04:55 GMT+8
 1. **Revenue Sayfası Derin İnceleme** ✅
