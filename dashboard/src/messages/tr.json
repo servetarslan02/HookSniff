@@ -2702,7 +2702,17 @@
     "queueRetry": "Kuyruk ve Tekrar Deneme",
     "queueRetryDesc": "Fazla istekler kuyruğa alınır ve kapasite uygun olduğunda teslim edilir. Başarısız teslimatlar üstel geri çekilme ile tekrar denenir.",
     "perEndpointConfig": "Endpoint Bazlı Yapılandırma",
-    "perEndpointConfigDesc": "Her endpoint'in özel hız limitleri olabilir. Varsayılanlar: 10 istek/sn, 600 istek/dk, burst 20."
+    "perEndpointConfigDesc": "Her endpoint'in özel hız limitleri olabilir. Varsayılanlar: 10 istek/sn, 600 istek/dk, burst 20.",
+    "editLimit": "Limiti Düzenle",
+    "deleteLimit": "Limiti Sil",
+    "deleteConfirm": "Bu endpoint'in hız limitini silmek istediğinizden emin misiniz?",
+    "requestsPerSecond": "Saniye Başına İstek",
+    "burstSize": "Burst Boyutu",
+    "enabled": "Aktif",
+    "limitUpdated": "Hız limiti güncellendi",
+    "limitDeleted": "Hız limiti silindi",
+    "limitUpdateFailed": "Hız limiti güncellenemedi",
+    "limitDeleteFailed": "Hız limiti silinemedi"
   },
   "portal": {
     "title": "👤 Müşteri Portalı",
