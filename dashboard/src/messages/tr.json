@@ -1357,6 +1357,7 @@
     "failedInLastHour": "Son 1 saatte {count} başarısız",
     "oldestPending": "En eski bekleyen",
     "healthCheckFailed": "Sağlık kontrolü başarısız",
+    "alertSettingsPartialFail": "Bazı alertler kaydedilemedi",
     "autoRefreshDisabled": "Otomatik yenileme devre dışı",
     "autoRefreshEnabled": "Otomatik yenileme etkin",
     "backToUsers": "← Kullanıcılara Dön",
