@@ -426,7 +426,7 @@ describe('BillingPage – Extended Tests', () => {
 
       // Mock window.location
       const originalHref = Object.getOwnPropertyDescriptor(window.location, 'href');
-      let redirectUrl = '';
+      const redirectUrl = '';
       Object.defineProperty(window, 'location', {
         value: { href: redirectUrl },
         writable: true,
