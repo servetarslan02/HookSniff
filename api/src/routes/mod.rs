@@ -116,6 +116,10 @@ pub fn api_router() -> Router {
             "/status",
             axum::routing::get(health::system_status).options(health::status_options),
         )
+        .route(
+            "/feature-flags",
+            axum::routing::get(health::public_feature_flags),
+        )
         .merge(protected)
         .merge(inbound_routes)
         .merge(admin_routes)
