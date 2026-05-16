@@ -975,19 +975,31 @@ export interface FeatureFlag {
 
 export interface PlatformSettings {
   default_plan: string;
+  // Per-plan limits
   max_endpoints_free: number;
+  max_endpoints_startup: number;
   max_endpoints_pro: number;
+  max_endpoints_enterprise: number;
   max_webhooks_free: number;
+  max_webhooks_startup: number;
   max_webhooks_pro: number;
+  max_webhooks_enterprise: number;
   rate_limit_free: number;
+  rate_limit_startup: number;
   rate_limit_pro: number;
-  retry_max_attempts: number;
+  rate_limit_enterprise: number;
   retention_days_free: number;
+  retention_days_startup: number;
   retention_days_pro: number;
+  retention_days_enterprise: number;
+  retry_max_attempts: number;
   maintenance_mode: boolean;
   signup_enabled: boolean;
+  // Per-plan prices
+  plan_price_startup: number;
   plan_price_pro: number;
-  plan_price_business: number;
+  plan_price_enterprise: number;
+  plan_price_business: number; // backward compat
   resend_api_key: string | null;
   email_sender: string | null;
   webhook_secret: string | null;

@@ -1961,22 +1961,35 @@ async fn notify_sdk_update(
 #[serde(deny_unknown_fields)]
 pub struct PlatformSettings {
     pub default_plan: String,
+    // ── Per-plan limits ──
     pub max_endpoints_free: i32,
+    pub max_endpoints_startup: i32,
     pub max_endpoints_pro: i32,
+    pub max_endpoints_enterprise: i32,
     pub max_webhooks_free: i32,
+    pub max_webhooks_startup: i32,
     pub max_webhooks_pro: i32,
+    pub max_webhooks_enterprise: i32,
     pub rate_limit_free: i32,
+    pub rate_limit_startup: i32,
     pub rate_limit_pro: i32,
-    pub retry_max_attempts: i32,
+    pub rate_limit_enterprise: i32,
     pub retention_days_free: i32,
+    pub retention_days_startup: i32,
     pub retention_days_pro: i32,
+    pub retention_days_enterprise: i32,
+    pub retry_max_attempts: i32,
     pub maintenance_mode: bool,
     pub signup_enabled: bool,
-    /// Monthly price for Pro plan (e.g. 29.0)
+    // ── Per-plan prices ──
+    #[serde(default = "default_price_startup")]
+    pub plan_price_startup: f64,
     #[serde(default = "default_price_pro")]
     pub plan_price_pro: f64,
-    /// Monthly price for Enterprise plan (e.g. 99.0)
-    #[serde(default = "default_price_business")]
+    #[serde(default = "default_price_enterprise")]
+    pub plan_price_enterprise: f64,
+    /// Kept for backward compat — maps to enterprise price
+    #[serde(default = "default_price_enterprise")]
     pub plan_price_business: f64,
     /// Resend API key for sending emails
     #[serde(default)]
@@ -1998,8 +2011,9 @@ pub struct PlatformSettings {
     pub cors_origins: Option<String>,
 }
 
+fn default_price_startup() -> f64 { 14.0 }
 fn default_price_pro() -> f64 { 29.0 }
-fn default_price_business() -> f64 { 99.0 }
+fn default_price_enterprise() -> f64 { 99.0 }
 fn default_backup_retention() -> i32 { 30 }
 fn default_global_rate_limit() -> i32 { 1000 }
 
@@ -2008,17 +2022,27 @@ impl Default for PlatformSettings {
         Self {
             default_plan: "developer".into(),
             max_endpoints_free: 5,
+            max_endpoints_startup: 20,
             max_endpoints_pro: 50,
+            max_endpoints_enterprise: 200,
             max_webhooks_free: 1000,
+            max_webhooks_startup: 10000,
             max_webhooks_pro: 50000,
+            max_webhooks_enterprise: 500000,
             rate_limit_free: 100,
+            rate_limit_startup: 500,
             rate_limit_pro: 1000,
-            retry_max_attempts: 3,
+            rate_limit_enterprise: 5000,
             retention_days_free: 7,
+            retention_days_startup: 14,
             retention_days_pro: 30,
+            retention_days_enterprise: 90,
+            retry_max_attempts: 3,
             maintenance_mode: false,
             signup_enabled: true,
+            plan_price_startup: 14.0,
             plan_price_pro: 29.0,
+            plan_price_enterprise: 99.0,
             plan_price_business: 99.0,
             resend_api_key: None,
             email_sender: None,
@@ -2095,7 +2119,7 @@ async fn update_settings(
     if settings.retry_max_attempts < 0 || settings.retry_max_attempts > 10 {
         return Err(AppError::BadRequest("retry_max_attempts must be 0-10".into()));
     }
-    if settings.plan_price_pro < 0.0 || settings.plan_price_business < 0.0 {
+    if settings.plan_price_startup < 0.0 || settings.plan_price_pro < 0.0 || settings.plan_price_enterprise < 0.0 {
         return Err(AppError::BadRequest("plan prices cannot be negative".into()));
     }
 

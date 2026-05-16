@@ -1595,7 +1595,7 @@
     "standardWebhooksActiveDesc": "Standard Webhooks spec is active. All new webhooks use the standard format.",
     "standardWebhooksDesc": "Industry standard webhook compliance",
     "standardWebhooksInactiveDesc": "Enable the feature flag to switch to Standard Webhooks format (webhook- prefix, whsec_ secrets).",
-    "startupPlan": "Startup Plan",
+    "startupPlan": "Startup",
     "status": "Status",
     "statusLabel": "Status",
     "stopImpersonating": "Stop Impersonating",
@@ -1859,7 +1859,8 @@
     "rateLimit": "Rate Limit/min",
     "polarSyncInfo": "Price changes here update the platform. Polar products should be updated to match.",
     "planPricesMoved": "Plan prices and limits are now managed from the Revenue page.",
-    "goToRevenue": "Go to Revenue"
+    "goToRevenue": "Go to Revenue",
+    "popular": "Popular"
   },
   "landing": {
     "nav": {

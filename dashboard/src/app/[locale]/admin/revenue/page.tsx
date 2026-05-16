@@ -44,36 +44,73 @@ function PlanLimitRow({ label, value, onChange }: { label: string; value: number
   );
 }
 
-function LimitCard({ label, free, pro, editing, field, form, setForm, unit }: {
-  label: string; free: number; pro: number; editing: boolean; field: string;
-  form: Record<string, number>; setForm: (f: Record<string, number>) => void; unit?: string;
+const PLAN_COLOR_MAP: Record<string, { border: string; bg: string; dot: string; badge: string }> = {
+  gray: { border: 'border-gray-200 dark:border-slate-700', bg: 'bg-gray-50/50 dark:bg-slate-800/50', dot: 'bg-gray-400', badge: 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400' },
+  emerald: { border: 'border-emerald-200 dark:border-emerald-500/20', bg: 'bg-emerald-50/50 dark:bg-emerald-500/5', dot: 'bg-emerald-500', badge: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
+  blue: { border: 'border-blue-200 dark:border-blue-500/20', bg: 'bg-blue-50/50 dark:bg-blue-500/5', dot: 'bg-blue-500', badge: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' },
+  violet: { border: 'border-violet-200 dark:border-violet-500/20', bg: 'bg-violet-50/50 dark:bg-violet-500/5', dot: 'bg-violet-500', badge: 'bg-violet-100 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400' },
+};
+
+function PlanCard({ name, color, price, limits, editing, onPriceChange, onLimitChange, t, free, popular }: {
+  name: string; color: string; price: number;
+  limits: { endpoints: number; webhooks: number; rateLimit: number; retention: number };
+  editing: boolean; onPriceChange?: (v: number) => void;
+  onLimitChange: (field: string, value: number) => void;
+  t: (k: string) => string; free?: boolean; popular?: boolean;
 }) {
+  const c = PLAN_COLOR_MAP[color] || PLAN_COLOR_MAP.gray;
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 p-3">
-      <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{label}</p>
-      {editing ? (
-        <div className="space-y-1">
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] text-gray-400 dark:text-slate-500 w-8">Free</span>
-            <input
-              type="number"
-              min="0"
-              value={free}
-              onChange={(e) => setForm({ ...form, [field]: Number(e.target.value) })}
-              className="w-full px-2 py-1 text-sm font-bold text-gray-900 dark:text-white bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg text-right focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-            />
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] text-gray-400 dark:text-slate-500 w-8">Pro</span>
-            <span className="text-sm font-bold text-blue-600 dark:text-blue-400 text-right w-full">{pro.toLocaleString()}{unit || ''}</span>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-0.5">
-          <p className="text-lg font-bold text-gray-900 dark:text-white">{free.toLocaleString()}{unit || ''}</p>
-          <p className="text-[10px] text-gray-400 dark:text-slate-500">Pro: {pro.toLocaleString()}{unit || ''}</p>
-        </div>
+    <div className={`rounded-xl border ${c.border} ${c.bg} p-4 relative ${popular ? 'ring-2 ring-blue-400 dark:ring-blue-500' : ''}`}>
+      {popular && (
+        <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 text-[10px] font-bold uppercase bg-blue-500 text-white rounded-full">
+          {t('popular') || 'Popular'}
+        </span>
       )}
+      <div className="flex items-center gap-2 mb-3">
+        <span className={`w-3 h-3 rounded-full ${c.dot}`} />
+        <span className="text-sm font-semibold text-gray-900 dark:text-white">{name}</span>
+      </div>
+
+      {/* Price */}
+      <div className="flex items-center gap-1.5 mb-4">
+        {free ? (
+          <span className="text-2xl font-bold text-gray-900 dark:text-white">Free</span>
+        ) : (
+          <>
+            <span className="text-base text-gray-500 dark:text-slate-400">$</span>
+            {editing && onPriceChange ? (
+              <input
+                type="number" min="0" step="1"
+                value={price}
+                onChange={(e) => onPriceChange(Number(e.target.value))}
+                className="w-20 px-2 py-1 text-2xl font-bold text-gray-900 dark:text-white bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+              />
+            ) : (
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">{price}</span>
+            )}
+            <span className="text-xs text-gray-500 dark:text-slate-400">/mo</span>
+          </>
+        )}
+      </div>
+
+      {/* Limits */}
+      <div className="space-y-2 text-xs">
+        {editing ? (
+          <>
+            <PlanLimitRow label={t('maxEndpoints') || 'Endpoints'} value={limits.endpoints} onChange={(v) => onLimitChange('endpoints', v)} />
+            <PlanLimitRow label={t('maxWebhooks') || 'Webhooks/mo'} value={limits.webhooks} onChange={(v) => onLimitChange('webhooks', v)} />
+            <PlanLimitRow label={t('rateLimit') || 'Rate/min'} value={limits.rateLimit} onChange={(v) => onLimitChange('rateLimit', v)} />
+            <PlanLimitRow label={t('retentionDays') || 'Retention'} value={limits.retention} onChange={(v) => onLimitChange('retention', v)} />
+          </>
+        ) : (
+          <>
+            <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('maxEndpoints') || 'Endpoints'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.endpoints}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('maxWebhooks') || 'Webhooks/mo'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.webhooks.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('rateLimit') || 'Rate/min'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.rateLimit.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('retentionDays') || 'Retention'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.retention}d</span></div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -98,21 +135,30 @@ export default function AdminRevenuePage() {
   const cohorts = cohortsData?.cohorts ?? [];
   const allRefunds = refundsData?.refunds ?? [];
   const refundsTotal = refundsData?.total ?? 0;
-  const planPrices = { pro: settings?.plan_price_pro ?? 29, business: settings?.plan_price_business ?? 99 };
+  const planPrices = { startup: settings?.plan_price_startup ?? 14, pro: settings?.plan_price_pro ?? 29, enterprise: settings?.plan_price_enterprise ?? 99 };
 
   // ── Plan Management State ──
   const [editingPlans, setEditingPlans] = useState(false);
   const [planForm, setPlanForm] = useState({
+    plan_price_startup: settings?.plan_price_startup ?? 14,
     plan_price_pro: settings?.plan_price_pro ?? 29,
-    plan_price_business: settings?.plan_price_business ?? 99,
+    plan_price_enterprise: settings?.plan_price_enterprise ?? 99,
     max_endpoints_free: settings?.max_endpoints_free ?? 5,
+    max_endpoints_startup: settings?.max_endpoints_startup ?? 20,
     max_endpoints_pro: settings?.max_endpoints_pro ?? 50,
-    max_webhooks_free: settings?.max_webhooks_free ?? 10000,
+    max_endpoints_enterprise: settings?.max_endpoints_enterprise ?? 200,
+    max_webhooks_free: settings?.max_webhooks_free ?? 1000,
+    max_webhooks_startup: settings?.max_webhooks_startup ?? 10000,
     max_webhooks_pro: settings?.max_webhooks_pro ?? 50000,
+    max_webhooks_enterprise: settings?.max_webhooks_enterprise ?? 500000,
     rate_limit_free: settings?.rate_limit_free ?? 100,
+    rate_limit_startup: settings?.rate_limit_startup ?? 500,
     rate_limit_pro: settings?.rate_limit_pro ?? 1000,
+    rate_limit_enterprise: settings?.rate_limit_enterprise ?? 5000,
     retention_days_free: settings?.retention_days_free ?? 7,
+    retention_days_startup: settings?.retention_days_startup ?? 14,
     retention_days_pro: settings?.retention_days_pro ?? 30,
+    retention_days_enterprise: settings?.retention_days_enterprise ?? 90,
   });
   const [savingPlans, setSavingPlans] = useState(false);
 
@@ -120,16 +166,25 @@ export default function AdminRevenuePage() {
   useEffect(() => {
     if (settings) {
       setPlanForm({
+        plan_price_startup: settings.plan_price_startup,
         plan_price_pro: settings.plan_price_pro,
-        plan_price_business: settings.plan_price_business,
+        plan_price_enterprise: settings.plan_price_enterprise,
         max_endpoints_free: settings.max_endpoints_free,
+        max_endpoints_startup: settings.max_endpoints_startup,
         max_endpoints_pro: settings.max_endpoints_pro,
+        max_endpoints_enterprise: settings.max_endpoints_enterprise,
         max_webhooks_free: settings.max_webhooks_free,
+        max_webhooks_startup: settings.max_webhooks_startup,
         max_webhooks_pro: settings.max_webhooks_pro,
+        max_webhooks_enterprise: settings.max_webhooks_enterprise,
         rate_limit_free: settings.rate_limit_free,
+        rate_limit_startup: settings.rate_limit_startup,
         rate_limit_pro: settings.rate_limit_pro,
+        rate_limit_enterprise: settings.rate_limit_enterprise,
         retention_days_free: settings.retention_days_free,
+        retention_days_startup: settings.retention_days_startup,
         retention_days_pro: settings.retention_days_pro,
+        retention_days_enterprise: settings.retention_days_enterprise,
       });
     }
   }, [settings]);
@@ -386,76 +441,90 @@ export default function AdminRevenuePage() {
         </div>
 
         <div className="p-4 sm:p-6 space-y-6">
-          {/* ── Prices ── */}
+          {/* ── Plan Cards (4 plans) ── */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t('planPrices') || 'Plan Prices'}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t('planPrices') || 'Plan Prices & Limits'}</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Developer (Free) */}
+              <PlanCard
+                name={t('developerPlan') || 'Developer'}
+                color="gray"
+                price={0}
+                limits={{
+                  endpoints: planForm.max_endpoints_free,
+                  webhooks: planForm.max_webhooks_free,
+                  rateLimit: planForm.rate_limit_free,
+                  retention: planForm.retention_days_free,
+                }}
+                editing={editingPlans}
+                onLimitChange={(field, value) => {
+                  const map: Record<string, string> = { endpoints: 'max_endpoints_free', webhooks: 'max_webhooks_free', rateLimit: 'rate_limit_free', retention: 'retention_days_free' };
+                  setPlanForm({ ...planForm, [map[field]]: value });
+                }}
+                t={t}
+                free
+              />
+
+              {/* Startup */}
+              <PlanCard
+                name={t('startupPlan') || 'Startup'}
+                color="emerald"
+                price={planForm.plan_price_startup}
+                limits={{
+                  endpoints: planForm.max_endpoints_startup,
+                  webhooks: planForm.max_webhooks_startup,
+                  rateLimit: planForm.rate_limit_startup,
+                  retention: planForm.retention_days_startup,
+                }}
+                editing={editingPlans}
+                onPriceChange={(v) => setPlanForm({ ...planForm, plan_price_startup: v })}
+                onLimitChange={(field, value) => {
+                  const map: Record<string, string> = { endpoints: 'max_endpoints_startup', webhooks: 'max_webhooks_startup', rateLimit: 'rate_limit_startup', retention: 'retention_days_startup' };
+                  setPlanForm({ ...planForm, [map[field]]: value });
+                }}
+                t={t}
+              />
+
               {/* Pro */}
-              <div className="rounded-xl border border-blue-200 dark:border-blue-500/20 bg-blue-50/50 dark:bg-blue-500/5 p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="w-3 h-3 rounded-full bg-blue-500" />
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{t('proPlan') || 'Pro'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg text-gray-500 dark:text-slate-400">$</span>
-                  {editingPlans ? (
-                    <input
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={planForm.plan_price_pro}
-                      onChange={(e) => setPlanForm({ ...planForm, plan_price_pro: Number(e.target.value) })}
-                      className="w-24 px-3 py-2 text-2xl font-bold text-gray-900 dark:text-white bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-                    />
-                  ) : (
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{planForm.plan_price_pro}</span>
-                  )}
-                  <span className="text-sm text-gray-500 dark:text-slate-400">/mo</span>
-                </div>
-                {editingPlans && (
-                  <div className="mt-3 space-y-2">
-                    <PlanLimitRow label={t('maxEndpoints') || 'Max Endpoints'} value={planForm.max_endpoints_pro} onChange={(v) => setPlanForm({ ...planForm, max_endpoints_pro: v })} />
-                    <PlanLimitRow label={t('maxWebhooks') || 'Max Webhooks/mo'} value={planForm.max_webhooks_pro} onChange={(v) => setPlanForm({ ...planForm, max_webhooks_pro: v })} />
-                    <PlanLimitRow label={t('rateLimit') || 'Rate Limit/min'} value={planForm.rate_limit_pro} onChange={(v) => setPlanForm({ ...planForm, rate_limit_pro: v })} />
-                    <PlanLimitRow label={t('retentionDays') || 'Retention (days)'} value={planForm.retention_days_pro} onChange={(v) => setPlanForm({ ...planForm, retention_days_pro: v })} />
-                  </div>
-                )}
-              </div>
+              <PlanCard
+                name={t('proPlan') || 'Pro'}
+                color="blue"
+                price={planForm.plan_price_pro}
+                limits={{
+                  endpoints: planForm.max_endpoints_pro,
+                  webhooks: planForm.max_webhooks_pro,
+                  rateLimit: planForm.rate_limit_pro,
+                  retention: planForm.retention_days_pro,
+                }}
+                editing={editingPlans}
+                onPriceChange={(v) => setPlanForm({ ...planForm, plan_price_pro: v })}
+                onLimitChange={(field, value) => {
+                  const map: Record<string, string> = { endpoints: 'max_endpoints_pro', webhooks: 'max_webhooks_pro', rateLimit: 'rate_limit_pro', retention: 'retention_days_pro' };
+                  setPlanForm({ ...planForm, [map[field]]: value });
+                }}
+                t={t}
+                popular
+              />
 
-              {/* Business */}
-              <div className="rounded-xl border border-violet-200 dark:border-violet-500/20 bg-violet-50/50 dark:bg-violet-500/5 p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="w-3 h-3 rounded-full bg-violet-500" />
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{t('businessPlan') || 'Business'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg text-gray-500 dark:text-slate-400">$</span>
-                  {editingPlans ? (
-                    <input
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={planForm.plan_price_business}
-                      onChange={(e) => setPlanForm({ ...planForm, plan_price_business: Number(e.target.value) })}
-                      className="w-24 px-3 py-2 text-2xl font-bold text-gray-900 dark:text-white bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-                    />
-                  ) : (
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{planForm.plan_price_business}</span>
-                  )}
-                  <span className="text-sm text-gray-500 dark:text-slate-400">/mo</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Free Plan Limits (always visible) ── */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3 uppercase tracking-wide">{t('freePlanLimits') || 'Free Plan Limits'}</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <LimitCard label={t('maxEndpoints') || 'Endpoints'} free={planForm.max_endpoints_free} pro={planForm.max_endpoints_pro} editing={editingPlans} field="max_endpoints_free" form={planForm} setForm={setPlanForm} />
-              <LimitCard label={t('maxWebhooks') || 'Webhooks/mo'} free={planForm.max_webhooks_free} pro={planForm.max_webhooks_pro} editing={editingPlans} field="max_webhooks_free" form={planForm} setForm={setPlanForm} />
-              <LimitCard label={t('rateLimit') || 'Rate/min'} free={planForm.rate_limit_free} pro={planForm.rate_limit_pro} editing={editingPlans} field="rate_limit_free" form={planForm} setForm={setPlanForm} />
-              <LimitCard label={t('retentionDays') || 'Retention'} free={planForm.retention_days_free} pro={planForm.retention_days_pro} editing={editingPlans} field="retention_days_free" form={planForm} setForm={setPlanForm} unit="d" />
+              {/* Enterprise */}
+              <PlanCard
+                name={t('enterprisePlan') || 'Enterprise'}
+                color="violet"
+                price={planForm.plan_price_enterprise}
+                limits={{
+                  endpoints: planForm.max_endpoints_enterprise,
+                  webhooks: planForm.max_webhooks_enterprise,
+                  rateLimit: planForm.rate_limit_enterprise,
+                  retention: planForm.retention_days_enterprise,
+                }}
+                editing={editingPlans}
+                onPriceChange={(v) => setPlanForm({ ...planForm, plan_price_enterprise: v })}
+                onLimitChange={(field, value) => {
+                  const map: Record<string, string> = { endpoints: 'max_endpoints_enterprise', webhooks: 'max_webhooks_enterprise', rateLimit: 'rate_limit_enterprise', retention: 'retention_days_enterprise' };
+                  setPlanForm({ ...planForm, [map[field]]: value });
+                }}
+                t={t}
+              />
             </div>
           </div>
 
