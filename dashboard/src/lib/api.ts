@@ -931,14 +931,14 @@ export const adminApi = {
 
   // Aşama 5 — Refund + Polar.sh
   refundUser: (token: string, userId: string, amount_cents: number, reason: string, currency?: string) =>
-    apiFetch<{ refund: { id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; status: string; created_at: string }; message: string }>(`/admin/users/${userId}/refund`, { method: 'POST', body: { amount_cents, reason, ...(currency ? { currency } : {}) }, token }),
+    apiFetch<{ refund: { id: string; customer_id: string; email?: string; amount_cents: number; currency: string; reason: string | null; status: string; created_at: string }; message: string }>(`/admin/users/${userId}/refund`, { method: 'POST', body: { amount_cents, reason, ...(currency ? { currency } : {}) }, token }),
 
   getUserRefunds: (token: string, userId: string, params?: { page?: number; per_page?: number }) => {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.set('page', params.page.toString());
     if (params?.per_page) searchParams.set('per_page', params.per_page.toString());
     const qs = searchParams.toString();
-    return apiFetch<{ refunds: Array<{ id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; admin_user_id: string | null; provider: string; provider_refund_id: string | null; status: string; created_at: string }>; total: number; page: number; per_page: number }>(`/admin/users/${userId}/refunds${qs ? `?${qs}` : ''}`, { token });
+    return apiFetch<{ refunds: Array<{ id: string; customer_id: string; email?: string; amount_cents: number; currency: string; reason: string | null; admin_user_id: string | null; provider: string; provider_refund_id: string | null; status: string; created_at: string }>; total: number; page: number; per_page: number }>(`/admin/users/${userId}/refunds${qs ? `?${qs}` : ''}`, { token });
   },
 
   getAllRefunds: (token: string, params?: { page?: number; per_page?: number; status?: string }) => {
@@ -947,7 +947,7 @@ export const adminApi = {
     if (params?.per_page) searchParams.set('per_page', params.per_page.toString());
     if (params?.status) searchParams.set('status', params.status);
     const qs = searchParams.toString();
-    return apiFetch<{ refunds: Array<{ id: string; customer_id: string; amount_cents: number; currency: string; reason: string | null; admin_user_id: string | null; provider: string; provider_refund_id: string | null; status: string; created_at: string }>; total: number; page: number; per_page: number }>(`/admin/refunds${qs ? `?${qs}` : ''}`, { token });
+    return apiFetch<{ refunds: Array<{ id: string; customer_id: string; email?: string; amount_cents: number; currency: string; reason: string | null; admin_user_id: string | null; provider: string; provider_refund_id: string | null; status: string; created_at: string }>; total: number; page: number; per_page: number }>(`/admin/refunds${qs ? `?${qs}` : ''}`, { token });
   },
 
   // Aşama 7 — GDPR + Bulk Email
