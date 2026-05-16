@@ -720,7 +720,7 @@ export const DeliveryDetailResponseSchema = z.object({
   error_message: z.string().nullable().optional(),
   created_at: z.string(),
   endpoint_url: z.string().nullable().optional(),
-  request_body: z.unknown().nullable().optional(),
+  request_body: z.any().nullable().optional(),
   request_headers: z.record(z.string(), z.string()).nullable().optional(),
 });
 
