@@ -52,17 +52,19 @@ export function useRealtime() {
     },
   });
 
-  // Fallback polling — WS bağlantısı yoksa
+  // Fallback polling — WS bağlantısı yoksa veya bağlanmaya çalışıyorsa
   useEffect(() => {
-    if (state === 'fallback' || state === 'disconnected') {
-      console.log('[Realtime] WS unavailable, starting fallback polling (30s)');
-      pollingRef.current = setInterval(() => {
-        queryClient.invalidateQueries({ queryKey: ['deliveries'] });
-        queryClient.invalidateQueries({ queryKey: ['webhooks'] });
-        queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
-        queryClient.invalidateQueries({ queryKey: ['endpoints'] });
-        queryClient.invalidateQueries({ queryKey: ['stats'] });
-      }, 30_000);
+    if (state === 'fallback' || state === 'disconnected' || state === 'connecting') {
+      if (!pollingRef.current) {
+        console.log(`[Realtime] WS state: ${state}, starting fallback polling (30s)`);
+        pollingRef.current = setInterval(() => {
+          queryClient.invalidateQueries({ queryKey: ['deliveries'] });
+          queryClient.invalidateQueries({ queryKey: ['webhooks'] });
+          queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+          queryClient.invalidateQueries({ queryKey: ['endpoints'] });
+          queryClient.invalidateQueries({ queryKey: ['stats'] });
+        }, 30_000);
+      }
     }
 
     return () => {

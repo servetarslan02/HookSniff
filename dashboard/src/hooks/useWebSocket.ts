@@ -41,6 +41,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     setState('connecting');
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
     const wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws';
+    const connectStart = Date.now();
 
     const ws = new WebSocket(`${wsUrl}?token=${encodeURIComponent(token)}`);
 
@@ -93,9 +94,18 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     };
 
     ws.onclose = (event) => {
-      console.log('[WS] Disconnected', event.code, event.reason);
+      const connectDuration = Date.now() - connectStart;
+      console.log('[WS] Disconnected', event.code, event.reason, `(${connectDuration}ms)`);
       wsRef.current = null;
       onDisconnected?.();
+
+      // Quick failure detection — if connection fails within 3s, it's likely
+      // that WS is not supported (e.g. proxy, Cloud Run cold start).
+      // Fall back to polling after 3 quick failures instead of 10.
+      const isQuickFailure = connectDuration < 3000 && !event.wasClean;
+      if (isQuickFailure) {
+        reconnectAttempts.current += 2; // Fast-track to fallback
+      }
 
       // Max reconnect attempts kontrolü
       if (reconnectAttempts.current >= maxReconnectAttempts) {
