@@ -141,6 +141,13 @@ function LoginForm() {
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"
               />
+              {mode === 'login' && (
+                <div className="mt-2 text-right">
+                  <Link href="/forgot-password" className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium">
+                    {t('forgotPassword')}
+                  </Link>
+                </div>
+              )}
               {passwordStrength && password.length > 0 && (
                 <div className="mt-2">
                   <div className="flex gap-1 mb-1">
