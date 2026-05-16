@@ -362,7 +362,7 @@ export function useDeadLetters(params?: { limit?: number; since?: string }) {
 }
 
 // ── Rate Limit Violations ──
-export function useRateLimitViolations(params?: { limit?: number }) {
+export function useRateLimitViolations(params?: { limit?: number; since?: string }) {
   const { token } = useAuth();
   return useQuery({
     queryKey: ['admin', 'rate-limit-violations', params],

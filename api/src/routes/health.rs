@@ -370,9 +370,9 @@ pub async fn health_check(
     };
     checks.insert("recent_errors".to_string(), recent_errors);
 
-    // Queue details (failed in last hour)
+    // Queue details — query webhook_queue (not deliveries!) for accurate queue depth
     let queue_detail = match sqlx::query_as::<_, (i64, i64, i64)>(
-        "SELECT COUNT(*) FILTER (WHERE status = 'pending'), COUNT(*) FILTER (WHERE status = 'processing'), COUNT(*) FILTER (WHERE status = 'failed' AND created_at >= NOW() - INTERVAL '1 hour') FROM deliveries",
+        "SELECT COUNT(*) FILTER (WHERE status = 'pending'), COUNT(*) FILTER (WHERE status = 'processing'), COUNT(*) FILTER (WHERE status = 'failed' AND updated_at >= NOW() - INTERVAL '1 hour') FROM webhook_queue",
     )
     .fetch_one(pool)
     .await
@@ -408,6 +408,12 @@ pub async fn health_check(
         }
         None => json!({ "status": "healthy", "latency_ms": 0, "note": "not configured" }),
     };
+    // Mark unhealthy if Redis is configured but failing
+    if let Some(status) = redis_status.get("status").and_then(|s| s.as_str()) {
+        if status == "unhealthy" {
+            overall_healthy = false;
+        }
+    }
     checks.insert("redis".to_string(), redis_status.clone());
 
     // Queue summary for top-level
@@ -445,9 +451,11 @@ pub async fn health_check(
         "_cache": "MISS"
     });
 
-    // Cache the response in Redis for 30 seconds
-    if let Some(ref cache) = cache_layer {
-        let _ = cache.set_with_ttl("health", "check", &response_json, std::time::Duration::from_secs(HEALTH_CACHE_TTL_SECS)).await;
+    // Only cache healthy responses — don't cache failures (avoids serving stale unhealthy data)
+    if overall_healthy {
+        if let Some(ref cache) = cache_layer {
+            let _ = cache.set_with_ttl("health", "check", &response_json, std::time::Duration::from_secs(HEALTH_CACHE_TTL_SECS)).await;
+        }
     }
 
     (
