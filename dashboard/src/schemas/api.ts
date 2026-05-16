@@ -97,13 +97,12 @@ export type RevenueValidated = z.infer<typeof RevenueSchema>;
 export const AuditLogEntrySchema = z.object({
   id: z.string(),
   customer_id: z.string().optional(),
-  user_id: z.string().optional(),
+  customer_email: z.string().nullish(),
   action: z.string(),
   resource_type: z.string(),
   resource_id: z.string().nullish(),
   details: z.record(z.string(), z.unknown()).nullish(),
   ip_address: z.string().nullish(),
-  user_agent: z.string().nullish(),
   created_at: z.string(),
 });
 export type AuditLogEntryValidated = z.infer<typeof AuditLogEntrySchema>;
