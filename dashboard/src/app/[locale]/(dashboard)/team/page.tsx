@@ -25,6 +25,19 @@ export default function TeamPage() {
   const t = useTranslations('team');
   const searchParams = useSearchParams();
 
+  const fetchTeams = useCallback(async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const data = await teamsApi.list(token);
+      setTeams(Array.isArray(data) ? data : []);
+    } catch {
+      toast(t("failedToLoadTeams"), "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [token, toast, t]);
+
   // Auto-accept invite if invite_token is in URL
   useEffect(() => {
     const inviteToken = searchParams.get('invite_token');
@@ -42,19 +55,6 @@ export default function TeamPage() {
   const canInvite = currentRole === 'admin';
   const canRemove = currentRole === 'admin';
   const canChangeRole = currentRole === 'admin';
-
-  const fetchTeams = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const data = await teamsApi.list(token);
-      setTeams(Array.isArray(data) ? data : []);
-    } catch {
-      toast(t("failedToLoadTeams"), "error");
-    } finally {
-      setLoading(false);
-    }
-  }, [token, toast, t]);
 
   const fetchMembers = useCallback(async (teamId: string) => {
     if (!token) return;

@@ -24,7 +24,7 @@ export function NotificationCenter() {
         notificationsApi.getUnreadCount(token).catch(() => null),
       ]);
       if (notifData) setNotifications(notifData.notifications || []);
-      if (countData) setUnreadCount(countData.count || 0);
+      if (countData) setUnreadCount(countData.unread_count || 0);
     } catch {
       // Silently fail - notifications are non-critical
     }
