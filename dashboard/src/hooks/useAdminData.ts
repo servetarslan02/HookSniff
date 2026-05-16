@@ -809,3 +809,24 @@ export function useAdminReplayDelivery() {
     },
   });
 }
+
+// ════════════════════════════════════════════════════════════════
+// Public Feature Flags — no auth required
+// ════════════════════════════════════════════════════════════════
+
+export function useFeatureFlags() {
+  return useQuery({
+    queryKey: ['feature-flags'],
+    queryFn: async () => {
+      const res = await fetch('/api/v1/feature-flags');
+      if (!res.ok) return { enabled_flags: [] as string[] };
+      return res.json() as Promise<{ enabled_flags: string[] }>;
+    },
+    staleTime: 60_000,
+  });
+}
+
+export function useIsFeatureEnabled(flagName: string): boolean {
+  const { data } = useFeatureFlags();
+  return data?.enabled_flags?.includes(flagName) ?? false;
+}

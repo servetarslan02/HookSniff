@@ -79,6 +79,20 @@ const statusStyles: Record<string, { bg: string; text: string; ring: string; dot
     dot: 'bg-violet-500',
     icon: '↩',
   },
+  cached: {
+    bg: 'bg-cyan-50 dark:bg-cyan-500/10',
+    text: 'text-cyan-700 dark:text-cyan-400',
+    ring: 'ring-cyan-600/20 dark:ring-cyan-500/30',
+    dot: 'bg-cyan-500',
+    icon: '🔁',
+  },
+  filtered: {
+    bg: 'bg-gray-50 dark:bg-gray-500/10',
+    text: 'text-gray-500 dark:text-gray-400',
+    ring: 'ring-gray-400/20 dark:ring-gray-500/30',
+    dot: 'bg-gray-400',
+    icon: '⏭',
+  },
 };
 
 const sizeClasses = {
