@@ -46,13 +46,11 @@ struct AlertRule {
 }
 
 #[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
 struct CreateAlertRequest {
     name: String,
     condition: String, // "failure_rate", "latency", "consecutive_failures"
     threshold: i32,
     channels: Vec<String>, // "slack", "email", "webhook"
-    _endpoint_id: Option<Uuid>,
 }
 
 async fn list_alerts(
@@ -167,9 +165,9 @@ async fn update_alert(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
     Json(req): Json<UpdateAlertRequest>,
 ) -> Result<Json<AlertRule>, AppError> {
-    // Verify ownership
+    // Verify ownership (allow platform alerts too)
     let _existing: (Uuid,) =
-        sqlx::query_as("SELECT id FROM alert_rules WHERE id = $1 AND customer_id = $2")
+        sqlx::query_as("SELECT id FROM alert_rules WHERE id = $1 AND (customer_id = $2 OR customer_id IS NULL)")
             .bind(id)
             .bind(customer.id)
             .fetch_optional(&pool)
@@ -211,7 +209,7 @@ async fn update_alert(
             channels = COALESCE($4, channels),
             is_active = COALESCE($5, is_active),
             updated_at = NOW()
-         WHERE id = $6 AND customer_id = $7
+         WHERE id = $6 AND (customer_id = $7 OR customer_id IS NULL)
          RETURNING id, name, condition, threshold, channels, is_active, created_at"
     )
     .bind(req.name.as_deref())
@@ -250,8 +248,9 @@ async fn get_alert(
     Extension(customer): Extension<Customer>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<AlertRule>, AppError> {
+    // Allow viewing both user's own alerts AND platform alerts (customer_id IS NULL)
     let alert = sqlx::query_as::<_, (Uuid, String, String, i32, serde_json::Value, bool, chrono::DateTime<chrono::Utc>)>(
-        "SELECT id, name, condition, threshold, channels, is_active, created_at FROM alert_rules WHERE id = $1 AND customer_id = $2"
+        "SELECT id, name, condition, threshold, channels, is_active, created_at FROM alert_rules WHERE id = $1 AND (customer_id = $2 OR customer_id IS NULL)"
     )
     .bind(id)
     .bind(customer.id)
@@ -285,7 +284,8 @@ async fn delete_alert(
     Extension(customer): Extension<Customer>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let result = sqlx::query("DELETE FROM alert_rules WHERE id = $1 AND customer_id = $2")
+    // Allow deleting both user's own alerts AND platform alerts (customer_id IS NULL)
+    let result = sqlx::query("DELETE FROM alert_rules WHERE id = $1 AND (customer_id = $2 OR customer_id IS NULL)")
         .bind(id)
         .bind(customer.id)
         .execute(&pool)
@@ -332,7 +332,7 @@ async fn test_alert(
 
     // Create an in-app notification for the user
     let _ = sqlx::query(
-        "INSERT INTO notifications (customer_id, title, body, is_read) VALUES ($1, $2, $3, false)"
+        "INSERT INTO notifications (customer_id, type, title, message, is_read) VALUES ($1, 'alert', $2, $3, false)"
     )
     .bind(customer.id)
     .bind(format!("🚨 Test Alert: {}", alert_name))
