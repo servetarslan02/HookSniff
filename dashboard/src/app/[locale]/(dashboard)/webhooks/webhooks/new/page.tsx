@@ -10,7 +10,7 @@ import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
 
 export default function SendWebhookPage() {
   const { toast } = useToast();
-  const { data: endpoints = [], isLoading: loadingEndpoints } = useEndpoints();
+  const { data: endpoints = [] } = useEndpoints();
   const createWebhook = useCreateWebhook();
   const [endpointId, setEndpointId] = useState('');
   const [eventType, setEventType] = useState('');
