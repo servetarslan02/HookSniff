@@ -304,22 +304,23 @@ async fn test_alert(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Verify ownership and fetch alert details
-    let alert = sqlx::query_as::<_, AlertRule>(
-        "SELECT id, name, condition, threshold, channels, is_active, created_at::text          FROM alert_rules WHERE id = $1 AND customer_id = $2",
+    let alert_info: Option<(Uuid, String, String)> = sqlx::query_as(
+        "SELECT id, name, condition FROM alert_rules WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
     .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    .await?;
+
+    let (alert_id, alert_name, alert_condition) = alert_info.ok_or(AppError::NotFound)?;
 
     // Publish AlertTriggered event (best-effort)
     if let Some(ref publisher) = event_publisher {
         if let Err(e) = publisher.publish(crate::events::AppEvent::AlertTriggered {
-            alert_id: alert.id,
+            alert_id,
             customer_id: customer.id,
-            name: alert.name.clone(),
-            condition: alert.condition.clone(),
+            name: alert_name,
+            condition: alert_condition,
         }).await {
             tracing::warn!("Failed to publish AlertTriggered event: {:?}", e);
         }
