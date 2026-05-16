@@ -19,6 +19,19 @@ impl Language {
             _ => Self::Tr,
         }
     }
+
+    /// Detect language from Accept-Language header value.
+    /// Checks the primary language tag (e.g. "en-US" → En, "tr" → Tr).
+    /// Defaults to English for non-Turkish languages (international users).
+    pub fn from_accept_language(header: &str) -> Self {
+        let primary = header.split(',').next().unwrap_or("").trim();
+        let lang_tag = primary.split(';').next().unwrap_or("").trim().to_lowercase();
+        if lang_tag.starts_with("tr") {
+            Self::Tr
+        } else {
+            Self::En
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -365,6 +378,11 @@ impl EmailProvider {
             "⚠️ No email provider configured (RESEND_API_KEY and GCP_SA_JSON both missing)"
         );
         Self::None
+    }
+
+    /// Returns true if an email provider is actually configured.
+    pub fn is_configured(&self) -> bool {
+        !matches!(self, Self::None)
     }
 
     pub async fn send_contact_email(
