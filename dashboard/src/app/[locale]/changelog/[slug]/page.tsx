@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+
+// ISR: revalidate every hour
+export const revalidate = 3600;
 import {
   changelog,
   getChangelogBySlug,
