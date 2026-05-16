@@ -5,7 +5,6 @@ import {
   api, endpointsApi, webhooksApi, analyticsApi, statsApi,
   billingApiExtended, applicationsApi, alertsApi, teamsApi,
   transformsApi, inboundApi, notificationsApi, apiFetch,
-  type Endpoint, type RetryPolicyConfig,
   type AlertRule, type Team, type TeamMember,
   type DeliveryDetail, type DeliveryAttempt, type NotificationListResponse,
   type AuditLogEntryResponse, type EndpointHealthResponse,
