@@ -4,7 +4,9 @@ compatibility_date = "2024-12-01"
 
 # ── Environment ──
 [vars]
-API_BASE = "https://hooksniff-api-1046140057667.europe-west1.run.app"
+API_BASE = "https://hooksniff-api-sdjufmaqka-ew.a.run.app"
+API_BASE_EU = "https://hooksniff-api-sdjufmaqka-ey.a.run.app"
+API_BASE_ME = "https://hooksniff-api-sdjufmaqka-zf.a.run.app"
 ENVIRONMENT = "production"
 
 # ── KV Namespaces (for rate limiting & edge caching) ──
