@@ -113,11 +113,13 @@ export default function AdminUsersPage() {
     if (!token) return;
     try {
       const result = await adminApi.impersonateUser(token, user.id);
-      // Store token in sessionStorage (more secure than URL params)
-      const sessionKey = `impersonate_token_${Date.now()}`;
-      sessionStorage.setItem(sessionKey, result.token);
-      // Open with session key instead of token in URL
-      window.open(`/${locale}/dashboard?impersonate_session=${sessionKey}`, '_blank');
+      // Open window synchronously before async operations (avoids popup blocker)
+      const newWindow = window.open('about:blank', '_blank');
+      if (newWindow) {
+        // Store token in sessionStorage of the new window via URL param
+        // Dashboard will read impersonate_token from URL and store it
+        newWindow.location.href = `/${locale}/dashboard?impersonate_token=${result.token}`;
+      }
       toast(t('impersonating') + `: ${user.email}`, 'success');
     } catch {
       toast(tc('error'), 'error');
