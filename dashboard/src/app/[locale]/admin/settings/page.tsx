@@ -289,68 +289,19 @@ export default function AdminSettingsPage() {
         </div>
       </div>
 
-      {/* Plan Limits */}
+      {/* Plan Limits & Prices — moved to Revenue page */}
       <div className={`glass-card p-6 ${settingsTab !== 'general' ? 'hidden' : ''}`}>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('planLimits')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('freePlan')}</h3>
-            <div className="space-y-3">
-              <div>
-                <label htmlFor="max_endpoints_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')} <span className="text-red-500">*</span></label>
-                <input id="max_endpoints_free" type="number" min={1} max={999} value={settings.max_endpoints_free} onChange={(e) => update('max_endpoints_free', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              </div>
-              <div>
-                <label htmlFor="max_webhooks_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxWebhooksMonth')} <span className="text-red-500">*</span></label>
-                <input id="max_webhooks_free" type="number" min={0} max={9999999} value={settings.max_webhooks_free} onChange={(e) => update('max_webhooks_free', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              </div>
-              <div>
-                <label htmlFor="rate_limit_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('rateLimitReqMin')} <span className="text-red-500">*</span></label>
-                <input id="rate_limit_free" type="number" min={1} max={100000} value={settings.rate_limit_free} onChange={(e) => update('rate_limit_free', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              </div>
-              <div>
-                <label htmlFor="retention_days_free" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('retentionDays')} <span className="text-red-500">*</span></label>
-                <input id="retention_days_free" type="number" min={1} max={365} value={settings.retention_days_free} onChange={(e) => update('retention_days_free', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              </div>
-            </div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💰 {t('planPrices') || 'Plan Prices & Limits'}</h2>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('planPricesMoved') || 'Plan prices and limits are now managed from the Revenue page.'}</p>
           </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('proPlan')}</h3>
-            <div className="space-y-3">
-              <div>
-                <label htmlFor="max_endpoints_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxEndpoints')} <span className="text-red-500">*</span></label>
-                <input id="max_endpoints_pro" type="number" min={1} max={999} value={settings.max_endpoints_pro} onChange={(e) => update('max_endpoints_pro', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              </div>
-              <div>
-                <label htmlFor="max_webhooks_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('maxWebhooksMonth')} <span className="text-red-500">*</span></label>
-                <input id="max_webhooks_pro" type="number" min={0} max={9999999} value={settings.max_webhooks_pro} onChange={(e) => update('max_webhooks_pro', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              </div>
-              <div>
-                <label htmlFor="rate_limit_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('rateLimitReqMin')} <span className="text-red-500">*</span></label>
-                <input id="rate_limit_pro" type="number" min={1} max={100000} value={settings.rate_limit_pro} onChange={(e) => update('rate_limit_pro', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              </div>
-              <div>
-                <label htmlFor="retention_days_pro" className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('retentionDays')} <span className="text-red-500">*</span></label>
-                <input id="retention_days_pro" type="number" min={1} max={365} value={settings.retention_days_pro} onChange={(e) => update('retention_days_pro', parseInt(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Plan Prices */}
-      <div className={`glass-card p-6 ${settingsTab !== 'general' ? 'hidden' : ''}`}>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💰 {t('planPrices') || 'Plan Prices'}</h2>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('planPricesDesc') || 'Monthly prices used for revenue calculations.'}</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="plan_price_pro" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('proPlan')} ($) <span className="text-red-500">*</span></label>
-            <input id="plan_price_pro" type="number" min={0} max={99999} step={0.01} value={settings.plan_price_pro} onChange={(e) => update('plan_price_pro', parseFloat(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-          </div>
-          <div>
-            <label htmlFor="plan_price_business" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('businessPlan')} ($) <span className="text-red-500">*</span></label>
-            <input id="plan_price_business" type="number" min={0} max={99999} step={0.01} value={settings.plan_price_business} onChange={(e) => update('plan_price_business', parseFloat(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-          </div>
+          <a
+            href="/admin/revenue"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 text-white hover:bg-brand-700 transition"
+          >
+            {t('goToRevenue') || 'Go to Revenue'} →
+          </a>
         </div>
       </div>
 
