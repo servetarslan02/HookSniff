@@ -1694,6 +1694,24 @@ async fn create_feature_flag(
 ) -> Result<impl IntoResponse, AppError> {
     require_admin_write(&customer)?;
 
+    // Validate and sanitize name
+    let name = body.name.trim();
+    if name.is_empty() || name.len() > 100 {
+        return Err(AppError::BadRequest("Flag name must be 1-100 characters".into()));
+    }
+    if !name.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '-') {
+        return Err(AppError::BadRequest("Flag name may only contain alphanumeric, underscore, or hyphen".into()));
+    }
+
+    // Check for duplicate name
+    let exists = sqlx::query_scalar::<_, bool>("SELECT EXISTS(SELECT 1 FROM feature_flags WHERE name = $1)")
+        .bind(name)
+        .fetch_one(&pool)
+        .await?;
+    if exists {
+        return Err(AppError::BadRequest(format!("Flag '{}' already exists", name)));
+    }
+
     let plans_json = serde_json::to_value(body.enabled_for_plans.unwrap_or_default())?;
 
     let flag = sqlx::query_as::<_, FeatureFlag>(
@@ -1701,7 +1719,7 @@ async fn create_feature_flag(
          VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING id, name, description, is_enabled, rollout_percentage, enabled_for_plans, created_by, created_at, updated_at"
     )
-    .bind(&body.name)
+    .bind(name)
     .bind(&body.description)
     .bind(body.is_enabled.unwrap_or(false))
     .bind(body.rollout_percentage.unwrap_or(100))
@@ -1732,8 +1750,28 @@ async fn update_feature_flag(
     .await?
     .ok_or(AppError::NotFound)?;
 
-    let new_name = body.name.as_deref().unwrap_or(&current.name);
-    let new_desc: Option<String> = body.description.or_else(|| current.description.clone());
+    // Name: use provided (trimmed) or keep current
+    let new_name = match body.name {
+        Some(ref n) => {
+            let trimmed = n.trim();
+            if trimmed.is_empty() || trimmed.len() > 100 {
+                return Err(AppError::BadRequest("Flag name must be 1-100 characters".into()));
+            }
+            if !trimmed.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '-') {
+                return Err(AppError::BadRequest("Flag name may only contain alphanumeric, underscore, or hyphen".into()));
+            }
+            trimmed.to_string()
+        }
+        None => current.name.clone(),
+    };
+
+    // Description: explicit null clears it, None keeps current
+    let new_desc: Option<String> = match body.description {
+        Some(d) if d.trim().is_empty() => None,
+        Some(d) => Some(d),
+        None => current.description.clone(),
+    };
+
     let new_enabled = body.is_enabled.unwrap_or(current.is_enabled);
     let new_pct = body.rollout_percentage.unwrap_or(current.rollout_percentage);
     let new_plans = if let Some(ref plans) = body.enabled_for_plans {
@@ -1747,7 +1785,7 @@ async fn update_feature_flag(
          WHERE id = $6
          RETURNING id, name, description, is_enabled, rollout_percentage, enabled_for_plans, created_by, created_at, updated_at"
     )
-    .bind(new_name)
+    .bind(&new_name)
     .bind(new_desc)
     .bind(new_enabled)
     .bind(new_pct)
