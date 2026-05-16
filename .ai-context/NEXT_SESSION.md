@@ -116,6 +116,9 @@ Bu dosyayı ilk kez okuyorsan:
 | 6 | Edge proxy routing | ✅ | Multi-region restore edildi |
 | 7 | device_tokens tablo | ✅ | Migration 019 eklendi |
 | 8 | Audit Log React crash | ✅ | details JSON render fix |
+| 9 | Response gzip middleware | ⏳ | Rust API'ye gzip ekle → %30-50 küçülme |
+| 10 | Redis cache (stats, health) | ⏳ | Sıkça sorulan endpoint'leri 30sn cache'le |
+| 11 | Edge cache süresi artır | ⏳ | Cloudflare GET cache 10sn → 60sn |
 
 ### Öncelik 1 — Güvenlik (P0 kalan)
 | # | Görev | Durum | Dosya |
