@@ -135,39 +135,6 @@ export function useSuccessRate(range = '24h') {
 
 // ── Mutations ──
 
-export function useUpdateEndpoint() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: string;
-      data: Partial<Endpoint> & { retry_policy?: RetryPolicyConfig };
-    }) => endpointsApi.update(token!, id, data),
-    onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: ['endpoint', id] });
-      const previous = queryClient.getQueryData(['endpoint', id]);
-      queryClient.setQueryData(['endpoint', id], (old: unknown) => ({
-        ...(old as Record<string, unknown>),
-        ...data,
-      }));
-      return { previous };
-    },
-    onError: (_err, { id }, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(['endpoint', id], context.previous);
-      }
-    },
-    onSettled: (_data, _error, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['endpoint', id] });
-      queryClient.invalidateQueries({ queryKey: ['endpoints'] });
-    },
-  });
-}
-
 export function useDeleteEndpoint() {
   const { token } = useAuth();
   const queryClient = useQueryClient();

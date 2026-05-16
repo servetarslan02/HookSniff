@@ -2607,7 +2607,17 @@
     "queueRetry": "Queue & Retry",
     "queueRetryDesc": "Excess requests are queued and delivered when capacity is available. Failed deliveries retry with exponential backoff.",
     "perEndpointConfig": "Per-Endpoint Config",
-    "perEndpointConfigDesc": "Each endpoint can have custom rate limits. Defaults: 10 req/sec, 600 req/min, burst 20."
+    "perEndpointConfigDesc": "Each endpoint can have custom rate limits. Defaults: 10 req/sec, 600 req/min, burst 20.",
+    "editLimit": "Edit Limit",
+    "deleteLimit": "Delete Limit",
+    "deleteConfirm": "Are you sure you want to delete the rate limit for this endpoint?",
+    "requestsPerSecond": "Requests per Second",
+    "burstSize": "Burst Size",
+    "enabled": "Enabled",
+    "limitUpdated": "Rate limit updated",
+    "limitDeleted": "Rate limit deleted",
+    "limitUpdateFailed": "Failed to update rate limit",
+    "limitDeleteFailed": "Failed to delete rate limit"
   },
   "portal": {
     "title": "👤 Customer Portal",
