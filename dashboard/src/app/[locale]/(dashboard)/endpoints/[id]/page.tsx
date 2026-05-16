@@ -87,7 +87,7 @@ export default function EndpointSettingsPage() {
 
       <SignatureCard
         endpointId={id}
-        signingSecret={endpoint.signing_secret}
+        signingSecret={endpoint.signing_secret ?? undefined}
       />
 
       <RateLimitCard endpoint={endpoint} />
