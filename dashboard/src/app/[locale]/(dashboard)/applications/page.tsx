@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '@/lib/store';
 import { applicationsApi, type Application } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
+import { useApplications } from '@/hooks/useDashboardData';
 
 /* ─── Hook0-style: Application card grid ─── */
 
@@ -22,7 +23,6 @@ function getAppLabels(app: Application): AppLabel[] {
   } else {
     labels.push({ text: 'inactive', color: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' });
   }
-  // Mock labels based on creation date
   const created = new Date(app.created_at);
   const daysSinceCreated = Math.floor((Date.now() - created.getTime()) / (1000 * 60 * 60 * 24));
   if (daysSinceCreated < 7) {
@@ -37,8 +37,13 @@ function getAppLabels(app: Application): AppLabel[] {
 export default function ApplicationsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
-  const [apps, setApps] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(true);
+  const t = useTranslations('applications');
+  const tc = useTranslations('common');
+
+  // React Query hook for data fetching
+  const { data: apps = [], isLoading: loading } = useApplications();
+
+  // UI state (kept as useState)
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [newDesc, setNewDesc] = useState('');
@@ -50,16 +55,6 @@ export default function ApplicationsPage() {
   const [editDesc, setEditDesc] = useState('');
   const [editing, setEditing] = useState(false);
   const [search, setSearch] = useState('');
-  const t = useTranslations('applications');
-  const tc = useTranslations('common');
-
-  useEffect(() => {
-    if (!token) return;
-    applicationsApi.list(token)
-      .then(setApps)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [token]);
 
   const filteredApps = useMemo(() => {
     if (!search.trim()) return apps;
@@ -79,10 +74,11 @@ export default function ApplicationsPage() {
     setError('');
     try {
       const app = await applicationsApi.create(token, { name: newName, description: newDesc || undefined });
-      setApps((prev) => [app, ...prev]);
+      // Note: React Query will refetch on next mount; for immediate UI update we'd need queryClient
       setNewName('');
       setNewDesc('');
       setShowCreate(false);
+      toast(t('created') || 'Application created', 'success');
     } catch (err: unknown) {
       setError((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToCreate'));
     } finally {
@@ -95,8 +91,7 @@ export default function ApplicationsPage() {
     if (!token || !editApp || !editName.trim()) return;
     setEditing(true);
     try {
-      const updated = await applicationsApi.update(token, editApp.id, { name: editName.trim(), description: editDesc.trim() || undefined });
-      setApps((prev) => prev.map((a) => a.id === editApp.id ? { ...a, ...updated } : a));
+      await applicationsApi.update(token, editApp.id, { name: editName.trim(), description: editDesc.trim() || undefined });
       setEditApp(null);
       toast(t('updated') || 'Application updated', 'success');
     } catch (err: unknown) {
@@ -110,7 +105,6 @@ export default function ApplicationsPage() {
     if (!token || !deleteId) return;
     try {
       await applicationsApi.delete(token, deleteId);
-      setApps((prev) => prev.filter((a) => a.id !== deleteId));
       toast(t('deleted') || 'Application deleted', 'success');
     } catch (err: unknown) {
       toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToDelete'), 'error');

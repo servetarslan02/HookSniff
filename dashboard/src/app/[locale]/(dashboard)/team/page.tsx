@@ -1,82 +1,75 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { teamsApi, type Team, type TeamMember } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import {
+  useTeams,
+  useTeamMembers,
+  useCreateTeam,
+  useInviteTeamMember,
+  useRemoveTeamMember,
+  useUpdateTeamMemberRole,
+  useAcceptTeamInvite,
+} from '@/hooks/useDashboardData';
 import { TeamList } from './components/TeamList';
 import { TeamDetail } from './components/TeamDetail';
 import { CreateTeamModal } from './components/CreateTeamModal';
 import { InviteMemberModal } from './components/InviteMemberModal';
 
 export default function TeamPage() {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
-  const [teams, setTeams] = useState<Team[]>([]);
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
-  const [members, setMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  const [removeTarget, setRemoveTarget] = useState<string | null>(null);
   const t = useTranslations('team');
   const searchParams = useSearchParams();
 
-  const fetchTeams = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const data = await teamsApi.list(token);
-      setTeams(Array.isArray(data) ? data : []);
-    } catch {
-      toast(t("failedToLoadTeams"), "error");
-    } finally {
-      setLoading(false);
-    }
-  }, [token, toast, t]);
+  // React Query hooks for data fetching
+  const { data: teams = [], isLoading: loading } = useTeams();
+  const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+  const { data: members = [] } = useTeamMembers(selectedTeamId);
+
+  // Mutations
+  const createTeamMutation = useCreateTeam();
+  const inviteMemberMutation = useInviteTeamMember();
+  const removeMemberMutation = useRemoveTeamMember();
+  const updateRoleMutation = useUpdateTeamMemberRole();
+  const acceptInviteMutation = useAcceptTeamInvite();
+
+  // UI state
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<string | null>(null);
+
+  const selectedTeam = teams.find((t) => t.id === selectedTeamId) ?? null;
 
   // Auto-accept invite if invite_token is in URL
   useEffect(() => {
     const inviteToken = searchParams.get('invite_token');
-    if (!inviteToken || !token) return;
-    teamsApi.acceptInvite(token, inviteToken).then((result) => {
-      toast(t('inviteAccepted') || `Invite accepted! Joined team as ${result.role}`, 'success');
-      fetchTeams();
-    }).catch((err) => {
-      const msg = err instanceof Error ? err.message : (t('inviteAcceptFailed') || 'Failed to accept invite');
-      toast(msg, 'error');
+    if (!inviteToken) return;
+    acceptInviteMutation.mutate(inviteToken, {
+      onSuccess: (result) => {
+        toast(t('inviteAccepted') || `Invite accepted! Joined team as ${result.role}`, 'success');
+      },
+      onError: (err) => {
+        const msg = err instanceof Error ? err.message : (t('inviteAcceptFailed') || 'Failed to accept invite');
+        toast(msg, 'error');
+      },
     });
-  }, [searchParams, token, toast, t, fetchTeams]);
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const currentRole = members.find((m) => m.customer_id === user?.id)?.role || 'viewer';
   const canInvite = currentRole === 'admin';
   const canRemove = currentRole === 'admin';
   const canChangeRole = currentRole === 'admin';
 
-  const fetchMembers = useCallback(async (teamId: string) => {
-    if (!token) return;
-    try {
-      const data = await teamsApi.listMembers(token, teamId);
-      setMembers(Array.isArray(data) ? data : []);
-    } catch {
-      toast(t("failedToLoadMembers"), "error");
-    }
-  }, [token, toast, t]);
-
-  useEffect(() => { fetchTeams(); }, [fetchTeams]);
-  useEffect(() => {
-    if (selectedTeam) fetchMembers(selectedTeam.id);
-  }, [selectedTeam, fetchMembers]);
-
   const handleCreate = async (name: string) => {
-    if (!token) return;
     try {
-      await teamsApi.create(token, { name });
+      await createTeamMutation.mutateAsync({ name });
       toast(t('teamCreated'), 'success');
-      fetchTeams();
+      setShowCreateModal(false);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('failedToCreateTeam');
       toast(msg, 'error');
@@ -84,11 +77,11 @@ export default function TeamPage() {
   };
 
   const handleInvite = async (email: string, role: string) => {
-    if (!token || !selectedTeam) return;
+    if (!selectedTeamId) return;
     try {
-      await teamsApi.inviteMember(token, selectedTeam.id, { email, role });
+      await inviteMemberMutation.mutateAsync({ teamId: selectedTeamId, data: { email, role } });
       toast(t('invitationSent'), 'success');
-      fetchMembers(selectedTeam.id);
+      setShowInviteModal(false);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('failedToInvite');
       toast(msg, 'error');
@@ -96,11 +89,10 @@ export default function TeamPage() {
   };
 
   const confirmRemoveMember = async () => {
-    if (!token || !selectedTeam || !removeTarget) return;
+    if (!selectedTeamId || !removeTarget) return;
     try {
-      await teamsApi.removeMember(token, selectedTeam.id, removeTarget);
+      await removeMemberMutation.mutateAsync({ teamId: selectedTeamId, memberId: removeTarget });
       toast(t('memberRemoved'), 'success');
-      fetchMembers(selectedTeam.id);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('removeFailed');
       toast(msg, 'error');
@@ -109,15 +101,14 @@ export default function TeamPage() {
   };
 
   const handleRoleChange = async (memberId: string, newRole: string) => {
-    if (!token || !selectedTeam) return;
+    if (!selectedTeamId) return;
     if (memberId === user?.id && newRole !== 'admin') {
       toast(t('cannotDemoteSelf'), 'error');
       return;
     }
     try {
-      await teamsApi.updateRole(token, selectedTeam.id, memberId, newRole);
+      await updateRoleMutation.mutateAsync({ teamId: selectedTeamId, memberId, role: newRole });
       toast(t('roleUpdated'), 'success');
-      fetchMembers(selectedTeam.id);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('failedToUpdateRole');
       toast(msg, 'error');
@@ -147,7 +138,7 @@ export default function TeamPage() {
           teams={teams}
           loading={loading}
           selectedTeamId={selectedTeam?.id}
-          onSelect={setSelectedTeam}
+          onSelect={(team) => setSelectedTeamId(team?.id ?? null)}
         />
 
         <div className="lg:col-span-2">

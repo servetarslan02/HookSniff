@@ -32,3 +32,25 @@
 - Cloud Build: push to main → Docker build → Cloud Run deploy
 - WS default config: enabled=true, 100 max connection, 5/user, 30s heartbeat
 - Rust build CI/CD'de oluyor (GitHub Actions + Cloud Build), local'de gerek yok
+
+---
+
+## 2026-05-16 Oturum 183 — React Query Tamamlama
+
+### Yapılan
+- 14 sayfa daha React Query'e çevrildi (toplam 25/25 dashboard sayfası)
+- 25+ yeni hook, 12+ yeni Zod schema
+- WS auth fix (query param token)
+- Cloud Run timeout + env var fix
+- URL-driven state (4 sayfa)
+
+### Kalan (düşük öncelik)
+Aşağıdaki sayfalar ya statik ya da çok az API çağrısı var:
+- rate-limiting/page.tsx — veri yok
+- retry-policy/page.tsx — veri yok
+- portal-customize/page.tsx — veri yok
+- webhook-builder/page.tsx — API yok (client-side)
+- routing/page.tsx — API yok
+- schemas/page.tsx — API yok
+- templates/page.tsx — API yok
+- custom-domain/page.tsx — API yok

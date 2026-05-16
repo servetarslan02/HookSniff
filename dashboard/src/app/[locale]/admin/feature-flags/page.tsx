@@ -1,21 +1,32 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { adminApi, type FeatureFlag } from '@/lib/api';
 import { useTranslations } from 'next-intl';
+import type { FeatureFlagValidated } from '@/schemas/api';
+import {
+  useAdminFeatureFlags,
+  useCreateFeatureFlag,
+  useUpdateFeatureFlag,
+  useDeleteFeatureFlag,
+} from '@/hooks/useAdminData';
 
 export default function FeatureFlagsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('featureFlags');
   const ta = useTranslations('admin');
-  const [flags, setFlags] = useState<FeatureFlag[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const { data, isLoading } = useAdminFeatureFlags();
+  const flags = data?.flags ?? [];
+  const createMutation = useCreateFeatureFlag();
+  const updateMutation = useUpdateFeatureFlag();
+  const deleteMutation = useDeleteFeatureFlag();
+
   const [showCreate, setShowCreate] = useState(false);
-  const [editTarget, setEditTarget] = useState<FeatureFlag | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<FeatureFlag | null>(null);
+  const [editTarget, setEditTarget] = useState<FeatureFlagValidated | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<FeatureFlagValidated | null>(null);
 
   // Create form
   const [newName, setNewName] = useState('');
@@ -23,7 +34,6 @@ export default function FeatureFlagsPage() {
   const [newEnabled, setNewEnabled] = useState(false);
   const [newRollout, setNewRollout] = useState(100);
   const [newPlans, setNewPlans] = useState<string[]>([]);
-  const [creating, setCreating] = useState(false);
 
   // Edit form
   const [editName, setEditName] = useState('');
@@ -31,31 +41,14 @@ export default function FeatureFlagsPage() {
   const [editEnabled, setEditEnabled] = useState(false);
   const [editRollout, setEditRollout] = useState(100);
   const [editPlans, setEditPlans] = useState<string[]>([]);
-  const [saving, setSaving] = useState(false);
 
   const PLAN_OPTIONS = ['developer', 'startup', 'pro', 'enterprise'];
-
-  const fetchFlags = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const data = await adminApi.listFeatureFlags(token);
-      setFlags(data.flags || []);
-    } catch {
-      toast(t('loadFailed'), 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [token, t, toast]);
-
-  useEffect(() => { fetchFlags(); }, [fetchFlags]);
 
   /* ─── Create ─── */
   const handleCreate = async () => {
     if (!token || !newName.trim()) return;
-    setCreating(true);
     try {
-      await adminApi.createFeatureFlag(token, {
+      await createMutation.mutateAsync({
         name: newName.trim(),
         description: newDesc || undefined,
         is_enabled: newEnabled,
@@ -69,64 +62,57 @@ export default function FeatureFlagsPage() {
       setNewEnabled(false);
       setNewRollout(100);
       setNewPlans([]);
-      fetchFlags();
     } catch (err) {
       toast(err instanceof Error ? err.message : t('createFailed'), 'error');
-    } finally {
-      setCreating(false);
     }
   };
 
   /* ─── Edit ─── */
-  const openEdit = (flag: FeatureFlag) => {
+  const openEdit = (flag: FeatureFlagValidated) => {
     setEditTarget(flag);
     setEditName(flag.name);
     setEditDesc(flag.description || '');
     setEditEnabled(flag.is_enabled);
-    setEditRollout(flag.rollout_percentage);
+    setEditRollout(flag.rollout_percentage ?? 100);
     setEditPlans(flag.enabled_for_plans || []);
   };
 
   const handleSave = async () => {
     if (!token || !editTarget) return;
-    setSaving(true);
     try {
-      await adminApi.updateFeatureFlag(token, editTarget.id, {
-        name: editName,
-        description: editDesc || undefined,
-        is_enabled: editEnabled,
-        rollout_percentage: editRollout,
-        enabled_for_plans: editPlans,
+      await updateMutation.mutateAsync({
+        id: editTarget.id,
+        data: {
+          name: editName,
+          description: editDesc || undefined,
+          is_enabled: editEnabled,
+          rollout_percentage: editRollout,
+          enabled_for_plans: editPlans,
+        },
       });
       toast(t('updated'), 'success');
       setEditTarget(null);
-      fetchFlags();
     } catch (err) {
       toast(err instanceof Error ? err.message : t('updateFailed'), 'error');
-    } finally {
-      setSaving(false);
     }
   };
 
   /* ─── Quick Toggle ─── */
-  const handleToggle = async (flag: FeatureFlag) => {
+  const handleToggle = (flag: FeatureFlagValidated) => {
     if (!token) return;
-    try {
-      await adminApi.updateFeatureFlag(token, flag.id, { is_enabled: !flag.is_enabled });
-      setFlags((prev) => prev.map((f) => f.id === flag.id ? { ...f, is_enabled: !f.is_enabled } : f));
-    } catch {
-      toast(t('toggleFailed'), 'error');
-    }
+    updateMutation.mutate({
+      id: flag.id,
+      data: { is_enabled: !flag.is_enabled },
+    });
   };
 
   /* ─── Delete ─── */
   const handleDelete = async () => {
     if (!token || !deleteTarget) return;
     try {
-      await adminApi.deleteFeatureFlag(token, deleteTarget.id);
+      await deleteMutation.mutateAsync(deleteTarget.id);
       toast(t('deleted'), 'success');
       setDeleteTarget(null);
-      fetchFlags();
     } catch {
       toast(t('deleteFailed'), 'error');
     }
@@ -156,7 +142,7 @@ export default function FeatureFlagsPage() {
 
       {/* Flags List */}
       <div className="glass-card overflow-hidden">
-        {loading ? (
+        {isLoading ? (
           <div className="p-12 text-center animate-pulse text-gray-500 dark:text-slate-400">Loading...</div>
         ) : flags.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400">
@@ -205,13 +191,13 @@ export default function FeatureFlagsPage() {
                   <div className="flex items-center gap-4">
                     {/* Rollout */}
                     <div className="text-right">
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">{flag.rollout_percentage}%</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{flag.rollout_percentage ?? 100}%</span>
                       <p className="text-xs text-gray-500 dark:text-slate-400">rollout</p>
                     </div>
 
                     {/* Plans */}
                     <div className="flex gap-1">
-                      {flag.enabled_for_plans?.length > 0 ? (
+                      {flag.enabled_for_plans && flag.enabled_for_plans.length > 0 ? (
                         flag.enabled_for_plans.map((plan) => (
                           <span key={plan} className="px-2 py-0.5 rounded-full text-xs bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400">
                             {plan}
@@ -273,7 +259,7 @@ export default function FeatureFlagsPage() {
             </div>
             <div className="flex gap-3 justify-end mt-6">
               <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">Cancel</button>
-              <button type="button" onClick={handleCreate} disabled={creating || !newName.trim()} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">{creating ? 'Creating...' : 'Create'}</button>
+              <button type="button" onClick={handleCreate} disabled={createMutation.isPending || !newName.trim()} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">{createMutation.isPending ? 'Creating...' : 'Create'}</button>
             </div>
           </div>
         </div>
@@ -317,7 +303,7 @@ export default function FeatureFlagsPage() {
             </div>
             <div className="flex gap-3 justify-end mt-6">
               <button type="button" onClick={() => setEditTarget(null)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">Cancel</button>
-              <button type="button" onClick={handleSave} disabled={saving} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
+              <button type="button" onClick={handleSave} disabled={updateMutation.isPending} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">{updateMutation.isPending ? 'Saving...' : 'Save'}</button>
             </div>
           </div>
         </div>
