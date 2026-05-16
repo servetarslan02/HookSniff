@@ -21,7 +21,12 @@ const mockHealth = {
   redis: { status: 'unknown', latency_ms: 0 },
   api: { status: 'unknown', uptime_seconds: 0 },
   queue: { pending: 0, processing: 0, failed: 0 },
-};
+  checks: {
+    database: { status: 'unknown', latency_ms: 0 },
+    redis: { status: 'unknown', latency_ms: 0 },
+    queue: { status: 'unknown', latency_ms: 0, pending_count: 0 },
+  },
+} as const;
 
 export default function AdminSystemPage() {
   const t = useTranslations('admin');

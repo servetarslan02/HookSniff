@@ -50,10 +50,10 @@ const stories: Record<string, {
       'Real-time dashboard shows delivery success rates and error details',
     ],
     results: [
-      { label: t('metricEngineeringTime'), before: '3-6 months', after: '2 hours' },
-      { label: t('metricInfraCost'), before: '$2,500/mo', after: '$29/mo' },
-      { label: t('metricEventLoss'), before: '5%', after: '0%' },
-      { label: t('metricDeliveryLatency'), before: '2-5 seconds', after: '<200ms' },
+      { label: 'metricEngineeringTime', before: '3-6 months', after: '2 hours' },
+      { label: 'metricInfraCost', before: '$2,500/mo', after: '$29/mo' },
+      { label: 'metricEventLoss', before: '5%', after: '0%' },
+      { label: 'metricDeliveryLatency', before: '2-5 seconds', after: '<200ms' },
     ],
     techStack: ['Node.js', 'PostgreSQL', 'Redis', 'Shopify', 'Stripe'],
   },
@@ -82,9 +82,9 @@ const stories: Record<string, {
     ],
     results: [
       { label: 'Event loss', before: '2%', after: '0%' },
-      { label: t('metricFraudLatency'), before: '45 seconds', after: '<200ms' },
-      { label: t('metricAuditCompliance'), before: 'Manual', after: 'Automated' },
-      { label: t('metricReconciliation'), before: '12/month', after: '0/month' },
+      { label: 'metricFraudLatency', before: '45 seconds', after: '<200ms' },
+      { label: 'metricAuditCompliance', before: 'Manual', after: 'Automated' },
+      { label: 'metricReconciliation', before: '12/month', after: '0/month' },
     ],
     techStack: ['Python', 'FastAPI', 'PostgreSQL', 'Stripe', 'AWS'],
   },
@@ -112,10 +112,10 @@ const stories: Record<string, {
       'HookSniff scales automatically with agent fleet growth',
     ],
     results: [
-      { label: t('metricPollingEliminated'), before: '5s intervals', after: 'Event-driven' },
-      { label: t('metricAgentComm'), before: '10%', after: '0%' },
-      { label: t('metricComputeCost'), before: '$800/mo (polling)', after: '$29/mo' },
-      { label: t('metricScaleCapacity'), before: '50 agents', after: '200+ agents' },
+      { label: 'metricPollingEliminated', before: '5s intervals', after: 'Event-driven' },
+      { label: 'metricAgentComm', before: '10%', after: '0%' },
+      { label: 'metricComputeCost', before: '$800/mo (polling)', after: '$29/mo' },
+      { label: 'metricScaleCapacity', before: '50 agents', after: '200+ agents' },
     ],
     techStack: ['Python', 'Rust', 'OpenAI', 'LangChain', 'Redis'],
   },
@@ -143,10 +143,10 @@ const stories: Record<string, {
       'Upgrade path to Pro ($29/mo) when we need more volume',
     ],
     results: [
-      { label: t('metricMonthlyCost'), before: '$490 (Svix)', after: '$0' },
-      { label: t('metricIntegrationTime'), before: '2-3 weeks', after: '2 hours' },
-      { label: t('metricSatisfaction'), before: 'No webhooks', after: 'Real-time' },
-      { label: t('metricEngEffort'), before: 'Full-time', after: 'Zero' },
+      { label: 'metricMonthlyCost', before: '$490 (Svix)', after: '$0' },
+      { label: 'metricIntegrationTime', before: '2-3 weeks', after: '2 hours' },
+      { label: 'metricSatisfaction', before: 'No webhooks', after: 'Real-time' },
+      { label: 'metricEngEffort', before: 'Full-time', after: 'Zero' },
     ],
     techStack: ['Next.js', 'TypeScript', 'Vercel', 'PlanetScale'],
   },
@@ -174,10 +174,10 @@ const stories: Record<string, {
       'Complete delivery logs serve as compliance audit trail',
     ],
     results: [
-      { label: t('metricNoShow'), before: '15%', after: '3%' },
-      { label: t('metricDataRegion'), before: 'US', after: 'EU (Frankfurt)' },
-      { label: t('metricCompliance'), before: 'At risk', after: 'GDPR compliant' },
-      { label: t('metricMissedNotif'), before: '200/month', after: '0/month' },
+      { label: 'metricNoShow', before: '15%', after: '3%' },
+      { label: 'metricDataRegion', before: 'US', after: 'EU (Frankfurt)' },
+      { label: 'metricCompliance', before: 'At risk', after: 'GDPR compliant' },
+      { label: 'metricMissedNotif', before: '200/month', after: '0/month' },
     ],
     techStack: ['C#', '.NET', 'PostgreSQL', 'Azure', 'FHIR'],
   },
@@ -206,9 +206,9 @@ const stories: Record<string, {
     ],
     results: [
       { label: 'SDK coverage', before: '2 languages', after: '11 languages' },
-      { label: t('metricIntegrationReq'), before: '50/month', after: '5/month (self-serve)' },
-      { label: t('metricTimeToFirst'), before: '3 days', after: '15 minutes' },
-      { label: t('metricSupportTickets'), before: '40/month', after: '8/month' },
+      { label: 'metricIntegrationReq', before: '50/month', after: '5/month (self-serve)' },
+      { label: 'metricTimeToFirst', before: '3 days', after: '15 minutes' },
+      { label: 'metricSupportTickets', before: '40/month', after: '8/month' },
     ],
     techStack: ['Go', 'Rust', 'TypeScript', 'Docker', 'Kubernetes'],
   },
@@ -308,7 +308,7 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
           <div className="grid md:grid-cols-2 gap-4">
             {story.results.map((r) => (
               <div key={r.label} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-                <p className="text-sm text-gray-500 dark:text-slate-500 mb-2">{r.label}</p>
+                <p className="text-sm text-gray-500 dark:text-slate-500 mb-2">{t(r.label)}</p>
                 <div className="flex items-center gap-3">
                   <div>
                     <p className="text-xs text-gray-500 dark:text-slate-600">{t("before")}</p>
