@@ -1703,7 +1703,7 @@ async fn create_feature_flag(
     .bind(&body.name)
     .bind(&body.description)
     .bind(body.is_enabled.unwrap_or(false))
-    .bind(body.rollout_percentage.unwrap_or(0))
+    .bind(body.rollout_percentage.unwrap_or(100))
     .bind(&plans_json)
     .bind(customer.id)
     .fetch_one(&pool)
