@@ -31,15 +31,13 @@
 - [x] Faz 15: CLI ✅
 - [x] Faz 16: Helm ✅
 - [x] Faz 17: is-a.dev ✅ (kullanılmıyor — silindi)
-- [x] Faz 20: Kod Kalitesi ✅ (console.log wrapping)
-- [x] Faz 22: Ek Düzeltmeler ✅ (tsconfig ES2022, MCP Node 20)
-- [x] Rust cargo check ✅ (format string fix + feature_flags import)
-- [x] Rust cargo test — struct field mismatch'leri düzeltildi (DeadLetterParams, RateLimitViolationParams, ExportUsersParams, AdminAuditEntry, RefundRow, CreateAlertRequest, Config) ✅ (2026-05-17, commit 1ecd972a)
+- [x] Faz 20: Kod Kalitesi ✅ (console.log wrapping + unwrap() temizliği — 47 production unwrap düzeltildi)
+- [x] Faz 22: Ek Düzeltmeler ✅ (tsconfig ES2022, MCP Node 20, SQL injection fix, dangerouslySetInnerHTML audit)
 - [ ] Faz 18: Final Test (Vercel deploy'da)
+- [ ] Faz 19: Merge & Deploy
 - [ ] Faz 21: E2E Test
-- [ ] unwrap() temizliği (816 tane)
-- [ ] dead_code temizliği
-- [ ] cargo audit ignore'ları
+- [ ] dead_code temizliği (11 tane — mevcut #[allow(dead_code)]'ler korundu, monitoring/sqlx gereksinimi)
+- [ ] cargo audit ignore'ları (8 tane RUSTSEC)
 
 ## Kalan İşler (Bir Sonraki Oturum)
 
