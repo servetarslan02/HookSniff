@@ -1595,7 +1595,7 @@
     "standardWebhooksActiveDesc": "Standard Webhooks standardı aktif. Tüm yeni webhook'lar standart formatı kullanıyor.",
     "standardWebhooksDesc": "Endüstri standardı webhook uyumluluğu",
     "standardWebhooksInactiveDesc": "Standard Webhooks formatına geçmek için feature flag'i etkinleştirin (webhook- öneki, whsec_ anahtarları).",
-    "startupPlan": "Startup Planı",
+    "startupPlan": "Startup",
     "status": "Durum",
     "statusLabel": "Durum",
     "stopImpersonating": "Taklidi Durdur",
@@ -1859,7 +1859,8 @@
     "rateLimit": "Hız Limiti/dk",
     "polarSyncInfo": "Fiyat değişiklikleri platformu günceller. Polar ürünlerinin de eşleştirilmesi gerekir.",
     "planPricesMoved": "Plan fiyatları ve limitleri artık Revenue sayfasından yönetiliyor.",
-    "goToRevenue": "Revenue'ye Git"
+    "goToRevenue": "Revenue'ye Git",
+    "popular": "Popüler"
   },
   "landing": {
     "nav": {
