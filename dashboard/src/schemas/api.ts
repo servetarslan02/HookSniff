@@ -715,6 +715,7 @@ export const UserRefundsResponseSchema = z.object({
   refunds: z.array(z.object({
     id: z.string(),
     customer_id: z.string(),
+    email: z.string().optional(),
     amount_cents: z.number(),
     currency: z.string(),
     reason: z.string().nullable(),
