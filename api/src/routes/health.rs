@@ -456,6 +456,24 @@ pub async fn health_check(
     )
 }
 
+/// GET /v1/feature-flags — Public endpoint returning enabled feature flags.
+///
+/// Returns only the flag names that are enabled (no admin details).
+/// Used by the frontend to conditionally show/hide features.
+/// No authentication required — this is public information.
+pub async fn public_feature_flags(
+    axum::extract::Extension(feature_flags): axum::extract::Extension<crate::feature_flags::FeatureFlagService>,
+) -> Json<Value> {
+    let flags = feature_flags.all().await;
+    let enabled: Vec<&str> = flags
+        .iter()
+        .filter(|f| f.is_enabled)
+        .map(|f| f.name.as_str())
+        .collect();
+
+    Json(json!({ "enabled_flags": enabled }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
