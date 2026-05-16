@@ -10,6 +10,7 @@ import { useToast } from '@/components/Toast';
 import { webhooksApi, type Delivery } from '@/lib/api';
 import { useWebhooks, useReplayDelivery } from '@/hooks/useDashboardData';
 import { useDeliveryStream } from '@/hooks/useDeliveryStream';
+import { useIsFeatureEnabled } from '@/hooks/useAdminData';
 import { VirtualTable } from '@/components/VirtualTable';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -21,6 +22,7 @@ export default function DeliveriesPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const bulkReplayEnabled = useIsFeatureEnabled('bulk_replay');
 
   // URL-driven state — page and filter survive refresh
   const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
@@ -211,8 +213,8 @@ export default function DeliveriesPage() {
           </div>
         ) : (
           <>
-            {/* Batch Replay Bar */}
-            {selectedIds.size > 0 && (
+            {/* Batch Replay Bar — only shown when bulk_replay flag is enabled */}
+            {bulkReplayEnabled && selectedIds.size > 0 && (
               <div className="px-6 py-3 flex items-center gap-3 bg-brand-50 dark:bg-brand-500/10 border-b border-brand-200 dark:border-brand-500/20">
                 <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('selectedCount', { count: selectedIds.size })}</span>
                 <button
@@ -237,16 +239,18 @@ export default function DeliveriesPage() {
               data={filtered}
               estimateSize={64}
               header={
-                <div className="grid grid-cols-[40px_120px_minmax(150px,1fr)_100px_80px_80px_160px_110px] bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50">
-                  <div className="px-3 py-3 flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={filtered.length > 0 && selectedIds.size === filtered.length}
-                      onChange={toggleSelectAll}
-                      className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
-                      aria-label={t('selectAll')}
-                    />
-                  </div>
+                <div className={`grid ${bulkReplayEnabled ? 'grid-cols-[40px_120px_minmax(150px,1fr)_100px_80px_80px_160px_110px]' : 'grid-cols-[120px_minmax(150px,1fr)_100px_80px_80px_160px_110px]'} bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50`}>
+                  {bulkReplayEnabled && (
+                    <div className="px-3 py-3 flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={filtered.length > 0 && selectedIds.size === filtered.length}
+                        onChange={toggleSelectAll}
+                        className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
+                        aria-label={t('selectAll')}
+                      />
+                    </div>
+                  )}
                   <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center">ID</div>
                   <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center">{t('event')}</div>
                   <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center">{t('status')}</div>
@@ -259,23 +263,25 @@ export default function DeliveriesPage() {
               renderRow={(d) => (
                 <div
                   key={d.id}
-                  className={`grid grid-cols-[40px_120px_minmax(150px,1fr)_100px_80px_80px_160px_110px] hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer border-b border-gray-200/50 dark:border-slate-700/50 ${selectedIds.has(d.id) ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''}`}
+                  className={`grid ${bulkReplayEnabled ? 'grid-cols-[40px_120px_minmax(150px,1fr)_100px_80px_80px_160px_110px]' : 'grid-cols-[120px_minmax(150px,1fr)_100px_80px_80px_160px_110px]'} hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer border-b border-gray-200/50 dark:border-slate-700/50 ${selectedIds.has(d.id) ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''}`}
                   tabIndex={0}
                   role="link"
                   aria-label={`Delivery ${d.id.slice(0, 12)}`}
                   onClick={() => router.push(`/deliveries/${d.id}`)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/deliveries/${d.id}`); } }}
                 >
-                  <div className="px-3 py-4 flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.has(d.id)}
-                      onChange={(e) => toggleSelect(d.id, e as unknown as React.MouseEvent)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
-                      aria-label={`Select ${d.id.slice(0, 12)}`}
-                    />
-                  </div>
+                  {bulkReplayEnabled && (
+                    <div className="px-3 py-4 flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(d.id)}
+                        onChange={(e) => toggleSelect(d.id, e as unknown as React.MouseEvent)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
+                        aria-label={`Select ${d.id.slice(0, 12)}`}
+                      />
+                    </div>
+                  )}
                   <div className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400 flex items-center">{d.id.slice(0, 12)}…</div>
                   <div className="px-6 py-4 flex items-center">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
