@@ -100,10 +100,12 @@ export default function FeatureFlagsPage() {
   /* ─── Quick Toggle ─── */
   const handleToggle = (flag: FeatureFlagValidated) => {
     if (!token) return;
-    updateMutation.mutate({
-      id: flag.id,
-      data: { is_enabled: !flag.is_enabled },
-    });
+    updateMutation.mutate(
+      { id: flag.id, data: { is_enabled: !flag.is_enabled } },
+      {
+        onError: () => toast(t('updateFailed'), 'error'),
+      },
+    );
   };
 
   /* ─── Delete ─── */
@@ -126,9 +128,9 @@ export default function FeatureFlagsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🚩 Feature Flags</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🚩 {t('pageTitle')}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-            Manage feature flags, rollouts, and plan-specific features
+            {t('pageDesc')}
           </p>
         </div>
         <button
@@ -136,18 +138,18 @@ export default function FeatureFlagsPage() {
           onClick={() => setShowCreate(true)}
           className="px-4 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
         >
-          + Create Flag
+          + {t('createFlag')}
         </button>
       </div>
 
       {/* Flags List */}
       <div className="glass-card overflow-hidden">
         {isLoading ? (
-          <div className="p-12 text-center animate-pulse text-gray-500 dark:text-slate-400">Loading...</div>
+          <div className="p-12 text-center animate-pulse text-gray-500 dark:text-slate-400">{t('loading')}</div>
         ) : flags.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400">
             <span className="text-4xl mb-3 block">🚩</span>
-            <p>No feature flags yet. Create your first one!</p>
+            <p>{t('emptyState')}</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
@@ -192,7 +194,7 @@ export default function FeatureFlagsPage() {
                     {/* Rollout */}
                     <div className="text-right">
                       <span className="text-sm font-medium text-gray-900 dark:text-white">{flag.rollout_percentage ?? 100}%</span>
-                      <p className="text-xs text-gray-500 dark:text-slate-400">rollout</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400">{t('rollout')}</p>
                     </div>
 
                     {/* Plans */}
@@ -204,14 +206,14 @@ export default function FeatureFlagsPage() {
                           </span>
                         ))
                       ) : (
-                        <span className="text-xs text-gray-400 dark:text-slate-500">all plans</span>
+                        <span className="text-xs text-gray-400 dark:text-slate-500">{t('allPlans')}</span>
                       )}
                     </div>
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
-                      <button type="button" onClick={() => openEdit(flag)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">Edit</button>
-                      <button type="button" onClick={() => setDeleteTarget(flag)} className="text-xs text-red-600 dark:text-red-400 hover:underline">Delete</button>
+                      <button type="button" onClick={() => openEdit(flag)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">{t('editTitle')}</button>
+                      <button type="button" onClick={() => setDeleteTarget(flag)} className="text-xs text-red-600 dark:text-red-400 hover:underline">{t('deleteTitle')}</button>
                     </div>
                   </div>
                 </div>
@@ -226,28 +228,28 @@ export default function FeatureFlagsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreate(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create Feature Flag</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createTitle')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Name *</label>
-                <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="my_feature" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono" />
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')} *</label>
+                <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t('namePlaceholder')} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Description</label>
-                <input type="text" value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder="What does this flag do?" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" />
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('description')}</label>
+                <input type="text" value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder={t('descPlaceholder')} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" />
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Enabled</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('enabled')}</label>
                 <button type="button" role="switch" aria-checked={newEnabled} onClick={() => setNewEnabled(!newEnabled)} className={`relative w-11 h-6 rounded-full transition-colors ${newEnabled ? 'bg-emerald-600' : 'bg-gray-300 dark:bg-slate-600'}`}>
                   <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${newEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Rollout: {newRollout}%</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('rolloutLabel', { pct: newRollout })}</label>
                 <input type="range" min="0" max="100" value={newRollout} onChange={(e) => setNewRollout(Number(e.target.value))} className="w-full" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Plans (empty = all)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('plansLabel')}</label>
                 <div className="flex gap-2 flex-wrap">
                   {PLAN_OPTIONS.map((plan) => (
                     <button key={plan} type="button" onClick={() => togglePlan(plan, newPlans, setNewPlans)} className={`px-3 py-1 rounded-full text-xs font-medium transition ${newPlans.includes(plan) ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400'}`}>
@@ -258,8 +260,8 @@ export default function FeatureFlagsPage() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">Cancel</button>
-              <button type="button" onClick={handleCreate} disabled={createMutation.isPending || !newName.trim()} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">{createMutation.isPending ? 'Creating...' : 'Create'}</button>
+              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{ta('cancel')}</button>
+              <button type="button" onClick={handleCreate} disabled={createMutation.isPending || !newName.trim()} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">{createMutation.isPending ? t('creating') : t('createFlag')}</button>
             </div>
           </div>
         </div>
@@ -270,28 +272,28 @@ export default function FeatureFlagsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setEditTarget(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Edit: {editTarget.name}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('editTitle')}: {editTarget.name}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')}</label>
                 <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('description')}</label>
                 <input type="text" value={editDesc} onChange={(e) => setEditDesc(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" />
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Enabled</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('enabled')}</label>
                 <button type="button" role="switch" aria-checked={editEnabled} onClick={() => setEditEnabled(!editEnabled)} className={`relative w-11 h-6 rounded-full transition-colors ${editEnabled ? 'bg-emerald-600' : 'bg-gray-300 dark:bg-slate-600'}`}>
                   <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${editEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Rollout: {editRollout}%</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('rolloutLabel', { pct: editRollout })}</label>
                 <input type="range" min="0" max="100" value={editRollout} onChange={(e) => setEditRollout(Number(e.target.value))} className="w-full" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Plans (empty = all)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('plansLabel')}</label>
                 <div className="flex gap-2 flex-wrap">
                   {PLAN_OPTIONS.map((plan) => (
                     <button key={plan} type="button" onClick={() => togglePlan(plan, editPlans, setEditPlans)} className={`px-3 py-1 rounded-full text-xs font-medium transition ${editPlans.includes(plan) ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400'}`}>
@@ -302,8 +304,8 @@ export default function FeatureFlagsPage() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button type="button" onClick={() => setEditTarget(null)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">Cancel</button>
-              <button type="button" onClick={handleSave} disabled={updateMutation.isPending} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">{updateMutation.isPending ? 'Saving...' : 'Save'}</button>
+              <button type="button" onClick={() => setEditTarget(null)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{ta('cancel')}</button>
+              <button type="button" onClick={handleSave} disabled={updateMutation.isPending} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">{updateMutation.isPending ? t('saving') : ta('save')}</button>
             </div>
           </div>
         </div>
@@ -314,13 +316,13 @@ export default function FeatureFlagsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete Feature Flag</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('deleteTitle')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-              Are you sure you want to delete <strong>{deleteTarget.name}</strong>? This cannot be undone.
+              {t('deleteConfirm', { name: deleteTarget.name })}
             </p>
             <div className="flex gap-3 justify-end">
-              <button type="button" onClick={() => setDeleteTarget(null)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">Cancel</button>
-              <button type="button" onClick={handleDelete} className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition">Delete</button>
+              <button type="button" onClick={() => setDeleteTarget(null)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{ta('cancel')}</button>
+              <button type="button" onClick={handleDelete} className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition">{ta('delete')}</button>
             </div>
           </div>
         </div>
