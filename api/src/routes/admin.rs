@@ -551,7 +551,7 @@ async fn user_plan_history(
            WHERE resource_type = 'customer' AND resource_id = $1 AND action = 'plan.changed'
            ORDER BY created_at DESC LIMIT 50"#,
     )
-    .bind(id)
+    .bind(id.to_string())
     .fetch_all(&pool)
     .await?;
 
