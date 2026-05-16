@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:17-alpine
         ports:
           - 5432:5432
         env:
@@ -34,11 +34,11 @@ jobs:
           --health-timeout=3s
           --health-retries=10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: target/
           key: ${{ runner.os }}-cargo-release-verify-${{ hashFiles('**/Cargo.lock') }}
@@ -53,11 +53,11 @@ jobs:
   dashboard-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: dashboard/package-lock.json
 
@@ -81,7 +81,7 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: dtolnay/rust-toolchain@stable
 
@@ -91,9 +91,9 @@ jobs:
       - name: Rust audit
         run: cargo audit
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Node audit
         working-directory: dashboard
@@ -112,11 +112,11 @@ jobs:
           - service: worker
             package: hooksniff-worker
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: dtolnay/rust-toolchain@stable
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: target/
           key: ${{ runner.os }}-cargo-release-build-${{ hashFiles('**/Cargo.lock') }}
