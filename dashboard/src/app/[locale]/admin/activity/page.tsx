@@ -33,6 +33,16 @@ const ACTION_COLORS: Record<string, string> = {
   USER_GDPR_DELETE: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
   ADMIN_TEST_WEBHOOK: 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300',
   BULK_REPLAY: 'bg-cyan-100 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400',
+  ADMIN_REFUND: 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400',
+  BULK_EMAIL_SENT: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400',
+  GDPR_EXPORT: 'bg-teal-100 dark:bg-teal-500/10 text-teal-700 dark:text-teal-400',
+  GDPR_DATA_DELETE: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
+  SERVICE_TOKEN_CREATE: 'bg-violet-100 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400',
+  SERVICE_TOKEN_DELETE: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
+  MEMBER_INVITE: 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400',
+  MEMBER_REMOVE: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
+  ROLE_CHANGE: 'bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400',
+  SUBSCRIPTION_CANCEL: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
 };
 
 const ACTION_ICONS: Record<string, string> = {
@@ -63,6 +73,16 @@ const ACTION_ICONS: Record<string, string> = {
   USER_GDPR_DELETE: '🗑️',
   ADMIN_TEST_WEBHOOK: '🧪',
   BULK_REPLAY: '↩️',
+  ADMIN_REFUND: '💸',
+  BULK_EMAIL_SENT: '📧',
+  GDPR_EXPORT: '📤',
+  GDPR_DATA_DELETE: '🗑️',
+  SERVICE_TOKEN_CREATE: '🔑',
+  SERVICE_TOKEN_DELETE: '🗑️',
+  MEMBER_INVITE: '📨',
+  MEMBER_REMOVE: '👋',
+  ROLE_CHANGE: '👔',
+  SUBSCRIPTION_CANCEL: '💳',
 };
 
 const KNOWN_ACTIONS = [
@@ -93,6 +113,16 @@ const KNOWN_ACTIONS = [
   'USER_GDPR_DELETE',
   'ADMIN_TEST_WEBHOOK',
   'BULK_REPLAY',
+  'ADMIN_REFUND',
+  'BULK_EMAIL_SENT',
+  'GDPR_EXPORT',
+  'GDPR_DATA_DELETE',
+  'SERVICE_TOKEN_CREATE',
+  'SERVICE_TOKEN_DELETE',
+  'MEMBER_INVITE',
+  'MEMBER_REMOVE',
+  'ROLE_CHANGE',
+  'SUBSCRIPTION_CANCEL',
 ];
 
 const perPage = 20;
