@@ -59,7 +59,7 @@ export default function FeatureFlagsPage() {
 
   /* ─── Create ─── */
   const handleCreate = async () => {
-    if (!token) return;
+    if (!token || createMutation.isPending) return;
     const trimmed = newName.trim();
     if (!trimmed) return;
     if (trimmed.length > 100) { toast(t('nameTooLong'), 'error'); return; }
@@ -95,12 +95,11 @@ export default function FeatureFlagsPage() {
   };
 
   const handleSave = async () => {
-    if (!token || !editTarget) return;
+    if (!token || !editTarget || updateMutation.isPending) return;
     try {
       await updateMutation.mutateAsync({
         id: editTarget.id,
         data: {
-          name: editName,
           description: editDesc.trim() || null,
           is_enabled: editEnabled,
           rollout_percentage: editRollout,
@@ -131,7 +130,7 @@ export default function FeatureFlagsPage() {
 
   /* ─── Delete ─── */
   const handleDelete = async () => {
-    if (!token || !deleteTarget) return;
+    if (!token || !deleteTarget || deleteMutation.isPending) return;
     try {
       await deleteMutation.mutateAsync(deleteTarget.id);
       toast(t('deleted'), 'success');
