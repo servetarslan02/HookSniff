@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 05:35 GMT+8 (Oturum 190)
+> Son güncelleme: 2026-05-17 05:55 GMT+8 (Oturum 191)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,27 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 191 — 2026-05-17 05:55 GMT+8
+1. **Version Upgrade — Faz 1-15 + Faz 22** ✅ (14 commit, branch: `upgrade/system-updates`)
+   - **Faz 1:** Hazırlık — branch oluşturuldu, build hatası düzeltildi (`statsFetching`)
+   - **Faz 2:** Minor/Patch — npm update (next-intl 4.12, vitest 4.1.6, dompurify 3.4.3)
+   - **Faz 3:** TypeScript 6.0.3
+   - **Faz 4:** ESLint 10.4.0
+   - **Faz 5:** recharts 3.8.1
+   - **Faz 6:** Tailwind 4 (auto-migration, 134 dosya)
+   - **Faz 7:** Next.js 16.2.6 + React 19.2.6
+   - **Faz 8:** GitHub Actions (checkout v6, cache v5, upload-artifact v7, setup-node v6, build-push v7, trivy v0.36.0, node 22, postgres 17)
+   - **Faz 9:** Docker (Node 22, PostgreSQL 17)
+   - **Faz 10:** Dependabot açıldı (limit: 3)
+   - **Faz 11:** Monitoring (Prometheus v3.11.3, Grafana 13.0.1)
+   - **Faz 12:** Edge Proxy (wrangler, vitest, typescript, workers-types)
+   - **Faz 13:** 11 SDK güncellendi (Rust reqwest 0.13, Go 1.24, Python 3.11, Node 20, PHP 8.2, Java 21, Kotlin 2.3, Swift 6.0, .NET 9, Ruby rubocop 1.75)
+   - **Faz 14:** Docs SDK (Docusaurus + React)
+   - **Faz 15:** CLI (commander)
+   - **Faz 22:** tsconfig ES2022, MCP Node 20
+   - **Push:** `upgrade/system-updates` branch
+   - **Kalan:** Faz 16-23 (merge, test, kod kalitesi)
 
 ### Oturum 190 — 2026-05-17 05:35 GMT+8
 1. **Feature Flags UI Entegrasyonu** ✅
