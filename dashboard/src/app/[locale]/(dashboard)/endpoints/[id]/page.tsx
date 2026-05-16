@@ -78,10 +78,10 @@ export default function EndpointSettingsPage() {
       </div>
 
       <RetryPolicyCard
-        initialMaxAttempts={endpoint.retry_policy?.max_retries ?? 5}
-        initialBackoff={'exponential'}
-        initialDelay={Math.round((endpoint.retry_policy?.backoff_ms ?? 10000) / 1000)}
-        initialMaxDelay={3600}
+        initialMaxAttempts={endpoint.retry_policy?.max_attempts ?? 5}
+        initialBackoff={endpoint.retry_policy?.backoff ?? 'exponential'}
+        initialDelay={endpoint.retry_policy?.initial_delay_secs ?? 10}
+        initialMaxDelay={endpoint.retry_policy?.max_delay_secs ?? 3600}
         onSave={handleSaveRetryPolicy}
       />
 
