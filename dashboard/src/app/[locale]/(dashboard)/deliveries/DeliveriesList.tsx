@@ -2,13 +2,15 @@
 
 import { getErrorMessage } from '@/lib/errors';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { webhooksApi, type Delivery } from '@/lib/api';
 import { useWebhooks, useReplayDelivery } from '@/hooks/useDashboardData';
+import { useDeliveryStream } from '@/hooks/useDeliveryStream';
+import { VirtualTable } from '@/components/VirtualTable';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
@@ -56,6 +58,30 @@ export default function DeliveriesPage() {
   const loading = isLoading;
   const error = queryError ? (getErrorMessage(queryError, tc('unknownError')) || tc('failedToLoadDeliveries')) : '';
 
+  // SSE stream — real-time delivery updates as secondary data source
+  const { connected: sseConnected, deliveries: sseDeliveries } = useDeliveryStream({
+    token: token || '',
+    enabled: !!token,
+  });
+
+  // Merge SSE deliveries into the main list (deduplicate by id)
+  const mergedDeliveries = useMemo(() => {
+    if (sseDeliveries.length === 0) return deliveries;
+    const existingIds = new Set(deliveries.map((d) => d.id));
+    const newFromSse = sseDeliveries
+      .filter((sse) => !existingIds.has(sse.id))
+      .map((sse) => ({
+        id: sse.id,
+        endpoint_id: sse.endpoint_id,
+        event: sse.event,
+        status: sse.status,
+        attempt_count: sse.attempts,
+        response_status: undefined,
+        created_at: sse.created_at,
+      } as Delivery));
+    return [...newFromSse, ...deliveries];
+  }, [deliveries, sseDeliveries]);
+
   const handleReplay = async () => {
     if (!replayTarget) return;
     setReplaying(true);
@@ -71,7 +97,7 @@ export default function DeliveriesPage() {
     }
   };
 
-  const filtered = deliveries.filter((d) =>
+  const filtered = mergedDeliveries.filter((d) =>
     !search || d.event?.toLowerCase().includes(search.toLowerCase()) || d.id.includes(search)
   );
 
@@ -115,7 +141,15 @@ export default function DeliveriesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+            {sseConnected && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live
+              </span>
+            )}
+          </div>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
         <input
@@ -199,11 +233,12 @@ export default function DeliveriesPage() {
               </div>
             )}
 
-            <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                  <th className="px-3 py-3">
+            <VirtualTable
+              data={filtered}
+              estimateSize={64}
+              header={
+                <div className="grid grid-cols-[40px_120px_minmax(150px,1fr)_100px_80px_80px_160px_110px] bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50">
+                  <div className="px-3 py-3 flex items-center">
                     <input
                       type="checkbox"
                       checked={filtered.length > 0 && selectedIds.size === filtered.length}
@@ -211,64 +246,74 @@ export default function DeliveriesPage() {
                       className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
                       aria-label={t('selectAll')}
                     />
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('event')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">{t('attempts')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">{t('response')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('time')}</th>
-                  <th className="px-6 py-3" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                {filtered.map((d) => (
-                  <tr key={d.id} className={`hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer ${selectedIds.has(d.id) ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''}`} tabIndex={0} role="link" aria-label={`Delivery ${d.id.slice(0, 12)}`} onClick={() => router.push(`/deliveries/${d.id}`)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/deliveries/${d.id}`); } }}>
-                    <td className="px-3 py-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.has(d.id)}
-                        onChange={(e) => toggleSelect(d.id, e as unknown as React.MouseEvent)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
-                        aria-label={`Select ${d.id.slice(0, 12)}`}
-                      />
-                    </td>
-                    <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 12)}…</td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
-                        {d.event || '—'}
+                  </div>
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center">ID</div>
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center">{t('event')}</div>
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center">{t('status')}</div>
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:flex items-center">{t('attempts')}</div>
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:flex items-center">{t('response')}</div>
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center">{t('time')}</div>
+                  <div className="px-6 py-3 flex items-center" />
+                </div>
+              }
+              renderRow={(d) => (
+                <div
+                  key={d.id}
+                  className={`grid grid-cols-[40px_120px_minmax(150px,1fr)_100px_80px_80px_160px_110px] hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer border-b border-gray-200/50 dark:border-slate-700/50 ${selectedIds.has(d.id) ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''}`}
+                  tabIndex={0}
+                  role="link"
+                  aria-label={`Delivery ${d.id.slice(0, 12)}`}
+                  onClick={() => router.push(`/deliveries/${d.id}`)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/deliveries/${d.id}`); } }}
+                >
+                  <div className="px-3 py-4 flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(d.id)}
+                      onChange={(e) => toggleSelect(d.id, e as unknown as React.MouseEvent)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-4 h-4 rounded text-brand-600 focus:ring-brand-500"
+                      aria-label={`Select ${d.id.slice(0, 12)}`}
+                    />
+                  </div>
+                  <div className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400 flex items-center">{d.id.slice(0, 12)}…</div>
+                  <div className="px-6 py-4 flex items-center">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
+                      {d.event || '—'}
+                    </span>
+                  </div>
+                  <div className="px-6 py-4 flex items-center">
+                    <StatusBadge status={d.status} />
+                  </div>
+                  <div className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400 hidden md:flex items-center">{d.attempt_count}</div>
+                  <div className="px-6 py-4 hidden md:flex items-center">
+                    {d.response_status ? (
+                      <span className={`text-sm font-mono ${d.response_status < 400 ? 'text-green-600' : 'text-red-600'}`}>
+                        {d.response_status}
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <StatusBadge status={d.status} />
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400 hidden md:table-cell">{d.attempt_count}</td>
-                    <td className="px-6 py-4 hidden md:table-cell">
-                      {d.response_status ? (
-                        <span className={`text-sm font-mono ${d.response_status < 400 ? 'text-green-600' : 'text-red-600'}`}>
-                          {d.response_status}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-gray-500 dark:text-slate-500">—</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
-                      {new Date(d.created_at).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      <button type="button"
-                        onClick={(e) => { e.stopPropagation(); router.push(`/deliveries/${d.id}`); }}
-                        className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-300 text-sm font-medium"
-                      >
-                        {t('viewDetails')}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            </div>
+                    ) : (
+                      <span className="text-sm text-gray-500 dark:text-slate-500">—</span>
+                    )}
+                  </div>
+                  <div className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 flex items-center">
+                    {new Date(d.created_at).toLocaleString()}
+                  </div>
+                  <div className="px-6 py-4 flex items-center">
+                    <button type="button"
+                      onClick={(e) => { e.stopPropagation(); router.push(`/deliveries/${d.id}`); }}
+                      className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-300 text-sm font-medium"
+                    >
+                      {t('viewDetails')}
+                    </button>
+                  </div>
+                </div>
+              )}
+              emptyState={
+                <div className="p-12 text-center text-gray-500 dark:text-slate-500">
+                  {isSearching ? t('noResults', { search }) : t('empty')}
+                </div>
+              }
+            />
 
             {/* Pagination */}
             {total > perPage && !isSearching && (
