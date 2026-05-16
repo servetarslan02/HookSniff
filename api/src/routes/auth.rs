@@ -157,6 +157,7 @@ async fn register(
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     Extension(email_provider): Extension<crate::email::EmailProvider>,
     Extension(job_queue): Extension<Option<crate::jobs::job_queue::JobQueue>>,
+    Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     headers: HeaderMap,
     Json(req): Json<CreateCustomerRequest>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -228,6 +229,17 @@ async fn register(
         let ip = extract_client_ip(&headers);
         let ua = headers.get("user-agent").and_then(|v| v.to_str().ok()).unwrap_or("unknown").to_string();
         let _ = crate::audit::log_action(&pool, customer.id, "REGISTER", "auth", Some(&rid), None, Some(&ip), Some(&ua)).await;
+    }
+
+    // Publish UserCreated event (best-effort)
+    if let Some(ref publisher) = event_publisher {
+        if let Err(e) = publisher.publish(crate::events::AppEvent::UserCreated {
+            user_id: customer.id,
+            email: customer.email.clone(),
+            plan: customer.plan.clone(),
+        }).await {
+            tracing::warn!("Failed to publish UserCreated event: {:?}", e);
+        }
     }
 
     // Send welcome email + verification email via job queue (survives restarts)
