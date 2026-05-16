@@ -1799,7 +1799,22 @@
     "headers": "Headers",
     "invoices": "Invoices",
     "payments": "Payments",
-    "viewDetails": "View Details"
+    "viewDetails": "View Details",
+    "arpu": "ARPU",
+    "avgRetention": "Avg retention",
+    "cohort": "Cohort",
+    "cohortAnalysis": "Cohort Analysis",
+    "cohortDesc": "Monthly customer cohorts — signups, retention, and revenue",
+    "collectedRevenue": "Collected Revenue",
+    "configurableFromSettings": "Configurable from Settings",
+    "customers": "Customers",
+    "expansionRevenue": "Expansion Revenue",
+    "ltv": "LTV",
+    "months": "mo",
+    "nrr": "NRR",
+    "paying": "paying",
+    "planPrices": "Plan Prices",
+    "signedUp": "Signed Up"
   },
   "landing": {
     "nav": {

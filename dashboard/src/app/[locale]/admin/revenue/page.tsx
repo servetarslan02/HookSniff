@@ -444,7 +444,7 @@ export default function AdminRevenuePage() {
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {allRefunds.map((ref, index) => (
                   <tr key={ref.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-gray-100 dark:hover:bg-gray-700 transition`}>
-                    <td className="px-4 sm:px-6 py-4 text-sm text-gray-900 dark:text-white font-mono text-xs">{ref.customer_id.slice(0, 8)}...</td>
+                    <td className="px-4 sm:px-6 py-4 text-sm text-gray-900 dark:text-white">{ref.email || ref.customer_id.slice(0, 8) + '...'}</td>
                     <td className="px-4 sm:px-6 py-4 text-sm font-medium text-red-600 dark:text-red-400">-{(ref.amount_cents / 100).toFixed(2)} {ref.currency.toUpperCase()}</td>
                     <td className="px-4 sm:px-6 py-4 text-sm text-gray-600 dark:text-slate-400 max-w-xs truncate">{ref.reason || '—'}</td>
                     <td className="px-4 sm:px-6 py-4">
