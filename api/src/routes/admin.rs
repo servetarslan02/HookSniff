@@ -2806,7 +2806,7 @@ async fn admin_dead_letters(
 
     let rows = sqlx::query_as::<_, DeadLetterRow>(&format!(
         r#"SELECT dl.id, dl.delivery_id, dl.endpoint_id, dl.customer_id,
-            '{}'::jsonb as payload, dl.reason, dl.attempts, dl.created_at,
+            '{{}}'::jsonb as payload, dl.reason, dl.attempts, dl.created_at,
             c.email as customer_email,
             e.url as endpoint_url
         FROM dead_letters dl
