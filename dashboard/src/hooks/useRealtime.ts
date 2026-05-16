@@ -1,3 +1,4 @@
+const rtDebug = process.env.NODE_ENV === 'development' ? console.log : () => {};
 'use client';
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -71,7 +72,7 @@ export function useRealtime() {
   useEffect(() => {
     if (state === 'fallback' || state === 'disconnected' || state === 'connecting') {
       if (!pollingRef.current) {
-        console.log(`[Realtime] WS state: ${state}, starting fallback polling (30s)`);
+        rtDebug(`[Realtime] WS state: ${state}, starting fallback polling (30s)`);
         pollingRef.current = setInterval(() => {
           queryClient.invalidateQueries({ queryKey: ['deliveries'] });
           queryClient.invalidateQueries({ queryKey: ['webhooks'] });
