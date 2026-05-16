@@ -34,8 +34,8 @@
 - Webhook verification tüm dillerde HMAC-SHA256
 
 ### Aşama 4 — Operasyonel ⏳ (SIRADA)
-- CI/CD pipeline: ❌
-- Dokümantasyon sitesi: ❌
+- CI/CD pipeline: ✅
+- Dokümantasyon sitesi: ✅ Quick start + guides tamamlandı
 - Performance benchmarking: ❌
 - Publish durumu kontrol: ❌
 
