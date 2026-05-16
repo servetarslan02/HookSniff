@@ -9,6 +9,10 @@ import {
   type AlertRule, type Team, type TeamMember,
   type DeliveryDetail, type DeliveryAttempt, type NotificationListResponse,
   type AuditLogEntryResponse, type EndpointHealthResponse,
+  type ApiKeyResponse, type PortalConfigResponse, type PortalEmbedCodeResponse,
+  type PortalProfileResponse, type PortalUsageResponse, type RateLimitResponse,
+  type SchemaRegistryListResponse, type SearchResponseData,
+  type ServiceTokenResponse, type TemplateListResponse,
 } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import {
@@ -27,6 +31,17 @@ import {
   InboundConfigSchema,
   SsoConfigSchema,
   EndpointHealthSchema,
+  LatencyTrendSchema,
+  ApiKeySchema,
+  PortalConfigSchema,
+  PortalEmbedCodeSchema,
+  PortalProfileSchema,
+  PortalUsageSchema,
+  RateLimitSchema,
+  SchemaRegistryListSchema,
+  SearchResponseSchema,
+  ServiceTokenSchema,
+  TemplateListSchema,
   type EndpointValidated,
   type BillingUsageValidated,
   type InvoiceValidated,
@@ -726,5 +741,236 @@ export function useEndpointHealth() {
     enabled: true,
     staleTime: 15_000,
     refetchInterval: 30_000,
+  });
+}
+
+// ── Latency Trend ──
+export function useLatencyTrend(range = '24h') {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['latency-trend', range],
+    queryFn: validated(
+      () => analyticsApi.latencyTrend(token!, range),
+      LatencyTrendSchema
+    ),
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+// ── API Keys ──
+export function useApiKeys() {
+  const { token } = useAuth();
+  return useQuery<ApiKeyResponse[]>({
+    queryKey: ['api-keys'],
+    queryFn: validated(() => api.getApiKeys(token!), ApiKeySchema.array()),
+    enabled: !!token,
+    staleTime: 15_000,
+  });
+}
+
+export function useCreateApiKey() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => api.createApiKey(token!, name),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['api-keys'] }),
+  });
+}
+
+export function useDeleteApiKey() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.deleteApiKey(token!, id),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['api-keys'] }),
+  });
+}
+
+export function useRotateApiKey() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.rotateApiKey(token!, id),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['api-keys'] }),
+  });
+}
+
+// ── Portal ──
+export function usePortalConfig() {
+  const { token } = useAuth();
+  return useQuery<PortalConfigResponse>({
+    queryKey: ['portal-config'],
+    queryFn: validated(() => api.getPortalConfig(token!), PortalConfigSchema),
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+export function usePortalEmbedCode() {
+  const { token } = useAuth();
+  return useQuery<PortalEmbedCodeResponse>({
+    queryKey: ['portal-embed-code'],
+    queryFn: validated(() => api.getPortalEmbedCode(token!), PortalEmbedCodeSchema),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+}
+
+export function useUpdatePortalConfig() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (config: Partial<PortalConfigResponse>) => api.updatePortalConfig(token!, config),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['portal-config'] }),
+  });
+}
+
+export function usePortalProfile() {
+  const { token } = useAuth();
+  return useQuery<PortalProfileResponse>({
+    queryKey: ['portal-profile'],
+    queryFn: validated(() => api.getPortalProfile(token!), PortalProfileSchema),
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+export function usePortalUsage() {
+  const { token } = useAuth();
+  return useQuery<PortalUsageResponse>({
+    queryKey: ['portal-usage'],
+    queryFn: validated(() => api.getPortalUsage(token!), PortalUsageSchema),
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+// ── Rate Limits ──
+export function useRateLimits() {
+  const { token } = useAuth();
+  return useQuery<RateLimitResponse[]>({
+    queryKey: ['rate-limits'],
+    queryFn: validated(() => api.getRateLimits(token!), RateLimitSchema.array()),
+    enabled: !!token,
+    staleTime: 15_000,
+  });
+}
+
+export function useSetRateLimit() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ endpointId, config }: { endpointId: string; config: { requests_per_second: number; burst_size: number; enabled: boolean } }) =>
+      api.setRateLimit(token!, endpointId, config),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['rate-limits'] }),
+  });
+}
+
+export function useDeleteRateLimit() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (endpointId: string) => api.deleteRateLimit(token!, endpointId),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['rate-limits'] }),
+  });
+}
+
+// ── Schemas ──
+export function useSchemas() {
+  const { token } = useAuth();
+  return useQuery<SchemaRegistryListResponse>({
+    queryKey: ['schemas'],
+    queryFn: validated(() => api.getSchemas(token!), SchemaRegistryListSchema),
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
+
+// ── Search ──
+export function useSearch(params: { q?: string; status?: string; page?: number; per_page?: number }) {
+  const { token } = useAuth();
+  const enabled = !!token && (!!params.q || !!params.status);
+  const searchParams: Record<string, string> = {};
+  if (params.q) searchParams.q = params.q;
+  if (params.status) searchParams.status = params.status;
+  if (params.page) searchParams.page = params.page.toString();
+  if (params.per_page) searchParams.per_page = params.per_page.toString();
+  return useQuery<SearchResponseData>({
+    queryKey: ['search', params],
+    queryFn: () => api.search(token!, searchParams),
+    enabled,
+    staleTime: 10_000,
+  });
+}
+
+// ── Service Tokens ──
+export function useServiceTokens() {
+  const { token } = useAuth();
+  return useQuery<ServiceTokenResponse[]>({
+    queryKey: ['service-tokens'],
+    queryFn: validated(() => api.getServiceTokens(token!), ServiceTokenSchema.array()),
+    enabled: !!token,
+    staleTime: 15_000,
+  });
+}
+
+export function useCreateServiceToken() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => api.createServiceToken(token!, name),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['service-tokens'] }),
+  });
+}
+
+export function useDeleteServiceToken() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.deleteServiceToken(token!, id),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['service-tokens'] }),
+  });
+}
+
+export function useRevealServiceToken() {
+  const { token } = useAuth();
+  return useMutation({
+    mutationFn: (id: string) => api.revealServiceToken(token!, id),
+  });
+}
+
+export function useUpdateServiceToken() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: { name?: string; is_active?: boolean } }) =>
+      api.updateServiceToken(token!, id, body),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['service-tokens'] }),
+  });
+}
+
+// ── Templates ──
+export function useTemplates(industry?: string) {
+  const { token } = useAuth();
+  return useQuery<TemplateListResponse>({
+    queryKey: ['templates', industry],
+    queryFn: validated(() => api.getTemplates(token!, industry), TemplateListSchema),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+}
+
+// ── Create Webhook (for webhook-builder + webhooks/new) ──
+export function useCreateWebhook() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { endpoint_id: string; event?: string; data: unknown }) =>
+      webhooksApi.create(token!, body),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['webhooks'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+    },
   });
 }
