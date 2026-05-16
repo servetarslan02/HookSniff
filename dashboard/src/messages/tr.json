@@ -1799,7 +1799,22 @@
     "headers": "Başlıklar",
     "invoices": "Faturalar",
     "payments": "Ödemeler",
-    "viewDetails": "Detayları Gör"
+    "viewDetails": "Detayları Gör",
+    "arpu": "ARPU",
+    "avgRetention": "Ort. tutma süresi",
+    "cohort": "Kohort",
+    "cohortAnalysis": "Kohort Analizi",
+    "cohortDesc": "Aylık müşteri kohortları — kayıtlar, tutma ve gelir",
+    "collectedRevenue": "Tahsil Edilen Gelir",
+    "configurableFromSettings": "Ayarlar'dan yapılandırılabilir",
+    "customers": "Müşteriler",
+    "expansionRevenue": "Genişleme Geliri",
+    "ltv": "LTV",
+    "months": "ay",
+    "nrr": "NRR",
+    "paying": "ödemeli",
+    "planPrices": "Plan Fiyatları",
+    "signedUp": "Kayıt Olan"
   },
   "landing": {
     "nav": {

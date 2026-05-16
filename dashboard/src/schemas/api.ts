@@ -90,7 +90,6 @@ export const RevenueSchema = z.object({
   collected_revenue: z.number().optional(),
   monthly_revenue: z.array(z.object({ month: z.string(), revenue: z.number() })).optional(),
   revenue_by_plan: z.array(z.object({ plan: z.string(), revenue: z.number(), count: z.number() })).optional(),
-  by_plan: z.array(z.object({ plan: z.string(), revenue: z.number(), count: z.number() })).optional(),
 });
 export type RevenueValidated = z.infer<typeof RevenueSchema>;
 
@@ -323,12 +322,14 @@ export const CohortSchema = z.object({
 // ── Revenue Cohorts Response Schema ──
 export const RevenueCohortsResponseSchema = z.object({
   cohorts: z.array(CohortSchema),
+  months: z.number().optional(),
 });
 
 // ── Refund Schema ──
 export const RefundSchema = z.object({
   id: z.string(),
   customer_id: z.string(),
+  email: z.string().optional(),
   amount_cents: z.number(),
   currency: z.string(),
   reason: z.string().nullable().optional(),
