@@ -2,8 +2,9 @@
 
 import { getErrorMessage } from '@/lib/errors';
 
-import { useState } from 'react';
-import { useRouter } from '@/i18n/navigation';
+import { useState, useCallback } from 'react';
+import { useRouter, usePathname } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { webhooksApi, type Delivery } from '@/lib/api';
@@ -16,8 +17,23 @@ export default function DeliveriesPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
-  const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState<string>('all');
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // URL-driven state — page and filter survive refresh
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+  const filter = searchParams.get('status') || 'all';
+
+  const setParam = useCallback((key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value === 'all' || value === '1') {
+      params.delete(key);
+    } else {
+      params.set(key, value);
+    }
+    const qs = params.toString();
+    router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
+  }, [searchParams, router, pathname]);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [replayTarget, setReplayTarget] = useState<Delivery | null>(null);
@@ -121,7 +137,14 @@ export default function DeliveriesPage() {
         ].map((f) => (
           <button
             key={f.key}
-            onClick={() => { setFilter(f.key); setPage(1); }}
+            onClick={() => {
+              const params = new URLSearchParams(searchParams.toString());
+              params.delete('page');
+              if (f.key === 'all') params.delete('status');
+              else params.set('status', f.key);
+              const qs = params.toString();
+              router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
+            }}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
               filter === f.key
                 ? 'bg-gray-900 text-white'
@@ -255,7 +278,7 @@ export default function DeliveriesPage() {
                 </span>
                 <nav aria-label={tc('pagination')} className="flex gap-2">
                   <button type="button"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    onClick={() => setParam('page', String(Math.max(1, page - 1)))}
                     disabled={page === 1}
                     aria-label={tc('previous')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 transition"
@@ -264,7 +287,7 @@ export default function DeliveriesPage() {
                   </button>
                   <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">{tc('pageOf', { page, totalPages })}</span>
                   <button type="button"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    onClick={() => setParam('page', String(Math.min(totalPages, page + 1)))}
                     disabled={page >= totalPages}
                     aria-label={tc('next')}
                     className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 transition"
