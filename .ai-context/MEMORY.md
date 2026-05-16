@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 03:38 GMT+8 (Oturum 178)
+> Son güncelleme: 2026-05-17 03:52 GMT+8 (Oturum 179)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,14 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 179 — 2026-05-17 03:52 GMT+8
+1. **Health Check Redis Cache** ✅ — 30sn cache, DB + Redis PING azaltıldı
+2. **Admin Stats Redis Cache** ✅ — 60sn cache, 10+ SQL sorgusu azaltıldı
+3. **Admin Revenue Redis Cache** ✅ — 60sn cache, 7+ SQL sorgusu azaltıldı
+4. **Edge Cache TTL** ✅ — /health ve /v1/status: 10sn → 60sn
+5. **Deserialize Derive'ları** ✅ — 7 struct'a Deserialize eklendi
+6. **Commit:** acdca488
 
 ### Oturum 174 — 2026-05-16 01:20 GMT+8
 1. **Admin Panel Aşama 3 — Müşteri İlişkileri** ✅

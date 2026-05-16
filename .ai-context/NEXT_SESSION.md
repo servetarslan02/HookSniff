@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-17 03:38 GMT+8 (Oturum 178)
+> Son güncelleme: 2026-05-17 03:52 GMT+8 (Oturum 179)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -16,6 +16,14 @@ Bu dosyayı ilk kez okuyorsan:
 ---
 
 ## ✅ Tamamlanan (Son Oturum — 2026-05-17)
+
+### Oturum 179: Redis Cache + Edge Cache TTL ✅
+1. **Health check Redis cache** — 30sn TTL, DB + Redis PING azaltıldı
+2. **Admin stats Redis cache** — 60sn TTL, 10+ SQL sorgusu → 1 cache read
+3. **Admin revenue Redis cache** — 60sn TTL, 7+ SQL sorgusu → 1 cache read
+4. **Edge cache TTL** — /health ve /v1/status: 10sn → 60sn
+5. **Deserialize derives** — 7 struct'a Deserialize eklendi
+6. **Commit:** acdca488 — push edildi
 
 ### Oturum 178: Audit Log Fix + Global Deploy + Benchmark ✅
 1. **Audit Log 500 düzeltildi** — `WHERE a.a.customer_id` çift alias bug'ı
@@ -116,9 +124,9 @@ Bu dosyayı ilk kez okuyorsan:
 | 6 | Edge proxy routing | ✅ | Multi-region restore edildi |
 | 7 | device_tokens tablo | ✅ | Migration 019 eklendi |
 | 8 | Audit Log React crash | ✅ | details JSON render fix |
-| 9 | Response gzip middleware | ⏳ | Rust API'ye gzip ekle → %30-50 küçülme |
-| 10 | Redis cache (stats, health) | ⏳ | Sıkça sorulan endpoint'leri 30sn cache'le |
-| 11 | Edge cache süresi artır | ⏳ | Cloudflare GET cache 10sn → 60sn |
+| 9 | Response gzip middleware | ✅ | Zaten varmış (CompressionLayer) |
+| 10 | Redis cache (stats, health) | ✅ | health 30sn, stats/revenue 60sn |
+| 11 | Edge cache süresi artır | ✅ | 10sn → 60sn |
 
 ### Öncelik 1 — Güvenlik (P0 kalan)
 | # | Görev | Durum | Dosya |
