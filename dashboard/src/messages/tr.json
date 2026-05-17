@@ -753,6 +753,8 @@
     "webhooksMonth": "Webhook/ay",
     "rateLimit": "Hız/dk",
     "dataRetention": "Veri Saklama",
+    "days": "gün",
+    "retentionDesc": "Webhook teslimat logları bu kadar gün saklanır.",
     "subscriptionDetails": "Abonelik Detayları",
     "paymentProvider": "Ödeme Sağlayıcı",
     "managePayment": "Ödeme yöntemini yönet →",

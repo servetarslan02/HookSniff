@@ -753,6 +753,8 @@
     "webhooksMonth": "Webhooks/mo",
     "rateLimit": "Rate/min",
     "dataRetention": "Data Retention",
+    "days": "days",
+    "retentionDesc": "Webhook delivery logs are kept for this many days.",
     "subscriptionDetails": "Subscription Details",
     "paymentProvider": "Payment Provider",
     "managePayment": "Manage payment method →",
