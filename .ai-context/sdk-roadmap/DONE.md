@@ -1,6 +1,27 @@
 # SDK — Tamamlanan İşler
 
-> Son güncelleme: 2026-05-18 01:10 GMT+8
+> Son güncelleme: 2026-05-18 01:20 GMT+8
+
+---
+
+## ✅ C# SDK — Svix'ten Adaptasyon — 2026-05-18
+
+### Yöntem
+- Svix C# SDK (`csharp/`) kopyalandı
+- `svix` → `hooksniff` bulk find-replace
+- Svix-specific features kaldırıldı
+- API dosyaları HookSniff endpoint'leri ile yeniden yazıldı
+- `.csproj` ve `.sln` güncellendi
+
+### Sonuç
+- 67 dosya
+- ~40 typed model
+- 7 API resource: authentication, endpoint, event_type, health, message, message_attempt, statistics
+- Webhook verification (HMAC-SHA256, hooksniff-id/signature/timestamp headers)
+- Auto-retry + exponential backoff
+- Auto-idempotency key
+- .NET 8.0+, Newtonsoft.Json, Polly
+- Versiyon: 1.0.0
 
 ---
 
