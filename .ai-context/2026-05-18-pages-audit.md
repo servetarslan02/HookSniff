@@ -51,3 +51,34 @@
 - ❌ gRPC delivery
 - ❌ SQS delivery
 - ❌ IP Whitelisting
+
+## İkinci Tur Düzeltmeler (FAQ, Terms, Newsletter, Docs)
+
+### FAQ Düzeltmeleri
+- Ücretsiz plan limiti: "10,000/month" → "100 events/day"
+- Rekabetçi dil yumuşatıldı: "competitors can't match" → "developer-friendly with transparent pricing"
+- Ödeme yöntemleri: yıllık faturalandırma eklendi
+- SLA: "99.9% uptime" olarak düzeltildi
+- Aşım davranışı: daha doğru açıklandı
+
+### Terms Düzeltmeleri
+- Yıllık faturalandırma seçeneği eklendi (%20 indirim)
+
+### Newsletter Düzeltmeleri
+- Sahte sosyal kanıt kaldırıldı (500+ abone, 48% açık oranı)
+- Sahte testimonial'lar kaldırıldı
+- Geçmiş sayılar "Coming soon" olarak işaretlendi (newsletter yeni)
+- "What to expect" bölümü eklendi
+
+### Docs Düzeltmeleri
+- Rate limits tablosu: doğru fiyatlar ($29/$49/Custom) ve limitler (günlük)
+- DLQ sayfası: doğru fiyatlar ve limitler
+- Architecture sayfası: implemente edilmemiş gRPC/SQS kaldırıldı
+- Security docs: IP whitelisting → SSRF protection
+- Get-started: api.hooksniff.dev → gerçek API URL
+- Overage pricing düzeltildi
+
+### Potansiyel Sorunlar (Servet'e sorulacak)
+- `enterprise@hooksniff.dev` email adresi tanımlı mı?
+- `portal.hooksniff.dev` domain'i tanımlı mı?
+- `hooksniff.dev` domain'i aktif mi?
