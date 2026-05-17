@@ -32,7 +32,7 @@
 | 4 | Message Poller | Orta | 3-4 saat | ✅ |
 | 5 | Ingest (inbound webhook) | Zor | 8-10 saat | ✅ |
 | 6 | Connector (8 servis) | Orta | 4-5 saat | ✅ |
-| 7 | Integration | Zor | 10-15 saat | ⬜ SIRADAKİ |
+| 7 | Integration | Zor | 10-15 saat | ✅ |
 | 8 | Streaming (SSE/WebSocket) | Çok zor | 15-20 saat | ⬜ |
 
 ---

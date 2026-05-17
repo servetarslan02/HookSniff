@@ -32,7 +32,7 @@
 | 11 | Message Poller | ✅ |
 | 12 | Ingest | ✅ |
 | 13 | Connector | ✅ |
-| 14 | Integration | ⬜ |
+| 14 | Integration | ✅ |
 | 15 | Streaming | ⬜ |
 
 ## 🔧 Build Ortamı (Bu sunucuda kuruldu)

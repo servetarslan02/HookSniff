@@ -25,6 +25,7 @@ pub mod notifications;
 pub mod operational_webhooks;
 pub mod message_poller;
 pub mod connectors;
+pub mod integrations;
 pub mod oauth;
 pub mod outbound_ips;
 pub mod playground;
@@ -76,6 +77,7 @@ pub fn api_router() -> Router {
         .nest("/operational-webhooks", operational_webhooks::router())
         .nest("/message-poller", message_poller::router())
         .nest("/connectors", connectors::router())
+        .nest("/integrations", integrations::router())
         .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
         .nest("/stream", stream::router())
         .nest("/events", events::router())
@@ -183,5 +185,6 @@ mod tests {
         let _ = operational_webhooks::router();
         let _ = message_poller::router();
         let _ = connectors::router();
+        let _ = integrations::router();
     }
 }

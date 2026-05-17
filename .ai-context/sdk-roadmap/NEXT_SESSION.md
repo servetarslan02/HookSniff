@@ -1,10 +1,10 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-18 06:26 GMT+8
+> Son güncelleme: 2026-05-18 06:40 GMT+8
 
-## 🎯 Sıradaki: Faz 14 — Integration
+## 🎯 Sıradaki: Faz 15 — Streaming
 
-Faz 8-13 tamamlandı.
+Faz 8-14 tamamlandı.
 
 ## 📊 Mevcut Durum
 
@@ -15,24 +15,22 @@ Faz 8-13 tamamlandı.
 - Faz 11 (Message Poller): ✅
 - Faz 12 (Ingest): ✅ (sidebar nav + SDK tamamlandı)
 - Faz 13 (Connector): ✅
-  - Migration 062: connectors + connector_configs tabloları ✅
-  - 8 connector seed: Stripe, Shopify, GitHub, Slack, Twilio, Discord, Linear, Notion ✅
-  - API routes (CRUD) ✅
-  - Dashboard sayfası ✅
-  - SDK'lar (11/11) ✅
-  - Sidebar nav: 🔌 Connectors ✅
+- Faz 14 (Integration): ✅
+  - Migration 063: integrations + integration_events tabloları ✅
+  - Rust API: CRUD + test + events + stats ✅
+  - Dashboard sayfası (overview, events, stats tabs) ✅
+  - API client (integrationsApi) ✅
+  - Sidebar nav: 🔗 Integrations ✅
   - i18n: en + tr ✅
-- Dashboard sidebar: 6 nav item (environments, background tasks, operational webhooks, message poller, inbound, connectors)
 
 ## ⚠️ Deploy Durumu
 - Dashboard (Vercel): ✅ Auto-deploy çalışıyor
-- API (Cloud Run): ❌ Connectors endpoint 404 — Cloud Build tetiklenmeli
-- DB: ✅ Tüm tablolar ve seed data hazır
+- API (Cloud Run): ❌ Integration endpoint'leri deploy edilmeli — Cloud Build tetiklenmeli
+- DB: ✅ Tüm tablolar hazır (migration 063 uygulandı)
 
 ## 📝 Sonraki Adımlar
-1. **Cloud Build tetikle** — Connectors API'si deploy edilmeli
-2. Faz 14: Integration (10-15 saat)
-3. Faz 15: Streaming (15-20 saat)
+1. **Cloud Build tetikle** — Integration API'si deploy edilmeli
+2. Faz 15: Streaming (SSE/WebSocket) (15-20 saat)
 
 ## 🔑 Oturum Notları
 - Oturumlar ~1 saat sürüyor
