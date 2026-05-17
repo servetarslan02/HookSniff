@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Link } from '@/i18n/navigation';
 import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
 

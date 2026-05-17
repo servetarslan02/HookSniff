@@ -10,7 +10,6 @@ const PLAN_OPTIONS = ['developer', 'startup', 'pro', 'enterprise'];
 export function OverviewTab({
   detail,
   planHistory,
-  userEndpoints,
   analytics,
   t,
   tc,

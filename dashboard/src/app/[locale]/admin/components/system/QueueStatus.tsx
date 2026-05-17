@@ -3,19 +3,19 @@
 import { useTranslations } from 'next-intl';
 
 interface QueueStatusData {
-  pending: number;
-  processing: number;
-  failed: number;
-  total: number;
-  failed_last_hour: number;
-  oldest_pending_at: string | null;
+  pending?: number;
+  processing?: number;
+  failed?: number;
+  total?: number;
+  failed_last_hour?: number;
+  oldest_pending_at?: string | null;
 }
 
 interface QueueStatusProps {
   queueStatus: QueueStatusData | undefined;
   dbSize: string | undefined;
-  queueDetail: { pending: number; processing: number; failed_last_hour: number } | undefined;
-  recentErrors: Array<{ id: string; event: string; error: string; created_at: string }> | undefined;
+  queueDetail?: { pending?: number; processing?: number; failed_last_hour?: number };
+  recentErrors?: Array<{ id?: string; event?: string; error?: string; created_at?: string }>;
   locale: string;
 }
 
@@ -71,7 +71,7 @@ export default function QueueStatusSection({ queueStatus, dbSize, queueDetail, r
                     <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">{err.error || 'Unknown error'}</p>
                   </div>
                   <span className="text-xs text-gray-500 dark:text-slate-400">
-                    {new Date(err.created_at).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(err.created_at ?? "").toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               </div>
@@ -99,12 +99,12 @@ export default function QueueStatusSection({ queueStatus, dbSize, queueDetail, r
               ].map((item) => (
                 <div key={item.label} className={`rounded-xl p-4 ${item.bg}`}>
                   <p className="text-xs text-gray-500 dark:text-slate-400">{item.label}</p>
-                  <p className={`text-2xl font-bold mt-1 ${item.color}`}>{item.value.toLocaleString()}</p>
+                  <p className={`text-2xl font-bold mt-1 ${item.color}`}>{(item.value ?? 0).toLocaleString()}</p>
                 </div>
               ))}
             </div>
-            {queueStatus.failed_last_hour > 0 && (
-              <p className="mt-3 text-sm text-red-600 dark:text-red-400">⚠️ {t('failedInLastHour', { count: queueStatus.failed_last_hour })}</p>
+            {(queueStatus.failed_last_hour ?? 0) > 0 && (
+              <p className="mt-3 text-sm text-red-600 dark:text-red-400">⚠️ {t('failedInLastHour', { count: queueStatus.failed_last_hour ?? 0 })}</p>
             )}
             {queueStatus.oldest_pending_at && (
               <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">{t('oldestPending')}: {new Date(queueStatus.oldest_pending_at).toLocaleString()}</p>

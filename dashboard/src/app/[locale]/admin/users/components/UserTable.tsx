@@ -28,8 +28,8 @@ interface UserTableProps {
   setPlanChangeTarget: (user: AdminUser) => void;
   setNewPlan: (plan: string) => void;
   planBadgeColors: PlanBadgeColors;
-  t: (key: string) => string;
-  tc: (key: string) => string;
+  t: any;
+  tc: any;
 }
 
 export function UserTable({

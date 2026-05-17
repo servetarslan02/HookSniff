@@ -4,8 +4,8 @@ import { useTranslations } from 'next-intl';
 
 interface RateLimitViolation {
   id: string;
-  customer_email?: string;
-  ip?: string;
+  customer_email?: string | null;
+  ip?: string | null;
   requests_count: number;
   limit_per_window: number;
   window_seconds: number;

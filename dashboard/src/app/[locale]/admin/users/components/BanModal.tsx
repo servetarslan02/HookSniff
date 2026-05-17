@@ -8,8 +8,8 @@ interface BanModalProps {
   setBanReason: (reason: string) => void;
   handleConfirmBan: () => void;
   setBanTarget: (user: AdminUser | null) => void;
-  t: (key: string, params?: Record<string, unknown>) => string;
-  tc: (key: string) => string;
+  t: any;
+  tc: any;
 }
 
 export function BanModal({

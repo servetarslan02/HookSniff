@@ -4,9 +4,9 @@ import { useTranslations } from 'next-intl';
 
 interface DeadLetter {
   id: string;
-  customer_email?: string;
-  endpoint_url?: string;
-  reason?: string;
+  customer_email?: string | null;
+  endpoint_url?: string | null;
+  reason?: string | null;
   attempts: number;
   created_at: string;
 }
