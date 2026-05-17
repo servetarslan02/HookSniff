@@ -233,6 +233,101 @@ export const statsApi = {
 // Auth API
 
 // Generic API client (axios-style wrapper — returns { data } for compatibility)
+// Environments API
+export interface EnvironmentOut {
+  id: string;
+  customer_id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  is_default: boolean;
+  color: string | null;
+  created_at: string;
+  updated_at: string;
+  variable_count: number | null;
+}
+
+export interface EnvironmentVariableOut {
+  id: string;
+  environment_id: string;
+  key: string;
+  value: string;
+  is_secret: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export const environmentsApi = {
+  list: (token: string) => apiFetch<EnvironmentOut[]>("/environments", { token }),
+  get: (token: string, id: string) => apiFetch<EnvironmentOut>(`/environments/${id}`, { token }),
+  create: (token: string, data: { name: string; slug?: string; description?: string; is_default?: boolean; color?: string }) =>
+    apiFetch<EnvironmentOut>("/environments", { method: "POST", body: data, token }),
+  update: (token: string, id: string, data: { name?: string; description?: string; is_default?: boolean; color?: string }) =>
+    apiFetch<EnvironmentOut>(`/environments/${id}`, { method: "PUT", body: data, token }),
+  delete: (token: string, id: string) => apiFetch<{ deleted: boolean }>(`/environments/${id}`, { method: "DELETE", token }),
+  listVariables: (token: string, id: string) => apiFetch<EnvironmentVariableOut[]>(`/environments/${id}/variables`, { token }),
+  createVariable: (token: string, id: string, data: { key: string; value: string; is_secret?: boolean }) =>
+    apiFetch<EnvironmentVariableOut>(`/environments/${id}/variables`, { method: "POST", body: data, token }),
+  deleteVariable: (token: string, envId: string, varId: string) =>
+    apiFetch<{ deleted: boolean }>(`/environments/${envId}/variables/${varId}`, { method: "DELETE", token }),
+};
+
+// Background Tasks API
+export interface BackgroundTaskOut {
+  id: string;
+  customer_id: string;
+  task_type: string;
+  status: "pending" | "running" | "completed" | "failed" | "cancelled";
+  data: Record<string, unknown> | null;
+  result: Record<string, unknown> | null;
+  error: string | null;
+  progress: number;
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+}
+
+export const backgroundTasksApi = {
+  list: (token: string) => apiFetch<BackgroundTaskOut[]>("/background-tasks", { token }),
+  get: (token: string, id: string) => apiFetch<BackgroundTaskOut>(`/background-tasks/${id}`, { token }),
+  cancel: (token: string, id: string) => apiFetch<BackgroundTaskOut>(`/background-tasks/${id}`, { method: "PUT", token }),
+};
+
+// Operational Webhooks API
+export interface OperationalWebhookEndpointOut {
+  id: string;
+  customer_id: string;
+  url: string;
+  description: string | null;
+  is_active: boolean;
+  event_types: string[] | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OperationalWebhookDeliveryOut {
+  id: string;
+  endpoint_id: string;
+  event_type: string;
+  payload: Record<string, unknown>;
+  response_status: number | null;
+  attempt_count: number;
+  status: string;
+  created_at: string;
+  delivered_at: string | null;
+}
+
+export const operationalWebhooksApi = {
+  list: (token: string) => apiFetch<OperationalWebhookEndpointOut[]>("/operational-webhooks", { token }),
+  get: (token: string, id: string) => apiFetch<OperationalWebhookEndpointOut>(`/operational-webhooks/${id}`, { token }),
+  create: (token: string, data: { url: string; description?: string; is_active?: boolean; event_types?: string[] }) =>
+    apiFetch<OperationalWebhookEndpointOut>("/operational-webhooks", { method: "POST", body: data, token }),
+  update: (token: string, id: string, data: { url?: string; description?: string; is_active?: boolean; event_types?: string[] }) =>
+    apiFetch<OperationalWebhookEndpointOut>(`/operational-webhooks/${id}`, { method: "PUT", body: data, token }),
+  delete: (token: string, id: string) => apiFetch<{ deleted: boolean }>(`/operational-webhooks/${id}`, { method: "DELETE", token }),
+  listDeliveries: (token: string, id: string) => apiFetch<OperationalWebhookDeliveryOut[]>(`/operational-webhooks/${id}/deliveries`, { token }),
+};
+
 export const api = {
   get: async <T = unknown>(path: string, token?: string) => ({ data: await apiFetch<T>(path, { token }) }),
   post: async <T = unknown>(path: string, body?: unknown, token?: string) => ({ data: await apiFetch<T>(path, { method: 'POST', body, token }) }),
