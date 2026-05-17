@@ -12,6 +12,8 @@ use std::time::Duration;
 
 use hyper::body::Bytes;
 use hyper_util::client::legacy::Client as HyperClient;
+use hyper_rustls::HttpsConnector;
+use hyper_util::client::legacy::connect::HttpConnector;
 
 pub mod api;
 mod api_internal;
@@ -22,6 +24,16 @@ mod models;
 mod request;
 pub mod webhooks;
 
+type Connector = HttpsConnector<HttpConnector>;
+
+pub(crate) fn make_connector(_proxy_address: Option<String>) -> Connector {
+    hyper_rustls::HttpsConnectorBuilder::new()
+        .with_native_roots()
+        .expect("failed to load native TLS roots")
+        .https_or_http()
+        .enable_http1()
+        .build()
+}
 
 pub struct Configuration {
     pub base_path: String,

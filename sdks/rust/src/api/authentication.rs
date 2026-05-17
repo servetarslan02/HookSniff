@@ -1,4 +1,3 @@
-// this file is @generated
 use crate::{error::Result, Configuration};
 
 #[derive(Default)]
@@ -17,13 +16,10 @@ impl<'a> Authentication<'a> {
 
     /// Logout the current auth token.
     pub async fn logout(&self, options: Option<AuthenticationLogoutOptions>) -> Result<()> {
-        let mut req = crate::request::Request::new(http1::Method::POST, "/api/v1/auth/logout");
-        if let Some(opts) = options {
-            if let Some(key) = opts.idempotency_key {
-                req = req.header("idempotency-key", &key);
-            }
-        }
-        req.execute(self.cfg).await?;
-        Ok(())
+        let idempotency_key = options.and_then(|o| o.idempotency_key);
+        crate::request::Request::new(http1::Method::POST, "/api/v1/auth/logout")
+            .with_optional_header_param("idempotency-key", idempotency_key)
+            .execute(self.cfg)
+            .await
     }
 }
