@@ -7,7 +7,8 @@ use uuid::Uuid;
 use crate::billing::Plan;
 use crate::error::AppError;
 use crate::models::application::{
-    Application, ApplicationResponse, CreateApplicationRequest, UpdateApplicationRequest,
+    Application, ApplicationResponse, ApplicationWithCount, CreateApplicationRequest,
+    UpdateApplicationRequest,
 };
 use crate::models::customer::Customer;
 
@@ -23,41 +24,52 @@ pub fn router() -> Router {
 }
 
 /// List all applications for the authenticated customer.
+/// Uses a single query with a LEFT JOIN to get endpoint counts (avoids N+1).
 async fn list_applications(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<ApplicationResponse>>, AppError> {
-    let apps = sqlx::query_as::<_, Application>(
-        "SELECT id, customer_id, name, description, is_active, created_at, updated_at \
-         FROM applications WHERE customer_id = $1 ORDER BY created_at DESC",
+    let rows = sqlx::query_as::<_, ApplicationWithCount>(
+        "SELECT a.id, a.customer_id, a.name, a.description, a.is_active, \
+         a.created_at, a.updated_at, \
+         COALESCE(e.cnt, 0) AS endpoint_count \
+         FROM applications a \
+         LEFT JOIN ( \
+           SELECT application_id, COUNT(*)::bigint AS cnt \
+           FROM endpoints GROUP BY application_id \
+         ) e ON e.application_id = a.id \
+         WHERE a.customer_id = $1 \
+         ORDER BY a.created_at DESC",
     )
     .bind(customer.id)
     .fetch_all(&pool)
     .await?;
 
-    let mut responses = Vec::with_capacity(apps.len());
-    for app in apps {
-        let count: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM endpoints WHERE application_id = $1",
-        )
-        .bind(app.id)
-        .fetch_one(&pool)
-        .await?;
-        responses.push(app.to_response(count.0));
-    }
+    let responses: Vec<ApplicationResponse> = rows
+        .into_iter()
+        .map(|r| r.to_response())
+        .collect();
 
     Ok(Json(responses))
 }
 
 /// Get a single application by ID.
+/// Uses a single query with a LEFT JOIN to get endpoint count (avoids N+1).
 async fn get_application(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<ApplicationResponse>, AppError> {
-    let app = sqlx::query_as::<_, Application>(
-        "SELECT id, customer_id, name, description, is_active, created_at, updated_at \
-         FROM applications WHERE id = $1 AND customer_id = $2",
+    let row = sqlx::query_as::<_, ApplicationWithCount>(
+        "SELECT a.id, a.customer_id, a.name, a.description, a.is_active, \
+         a.created_at, a.updated_at, \
+         COALESCE(e.cnt, 0) AS endpoint_count \
+         FROM applications a \
+         LEFT JOIN ( \
+           SELECT application_id, COUNT(*)::bigint AS cnt \
+           FROM endpoints GROUP BY application_id \
+         ) e ON e.application_id = a.id \
+         WHERE a.id = $1 AND a.customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
@@ -65,14 +77,7 @@ async fn get_application(
     .await?
     .ok_or(AppError::NotFound)?;
 
-    let count: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM endpoints WHERE application_id = $1",
-    )
-    .bind(app.id)
-    .fetch_one(&pool)
-    .await?;
-
-    Ok(Json(app.to_response(count.0)))
+    Ok(Json(row.to_response()))
 }
 
 /// Create a new application.
@@ -185,26 +190,20 @@ async fn update_application(
         }
     }
 
-    let updated = sqlx::query_as::<_, Application>(
+    let updated = sqlx::query_as::<_, ApplicationWithCount>(
         "UPDATE applications SET \
          name = COALESCE($3, name), \
          description = COALESCE($4, description), \
          is_active = COALESCE($5, is_active) \
          WHERE id = $1 AND customer_id = $2 \
-         RETURNING id, customer_id, name, description, is_active, created_at, updated_at",
+         RETURNING id, customer_id, name, description, is_active, created_at, updated_at, \
+         COALESCE((SELECT COUNT(*)::bigint FROM endpoints WHERE application_id = $1), 0) AS endpoint_count",
     )
     .bind(id)
     .bind(customer.id)
     .bind(&req.name)
     .bind(&req.description)
     .bind(req.is_active)
-    .fetch_one(&pool)
-    .await?;
-
-    let count: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM endpoints WHERE application_id = $1",
-    )
-    .bind(updated.id)
     .fetch_one(&pool)
     .await?;
 
@@ -218,7 +217,7 @@ async fn update_application(
         }
     }
 
-    Ok(Json(updated.to_response(count.0)))
+    Ok(Json(updated.to_response()))
 }
 
 /// Delete an application.
