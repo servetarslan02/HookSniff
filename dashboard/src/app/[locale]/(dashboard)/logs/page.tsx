@@ -8,6 +8,7 @@ import { type Delivery, type DeliveryAttempt, webhooksApi } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
 import { useDeliveryLogs } from '@/hooks/useDashboardData';
+import { LazySection, Skeletons } from '@/components/LazySection';
 
 type StatusFilter = 'all' | 'delivered' | 'failed' | 'pending';
 
@@ -152,6 +153,7 @@ export default function LogsPage() {
       )}
 
       {/* Table */}
+      <LazySection fallback={Skeletons.table()} rootMargin={300}>
       <div className="glass-card overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center">
@@ -311,6 +313,7 @@ export default function LogsPage() {
           </>
         )}
       </div>
+      </LazySection>
 
       {/* Detail Modal */}
       {selected && (
