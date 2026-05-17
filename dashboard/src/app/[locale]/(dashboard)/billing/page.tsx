@@ -27,9 +27,8 @@ export default function BillingPage() {
   // React Query hooks for data fetching
   const { data: usageData, isLoading: loadingUsage } = useBillingUsage();
   const { data: invoices, isLoading: loadingInvoices } = useBillingInvoices();
-  const { getPlanLimits, getPlan } = usePlans();
+  const { getPlanLimits } = usePlans();
   const planLimits = getPlanLimits(currentPlan);
-  const planInfo = getPlan(currentPlan);
 
   // Derived values from usage data
   const usageCount = usageData
