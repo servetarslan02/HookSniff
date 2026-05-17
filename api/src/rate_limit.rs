@@ -261,13 +261,16 @@ impl RateLimitStore for RedisRateLimiter {
         {
             Ok(r) => r,
             Err(e) => {
-                // HS-273: Fail-closed — deny request when Redis is unavailable.
-                // Previously fail-open allowed unlimited requests during Redis outages,
-                // effectively disabling rate limiting. Now we deny and log.
-                tracing::error!("Redis rate limit error: {e}, denying request (fail-closed)");
+                // HS-273: Fail-open when Redis is unavailable.
+                // The original fail-closed approach blocked ALL requests when Redis
+                // was down (e.g. Upstash quota exceeded), causing total outage.
+                // Now we allow the request through but log the error. The per-IP
+                // rate limiting still works via the in-memory fallback in the
+                // rate_limit_middleware layer.
+                tracing::warn!("Redis rate limit error: {e}, allowing request (fail-open)");
                 return RateLimitResult {
-                    allowed: false,
-                    remaining: 0,
+                    allowed: true,
+                    remaining: limit.saturating_sub(1),
                     limit,
                     reset_seconds: window_secs,
                 };
