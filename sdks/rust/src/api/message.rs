@@ -41,16 +41,6 @@ pub struct MessageCreateOptions {
 }
 
 #[derive(Default)]
-pub struct MessageExpungeAllContentsOptions {
-    pub idempotency_key: Option<String>,
-}
-
-#[derive(Default)]
-pub struct MessagePrecheckOptions {
-    pub idempotency_key: Option<String>,
-}
-
-#[derive(Default)]
 pub struct MessageGetOptions {
     /// When `true` message payloads are included in the response.
     pub with_content: Option<bool>,
@@ -63,8 +53,6 @@ pub struct Message<'a> {
 impl<'a> Message<'a> {
     pub(super) fn new(cfg: &'a Configuration) -> Self {
         Self { cfg }
-    }
-
     }
 
     /// List all of the application's messages.
@@ -162,49 +150,6 @@ impl<'a> Message<'a> {
     ///   }
     /// }
     /// ```
-    pub async fn expunge_all_contents(
-        &self,
-        app_id: String,
-        options: Option<MessageExpungeAllContentsOptions>,
-    ) -> Result<ExpungeAllContentsOut> {
-        let MessageExpungeAllContentsOptions { idempotency_key } = options.unwrap_or_default();
-
-        crate::request::Request::new(
-            http1::Method::POST,
-            "/api/v1/app/{app_id}/msg/expunge-all-contents",
-        )
-        .with_path_param("app_id", app_id)
-        .with_optional_header_param("idempotency-key", idempotency_key)
-        .execute(self.cfg)
-        .await
-    }
-
-    /// A pre-check call for `message.create` that checks whether any active
-    /// endpoints are listening to this message.
-    ///
-    /// Note: most people shouldn't be using this API. HookSniff doesn't bill you for
-    /// messages not actually sent, so using this API doesn't save money.
-    /// If unsure, please ask HookSniff support before using this API.
-    pub async fn precheck(
-        &self,
-        app_id: String,
-        message_precheck_in: MessagePrecheckIn,
-        options: Option<MessagePrecheckOptions>,
-    ) -> Result<MessagePrecheckOut> {
-        let MessagePrecheckOptions { idempotency_key } = options.unwrap_or_default();
-
-        crate::request::Request::new(
-            http1::Method::POST,
-            "/api/v1/app/{app_id}/msg/precheck/active",
-        )
-        .with_path_param("app_id", app_id)
-        .with_optional_header_param("idempotency-key", idempotency_key)
-        .with_body_param(message_precheck_in)
-        .execute(self.cfg)
-        .await
-    }
-
-    /// Get a message by its ID or eventID.
     pub async fn get(
         &self,
         app_id: String,
@@ -237,93 +182,4 @@ impl<'a> Message<'a> {
         .execute(self.cfg)
         .await
     }
-
-    #[cfg(feature = "hooksniff_beta")]
-    pub async fn events(
-        &self,
-        params: V1MessageEventsParams,
-    ) -> Result<crate::models::MessageEventsOut> {
-        let V1MessageEventsParams {
-            app_id,
-            limit,
-            iterator,
-            event_types,
-            channels,
-            after,
-        } = params;
-
-        crate::request::Request::new(http1::Method::GET, "/api/v1/app/{app_id}/events")
-            .with_path_param("app_id", app_id)
-            .with_optional_query_param("limit", limit)
-            .with_optional_query_param("iterator", iterator)
-            .with_optional_query_param("event_types", event_types)
-            .with_optional_query_param("channels", channels)
-            .with_optional_query_param("after", after)
-            .execute(self.cfg)
-            .await
-    }
-
-    #[cfg(feature = "hooksniff_beta")]
-    pub async fn events_subscription(
-        &self,
-        params: V1MessageEventsSubscriptionParams,
-    ) -> Result<crate::models::MessageEventsOut> {
-        let V1MessageEventsSubscriptionParams {
-            app_id,
-            subscription_id,
-            limit,
-            iterator,
-            event_types,
-            channels,
-            after,
-        } = params;
-
-        crate::request::Request::new(
-            http1::Method::GET,
-            "/api/v1/app/{app_id}/events/subscription/{subscription_id}",
-        )
-        .with_path_param("app_id", app_id.to_string())
-        .with_path_param("subscription_id", subscription_id.to_string())
-        .with_optional_query_param("limit", limit)
-        .with_optional_query_param("iterator", iterator)
-        .with_optional_query_param("event_types", event_types)
-        .with_optional_query_param("channels", channels)
-        .with_optional_query_param("after", after)
-        .execute(self.cfg)
-        .await
-    }
-}
-
-#[cfg(feature = "hooksniff_beta")]
-#[derive(Clone, Debug)]
-pub struct V1MessageEventsParams {
-    /// The app's ID or UID
-    pub app_id: String,
-    /// Limit the number of returned items
-    pub limit: Option<i32>,
-    /// The iterator returned from a prior invocation
-    pub iterator: Option<String>,
-    /// Filter response based on the event type
-    pub event_types: Option<Vec<String>>,
-    /// Filter response based on the event type.
-    pub channels: Option<Vec<String>>,
-    pub after: Option<String>,
-}
-
-#[cfg(feature = "hooksniff_beta")]
-#[derive(Clone, Debug)]
-pub struct V1MessageEventsSubscriptionParams {
-    /// The app's ID or UID
-    pub app_id: String,
-    /// The esub's ID or UID
-    pub subscription_id: String,
-    /// Limit the number of returned items
-    pub limit: Option<i32>,
-    /// The iterator returned from a prior invocation
-    pub iterator: Option<String>,
-    /// Filter response based on the event type
-    pub event_types: Option<Vec<String>>,
-    /// Filter response based on the event type.
-    pub channels: Option<Vec<String>>,
-    pub after: Option<String>,
 }

@@ -73,9 +73,6 @@ pub mod list_response_event_type_out;
 pub mod list_response_message_attempt_out;
 pub mod list_response_message_endpoint_out;
 pub mod list_response_message_out;
-pub mod list_response_stream_event_type_out;
-pub mod list_response_stream_out;
-pub mod list_response_stream_sink_out;
 pub mod message_attempt_exhausted_event;
 pub mod message_attempt_exhausted_event_data;
 pub mod message_attempt_failed_data;
@@ -232,9 +229,6 @@ pub use self::{
     list_response_message_attempt_out::ListResponseMessageAttemptOut,
     list_response_message_endpoint_out::ListResponseMessageEndpointOut,
     list_response_message_out::ListResponseMessageOut,
-    list_response_stream_event_type_out::ListResponseStreamEventTypeOut,
-    list_response_stream_out::ListResponseStreamOut,
-    list_response_stream_sink_out::ListResponseStreamSinkOut,
     message_attempt_exhausted_event::MessageAttemptExhaustedEvent,
     message_attempt_exhausted_event_data::MessageAttemptExhaustedEventData,
     message_attempt_failed_data::MessageAttemptFailedData,

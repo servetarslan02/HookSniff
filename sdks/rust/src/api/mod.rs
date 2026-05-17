@@ -25,6 +25,7 @@ pub use self::{
         EventType, EventTypeCreateOptions, EventTypeDeleteOptions, EventTypeImportOpenapiOptions,
         EventTypeListOptions,
     },
+    health::Health,
     message::{
         Message, MessageCreateOptions, MessageGetOptions, MessageListOptions,
     },
@@ -61,7 +62,7 @@ impl HookSniff {
         MessageAttempt::new(&self.cfg)
     }
 
-    pub fn statistics(&self) -> Statistics<'_> {
-        Statistics::new(&self.cfg)
+    pub fn statistics(&self) -> Statistics {
+        Statistics
     }
 }
