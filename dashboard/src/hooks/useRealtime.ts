@@ -1,6 +1,6 @@
 'use client';
 const rtDebug = process.env.NODE_ENV === 'development' ? console.log : () => {};
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useWebSocket } from './useWebSocket';
 import type { WsEvent } from '@/schemas/api';
@@ -9,7 +9,7 @@ export function useRealtime() {
   const queryClient = useQueryClient();
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleEvent = (event: WsEvent) => {
+  const handleEvent = useCallback((event: WsEvent) => {
     switch (event.type) {
       case 'delivery.created':
       case 'delivery.status_changed':
@@ -55,7 +55,7 @@ export function useRealtime() {
         queryClient.invalidateQueries({ queryKey: ['admin'] });
         break;
     }
-  };
+  }, [queryClient]);
 
   const { state } = useWebSocket({
     onEvent: handleEvent,
