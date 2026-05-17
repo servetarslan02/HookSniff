@@ -28,7 +28,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 | ✅ | Elixir SDK adapte | Tamamlandı | %80 |
 | Faz 1 | Core kalite | ✅ Tamamlandı | %85 |
 | Faz 2 | Test suite | ✅ Tamamlandı | %90 |
-| Faz 3 | CI/CD | ⬜ | %92 |
+| Faz 3 | CI/CD | ✅ Tamamlandı | %95 |
 | Faz 4 | OpenAPI codegen | ⬜ | %95 |
 | Faz 5 | Dokümantasyon | ⬜ | %97 |
 | Faz 6 | Multi-dil publish | ⬜ | 11/11 |
@@ -86,9 +86,11 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 - [ ] Resource tests
 
 ### Faz 3 — CI/CD (2 saat)
-- [ ] GitHub Actions workflow
-- [ ] Otomatik publish
-- [ ] CHANGELOG
+- [x] GitHub Actions workflow (ci.yml, sdk-publish.yml, deploy.yml, trivy-scan.yml)
+- [x] Local CI script'leri (local-ci.sh, local-sdk-test.sh, local-sdk-publish.sh)
+- [x] Makefile entegrasyonu (make ci, make ci-test, make ci-publish)
+- [x] Otomatik publish (dry-run + gerçek, 11 SDK)
+- [x] CHANGELOG güncellendi
 
 ### Faz 4 — OpenAPI Codegen (3 saat)
 - [ ] Type üretici script
