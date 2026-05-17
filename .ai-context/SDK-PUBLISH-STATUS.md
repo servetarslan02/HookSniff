@@ -1,43 +1,64 @@
-# 📦 SDK Publish Durumu — 2026-05-11 20:59 GMT+8
+# 📦 SDK Publish Durumu — 2026-05-18 03:10 GMT+8
 
-> ⚠️ Bu dosya registry API'leriyle doğrulanmıştır. `search.maven.org` indeksleme gecikmesi yaşayabilir,
-> doğrulama için her zaman `repo1.maven.org` kullanılmalıdır.
+## Yayınlananlar ✅ (v1.0.0)
 
-## Yayınlananlar ✅ (11/11)
+| # | SDK | Versiyon | Registry | Durum | URL |
+|---|-----|----------|----------|-------|-----|
+| 1 | **Node.js** | 1.0.0 | npm | ✅ Yüklendi | https://www.npmjs.com/package/hooksniff |
+| 2 | **Python** | 1.0.0 | PyPI | ✅ Yüklendi | https://pypi.org/project/hooksniff/1.0.0/ |
+| 3 | Go | 1.0.0 | proxy.golang.org | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-go |
+| 4 | Rust | 1.0.0 | crates.io | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-rust |
+| 5 | Ruby | 1.0.0 | RubyGems | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-ruby |
+| 6 | Java | 1.0.0 | Maven Central | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-java |
+| 7 | Kotlin | 1.0.0 | Maven Central | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-kotlin |
+| 8 | PHP | 1.0.0 | Packagist | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-php |
+| 9 | C# | 1.0.0 | NuGet | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-csharp |
+| 10 | Elixir | 1.0.0 | Hex.pm | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-elixir |
+| 11 | Swift | 1.0.0 | GitHub Package Index | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-swift |
 
-| # | SDK | Versiyon | Registry | Doğrulama |
-|---|-----|----------|----------|-----------|
-| 1 | Node.js | 0.3.0 | npm | ✅ `registry.npmjs.org` API |
-| 2 | Python | 0.3.0 | PyPI | ✅ `pypi.org/pypi/hooksniff/json` |
-| 3 | Go | v0.3.0 | proxy.golang.org | ✅ `proxy.golang.org` API |
-| 4 | Rust | 0.3.0 | crates.io | ✅ `crates.io/api/v1` |
-| 5 | Ruby | 0.3.0 | RubyGems | ✅ `rubygems.org/api` — 183 indirme |
-| 6 | C# | 0.3.0 | NuGet | ✅ `api.nuget.org` |
-| 7 | Elixir | 0.3.0 | Hex.pm | ✅ `hex.pm/api` |
-| 8 | Swift | v0.3.0 | GitHub repo | ✅ `hooksniff-swift` public repo |
-| 9 | PHP | 0.1.0 | Packagist | ✅ `hooksniff/hooksniff-php` |
-| 10 | Java | 0.3.0 | Maven Central | ✅ `repo1.maven.org` (0.1.0, 0.2.0, 0.3.0) |
-| 11 | Kotlin | 0.3.0 | Maven Central | ✅ `repo1.maven.org` (`hooksniff-sdk-kotlin`) |
+## Ayrı Repo Yapısı (Tüm SDK'lar)
 
-## Registry URL'leri
-
-| SDK | URL |
-|-----|-----|
-| Node.js | https://www.npmjs.com/package/hooksniff-sdk |
-| Python | https://pypi.org/project/hooksniff/ |
+| SDK | Repo |
+|-----|------|
+| Node.js | https://github.com/servetarslan02/hooksniff-node |
+| Python | https://github.com/servetarslan02/hooksniff-python |
 | Go | https://github.com/servetarslan02/hooksniff-go |
-| Rust | https://crates.io/crates/hooksniff |
-| Ruby | https://rubygems.org/gems/hooksniff |
-| Java | https://repo1.maven.org/maven2/io/github/servetarslan02/hooksniff-sdk/ |
-| Kotlin | https://repo1.maven.org/maven2/io/github/servetarslan02/hooksniff-sdk-kotlin/ |
-| C# | https://www.nuget.org/packages/HookSniff/ |
-| Elixir | https://hex.pm/packages/hooksniff |
+| Rust | https://github.com/servetarslan02/hooksniff-rust |
+| Ruby | https://github.com/servetarslan02/hooksniff-ruby |
+| Java | https://github.com/servetarslan02/hooksniff-java |
+| Kotlin | https://github.com/servetarslan02/hooksniff-kotlin |
+| PHP | https://github.com/servetarslan02/hooksniff-php |
+| C# | https://github.com/servetarslan02/hooksniff-csharp |
+| Elixir | https://github.com/servetarslan02/hooksniff-elixir |
 | Swift | https://github.com/servetarslan02/hooksniff-swift |
-| PHP | https://packagist.org/packages/hooksniff/hooksniff-php |
 
-## Notlar
-- Java 3 versiyon yayında: 0.1.0, 0.2.0, 0.3.0
-- Kotlin tek versiyon: 0.3.0 (artifact: `hooksniff-sdk-kotlin`)
-- PHP sadece 0.1.0 (GitHub repo public yapıldıysa yeni push'lar otomatik gelir)
-- Ruby 183 indirme almış
-- `search.maven.org` API'si indeksleme gecikmesi yaşayabilir — doğrulama için `repo1.maven.org` kullan
+## Kalan Publish Komutları
+
+```bash
+# Go (GOPROXY otomatik indexlenir)
+cd sdks/go && go tag v1.0.0 && git push --tags
+
+# Rust
+cd sdks/rust && cargo login <token> && cargo publish
+
+# Ruby
+cd sdks/ruby && gem build hooksniff.gemspec && gem push hooksniff-*.gem
+
+# Java (Maven Central — Sonatype credentials gerekli)
+cd sdks/java && mvn deploy -B -DskipTests
+
+# Kotlin (Maven Central)
+cd sdks/kotlin && ./gradlew publish
+
+# PHP (Packagist — repo URL'den otomatik güncellenir)
+# Sadece push yeterli: git push origin main
+
+# C# (NuGet)
+cd sdks/csharp && dotnet pack -c Release && dotnet nuget push "bin/Release/*.nupkg" --api-key <key> --source https://api.nuget.org/v3/index.json
+
+# Elixir (Hex.pm)
+cd sdks/elixir && mix hex.publish --yes
+
+# Swift (otomatik — git tag ile)
+cd sdks/swift && git tag v1.0.0 && git push --tags
+```

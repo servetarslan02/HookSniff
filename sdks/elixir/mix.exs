@@ -47,6 +47,8 @@ defmodule HookSniffAPI.Mixfile do
    defp package do
       [
         name: "hooksniff",
+        licenses: ["MIT"],
+        links: %{"GitHub" => "https://github.com/servetarslan02/hooksniff-elixir"},
         files: ~w(.formatter.exs config lib mix.exs README* LICENSE*),
       ]
   end
