@@ -5,6 +5,7 @@ pub mod api_keys;
 pub mod applications;
 pub mod audit_log;
 pub mod auth;
+pub mod auth_2fa;
 pub mod billing;
 pub mod contact;
 pub mod custom_domains;
