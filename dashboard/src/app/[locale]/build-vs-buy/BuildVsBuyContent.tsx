@@ -14,7 +14,7 @@ const dimensions = [
   },
   {
     title: 'Engineering Cost',
-    hooksniff: '$29/mo (Pro plan) — no engineers needed for maintenance',
+    hooksniff: '$24/mo (Pro plan) — no engineers needed for maintenance',
     build: '3–5 engineers × 6–12 months = $300K–$1M+ initial build, then 1–2 engineers on-call permanently',
     whyItMatters: 'Webhook infrastructure looks simple (just HTTP POST, right?) but hides distributed-systems complexity: durable queues, retry logic, dead-letter handling, SSRF protection, signing, replay protection, FIFO ordering, log retention, and a self-serve portal. Each is a multi-week project.',
   },
@@ -149,7 +149,7 @@ export default function BuildVsBuyContent() {
             <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">vs 6–12 months to build</p>
           </div>
           <div className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 text-center">
-            <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-2">$29/mo</p>
+            <p className="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-2">$24/mo</p>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t("hooksniffPro")}</p>
             <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">vs $300K–$1M+ to build</p>
           </div>
@@ -216,7 +216,7 @@ export default function BuildVsBuyContent() {
               <ul className="space-y-3">
                 {[
                   { item: 'Setup time', cost: '1 day' },
-                  { item: 'Monthly cost (Pro)', cost: '$29/mo' },
+                  { item: 'Monthly cost (Pro)', cost: '$24/mo' },
                   { item: 'Infrastructure', cost: 'Included' },
                   { item: 'SOC 2 compliance', cost: 'Ready' },
                   { item: 'On-call burden', cost: 'Zero' },

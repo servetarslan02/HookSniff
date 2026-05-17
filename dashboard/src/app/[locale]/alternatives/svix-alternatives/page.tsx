@@ -14,8 +14,8 @@ const alternatives = [
     name: 'HookSniff',
     emoji: '🪝',
     taglineKey: 'bestForStartups',
-    price: '$29/mo',
-    pros: ['10x cheaper than Svix', 'FIFO ordered delivery', 'Schema registry', 'Open source + self-hosted', 'English & Turkish dashboard', 'Smart routing'],
+    price: '$24/mo',
+    pros: ['20x cheaper than Svix', 'FIFO ordered delivery', 'Schema registry', 'Open source + self-hosted', 'English & Turkish dashboard', 'Smart routing'],
     cons: ['Newer (less enterprise trust)', 'SOC 2 ready (not Type 2 yet)', '99.9% SLA (vs Svix 99.99%)', 'No HIPAA/PCI-DSS yet'],
     bestForKey: 'bestForStartupsDesc',
   },
@@ -104,7 +104,7 @@ export default async function SvixAlternativesPage() {
               <tbody>
                 {[
                   { name: 'Svix', price: '$490/mo', sdks: '6', oss: '✅', self: '✅', soc2: 'Type 2', sla: '99.99%', highlight: false },
-                  { name: 'HookSniff', price: '$29/mo', sdks: '11', oss: '✅', self: '✅', soc2: t('ready'), sla: '99.9%', highlight: true },
+                  { name: 'HookSniff', price: '$24/mo', sdks: '11', oss: '✅', self: '✅', soc2: t('ready'), sla: '99.9%', highlight: true },
                   { name: 'Hookdeck', price: '$39/mo+', sdks: '8', oss: '❌', self: '❌', soc2: 'Type 2', sla: '99.999%', highlight: false },
                   { name: 'Hook0', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', sdks: '4', oss: '✅', self: '✅', soc2: '❌', sla: 'N/A', highlight: false },
                   { name: 'Convoy', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', sdks: '1 (Go)', oss: '✅', self: '✅', soc2: '❌', sla: 'N/A', highlight: false },

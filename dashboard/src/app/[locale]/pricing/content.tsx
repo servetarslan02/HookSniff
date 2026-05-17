@@ -17,7 +17,7 @@ function RoiCalculator() {
 
   const svixCost = events <= 0 ? 0 : 490;
   const hookdeckCost = events <= 10000 ? 0 : 39 + Math.max(0, Math.ceil((events - 10000) / 100000)) * 1;
-  const hooksniffCost = events <= 100 ? 0 : events <= 30000 ? 29 : events <= 100000 ? 49 : 49 + Math.max(0, Math.ceil((events - 100000) / 1000)) * 0.0001;
+  const hooksniffCost = events <= 100 ? 0 : events <= 30000 ? 24 : events <= 100000 ? 49 : 149 + Math.max(0, Math.ceil((events - 100000) / 1000)) * 0.0001;
   const savingsVsSvix = svixCost - hooksniffCost;
   const savingsPercent = svixCost > 0 ? Math.round((savingsVsSvix / svixCost) * 100) : 0;
 
@@ -91,17 +91,17 @@ export function PricingPageContent() {
   const tf = useTranslations('pricingFaq');
   const isTr = locale === 'tr';
 
-  const monthlyPrices = { developer: 0, startup: 29, pro: 49, enterprise: 99 };
+  const monthlyPrices = { developer: 0, startup: 24, pro: 49, enterprise: 149 };
   const annualPrices = {
     developer: 0,
-    startup: Math.round(29 * 12 * 0.8),
+    startup: Math.round(24 * 12 * 0.8),
     pro: Math.round(49 * 12 * 0.8),
-    enterprise: Math.round(99 * 12 * 0.8),
+    enterprise: Math.round(149 * 12 * 0.8),
   };
 
   const getPrice = (plan: string) => {
     if (plan === 'developer') return '$0';
-    if (plan === 'enterprise') return '$99';
+    if (plan === 'enterprise') return '$149';
     const prices = billingPeriod === 'annual' ? annualPrices : monthlyPrices;
     const val = prices[plan as keyof typeof prices];
     return `$${val}`;

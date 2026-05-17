@@ -698,11 +698,11 @@
       "developer": "Developer",
       "startup": "Startup",
       "developerLimit": "Günlük 100 event",
-      "startupLimit": "Günlük 30.000 event",
-      "proLimit": "Günlük 100.000 event",
-      "enterpriseLimit": "Sınırsız",
-      "freeLimit": "Günlük 100 event",
-      "businessLimit": "Sınırsız"
+      "startupLimit": "Gunluk 30.000 event",
+      "proLimit": "Gunluk 100.000 event",
+      "enterpriseLimit": "Sinirsiz",
+      "freeLimit": "Gunluk 100 event",
+      "businessLimit": "Sinirsiz"
     },
     "features": {
       "deliveries": "Ayda {count} teslimat",
@@ -2025,17 +2025,17 @@
       "startTrial": "Ücretsiz deneyin",
       "contactSales": "Satışla iletişime geçin",
       "proFeatures": [
-        "Günlük 100.000 event",
-        "Sınırsız uygulama",
+        "Gunluk 100.000 event",
+        "Sinirsiz uygulama",
         "500 endpoint",
-        "Sınırsız event tipi",
-        "Sınırsız abonelik",
-        "30 günlük log",
-        "Event başına $0.0001 overage",
-        "FIFO sıralı teslimat",
+        "Sinirsiz event tipi",
+        "Sinirsiz abonelik",
+        "30 gunluk log",
+        "Event basina $0.0001 overage",
+        "FIFO sirali teslimat",
         "Analitik ve grafikler",
-        "Şema kayıt merkezi",
-        "Webhook oyun alanı"
+        "Sema kayit merkezi",
+        "Webhook oyun alani"
       ],
       "enterpriseFeatures": [
         "Tamamen yönetilen — sahip olunması gereken altyapı yok",
@@ -2255,7 +2255,7 @@
   "q1": "HookSniff nedir?",
   "a1": "HookSniff, geliştiriciler için bir webhook teslimat servisidir. Webhook'larınızı otomatik yeniden denemeler, HMAC imzaları ve gerçek zamanlı izleme ile güvenilir bir şekilde endpoint'lerinize teslim ediyoruz.",
   "q2": "HookSniff, Svix veya Hookdeck'ten nasıl farklı?",
-  "a2": "HookSniff benzer özellikleri daha düşük maliyetle sunar. Pro planımız ayda $29 iken Svix ayda $490. Ayrıca 11 SDK, FIFO teslimat, CloudEvents ve şema kayıt merkezi destekliyoruz. Geliştirici dostu ve şeffaf fiyatlandırma odaklıyız.",
+  "a2": "HookSniff benzer özellikleri daha düşük maliyetle sunar. Pro planımız ayda $24 iken Svix ayda $490. Ayrıca 11 SDK, FIFO teslimat, CloudEvents ve şema kayıt merkezi destekliyoruz. Geliştirici dostu ve şeffaf fiyatlandırma odaklıyız.",
   "q3": "HookSniff production-ready mı?",
   "a3": "Evet. HookSniff %99.9 uptime SLA ile webhook teslimatı yapar. Dayanıklı depolama için PostgreSQL, üstel geri çekilmeli otomatik yeniden denemeler ve başarısız teslimatlar için ölü mektup kuyrukları kullanıyoruz.",
   "q4": "Nasıl başlarım?",
@@ -2348,7 +2348,7 @@
   },
   "pricing": {
     "title": "Fiyatlandırma",
-    "badge": "Svix'ten 10x daha ucuz",
+    "badge": "Svix'ten 20x daha ucuz",
     "heroTitle": "Sizinle birlikte büyüyen fiyatlandırma",
     "heroSubtitle": "12 aydan fazla webhook altyapı geliştirme süresinden tasarruf edin. Ücretsiz başlayın, hazır olduğunuzda ölçekleyin.",
     "heroNote": "Kredi kartı gerekmez. Sürpriz ücret yok. İstediğiniz zaman iptal edin.",
@@ -2374,18 +2374,18 @@
       "11 SDK erişimi"
     ],
     "proFeatures": [
-      "Günlük 100.000 event",
-      "Sınırsız uygulama",
+      "Gunluk 100.000 event",
+      "Sinirsiz uygulama",
       "500 endpoint",
-      "Sınırsız event tipi",
-      "Sınırsız abonelik",
-      "30 günlük log",
-      "Event başına $0.0001 overage",
-      "FIFO sıralı teslimat",
+      "Sinirsiz event tipi",
+      "Sinirsiz abonelik",
+      "30 gunluk log",
+      "Event basina $0.0001 overage",
+      "FIFO sirali teslimat",
       "Analitik ve grafikler",
-      "Şema kayıt merkezi",
-      "Webhook oyun alanı",
-      "Öncelikli destek"
+      "Sema kayit merkezi",
+      "Webhook oyun alani",
+      "Oncelikli destek"
     ],
     "businessFeatures": [
       "Sınırsız event",
@@ -2573,8 +2573,8 @@
       "E-posta desteği"
     ],
     "ctaDeveloper": "Ücretsiz başla",
-    "ctaStartup": "Aylık ₺599'dan başla",
-    "ctaPro": "Aylık ₺999'dan başla",
+    "ctaStartup": "Aylik $24 ile basla",
+    "ctaPro": "Aylik $49 ile basla",
     "ctaEnterprise": "Satış ile iletişime geçin",
     "dailyEvents": "Günlük event",
     "applications": "Uygulamalar",
@@ -3455,7 +3455,7 @@
     "badge": "🚀 Startup Programı",
     "subtitle": "Erken aşama girişimler için özel fiyatlandırma. Ürününüze odaklanın, webhook altyapısına değil.",
     "benefit50Title": "%50 indirimli Pro",
-    "benefit50Desc": "Seri A öncesi girişimler Pro planı ayda $14.50'a alır ($29 yerine).",
+    "benefit50Desc": "Seri A oncesi girisimler Pro planini ayda $24.50'a alir ($49 yerine).",
     "benefitFreeTitle": "Genişletilmiş ücretsiz katman",
     "benefitFreeDesc": "Ücretsiz kademede ayda 10.000 etkinlik.",
     "benefitPriorityTitle": "Öncelikli destek",
@@ -3467,7 +3467,9 @@
     "qualify4": "Ürün geliştirme (yan proje değil)",
     "qualify5": "Kayıtlı şirket veya aktif şirket kurulumu",
     "ctaDesc": "Girişiminizden bahsedin. Genellikle 24 saat içinde yanıt veririz.",
-    "ctaButton": "Şimdi başvurun →"
+    "ctaButton": "Şimdi başvurun →",
+    "ctaStartup": "Aylik $24 ile basla",
+    "ctaPro": "Aylik $49 ile basla"
   },
   "useCases": {
     "title": "Kullanım Alanları",
