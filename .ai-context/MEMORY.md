@@ -63,7 +63,7 @@ HookSniff/
 
 | Servis | Bilgi |
 |--------|-------|
-| **Admin giriş** | email: servetarslan02@gmail.com / şifre: Alayci_165 |
+| **Admin giriş** | email: servetarslan02@gmail.com |
 | **Demo giriş** | email: demo@hooksniff.com / şifre: Demo1234! |
 | **Google Cloud** | proje: hooksniff-app |
 | **Neon DB** | proje: hookrelay (org: Servet, Free tier) |
@@ -173,6 +173,8 @@ HookSniff/
 Aşağıdaki SDK'ların kodu ayrı repolarda push edildi ama registry'ye yüklenmedi.
 Her biri için local build + publish komutları:
 
+**⚠️ Credentials local dosyalarda saklanır, GitHub'a push edilmez!**
+
 #### Ruby (RubyGems)
 ```bash
 cd hooksniff-ruby
@@ -183,14 +185,12 @@ gem push hooksniff-1.1.0.gem
 #### Java (Maven Central via Sonatype)
 ```bash
 cd hooksniff-java
-# Sonatype credentials: A81UHB / CJlxjBhCDasTB00Cip3lqzu1icvtonu7o
 mvn deploy -B -DskipTests
 ```
 
 #### Kotlin (Maven Central via Sonatype)
 ```bash
 cd hooksniff-kotlin
-# Aynı Sonatype credentials
 ./gradlew publish
 ```
 
@@ -198,15 +198,16 @@ cd hooksniff-kotlin
 ```bash
 cd hooksniff-csharp
 dotnet pack -c Release
-dotnet nuget push "bin/Release/*.nupkg" --api-key oy2eyxly2puop7uki47q6ewsoelcrikudaito7a7nxkjyy --source https://api.nuget.org/v3/index.json
+dotnet nuget push "bin/Release/*.nupkg" --api-key <NUGET_KEY> --source https://api.nuget.org/v3/index.json
 ```
 
 #### Elixir (Hex.pm)
 ```bash
 cd hooksniff-elixir
 mix hex.publish --yes
-# Hex API key: 20e1faa34deb3e75d01dec3002e30bfc
 ```
+
+Credentials → local `.env` dosyasında saklanır.
 
 ---
 
