@@ -162,6 +162,8 @@
     "sectionTools": "Araçlar",
     "sectionAdvanced": "Gelişmiş",
     "sectionAccount": "Hesap",
+    "sectionBilling": "Faturalandırma",
+    "billingSection": "Faturalandırma",
     "routing": "Yönlendirme",
     "applications": "Uygulamalar",
     "serviceTokens": "Hizmet Jetonları",
