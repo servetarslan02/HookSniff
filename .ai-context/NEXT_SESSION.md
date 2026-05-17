@@ -148,40 +148,20 @@ Tüm 4 güvenlik fix'i zaten uygulanmış:
 
 ## 📋 Sıradaki İşler
 
-### Öncelik 0 — Lazy + Prefetch Kalan Sayfalar (EN KRİTİK)
+### Öncelik 0 — Lazy + Prefetch Kalan Sayfalar ✅ (2026-05-17)
 
-**Pattern:** Aşağıdaki sayfalara `LazySection` + `Skeletons` uygula. Split DEĞIL, sadece sarmala.
+**Pattern:** Aşağıdaki sayfalara `LazySection` + `Skeletons` uygulandı.
 
-| # | Sayfa | Satır | Yapılacak |
-|---|-------|-------|-----------|
-| 1 | **admin/users/[id]** | 1624 | User detail sayfası — above fold: header + user info card. Below fold: activity, endpoints, webhooks, API keys, settings section'larını LazySection ile sarmala |
-| 2 | **applications/[id]** | 498 | Application detail — above fold: header + app info. Below fold: webhook deliveries, settings |
-| 3 | **logs** | 414 | Delivery logs — above fold: header + filters. Below fold: log table |
-| 4 | **applications** | 398 | Applications list — above fold: header + search. Below fold: app grid/table |
-| 5 | **endpoints** | 379 | Endpoints list — above fold: header + filters. Below fold: endpoint table |
-| 6 | **blog/[slug]** | 316 | Blog post — above fold: header. Below fold: content |
+| # | Sayfa | Satır | Durum |
+|---|-------|-------|-------|
+| 1 | **admin/users/[id]** | 1624 | ✅ Plan history, recent deliveries, analytics charts + 8 tab içeriği LazySection |
+| 2 | **applications/[id]** | 498 | ✅ Endpoints section LazySection |
+| 3 | **logs** | 414 | ✅ Delivery table LazySection |
+| 4 | **applications** | 398 | ✅ Card grid LazySection |
+| 5 | **endpoints** | 379 | ✅ Endpoint list LazySection |
+| 6 | **blog/[slug]** | 316 | ⏭️ Server component — LazySection client-only, atlandı |
 
-**Nasıl uygulanır (her sayfa için):**
-```tsx
-// 1. Import ekle
-import { LazySection, Skeletons } from '@/components/LazySection';
-
-// 2. Above-the-fold content olduğu gibi kalır (header, filters, search)
-
-// 3. Below-the-fold content'i LazySection ile sarmala
-<LazySection fallback={Skeletons.table()} rootMargin={300}>
-  <HeavyTable data={data} />
-</LazySection>
-
-// 4. Modal'lar LazySection DIŞINDA kalmalı (her zaman erişilebilir)
-```
-
-**ÖNEMLİ KURALLAR:**
-- Split yapma — sadece LazySection ile sarmala
-- Modal'lar LazySection dışında kalmalı
-- `Skeletons.table()` tablo için, `Skeletons.card` kart için, `Skeletons.statCards` istatistik kartları için
-- `rootMargin={300}` — viewport'a 300px kala yükleme başlar
-- Her sayfadan sonra commit + push et
+**Commit:** bb3b4af9 — push edildi
 
 ### Öncelik 1 — Performans (Kalan)</
 
