@@ -127,7 +127,7 @@ export function PricingPageContent() {
     {
       category: t('usage'),
       items: [
-        { feature: t('dailyEvents'), developer: '100', startup: '30,000', pro: '100,000', enterprise: t('unlimited') },
+        { feature: t('dailyEvents'), developer: '100', startup: '30,000', pro: '100,000', enterprise: t('custom') },
         { feature: t('applications'), developer: t('unlimited'), startup: t('unlimited'), pro: t('unlimited'), enterprise: t('unlimited') },
         { feature: t('endpoints'), developer: '5', startup: '50', pro: '500', enterprise: t('unlimited') },
         { feature: t('eventTypes'), developer: '10', startup: '50', pro: t('unlimited'), enterprise: t('unlimited') },
