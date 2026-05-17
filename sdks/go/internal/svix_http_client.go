@@ -156,6 +156,24 @@ func executeRequestWithRetries(client *HookSniffHttpClient, request *http.Reques
 
 	resp, err := client.HTTPClient.Do(request)
 	for try := 0; try < len(client.RetrySchedule); try++ {
+		// 429 Rate Limit — respect Retry-After header
+		if err == nil && resp.StatusCode == 429 {
+			retryAfter := resp.Header.Get("Retry-After")
+			var sleepTime time.Duration
+			if seconds, parseErr := strconv.Atoi(retryAfter); parseErr == nil {
+				sleepTime = time.Duration(seconds) * time.Second
+			} else {
+				sleepTime = client.RetrySchedule[try]
+			}
+			if bodyBytes != nil {
+				request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+			}
+			request.Header.Set("hooksniff-retry-count", strconv.Itoa(try+1))
+			time.Sleep(sleepTime)
+			resp, err = client.HTTPClient.Do(request)
+			continue
+		}
+
 		if err == nil && resp.StatusCode < 500 {
 			break
 		}
