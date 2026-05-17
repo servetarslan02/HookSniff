@@ -21,7 +21,6 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class MessageIn {
-    @JsonProperty private ApplicationIn application;
     @JsonProperty private Set<String> channels;
     @JsonProperty private OffsetDateTime deliverAt;
     @JsonProperty private String eventId;
@@ -34,10 +33,6 @@ public class MessageIn {
 
     public MessageIn() {}
 
-    public MessageIn application(ApplicationIn application) {
-        this.application = application;
-        return this;
-    }
 
     /**
      * Optionally creates a new application alongside the message.
@@ -48,13 +43,6 @@ public class MessageIn {
      * @return application
      */
     @javax.annotation.Nullable
-    public ApplicationIn getApplication() {
-        return application;
-    }
-
-    public void setApplication(ApplicationIn application) {
-        this.application = application;
-    }
 
     public MessageIn channels(Set<String> channels) {
         this.channels = channels;

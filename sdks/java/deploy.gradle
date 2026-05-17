@@ -1,20 +1,6 @@
-
-/*
- * Based on Stripe's java deployment, which is in turn
- * based on the example at Chris Banes's repository that allows signing
- * without manually creating a maven file.
- *
- * The original can be found at
- * https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle
- */
-
 apply plugin: "signing"
 apply plugin: "maven-publish"
 apply plugin: "io.github.gradle-nexus.publish-plugin"
-
-def isReleaseBuild() {
-    return VERSION_NAME.contains("SNAPSHOT") == false
-}
 
 def getReleaseRepositoryUrl() {
     return hasProperty("RELEASE_REPOSITORY_URL") ? RELEASE_REPOSITORY_URL
@@ -40,7 +26,6 @@ nexusPublishing {
         sonatype {
             nexusUrl.set(uri(getReleaseRepositoryUrl()))
             snapshotRepositoryUrl.set(uri(getSnapshotRepositoryUrl()))
-
             username = getRepositoryUsername()
             password = getRepositoryPassword()
         }
@@ -67,7 +52,6 @@ publishing {
         maven(MavenPublication) {
             groupId = GROUP
             version = VERSION_NAME
-
             from components.java
             artifact sourcesJar
             artifact javadocJar
@@ -75,11 +59,9 @@ publishing {
                 name = POM_NAME
                 description = POM_DESCRIPTION
                 url = POM_URL
-
                 groupId = GROUP
                 artifactId = POM_ARTIFACT_ID
                 version = VERSION_NAME
-
                 licenses {
                     license {
                         name = POM_LICENCE_NAME
@@ -99,17 +81,16 @@ publishing {
                     developerConnection = POM_SCM_DEV_CONNECTION
                     url = POM_SCM_URL
                 }
-                organization {
-                    name = POM_DEVELOPER_NAME
-                    url = POM_ORGANIZATION_URL
-                }
             }
         }
     }
 }
 
 signing {
-    required { !project.version.endsWith("-SNAPSHOT") && !project.hasProperty("skipSigning") }
-    useGpgCmd()
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    if (signingKey) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
     sign publishing.publications.maven
 }

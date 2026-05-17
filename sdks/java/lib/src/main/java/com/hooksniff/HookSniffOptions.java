@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 @Getter
 public final class HookSniffOptions {
-    public static final String DEFAULT_URL = "https://hooksniff-api-1046140057667.europe-west1.run.app";
+    public static final String DEFAULT_URL = "https://api.hooksniff.com";
 
     private String serverUrl;
     private final List<Long> retrySchedule = Arrays.asList(50L, 100L, 200L);
