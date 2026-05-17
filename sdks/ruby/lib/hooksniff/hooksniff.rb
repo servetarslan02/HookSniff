@@ -19,6 +19,7 @@ module HookSniff
     attr_accessor :message
     attr_accessor :message_attempt
     attr_accessor :statistics
+    attr_accessor :environment
 
     def initialize(auth_token, options = HookSniffOptions.new)
       uri = URI(options.server_url || "https://hooksniff-api-1046140057667.europe-west1.run.app")
@@ -31,6 +32,7 @@ module HookSniff
       @message = Message.new(api_client)
       @message_attempt = MessageAttempt.new(api_client)
       @statistics = Statistics.new(api_client)
+      @environment = Environment.new(api_client)
     end
   end
 end
