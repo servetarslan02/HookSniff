@@ -28,6 +28,12 @@ from .endpoint_out import EndpointOut
 from .endpoint_patch import EndpointPatch
 from .endpoint_secret_out import EndpointSecretOut
 from .endpoint_secret_rotate_in import EndpointSecretRotateIn
+from .environment_in import EnvironmentIn
+from .environment_out import EnvironmentOut
+from .environment_patch import EnvironmentPatch
+from .environment_variable_in import EnvironmentVariableIn
+from .environment_variable_out import EnvironmentVariableOut
+from .environment_variable_bulk_upsert_in import EnvironmentVariableBulkUpsertIn
 from .endpoint_stats import EndpointStats
 from .endpoint_transformation_in import EndpointTransformationIn
 from .endpoint_transformation_out import EndpointTransformationOut
