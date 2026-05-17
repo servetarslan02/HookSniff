@@ -17,7 +17,7 @@ pub async fn process_expired_grace_periods(pool: &sqlx::PgPool) -> Result<u64, A
     let count = rows.len() as u64;
 
     for (customer_id, _plan) in &rows {
-        let free_limit = Plan::Developer.max_webhooks_per_month() as i64;
+        let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
 
         sqlx::query(
             "UPDATE customers SET plan = 'free', webhook_limit = $1, \

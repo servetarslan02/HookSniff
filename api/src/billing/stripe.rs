@@ -631,7 +631,7 @@ async fn handle_chargeback_created(
 
         if let Some((customer_id,)) = customer_row {
             // Downgrade to free and clear subscription
-            let free_limit = crate::billing::Plan::Developer.max_webhooks_per_month() as i32;
+            let free_limit = crate::billing::Plan::Developer.max_webhooks_per_day() as i32;
             sqlx::query(
                 "UPDATE customers SET \
                  plan = 'free', webhook_limit = $1, \
