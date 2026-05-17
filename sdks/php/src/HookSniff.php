@@ -16,6 +16,7 @@ use HookSniff\Api\Environment;
 use HookSniff\Api\BackgroundTask;
 use HookSniff\Api\OperationalWebhook;
 use HookSniff\Api\MessagePoller;
+use HookSniff\Api\Inbound;
 use HookSniff\Request\HookSniffHttpClient;
 
 class HookSniff
@@ -31,6 +32,7 @@ class HookSniff
     public BackgroundTask $backgroundTask;
     public OperationalWebhook $operationalWebhook;
     public MessagePoller $messagePoller;
+    public Inbound $inbound;
 
     public function __construct(
         string $token,
@@ -57,5 +59,6 @@ class HookSniff
         $this->backgroundTask = new BackgroundTask($hooksniffHttpClient);
         $this->operationalWebhook = new OperationalWebhook($hooksniffHttpClient);
         $this->messagePoller = new MessagePoller($hooksniffHttpClient);
+        $this->inbound = new Inbound($hooksniffHttpClient);
     }
 }

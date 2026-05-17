@@ -23,6 +23,7 @@ public class HookSniff {
     private final BackgroundTask backgroundTask;
     private final OperationalWebhook operationalWebhook;
     private final MessagePoller messagePoller;
+    private final Inbound inbound;
 
     public HookSniff(String token) {
         this(token, new HookSniffOptions());
@@ -55,5 +56,6 @@ public class HookSniff {
         this.backgroundTask = new BackgroundTask(this.httpClient);
         this.operationalWebhook = new OperationalWebhook(this.httpClient);
         this.messagePoller = new MessagePoller(this.httpClient);
+        this.inbound = new Inbound(this.httpClient);
     }
 }
