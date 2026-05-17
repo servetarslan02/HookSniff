@@ -13,8 +13,8 @@ export default function BillingOverviewPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'api-keys', label: t('apiKeys'), icon: '🔑', content: <ApiKeysPage /> },
-        { key: 'billing', label: t('billing'), icon: '💳', content: <BillingPage /> },
+        { key: 'api-keys', label: t('apiKeys'), icon: '🔑', content: () => <ApiKeysPage /> },
+        { key: 'billing', label: t('billing'), icon: '💳', content: () => <BillingPage /> },
       ]}
     />
   );
