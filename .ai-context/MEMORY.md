@@ -718,3 +718,49 @@ HookSniff/
 - admin/system, admin/users, admin/alerts, admin/feature-flags lazy load
 - NEXT_SESSION.md'de detaylı talimat var
 
+---
+
+## 🛠️ Sık Kullanılan Komutlar
+
+### Local CI/CD
+```powershell
+bash local-ci.sh                        # Tüm CI (lint + test + build + security)
+bash local-sdk-test.sh all              # 11 SDK testi
+bash local-sdk-publish.sh dry-run all   # SDK publish test
+make ci                                 # Makefile ile CI
+make ci-test                            # Makefile ile SDK test
+```
+
+### OpenAPI Codegen
+```powershell
+python3 openapi-codegen.py all          # Tüm SDK'lar için type üret (170 schema)
+python3 openapi-codegen.py validate     # OpenAPI spec doğrula
+python3 openapi-codegen.py node         # Sadece Node.js types
+python3 openapi-codegen.py python       # Sadece Python models
+python3 openapi-codegen.py go           # Sadece Go structs
+make codegen                            # Makefile ile tümü
+make codegen-validate                   # Makefile ile doğrulama
+```
+
+### Dashboard Build
+```powershell
+cd dashboard && npm install && npm run build
+```
+
+### Git Workflow
+```powershell
+git add -A && git commit -m "feat: açıklama"
+git pull --rebase origin main && git push origin main
+```
+
+### SDK Publish (TOKEN gerekli)
+```powershell
+$env:NPM_TOKEN="npm_xxx"               # Windows PowerShell
+export NPM_TOKEN="npm_xxx"             # Linux/Mac
+bash local-sdk-publish.sh publish node  # Publish
+```
+
+**TOKEN'lar:** NPM_TOKEN, PYPI_TOKEN, CARGO_REGISTRY_TOKEN, RUBYGEMS_TOKEN, MAVEN_USERNAME, MAVEN_PASSWORD, NUGET_TOKEN, HEX_API_KEY, PACKAGIST_TOKEN
+
+**Detaylı referans:** COMMANDS.md
+
