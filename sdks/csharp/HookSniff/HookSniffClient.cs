@@ -69,6 +69,11 @@ namespace HookSniff
             get => new ConnectorApi(this);
         }
 
+        public IntegrationApi Integration
+        {
+            get => new IntegrationApi(this);
+        }
+
         public ILogger? Logger { get; }
 
         public HookSniffHttpClient HookSniffHttpClient;

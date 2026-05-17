@@ -25,6 +25,7 @@ public class HookSniff {
     private final MessagePoller messagePoller;
     private final Inbound inbound;
     private final Connector connector;
+    private final Integration integration;
 
     public HookSniff(String token) {
         this(token, new HookSniffOptions());
@@ -59,5 +60,8 @@ public class HookSniff {
         this.messagePoller = new MessagePoller(this.httpClient);
         this.inbound = new Inbound(this.httpClient);
         this.connector = new Connector(this.httpClient);
+        this.integration = new Integration(this.httpClient);
     }
+
+    public Integration integration() { return integration; }
 }

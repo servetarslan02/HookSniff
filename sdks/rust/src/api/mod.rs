@@ -15,6 +15,7 @@ mod operational_webhook;
 mod message_poller;
 mod inbound;
 mod connector;
+mod integration;
 mod event_type;
 mod health;
 mod message;
@@ -46,6 +47,7 @@ pub use self::{
     message_poller::MessagePoller,
     inbound::Inbound,
     connector::ConnectorApi,
+    integration::IntegrationApi,
 };
 
 impl HookSniff {
@@ -71,6 +73,10 @@ impl HookSniff {
 
     pub fn connector(&self) -> ConnectorApi<'_> {
         ConnectorApi::new(&self.cfg)
+    }
+
+    pub fn integration(&self) -> IntegrationApi<'_> {
+        IntegrationApi::new(&self.cfg)
     }
 
     pub fn endpoint(&self) -> Endpoint<'_> {
