@@ -22,6 +22,7 @@ pub mod health;
 pub mod health_endpoints;
 pub mod inbound;
 pub mod notifications;
+pub mod operational_webhooks;
 pub mod oauth;
 pub mod outbound_ips;
 pub mod playground;
@@ -70,6 +71,7 @@ pub fn api_router() -> Router {
         .nest("/endpoints", endpoints::router())
         .nest("/environments", environments::router())
         .nest("/background-tasks", background_tasks::router())
+        .nest("/operational-webhooks", operational_webhooks::router())
         .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
         .nest("/stream", stream::router())
         .nest("/events", events::router())
@@ -174,5 +176,6 @@ mod tests {
         let _ = oauth::router();
         let _ = environments::router();
         let _ = background_tasks::router();
+        let _ = operational_webhooks::router();
     }
 }

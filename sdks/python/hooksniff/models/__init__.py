@@ -4,6 +4,7 @@ HookSniff SDK — Models
 
 from .api_token_out import ApiTokenOut
 from .background_task_out import BackgroundTaskOut
+from .operational_webhook import OperationalWebhookEndpointOut, OperationalWebhookEndpointIn, OperationalWebhookDeliveryOut
 from .app_portal_capability import AppPortalCapability
 from .bulk_replay_in import BulkReplayIn
 from .common import Common

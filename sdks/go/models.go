@@ -40,6 +40,9 @@ type (
 	EnvironmentVariableIn                     = models.EnvironmentVariableIn
 	EnvironmentVariableOut                    = models.EnvironmentVariableOut
 	BackgroundTaskOut                         = models.BackgroundTaskOut
+	OperationalWebhookEndpointIn              = models.OperationalWebhookEndpointIn
+	OperationalWebhookEndpointOut             = models.OperationalWebhookEndpointOut
+	OperationalWebhookDeliveryOut             = models.OperationalWebhookDeliveryOut
 	EndpointCreatedEvent                      = models.EndpointCreatedEvent
 	EndpointCreatedEventData                  = models.EndpointCreatedEventData
 	EndpointDeletedEvent                      = models.EndpointDeletedEvent
