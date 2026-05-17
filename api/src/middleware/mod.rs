@@ -8,6 +8,8 @@ use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
 use uuid::Uuid;
 
+use crate::routes::auth::CUSTOMER_SELECT;
+
 const AUTH_COOKIE_NAME: &str = "hooksniff_token";
 const REFRESH_COOKIE_NAME: &str = "hooksniff_refresh";
 const AUTH_CACHE_TTL: Duration = Duration::from_secs(30);
@@ -260,7 +262,7 @@ pub async fn auth_middleware(
         } else {
             // Cache miss — query DB (no lock held during async operations)
             let candidates =
-                sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE api_key_prefix = $1")
+                sqlx::query_as::<_, Customer>(&format!("{} WHERE api_key_prefix = $1", CUSTOMER_SELECT))
                     .bind(&prefix)
                     .fetch_all(&*pool)
                     .await?;
@@ -327,9 +329,7 @@ pub async fn auth_middleware(
                         if let Some(team_id) = team_id_opt {
                             // Then fetch the team owner as customer
                             let customer = sqlx::query_as::<_, Customer>(
-                                "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers c \
-                                 INNER JOIN teams t ON t.owner_id = c.id \
-                                 WHERE t.id = $1"
+                                &format!("{} c INNER JOIN teams t ON t.owner_id = c.id WHERE t.id = $1", CUSTOMER_SELECT)
                             )
                             .bind(team_id)
                             .fetch_optional(&*pool)
@@ -374,7 +374,7 @@ pub async fn auth_middleware(
         // HS-261: Check if token has been revoked (individual or all-tokens-for-customer)
         check_token_revocation(&pool, &claims).await?;
 
-        sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE id = $1")
+        sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
             .bind(claims.sub)
             .fetch_optional(&*pool)
             .await?
@@ -415,7 +415,7 @@ pub async fn jwt_auth_middleware(
     let customer = if let Some(c) = redis_cached {
         c
     } else {
-        let c = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE id = $1")
+        let c = sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
             .bind(claims.sub)
             .fetch_optional(&*pool)
             .await?
