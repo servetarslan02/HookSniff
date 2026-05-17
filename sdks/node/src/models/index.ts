@@ -34,7 +34,6 @@ export { type MessageAttemptFailingEventData } from "./messageAttemptFailingEven
 export { type MessageAttemptLog } from "./messageAttemptLog";
 export { type MessageAttemptLogEvent } from "./messageAttemptLogEvent";
 export { type MessageAttemptOut } from "./messageAttemptOut";
-export { type MessageAttemptRecoveredEventData } from "./messageAttemptRecoveredEventData";
 export { MessageAttemptTriggerType } from "./messageAttemptTriggerType";
 export { type MessageIn } from "./messageIn";
 export { type MessageOut } from "./messageOut";
