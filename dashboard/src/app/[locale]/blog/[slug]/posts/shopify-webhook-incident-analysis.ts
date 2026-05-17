@@ -1,4 +1,4 @@
-import type { Post } from '.../data';
+import type { Post } from '../data';
 
 export const post: Post = {
     title: 'What the Shopify Webhook Incident Teaches Us About Resilience',

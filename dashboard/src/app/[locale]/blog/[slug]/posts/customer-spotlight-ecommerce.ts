@@ -1,4 +1,4 @@
-import type { Post } from '.../data';
+import type { Post } from '../data';
 
 export const post: Post = {
     title: 'How an E-Commerce Platform Scaled Webhook Delivery with HookSniff',

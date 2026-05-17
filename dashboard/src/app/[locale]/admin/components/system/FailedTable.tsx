@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+
 import { useTranslations } from 'next-intl';
 
 interface FailedDelivery {
   id: string;
-  customer_email?: string;
-  endpoint_url?: string;
-  event_type?: string;
+  customer_email?: string | null;
+  endpoint_url?: string | null;
+  event_type?: string | null;
   attempt_count: number;
-  error_message?: string;
-  response_status?: number;
+  error_message?: string | null;
+  response_status?: number | null;
   created_at: string;
 }
 

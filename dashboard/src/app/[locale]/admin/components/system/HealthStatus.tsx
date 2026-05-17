@@ -2,29 +2,9 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 
-interface HealthCheck {
-  status: string;
-  latency_ms?: number;
-}
-
-interface HealthData {
-  status: string;
-  database?: HealthCheck;
-  redis?: HealthCheck;
-  api?: { status: string; uptime_seconds?: number };
-  queue?: { pending: number; processing: number; failed: number };
-  checks?: {
-    database?: HealthCheck;
-    redis?: HealthCheck;
-    queue?: { status: string; latency_ms?: number; pending_count?: number };
-    db_size?: { size: string };
-    recent_errors?: { errors: Array<{ id: string; event: string; error: string; created_at: string }> };
-    queue_detail?: { pending: number; processing: number; failed_last_hour: number };
-  };
-}
 
 interface HealthStatusProps {
-  health: HealthData;
+  health: any;
   isHealthError: boolean;
   alerts: Array<{ is_active: boolean }>;
   onRefresh: () => void;
@@ -44,7 +24,7 @@ const statusColor = (status: string) => {
   }
 };
 
-const formatUptime = (seconds: number, t: (key: string) => string) => {
+const formatUptime = (seconds: number, t: any) => {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
@@ -124,7 +104,7 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
             onClick={onRefresh}
             className="sm:ml-auto px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition"
           >
-            🔄 {tc('refresh')}
+            🔄 {t('refresh')}
           </button>
         </div>
         <p className="text-xs text-gray-500 dark:text-slate-400">

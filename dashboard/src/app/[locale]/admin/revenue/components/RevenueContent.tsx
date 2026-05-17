@@ -133,7 +133,7 @@ interface Refund {
   customer_id: string;
   amount_cents: number;
   currency: string;
-  reason?: string;
+  reason?: string | null;
   status: string;
   created_at: string;
 }

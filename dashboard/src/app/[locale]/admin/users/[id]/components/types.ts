@@ -6,7 +6,7 @@ export interface OverviewTabProps {
   userEndpoints: any[];
   analytics: any;
   t: (key: string, values?: any) => string;
-  tc: (key: string) => string;
+  tc: any;
   newPlan: string;
   setNewPlan: (plan: string) => void;
   handleUpdatePlan: () => void;
@@ -30,7 +30,7 @@ export interface WebhooksTabProps {
   handleViewDelivery: (deliveryId: string) => void;
   handleReplay: (deliveryId: string) => void;
   t: (key: string, values?: any) => string;
-  tc: (key: string) => string;
+  tc: any;
 }
 
 export interface ApiKeysTabProps {
@@ -70,7 +70,7 @@ export interface CommunicationsTabProps {
   commFilter: string;
   setCommFilter: (filter: string) => void;
   t: (key: string, values?: any) => string;
-  tc: (key: string) => string;
+  tc: any;
 }
 
 export interface BillingTabProps {
@@ -91,7 +91,7 @@ export interface BillingTabProps {
   gdprDeleteReason: string;
   setGdprDeleteReason: (reason: string) => void;
   t: (key: string, values?: any) => string;
-  tc: (key: string) => string;
+  tc: any;
   setShowRefundModal: (show: boolean) => void;
 }
 
@@ -148,5 +148,5 @@ export interface UserModalsProps {
   deliveryLoading: boolean;
   deliveryAttempts: any[];
   t: (key: string, values?: any) => string;
-  tc: (key: string) => string;
+  tc: any;
 }
