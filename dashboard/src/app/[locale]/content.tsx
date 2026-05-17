@@ -304,12 +304,13 @@ export function HomeContent() {
   const featureIcons = [icons.retry, icons.shield, icons.chart, icons.bolt, icons.queue, icons.globe];
 
   const isTr = locale === 'tr';
-  const { plans: planData, formatPrice } = usePlans();
+  const { plans: planData, formatPrice, getPlanPrice } = usePlans();
+  const [yearly, setYearly] = useState(false);
   const plans = [
     { name: tPricing('developer'), desc: tPricing('developerDesc'), price: '$0', period: tPricing('month'), features: tPricing.raw('developerFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('startup'), desc: tPricing('startupDesc'), price: isTr ? '₺599' : formatPrice('startup'), period: tPricing('month'), features: tPricing.raw('startupFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('pro'), desc: tPricing('proDesc'), price: isTr ? '₺999' : formatPrice('pro'), period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('getStarted'), popular: true },
-    { name: tPricing('enterprise'), desc: tPricing('enterpriseDesc'), price: isTr ? '₺4,999' : formatPrice('enterprise'), period: tPricing('month'), features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('contactSales'), popular: false },
+    { name: tPricing('startup'), desc: tPricing('startupDesc'), price: isTr ? '₺599' : formatPrice('startup', yearly), period: yearly ? tPricing('year') : tPricing('month'), features: tPricing.raw('startupFeatures') as string[], cta: tPricing('getStarted'), popular: false },
+    { name: tPricing('pro'), desc: tPricing('proDesc'), price: isTr ? '₺999' : formatPrice('pro', yearly), period: yearly ? tPricing('year') : tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('getStarted'), popular: true },
+    { name: tPricing('enterprise'), desc: tPricing('enterpriseDesc'), price: isTr ? '₺4,999' : formatPrice('enterprise', yearly), period: yearly ? tPricing('year') : tPricing('month'), features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('contactSales'), popular: false },
   ];
 
   return (
@@ -457,6 +458,28 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
       <div id="pricing" className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{tPricing('title')}</h2>
+          {/* Monthly / Yearly toggle */}
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <span className={`text-sm font-medium transition ${!yearly ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-slate-400'}`}>
+              {tPricing('month') || 'Monthly'}
+            </span>
+            <button
+              type="button"
+              onClick={() => setYearly(!yearly)}
+              className={`relative w-12 h-6 rounded-full transition-colors duration-200 cursor-pointer ${yearly ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'}`}
+              aria-label="Toggle yearly pricing"
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${yearly ? 'translate-x-6' : ''}`} />
+            </button>
+            <span className={`text-sm font-medium transition ${yearly ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-slate-400'}`}>
+              {tPricing('year') || 'Yearly'}
+            </span>
+            {yearly && (
+              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                -20%
+              </span>
+            )}
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {plans.map((plan, i) => (
