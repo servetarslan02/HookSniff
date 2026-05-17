@@ -129,9 +129,12 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
         const error = await res.json().catch(() => ({ message: `API error: ${res.status}` }));
         // Item 282: Use error catalog for user-friendly messages
         const errorCode = extractErrorCode(error);
-        const message = errorCode
-          ? getUserFriendlyMessage(errorCode)
-          : (error.error?.message || `API error: ${res.status}`);
+        const specificMessage = error.error?.message || error.message;
+        const message = specificMessage
+          ? specificMessage
+          : errorCode
+            ? getUserFriendlyMessage(errorCode)
+            : `API error: ${res.status}`;
         throw new Error(message);
       }
 
@@ -1188,7 +1191,7 @@ export const billingApiExtended = {
     apiFetch<BillingSubscription>('/billing/subscription', { token }),
 
   upgrade: (token: string, plan: string, billingPeriod?: string) =>
-    apiFetch<{ success: boolean; checkout_url?: string }>('/billing/upgrade', { method: 'POST', body: { plan, provider: 'polar', billing_period: billingPeriod || 'monthly' }, token }),
+    apiFetch<{ checkout_url?: string; message?: string; requires_contact?: boolean; contact_url?: string; prorated_amount_cents?: number }>('/billing/upgrade', { method: 'POST', body: { plan, provider: 'polar', billing_period: billingPeriod || 'monthly' }, token }),
 
   getInvoices: (token: string) =>
     apiFetch<Invoice[]>('/billing/invoices', { token }),
