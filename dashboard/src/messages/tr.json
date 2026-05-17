@@ -296,7 +296,16 @@
     "noEndpointsYet": "Henüz endpoint yok. Webhook almaya başlamak için bir tane oluşturun.",
     "cancelBtn": "İptal",
     "selectAllLabel": "Tümünü seç ({count})",
-    "bulkDeleted": "{count} endpoint silindi"
+    "bulkDeleted": "{count} endpoint silindi",
+    "rotateSecret": "Secret yenile",
+    "secretRotated": "Secret yenilendi",
+    "newSecret": "Yeni Secret",
+    "newSecretDesc": "Bu secret'i şimdi kopyalayın. Tekrar göremezsiniz.",
+    "copied": "Kopyalandı!",
+    "copy": "Kopyala",
+    "delete": "Sil",
+    "disable": "Devre dışı bırak",
+    "enable": "Aktif et"
   },
   "deliveries": {
     "title": "Teslimatlar",
@@ -740,7 +749,12 @@
     "date": "Tarih",
     "amount": "Tutar",
     "plan": "Plan",
-    "status": "Durum",
+    "status": {
+      "active": "Aktif",
+      "canceled": "İptal Edildi",
+      "past_due": "Ödeme Gecikmiş",
+      "inactive": "Pasif"
+    },
     "invalidCheckoutUrl": "Geçersiz ödeme URL'si",
     "contactSales": "Satış Ekibiyle İletişim",
     "customPricing": "Özel Fiyat",
@@ -767,12 +781,6 @@
     "billingPeriod": "Fatura dönemi",
     "periodMonthly": "aylık",
     "periodAnnual": "yıllık",
-    "status": {
-      "active": "Aktif",
-      "canceled": "İptal Edildi",
-      "past_due": "Ödeme Gecikmiş",
-      "inactive": "Pasif"
-    },
     "cancelAtPeriodEnd": "Aboneliğiniz mevcut dönemin sonunda iptal edilecek.",
     "usageOverview": "Kullanım Özeti",
     "overageSettings": "Aşım Ayarları",
@@ -3717,7 +3725,11 @@
     "noEndpoints": "Bu uygulamada henüz endpoint yok",
     "searchPlaceholder": "Belirli bir uygulama arayın...",
     "noDeliveries": "Henüz teslimat yok",
-    "statusLabel": "Durum"
+    "statusLabel": "Durum",
+    "endpointCreated": "Endpoint oluşturuldu",
+    "noEndpointsDesc": "Webhook almaya başlamak için ilk endpoint'inizi oluşturun.",
+    "notFoundDesc": "Bu uygulama silinmiş olabilir veya erişim izniniz yok.",
+    "manageEndpoints": "Endpoint'leri yönet"
   },
   "serviceTokens": {
     "title": "Hizmet Jetonları",

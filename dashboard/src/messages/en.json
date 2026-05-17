@@ -296,7 +296,16 @@
     "noEndpointsYet": "No endpoints yet. Create one to start receiving webhooks.",
     "cancelBtn": "Cancel",
     "selectAllLabel": "Select all ({count})",
-    "bulkDeleted": "Deleted {count} endpoints"
+    "bulkDeleted": "Deleted {count} endpoints",
+    "rotateSecret": "Rotate secret",
+    "secretRotated": "Secret rotated",
+    "newSecret": "New Secret",
+    "newSecretDesc": "Copy this secret now. You won't be able to see it again.",
+    "copied": "Copied!",
+    "copy": "Copy",
+    "delete": "Delete",
+    "disable": "Disable",
+    "enable": "Enable"
   },
   "deliveries": {
     "title": "Deliveries",
@@ -740,7 +749,12 @@
     "date": "Date",
     "amount": "Amount",
     "plan": "Plan",
-    "status": "Status",
+    "status": {
+      "active": "Active",
+      "canceled": "Canceled",
+      "past_due": "Past Due",
+      "inactive": "Inactive"
+    },
     "invalidCheckoutUrl": "Invalid checkout URL",
     "contactSales": "Contact Sales",
     "customPricing": "Custom",
@@ -767,12 +781,6 @@
     "billingPeriod": "Billing period",
     "periodMonthly": "monthly",
     "periodAnnual": "annual",
-    "status": {
-      "active": "Active",
-      "canceled": "Canceled",
-      "past_due": "Past Due",
-      "inactive": "Inactive"
-    },
     "cancelAtPeriodEnd": "Your subscription will cancel at the end of the current period.",
     "usageOverview": "Usage Overview",
     "overageSettings": "Overage Settings",
@@ -3717,7 +3725,11 @@
     "noEndpoints": "No endpoints in this application yet",
     "searchPlaceholder": "Search for a specific application...",
     "noDeliveries": "No deliveries yet",
-    "statusLabel": "Status"
+    "statusLabel": "Status",
+    "endpointCreated": "Endpoint created",
+    "noEndpointsDesc": "Create your first endpoint to start receiving webhooks.",
+    "notFoundDesc": "This application may have been deleted or you don't have access.",
+    "manageEndpoints": "Manage endpoints"
   },
   "serviceTokens": {
     "title": "Service Tokens",
