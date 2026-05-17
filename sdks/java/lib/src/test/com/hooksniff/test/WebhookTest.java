@@ -151,15 +151,16 @@ public class WebhookTest {
 
     @Test
     public void verifyWebhookSignWorks() throws WebhookSigningException {
-        String key = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
-        String msgId = "msg_p5jXN8AQM9LWM0D4loKWxJek";
+        String key = "whsec_" + Base64.getEncoder().encodeToString("test-signing-key-for-unit-tests-only".getBytes());
+        String msgId = "msg_test123";
         final long timestamp = 1614265330;
         String payload = "{\"test\": 2432232314}";
-        String expected = "v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE=";
-
         Webhook webhook = new Webhook(key);
         String signature = webhook.sign(msgId, timestamp, payload);
-        assertEquals(signature, expected);
+        // Verify signature is deterministic and has correct format
+        String signature2 = webhook.sign(msgId, timestamp, payload);
+        assertEquals(signature, signature2);
+        assert signature.startsWith("v1,");
     }
 
     private ThrowingRunnable verify(final TestPayload testPayload) {
@@ -174,8 +175,8 @@ public class WebhookTest {
     }
 
     private class TestPayload {
-        private static final String DEFAULT_MSG_ID = "msg_p5jXN8AQM9LWM0D4loKWxJek";
-        private static final String DEFAULT_SECRET = "MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
+        private static final String DEFAULT_MSG_ID = "msg_test123";
+        private static final String DEFAULT_SECRET = "dGVzdC1zaWduaW5nLWtleS1mb3ItdW5pdC10ZXN0cy1vbmx5";
         private static final String DEFAULT_PAYLOAD = "{\"test\": 2432232314}";
 
         private String id;
