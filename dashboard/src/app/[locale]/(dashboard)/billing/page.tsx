@@ -103,6 +103,16 @@ export default function BillingPage() {
     setUpgrading(true);
     try {
       const result = await billingApiExtended.upgrade(token, showUpgradeModal, billingPeriod);
+
+      // Enterprise requires contact
+      if (result.requires_contact) {
+        const contactUrl = result.contact_url || 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
+        window.open(contactUrl, '_blank');
+        toast(t('enterpriseContact') || 'Enterprise plan requires a custom agreement. Opening contact...', 'info');
+        setShowUpgradeModal(null);
+        return;
+      }
+
       if (result.checkout_url) {
         const url = new URL(result.checkout_url);
         const trustedHosts = ['polar.sh', 'checkout.polar.sh', 'pay.stripe.com', 'sandbox-api.iyzipay.com', 'api.iyzipay.com'];
@@ -112,7 +122,7 @@ export default function BillingPage() {
           toast(tc('invalidCheckoutUrl'), 'error');
         }
       } else {
-        toast(t('upgradeInitiated'), 'success');
+        toast(result.message || t('upgradeInitiated'), 'success');
       }
     } catch (err: unknown) {
       toast(getErrorMessage(err, tc('unknownError')) || tc('upgradeFailed'), 'error');
