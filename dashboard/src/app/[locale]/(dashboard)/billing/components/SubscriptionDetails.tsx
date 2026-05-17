@@ -15,6 +15,16 @@ const PROVIDER_LABELS: Record<string, { name: string; icon: string }> = {
   iyzico: { name: 'iyzico', icon: '🟡' },
 };
 
+function getCardIcon(brand?: string): string {
+  switch (brand?.toLowerCase()) {
+    case 'visa': return '💳';
+    case 'mastercard': return '💳';
+    case 'amex': return '💳';
+    case 'discover': return '💳';
+    default: return '💳';
+  }
+}
+
 const STATUS_STYLES: Record<string, string> = {
   active: 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-green-600/20',
   canceled: 'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-600/20',
@@ -119,12 +129,25 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
           )}
         </div>
 
-        {/* Payment Provider */}
+        {/* Card on File */}
         <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
-          <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('paymentProvider')}</p>
-          <p className="text-lg font-semibold text-gray-900 dark:text-white">
-            {provider.icon} {provider.name}
-          </p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('cardOnFile')}</p>
+          {sub.card_last4 ? (
+            <>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                {getCardIcon(sub.card_brand)} {sub.card_brand?.toUpperCase() || '••••'} •••• {sub.card_last4}
+              </p>
+              {sub.card_exp_month && sub.card_exp_year && (
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                  {t('expires')} {String(sub.card_exp_month).padStart(2, '0')}/{sub.card_exp_year}
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">
+              {provider.icon} {provider.name}
+            </p>
+          )}
           {!isFree && (
             <button
               type="button"
@@ -132,7 +155,7 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
               disabled={openingPortal}
               className="text-xs text-brand-600 dark:text-brand-400 hover:underline mt-2 disabled:opacity-50"
             >
-              {openingPortal ? t('openingPortal') : t('managePayment')}
+              {openingPortal ? t('openingPortal') : t('changeCard')}
             </button>
           )}
         </div>

@@ -60,6 +60,21 @@ pub struct Customer {
     /// Whether to send email notifications for overage. Default: true.
     #[serde(default = "default_true")]
     pub overage_email_notification: bool,
+    /// Card last 4 digits (from payment provider)
+    #[serde(default)]
+    pub card_last4: Option<String>,
+    /// Card brand (visa, mastercard, amex, etc.)
+    #[serde(default)]
+    pub card_brand: Option<String>,
+    /// Card expiry month (1-12)
+    #[serde(default)]
+    pub card_exp_month: Option<i16>,
+    /// Card expiry year (e.g. 2027)
+    #[serde(default)]
+    pub card_exp_year: Option<i16>,
+    /// When card info was last updated
+    #[serde(default)]
+    pub card_updated_at: Option<DateTime<Utc>>,
 }
 
 fn default_payment_provider() -> String {
