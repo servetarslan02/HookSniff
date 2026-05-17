@@ -501,6 +501,10 @@ export const BillingSubscriptionSchema = z.object({
   cancel_at_period_end: z.boolean(),
   billing_period: z.string(),
   current_period_end: z.string().nullish(),
+  card_last4: z.string().nullish(),
+  card_brand: z.string().nullish(),
+  card_exp_month: z.number().nullish(),
+  card_exp_year: z.number().nullish(),
 });
 export type BillingSubscriptionValidated = z.infer<typeof BillingSubscriptionSchema>;
 
