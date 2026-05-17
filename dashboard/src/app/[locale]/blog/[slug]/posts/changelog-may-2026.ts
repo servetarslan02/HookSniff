@@ -1,7 +1,6 @@
-import type { Post } from '../data';
+import type { Post } from '.../data';
 
 export const post: Post = {
-
     title: 'HookSniff Changelog — May 2026',
     date: '2026-05-01',
     category: 'Changelog',
