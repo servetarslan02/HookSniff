@@ -1,45 +1,25 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-18 03:48 GMT+8
-> Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
+> Son güncelleme: 2026-05-18 04:43 GMT+8
 
-## 🎯 Sıradaki: Kotlin SDK Publish
+## 🎯 Sıradaki: Yeni Özellikler (Faz 8-15)
 
-10/11 SDK v1.0.0 olarak yayınlandı. Sadece **Kotlin** kaldı.
+11/11 SDK v1.0.0 olarak yayınlandı ve temizlendi. Sıradaki:
 
-### Hızlı Başlangıç:
-```bash
-git pull origin main
-cat .ai-context/sdk-roadmap/MEMORY.md
-```
+### Faz 8 — Environment (4-6 saat)
+- [ ] Migration: `environments` tablosu
+- [ ] Migration: `environment_variables` tablosu
+- [ ] Rust API: CRUD endpointleri
+- [ ] SDK güncellemesi (11 dil)
+- [ ] Dashboard UI
 
-### Kotlin Publish Adımları:
-1. `cd sdks/kotlin`
-2. Svix-specific dosyaları sil (connector configs, polling, streaming)
-3. API dosyalarını temizle (Authentication, Endpoint, Statistics, Message, HookSniff)
-4. `./gradlew build -x test` — build et
-5. Publish et:
-   ```bash
-   export JAVA_HOME=/opt/jdk-17.0.12
-   GPG_KEY=$(gpg --export-secret-keys --armor [REDACTED])
-   ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository \
-     -PNEXUS_USERNAME=[REDACTED] \
-     -PNEXUS_PASSWORD='[REDACTED]' \
-     -PsigningKey="$GPG_KEY" \
-     -PsigningPassword=""
-   ```
-6. Ayrı repoya push et: `hooksniff-kotlin`
-7. Ana repoya push et
-8. Bu dosyayı güncelle
-
-### Sonra:
-- Test coverage artırma (tüm SDK'lar)
-- Faz 8-15 yeni özellikler
+### Faz 9 — Background Task (3-4 saat)
+### Faz 10 — Operational Webhook (3-4 saat)
+### Faz 11 — Message Poller (3-4 saat)
+### Faz 12-15 — Ingest, Connector, Integration, Streaming
 
 ## 📊 Mevcut Durum
-
-- 10/11 SDK: v1.0.0, yayında
-- 1 SDK (Kotlin): v1.0.0, kod hazır ama publish edilmedi
-- Tüm SDK'lar ayrı repolarda
-- GPG key keyserver'da mevcut
-- Sonatype credentials çalışıyor
+- 11/11 SDK: v1.0.0, yayında, derleniyor
+- Svix-specific kod: tamamen temizlendi
+- Build ortamı: JDK 17 + Rust 1.95.0 kurulu
+- GPG key: yeni key oluşturuldu (FC5EA3BE171950ED5B42B44948FA192D3997BF0E)
