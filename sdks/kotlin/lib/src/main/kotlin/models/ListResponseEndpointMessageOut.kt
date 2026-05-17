@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ListResponseEndpointMessageOut(
-    val data: List<EndpointMessageOut>,
+    val data: List<MessageEndpointOut>,
     val done: Boolean,
     val iterator: String? = null,
     val prevIterator: String? = null,
