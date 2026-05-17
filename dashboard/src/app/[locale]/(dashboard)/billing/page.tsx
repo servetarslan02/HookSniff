@@ -10,6 +10,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { billingApiExtended } from '@/lib/api';
 import { useBillingUsage, useBillingInvoices } from '@/hooks/useDashboardData';
+import { usePlans } from '@/hooks/usePlans';
 import { UsageChart, type UsageChartData } from './components/UsageChart';
 import { PlanCards } from './components/PlanCards';
 import { InvoiceTable } from './components/InvoiceTable';
@@ -26,6 +27,9 @@ export default function BillingPage() {
   // React Query hooks for data fetching
   const { data: usageData, isLoading: loadingUsage } = useBillingUsage();
   const { data: invoices, isLoading: loadingInvoices } = useBillingInvoices();
+  const { getPlanLimits, getPlan } = usePlans();
+  const planLimits = getPlanLimits(currentPlan);
+  const planInfo = getPlan(currentPlan);
 
   // Derived values from usage data
   const usageCount = usageData
@@ -185,6 +189,31 @@ export default function BillingPage() {
             <div className="text-sm text-gray-500 dark:text-slate-400">{t('used')}</div>
           </div>
         </div>
+
+        {/* Plan Limits */}
+        {planLimits && (
+          <div className="mt-6 pt-6 border-t border-gray-200/50 dark:border-slate-700/50">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4">{t('planLimits') || 'Plan Limits'}</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.endpoints}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('endpoints') || 'Endpoints'}</p>
+              </div>
+              <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.webhooks.toLocaleString()}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('webhooksMonth') || 'Webhooks/mo'}</p>
+              </div>
+              <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.rateLimit.toLocaleString()}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('rateLimit') || 'Rate/min'}</p>
+              </div>
+              <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.retention}<span className="text-base">d</span></p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('dataRetention') || 'Data Retention'}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Monthly Chart */}
