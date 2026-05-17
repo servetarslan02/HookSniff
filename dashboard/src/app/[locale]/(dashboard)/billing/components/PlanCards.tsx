@@ -3,69 +3,30 @@
 import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { usePlans } from '@/hooks/usePlans';
 
-const planDefaults = [
-  {
-    key: 'developer',
-    nameKey: 'plans.developer',
-    priceUsd: 0,
-    priceTry: 0,
-    yearlyPriceUsd: 0,
-    yearlyPriceTry: 0,
-    limitKey: 'plans.developerLimit',
-    features: [
-      '100 events/day',
-      '1 application',
-      '5 endpoints',
-      '10 event types',
-      '10 subscriptions',
-      '7-day log retention',
-      'HMAC signatures',
-      '2FA support',
-      'Community support',
-    ],
-    popular: false,
-  },
-  {
-    key: 'startup',
-    nameKey: 'plans.startup',
-    priceUsd: 29,
-    priceTry: 599,
-    yearlyPriceUsd: 24.65,
-    yearlyPriceTry: 509,
-    limitKey: 'plans.startupLimit',
-    features: [
-      '30kEventsDay', '1application', '50endpoints', '50eventTypes', '300subscriptions', '14dayLog', 'neverBlocked', '003overage', 'cloudevents', 'secretRotation', 'deadLetter', 'emailSupport',
-    ],
-    popular: false,
-  },
-  {
-    key: 'pro',
-    nameKey: 'plans.pro',
-    priceUsd: 49,
-    priceTry: 999,
-    yearlyPriceUsd: 41.65,
-    yearlyPriceTry: 849,
-    limitKey: 'plans.proLimit',
-    features: [
-      '100kEventsDay', 'unlimitedApps', '500endpoints', 'unlimitedEventTypes', 'unlimitedSubs', '30dayLog', '0001overage', 'fifo', 'ipWhitelist', 'analytics', 'schemaRegistry', 'prioritySupport',
-    ],
-    popular: true,
-  },
-  {
-    key: 'enterprise',
-    nameKey: 'plans.enterprise',
-    priceUsd: 0,
-    priceTry: 0,
-    yearlyPriceUsd: 0,
-    yearlyPriceTry: 0,
-    limitKey: 'plans.enterpriseLimit',
-    features: [
-      'unlimitedEvents', 'unlimitedApps', 'unlimitedEndpoints', 'unlimitedEventTypes', 'unlimitedSubs', 'customLog', 'customPricing', 'ssoSaml', 'accountManager', 'sla99', 'customIntegrations', 'onPremise',
-    ],
-    popular: false,
-  },
-];
+const PLAN_FEATURES: Record<string, string[]> = {
+  developer: [
+    '100 events/day',
+    '1 application',
+    '5 endpoints',
+    '10 event types',
+    '10 subscriptions',
+    '7-day log retention',
+    'HMAC signatures',
+    '2FA support',
+    'Community support',
+  ],
+  startup: [
+    '30kEventsDay', '1application', '50endpoints', '50eventTypes', '300subscriptions', '14dayLog', 'neverBlocked', '003overage', 'cloudevents', 'secretRotation', 'deadLetter', 'emailSupport',
+  ],
+  pro: [
+    '100kEventsDay', 'unlimitedApps', '500endpoints', 'unlimitedEventTypes', 'unlimitedSubs', '30dayLog', '0001overage', 'fifo', 'ipWhitelist', 'analytics', 'schemaRegistry', 'prioritySupport',
+  ],
+  enterprise: [
+    'unlimitedEvents', 'unlimitedApps', 'unlimitedEndpoints', 'unlimitedEventTypes', 'unlimitedSubs', 'customLog', 'customPricing', 'ssoSaml', 'accountManager', 'sla99', 'customIntegrations', 'onPremise',
+  ],
+};
 
 export function PlanCards({
   currentPlan,
@@ -77,13 +38,33 @@ export function PlanCards({
   const t = useTranslations('billing');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const isAnnual = billingPeriod === 'annual';
+  const { plans: apiPlans, getPlan } = usePlans();
 
-  const plans = planDefaults.map(p => ({
-    ...p,
-    price: p.key === 'developer' ? 0 : isAnnual ? p.yearlyPriceUsd : p.priceUsd,
-    monthlyPrice: p.key === 'developer' ? 0 : p.priceUsd,
-    isEnterprise: p.key === 'enterprise',
-  }));
+  const planOrder = ['developer', 'startup', 'pro', 'enterprise'];
+
+  const plans = planOrder.map((key) => {
+    const apiPlan = getPlan(key);
+    const priceMonthly = apiPlan?.price_monthly ?? (key === 'developer' ? 0 : key === 'startup' ? 14 : key === 'pro' ? 29 : 99);
+    const priceYearly = apiPlan?.price_yearly ?? (key === 'developer' ? 0 : key === 'startup' ? 168 : key === 'pro' ? 278 : 950);
+    const limits = apiPlan ? {
+      endpoints: apiPlan.max_endpoints,
+      webhooks: apiPlan.max_webhooks,
+      rateLimit: apiPlan.rate_limit,
+      retention: apiPlan.retention_days,
+    } : null;
+
+    return {
+      key,
+      nameKey: `plans.${key}`,
+      price: key === 'developer' ? 0 : isAnnual ? Math.round(priceYearly / 12) : priceMonthly,
+      monthlyPrice: priceMonthly,
+      yearlyTotal: priceYearly,
+      limits,
+      features: PLAN_FEATURES[key] || [],
+      popular: key === 'pro',
+      isEnterprise: key === 'enterprise',
+    };
+  });
 
   return (
     <div>
@@ -115,7 +96,7 @@ export function PlanCards({
           >
             {t('annual')}
             <span className="ml-1.5 inline-block px-1.5 py-0.5 text-[10px] font-bold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
-              -15%
+              -20%
             </span>
           </button>
         </div>
@@ -124,10 +105,10 @@ export function PlanCards({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {plans.map((plan) => {
           const isCurrent = plan.key === currentPlan;
-          const isDowngrade = plans.findIndex((p) => p.key === currentPlan) > plans.indexOf(plan);
+          const isDowngrade = planOrder.indexOf(plan.key) < planOrder.indexOf(currentPlan);
           return (
             <div
-              key={plan.nameKey}
+              key={plan.key}
               className={clsx(
                 'glass-card p-6 hover-lift relative',
                 plan.popular && 'ring-2 ring-brand-500'
@@ -141,7 +122,10 @@ export function PlanCards({
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t(plan.nameKey)}</h3>
               <div className="mt-2 mb-4">
                 {plan.isEnterprise ? (
-                  <span className="text-3xl font-bold text-gray-900 dark:text-white">{t('customPricing')}</span>
+                  <>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
+                    <span className="text-gray-500 dark:text-slate-400 text-sm">/month</span>
+                  </>
                 ) : plan.key === 'developer' ? (
                   <>
                     <span className="text-3xl font-bold text-gray-900 dark:text-white">$0</span>
@@ -168,7 +152,15 @@ export function PlanCards({
                   </>
                 )}
               </div>
-              <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t(plan.limitKey)}</p>
+              {/* Dynamic limits */}
+              {plan.limits && (
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+                  {plan.limits.endpoints} endpoints · {plan.limits.webhooks.toLocaleString()} webhooks/mo · {plan.limits.retention}d retention
+                </p>
+              )}
+              {!plan.limits && (
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t(plan.key === 'enterprise' ? 'plans.enterpriseLimit' : `plans.${plan.key}Limit`)}</p>
+              )}
               <ul className="space-y-2 mb-6">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
