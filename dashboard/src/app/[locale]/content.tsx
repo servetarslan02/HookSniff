@@ -304,7 +304,7 @@ export function HomeContent() {
   const featureIcons = [icons.retry, icons.shield, icons.chart, icons.bolt, icons.queue, icons.globe];
 
   const isTr = locale === 'tr';
-  const { plans: planData, formatPrice, getPlanPrice } = usePlans();
+  const { formatPrice } = usePlans();
   const [yearly, setYearly] = useState(false);
   const plans = [
     { name: tPricing('developer'), desc: tPricing('developerDesc'), price: '$0', period: tPricing('month'), features: tPricing.raw('developerFeatures') as string[], cta: tPricing('getStarted'), popular: false },

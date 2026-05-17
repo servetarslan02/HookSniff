@@ -38,7 +38,7 @@ export function PlanCards({
   const t = useTranslations('billing');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const isAnnual = billingPeriod === 'annual';
-  const { plans: apiPlans, getPlan } = usePlans();
+  const { getPlan } = usePlans();
 
   const planOrder = ['developer', 'startup', 'pro', 'enterprise'];
 
