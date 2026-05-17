@@ -7,7 +7,6 @@ type MessageIn struct {
 	// Optionally creates a new application alongside the message.
 	//
 	// If the application id or uid that is used in the path already exists, this argument is ignored.
-	Application *ApplicationIn `json:"application,omitempty"`
 	Channels    []string       `json:"channels,omitempty"` // List of free-form identifiers that endpoints can filter by
 	// The date and time at which the message will be delivered.
 	//

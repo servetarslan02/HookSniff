@@ -1,7 +1,6 @@
 // this file is @generated
 use serde::{Deserialize, Serialize};
 
-use super::application_in::ApplicationIn;
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct MessageIn {
@@ -10,7 +9,6 @@ pub struct MessageIn {
     /// If the application id or uid that is used in the path already exists,
     /// this argument is ignored.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub application: Option<ApplicationIn>,
 
     /// List of free-form identifiers that endpoints can filter by
     #[serde(skip_serializing_if = "Option::is_none")]
