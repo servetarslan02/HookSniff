@@ -237,56 +237,60 @@ export function PricingPageContent() {
           {planData.map((plan) => (
             <div
               key={plan.key}
-              className={`relative rounded-xl p-6 transition-all duration-300 hover:shadow-lg flex flex-col ${
+              className={`relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col overflow-hidden ${
                 plan.popular
-                  ? 'bg-white dark:bg-slate-800 border-2 border-brand-400 dark:border-brand-500 shadow-lg dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
-                  : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xs dark:shadow-lg'
+                  ? 'bg-white dark:bg-slate-800 border-2 border-brand-500 dark:border-brand-400 shadow-xl dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
+                  : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg'
               }`}
             >
+              {/* Popular badge */}
               {plan.popular && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-brand-600 text-white text-xs font-medium rounded-full">
-                  {t('mostPopular')}
-                </span>
-              )}
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t(plan.key)}</h3>
-              <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t(`${plan.key}Desc`)}</p>
-              {plan.key === 'enterprise' ? (
-                <div className="mt-2 mb-1">
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">{t('customPricing')}</span>
-                </div>
-              ) : (
-                <div className="mt-2 mb-1">
-                  <span className="text-4xl font-bold text-gray-900 dark:text-white">{getPrice(plan.key)}</span>
-                  <span className="text-gray-500 dark:text-slate-500">{getPeriodLabel()}</span>
-                  {billingPeriod === 'annual' && plan.key !== 'developer' && (
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
-                      {t('billedAnnually')}
-                    </p>
-                  )}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-600 to-purple-600 text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-lg z-10">
+                  ⭐ {t('mostPopular')}
                 </div>
               )}
-              <p className="text-sm text-gray-600 dark:text-slate-400 mb-6">{t(`${plan.key}Desc`)}</p>
-              <ul className="space-y-3 mb-6 flex-1">
+              {/* Header */}
+              <div className={`p-6 pb-4 ${plan.popular ? 'bg-gradient-to-br from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10' : ''}`}>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t(plan.key)}</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 leading-relaxed">{t(`${plan.key}Desc`)}</p>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="text-5xl font-extrabold text-gray-900 dark:text-white">{getPrice(plan.key)}</span>
+                  <span className="text-gray-500 dark:text-slate-500 text-sm font-medium">{getPeriodLabel()}</span>
+                </div>
+                {billingPeriod === 'annual' && plan.key !== 'developer' && plan.key !== 'enterprise' && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-medium">
+                    {t('billedAnnually')}
+                  </p>
+                )}
+              </div>
+              {/* Divider */}
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-slate-600 to-transparent" />
+              {/* Features */}
+              <ul className="p-6 space-y-3 flex-1">
                 {featureKeys[plan.key].map((f: string) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-gray-700 dark:text-slate-300">
-                    <svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    {f}
+                  <li key={f} className="flex items-start gap-3 text-sm text-gray-700 dark:text-slate-300">
+                    <span className="mt-0.5 w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                    <span className="leading-snug">{f}</span>
                   </li>
                 ))}
               </ul>
-              <button
-                onClick={() => {
-                  if (token) {
-                    router.push(`/billing`);
-                  } else {
-                    router.push('/register');
-                  }
-                }}
-                className={`block w-full text-center py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  plan.ctaStyle === 'filled'
-                    ? 'bg-brand-600 hover:bg-brand-700 text-white shadow-md'
+              {/* CTA */}
+              <div className="p-6 pt-0">
+                <button
+                  onClick={() => {
+                    if (token) {
+                      router.push(`/billing`);
+                    } else {
+                      router.push('/register');
+                    }
+                  }}
+                  className={`block w-full text-center py-3.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                    plan.ctaStyle === 'filled'
+                      ? 'bg-gradient-to-r from-brand-600 to-purple-600 text-white hover:from-brand-700 hover:to-purple-700 shadow-lg shadow-brand-500/25 hover:shadow-xl hover:shadow-brand-500/30'
                     : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-xs'
                 }`}
               >
