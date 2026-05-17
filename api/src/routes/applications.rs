@@ -4,7 +4,6 @@ use axum::{Json, Router};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::billing::Plan;
 use crate::error::AppError;
 use crate::models::application::{
     Application, ApplicationResponse, ApplicationWithCount, CreateApplicationRequest,
@@ -90,21 +89,6 @@ async fn create_application(
     // Validate input
     req.validate()
         .map_err(AppError::BadRequest)?;
-
-    // Plan-based limit check
-    let plan = Plan::parse_str(&customer.plan);
-    let app_count: (i64,) =
-        sqlx::query_as("SELECT COUNT(*) FROM applications WHERE customer_id = $1")
-            .bind(customer.id)
-            .fetch_one(&pool)
-            .await?;
-
-    let max_apps = plan.max_applications();
-    if app_count.0 as u32 >= max_apps {
-        return Err(AppError::BadRequest(format!(
-            "Application limit reached ({max_apps}). Upgrade your plan for more applications."
-        )));
-    }
 
     // Unique name check (per customer)
     let exists: (bool,) = sqlx::query_as(
