@@ -317,6 +317,38 @@ export interface OperationalWebhookDeliveryOut {
   delivered_at: string | null;
 }
 
+export interface PolledMessage {
+  id: string;
+  endpoint_id: string;
+  event_type: string | null;
+  status: string;
+  attempt_count: number;
+  response_status: number | null;
+  created_at: string;
+  payload?: Record<string, unknown>;
+}
+
+export interface MessagePollerCursor {
+  consumer_id: string;
+  last_message_id: string | null;
+  last_sequence_num: number;
+}
+
+export interface MessagePollerPollResponse {
+  messages: PolledMessage[];
+  cursor: MessagePollerCursor;
+  done: boolean;
+}
+
+export interface MessagePollerCursorResponse {
+  cursor: MessagePollerCursor;
+}
+
+export interface MessagePollerCommitResponse {
+  cursor: MessagePollerCursor;
+  committed: boolean;
+}
+
 export const operationalWebhooksApi = {
   list: (token: string) => apiFetch<OperationalWebhookEndpointOut[]>("/operational-webhooks", { token }),
   get: (token: string, id: string) => apiFetch<OperationalWebhookEndpointOut>(`/operational-webhooks/${id}`, { token }),
@@ -326,6 +358,22 @@ export const operationalWebhooksApi = {
     apiFetch<OperationalWebhookEndpointOut>(`/operational-webhooks/${id}`, { method: "PUT", body: data, token }),
   delete: (token: string, id: string) => apiFetch<{ deleted: boolean }>(`/operational-webhooks/${id}`, { method: "DELETE", token }),
   listDeliveries: (token: string, id: string) => apiFetch<OperationalWebhookDeliveryOut[]>(`/operational-webhooks/${id}/deliveries`, { token }),
+};
+
+export const messagePollerApi = {
+  poll: (token: string, params: { consumer_id: string; limit?: number; endpoint_id?: string; event_type?: string; include_payload?: boolean }) => {
+    const qs = new URLSearchParams();
+    qs.set('consumer_id', params.consumer_id);
+    if (params.limit) qs.set('limit', params.limit.toString());
+    if (params.endpoint_id) qs.set('endpoint_id', params.endpoint_id);
+    if (params.event_type) qs.set('event_type', params.event_type);
+    if (params.include_payload !== undefined) qs.set('include_payload', params.include_payload.toString());
+    return apiFetch<MessagePollerPollResponse>(`/message-poller/poll?${qs}`, { token });
+  },
+  seek: (token: string, data: { consumer_id: string; message_id: string; endpoint_id?: string }) =>
+    apiFetch<MessagePollerCursorResponse>("/message-poller/seek", { method: "POST", body: data, token }),
+  commit: (token: string, data: { consumer_id: string; message_id: string; endpoint_id?: string }) =>
+    apiFetch<MessagePollerCommitResponse>("/message-poller/commit", { method: "POST", body: data, token }),
 };
 
 export const api = {

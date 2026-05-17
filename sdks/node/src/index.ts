@@ -4,6 +4,7 @@ import { Endpoint } from "./api/endpoint";
 import { Environment } from "./api/environment";
 import { EventType } from "./api/eventType";
 import { OperationalWebhook } from "./api/operationalWebhook";
+import { MessagePoller } from "./api/messagePoller";
 import { Health } from "./api/health";
 import { Message } from "./api/message";
 import { MessageAttempt } from "./api/messageAttempt";
@@ -38,6 +39,7 @@ export type { EndpointListOptions } from "./api/endpoint";
 export type { EventTypeListOptions } from "./api/eventType";
 export { type MessageListOptions, messageInRaw } from "./api/message";
 export type { MessageAttemptListByEndpointOptions, MessageAttemptListByMsgOptions } from "./api/messageAttempt";
+export type { PollOptions, SeekOptions, CommitOptions } from "./api/messagePoller";
 
 export type HookSniffOptions = {
   debug?: boolean;
@@ -100,6 +102,10 @@ export class HookSniff {
 
   public get operationalWebhook() {
     return new OperationalWebhook(this.requestCtx);
+  }
+
+  public get messagePoller() {
+    return new MessagePoller(this.requestCtx);
   }
 
   public get health() {
