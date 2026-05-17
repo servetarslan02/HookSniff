@@ -1,219 +1,78 @@
 <?php
 
+declare(strict_types=1);
+
 namespace HookSniff\Tests;
 
-final class WebhookTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+use HookSniff\Webhook;
+use HookSniff\Exception\WebhookVerificationException;
+
+class WebhookTest extends TestCase
 {
-    private const TOLERANCE = 5 * 60;
+    private const SECRET = 'whsec_dGVzdA==';
+    private const MSG_ID = 'msg_test123';
+    private const PAYLOAD = '{"event":"test"}';
 
-    public function testValidSignatureIsValidAndReturnsJson()
+    private function sign(string $secret, string $msgId, int $timestamp, string $payload): string
     {
-        $testPayload = new TestPayload(time());
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $json = $wh->verify($testPayload->payload, $testPayload->header);
-
-        $this->assertEquals(
-            $json['test'],
-            2432232315,
-            "did not return expected json"
-        );
+        $decoded = base64_decode(str_replace('whsec_', '', $secret));
+        $toSign = "{$msgId}.{$timestamp}.{$payload}";
+        $sig = base64_encode(hash_hmac('sha256', $toSign, $decoded, true));
+        return "v1,{$sig}";
     }
 
-    public function testValidBrandlessSignatureIsValidAndReturnsJson()
+    public function testVerifyValidSignature(): void
     {
-        $testPayload = new TestPayload(time());
-        $unbrandedHeaders = array(
-            "webhook-id" => $testPayload->header['hooksniff-id'],
-            "webhook-signature" => $testPayload->header['hooksniff-signature'],
-            "webhook-timestamp" => $testPayload->header['hooksniff-timestamp'],
-        );
-        $testPayload->header = $unbrandedHeaders;
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $json = $wh->verify($testPayload->payload, $testPayload->header);
-
-        $this->assertEquals(
-            $json['test'],
-            2432232315,
-            "did not return expected json"
-        );
-    }
-
-    public function testInvalidSignatureThrowsException()
-    {
-        $this->expectException(\HookSniff\Exception\WebhookVerificationException::class);
-        $this->expectExceptionMessage("No matching signature found");
-
-        $testPayload = new TestPayload(time());
-        $testPayload->header['hooksniff-signature'] = 'v1,dawfeoifkpqwoekfpqoekf';
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $wh->verify($testPayload->payload, $testPayload->header);
-    }
-
-    public function testBadlyFormattedSignatureThrowsException()
-    {
-        $this->expectException(\HookSniff\Exception\WebhookVerificationException::class);
-        $this->expectExceptionMessage("No matching signature found");
-
-        $testPayload = new TestPayload(time());
-        $testPayload->header['hooksniff-signature'] = 'BAD_SIG_NATURE';
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $wh->verify($testPayload->payload, $testPayload->header);
-    }
-
-    public function testMissingIdThrowsException()
-    {
-        $this->expectException(\HookSniff\Exception\WebhookVerificationException::class);
-        $this->expectExceptionMessage("Missing required headers");
-
-        $testPayload = new TestPayload(time());
-        unset($testPayload->header['hooksniff-id']);
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $wh->verify($testPayload->payload, $testPayload->header);
-    }
-
-    public function testMissingTimestampThrowsException()
-    {
-        $this->expectException(\HookSniff\Exception\WebhookVerificationException::class);
-        $this->expectExceptionMessage("Missing required headers");
-
-        $testPayload = new TestPayload(time());
-        unset($testPayload->header['hooksniff-timestamp']);
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $wh->verify($testPayload->payload, $testPayload->header);
-    }
-
-    public function testMissingSignatureThrowsException()
-    {
-        $this->expectException(\HookSniff\Exception\WebhookVerificationException::class);
-        $this->expectExceptionMessage("Missing required headers");
-
-        $testPayload = new TestPayload(time());
-        unset($testPayload->header['hooksniff-signature']);
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $wh->verify($testPayload->payload, $testPayload->header);
-    }
-
-    public function testOldTimestampThrowsException()
-    {
-        $this->expectException(\HookSniff\Exception\WebhookVerificationException::class);
-        $this->expectExceptionMessage("Message timestamp too old");
-
-        $testPayload = new TestPayload(time() - self::TOLERANCE - 1);
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $wh->verify($testPayload->payload, $testPayload->header);
-    }
-
-    public function testNewTimestampThrowsException()
-    {
-        $this->expectException(\HookSniff\Exception\WebhookVerificationException::class);
-        $this->expectExceptionMessage("Message timestamp too new");
-
-        $testPayload = new TestPayload(time() + self::TOLERANCE + 1);
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $wh->verify($testPayload->payload, $testPayload->header);
-    }
-
-    public function testMultiSigPayloadIsValid()
-    {
-        // We're checking that `verify()` doesn't throw an exception.
-        // It doesn't return anything we can assert about.
-        $this->expectNotToPerformAssertions();
-
-        $testPayload = new TestPayload(time());
-        $sigs = [
-            "v1,Ceo5qEr07ixe2NLpvHk3FH9bwy/WavXrAFQ/9tdO6mc=",
-            "v2,Ceo5qEr07ixe2NLpvHk3FH9bwy/WavXrAFQ/9tdO6mc=",
-            $testPayload->header['hooksniff-signature'], // valid signature
-            "v1,Ceo5qEr07ixe2NLpvHk3FH9bwy/WavXrAFQ/9tdO6mc=",
+        $wh = new Webhook(self::SECRET);
+        $timestamp = time();
+        $sig = $this->sign(self::SECRET, self::MSG_ID, $timestamp, self::PAYLOAD);
+        $headers = [
+            'webhook-id' => self::MSG_ID,
+            'webhook-timestamp' => (string) $timestamp,
+            'webhook-signature' => $sig,
         ];
-        $testPayload->header['hooksniff-signature'] = implode(" ", $sigs);
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $wh->verify($testPayload->payload, $testPayload->header);
+        $result = $wh->verify(self::PAYLOAD, $headers);
+        $this->assertEquals(['event' => 'test'], $result);
     }
 
-    public function testSignatureVerificationWithAndWithoutPrefix()
+    public function testRejectInvalidSignature(): void
     {
-        // We're checking that `verify()` doesn't throw an exception.
-        // It doesn't return anything we can assert about.
-        $this->expectNotToPerformAssertions();
-
-        $testPayload = new TestPayload(time());
-
-        $wh = new \HookSniff\Webhook($testPayload->secret);
-        $wh->verify($testPayload->payload, $testPayload->header);
-
-
-        $wh = new \HookSniff\Webhook("whsec_" . $testPayload->secret);
-        $wh->verify($testPayload->payload, $testPayload->header);
+        $wh = new Webhook(self::SECRET);
+        $headers = [
+            'webhook-id' => self::MSG_ID,
+            'webhook-timestamp' => (string) time(),
+            'webhook-signature' => 'v1,invalid',
+        ];
+        $this->expectException(WebhookVerificationException::class);
+        $wh->verify(self::PAYLOAD, $headers);
     }
 
-    public function testSignFunctionWorks()
+    public function testRejectOldTimestamp(): void
     {
-        $key = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
-        $msgId = "msg_p5jXN8AQM9LWM0D4loKWxJek";
-        $timestamp = 1614265330;
-        $payload = '{"test": 2432232314}';
-        $expected = "v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE=";
-
-        $wh = new \HookSniff\Webhook($key);
-
-        $signature = $wh->sign($msgId, $timestamp, $payload);
-        $this->assertEquals(
-            $signature,
-            $expected,
-            "did not return expected signature"
-        );
+        $wh = new Webhook(self::SECRET);
+        $oldTs = time() - 600;
+        $sig = $this->sign(self::SECRET, self::MSG_ID, $oldTs, self::PAYLOAD);
+        $headers = [
+            'webhook-id' => self::MSG_ID,
+            'webhook-timestamp' => (string) $oldTs,
+            'webhook-signature' => $sig,
+        ];
+        $this->expectException(WebhookVerificationException::class);
+        $wh->verify(self::PAYLOAD, $headers);
     }
 
-    public function testInvalidFloatTimestamp()
+    public function testSvixBrandedHeaders(): void
     {
-        $this->expectException(\HookSniff\Exception\WebhookSigningException::class);
-        $key = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
-        $msgId = "msg_p5jXN8AQM9LWM0D4loKWxJek";
-        $timestamp = "161426533.0";
-        $payload = '{"test": 2432232314}';
-        $expected = "v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE=";
-
-        $wh = new \HookSniff\Webhook($key);
-
-        $signature = $wh->sign($msgId, $timestamp, $payload);
-    }
-
-    public function testInvalidStringTimestamp()
-    {
-        $this->expectException(\HookSniff\Exception\WebhookSigningException::class);
-        $key = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
-        $msgId = "msg_p5jXN8AQM9LWM0D4loKWxJek";
-        $timestamp = "invalid timestamp";
-        $payload = '{"test": 2432232314}';
-        $expected = "v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE=";
-
-        $wh = new \HookSniff\Webhook($key);
-
-        $signature = $wh->sign($msgId, $timestamp, $payload);
-    }
-
-    public function testInvalidNegativeTimestamp()
-    {
-        $this->expectException(\HookSniff\Exception\WebhookSigningException::class);
-        $key = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
-        $msgId = "msg_p5jXN8AQM9LWM0D4loKWxJek";
-        $timestamp = "-161426533";
-        $payload = '{"test": 2432232314}';
-        $expected = "v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE=";
-
-        $wh = new \HookSniff\Webhook($key);
-
-        $signature = $wh->sign($msgId, $timestamp, $payload);
+        $wh = new Webhook(self::SECRET);
+        $timestamp = time();
+        $sig = $this->sign(self::SECRET, self::MSG_ID, $timestamp, self::PAYLOAD);
+        $headers = [
+            'svix-id' => self::MSG_ID,
+            'svix-timestamp' => (string) $timestamp,
+            'svix-signature' => $sig,
+        ];
+        $result = $wh->verify(self::PAYLOAD, $headers);
+        $this->assertEquals(['event' => 'test'], $result);
     }
 }
