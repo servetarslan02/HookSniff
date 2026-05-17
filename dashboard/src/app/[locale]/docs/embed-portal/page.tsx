@@ -2,50 +2,58 @@ import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 
-// Revalidate every hour for ISR
 export const revalidate = 3600;
-
 
 export const metadata: Metadata = {
   title: 'Embed Portal',
   description: 'Embed the HookSniff customer portal in your application',
 };
 
-
-// Force SSR — SSG output was missing on Vercel for this page
-export const dynamic = 'force-dynamic';
-
-// Force redeploy — docs/portal page fix
 export default function PortalPage() {
   const t = useTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("embeddablePortal")}</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Embeddable Portal</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Let your customers manage their own webhook endpoints, view deliveries, and inspect payloads — embedded directly in your app.
+        Let your customers manage their own webhooks — without building a UI from scratch.
       </p>
 
-      {/* What is the Portal */}
+      {/* The Problem */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">What is the Embeddable Portal?</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Problem</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          The embeddable portal is a white-labeled UI component that your customers can use to:
+          If you&apos;re a SaaS platform sending webhooks to your customers, they need to:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
+          <li>Add and manage their webhook endpoints</li>
+          <li>View delivery status and debug failures</li>
+          <li>Rotate signing secrets</li>
+          <li>Replay failed deliveries</li>
+        </ul>
+        <p className="text-gray-600 dark:text-slate-400 mt-4">
+          Building this UI yourself takes weeks. And every customer asks for different features.
+        </p>
+      </section>
+
+      {/* The Solution */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Solution: Embeddable Portal</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">
+          HookSniff provides a white-labeled portal component you can embed in your app with a single script tag. Your customers get a full webhook management UI without you writing a line of frontend code.
+        </p>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">Customers can:</p>
+        <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li><strong>Create & manage endpoints</strong> — Add their own webhook URLs</li>
-          <li><strong>{t("viewDeliveries")}</strong> — See all webhook deliveries with status, timestamps, and payloads</li>
-          <li><strong>{t("inspectPayloads")}</strong> — View request and response details for each attempt</li>
-          <li><strong>{t("rotateSecretsPortal")}</strong> — Manage their own signing secrets</li>
-          <li><strong>{t("replayFailed")}</strong> — Re-queue deliveries that failed</li>
+          <li><strong>View deliveries</strong> — See all webhook deliveries with status, timestamps, and payloads</li>
+          <li><strong>Inspect payloads</strong> — View request and response details for each attempt</li>
+          <li><strong>Rotate secrets</strong> — Manage their own signing secrets</li>
+          <li><strong>Replay failed deliveries</strong> — Re-queue deliveries that failed</li>
         </ul>
       </section>
 
       {/* How to Embed */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("howToEmbed")}</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Add the portal to your app with a single script tag or iframe:
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How to Embed</h2>
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Script Tag (Recommended)</h3>
         <CodeBlock
@@ -77,7 +85,7 @@ export default function PortalPage() {
 
       {/* Customization */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("customization")}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Customization</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Match the portal to your brand:
         </p>
@@ -92,26 +100,24 @@ export default function PortalPage() {
     companyName: 'Your Company',
   },
   features: {
-    createEndpoints: true,    // Allow customers to create endpoints
-    rotateSecrets: true,      // Allow secret rotation
-    replayDeliveries: true,   // Allow replaying failed webhooks
-    viewPayloads: true,       // Show full payload details
+    createEndpoints: true,
+    rotateSecrets: true,
+    replayDeliveries: true,
+    viewPayloads: true,
   },
 });`}
         />
       </section>
 
-      {/* Customer Self-Service */}
+      {/* Benefits */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Customer Self-Service</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          The portal enables customer self-service, reducing support burden:
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Why Use the Portal?</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><strong>{t("zeroTickets")}</strong> — Customers can debug their own webhook issues</li>
+          <li><strong>Zero support tickets</strong> — Customers debug their own webhook issues</li>
           <li><strong>Real-time visibility</strong> — See delivery status without contacting your team</li>
-          <li><strong>{t("secureAccess")}</strong> — Each customer only sees their own endpoints and deliveries</li>
-          <li><strong>{t("apiKeyScoping")}</strong> — Portal keys are scoped to the customer's resources</li>
+          <li><strong>Secure access</strong> — Each customer only sees their own endpoints and deliveries</li>
+          <li><strong>API key scoping</strong> — Portal keys are scoped to the customer&apos;s resources</li>
+          <li><strong>No frontend work</strong> — Embed with one line, customize with options</li>
         </ul>
       </section>
     </article>
