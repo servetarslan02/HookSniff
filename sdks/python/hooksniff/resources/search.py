@@ -1,21 +1,31 @@
 """
-HookSniff API Resource: Search
+HookSniff SDK — Search Resource
 """
 
-from typing import List, Optional
-from hooksniff.request import HookSniffRequest, HookSniffRequestContext
-from hooksniff.models.search_result import SearchResult
+from __future__ import annotations
+
+from typing import Any
+
+from ..request import HookSniffRequest, RequestConfig
 
 
 class Search:
-    def __init__(self, ctx: HookSniffRequestContext):
-        self._ctx = ctx
+    """Search across all resources."""
 
-    def query(self, q: str, limit: Optional[int] = None) -> List[SearchResult]:
-        """Search webhook deliveries."""
+    def __init__(self, config: RequestConfig):
+        self._config = config
+
+    def search(
+        self,
+        query: str,
+        type: str | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Search endpoints, deliveries, teams, etc."""
         req = HookSniffRequest("GET", "/v1/search")
-        params = {"q": q}
-        if limit is not None:
-            params["limit"] = limit
-        req.set_query_params(params)
-        return req.send(self._ctx, parser=lambda data: [SearchResult._from_json(item) for item in data] if isinstance(data, list) else [])
+        req.set_query_params({
+            "q": query,
+            "type": type,
+            "limit": limit,
+        })
+        return req.send(self._config, lambda j: j)

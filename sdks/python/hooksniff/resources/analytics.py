@@ -1,50 +1,50 @@
 """
-HookSniff API Resource: Analytics
+HookSniff SDK — Analytics Resource
 """
 
-from typing import Optional
-from hooksniff.request import HookSniffRequest, HookSniffRequestContext
-from hooksniff.models.analytics_trend_response import AnalyticsTrendResponse
-from hooksniff.models.success_rate_response import SuccessRateResponse
-from hooksniff.models.latency_response import LatencyResponse
+from __future__ import annotations
+
+from typing import Any
+
+from ..request import HookSniffRequest, RequestConfig
 
 
 class Analytics:
-    def __init__(self, ctx: HookSniffRequestContext):
-        self._ctx = ctx
+    """Analytics & stats."""
 
-    def deliveries(self, since: Optional[str] = None, until: Optional[str] = None) -> AnalyticsTrendResponse:
-        """Get delivery trend data."""
-        req = HookSniffRequest("GET", "/v1/analytics/deliveries")
-        params = {}
-        if since:
-            params["since"] = since
-        if until:
-            params["until"] = until
-        if params:
-            req.set_query_params(params)
-        return req.send(self._ctx, parser=AnalyticsTrendResponse._from_json)
+    def __init__(self, config: RequestConfig):
+        self._config = config
 
-    def success_rate(self, since: Optional[str] = None, until: Optional[str] = None) -> SuccessRateResponse:
-        """Get success rate metrics."""
+    def get_stats(self, period: str = "30d") -> dict[str, Any]:
+        """Get overall stats for the given period."""
+        req = HookSniffRequest("GET", "/v1/analytics/stats")
+        req.set_query_param("period", period)
+        return req.send(self._config, lambda j: j)
+
+    def get_trends(
+        self,
+        metric: str = "deliveries",
+        period: str = "30d",
+    ) -> dict[str, Any]:
+        """Get trend data for a metric."""
+        req = HookSniffRequest("GET", "/v1/analytics/trends")
+        req.set_query_params({"metric": metric, "period": period})
+        return req.send(self._config, lambda j: j)
+
+    def get_success_rate(self, period: str = "30d") -> dict[str, Any]:
+        """Get success rate overall and by endpoint."""
         req = HookSniffRequest("GET", "/v1/analytics/success-rate")
-        params = {}
-        if since:
-            params["since"] = since
-        if until:
-            params["until"] = until
-        if params:
-            req.set_query_params(params)
-        return req.send(self._ctx, parser=SuccessRateResponse._from_json)
+        req.set_query_param("period", period)
+        return req.send(self._config, lambda j: j)
 
-    def latency(self, since: Optional[str] = None, until: Optional[str] = None) -> LatencyResponse:
-        """Get latency metrics."""
+    def get_latency(self, period: str = "30d") -> dict[str, Any]:
+        """Get latency trends (p50, p95, p99)."""
         req = HookSniffRequest("GET", "/v1/analytics/latency")
-        params = {}
-        if since:
-            params["since"] = since
-        if until:
-            params["until"] = until
-        if params:
-            req.set_query_params(params)
-        return req.send(self._ctx, parser=LatencyResponse._from_json)
+        req.set_query_param("period", period)
+        return req.send(self._config, lambda j: j)
+
+    def get_delivery_trends(self, period: str = "30d") -> dict[str, Any]:
+        """Get delivery volume trends."""
+        req = HookSniffRequest("GET", "/v1/analytics/delivery-trends")
+        req.set_query_param("period", period)
+        return req.send(self._config, lambda j: j)
