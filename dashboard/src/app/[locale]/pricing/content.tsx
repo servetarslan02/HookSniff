@@ -91,20 +91,20 @@ export function PricingPageContent() {
   const tf = useTranslations('pricingFaq');
   const isTr = locale === 'tr';
 
-  const monthlyPrices = { developer: 0, startup: isTr ? 599 : 29, pro: isTr ? 999 : 49, enterprise: 0 };
+  const monthlyPrices = { developer: 0, startup: 29, pro: 49, enterprise: 0 };
   const annualPrices = {
     developer: 0,
-    startup: isTr ? Math.round(599 * 12 * 0.8) : Math.round(29 * 12 * 0.8),
-    pro: isTr ? Math.round(999 * 12 * 0.8) : Math.round(49 * 12 * 0.8),
+    startup: Math.round(29 * 12 * 0.8),
+    pro: Math.round(49 * 12 * 0.8),
     enterprise: 0,
   };
 
   const getPrice = (plan: string) => {
-    if (plan === 'developer') return isTr ? '₺0' : '$0';
+    if (plan === 'developer') return '$0';
     if (plan === 'enterprise') return t('custom');
     const prices = billingPeriod === 'annual' ? annualPrices : monthlyPrices;
     const val = prices[plan as keyof typeof prices];
-    return isTr ? `₺${val.toLocaleString()}` : `$${val}`;
+    return `$${val}`;
   };
 
   const getPeriodLabel = () => billingPeriod === 'annual' ? t('billedAnnually') : t('month');
