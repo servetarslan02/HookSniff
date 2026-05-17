@@ -1,21 +1,90 @@
 # SDK Roadmap MEMORY
 
-> Son güncelleme: 2026-05-17 23:58 GMT+8
+> Son güncelleme: 2026-05-18 00:08 GMT+8
 
-## Durum
-- Node.js SDK: ✅ Svix'ten adapte edildi (0.5.0, %70-75)
-- Python SDK: ✅ Svix SDK'dan doğrudan adapte edildi (127 dosya, 101 model) (1.0.0, %80)
-- Go SDK: ✅ Svix SDK'dan doğrudan adapte edildi (115 dosya, 99 model) (1.0.0, %80)
-- Rust SDK: ✅ Svix SDK'dan doğrudan adapte edildi (118 dosya, 98 model) (1.0.0, %80)
-- 7 SDK daha: ⬜ Beklemede (Ruby, Java, Kotlin, PHP, C#, Swift, Elixir)
+## ⚠️ KRİTİK: SDK Adaptasyon Yöntemi
 
-## Adaptasyon Yöntemi
-1. Svix SDK'yı kopyala
-2. `svix` → `hooksniff` yeniden adlandır
-3. API base URL'ini değiştir
-4. Svix-specific features kaldır
-5. GitHub'a push et
+**ASLA sıfırdan yazma!** Her zaman Svix SDK'yı kopyala ve adapte et.
 
-## Sıradaki
-1. Kalan 7 SDK (Ruby, Java, Kotlin, PHP, C#, Swift, Elixir)
-2. Faz 1-7: Core kalite, test, CI/CD, codegen, docs
+### Adımlar (her SDK için aynı):
+1. Svix repo'sundan ilgili dil SDK'sını kopyala (`svix-libs/python/`, `svix-libs/go/`, `svix-libs/rust/` vb.)
+2. Bulk find-replace yap: `svix` → `hooksniff`, `Svix` → `HookSniff`, `SVIX` → `HOOKSNIFF`
+3. Import path'lerini değiştir: `github.com/svix/svix-webhooks` → `github.com/servetarslan02/hooksniff-go` vb.
+4. API base URL'ini değiştir: `api.svix.com` → `api.hooksniff.com`
+5. Svix-specific features kaldır (aşağıya bak)
+6. `svix-id`/`svix-signature`/`svix-timestamp` header'larını `hooksniff-id`/`hooksniff-signature`/`hooksniff-timestamp` olarak değiştir
+7. Syntax-check yap
+8. GitHub'a push et
+9. `.ai-context/sdk-roadmap/` dosyalarını güncelle
+
+### Kaldırılacak Svix-specific features:
+- autoconfig (svix autoconfig token)
+- streaming (svix streaming)
+- ingest (svix ingest endpoints/sources)
+- connectors (svix connectors - shopify, stripe vb.)
+- environment (svix environment)
+- integration (svix integration)
+- operational_webhook (svix operational webhooks)
+- background_task (svix background tasks)
+- message_poller (svix message poller)
+- application (svix application - HookSniff endpoint kullanıyor)
+- Svix-specific connector config'ler (*_config.go, *_config_out.go vb.)
+
+### Dosya yapısı (Python örneği):
+```
+sdks/python/
+├── hooksniff/
+│   ├── __init__.py
+│   ├── exceptions.py
+│   ├── webhooks.py
+│   ├── py.typed
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── client.py          (attrs-based)
+│   │   ├── common.py          (ApiBase - httpx)
+│   │   ├── hooksniff.py       (main client)
+│   │   ├── errors/
+│   │   ├── endpoint.py
+│   │   ├── message.py
+│   │   ├── message_attempt.py
+│   │   ├── authentication.py
+│   │   ├── event_type.py
+│   │   └── statistics.py
+│   └── models/
+│       └── __init__.py
+├── tests/
+├── pyproject.toml
+└── README.md
+```
+
+## Mevcut Durum
+- Node.js SDK: ✅ Svix'ten adapte edildi (0.5.0)
+- Python SDK: ✅ Svix SDK'dan doğrudan adapte edildi (1.0.0, 127 dosya, 101 model)
+- Go SDK: ✅ Svix SDK'dan doğrudan adapte edildi (1.0.0, 115 dosya, 99 model)
+- Rust SDK: ✅ Svix SDK'dan doğrudan adapte edildi (1.0.0, 118 dosya, 98 model)
+- Ruby: ⬜ Sıradaki
+- Java: ⬜
+- Kotlin: ⬜
+- PHP: ⬜
+- C#: ⬜
+- Swift: ⬜
+- Elixir: ⬜
+
+## Svix Repo
+- GitHub: `https://github.com/svix/svix-webhooks`
+- Python: `svix-libs/python/svix/`
+- Go: `svix-libs/go/`
+- Rust: `svix-libs/rust/`
+- Ruby: `svix-libs/ruby/`
+- Java: `svix-libs/java/`
+- Kotlin: `svix-libs/kotlin/`
+- PHP: `svix-libs/php/`
+- C#: `svix-libs/csharp/` veya `svix-libs/dotnet/`
+- Swift: `svix-libs/swift/`
+- Elixir: `svix-libs/elixir/`
+
+## HookSniff API Bilgileri
+- Base URL: `https://api.hooksniff-1046140057667.europe-west1.run.app`
+- API versioning: `/v1/` prefix
+- Auth: Bearer token
+- Webhook headers: `hooksniff-id`, `hooksniff-signature`, `hooksniff-timestamp`
