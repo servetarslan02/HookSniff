@@ -33,6 +33,12 @@ type (
 	EasypostConfig                            = models.EasypostConfig
 	EasypostConfigOut                         = models.EasypostConfigOut
 	EmptyResponse                             = models.EmptyResponse
+	EnvironmentIn                             = models.EnvironmentIn
+	EnvironmentModelOut                       = models.EnvironmentModelOut
+	EnvironmentPatch                          = models.EnvironmentPatch
+	EnvironmentVariableBulkUpsertIn           = models.EnvironmentVariableBulkUpsertIn
+	EnvironmentVariableIn                     = models.EnvironmentVariableIn
+	EnvironmentVariableOut                    = models.EnvironmentVariableOut
 	EndpointCreatedEvent                      = models.EndpointCreatedEvent
 	EndpointCreatedEventData                  = models.EndpointCreatedEventData
 	EndpointDeletedEvent                      = models.EndpointDeletedEvent

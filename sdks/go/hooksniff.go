@@ -30,6 +30,7 @@ type (
 		Message        *Message
 		MessageAttempt *MessageAttempt
 		Statistics     *Statistics
+		Environment    *Environment
 	}
 )
 
@@ -66,6 +67,7 @@ func New(token string, options *HookSniffOptions) (*HookSniff, error) {
 		Message:        newMessage(&hooksniffHttpClient),
 		MessageAttempt: newMessageAttempt(&hooksniffHttpClient),
 		Statistics:     newStatistics(&hooksniffHttpClient),
+		Environment:    newEnvironment(&hooksniffHttpClient),
 	}
 	return &hs, nil
 }
