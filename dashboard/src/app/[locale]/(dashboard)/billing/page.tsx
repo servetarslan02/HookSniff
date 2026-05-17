@@ -14,6 +14,8 @@ import { usePlans } from '@/hooks/usePlans';
 import { UsageChart, type UsageChartData } from './components/UsageChart';
 import { PlanCards } from './components/PlanCards';
 import { InvoiceTable } from './components/InvoiceTable';
+import { SubscriptionDetails } from './components/SubscriptionDetails';
+import { OverageSettings } from './components/OverageSettings';
 
 export default function BillingPage() {
   const { user, token } = useAuth();
@@ -38,6 +40,14 @@ export default function BillingPage() {
     ? usageData.webhooks?.limit ?? usageData.deliveries_limit ?? 10000
     : 10000;
 
+  // Endpoint usage
+  const endpointUsed = usageData
+    ? usageData.endpoints?.used ?? usageData.endpoints_count ?? 0
+    : 0;
+  const endpointLimit = usageData
+    ? usageData.endpoints?.limit ?? usageData.endpoints_limit ?? 5
+    : 5;
+
   // Build chart data from usage
   const chartData: UsageChartData[] = usageData
     ? (() => {
@@ -48,6 +58,7 @@ export default function BillingPage() {
     : [];
 
   const usagePercent = usageLimit > 0 ? Math.round((usageCount / usageLimit) * 100) : 0;
+  const endpointPercent = endpointLimit > 0 ? Math.round((endpointUsed / endpointLimit) * 100) : 0;
 
   // UI state (kept as useState)
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -131,11 +142,6 @@ export default function BillingPage() {
     }
   };
 
-  // Calculate next billing date dynamically (1st of next month)
-  const now = new Date();
-  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  const nextBillingDate = nextMonth.toISOString().split('T')[0];
-
   return (
     <div className="space-y-8">
       <div>
@@ -145,33 +151,15 @@ export default function BillingPage() {
         </p>
       </div>
 
-      {/* Current Plan Summary */}
-      <div className="glass-card p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('currentPlan')}</h2>
-            <div className="flex items-center gap-3 mt-2">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300 ring-1 ring-inset ring-brand-600/20">
-                {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
-              </span>
-              <span className="text-sm text-gray-500 dark:text-slate-400">
-                {t('nextBilling')}: {new Date(nextBillingDate).toLocaleDateString(locale)}
-              </span>
-            </div>
-          </div>
-          {currentPlan !== 'developer' && (
-            <button type="button"
-              onClick={() => setShowCancelModal(true)}
-              className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition"
-            >
-              {t('cancelSubscription')}
-            </button>
-          )}
-        </div>
+      {/* Subscription Details */}
+      <SubscriptionDetails />
 
-        {/* Usage */}
-        <div className="flex items-center gap-6">
-          <div className="flex-1">
+      {/* Usage Overview */}
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('usageOverview')}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* Webhook Usage */}
+          <div>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-gray-600 dark:text-slate-400">{t('webhooksThisMonth')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
@@ -193,32 +181,47 @@ export default function BillingPage() {
               </p>
             )}
           </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">{usagePercent}%</div>
-            <div className="text-sm text-gray-500 dark:text-slate-400">{t('used')}</div>
+
+          {/* Endpoint Usage */}
+          <div>
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-gray-600 dark:text-slate-400">{t('endpoints')}</span>
+              <span className="font-medium text-gray-900 dark:text-white">
+                {endpointUsed} / {endpointLimit}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3">
+              <div
+                className={clsx(
+                  'h-3 rounded-full transition-all duration-500',
+                  endpointPercent > 80 ? 'bg-red-500' : endpointPercent > 50 ? 'bg-yellow-500' : 'bg-brand-500'
+                )}
+                style={{ width: `${endpointPercent}%` }}
+              />
+            </div>
           </div>
         </div>
 
-        {/* Plan Limits */}
+        {/* Plan Limits Grid */}
         {planLimits && (
           <div className="mt-6 pt-6 border-t border-gray-200/50 dark:border-slate-700/50">
-            <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4">{t('planLimits') || 'Plan Limits'}</h3>
+            <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4">{t('planLimits')}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.endpoints}</p>
-                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('endpoints') || 'Endpoints'}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('endpoints')}</p>
               </div>
               <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.webhooks.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('webhooksMonth') || 'Webhooks/mo'}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('webhooksMonth')}</p>
               </div>
               <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.rateLimit.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('rateLimit') || 'Rate/min'}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('rateLimit')}</p>
               </div>
               <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.retention}<span className="text-base">d</span></p>
-                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('dataRetention') || 'Data Retention'}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('dataRetention')}</p>
               </div>
             </div>
           </div>
@@ -242,6 +245,9 @@ export default function BillingPage() {
           </p>
         )}
       </div>
+
+      {/* Overage Settings */}
+      <OverageSettings />
 
       {/* Plans */}
       <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} />
