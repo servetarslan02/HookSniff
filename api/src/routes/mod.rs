@@ -6,6 +6,7 @@ pub mod applications;
 pub mod audit_log;
 pub mod auth;
 pub mod auth_2fa;
+pub mod background_tasks;
 pub mod billing;
 pub mod contact;
 pub mod custom_domains;
@@ -68,6 +69,7 @@ pub fn api_router() -> Router {
         .nest("/outbound-ips", outbound_ips::router())
         .nest("/endpoints", endpoints::router())
         .nest("/environments", environments::router())
+        .nest("/background-tasks", background_tasks::router())
         .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
         .nest("/stream", stream::router())
         .nest("/events", events::router())
@@ -171,5 +173,6 @@ mod tests {
         let _ = portal_config::router();
         let _ = oauth::router();
         let _ = environments::router();
+        let _ = background_tasks::router();
     }
 }

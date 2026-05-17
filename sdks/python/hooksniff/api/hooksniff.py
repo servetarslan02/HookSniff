@@ -4,6 +4,7 @@ import typing as t
 from dataclasses import dataclass, field
 
 from .authentication import Authentication, AuthenticationAsync
+from .background_task import BackgroundTask, BackgroundTaskAsync
 from .client import AuthenticatedClient
 from .endpoint import Endpoint, EndpointAsync
 from .environment import Environment, EnvironmentAsync
@@ -54,6 +55,10 @@ class HookSniffAsync(ClientBase):
         return AuthenticationAsync(self._client)
 
     @property
+    def background_task(self) -> BackgroundTaskAsync:
+        return BackgroundTaskAsync(self._client)
+
+    @property
     def endpoint(self) -> EndpointAsync:
         return EndpointAsync(self._client)
 
@@ -82,6 +87,10 @@ class HookSniff(ClientBase):
     @property
     def authentication(self) -> Authentication:
         return Authentication(self._client)
+
+    @property
+    def background_task(self) -> BackgroundTask:
+        return BackgroundTask(self._client)
 
     @property
     def endpoint(self) -> Endpoint:
