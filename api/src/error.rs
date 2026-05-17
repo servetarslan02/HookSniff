@@ -24,6 +24,9 @@ pub enum AppError {
     #[error("Conflict: {0}")]
     Conflict(String),
 
+    #[error("Validation error: {0}")]
+    Validation(String),
+
     #[error("Rate limit exceeded")]
     RateLimitExceeded,
 
@@ -50,6 +53,11 @@ impl IntoResponse for AppError {
                 self.to_string(),
             ),
             AppError::Conflict(msg) => (StatusCode::CONFLICT, "CONFLICT", msg.clone()),
+            AppError::Validation(msg) => (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                "VALIDATION_ERROR",
+                msg.clone(),
+            ),
             AppError::RateLimitExceeded => (
                 StatusCode::TOO_MANY_REQUESTS,
                 "RATE_LIMIT_EXCEEDED",
@@ -140,6 +148,12 @@ mod tests {
     fn test_display_conflict() {
         let err = AppError::Conflict("duplicate entry".into());
         assert_eq!(err.to_string(), "Conflict: duplicate entry");
+    }
+
+    #[test]
+    fn test_display_validation() {
+        let err = AppError::Validation("invalid field".into());
+        assert_eq!(err.to_string(), "Validation error: invalid field");
     }
 
     #[test]
@@ -263,6 +277,15 @@ mod tests {
         assert_eq!(status, StatusCode::CONFLICT);
         assert_eq!(body["error"]["code"], "CONFLICT");
         assert_eq!(body["error"]["message"], "duplicate endpoint name");
+    }
+
+    #[tokio::test]
+    async fn test_into_response_validation() {
+        let resp = AppError::Validation("invalid input".into()).into_response();
+        let (status, body) = extract_status_and_body(resp).await;
+        assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+        assert_eq!(body["error"]["code"], "VALIDATION_ERROR");
+        assert_eq!(body["error"]["message"], "invalid input");
     }
 
     #[tokio::test]
