@@ -76,8 +76,8 @@ const stories = [
     author: 'Head of Engineering',
     authorRole: 'Head of Engineering',
     quote: 'Zero event loss for compliance. The HMAC signatures and delivery logs give us the audit trail we need.',
-    metric: '99.99%',
-    metricLabel: 'delivery rate',
+    metric: '99.9%',
+    metricLabel: 'SLA guaranteed',
   },
   {
     slug: 'ai-agent-fleet',
@@ -139,7 +139,7 @@ const techLogos = [
 const stats = [
   { value: '11', label: 'SDKs published' },
   { value: '1,378', label: 'metricTestsPassing' },
-  { value: '99.97%', label: 'metricDeliveryRate' },
+  { value: '99.9%', label: 'metricDeliveryRate' },
   { value: '8', label: 'metricLanguages' },
 ];
 

@@ -102,7 +102,7 @@ async function emitOrderEvent(eventType, orderData) {
 
 After 30 days on HookSniff:
 
-- **99.97% delivery rate** — Up from 94.2% with the in-house system
+- **99.9% delivery rate (SLA-backed)** — Up from 94.2% with the in-house system
 - **Zero ordering issues** — FIFO delivery eliminated the out-of-order problem completely
 - **60% less engineering time** — From 15-20 hours/week to 6-8 hours/week on webhook-related work
 - **Real-time visibility** — The dashboard shows every delivery with payload, status, and latency. Debugging that used to take hours now takes minutes.
