@@ -2,21 +2,21 @@ import os
 
 import pytest
 
-from svix import SvixOptions
-from svix.api import (
+from hooksniff import HookSniffOptions
+from hooksniff.api import (
     ApplicationIn,
     EndpointIn,
     EventTypeIn,
-    Svix,
+    HookSniff,
 )
-from svix.exceptions import HttpError
-from svix.models import EndpointPatch
+from hooksniff.exceptions import HttpError
+from hooksniff.models import EndpointPatch
 
-TOKEN = os.getenv("SVIX_TOKEN")
-SERVER_URL = os.getenv("SVIX_SERVER_URL")
+TOKEN = os.getenv("HOOKSNIFF_TOKEN")
+SERVER_URL = os.getenv("HOOKSNIFF_SERVER_URL")
 
 CLIENT = (
-    Svix(TOKEN, SvixOptions(server_url=SERVER_URL))
+    HookSniff(TOKEN, HookSniffOptions(server_url=SERVER_URL))
     if TOKEN is not None and SERVER_URL is not None
     else None
 )
@@ -24,7 +24,7 @@ CLIENT = (
 
 @pytest.mark.skipif(
     CLIENT is None,
-    reason="SVIX_TOKEN and SVIX_SERVER_URL are required to run this test",
+    reason="HOOKSNIFF_TOKEN and HOOKSNIFF_SERVER_URL are required to run this test",
 )
 def test_endpoint_crud() -> None:
     app = CLIENT.application.create(ApplicationIn(name="app"))
@@ -42,7 +42,7 @@ def test_endpoint_crud() -> None:
         assert e.status_code == 409, "conflicts are expected but other statuses are not"
 
     ep = CLIENT.endpoint.create(
-        app.id, EndpointIn(url="https://example.svix.com/", channels=["ch0", "ch1"])
+        app.id, EndpointIn(url="https://example.hooksniff.com/", channels=["ch0", "ch1"])
     )
     assert {s for s in ep.channels} == {"ch0", "ch1"}
     ep_patched = CLIENT.endpoint.patch(

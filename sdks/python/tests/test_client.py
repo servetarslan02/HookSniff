@@ -6,7 +6,7 @@ import pytest
 from pytest_httpserver import HTTPServer
 from werkzeug import Request, Response
 
-from svix.api import (
+from hooksniff.api import (
     ApplicationIn,
     ApplicationOut,
     EndpointIn,
@@ -14,9 +14,9 @@ from svix.api import (
     EventTypeIn,
     EventTypeOut,
     MessageIn,
-    Svix,
+    HookSniff,
 )
-from svix.webhooks import Webhook
+from hooksniff.webhooks import Webhook
 
 
 def _gen_uuid(name: str) -> str:
@@ -24,8 +24,8 @@ def _gen_uuid(name: str) -> str:
 
 
 @pytest.fixture
-def svix_app_name() -> str:
-    return "svix_python_tests"
+def hooksniff_app_name() -> str:
+    return "hooksniff_python_tests"
 
 
 @pytest.fixture
@@ -49,18 +49,18 @@ def endpoint_url() -> str:
     return "http://localhost/webhook/receiver"
 
 
-def create_svix_app(
-    svix_api: Svix, svix_app_name: str, svix_app_uid: str
+def create_hooksniff_app(
+    hooksniff_api: HookSniff, hooksniff_app_name: str, hooksniff_app_uid: str
 ) -> ApplicationOut:
-    return svix_api.application.get_or_create(
-        ApplicationIn(name=svix_app_name, uid=svix_app_uid)
+    return hooksniff_api.application.get_or_create(
+        ApplicationIn(name=hooksniff_app_name, uid=hooksniff_app_uid)
     )
 
 
-def create_svix_event_type(
-    svix_api: Svix, event_type_schema: Dict[str, Any]
+def create_hooksniff_event_type(
+    hooksniff_api: HookSniff, event_type_schema: Dict[str, Any]
 ) -> EventTypeOut:
-    return svix_api.event_type.create(
+    return hooksniff_api.event_type.create(
         EventTypeIn(
             name=event_type_schema["title"],
             description=event_type_schema["description"],
@@ -69,8 +69,8 @@ def create_svix_event_type(
     )
 
 
-def create_svix_endpoint(
-    svix_api: Svix,
+def create_hooksniff_endpoint(
+    hooksniff_api: HookSniff,
     app_uid: str,
     event_type_name: str,
     endpoint_url: str,
@@ -79,7 +79,7 @@ def create_svix_endpoint(
     metadata: Optional[Dict[str, Any]] = None,
     secret: Optional[str] = None,
 ) -> EndpointOut:
-    return svix_api.endpoint.create(
+    return hooksniff_api.endpoint.create(
         app_uid,
         EndpointIn(
             url=endpoint_url,
@@ -93,23 +93,23 @@ def create_svix_endpoint(
     )
 
 
-def test_svix_application_create(svix_api: Svix, svix_app_name: str) -> None:
-    svix_app_uid = _gen_uuid(svix_app_name)
-    app = create_svix_app(svix_api, svix_app_name, svix_app_uid)
-    assert app.name == svix_app_name
-    assert app.uid == svix_app_uid
+def test_hooksniff_application_create(hooksniff_api: HookSniff, hooksniff_app_name: str) -> None:
+    hooksniff_app_uid = _gen_uuid(hooksniff_app_name)
+    app = create_hooksniff_app(hooksniff_api, hooksniff_app_name, hooksniff_app_uid)
+    assert app.name == hooksniff_app_name
+    assert app.uid == hooksniff_app_uid
 
 
-def test_svix_event_type_create(
-    svix_api: Svix, event_type_schema: Dict[str, Any]
+def test_hooksniff_event_type_create(
+    hooksniff_api: HookSniff, event_type_schema: Dict[str, Any]
 ) -> None:
-    event_type = create_svix_event_type(svix_api, event_type_schema)
+    event_type = create_hooksniff_event_type(hooksniff_api, event_type_schema)
     assert event_type.name == event_type_schema["title"]
     assert event_type.description == event_type_schema["description"]
     assert event_type.schemas == {"1": event_type_schema}
 
 
-def svix_endpoint_create_test_params_ids() -> List[str]:
+def hooksniff_endpoint_create_test_params_ids() -> List[str]:
     ids = []
     for params in itertools.product([False, True], repeat=3):
         with_channel, with_metadata, with_secret = params
@@ -128,27 +128,27 @@ def svix_endpoint_create_test_params_ids() -> List[str]:
 @pytest.mark.parametrize(
     "with_channel,with_metadata,with_secret",
     list(itertools.product([False, True], repeat=3)),
-    ids=svix_endpoint_create_test_params_ids(),
+    ids=hooksniff_endpoint_create_test_params_ids(),
 )
-def test_svix_endpoint_create(
-    svix_api: Svix,
-    svix_app_name: str,
+def test_hooksniff_endpoint_create(
+    hooksniff_api: HookSniff,
+    hooksniff_app_name: str,
     event_type_schema: Dict[str, Any],
     endpoint_url: str,
     with_channel: bool,
     with_metadata: bool,
     with_secret: bool,
 ) -> None:
-    svix_app_uid = _gen_uuid(svix_app_name)
-    app = create_svix_app(svix_api, svix_app_name, svix_app_uid)
-    event_type = create_svix_event_type(svix_api, event_type_schema)
+    hooksniff_app_uid = _gen_uuid(hooksniff_app_name)
+    app = create_hooksniff_app(hooksniff_api, hooksniff_app_name, hooksniff_app_uid)
+    event_type = create_hooksniff_event_type(hooksniff_api, event_type_schema)
     endpoint_uid = _gen_uuid(endpoint_url)
     channel = "test" if with_channel else None
     metadata = {"test": "test"} if with_metadata else None
     secret = "whsec_" + "e" * 32 if with_secret else None
     assert app.uid
-    endpoint = create_svix_endpoint(
-        svix_api,
+    endpoint = create_hooksniff_endpoint(
+        hooksniff_api,
         app.uid,
         event_type.name,
         endpoint_url,
@@ -165,43 +165,43 @@ def test_svix_endpoint_create(
     if with_metadata:
         assert endpoint.metadata == metadata
     if with_secret:
-        assert svix_api.endpoint.get_secret(app.uid, endpoint_uid).key == secret
+        assert hooksniff_api.endpoint.get_secret(app.uid, endpoint_uid).key == secret
 
 
 @pytest.mark.parametrize(
     "with_channel", [False, True], ids=["without channel", "with channel"]
 )
-def test_svix_message_create(
-    svix_api: Svix,
-    svix_app_name: str,
+def test_hooksniff_message_create(
+    hooksniff_api: HookSniff,
+    hooksniff_app_name: str,
     event_type_schema: Dict[str, Any],
     httpserver: HTTPServer,
     with_channel: bool,
 ) -> None:
-    svix_app_uid = _gen_uuid(svix_app_name)
-    create_svix_app(svix_api, svix_app_name, svix_app_uid)
-    event_type = create_svix_event_type(svix_api, event_type_schema)
+    hooksniff_app_uid = _gen_uuid(hooksniff_app_name)
+    create_hooksniff_app(hooksniff_api, hooksniff_app_name, hooksniff_app_uid)
+    event_type = create_hooksniff_event_type(hooksniff_api, event_type_schema)
 
     channel = "test" if with_channel else None
     endpoint_path = "/webhook/receiver/"
     endpoint_url = httpserver.url_for(endpoint_path)
     endpoint_uid = _gen_uuid(endpoint_url)
-    create_svix_endpoint(
-        svix_api,
-        svix_app_uid,
+    create_hooksniff_endpoint(
+        hooksniff_api,
+        hooksniff_app_uid,
         event_type.name,
         endpoint_url,
         endpoint_uid,
         channel=channel,
     )
-    secret = svix_api.endpoint.get_secret(svix_app_uid, endpoint_uid).key
+    secret = hooksniff_api.endpoint.get_secret(hooksniff_app_uid, endpoint_uid).key
 
     payload = {"value": "test"}
 
     def webhook_handler(request: Request) -> Response:
-        assert "Svix-Id" in request.headers
-        assert "Svix-Timestamp" in request.headers
-        assert "Svix-Signature" in request.headers
+        assert "HookSniff-Id" in request.headers
+        assert "HookSniff-Timestamp" in request.headers
+        assert "HookSniff-Signature" in request.headers
 
         webhook = Webhook(secret)
         headers: dict[str, str] = dict(request.headers.items())
@@ -218,8 +218,8 @@ def test_svix_message_create(
 
     # send message and check it is received by local http server
     with httpserver.wait() as waiting:
-        message_out = svix_api.message.create(
-            svix_app_uid,
+        message_out = hooksniff_api.message.create(
+            hooksniff_app_uid,
             MessageIn(
                 event_type=event_type.name,
                 payload=payload,
