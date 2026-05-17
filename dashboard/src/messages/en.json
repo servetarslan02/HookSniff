@@ -191,7 +191,8 @@
     "sectionMonitoring": "Monitoring",
     "observability": "Observability",
     "sectionContent": "Content",
-    "account": "Account"
+    "account": "Account",
+    "profile": "Profile"
   },
   "dashboard": {
     "title": "Dashboard",
