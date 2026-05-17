@@ -55,12 +55,7 @@ impl Plan {
 
     /// Max applications per plan
     pub fn max_applications(&self) -> u32 {
-        match self {
-            Plan::Developer => 3,
-            Plan::Startup => 10,
-            Plan::Pro => u32::MAX, // unlimited
-            Plan::Enterprise => u32::MAX,
-        }
+        u32::MAX // unlimited — applications are just organizational groups
     }
 
     /// Max event types per plan
@@ -609,8 +604,8 @@ mod tests {
 
     #[test]
     fn max_applications_all() {
-        assert_eq!(Plan::Developer.max_applications(), 3);
-        assert_eq!(Plan::Startup.max_applications(), 10);
+        assert_eq!(Plan::Developer.max_applications(), u32::MAX);
+        assert_eq!(Plan::Startup.max_applications(), u32::MAX);
         assert_eq!(Plan::Pro.max_applications(), u32::MAX);
         assert_eq!(Plan::Enterprise.max_applications(), u32::MAX);
     }
