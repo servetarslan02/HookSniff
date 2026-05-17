@@ -1,7 +1,7 @@
 import { ApiException, type XOR } from "./util";
 import type { HttpErrorOut, HTTPValidationError } from "./HttpErrors";
 
-export const LIB_VERSION = "1.93.0";
+export const LIB_VERSION = "1.0.0";
 const USER_AGENT = `hooksniff-libs/${LIB_VERSION}/javascript`;
 
 export enum HttpMethod {
@@ -17,15 +17,16 @@ export enum HttpMethod {
 }
 
 export type HookSniffRequestContext = {
-  /** The API base URL, like "https://api.hooksniff.com" */
+  /** The API base URL */
   baseUrl: string;
   /** The 'bearer' scheme access token */
   token: string;
   /** Time in milliseconds to wait for requests to get a response. */
   timeout?: number;
+  /** Enable debug logging */
+  debug?: boolean;
   /**
    * Custom fetch implementation to use for HTTP requests.
-   * Useful for testing, adding custom middleware, or running in non-standard environments.
    */
   fetch?: typeof fetch;
 } & XOR<
@@ -84,7 +85,6 @@ export class HookSniffRequest {
         this.queryParams[name] = value.join(",");
       }
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _assert_unreachable: never = value;
       throw new Error(`query parameter ${name} has unsupported type`);
     }
@@ -97,7 +97,7 @@ export class HookSniffRequest {
 
     this.headerParams[name] = value;
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   public setBody(value: any) {
     this.body = JSON.stringify(value);
   }
@@ -105,15 +105,13 @@ export class HookSniffRequest {
   /**
    * Send this request, returning the request body as a caller-specified type.
    *
-   * If the server returns a 422 error, an `ApiException<HTTPValidationError>` is thrown.
-   * If the server returns another 4xx error, an `ApiException<HttpErrorOut>` is thrown.
-   *
-   * If the server returns a 5xx error, the request is retried up to two times with exponential backoff.
-   * If retries are exhausted, an `ApiException<HttpErrorOut>` is thrown.
+   * - 422 → `ApiException<HTTPValidationError>`
+   * - 4xx → `ApiException<HttpErrorOut>`
+   * - 429 → Auto-retry with Retry-After header
+   * - 5xx → Auto-retry with exponential backoff
    */
   public async send<R>(
     ctx: HookSniffRequestContext,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parseResponseBody: (jsonObject: any) => R
   ): Promise<R> {
     const response = await this.sendInner(ctx);
@@ -147,30 +145,35 @@ export class HookSniffRequest {
     if (this.body != null) {
       this.headerParams["content-type"] = "application/json";
     }
-    // Cloudflare Workers fail if the credentials option is used in a fetch call.
-    // This work around that. Source:
-    // https://github.com/cloudflare/workers-sdk/issues/2514#issuecomment-21.90.0014
+
     const isCredentialsSupported = "credentials" in Request.prototype;
+
+    const requestInit: HookSniffRequestInit = {
+      method: this.method.toString(),
+      body: this.body,
+      headers: {
+        accept: "application/json, */*;q=0.8",
+        authorization: `Bearer ${ctx.token}`,
+        "user-agent": USER_AGENT,
+        "hooksniff-req-id": randomId.toString(),
+        ...this.headerParams,
+      },
+      credentials: isCredentialsSupported ? "same-origin" : undefined,
+      signal: ctx.timeout !== undefined ? AbortSignal.timeout(ctx.timeout) : undefined,
+    };
+
+    if (ctx.debug) {
+      console.log(`[HookSniff] ${this.method} ${url.toString()}`);
+    }
 
     const response = await sendWithRetry(
       url,
-      {
-        method: this.method.toString(),
-        body: this.body,
-        headers: {
-          accept: "application/json, */*;q=0.8",
-          authorization: `Bearer ${ctx.token}`,
-          "user-agent": USER_AGENT,
-          "hooksniff-req-id": randomId.toString(),
-          ...this.headerParams,
-        },
-        credentials: isCredentialsSupported ? "same-origin" : undefined,
-        signal: ctx.timeout !== undefined ? AbortSignal.timeout(ctx.timeout) : undefined,
-      },
+      requestInit,
       ctx.retryScheduleInMs,
       ctx.retryScheduleInMs?.[0],
       ctx.retryScheduleInMs?.length || ctx.numRetries,
-      ctx.fetch
+      ctx.fetch,
+      ctx.debug
     );
     return filterResponseForErrors(response);
   }
@@ -205,6 +208,13 @@ type HookSniffRequestInit = RequestInit & {
   headers: Record<string, string>;
 };
 
+/**
+ * Send a request with automatic retry for 429 (rate limit) and 5xx errors.
+ *
+ * - 429: Respects `Retry-After` header, falls back to exponential backoff
+ * - 5xx: Exponential backoff
+ * - 4xx: No retry (except 429)
+ */
 async function sendWithRetry(
   url: URL,
   init: HookSniffRequestInit,
@@ -212,6 +222,7 @@ async function sendWithRetry(
   nextInterval = 50,
   triesLeft = 2,
   fetchImpl: typeof fetch = fetch,
+  debug = false,
   retryCount = 1
 ): Promise<Response> {
   const sleep = (interval: number) =>
@@ -219,25 +230,67 @@ async function sendWithRetry(
 
   try {
     const response = await fetchImpl(url, init);
-    if (triesLeft <= 0 || response.status < 500) {
-      return response;
+
+    // 429 Rate Limit — retry with Retry-After
+    if (response.status === 429 && triesLeft > 0) {
+      const retryAfter = response.headers.get("Retry-After");
+      let delayMs: number;
+
+      if (retryAfter) {
+        // Retry-After can be seconds or HTTP date
+        const seconds = parseInt(retryAfter, 10);
+        if (!isNaN(seconds)) {
+          delayMs = seconds * 1000;
+        } else {
+          const date = new Date(retryAfter);
+          delayMs = date.getTime() - Date.now();
+          if (delayMs < 0) delayMs = nextInterval;
+        }
+      } else {
+        delayMs = nextInterval;
+      }
+
+      if (debug) {
+        console.log(`[HookSniff] 429 rate limited, retrying in ${delayMs}ms (attempt ${retryCount})`);
+      }
+
+      await sleep(delayMs);
+      init.headers["hooksniff-retry-count"] = retryCount.toString();
+      nextInterval = retryScheduleInMs?.[retryCount] || nextInterval * 2;
+      return await sendWithRetry(
+        url, init, retryScheduleInMs, nextInterval, --triesLeft, fetchImpl, debug, ++retryCount
+      );
     }
+
+    // 5xx Server Error — retry
+    if (response.status >= 500 && triesLeft > 0) {
+      if (debug) {
+        console.log(`[HookSniff] ${response.status} server error, retrying in ${nextInterval}ms (attempt ${retryCount})`);
+      }
+
+      await sleep(nextInterval);
+      init.headers["hooksniff-retry-count"] = retryCount.toString();
+      nextInterval = retryScheduleInMs?.[retryCount] || nextInterval * 2;
+      return await sendWithRetry(
+        url, init, retryScheduleInMs, nextInterval, --triesLeft, fetchImpl, debug, ++retryCount
+      );
+    }
+
+    return response;
   } catch (e) {
     if (triesLeft <= 0) {
       throw e;
     }
-  }
 
-  await sleep(nextInterval);
-  init.headers["hooksniff-retry-count"] = retryCount.toString();
-  nextInterval = retryScheduleInMs?.[retryCount] || nextInterval * 2;
-  return await sendWithRetry(
-    url,
-    init,
-    retryScheduleInMs,
-    nextInterval,
-    --triesLeft,
-    fetchImpl,
-    ++retryCount
-  );
+    if (debug) {
+      console.log(`[HookSniff] Request failed, retrying in ${nextInterval}ms (attempt ${retryCount})`);
+    }
+
+    await sleep(nextInterval);
+    init.headers["hooksniff-retry-count"] = retryCount.toString();
+    nextInterval = retryScheduleInMs?.[retryCount] || nextInterval * 2;
+    return await sendWithRetry(
+      url, init, retryScheduleInMs, nextInterval, --triesLeft, fetchImpl, debug, ++retryCount
+    );
+  }
 }

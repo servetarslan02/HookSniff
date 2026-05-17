@@ -40,6 +40,7 @@ export class HookSniff {
         baseUrl,
         token,
         timeout: options.requestTimeout,
+        debug: options.debug,
         retryScheduleInMs: options.retryScheduleInMs,
         fetch: options.fetch,
       };
@@ -49,6 +50,7 @@ export class HookSniff {
       baseUrl,
       token,
       timeout: options.requestTimeout,
+      debug: options.debug,
       numRetries: options.numRetries ?? 2,
       fetch: options.fetch,
     };

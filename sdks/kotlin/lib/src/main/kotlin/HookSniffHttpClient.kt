@@ -69,9 +69,20 @@ internal constructor(
     }
 
     suspend fun executeRequestWithRetry(request: Request): Response {
-
         var res = client.newCall(request).execute()
 
+        // 429 Rate Limit — respect Retry-After header
+        if (res.code == 429) {
+            val retryAfter = res.header("Retry-After")
+            val delayMs = retryAfter?.toLongOrNull()?.times(1000) ?: 1000L
+            delay(delayMs)
+            val newReq = request.newBuilder()
+                .header("hooksniff-retry-count", "1")
+                .build()
+            res = client.newCall(newReq).execute()
+        }
+
+        // 5xx Server Error — exponential backoff
         if (res.code >= 500) {
             retrySchedule.forEachIndexed { index, sleepTime ->
                 run {
