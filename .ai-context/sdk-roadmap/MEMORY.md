@@ -59,5 +59,6 @@ DB tabloları ve seed data hazır.
 - Faz 11: Message Poller — API + Dashboard + 11 SDK
 - Faz 12: Ingest — sidebar nav + SDK tamamlandı
 - Faz 13: Connector — 8 servis (Stripe, Shopify, GitHub, Slack, Twilio, Discord, Linear, Notion)
-- Migration 061 (message_cursors) + 062 (connectors) uygulandı
-- Tüm SDK'lar güncellendi (13 resource × 11 dil)
+- Faz 14: Integration — API + Dashboard + Migration 063 + 11 SDK güncellendi
+- Migration 061 (message_cursors) + 062 (connectors) + 063 (integrations) uygulandı
+- Tüm SDK'lar güncellendi (14 resource × 11 dil)
