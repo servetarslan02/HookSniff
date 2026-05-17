@@ -600,7 +600,14 @@
     "subtitleDesc": "Delivery trends, success rates, and performance metrics",
     "successfulLabel": "Successful",
     "failedLabel": "Failed",
-    "successLabel": "success"
+    "successLabel": "success",
+    "analytics": {
+      "successRate": "Success Rate",
+      "totalDelivered": "Total Delivered",
+      "totalFailed": "Total Failed"
+    },
+    "latencyTrend": "Latency Trend",
+    "latencyTrendDesc": "Average response time over the selected period"
   },
   "settings": {
     "title": "Settings",
@@ -736,7 +743,17 @@
       "accountManager": "Dedicated account manager",
       "sla99": "99.9% SLA guarantee",
       "customIntegrations": "Custom integrations",
-      "onPremise": "On-premise option"
+      "onPremise": "On-premise option",
+      "100 events/day": "100 events/day",
+      "1 application": "1 application",
+      "5 endpoints": "5 endpoints",
+      "10 event types": "10 event types",
+      "10 subscriptions": "10 subscriptions",
+      "7-day log retention": "7-day log retention",
+      "HMAC signatures": "HMAC signatures",
+      "2FA support": "2FA support",
+      "Community support": "Community support",
+      "unlimitedEndpoints": "Unlimited endpoints"
     },
     "plans.free": "Free",
     "plans.pro": "Pro",
@@ -2136,7 +2153,8 @@
     "rotateDesc": "The old key will stop working immediately. You’ll receive a new key to replace it.",
     "deleteTitle": "Delete API Key?",
     "deleteDesc": "This action cannot be undone. Any services using this key will immediately lose access.",
-    "failedToLoad": "Failed to load API keys"
+    "failedToLoad": "Failed to load API keys",
+    "create": "Create API Key"
   },
   "onboarding": {
     "welcome": "Welcome to HookSniff! 🪝",
@@ -2734,7 +2752,8 @@
     "upgradeHintSuffix": " to enable SSO for your organization.",
     "upgradeHint1": "💡 SSO is available on the ",
     "upgradeHintBold": "Business",
-    "upgradeHint2": " plan. "
+    "upgradeHint2": " plan. ",
+    "testConnection": "Test Connection"
   },
   "auditLog": {
     "title": "📋 Audit Log",
@@ -2981,7 +3000,9 @@
     "typeStr": "str",
     "typeNum": "num",
     "typeBool": "bool",
-    "selectEndpoint": "Select an endpoint"
+    "selectEndpoint": "Select an endpoint",
+    "noEndpoints": "No endpoints found. Create an endpoint first.",
+    "goToCore": "Go to Core → Endpoints"
   },
   "apiImporter": {
     "title": "📥 API Spec Importer",
@@ -3081,7 +3102,8 @@
     "totalRetryTime": "Total retry time (worst case):",
     "tip": "Tip:",
     "tipContent": "Per-endpoint retry policies override these global defaults. Configure them in",
-    "endpointSettingsLink": "Endpoint Settings"
+    "endpointSettingsLink": "Endpoint Settings",
+    "noEndpoints": "No endpoints found. Create an endpoint first to configure retry policy."
   },
   "inbound": {
     "title": "Inbound Webhooks",
@@ -3337,7 +3359,8 @@
     "metricReconciliation": "Reconciliation errors",
     "metricTestsPassing": "Tests passing",
     "metricDeliveryRate": "Delivery rate",
-    "metricLanguages": "Languages supported"
+    "metricLanguages": "Languages supported",
+    "SDKs published": "SDKs Published"
   },
   "providers": {
     "title": "Providers",
@@ -3464,7 +3487,8 @@
     "auditTrail": "Audit trail",
     "avgDeliveryLatency": "Avg delivery latency",
     "deliverySuccessRate": "Delivery success rate",
-    "freeTierEvents": "Free tier events"
+    "freeTierEvents": "Free tier events",
+    "SDKs available": "SDKs available"
   },
   "whatIsWebhook": {
     "simpleExplanation": "The Simple Explanation",
@@ -3798,5 +3822,19 @@
     "nameImmutable": "Flag name cannot be changed after creation",
     "nameTooLong": "Flag name must be 100 characters or less",
     "nameInvalid": "Flag name may only contain letters, numbers, underscore, or hyphen"
+  },
+  "schemas": {
+    "title": "Schema Registry",
+    "subtitle": "Manage your webhook event schemas",
+    "noSchemas": "No schemas found",
+    "createSchema": "Create Schema",
+    "schemaName": "Schema Name",
+    "schemaType": "Schema Type",
+    "version": "Version",
+    "createdAt": "Created At",
+    "actions": "Actions",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View"
   }
 }
