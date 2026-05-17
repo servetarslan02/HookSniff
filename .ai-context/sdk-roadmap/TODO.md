@@ -1,6 +1,6 @@
 # SDK — Yapılacak İşler
 
-> Son güncelleme: 2026-05-18 01:40 GMT+8
+> Son güncelleme: 2026-05-18 01:32 GMT+8
 
 ---
 
@@ -110,3 +110,22 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 - [ ] Performance benchmark
 - [ ] Security audit
 - [ ] Migration guide
+
+---
+
+## 🟢 Yeni Özellikler (SDK Faz 1-7 Sonrası)
+
+> Detaylar: NEW-FEATURES-PLAN.md
+
+| # | Özellik | Zorluk | Süre | Durum |
+|---|---------|--------|------|-------|
+| 1 | Environment (dev/staging/prod) | Orta | 4-6 saat | ⬜ |
+| 2 | Background Task | Orta | 3-4 saat | ⬜ |
+| 3 | Operational Webhook | Orta | 3-4 saat | ⬜ |
+| 4 | Message Poller | Orta | 3-4 saat | ⬜ |
+| 5 | Ingest (inbound webhook) | Zor | 8-10 saat | ⬜ |
+| 6 | Connector (Shopify,Stripe...) | Çok zor | 20+ saat | ⬜ |
+| 7 | Integration | Zor | 10-15 saat | ⬜ |
+| 8 | Streaming (SSE/WebSocket) | Çok zor | 15-20 saat | ⬜ |
+
+**Bağımlılık sırası:** 1→2→3, 5→6→7, 4 ve 8 bağımsız
