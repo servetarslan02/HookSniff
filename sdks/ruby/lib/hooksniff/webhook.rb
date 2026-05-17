@@ -1,76 +1,84 @@
 # frozen_string_literal: true
 
-require 'openssl'
-require 'base64'
-require 'json'
-
 module HookSniff
-  class WebhookVerificationError < StandardError; end
-
   class Webhook
-    TIMESTAMP_TOLERANCE = 300 # 5 minutes
+
+    def self.new_using_raw_bytes(secret)
+      self.new(secret.pack("C*").force_encoding("UTF-8"))
+    end
 
     def initialize(secret)
-      @secret = decode_secret(secret)
+      if secret.start_with?(SECRET_PREFIX)
+        secret = secret[SECRET_PREFIX.length..-1]
+      end
+
+      @secret = Base64.decode64(secret)
     end
 
     def verify(payload, headers)
-      normalized = headers.transform_keys(&:downcase)
-
-      msg_id = normalized['svix-id'] || normalized['webhook-id']
-      timestamp = normalized['svix-timestamp'] || normalized['webhook-timestamp']
-      signature = normalized['svix-signature'] || normalized['webhook-signature']
-
-      raise WebhookVerificationError, 'Missing webhook-id header' unless msg_id
-      raise WebhookVerificationError, 'Missing webhook-timestamp header' unless timestamp
-      raise WebhookVerificationError, 'Missing webhook-signature header' unless signature
-
-      ts = timestamp.to_i
-      now = Time.now.to_i
-      if (now - ts).abs > TIMESTAMP_TOLERANCE
-        raise WebhookVerificationError, 'Webhook timestamp is too old or too new'
-      end
-
-      content = "#{msg_id}.#{timestamp}.#{payload}"
-      expected_hmac = OpenSSL::HMAC.digest('SHA256', @secret, content)
-      expected_sig = "v1,#{Base64.strict_encode64(expected_hmac)}"
-
-      signatures = signature.split(',').map(&:strip)
-      signatures.each do |sig|
-        parts = sig.split(',', 2)
-        sig_value = parts.length > 1 ? parts[1] : parts[0]
-
-        expected_parts = expected_sig.split(',', 2)
-        expected_value = expected_parts.length > 1 ? expected_parts[1] : expected_parts[0]
-
-        if secure_compare(expected_value, sig_value)
-          return payload.is_a?(String) ? (JSON.parse(payload) rescue payload) : payload
+      msgId = headers["hooksniff-id"]
+      msgSignature = headers["hooksniff-signature"]
+      msgTimestamp = headers["hooksniff-timestamp"]
+      if !msgSignature || !msgId || !msgTimestamp
+        msgId = headers["webhook-id"]
+        msgSignature = headers["webhook-signature"]
+        msgTimestamp = headers["webhook-timestamp"]
+        if !msgSignature || !msgId || !msgTimestamp
+          raise WebhookVerificationError, "Missing required headers"
         end
       end
 
-      raise WebhookVerificationError, 'Invalid webhook signature'
+      verify_timestamp(msgTimestamp)
+
+      _, signature = sign(msgId, msgTimestamp, payload).split(",", 2)
+
+      passedSignatures = msgSignature.split(" ")
+      passedSignatures.each do |versionedSignature|
+        version, expectedSignature = versionedSignature.split(",", 2)
+        if version != "v1"
+          next
+        end
+
+        if ::HookSniff::secure_compare(signature, expectedSignature)
+          return nil if payload.empty?
+          return JSON.parse(payload, symbolize_names: true)
+        end
+      end
+
+      raise WebhookVerificationError, "No matching signature found"
     end
 
-    def sign(msg_id, timestamp, payload)
-      ts = timestamp.to_i.to_s
-      content = "#{msg_id}.#{ts}.#{payload}"
-      hmac = OpenSSL::HMAC.digest('SHA256', @secret, content)
-      "v1,#{Base64.strict_encode64(hmac)}"
+    def sign(msgId, timestamp, payload)
+      begin
+        now = Integer(timestamp)
+      rescue
+        raise WebhookSigningError, "Invalid timestamp"
+      end
+
+      toSign = "#{msgId}.#{timestamp}.#{payload}"
+      signature = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest.new("sha256"), @secret, toSign)).strip
+      return "v1,#{signature}"
     end
 
     private
+    SECRET_PREFIX = "whsec_"
+    TOLERANCE = 5 * 60
 
-    def decode_secret(secret)
-      raw = secret.start_with?('whsec_') ? secret[6..] : secret
-      Base64.decode64(raw) rescue raw
-    end
+    def verify_timestamp(timestampHeader)
+      begin
+        now = Integer(Time.now)
+        timestamp = Integer(timestampHeader)
+      rescue
+        raise WebhookVerificationError, "Invalid Signature Headers"
+      end
 
-    def secure_compare(a, b)
-      return false if a.length != b.length
+      if timestamp < (now - TOLERANCE)
+        raise WebhookVerificationError, "Message timestamp too old"
+      end
 
-      result = 0
-      a.bytes.zip(b.bytes) { |x, y| result |= x ^ y }
-      result.zero?
+      if timestamp > (now + TOLERANCE)
+        raise WebhookVerificationError, "Message timestamp too new"
+      end
     end
   end
 end
