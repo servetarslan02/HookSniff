@@ -58,7 +58,7 @@ sdks/python/
 ```
 
 ## Mevcut Durum
-- Node.js SDK: ✅ Svix'ten adapte edildi (0.5.0)
+- Node.js SDK: ✅ Svix'ten yeniden adapte edildi (1.0.0, 63 dosya, ~40 model)
 - Python SDK: ✅ Svix SDK'dan doğrudan adapte edildi (1.0.0, 127 dosya, 101 model)
 - Go SDK: ✅ Svix SDK'dan doğrudan adapte edildi (1.0.0, 115 dosya, 99 model)
 - Rust SDK: ✅ Svix SDK'dan doğrudan adapte edildi (1.0.0, 118 dosya, 98 model)

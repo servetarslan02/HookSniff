@@ -187,13 +187,20 @@
 
 ---
 
-## ✅ Node.js SDK — Svix'ten Adaptasyon — 2026-05-17
+## ✅ Node.js SDK — Svix'ten Yeniden Adaptasyon — 2026-05-18
 
 ### Yöntem
-- Svix Node.js SDK referans alınarak adapte edildi
+- Svix JS SDK (`javascript/`) kopyalandı ve HookSniff'e adapte edildi
+- Eski el yapımı SDK (v0.5.0) replace edildi
+- `svix` → `hooksniff` bulk find-replace
+- Svix-specific features kaldırıldı
 
 ### Sonuç
-- 12 resource
-- 80+ TypeScript type
-- retry+backoff, auto-pagination, webhook verify
-- Versiyon: 0.5.0
+- 63 dosya
+- ~40 typed model
+- 7 API resource: authentication, endpoint, event_type, health, message, message_attempt, statistics
+- Webhook verification (HMAC-SHA256, hooksniff-id/signature/timestamp headers)
+- Auto-retry + exponential backoff
+- Auto-idempotency key
+- TypeScript, ESM+CJS
+- Versiyon: 1.0.0
