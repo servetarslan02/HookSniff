@@ -95,11 +95,11 @@ namespace HookSniff
                         delayMs = retryScheduleMilliseconds[index];
                     }
                     Thread.Sleep(delayMs);
-                    HttpRequestMessage retryRequest = BuildRequest(
+                    HttpRequestMessage retryReq = BuildRequest(
                         method, path, req_id, pathParams, queryParams, headerParams, content
                     );
-                    retryRequest.Headers.Add("hooksniff-retry-count", (index + 1).ToString());
-                    response = await _httpClient.SendAsync(retryRequest, cancellationToken);
+                    retryReq.Headers.Add("hooksniff-retry-count", (index + 1).ToString());
+                    response = await _httpClient.SendAsync(retryReq, cancellationToken);
                     continue;
                 }
 
@@ -108,7 +108,7 @@ namespace HookSniff
                     break;
                 }
                 Thread.Sleep(retryScheduleMilliseconds[index]);
-                HttpRequestMessage retryRequest = BuildRequest(
+                HttpRequestMessage retryReq2 = BuildRequest(
                     method,
                     path,
                     req_id,
@@ -117,8 +117,8 @@ namespace HookSniff
                     headerParams,
                     content
                 );
-                retryRequest.Headers.Add("hooksniff-retry-count", (index + 1).ToString());
-                response = await _httpClient.SendAsync(retryRequest, cancellationToken);
+                retryReq2.Headers.Add("hooksniff-retry-count", (index + 1).ToString());
+                response = await _httpClient.SendAsync(retryReq2, cancellationToken);
             }
             return await FilterResponseForErrors<T>(response, cancellationToken);
         }
