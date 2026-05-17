@@ -38,7 +38,6 @@ namespace HookSniff.Models
             StringBuilder sb = new StringBuilder();
 
             sb.Append("class MessageIn {\n");
-            sb.Append("  Application: ").Append(Application).Append('\n');
             sb.Append("  Channels: ").Append(Channels).Append('\n');
             sb.Append("  DeliverAt: ").Append(DeliverAt).Append('\n');
             sb.Append("  EventId: ").Append(EventId).Append('\n');

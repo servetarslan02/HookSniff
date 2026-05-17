@@ -1,3 +1,6 @@
+export type Datetime = string;
+
+export type Uuid = string;
 // ═══════════════════════════════════════════════════════════
 // HookSniff SDK — Auto-generated from OpenAPI spec
 // DO NOT EDIT — regenerate with: python3 openapi-codegen.py node
