@@ -34,8 +34,6 @@ const ALLOWED_CHECKOUT_DOMAINS: &[&str] = &[
 /// - Is a valid HTTPS URL (or HTTP for localhost dev)
 /// - Matches an allowed payment provider domain
 fn validate_checkout_url(url: &str) -> Result<(), AppError> {
-
-fn validate_checkout_url(url: &str) -> Result<(), AppError> {
     let parsed = url::Url::parse(url).map_err(|_| {
         AppError::BadRequest("Invalid checkout URL format".into())
     })?;
