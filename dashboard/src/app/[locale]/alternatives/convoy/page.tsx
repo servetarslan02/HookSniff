@@ -32,7 +32,7 @@ export default async function ConvoyAlternativePage() {
               <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Convoy</th>
             </tr></thead>
             <tbody>{[
-              { featureKey: 'pricePro', hooksniff: '$29/mo', convoy: 'Free (self-hosted)', bestFor: 'convoy' },
+              { featureKey: 'pricePro', hooksniff: '$24/mo', convoy: 'Free (self-hosted)', bestFor: 'convoy' },
               { featureKey: 'sdkCount', hooksniff: '11', convoy: '1 (Go)', bestFor: 'hooksniff' },
               { featureKey: 'fifoDelivery', hooksniff: '✅', convoy: '❌', bestFor: 'hooksniff' },
               { featureKey: 'cloudEvents', hooksniff: '✅', convoy: '❌', bestFor: 'hooksniff' },

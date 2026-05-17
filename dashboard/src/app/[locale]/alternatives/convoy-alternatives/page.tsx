@@ -46,7 +46,7 @@ export default function ConvoyAlternativesPage() {
               <tbody>
                 {[
                   { name: 'Convoy', price: 'Free', sdks: '1 (Go)', cloud: '❌', oss: '✅', portal: 'Basic', hl: false },
-                  { name: 'HookSniff', price: '$29/mo', sdks: '11', cloud: '✅', oss: '✅', portal: 'Full', hl: true },
+                  { name: 'HookSniff', price: '$24/mo', sdks: '11', cloud: '✅', oss: '✅', portal: 'Full', hl: true },
                   { name: 'Svix', price: '$490/mo', sdks: '6', cloud: '✅', oss: '✅', portal: 'Full', hl: false },
                   { name: 'Hookdeck', price: '$39/mo+', sdks: '8', cloud: '✅', oss: '❌', portal: 'Full', hl: false },
                   { name: 'Hook0', price: 'Free', sdks: '4', cloud: '✅', oss: '✅', portal: 'Basic', hl: false },

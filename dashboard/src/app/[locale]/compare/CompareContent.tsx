@@ -7,7 +7,7 @@ import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 const tlDr = [
-  'HookSniff is 10x cheaper than Svix ($29/mo vs $490/mo) with more features.',
+  'HookSniff is 20x cheaper than Svix ($24/mo vs $490/mo) with more features.',
   'Both have 11 SDKs. HookSniff adds FIFO delivery, CloudEvents, and schema registry — Svix doesn\'t.',
   'Svix leads in compliance (SOC 2 Type 2, HIPAA, PCI-DSS) and enterprise trust (30+ Fortune 500 logos).',
   'Hookdeck has the best routing and 99.999% SLA, but is closed-source and usage-based.',
@@ -38,7 +38,7 @@ const sections = [
   {
     title: 'Pricing',
     description: 'Total cost of ownership at different scales.',
-    hooksniff: { text: 'Pro: $29/mo. 10,000 free events/mo. $0.50 per 100K events. 20% annual discount. All features included.', badge: '$29/mo' },
+    hooksniff: { text: 'Pro: $24/mo. 10,000 free events/mo. $0.50 per 100K events. 20% annual discount. All features included.', badge: '$24/mo' },
     svix: { text: 'Professional: $490/mo. Unlimited free tier. Custom per-event pricing. Enterprise: custom.', badge: '$490/mo' },
     hookdeck: { text: 'Developer: $0 (10K events). Team: $39/mo + usage. Growth: $499/mo. $1.00 per 100K events.', badge: '$39/mo+' },
     hook0: { text: 'Self-hosted: free. Cloud: €99/mo. No per-event pricing on self-hosted.', badge: 'Free' },
@@ -218,7 +218,7 @@ const sections = [
 ];
 
 const faq = [
-  { q: 'Is HookSniff really cheaper than Svix?', a: 'Yes. HookSniff Pro is $29/mo vs Svix Professional at $490/mo. That\'s $5,532/year saved. HookSniff even offers a free tier with 10,000 events/month.' },
+  { q: 'Is HookSniff really cheaper than Svix?', a: 'Yes. HookSniff Pro is $24/mo vs Svix Professional at $490/mo. That\'s $5,592/year saved. HookSniff even offers a free tier with 10,000 events/month.' },
   { q: 'Why is HookSniff SOC 2 "Ready" but not "Type 2"?', a: 'SOC 2 Type 2 requires a 3–12 month audit period. HookSniff has implemented all required controls and is undergoing the audit. We expect Type 2 certification soon.' },
   { q: 'Can I self-host HookSniff?', a: 'Yes. HookSniff is open-source (MIT license) and supports Docker deployment. You can run the entire stack on your own infrastructure.' },
   { q: 'Which webhook service has the most SDKs?', a: 'HookSniff and Svix both have 11 SDKs. Hookdeck has 8, Hook0 has 4.' },
@@ -413,7 +413,7 @@ export default function CompareContent() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">When to choose what?</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {[
-              { when: 'Choose HookSniff if...', items: ['You want the best price/feature ratio ($29/mo)', 'You need FIFO ordered delivery', 'You want CloudEvents standard support', 'You\'re a startup watching costs', 'You want self-hosted + managed options', 'You need a schema registry'] },
+              { when: 'Choose HookSniff if...', items: ['You want the best price/feature ratio ($24/mo)', 'You need FIFO ordered delivery', 'You want CloudEvents standard support', 'You\'re a startup watching costs', 'You want self-hosted + managed options', 'You need a schema registry'] },
               { when: 'Choose Svix if...', items: ['You need SOC 2 Type 2, HIPAA, or PCI-DSS', 'You\'re a Fortune 500 company', 'You need 99.999% SLA guarantees', 'You want data streaming (Svix Stream)', 'You need 6+ data residency regions', 'You want the most mature ecosystem'] },
               { when: 'Choose Hookdeck if...', items: ['You need complex event routing rules', 'You need 99.999% uptime SLA', 'You want webhook latency alerts (Radar)', 'You need advanced inbound webhook handling', 'You want a fully managed solution'] },
               { when: 'Choose Hook0 if...', items: ['You want 100% self-hosted control', 'You need European data sovereignty', 'Budget is the #1 priority', 'You want a bootstrapped, no-VC company'] },
