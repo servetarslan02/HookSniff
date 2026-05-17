@@ -11,7 +11,6 @@ const LOCALE_REGEX = new RegExp(`^/(${routing.locales.join('|')})(/|$)`);
 const ROUTE_REDIRECTS: Record<string, string> = {
   // Core section
   '/endpoints': '/applications',
-  '/applications': '/applications',
   '/api-keys': '/core',
   // Deliveries section
   '/logs': '/deliveries',
