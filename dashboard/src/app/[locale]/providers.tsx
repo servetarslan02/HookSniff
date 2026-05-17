@@ -12,7 +12,7 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
           queries: {
             staleTime: 5 * 60 * 1000, // 5 dk cache
             gcTime: 10 * 60 * 1000, // 10 dk garbage collection
-            refetchOnWindowFocus: true,
+            refetchOnWindowFocus: false,
             retry: 2,
             retryDelay: (attemptIndex) =>
               Math.min(1000 * 2 ** attemptIndex, 30_000),
