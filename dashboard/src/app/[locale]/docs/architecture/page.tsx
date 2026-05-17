@@ -60,10 +60,10 @@ export default function ArchitecturePage() {
                                     │
                     ┌───────────────┼───────────────┐
                     ▼               ▼               ▼
-              ┌──────────┐   ┌──────────┐   ┌──────────┐
-              │  HTTP    │   │  gRPC    │   │  SQS     │
-              │ Delivery │   │ Delivery │   │ Delivery │
-              └──────────┘   └──────────┘   └──────────┘`}
+              ┌──────────┐   ┌──────────┐
+              │  HTTP    │   │WebSocket │
+              │ Delivery │   │ Delivery │
+              └──────────┘   └──────────┘`}
         </pre>
       </section>
 
@@ -92,7 +92,7 @@ export default function ArchitecturePage() {
               Webhook delivery engine built with <strong>Rust + Tokio</strong>. Polls the queue and executes deliveries.
             </p>
             <ul className="space-y-1 text-sm text-gray-600 dark:text-slate-400">
-              <li>• HTTP, gRPC, SQS, WebSocket delivery backends</li>
+              <li>• HTTP and WebSocket delivery backends</li>
               <li>• HMAC-SHA256 payload signing (Standard Webhooks)</li>
               <li>• Fanout: one event → multiple endpoints</li>
               <li>• Exponential backoff retry with jitter</li>

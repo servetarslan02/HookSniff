@@ -44,15 +44,15 @@ export default function RateLimitingPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-medium">Developer</td><td className="px-4 py-3">$0</td><td className="px-4 py-3">100</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">5</td></tr>
-              <tr><td className="px-4 py-3 font-medium">Startup</td><td className="px-4 py-3">$14/mo</td><td className="px-4 py-3">500</td><td className="px-4 py-3">10,000</td><td className="px-4 py-3">20</td></tr>
-              <tr><td className="px-4 py-3 font-medium">Pro</td><td className="px-4 py-3">$29/mo</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">50,000</td><td className="px-4 py-3">50</td></tr>
-              <tr><td className="px-4 py-3 font-medium">Enterprise</td><td className="px-4 py-3">$99/mo</td><td className="px-4 py-3">5,000</td><td className="px-4 py-3">500,000</td><td className="px-4 py-3">200</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Developer</td><td className="px-4 py-3">$0</td><td className="px-4 py-3">100</td><td className="px-4 py-3">100/day</td><td className="px-4 py-3">5</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Startup</td><td className="px-4 py-3">$29/mo</td><td className="px-4 py-3">500</td><td className="px-4 py-3">30,000/day</td><td className="px-4 py-3">50</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Pro</td><td className="px-4 py-3">$49/mo</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">100,000/day</td><td className="px-4 py-3">500</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Enterprise</td><td className="px-4 py-3">Custom</td><td className="px-4 py-3">Custom</td><td className="px-4 py-3">Unlimited</td><td className="px-4 py-3">Unlimited</td></tr>
             </tbody>
           </table></div>
         </div>
         <p className="text-gray-600 dark:text-slate-400">
-          Yearly billing: 20% discount. Overage pricing: Startup $0.00003/event, Pro $0.000001/event.
+          Yearly billing: 20% discount. Overage pricing: Startup $0.003/event, Pro $0.0001/event.
         </p>
       </section>
 
@@ -118,9 +118,9 @@ Retry-After: 30                 // Seconds to wait before retrying
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400 mb-4">
           <li><strong>Developer ($0):</strong> 1,000 webhooks/month — blocked at limit</li>
-          <li><strong>Startup ($14/mo):</strong> 10,000 webhooks/month — overage at $0.00003/event</li>
-          <li><strong>Pro ($29/mo):</strong> 50,000 webhooks/month — overage at $0.000001/event</li>
-          <li><strong>Enterprise ($99/mo):</strong> 500,000 webhooks/month — custom overage</li>
+          <li><strong>Startup ($29/mo):</strong> 30,000 events/day — overage at $0.003/event</li>
+          <li><strong>Pro ($49/mo):</strong> 100,000 events/day — overage at $0.0001/event</li>
+          <li><strong>Enterprise (Custom):</strong> Unlimited events — custom pricing</li>
         </ul>
         <p className="text-gray-600 dark:text-slate-400">
           Check your current usage via the API: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">GET /v1/billing/usage</code>
