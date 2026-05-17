@@ -54,16 +54,16 @@ internal constructor(
         val request = reqBuilder.build()
         val res = executeRequestWithRetry(request)
 
-        // if body is null panic
         if (res.body == null) {
             throw ApiException("Body is null", res.code)
         }
         val bodyString = res.body!!.string()
         if (res.code == 204) {
-            return jsonDeserializer.decodeFromString<Res>("true")
+            @Suppress("UNCHECKED_CAST")
+            return true as Res
         }
         if (res.code in 200..299) {
-            return jsonDeserializer.decodeFromString<Res>(bodyString)
+            return jsonDeserializer.decodeFromString(bodyString)
         }
         throw ApiException("Non 200 status code ${res.code}", res.code, bodyString)
     }

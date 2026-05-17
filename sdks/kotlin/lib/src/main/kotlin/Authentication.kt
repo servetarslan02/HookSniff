@@ -1,9 +1,10 @@
-package com.hooksniff
+package com.hooksniff.kotlin
 
 class Authentication(private val client: HookSniffHttpClient) {
-    fun logout(idempotencyKey: String? = null) {
-        val headers = mutableMapOf<String, String>()
-        if (idempotencyKey != null) headers["idempotency-key"] = idempotencyKey
-        client.executeRequest("POST", "/api/v1/auth/logout", headers, null, null)
+    /** Logout the currently authenticated user. */
+    suspend fun logout(idempotencyKey: String? = null) {
+        val headers = okhttp3.Headers.Builder()
+        if (idempotencyKey != null) headers.add("idempotency-key", idempotencyKey)
+        client.executeRequest<Any, Boolean>("POST", client.newUrlBuilder().encodedPath("/api/v1/auth/logout").build(), headers = headers.build())
     }
 }

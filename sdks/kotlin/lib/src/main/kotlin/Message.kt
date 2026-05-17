@@ -1,13 +1,9 @@
 // this file is @generated
 package com.hooksniff.kotlin
 
-import com.hooksniff.kotlin.models.ApplicationIn
-import com.hooksniff.kotlin.models.ExpungeAllContentsOut
 import com.hooksniff.kotlin.models.ListResponseMessageOut
 import com.hooksniff.kotlin.models.MessageIn
 import com.hooksniff.kotlin.models.MessageOut
-import com.hooksniff.kotlin.models.MessagePrecheckIn
-import com.hooksniff.kotlin.models.MessagePrecheckOut
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
@@ -40,18 +36,12 @@ data class MessageCreateOptions(
     val idempotencyKey: String? = null,
 )
 
-data class MessageExpungeAllContentsOptions(val idempotencyKey: String? = null)
-
-data class MessagePrecheckOptions(val idempotencyKey: String? = null)
-
 data class MessageGetOptions(
     /** When `true` message payloads are included in the response. */
     val withContent: Boolean? = null
 )
 
 class Message(private val client: HookSniffHttpClient) {
-    val poller: MessagePoller = MessagePoller(client)
-
     /**
      * List all of the application's messages.
      *
@@ -108,90 +98,20 @@ class Message(private val client: HookSniffHttpClient) {
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
         var msgInInternal =
             MessageInInternal(
-                messageIn.application,
                 messageIn.channels,
                 messageIn.eventId,
                 messageIn.eventType,
                 mapOf(),
                 messageIn.payloadRetentionHours,
-                messageIn.payloadRetentionPeriod,
                 messageIn.tags,
-                messageIn.transformationsParams,
             )
-        if (msgInInternal.transformationsParams != null) {
-            // only set rawPayload if not already set
-            if (msgInInternal.transformationsParams!!["rawPayload"] == null) {
-                var trParams =
-                    (msgInInternal.transformationsParams as Map<String, Any>).toMutableMap()
-                trParams["rawPayload"] = messageIn.payload
-                msgInInternal.transformationsParams = trParams.toMap()
-            }
-        } else {
-            val trParams = mapOf("rawPayload" to messageIn.payload)
-            msgInInternal.transformationsParams = trParams
-        }
+        val trParams = mapOf("rawPayload" to messageIn.payload)
+        msgInInternal.transformationsParams = trParams
         return client.executeRequest<MessageInInternal, MessageOut>(
             "POST",
             url.build(),
             headers = headers.build(),
             reqBody = msgInInternal,
-        )
-    }
-
-    /**
-     * Delete all message payloads for the application.
-     *
-     * This operation is only available in the <a href="https://hooksniff.com/pricing"
-     * target="_blank">Enterprise</a> plan.
-     *
-     * A completed task will return a payload like the following:
-     * ```json
-     * {
-     *   "id": "qtask_33qen93MNuelBAq1T9G7eHLJRsF",
-     *   "status": "finished",
-     *   "task": "application.purge_content",
-     *   "data": {
-     *     "messagesPurged": 150
-     *   }
-     * }
-     * ```
-     */
-    suspend fun expungeAllContents(
-        appId: String,
-        options: MessageExpungeAllContentsOptions = MessageExpungeAllContentsOptions(),
-    ): ExpungeAllContentsOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/app/$appId/msg/expunge-all-contents")
-        val headers = Headers.Builder()
-        options.idempotencyKey?.let { headers.add("idempotency-key", it) }
-        return client.executeRequest<Any, ExpungeAllContentsOut>(
-            "POST",
-            url.build(),
-            headers = headers.build(),
-        )
-    }
-
-    /**
-     * A pre-check call for `message.create` that checks whether any active endpoints are listening
-     * to this message.
-     *
-     * Note: most people shouldn't be using this API. HookSniff doesn't bill you for messages not
-     * actually sent, so using this API doesn't save money. If unsure, please ask HookSniff support
-     * before using this API.
-     */
-    suspend fun precheck(
-        appId: String,
-        messagePrecheckIn: MessagePrecheckIn,
-        options: MessagePrecheckOptions = MessagePrecheckOptions(),
-    ): MessagePrecheckOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/app/$appId/msg/precheck/active")
-        val headers = Headers.Builder()
-        options.idempotencyKey?.let { headers.add("idempotency-key", it) }
-
-        return client.executeRequest<MessagePrecheckIn, MessagePrecheckOut>(
-            "POST",
-            url.build(),
-            headers = headers.build(),
-            reqBody = messagePrecheckIn,
         )
     }
 
@@ -236,15 +156,12 @@ fun messageInRaw(
     eventType: String,
     payload: String,
     contentType: String? = null,
-    application: ApplicationIn? = null,
     channels: Set<String>? = null,
     eventId: String? = null,
     payloadRetentionHours: Long? = null,
-    payloadRetentionPeriod: Long? = 90L,
     tags: Set<String>? = null,
-    transformationsParams: Map<String, JsonElement> = mapOf(),
 ): MessageIn {
-    val transformationsParams = transformationsParams.toMutableMap()
+    val transformationsParams = mutableMapOf<String, JsonElement>()
     transformationsParams["rawPayload"] = JsonPrimitive(payload)
     if (contentType != null) {
         val headers = mapOf("content-type" to JsonPrimitive(contentType))
@@ -254,11 +171,9 @@ fun messageInRaw(
     return MessageIn(
         eventType = eventType,
         payload = "",
-        application = application,
         channels = channels,
         eventId = eventId,
         payloadRetentionHours = payloadRetentionHours,
-        payloadRetentionPeriod = payloadRetentionPeriod,
         tags = tags,
         transformationsParams = JsonObject(transformationsParams),
     )
@@ -266,13 +181,11 @@ fun messageInRaw(
 
 @Serializable
 private data class MessageInInternal(
-    val application: ApplicationIn? = null,
     val channels: Set<String>? = null,
     val eventId: String? = null,
     val eventType: String,
     @Serializable(with = StringAnyMapSerializer::class) var payload: Map<String, Any>,
     val payloadRetentionHours: Long? = null,
-    val payloadRetentionPeriod: Long? = null,
     val tags: Set<String>? = null,
     @Serializable(with = StringAnyMapSerializer::class)
     var transformationsParams: Map<String, Any>? = null,
