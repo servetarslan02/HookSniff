@@ -1,560 +1,209 @@
 """
-HookSniff SDK — API Models
-
-Type definitions for the HookSniff API.
+HookSniff SDK — Models
 """
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
-from datetime import datetime
-
-
-# ─── Common ────────────────────────────────────────────────────────
-
-@dataclass
-class RetryPolicy:
-    max_retries: int
-    initial_delay_ms: int
-    max_delay_ms: int
-    backoff_multiplier: float
-
-
-# ─── Auth ──────────────────────────────────────────────────────────
-
-@dataclass
-class RegisterRequest:
-    email: str
-    password: str
-    name: Optional[str] = None
-
-
-@dataclass
-class LoginRequest:
-    email: str
-    password: str
-    totp_code: Optional[str] = None
-
-
-@dataclass
-class AuthResponse:
-    access_token: str
-    refresh_token: str
-    token_type: str
-    expires_in: int
-    user: Dict[str, Any]
-
-
-@dataclass
-class CustomerResponse:
-    id: str
-    email: str
-    name: Optional[str] = None
-    plan: str = ""
-    is_verified: bool = False
-    two_factor_enabled: bool = False
-    created_at: str = ""
-    api_key_prefix: str = ""
-    webhook_count: int = 0
-    team_count: int = 0
-
-
-@dataclass
-class ForgotPasswordRequest:
-    email: str
-
-
-@dataclass
-class ResetPasswordRequest:
-    token: str
-    new_password: str
-
-
-@dataclass
-class VerifyEmailRequest:
-    token: str
-
-
-@dataclass
-class RefreshTokenRequest:
-    refresh_token: str
-
-
-@dataclass
-class Enable2faResponse:
-    secret: str
-    qr_code_url: str
-    backup_codes: List[str] = field(default_factory=list)
-
-
-@dataclass
-class UpdateProfileRequest:
-    name: Optional[str] = None
-
-
-@dataclass
-class ChangePasswordRequest:
-    current_password: str
-    new_password: str
-
-
-# ─── Endpoints ─────────────────────────────────────────────────────
-
-@dataclass
-class EndpointIn:
-    url: str
-    description: Optional[str] = None
-    is_active: Optional[bool] = None
-    retry_policy: Optional[Dict[str, Any]] = None
-    allowed_ips: Optional[List[str]] = None
-    event_filter: Optional[List[str]] = None
-    custom_headers: Optional[Dict[str, str]] = None
-    routing_strategy: Optional[str] = None
-    fallback_url: Optional[str] = None
-    format: Optional[str] = None
-
-
-@dataclass
-class EndpointUpdate:
-    url: Optional[str] = None
-    description: Optional[str] = None
-    is_active: Optional[bool] = None
-    retry_policy: Optional[Dict[str, Any]] = None
-    allowed_ips: Optional[List[str]] = None
-    event_filter: Optional[List[str]] = None
-    custom_headers: Optional[Dict[str, str]] = None
-    routing_strategy: Optional[str] = None
-    fallback_url: Optional[str] = None
-    format: Optional[str] = None
-
-
-@dataclass
-class EndpointOut:
-    id: str
-    url: str
-    description: Optional[str] = None
-    is_active: bool = True
-    retry_policy: Dict[str, Any] = field(default_factory=dict)
-    created_at: str = ""
-    allowed_ips: Optional[List[str]] = None
-    event_filter: Optional[List[str]] = None
-    custom_headers: Optional[Dict[str, str]] = None
-    routing_strategy: str = "round-robin"
-    fallback_url: Optional[str] = None
-    avg_response_ms: float = 0
-    failure_streak: int = 0
-    format: str = "standard"
-
-
-@dataclass
-class EndpointSecretOut:
-    secret: str
-    rotated_at: str = ""
-
-
-@dataclass
-class EndpointStats:
-    total_deliveries: int = 0
-    successful: int = 0
-    failed: int = 0
-    success_rate: float = 0.0
-
-
-@dataclass
-class EndpointHealth:
-    endpoint_id: str = ""
-    url: str = ""
-    status: str = "healthy"
-    uptime_percentage: float = 100.0
-    avg_response_ms: float = 0.0
-    last_success_at: Optional[str] = None
-    last_failure_at: Optional[str] = None
-    failure_streak: int = 0
-    recent_attempts: int = 0
-    recent_failures: int = 0
-
-
-@dataclass
-class ListResponseEndpointOut:
-    data: List[EndpointOut] = field(default_factory=list)
-    iterator: Optional[str] = None
-    done: Optional[bool] = None
-
-
-# ─── Webhooks / Messages ───────────────────────────────────────────
-
-@dataclass
-class MessageIn:
-    event: str
-    data: Dict[str, Any] = field(default_factory=dict)
-    endpoint_id: Optional[str] = None
-    metadata: Optional[Dict[str, str]] = None
-
-
-@dataclass
-class MessageOut:
-    id: str
-    event: str
-    data: Dict[str, Any] = field(default_factory=dict)
-    metadata: Optional[Dict[str, str]] = None
-    created_at: str = ""
-
-
-@dataclass
-class BatchMessageIn:
-    messages: List[MessageIn] = field(default_factory=list)
-
-
-@dataclass
-class BatchMessageResponse:
-    results: List[Dict[str, Any]] = field(default_factory=list)
-    success_count: int = 0
-    failure_count: int = 0
-
-
-@dataclass
-class ListResponseMessageOut:
-    data: List[MessageOut] = field(default_factory=list)
-    iterator: Optional[str] = None
-    done: Optional[bool] = None
-
-
-# ─── Message Attempts / Deliveries ─────────────────────────────────
-
-@dataclass
-class MessageAttemptOut:
-    id: str
-    message_id: str
-    endpoint_id: str
-    status: str = ""
-    response_status: Optional[int] = None
-    response_body: Optional[str] = None
-    duration_ms: float = 0
-    created_at: str = ""
-    error_message: Optional[str] = None
-
-
-@dataclass
-class ListResponseMessageAttemptOut:
-    data: List[MessageAttemptOut] = field(default_factory=list)
-    iterator: Optional[str] = None
-    done: Optional[bool] = None
-
-
-# ─── API Keys ──────────────────────────────────────────────────────
-
-@dataclass
-class ApiTokenOut:
-    id: str
-    name: str
-    prefix: str = ""
-    last_used_at: Optional[str] = None
-    created_at: str = ""
-    expires_at: Optional[str] = None
-    is_active: bool = True
-    scopes: List[str] = field(default_factory=list)
-
-
-@dataclass
-class ApiTokenCreateOut(ApiTokenOut):
-    key: str = ""
-
-
-# ─── Teams ─────────────────────────────────────────────────────────
-
-@dataclass
-class TeamOut:
-    id: str
-    name: str
-    created_at: str = ""
-    member_count: int = 0
-    endpoint_count: int = 0
-
-
-@dataclass
-class TeamMemberOut:
-    id: str
-    user_id: str
-    email: str
-    name: Optional[str] = None
-    role: str = "member"
-    joined_at: str = ""
-
-
-@dataclass
-class TeamInviteOut:
-    id: str
-    email: str
-    role: str = "member"
-    created_at: str = ""
-    expires_at: str = ""
-
-
-@dataclass
-class TeamDetailOut(TeamOut):
-    members: List[TeamMemberOut] = field(default_factory=list)
-    pending_invites: List[TeamInviteOut] = field(default_factory=list)
-
-
-@dataclass
-class TeamIn:
-    name: str
-
-
-@dataclass
-class TeamInviteIn:
-    email: str
-    role: str = "member"
-
-
-@dataclass
-class TeamRoleUpdate:
-    role: str
-
-
-# ─── Alerts ────────────────────────────────────────────────────────
-
-@dataclass
-class AlertRuleOut:
-    id: str
-    name: str
-    condition: str
-    threshold: float = 0.0
-    window_minutes: int = 0
-    is_active: bool = True
-    notification_channels: List[str] = field(default_factory=list)
-    created_at: str = ""
-
-
-@dataclass
-class AlertRuleIn:
-    name: str
-    condition: str
-    threshold: float
-    window_minutes: int
-    notification_channels: Optional[List[str]] = None
-
-
-# ─── Notifications ─────────────────────────────────────────────────
-
-@dataclass
-class NotificationOut:
-    id: str
-    type: str
-    title: str
-    message: str
-    is_read: bool = False
-    data: Optional[Dict[str, Any]] = None
-    created_at: str = ""
-
-
-@dataclass
-class NotificationListResponse:
-    data: List[NotificationOut] = field(default_factory=list)
-    total: int = 0
-    unread_count: int = 0
-
-
-@dataclass
-class DeviceTokenIn:
-    token: str
-    platform: str
-    device_name: Optional[str] = None
-
-
-@dataclass
-class DeviceTokenOut:
-    id: str
-    token: str
-    platform: str
-    device_name: Optional[str] = None
-    created_at: str = ""
-
-
-@dataclass
-class NotificationPreferences:
-    email_deliveries: bool = True
-    email_failures: bool = True
-    email_weekly_digest: bool = True
-    push_deliveries: bool = False
-    push_failures: bool = True
-
-
-@dataclass
-class NotificationPreferencesUpdate:
-    email_deliveries: Optional[bool] = None
-    email_failures: Optional[bool] = None
-    email_weekly_digest: Optional[bool] = None
-    push_deliveries: Optional[bool] = None
-    push_failures: Optional[bool] = None
-
-
-# ─── Billing ───────────────────────────────────────────────────────
-
-@dataclass
-class SubscriptionOut:
-    plan: str
-    status: str = ""
-    current_period_start: str = ""
-    current_period_end: str = ""
-    cancel_at_period_end: bool = False
-    payment_provider: Optional[str] = None
-    portal_url: Optional[str] = None
-    limits: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class UpgradeRequest:
-    plan: str
-    payment_method: Optional[str] = None
-
-
-@dataclass
-class UpgradeResponse:
-    checkout_url: str = ""
-    session_id: str = ""
-
-
-@dataclass
-class UsageOut:
-    period_start: str = ""
-    period_end: str = ""
-    deliveries_used: int = 0
-    deliveries_limit: int = 0
-    endpoints_used: int = 0
-    endpoints_limit: int = 0
-    overage: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class InvoiceOut:
-    id: str
-    amount_cents: int = 0
-    currency: str = "usd"
-    status: str = ""
-    created_at: str = ""
-    pdf_url: Optional[str] = None
-
-
-@dataclass
-class BillingPortalResponse:
-    url: str = ""
-
-
-# ─── Analytics ─────────────────────────────────────────────────────
-
-@dataclass
-class StatsResponse:
-    total_deliveries: int = 0
-    success_rate: float = 0.0
-    avg_latency_ms: float = 0.0
-    active_endpoints: int = 0
-    period: str = ""
-
-
-@dataclass
-class TrendPoint:
-    date: str
-    value: float = 0.0
-
-
-@dataclass
-class TrendResponse:
-    data: List[TrendPoint] = field(default_factory=list)
-    metric: str = ""
-    period: str = ""
-
-
-@dataclass
-class SuccessRateResponse:
-    overall: float = 0.0
-    by_endpoint: List[Dict[str, Any]] = field(default_factory=list)
-
-
-@dataclass
-class LatencyResponse:
-    data: List[TrendPoint] = field(default_factory=list)
-    p50: float = 0.0
-    p95: float = 0.0
-    p99: float = 0.0
-
-
-@dataclass
-class DeliveryTrendResponse:
-    data: List[TrendPoint] = field(default_factory=list)
-    total: int = 0
-
-
-# ─── Search ────────────────────────────────────────────────────────
-
-@dataclass
-class SearchResult:
-    type: str
-    id: str
-    title: str
-    description: str = ""
-    url: str = ""
-    score: float = 0.0
-
-
-# ─── Health ────────────────────────────────────────────────────────
-
-@dataclass
-class HealthCheck:
-    status: str = ""
-    version: str = ""
-    uptime_seconds: int = 0
-    database: str = ""
-    redis: str = ""
-    region: str = ""
-
-
-@dataclass
-class SystemStatus:
-    status: str = ""
-    version: str = ""
-    uptime_seconds: int = 0
-    total_customers: int = 0
-    total_endpoints: int = 0
-    total_deliveries_today: int = 0
-    queue_depth: int = 0
-
-
-# ─── Admin ─────────────────────────────────────────────────────────
-
-@dataclass
-class AdminAuditEntry:
-    id: str
-    action: str
-    actor: str
-    target_type: str
-    target_id: str
-    details: Optional[Dict[str, Any]] = None
-    ip_address: str = ""
-    created_at: str = ""
-
-
-@dataclass
-class AdminAuditLogResponse:
-    data: List[AdminAuditEntry] = field(default_factory=list)
-    total: int = 0
-
-
-@dataclass
-class AdminRevenueEntry:
-    date: str
-    revenue_cents: int = 0
-    new_subscriptions: int = 0
-    cancellations: int = 0
-    mrr_cents: int = 0
-
-
-@dataclass
-class AdminRevenueResponse:
-    data: List[AdminRevenueEntry] = field(default_factory=list)
-    total_revenue_cents: int = 0
-    mrr_cents: int = 0
-
-
-# ─── Ordering ──────────────────────────────────────────────────────
-
-Ordering = str  # "ascending" | "descending"
+from .aggregate_event_types_out import AggregateEventTypesOut
+from .api_token_out import ApiTokenOut
+from .app_portal_access_in import AppPortalAccessIn
+from .app_portal_access_out import AppPortalAccessOut
+from .app_portal_capability import AppPortalCapability
+from .app_usage_stats_in import AppUsageStatsIn
+from .app_usage_stats_out import AppUsageStatsOut
+from .bulk_replay_in import BulkReplayIn
+from .common import Common
+from .create_stream_events_in import CreateStreamEventsIn
+from .create_stream_events_out import CreateStreamEventsOut
+from .dashboard_access_out import DashboardAccessOut
+from .empty_response import EmptyResponse
+from .endpoint_created_event import EndpointCreatedEvent
+from .endpoint_created_event_data import EndpointCreatedEventData
+from .endpoint_deleted_event import EndpointDeletedEvent
+from .endpoint_deleted_event_data import EndpointDeletedEventData
+from .endpoint_disabled_event import EndpointDisabledEvent
+from .endpoint_disabled_event_data import EndpointDisabledEventData
+from .endpoint_disabled_trigger import EndpointDisabledTrigger
+from .endpoint_enabled_event import EndpointEnabledEvent
+from .endpoint_enabled_event_data import EndpointEnabledEventData
+from .endpoint_headers_in import EndpointHeadersIn
+from .endpoint_headers_out import EndpointHeadersOut
+from .endpoint_headers_patch_in import EndpointHeadersPatchIn
+from .endpoint_in import EndpointIn
+from .endpoint_message_out import EndpointMessageOut
+from .endpoint_out import EndpointOut
+from .endpoint_patch import EndpointPatch
+from .endpoint_secret_out import EndpointSecretOut
+from .endpoint_secret_rotate_in import EndpointSecretRotateIn
+from .endpoint_stats import EndpointStats
+from .endpoint_transformation_in import EndpointTransformationIn
+from .endpoint_transformation_out import EndpointTransformationOut
+from .endpoint_transformation_patch import EndpointTransformationPatch
+from .endpoint_update import EndpointUpdate
+from .endpoint_updated_event import EndpointUpdatedEvent
+from .endpoint_updated_event_data import EndpointUpdatedEventData
+from .event_example_in import EventExampleIn
+from .event_in import EventIn
+from .event_out import EventOut
+from .event_stream_out import EventStreamOut
+from .event_type_from_open_api import EventTypeFromOpenApi
+from .event_type_import_open_api_in import EventTypeImportOpenApiIn
+from .event_type_import_open_api_out import EventTypeImportOpenApiOut
+from .event_type_import_open_api_out_data import EventTypeImportOpenApiOutData
+from .event_type_in import EventTypeIn
+from .event_type_out import EventTypeOut
+from .event_type_patch import EventTypePatch
+from .event_type_update import EventTypeUpdate
+from .expunge_all_contents_out import ExpungeAllContentsOut
+from .http_attempt_times import HttpAttemptTimes
+from .http_sink_headers_patch_in import HttpSinkHeadersPatchIn
+from .list_response_application_out import ListResponseApplicationOut
+from .list_response_background_task_out import ListResponseBackgroundTaskOut
+from .list_response_connector_out import ListResponseConnectorOut
+from .list_response_endpoint_message_out import ListResponseEndpointMessageOut
+from .list_response_endpoint_out import ListResponseEndpointOut
+from .list_response_event_type_out import ListResponseEventTypeOut
+from .list_response_ingest_endpoint_out import ListResponseIngestEndpointOut
+from .list_response_ingest_source_out import ListResponseIngestSourceOut
+from .list_response_integration_out import ListResponseIntegrationOut
+from .list_response_message_attempt_out import ListResponseMessageAttemptOut
+from .list_response_message_endpoint_out import ListResponseMessageEndpointOut
+from .list_response_message_out import ListResponseMessageOut
+from .list_response_operational_webhook_endpoint_out import ListResponseOperationalWebhookEndpointOut
+from .list_response_stream_event_type_out import ListResponseStreamEventTypeOut
+from .list_response_stream_out import ListResponseStreamOut
+from .list_response_stream_sink_out import ListResponseStreamSinkOut
+from .message_attempt_exhausted_event import MessageAttemptExhaustedEvent
+from .message_attempt_exhausted_event_data import MessageAttemptExhaustedEventData
+from .message_attempt_failed_data import MessageAttemptFailedData
+from .message_attempt_failing_event import MessageAttemptFailingEvent
+from .message_attempt_failing_event_data import MessageAttemptFailingEventData
+from .message_attempt_log import MessageAttemptLog
+from .message_attempt_log_event import MessageAttemptLogEvent
+from .message_attempt_out import MessageAttemptOut
+from .message_attempt_recovered_event import MessageAttemptRecoveredEvent
+from .message_attempt_recovered_event_data import MessageAttemptRecoveredEventData
+from .message_attempt_trigger_type import MessageAttemptTriggerType
+from .message_endpoint_out import MessageEndpointOut
+from .message_in import MessageIn
+from .message_out import MessageOut
+from .message_precheck_in import MessagePrecheckIn
+from .message_precheck_out import MessagePrecheckOut
+from .message_status import MessageStatus
+from .message_status_text import MessageStatusText
+from .ordering import Ordering
+from .recover_in import RecoverIn
+from .recover_out import RecoverOut
+from .replay_in import ReplayIn
+from .replay_out import ReplayOut
+from .rotate_poller_token_in import RotatePollerTokenIn
+from .rotate_token_out import RotateTokenOut
+from .sink_secret_out import SinkSecretOut
+from .sink_status import SinkStatus
+from .sink_status_in import SinkStatusIn
+from .sink_transform_in import SinkTransformIn
+from .sink_transformation_out import SinkTransformationOut
+from .status_code_class import StatusCodeClass
+from .subscribe_in import SubscribeIn
+
+__all__ = [
+    "AggregateEventTypesOut",
+    "ApiTokenOut",
+    "AppPortalAccessIn",
+    "AppPortalAccessOut",
+    "AppPortalCapability",
+    "AppUsageStatsIn",
+    "AppUsageStatsOut",
+    "BulkReplayIn",
+    "Common",
+    "CreateStreamEventsIn",
+    "CreateStreamEventsOut",
+    "DashboardAccessOut",
+    "EmptyResponse",
+    "EndpointCreatedEvent",
+    "EndpointCreatedEventData",
+    "EndpointDeletedEvent",
+    "EndpointDeletedEventData",
+    "EndpointDisabledEvent",
+    "EndpointDisabledEventData",
+    "EndpointDisabledTrigger",
+    "EndpointEnabledEvent",
+    "EndpointEnabledEventData",
+    "EndpointHeadersIn",
+    "EndpointHeadersOut",
+    "EndpointHeadersPatchIn",
+    "EndpointIn",
+    "EndpointMessageOut",
+    "EndpointOut",
+    "EndpointPatch",
+    "EndpointSecretOut",
+    "EndpointSecretRotateIn",
+    "EndpointStats",
+    "EndpointTransformationIn",
+    "EndpointTransformationOut",
+    "EndpointTransformationPatch",
+    "EndpointUpdate",
+    "EndpointUpdatedEvent",
+    "EndpointUpdatedEventData",
+    "EventExampleIn",
+    "EventIn",
+    "EventOut",
+    "EventStreamOut",
+    "EventTypeFromOpenApi",
+    "EventTypeImportOpenApiIn",
+    "EventTypeImportOpenApiOut",
+    "EventTypeImportOpenApiOutData",
+    "EventTypeIn",
+    "EventTypeOut",
+    "EventTypePatch",
+    "EventTypeUpdate",
+    "ExpungeAllContentsOut",
+    "HttpAttemptTimes",
+    "HttpSinkHeadersPatchIn",
+    "ListResponseApplicationOut",
+    "ListResponseBackgroundTaskOut",
+    "ListResponseConnectorOut",
+    "ListResponseEndpointMessageOut",
+    "ListResponseEndpointOut",
+    "ListResponseEventTypeOut",
+    "ListResponseIngestEndpointOut",
+    "ListResponseIngestSourceOut",
+    "ListResponseIntegrationOut",
+    "ListResponseMessageAttemptOut",
+    "ListResponseMessageEndpointOut",
+    "ListResponseMessageOut",
+    "ListResponseOperationalWebhookEndpointOut",
+    "ListResponseStreamEventTypeOut",
+    "ListResponseStreamOut",
+    "ListResponseStreamSinkOut",
+    "MessageAttemptExhaustedEvent",
+    "MessageAttemptExhaustedEventData",
+    "MessageAttemptFailedData",
+    "MessageAttemptFailingEvent",
+    "MessageAttemptFailingEventData",
+    "MessageAttemptLog",
+    "MessageAttemptLogEvent",
+    "MessageAttemptOut",
+    "MessageAttemptRecoveredEvent",
+    "MessageAttemptRecoveredEventData",
+    "MessageAttemptTriggerType",
+    "MessageEndpointOut",
+    "MessageIn",
+    "MessageOut",
+    "MessagePrecheckIn",
+    "MessagePrecheckOut",
+    "MessageStatus",
+    "MessageStatusText",
+    "Ordering",
+    "RecoverIn",
+    "RecoverOut",
+    "ReplayIn",
+    "ReplayOut",
+    "RotatePollerTokenIn",
+    "RotateTokenOut",
+    "SinkSecretOut",
+    "SinkStatus",
+    "SinkStatusIn",
+    "SinkTransformIn",
+    "SinkTransformationOut",
+    "StatusCodeClass",
+    "SubscribeIn",
+]

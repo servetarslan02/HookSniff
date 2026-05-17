@@ -1,10 +1,3 @@
-"""
-HookSniff SDK — Common API utilities
-
-Core request handling with httpx, retry logic, and serialization.
-Adapted from Svix SDK architecture.
-"""
-
 import asyncio
 import random
 import time
@@ -22,6 +15,7 @@ from .errors.http_validation_error import HTTPValidationError
 def ensure_tz(x: t.Optional[datetime]) -> t.Optional[datetime]:
     if x is None:
         return None
+
     if x.tzinfo is None:
         return x.replace(tzinfo=timezone.utc)
     return x
@@ -30,6 +24,7 @@ def ensure_tz(x: t.Optional[datetime]) -> t.Optional[datetime]:
 def sanitize_field(v: t.Any) -> t.Any:
     if isinstance(v, datetime):
         return ensure_tz(v)
+
     return v
 
 

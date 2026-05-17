@@ -1,3 +1,0 @@
-"""
-HookSniff SDK — Resources
-"""
