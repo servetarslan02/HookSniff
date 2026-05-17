@@ -6,9 +6,10 @@ interface LatencyEndpoint {
   endpoint_id: string;
   url: string;
   total_deliveries: number;
-  avg_latency_ms: number | null;
-  p95_latency_ms: number | null;
+  avg_latency_ms?: number | null;
+  p95_latency_ms?: number | null;
   error_rate: number;
+  failed_count?: number;
 }
 
 export default function LatencyTable({ endpoints }: { endpoints: LatencyEndpoint[] }) {

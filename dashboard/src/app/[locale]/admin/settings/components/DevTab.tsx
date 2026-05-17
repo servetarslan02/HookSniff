@@ -1,11 +1,9 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function DevTab() {
-  const t = useTranslations('admin');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

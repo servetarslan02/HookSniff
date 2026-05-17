@@ -18,8 +18,8 @@ interface UserFiltersProps {
   handleExportCSV: () => void;
   setPage: (page: number) => void;
   planOptions: PlanOption[];
-  t: (key: string) => string;
-  tc: (key: string) => string;
+  t: any;
+  tc: any;
 }
 
 export function UserFilters({
@@ -36,7 +36,6 @@ export function UserFilters({
   setPage,
   planOptions,
   t,
-  tc,
 }: UserFiltersProps) {
   return (
     <form onSubmit={handleSearch} className="glass-card p-4">

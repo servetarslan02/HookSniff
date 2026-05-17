@@ -39,12 +39,19 @@ const withBundleAnalyzer = process.env.ANALYZE === 'true'
   ? require('@next/bundle-analyzer')({ enabled: true })
   : (config) => config;
 
-module.exports = withSentryConfig(withBundleAnalyzer(withNextIntl(nextConfig)), {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  silent: !process.env.CI,
-  widenClientFileUpload: true,
-  hideSourceMaps: true,
-  disableLogger: true,
-  automaticVercelMonitors: true,
-});
+const baseConfig = withBundleAnalyzer(withNextIntl(nextConfig));
+
+// Only enable Sentry sourcemap upload when org + project are configured
+if (process.env.SENTRY_ORG && process.env.SENTRY_PROJECT) {
+  module.exports = withSentryConfig(baseConfig, {
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+    silent: !process.env.CI,
+    widenClientFileUpload: true,
+    hideSourceMaps: true,
+    disableLogger: true,
+    automaticVercelMonitors: true,
+  });
+} else {
+  module.exports = baseConfig;
+}

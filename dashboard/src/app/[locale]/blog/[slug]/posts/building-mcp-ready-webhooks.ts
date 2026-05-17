@@ -1,4 +1,4 @@
-import type { Post } from '.../data';
+import type { Post } from '../data';
 
 export const post: Post = {
     title: 'Building an MCP-Ready Webhook Service: Lessons from HookSniff',

@@ -13,7 +13,7 @@ interface HealthTabProps {
   disabledEndpoints: number | undefined;
 }
 
-export default function HealthTab({ stats, rateLimitData, failedDeliveriesData, queueStatus, totalEndpoints, activeEndpoints, disabledEndpoints }: HealthTabProps) {
+export default function HealthTab({ stats: _stats, rateLimitData, failedDeliveriesData, queueStatus, totalEndpoints, activeEndpoints, disabledEndpoints }: HealthTabProps) {
   const t = useTranslations('admin');
 
   return (
