@@ -2071,6 +2071,78 @@ async fn fetch_platform_settings(pool: &PgPool) -> PlatformSettings {
     PlatformSettings::default()
 }
 
+/// Public plan information (no auth required).
+/// Returns plan prices and limits for display on pricing page and dashboard.
+#[derive(Debug, Serialize)]
+pub struct PublicPlanInfo {
+    pub plans: Vec<PublicPlan>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct PublicPlan {
+    pub id: String,
+    pub name: String,
+    pub price_monthly: f64,
+    pub price_yearly: f64,
+    pub max_endpoints: i32,
+    pub max_webhooks: i32,
+    pub rate_limit: i32,
+    pub retention_days: i32,
+    pub popular: bool,
+}
+
+/// GET /v1/plans — Public plan pricing (no auth)
+pub async fn public_plans(Extension(pool): Extension<PgPool>) -> Json<PublicPlanInfo> {
+    let settings = fetch_platform_settings(&pool).await;
+    let plans = vec![
+        PublicPlan {
+            id: "developer".into(),
+            name: "Developer".into(),
+            price_monthly: 0.0,
+            price_yearly: 0.0,
+            max_endpoints: settings.max_endpoints_free,
+            max_webhooks: settings.max_webhooks_free,
+            rate_limit: settings.rate_limit_free,
+            retention_days: settings.retention_days_free,
+            popular: false,
+        },
+        PublicPlan {
+            id: "startup".into(),
+            name: "Startup".into(),
+            price_monthly: settings.plan_price_startup,
+            price_yearly: (settings.plan_price_startup * 12.0 * 0.8).round(),
+            max_endpoints: settings.max_endpoints_startup,
+            max_webhooks: settings.max_webhooks_startup,
+            rate_limit: settings.rate_limit_startup,
+            retention_days: settings.retention_days_startup,
+            popular: false,
+        },
+        PublicPlan {
+            id: "pro".into(),
+            name: "Pro".into(),
+            price_monthly: settings.plan_price_pro,
+            price_yearly: (settings.plan_price_pro * 12.0 * 0.8).round(),
+            max_endpoints: settings.max_endpoints_pro,
+            max_webhooks: settings.max_webhooks_pro,
+            rate_limit: settings.rate_limit_pro,
+            retention_days: settings.retention_days_pro,
+            popular: true,
+        },
+        PublicPlan {
+            id: "enterprise".into(),
+            name: "Enterprise".into(),
+            price_monthly: settings.plan_price_enterprise,
+            price_yearly: (settings.plan_price_enterprise * 12.0 * 0.8).round(),
+            max_endpoints: settings.max_endpoints_enterprise,
+            max_webhooks: settings.max_webhooks_enterprise,
+            rate_limit: settings.rate_limit_enterprise,
+            retention_days: settings.retention_days_enterprise,
+            popular: false,
+        },
+    ];
+    Json(PublicPlanInfo { plans })
+}
+
 /// GET /v1/admin/settings — Get platform settings
 async fn get_settings(
     Extension(pool): Extension<PgPool>,
