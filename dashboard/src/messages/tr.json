@@ -192,7 +192,10 @@
     "observability": "İzleme",
     "sectionContent": "İçerik",
     "account": "Hesap",
-    "profile": "Profil"
+    "profile": "Profil",
+    "environments": "Ortamlar",
+    "backgroundTasks": "Arka Plan Görevleri",
+    "operationalWebhooks": "Operasyonel Webhooklar"
   },
   "dashboard": {
     "title": "Dashboard",
