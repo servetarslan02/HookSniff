@@ -519,3 +519,18 @@ mod tests {
         assert_eq!(json["total_failed"], 3);
     }
 }
+
+    #[test]
+    fn test_admin_delete_data_request_confirm_false() {
+        let json = r#"{"confirm": false, "reason": "testing"}"#;
+        let req: AdminDeleteDataRequest = serde_json::from_str(json).unwrap();
+        assert!(!req.confirm);
+    }
+
+    #[test]
+    fn test_bulk_email_request_with_filters() {
+        let json = r#"{"subject": "Pro Update", "body": "Hi", "plan_filter": "pro", "status_filter": "verified"}"#;
+        let req: BulkEmailRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.plan_filter.as_deref(), Some("pro"));
+        assert_eq!(req.status_filter.as_deref(), Some("verified"));
+    }
