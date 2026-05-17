@@ -12,7 +12,7 @@
 | 4 | **Rust** | Rust | Svix'ten temiz adapte | 1.0.0 | ✅ hooksniff-rust | crates.io | ✅ Yüklendi |
 | 5 | **Ruby** | Ruby | Svix'ten adapte | 1.0.0 | ✅ hooksniff-ruby | RubyGems | ✅ Yüklendi |
 | 6 | **Java** | Java | Svix'ten temiz adapte | 1.0.0 | ✅ hooksniff-java | Maven Central | ✅ Yüklendi |
-| 7 | **Kotlin** | Kotlin | Svix'ten adapte | 1.0.0 | ✅ hooksniff-kotlin | Maven Central | ⏳ Publish edilmedi |
+| 7 | **Kotlin** | Kotlin | Svix'ten adapte | 1.0.0 | ✅ hooksniff-kotlin | Maven Central | ✅ Yüklendi |
 | 8 | **PHP** | PHP | Svix'ten adapte | 1.0.0 | ✅ hooksniff-php | Packagist | ✅ Tetiklendi |
 | 9 | **C#** | C# | Svix'ten adapte | 1.0.0 | ✅ hooksniff-csharp | NuGet | ✅ Yüklendi |
 | 10 | **Elixir** | Elixir | OpenAPI'den adapte | 1.0.0 | ✅ hooksniff-elixir | Hex.pm | ✅ Yüklendi |
