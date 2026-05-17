@@ -9,6 +9,7 @@ pub use crate::models::*;
 
 mod authentication;
 mod endpoint;
+mod environment;
 mod event_type;
 mod health;
 mod message;
@@ -21,6 +22,7 @@ pub use self::{
         Endpoint, EndpointCreateOptions, EndpointListOptions,
         EndpointRotateSecretOptions, EndpointSendExampleOptions,
     },
+    environment::Environment,
     event_type::{
         EventType, EventTypeCreateOptions, EventTypeDeleteOptions, EventTypeImportOpenapiOptions,
         EventTypeListOptions,
@@ -44,6 +46,10 @@ impl HookSniff {
 
     pub fn endpoint(&self) -> Endpoint<'_> {
         Endpoint::new(&self.cfg)
+    }
+
+    pub fn environment(&self) -> Environment<'_> {
+        Environment::new(&self.cfg)
     }
 
     pub fn event_type(&self) -> EventType<'_> {

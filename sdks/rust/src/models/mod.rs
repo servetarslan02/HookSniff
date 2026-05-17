@@ -21,6 +21,7 @@ pub mod docusign_config_out;
 pub mod easypost_config;
 pub mod easypost_config_out;
 pub mod empty_response;
+pub mod environment;
 pub mod endpoint_created_event;
 pub mod endpoint_created_event_data;
 pub mod endpoint_deleted_event;
