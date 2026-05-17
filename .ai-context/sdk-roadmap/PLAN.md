@@ -54,7 +54,7 @@ Neden?
 | 0.4 | Rust SDK — Svix'ten doğrudan | ✅ |
 | 0.5 | Ruby SDK — Svix'ten adapte | ✅ |
 | 0.6 | Java SDK — Svix'ten adapte | ✅ |
-| 0.7 | Kotlin SDK — Svix'ten adapte | ⬜ |
+| 0.7 | Kotlin SDK — Svix'ten adapte | ✅ |
 | 0.8 | PHP SDK — Svix'ten adapte | ⬜ |
 | 0.9 | C# SDK — Svix'ten adapte | ⬜ |
 | 0.10 | Swift SDK — Svix'ten adapte | ⬜ |
