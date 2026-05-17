@@ -426,3 +426,41 @@ mod tests {
         assert_eq!(json["amount"], 29.0);
     }
 }
+
+    #[test]
+    fn test_recent_signup_serialization() {
+        let signup = RecentSignup {
+            id: uuid::Uuid::new_v4(),
+            email: "new@user.com".to_string(),
+            name: Some("New User".to_string()),
+            plan: "developer".to_string(),
+            created_at: chrono::Utc::now(),
+        };
+        let json = serde_json::to_value(&signup).unwrap();
+        assert_eq!(json["email"], "new@user.com");
+        assert_eq!(json["plan"], "developer");
+    }
+
+    #[test]
+    fn test_revenue_by_plan_serialization() {
+        let rbp = RevenueByPlan {
+            plan: "pro".to_string(),
+            revenue: 580.0,
+            count: 20,
+        };
+        let json = serde_json::to_value(&rbp).unwrap();
+        assert_eq!(json["plan"], "pro");
+        assert_eq!(json["revenue"], 580.0);
+        assert_eq!(json["count"], 20);
+    }
+
+    #[test]
+    fn test_revenue_row_serialization() {
+        let row = RevenueRow {
+            month: "2024-01".to_string(),
+            revenue: 5000.0,
+        };
+        let json = serde_json::to_value(&row).unwrap();
+        assert_eq!(json["month"], "2024-01");
+        assert_eq!(json["revenue"], 5000.0);
+    }
