@@ -277,29 +277,7 @@ async fn create_webhook(
     let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
     // Atomic check-and-increment: reserve webhook slot before creating delivery
-    // If allow_overage is true (never-blocked mode), always allow; otherwise block at limit
-    let updated: Option<Customer> = if customer.allow_overage {
-        // Never-blocked: always increment, no cap
-        sqlx::query_as(
-            "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 RETURNING *",
-        )
-        .bind(customer.id)
-        .fetch_optional(&pool)
-        .await?
-    } else {
-        // Standard: block at limit
-        sqlx::query_as(
-            "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
-        )
-        .bind(customer.id)
-        .bind(customer.webhook_limit)
-        .fetch_optional(&pool)
-        .await?
-    };
-
-    if updated.is_none() {
-        return Err(AppError::RateLimitExceeded);
-    }
+    reserve_webhook_slot(&pool, &customer, 1).await?;
 
     let delivery = sqlx::query_as::<_, Delivery>(
         "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) VALUES ($1, $2, $3, $4, 'pending', $5, $6) RETURNING *",
@@ -392,28 +370,7 @@ async fn batch_webhooks(
 
     // Atomic check-and-increment for batch: reserve slots for all webhooks in the batch
     let batch_count = req.webhooks.len() as i64;
-    let updated: Option<Customer> = if customer.allow_overage {
-        sqlx::query_as(
-            "UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 RETURNING *",
-        )
-        .bind(batch_count)
-        .bind(customer.id)
-        .fetch_optional(&pool)
-        .await?
-    } else {
-        sqlx::query_as(
-            "UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 AND webhook_count + $1 <= $3 RETURNING *",
-        )
-        .bind(batch_count)
-        .bind(customer.id)
-        .bind(customer.webhook_limit)
-        .fetch_optional(&pool)
-        .await?
-    };
-
-    if updated.is_none() {
-        return Err(AppError::RateLimitExceeded);
-    }
+    reserve_webhook_slot(&pool, &customer, batch_count).await?;
 
     // Collect unique endpoint IDs and fetch all in one query (eliminates N+1)
     let endpoint_ids: Vec<Uuid> = req
@@ -597,26 +554,7 @@ async fn replay_webhook(
         serde_json::to_string(&original.payload).map_err(|e| AppError::Internal(e.into()))?;
 
     // Atomic check-and-increment: reserve webhook slot before creating replay delivery
-    let updated: Option<Customer> = if customer.allow_overage {
-        sqlx::query_as(
-            "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 RETURNING *",
-        )
-        .bind(customer.id)
-        .fetch_optional(&pool)
-        .await?
-    } else {
-        sqlx::query_as(
-            "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
-        )
-        .bind(customer.id)
-        .bind(customer.webhook_limit)
-        .fetch_optional(&pool)
-        .await?
-    };
-
-    if updated.is_none() {
-        return Err(AppError::RateLimitExceeded);
-    }
+    reserve_webhook_slot(&pool, &customer, 1).await?;
 
     let new_delivery = sqlx::query_as::<_, Delivery>(
         "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, replay_count) VALUES ($1, $2, $3, $4, 'pending', $5, 1) RETURNING *",
@@ -741,24 +679,7 @@ async fn batch_replay(
         };
 
         // Rate limit check — never-blocked mode support
-        let updated: Option<Customer> = if customer.allow_overage {
-            sqlx::query_as(
-                "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 RETURNING *",
-            )
-            .bind(customer.id)
-            .fetch_optional(&pool)
-            .await?
-        } else {
-            sqlx::query_as(
-                "UPDATE customers SET webhook_count = webhook_count + 1 WHERE id = $1 AND webhook_count < $2 RETURNING *",
-            )
-            .bind(customer.id)
-            .bind(customer.webhook_limit)
-            .fetch_optional(&pool)
-            .await?
-        };
-
-        if updated.is_none() {
+        if reserve_webhook_slot(&pool, &customer, 1).await.is_err() {
             errors.push(serde_json::json!({ "id": id, "error": "Rate limit exceeded" }));
             continue;
         }
@@ -803,31 +724,36 @@ async fn batch_replay(
     })))
 }
 
-fn parse_date_from_str(s: &str) -> Option<DateTime<Utc>> {
+/// Atomically increment webhook_count with overage support.
+/// Returns Err if the customer is at their limit (and overage is not allowed).
+async fn reserve_webhook_slot(
+    pool: &PgPool,
+    customer: &Customer,
+    count: i64,
+) -> Result<(), AppError> {
+    let updated: Option<Customer> = if customer.allow_overage {
+        sqlx::query_as("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 RETURNING *")
+            .bind(count).bind(customer.id).fetch_optional(pool).await?
+    } else {
+        sqlx::query_as("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 AND webhook_count + $1 <= $3 RETURNING *")
+            .bind(count).bind(customer.id).bind(customer.webhook_limit).fetch_optional(pool).await?
+    };
+    if updated.is_none() { Err(AppError::RateLimitExceeded) } else { Ok(()) }
+}
+
+/// Parse a date string (ISO datetime or date-only) with configurable time default.
+fn parse_date_str(s: &str, default_hms: (u32, u32, u32)) -> Option<DateTime<Utc>> {
     if let Ok(dt) = NaiveDateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S") {
         Some(DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc))
     } else if let Ok(d) = NaiveDate::parse_from_str(s, "%Y-%m-%d") {
-        Some(DateTime::<Utc>::from_naive_utc_and_offset(
-            d.and_hms_opt(0, 0, 0)?,
-            Utc,
-        ))
+        Some(DateTime::<Utc>::from_naive_utc_and_offset(d.and_hms_opt(default_hms.0, default_hms.1, default_hms.2)?, Utc))
     } else {
         None
     }
 }
 
-fn parse_date_to_str(s: &str) -> Option<DateTime<Utc>> {
-    if let Ok(dt) = NaiveDateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S") {
-        Some(DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc))
-    } else if let Ok(d) = NaiveDate::parse_from_str(s, "%Y-%m-%d") {
-        Some(DateTime::<Utc>::from_naive_utc_and_offset(
-            d.and_hms_opt(23, 59, 59)?,
-            Utc,
-        ))
-    } else {
-        None
-    }
-}
+fn parse_date_from_str(s: &str) -> Option<DateTime<Utc>> { parse_date_str(s, (0, 0, 0)) }
+fn parse_date_to_str(s: &str) -> Option<DateTime<Utc>> { parse_date_str(s, (23, 59, 59)) }
 
 async fn export_deliveries(
     Extension(pool): Extension<PgPool>,
