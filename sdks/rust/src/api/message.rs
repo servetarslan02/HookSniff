@@ -1,5 +1,4 @@
 // this file is @generated
-use super::MessagePoller;
 use crate::{error::Result, models::*, Configuration};
 
 #[derive(Default)]
@@ -66,8 +65,6 @@ impl<'a> Message<'a> {
         Self { cfg }
     }
 
-    pub fn poller(&self) -> MessagePoller<'a> {
-        MessagePoller::new(self.cfg)
     }
 
     /// List all of the application's messages.

@@ -11,13 +11,11 @@ import (
 
 type Message struct {
 	client *internal.HookSniffHttpClient
-	Poller *MessagePoller
 }
 
 func newMessage(client *internal.HookSniffHttpClient) *Message {
 	return &Message{
 		client: client,
-		Poller: newMessagePoller(client),
 	}
 }
 

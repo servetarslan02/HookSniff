@@ -5,7 +5,6 @@ use std::str::FromStr;
 use serde_json::json;
 
 use crate::{
-    api::{ConnectorProduct, MessageStatus, Ordering, StatusCodeClass},
     models::MessageIn,
 };
 
@@ -46,16 +45,12 @@ impl MessageIn {
 
 #[derive(Debug, thiserror::Error)]
 #[error("invalid value for productType")]
-pub struct ConnectorProductFromStrError;
 
-impl FromStr for ConnectorProduct {
-    type Err = ConnectorProductFromStrError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "Dispatch" => Ok(Self::Dispatch),
             "Stream" => Ok(Self::Stream),
-            _ => Err(ConnectorProductFromStrError),
         }
     }
 }

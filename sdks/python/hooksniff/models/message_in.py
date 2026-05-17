@@ -2,12 +2,10 @@
 import typing as t
 from datetime import datetime
 
-from .application_in import ApplicationIn
 from .common import BaseModel
 
 
 class MessageIn(BaseModel):
-    application: t.Optional[ApplicationIn] = None
     """Optionally creates a new application alongside the message.
 
     If the application id or uid that is used in the path already exists, this argument is ignored."""
