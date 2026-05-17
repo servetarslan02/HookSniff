@@ -30,6 +30,33 @@ pub struct UpdateApplicationRequest {
     pub is_active: Option<bool>,
 }
 
+/// Row type for queries that JOIN endpoint counts in a single query.
+#[derive(Debug, sqlx::FromRow)]
+pub struct ApplicationWithCount {
+    pub id: Uuid,
+    pub customer_id: Uuid,
+    pub name: String,
+    pub description: Option<String>,
+    pub is_active: bool,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub endpoint_count: i64,
+}
+
+impl ApplicationWithCount {
+    pub fn to_response(self) -> ApplicationResponse {
+        ApplicationResponse {
+            id: self.id,
+            name: self.name,
+            description: self.description,
+            is_active: self.is_active,
+            created_at: self.created_at,
+            updated_at: self.updated_at,
+            endpoint_count: self.endpoint_count,
+        }
+    }
+}
+
 /// API response shape for an application.
 #[derive(Debug, Serialize)]
 pub struct ApplicationResponse {
