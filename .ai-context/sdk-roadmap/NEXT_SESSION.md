@@ -21,10 +21,10 @@ cat .ai-context/sdk-roadmap/MEMORY.md
 5. Publish et:
    ```bash
    export JAVA_HOME=/opt/jdk-17.0.12
-   GPG_KEY=$(gpg --export-secret-keys --armor 5F815C019784733D)
+   GPG_KEY=$(gpg --export-secret-keys --armor [REDACTED])
    ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository \
-     -PNEXUS_USERNAME=f0wXBf \
-     -PNEXUS_PASSWORD='EYLV763IsQVseaffdOXNScf2HZlcLDGEK' \
+     -PNEXUS_USERNAME=[REDACTED] \
+     -PNEXUS_PASSWORD='[REDACTED]' \
      -PsigningKey="$GPG_KEY" \
      -PsigningPassword=""
    ```

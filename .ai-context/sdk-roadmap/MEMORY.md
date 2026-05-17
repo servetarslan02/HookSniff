@@ -56,10 +56,10 @@
 8. Publish et (Java ile aynı GPG key + Sonatype credentials):
    ```bash
    export JAVA_HOME=/opt/jdk-17.0.12
-   GPG_KEY=$(gpg --export-secret-keys --armor 5F815C019784733D)
+   GPG_KEY=$(gpg --export-secret-keys --armor [REDACTED])
    ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository \
-     -PNEXUS_USERNAME=f0wXBf \
-     -PNEXUS_PASSWORD='EYLV763IsQVseaffdOXNScf2HZlcLDGEK' \
+     -PNEXUS_USERNAME=[REDACTED] \
+     -PNEXUS_PASSWORD='[REDACTED]' \
      -PsigningKey="$GPG_KEY" \
      -PsigningPassword=""
    ```
@@ -69,15 +69,15 @@
 
 | Registry | Token | Durum |
 |----------|-------|-------|
-| npm | `npm_yKNX...` | ✅ Kullanıldı |
-| PyPI | `pypi-AgEI...` | ✅ Kullanıldı |
-| crates.io | `ciozq2VZ...` | ✅ Kullanıldı |
-| RubyGems | `rubygems_6dcd...` | ✅ Kullanıldı |
-| NuGet | `oy2eyxl...` | ✅ Kullanıldı |
-| Hex.pm | `caff9417...` | ✅ Kullanıldı |
+| npm | `[REDACTED]` | ✅ Kullanıldı |
+| PyPI | `[REDACTED]` | ✅ Kullanıldı |
+| crates.io | `[REDACTED]` | ✅ Kullanıldı |
+| RubyGems | `[REDACTED]` | ✅ Kullanıldı |
+| NuGet | `[REDACTED]` | ✅ Kullanıldı |
+| Hex.pm | `[REDACTED]` | ✅ Kullanıldı |
 | Packagist | `86b49ac...` | ✅ Kullanıldı |
-| Maven Central | `f0wXBf` / `EYLV763...` | ✅ Kullanıldı |
-| GPG Key ID | `5F815C019784733D` | ✅ Keyserver'a yüklendi |
+| Maven Central | `[REDACTED]` / `EYLV763...` | ✅ Kullanıldı |
+| GPG Key ID | `[REDACTED]` | ✅ Keyserver'a yüklendi |
 
 ## 📂 Ayrı Repo Yapısı (Tüm SDK'lar)
 
@@ -126,4 +126,4 @@
 - Elixir: `/opt/elixir/bin` (v1.18.3)
 - Erlang: `/snap/bin` (snap install erlang --classic)
 - dotnet: `/snap/bin` (snap install dotnet-sdk --classic)
-- GPG key: `5F815C019784733D` (HookSniff <support@hooksniff.com>)
+- GPG key: `[REDACTED]` (HookSniff <support@hooksniff.com>)
