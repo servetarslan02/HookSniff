@@ -302,8 +302,11 @@ export default function SdksPage() {
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('sdks')}</h1>
-      <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Official SDKs for 8 languages. Install via your package manager and start sending webhooks in seconds.
+      <p className="text-lg text-gray-600 dark:text-slate-400 mb-2">
+        Writing raw HTTP requests is tedious and error-prone. SDKs handle authentication, serialization, and error handling so you can focus on your business logic.
+      </p>
+      <p className="text-gray-600 dark:text-slate-400 mb-8">
+        HookSniff provides official SDKs for 11 languages. Each SDK wraps the REST API with type-safe methods and built-in signature verification.
       </p>
 
       {sdks.map((sdk) => (
