@@ -552,6 +552,9 @@ impl PaymentProviderImpl for PolarProvider {
         Ok(())
     }
 
+}
+
+impl PolarProvider {
     /// Update a Polar product's price via API.
     pub async fn update_product_price(
         &self,
