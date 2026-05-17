@@ -27,7 +27,7 @@ export function SignatureCard({
     setRotating(true);
     try {
       const data = await endpointsApi.rotateSecret(token, endpointId);
-      setNewSecret(data.secret);
+      setNewSecret(data.signing_secret);
       toast(t('toastSecretRotated'), 'success');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('toastRotationFailed');
