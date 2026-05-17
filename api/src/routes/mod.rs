@@ -15,6 +15,7 @@ pub mod devices;
 pub mod docs;
 pub mod embed;
 pub mod endpoints;
+pub mod environments;
 pub mod events;
 pub mod health;
 pub mod health_endpoints;
@@ -66,6 +67,7 @@ pub fn api_router() -> Router {
         .nest("/applications", applications::router())
         .nest("/outbound-ips", outbound_ips::router())
         .nest("/endpoints", endpoints::router())
+        .nest("/environments", environments::router())
         .nest("/endpoints/{endpoint_id}/transforms", transforms::router())
         .nest("/stream", stream::router())
         .nest("/events", events::router())
@@ -168,5 +170,6 @@ mod tests {
         let _ = rate_limits::router();
         let _ = portal_config::router();
         let _ = oauth::router();
+        let _ = environments::router();
     }
 }
