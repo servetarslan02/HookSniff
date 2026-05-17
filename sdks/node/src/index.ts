@@ -5,6 +5,7 @@ import { Health } from "./api/health";
 import { Message } from "./api/message";
 import { MessageAttempt } from "./api/messageAttempt";
 import { Statistics } from "./api/statistics";
+import { subscribeToStream, type StreamOptions, type StreamSubscription } from "./stream";
 import type { HookSniffRequestContext } from "./request";
 
 export { type PostOptions, ApiException } from "./util";
@@ -27,6 +28,7 @@ export {
 } from "./errors";
 export * from "./webhook";
 export * from "./webhook-events";
+export * from "./stream";
 export * from "./models/index";
 
 export type { EndpointListOptions } from "./api/endpoint";
@@ -99,5 +101,22 @@ export class HookSniff {
 
   public get statistics() {
     return new Statistics(this.requestCtx);
+  }
+
+  /**
+   * Subscribe to real-time events via Server-Sent Events (SSE).
+   *
+   * @example
+   * ```ts
+   * const sub = hs.stream({
+   *   eventTypes: ["order.created"],
+   *   onEvent: (event) => console.log(event),
+   * });
+   *
+   * // Later: sub.close();
+   * ```
+   */
+  public stream(options: StreamOptions): StreamSubscription {
+    return subscribeToStream(this.requestCtx, options);
   }
 }
