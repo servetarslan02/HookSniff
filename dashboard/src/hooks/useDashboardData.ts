@@ -21,6 +21,8 @@ import {
   DeliveryTrendSchema,
   SuccessRateSchema,
   BillingUsageSchema,
+  BillingSubscriptionSchema,
+  OverageSettingsSchema,
   InvoiceSchema,
   ApplicationSchema,
   TransformRuleSchema,
@@ -39,6 +41,8 @@ import {
   TemplateListSchema,
   type EndpointValidated,
   type BillingUsageValidated,
+  type BillingSubscriptionValidated,
+  type OverageSettingsValidated,
   type InvoiceValidated,
   type ApplicationValidated,
   type TransformRuleValidated,
@@ -205,6 +209,28 @@ export function useBillingInvoices() {
   return useQuery<InvoiceValidated[]>({
     queryKey: ['billing', 'invoices'],
     queryFn: validated(() => billingApiExtended.getInvoices(token!), InvoiceSchema.array()),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+}
+
+// ── Billing Subscription ──
+export function useBillingSubscription() {
+  const { token } = useAuth();
+  return useQuery<BillingSubscriptionValidated>({
+    queryKey: ['billing', 'subscription'],
+    queryFn: validated(() => billingApiExtended.getSubscription(token!), BillingSubscriptionSchema),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+}
+
+// ── Overage Settings ──
+export function useOverageSettings() {
+  const { token } = useAuth();
+  return useQuery<OverageSettingsValidated>({
+    queryKey: ['billing', 'overage'],
+    queryFn: validated(() => billingApiExtended.getOverageSettings(token!), OverageSettingsSchema),
     enabled: !!token,
     staleTime: 60_000,
   });
