@@ -27,7 +27,7 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
   const { toast } = useToast();
   const t = useTranslations('billing');
   const tc = useTranslations('common');
-  const { data: sub, isLoading } = useBillingSubscription();
+  const { data: sub, isLoading, error } = useBillingSubscription();
   const [openingPortal, setOpeningPortal] = useState(false);
 
   const handleOpenPortal = async () => {
@@ -53,6 +53,19 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
           <div className="h-4 w-64 bg-gray-200 dark:bg-slate-700 rounded" />
           <div className="h-4 w-48 bg-gray-200 dark:bg-slate-700 rounded" />
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="glass-card p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          {t('subscriptionDetails')}
+        </h2>
+        <p className="text-sm text-red-600 dark:text-red-400">
+          {tc('unknownError')}
+        </p>
       </div>
     );
   }
