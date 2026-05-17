@@ -1178,8 +1178,35 @@ export interface BillingUsage {
 export interface BillingSubscription {
   plan: string;
   status: string;
+  payment_provider: string;
+  stripe_subscription_id?: string;
+  polar_subscription_id?: string;
+  iyzico_subscription_id?: string;
+  webhook_limit: number;
+  endpoint_limit: number;
+  retention_days: number;
+  monthly_price_cents: number;
+  cancel_at_period_end: boolean;
+  billing_period: string;
   current_period_end?: string;
-  cancel_at_period_end?: boolean;
+}
+
+export interface OverageSettings {
+  allow_overage: boolean;
+  overage_email_notification: boolean;
+  plan: string;
+  daily_limit: number;
+  overage_price: number;
+}
+
+export interface PortalResponse {
+  url: string;
+  provider: string;
+}
+
+export interface RefundResponse {
+  message: string;
+  status: string;
 }
 
 // Extended Billing API
@@ -1195,6 +1222,18 @@ export const billingApiExtended = {
 
   getInvoices: (token: string) =>
     apiFetch<Invoice[]>('/billing/invoices', { token }),
+
+  openPortal: (token: string) =>
+    apiFetch<PortalResponse>('/billing/portal', { method: 'POST', token }),
+
+  requestRefund: (token: string, reason: string) =>
+    apiFetch<RefundResponse>('/billing/refund', { method: 'POST', body: { reason }, token }),
+
+  getOverageSettings: (token?: string) =>
+    apiFetch<OverageSettings>('/billing/settings', { token }),
+
+  updateOverageSettings: (token: string, data: { allow_overage?: boolean; overage_email_notification?: boolean }) =>
+    apiFetch<OverageSettings>('/billing/settings', { method: 'PUT', body: data, token }),
 };
 
 // Analytics API
