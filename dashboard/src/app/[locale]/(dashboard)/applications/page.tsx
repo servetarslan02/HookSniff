@@ -9,6 +9,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { useApplications } from '@/hooks/useDashboardData';
 import { useQueryClient } from '@tanstack/react-query';
+import { LazySection, Skeletons } from '@/components/LazySection';
 
 /* ─── Hook0-style: Application card grid ─── */
 
@@ -239,6 +240,7 @@ export default function ApplicationsPage() {
       )}
 
       {/* ── Card Grid ── */}
+      <LazySection fallback={Skeletons.card} rootMargin={300}>
       {filteredApps.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 px-5 py-16 text-center">
           <div className="text-4xl mb-3">📱</div>
@@ -344,6 +346,7 @@ export default function ApplicationsPage() {
           })}
         </div>
       )}
+      </LazySection>
 
       {/* ── Edit Modal ── */}
       {editApp && (

@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { LazySection, Skeletons } from '@/components/LazySection';
 
 export default function EndpointsPage() {
   const { token } = useAuth();
@@ -224,6 +225,7 @@ export default function EndpointsPage() {
         </div>
       )}
 
+      <LazySection fallback={Skeletons.table()} rootMargin={300}>
       {endpoints.length === 0 ? (
         <div className="glass-card p-12 text-center text-gray-500 dark:text-slate-500">
           {t('noEndpointsYet')}
@@ -330,6 +332,7 @@ export default function EndpointsPage() {
         </div>
         </>
       )}
+      </LazySection>
       <ConfirmDialog
         open={!!deleteId}
         title={t('deleteTitle')}

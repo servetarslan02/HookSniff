@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { StatusBadge } from '@/components/StatusBadge';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
+import { LazySection, Skeletons } from '@/components/LazySection';
 import { useTranslations, useLocale } from 'next-intl';
 import {
   useAdminUserDetail,
@@ -541,6 +542,7 @@ export default function AdminUserDetailPage() {
 
       {/* Plan History */}
       {planHistory.length > 0 && (
+        <LazySection fallback={Skeletons.card} rootMargin={300}>
         <div className="glass-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📋 {t("planHistory") || "Plan History"}</h2>
@@ -565,9 +567,11 @@ export default function AdminUserDetailPage() {
             ))}
           </div>
         </div>
+        </LazySection>
       )}
 
       {/* Recent Deliveries */}
+      <LazySection fallback={Skeletons.table()} rootMargin={300}>
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("recentDeliveries")}</h2>
@@ -628,9 +632,11 @@ export default function AdminUserDetailPage() {
           </div>
         )}
       </div>
+      </LazySection>
 
       {/* Customer Analytics Charts */}
       {analytics && (
+        <LazySection fallback={Skeletons.chart} rootMargin={300}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Daily Deliveries Chart */}
           <div className="glass-card p-6">
@@ -715,11 +721,13 @@ export default function AdminUserDetailPage() {
             </div>
           </div>
         </div>
+        </LazySection>
       )}
       </>)}
 
       {/* ═══ TAB: Endpoints ═══ */}
       {activeTab === "endpoints" && (
+        <LazySection fallback={Skeletons.table()} rootMargin={300}>
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">🔗 {t("endpoints") || "Endpoints"}</h2>
           {userEndpoints.length > 0 ? (
@@ -751,10 +759,12 @@ export default function AdminUserDetailPage() {
             <p className="text-sm text-gray-500 dark:text-slate-400">{t("noEndpoints") || "No endpoints"}</p>
           )}
         </div>
+        </LazySection>
       )}
 
       {/* ═══ TAB: Webhooks ═══ */}
       {activeTab === "webhooks" && (
+        <LazySection fallback={Skeletons.table()} rootMargin={300}>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📦 {t("webhooks") || "Webhooks"}</h2>
@@ -808,10 +818,12 @@ export default function AdminUserDetailPage() {
             <p className="text-sm text-gray-500 dark:text-slate-400">{t("noDeliveries") || "No deliveries"}</p>
           )}
         </div>
+        </LazySection>
       )}
 
       {/* ═══ TAB: API Keys ═══ */}
       {activeTab === "apikeys" && (
+        <LazySection fallback={Skeletons.card} rootMargin={300}>
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">🔑 {t("apiKeys") || "API Keys"}</h2>
           {userApiKeys.length > 0 ? (
@@ -833,10 +845,12 @@ export default function AdminUserDetailPage() {
             <p className="text-sm text-gray-500 dark:text-slate-400">{t("noApiKeys") || "No API keys"}</p>
           )}
         </div>
+        </LazySection>
       )}
 
       {/* ═══ TAB: Applications ═══ */}
       {activeTab === "applications" && (
+        <LazySection fallback={Skeletons.card} rootMargin={300}>
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📱 {t("applications") || "Applications"}</h2>
           {userApps.length > 0 ? (
@@ -856,10 +870,12 @@ export default function AdminUserDetailPage() {
             <p className="text-sm text-gray-500 dark:text-slate-400">{t("noApplications") || "No applications"}</p>
           )}
         </div>
+        </LazySection>
       )}
 
       {/* ═══ TAB: Usage ═══ */}
       {activeTab === "usage" && userUsage && (
+        <LazySection fallback={Skeletons.chart} rootMargin={300}>
         <div className="space-y-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📈 {t("usageStats") || "Usage Statistics"}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -891,10 +907,12 @@ export default function AdminUserDetailPage() {
             </div>
           </div>
         </div>
+        </LazySection>
       )}
 
       {/* ═══ TAB: Notes & Tags ═══ */}
       {activeTab === "notes" && (
+        <LazySection fallback={Skeletons.card} rootMargin={300}>
         <div className="space-y-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📝 {t("notesAndTags") || "Notes & Tags"}</h2>
 
@@ -982,10 +1000,12 @@ export default function AdminUserDetailPage() {
             </div>
           </div>
         </div>
+        </LazySection>
       )}
 
       {/* ═══ TAB: Communications ═══ */}
       {activeTab === "communications" && (
+        <LazySection fallback={Skeletons.table()} rootMargin={300}>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💬 {t("communications") || "Communication History"}</h2>
@@ -1051,10 +1071,12 @@ export default function AdminUserDetailPage() {
             </div>
           )}
         </div>
+        </LazySection>
       )}
 
       {/* ═══ TAB: Billing (Invoices + Payments + Refunds) ═══ */}
       {activeTab === "billing" && (
+        <LazySection fallback={Skeletons.table()} rootMargin={300}>
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💰 {t("billing") || "Billing"}</h2>
@@ -1227,6 +1249,7 @@ export default function AdminUserDetailPage() {
             </div>
           </div>
         </div>
+        </LazySection>
       )}
 
       {/* Ban Reason Modal */}

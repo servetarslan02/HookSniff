@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { LazySection, Skeletons } from '@/components/LazySection';
 
 /* ─── Application Detail — endpoint yönetimi ile birlikte ─── */
 
@@ -221,6 +222,7 @@ export default function ApplicationDetailPage() {
       </div>
 
       {/* ── Endpoints Section ── */}
+      <LazySection fallback={Skeletons.card} rootMargin={300}>
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -435,6 +437,7 @@ export default function ApplicationDetailPage() {
           </div>
         )}
       </div>
+      </LazySection>
 
       {/* ── Confirm Delete Dialog ── */}
       <ConfirmDialog
