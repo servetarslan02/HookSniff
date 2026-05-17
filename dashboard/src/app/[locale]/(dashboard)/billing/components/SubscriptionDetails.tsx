@@ -15,7 +15,7 @@ const PROVIDER_LABELS: Record<string, { name: string; icon: string }> = {
   iyzico: { name: 'iyzico', icon: '🟡' },
 };
 
-function getCardIcon(brand?: string): string {
+function getCardIcon(brand?: string | null): string {
   switch (brand?.toLowerCase()) {
     case 'visa': return '💳';
     case 'mastercard': return '💳';
