@@ -491,16 +491,16 @@ export const BillingSubscriptionSchema = z.object({
   plan: z.string(),
   status: z.string(),
   payment_provider: z.string(),
-  stripe_subscription_id: z.string().optional(),
-  polar_subscription_id: z.string().optional(),
-  iyzico_subscription_id: z.string().optional(),
+  stripe_subscription_id: z.string().nullish(),
+  polar_subscription_id: z.string().nullish(),
+  iyzico_subscription_id: z.string().nullish(),
   webhook_limit: z.number(),
   endpoint_limit: z.number(),
   retention_days: z.number(),
   monthly_price_cents: z.number(),
   cancel_at_period_end: z.boolean(),
   billing_period: z.string(),
-  current_period_end: z.string().optional(),
+  current_period_end: z.string().nullish(),
 });
 export type BillingSubscriptionValidated = z.infer<typeof BillingSubscriptionSchema>;
 
