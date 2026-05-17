@@ -35,6 +35,7 @@ type (
 		OperationalWebhook *OperationalWebhook
 		MessagePoller *MessagePoller
 		Inbound *Inbound
+		Connector *ConnectorApi
 	}
 )
 
@@ -76,6 +77,7 @@ func New(token string, options *HookSniffOptions) (*HookSniff, error) {
 		OperationalWebhook: newOperationalWebhook(&hooksniffHttpClient),
 		MessagePoller: newMessagePoller(&hooksniffHttpClient),
 		Inbound: newInbound(&hooksniffHttpClient),
+		Connector: newConnectorApi(&hooksniffHttpClient),
 	}
 	return &hs, nil
 }

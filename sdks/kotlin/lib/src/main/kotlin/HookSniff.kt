@@ -16,6 +16,7 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
     val operationalWebhook: OperationalWebhook
     val messagePoller: MessagePoller
     val inbound: Inbound
+    val connector: Connector
 
     init {
         if (options.baseUrl == null) {
@@ -37,5 +38,6 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
         operationalWebhook = OperationalWebhook(httpClient)
         messagePoller = MessagePoller(httpClient)
         inbound = Inbound(httpClient)
+        connector = Connector(httpClient)
     }
 }

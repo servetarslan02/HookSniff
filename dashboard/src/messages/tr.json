@@ -197,7 +197,8 @@
     "backgroundTasks": "Arka Plan Görevleri",
     "operationalWebhooks": "Operasyonel Webhooklar",
     "messagePoller": "Mesaj Yoklayıcı",
-    "inboundWebhooks": "Gelen Webhooklar"
+    "inboundWebhooks": "Gelen Webhooklar",
+    "connectors": "Bağlayıcılar"
   },
   "dashboard": {
     "title": "Dashboard",
