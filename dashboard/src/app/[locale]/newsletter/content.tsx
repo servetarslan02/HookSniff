@@ -8,29 +8,29 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 
 
-/* ─── Sample Past Issues ─── */
+/* ─── Upcoming Topics ─── */
 
 const pastIssues = [
   {
     title: 'Webhook Retry Strategies: Exponential Backoff vs Linear',
-    date: '2026-05-03',
+    date: 'Coming soon',
     category: 'Engineering',
     excerpt: 'Deep dive into retry strategies, jitter, and why exponential backoff with jitter beats linear every time.',
     slug: 'webhook-retry-strategies',
   },
   {
     title: 'How Stripe Processes 100M+ Webhooks Per Day',
-    date: '2026-04-26',
+    date: 'Coming soon',
     category: 'Industry',
     excerpt: 'Architecture analysis of Stripe\'s webhook infrastructure and lessons for your own system.',
     slug: 'stripe-webhook-architecture',
   },
   {
-    title: 'HookSniff v0.4.0: All 11 SDKs Published',
-    date: '2026-04-19',
-    category: 'Product',
-    excerpt: 'Node.js, Python, Rust, Go, Java, Kotlin, PHP, C#, Elixir, Swift, Ruby — all on their package managers.',
-    slug: 'v0-4-0-sdks',
+    title: 'Building FIFO Webhook Delivery with PostgreSQL',
+    date: 'Coming soon',
+    category: 'Engineering',
+    excerpt: 'How we used PostgreSQL LISTEN/NOTIFY to build ordered webhook delivery without external message queues.',
+    slug: 'fifo-webhook-delivery',
   },
 ];
 
@@ -191,7 +191,7 @@ export function NewsletterPageContent() {
 
         {/* Past Issues */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">{t("recentIssues")}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Upcoming topics</h2>
 
           {/* Category Filter */}
           <div className="flex flex-wrap gap-2 mb-6 justify-center">
@@ -248,49 +248,42 @@ export function NewsletterPageContent() {
         <div className="mb-16 text-center">
           <div className="inline-flex items-center gap-6 px-8 py-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">500+</p>
-              <p className="text-xs text-gray-500 dark:text-slate-500">{t("subscribers")}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">New</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500">{t("subscribers") || 'Newsletter'}</p>
             </div>
             <div className="w-px h-10 bg-gray-200 dark:bg-slate-800" />
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">48%</p>
-              <p className="text-xs text-gray-500 dark:text-slate-500">{t("openRate")}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">Weekly</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500">{t("openRate") || 'Frequency'}</p>
             </div>
             <div className="w-px h-10 bg-gray-200 dark:border-slate-700" />
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">17</p>
-              <p className="text-xs text-gray-500 dark:text-slate-500">{t("issuesSent")}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">Free</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500">{t("issuesSent") || 'Forever'}</p>
             </div>
           </div>
         </div>
 
-        {/* Testimonials */}
+        {/* What to Expect */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">{t("whatSubscribersSay")}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">What to expect</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {[
               {
-                quote: 'Finally, a webhook newsletter that goes beyond product announcements. The engineering deep dives are genuinely useful.',
-                author: 'Alex K.',
-                role: 'Backend Engineer',
+                icon: '🔧',
+                title: 'Engineering deep dives',
+                desc: 'Webhook architecture, Rust internals, distributed systems patterns — written for developers who want to understand the how and why.',
               },
               {
-                quote: 'HookSniff\'s changelog emails are the only product updates I actually read. Concise, well-structured, and always relevant.',
-                author: 'Maria S.',
-                role: 'DevOps Lead',
+                icon: '📦',
+                title: 'Product updates',
+                desc: 'New features, SDK releases, and platform improvements. Concise, well-structured, and always relevant to your integration.',
               },
-            ].map((t) => (
-              <div key={t.author} className="p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
-                <p className="text-sm text-gray-700 dark:text-slate-300 italic mb-3">&ldquo;{t.quote}&rdquo;</p>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-xs font-bold text-brand-600 dark:text-brand-400">
-                    {t.author.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-gray-900 dark:text-white">{t.author}</p>
-                    <p className="text-xs text-gray-500 dark:text-slate-500">{t.role}</p>
-                  </div>
-                </div>
+            ].map((item) => (
+              <div key={item.title} className="p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
+                <span className="text-2xl mb-2 block">{item.icon}</span>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-slate-400">{item.desc}</p>
               </div>
             ))}
           </div>
