@@ -178,8 +178,8 @@ export default function AdminRevenuePage() {
     rate_limit_enterprise: settings?.rate_limit_enterprise ?? 5000,
     retention_days_free: settings?.retention_days_free ?? 7,
     retention_days_startup: settings?.retention_days_startup ?? 14,
-    retention_days_pro: settings?.retention_days_pro ?? 30,
-    retention_days_enterprise: settings?.retention_days_enterprise ?? 90,
+    retention_days_pro: settings?.retention_days_pro ?? 180,
+    retention_days_enterprise: settings?.retention_days_enterprise ?? 365,
   });
   const [savingPlans, setSavingPlans] = useState(false);
 
