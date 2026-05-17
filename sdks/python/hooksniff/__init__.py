@@ -1,8 +1,6 @@
 """
 HookSniff Python SDK
 
-Adapted from Svix SDK architecture.
-
 Usage:
     from hooksniff import HookSniff, HookSniffOptions
 
@@ -16,7 +14,22 @@ Usage:
 
 from .api.hooksniff import HookSniff, HookSniffAsync, HookSniffOptions, DEFAULT_SERVER_URL
 from .webhooks import Webhook, WebhookVerificationError
-from .exceptions import HttpError, HTTPValidationError
+from .exceptions import (
+    HookSniffError,
+    BadRequestError,
+    UnauthorizedError,
+    ForbiddenError,
+    NotFoundError,
+    ConflictError,
+    UnprocessableEntityError,
+    RateLimitError,
+    InternalServerError,
+    BadGatewayError,
+    ServiceUnavailableError,
+    GatewayTimeoutError,
+    HttpError,
+    HTTPValidationError,
+)
 
 __version__ = "1.0.0"
 
@@ -27,6 +40,18 @@ __all__ = [
     "DEFAULT_SERVER_URL",
     "Webhook",
     "WebhookVerificationError",
+    "HookSniffError",
+    "BadRequestError",
+    "UnauthorizedError",
+    "ForbiddenError",
+    "NotFoundError",
+    "ConflictError",
+    "UnprocessableEntityError",
+    "RateLimitError",
+    "InternalServerError",
+    "BadGatewayError",
+    "ServiceUnavailableError",
+    "GatewayTimeoutError",
     "HttpError",
     "HTTPValidationError",
 ]

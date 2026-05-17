@@ -9,6 +9,22 @@ import type { HookSniffRequestContext } from "./request";
 
 export { type PostOptions, ApiException } from "./util";
 export { HTTPValidationError, HttpErrorOut, ValidationError } from "./HttpErrors";
+export {
+  HookSniffError,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  UnprocessableEntityError,
+  RateLimitError,
+  InternalServerError,
+  BadGatewayError,
+  ServiceUnavailableError,
+  GatewayTimeoutError,
+  createErrorFromStatus,
+  type ValidationErrorItem,
+} from "./errors";
 export * from "./webhook";
 export * from "./models/index";
 
