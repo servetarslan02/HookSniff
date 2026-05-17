@@ -699,7 +699,9 @@
       "developerLimit": "100 events/day",
       "startupLimit": "30,000 events/day",
       "proLimit": "100,000 events/day",
-      "enterpriseLimit": "Unlimited"
+      "enterpriseLimit": "Unlimited",
+      "freeLimit": "100 events/day",
+      "businessLimit": "Unlimited"
     },
     "features": {
       "deliveries": "{count} deliveries/month",
@@ -2385,12 +2387,12 @@
       "Priority support"
     ],
     "businessFeatures": [
-      "500,000 webhooks/month",
-      "500 endpoints",
-      "10 retry attempts",
+      "Unlimited events",
+      "Unlimited endpoints",
+      "Custom retry attempts",
       "99.9% SLA guarantee",
       "Dedicated support",
-      "90-day log retention",
+      "Custom log retention",
       "Everything in Pro",
       "Schema registry",
       "FIFO delivery",

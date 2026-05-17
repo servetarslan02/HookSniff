@@ -699,7 +699,9 @@
       "developerLimit": "Günlük 100 event",
       "startupLimit": "Günlük 30.000 event",
       "proLimit": "Günlük 100.000 event",
-      "enterpriseLimit": "Sınırsız"
+      "enterpriseLimit": "Sınırsız",
+      "freeLimit": "Günlük 100 event",
+      "businessLimit": "Sınırsız"
     },
     "features": {
       "deliveries": "Ayda {count} teslimat",
@@ -2385,12 +2387,12 @@
       "Öncelikli destek"
     ],
     "businessFeatures": [
-      "Ayda 500.000 webhook",
-      "500 endpoint",
-      "10 yeniden deneme",
+      "Sınırsız event",
+      "Sınırsız endpoint",
+      "Özel yeniden deneme sayısı",
       "%99.9 SLA garantisi",
       "Özel destek",
-      "90 günlük log saklama",
+      "Özel log saklama süresi",
       "Pro'daki her şey",
       "Şema kayıt defteri",
       "FIFO teslimat",
