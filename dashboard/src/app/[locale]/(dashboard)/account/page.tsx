@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { useState, useEffect, type ReactNode } from 'react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -15,6 +16,7 @@ const tabSkeleton = (
   </div>
 );
 
+// Lazy wrappers — only load when the factory is called (tab visited)
 const TeamPage = dynamic(() => import('../team/page'), { ssr: false, loading: () => tabSkeleton });
 const NotificationsPage = dynamic(() => import('../notifications/page'), { ssr: false, loading: () => tabSkeleton });
 const SettingsPage = dynamic(() => import('../settings/page'), { ssr: false, loading: () => tabSkeleton });
@@ -26,10 +28,10 @@ export default function AccountPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'team', label: t('team'), icon: '👥', content: <TeamPage /> },
-        { key: 'notifications', label: t('notifications'), icon: '🔔', content: <NotificationsPage /> },
-        { key: 'settings', label: t('settings'), icon: '⚙️', content: <SettingsPage /> },
-        { key: 'portal', label: t('portal'), icon: '🖼️', content: <PortalManagePage /> },
+        { key: 'team', label: t('team'), icon: '👥', content: () => <TeamPage /> },
+        { key: 'notifications', label: t('notifications'), icon: '🔔', content: () => <NotificationsPage /> },
+        { key: 'settings', label: t('settings'), icon: '⚙️', content: () => <SettingsPage /> },
+        { key: 'profile', label: t('profile') || 'Profil', icon: '🖼️', content: () => <PortalManagePage /> },
       ]}
     />
   );
