@@ -745,7 +745,12 @@
     "mostPopular": "Most Popular",
     "nextBilling": "Next billing date",
     "webhooksThisMonth": "Webhooks this month",
-    "used": "used"
+    "used": "used",
+    "planLimits": "Plan Limits",
+    "endpoints": "Endpoints",
+    "webhooksMonth": "Webhooks/mo",
+    "rateLimit": "Rate/min",
+    "dataRetention": "Data Retention"
   },
   "auth": {
     "login": "Log In",

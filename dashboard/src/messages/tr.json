@@ -745,7 +745,12 @@
     "mostPopular": "En Popüler",
     "nextBilling": "Sonraki fatura tarihi",
     "webhooksThisMonth": "Bu ayki webhook sayısı",
-    "used": "kullanıldı"
+    "used": "kullanıldı",
+    "planLimits": "Plan Limitleri",
+    "endpoints": "Endpoint",
+    "webhooksMonth": "Webhook/ay",
+    "rateLimit": "Hız/dk",
+    "dataRetention": "Veri Saklama"
   },
   "auth": {
     "login": "Giriş Yap",
