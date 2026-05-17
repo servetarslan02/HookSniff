@@ -1,6 +1,6 @@
 # SDK — Yapılacak İşler
 
-> Son güncelleme: 2026-05-18 01:20 GMT+8
+> Son güncelleme: 2026-05-18 01:30 GMT+8
 
 ---
 
@@ -24,8 +24,8 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 | ✅ | Kotlin SDK adapte | Tamamlandı | %75 |
 | ✅ | PHP SDK adapte | Tamamlandı | %80 |
 | ✅ | C# SDK adapte | Tamamlandı | %80 |
-| ⬜ | Swift SDK adapte | Beklemede | — |
-| ⬜ | Elixir SDK adapte | Beklemede | — |
+| ✅ | Swift SDK adapte | Tamamlandı | %80 |
+| ✅ | Elixir SDK adapte | Tamamlandı | %80 |
 | Faz 1 | Core kalite | ⬜ | %85 |
 | Faz 2 | Test suite | ⬜ | %90 |
 | Faz 3 | CI/CD | ⬜ | %92 |

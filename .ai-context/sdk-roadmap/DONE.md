@@ -1,6 +1,37 @@
 # SDK — Tamamlanan İşler
 
-> Son güncelleme: 2026-05-18 01:20 GMT+8
+> Son güncelleme: 2026-05-18 01:30 GMT+8
+
+---
+
+## ✅ Swift SDK — HookSniff Custom — 2026-05-18
+
+### Yöntem
+- Svix repo'sunda Swift SDK bulunmadığı için mevcut HookSniff custom SDK korundu
+- `hooksniff` isimlendirmesi zaten doğru
+- Webhook verification backward-compatible (svix-id header desteği kasıtlı)
+
+### Sonuç
+- ~14 Swift dosyası
+- Custom resource'lar: endpoints, webhooks, auth, analytics, api_keys, alerts, teams, search, billing, health
+- Webhook verification (HMAC-SHA256)
+- Auto-retry + exponential backoff
+- Linux compatibility (FoundationNetworking)
+- Versiyon: 1.0.0
+
+---
+
+## ✅ Elixir SDK — OpenAPI'den Adaptasyon — 2026-05-18
+
+### Yöntem
+- OpenAPI spec'den üretilmiş SDK, HookSniff isimlendirmesi zaten doğru
+- Webhook verification backward-compatible (svix-id header desteği kasıtlı)
+
+### Sonuç
+- 247 dosya
+- Webhook verification (HMAC-SHA256)
+- Auto-retry + exponential backoff
+- Versiyon: 1.0.0
 
 ---
 

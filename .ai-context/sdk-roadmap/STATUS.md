@@ -1,6 +1,6 @@
 # SDK Durum Tablosu
 
-> Son güncelleme: 2026-05-18 01:20 GMT+8
+> Son güncelleme: 2026-05-18 01:30 GMT+8
 
 ## Genel Bakış
 
@@ -15,8 +15,8 @@
 | 7 | **Kotlin** | Kotlin | Svix'ten adapte | 1.0.0 | 131 | 103 | ✅ |
 | 8 | **PHP** | PHP | Svix'ten adapte | 1.0.0 | 89 | ~50 | ✅ |
 | 9 | **C#** | C# | Svix'ten adapte | 1.0.0 | 67 | ~40 | ✅ |
-| 10 | Swift | Swift | Svix'ten adapte | — | — | — | ⬜ |
-| 11 | Elixir | Elixir | Svix'ten adapte | — | — | — | ⬜ |
+| 10 | **Swift** | Swift | HookSniff custom | 1.0.0 | ~14 | — | ✅ |
+| 11 | **Elixir** | Elixir | OpenAPI'den adapte | 1.0.0 | 247 | — | ✅ |
 
 ## Resource Mapping (Svix → HookSniff)
 

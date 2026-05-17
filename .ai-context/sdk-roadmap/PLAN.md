@@ -1,6 +1,6 @@
 # SDK Strateji Planı — %100 Hedefi
 
-> Son güncelleme: 2026-05-18 01:20 GMT+8
+> Son güncelleme: 2026-05-18 01:30 GMT+8
 > Hedef: Stripe seviyesinde SDK kalitesi
 
 ---
@@ -57,8 +57,8 @@ Neden?
 | 0.7 | Kotlin SDK — Svix'ten adapte | ✅ |
 | 0.8 | PHP SDK — Svix'ten adapte | ✅ |
 | 0.9 | C# SDK — Svix'ten adapte | ✅ |
-| 0.10 | Swift SDK — Svix'ten adapte | ⬜ |
-| 0.11 | Elixir SDK — Svix'ten adapte | ⬜ |
+| 0.10 | Swift SDK — HookSniff custom | ✅ |
+| 0.11 | Elixir SDK — OpenAPI'den adapte | ✅ |
 
 ### Faz 1 — Core Kalite (6 saat)
 | # | Görev | Süre |

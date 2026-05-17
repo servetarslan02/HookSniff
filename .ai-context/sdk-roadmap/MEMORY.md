@@ -1,6 +1,6 @@
 # SDK Roadmap MEMORY
 
-> Son güncelleme: 2026-05-18 01:20 GMT+8
+> Son güncelleme: 2026-05-18 01:30 GMT+8
 
 ## ⚠️ KRİTİK: SDK Adaptasyon Yöntemi
 
@@ -67,8 +67,8 @@ sdks/python/
 - Kotlin: ✅ Svix'ten adapte edildi (1.0.0, 131 dosya, 103 model)
 - PHP: ✅ Svix'ten adapte edildi (1.0.0, 89 dosya, ~50 model)
 - C#: ✅ Svix'ten adapte edildi (1.0.0, 67 dosya, ~40 model)
-- Swift: ⬜ Sıradaki
-- Elixir: ⬜
+- Swift: ✅ HookSniff custom (1.0.0, ~14 dosya)
+- Elixir: ✅ OpenAPI'den adapte edildi (1.0.0, 247 dosya)
 
 ## Svix Repo
 - GitHub: `https://github.com/svix/svix-webhooks`
