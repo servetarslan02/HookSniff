@@ -245,7 +245,7 @@ export default function BuildVsBuyContent() {
           <ul className="space-y-2">
             {[
               'Hobbyist and research workloads where reliability isn\'t critical',
-              'Very low volume (fewer than 100 events/day) with no SLA requirements',
+              'Very low volume (fewer than 1,000 events/day) with no SLA requirements',
               'Unusual data-residency or air-gapped deployments where cloud services can\'t be used',
               'You already have a mature event infrastructure team with deep distributed-systems expertise',
             ].map((item) => (

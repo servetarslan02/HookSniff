@@ -72,7 +72,7 @@ impl Default for PlatformSettings {
             max_endpoints_startup: 50,
             max_endpoints_pro: 500,
             max_endpoints_enterprise: i32::MAX,
-            max_webhooks_free: 100,
+            max_webhooks_free: 1000,
             max_webhooks_startup: 30000,
             max_webhooks_pro: 100000,
             max_webhooks_enterprise: i32::MAX,
