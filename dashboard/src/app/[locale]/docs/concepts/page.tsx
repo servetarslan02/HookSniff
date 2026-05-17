@@ -1,4 +1,3 @@
-import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -11,7 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default function ConceptsPage() {
-  const t = useTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Core Concepts</h1>

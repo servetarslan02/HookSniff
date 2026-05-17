@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/store';
-import { operationalWebhooksApi, type OperationalWebhookEndpointOut, type OperationalWebhookDeliveryOut } from '@/lib/api';
+import { operationalWebhooksApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -38,9 +38,9 @@ export default function OperationalWebhooksPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['op-webhooks'] });
       setShowCreate(false); setNewUrl(''); setNewDesc('');
-      toast({ title: 'Webhook endpoint created', type: 'success' });
+      toast('Webhook endpoint created', 'success');
     },
-    onError: (e: Error) => toast({ title: e.message, type: 'error' }),
+    onError: (e: Error) => toast(e.message, 'error'),
   });
 
   const deleteMutation = useMutation({
@@ -48,9 +48,9 @@ export default function OperationalWebhooksPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['op-webhooks'] });
       if (selectedId) setSelectedId(null);
-      toast({ title: 'Endpoint deleted', type: 'success' });
+      toast('Endpoint deleted', 'success');
     },
-    onError: (e: Error) => toast({ title: e.message, type: 'error' }),
+    onError: (e: Error) => toast(e.message, 'error'),
   });
 
   return (
