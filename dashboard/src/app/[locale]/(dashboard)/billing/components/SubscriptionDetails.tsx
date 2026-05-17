@@ -22,7 +22,7 @@ const STATUS_STYLES: Record<string, string> = {
   inactive: 'bg-gray-50 dark:bg-gray-500/10 text-gray-700 dark:text-gray-400 ring-gray-600/20',
 };
 
-export function SubscriptionDetails() {
+export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
   const { token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('billing');
@@ -94,6 +94,15 @@ export function SubscriptionDetails() {
             <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-2">
               ⚠️ {t('cancelAtPeriodEnd')}
             </p>
+          )}
+          {!isFree && !sub.cancel_at_period_end && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="text-xs text-red-600 dark:text-red-400 hover:underline mt-2 block"
+            >
+              {t('cancelSubscription')}
+            </button>
           )}
         </div>
 
