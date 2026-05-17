@@ -738,43 +738,16 @@ async fn handle_stripe_webhook(
     headers: axum::http::HeaderMap,
     body: String,
 ) -> Result<StatusCode, AppError> {
-    // Rate limit billing webhooks per IP
-    let client_ip = headers
-        .get("x-real-ip")
-        .or_else(|| headers.get("x-forwarded-for"))
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("unknown");
-    let rl_key = format!("billing_webhook:{}", client_ip);
-    let rl_result = rate_limiter
-        .check_with_headers(&rl_key, BILLING_WEBHOOK_RATE_LIMIT)
-        .await;
-    if !rl_result.allowed {
-        return Err(AppError::RateLimitExceeded);
-    }
+    check_billing_webhook_rate_limit(&rate_limiter, &headers).await?;
 
-    let signature = headers
-        .get("stripe-signature")
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("");
-
+    let signature = headers.get("stripe-signature").and_then(|v| v.to_str().ok()).unwrap_or("");
     let webhook_secret = cfg.stripe_webhook_secret.as_deref().unwrap_or("");
-
     if webhook_secret.is_empty() {
-        tracing::error!("Stripe webhook secret not configured — rejecting webhook to prevent billing manipulation");
-        return Err(AppError::Internal(anyhow::anyhow!(
-            "Billing webhook secret not configured"
-        )));
+        tracing::error!("Stripe webhook secret not configured — rejecting webhook");
+        return Err(AppError::Internal(anyhow::anyhow!("Billing webhook secret not configured")));
     }
 
-    stripe::handle_webhook_event(
-        &pool,
-        &body,
-        signature,
-        webhook_secret,
-        cfg.webhook_timestamp_tolerance_secs,
-    )
-    .await?;
-
+    stripe::handle_webhook_event(&pool, &body, signature, webhook_secret, cfg.webhook_timestamp_tolerance_secs).await?;
     Ok(StatusCode::OK)
 }
 
@@ -785,46 +758,14 @@ async fn handle_polar_webhook(
     headers: axum::http::HeaderMap,
     body: String,
 ) -> Result<StatusCode, AppError> {
-    // Rate limit billing webhooks per IP
-    let client_ip = headers
-        .get("x-real-ip")
-        .or_else(|| headers.get("x-forwarded-for"))
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("unknown");
-    let rl_key = format!("billing_webhook:{}", client_ip);
-    let rl_result = rate_limiter
-        .check_with_headers(&rl_key, BILLING_WEBHOOK_RATE_LIMIT)
-        .await;
-    if !rl_result.allowed {
-        return Err(AppError::RateLimitExceeded);
-    }
-
-    // HS-021: Idempotency check — extract event ID from body and check if already processed
-    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&body) {
-        if let Some(event_id) = parsed.get("id").and_then(|v| v.as_str()) {
-            let already_processed: bool = sqlx::query_scalar(
-                "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider = 'polar' AND provider_event_id = $1)"
-            )
-            .bind(event_id)
-            .fetch_one(&pool)
-            .await
-            .unwrap_or(false);
-
-            if already_processed {
-                tracing::info!("♻️ Polar event {} already processed, skipping", event_id);
-                return Ok(StatusCode::OK);
-            }
-        }
-    }
+    check_billing_webhook_rate_limit(&rate_limiter, &headers).await?;
+    check_webhook_idempotency(&pool, &body, "polar").await?;
 
     let config = crate::billing::polar::PolarConfig::from_env()
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Polar.sh not configured")))?;
-
     let provider = crate::billing::polar::PolarProvider::new(config);
     let result = provider.handle_webhook(&headers, &body, &pool).await?;
-
     process_webhook_result(&pool, &result, "polar").await?;
-
     Ok(StatusCode::OK)
 }
 
@@ -835,47 +776,62 @@ async fn handle_iyzico_webhook(
     headers: axum::http::HeaderMap,
     body: String,
 ) -> Result<StatusCode, AppError> {
-    // Rate limit billing webhooks per IP
-    let client_ip = headers
-        .get("x-real-ip")
-        .or_else(|| headers.get("x-forwarded-for"))
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("unknown");
-    let rl_key = format!("billing_webhook:{}", client_ip);
-    let rl_result = rate_limiter
-        .check_with_headers(&rl_key, BILLING_WEBHOOK_RATE_LIMIT)
-        .await;
-    if !rl_result.allowed {
-        return Err(AppError::RateLimitExceeded);
-    }
-
-    // HS-021: Idempotency check — extract event ID from body and check if already processed
-    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&body) {
-        if let Some(event_id) = parsed.get("id").and_then(|v| v.as_str()) {
-            let already_processed: bool = sqlx::query_scalar(
-                "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider = 'iyzico' AND provider_event_id = $1)"
-            )
-            .bind(event_id)
-            .fetch_one(&pool)
-            .await
-            .unwrap_or(false);
-
-            if already_processed {
-                tracing::info!("♻️ iyzico event {} already processed, skipping", event_id);
-                return Ok(StatusCode::OK);
-            }
-        }
-    }
+    check_billing_webhook_rate_limit(&rate_limiter, &headers).await?;
+    check_webhook_idempotency(&pool, &body, "iyzico").await?;
 
     let config = crate::billing::iyzico::IyzicoConfig::from_env()
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("iyzico not configured")))?;
-
     let provider = crate::billing::iyzico::IyzicoProvider::new(config);
     let result = provider.handle_webhook(&headers, &body, &pool).await?;
-
     process_webhook_result(&pool, &result, "iyzico").await?;
-
     Ok(StatusCode::OK)
+}
+
+/// Shared rate limit check for billing webhooks.
+async fn check_billing_webhook_rate_limit(
+    rate_limiter: &crate::rate_limit::RateLimiter,
+    headers: &axum::http::HeaderMap,
+) -> Result<(), AppError> {
+    let client_ip = headers.get("x-real-ip").or_else(|| headers.get("x-forwarded-for"))
+        .and_then(|v| v.to_str().ok()).unwrap_or("unknown");
+    let rl_key = format!("billing_webhook:{}", client_ip);
+    let rl_result = rate_limiter.check_with_headers(&rl_key, BILLING_WEBHOOK_RATE_LIMIT).await;
+    if !rl_result.allowed { Err(AppError::RateLimitExceeded) } else { Ok(()) }
+}
+
+/// HS-021: Idempotency check — skip if event already processed.
+async fn check_webhook_idempotency(pool: &PgPool, body: &str, provider: &str) -> Result<(), AppError> {
+    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(body) {
+        if let Some(event_id) = parsed.get("id").and_then(|v| v.as_str()) {
+            let already_processed: bool = sqlx::query_scalar(
+                "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider = $1 AND provider_event_id = $2)"
+            )
+            .bind(provider).bind(event_id).fetch_one(pool).await.unwrap_or(false);
+            if already_processed {
+                tracing::info!("♻️ {} event {} already processed, skipping", provider, event_id);
+                return Err(AppError::from(anyhow::anyhow!("already_processed")));
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Get the provider-specific column names for customer table updates.
+fn provider_columns(provider: &str) -> Option<(&'static str, &'static str)> {
+    match provider {
+        "polar" => Some(("polar_customer_id", "polar_subscription_id")),
+        "iyzico" => Some(("iyzico_customer_id", "iyzico_subscription_id")),
+        _ => None,
+    }
+}
+
+/// Get the provider-specific subscription ID column name.
+fn provider_sub_col(provider: &str) -> Option<&'static str> {
+    match provider {
+        "polar" => Some("polar_subscription_id"),
+        "iyzico" => Some("iyzico_subscription_id"),
+        _ => None,
+    }
 }
 
 /// Process a webhook result from any provider and update the database.
@@ -883,16 +839,6 @@ async fn process_webhook_result(
     pool: &sqlx::PgPool,
     result: &crate::billing::provider::WebhookResult,
     provider: &str,
-) -> Result<(), AppError> {
-    process_webhook_result_with_event_id(pool, result, provider, None).await
-}
-
-/// Process a webhook result with optional event ID for idempotency (HS-021).
-async fn process_webhook_result_with_event_id(
-    pool: &sqlx::PgPool,
-    result: &crate::billing::provider::WebhookResult,
-    provider: &str,
-    _event_id: Option<&str>,
 ) -> Result<(), AppError> {
     use crate::billing::provider::WebhookResult;
 
@@ -904,33 +850,21 @@ async fn process_webhook_result_with_event_id(
             provider_subscription_id,
         } => {
             let webhook_limit = plan.max_webhooks_per_month() as i64;
-            let update_query = match provider {
-                "polar" => sqlx::query(
+            if let Some((cust_col, sub_col)) = provider_columns(provider) {
+                let query = format!(
                     "UPDATE customers SET plan = $1, payment_provider = $2, \
-                         polar_customer_id = $3, polar_subscription_id = $4, webhook_limit = $5, \
-                         payment_failed_at = NULL, updated_at = NOW() WHERE id = $6",
-                )
-                .bind(plan.as_str())
-                .bind(provider)
-                .bind(provider_customer_id)
-                .bind(provider_subscription_id)
-                .bind(webhook_limit)
-                .bind(customer_id),
-                "iyzico" => sqlx::query(
-                    "UPDATE customers SET plan = $1, payment_provider = $2, \
-                         iyzico_customer_id = $3, iyzico_subscription_id = $4, webhook_limit = $5, \
-                         payment_failed_at = NULL, updated_at = NOW() WHERE id = $6",
-                )
-                .bind(plan.as_str())
-                .bind(provider)
-                .bind(provider_customer_id)
-                .bind(provider_subscription_id)
-                .bind(webhook_limit)
-                .bind(customer_id),
-                _ => return Ok(()),
-            };
-
-            update_query.execute(pool).await?;
+                     {} = $3, {} = $4, webhook_limit = $5, \
+                     payment_failed_at = NULL, updated_at = NOW() WHERE id = $6",
+                    cust_col, sub_col
+                );
+                sqlx::query(&query)
+                    .bind(plan.as_str()).bind(provider)
+                    .bind(provider_customer_id).bind(provider_subscription_id)
+                    .bind(webhook_limit).bind(customer_id)
+                    .execute(pool).await?;
+            } else {
+                return Ok(());
+            }
 
             // HS-060: Clean up excess endpoints if upgrading from free (in case of re-subscribe)
             cleanup_excess_endpoints(pool, *customer_id, plan).await?;
@@ -975,66 +909,32 @@ async fn process_webhook_result_with_event_id(
             status,
         } => {
             let webhook_limit = plan.max_webhooks_per_month() as i64;
+            if let Some(sub_col) = provider_sub_col(provider) {
+                let query = format!(
+                    "UPDATE customers SET plan = $1, webhook_limit = $2, \
+                     payment_failed_at = NULL, updated_at = NOW() WHERE {} = $3",
+                    sub_col
+                );
+                sqlx::query(&query).bind(plan.as_str()).bind(webhook_limit)
+                    .bind(provider_subscription_id).execute(pool).await?;
+            } else {
+                return Ok(());
+            }
 
-            // HS-059: Clear grace period on successful renewal
-            let query = match provider {
-                "polar" => {
-                    sqlx::query(
-                        "UPDATE customers SET plan = $1, webhook_limit = $2, \
-                         payment_failed_at = NULL, updated_at = NOW() WHERE polar_subscription_id = $3"
-                    )
-                    .bind(plan.as_str())
-                    .bind(webhook_limit)
-                    .bind(provider_subscription_id)
-                }
-                "iyzico" => {
-                    sqlx::query(
-                        "UPDATE customers SET plan = $1, webhook_limit = $2, \
-                         payment_failed_at = NULL, updated_at = NOW() WHERE iyzico_subscription_id = $3"
-                    )
-                    .bind(plan.as_str())
-                    .bind(webhook_limit)
-                    .bind(provider_subscription_id)
-                }
-                _ => return Ok(()),
-            };
-
-            query.execute(pool).await?;
-
-            // HS-060: If plan changed (upgrade/downgrade), clean up excess endpoints
-            let customer_id: Option<(uuid::Uuid,)> = match provider {
-                "polar" => {
-                    sqlx::query_as("SELECT id FROM customers WHERE polar_subscription_id = $1")
-                        .bind(provider_subscription_id)
-                        .fetch_optional(pool)
-                        .await?
-                }
-                "iyzico" => {
-                    sqlx::query_as("SELECT id FROM customers WHERE iyzico_subscription_id = $1")
-                        .bind(provider_subscription_id)
-                        .fetch_optional(pool)
-                        .await?
-                }
-                _ => None,
-            };
-            if let Some((cid,)) = customer_id {
-                cleanup_excess_endpoints(pool, cid, plan).await?;
-
-                // Create invoice record for plan change
-                let amount_cents = plan.monthly_price_cents() as i32;
-                let currency = if provider == "iyzico" { "TRY" } else { "USD" };
-                if let Err(e) = sqlx::query(
-                    "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) \
-                     VALUES ($1, $2, $3, 'paid', $4)",
-                )
-                .bind(cid)
-                .bind(amount_cents)
-                .bind(currency)
-                .bind(plan.as_str())
-                .execute(pool)
-                .await
-                {
-                    tracing::warn!("Failed to insert invoice for customer {}: {:?}", cid, e);
+            // HS-060: If plan changed, clean up excess endpoints
+            if let Some(sub_col) = provider_sub_col(provider) {
+                let cid_query = format!("SELECT id FROM customers WHERE {} = $1", sub_col);
+                let customer_id: Option<(uuid::Uuid,)> = sqlx::query_as(&cid_query)
+                    .bind(provider_subscription_id).fetch_optional(pool).await?;
+                if let Some((cid,)) = customer_id {
+                    cleanup_excess_endpoints(pool, cid, plan).await?;
+                    let amount_cents = plan.monthly_price_cents() as i32;
+                    let currency = if provider == "iyzico" { "TRY" } else { "USD" };
+                    if let Err(e) = sqlx::query(
+                        "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) VALUES ($1, $2, $3, 'paid', $4)",
+                    ).bind(cid).bind(amount_cents).bind(currency).bind(plan.as_str()).execute(pool).await {
+                        tracing::warn!("Failed to insert invoice for customer {}: {:?}", cid, e);
+                    }
                 }
             }
 
@@ -1050,46 +950,26 @@ async fn process_webhook_result_with_event_id(
             provider_subscription_id,
         } => {
             let free_limit = Plan::Developer.max_webhooks_per_month() as i64;
-            let query = match provider {
-                "polar" => {
-                    sqlx::query(
-                        "UPDATE customers SET plan = 'free', polar_subscription_id = NULL, webhook_limit = $2, \
-                         cancel_at_period_end = false, updated_at = NOW() WHERE polar_subscription_id = $1"
-                    )
-                    .bind(provider_subscription_id)
-                    .bind(free_limit)
-                }
-                "iyzico" => {
-                    sqlx::query(
-                        "UPDATE customers SET plan = 'free', iyzico_subscription_id = NULL, webhook_limit = $2, \
-                         cancel_at_period_end = false, updated_at = NOW() WHERE iyzico_subscription_id = $1"
-                    )
-                    .bind(provider_subscription_id)
-                    .bind(free_limit)
-                }
-                _ => return Ok(()),
-            };
+            if let Some(sub_col) = provider_sub_col(provider) {
+                let query = format!(
+                    "UPDATE customers SET plan = 'free', {} = NULL, webhook_limit = $2, \
+                     cancel_at_period_end = false, updated_at = NOW() WHERE {} = $1",
+                    sub_col, sub_col
+                );
+                sqlx::query(&query).bind(provider_subscription_id).bind(free_limit)
+                    .execute(pool).await?;
+            } else {
+                return Ok(());
+            }
 
-            query.execute(pool).await?;
-
-            // HS-060: Clean up excess endpoints on cancellation (free plan = 5 endpoints)
-            let customer_id: Option<(uuid::Uuid,)> = match provider {
-                "polar" => {
-                    sqlx::query_as("SELECT id FROM customers WHERE polar_subscription_id = $1")
-                        .bind(provider_subscription_id)
-                        .fetch_optional(pool)
-                        .await?
+            // HS-060: Clean up excess endpoints on cancellation
+            if let Some(sub_col) = provider_sub_col(provider) {
+                let cid_query = format!("SELECT id FROM customers WHERE {} = $1", sub_col);
+                let customer_id: Option<(uuid::Uuid,)> = sqlx::query_as(&cid_query)
+                    .bind(provider_subscription_id).fetch_optional(pool).await?;
+                if let Some((cid,)) = customer_id {
+                    cleanup_excess_endpoints(pool, cid, &Plan::Developer).await?;
                 }
-                "iyzico" => {
-                    sqlx::query_as("SELECT id FROM customers WHERE iyzico_subscription_id = $1")
-                        .bind(provider_subscription_id)
-                        .fetch_optional(pool)
-                        .await?
-                }
-                _ => None,
-            };
-            if let Some((cid,)) = customer_id {
-                cleanup_excess_endpoints(pool, cid, &Plan::Developer).await?;
             }
 
             tracing::info!(
