@@ -5,7 +5,7 @@ use std::str::FromStr;
 use serde_json::json;
 
 use crate::{
-    models::MessageIn,
+    models::{MessageIn, Ordering, MessageStatus, StatusCodeClass},
 };
 
 impl MessageIn {
@@ -40,18 +40,6 @@ impl MessageIn {
         transformations_params["headers"]["content-type"] = content_type.into();
 
         self
-    }
-}
-
-#[derive(Debug, thiserror::Error)]
-#[error("invalid value for productType")]
-
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "Dispatch" => Ok(Self::Dispatch),
-            "Stream" => Ok(Self::Stream),
-        }
     }
 }
 

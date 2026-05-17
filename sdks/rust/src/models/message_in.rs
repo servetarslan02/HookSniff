@@ -4,12 +4,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct MessageIn {
-    /// Optionally creates a new application alongside the message.
-    ///
-    /// If the application id or uid that is used in the path already exists,
-    /// this argument is ignored.
-    #[serde(skip_serializing_if = "Option::is_none")]
-
     /// List of free-form identifiers that endpoints can filter by
     #[serde(skip_serializing_if = "Option::is_none")]
     pub channels: Option<Vec<String>>,
@@ -64,7 +58,6 @@ pub struct MessageIn {
 impl MessageIn {
     pub fn new(event_type: String, payload: serde_json::Value) -> Self {
         Self {
-            application: None,
             channels: None,
             deliver_at: None,
             event_id: None,
