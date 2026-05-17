@@ -162,6 +162,8 @@
     "sectionTools": "Tools",
     "sectionAdvanced": "Advanced",
     "sectionAccount": "Account",
+    "sectionBilling": "Billing",
+    "billingSection": "Billing",
     "routing": "Routing",
     "applications": "Applications",
     "serviceTokens": "Service Tokens",

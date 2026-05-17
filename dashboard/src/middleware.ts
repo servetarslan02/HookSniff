@@ -48,7 +48,7 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/portal-manage': '/account',
   '/portal-section': '/account',
   '/team-mgmt': '/account',
-  '/billing-overview': '/account',
+  '/billing-overview': '/billing-section',
   '/settings-section': '/account',
 };
 
