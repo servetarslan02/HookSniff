@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/store';
-import { environmentsApi, type EnvironmentOut } from '@/lib/api';
+import { environmentsApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -29,18 +29,18 @@ export default function EnvironmentsPage() {
       queryClient.invalidateQueries({ queryKey: ['environments'] });
       setShowCreate(false);
       setNewName(''); setNewSlug(''); setNewDesc('');
-      toast({ title: 'Environment created', type: 'success' });
+      toast('Environment created', 'success');
     },
-    onError: (e: Error) => toast({ title: e.message, type: 'error' }),
+    onError: (e: Error) => toast(e.message, 'error'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => environmentsApi.delete(token!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['environments'] });
-      toast({ title: 'Environment deleted', type: 'success' });
+      toast('Environment deleted', 'success');
     },
-    onError: (e: Error) => toast({ title: e.message, type: 'error' }),
+    onError: (e: Error) => toast(e.message, 'error'),
   });
 
   const handleCreate = () => {
