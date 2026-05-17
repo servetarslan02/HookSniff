@@ -33,7 +33,7 @@
 | 12 | Ingest | ✅ |
 | 13 | Connector | ✅ |
 | 14 | Integration | ✅ |
-| 15 | Streaming | ⬜ |
+| 15 | Streaming | ✅ |
 
 ## 🔧 Build Ortamı (Bu sunucuda kuruldu)
 - JDK 17: /opt/jdk-17

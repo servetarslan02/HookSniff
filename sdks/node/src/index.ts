@@ -8,6 +8,7 @@ import { MessagePoller } from "./api/messagePoller";
 import { Inbound } from "./api/inbound";
 import { ConnectorApi } from "./api/connector";
 import { IntegrationApi } from "./api/integration";
+import { StreamApi } from "./api/stream";
 import { Health } from "./api/health";
 import { Message } from "./api/message";
 import { MessageAttempt } from "./api/messageAttempt";
@@ -121,6 +122,10 @@ export class HookSniff {
 
   public get integration() {
     return new IntegrationApi(this.requestCtx);
+  }
+
+  public get stream() {
+    return new StreamApi(this.requestCtx);
   }
 
   public get health() {
