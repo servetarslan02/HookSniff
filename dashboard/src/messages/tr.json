@@ -600,7 +600,14 @@
     "subtitleDesc": "Teslimat trendleri, başarı oranları ve performans metrikleri",
     "successfulLabel": "Başarılı",
     "failedLabel": "Başarısız",
-    "successLabel": "başarılı"
+    "successLabel": "başarılı",
+    "analytics": {
+      "successRate": "Başarı Oranı",
+      "totalDelivered": "Toplam Teslim Edilen",
+      "totalFailed": "Toplam Başarısız"
+    },
+    "latencyTrend": "Gecikme Eğilimi",
+    "latencyTrendDesc": "Seçilen dönemdeki ortalama yanıt süresi"
   },
   "settings": {
     "title": "Ayarlar",
@@ -736,7 +743,17 @@
       "accountManager": "Dedicated hesap yöneticisi",
       "sla99": "%99.9 SLA garantisi",
       "customIntegrations": "Özel entegrasyonlar",
-      "onPremise": "On-premise seçeneği"
+      "onPremise": "On-premise seçeneği",
+      "100 events/day": "100 olay/gün",
+      "1 application": "1 uygulama",
+      "5 endpoints": "5 endpoint",
+      "10 event types": "10 olay tipi",
+      "10 subscriptions": "10 abonelik",
+      "7-day log retention": "7 günlük log saklama",
+      "HMAC signatures": "HMAC imzaları",
+      "2FA support": "2FA desteği",
+      "Community support": "Topluluk desteği",
+      "unlimitedEndpoints": "Sınırsız endpoint"
     },
     "plans.free": "Ücretsiz",
     "plans.pro": "Pro",
@@ -2136,7 +2153,8 @@
     "rotateDesc": "Eski anahtar hemen çalışmayı durduracak. Yerine yeni bir anahtar alacaksınız.",
     "deleteTitle": "API Anahtarı Silinsin mi?",
     "deleteDesc": "Bu işlem geri alınamaz. Bu anahtarı kullanan tüm hizmetler erişimini hemen kaybedecek.",
-    "failedToLoad": "API anahtarları yüklenemedi"
+    "failedToLoad": "API anahtarları yüklenemedi",
+    "create": "API Anahtarı Oluştur"
   },
   "onboarding": {
     "welcome": "HookSniff'e Hoş Geldiniz! 🪝",
@@ -2829,7 +2847,8 @@
     "upgradeHintBold": "Enterprise",
     "upgradeHint2": " planında kullanılabilir. Kuruluşunuzda SSO'yu etkinleştirmek için ",
     "upgradeNow": "hemen yükseltin",
-    "upgradeHintSuffix": "."
+    "upgradeHintSuffix": ".",
+    "testConnection": "Bağlantıyı Test Et"
   },
   "endpointSettings": {
     "title": "Endpoint Ayarları",
@@ -2981,7 +3000,9 @@
     "typeStr": "metin",
     "typeNum": "sayı",
     "typeBool": "bool",
-    "selectEndpoint": "Bir endpoint seçin"
+    "selectEndpoint": "Bir endpoint seçin",
+    "noEndpoints": "Endpoint bulunamadı. Önce bir endpoint oluşturun.",
+    "goToCore": "Core → Endpoint'lere Git"
   },
   "apiImporter": {
     "title": "📥 API Spec İçe Aktarıcı",
@@ -3081,7 +3102,8 @@
     "totalRetryTime": "Toplam yeniden deneme süresi (en kötü durum):",
     "tip": "İpucu:",
     "tipContent": "Endpoint başına yeniden deneme politikaları bu global varsayılanları geçersiz kılar. Şuralardan yapılandırın:",
-    "endpointSettingsLink": "Endpoint Ayarları"
+    "endpointSettingsLink": "Endpoint Ayarları",
+    "noEndpoints": "Endpoint bulunamadı. Retry policy yapılandırmak için önce bir endpoint oluşturun."
   },
   "inbound": {
     "title": "Gelen Webhooklar",
@@ -3337,7 +3359,8 @@
     "metricReconciliation": "Uzlaştırma hataları",
     "metricTestsPassing": "Geçen testler",
     "metricDeliveryRate": "Teslimat oranı",
-    "metricLanguages": "Desteklenen diller"
+    "metricLanguages": "Desteklenen diller",
+    "SDKs published": "SDK'lar Yayınlandı"
   },
   "providers": {
     "title": "Sağlayıcılar",
@@ -3464,7 +3487,8 @@
     "auditTrail": "Denetim izi",
     "avgDeliveryLatency": "Ort. teslimat gecikmesi",
     "deliverySuccessRate": "Teslimat başarı oranı",
-    "freeTierEvents": "Ücretsiz katman eventleri"
+    "freeTierEvents": "Ücretsiz katman eventleri",
+    "SDKs available": "SDK'lar mevcut"
   },
   "whatIsWebhook": {
     "simpleExplanation": "Basit Açıklama",
@@ -3798,5 +3822,19 @@
     "nameImmutable": "Flag adı oluşturulduktan sonra değiştirilemez",
     "nameTooLong": "Flag adı 100 karakterden kısa olmalı",
     "nameInvalid": "Flag adı sadece harf, rakam, alt çizgi veya tire içerebilir"
+  },
+  "schemas": {
+    "title": "Şema Kaydı",
+    "subtitle": "Webhook olay şemalarınızı yönetin",
+    "noSchemas": "Şema bulunamadı",
+    "createSchema": "Şema Oluştur",
+    "schemaName": "Şema Adı",
+    "schemaType": "Şema Tipi",
+    "version": "Sürüm",
+    "createdAt": "Oluşturulma",
+    "actions": "İşlemler",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "view": "Görüntüle"
   }
 }
