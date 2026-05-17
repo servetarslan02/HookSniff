@@ -47,6 +47,7 @@ impl ApplicationWithCount {
     pub fn to_response(self) -> ApplicationResponse {
         ApplicationResponse {
             id: self.id,
+            customer_id: self.customer_id,
             name: self.name,
             description: self.description,
             is_active: self.is_active,
@@ -61,6 +62,7 @@ impl ApplicationWithCount {
 #[derive(Debug, Serialize)]
 pub struct ApplicationResponse {
     pub id: Uuid,
+    pub customer_id: Uuid,
     pub name: String,
     pub description: Option<String>,
     pub is_active: bool,
@@ -74,6 +76,7 @@ impl Application {
     pub fn to_response(self, endpoint_count: i64) -> ApplicationResponse {
         ApplicationResponse {
             id: self.id,
+            customer_id: self.customer_id,
             name: self.name,
             description: self.description,
             is_active: self.is_active,
