@@ -1,6 +1,6 @@
 # SDK Strateji Planı — %100 Hedefi
 
-> Son güncelleme: 2026-05-18 01:50 GMT+8
+> Son güncelleme: 2026-05-18 01:55 GMT+8
 > Hedef: Stripe seviyesinde SDK kalitesi
 
 ---
@@ -68,8 +68,8 @@ Neden?
 | 1.3 | Debug logging | ✅ Node.js |
 | 1.4 | Error specificity (20+ class) | ✅ Node,Python,Go,Rust,Ruby |
 | 1.5 | Typed webhook events | ✅ Node.js |
-| 1.6 | JSDoc + examples (12 resource) | ⬜ |
-| 1.7 | Streaming/SSE support | ⬜ |
+| 1.6 | JSDoc + examples | ✅ Node.js |
+| 1.7 | Streaming/SSE support | ✅ Node.js |
 
 ### Faz 2 — Test Suite (4 saat)
 ### Faz 3 — CI/CD + Publish (2 saat)
