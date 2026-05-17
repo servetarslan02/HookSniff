@@ -8,6 +8,7 @@ import { Link } from '@/i18n/navigation';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { useApplications } from '@/hooks/useDashboardData';
+import { useQueryClient } from '@tanstack/react-query';
 
 /* ─── Hook0-style: Application card grid ─── */
 
@@ -37,6 +38,7 @@ function getAppLabels(app: Application): AppLabel[] {
 export default function ApplicationsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const t = useTranslations('applications');
   const tc = useTranslations('common');
 
@@ -74,7 +76,7 @@ export default function ApplicationsPage() {
     setError('');
     try {
       await applicationsApi.create(token, { name: newName, description: newDesc || undefined });
-      // Note: React Query will refetch on next mount; for immediate UI update we'd need queryClient
+      queryClient.invalidateQueries({ queryKey: ['applications'] });
       setNewName('');
       setNewDesc('');
       setShowCreate(false);
@@ -92,6 +94,7 @@ export default function ApplicationsPage() {
     setEditing(true);
     try {
       await applicationsApi.update(token, editApp.id, { name: editName.trim(), description: editDesc.trim() || undefined });
+      queryClient.invalidateQueries({ queryKey: ['applications'] });
       setEditApp(null);
       toast(t('updated') || 'Application updated', 'success');
     } catch (err: unknown) {
@@ -105,6 +108,7 @@ export default function ApplicationsPage() {
     if (!token || !deleteId) return;
     try {
       await applicationsApi.delete(token, deleteId);
+      queryClient.invalidateQueries({ queryKey: ['applications'] });
       toast(t('deleted') || 'Application deleted', 'success');
     } catch (err: unknown) {
       toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToDelete'), 'error');
