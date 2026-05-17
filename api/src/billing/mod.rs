@@ -103,13 +103,13 @@ impl Plan {
         }
     }
 
-    /// Overage price per event in cents (USD) — charged when daily limit exceeded
-    pub fn overage_price_cents_per_event(&self) -> f64 {
+    /// Overage price per event in dollars (USD) — charged when daily limit exceeded
+    pub fn overage_price_per_event(&self) -> f64 {
         match self {
-            Plan::Developer => 0.0,  // blocked at limit
-            Plan::Startup => 0.003,  // $0.003/event
-            Plan::Pro => 0.0001,     // $0.0001/event
-            Plan::Enterprise => 0.0, // custom
+            Plan::Developer => 0.0,     // blocked at limit
+            Plan::Startup => 0.00003,   // $0.00003/event (0.003 cents)
+            Plan::Pro => 0.000001,      // $0.000001/event (0.0001 cents)
+            Plan::Enterprise => 0.0,    // custom
         }
     }
 
@@ -655,14 +655,14 @@ mod tests {
         assert_eq!(Plan::Enterprise.max_events_per_day(), u64::MAX);
     }
 
-    // ── overage_price_cents_per_event ──────────────────────────
+    // ── overage_price_per_event ──────────────────────────
 
     #[test]
     fn overage_price_all() {
-        assert_eq!(Plan::Developer.overage_price_cents_per_event(), 0.0);
-        assert_eq!(Plan::Startup.overage_price_cents_per_event(), 0.003);
-        assert_eq!(Plan::Pro.overage_price_cents_per_event(), 0.0001);
-        assert_eq!(Plan::Enterprise.overage_price_cents_per_event(), 0.0);
+        assert_eq!(Plan::Developer.overage_price_per_event(), 0.0);
+        assert_eq!(Plan::Startup.overage_price_per_event(), 0.00003);
+        assert_eq!(Plan::Pro.overage_price_per_event(), 0.000001);
+        assert_eq!(Plan::Enterprise.overage_price_per_event(), 0.0);
     }
 
     // ── allows_overage ─────────────────────────────────────────

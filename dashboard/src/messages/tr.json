@@ -785,6 +785,7 @@
     "eventsPerDay": "olay/gün",
     "overagePrice": "Aşım Fiyatı",
     "perEvent": "olay başına",
+    "noOverage": "plana dahil",
     "overageUpgradeRequired": "Aşım ayarlarını etkinleştirmek için ücretli plana geçin.",
     "overageSettingsSaved": "Aşım ayarları kaydedildi.",
     "actions": "İşlemler",
