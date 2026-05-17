@@ -69,6 +69,10 @@ sdks/python/
 - C#: ✅ Svix'ten adapte edildi (1.0.0, 67 dosya, ~40 model)
 - Swift: ✅ HookSniff custom (1.0.0, ~14 dosya)
 - Elixir: ✅ OpenAPI'den adapte edildi (1.0.0, 247 dosya)
+- Faz 1 (Core kalite): ✅ Tamamlandı
+- Faz 2 (Test suite): ✅ Tamamlandı
+- Faz 3 (CI/CD): ✅ Tamamlandı — local CI script'leri + CHANGELOG
+- Faz 4 (OpenAPI codegen): ⬜ Sıradaki
 
 ## Svix Repo
 - GitHub: `https://github.com/svix/svix-webhooks`
