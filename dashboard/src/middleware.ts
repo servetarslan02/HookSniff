@@ -10,8 +10,8 @@ const LOCALE_REGEX = new RegExp(`^/(${routing.locales.join('|')})(/|$)`);
 // Route consolidation map: old individual routes → new consolidated routes
 const ROUTE_REDIRECTS: Record<string, string> = {
   // Core section
-  '/endpoints': '/core',
-  '/applications': '/core',
+  '/endpoints': '/applications',
+  '/applications': '/applications',
   '/api-keys': '/core',
   // Deliveries section
   '/logs': '/deliveries',
