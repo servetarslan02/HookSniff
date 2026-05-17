@@ -75,3 +75,4 @@ api/.env.test
 sdks/kotlin/gradle.properties
 deploy/keys/
 *.pem
+.sdk-tokens.env
