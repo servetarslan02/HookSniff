@@ -63,7 +63,6 @@ module HookSniff
     def self.deserialize(attributes = {})
       attributes = attributes.transform_keys(&:to_s)
       attrs = Hash.new
-      attrs["application"] = HookSniff::ApplicationIn.deserialize(attributes["application"]) if attributes["application"]
       attrs["channels"] = attributes["channels"]
       attrs["deliver_at"] = DateTime.rfc3339(attributes["deliverAt"]).to_time if attributes["deliverAt"]
       attrs["event_id"] = attributes["eventId"]
