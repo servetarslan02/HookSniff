@@ -7,7 +7,7 @@
 
 ## 🎯 Hedef Tanımı
 
-**%100 = Stripe seviyesi.** Kullanıcı SDK'yı indirdiğinde:
+**%100 = Svix seviyesi.** Kullanıcı SDK'yı indirdiğinde:
 - Type-safe, autocomplete çalışıyor
 - Her method'da JSDoc/docstring + example kod
 - Retry, rate limit, pagination otomatik
