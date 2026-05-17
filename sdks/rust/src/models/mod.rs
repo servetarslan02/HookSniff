@@ -27,6 +27,7 @@ pub mod operational_webhook;
 pub mod message_poller;
 pub mod inbound;
 pub mod connector;
+pub mod integration;
 pub mod endpoint_created_event;
 pub mod endpoint_created_event_data;
 pub mod endpoint_deleted_event;

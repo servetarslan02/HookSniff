@@ -36,6 +36,7 @@ type (
 		MessagePoller *MessagePoller
 		Inbound *Inbound
 		Connector *ConnectorApi
+		Integration *IntegrationApi
 	}
 )
 
@@ -78,6 +79,7 @@ func New(token string, options *HookSniffOptions) (*HookSniff, error) {
 		MessagePoller: newMessagePoller(&hooksniffHttpClient),
 		Inbound: newInbound(&hooksniffHttpClient),
 		Connector: newConnectorApi(&hooksniffHttpClient),
+		Integration: newIntegrationApi(&hooksniffHttpClient),
 	}
 	return &hs, nil
 }
