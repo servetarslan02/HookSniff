@@ -1,5 +1,6 @@
 'use client';
 
+import { LazySection } from '@/components/LazySection';
 import { useState, useEffect } from 'react';
 import { useAdminRevenue, useAdminRevenueMetrics, useAdminRevenueCohorts, useAdminRefunds, useAdminChurn, useAdminSettings, useUpdateSettings } from '@/hooks/useAdminData';
 import { StatCard } from '@/components/tremor/StatCard';
