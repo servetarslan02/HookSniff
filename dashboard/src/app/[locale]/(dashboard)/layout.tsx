@@ -74,6 +74,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         { name: t('inboundWebhooks'), href: '/inbound', icon: '📥' },
         { name: t('connectors'), href: '/connectors', icon: '🔌' },
         { name: t('integrations'), href: '/integrations', icon: '🔗' },
+        { name: t('streaming'), href: '/streaming', icon: '📡' },
         { name: t('securitySection'), href: '/security-section', icon: '🔒' },
         { name: t('routingConfig'), href: '/routing-config', icon: '🔀' },
       ],

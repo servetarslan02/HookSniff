@@ -199,7 +199,8 @@
     "messagePoller": "Message Poller",
     "inboundWebhooks": "Inbound Webhooks",
     "connectors": "Connectors",
-    "integrations": "Integrations"
+    "integrations": "Integrations",
+    "streaming": "Streaming"
   },
   "dashboard": {
     "title": "Dashboard",

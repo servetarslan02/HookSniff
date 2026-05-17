@@ -16,6 +16,7 @@ mod message_poller;
 mod inbound;
 mod connector;
 mod integration;
+mod stream;
 mod event_type;
 mod health;
 mod message;
@@ -48,6 +49,7 @@ pub use self::{
     inbound::Inbound,
     connector::ConnectorApi,
     integration::IntegrationApi,
+    stream::StreamApi,
 };
 
 impl HookSniff {
@@ -77,6 +79,10 @@ impl HookSniff {
 
     pub fn integration(&self) -> IntegrationApi<'_> {
         IntegrationApi::new(&self.cfg)
+    }
+
+    pub fn stream(&self) -> StreamApi<'_> {
+        StreamApi::new(&self.cfg)
     }
 
     pub fn endpoint(&self) -> Endpoint<'_> {
