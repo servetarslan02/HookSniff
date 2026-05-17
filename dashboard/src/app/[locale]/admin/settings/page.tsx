@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useAdminSettings, useUpdateSettings, useAdminAlerts, useCreateAlert, useUpdateAlert } from '@/hooks/useAdminData';
-import { useQueryClient } from '@tanstack/react-query';
 import type { PlatformSettings } from '@/lib/api';
 
 interface AlertRule {
@@ -56,13 +56,25 @@ const ALERT_CONDITIONS: Record<string, { condition: string; label: string; unit:
   consecutive_failures: { condition: 'consecutive_failures', label: 'failedDeliveryThreshold', unit: 'perHour', direction: 'above', default: 10 },
 };
 
+const tabSkeleton = (
+  <div className="space-y-6 animate-pulse">
+    <div className="glass-card p-6"><div className="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl" /></div>
+    <div className="glass-card p-6"><div className="h-32 bg-gray-200 dark:bg-slate-700 rounded-xl" /></div>
+  </div>
+);
+
+// Lazy-loaded tab components — only mount when the tab is first visited
+const GeneralTab = dynamic(() => import('./components/GeneralTab'), { ssr: false, loading: () => tabSkeleton });
+const EmailTab = dynamic(() => import('./components/EmailTab'), { ssr: false, loading: () => tabSkeleton });
+const AlertsTab = dynamic(() => import('./components/AlertsTab'), { ssr: false, loading: () => tabSkeleton });
+const DevTab = dynamic(() => import('./components/DevTab'), { ssr: false, loading: () => tabSkeleton });
+
 export default function AdminSettingsPage() {
   const { toast } = useToast();
   const t = useTranslations('admin');
   const tc = useTranslations('common');
 
   // React Query hooks
-  const queryClient = useQueryClient();
   const { data: settingsData, isLoading } = useAdminSettings();
   const updateSettingsMutation = useUpdateSettings();
   const { data: alertRules = [] } = useAdminAlerts();
@@ -73,6 +85,7 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<PlatformSettings>(defaultSettings);
   const [showSuccess, setShowSuccess] = useState(false);
   const [settingsTab, setSettingsTab] = useState<'general' | 'email' | 'alerts' | 'dev'>('general');
+  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set(['general']));
   const [alertThresholds, setAlertThresholds] = useState<Record<string, number>>({
     success_rate: 95,
     latency: 5000,
@@ -164,18 +177,37 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const update = (key: keyof PlatformSettings, value: unknown) => {
+  const update = useCallback((key: keyof PlatformSettings, value: unknown) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
     setShowSuccess(false);
-  };
+  }, []);
 
-  const updateAlertThreshold = (key: string, value: number) => {
+  const updateAlertThreshold = useCallback((key: string, value: number) => {
     setAlertThresholds((prev) => ({ ...prev, [key]: value }));
-  };
+  }, []);
 
-  const toggleChannel = (channel: string) => {
+  const toggleChannel = useCallback((channel: string) => {
     setAlertChannels((prev) => ({ ...prev, [channel]: !prev[channel] }));
-  };
+  }, []);
+
+  const setTab = useCallback((tab: string) => {
+    setSettingsTab(tab as 'general' | 'email' | 'alerts' | 'dev');
+    setVisitedTabs(prev => {
+      if (prev.has(tab)) return prev;
+      const next = new Set(prev);
+      next.add(tab);
+      return next;
+    });
+  }, []);
+
+  const handleTabHover = useCallback((tab: string) => {
+    setVisitedTabs(prev => {
+      if (prev.has(tab)) return prev;
+      const next = new Set(prev);
+      next.add(tab);
+      return next;
+    });
+  }, []);
 
   // Loading state
   if (isLoading) {
@@ -196,8 +228,16 @@ export default function AdminSettingsPage() {
     );
   }
 
+  const tabs = [
+    { key: 'general', icon: '⚙️', label: t('general') || 'General' },
+    { key: 'email', icon: '📧', label: t('emailSecurity') || 'Email & Security' },
+    { key: 'alerts', icon: '🚨', label: t('alertsRetry') || 'Alerts & Retry' },
+    { key: 'dev', icon: '🧪', label: 'Dev Tools' },
+  ] as const;
+
   return (
     <div className="space-y-8 max-w-3xl">
+      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('platformSettings')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">
@@ -219,15 +259,11 @@ export default function AdminSettingsPage() {
 
       {/* Tab Navigation */}
       <div className="flex gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl w-fit">
-        {([
-          { key: 'general', icon: '⚙️', label: t('general') || 'General' },
-          { key: 'email', icon: '📧', label: t('emailSecurity') || 'Email & Security' },
-          { key: 'alerts', icon: '🚨', label: t('alertsRetry') || 'Alerts & Retry' },
-          { key: 'dev', icon: '🧪', label: 'Dev Tools' },
-        ] as const).map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setSettingsTab(tab.key)}
+            onClick={() => setTab(tab.key)}
+            onMouseEnter={() => handleTabHover(tab.key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
               settingsTab === tab.key
                 ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
@@ -240,204 +276,40 @@ export default function AdminSettingsPage() {
         ))}
       </div>
 
-      {/* General */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('general')}</h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">{t('maintenanceMode')}</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400">{t('maintenanceDesc')}</div>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={settings.maintenance_mode}
-              onClick={() => update('maintenance_mode', !settings.maintenance_mode)}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                settings.maintenance_mode ? 'bg-red-600' : 'bg-gray-300 dark:bg-slate-600'
-              }`}
-            >
-              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform duration-200 ${
-                settings.maintenance_mode ? 'translate-x-5' : 'translate-x-0'
-              }`} />
-            </button>
-          </div>
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">{t('signupsEnabled')}</div>
-              <div className="text-xs text-gray-500 dark:text-slate-400">{t('signupsDesc')}</div>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={settings.signup_enabled}
-              onClick={() => update('signup_enabled', !settings.signup_enabled)}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                settings.signup_enabled ? 'bg-green-600' : 'bg-gray-300 dark:bg-slate-600'
-              }`}
-            >
-              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform duration-200 ${
-                settings.signup_enabled ? 'translate-x-5' : 'translate-x-0'
-              }`} />
-            </button>
-          </div>
-          <div>
-            <label htmlFor="default_plan" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('defaultPlan')} <span className="text-red-500">*</span></label>
-            <select
-              id="default_plan"
-              value={settings.default_plan}
-              onChange={(e) => update('default_plan', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition"
-            >
-              <option value="developer">{t('developerPlan')}</option>
-              <option value="startup">{t('startupPlan')}</option>
-              <option value="pro">{t('proPlan')}</option>
-              <option value="enterprise">{t('enterprisePlan')}</option>
-            </select>
-          </div>
+      {/* Tab Content — lazy loaded, only visited tabs render */}
+      {visitedTabs.has('general') && (
+        <div style={{ display: settingsTab === 'general' ? 'block' : 'none' }}>
+          <GeneralTab settings={settings} update={update} />
         </div>
-      </div>
+      )}
 
-      {/* Plan Limits & Prices — moved to Revenue page */}
-      <div className={`glass-card p-6 ${settingsTab !== 'general' ? 'hidden' : ''}`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💰 {t('planPrices') || 'Plan Prices & Limits'}</h2>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('planPricesMoved') || 'Plan prices and limits are now managed from the Revenue page.'}</p>
-          </div>
-          <a
-            href="/admin/revenue"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 text-white hover:bg-brand-700 transition"
-          >
-            {t('goToRevenue') || 'Go to Revenue'} →
-          </a>
+      {visitedTabs.has('email') && (
+        <div style={{ display: settingsTab === 'email' ? 'block' : 'none' }}>
+          <EmailTab settings={settings} update={update} />
         </div>
-      </div>
+      )}
 
-      {/* Email Settings */}
-      <div className={`glass-card p-6 ${settingsTab !== 'email' ? 'hidden' : ''}`}>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📧 {t('emailSettings') || 'Email Settings'}</h2>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('emailSettingsDesc') || 'Configure email delivery via Resend.'}</p>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="resend_api_key" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Resend API Key</label>
-            <input id="resend_api_key" type="password" value={settings.resend_api_key || ''} onChange={(e) => update('resend_api_key', e.target.value || null)} placeholder="re_..." className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-          </div>
-          <div>
-            <label htmlFor="email_sender" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('senderAddress') || 'Sender Address'}</label>
-            <input id="email_sender" type="email" value={settings.email_sender || ''} onChange={(e) => update('email_sender', e.target.value || null)} placeholder="noreply@hooksniff.dev" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-          </div>
+      {visitedTabs.has('alerts') && (
+        <div style={{ display: settingsTab === 'alerts' ? 'block' : 'none' }}>
+          <AlertsTab
+            settings={settings}
+            update={update}
+            alertRules={alertRules as AlertRule[]}
+            alertThresholds={alertThresholds}
+            alertChannels={alertChannels}
+            updateAlertThreshold={updateAlertThreshold}
+            toggleChannel={toggleChannel}
+            handleAlertSave={handleAlertSave}
+            isSaving={createAlertMutation.isPending || updateAlertMutation.isPending}
+          />
         </div>
-      </div>
+      )}
 
-      {/* Security Settings */}
-      <div className={`glass-card p-6 ${settingsTab !== 'email' ? 'hidden' : ''}`}>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🔐 {t('securitySettings') || 'Security & Webhook Settings'}</h2>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="webhook_secret" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('webhookSecret') || 'Default Webhook Secret'}</label>
-            <input id="webhook_secret" type="password" value={settings.webhook_secret || ''} onChange={(e) => update('webhook_secret', e.target.value || null)} placeholder="whsec_..." className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('webhookSecretDesc') || 'Default signing secret for webhook payloads.'}</p>
-          </div>
-          <div>
-            <label htmlFor="global_rate_limit" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('globalRateLimit') || 'Global API Rate Limit (req/min)'}</label>
-            <input id="global_rate_limit" type="number" min={10} max={100000} value={settings.global_rate_limit} onChange={(e) => update('global_rate_limit', parseInt(e.target.value) || 1000)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-          </div>
-          <div>
-            <label htmlFor="cors_origins" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('corsOrigins') || 'Allowed CORS Origins'}</label>
-            <input id="cors_origins" type="text" value={settings.cors_origins || ''} onChange={(e) => update('cors_origins', e.target.value || null)} placeholder="https://hooksniff.vercel.app, https://app.example.com" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('corsOriginsDesc') || 'Comma-separated list of allowed origins. Leave empty for default.'}</p>
-          </div>
+      {visitedTabs.has('dev') && (
+        <div style={{ display: settingsTab === 'dev' ? 'block' : 'none' }}>
+          <DevTab />
         </div>
-      </div>
-
-      {/* Backup Settings */}
-      <div className={`glass-card p-6 ${settingsTab !== 'email' ? 'hidden' : ''}`}>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💾 {t('backupSettings') || 'Backup Settings'}</h2>
-        <div>
-          <label htmlFor="backup_retention" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('backupRetention') || 'Backup Retention (days)'}</label>
-          <input id="backup_retention" type="number" min={1} max={365} value={settings.backup_retention_days} onChange={(e) => update('backup_retention_days', parseInt(e.target.value) || 30)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('backupRetentionDesc') || 'Number of days to keep database backups.'}</p>
-        </div>
-      </div>
-
-      {/* Retry Settings */}
-      <div className={`glass-card p-6 ${settingsTab !== 'alerts' ? 'hidden' : ''}`}>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('retrySettings')}</h2>
-        <div>
-          <label htmlFor="retry_max_attempts" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('maxRetryAttempts')} <span className="text-red-500">*</span></label>
-          <input id="retry_max_attempts" type="number" value={settings.retry_max_attempts} onChange={(e) => update('retry_max_attempts', parseInt(e.target.value) || 0)} min={0} max={10} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('retryDesc')}</p>
-        </div>
-      </div>
-
-      {/* Alert Thresholds */}
-      <div className={`glass-card p-6 ${settingsTab !== 'alerts' ? 'hidden' : ''}`}>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🚨 {t('alertThresholds')}</h2>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('alertThresholdsDesc')}</p>
-
-        {alertRules.length > 0 && (
-          <div className="mb-4 flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
-            <span className="w-2 h-2 rounded-full bg-green-500" />
-            {alertRules.length} {t('activeAlertRules') || 'active alert rule(s) configured'}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="alert_success_rate" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('successRateThreshold')}</label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 dark:text-slate-400">{t('below')}</span>
-              <input id="alert_success_rate" type="number" min={0} max={100} value={alertThresholds.success_rate} onChange={(e) => updateAlertThreshold('success_rate', parseInt(e.target.value) || 0)} className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              <span className="text-sm text-gray-500 dark:text-slate-400">%</span>
-            </div>
-          </div>
-          <div>
-            <label htmlFor="alert_latency" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('latencyThreshold')}</label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 dark:text-slate-400">{t('above')}</span>
-              <input id="alert_latency" type="number" min={0} max={60000} value={alertThresholds.latency} onChange={(e) => updateAlertThreshold('latency', parseInt(e.target.value) || 0)} className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              <span className="text-sm text-gray-500 dark:text-slate-400">ms</span>
-            </div>
-          </div>
-          <div>
-            <label htmlFor="alert_failed" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('failedDeliveryThreshold')}</label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 dark:text-slate-400">{t('above')}</span>
-              <input id="alert_failed" type="number" min={0} max={10000} value={alertThresholds.consecutive_failures} onChange={(e) => updateAlertThreshold('consecutive_failures', parseInt(e.target.value) || 0)} className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition" />
-              <span className="text-sm text-gray-500 dark:text-slate-400">{t('perHour')}</span>
-            </div>
-          </div>
-        </div>
-        <div className="mt-6">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{t('notificationChannels')}</h3>
-          <div className="flex flex-wrap gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={alertChannels.email} onChange={() => toggleChannel('email')} className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
-              <span className="text-sm text-gray-700 dark:text-slate-300">📧 Email</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={alertChannels.slack} onChange={() => toggleChannel('slack')} className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
-              <span className="text-sm text-gray-700 dark:text-slate-300">💬 Slack</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={alertChannels.webhook} onChange={() => toggleChannel('webhook')} className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
-              <span className="text-sm text-gray-700 dark:text-slate-300">🔗 Webhook</span>
-            </label>
-          </div>
-        </div>
-
-        <div className="mt-6 flex items-center gap-3 justify-end">
-          <button type="button"
-            onClick={handleAlertSave}
-            disabled={createAlertMutation.isPending || updateAlertMutation.isPending}
-            className="px-6 py-3 bg-orange-600 dark:bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 dark:hover:bg-orange-700 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition disabled:opacity-60"
-          >
-            {(createAlertMutation.isPending || updateAlertMutation.isPending) ? tc('saving') : (t('saveAlertSettings') || '🚨 Save Alert Settings')}
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* Save button */}
       <div className="flex items-center gap-3 justify-end">
@@ -454,79 +326,6 @@ export default function AdminSettingsPage() {
           {updateSettingsMutation.isPending ? tc('saving') : t('saveSettings')}
         </button>
       </div>
-    
-      {/* Dev Tools — Sentry Test */}
-      <div className={`glass-card p-6 ${settingsTab !== 'dev' ? 'hidden' : ''}`}>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🧪 Dev Tools</h2>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-          Development and debugging tools. Only visible in dev mode.
-        </p>
-
-        <div className="space-y-4">
-          {/* Sentry Error Test */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white">Sentry Error Test</h3>
-              <p className="text-xs text-gray-500 dark:text-slate-400">Throw a test error to verify Sentry integration</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                try {
-                  throw new Error('[HookSniff] Sentry test error from admin settings');
-                } catch (e) {
-                  import('@sentry/nextjs').then((Sentry) => {
-                    Sentry.captureException(e);
-                    toast('Test error sent to Sentry', 'success');
-                  }).catch(() => {
-                    toast('Sentry not available in this environment', 'error');
-                  });
-                }
-              }}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition"
-            >
-              Send Test Error
-            </button>
-          </div>
-
-          {/* WS Connection Test */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white">WebSocket Status</h3>
-              <p className="text-xs text-gray-500 dark:text-slate-400">Check WebSocket connection state</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-                const wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws';
-                toast(`WS: ${wsUrl}`, 'info');
-              }}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-lg transition"
-            >
-              Check WS
-            </button>
-          </div>
-
-          {/* Cache Clear */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white">Clear React Query Cache</h3>
-              <p className="text-xs text-gray-500 dark:text-slate-400">Force invalidate all cached data</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                queryClient.clear();
-                toast('React Query cache cleared', 'success');
-              }}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-lg transition"
-            >
-              Clear Cache
-            </button>
-          </div>
-        </div>
-      </div>
-</div>
+    </div>
   );
 }
