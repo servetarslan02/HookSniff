@@ -4,6 +4,26 @@
 
 ---
 
+## ✅ Kotlin SDK — Svix'ten Adaptasyon — 2026-05-18
+
+### Yöntem
+- Svix Kotlin SDK (`svix-libs/kotlin/`) kopyalandı
+- `com.svix` → `com.hooksniff` package rename
+- `Svix` → `HookSniff` class rename
+- Svix-specific features kaldırıldı
+- `build.gradle` ve `gradle.properties` güncellendi
+
+### Sonuç
+- 131 dosya
+- 103 typed model
+- 7 API resource: authentication, endpoint, event_type, health, message, message_attempt, statistics
+- Webhook verification (HMAC-SHA256, Standard Webhooks)
+- Auto-retry + exponential backoff
+- Auto-idempotency key
+- Versiyon: 1.0.0
+
+---
+
 ## ✅ Java SDK — Svix'ten Adaptasyon — 2026-05-18
 
 ### Yöntem
