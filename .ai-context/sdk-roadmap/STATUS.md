@@ -12,7 +12,7 @@
 | 4 | **Rust** | Rust | Svix SDK doğrudan | 1.0.0 | 118 | 98 | ✅ |
 | 5 | **Ruby** | Ruby | Svix'ten adapte | 1.0.0 | 74 | 48 | ✅ |
 | 6 | **Java** | Java | Svix'ten adapte | 1.0.0 | 158 | 104 | ✅ |
-| 7 | Kotlin | Kotlin | Svix'ten adapte | — | — | — | ⬜ |
+| 7 | **Kotlin** | Kotlin | Svix'ten adapte | 1.0.0 | 131 | 103 | ✅ |
 | 8 | PHP | PHP | Svix'ten adapte | — | — | — | ⬜ |
 | 9 | C# | C# | Svix'ten adapte | — | — | — | ⬜ |
 | 10 | Swift | Swift | Svix'ten adapte | — | — | — | ⬜ |

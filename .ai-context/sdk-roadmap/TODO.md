@@ -21,7 +21,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 | ✅ | Rust SDK adapte | Tamamlandı | %80 |
 | ✅ | Ruby SDK adapte | Tamamlandı | %75 |
 | ✅ | Java SDK adapte | Tamamlandı | %75 |
-| ⬜ | Kotlin SDK adapte | Beklemede | — |
+| ✅ | Kotlin SDK adapte | Tamamlandı | %75 |
 | ⬜ | PHP SDK adapte | Beklemede | — |
 | ⬜ | C# SDK adapte | Beklemede | — |
 | ⬜ | Swift SDK adapte | Beklemede | — |
@@ -56,7 +56,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 
 ---
 
-## 🔴 Sıradaki: Kotlin SDK Adaptasyonu
+## 🔴 Sıradaki: PHP SDK Adaptasyonu
 
 ### Adımlar:
 1. `cp -r svix-libs/java/* sdks/java/`
