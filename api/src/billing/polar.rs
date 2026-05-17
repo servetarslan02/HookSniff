@@ -317,9 +317,14 @@ impl PaymentProviderImpl for PolarProvider {
             .map_err(|e| AppError::Internal(anyhow::anyhow!("Polar request failed: {}", e)))?;
 
         if !resp.status().is_success() {
+            let status = resp.status();
             let body = resp.text().await.unwrap_or_default();
-            tracing::error!("Polar checkout creation failed: {}", body);
-            return Err(AppError::Internal(anyhow::anyhow!("Polar checkout failed")));
+            tracing::error!("Polar checkout creation failed ({}): {}", status, body);
+            return Err(AppError::Internal(anyhow::anyhow!(
+                "Polar checkout failed ({}): {}",
+                status,
+                if body.len() > 200 { &body[..200] } else { &body }
+            )));
         }
 
         let session: CheckoutSession = resp.json().await.map_err(|e| {
