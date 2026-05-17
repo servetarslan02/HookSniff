@@ -246,7 +246,7 @@ async fn get_plan(Extension(customer): Extension<Customer>) -> Json<serde_json::
     let plan = crate::billing::Plan::parse_str(&customer.plan);
     Json(serde_json::json!({
         "plan": customer.plan,
-        "max_webhooks_per_month": plan.max_webhooks_per_month(),
+        "max_webhooks_per_day": plan.max_webhooks_per_day(),
         "max_endpoints": plan.max_endpoints(),
         "max_requests_per_minute": plan.max_requests_per_minute(),
         "retention_days": plan.retention_days(),

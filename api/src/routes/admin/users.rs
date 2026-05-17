@@ -232,7 +232,7 @@ pub async fn change_plan(
         "startup" => 30_000,
         "pro" => 100_000,
         "enterprise" => i64::MAX,
-        _ => 10_000,
+        _ => 100,
     };
 
     let current_plan: Option<(String,)> =
@@ -246,7 +246,7 @@ pub async fn change_plan(
             "startup" => 30_000,
             "pro" => 100_000,
             "enterprise" => i64::MAX,
-            _ => 10_000,
+            _ => 100,
         };
         limit > old_limit
     } else {

@@ -125,7 +125,7 @@ async fn process_webhook_result(
             provider_customer_id,
             provider_subscription_id,
         } => {
-            let webhook_limit = plan.max_webhooks_per_month() as i64;
+            let webhook_limit = plan.max_webhooks_per_day() as i64;
             if let Some((cust_col, sub_col)) = provider_columns(provider) {
                 let query = format!(
                     "UPDATE customers SET plan = $1, payment_provider = $2, \
@@ -184,7 +184,7 @@ async fn process_webhook_result(
             plan,
             status,
         } => {
-            let webhook_limit = plan.max_webhooks_per_month() as i64;
+            let webhook_limit = plan.max_webhooks_per_day() as i64;
             if let Some(sub_col) = provider_sub_col(provider) {
                 let query = format!(
                     "UPDATE customers SET plan = $1, webhook_limit = $2, \
@@ -225,7 +225,7 @@ async fn process_webhook_result(
         WebhookResult::SubscriptionCanceled {
             provider_subscription_id,
         } => {
-            let free_limit = Plan::Developer.max_webhooks_per_month() as i64;
+            let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
             if let Some(sub_col) = provider_sub_col(provider) {
                 let query = format!(
                     "UPDATE customers SET plan = 'free', {} = NULL, webhook_limit = $2, \
