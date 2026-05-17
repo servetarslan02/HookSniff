@@ -37,6 +37,7 @@ type (
 		Inbound *Inbound
 		Connector *ConnectorApi
 		Integration *IntegrationApi
+		Stream *StreamApi
 	}
 )
 
@@ -80,6 +81,7 @@ func New(token string, options *HookSniffOptions) (*HookSniff, error) {
 		Inbound: newInbound(&hooksniffHttpClient),
 		Connector: newConnectorApi(&hooksniffHttpClient),
 		Integration: newIntegrationApi(&hooksniffHttpClient),
+		Stream: newStreamApi(&hooksniffHttpClient),
 	}
 	return &hs, nil
 }

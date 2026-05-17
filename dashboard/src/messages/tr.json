@@ -199,7 +199,8 @@
     "messagePoller": "Mesaj Yoklayıcı",
     "inboundWebhooks": "Gelen Webhooklar",
     "connectors": "Bağlayıcılar",
-    "integrations": "Entegrasyonlar"
+    "integrations": "Entegrasyonlar",
+    "streaming": "Yayın"
   },
   "dashboard": {
     "title": "Dashboard",

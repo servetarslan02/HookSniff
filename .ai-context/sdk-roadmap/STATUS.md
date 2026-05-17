@@ -36,6 +36,7 @@
 | Inbound | /v1/inbound | ✅ |
 | Connector | /v1/connectors | ✅ |
 | Integration | /v1/integrations | ✅ |
+| Stream | /v1/stream | ✅ |
 
 ## Dashboard Sayfaları
 
@@ -48,6 +49,7 @@
 | Inbound Webhooks | /inbound | ✅ |
 | Connectors | /connectors | ✅ |
 | Integrations | /integrations | ✅ |
+| Streaming | /streaming | ✅ |
 
 ## DB Tabloları
 
@@ -64,3 +66,6 @@
 | connector_configs | ✅ |
 | integrations | ✅ |
 | integration_events | ✅ |
+| stream_channels | ✅ |
+| stream_subscriptions | ✅ |
+| stream_messages | ✅ |

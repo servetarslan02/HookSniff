@@ -18,6 +18,7 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
     val inbound: Inbound
     val connector: Connector
     val integration: Integration
+    val stream: Stream
 
     init {
         if (options.baseUrl == null) {
@@ -41,5 +42,6 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
         inbound = Inbound(httpClient)
         connector = Connector(httpClient)
         integration = Integration(httpClient)
+        stream = Stream(httpClient)
     }
 }

@@ -952,6 +952,69 @@ export const integrationsApi = {
   getStats: (token: string, id: string) => apiFetch<IntegrationStatsOut>(`/integrations/${id}/stats`, { token }),
 };
 
+// Stream types
+export interface StreamChannelOut {
+  id: string;
+  customer_id: string;
+  name: string;
+  description: string | null;
+  channel_type: string;
+  event_filter: string[] | null;
+  enabled: boolean;
+  max_subscribers: number;
+  current_subscribers: number;
+  total_messages: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StreamChannelDetailOut extends StreamChannelOut {
+  recent_messages: StreamMessageOut[];
+}
+
+export interface StreamMessageOut {
+  id: string;
+  channel_id: string;
+  event_type: string;
+  payload: Record<string, unknown>;
+  delivered_count: number;
+  created_at: string;
+}
+
+export interface StreamSubscriptionOut {
+  id: string;
+  channel_id: string;
+  customer_id: string;
+  connection_type: string;
+  client_id: string | null;
+  event_filter: string[] | null;
+  connected_at: string;
+  last_heartbeat_at: string;
+  messages_sent: number;
+  metadata: Record<string, unknown>;
+}
+
+export const streamApi = {
+  listChannels: (token: string) => apiFetch<StreamChannelOut[]>('/stream/channels', { token }),
+  getChannel: (token: string, id: string) => apiFetch<StreamChannelDetailOut>(`/stream/channels/${id}`, { token }),
+  createChannel: (token: string, data: { name: string; description?: string; channel_type?: string; event_filter?: string[]; max_subscribers?: number; enabled?: boolean }) =>
+    apiFetch<StreamChannelOut>('/stream/channels', { method: 'POST', body: data, token }),
+  updateChannel: (token: string, id: string, data: { name?: string; description?: string; event_filter?: string[]; max_subscribers?: number; enabled?: boolean }) =>
+    apiFetch<StreamChannelOut>(`/stream/channels/${id}`, { method: 'PUT', body: data, token }),
+  deleteChannel: (token: string, id: string) => apiFetch<{ deleted: boolean }>(`/stream/channels/${id}`, { method: 'DELETE', token }),
+  listMessages: (token: string, id: string, params?: { event_type?: string; limit?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.event_type) qs.set('event_type', params.event_type);
+    if (params?.limit) qs.set('limit', String(params.limit));
+    const q = qs.toString();
+    return apiFetch<StreamMessageOut[]>(`/stream/channels/${id}/messages${q ? `?${q}` : ''}`, { token });
+  },
+  listSubscriptions: (token: string) => apiFetch<StreamSubscriptionOut[]>('/stream/subscriptions', { token }),
+  disconnectSubscription: (token: string, id: string) => apiFetch<{ disconnected: boolean }>(`/stream/subscriptions/${id}`, { method: 'DELETE', token }),
+  publish: (token: string, data: { channel_id: string; event_type: string; payload: Record<string, unknown> }) =>
+    apiFetch<{ success: boolean; message_id: string; delivered_to: number }>('/stream/publish', { method: 'POST', body: data, token }),
+};
+
 // Two-Factor Authentication API
 export const twoFactorApi = {
   enable: (token: string) =>
