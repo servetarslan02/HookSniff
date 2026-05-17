@@ -877,6 +877,81 @@ export const connectorsApi = {
   deleteConfig: (token: string, id: string) => apiFetch<{ deleted: boolean }>(`/connectors/configs/${id}`, { method: 'DELETE', token }),
 };
 
+// Integration types
+export interface IntegrationOut {
+  id: string;
+  customer_id: string;
+  name: string;
+  description: string | null;
+  connector_config_id: string;
+  connector_name: string;
+  connector_display_name: string;
+  endpoint_id: string;
+  endpoint_url: string;
+  enabled: boolean;
+  event_filter: string[] | null;
+  transform_id: string | null;
+  retry_policy: Record<string, unknown>;
+  metadata: Record<string, unknown>;
+  last_triggered_at: string | null;
+  last_success_at: string | null;
+  last_failure_at: string | null;
+  failure_count: number;
+  total_deliveries: number;
+  total_failures: number;
+  health_status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IntegrationEventOut {
+  id: string;
+  integration_id: string;
+  event_type: string;
+  source_event_id: string | null;
+  payload: Record<string, unknown>;
+  status: string;
+  delivery_id: string | null;
+  error_message: string | null;
+  attempts: number;
+  duration_ms: number | null;
+  created_at: string;
+  processed_at: string | null;
+}
+
+export interface IntegrationStatsOut {
+  total_events: number;
+  delivered: number;
+  failed: number;
+  pending: number;
+  filtered: number;
+  avg_duration_ms: number | null;
+  success_rate: number;
+  last_24h_events: number;
+  last_24h_failures: number;
+}
+
+export const integrationsApi = {
+  list: (token: string) => apiFetch<IntegrationOut[]>('/integrations', { token }),
+  get: (token: string, id: string) => apiFetch<IntegrationOut>(`/integrations/${id}`, { token }),
+  create: (token: string, data: { name: string; description?: string; connector_config_id: string; endpoint_id: string; event_filter?: string[]; transform_id?: string; retry_policy?: Record<string, unknown>; metadata?: Record<string, unknown>; enabled?: boolean }) =>
+    apiFetch<IntegrationOut>('/integrations', { method: 'POST', body: data, token }),
+  update: (token: string, id: string, data: { name?: string; description?: string; endpoint_id?: string; event_filter?: string[]; transform_id?: string; retry_policy?: Record<string, unknown>; metadata?: Record<string, unknown>; enabled?: boolean }) =>
+    apiFetch<IntegrationOut>(`/integrations/${id}`, { method: 'PUT', body: data, token }),
+  delete: (token: string, id: string) => apiFetch<{ deleted: boolean }>(`/integrations/${id}`, { method: 'DELETE', token }),
+  test: (token: string, id: string) => apiFetch<{ success: boolean; event_id: string; message: string }>(`/integrations/${id}/test`, { method: 'POST', token }),
+  listEvents: (token: string, id: string, params?: { status?: string; event_type?: string; limit?: number; offset?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.status) qs.set('status', params.status);
+    if (params?.event_type) qs.set('event_type', params.event_type);
+    if (params?.limit) qs.set('limit', String(params.limit));
+    if (params?.offset) qs.set('offset', String(params.offset));
+    const q = qs.toString();
+    return apiFetch<IntegrationEventOut[]>(`/integrations/${id}/events${q ? `?${q}` : ''}`, { token });
+  },
+  getStats: (token: string, id: string) => apiFetch<IntegrationStatsOut>(`/integrations/${id}/stats`, { token }),
+};
+
 // Two-Factor Authentication API
 export const twoFactorApi = {
   enable: (token: string) =>
