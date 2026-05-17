@@ -4,6 +4,26 @@
 
 ---
 
+## ✅ Ruby SDK — Svix'ten Adaptasyon — 2026-05-18
+
+### Yöntem
+- Svix Ruby SDK (`svix-libs/ruby/`) kopyalandı
+- `svix` → `hooksniff` bulk find-replace
+- Svix-specific features kaldırıldı (application, background_task, connector, environment, ingest, integration, operational_webhook, streaming, message_poller)
+- API dosyaları HookSniff endpoint'leri ile yeniden yazıldı
+- `hooksniff.gemspec` güncellendi
+
+### Sonuç
+- 74 dosya (692'den düşürüldü — eski OpenAPI Generator boilerplate kaldırıldı)
+- 48 typed model
+- 7 API resource: authentication, endpoint, event_type, health, message, message_attempt, statistics
+- Webhook verification (HMAC-SHA256, Standard Webhooks)
+- Auto-retry + exponential backoff
+- Auto-idempotency key
+- Versiyon: 1.0.0
+
+---
+
 ## ✅ Rust SDK — Svix'ten Doğrudan Adaptasyon — 2026-05-17
 
 ### Yöntem

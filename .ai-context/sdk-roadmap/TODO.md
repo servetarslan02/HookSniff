@@ -19,7 +19,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 | ✅ | Python SDK adapte | Tamamlandı | %80 |
 | ✅ | Go SDK adapte | Tamamlandı | %80 |
 | ✅ | Rust SDK adapte | Tamamlandı | %80 |
-| ⬜ | Ruby SDK adapte | Sıradaki | — |
+| ✅ | Ruby SDK adapte | Tamamlandı | %75 |
 | ⬜ | Java SDK adapte | Beklemede | — |
 | ⬜ | Kotlin SDK adapte | Beklemede | — |
 | ⬜ | PHP SDK adapte | Beklemede | — |
@@ -36,7 +36,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 
 ---
 
-## 🔴 Sıradaki: Ruby SDK Adaptasyonu
+## 🔴 Sıradaki: Java SDK Adaptasyonu
 
 ### Adımlar:
 1. `git clone https://github.com/svix/svix-webhooks.git` (zaten var: `hooksniff-sdk/svix-libs/`)
