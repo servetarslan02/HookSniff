@@ -152,7 +152,7 @@ export default function BillingPage() {
       </div>
 
       {/* Subscription Details */}
-      <SubscriptionDetails />
+      <SubscriptionDetails onCancel={() => setShowCancelModal(true)} />
 
       {/* Usage Overview */}
       <div className="glass-card p-6">
