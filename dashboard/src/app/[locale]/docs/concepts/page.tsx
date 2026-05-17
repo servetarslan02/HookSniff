@@ -57,6 +57,7 @@ export default function ConceptsPage() {
           <li><strong>{t("payloads")}</strong> — JSON data sent as the request body</li>
           <li><strong>{t("deliveryStatus")}</strong> — <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">pending</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">delivered</code>, or <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">failed</code></li>
           <li><strong>{t("attemptTracking")}</strong> — Each delivery attempt is recorded with status code, response body, and duration</li>
+          <li><strong>Idempotency</strong> — Use the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">Idempotency-Key</code> header to prevent duplicate deliveries</li>
         </ul>
       </section>
 
@@ -64,7 +65,7 @@ export default function ConceptsPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("retries")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Failed deliveries are automatically retried using <strong>exponential backoff with jitter</strong>. The default schedule:
+          Failed deliveries are automatically retried using <strong>exponential backoff with jitter</strong>. The default schedule (3 attempts):
         </p>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700 mb-4">
           <div className="overflow-x-auto"><table className="w-full text-sm">
@@ -76,17 +77,14 @@ export default function ConceptsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3">1</td><td className="px-4 py-3">{t("immediate")}</td><td className="px-4 py-3">0</td></tr>
-              <tr><td className="px-4 py-3">2</td><td className="px-4 py-3">10 seconds</td><td className="px-4 py-3">10s</td></tr>
-              <tr><td className="px-4 py-3">3</td><td className="px-4 py-3">30 seconds</td><td className="px-4 py-3">40s</td></tr>
-              <tr><td className="px-4 py-3">4</td><td className="px-4 py-3">2 minutes</td><td className="px-4 py-3">~2.5m</td></tr>
-              <tr><td className="px-4 py-3">5</td><td className="px-4 py-3">10 minutes</td><td className="px-4 py-3">~12.5m</td></tr>
-              <tr><td className="px-4 py-3">6</td><td className="px-4 py-3">30 minutes</td><td className="px-4 py-3">~42.5m</td></tr>
+              <tr><td className="px-4 py-3">1</td><td className="px-4 py-3">~1 second</td><td className="px-4 py-3">~1s</td></tr>
+              <tr><td className="px-4 py-3">2</td><td className="px-4 py-3">~2 seconds</td><td className="px-4 py-3">~3s</td></tr>
+              <tr><td className="px-4 py-3">3</td><td className="px-4 py-3">~4 seconds</td><td className="px-4 py-3">~7s</td></tr>
             </tbody>
           </table></div>
         </div>
         <p className="text-gray-600 dark:text-slate-400">
-          After <strong>6 failed attempts</strong>, the delivery is marked as failed and moved to the Dead Letter Queue. See <a href="/docs/retries" className="text-brand-600 hover:text-brand-700">Retries & DLQ</a> for details.
+          After <strong>3 failed attempts</strong> (default, configurable per endpoint), the delivery is marked as failed and moved to the Dead Letter Queue. See <a href="/docs/retries" className="text-brand-600 hover:text-brand-700">Retries & DLQ</a> for details.
         </p>
       </section>
 
@@ -100,7 +98,7 @@ export default function ConceptsPage() {
           <li>{t("originalPayload")}</li>
           <li>{t("allAttempts")}</li>
           <li>Ability to <strong>replay</strong> — re-queue the delivery for another attempt</li>
-          <li>Configurable retention (default: 30 days)</li>
+          <li>Retention based on plan (Developer: 7 days, Startup: 14 days, Pro: 180 days, Enterprise: 365 days)</li>
         </ul>
       </section>
 

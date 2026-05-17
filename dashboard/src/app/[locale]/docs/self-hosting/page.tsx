@@ -52,6 +52,7 @@ make self-host`}
             <tbody className="divide-y divide-gray-200">
               <tr><td className="px-4 py-3 font-medium">{t("dashboard")}</td><td className="px-4 py-3">3001</td><td className="px-4 py-3">{t("webui")}</td></tr>
               <tr><td className="px-4 py-3 font-medium">API</td><td className="px-4 py-3">3000</td><td className="px-4 py-3">{t("restApi")}</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Worker</td><td className="px-4 py-3">—</td><td className="px-4 py-3">Webhook delivery engine (background process)</td></tr>
               <tr><td className="px-4 py-3 font-medium">PostgreSQL</td><td className="px-4 py-3">5432</td><td className="px-4 py-3">{t("database")}</td></tr>
               <tr><td className="px-4 py-3 font-medium">Redis</td><td className="px-4 py-3">6379</td><td className="px-4 py-3">Cache + Queue</td></tr>
             </tbody>

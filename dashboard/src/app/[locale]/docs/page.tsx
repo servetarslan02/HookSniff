@@ -28,7 +28,7 @@ export default function DocsPage() {
           { title: '📐 Core Concepts', desc: 'Endpoints, deliveries, retries, and more.', href: '/docs/concepts' },
           { title: '🔒 Security', desc: 'HMAC-SHA256 verification, IP whitelisting, TLS.', href: '/docs/security' },
           { title: '🖥️ Dashboard', desc: 'Monitor deliveries, manage endpoints, view analytics.', href: '/docs/dashboard' },
-          { title: '🔌 Integrations', desc: 'Stripe, GitHub, Shopify, and generic guides.', href: '/docs/integrations' },
+          { title: '🔌 Integrations', desc: 'GitHub, Shopify, and generic webhook guides.', href: '/docs/integrations' },
           { title: '🐳 Self-Hosting', desc: 'Run HookSniff on your own infrastructure.', href: '/docs/self-hosting' },
           { title: '🔄 Retries & DLQ', desc: 'Exponential backoff, replay failed webhooks.', href: '/docs/retries' },
           { title: '📦 SDKs', desc: 'Official Node.js, Python, and Go SDKs.', href: '/docs/sdk-libraries' },
@@ -78,10 +78,10 @@ export default function DocsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3">{t('developer')}</td><td className="px-4 py-3">100</td><td className="px-4 py-3">1,000</td></tr>
-              <tr><td className="px-4 py-3">{t('startup')}</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">30,000</td></tr>
-              <tr><td className="px-4 py-3">{t('pro')}</td><td className="px-4 py-3">10,000</td><td className="px-4 py-3">100,000</td></tr>
-              <tr><td className="px-4 py-3">{t('enterprise')}</td><td className="px-4 py-3">{t('unlimited')}</td><td className="px-4 py-3">{t('unlimited')}</td></tr>
+              <tr><td className="px-4 py-3">{t('developer')} ($0)</td><td className="px-4 py-3">100</td><td className="px-4 py-3">1,000</td></tr>
+              <tr><td className="px-4 py-3">{t('startup')} ($14/mo)</td><td className="px-4 py-3">500</td><td className="px-4 py-3">10,000</td></tr>
+              <tr><td className="px-4 py-3">{t('pro')} ($29/mo)</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">50,000</td></tr>
+              <tr><td className="px-4 py-3">{t('enterprise')} ($99/mo)</td><td className="px-4 py-3">5,000</td><td className="px-4 py-3">500,000</td></tr>
             </tbody>
           </table></div>
         </div>
