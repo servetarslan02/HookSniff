@@ -1,4 +1,10 @@
 export { type EndpointCreatedEventData } from "./endpointCreatedEventData";
+export { type EnvironmentIn } from "./environmentIn";
+export { type EnvironmentOut } from "./environmentOut";
+export { type EnvironmentPatch } from "./environmentPatch";
+export { type EnvironmentVariableIn } from "./environmentVariableIn";
+export { type EnvironmentVariableOut } from "./environmentVariableOut";
+export { type EnvironmentVariableBulkUpsertIn } from "./environmentVariableBulkUpsertIn";
 export { type EndpointDeletedEventData } from "./endpointDeletedEventData";
 export { type EndpointDisabledEventData } from "./endpointDisabledEventData";
 export { EndpointDisabledTrigger } from "./endpointDisabledTrigger";
