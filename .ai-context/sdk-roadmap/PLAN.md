@@ -69,6 +69,142 @@ Ruby, Java, Kotlin, PHP, C#, Swift, Elixir
 9. Publish et
 ```
 
+---
+
+## 📦 Publish Rehberi (Her Dil)
+
+### 1. Node.js → npm
+```bash
+cd sdks/node
+npm run build
+npm publish --access public
+# Gerekli: npm token (npmjs.com → Access Tokens)
+# Versiyon: package.json → "version"
+```
+
+### 2. Python → PyPI
+```bash
+cd sdks/python
+python3 -m build
+python3 -m twine upload dist/*
+# Gerekli: PyPI token (pypi.org → API tokens)
+# Versiyon: pyproject.toml veya setup.cfg → version
+```
+
+### 3. Go → proxy.golang.org
+```bash
+cd sdks/go
+git tag v0.5.0
+git push origin v0.5.0
+# Go module otomatik publish olur (tag push ile)
+# Gerekli: GitHub repo public olmalı
+# Versiyon: git tag
+```
+
+### 4. Rust → crates.io
+```bash
+cd sdks/rust
+cargo publish
+# Gerekli: crates.io token (crates.io → API Tokens)
+# Versiyon: Cargo.toml → version
+```
+
+### 5. Ruby → RubyGems
+```bash
+cd sdks/ruby
+gem build hooksniff.gemspec
+gem push hooksniff-*.gem
+# Gerekli: RubyGems API key
+# Versiyon: lib/hooksniff/version.rb → VERSION
+```
+
+### 6. Java → Maven Central
+```bash
+cd sdks/java
+./gradlew publish
+# Gerekli: Maven Central token (sonatype.org)
+# Gerekli: GPG key imzası
+# Versiyon: build.gradle → version
+# Not: En zor publish, ~24 saat sürebilir
+```
+
+### 7. Kotlin → Maven Central
+```bash
+cd sdks/kotlin
+./gradlew publish
+# Gerekli: Aynı Maven Central token + GPG key
+# Versiyon: build.gradle.kts → version
+```
+
+### 8. PHP → Packagist
+```bash
+# Sadece git tag push yeterli
+cd sdks/php
+git tag v0.5.0
+git push origin v0.5.0
+# Packagist otomatik algılar (GitHub webhook)
+# Gerekli: Packagist hesabı + GitHub webhook
+# Versiyon: composer.json → version
+```
+
+### 9. C# → NuGet
+```bash
+cd sdks/csharp
+dotnet pack -c Release
+dotnet nuget push bin/Release/*.nupkg --api-key $NUGET_KEY --source https://api.nuget.org/v3/index.json
+# Gerekli: NuGet API key
+# Versiyon: .csproj → Version
+```
+
+### 10. Elixir → Hex.pm
+```bash
+cd sdks/elixir
+mix hex.publish
+# Gerekli: Hex.pm API key
+# Versiyon: mix.exs → version
+```
+
+### 11. Swift → GitHub (SPM)
+```bash
+cd sdks/swift
+git tag v0.5.0
+git push origin v0.5.0
+# Swift Package Manager GitHub'dan çeker
+# Gerekli: GitHub repo public olmalı
+# Versiyon: Package.swift + git tag
+```
+
+---
+
+## 🔑 Registry Token'ları (Servet'in yapması gerekli)
+
+| Registry | Token Konumu | Durum |
+|----------|-------------|-------|
+| npm | npmjs.com → Access Tokens | ⬜ Gerekli |
+| PyPI | pypi.org → API Tokens | ⬜ Gerekli |
+| crates.io | crates.io → API Tokens | ⬜ Gerekli |
+| RubyGems | rubygems.org → API Keys | ⬜ Gerekli |
+| Maven Central | sonatype.org | ⬜ Gerekli |
+| NuGet | nuget.org → API Keys | ⬜ Gerekli |
+| Hex.pm | hex.pm → API Keys | ⬜ Gerekli |
+| Packagist | packagist.org → API Tokens | ⬜ Gerekli |
+
+---
+
+## 🤖 CI/CD Otomasyonu (GitHub Actions)
+
+### Publish Workflow (`.github/workflows/sdk-publish.yml`)
+```yaml
+# Trigger: git tag push (v*)
+# Otomatik: build → test → publish (tüm diller)
+# Her tag'de tüm SDK'lar publish edilir
+```
+
+### Adımlar:
+1. `.github/workflows/sdk-ci.yml` — her push'ta build + test
+2. `.github/workflows/sdk-publish.yml` — tag'de publish
+3. Her SDK için ayrı job (paralel çalışır)
+
 ### Svix SDK Referans Linkleri
 | Dil | Repo |
 |-----|------|
