@@ -2046,7 +2046,6 @@
       ],
       "developerFeatures": [
         "Günlük 100 event",
-        "1 uygulama",
         "5 endpoint",
         "10 event tipi",
         "10 abonelik",
@@ -2058,7 +2057,6 @@
       ],
       "startupFeatures": [
         "Günlük 30.000 event",
-        "1 uygulama",
         "50 endpoint",
         "50 event tipi",
         "300 abonelik",
