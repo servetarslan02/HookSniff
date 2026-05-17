@@ -4,9 +4,9 @@ namespace HookSniff\Tests;
 
 final class TestPayload
 {
-    private const DEFAULT_MSG_ID = "msg_p5jXN8AQM9LWM0D4loKWxJek";
+    private const DEFAULT_MSG_ID = "msg_test123";
     private const DEFAULT_PAYLOAD = '{"test": 2432232315}';
-    private const DEFAULT_SECRET = "MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
+    private const DEFAULT_SECRET = "dGVzdC1zaWduaW5nLWtleS1mb3ItdW5pdC10ZXN0cy1vbmx5";
 
     public $id;
     public $timestamp;

@@ -2,9 +2,9 @@
 
 require "hooksniff"
 
-DEFAULT_MSG_ID = "msg_p5jXN8AQM9LWM0D4loKWxJek"
+DEFAULT_MSG_ID = "msg_test123"
 DEFAULT_PAYLOAD = "{\"test\": 2432232314}"
-DEFAULT_SECRET = "MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw"
+DEFAULT_SECRET = "dGVzdC1zaWduaW5nLWtleS1mb3ItdW5pdC10ZXN0cy1vbmx5"
 TOLERANCE = 5 * 60
 
 class TestPayload
@@ -150,8 +150,8 @@ describe HookSniff::Webhook do
   end
 
   it "sign function works" do
-    key = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw"
-    msg_id = "msg_p5jXN8AQM9LWM0D4loKWxJek"
+    key = "whsec_dGVzdC1zaWduaW5nLWtleS1mb3ItdW5pdC10ZXN0cy1vbmx5"
+    msg_id = "msg_test123"
     timestamp = 1614265330
     payload = "{\"test\": 2432232314}"
     expected = "v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE="
