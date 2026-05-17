@@ -1,6 +1,6 @@
 use super::*;
 
-async fn open_portal(
+pub async fn open_portal(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
@@ -47,7 +47,7 @@ struct PeriodInfo {
 }
 
 
-async fn get_usage(
+pub async fn get_usage(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<UsageResponse>, AppError> {
@@ -115,7 +115,7 @@ type InvoiceRow = (
 );
 
 
-async fn get_invoices(
+pub async fn get_invoices(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<InvoiceResponse>>, AppError> {
@@ -162,7 +162,7 @@ struct RefundResponse {
 }
 
 
-async fn request_refund(
+pub async fn request_refund(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
@@ -204,7 +204,7 @@ struct OverageSettingsResponse {
 
 /// GET /v1/billing/settings — Get current overage settings
 
-async fn get_overage_settings(
+pub async fn get_overage_settings(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<OverageSettingsResponse>, AppError> {
     let plan = Plan::parse_str(&customer.plan);
@@ -225,7 +225,7 @@ struct UpdateOverageSettingsRequest {
 
 /// PUT /v1/billing/settings — Update overage settings
 
-async fn update_overage_settings(
+pub async fn update_overage_settings(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<UpdateOverageSettingsRequest>,

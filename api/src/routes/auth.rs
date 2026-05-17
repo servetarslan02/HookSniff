@@ -590,7 +590,7 @@ async fn update_profile(
     if let Err(e) = crate::validation::validate_email(&req.email) { return Err(AppError::BadRequest(e)); }
 
     if req.email != customer.email {
-        let existing: Option<(Uuid)> = sqlx::query_as("SELECT id FROM customers WHERE email = $1 AND id != $2")
+        let existing: Option<Uuid> = sqlx::query_scalar("SELECT id FROM customers WHERE email = $1 AND id != $2")
             .bind(&req.email).bind(customer.id).fetch_optional(&pool).await?;
         if existing.is_some() { return Err(AppError::BadRequest("Invalid email".into())); }
     }

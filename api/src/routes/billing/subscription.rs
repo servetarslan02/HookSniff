@@ -1,6 +1,6 @@
 use super::*;
 
-async fn get_subscription(
+pub async fn get_subscription(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<SubscriptionResponse>, AppError> {
     let plan = Plan::parse_str(&customer.plan);
@@ -57,7 +57,7 @@ async fn get_subscription(
 
 /// DELETE /v1/billing/subscription — Cancel the current subscription (downgrade to free at period end)
 
-async fn cancel_subscription(
+pub async fn cancel_subscription(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -159,7 +159,7 @@ fn calculate_proration(
 }
 
 
-async fn upgrade_plan(
+pub async fn upgrade_plan(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
