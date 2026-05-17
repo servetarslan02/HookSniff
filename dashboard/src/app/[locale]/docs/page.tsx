@@ -25,13 +25,17 @@ export default function DocsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-12">
         {[
           { title: '🚀 Quickstart', desc: 'Send your first webhook in under 5 minutes.', href: '/docs/quickstart' },
+          { title: '🪝 What is HookSniff?', desc: 'The problem, how it works, and why to use it.', href: '/docs/what-is-hooksniff' },
           { title: '📐 Core Concepts', desc: 'Endpoints, deliveries, retries, and more.', href: '/docs/concepts' },
+          { title: '✅ Best Practices', desc: 'Production patterns for webhook integrations.', href: '/docs/best-practices' },
           { title: '🔒 Security', desc: 'HMAC-SHA256 verification, IP whitelisting, TLS.', href: '/docs/security' },
           { title: '🖥️ Dashboard', desc: 'Monitor deliveries, manage endpoints, view analytics.', href: '/docs/dashboard' },
           { title: '🔌 Integrations', desc: 'GitHub, Shopify, and generic webhook guides.', href: '/docs/integrations' },
           { title: '🐳 Self-Hosting', desc: 'Run HookSniff on your own infrastructure.', href: '/docs/self-hosting' },
           { title: '🔄 Retries & DLQ', desc: 'Exponential backoff, replay failed webhooks.', href: '/docs/retries' },
-          { title: '📦 SDKs', desc: 'Official Node.js, Python, and Go SDKs.', href: '/docs/sdk-libraries' },
+          { title: '⚡ Rate Limiting', desc: 'Request limits, throttling, and plan quotas.', href: '/docs/rate-limiting' },
+          { title: '📦 SDKs', desc: 'Official Node.js, Python, Go, and 8 more SDKs.', href: '/docs/sdk-libraries' },
+          { title: '🐛 Error Codes', desc: 'API error codes reference and troubleshooting.', href: '/docs/error-codes' },
         ].map((card) => (
           <Link
             key={card.href}
