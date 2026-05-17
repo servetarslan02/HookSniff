@@ -1,5 +1,6 @@
 package com.hooksniff.kotlin
 
+import com.hooksniff.kotlin.exceptions.WebhookVerificationException
 import org.junit.Test
 import org.junit.Assert.*
 import javax.crypto.Mac
@@ -27,7 +28,7 @@ class WebhookTest {
 
     private fun buildHeaders(vararg pairs: Pair<String, String>): HttpHeaders {
         val map = pairs.toList().groupBy { it.first }.mapValues { (_, v) -> v.map { it.second } }
-        return HttpHeaders.of(map) { true }
+        return HttpHeaders.of(map) { _, _ -> true }
     }
 
     @Test
