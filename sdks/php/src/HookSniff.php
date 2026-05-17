@@ -12,6 +12,7 @@ use HookSniff\Api\Health;
 use HookSniff\Api\Message;
 use HookSniff\Api\MessageAttempt;
 use HookSniff\Api\Statistics;
+use HookSniff\Api\Environment;
 use HookSniff\Request\HookSniffHttpClient;
 
 class HookSniff
@@ -23,6 +24,7 @@ class HookSniff
     public Message $message;
     public MessageAttempt $messageAttempt;
     public Statistics $statistics;
+    public Environment $environment;
 
     public function __construct(
         string $token,
@@ -45,5 +47,6 @@ class HookSniff
         $this->message = new Message($hooksniffHttpClient);
         $this->messageAttempt = new MessageAttempt($hooksniffHttpClient);
         $this->statistics = new Statistics($hooksniffHttpClient);
+        $this->environment = new Environment($hooksniffHttpClient);
     }
 }
