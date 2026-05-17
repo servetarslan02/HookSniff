@@ -1,62 +1,51 @@
 /**
- * HookSniff API Resource: API Keys
+ * HookSniff SDK — API Keys Resource
  */
 
-import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
-import { ApiKeyModel, type ApiKeyCreateInput, type ApiKeyOutput } from "../models";
-import { paginate, collectAll, type PaginationOptions } from "../pagination";
+import { HttpMethod, HookSniffRequest, type HookSniffRequestContext } from "../request";
+import type { PostOptions } from "../util";
+import type { ApiKeyInfo, CreateApiKeyResponse } from "../models";
 
-export type { ApiKeyCreateInput, ApiKeyOutput };
+export interface ApiKeyCreateOptions extends PostOptions {
+  name?: string;
+  scopes?: string[];
+  expires_in_days?: number;
+}
 
 export class ApiKeys {
-  constructor(private readonly ctx: HookSniffRequestContext) {}
+  constructor(private readonly requestCtx: HookSniffRequestContext) {}
 
-  /** List all API keys */
-  async list(): Promise<ApiKeyOutput[]> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/v1/api-keys");
-    return req.send<ApiKeyOutput[]>(this.ctx, (json) => {
-      const arr = Array.isArray(json) ? json : [];
-      return arr.map((item) =>
-        typeof item === "object" && item !== null
-          ? ApiKeyModel._fromJsonObject(item as Record<string, unknown>)
-          : item
-      );
+  /** List all API keys. */
+  public list(): Promise<ApiKeyInfo[]> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/api-keys");
+    return request.send(this.requestCtx, (json) => json as ApiKeyInfo[]);
+  }
+
+  /** Create a new API key. Returns the full key (only shown once). */
+  public create(options?: ApiKeyCreateOptions): Promise<CreateApiKeyResponse> {
+    const request = new HookSniffRequest(HttpMethod.POST, "/v1/api-keys");
+    request.setBody({
+      name: options?.name,
+      scopes: options?.scopes,
+      expires_in_days: options?.expires_in_days,
     });
+    if (options?.idempotencyKey) {
+      request.setHeaderParam("idempotency-key", options.idempotencyKey);
+    }
+    return request.send(this.requestCtx, (json) => json as CreateApiKeyResponse);
   }
 
-  /** Iterate through all API keys with automatic pagination */
-  listAll(options?: PaginationOptions): AsyncGenerator<ApiKeyOutput, void, undefined> {
-    return paginate(async ({ limit, offset }) => {
-      const req = new HookSniffRequest(HttpMethod.GET, "/v1/api-keys");
-      req.setQueryParams({ limit, offset });
-      return req.send<{ data: ApiKeyOutput[]; has_more: boolean }>(this.ctx, (json) => {
-        const obj = json as Record<string, unknown>;
-        const data = Array.isArray(obj.data)
-          ? obj.data.map((item) =>
-              typeof item === "object" && item !== null
-                ? ApiKeyModel._fromJsonObject(item as Record<string, unknown>)
-                : item
-            )
-          : [];
-        return { data, has_more: Boolean(obj.has_more ?? false) };
-      });
-    }, options);
+  /** Delete an API key. */
+  public delete(keyId: string): Promise<void> {
+    const request = new HookSniffRequest(HttpMethod.DELETE, "/v1/api-keys/{id}");
+    request.setPathParam("id", keyId);
+    return request.sendNoResponseBody(this.requestCtx);
   }
 
-  /** Create a new API key */
-  async create(input: ApiKeyCreateInput, idempotencyKey?: string): Promise<ApiKeyOutput> {
-    const req = new HookSniffRequest(HttpMethod.POST, "/v1/api-keys");
-    if (idempotencyKey) req.setHeaderParam("idempotency-key", idempotencyKey);
-    req.setBody(ApiKeyModel._toJsonObject(input));
-    return req.send<ApiKeyOutput>(this.ctx, (json) =>
-      ApiKeyModel._fromJsonObject(json as Record<string, unknown>)
-    );
-  }
-
-  /** Delete an API key */
-  async delete(id: string): Promise<void> {
-    const req = new HookSniffRequest(HttpMethod.DELETE, "/v1/api-keys/{id}");
-    req.setPathParam("id", id);
-    return req.sendVoid(this.ctx);
+  /** Rotate an API key (old key invalidated, new key returned). */
+  public rotate(keyId: string): Promise<CreateApiKeyResponse> {
+    const request = new HookSniffRequest(HttpMethod.POST, "/v1/api-keys/{id}/rotate");
+    request.setPathParam("id", keyId);
+    return request.send(this.requestCtx, (json) => json as CreateApiKeyResponse);
   }
 }

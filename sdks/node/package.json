@@ -1,7 +1,7 @@
 {
   "name": "hooksniff-sdk",
-  "version": "0.4.0",
-  "description": "Official Node.js SDK for HookSniff — reliable webhook delivery",
+  "version": "0.5.0",
+  "description": "Official Node.js SDK for HookSniff — reliable webhook delivery for developers",
   "repository": {
     "type": "git",
     "url": "https://github.com/servetarslan02/HookSniff.git"
@@ -18,30 +18,29 @@
   },
   "files": [
     "dist/src/",
-    "README.md",
-    "LICENSE"
+    "README.md"
   ],
   "scripts": {
     "build": "tsc",
-    "test": "node --import tsx src/__tests__/webhook.test.ts && node --import tsx src/__tests__/models.test.ts && node --import tsx src/__tests__/request.test.ts && node --import tsx src/__tests__/pagination.test.ts",
-    "clean": "rm -rf dist/",
-    "prepublishOnly": "npm run build"
-  },
-  "engines": {
-    "node": ">=20.0.0"
+    "prepublishOnly": "npm run build",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --passWithNoTests"
   },
   "keywords": [
     "hooksniff",
     "webhook",
+    "webhooks",
     "sdk",
     "api",
-    "webhook-delivery"
+    "delivery",
+    "retries"
   ],
   "author": "HookSniff",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
-    "@types/node": "^25.6.2",
-    "tsx": "^4.0.0",
+    "@types/node": "^25.8.0",
     "typescript": "^5.0.0"
   }
 }

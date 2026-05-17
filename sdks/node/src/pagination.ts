@@ -1,70 +1,79 @@
 /**
- * HookSniff SDK — Pagination Iterator
+ * HookSniff SDK — Auto-pagination iterator
  *
- * Provides async iteration over paginated API responses.
- * Works with any endpoint that returns { data: T[], has_more: boolean }.
+ * Provides `for await` pagination over list endpoints.
+ * Based on Svix SDK architecture (MIT License).
  *
  * Usage:
- *   for await (const delivery of hs.webhooks.listAll()) {
- *     console.log(delivery.id);
+ *   for await (const ep of hooksniff.endpoints.list()) {
+ *     console.log(ep.id);
  *   }
  */
 
-export interface Page<T> {
+export interface ListResponse<T> {
   data: T[];
-  has_more: boolean;
+  iterator?: string | null;
+  done?: boolean;
 }
 
 export interface PaginationOptions {
-  /** Items per page (default: 50) */
   limit?: number;
-  /** Maximum total items to fetch (default: unlimited) */
-  maxItems?: number;
+  iterator?: string | null;
 }
 
 /**
- * Create an async generator that paginates through API results.
- *
- * @param fetchPage - Function that fetches a page given { limit, offset }
- * @param options - Pagination options (limit, maxItems)
+ * Creates an async iterator that automatically fetches the next page
+ * until all items are consumed.
  */
-export async function* paginate<T>(
-  fetchPage: (params: { limit: number; offset: number }) => Promise<Page<T>>,
-  options?: PaginationOptions
-): AsyncGenerator<T, void, undefined> {
-  const limit = options?.limit ?? 50;
-  const maxItems = options?.maxItems ?? Infinity;
-  let offset = 0;
-  let fetched = 0;
+export function paginatedIterator<T, O extends PaginationOptions = PaginationOptions>(
+  fetchPage: (options?: O) => Promise<ListResponse<T>>,
+  options?: O
+): AsyncIterable<T> {
+  return {
+    [Symbol.asyncIterator]() {
+      let currentIterator: string | null | undefined = options?.iterator ?? null;
+      let done = false;
+      let buffer: T[] = [];
+      let bufferIndex = 0;
 
-  while (fetched < maxItems) {
-    const page = await fetchPage({ limit, offset });
+      return {
+        async next(): Promise<IteratorResult<T>> {
+          // If buffer has items, return next
+          if (bufferIndex < buffer.length) {
+            return { value: buffer[bufferIndex++], done: false };
+          }
 
-    for (const item of page.data) {
-      if (fetched >= maxItems) return;
-      yield item;
-      fetched++;
-    }
+          // If we're done, return
+          if (done) {
+            return { value: undefined as unknown as T, done: true };
+          }
 
-    if (!page.has_more) return;
-    if (page.data.length === 0) return; // Safety: avoid infinite loop on empty pages
+          // Fetch next page
+          const pageOptions = {
+            ...options,
+            iterator: currentIterator,
+          } as O;
 
-    offset += page.data.length;
-  }
-}
+          const response = await fetchPage(pageOptions);
 
-/**
- * Collect all pages into a single array.
- * Convenience wrapper around paginate() for cases where
- * you need all results at once.
- */
-export async function collectAll<T>(
-  fetchPage: (params: { limit: number; offset: number }) => Promise<Page<T>>,
-  options?: PaginationOptions
-): Promise<T[]> {
-  const results: T[] = [];
-  for await (const item of paginate(fetchPage, options)) {
-    results.push(item);
-  }
-  return results;
+          buffer = response.data ?? [];
+          bufferIndex = 0;
+
+          // Check if there are more pages
+          if (response.done === true || !response.iterator || buffer.length === 0) {
+            done = true;
+          } else {
+            currentIterator = response.iterator;
+          }
+
+          // If this page was empty, we're done
+          if (buffer.length === 0) {
+            return { value: undefined as unknown as T, done: true };
+          }
+
+          return { value: buffer[bufferIndex++], done: false };
+        },
+      };
+    },
+  };
 }

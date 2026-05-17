@@ -1,100 +1,93 @@
 /**
- * HookSniff API Resource: Endpoints
- *
- * Manage webhook endpoints — create, list, update, delete, rotate secrets.
+ * HookSniff SDK — Endpoints Resource
  */
 
-import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
-import {
-  EndpointModel,
-  EndpointSecretModel,
-  type EndpointCreateInput,
-  type EndpointUpdateInput,
-  type EndpointOutput,
-  type EndpointSecretOutput,
+import { HttpMethod, HookSniffRequest, type HookSniffRequestContext } from "../request";
+import { paginatedIterator, type ListResponse, type PaginationOptions } from "../pagination";
+import type {
+  Endpoint,
+  EndpointListResponse,
+  CreateEndpointRequest,
+  UpdateEndpointRequest,
+  RotateSecretResponse,
 } from "../models";
-import { paginate, collectAll, type PaginationOptions } from "../pagination";
 
-export type { EndpointCreateInput, EndpointUpdateInput, EndpointOutput, EndpointSecretOutput };
+export interface EndpointListOptions extends PaginationOptions {
+  is_active?: boolean;
+}
+
+export interface EndpointRotateSecretOptions {
+  idempotencyKey?: string;
+}
 
 export class Endpoints {
-  constructor(private readonly ctx: HookSniffRequestContext) {}
+  constructor(private readonly requestCtx: HookSniffRequestContext) {}
 
-  /** List all endpoints (single page) */
-  async list(): Promise<EndpointOutput[]> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/v1/endpoints");
-    return req.send<EndpointOutput[]>(this.ctx, (json) => {
-      const arr = Array.isArray(json) ? json : [];
-      return arr.map((item) =>
-        typeof item === "object" && item !== null
-          ? EndpointModel._fromJsonObject(item as Record<string, unknown>)
-          : item
-      );
+  /** List all endpoints for the authenticated user. */
+  public list(options?: EndpointListOptions): Promise<EndpointListResponse> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/endpoints");
+    request.setQueryParams({
+      limit: options?.limit,
+      iterator: options?.iterator,
+      is_active: options?.is_active,
     });
+    return request.send(this.requestCtx, (json) => json as EndpointListResponse);
   }
 
-  /** Iterate through all endpoints with automatic pagination */
-  listAll(options?: PaginationOptions): AsyncGenerator<EndpointOutput, void, undefined> {
-    return paginate(async ({ limit, offset }) => {
-      const req = new HookSniffRequest(HttpMethod.GET, "/v1/endpoints");
-      req.setQueryParams({ limit, offset });
-      const page = await req.send<{ data: EndpointOutput[]; has_more: boolean }>(this.ctx, (json) => {
-        const obj = json as Record<string, unknown>;
-        const data = Array.isArray(obj.data)
-          ? obj.data.map((item) =>
-              typeof item === "object" && item !== null
-                ? EndpointModel._fromJsonObject(item as Record<string, unknown>)
-                : item
-            )
-          : [];
-        return { data, has_more: Boolean(obj.has_more ?? false) };
-      });
-      return page;
-    }, options);
-  }
-
-  /** Create a new endpoint */
-  async create(input: EndpointCreateInput, idempotencyKey?: string): Promise<EndpointOutput> {
-    const req = new HookSniffRequest(HttpMethod.POST, "/v1/endpoints");
-    if (idempotencyKey) req.setHeaderParam("idempotency-key", idempotencyKey);
-    req.setBody(EndpointModel._toJsonObject(input));
-    return req.send<EndpointOutput>(this.ctx, (json) =>
-      EndpointModel._fromJsonObject(json as Record<string, unknown>)
+  /** Auto-paginate through all endpoints. */
+  public listAll(options?: EndpointListOptions): AsyncIterable<Endpoint> {
+    return paginatedIterator(
+      (opts) => this.list({ ...options, ...opts }),
+      options
     );
   }
 
-  /** Get an endpoint by ID */
-  async get(id: string): Promise<EndpointOutput> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/v1/endpoints/{id}");
-    req.setPathParam("id", id);
-    return req.send<EndpointOutput>(this.ctx, (json) =>
-      EndpointModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Get a single endpoint by ID. */
+  public get(endpointId: string): Promise<Endpoint> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/endpoints/{id}");
+    request.setPathParam("id", endpointId);
+    return request.send(this.requestCtx, (json) => json as Endpoint);
   }
 
-  /** Update an endpoint */
-  async update(id: string, input: EndpointUpdateInput): Promise<EndpointOutput> {
-    const req = new HookSniffRequest(HttpMethod.PUT, "/v1/endpoints/{id}");
-    req.setPathParam("id", id);
-    req.setBody(EndpointModel._toJsonObject(input));
-    return req.send<EndpointOutput>(this.ctx, (json) =>
-      EndpointModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Create a new endpoint. */
+  public create(body: CreateEndpointRequest): Promise<Endpoint> {
+    const request = new HookSniffRequest(HttpMethod.POST, "/v1/endpoints");
+    request.setBody(body);
+    return request.send(this.requestCtx, (json) => json as Endpoint);
   }
 
-  /** Delete an endpoint */
-  async delete(id: string): Promise<void> {
-    const req = new HookSniffRequest(HttpMethod.DELETE, "/v1/endpoints/{id}");
-    req.setPathParam("id", id);
-    return req.sendVoid(this.ctx);
+  /** Update an existing endpoint. */
+  public update(endpointId: string, body: UpdateEndpointRequest): Promise<Endpoint> {
+    const request = new HookSniffRequest(HttpMethod.PUT, "/v1/endpoints/{id}");
+    request.setPathParam("id", endpointId);
+    request.setBody(body);
+    return request.send(this.requestCtx, (json) => json as Endpoint);
   }
 
-  /** Rotate the signing secret for an endpoint */
-  async rotateSecret(id: string): Promise<EndpointSecretOutput> {
-    const req = new HookSniffRequest(HttpMethod.POST, "/v1/endpoints/{id}/rotate-secret");
-    req.setPathParam("id", id);
-    return req.send<EndpointSecretOutput>(this.ctx, (json) =>
-      EndpointSecretModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Delete an endpoint. */
+  public delete(endpointId: string): Promise<void> {
+    const request = new HookSniffRequest(HttpMethod.DELETE, "/v1/endpoints/{id}");
+    request.setPathParam("id", endpointId);
+    return request.sendNoResponseBody(this.requestCtx);
+  }
+
+  /** Rotate the signing secret for an endpoint. */
+  public rotateSecret(
+    endpointId: string,
+    options?: EndpointRotateSecretOptions
+  ): Promise<RotateSecretResponse> {
+    const request = new HookSniffRequest(HttpMethod.POST, "/v1/endpoints/{id}/rotate-secret");
+    request.setPathParam("id", endpointId);
+    if (options?.idempotencyKey) {
+      request.setHeaderParam("idempotency-key", options.idempotencyKey);
+    }
+    return request.send(this.requestCtx, (json) => json as RotateSecretResponse);
+  }
+
+  /** Get health info for an endpoint. */
+  public health(endpointId: string): Promise<import("../models").EndpointHealth> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/endpoints/{id}/health");
+    request.setPathParam("id", endpointId);
+    return request.send(this.requestCtx, (json) => json as import("../models").EndpointHealth);
   }
 }
