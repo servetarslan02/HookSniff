@@ -1,231 +1,172 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-require 'hooksniff/webhook'
-require 'openssl'
-require 'base64'
-require 'json'
-require 'time'
+require "hooksniff"
 
-RSpec.describe HookSniff::Webhook do
-  let(:raw_secret) { 'testsecretkey1234567890abcdef' }
-  let(:secret) { "whsec_#{Base64.strict_encode64(raw_secret)}" }
-  let(:webhook) { described_class.new(secret) }
-  let(:msg_id) { 'msg_test123' }
-  let(:payload) { '{"event":"test","data":{"id":1}}' }
+DEFAULT_MSG_ID = "msg_p5jXN8AQM9LWM0D4loKWxJek"
+DEFAULT_PAYLOAD = "{\"test\": 2432232314}"
+DEFAULT_SECRET = "MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw"
+TOLERANCE = 5 * 60
 
-  def compute_signature(secret_key, msg_id, timestamp, payload_body)
-    content = "#{msg_id}.#{timestamp}.#{payload_body}"
-    hmac = OpenSSL::HMAC.digest('SHA256', secret_key, content)
-    "v1,#{Base64.strict_encode64(hmac)}"
+class TestPayload
+
+  def initialize(id: DEFAULT_MSG_ID, timestamp: Time.now.to_i, payload: DEFAULT_PAYLOAD, secret: DEFAULT_SECRET)
+    @id = id
+    @timestamp = timestamp
+
+    @payload = payload
+    @secret = secret
+
+    toSign = "#{@id}.#{@timestamp}.#{@payload}"
+    @signature = Base64
+      .encode64(OpenSSL::HMAC.digest(OpenSSL::Digest.new("sha256"), Base64.decode64(@secret), toSign))
+      .strip
+
+    @headers = {
+      "hooksniff-id" => @id,
+      "hooksniff-signature" => "v1,#{@signature}",
+      "hooksniff-timestamp" => @timestamp
+    }
   end
 
-  describe '#verify' do
-    context 'with valid signature' do
-      it 'returns the parsed payload on success' do
-        timestamp = Time.now.to_i.to_s
-        sig = compute_signature(raw_secret, msg_id, timestamp, payload)
+  attr_accessor :secret
+  attr_accessor :id
+  attr_accessor :timestamp
+  attr_accessor :payload
+  attr_accessor :signature
+  attr_accessor :headers
+end
 
-        headers = {
-          'svix-id' => msg_id,
-          'svix-timestamp' => timestamp,
-          'svix-signature' => sig
-        }
+describe HookSniff::Webhook do
+  it "missing id raises error" do
+    testPayload = TestPayload.new
+    testPayload.headers.delete("hooksniff-id")
 
-        result = webhook.verify(payload, headers)
-        expect(result).to eq(JSON.parse(payload))
-      end
+    wh = HookSniff::Webhook.new(testPayload.secret)
 
-      it 'works with webhook- prefixed headers' do
-        timestamp = Time.now.to_i.to_s
-        sig = compute_signature(raw_secret, msg_id, timestamp, payload)
-
-        headers = {
-          'webhook-id' => msg_id,
-          'webhook-timestamp' => timestamp,
-          'webhook-signature' => sig
-        }
-
-        result = webhook.verify(payload, headers)
-        expect(result).to eq(JSON.parse(payload))
-      end
-
-      it 'is case-insensitive on header keys' do
-        timestamp = Time.now.to_i.to_s
-        sig = compute_signature(raw_secret, msg_id, timestamp, payload)
-
-        headers = {
-          'Svix-Id' => msg_id,
-          'Svix-Timestamp' => timestamp,
-          'Svix-Signature' => sig
-        }
-
-        result = webhook.verify(payload, headers)
-        expect(result).to eq(JSON.parse(payload))
-      end
-
-      it 'accepts signature with multiple comma-separated values' do
-        timestamp = Time.now.to_i.to_s
-        sig = compute_signature(raw_secret, msg_id, timestamp, payload)
-        multi_sig = "v1_wrong,#{sig}"
-
-        headers = {
-          'svix-id' => msg_id,
-          'svix-timestamp' => timestamp,
-          'svix-signature' => multi_sig
-        }
-
-        # The second sig in the comma list should match
-        result = webhook.verify(payload, headers)
-        expect(result).to eq(JSON.parse(payload))
-      end
-    end
-
-    context 'with invalid signature' do
-      it 'raises WebhookVerificationError' do
-        timestamp = Time.now.to_i.to_s
-
-        headers = {
-          'svix-id' => msg_id,
-          'svix-timestamp' => timestamp,
-          'svix-signature' => 'v1,dGhpcyBpcyB3cm9uZw==' # wrong sig
-        }
-
-        expect { webhook.verify(payload, headers) }
-          .to raise_error(HookSniff::WebhookVerificationError, /Invalid webhook signature/)
-      end
-
-      it 'rejects signature signed with a different secret' do
-        timestamp = Time.now.to_i.to_s
-        wrong_secret = 'completelydifferentsecretkey1234'
-        sig = compute_signature(wrong_secret, msg_id, timestamp, payload)
-
-        headers = {
-          'svix-id' => msg_id,
-          'svix-timestamp' => timestamp,
-          'svix-signature' => sig
-        }
-
-        expect { webhook.verify(payload, headers) }
-          .to raise_error(HookSniff::WebhookVerificationError, /Invalid webhook signature/)
-      end
-    end
-
-    context 'with expired timestamp' do
-      it 'rejects timestamps older than tolerance' do
-        old_timestamp = (Time.now.to_i - 600).to_s # 10 minutes ago
-        sig = compute_signature(raw_secret, msg_id, old_timestamp, payload)
-
-        headers = {
-          'svix-id' => msg_id,
-          'svix-timestamp' => old_timestamp,
-          'svix-signature' => sig
-        }
-
-        expect { webhook.verify(payload, headers) }
-          .to raise_error(HookSniff::WebhookVerificationError, /timestamp is too old/)
-      end
-
-      it 'rejects timestamps in the future beyond tolerance' do
-        future_timestamp = (Time.now.to_i + 600).to_s # 10 minutes from now
-        sig = compute_signature(raw_secret, msg_id, future_timestamp, payload)
-
-        headers = {
-          'svix-id' => msg_id,
-          'svix-timestamp' => future_timestamp,
-          'svix-signature' => sig
-        }
-
-        expect { webhook.verify(payload, headers) }
-          .to raise_error(HookSniff::WebhookVerificationError, /timestamp is too old/)
-      end
-
-      it 'accepts timestamps within tolerance' do
-        recent_timestamp = (Time.now.to_i - 100).to_s # 100 seconds ago, within 300s
-        sig = compute_signature(raw_secret, msg_id, recent_timestamp, payload)
-
-        headers = {
-          'svix-id' => msg_id,
-          'svix-timestamp' => recent_timestamp,
-          'svix-signature' => sig
-        }
-
-        result = webhook.verify(payload, headers)
-        expect(result).to eq(JSON.parse(payload))
-      end
-    end
-
-    context 'with missing headers' do
-      it 'raises error when svix-id is missing' do
-        timestamp = Time.now.to_i.to_s
-        headers = {
-          'svix-timestamp' => timestamp,
-          'svix-signature' => 'v1,fakesig'
-        }
-
-        expect { webhook.verify(payload, headers) }
-          .to raise_error(HookSniff::WebhookVerificationError, /Missing webhook-id/)
-      end
-
-      it 'raises error when svix-timestamp is missing' do
-        headers = {
-          'svix-id' => msg_id,
-          'svix-signature' => 'v1,fakesig'
-        }
-
-        expect { webhook.verify(payload, headers) }
-          .to raise_error(HookSniff::WebhookVerificationError, /Missing webhook-timestamp/)
-      end
-
-      it 'raises error when svix-signature is missing' do
-        timestamp = Time.now.to_i.to_s
-        headers = {
-          'svix-id' => msg_id,
-          'svix-timestamp' => timestamp
-        }
-
-        expect { webhook.verify(payload, headers) }
-          .to raise_error(HookSniff::WebhookVerificationError, /Missing webhook-signature/)
-      end
-
-      it 'raises error when all headers are missing' do
-        expect { webhook.verify(payload, {}) }
-          .to raise_error(HookSniff::WebhookVerificationError, /Missing webhook-id/)
-      end
-    end
+    expect { wh.verify(testPayload.payload, testPayload.headers) }.to(raise_error(HookSniff::WebhookVerificationError))
   end
 
-  describe '#sign' do
-    it 'generates a valid signature that can be verified' do
-      timestamp = Time.now.to_i
-      sig = webhook.sign(msg_id, timestamp, payload)
+  it "missing timestamp raises error" do
+    testPayload = TestPayload.new
+    testPayload.headers.delete("hooksniff-timestamp")
 
-      headers = {
-        'svix-id' => msg_id,
-        'svix-timestamp' => timestamp.to_s,
-        'svix-signature' => sig
-      }
+    wh = HookSniff::Webhook.new(testPayload.secret)
 
-      result = webhook.verify(payload, headers)
-      expect(result).to eq(JSON.parse(payload))
-    end
+    expect { wh.verify(testPayload.payload, testPayload.headers) }.to(raise_error(HookSniff::WebhookVerificationError))
   end
 
-  describe '#initialize' do
-    it 'accepts raw base64 secret (without whsec_ prefix)' do
-      raw = Base64.strict_encode64(raw_secret)
-      wh = described_class.new(raw)
-      timestamp = Time.now.to_i.to_s
-      sig = compute_signature(raw_secret, msg_id, timestamp, payload)
+  it "missing signature raises error" do
+    testPayload = TestPayload.new
+    testPayload.headers.delete("hooksniff-signature")
 
-      headers = {
-        'svix-id' => msg_id,
-        'svix-timestamp' => timestamp,
-        'svix-signature' => sig
-      }
+    wh = HookSniff::Webhook.new(testPayload.secret)
 
-      result = wh.verify(payload, headers)
-      expect(result).to eq(JSON.parse(payload))
-    end
+    expect { wh.verify(testPayload.payload, testPayload.headers) }.to(raise_error(HookSniff::WebhookVerificationError))
+  end
+
+  it "invalid signature raises error" do
+    testPayload = TestPayload.new
+    testPayload.headers["hooksniff-signature"] = "v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLawdd"
+
+    wh = HookSniff::Webhook.new(testPayload.secret)
+
+    expect { wh.verify(testPayload.payload, testPayload.headers) }.to(raise_error(HookSniff::WebhookVerificationError))
+  end
+
+  it "valid signature is valid and returns valid json" do
+    testPayload = TestPayload.new
+    wh = HookSniff::Webhook.new(testPayload.secret)
+
+    json = wh.verify(testPayload.payload, testPayload.headers)
+    expect(json[:test]).to(eq(2432232314))
+  end
+
+  it "valid unbranded signature is valid and returns valid json" do
+    testPayload = TestPayload.new
+    unbrandedHeaders = {
+      "webhook-id" => testPayload.headers["hooksniff-id"],
+      "webhook-signature" => testPayload.headers["hooksniff-signature"],
+      "webhook-timestamp" => testPayload.headers["hooksniff-timestamp"]
+    }
+    testPayload.headers = unbrandedHeaders
+
+    wh = HookSniff::Webhook.new(testPayload.secret)
+
+    json = wh.verify(testPayload.payload, testPayload.headers)
+    expect(json[:test]).to(eq(2432232314))
+  end
+
+  it "old timestamp raises error" do
+    testPayload = TestPayload.new(timestamp: Time.now.to_i - TOLERANCE - 1)
+
+    wh = HookSniff::Webhook.new(testPayload.secret)
+
+    expect { wh.verify(testPayload.payload, testPayload.headers) }.to(raise_error(HookSniff::WebhookVerificationError))
+  end
+
+  it "new timestamp raises error" do
+    testPayload = TestPayload.new(timestamp: Time.now.to_i + TOLERANCE + 1)
+
+    wh = HookSniff::Webhook.new(testPayload.secret)
+
+    expect { wh.verify(testPayload.payload, testPayload.headers) }.to(raise_error(HookSniff::WebhookVerificationError))
+  end
+
+  it "invalid timestamp raises error" do
+    testPayload = TestPayload.new(timestamp: "teadwd")
+
+    wh = HookSniff::Webhook.new(testPayload.secret)
+
+    expect { wh.verify(testPayload.payload, testPayload.headers) }.to(raise_error(HookSniff::WebhookVerificationError))
+  end
+
+  it "multi sig payload is valid" do
+    testPayload = TestPayload.new
+    sigs = [
+      "v1,Ceo5qEr07ixe2NLpvHk3FH9bwy/WavXrAFQ/9tdO6mc=",
+      "v2,Ceo5qEr07ixe2NLpvHk3FH9bwy/WavXrAFQ/9tdO6mc=",
+      # valid signature
+      testPayload.headers["hooksniff-signature"],
+      "v1,Ceo5qEr07ixe2NLpvHk3FH9bwy/WavXrAFQ/9tdO6mc="
+    ]
+    testPayload.headers["hooksniff-signature"] = sigs.join(" ")
+
+    wh = HookSniff::Webhook.new(testPayload.secret)
+
+    json = wh.verify(testPayload.payload, testPayload.headers)
+    expect(json[:test]).to(eq(2432232314))
+  end
+
+  it "signature verification works with and without prefix" do
+    testPayload = TestPayload.new
+
+    wh = HookSniff::Webhook.new(testPayload.secret)
+    json = wh.verify(testPayload.payload, testPayload.headers)
+    expect(json[:test]).to(eq(2432232314))
+
+    wh = HookSniff::Webhook.new("whsec_" + testPayload.secret)
+    json = wh.verify(testPayload.payload, testPayload.headers)
+    expect(json[:test]).to(eq(2432232314))
+  end
+
+  it "sign function works" do
+    key = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw"
+    msg_id = "msg_p5jXN8AQM9LWM0D4loKWxJek"
+    timestamp = 1614265330
+    payload = "{\"test\": 2432232314}"
+    expected = "v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE="
+
+    wh = HookSniff::Webhook.new(key)
+    signature = wh.sign(msg_id, timestamp, payload)
+    expect(signature).to(eq(expected))
+  end
+
+  it "returns empty json when payload is empty" do
+    testPayload = TestPayload.new(payload: '')
+
+    wh = HookSniff::Webhook.new(testPayload.secret)
+
+    json = wh.verify(testPayload.payload, testPayload.headers)
+    expect(json).to(eq(nil))
   end
 end

@@ -1,9 +1,7 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-gemspec name: "hooksniff"
+gem 'base64'
+gem 'logger'
+gem 'ostruct'
 
-group :development, :test do
-  gem 'rake', '~> 13.0.1'
-  gem 'pry-byebug'
-  gem 'rubocop', '~> 1.75.0'
-end
+gemspec
