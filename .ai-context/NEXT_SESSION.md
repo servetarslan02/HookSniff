@@ -24,7 +24,10 @@ Bu dosyayı ilk kez okuyorsan:
 4. **Admin sidebar** — PrefetchLink ile hover prefetch (80ms delay)
 5. **Dashboard sidebar** — PrefetchLink ile hover prefetch (80ms delay)
 6. **System page** — 8 below-the-fold section LazySection ile sarmalandı
-7. **Commit:** 518cad4e — push edildi
+7. **Users page** — bulk actions + user table LazySection ile sarmalandı
+8. **Alerts page** — create/edit form + alert list LazySection ile sarmalandı
+9. **Feature-flags page** — flags table LazySection ile sarmalandı (modals dışarıda)
+10. **Commit:** 518cad4e, 169637d2 — push edildi
 
 ### Billing Page Complete Overhaul ✅ (2026-05-17 17:37)
 1. **Sidebar: Billing ayrı bölüm** — Account'dan çıkarıldı, kendi section'ı (💳)
@@ -343,9 +346,9 @@ postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-
 
 ### Kalan Sayfalar (sırayla yapılacak):
 1. **admin/system** (720 satır) — ✅ LazySection ile sarmalandı (8 section)
-2. **admin/users** (675 satır) — user table lazy load
-3. **admin/alerts** (375 satır) — alerts list lazy load
-4. **admin/feature-flags** (332 satır) — flags list lazy load
+2. **admin/users** (675 satır) — ✅ LazySection ile sarmalandı (bulk actions + user table)
+3. **admin/alerts** (375 satır) — ✅ LazySection ile sarmalandı (form + alert list)
+4. **admin/feature-flags** (332 satır) — ✅ LazySection ile sarmalandı (flags table)
 
 ### Pattern (tek-view sayfalar için):
 ```tsx
