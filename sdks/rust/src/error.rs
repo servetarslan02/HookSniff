@@ -19,29 +19,6 @@ pub enum Error {
     Http(HttpErrorContent<crate::models::HttpErrorOut>),
     /// Http Validation Error
     Validation(HttpErrorContent<crate::models::HttpValidationError>),
-    /// 400 Bad Request
-    BadRequest(HttpErrorContent<crate::models::HttpErrorOut>),
-    /// 401 Unauthorized
-    Unauthorized(HttpErrorContent<crate::models::HttpErrorOut>),
-    /// 403 Forbidden
-    Forbidden(HttpErrorContent<crate::models::HttpErrorOut>),
-    /// 404 Not Found
-    NotFound(HttpErrorContent<crate::models::HttpErrorOut>),
-    /// 409 Conflict
-    Conflict(HttpErrorContent<crate::models::HttpErrorOut>),
-    /// 429 Rate Limited
-    RateLimited {
-        content: HttpErrorContent<crate::models::HttpErrorOut>,
-        retry_after: Option<u64>,
-    },
-    /// 500 Internal Server Error
-    InternalServerError(HttpErrorContent<crate::models::HttpErrorOut>),
-    /// 502 Bad Gateway
-    BadGateway(HttpErrorContent<crate::models::HttpErrorOut>),
-    /// 503 Service Unavailable
-    ServiceUnavailable(HttpErrorContent<crate::models::HttpErrorOut>),
-    /// 504 Gateway Timeout
-    GatewayTimeout(HttpErrorContent<crate::models::HttpErrorOut>),
 }
 
 impl Error {
@@ -59,56 +36,14 @@ impl Error {
                         payload: serde_json::from_slice(&bytes).ok(),
                     })
                 } else {
-                    let content = HttpErrorContent {
+                    Error::Http(HttpErrorContent {
                         status: http1_to_02_status_code(status_code),
                         payload: serde_json::from_slice(&bytes).ok(),
-                    };
-                    match status_code.as_u16() {
-                        400 => Self::BadRequest(content),
-                        401 => Self::Unauthorized(content),
-                        403 => Self::Forbidden(content),
-                        404 => Self::NotFound(content),
-                        409 => Self::Conflict(content),
-                        500 => Self::InternalServerError(content),
-                        502 => Self::BadGateway(content),
-                        503 => Self::ServiceUnavailable(content),
-                        504 => Self::GatewayTimeout(content),
-                        _ => Error::Http(content),
-                    }
+                    })
                 }
             }
             Err(e) => Self::Generic(e.to_string()),
         }
-    }
-
-    /// Returns true if this error is a rate limit error (429).
-    pub fn is_rate_limit(&self) -> bool {
-        matches!(self, Error::RateLimited { .. })
-    }
-
-    /// Returns true if this error is a server error (5xx).
-    pub fn is_server_error(&self) -> bool {
-        matches!(
-            self,
-            Error::InternalServerError(_)
-                | Error::BadGateway(_)
-                | Error::ServiceUnavailable(_)
-                | Error::GatewayTimeout(_)
-        )
-    }
-
-    /// Returns true if this error is a client error (4xx).
-    pub fn is_client_error(&self) -> bool {
-        matches!(
-            self,
-            Error::BadRequest(_)
-                | Error::Unauthorized(_)
-                | Error::Forbidden(_)
-                | Error::NotFound(_)
-                | Error::Conflict(_)
-                | Error::Validation(_)
-                | Error::RateLimited { .. }
-        )
     }
 }
 
@@ -125,18 +60,6 @@ impl fmt::Display for Error {
             Error::Generic(s) => s.fmt(f),
             Error::Http(e) => format!("Http error (status={}) {:?}", e.status, e.payload).fmt(f),
             Error::Validation(e) => format!("Validation error {:?}", e.payload).fmt(f),
-            Error::BadRequest(e) => format!("Bad request (status=400) {:?}", e.payload).fmt(f),
-            Error::Unauthorized(e) => format!("Unauthorized (status=401) {:?}", e.payload).fmt(f),
-            Error::Forbidden(e) => format!("Forbidden (status=403) {:?}", e.payload).fmt(f),
-            Error::NotFound(e) => format!("Not found (status=404) {:?}", e.payload).fmt(f),
-            Error::Conflict(e) => format!("Conflict (status=409) {:?}", e.payload).fmt(f),
-            Error::RateLimited { content, retry_after } => {
-                format!("Rate limited (status=429, retry_after={:?}) {:?}", retry_after, content.payload).fmt(f)
-            }
-            Error::InternalServerError(e) => format!("Internal server error (status=500) {:?}", e.payload).fmt(f),
-            Error::BadGateway(e) => format!("Bad gateway (status=502) {:?}", e.payload).fmt(f),
-            Error::ServiceUnavailable(e) => format!("Service unavailable (status=503) {:?}", e.payload).fmt(f),
-            Error::GatewayTimeout(e) => format!("Gateway timeout (status=504) {:?}", e.payload).fmt(f),
         }
     }
 }

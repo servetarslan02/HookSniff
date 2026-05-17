@@ -94,12 +94,12 @@ impl HookSniff {
     pub fn with_token(&self, token: String) -> Self {
         let base_path = self.server_url.clone().unwrap_or_else(|| {
             match token.split('.').next_back() {
-                Some("us") => "https://hooksniff-api-1046140057667.europe-west1.run.app",
-                Some("eu") => "https://hooksniff-api-1046140057667.europe-west1.run.app",
-                Some("in") => "https://hooksniff-api-1046140057667.europe-west1.run.app",
-                Some("ca") => "https://hooksniff-api-1046140057667.europe-west1.run.app",
-                Some("au") => "https://hooksniff-api-1046140057667.europe-west1.run.app",
-                _ => "https://hooksniff-api-1046140057667.europe-west1.run.app",
+                Some("us") => "https://api.us.hooksniff.com",
+                Some("eu") => "https://api.eu.hooksniff.com",
+                Some("in") => "https://api.in.hooksniff.com",
+                Some("ca") => "https://api.ca.hooksniff.com",
+                Some("au") => "https://api.au.hooksniff.com",
+                _ => "https://api.hooksniff.com",
             }
             .to_string()
         });

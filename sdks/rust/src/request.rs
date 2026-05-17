@@ -163,20 +163,6 @@ impl Request {
             match res {
                 Ok(result) => return Ok(result),
                 e @ Err(Error::Validation(_)) => return e,
-                Err(Error::Http(err)) if err.status.as_u16() == 429 => {
-                    // 429 Rate Limit — respect Retry-After header
-                    let retry_after = err.headers.get("retry-after")
-                        .and_then(|v| v.to_str().ok())
-                        .and_then(|v| v.parse::<u64>().ok());
-                    let sleep_duration = retry_after
-                        .map(|s| Duration::from_secs(s))
-                        .or(next_backoff)
-                        .unwrap_or(Duration::from_secs(1));
-                    tokio::time::sleep(sleep_duration).await;
-                    retry_count += 1;
-                    request.headers_mut().insert("hooksniff-retry-count", retry_count.into());
-                    continue;
-                }
                 Err(Error::Http(err)) if err.status.as_u16() < 500 => return Err(Error::Http(err)),
                 e @ Err(_) => {
                     if next_backoff.is_none() {
