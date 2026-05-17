@@ -25,7 +25,7 @@ export default function RetriesPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("exponentialBackoff")}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Failed deliveries are retried up to <strong>6 times</strong> with increasing delays:
+          Failed deliveries are retried up to <strong>3 times</strong> (default) with exponential backoff:
         </p>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700 mb-6">
           <div className="overflow-x-auto"><table className="w-full text-sm">
@@ -37,17 +37,17 @@ export default function RetriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-medium">1</td><td className="px-4 py-3">{t("immediate")}</td><td className="px-4 py-3">0</td></tr>
-              <tr><td className="px-4 py-3 font-medium">2</td><td className="px-4 py-3">10 seconds</td><td className="px-4 py-3">10s</td></tr>
-              <tr><td className="px-4 py-3 font-medium">3</td><td className="px-4 py-3">30 seconds</td><td className="px-4 py-3">40s</td></tr>
-              <tr><td className="px-4 py-3 font-medium">4</td><td className="px-4 py-3">2 minutes</td><td className="px-4 py-3">~2.5 min</td></tr>
-              <tr><td className="px-4 py-3 font-medium">5</td><td className="px-4 py-3">10 minutes</td><td className="px-4 py-3">~12.5 min</td></tr>
-              <tr><td className="px-4 py-3 font-medium">6</td><td className="px-4 py-3">30 minutes</td><td className="px-4 py-3">~42.5 min</td></tr>
+              <tr><td className="px-4 py-3 font-medium">1</td><td className="px-4 py-3">~1 second</td><td className="px-4 py-3">~1s</td></tr>
+              <tr><td className="px-4 py-3 font-medium">2</td><td className="px-4 py-3">~2 seconds</td><td className="px-4 py-3">~3s</td></tr>
+              <tr><td className="px-4 py-3 font-medium">3</td><td className="px-4 py-3">~4 seconds</td><td className="px-4 py-3">~7s</td></tr>
             </tbody>
           </table></div>
         </div>
+        <p className="text-gray-600 dark:text-slate-400 mb-2">
+          Default policy: base delay 1s, multiplier 2x, max delay 1 hour. Jitter (0–25%) is applied to all delays to prevent <strong>thundering herd</strong> problems.
+        </p>
         <p className="text-gray-600 dark:text-slate-400">
-          Jitter (±25%) is applied to all delays to prevent <strong>thundering herd</strong> problems when many deliveries fail simultaneously.
+          The number of retry attempts is configurable per endpoint (1–100). Platform default is set by the admin.
         </p>
       </section>
 
@@ -55,13 +55,15 @@ export default function RetriesPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">What Counts as a Failure?</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>HTTP status code <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">4xx</code> or <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">5xx</code></li>
+          <li>HTTP status code <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">5xx</code> (server errors)</li>
+          <li>HTTP status code <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">429</code> (rate limited)</li>
+          <li>HTTP status code <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">408</code> (request timeout)</li>
           <li>Connection timeout (30 seconds default)</li>
           <li>{t("dnsFailure")}</li>
           <li>{t("tlsHandshakeFailure")}</li>
         </ul>
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          Only <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">2xx</code> responses are considered successful.
+          Only <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">2xx</code> responses are considered successful. Other <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">4xx</code> errors (400, 401, 403, 404, etc.) are <strong>not retried</strong> — they indicate a client-side issue.
         </p>
       </section>
 
@@ -72,12 +74,15 @@ export default function RetriesPage() {
           Configure retry behavior per endpoint:
         </p>
         <CodeBlock
-          code={`{
-  "max_attempts": 5,
-  "backoff": "exponential",
-  "initial_delay_secs": 30,
-  "max_delay_secs": 3600
-}`}
+          code={`curl -X PUT https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints/ep_abc123/retry-policy \\
+  -H "Authorization: Bearer hr_live_YOUR_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "max_attempts": 5,
+    "base_delay_ms": 2000,
+    "max_delay_ms": 600000,
+    "multiplier": 2.0
+  }'`}
         />
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700 mt-4">
           <div className="overflow-x-auto"><table className="w-full text-sm">
@@ -89,10 +94,10 @@ export default function RetriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-mono text-sm">max_attempts</td><td className="px-4 py-3">3</td><td className="px-4 py-3">{t("maxDeliveryAttempts")}</td></tr>
-              <tr><td className="px-4 py-3 font-mono text-sm">backoff</td><td className="px-4 py-3">exponential</td><td className="px-4 py-3">Strategy: exponential, linear, fixed</td></tr>
-              <tr><td className="px-4 py-3 font-mono text-sm">initial_delay_secs</td><td className="px-4 py-3">10</td><td className="px-4 py-3">{t("delayBeforeFirst")}</td></tr>
-              <tr><td className="px-4 py-3 font-mono text-sm">max_delay_secs</td><td className="px-4 py-3">3600</td><td className="px-4 py-3">Maximum delay between retries (1 hour)</td></tr>
+              <tr><td className="px-4 py-3 font-mono text-sm">max_attempts</td><td className="px-4 py-3">3</td><td className="px-4 py-3">{t("maxDeliveryAttempts")} (1–100)</td></tr>
+              <tr><td className="px-4 py-3 font-mono text-sm">base_delay_ms</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">Base delay in milliseconds before first retry</td></tr>
+              <tr><td className="px-4 py-3 font-mono text-sm">max_delay_ms</td><td className="px-4 py-3">3,600,000</td><td className="px-4 py-3">Maximum delay cap (1 hour)</td></tr>
+              <tr><td className="px-4 py-3 font-mono text-sm">multiplier</td><td className="px-4 py-3">2.0</td><td className="px-4 py-3">Backoff multiplier (1.0 = linear, 2.0 = exponential)</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -123,7 +128,7 @@ export default function RetriesPage() {
           <li>Delivery status is set to <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">failed</code></li>
           <li>All attempt details (status codes, errors, timestamps) are preserved</li>
           <li>{t("originalRetained")}</li>
-          <li>DLQ entries are retained for 30 days by default</li>
+          <li>DLQ entries are retained based on your plan's retention period (Developer: 7 days, Startup: 14 days, Pro: 180 days, Enterprise: 365 days)</li>
           <li>{t("inspectDlqEntries")}</li>
         </ul>
       </section>
