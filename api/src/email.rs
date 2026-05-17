@@ -4,6 +4,21 @@ use crate::resend_email::ResendEmailClient;
 use base64::Engine;
 use serde::Deserialize;
 
+/// Wrap content in the standard HookSniff email HTML template.
+fn email_html(content: &str) -> String {
+    format!(
+        r#"<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+{}
+  <p style="margin-top: 24px; color: #6b7280;">— {}</p>
+</body>
+</html>"#,
+        content,
+        "HookSniff"
+    )
+}
+
 /// Language for email templates. Defaults to Turkish (primary market).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum Language {
@@ -42,31 +57,19 @@ pub(crate) fn tpl_welcome(display_name: &str, lang: Language) -> (&'static str, 
     match lang {
         Language::Tr => (
             "HookSniff'e Hoş Geldiniz!",
-            format!(
-                r#"<!DOCTYPE html>
-<html>
-<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #6d28d9;">HookSniff'e Hoş Geldiniz, {display_name}! 🎉</h1>
+            email_html(&format!(
+                r#"  <h1 style="color: #6d28d9;">HookSniff'e Hoş Geldiniz, {display_name}! 🎉</h1>
   <p>Hesabınız başarıyla oluşturuldu.</p>
-  <p>Artık uç noktalar oluşturabilir, webhook'lar kurabilir ve teslimatlarınızı izlemeye başlayabilirsiniz.</p>
-  <p style="margin-top: 24px; color: #6b7280;">— HookSniff Ekibi</p>
-</body>
-</html>"#
-            ),
+  <p>Artık uç noktalar oluşturabilir, webhook'lar kurabilir ve teslimatlarınızı izlemeye başlayabilirsiniz.</p>"#
+            )),
         ),
         Language::En => (
             "Welcome to HookSniff!",
-            format!(
-                r#"<!DOCTYPE html>
-<html>
-<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #6d28d9;">Welcome to HookSniff, {display_name}! 🎉</h1>
+            email_html(&format!(
+                r#"  <h1 style="color: #6d28d9;">Welcome to HookSniff, {display_name}! 🎉</h1>
   <p>Your account has been created successfully.</p>
-  <p>You can now create endpoints, set up webhooks, and start monitoring your deliveries.</p>
-  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
-</body>
-</html>"#
-            ),
+  <p>You can now create endpoints, set up webhooks, and start monitoring your deliveries.</p>"#
+            )),
         ),
     }
 }
@@ -75,51 +78,21 @@ pub(crate) fn tpl_verification(verification_url: &str, lang: Language) -> (&'sta
     match lang {
         Language::Tr => (
             "HookSniff hesabınızı doğrulayın",
-            format!(
-                r#"<!DOCTYPE html>
-<html>
-<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #6d28d9;">E-posta adresinizi doğrulayın</h1>
+            email_html(&format!(
+                r#"  <h1 style="color: #6d28d9;">E-posta adresinizi doğrulayın</h1>
   <p>E-posta adresinizi doğrulamak için aşağıdaki bağlantıya tıklayın:</p>
-  <p>
-    <a href="{verification_url}"
-       style="display:inline-block;background:#6d28d9;color:#fff;
-              padding:12px 24px;border-radius:6px;text-decoration:none;
-              font-weight:bold;">
-      E-postayı Doğrula
-    </a>
-  </p>
-  <p style="color:#6b7280;font-size:14px;">
-    Bu bağlantı 24 saat içinde geçerliliğini yitirir. Bir hesap oluşturmadıysanız bu e-postayı görmezden gelebilirsiniz.
-  </p>
-  <p style="margin-top: 24px; color: #6b7280;">— HookSniff Ekibi</p>
-</body>
-</html>"#
-            ),
+  <p><a href="{verification_url}" style="display:inline-block;background:#6d28d9;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">E-postayı Doğrula</a></p>
+  <p style="color:#6b7280;font-size:14px;">Bu bağlantı 24 saat içinde geçerliliğini yitirir. Bir hesap oluşturmadıysanız bu e-postayı görmezden gelebilirsiniz.</p>"#
+            )),
         ),
         Language::En => (
             "Verify your HookSniff account",
-            format!(
-                r#"<!DOCTYPE html>
-<html>
-<body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: #6d28d9;">Verify your email</h1>
+            email_html(&format!(
+                r#"  <h1 style="color: #6d28d9;">Verify your email</h1>
   <p>Click the link below to verify your email address:</p>
-  <p>
-    <a href="{verification_url}"
-       style="display:inline-block;background:#6d28d9;color:#fff;
-              padding:12px 24px;border-radius:6px;text-decoration:none;
-              font-weight:bold;">
-      Verify Email
-    </a>
-  </p>
-  <p style="color:#6b7280;font-size:14px;">
-    This link expires in 24 hours. If you didn't create an account, ignore this email.
-  </p>
-  <p style="margin-top: 24px; color: #6b7280;">— The HookSniff Team</p>
-</body>
-</html>"#
-            ),
+  <p><a href="{verification_url}" style="display:inline-block;background:#6d28d9;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Verify Email</a></p>
+  <p style="color:#6b7280;font-size:14px;">This link expires in 24 hours. If you didn't create an account, ignore this email.</p>"#
+            )),
         ),
     }
 }
