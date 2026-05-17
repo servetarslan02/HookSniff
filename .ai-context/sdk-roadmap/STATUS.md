@@ -35,6 +35,7 @@
 | MessagePoller | /v1/message-poller | ✅ |
 | Inbound | /v1/inbound | ✅ |
 | Connector | /v1/connectors | ✅ |
+| Integration | /v1/integrations | ✅ |
 
 ## Dashboard Sayfaları
 
@@ -46,6 +47,7 @@
 | Message Poller | /message-poller | ✅ |
 | Inbound Webhooks | /inbound | ✅ |
 | Connectors | /connectors | ✅ |
+| Integrations | /integrations | ✅ |
 
 ## DB Tabloları
 
@@ -60,3 +62,5 @@
 | inbound_configs | ✅ |
 | connectors | ✅ (8 seed) |
 | connector_configs | ✅ |
+| integrations | ✅ |
+| integration_events | ✅ |

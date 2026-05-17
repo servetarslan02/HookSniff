@@ -198,7 +198,8 @@
     "operationalWebhooks": "Operational Webhooks",
     "messagePoller": "Message Poller",
     "inboundWebhooks": "Inbound Webhooks",
-    "connectors": "Connectors"
+    "connectors": "Connectors",
+    "integrations": "Integrations"
   },
   "dashboard": {
     "title": "Dashboard",

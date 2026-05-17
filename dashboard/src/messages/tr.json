@@ -198,7 +198,8 @@
     "operationalWebhooks": "Operasyonel Webhooklar",
     "messagePoller": "Mesaj Yoklayıcı",
     "inboundWebhooks": "Gelen Webhooklar",
-    "connectors": "Bağlayıcılar"
+    "connectors": "Bağlayıcılar",
+    "integrations": "Entegrasyonlar"
   },
   "dashboard": {
     "title": "Dashboard",
