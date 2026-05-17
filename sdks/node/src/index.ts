@@ -7,6 +7,7 @@ import { OperationalWebhook } from "./api/operationalWebhook";
 import { MessagePoller } from "./api/messagePoller";
 import { Inbound } from "./api/inbound";
 import { ConnectorApi } from "./api/connector";
+import { IntegrationApi } from "./api/integration";
 import { Health } from "./api/health";
 import { Message } from "./api/message";
 import { MessageAttempt } from "./api/messageAttempt";
@@ -116,6 +117,10 @@ export class HookSniff {
 
   public get connector() {
     return new ConnectorApi(this.requestCtx);
+  }
+
+  public get integration() {
+    return new IntegrationApi(this.requestCtx);
   }
 
   public get health() {

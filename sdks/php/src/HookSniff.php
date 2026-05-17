@@ -35,6 +35,7 @@ class HookSniff
     public MessagePoller $messagePoller;
     public Inbound $inbound;
     public Connector $connector;
+    public Integration $integration;
 
     public function __construct(
         string $token,
@@ -63,5 +64,6 @@ class HookSniff
         $this->messagePoller = new MessagePoller($hooksniffHttpClient);
         $this->inbound = new Inbound($hooksniffHttpClient);
         $this->connector = new Connector($hooksniffHttpClient);
+        $this->integration = new Integration($hooksniffHttpClient);
     }
 }
