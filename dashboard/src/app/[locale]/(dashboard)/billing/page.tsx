@@ -3,15 +3,12 @@
 import { getErrorMessage } from '@/lib/errors';
 
 import { useState, useRef, useEffect } from 'react';
-import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { billingApiExtended } from '@/lib/api';
-import { useBillingUsage, useBillingInvoices } from '@/hooks/useDashboardData';
-import { usePlans } from '@/hooks/usePlans';
-import { UsageChart, type UsageChartData } from './components/UsageChart';
+import { useBillingInvoices } from '@/hooks/useDashboardData';
 import { PlanCards } from './components/PlanCards';
 import { InvoiceTable } from './components/InvoiceTable';
 import { SubscriptionDetails } from './components/SubscriptionDetails';
@@ -22,43 +19,11 @@ export default function BillingPage() {
   const { toast } = useToast();
   const t = useTranslations('billing');
   const tc = useTranslations('common');
-  const locale = useLocale();
   const router = useRouter();
   const currentPlan = user?.plan || 'developer';
 
   // React Query hooks for data fetching
-  const { data: usageData, isLoading: loadingUsage } = useBillingUsage();
   const { data: invoices, isLoading: loadingInvoices } = useBillingInvoices();
-  const { getPlanLimits } = usePlans();
-  const planLimits = getPlanLimits(currentPlan);
-
-  // Derived values from usage data
-  const usageCount = usageData
-    ? usageData.webhooks?.used ?? usageData.deliveries_used ?? 0
-    : 0;
-  const usageLimit = usageData
-    ? usageData.webhooks?.limit ?? usageData.deliveries_limit ?? 10000
-    : 10000;
-
-  // Endpoint usage
-  const endpointUsed = usageData
-    ? usageData.endpoints?.used ?? usageData.endpoints_count ?? 0
-    : 0;
-  const endpointLimit = usageData
-    ? usageData.endpoints?.limit ?? usageData.endpoints_limit ?? 5
-    : 5;
-
-  // Build chart data from usage
-  const chartData: UsageChartData[] = usageData
-    ? (() => {
-        const now = new Date();
-        const monthLabel = now.toLocaleString(locale, { month: 'short' });
-        return [{ month: monthLabel, count: usageCount }];
-      })()
-    : [];
-
-  const usagePercent = usageLimit > 0 ? Math.round((usageCount / usageLimit) * 100) : 0;
-  const endpointPercent = endpointLimit > 0 ? Math.round((endpointUsed / endpointLimit) * 100) : 0;
 
   // UI state (kept as useState)
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -153,117 +118,6 @@ export default function BillingPage() {
 
       {/* Subscription Details */}
       <SubscriptionDetails onCancel={() => setShowCancelModal(true)} />
-
-      {/* Usage Overview */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('usageOverview')}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {/* Webhook Usage */}
-          <div>
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-600 dark:text-slate-400">{t('webhooksThisMonth')}</span>
-              <span className="font-medium text-gray-900 dark:text-white">
-                {usageCount.toLocaleString()} / {usageLimit.toLocaleString()}
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3">
-              <div
-                className={clsx(
-                  'h-3 rounded-full transition-all duration-500',
-                  usagePercent > 80 ? 'bg-red-500' : usagePercent > 50 ? 'bg-yellow-500' : 'bg-brand-500'
-                )}
-                style={{ width: `${usagePercent}%` }}
-              />
-            </div>
-            {usagePercent > 80 && (
-              <p className="text-xs text-red-600 dark:text-red-400 mt-1.5">
-                ⚠️ {t('approachingLimit')}
-              </p>
-            )}
-          </div>
-
-          {/* Endpoint Usage */}
-          <div>
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-600 dark:text-slate-400">{t('endpoints')}</span>
-              <span className="font-medium text-gray-900 dark:text-white">
-                {endpointUsed} / {endpointLimit}
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3">
-              <div
-                className={clsx(
-                  'h-3 rounded-full transition-all duration-500',
-                  endpointPercent > 80 ? 'bg-red-500' : endpointPercent > 50 ? 'bg-yellow-500' : 'bg-brand-500'
-                )}
-                style={{ width: `${endpointPercent}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Data Retention */}
-          <div>
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-600 dark:text-slate-400">{t('dataRetention')}</span>
-              <span className="font-medium text-gray-900 dark:text-white">
-                {planLimits?.retention ?? '—'} {t('days')}
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3">
-              <div
-                className="h-3 rounded-full transition-all duration-500 bg-brand-500"
-                style={{ width: '100%' }}
-              />
-            </div>
-            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1.5">
-              {t('retentionDesc')}
-            </p>
-          </div>
-        </div>
-
-        {/* Plan Limits Grid */}
-        {planLimits && (
-          <div className="mt-6 pt-6 border-t border-gray-200/50 dark:border-slate-700/50">
-            <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4">{t('planLimits')}</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.endpoints}</p>
-                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('endpoints')}</p>
-              </div>
-              <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.webhooks.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('webhooksMonth')}</p>
-              </div>
-              <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.rateLimit.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('rateLimit')}</p>
-              </div>
-              <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{planLimits.retention}<span className="text-base">d</span></p>
-                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('dataRetention')}</p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Monthly Chart */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('usage')}</h2>
-        {loadingUsage ? (
-          <div className="flex items-center justify-center py-10">
-            <div className="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : chartData.length > 0 ? (
-          <div className="overflow-x-auto">
-            <UsageChart data={chartData} />
-          </div>
-        ) : (
-          <p className="text-sm text-gray-500 dark:text-slate-400 py-6 text-center">
-            {t('noUsageData')}
-          </p>
-        )}
-      </div>
 
       {/* Overage Settings */}
       <OverageSettings />
