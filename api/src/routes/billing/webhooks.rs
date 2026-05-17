@@ -304,9 +304,3 @@ async fn process_webhook_result(
     Ok(())
 }
 
-// ──────────────────────────────────────────────────────────────
-// HS-059: Grace period checker (called by background worker)
-// ──────────────────────────────────────────────────────────────
-
-/// Check for customers past their grace period and downgrade them.
-/// Should be called periodically (e.g., daily) by the worker.
