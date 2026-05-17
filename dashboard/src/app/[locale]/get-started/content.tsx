@@ -114,13 +114,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     icon: '🌐',
     install: '',
     code: `# 1. Create an endpoint
-curl -X POST https://api.hooksniff.dev/v1/endpoints \\
+curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"url": "https://myapp.com/webhooks"}'
 
 # 2. Send a webhook
-curl -X POST https://api.hooksniff.dev/v1/webhooks \\
+curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"endpoint_id": "ep_abc123", "event": "order.created", "data": {"order_id": "ord_123", "total": 49.99}}'`,
@@ -313,10 +313,10 @@ export function GetStartedPageContent() {
           <div className="bg-gray-900 rounded-xl p-4 mb-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-gray-500 uppercase tracking-wider">{t('testWebhook')}</span>
-              <CopyButton text={`curl -X POST https://api.hooksniff.dev/v1/webhooks \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"endpoint_id":"ep_YOUR_ID","event":"order.created","data":{"order_id":"ord_123","total":49.99}}'`} />
+              <CopyButton text={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \\\n  -H "Authorization: Bearer YOUR_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"endpoint_id":"ep_YOUR_ID","event":"order.created","data":{"order_id":"ord_123","total":49.99}}'`} />
             </div>
             <pre className="text-sm font-mono text-green-400 overflow-x-auto">
-              <code>{`curl -X POST https://api.hooksniff.dev/v1/webhooks \\
+              <code>{`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{

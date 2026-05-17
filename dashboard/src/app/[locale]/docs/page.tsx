@@ -23,7 +23,7 @@ const sections = [
     title: 'How-To Guides',
     cards: [
       { title: '✅ Best Practices', desc: 'Production patterns for webhook integrations.', href: '/docs/best-practices' },
-      { title: '🔒 Security', desc: 'HMAC-SHA256 verification, IP whitelisting, TLS.', href: '/docs/security' },
+      { title: '🔒 Security', desc: 'HMAC-SHA256 verification, SSRF protection, TLS, 2FA.', href: '/docs/security' },
       { title: '🔄 Retries & DLQ', desc: 'Exponential backoff, replay failed webhooks.', href: '/docs/retries' },
       { title: '🔍 Debug Failed Webhooks', desc: 'How to investigate delivery failures.', href: '/docs/debug-failed-webhooks' },
       { title: '📊 Monitor Performance', desc: 'Metrics, alerts, and Grafana integration.', href: '/docs/monitor-performance' },
@@ -129,14 +129,14 @@ export default function DocsPage() {
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Plan</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Requests/min</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Webhooks/month</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Events/day</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3">Developer ($0)</td><td className="px-4 py-3">100</td><td className="px-4 py-3">1,000</td></tr>
-              <tr><td className="px-4 py-3">Startup ($14/mo)</td><td className="px-4 py-3">500</td><td className="px-4 py-3">10,000</td></tr>
-              <tr><td className="px-4 py-3">Pro ($29/mo)</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">50,000</td></tr>
-              <tr><td className="px-4 py-3">Enterprise ($99/mo)</td><td className="px-4 py-3">5,000</td><td className="px-4 py-3">500,000</td></tr>
+              <tr><td className="px-4 py-3">Developer ($0)</td><td className="px-4 py-3">100</td><td className="px-4 py-3">100</td></tr>
+              <tr><td className="px-4 py-3">Startup ($29/mo)</td><td className="px-4 py-3">500</td><td className="px-4 py-3">30,000</td></tr>
+              <tr><td className="px-4 py-3">Pro ($49/mo)</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">100,000</td></tr>
+              <tr><td className="px-4 py-3">Enterprise (Custom)</td><td className="px-4 py-3">Custom</td><td className="px-4 py-3">Unlimited</td></tr>
             </tbody>
           </table></div>
         </div>
