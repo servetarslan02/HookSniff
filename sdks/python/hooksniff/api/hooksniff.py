@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from .authentication import Authentication, AuthenticationAsync
 from .client import AuthenticatedClient
 from .endpoint import Endpoint, EndpointAsync
+from .environment import Environment, EnvironmentAsync
 from .event_type import EventType, EventTypeAsync
 from .message import Message, MessageAsync
 from .message_attempt import MessageAttempt, MessageAttemptAsync
@@ -57,6 +58,10 @@ class HookSniffAsync(ClientBase):
         return EndpointAsync(self._client)
 
     @property
+    def environment(self) -> EnvironmentAsync:
+        return EnvironmentAsync(self._client)
+
+    @property
     def event_type(self) -> EventTypeAsync:
         return EventTypeAsync(self._client)
 
@@ -81,6 +86,10 @@ class HookSniff(ClientBase):
     @property
     def endpoint(self) -> Endpoint:
         return Endpoint(self._client)
+
+    @property
+    def environment(self) -> Environment:
+        return Environment(self._client)
 
     @property
     def event_type(self) -> EventType:
