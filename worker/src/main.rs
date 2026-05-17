@@ -75,40 +75,6 @@ mod fifo;
 pub mod telemetry;
 mod throttle;
 
-/// Start a minimal HTTP health check server for Cloud Run.
-/// Cloud Run requires containers to listen on PORT=8080.
-#[allow(dead_code)]
-async fn start_health_server(port: u16) {
-    use axum::{routing::get, Router};
-
-    let app = Router::new()
-        .route("/health", get(|| async { "ok" }))
-        .route("/livez", get(|| async { "ok" }))
-        .route("/readyz", get(|| async {
-            if READY.load(std::sync::atomic::Ordering::Relaxed) {
-                (axum::http::StatusCode::OK, "ready")
-            } else {
-                (axum::http::StatusCode::SERVICE_UNAVAILABLE, "not ready")
-            }
-        }))
-        .route("/", get(|| async { "HookSniff Worker 🐝" }));
-
-    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], port));
-    tracing::info!("🏥 Health check server on :{}", port);
-
-    let listener = match tokio::net::TcpListener::bind(addr).await {
-        Ok(l) => l,
-        Err(e) => {
-            tracing::error!("❌ Failed to bind health server on port {}: {}", port, e);
-            return;
-        }
-    };
-
-    if let Err(e) = axum::serve(listener, app).await {
-        tracing::error!("❌ Health server error: {}", e);
-    }
-}
-
 /// Shared readiness state — set to true once DB pool is connected.
 static READY: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
@@ -117,7 +83,7 @@ static READY: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new
 /// - `/health`  — legacy Cloud Run health check (always 200)
 /// - `/livez`   — liveness probe: process is alive (always 200)
 /// - `/readyz`  — readiness probe: ready to serve traffic (checks DB connectivity)
-async fn start_health_server_with_listener(listener: tokio::net::TcpListener) {
+async fn start_health_server(listener: tokio::net::TcpListener) {
     use axum::{routing::get, Router};
 
     let app = Router::new()
@@ -193,7 +159,7 @@ async fn main() -> Result<()> {
     let health_listener =
         tokio::net::TcpListener::bind(std::net::SocketAddr::from(([0, 0, 0, 0], health_port)))
             .await?;
-    tokio::spawn(start_health_server_with_listener(health_listener));
+    tokio::spawn(start_health_server(health_listener));
     tracing::info!("🏥 Health server bound on :{}", health_port);
 
     // Database pool — strip channel_binding=require (sqlx 0.8 doesn't support it)
@@ -458,6 +424,80 @@ async fn shutdown_signal() {
     }
 }
 
+
+// ── Delivery outcome helpers ────────────────────────────────
+
+/// Move a delivery to dead_letter (non-retryable or max attempts exceeded).
+/// Returns the new failure_streak for the endpoint.
+async fn dead_letter_delivery(
+    pool: &PgPool,
+    queue_id: uuid::Uuid,
+    delivery_id: uuid::Uuid,
+    endpoint_id: uuid::Uuid,
+    attempt: i32,
+    error_msg: &str,
+    attempt_status: Option<i32>,
+    attempt_body: Option<&str>,
+    attempt_headers: Option<&serde_json::Value>,
+    duration_ms: i32,
+    trace_id: Option<&str>,
+    context: &str,
+) -> Result<i32> {
+    let mut tx = pool.begin().await?;
+
+    sqlx::query::<sqlx::Postgres>(
+        "UPDATE webhook_queue SET status = 'dead_letter', processed_at = now(), attempt_count = $1 WHERE id = $2",
+    )
+    .bind(attempt).bind(queue_id).execute(&mut *tx).await?;
+
+    sqlx::query::<sqlx::Postgres>(
+        r#"INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
+           SELECT id, endpoint_id, customer_id, payload, $2, $3 FROM deliveries WHERE id = $1"#,
+    )
+    .bind(delivery_id).bind(error_msg).bind(attempt).execute(&mut *tx).await?;
+
+    sqlx::query::<sqlx::Postgres>(
+        "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1",
+    )
+    .bind(delivery_id).bind(error_msg).execute(&mut *tx).await?;
+
+    record_delivery_attempt(&mut tx, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(error_msg), trace_id, attempt_headers).await?;
+
+    let new_streak: i32 = sqlx::query_scalar(
+        "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1 RETURNING failure_streak",
+    )
+    .bind(endpoint_id).fetch_one(&mut *tx).await.unwrap_or(0);
+
+    commit_delivery_tx(tx, delivery_id, context).await?;
+    Ok(new_streak)
+}
+
+/// Schedule a delivery for retry with exponential backoff.
+async fn retry_delivery(
+    pool: &PgPool,
+    queue_id: uuid::Uuid,
+    delivery_id: uuid::Uuid,
+    attempt: i32,
+    next_retry: chrono::DateTime<chrono::Utc>,
+    error_msg: &str,
+    attempt_status: Option<i32>,
+    attempt_body: Option<&str>,
+    attempt_headers: Option<&serde_json::Value>,
+    duration_ms: i32,
+    trace_id: Option<&str>,
+) -> Result<()> {
+    let mut tx = pool.begin().await?;
+
+    sqlx::query::<sqlx::Postgres>(
+        "UPDATE webhook_queue SET status = 'pending', attempt_count = $1, next_retry_at = $2 WHERE id = $3",
+    )
+    .bind(attempt).bind(next_retry).bind(queue_id).execute(&mut *tx).await?;
+
+    record_delivery_attempt(&mut tx, delivery_id, attempt, attempt_status, attempt_body, duration_ms, Some(&format!("{} — retry scheduled", error_msg)), trace_id, attempt_headers).await?;
+
+    commit_delivery_tx(tx, delivery_id, "retry").await?;
+    Ok(())
+}
 
 /// Process all pending items in the queue
 async fn process_pending(
@@ -789,226 +829,45 @@ async fn process_pending(
                 let _ = fifo::mark_fifo_delivered(&pool, endpoint_id, delivery_id).await;
             } else if is_non_retryable(status_code) {
                 // ❌ Client error (4xx except 429) → dead letter, don't retry
-                tracing::error!(
-                    "❌ Delivery {} → {} — non-retryable client error (HTTP {}), moving to dead letter",
-                    delivery_id,
-                    error_msg,
-                    status_code
-                );
+                tracing::error!("❌ Delivery {} → {} — non-retryable (HTTP {}), dead letter", delivery_id, error_msg, status_code);
 
-                let mut tx = pool.begin().await?;
+                let dl_err = format!("{} (HTTP {}, non-retryable)", error_msg, status_code);
+                let new_streak = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &dl_err, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "non-retryable dead letter").await?;
 
-                sqlx::query::<sqlx::Postgres>(
-                    r#"
-                    UPDATE webhook_queue
-                    SET status = 'dead_letter', processed_at = now(), attempt_count = $1
-                    WHERE id = $2
-                    "#,
-                )
-                .bind(attempt)
-                .bind(item.id)
-                .execute(&mut *tx)
-                .await?;
-
-                sqlx::query::<sqlx::Postgres>(
-                    r#"
-                    INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
-                    SELECT id, endpoint_id, customer_id, payload, $2, $3
-                    FROM deliveries WHERE id = $1
-                    "#,
-                )
-                .bind(delivery_id)
-                .bind(format!("{} (HTTP {}, non-retryable)", error_msg, status_code))
-                .bind(attempt)
-                .execute(&mut *tx)
-                .await?;
-
-                sqlx::query::<sqlx::Postgres>(
-                    "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1",
-                )
-                .bind(delivery_id)
-                .bind(format!("{} (HTTP {})", error_msg, status_code))
-                .execute(&mut *tx)
-                .await?;
-
-                record_delivery_attempt(
-                    &mut tx,
-                    delivery_id,
-                    attempt,
-                    attempt_status,
-                    attempt_body,
-                    duration_ms,
-                    Some(&format!("{} — non-retryable (HTTP {})", error_msg, status_code)),
-                    trace_id.as_deref(),
-                    attempt_headers,
-                )
-                .await?;
-
-                // Update failure_streak and notify if threshold crossed
-                let new_streak: i32 = sqlx::query_scalar(
-                    "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1 RETURNING failure_streak"
-                )
-                .bind(item.endpoint_id)
-                .fetch_one(&mut *tx)
-                .await
-                .unwrap_or(0);
-
-                // Fire-and-forget email notification for endpoint down
                 {
                     let pool_clone = pool.clone();
                     let url_clone = item.endpoint_url.clone();
-                    tokio::spawn(async move {
-                        notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await;
-                    });
+                    tokio::spawn(async move { notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await; });
                 }
 
-                // HS-034: Commit transaction
-                commit_delivery_tx(tx, delivery_id, "non-retryable dead letter").await?;
-
-                // HS-020: Record failure in circuit breaker
                 cb.record_failure(endpoint_id).await;
-
-                // BUG-024: Record attempt in throttle (may trigger backoff)
                 tm.record_attempt(endpoint_id).await;
-
-                // HS-023: Mark FIFO item as failed (blocks subsequent items)
                 let _ = fifo::mark_fifo_failed(&pool, endpoint_id).await;
             } else if attempt >= item.max_attempts {
                 // ❌ Max deneme aşıldı → dead letter
-                tracing::error!(
-                    "❌ Delivery {} → {} — max attempts, moving to dead letter",
-                    delivery_id,
-                    error_msg
-                );
+                tracing::error!("❌ Delivery {} → {} — max attempts, dead letter", delivery_id, error_msg);
 
-                let mut tx = pool.begin().await?;
+                let new_streak = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &error_msg, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "max attempts dead letter").await?;
 
-                sqlx::query::<sqlx::Postgres>(
-                    r#"
-                    UPDATE webhook_queue
-                    SET status = 'dead_letter', processed_at = now(), attempt_count = $1
-                    WHERE id = $2
-                    "#,
-                )
-                .bind(attempt)
-                .bind(item.id)
-                .execute(&mut *tx)
-                .await?;
-
-                // Move to dead_letters
-                sqlx::query::<sqlx::Postgres>(
-                    r#"
-                    INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
-                    SELECT id, endpoint_id, customer_id, payload, $2, $3
-                    FROM deliveries WHERE id = $1
-                    "#,
-                )
-                .bind(delivery_id)
-                .bind(&error_msg)
-                .bind(attempt)
-                .execute(&mut *tx)
-                .await?;
-
-                // Update delivery status
-                sqlx::query::<sqlx::Postgres>(
-                    "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1",
-                )
-                .bind(delivery_id)
-                .bind(&error_msg)
-                .execute(&mut *tx)
-                .await?;
-
-                record_delivery_attempt(
-                    &mut tx,
-                    delivery_id,
-                    attempt,
-                    attempt_status,
-                    attempt_body,
-                    duration_ms,
-                    Some(&error_msg),
-                    trace_id.as_deref(),
-                    attempt_headers,
-                )
-                .await?;
-
-                // Increment endpoint failure streak on dead letter
-                let new_streak: i32 = sqlx::query_scalar(
-                    "UPDATE endpoints SET failure_streak = failure_streak + 1, last_failure_at = now() WHERE id = $1 RETURNING failure_streak"
-                )
-                .bind(item.endpoint_id)
-                .fetch_one(&mut *tx)
-                .await
-                .unwrap_or(0);
-
-                // Fire-and-forget email notification for endpoint down
                 {
                     let pool_clone = pool.clone();
                     let url_clone = item.endpoint_url.clone();
-                    tokio::spawn(async move {
-                        notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await;
-                    });
+                    tokio::spawn(async move { notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await; });
                 }
 
-                // HS-034: Commit transaction
-                commit_delivery_tx(tx, delivery_id, "max attempts dead letter").await?;
-
-                // HS-020: Record failure in circuit breaker
                 cb.record_failure(endpoint_id).await;
-
-                // BUG-024: Record attempt in throttle (may trigger backoff)
                 tm.record_attempt(endpoint_id).await;
-
-                // HS-023: Mark FIFO item as dead-lettered
                 let _ = fifo::mark_fifo_failed(&pool, endpoint_id).await;
             } else {
                 // 🔄 Retry — exponential backoff
                 let delay = calculate_backoff(attempt);
                 let next_retry = chrono::Utc::now() + chrono::Duration::seconds(delay);
 
-                tracing::warn!(
-                    "⚠️ Delivery {} → {} — retrying in {}s (attempt {}/{})",
-                    delivery_id,
-                    error_msg,
-                    delay,
-                    attempt,
-                    item.max_attempts
-                );
+                tracing::warn!("⚠️ Delivery {} → {} — retrying in {}s (attempt {}/{})", delivery_id, error_msg, delay, attempt, item.max_attempts);
 
-                let mut tx = pool.begin().await?;
+                retry_delivery(&pool, item.id, delivery_id, attempt, next_retry, &error_msg, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref()).await?;
 
-                sqlx::query::<sqlx::Postgres>(
-                    r#"
-                    UPDATE webhook_queue
-                    SET status = 'pending', attempt_count = $1, next_retry_at = $2
-                    WHERE id = $3
-                    "#,
-                )
-                .bind(attempt)
-                .bind(next_retry)
-                .bind(item.id)
-                .execute(&mut *tx)
-                .await?;
-
-                record_delivery_attempt(
-                    &mut tx,
-                    delivery_id,
-                    attempt,
-                    attempt_status,
-                    attempt_body,
-                    duration_ms,
-                    Some(&format!("{} — retry scheduled", error_msg)),
-                    trace_id.as_deref(),
-                    attempt_headers,
-                )
-                .await?;
-
-                // HS-034: Commit transaction
-                commit_delivery_tx(tx, delivery_id, "retry").await?;
-
-                // HS-020: Record failure in circuit breaker (retry = delivery failed)
                 cb.record_failure(endpoint_id).await;
-
-                // BUG-024: Record attempt in throttle (may trigger backoff)
                 tm.record_attempt(endpoint_id).await;
             }
 
