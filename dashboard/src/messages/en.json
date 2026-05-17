@@ -1961,7 +1961,7 @@
       "playground": "Playground"
     },
     "hero": {
-      "uptime": "99.99% delivery uptime",
+      "uptime": "99.9% SLA guaranteed",
       "title": "Webhooks that",
       "typewriter": [
         "actually deliver",
@@ -2029,7 +2029,6 @@
         "30-day log retention",
         "$0.0001/event overage",
         "FIFO ordered delivery",
-        "IP whitelisting",
         "Analytics & graphs",
         "Schema registry",
         "Webhook playground"
@@ -2363,14 +2362,14 @@
     "proDesc": "Unleash your data connectivity with enterprise features and better support.",
     "businessDesc": "For teams that need guarantees",
     "freeFeatures": [
-      "10,000 webhooks/month",
+      "100 events/day",
       "5 endpoints",
       "3 retry attempts",
       "HMAC-SHA256 signatures",
       "Dashboard access",
       "Community support",
       "7-day log retention",
-      "8 SDK access"
+      "11 SDK access"
     ],
     "proFeatures": [
       "100,000 events/day",
@@ -2381,7 +2380,6 @@
       "30-day log retention",
       "$0.0001/event overage",
       "FIFO ordered delivery",
-      "IP whitelisting",
       "Analytics & graphs",
       "Schema registry",
       "Webhook playground",
@@ -3174,7 +3172,8 @@
     "globalInfrastructureDesc": "Deployed in EU (Frankfurt) with CDN coverage worldwide via Cloudflare.",
     "readyToStart": "Ready to get started?",
     "startFree": "Start Free",
-    "contactUs": "Contact Us"
+    "contactUs": "Contact Us",
+    "apiRoutes": "API Routes"
   },
   "error": {
     "title": "Something went wrong",
@@ -3413,8 +3412,8 @@
     "feature2faDesc": "Two-factor authentication via authenticator apps. Protect your account beyond passwords.",
     "featureSso": "SSO / SAML",
     "featureSsoDesc": "Enterprise single sign-on. Integrate with Okta, Auth0, Google Workspace, and more.",
-    "featureIpWhitelist": "IP Whitelisting",
-    "featureIpWhitelistDesc": "Restrict API access to specific IPs or CIDR ranges. Block unauthorized sources.",
+    "featureIpWhitelist": "IP Whitelisting (Coming Soon)",
+    "featureIpWhitelistDesc": "Restrict API access to specific IPs or CIDR ranges. This feature is currently in development.",
     "featureSsrf": "SSRF Protection",
     "featureSsrfDesc": "Built-in Server-Side Request Forgery protection. Block internal network access.",
     "featureArgon2": "Argon2 Password Hashing",
@@ -3683,10 +3682,10 @@
     "soc2": "SOC 2",
     "uptimeSla": "Uptime SLA",
     "openSource": "Open source",
-    "i18n": "8-language i18n",
+    "i18n": "2-language i18n",
     "events": "events",
     "httpOnly": "HTTP only",
-    "httpWsGrpc": "HTTP/WS/gRPC/SQS",
+    "httpWsGrpc": "HTTP, WebSocket",
     "ready": "Ready",
     "type2": "Type 2",
     "service": "Service",

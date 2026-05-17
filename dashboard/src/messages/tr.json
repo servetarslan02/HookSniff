@@ -1961,7 +1961,7 @@
       "playground": "Playground"
     },
     "hero": {
-      "uptime": "%99.99 teslimat uptime",
+      "uptime": "%99.9 SLA garantisi",
       "title": "Asla başarısız olmayan",
       "typewriter": [
         "webhook'lar",
@@ -2021,18 +2021,17 @@
       "startTrial": "Ücretsiz deneyin",
       "contactSales": "Satışla iletişime geçin",
       "proFeatures": [
-        "Günde 100.000'e kadar olay",
+        "Günlük 100.000 event",
         "Sınırsız uygulama",
         "500 endpoint",
-        "Sınırsız olay türü",
+        "Sınırsız event tipi",
         "Sınırsız abonelik",
-        "30 gün veri saklama",
-        "Olay başına $0.0001 overage",
+        "30 günlük log",
+        "Event başına $0.0001 overage",
         "FIFO sıralı teslimat",
-        "IP beyaz liste",
         "Analitik ve grafikler",
-        "Şema kayıt defteri",
-        "Webhook playground"
+        "Şema kayıt merkezi",
+        "Webhook oyun alanı"
       ],
       "enterpriseFeatures": [
         "Tamamen yönetilen — sahip olunması gereken altyapı yok",
@@ -2363,14 +2362,14 @@
     "proDesc": "Kurumsal özellikleri ve daha iyi desteği ile veri bağlantınızı serbest bırakın.",
     "businessDesc": "Garantiye ihtiyacı olan ekipler için",
     "freeFeatures": [
-      "Ayda 10.000 webhook",
+      "Günlük 100 event",
       "5 endpoint",
       "3 yeniden deneme",
       "HMAC-SHA256 imzaları",
       "Panel erişimi",
       "Topluluk desteği",
       "7 günlük log saklama",
-      "8 SDK erişimi"
+      "11 SDK erişimi"
     ],
     "proFeatures": [
       "Günlük 100.000 event",
@@ -2381,7 +2380,6 @@
       "30 günlük log",
       "Event başına $0.0001 overage",
       "FIFO sıralı teslimat",
-      "IP beyaz liste",
       "Analitik ve grafikler",
       "Şema kayıt merkezi",
       "Webhook oyun alanı",
@@ -3174,7 +3172,8 @@
     "globalInfrastructureDesc": "EU'da (Frankfurt) konuşlandırılmış, Cloudflare aracılığıyla dünya çapında CDN kapsamı.",
     "readyToStart": "Başlamaya hazır mısınız?",
     "startFree": "Ücretsiz Başlayın",
-    "contactUs": "Bize Ulaşın"
+    "contactUs": "Bize Ulaşın",
+    "apiRoutes": "API Route"
   },
   "error": {
     "title": "Bir şeyler yanlış gitti",
@@ -3413,8 +3412,8 @@
     "feature2faDesc": "Authenticator uygulamalarıyla iki faktörlü doğrulama. Hesabınızı şifrelerin ötesinde koruyun.",
     "featureSso": "SSO / SAML",
     "featureSsoDesc": "Kurumsal tek oturum açma. Okta, Auth0, Google Workspace ve daha fazlasıyla entegre edin.",
-    "featureIpWhitelist": "IP Beyaz Liste",
-    "featureIpWhitelistDesc": "API erişimini belirli IP'lere veya CIDR aralıklarına kısıtlayın. Yetkisiz kaynakları engelleyin.",
+    "featureIpWhitelist": "IP Beyaz Liste (Yakında)",
+    "featureIpWhitelistDesc": "API erişimini belirli IP veya CIDR aralıklarıyla kısıtlayın. Bu özellik şu anda geliştirme aşamasındadır.",
     "featureSsrf": "SSRF Koruması",
     "featureSsrfDesc": "Dahili Sunucu Tarafı İstek Sahteciliği koruması yerleşik. Dahili ağ erişimini engelleyin.",
     "featureArgon2": "Argon2 Parola Hashleme",
@@ -3683,10 +3682,10 @@
     "soc2": "SOC 2",
     "uptimeSla": "Uptime SLA",
     "openSource": "Açık kaynak",
-    "i18n": "8 dilli i18n",
+    "i18n": "2 dilli i18n",
     "events": "olay",
-    "httpOnly": "Yalnızca HTTP",
-    "httpWsGrpc": "HTTP/WS/gRPC/SQS",
+    "httpOnly": "Sadece HTTP",
+    "httpWsGrpc": "HTTP, WebSocket",
     "ready": "Hazır",
     "type2": "Tip 2",
     "service": "Hizmet",

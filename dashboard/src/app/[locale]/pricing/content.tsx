@@ -139,7 +139,7 @@ export function PricingPageContent() {
     {
       category: t('delivery'),
       items: [
-        { feature: t('deliveryMethods'), developer: t('http'), startup: `${t('http')}, ${t('ws')}`, pro: `${t('http')}, ${t('ws')}, ${t('grpc')}`, enterprise: `${t('http')}, ${t('ws')}, ${t('grpc')}, ${t('sqs')}` },
+        { feature: t('deliveryMethods'), developer: t('http'), startup: `${t('http')}, WebSocket`, pro: `${t('http')}, WebSocket`, enterprise: `${t('http')}, WebSocket` },
         { feature: t('retryAttempts'), developer: '3', startup: '5', pro: '10', enterprise: t('custom') },
         { feature: t('customRetryPolicies'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
         { feature: t('fifoDelivery'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
@@ -152,7 +152,7 @@ export function PricingPageContent() {
       items: [
         { feature: t('hmacSignatures'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
         { feature: t('secretRotation'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: t('ipWhitelisting'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
+        { feature: `${t('ipWhitelisting')} (Coming Soon)`, developer: '—', startup: '—', pro: '🔜', enterprise: '🔜' },
         { feature: t('ssoSaml'), developer: '—', startup: '—', pro: '—', enterprise: '✅' },
         { feature: t('twoFactor'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
         { feature: t('cloudevents'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
