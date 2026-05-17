@@ -42,11 +42,11 @@ Bu dosyayı ilk kez okuyorsan:
 3. **TabbedSection** — URL param persistence, badge desteği, createLazyTab helper
 4. **Admin sidebar** — PrefetchLink ile hover prefetch (80ms delay)
 5. **Dashboard sidebar** — PrefetchLink ile hover prefetch (80ms delay)
-6. **System page** — 8 below-the-fold section LazySection ile sarmalandı
-7. **Users page** — bulk actions + user table LazySection ile sarmalandı
-8. **Alerts page** — create/edit form + alert list LazySection ile sarmalandı
-9. **Feature-flags page** — flags table LazySection ile sarmalandı (modals dışarıda)
-10. **Commit:** 518cad4e, 169637d2 — push edildi
+6. **System page** — 8 section'a bölündü (740 → 207 satır, %72 azalma)
+7. **Users page** — LazySection ile sarmalandı (bulk actions + user table)
+8. **Alerts page** — LazySection ile sarmalandı (form + alert list)
+9. **Feature-flags page** — LazySection ile sarmalandı (flags table, modals dışarıda)
+10. **Commit:** 518cad4e, 169637d2, f3d4fd91 — push edildi
 
 ### Billing Page Complete Overhaul ✅ (2026-05-17 17:37)
 1. **Sidebar: Billing ayrı bölüm** — Account'dan çıkarıldı, kendi section'ı (💳)
