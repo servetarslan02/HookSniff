@@ -21,7 +21,7 @@ const PLAN_COLOR_MAP: Record<string, { border: string; bg: string; dot: string; 
 const PLAN_FEATURES: Record<string, string[]> = {
   developer: ['5 endpoints', '1,000 webhooks/mo', '100 rate/min', '7-day retention', 'HMAC signatures', '2FA support'],
   startup: ['20 endpoints', '10K webhooks/mo', '500 rate/min', '14-day retention', 'CloudEvents', 'Secret rotation', 'Dead letter queue', 'Email support'],
-  pro: ['50 endpoints', '50K webhooks/mo', '1,000 rate/min', '30-day retention', 'FIFO delivery', 'IP whitelist', 'Analytics', 'Schema registry', 'Priority support'],
+  pro: ['50 endpoints', '50K webhooks/mo', '1,000 rate/min', '180-day retention', 'FIFO delivery', 'IP whitelist', 'Analytics', 'Schema registry', 'Priority support'],
   enterprise: ['200 endpoints', '500K webhooks/mo', '5,000 rate/min', '90-day retention', 'SSO/SAML', 'Account manager', '99.9% SLA', 'Custom integrations', 'On-premise option'],
 };
 
