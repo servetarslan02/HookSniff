@@ -44,6 +44,11 @@ namespace HookSniff
             get => new Environment(this);
         }
 
+        public BackgroundTask BackgroundTask
+        {
+            get => new BackgroundTask(this);
+        }
+
         public ILogger? Logger { get; }
 
         public HookSniffHttpClient HookSniffHttpClient;

@@ -13,6 +13,7 @@ use HookSniff\Api\Message;
 use HookSniff\Api\MessageAttempt;
 use HookSniff\Api\Statistics;
 use HookSniff\Api\Environment;
+use HookSniff\Api\BackgroundTask;
 use HookSniff\Request\HookSniffHttpClient;
 
 class HookSniff
@@ -25,6 +26,7 @@ class HookSniff
     public MessageAttempt $messageAttempt;
     public Statistics $statistics;
     public Environment $environment;
+    public BackgroundTask $backgroundTask;
 
     public function __construct(
         string $token,
@@ -48,5 +50,6 @@ class HookSniff
         $this->messageAttempt = new MessageAttempt($hooksniffHttpClient);
         $this->statistics = new Statistics($hooksniffHttpClient);
         $this->environment = new Environment($hooksniffHttpClient);
+        $this->backgroundTask = new BackgroundTask($hooksniffHttpClient);
     }
 }

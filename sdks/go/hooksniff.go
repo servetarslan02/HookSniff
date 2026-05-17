@@ -31,6 +31,7 @@ type (
 		MessageAttempt *MessageAttempt
 		Statistics     *Statistics
 		Environment    *Environment
+		BackgroundTask *BackgroundTask
 	}
 )
 
@@ -68,6 +69,7 @@ func New(token string, options *HookSniffOptions) (*HookSniff, error) {
 		MessageAttempt: newMessageAttempt(&hooksniffHttpClient),
 		Statistics:     newStatistics(&hooksniffHttpClient),
 		Environment:    newEnvironment(&hooksniffHttpClient),
+		BackgroundTask: newBackgroundTask(&hooksniffHttpClient),
 	}
 	return &hs, nil
 }

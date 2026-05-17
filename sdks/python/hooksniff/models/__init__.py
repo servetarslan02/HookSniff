@@ -3,6 +3,7 @@ HookSniff SDK — Models
 """
 
 from .api_token_out import ApiTokenOut
+from .background_task_out import BackgroundTaskOut
 from .app_portal_capability import AppPortalCapability
 from .bulk_replay_in import BulkReplayIn
 from .common import Common
