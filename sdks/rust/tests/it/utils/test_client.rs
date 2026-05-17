@@ -46,10 +46,10 @@ impl TestClientBuilder {
 
     pub fn build(self) -> TestClient {
         let token = self.token.unwrap_or_else(|| {
-            std::env::var("HOOKSNIFF_TOKEN").expect("HOOKSNIFF_TOKEN is required to run this test")
+            std::env::var("SVIX_TOKEN").expect("SVIX_TOKEN is required to run this test")
         });
         let url = self.url.unwrap_or_else(|| {
-            std::env::var("HOOKSNIFF_SERVER_URL").expect("HOOKSNIFF_SERVER_URL is required to run this test")
+            std::env::var("SVIX_SERVER_URL").expect("SVIX_SERVER_URL is required to run this test")
         });
         let client = HookSniff::new(
             token.clone(),
