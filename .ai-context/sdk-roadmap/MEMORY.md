@@ -30,7 +30,7 @@
 | 8 | **Elixir** | Hex.pm | ✅ Yüklendi | https://hex.pm/packages/hooksniff/1.0.0 |
 | 9 | **PHP** | Packagist | ✅ Güncelleme tetiklendi | https://packagist.org/packages/hooksniff/hooksniff |
 | 10 | **Swift** | GitHub tag | ✅ v1.0.0 tag atıldı | https://github.com/servetarslan02/hooksniff-swift |
-| 11 | **Kotlin** | Maven Central | ⏳ Yayınlanmadı | https://github.com/servetarslan02/hooksniff-kotlin |
+| 11 | **Kotlin** | Maven Central | ✅ Yüklendi | https://central.sonatype.com/artifact/io.github.servetarslan02/hooksniff-sdk-kotlin |
 
 ## ⏳ Sıradaki: Kotlin SDK
 
