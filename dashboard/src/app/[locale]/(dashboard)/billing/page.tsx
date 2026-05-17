@@ -81,7 +81,7 @@ export default function BillingPage() {
 
       // Enterprise requires contact
       if (result.requires_contact) {
-        const contactUrl = result.contact_url || 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
+        const contactUrl = result.contact_url || '/contact';
         window.open(contactUrl, '_blank');
         toast(t('enterpriseContact') || 'Enterprise plan requires a custom agreement. Opening contact...', 'info');
         setShowUpgradeModal(null);

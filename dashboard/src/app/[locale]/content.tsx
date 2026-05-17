@@ -514,7 +514,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
               <button
                 onClick={() => {
                   if (plan.name === tPricing('enterprise')) {
-                    window.location.href = 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
+                    window.location.href = '/contact';
                   } else if (token) {
                     router.push('/billing');
                   } else {
