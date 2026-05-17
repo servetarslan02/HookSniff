@@ -1,90 +1,94 @@
 /**
- * HookSniff API Resource: Webhooks
- *
- * Send, list, get, replay, and batch webhooks.
+ * HookSniff SDK — Webhooks Resource (Send webhooks)
  */
 
-import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
-import {
-  WebhookModel,
-  DeliveryModel,
-  DeliveryListModel,
-  BatchModel,
-  type WebhookSendInput,
-  type WebhookBatchInput,
-  type DeliveryOutput,
-  type DeliveryListOutput,
-  type BatchOutput,
+import { HttpMethod, HookSniffRequest, type HookSniffRequestContext } from "../request";
+import type { PostOptions } from "../util";
+import type {
+  CreateWebhookRequest,
+  BatchWebhookRequest,
+  Delivery,
+  DeliveryListResponse,
+  BatchResponse,
+  BatchReplayRequest,
 } from "../models";
-import { paginate, collectAll, type Page, type PaginationOptions } from "../pagination";
+import { paginatedIterator, type PaginationOptions } from "../pagination";
 
-export type { WebhookSendInput, WebhookBatchInput, DeliveryOutput, DeliveryListOutput, BatchOutput };
+export interface WebhookSendOptions extends PostOptions {}
+
+export interface WebhookListOptions extends PaginationOptions {
+  endpoint_id?: string;
+  status?: string;
+}
 
 export class Webhooks {
-  constructor(private readonly ctx: HookSniffRequestContext) {}
+  constructor(private readonly requestCtx: HookSniffRequestContext) {}
 
-  /** Send a single webhook */
-  async send(input: WebhookSendInput, idempotencyKey?: string): Promise<DeliveryOutput> {
-    const req = new HookSniffRequest(HttpMethod.POST, "/v1/webhooks");
-    if (idempotencyKey) req.setHeaderParam("idempotency-key", idempotencyKey);
-    req.setBody(WebhookModel._toJsonObject(input));
-    return req.send<DeliveryOutput>(this.ctx, (json) =>
-      DeliveryModel._fromJsonObject(json as Record<string, unknown>)
+  /** Send a single webhook. */
+  public send(body: CreateWebhookRequest, options?: WebhookSendOptions): Promise<Delivery> {
+    const request = new HookSniffRequest(HttpMethod.POST, "/v1/webhooks");
+    request.setBody(body);
+    if (options?.idempotencyKey) {
+      request.setHeaderParam("idempotency-key", options.idempotencyKey);
+    }
+    return request.send(this.requestCtx, (json) => json as Delivery);
+  }
+
+  /** Send multiple webhooks in a batch. */
+  public sendBatch(body: BatchWebhookRequest, options?: PostOptions): Promise<BatchResponse> {
+    const request = new HookSniffRequest(HttpMethod.POST, "/v1/webhooks/batch");
+    request.setBody(body);
+    if (options?.idempotencyKey) {
+      request.setHeaderParam("idempotency-key", options.idempotencyKey);
+    }
+    return request.send(this.requestCtx, (json) => json as BatchResponse);
+  }
+
+  /** Get a delivery by ID. */
+  public getDelivery(deliveryId: string): Promise<Delivery> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/webhooks/{id}");
+    request.setPathParam("id", deliveryId);
+    return request.send(this.requestCtx, (json) => json as Delivery);
+  }
+
+  /** List deliveries. */
+  public listDeliveries(options?: WebhookListOptions): Promise<DeliveryListResponse> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/webhooks");
+    request.setQueryParams({
+      limit: options?.limit,
+      iterator: options?.iterator,
+      endpoint_id: options?.endpoint_id,
+      status: options?.status,
+    });
+    return request.send(this.requestCtx, (json) => json as DeliveryListResponse);
+  }
+
+  /** Auto-paginate through all deliveries. */
+  public listAllDeliveries(options?: WebhookListOptions): AsyncIterable<Delivery> {
+    return paginatedIterator(
+      (opts) => this.listDeliveries({ ...options, ...opts }),
+      options
     );
   }
 
-  /** Send batch webhooks */
-  async batch(input: WebhookBatchInput, idempotencyKey?: string): Promise<BatchOutput> {
-    const req = new HookSniffRequest(HttpMethod.POST, "/v1/webhooks/batch");
-    if (idempotencyKey) req.setHeaderParam("idempotency-key", idempotencyKey);
-    req.setBody(WebhookModel._toBatchJsonObject(input));
-    return req.send<BatchOutput>(this.ctx, (json) =>
-      BatchModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Replay a specific delivery. */
+  public replay(deliveryId: string): Promise<Delivery> {
+    const request = new HookSniffRequest(HttpMethod.POST, "/v1/webhooks/{id}/replay");
+    request.setPathParam("id", deliveryId);
+    return request.send(this.requestCtx, (json) => json as Delivery);
   }
 
-  /** List deliveries (single page) */
-  async list(options?: { limit?: number; offset?: number }): Promise<DeliveryListOutput> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/v1/webhooks");
-    if (options?.limit) req.setQueryParams({ limit: options.limit });
-    if (options?.offset) req.setQueryParams({ offset: options.offset });
-    return req.send<DeliveryListOutput>(this.ctx, (json) =>
-      DeliveryListModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Batch replay multiple deliveries. */
+  public replayBatch(body: BatchReplayRequest): Promise<BatchResponse> {
+    const request = new HookSniffRequest(HttpMethod.POST, "/v1/webhooks/batch/replay");
+    request.setBody(body);
+    return request.send(this.requestCtx, (json) => json as BatchResponse);
   }
 
-  /** Iterate through all deliveries with automatic pagination */
-  listAll(options?: PaginationOptions): AsyncGenerator<DeliveryOutput, void, undefined> {
-    return paginate(async ({ limit, offset }) => {
-      const page = await this.list({ limit, offset });
-      return { data: page.data, has_more: page.has_more };
-    }, options);
-  }
-
-  /** Collect all deliveries into an array */
-  async listAllArray(options?: PaginationOptions): Promise<DeliveryOutput[]> {
-    return collectAll(async ({ limit, offset }) => {
-      const page = await this.list({ limit, offset });
-      return { data: page.data, has_more: page.has_more };
-    }, options);
-  }
-
-  /** Get a specific delivery */
-  async get(id: string): Promise<DeliveryOutput> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/v1/webhooks/{id}");
-    req.setPathParam("id", id);
-    return req.send<DeliveryOutput>(this.ctx, (json) =>
-      DeliveryModel._fromJsonObject(json as Record<string, unknown>)
-    );
-  }
-
-  /** Replay a delivery */
-  async replay(id: string, idempotencyKey?: string): Promise<DeliveryOutput> {
-    const req = new HookSniffRequest(HttpMethod.POST, "/v1/webhooks/{id}/replay");
-    req.setPathParam("id", id);
-    if (idempotencyKey) req.setHeaderParam("idempotency-key", idempotencyKey);
-    return req.send<DeliveryOutput>(this.ctx, (json) =>
-      DeliveryModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Get delivery attempts for a delivery. */
+  public getAttempts(deliveryId: string): Promise<import("../models").DeliveryAttempt[]> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/webhooks/{id}/attempts");
+    request.setPathParam("id", deliveryId);
+    return request.send(this.requestCtx, (json) => json as import("../models").DeliveryAttempt[]);
   }
 }

@@ -1,26 +1,27 @@
 /**
- * HookSniff API Resource: Search
+ * HookSniff SDK — Search Resource
  */
 
-import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
-import { SearchModel, type SearchResult } from "../models";
+import { HttpMethod, HookSniffRequest, type HookSniffRequestContext } from "../request";
+import type { SearchResult } from "../models";
 
-export type { SearchResult };
+export interface SearchOptions {
+  q: string;
+  type?: string;
+  limit?: number;
+}
 
 export class Search {
-  constructor(private readonly ctx: HookSniffRequestContext) {}
+  constructor(private readonly requestCtx: HookSniffRequestContext) {}
 
-  /** Search webhook deliveries */
-  async query(q: string, options?: { limit?: number }): Promise<SearchResult[]> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/v1/search");
-    req.setQueryParams({ q, ...options });
-    return req.send<SearchResult[]>(this.ctx, (json) => {
-      const arr = Array.isArray(json) ? json : [];
-      return arr.map((item) =>
-        typeof item === "object" && item !== null
-          ? SearchModel._fromJsonObject(item as Record<string, unknown>)
-          : item
-      );
+  /** Search across endpoints, deliveries, teams, etc. */
+  public query(options: SearchOptions): Promise<SearchResult[]> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/search");
+    request.setQueryParams({
+      q: options.q,
+      type: options.type,
+      limit: options.limit,
     });
+    return request.send(this.requestCtx, (json) => json as SearchResult[]);
   }
 }

@@ -1,99 +1,139 @@
 # 🪝 HookSniff SDK — Node.js
 
-Official Node.js SDK for [HookSniff](https://hooksniff.vercel.app) — reliable webhook delivery for developers.
+Official Node.js/TypeScript SDK for [HookSniff](https://hooksniff.vercel.app) — reliable webhook delivery for developers.
+
+[![npm version](https://img.shields.io/npm/v/hooksniff-sdk.svg)](https://www.npmjs.com/package/hooksniff-sdk)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Installation
 
 ```bash
 npm install hooksniff-sdk
+# or
+yarn add hooksniff-sdk
 ```
-
-**Requires Node.js 18+** (native `fetch` support, zero external dependencies)
-
----
 
 ## Quick Start
 
 ```typescript
 import { HookSniff } from 'hooksniff-sdk';
 
-const hs = new HookSniff({ apiKey: 'your-api-key' });
+const hs = new HookSniff('your-api-key');
 
 // List endpoints
-const endpoints = await hs.endpoints.list();
-
-// Create an endpoint
-const endpoint = await hs.endpoints.create({
-  url: 'https://your-app.com/webhook',
-  description: 'Order notifications',
-});
+const { data } = await hs.endpoints.list();
+console.log(data);
 
 // Send a webhook
 const delivery = await hs.webhooks.send({
-  endpoint_id: endpoint.id,
+  endpoint_id: 'ep_123',
+  event: 'order.created',
+  data: { order_id: '12345' },
+});
+console.log(delivery.id);
+```
+
+## Features
+
+- ✅ **Type-safe** — Full TypeScript support
+- ✅ **Auto-retry** — Exponential backoff with jitter on 5xx errors
+- ✅ **Auto-idempotency** — POST requests get unique idempotency keys
+- ✅ **Auto-pagination** — `for await` iteration over list endpoints
+- ✅ **Webhook verification** — HMAC-SHA256, Standard Webhooks compatible
+- ✅ **Zero dependencies** — Uses native `fetch` (Node 18+)
+- ✅ **Custom fetch** — Bring your own fetch implementation
+
+## Usage
+
+### Authentication
+
+```typescript
+import { HookSniff } from 'hooksniff-sdk';
+
+const hs = new HookSniff('hooksniff_xxx', {
+  serverUrl: 'https://hooksniff-api-xxx.run.app', // optional
+  requestTimeout: 30000, // 30s
+  numRetries: 3,
+});
+```
+
+### Endpoints
+
+```typescript
+// List endpoints
+const { data: endpoints } = await hs.endpoints.list();
+
+// Auto-paginate through ALL endpoints
+for await (const ep of hs.endpoints.listAll()) {
+  console.log(ep.url);
+}
+
+// Create endpoint
+const ep = await hs.endpoints.create({
+  url: 'https://example.com/webhook',
+  description: 'Order notifications',
+  event_filter: ['order.*'],
+});
+
+// Update endpoint
+await hs.endpoints.update(ep.id, { is_active: false });
+
+// Rotate secret
+const { secret } = await hs.endpoints.rotateSecret(ep.id);
+
+// Check health
+const health = await hs.endpoints.health(ep.id);
+
+// Delete endpoint
+await hs.endpoints.delete(ep.id);
+```
+
+### Webhooks
+
+```typescript
+// Send a webhook
+const delivery = await hs.webhooks.send({
+  endpoint_id: 'ep_123',
   event: 'order.created',
   data: { order_id: '12345', total: 99.99 },
 });
 
-// Get delivery status
-const status = await hs.webhooks.get(delivery.id);
+// Batch send
+const result = await hs.webhooks.sendBatch({
+  webhooks: [
+    { endpoint_id: 'ep_123', event: 'order.created', data: { id: '1' } },
+    { endpoint_id: 'ep_123', event: 'order.created', data: { id: '2' } },
+  ],
+});
+console.log(`Sent: ${result.success_count}, Failed: ${result.failure_count}`);
+
+// Get delivery details
+const deliveryDetails = await hs.webhooks.getDelivery('dlv_xxx');
+
+// List deliveries with auto-pagination
+for await (const dlv of hs.webhooks.listAllDeliveries({ status: 'failed' })) {
+  console.log(`${dlv.id}: ${dlv.status}`);
+}
+
+// Replay a delivery
+await hs.webhooks.replay('dlv_xxx');
+
+// Get delivery attempts
+const attempts = await hs.webhooks.getAttempts('dlv_xxx');
 ```
 
----
-
-## Pagination
-
-List endpoints return pages. Use `listAll()` to iterate through **all** results automatically:
-
-```typescript
-// Iterate one by one (memory efficient)
-for await (const delivery of hs.webhooks.listAll()) {
-  console.log(delivery.id);
-}
-
-// Collect all into an array
-const allDeliveries = await hs.webhooks.listAllArray();
-
-// Limit results
-for await (const ep of hs.endpoints.listAll({ maxItems: 100 })) {
-  console.log(ep.url);
-}
-
-// Custom page size
-for await (const rule of hs.alerts.listAllRules({ limit: 25 })) {
-  console.log(rule.name);
-}
-```
-
-**Available on all list endpoints:**
-| Method | Returns |
-|--------|---------|
-| `hs.webhooks.listAll()` | `AsyncGenerator<DeliveryOutput>` |
-| `hs.webhooks.listAllArray()` | `Promise<DeliveryOutput[]>` |
-| `hs.endpoints.listAll()` | `AsyncGenerator<EndpointOutput>` |
-| `hs.alerts.listAllRules()` | `AsyncGenerator<AlertRule>` |
-| `hs.alerts.listAllNotifications()` | `AsyncGenerator<AlertNotification>` |
-| `hs.apiKeys.listAll()` | `AsyncGenerator<ApiKeyOutput>` |
-| `hs.teams.listAll()` | `AsyncGenerator<TeamMember>` |
-
----
-
-## Verify Incoming Webhooks
+### Verify Incoming Webhooks
 
 ```typescript
 import { Webhook } from 'hooksniff-sdk';
 
-const wh = new Webhook('whsec_your_signing_secret');
+const wh = new Webhook('whsec_base64...');
 
+// In your webhook handler (Express example)
 app.post('/webhook', (req, res) => {
   try {
-    const payload = wh.verify(req.body, {
-      'webhook-id': req.headers['webhook-id'],
-      'webhook-timestamp': req.headers['webhook-timestamp'],
-      'webhook-signature': req.headers['webhook-signature'],
-    });
-
-    console.log('Event:', payload.event);
+    const payload = wh.verify(req.body, req.headers);
+    console.log('Verified:', payload);
     res.status(200).send('OK');
   } catch (err) {
     res.status(400).send('Invalid signature');
@@ -101,210 +141,111 @@ app.post('/webhook', (req, res) => {
 });
 ```
 
----
-
-## API Reference
-
-### Authentication
+### Auth
 
 ```typescript
-const auth = await hs.auth.register({ email: 'you@example.com', password: 'secure-password' });
-const { token } = await hs.auth.login({ email: 'you@example.com', password: 'secure-password' });
-const setup = await hs.auth.enable2fa();
-await hs.auth.verifyEmail('verification-token');
-await hs.auth.forgotPassword('you@example.com');
-const data = await hs.auth.exportData(); // GDPR
-await hs.auth.deleteAccount();            // GDPR
-```
-
-### Endpoints
-
-```typescript
-const endpoints = await hs.endpoints.list();
-const ep = await hs.endpoints.create({ url: 'https://app.com/webhook', description: 'My endpoint', rate_limit: 100 });
-const endpoint = await hs.endpoints.get('ep_123');
-const updated = await hs.endpoints.update('ep_123', { url: 'https://new-url.com' });
-await hs.endpoints.delete('ep_123');
-const { key } = await hs.endpoints.rotateSecret('ep_123');
-```
-
-### Webhooks
-
-```typescript
-const delivery = await hs.webhooks.send({
-  endpoint_id: 'ep_123',
-  event: 'order.created',
-  data: { order_id: '12345' },
+// Register
+const { access_token } = await hs.auth.register({
+  email: 'user@example.com',
+  password: 'secure_password',
 });
 
-const batch = await hs.webhooks.batch({
-  endpoint_id: 'ep_123',
-  events: [
-    { event: 'order.created', data: { order_id: '1' } },
-    { event: 'order.created', data: { order_id: '2' } },
-  ],
+// Login
+const auth = await hs.auth.login({
+  email: 'user@example.com',
+  password: 'secure_password',
 });
 
-const { data, has_more } = await hs.webhooks.list({ limit: 20 });
-const single = await hs.webhooks.get('dlv_456');
-await hs.webhooks.replay('dlv_456');
-```
+// Get current user
+const me = await hs.auth.me();
 
-### Analytics
-
-```typescript
-const trends = await hs.analytics.trends({ since: '2026-01-01', until: '2026-01-31' });
-const rate = await hs.analytics.successRate();
-const latency = await hs.analytics.latency();
-```
-
-### API Keys
-
-```typescript
-const keys = await hs.apiKeys.list();
-const newKey = await hs.apiKeys.create({ name: 'CI/CD' });
-const keyWithExpiry = await hs.apiKeys.create({ name: 'Temp', expires_at: '2026-12-31' });
-await hs.apiKeys.delete('key_123');
-```
-
-### Alerts
-
-```typescript
-const rules = await hs.alerts.listRules();
-const notifications = await hs.alerts.listNotifications({ limit: 10 });
-
-// Iterate all notifications
-for await (const notif of hs.alerts.listAllNotifications()) {
-  console.log(notif.message);
-}
+// 2FA
+const { qr_code_url, backup_codes } = await hs.auth.enable2fa({ password: 'xxx' });
 ```
 
 ### Teams
 
 ```typescript
-const members = await hs.teams.list();
-await hs.teams.invite('dev@example.com', 'developer');
-await hs.teams.remove('member_123');
-```
-
-### Search
-
-```typescript
-const results = await hs.search.query('order.created', { limit: 10 });
+const teams = await hs.teams.list();
+const team = await hs.teams.create({ name: 'Backend Team' });
+await hs.teams.invite(team.id, { email: 'dev@example.com', role: 'member' });
 ```
 
 ### Billing
 
 ```typescript
-const plan = await hs.billing.getPlan();
-const { url } = await hs.billing.upgrade('pro');
-const { url: portalUrl } = await hs.billing.portal();
+const subscription = await hs.billing.subscription();
+const usage = await hs.billing.usage();
+const invoices = await hs.billing.invoices();
+const { checkout_url } = await hs.billing.upgrade({ plan: 'pro' });
 ```
 
-### Health
+### Analytics
 
 ```typescript
-const health = await hs.health.check();
-console.log(health.status);           // 'ok'
-console.log(health.db.latency_ms);    // 23
-console.log(health.queue.pending);    // 0
-console.log(health.otel?.enabled);    // true
+const stats = await hs.analytics.stats({ range: '7d' });
+const trends = await hs.analytics.deliveryTrends({ range: '30d' });
+const successRate = await hs.analytics.successRate();
+const latency = await hs.analytics.latency({ range: '24h' });
 ```
 
----
+### Search
+
+```typescript
+const results = await hs.search.query({ q: 'order', type: 'endpoint' });
+```
+
+### Admin (requires admin API key)
+
+```typescript
+const status = await hs.admin.systemStatus();
+const users = await hs.admin.listUsers({ plan: 'pro' });
+const revenue = await hs.admin.revenue({ range: '30d' });
+```
 
 ## Error Handling
 
 ```typescript
-import { HookSniff, ApiException } from 'hooksniff-sdk';
+import { ApiException } from 'hooksniff-sdk';
 
 try {
-  await hs.webhooks.send({ endpoint_id: 'invalid', event: 'test', data: {} });
+  await hs.endpoints.get('nonexistent');
 } catch (err) {
   if (err instanceof ApiException) {
-    console.error(`API Error ${err.code} ${err.statusText}:`, err.body);
-    console.error('Request ID:', err.headers['x-request-id']);
+    console.log(err.code);     // 404
+    console.log(err.body);     // { code: "not_found", detail: "..." }
+    console.log(err.headers);  // response headers
   }
 }
 ```
 
----
-
-## Options
+## Configuration Options
 
 ```typescript
-const hs = new HookSniff({
-  apiKey: 'your-key',
-  baseUrl: 'https://custom-api.example.com', // default: HookSniff production
-  timeout: 10000,                             // default: 30000ms
-  numRetries: 3,                              // default: 2
-  fetch: customFetch,                         // default: globalThis.fetch
+const hs = new HookSniff('hooksniff_xxx', {
+  // Custom API URL
+  serverUrl: 'https://my-self-hosted.run.app',
+
+  // Request timeout (ms)
+  requestTimeout: 30000,
+
+  // Retry on 5xx (default: 2)
+  numRetries: 3,
+
+  // Or custom retry schedule (ms per retry)
+  retryScheduleInMs: [100, 500, 1000],
+
+  // Custom fetch (for testing or proxies)
+  fetch: myCustomFetch,
 });
 ```
 
-### Custom Fetch
+## Requirements
 
-Inject a custom `fetch` implementation for testing, proxies, or middleware:
-
-```typescript
-import { HookSniff } from 'hooksniff-sdk';
-
-// Custom fetch with logging
-const loggingFetch: typeof fetch = async (url, init) => {
-  console.log(`→ ${init?.method} ${url}`);
-  const response = await globalThis.fetch(url, init);
-  console.log(`← ${response.status}`);
-  return response;
-};
-
-const hs = new HookSniff({
-  apiKey: 'your-key',
-  fetch: loggingFetch,
-});
-```
-
-### Idempotency Keys
-
-POST requests automatically get a unique idempotency key. Override with your own:
-
-```typescript
-await hs.webhooks.send(
-  { endpoint_id: 'ep_123', event: 'test', data: {} },
-  'my-unique-key-123'  // custom idempotency key
-);
-```
-
----
-
-## Webhook Signature Verification
-
-The `Webhook` class supports:
-- **HMAC-SHA256** signatures (Standard Webhooks compliant)
-- **`whsec_` prefixed secrets** (auto-detected)
-- **Both header formats**: `webhook-id`/`svix-id`, `webhook-timestamp`/`svix-timestamp`, `webhook-signature`/`svix-signature`
-- **Replay protection** (5-minute timestamp tolerance)
-- **Multiple signatures** (comma-separated, for secret rotation)
-- **Timing-safe comparison** (prevents timing attacks)
-
----
-
-## TypeScript Support
-
-Full type definitions included. All models are exported:
-
-```typescript
-import type {
-  EndpointOutput,
-  DeliveryOutput,
-  AlertRule,
-  TeamMember,
-  HealthOutput,
-  ApiKeyOutput,
-} from 'hooksniff-sdk';
-```
-
----
+- Node.js 18+ (native `fetch` support)
 
 ## License
 
-MIT — see [LICENSE](../../LICENSE) for details.
+MIT — see [LICENSE](../../LICENSE)
+
+Based on [Svix SDK](https://github.com/svix/svix-webhooks) architecture (MIT License).
