@@ -10,44 +10,6 @@ export default function IntegrationsPage() {
         Connect HookSniff with popular platforms. Use our inbound proxy to receive webhooks from third-party services, or send webhooks to your own endpoints.
       </p>
 
-      {/* Stripe */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("stripeWebhooks")}</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Forward Stripe webhook events through HookSniff for reliable delivery and monitoring:
-        </p>
-        <ol className="space-y-3 text-gray-600 dark:text-slate-400 mb-4">
-          <li><strong>1.</strong> Create an endpoint in HookSniff pointing to your server</li>
-          <li><strong>2.</strong> In Stripe Dashboard → Developers → Webhooks, set the endpoint URL to your HookSniff inbound proxy</li>
-          <li><strong>3.</strong> Select the events you want to receive (e.g., <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">payment_intent.succeeded</code>)</li>
-          <li><strong>4.</strong> Verify Stripe's signature in your handler alongside HookSniff's signature</li>
-        </ol>
-        <CodeBlock
-          code={`// Your server receives webhooks from HookSniff
-// Verify both HookSniff AND Stripe signatures
-app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  // 1. Verify HookSniff signature
-  const hooksniffSig = req.headers['x-hooksniff-signature'];
-  if (!verifyHookSniffSignature(req.body, hooksniffSig, 'whsec_your_secret')) {
-    return res.status(401).send('Invalid HookSniff signature');
-  }
-
-  // 2. Verify Stripe signature
-  const stripeSig = req.headers['stripe-signature'];
-  const event = stripe.webhooks.constructEvent(req.body, stripeSig, 'whsec_stripe_secret');
-
-  // 3. Process the event
-  switch (event.type) {
-    case 'payment_intent.succeeded':
-      handlePayment(event.data.object);
-      break;
-  }
-
-  res.status(200).json({ received: true });
-});`}
-        />
-      </section>
-
       {/* GitHub */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("githubWebhooks")}</h2>
@@ -97,17 +59,6 @@ function verifyGitHubSignature(payload: string, signature: string, secret: strin
         <CodeBlock
           code={`import express from 'express';
 import { HookSniff } from 'hooksniff-sdk';
-import type { Metadata } from 'next';
-
-// Revalidate every hour for ISR
-export const revalidate = 3600;
-
-
-export const metadata: Metadata = {
-  title: 'Integrations',
-  description: 'Connect HookSniff with your favorite tools and services',
-};
-
 
 const app = express();
 const hr = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });
@@ -131,8 +82,6 @@ app.post('/webhooks/:provider', express.raw({ type: 'application/json' }), async
 
 function normalizeEvent(provider: string, payload: any) {
   switch (provider) {
-    case 'stripe':
-      return { type: payload.type, data: payload.data.object };
     case 'github':
       return { type: payload.event, data: payload.body };
     case 'shopify':
