@@ -1,7 +1,6 @@
-import type { Post } from '../data';
+import type { Post } from '.../data';
 
 export const post: Post = {
-
     title: 'Complete Guide to Stripe Webhooks',
     date: '2026-05-05',
     category: 'Integration',

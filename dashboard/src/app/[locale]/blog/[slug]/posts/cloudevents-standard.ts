@@ -1,7 +1,6 @@
-import type { Post } from '../data';
+import type { Post } from '.../data';
 
 export const post: Post = {
-
     title: 'Embracing the CloudEvents Standard',
     date: '2026-04-10',
     category: 'Standard',

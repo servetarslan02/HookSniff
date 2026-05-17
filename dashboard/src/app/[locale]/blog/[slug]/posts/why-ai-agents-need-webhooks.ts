@@ -1,7 +1,6 @@
-import type { Post } from '../data';
+import type { Post } from '.../data';
 
 export const post: Post = {
-
     title: 'Why AI Agents Need Webhooks',
     date: '2026-05-09',
     category: 'AI & Agents',
