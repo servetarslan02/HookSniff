@@ -2,110 +2,217 @@
 HookSniff SDK — Admin Resource
 """
 
-from __future__ import annotations
+import typing as t
+from dataclasses import dataclass
 
-from typing import Any
+from ..models import (
+    CustomerResponse,
+    AdminAuditLogResponse,
+    AdminRevenueResponse,
+    SystemStatus,
+)
+from .common import ApiBase, BaseOptions, serialize_params
 
-from ..request import HookSniffRequest, RequestConfig
+
+@dataclass
+class AdminListOptions(BaseOptions):
+    limit: t.Optional[int] = None
+    offset: t.Optional[int] = None
+    search: t.Optional[str] = None
+
+    def _query_params(self) -> t.Dict[str, str]:
+        return serialize_params({
+            "limit": self.limit,
+            "offset": self.offset,
+            "search": self.search,
+        })
 
 
-class Admin:
-    """Admin operations (requires admin API key)."""
-
-    def __init__(self, config: RequestConfig):
-        self._config = config
-
-    def list_users(
-        self,
-        limit: int | None = None,
-        offset: int | None = None,
-        search: str | None = None,
-    ) -> dict[str, Any]:
+class AdminAsync(ApiBase):
+    async def list_users(
+        self, options: AdminListOptions = AdminListOptions()
+    ) -> t.Dict[str, t.Any]:
         """List all users (admin)."""
-        req = HookSniffRequest("GET", "/v1/admin/users")
-        req.set_query_params({
-            "limit": limit,
-            "offset": offset,
-            "search": search,
-        })
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(
+            method="get",
+            path="/api/v1/admin/users",
+            query_params=options._query_params(),
+        )
+        return response.json()
 
-    def get_user(self, user_id: str) -> dict[str, Any]:
+    async def get_user(self, user_id: str) -> CustomerResponse:
         """Get user details (admin)."""
-        req = HookSniffRequest("GET", "/v1/admin/users/{id}")
-        req.set_path_param("id", user_id)
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(
+            method="get",
+            path="/api/v1/admin/users/{user_id}",
+            path_params={"user_id": user_id},
+        )
+        return CustomerResponse(**response.json())
 
-    def update_user_plan(self, user_id: str, plan: str) -> dict[str, Any]:
+    async def update_user_plan(self, user_id: str, plan: str) -> CustomerResponse:
         """Update a user's plan (admin)."""
-        req = HookSniffRequest("PUT", "/v1/admin/users/{id}/plan")
-        req.set_path_param("id", user_id)
-        req.set_body({"plan": plan})
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(
+            method="put",
+            path="/api/v1/admin/users/{user_id}/plan",
+            path_params={"user_id": user_id},
+            json_body={"plan": plan},
+        )
+        return CustomerResponse(**response.json())
 
-    def update_user_status(self, user_id: str, is_active: bool) -> dict[str, Any]:
+    async def update_user_status(self, user_id: str, is_active: bool) -> CustomerResponse:
         """Activate/deactivate a user (admin)."""
-        req = HookSniffRequest("PUT", "/v1/admin/users/{id}/status")
-        req.set_path_param("id", user_id)
-        req.set_body({"is_active": is_active})
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(
+            method="put",
+            path="/api/v1/admin/users/{user_id}/status",
+            path_params={"user_id": user_id},
+            json_body={"is_active": is_active},
+        )
+        return CustomerResponse(**response.json())
 
-    def get_stats(self) -> dict[str, Any]:
+    async def get_stats(self) -> SystemStatus:
         """Get admin dashboard stats."""
-        req = HookSniffRequest("GET", "/v1/admin/stats")
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(method="get", path="/api/v1/admin/stats")
+        return SystemStatus(**response.json())
 
-    def get_revenue(self, period: str = "30d") -> dict[str, Any]:
+    async def get_revenue(self, period: str = "30d") -> AdminRevenueResponse:
         """Get revenue data."""
-        req = HookSniffRequest("GET", "/v1/admin/revenue")
-        req.set_query_param("period", period)
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(
+            method="get",
+            path="/api/v1/admin/revenue",
+            query_params={"period": period},
+        )
+        return AdminRevenueResponse(**response.json())
 
-    def get_audit_log(
-        self,
-        limit: int | None = None,
-        offset: int | None = None,
-    ) -> dict[str, Any]:
+    async def get_audit_log(
+        self, options: AdminListOptions = AdminListOptions()
+    ) -> AdminAuditLogResponse:
         """Get audit log entries."""
-        req = HookSniffRequest("GET", "/v1/admin/audit-log")
-        req.set_query_params({
-            "limit": limit,
-            "offset": offset,
-        })
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(
+            method="get",
+            path="/api/v1/admin/audit-log",
+            query_params=options._query_params(),
+        )
+        return AdminAuditLogResponse(**response.json())
 
-    def send_email(
-        self,
-        to: str,
-        subject: str,
-        body: str,
-        html: bool = True,
-    ) -> dict[str, Any]:
+    async def send_email(
+        self, to: str, subject: str, body: str, html: bool = True
+    ) -> None:
         """Send an email (admin)."""
-        req = HookSniffRequest("POST", "/v1/admin/email")
-        req.set_body({
-            "to": to,
-            "subject": subject,
-            "body": body,
-            "html": html,
-        })
-        return req.send(self._config, lambda j: j)
+        await self._request_asyncio(
+            method="post",
+            path="/api/v1/admin/email",
+            json_body={"to": to, "subject": subject, "body": body, "html": html},
+        )
 
-    def send_bulk_email(
+    async def send_bulk_email(
         self,
-        recipients: list[str],
+        recipients: t.List[str],
         subject: str,
         body: str,
-        plan_filter: str | None = None,
-    ) -> dict[str, Any]:
+        plan_filter: t.Optional[str] = None,
+    ) -> None:
         """Send bulk email (admin)."""
-        req = HookSniffRequest("POST", "/v1/admin/email/bulk")
-        body_data: dict[str, Any] = {
+        payload: t.Dict[str, t.Any] = {
             "recipients": recipients,
             "subject": subject,
             "body": body,
         }
         if plan_filter:
-            body_data["plan_filter"] = plan_filter
-        req.set_body(body_data)
-        return req.send(self._config, lambda j: j)
+            payload["plan_filter"] = plan_filter
+        await self._request_asyncio(
+            method="post",
+            path="/api/v1/admin/email/bulk",
+            json_body=payload,
+        )
+
+
+class Admin(ApiBase):
+    def list_users(self, options: AdminListOptions = AdminListOptions()) -> t.Dict[str, t.Any]:
+        """List all users."""
+        response = self._request_sync(
+            method="get",
+            path="/api/v1/admin/users",
+            query_params=options._query_params(),
+        )
+        return response.json()
+
+    def get_user(self, user_id: str) -> CustomerResponse:
+        """Get user details."""
+        response = self._request_sync(
+            method="get",
+            path="/api/v1/admin/users/{user_id}",
+            path_params={"user_id": user_id},
+        )
+        return CustomerResponse(**response.json())
+
+    def update_user_plan(self, user_id: str, plan: str) -> CustomerResponse:
+        """Update user plan."""
+        response = self._request_sync(
+            method="put",
+            path="/api/v1/admin/users/{user_id}/plan",
+            path_params={"user_id": user_id},
+            json_body={"plan": plan},
+        )
+        return CustomerResponse(**response.json())
+
+    def update_user_status(self, user_id: str, is_active: bool) -> CustomerResponse:
+        """Activate/deactivate user."""
+        response = self._request_sync(
+            method="put",
+            path="/api/v1/admin/users/{user_id}/status",
+            path_params={"user_id": user_id},
+            json_body={"is_active": is_active},
+        )
+        return CustomerResponse(**response.json())
+
+    def get_stats(self) -> SystemStatus:
+        """Get admin stats."""
+        response = self._request_sync(method="get", path="/api/v1/admin/stats")
+        return SystemStatus(**response.json())
+
+    def get_revenue(self, period: str = "30d") -> AdminRevenueResponse:
+        """Get revenue data."""
+        response = self._request_sync(
+            method="get",
+            path="/api/v1/admin/revenue",
+            query_params={"period": period},
+        )
+        return AdminRevenueResponse(**response.json())
+
+    def get_audit_log(self, options: AdminListOptions = AdminListOptions()) -> AdminAuditLogResponse:
+        """Get audit log."""
+        response = self._request_sync(
+            method="get",
+            path="/api/v1/admin/audit-log",
+            query_params=options._query_params(),
+        )
+        return AdminAuditLogResponse(**response.json())
+
+    def send_email(self, to: str, subject: str, body: str, html: bool = True) -> None:
+        """Send an email."""
+        self._request_sync(
+            method="post",
+            path="/api/v1/admin/email",
+            json_body={"to": to, "subject": subject, "body": body, "html": html},
+        )
+
+    def send_bulk_email(
+        self,
+        recipients: t.List[str],
+        subject: str,
+        body: str,
+        plan_filter: t.Optional[str] = None,
+    ) -> None:
+        """Send bulk email."""
+        payload: t.Dict[str, t.Any] = {
+            "recipients": recipients,
+            "subject": subject,
+            "body": body,
+        }
+        if plan_filter:
+            payload["plan_filter"] = plan_filter
+        self._request_sync(
+            method="post",
+            path="/api/v1/admin/email/bulk",
+            json_body=payload,
+        )

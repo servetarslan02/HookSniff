@@ -1,0 +1,1 @@
+# HookSniff SDK — Errors
