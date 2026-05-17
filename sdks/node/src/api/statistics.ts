@@ -1,92 +1,28 @@
-// this file is @generated
-
-import {
-  type AggregateEventTypesOut,
-  AggregateEventTypesOutSerializer,
-} from "../models/aggregateEventTypesOut";
-import {
-  type AppUsageStatsIn,
-  AppUsageStatsInSerializer,
-} from "../models/appUsageStatsIn";
-import {
-  type AppUsageStatsOut,
-  AppUsageStatsOutSerializer,
-} from "../models/appUsageStatsOut";
 import { HttpMethod, HookSniffRequest, type HookSniffRequestContext } from "../request";
 
-export interface StatisticsAggregateAppStatsOptions {
-  idempotencyKey?: string;
-}
-
+/**
+ * Usage statistics.
+ *
+ * Get aggregate statistics about your webhook usage.
+ *
+ * @example
+ * ```ts
+ * const hs = new HookSniff("hooksniff_xxx");
+ *
+ * // Get app usage stats
+ * const stats = await hs.statistics.aggregateAppStats();
+ * ```
+ */
 export class Statistics {
   public constructor(private readonly requestCtx: HookSniffRequestContext) {}
 
   /**
-   * Creates a background task to calculate the number of message attempts (`messageDestinations`) made for all applications in the environment.
+   * Get aggregate application statistics.
    *
-   * Note that this endpoint is asynchronous. You will need to poll the `Get Background Task` endpoint to
-   * retrieve the results of the operation.
-   *
-   * The completed background task will return a payload like the following:
-   * ```json
-   * {
-   *   "id": "qtask_33qe39Stble9Rn3ZxFrqL5ZSsjT",
-   *   "status": "finished",
-   *   "task": "application.stats",
-   *   "data": {
-   *     "appStats": [
-   *       {
-   *         "messageDestinations": 2,
-   *         "appId": "app_33W1An2Zz5cO9SWbhHsYyDmVC6m",
-   *         "appUid": null
-   *       }
-   *     ]
-   *   }
-   * }
-   * ```
+   * Returns message delivery counts and other usage metrics.
    */
-  public aggregateAppStats(
-    appUsageStatsIn: AppUsageStatsIn,
-    options?: StatisticsAggregateAppStatsOptions
-  ): Promise<AppUsageStatsOut> {
-    const request = new HookSniffRequest(HttpMethod.POST, "/api/v1/stats/usage/app");
-
-    request.setHeaderParam("idempotency-key", options?.idempotencyKey);
-    request.setBody(AppUsageStatsInSerializer._toJsonObject(appUsageStatsIn));
-
-    return request.send(this.requestCtx, AppUsageStatsOutSerializer._fromJsonObject);
-  }
-
-  /**
-   * Creates a background task to calculate the listed event types for all apps in the organization.
-   *
-   * Note that this endpoint is asynchronous. You will need to poll the `Get Background Task` endpoint to
-   * retrieve the results of the operation.
-   *
-   * The completed background task will return a payload like the following:
-   * ```json
-   * {
-   *   "id": "qtask_33qe39Stble9Rn3ZxFrqL5ZSsjT",
-   *   "status": "finished",
-   *   "task": "event-type.aggregate",
-   *   "data": {
-   *     "event_types": [
-   *       {
-   *         "appId": "app_33W1An2Zz5cO9SWbhHsYyDmVC6m",
-   *         "explicitlySubscribedEventTypes": ["user.signup", "user.deleted"],
-   *         "hasCatchAllEndpoint": false
-   *       }
-   *     ]
-   *   }
-   * }
-   * ```
-   */
-  public aggregateEventTypes(): Promise<AggregateEventTypesOut> {
-    const request = new HookSniffRequest(HttpMethod.PUT, "/api/v1/stats/usage/event-types");
-
-    return request.send(
-      this.requestCtx,
-      AggregateEventTypesOutSerializer._fromJsonObject
-    );
+  public aggregateAppStats(): Promise<any> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/api/v1/stats/usage/app");
+    return request.send(this.requestCtx, (x) => x);
   }
 }
