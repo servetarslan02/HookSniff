@@ -1,14 +1,8 @@
-/**
- * HookSniff SDK — Utility types and error handling
-
- * Adapted for HookSniff API.
- */
-
 export interface PostOptions {
   idempotencyKey?: string;
 }
 
-export class ApiException<T = unknown> extends Error {
+export class ApiException<T> extends Error {
   public headers: Record<string, string> = {};
 
   public constructor(
@@ -16,7 +10,7 @@ export class ApiException<T = unknown> extends Error {
     public body: T,
     headers: Headers
   ) {
-    super(`HTTP-Code: ${code}\nBody: ${typeof body === "string" ? body : JSON.stringify(body)}`);
+    super(`HTTP-Code: ${code}\nHeaders: ${JSON.stringify(headers)}`);
 
     headers.forEach((value: string, name: string) => {
       this.headers[name] = value;
@@ -24,9 +18,6 @@ export class ApiException<T = unknown> extends Error {
   }
 }
 
-/**
- * XOR type helper — forces exactly one of two options.
- */
 export type XOR<T, U> =
   | (T & { [K in keyof U]?: never })
   | (U & { [K in keyof T]?: never });

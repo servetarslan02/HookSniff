@@ -1,14 +1,8 @@
-/**
- * HookSniff SDK — HTTP Request Client
-
- * Handles auth, retries with exponential backoff, timeout, and idempotency keys.
- */
-
 import { ApiException, type XOR } from "./util";
 import type { HttpErrorOut, HTTPValidationError } from "./HttpErrors";
 
-export const LIB_VERSION = "0.5.0";
-const USER_AGENT = `hooksniff-sdk/${LIB_VERSION}`;
+export const LIB_VERSION = "1.93.0";
+const USER_AGENT = `hooksniff-libs/${LIB_VERSION}/javascript`;
 
 export enum HttpMethod {
   GET = "GET",
@@ -23,7 +17,7 @@ export enum HttpMethod {
 }
 
 export type HookSniffRequestContext = {
-  /** The API base URL, like "https://hooksniff-api-xxx.run.app/v1" */
+  /** The API base URL, like "https://api.hooksniff.com" */
   baseUrl: string;
   /** The 'bearer' scheme access token */
   token: string;
@@ -36,11 +30,14 @@ export type HookSniffRequestContext = {
   fetch?: typeof fetch;
 } & XOR<
   {
-    /** List of delays (in milliseconds) to wait before each retry attempt. */
+    /** List of delays (in milliseconds) to wait before each retry attempt.*/
     retryScheduleInMs?: number[];
   },
   {
-    /** The number of times the client will retry if a server-side error or timeout is received. Default: 2 */
+    /** The number of times the client will retry if a server-side error
+     *  or timeout is received.
+     *  Default: 2
+     */
     numRetries?: number;
   }
 >;
@@ -72,7 +69,9 @@ export class HookSniffRequest {
   }
 
   public setQueryParam(name: string, value: QueryParameter) {
-    if (value === undefined || value === null) return;
+    if (value === undefined || value === null) {
+      return;
+    }
 
     if (typeof value === "string") {
       this.queryParams[name] = value;
@@ -85,27 +84,32 @@ export class HookSniffRequest {
         this.queryParams[name] = value.join(",");
       }
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _assert_unreachable: never = value;
       throw new Error(`query parameter ${name} has unsupported type`);
     }
   }
 
   public setHeaderParam(name: string, value?: string) {
-    if (value === undefined) return;
+    if (value === undefined) {
+      return;
+    }
+
     this.headerParams[name] = value;
   }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public setBody(value: any) {
     this.body = JSON.stringify(value);
   }
 
   /**
-   * Send this request, returning the response body parsed as type R.
+   * Send this request, returning the request body as a caller-specified type.
    *
-   * 422 → ApiException<HTTPValidationError>
-   * 4xx → ApiException<HttpErrorOut>
-   * 5xx → retried with exponential backoff
+   * If the server returns a 422 error, an `ApiException<HTTPValidationError>` is thrown.
+   * If the server returns another 4xx error, an `ApiException<HttpErrorOut>` is thrown.
+   *
+   * If the server returns a 5xx error, the request is retried up to two times with exponential backoff.
+   * If retries are exhausted, an `ApiException<HttpErrorOut>` is thrown.
    */
   public async send<R>(
     ctx: HookSniffRequestContext,
@@ -120,7 +124,7 @@ export class HookSniffRequest {
     return parseResponseBody(JSON.parse(responseBody));
   }
 
-  /** Same as `send`, but the response body is discarded. */
+  /** Same as `send`, but the response body is discarded, not parsed. */
   public async sendNoResponseBody(ctx: HookSniffRequestContext): Promise<void> {
     await this.sendInner(ctx);
   }
@@ -131,7 +135,6 @@ export class HookSniffRequest {
       url.searchParams.set(name, value);
     }
 
-    // Auto idempotency key for POST
     if (
       this.headerParams["idempotency-key"] === undefined &&
       this.method.toUpperCase() === "POST"
@@ -144,7 +147,9 @@ export class HookSniffRequest {
     if (this.body != null) {
       this.headerParams["content-type"] = "application/json";
     }
-
+    // Cloudflare Workers fail if the credentials option is used in a fetch call.
+    // This work around that. Source:
+    // https://github.com/cloudflare/workers-sdk/issues/2514#issuecomment-21.90.0014
     const isCredentialsSupported = "credentials" in Request.prototype;
 
     const response = await sendWithRetry(

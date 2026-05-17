@@ -1,46 +1,39 @@
 {
-  "name": "hooksniff-sdk",
-  "version": "0.5.0",
-  "description": "Official Node.js SDK for HookSniff — reliable webhook delivery for developers",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/servetarslan02/HookSniff.git"
-  },
-  "homepage": "https://hooksniff.vercel.app",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/src/index.js",
-      "require": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
-    }
-  },
+  "name": "hooksniff",
+  "version": "1.0.0",
+  "description": "HookSniff webhooks API client and webhook verification library",
+  "author": "hooksniff",
+  "repository": "https://github.com/hooksniff/hooksniff-webhooks",
+  "type": "commonjs",
+  "keywords": [
+    "hooksniff",
+    "diahook",
+    "webhooks",
+    "typescript"
+  ],
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
   "files": [
-    "dist/src/",
-    "README.md"
+    "src",
+    "dist"
   ],
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "npm run build",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --passWithNoTests"
+    "prepare": "npm run build",
+    "test": "tsc -p tsconfig.test.json && node --enable-source-maps test_build/src/index.test.js",
+    "prepublishOnly": "biome check",
+    "check": "biome check",
+    "check:fix": "biome check --write",
+    "fmt": "biome format --write"
   },
-  "keywords": [
-    "hooksniff",
-    "webhook",
-    "webhooks",
-    "sdk",
-    "api",
-    "delivery",
-    "retries"
-  ],
-  "author": "HookSniff",
-  "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
+  "dependencies": {
+    "standardwebhooks": "1.0.0"
   },
   "devDependencies": {
-    "@types/node": "^25.8.0",
-    "typescript": "^5.0.0"
+    "@biomejs/biome": "2.2.4",
+    "@stablelib/utf8": "^2.0.0",
+    "mockttp": "^4.4.1",
+    "typescript": "^4.0"
   }
 }
