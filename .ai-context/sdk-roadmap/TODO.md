@@ -41,8 +41,8 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 - `HookSniffHttpClient.kt` coroutine tabanlı (`suspend` fonksiyonlar)
 - `kotlinx.serialization` kullanıyor
 - `gradle.properties` hazır (io.github.servetarslan02, hooksniff-sdk-kotlin)
-- GPG key: `5F815C019784733D` (keyserver'da mevcut)
-- Sonatype: `f0wXBf` / `EYLV763IsQVseaffdOXNScf2HZlcLDGEK`
+- GPG key: `[REDACTED]` (keyserver'da mevcut)
+- Sonatype: `[REDACTED]` / `[REDACTED]`
 
 ---
 
