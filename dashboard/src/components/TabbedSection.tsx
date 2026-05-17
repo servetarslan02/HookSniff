@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 
 export interface Tab {
   key: string;
   label: string;
   icon?: string;
-  content: ReactNode;
+  /** Either a ReactNode or a factory function for lazy rendering */
+  content: ReactNode | (() => ReactNode);
 }
 
 interface TabbedSectionProps {
@@ -16,8 +17,17 @@ interface TabbedSectionProps {
 
 export function TabbedSection({ tabs, defaultTab }: TabbedSectionProps) {
   const [active, setActive] = useState(defaultTab || tabs[0]?.key || '');
+  const [visited, setVisited] = useState<Set<string>>(() => new Set([defaultTab || tabs[0]?.key || '']));
 
-  const currentTab = tabs.find((t) => t.key === active) || tabs[0];
+  const handleTabClick = useCallback((key: string) => {
+    setActive(key);
+    setVisited((prev) => {
+      if (prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -28,7 +38,7 @@ export function TabbedSection({ tabs, defaultTab }: TabbedSectionProps) {
             <button
               key={tab.key}
               type="button"
-              onClick={() => setActive(tab.key)}
+              onClick={() => handleTabClick(tab.key)}
               className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 active === tab.key
                   ? 'border-brand-600 text-brand-600 dark:text-brand-400 dark:border-brand-400'
@@ -42,10 +52,16 @@ export function TabbedSection({ tabs, defaultTab }: TabbedSectionProps) {
         </div>
       </div>
 
-      {/* Active Tab Content */}
-      <div key={currentTab?.key}>
-        {currentTab?.content}
-      </div>
+      {/* Tab Content — only render tabs that have been visited (lazy) */}
+      {tabs.map((tab) => {
+        if (!visited.has(tab.key)) return null;
+        const content = typeof tab.content === 'function' ? (tab.content as () => ReactNode)() : tab.content;
+        return (
+          <div key={tab.key} style={{ display: tab.key === active ? 'block' : 'none' }}>
+            {content}
+          </div>
+        );
+      })}
     </div>
   );
 }
