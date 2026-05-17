@@ -20,6 +20,7 @@ public class HookSniff {
     private final MessageAttempt messageAttempt;
     private final Statistics statistics;
     private final Environment environment;
+    private final BackgroundTask backgroundTask;
 
     public HookSniff(String token) {
         this(token, new HookSniffOptions());
@@ -49,5 +50,6 @@ public class HookSniff {
         this.messageAttempt = new MessageAttempt(this.httpClient);
         this.statistics = new Statistics(this.httpClient);
         this.environment = new Environment(this.httpClient);
+        this.backgroundTask = new BackgroundTask(this.httpClient);
     }
 }

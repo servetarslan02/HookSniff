@@ -39,6 +39,7 @@ type (
 	EnvironmentVariableBulkUpsertIn           = models.EnvironmentVariableBulkUpsertIn
 	EnvironmentVariableIn                     = models.EnvironmentVariableIn
 	EnvironmentVariableOut                    = models.EnvironmentVariableOut
+	BackgroundTaskOut                         = models.BackgroundTaskOut
 	EndpointCreatedEvent                      = models.EndpointCreatedEvent
 	EndpointCreatedEventData                  = models.EndpointCreatedEventData
 	EndpointDeletedEvent                      = models.EndpointDeletedEvent

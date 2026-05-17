@@ -8,6 +8,7 @@ pub use self::client::{HookSniff, HookSniffOptions};
 pub use crate::models::*;
 
 mod authentication;
+mod background_task;
 mod endpoint;
 mod environment;
 mod event_type;
@@ -18,6 +19,7 @@ mod statistics;
 
 pub use self::{
     authentication::{Authentication, AuthenticationLogoutOptions},
+    background_task::BackgroundTask,
     endpoint::{
         Endpoint, EndpointCreateOptions, EndpointListOptions,
         EndpointRotateSecretOptions, EndpointSendExampleOptions,
@@ -42,6 +44,10 @@ pub use self::{
 impl HookSniff {
     pub fn authentication(&self) -> Authentication<'_> {
         Authentication::new(&self.cfg)
+    }
+
+    pub fn background_task(&self) -> BackgroundTask<'_> {
+        BackgroundTask::new(&self.cfg)
     }
 
     pub fn endpoint(&self) -> Endpoint<'_> {

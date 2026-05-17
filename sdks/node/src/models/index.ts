@@ -1,4 +1,5 @@
 export { type EndpointCreatedEventData } from "./endpointCreatedEventData";
+export { type BackgroundTaskOut } from "./backgroundTaskOut";
 export { type EnvironmentIn } from "./environmentIn";
 export { type EnvironmentOut } from "./environmentOut";
 export { type EnvironmentPatch } from "./environmentPatch";

@@ -1,4 +1,5 @@
 pub mod application;
+pub mod background_task;
 pub mod customer;
 pub mod delivery;
 pub mod endpoint;

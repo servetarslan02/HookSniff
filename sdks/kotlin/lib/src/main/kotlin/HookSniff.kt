@@ -12,6 +12,7 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
     val messageAttempt: MessageAttempt
     val statistics: Statistics
     val environment: Environment
+    val backgroundTask: BackgroundTask
 
     init {
         if (options.baseUrl == null) {
@@ -29,5 +30,6 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
         messageAttempt = MessageAttempt(httpClient)
         statistics = Statistics(httpClient)
         environment = Environment(httpClient)
+        backgroundTask = BackgroundTask(httpClient)
     }
 }

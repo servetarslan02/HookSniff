@@ -1,4 +1,5 @@
 import { Authentication } from "./api/authentication";
+import { BackgroundTask } from "./api/backgroundTask";
 import { Endpoint } from "./api/endpoint";
 import { Environment } from "./api/environment";
 import { EventType } from "./api/eventType";
@@ -78,6 +79,10 @@ export class HookSniff {
 
   public get authentication() {
     return new Authentication(this.requestCtx);
+  }
+
+  public get backgroundTask() {
+    return new BackgroundTask(this.requestCtx);
   }
 
   public get endpoint() {
