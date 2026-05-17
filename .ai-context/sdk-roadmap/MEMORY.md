@@ -1,28 +1,28 @@
 # SDK Roadmap MEMORY
 
-> Son güncelleme: 2026-05-18 06:26 GMT+8 (Oturum — Faz 8-13 tamamlandı)
+> Son güncelleme: 2026-05-18 07:26 GMT+8
 
 ## ⚠️ KRİTİK: SDK Adaptasyon Yöntemi
 
 **ASLA sıfırdan yazma!** Her zaman Svix SDK'yı kopyala ve adapte et.
 
-## 📊 SDK Publish Durumu — v1.0.0
+## 📊 SDK Publish Durumu — v1.1.0
 
 | # | SDK | Registry | Durum |
 |---|-----|----------|-------|
-| 1 | **Node.js** | npm | ✅ |
-| 2 | **Python** | PyPI | ✅ |
-| 3 | **Go** | GitHub tag | ✅ |
-| 4 | **Rust** | crates.io | ✅ |
-| 5 | **Ruby** | RubyGems | ✅ |
-| 6 | **Java** | Maven Central | ✅ |
-| 7 | **C#** | NuGet | ✅ |
-| 8 | **Elixir** | Hex.pm | ✅ |
-| 9 | **PHP** | Packagist | ✅ |
-| 10 | **Swift** | GitHub tag | ✅ |
-| 11 | **Kotlin** | Maven Central | ✅ |
+| 1 | **Node.js** | npm | ✅ v1.1.0 yüklendi |
+| 2 | **Python** | PyPI | ✅ v1.1.0 yüklendi |
+| 3 | **Go** | GitHub tag | ✅ v1.1.0 |
+| 4 | **Rust** | crates.io | ✅ v1.1.0 yüklendi |
+| 5 | **Ruby** | RubyGems | ⏳ gem push gerekli |
+| 6 | **Java** | Maven Central | ⏳ mvn deploy gerekli |
+| 7 | **C#** | NuGet | ⏳ dotnet nuget push gerekli |
+| 8 | **Elixir** | Hex.pm | ⏳ mix hex.publish gerekli |
+| 9 | **PHP** | Packagist | ✅ otomatik |
+| 10 | **Swift** | GitHub tag | ✅ v1.1.0 |
+| 11 | **Kotlin** | Maven Central | ⏳ ./gradlew publish gerekli |
 
-## 📊 Faz İlerlemesi
+## 📊 Faz İlerlemesi — TÜMÜ TAMAMLANDI
 
 | Faz | İçerik | Durum |
 |-----|--------|-------|
@@ -35,13 +35,12 @@
 | 14 | Integration | ✅ |
 | 15 | Streaming | ✅ |
 
-## 🔧 Build Ortamı (Bu sunucuda kuruldu)
+## 🔧 Build Ortamı
 - JDK 17: /opt/jdk-17
 - Maven: /opt/apache-maven-3.9.6
 - Go: /usr/local/go/bin
 - Rust: $HOME/.cargo/env (rustc 1.95.0)
 - Node.js: v22.22.1
-- GPG Key ID: FC5EA3BE171950ED5B42B44948FA192D3997BF0E
 
 ## HookSniff API Bilgileri
 - Base URL: `https://api.hooksniff-1046140057667.europe-west1.run.app`
@@ -51,14 +50,10 @@
 - Vercel: Auto-deploy from GitHub
 
 ## ⚠️ Deploy Notu
-Cloud Build manuel tetikleniyor. Son connector API'si deploy edilmeli.
-DB tabloları ve seed data hazır.
+Cloud Build manuel tetikleniyor. Tüm yeni API'ler (Integration, Stream) deploy edilmeli.
 
 ## 📝 Son Oturum (2026-05-18)
-- Faz 10: Operational webhook worker dispatch eklendi (delivery.failed, endpoint.disabled)
-- Faz 11: Message Poller — API + Dashboard + 11 SDK
-- Faz 12: Ingest — sidebar nav + SDK tamamlandı
-- Faz 13: Connector — 8 servis (Stripe, Shopify, GitHub, Slack, Twilio, Discord, Linear, Notion)
-- Faz 14: Integration — API + Dashboard + Migration 063 + 11 SDK güncellendi
-- Migration 061 (message_cursors) + 062 (connectors) + 063 (integrations) uygulandı
-- Tüm SDK'lar güncellendi (14 resource × 11 dil)
+- Faz 14 + Faz 15 tamamlandı
+- 11 SDK v1.1.0 — tüm ayrı repolar güncellendi
+- npm, PyPI, crates.io publish edildi
+- 5 SDK registry publish bekliyor (Ruby, Java, Kotlin, C#, Elixir)
