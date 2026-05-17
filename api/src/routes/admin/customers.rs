@@ -409,3 +409,19 @@ mod tests {
 
     use chrono::Utc;
 }
+
+    #[test]
+    fn test_communication_query_with_type() {
+        let json = r#"{"type": "email", "page": 2, "per_page": 25}"#;
+        let params: CommunicationQuery = serde_json::from_str(json).unwrap();
+        assert_eq!(params.r#type.as_deref(), Some("email"));
+        assert_eq!(params.page, Some(2));
+        assert_eq!(params.per_page, Some(25));
+    }
+
+    #[test]
+    fn test_create_note_request_empty_rejected() {
+        let json = r#"{"content": ""}"#;
+        let req: CreateNoteRequest = serde_json::from_str(json).unwrap();
+        assert!(req.content.is_empty());
+    }

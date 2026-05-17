@@ -444,3 +444,22 @@ mod tests {
         assert_eq!(json["retention_rate"], 70.0);
     }
 }
+
+    #[test]
+    fn test_payment_transaction_row_serialization() {
+        let payment = PaymentTransactionRow {
+            id: Uuid::nil(),
+            customer_id: Uuid::nil(),
+            amount_cents: 4900,
+            currency: "usd".to_string(),
+            status: "completed".to_string(),
+            provider: "polar".to_string(),
+            provider_transaction_id: Some("txn_456".to_string()),
+            metadata: Some(serde_json::json!({ "plan": "pro" })),
+            created_at: chrono::Utc.timestamp_opt(1700000000, 0).unwrap(),
+        };
+        let json = serde_json::to_value(&payment).unwrap();
+        assert_eq!(json["amount_cents"], 4900);
+        assert_eq!(json["status"], "completed");
+        assert_eq!(json["metadata"]["plan"], "pro");
+    }
