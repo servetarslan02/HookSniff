@@ -26,6 +26,7 @@ module HookSniff
     attr_accessor :inbound
     attr_accessor :connector
     attr_accessor :integration
+    attr_accessor :stream
 
     def initialize(auth_token, options = HookSniffOptions.new)
       uri = URI(options.server_url || "https://hooksniff-api-1046140057667.europe-west1.run.app")
@@ -45,6 +46,7 @@ module HookSniff
       @inbound = Inbound.new(api_client)
       @connector = Connector.new(api_client)
       @integration = IntegrationApi.new(api_client)
+      @stream = StreamApi.new(api_client)
     end
   end
 end

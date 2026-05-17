@@ -61,7 +61,9 @@ public class HookSniff {
         this.inbound = new Inbound(this.httpClient);
         this.connector = new Connector(this.httpClient);
         this.integration = new Integration(this.httpClient);
+        this.stream = new Stream(this.httpClient);
     }
 
     public Integration integration() { return integration; }
+    public Stream stream() { return stream; }
 }
