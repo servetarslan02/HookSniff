@@ -213,7 +213,7 @@ export const endpointsApi = {
     apiFetch<{ deleted: boolean }>(`/endpoints/${id}`, { method: "DELETE", token }),
 
   rotateSecret: (token: string, id: string) =>
-    apiFetch<{ secret: string }>(`/endpoints/${id}/rotate-secret`, { method: "POST", token }),
+    apiFetch<{ signing_secret: string }>(`/endpoints/${id}/rotate-secret`, { method: "POST", token }),
 };
 
 // Webhook API
