@@ -69,7 +69,7 @@ await hs.webhooks.send({
     },
     metrics: [
       { label: 'avgDeliveryLatency', value: '<200ms' },
-      { label: 'deliverySuccessRate', value: '99.97%' },
+      { label: 'deliverySuccessRate', value: '99.9%' },
       { label: 'SDKs available', value: '11' },
       { label: 'freeTierEvents', value: '1,000/mo' },
     ],

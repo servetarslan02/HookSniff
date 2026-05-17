@@ -15,7 +15,7 @@ export default async function SvixAlternativePage() {
     { featureKey: 'fifoDelivery', hooksniff: '✅', svix: '❌', bestFor: 'hooksniff' },
     { featureKey: 'cloudEvents', hooksniff: '✅', svix: '✅', bestFor: 'tie' },
     { featureKey: 'schemaRegistry', hooksniff: '✅', svix: '❌', bestFor: 'hooksniff' },
-    { featureKey: 'deliveryMethods', hooksniff: t('httpWsGrpc'), svix: t('httpOnly'), bestFor: 'hooksniff' },
+    { featureKey: 'deliveryMethods', hooksniff: t('httpWsGrpc'), svix: 'HTTP, WebSocket', bestFor: 'tie' },
     { featureKey: 'selfHosted', hooksniff: '✅', svix: '✅', bestFor: 'tie' },
     { featureKey: 'soc2', hooksniff: t('ready'), svix: t('type2'), bestFor: 'svix' },
     { featureKey: 'uptimeSla', hooksniff: '99.9%', svix: '99.99%', bestFor: 'svix' },
@@ -66,7 +66,7 @@ export default async function SvixAlternativePage() {
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>{t('pricePro')}:</strong> $29/mo vs Svix at $490/mo — {t('savedPerYear', { amount: '$5,532' })}</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>FIFO + Schema Registry:</strong> Ordered delivery and payload validation — features Svix doesn&apos;t offer</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>{t('i18n')}:</strong> 8-language dashboard for international teams</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>{t('i18n')}:</strong> English and Turkish dashboard with more languages coming soon</li>
             </ul>
           </div>
 
