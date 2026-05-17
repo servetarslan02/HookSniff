@@ -125,7 +125,10 @@ HookSniff/
    - Versiyon: 0.4.0 → 0.5.0
    - Kalite: %55-60 → %65-70 (Stripe'a göre)
    - Commit: c03cfa00
-   - `2026-05-17-node-sdk-rewrite.md` oluşturuldu
+2. **SDK Roadmap Klasörü Oluşturuldu** ✅
+   - `.ai-context/sdk-roadmap/` → STATUS.md, DONE.md, TODO.md, PLAN.md
+   - 11 SDK durum tablosu, yapılacak işler, strateji planı
+   - Commit: 1bbb082e, fcab88fd
 
 ### Oturum 195 — 2026-05-17 06:05 GMT+8
 1. **Settings Sayfası Derin İnceleme + 13 Fix** ✅
