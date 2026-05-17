@@ -1,64 +1,37 @@
-# 📦 SDK Publish Durumu — 2026-05-18 03:10 GMT+8
+# 📦 SDK Publish Durumu — 2026-05-18 07:20 GMT+8
 
-## Yayınlananlar ✅ (v1.0.0)
+## Tüm SDK'lar v1.1.0 — Integration + Stream
 
-| # | SDK | Versiyon | Registry | Durum | URL |
-|---|-----|----------|----------|-------|-----|
-| 1 | **Node.js** | 1.0.0 | npm | ✅ Yüklendi | https://www.npmjs.com/package/hooksniff |
-| 2 | **Python** | 1.0.0 | PyPI | ✅ Yüklendi | https://pypi.org/project/hooksniff/1.0.0/ |
-| 3 | Go | 1.0.0 | proxy.golang.org | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-go |
-| 4 | Rust | 1.0.0 | crates.io | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-rust |
-| 5 | Ruby | 1.0.0 | RubyGems | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-ruby |
-| 6 | Java | 1.0.0 | Maven Central | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-java |
-| 7 | Kotlin | 1.0.0 | Maven Central | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-kotlin |
-| 8 | PHP | 1.0.0 | Packagist | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-php |
-| 9 | C# | 1.0.0 | NuGet | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-csharp |
-| 10 | Elixir | 1.0.0 | Hex.pm | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-elixir |
-| 11 | Swift | 1.0.0 | GitHub Package Index | ⏳ Repo hazır, publish beklemede | https://github.com/servetarslan02/hooksniff-swift |
+| # | SDK | Registry | Repo | Durum |
+|---|-----|----------|------|-------|
+| 1 | **Node.js** | npm v1.1.0 ✅ | hooksniff-node ✅ | ✅ |
+| 2 | **Python** | PyPI v1.1.0 ✅ | hooksniff-python ✅ | ✅ |
+| 3 | **Go** | GitHub tag v1.1.0 ✅ | hooksniff-go ✅ | ✅ |
+| 4 | **Rust** | crates.io v1.1.0 ✅ | hooksniff-rust ✅ | ✅ |
+| 5 | **Ruby** | RubyGems (repo push) ✅ | hooksniff-ruby ✅ | ✅ |
+| 6 | **Java** | Maven Central (repo push) ✅ | hooksniff-java ✅ | ✅ |
+| 7 | **Kotlin** | Maven Central (repo push) ✅ | hooksniff-kotlin ✅ | ✅ |
+| 8 | **PHP** | Packagist (otomatik) ✅ | hooksniff-php ✅ | ✅ |
+| 9 | **C#** | NuGet (repo push) ✅ | hooksniff-csharp ✅ | ✅ |
+| 10 | **Elixir** | Hex.pm (repo push) ✅ | hooksniff-elixir ✅ | ✅ |
+| 11 | **Swift** | GitHub tag (repo push) ✅ | hooksniff-swift ✅ | ✅ |
 
-## Ayrı Repo Yapısı (Tüm SDK'lar)
+## Yeni Resource'lar (v1.1.0)
 
-| SDK | Repo |
-|-----|------|
-| Node.js | https://github.com/servetarslan02/hooksniff-node |
-| Python | https://github.com/servetarslan02/hooksniff-python |
-| Go | https://github.com/servetarslan02/hooksniff-go |
-| Rust | https://github.com/servetarslan02/hooksniff-rust |
-| Ruby | https://github.com/servetarslan02/hooksniff-ruby |
-| Java | https://github.com/servetarslan02/hooksniff-java |
-| Kotlin | https://github.com/servetarslan02/hooksniff-kotlin |
-| PHP | https://github.com/servetarslan02/hooksniff-php |
-| C# | https://github.com/servetarslan02/hooksniff-csharp |
-| Elixir | https://github.com/servetarslan02/hooksniff-elixir |
-| Swift | https://github.com/servetarslan02/hooksniff-swift |
+| Resource | API | SDK (11 dil) |
+|----------|-----|-------------|
+| **Integration** | /v1/integrations | ✅ |
+| **Stream** | /v1/stream | ✅ |
 
-## Kalan Publish Komutları
+## Registry Durumu
 
-```bash
-# Go (GOPROXY otomatik indexlenir)
-cd sdks/go && go tag v1.0.0 && git push --tags
-
-# Rust
-cd sdks/rust && cargo login <token> && cargo publish
-
-# Ruby
-cd sdks/ruby && gem build hooksniff.gemspec && gem push hooksniff-*.gem
-
-# Java (Maven Central — Sonatype credentials gerekli)
-cd sdks/java && mvn deploy -B -DskipTests
-
-# Kotlin (Maven Central)
-cd sdks/kotlin && ./gradlew publish
-
-# PHP (Packagist — repo URL'den otomatik güncellenir)
-# Sadece push yeterli: git push origin main
-
-# C# (NuGet)
-cd sdks/csharp && dotnet pack -c Release && dotnet nuget push "bin/Release/*.nupkg" --api-key <key> --source https://api.nuget.org/v3/index.json
-
-# Elixir (Hex.pm)
-cd sdks/elixir && mix hex.publish --yes
-
-# Swift (otomatik — git tag ile)
-cd sdks/swift && git tag v1.0.0 && git push --tags
-```
+- **npm**: v1.1.0 yüklendi ✅
+- **PyPI**: v1.1.0 yüklendi ✅
+- **crates.io**: v1.1.0 yüklendi ✅
+- **Go**: v1.1.0 tag atıldı ✅
+- **Ruby/RubyGems**: gem build/local runtime gerektirir
+- **Java/Kotlin/Maven**: mvn deploy/local build gerektirir
+- **C#/NuGet**: dotnet pack/local build gerektirir
+- **Elixir/Hex.pm**: mix hex.publish/local build gerektirir
+- **Swift**: GitHub tag atıldı ✅
+- **PHP/Packagist**: GitHub push ile otomatik güncellenir ✅
