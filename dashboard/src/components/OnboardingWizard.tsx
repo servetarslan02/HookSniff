@@ -348,7 +348,7 @@ export function OnboardingWizard() {
                     <div className="text-xl mb-1">🧪</div>
                     <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("playground")}</div>
                   </a>
-                  <a href="/billing-overview" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                  <a href="/core" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                     <div className="text-xl mb-1">🔑</div>
                     <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("apiKeys")}</div>
                   </a>

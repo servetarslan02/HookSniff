@@ -17,7 +17,6 @@ const tabSkeleton = (
 
 const TeamPage = dynamic(() => import('../team/page'), { ssr: false, loading: () => tabSkeleton });
 const NotificationsPage = dynamic(() => import('../notifications/page'), { ssr: false, loading: () => tabSkeleton });
-const BillingPage = dynamic(() => import('../billing/page'), { ssr: false, loading: () => tabSkeleton });
 const SettingsPage = dynamic(() => import('../settings/page'), { ssr: false, loading: () => tabSkeleton });
 const PortalManagePage = dynamic(() => import('../portal-manage/page'), { ssr: false, loading: () => tabSkeleton });
 
@@ -29,7 +28,6 @@ export default function AccountPage() {
       tabs={[
         { key: 'team', label: t('team'), icon: '👥', content: <TeamPage /> },
         { key: 'notifications', label: t('notifications'), icon: '🔔', content: <NotificationsPage /> },
-        { key: 'billing', label: t('billing'), icon: '💳', content: <BillingPage /> },
         { key: 'settings', label: t('settings'), icon: '⚙️', content: <SettingsPage /> },
         { key: 'portal', label: t('portal'), icon: '🖼️', content: <PortalManagePage /> },
       ]}
