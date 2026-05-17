@@ -127,3 +127,35 @@
 - Erlang: `/snap/bin` (snap install erlang --classic)
 - dotnet: `/snap/bin` (snap install dotnet-sdk --classic)
 - GPG key: `[REDACTED]` (HookSniff <support@hooksniff.com>)
+
+## 📝 Oturum 2026-05-18 — SDK Cleanup & Kotlin Publish
+
+### Yapılan:
+1. **Kotlin SDK Publish** ✅ — Maven Central'a yüklendi (io.github.servetarslan02:hooksniff-sdk-kotlin:1.0.0)
+2. **Svix-specific kod temizliği** — 11 SDK'dan Svix'e özel model/method/API dosyaları kaldırıldı (142 dosya, 6840 satır)
+3. **Test secret temizliği** — Java SDK'daki hardcoded whsec_MfKQ9r8... secret kaldırıldı
+4. **Rust SDK derleme** — 0 hata, 0 uyarı ile derleniyor
+5. **Node.js build fix** — messageAttemptRecoveredEventData export kaldırıldı
+6. **Python fix** — broken message_poller import kaldırıldı
+7. **JDK 17 kuruldu** — /opt/jdk-17
+8. **Rust kuruldu** — rustc 1.95.0
+
+### Build Ortamı:
+- JDK 17: /opt/jdk-17
+- Rust: source "$HOME/.cargo/env" (rustc 1.95.0)
+- GPG key: FC5EA3BE171950ED5B42B44948FA192D3997BF0E (yeni, keyserver'da mevcut)
+
+### 11/11 SDK Durumu:
+| SDK | Build | Registry |
+|-----|-------|----------|
+| Java | ✅ | Maven Central |
+| Kotlin | ✅ | Maven Central |
+| Rust | ✅ | crates.io |
+| Node.js | ✅ | npm |
+| Go | ✅ | GitHub tag |
+| Python | ✅ (syntax) | PyPI |
+| Ruby | ✅ | RubyGems |
+| PHP | ✅ (kaynak) | Packagist |
+| C# | ✅ | NuGet |
+| Elixir | ✅ | Hex.pm |
+| Swift | ✅ | GitHub tag |
