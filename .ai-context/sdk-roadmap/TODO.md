@@ -101,7 +101,7 @@
 | Tarih | Yapılan | Kalite |
 |-------|---------|--------|
 | 2026-05-11 | 11 SDK auto-gen + publish | %20-25 |
-| 2026-05-17 | Node.js SDK Svix tabanlı rewrite | %70-75 |
+| 2026-05-17 | Node.js SDK Yeniden rewrite | %70-75 |
 | TBD | Python, Go, Rust rewrite | → %70-75 |
 | TBD | Test suite + CI/CD | → %85+ |
 | TBD | Dokümantasyon + examples | → %90+ |

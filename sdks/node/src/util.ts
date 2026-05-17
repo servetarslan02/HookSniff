@@ -1,7 +1,6 @@
 /**
  * HookSniff SDK — Utility types and error handling
- *
- * Based on Svix SDK architecture (MIT License).
+
  * Adapted for HookSniff API.
  */
 

@@ -8,7 +8,7 @@
 
 ### Ne yapıldı?
 - Eski OpenAPI Generator 7.22.0 boilerplate kaldırıldı
-- Svix SDK mimarisi (MIT lisans) bazlı el yapımı SDK oluşturuldu
+- el yapımı el yapımı SDK oluşturuldu
 - `sdks/node/` tamamen yeniden yazıldı
 
 ### Eklenen özellikler

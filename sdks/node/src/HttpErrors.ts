@@ -1,7 +1,6 @@
 /**
  * HookSniff SDK — HTTP Error Models
- *
- * Based on Svix SDK architecture (MIT License).
+
  */
 
 export class HttpErrorOut {
