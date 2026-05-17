@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 23:04 GMT+8 (Oturum — Python SDK Rewrite)
+> Son güncelleme: 2026-05-18 01:30 GMT+8 (Oturum — PHP + C# SDK Adaptasyonu)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
