@@ -318,3 +318,48 @@ postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-
 6. **Türkçe çeviriler düzeltildi** — Dashboard → Kontrol Paneli, Playground → Oyun Alanı
 7. **Translation keys**: 2809 EN = 2809 TR (tam uyumlu)
 8. **Commit:** b2f9a8d — push edildi
+
+## 🔄 Kalan Performans Optimizasyonu (2026-05-17)
+
+### Tamamlanan:
+- ✅ admin/overview — 4 lazy tab component'a bölündü
+- ✅ admin/settings — 4 lazy tab (general, email, alerts, dev)
+- ✅ admin/revenue — below-the-fold lazy load
+- ✅ 11 tabbed sayfa — lazy tab + hover prefetch
+- ✅ TabbedSection — lazy + prefetch component
+- ✅ AuthGuard — non-blocking
+- ✅ API N+1 fix (applications)
+- ✅ customer_id fix (ApplicationResponse)
+- ✅ Limit kaldırma (applications)
+
+### Kalan Sayfalar (sırayla yapılacak):
+1. **admin/system** (720 satır) — health checks + tables, below-the-fold lazy load
+2. **admin/users** (675 satır) — user table lazy load
+3. **admin/alerts** (375 satır) — alerts list lazy load
+4. **admin/feature-flags** (332 satır) — flags list lazy load
+
+### Pattern (tek-view sayfalar için):
+```tsx
+// 1. Parent'ta hook'lar kalır, data prop olarak geçilir
+const { data } = useSomeHook();
+
+// 2. Below-the-fold content ayrı component'e çıkar
+// components/ContentSection.tsx
+export default function ContentSection({ data }: Props) { ... }
+
+// 3. Dynamic import ile lazy load
+const ContentSection = dynamic(() => import('./components/ContentSection'), {
+  ssr: false,
+  loading: () => <Skeleton />
+});
+
+// 4. Parent'ta render
+return (
+  <div>
+    <Header /> {/* above fold */}
+    <StatCards /> {/* above fold */}
+    <ContentSection data={data} /> {/* below fold, lazy */}
+  </div>
+);
+```
+

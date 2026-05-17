@@ -684,3 +684,22 @@ HookSniff/
    - `tr.json`: 2809 key (tam uyumlu, 0 eksik)
    - `defaultValue` parametreleri kaldırıldı — artık doğrudan translation key kullanılıyor
 4. **Commit:** b2f9a8d — push edildi
+
+## 📝 Oturum 2026-05-17 — Performans Optimizasyonu
+
+### Yapılan (12 dosya değişti, ~1000 satır):
+1. API N+1 sorgu fix (applications) — 6 sorgu → 1 sorgu
+2. ApplicationResponse.customer_id eklendi (frontend Zod schema uyumsuzluğu fix)
+3. Application limit kaldırıldı
+4. AuthGuard non-blocking (token varsa hemen render)
+5. TabbedSection lazy + hover prefetch (30+ sekme)
+6. Admin overview 909→144 satır (4 lazy tab component)
+7. Admin/settings lazy tabs
+8. Admin/revenue below-the-fold lazy load
+9. LazySection component (viewport-based)
+10. "Portal" → "Profil" isim değişikliği
+
+### Kalan:
+- admin/system, admin/users, admin/alerts, admin/feature-flags lazy load
+- NEXT_SESSION.md'de detaylı talimat var
+
