@@ -1,76 +1,99 @@
 """
-HookSniff API Resource: Webhooks
-
-Send, list, get, replay, and batch webhooks.
+HookSniff SDK — Webhooks Resource
 """
 
-from typing import Any, Dict, Generator, List, Optional
-from hooksniff.request import HookSniffRequest, HookSniffRequestContext
-from hooksniff.models.delivery import Delivery
-from hooksniff.models.delivery_list_response import DeliveryListResponse
-from hooksniff.models.batch_webhook_response import BatchWebhookResponse
-from hooksniff.pagination import paginate, collect_all, Page
+from __future__ import annotations
+
+from typing import Any, Generator
+
+from ..request import HookSniffRequest, RequestConfig
+from ..pagination import paginate
+from ..models import (
+    CreateWebhookRequest,
+    BatchWebhookRequest,
+    Delivery,
+    DeliveryListResponse,
+    BatchResponse,
+    DeliveryAttempt,
+    BatchReplayRequest,
+)
 
 
 class Webhooks:
-    def __init__(self, ctx: HookSniffRequestContext):
-        self._ctx = ctx
+    """Webhook sending & delivery management."""
 
-    def send(self, data: Dict[str, Any], idempotency_key: Optional[str] = None) -> Delivery:
+    def __init__(self, config: RequestConfig):
+        self._config = config
+
+    def send(self, body: CreateWebhookRequest | dict[str, Any]) -> dict[str, Any]:
         """Send a single webhook."""
         req = HookSniffRequest("POST", "/v1/webhooks")
-        if idempotency_key:
-            req.set_header_param("idempotency-key", idempotency_key)
-        req.set_body(data)
-        return req.send(self._ctx, parser=Delivery._from_json)
+        data = body.__dict__ if isinstance(body, CreateWebhookRequest) else body
+        req.set_body({k: v for k, v in data.items() if v is not None})
+        return req.send(self._config, lambda j: j)
 
-    def batch(self, data: Dict[str, Any], idempotency_key: Optional[str] = None) -> BatchWebhookResponse:
-        """Send batch webhooks."""
+    def send_batch(self, body: BatchWebhookRequest | dict[str, Any]) -> dict[str, Any]:
+        """Send multiple webhooks in a single request."""
         req = HookSniffRequest("POST", "/v1/webhooks/batch")
-        if idempotency_key:
-            req.set_header_param("idempotency-key", idempotency_key)
+        data = body.__dict__ if isinstance(body, BatchWebhookRequest) else body
         req.set_body(data)
-        return req.send(self._ctx, parser=BatchWebhookResponse._from_json)
+        return req.send(self._config, lambda j: j)
 
-    def list(self, limit: Optional[int] = None, offset: Optional[int] = None) -> DeliveryListResponse:
-        """List deliveries (single page)."""
-        req = HookSniffRequest("GET", "/v1/webhooks")
-        if limit is not None:
-            req.set_query_params({"limit": limit})
-        if offset is not None:
-            req.set_query_params({"offset": offset})
-        return req.send(self._ctx, parser=DeliveryListResponse._from_json)
-
-    def list_all(self, limit: int = 50, max_pages: int = 100) -> Generator[Delivery, None, None]:
-        """Iterate through all deliveries with automatic pagination."""
-        def fetch_page(lim, offset):
-            req = HookSniffRequest("GET", "/v1/webhooks")
-            req.set_query_params({"limit": lim, "offset": offset})
-            resp = req.send(self._ctx, parser=DeliveryListResponse._from_json)
-            return Page(
-                data=resp.deliveries if hasattr(resp, 'deliveries') else [],
-                has_more=resp.has_more if hasattr(resp, 'has_more') else False,
-            )
-        return paginate(fetch_page, limit=limit, max_pages=max_pages)
-
-    def list_all_collect(self, limit: int = 50, max_pages: int = 100) -> List[Delivery]:
-        """Collect all deliveries into a list. Alias for list_all_array."""
-        return list(self.list_all(limit=limit, max_pages=max_pages))
-
-    def list_all_array(self, limit: int = 50, max_pages: int = 100) -> List[Delivery]:
-        """Collect all deliveries into a array (Node.js compatibility alias)."""
-        return self.list_all_collect(limit=limit, max_pages=max_pages)
-
-    def get(self, delivery_id: str) -> Delivery:
-        """Get a specific delivery."""
-        req = HookSniffRequest("GET", "/v1/webhooks/{id}")
+    def get_delivery(self, delivery_id: str) -> dict[str, Any]:
+        """Get a delivery by ID."""
+        req = HookSniffRequest("GET", "/v1/deliveries/{id}")
         req.set_path_param("id", delivery_id)
-        return req.send(self._ctx, parser=Delivery._from_json)
+        return req.send(self._config, lambda j: j)
 
-    def replay(self, delivery_id: str, idempotency_key: Optional[str] = None) -> Delivery:
-        """Replay a delivery."""
-        req = HookSniffRequest("POST", "/v1/webhooks/{id}/replay")
+    def list_deliveries(
+        self,
+        endpoint_id: str | None = None,
+        status: str | None = None,
+        limit: int | None = None,
+        iterator: str | None = None,
+    ) -> dict[str, Any]:
+        """List deliveries."""
+        req = HookSniffRequest("GET", "/v1/deliveries")
+        req.set_query_params({
+            "endpoint_id": endpoint_id,
+            "status": status,
+            "limit": limit,
+            "iterator": iterator,
+        })
+        return req.send(self._config, lambda j: j)
+
+    def list_deliveries_all(
+        self,
+        endpoint_id: str | None = None,
+        status: str | None = None,
+        limit: int | None = None,
+    ) -> Generator[dict[str, Any], None, None]:
+        """Auto-paginate through all deliveries."""
+        return paginate(
+            lambda **kw: self.list_deliveries(endpoint_id=endpoint_id, status=status, **kw),
+            limit=limit,
+        )
+
+    def get_attempts(self, delivery_id: str) -> list[dict[str, Any]]:
+        """Get all attempts for a delivery."""
+        req = HookSniffRequest("GET", "/v1/deliveries/{id}/attempts")
         req.set_path_param("id", delivery_id)
-        if idempotency_key:
-            req.set_header_param("idempotency-key", idempotency_key)
-        return req.send(self._ctx, parser=Delivery._from_json)
+        return req.send(self._config, lambda j: j)
+
+    def replay(self, body: BatchReplayRequest | dict[str, Any]) -> dict[str, Any]:
+        """Replay failed deliveries."""
+        req = HookSniffRequest("POST", "/v1/deliveries/replay")
+        data = body.__dict__ if isinstance(body, BatchReplayRequest) else body
+        req.set_body(data)
+        return req.send(self._config, lambda j: j)
+
+    def test(self, endpoint_id: str, event: str | None = None, data: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Send a test webhook to an endpoint."""
+        req = HookSniffRequest("POST", "/v1/webhooks/test")
+        body: dict[str, Any] = {"endpoint_id": endpoint_id}
+        if event:
+            body["event"] = event
+        if data:
+            body["data"] = data
+        req.set_body(body)
+        return req.send(self._config, lambda j: j)

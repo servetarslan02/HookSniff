@@ -4,60 +4,88 @@ HookSniff SDK — Main Client
 Usage:
     from hooksniff import HookSniff
 
-    hs = HookSniff(api_key="your-api-key")
+    hs = HookSniff(api_key="hooksniff_xxx")
+
+    # List endpoints
     endpoints = hs.endpoints.list()
+
+    # Auto-paginate
+    for ep in hs.endpoints.list_all():
+        print(ep["url"])
+
+    # Send a webhook
+    delivery = hs.webhooks.send({
+        "endpoint_id": "ep_123",
+        "event": "order.created",
+        "data": {"order_id": "12345"},
+    })
+
+    # Verify incoming webhook
+    from hooksniff import Webhook
+    wh = Webhook("whsec_...")
+    payload = wh.verify(raw_body, headers)
 """
 
-from hooksniff.request import HookSniffRequestContext
-from hooksniff.resources.endpoints import Endpoints
-from hooksniff.resources.webhooks import Webhooks
-from hooksniff.resources.auth import Auth
-from hooksniff.resources.analytics import Analytics
-from hooksniff.resources.api_keys import ApiKeys
-from hooksniff.resources.alerts import Alerts
-from hooksniff.resources.teams import Teams
-from hooksniff.resources.search import Search
-from hooksniff.resources.billing import Billing
-from hooksniff.resources.health import Health
+from __future__ import annotations
 
-DEFAULT_BASE_URL = "https://hooksniff-api-1046140057667.europe-west1.run.app"
+from .request import RequestConfig, DEFAULT_BASE_URL
+from .resources import (
+    Endpoints,
+    Webhooks,
+    Auth,
+    ApiKeys,
+    Teams,
+    Alerts,
+    Analytics,
+    Billing,
+    Health,
+    Search,
+    Notifications,
+    Admin,
+)
 
 
 class HookSniff:
     """
-    HookSniff API client.
+    HookSniff API Client.
 
     Args:
-        api_key: Your API key or JWT token.
-        base_url: Base URL of the HookSniff API (default: production).
-        timeout: Request timeout in milliseconds (default: 30000).
-        num_retries: Number of retries for 5xx errors (default: 2).
+        api_key: Your HookSniff API key (starts with "hooksniff_")
+        server_url: API base URL (defaults to production)
+        timeout: Request timeout in seconds
+        num_retries: Number of retries on 5xx errors (default: 2)
+        debug: Enable debug logging
+
+    Example:
+        hs = HookSniff(api_key="hooksniff_xxx")
+        endpoints = hs.endpoints.list()
     """
 
     def __init__(
         self,
         api_key: str,
-        base_url: str = DEFAULT_BASE_URL,
-        timeout: int = 30000,
+        server_url: str = DEFAULT_BASE_URL,
+        timeout: float | None = 30.0,
         num_retries: int = 2,
+        debug: bool = False,
     ):
-        if not api_key:
-            raise ValueError("HookSniff: api_key is required")
-
-        self._ctx = HookSniffRequestContext(
-            base_url=base_url,
+        self._config = RequestConfig(
+            base_url=server_url,
             token=api_key,
             timeout=timeout,
             num_retries=num_retries,
+            debug=debug,
         )
 
-        self.endpoints = Endpoints(self._ctx)
-        self.webhooks = Webhooks(self._ctx)
-        self.auth = Auth(self._ctx)
-        self.analytics = Analytics(self._ctx)
-        self.api_keys = ApiKeys(self._ctx)
-        self.alerts = Alerts(self._ctx)
-        self.teams = Teams(self._ctx)
-        self.search = Search(self._ctx)
-        self.billing = Billing(self._ctx)
-        self.health = Health(self._ctx)
+        self.endpoints = Endpoints(self._config)
+        self.webhooks = Webhooks(self._config)
+        self.auth = Auth(self._config)
+        self.api_keys = ApiKeys(self._config)
+        self.teams = Teams(self._config)
+        self.alerts = Alerts(self._config)
+        self.analytics = Analytics(self._config)
+        self.billing = Billing(self._config)
+        self.health = Health(self._config)
+        self.search = Search(self._config)
+        self.notifications = Notifications(self._config)
+        self.admin = Admin(self._config)

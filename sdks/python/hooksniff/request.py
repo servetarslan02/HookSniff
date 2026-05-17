@@ -1,140 +1,229 @@
 """
-HookSniff HTTP Request Helper
+HookSniff SDK — HTTP Request Client
 
-Zero-dependency HTTP client using urllib.request.
-Handles auth, retries, error mapping, and idempotency keys.
+Handles auth, retries with exponential backoff, timeout, and idempotency keys.
+Svix-style request handling adapted for HookSniff.
 """
+
+from __future__ import annotations
 
 import json
 import time
 import uuid
-import urllib.request
-import urllib.error
-import urllib.parse
-from typing import Any, Dict, Optional
+from dataclasses import dataclass, field
+from typing import Any, Callable, Optional
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError
+from urllib.parse import urlencode
 
-LIB_VERSION = "0.4.0"
-USER_AGENT = f"hooksniff-sdk/{LIB_VERSION}/python"
+from .exceptions import (
+    ApiException,
+    RateLimitError,
+    NotFoundException,
+    ValidationException,
+    UnauthorizedException,
+    ForbiddenException,
+    ServerException,
+)
 
-
-class ApiException(Exception):
-    """HookSniff API error."""
-
-    def __init__(self, code: int, body: Any, headers: Dict[str, str] = None):
-        self.code = code
-        self.body = body
-        self.headers = headers or {}
-        # Safe serialization — body might be a string (non-JSON response)
-        try:
-            body_str = json.dumps(body) if not isinstance(body, str) else body
-        except (TypeError, ValueError):
-            body_str = str(body)
-        super().__init__(f"HookSniff API Error {code}: {body_str}")
+LIB_VERSION = "0.5.0"
+USER_AGENT = f"hooksniff-python-sdk/{LIB_VERSION}"
+DEFAULT_BASE_URL = "https://hooksniff-api-1046140057667.europe-west1.run.app"
 
 
-class HookSniffRequestContext:
-    """Request context holding base URL, token, timeout, and retry config."""
-
-    def __init__(self, base_url: str, token: str, timeout: int = 30000, num_retries: int = 2):
-        self.base_url = base_url.rstrip("/")
-        self.token = token
-        self.timeout = timeout
-        self.num_retries = num_retries
+@dataclass
+class RequestConfig:
+    """Configuration for the HTTP request client."""
+    base_url: str = DEFAULT_BASE_URL
+    token: str = ""
+    timeout: float | None = 30.0
+    num_retries: int = 2
+    retry_schedule_ms: list[int] | None = None
+    debug: bool = False
 
 
 class HookSniffRequest:
-    """HTTP request builder and executor."""
+    """Builds and sends HTTP requests to the HookSniff API."""
 
     def __init__(self, method: str, path: str):
         self.method = method
         self.path = path
-        self._body: Optional[str] = None
-        self._query_params: Dict[str, str] = {}
-        self._header_params: Dict[str, str] = {}
+        self._body: str | None = None
+        self._query_params: dict[str, str] = {}
+        self._header_params: dict[str, str] = {}
 
-    def set_path_param(self, name: str, value: str):
-        self.path = self.path.replace(f"{{{name}}}", urllib.parse.quote(str(value), safe=""))
+    def set_path_param(self, name: str, value: str) -> None:
+        new_path = self.path.replace(f"{{{name}}}", _quote(value))
+        if new_path == self.path:
+            raise ValueError(f"path parameter '{name}' not found in path")
+        self.path = new_path
 
-    def set_query_params(self, params: Dict[str, Any]):
-        for key, value in params.items():
-            if value is not None:
-                self._query_params[key] = str(value)
+    def set_query_params(self, params: dict[str, Any]) -> None:
+        for name, value in params.items():
+            self.set_query_param(name, value)
 
-    def set_header_param(self, name: str, value: str):
+    def set_query_param(self, name: str, value: Any) -> None:
+        if value is None:
+            return
+        if isinstance(value, bool):
+            self._query_params[name] = "true" if value else "false"
+        elif isinstance(value, (int, float)):
+            self._query_params[name] = str(value)
+        elif isinstance(value, str):
+            self._query_params[name] = value
+        elif isinstance(value, list):
+            if value:
+                self._query_params[name] = ",".join(str(v) for v in value)
+        elif hasattr(value, "isoformat"):  # datetime
+            self._query_params[name] = value.isoformat()
+
+    def set_header_param(self, name: str, value: str | None) -> None:
         if value is not None:
             self._header_params[name] = value
 
-    def set_body(self, value: Any):
-        self._body = json.dumps(value)
+    def set_body(self, value: Any) -> None:
+        self._body = json.dumps(value, separators=(",", ":"))
 
-    def send(self, ctx: HookSniffRequestContext, parser=None) -> Any:
-        response = self._send_with_retry(ctx)
-        if response.status == 204:
-            return None
-        text = response.read().decode("utf-8")
+    def send(self, config: RequestConfig, parse: Callable[[Any], T]) -> T:
+        """Send request and parse response."""
+        response = self._send_inner(config)
+        if response["status"] == 204:
+            return None  # type: ignore
+        return parse(response["body"])
 
-        # Empty body check — match Node.js behavior
-        if not text or len(text.strip()) == 0:
-            if parser:
-                raise ApiException(
-                    response.status, "Empty response body", dict(response.headers)
-                )
-            return None
+    def send_no_body(self, config: RequestConfig) -> None:
+        """Send request, discard response body."""
+        self._send_inner(config)
 
-        data = json.loads(text)
-        return parser(data) if parser else data
-
-    def send_void(self, ctx: HookSniffRequestContext):
-        response = self._send_with_retry(ctx)
-        # Consume response body to free the connection (matches Node.js behavior)
-        try:
-            response.read()
-        except Exception:
-            pass
-
-    def _send_with_retry(self, ctx: HookSniffRequestContext) -> urllib.request.Request:
-        url = ctx.base_url + self.path
+    def _send_inner(self, config: RequestConfig) -> dict[str, Any]:
+        url = config.base_url + self.path
         if self._query_params:
-            url += "?" + urllib.parse.urlencode(self._query_params)
+            url += "?" + urlencode(self._query_params, doseq=True)
 
         # Auto idempotency key for POST
         if "idempotency-key" not in self._header_params and self.method == "POST":
             self._header_params["idempotency-key"] = f"auto_{uuid.uuid4()}"
 
         headers = {
-            "Accept": "application/json",
-            "Authorization": f"Bearer {ctx.token}",
-            "User-Agent": USER_AGENT,
-            **self._header_params,
+            "accept": "application/json, */*;q=0.8",
+            "authorization": f"Bearer {config.token}",
+            "user-agent": USER_AGENT,
+            "hooksniff-req-id": str(uuid.uuid4().int)[:16],
+        }
+        if self._body is not None:
+            headers["content-type"] = "application/json"
+        headers.update(self._header_params)
+
+        if config.debug:
+            print(f"[HookSniff] {self.method} {url}")
+
+        return _send_with_retry(
+            url=url,
+            method=self.method,
+            body=self._body,
+            headers=headers,
+            timeout=config.timeout,
+            num_retries=config.num_retries,
+            retry_schedule_ms=config.retry_schedule_ms,
+            debug=config.debug,
+        )
+
+
+# ─── Internal helpers ──────────────────────────────────────────────
+
+T = Any  # generic type var placeholder
+
+
+def _quote(value: str) -> str:
+    from urllib.parse import quote as _url_quote
+    return _url_quote(str(value), safe="")
+
+
+def _send_with_retry(
+    url: str,
+    method: str,
+    body: str | None,
+    headers: dict[str, str],
+    timeout: float | None,
+    num_retries: int,
+    retry_schedule_ms: list[int] | None,
+    debug: bool,
+    retry_count: int = 0,
+) -> dict[str, Any]:
+    """Send HTTP request with exponential backoff retry on 5xx."""
+    try:
+        req = Request(url, data=body.encode("utf-8") if body else None, headers=headers, method=method)
+        resp = urlopen(req, timeout=timeout)
+        resp_body = resp.read().decode("utf-8")
+        status = resp.status
+
+        if debug:
+            print(f"[HookSniff] ← {status}")
+
+        return {
+            "status": status,
+            "body": json.loads(resp_body) if resp_body else None,
+            "headers": dict(resp.headers),
         }
 
-        if self._body is not None:
-            headers["Content-Type"] = "application/json"
+    except HTTPError as e:
+        status = e.code
+        resp_body = e.read().decode("utf-8", errors="replace")
+        resp_headers = dict(e.headers)
 
-        max_retries = ctx.num_retries
-        last_error = None
+        if debug:
+            print(f"[HookSniff] ← {status} (attempt {retry_count + 1})")
 
-        for attempt in range(max_retries + 1):
-            try:
-                data = self._body.encode("utf-8") if self._body else None
-                req = urllib.request.Request(url, data=data, headers=headers, method=self.method)
-                response = urllib.request.urlopen(req, timeout=ctx.timeout / 1000)
-                return response
+        # Retry on 5xx
+        if status >= 500 and retry_count < num_retries:
+            delay_ms = _get_retry_delay(retry_count, retry_schedule_ms)
+            if debug:
+                print(f"[HookSniff] Retrying in {delay_ms}ms...")
+            time.sleep(delay_ms / 1000)
+            return _send_with_retry(
+                url=url, method=method, body=body, headers=headers,
+                timeout=timeout, num_retries=num_retries,
+                retry_schedule_ms=retry_schedule_ms, debug=debug,
+                retry_count=retry_count + 1,
+            )
 
-            except urllib.error.HTTPError as e:
-                error_body = e.read().decode("utf-8", errors="replace")
-                try:
-                    parsed = json.loads(error_body)
-                except (json.JSONDecodeError, ValueError):
-                    parsed = error_body
-                if e.code < 500:
-                    raise ApiException(e.code, parsed, dict(e.headers)) from e
-                last_error = ApiException(e.code, parsed, dict(e.headers))
+        # Parse error body
+        try:
+            error_body = json.loads(resp_body)
+        except (json.JSONDecodeError, ValueError):
+            error_body = resp_body
 
-            except Exception as e:
-                last_error = e
+        _raise_for_status(status, error_body, resp_headers)
+        raise  # unreachable
 
-            if attempt < max_retries:
-                time.sleep(0.05 * (2 ** attempt))
+    except Exception as e:
+        if debug:
+            print(f"[HookSniff] Error: {e}")
+        raise
 
-        raise last_error or Exception("Request failed after retries")
+
+def _get_retry_delay(retry_count: int, schedule: list[int] | None) -> int:
+    if schedule and retry_count < len(schedule):
+        return schedule[retry_count]
+    return 50 * (2 ** retry_count)  # exponential backoff: 50, 100, 200, ...
+
+
+def _raise_for_status(status: int, body: object, headers: dict[str, str]) -> None:
+    """Raise the appropriate exception for the given HTTP status code."""
+    if status == 401:
+        raise UnauthorizedException(status, body, headers)
+    if status == 403:
+        raise ForbiddenException(status, body, headers)
+    if status == 404:
+        raise NotFoundException(status, body, headers)
+    if status == 422:
+        raise ValidationException(status, body, headers)
+    if status == 429:
+        retry_after = headers.get("retry-after")
+        raise RateLimitError(
+            status_code=status, body=body, headers=headers,
+            retry_after=float(retry_after) if retry_after else None,
+        )
+    if status >= 500:
+        raise ServerException(status, body, headers)
+    raise ApiException(status, body, headers)

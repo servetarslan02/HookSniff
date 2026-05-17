@@ -1,10 +1,13 @@
 """
 HookSniff Python SDK
 
+A clean, modern SDK for the HookSniff webhook delivery API.
+Svix-style architecture adapted for HookSniff.
+
 Usage:
     from hooksniff import HookSniff
 
-    hs = HookSniff(api_key="your-api-key")
+    hs = HookSniff(api_key="hooksniff_xxx")
 
     # List endpoints
     endpoints = hs.endpoints.list()
@@ -13,7 +16,7 @@ Usage:
     delivery = hs.webhooks.send({
         "endpoint_id": "ep_123",
         "event": "order.created",
-        "data": {"order_id": "12345"}
+        "data": {"order_id": "12345"},
     })
 
     # Verify incoming webhook signature
@@ -22,19 +25,34 @@ Usage:
     payload = wh.verify(raw_body, headers)
 """
 
-from hooksniff.client import HookSniff
-from hooksniff.webhook import Webhook, WebhookVerificationError
-from hooksniff.pagination import paginate, collect_all, Page
-from hooksniff.request import ApiException
-from hooksniff.serialization import SerializationError
+from .client import HookSniff
+from .webhook import Webhook, WebhookVerificationError
+from .exceptions import (
+    HookSniffError,
+    ApiException,
+    RateLimitError,
+    NotFoundException,
+    ValidationException,
+    UnauthorizedException,
+    ForbiddenException,
+    ServerException,
+)
+from .pagination import paginate, collect_all, Page
+from .request import LIB_VERSION
 
-__version__ = "0.4.0"
+__version__ = LIB_VERSION
 __all__ = [
     "HookSniff",
     "Webhook",
     "WebhookVerificationError",
+    "HookSniffError",
     "ApiException",
-    "SerializationError",
+    "RateLimitError",
+    "NotFoundException",
+    "ValidationException",
+    "UnauthorizedException",
+    "ForbiddenException",
+    "ServerException",
     "paginate",
     "collect_all",
     "Page",
