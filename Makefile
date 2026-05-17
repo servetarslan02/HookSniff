@@ -248,3 +248,37 @@ deploy-compose: ## Production compose ile başlat (local test)
 deploy-stop: ## Production compose durdur
 	docker compose -f deploy/docker-compose.prod.yml down
 	@echo "⏹️  Production servisleri durduruldu."
+
+# ── Local CI/CD (GitHub Actions yerine) ──
+
+ci: ## Local CI — tümünü çalıştır (lint + test + build + security)
+	@bash local-ci.sh all
+
+ci-test: ## SDK testlerini çalıştır
+	@bash local-sdk-test.sh all
+
+ci-publish: ## SDK publish dry-run
+	@bash local-sdk-publish.sh dry-run all
+
+ci-publish-live: ## SDK publish — gerçekten yükle (TOKEN'lar gerekli)
+	@bash local-sdk-publish.sh publish $(SDK)
+
+ci-security: ## Güvenlik taraması
+	@bash local-ci.sh security
+
+# ── OpenAPI Codegen ──
+
+codegen: ## Tüm SDK'lar için type/model üret
+	python3 openapi-codegen.py all
+
+codegen-validate: ## OpenAPI spec doğrula
+	python3 openapi-codegen.py validate
+
+codegen-node: ## Node.js types üret
+	python3 openapi-codegen.py node
+
+codegen-python: ## Python models üret
+	python3 openapi-codegen.py python
+
+codegen-go: ## Go structs üret
+	python3 openapi-codegen.py go
