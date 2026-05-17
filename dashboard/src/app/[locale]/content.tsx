@@ -482,53 +482,69 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {plans.map((plan, i) => (
-            <div key={i} className={`relative rounded-2xl p-8 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg flex flex-col ${
+          {plans.map((plan, i) => {
+            // Group features by category for better display
+            const isEnterprise = plan.name === tPricing('enterprise');
+            return (
+            <div key={i} className={`relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col overflow-hidden ${
               plan.popular
-                ? 'bg-white dark:bg-slate-800 border-2 border-brand-500 dark:border-brand-400 shadow-lg dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
-                : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xs dark:shadow-lg'
+                ? 'bg-white dark:bg-slate-800 border-2 border-brand-500 dark:border-brand-400 shadow-xl dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
+                : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg'
             }`}>
+              {/* Popular badge */}
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-600 dark:bg-brand-500 text-white px-4 py-1 rounded-full text-sm font-medium shadow-md">
-                  {tPricing('mostPopular')}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-600 to-purple-600 text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-lg z-10">
+                  ⭐ {tPricing('mostPopular')}
                 </div>
               )}
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{plan.name}</h3>
-              {plan.desc && (
-                <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{plan.desc}</p>
-              )}
-              <div className="mt-4 mb-6">
-                <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
-                <span className="text-gray-500 dark:text-slate-400">{plan.period}</span>
+              {/* Header */}
+              <div className={`p-6 pb-4 ${plan.popular ? 'bg-gradient-to-br from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10' : ''}`}>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{plan.name}</h3>
+                {plan.desc && (
+                  <p className="mt-1 text-sm text-gray-500 dark:text-slate-400 leading-relaxed">{plan.desc}</p>
+                )}
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="text-5xl font-extrabold text-gray-900 dark:text-white">{plan.price}</span>
+                  <span className="text-gray-500 dark:text-slate-400 text-sm font-medium">{plan.period}</span>
+                </div>
               </div>
-              <ul className="space-y-3 mb-8 flex-1">
+              {/* Divider */}
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-slate-600 to-transparent" />
+              {/* Features */}
+              <ul className="p-6 space-y-3 flex-1">
                 {plan.features.map((f, j) => (
-                  <li key={j} className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
-                    <svg className="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {f}
+                  <li key={j} className="flex items-start gap-3 text-sm text-gray-700 dark:text-slate-300">
+                    <span className="mt-0.5 w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                    <span className="leading-snug">{f}</span>
                   </li>
                 ))}
               </ul>
-              <button
-                onClick={() => {
-                  if (token) {
-                    router.push('/billing');
-                  } else {
-                    router.push('/register');
-                  }
-                }}
-                className={`w-full py-3 rounded-xl font-medium transition cursor-pointer ${
-                  plan.popular
-                    ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600 shadow-md'
-                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-xs'
-                }`}
-              >
-                {plan.cta}
-              </button>
+              {/* CTA */}
+              <div className="p-6 pt-0">
+                <button
+                  onClick={() => {
+                    if (token) {
+                      router.push('/billing');
+                    } else {
+                      router.push('/register');
+                    }
+                  }}
+                  className={`w-full py-3.5 rounded-xl font-semibold transition-all cursor-pointer ${
+                    plan.popular
+                      ? 'bg-gradient-to-r from-brand-600 to-purple-600 text-white hover:from-brand-700 hover:to-purple-700 shadow-lg shadow-brand-500/25 hover:shadow-xl hover:shadow-brand-500/30'
+                      : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-sm hover:shadow-md'
+                  }`}
+                >
+                  {plan.cta}
+                </button>
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
