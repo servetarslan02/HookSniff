@@ -1990,7 +1990,8 @@
       "startupDesc": "Yeni özelliklerimizle webhook deneyiminizi geliştirin ve girişiminizi büyütün!",
       "proDesc": "Kurumsal özellikleri ve daha iyi desteği ile veri bağlantınızı serbest bırakın.",
       "enterpriseDesc": "Daha fazla mı ihtiyacınız var? Farklı bir şeye mi ihtiyacınız var? Bize bildirin, sizin için özel bir plan oluşturalım.",
-      "customPricing": "Özel Fiyatlandırma"
+      "customPricing": "Özel Fiyatlandırma",
+      "year": "/yıl"
     },
     "footer": {
       "github": "GitHub",

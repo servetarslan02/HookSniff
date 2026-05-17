@@ -1931,7 +1931,7 @@
       "startup": "Startup",
       "pro": "Pro",
       "enterprise": "Enterprise",
-      "month": "/month",
+      "month": "/mo",
       "getStarted": "Get started",
       "startTrial": "Start free trial",
       "contactSales": "Contact sales",
@@ -1990,7 +1990,8 @@
       "startupDesc": "Enhance your webhook experience with new features and grow your startup!",
       "proDesc": "Unleash your data connectivity with enterprise features and better support.",
       "enterpriseDesc": "Need more? Need something different? Let us know, we will build a custom plan for you.",
-      "customPricing": "Custom Pricing"
+      "customPricing": "Custom Pricing",
+      "year": "/year"
     },
     "footer": {
       "github": "GitHub",
