@@ -1,255 +1,239 @@
 /**
- * HookSniff HTTP Request Helper
+ * HookSniff SDK — HTTP Request Client
  *
- * Modern, zero-dependency HTTP client using native fetch.
- * Handles auth, retries, error mapping, and idempotency keys.
+ * Based on Svix SDK architecture (MIT License).
+ * Handles auth, retries with exponential backoff, timeout, and idempotency keys.
  */
 
-export const LIB_VERSION = "0.4.0";
-const USER_AGENT = `hooksniff-sdk/${LIB_VERSION} (node)`;
+import { ApiException, type XOR } from "./util";
+import type { HttpErrorOut, HTTPValidationError } from "./HttpErrors";
 
-export type HookSniffRequestContext = {
-  baseUrl: string;
-  token: string;
-  timeout?: number;
-  numRetries?: number;
-  fetch?: typeof globalThis.fetch;
-};
+export const LIB_VERSION = "0.5.0";
+const USER_AGENT = `hooksniff-sdk/${LIB_VERSION}`;
 
 export enum HttpMethod {
   GET = "GET",
+  HEAD = "HEAD",
   POST = "POST",
   PUT = "PUT",
   DELETE = "DELETE",
-  PATCH = "PATCH",
-  HEAD = "HEAD",
+  CONNECT = "CONNECT",
   OPTIONS = "OPTIONS",
+  TRACE = "TRACE",
+  PATCH = "PATCH",
 }
 
-export class ApiException extends Error {
-  public headers: Record<string, string> = {};
-
-  constructor(
-    public code: number,
-    public statusText: string,
-    public body: unknown,
-    headers: Headers
-  ) {
-    super(`HookSniff API Error ${code} ${statusText}: ${JSON.stringify(body)}`);
-    headers.forEach((value, name) => {
-      this.headers[name] = value;
-    });
+export type HookSniffRequestContext = {
+  /** The API base URL, like "https://hooksniff-api-xxx.run.app/v1" */
+  baseUrl: string;
+  /** The 'bearer' scheme access token */
+  token: string;
+  /** Time in milliseconds to wait for requests to get a response. */
+  timeout?: number;
+  /**
+   * Custom fetch implementation to use for HTTP requests.
+   * Useful for testing, adding custom middleware, or running in non-standard environments.
+   */
+  fetch?: typeof fetch;
+} & XOR<
+  {
+    /** List of delays (in milliseconds) to wait before each retry attempt. */
+    retryScheduleInMs?: number[];
+  },
+  {
+    /** The number of times the client will retry if a server-side error or timeout is received. Default: 2 */
+    numRetries?: number;
   }
-}
+>;
+
+type QueryParameter = string | boolean | number | Date | string[] | null | undefined;
 
 export class HookSniffRequest {
-  private body?: string;
-  private queryParams: Record<string, string> = {};
-  private headerParams: Record<string, string> = {};
-  private bodySet = false;
-
   constructor(
     private readonly method: HttpMethod,
     private path: string
   ) {}
 
-  setPathParam(name: string, value: string): void {
-    const encoded = encodeURIComponent(value);
-    // Replace ALL occurrences of {name} in the path
-    while (this.path.includes(`{${name}}`)) {
-      this.path = this.path.replace(`{${name}}`, encoded);
+  private body?: string;
+  private queryParams: Record<string, string> = {};
+  private headerParams: Record<string, string> = {};
+
+  public setPathParam(name: string, value: string) {
+    const newPath = this.path.replace(`{${name}}`, encodeURIComponent(value));
+    if (this.path === newPath) {
+      throw new Error(`path parameter ${name} not found`);
     }
+    this.path = newPath;
   }
 
-  setQueryParams(params: Record<string, string | number | boolean | null | undefined>): void {
+  public setQueryParams(params: { [name: string]: QueryParameter }) {
     for (const [name, value] of Object.entries(params)) {
-      if (value === undefined || value === null) continue;
-      this.queryParams[name] = String(value);
+      this.setQueryParam(name, value);
     }
   }
 
-  setHeaderParam(name: string, value?: string): void {
-    if (value !== undefined) {
-      this.headerParams[name] = value;
+  public setQueryParam(name: string, value: QueryParameter) {
+    if (value === undefined || value === null) return;
+
+    if (typeof value === "string") {
+      this.queryParams[name] = value;
+    } else if (typeof value === "boolean" || typeof value === "number") {
+      this.queryParams[name] = value.toString();
+    } else if (value instanceof Date) {
+      this.queryParams[name] = value.toISOString();
+    } else if (Array.isArray(value)) {
+      if (value.length > 0) {
+        this.queryParams[name] = value.join(",");
+      }
+    } else {
+      const _assert_unreachable: never = value;
+      throw new Error(`query parameter ${name} has unsupported type`);
     }
   }
 
-  setBody(value: unknown): void {
-    if (this.bodySet) {
-      console.warn("HookSniff: setBody() called twice — overwriting previous body");
-    }
+  public setHeaderParam(name: string, value?: string) {
+    if (value === undefined) return;
+    this.headerParams[name] = value;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public setBody(value: any) {
     this.body = JSON.stringify(value);
-    this.bodySet = true;
   }
 
-  async send<T>(ctx: HookSniffRequestContext, parser?: (json: unknown) => T): Promise<T> {
-    const response = await this.sendWithRetry(ctx);
-
+  /**
+   * Send this request, returning the response body parsed as type R.
+   *
+   * 422 → ApiException<HTTPValidationError>
+   * 4xx → ApiException<HttpErrorOut>
+   * 5xx → retried with exponential backoff
+   */
+  public async send<R>(
+    ctx: HookSniffRequestContext,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parseResponseBody: (jsonObject: any) => R
+  ): Promise<R> {
+    const response = await this.sendInner(ctx);
     if (response.status === 204) {
-      return undefined as T;
+      return <R>null;
     }
-
-    const text = await response.text();
-
-    // Empty body check
-    if (!text || text.trim().length === 0) {
-      if (parser) {
-        throw new ApiException(
-          response.status,
-          response.statusText,
-          "Empty response body",
-          response.headers
-        );
-      }
-      return undefined as T;
-    }
-
-    // Safe JSON parse
-    let json: unknown;
-    try {
-      json = JSON.parse(text);
-    } catch {
-      throw new ApiException(
-        response.status,
-        response.statusText,
-        `Invalid JSON response: ${text.substring(0, 200)}`,
-        response.headers
-      );
-    }
-
-    // Safe parser execution
-    if (parser) {
-      try {
-        return parser(json);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        throw new ApiException(
-          response.status,
-          response.statusText,
-          `Response parsing failed: ${message}`,
-          response.headers
-        );
-      }
-    }
-
-    return json as T;
+    const responseBody = await response.text();
+    return parseResponseBody(JSON.parse(responseBody));
   }
 
-  async sendVoid(ctx: HookSniffRequestContext): Promise<void> {
-    const response = await this.sendWithRetry(ctx);
-    // Consume response body to free the connection
-    await response.text().catch(() => {});
+  /** Same as `send`, but the response body is discarded. */
+  public async sendNoResponseBody(ctx: HookSniffRequestContext): Promise<void> {
+    await this.sendInner(ctx);
   }
 
-  private async sendWithRetry(ctx: HookSniffRequestContext): Promise<Response> {
+  private async sendInner(ctx: HookSniffRequestContext): Promise<Response> {
     const url = new URL(ctx.baseUrl + this.path);
     for (const [name, value] of Object.entries(this.queryParams)) {
       url.searchParams.set(name, value);
     }
 
     // Auto idempotency key for POST
-    if (this.headerParams["idempotency-key"] === undefined && this.method === HttpMethod.POST) {
-      this.headerParams["idempotency-key"] = `auto_${generateIdempotencyKey()}`;
+    if (
+      this.headerParams["idempotency-key"] === undefined &&
+      this.method.toUpperCase() === "POST"
+    ) {
+      this.headerParams["idempotency-key"] = `auto_${crypto.randomUUID()}`;
     }
 
-    const headers: Record<string, string> = {
-      accept: "application/json",
-      authorization: `Bearer ${ctx.token}`,
-      "user-agent": USER_AGENT,
-      ...this.headerParams,
-    };
+    const randomId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 
-    if (this.body !== undefined) {
-      headers["content-type"] = "application/json";
+    if (this.body != null) {
+      this.headerParams["content-type"] = "application/json";
     }
 
-    const fetchFn = ctx.fetch ?? globalThis.fetch;
-    const maxRetries = ctx.numRetries ?? 2;
-    const retryBaseMs = 50;
-    let lastError: Error | undefined;
+    const isCredentialsSupported = "credentials" in Request.prototype;
 
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      const controller = new AbortController();
-      let timeoutId: ReturnType<typeof setTimeout> | undefined;
-
-      try {
-        if (ctx.timeout) {
-          timeoutId = setTimeout(() => controller.abort(), ctx.timeout);
-        }
-
-        const response = await fetchFn(url, {
-          method: this.method,
-          headers,
-          body: this.body,
-          signal: controller.signal,
-        });
-
-        // Don't retry on 4xx — only 5xx
-        if (response.status < 500) {
-          if (response.status >= 400) {
-            const errorBody = await response.text().catch(() => "Unknown error");
-            let parsed: unknown;
-            try {
-              parsed = JSON.parse(errorBody);
-            } catch {
-              parsed = errorBody;
-            }
-            throw new ApiException(
-              response.status,
-              response.statusText,
-              parsed,
-              response.headers
-            );
-          }
-          return response;
-        }
-
-        // 5xx — will retry
-        const errorBody = await response.text().catch(() => "Unable to read response body");
-        let parsed: unknown;
-        try {
-          parsed = JSON.parse(errorBody);
-        } catch {
-          parsed = errorBody;
-        }
-        lastError = new ApiException(response.status, response.statusText, parsed, response.headers);
-      } catch (err) {
-        if (err instanceof ApiException && err.code < 500) {
-          throw err; // Don't retry client errors
-        }
-        lastError = err instanceof Error ? err : new Error(String(err));
-      } finally {
-        if (timeoutId) clearTimeout(timeoutId);
-      }
-
-      // Exponential backoff with jitter: 50ms, 100ms, 200ms, ... + random jitter
-      if (attempt < maxRetries) {
-        const backoff = retryBaseMs * Math.pow(2, attempt);
-        const jitter = Math.random() * retryBaseMs;
-        await new Promise((r) => setTimeout(r, backoff + jitter));
-      }
-    }
-
-    throw lastError ?? new Error("Request failed after retries");
+    const response = await sendWithRetry(
+      url,
+      {
+        method: this.method.toString(),
+        body: this.body,
+        headers: {
+          accept: "application/json, */*;q=0.8",
+          authorization: `Bearer ${ctx.token}`,
+          "user-agent": USER_AGENT,
+          "hooksniff-req-id": randomId.toString(),
+          ...this.headerParams,
+        },
+        credentials: isCredentialsSupported ? "same-origin" : undefined,
+        signal: ctx.timeout !== undefined ? AbortSignal.timeout(ctx.timeout) : undefined,
+      },
+      ctx.retryScheduleInMs,
+      ctx.retryScheduleInMs?.[0],
+      ctx.retryScheduleInMs?.length || ctx.numRetries,
+      ctx.fetch
+    );
+    return filterResponseForErrors(response);
   }
 }
 
-/**
- * Generate a unique idempotency key.
- * Uses crypto.randomUUID() when available (Node 18.4+),
- * falls back to timestamp + Math.random() for older runtimes.
- */
-function generateIdempotencyKey(): string {
-  try {
-    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-      return `auto_${crypto.randomUUID()}`;
-    }
-  } catch {
-    // crypto not available, fall through
+async function filterResponseForErrors(response: Response): Promise<Response> {
+  if (response.status < 300) {
+    return response;
   }
-  // Fallback: timestamp + random hex (collision-safe for idempotency)
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 10);
-  const random2 = Math.random().toString(36).substring(2, 10);
-  return `auto_${timestamp}-${random}-${random2}`;
+
+  const responseBody = await response.text();
+
+  if (response.status === 422) {
+    throw new ApiException<HTTPValidationError>(
+      response.status,
+      JSON.parse(responseBody) as HTTPValidationError,
+      response.headers
+    );
+  }
+
+  if (response.status >= 400 && response.status <= 499) {
+    throw new ApiException<HttpErrorOut>(
+      response.status,
+      JSON.parse(responseBody) as HttpErrorOut,
+      response.headers
+    );
+  }
+  throw new ApiException(response.status, responseBody, response.headers);
+}
+
+type HookSniffRequestInit = RequestInit & {
+  headers: Record<string, string>;
+};
+
+async function sendWithRetry(
+  url: URL,
+  init: HookSniffRequestInit,
+  retryScheduleInMs?: number[],
+  nextInterval = 50,
+  triesLeft = 2,
+  fetchImpl: typeof fetch = fetch,
+  retryCount = 1
+): Promise<Response> {
+  const sleep = (interval: number) =>
+    new Promise((resolve) => setTimeout(resolve, interval));
+
+  try {
+    const response = await fetchImpl(url, init);
+    if (triesLeft <= 0 || response.status < 500) {
+      return response;
+    }
+  } catch (e) {
+    if (triesLeft <= 0) {
+      throw e;
+    }
+  }
+
+  await sleep(nextInterval);
+  init.headers["hooksniff-retry-count"] = retryCount.toString();
+  nextInterval = retryScheduleInMs?.[retryCount] || nextInterval * 2;
+  return await sendWithRetry(
+    url,
+    init,
+    retryScheduleInMs,
+    nextInterval,
+    --triesLeft,
+    fetchImpl,
+    ++retryCount
+  );
 }

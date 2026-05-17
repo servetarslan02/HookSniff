@@ -1,49 +1,58 @@
 /**
- * HookSniff API Resource: Analytics
+ * HookSniff SDK — Analytics Resource
  */
 
-import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
-import {
-  TrendResponseModel,
-  SuccessRateModel,
-  LatencyModel,
-  type TrendResponse,
-  type SuccessRateResponse,
-  type LatencyResponse,
+import { HttpMethod, HookSniffRequest, type HookSniffRequestContext } from "../request";
+import type {
+  StatsResponse,
+  AnalyticsTrendResponse,
+  SuccessRateResponse,
+  LatencyTrendResponse,
+  DeliveryTrendResponse,
 } from "../models";
 
-export type { TrendResponse, SuccessRateResponse, LatencyResponse };
+export interface AnalyticsOptions {
+  range?: "1h" | "24h" | "7d" | "30d" | "90d";
+  endpoint_id?: string;
+}
 
 export class Analytics {
-  constructor(private readonly ctx: HookSniffRequestContext) {}
+  constructor(private readonly requestCtx: HookSniffRequestContext) {}
 
-  /** Get delivery trend data */
-  async trends(options?: { since?: string; until?: string }): Promise<TrendResponse> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/v1/analytics/deliveries");
-    if (options?.since) req.setQueryParams({ since: options.since });
-    if (options?.until) req.setQueryParams({ until: options.until });
-    return req.send<TrendResponse>(this.ctx, (json) =>
-      TrendResponseModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Get overall stats. */
+  public stats(options?: AnalyticsOptions): Promise<StatsResponse> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/stats");
+    request.setQueryParams({ range: options?.range });
+    return request.send(this.requestCtx, (json) => json as StatsResponse);
   }
 
-  /** Get success rate metrics */
-  async successRate(options?: { since?: string; until?: string }): Promise<SuccessRateResponse> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/v1/analytics/success-rate");
-    if (options?.since) req.setQueryParams({ since: options.since });
-    if (options?.until) req.setQueryParams({ until: options.until });
-    return req.send<SuccessRateResponse>(this.ctx, (json) =>
-      SuccessRateModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Get delivery trends over time. */
+  public deliveryTrends(options?: AnalyticsOptions): Promise<DeliveryTrendResponse> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/analytics/deliveries");
+    request.setQueryParams({
+      range: options?.range,
+      endpoint_id: options?.endpoint_id,
+    });
+    return request.send(this.requestCtx, (json) => json as DeliveryTrendResponse);
   }
 
-  /** Get latency metrics */
-  async latency(options?: { since?: string; until?: string }): Promise<LatencyResponse> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/v1/analytics/latency");
-    if (options?.since) req.setQueryParams({ since: options.since });
-    if (options?.until) req.setQueryParams({ until: options.until });
-    return req.send<LatencyResponse>(this.ctx, (json) =>
-      LatencyModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Get success rate analytics. */
+  public successRate(options?: AnalyticsOptions): Promise<SuccessRateResponse> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/analytics/success-rate");
+    request.setQueryParams({
+      range: options?.range,
+      endpoint_id: options?.endpoint_id,
+    });
+    return request.send(this.requestCtx, (json) => json as SuccessRateResponse);
+  }
+
+  /** Get latency trends. */
+  public latency(options?: AnalyticsOptions): Promise<LatencyTrendResponse> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/analytics/latency");
+    request.setQueryParams({
+      range: options?.range,
+      endpoint_id: options?.endpoint_id,
+    });
+    return request.send(this.requestCtx, (json) => json as LatencyTrendResponse);
   }
 }
