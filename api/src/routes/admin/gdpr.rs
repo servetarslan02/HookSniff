@@ -3,6 +3,7 @@
 use axum::extract::{Extension, Path};
 use axum::Json;
 use serde::Deserialize;
+use sqlx::Row;
 use sqlx::PgPool;
 use uuid::Uuid;
 
