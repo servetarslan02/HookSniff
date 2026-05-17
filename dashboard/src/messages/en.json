@@ -2046,7 +2046,6 @@
       ],
       "developerFeatures": [
         "100 events/day",
-        "1 application",
         "5 endpoints",
         "10 event types",
         "10 subscriptions",
@@ -2058,7 +2057,6 @@
       ],
       "startupFeatures": [
         "30,000 events/day",
-        "1 application",
         "50 endpoints",
         "50 event types",
         "300 subscriptions",
