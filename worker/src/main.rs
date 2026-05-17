@@ -72,6 +72,7 @@ mod circuit_breaker;
 mod config;
 pub mod delivery;
 mod fifo;
+pub mod operational_webhook;
 pub mod telemetry;
 mod throttle;
 
@@ -428,7 +429,7 @@ async fn shutdown_signal() {
 // ── Delivery outcome helpers ────────────────────────────────
 
 /// Move a delivery to dead_letter (non-retryable or max attempts exceeded).
-/// Returns the new failure_streak for the endpoint.
+/// Returns (new_failure_streak, customer_id) for the endpoint.
 async fn dead_letter_delivery(
     pool: &PgPool,
     queue_id: uuid::Uuid,
@@ -442,13 +443,19 @@ async fn dead_letter_delivery(
     duration_ms: i32,
     trace_id: Option<&str>,
     context: &str,
-) -> Result<i32> {
+) -> Result<(i32, uuid::Uuid)> {
     let mut tx = pool.begin().await?;
 
     sqlx::query::<sqlx::Postgres>(
         "UPDATE webhook_queue SET status = 'dead_letter', processed_at = now(), attempt_count = $1 WHERE id = $2",
     )
     .bind(attempt).bind(queue_id).execute(&mut *tx).await?;
+
+    // Get customer_id from the delivery before dead-lettering
+    let customer_id: uuid::Uuid = sqlx::query_scalar(
+        "SELECT customer_id FROM deliveries WHERE id = $1",
+    )
+    .bind(delivery_id).fetch_one(&mut *tx).await?;
 
     sqlx::query::<sqlx::Postgres>(
         r#"INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
@@ -469,7 +476,7 @@ async fn dead_letter_delivery(
     .bind(endpoint_id).fetch_one(&mut *tx).await.unwrap_or(0);
 
     commit_delivery_tx(tx, delivery_id, context).await?;
-    Ok(new_streak)
+    Ok((new_streak, customer_id))
 }
 
 /// Schedule a delivery for retry with exponential backoff.
@@ -832,12 +839,29 @@ async fn process_pending(
                 tracing::error!("❌ Delivery {} → {} — non-retryable (HTTP {}), dead letter", delivery_id, error_msg, status_code);
 
                 let dl_err = format!("{} (HTTP {}, non-retryable)", error_msg, status_code);
-                let new_streak = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &dl_err, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "non-retryable dead letter").await?;
+                let (new_streak, customer_id) = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &dl_err, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "non-retryable dead letter").await?;
 
                 {
                     let pool_clone = pool.clone();
                     let url_clone = item.endpoint_url.clone();
                     tokio::spawn(async move { notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await; });
+                }
+
+                // Dispatch operational webhook: delivery.failed
+                {
+                    let pool_clone = pool.clone();
+                    let hc_clone = http_client.clone();
+                    let op_payload = serde_json::json!({
+                        "delivery_id": delivery_id.to_string(),
+                        "endpoint_id": endpoint_id.to_string(),
+                        "endpoint_url": item.endpoint_url,
+                        "error": dl_err,
+                        "attempt": attempt,
+                        "status_code": status_code,
+                    });
+                    tokio::spawn(async move {
+                        operational_webhook::dispatch_event(&pool_clone, &hc_clone, customer_id, operational_webhook::OpWebhookEvent::DeliveryFailed, op_payload).await;
+                    });
                 }
 
                 cb.record_failure(endpoint_id).await;
@@ -847,12 +871,29 @@ async fn process_pending(
                 // ❌ Max deneme aşıldı → dead letter
                 tracing::error!("❌ Delivery {} → {} — max attempts, dead letter", delivery_id, error_msg);
 
-                let new_streak = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &error_msg, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "max attempts dead letter").await?;
+                let (new_streak, customer_id) = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &error_msg, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "max attempts dead letter").await?;
 
                 {
                     let pool_clone = pool.clone();
                     let url_clone = item.endpoint_url.clone();
                     tokio::spawn(async move { notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await; });
+                }
+
+                // Dispatch operational webhook: delivery.failed
+                {
+                    let pool_clone = pool.clone();
+                    let hc_clone = http_client.clone();
+                    let op_payload = serde_json::json!({
+                        "delivery_id": delivery_id.to_string(),
+                        "endpoint_id": endpoint_id.to_string(),
+                        "endpoint_url": item.endpoint_url,
+                        "error": error_msg,
+                        "attempt": attempt,
+                        "max_attempts": item.max_attempts,
+                    });
+                    tokio::spawn(async move {
+                        operational_webhook::dispatch_event(&pool_clone, &hc_clone, customer_id, operational_webhook::OpWebhookEvent::DeliveryFailed, op_payload).await;
+                    });
                 }
 
                 cb.record_failure(endpoint_id).await;
@@ -980,8 +1021,9 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
 
     // Item 267: Wrap all zombie reaper operations in a single transaction
     let mut tx = pool.begin().await?;
+    let mut dead_lettered: Vec<(uuid::Uuid, uuid::Uuid, i32)> = Vec::new(); // (delivery_id, endpoint_id, attempt)
 
-    for (id, delivery_id, _endpoint_id, attempt, max_attempts) in &stuck {
+    for (id, delivery_id, endpoint_id, attempt, max_attempts) in &stuck {
         if *attempt >= *max_attempts {
             // Max attempts exceeded → dead letter
             tracing::error!(
@@ -1022,6 +1064,8 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
             .bind("zombie reaper: max attempts exceeded")
             .execute(&mut *tx)
             .await?;
+
+            dead_lettered.push((*delivery_id, *endpoint_id, *attempt));
         } else {
             // Reset to pending for retry
             sqlx::query::<sqlx::Postgres>(
@@ -1051,6 +1095,38 @@ async fn reap_zombies(pool: &PgPool) -> Result<usize> {
         }
         anyhow::anyhow!("Zombie reaper commit failed: {}", e)
     })?;
+
+    // Dispatch operational webhooks for dead-lettered zombies
+    for (delivery_id, endpoint_id, attempt) in dead_lettered {
+        let pool_clone = pool.clone();
+        tokio::spawn(async move {
+            // Look up customer_id for this delivery
+            if let Ok(Some(customer_id)) = sqlx::query_scalar::<_, uuid::Uuid>(
+                "SELECT customer_id FROM deliveries WHERE id = $1",
+            )
+            .bind(delivery_id)
+            .fetch_optional(&pool_clone)
+            .await
+            {
+                let http_client = reqwest::Client::new();
+                let op_payload = serde_json::json!({
+                    "delivery_id": delivery_id.to_string(),
+                    "endpoint_id": endpoint_id.to_string(),
+                    "error": "zombie reaper: max attempts exceeded",
+                    "attempt": attempt,
+                });
+                operational_webhook::dispatch_event(
+                    &pool_clone,
+                    &http_client,
+                    customer_id,
+                    operational_webhook::OpWebhookEvent::DeliveryFailed,
+                    op_payload,
+                )
+                .await;
+            }
+        });
+    }
+
     Ok(stuck.len())
 }
 
@@ -1217,6 +1293,7 @@ fn is_transient_db_error(e: &sqlx::Error) -> bool {
 
 /// Send email notification when an endpoint becomes unhealthy (failure_streak >= 5).
 /// Reads Resend config from platform_settings.
+/// Also dispatches `endpoint.disabled` operational webhook at threshold crossings.
 async fn notify_endpoint_down(
     pool: &PgPool,
     endpoint_id: uuid::Uuid,
@@ -1228,9 +1305,9 @@ async fn notify_endpoint_down(
         return;
     }
 
-    // Get customer email and platform settings
-    let result = sqlx::query_as::<_, (String, String, Option<String>, Option<String>)>(
-        r#"SELECT c.email, e.url, s.resend_api_key, s.email_sender
+    // Get customer email, customer_id, and platform settings
+    let result = sqlx::query_as::<_, (String, uuid::Uuid, String, Option<String>, Option<String>)>(
+        r#"SELECT c.email, c.id, e.url, s.resend_api_key, s.email_sender
            FROM endpoints e
            JOIN customers c ON e.customer_id = c.id
            CROSS JOIN (SELECT value FROM platform_settings WHERE key = 'main') ps
@@ -1245,10 +1322,28 @@ async fn notify_endpoint_down(
     .fetch_optional(pool)
     .await;
 
-    let (customer_email, _url, api_key_opt, sender_opt) = match result {
+    let (customer_email, customer_id, _url, api_key_opt, sender_opt) = match result {
         Ok(Some(row)) => row,
         _ => return, // Silently skip if we can't fetch
     };
+
+    // Dispatch operational webhook: endpoint.disabled
+    {
+        let http_client = reqwest::Client::new();
+        let op_payload = serde_json::json!({
+            "endpoint_id": endpoint_id.to_string(),
+            "endpoint_url": endpoint_url,
+            "failure_streak": failure_streak,
+        });
+        operational_webhook::dispatch_event(
+            pool,
+            &http_client,
+            customer_id,
+            operational_webhook::OpWebhookEvent::EndpointDisabled,
+            op_payload,
+        )
+        .await;
+    }
 
     let api_key = match api_key_opt {
         Some(k) if !k.is_empty() => k,
