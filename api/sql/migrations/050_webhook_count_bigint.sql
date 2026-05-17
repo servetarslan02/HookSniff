@@ -1,0 +1,1 @@
+ALTER TABLE customers ALTER COLUMN webhook_count SET DATA TYPE BIGINT;
