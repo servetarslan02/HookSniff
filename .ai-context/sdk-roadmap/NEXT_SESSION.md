@@ -1,18 +1,24 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-18 05:20 GMT+8
+> Son güncelleme: 2026-05-18 05:32 GMT+8
 
 ## 🎯 Sıradaki: Faz 11 — Message Poller
 
-Faz 8-10 tamamlandı. Sıradaki: Message Poller (3-4 saat).
-
-### Faz 11 Adımları:
-1. Migration: `message_cursors` tablosu
-2. Rust API: Poll, seek, commit endpoint'leri
-3. SDK güncellemesi (11 dil)
+Faz 8-10 tamamlandı + Dashboard sayfaları eklendi.
 
 ## 📊 Mevcut Durum
-- Faz 8 (Environment): ✅
-- Faz 9 (Background Task): ✅
-- Faz 10 (Operational Webhook): ✅
-- Sıradaki: Faz 11 (Message Poller)
+
+- 11/11 SDK: v1.0.0
+- Faz 8 (Environment): ✅ + Dashboard sayfası ✅
+- Faz 9 (Background Task): ✅ + Dashboard sayfası ✅
+- Faz 10 (Operational Webhook): ✅ + Dashboard sayfası ✅
+- Dashboard sidebar: 3 yeni nav item eklendi
+- API client'ları: environmentsApi, backgroundTasksApi, operationalWebhooksApi
+- i18n: en + tr çevirileri
+
+## 📝 Sonraki Adımlar
+1. Faz 11: Message Poller (3-4 saat)
+2. Faz 12: Ingest (8-10 saat)
+3. Faz 13: Connector (20+ saat)
+4. Faz 14: Integration (10-15 saat)
+5. Faz 15: Streaming (15-20 saat)
