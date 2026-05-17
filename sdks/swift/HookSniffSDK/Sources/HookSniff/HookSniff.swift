@@ -33,6 +33,7 @@ public class HookSniff {
     public lazy var operationalWebhooks = OperationalWebhooksResource(client: self)
     public lazy var messagePoller = MessagePollerResource(client: self)
     public lazy var inbound = InboundResource(client: self)
+    public lazy var connector = ConnectorResource(client: self)
 
     /// Create a new HookSniff client.
     ///

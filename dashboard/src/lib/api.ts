@@ -839,6 +839,44 @@ export const inboundApi = {
     apiFetch<InboundConfig>('/inbound/configs', { method: 'POST', body: data, token }),
 };
 
+export interface ConnectorOut {
+  id: string;
+  name: string;
+  display_name: string;
+  description: string | null;
+  icon_url: string | null;
+  config_schema: Record<string, unknown>;
+  supported_events: string[] | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ConnectorConfigOut {
+  id: string;
+  connector_id: string;
+  connector_name: string;
+  connector_display_name: string;
+  name: string;
+  config: Record<string, unknown>;
+  is_active: boolean;
+  last_sync_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const connectorsApi = {
+  list: (token: string) => apiFetch<ConnectorOut[]>('/connectors', { token }),
+  get: (token: string, id: string) => apiFetch<ConnectorOut>(`/connectors/${id}`, { token }),
+  listConfigs: (token: string) => apiFetch<ConnectorConfigOut[]>('/connectors/configs', { token }),
+  getConfig: (token: string, id: string) => apiFetch<ConnectorConfigOut>(`/connectors/configs/${id}`, { token }),
+  createConfig: (token: string, data: { connector_id: string; name: string; config?: Record<string, unknown>; credentials?: Record<string, unknown> }) =>
+    apiFetch<ConnectorConfigOut>('/connectors/configs', { method: 'POST', body: data, token }),
+  updateConfig: (token: string, id: string, data: { name?: string; config?: Record<string, unknown>; credentials?: Record<string, unknown>; is_active?: boolean }) =>
+    apiFetch<ConnectorConfigOut>(`/connectors/configs/${id}`, { method: 'PUT', body: data, token }),
+  deleteConfig: (token: string, id: string) => apiFetch<{ deleted: boolean }>(`/connectors/configs/${id}`, { method: 'DELETE', token }),
+};
+
 // Two-Factor Authentication API
 export const twoFactorApi = {
   enable: (token: string) =>

@@ -24,6 +24,7 @@ public class HookSniff {
     private final OperationalWebhook operationalWebhook;
     private final MessagePoller messagePoller;
     private final Inbound inbound;
+    private final Connector connector;
 
     public HookSniff(String token) {
         this(token, new HookSniffOptions());
@@ -57,5 +58,6 @@ public class HookSniff {
         this.operationalWebhook = new OperationalWebhook(this.httpClient);
         this.messagePoller = new MessagePoller(this.httpClient);
         this.inbound = new Inbound(this.httpClient);
+        this.connector = new Connector(this.httpClient);
     }
 }

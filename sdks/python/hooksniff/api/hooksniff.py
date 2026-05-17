@@ -12,6 +12,7 @@ from .event_type import EventType, EventTypeAsync
 from .operational_webhook import OperationalWebhook, OperationalWebhookAsync
 from .message_poller import MessagePoller, MessagePollerAsync
 from .inbound import Inbound, InboundAsync
+from .connector import Connector, ConnectorAsync
 from .message import Message, MessageAsync
 from .message_attempt import MessageAttempt, MessageAttemptAsync
 from .statistics import Statistics, StatisticsAsync
@@ -82,6 +83,10 @@ class HookSniffAsync(ClientBase):
         return InboundAsync(self._client)
 
     @property
+    def connector(self) -> ConnectorAsync:
+        return ConnectorAsync(self._client)
+
+    @property
     def event_type(self) -> EventTypeAsync:
         return EventTypeAsync(self._client)
 
@@ -126,6 +131,10 @@ class HookSniff(ClientBase):
     @property
     def inbound(self) -> Inbound:
         return Inbound(self._client)
+
+    @property
+    def connector(self) -> Connector:
+        return Connector(self._client)
 
     @property
     def event_type(self) -> EventType:
