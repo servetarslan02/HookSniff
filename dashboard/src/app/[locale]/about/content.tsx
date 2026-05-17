@@ -40,9 +40,9 @@ export function AboutPageContent() {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {[
-            { value: '99.97%', label: t('deliveryRate') },
-            { value: '<50ms', label: t('avgLatency') },
+            { value: '99.9%', label: 'SLA' },
             { value: '11', label: t('about.sdkLanguages') },
+            { value: '30+', label: t('about.apiRoutes') || 'API Routes' },
             { value: '$0', label: t('about.startingPrice') },
           ].map(stat => (
             <div key={stat.label} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 text-center">

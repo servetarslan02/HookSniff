@@ -194,7 +194,7 @@ function DashboardPreview() {
           <div className="grid grid-cols-3 gap-4">
             {[
               { label: tHero('deliveries'), value: '24,891', color: 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400' },
-              { label: tHero('successRate'), value: '99.97%', color: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
+              { label: tHero('successRate'), value: '99.9%', color: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
               { label: tHero('avgLatency'), value: '45ms', color: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400' },
             ].map(s => (
               <div key={s.label} className={`rounded-xl p-4 ${s.color}`}>
