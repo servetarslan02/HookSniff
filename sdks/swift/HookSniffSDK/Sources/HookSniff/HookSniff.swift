@@ -87,6 +87,19 @@ public class HookSniff {
                 let httpResponse = response as! HTTPURLResponse
                 let statusCode = httpResponse.statusCode
 
+                // 429 Rate Limit — respect Retry-After header
+                if statusCode == 429, attempt < numRetries {
+                    let retryAfterHeader = httpResponse.value(forHTTPHeaderField: "Retry-After")
+                    let delayMs: UInt64
+                    if let retryAfter = retryAfterHeader, let seconds = UInt64(retryAfter) {
+                        delayMs = seconds * 1_000_000_000
+                    } else {
+                        delayMs = UInt64(50 * Int(pow(2.0, Double(attempt)))) * 1_000_000
+                    }
+                    try await Task.sleep(nanoseconds: delayMs)
+                    continue
+                }
+
                 // Don't retry on 4xx
                 if statusCode < 500 {
                     let parsedBody: Any?

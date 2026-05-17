@@ -81,6 +81,28 @@ namespace HookSniff
             var response = await _httpClient.SendAsync(request, cancellationToken);
             for (var index = 0; index < retryScheduleMilliseconds.Count; index++)
             {
+                // 429 Rate Limit — respect Retry-After header
+                if ((int)response.StatusCode == 429)
+                {
+                    var retryAfter = response.Headers.RetryAfter;
+                    int delayMs;
+                    if (retryAfter?.Delta != null)
+                    {
+                        delayMs = (int)retryAfter.Delta.Value.TotalMilliseconds;
+                    }
+                    else
+                    {
+                        delayMs = retryScheduleMilliseconds[index];
+                    }
+                    Thread.Sleep(delayMs);
+                    HttpRequestMessage retryRequest = BuildRequest(
+                        method, path, req_id, pathParams, queryParams, headerParams, content
+                    );
+                    retryRequest.Headers.Add("hooksniff-retry-count", (index + 1).ToString());
+                    response = await _httpClient.SendAsync(retryRequest, cancellationToken);
+                    continue;
+                }
+
                 if ((int)response.StatusCode < 500)
                 {
                     break;

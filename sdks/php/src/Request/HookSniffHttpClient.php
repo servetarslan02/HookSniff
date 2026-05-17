@@ -104,6 +104,13 @@ class HookSniffHttpClient
                 ];
 
                 // Check if we should retry based on status code
+                if ($statusCode == 429 && $attempt < $maxRetries) {
+                    $retryAfter = $responseHeaders['retry-after'] ?? null;
+                    $delayMs = $retryAfter ? (int)$retryAfter * 1000 : $this->retryScheduleMs[$attempt] ?? 50;
+                    usleep($delayMs * 1000);
+                    $attempt++;
+                    continue;
+                }
                 if ($statusCode >= 500 && $attempt < $maxRetries) {
                     $this->sleepFromSchedule($attempt);
                     $attempt++;
@@ -128,6 +135,13 @@ class HookSniffHttpClient
                     ];
 
                     // Check if we should retry based on status code
+                    if ($statusCode == 429 && $attempt < $maxRetries) {
+                        $retryAfter = $responseHeaders['retry-after'] ?? null;
+                        $delayMs = $retryAfter ? (int)$retryAfter * 1000 : $this->retryScheduleMs[$attempt] ?? 50;
+                        usleep($delayMs * 1000);
+                        $attempt++;
+                        continue;
+                    }
                     if ($statusCode >= 500 && $attempt < $maxRetries) {
                         $this->sleepFromSchedule($attempt);
                         $attempt++;
