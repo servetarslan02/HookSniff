@@ -279,7 +279,7 @@ export function PricingPageContent() {
               <button
                 onClick={() => {
                   if (plan.key === 'enterprise') {
-                    window.location.href = 'mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry';
+                    window.location.href = '/contact';
                   } else if (token) {
                     router.push(`/billing`);
                   } else {
