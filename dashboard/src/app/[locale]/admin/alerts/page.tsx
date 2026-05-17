@@ -1,5 +1,6 @@
 'use client';
 
+import { LazySection, Skeletons } from '@/components/LazySection';
 import { useState } from 'react';
 import { useAdminAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert } from '@/hooks/useAdminData';
 import { useTranslations } from 'next-intl';
@@ -190,6 +191,8 @@ export default function AdminAlertsPage() {
         ))}
       </div>
 
+      {/* Create/Edit Form + Alert List — below the fold, lazy loaded */}
+      <LazySection fallback={Skeletons.card} rootMargin={300}>
       {/* Create/Edit Form */}
       {showForm && (
         <div className="glass-card p-6 border-2 border-red-200 dark:border-red-500/30">
@@ -370,6 +373,7 @@ export default function AdminAlertsPage() {
           )}
         </div>
       )}
+      </LazySection>
     </div>
   );
 }
