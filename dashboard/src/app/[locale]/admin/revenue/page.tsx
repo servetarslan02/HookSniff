@@ -156,8 +156,6 @@ export default function AdminRevenuePage() {
   const cohorts = cohortsData?.cohorts ?? [];
   const allRefunds = refundsData?.refunds ?? [];
   const refundsTotal = refundsData?.total ?? 0;
-  const planPrices = { startup: settings?.plan_price_startup ?? 14, pro: settings?.plan_price_pro ?? 29, enterprise: settings?.plan_price_enterprise ?? 99 };
-
   // ── Plan Management State ──
   const [editingPlans, setEditingPlans] = useState(false);
   const [planForm, setPlanForm] = useState({
@@ -187,25 +185,25 @@ export default function AdminRevenuePage() {
   useEffect(() => {
     if (settings) {
       setPlanForm({
-        plan_price_startup: settings.plan_price_startup,
-        plan_price_pro: settings.plan_price_pro,
-        plan_price_enterprise: settings.plan_price_enterprise,
-        max_endpoints_free: settings.max_endpoints_free,
-        max_endpoints_startup: settings.max_endpoints_startup,
-        max_endpoints_pro: settings.max_endpoints_pro,
-        max_endpoints_enterprise: settings.max_endpoints_enterprise,
-        max_webhooks_free: settings.max_webhooks_free,
-        max_webhooks_startup: settings.max_webhooks_startup,
-        max_webhooks_pro: settings.max_webhooks_pro,
-        max_webhooks_enterprise: settings.max_webhooks_enterprise,
-        rate_limit_free: settings.rate_limit_free,
-        rate_limit_startup: settings.rate_limit_startup,
-        rate_limit_pro: settings.rate_limit_pro,
-        rate_limit_enterprise: settings.rate_limit_enterprise,
-        retention_days_free: settings.retention_days_free,
-        retention_days_startup: settings.retention_days_startup,
-        retention_days_pro: settings.retention_days_pro,
-        retention_days_enterprise: settings.retention_days_enterprise,
+        plan_price_startup: settings.plan_price_startup ?? 14,
+        plan_price_pro: settings.plan_price_pro ?? 29,
+        plan_price_enterprise: settings.plan_price_enterprise ?? 99,
+        max_endpoints_free: settings.max_endpoints_free ?? 5,
+        max_endpoints_startup: settings.max_endpoints_startup ?? 20,
+        max_endpoints_pro: settings.max_endpoints_pro ?? 50,
+        max_endpoints_enterprise: settings.max_endpoints_enterprise ?? 200,
+        max_webhooks_free: settings.max_webhooks_free ?? 1000,
+        max_webhooks_startup: settings.max_webhooks_startup ?? 10000,
+        max_webhooks_pro: settings.max_webhooks_pro ?? 50000,
+        max_webhooks_enterprise: settings.max_webhooks_enterprise ?? 500000,
+        rate_limit_free: settings.rate_limit_free ?? 100,
+        rate_limit_startup: settings.rate_limit_startup ?? 500,
+        rate_limit_pro: settings.rate_limit_pro ?? 1000,
+        rate_limit_enterprise: settings.rate_limit_enterprise ?? 5000,
+        retention_days_free: settings.retention_days_free ?? 7,
+        retention_days_startup: settings.retention_days_startup ?? 14,
+        retention_days_pro: settings.retention_days_pro ?? 180,
+        retention_days_enterprise: settings.retention_days_enterprise ?? 365,
       });
     }
   }, [settings]);
@@ -214,10 +212,7 @@ export default function AdminRevenuePage() {
     if (!token || !settings) return;
     setSavingPlans(true);
     try {
-      const result = await updateSettingsMutation.mutateAsync({
-        token,
-        settings: { ...settings, ...planForm },
-      });
+      await updateSettingsMutation.mutateAsync({ ...settings, ...planForm });
       toast(t('settingsSaved') || 'Plan settings saved! Prices syncing to Polar...', 'success');
       setEditingPlans(false);
       // Invalidate to pick up any Polar sync results
