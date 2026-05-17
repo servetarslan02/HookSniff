@@ -1,1 +1,1 @@
-use crate::Configuration;
+// Deprecated type aliases - kept for backward compatibility

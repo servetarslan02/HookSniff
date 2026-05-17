@@ -63,6 +63,7 @@ impl Request {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_query_param(mut self, basename: &'static str, param: impl QueryParamValue) -> Self {
         self.query_params.insert(basename, param.encode());
         self
