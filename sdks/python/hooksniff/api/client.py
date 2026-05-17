@@ -1,9 +1,3 @@
-"""
-HookSniff SDK — API Client (attrs-based)
-
-Adapted from Svix SDK architecture.
-"""
-
 import ssl
 from typing import Dict, List, Union, Optional
 
