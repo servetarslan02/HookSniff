@@ -1,6 +1,10 @@
 # HookSniff C# SDK
 
-Official C# SDK for the [HookSniff](https://hooksniff.com) webhook delivery API.
+<p align="center">
+  <a href="https://github.com/servetarslan02/HookSniff"><img src="https://img.shields.io/github/license/servetarslan02/HookSniff" alt="License"></a>
+</p>
+
+C# SDK for the [HookSniff](https://hooksniff.com) webhook delivery platform.
 
 ## Installation
 
@@ -8,61 +12,34 @@ Official C# SDK for the [HookSniff](https://hooksniff.com) webhook delivery API.
 dotnet add package HookSniff
 ```
 
-## Usage
+## Quick Start
 
 ```csharp
-using HookSniff;
-using HookSniff.Models;
-
-// Initialize client
-var client = new HookSniffClient("your-api-key");
-
-// List endpoints
+var client = new HookSniff("hs_xxx");
 var endpoints = await client.Endpoint.ListAsync();
-
-// Create an endpoint
-var endpoint = await client.Endpoint.CreateAsync(new EndpointIn
-{
-    Url = "https://example.com/webhook"
-});
-
-// Send a message
-var message = await client.Message.CreateAsync(new MessageIn
-{
-    EventType = "order.created",
-    Payload = new { order_id = "12345" }
-});
-
-// List message attempts
-var attempts = await client.MessageAttempt.ListByMsgAsync(message.Id);
-
-// Verify incoming webhook signature
-var webhook = new Webhook("whsec_...");
-var payload = webhook.Verify(rawBody, headers);
-
-// List event types
-var eventTypes = await client.EventType.ListAsync();
-
-// Health check
-await client.Health.PingAsync();
+Console.WriteLine(endpoints);
 ```
 
-## API Reference
+## Webhook Verification
 
-### Resources
+```csharp
+var wh = new Webhook("whsec_xxx");
+var payload = wh.Verify(body, headers);
+```
 
-- **Endpoint** — Create, list, update, delete endpoints
-- **Message** — Create and list messages
-- **MessageAttempt** — List and inspect delivery attempts
-- **EventType** — Manage event types
-- **Authentication** — Auth operations
-- **Statistics** — Usage statistics
-- **Health** — Health check
+## Resources
 
-## Requirements
+| Resource | Methods |
+|----------|---------|
+| Endpoint | list, create, get, update, delete |
+| Message | create, list, get |
+| MessageAttempt | list, listByMsg, get, resend |
+| Authentication | dashboardAccess |
+| EventType | list |
+| Statistics | aggregate |
 
-- .NET 8.0+
+## Links
 
-## License
-
-MIT
+- [Documentation](https://docs.hooksniff.com)
+- [API Reference](https://api.hooksniff.com)
+- [GitHub](https://github.com/servetarslan02/HookSniff)
