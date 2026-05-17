@@ -162,7 +162,7 @@ export function PricingPageContent() {
       category: t('monitoringLogs'),
       items: [
         { feature: t('dashboard'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: t('logRetention'), developer: `7 ${t('days')}`, startup: `14 ${t('days')}`, pro: `30 ${t('days')}`, enterprise: t('custom') },
+        { feature: t('logRetention'), developer: `7 ${t('days')}`, startup: `14 ${t('days')}`, pro: `180 ${t('days')}`, enterprise: t('custom') },
         { feature: t('realtimeLogs'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
         { feature: t('analyticsGraphs'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
         { feature: t('schemaRegistry'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
