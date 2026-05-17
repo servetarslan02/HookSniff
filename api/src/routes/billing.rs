@@ -683,7 +683,7 @@ async fn get_overage_settings(
         overage_email_notification: customer.overage_email_notification,
         plan: plan.as_str().to_string(),
         daily_limit: plan.max_events_per_day(),
-        overage_price: plan.overage_price_cents_per_event(),
+        overage_price: plan.overage_price_per_event(),
     }))
 }
 
@@ -719,7 +719,7 @@ async fn update_overage_settings(
         overage_email_notification: updated.overage_email_notification,
         plan: plan.as_str().to_string(),
         daily_limit: plan.max_events_per_day(),
-        overage_price: plan.overage_price_cents_per_event(),
+        overage_price: plan.overage_price_per_event(),
     }))
 }
 
