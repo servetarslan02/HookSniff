@@ -9,7 +9,7 @@ export default async function HookdeckAlternativePage() {
   const tc = await getTranslations('compare');
 
   const rows = [
-    { featureKey: 'pricePro', hooksniff: '$29/mo', hookdeck: '$39/mo + usage', bestFor: 'hooksniff' },
+    { featureKey: 'pricePro', hooksniff: '$24/mo', hookdeck: '$39/mo + usage', bestFor: 'hooksniff' },
     { featureKey: 'freeTier', hooksniff: `10,000 ${t('events')}`, hookdeck: `10,000 ${t('events')}`, bestFor: 'tie' },
     { featureKey: 'sdkCount', hooksniff: '11', hookdeck: '8', bestFor: 'hooksniff' },
     { featureKey: 'fifoDelivery', hooksniff: '✅', hookdeck: '❌', bestFor: 'hooksniff' },
@@ -64,7 +64,7 @@ export default async function HookdeckAlternativePage() {
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🪝 {t('whyChooseHooksniff')}</h2>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Open source & self-hosted:</strong> MIT licensed. Hookdeck is closed-source and cloud-only.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Fixed pricing:</strong> $29/mo flat vs Hookdeck&apos;s usage-based billing that can be unpredictable.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Fixed pricing:</strong> $24/mo flat vs Hookdeck&apos;s usage-based billing that can be unpredictable.</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>FIFO + Schema Registry:</strong> Ordered delivery and payload validation that Hookdeck doesn&apos;t offer.</li>
             </ul>
           </div>

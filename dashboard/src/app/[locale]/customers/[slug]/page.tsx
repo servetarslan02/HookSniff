@@ -51,7 +51,7 @@ const stories: Record<string, {
     ],
     results: [
       { label: 'metricEngineeringTime', before: '3-6 months', after: '2 hours' },
-      { label: 'metricInfraCost', before: '$2,500/mo', after: '$29/mo' },
+      { label: 'metricInfraCost', before: '$2,500/mo', after: '$24/mo' },
       { label: 'metricEventLoss', before: '5%', after: '0%' },
       { label: 'metricDeliveryLatency', before: '2-5 seconds', after: '<200ms' },
     ],
@@ -114,7 +114,7 @@ const stories: Record<string, {
     results: [
       { label: 'metricPollingEliminated', before: '5s intervals', after: 'Event-driven' },
       { label: 'metricAgentComm', before: '10%', after: '0%' },
-      { label: 'metricComputeCost', before: '$800/mo (polling)', after: '$29/mo' },
+      { label: 'metricComputeCost', before: '$800/mo (polling)', after: '$24/mo' },
       { label: 'metricScaleCapacity', before: '50 agents', after: '200+ agents' },
     ],
     techStack: ['Python', 'Rust', 'OpenAI', 'LangChain', 'Redis'],
@@ -140,7 +140,7 @@ const stories: Record<string, {
       'HookSniff free tier handles our 8K events/month with zero cost',
       '5-minute integration with the Node.js SDK',
       'Dashboard gives us visibility into delivery success without building our own',
-      'Upgrade path to Pro ($29/mo) when we need more volume',
+      'Upgrade path to Pro ($24/mo) when we need more volume',
     ],
     results: [
       { label: 'metricMonthlyCost', before: '$490 (Svix)', after: '$0' },
