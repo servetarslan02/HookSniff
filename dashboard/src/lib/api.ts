@@ -200,7 +200,7 @@ export const endpointsApi = {
   get: (token: string, id: string) =>
     apiFetch<Endpoint>(`/endpoints/${id}`, { token }),
 
-  create: (token: string, data: { url: string; description?: string }) =>
+  create: (token: string, data: { url: string; description?: string; application_id?: string }) =>
     apiFetch<Endpoint>("/endpoints", { method: "POST", body: data, token }),
 
   update: (token: string, id: string, data: Partial<Endpoint> & { retry_policy?: RetryPolicyConfig }) =>

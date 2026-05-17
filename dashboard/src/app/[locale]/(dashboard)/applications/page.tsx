@@ -302,10 +302,10 @@ export default function ApplicationsPage() {
                 {/* Footer */}
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
                   <Link
-                    href={`/core`}
+                    href={`/applications/${app.id}`}
                     className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
                   >
-                    See events →
+                    {t('manageEndpoints') || 'Manage endpoints'} →
                   </Link>
                   <span className="text-xs text-gray-400 dark:text-gray-500">
                     {tc('created') || 'Created'} {formatDate(app.created_at)}
