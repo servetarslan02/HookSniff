@@ -18,7 +18,7 @@ export function SetupChecklist() {
   const [dismissed, setDismissed] = useState(false);
   const items: ChecklistItem[] = [
     { id: 'account', label: t('checklistAccount'), href: "/", icon: '👤' },
-    { id: 'apikey', label: t('checklistApikey'), href: `/billing-overview`, icon: '🔑' },
+    { id: 'apikey', label: t('checklistApikey'), href: `/core`, icon: '🔑' },
     { id: 'endpoint', label: t('checklistEndpoint'), href: `/core`, icon: '🔗' },
     { id: 'webhook', label: t('checklistWebhook'), href: `/devtools`, icon: '🧪' },
     { id: 'monitor', label: t('checklistMonitor'), href: `/core`, icon: '📊' },
