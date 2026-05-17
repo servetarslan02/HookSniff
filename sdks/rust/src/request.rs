@@ -1,197 +1,283 @@
-//! HookSniff SDK — HTTP Request Helper
-//!
-//! Handles auth, retries, error mapping, and idempotency keys.
+// Modified version of the file openapi-generator would usually put in
+// apis/request.rs
 
-use reqwest::blocking::Client;
-use reqwest::StatusCode;
+use std::{collections::HashMap, time::Duration};
+
+use http1::header::{HeaderValue, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
+use http_body_util::{BodyExt as _, Full};
+use hyper::body::Bytes;
+use itertools::Itertools as _;
+use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
+use rand::Rng;
 use serde::de::DeserializeOwned;
-use serde::Serialize;
-use std::collections::HashMap;
-use std::time::Duration;
 
-const LIB_VERSION: &str = "0.4.0";
+use crate::{error::Error, models, Configuration};
 
-/// Error returned by the HookSniff API.
-#[derive(Debug)]
-pub struct ApiException {
-    pub code: u16,
-    pub body: String,
+#[allow(dead_code)]
+pub(crate) enum Auth {
+    None,
+    Bearer,
 }
 
-impl std::fmt::Display for ApiException {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "HookSniff API Error {}: {}", self.code, self.body)
-    }
+/// If the authorization type is unspecified then it will be automatically
+/// detected based on the configuration. This functionality is useful when the
+/// OpenAPI definition does not include an authorization scheme.
+#[derive(Clone)]
+pub(crate) struct Request {
+    method: http1::Method,
+    path: &'static str,
+    query_params: HashMap<&'static str, String>,
+    no_return_type: bool,
+    path_params: HashMap<&'static str, String>,
+    header_params: HashMap<&'static str, String>,
+    // TODO: multiple body params are possible technically, but not supported here.
+    serialized_body: Option<String>,
 }
 
-impl std::error::Error for ApiException {}
-
-/// Shared request context.
-#[derive(Clone, Debug)]
-pub struct HookSniffRequestContext {
-    pub base_url: String,
-    pub token: String,
-    pub timeout: Duration,
-    pub num_retries: u32,
-}
-
-/// HTTP methods.
-#[derive(Clone, Copy)]
-pub enum HttpMethod {
-    Get,
-    Post,
-    Put,
-    Delete,
-}
-
-/// Builder for a HookSniff API request.
-pub struct HookSniffRequest {
-    method: HttpMethod,
-    path: String,
-    body: Option<String>,
-    query_params: HashMap<String, String>,
-    header_params: HashMap<String, String>,
-}
-
-impl HookSniffRequest {
-    pub fn new(method: HttpMethod, path: &str) -> Self {
-        Self {
+impl Request {
+    pub fn new(method: http1::Method, path: &'static str) -> Self {
+        Request {
             method,
-            path: path.to_string(),
-            body: None,
+            path,
             query_params: HashMap::new(),
+            path_params: HashMap::new(),
             header_params: HashMap::new(),
+            serialized_body: None,
+            no_return_type: false,
         }
     }
 
-    pub fn set_path_param(&mut self, name: &str, value: &str) {
-        self.path = self.path.replace(&format!("{{{}}}", name), value);
+    pub fn with_body_param<T: serde::Serialize>(mut self, param: T) -> Self {
+        self.serialized_body = Some(serde_json::to_string(&param).unwrap());
+        self
     }
 
-    pub fn set_query_param(&mut self, name: &str, value: &str) {
-        self.query_params.insert(name.to_string(), value.to_string());
+    pub fn with_optional_header_param(
+        mut self,
+        basename: &'static str,
+        param: Option<String>,
+    ) -> Self {
+        if let Some(value) = param {
+            self.header_params.insert(basename, value);
+        }
+        self
     }
 
-    pub fn set_header_param(&mut self, name: &str, value: &str) {
-        self.header_params.insert(name.to_string(), value.to_string());
+    pub fn with_query_param(mut self, basename: &'static str, param: impl QueryParamValue) -> Self {
+        self.query_params.insert(basename, param.encode());
+        self
     }
 
-    pub fn set_body<T: Serialize>(&mut self, value: &T) {
-        self.body = Some(serde_json::to_string(value).expect("serialization failed"));
+    pub fn with_optional_query_param<T: QueryParamValue>(
+        mut self,
+        basename: &'static str,
+        param: Option<T>,
+    ) -> Self {
+        if let Some(value) = param {
+            self.query_params.insert(basename, value.encode());
+        }
+        self
     }
 
-    /// Send the request and deserialize the response.
-    pub fn send<T: DeserializeOwned>(&self, ctx: &HookSniffRequestContext) -> Result<T, Box<dyn std::error::Error>> {
-        let text = self.send_raw(ctx)?;
-        let value: T = serde_json::from_str(&text)?;
-        Ok(value)
+    pub fn with_path_param(mut self, basename: &'static str, param: String) -> Self {
+        self.path_params.insert(basename, param);
+        self
     }
 
-    /// Send the request and return raw text (for void endpoints).
-    pub fn send_void(&self, ctx: &HookSniffRequestContext) -> Result<(), Box<dyn std::error::Error>> {
-        self.send_raw(ctx)?;
-        Ok(())
+    pub fn returns_nothing(mut self) -> Self {
+        self.no_return_type = true;
+        self
     }
 
-    /// Read-only accessors for testing.
-    #[cfg(feature = "test-utils")]
-    pub fn path(&self) -> &str {
-        &self.path
+    pub async fn execute<T: DeserializeOwned>(self, conf: &Configuration) -> Result<T, Error> {
+        match self.execute_with_backoff(conf).await? {
+            // This is a hack; if there's no_ret_type, T is (), but serde_json gives an
+            // error when deserializing "" into (), so deserialize 'null' into it
+            // instead.
+            // An alternate option would be to require T: Default, and then return
+            // T::default() here instead since () implements that, but then we'd
+            // need to impl default for all models.
+            None => Ok(serde_json::from_str("null").expect("serde null value")),
+            Some(bytes) => Ok(serde_json::from_slice(&bytes).map_err(Error::generic)?),
+        }
     }
 
-    #[cfg(feature = "test-utils")]
-    pub fn query_params(&self) -> &HashMap<String, String> {
-        &self.query_params
-    }
-
-    #[cfg(feature = "test-utils")]
-    pub fn header_params(&self) -> &HashMap<String, String> {
-        &self.header_params
-    }
-
-    #[cfg(feature = "test-utils")]
-    pub fn body_str(&self) -> Option<&str> {
-        self.body.as_deref()
-    }
-
-    fn send_raw(&self, ctx: &HookSniffRequestContext) -> Result<String, Box<dyn std::error::Error>> {
-        let client = Client::builder()
-            .timeout(ctx.timeout)
-            .build()?;
-
-        let mut url = format!("{}{}", ctx.base_url, self.path);
-        if !self.query_params.is_empty() {
-            let qs: String = self.query_params
-                .iter()
-                .map(|(k, v)| format!("{}={}", k, v))
-                .collect::<Vec<_>>()
-                .join("&");
-            url = format!("{}?{}", url, qs);
+    async fn execute_with_backoff(mut self, conf: &Configuration) -> Result<Option<Bytes>, Error> {
+        let no_return_type = self.no_return_type;
+        if self.method == http1::Method::POST && !self.header_params.contains_key("idempotency-key")
+        {
+            self.header_params
+                .insert("idempotency-key", format!("auto_{}", uuid::Uuid::new_v4()));
         }
 
-        let method = match self.method {
-            HttpMethod::Get => reqwest::Method::GET,
-            HttpMethod::Post => reqwest::Method::POST,
-            HttpMethod::Put => reqwest::Method::PUT,
-            HttpMethod::Delete => reqwest::Method::DELETE,
+        const MAX_BACKOFF: Duration = Duration::from_secs(5);
+
+        let retry_schedule = match &conf.retry_schedule {
+            Some(schedule) => schedule,
+            None => &std::iter::successors(Some(Duration::from_millis(20)), |last_backoff| {
+                Some(MAX_BACKOFF.min(*last_backoff * 2))
+            })
+            .take(conf.num_retries as usize)
+            .collect(),
+        };
+        let mut retries = retry_schedule.iter();
+
+        let mut request = self.build_request(conf)?;
+        request
+            .headers_mut()
+            .insert("hooksniff-req-id", rand::rng().random::<u32>().into());
+
+        let mut retry_count = 0;
+
+        let execute_request = async |request| {
+            let response = conf.client.request(request).await.map_err(Error::generic)?;
+
+            let status = response.status();
+            if !status.is_success() {
+                Err(Error::from_response(status, response.into_body()).await)
+            } else if no_return_type {
+                Ok(None)
+            } else {
+                let bytes = response
+                    .into_body()
+                    .collect()
+                    .await
+                    .map_err(Error::generic)?
+                    .to_bytes();
+                Ok(Some(bytes))
+            }
         };
 
-        let idempotency_key = uuid::Uuid::new_v4().to_string();
+        loop {
+            let request_fut = execute_request(request.clone());
+            let res = if let Some(duration) = conf.timeout {
+                tokio::time::timeout(duration, request_fut)
+                    .await
+                    .map_err(Error::generic)?
+            } else {
+                request_fut.await
+            };
 
-        let mut last_err: Option<String> = None;
+            let next_backoff = retries.next().copied();
 
-        for attempt in 0..=ctx.num_retries {
-            let mut req = client
-                .request(method.clone(), &url)
-                .header("accept", "application/json")
-                .header("authorization", format!("Bearer {}", ctx.token))
-                .header("user-agent", format!("hooksniff-sdk/{}/rust", LIB_VERSION));
-
-            // Auto idempotency key for POST
-            if matches!(self.method, HttpMethod::Post) && !self.header_params.contains_key("idempotency-key") {
-                req = req.header("idempotency-key", &idempotency_key);
-            }
-
-            for (k, v) in &self.header_params {
-                req = req.header(k.as_str(), v.as_str());
-            }
-
-            if let Some(ref body) = self.body {
-                req = req
-                    .header("content-type", "application/json")
-                    .body(body.clone());
-            }
-
-            match req.send() {
-                Ok(resp) => {
-                    let status = resp.status();
-                    if status == StatusCode::NO_CONTENT {
-                        return Ok(String::new());
+            match res {
+                Ok(result) => return Ok(result),
+                e @ Err(Error::Validation(_)) => return e,
+                Err(Error::Http(err)) if err.status.as_u16() < 500 => return Err(Error::Http(err)),
+                e @ Err(_) => {
+                    if next_backoff.is_none() {
+                        return e;
                     }
-                    if status.is_success() {
-                        return Ok(resp.text()?);
-                    }
-                    if status.is_client_error() {
-                        let body = resp.text().unwrap_or_else(|_| "Unknown error".to_string());
-                        return Err(Box::new(ApiException {
-                            code: status.as_u16(),
-                            body,
-                        }));
-                    }
-                    // 5xx — retry
-                    last_err = Some(format!("HTTP {}", status.as_u16()));
-                }
-                Err(e) => {
-                    last_err = Some(e.to_string());
                 }
             }
 
-            // Exponential backoff
-            if attempt < ctx.num_retries {
-                std::thread::sleep(Duration::from_millis(50 * 2u64.pow(attempt)));
-            }
+            tokio::time::sleep(next_backoff.expect("next_backoff is always Some")).await;
+            retry_count += 1;
+
+            request
+                .headers_mut()
+                .insert("hooksniff-retry-count", retry_count.into());
+        }
+    }
+
+    fn build_request(self, conf: &Configuration) -> Result<http1::Request<Full<Bytes>>, Error> {
+        const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');
+        const PATH: &AsciiSet = &FRAGMENT.add(b'#').add(b'?').add(b'{').add(b'}');
+        const PATH_SEGMENT: &AsciiSet = &PATH.add(b'/').add(b'%');
+
+        let mut path = self.path.to_owned();
+        for (k, v) in self.path_params {
+            // replace {id} with the value of the id path param
+            let percent_encoded_path_param_value =
+                utf8_percent_encode(&v, PATH_SEGMENT).to_string();
+            path = path.replace(&format!("{{{k}}}"), &percent_encoded_path_param_value);
         }
 
-        Err(last_err.unwrap_or_else(|| "Request failed after retries".to_string()).into())
+        let mut uri = format!("{}{}", conf.base_path, path);
+
+        let mut query_string = url::form_urlencoded::Serializer::new("".to_owned());
+        for (key, val) in self.query_params {
+            query_string.append_pair(key, &val);
+        }
+
+        let query_string_str = query_string.finish();
+        if !query_string_str.is_empty() {
+            uri += "?";
+            uri += &query_string_str;
+        }
+
+        let uri = http1::Uri::try_from(uri).map_err(Error::generic)?;
+        let mut req_builder = http1::Request::builder().uri(uri).method(self.method);
+
+        let mut request = if let Some(body) = self.serialized_body {
+            let req_headers = req_builder.headers_mut().unwrap();
+            req_headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+            req_headers.insert(CONTENT_LENGTH, body.len().into());
+            req_builder.body(Full::from(body)).map_err(Error::generic)?
+        } else {
+            req_builder.body(Full::default()).map_err(Error::generic)?
+        };
+
+        let request_headers = request.headers_mut();
+
+        // Detect the authorization type if it hasn't been set.
+        let auth = if conf.bearer_access_token.is_some() {
+            Auth::Bearer
+        } else {
+            Auth::None
+        };
+        match auth {
+            Auth::Bearer => {
+                if let Some(token) = &conf.bearer_access_token {
+                    let value = format!("Bearer {token}")
+                        .try_into()
+                        .map_err(Error::generic)?;
+                    request_headers.insert(AUTHORIZATION, value);
+                }
+            }
+            Auth::None => {}
+        }
+
+        if let Some(user_agent) = &conf.user_agent {
+            let value = user_agent.try_into().map_err(Error::generic)?;
+            request_headers.insert(USER_AGENT, value);
+        }
+
+        for (k, v) in self.header_params {
+            let v = v.try_into().map_err(Error::generic)?;
+            request_headers.insert(k, v);
+        }
+
+        Ok(request)
+    }
+}
+
+pub(crate) trait QueryParamValue {
+    fn encode(&self) -> String;
+}
+
+macro_rules! impl_query_param_value {
+    ($ty:ty) => {
+        impl QueryParamValue for $ty {
+            fn encode(&self) -> String {
+                self.to_string()
+            }
+        }
+    };
+}
+
+impl_query_param_value!(bool);
+impl_query_param_value!(i32);
+impl_query_param_value!(String);
+impl_query_param_value!(models::BackgroundTaskStatus);
+impl_query_param_value!(models::BackgroundTaskType);
+impl_query_param_value!(models::ConnectorProduct);
+impl_query_param_value!(models::MessageStatus);
+impl_query_param_value!(models::Ordering);
+impl_query_param_value!(models::StatusCodeClass);
+
+impl QueryParamValue for Vec<String> {
+    fn encode(&self) -> String {
+        self.iter().format(",").to_string()
     }
 }
