@@ -41,12 +41,25 @@ export function usePlans() {
     gcTime: 10 * 60 * 1000,   // 10 minutes
   });
 
+  // Hardcoded fallback prices (used when API is unavailable / rate limited)
+  const FALLBACK_PRICES: Record<string, { monthly: number; yearly: number }> = {
+    developer: { monthly: 0, yearly: 0 },
+    startup: { monthly: 29, yearly: 278 },
+    pro: { monthly: 49, yearly: 470 },
+    enterprise: { monthly: 0, yearly: 0 },
+  };
+
   const getPlan = (id: string) => plans.find(p => p.id === id);
 
   const getPlanPrice = (id: string, yearly = false) => {
     const plan = getPlan(id);
-    if (!plan) return 0;
-    return yearly ? plan.price_yearly : plan.price_monthly;
+    if (plan) {
+      return yearly ? plan.price_yearly : plan.price_monthly;
+    }
+    // Fallback to hardcoded prices when API hasn't loaded
+    const fallback = FALLBACK_PRICES[id];
+    if (!fallback) return 0;
+    return yearly ? fallback.yearly : fallback.monthly;
   };
 
   const getPlanLimits = (id: string) => {
