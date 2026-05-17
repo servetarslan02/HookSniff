@@ -28,7 +28,7 @@ struct FeatureFlag {
 }
 
 #[derive(Debug, Deserialize)]
-struct CreateFeatureFlagRequest {
+pub(crate) struct CreateFeatureFlagRequest {
     name: String,
     description: Option<String>,
     is_enabled: Option<bool>,
@@ -37,7 +37,7 @@ struct CreateFeatureFlagRequest {
 }
 
 #[derive(Debug, Deserialize)]
-struct UpdateFeatureFlagRequest {
+pub(crate) struct UpdateFeatureFlagRequest {
     name: Option<String>,
     description: Option<String>,
     is_enabled: Option<bool>,
