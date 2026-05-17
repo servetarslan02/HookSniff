@@ -31,7 +31,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 | Faz 3 | CI/CD | ✅ Tamamlandı | %95 |
 | Faz 4 | OpenAPI codegen | ✅ Tamamlandı | %96 |
 | Faz 5 | Dokümantasyon | ✅ Tamamlandı | %98 |
-| Faz 6 | Multi-dil publish | ⬜ | 11/11 |
+| Faz 6 | Multi-dil publish | ✅ Tamamlandı | 11/11 |
 | Faz 7 | Son dokunuşlar | ⬜ | %100 |
 
 ---
@@ -106,8 +106,11 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 - [x] Her SDK'da: kurulum, quick start, webhook verification, error handling
 
 ### Faz 6 — Multi-Dil Publish (12-16 saat)
-- [ ] npm, PyPI, crates.io, Go module
-- [ ] RubyGems, Maven Central, NuGet, Hex.pm, Packagist
+- [x] publish-sdk.sh: token-based publish script
+- [x] Token'lar kaydedildi (.sdk-tokens.env, gitignore'da)
+- [x] npm, PyPI, crates.io, Go module
+- [x] RubyGems, Maven Central, NuGet, Hex.pm, Packagist
+- [x] publish-sdk.sh [sdk|all] ile publish
 
 ### Faz 7 — Son Dokunuşlar (3 saat)
 - [ ] Tree-shaking
