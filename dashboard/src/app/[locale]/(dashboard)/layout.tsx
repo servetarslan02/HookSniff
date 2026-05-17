@@ -49,6 +49,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       label: t('sectionCore'),
       items: [
         { name: t('core'), href: '/core', icon: '📊' },
+        { name: t('applications'), href: '/applications', icon: '📱' },
         { name: t('deliveries'), href: '/deliveries', icon: '🔗' },
       ],
     },
