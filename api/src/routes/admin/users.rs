@@ -17,6 +17,22 @@ use super::{
     UserSummary,
 };
 
+/// Detailed user info (used in tests, not directly in handlers).
+#[derive(Debug, serde::Serialize)]
+pub struct UserDetail {
+    pub id: Uuid,
+    pub email: String,
+    pub name: Option<String>,
+    pub plan: String,
+    pub is_active: bool,
+    pub is_admin: bool,
+    pub webhook_limit: i64,
+    pub webhook_count: i64,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub endpoints: Vec<EndpointSummary>,
+    pub recent_deliveries: Vec<DeliverySummary>,
+}
+
 /// GET /v1/admin/users — List all customers with pagination and filters.
 pub async fn list_users(
     Extension(pool): Extension<PgPool>,
@@ -1060,4 +1076,69 @@ pub async fn admin_user_replay_delivery(
         "original_id": orig_id,
         "new_delivery_id": new_delivery.0,
     })))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::{TimeZone, Utc};
+
+    #[test]
+    fn test_user_analytics_serialization() {
+        let analytics = UserAnalytics {
+            daily_deliveries: vec![],
+            top_event_types: vec![],
+            endpoint_health: vec![],
+        };
+        let json = serde_json::to_value(&analytics).unwrap();
+        assert!(json.get("daily_deliveries").is_some());
+        assert!(json.get("top_events").is_some());
+        assert!(json.get("endpoint_health").is_some());
+    }
+
+    #[test]
+    fn test_user_detail_response_serialization() {
+        let resp = UserDetailResponse {
+            user: UserSummary {
+                id: Uuid::new_v4(),
+                email: "a@b.com".to_string(),
+                name: None,
+                plan: "developer".to_string(),
+                role: "member".to_string(),
+                is_active: true,
+                is_admin: false,
+                created_at: Utc::now(),
+            },
+            endpoints: vec![],
+            recent_deliveries: vec![],
+            usage_stats: UsageStats {
+                total_deliveries: 0,
+                success_rate: 100.0,
+                endpoints_count: 0,
+            },
+        };
+        let json = serde_json::to_value(&resp).unwrap();
+        assert!(json.get("user").is_some());
+        assert!(json.get("usage_stats").is_some());
+    }
+
+    #[test]
+    fn test_user_detail_serialization() {
+        let detail = UserDetail {
+            id: Uuid::new_v4(),
+            email: "admin@x.com".to_string(),
+            name: Some("Admin".to_string()),
+            plan: "enterprise".to_string(),
+            is_active: true,
+            is_admin: true,
+            webhook_limit: 500_000,
+            webhook_count: 1234,
+            created_at: Utc::now(),
+            endpoints: vec![],
+            recent_deliveries: vec![],
+        };
+        let json = serde_json::to_value(&detail).unwrap();
+        assert_eq!(json["webhook_limit"], 500_000);
+        assert_eq!(json["webhook_count"], 1234);
+    }
 }

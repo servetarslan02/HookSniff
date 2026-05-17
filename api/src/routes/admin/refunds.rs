@@ -295,3 +295,49 @@ mod tests {
         assert_eq!(json["provider"], "polar");
     }
 }
+
+    #[test]
+    fn test_admin_refund_request_with_currency() {
+        let json = r#"{"amount_cents": 2900, "reason": "Duplicate charge", "currency": "try"}"#;
+        let req: AdminRefundRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.amount_cents, 2900);
+        assert_eq!(req.currency.as_deref(), Some("try"));
+    }
+
+    #[test]
+    fn test_admin_refund_request_empty_rejected() {
+        let json = r#"{"amount_cents": 0, "reason": ""}"#;
+        let req: AdminRefundRequest = serde_json::from_str(json).unwrap();
+        assert_eq!(req.amount_cents, 0);
+        assert!(req.reason.is_empty());
+    }
+
+    #[test]
+    fn test_refund_query_with_status() {
+        let json = r#"{"status": "completed", "page": 1, "per_page": 25}"#;
+        let params: RefundQuery = serde_json::from_str(json).unwrap();
+        assert_eq!(params.status.as_deref(), Some("completed"));
+        assert_eq!(params.page, Some(1));
+        assert_eq!(params.per_page, Some(25));
+    }
+
+    #[test]
+    fn test_refund_row_serialization_pending() {
+        let refund = RefundRow {
+            id: Uuid::nil(),
+            customer_id: Uuid::nil(),
+            email: "user@example.com".to_string(),
+            amount_cents: 9900,
+            currency: "usd".to_string(),
+            reason: None,
+            admin_user_id: None,
+            provider: "polar".to_string(),
+            provider_refund_id: None,
+            status: "pending".to_string(),
+            created_at: chrono::Utc.timestamp_opt(1700000000, 0).unwrap(),
+        };
+        let json = serde_json::to_value(&refund).unwrap();
+        assert_eq!(json["status"], "pending");
+        assert!(json["reason"].is_null());
+        assert!(json["provider_refund_id"].is_null());
+    }

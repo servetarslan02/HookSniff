@@ -383,3 +383,35 @@ mod tests {
         let _router = router();
     }
 }
+
+    #[test]
+    fn test_user_summary_banned_status() {
+        let user = UserSummary {
+            id: uuid::Uuid::new_v4(),
+            email: "banned@x.com".to_string(),
+            name: None,
+            plan: "developer".to_string(),
+            role: "member".to_string(),
+            is_active: false,
+            is_admin: false,
+            created_at: chrono::Utc::now(),
+        };
+        let json = serde_json::to_value(&user).unwrap();
+        assert_eq!(json["status"], "banned");
+    }
+
+    #[test]
+    fn test_delivery_summary_event_alias() {
+        let d = DeliverySummary {
+            id: uuid::Uuid::new_v4(),
+            endpoint_id: uuid::Uuid::new_v4(),
+            status: "pending".to_string(),
+            event_type: Some("user.signup".to_string()),
+            created_at: chrono::Utc::now(),
+            attempt_count: 0,
+        };
+        let json = serde_json::to_value(&d).unwrap();
+        let json_str = json.to_string();
+        let from_json: serde_json::Value = serde_json::from_str(&json_str).unwrap();
+        assert_eq!(from_json["event"], "user.signup");
+    }
