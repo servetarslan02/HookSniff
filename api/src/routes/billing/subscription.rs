@@ -98,7 +98,7 @@ pub async fn cancel_subscription(
 // ──────────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
-struct UpgradeRequest {
+pub(crate) struct UpgradeRequest {
     plan: String,
     /// Payment provider: "stripe", "polar", or "iyzico"
     /// If not specified, uses the customer's existing provider or defaults to Stripe.
@@ -110,7 +110,7 @@ struct UpgradeRequest {
 }
 
 #[derive(Debug, Serialize)]
-struct UpgradeResponse {
+pub(crate) struct UpgradeResponse {
     checkout_url: Option<String>,
     provider: String,
     message: String,
@@ -355,9 +355,5 @@ pub async fn upgrade_plan(
     }))
 }
 
-// ──────────────────────────────────────────────────────────────
-// POST /v1/billing/portal — Open customer portal
-// ──────────────────────────────────────────────────────────────
-
-#[derive(Serialize)]
+// Portal routes are in billing/portal.rs
 
