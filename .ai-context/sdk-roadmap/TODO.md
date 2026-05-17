@@ -1,13 +1,12 @@
 # SDK — Yapılacak İşler
 
-> Son güncelleme: 2026-05-18 05:55 GMT+8
+> Son güncelleme: 2026-05-18 06:26 GMT+8
 
 ---
 
 ## ⚠️ ÖNEMLİ KURAL
 
 **ASLA sıfırdan SDK yazma!** Svix SDK'yı kopyala, yeniden adlandır, adapte et.
-Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 
 ---
 
@@ -17,44 +16,41 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 |-----|--------|-------|-------|
 | ✅ | SDK Adaptasyonu (11 dil) | Tamamlandı | %100 |
 | ✅ | Live Publish (11/11 SDK) | Tamamlandı | %100 |
-| ✅ | Faz 8-10 Yeni Özellikler | Tamamlandı | %100 |
-| ⏳ | Test Coverage Artırma | Beklemede | — |
-| ⏳ | Faz 11-15 Yeni Özellikler | Beklemede | — |
+| ✅ | Faz 8-13 Yeni Özellikler | Tamamlandı | %100 |
+| ⏳ | Cloud Build Deploy | Beklemede | — |
+| ⏳ | Faz 14-15 | Beklemede | — |
 
 ---
 
 ## 🟢 Yeni Özellikler
 
-> Detaylar: NEW-FEATURES-PLAN.md
-
 | # | Özellik | Zorluk | Süre | Durum |
 |---|---------|--------|------|-------|
-| 1 | Environment (dev/staging/prod) | Orta | 4-6 saat | ✅ |
+| 1 | Environment | Orta | 4-6 saat | ✅ |
 | 2 | Background Task | Orta | 3-4 saat | ✅ |
-| 3 | Operational Webhook | Orta | 3-4 saat | ✅ TAMAM |
-| 4 | Message Poller | Orta | 3-4 saat | ⬜ SIRADAKİ |
-| 5 | Ingest (inbound webhook) | Zor | 8-10 saat | ⬜ |
-| 6 | Connector (Shopify,Stripe...) | Çok zor | 20+ saat | ⬜ |
-| 7 | Integration | Zor | 10-15 saat | ⬜ |
+| 3 | Operational Webhook | Orta | 3-4 saat | ✅ |
+| 4 | Message Poller | Orta | 3-4 saat | ✅ |
+| 5 | Ingest (inbound webhook) | Zor | 8-10 saat | ✅ |
+| 6 | Connector (8 servis) | Orta | 4-5 saat | ✅ |
+| 7 | Integration | Zor | 10-15 saat | ⬜ SIRADAKİ |
 | 8 | Streaming (SSE/WebSocket) | Çok zor | 15-20 saat | ⬜ |
-
-**Bağımlılık sırası:** 1→2→3, 5→6→7, 4 ve 8 bağımsız
 
 ---
 
-## ✅ Faz 10 — Operational Webhook (TAMAMLANDI)
+## ⚠️ Acil: Cloud Build Deploy
+
+Connectors API'si Cloud Run'da 404 döndürüyor. Cloud Build tetiklenmeli.
+DB tabloları ve seed data hazır, sadece API deploy gerekli.
+
+---
+
+## ✅ Faz 13 — Connector (TAMAMLANDI)
 
 ### Yapılan:
-1. Migration: `operational_webhook_endpoints` tablosu ✅
-2. Migration: `operational_webhook_deliveries` tablosu ✅
-3. Rust API: CRUD + delivery log ✅
+1. Migration 062: `connectors` + `connector_configs` tabloları ✅
+2. 8 connector seed: Stripe, Shopify, GitHub, Slack, Twilio, Discord, Linear, Notion ✅
+3. Rust API: CRUD (list, get, create, update, delete) ✅
 4. Dashboard sayfası ✅
-5. SDK güncellemesi (11 dil) ✅
-6. **Worker event dispatch** ✅
-   - `worker/src/operational_webhook.rs` — yeni modül
-   - `delivery.failed` — dead-letter olaylarında tetiklenir
-   - `endpoint.disabled` — failure_streak eşiklerinde (5, 10, 20, 50)
-   - Zombie reaper entegrasyonu
-   - Standard Webhooks HMAC-SHA256 signing
-   - Event type filtering
-   - Delivery recording
+5. SDK'lar (11/11) ✅
+6. Sidebar nav: 🔌 ✅
+7. i18n: en + tr ✅

@@ -1,40 +1,62 @@
 # SDK Durum Tablosu
 
-> Son güncelleme: 2026-05-18 04:43 GMT+8
+> Son güncelleme: 2026-05-18 06:26 GMT+8
 
 ## Genel Bakış
 
-| # | SDK | Dil | Yöntem | Versiyon | Ayrı Repo | Registry | Durum |
-|---|-----|-----|--------|----------|-----------|----------|-------|
-| 1 | **Node.js** | TypeScript | Svix'ten adapte | 1.0.0 | ✅ hooksniff-node | npm | ✅ Yüklendi |
-| 2 | **Python** | Python | Svix SDK doğrudan | 1.0.0 | ✅ hooksniff-python | PyPI | ✅ Yüklendi |
-| 3 | **Go** | Go | Svix SDK doğrudan | 1.0.0 | ✅ hooksniff-go | GitHub tag | ✅ Tag atıldı |
-| 4 | **Rust** | Rust | Svix'ten temiz adapte | 1.0.0 | ✅ hooksniff-rust | crates.io | ✅ Yüklendi |
-| 5 | **Ruby** | Ruby | Svix'ten adapte | 1.0.0 | ✅ hooksniff-ruby | RubyGems | ✅ Yüklendi |
-| 6 | **Java** | Java | Svix'ten temiz adapte | 1.0.0 | ✅ hooksniff-java | Maven Central | ✅ Yüklendi |
-| 7 | **Kotlin** | Kotlin | Svix'ten adapte | 1.0.0 | ✅ hooksniff-kotlin | Maven Central | ✅ Yüklendi |
-| 8 | **PHP** | PHP | Svix'ten adapte | 1.0.0 | ✅ hooksniff-php | Packagist | ✅ Tetiklendi |
-| 9 | **C#** | C# | Svix'ten adapte | 1.0.0 | ✅ hooksniff-csharp | NuGet | ✅ Yüklendi |
-| 10 | **Elixir** | Elixir | OpenAPI'den adapte | 1.0.0 | ✅ hooksniff-elixir | Hex.pm | ✅ Yüklendi |
-| 11 | **Swift** | Swift | HookSniff custom | 1.0.0 | ✅ hooksniff-swift | GitHub tag | ✅ Tag atıldı |
+| # | SDK | Dil | Versiyon | Registry | Durum |
+|---|-----|-----|----------|----------|-------|
+| 1 | **Node.js** | TypeScript | 1.0.0 | npm | ✅ |
+| 2 | **Python** | Python | 1.0.0 | PyPI | ✅ |
+| 3 | **Go** | Go | 1.0.0 | GitHub tag | ✅ |
+| 4 | **Rust** | Rust | 1.0.0 | crates.io | ✅ |
+| 5 | **Ruby** | Ruby | 1.0.0 | RubyGems | ✅ |
+| 6 | **Java** | Java | 1.0.0 | Maven Central | ✅ |
+| 7 | **Kotlin** | Kotlin | 1.0.0 | Maven Central | ✅ |
+| 8 | **PHP** | PHP | 1.0.0 | Packagist | ✅ |
+| 9 | **C#** | C# | 1.0.0 | NuGet | ✅ |
+| 10 | **Elixir** | Elixir | 1.0.0 | Hex.pm | ✅ |
+| 11 | **Swift** | Swift | 1.0.0 | GitHub tag | ✅ |
 
-## Resource Mapping (Svix → HookSniff)
+## SDK Resource'lar (Tüm Dillerde Mevcut)
 
-| Svix Resource | HookSniff Resource | Durum |
-|---------------|-------------------|-------|
-| Application | Endpoint (HookSniff endpoint kullanıyor) | ✅ |
-| Authentication | Authentication | ✅ |
-| Endpoint | Endpoint | ✅ |
-| EventType | EventType | ✅ |
-| Health | Health | ✅ |
-| Message | Message | ✅ |
-| MessageAttempt | MessageAttempt | ✅ |
-| Statistics | Statistics | ✅ |
-| BackgroundTask | — (kaldırıldı) | ❌ |
-| Connector | — (kaldırıldı) | ❌ |
-| Environment | — (kaldırıldı) | ❌ |
-| Ingest | — (kaldırıldı) | ❌ |
-| Integration | — (kaldırıldı) | ❌ |
-| OperationalWebhook | — (kaldırıldı) | ❌ |
-| Streaming | — (kaldırıldı) | ❌ |
-| MessagePoller | — (kaldırıldı) | ❌ |
+| Resource | API | Durum |
+|----------|-----|-------|
+| Authentication | /v1/auth | ✅ |
+| Endpoint | /v1/endpoints | ✅ |
+| EventType | /v1/event-type | ✅ |
+| Health | /v1/health | ✅ |
+| Message | /v1/webhooks | ✅ |
+| MessageAttempt | /v1/webhooks/{id}/attempts | ✅ |
+| Statistics | /v1/stats | ✅ |
+| Environment | /v1/environments | ✅ |
+| BackgroundTask | /v1/background-tasks | ✅ |
+| OperationalWebhook | /v1/operational-webhooks | ✅ |
+| MessagePoller | /v1/message-poller | ✅ |
+| Inbound | /v1/inbound | ✅ |
+| Connector | /v1/connectors | ✅ |
+
+## Dashboard Sayfaları
+
+| Sayfa | URL | Durum |
+|-------|-----|-------|
+| Environments | /environments | ✅ |
+| Background Tasks | /background-tasks | ✅ |
+| Operational Webhooks | /operational-webhooks | ✅ |
+| Message Poller | /message-poller | ✅ |
+| Inbound Webhooks | /inbound | ✅ |
+| Connectors | /connectors | ✅ |
+
+## DB Tabloları
+
+| Tablo | Durum |
+|-------|-------|
+| environments | ✅ |
+| environment_variables | ✅ |
+| background_tasks | ✅ |
+| operational_webhook_endpoints | ✅ |
+| operational_webhook_deliveries | ✅ |
+| message_cursors | ✅ |
+| inbound_configs | ✅ |
+| connectors | ✅ (8 seed) |
+| connector_configs | ✅ |
