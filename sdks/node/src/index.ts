@@ -1,5 +1,6 @@
 import { Authentication } from "./api/authentication";
 import { Endpoint } from "./api/endpoint";
+import { Environment } from "./api/environment";
 import { EventType } from "./api/eventType";
 import { Health } from "./api/health";
 import { Message } from "./api/message";
@@ -81,6 +82,10 @@ export class HookSniff {
 
   public get endpoint() {
     return new Endpoint(this.requestCtx);
+  }
+
+  public get environment() {
+    return new Environment(this.requestCtx);
   }
 
   public get eventType() {
