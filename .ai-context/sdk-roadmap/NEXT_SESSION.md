@@ -1,25 +1,47 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-18 04:43 GMT+8
+> Son güncelleme: 2026-05-18 05:00 GMT+8
+> Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
-## 🎯 Sıradaki: Yeni Özellikler (Faz 8-15)
+## 🎯 Sıradaki: Faz 9 — Background Task
 
-11/11 SDK v1.0.0 olarak yayınlandı ve temizlendi. Sıradaki:
+Faz 8 (Environment) tamamlandı. Sıradaki büyük özellik: Background Task.
 
-### Faz 8 — Environment (4-6 saat)
-- [ ] Migration: `environments` tablosu
-- [ ] Migration: `environment_variables` tablosu
-- [ ] Rust API: CRUD endpointleri
-- [ ] SDK güncellemesi (11 dil)
-- [ ] Dashboard UI
+### Hızlı Başlangıç:
+```bash
+git pull origin main
+cat .ai-context/sdk-roadmap/MEMORY.md
+```
 
-### Faz 9 — Background Task (3-4 saat)
-### Faz 10 — Operational Webhook (3-4 saat)
-### Faz 11 — Message Poller (3-4 saat)
-### Faz 12-15 — Ingest, Connector, Integration, Streaming
+### Faz 9 — Background Task Adımları:
+1. Migration: `background_tasks` tablosu (id, status, task_type, data, result, created_at, finished_at)
+2. Rust API: List, get, cancel endpoint'leri
+3. Worker: Task execution logic
+4. SDK güncellemesi (11 dil)
 
 ## 📊 Mevcut Durum
-- 11/11 SDK: v1.0.0, yayında, derleniyor
-- Svix-specific kod: tamamen temizlendi
-- Build ortamı: JDK 17 + Rust 1.95.0 kurulu
-- GPG key: yeni key oluşturuldu (FC5EA3BE171950ED5B42B44948FA192D3997BF0E)
+
+- 11/11 SDK: v1.0.0, yayında
+- Faz 8 (Environment): ✅ Tamamlandı
+  - Migration'lar: 056_environments.sql, 057_environment_variables.sql
+  - Rust API: Full CRUD + variables + bulk upsert
+  - 11/11 SDK güncellendi
+- Sıradaki: Faz 9 (Background Task)
+
+## 📝 Faz 8 Tamamlanan İşler
+
+- `environments` tablosu (per-customer, slug, color, is_default)
+- `environment_variables` tablosu (key-value, is_secret flag)
+- Rust model: Environment, EnvironmentVariable
+- Rust routes: /environments (CRUD + variables + bulk upsert)
+- Node.js SDK: Environment API + models
+- Python SDK: Environment + EnvironmentAsync + models
+- Go SDK: Environment struct + models
+- Rust SDK: Environment struct + models
+- Ruby SDK: Environment class
+- Java SDK: Environment class + models
+- Kotlin SDK: Environment class + models
+- PHP SDK: Environment class
+- C# SDK: Environment class
+- Elixir SDK: Environments module
+- Swift SDK: EnvironmentsResource class
