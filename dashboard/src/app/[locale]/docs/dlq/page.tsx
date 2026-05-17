@@ -42,7 +42,7 @@ export default function DlqPage() {
           A delivery is moved to the DLQ when:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>All retry attempts have been exhausted (default: 6 attempts)</li>
+          <li>All retry attempts have been exhausted (default: 3 attempts, configurable per endpoint)</li>
           <li>{t("endpointDisabled")}</li>
           <li>The delivery has been pending for too long (stale delivery timeout)</li>
         </ul>
@@ -76,14 +76,11 @@ export default function DlqPage() {
   "endpoint_id": "ep_abc123",
   "event": "order.created",
   "status": "failed",
-  "attempt_count": 6,
+  "attempt_count": 3,
   "attempts": [
     { "attempt": 1, "status": 500, "error": "Internal Server Error", "timestamp": "2026-01-15T10:30:00Z" },
-    { "attempt": 2, "status": 500, "error": "Internal Server Error", "timestamp": "2026-01-15T10:30:10Z" },
-    { "attempt": 3, "status": 500, "error": "Internal Server Error", "timestamp": "2026-01-15T10:30:40Z" },
-    { "attempt": 4, "status": 500, "error": "Internal Server Error", "timestamp": "2026-01-15T10:32:40Z" },
-    { "attempt": 5, "status": 500, "error": "Internal Server Error", "timestamp": "2026-01-15T10:42:40Z" },
-    { "attempt": 6, "status": 500, "error": "Internal Server Error", "timestamp": "2026-01-15T11:12:40Z" }
+    { "attempt": 2, "status": 500, "error": "Internal Server Error", "timestamp": "2026-01-15T10:30:01Z" },
+    { "attempt": 3, "status": 500, "error": "Internal Server Error", "timestamp": "2026-01-15T10:30:03Z" }
   ],
   "payload": { "order_id": "12345", "total": 99.99 },
   "created_at": "2026-01-15T10:30:00Z"
@@ -125,8 +122,8 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
             <tbody className="divide-y divide-gray-200">
               <tr><td className="px-4 py-3">{t("developer")}</td><td className="px-4 py-3">7 days</td><td className="px-4 py-3">100</td></tr>
               <tr><td className="px-4 py-3">{t("startup")}</td><td className="px-4 py-3">14 days</td><td className="px-4 py-3">1,000</td></tr>
-              <tr><td className="px-4 py-3">{t("pro")}</td><td className="px-4 py-3">30 days</td><td className="px-4 py-3">5,000</td></tr>
-              <tr><td className="px-4 py-3">{t("enterprise")}</td><td className="px-4 py-3">Custom</td><td className="px-4 py-3">Custom</td></tr>
+              <tr><td className="px-4 py-3">{t("pro")}</td><td className="px-4 py-3">180 days</td><td className="px-4 py-3">5,000</td></tr>
+              <tr><td className="px-4 py-3">{t("enterprise")}</td><td className="px-4 py-3">365 days</td><td className="px-4 py-3">Custom</td></tr>
             </tbody>
           </table></div>
         </div>
