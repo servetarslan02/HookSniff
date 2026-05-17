@@ -261,4 +261,3 @@ pub async fn update_overage_settings(
 /// Maximum billing webhook attempts per IP per minute.
 const BILLING_WEBHOOK_RATE_LIMIT: u32 = 30;
 
-/// POST /v1/billing/webhook — Stripe webhook handler
