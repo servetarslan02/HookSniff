@@ -173,16 +173,6 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
           </div>
         )}
 
-        {/* Limits */}
-        <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
-          <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('planLimits')}</p>
-          <div className="space-y-1 text-sm text-gray-700 dark:text-slate-300">
-            <p>{sub.endpoint_limit} {t('endpoints')}</p>
-            <p>{sub.webhook_limit.toLocaleString()} {t('webhooksMonth')}</p>
-            <p>{sub.retention_days}d {t('dataRetention')}</p>
-          </div>
-        </div>
-
         {/* Subscription ID (debug) */}
         {(sub.stripe_subscription_id || sub.polar_subscription_id || sub.iyzico_subscription_id) && (
           <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
