@@ -39,6 +39,11 @@ namespace HookSniff
             get => new Statistics(this);
         }
 
+        public Environment Environment
+        {
+            get => new Environment(this);
+        }
+
         public ILogger? Logger { get; }
 
         public HookSniffHttpClient HookSniffHttpClient;
