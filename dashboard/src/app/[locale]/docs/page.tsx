@@ -36,6 +36,16 @@ export default function DocsPage() {
           { title: '⚡ Rate Limiting', desc: 'Request limits, throttling, and plan quotas.', href: '/docs/rate-limiting' },
           { title: '📦 SDKs', desc: 'Official Node.js, Python, Go, and 8 more SDKs.', href: '/docs/sdk-libraries' },
           { title: '🐛 Error Codes', desc: 'API error codes reference and troubleshooting.', href: '/docs/error-codes' },
+          { title: '🔧 Troubleshooting', desc: 'Common issues and how to fix them.', href: '/docs/troubleshooting' },
+          { title: '🔍 Debug Failed Webhooks', desc: 'How to investigate delivery failures.', href: '/docs/debug-failed-webhooks' },
+          { title: '📊 Monitor Performance', desc: 'Metrics, alerts, and Grafana integration.', href: '/docs/monitor-performance' },
+          { title: '⚙️ Configuration', desc: 'All environment variables and config options.', href: '/docs/configuration' },
+          { title: '🏗️ Build Stripe-like Webhooks', desc: 'Step-by-step guide to production webhooks.', href: '/docs/build-stripe-like' },
+          { title: '📡 Event Processing', desc: 'How HookSniff processes events end-to-end.', href: '/docs/event-processing' },
+          { title: '🔄 Webhook vs Polling', desc: 'When to use each approach.', href: '/docs/webhook-vs-polling' },
+          { title: '✅ Delivery Guarantees', desc: 'At-least-once delivery and idempotency.', href: '/docs/delivery-guarantees' },
+          { title: '🏢 Multi-Tenant', desc: 'Build multi-tenant webhook systems.', href: '/docs/multi-tenant' },
+          { title: '🛡️ Error Handling', desc: 'Handle webhook errors gracefully.', href: '/docs/error-handling' },
         ].map((card) => (
           <Link
             key={card.href}
