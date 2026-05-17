@@ -821,7 +821,7 @@ async fn handle_polar_webhook(
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Polar.sh not configured")))?;
 
     let provider = crate::billing::polar::PolarProvider::new(config);
-    let result = provider.handle_webhook(&headers, &body).await?;
+    let result = provider.handle_webhook(&headers, &body, &pool).await?;
 
     process_webhook_result(&pool, &result, "polar").await?;
 
@@ -871,7 +871,7 @@ async fn handle_iyzico_webhook(
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("iyzico not configured")))?;
 
     let provider = crate::billing::iyzico::IyzicoProvider::new(config);
-    let result = provider.handle_webhook(&headers, &body).await?;
+    let result = provider.handle_webhook(&headers, &body, &pool).await?;
 
     process_webhook_result(&pool, &result, "iyzico").await?;
 
