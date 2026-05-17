@@ -1,78 +1,79 @@
 """
-HookSniff Pagination Utilities
+HookSniff SDK — Auto-pagination
 
-Provides async-like pagination for list endpoints.
-Python equivalent of Node.js pagination.ts.
+Provides automatic pagination over list endpoints.
+
+Usage:
+    for ep in hs.endpoints.list_all():
+        print(ep["url"])
 """
 
-from typing import Any, Callable, Dict, Generator, Generic, List, Optional, TypeVar
+from __future__ import annotations
+
+from typing import Any, Callable, Generator, Generic, Optional, TypeVar
 
 T = TypeVar("T")
 
 
 class Page(Generic[T]):
-    """A single page of results."""
+    """Represents a single page of results."""
 
-    def __init__(self, data: List[T], has_more: bool):
+    def __init__(self, data: list[T], iterator: str | None = None, done: bool = False):
         self.data = data
-        self.has_more = has_more
+        self.iterator = iterator
+        self.done = done
 
 
 def paginate(
-    fetch_page: Callable[[int, int], Page[T]],
-    limit: int = 50,
-    max_pages: int = 100,
-) -> Generator[T, None, None]:
+    fetch_page: Callable[..., dict[str, Any]],
+    limit: int | None = None,
+    iterator: str | None = None,
+) -> Generator[dict[str, Any], None, None]:
     """
-    Iterate through all items using offset-based pagination.
+    Auto-paginate through all items from a list endpoint.
 
     Args:
-        fetch_page: Function that takes (limit, offset) and returns a Page.
-        limit: Number of items per page (default: 50).
-        max_pages: Maximum number of pages to fetch (safety limit).
+        fetch_page: Function that fetches a single page
+        limit: Items per page
+        iterator: Starting iterator
 
     Yields:
-        Individual items from all pages.
-
-    Example:
-        for endpoint in paginate(lambda l, o: client.endpoints.list(limit=l, offset=o)):
-            print(endpoint)
+        Individual items from all pages
     """
-    offset = 0
-    pages_fetched = 0
+    current_iterator = iterator
+    done = False
 
-    while pages_fetched < max_pages:
-        page = fetch_page(limit, offset)
+    while not done:
+        params: dict[str, Any] = {}
+        if limit is not None:
+            params["limit"] = limit
+        if current_iterator is not None:
+            params["iterator"] = current_iterator
 
-        # Safety: avoid infinite loop on empty pages with has_more=True
-        if not page.data:
-            break
+        response = fetch_page(**params)
+        data = response.get("data", [])
 
-        for item in page.data:
+        for item in data:
             yield item
 
-        if not page.has_more:
-            break
-
-        # Advance by actual items received (not limit) — matches Node.js behavior
-        offset += len(page.data)
-        pages_fetched += 1
+        if response.get("done") is True or not response.get("iterator") or not data:
+            done = True
+        else:
+            current_iterator = response["iterator"]
 
 
 def collect_all(
-    fetch_page: Callable[[int, int], Page[T]],
-    limit: int = 50,
-    max_pages: int = 100,
-) -> List[T]:
+    fetch_page: Callable[..., dict[str, Any]],
+    limit: int | None = None,
+) -> list[dict[str, Any]]:
     """
-    Collect all items into a list.
+    Collect all items from a paginated endpoint into a list.
 
     Args:
-        fetch_page: Function that takes (limit, offset) and returns a Page.
-        limit: Number of items per page (default: 50).
-        max_pages: Maximum number of pages to fetch.
+        fetch_page: Function that fetches a single page
+        limit: Items per page
 
     Returns:
-        List of all items.
+        List of all items
     """
-    return list(paginate(fetch_page, limit, max_pages))
+    return list(paginate(fetch_page, limit=limit))

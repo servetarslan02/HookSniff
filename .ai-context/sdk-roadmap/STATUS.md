@@ -1,13 +1,13 @@
 # SDK Durum Tablosu
 
-> Son güncelleme: 2026-05-17 22:06 GMT+8
+> Son güncelleme: 2026-05-17 23:04 GMT+8
 
 ## Genel Bakış
 
 | # | SDK | Dil | Yöntem | Versiyon | Kalite | Durum |
 |---|-----|-----|--------|----------|--------|-------|
 | 1 | **Node.js** | TypeScript | el yapımı | 0.5.0 | %70-75 | ✅ Yeniden yazıldı |
-| 2 | Python | Python | OpenAPI auto-gen | 0.3.0 | %20-25 | ⬜ Yeniden yazılacak |
+| 2 | **Python** | Python | el yapımı | 0.5.0 | %70-75 | ✅ Yeniden yazıldı |
 | 3 | Go | Go | OpenAPI auto-gen | 0.3.0 | %20-25 | ⬜ Yeniden yazılacak |
 | 4 | Rust | Rust | OpenAPI auto-gen | 0.4.0 | %20-25 | ⬜ Yeniden yazılacak |
 | 5 | Ruby | Ruby | OpenAPI auto-gen | 0.3.0 | %20-25 | ⬜ Beklemede |
@@ -19,7 +19,7 @@
 | 11 | Elixir | Elixir | OpenAPI auto-gen | 1.0.0 | %20-25 | ⬜ Beklemede |
 
 ## Hedef Kalite Skoru
-- **%70+** → el yapımı (Node.js seviyesi)
+- **%70+** → el yapımı (Node.js/Python seviyesi)
 - **%85+** → + Test suite + CI/CD + Publish otomasyonu
 - **%90+** → + Dokümantasyon site + Example'lar + Edge case'ler
 
@@ -27,7 +27,7 @@
 | SDK | Registry | URL | Yayınlandı mı? |
 |-----|----------|-----|----------------|
 | Node.js | npm | npmjs.com/package/hooksniff-sdk | ✅ (0.3.0, 0.5.0 publish edilecek) |
-| Python | PyPI | pypi.org/project/hooksniff | ✅ (0.3.0) |
+| Python | PyPI | pypi.org/project/hooksniff | ✅ (0.3.0, 0.5.0 publish edilecek) |
 | Go | proxy.golang.org | github.com/servetarslan02/hooksniff-go | ✅ (v0.3.0) |
 | Rust | crates.io | crates.io/crates/hooksniff | ✅ (0.4.0) |
 | Ruby | RubyGems | rubygems.org/gems/hooksniff | ✅ (0.3.0, 183 indirme) |

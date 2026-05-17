@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-17 21:44 GMT+8 (Oturum — Lazy + Prefetch)
+> Son güncelleme: 2026-05-17 23:04 GMT+8 (Oturum — Python SDK Rewrite)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -28,11 +28,23 @@ Bu dosyayı ilk kez okuyorsan:
 8. **Commit** — bdf6df61
 9. **`.ai-context/sdk-roadmap/`** — STATUS.md, DONE.md, TODO.md, PLAN.md oluşturuldu
 
+### Python SDK Yeniden Yazım ✅ (2026-05-17 23:04)
+1. **Svix tabanlı mimari** — OpenAPI Generator boilerplace kaldırıldı, el yapımı SDK
+2. **12 resource** — endpoints, webhooks, auth, apiKeys, teams, alerts, analytics, billing, health, search, notifications, admin
+3. **80+ Python type** — dataclass tabanlı, OpenAPI spec'ten
+4. **Özellikler** — retry+backoff, auto-idempotency, auto-pagination, webhook verify, debug logging
+5. **Versiyon** — 0.3.0 → 0.5.0
+6. **Kalite** — %20-25 → %70-75
+7. **Test** — 19 test, tümü geçiyor (webhook, request, pagination, client, exceptions)
+8. **Paketleme** — pyproject.toml (hatchling), zero dependencies
+9. **Temizlik** — Eski OpenAPI Generator dosyaları kaldırıldı (pydantic, 150+ auto-gen model)
+
 ### Sıradaki (SDK Roadmap)
-- 🔴 Node.js 0.5.0 npm publish
-- 🟡 Python SDK rewrite (Svix Python core'dan adapte)
-- 🟡 Go SDK rewrite
+- ✅ Node.js 0.5.0 rewrite
+- ✅ Python 0.5.0 rewrite
+- 🔴 Go SDK rewrite (Svix Go core'dan adapte)
 - 🟡 Rust SDK rewrite
+- 🟡 Kalan 7 SDK (Ruby, Java, Kotlin, PHP, C#, Swift, Elixir)
 - 🟢 Test suite + CI/CD
 - Detay: `.ai-context/sdk-roadmap/TODO.md`
 

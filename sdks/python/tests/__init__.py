@@ -1,1 +1,1 @@
-# HookSniff Python SDK tests
+# tests package
