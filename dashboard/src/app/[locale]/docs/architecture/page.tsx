@@ -16,8 +16,11 @@ export default function ArchitecturePage() {
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("architecture")}</h1>
-      <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        How HookSniff works under the hood — system components, data flow, and technology choices.
+      <p className="text-lg text-gray-600 dark:text-slate-400 mb-4">
+        Understanding the architecture helps you debug issues, plan capacity, and make informed decisions about self-hosting.
+      </p>
+      <p className="text-gray-600 dark:text-slate-400 mb-8">
+        HookSniff is built with Rust for performance and reliability. The API handles ingestion, the worker handles delivery, and PostgreSQL handles both storage and queuing.
       </p>
 
       {/* System Overview */}
