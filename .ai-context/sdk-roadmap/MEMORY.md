@@ -1,6 +1,6 @@
 # SDK Roadmap MEMORY
 
-> Son güncelleme: 2026-05-18 00:08 GMT+8
+> Son güncelleme: 2026-05-18 01:10 GMT+8
 
 ## ⚠️ KRİTİK: SDK Adaptasyon Yöntemi
 
@@ -65,8 +65,8 @@ sdks/python/
 - Ruby: ✅ Svix'ten adapte edildi (1.0.0, 74 dosya, 48 model)
 - Java: ✅ Svix'ten adapte edildi (1.0.0, 158 dosya, 104 model)
 - Kotlin: ✅ Svix'ten adapte edildi (1.0.0, 131 dosya, 103 model)
-- PHP: ⬜ Sıradaki
-- C#: ⬜
+- PHP: ✅ Svix'ten adapte edildi (1.0.0, 89 dosya, ~50 model)
+- C#: ⬜ Sıradaki
 - Swift: ⬜
 - Elixir: ⬜
 

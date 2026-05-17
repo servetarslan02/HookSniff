@@ -1,6 +1,6 @@
 # SDK Durum Tablosu
 
-> Son güncelleme: 2026-05-18 00:08 GMT+8
+> Son güncelleme: 2026-05-18 01:10 GMT+8
 
 ## Genel Bakış
 
@@ -13,7 +13,7 @@
 | 5 | **Ruby** | Ruby | Svix'ten adapte | 1.0.0 | 74 | 48 | ✅ |
 | 6 | **Java** | Java | Svix'ten adapte | 1.0.0 | 158 | 104 | ✅ |
 | 7 | **Kotlin** | Kotlin | Svix'ten adapte | 1.0.0 | 131 | 103 | ✅ |
-| 8 | PHP | PHP | Svix'ten adapte | — | — | — | ⬜ |
+| 8 | **PHP** | PHP | Svix'ten adapte | 1.0.0 | 89 | ~50 | ✅ |
 | 9 | C# | C# | Svix'ten adapte | — | — | — | ⬜ |
 | 10 | Swift | Swift | Svix'ten adapte | — | — | — | ⬜ |
 | 11 | Elixir | Elixir | Svix'ten adapte | — | — | — | ⬜ |
