@@ -9,6 +9,7 @@ import { AuthGuard } from '@/components/AuthGuard';
 import { NotificationCenter } from '@/components/NotificationCenter';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { PrefetchLink } from '@/components/PrefetchLink';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
@@ -132,9 +133,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                   {section.items.map((item) => {
                     const isActive = cleanPath === item.href || cleanPath.startsWith(item.href + '/');
                     return (
-                      <Link
+                      <PrefetchLink
                         key={item.href}
                         href={item.href}
+                        hoverDelay={80}
                         className={clsx(
                           'flex items-center px-3 py-2 text-sm rounded-lg transition-colors',
                           isActive
@@ -145,7 +147,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                       >
                         <span className="mr-3">{item.icon}</span>
                         {item.name}
-                      </Link>
+                      </PrefetchLink>
                     );
                   })}
                 </div>

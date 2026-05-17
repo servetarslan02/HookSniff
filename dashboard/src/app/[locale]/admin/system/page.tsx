@@ -1,6 +1,6 @@
 'use client';
 
-import { LazySection } from '@/components/LazySection';
+import { LazySection, Skeletons } from '@/components/LazySection';
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useToast } from '@/components/Toast';
@@ -288,7 +288,8 @@ export default function AdminSystemPage() {
         </div>
       </div>
 
-      {/* Service Cards */}
+      {/* Service Cards — below the fold, lazy loaded */}
+      <LazySection fallback={<Skeletons.statCards />} rootMargin={400}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {services.map((service) => {
           const colors = statusColor(service.status);
@@ -329,8 +330,10 @@ export default function AdminSystemPage() {
           );
         })}
       </div>
+      </LazySection>
 
-      {/* DB Size + Queue Details */}
+      {/* DB Size + Queue Details — lazy loaded */}
+      <LazySection fallback={Skeletons.card} rootMargin={300}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {health?.checks?.db_size?.size && (
           <div className="glass-card p-6">
@@ -361,8 +364,10 @@ export default function AdminSystemPage() {
           </div>
         )}
       </div>
+      </LazySection>
 
-      {/* Recent Error Logs */}
+      {/* Recent Error Logs — lazy loaded */}
+      <LazySection fallback={Skeletons.table()} rootMargin={300}>
       {health?.checks?.recent_errors?.errors && health.checks.recent_errors.errors.length > 0 && (
         <div className="glass-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
@@ -385,8 +390,10 @@ export default function AdminSystemPage() {
           </div>
         </div>
       )}
+      </LazySection>
 
-      {/* Infrastructure */}
+      {/* Infrastructure — lazy loaded */}
+      <LazySection fallback={Skeletons.card} rootMargin={200}>
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('infrastructure')}</h2>
@@ -406,8 +413,10 @@ export default function AdminSystemPage() {
           ))}
         </div>
       </div>
+      </LazySection>
 
-      {/* Queue Status */}
+      {/* Queue Status — lazy loaded */}
+      <LazySection fallback={Skeletons.card} rootMargin={200}>
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <div>
@@ -441,8 +450,10 @@ export default function AdminSystemPage() {
           <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">{t('noData') || 'No data'}</div>
         )}
       </div>
+      </LazySection>
 
-      {/* Failed Deliveries */}
+      {/* Failed Deliveries — lazy loaded */}
+      <LazySection fallback={Skeletons.table()} rootMargin={200}>
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">❌ {t('failedDeliveries') || 'Failed Deliveries'} (24h)</h2>
@@ -501,8 +512,10 @@ export default function AdminSystemPage() {
           <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">✅ {t('noFailedDeliveries') || 'No failed deliveries in the last 24h'}</div>
         )}
       </div>
+      </LazySection>
 
-      {/* Dead Letters */}
+      {/* Dead Letters — lazy loaded */}
+      <LazySection fallback={Skeletons.table()} rootMargin={200}>
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💀 {t('deadLetters') || 'Dead Letters'}</h2>
@@ -539,8 +552,10 @@ export default function AdminSystemPage() {
           <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">✅ {t('noDeadLetters') || 'No dead letters'}</div>
         )}
       </div>
+      </LazySection>
 
-      {/* Rate Limit Violations */}
+      {/* Rate Limit Violations — lazy loaded */}
+      <LazySection fallback={Skeletons.table()} rootMargin={200}>
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">🚦 {t('rateLimitViolations') || 'Rate Limit Violations'}</h2>
@@ -576,8 +591,10 @@ export default function AdminSystemPage() {
           <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">✅ {t('noViolations') || 'No rate limit violations'}</div>
         )}
       </div>
+      </LazySection>
 
-      {/* API Latency */}
+      {/* API Latency — lazy loaded */}
+      <LazySection fallback={Skeletons.table()} rootMargin={200}>
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">⏱️ {t('apiLatency') || 'API Latency'} (24h)</h2>
@@ -617,8 +634,10 @@ export default function AdminSystemPage() {
           <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">{t('noData') || 'No data'}</div>
         )}
       </div>
+      </LazySection>
 
-      {/* Test Webhook Console */}
+      {/* Test Webhook Console — lazy loaded */}
+      <LazySection fallback={Skeletons.card} rootMargin={200}>
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('testWebhookTitle')}</h2>
@@ -715,6 +734,7 @@ export default function AdminSystemPage() {
           )}
         </div>
       </div>
+      </LazySection>
     </div>
   );
 }
