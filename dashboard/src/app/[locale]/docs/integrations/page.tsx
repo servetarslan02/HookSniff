@@ -58,7 +58,7 @@ function verifyGitHubSignature(payload: string, signature: string, secret: strin
         </p>
         <CodeBlock
           code={`import express from 'express';
-import { HookSniff } from 'hooksniff-sdk';
+import { HookSniff } from 'hooksniff';
 
 const app = express();
 const hr = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });
