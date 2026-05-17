@@ -44,7 +44,7 @@ export default function RateLimitingPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-medium">Developer</td><td className="px-4 py-3">$0</td><td className="px-4 py-3">100</td><td className="px-4 py-3">100/day</td><td className="px-4 py-3">5</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Developer</td><td className="px-4 py-3">$0</td><td className="px-4 py-3">100</td><td className="px-4 py-3">1,000/day</td><td className="px-4 py-3">5</td></tr>
               <tr><td className="px-4 py-3 font-medium">Startup</td><td className="px-4 py-3">$24/mo</td><td className="px-4 py-3">500</td><td className="px-4 py-3">30,000/day</td><td className="px-4 py-3">50</td></tr>
               <tr><td className="px-4 py-3 font-medium">Pro</td><td className="px-4 py-3">$49/mo</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">100,000/day</td><td className="px-4 py-3">500</td></tr>
               <tr><td className="px-4 py-3 font-medium">Enterprise</td><td className="px-4 py-3">$149/mo</td><td className="px-4 py-3">Custom</td><td className="px-4 py-3">Unlimited</td><td className="px-4 py-3">Unlimited</td></tr>

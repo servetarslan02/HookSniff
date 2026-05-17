@@ -7,7 +7,7 @@ import { usePlans } from '@/hooks/usePlans';
 
 const PLAN_FEATURES: Record<string, string[]> = {
   developer: [
-    '100 events/day',
+    '1,000 events/day',
     '1 application',
     '5 endpoints',
     '10 event types',
