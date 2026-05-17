@@ -1517,7 +1517,7 @@ async fn cleanup_expired_retention(pool: &PgPool) -> Result<(i64, i64)> {
             obj.and_then(|o| o.get("retention_days_enterprise")).and_then(|v| v.as_i64()).unwrap_or(90),
         )
     } else {
-        (7, 14, 30, 90)
+        (7, 14, 180, 365)
     };
 
     // Delete deliveries per plan tier

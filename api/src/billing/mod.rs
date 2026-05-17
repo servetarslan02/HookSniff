@@ -168,7 +168,7 @@ impl Plan {
         match self {
             Plan::Developer => 7,
             Plan::Startup => 14,
-            Plan::Pro => 30,
+            Plan::Pro => 180,
             Plan::Enterprise => 365,
         }
     }
