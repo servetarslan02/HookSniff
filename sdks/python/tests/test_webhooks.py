@@ -6,7 +6,7 @@ import hashlib
 from math import floor
 from datetime import datetime, timedelta, timezone
 
-from svix.webhooks import Webhook, WebhookVerificationError
+from hooksniff.webhooks import Webhook, WebhookVerificationError
 
 defaultMsgID = "msg_p5jXN8AQM9LWM0D4loKWxJek"
 defaultPayload = '{"test": 2432232314}'

@@ -1,12 +1,12 @@
-import svix
-from svix.api import MessageListOptions,IngestSourceIn, CronConfig, ApplicationIn, ApplicationCreateOptions
-from svix.api.ingest_source import IngestSource
+import hooksniff
+from hooksniff.api import MessageListOptions,IngestSourceIn, CronConfig, ApplicationIn, ApplicationCreateOptions
+from hooksniff.api.ingest_source import IngestSource
 
 import httpretty
 
 @httpretty.activate(verbose=True, allow_net_connect=False)
 def test_octothorpe_in_query_param():
-    svx = svix.Svix("token",svix.SvixOptions(server_url="http://test.example"))
+    svx = hooksniff.HookSniff("token",hooksniff.HookSniffOptions(server_url="http://test.example"))
     httpretty.register_uri(
         httpretty.GET,
         "http://test.example/api/v1/app/app_id/msg?tag=test%23test",
@@ -16,7 +16,7 @@ def test_octothorpe_in_query_param():
 
 @httpretty.activate(verbose=True, allow_net_connect=False)
 def test_struct_enum_with_fields():
-    svx = svix.Svix("token", svix.SvixOptions(server_url="http://test.example"))
+    svx = hooksniff.HookSniff("token", hooksniff.HookSniffOptions(server_url="http://test.example"))
     ingest_source = IngestSource(svx._client)
     httpretty.register_uri(
         httpretty.POST,
@@ -38,7 +38,7 @@ def test_struct_enum_with_fields():
 
 @httpretty.activate(verbose=True, allow_net_connect=False)
 def test_struct_enum_without_fields():
-    svx = svix.Svix("token", svix.SvixOptions(server_url="http://test.example"))
+    svx = hooksniff.HookSniff("token", hooksniff.HookSniffOptions(server_url="http://test.example"))
     ingest_source = IngestSource(svx._client)
     httpretty.register_uri(
         httpretty.POST,
@@ -54,7 +54,7 @@ def test_struct_enum_without_fields():
 
 @httpretty.activate(verbose=True, allow_net_connect=False)
 def test_idempotency_key_is_sent_for_create_request():
-    svx = svix.Svix("token", svix.SvixOptions(server_url="http://test.example"))
+    svx = hooksniff.HookSniff("token", hooksniff.HookSniffOptions(server_url="http://test.example"))
     httpretty.register_uri(
         httpretty.POST,
         "http://test.example/api/v1/app",
@@ -69,7 +69,7 @@ def test_idempotency_key_is_sent_for_create_request():
 
 @httpretty.activate(verbose=True, allow_net_connect=False)
 def test_client_provided_idempotency_key_is_not_overridden():
-    svx = svix.Svix("token", svix.SvixOptions(server_url="http://test.example"))
+    svx = hooksniff.HookSniff("token", hooksniff.HookSniffOptions(server_url="http://test.example"))
     httpretty.register_uri(
         httpretty.POST,
         "http://test.example/api/v1/app",
@@ -90,7 +90,7 @@ def test_client_provided_idempotency_key_is_not_overridden():
 
 @httpretty.activate(verbose=True, allow_net_connect=False)
 def test_unknown_keys_are_ignored():
-    svx = svix.Svix("token", svix.SvixOptions(server_url="http://test.example"))
+    svx = hooksniff.HookSniff("token", hooksniff.HookSniffOptions(server_url="http://test.example"))
     httpretty.register_uri(
         httpretty.GET,
         "http://test.example/api/v1/app",
