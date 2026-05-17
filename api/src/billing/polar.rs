@@ -98,8 +98,8 @@ impl PolarConfig {
 /// Request to create a checkout session.
 #[derive(Debug, Serialize)]
 struct CreateCheckoutRequest {
-    /// Product IDs to include in the checkout.
-    products: Vec<String>,
+    /// Product ID to include in the checkout.
+    product_id: String,
     /// External customer ID (our customer UUID).
     #[serde(skip_serializing_if = "Option::is_none")]
     external_customer_id: Option<String>,
@@ -295,7 +295,7 @@ impl PaymentProviderImpl for PolarProvider {
         metadata.insert("plan".to_string(), plan.as_str().to_string());
 
         let req_body = CreateCheckoutRequest {
-            products: vec![product_id.to_string()],
+            product_id: product_id.to_string(),
             external_customer_id: Some(customer_id.to_string()),
             customer_email: Some(customer_email.to_string()),
             success_url: Some(format!("{}/dashboard/billing?upgraded=true", app_url)),
@@ -341,6 +341,7 @@ impl PaymentProviderImpl for PolarProvider {
         &self,
         headers: &axum::http::HeaderMap,
         body: &str,
+        pool: &sqlx::PgPool,
     ) -> Result<WebhookResult, AppError> {
         // Verify signature
         let sig_header = headers
