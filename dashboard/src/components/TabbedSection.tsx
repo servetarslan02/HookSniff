@@ -29,6 +29,16 @@ export function TabbedSection({ tabs, defaultTab }: TabbedSectionProps) {
     });
   }, []);
 
+  // Prefetch on hover — start loading tab content before click
+  const handleTabHover = useCallback((key: string) => {
+    setVisited((prev) => {
+      if (prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* Tab Bar */}
@@ -39,6 +49,7 @@ export function TabbedSection({ tabs, defaultTab }: TabbedSectionProps) {
               key={tab.key}
               type="button"
               onClick={() => handleTabClick(tab.key)}
+              onMouseEnter={() => handleTabHover(tab.key)}
               className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 active === tab.key
                   ? 'border-brand-600 text-brand-600 dark:text-brand-400 dark:border-brand-400'
@@ -52,7 +63,7 @@ export function TabbedSection({ tabs, defaultTab }: TabbedSectionProps) {
         </div>
       </div>
 
-      {/* Tab Content — only render tabs that have been visited (lazy) */}
+      {/* Tab Content — render visited tabs, hide inactive ones */}
       {tabs.map((tab) => {
         if (!visited.has(tab.key)) return null;
         const content = typeof tab.content === 'function' ? (tab.content as () => ReactNode)() : tab.content;
