@@ -310,7 +310,7 @@ export function HomeContent() {
     { name: tPricing('developer'), desc: tPricing('developerDesc'), price: '$0', period: tPricing('month'), features: tPricing.raw('developerFeatures') as string[], cta: tPricing('getStarted'), popular: false },
     { name: tPricing('startup'), desc: tPricing('startupDesc'), price: formatPrice('startup', yearly), period: yearly ? tPricing('year') : tPricing('month'), features: tPricing.raw('startupFeatures') as string[], cta: tPricing('getStarted'), popular: false },
     { name: tPricing('pro'), desc: tPricing('proDesc'), price: formatPrice('pro', yearly), period: yearly ? tPricing('year') : tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('getStarted'), popular: true },
-    { name: tPricing('enterprise'), desc: tPricing('enterpriseDesc'), price: formatPrice('enterprise', yearly), period: yearly ? tPricing('year') : tPricing('month'), features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('contactSales'), popular: false },
+    { name: tPricing('enterprise'), desc: tPricing('enterpriseDesc'), price: '$99', period: yearly ? tPricing('year') : tPricing('month'), features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('getStarted'), popular: false },
   ];
 
   return (
@@ -513,9 +513,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
               </ul>
               <button
                 onClick={() => {
-                  if (plan.name === tPricing('enterprise')) {
-                    window.location.href = '/contact';
-                  } else if (token) {
+                  if (token) {
                     router.push('/billing');
                   } else {
                     router.push('/register');
