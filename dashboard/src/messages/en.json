@@ -785,6 +785,7 @@
     "eventsPerDay": "events/day",
     "overagePrice": "Overage Price",
     "perEvent": "per event",
+    "noOverage": "included in plan",
     "overageUpgradeRequired": "Upgrade to a paid plan to enable overage settings.",
     "overageSettingsSaved": "Overage settings saved.",
     "actions": "Actions",

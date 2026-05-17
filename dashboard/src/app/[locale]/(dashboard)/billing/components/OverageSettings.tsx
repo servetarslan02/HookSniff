@@ -128,10 +128,15 @@ export function OverageSettings() {
           <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
             <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('overagePrice')}</p>
             <p className="text-xl font-bold text-gray-900 dark:text-white">
-              ${settings.overage_price.toFixed(4)}
+              {settings.overage_price === 0
+                ? '$0.00'
+                : settings.overage_price < 0.001
+                  ? `$${(settings.overage_price * 1000).toFixed(2)} / 1K`
+                  : `$${settings.overage_price.toFixed(4)}`
+              }
             </p>
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-              {t('perEvent')}
+              {settings.overage_price === 0 ? t('noOverage') : t('perEvent')}
             </p>
           </div>
         </div>
