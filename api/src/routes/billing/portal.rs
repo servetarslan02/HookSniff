@@ -19,7 +19,7 @@ pub async fn open_portal(
 // ──────────────────────────────────────────────────────────────
 
 #[derive(Serialize)]
-struct UsageResponse {
+pub(crate) struct UsageResponse {
     plan: String,
     payment_provider: String,
     webhooks: UsageCounter,
@@ -96,7 +96,7 @@ pub async fn get_usage(
 // ──────────────────────────────────────────────────────────────
 
 #[derive(Serialize)]
-struct InvoiceResponse {
+pub(crate) struct InvoiceResponse {
     id: String,
     date: String,
     amount: f64,
@@ -151,12 +151,12 @@ pub async fn get_invoices(
 // ──────────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
-struct RefundRequest {
+pub(crate) struct RefundRequest {
     reason: String,
 }
 
 #[derive(Serialize)]
-struct RefundResponse {
+pub(crate) struct RefundResponse {
     message: String,
     status: String,
 }
@@ -194,7 +194,7 @@ pub async fn request_refund(
 // ──────────────────────────────────────────────────────────────
 
 #[derive(Serialize, Debug)]
-struct OverageSettingsResponse {
+pub(crate) struct OverageSettingsResponse {
     allow_overage: bool,
     overage_email_notification: bool,
     plan: String,
@@ -218,7 +218,7 @@ pub async fn get_overage_settings(
 }
 
 #[derive(Deserialize, Debug)]
-struct UpdateOverageSettingsRequest {
+pub(crate) struct UpdateOverageSettingsRequest {
     allow_overage: Option<bool>,
     overage_email_notification: Option<bool>,
 }
@@ -254,9 +254,5 @@ pub async fn update_overage_settings(
     }))
 }
 
-// ──────────────────────────────────────────────────────────────
-// Webhook handlers for each provider
-// ──────────────────────────────────────────────────────────────
-
-/// Maximum billing webhook attempts per IP per minute.
+// Webhook handlers are in billing/webhooks.rs
 
