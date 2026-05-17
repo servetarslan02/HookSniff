@@ -44,8 +44,8 @@ export function PlanCards({
 
   const plans = planOrder.map((key) => {
     const apiPlan = getPlan(key);
-    const priceMonthly = apiPlan?.price_monthly ?? (key === 'developer' ? 0 : key === 'startup' ? 14 : key === 'pro' ? 29 : 99);
-    const priceYearly = apiPlan?.price_yearly ?? (key === 'developer' ? 0 : key === 'startup' ? 168 : key === 'pro' ? 278 : 950);
+    const priceMonthly = apiPlan?.price_monthly ?? (key === 'developer' ? 0 : key === 'startup' ? 29 : key === 'pro' ? 49 : 0);
+    const priceYearly = apiPlan?.price_yearly ?? (key === 'developer' ? 0 : key === 'startup' ? 278 : key === 'pro' ? 470 : 0);
     const limits = apiPlan ? {
       endpoints: apiPlan.max_endpoints,
       webhooks: apiPlan.max_webhooks,
