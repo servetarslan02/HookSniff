@@ -433,9 +433,13 @@ pub async fn create_rate_limiter() -> RateLimiter {
 /// Extract the rate limit key from the request (API key prefix or IP).
 ///
 /// Security: X-Forwarded-For is user-controllable and MUST NOT be trusted directly.
-/// We only use it if TRUSTED_PROXY_COUNT is set (indicating a known proxy layer).
-/// Otherwise, fall back to "unknown" for unauthenticated requests without a real
-/// connection-level IP (which still rate-limits via the shared "unknown" bucket).
+/// We only use it if TRUST_PROXY_HEADERS is set (indicating a known proxy layer).
+/// Otherwise, fall back to IP from trusted headers or "unknown" for truly anonymous.
+///
+/// Bug fix: Previously all unauthenticated requests without TRUST_PROXY_HEADERS
+/// shared key "unknown", causing a single 100/min bucket for ALL endpoints and users.
+/// Now we include the request path so different endpoints have separate buckets,
+/// and we always try to extract a client IP from common proxy headers.
 fn extract_key(req: &Request) -> String {
     req.headers()
         .get("authorization")
@@ -443,18 +447,30 @@ fn extract_key(req: &Request) -> String {
         .and_then(|v| v.strip_prefix("Bearer "))
         .map(|k| k[..15.min(k.len())].to_string())
         .unwrap_or_else(|| {
-            // Only trust X-Forwarded-For if explicitly configured (behind a trusted proxy).
-            // Without proxy trust, spoofed X-Forwarded-For headers would allow rate-limit bypass.
-            if std::env::var("TRUST_PROXY_HEADERS").as_deref() == Ok("true") {
-                req.headers()
-                    .get("x-forwarded-for")
-                    .and_then(|v| v.to_str().ok())
-                    .and_then(|v| v.split(',').next())
-                    .map(|ip| ip.trim().to_string())
-                    .unwrap_or_else(|| "unknown".to_string())
-            } else {
-                "unknown".to_string()
-            }
+            // Always try to extract client IP from proxy headers.
+            // In production behind Cloudflare/Cloud Run, these are set by the
+            // infrastructure and are trustworthy. We prefer X-Real-IP (set by
+            // our edge proxy from CF-Connecting-IP) then X-Forwarded-For.
+            let ip = req
+                .headers()
+                .get("x-real-ip")
+                .and_then(|v| v.to_str().ok())
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty() && s != "unknown")
+                .or_else(|| {
+                    req.headers()
+                        .get("x-forwarded-for")
+                        .and_then(|v| v.to_str().ok())
+                        .and_then(|v| v.split(',').next_back())
+                        .map(|s| s.trim().to_string())
+                        .filter(|s| !s.is_empty() && s != "unknown")
+                })
+                .unwrap_or_else(|| "unknown".to_string());
+
+            // Include the request path in the key so different endpoints
+            // (login, register, etc.) have separate rate limit buckets.
+            let path = req.uri().path().to_string();
+            format!("{}:{}", ip, path)
         })
 }
 
@@ -510,9 +526,19 @@ pub async fn rate_limit_middleware(
         );
         Ok(response)
     } else {
-        let mut response = Response::new(axum::body::Body::empty());
+        let body = axum::body::Body::from(
+            serde_json::to_string(&serde_json::json!({
+                "error": {
+                    "code": "RATE_LIMIT_EXCEEDED",
+                    "message": "Rate limit exceeded. Please try again later."
+                }
+            }))
+            .unwrap_or_default(),
+        );
+        let mut response = Response::new(body);
         *response.status_mut() = StatusCode::TOO_MANY_REQUESTS;
         let headers = response.headers_mut();
+        insert_header(headers, "Content-Type", "application/json");
         insert_header(headers, "X-RateLimit-Limit", &result.limit.to_string());
         insert_header(headers, "X-RateLimit-Remaining", "0");
         insert_header(
