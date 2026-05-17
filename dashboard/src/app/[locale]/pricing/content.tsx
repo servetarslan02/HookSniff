@@ -91,17 +91,17 @@ export function PricingPageContent() {
   const tf = useTranslations('pricingFaq');
   const isTr = locale === 'tr';
 
-  const monthlyPrices = { developer: 0, startup: 29, pro: 49, enterprise: 0 };
+  const monthlyPrices = { developer: 0, startup: 29, pro: 49, enterprise: 99 };
   const annualPrices = {
     developer: 0,
     startup: Math.round(29 * 12 * 0.8),
     pro: Math.round(49 * 12 * 0.8),
-    enterprise: 0,
+    enterprise: Math.round(99 * 12 * 0.8),
   };
 
   const getPrice = (plan: string) => {
     if (plan === 'developer') return '$0';
-    if (plan === 'enterprise') return t('custom');
+    if (plan === 'enterprise') return '$99';
     const prices = billingPeriod === 'annual' ? annualPrices : monthlyPrices;
     const val = prices[plan as keyof typeof prices];
     return `$${val}`;
@@ -278,9 +278,7 @@ export function PricingPageContent() {
               </ul>
               <button
                 onClick={() => {
-                  if (plan.key === 'enterprise') {
-                    window.location.href = '/contact';
-                  } else if (token) {
+                  if (token) {
                     router.push(`/billing`);
                   } else {
                     router.push('/register');
@@ -292,7 +290,7 @@ export function PricingPageContent() {
                     : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-xs'
                 }`}
               >
-                {plan.key === 'enterprise' ? t('contactSales') : t('getStarted')}
+                {t('getStarted')}
               </button>
             </div>
           ))}
