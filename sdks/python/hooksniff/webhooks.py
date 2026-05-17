@@ -1,12 +1,3 @@
-"""
-HookSniff SDK — Webhook Signature Verification
-
-Verifies incoming webhook signatures using HMAC-SHA256.
-Compatible with Standard Webhooks format (whsec_ prefix secrets).
-
-Adapted from Svix SDK architecture.
-"""
-
 import typing as t
 from datetime import datetime
 from standardwebhooks.webhooks import Webhook as StdWh
