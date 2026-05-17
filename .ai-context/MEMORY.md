@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-17 06:05 GMT+8 (Oturum 195)
+> Son güncelleme: 2026-05-17 21:55 GMT+8 (Oturum 196 — Node.js SDK Rewrite)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -114,6 +114,18 @@ HookSniff/
 ---
 
 ## 🔧 Son Yapılan İşler
+
+### Oturum 196 — 2026-05-17 21:55 GMT+8
+1. **Node.js SDK Svix Tabanlı Yeniden Yazım** ✅
+   - Eski OpenAPI Generator boilerplate kaldırıldı
+   - Svix SDK mimarisi (MIT lisans) bazlı el yapımı SDK
+   - 19 kaynak dosya, 80+ TypeScript type
+   - Eklenen: retry+backoff, auto-idempotency, auto-pagination, webhook verify, custom fetch, timeout
+   - 12 resource: endpoints, webhooks, auth, apiKeys, teams, alerts, analytics, billing, health, search, notifications, admin
+   - Versiyon: 0.4.0 → 0.5.0
+   - Kalite: %55-60 → %65-70 (Stripe'a göre)
+   - Commit: c03cfa00
+   - `2026-05-17-node-sdk-rewrite.md` oluşturuldu
 
 ### Oturum 195 — 2026-05-17 06:05 GMT+8
 1. **Settings Sayfası Derin İnceleme + 13 Fix** ✅
