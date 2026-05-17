@@ -1,5 +1,8 @@
 export { type EndpointCreatedEventData } from "./endpointCreatedEventData";
 export { type BackgroundTaskOut } from "./backgroundTaskOut";
+export { type OperationalWebhookEndpointIn } from "./operationalWebhookEndpointIn";
+export { type OperationalWebhookEndpointOut } from "./operationalWebhookEndpointOut";
+export { type OperationalWebhookDeliveryOut } from "./operationalWebhookDeliveryOut";
 export { type EnvironmentIn } from "./environmentIn";
 export { type EnvironmentOut } from "./environmentOut";
 export { type EnvironmentPatch } from "./environmentPatch";

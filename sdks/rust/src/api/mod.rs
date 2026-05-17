@@ -11,6 +11,7 @@ mod authentication;
 mod background_task;
 mod endpoint;
 mod environment;
+mod operational_webhook;
 mod event_type;
 mod health;
 mod message;
@@ -48,6 +49,10 @@ impl HookSniff {
 
     pub fn background_task(&self) -> BackgroundTask<'_> {
         BackgroundTask::new(&self.cfg)
+    }
+
+    pub fn operational_webhook(&self) -> OperationalWebhook<'_> {
+        OperationalWebhook::new(&self.cfg)
     }
 
     pub fn endpoint(&self) -> Endpoint<'_> {
