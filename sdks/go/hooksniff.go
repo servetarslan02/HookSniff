@@ -33,6 +33,7 @@ type (
 		Environment    *Environment
 		BackgroundTask *BackgroundTask
 		OperationalWebhook *OperationalWebhook
+		MessagePoller *MessagePoller
 	}
 )
 
@@ -72,6 +73,7 @@ func New(token string, options *HookSniffOptions) (*HookSniff, error) {
 		Environment:    newEnvironment(&hooksniffHttpClient),
 		BackgroundTask: newBackgroundTask(&hooksniffHttpClient),
 		OperationalWebhook: newOperationalWebhook(&hooksniffHttpClient),
+		MessagePoller: newMessagePoller(&hooksniffHttpClient),
 	}
 	return &hs, nil
 }

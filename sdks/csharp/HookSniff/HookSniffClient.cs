@@ -54,6 +54,11 @@ namespace HookSniff
             get => new OperationalWebhook(this);
         }
 
+        public MessagePoller MessagePoller
+        {
+            get => new MessagePoller(this);
+        }
+
         public ILogger? Logger { get; }
 
         public HookSniffHttpClient HookSniffHttpClient;

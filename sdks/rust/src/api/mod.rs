@@ -12,6 +12,7 @@ mod background_task;
 mod endpoint;
 mod environment;
 mod operational_webhook;
+mod message_poller;
 mod event_type;
 mod health;
 mod message;
@@ -40,6 +41,7 @@ pub use self::{
         MessageAttemptListByMsgOptions, MessageAttemptResendOptions,
     },
     statistics::Statistics,
+    message_poller::MessagePoller,
 };
 
 impl HookSniff {
@@ -53,6 +55,10 @@ impl HookSniff {
 
     pub fn operational_webhook(&self) -> OperationalWebhook<'_> {
         OperationalWebhook::new(&self.cfg)
+    }
+
+    pub fn message_poller(&self) -> MessagePoller<'_> {
+        MessagePoller::new(&self.cfg)
     }
 
     pub fn endpoint(&self) -> Endpoint<'_> {

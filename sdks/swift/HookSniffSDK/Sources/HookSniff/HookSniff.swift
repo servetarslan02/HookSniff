@@ -31,6 +31,7 @@ public class HookSniff {
     public lazy var environments = EnvironmentsResource(client: self)
     public lazy var backgroundTasks = BackgroundTasksResource(client: self)
     public lazy var operationalWebhooks = OperationalWebhooksResource(client: self)
+    public lazy var messagePoller = MessagePollerResource(client: self)
 
     /// Create a new HookSniff client.
     ///

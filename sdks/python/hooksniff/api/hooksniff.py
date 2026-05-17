@@ -10,6 +10,7 @@ from .endpoint import Endpoint, EndpointAsync
 from .environment import Environment, EnvironmentAsync
 from .event_type import EventType, EventTypeAsync
 from .operational_webhook import OperationalWebhook, OperationalWebhookAsync
+from .message_poller import MessagePoller, MessagePollerAsync
 from .message import Message, MessageAsync
 from .message_attempt import MessageAttempt, MessageAttemptAsync
 from .statistics import Statistics, StatisticsAsync
@@ -72,6 +73,10 @@ class HookSniffAsync(ClientBase):
         return OperationalWebhookAsync(self._client)
 
     @property
+    def message_poller(self) -> MessagePollerAsync:
+        return MessagePollerAsync(self._client)
+
+    @property
     def event_type(self) -> EventTypeAsync:
         return EventTypeAsync(self._client)
 
@@ -108,6 +113,10 @@ class HookSniff(ClientBase):
     @property
     def operational_webhook(self) -> OperationalWebhook:
         return OperationalWebhook(self._client)
+
+    @property
+    def message_poller(self) -> MessagePoller:
+        return MessagePoller(self._client)
 
     @property
     def event_type(self) -> EventType:
