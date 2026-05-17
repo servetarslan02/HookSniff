@@ -2,54 +2,111 @@
 HookSniff SDK — Billing Resource
 """
 
-from __future__ import annotations
+import typing as t
+from dataclasses import dataclass
 
-from typing import Any
+from ..models import (
+    SubscriptionOut,
+    UpgradeRequest,
+    UpgradeResponse,
+    UsageOut,
+    InvoiceOut,
+    BillingPortalResponse,
+)
+from .common import ApiBase, BaseOptions, serialize_params
 
-from ..request import HookSniffRequest, RequestConfig
+
+@dataclass
+class BillingUpgradeOptions(BaseOptions):
+    idempotency_key: t.Optional[str] = None
+
+    def _header_params(self) -> t.Dict[str, str]:
+        return serialize_params({"idempotency-key": self.idempotency_key})
 
 
-class Billing:
-    """Billing & subscription management."""
-
-    def __init__(self, config: RequestConfig):
-        self._config = config
-
-    def get_subscription(self) -> dict[str, Any]:
+class BillingAsync(ApiBase):
+    async def get_subscription(self) -> SubscriptionOut:
         """Get current subscription details."""
-        req = HookSniffRequest("GET", "/v1/billing/subscription")
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(method="get", path="/api/v1/billing/subscription")
+        return SubscriptionOut(**response.json())
 
-    def upgrade(self, plan: str, payment_method: str | None = None) -> dict[str, Any]:
+    async def upgrade(
+        self, upgrade_in: UpgradeRequest, options: BillingUpgradeOptions = BillingUpgradeOptions()
+    ) -> UpgradeResponse:
         """Upgrade to a paid plan."""
-        req = HookSniffRequest("POST", "/v1/billing/upgrade")
-        body: dict[str, Any] = {"plan": plan}
-        if payment_method:
-            body["payment_method"] = payment_method
-        req.set_body(body)
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(
+            method="post",
+            path="/api/v1/billing/upgrade",
+            header_params=options._header_params(),
+            json_body=upgrade_in.__dict__,
+        )
+        return UpgradeResponse(**response.json())
 
-    def get_usage(self) -> dict[str, Any]:
+    async def get_usage(self) -> UsageOut:
         """Get current billing period usage."""
-        req = HookSniffRequest("GET", "/v1/billing/usage")
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(method="get", path="/api/v1/billing/usage")
+        return UsageOut(**response.json())
 
-    def list_invoices(self) -> list[dict[str, Any]]:
+    async def list_invoices(self) -> t.List[InvoiceOut]:
         """List all invoices."""
-        req = HookSniffRequest("GET", "/v1/billing/invoices")
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(method="get", path="/api/v1/billing/invoices")
+        return [InvoiceOut(**item) for item in response.json()]
 
-    def open_portal(self) -> dict[str, Any]:
-        """Open billing portal (Stripe/Polar)."""
-        req = HookSniffRequest("POST", "/v1/billing/portal")
-        return req.send(self._config, lambda j: j)
+    async def open_portal(self) -> BillingPortalResponse:
+        """Open billing portal."""
+        response = await self._request_asyncio(method="post", path="/api/v1/billing/portal")
+        return BillingPortalResponse(**response.json())
 
-    def cancel(self) -> dict[str, Any]:
+    async def cancel(self) -> SubscriptionOut:
         """Cancel subscription at period end."""
-        req = HookSniffRequest("POST", "/v1/billing/cancel")
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(method="post", path="/api/v1/billing/cancel")
+        return SubscriptionOut(**response.json())
 
-    def resume(self) -> dict[str, Any]:
+    async def resume(self) -> SubscriptionOut:
         """Resume cancelled subscription."""
-        req = HookSniffRequest("POST", "/v1/billing/resume")
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(method="post", path="/api/v1/billing/resume")
+        return SubscriptionOut(**response.json())
+
+
+class Billing(ApiBase):
+    def get_subscription(self) -> SubscriptionOut:
+        """Get current subscription."""
+        response = self._request_sync(method="get", path="/api/v1/billing/subscription")
+        return SubscriptionOut(**response.json())
+
+    def upgrade(
+        self, upgrade_in: UpgradeRequest, options: BillingUpgradeOptions = BillingUpgradeOptions()
+    ) -> UpgradeResponse:
+        """Upgrade to a paid plan."""
+        response = self._request_sync(
+            method="post",
+            path="/api/v1/billing/upgrade",
+            header_params=options._header_params(),
+            json_body=upgrade_in.__dict__,
+        )
+        return UpgradeResponse(**response.json())
+
+    def get_usage(self) -> UsageOut:
+        """Get usage."""
+        response = self._request_sync(method="get", path="/api/v1/billing/usage")
+        return UsageOut(**response.json())
+
+    def list_invoices(self) -> t.List[InvoiceOut]:
+        """List invoices."""
+        response = self._request_sync(method="get", path="/api/v1/billing/invoices")
+        return [InvoiceOut(**item) for item in response.json()]
+
+    def open_portal(self) -> BillingPortalResponse:
+        """Open billing portal."""
+        response = self._request_sync(method="post", path="/api/v1/billing/portal")
+        return BillingPortalResponse(**response.json())
+
+    def cancel(self) -> SubscriptionOut:
+        """Cancel subscription."""
+        response = self._request_sync(method="post", path="/api/v1/billing/cancel")
+        return SubscriptionOut(**response.json())
+
+    def resume(self) -> SubscriptionOut:
+        """Resume subscription."""
+        response = self._request_sync(method="post", path="/api/v1/billing/resume")
+        return SubscriptionOut(**response.json())
