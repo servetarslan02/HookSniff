@@ -1,21 +1,17 @@
 # SDK Durum Tablosu
 
-> Son güncelleme: 2026-05-17 23:55 GMT+8
+> Son güncelleme: 2026-05-17 23:58 GMT+8
 
-## Genel Bakış
-
-| # | SDK | Dil | Yöntem | Versiyon | Kalite | Durum |
-|---|-----|-----|--------|----------|--------|-------|
-| 1 | **Node.js** | TypeScript | Svix'ten adapte | 0.5.0 | %70-75 | ✅ Tamamlandı |
-| 2 | **Python** | Python | Svix SDK doğrudan | 1.0.0 | %80 | ✅ Tamamlandı |
-| 3 | **Go** | Go | Svix SDK doğrudan | 1.0.0 | %80 | ✅ Tamamlandı |
-| 4 | Rust | Rust | Svix'ten adapte | — | — | ⬜ Sıradaki |
-| 5-11 | 7 SDK | Çeşitli | Svix'ten adapte | — | — | ⬜ Beklemede |
-
-## Adaptasyon Yöntemi
-1. Svix SDK'yı kopyala
-2. `svix` → `hooksniff` yeniden adlandır (bulk find-replace)
-3. API base URL'ini değiştir
-4. Svix-specific features kaldır (autoconfig, streaming, ingest, connectors)
-5. Syntax-check yap
-6. GitHub'a push et
+| # | SDK | Versiyon | Dosya | Model | Durum |
+|---|-----|----------|-------|-------|-------|
+| 1 | **Node.js** | 0.5.0 | — | 80+ | ✅ |
+| 2 | **Python** | 1.0.0 | 127 | 101 | ✅ |
+| 3 | **Go** | 1.0.0 | 115 | 99 | ✅ |
+| 4 | **Rust** | 1.0.0 | 118 | 98 | ✅ |
+| 5 | Ruby | — | — | — | ⬜ |
+| 6 | Java | — | — | — | ⬜ |
+| 7 | Kotlin | — | — | — | ⬜ |
+| 8 | PHP | — | — | — | ⬜ |
+| 9 | C# | — | — | — | ⬜ |
+| 10 | Swift | — | — | — | ⬜ |
+| 11 | Elixir | — | — | — | ⬜ |
