@@ -5,12 +5,12 @@ from subprocess import CalledProcessError, check_output
 import pytest
 import requests
 from requests.adapters import HTTPAdapter
-from svix.api import Svix, SvixOptions
+from hooksniff.api import HookSniff, HookSniffOptions
 from urllib3.util.retry import Retry
 
-SVIX_ORG_ID = "org_svix_python_tests"
-TOKEN = os.getenv("SVIX_TOKEN")
-SERVER_URL = os.getenv("SVIX_SERVER_URL")
+HOOKSNIFF_ORG_ID = "org_hooksniff_python_tests"
+TOKEN = os.getenv("HOOKSNIFF_TOKEN")
+SERVER_URL = os.getenv("HOOKSNIFF_SERVER_URL")
 if not TOKEN and not SERVER_URL:
 
     def pytest_collection_modifyitems(config, items):
@@ -76,48 +76,48 @@ if not TOKEN and not SERVER_URL:
         return ("172.17.0.1", 0)
 
     @pytest.fixture(scope="session")
-    def svix_server_url(docker_services):
+    def hooksniff_server_url(docker_services):
         # svix server container exposes a free port to the docker host,
         # we use the docker network gateway IP in case the tests are also
         # executed in a container
-        svix_server_port = docker_services.port_for("backend", 8071)
-        return f"http://172.17.0.1:{svix_server_port}"
+        hooksniff_server_port = docker_services.port_for("backend", 8071)
+        return f"http://172.17.0.1:{hooksniff_server_port}"
 
     @pytest.fixture(autouse=True, scope="session")
-    def svix_server(svix_server_url):
-        """Spawn a Svix server for the tests session using docker compose"""
+    def hooksniff_server(hooksniff_server_url):
+        """Spawn a HookSniff server for the tests session using docker compose"""
         # wait for the svix backend service to be up and responding
         request_session = requests.Session()
         retries = Retry(
             total=10, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504]
         )
         request_session.mount("http://", HTTPAdapter(max_retries=retries))
-        api_url = f"{svix_server_url}/api/v1/health/"
+        api_url = f"{hooksniff_server_url}/api/v1/health/"
         response = request_session.get(api_url)
         assert response
 
     @pytest.fixture(autouse=True)
-    def svix_wiper(docker_compose):
+    def hooksniff_wiper(docker_compose):
         """Ensure stateless tests"""
         yield
         # wipe svix database after each test to ensure stateless tests
         docker_compose.execute(
-            f"exec -T backend svix-server wipe --yes-i-know-what-im-doing {SVIX_ORG_ID}"
+            f"exec -T backend svix-server wipe --yes-i-know-what-im-doing {HOOKSNIFF_ORG_ID}"
         )
 
     @pytest.fixture(scope="session")
-    def svix_api(svix_server_url, docker_compose):
+    def hooksniff_api(hooksniff_server_url, docker_compose):
         # generate bearer token to authorize communication with the svix server
         exec_output = docker_compose.execute(
-            f"exec -T backend svix-server jwt generate {SVIX_ORG_ID}"
+            f"exec -T backend svix-server jwt generate {HOOKSNIFF_ORG_ID}"
         )
-        svix_auth_token = (
+        hooksniff_auth_token = (
             exec_output.decode()
             .replace("Token (Bearer): ", "")
             .replace("\r", "")
             .replace("\n", "")
         )
-        return Svix(
-            svix_auth_token,
-            SvixOptions(server_url=svix_server_url),
+        return HookSniff(
+            hooksniff_auth_token,
+            HookSniffOptions(server_url=hooksniff_server_url),
         )

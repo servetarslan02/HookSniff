@@ -31,23 +31,23 @@ namespace HookSniff
 
             if (region == "us")
             {
-                return "https://api.us.hooksniff.com";
+                return "https://hooksniff-api-1046140057667.europe-west1.run.app";
             }
             else if (region == "eu")
             {
-                return "https://api.eu.hooksniff.com";
+                return "https://hooksniff-api-1046140057667.europe-west1.run.app";
             }
             else if (region == "in")
             {
-                return "https://api.in.hooksniff.com";
+                return "https://hooksniff-api-1046140057667.europe-west1.run.app";
             }
             else if (region == "ca")
             {
-                return "https://api.ca.hooksniff.com";
+                return "https://hooksniff-api-1046140057667.europe-west1.run.app";
             }
             else if (region == "au")
             {
-                return "https://api.au.hooksniff.com";
+                return "https://hooksniff-api-1046140057667.europe-west1.run.app";
             }
             else
             {

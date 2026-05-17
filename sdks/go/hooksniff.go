@@ -71,16 +71,16 @@ func New(token string, options *HookSniffOptions) (*HookSniff, error) {
 }
 
 func getDefaultBaseUrl(token string) *url.URL {
-	defaultUrl := "https://api.hooksniff.com"
+	defaultUrl := "https://hooksniff-api-1046140057667.europe-west1.run.app"
 	if token != "" {
 		parts := strings.Split(token, ".")
 		if len(parts) > 1 {
 			region := parts[len(parts)-1]
 			switch region {
 			case "us":
-				defaultUrl = "https://api.us.hooksniff.com"
+				defaultUrl = "https://hooksniff-api-1046140057667.europe-west1.run.app"
 			case "eu":
-				defaultUrl = "https://api.eu.hooksniff.com"
+				defaultUrl = "https://hooksniff-api-1046140057667.europe-west1.run.app"
 			}
 		}
 	}

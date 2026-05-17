@@ -11,7 +11,7 @@ from .message import Message, MessageAsync
 from .message_attempt import MessageAttempt, MessageAttemptAsync
 from .statistics import Statistics, StatisticsAsync
 
-DEFAULT_SERVER_URL = "https://api.hooksniff.com"
+DEFAULT_SERVER_URL = "https://hooksniff-api-1046140057667.europe-west1.run.app"
 
 
 @dataclass
