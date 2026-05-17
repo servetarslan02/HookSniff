@@ -1,7 +1,6 @@
 // this file is @generated
 package com.hooksniff.kotlin
 
-import com.hooksniff.kotlin.models.BulkReplayIn
 import com.hooksniff.kotlin.models.EndpointHeadersIn
 import com.hooksniff.kotlin.models.EndpointHeadersOut
 import com.hooksniff.kotlin.models.EndpointHeadersPatchIn
@@ -10,20 +9,11 @@ import com.hooksniff.kotlin.models.EndpointOut
 import com.hooksniff.kotlin.models.EndpointPatch
 import com.hooksniff.kotlin.models.EndpointSecretOut
 import com.hooksniff.kotlin.models.EndpointSecretRotateIn
-import com.hooksniff.kotlin.models.EndpointStats
-import com.hooksniff.kotlin.models.EndpointTransformationIn
-import com.hooksniff.kotlin.models.EndpointTransformationOut
-import com.hooksniff.kotlin.models.EndpointTransformationPatch
 import com.hooksniff.kotlin.models.EndpointUpdate
 import com.hooksniff.kotlin.models.EventExampleIn
 import com.hooksniff.kotlin.models.ListResponseEndpointOut
 import com.hooksniff.kotlin.models.MessageOut
 import com.hooksniff.kotlin.models.Ordering
-import com.hooksniff.kotlin.models.RecoverIn
-import com.hooksniff.kotlin.models.RecoverOut
-import com.hooksniff.kotlin.models.ReplayIn
-import com.hooksniff.kotlin.models.ReplayOut
-import kotlinx.datetime.Instant
 import okhttp3.Headers
 
 data class EndpointListOptions(
@@ -37,22 +27,9 @@ data class EndpointListOptions(
 
 data class EndpointCreateOptions(val idempotencyKey: String? = null)
 
-data class EndpointBulkReplayOptions(val idempotencyKey: String? = null)
-
-data class EndpointRecoverOptions(val idempotencyKey: String? = null)
-
-data class EndpointReplayMissingOptions(val idempotencyKey: String? = null)
-
 data class EndpointRotateSecretOptions(val idempotencyKey: String? = null)
 
 data class EndpointSendExampleOptions(val idempotencyKey: String? = null)
-
-data class EndpointGetStatsOptions(
-    /** Filter the range to data starting from this date. */
-    val since: Instant? = null,
-    /** Filter the range to data ending by this date. */
-    val until: Instant? = null,
-)
 
 class Endpoint(private val client: HookSniffHttpClient) {
     /** List the application's endpoints. */
@@ -131,45 +108,6 @@ class Endpoint(private val client: HookSniffHttpClient) {
         )
     }
 
-    /**
-     * Bulk replay messages sent to the endpoint.
-     *
-     * Only messages that were created after `since` will be sent. This will replay both successful,
-     * and failed messages
-     *
-     * A completed task will return a payload like the following:
-     * ```json
-     * {
-     *   "id": "qtask_33qen93MNuelBAq1T9G7eHLJRsF",
-     *   "status": "finished",
-     *   "task": "endpoint.bulk-replay",
-     *   "data": {
-     *     "messagesSent": 2
-     *   }
-     * }
-     * ```
-     */
-    suspend fun bulkReplay(
-        appId: String,
-        endpointId: String,
-        bulkReplayIn: BulkReplayIn,
-        options: EndpointBulkReplayOptions = EndpointBulkReplayOptions(),
-    ): ReplayOut {
-        val url =
-            client
-                .newUrlBuilder()
-                .encodedPath("/api/v1/app/$appId/endpoint/$endpointId/bulk-replay")
-        val headers = Headers.Builder()
-        options.idempotencyKey?.let { headers.add("idempotency-key", it) }
-
-        return client.executeRequest<BulkReplayIn, ReplayOut>(
-            "POST",
-            url.build(),
-            headers = headers.build(),
-            reqBody = bulkReplayIn,
-        )
-    }
-
     /** Get the additional headers to be sent with the webhook. */
     suspend fun getHeaders(appId: String, endpointId: String): EndpointHeadersOut {
         val url =
@@ -206,81 +144,6 @@ class Endpoint(private val client: HookSniffHttpClient) {
             "PATCH",
             url.build(),
             reqBody = endpointHeadersPatchIn,
-        )
-    }
-
-    /**
-     * Resend all failed messages since a given time.
-     *
-     * Messages that were sent successfully, even if failed initially, are not resent.
-     *
-     * A completed task will return a payload like the following:
-     * ```json
-     * {
-     *   "id": "qtask_33qen93MNuelBAq1T9G7eHLJRsF",
-     *   "status": "finished",
-     *   "task": "endpoint.recover",
-     *   "data": {
-     *     "messagesSent": 2
-     *   }
-     * }
-     * ```
-     */
-    suspend fun recover(
-        appId: String,
-        endpointId: String,
-        recoverIn: RecoverIn,
-        options: EndpointRecoverOptions = EndpointRecoverOptions(),
-    ): RecoverOut {
-        val url =
-            client.newUrlBuilder().encodedPath("/api/v1/app/$appId/endpoint/$endpointId/recover")
-        val headers = Headers.Builder()
-        options.idempotencyKey?.let { headers.add("idempotency-key", it) }
-
-        return client.executeRequest<RecoverIn, RecoverOut>(
-            "POST",
-            url.build(),
-            headers = headers.build(),
-            reqBody = recoverIn,
-        )
-    }
-
-    /**
-     * Replays messages to the endpoint.
-     *
-     * Only messages that were created after `since` will be sent. Messages that were previously
-     * sent to the endpoint are not resent.
-     *
-     * A completed task will return a payload like the following:
-     * ```json
-     * {
-     *   "id": "qtask_33qen93MNuelBAq1T9G7eHLJRsF",
-     *   "status": "finished",
-     *   "task": "endpoint.replay",
-     *   "data": {
-     *     "messagesSent": 2
-     *   }
-     * }
-     * ```
-     */
-    suspend fun replayMissing(
-        appId: String,
-        endpointId: String,
-        replayIn: ReplayIn,
-        options: EndpointReplayMissingOptions = EndpointReplayMissingOptions(),
-    ): ReplayOut {
-        val url =
-            client
-                .newUrlBuilder()
-                .encodedPath("/api/v1/app/$appId/endpoint/$endpointId/replay-missing")
-        val headers = Headers.Builder()
-        options.idempotencyKey?.let { headers.add("idempotency-key", it) }
-
-        return client.executeRequest<ReplayIn, ReplayOut>(
-            "POST",
-            url.build(),
-            headers = headers.build(),
-            reqBody = replayIn,
         )
     }
 
@@ -341,69 +204,6 @@ class Endpoint(private val client: HookSniffHttpClient) {
             url.build(),
             headers = headers.build(),
             reqBody = eventExampleIn,
-        )
-    }
-
-    /** Get basic statistics for the endpoint. */
-    suspend fun getStats(
-        appId: String,
-        endpointId: String,
-        options: EndpointGetStatsOptions = EndpointGetStatsOptions(),
-    ): EndpointStats {
-        val url =
-            client.newUrlBuilder().encodedPath("/api/v1/app/$appId/endpoint/$endpointId/stats")
-        options.since?.let { url.addQueryParameter("since", serializeQueryParam(it)) }
-        options.until?.let { url.addQueryParameter("until", serializeQueryParam(it)) }
-        return client.executeRequest<Any, EndpointStats>("GET", url.build())
-    }
-
-    /** Get the transformation code associated with this endpoint. */
-    suspend fun transformationGet(appId: String, endpointId: String): EndpointTransformationOut {
-        val url =
-            client
-                .newUrlBuilder()
-                .encodedPath("/api/v1/app/$appId/endpoint/$endpointId/transformation")
-        return client.executeRequest<Any, EndpointTransformationOut>("GET", url.build())
-    }
-
-    /** Set or unset the transformation code associated with this endpoint. */
-    suspend fun patchTransformation(
-        appId: String,
-        endpointId: String,
-        endpointTransformationPatch: EndpointTransformationPatch,
-    ) {
-        val url =
-            client
-                .newUrlBuilder()
-                .encodedPath("/api/v1/app/$appId/endpoint/$endpointId/transformation")
-
-        client.executeRequest<EndpointTransformationPatch, Boolean>(
-            "PATCH",
-            url.build(),
-            reqBody = endpointTransformationPatch,
-        )
-    }
-
-    /**
-     * This operation was renamed to `set-transformation`.
-     *
-     * @deprecated
-     */
-    @Deprecated("")
-    suspend fun transformationPartialUpdate(
-        appId: String,
-        endpointId: String,
-        endpointTransformationIn: EndpointTransformationIn,
-    ) {
-        val url =
-            client
-                .newUrlBuilder()
-                .encodedPath("/api/v1/app/$appId/endpoint/$endpointId/transformation")
-
-        client.executeRequest<EndpointTransformationIn, Boolean>(
-            "PATCH",
-            url.build(),
-            reqBody = endpointTransformationIn,
         )
     }
 }

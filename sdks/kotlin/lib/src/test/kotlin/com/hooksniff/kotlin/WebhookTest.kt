@@ -4,6 +4,7 @@ import org.junit.Test
 import org.junit.Assert.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import java.net.http.HttpHeaders
 import java.util.Base64
 
 class WebhookTest {
@@ -24,23 +25,27 @@ class WebhookTest {
         return "v1,$sig"
     }
 
+    private fun buildHeaders(vararg pairs: Pair<String, String>): HttpHeaders {
+        val map = pairs.toList().groupBy { it.first }.mapValues { (_, v) -> v.map { it.second } }
+        return HttpHeaders.of(map) { true }
+    }
+
     @Test
     fun testVerifyValidSignature() {
         val wh = Webhook(SECRET)
         val sig = sign(SECRET, MSG_ID, TIMESTAMP, PAYLOAD)
-        val headers = mapOf(
+        val headers = buildHeaders(
             "webhook-id" to MSG_ID,
             "webhook-timestamp" to TIMESTAMP.toString(),
             "webhook-signature" to sig
         )
-        val result = wh.verify(PAYLOAD, headers)
-        assertNotNull(result)
+        wh.verify(PAYLOAD, headers)
     }
 
-    @Test(expected = WebhookVerificationError::class)
+    @Test(expected = WebhookVerificationException::class)
     fun testRejectInvalidSignature() {
         val wh = Webhook(SECRET)
-        val headers = mapOf(
+        val headers = buildHeaders(
             "webhook-id" to MSG_ID,
             "webhook-timestamp" to TIMESTAMP.toString(),
             "webhook-signature" to "v1,invalid"
@@ -48,12 +53,12 @@ class WebhookTest {
         wh.verify(PAYLOAD, headers)
     }
 
-    @Test(expected = WebhookVerificationError::class)
+    @Test(expected = WebhookVerificationException::class)
     fun testRejectOldTimestamp() {
         val wh = Webhook(SECRET)
         val oldTs = System.currentTimeMillis() / 1000 - 600
         val sig = sign(SECRET, MSG_ID, oldTs, PAYLOAD)
-        val headers = mapOf(
+        val headers = buildHeaders(
             "webhook-id" to MSG_ID,
             "webhook-timestamp" to oldTs.toString(),
             "webhook-signature" to sig
@@ -62,15 +67,14 @@ class WebhookTest {
     }
 
     @Test
-    fun testSvixBrandedHeaders() {
+    fun testHookSniffBrandedHeaders() {
         val wh = Webhook(SECRET)
         val sig = sign(SECRET, MSG_ID, TIMESTAMP, PAYLOAD)
-        val headers = mapOf(
-            "svix-id" to MSG_ID,
-            "svix-timestamp" to TIMESTAMP.toString(),
-            "svix-signature" to sig
+        val headers = buildHeaders(
+            "hooksniff-id" to MSG_ID,
+            "hooksniff-timestamp" to TIMESTAMP.toString(),
+            "hooksniff-signature" to sig
         )
-        val result = wh.verify(PAYLOAD, headers)
-        assertNotNull(result)
+        wh.verify(PAYLOAD, headers)
     }
 }
