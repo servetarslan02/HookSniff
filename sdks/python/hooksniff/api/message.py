@@ -12,8 +12,6 @@ from ..models import (
     MessagePrecheckOut,
 )
 from .common import ApiBase, BaseOptions, serialize_params
-from .message_poller import (
-)
 
 
 @dataclass
