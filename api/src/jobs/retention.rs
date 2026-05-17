@@ -112,6 +112,26 @@ pub async fn reset_monthly_webhook_counts(pool: &PgPool) -> Result<()> {
     Ok(())
 }
 
+/// Reset daily webhook counters — runs every day at midnight UTC.
+/// All customers get their webhook_count reset to 0 daily.
+pub async fn reset_daily_webhook_counts(pool: &PgPool) -> Result<()> {
+    let result = sqlx::query(
+        r#"UPDATE customers
+           SET webhook_count = 0, updated_at = NOW()
+           WHERE webhook_count > 0"#,
+    )
+    .execute(pool)
+    .await?;
+
+    if result.rows_affected() > 0 {
+        tracing::info!(
+            "🔄 Reset daily webhook counters for {} customers",
+            result.rows_affected()
+        );
+    }
+    Ok(())
+}
+
 /// Clean up expired seen_webhooks entries.
 async fn cleanup_seen_webhooks(pool: &PgPool) -> Result<u64> {
     let result = sqlx::query("DELETE FROM seen_webhooks WHERE expires_at < now()")

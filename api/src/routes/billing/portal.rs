@@ -65,9 +65,9 @@ pub async fn get_usage(
         payment_provider: customer.payment_provider.clone(),
         webhooks: UsageCounter {
             used: customer.webhook_count as u64,
-            limit: plan.max_webhooks_per_month(),
+            limit: plan.max_webhooks_per_day(),
             remaining: plan
-                .max_webhooks_per_month()
+                .max_webhooks_per_day()
                 .saturating_sub(customer.webhook_count as u64),
         },
         endpoints: UsageCounter {

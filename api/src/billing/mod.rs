@@ -118,10 +118,10 @@ impl Plan {
         }
     }
 
-    /// Max webhook deliveries per month
-    pub fn max_webhooks_per_month(&self) -> u64 {
+    /// Max webhook deliveries per day
+    pub fn max_webhooks_per_day(&self) -> u64 {
         match self {
-            Plan::Developer => 10_000,
+            Plan::Developer => 100,
             Plan::Startup => 30_000,
             Plan::Pro => 100_000,
             Plan::Enterprise => u64::MAX,
@@ -458,7 +458,7 @@ pub struct Usage {
 impl Usage {
     /// Check if the customer has exceeded their daily webhook limit
     pub fn is_webhook_limit_exceeded(&self) -> bool {
-        self.webhooks_today >= self.plan.max_webhooks_per_month()
+        self.webhooks_today >= self.plan.max_webhooks_per_day()
     }
 
     /// Check if the customer has exceeded their endpoint limit
@@ -469,7 +469,7 @@ impl Usage {
     /// Get remaining webhook deliveries for today
     pub fn remaining_webhooks(&self) -> u64 {
         self.plan
-            .max_webhooks_per_month()
+            .max_webhooks_per_day()
             .saturating_sub(self.webhooks_today)
     }
 
@@ -670,14 +670,14 @@ mod tests {
         assert!(Plan::Enterprise.allows_overage());
     }
 
-    // ── max_webhooks_per_month ─────────────────────────────────
+    // ── max_webhooks_per_day ─────────────────────────────────
 
     #[test]
-    fn max_webhooks_per_month_all() {
-        assert_eq!(Plan::Developer.max_webhooks_per_month(), 10_000);
-        assert_eq!(Plan::Startup.max_webhooks_per_month(), 30_000);
-        assert_eq!(Plan::Pro.max_webhooks_per_month(), 100_000);
-        assert_eq!(Plan::Enterprise.max_webhooks_per_month(), u64::MAX);
+    fn max_webhooks_per_day_all() {
+        assert_eq!(Plan::Developer.max_webhooks_per_day(), 100);
+        assert_eq!(Plan::Startup.max_webhooks_per_day(), 30_000);
+        assert_eq!(Plan::Pro.max_webhooks_per_day(), 100_000);
+        assert_eq!(Plan::Enterprise.max_webhooks_per_day(), u64::MAX);
     }
 
     // ── max_requests_per_minute ────────────────────────────────
@@ -786,9 +786,9 @@ mod tests {
         assert!(Plan::Startup.max_endpoints() < Plan::Pro.max_endpoints());
         assert!(Plan::Pro.max_endpoints() < Plan::Enterprise.max_endpoints());
 
-        assert!(Plan::Developer.max_webhooks_per_month() < Plan::Startup.max_webhooks_per_month());
-        assert!(Plan::Startup.max_webhooks_per_month() < Plan::Pro.max_webhooks_per_month());
-        assert!(Plan::Pro.max_webhooks_per_month() < Plan::Enterprise.max_webhooks_per_month());
+        assert!(Plan::Developer.max_webhooks_per_day() < Plan::Startup.max_webhooks_per_day());
+        assert!(Plan::Startup.max_webhooks_per_day() < Plan::Pro.max_webhooks_per_day());
+        assert!(Plan::Pro.max_webhooks_per_day() < Plan::Enterprise.max_webhooks_per_day());
     }
 
     // ── Usage ──────────────────────────────────────────────────

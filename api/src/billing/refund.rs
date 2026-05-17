@@ -105,7 +105,7 @@ pub async fn process_refund(
     .await?;
 
     // Downgrade to Free plan
-    let free_limit = Plan::Developer.max_webhooks_per_month() as i32;
+    let free_limit = Plan::Developer.max_webhooks_per_day() as i32;
     sqlx::query(
         "UPDATE customers SET \
          plan = 'free', webhook_limit = $1, \
@@ -194,7 +194,7 @@ pub async fn handle_chargeback(
     // 2. Suspend account — downgrade to free and mark as suspended (in transaction)
     let mut tx = pool.begin().await?;
 
-    let free_limit = Plan::Developer.max_webhooks_per_month() as i32;
+    let free_limit = Plan::Developer.max_webhooks_per_day() as i32;
     let clear_sub_col = match provider {
         "polar" => "polar_subscription_id = NULL",
         "iyzico" => "iyzico_subscription_id = NULL",
