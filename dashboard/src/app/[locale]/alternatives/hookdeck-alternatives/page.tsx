@@ -54,7 +54,7 @@ export default async function HookdeckAlternativesPage() {
               <tbody>
                 {[
                   { name: 'Hookdeck', price: '$39/mo+', oss: '❌', self: '❌', sdks: '8', soc2: 'Type 2', hl: false },
-                  { name: 'HookSniff', price: '$29/mo', oss: '✅', self: '✅', sdks: '11', soc2: t('ready'), hl: true },
+                  { name: 'HookSniff', price: '$24/mo', oss: '✅', self: '✅', sdks: '11', soc2: t('ready'), hl: true },
                   { name: 'Svix', price: '$490/mo', oss: '✅', self: '✅', sdks: '6', soc2: 'Type 2', hl: false },
                   { name: 'Hook0', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', oss: '✅', self: '✅', sdks: '4', soc2: '❌', hl: false },
                   { name: 'Convoy', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', oss: '✅', self: '✅', sdks: '1', soc2: '❌', hl: false },
@@ -79,7 +79,7 @@ export default async function HookdeckAlternativesPage() {
             <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-400">
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Open source:</strong> HookSniff is MIT licensed. Hookdeck is closed-source.</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Self-hosted:</strong> You can deploy HookSniff on your own infrastructure. Hookdeck is cloud-only.</li>
-              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Fixed pricing:</strong> $29/mo flat vs Hookdeck&apos;s usage-based billing.</li>
+              <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>Fixed pricing:</strong> $24/mo flat vs Hookdeck&apos;s usage-based billing.</li>
               <li className="flex items-start gap-2"><svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg><strong>More SDKs:</strong> 11 SDKs vs Hookdeck&apos;s 8. FIFO delivery and CloudEvents support.</li>
             </ul>
           </div>

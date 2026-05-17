@@ -134,9 +134,9 @@ export default function DocsPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               <tr><td className="px-4 py-3">Developer ($0)</td><td className="px-4 py-3">100</td><td className="px-4 py-3">100</td></tr>
-              <tr><td className="px-4 py-3">Startup ($29/mo)</td><td className="px-4 py-3">500</td><td className="px-4 py-3">30,000</td></tr>
+              <tr><td className="px-4 py-3">Startup ($24/mo)</td><td className="px-4 py-3">500</td><td className="px-4 py-3">30,000</td></tr>
               <tr><td className="px-4 py-3">Pro ($49/mo)</td><td className="px-4 py-3">1,000</td><td className="px-4 py-3">100,000</td></tr>
-              <tr><td className="px-4 py-3">Enterprise (Custom)</td><td className="px-4 py-3">Custom</td><td className="px-4 py-3">Unlimited</td></tr>
+              <tr><td className="px-4 py-3">Enterprise ($149/mo)</td><td className="px-4 py-3">Custom</td><td className="px-4 py-3">Unlimited</td></tr>
             </tbody>
           </table></div>
         </div>
