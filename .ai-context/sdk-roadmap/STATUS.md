@@ -1,12 +1,12 @@
 # SDK Durum Tablosu
 
-> Son güncelleme: 2026-05-18 01:30 GMT+8
+> Son güncelleme: 2026-05-18 01:40 GMT+8
 
 ## Genel Bakış
 
 | # | SDK | Dil | Yöntem | Versiyon | Dosya | Model | Durum |
 |---|-----|-----|--------|----------|-------|-------|-------|
-| 1 | **Node.js** | TypeScript | Svix'ten adapte | 0.5.0 | — | 80+ | ✅ |
+| 1 | **Node.js** | TypeScript | Svix'ten adapte | 1.0.0 | 63 | ~40 | ✅ |
 | 2 | **Python** | Python | Svix SDK doğrudan | 1.0.0 | 127 | 101 | ✅ |
 | 3 | **Go** | Go | Svix SDK doğrudan | 1.0.0 | 115 | 99 | ✅ |
 | 4 | **Rust** | Rust | Svix SDK doğrudan | 1.0.0 | 118 | 98 | ✅ |
