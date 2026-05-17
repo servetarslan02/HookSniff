@@ -51,12 +51,19 @@ const PLAN_COLOR_MAP: Record<string, { border: string; bg: string; dot: string; 
   violet: { border: 'border-violet-200 dark:border-violet-500/20', bg: 'bg-violet-50/50 dark:bg-violet-500/5', dot: 'bg-violet-500', badge: 'bg-violet-100 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400' },
 };
 
-function PlanCard({ name, color, price, limits, editing, onPriceChange, onLimitChange, t, free, popular }: {
+const PLAN_FEATURES: Record<string, string[]> = {
+  developer: ['5 endpoints', '1,000 webhooks/mo', '100 rate/min', '7-day retention', 'HMAC signatures', '2FA support'],
+  startup: ['20 endpoints', '10K webhooks/mo', '500 rate/min', '14-day retention', 'CloudEvents', 'Secret rotation', 'Dead letter queue', 'Email support'],
+  pro: ['50 endpoints', '50K webhooks/mo', '1,000 rate/min', '30-day retention', 'FIFO delivery', 'IP whitelist', 'Analytics', 'Schema registry', 'Priority support'],
+  enterprise: ['200 endpoints', '500K webhooks/mo', '5,000 rate/min', '90-day retention', 'SSO/SAML', 'Account manager', '99.9% SLA', 'Custom integrations', 'On-premise option'],
+};
+
+function PlanCard({ name, color, price, limits, editing, onPriceChange, onLimitChange, t, free, popular, planId }: {
   name: string; color: string; price: number;
   limits: { endpoints: number; webhooks: number; rateLimit: number; retention: number };
   editing: boolean; onPriceChange?: (v: number) => void;
   onLimitChange: (field: string, value: number) => void;
-  t: (k: string) => string; free?: boolean; popular?: boolean;
+  t: (k: string) => string; free?: boolean; popular?: boolean; planId?: string;
 }) {
   const c = PLAN_COLOR_MAP[color] || PLAN_COLOR_MAP.gray;
   return (
@@ -111,6 +118,20 @@ function PlanCard({ name, color, price, limits, editing, onPriceChange, onLimitC
           </>
         )}
       </div>
+
+      {/* Features */}
+      {planId && PLAN_FEATURES[planId] && (
+        <div className="mt-3 pt-3 border-t border-gray-200/50 dark:border-slate-700/50">
+          <p className="text-[10px] font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-2">{t('features') || 'Features'}</p>
+          <ul className="space-y-1">
+            {PLAN_FEATURES[planId].map((f, i) => (
+              <li key={i} className="flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-slate-400">
+                <span className="text-emerald-500">✓</span> {f}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
@@ -464,6 +485,7 @@ export default function AdminRevenuePage() {
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
+                planId="developer"
                 free
               />
 
@@ -485,6 +507,7 @@ export default function AdminRevenuePage() {
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
+                planId="startup"
               />
 
               {/* Pro */}
@@ -505,6 +528,7 @@ export default function AdminRevenuePage() {
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
+                planId="pro"
                 popular
               />
 
@@ -526,6 +550,7 @@ export default function AdminRevenuePage() {
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
+                planId="enterprise"
               />
             </div>
           </div>
