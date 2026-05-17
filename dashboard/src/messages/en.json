@@ -737,7 +737,7 @@
       "500endpoints": "500 endpoints",
       "unlimitedEventTypes": "Unlimited event types",
       "unlimitedSubs": "Unlimited subscriptions",
-      "30dayLog": "30-day log retention",
+      "30dayLog": "180-day log retention",
       "0001overage": "$0.0001/event overage",
       "fifo": "FIFO ordered delivery",
       "ipWhitelist": "IP whitelisting",
@@ -1243,7 +1243,7 @@
     "s8Items": [
       "Webhook delivery logs are retained according to your plan's retention period",
       "Free plan: 7 days",
-      "Pro plan: 30 days",
+      "Pro plan: 180 days",
       "Business plan: 90 days",
       "After the retention period, data is automatically and permanently deleted"
     ],
@@ -1251,7 +1251,7 @@
     "s9Items": [
       "Paid plans are billed monthly or annually (20% discount on annual plans)",
       "All fees are non-refundable except as required by applicable law",
-      "We may change pricing with 30 days notice",
+      "We may change pricing with 180 days notice",
       "Failure to pay may result in account suspension or downgrade to Free plan",
       "Overage charges may apply if you exceed your plan limits"
     ],
@@ -1281,8 +1281,8 @@
     "s13Items": [
       "You may terminate your account at any time through the dashboard",
       "We may terminate or suspend your account for violation of these Terms",
-      "We may discontinue the Service with 30 days' notice",
-      "Upon termination, your data will be deleted within 30 days"
+      "We may discontinue the Service with 180 days' notice",
+      "Upon termination, your data will be deleted within 180 days"
     ],
     "s14Title": "14. Modifications",
     "s14Text": "We may update these Terms from time to time. We will notify you of material changes via email or dashboard notification. Continued use after changes constitutes acceptance.",
@@ -1365,7 +1365,7 @@
     "s7Webhook": "Webhook delivery logs",
     "s7WebhookRetention": "7-365 days (plan dependent)",
     "s7Api": "API request logs",
-    "s7ApiRetention": "30 days",
+    "s7ApiRetention": "180 days",
     "s7Analytics": "Analytics data",
     "s7AnalyticsRetention": "90 days",
     "s7Payment": "Payment records",
@@ -1545,7 +1545,7 @@
     "infrastructure": "Infrastructure",
     "infrastructureHeader": "Service",
     "infrastructureTable": "Infrastructure Details",
-    "last30Days": "Last 30 days",
+    "last30Days": "Last 180 days",
     "last7Days": "Last 7 days",
     "last90Days": "Last 90 days",
     "lastChecked": "Last checked: {time}",
@@ -2030,7 +2030,7 @@
         "500 endpoints",
         "Unlimited event types",
         "Unlimited subscriptions",
-        "30-day log retention",
+        "180-day log retention",
         "$0.0001/event overage",
         "FIFO ordered delivery",
         "Analytics & graphs",
@@ -2379,7 +2379,7 @@
       "500 endpoints",
       "Unlimited event types",
       "Unlimited subscriptions",
-      "30-day log retention",
+      "180-day log retention",
       "$0.0001/event overage",
       "FIFO ordered delivery",
       "Analytics & graphs",
