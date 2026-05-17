@@ -11,7 +11,6 @@ export function CommunicationsTab({
   commFilter,
   setCommFilter,
   t,
-  tc,
 }: CommunicationsTabProps) {
   return (
     <LazySection fallback={Skeletons.table()} rootMargin={300}>

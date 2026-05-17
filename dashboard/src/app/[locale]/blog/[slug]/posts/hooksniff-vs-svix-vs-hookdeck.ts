@@ -1,4 +1,4 @@
-import type { Post } from '.../data';
+import type { Post } from '../data';
 
 export const post: Post = {
     title: 'HookSniff vs Svix vs Hookdeck vs Hook0: 2026 Webhook Service Comparison',

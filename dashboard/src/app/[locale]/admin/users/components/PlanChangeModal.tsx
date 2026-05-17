@@ -14,8 +14,8 @@ interface PlanChangeModalProps {
   handleChangePlan: () => void;
   setPlanChangeTarget: (user: AdminUser | null) => void;
   planOptions: PlanOption[];
-  t: (key: string, params?: Record<string, unknown>) => string;
-  tc: (key: string) => string;
+  t: any;
+  tc: any;
 }
 
 export function PlanChangeModal({

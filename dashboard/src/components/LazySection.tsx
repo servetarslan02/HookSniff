@@ -29,19 +29,6 @@ const defaultSkeleton = (
   </div>
 );
 
-const tableSkeleton = (
-  <div className="glass-card p-6 animate-pulse space-y-3">
-    <div className="h-5 bg-gray-200 dark:bg-slate-700 rounded-md w-1/4 mb-4" />
-    {Array.from({ length: 5 }).map((_, i) => (
-      <div key={i} className="flex gap-4">
-        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-md flex-1" />
-        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-md w-24" />
-        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-md w-16" />
-      </div>
-    ))}
-  </div>
-);
-
 const chartSkeleton = (
   <div className="glass-card p-6 animate-pulse">
     <div className="h-5 bg-gray-200 dark:bg-slate-700 rounded-md w-1/3 mb-4" />
