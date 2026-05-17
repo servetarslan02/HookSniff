@@ -13,8 +13,8 @@ export default function SettingsSectionPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'settings', label: t('settings'), icon: '⚙️', content: <SettingsPage /> },
-        { key: 'service-tokens', label: t('serviceTokens'), icon: '🎟️', content: <ServiceTokensPage /> },
+        { key: 'settings', label: t('settings'), icon: '⚙️', content: () => <SettingsPage /> },
+        { key: 'service-tokens', label: t('serviceTokens'), icon: '🎟️', content: () => <ServiceTokensPage /> },
       ]}
     />
   );

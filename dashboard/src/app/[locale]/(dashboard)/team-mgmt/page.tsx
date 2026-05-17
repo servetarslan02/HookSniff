@@ -14,9 +14,9 @@ export default function TeamMgmtPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'team', label: t('team'), icon: '👥', content: <TeamPage /> },
-        { key: 'notifications', label: t('notifications'), icon: '🔔', content: <NotificationsPage /> },
-        { key: 'applications', label: t('applications'), icon: '📁', content: <ApplicationsPage /> },
+        { key: 'team', label: t('team'), icon: '👥', content: () => <TeamPage /> },
+        { key: 'notifications', label: t('notifications'), icon: '🔔', content: () => <NotificationsPage /> },
+        { key: 'applications', label: t('applications'), icon: '📁', content: () => <ApplicationsPage /> },
       ]}
     />
   );

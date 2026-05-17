@@ -25,9 +25,9 @@ export default function MonitoringPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'health', label: t('health'), icon: '💓', content: <HealthPage /> },
-        { key: 'alerts', label: t('alerts'), icon: '🔔', content: <AlertsPage /> },
-        { key: 'analytics', label: t('analytics'), icon: '📈', content: <AnalyticsPage /> },
+        { key: 'health', label: t('health'), icon: '💓', content: () => <HealthPage /> },
+        { key: 'alerts', label: t('alerts'), icon: '🔔', content: () => <AlertsPage /> },
+        { key: 'analytics', label: t('analytics'), icon: '📈', content: () => <AnalyticsPage /> },
       ]}
     />
   );
