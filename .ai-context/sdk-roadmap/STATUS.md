@@ -1,6 +1,6 @@
 # SDK Durum Tablosu
 
-> Son güncelleme: 2026-05-18 01:40 GMT+8
+> Son güncelleme: 2026-05-18 01:32 GMT+8
 
 ## Genel Bakış
 
