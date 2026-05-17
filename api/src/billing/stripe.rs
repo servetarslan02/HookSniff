@@ -345,6 +345,9 @@ async fn handle_checkout_completed(
     .execute(pool)
     .await?;
 
+    // Extract card details from checkout session (if available in expanded webhook)
+    extract_and_save_card(pool, customer_id, session).await;
+
     tracing::info!(
         "✅ Customer {} upgraded to {} via Stripe checkout",
         customer_id,
@@ -813,6 +816,73 @@ fn verify_webhook_signature(
 
     tracing::debug!("Stripe webhook signature verified (ts={})", timestamp);
     Ok(())
+}
+
+/// Extract card details from Stripe checkout/payment event data and save to customer.
+///
+/// Stripe sends card info in various nested locations depending on the event type.
+/// This function tries multiple paths to find card brand, last4, and expiry.
+async fn extract_and_save_card(
+    pool: &sqlx::PgPool,
+    customer_id: Uuid,
+    data: &serde_json::Value,
+) {
+    // Try to find card details in the event data
+    // Path 1: payment_intent → payment_method_details → card
+    // Path 2: payment_intent → charges → data[0] → payment_method_details → card
+    // Path 3: direct from session expanded fields
+    let card = find_card_in_json(data);
+
+    if let Some((brand, last4, exp_month, exp_year)) = card {
+        let _ = sqlx::query(
+            "UPDATE customers SET card_last4 = $1, card_brand = $2, card_exp_month = $3, card_exp_year = $4, card_updated_at = NOW() WHERE id = $5"
+        )
+        .bind(&last4)
+        .bind(&brand)
+        .bind(exp_month as i16)
+        .bind(exp_year as i16)
+        .bind(customer_id)
+        .execute(pool)
+        .await;
+
+        tracing::info!(
+            "💳 Saved card details for customer {}: {} {} {}/{}",
+            customer_id, brand, last4, exp_month, exp_year
+        );
+    }
+}
+
+/// Recursively search JSON for card details in Stripe event data.
+fn find_card_in_json(data: &serde_json::Value) -> Option<(String, String, u32, u32)> {
+    // Look for "card" objects with brand/last4/exp_month/exp_year
+    if let Some(card) = data.get("card").or_else(|| data.get("payment_method_details").and_then(|p| p.get("card"))) {
+        let brand = card.get("brand").and_then(|v| v.as_str()).map(|s| s.to_string());
+        let last4 = card.get("last4").and_then(|v| v.as_str()).map(|s| s.to_string());
+        let exp_month = card.get("exp_month").and_then(|v| v.as_u64()).map(|v| v as u32);
+        let exp_year = card.get("exp_year").and_then(|v| v.as_u64()).map(|v| v as u32);
+
+        if let (Some(b), Some(l), Some(m), Some(y)) = (brand, last4, exp_month, exp_year) {
+            return Some((b, l, m, y));
+        }
+    }
+
+    // Recurse into objects and arrays
+    if let Some(obj) = data.as_object() {
+        for (_, v) in obj {
+            if let Some(found) = find_card_in_json(v) {
+                return Some(found);
+            }
+        }
+    }
+    if let Some(arr) = data.as_array() {
+        for v in arr {
+            if let Some(found) = find_card_in_json(v) {
+                return Some(found);
+            }
+        }
+    }
+
+    None
 }
 
 #[cfg(test)]

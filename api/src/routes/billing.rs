@@ -102,6 +102,14 @@ struct SubscriptionResponse {
     billing_period: String,
     /// Current period end date (ISO 8601)
     current_period_end: Option<String>,
+    /// Card last 4 digits
+    card_last4: Option<String>,
+    /// Card brand (visa, mastercard, amex, etc.)
+    card_brand: Option<String>,
+    /// Card expiry month (1-12)
+    card_exp_month: Option<i16>,
+    /// Card expiry year (e.g. 2027)
+    card_exp_year: Option<i16>,
 }
 
 async fn get_subscription(
@@ -148,6 +156,10 @@ async fn get_subscription(
         cancel_at_period_end: customer.cancel_at_period_end,
         billing_period: "monthly".to_string(), // Default; annual tracked via provider
         current_period_end,
+        card_last4: customer.card_last4.clone(),
+        card_brand: customer.card_brand.clone(),
+        card_exp_month: customer.card_exp_month,
+        card_exp_year: customer.card_exp_year,
     }))
 }
 

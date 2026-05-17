@@ -317,7 +317,7 @@ async fn login(
     // ── HS-038f: Timing attack mitigation ──
     // Always perform password hash verification to prevent timing-based user enumeration.
     // If user not found or inactive, hash against a dummy Argon2 hash (constant-time compare).
-    let customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification FROM customers WHERE email = $1")
+    let customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE email = $1")
         .bind(&req.email)
         .fetch_optional(&pool)
         .await?;
@@ -435,7 +435,7 @@ async fn verify_2fa_login(
     // Verify the temp token
     let claims = jwt::verify_token(&req.temp_token, &cfg.jwt_secret)?;
 
-    let customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification FROM customers WHERE id = $1")
+    let customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE id = $1")
         .bind(claims.sub)
         .fetch_optional(&pool)
         .await?
@@ -800,7 +800,7 @@ async fn refresh_token(
 
     let (token_id, customer_id, _expires_at) = record.ok_or(AppError::Unauthorized)?;
 
-    let customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification FROM customers WHERE id = $1")
+    let customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE id = $1")
         .bind(customer_id)
         .fetch_optional(&pool)
         .await?

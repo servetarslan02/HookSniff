@@ -376,7 +376,7 @@ async fn handle_inbound(
     // Use 24-char prefix to match DB storage (api_key_prefix)
     let prefix = &api_key[..24.min(api_key.len())];
     let candidates =
-        sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification FROM customers WHERE api_key_prefix = $1")
+        sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE api_key_prefix = $1")
             .bind(prefix)
             .fetch_all(&pool)
             .await?;
@@ -400,7 +400,7 @@ async fn handle_inbound(
 
         for (hash, customer_id) in &api_key_rows {
             if crate::middleware::verify_api_key(api_key, hash) {
-                customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification FROM customers WHERE id = $1")
+                customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE id = $1")
                     .bind(customer_id)
                     .fetch_optional(&pool)
                     .await?;
@@ -525,7 +525,7 @@ async fn handle_inbound_to_endpoint(
     // Use 24-char prefix to match DB storage (api_key_prefix)
     let prefix = &api_key[..24.min(api_key.len())];
     let candidates =
-        sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification FROM customers WHERE api_key_prefix = $1")
+        sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE api_key_prefix = $1")
             .bind(prefix)
             .fetch_all(&pool)
             .await?;
@@ -549,7 +549,7 @@ async fn handle_inbound_to_endpoint(
 
         for (hash, customer_id) in &api_key_rows {
             if crate::middleware::verify_api_key(api_key, hash) {
-                customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification FROM customers WHERE id = $1")
+                customer = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE id = $1")
                     .bind(customer_id)
                     .fetch_optional(&pool)
                     .await?;
