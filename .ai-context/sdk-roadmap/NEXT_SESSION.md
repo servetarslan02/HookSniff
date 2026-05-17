@@ -1,39 +1,48 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-18 06:55 GMT+8
+> Son güncelleme: 2026-05-18 07:26 GMT+8
 
 ## 🎯 TÜM FAZLAR TAMAMLANDI (8-15)
 
-## 📊 Mevcut Durum
+SDK Roadmap'teki tüm fazlar tamamlandı. Yeni feature geliştirme bitti.
 
-- 11/11 SDK: v1.0.0
-- Faz 8 (Environment): ✅
-- Faz 9 (Background Task): ✅
-- Faz 10 (Operational Webhook): ✅
-- Faz 11 (Message Poller): ✅
-- Faz 12 (Ingest): ✅
-- Faz 13 (Connector): ✅
-- Faz 14 (Integration): ✅
-- Faz 15 (Streaming): ✅
-  - Migration 064: stream_channels + stream_subscriptions + stream_messages tabloları ✅
-  - Rust API: channels CRUD + subscribe (SSE) + publish + subscriptions + messages ✅
-  - Dashboard sayfası (live event feed, channel management) ✅
-  - SDK'lar güncellendi (11/11) ✅
-  - Sidebar nav: 📡 Streaming ✅
-  - i18n: en + tr ✅
+---
 
-## ⚠️ Deploy Durumu
-- Dashboard (Vercel): ✅ Auto-deploy çalışıyor
-- API (Cloud Run): ❌ Tüm yeni endpoint'ler deploy edilmeli — Cloud Build tetiklenmeli
-- DB: ✅ Tüm tablolar hazır (migration 063 + 064 uygulandı)
+## ⚠️ KALAN İŞLER
 
-## 📝 Bundan Sonraki Adımlar
-1. **Cloud Build tetikle** — Tüm yeni API'ler deploy edilmeli
-2. Genel kalite kontrol ve test
-3. Dokümantasyon güncelleme
-4. SDK publish (npm, PyPI, crates.io, vb.)
+### 1. Cloud Build Deploy (EN KRİTİK)
+Tüm yeni API endpoint'leri (Integration, Stream) Cloud Run'da aktif değil.
+```bash
+gcloud builds submit --config cloudbuild.yaml .
+```
+veya GCP Console'dan manual trigger.
 
-## 🔑 Oturum Notları
-- Oturumlar ~1 saat sürüyor
-- Her faz sonunda hafıza dosyaları güncelleniyor
-- Cloud Build manuel tetikleniyor
+### 2. Registry Publish (5 SDK)
+Kod ayrı repolarda push edildi, ama registry'ye yüklenmedi:
+
+| SDK | Komut | Gereken |
+|-----|-------|---------|
+| Ruby | `gem build hooksniff.gemspec && gem push *.gem` | Ruby runtime |
+| Java | `mvn deploy -B -DskipTests` | JDK + Maven |
+| Kotlin | `./gradlew publish` | JDK + Gradle |
+| C# | `dotnet pack && dotnet nuget push` | .NET SDK |
+| Elixir | `mix hex.publish --yes` | Elixir + Mix |
+
+Credentials: MEMORY.md'de var.
+
+### 3. SDK Publish Doğrulama
+Her registry'de v1.1.0'ın yüklendiğini doğrula:
+- https://www.npmjs.com/package/hooksniff
+- https://pypi.org/project/hooksniff/
+- https://crates.io/crates/hooksniff
+- https://rubygems.org/gems/hooksniff
+- https://hex.pm/packages/hooksniff
+
+---
+
+## 🔧потенциальные İyileştirmeler
+
+- SDK test coverage artırma
+- Dokümantasyon sitesi
+- CI/CD pipeline (GitHub Actions)
+- SDK auto-publish workflow
