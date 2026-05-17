@@ -1,6 +1,6 @@
 # SDK Roadmap MEMORY
 
-> Son güncelleme: 2026-05-18 01:40 GMT+8
+> Son güncelleme: 2026-05-18 01:32 GMT+8
 
 ## ⚠️ KRİTİK: SDK Adaptasyon Yöntemi
 
@@ -88,3 +88,18 @@ sdks/python/
 - API versioning: `/v1/` prefix
 - Auth: Bearer token
 - Webhook headers: `hooksniff-id`, `hooksniff-signature`, `hooksniff-timestamp`
+
+## 🟢 Yeni Özellikler Planı (SDK Publish Sonrası)
+
+> Detaylar: NEW-FEATURES-PLAN.md
+
+**Sıra:** Environment → Background Task → Operational Webhook → Message Poller → Ingest → Connector → Integration → Streaming
+
+**Bağımlılıklar:**
+- 1→2→3 (Environment → Background Task → Operational Webhook)
+- 5→6→7 (Ingest → Connector → Integration)
+- 4 ve 8 bağımsız
+
+**Toplam:** ~65-85 saat, 8 yeni tablo
+
+**Öncelik:** Önce SDK Faz 1-7 (core kalite, test, CI/CD, publish), sonra yeni feature'lar

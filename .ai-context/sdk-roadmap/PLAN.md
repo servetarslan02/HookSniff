@@ -1,6 +1,6 @@
 # SDK Strateji Planı — %100 Hedefi
 
-> Son güncelleme: 2026-05-18 01:40 GMT+8
+> Son güncelleme: 2026-05-18 01:32 GMT+8
 > Hedef: Stripe seviyesinde SDK kalitesi
 
 ---
@@ -79,6 +79,46 @@ Neden?
 ### Faz 7 — Son Dokunuşlar (3 saat)
 
 **Toplam:** 34-38 saat → %100
+
+---
+
+## 🟢 Faz 8-15 — Yeni Özellikler (SDK Publish Sonrası)
+
+> Detaylar: NEW-FEATURES-PLAN.md
+
+### Faz 8 — Environment (4-6 saat)
+| # | Görev | Süre |
+|---|-------|------|
+| 8.1 | Migration: `environments` tablosu | 30 dk |
+| 8.2 | Migration: `environment_variables` tablosu | 30 dk |
+| 8.3 | Rust API: CRUD endpoint'leri | 2 saat |
+| 8.4 | SDK güncellemesi (11 dil) | 1-2 saat |
+| 8.5 | Dashboard UI | 1 saat |
+
+### Faz 9 — Background Task (3-4 saat)
+| # | Görev | Süre |
+|---|-------|------|
+| 9.1 | Migration: `background_tasks` tablosu | 30 dk |
+| 9.2 | Rust API: List, get, cancel | 1.5 saat |
+| 9.3 | Worker: Task execution | 1 saat |
+| 9.4 | SDK güncellemesi (11 dil) | 1 saat |
+
+### Faz 10 — Operational Webhook (3-4 saat)
+| # | Görev | Süre |
+|---|-------|------|
+| 10.1 | Migration: `operational_webhook_endpoints` | 30 dk |
+| 10.2 | Migration: `operational_webhook_deliveries` | 30 dk |
+| 10.3 | Rust API: CRUD + delivery log | 1.5 saat |
+| 10.4 | Worker: Event dispatch | 1 saat |
+| 10.5 | SDK güncellemesi (11 dil) | 1 saat |
+
+### Faz 11 — Message Poller (3-4 saat)
+### Faz 12 — Ingest (8-10 saat)
+### Faz 13 — Connector (20+ saat)
+### Faz 14 — Integration (10-15 saat)
+### Faz 15 — Streaming (15-20 saat)
+
+**Toplam yeni özellikler:** ~65-85 saat
 
 ---
 
