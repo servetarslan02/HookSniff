@@ -4,159 +4,148 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"encoding/json"
-	"errors"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
 )
 
-const timestampTolerance = 5 * time.Minute
+var base64enc = base64.StdEncoding
+
+type Webhook struct {
+	key []byte
+}
+
+const webhookSecretPrefix = "whsec_"
+
+var tolerance time.Duration = 5 * time.Minute
 
 var (
-	ErrMissingWebhookID        = errors.New("hooksniff: missing webhook-id header")
-	ErrMissingWebhookTimestamp = errors.New("hooksniff: missing webhook-timestamp header")
-	ErrMissingWebhookSignature = errors.New("hooksniff: missing webhook-signature header")
-	ErrInvalidTimestamp        = errors.New("hooksniff: invalid webhook-timestamp header")
-	ErrTimestampTooOld         = errors.New("hooksniff: webhook timestamp is too old or too new")
-	ErrInvalidSignature        = errors.New("hooksniff: invalid webhook signature")
+	errRequiredHeaders     = fmt.Errorf("missing required headers")
+	errInvalidHeaders      = fmt.Errorf("invalid signature headers")
+	errNoMatchingSignature = fmt.Errorf("no matching signature found")
+	errMessageTooOld       = fmt.Errorf("message timestamp too old")
+	errMessageTooNew       = fmt.Errorf("message timestamp too new")
 )
 
-// Webhook verifies incoming webhook signatures.
-type Webhook struct {
-	secret []byte
-}
-
-// NewWebhook creates a new Webhook verifier.
-// The secret should be the endpoint's signing secret (e.g., "whsec_base64encoded...").
-func NewWebhook(secret string) *Webhook {
-	return &Webhook{secret: decodeSecret(secret)}
-}
-
-// decodeSecret strips the whsec_ prefix and base64-decodes the secret.
-func decodeSecret(secret string) []byte {
-	raw := secret
-	if strings.HasPrefix(raw, "whsec_") {
-		raw = raw[6:]
-	}
-
-	decoded, err := base64.StdEncoding.DecodeString(raw)
+func NewWebhook(secret string) (*Webhook, error) {
+	key, err := base64enc.DecodeString(strings.TrimPrefix(secret, webhookSecretPrefix))
 	if err != nil {
-		return []byte(raw)
+		return nil, err
 	}
-	return decoded
+	return &Webhook{
+		key: key,
+	}, nil
 }
 
-// Verify verifies a webhook payload against its signature headers.
-// Returns the parsed payload as a map if verification succeeds.
-func (w *Webhook) Verify(payload []byte, headers map[string]string) (map[string]interface{}, error) {
-	// Normalize headers to lowercase
-	normalized := make(map[string]string)
-	for k, v := range headers {
-		normalized[strings.ToLower(k)] = v
+func NewWebhookRaw(secret []byte) (*Webhook, error) {
+	return &Webhook{
+		key: secret,
+	}, nil
+}
+
+// Verify validates the payload against the hooksniff signature headers
+// using the webhooks signing secret.
+//
+// Returns an error if the body or headers are missing/unreadable
+// or if the signature doesn't match.
+func (wh *Webhook) Verify(payload []byte, headers http.Header) error {
+	return wh.verify(payload, headers, true)
+}
+
+// VerifyIgnoringTimestamp validates the payload against the hooksniff signature headers
+// using the webhooks signing secret.
+//
+// Returns an error if the body or headers are missing/unreadable
+// or if the signature doesn't match.
+//
+// WARNING: This function does not check the signature's timestamp.
+// We recommend using the `Verify` function instead.
+func (wh *Webhook) VerifyIgnoringTimestamp(payload []byte, headers http.Header) error {
+	return wh.verify(payload, headers, false)
+}
+
+func (wh *Webhook) verify(payload []byte, headers http.Header, enforceTolerance bool) error {
+	msgId := headers.Get("hooksniff-id")
+	msgSignature := headers.Get("hooksniff-signature")
+	msgTimestamp := headers.Get("hooksniff-timestamp")
+
+	if msgId == "" || msgSignature == "" || msgTimestamp == "" {
+		msgId = headers.Get("webhook-id")
+		msgSignature = headers.Get("webhook-signature")
+		msgTimestamp = headers.Get("webhook-timestamp")
+		if msgId == "" || msgSignature == "" || msgTimestamp == "" {
+			return errRequiredHeaders
+		}
 	}
 
-	// Support both svix- and webhook- prefixed headers
-	msgID := normalized["svix-id"]
-	if msgID == "" {
-		msgID = normalized["webhook-id"]
-	}
-	timestamp := normalized["svix-timestamp"]
-	if timestamp == "" {
-		timestamp = normalized["webhook-timestamp"]
-	}
-	signature := normalized["svix-signature"]
-	if signature == "" {
-		signature = normalized["webhook-signature"]
-	}
-
-	if msgID == "" {
-		return nil, ErrMissingWebhookID
-	}
-	if timestamp == "" {
-		return nil, ErrMissingWebhookTimestamp
-	}
-	if signature == "" {
-		return nil, ErrMissingWebhookSignature
-	}
-
-	// Validate timestamp
-	ts, err := strconv.ParseInt(timestamp, 10, 64)
+	timestamp, err := parseTimestampHeader(msgTimestamp)
 	if err != nil {
-		return nil, ErrInvalidTimestamp
+		return err
 	}
 
-	now := time.Now().Unix()
-	if abs(now-ts) > int64(timestampTolerance.Seconds()) {
-		return nil, ErrTimestampTooOld
-	}
-
-	// Compute expected signature
-	content := fmt.Sprintf("%s.%s.%s", msgID, timestamp, string(payload))
-	mac := hmac.New(sha256.New, w.secret)
-	mac.Write([]byte(content))
-	expectedSig := base64.StdEncoding.EncodeToString(mac.Sum(nil))
-	expected := "v1," + expectedSig
-
-	// Verify signature (supports multiple comma-separated signatures)
-	if !verifySignature(expected, signature) {
-		return nil, ErrInvalidSignature
-	}
-
-	// Parse JSON payload
-	var result map[string]interface{}
-	if err := json.Unmarshal(payload, &result); err != nil {
-		// Return raw payload as string if not JSON
-		return map[string]interface{}{"_raw": string(payload)}, nil
-	}
-
-	return result, nil
-}
-
-// Sign signs a payload for testing or server-side webhook sending.
-func (w *Webhook) Sign(msgID string, timestamp time.Time, payload []byte) string {
-	ts := strconv.FormatInt(timestamp.Unix(), 10)
-	content := fmt.Sprintf("%s.%s.%s", msgID, ts, string(payload))
-	mac := hmac.New(sha256.New, w.secret)
-	mac.Write([]byte(content))
-	sig := base64.StdEncoding.EncodeToString(mac.Sum(nil))
-	return "v1," + sig
-}
-
-// verifySignature checks if any of the comma-separated signatures match.
-func verifySignature(expected, actual string) bool {
-	signatures := strings.Split(actual, ",")
-	for _, sig := range signatures {
-		sig = strings.TrimSpace(sig)
-
-		// Strip version prefix
-		parts := strings.SplitN(sig, ",", 2)
-		sigPart := sig
-		if len(parts) > 1 {
-			sigPart = parts[1]
+	if enforceTolerance {
+		if err := verifyTimestamp(timestamp); err != nil {
+			return err
 		}
+	}
 
-		expectedParts := strings.SplitN(expected, ",", 2)
-		expectedPart := expected
-		if len(expectedParts) > 1 {
-			expectedPart = expectedParts[1]
+	computedSignature, err := wh.Sign(msgId, timestamp, payload)
+	if err != nil {
+		return err
+	}
+	expectedSignature := []byte(strings.Split(computedSignature, ",")[1])
+
+	passedSignatures := strings.Split(msgSignature, " ")
+	for _, versionedSignature := range passedSignatures {
+		sigParts := strings.Split(versionedSignature, ",")
+		if len(sigParts) < 2 {
+			continue
 		}
+		version := sigParts[0]
+		signature := []byte(sigParts[1])
 
-		if len(expectedPart) != len(sigPart) {
+		if version != "v1" {
 			continue
 		}
 
-		if hmac.Equal([]byte(expectedPart), []byte(sigPart)) {
-			return true
+		if hmac.Equal(signature, expectedSignature) {
+			return nil
 		}
 	}
-	return false
+	return errNoMatchingSignature
 }
 
-func abs(x int64) int64 {
-	if x < 0 {
-		return -x
+func (wh *Webhook) Sign(msgId string, timestamp time.Time, payload []byte) (string, error) {
+	toSign := fmt.Sprintf("%s.%d.%s", msgId, timestamp.Unix(), payload)
+
+	h := hmac.New(sha256.New, wh.key)
+	h.Write([]byte(toSign))
+	sig := make([]byte, base64enc.EncodedLen(h.Size()))
+	base64enc.Encode(sig, h.Sum(nil))
+	return fmt.Sprintf("v1,%s", sig), nil
+
+}
+
+func parseTimestampHeader(timestampHeader string) (time.Time, error) {
+	timeInt, err := strconv.ParseInt(timestampHeader, 10, 64)
+	if err != nil {
+		return time.Time{}, errInvalidHeaders
 	}
-	return x
+	timestamp := time.Unix(timeInt, 0)
+	return timestamp, nil
+}
+
+func verifyTimestamp(timestamp time.Time) error {
+	now := time.Now()
+
+	if now.Sub(timestamp) > tolerance {
+		return errMessageTooOld
+	}
+	if timestamp.Unix() > now.Add(tolerance).Unix() {
+		return errMessageTooNew
+	}
+
+	return nil
 }
