@@ -1,5 +1,6 @@
 'use client';
 
+import { LazySection, Skeletons } from '@/components/LazySection';
 import { useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -142,7 +143,8 @@ export default function FeatureFlagsPage() {
         </button>
       </div>
 
-      {/* Flags List */}
+      {/* Flags List — below the fold, lazy loaded */}
+      <LazySection fallback={Skeletons.table()} rootMargin={300}>
       <div className="glass-card overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center animate-pulse text-gray-500 dark:text-slate-400">{t('loading')}</div>
@@ -222,6 +224,7 @@ export default function FeatureFlagsPage() {
           </div>
         )}
       </div>
+      </LazySection>
 
       {/* ─── Create Modal ─── */}
       {showCreate && (

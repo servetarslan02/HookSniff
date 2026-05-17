@@ -1,6 +1,6 @@
 'use client';
 
-import { LazySection } from '@/components/LazySection';
+import { LazySection, Skeletons } from '@/components/LazySection';
 import { useState, useMemo } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
@@ -319,6 +319,8 @@ export default function AdminUsersPage() {
         </div>
       </form>
 
+      {/* Bulk Action Bar + User Table — below the fold, lazy loaded */}
+      <LazySection fallback={Skeletons.table()} rootMargin={300}>
       {/* Bulk Action Bar */}
       {selectedIds.size > 0 && (
         <div className="glass-card p-4 flex flex-wrap items-center gap-3 border-2 border-red-200 dark:border-red-500/30">
@@ -632,6 +634,7 @@ export default function AdminUsersPage() {
           </div>
         </div>
       )}
+      </LazySection>
 
       {/* Plan Change Modal */}
       {planChangeTarget && (
