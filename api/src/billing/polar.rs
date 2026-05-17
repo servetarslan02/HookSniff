@@ -440,6 +440,37 @@ impl PaymentProviderImpl for PolarProvider {
                     .unwrap_or("USD")
                     .to_string();
 
+                // Try to extract card details from Polar order data
+                // Polar may include billing details in the order object
+                let card_info = extract_polar_card_info(order);
+
+                if let Some((brand, last4, exp_month, exp_year)) = card_info {
+                    // Get customer_id from the order to save card info
+                    let customer_id = order
+                        .get("customer_id")
+                        .or_else(|| order.get("external_customer_id"))
+                        .and_then(|v| v.as_str())
+                        .and_then(|s| Uuid::parse_str(s).ok());
+
+                    if let Some(cid) = customer_id {
+                        let _ = sqlx::query(
+                            "UPDATE customers SET card_last4 = $1, card_brand = $2, card_exp_month = $3, card_exp_year = $4, card_updated_at = NOW() WHERE id = $5"
+                        )
+                        .bind(&last4)
+                        .bind(&brand)
+                        .bind(exp_month as i16)
+                        .bind(exp_year as i16)
+                        .bind(cid)
+                        .execute(pool)
+                        .await;
+
+                        tracing::info!(
+                            "💳 Saved Polar card details for customer {}: {} {}",
+                            cid, brand, last4
+                        );
+                    }
+                }
+
                 Ok(WebhookResult::PaymentSucceeded {
                     provider_tx_id: tx_id,
                     amount_cents: amount,
@@ -619,6 +650,47 @@ impl PolarProvider {
         }
         results
     }
+}
+
+/// Extract card details from Polar.sh order data.
+///
+/// Polar may include payment method info in various locations within the order object.
+/// Tries multiple paths to find card brand, last4, and expiry.
+fn extract_polar_card_info(data: &serde_json::Value) -> Option<(String, String, u32, u32)> {
+    // Polar might include card info in billing_details, payment_method, or nested objects
+    let paths = [
+        ("billing_details", "card"),
+        ("payment_method", "card"),
+        ("payment_method_details", "card"),
+        ("charge", "payment_method_details"),
+    ];
+
+    for (outer, inner) in paths {
+        if let Some(card) = data.get(outer).and_then(|o| o.get(inner)) {
+            let brand = card.get("brand").and_then(|v| v.as_str());
+            let last4 = card.get("last4").and_then(|v| v.as_str());
+            let exp_month = card.get("exp_month").and_then(|v| v.as_u64());
+            let exp_year = card.get("exp_year").and_then(|v| v.as_u64());
+
+            if let (Some(b), Some(l), Some(m), Some(y)) = (brand, last4, exp_month, exp_year) {
+                return Some((b.to_string(), l.to_string(), m as u32, y as u32));
+            }
+        }
+    }
+
+    // Also try direct "card" object at root level
+    if let Some(card) = data.get("card") {
+        let brand = card.get("brand").and_then(|v| v.as_str());
+        let last4 = card.get("last4").and_then(|v| v.as_str());
+        let exp_month = card.get("exp_month").and_then(|v| v.as_u64());
+        let exp_year = card.get("exp_year").and_then(|v| v.as_u64());
+
+        if let (Some(b), Some(l), Some(m), Some(y)) = (brand, last4, exp_month, exp_year) {
+            return Some((b.to_string(), l.to_string(), m as u32, y as u32));
+        }
+    }
+
+    None
 }
 
 #[cfg(test)]
