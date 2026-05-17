@@ -1,161 +1,63 @@
 # SDK Roadmap MEMORY
 
-> Son güncelleme: 2026-05-18 03:48 GMT+8 (Oturum — 10/11 SDK v1.0.0 publish edildi)
+> Son güncelleme: 2026-05-18 06:26 GMT+8 (Oturum — Faz 8-13 tamamlandı)
 
 ## ⚠️ KRİTİK: SDK Adaptasyon Yöntemi
 
 **ASLA sıfırdan yazma!** Her zaman Svix SDK'yı kopyala ve adapte et.
 
-### Adımlar (her SDK için aynı):
-1. Svix repo'sundan ilgili dil SDK'sını kopyala
-2. Bulk find-replace: `svix` → `hooksniff`, `Svix` → `HookSniff`, `SVIX` → `HOOKSNIFF`
-3. Import path'lerini değiştir
-4. API base URL'ini değiştir
-5. Svix-specific features kaldır (Application, BackgroundTask, Connector, Environment, Ingest, Integration, OperationalWebhook, Streaming, MessagePoller)
-6. Header'ları değiştir: `hooksniff-id`, `hooksniff-signature`, `hooksniff-timestamp`
-7. Syntax-check yap
-8. GitHub'a push et
-
 ## 📊 SDK Publish Durumu — v1.0.0
 
-| # | SDK | Registry | Durum | URL |
-|---|-----|----------|-------|-----|
-| 1 | **Node.js** | npm | ✅ Yüklendi | https://www.npmjs.com/package/hooksniff |
-| 2 | **Python** | PyPI | ✅ Yüklendi | https://pypi.org/project/hooksniff/1.0.0/ |
-| 3 | **Go** | GitHub tag | ✅ v1.0.0 tag atıldı | https://github.com/servetarslan02/hooksniff-go |
-| 4 | **Rust** | crates.io | ✅ Yüklendi | https://crates.io/crates/hooksniff |
-| 5 | **Ruby** | RubyGems | ✅ Yüklendi | https://rubygems.org/gems/hooksniff |
-| 6 | **Java** | Maven Central | ✅ Yüklendi | `io.github.servetarslan02:hooksniff-sdk:1.0.0` |
-| 7 | **C#** | NuGet | ✅ Yüklendi | https://www.nuget.org/packages/HookSniff/ |
-| 8 | **Elixir** | Hex.pm | ✅ Yüklendi | https://hex.pm/packages/hooksniff/1.0.0 |
-| 9 | **PHP** | Packagist | ✅ Güncelleme tetiklendi | https://packagist.org/packages/hooksniff/hooksniff |
-| 10 | **Swift** | GitHub tag | ✅ v1.0.0 tag atıldı | https://github.com/servetarslan02/hooksniff-swift |
-| 11 | **Kotlin** | Maven Central | ✅ Yüklendi | https://central.sonatype.com/artifact/io.github.servetarslan02/hooksniff-sdk-kotlin |
+| # | SDK | Registry | Durum |
+|---|-----|----------|-------|
+| 1 | **Node.js** | npm | ✅ |
+| 2 | **Python** | PyPI | ✅ |
+| 3 | **Go** | GitHub tag | ✅ |
+| 4 | **Rust** | crates.io | ✅ |
+| 5 | **Ruby** | RubyGems | ✅ |
+| 6 | **Java** | Maven Central | ✅ |
+| 7 | **C#** | NuGet | ✅ |
+| 8 | **Elixir** | Hex.pm | ✅ |
+| 9 | **PHP** | Packagist | ✅ |
+| 10 | **Swift** | GitHub tag | ✅ |
+| 11 | **Kotlin** | Maven Central | ✅ |
 
-## ⏳ Sıradaki: Kotlin SDK
+## 📊 Faz İlerlemesi
 
-### Kotlin Sorunları:
-- Svix-specific model dosyaları hâlâ mevcut (connector configs, polling, streaming, vb.)
-- `Authentication.kt` — Svix API'lerini referans ediyor (appPortalAccess, streamPortalAccess, expireAll, dashboardAccess, streamLogout, streamExpireAll, getStreamPollerToken, rotateStreamPollerToken)
-- `Endpoint.kt` — bulkReplay, recover, replayMissing, getStats, transformationGet, patchTransformation metodları var
-- `Statistics.kt` — aggregateAppStats, aggregateEventTypes referansları var
-- `HookSniff.kt` — Application, BackgroundTask, Ingest, Integration, Streaming, OperationalWebhook, OperationalWebhookEndpoint referansları var
-- `Message.kt` — MessagePoller, ExpungeAllContents, Precheck referansları var
-- `HookSniffHttpClient.kt` — coroutine tabanlı (`suspend` fonksiyonlar)
-- `deploy.gradle` — `classifier` deprecated, `archiveClassifier` olmalı
-- `gradle.properties` — oluşturuldu (io.github.servetarslan02, hooksniff-sdk-kotlin)
+| Faz | İçerik | Durum |
+|-----|--------|-------|
+| 8 | Environment | ✅ |
+| 9 | Background Task | ✅ |
+| 10 | Operational Webhook | ✅ (worker dispatch dahil) |
+| 11 | Message Poller | ✅ |
+| 12 | Ingest | ✅ |
+| 13 | Connector | ✅ |
+| 14 | Integration | ⬜ |
+| 15 | Streaming | ⬜ |
 
-### Kotlin Publish Adımları:
-1. Svix-specific model dosyalarını sil
-2. `Authentication.kt` — sadece `logout()` metodunu tut
-3. `Endpoint.kt` — core metodları tut (list, create, get, update, delete, patch, getHeaders, updateHeaders, patchHeaders, getSecret, rotateSecret, sendExample)
-4. `Statistics.kt` — boş class yap
-5. `HookSniff.kt` — sadece core API'leri tut (authentication, endpoint, eventType, health, message, messageAttempt, statistics)
-6. `Message.kt` — sadece core metodları tut (list, create, get, expungeContent)
-7. Build et: `./gradlew build -x test`
-8. Publish et (Java ile aynı GPG key + Sonatype credentials):
-   ```bash
-   export JAVA_HOME=/opt/jdk-17.0.12
-   GPG_KEY=$(gpg --export-secret-keys --armor [REDACTED])
-   ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository \
-     -PNEXUS_USERNAME=[REDACTED] \
-     -PNEXUS_PASSWORD='[REDACTED]' \
-     -PsigningKey="$GPG_KEY" \
-     -PsigningPassword=""
-   ```
-9. Repo'ya push et
-
-## 🔑 Token Durumu
-
-| Registry | Token | Durum |
-|----------|-------|-------|
-| npm | `[REDACTED]` | ✅ Kullanıldı |
-| PyPI | `[REDACTED]` | ✅ Kullanıldı |
-| crates.io | `[REDACTED]` | ✅ Kullanıldı |
-| RubyGems | `[REDACTED]` | ✅ Kullanıldı |
-| NuGet | `[REDACTED]` | ✅ Kullanıldı |
-| Hex.pm | `[REDACTED]` | ✅ Kullanıldı |
-| Packagist | `86b49ac...` | ✅ Kullanıldı |
-| Maven Central | `[REDACTED]` / `EYLV763...` | ✅ Kullanıldı |
-| GPG Key ID | `[REDACTED]` | ✅ Keyserver'a yüklendi |
-
-## 📂 Ayrı Repo Yapısı (Tüm SDK'lar)
-
-| SDK | Repo |
-|-----|------|
-| Node.js | https://github.com/servetarslan02/hooksniff-node |
-| Python | https://github.com/servetarslan02/hooksniff-python |
-| Go | https://github.com/servetarslan02/hooksniff-go |
-| Rust | https://github.com/servetarslan02/hooksniff-rust |
-| Ruby | https://github.com/servetarslan02/hooksniff-ruby |
-| Java | https://github.com/servetarslan02/hooksniff-java |
-| Kotlin | https://github.com/servetarslan02/hooksniff-kotlin |
-| PHP | https://github.com/servetarslan02/hooksniff-php |
-| C# | https://github.com/servetarslan02/hooksniff-csharp |
-| Elixir | https://github.com/servetarslan02/hooksniff-elixir |
-| Swift | https://github.com/servetarslan02/hooksniff-swift |
-
-## 📊 Benchmark Sonuçları
-
-| SDK | Dosya | Satır | Model |
-|-----|-------|-------|-------|
-| Node.js | 73 | 5,851 | ~40 |
-| Python | 134 | 7,939 | 101 |
-| Go | 124 | 6,003 | 99 |
-| Rust | 126 | 8,067 | 98 |
-| Ruby | 75 | 4,312 | 48 |
-| Java | 218 | 14,531 | 104 |
-| Kotlin | 131 | 3,405 | 103 |
-| PHP | 89 | 8,483 | ~50 |
-| C# | 71 | 4,471 | ~40 |
-| Elixir | 249 | 13,791 | — |
-| Swift | 460 | 19,332 | — |
+## 🔧 Build Ortamı (Bu sunucuda kuruldu)
+- JDK 17: /opt/jdk-17
+- Maven: /opt/apache-maven-3.9.6
+- Go: /usr/local/go/bin
+- Rust: $HOME/.cargo/env (rustc 1.95.0)
+- Node.js: v22.22.1
+- GPG Key ID: FC5EA3BE171950ED5B42B44948FA192D3997BF0E
 
 ## HookSniff API Bilgileri
 - Base URL: `https://api.hooksniff-1046140057667.europe-west1.run.app`
-- API versioning: `/v1/` prefix
-- Auth: Bearer token
-- Webhook headers: `hooksniff-id`, `hooksniff-signature`, `hooksniff-timestamp`
+- Dashboard: `https://hooksniff.vercel.app`
+- DB: Neon PostgreSQL
+- Deploy: Cloud Build (cloudbuild.yaml)
+- Vercel: Auto-deploy from GitHub
 
-## 🔧 Build Ortamı Bilgileri (Bu sunucuda kuruldu)
-- Java 17: `/opt/jdk-17.0.12`
-- Maven: `/opt/apache-maven-3.9.6`
-- Go: `/usr/local/go/bin`
-- Rust: `$HOME/.cargo/env`
-- Ruby: `/snap/bin` (snap install ruby --classic)
-- Elixir: `/opt/elixir/bin` (v1.18.3)
-- Erlang: `/snap/bin` (snap install erlang --classic)
-- dotnet: `/snap/bin` (snap install dotnet-sdk --classic)
-- GPG key: `[REDACTED]` (HookSniff <support@hooksniff.com>)
+## ⚠️ Deploy Notu
+Cloud Build manuel tetikleniyor. Son connector API'si deploy edilmeli.
+DB tabloları ve seed data hazır.
 
-## 📝 Oturum 2026-05-18 — SDK Cleanup & Kotlin Publish
-
-### Yapılan:
-1. **Kotlin SDK Publish** ✅ — Maven Central'a yüklendi (io.github.servetarslan02:hooksniff-sdk-kotlin:1.0.0)
-2. **Svix-specific kod temizliği** — 11 SDK'dan Svix'e özel model/method/API dosyaları kaldırıldı (142 dosya, 6840 satır)
-3. **Test secret temizliği** — Java SDK'daki hardcoded whsec_MfKQ9r8... secret kaldırıldı
-4. **Rust SDK derleme** — 0 hata, 0 uyarı ile derleniyor
-5. **Node.js build fix** — messageAttemptRecoveredEventData export kaldırıldı
-6. **Python fix** — broken message_poller import kaldırıldı
-7. **JDK 17 kuruldu** — /opt/jdk-17
-8. **Rust kuruldu** — rustc 1.95.0
-
-### Build Ortamı:
-- JDK 17: /opt/jdk-17
-- Rust: source "$HOME/.cargo/env" (rustc 1.95.0)
-- GPG key: FC5EA3BE171950ED5B42B44948FA192D3997BF0E (yeni, keyserver'da mevcut)
-
-### 11/11 SDK Durumu:
-| SDK | Build | Registry |
-|-----|-------|----------|
-| Java | ✅ | Maven Central |
-| Kotlin | ✅ | Maven Central |
-| Rust | ✅ | crates.io |
-| Node.js | ✅ | npm |
-| Go | ✅ | GitHub tag |
-| Python | ✅ (syntax) | PyPI |
-| Ruby | ✅ | RubyGems |
-| PHP | ✅ (kaynak) | Packagist |
-| C# | ✅ | NuGet |
-| Elixir | ✅ | Hex.pm |
-| Swift | ✅ | GitHub tag |
+## 📝 Son Oturum (2026-05-18)
+- Faz 10: Operational webhook worker dispatch eklendi (delivery.failed, endpoint.disabled)
+- Faz 11: Message Poller — API + Dashboard + 11 SDK
+- Faz 12: Ingest — sidebar nav + SDK tamamlandı
+- Faz 13: Connector — 8 servis (Stripe, Shopify, GitHub, Slack, Twilio, Discord, Linear, Notion)
+- Migration 061 (message_cursors) + 062 (connectors) uygulandı
+- Tüm SDK'lar güncellendi (13 resource × 11 dil)
