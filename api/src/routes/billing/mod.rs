@@ -17,6 +17,9 @@ use crate::models::customer::Customer;
 /// Grace period in days after a failed payment before downgrade.
 const GRACE_PERIOD_DAYS: i64 = 7;
 
+// Maximum billing webhook attempts per IP per minute.
+pub(crate) const BILLING_WEBHOOK_RATE_LIMIT: u32 = 30;
+
 /// Item 259: Allowed checkout URL domains for server-side validation.
 const ALLOWED_CHECKOUT_DOMAINS: &[&str] = &[
     "checkout.stripe.com",
@@ -70,9 +73,16 @@ mod webhooks;
 mod grace;
 
 pub use grace::process_expired_grace_periods;
+pub(crate) use grace::cleanup_excess_endpoints;
 use subscription::{get_subscription, cancel_subscription, upgrade_plan};
 use portal::{open_portal, get_usage, get_invoices, request_refund, get_overage_settings, update_overage_settings};
 use webhooks::{handle_stripe_webhook, handle_polar_webhook, handle_iyzico_webhook};
+
+#[derive(Serialize)]
+pub(crate) struct PortalResponse {
+    pub(crate) url: String,
+    pub(crate) provider: String,
+}
 
 pub fn router() -> Router {
     Router::new()

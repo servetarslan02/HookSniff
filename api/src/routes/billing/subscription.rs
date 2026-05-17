@@ -360,8 +360,4 @@ pub async fn upgrade_plan(
 // ──────────────────────────────────────────────────────────────
 
 #[derive(Serialize)]
-struct PortalResponse {
-    url: String,
-    provider: String,
-}
 
