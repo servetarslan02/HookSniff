@@ -6,7 +6,7 @@
 
 | # | SDK | Dil | Yöntem | Versiyon | Kalite | Durum |
 |---|-----|-----|--------|----------|--------|-------|
-| 1 | **Node.js** | TypeScript | Svix tabanlı el yapımı | 0.5.0 | %70-75 | ✅ Yeniden yazıldı |
+| 1 | **Node.js** | TypeScript | el yapımı | 0.5.0 | %70-75 | ✅ Yeniden yazıldı |
 | 2 | Python | Python | OpenAPI auto-gen | 0.3.0 | %20-25 | ⬜ Yeniden yazılacak |
 | 3 | Go | Go | OpenAPI auto-gen | 0.3.0 | %20-25 | ⬜ Yeniden yazılacak |
 | 4 | Rust | Rust | OpenAPI auto-gen | 0.4.0 | %20-25 | ⬜ Yeniden yazılacak |
@@ -19,7 +19,7 @@
 | 11 | Elixir | Elixir | OpenAPI auto-gen | 1.0.0 | %20-25 | ⬜ Beklemede |
 
 ## Hedef Kalite Skoru
-- **%70+** → Svix tabanlı el yapımı (Node.js seviyesi)
+- **%70+** → el yapımı (Node.js seviyesi)
 - **%85+** → + Test suite + CI/CD + Publish otomasyonu
 - **%90+** → + Dokümantasyon site + Example'lar + Edge case'ler
 

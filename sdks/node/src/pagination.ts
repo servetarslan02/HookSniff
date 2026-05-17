@@ -1,9 +1,7 @@
 /**
  * HookSniff SDK — Auto-pagination iterator
- *
  * Provides `for await` pagination over list endpoints.
- * Based on Svix SDK architecture (MIT License).
- *
+
  * Usage:
  *   for await (const ep of hooksniff.endpoints.list()) {
  *     console.log(ep.id);

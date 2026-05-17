@@ -118,7 +118,7 @@ HookSniff/
 ### Oturum 196 — 2026-05-17 21:55 GMT+8
 1. **Node.js SDK Svix Tabanlı Yeniden Yazım** ✅
    - Eski OpenAPI Generator boilerplate kaldırıldı
-   - Svix SDK mimarisi (MIT lisans) bazlı el yapımı SDK
+   - el yapımı el yapımı SDK
    - 19 kaynak dosya, 80+ TypeScript type
    - Eklenen: retry+backoff, auto-idempotency, auto-pagination, webhook verify, custom fetch, timeout
    - 12 resource: endpoints, webhooks, auth, apiKeys, teams, alerts, analytics, billing, health, search, notifications, admin

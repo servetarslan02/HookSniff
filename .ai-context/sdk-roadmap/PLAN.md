@@ -11,7 +11,6 @@ Kullanıcı SDK'yı indirdiğinde aynı kalitede deneyim yaşamalı.
 
 ---
 
-## 📐 Strateji: "Svix Core + HookSniff Surface"
 
 ### Ne demek?
 - Svix'in **altyapı kodunu** (request, retry, webhook verify, pagination) al
