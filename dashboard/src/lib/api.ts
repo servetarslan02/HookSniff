@@ -1189,6 +1189,10 @@ export interface BillingSubscription {
   cancel_at_period_end: boolean;
   billing_period: string;
   current_period_end?: string;
+  card_last4?: string;
+  card_brand?: string;
+  card_exp_month?: number;
+  card_exp_year?: number;
 }
 
 export interface OverageSettings {
