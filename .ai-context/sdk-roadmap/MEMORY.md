@@ -87,12 +87,12 @@
 
 ## ⚠️ Gelecek Oturum İçin Yapılacaklar
 
-1. **Test coverage artır** — %60-70 → %90+
-2. **Live publish test** — Bir SDK'yı (Node.js) npm'e yükle
-3. **Svix connector'ları** — Shopify, Stripe entegrasyonu
-4. **Streaming** — SSE/WebSocket desteği
-5. **Ingest** — Inbound webhook receiver
-6. **Faz 8-15 yeni özellikler** — Environment, Background Task, Operational Webhook
+1. **Ayrı repo sync** — `sync-sdks.sh` script'i var ama token scope sorunu var. Servet'ten yeni token gerekli (repo write scope'lu)
+   - Mevcut ayrı repo'lar: hooksniff-go, hooksniff-java, hooksniff-kotlin, hooksniff-php, hooksniff-ruby, hooksniff-swift
+   - Olmayan: hooksniff-node, hooksniff-python, hooksniff-rust, hooksniff-csharp, hooksniff-elixir (sadece ana repoda)
+2. **Live publish test** — npm'e yükle
+3. **Test coverage artır** — %60-70 → %90+
+4. **Faz 8-15 yeni özellikler**
 
 ## 📊 Benchmark Sonuçları
 
