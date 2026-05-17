@@ -53,7 +53,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 | # | Özellik | Zorluk | Süre | Durum |
 |---|---------|--------|------|-------|
 | 1 | Environment (dev/staging/prod) | Orta | 4-6 saat | ✅ |
-| 2 | Background Task | Orta | 3-4 saat | ⬜ |
+| 2 | Background Task | Orta | 3-4 saat | ✅ |
 | 3 | Operational Webhook | Orta | 3-4 saat | ⬜ |
 | 4 | Message Poller | Orta | 3-4 saat | ⬜ |
 | 5 | Ingest (inbound webhook) | Zor | 8-10 saat | ⬜ |
