@@ -486,6 +486,34 @@ export const BillingUsageSchema = z.object({
 });
 export type BillingUsageValidated = z.infer<typeof BillingUsageSchema>;
 
+// ── Billing Subscription Schema ──
+export const BillingSubscriptionSchema = z.object({
+  plan: z.string(),
+  status: z.string(),
+  payment_provider: z.string(),
+  stripe_subscription_id: z.string().optional(),
+  polar_subscription_id: z.string().optional(),
+  iyzico_subscription_id: z.string().optional(),
+  webhook_limit: z.number(),
+  endpoint_limit: z.number(),
+  retention_days: z.number(),
+  monthly_price_cents: z.number(),
+  cancel_at_period_end: z.boolean(),
+  billing_period: z.string(),
+  current_period_end: z.string().optional(),
+});
+export type BillingSubscriptionValidated = z.infer<typeof BillingSubscriptionSchema>;
+
+// ── Overage Settings Schema ──
+export const OverageSettingsSchema = z.object({
+  allow_overage: z.boolean(),
+  overage_email_notification: z.boolean(),
+  plan: z.string(),
+  daily_limit: z.number(),
+  overage_price: z.number(),
+});
+export type OverageSettingsValidated = z.infer<typeof OverageSettingsSchema>;
+
 // ── Team Schema ──
 export const TeamSchema = z.object({
   id: z.string(),
