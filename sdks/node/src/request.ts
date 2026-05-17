@@ -1,5 +1,6 @@
 import { ApiException, type XOR } from "./util";
 import type { HttpErrorOut, HTTPValidationError } from "./HttpErrors";
+import { createErrorFromStatus, HookSniffError } from "./errors";
 
 export const LIB_VERSION = "1.0.0";
 const USER_AGENT = `hooksniff-libs/${LIB_VERSION}/javascript`;
@@ -185,23 +186,19 @@ async function filterResponseForErrors(response: Response): Promise<Response> {
   }
 
   const responseBody = await response.text();
-
-  if (response.status === 422) {
-    throw new ApiException<HTTPValidationError>(
-      response.status,
-      JSON.parse(responseBody) as HTTPValidationError,
-      response.headers
-    );
+  let parsedBody: any;
+  try {
+    parsedBody = JSON.parse(responseBody);
+  } catch {
+    parsedBody = { detail: responseBody };
   }
 
-  if (response.status >= 400 && response.status <= 499) {
-    throw new ApiException<HttpErrorOut>(
-      response.status,
-      JSON.parse(responseBody) as HttpErrorOut,
-      response.headers
-    );
-  }
-  throw new ApiException(response.status, responseBody, response.headers);
+  const headers: Record<string, string> = {};
+  response.headers.forEach((value, name) => {
+    headers[name] = value;
+  });
+
+  throw createErrorFromStatus(response.status, parsedBody, headers);
 }
 
 type HookSniffRequestInit = RequestInit & {
