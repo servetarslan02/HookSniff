@@ -1,6 +1,6 @@
 # SDK — Yapılacak İşler
 
-> Son güncelleme: 2026-05-18 01:32 GMT+8
+> Son güncelleme: 2026-05-18 01:35 GMT+8
 
 ---
 
@@ -26,7 +26,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 | ✅ | C# SDK adapte | Tamamlandı | %80 |
 | ✅ | Swift SDK adapte | Tamamlandı | %80 |
 | ✅ | Elixir SDK adapte | Tamamlandı | %80 |
-| Faz 1 | Core kalite | ⬜ | %85 |
+| Faz 1 | Core kalite | 🟡 Başladı | %85 |
 | Faz 2 | Test suite | ⬜ | %90 |
 | Faz 3 | CI/CD | ⬜ | %92 |
 | Faz 4 | OpenAPI codegen | ⬜ | %95 |

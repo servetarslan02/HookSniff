@@ -1,6 +1,6 @@
 # SDK Strateji Planı — %100 Hedefi
 
-> Son güncelleme: 2026-05-18 01:32 GMT+8
+> Son güncelleme: 2026-05-18 01:35 GMT+8
 > Hedef: Stripe seviyesinde SDK kalitesi
 
 ---
@@ -63,13 +63,13 @@ Neden?
 ### Faz 1 — Core Kalite (6 saat)
 | # | Görev | Süre |
 |---|-------|------|
-| 1.1 | Rate limit handling (429 auto-retry) | 30 dk |
-| 1.2 | ESM + CJS dual export (Node.js) | 30 dk |
-| 1.3 | Debug logging | 30 dk |
-| 1.4 | Error specificity (20+ class) | 30 dk |
-| 1.5 | Typed webhook events | 1 saat |
-| 1.6 | JSDoc + examples (12 resource) | 2 saat |
-| 1.7 | Streaming/SSE support | 1 saat |
+| 1.1 | Rate limit handling (429 auto-retry) | ✅ Node.js + Kotlin |
+| 1.2 | ESM + CJS dual export (Node.js) | ✅ |
+| 1.3 | Debug logging | ✅ Node.js |
+| 1.4 | Error specificity (20+ class) | ⬜ |
+| 1.5 | Typed webhook events | ⬜ |
+| 1.6 | JSDoc + examples (12 resource) | ⬜ |
+| 1.7 | Streaming/SSE support | ⬜ |
 
 ### Faz 2 — Test Suite (4 saat)
 ### Faz 3 — CI/CD + Publish (2 saat)
