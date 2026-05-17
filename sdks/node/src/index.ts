@@ -26,6 +26,7 @@ export {
   type ValidationErrorItem,
 } from "./errors";
 export * from "./webhook";
+export * from "./webhook-events";
 export * from "./models/index";
 
 export type { EndpointListOptions } from "./api/endpoint";
