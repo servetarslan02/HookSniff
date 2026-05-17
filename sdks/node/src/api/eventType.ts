@@ -1,5 +1,3 @@
-// this file is @generated
-
 import {
   type EventTypeImportOpenApiIn,
   EventTypeImportOpenApiInSerializer,
@@ -21,6 +19,7 @@ import {
 } from "../models/listResponseEventTypeOut";
 import { HttpMethod, HookSniffRequest, type HookSniffRequestContext } from "../request";
 
+/** Options for listing event types */
 export interface EventTypeListOptions {
   limit?: number;
   iterator?: string | null;
@@ -29,23 +28,70 @@ export interface EventTypeListOptions {
   withContent?: boolean;
 }
 
+/** Options for creating an event type */
 export interface EventTypeCreateOptions {
   idempotencyKey?: string;
 }
 
+/** Options for importing event types from OpenAPI */
 export interface EventTypeImportOpenapiOptions {
   idempotencyKey?: string;
 }
 
+/** Options for deleting an event type */
 export interface EventTypeDeleteOptions {
-  /** By default event types are archived when "deleted". Passing this to `true` deletes them entirely. */
+  /** Also expunge the event type (permanent) */
   expunge?: boolean;
 }
 
+/**
+ * Manage event types.
+ *
+ * Event types define the types of webhooks your application can send.
+ * Endpoints can filter which event types they want to receive.
+ *
+ * @example
+ * ```ts
+ * const hs = new HookSniff("hooksniff_xxx");
+ *
+ * // Create an event type
+ * await hs.eventType.create({
+ *   name: "order.created",
+ *   description: "Fired when a new order is created",
+ *   schemas: {
+ *     "1": {
+ *       properties: {
+ *         orderId: { type: "string" },
+ *         total: { type: "number" },
+ *       },
+ *     },
+ *   },
+ * });
+ *
+ * // List all event types
+ * const { data } = await hs.eventType.list();
+ *
+ * // Get a specific event type
+ * const et = await hs.eventType.get("order.created");
+ *
+ * // Update event type
+ * await hs.eventType.update("order.created", {
+ *   description: "Updated description",
+ * });
+ *
+ * // Delete (archive) event type
+ * await hs.eventType.delete("old.event");
+ * ```
+ */
 export class EventType {
   public constructor(private readonly requestCtx: HookSniffRequestContext) {}
 
-  /** Return the list of event types. */
+  /**
+   * List all event types.
+   *
+   * @param options - Filtering and pagination options
+   * @returns A paginated list of event types
+   */
   public list(options?: EventTypeListOptions): Promise<ListResponseEventTypeOut> {
     const request = new HookSniffRequest(HttpMethod.GET, "/api/v1/event-type");
 
@@ -64,11 +110,13 @@ export class EventType {
   }
 
   /**
-   * Create new or unarchive existing event type.
+   * Create a new event type.
    *
-   * Unarchiving an event type will allow endpoints to filter on it and messages to be sent with it.
-   * Endpoints filtering on the event type before archival will continue to filter on it.
-   * This operation does not preserve the description and schemas.
+   * If an archived event type with the same name exists, it will be unarchived.
+   *
+   * @param eventTypeIn - The event type configuration
+   * @param options - Request options
+   * @returns The created event type
    */
   public create(
     eventTypeIn: EventTypeIn,
@@ -83,22 +131,26 @@ export class EventType {
   }
 
   /**
-   * Given an OpenAPI spec, create new or update existing event types.
+   * Import event types from an OpenAPI specification.
    *
-   * If an existing `archived` event type is updated, it will be unarchived.
-   * The importer will convert all webhooks found in the either the `webhooks` or `x-webhooks`
-   * top-level.
+   * This creates or updates event types based on the `webhooks` or
+   * `x-webhooks` sections of the spec.
+   *
+   * @param eventTypeImportOpenApiIn - The OpenAPI spec to import
+   * @param options - Request options
+   * @returns Import result with created/updated event types
    */
   public importOpenapi(
     eventTypeImportOpenApiIn: EventTypeImportOpenApiIn,
     options?: EventTypeImportOpenapiOptions
   ): Promise<EventTypeImportOpenApiOut> {
-    const request = new HookSniffRequest(HttpMethod.POST, "/api/v1/event-type/import/openapi");
+    const request = new HookSniffRequest(
+      HttpMethod.POST,
+      "/api/v1/event-type/import/openapi"
+    );
 
     request.setHeaderParam("idempotency-key", options?.idempotencyKey);
-    request.setBody(
-      EventTypeImportOpenApiInSerializer._toJsonObject(eventTypeImportOpenApiIn)
-    );
+    request.setBody(EventTypeImportOpenApiInSerializer._toJsonObject(eventTypeImportOpenApiIn));
 
     return request.send(
       this.requestCtx,
@@ -106,7 +158,12 @@ export class EventType {
     );
   }
 
-  /** Get an event type. */
+  /**
+   * Get an event type by name.
+   *
+   * @param eventTypeName - The event type name (e.g., "order.created")
+   * @returns The event type details
+   */
   public get(eventTypeName: string): Promise<EventTypeOut> {
     const request = new HookSniffRequest(
       HttpMethod.GET,
@@ -118,7 +175,13 @@ export class EventType {
     return request.send(this.requestCtx, EventTypeOutSerializer._fromJsonObject);
   }
 
-  /** Update an event type. */
+  /**
+   * Update an event type.
+   *
+   * @param eventTypeName - The event type name
+   * @param eventTypeUpdate - The updated configuration
+   * @returns The updated event type
+   */
   public update(
     eventTypeName: string,
     eventTypeUpdate: EventTypeUpdate
@@ -135,14 +198,18 @@ export class EventType {
   }
 
   /**
-   * Archive an event type.
+   * Delete (archive) an event type.
    *
-   * Endpoints already configured to filter on an event type will continue to do so after archival.
-   * However, new messages can not be sent with it and endpoints can not filter on it.
-   * An event type can be unarchived with the
-   * [create operation](#operation/create_event_type_api_v1_event_type__post).
+   * Archived event types cannot be used for new messages, but existing
+   * endpoints continue to receive them. Use `create` to unarchive.
+   *
+   * @param eventTypeName - The event type name
+   * @param options - Delete options
    */
-  public delete(eventTypeName: string, options?: EventTypeDeleteOptions): Promise<void> {
+  public delete(
+    eventTypeName: string,
+    options?: EventTypeDeleteOptions
+  ): Promise<void> {
     const request = new HookSniffRequest(
       HttpMethod.DELETE,
       "/api/v1/event-type/{event_type_name}"
@@ -156,7 +223,13 @@ export class EventType {
     return request.sendNoResponseBody(this.requestCtx);
   }
 
-  /** Partially update an event type. */
+  /**
+   * Partially update an event type.
+   *
+   * @param eventTypeName - The event type name
+   * @param eventTypePatch - Fields to update
+   * @returns The updated event type
+   */
   public patch(
     eventTypeName: string,
     eventTypePatch: EventTypePatch
