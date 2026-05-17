@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/lib/store';
-import { backgroundTasksApi, type BackgroundTaskOut } from '@/lib/api';
+import { backgroundTasksApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -34,9 +34,9 @@ export default function BackgroundTasksPage() {
     mutationFn: (id: string) => backgroundTasksApi.cancel(token!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['background-tasks'] });
-      toast({ title: 'Task cancelled', type: 'success' });
+      toast('Task cancelled', 'success');
     },
-    onError: (e: Error) => toast({ title: e.message, type: 'error' }),
+    onError: (e: Error) => toast(e.message, 'error'),
   });
 
   return (
