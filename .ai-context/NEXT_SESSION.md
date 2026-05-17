@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-17 17:37 GMT+8 (Oturum — Billing Overhaul)
+> Son güncelleme: 2026-05-17 21:44 GMT+8 (Oturum — Lazy + Prefetch)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -16,6 +16,15 @@ Bu dosyayı ilk kez okuyorsan:
 ---
 
 ## ✅ Tamamlanan (Son Oturum — 2026-05-17)
+
+### Lazy + Prefetch System (Stripe/Linear Pattern) ✅ (2026-05-17 21:44)
+1. **LazySection** — IntersectionObserver + fade-in animasyon + skeleton presets (statCards, table, chart, page)
+2. **PrefetchLink** — Hover ile route chunk + React Query data prefetch (Stripe tarzı)
+3. **TabbedSection** — URL param persistence, badge desteği, createLazyTab helper
+4. **Admin sidebar** — PrefetchLink ile hover prefetch (80ms delay)
+5. **Dashboard sidebar** — PrefetchLink ile hover prefetch (80ms delay)
+6. **System page** — 8 below-the-fold section LazySection ile sarmalandı
+7. **Commit:** 518cad4e — push edildi
 
 ### Billing Page Complete Overhaul ✅ (2026-05-17 17:37)
 1. **Sidebar: Billing ayrı bölüm** — Account'dan çıkarıldı, kendi section'ı (💳)
@@ -333,33 +342,41 @@ postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-
 - ✅ Limit kaldırma (applications)
 
 ### Kalan Sayfalar (sırayla yapılacak):
-1. **admin/system** (720 satır) — health checks + tables, below-the-fold lazy load
+1. **admin/system** (720 satır) — ✅ LazySection ile sarmalandı (8 section)
 2. **admin/users** (675 satır) — user table lazy load
 3. **admin/alerts** (375 satır) — alerts list lazy load
 4. **admin/feature-flags** (332 satır) — flags list lazy load
 
 ### Pattern (tek-view sayfalar için):
 ```tsx
-// 1. Parent'ta hook'lar kalır, data prop olarak geçilir
-const { data } = useSomeHook();
+// 1. Import
+import { LazySection, Skeletons } from '@/components/LazySection';
 
-// 2. Below-the-fold content ayrı component'e çıkar
-// components/ContentSection.tsx
-export default function ContentSection({ data }: Props) { ... }
-
-// 3. Dynamic import ile lazy load
-const ContentSection = dynamic(() => import('./components/ContentSection'), {
-  ssr: false,
-  loading: () => <Skeleton />
-});
-
-// 4. Parent'ta render
+// 2. Above-the-fold content stays eager
 return (
   <div>
     <Header /> {/* above fold */}
     <StatCards /> {/* above fold */}
-    <ContentSection data={data} /> {/* below fold, lazy */}
+
+    {/* Below-the-fold: LazySection ile sarmala */}
+    <LazySection fallback={Skeletons.table()} rootMargin={300}>
+      <HeavyTable data={data} />
+    </LazySection>
+
+    <LazySection fallback={Skeletons.card} rootMargin={200}>
+      <Chart data={data} />
+    </LazySection>
   </div>
 );
+
+// 3. Sidebar linkleri için PrefetchLink kullan
+import { PrefetchLink } from '@/components/PrefetchLink';
+<PrefetchLink href="/deliveries" hoverDelay={80}>
+  Deliveries
+</PrefetchLink>
+
+// 4. Tab'lı sayfalar için TabbedSection + createLazyTab
+import { TabbedSection, createLazyTab } from '@/components/TabbedSection';
+const OverviewTab = createLazyTab(() => import('./components/OverviewTab'));
 ```
 
