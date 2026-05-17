@@ -1,73 +1,168 @@
-# SDK Strateji Planı
+# SDK Strateji Planı — %100 Hedefi
 
-> Son güncelleme: 2026-05-17 22:06 GMT+8
-
----
-
-## 🎯 Hedef
-
-HookSniff SDK'larını **Svix seviyesinde** (Stripe'ın %75'i) yapmak.
-Kullanıcı SDK'yı indirdiğinde aynı kalitede deneyim yaşamalı.
+> Son güncelleme: 2026-05-17 22:20 GMT+8
+> Hedef: Stripe seviyesinde SDK kalitesi
 
 ---
 
+## 🎯 Hedef Tanımı
 
-### Ne demek?
-- Svix'in **altyapı kodunu** (request, retry, webhook verify, pagination) al
-- HookSniff'in **API endpoint'leri** (resource'lar, model'ler) ile değiştir
-- MIT lisansı → yasal, credit ver yeterli
+**%100 = Stripe seviyesi.** Kullanıcı SDK'yı indirdiğinde:
+- Type-safe, autocomplete çalışıyor
+- Her method'da JSDoc + example kod
+- Retry, rate limit, pagination otomatik
+- Webhook verify tek satırda
+- Hata durumunda açıklayıcı mesaj
+- Test coverage %95+
+- CI/CD otomatik publish
+- Dokümantasyon interaktif
 
-### Neden bu strateji?
-1. **Hız** — 2-3 saat vs 1-2 gün (SDK başına)
-2. **Kalite** — Svix production'da test edilmiş, 22M+ npm indirme/ay
-3. **Tutarlılık** — Tüm diller aynı pattern, aynı DX
-4. **Bakım** — Svix güncelleme yaptığında biz de güncelleyebiliriz
+---
+
+## 📐 Mimariler Arası Karşılaştırma
+
+| Katman | Mevcut | %100 Hedef |
+|--------|--------|------------|
+| **Core** (request, retry, webhook) | ✅ Var | ✅ + rate limit + streaming |
+| **Resources** (endpoint, webhook vs.) | ✅ 12 adet | ✅ + JSDoc + examples |
+| **Models** (type'lar) | ⚠️ %80 typed | ✅ %100 typed (OpenAPI codegen) |
+| **Test** | ❌ Yok | ✅ %95+ coverage |
+| **CI/CD** | ❌ Yok | ✅ GitHub Actions |
+| **Publish** | ⚠️ Manuel | ✅ Otomatik (tag → publish) |
+| **Dokümantasyon** | ⚠️ README | ✅ Interaktif site |
+| **ESM/CJS** | ⚠️ Sadece CJS | ✅ Dual export |
+| **Debug** | ❌ Yok | ✅ Request/response logging |
+| **Error handling** | ⚠️ Genel | ✅ 20+ spesifik error class |
+| **Streaming** | ❌ Yok | ✅ SSE support |
+| **Tree-shaking** | ❌ Yok | ✅ ESM modular import |
 
 ---
 
 ## 🗓️ Faz Planı
 
-### Faz 1 — En Kritik 4 SDK ✅ (2026-05-17)
-| SDK | Durum | Kalite |
-|-----|-------|--------|
-| Node.js | ✅ Tamamlandı | %70-75 |
-| Python | ⬜ Sıradaki | → %70-75 |
-| Go | ⬜ Sıradaki | → %70-75 |
-| Rust | ⬜ Sıradaki | → %70-75 |
+### Faz 1 — Core Kalite (6 saat)
+> Mevcut SDK'yı production-ready yapar
 
-**Neden bunlar?**
-- Node.js: En popüler dil, en çok kullanıcı
-- Python: Data/AI dünyası, ikinci popüler
-- Go: Backend developer'lar, performans odaklı
-- Rust: HookSniff'in kendisi Rust, dogfooding
+| # | Görev | Süre | Puan |
+|---|-------|------|------|
+| 1.1 | Rate limit handling (429 auto-retry) | 30 dk | +5 |
+| 1.2 | ESM + CJS dual export | 30 dk | +3 |
+| 1.3 | Debug logging (request/response) | 30 dk | +2 |
+| 1.4 | Error specificity (20+ class) | 30 dk | +3 |
+| 1.5 | Typed webhook events | 1 saat | +3 |
+| 1.6 | JSDoc + examples (12 resource) | 2 saat | +5 |
+| 1.7 | Streaming/SSE support | 1 saat | +3 |
+| **Faz 1 toplam** | | **6 saat** | **+24 puan** |
 
-### Faz 2 — Kalan 7 SDK (opsiyonel)
-Ruby, Java, Kotlin, PHP, C#, Swift, Elixir
-
-**Ne zaman?** Faz 1 tamamlandıktan sonra, kullanıcı talebine göre.
-
-### Faz 3 — Kalite Artışı (tüm SDK'lar)
-1. Test suite (her SDK için)
-2. CI/CD (GitHub Actions)
-3. Publish otomasyonu
-4. Dokümantasyon
+**Sonuç:** %70-75 → **~%85**
 
 ---
 
-## 🔧 Teknik Detaylar
+### Faz 2 — Test Suite (4 saat)
+> En büyük puan artışı
 
-### Her SDK için yapılıcak adımlar
-```
-1. Svix SDK deposunu klonla
-2. Core dosyaları al (request, webhook, util, pagination)
-3. "svix" → "hooksniff" isim değişikliği
-4. Svix'e özel feature'ları çıkar (region detection, connectors vs.)
-5. HookSniff OpenAPI spec'ten resource dosyaları oluştur
-6. HookSniff model'lerini yaz (TypeScript/Python/Go type'ları)
-7. Main class oluştur (HookSniff/Svix class'ı yerine)
-8. Build et, test et
-9. Publish et
-```
+| # | Görev | Süre | Puan |
+|---|-------|------|------|
+| 2.1 | Test altyapısı kur (vitest/jest) | 30 dk | — |
+| 2.2 | request.ts test (retry, backoff, timeout, error) | 1 saat | +3 |
+| 2.3 | webhook.ts test (verify, sign, invalid, expired) | 30 dk | +2 |
+| 2.4 | pagination.ts test (single, multi, empty) | 30 dk | +1 |
+| 2.5 | Resource test — endpoints, webhooks, auth | 1 saat | +2 |
+| 2.6 | Resource test — teams, alerts, billing, analytics | 30 dk | +1 |
+| 2.7 | Resource test — admin, search, notifications, health | 30 dk | +1 |
+| **Faz 2 toplam** | | **4 saat** | **+10 puan** |
+
+**Sonuç:** %85 → **~%90**
+
+---
+
+### Faz 3 — CI/CD + Publish Otomasyonu (2 saat)
+> Otomatik build, test, publish
+
+| # | Görev | Süre | Puan |
+|---|-------|------|------|
+| 3.1 | `.github/workflows/sdk-ci.yml` — her push'ta build+test | 30 dk | +1 |
+| 3.2 | `.github/workflows/sdk-publish.yml` — tag'de publish | 30 dk | +1 |
+| 3.3 | Otomatik CHANGELOG.md üretimi | 30 dk | +1 |
+| 3.4 | npm publish otomasyonu (Node.js) | 30 dk | — |
+| **Faz 3 toplam** | | **2 saat** | **+3 puan** |
+
+**Sonuç:** %90 → **~%92**
+
+---
+
+### Faz 4 — OpenAPI Codegen (3 saat)
+> Model'lerin %100 type-safe olması
+
+| # | Görev | Süre | Puan |
+|---|-------|------|------|
+| 4.1 | OpenAPI spec'ten TypeScript type üretici script | 1 saat | +2 |
+| 4.2 | Tüm model'leri codegen ile üret (80+ type) | 1 saat | +2 |
+| 4.3 | Serializer/Deserializer ekle | 1 saat | +1 |
+| **Faz 4 toplam** | | **3 saat** | **+5 puan** |
+
+**Sonuç:** %92 → **~%95**
+
+---
+
+### Faz 5 — Dokümantasyon Sitesi (4 saat)
+> Interaktif API reference + guides
+
+| # | Görev | Süre | Puan |
+|---|-------|------|------|
+| 5.1 | Docusaurus/Nextra site kurulumu | 1 saat | — |
+| 5.2 | Quick Start guide (her dil) | 1 saat | +1 |
+| 5.3 | API Reference (OpenAPI spec'ten otomatik) | 1 saat | +1 |
+| 5.4 | Example'lar (webhook send, verify, pagination) | 1 saat | +1 |
+| **Faz 5 toplam** | | **4 saat** | **+3 puan** |
+
+**Sonuç:** %95 → **~%97**
+
+---
+
+### Faz 6 — Multi-Dil Yayılımı (12-16 saat)
+> Aynı kaliteyi diğer 10 SDK'ya uygula
+
+| # | Görev | Süre | Not |
+|---|-------|------|-----|
+| 6.1 | Python SDK rewrite | 2-3 saat | Svix Python core'dan adapte |
+| 6.2 | Go SDK rewrite | 2-3 saat | Svix Go core'dan adapte |
+| 6.3 | Rust SDK rewrite | 2-3 saat | Svix Rust core'dan adapte |
+| 6.4 | Kalan 7 SDK (Ruby, Java, Kotlin, PHP, C#, Swift, Elixir) | 6-8 saat | Her biri 1 saat |
+| **Faz 6 toplam** | | **12-16 saat** | |
+
+**Sonuç:** 1/11 → **11/11 SDK %95+**
+
+---
+
+### Faz 7 — Son Dokunuşlar (3 saat)
+> %97 → %100
+
+| # | Görev | Süre | Puan |
+|---|-------|------|------|
+| 7.1 | Tree-shaking optimizasyonu (ESM modular) | 1 saat | +1 |
+| 7.2 | Performance benchmark (diğer SDK'larla karşılaştırma) | 30 dk | +0.5 |
+| 7.3 | Security audit (npm audit, Snyk) | 30 dk | +0.5 |
+| 7.4 | Migration guide (v0.4 → v0.5 breaking changes) | 30 dk | +0.5 |
+| 7.5 | Interactive playground (webhook test tool) | 30 dk | +0.5 |
+| **Faz 7 toplam** | | **3 saat** | **+3 puan** |
+
+**Sonuç:** %97 → **%100**
+
+---
+
+## 📊 Toplam Zaman Çizelgesi
+
+| Faz | İçerik | Süre | Sonuç |
+|-----|--------|------|-------|
+| Faz 1 | Core kalite | 6 saat | %85 |
+| Faz 2 | Test suite | 4 saat | %90 |
+| Faz 3 | CI/CD | 2 saat | %92 |
+| Faz 4 | OpenAPI codegen | 3 saat | %95 |
+| Faz 5 | Dokümantasyon | 4 saat | %97 |
+| Faz 6 | Multi-dil (10 SDK) | 12-16 saat | 11/11 %95+ |
+| Faz 7 | Son dokunuşlar | 3 saat | %100 |
+| **TOPLAM** | | **34-38 saat** | **%100** |
 
 ---
 
@@ -138,7 +233,6 @@ cd sdks/kotlin
 
 ### 8. PHP → Packagist
 ```bash
-# Sadece git tag push yeterli
 cd sdks/php
 git tag v0.5.0
 git push origin v0.5.0
@@ -191,34 +285,45 @@ git push origin v0.5.0
 
 ---
 
-## 🤖 CI/CD Otomasyonu (GitHub Actions)
+## 🤖 CI/CD Workflow
 
-### Publish Workflow (`.github/workflows/sdk-publish.yml`)
+### `sdk-ci.yml` — Her push'ta
 ```yaml
-# Trigger: git tag push (v*)
-# Otomatik: build → test → publish (tüm diller)
-# Her tag'de tüm SDK'lar publish edilir
+name: SDK CI
+on: [push, pull_request]
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        sdk: [node, python, go, rust]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: cd sdks/${{ matrix.sdk }} && make build
+      - name: Test
+        run: cd sdks/${{ matrix.sdk }} && make test
 ```
 
-### Adımlar:
-1. `.github/workflows/sdk-ci.yml` — her push'ta build + test
-2. `.github/workflows/sdk-publish.yml` — tag'de publish
-3. Her SDK için ayrı job (paralel çalışır)
-
-### Svix SDK Referans Linkleri
-| Dil | Repo |
-|-----|------|
-| TypeScript | `github.com/svix/svix-webhooks/javascript/` |
-| Python | `github.com/svix/svix-webhooks/python/` |
-| Go | `github.com/svix/svix-webhooks/go/` |
-| Rust | `github.com/svix/svix-webhooks/rust/` |
-| Ruby | `github.com/svix/svix-webhooks/ruby/` |
-| Java | `github.com/svix/svix-webhooks/java/` |
-| Kotlin | `github.com/svix/svix-webhooks/kotlin/` |
-| PHP | `github.com/svix/svix-webhooks/php/` |
-| C# | `github.com/svix/svix-webhooks/csharp/` |
-| Swift | `github.com/svix/svix-webhooks/swift/` |
-| Elixir | `github.com/svix/svix-webhooks/elixir/` |
+### `sdk-publish.yml` — Tag'de
+```yaml
+name: SDK Publish
+on:
+  push:
+    tags: ['v*']
+jobs:
+  publish:
+    strategy:
+      matrix:
+        sdk: [node, python, go, rust]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+          CARGO_TOKEN: ${{ secrets.CARGO_TOKEN }}
+        run: cd sdks/${{ matrix.sdk }} && make publish
+```
 
 ---
 
@@ -227,8 +332,9 @@ git push origin v0.5.0
 1. **Onay almadan başlama** — Servet onay vermeden yeni SDK'ya geçme
 2. **Her SDK sonrası commit + push** — GitHub'a sync et
 3. **`.ai-context/sdk-roadmap/` güncelle** — STATUS.md, DONE.md, TODO.md
-4. **MEMORY.md güncelle** — Oturum sonunda yeni iş kaydı
-5. **Breaking change varsa haber ver** — Kullanıcı etkilenirse söyle
+4. **Breaking change varsa haber ver** — Kullanıcı etkilenirse söyle
+5. **Svix branding** — Public dosyalarda Svix adı geçmeyecek
+6. **Versiyon tutarlılığı** — Tüm SDK'lar aynı versiyonda olmalı
 
 ---
 
@@ -236,8 +342,9 @@ git push origin v0.5.0
 
 | Kriter | Hedef | Ölçüm |
 |--------|-------|-------|
-| SDK kalitesi | %70+ (her dil) | Retry, pagination, webhook verify var mı? |
+| SDK kalitesi | %100 (her dil) | Tüm checklist tamam |
 | Versiyon tutarlılığı | Tümü 0.5.0 | STATUS.md |
-| Test coverage | %80+ | CI pipeline |
+| Test coverage | %95+ | CI pipeline |
 | Publish | 11/11 registry | STATUS.md |
-| Kullanıcı DX | Svix ile aynı | Code comparison |
+| Kullanıcı DX | Stripe ile aynı | Code comparison |
+| Dokümantasyon | Interaktif site | docs.hooksniff.com |
