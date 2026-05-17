@@ -26,10 +26,10 @@ export default function ContentMgmtPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'schemas', label: t('schemas'), icon: '📐', content: <SchemasPage /> },
-        { key: 'templates', label: t('templates'), icon: '📄', content: <TemplatesPage /> },
-        { key: 'inbound', label: t('inbound'), icon: '📨', content: <InboundPage /> },
-        { key: 'transforms', label: t('transforms'), icon: '🔄', content: <TransformsPage /> },
+        { key: 'schemas', label: t('schemas'), icon: '📐', content: () => <SchemasPage /> },
+        { key: 'templates', label: t('templates'), icon: '📄', content: () => <TemplatesPage /> },
+        { key: 'inbound', label: t('inbound'), icon: '📨', content: () => <InboundPage /> },
+        { key: 'transforms', label: t('transforms'), icon: '🔄', content: () => <TransformsPage /> },
       ]}
     />
   );

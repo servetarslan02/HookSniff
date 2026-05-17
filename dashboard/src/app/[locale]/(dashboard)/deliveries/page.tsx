@@ -24,9 +24,9 @@ export default function DeliveriesSectionPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'logs', label: t('logs'), icon: '📋', content: <LogsPage /> },
-        { key: 'deliveries', label: t('deliveries'), icon: '📦', content: <DeliveriesList /> },
-        { key: 'search', label: t('search'), icon: '🔍', content: <SearchPage /> },
+        { key: 'logs', label: t('logs'), icon: '📋', content: () => <LogsPage /> },
+        { key: 'deliveries', label: t('deliveries'), icon: '📦', content: () => <DeliveriesList /> },
+        { key: 'search', label: t('search'), icon: '🔍', content: () => <SearchPage /> },
       ]}
     />
   );

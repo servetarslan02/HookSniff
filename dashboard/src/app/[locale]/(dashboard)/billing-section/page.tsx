@@ -23,7 +23,7 @@ export default function BillingSectionPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'billing', label: t('billing'), icon: '💳', content: <BillingPage /> },
+        { key: 'billing', label: t('billing'), icon: '💳', content: () => <BillingPage /> },
       ]}
     />
   );

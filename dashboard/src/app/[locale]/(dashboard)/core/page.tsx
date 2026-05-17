@@ -24,8 +24,8 @@ export default function CorePage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'overview', label: t('dashboard'), icon: '📊', content: <DashboardOverview /> },
-        { key: 'api-keys', label: t('apiKeys'), icon: '🔑', content: <ApiKeysPage /> },
+        { key: 'overview', label: t('dashboard'), icon: '📊', content: () => <DashboardOverview /> },
+        { key: 'api-keys', label: t('apiKeys'), icon: '🔑', content: () => <ApiKeysPage /> },
       ]}
     />
   );

@@ -22,10 +22,10 @@ export default function DevToolsPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'playground', label: t('playground'), icon: '🧪', content: <PlaygroundPage /> },
-        { key: 'signature', label: t('signatureTool'), icon: '🔐', content: <SignatureVerifierPage /> },
-        { key: 'webhook-builder', label: t('webhookBuilder'), icon: '🔧', content: <WebhookBuilderPage /> },
-        { key: 'api-importer', label: t('apiImporter'), icon: '📥', content: <ApiImporterPage /> },
+        { key: 'playground', label: t('playground'), icon: '🧪', content: () => <PlaygroundPage /> },
+        { key: 'signature', label: t('signatureTool'), icon: '🔐', content: () => <SignatureVerifierPage /> },
+        { key: 'webhook-builder', label: t('webhookBuilder'), icon: '🔧', content: () => <WebhookBuilderPage /> },
+        { key: 'api-importer', label: t('apiImporter'), icon: '📥', content: () => <ApiImporterPage /> },
       ]}
     />
   );
