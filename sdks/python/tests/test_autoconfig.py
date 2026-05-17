@@ -3,8 +3,8 @@ import json
 
 import pytest
 
-from svix import AutoConfigError
-from svix.autoconfig import _AUTOCONFIG_TOKEN_PREFIX_V1, _decode_autoconfig_token_v1
+from hooksniff import AutoConfigError
+from hooksniff.autoconfig import _AUTOCONFIG_TOKEN_PREFIX_V1, _decode_autoconfig_token_v1
 
 
 def test_decode_autoconfig_token_v1_parses_payload():
