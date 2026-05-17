@@ -2,25 +2,31 @@
 HookSniff SDK — Health Resource
 """
 
-from __future__ import annotations
+import typing as t
 
-from typing import Any
+from ..models import HealthCheck, SystemStatus
+from .common import ApiBase
 
-from ..request import HookSniffRequest, RequestConfig
 
-
-class Health:
-    """API health check."""
-
-    def __init__(self, config: RequestConfig):
-        self._config = config
-
-    def check(self) -> dict[str, Any]:
+class HealthAsync(ApiBase):
+    async def check(self) -> HealthCheck:
         """Check API health status."""
-        req = HookSniffRequest("GET", "/v1/health")
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(method="get", path="/api/v1/health")
+        return HealthCheck(**response.json())
 
-    def status(self) -> dict[str, Any]:
+    async def status(self) -> SystemStatus:
         """Get detailed system status."""
-        req = HookSniffRequest("GET", "/v1/status")
-        return req.send(self._config, lambda j: j)
+        response = await self._request_asyncio(method="get", path="/api/v1/status")
+        return SystemStatus(**response.json())
+
+
+class Health(ApiBase):
+    def check(self) -> HealthCheck:
+        """Check API health."""
+        response = self._request_sync(method="get", path="/api/v1/health")
+        return HealthCheck(**response.json())
+
+    def status(self) -> SystemStatus:
+        """Get system status."""
+        response = self._request_sync(method="get", path="/api/v1/status")
+        return SystemStatus(**response.json())

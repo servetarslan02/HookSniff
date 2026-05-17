@@ -1,59 +1,44 @@
 """
 HookSniff Python SDK
 
-A clean, modern SDK for the HookSniff webhook delivery API.
 Svix-style architecture adapted for HookSniff.
 
 Usage:
-    from hooksniff import HookSniff
+    from hooksniff import HookSniff, HookSniffOptions
 
-    hs = HookSniff(api_key="hooksniff_xxx")
+    hs = HookSniff("hooksniff_xxx")
 
     # List endpoints
-    endpoints = hs.endpoints.list()
+    endpoints = hs.endpoint.list()
 
     # Send a webhook
-    delivery = hs.webhooks.send({
-        "endpoint_id": "ep_123",
-        "event": "order.created",
-        "data": {"order_id": "12345"},
-    })
+    from hooksniff.models import MessageIn
+    msg = hs.message.create(MessageIn(event="order.created", data={"id": "123"}))
 
-    # Verify incoming webhook signature
+    # Verify incoming webhook
     from hooksniff import Webhook
     wh = Webhook("whsec_...")
     payload = wh.verify(raw_body, headers)
+
+    # Async usage
+    from hooksniff import HookSniffAsync
+    hs = HookSniffAsync("hooksniff_xxx")
+    endpoints = await hs.endpoint.list()
 """
 
-from .client import HookSniff
-from .webhook import Webhook, WebhookVerificationError
-from .exceptions import (
-    HookSniffError,
-    ApiException,
-    RateLimitError,
-    NotFoundException,
-    ValidationException,
-    UnauthorizedException,
-    ForbiddenException,
-    ServerException,
-)
-from .pagination import paginate, collect_all, Page
-from .request import LIB_VERSION
+from .api.hooksniff import HookSniff, HookSniffAsync, HookSniffOptions, DEFAULT_SERVER_URL
+from .webhooks import Webhook, WebhookVerificationError
+from .exceptions import HttpError, HTTPValidationError
 
-__version__ = LIB_VERSION
+__version__ = "0.5.0"
+
 __all__ = [
     "HookSniff",
+    "HookSniffAsync",
+    "HookSniffOptions",
+    "DEFAULT_SERVER_URL",
     "Webhook",
     "WebhookVerificationError",
-    "HookSniffError",
-    "ApiException",
-    "RateLimitError",
-    "NotFoundException",
-    "ValidationException",
-    "UnauthorizedException",
-    "ForbiddenException",
-    "ServerException",
-    "paginate",
-    "collect_all",
-    "Page",
+    "HttpError",
+    "HTTPValidationError",
 ]

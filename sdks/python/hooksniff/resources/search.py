@@ -2,30 +2,49 @@
 HookSniff SDK — Search Resource
 """
 
-from __future__ import annotations
+import typing as t
 
-from typing import Any
+from ..models import SearchResult
+from .common import ApiBase
 
-from ..request import HookSniffRequest, RequestConfig
+
+class SearchAsync(ApiBase):
+    async def search(
+        self,
+        query: str,
+        type: t.Optional[str] = None,
+        limit: t.Optional[int] = None,
+    ) -> t.List[SearchResult]:
+        """Search endpoints, deliveries, teams, etc."""
+        params: t.Dict[str, t.Any] = {"q": query}
+        if type:
+            params["type"] = type
+        if limit:
+            params["limit"] = limit
+        response = await self._request_asyncio(
+            method="get",
+            path="/api/v1/search",
+            query_params={k: str(v) for k, v in params.items()},
+        )
+        return [SearchResult(**item) for item in response.json()]
 
 
-class Search:
-    """Search across all resources."""
-
-    def __init__(self, config: RequestConfig):
-        self._config = config
-
+class Search(ApiBase):
     def search(
         self,
         query: str,
-        type: str | None = None,
-        limit: int | None = None,
-    ) -> list[dict[str, Any]]:
+        type: t.Optional[str] = None,
+        limit: t.Optional[int] = None,
+    ) -> t.List[SearchResult]:
         """Search endpoints, deliveries, teams, etc."""
-        req = HookSniffRequest("GET", "/v1/search")
-        req.set_query_params({
-            "q": query,
-            "type": type,
-            "limit": limit,
-        })
-        return req.send(self._config, lambda j: j)
+        params: t.Dict[str, t.Any] = {"q": query}
+        if type:
+            params["type"] = type
+        if limit:
+            params["limit"] = limit
+        response = self._request_sync(
+            method="get",
+            path="/api/v1/search",
+            query_params={k: str(v) for k, v in params.items()},
+        )
+        return [SearchResult(**item) for item in response.json()]
