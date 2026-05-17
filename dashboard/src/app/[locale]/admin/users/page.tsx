@@ -1,5 +1,6 @@
 'use client';
 
+import { LazySection } from '@/components/LazySection';
 import { useState, useMemo } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
