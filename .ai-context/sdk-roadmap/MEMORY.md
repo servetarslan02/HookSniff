@@ -62,8 +62,8 @@ sdks/python/
 - Python SDK: ✅ Svix SDK'dan doğrudan adapte edildi (1.0.0, 127 dosya, 101 model)
 - Go SDK: ✅ Svix SDK'dan doğrudan adapte edildi (1.0.0, 115 dosya, 99 model)
 - Rust SDK: ✅ Svix SDK'dan doğrudan adapte edildi (1.0.0, 118 dosya, 98 model)
-- Ruby: ⬜ Sıradaki
-- Java: ⬜
+- Ruby: ✅ Svix'ten adapte edildi (1.0.0, 74 dosya, 48 model)
+- Java: ⬜ Sıradaki
 - Kotlin: ⬜
 - PHP: ⬜
 - C#: ⬜

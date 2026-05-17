@@ -52,7 +52,7 @@ Neden?
 | 0.2 | Python SDK — Svix'ten doğrudan | ✅ |
 | 0.3 | Go SDK — Svix'ten doğrudan | ✅ |
 | 0.4 | Rust SDK — Svix'ten doğrudan | ✅ |
-| 0.5 | Ruby SDK — Svix'ten adapte | ⬜ |
+| 0.5 | Ruby SDK — Svix'ten adapte | ✅ |
 | 0.6 | Java SDK — Svix'ten adapte | ⬜ |
 | 0.7 | Kotlin SDK — Svix'ten adapte | ⬜ |
 | 0.8 | PHP SDK — Svix'ten adapte | ⬜ |
