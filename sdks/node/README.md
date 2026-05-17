@@ -1,90 +1,108 @@
 <h1 align="center">
-    <a style="text-decoration: none" href="https://www.hooksniff.com">
-      <img width="120" src="https://avatars.githubusercontent.com/u/80175132?s=200&v=4" />
-      <p align="center">HookSniff - Webhooks as a service</p>
-    </a>
+  <img width="120" src="https://avatars.githubusercontent.com/u/80175132?s=200&v=4" />
+  <br>HookSniff Node.js SDK
 </h1>
-<h2 align="center">
-  <a href="https://hooksniff.com">Website</a> | <a href="https://docs.hooksniff.com">Documentation</a> | <a href="https://hooksniff.com/slack">Community Slack</a>
-<h2>
 
-Typescript/Javascript library for interacting with the HookSniff API and verifying webhook signatures
+<p align="center">
+  <a href="https://www.npmjs.com/package/hooksniff"><img src="https://img.shields.io/npm/v/hooksniff.svg" alt="NPM"></a>
+  <a href="https://github.com/servetarslan02/HookSniff"><img src="https://img.shields.io/github/license/servetarslan02/HookSniff" alt="License"></a>
+</p>
 
-![GitHub tag](https://img.shields.io/github/tag/hooksniff/hooksniff-webhooks.svg)
-[![NPM version](https://img.shields.io/npm/v/hooksniff.svg)](https://www.npmjs.com/package/hooksniff)
+TypeScript/Node.js SDK for the [HookSniff](https://hooksniff.com) webhook delivery platform.
 
-[![Join our slack](https://img.shields.io/badge/Slack-join%20the%20community-blue?logo=slack&style=social)](https://www.hooksniff.com/slack/)
+## Installation
 
-# Usage Documentation
-
-You can find general usage documentation at <https://docs.hooksniff.com>.  For complete API documentation with code examples for each endpoint in all of our official client libraries head over to our API documentation site at <https://api.hooksniff.com>.
-
-# Language Support
-
-<table style="table-layout:fixed; white-space: nowrap;">
-  <th colspan="2">⚡️ Features ⚡️</th>
-  <tr>
-    <th>Officially Supported</th>
-    <th>✅</th>
-  </tr>
-  <tr>
-    <th>API Support</th>
-    <th>✅</th>
-  </tr>
-  <tr>
-    <th>Signature Verification</th>
-    <th>✅</th>
-  </tr>
-  <tr>
-    <th>Caveats</th>
-    <th>None! 🚀</th>
-  </tr>
-</table>
-
-# Installation
-
-```sh
+```bash
 npm install hooksniff
-# or
-yarn add hooksniff
 ```
 
-# Usage
+## Quick Start
 
-```js
-import { HookSniff } from "hooksniff";
+```typescript
+import { HookSniff } from 'hooksniff';
 
-const hooksniff = new HookSniff("AUTH_TOKEN");
-const app = await hooksniff.application.create({ name: "Application name" });
-```
-# Development
+const client = new HookSniff({ apiKey: 'hs_xxx' });
 
+// List endpoints
+const endpoints = await client.endpoint.list();
+console.log(endpoints);
 
-First checkout the [core README](../README.md#development) for details on how to generate our API bindings, then follow the steps below.
+// Create an endpoint
+const endpoint = await client.endpoint.create({
+  url: 'https://example.com/webhook',
+  description: 'My endpoint',
+});
 
-## Requirements
+// Send a webhook
+const message = await client.message.create({
+  event: 'order.created',
+  data: { orderId: '123', amount: 99.99 },
+});
 
- - node
- - yarn
-
-## Building the library
-```sh
-yarn
-yarn build
-```
-
-## Contributing
-
-Before opening a PR be sure to format your code!
-
-```sh
-yarn lint:fix
+// Get delivery attempts
+const attempts = await client.messageAttempt.listByMsg(message.id);
 ```
 
-## Running Tests
+## Webhook Verification
 
-Simply run:
+```typescript
+import { Webhook } from 'hooksniff';
 
-```sh
-yarn test
+const wh = new Webhook('whsec_xxx');
+
+try {
+  const payload = wh.verify(rawBody, {
+    'hooksniff-id': headers['hooksniff-id'],
+    'hooksniff-signature': headers['hooksniff-signature'],
+    'hooksniff-timestamp': headers['hooksniff-timestamp'],
+  });
+  // Payload is valid
+  console.log(payload);
+} catch (err) {
+  // Invalid signature
+  console.error('Webhook verification failed:', err);
+}
 ```
+
+## Error Handling
+
+```typescript
+import { HookSniff, HookSniffError } from 'hooksniff';
+
+try {
+  await client.endpoint.get('invalid_id');
+} catch (err) {
+  if (err instanceof HookSniffError) {
+    console.error(err.code);    // 'not_found'
+    console.error(err.message); // 'Endpoint not found'
+  }
+}
+```
+
+## Configuration
+
+```typescript
+const client = new HookSniff({
+  apiKey: 'hs_xxx',
+  baseUrl: 'https://api.hooksniff.com/v1', // optional
+  timeout: 30000,                            // ms
+  retries: 3,                                // auto-retry on 429/5xx
+});
+```
+
+## Resources
+
+| Resource | Methods |
+|----------|---------|
+| `endpoint` | `list`, `create`, `get`, `update`, `delete` |
+| `message` | `create`, `list`, `get` |
+| `messageAttempt` | `list`, `listByMsg`, `get`, `resend` |
+| `authentication` | `dashboardAccess` |
+| `eventType` | `list` |
+| `statistics` | `aggregate` |
+
+## Links
+
+- [Documentation](https://docs.hooksniff.com)
+- [API Reference](https://api.hooksniff.com)
+- [GitHub](https://github.com/servetarslan02/HookSniff)

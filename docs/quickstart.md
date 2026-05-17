@@ -1,89 +1,133 @@
-# Quickstart — 5 Minutes
+# HookSniff Quick Start Guide
+
+Get started with HookSniff in 5 minutes.
 
 ## 1. Get Your API Key
 
-Sign up at [hooksniff.vercel.app](https://hooksniff.vercel.app) and get your API key.
+1. Sign up at [hooksniff.com](https://hooksniff.com)
+2. Go to **Settings → API Keys**
+3. Create a new API key (starts with `hs_`)
+
+## 2. Install SDK
+
+Choose your language:
 
 ```bash
-export HOOKSNIFF_KEY="hr_live_your_key_here"
+# Node.js / TypeScript
+npm install hooksniff
+
+# Python
+pip install hooksniff
+
+# Go
+go get github.com/servetarslan02/hooksniff-go
+
+# Rust
+cargo add hooksniff
+
+# Ruby
+gem install hooksniff
+
+# PHP
+composer require hooksniff/hooksniff
+
+# C#
+dotnet add package HookSniff
 ```
 
-## 2. Create an Endpoint
+## 3. Create an Endpoint
 
-```bash
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
-  -H "Authorization: Bearer $HOOKSNIFF_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://myapp.com/webhook"}'
+An endpoint is where HookSniff delivers your webhooks.
+
+```python
+from hooksniff import HookSniff
+
+client = HookSniff("hs_xxx")
+
+endpoint = client.endpoint.create(
+    url="https://your-app.com/webhook",
+    description="Order notifications",
+)
+print(f"Endpoint created: {endpoint.id}")
 ```
 
-Save the returned `id`.
+## 4. Send a Webhook
 
-## 3. Send a Webhook
-
-```bash
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \
-  -H "Authorization: Bearer $HOOKSNIFF_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "endpoint_id": "ep_YOUR_ENDPOINT_ID",
-    "event": "test.ping",
-    "data": {"hello": "world"}
-  }'
+```python
+message = client.message.create(
+    event="order.created",
+    data={
+        "order_id": "ORD-123",
+        "amount": 99.99,
+        "currency": "USD",
+    },
+)
+print(f"Message sent: {message.id}")
 ```
 
-## 4. Check Status
+## 5. Verify Incoming Webhooks
 
-```bash
-curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/YOUR_DELIVERY_ID \
-  -H "Authorization: Bearer $HOOKSNIFF_KEY"
+When your app receives a webhook from HookSniff, verify its signature:
+
+```python
+from hooksniff import Webhook
+
+wh = Webhook("whsec_xxx")  # Get from endpoint settings
+
+try:
+    payload = wh.verify(request.body, request.headers)
+    # ✅ Valid — process the webhook
+    print(f"Event: {payload['event']}")
+    print(f"Data: {payload['data']}")
+except Exception:
+    # ❌ Invalid — reject
+    return 403
 ```
 
-## 5. Verify Signatures (Recommended)
+## 6. Check Delivery Status
 
-HookSniff uses [Standard Webhooks](https://www.standardwebhooks.com/) signatures. Verify the `webhook-signature` header:
-
-```javascript
-const crypto = require('crypto');
-
-app.post('/webhook', (req, res) => {
-  const msgId = req.headers['webhook-id'];
-  const timestamp = req.headers['webhook-timestamp'];
-  const signature = req.headers['webhook-signature'];
-  const secret = 'whsec_your_endpoint_secret';
-
-  // Decode secret
-  const secretBytes = Buffer.from(secret.replace('whsec_', ''), 'base64');
-
-  // Compute expected signature
-  const signedContent = `${msgId}.${timestamp}.${JSON.stringify(req.body)}`;
-  const expected = 'v1,' + crypto
-    .createHmac('sha256', secretBytes)
-    .update(signedContent)
-    .digest('base64');
-
-  // Verify signature (may have multiple, space-separated)
-  const sigs = signature.split(' ');
-  const valid = sigs.some(sig => sig === expected);
-
-  if (!valid) {
-    return res.status(401).send('Invalid signature');
-  }
-
-  // Check timestamp (reject if older than 5 minutes)
-  const age = Math.abs(Date.now() / 1000 - parseInt(timestamp));
-  if (age > 300) {
-    return res.status(401).send('Timestamp expired');
-  }
-
-  // Process webhook
-  console.log('Event:', req.body.event);
-  console.log('Data:', req.body.data);
-
-  res.status(200).send('OK');
-});
+```python
+# Get delivery attempts for a message
+attempts = client.message_attempt.list_by_msg(message.id)
+for attempt in attempts:
+    print(f"Status: {attempt.response_status_code}")
+    print(f"Duration: {attempt.duration_ms}ms")
 ```
 
----
+## Next Steps
 
-That's it! Your webhooks are now delivered reliably with automatic retries.
+- [API Reference](https://api.hooksniff.com) — Full endpoint documentation
+- [SDK Reference](../sdks/README.md) — Language-specific guides
+- [Webhook Security](security.md) — Best practices
+- [Examples](../examples/) — Code samples
+
+## Common Patterns
+
+### Retry Failed Deliveries
+
+```python
+# Resend a failed attempt
+client.message_attempt.resend(message_id, attempt_id)
+```
+
+### List All Endpoints
+
+```python
+endpoints = client.endpoint.list()
+for ep in endpoints:
+    print(f"{ep.url} — {ep.description}")
+```
+
+### Filter by Event Type
+
+```python
+messages = client.message.list(event_types=["order.created", "order.updated"])
+```
+
+### Pagination
+
+```python
+# Auto-pagination (all SDKs support this)
+for endpoint in client.endpoint.list_iterator():
+    print(endpoint.url)
+```
