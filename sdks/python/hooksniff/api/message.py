@@ -13,8 +13,6 @@ from ..models import (
 )
 from .common import ApiBase, BaseOptions, serialize_params
 from .message_poller import (
-    MessagePoller,
-    MessagePollerAsync,
 )
 
 
@@ -144,8 +142,6 @@ def message_in_raw(
 
 class MessageAsync(ApiBase):
     @property
-    def poller(self) -> MessagePollerAsync:
-        return MessagePollerAsync(self._client)
 
     async def list(
         self, app_id: str, options: MessageListOptions = MessageListOptions()
@@ -287,8 +283,6 @@ class MessageAsync(ApiBase):
 
 class Message(ApiBase):
     @property
-    def poller(self) -> MessagePoller:
-        return MessagePoller(self._client)
 
     def list(
         self, app_id: str, options: MessageListOptions = MessageListOptions()
