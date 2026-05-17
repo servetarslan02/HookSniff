@@ -33,9 +33,9 @@ pub struct Webhook {
 }
 
 const PREFIX: &str = "whsec_";
-const HOOKSNIFF_MSG_ID_KEY: &str = "hooksniff-id";
-const HOOKSNIFF_MSG_SIGNATURE_KEY: &str = "hooksniff-signature";
-const HOOKSNIFF_MSG_TIMESTAMP_KEY: &str = "hooksniff-timestamp";
+const SVIX_MSG_ID_KEY: &str = "hooksniff-id";
+const SVIX_MSG_SIGNATURE_KEY: &str = "hooksniff-signature";
+const SVIX_MSG_TIMESTAMP_KEY: &str = "hooksniff-timestamp";
 const UNBRANDED_MSG_ID_KEY: &str = "webhook-id";
 const UNBRANDED_MSG_SIGNATURE_KEY: &str = "webhook-signature";
 const UNBRANDED_MSG_TIMESTAMP_KEY: &str = "webhook-timestamp";
@@ -72,16 +72,16 @@ impl Webhook {
         headers: &HM,
         enforce_tolerance: bool,
     ) -> Result<(), WebhookError> {
-        let msg_id = Self::get_header(headers, HOOKSNIFF_MSG_ID_KEY, UNBRANDED_MSG_ID_KEY, "id")?;
+        let msg_id = Self::get_header(headers, SVIX_MSG_ID_KEY, UNBRANDED_MSG_ID_KEY, "id")?;
         let msg_signature = Self::get_header(
             headers,
-            HOOKSNIFF_MSG_SIGNATURE_KEY,
+            SVIX_MSG_SIGNATURE_KEY,
             UNBRANDED_MSG_SIGNATURE_KEY,
             "signature",
         )?;
         let msg_ts = Self::get_header(
             headers,
-            HOOKSNIFF_MSG_TIMESTAMP_KEY,
+            SVIX_MSG_TIMESTAMP_KEY,
             UNBRANDED_MSG_TIMESTAMP_KEY,
             "timestamp",
         )
@@ -215,7 +215,7 @@ mod tests {
     use http02::HeaderMap;
 
     use super::{
-        Webhook, HOOKSNIFF_MSG_ID_KEY, HOOKSNIFF_MSG_SIGNATURE_KEY, HOOKSNIFF_MSG_TIMESTAMP_KEY,
+        Webhook, SVIX_MSG_ID_KEY, SVIX_MSG_SIGNATURE_KEY, SVIX_MSG_TIMESTAMP_KEY,
         UNBRANDED_MSG_ID_KEY, UNBRANDED_MSG_SIGNATURE_KEY, UNBRANDED_MSG_TIMESTAMP_KEY,
     };
 
@@ -225,9 +225,9 @@ mod tests {
 
     fn get_hooksniff_headers(msg_id: &str, signature: &str) -> HeaderMap {
         let mut headers = HeaderMap::new();
-        headers.insert(HOOKSNIFF_MSG_ID_KEY, msg_id.parse().unwrap());
-        headers.insert(HOOKSNIFF_MSG_SIGNATURE_KEY, signature.parse().unwrap());
-        headers.insert(HOOKSNIFF_MSG_TIMESTAMP_KEY, now().to_string().parse().unwrap());
+        headers.insert(SVIX_MSG_ID_KEY, msg_id.parse().unwrap());
+        headers.insert(SVIX_MSG_SIGNATURE_KEY, signature.parse().unwrap());
+        headers.insert(SVIX_MSG_TIMESTAMP_KEY, now().to_string().parse().unwrap());
         headers
     }
 
@@ -306,7 +306,7 @@ mod tests {
                 "{},",
                 signature.split(',').collect::<Vec<&str>>().first().unwrap()
             );
-            headers.insert(HOOKSNIFF_MSG_SIGNATURE_KEY, partial.parse().unwrap());
+            headers.insert(SVIX_MSG_SIGNATURE_KEY, partial.parse().unwrap());
             headers.insert(UNBRANDED_MSG_SIGNATURE_KEY, partial.parse().unwrap());
             assert!(wh.verify(payload, &headers).is_err());
         }
@@ -317,7 +317,7 @@ mod tests {
             get_unbranded_headers(msg_id, &signature),
         ] {
             let partial = &signature[0..8];
-            headers.insert(HOOKSNIFF_MSG_SIGNATURE_KEY, partial.parse().unwrap());
+            headers.insert(SVIX_MSG_SIGNATURE_KEY, partial.parse().unwrap());
             headers.insert(UNBRANDED_MSG_SIGNATURE_KEY, partial.parse().unwrap());
             assert!(wh.verify(payload, &headers).is_err());
         }
@@ -339,7 +339,7 @@ mod tests {
             let signature = wh.sign(msg_id, ts, payload).unwrap();
             let mut headers = get_hooksniff_headers(msg_id, &signature);
             headers.insert(
-                super::HOOKSNIFF_MSG_TIMESTAMP_KEY,
+                super::SVIX_MSG_TIMESTAMP_KEY,
                 ts.to_string().parse().unwrap(),
             );
 
@@ -352,7 +352,7 @@ mod tests {
         let signature = wh.sign(msg_id, ts, payload).unwrap();
         let mut headers = get_hooksniff_headers(msg_id, &signature);
         headers.insert(
-            super::HOOKSNIFF_MSG_TIMESTAMP_KEY,
+            super::SVIX_MSG_TIMESTAMP_KEY,
             // Timestamp mismatch!
             (ts + 1).to_string().parse().unwrap(),
         );
@@ -374,7 +374,7 @@ mod tests {
         let signature = wh.sign(msg_id, ts, payload).unwrap();
         let mut headers = get_hooksniff_headers(msg_id, &signature);
         headers.insert(
-            super::HOOKSNIFF_MSG_TIMESTAMP_KEY,
+            super::SVIX_MSG_TIMESTAMP_KEY,
             ts.to_string().parse().unwrap(),
         );
 
@@ -436,9 +436,9 @@ mod tests {
             (
                 get_hooksniff_headers(msg_id, &signature),
                 [
-                    HOOKSNIFF_MSG_ID_KEY,
-                    HOOKSNIFF_MSG_SIGNATURE_KEY,
-                    HOOKSNIFF_MSG_TIMESTAMP_KEY,
+                    SVIX_MSG_ID_KEY,
+                    SVIX_MSG_SIGNATURE_KEY,
+                    SVIX_MSG_TIMESTAMP_KEY,
                 ],
             ),
             (
