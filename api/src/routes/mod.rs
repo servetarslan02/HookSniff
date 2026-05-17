@@ -120,6 +120,10 @@ pub fn api_router() -> Router {
             "/feature-flags",
             axum::routing::get(health::public_feature_flags),
         )
+        .route(
+            "/plans",
+            axum::routing::get(admin::public_plans),
+        )
         .merge(protected)
         .merge(inbound_routes)
         .merge(admin_routes)

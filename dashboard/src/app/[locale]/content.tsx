@@ -5,6 +5,7 @@ import { Link, useRouter } from '@/i18n/navigation';
 import dynamic from 'next/dynamic';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
+import { usePlans } from '@/hooks/usePlans';
 import Footer from '@/components/Footer';
 
 // Lazy load ThemeToggle
@@ -303,11 +304,12 @@ export function HomeContent() {
   const featureIcons = [icons.retry, icons.shield, icons.chart, icons.bolt, icons.queue, icons.globe];
 
   const isTr = locale === 'tr';
+  const { plans: planData, formatPrice } = usePlans();
   const plans = [
     { name: tPricing('developer'), desc: tPricing('developerDesc'), price: '$0', period: tPricing('month'), features: tPricing.raw('developerFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('startup'), desc: tPricing('startupDesc'), price: isTr ? '₺599' : '$29', period: tPricing('month'), features: tPricing.raw('startupFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('pro'), desc: tPricing('proDesc'), price: isTr ? '₺999' : '$49', period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('getStarted'), popular: true },
-    { name: tPricing('enterprise'), desc: tPricing('enterpriseDesc'), price: tPricing('customPricing'), period: '', features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('contactSales'), popular: false },
+    { name: tPricing('startup'), desc: tPricing('startupDesc'), price: isTr ? '₺599' : formatPrice('startup'), period: tPricing('month'), features: tPricing.raw('startupFeatures') as string[], cta: tPricing('getStarted'), popular: false },
+    { name: tPricing('pro'), desc: tPricing('proDesc'), price: isTr ? '₺999' : formatPrice('pro'), period: tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('getStarted'), popular: true },
+    { name: tPricing('enterprise'), desc: tPricing('enterpriseDesc'), price: isTr ? '₺4,999' : formatPrice('enterprise'), period: tPricing('month'), features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('contactSales'), popular: false },
   ];
 
   return (
