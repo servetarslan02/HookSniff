@@ -1,38 +1,50 @@
 import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
-// Revalidate every hour for ISR
 export const revalidate = 3600;
-
 
 export const metadata: Metadata = {
   title: 'Dead Letter Queue',
   description: 'Manage failed webhook deliveries with the dead letter queue',
 };
 
-
 export default function DlqPage() {
   const t = useTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t("deadLetterQueue")}</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Dead Letter Queue (DLQ)</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Failed webhook deliveries are preserved in the Dead Letter Queue (DLQ) for inspection and replay.
+        Failed deliveries shouldn&apos;t vanish. The DLQ preserves them so you can understand what went wrong and fix it.
       </p>
 
-      {/* What is DLQ */}
+      {/* The Problem */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">What is the Dead Letter Queue?</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Problem</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          The DLQ is a holding area for webhook deliveries that have exhausted all retry attempts. Instead of being silently dropped, these deliveries are preserved with full context so you can:
+          After all retries are exhausted, what happens to the event? In most webhook systems, it&apos;s silently dropped. You never know it failed, and the data is lost forever.
         </p>
-        <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>{t("understandWhy")}</li>
-          <li>{t("inspectPayload")}</li>
-          <li>{t("replayDeliveries")}</li>
-          <li>{t("auditFailed")}</li>
+        <p className="text-gray-600 dark:text-slate-400">
+          This is especially painful for critical events like payments or order updates — losing them means lost revenue or unhappy customers.
+        </p>
+      </section>
+
+      {/* The Solution */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How the DLQ Works</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">
+          When a delivery exhausts all retry attempts, HookSniff moves it to the Dead Letter Queue instead of dropping it. The DLQ preserves everything:
+        </p>
+        <ul className="space-y-2 text-gray-600 dark:text-slate-400 mb-4">
+          <li><strong>Original payload</strong> — The full event data</li>
+          <li><strong>All attempt details</strong> — Status codes, response bodies, timestamps for every retry</li>
+          <li><strong>Timing</strong> — When each attempt was made and how long it took</li>
+          <li><strong>Error context</strong> — Why each attempt failed</li>
         </ul>
+        <p className="text-gray-600 dark:text-slate-400">
+          You can inspect DLQ entries via the API or dashboard, and <strong>replay</strong> them with one click after fixing the issue.
+        </p>
       </section>
 
       {/* When Webhooks Go to DLQ */}
@@ -41,25 +53,23 @@ export default function DlqPage() {
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           A delivery is moved to the DLQ when:
         </p>
-        <ul className="space-y-2 text-gray-600 dark:text-slate-400">
+        <ul className="space-y-2 text-gray-600 dark:text-slate-400 mb-4">
           <li>All retry attempts have been exhausted (default: 3 attempts, configurable per endpoint)</li>
-          <li>{t("endpointDisabled")}</li>
+          <li>The endpoint is disabled</li>
           <li>The delivery has been pending for too long (stale delivery timeout)</li>
         </ul>
-        <p className="text-gray-600 dark:text-slate-400 mt-4">
-          Common failure reasons:
-        </p>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">Common failure reasons:</p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li>Endpoint returning <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">5xx</code> errors consistently</li>
           <li>Endpoint unreachable (DNS failure, connection timeout)</li>
-          <li>{t("tlsIssues")}</li>
-          <li>Endpoint returning <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">4xx</code> errors (client-side issue)</li>
+          <li>TLS certificate issues</li>
+          <li>Endpoint returning <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">429</code> rate limits that don&apos;t clear</li>
         </ul>
       </section>
 
       {/* Inspecting DLQ */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("inspectingDlq")}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Inspecting DLQ Entries</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Query failed deliveries via the API:
         </p>
@@ -90,23 +100,22 @@ export default function DlqPage() {
 
       {/* Replaying from DLQ */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("replayingFailed")}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Replaying Failed Deliveries</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Once you've fixed the issue, replay the delivery:
+          Once you&apos;ve fixed the issue, replay the delivery. This resets the attempt counter and re-queues with a fresh retry schedule:
         </p>
         <CodeBlock
-          code={`# Replay a single delivery
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/wh_xyz789/replay \\
+          code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/wh_xyz789/replay \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          Replay resets the attempt counter and re-queues the delivery with a fresh retry schedule. You can also replay from the dashboard with one click.
+          You can also replay from the dashboard with one click. Batch replay is available for multiple failed deliveries.
         </p>
       </section>
 
       {/* DLQ Retention */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t("dlqRetention")}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">DLQ Retention</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           DLQ entries are retained based on your plan:
         </p>
@@ -114,16 +123,16 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("plan")}</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("retention")}</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t("maxDlq")}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Plan</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Retention</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Max DLQ Entries</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3">{t("developer")}</td><td className="px-4 py-3">7 days</td><td className="px-4 py-3">100</td></tr>
-              <tr><td className="px-4 py-3">{t("startup")}</td><td className="px-4 py-3">14 days</td><td className="px-4 py-3">1,000</td></tr>
-              <tr><td className="px-4 py-3">{t("pro")}</td><td className="px-4 py-3">180 days</td><td className="px-4 py-3">5,000</td></tr>
-              <tr><td className="px-4 py-3">{t("enterprise")}</td><td className="px-4 py-3">365 days</td><td className="px-4 py-3">Custom</td></tr>
+              <tr><td className="px-4 py-3">Developer ($0)</td><td className="px-4 py-3">7 days</td><td className="px-4 py-3">100</td></tr>
+              <tr><td className="px-4 py-3">Startup ($14/mo)</td><td className="px-4 py-3">14 days</td><td className="px-4 py-3">1,000</td></tr>
+              <tr><td className="px-4 py-3">Pro ($29/mo)</td><td className="px-4 py-3">180 days</td><td className="px-4 py-3">5,000</td></tr>
+              <tr><td className="px-4 py-3">Enterprise ($99/mo)</td><td className="px-4 py-3">365 days</td><td className="px-4 py-3">Custom</td></tr>
             </tbody>
           </table></div>
         </div>
