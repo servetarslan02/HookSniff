@@ -776,3 +776,4 @@ export const analyticsApi = {
   latencyTrend: (token: string, range: string = '24h') =>
     apiFetch<LatencyTrendResponse>(`/analytics/latency?range=${range}`, { token }),
 };
+// deploy trigger Mon May 18 01:16:03 AM CST 2026
