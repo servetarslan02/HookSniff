@@ -191,7 +191,8 @@
     "sectionMonitoring": "İzleme",
     "observability": "İzleme",
     "sectionContent": "İçerik",
-    "account": "Hesap"
+    "account": "Hesap",
+    "profile": "Profil"
   },
   "dashboard": {
     "title": "Dashboard",
