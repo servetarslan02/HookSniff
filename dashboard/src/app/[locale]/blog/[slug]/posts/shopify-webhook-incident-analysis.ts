@@ -1,7 +1,6 @@
-import type { Post } from '../data';
+import type { Post } from '.../data';
 
 export const post: Post = {
-
     title: 'What the Shopify Webhook Incident Teaches Us About Resilience',
     date: '2026-04-30',
     category: 'Engineering',
@@ -158,5 +157,4 @@ The Shopify incident is a reminder that webhook infrastructure is only as resili
 Building resilient webhook consumers is not optional — it is a production requirement. Plan for 3x burst capacity, implement circuit breakers, use dead letter queues, and monitor p99 latency.
 
 And if you do not want to build all of that yourself, HookSniff handles it out of the box. Sign up at hooksniff.vercel.app — your first 10,000 webhooks per month are free.`,
-  },
 };

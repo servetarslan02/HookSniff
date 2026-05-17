@@ -1,7 +1,6 @@
-import type { Post } from '../data';
+import type { Post } from '.../data';
 
 export const post: Post = {
-
     title: 'Why FIFO Webhook Delivery Matters',
     date: '2026-04-20',
     category: 'Engineering',

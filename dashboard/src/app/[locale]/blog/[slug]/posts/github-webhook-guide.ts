@@ -1,7 +1,6 @@
-import type { Post } from '../data';
+import type { Post } from '.../data';
 
 export const post: Post = {
-
     title: 'How to Set Up GitHub Webhooks',
     date: '2026-04-15',
     category: 'Integration',
