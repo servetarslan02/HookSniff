@@ -91,7 +91,7 @@ impl Plan {
     /// Max events per day
     pub fn max_events_per_day(&self) -> u64 {
         match self {
-            Plan::Developer => 100,
+            Plan::Developer => 1_000,
             Plan::Startup => 30_000,
             Plan::Pro => 100_000,
             Plan::Enterprise => u64::MAX,
@@ -121,7 +121,7 @@ impl Plan {
     /// Max webhook deliveries per day
     pub fn max_webhooks_per_day(&self) -> u64 {
         match self {
-            Plan::Developer => 100,
+            Plan::Developer => 1_000,
             Plan::Startup => 30_000,
             Plan::Pro => 100_000,
             Plan::Enterprise => u64::MAX,
@@ -131,7 +131,7 @@ impl Plan {
     /// Max API requests per minute
     pub fn max_requests_per_minute(&self) -> u32 {
         match self {
-            Plan::Developer => 100,
+            Plan::Developer => 1_000,
             Plan::Startup => 1_000,
             Plan::Pro => 10_000,
             Plan::Enterprise => u32::MAX,
@@ -674,7 +674,7 @@ mod tests {
 
     #[test]
     fn max_webhooks_per_day_all() {
-        assert_eq!(Plan::Developer.max_webhooks_per_day(), 100);
+        assert_eq!(Plan::Developer.max_webhooks_per_day(), 1_000);
         assert_eq!(Plan::Startup.max_webhooks_per_day(), 30_000);
         assert_eq!(Plan::Pro.max_webhooks_per_day(), 100_000);
         assert_eq!(Plan::Enterprise.max_webhooks_per_day(), u64::MAX);

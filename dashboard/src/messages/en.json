@@ -698,11 +698,11 @@
       "enterprise": "Enterprise",
       "developer": "Developer",
       "startup": "Startup",
-      "developerLimit": "100 events/day",
+      "developerLimit": "1,000 events/day",
       "startupLimit": "30,000 events/day",
       "proLimit": "100,000 events/day",
       "enterpriseLimit": "Unlimited",
-      "freeLimit": "100 events/day",
+      "freeLimit": "1,000 events/day",
       "businessLimit": "Unlimited"
     },
     "features": {
@@ -753,7 +753,7 @@
       "sla99": "99.9% SLA guarantee",
       "customIntegrations": "Custom integrations",
       "onPremise": "On-premise option",
-      "100 events/day": "100 events/day",
+      "1,000 events/day": "1,000 events/day",
       "1 application": "1 application",
       "5 endpoints": "5 endpoints",
       "10 event types": "10 event types",
@@ -2049,7 +2049,7 @@
         "Custom contracts"
       ],
       "developerFeatures": [
-        "100 events/day",
+        "1,000 events/day",
         "5 endpoints",
         "10 event types",
         "10 subscriptions",
@@ -2262,7 +2262,7 @@
   "q4": "How do I get started?",
   "a4": "Sign up for a free account at hooksniff.vercel.app, get your API key, and create an endpoint. Send your first webhook in under 5 minutes with our quick start guide or SDK.",
   "q5": "Do I need a credit card to start?",
-  "a5": "No. The free plan includes 100 events per day with no credit card required. Upgrade to Startup, Pro, or Enterprise when you need more.",
+  "a5": "No. The free plan includes 1,000 events per day with no credit card required. Upgrade to Startup, Pro, or Enterprise when you need more.",
   "q6": "What payment methods do you accept?",
   "a6": "We accept all major credit cards via Polar.sh for global payments and iyzico for Turkish customers. Plans are billed monthly or annually (20% discount on annual).",
   "q7": "Can I change my plan at any time?",
@@ -2365,7 +2365,7 @@
     "proDesc": "Unleash your data connectivity with enterprise features and better support.",
     "businessDesc": "For teams that need guarantees",
     "freeFeatures": [
-      "100 events/day",
+      "1,000 events/day",
       "5 endpoints",
       "3 retry attempts",
       "HMAC-SHA256 signatures",
@@ -2547,7 +2547,7 @@
     "startup": "Startup",
     "developerDesc": "Perfect for trying out HookSniff. No setup needed, free forever for side projects.",
     "developerFeatures": [
-      "100 events/day",
+      "1,000 events/day",
       "1 application",
       "5 endpoints",
       "10 event types",

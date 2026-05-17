@@ -698,11 +698,11 @@
       "enterprise": "Enterprise",
       "developer": "Developer",
       "startup": "Startup",
-      "developerLimit": "Günlük 100 event",
+      "developerLimit": "Günlük 1.000 event",
       "startupLimit": "Gunluk 30.000 event",
       "proLimit": "Gunluk 100.000 event",
       "enterpriseLimit": "Sinirsiz",
-      "freeLimit": "Gunluk 100 event",
+      "freeLimit": "Gunluk 1.000 event",
       "businessLimit": "Sinirsiz"
     },
     "features": {
@@ -753,7 +753,7 @@
       "sla99": "%99.9 SLA garantisi",
       "customIntegrations": "Özel entegrasyonlar",
       "onPremise": "On-premise seçeneği",
-      "100 events/day": "100 olay/gün",
+      "100 events/day": "1.000 olay/gün",
       "1 application": "1 uygulama",
       "5 endpoints": "5 endpoint",
       "10 event types": "10 olay tipi",
@@ -2049,7 +2049,7 @@
         "Özel sözleşmeler"
       ],
       "developerFeatures": [
-        "Günlük 100 event",
+        "Günlük 1.000 event",
         "5 endpoint",
         "10 event tipi",
         "10 abonelik",
@@ -2262,7 +2262,7 @@
   "q4": "Nasıl başlarım?",
   "a4": "hooksniff.vercel.app'da ücretsiz bir hesap oluşturun, API anahtarınızı alın ve bir endpoint oluşturun. Hızlı başlangıç rehberimiz veya SDK'mız ile 5 dakikadan kısa sürede ilk webhook'unuzu gönderin.",
   "q5": "Başlamak için kredi kartına ihtiyacım var mı?",
-  "a5": "Hayır. Ücretsiz plan günde 100 event içerir ve kredi kartı gerekmez. Daha fazlasına ihtiyacınız olduğunda Startup, Pro veya Enterprise planına geçin.",
+  "a5": "Hayır. Ücretsiz plan günde 1.000 event içerir ve kredi kartı gerekmez. Daha fazlasına ihtiyacınız olduğunda Startup, Pro veya Enterprise planına geçin.",
   "q6": "Hangi ödeme yöntemlerini kabul ediyorsunuz?",
   "a6": "Polar.sh üzerinden küresel ödemeler ve iyzico üzerinden Türk müşteriler için tüm büyük kredi kartlarını kabul ediyoruz. Planlar aylık veya yıllık olarak faturalandırılır (yıllıkta %20 indirim).",
   "q7": "Planımı istediğim zaman değiştirebilir miyim?",
@@ -2365,7 +2365,7 @@
     "proDesc": "Kurumsal özellikleri ve daha iyi desteği ile veri bağlantınızı serbest bırakın.",
     "businessDesc": "Garantiye ihtiyacı olan ekipler için",
     "freeFeatures": [
-      "Günlük 100 event",
+      "Günlük 1.000 event",
       "5 endpoint",
       "3 yeniden deneme",
       "HMAC-SHA256 imzaları",
@@ -2547,7 +2547,7 @@
     "startup": "Startup",
     "developerDesc": "HookSniff'ı denemek için mükemmel bir yol. Kurulum gerektirmez, yan projeler için sonsuza dek ücretsiz.",
     "developerFeatures": [
-      "Günlük 100 event",
+      "Günlük 1.000 event",
       "1 uygulama",
       "5 endpoint",
       "10 event tipi",
