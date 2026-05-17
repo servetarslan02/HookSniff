@@ -93,16 +93,39 @@ public class HookSniffHttpClient {
         Response response = client.newCall(request).execute();
 
         int retryCount = 0;
-        while (response.code() >= 500 && retryCount < retrySchedule.size()) {
+        while (retryCount < retrySchedule.size()) {
+            // 429 Rate Limit — respect Retry-After header
+            if (response.code() == 429) {
+                response.close();
+                String retryAfter = response.header("Retry-After");
+                long delayMs;
+                if (retryAfter != null) {
+                    try {
+                        delayMs = Long.parseLong(retryAfter) * 1000;
+                    } catch (NumberFormatException e) {
+                        delayMs = retrySchedule.get(retryCount);
+                    }
+                } else {
+                    delayMs = retrySchedule.get(retryCount);
+                }
+                LockSupport.parkNanos(delayMs * 1_000_000);
+                Request retryRequest = request.newBuilder()
+                        .header("hooksniff-retry-count", String.valueOf(retryCount + 1))
+                        .build();
+                response = client.newCall(retryRequest).execute();
+                retryCount++;
+                continue;
+            }
+
+            if (response.code() < 500) {
+                break;
+            }
+
             response.close();
-
-            // Use LockSupport for precise parking instead of Thread.sleep
-            LockSupport.parkNanos(retrySchedule.get(retryCount) * 1_000_000); // Convert ms to ns
-
-            Request retryRequest =
-                    request.newBuilder()
-                            .header("hooksniff-retry-count", String.valueOf(retryCount + 1))
-                            .build();
+            LockSupport.parkNanos(retrySchedule.get(retryCount) * 1_000_000);
+            Request retryRequest = request.newBuilder()
+                    .header("hooksniff-retry-count", String.valueOf(retryCount + 1))
+                    .build();
             response = client.newCall(retryRequest).execute();
             retryCount++;
         }

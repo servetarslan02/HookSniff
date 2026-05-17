@@ -163,6 +163,15 @@ class ApiBase:
         response = await self._httpx_async_client.request(**httpx_kwargs)
 
         for retry_count, sleep_time in enumerate(self._client.retry_schedule):
+            # 429 Rate Limit — respect Retry-After header
+            if response.status_code == 429:
+                retry_after = response.headers.get("retry-after")
+                delay = int(retry_after) if retry_after and retry_after.isdigit() else sleep_time
+                await asyncio.sleep(delay)
+                httpx_kwargs["headers"]["hooksniff-retry-count"] = str(retry_count)
+                response = await self._httpx_async_client.request(**httpx_kwargs)
+                continue
+
             if response.status_code < 500:
                 break
 
@@ -191,6 +200,15 @@ class ApiBase:
         )
         response = self._httpx_client.request(**httpx_kwargs)
         for retry_count, sleep_time in enumerate(self._client.retry_schedule):
+            # 429 Rate Limit — respect Retry-After header
+            if response.status_code == 429:
+                retry_after = response.headers.get("retry-after")
+                delay = int(retry_after) if retry_after and retry_after.isdigit() else sleep_time
+                time.sleep(delay)
+                httpx_kwargs["headers"]["hooksniff-retry-count"] = str(retry_count)
+                response = self._httpx_client.request(**httpx_kwargs)
+                continue
+
             if response.status_code < 500:
                 break
 
