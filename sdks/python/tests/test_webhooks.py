@@ -8,9 +8,9 @@ from datetime import datetime, timedelta, timezone
 
 from hooksniff.webhooks import Webhook, WebhookVerificationError
 
-defaultMsgID = "msg_test123"
+defaultMsgID = "msg_p5jXN8AQM9LWM0D4loKWxJek"
 defaultPayload = '{"test": 2432232314}'
-defaultSecret = "dGVzdC1zaWduaW5nLWtleS1mb3ItdW5pdC10ZXN0cy1vbmx5"
+defaultSecret = "MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw"
 
 tolerance = timedelta(minutes=5)
 
@@ -174,8 +174,8 @@ def test_signature_verification_with_and_without_prefix():
 
 
 def test_sign_function():
-    key = "whsec_dGVzdC1zaWduaW5nLWtleS1mb3ItdW5pdC10ZXN0cy1vbmx5"
-    msg_id = "msg_test123"
+    key = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw"
+    msg_id = "msg_p5jXN8AQM9LWM0D4loKWxJek"
     timestamp = datetime.utcfromtimestamp(1614265330)
     payload = '{"test": 2432232314}'
     expected = "v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE="
