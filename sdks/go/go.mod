@@ -1,7 +1,7 @@
-module github.com/servetarslan02/HookSniff/sdks/go
+module github.com/servetarslan02/hooksniff-go
 
-go 1.24
+go 1.21
 
 require (
-	gopkg.in/validator.v2 v2.0.1
+	github.com/google/uuid v1.6.0
 )
