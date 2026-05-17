@@ -1,7 +1,6 @@
-import type { Post } from '../data';
+import type { Post } from '.../data';
 
 export const post: Post = {
-
     title: 'Webhook Security: A Complete Guide',
     date: '2026-04-05',
     category: 'Engineering',

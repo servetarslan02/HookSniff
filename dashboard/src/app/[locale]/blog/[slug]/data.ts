@@ -14,6 +14,7 @@ export const categoryGradients: Record<string, string> = {
   'Standard': 'from-teal-500 to-cyan-600',
 };
 
+
 import { post as hooksniff_vs_svix_vs_hookdeck } from './posts/hooksniff-vs-svix-vs-hookdeck';
 import { post as may_2026_changelog } from './posts/may-2026-changelog';
 import { post as building_mcp_ready_webhooks } from './posts/building-mcp-ready-webhooks';
@@ -30,7 +31,6 @@ import { post as fifo_webhook_delivery } from './posts/fifo-webhook-delivery';
 import { post as github_webhook_guide } from './posts/github-webhook-guide';
 import { post as cloudevents_standard } from './posts/cloudevents-standard';
 import { post as webhook_security_guide } from './posts/webhook-security-guide';
-
 import { post as shopify_webhook_incident_analysis } from './posts/shopify-webhook-incident-analysis';
 
 export const posts: Record<string, Post> = {
@@ -52,6 +52,7 @@ export const posts: Record<string, Post> = {
   'webhook-security-guide': webhook_security_guide,
   'shopify-webhook-incident-analysis': shopify_webhook_incident_analysis,
 };
+
 
 // Get ordered list of slugs for prev/next navigation
 export const orderedSlugs = [
