@@ -418,6 +418,7 @@ impl PaymentProviderImpl for IyzicoProvider {
         &self,
         headers: &axum::http::HeaderMap,
         body: &str,
+        _pool: &sqlx::PgPool,
     ) -> Result<WebhookResult, AppError> {
         self.verify_webhook_signature(body, headers)?;
 

@@ -103,6 +103,7 @@ pub trait PaymentProviderImpl: Send + Sync {
         &self,
         headers: &axum::http::HeaderMap,
         body: &str,
+        pool: &sqlx::PgPool,
     ) -> Result<WebhookResult, AppError>;
 
     /// Open a customer portal for managing subscription.
