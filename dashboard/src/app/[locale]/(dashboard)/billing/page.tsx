@@ -157,7 +157,7 @@ export default function BillingPage() {
       {/* Usage Overview */}
       <div className="glass-card p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('usageOverview')}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {/* Webhook Usage */}
           <div>
             <div className="flex justify-between text-sm mb-2">
@@ -199,6 +199,25 @@ export default function BillingPage() {
                 style={{ width: `${endpointPercent}%` }}
               />
             </div>
+          </div>
+
+          {/* Data Retention */}
+          <div>
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-gray-600 dark:text-slate-400">{t('dataRetention')}</span>
+              <span className="font-medium text-gray-900 dark:text-white">
+                {planLimits?.retention ?? '—'} {t('days')}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3">
+              <div
+                className="h-3 rounded-full transition-all duration-500 bg-brand-500"
+                style={{ width: '100%' }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1.5">
+              {t('retentionDesc')}
+            </p>
           </div>
         </div>
 
