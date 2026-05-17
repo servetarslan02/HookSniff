@@ -21,6 +21,7 @@ public class HookSniff {
     private final Statistics statistics;
     private final Environment environment;
     private final BackgroundTask backgroundTask;
+    private final OperationalWebhook operationalWebhook;
 
     public HookSniff(String token) {
         this(token, new HookSniffOptions());
@@ -51,5 +52,6 @@ public class HookSniff {
         this.statistics = new Statistics(this.httpClient);
         this.environment = new Environment(this.httpClient);
         this.backgroundTask = new BackgroundTask(this.httpClient);
+        this.operationalWebhook = new OperationalWebhook(this.httpClient);
     }
 }

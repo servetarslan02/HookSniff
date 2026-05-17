@@ -49,6 +49,11 @@ namespace HookSniff
             get => new BackgroundTask(this);
         }
 
+        public OperationalWebhook OperationalWebhook
+        {
+            get => new OperationalWebhook(this);
+        }
+
         public ILogger? Logger { get; }
 
         public HookSniffHttpClient HookSniffHttpClient;

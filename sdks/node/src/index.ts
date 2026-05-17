@@ -3,6 +3,7 @@ import { BackgroundTask } from "./api/backgroundTask";
 import { Endpoint } from "./api/endpoint";
 import { Environment } from "./api/environment";
 import { EventType } from "./api/eventType";
+import { OperationalWebhook } from "./api/operationalWebhook";
 import { Health } from "./api/health";
 import { Message } from "./api/message";
 import { MessageAttempt } from "./api/messageAttempt";
@@ -95,6 +96,10 @@ export class HookSniff {
 
   public get eventType() {
     return new EventType(this.requestCtx);
+  }
+
+  public get operationalWebhook() {
+    return new OperationalWebhook(this.requestCtx);
   }
 
   public get health() {

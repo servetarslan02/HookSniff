@@ -32,6 +32,7 @@ type (
 		Statistics     *Statistics
 		Environment    *Environment
 		BackgroundTask *BackgroundTask
+		OperationalWebhook *OperationalWebhook
 	}
 )
 
@@ -70,6 +71,7 @@ func New(token string, options *HookSniffOptions) (*HookSniff, error) {
 		Statistics:     newStatistics(&hooksniffHttpClient),
 		Environment:    newEnvironment(&hooksniffHttpClient),
 		BackgroundTask: newBackgroundTask(&hooksniffHttpClient),
+		OperationalWebhook: newOperationalWebhook(&hooksniffHttpClient),
 	}
 	return &hs, nil
 }
