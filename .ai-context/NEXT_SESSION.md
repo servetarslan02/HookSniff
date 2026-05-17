@@ -17,6 +17,25 @@ Bu dosyayı ilk kez okuyorsan:
 
 ## ✅ Tamamlanan (Son Oturum — 2026-05-17)
 
+### Node.js SDK Yeniden Yazım ✅ (2026-05-17 22:13)
+1. **Svix tabanlı mimari** — OpenAPI Generator boilerplace kaldırıldı, el yapımı SDK
+2. **12 resource** — endpoints, webhooks, auth, apiKeys, teams, alerts, analytics, billing, health, search, notifications, admin
+3. **80+ TypeScript type** — OpenAPI spec'ten
+4. **Özellikler** — retry+backoff, auto-idempotency, auto-pagination, webhook verify, custom fetch, timeout
+5. **Versiyon** — 0.4.0 → 0.5.0
+6. **Kalite** — %55-60 → %70-75
+7. **Svix branding kaldırıldı** — %100 HookSniff native görünüm
+8. **Commit** — bdf6df61
+9. **`.ai-context/sdk-roadmap/`** — STATUS.md, DONE.md, TODO.md, PLAN.md oluşturuldu
+
+### Sıradaki (SDK Roadmap)
+- 🔴 Node.js 0.5.0 npm publish
+- 🟡 Python SDK rewrite (Svix Python core'dan adapte)
+- 🟡 Go SDK rewrite
+- 🟡 Rust SDK rewrite
+- 🟢 Test suite + CI/CD
+- Detay: `.ai-context/sdk-roadmap/TODO.md`
+
 ### Lazy + Prefetch System (Stripe/Linear Pattern) ✅ (2026-05-17 21:44)
 1. **LazySection** — IntersectionObserver + fade-in animasyon + skeleton presets (statCards, table, chart, page)
 2. **PrefetchLink** — Hover ile route chunk + React Query data prefetch (Stripe tarzı)
