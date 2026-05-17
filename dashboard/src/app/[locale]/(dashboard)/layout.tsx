@@ -51,6 +51,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       items: [
         { name: t('core'), href: '/core', icon: '📊' },
         { name: t('applications'), href: '/applications', icon: '📱' },
+        { name: t('environments'), href: '/environments', icon: '🌐' },
+        { name: t('backgroundTasks'), href: '/background-tasks', icon: '⏳' },
         { name: t('deliveries'), href: '/deliveries', icon: '🔗' },
       ],
     },
@@ -67,6 +69,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       label: t('sectionMonitoring'),
       items: [
         { name: t('observability'), href: '/observability', icon: '📡' },
+        { name: t('operationalWebhooks'), href: '/operational-webhooks', icon: '🪝' },
         { name: t('securitySection'), href: '/security-section', icon: '🔒' },
         { name: t('routingConfig'), href: '/routing-config', icon: '🔀' },
       ],

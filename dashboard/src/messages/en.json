@@ -192,7 +192,10 @@
     "observability": "Observability",
     "sectionContent": "Content",
     "account": "Account",
-    "profile": "Profile"
+    "profile": "Profile",
+    "environments": "Environments",
+    "backgroundTasks": "Background Tasks",
+    "operationalWebhooks": "Operational Webhooks"
   },
   "dashboard": {
     "title": "Dashboard",
