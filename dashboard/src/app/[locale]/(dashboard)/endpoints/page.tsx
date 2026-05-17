@@ -106,7 +106,7 @@ export default function EndpointsPage() {
     setRotatingId(ep.id);
     try {
       const data = await endpointsApi.rotateSecret(token, ep.id);
-      setNewSecret(data.secret);
+      setNewSecret(data.signing_secret);
       toast(t('secretRotated'), 'success');
     } catch (err) {
       toast(err instanceof Error ? err.message : tc('error'), 'error');
