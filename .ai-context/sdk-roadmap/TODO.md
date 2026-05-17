@@ -1,7 +1,10 @@
 # SDK — Yapılacak İşler (%100 Yol Haritası)
 
-> Son güncelleme: 2026-05-17 22:20 GMT+8
+> Son güncelleme: 2026-05-17 23:11 GMT+8
 > Hedef: Stripe seviyesinde SDK kalitesi
+>
+> ⚠️ ÖNEMLİ: Python ve Node.js SDK'lar Svix'ten doğrudan çevrilmedi.
+> Bir sonraki oturumda Svix kaynak kodu incelenecek. Bakınız: `SVIX-ADAPTATION.md`
 
 ---
 
