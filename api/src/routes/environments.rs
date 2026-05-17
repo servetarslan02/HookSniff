@@ -141,7 +141,7 @@ async fn update_environment(
     Json(req): Json<UpdateEnvironmentRequest>,
 ) -> Result<Json<EnvironmentResponse>, AppError> {
     // Check ownership
-    let existing = sqlx::query_as::<_, Environment>(
+    let _existing = sqlx::query_as::<_, Environment>(
         "SELECT id, customer_id, name, slug, description, is_default, color, created_at, updated_at \
          FROM environments WHERE id = $1 AND customer_id = $2",
     )
