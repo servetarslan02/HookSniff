@@ -15,6 +15,7 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
     val backgroundTask: BackgroundTask
     val operationalWebhook: OperationalWebhook
     val messagePoller: MessagePoller
+    val inbound: Inbound
 
     init {
         if (options.baseUrl == null) {
@@ -35,5 +36,6 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
         backgroundTask = BackgroundTask(httpClient)
         operationalWebhook = OperationalWebhook(httpClient)
         messagePoller = MessagePoller(httpClient)
+        inbound = Inbound(httpClient)
     }
 }

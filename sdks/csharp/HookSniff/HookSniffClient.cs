@@ -59,6 +59,11 @@ namespace HookSniff
             get => new MessagePoller(this);
         }
 
+        public Inbound Inbound
+        {
+            get => new Inbound(this);
+        }
+
         public ILogger? Logger { get; }
 
         public HookSniffHttpClient HookSniffHttpClient;

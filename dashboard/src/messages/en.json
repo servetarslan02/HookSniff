@@ -196,7 +196,8 @@
     "environments": "Environments",
     "backgroundTasks": "Background Tasks",
     "operationalWebhooks": "Operational Webhooks",
-    "messagePoller": "Message Poller"
+    "messagePoller": "Message Poller",
+    "inboundWebhooks": "Inbound Webhooks"
   },
   "dashboard": {
     "title": "Dashboard",
