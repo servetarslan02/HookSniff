@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const quickstartTabs = [
   {
     label: 'Node.js',
-    code: `import { HookSniff } from 'hooksniff-sdk';
+    code: `import { HookSniff } from 'hooksniff';
 
 const hr = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });
 

@@ -10,10 +10,10 @@ const sdks = [
     icon: '📦',
     nameKey: 'nodeSdk',
     lang: 'Node.js',
-    install: 'npm install hooksniff-sdk',
+    install: 'npm install hooksniff',
     status: 'Stable',
     statusColor: 'green',
-    quickStart: `import { HookSniff } from 'hooksniff-sdk';
+    quickStart: `import { HookSniff } from 'hooksniff';
 
 const hr = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });
 
@@ -32,7 +32,7 @@ const delivery = await hr.webhooks.send({
 });
 console.log('Delivery:', delivery.id, delivery.status);`,
     verify: `import express from 'express';
-import { verifySignature } from 'hooksniff-sdk';
+import { verifySignature } from 'hooksniff';
 
 const app = express();
 
@@ -47,7 +47,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   console.log('Received:', event.event);
   res.status(200).send('OK');
 });`,
-    types: `import type { Endpoint, Delivery, WebhookEvent } from 'hooksniff-sdk';
+    types: `import type { Endpoint, Delivery, WebhookEvent } from 'hooksniff';
 
 const endpoints: Endpoint[] = await hr.endpoints.list();
 const delivery: Delivery = await hr.webhooks.send({
@@ -209,7 +209,7 @@ puts "Delivery: #{delivery.id}"`,
     icon: '🐘',
     nameKey: 'phpSdk',
     lang: 'PHP',
-    install: 'composer require hooksniff/hooksniff-php',
+    install: 'composer require hooksniff/hooksniff',
     status: 'Stable',
     statusColor: 'green',
     quickStart: `<?php
