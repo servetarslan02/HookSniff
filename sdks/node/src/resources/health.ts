@@ -1,20 +1,16 @@
 /**
- * HookSniff API Resource: Health
+ * HookSniff SDK — Health Resource
  */
 
-import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
-import { HealthModel, type HealthOutput } from "../models";
-
-export type { HealthOutput };
+import { HttpMethod, HookSniffRequest, type HookSniffRequestContext } from "../request";
+import type { SystemStatus } from "../models";
 
 export class Health {
-  constructor(private readonly ctx: HookSniffRequestContext) {}
+  constructor(private readonly requestCtx: HookSniffRequestContext) {}
 
-  /** Check API health */
-  async check(): Promise<HealthOutput> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/health");
-    return req.send<HealthOutput>(this.ctx, (json) =>
-      HealthModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Check API health. */
+  public check(): Promise<SystemStatus> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/health");
+    return request.send(this.requestCtx, (json) => json as SystemStatus);
   }
 }

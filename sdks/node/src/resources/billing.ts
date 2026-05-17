@@ -1,38 +1,48 @@
 /**
- * HookSniff API Resource: Billing
+ * HookSniff SDK — Billing Resource
  */
 
-import { HookSniffRequest, HttpMethod, type HookSniffRequestContext } from "../request";
-import { PlanInfoModel, PortalModel, type PlanInfo, type PortalOutput } from "../models";
-
-export type { PlanInfo, PortalOutput };
+import { HttpMethod, HookSniffRequest, type HookSniffRequestContext } from "../request";
+import type {
+  SubscriptionResponse,
+  UpgradeRequest,
+  UpgradeResponse,
+  UsageResponse,
+  InvoiceResponse,
+  BillingPortalResponse,
+} from "../models";
 
 export class Billing {
-  constructor(private readonly ctx: HookSniffRequestContext) {}
+  constructor(private readonly requestCtx: HookSniffRequestContext) {}
 
-  /** Get current plan info */
-  async getPlan(): Promise<PlanInfo> {
-    const req = new HookSniffRequest(HttpMethod.GET, "/v1/billing/plan");
-    return req.send<PlanInfo>(this.ctx, (json) =>
-      PlanInfoModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Get current subscription. */
+  public subscription(): Promise<SubscriptionResponse> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/billing/subscription");
+    return request.send(this.requestCtx, (json) => json as SubscriptionResponse);
   }
 
-  /** Upgrade plan */
-  async upgrade(plan: string, idempotencyKey?: string): Promise<PortalOutput> {
-    const req = new HookSniffRequest(HttpMethod.POST, "/v1/billing/upgrade");
-    if (idempotencyKey) req.setHeaderParam("idempotency-key", idempotencyKey);
-    req.setBody({ plan });
-    return req.send<PortalOutput>(this.ctx, (json) =>
-      PortalModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Get usage for current billing period. */
+  public usage(): Promise<UsageResponse> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/billing/usage");
+    return request.send(this.requestCtx, (json) => json as UsageResponse);
   }
 
-  /** Open customer portal */
-  async portal(): Promise<PortalOutput> {
-    const req = new HookSniffRequest(HttpMethod.POST, "/v1/billing/portal");
-    return req.send<PortalOutput>(this.ctx, (json) =>
-      PortalModel._fromJsonObject(json as Record<string, unknown>)
-    );
+  /** Get invoices. */
+  public invoices(): Promise<InvoiceResponse[]> {
+    const request = new HookSniffRequest(HttpMethod.GET, "/v1/billing/invoices");
+    return request.send(this.requestCtx, (json) => json as InvoiceResponse[]);
+  }
+
+  /** Upgrade plan. Returns checkout URL. */
+  public upgrade(body: UpgradeRequest): Promise<UpgradeResponse> {
+    const request = new HookSniffRequest(HttpMethod.POST, "/v1/billing/upgrade");
+    request.setBody(body);
+    return request.send(this.requestCtx, (json) => json as UpgradeResponse);
+  }
+
+  /** Open billing portal (Polar.sh/Stripe). */
+  public portal(): Promise<BillingPortalResponse> {
+    const request = new HookSniffRequest(HttpMethod.POST, "/v1/billing/portal");
+    return request.send(this.requestCtx, (json) => json as BillingPortalResponse);
   }
 }
