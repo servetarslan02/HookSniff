@@ -174,7 +174,7 @@ export function PlanCards({
                 </div>
               ) : plan.isEnterprise ? (
                 <button type="button"
-                  onClick={() => window.open('mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry', '_blank')}
+                  onClick={() => window.open('/contact', '_blank')}
                   className="w-full py-2.5 rounded-xl text-sm font-medium bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 transition"
                 >
                   {t('contactSales')}

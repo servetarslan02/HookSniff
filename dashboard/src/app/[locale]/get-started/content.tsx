@@ -391,11 +391,11 @@ export function GetStartedPageContent() {
         <div className="bg-gray-900 rounded-xl p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-gray-500 uppercase tracking-wider">{t('embedCode')}</span>
-            <CopyButton text={`<iframe\n  src="https://portal.hooksniff.dev/embed?token=YOUR_PORTAL_TOKEN"\n  style="width:100%;height:600px;border:none;"\n  allow="clipboard-write"\n/>`} />
+            <CopyButton text={`<iframe\n  src="https://hooksniff.vercel.app/portal-customize?token=YOUR_PORTAL_TOKEN"\n  style="width:100%;height:600px;border:none;"\n  allow="clipboard-write"\n/>`} />
           </div>
           <pre className="text-sm font-mono text-green-400 overflow-x-auto">
             <code>{`<iframe
-  src="https://portal.hooksniff.dev/embed?token=YOUR_PORTAL_TOKEN"
+  src="https://hooksniff.vercel.app/portal-customize?token=YOUR_PORTAL_TOKEN"
   style="width: 100%; height: 600px; border: none;"
   allow="clipboard-write"
 />`}</code>
