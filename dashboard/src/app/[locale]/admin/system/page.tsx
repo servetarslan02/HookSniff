@@ -1,5 +1,6 @@
 'use client';
 
+import { LazySection } from '@/components/LazySection';
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useToast } from '@/components/Toast';
