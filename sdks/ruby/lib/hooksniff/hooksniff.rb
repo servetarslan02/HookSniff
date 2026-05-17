@@ -22,6 +22,7 @@ module HookSniff
     attr_accessor :environment
     attr_accessor :background_task
     attr_accessor :operational_webhook
+    attr_accessor :message_poller
 
     def initialize(auth_token, options = HookSniffOptions.new)
       uri = URI(options.server_url || "https://hooksniff-api-1046140057667.europe-west1.run.app")
@@ -37,6 +38,7 @@ module HookSniff
       @environment = Environment.new(api_client)
       @background_task = BackgroundTask.new(api_client)
       @operational_webhook = OperationalWebhook.new(api_client)
+      @message_poller = MessagePoller.new(api_client)
     end
   end
 end
