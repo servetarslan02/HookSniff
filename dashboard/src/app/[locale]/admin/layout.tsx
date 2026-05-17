@@ -6,6 +6,7 @@ import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
 import { notificationsApi } from '@/lib/api';
 import { useRealtime } from '@/hooks/useRealtime';
@@ -113,10 +114,11 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                 ? pathname === '/admin'
                 : pathname.startsWith(item.href);
             return (
-              <Link
+              <PrefetchLink
                 key={item.nameKey}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
+                hoverDelay={80}
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
                   isActive
@@ -126,7 +128,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               >
                 <span className="text-lg">{item.icon}</span>
                 {t(`nav.${item.nameKey}`)}
-              </Link>
+              </PrefetchLink>
             );
           })}
         </nav>
