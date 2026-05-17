@@ -1,19 +1,18 @@
 # SDK Roadmap MEMORY
 
-> Son güncelleme: 2026-05-17 23:36 GMT+8
+> Son güncelleme: 2026-05-17 23:42 GMT+8
 
 ## Durum
 - Node.js SDK: ✅ Svix'ten adapte edildi (0.5.0, %70-75)
-- Python SDK: ✅ Svix mimarisine uyarlandı (httpx + attrs + ApiBase, sync+async) (0.5.0, %75-80)
+- Python SDK: ✅ Svix SDK'dan doğrudan adapte edildi (127 dosya, 101 model, sync+async) (1.0.0, %80)
 - Go SDK: ⬜ Sıradaki (Svix Go core'dan adapte)
 - Rust SDK: ⬜ Sıradaki
 - 7 SDK daha: ⬜ Beklemede
 
 ## Yaklaşım
 - Svix'in mevcut SDK'larını alıp HookSniff'e uyarlıyoruz
-- Mimari: httpx, attrs, ApiBase pattern, sync+async, auto-gen models
-- Node.js: Svix'ten doğru çevrildi ✅
-- Python: Svix mimarisine tam uyarlandı ✅ (httpx, attrs, ApiBase, 12 resource, sync+async)
+- Python: Svix SDK'nın tamamı kopyalandı, svix→hooksniff yeniden adlandırıldı, Svix-specific features kaldırıldı
+- Node.js: Svix'ten adapte edildi
 - Go ve sonrası: Hepsi Svix'ten adapte edilecek
 - Hedef: %100 (Stripe seviyesi)
 
