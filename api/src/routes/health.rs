@@ -63,6 +63,7 @@ pub struct ComponentStatus {
 /// Results cached in Redis for 30 seconds to reduce DB load.
 pub async fn system_status(
     axum::extract::Extension(health_pool): axum::extract::Extension<crate::db::HealthPool>,
+    axum::extract::Extension(cache_layer): axum::extract::Extension<Option<crate::cache::CacheLayer>>,
 ) -> (StatusCode, axum::http::HeaderMap, Json<SystemStatus>) {
     let pool = &health_pool.0;
     let mut headers = axum::http::HeaderMap::new();
@@ -121,50 +122,30 @@ pub async fn system_status(
     components.push(db_status);
 
     // ── Redis (optional — healthy if not configured) ──
-    let redis_url = crate::config::resolve_redis_url();
-    if let Some(ref url) = redis_url {
+    // Use existing CacheLayer connection instead of creating a new one
+    if let Some(ref cache) = cache_layer {
         let redis_start = Instant::now();
-        let redis_status = match redis::Client::open(url.as_str()) {
-            Ok(client) => match redis::aio::ConnectionManager::new(client).await {
-                Ok(mut conn) => {
-                    let ping_result: Result<String, _> =
-                        redis::cmd("PING").query_async(&mut conn).await;
-                    let latency = redis_start.elapsed().as_millis() as i64;
-                    match ping_result {
-                        Ok(_) => ComponentStatus {
-                            name: "Redis".to_string(),
-                            status: "healthy".to_string(),
-                            latency_ms: Some(latency),
-                            description: "Redis rate limiter and caching".to_string(),
-                            last_checked: now.clone(),
-                        },
-                        Err(e) => {
-                            tracing::error!("Status check: Redis PING failed: {e}");
-                            ComponentStatus {
-                                name: "Redis".to_string(),
-                                status: "unhealthy".to_string(),
-                                latency_ms: Some(latency),
-                                description: format!("Redis PING failed: {e}"),
-                                last_checked: now.clone(),
-                            }
-                        }
-                    }
-                }
-                Err(e) => ComponentStatus {
-                    name: "Redis".to_string(),
-                    status: "unhealthy".to_string(),
-                    latency_ms: None,
-                    description: format!("Redis connection failed: {e}"),
-                    last_checked: now.clone(),
-                },
-            },
-            Err(e) => ComponentStatus {
+        let mut conn = cache.conn().clone();
+        let ping_result: Result<String, _> = redis::cmd("PING").query_async(&mut conn).await;
+        let latency = redis_start.elapsed().as_millis() as i64;
+        let redis_status = match ping_result {
+            Ok(_) => ComponentStatus {
                 name: "Redis".to_string(),
-                status: "unhealthy".to_string(),
-                latency_ms: None,
-                description: format!("Redis client error: {e}"),
+                status: "healthy".to_string(),
+                latency_ms: Some(latency),
+                description: "Redis rate limiter and caching".to_string(),
                 last_checked: now.clone(),
             },
+            Err(e) => {
+                tracing::error!("Status check: Redis PING failed: {e}");
+                ComponentStatus {
+                    name: "Redis".to_string(),
+                    status: "unhealthy".to_string(),
+                    latency_ms: Some(latency),
+                    description: format!("Redis PING failed: {e}"),
+                    last_checked: now.clone(),
+                }
+            }
         };
         components.push(redis_status);
     }
@@ -387,23 +368,16 @@ pub async fn health_check(
     };
     checks.insert("queue_detail".to_string(), queue_detail);
 
-    // Redis check — actually PING Redis to verify connectivity
-    let redis_status = match crate::config::resolve_redis_url() {
-        Some(ref url) => {
+    // Redis check — use existing CacheLayer connection instead of creating a new one
+    let redis_status = match &cache_layer {
+        Some(cache) => {
             let redis_start = Instant::now();
-            match redis::Client::open(url.as_str()) {
-                Ok(client) => match redis::aio::ConnectionManager::new(client).await {
-                    Ok(mut conn) => {
-                        let ping: Result<String, _> = redis::cmd("PING").query_async(&mut conn).await;
-                        let latency = redis_start.elapsed().as_millis() as i64;
-                        match ping {
-                            Ok(_) => json!({ "status": "healthy", "latency_ms": latency, "note": "connected" }),
-                            Err(e) => json!({ "status": "unhealthy", "latency_ms": latency, "note": format!("PING failed: {e}") }),
-                        }
-                    }
-                    Err(e) => json!({ "status": "unhealthy", "latency_ms": 0, "note": format!("connection failed: {e}") }),
-                },
-                Err(e) => json!({ "status": "unhealthy", "latency_ms": 0, "note": format!("client error: {e}") }),
+            let mut conn = cache.conn().clone();
+            let ping: Result<String, _> = redis::cmd("PING").query_async(&mut conn).await;
+            let latency = redis_start.elapsed().as_millis() as i64;
+            match ping {
+                Ok(_) => json!({ "status": "healthy", "latency_ms": latency, "note": "connected" }),
+                Err(e) => json!({ "status": "unhealthy", "latency_ms": latency, "note": format!("PING failed: {e}") }),
             }
         }
         None => json!({ "status": "healthy", "latency_ms": 0, "note": "not configured" }),
