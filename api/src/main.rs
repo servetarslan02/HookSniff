@@ -304,6 +304,17 @@ async fn main() -> Result<()> {
         }
     });
 
+    // Daily webhook count reset (every 24 hours)
+    let daily_reset_pool = pool.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(24 * 60 * 60)).await;
+            if let Err(e) = jobs::retention::reset_daily_webhook_counts(&daily_reset_pool).await {
+                tracing::error!("❌ Daily count reset failed: {:?}", e);
+            }
+        }
+    });
+
     // Cleanup: seen_webhooks + idempotency_keys + revoked_tokens (every 6 hours, distributed lock)
     let cleanup_pool = pool.clone();
     let cleanup_queue = job_queue.clone();

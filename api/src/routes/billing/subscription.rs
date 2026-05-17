@@ -36,7 +36,7 @@ pub async fn get_subscription(
         stripe_subscription_id: customer.stripe_subscription_id.clone(),
         polar_subscription_id: customer.polar_subscription_id.clone(),
         iyzico_subscription_id: customer.iyzico_subscription_id.clone(),
-        webhook_limit: plan.max_webhooks_per_month(),
+        webhook_limit: plan.max_webhooks_per_day(),
         endpoint_limit: plan.max_endpoints(),
         retention_days: plan.retention_days(),
         monthly_price_cents: plan.monthly_price_cents(),
