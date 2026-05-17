@@ -20,7 +20,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 | ✅ | Go SDK adapte | Tamamlandı | %80 |
 | ✅ | Rust SDK adapte | Tamamlandı | %80 |
 | ✅ | Ruby SDK adapte | Tamamlandı | %75 |
-| ⬜ | Java SDK adapte | Beklemede | — |
+| ✅ | Java SDK adapte | Tamamlandı | %75 |
 | ⬜ | Kotlin SDK adapte | Beklemede | — |
 | ⬜ | PHP SDK adapte | Beklemede | — |
 | ⬜ | C# SDK adapte | Beklemede | — |
@@ -56,7 +56,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 
 ---
 
-## 🔴 Sonraki: Java SDK Adaptasyonu
+## 🔴 Sıradaki: Kotlin SDK Adaptasyonu
 
 ### Adımlar:
 1. `cp -r svix-libs/java/* sdks/java/`
