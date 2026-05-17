@@ -29,7 +29,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 | Faz 1 | Core kalite | ✅ Tamamlandı | %85 |
 | Faz 2 | Test suite | ✅ Tamamlandı | %90 |
 | Faz 3 | CI/CD | ✅ Tamamlandı | %95 |
-| Faz 4 | OpenAPI codegen | ⬜ | %95 |
+| Faz 4 | OpenAPI codegen | ✅ Tamamlandı | %96 |
 | Faz 5 | Dokümantasyon | ⬜ | %97 |
 | Faz 6 | Multi-dil publish | ⬜ | 11/11 |
 | Faz 7 | Son dokunuşlar | ⬜ | %100 |
@@ -93,9 +93,10 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 - [x] CHANGELOG güncellendi
 
 ### Faz 4 — OpenAPI Codegen (3 saat)
-- [ ] Type üretici script
-- [ ] Model generation
-- [ ] Validation
+- [x] Type üretici script (openapi-codegen.py)
+- [x] Model generation (Node.js, Python, Go — 170 schema)
+- [x] Validation (spec doğrulama + duplicate detection)
+- [x] Makefile entegrasyonu (make codegen, make codegen-validate)
 
 ### Faz 5 — Dokümantasyon (4 saat)
 - [ ] Site kurulumu
