@@ -2,7 +2,7 @@
 
 use axum::extract::Extension;
 use axum::Json;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use sqlx::PgPool;
 
@@ -13,7 +13,7 @@ use super::require_admin;
 
 // ── Types ──────────────────────────────────────────────────
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SystemStats {
     pub total_users: i64,
     pub total_deliveries: i64,
@@ -26,7 +26,7 @@ pub struct SystemStats {
     pub trends: StatsTrends,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StatsTrends {
     pub total_users_yesterday: i64,
     pub total_deliveries_yesterday: i64,
@@ -35,13 +35,13 @@ pub struct StatsTrends {
     pub active_webhooks: i64,
 }
 
-#[derive(Debug, Serialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct PlanCount {
     pub plan: String,
     pub count: i64,
 }
 
-#[derive(Debug, Serialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct RecentSignup {
     pub id: uuid::Uuid,
     pub email: String,
@@ -50,20 +50,20 @@ pub struct RecentSignup {
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
-#[derive(Debug, Serialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct RevenueRow {
     pub month: String,
     pub revenue: f64,
 }
 
-#[derive(Debug, Serialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct RevenueByPlan {
     pub plan: String,
     pub revenue: f64,
     pub count: i64,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RevenueResponse {
     pub monthly_revenue: Vec<RevenueRow>,
     pub revenue_by_plan: Vec<RevenueByPlan>,
@@ -73,7 +73,7 @@ pub struct RevenueResponse {
     pub collected_revenue: f64,
 }
 
-#[derive(Debug, Serialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct ChurnedUser {
     pub id: uuid::Uuid,
     pub email: String,

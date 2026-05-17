@@ -1,6 +1,6 @@
 use super::*;
 
-async fn handle_stripe_webhook(
+pub async fn handle_stripe_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<Config>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
@@ -22,7 +22,7 @@ async fn handle_stripe_webhook(
 
 /// POST /v1/billing/webhook/polar — Polar.sh webhook handler
 
-async fn handle_polar_webhook(
+pub async fn handle_polar_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: axum::http::HeaderMap,
@@ -41,7 +41,7 @@ async fn handle_polar_webhook(
 
 /// POST /v1/billing/webhook/iyzico — iyzico webhook handler
 
-async fn handle_iyzico_webhook(
+pub async fn handle_iyzico_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: axum::http::HeaderMap,
