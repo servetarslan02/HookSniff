@@ -2,7 +2,7 @@
 
 ## Ne Yapıldı?
 
-Node.js SDK tamamen yeniden yazıldı. Eski OpenAPI Generator boilerplate kaldırıldı, yerine Svix SDK mimarisi (MIT lisans) bazlı el yapımı SDK konuldu.
+Node.js SDK tamamen yeniden yazıldı. Eski OpenAPI Generator boilerplate kaldırıldı, yerine el yapımı el yapımı SDK konuldu.
 
 ## Değişiklikler
 
