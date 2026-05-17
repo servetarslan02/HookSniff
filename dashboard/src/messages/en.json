@@ -197,7 +197,8 @@
     "backgroundTasks": "Background Tasks",
     "operationalWebhooks": "Operational Webhooks",
     "messagePoller": "Message Poller",
-    "inboundWebhooks": "Inbound Webhooks"
+    "inboundWebhooks": "Inbound Webhooks",
+    "connectors": "Connectors"
   },
   "dashboard": {
     "title": "Dashboard",

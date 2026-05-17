@@ -72,6 +72,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         { name: t('operationalWebhooks'), href: '/operational-webhooks', icon: '🪝' },
         { name: t('messagePoller'), href: '/message-poller', icon: '📬' },
         { name: t('inboundWebhooks'), href: '/inbound', icon: '📥' },
+        { name: t('connectors'), href: '/connectors', icon: '🔌' },
         { name: t('securitySection'), href: '/security-section', icon: '🔒' },
         { name: t('routingConfig'), href: '/routing-config', icon: '🔀' },
       ],
