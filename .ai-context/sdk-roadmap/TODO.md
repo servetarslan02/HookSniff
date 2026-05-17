@@ -30,7 +30,7 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 | Faz 2 | Test suite | ✅ Tamamlandı | %90 |
 | Faz 3 | CI/CD | ✅ Tamamlandı | %95 |
 | Faz 4 | OpenAPI codegen | ✅ Tamamlandı | %96 |
-| Faz 5 | Dokümantasyon | ⬜ | %97 |
+| Faz 5 | Dokümantasyon | ✅ Tamamlandı | %98 |
 | Faz 6 | Multi-dil publish | ⬜ | 11/11 |
 | Faz 7 | Son dokunuşlar | ⬜ | %100 |
 
@@ -99,10 +99,11 @@ Detaylar: MEMORY.md → 'SDK Adaptasyon Yöntemi'
 - [x] Makefile entegrasyonu (make codegen, make codegen-validate)
 
 ### Faz 5 — Dokümantasyon (4 saat)
-- [ ] Site kurulumu
-- [ ] Quick start guides
-- [ ] API reference
-- [ ] Examples
+- [x] generate-docs.py: SDK README üretici script
+- [x] 11 SDK README.md güncellendi (tutarlı format)
+- [x] sdks/README.md: SDK overview sayfası
+- [x] docs/quickstart.md: 5 dakikalık başlangıç rehberi
+- [x] Her SDK'da: kurulum, quick start, webhook verification, error handling
 
 ### Faz 6 — Multi-Dil Publish (12-16 saat)
 - [ ] npm, PyPI, crates.io, Go module
