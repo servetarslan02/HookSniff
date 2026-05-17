@@ -5,6 +5,7 @@ import { Environment } from "./api/environment";
 import { EventType } from "./api/eventType";
 import { OperationalWebhook } from "./api/operationalWebhook";
 import { MessagePoller } from "./api/messagePoller";
+import { Inbound } from "./api/inbound";
 import { Health } from "./api/health";
 import { Message } from "./api/message";
 import { MessageAttempt } from "./api/messageAttempt";
@@ -106,6 +107,10 @@ export class HookSniff {
 
   public get messagePoller() {
     return new MessagePoller(this.requestCtx);
+  }
+
+  public get inbound() {
+    return new Inbound(this.requestCtx);
   }
 
   public get health() {

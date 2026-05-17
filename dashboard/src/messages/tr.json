@@ -196,7 +196,8 @@
     "environments": "Ortamlar",
     "backgroundTasks": "Arka Plan Görevleri",
     "operationalWebhooks": "Operasyonel Webhooklar",
-    "messagePoller": "Mesaj Yoklayıcı"
+    "messagePoller": "Mesaj Yoklayıcı",
+    "inboundWebhooks": "Gelen Webhooklar"
   },
   "dashboard": {
     "title": "Dashboard",

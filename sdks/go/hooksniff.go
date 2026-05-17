@@ -34,6 +34,7 @@ type (
 		BackgroundTask *BackgroundTask
 		OperationalWebhook *OperationalWebhook
 		MessagePoller *MessagePoller
+		Inbound *Inbound
 	}
 )
 
@@ -74,6 +75,7 @@ func New(token string, options *HookSniffOptions) (*HookSniff, error) {
 		BackgroundTask: newBackgroundTask(&hooksniffHttpClient),
 		OperationalWebhook: newOperationalWebhook(&hooksniffHttpClient),
 		MessagePoller: newMessagePoller(&hooksniffHttpClient),
+		Inbound: newInbound(&hooksniffHttpClient),
 	}
 	return &hs, nil
 }
