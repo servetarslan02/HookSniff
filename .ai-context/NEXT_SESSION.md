@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-17 06:50 GMT+8 (Oturum — Email Deep Fix)
+> Son güncelleme: 2026-05-17 17:37 GMT+8 (Oturum — Billing Overhaul)
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
@@ -16,6 +16,25 @@ Bu dosyayı ilk kez okuyorsan:
 ---
 
 ## ✅ Tamamlanan (Son Oturum — 2026-05-17)
+
+### Billing Page Complete Overhaul ✅ (2026-05-17 17:37)
+1. **Sidebar: Billing ayrı bölüm** — Account'dan çıkarıldı, kendi section'ı (💳)
+2. **SubscriptionDetails bileşeni** — Plan, status badge, ödeme sağlayıcı, portal linki, limitler
+3. **OverageSettings bileşeni** — allow_overage toggle, email bildirim, günlük limit, birim fiyat
+4. **InvoiceTable geliştirme** — 14 gün içinde iade talep butonu + refund modal
+5. **API katmanı** — 4 yeni fonksiyon (openPortal, requestRefund, getOverageSettings, updateOverageSettings)
+6. **Zod schema'lar** — BillingSubscriptionSchema, OverageSettingsSchema
+7. **React Query hook'ları** — useBillingSubscription, useOverageSettings
+8. **i18n** — ~35 yeni key (EN + TR)
+9. **Eski URL redirect** — /billing-overview → /billing-section
+- **Commits:** afab22fd, ef1bd10c — push edildi
+
+### Security P0 Fixes — Doğrulama ✅ (2026-05-17 17:09)
+Tüm 4 güvenlik fix'i zaten uygulanmış:
+- HS-038f: Timing attack — dummy hash ile normalize ✅
+- HS-038g: serde_json hata — "Invalid request format" ✅
+- HS-038h: Email enumeration — generic response ✅
+- HS-038j: unwrap() panic — safe insert_header helper ✅
 
 ### Email Deep Fix: Admin Email Sayfası 16 Fix ✅ (2026-05-17 06:50)
 1. **Bulk email text → html** — Resend API doğru format
@@ -116,13 +135,13 @@ Bu dosyayı ilk kez okuyorsan:
 
 **✅ UYGULANDI (Oturum 173, 2026-05-15):** Neon HTTP API ile 8 index oluşturuldu, ANALYZE çalıştırıldı. Tablolar küçük (<40 row) olduğu için PostgreSQL hala seq scan tercih ediyor — tablolar büyüyünce index otomatik kullanılacak.
 
-### Öncelik 1 — Güvenlik (P0 kalan)
+### Öncelik 1 — Güvenlik (P0)
 | # | Görev | Durum | Dosya |
 |---|-------|-------|-------|
-| 1 | HS-038f: Timing attack — login hataları farklı mesajlar | ⬜ | auth.rs |
-| 2 | HS-038g: serde_json hata gösteriyor | ⬜ | error.rs |
-| 3 | HS-038h: Email enumeration — register mesajı | ⬜ | auth.rs |
-| 4 | HS-038j: rate_limit.rs unwrap() — panic riski | ⬜ | rate_limit.rs |
+| 1 | HS-038f: Timing attack — login hataları farklı mesajlar | ✅ | auth.rs (dummy hash ile normalize) |
+| 2 | HS-038g: serde_json hata gösteriyor | ✅ | error.rs ("Invalid request format") |
+| 3 | HS-038h: Email enumeration — register mesajı | ✅ | auth.rs (generic response) |
+| 4 | HS-038j: rate_limit.rs unwrap() — panic riski | ✅ | rate_limit.rs (safe insert_header) |
 
 ---
 
@@ -147,13 +166,13 @@ Bu dosyayı ilk kez okuyorsan:
 | 10 | Redis cache (stats, health) | ✅ | health 30sn, stats/revenue 60sn |
 | 11 | Edge cache süresi artır | ✅ | 10sn → 60sn |
 
-### Öncelik 1 — Güvenlik (P0 kalan)
+### Öncelik 1 — Güvenlik (P0) ✅ TAMAMLANDI
 | # | Görev | Durum | Dosya |
 |---|-------|-------|-------|
-| 4 | HS-038f: Timing attack — login hataları farklı mesajlar | ⬜ | auth.rs |
-| 5 | HS-038g: serde_json hata gösteriyor | ⬜ | error.rs |
-| 6 | HS-038h: Email enumeration — register mesajı | ⬜ | auth.rs |
-| 7 | HS-038j: rate_limit.rs unwrap() — panic riski | ⬜ | rate_limit.rs |
+| 4 | HS-038f: Timing attack — login hataları farklı mesajlar | ✅ | auth.rs |
+| 5 | HS-038g: serde_json hata gösteriyor | ✅ | error.rs |
+| 6 | HS-038h: Email enumeration — register mesajı | ✅ | auth.rs |
+| 7 | HS-038j: rate_limit.rs unwrap() — panic riski | ✅ | rate_limit.rs |
 
 ### Öncelik 2 — i18n
 | # | Görev | Durum | Not |
