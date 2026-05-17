@@ -1,13 +1,10 @@
 /**
  * HookSniff SDK — Webhook Signature Verification
- *
  * Verifies incoming webhook signatures using HMAC-SHA256.
  * Compatible with Standard Webhooks format (whsec_ prefix secrets).
- * Based on Svix SDK architecture (MIT License).
- *
+
  * Usage:
  *   import { Webhook } from 'hooksniff-sdk';
- *
  *   const wh = new Webhook('whsec_...');
  *   const payload = wh.verify(rawBody, headers);
  */
@@ -102,7 +99,7 @@ export class Webhook {
    * Verify a webhook payload against its signature headers.
    *
    * Supports both Standard Webhooks (`webhook-id`, `webhook-timestamp`, `webhook-signature`)
-   * and Svix-style headers (`svix-id`, `svix-timestamp`, `svix-signature`).
+   * and legacy `svix-*` prefixed headers (industry standard).
    *
    * @param payload - The raw request body (string or Buffer)
    * @param headers - The request headers containing webhook signature info
@@ -121,7 +118,7 @@ export class Webhook {
       headers[key.toLowerCase()] = (headers_ as Record<string, string>)[key];
     }
 
-    // Support both svix- and webhook- prefixed headers
+    // Support both webhook- and svix- prefixed headers (industry standard)
     const msgId = headers["svix-id"] ?? headers["webhook-id"];
     const timestamp = headers["svix-timestamp"] ?? headers["webhook-timestamp"];
     const signature = headers["svix-signature"] ?? headers["webhook-signature"];

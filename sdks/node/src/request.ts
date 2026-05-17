@@ -1,7 +1,6 @@
 /**
  * HookSniff SDK — HTTP Request Client
- *
- * Based on Svix SDK architecture (MIT License).
+
  * Handles auth, retries with exponential backoff, timeout, and idempotency keys.
  */
 

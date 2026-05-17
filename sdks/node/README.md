@@ -248,4 +248,3 @@ const hs = new HookSniff('hooksniff_xxx', {
 
 MIT — see [LICENSE](../../LICENSE)
 
-Based on [Svix SDK](https://github.com/svix/svix-webhooks) architecture (MIT License).

@@ -1,29 +1,22 @@
 /**
  * HookSniff SDK — Main Entry Point
- *
  * A clean, modern SDK for the HookSniff webhook delivery API.
- * Architecture based on Svix SDK (MIT License), adapted for HookSniff.
- *
+
  * Usage:
  *   import { HookSniff } from 'hooksniff-sdk';
- *
  *   const hs = new HookSniff({ apiKey: 'hooksniff_xxx' });
- *
  *   // List endpoints
  *   const endpoints = await hs.endpoints.list();
- *
  *   // Auto-paginate through all endpoints
  *   for await (const ep of hs.endpoints.listAll()) {
  *     console.log(ep.url);
  *   }
- *
  *   // Send a webhook
  *   const delivery = await hs.webhooks.send({
  *     endpoint_id: 'ep_123',
  *     event: 'order.created',
  *     data: { order_id: '12345' },
  *   });
- *
  *   // Verify incoming webhook signature
  *   import { Webhook } from 'hooksniff-sdk';
  *   const wh = new Webhook('whsec_...');
@@ -86,14 +79,11 @@ export type HookSniffOptions = {
 
 /**
  * HookSniff API Client
- *
  * @example
  * ```ts
  * const hs = new HookSniff({ apiKey: 'hooksniff_xxx' });
- *
  * // List endpoints
  * const { data } = await hs.endpoints.list();
- *
  * // Send a webhook
  * const delivery = await hs.webhooks.send({
  *   endpoint_id: 'ep_123',
