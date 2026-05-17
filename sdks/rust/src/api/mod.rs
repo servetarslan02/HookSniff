@@ -13,6 +13,7 @@ mod endpoint;
 mod environment;
 mod operational_webhook;
 mod message_poller;
+mod inbound;
 mod event_type;
 mod health;
 mod message;
@@ -42,6 +43,7 @@ pub use self::{
     },
     statistics::Statistics,
     message_poller::MessagePoller,
+    inbound::Inbound,
 };
 
 impl HookSniff {
@@ -59,6 +61,10 @@ impl HookSniff {
 
     pub fn message_poller(&self) -> MessagePoller<'_> {
         MessagePoller::new(&self.cfg)
+    }
+
+    pub fn inbound(&self) -> Inbound<'_> {
+        Inbound::new(&self.cfg)
     }
 
     pub fn endpoint(&self) -> Endpoint<'_> {
