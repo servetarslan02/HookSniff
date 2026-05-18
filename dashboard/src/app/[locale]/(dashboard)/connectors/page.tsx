@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/store';
 import { connectorsApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
@@ -23,6 +24,7 @@ const PROVIDER_ICONS: Record<string, string> = {
 };
 
 export default function ConnectorsPage() {
+  const t = useTranslations('connectors');
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -49,7 +51,7 @@ export default function ConnectorsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['connector-configs'] });
       setShowCreate(false); setConfigName(''); setSelectedConnector('');
-      toast('Connector configured', 'success');
+      toast(t('connectorConfigured'), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
@@ -59,7 +61,7 @@ export default function ConnectorsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['connector-configs'] });
       if (selectedId) setSelectedId(null);
-      toast('Connector removed', 'success');
+      toast(t('connectorRemoved'), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
@@ -68,19 +70,19 @@ export default function ConnectorsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Connectors</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Manage external service integrations (Stripe, Shopify, GitHub, etc.)</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
         </div>
         <button onClick={() => setShowCreate(true)} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-          + Add Connector
+          {t('addConnector')}
         </button>
       </div>
 
       {/* Available Connectors */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Available Connectors</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('availableConnectors')}</h2>
         {loadingConnectors ? (
-          <div className="text-center py-8 text-gray-500">Loading...</div>
+          <div className="text-center py-8 text-gray-500">{t('loading')}</div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {connectors.map(c => (
@@ -112,27 +114,27 @@ export default function ConnectorsPage() {
       {/* Create Config */}
       {showCreate && (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Add Connector Configuration</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">{t('addConfiguration')}</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Connector</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('connector')}</label>
               <select
                 value={selectedConnector}
                 onChange={e => setSelectedConnector(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                <option value="">Select a connector...</option>
+                <option value="">{t('selectConnector')}</option>
                 {connectors.map(c => (
                   <option key={c.id} value={c.id}>{PROVIDER_ICONS[c.name] || '🔌'} {c.display_name}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('name')}</label>
               <input
                 value={configName}
                 onChange={e => setConfigName(e.target.value)}
-                placeholder="e.g. My Stripe Production"
+                placeholder={t('namePlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -147,23 +149,23 @@ export default function ConnectorsPage() {
               disabled={createMutation.isPending || !selectedConnector || !configName.trim()}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
             >
-              {createMutation.isPending ? 'Creating...' : 'Create'}
+              {createMutation.isPending ? t('creating') : t('create')}
             </button>
-            <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800">Cancel</button>
+            <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800">{t('cancel')}</button>
           </div>
         </div>
       )}
 
       {/* Configured Connectors */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Your Configurations</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('yourConfigurations')}</h2>
         {loadingConfigs ? (
-          <div className="text-center py-8 text-gray-500">Loading...</div>
+          <div className="text-center py-8 text-gray-500">{t('loading')}</div>
         ) : configs.length === 0 ? (
           <div className="text-center py-8">
             <div className="text-4xl mb-3">🔌</div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">No connectors configured</h3>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Add a connector to start receiving webhooks from external services</p>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('noConnectors')}</h3>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">{t('noConnectorsDesc')}</p>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -182,7 +184,7 @@ export default function ConnectorsPage() {
                     </div>
                   </div>
                   <span className={`px-2 py-0.5 text-xs rounded-full ${cfg.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
-                    {cfg.is_active ? 'active' : 'inactive'}
+                    {cfg.is_active ? t('active') : t('inactive')}
                   </span>
                 </div>
                 <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100 dark:border-gray-700">
@@ -191,7 +193,7 @@ export default function ConnectorsPage() {
                     onClick={e => { e.stopPropagation(); deleteMutation.mutate(cfg.id); }}
                     className="text-xs text-red-500 hover:text-red-700"
                   >
-                    Delete
+                    {t('delete')}
                   </button>
                 </div>
               </div>

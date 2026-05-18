@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/store';
 import { backgroundTasksApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
@@ -19,6 +20,8 @@ function formatDate(s: string | null) {
 }
 
 export default function BackgroundTasksPage() {
+  const t = useTranslations('backgroundTasks');
+  const tc = useTranslations('common');
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -34,7 +37,7 @@ export default function BackgroundTasksPage() {
     mutationFn: (id: string) => backgroundTasksApi.cancel(token!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['background-tasks'] });
-      toast('Task cancelled', 'success');
+      toast(t('taskCancelled'), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
@@ -42,29 +45,29 @@ export default function BackgroundTasksPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Background Tasks</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Monitor async operations like bulk replay and retry</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12 text-gray-500">Loading...</div>
+        <div className="text-center py-12 text-gray-500">{t('loading')}</div>
       ) : tasks.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-4xl mb-3">⏳</div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">No background tasks</h3>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Tasks will appear here when you run bulk operations</p>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('noTasks')}</h3>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">{t('noTasksDesc')}</p>
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900/50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Type</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Progress</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Created</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Finished</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('type')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('status')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('progress')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('created')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('finished')}</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -84,7 +87,7 @@ export default function BackgroundTasksPage() {
                   <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{formatDate(task.finished_at)}</td>
                   <td className="px-4 py-3 text-right">
                     {(task.status === 'pending' || task.status === 'running') && (
-                      <button onClick={() => cancelMutation.mutate(task.id)} className="text-xs text-red-500 hover:text-red-700">Cancel</button>
+                      <button onClick={() => cancelMutation.mutate(task.id)} className="text-xs text-red-500 hover:text-red-700">{t('cancel')}</button>
                     )}
                   </td>
                 </tr>

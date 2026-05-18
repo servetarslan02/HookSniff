@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/store';
 import { messagePollerApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
@@ -12,6 +13,7 @@ function formatDate(s: string | null) {
 }
 
 export default function MessagePollerPage() {
+  const t = useTranslations('messagePoller');
   const { token } = useAuth();
   const { toast } = useToast();
   const [consumerId, setConsumerId] = useState('default');
@@ -35,7 +37,7 @@ export default function MessagePollerPage() {
     mutationFn: (messageId: string) =>
       messagePollerApi.commit(token!, { consumer_id: consumerId, message_id: messageId }),
     onSuccess: () => {
-      toast('Cursor committed', 'success');
+      toast(t('cursorCommitted'), 'success');
       refetch();
     },
     onError: (e: Error) => toast(e.message, 'error'),
@@ -45,7 +47,7 @@ export default function MessagePollerPage() {
     mutationFn: (messageId: string) =>
       messagePollerApi.seek(token!, { consumer_id: consumerId, message_id: messageId }),
     onSuccess: () => {
-      toast('Cursor seeked', 'success');
+      toast(t('cursorSeeked'), 'success');
       refetch();
     },
     onError: (e: Error) => toast(e.message, 'error'),
@@ -54,27 +56,25 @@ export default function MessagePollerPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Message Poller</h1>
-        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-          Poll for messages using cursor-based pagination. Each consumer tracks their position in the stream.
-        </p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
       </div>
 
       {/* Config Panel */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 space-y-3 sm:space-y-4">
-        <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Poll Configuration</h3>
+        <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">{t('pollConfig')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Consumer ID</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('consumerId')}</label>
             <input
               value={consumerId}
               onChange={e => setConsumerId(e.target.value)}
-              placeholder="my-consumer"
+              placeholder={t('consumerPlaceholder')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Limit</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('limit')}</label>
             <input
               type="number"
               value={limit}
@@ -85,11 +85,11 @@ export default function MessagePollerPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event Type (filter)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('eventType')}</label>
             <input
               value={eventType}
               onChange={e => setEventType(e.target.value)}
-              placeholder="e.g. order.created"
+              placeholder={t('eventTypePlaceholder')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
@@ -101,7 +101,7 @@ export default function MessagePollerPage() {
                 onChange={e => setIncludePayload(e.target.checked)}
                 className="w-4 h-4 text-indigo-600 rounded"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Include payload</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t('includePayload')}</span>
             </label>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function MessagePollerPage() {
             disabled={isFetching}
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition"
           >
-            {isFetching ? 'Polling...' : '🔄 Poll'}
+            {isFetching ? t('polling') : t('poll')}
           </button>
         </div>
       </div>
@@ -119,25 +119,25 @@ export default function MessagePollerPage() {
       {/* Cursor Info */}
       {data?.cursor && (
         <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-          <h4 className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">📌 Cursor Position</h4>
+          <h4 className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('cursorPosition')}</h4>
           <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            <span>Consumer: <code className="font-mono">{data.cursor.consumer_id}</code></span>
-            <span>Last Message: <code className="font-mono">{data.cursor.last_message_id ?? '—'}</code></span>
-            <span>Sequence: <code className="font-mono">{data.cursor.last_sequence_num}</code></span>
-            <span>Done: <code className="font-mono">{data.done ? 'yes' : 'no'}</code></span>
+            <span>{t('consumer')}: <code className="font-mono">{data.cursor.consumer_id}</code></span>
+            <span>{t('lastMessage')}: <code className="font-mono">{data.cursor.last_message_id ?? '—'}</code></span>
+            <span>{t('sequence')}: <code className="font-mono">{data.cursor.last_sequence_num}</code></span>
+            <span>{t('done')}: <code className="font-mono">{data.done ? t('yes') : t('no')}</code></span>
           </div>
         </div>
       )}
 
       {/* Messages */}
       {isLoading ? (
-        <div className="text-center py-12 text-gray-500">Loading...</div>
+        <div className="text-center py-12 text-gray-500">{t('loading')}</div>
       ) : !data || data.messages.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-4xl mb-3">📬</div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">No new messages</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('noMessages')}</h3>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
-            {data?.done ? 'You\'re all caught up!' : 'Poll to fetch new messages'}
+            {data?.done ? t('allCaughtUp') : t('pollToFetch')}
           </p>
         </div>
       ) : (
@@ -145,13 +145,13 @@ export default function MessagePollerPage() {
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900/50">
               <tr>
-                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Event</th>
-                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Status</th>
-                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Attempts</th>
-                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Response</th>
-                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Created</th>
-                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('id')}</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('event')}</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">{t('status')}</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">{t('attempts')}</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">{t('response')}</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">{t('created')}</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -185,17 +185,15 @@ export default function MessagePollerPage() {
                         onClick={() => commitMutation.mutate(msg.id)}
                         disabled={commitMutation.isPending}
                         className="text-xs text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
-                        title="Commit (advance cursor past this message)"
                       >
-                        ✓ Commit
+                        {t('commit')}
                       </button>
                       <button
                         onClick={() => seekMutation.mutate(msg.id)}
                         disabled={seekMutation.isPending}
                         className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                        title="Seek (set cursor to this message)"
                       >
-                        ↩ Seek
+                        {t('seek')}
                       </button>
                     </div>
                   </td>
@@ -209,7 +207,7 @@ export default function MessagePollerPage() {
       {/* Payload Preview */}
       {includePayload && data?.messages.some(m => m.payload) && (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Payload Preview (first message)</h4>
+          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{t('payloadPreview')}</h4>
           <pre className="text-xs font-mono text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-lg p-3 overflow-x-auto max-h-48">
             {JSON.stringify(data.messages[0]?.payload, null, 2)}
           </pre>
