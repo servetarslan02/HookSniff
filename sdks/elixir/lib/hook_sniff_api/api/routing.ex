@@ -97,4 +97,92 @@ defmodule HookSniffAPI.Api.Routing do
       {200, HookSniffAPI.Model.RoutingInfo}
     ])
   end
+
+  @doc """
+  Get endpoint health status
+
+  ### Parameters
+
+  - `connection` (HookSniffAPI.Connection): Connection to server
+  - `id` (String.t): 
+  - `opts` (keyword): Optional parameters
+
+  ### Returns
+
+  - `{:ok, nil}` on success
+  - `{:error, Tesla.Env.t}` on failure
+  """
+  @spec routing_id_health_get(Tesla.Env.client, String.t, keyword()) :: {:ok, nil} | {:error, Tesla.Env.t}
+  def routing_id_health_get(connection, id, _opts \\ []) do
+    request =
+      %{}
+      |> method(:get)
+      |> url("/routing/#{id}/health")
+      |> Enum.into([])
+
+    connection
+    |> Connection.request(request)
+    |> evaluate_response([
+      {200, false}
+    ])
+  end
+
+  @doc """
+  Get routing config for endpoint
+
+  ### Parameters
+
+  - `connection` (HookSniffAPI.Connection): Connection to server
+  - `id` (String.t): 
+  - `opts` (keyword): Optional parameters
+
+  ### Returns
+
+  - `{:ok, nil}` on success
+  - `{:error, Tesla.Env.t}` on failure
+  """
+  @spec routing_id_routing_get(Tesla.Env.client, String.t, keyword()) :: {:ok, nil} | {:error, Tesla.Env.t}
+  def routing_id_routing_get(connection, id, _opts \\ []) do
+    request =
+      %{}
+      |> method(:get)
+      |> url("/routing/#{id}/routing")
+      |> Enum.into([])
+
+    connection
+    |> Connection.request(request)
+    |> evaluate_response([
+      {200, false}
+    ])
+  end
+
+  @doc """
+  Update routing config
+
+  ### Parameters
+
+  - `connection` (HookSniffAPI.Connection): Connection to server
+  - `id` (String.t): 
+  - `opts` (keyword): Optional parameters
+
+  ### Returns
+
+  - `{:ok, nil}` on success
+  - `{:error, Tesla.Env.t}` on failure
+  """
+  @spec routing_id_routing_put(Tesla.Env.client, String.t, keyword()) :: {:ok, nil} | {:error, Tesla.Env.t}
+  def routing_id_routing_put(connection, id, _opts \\ []) do
+    request =
+      %{}
+      |> method(:put)
+      |> url("/routing/#{id}/routing")
+      |> ensure_body()
+      |> Enum.into([])
+
+    connection
+    |> Connection.request(request)
+    |> evaluate_response([
+      {200, false}
+    ])
+  end
 end

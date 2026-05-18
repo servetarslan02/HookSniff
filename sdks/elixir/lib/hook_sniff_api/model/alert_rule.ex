@@ -7,6 +7,7 @@ defmodule HookSniffAPI.Model.AlertRule do
   """
 
   @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :id,
     :name,

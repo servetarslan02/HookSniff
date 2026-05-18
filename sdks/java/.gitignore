@@ -19,3 +19,12 @@ hs_err_pid*
 target
 .gradle
 build
+.project
+
+# Build files
+bin/
+
+.classpath
+.settings
+
+.idea/
