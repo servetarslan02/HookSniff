@@ -6,9 +6,9 @@
 
 ---
 
-## 🔴 YÜKSEK RİSK (2)
+## 🔴 YÜKSEK RİSK (2) — ✅ DÜZELTİLDİ
 
-### 1. WebSocket Origin — Localhost Üretimde Açık
+### 1. WebSocket Origin — Localhost Üretimde Açık — ✅ DÜZELTİLDİ
 **Dosya:** `api/src/routes/ws.rs:47-48`
 **Risk:** SSRF / Unauthorized Access
 
@@ -126,6 +126,8 @@ let sort_field = params.sort_field.as_deref().unwrap_or("created_at");
 | 9 | Password hashing | 🟢 Güvenli | ✅ |
 | 10 | CSP headers | 🟢 Güvenli | ✅ |
 | 11 | ENV güvenliği | 🟢 Güvenli | ✅ |
+| 12 | Timing attack (inbound) | 🔴 Orta-Yüksek | ✅ Düzeltildi |
+| 13 | OAuth state timing | 🟡 Orta | ✅ Düzeltildi |
 
 ---
 
