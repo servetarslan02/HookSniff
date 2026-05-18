@@ -148,7 +148,7 @@ HookSniff/
 | 6 | Java | Maven Central | — | ⏳ mvn deploy gerekli |
 | 7 | Kotlin | Maven Central | — | ⏳ ./gradlew publish gerekli |
 | 8 | PHP | Packagist | — | ✅ Otomatik (GitHub push) |
-| 9 | C# | NuGet | — | ⏳ dotnet nuget push gerekli |
+| 9 | C# | NuGet | 1.2.0 | ✅ Yüklendi (30+ resource) |
 | 10 | Elixir | Hex.pm | — | ⏳ mix hex.publish gerekli |
 | 11 | Swift | GitHub tag | v1.1.0 | ✅ |
 
