@@ -1,48 +1,40 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-18 07:26 GMT+8
+> Son güncelleme: 2026-05-18 16:45 GMT+8
 
-## 🎯 TÜM FAZLAR TAMAMLANDI (8-15)
+## ✅ Yapılan
+- Java SDK v1.1.2 → Maven Central publish edildi
+- sdks/ klasörü ana repodan silindi
+- Credential'lar MEMORY.md'ye kaydedildi
 
-SDK Roadmap'teki tüm fazlar tamamlandı. Yeni feature geliştirme bitti.
+## ⏳ Kalan İşler
 
----
+### 1. Kotlin SDK — EN KRİTİK
+hooksniff-kotlin repo'sunda build hataları var:
+- Package çakışması: bazı dosyalar `com.hooksniff`, bazıları `com.hooksniff.kotlin`
+- Eksik tipler: BackgroundTaskStatus, BackgroundTaskType, ApplicationIn
+- `client.request()` methodu tanımlı değil
+- **Çözüm:** Tüm dosyaları `com.hooksniff.kotlin` package'ına taşı, eksik tipleri ekle
 
-## ⚠️ KALAN İŞLER
-
-### 1. Cloud Build Deploy (EN KRİTİK)
-Tüm yeni API endpoint'leri (Integration, Stream) Cloud Run'da aktif değil.
+### 2. Ruby SDK Publish
 ```bash
-gcloud builds submit --config cloudbuild.yaml .
+cd hooksniff-ruby
+gem build hooksniff.gemspec
+gem push hooksniff-*.gem
 ```
-veya GCP Console'dan manual trigger.
 
-### 2. Registry Publish (5 SDK)
-Kod ayrı repolarda push edildi, ama registry'ye yüklenmedi:
+### 3. C# SDK Publish
+```bash
+cd hooksniff-csharp
+dotnet pack -c Release
+dotnet nuget push "bin/Release/*.nupkg" --api-key <NUGET_KEY> --source https://api.nuget.org/v3/index.json
+```
 
-| SDK | Komut | Gereken |
-|-----|-------|---------|
-| Ruby | `gem build hooksniff.gemspec && gem push *.gem` | Ruby runtime |
-| Java | `mvn deploy -B -DskipTests` | JDK + Maven |
-| Kotlin | `./gradlew publish` | JDK + Gradle |
-| C# | `dotnet pack && dotnet nuget push` | .NET SDK |
-| Elixir | `mix hex.publish --yes` | Elixir + Mix |
+### 4. Elixir SDK Publish
+```bash
+cd hooksniff-elixir
+mix hex.publish --yes
+```
 
-Credentials: MEMORY.md'de var.
-
-### 3. SDK Publish Doğrulama
-Her registry'de v1.1.0'ın yüklendiğini doğrula:
-- https://www.npmjs.com/package/hooksniff
-- https://pypi.org/project/hooksniff/
-- https://crates.io/crates/hooksniff
-- https://rubygems.org/gems/hooksniff
-- https://hex.pm/packages/hooksniff
-
----
-
-## 🔧потенциальные İyileştirmeler
-
-- SDK test coverage artırma
-- Dokümantasyon sitesi
-- CI/CD pipeline (GitHub Actions)
-- SDK auto-publish workflow
+## 🔧credential Lokasyonu
+Tüm credential'lar `.ai-context/sdk-roadmap/MEMORY.md` içinde.
