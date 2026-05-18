@@ -186,19 +186,19 @@ export function PricingPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <PublicNavbar pageTitle={t('title')} />
 
-      <main className="max-w-6xl mx-auto px-6 py-16">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
         {/* Hero */}
-        <div className="text-center mb-16">
-          <span className="inline-block px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-sm font-medium rounded-full mb-4">
+        <div className="text-center mb-8 sm:mb-12 md:mb-16">
+          <span className="inline-block px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm font-medium rounded-full mb-3 sm:mb-4">
             {t('badge')}
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
             {t('heroTitle')}
           </h1>
-          <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto mb-2">
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto mb-2 px-2">
             {t('heroSubtitle')}
           </p>
-          <p className="text-sm text-gray-500 dark:text-slate-500 mb-8">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-500 mb-4 sm:mb-8">
             {t('heroNote')}
           </p>
 
@@ -233,7 +233,7 @@ export function PricingPageContent() {
         </div>
 
         {/* Plan Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
           {planData.map((plan) => (
             <div
               key={plan.key}
@@ -320,7 +320,7 @@ export function PricingPageContent() {
 
         {/* Comparison Table */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">{t('compareTitle')}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white text-center mb-4 sm:mb-6">{t('compareTitle')}</h2>
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden shadow-xs dark:shadow-lg">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -360,8 +360,8 @@ export function PricingPageContent() {
 
         {/* Security & Compliance */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('securityTitle')}</h2>
-          <div className="grid md:grid-cols-4 gap-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white text-center mb-4 sm:mb-8">{t('securityTitle')}</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {[
               { icon: '🔒', titleKey: 'securityItem1Title', descKey: 'securityItem1Desc' },
               { icon: '🛡️', titleKey: 'securityItem2Title', descKey: 'securityItem2Desc' },
@@ -383,8 +383,8 @@ export function PricingPageContent() {
 
         {/* Support Levels */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('supportTitle')}</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white text-center mb-4 sm:mb-8">{t('supportTitle')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {[
               { plan: t('developer'), level: t('communitySupport'), features: t.raw('supportDeveloperFeatures') as string[], response: t('supportBestEffort'), highlight: false },
               { plan: t('pro'), level: t('prioritySupport'), features: t.raw('supportProFeatures') as string[], response: t('supportResponse48h'), highlight: true },

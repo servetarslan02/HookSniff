@@ -51,14 +51,14 @@ export default function LogsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
             {t('subtitle')}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <button type="button"
             onClick={() => setAutoRefresh(!autoRefresh)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
@@ -178,25 +178,25 @@ export default function LogsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                       ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                       Event
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">
                       Endpoint
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">
                       Attempts
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">
                       Response
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden xs:table-cell">
                       Time
                     </th>
                   </tr>
@@ -218,21 +218,21 @@ export default function LogsPage() {
                         }
                       }}
                     >
-                      <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
-                        {d.id.slice(0, 10)}…
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-400">
+                        {d.id.slice(0, 8)}…
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
                           {d.event || '—'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm font-mono text-gray-500 dark:text-slate-500">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-500 hidden sm:table-cell">
                         {d.endpoint_id?.slice(0, 8)}…
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4">
                         <StatusBadge status={d.status} />
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400 hidden md:table-cell">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:table-cell">
                         <div className="flex items-center gap-1.5">
                           {d.attempt_count > 1 && (
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
@@ -240,10 +240,10 @@ export default function LogsPage() {
                           {d.attempt_count}
                         </div>
                       </td>
-                      <td className="px-6 py-4 hidden lg:table-cell">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
                         {d.response_status ? (
                           <span
-                            className={`text-sm font-mono font-medium ${
+                            className={`text-xs sm:text-sm font-mono font-medium ${
                               d.response_status < 300
                                 ? 'text-green-600 dark:text-green-400'
                                 : d.response_status < 400
@@ -256,10 +256,10 @@ export default function LogsPage() {
                             {d.response_status}
                           </span>
                         ) : (
-                          <span className="text-sm text-gray-500 dark:text-slate-500">—</span>
+                          <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-500">—</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap hidden xs:table-cell">
                         {new Date(d.created_at).toLocaleString(undefined, {
                           month: 'short',
                           day: 'numeric',
@@ -275,8 +275,8 @@ export default function LogsPage() {
 
             {/* Pagination */}
             {total > perPage && (
-              <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
-                <span className="text-sm text-gray-500 dark:text-slate-400">
+              <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">
                   {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
                 </span>
                 <nav aria-label={tc('pagination')} className="flex items-center gap-2">
@@ -319,9 +319,9 @@ export default function LogsPage() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" aria-hidden="true" onClick={() => setSelected(null)} />
-          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80dvh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('deliveryDetails')}</h3>
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-3 sm:mx-4 max-h-[80dvh] overflow-y-auto">
+            <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{t('deliveryDetails')}</h3>
               <button type="button"
                 onClick={() => setSelected(null)}
                 aria-label={tc('close')}

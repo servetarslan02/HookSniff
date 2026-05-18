@@ -240,7 +240,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Item 127/128 — Page content with ARIA landmark and skip-to-content target */}
-        <main id="admin-main-content" role="main" className="p-4 md:p-8 page-enter">{children}</main>
+        <main id="admin-main-content" role="main" className="p-3 sm:p-4 md:p-6 lg:p-8 page-enter">{children}</main>
       </div>
     </div>
   );

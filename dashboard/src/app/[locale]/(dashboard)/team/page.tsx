@@ -120,14 +120,14 @@ export default function TeamPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
             {t('subtitle')}
           </p>
         </div>
         <button type="button"
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2.5 bg-brand-600 dark:bg-brand-500 text-white rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
+          className="px-3 sm:px-4 py-2 sm:py-2.5 bg-brand-600 dark:bg-brand-500 text-white rounded-xl text-xs sm:text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
         >
           {t('createTeam')}
         </button>

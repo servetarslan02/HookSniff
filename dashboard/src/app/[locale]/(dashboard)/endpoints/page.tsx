@@ -161,15 +161,15 @@ export default function EndpointsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
         <button
           type="button"
           onClick={() => setShowCreate(!showCreate)}
-          className="bg-brand-600 dark:bg-brand-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
+          className="bg-brand-600 dark:bg-brand-500 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
         >
           {t('newEndpoint')}
         </button>
@@ -347,9 +347,9 @@ export default function EndpointsPage() {
       {newSecret && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setNewSecret(null)} />
-          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">🔑 {t('newSecret')}</h3>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-3 sm:mx-4 p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">🔑 {t('newSecret')}</h3>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mb-3 sm:mb-4">
               {t('newSecretDesc')}
             </p>
             <div className="bg-gray-100 dark:bg-slate-700 rounded-lg p-4 mb-4">

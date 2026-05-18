@@ -9,8 +9,8 @@ interface EmptyStateProps {
 
 export default function EmptyState({ icon = '📭', title, description, action }: EmptyStateProps) {
   return (
-    <div className="glass-card p-12 text-center">
-      <div className="text-5xl mb-4">{icon}</div>
+    <div className="glass-card p-6 sm:p-8 lg:p-12 text-center">
+      <div className="text-4xl sm:text-5xl mb-4">{icon}</div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
       {description && <p className="text-sm text-gray-500 dark:text-slate-400 mb-6 max-w-md mx-auto">{description}</p>}
       {action && (

@@ -226,16 +226,16 @@ function SocialProof() {
   ];
 
   return (
-    <section className="py-16 border-y border-gray-200/50 dark:border-slate-700/50 bg-white/50 dark:bg-slate-900/50">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="py-8 sm:py-12 md:py-16 border-y border-gray-200/50 dark:border-slate-700/50 bg-white/50 dark:bg-slate-900/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Features */}
-        <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">{t('whyHookSniff')}</h2>
-          <p className="text-gray-500 dark:text-slate-400 max-w-2xl mx-auto">{t('whyHookSniffDesc')}</p>
+        <div className="text-center mb-6 sm:mb-12">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4">{t('whyHookSniff')}</h2>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 max-w-2xl mx-auto px-2">{t('whyHookSniffDesc')}</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {features.map((feature) => (
-            <div key={feature.title} className="text-center glass-card p-6 hover-lift">
+            <div key={feature.title} className="text-center glass-card p-4 sm:p-6 hover-lift">
               <div className="text-3xl mb-3" aria-hidden="true">{feature.icon}</div>
               <div className="text-lg font-bold text-gray-900 dark:text-white mb-2">{feature.title}</div>
               <div className="text-sm text-gray-500 dark:text-slate-400">{feature.desc}</div>
@@ -257,12 +257,12 @@ function HowItWorks() {
   ];
 
   return (
-    <section className="py-24">
-      <div className="text-center mb-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{t('title')}</h2>
-        <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto">{t('subtitle')}</p>
+    <section className="py-12 sm:py-16 md:py-24">
+      <div className="text-center mb-8 sm:mb-12 md:mb-16">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{t('title')}</h2>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 max-w-xl mx-auto px-2">{t('subtitle')}</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 relative">
         <div className="hidden md:block absolute top-10 left-[16.6%] right-[16.6%] h-0.5 bg-linear-to-r from-brand-300 via-purple-300 to-brand-300 dark:from-brand-700 dark:via-purple-700 dark:to-brand-700 opacity-100 dark:opacity-60 z-0" />
         {steps.map((step, i) => (
           <div key={i} className="relative flex flex-col items-center text-center">
@@ -373,25 +373,25 @@ export function HomeContent() {
       {/* Hero */}
       <section className="relative hero-gradient">
         <FloatingParticles />
-        <main className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="pt-24 pb-8 text-center">
-            <div className="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-4 py-2 rounded-full text-sm font-medium mb-8 border border-brand-100 dark:border-brand-500/20">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+          <div className="pt-12 sm:pt-16 md:pt-24 pb-4 sm:pb-8 text-center">
+            <div className="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-8 border border-brand-100 dark:border-brand-500/20">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
               {tHero('uptime')}
             </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 sm:mb-6 leading-tight">
               {tHero('title')}
               <br />
               <TypewriterText />
             </h1>
-            <p className="text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2">
               {tHero('subtitle')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/register" className="bg-gray-900 dark:bg-brand-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0">
+              <Link href="/register" className="bg-gray-900 dark:bg-brand-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow">
                 {token ? tHero('ctaDashboard') : tHero('cta')}
               </Link>
-              <Link href="/docs" className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition btn-ripple">
+              <Link href="/docs" className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition btn-ripple">
                 {tHero('ctaSecondary')}
               </Link>
             </div>
@@ -429,15 +429,15 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
       </div>
 
       {/* Features */}
-      <div id="features" className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{tFeatures('title')}</h2>
-          <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto">{tFeatures('subtitle')}</p>
+      <div id="features" className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-8 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{tFeatures('title')}</h2>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 max-w-xl mx-auto px-2">{tFeatures('subtitle')}</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-12 sm:mb-24">
           {featureKeys.map((key, i) => (
-            <div key={key} className="glass-card p-8 hover-lift card-tilt group">
-              <div className="w-14 h-14 rounded-xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 border border-brand-100 dark:border-brand-500/20">
+            <div key={key} className="glass-card p-5 sm:p-6 md:p-8 hover-lift card-tilt group">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-300 border border-brand-100 dark:border-brand-500/20">
                 {featureIcons[i]}
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{tFeatures(key)}</h3>
@@ -453,9 +453,9 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
       </div>
 
       {/* Pricing */}
-      <div id="pricing" className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{tPricing('title')}</h2>
+      <div id="pricing" className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-8 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">{tPricing('title')}</h2>
           {/* Monthly / Yearly toggle */}
           <div className="flex items-center justify-center gap-3 mt-6">
             <span className={`text-sm font-medium transition ${!yearly ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-slate-400'}`}>
@@ -479,7 +479,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
             )}
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-16">
           {plans.map((plan, i) => {
             return (
             <div key={i} className={`relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col overflow-hidden ${

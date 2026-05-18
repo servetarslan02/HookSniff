@@ -119,13 +119,13 @@ export default function DeliveryDetailPage() {
             </svg>
           </button>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 font-mono">{delivery.id}</p>
+            <h2 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1 font-mono truncate max-w-[200px] sm:max-w-none">{delivery.id}</p>
           </div>
         </div>
         <button type="button"
           onClick={() => setShowReplayConfirm(true)}
-          className="bg-brand-600 dark:bg-brand-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition flex items-center gap-2"
+          className="bg-brand-600 dark:bg-brand-500 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition flex items-center gap-1.5 sm:gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
