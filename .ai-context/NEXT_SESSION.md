@@ -1,56 +1,45 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 02:45 GMT+8
-> Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
+> Son güncelleme: 2026-05-19 02:48 GMT+8
 
-## 🎯 Sıradaki: #6 — Idempotency Key Kontrolü
+## 🎯 Sıradaki: #7 — Response Metadata Erişimi
 
 ### Ne Yapılacak?
-Tüm 11 SDK'ya `idempotencyKey` parametresi ekle:
-- Kullanıcı kendi key'ini verebilmeli (opsiyonel)
-- Verilmezse otomatik `auto_xxx` üretilmeli
-- Retry güvenliği için kritik
+Tüm 11 SDK'da response header'larına erişim ekle:
+- `x-request-id` — debug için
+- `x-ratelimit-remaining` — rate limit takibi
+- `statusCode` — HTTP status code
 
 ### Örnek Kullanım:
-```typescript
-// Otomatik
-await client.message.create({ eventType: "order.created", payload: {...} });
-// Manuel
-await client.message.create({ eventType: "order.created", payload: {...} }, { idempotencyKey: "order_123" });
+```go
+// Go
+resp, err := client.Endpoint.List(ctx, nil)
+fmt.Println(resp.Headers.Get("x-request-id"))
+fmt.Println(resp.Headers.Get("x-ratelimit-remaining"))
 ```
 
-### Tahmini Süre: 1-2 saat
+### Tahmini Süre: 2-3 saat
 
 ---
 
-## 📋 Tamamlanan Son İş
+## 📊 SDK Kalite Skoru: %89
 
-### #5 — Webhook Payload Parsing ✅ (2026-05-19)
-- 11 SDK'da `verify()` → `WebhookEvent` döndürüyor
-- `event`, `data`, `timestamp` field'ları
-- Backward compatible (`verifyRaw()` / `verify_raw()`)
-
----
-
-## 📊 SDK Kalite Skoru: %88
-
-| Faz | İçerik | Durum |
-|-----|--------|-------|
-| 1 | İmza doğrulama | ✅ 11/11 |
-| 2 | Retry/Backoff | ✅ 11/11 |
-| 3 | Pagination | ✅ 11/11 |
-| 4 | Error types (21) | ✅ 11/11 |
-| 5 | Payload Parsing | ✅ 11/11 |
-| 6 | Idempotency Key | ❌ Sıradaki |
-| 7 | Response Metadata | ❌ |
+| # | Feature | Durum |
+|---|---------|-------|
+| 1-4 | Faz 1 (Kritik) | ✅ |
+| 5 | Payload Parsing | ✅ |
+| 6 | Idempotency Key | ✅ (zaten varmış) |
+| 7 | Response Metadata | ❌ Sıradaki |
 | 8 | Config | ❌ |
 | 9 | Debug Logging | ❌ |
 | 10 | Typed Events | ❌ |
+| 11 | SDK Version Header | ❌ |
+| 12 | Test Coverage | ❌ |
+| 13 | CI/CD | ❌ |
 
 ---
 
 ## ⚠️ Bilinen Sorunlar
 
-1. Kotlin SDK build sorunu devam ediyor (package çakışması)
+1. Kotlin SDK build sorunu (package çakışması)
 2. Test coverage düşük (%60-70)
-3. Connector'lar eksik (Shopify, Stripe)
