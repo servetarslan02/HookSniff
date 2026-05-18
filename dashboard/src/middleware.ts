@@ -20,9 +20,6 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/schemas': '/content-mgmt',
   '/templates': '/content-mgmt',
   '/inbound': '/content-mgmt',
-  '/operational-webhooks': '/content-mgmt',
-  '/message-poller': '/content-mgmt',
-  '/background-tasks': '/content-mgmt',
   // DevTools section
   '/playground': '/devtools',
   '/signature-verifier': '/devtools',
@@ -55,10 +52,8 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/billing': '/account',
   // Deleted container pages
   '/team-mgmt': '/account',
-  '/billing-overview': '/account',
   '/settings-section': '/account',
   '/portal-section': '/account',
-  '/billing-section': '/account',
 };
 
 export default function middleware(request: NextRequest) {
