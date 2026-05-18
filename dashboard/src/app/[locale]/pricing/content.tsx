@@ -238,7 +238,7 @@ export function PricingPageContent() {
             <div
               key={plan.key}
               className={
-                'relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col overflow-hidden ' +
+                'relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col ' +
                 (plan.popular
                   ? 'bg-white dark:bg-slate-800 border-2 border-brand-500 dark:border-brand-400 shadow-xl dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
                   : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg')
@@ -246,20 +246,20 @@ export function PricingPageContent() {
             >
               {/* Popular badge */}
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-600 to-purple-600 text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-lg z-10">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-600 to-purple-600 text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-lg z-10 whitespace-nowrap">
                   ⭐ {t('mostPopular')}
                 </div>
               )}
               {/* Header */}
-              <div className={`p-6 pb-4 ${plan.popular ? 'bg-gradient-to-br from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10' : ''}`}>
+              <div className={`p-6 pb-4 ${plan.popular ? 'pt-8 bg-gradient-to-br from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10' : ''}`}>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t(plan.key)}</h3>
-                <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 leading-relaxed">{t(`${plan.key}Desc`)}</p>
-                <div className="mt-4 flex items-baseline gap-1">
+                <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 leading-relaxed min-h-[2.5rem]">{t(`${plan.key}Desc`)}</p>
+                <div className="mt-4 flex items-baseline gap-1 min-h-[3.5rem]">
                   <span className="text-5xl font-extrabold text-gray-900 dark:text-white">{getPrice(plan.key)}</span>
                   <span className="text-gray-500 dark:text-slate-500 text-sm font-medium">{getPeriodLabel()}</span>
                 </div>
                 {billingPeriod === 'annual' && plan.key !== 'developer' && plan.key !== 'enterprise' && (
-                  <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-medium">
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-medium min-h-[1rem]">
                     {t('billedAnnually')}
                   </p>
                 )}

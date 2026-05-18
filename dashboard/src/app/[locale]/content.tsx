@@ -482,24 +482,24 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-16">
           {plans.map((plan, i) => {
             return (
-            <div key={i} className={`relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col overflow-hidden ${
+            <div key={i} className={`relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col ${
               plan.popular
                 ? 'bg-white dark:bg-slate-800 border-2 border-brand-500 dark:border-brand-400 shadow-xl dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
                 : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg'
             }`}>
               {/* Popular badge */}
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-600 to-purple-600 text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-lg z-10">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-600 to-purple-600 text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-lg z-10 whitespace-nowrap">
                   ⭐ {tPricing('mostPopular')}
                 </div>
               )}
               {/* Header */}
-              <div className={`p-6 pb-4 ${plan.popular ? 'bg-gradient-to-br from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10' : ''}`}>
+              <div className={`p-6 pb-4 ${plan.popular ? 'pt-8 bg-gradient-to-br from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10' : ''}`}>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">{plan.name}</h3>
                 {plan.desc && (
-                  <p className="mt-1 text-sm text-gray-500 dark:text-slate-400 leading-relaxed">{plan.desc}</p>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-slate-400 leading-relaxed min-h-[2.5rem]">{plan.desc}</p>
                 )}
-                <div className="mt-4 flex items-baseline gap-1">
+                <div className="mt-4 flex items-baseline gap-1 min-h-[3.5rem]">
                   <span className="text-5xl font-extrabold text-gray-900 dark:text-white">{plan.price}</span>
                   <span className="text-gray-500 dark:text-slate-400 text-sm font-medium">{plan.period}</span>
                 </div>
