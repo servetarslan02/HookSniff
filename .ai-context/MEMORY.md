@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 01:11 GMT+8 (Pagination Helper tüm SDK'lara eklendi)
+> Son güncelleme: 2026-05-19 06:24 GMT+8 (Node.js SDK v1.3.0 yayınlandı)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -140,7 +140,7 @@ HookSniff/
 
 | # | SDK | Registry | Versiyon | Durum |
 |---|-----|----------|----------|-------|
-| 1 | Node.js | npm | 1.1.0 | ✅ Yüklendi |
+| 1 | Node.js | npm | 1.3.0 | ✅ Yüklendi |
 | 2 | Python | PyPI | 1.1.0 | ✅ Yüklendi |
 | 3 | Go | GitHub tag | v1.1.0 | ✅ |
 | 4 | Rust | crates.io | 1.1.0 | ✅ Yüklendi |
