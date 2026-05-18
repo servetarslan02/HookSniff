@@ -4973,5 +4973,33 @@
     "retentionCol": "Retention",
     "maxDlq": "Max DLQ Entries",
     "retentionExpired": "After retention expires, DLQ entries are permanently deleted. Export important data before it expires."
+  },
+  "docsEventTypes": {
+    "title": "Event Types",
+    "subtitle": "Event types let you categorize webhooks and route them to the right endpoints. Without them, every webhook goes everywhere.",
+    "theProblem": "The Problem",
+    "problemDesc1": "If your application sends different kinds of events — order updates, user signups, payment confirmations — you probably want different endpoints to handle them. Your order processing service shouldn't receive user signup events.",
+    "problemDesc2": "Without event types, you'd need to filter on the consumer side, wasting bandwidth and processing time.",
+    "howWorks": "How Event Types Work",
+    "howWorksDesc": "Event types are string identifiers that describe what happened. They follow a resource.action pattern:",
+    "anyFormat": "You can use any string format, but resource.action is recommended for consistency.",
+    "registering": "Registering Event Types",
+    "registeringDesc": "Event types are automatically registered when you send a webhook. No pre-registration required:",
+    "nowAvailable": "The event type order.created is now available for filtering and search.",
+    "filtering": "Filtering by Event Type",
+    "filteringDesc": "Configure endpoints to only receive specific event types using the event_filter field:",
+    "filterPatterns": "Supported filter patterns:",
+    "exactMatch": "Exact match",
+    "wildcard": "Wildcard (all order events)",
+    "allEvents": "All events (default)",
+    "schemaValidation": "Schema Validation",
+    "schemaValidationDesc": "Optionally define JSON schemas for event types to validate payloads before delivery:",
+    "schemaReject": "When a schema is defined, payloads that don't match are rejected with a 400 Bad Request error before they even enter the delivery pipeline.",
+    "bestPractices": "Best Practices",
+    "bpSpecific": "Be specific: invoice.payment_failed is better than invoice.error",
+    "bpDots": "Use dots as separators: resource.action format",
+    "bpVersion": "Version when changing shapes: order.created.v2",
+    "bpWildcards": "Use wildcards for grouping: payment.* catches all payment events",
+    "bpDocument": "Document your event types: Keep a list of all event types your application emits"
   }
 }
