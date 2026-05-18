@@ -32,15 +32,16 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/health': '/observability',
   '/alerts': '/observability',
   '/analytics': '/observability',
-  // Security section
-  '/rate-limiting': '/security-section',
-  '/audit-log': '/security-section',
-  '/sso': '/security-section',
-  // Routing/Config section (now has environments tab)
+  // Security section (now inside routing-config)
+  '/security-section': '/routing-config',
+  // Routing/Config section (now has security + environments tabs)
   '/retry-policy': '/routing-config',
   '/routing': '/routing-config',
   '/custom-domain': '/routing-config',
   '/environments': '/routing-config',
+  '/rate-limiting': '/routing-config',
+  '/audit-log': '/routing-config',
+  '/sso': '/routing-config',
   // Integrations section (now has connectors + streaming tabs)
   '/connectors': '/integrations',
   '/streaming': '/integrations',
@@ -112,8 +113,8 @@ export default function middleware(request: NextRequest) {
     '/privacy', '/terms', '/status', '/newsletter', '/build-vs-buy',
     '/get-started', '/startups',
     // Consolidated dashboard routes
-    '/core', '/applications', '/deliveries', '/content-mgmt', '/integrations',
-    '/observability', '/devtools', '/routing-config', '/security-section',
+    '/core', '/applications', '/deliveries', '/content-mgmt', '/operational-webhooks',
+    '/integrations', '/observability', '/devtools', '/routing-config',
     '/account', '/billing-section',
   ];
   const isPublic = withoutLocale === '/' || publicPaths.some((path) => withoutLocale.startsWith(path));

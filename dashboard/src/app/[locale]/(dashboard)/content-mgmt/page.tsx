@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
-    <div className="h-48 bg-gray-200 dark:slate-700 rounded-xl" />
+    <div className="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl" />
     <div className="space-y-2">
       {[1, 2, 3].map((i) => (
         <div key={i} className="h-10 bg-gray-200 dark:bg-slate-700 rounded-lg" />
@@ -17,11 +17,7 @@ const tabSkeleton = (
 
 const SchemasPage = dynamic(() => import('../schemas/page'), { ssr: false, loading: () => tabSkeleton });
 const TemplatesPage = dynamic(() => import('../templates/page'), { ssr: false, loading: () => tabSkeleton });
-const InboundPage = dynamic(() => import('../inbound/page'), { ssr: false, loading: () => tabSkeleton });
 const TransformsPage = dynamic(() => import('../transforms/page'), { ssr: false, loading: () => tabSkeleton });
-const OperationalWebhooksPage = dynamic(() => import('../operational-webhooks/page'), { ssr: false, loading: () => tabSkeleton });
-const MessagePollerPage = dynamic(() => import('../message-poller/page'), { ssr: false, loading: () => tabSkeleton });
-const BackgroundTasksPage = dynamic(() => import('../background-tasks/page'), { ssr: false, loading: () => tabSkeleton });
 
 export default function ContentMgmtPage() {
   const t = useTranslations('nav');
@@ -31,11 +27,7 @@ export default function ContentMgmtPage() {
       tabs={[
         { key: 'schemas', label: t('schemas'), icon: '📐', content: () => <SchemasPage /> },
         { key: 'templates', label: t('templates'), icon: '📄', content: () => <TemplatesPage /> },
-        { key: 'inbound', label: t('inboundWebhooks'), icon: '📨', content: () => <InboundPage /> },
         { key: 'transforms', label: t('transforms'), icon: '🔄', content: () => <TransformsPage /> },
-        { key: 'operational', label: t('operationalWebhooks'), icon: '🪝', content: () => <OperationalWebhooksPage /> },
-        { key: 'poller', label: t('messagePoller'), icon: '📬', content: () => <MessagePollerPage /> },
-        { key: 'tasks', label: t('backgroundTasks'), icon: '⏳', content: () => <BackgroundTasksPage /> },
       ]}
     />
   );

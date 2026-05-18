@@ -64,7 +64,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       key: 'webhooks',
       label: t('sectionWebhooks'),
       items: [
-        { name: t('webhookDashboard'), href: '/content-mgmt', icon: '📥' },
+        { name: t('contentMgmt'), href: '/content-mgmt', icon: '📐' },
         { name: t('operationalWebhooks'), href: '/operational-webhooks', icon: '🪝' },
       ],
     },
@@ -94,7 +94,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       label: t('sectionConfig'),
       items: [
         { name: t('routingConfig'), href: '/routing-config', icon: '🔀' },
-        { name: t('securitySection'), href: '/security-section', icon: '🔒' },
       ],
     },
     {
