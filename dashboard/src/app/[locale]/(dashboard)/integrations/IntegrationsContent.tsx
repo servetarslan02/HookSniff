@@ -43,7 +43,7 @@ const STATUS_COLORS: Record<string, string> = {
   filtered: 'bg-gray-100 text-gray-600',
 };
 
-function IntegrationsContent() {
+export default function IntegrationsContent() {
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
