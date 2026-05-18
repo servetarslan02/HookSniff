@@ -10,8 +10,7 @@ defmodule HookSniffAPI.Api.Admin do
   import HookSniffAPI.RequestBuilder
 
   @doc """
-  List all alert rules (admin)
-  Returns all alert rules for the authenticated admin's account
+  Revenue by month (admin)
 
   ### Parameters
 
@@ -20,437 +19,10 @@ defmodule HookSniffAPI.Api.Admin do
 
   ### Returns
 
-  - `{:ok, [%AdminAlertRule{}, ...]}` on success
+  - `{:ok, [%AdminRevenueGet200ResponseInner{}, ...]}` on success
   - `{:error, Tesla.Env.t}` on failure
   """
-  @spec admin_alerts_get(Tesla.Env.client, keyword()) :: {:ok, [HookSniffAPI.Model.AdminAlertRule.t]} | {:error, Tesla.Env.t}
-  def admin_alerts_get(connection, _opts \\ []) do
-    request =
-      %{}
-      |> method(:get)
-      |> url("/admin/alerts")
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.AdminAlertRule}
-    ])
-  end
-
-  @doc """
-  Delete an alert rule (admin)
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `id` (String.t): 
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.AdminAlertsIdDelete200Response.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_alerts_id_delete(Tesla.Env.client, String.t, keyword()) :: {:ok, HookSniffAPI.Model.AdminAlertsIdDelete200Response.t} | {:error, Tesla.Env.t}
-  def admin_alerts_id_delete(connection, id, _opts \\ []) do
-    request =
-      %{}
-      |> method(:delete)
-      |> url("/admin/alerts/#{id}")
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.AdminAlertsIdDelete200Response}
-    ])
-  end
-
-  @doc """
-  Update an alert rule (admin)
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `id` (String.t): 
-  - `opts` (keyword): Optional parameters
-    - `:body` (AdminUpdateAlertRequest): 
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.AdminAlertRule.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_alerts_id_put(Tesla.Env.client, String.t, keyword()) :: {:ok, HookSniffAPI.Model.AdminAlertRule.t} | {:error, Tesla.Env.t}
-  def admin_alerts_id_put(connection, id, opts \\ []) do
-    optional_params = %{
-      :body => :body
-    }
-
-    request =
-      %{}
-      |> method(:put)
-      |> url("/admin/alerts/#{id}")
-      |> add_optional_params(optional_params, opts)
-      |> ensure_body()
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.AdminAlertRule}
-    ])
-  end
-
-  @doc """
-  Create a platform alert rule (admin)
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `admin_create_alert_request` (AdminCreateAlertRequest): 
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.AdminAlertRule.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_alerts_post(Tesla.Env.client, HookSniffAPI.Model.AdminCreateAlertRequest.t, keyword()) :: {:ok, HookSniffAPI.Model.AdminAlertRule.t} | {:error, Tesla.Env.t}
-  def admin_alerts_post(connection, admin_create_alert_request, _opts \\ []) do
-    request =
-      %{}
-      |> method(:post)
-      |> url("/admin/alerts")
-      |> add_param(:body, :body, admin_create_alert_request)
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {201, HookSniffAPI.Model.AdminAlertRule}
-    ])
-  end
-
-  @doc """
-  List audit logs (admin)
-  Returns all audit log entries across all users
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `opts` (keyword): Optional parameters
-    - `:page` (integer()): 
-    - `:per_page` (integer()): 
-    - `:action` (String.t): 
-    - `:admin_id` (String.t): 
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.AdminAuditLogResponse.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_audit_logs_get(Tesla.Env.client, keyword()) :: {:ok, HookSniffAPI.Model.AdminAuditLogResponse.t} | {:error, Tesla.Env.t}
-  def admin_audit_logs_get(connection, opts \\ []) do
-    optional_params = %{
-      :page => :query,
-      :per_page => :query,
-      :action => :query,
-      :admin_id => :query
-    }
-
-    request =
-      %{}
-      |> method(:get)
-      |> url("/admin/audit-logs")
-      |> add_optional_params(optional_params, opts)
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.AdminAuditLogResponse}
-    ])
-  end
-
-  @doc """
-  Get churn metrics (admin)
-  Lists users who became inactive in the last 30 days
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.ChurnResponse.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_churn_get(Tesla.Env.client, keyword()) :: {:ok, HookSniffAPI.Model.ChurnResponse.t} | {:error, Tesla.Env.t}
-  def admin_churn_get(connection, _opts \\ []) do
-    request =
-      %{}
-      |> method(:get)
-      |> url("/admin/churn")
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.ChurnResponse}
-    ])
-  end
-
-  @doc """
-  Replay a delivery (admin)
-  Creates a new delivery with the same payload as the original
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `id` (String.t): Original delivery ID to replay
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.ReplayDeliveryResponse.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_deliveries_id_replay_post(Tesla.Env.client, String.t, keyword()) :: {:ok, HookSniffAPI.Model.ReplayDeliveryResponse.t} | {:error, Tesla.Env.t}
-  def admin_deliveries_id_replay_post(connection, id, _opts \\ []) do
-    request =
-      %{}
-      |> method(:post)
-      |> url("/admin/deliveries/#{id}/replay")
-      |> ensure_body()
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.ReplayDeliveryResponse}
-    ])
-  end
-
-  @doc """
-  Get deploy info
-  Admin-only. Returns current deployment version and build info.
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.DeployInfo.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_deploy_info_get(Tesla.Env.client, keyword()) :: {:ok, nil} | {:ok, HookSniffAPI.Model.DeployInfo.t} | {:error, Tesla.Env.t}
-  def admin_deploy_info_get(connection, _opts \\ []) do
-    request =
-      %{}
-      |> method(:get)
-      |> url("/admin/deploy-info")
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.DeployInfo},
-      {401, false},
-      {403, false}
-    ])
-  end
-
-  @doc """
-  List feature flags
-  Admin-only. Returns all feature flags.
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.AdminFeatureFlagsGet200Response.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_feature_flags_get(Tesla.Env.client, keyword()) :: {:ok, nil} | {:ok, HookSniffAPI.Model.AdminFeatureFlagsGet200Response.t} | {:error, Tesla.Env.t}
-  def admin_feature_flags_get(connection, _opts \\ []) do
-    request =
-      %{}
-      |> method(:get)
-      |> url("/admin/feature-flags")
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.AdminFeatureFlagsGet200Response},
-      {401, false},
-      {403, false}
-    ])
-  end
-
-  @doc """
-  Delete feature flag
-  Admin-only. Deletes a feature flag.
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `id` (String.t): 
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, nil}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_feature_flags_id_delete(Tesla.Env.client, String.t, keyword()) :: {:ok, nil} | {:error, Tesla.Env.t}
-  def admin_feature_flags_id_delete(connection, id, _opts \\ []) do
-    request =
-      %{}
-      |> method(:delete)
-      |> url("/admin/feature-flags/#{id}")
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, false},
-      {404, false},
-      {403, false}
-    ])
-  end
-
-  @doc """
-  Update feature flag
-  Admin-only. Updates a feature flag.
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `id` (String.t): 
-  - `opts` (keyword): Optional parameters
-    - `:body` (AdminFeatureFlagsIdPutRequest): 
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.FeatureFlag.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_feature_flags_id_put(Tesla.Env.client, String.t, keyword()) :: {:ok, HookSniffAPI.Model.FeatureFlag.t} | {:ok, nil} | {:error, Tesla.Env.t}
-  def admin_feature_flags_id_put(connection, id, opts \\ []) do
-    optional_params = %{
-      :body => :body
-    }
-
-    request =
-      %{}
-      |> method(:put)
-      |> url("/admin/feature-flags/#{id}")
-      |> add_optional_params(optional_params, opts)
-      |> ensure_body()
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.FeatureFlag},
-      {404, false},
-      {403, false}
-    ])
-  end
-
-  @doc """
-  Create feature flag
-  Admin-only. Creates a new feature flag.
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `admin_feature_flags_post_request` (AdminFeatureFlagsPostRequest): 
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.FeatureFlag.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_feature_flags_post(Tesla.Env.client, HookSniffAPI.Model.AdminFeatureFlagsPostRequest.t, keyword()) :: {:ok, HookSniffAPI.Model.FeatureFlag.t} | {:ok, nil} | {:error, Tesla.Env.t}
-  def admin_feature_flags_post(connection, admin_feature_flags_post_request, _opts \\ []) do
-    request =
-      %{}
-      |> method(:post)
-      |> url("/admin/feature-flags")
-      |> add_param(:body, :body, admin_feature_flags_post_request)
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {201, HookSniffAPI.Model.FeatureFlag},
-      {400, false},
-      {403, false}
-    ])
-  end
-
-  @doc """
-  Export revenue data as CSV (admin)
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `opts` (keyword): Optional parameters
-    - `:format` (String.t): 
-    - `:months` (integer()): Number of months to include
-
-  ### Returns
-
-  - `{:ok, String.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_revenue_export_get(Tesla.Env.client, keyword()) :: {:ok, String.t} | {:error, Tesla.Env.t}
-  def admin_revenue_export_get(connection, opts \\ []) do
-    optional_params = %{
-      :format => :query,
-      :months => :query
-    }
-
-    request =
-      %{}
-      |> method(:get)
-      |> url("/admin/revenue/export")
-      |> add_optional_params(optional_params, opts)
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, false}
-    ])
-  end
-
-  @doc """
-  Revenue analytics (admin)
-  Returns monthly revenue, revenue by plan, MRR, churn rate, and MRR trend
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.RevenueResponse.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_revenue_get(Tesla.Env.client, keyword()) :: {:ok, HookSniffAPI.Model.RevenueResponse.t} | {:error, Tesla.Env.t}
+  @spec admin_revenue_get(Tesla.Env.client, keyword()) :: {:ok, [HookSniffAPI.Model.AdminRevenueGet200ResponseInner.t]} | {:error, Tesla.Env.t}
   def admin_revenue_get(connection, _opts \\ []) do
     request =
       %{}
@@ -461,7 +33,7 @@ defmodule HookSniffAPI.Api.Admin do
     connection
     |> Connection.request(request)
     |> evaluate_response([
-      {200, HookSniffAPI.Model.RevenueResponse}
+      {200, HookSniffAPI.Model.AdminRevenueGet200ResponseInner}
     ])
   end
 
@@ -501,64 +73,6 @@ defmodule HookSniffAPI.Api.Admin do
   end
 
   @doc """
-  Get platform settings (admin)
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.PlatformSettings.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_settings_get(Tesla.Env.client, keyword()) :: {:ok, HookSniffAPI.Model.PlatformSettings.t} | {:error, Tesla.Env.t}
-  def admin_settings_get(connection, _opts \\ []) do
-    request =
-      %{}
-      |> method(:get)
-      |> url("/admin/settings")
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.PlatformSettings}
-    ])
-  end
-
-  @doc """
-  Update platform settings (admin)
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `platform_settings` (PlatformSettings): 
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.AdminSettingsPut200Response.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_settings_put(Tesla.Env.client, HookSniffAPI.Model.PlatformSettings.t, keyword()) :: {:ok, HookSniffAPI.Model.AdminSettingsPut200Response.t} | {:error, Tesla.Env.t}
-  def admin_settings_put(connection, platform_settings, _opts \\ []) do
-    request =
-      %{}
-      |> method(:put)
-      |> url("/admin/settings")
-      |> add_param(:body, :body, platform_settings)
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.AdminSettingsPut200Response}
-    ])
-  end
-
-  @doc """
   System-wide statistics (admin)
 
   ### Parameters
@@ -587,77 +101,7 @@ defmodule HookSniffAPI.Api.Admin do
   end
 
   @doc """
-  Send a test webhook to a URL (admin)
-  Sends an HTTP POST to the specified URL with SSRF protection
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `admin_test_webhook_request` (AdminTestWebhookRequest): 
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.AdminTestWebhookResponse.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_test_webhook_post(Tesla.Env.client, HookSniffAPI.Model.AdminTestWebhookRequest.t, keyword()) :: {:ok, HookSniffAPI.Model.AdminTestWebhookResponse.t} | {:error, Tesla.Env.t}
-  def admin_test_webhook_post(connection, admin_test_webhook_request, _opts \\ []) do
-    request =
-      %{}
-      |> method(:post)
-      |> url("/admin/test-webhook")
-      |> add_param(:body, :body, admin_test_webhook_request)
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.AdminTestWebhookResponse}
-    ])
-  end
-
-  @doc """
-  Export users as CSV (admin)
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `opts` (keyword): Optional parameters
-    - `:format` (String.t): 
-    - `:plan` (String.t): Filter by plan
-    - `:status` (String.t): Filter by status
-
-  ### Returns
-
-  - `{:ok, String.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_users_export_get(Tesla.Env.client, keyword()) :: {:ok, String.t} | {:error, Tesla.Env.t}
-  def admin_users_export_get(connection, opts \\ []) do
-    optional_params = %{
-      :format => :query,
-      :plan => :query,
-      :status => :query
-    }
-
-    request =
-      %{}
-      |> method(:get)
-      |> url("/admin/users/export")
-      |> add_optional_params(optional_params, opts)
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, false}
-    ])
-  end
-
-  @doc """
   List all users (admin)
-  Returns paginated list of users with optional filters
 
   ### Parameters
 
@@ -665,11 +109,6 @@ defmodule HookSniffAPI.Api.Admin do
   - `opts` (keyword): Optional parameters
     - `:page` (integer()): 
     - `:per_page` (integer()): 
-    - `:search` (String.t): Search by email or name (ILIKE)
-    - `:plan` (String.t): Filter by plan
-    - `:status` (String.t): Filter by status
-    - `:created_after` (Date.t): Filter users created after this date (ISO 8601)
-    - `:created_before` (Date.t): Filter users created before this date (ISO 8601)
 
   ### Returns
 
@@ -680,12 +119,7 @@ defmodule HookSniffAPI.Api.Admin do
   def admin_users_get(connection, opts \\ []) do
     optional_params = %{
       :page => :query,
-      :per_page => :query,
-      :search => :query,
-      :plan => :query,
-      :status => :query,
-      :created_after => :query,
-      :created_before => :query
+      :per_page => :query
     }
 
     request =
@@ -703,44 +137,7 @@ defmodule HookSniffAPI.Api.Admin do
   end
 
   @doc """
-  Get user analytics (admin)
-  Returns delivery analytics for a specific user over a time period
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `id` (String.t): 
-  - `opts` (keyword): Optional parameters
-    - `:days` (integer()): Number of days to analyze
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.UserAnalytics.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec admin_users_id_analytics_get(Tesla.Env.client, String.t, keyword()) :: {:ok, HookSniffAPI.Model.UserAnalytics.t} | {:error, Tesla.Env.t}
-  def admin_users_id_analytics_get(connection, id, opts \\ []) do
-    optional_params = %{
-      :days => :query
-    }
-
-    request =
-      %{}
-      |> method(:get)
-      |> url("/admin/users/#{id}/analytics")
-      |> add_optional_params(optional_params, opts)
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.UserAnalytics}
-    ])
-  end
-
-  @doc """
   Get user details (admin)
-  Returns user details with endpoints, recent deliveries, and usage stats
 
   ### Parameters
 
@@ -750,10 +147,10 @@ defmodule HookSniffAPI.Api.Admin do
 
   ### Returns
 
-  - `{:ok, HookSniffAPI.Model.AdminUsersIdGet200Response.t}` on success
+  - `{:ok, nil}` on success
   - `{:error, Tesla.Env.t}` on failure
   """
-  @spec admin_users_id_get(Tesla.Env.client, String.t, keyword()) :: {:ok, HookSniffAPI.Model.AdminUsersIdGet200Response.t} | {:error, Tesla.Env.t}
+  @spec admin_users_id_get(Tesla.Env.client, String.t, keyword()) :: {:ok, nil} | {:error, Tesla.Env.t}
   def admin_users_id_get(connection, id, _opts \\ []) do
     request =
       %{}
@@ -764,7 +161,7 @@ defmodule HookSniffAPI.Api.Admin do
     connection
     |> Connection.request(request)
     |> evaluate_response([
-      {200, HookSniffAPI.Model.AdminUsersIdGet200Response}
+      {200, false}
     ])
   end
 

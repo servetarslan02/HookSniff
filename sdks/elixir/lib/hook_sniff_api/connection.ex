@@ -82,7 +82,7 @@ defmodule HookSniffAPI.Connection do
         Keyword.get(
           tesla_options,
           :user_agent,
-          "openapi-generator - HookSniffAPI 0.3.0 - elixir"
+          "openapi-generator - HookSniffAPI 1.0.0 - elixir"
         )
       )
 

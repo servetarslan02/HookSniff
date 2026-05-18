@@ -7,6 +7,7 @@ defmodule HookSniffAPI.Model.StatsResponse do
   """
 
   @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :total_deliveries,
     :successful_deliveries,

@@ -102,36 +102,6 @@ defmodule HookSniffAPI.Api.Auth do
   end
 
   @doc """
-  Get 2FA status
-  Returns whether 2FA is enabled for the authenticated user
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.Auth2faStatusGet200Response.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec auth2fa_status_get(Tesla.Env.client, keyword()) :: {:ok, nil} | {:ok, HookSniffAPI.Model.Auth2faStatusGet200Response.t} | {:error, Tesla.Env.t}
-  def auth2fa_status_get(connection, _opts \\ []) do
-    request =
-      %{}
-      |> method(:get)
-      |> url("/auth/2fa/status")
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.Auth2faStatusGet200Response},
-      {401, false}
-    ])
-  end
-
-  @doc """
   Verify 2FA code during login
 
   ### Parameters
@@ -187,69 +157,6 @@ defmodule HookSniffAPI.Api.Auth do
     |> Connection.request(request)
     |> evaluate_response([
       {200, false}
-    ])
-  end
-
-  @doc """
-  Get consent preferences
-  Returns the authenticated user's consent preferences
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.AuthConsentGet200Response.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec auth_consent_get(Tesla.Env.client, keyword()) :: {:ok, nil} | {:ok, HookSniffAPI.Model.AuthConsentGet200Response.t} | {:error, Tesla.Env.t}
-  def auth_consent_get(connection, _opts \\ []) do
-    request =
-      %{}
-      |> method(:get)
-      |> url("/auth/consent")
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.AuthConsentGet200Response},
-      {401, false}
-    ])
-  end
-
-  @doc """
-  Update a consent preference
-  Sets a single consent key to true/false
-
-  ### Parameters
-
-  - `connection` (HookSniffAPI.Connection): Connection to server
-  - `auth_consent_post_request` (AuthConsentPostRequest): 
-  - `opts` (keyword): Optional parameters
-
-  ### Returns
-
-  - `{:ok, HookSniffAPI.Model.AuthConsentPost200Response.t}` on success
-  - `{:error, Tesla.Env.t}` on failure
-  """
-  @spec auth_consent_post(Tesla.Env.client, HookSniffAPI.Model.AuthConsentPostRequest.t, keyword()) :: {:ok, nil} | {:ok, HookSniffAPI.Model.AuthConsentPost200Response.t} | {:error, Tesla.Env.t}
-  def auth_consent_post(connection, auth_consent_post_request, _opts \\ []) do
-    request =
-      %{}
-      |> method(:post)
-      |> url("/auth/consent")
-      |> add_param(:body, :body, auth_consent_post_request)
-      |> Enum.into([])
-
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, HookSniffAPI.Model.AuthConsentPost200Response},
-      {400, false},
-      {401, false}
     ])
   end
 

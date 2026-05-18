@@ -1,47 +1,44 @@
-# HookSniffAPI
+# HookSniff Elixir SDK
 
-Webhook delivery, monitoring, and management API. All endpoints under &#x60;/v1&#x60; require authentication via &#x60;Authorization: Bearer &lt;api_key&gt;&#x60; header unless marked as **Public**. 
+<p align="center">
+  <a href="https://github.com/servetarslan02/HookSniff"><img src="https://img.shields.io/github/license/servetarslan02/HookSniff" alt="License"></a>
+</p>
 
-## Building
-
-To install the required dependencies and to build the elixir project, run:
-
-```console
-mix local.hex --force
-mix do deps.get, compile
-```
+Elixir SDK for the [HookSniff](https://hooksniff.com) webhook delivery platform.
 
 ## Installation
 
-If [available in Hex][], the package can be installed by adding `hooksniff` to
-your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [{:hooksniff, "~> 0.3.0"}]
-end
+```bash
+{ :hooksniff, "~> 1.0" }
 ```
 
-Documentation can be generated with [ExDoc][] and published on [HexDocs][]. Once published, the docs can be found at
-[https://hexdocs.pm/hooksniff][docs].
-
-## Configuration
-
-You can override the URL of your server (e.g. if you have a separate development and production server in your
-configuration files).
+## Quick Start
 
 ```elixir
-config :hooksniff, base_url: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1"
+client = HookSniff.new("hs_xxx")
+{:ok, endpoints} = HookSniff.Endpoint.list(client)
+IO.inspect(endpoints)
 ```
 
-Multiple clients for the same API with different URLs can be created passing different `base_url`s when calling
-`HookSniffAPI.Connection.new/1`:
+## Webhook Verification
 
 ```elixir
-client = HookSniffAPI.Connection.new(base_url: "https://hooksniff-api-1046140057667.europe-west1.run.app/v1")
+{:ok, payload} = HookSniff.Webhook.verify(body, headers, "whsec_xxx")
 ```
 
-[exdoc]: https://github.com/elixir-lang/ex_doc
-[hexdocs]: https://hexdocs.pm
-[available in hex]: https://hex.pm/docs/publish
-[docs]: https://hexdocs.pm/hooksniff
+## Resources
+
+| Resource | Methods |
+|----------|---------|
+| Endpoint | list, create, get, update, delete |
+| Message | create, list, get |
+| MessageAttempt | list, listByMsg, get, resend |
+| Authentication | dashboardAccess |
+| EventType | list |
+| Statistics | aggregate |
+
+## Links
+
+- [Documentation](https://docs.hooksniff.com)
+- [API Reference](https://api.hooksniff.com)
+- [GitHub](https://github.com/servetarslan02/HookSniff)

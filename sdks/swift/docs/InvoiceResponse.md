@@ -4,7 +4,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | 
-**amountCents** | **Int64** |  | 
+**amountCents** | **Int** |  | 
 **currency** | **String** |  | 
 **status** | **String** |  | 
 **createdAt** | **Date** |  | 

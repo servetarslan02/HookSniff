@@ -7,6 +7,9 @@ Method | HTTP request | Description
 [**endpointsIdHealthGet**](RoutingAPI.md#endpointsidhealthget) | **GET** /endpoints/{id}/health | Get endpoint health status
 [**endpointsIdRoutingGet**](RoutingAPI.md#endpointsidroutingget) | **GET** /endpoints/{id}/routing | Get routing config for endpoint
 [**endpointsIdRoutingPut**](RoutingAPI.md#endpointsidroutingput) | **PUT** /endpoints/{id}/routing | Update routing config
+[**routingIdHealthGet**](RoutingAPI.md#routingidhealthget) | **GET** /routing/{id}/health | Get endpoint health status
+[**routingIdRoutingGet**](RoutingAPI.md#routingidroutingget) | **GET** /routing/{id}/routing | Get routing config for endpoint
+[**routingIdRoutingPut**](RoutingAPI.md#routingidroutingput) | **PUT** /routing/{id}/routing | Update routing config
 
 
 # **endpointsIdHealthGet**
@@ -152,6 +155,150 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/json
  - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **routingIdHealthGet**
+```swift
+    open class func routingIdHealthGet(id: String, completion: @escaping (_ data: Void?, _ error: Error?) -> Void)
+```
+
+Get endpoint health status
+
+### Example
+```swift
+// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
+import OpenAPIClient
+
+let id = "id_example" // String | 
+
+// Get endpoint health status
+RoutingAPI.routingIdHealthGet(id: id) { (response, error) in
+    guard error == nil else {
+        print(error)
+        return
+    }
+
+    if (response) {
+        dump(response)
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String** |  | 
+
+### Return type
+
+Void (empty response body)
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **routingIdRoutingGet**
+```swift
+    open class func routingIdRoutingGet(id: String, completion: @escaping (_ data: Void?, _ error: Error?) -> Void)
+```
+
+Get routing config for endpoint
+
+### Example
+```swift
+// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
+import OpenAPIClient
+
+let id = "id_example" // String | 
+
+// Get routing config for endpoint
+RoutingAPI.routingIdRoutingGet(id: id) { (response, error) in
+    guard error == nil else {
+        print(error)
+        return
+    }
+
+    if (response) {
+        dump(response)
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String** |  | 
+
+### Return type
+
+Void (empty response body)
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **routingIdRoutingPut**
+```swift
+    open class func routingIdRoutingPut(id: String, completion: @escaping (_ data: Void?, _ error: Error?) -> Void)
+```
+
+Update routing config
+
+### Example
+```swift
+// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
+import OpenAPIClient
+
+let id = "id_example" // String | 
+
+// Update routing config
+RoutingAPI.routingIdRoutingPut(id: id) { (response, error) in
+    guard error == nil else {
+        print(error)
+        return
+    }
+
+    if (response) {
+        dump(response)
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String** |  | 
+
+### Return type
+
+Void (empty response body)
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
