@@ -1,5 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
 
@@ -8,88 +9,81 @@ export const metadata: Metadata = {
   description: 'How to investigate and fix failed webhook deliveries',
 };
 
-export default function DebugFailedWebhooksPage() {
+export default async function DebugFailedWebhooksPage() {
+  const t = await getTranslations('docsDebugFailed');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Debug Failed Webhooks</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        A webhook failed. Now what? Here&apos;s how to find out why and fix it.
+        {t('subtitle')}
       </p>
 
-      {/* Step 1: Find the failed delivery */}
+      {/* Step 1 */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Step 1: Find the Failed Delivery</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">Search for failed deliveries via the API:</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step1')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('step1Desc')}</p>
         <CodeBlock
           code={`curl "https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks?status=failed&per_page=10" \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
-        <p className="text-gray-600 dark:text-slate-400 mt-4">Or use the dashboard: go to <strong>Deliveries</strong> → filter by <strong>Failed</strong> status.</p>
       </section>
 
-      {/* Step 2: Check attempt details */}
+      {/* Step 2 */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Step 2: Check Attempt Details</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">Each delivery has attempt details showing exactly what happened:</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step2')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('step2Desc')}</p>
         <CodeBlock
           code={`curl "https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/wh_xyz789/attempts" \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
-        <p className="text-gray-600 dark:text-slate-400 mt-4 mb-4">Look for:</p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><strong>Status code</strong> — What HTTP status did your endpoint return?</li>
-          <li><strong>Response body</strong> — Did your endpoint return an error message?</li>
-          <li><strong>Duration</strong> — Did the request timeout (30s limit)?</li>
-          <li><strong>Timestamp</strong> — When did each attempt happen?</li>
+          <li><strong>{t('step2Field1').split(' — ')[0]}</strong> — {t('step2Field1').split(' — ')[1]}</li>
+          <li><strong>{t('step2Field2').split(' — ')[0]}</strong> — {t('step2Field2').split(' — ')[1]}</li>
+          <li><strong>{t('step2Field3').split(' — ')[0]}</strong> — {t('step2Field3').split(' — ')[1]}</li>
+          <li><strong>{t('step2Field4').split(' — ')[0]}</strong> — {t('step2Field4').split(' — ')[1]}</li>
         </ul>
       </section>
 
-      {/* Common failure patterns */}
+      {/* Common Patterns */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Common Failure Patterns</h2>
-
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('commonPatterns')}</h2>
         <div className="space-y-6 not-prose">
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <h4 className="font-semibold text-gray-900 dark:text-white mb-2">500 Internal Server Error</h4>
-            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">Your endpoint has a bug. Check your server logs for the timestamp of the delivery attempt.</p>
-            <p className="text-sm text-gray-500 dark:text-slate-500">Fix: Debug your endpoint code, fix the bug, then replay the delivery.</p>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('fix5xx')}</p>
           </div>
-
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <h4 className="font-semibold text-gray-900 dark:text-white mb-2">401 Unauthorized</h4>
-            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">Your endpoint is rejecting the request. Check if you&apos;re verifying the HookSniff signature correctly.</p>
-            <p className="text-sm text-gray-500 dark:text-slate-500">Fix: Make sure you&apos;re using the correct signing secret and the verification code is correct.</p>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('fix401')}</p>
           </div>
-
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <h4 className="font-semibold text-gray-900 dark:text-white mb-2">404 Not Found</h4>
-            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">Your endpoint URL is wrong or the route doesn&apos;t exist.</p>
-            <p className="text-sm text-gray-500 dark:text-slate-500">Fix: Check the endpoint URL. Make sure the path is correct and the server is running.</p>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('fix404')}</p>
           </div>
-
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Connection Timeout</h4>
-            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">Your endpoint took more than 30 seconds to respond.</p>
-            <p className="text-sm text-gray-500 dark:text-slate-500">Fix: Return 200 immediately and process asynchronously. See Best Practices.</p>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('fixTimeout')}</p>
           </div>
-
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <h4 className="font-semibold text-gray-900 dark:text-white mb-2">DNS Failure</h4>
-            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">The domain in your endpoint URL doesn&apos;t resolve.</p>
-            <p className="text-sm text-gray-500 dark:text-slate-500">Fix: Check the URL spelling. Make sure DNS is configured correctly.</p>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('fixDns')}</p>
+          </div>
+          <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">TLS Error</h4>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('fixTls')}</p>
           </div>
         </div>
       </section>
 
-      {/* Step 3: Fix and replay */}
+      {/* Step 3 */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Step 3: Fix and Replay</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">After fixing the issue on your endpoint, replay the failed delivery:</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step4')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('step4Desc')}</p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/wh_xyz789/replay \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
-        <p className="text-gray-600 dark:text-slate-400 mt-4">Or replay from the dashboard with one click. The delivery will be re-queued with a fresh retry schedule.</p>
+        <p className="text-gray-600 dark:text-slate-400 mt-4">{t('step4Tip')}</p>
       </section>
     </article>
   );
