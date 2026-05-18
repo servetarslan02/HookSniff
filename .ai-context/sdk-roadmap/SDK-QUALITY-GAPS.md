@@ -123,17 +123,21 @@ Her SDK'da `debug=true` ile:
 ## ❌ KALAN EKSİKLER
 
 ### 12. Test Coverage Artırma ✅ (11/11 — 2026-05-19)
-- Typed webhook event testleri tüm SDK'lara eklendi
-- Node.js: 4 test (typed events + backward compat)
-- Python: 14 test (8 event type + backward compat + edge cases)
-- Go: 10 test (typed parsing + all events + version header)
-- Rust: 7 test (typed parsing + backwards compat)
-- Ruby: 8 test (typed events + backward compat + snake_case)
-- Kotlin: 7 test (typed events + backward compat)
-- PHP: 7 test (typed events + backward compat + empty data)
-- C#: 4 test (typed parsing + backward compat)
-- Elixir: 8 test (typed events + backward compat + snake_case)
-- Swift: 7 test (typed events + backward compat + all types)
+- Kapsamlı test suitleri tüm SDK'lara eklendi
+- Kapsanan alanlar: Webhook verification, Typed events, Error types, Backward compat, Edge cases, Unicode, Empty data
+
+| SDK | Test Dosyası | Kapsam |
+|-----|-------------|--------|
+| Node.js | 1 (index.test.ts) | Webhook, Errors, Typed Events, Edge Cases, Version |
+| Python | 12 | Typed Events, Backward Compat, Edge Cases, Signature, Unicode |
+| Go | 3 | Webhook, Typed Data, Error Types, Edge Cases, Version |
+| Rust | 8 | Typed Events, Edge Cases, Unicode, Nested JSON |
+| Ruby | 2 | Typed Events, Backward Compat, Unicode, Event Types |
+| Kotlin | 3 | Typed Events, Backward Compat, Unicode, Empty Data |
+| PHP | 5 | Typed Events, Backward Compat, Edge Cases, Unicode |
+| C# | 2 | Typed Events, Backward Compat, Event Types |
+| Elixir | 18 | Typed Events, Edge Cases, Unicode, Snake_case |
+| Swift | 6+ | Typed Events, Backward Compat, Unicode, Empty Data |
 
 ### 13. CI/CD Otomatik Publish ❌
 - Tag push'ta otomatik publish
