@@ -51,24 +51,25 @@ HookSniff: ██████████████░░░░░░  72%
 
 **Durum: TÜM 11 SDK'DA MEVCUT**
 
-| SDK | Retry Mekanizması | 429 Retry-After | Exponential Backoff | Debug Log |
-|-----|-------------------|-----------------|---------------------|-----------|
-| Node.js | `sendWithRetry()` | ✅ | ✅ | ✅ |
-| Python | `do_request_with_retry()` | ✅ | ✅ | ❌ |
-| Go | `svix_http_client.go` loop | ✅ | ✅ | ❌ |
-| Rust | `execute_with_backoff()` | ✅ | ✅ | ❌ |
-| Ruby | `hooksniff_http_client.rb` loop | ✅ | ✅ | ❌ |
-| Java | `executeRequestWithRetry()` | ✅ | ✅ | ✅ |
-| Kotlin | `executeRequestWithRetry()` | ✅ | ✅ | ❌ |
-| C# | retry loop | ✅ | ✅ | ❌ |
-| PHP | retry loop | ✅ | ✅ | ❌ |
-| Elixir | `do_request_with_retry()` | ✅ | ✅ | ❌ |
-| Swift | retry loop | ✅ | ✅ | ❌ |
+| SDK | Retry Mekanizması | 429 Retry-After | 5xx Backoff | Timeout Retry | Default |
+|-----|-------------------|-----------------|-------------|---------------|---------|
+| Node.js | `sendWithRetry()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Python | `do_request_with_retry()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Go | `svix_http_client.go` loop | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Rust | `execute_with_backoff()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Ruby | `hooksniff_http_client.rb` loop | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Java | `executeRequestWithRetry()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Kotlin | `executeRequestWithRetry()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| C# | retry loop | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| PHP | retry loop | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Elixir | `do_request_with_retry()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Swift | retry loop | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
 
 **Tüm SDK'larda:**
-- `retrySchedule` / `numRetries` config seçeneği
+- `retrySchedule` / `numRetries` config seçeneği (varsayılan: 3 deneme)
 - 429'da `Retry-After` header'ı okunuyor
-- 5xx'de exponential backoff
+- 5xx'de exponential backoff (1s, 2s, 4s)
+- Timeout durumunda retry
 - `hooksniff-retry-count` header'ı ekleniyor
 
 ---
