@@ -93,7 +93,7 @@ export default function StreamingPage() {
     mutationFn: (id: string) => streamApi.disconnectSubscription(token!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stream-subscriptions'] });
-      toast(t('subscription{t('disconnect')}ed'), 'success');
+      toast(t('subscriptionDisconnected'), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
