@@ -1,4 +1,4 @@
-# 📦 SDK Publish Durumu — 2026-05-18 20:39 GMT+8
+# 📦 SDK Publish Durumu — 2026-05-18 20:57 GMT+8
 
 ## Genel Durum
 
@@ -47,10 +47,9 @@ cd hooksniff-kotlin
 - https://www.nuget.org/packages/HookSniff/1.2.0
 
 ### Elixir → Hex.pm
-```bash
-cd hooksniff-elixir
-mix hex.publish --yes
-```
+- ✅ v1.2.0 yüklendi (2026-05-18)
+- 35 resource, tüm API kapsaması
+- https://hex.pm/packages/hooksniff/1.2.0
 
 ---
 
