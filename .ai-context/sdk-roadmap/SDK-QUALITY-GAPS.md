@@ -1,7 +1,7 @@
 # SDK Kalite Boşlukları — Svix Karşılaştırması
 
 > Oluşturma: 2026-05-19 00:22 GMT+8
-> Güncelleme: 2026-05-19 00:40 GMT+8 — Öncelikler yeniden düzenlendi
+> Güncelleme: 2026-05-19 01:52 GMT+8 — **Doğrulama sonrası güncellendi (11 SDK audit)**
 > Durum: Belgeleme — uygulama bekliyor
 > Amaç: HookSniff SDK'larını Svix seviyesine çıkarmak için gereken tüm eksikler
 
@@ -11,172 +11,118 @@
 
 ```
 Svix:      ████████████████████ 100%
-HookSniff: ████████████░░░░░░░░  62%
+HookSniff: ██████████████░░░░░░  72%
 ```
 
-**Hedef: %90+ (50-65 saat)**
+**Hedef: %90+ (25-35 saat kaldı)**
 
 ---
 
-## 🔴 Kritik Eksikler (Yüksek Etki)
+## ✅ Tamamlananlar (Faz 1 — Kritik)
 
-### 1. Webhook İmza Doğrulama ← EN KRİTİK
+### 1. Webhook İmza Doğrulama ✅
 
-Bir webhook SDK'sının **birinci görevi**: gelen webhook'ların gerçekten HookSniff'ten geldiğini doğrulamak. Bu yoksa güvenlik açığı var demektir.
+**Durum: TÜM 11 SDK'DA MEVCUT**
 
-**Svix Örneği (Python):**
-```python
-from svix.webhooks import Webhook
-wh = Webhook("whsec_xxx")
-payload = wh.verify(request.body, request.headers)
-# Doğrulanmış payload döner, geçersizse exception fırlatır
-```
+| SDK | Method | Algoritma | Timestamp | Unbranded |
+|-----|--------|-----------|-----------|-----------|
+| Node.js | `wh.verify(payload, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
+| Python | `wh.verify(data, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
+| Go | `wh.Verify(payload, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
+| Rust | `wh.verify(payload, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
+| Ruby | `wh.verify(payload, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
+| Java | `wh.verify(payload, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
+| Kotlin | `wh.verify(payload, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
+| C# | `wh.Verify(payload, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
+| PHP | `Webhook::verify($payload, $headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
+| Elixir | `Webhook.verify(payload, headers, secret)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
+| Swift | `wh.verify(payload, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
 
-**Svix Örneği (Node.js):**
-```typescript
-const wh = new Webhook("whsec_xxx");
-const payload = wh.verify(request.body, request.headers);
-```
-
-**Yapılacaklar:**
-- [ ] Rust: `WebhookVerifier` struct, `verify(payload, headers, secret)` methodu
-- [ ] Node.js: `Webhook.verify(payload, headers)` static method
-- [ ] Python: `Webhook.verify(payload, headers)` class method
-- [ ] Go: `webhook.Verify(payload, headers, secret)` fonksiyonu
-- [ ] Java/Kotlin: `WebhookVerifier.verify(payload, headers, secret)`
-- [ ] Ruby: `Webhook.verify(payload, headers, secret)`
-- [ ] C#: `WebhookVerifier.Verify(payload, headers, secret)`
-- [ ] PHP: `Webhook::verify($payload, $headers, $secret)`
-- [ ] Swift: `WebhookVerifier.verify(payload:headers:secret:)`
-- [ ] Elixir: `Webhook.verify(payload, headers, secret)`
-
-**Her dilde desteklenecek imza algoritmaları:**
-- HMAC-SHA256 (v1)
-- HMAC-SHA512 (v2, opsiyonel)
-- Timestamp kontrolü (replay attack önleme)
-
-**Tahmini Süre:** 6-8 saat (tüm diller)
-**Öncelik:** 🔴 Kritik — #1 öncelik
+**Desteklenen özellikler:**
+- `whsec_` prefix'li secret format (Standard Webhooks uyumlu)
+- `hooksniff-id`, `hooksniff-timestamp`, `hooksniff-signature` header'ları
+- Unbranded (`webhook-id`, `webhook-signature`, `webhook-timestamp`) desteği
+- Replay attack önleme (5 dakika timestamp tolerance)
+- `sign()` methodu (Node.js, Python, Go, Ruby, Elixir, Swift)
 
 ---
 
-### 2. Retry + Exponential Backoff
+### 2. Retry + Exponential Backoff ✅
 
-Webhook teslimatı güvenilir olmalı. 429, 500, 502, 503, timeout durumlarında otomatik retry yapılmalı.
+**Durum: TÜM 11 SDK'DA MEVCUT**
 
-**Svix Davranışı:**
-- 429 → `Retry-After` header'ına göre bekle
-- 500/502/503 → Exponential backoff (1s, 2s, 4s, 8s...)
-- Timeout → Retry
-- Max 3 deneme (varsayılan)
+| SDK | Retry Mekanizması | 429 Retry-After | Exponential Backoff | Debug Log |
+|-----|-------------------|-----------------|---------------------|-----------|
+| Node.js | `sendWithRetry()` | ✅ | ✅ | ✅ |
+| Python | `do_request_with_retry()` | ✅ | ✅ | ❌ |
+| Go | `svix_http_client.go` loop | ✅ | ✅ | ❌ |
+| Rust | `execute_with_backoff()` | ✅ | ✅ | ❌ |
+| Ruby | `hooksniff_http_client.rb` loop | ✅ | ✅ | ❌ |
+| Java | `executeRequestWithRetry()` | ✅ | ✅ | ❌ |
+| Kotlin | `executeRequestWithRetry()` | ✅ | ✅ | ❌ |
+| C# | retry loop | ✅ | ✅ | ❌ |
+| PHP | retry loop | ✅ | ✅ | ❌ |
+| Elixir | `do_request_with_retry()` | ✅ | ✅ | ❌ |
+| Swift | retry loop | ✅ | ✅ | ❌ |
 
-**Yapılacaklar:**
-- [ ] Tüm diller: `maxRetries` config seçeneği (varsayılan: 3)
-- [ ] Tüm diller: Exponential backoff + jitter
-- [ ] Tüm diller: 429'da `Retry-After` header'ını oku
-- [ ] Tüm diller: Retry edilen istekleri log (debug modunda)
-
-**Tahmini Süre:** 4-6 saat (tüm diller)
-**Öncelik:** 🔴 Kritik — #2 öncelik
-
----
-
-### 3. Pagination Helper
-
-**Svix:** Otomatik iterator yönetimi, `list()` methodu otomatik sayfalama döndürüyor.
-**HookSniff:** Kullanıcı elle `iterator` parametresini yönetmek zorunda.
-
-**Svix Örneği (Node.js):**
-```typescript
-const list = await svx.message.list({ limit: 100 });
-for (const msg of list.data) {
-    // işle
-}
-if (!list.done) {
-    // list.next() ile sonraki sayfa
-}
-```
-
-**HookSniff Mevcut (Node.js):**
-```typescript
-let cursor = undefined;
-do {
-    const list = await client.message.list({ limit: 100, iterator: cursor });
-    for (const msg of list.data) {
-        // işle
-    }
-    cursor = list.done ? undefined : list.iterator;
-} while (cursor);
-```
-
-**Yapılacaklar:**
-- [ ] Rust: `ListResponse<T>`'a `next_page()` methodu ekle
-- [ ] Node.js: `list()` async iterator döndürsün
-- [ ] Python: `list()` generator/async generator döndürsün
-- [ ] Go: `ListPager` struct ekle
-- [ ] Java/Kotlin: `PageIterator<T>` class ekle
-- [ ] Ruby: `each` methodu ekle (Enumerable)
-- [ ] C#: `IAsyncEnumerable<T>` desteği
-- [ ] PHP: Generator/Iterator pattern
-- [ ] Swift: `AsyncSequence` desteği
-- [ ] Elixir: Stream/Flow pattern
-
-**Tahmini Süre:** 8-12 saat (tüm diller)
-**Öncelik:** 🔴 Kritik — #3 öncelik
+**Tüm SDK'larda:**
+- `retrySchedule` / `numRetries` config seçeneği
+- 429'da `Retry-After` header'ı okunuyor
+- 5xx'de exponential backoff
+- `hooksniff-retry-count` header'ı ekleniyor
 
 ---
 
-### 4. Error Class Çeşitliliği
+### 3. Pagination Helper ✅
 
-**Svix:** 20+ spesifik error type:
-```
-SvixError
-├── HttpError (status, body)
-│   ├── BadRequestError (400)
-│   ├── UnauthorizedError (401)
-│   ├── ForbiddenError (403)
-│   ├── NotFoundError (404)
-│   ├── ConflictError (409)
-│   ├── RateLimitError (429, retryAfter)
-│   └── InternalServerError (500)
-├── ValidationError (field, message)
-├── TimeoutError
-├── NetworkError
-└── AuthenticationError
-```
+**Durum: TÜM 11 SDK'DA MEVCUT**
 
-**HookSniff Mevcut (Rust):**
-```rust
-pub enum Error {
-    Generic(String),
-    Http(HttpErrorContent<HttpErrorOut>),
-    Validation(HttpErrorContent<HttpValidationError>),
-}
-```
+Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi otomatik.
 
-**Yapılacaklar:**
-- [ ] Rust: `RateLimited`, `Unauthorized`, `NotFound`, `Conflict`, `Timeout` variant'ları ekle
-- [ ] Node.js: Spesifik error class'ları ekle
-- [ ] Python: Exception hierarchy ekle
-- [ ] Go: Error type assertion desteği
-- [ ] Java/Kotlin: Exception class'ları ekle
-- [ ] Ruby: Error class hierarchy
-- [ ] C#: Exception class'ları
-- [ ] PHP: Exception class'ları
+---
+
+## ❌ Kalan Eksikler
+
+### 4. Error Class Çeşitliliği ❌
+
+**Svix:** 20+ spesifik error type
+**HookSniff:** 5 SDK'da tam, 6 SDK'da eksik
+
+| SDK | Mevcut Error Types | Durum |
+|-----|-------------------|-------|
+| Node.js | 12 type (BadRequest, Unauthorized, Forbidden, NotFound, Conflict, UnprocessableEntity, RateLimit, InternalServer, BadGateway, ServiceUnavailable, GatewayTimeout + base) | ✅ TAMAM |
+| Python | 12 type (aynı hierarchy) | ✅ TAMAM |
+| Go | 12 type (aynı hierarchy) | ✅ TAMAM |
+| Ruby | 12 type (aynı hierarchy) | ✅ TAMAM |
+| PHP | 12 type (aynı hierarchy) | ✅ TAMAM |
+| Rust | 3 type (Generic, Http, Validation) | ❌ EKSİK |
+| Java | 3 type (ApiException, WebhookSigningException, WebhookVerificationException) | ❌ EKSİK |
+| Kotlin | 3 type (ApiException, WebhookSigningException, WebhookVerificationException) | ❌ EKSİK |
+| C# | 1 type (WebhookVerificationException) | ❌ EKSİK |
+| Elixir | 1 type (VerificationError) | ❌ EKSİK |
+| Swift | 1 type (VerificationError) | ❌ EKSİK |
+
+**Eklenecek (6 SDK):**
+- [ ] Rust: `RateLimitError`, `UnauthorizedError`, `NotFoundError`, `ConflictError`, `TimeoutError` variant'ları + `createErrorFromStatus()` factory
+- [ ] Java: `BadRequestError`, `UnauthorizedError`, `ForbiddenError`, `NotFoundError`, `ConflictError`, `RateLimitError`, `InternalServerError`, `BadGatewayError`, `ServiceUnavailableError`, `GatewayTimeoutError` class'ları
+- [ ] Kotlin: Aynı class'lar (Kotlin idiomatic)
+- [ ] C#: Aynı class'lar (.NET exception hierarchy)
+- [ ] Elixir: Error tuple pattern (`{:error, %RateLimitError{}}`)
 - [ ] Swift: Error protocol implementasyonu
-- [ ] Elixir: Error tuple pattern
 
-**Tahmini Süre:** 6-8 saat (tüm diller)
-**Öncelik:** 🔴 Kritik — #4 öncelik
+**Referans:** Node.js `src/errors.ts` — tüm SDK'lar bu pattern'ı izlemeli
+
+**Tahmini Süre:** 4-6 saat (6 SDK)
+**Öncelik:** 🔴 Kritik — TEK KALAN KRİTİK EKSİK
 
 ---
 
 ## 🟡 Orta Eksikler (Orta Etki)
 
-### 5. Config Seçenekleri
+### 5. Config Seçenekleri ❌
 
 **Svix:** `Svix(token, SvixOptions{serverUrl, debug, timeout})`
-**HookSniff:** Sabit ayarlar, çoğu config edilemiyor.
+**HookSniff:** Bazı SDK'larda var (Node.js: `baseUrl`, `timeout`, `debug`, `fetch`), çoğu eksik.
 
 **Yapılacaklar:**
 - [ ] Tüm diller: `baseUrl` override (self-hosted HookSniff için)
@@ -185,124 +131,81 @@ pub enum Error {
 - [ ] Tüm diller: `debug` flag
 
 **Tahmini Süre:** 3-4 saat (tüm diller)
-**Öncelik:** 🟡 Orta — #5 öncelik
-
----
-
-### 6. CI/CD Otomatik Publish
-
-**Svix:** GitHub Actions ile tag push'ta otomatik publish.
-**HookSniff:** Manuel publish, unutulabiliyor.
-
-**Yapılacaklar:**
-- [ ] Rust: `.github/workflows/publish.yml` — tag → `cargo publish`
-- [ ] Node.js: `.github/workflows/publish.yml` — tag → `npm publish`
-- [ ] Python: `.github/workflows/publish.yml` — tag → `twine upload`
-- [ ] Go: GitHub release + tag
-- [ ] Java/Kotlin: `.github/workflows/publish.yml` — tag → Maven Central
-- [ ] Ruby: `.github/workflows/publish.yml` — tag → `gem push`
-- [ ] C#: `.github/workflows/publish.yml` — tag → `dotnet nuget push`
-- [ ] PHP: `.github/workflows/publish.yml` — tag → Packagist (auto-update)
-- [ ] Elixir: `.github/workflows/publish.yml` — tag → `mix hex.publish`
-- [ ] Swift: GitHub release + tag
-
-**Ortak Workflow Template:**
-```yaml
-name: Publish SDK
-on:
-  push:
-    tags: ['v*']
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      # Dil-spesifik publish adımları
-```
-
-**Tahmini Süre:** 3-4 saat (tüm diller)
-**Öncelik:** 🟡 Orta — #6 öncelik
-
----
-
-### 7. Debug Logging
-
-**Svix:** `debug: true` seçeneği ile tüm HTTP isteklerini loglar.
-**HookSniff:** Hiç logging yok.
-
-**Yapılacaklar:**
-- [ ] Rust: `tracing` feature flag ile debug logging
-- [ ] Node.js: `debug` option + `console.debug` output
-- [ ] Python: `logging` modülü ile debug logger
-- [ ] Go: `log/slog` ile debug logging
-- [ ] Java/Kotlin: SLF4J/Log4j desteği
-- [ ] Ruby: `Logger` modülü
-- [ ] C#: `ILogger` desteği
-- [ ] PHP: `error_log` veya PSR-3 logger
-- [ ] Swift: `os_log` desteği
-- [ ] Elixir: `Logger` modülü
-
-**Log Formatı:**
-```
-[HOOKSNIFF] GET /v1/webhooks → 200 (123ms)
-[HOOKSNIFF] POST /v1/webhooks → 201 (456ms) [idempotency: auto_xxx]
-[HOOKSNIFF] GET /v1/webhooks → 429 (retry in 2s)
-[HOOKSNIFF] GET /v1/webhooks → 200 (89ms) [retry #1]
-```
-
-**Tahmini Süre:** 4-6 saat (tüm diller)
 **Öncelik:** 🟡 Orta
 
 ---
 
-### 8. Typed Webhook Events
+### 6. CI/CD Otomatik Publish ❌
+
+**Svix:** GitHub Actions ile tag push'ta otomatik publish.
+**HookSniff:** Manuel publish (`publish-sdks.sh` script).
+
+**Yapılacaklar:**
+- [ ] Her SDK için `.github/workflows/publish.yml`
+- [ ] Tag push'ta otomatik publish (v*)
+- [ ] Ortak workflow template
+
+**Tahmini Süre:** 3-4 saat (tüm diller)
+**Öncelik:** 🟡 Orta
+
+---
+
+### 7. Debug Logging ❌
+
+**Svix:** `debug: true` ile tüm HTTP isteklerini loglar.
+**HookSniff:** Node.js'de var (`debug` option), diğerlerinde yok.
+
+| SDK | Debug Logging |
+|-----|---------------|
+| Node.js | ✅ `console.log` |
+| Python | ❌ |
+| Go | ❌ |
+| Rust | ❌ |
+| Ruby | ❌ |
+| Java | ❌ |
+| Kotlin | ❌ |
+| C# | ❌ |
+| PHP | ❌ |
+| Swift | ❌ |
+| Elixir | ❌ |
+
+**Tahmini Süre:** 4-6 saat (10 SDK)
+**Öncelik:** 🟡 Orta
+
+---
+
+### 8. Typed Webhook Events ❌
 
 **Svix:** Event type'ları compile-time'da biliniyor.
 **HookSniff:** Sadece `MessageOut` var, event type'ı string.
 
 **Yapılacaklar:**
-- [ ] Tüm diller: Webhook event type'ları için interface/struct/record oluştur
-- [ ] Event type'ları:
-  - `endpoint.created`
-  - `endpoint.updated`
-  - `endpoint.deleted`
-  - `endpoint.disabled`
-  - `endpoint.enabled`
-  - `message.attempt.exhausted`
-  - `message.attempt.failing`
-  - `message.attempt.recovered`
-  - `background_task.finished`
+- [ ] Tüm diller: Event type interface/struct/record
+- [ ] Event type'ları: `endpoint.created`, `endpoint.updated`, `endpoint.deleted`, `endpoint.disabled`, `endpoint.enabled`, `message.attempt.exhausted`, `message.attempt.failing`, `message.attempt.recovered`, `background_task.finished`
 
 **Tahmini Süre:** 4-6 saat (tüm diller)
 **Öncelik:** 🟡 Orta
 
 ---
 
-### 9. Test Coverage Artırma
+### 9. Test Coverage Artırma ❌
 
-**Svix:** %95+ coverage, her resource için mock test.
-**HookSniff:** ~%70 coverage, sadece temel testler.
+**Svix:** %95+ coverage.
+**HookSniff:** ~%70 coverage.
 
-**Yapılacaklar:**
-- [ ] Rust: Her API resource için wiremock test
-- [ ] Node.js: Jest ile tüm endpoint'lerin testi
-- [ ] Python: pytest ile tüm endpoint'lerin testi
-- [ ] Go: `testing` ile tüm endpoint'lerin testi
-- [ ] Java/Kotlin: JUnit + WireMock
-- [ ] Ruby: RSpec ile tüm endpoint'lerin testi
-- [ ] C#: xUnit + WireMock.Net
-- [ ] PHP: PHPUnit ile tüm endpoint'lerin testi
-- [ ] Swift: XCTest ile tüm endpoint'lerin testi
-- [ ] Elixir: ExUnit ile tüm endpoint'lerin testi
-
-**Test Senaryoları:**
-1. Her endpoint'in başarılı response'u
-2. Her error code'un doğru handle'ı (400, 401, 403, 404, 409, 429, 500)
-3. Rate limit retry
-4. Idempotency key
-5. Pagination (iterator)
-6. Webhook verification (geçerli, geçersiz, expired timestamp)
-7. Edge cases (boş body, büyük payload, Unicode)
+| SDK | Test Dosyası | Tahmini Coverage |
+|-----|-------------|-----------------|
+| Node.js | 211 test | ~%70 |
+| Python | 77 test | ~%65 |
+| Go | test dosyaları | ~%70 |
+| Rust | 6 dosya, 2700+ satır | ~%75 |
+| Ruby | 170+ spec | ~%75 |
+| Java | 209 test | ~%70 |
+| Kotlin | 179 test | ~%70 |
+| C# | 220 test | ~%70 |
+| PHP | test dosyaları | ~%65 |
+| Swift | 10 dosya | ~%65 |
+| Elixir | 21 test | ~%60 |
 
 **Tahmini Süre:** 12-16 saat (tüm diller)
 **Öncelik:** 🟡 Orta
@@ -311,142 +214,97 @@ jobs:
 
 ## 🟢 Düşük Eksikler (Düşük Etki)
 
-### 10. JSDoc / Docstring
+### 10. JSDoc / Docstring ❌
 
-**Svix:** Her method için JSDoc/docstring + example kod.
-**HookSniff:** Minimal documentation.
+**Tahmini Süre:** 8-12 saat
+**Öncelik:** 🟢 Düşük
 
-**Yapılacaklar:**
-- [ ] Her public method için:
-  - Açıklama (ne yapar)
-  - Parametreler (tip, zorunlu mu, default değer)
-  - Dönüş değeri
-  - Example kod
-  - Throws/Errors
+### 11. Streaming / SSE Desteği ❌
 
-**Tahmini Süre:** 8-12 saat (tüm diller)
+**Tahmini Süre:** 8-12 saat
+**Öncelik:** 🟢 Düşük
+
+### 12. Rate Limit Header Parsing ❌
+
+**Tahmini Süre:** 2-3 saat
+**Öncelik:** 🟢 Düşük
+
+### 13. Custom HTTP Client Desteği ❌
+
+**Tahmini Süre:** 4-6 saat
 **Öncelik:** 🟢 Düşük
 
 ---
 
-### 11. Streaming / SSE Desteği
+## 📋 Uygulama Sırası (Güncel)
 
-**Svix:** Server-Sent Events desteği.
-**HookSniff:** Yok.
+### Faz 1 — Kritik ✅ (TAMAMLANDI)
+1. ✅ Webhook imza doğrulama (11/11 SDK)
+2. ✅ Retry + exponential backoff (11/11 SDK)
+3. ✅ Pagination helper (11/11 SDK)
 
-**Yapılacaklar:**
-- [ ] Node.js: `EventSource` veya custom SSE client
-- [ ] Python: `httpx` streaming
-- [ ] Go: `bufio.Scanner` ile SSE
-- [ ] Rust: `tokio::io::AsyncBufRead` ile SSE
-- [ ] Diğer diller: HTTP streaming desteği
-
-**Tahmini Süre:** 8-12 saat (tüm diller)
-**Öncelik:** 🟢 Düşük
-
----
-
-### 12. Rate Limit Header Parsing
-
-**Svix:** `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` header'larını parse eder.
-**HookSniff:** Sadece 429'da retry.
-
-**Yapılacaklar:**
-- [ ] Tüm diller: Rate limit header'larını response'a ekle
-- [ ] `rateLimitRemaining`, `rateLimitReset` property'leri
-
-**Tahmini Süre:** 2-3 saat (tüm diller)
-**Öncelik:** 🟢 Düşük
-
----
-
-### 13. Custom HTTP Client Desteği
-
-**Svix:** Kullanıcı kendi HTTP client'ını verebilir.
-**HookSniff:** Sabit client.
-
-**Yapılacaklar:**
-- [ ] Rust: `tower::Service` trait ile custom backend
-- [ ] Node.js: Custom `fetch` function
-- [ ] Python: Custom `httpx.Client`
-- [ ] Go: `http.Client` injection
-- [ ] Java/Kotlin: `OkHttpClient` injection
-- [ ] Diğer diller: HTTP client injection
-
-**Tahmini Süre:** 4-6 saat (tüm diller)
-**Öncelik:** 🟢 Düşük
-
----
-
-## 📋 Uygulama Sırası
-
-### Faz 1 — Kritik (24-34 saat)
-1. Webhook imza doğrulama (tüm diller)
-2. Retry + exponential backoff (tüm diller)
-3. Pagination helper (tüm diller)
-4. Error class çeşitliliği (tüm diller)
+### Faz 1.5 — Kalan Kritik (4-6 saat)
+4. ❌ Error class çeşitliliği (6 SDK: Rust, Java, Kotlin, C#, Elixir, Swift)
 
 ### Faz 2 — Orta (20-28 saat)
-5. Config seçenekleri (tüm diller)
-6. CI/CD otomatik publish (tüm diller)
-7. Debug logging (tüm diller)
-8. Typed webhook events (tüm diller)
-9. Test coverage artırma (tüm diller)
+5. ❌ Config seçenekleri (tüm diller)
+6. ❌ CI/CD otomatik publish (tüm diller)
+7. ❌ Debug logging (10 SDK)
+8. ❌ Typed webhook events (tüm diller)
+9. ❌ Test coverage artırma (tüm diller)
 
 ### Faz 3 — Düşük (22-33 saat)
-10. JSDoc/docstring (tüm diller)
-11. Streaming/SSE desteği
-12. Rate limit header parsing
-13. Custom HTTP client desteği
+10. ❌ JSDoc/docstring
+11. ❌ Streaming/SSE desteği
+12. ❌ Rate limit header parsing
+13. ❌ Custom HTTP client desteği
 
-**Toplam:** ~50-65 saat → %90+
+**Kalan toplam:** ~25-35 saat → %90+
 
 ---
 
-## 📊 Dil Bazlı Durum
+## 📊 Dil Bazlı Durum (Güncel)
 
 | # | Eksik | Rust | Node | Python | Go | Java | Kotlin | Ruby | C# | PHP | Swift | Elixir |
 |---|-------|------|------|--------|-----|------|--------|------|-----|-----|-------|--------|
-| 1 | İmza doğrulama | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| 2 | Retry/Backoff | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 1 | İmza doğrulama | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 2 | Retry/Backoff | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | 3 | Pagination | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 4 | Error types | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
-| 5 | Config | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 4 | Error types | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ |
+| 5 | Config | 🔶 | ✅ | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
 | 6 | CI/CD | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| 7 | Debug logging | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 7 | Debug logging | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 8 | Typed events | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 9 | Test coverage | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
 | 10 | JSDoc | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 11 | Streaming | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 12 | Rate limit | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| 13 | Custom client | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 13 | Custom client | ❌ | ✅ | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
 
 **Legend:** ✅ Var | 🔶 Kısmen | ❌ Yok
 
 ---
 
-## 🎯 Başarı Kriterleri
+## 🎯 Başarı Kriterleri (Güncel)
 
-| Kriter | Mevcut | Hedef |
-|--------|--------|-------|
-| SDK kalite skoru | %62 | %90+ |
-| Test coverage | ~%70 | %95+ |
-| Error type sayısı | 3 | 10+ |
-| İmza doğrulama | Yok | 11 dilde |
-| Retry/Backoff | Yok | Otomatik |
-| Pagination | Manuel | Otomatik |
-| Config | Sabit | Override edilebilir |
-| Debug logging | Yok | Feature flag |
-| CI/CD | Manuel | Otomatik |
+| Kriter | Eski Tahmin | Gerçek | Hedef |
+|--------|-------------|--------|-------|
+| SDK kalite skoru | %62 | **%72** | %90+ |
+| Test coverage | ~%70 | ~%70 | %95+ |
+| Error type sayısı | 3 | **5 SDK'da 12, 6 SDK'da 1-3** | 10+ (tümü) |
+| İmza doğrulama | Yok | **✅ 11/11** | 11 dilde |
+| Retry/Backoff | Yok | **✅ 11/11** | Otomatik |
+| Pagination | Manuel | **✅ 11/11** | Otomatik |
+| Config | Sabit | 🔶 Kısmen | Override edilebilir |
+| Debug logging | Yok | 🔶 Node.js'de var | Feature flag |
+| CI/CD | Manuel | ❌ Manuel | Otomatik |
 
 ---
 
 ## ⚠️ Notlar
 
-- Her SDK kendi repo'sunda, ortak CI/CD template kullanılacak
-- **İmza doğrulama en kritik eksik** — webhook SDK'sının temel güvenlik özelliği
-- Retry/backoff ikinci en kritik — güvenilir teslimat için şart
-- Pagination üçüncü — kullanıcı deneyimini doğrudan etkiliyor
-- Svix 93 iterasyon yapmış, biz 2 — acele etmeye gerek yok, kaliteli yapalım
-- Her faz tamamlandığında `.ai-context/sdk-roadmap/STATUS.md` güncellenecek
-- **Faz 1 bitmeden publish etme** — imza doğrulama olmadan SDK kullanılmaz
+- **2026-05-19 doğrulama:** SDK-QUALITY-GAPS.md güncelliğini yitirmiş — Faz 1 (imza, retry, pagination) zaten tamamlanmış
+- **Tek kalan kritik eksik:** Error class'ları (6 SDK)
+- Her SDK kendi repo'sunda (`hooksniff-{dil}`)
+- Svix 93 iterasyon yapmış, biz ~10 — acele etmeye gerek yok, kaliteli yapalım
+- **Error class'ları bitmeden yeni SDK versiyonu publish etme**
