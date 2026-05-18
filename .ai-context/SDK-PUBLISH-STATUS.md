@@ -11,7 +11,7 @@ Tüm 11 SDK'nın **kodları** ayrı repolara push edildi (v1.1.0).
 
 | SDK | Registry | Versiyon | URL |
 |-----|----------|----------|-----|
-| Node.js | npm | 1.1.0 | https://www.npmjs.com/package/hooksniff |
+| Node.js | npm | 1.2.0 | https://www.npmjs.com/package/hooksniff |
 | Python | PyPI | 1.1.0 | https://pypi.org/project/hooksniff/1.1.0/ |
 | Rust | crates.io | 1.1.0 | https://crates.io/crates/hooksniff |
 | Go | GitHub tag | v1.1.0 | github.com/servetarslan02/hooksniff-go/releases |
