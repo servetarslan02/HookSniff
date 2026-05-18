@@ -1,6 +1,7 @@
 # SDK Kalite Boşlukları — Svix Karşılaştırması
 
 > Oluşturma: 2026-05-19 00:22 GMT+8
+> Güncelleme: 2026-05-19 00:40 GMT+8 — Öncelikler yeniden düzenlendi
 > Durum: Belgeleme — uygulama bekliyor
 > Amaç: HookSniff SDK'larını Svix seviyesine çıkarmak için gereken tüm eksikler
 
@@ -13,13 +14,74 @@ Svix:      ████████████████████ 100%
 HookSniff: ████████████░░░░░░░░  62%
 ```
 
-**Hedef: %90+ (30-40 saat)**
+**Hedef: %90+ (50-65 saat)**
 
 ---
 
 ## 🔴 Kritik Eksikler (Yüksek Etki)
 
-### 1. Pagination Helper
+### 1. Webhook İmza Doğrulama ← EN KRİTİK
+
+Bir webhook SDK'sının **birinci görevi**: gelen webhook'ların gerçekten HookSniff'ten geldiğini doğrulamak. Bu yoksa güvenlik açığı var demektir.
+
+**Svix Örneği (Python):**
+```python
+from svix.webhooks import Webhook
+wh = Webhook("whsec_xxx")
+payload = wh.verify(request.body, request.headers)
+# Doğrulanmış payload döner, geçersizse exception fırlatır
+```
+
+**Svix Örneği (Node.js):**
+```typescript
+const wh = new Webhook("whsec_xxx");
+const payload = wh.verify(request.body, request.headers);
+```
+
+**Yapılacaklar:**
+- [ ] Rust: `WebhookVerifier` struct, `verify(payload, headers, secret)` methodu
+- [ ] Node.js: `Webhook.verify(payload, headers)` static method
+- [ ] Python: `Webhook.verify(payload, headers)` class method
+- [ ] Go: `webhook.Verify(payload, headers, secret)` fonksiyonu
+- [ ] Java/Kotlin: `WebhookVerifier.verify(payload, headers, secret)`
+- [ ] Ruby: `Webhook.verify(payload, headers, secret)`
+- [ ] C#: `WebhookVerifier.Verify(payload, headers, secret)`
+- [ ] PHP: `Webhook::verify($payload, $headers, $secret)`
+- [ ] Swift: `WebhookVerifier.verify(payload:headers:secret:)`
+- [ ] Elixir: `Webhook.verify(payload, headers, secret)`
+
+**Her dilde desteklenecek imza algoritmaları:**
+- HMAC-SHA256 (v1)
+- HMAC-SHA512 (v2, opsiyonel)
+- Timestamp kontrolü (replay attack önleme)
+
+**Tahmini Süre:** 6-8 saat (tüm diller)
+**Öncelik:** 🔴 Kritik — #1 öncelik
+
+---
+
+### 2. Retry + Exponential Backoff
+
+Webhook teslimatı güvenilir olmalı. 429, 500, 502, 503, timeout durumlarında otomatik retry yapılmalı.
+
+**Svix Davranışı:**
+- 429 → `Retry-After` header'ına göre bekle
+- 500/502/503 → Exponential backoff (1s, 2s, 4s, 8s...)
+- Timeout → Retry
+- Max 3 deneme (varsayılan)
+
+**Yapılacaklar:**
+- [ ] Tüm diller: `maxRetries` config seçeneği (varsayılan: 3)
+- [ ] Tüm diller: Exponential backoff + jitter
+- [ ] Tüm diller: 429'da `Retry-After` header'ını oku
+- [ ] Tüm diller: Retry edilen istekleri log (debug modunda)
+
+**Tahmini Süre:** 4-6 saat (tüm diller)
+**Öncelik:** 🔴 Kritik — #2 öncelik
+
+---
+
+### 3. Pagination Helper
 
 **Svix:** Otomatik iterator yönetimi, `list()` methodu otomatik sayfalama döndürüyor.
 **HookSniff:** Kullanıcı elle `iterator` parametresini yönetmek zorunda.
@@ -60,11 +122,11 @@ do {
 - [ ] Elixir: Stream/Flow pattern
 
 **Tahmini Süre:** 8-12 saat (tüm diller)
-**Öncelik:** 🔴 Kritik
+**Öncelik:** 🔴 Kritik — #3 öncelik
 
 ---
 
-### 2. Error Class Çeşitliliği
+### 4. Error Class Çeşitliliği
 
 **Svix:** 20+ spesifik error type:
 ```
@@ -105,11 +167,29 @@ pub enum Error {
 - [ ] Elixir: Error tuple pattern
 
 **Tahmini Süre:** 6-8 saat (tüm diller)
-**Öncelik:** 🔴 Kritik
+**Öncelik:** 🔴 Kritik — #4 öncelik
 
 ---
 
-### 3. CI/CD Otomatik Publish
+## 🟡 Orta Eksikler (Orta Etki)
+
+### 5. Config Seçenekleri
+
+**Svix:** `Svix(token, SvixOptions{serverUrl, debug, timeout})`
+**HookSniff:** Sabit ayarlar, çoğu config edilemiyor.
+
+**Yapılacaklar:**
+- [ ] Tüm diller: `baseUrl` override (self-hosted HookSniff için)
+- [ ] Tüm diller: `timeout` ayarı (ms)
+- [ ] Tüm diller: Custom header ekleme
+- [ ] Tüm diller: `debug` flag
+
+**Tahmini Süre:** 3-4 saat (tüm diller)
+**Öncelik:** 🟡 Orta — #5 öncelik
+
+---
+
+### 6. CI/CD Otomatik Publish
 
 **Svix:** GitHub Actions ile tag push'ta otomatik publish.
 **HookSniff:** Manuel publish, unutulabiliyor.
@@ -141,13 +221,11 @@ jobs:
 ```
 
 **Tahmini Süre:** 3-4 saat (tüm diller)
-**Öncelik:** 🔴 Kritik
+**Öncelik:** 🟡 Orta — #6 öncelik
 
 ---
 
-## 🟡 Orta Eksikler (Orta Etki)
-
-### 4. Debug Logging
+### 7. Debug Logging
 
 **Svix:** `debug: true` seçeneği ile tüm HTTP isteklerini loglar.
 **HookSniff:** Hiç logging yok.
@@ -177,7 +255,7 @@ jobs:
 
 ---
 
-### 5. Typed Webhook Events
+### 8. Typed Webhook Events
 
 **Svix:** Event type'ları compile-time'da biliniyor.
 **HookSniff:** Sadece `MessageOut` var, event type'ı string.
@@ -200,7 +278,7 @@ jobs:
 
 ---
 
-### 6. Test Coverage Artırma
+### 9. Test Coverage Artırma
 
 **Svix:** %95+ coverage, her resource için mock test.
 **HookSniff:** ~%70 coverage, sadece temel testler.
@@ -233,7 +311,7 @@ jobs:
 
 ## 🟢 Düşük Eksikler (Düşük Etki)
 
-### 7. JSDoc / Docstring
+### 10. JSDoc / Docstring
 
 **Svix:** Her method için JSDoc/docstring + example kod.
 **HookSniff:** Minimal documentation.
@@ -251,7 +329,7 @@ jobs:
 
 ---
 
-### 8. Streaming / SSE Desteği
+### 11. Streaming / SSE Desteği
 
 **Svix:** Server-Sent Events desteği.
 **HookSniff:** Yok.
@@ -268,7 +346,7 @@ jobs:
 
 ---
 
-### 9. Rate Limit Header Parsing
+### 12. Rate Limit Header Parsing
 
 **Svix:** `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` header'larını parse eder.
 **HookSniff:** Sadece 429'da retry.
@@ -282,7 +360,7 @@ jobs:
 
 ---
 
-### 10. Custom HTTP Client Desteği
+### 13. Custom HTTP Client Desteği
 
 **Svix:** Kullanıcı kendi HTTP client'ını verebilir.
 **HookSniff:** Sabit client.
@@ -302,40 +380,46 @@ jobs:
 
 ## 📋 Uygulama Sırası
 
-### Faz 1 — Kritik (17-24 saat)
-1. Pagination helper (tüm diller)
-2. Error class çeşitliliği (tüm diller)
-3. CI/CD otomatik publish (tüm diller)
+### Faz 1 — Kritik (24-34 saat)
+1. Webhook imza doğrulama (tüm diller)
+2. Retry + exponential backoff (tüm diller)
+3. Pagination helper (tüm diller)
+4. Error class çeşitliliği (tüm diller)
 
 ### Faz 2 — Orta (20-28 saat)
-4. Debug logging (tüm diller)
-5. Typed webhook events (tüm diller)
-6. Test coverage artırma (tüm diller)
+5. Config seçenekleri (tüm diller)
+6. CI/CD otomatik publish (tüm diller)
+7. Debug logging (tüm diller)
+8. Typed webhook events (tüm diller)
+9. Test coverage artırma (tüm diller)
 
 ### Faz 3 — Düşük (22-33 saat)
-7. JSDoc/docstring (tüm diller)
-8. Streaming/SSE desteği
-9. Rate limit header parsing
-10. Custom HTTP client desteği
+10. JSDoc/docstring (tüm diller)
+11. Streaming/SSE desteği
+12. Rate limit header parsing
+13. Custom HTTP client desteği
 
-**Toplam:** ~60-85 saat → %90+
+**Toplam:** ~50-65 saat → %90+
 
 ---
 
 ## 📊 Dil Bazlı Durum
 
-| Eksik | Rust | Node | Python | Go | Java | Kotlin | Ruby | C# | PHP | Swift | Elixir |
-|-------|------|------|--------|-----|------|--------|------|-----|-----|-------|--------|
-| Pagination | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Error types | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
-| CI/CD | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Debug logging | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Typed events | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Test coverage | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
-| JSDoc | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Streaming | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Rate limit | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Custom client | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| # | Eksik | Rust | Node | Python | Go | Java | Kotlin | Ruby | C# | PHP | Swift | Elixir |
+|---|-------|------|------|--------|-----|------|--------|------|-----|-----|-------|--------|
+| 1 | İmza doğrulama | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 2 | Retry/Backoff | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 3 | Pagination | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 4 | Error types | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
+| 5 | Config | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 6 | CI/CD | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 7 | Debug logging | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 8 | Typed events | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 9 | Test coverage | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
+| 10 | JSDoc | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 11 | Streaming | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 12 | Rate limit | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 13 | Custom client | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 **Legend:** ✅ Var | 🔶 Kısmen | ❌ Yok
 
@@ -348,17 +432,21 @@ jobs:
 | SDK kalite skoru | %62 | %90+ |
 | Test coverage | ~%70 | %95+ |
 | Error type sayısı | 3 | 10+ |
+| İmza doğrulama | Yok | 11 dilde |
+| Retry/Backoff | Yok | Otomatik |
 | Pagination | Manuel | Otomatik |
+| Config | Sabit | Override edilebilir |
 | Debug logging | Yok | Feature flag |
 | CI/CD | Manuel | Otomatik |
-| Dokümantasyon | README | Interaktif site |
 
 ---
 
 ## ⚠️ Notlar
 
 - Her SDK kendi repo'sunda, ortak CI/CD template kullanılacak
-- Pagination helper en kritik eksik — kullanıcı deneyimini doğrudan etkiliyor
-- Error çeşitliliği ikinci en kritik — retry logic'i etkiliyor
+- **İmza doğrulama en kritik eksik** — webhook SDK'sının temel güvenlik özelliği
+- Retry/backoff ikinci en kritik — güvenilir teslimat için şart
+- Pagination üçüncü — kullanıcı deneyimini doğrudan etkiliyor
 - Svix 93 iterasyon yapmış, biz 2 — acele etmeye gerek yok, kaliteli yapalım
 - Her faz tamamlandığında `.ai-context/sdk-roadmap/STATUS.md` güncellenecek
+- **Faz 1 bitmeden publish etme** — imza doğrulama olmadan SDK kullanılmaz
