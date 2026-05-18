@@ -156,7 +156,7 @@ fn verify_stripe(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &
     let payload = format!("{}.{}", timestamp, String::from_utf8_lossy(body));
     let expected = compute_hmac_hex(secret.as_bytes(), payload.as_bytes());
 
-    if expected == signature {
+    if constant_time_eq(&expected, signature) {
         Ok(())
     } else {
         Err("Stripe signature mismatch")
@@ -176,7 +176,7 @@ fn verify_github(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &
     let signature = sig_header.strip_prefix("sha256=").ok_or("Invalid format")?;
     let expected = compute_hmac_hex(secret.as_bytes(), body);
 
-    if expected == signature {
+    if constant_time_eq(&expected, signature) {
         Ok(())
     } else {
         Err("GitHub signature mismatch")
@@ -197,7 +197,7 @@ fn verify_shopify(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), 
     let expected_bytes = compute_hmac_raw(secret.as_bytes(), body);
     let expected = BASE64.encode(&expected_bytes);
 
-    if expected == sig_header {
+    if constant_time_eq(&expected, sig_header) {
         Ok(())
     } else {
         Err("Shopify signature mismatch")
@@ -224,7 +224,7 @@ fn verify_generic(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), 
 
     let expected = compute_hmac_hex(secret.as_bytes(), body);
 
-    if expected == signature {
+    if constant_time_eq(&expected, signature) {
         Ok(())
     } else {
         Err("Signature mismatch")
@@ -243,6 +243,18 @@ fn compute_hmac_raw(key: &[u8], data: &[u8]) -> Vec<u8> {
 
 fn compute_hmac_hex(key: &[u8], data: &[u8]) -> String {
     hex::encode(compute_hmac_raw(key, data))
+}
+
+/// Constant-time hex string comparison to prevent timing attacks.
+fn constant_time_eq(a: &str, b: &str) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    let mut diff = 0u8;
+    for (x, y) in a.bytes().zip(b.bytes()) {
+        diff |= x ^ y;
+    }
+    diff == 0
 }
 
 // ── Config CRUD ──
