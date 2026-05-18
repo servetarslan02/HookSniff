@@ -60,10 +60,10 @@ Oturum 6: Error types → Tüm SDK'lar
 ```
 
 ## 🔑 Hesap Bilgileri
-- Admin: servetarslan02@gmail.com / Alayci_165
+- Admin: servetarslan02@gmail.com (şifre: .sdk-tokens.env)
 - Dashboard: https://hooksniff.vercel.app
 - API: https://hooksniff-api-1046140057667.europe-west1.run.app
-- Demo: demo@hooksniff.com / Demo1234!
+- Demo: demo@hooksniff.com (şifre: .sdk-tokens.env)
 
 ## 📊 Genel Durum
 - **11/11 SDK** registry'de yüklü ✅
