@@ -11,7 +11,7 @@ function formatDate(s: string | null) {
   return new Date(s).toLocaleString();
 }
 
-function OperationalWebhooksList() {
+export default function OperationalWebhooksList() {
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
