@@ -11,10 +11,10 @@
 
 ```
 Svix:      ████████████████████ 100%
-HookSniff: ██████████████░░░░░░  72%
+HookSniff: ████████████████░░░░  80%
 ```
 
-**Hedef: %90+ (25-35 saat kaldı)**
+**Hedef: %90+ (15-25 saat kaldı)**
 
 ---
 
@@ -96,12 +96,12 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 | Go | 12 type (aynı hierarchy) | ✅ TAMAM |
 | Ruby | 12 type (aynı hierarchy) | ✅ TAMAM |
 | PHP | 12 type (aynı hierarchy) | ✅ TAMAM |
-| Rust | 3 type (Generic, Http, Validation) | ❌ EKSİK |
-| Java | 3 type (ApiException, WebhookSigningException, WebhookVerificationException) | ❌ EKSİK |
-| Kotlin | 3 type (ApiException, WebhookSigningException, WebhookVerificationException) | ❌ EKSİK |
-| C# | 1 type (WebhookVerificationException) | ❌ EKSİK |
-| Elixir | 1 type (VerificationError) | ❌ EKSİK |
-| Swift | 1 type (VerificationError) | ❌ EKSİK |
+| Rust | 12 type (base Error + status check methods + factory) | ✅ TAMAM |
+| Java | 12 type (HookSniffApiException hierarchy + factory) | ✅ TAMAM |
+| Kotlin | 12 type (HookSniffApiException hierarchy + factory) | ✅ TAMAM |
+| C# | 12 type (HookSniffApiException hierarchy + factory) | ✅ TAMAM |
+| Elixir | 12 type (exception modules + ErrorFactory) | ✅ TAMAM |
+| Swift | 12 type (Error structs + HookSniffErrorFactory) | ✅ TAMAM |
 
 **Eklenecek (6 SDK):**
 - [ ] Rust: `RateLimitError`, `UnauthorizedError`, `NotFoundError`, `ConflictError`, `TimeoutError` variant'ları + `createErrorFromStatus()` factory
@@ -244,8 +244,8 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 2. ✅ Retry + exponential backoff (11/11 SDK)
 3. ✅ Pagination helper (11/11 SDK)
 
-### Faz 1.5 — Kalan Kritik (4-6 saat)
-4. ❌ Error class çeşitliliği (6 SDK: Rust, Java, Kotlin, C#, Elixir, Swift)
+### Faz 1.5 — Error Classes ✅ (TAMAMLANDI)
+4. ✅ Error class çeşitliliği (11/11 SDK — 12 type her biri)
 
 ### Faz 2 — Orta (20-28 saat)
 5. ❌ Config seçenekleri (tüm diller)
@@ -271,7 +271,7 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 | 1 | İmza doğrulama | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | 2 | Retry/Backoff | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | 3 | Pagination | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 4 | Error types | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ |
+| 4 | Error types | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | 5 | Config | 🔶 | ✅ | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
 | 6 | CI/CD | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 7 | Debug logging | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -292,7 +292,7 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 |--------|-------------|--------|-------|
 | SDK kalite skoru | %62 | **%72** | %90+ |
 | Test coverage | ~%70 | ~%70 | %95+ |
-| Error type sayısı | 3 | **5 SDK'da 12, 6 SDK'da 1-3** | 10+ (tümü) |
+| Error type sayısı | **12 (11/11 SDK)** | 10+ (tümü) |
 | İmza doğrulama | Yok | **✅ 11/11** | 11 dilde |
 | Retry/Backoff | Yok | **✅ 11/11** | Otomatik |
 | Pagination | Manuel | **✅ 11/11** | Otomatik |
