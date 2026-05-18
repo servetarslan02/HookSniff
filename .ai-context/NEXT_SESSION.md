@@ -1,72 +1,40 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 05:35 GMT+8
+> Son güncelleme: 2026-05-19 07:17 GMT+8
 
-## ✅ Tamamlanan: i18n Türkçe Çeviri — Dashboard + Docs Sayfaları
+## ✅ Tamamlanan (Bu Oturum)
 
-### Dashboard Sayfaları (5 tane)
-- `background-tasks/page.tsx` ✅
-- `connectors/page.tsx` ✅
-- `environments/page.tsx` ✅
-- `message-poller/page.tsx` ✅
-- `streaming/page.tsx` ✅
+- API entegrasyon testleri (15+ endpoint)
+- `pgcrypto` extension eklendi (webhook oluşturma düzeldi)
+- `custom_headers` sütunu eklendi (worker processing düzeldi)
+- OpenAPI SDK sync workflow oluşturuldu
+- `SDK_PUSH_TOKEN` secret eklendi
+- `sdks/` klasörü ana repodan kaldırıldı
 
-### Docs Sayfaları (8 tane)
-- `what-is-hooksniff/page.tsx` ✅ (79 anahtar)
-- `security/page.tsx` ✅ (32 anahtar)
-- `troubleshooting/page.tsx` ✅ (52 anahtar)
-- `best-practices/page.tsx` ✅ (43 anahtar)
-- `concepts/page.tsx` ✅ (61 anahtar)
-- `error-codes/page.tsx` ✅ (45 anahtar)
-- `configuration/page.tsx` ✅ (29 anahtar)
+## 📋 Sıradaki
 
-### Toplam İstatistik
-- **500+ yeni çeviri anahtarı** eklendi
-- **13 sayfa** tamamen i18n'e taşındı
-- **10+ commit** push edildi
+### 1. GitHub Actions Billing (Otomatik)
+- Billing yenilendiğinde `openapi-sdk-sync.yml` otomatik çalışacak
+- `docs/openapi.yaml` değiştiğinde 11 SDK ayrı repolara push edilecek
 
----
+### 2. Onboarding / Quickstart Düzenleme
+- Dashboard'da `Onboarding.tsx` component'i var
+- `/docs/quickstart` sayfası mevcut
+- İlk giriş deneyimini iyileştir
 
-## 🎯 Sıradaki: Kalan Docs Sayfaları (10 tane)
+### 3. Token Ayarları
+- `.sdk-tokens.env` dosyasını oluştur
+- Demo şifresi: `Demo1234!`
 
-1. `retries/page.tsx` (160 lines)
-2. `build-stripe-like/page.tsx` (146 lines)
-3. `rate-limiting/page.tsx` (145 lines)
-4. `error-handling/page.tsx` (143 lines)
-5. `dlq/page.tsx` (142 lines)
-6. `event-types/page.tsx` (140 lines)
-7. `embed-portal/page.tsx` (123 lines)
-8. `webhook-vs-polling/page.tsx` (127 lines)
-9. `debug-failed-webhooks/page.tsx` (96 lines)
-10. `event-processing/page.tsx` (88 lines)
-11. `multi-tenant/page.tsx` (63 lines)
+### 4. Cloud Build ile Deploy
+- Worker değişiklikleri (custom_headers) deploy edilmeli
+- `pgcrypto` extension Neon DB'de aktif (deploy gerektirmez)
 
-### Tahmini Süre: 1-2 oturum
+## 🔧 Bilinen Sorunlar
 
----
-
-## ✅ Tamamlanan: Docs Sayfaları i18n (Bu Oturum — 2026-05-19 06:00)
-
-### Tüm 11 Docs Sayfası i18n'e Taşındı ✅
-- `retries/page.tsx` ✅ (2 eksik anahtar tamamlandı: `default`, `description`)
-- `build-stripe-like/page.tsx` ✅ (tamamen hardcoded'dan getTranslations'a geçirildi, 38 anahtar)
-- `rate-limiting/page.tsx` ✅
-- `error-handling/page.tsx` ✅
-- `dlq/page.tsx` ✅
-- `event-types/page.tsx` ✅
-- `embed-portal/page.tsx` ✅
-- `webhook-vs-polling/page.tsx` ✅
-- `debug-failed-webhooks/page.tsx` ✅
-- `event-processing/page.tsx` ✅
-- `multi-tenant/page.tsx` ✅
-
-### Toplam
-- **Docs sayfaları:** %100 çevrildi (18/18)
-- **Dashboard sayfaları:** %95+ çevrildi
-
----
-
-## 📊 Genel Durum
-- Dashboard sayfaları: %95+ çevrildi
-- Docs sayfaları: %100 çevrildi ✅
-- SDK kalite skoru: %100
+| Sorun | Durum | Not |
+|-------|-------|-----|
+| `/v1/event-type` 404 | ⚠️ | Route tanımlı değil, doğru path: `/v1/events` |
+| `/v1/analytics/overview` 404 | ⚠️ | Doğru path: `/v1/analytics/deliveries` |
+| Webhook delivery "pending" kalıyor | ✅ Düzeldi | `custom_headers` sütunu eklendi |
+| `pgcrypto` yok | ✅ Düzeldi | Neon DB'ye extension eklendi |
