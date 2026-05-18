@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -73,7 +72,6 @@ const sections = [
 ];
 
 export default function DocsPage() {
-  const t = useTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Documentation</h1>

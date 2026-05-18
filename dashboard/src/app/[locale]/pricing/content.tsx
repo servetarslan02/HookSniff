@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import Footer from '@/components/Footer';
 import PublicNavbar from '@/components/PublicNavbar';
@@ -86,10 +86,8 @@ export function PricingPageContent() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const router = useRouter();
   const { token } = useAuth();
-  const locale = useLocale();
   const t = useTranslations('pricing');
   const tf = useTranslations('pricingFaq');
-  const isTr = locale === 'tr';
 
   const monthlyPrices = { developer: 0, startup: 24, pro: 49, enterprise: 149 };
   const annualPrices = {
@@ -208,21 +206,23 @@ export function PricingPageContent() {
           <div className="inline-flex items-center gap-3 p-1 bg-gray-100 dark:bg-slate-800 rounded-full">
             <button
               onClick={() => setBillingPeriod('monthly')}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
-                billingPeriod === 'monthly'
+              className={
+                'px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ' +
+                (billingPeriod === 'monthly'
                   ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
-                  : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
+                  : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white')
+              }
             >
               {t('monthly')}
             </button>
             <button
               onClick={() => setBillingPeriod('annual')}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer flex items-center gap-2 ${
-                billingPeriod === 'annual'
+              className={
+                'px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer flex items-center gap-2 ' +
+                (billingPeriod === 'annual'
                   ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
-                  : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
+                  : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white')
+              }
             >
               {t('annual')}
               <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-full">
@@ -237,11 +237,12 @@ export function PricingPageContent() {
           {planData.map((plan) => (
             <div
               key={plan.key}
-              className={`relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col overflow-hidden ${
-                plan.popular
+              className={
+                'relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col overflow-hidden ' +
+                (plan.popular
                   ? 'bg-white dark:bg-slate-800 border-2 border-brand-500 dark:border-brand-400 shadow-xl dark:shadow-brand-500/20 ring-1 ring-brand-400/30 dark:ring-brand-500/30'
-                  : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg'
-              }`}
+                  : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-lg')
+              }
             >
               {/* Popular badge */}
               {plan.popular && (
@@ -288,14 +289,16 @@ export function PricingPageContent() {
                       router.push('/register');
                     }
                   }}
-                  className={`block w-full text-center py-3.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
-                    plan.ctaStyle === 'filled'
+                  className={
+                    'block w-full text-center py-3.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ' +
+                    (plan.ctaStyle === 'filled'
                       ? 'bg-gradient-to-r from-brand-600 to-purple-600 text-white hover:from-brand-700 hover:to-purple-700 shadow-lg shadow-brand-500/25 hover:shadow-xl hover:shadow-brand-500/30'
-                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-xs'
-                }`}
-              >
+                      : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-xs')
+                  }
+                >
                 {t('getStarted')}
               </button>
+            </div>
             </div>
           ))}
         </div>
@@ -389,9 +392,10 @@ export function PricingPageContent() {
             ].map((s) => (
               <div
                 key={s.plan}
-                className={`bg-white dark:bg-slate-800 rounded-xl border p-6 flex flex-col ${
-                  s.highlight ? 'border-brand-400 dark:border-brand-500 ring-1 ring-brand-400 dark:ring-brand-500' : 'border-gray-200 dark:border-slate-700'
-                }`}
+                className={
+                  'bg-white dark:bg-slate-800 rounded-xl border p-6 flex flex-col ' +
+                  (s.highlight ? 'border-brand-400 dark:border-brand-500 ring-1 ring-brand-400 dark:ring-brand-500' : 'border-gray-200 dark:border-slate-700')
+                }
               >
                 <p className="text-xs font-medium text-gray-500 dark:text-slate-500 uppercase tracking-wider">{s.plan}</p>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-1">{s.level}</h3>
