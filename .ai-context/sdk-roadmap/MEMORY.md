@@ -72,15 +72,15 @@ ciozq2VZY9iBIKxYlBMJuUg8p8Cg7Z1KeqE
 | 10 | Elixir | Hex.pm | 1.1.1 | ✅ |
 | 11 | Swift | GitHub tag | v1.1.0 | ✅ |
 
-## 📊 SDK Kalite İlerlemesi (2026-05-19 01:52 — Doğrulandı)
+## 📊 SDK Kalite İlerlemesi (2026-05-19 02:24 — GÜNCEL)
 
 | Feature | Durum | Not |
 |---------|-------|-----|
 | İmza Doğrulama | ✅ 11/11 | HMAC-SHA256, 5 dk tolerance, unbranded destek |
-| Retry/Backoff | ✅ 11/11 | 429 Retry-After + exponential backoff |
+| Retry/Backoff | ✅ 11/11 | 429 Retry-After + 5xx backoff + timeout, 1s/2s/4s, 3 retry |
 | Pagination Helper | ✅ 11/11 | Tüm SDK'lara eklendi |
-| Error Types | ❌ 6/11 eksik | Rust, Java, Kotlin, C#, Elixir, Swift |
-| Config Options | 🔶 Kısmen | Node.js tamam, diğerlerinde eksik |
+| Error Types | ✅ 11/11 | 21 type (12 HTTP + 3 non-HTTP + base + validation) |
+| Config Options | 🔶 1/11 | Sadece Node.js'de tam |
 | Debug Logging | 🔶 1/11 | Sadece Node.js'de var |
 | CI/CD | ❌ 0/11 | Manuel publish |
 | Typed Events | ❌ 0/11 | Sıradaki |
