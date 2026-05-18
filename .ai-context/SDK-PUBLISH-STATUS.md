@@ -44,11 +44,9 @@ cd hooksniff-kotlin
 ```
 
 ### C# → NuGet
-```bash
-cd hooksniff-csharp
-dotnet pack -c Release
-dotnet nuget push "HookSniff/bin/Release/*.nupkg" --api-key <KEY> --source https://api.nuget.org/v3/index.json
-```
+- ✅ v1.2.0 yüklendi (2026-05-18)
+- 30+ resource, Faz 8-15 dahil
+- https://www.nuget.org/packages/HookSniff/1.2.0
 
 ### Elixir → Hex.pm
 ```bash
