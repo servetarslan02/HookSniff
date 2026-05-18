@@ -31,5 +31,14 @@
 - `HookSniffTest.java` — tamamen yeniden yazıldı
 - `build.gradle` — JUnit fix, wiremock kaldırıldı
 
+## Sonatype Publish
+- Central Portal upload başarılı: Deployment ID `cd03e7b5-dc17-44a2-9601-210afae246b6` (AUTOMATIC)
+- Upload credential'ları: f0wXBf / EYLV763IsQVseaffdOXNScf2HZlcLDGEK
+- Publish script eklendi: `publish.sh`
+- GPG key pair oluşturuldu (server'da, no passphrase)
+- deploy.gradle güncellendi (env-based credentials)
+
 ## Commit
 - `f3a3eb4` — `fix(java-sdk): critical bugs and missing features`
+- `a734246` — `fix: test compilation error - HookSniffOptions is final`
+- `d29d0df` — `chore: add publish script and env-based credentials`
