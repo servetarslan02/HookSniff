@@ -98,11 +98,17 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       ],
     },
     {
+      key: 'billing',
+      label: t('sectionBilling'),
+      items: [
+        { name: t('billingSection'), href: '/billing-section', icon: '💳' },
+      ],
+    },
+    {
       key: 'account',
       label: t('sectionAccount'),
       items: [
         { name: t('account'), href: '/account', icon: '👤' },
-        { name: t('billingSection'), href: '/billing-section', icon: '💳' },
       ],
     },
   ];
