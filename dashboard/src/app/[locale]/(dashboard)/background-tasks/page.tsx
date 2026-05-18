@@ -21,7 +21,6 @@ function formatDate(s: string | null) {
 
 export default function BackgroundTasksPage() {
   const t = useTranslations('backgroundTasks');
-  const tc = useTranslations('common');
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
