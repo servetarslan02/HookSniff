@@ -9,7 +9,7 @@
 
 ```
 Svix:      ████████████████████ 100%
-HookSniff: ████████████████████░  96%
+HookSniff: ████████████████████░  97%
 ```
 
 ---
@@ -122,9 +122,18 @@ Her SDK'da `debug=true` ile:
 
 ## ❌ KALAN EKSİKLER
 
-### 12. Test Coverage Artırma ❌
-- ~%70 → %95+
-- Tahmini: 12-16 saat | 🟡 Orta
+### 12. Test Coverage Artırma ✅ (11/11 — 2026-05-19)
+- Typed webhook event testleri tüm SDK'lara eklendi
+- Node.js: 4 test (typed events + backward compat)
+- Python: 14 test (8 event type + backward compat + edge cases)
+- Go: 10 test (typed parsing + all events + version header)
+- Rust: 7 test (typed parsing + backwards compat)
+- Ruby: 8 test (typed events + backward compat + snake_case)
+- Kotlin: 7 test (typed events + backward compat)
+- PHP: 7 test (typed events + backward compat + empty data)
+- C#: 4 test (typed parsing + backward compat)
+- Elixir: 8 test (typed events + backward compat + snake_case)
+- Swift: 7 test (typed events + backward compat + all types)
 
 ### 13. CI/CD Otomatik Publish ❌
 - Tag push'ta otomatik publish
@@ -141,11 +150,9 @@ Her SDK'da `debug=true` ile:
 ## 📋 Uygulama Sırası
 
 ```
-✅ #1-11 tamamlandı
+✅ #1-12 tamamlandı
         ↓
-Test Coverage (#12)     ← sıradaki
-        ↓
-CI/CD (#13)             ← test → publish pipeline
+CI/CD (#13)             ← sıradaki
 ```
 
 **Kalan toplam:** ~16-24 saat → %100
