@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import dynamic from 'next/dynamic';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { usePlans } from '@/hooks/usePlans';
 import Footer from '@/components/Footer';
@@ -286,7 +286,6 @@ export function HomeContent() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const router = useRouter();
   const { token, user } = useAuth();
-  const locale = useLocale();
 
   // Admin users go to admin panel
   useEffect(() => {
@@ -303,7 +302,6 @@ export function HomeContent() {
   const featureKeys = ['smartRetries', 'hmacSignatures', 'dashboard', 'lowLatency', 'dlq', 'global'] as const;
   const featureIcons = [icons.retry, icons.shield, icons.chart, icons.bolt, icons.queue, icons.globe];
 
-  const isTr = locale === 'tr';
   const { formatPrice } = usePlans();
   const [yearly, setYearly] = useState(false);
   const plans = [
@@ -483,8 +481,6 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {plans.map((plan, i) => {
-            // Group features by category for better display
-            const isEnterprise = plan.name === tPricing('enterprise');
             return (
             <div key={i} className={`relative rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col overflow-hidden ${
               plan.popular
