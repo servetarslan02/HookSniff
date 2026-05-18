@@ -64,19 +64,15 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       key: 'webhooks',
       label: t('sectionWebhooks'),
       items: [
-        { name: t('inboundWebhooks'), href: '/inbound', icon: '📥' },
+        { name: t('webhookDashboard'), href: '/content-mgmt', icon: '📥' },
         { name: t('operationalWebhooks'), href: '/operational-webhooks', icon: '🪝' },
-        { name: t('messagePoller'), href: '/message-poller', icon: '📬' },
-        { name: t('backgroundTasks'), href: '/background-tasks', icon: '⏳' },
       ],
     },
     {
       key: 'integrations',
       label: t('sectionIntegrations'),
       items: [
-        { name: t('connectors'), href: '/connectors', icon: '🔌' },
         { name: t('integrations'), href: '/integrations', icon: '🔗' },
-        { name: t('streaming'), href: '/streaming', icon: '📡' },
       ],
     },
     {
@@ -91,7 +87,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       label: t('sectionDevtools'),
       items: [
         { name: t('devtools'), href: '/devtools', icon: '🛠️' },
-        { name: t('contentMgmt'), href: '/content-mgmt', icon: '📐' },
       ],
     },
     {
@@ -100,21 +95,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       items: [
         { name: t('routingConfig'), href: '/routing-config', icon: '🔀' },
         { name: t('securitySection'), href: '/security-section', icon: '🔒' },
-        { name: t('environments'), href: '/environments', icon: '🌐' },
-      ],
-    },
-    {
-      key: 'portal',
-      label: t('sectionPortal'),
-      items: [
-        { name: t('portalSection'), href: '/portal-section', icon: '🪝' },
-      ],
-    },
-    {
-      key: 'billing',
-      label: t('sectionBilling'),
-      items: [
-        { name: t('billingSection'), href: '/billing-section', icon: '💳' },
       ],
     },
     {
@@ -122,6 +102,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       label: t('sectionAccount'),
       items: [
         { name: t('account'), href: '/account', icon: '👤' },
+        { name: t('billingSection'), href: '/billing-section', icon: '💳' },
       ],
     },
   ];
