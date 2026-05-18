@@ -72,6 +72,7 @@ mod circuit_breaker;
 mod config;
 pub mod delivery;
 mod fifo;
+pub mod metrics_push;
 pub mod operational_webhook;
 pub mod telemetry;
 mod throttle;
@@ -162,6 +163,10 @@ async fn main() -> Result<()> {
             .await?;
     tokio::spawn(start_health_server(health_listener));
     tracing::info!("🏥 Health server bound on :{}", health_port);
+
+    // Start worker health metrics push to Grafana Cloud (every 60s)
+    tokio::spawn(metrics_push::run());
+    tracing::info!("📊 Worker metrics push started");
 
     // Database pool — strip channel_binding=require (sqlx 0.8 doesn't support it)
     let db_url = cfg
