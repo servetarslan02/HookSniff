@@ -1,36 +1,28 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 03:55 GMT+8
+> Son güncelleme: 2026-05-19 03:58 GMT+8
 
-## 🎯 Sıradaki: #11 — SDK Version Header
+## 🎯 Sıradaki: #12 — Test Coverage Artırma
 
 ### Ne Yapılacak?
-Tüm SDK'lara `X-HookSniff-SDK: hooksniff-{dil}/{versiyon}` header'ı ekle.
-Her API çağrısında otomatik gönderilecek.
+SDK test coverage'ını %70'den %95+ seviyesine çıkar.
+Her SDK'da unit test'ler yazılacak.
 
-### Tahmini Süre: 1 saat
+### Tahmini Süre: 12-16 saat
 
 ---
 
-## 📊 SDK Kalite Skoru: %95
+## 📊 SDK Kalite Skoru: %96
 
 | # | Feature | Durum |
 |---|---------|-------|
-| 1-10 | Faz 1-4 | ✅ |
-| 11 | SDK Version Header | ❌ Sıradaki |
-| 12 | Test Coverage | ❌ |
+| 1-11 | Faz 1-5 | ✅ |
+| 12 | Test Coverage | ❌ Sıradaki |
 | 13 | CI/CD Otomatik Publish | ❌ |
 | 14-17 | Düşük öncelik | ❌ |
 
 ## Son Yapılan İş (2026-05-19)
-- ✅ Typed Webhook Events — 11/11 SDK tamamlandı
-- Python: dataclass + typed event subclass
-- Go: generic parseEventData[T] helper
-- Rust: TypedWebhookEvent enum + serde
-- Ruby: typed data class + subclass
-- Java: Jackson annotated data classes
-- Kotlin: extension functions
-- PHP: WebhookEvents namespace
-- C#: JsonPropertyName annotated classes
-- Elixir: struct + parse_*_data() functions
-- Swift: struct + parse*Data() methods
+- ✅ Typed Webhook Events (#10) — 11/11 SDK
+- ✅ SDK Version Header (#11) — 11/11 SDK
+  - `X-HookSniff-SDK: hooksniff-{dil}/{versiyon}` header'ı eklendi
+  - Tüm SDK'larda User-Agent ile birlikte otomatik gönderilir

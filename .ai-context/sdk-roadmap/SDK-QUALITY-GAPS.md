@@ -9,7 +9,7 @@
 
 ```
 Svix:      ████████████████████ 100%
-HookSniff: ████████████████████░  95%
+HookSniff: ████████████████████░  96%
 ```
 
 ---
@@ -117,7 +117,12 @@ Her SDK'da `debug=true` ile:
 - Elixir: `EndpointCreatedData` struct + `parse_endpoint_created_data()`
 - Swift: `EndpointCreatedData` struct + `parseEndpointCreatedData()`
 
-### 11. SDK Version Header ❌
+### 11. SDK Version Header ✅ (11/11 — 2026-05-19)
+- `X-HookSniff-SDK: hooksniff-{dil}/{versiyon}` header'ı
+- Tüm SDK'larda User-Agent ile birlikte otomatik gönderilir
+- Her API çağrısında tracking için kullanılır
+
+### 12. Test Coverage Artırma ❌
 - `X-HookSniff-SDK: hooksniff-{dil}/{versiyon}`
 - Tahmini: 1 saat | 🟢 Düşük
 
