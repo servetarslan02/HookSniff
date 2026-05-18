@@ -1,0 +1,82 @@
+export * from './aPIKeysApi';
+import { APIKeysApi } from './aPIKeysApi';
+export * from './adminApi';
+import { AdminApi } from './adminApi';
+export * from './alertsApi';
+import { AlertsApi } from './alertsApi';
+export * from './analyticsApi';
+import { AnalyticsApi } from './analyticsApi';
+export * from './applicationsApi';
+import { ApplicationsApi } from './applicationsApi';
+export * from './auditLogApi';
+import { AuditLogApi } from './auditLogApi';
+export * from './authApi';
+import { AuthApi } from './authApi';
+export * from './billingApi';
+import { BillingApi } from './billingApi';
+export * from './contactApi';
+import { ContactApi } from './contactApi';
+export * from './customDomainsApi';
+import { CustomDomainsApi } from './customDomainsApi';
+export * from './customerPortalApi';
+import { CustomerPortalApi } from './customerPortalApi';
+export * from './deliveryDetailsApi';
+import { DeliveryDetailsApi } from './deliveryDetailsApi';
+export * from './devicesApi';
+import { DevicesApi } from './devicesApi';
+export * from './embedApi';
+import { EmbedApi } from './embedApi';
+export * from './endpointsApi';
+import { EndpointsApi } from './endpointsApi';
+export * from './eventsApi';
+import { EventsApi } from './eventsApi';
+export * from './healthApi';
+import { HealthApi } from './healthApi';
+export * from './inboundApi';
+import { InboundApi } from './inboundApi';
+export * from './notificationsApi';
+import { NotificationsApi } from './notificationsApi';
+export * from './oAuthApi';
+import { OAuthApi } from './oAuthApi';
+export * from './outboundIPsApi';
+import { OutboundIPsApi } from './outboundIPsApi';
+export * from './playgroundApi';
+import { PlaygroundApi } from './playgroundApi';
+export * from './rateLimitsApi';
+import { RateLimitsApi } from './rateLimitsApi';
+export * from './routingApi';
+import { RoutingApi } from './routingApi';
+export * from './sSOApi';
+import { SSOApi } from './sSOApi';
+export * from './schemasApi';
+import { SchemasApi } from './schemasApi';
+export * from './searchApi';
+import { SearchApi } from './searchApi';
+export * from './serviceTokensApi';
+import { ServiceTokensApi } from './serviceTokensApi';
+export * from './simulatorApi';
+import { SimulatorApi } from './simulatorApi';
+export * from './statsApi';
+import { StatsApi } from './statsApi';
+export * from './streamApi';
+import { StreamApi } from './streamApi';
+export * from './teamsApi';
+import { TeamsApi } from './teamsApi';
+export * from './templatesApi';
+import { TemplatesApi } from './templatesApi';
+export * from './transformsApi';
+import { TransformsApi } from './transformsApi';
+export * from './webhooksApi';
+import { WebhooksApi } from './webhooksApi';
+import * as http from 'http';
+
+export class HttpError extends Error {
+    constructor (public response: http.IncomingMessage, public body: any, public statusCode?: number) {
+        super('HTTP request failed');
+        this.name = 'HttpError';
+    }
+}
+
+export { RequestFile } from '../model/models';
+
+export const APIS = [APIKeysApi, AdminApi, AlertsApi, AnalyticsApi, ApplicationsApi, AuditLogApi, AuthApi, BillingApi, ContactApi, CustomDomainsApi, CustomerPortalApi, DeliveryDetailsApi, DevicesApi, EmbedApi, EndpointsApi, EventsApi, HealthApi, InboundApi, NotificationsApi, OAuthApi, OutboundIPsApi, PlaygroundApi, RateLimitsApi, RoutingApi, SSOApi, SchemasApi, SearchApi, ServiceTokensApi, SimulatorApi, StatsApi, StreamApi, TeamsApi, TemplatesApi, TransformsApi, WebhooksApi];

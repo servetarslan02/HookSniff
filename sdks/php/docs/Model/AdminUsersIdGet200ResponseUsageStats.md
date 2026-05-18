@@ -1,0 +1,11 @@
+# AdminUsersIdGet200ResponseUsageStats
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**total_deliveries** | **int** |  | [optional]
+**success_rate** | **float** |  | [optional]
+**endpoints_count** | **int** |  | [optional]
+
+[[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)
