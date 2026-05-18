@@ -5,19 +5,15 @@ import { useAuth } from '@/lib/store';
 import { streamApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
   return new Date(s).toLocaleString();
 }
 
-const CHANNEL_TYPES = [
-  { value: 'sse', label: 'SSE', icon: '📡' },
-  { value: 'websocket', label: 'WebSocket', icon: '🔌' },
-  { value: 'both', label: 'Both', icon: '🔗' },
-];
-
 export default function StreamingPage() {
+  const t = useTranslations('streaming');
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -59,7 +55,7 @@ export default function StreamingPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stream-channels'] });
       resetForm();
-      toast('Channel created', 'success');
+      toast(t('channelCreated'), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
@@ -69,7 +65,7 @@ export default function StreamingPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stream-channels'] });
       setSelectedId(null);
-      toast('Channel deleted', 'success');
+      toast(t('channelDeleted'), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
@@ -79,7 +75,7 @@ export default function StreamingPage() {
       streamApi.updateChannel(token!, id, { enabled }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stream-channels'] });
-      toast('Channel updated', 'success');
+      toast(t('channelUpdated'), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
@@ -88,7 +84,7 @@ export default function StreamingPage() {
     mutationFn: ({ channelId, eventType, payload }: { channelId: string; eventType: string; payload: any }) =>
       streamApi.publish(token!, { channel_id: channelId, event_type: eventType, payload }),
     onSuccess: (data) => {
-      toast(`Published to ${data.delivered_to} subscribers`, 'success');
+      toast(t('publishedTo', { count: data.delivered_to }), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
@@ -97,7 +93,7 @@ export default function StreamingPage() {
     mutationFn: (id: string) => streamApi.disconnectSubscription(token!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stream-subscriptions'] });
-      toast('Subscription disconnected', 'success');
+      toast(t('subscription{t('disconnect')}ed'), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
@@ -151,35 +147,35 @@ export default function StreamingPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Streaming</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            Real-time event streaming — SSE and WebSocket channels
+            {t('subtitle')}
           </p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
           className="px-3 sm:px-4 py-2 bg-indigo-600 text-white text-xs sm:text-sm rounded-lg hover:bg-indigo-700 transition"
         >
-          + New Channel
+          {t('newChannel')}
         </button>
       </div>
 
       {/* Create Form */}
       {showCreate && (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Create Stream Channel</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">{t('createChannel')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('name')}</label>
               <input
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                placeholder="e.g. live-deliveries"
+                placeholder={t('namePlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('type')}</label>
               <select
                 value={formType}
                 onChange={(e) => setFormType(e.target.value)}
@@ -191,22 +187,22 @@ export default function StreamingPage() {
               </select>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('description')}</label>
               <input
                 value={formDesc}
                 onChange={(e) => setFormDesc(e.target.value)}
-                placeholder="Optional description"
+                placeholder={t('descriptionPlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Event Filter <span className="text-gray-400 font-normal">(comma-separated, empty = all)</span>
+                {t('eventFilter')} <span className="text-gray-400 font-normal">{t('eventFilterHint')}</span>
               </label>
               <input
                 value={formFilter}
                 onChange={(e) => setFormFilter(e.target.value)}
-                placeholder="e.g. delivery.created, delivery.failed"
+                placeholder={t('eventFilterPlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -214,7 +210,7 @@ export default function StreamingPage() {
           <div className="flex gap-2">
             <button
               onClick={() => {
-                if (!formName.trim()) { toast('Name required', 'error'); return; }
+                if (!formName.trim()) { toast(t('nameRequired'), 'error'); return; }
                 createMutation.mutate({
                   name: formName,
                   description: formDesc || undefined,
@@ -225,21 +221,21 @@ export default function StreamingPage() {
               disabled={createMutation.isPending}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
             >
-              {createMutation.isPending ? 'Creating...' : 'Create Channel'}
+              {createMutation.isPending ? t('creating') : t('createChannelBtn')}
             </button>
-            <button onClick={resetForm} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800">Cancel</button>
+            <button onClick={resetForm} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800">{t('cancel')}</button>
           </div>
         </div>
       )}
 
       {/* Channels List */}
       {isLoading ? (
-        <div className="text-center py-12 text-gray-500">Loading channels...</div>
+        <div className="text-center py-12 text-gray-500">{t('loading')}</div>
       ) : channels.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-5xl mb-4">📡</div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">No stream channels</h3>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Create a channel to start streaming events in real-time</p>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('noChannels')}</h3>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">{t('noChannelsDesc')}</p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -257,18 +253,18 @@ export default function StreamingPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">{ch.name}</h3>
                   <span className="text-xs text-gray-500">
-                    {CHANNEL_TYPES.find((t) => t.value === ch.channel_type)?.icon} {ch.channel_type.toUpperCase()}
+                    {CHANNEL_TYPES.find((ct) => ct.value === ch.channel_type)?.icon} {ch.channel_type.toUpperCase()}
                   </span>
                 </div>
                 <span className={`px-2 py-0.5 text-xs rounded-full ${ch.enabled ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
-                  {ch.enabled ? 'live' : 'off'}
+                  {ch.enabled ? t('live') : t('off')}
                 </span>
               </div>
               {ch.description && <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{ch.description}</p>}
               <div className="flex items-center gap-3 text-xs text-gray-500">
-                <span>{ch.current_subscribers} subscribers</span>
+                <span>{ch.current_subscribers} {t('subscribers')}</span>
                 <span>·</span>
-                <span>{ch.total_messages} messages</span>
+                <span>{ch.total_messages} {t('messages')}</span>
               </div>
               {ch.event_filter && ch.event_filter.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
@@ -285,10 +281,10 @@ export default function StreamingPage() {
                     onClick={(e) => { e.stopPropagation(); toggleMutation.mutate({ id: ch.id, enabled: !ch.enabled }); }}
                     className={`text-xs ${ch.enabled ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}`}
                   >
-                    {ch.enabled ? 'Disable' : 'Enable'}
+                    {ch.enabled ? t('disable') : t('enable')}
                   </button>
                   <button
-                    onClick={(e) => { e.stopPropagation(); if (confirm('Delete?')) deleteMutation.mutate(ch.id); }}
+                    onClick={(e) => { e.stopPropagation(); if (confirm(t('deleteConfirm'))) deleteMutation.mutate(ch.id); }}
                     className="text-xs text-red-500 hover:text-red-700"
                   >
                     Delete
@@ -323,20 +319,20 @@ export default function StreamingPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <span className="text-xs text-gray-500">Type</span>
+                    <span className="text-xs text-gray-500">{t('type')}</span>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">{selected.channel_type.toUpperCase()}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">Subscribers</span>
+                    <span className="text-xs text-gray-500">{t('subscribers')}</span>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">{selected.current_subscribers}/{selected.max_subscribers}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">Total Messages</span>
+                    <span className="text-xs text-gray-500">{t('totalMessages')}</span>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">{selected.total_messages}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">Status</span>
-                    <p className={`text-sm font-medium ${selected.enabled ? 'text-green-600' : 'text-gray-400'}`}>{selected.enabled ? 'Live' : 'Disabled'}</p>
+                    <span className="text-xs text-gray-500">{t('status')}</span>
+                    <p className={`text-sm font-medium ${selected.enabled ? 'text-green-600' : 'text-gray-400'}`}>{selected.enabled ? t('live') : t('disabled')}</p>
                   </div>
                 </div>
 
@@ -346,19 +342,19 @@ export default function StreamingPage() {
                       onClick={() => startLive(selected.id)}
                       className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
                     >
-                      ▶ Start Live View
+                      {t('startLive')}
                     </button>
                   ) : (
                     <button
                       onClick={stopLive}
                       className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
                     >
-                      ⏹ Stop
+                      {t('stop')}
                     </button>
                   )}
                   <button
                     onClick={() => {
-                      const eventType = prompt('Event type:', 'test.event');
+                      const eventType = prompt(t('publishTest') + ':', 'test.event');
                       if (eventType) {
                         publishMutation.mutate({
                           channelId: selected.id,
@@ -369,17 +365,17 @@ export default function StreamingPage() {
                     }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
                   >
-                    📤 Publish Test Event
+                    {t('publishTest')}
                   </button>
                 </div>
 
                 {/* Live Event Feed */}
                 {isLive && (
                   <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">🔴 Live Event Feed</h4>
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('liveEventFeed')}</h4>
                     <div className="bg-gray-900 rounded-lg p-4 max-h-64 overflow-y-auto font-mono text-xs">
                       {liveEvents.length === 0 ? (
-                        <div className="text-gray-500">Waiting for events...</div>
+                        <div className="text-gray-500">{t('waitingForEvents')}</div>
                       ) : (
                         liveEvents.map((ev, i) => (
                           <div key={i} className={`mb-1 ${ev.type === 'connected' ? 'text-green-400' : 'text-blue-300'}`}>
@@ -399,7 +395,7 @@ export default function StreamingPage() {
             {tab === 'messages' && (
               <div className="space-y-3">
                 {channelDetail.recent_messages.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">No messages yet</div>
+                  <div className="text-center py-8 text-gray-500">{t('noMessagesYet')}</div>
                 ) : (
                   <div className="space-y-2">
                     {channelDetail.recent_messages.map((msg) => (
@@ -409,7 +405,7 @@ export default function StreamingPage() {
                           <span className="text-xs text-gray-500">{formatDate(msg.created_at)}</span>
                         </div>
                         <pre className="text-xs text-gray-600 dark:text-gray-400 overflow-x-auto">{JSON.stringify(msg.payload, null, 2)}</pre>
-                        <span className="text-xs text-gray-400 mt-1">Delivered to {msg.delivered_count}</span>
+                        <span className="text-xs text-gray-400 mt-1">{t('deliveredTo', { count: msg.delivered_count })}</span>
                       </div>
                     ))}
                   </div>
@@ -421,17 +417,17 @@ export default function StreamingPage() {
             {tab === 'subscriptions' && (
               <div className="space-y-3">
                 {subscriptions.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">No active subscriptions</div>
+                  <div className="text-center py-8 text-gray-500">{t('noActiveSubscriptions')}</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="text-left text-xs text-gray-500 uppercase border-b border-gray-200 dark:border-gray-700">
-                          <th className="pb-2 pr-4">Type</th>
-                          <th className="pb-2 pr-4">Client</th>
-                          <th className="pb-2 pr-4">Messages</th>
-                          <th className="pb-2 pr-4">Connected</th>
-                          <th className="pb-2">Actions</th>
+                          <th className="pb-2 pr-4">{t('type')}</th>
+                          <th className="pb-2 pr-4">{t('client')}</th>
+                          <th className="pb-2 pr-4">{t('messages')}</th>
+                          <th className="pb-2 pr-4">{t('connected')}</th>
+                          <th className="pb-2">{t('actions')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -446,7 +442,7 @@ export default function StreamingPage() {
                                 onClick={() => disconnectMutation.mutate(sub.id)}
                                 className="text-xs text-red-500 hover:text-red-700"
                               >
-                                Disconnect
+                                {t('disconnect')}
                               </button>
                             </td>
                           </tr>

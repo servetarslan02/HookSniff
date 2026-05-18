@@ -5,8 +5,10 @@ import { useAuth } from '@/lib/store';
 import { environmentsApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 
 export default function EnvironmentsPage() {
+  const t = useTranslations('environments');
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -29,7 +31,7 @@ export default function EnvironmentsPage() {
       queryClient.invalidateQueries({ queryKey: ['environments'] });
       setShowCreate(false);
       setNewName(''); setNewSlug(''); setNewDesc('');
-      toast('Environment created', 'success');
+      toast(t('environmentCreated'), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
@@ -38,7 +40,7 @@ export default function EnvironmentsPage() {
     mutationFn: (id: string) => environmentsApi.delete(token!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['environments'] });
-      toast('Environment deleted', 'success');
+      toast(t('environmentDeleted'), 'success');
     },
     onError: (e: Error) => toast(e.message, 'error'),
   });
@@ -52,35 +54,35 @@ export default function EnvironmentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Environments</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Manage dev, staging, and production environments</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
         </div>
         <button onClick={() => setShowCreate(true)} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-          + New Environment
+          {t('newEnvironment')}
         </button>
       </div>
 
       {showCreate && (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Create Environment</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">{t('createEnvironment')}</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-              <input value={newName} onChange={e => setNewName(e.target.value)} placeholder="Production"
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('name')}</label>
+              <input value={newName} onChange={e => setNewName(e.target.value)} placeholder={t('namePlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug</label>
-              <input value={newSlug} onChange={e => setNewSlug(e.target.value)} placeholder="production (auto-generated)"
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('slug')}</label>
+              <input value={newSlug} onChange={e => setNewSlug(e.target.value)} placeholder={t('slugPlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-              <input value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Optional description"
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('description')}</label>
+              <input value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder={t('descriptionPlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Color</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('color')}</label>
               <input type="color" value={newColor} onChange={e => setNewColor(e.target.value)}
                 className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer" />
             </div>
@@ -88,20 +90,20 @@ export default function EnvironmentsPage() {
           <div className="flex gap-2">
             <button onClick={handleCreate} disabled={createMutation.isPending}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
-              {createMutation.isPending ? 'Creating...' : 'Create'}
+              {createMutation.isPending ? t('creating') : t('create')}
             </button>
-            <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800">Cancel</button>
+            <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800">{t('cancel')}</button>
           </div>
         </div>
       )}
 
       {isLoading ? (
-        <div className="text-center py-12 text-gray-500">Loading...</div>
+        <div className="text-center py-12 text-gray-500">{t('loading')}</div>
       ) : envs.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-4xl mb-3">🌐</div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">No environments yet</h3>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Create your first environment to get started</p>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('noEnvironments')}</h3>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">{t('noEnvironmentsDesc')}</p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -116,13 +118,13 @@ export default function EnvironmentsPage() {
                   </div>
                 </div>
                 {env.is_default && (
-                  <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full">default</span>
+                  <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full">{t('default')}</span>
                 )}
               </div>
               {env.description && <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{env.description}</p>}
               <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-                <span className="text-xs text-gray-500">{env.variable_count ?? 0} variables</span>
-                <button onClick={() => deleteMutation.mutate(env.id)} className="text-xs text-red-500 hover:text-red-700">Delete</button>
+                <span className="text-xs text-gray-500">{env.variable_count ?? 0} {t('variables')}</span>
+                <button onClick={() => deleteMutation.mutate(env.id)} className="text-xs text-red-500 hover:text-red-700">{t('delete')}</button>
               </div>
             </div>
           ))}
