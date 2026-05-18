@@ -1,164 +1,142 @@
-# Dashboard Restructure Plan v3 — Kullanıcı Odaklı Yapı
+# Dashboard Restructure Plan v3 — Final
 
-> Tarih: 2026-05-19 02:37 GMT+8
-> Durum: Planlama aşaması
-> Prensip: Kullanıcı ne düşünüyor → o gruplama
-
----
-
-## 🎯 Temel Prensip
-
-```
-Kullanıcı sormuyor: "Schema & Content nerede?"
-Kullanıcı soruyor:  "Endpoint'lerimi nerede yönetirim?"
-                     "Mesajlarımı nerede görürüm?"
-                     "Webhook'larım güvenli mi?"
-```
+> Tarih: 2026-05-19 02:57 GMT+8
+> Durum: Karar verildi, uygulanacak
+> Prensip: Tekrar yok, mantıklı gruplama, her şey sidebar'da görünür
 
 ---
 
-## 📋 Yeni Sidebar — 8 Section
+## 📊 Mevcut Durum Analizi
+
+### Sidebar'daki Section Sayfaları (container — tab'lı)
+
+| Section Sayfa | İçindeki Tab'lar | Satır |
+|---|---|---|
+| core | DashboardOverview + API Keys | 32 |
+| deliveries | Logs + Deliveries + Search | 33 |
+| content-mgmt | Schemas + Templates + Inbound + Transforms | 36 |
+| devtools | Playground + Signature Verifier + Webhook Builder + API Importer | 32 |
+| observability | Health + Alerts + Analytics | 34 |
+| security-section | Rate Limiting + Audit Log + SSO | 34 |
+| routing-config | Retry Policy + Routing + Custom Domain | 34 |
+| billing-section | Billing | 30 |
+| settings-section | Settings + Service Tokens | 21 |
+| portal-section | Portal Customize + Portal Manage | 32 |
+| team-mgmt | Team + Notifications + Applications | 23 |
+| account | Team + Notifications + Settings + Portal Manage | 38 |
+
+### Sidebar'da Olmayan独立 Sayfalar
+
+| Sayfa | Satır | Ne yapıyor |
+|---|---|---|
+| applications | 401 | Uygulama listesi + oluştur |
+| environments | 133 | Ortam değişkenleri |
+| background-tasks | 98 | Arka plan görevleri |
+| operational-webhooks | 168 | Operasyonel webhook'lar |
+| message-poller | 220 | Mesaj yoklayıcı |
+| inbound | 156 | Gelen webhook'lar |
+| connectors | 204 | Bağlayıcılar |
+| integrations | 549 | Entegrasyonlar |
+| streaming | 465 | Gerçek zamanlı yayın |
+| endpoints | 382 | Endpoint yönetimi |
+
+### Tespit Edilen Sorunlar
+
+**KORKUNÇ TEKRARLAR:**
+| Sayfa | Kaç yerde görünüyor | Nerede |
+|---|---|---|
+| Team | 3 kez | team-mgmt, account, sidebar |
+| Notifications | 3 kez | team-mgmt, account, sidebar |
+| Settings | 3 kez | settings-section, account, sidebar |
+| Applications | 2 kez | team-mgmt, sidebar |
+| Portal Manage | 2 kez | portal-section, account |
+| API Keys | 2 kez | core, billing-overview |
+| Billing | 2 kez | billing-section, billing-overview |
+
+---
+
+## ✅ Yeni Sidebar Yapısı (12 Section, ~25 Sayfa)
 
 ```
-┌──────────────────────────────────────────────────────┐
-│  🪝 HookSniff                                         │
-├──────────────────────────────────────────────────────┤
-│                                                       │
-│  📊 Overview              → /dashboard                │
-│                                                       │
-│  ── WEBHOOK'LARIM ─────────────────────────────────  │
-│  🔗 Endpoints             → /endpoints               │
-│  📱 Applications          → /applications            │
-│  🔑 API Keys              → /api-keys                │
-│                                                       │
-│  ── MESAJLAR ───────────────────────────────────────  │
-│  📨 Deliveries            → /deliveries (tab'lar:     │
-│       └─ History | Search | Logs)                     │
-│                                                       │
-│  ── KONFİGÜRASYON ──────────────────────────────────  │
-│  🔀 Routing               → /routing (tab'lar:        │
-│       └─ Rules | Retry Policy | Custom Domain)        │
-│  📐 Content               → /content (tab'lar:        │
-│       └─ Schemas | Templates | Transforms | Inbound)  │
-│  🌐 Environments          → /environments             │
-│                                                       │
-│  ── GÜVENLİK ───────────────────────────────────────  │
-│  🔒 Security              → /security (tab'lar:       │
-│       └─ Rate Limiting | SSO | Audit Log)             │
-│                                                       │
-│  ── ENTEGRASYONLAR ──────────────────────────────────  │
-│  🔌 Connectors            → /connectors               │
-│  🔗 Integrations          → /integrations             │
-│  🪝 Op. Webhooks          → /operational-webhooks     │
-│  📬 Message Poller        → /message-poller            │
-│  📡 Streaming             → /streaming                │
-│                                                       │
-│  ── İZLEME ──────────────────────────────────────────  │
-│  📡 Observability         → /observability (tab'lar:   │
-│       └─ Health | Alerts | Analytics)                 │
-│  ⏳ Background Tasks      → /background-tasks          │
-│                                                       │
-│  ── ARAÇLAR ─────────────────────────────────────────  │
-│  🛠️ DevTools              → /devtools (tab'lar:        │
-│       └─ Playground | Signature | Builder | Importer)  │
-│                                                       │
-│  ── HESAP ───────────────────────────────────────────  │
-│  👤 Account               → /account (tab'lar:         │
-│       └─ Team | Tokens | Portal | Notifications |      │
-│          Settings | Billing)                           │
-│                                                       │
-└──────────────────────────────────────────────────────┘
+🪝 HookSniff Dashboard
+│
+├── 📊 GENEL BAKIŞ (core)
+│   ├── Dashboard (özet istatistikler)
+│   └── API Anahtarları
+│
+├── 📱 UYGULAMALAR (applications) ← 独立 sayfa, 401 satır
+│   └── [detay sayfası] → Endpoint'ler (382 satır)
+│
+├── 🔗 TESLİMATLAR (deliveries)
+│   ├── Loglar (417 satır)
+│   ├── Teslimatlar (33 satır - list)
+│   └── Arama (131 satır)
+│
+├── 📡 GÖZLEM (observability)
+│   ├── Sağlık (148 satır)
+│   ├── Uyarılar (367 satır)
+│   └── Analitik (156 satır)
+│
+├── 📥 WEBHOOK'LAR
+│   ├── Gelen Webhook'lar (156 satır)
+│   ├── Operasyonel Webhook'lar (168 satır)
+│   └── Mesaj Yoklayıcı (220 satır)
+│
+├── 🔌 ENTEGRASYONLAR
+│   ├── Bağlayıcılar (204 satır)
+│   ├── Entegrasyonlar (549 satır)
+│   └── Yayın (465 satır)
+│
+├── 🛠️ GELİŞTİRİCİ ARAÇLARI (devtools)
+│   ├── Playground (sandbox)
+│   ├── İmza Doğrulayıcı (260 satır)
+│   ├── Webhook Oluşturucu (256 satır)
+│   └── API İçe Aktarıcı (70 satır)
+│
+├── 📐 İÇERİK (content-mgmt)
+│   ├── Şemalar (42 satır)
+│   ├── Şablonlar (55 satır)
+│   └── Dönüştürmeler (181 satır)
+│
+├── 🔀 YAPILANDIRMA
+│   ├── Yönlendirme (48 satır)
+│   ├── Tekrar Politikası (52 satır)
+│   ├── Özel Alan Adı (176 satır)
+│   ├── Hız Sınırı (231 satır)
+│   └── Ortamlar (133 satır)
+│
+├── 🔒 GÜVENLİK
+│   ├── SSO / SAML (268 satır)
+│   ├── Denetim Günlüğü (137 satır)
+│   └── Arka Plan Görevleri (98 satır)
+│
+├── 🪝 PORTAL
+│   ├── Portal Özelleştir (268 satır)
+│   └── Portal Yönet (191 satır)
+│
+├── 💳 FATURALANDIRMA
+│   └── Plan & Ödeme (193 satır)
+│
+└── 👤 HESAP
+    ├── Profil & Ayarlar (35 satır)
+    ├── Ekip Yönetimi (189 satır)
+    ├── Bildirimler (283 satır)
+    └── Hizmet Jetonları (182 satır)
 ```
 
 ---
 
-## 📊 Section Detayları
+## 📋 Değişiklik Özeti
 
-### 📊 Overview — `/dashboard`
-- Toplam endpoint, mesaj, success rate
-- Son aktivite feed
-- Hızlı erişim butonları
-
-### 🔗 WEBHOOK'LARIM — 3 bağımsız sayfa
-| Sayfa | URL | Neden ayrı? |
-|-------|-----|-------------|
-| Endpoints | `/endpoints` | Ana iş, CRUD gerekli |
-| Applications | `/applications` | Gruplama, detail page var |
-| API Keys | `/api-keys` | Güvenlik, ayrı sayfa |
-
-### 📨 MESAJLAR — 1 sayfa, 3 tab
-| Tab | Component | İçerik |
-|-----|-----------|--------|
-| History | `<DeliveriesPage />` | Teslim geçmişi |
-| Search | `<SearchPage />` | Webhook arama |
-| Logs | `<LogsPage />` | Tüm loglar |
-
-**Neden tek sayfa?** Hepsi "mesaj geçmişi" — kullanıcı arama yaparken History'ye de bakıyor.
-
-### 🔀 KONFİGÜRASYON — 3 sayfa
-| Sayfa | URL | Tab'lar |
-|-------|-----|---------|
-| Routing | `/routing` | Rules, Retry Policy, Custom Domain |
-| Content | `/content` | Schemas, Templates, Transforms, Inbound |
-| Environments | `/environments` | (bağımsız sayfa) |
-
-**Neden "Konfigürasyon"?** Kullanıcı "webhook'larım nasıl çalışsın?" sorusunun cevabı.
-
-### 🔒 GÜVENLİK — 1 sayfa, 3 tab
-| Tab | Component | İçerik |
-|-----|-----------|--------|
-| Rate Limiting | `<RateLimitingPage />` | Hız sınırı |
-| SSO | `<SsoPage />` | Tek oturum açma |
-| Audit Log | `<AuditLogPage />` | Denetim günlüğü |
-
-### 🔌 ENTEGRASYONLAR — 5 bağımsız sayfa
-| Sayfa | URL | Neden ayrı? |
-|-------|-----|-------------|
-| Connectors | `/connectors` | Shopify, Stripe — yapılandırma gerektirir |
-| Integrations | `/integrations` | 3. parti — farklı workflow |
-| Op. Webhooks | `/operational-webhooks` | Sistem webhook'ları |
-| Message Poller | `/message-poller` | Polling mekanizması |
-| Streaming | `/streaming` | SSE/WebSocket — farklı teknoloji |
-
-### 📡 İZLEME — 2 sayfa
-| Sayfa | URL | Tab'lar |
-|-------|-----|---------|
-| Observability | `/observability` | Health, Alerts, Analytics |
-| Background Tasks | `/background-tasks` | (bağımsız sayfa) |
-
-### 🛠️ ARAÇLAR — 1 sayfa, 4 tab
-| Tab | Component | İçerik |
-|-----|-----------|--------|
-| Playground | `<PlaygroundPage />` | Test webhook gönder |
-| Signature Tool | `<SignatureVerifierPage />` | HMAC doğrulama |
-| Webhook Builder | `<WebhookBuilderPage />` | Görsel oluşturucu |
-| API Importer | `<ApiImporterPage />` | API import |
-
-### 👤 HESAP — 1 sayfa, 6 tab
-| Tab | Component | İçerik |
-|-----|-----------|--------|
-| Team | `<TeamPage />` | Üye yönetimi |
-| Service Tokens | `<ServiceTokensPage />` | Token yönetimi |
-| Portal | `<PortalCustomizePage />` | Portal özelleştirme |
-| Notifications | `<NotificationsPage />` | Bildirim ayarları |
-| Settings | `<SettingsPage />` | Genel ayarlar |
-| Billing | `<BillingPage />` | Plan & ödeme |
-
-**Neden Portal burada?** Kullanıcı portal'ı ayda 1 değiştirir. Billing gibi nadir kullanılan şey.
-
----
-
-## 📊 Karşılaştırma
-
-| | v2 (önceki) | v3 (yeni) |
-|--|-------------|-----------|
-| Section sayısı | 11 | **8** |
-| Top-level item | 15 | **12** |
-| Mantık | Feature bazlı | **Kullanıcı odaklı** |
-| Portal | Tek section | **Account altı** |
-| Billing | Tek section | **Account altı** |
-| Environments | Kayıp | **Konfigürasyon altı** |
-| Background Tasks | Kayıp | **İzleme altı** |
+| İşlem | Sayfa | Neden |
+|---|---|---|
+| 🔴 Sil | team-mgmt | Tekrar — team/account'da var |
+| 🔴 Sil | billing-overview | Tekrar — billing-section'da var |
+| 🔴 Sil | settings-section | Tekrar — account'da var |
+| 🟡 Birleştir | account → Hesap section | Profil + Ekip + Bildirim + Jetonlar |
+| 🟢 Sidebar'a ekle | environments, endpoints, operational-webhooks, message-poller, inbound, connectors, integrations, streaming |独立 çalışan sayfalar |
+| 🟢 Yeni grup | WEBHOOK'LAR | inbound + operational + poller mantıklı grup |
+| 🟢 Yeni grup | ENTEGRASYONLAR | connectors + integrations + streaming mantıklı grup |
 
 ---
 
@@ -167,25 +145,43 @@ Kullanıcı soruyor:  "Endpoint'lerimi nerede yönetirim?"
 ```
 ESKI                              → YENİ
 ─────────────────────────────────────────────────
-/billing                          → /account (Billing tab)
-/billing-overview                 → /account (Billing tab)
-/billing-section                  → /account (Billing tab)
-/team                             → /account (Team tab)
-/team-mgmt                        → /account (Team tab)
-/settings                         → /account (Settings tab)
-/settings-section                 → /account (Settings tab)
-/portal-customize                 → /account (Portal tab)
-/portal-manage                    → /account (Portal tab)
-/portal-section                   → /account (Portal tab)
-/routing                          → /routing (Rules tab)
-/routing-config                   → /routing (tek sayfa)
+/team-mgmt                        → /account (Team tab) — SİL
+/billing-overview                 → /account (Billing tab) — SİL
+/settings-section                 → /account (Settings tab) — SİL
+/portal-section                   → /portal (tek sayfa)
 /content-mgmt                     → /content (tek sayfa)
 /security-section                 → /security (tek sayfa)
-/sandbox                          → /devtools (Playground tab)
-/sandbox/playground               → /devtools (Playground tab)
-/notifications                    → /account (Notifications tab)
-/service-tokens                   → /account (Tokens tab)
+/routing-config                   → /config (tek sayfa)
+/billing-section                  → /billing (tek sayfa)
 ```
+
+---
+
+## 🏗️ Uygulama Adımları
+
+### Adım 1: Sidebar Güncellemesi
+- `layout.tsx` içindeki `sections` dizisini yeni yapıya göre güncelle
+- Silinecek section'ları kaldır (team-mgmt, billing-overview, settings-section)
+- Yeni section'ları ekle (WEBHOOK'LAR, ENTEGRASYONLAR, YAPILANDIRMA, GÜVENLİK, PORTAL)
+
+### Adım 2: Yeni Container Sayfaları Oluştur
+- `/webhooks` → Gelen + Operasyonel + Poller tab'ları
+- `/integrations` → Bağlayıcılar + Entegrasyonlar + Yayın tab'ları
+- `/config` → Yönlendirme + Tekrar + Özel Alan + Hız Sınırı + Ortamlar tab'ları
+- `/security` → SSO + Denetim + Arka Plan Görevleri tab'ları
+- `/portal` → Özelleştir + Yönet tab'ları
+
+### Adım 3: Eski URL Redirect
+- Eski URL'leri yeni URL'lere redirect et (Next.js middleware)
+- SEO + bookmark koruması
+
+### Adım 4: i18n Güncellemesi
+- `tr.json` ve `en.json` dosyalarına yeni nav anahtarları ekle
+
+### Adım 5: Test
+- Tüm sayfaların yüklenmesini kontrol et
+- Tab geçişlerinin çalıştığını doğrula
+- Mobil responsive kontrol
 
 ---
 
@@ -196,3 +192,4 @@ ESKI                              → YENİ
 - `applications/[id]`, `deliveries/[id]`, `endpoints/[id]` detail sayfaları korunacak
 - Admin panel ayrı kalacak (`/admin`)
 - Public sayfalar (landing, docs, blog) etkilenmeyecek
+- Arka Plan Görevleri (background-tasks) GÜVENLİK altında — operasyonel takip için mantıklı
