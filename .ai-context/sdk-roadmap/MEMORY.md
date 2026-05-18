@@ -9,9 +9,16 @@
 ## 🔑 Credential'lar
 
 ### Sonatype (Maven Central)
+**Java SDK (aktif):**
 ```
 Username: f0wXBf
 Password: EYLV763IsQVseaffdOXNScf2HZlcLDGEK
+```
+
+**Yedek / Kotlin SDK:**
+```
+Username: 7cxUFC
+Password: kjwdGgyf22tr4tbRjDYN7X9VYrmRoqOJy
 ```
 
 ### npm
