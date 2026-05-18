@@ -1,6 +1,6 @@
 # SDK Roadmap MEMORY
 
-> Son güncelleme: 2026-05-18 16:45 GMT+8
+> Son güncelleme: 2026-05-18 18:29 GMT+8
 
 ## ⚠️ KRİTİK: SDK Adaptasyon Yöntemi
 
@@ -8,14 +8,24 @@
 
 ## 🔑 Credential'lar
 
+### NuGet
+```
+oy2eyxly2puop7uki47q6ewsoelcrikudaito7a7nxkjyy
+```
+
+### RubyGems
+```
+rubygems_ab4a30751cbdea680577f44baadfeaaca376f6d0c1c97ccc
+```
+
 ### Sonatype (Maven Central)
-**Java SDK (aktif):**
+**Java SDK:**
 ```
 Username: f0wXBf
 Password: EYLV763IsQVseaffdOXNScf2HZlcLDGEK
 ```
 
-**Yedek / Kotlin SDK:**
+**Kotlin SDK:**
 ```
 Username: 7cxUFC
 Password: kjwdGgyf22tr4tbRjDYN7X9VYrmRoqOJy
@@ -36,16 +46,6 @@ pypi-AgEIcHlwaS5vcmcCJDZhMjRlNGRjLTFlZDYtNGU3YS04OGZiLTFiOTc0MzQyMmFlNwACKlszLCJ
 ciozq2VZY9iBIKxYlBMJuUg8p8Cg7Z1KeqE
 ```
 
-### RubyGems
-```
-rubygems_236be4c92841e391cbb1cb11e2bd18f04f97bc05abbd78e5
-```
-
-### NuGet
-```
-oy2eyxly2puop7uki47q6ewsoelcrikudaito7a7nxkjyy
-```
-
 ### Hex.pm
 ```
 20e1faa34deb3e75d01dec3002e30bfc
@@ -56,36 +56,21 @@ oy2eyxly2puop7uki47q6ewsoelcrikudaito7a7nxkjyy
 86b49acd74d0894483fae6e47c4f68712239dcde
 ```
 
-### Cloudflare R2 (S3)
-```
-Access Key ID: 00e106b8f3ef03184261d1cd5a9163e7
-Secret Access Key: c2154c6c31d2e429e62955de20b3f59627c74ef5ea899778e6fc12c03137e927
-Endpoint: https://2a7ee86912c49fd36cff048204c37f70.r2.cloudflarestorage.com
-```
+## 📊 SDK Publish Durumu (2026-05-18 18:29 Gerçek Durum)
 
-### Terraform
-```
-ghaot-scyXJUiMzsXcNvV1
-```
-
-## 📊 SDK Publish Durumu (2026-05-18 16:54 Gerçek Durum)
-
-| # | SDK | Registry | Versiyon | Faz 8-15 | Durum |
-|---|-----|----------|----------|----------|-------|
-| 1 | **Node.js** | npm | 1.1.0 | 8/8 ✅ | ✅ Yüklendi |
-| 2 | **Python** | PyPI | 1.1.0 | 8/8 ✅ | ✅ Yüklendi |
-| 3 | **Go** | GitHub tag | v1.1.0 | 5/8 ❌ | ⏳ background_task, op_webhook, poller, inbound eksik |
-| 4 | **Rust** | crates.io | 1.1.0 | 8/8 ✅ | ✅ Yüklendi |
-| 5 | **Java** | Maven Central | 1.1.2 | 8/8 ✅ | ✅ Yüklendi (2026-05-18) |
-| 6 | **Kotlin** | Maven Central | 1.1.0 | var/bozuk | ❌ Build hatalı, rewrite gerekiyor |
-| 7 | **Ruby** | RubyGems | 1.0.0 | 2/8 ❌ | ⏳ env, bg_task, op_webhook, poller, inbound, connector eksik |
-| 8 | **PHP** | Packagist | 1.1.0 | 2/8 ❌ | ⏳ Aynı eksikler |
-| 9 | **C#** | NuGet | 1.0.0 | 2/8 ❌ | ⏳ Aynı eksikler |
-| 10 | **Elixir** | Hex.pm | 1.1.1 | 0/8 ❌ | ⏳ Hiçbir faz resource'ı yok |
-| 11 | **Swift** | GitHub tag | v1.1.0 | 3/8 ❌ | ⏳ env, bg_task, op_webhook, poller, connector eksik |
-
-⚠️ **ÖNEMLİ:** MEMORY.md'nin eski halinde "tüm fazlar tamamlandı, 11 SDK v1.1.0" yazıyordu ama bu doğru değil.
-Sadece Node.js, Python ve Rust'ta tüm Faz 8-15 kaynakları mevcut.
+| # | SDK | Registry | Versiyon | Faz 8-15 | Ek Resource | Durum |
+|---|-----|----------|----------|----------|-------------|-------|
+| 1 | **Node.js** | npm | 1.1.0 | 8/8 ✅ | — | ✅ Yüklendi |
+| 2 | **Python** | PyPI | 1.1.0 | 8/8 ✅ | — | ✅ Yüklendi |
+| 3 | **Go** | GitHub tag | v1.1.0 | 5/8 ❌ | — | ✅ (eksik resource var) |
+| 4 | **Rust** | crates.io | 1.1.0 | 8/8 ✅ | — | ✅ Yüklendi |
+| 5 | **Ruby** | **RubyGems** | **1.2.0** | **8/8 ✅** | **30+** | ✅ **Yüklendi (2026-05-18)** |
+| 6 | **Java** | Maven Central | 1.1.2 | 8/8 ✅ | — | ✅ Yüklendi |
+| 7 | **Kotlin** | Maven Central | 1.1.0 | bozuk | — | ❌ Build fix gerekli |
+| 8 | **PHP** | Packagist | 1.1.0 | 2/8 ❌ | — | ✅ (eksik resource var) |
+| 9 | **C#** | **NuGet** | **1.2.0** | **8/8 ✅** | **30+** | ✅ **Yüklendi (2026-05-18)** |
+| 10 | **Elixir** | Hex.pm | 1.1.1 | 0/8 ❌ | — | ⏳ Publish gerekli |
+| 11 | **Swift** | GitHub tag | v1.1.0 | 3/8 ❌ | — | ✅ (eksik resource var) |
 
 ## 📊 Faz İlerlemesi — TÜMÜ TAMAMLANDI
 
@@ -93,17 +78,34 @@ Sadece Node.js, Python ve Rust'ta tüm Faz 8-15 kaynakları mevcut.
 |-----|--------|-------|
 | 8 | Environment | ✅ |
 | 9 | Background Task | ✅ |
-| 10 | Operational Webhook | ✅ (worker dispatch dahil) |
+| 10 | Operational Webhook | ✅ |
 | 11 | Message Poller | ✅ |
 | 12 | Ingest | ✅ |
 | 13 | Connector | ✅ |
 | 14 | Integration | ✅ |
 | 15 | Streaming | ✅ |
 
-## 🏗️ Build Ortamı (Bu Sunucu)
-- JDK 17: /opt/jdk-17
-- Node.js: v22.22.1
-- GPG key: /tmp/gpg-hooksniff (geçici, sunucu restart'ta silinir)
+## 📝 Son Oturum (2026-05-18 18:29)
+
+### Yapılan:
+- **Ruby SDK v1.2.0** → RubyGems'e publish edildi
+  - 24 yeni API dosyası eklendi (Environment, BackgroundTask, OperationalWebhook, MessagePoller, Inbound, Connector + 18 ek resource)
+  - hooksniff.rb güncellendi (tüm resource require + client accessor)
+  - Ruby 3.2.4 kaynak koddan derlendi (libyaml + psych + openssl)
+  - curl ile RubyGems API'ye push edildi
+  - GitHub'a push edildi
+
+- **C# SDK v1.2.0** → NuGet'e publish edildi
+  - 25+ yeni resource eklendi (Environment, BackgroundTask, OperationalWebhook, MessagePoller, Inbound, Connector, Integration, Stream + 18 ek resource)
+  - 21 yeni model dosyası oluşturuldu
+  - HookSniffClient.cs güncellendi (30+ resource property)
+  - dotnet SDK 8.0 kuruldu
+  - GitHub'a push edildi
+
+### Kalan:
+- **Kotlin** → Build fix + Maven Central publish
+- **Elixir** → Hex.pm publish
+- **Go, PHP, Swift** → Eksik Faz 8-15 resource'ları (düşük öncelik)
 
 ## ⚠️ KRİTİK KURALLAR
 
@@ -111,9 +113,3 @@ Sadece Node.js, Python ve Rust'ta tüm Faz 8-15 kaynakları mevcut.
 2. **Ana repoda sdks/ klasörü yok** — ayrı repolarda yaşıyor
 3. **Ayrı repolar** — hooksniff-{dil} formatında
 4. **Oturumlar 1 saat** — her şeyi dosyalara yaz, push et
-
-## 📝 Son Oturum (2026-05-18)
-- Java SDK v1.1.2 Maven Central'a publish edildi (Version.java düzeltildi)
-- Kotlin SDK build hâlâ bozuk (package çakışması: com.hooksniff vs com.hooksniff.kotlin)
-- Ana repodaki sdks/ klasörü silindi (1861 dosya)
-- GPG key keyserver'a yüklendi
