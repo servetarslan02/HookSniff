@@ -9,143 +9,144 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 /* ─── Customer Stories Data ─── */
 /* HS-067: These are illustrative usage scenarios, not real customer testimonials. */
 
-const featured = [
-  {
-    slug: 'ecommerce-platform',
-    company: 'ShopFlow',
-    logo: 'SF',
-    industry: 'E-Commerce',
-    quote: 'We switched from building our own webhooks to HookSniff. Saved us 3 months of engineering time and $2K/month in infrastructure costs.',
-    author: 'CTO',
-    metric: '3 months saved',
-    metricLabel: 'Engineering time',
-    desc: 'How ShopFlow scaled webhook delivery to 50K events/day and cut infrastructure costs by 60%.',
-  },
-  {
-    slug: 'fintech-startup',
-    company: 'PayFlow',
-    logo: 'PF',
-    industry: 'Fintech',
-    quote: 'We needed zero event loss for compliance. HookSniff delivers. The HMAC signatures and delivery logs give us the audit trail we need.',
-    author: 'Head of Engineering',
-    metric: '0',
-    metricLabel: 'Events lost',
-    desc: 'How PayFlow achieved zero event loss for financial compliance with HookSniff\'s FIFO delivery.',
-  },
-  {
-    slug: 'ai-agent-fleet',
-    company: 'NeuralOps',
-    logo: 'NO',
-    industry: 'AI / ML',
-    quote: 'HookSniff is the nervous system for our AI agent fleet. Events trigger actions in real-time. The schema registry ensures payload consistency across 200+ agents.',
-    author: 'ML Engineer',
-    metric: '<200ms',
-    metricLabel: 'Avg latency',
-    desc: 'How NeuralOps uses HookSniff to orchestrate 200+ AI agents with real-time event delivery.',
-  },
-  {
-    slug: 'saas-integration',
-    company: 'CloudSync',
-    logo: 'CS',
-    industry: 'SaaS',
-    quote: 'Free tier that actually works for startups. We process 8K webhooks/month without paying a cent. Svix wanted $490/month for the same thing.',
-    author: 'Solo Founder',
-    metric: '$0/mo',
-    metricLabel: 'Cost on Free tier',
-    desc: 'How CloudSync launched their webhook integration on HookSniff\'s free tier and scaled to Pro.',
-  },
-];
-
-const stories = [
-  {
-    slug: 'ecommerce-platform',
-    company: 'ShopFlow',
-    logo: 'SF',
-    industry: 'E-Commerce',
-    author: 'CTO',
-    authorRole: 'CTO',
-    quote: 'We switched from building our own webhooks to HookSniff. Saved us 3 months of engineering time.',
-    metric: '50K',
-    metricLabel: 'events/day',
-  },
-  {
-    slug: 'fintech-startup',
-    company: 'PayFlow',
-    logo: 'PF',
-    industry: 'Fintech',
-    author: 'Head of Engineering',
-    authorRole: 'Head of Engineering',
-    quote: 'Zero event loss for compliance. The HMAC signatures and delivery logs give us the audit trail we need.',
-    metric: '99.9%',
-    metricLabel: 'SLA guaranteed',
-  },
-  {
-    slug: 'ai-agent-fleet',
-    company: 'NeuralOps',
-    logo: 'NO',
-    industry: 'AI / ML',
-    author: 'ML Engineer',
-    authorRole: 'ML Engineer',
-    quote: 'HookSniff is the nervous system for our AI agent fleet. Events trigger actions in real-time.',
-    metric: '200+',
-    metricLabel: 'agents connected',
-  },
-  {
-    slug: 'saas-integration',
-    company: 'CloudSync',
-    logo: 'CS',
-    industry: 'SaaS',
-    author: 'Solo Founder',
-    authorRole: 'Founder',
-    quote: 'Free tier that actually works. We process 8K webhooks/month without paying a cent.',
-    metric: '8K',
-    metricLabel: 'events/month free',
-  },
-  {
-    slug: 'healthcare-saas',
-    company: 'MedConnect',
-    logo: 'MC',
-    industry: 'Healthcare',
-    author: 'CTO',
-    authorRole: 'CTO',
-    quote: 'GDPR compliance and EU data processing were non-negotiable. HookSniff checked every box.',
-    metric: 'EU',
-    metricLabel: 'data region (Frankfurt)',
-  },
-  {
-    slug: 'devtools-platform',
-    company: 'BuildKit',
-    logo: 'BK',
-    industry: 'Developer Tools',
-    author: 'Lead Developer',
-    authorRole: 'Lead Developer',
-    quote: 'The webhook playground and 11 SDKs made integration a breeze. Our developers love it.',
-    metric: '11',
-    metricLabel: 'SDKs available',
-  },
-];
-
-const techLogos = [
-  { name: 'GCP Cloud Run', desc: 'API hosting' },
-  { name: 'Neon PostgreSQL', desc: 'Database' },
-  { name: 'Upstash Redis', desc: 'Cache & rate limiting' },
-  { name: 'Cloudflare', desc: 'CDN & DNS' },
-  { name: 'Vercel', desc: 'Dashboard hosting' },
-  { name: 'Polar.sh', desc: 'Payments' },
-  { name: 'Rust', desc: 'API language' },
-  { name: 'Next.js', desc: 'Dashboard framework' },
-];
-
-const stats = [
-  { value: '11', label: 'SDKs published' },
-  { value: '1,378', label: 'metricTestsPassing' },
-  { value: '99.9%', label: 'metricDeliveryRate' },
-  { value: '8', label: 'metricLanguages' },
-];
-
 export function CustomersPageContent() {
   const t = useTranslations('customers');
   const [activeFilter, setActiveFilter] = useState('All');
+
+  const featured = [
+    {
+      slug: 'ecommerce-platform',
+      company: 'ShopFlow',
+      logo: 'SF',
+      industry: t('indEcommerce'),
+      quote: t('quoteShopFlow'),
+      author: t('roleCto'),
+      metric: '3 months saved',
+      metricLabel: t('metricEngTime'),
+      desc: t('descShopFlow'),
+    },
+    {
+      slug: 'fintech-startup',
+      company: 'PayFlow',
+      logo: 'PF',
+      industry: t('indFintech'),
+      quote: t('quotePayFlow'),
+      author: t('roleHeadEng'),
+      metric: '0',
+      metricLabel: t('metricEventsLost'),
+      desc: t('descPayFlow'),
+    },
+    {
+      slug: 'ai-agent-fleet',
+      company: 'NeuralOps',
+      logo: 'NO',
+      industry: t('indAiMl'),
+      quote: t('quoteNeuralOps'),
+      author: t('roleMlEng'),
+      metric: '<200ms',
+      metricLabel: t('metricAvgLatency'),
+      desc: t('descNeuralOps'),
+    },
+    {
+      slug: 'saas-integration',
+      company: 'CloudSync',
+      logo: 'CS',
+      industry: t('indSaas'),
+      quote: t('quoteCloudSync'),
+      author: t('roleSoloFounder'),
+      metric: '$0/mo',
+      metricLabel: t('metricCostFree'),
+      desc: t('descCloudSync'),
+    },
+  ];
+
+  const stories = [
+    {
+      slug: 'ecommerce-platform',
+      company: 'ShopFlow',
+      logo: 'SF',
+      industry: t('indEcommerce'),
+      author: t('roleCto'),
+      authorRole: t('roleCto'),
+      quote: t('quoteShopFlowShort'),
+      metric: '50K',
+      metricLabel: t('metricEventsDay'),
+    },
+    {
+      slug: 'fintech-startup',
+      company: 'PayFlow',
+      logo: 'PF',
+      industry: t('indFintech'),
+      author: t('roleHeadEng'),
+      authorRole: t('roleHeadEng'),
+      quote: t('quotePayFlowShort'),
+      metric: '99.9%',
+      metricLabel: t('metricSla'),
+    },
+    {
+      slug: 'ai-agent-fleet',
+      company: 'NeuralOps',
+      logo: 'NO',
+      industry: t('indAiMl'),
+      author: t('roleMlEng'),
+      authorRole: t('roleMlEng'),
+      quote: t('quoteNeuralOpsShort'),
+      metric: '200+',
+      metricLabel: t('metricAgents'),
+    },
+    {
+      slug: 'saas-integration',
+      company: 'CloudSync',
+      logo: 'CS',
+      industry: t('indSaas'),
+      author: t('roleSoloFounder'),
+      authorRole: t('roleFounder'),
+      quote: t('quoteCloudSyncShort'),
+      metric: '8K',
+      metricLabel: t('metricEventsMonth'),
+    },
+    {
+      slug: 'healthcare-saas',
+      company: 'MedConnect',
+      logo: 'MC',
+      industry: t('indHealthcare'),
+      author: t('roleCto'),
+      authorRole: t('roleCto'),
+      quote: t('quoteMedConnect'),
+      metric: 'EU',
+      metricLabel: t('metricDataRegion'),
+    },
+    {
+      slug: 'devtools-platform',
+      company: 'BuildKit',
+      logo: 'BK',
+      industry: t('indDevTools'),
+      author: t('roleLeadDev'),
+      authorRole: t('roleLeadDev'),
+      quote: t('quoteBuildKit'),
+      metric: '11',
+      metricLabel: t('metricSdks'),
+    },
+  ];
+
+  const techLogos = [
+    { name: 'GCP Cloud Run', desc: t('techGcp') },
+    { name: 'Neon PostgreSQL', desc: t('techNeon') },
+    { name: 'Upstash Redis', desc: t('techUpstash') },
+    { name: 'Cloudflare', desc: t('techCf') },
+    { name: 'Vercel', desc: t('techVercel') },
+    { name: 'Polar.sh', desc: t('techPolar') },
+    { name: 'Rust', desc: t('techRust') },
+    { name: 'Next.js', desc: t('techNext') },
+  ];
+
+  const stats = [
+    { value: '11', label: 'metricSdks' },
+    { value: '1,378', label: 'metricTestsPassing' },
+    { value: '99.9%', label: 'metricDeliveryRate' },
+    { value: '8', label: 'metricLanguages' },
+  ];
+
   const industries = ['All', ...new Set(stories.map((s) => s.industry))];
   const filtered = activeFilter === 'All' ? stories : stories.filter((s) => s.industry === activeFilter);
 
@@ -166,10 +167,10 @@ export function CustomersPageContent() {
         {/* Hero */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Trusted by developers worldwide
+            {t('heroTitle')}
           </h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
-            From solo founders to enterprise teams — HookSniff delivers webhooks reliably for thousands of developers.
+            {t('heroSubtitle')}
           </p>
         </div>
 
@@ -187,14 +188,14 @@ export function CustomersPageContent() {
         <div className="mb-16">
           <p className="text-center text-sm text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-6">{t("builtOn")}</p>
           <div className="flex flex-wrap justify-center gap-6">
-            {techLogos.map((t) => (
-              <div key={t.name} className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
+            {techLogos.map((tech) => (
+              <div key={tech.name} className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
                 <div className="w-8 h-8 rounded-full bg-linear-to-br from-brand-100 to-blue-100 dark:from-brand-900/30 dark:to-blue-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-bold">
-                  {t.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
+                  {tech.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{t.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-slate-500">{t.desc}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{tech.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-500">{tech.desc}</p>
                 </div>
               </div>
             ))}
@@ -204,7 +205,7 @@ export function CustomersPageContent() {
         {/* Featured Stories */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">{t("featuredStories")}</h2>
-          <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-8">Illustrative usage scenarios based on common webhook patterns.</p>
+          <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-8">{t('illustrativeNote')}</p>
           <div className="grid md:grid-cols-2 gap-6">
             {featured.map((f) => (
               <Link key={f.slug} href={`/customers/${f.slug}`} className="group">
@@ -222,7 +223,7 @@ export function CustomersPageContent() {
                       <p className="text-2xl font-bold text-brand-600 dark:text-brand-400">{f.metric}</p>
                       <p className="text-xs text-gray-500 dark:text-slate-500">{f.metricLabel}</p>
                     </div>
-                    <span className="text-sm text-brand-600 dark:text-brand-400 group-hover:underline">Read story →</span>
+                    <span className="text-sm text-brand-600 dark:text-brand-400 group-hover:underline">{t('readStory')}</span>
                   </div>
                 </div>
               </Link>
@@ -233,7 +234,7 @@ export function CustomersPageContent() {
         {/* All Stories */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">{t("allStories")}</h2>
-          <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-8">These are illustrative usage scenarios, not real customer testimonials.</p>
+          <p className="text-center text-sm text-gray-500 dark:text-slate-500 mb-8">{t('disclaimerNote')}</p>
 
           {/* Filter */}
           <div className="flex flex-wrap gap-2 mb-8 justify-center">
@@ -284,9 +285,9 @@ export function CustomersPageContent() {
         {/* CTA */}
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
           <h2 className="text-2xl font-bold text-white mb-2">{t("joinThousands")}</h2>
-          <p className="text-gray-500 dark:text-slate-400 mb-6">Start sending webhooks in 5 minutes. No credit card required.</p>
+          <p className="text-gray-500 dark:text-slate-400 mb-6">{t('startSending')}</p>
           <div className="flex items-center justify-center gap-4">
-            <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
+            <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('startFree')}</Link>
             <Link href="/contact" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">{t("talkToUs")}</Link>
           </div>
         </div>
