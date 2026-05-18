@@ -15,7 +15,7 @@
 | 7 | **Kotlin** | Kotlin | 1.1.0 | Maven Central | ⏳ | 8/8 ✅ | build fix gerekli |
 | 8 | **PHP** | PHP | 1.1.0 | Packagist | ✅ | 8/8 ✅ | — |
 | 9 | **C#** | C# | **1.2.0** | NuGet | ✅ | 8/8 ✅ | 30+ resource |
-| 10 | **Elixir** | Elixir | 1.1.1 | Hex.pm | ⏳ | 8/8 ✅ | — |
+| 10 | **Elixir** | Elixir | **1.2.1** | Hex.pm | ✅ | 8/8 ✅ | — |
 | 11 | **Swift** | Swift | 1.1.0 | GitHub tag | ✅ | 8/8 ✅ | — |
 
 ## Publish Edilen SDK'lar (Registry)
