@@ -6,235 +6,150 @@ import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
-const tlDr = [
-  'HookSniff is 20x cheaper than Svix ($24/mo vs $490/mo) with more features.',
-  'Both have 11 SDKs. HookSniff adds FIFO delivery, CloudEvents, and schema registry — Svix doesn\'t.',
-  'Svix leads in compliance (SOC 2 Type 2, HIPAA, PCI-DSS) and enterprise trust (30+ Fortune 500 logos).',
-  'Hookdeck has the best routing and 99.999% SLA, but is closed-source and usage-based.',
-  'Hook0 is the simplest self-hosted option but has only 4 SDKs and no compliance.',
-];
+const tlDrKeys = ['tlDr1', 'tlDr2', 'tlDr3', 'tlDr4', 'tlDr5'];
 
-const sections = [
-  {
-    title: 'Production Track Record',
-    description: 'How battle-tested is the platform in production?',
-    hooksniff: { text: 'Open-source since 2025. Growing community of startups and indie developers. 1,378 tests, production-ready codebase.', badge: 'Growing' },
-    svix: { text: 'Delivers billions of webhooks for fast-growing startups and Fortune 500. YC/a16z backed. 4.5M SDK downloads/week.', badge: 'Leader' },
-    hookdeck: { text: 'Processing billions of events/week. SOC 2 Type 2 certified. Used by thousands of developers worldwide.', badge: 'Established' },
-    hook0: { text: 'Independent European company. Bootstrapped, no VC. Smaller but dedicated community.', badge: 'Niche' },
-    winner: 'svix',
-    bestFit: 'Svix for enterprise trust, HookSniff for cost-conscious startups.',
+/* Section keys map — title, description, bestFit are translated via t() */
+const sectionKeys = [
+  { titleKey: 'sectionProductionTitle', descKey: 'sectionProductionDesc', bestFitKey: 'bestFitProduction', winner: 'svix',
+    hooksniff: { text: 'prodHooksniff', badge: 'badgeGrowing' },
+    svix: { text: 'prodSvix', badge: 'badgeLeader' },
+    hookdeck: { text: 'prodHookdeck', badge: 'badgeEstablished' },
+    hook0: { text: 'prodHook0', badge: 'badgeNiche' },
   },
-  {
-    title: 'Uptime SLA',
-    description: 'Contractually guaranteed uptime.',
-    hooksniff: { text: '99.9% uptime SLA. Upgrading to 99.99% with multi-region deployment.', badge: '99.9%' },
-    svix: { text: 'Up to 99.999% depending on tier. Measured 99.99999% historical uptime.', badge: '99.999%' },
-    hookdeck: { text: 'Up to 99.999% depending on tier. 99.999% measured uptime.', badge: '99.999%' },
-    hook0: { text: 'No SLA. Self-hosted — uptime depends on your infrastructure.', badge: 'N/A' },
-    winner: 'svix',
-    bestFit: 'Svix and Hookdeck for mission-critical. HookSniff for growing teams.',
+  { titleKey: 'sectionUptimeTitle', descKey: 'sectionUptimeDesc', bestFitKey: 'bestFitUptime', winner: 'svix',
+    hooksniff: { text: 'uptimeHooksniff', badge: '99.9%' },
+    svix: { text: 'uptimeSvix', badge: '99.999%' },
+    hookdeck: { text: 'uptimeHookdeck', badge: '99.999%' },
+    hook0: { text: 'uptimeHook0', badge: 'badgeNa' },
   },
-  {
-    title: 'Pricing',
-    description: 'Total cost of ownership at different scales.',
-    hooksniff: { text: 'Pro: $24/mo. 10,000 free events/mo. $0.50 per 100K events. 20% annual discount. All features included.', badge: '$24/mo' },
-    svix: { text: 'Professional: $490/mo. Unlimited free tier. Custom per-event pricing. Enterprise: custom.', badge: '$490/mo' },
-    hookdeck: { text: 'Developer: $0 (10K events). Team: $39/mo + usage. Growth: $499/mo. $1.00 per 100K events.', badge: '$39/mo+' },
-    hook0: { text: 'Self-hosted: free. Cloud: €99/mo. No per-event pricing on self-hosted.', badge: 'Free' },
-    winner: 'hooksniff',
-    bestFit: 'HookSniff for best value. Hook0 for zero budget.',
+  { titleKey: 'sectionPricingTitle', descKey: 'sectionPricingDesc', bestFitKey: 'bestFitPricing', winner: 'hooksniff',
+    hooksniff: { text: 'pricingHooksniff', badge: '$24/mo' },
+    svix: { text: 'pricingSvix', badge: '$490/mo' },
+    hookdeck: { text: 'pricingHookdeck', badge: '$39/mo+' },
+    hook0: { text: 'pricingHook0', badge: 'pricingFree' },
   },
-  {
-    title: 'SDKs & Language Support',
-    description: 'Officially supported client libraries.',
-    hooksniff: { text: '11 SDKs: Node.js, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift. Plus CLI tool.', badge: '11 SDKs' },
-    svix: { text: '11 SDKs: TypeScript, Python, Go, Java, Kotlin, Ruby, Rust, PHP, C#, CLI. Plus signature verification libs.', badge: '11 SDKs' },
-    hookdeck: { text: '8 SDKs: TypeScript, Python, Go, Java, Ruby, PHP, C#, Rust. Plus CLI tool.', badge: '8 SDKs' },
-    hook0: { text: '4 SDKs: JavaScript, Python, Go, PHP. Smaller ecosystem.', badge: '4 SDKs' },
-    winner: 'tie',
-    bestFit: 'HookSniff and Svix tied. Both cover every major language.',
+  { titleKey: 'sectionSdkTitle', descKey: 'sectionSdkDesc', bestFitKey: 'bestFitSdk', winner: 'tie',
+    hooksniff: { text: 'sdkHooksniff', badge: '11 SDKs' },
+    svix: { text: 'sdkSvix', badge: '11 SDKs' },
+    hookdeck: { text: 'sdkHookdeck', badge: '8 SDKs' },
+    hook0: { text: 'sdkHook0', badge: '4 SDKs' },
   },
-  {
-    title: 'FIFO Ordered Delivery',
-    description: 'Guarantee events are delivered in exact order. Critical for sequential operations like payment flows and state machines.',
-    hooksniff: { text: '✅ Full FIFO support with sequence numbers. Per-endpoint ordering guarantees.', badge: '✅' },
-    svix: { text: '❌ Not supported. Events may arrive out of order.', badge: '❌' },
-    hookdeck: { text: '❌ Not supported. Events may arrive out of order.', badge: '❌' },
-    hook0: { text: '❌ Not supported.', badge: '❌' },
-    winner: 'hooksniff',
-    bestFit: 'HookSniff — only service with FIFO support.',
+  { titleKey: 'sectionFifoTitle', descKey: 'sectionFifoDesc', bestFitKey: 'bestFitFifo', winner: 'hooksniff',
+    hooksniff: { text: 'fifoHooksniff', badge: '✅' },
+    svix: { text: 'fifoSvix', badge: '❌' },
+    hookdeck: { text: 'fifoHookdeck', badge: '❌' },
+    hook0: { text: 'fifoHook0', badge: '❌' },
   },
-  {
-    title: 'CloudEvents v1.0',
-    description: 'CNCF standard event format. Provides a common envelope for event data across different systems.',
-    hooksniff: { text: '✅ Full CloudEvents v1.0 support. Required attributes (specversion, type, source, id) validated.', badge: '✅' },
-    svix: { text: '❌ Not supported. Uses proprietary event format.', badge: '❌' },
-    hookdeck: { text: '❌ Not supported.', badge: '❌' },
-    hook0: { text: '❌ Not supported.', badge: '❌' },
-    winner: 'hooksniff',
-    bestFit: 'HookSniff — only service with CloudEvents support.',
+  { titleKey: 'sectionCloudEventsTitle', descKey: 'sectionCloudEventsDesc', bestFitKey: 'bestFitCloudEvents', winner: 'hooksniff',
+    hooksniff: { text: 'ceHooksniff', badge: '✅' },
+    svix: { text: 'ceSvix', badge: '❌' },
+    hookdeck: { text: 'ceHookdeck', badge: '❌' },
+    hook0: { text: 'ceHook0', badge: '❌' },
   },
-  {
-    title: 'Schema Registry',
-    description: 'Define, validate, and version webhook payloads with JSON Schema. Catch breaking changes before they ship.',
-    hooksniff: { text: '✅ Full schema registry with versioning, validation, and breaking change detection.', badge: '✅' },
-    svix: { text: '❌ No schema registry. Payloads are unvalidated.', badge: '❌' },
-    hookdeck: { text: '❌ No schema registry.', badge: '❌' },
-    hook0: { text: '❌ No schema registry.', badge: '❌' },
-    winner: 'hooksniff',
-    bestFit: 'HookSniff — only service with schema registry.',
+  { titleKey: 'sectionSchemaTitle', descKey: 'sectionSchemaDesc', bestFitKey: 'bestFitSchema', winner: 'hooksniff',
+    hooksniff: { text: 'schemaHooksniff', badge: '✅' },
+    svix: { text: 'schemaSvix', badge: '❌' },
+    hookdeck: { text: 'schemaHookdeck', badge: '❌' },
+    hook0: { text: 'schemaHook0', badge: '❌' },
   },
-  {
-    title: 'Embeddable Consumer Portal',
-    description: 'White-label UI for your customers to manage webhook subscriptions, view logs, and replay events.',
-    hooksniff: { text: '✅ Full embeddable portal. Endpoint management, log viewer, replay, secret rotation.', badge: '✅' },
-    svix: { text: '✅ Best-in-class. Fully themable, React library, one line of code. Custom UI via SDKs.', badge: '✅ Best' },
-    hookdeck: { text: '❌ No embeddable portal. Dashboard-only.', badge: '❌' },
-    hook0: { text: '❌ Basic UI only.', badge: '❌' },
-    winner: 'svix',
-    bestFit: 'Svix for best portal. HookSniff for solid alternative.',
+  { titleKey: 'sectionPortalTitle', descKey: 'sectionPortalDesc', bestFitKey: 'bestFitPortal', winner: 'svix',
+    hooksniff: { text: 'portalHooksniff', badge: '✅' },
+    svix: { text: 'portalSvix', badge: 'badgeBest' },
+    hookdeck: { text: 'portalHookdeck', badge: '❌' },
+    hook0: { text: 'portalHook0', badge: '❌' },
   },
-  {
-    title: 'Smart Routing',
-    description: 'Route webhooks to different endpoints based on strategy: round-robin, latency-based, or failover.',
-    hooksniff: { text: '✅ Round-robin, latency-based, and failover routing with fallback URLs.', badge: '✅' },
-    svix: { text: '❌ No smart routing. Single endpoint per webhook.', badge: '❌' },
-    hookdeck: { text: '✅ Advanced routing with filtering, transformation, and fan-out.', badge: '✅ Best' },
-    hook0: { text: '❌ No smart routing.', badge: '❌' },
-    winner: 'hookdeck',
-    bestFit: 'Hookdeck for advanced routing. HookSniff for basic needs.',
+  { titleKey: 'sectionRoutingTitle', descKey: 'sectionRoutingDesc', bestFitKey: 'bestFitRouting', winner: 'hookdeck',
+    hooksniff: { text: 'routingHooksniff', badge: '✅' },
+    svix: { text: 'routingSvix', badge: '❌' },
+    hookdeck: { text: 'routingHookdeck', badge: 'badgeBest' },
+    hook0: { text: 'routingHook0', badge: '❌' },
   },
-  {
-    title: 'Payload Transformations',
-    description: 'Modify webhook payloads before delivery. Filter fields, reshape data, adapt to consumer formats.',
-    hooksniff: { text: '✅ Template-based transformations with filtering.', badge: '✅' },
-    svix: { text: '✅ JavaScript-based payload transformations and delivery control.', badge: '✅' },
-    hookdeck: { text: '✅ Custom functions for payload modification.', badge: '✅' },
-    hook0: { text: '❌ Not supported.', badge: '❌' },
-    winner: 'svix',
-    bestFit: 'Svix for JS-based transforms. HookSniff for templates.',
+  { titleKey: 'sectionTransformTitle', descKey: 'sectionTransformDesc', bestFitKey: 'bestFitTransform', winner: 'svix',
+    hooksniff: { text: 'transformHooksniff', badge: '✅' },
+    svix: { text: 'transformSvix', badge: '✅' },
+    hookdeck: { text: 'transformHookdeck', badge: '✅' },
+    hook0: { text: 'transformHook0', badge: '❌' },
   },
-  {
-    title: 'Inbound Webhook Proxy',
-    description: 'Receive webhooks from third-party providers (Stripe, GitHub, Shopify) and forward them to your app.',
-    hooksniff: { text: '✅ Supports Stripe, GitHub, Shopify, and Generic. Auto-verifies HMAC signatures.', badge: '✅' },
-    svix: { text: '✅ Svix Ingest — dedicated product for receiving webhooks.', badge: '✅' },
-    hookdeck: { text: '✅ Core strength — Event Gateway for inbound webhooks.', badge: '✅ Best' },
-    hook0: { text: '❌ Not supported.', badge: '❌' },
-    winner: 'hookdeck',
-    bestFit: 'Hookdeck for core strength. HookSniff and Svix for basic needs.',
+  { titleKey: 'sectionInboundTitle', descKey: 'sectionInboundDesc', bestFitKey: 'bestFitInbound', winner: 'hookdeck',
+    hooksniff: { text: 'inboundHooksniff', badge: '✅' },
+    svix: { text: 'inboundSvix', badge: '✅' },
+    hookdeck: { text: 'inboundHookdeck', badge: 'badgeBest' },
+    hook0: { text: 'inboundHook0', badge: '❌' },
   },
-  {
-    title: 'Real-Time Streaming',
-    description: 'Live delivery stream for monitoring and debugging.',
-    hooksniff: { text: '✅ Server-Sent Events (SSE) for real-time delivery stream.', badge: '✅' },
-    svix: { text: '✅ Svix Stream — dedicated data streaming product. Goes beyond webhooks.', badge: '✅ Best' },
-    hookdeck: { text: '❌ No real-time streaming.', badge: '❌' },
-    hook0: { text: '❌ No real-time streaming.', badge: '❌' },
-    winner: 'svix',
-    bestFit: 'Svix for dedicated streaming product. HookSniff for SSE.',
+  { titleKey: 'sectionStreamingTitle', descKey: 'sectionStreamingDesc', bestFitKey: 'bestFitStreaming', winner: 'svix',
+    hooksniff: { text: 'streamingHooksniff', badge: '✅' },
+    svix: { text: 'streamingSvix', badge: 'badgeBest' },
+    hookdeck: { text: 'streamingHookdeck', badge: '❌' },
+    hook0: { text: 'streamingHook0', badge: '❌' },
   },
-  {
-    title: 'Rate Limiting',
-    description: 'Protect consumer endpoints from being overwhelmed. Per-endpoint throttling.',
-    hooksniff: { text: '✅ Token bucket and sliding window algorithms. Per-endpoint configuration.', badge: '✅' },
-    svix: { text: '✅ Per-tier limits: 50/s (Free), 400/s (Pro), Custom (Enterprise).', badge: '✅' },
-    hookdeck: { text: '✅ Throughput management with backpressure.', badge: '✅' },
-    hook0: { text: '❌ Not supported.', badge: '❌' },
-    winner: 'hooksniff',
-    bestFit: 'HookSniff for per-endpoint control. Svix for tier-based.',
+  { titleKey: 'sectionRateLimitTitle', descKey: 'sectionRateLimitDesc', bestFitKey: 'bestFitRateLimit', winner: 'hooksniff',
+    hooksniff: { text: 'rlHooksniff', badge: '✅' },
+    svix: { text: 'rlSvix', badge: '✅' },
+    hookdeck: { text: 'rlHookdeck', badge: '✅' },
+    hook0: { text: 'rlHook0', badge: '❌' },
   },
-  {
-    title: 'Latency Alerts',
-    description: 'Get notified when webhook delivery latency exceeds thresholds.',
-    hooksniff: { text: '✅ Alerts API with latency, failure rate, and consecutive failure conditions.', badge: '✅' },
-    svix: { text: '❌ No dedicated latency alerts.', badge: '❌' },
-    hookdeck: { text: '✅ Radar — dedicated latency alerting for third-party webhooks.', badge: '✅ Best' },
-    hook0: { text: '❌ Not supported.', badge: '❌' },
-    winner: 'hookdeck',
-    bestFit: 'Hookdeck for Radar. HookSniff for alerts API.',
+  { titleKey: 'sectionLatencyTitle', descKey: 'sectionLatencyDesc', bestFitKey: 'bestFitLatency', winner: 'hookdeck',
+    hooksniff: { text: 'latencyHooksniff', badge: '✅' },
+    svix: { text: 'latencySvix', badge: '❌' },
+    hookdeck: { text: 'latencyHookdeck', badge: 'badgeBest' },
+    hook0: { text: 'latencyHook0', badge: '❌' },
   },
-  {
-    title: 'Standard Webhooks',
-    description: 'Compatibility with the open Standard Webhooks specification for signing and verification.',
-    hooksniff: { text: '✅ Fully compatible. Uses HMAC-SHA256 with whsec_ secrets.', badge: '✅' },
-    svix: { text: '✅ Authored the spec with Twilio, Kong, Mux, Supabase, ngrok, Lob. Adopted by OpenAI, Brex.', badge: '✅ Author' },
-    hookdeck: { text: '⚠️ Custom signature schemes only. No Standard Webhooks.', badge: '⚠️' },
-    hook0: { text: '✅ Compatible with Standard Webhooks.', badge: '✅' },
-    winner: 'svix',
-    bestFit: 'Svix as spec author. HookSniff and Hook0 as adopters.',
+  { titleKey: 'sectionStandardTitle', descKey: 'sectionStandardDesc', bestFitKey: 'bestFitStandard', winner: 'svix',
+    hooksniff: { text: 'standardHooksniff', badge: '✅' },
+    svix: { text: 'standardSvix', badge: 'badgeAuthor' },
+    hookdeck: { text: 'standardHookdeck', badge: '⚠️' },
+    hook0: { text: 'standardHook0', badge: '✅' },
   },
-  {
-    title: 'Compliance & Security',
-    description: 'Regulatory and security certifications.',
-    hooksniff: { text: 'SOC 2 ready (audit in progress). GDPR compliant (EU hosting). SSRF protection. Constant-time HMAC. Argon2id. 2FA.', badge: 'SOC 2 Ready' },
-    svix: { text: 'SOC 2 Type II. HIPAA. PCI-DSS. PIPEDA. GDPR. CCPA. Static source IPs. Mature Rust codebase.', badge: 'Full' },
-    hookdeck: { text: 'SOC 2 Type II. PIPEDA. GDPR. CCPA. SSO/SAML on Growth+. IP whitelisting (add-on).', badge: 'SOC 2' },
-    hook0: { text: 'GDPR compliant (EU hosting). No SOC 2. No HIPAA.', badge: 'GDPR' },
-    winner: 'svix',
-    bestFit: 'Svix for full compliance. HookSniff for startups.',
+  { titleKey: 'sectionComplianceTitle', descKey: 'sectionComplianceDesc', bestFitKey: 'bestFitCompliance', winner: 'svix',
+    hooksniff: { text: 'complianceHooksniff', badge: 'SOC 2 Ready' },
+    svix: { text: 'complianceSvix', badge: 'badgeFull' },
+    hookdeck: { text: 'complianceHookdeck', badge: 'SOC 2' },
+    hook0: { text: 'complianceHook0', badge: 'GDPR' },
   },
-  {
-    title: 'Data Residency',
-    description: 'Where customer data can be hosted.',
-    hooksniff: { text: 'EU (Frankfurt). Single region.', badge: 'EU' },
-    svix: { text: 'EU, US, Australia, Canada, India, and custom private regions.', badge: '6+ regions' },
-    hookdeck: { text: 'US, EU, and Asia.', badge: '3 regions' },
-    hook0: { text: 'Your choice — self-hosted anywhere. Cloud: Europe.', badge: 'Any' },
-    winner: 'svix',
-    bestFit: 'Svix for 6+ regions. Hook0 for self-hosted anywhere.',
+  { titleKey: 'sectionResidencyTitle', descKey: 'sectionResidencyDesc', bestFitKey: 'bestFitResidency', winner: 'svix',
+    hooksniff: { text: 'residencyHooksniff', badge: 'EU' },
+    svix: { text: 'residencySvix', badge: '6+ regions' },
+    hookdeck: { text: 'residencyHookdeck', badge: '3 regions' },
+    hook0: { text: 'residencyHook0', badge: 'Any' },
   },
-  {
-    title: 'Open Source & Self-Hosted',
-    description: 'Can you run it on your own infrastructure?',
-    hooksniff: { text: '✅ MIT license. Docker deployment. Full feature parity with cloud.', badge: '✅ MIT' },
-    svix: { text: '✅ MIT license. Docker/K8s. Enterprise on-prem available.', badge: '✅ MIT' },
-    hookdeck: { text: '❌ Closed-source. Cloud-only.', badge: '❌' },
-    hook0: { text: '✅ Open-source. Self-hosted or cloud.', badge: '✅' },
-    winner: 'hooksniff',
-    bestFit: 'All except Hookdeck. HookSniff for MIT + full features.',
+  { titleKey: 'sectionOpenSourceTitle', descKey: 'sectionOpenSourceDesc', bestFitKey: 'bestFitOpenSource', winner: 'hooksniff',
+    hooksniff: { text: 'ossHooksniff', badge: '✅ MIT' },
+    svix: { text: 'ossSvix', badge: '✅ MIT' },
+    hookdeck: { text: 'ossHookdeck', badge: '❌' },
+    hook0: { text: 'ossHook0', badge: '✅' },
   },
-  {
-    title: 'Developer Experience',
-    description: 'CLI, Terraform, MCP, i18n, documentation quality.',
-    hooksniff: { text: 'CLI tool. MCP support. 8-language i18n dashboard. OpenAPI spec. 1,378 tests.', badge: 'Strong' },
-    svix: { text: 'CLI tool. Terraform provider. Swagger API docs. 6 industry use-case pages.', badge: 'Best' },
-    hookdeck: { text: 'CLI tool. Terraform provider. MCP support. Console. Radar.', badge: 'Strong' },
-    hook0: { text: 'MCP Server. Basic docs. Smaller ecosystem.', badge: 'Basic' },
-    winner: 'svix',
-    bestFit: 'Svix for best DX. HookSniff for i18n + MCP.',
+  { titleKey: 'sectionDxTitle', descKey: 'sectionDxDesc', bestFitKey: 'bestFitDx', winner: 'svix',
+    hooksniff: { text: 'dxHooksniff', badge: 'badgeStrong' },
+    svix: { text: 'dxSvix', badge: 'badgeBest' },
+    hookdeck: { text: 'dxHookdeck', badge: 'badgeStrong' },
+    hook0: { text: 'dxHook0', badge: 'badgeBasic' },
   },
-  {
-    title: 'Business Continuity',
-    description: 'Will the vendor be there long-term?',
-    hooksniff: { text: 'Open-source (MIT). Self-hostable. No vendor lock-in. Growing community.', badge: 'Low risk' },
-    svix: { text: 'YC/a16z backed. Powers Fortune 500 webhooks. Years of production history.', badge: 'Very low' },
-    hookdeck: { text: 'VC-backed. Established customer base. SOC 2 certified.', badge: 'Low' },
-    hook0: { text: 'Bootstrapped, no VC. "100% bootstrapped, we are here to stay."', badge: 'Low' },
-    winner: 'svix',
-    bestFit: 'Svix for VC backing. HookSniff and Hook0 for no lock-in.',
+  { titleKey: 'sectionContinuityTitle', descKey: 'sectionContinuityDesc', bestFitKey: 'bestFitContinuity', winner: 'svix',
+    hooksniff: { text: 'continuityHooksniff', badge: 'badgeLowRisk' },
+    svix: { text: 'continuitySvix', badge: 'badgeVeryLow' },
+    hookdeck: { text: 'continuityHookdeck', badge: 'badgeLow' },
+    hook0: { text: 'continuityHook0', badge: 'badgeLow' },
   },
 ];
 
-const faq = [
-  { q: 'Is HookSniff really cheaper than Svix?', a: 'Yes. HookSniff Pro is $24/mo vs Svix Professional at $490/mo. That\'s $5,592/year saved. HookSniff even offers a free tier with 10,000 events/month.' },
-  { q: 'Why is HookSniff SOC 2 "Ready" but not "Type 2"?', a: 'SOC 2 Type 2 requires a 3–12 month audit period. HookSniff has implemented all required controls and is undergoing the audit. We expect Type 2 certification soon.' },
-  { q: 'Can I self-host HookSniff?', a: 'Yes. HookSniff is open-source (MIT license) and supports Docker deployment. You can run the entire stack on your own infrastructure.' },
-  { q: 'Which webhook service has the most SDKs?', a: 'HookSniff and Svix both have 11 SDKs. Hookdeck has 8, Hook0 has 4.' },
-  { q: 'What is FIFO delivery and why does it matter?', a: 'FIFO (First In, First Out) guarantees events are delivered in order. Critical for sequential operations like order status updates, payment flows, and state machines. Only HookSniff offers this.' },
-  { q: 'Is HookSniff production-ready?', a: 'Yes. 1,378 tests, OpenTelemetry observability, SSRF protection, HMAC signing, GDPR compliance, and it runs on Google Cloud Run with Neon PostgreSQL.' },
-  { q: 'Can I migrate from Svix to HookSniff?', a: 'Yes. HookSniff uses the Standard Webhooks spec (same as Svix), so migration is straightforward. Your existing HMAC verification code will work as-is.' },
-  { q: 'Does HookSniff support HIPAA?', a: 'Not yet. HIPAA compliance requires a BAA and external audit. It\'s on our roadmap. Svix currently supports HIPAA.' },
+const faqKeys = [
+  { q: 'faq1q', a: 'faq1a' },
+  { q: 'faq2q', a: 'faq2a' },
+  { q: 'faq3q', a: 'faq3a' },
+  { q: 'faq4q', a: 'faq4a' },
+  { q: 'faq5q', a: 'faq5a' },
+  { q: 'faq6q', a: 'faq6a' },
+  { q: 'faq7q', a: 'faq7a' },
+  { q: 'faq8q', a: 'faq8a' },
 ];
 
 const scorecard = [
-  { category: 'Features', hooksniff: 9, svix: 8, hookdeck: 8, hook0: 5 },
-  { category: 'Pricing', hooksniff: 10, svix: 4, hookdeck: 7, hook0: 10 },
-  { category: 'Compliance', hooksniff: 6, svix: 10, hookdeck: 8, hook0: 3 },
-  { category: 'DX', hooksniff: 8, svix: 9, hookdeck: 8, hook0: 5 },
-  { category: 'Reliability', hooksniff: 7, svix: 10, hookdeck: 10, hook0: 5 },
-  { category: 'Open Source', hooksniff: 10, svix: 10, hookdeck: 0, hook0: 10 },
+  { categoryKey: 'scoreFeatures', hooksniff: 9, svix: 8, hookdeck: 8, hook0: 5 },
+  { categoryKey: 'scorePricing', hooksniff: 10, svix: 4, hookdeck: 7, hook0: 10 },
+  { categoryKey: 'scoreCompliance', hooksniff: 6, svix: 10, hookdeck: 8, hook0: 3 },
+  { categoryKey: 'scoreDx', hooksniff: 8, svix: 9, hookdeck: 8, hook0: 5 },
+  { categoryKey: 'scoreReliability', hooksniff: 7, svix: 10, hookdeck: 10, hook0: 5 },
+  { categoryKey: 'scoreOpenSource', hooksniff: 10, svix: 10, hookdeck: 0, hook0: 10 },
 ];
 
 function Badge({ text, variant }: { text: string; variant: 'green' | 'red' | 'yellow' | 'gray' | 'blue' }) {
@@ -258,6 +173,29 @@ export default function CompareContent() {
   const t = useTranslations('compare');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
+  const chooseSections = [
+    { when: t('whenChooseHooksniff'), items: [t('chooseHooksniff1'), t('chooseHooksniff2'), t('chooseHooksniff3'), t('chooseHooksniff4'), t('chooseHooksniff5'), t('chooseHooksniff6')] },
+    { when: t('whenChooseSvix'), items: [t('chooseSvix1'), t('chooseSvix2'), t('chooseSvix3'), t('chooseSvix4'), t('chooseSvix5'), t('chooseSvix6')] },
+    { when: t('whenChooseHookdeck'), items: [t('chooseHookdeck1'), t('chooseHookdeck2'), t('chooseHookdeck3'), t('chooseHookdeck4'), t('chooseHookdeck5')] },
+    { when: t('whenChooseHook0'), items: [t('chooseHook01'), t('chooseHook02'), t('chooseHook03'), t('chooseHook04')] },
+  ];
+
+  const deepDiveLinks = [
+    { title: t('deepDiveTitle'), desc: t('deepDiveDesc'), href: '/alternatives/svix' },
+    { title: t('deepDiveTitle2'), desc: t('deepDiveDesc2'), href: '/alternatives/hookdeck' },
+    { title: t('deepDiveTitle3'), desc: t('deepDiveDesc3'), href: '/alternatives/hook0' },
+    { title: t('deepDiveTitle4'), desc: t('deepDiveDesc4'), href: '/alternatives/svix-alternatives' },
+    { title: t('deepDiveTitle5'), desc: t('deepDiveDesc5'), href: '/alternatives/hookdeck-alternatives' },
+    { title: t('deepDiveTitle6'), desc: t('deepDiveDesc6'), href: '/build-vs-buy' },
+  ];
+
+  const screenshots = [
+    { src: '/screenshots/compare-hero.jpg', alt: t('altComparePage'), title: t('comparePage'), desc: t('sectionDesc20') },
+    { src: '/screenshots/scorecard.jpg', alt: t('altScorecard'), title: t('scorecard'), desc: t('sectionDesc6') },
+    { src: '/screenshots/playground.png', alt: t('altPlayground'), title: t('playground'), desc: t('sectionDescGenUrl') },
+    { src: '/screenshots/build-vs-buy.png', alt: t('altBuildVsBuy'), title: t('buildVsBuy'), desc: t('sectionDesc12dim') },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
@@ -275,10 +213,10 @@ export default function CompareContent() {
         {/* Hero */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            HookSniff vs Svix vs Hookdeck vs Hook0
+            {t('heroTitle')}
           </h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
-            A comprehensive, honest comparison of the top webhook services in 2026. Updated May 2026.
+            {t('heroSubtitle')}
           </p>
         </div>
 
@@ -286,10 +224,10 @@ export default function CompareContent() {
         <div className="mb-16 p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">TL;DR</h2>
           <ul className="space-y-2">
-            {tlDr.map((item, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-slate-400">
+            {tlDrKeys.map((key) => (
+              <li key={key} className="flex items-start gap-2 text-sm text-gray-600 dark:text-slate-400">
                 <svg className="w-4 h-4 text-brand-600 dark:text-brand-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                {item}
+                {t(key)}
               </li>
             ))}
           </ul>
@@ -299,34 +237,15 @@ export default function CompareContent() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("inAction")}</h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
-              <Image src="/screenshots/compare-hero.jpg" alt="HookSniff Compare — side-by-side webhook service comparison" width={800} height={450} className="w-full" />
-              <div className="p-4">
-                <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("comparePage")}</h3>
-                <p className="text-xs text-gray-500 dark:text-slate-500">20 detailed sections with honest, side-by-side comparison.</p>
+            {screenshots.map((s) => (
+              <div key={s.src} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                <Image src={s.src} alt={s.alt} width={800} height={450} className="w-full" />
+                <div className="p-4">
+                  <h3 className="font-bold text-gray-900 dark:text-white text-sm">{s.title}</h3>
+                  <p className="text-xs text-gray-500 dark:text-slate-500">{s.desc}</p>
+                </div>
               </div>
-            </div>
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
-              <Image src="/screenshots/scorecard.jpg" alt="HookSniff Scorecard — feature comparison across 6 categories" width={800} height={450} className="w-full" />
-              <div className="p-4">
-                <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("scorecard")}</h3>
-                <p className="text-xs text-gray-500 dark:text-slate-500">6 categories scored honestly. Svix: 51, HookSniff: 50.</p>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
-              <Image src="/screenshots/playground.png" alt="HookSniff Playground — test webhooks in real-time" width={800} height={450} className="w-full" />
-              <div className="p-4">
-                <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("playground")}</h3>
-                <p className="text-xs text-gray-500 dark:text-slate-500">Generate URLs, send webhooks, inspect payloads in real-time.</p>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
-              <Image src="/screenshots/build-vs-buy.png" alt="HookSniff Build vs Buy — 12 dimension webhook infrastructure comparison" width={800} height={450} className="w-full" />
-              <div className="p-4">
-                <h3 className="font-bold text-gray-900 dark:text-white text-sm">{t("buildVsBuy")}</h3>
-                <p className="text-xs text-gray-500 dark:text-slate-500">12 dimensions: cost, time, security, reliability, and more.</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -346,8 +265,8 @@ export default function CompareContent() {
               </thead>
               <tbody>
                 {scorecard.map((row) => (
-                  <tr key={row.category} className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
-                    <td className="py-2 px-4 text-gray-700 dark:text-slate-300 font-medium">{row.category}</td>
+                  <tr key={row.categoryKey} className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
+                    <td className="py-2 px-4 text-gray-700 dark:text-slate-300 font-medium">{t(row.categoryKey)}</td>
                     <td className="py-2 px-4 text-center font-bold text-gray-900 dark:text-white bg-brand-50/20 dark:bg-brand-500/5">{row.hooksniff}/10</td>
                     <td className="py-2 px-4 text-center text-gray-600 dark:text-slate-400">{row.svix}/10</td>
                     <td className="py-2 px-4 text-center text-gray-600 dark:text-slate-400">{row.hookdeck}/10</td>
@@ -375,15 +294,15 @@ export default function CompareContent() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("detailedComparison")}</h2>
           <div className="space-y-6">
-            {sections.map((section, idx) => (
-              <div key={section.title} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+            {sectionKeys.map((section, idx) => (
+              <div key={section.titleKey} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
                   <div className="flex items-center gap-3">
                     <span className="w-7 h-7 flex items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-bold">{idx + 1}</span>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">{section.title}</h3>
-                      <p className="text-xs text-gray-500 dark:text-slate-500">{section.description}</p>
-                      {section.bestFit && <p className="text-xs text-brand-600 dark:text-brand-400 mt-1 font-medium">Best fit: {section.bestFit}</p>}
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t(section.titleKey)}</h3>
+                      <p className="text-xs text-gray-500 dark:text-slate-500">{t(section.descKey)}</p>
+                      {section.bestFitKey && <p className="text-xs text-brand-600 dark:text-brand-400 mt-1 font-medium">{t('bestFit')}: {t(section.bestFitKey)}</p>}
                     </div>
                   </div>
                 </div>
@@ -396,9 +315,9 @@ export default function CompareContent() {
                       <div key={name} className={`p-4 ${isWinner ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold text-gray-500 dark:text-slate-500">{labels[name]}</span>
-                          <Badge text={data.badge} variant={getBadgeVariant(section.winner, name)} />
+                          <Badge text={t(data.badge)} variant={getBadgeVariant(section.winner, name)} />
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-slate-400">{data.text}</p>
+                        <p className="text-sm text-gray-600 dark:text-slate-400">{t(data.text)}</p>
                       </div>
                     );
                   })}
@@ -410,14 +329,9 @@ export default function CompareContent() {
 
         {/* When to choose what */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">When to choose what?</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t('whenChooseHooksniff').replace('...', '?')}</h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {[
-              { when: 'Choose HookSniff if...', items: ['You want the best price/feature ratio ($24/mo)', 'You need FIFO ordered delivery', 'You want CloudEvents standard support', 'You\'re a startup watching costs', 'You want self-hosted + managed options', 'You need a schema registry'] },
-              { when: 'Choose Svix if...', items: ['You need SOC 2 Type 2, HIPAA, or PCI-DSS', 'You\'re a Fortune 500 company', 'You need 99.999% SLA guarantees', 'You want data streaming (Svix Stream)', 'You need 6+ data residency regions', 'You want the most mature ecosystem'] },
-              { when: 'Choose Hookdeck if...', items: ['You need complex event routing rules', 'You need 99.999% uptime SLA', 'You want webhook latency alerts (Radar)', 'You need advanced inbound webhook handling', 'You want a fully managed solution'] },
-              { when: 'Choose Hook0 if...', items: ['You want 100% self-hosted control', 'You need European data sovereignty', 'Budget is the #1 priority', 'You want a bootstrapped, no-VC company'] },
-            ].map((section) => (
+            {chooseSections.map((section) => (
               <div key={section.when} className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
                 <h3 className="font-bold text-gray-900 dark:text-white mb-3">{section.when}</h3>
                 <ul className="space-y-2">
@@ -437,7 +351,7 @@ export default function CompareContent() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("faq")}</h2>
           <div className="space-y-3 max-w-3xl mx-auto">
-            {faq.map((item, i) => (
+            {faqKeys.map((item, i) => (
               <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
                 <button
                   type="button"
@@ -445,11 +359,11 @@ export default function CompareContent() {
                   onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
                   className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                 >
-                  <span className="font-medium text-gray-900 dark:text-white pr-4">{item.q}</span>
+                  <span className="font-medium text-gray-900 dark:text-white pr-4">{t(item.q)}</span>
                   <svg className={`w-5 h-5 text-gray-500 dark:text-slate-500 shrink-0 transition-transform ${expandedFaq === i ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 {expandedFaq === i && (
-                  <div className="px-6 pb-4"><p className="text-sm text-gray-600 dark:text-slate-400">{item.a}</p></div>
+                  <div className="px-6 pb-4"><p className="text-sm text-gray-600 dark:text-slate-400">{t(item.a)}</p></div>
                 )}
               </div>
             ))}
@@ -460,14 +374,7 @@ export default function CompareContent() {
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">{t("deepDive")}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { title: 'HookSniff vs Svix', desc: 'Detailed 1:1 comparison', href: '/alternatives/svix' },
-              { title: 'HookSniff vs Hookdeck', desc: 'Open-source vs closed-source', href: '/alternatives/hookdeck' },
-              { title: 'HookSniff vs Hook0', desc: 'Feature-rich vs minimal', href: '/alternatives/hook0' },
-              { title: 'Svix Alternatives', desc: 'All Svix alternatives ranked', href: '/alternatives/svix-alternatives' },
-              { title: 'Hookdeck Alternatives', desc: 'All Hookdeck alternatives ranked', href: '/alternatives/hookdeck-alternatives' },
-              { title: 'Build vs Buy', desc: 'Should you build your own?', href: '/build-vs-buy' },
-            ].map((link) => (
+            {deepDiveLinks.map((link) => (
               <Link key={link.title} href={link.href} className="group p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
                 <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mb-1">{link.title}</h3>
                 <p className="text-sm text-gray-600 dark:text-slate-400">{link.desc}</p>
@@ -478,10 +385,10 @@ export default function CompareContent() {
 
         {/* CTA */}
         <div className="text-center p-8 bg-gray-900 dark:bg-slate-800 rounded-xl">
-          <h2 className="text-2xl font-bold text-white mb-2">Ready to try HookSniff?</h2>
-          <p className="text-gray-500 dark:text-slate-400 mb-6">Start free. Scale when ready. No credit card required.</p>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('ctaTitle')}</h2>
+          <p className="text-gray-500 dark:text-slate-400 mb-6">{t('ctaSubtitle')}</p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">Start for free →</Link>
+            <Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('ctaButton')}</Link>
             <Link href="/pricing" className="px-6 py-3 border border-gray-600 dark:border-slate-600 text-gray-300 dark:text-slate-300 rounded-lg text-sm font-medium hover:border-gray-400 dark:hover:border-slate-400 transition-colors">{t("viewPricing")}</Link>
           </div>
         </div>
