@@ -1,5 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
 
@@ -8,52 +9,28 @@ export const metadata: Metadata = {
   description: 'Embed the HookSniff customer portal in your application',
 };
 
-export default function PortalPage() {
+export default async function PortalPage() {
+  const t = await getTranslations('docsEmbedPortal');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Embeddable Portal</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Let your customers manage their own webhooks — without building a UI from scratch.
+        {t('subtitle')}
       </p>
 
       {/* The Problem */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Problem</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          If you&apos;re a SaaS platform sending webhooks to your customers, they need to:
-        </p>
-        <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>Add and manage their webhook endpoints</li>
-          <li>View delivery status and debug failures</li>
-          <li>Rotate signing secrets</li>
-          <li>Replay failed deliveries</li>
-        </ul>
-        <p className="text-gray-600 dark:text-slate-400 mt-4">
-          Building this UI yourself takes weeks. And every customer asks for different features.
-        </p>
-      </section>
-
-      {/* The Solution */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Solution: Embeddable Portal</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          HookSniff provides a white-labeled portal component you can embed in your app with a single script tag. Your customers get a full webhook management UI without you writing a line of frontend code.
-        </p>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">Customers can:</p>
-        <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><strong>Create & manage endpoints</strong> — Add their own webhook URLs</li>
-          <li><strong>View deliveries</strong> — See all webhook deliveries with status, timestamps, and payloads</li>
-          <li><strong>Inspect payloads</strong> — View request and response details for each attempt</li>
-          <li><strong>Rotate secrets</strong> — Manage their own signing secrets</li>
-          <li><strong>Replay failed deliveries</strong> — Re-queue deliveries that failed</li>
-        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('theProblem')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('problemDesc')}</p>
       </section>
 
       {/* How to Embed */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How to Embed</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('howEmbed')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('howEmbedDesc')}</p>
 
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Script Tag (Recommended)</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('install')}</h3>
+        <p className="text-gray-600 dark:text-slate-400 mb-3">{t('installDesc')}</p>
         <CodeBlock
           code={`<!-- Add to your app's HTML -->
 <script src="https://cdn.hooksniff.com/portal.js"></script>
@@ -83,10 +60,8 @@ export default function PortalPage() {
 
       {/* Customization */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Customization</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Match the portal to your brand:
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('customization')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('customizationDesc')}</p>
         <CodeBlock
           code={`HookSniffPortal.init({
   apiKey: 'hr_live_YOUR_CUSTOMER_KEY',
@@ -107,15 +82,17 @@ export default function PortalPage() {
         />
       </section>
 
-      {/* Benefits */}
+      {/* Features */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Why Use the Portal?</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('features')}</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><strong>Zero support tickets</strong> — Customers debug their own webhook issues</li>
-          <li><strong>Real-time visibility</strong> — See delivery status without contacting your team</li>
-          <li><strong>Secure access</strong> — Each customer only sees their own endpoints and deliveries</li>
-          <li><strong>API key scoping</strong> — Portal keys are scoped to the customer&apos;s resources</li>
-          <li><strong>No frontend work</strong> — Embed with one line, customize with options</li>
+          <li>{t('feature1')}</li>
+          <li>{t('feature2')}</li>
+          <li>{t('feature3')}</li>
+          <li>{t('feature4')}</li>
+          <li>{t('feature5')}</li>
+          <li>{t('feature6')}</li>
+          <li>{t('feature7')}</li>
         </ul>
       </section>
     </article>
