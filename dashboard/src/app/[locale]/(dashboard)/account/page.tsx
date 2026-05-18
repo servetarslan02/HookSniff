@@ -18,7 +18,6 @@ const tabSkeleton = (
 const TeamPage = dynamic(() => import('../team/page'), { ssr: false, loading: () => tabSkeleton });
 const NotificationsPage = dynamic(() => import('../notifications/page'), { ssr: false, loading: () => tabSkeleton });
 const SettingsPage = dynamic(() => import('../settings/page'), { ssr: false, loading: () => tabSkeleton });
-const ServiceTokensPage = dynamic(() => import('../service-tokens/page'), { ssr: false, loading: () => tabSkeleton });
 const PortalCustomizePage = dynamic(() => import('../portal-customize/page'), { ssr: false, loading: () => tabSkeleton });
 const PortalManagePage = dynamic(() => import('../portal-manage/page'), { ssr: false, loading: () => tabSkeleton });
 
@@ -31,7 +30,6 @@ export default function AccountPage() {
         { key: 'settings', label: t('settings'), icon: '⚙️', content: () => <SettingsPage /> },
         { key: 'team', label: t('team'), icon: '👥', content: () => <TeamPage /> },
         { key: 'notifications', label: t('notifications'), icon: '🔔', content: () => <NotificationsPage /> },
-        { key: 'tokens', label: t('serviceTokens'), icon: '🎟️', content: () => <ServiceTokensPage /> },
         { key: 'portal-customize', label: t('portalCustomize'), icon: '🎨', content: () => <PortalCustomizePage /> },
         { key: 'portal-manage', label: t('portalManage'), icon: '🖼️', content: () => <PortalManagePage /> },
       ]}
