@@ -19,7 +19,7 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/transforms': '/content-mgmt',
   '/schemas': '/content-mgmt',
   '/templates': '/content-mgmt',
-  '/inbound': '/content-mgmt',
+  '/inbound': '/operational-webhooks',
   // DevTools section
   '/playground': '/devtools',
   '/signature-verifier': '/devtools',
