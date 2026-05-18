@@ -1,5 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
 
@@ -8,46 +9,47 @@ export const metadata: Metadata = {
   description: 'How HookSniff secures webhook deliveries with signatures and encryption',
 };
 
-export default function SecurityPage() {
+export default async function SecurityPage() {
+  const t = await getTranslations('docsSecurity');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Webhook Security</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Webhooks carry sensitive data. Without verification, anyone can send fake events to your endpoint.
+        {t('subtitle')}
       </p>
 
       {/* The Problem */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Problem</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('theProblem')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Webhooks are just HTTP POST requests. If your endpoint accepts any POST request without verification, an attacker can:
+          {t('theProblemDesc')}
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>Send fake &quot;payment succeeded&quot; events to give themselves free products</li>
-          <li>Replay old events to trigger duplicate processing</li>
-          <li>Send malformed payloads to crash your application</li>
+          <li>{t('problem1')}</li>
+          <li>{t('problem2')}</li>
+          <li>{t('problem3')}</li>
         </ul>
       </section>
 
       {/* The Solution */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How HookSniff Secures Webhooks</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('howSecures')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Every webhook is signed using <strong>Standard Webhooks</strong> HMAC-SHA256. The signature is included in the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Signature</code> header. The receiver verifies the signature using the shared secret — if it doesn&apos;t match, the request is rejected.
+          {t('howSecuresDesc1')}
         </p>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Format: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">v1,{'{'}base64(hmac_signature){'}'}</code>
         </p>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">HookSniff also includes:</p>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('howSecuresAlso')}</p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Timestamp</code> — Unix timestamp to prevent replay attacks</li>
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Delivery-Id</code> — Unique delivery identifier for deduplication</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Timestamp</code> — {t('timestampHeader')}</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Delivery-Id</code> — {t('deliveryIdHeader')}</li>
         </ul>
       </section>
 
       {/* Verification Examples */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Verification Examples</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('verificationExamples')}</h2>
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Node.js</h3>
         <CodeBlock
@@ -114,9 +116,9 @@ def verify_webhook_signature(payload: bytes, signature_header: str, secret: str)
 
       {/* Timestamp Validation */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Timestamp Validation</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('timestampValidation')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Always validate the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Timestamp</code> header to prevent replay attacks. Reject webhooks older than <strong>5 minutes</strong>:
+          {t('timestampValidationDesc')}
         </p>
         <CodeBlock
           code={`function isTimestampValid(timestampHeader: string, toleranceSec = 300): boolean {
@@ -129,43 +131,43 @@ def verify_webhook_signature(payload: bytes, signature_header: str, secret: str)
 
       {/* IP Whitelisting */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">IP Whitelisting</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('ipWhitelisting')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          For additional security, restrict incoming webhooks to HookSniff&apos;s IP addresses:
+          {t('ipWhitelistingDesc')}
         </p>
         <CodeBlock
           code={`curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/outbound-ips`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          Use these IPs in your firewall or reverse proxy. Note: IPs may change — fetch periodically.
+          {t('ipWhitelistingNote')}
         </p>
       </section>
 
       {/* SSRF Protection */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">SSRF Protection</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('ssrfProtection')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          HookSniff blocks webhook delivery to internal/private networks to prevent SSRF attacks:
+          {t('ssrfProtectionDesc')}
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">localhost</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">127.0.0.1</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">::1</code></li>
-          <li>Private IP ranges: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">10.*</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">172.16-31.*</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">192.168.*</code></li>
-          <li>Link-local: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">169.254.*</code></li>
-          <li>Internal domains: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">*.local</code>, <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">*.internal</code></li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">{t('ssrfLocalhost')}</code></li>
+          <li>{t('ssrfPrivate')}</li>
+          <li>{t('ssrfLinkLocal')}</li>
+          <li>{t('ssrfInternal')}</li>
         </ul>
       </section>
 
       {/* Checklist */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Security Checklist</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('checklist')}</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>✅ Always verify HMAC signatures before processing</li>
-          <li>✅ Use constant-time comparison (hmac.compare_digest)</li>
-          <li>✅ Validate timestamps (reject older than 5 minutes)</li>
-          <li>✅ Use HTTPS endpoints only</li>
-          <li>✅ Store signing secrets securely (environment variables, not code)</li>
-          <li>✅ Rotate secrets periodically via the API</li>
-          <li>✅ Whitelist HookSniff&apos;s outbound IPs if your firewall supports it</li>
+          <li>✅ {t('check1')}</li>
+          <li>✅ {t('check2')}</li>
+          <li>✅ {t('check3')}</li>
+          <li>✅ {t('check4')}</li>
+          <li>✅ {t('check5')}</li>
+          <li>✅ {t('check6')}</li>
+          <li>✅ {t('check7')}</li>
         </ul>
       </section>
     </article>
