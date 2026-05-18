@@ -41,8 +41,8 @@ const withBundleAnalyzer = process.env.ANALYZE === 'true'
 
 const baseConfig = withBundleAnalyzer(withNextIntl(nextConfig));
 
-// Only enable Sentry sourcemap upload when org + project are configured
-if (process.env.SENTRY_ORG && process.env.SENTRY_PROJECT) {
+// Only enable Sentry sourcemap upload when org + project + auth token are configured
+if (process.env.SENTRY_ORG && process.env.SENTRY_PROJECT && process.env.SENTRY_AUTH_TOKEN) {
   module.exports = withSentryConfig(baseConfig, {
     org: process.env.SENTRY_ORG,
     project: process.env.SENTRY_PROJECT,
@@ -51,6 +51,11 @@ if (process.env.SENTRY_ORG && process.env.SENTRY_PROJECT) {
     hideSourceMaps: true,
     disableLogger: true,
     automaticVercelMonitors: true,
+    telemetry: false,
+    // Don't fail the build if Sentry upload fails
+    errorHandler: (err) => {
+      console.warn('⚠️ Sentry upload error (non-fatal):', err.message);
+    },
   });
 } else {
   module.exports = baseConfig;
