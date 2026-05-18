@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-18 07:26 GMT+8 (Oturum — Faz 8-15 tamamlandı, SDK publish)
+> Son güncelleme: 2026-05-19 00:36 GMT+8 (Tüm SDK registry publish tamamlandı)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -145,11 +145,11 @@ HookSniff/
 | 3 | Go | GitHub tag | v1.1.0 | ✅ |
 | 4 | Rust | crates.io | 1.1.0 | ✅ Yüklendi |
 | 5 | Ruby | RubyGems | 1.2.0 | ✅ Yüklendi (30+ resource) |
-| 6 | Java | Maven Central | — | ⏳ mvn deploy gerekli |
-| 7 | Kotlin | Maven Central | — | ⏳ ./gradlew publish gerekli |
-| 8 | PHP | Packagist | — | ✅ Otomatik (GitHub push) |
-| 9 | C# | NuGet | 1.2.0 | ✅ Yüklendi (30+ resource) |
-| 10 | Elixir | Hex.pm | — | ⏳ mix hex.publish gerekli |
+| 6 | Java | Maven Central | 1.1.0 | ✅ Yüklendi |
+| 7 | Kotlin | Maven Central | 1.1.0 | ✅ Yüklendi |
+| 8 | PHP | Packagist | 1.1.0 | ✅ Otomatik (GitHub push) |
+| 9 | C# | NuGet | 1.2.0 | ✅ Yüklendi |
+| 10 | Elixir | Hex.pm | 1.1.0 | ✅ Yüklendi |
 | 11 | Swift | GitHub tag | v1.1.0 | ✅ |
 
 ### Ayrı Repo Durumu (Hepsi v1.1.0 kodu push edildi)
@@ -168,46 +168,9 @@ HookSniff/
 | hooksniff-elixir | github.com/servetarslan02/hooksniff-elixir | 5fd0f41f |
 | hooksniff-swift | github.com/servetarslan02/hooksniff-swift | 69479f1f |
 
-### ⚠️ KALAN REGISTRY PUBLISH İŞLEMLERİ
+### ✅ TÜM REGISTRY PUBLISH İŞLEMLERİ TAMAMLANDI
 
-Aşağıdaki SDK'ların kodu ayrı repolarda push edildi ama registry'ye yüklenmedi.
-Her biri için local build + publish komutları:
-
-**⚠️ Credentials local dosyalarda saklanır, GitHub'a push edilmez!**
-
-#### Ruby (RubyGems)
-```bash
-cd hooksniff-ruby
-gem build hooksniff.gemspec
-gem push hooksniff-1.1.0.gem
-```
-
-#### Java (Maven Central via Sonatype)
-```bash
-cd hooksniff-java
-mvn deploy -B -DskipTests
-```
-
-#### Kotlin (Maven Central via Sonatype)
-```bash
-cd hooksniff-kotlin
-./gradlew publish
-```
-
-#### C# (NuGet)
-```bash
-cd hooksniff-csharp
-dotnet pack -c Release
-dotnet nuget push "bin/Release/*.nupkg" --api-key <NUGET_KEY> --source https://api.nuget.org/v3/index.json
-```
-
-#### Elixir (Hex.pm)
-```bash
-cd hooksniff-elixir
-mix hex.publish --yes
-```
-
-Credentials → local `.env` dosyasında saklanır.
+11 SDK'nın hepsi ilgili registry'lere yüklendi.
 
 ---
 
@@ -236,13 +199,11 @@ Credentials → local `.env` dosyasında saklanır.
 
 ---
 
-## 📝 Son Oturum (2026-05-18)
+## 📝 Son Oturum (2026-05-19)
 
-- Faz 14 (Integration) + Faz 15 (Streaming) tamamlandı
-- 11 SDK v1.1.0 — tüm ayrı repolar güncellendi
-- npm, PyPI, crates.io, Go tag, Swift tag publish edildi
-- Ruby, Java, Kotlin, C#, Elixir registry publish bekliyor (local build gerekli)
-- Migration 063 + 064 Neon DB'ye uygulandı
+- Tüm SDK registry publish işlemleri tamamlandı (Ruby, Java, Kotlin, C#, Elixir)
+- 11 SDK → 11 registry'de yüklü ✅
+- Sıradaki: test coverage artırma veya yeni feature
 
 ### Python SDK v1.2.0 Büyük Düzeltme (2026-05-18 22:52)
 - **Kritik sorun düzeltildi**: Tüm API yolları Svix'ten kalmıştı, HookSniff'e uyarlandı
