@@ -15,5 +15,4 @@
 - Env variable'ları Vercel'de KALDIRMA — Sentry kullanılıyor
 
 ## Deploy Durumu
-- Günlük deploy limiti (100/gün) dolmuş
-- Yarın otomatik tetiklenir veya manuel redeploy yapılabilir
+- Build hatası düzeltildi, yeni deploy tetiklenir
