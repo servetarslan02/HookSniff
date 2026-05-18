@@ -11,10 +11,10 @@
 
 ```
 Svix:      ████████████████████ 100%
-HookSniff: ████████████████░░░░  80%
+HookSniff: █████████████████░░░  85%
 ```
 
-**Hedef: %90+ (15-25 saat kaldı)**
+**Hedef: %90+ (10-20 saat kaldı)**
 
 ---
 
@@ -87,7 +87,7 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 ### 4. Error Class Çeşitliliği ❌
 
 **Svix:** 20+ spesifik error type
-**HookSniff:** 5 SDK'da tam, 6 SDK'da eksik
+**HookSniff:** ✅ 11/11 SDK'da 21 error type
 
 | SDK | Mevcut Error Types | Durum |
 |-----|-------------------|-------|
@@ -245,7 +245,7 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 3. ✅ Pagination helper (11/11 SDK)
 
 ### Faz 1.5 — Error Classes ✅ (TAMAMLANDI)
-4. ✅ Error class çeşitliliği (11/11 SDK — 12 type her biri)
+4. ✅ Error class çeşitliliği (11/11 SDK — 21 type her biri)
 
 ### Faz 2 — Orta (20-28 saat)
 5. ❌ Config seçenekleri (tüm diller)
@@ -290,7 +290,7 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 
 | Kriter | Eski Tahmin | Gerçek | Hedef |
 |--------|-------------|--------|-------|
-| SDK kalite skoru | %62 | **%72** | %90+ |
+| SDK kalite skoru | **%85** | %90+ |
 | Test coverage | ~%70 | ~%70 | %95+ |
 | Error type sayısı | **12 (11/11 SDK)** | 10+ (tümü) |
 | İmza doğrulama | Yok | **✅ 11/11** | 11 dilde |
