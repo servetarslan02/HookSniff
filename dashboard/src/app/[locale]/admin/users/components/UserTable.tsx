@@ -80,33 +80,35 @@ export function UserTable({
                       className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
                     />
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('id')}</th>
+                  <th scope="col" className="px-3 py-3 hidden lg:table-cell">
+                    <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('id')}</span>
+                  </th>
                   <th scope="col">
-                    <button type="button" onClick={() => handleSort('email')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByEmail')}>
+                    <button type="button" onClick={() => handleSort('email')} className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByEmail')}>
                       {tc('email')} {sortField === 'email' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
                   </th>
-                  <th scope="col">
+                  <th scope="col" className="hidden sm:table-cell">
                     <button type="button" onClick={() => handleSort('name')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByName')}>
                       {tc('name')} {sortField === 'name' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
                   </th>
                   <th scope="col">
-                    <button type="button" onClick={() => handleSort('plan')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByPlan')}>
+                    <button type="button" onClick={() => handleSort('plan')} className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByPlan')}>
                       {tc('plan')} {sortField === 'plan' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
                   </th>
-                  <th scope="col">
+                  <th scope="col" className="hidden md:table-cell">
                     <button type="button" onClick={() => handleSort('status')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByStatus')}>
                       {tc('status')} {sortField === 'status' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
                   </th>
-                  <th scope="col">
+                  <th scope="col" className="hidden lg:table-cell">
                     <button type="button" onClick={() => handleSort('created_at')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByCreated')}>
                       {tc('created')} {sortField === 'created_at' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('actions')}</th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
@@ -121,38 +123,38 @@ export function UserTable({
                         className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
                       />
                     </td>
-                    <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
+                    <td className="px-3 py-3 sm:py-4 text-xs font-mono text-gray-600 dark:text-slate-400 hidden lg:table-cell">
                       {u.id.slice(0, 8)}…
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-linear-to-br from-red-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-linear-to-br from-red-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                           {(u.name || u.email)?.charAt(0).toUpperCase() || '?'}
                         </div>
-                        <span className="text-sm text-gray-900 dark:text-white">{u.email}</span>
+                        <span className="text-xs sm:text-sm text-gray-900 dark:text-white truncate max-w-[150px] sm:max-w-none">{u.email}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">{u.name || '—'}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1.5">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${planBadgeColors[u.plan] || planBadgeColors.developer}`}>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden sm:table-cell">{u.name || '—'}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <div className="flex items-center gap-1 sm:gap-1.5">
+                        <span className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${planBadgeColors[u.plan] || planBadgeColors.developer}`}>
                           {u.plan}
                         </span>
                         {u.role && u.role !== 'member' && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400">
+                          <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 hidden sm:inline-flex">
                             {u.role}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                         <StatusBadge status={u.status} />
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 hidden lg:table-cell">
                       {new Date(u.created_at).toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <div className="flex items-center gap-1 sm:gap-2">
                         <Link
                           href={`/admin/users/${u.id}`}
                           className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium"
@@ -161,13 +163,13 @@ export function UserTable({
                         </Link>
                         <button type="button"
                           onClick={() => { setPlanChangeTarget(u); setNewPlan(u.plan); }}
-                          className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium"
+                          className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium hidden sm:inline"
                         >
                           {t('changePlan')}
                         </button>
                         <button type="button"
                           onClick={() => handleToggleStatus(u)}
-                          className={`text-xs font-medium ${
+                          className={`text-xs font-medium hidden sm:inline ${
                             u.status === 'active'
                               ? 'text-red-600 dark:text-red-400 hover:text-red-700'
                               : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'
@@ -177,7 +179,7 @@ export function UserTable({
                         </button>
                         <button type="button"
                           onClick={() => handleImpersonate(u)}
-                          className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 font-medium"
+                          className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 font-medium hidden md:inline"
                           title={t('viewAsUser')}
                         >
                           👁️ {t('impersonateUser')}
@@ -192,19 +194,20 @@ export function UserTable({
 
           {/* Pagination */}
           {total > perPage && (
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
-              <span className="text-sm text-gray-500 dark:text-slate-400">
+            <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">
                 {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
               </span>
               <div className="flex gap-1">
                 <button type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                 >
                   {tc('previous')}
                 </button>
-                {/* Page numbers */}
+                {/* Page numbers — hidden on mobile */}
+                <div className="hidden sm:flex gap-1">
                 {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
                   let pageNum: number;
                   if (totalPages <= 7) {
@@ -231,10 +234,11 @@ export function UserTable({
                     </button>
                   );
                 })}
+                </div>
                 <button type="button"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                 >
                   {tc('next')}
                 </button>

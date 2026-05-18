@@ -351,10 +351,10 @@ export default function AdminUserDetailPage() {
           {tc("back")}
         </button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
             {detail.user.name || detail.user.email}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400">{t("userDetail")}</p>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{t("userDetail")}</p>
         </div>
         <div className="flex items-center gap-2">
           <button

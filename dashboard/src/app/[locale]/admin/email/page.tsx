@@ -70,11 +70,11 @@ export default function AdminEmailPage() {
   }, [subject, body]);
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-4 sm:space-y-6 max-w-3xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">📧 {t('bulkEmail') || 'Bulk Email'}</h1>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">📧 {t('bulkEmail') || 'Bulk Email'}</h1>
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
           {t('bulkEmailDesc') || 'Send email to multiple users at once. Free/developer users are excluded by default.'}
         </p>
       </div>

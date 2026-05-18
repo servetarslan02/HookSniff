@@ -147,12 +147,14 @@ export default function ApplicationsPage() {
     );
   }
 
+// responsive-fix
+
   return (
     <div className="space-y-4">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
             {t('title') || 'Applications'}
           </h2>
           <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
@@ -162,7 +164,7 @@ export default function ApplicationsPage() {
         <button
           type="button"
           onClick={() => setShowCreate(!showCreate)}
-          className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition"
+          className="px-3 sm:px-4 py-2 bg-indigo-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-indigo-700 transition"
         >
           {t('create') || 'Create application'}
         </button>
@@ -263,7 +265,7 @@ export default function ApplicationsPage() {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {filteredApps.map((app) => {
             const labels = getAppLabels(app);
             return (
@@ -352,8 +354,8 @@ export default function ApplicationsPage() {
       {editApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setEditApp(null)} />
-          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-3 sm:mx-4 p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
               ✏️ {t('editApp') || 'Edit Application'}
             </h3>
             <form onSubmit={handleEdit} className="space-y-4">
