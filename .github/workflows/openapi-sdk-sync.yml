@@ -1,0 +1,163 @@
+name: OpenAPI SDK Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/openapi.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sdk-sync-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lang: node
+            generator: typescript-node
+            pkg: hooksniff
+            repo: hooksniff-node
+          - lang: python
+            generator: python
+            pkg: hooksniff
+            repo: hooksniff-python
+          - lang: go
+            generator: go
+            pkg: hooksniff
+            repo: hooksniff-go
+          - lang: rust
+            generator: rust
+            pkg: hooksniff
+            repo: hooksniff-rust
+          - lang: ruby
+            generator: ruby
+            pkg: hooksniff
+            repo: hooksniff-ruby
+          - lang: java
+            generator: java
+            pkg: hooksniff
+            repo: hooksniff-java
+          - lang: kotlin
+            generator: kotlin
+            pkg: hooksniff
+            repo: hooksniff-kotlin
+          - lang: php
+            generator: php
+            pkg: hooksniff
+            repo: hooksniff-php
+          - lang: csharp
+            generator: csharp
+            pkg: HookSniff
+            repo: hooksniff-csharp
+          - lang: elixir
+            generator: elixir
+            pkg: hooksniff
+            repo: hooksniff-elixir
+          - lang: swift
+            generator: swift5
+            pkg: hooksniff
+            repo: hooksniff-swift
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Setup Java (for OpenAPI Generator)
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install OpenAPI Generator CLI
+        run: npm install -g @openapitools/openapi-generator-cli
+
+      - name: Generate SDK
+        run: |
+          mkdir -p generated
+          npx @openapitools/openapi-generator-cli generate \
+            -i docs/openapi.yaml \
+            -g ${{ matrix.generator }} \
+            -o generated/${{ matrix.lang }} \
+            --package-name ${{ matrix.pkg }} \
+            --global-property=models,apis,supportingFiles \
+            --skip-validate-spec
+
+      - name: Checkout SDK repo
+        uses: actions/checkout@v6
+        with:
+          repository: servetarslan02/${{ matrix.repo }}
+          token: ${{ secrets.SDK_PUSH_TOKEN }}
+          path: sdk-repo
+
+      - name: Sync generated code
+        run: |
+          # Preserve .git, README, custom files
+          cd sdk-repo
+          
+          # Find and preserve files listed in .openapi-generator-ignore
+          IGNORE_FILE="../generated/${{ matrix.lang }}/.openapi-generator-ignore"
+          PRESERVE_PATTERNS=()
+          if [ -f "$IGNORE_FILE" ]; then
+            while IFS= read -r pattern; do
+              [[ "$pattern" =~ ^#.*$ || -z "$pattern" ]] && continue
+              PRESERVE_PATTERNS+=("$pattern")
+            done < "$IGNORE_FILE"
+          fi
+          
+          # Always preserve these
+          PRESERVED=(".git" "README.md" ".openapi-generator-ignore" "LICENSE")
+          
+          # Backup preserved files
+          for f in "${PRESERVED[@]}"; do
+            if [ -e "$f" ]; then
+              cp -r "$f" /tmp/preserved_${f} 2>/dev/null || true
+            fi
+          done
+          
+          # Copy generated files (excluding .openapi-generator metadata)
+          rsync -av --delete \
+            --exclude='.openapi-generator/' \
+            --exclude='.git/' \
+            --exclude='README.md' \
+            --exclude='LICENSE' \
+            ../generated/${{ matrix.lang }}/ .
+          
+          # Restore preserved files
+          for f in "${PRESERVED[@]}"; do
+            if [ -e "/tmp/preserved_${f}" ]; then
+              cp -r "/tmp/preserved_${f}" . 2>/dev/null || true
+            fi
+          done
+
+      - name: Commit and push
+        working-directory: sdk-repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          git add -A
+          git commit -m "chore: regenerate SDK from OpenAPI spec
+
+          Source: servetarslan02/HookSniff@${{ github.sha }}
+          Generator: ${{ matrix.generator }}
+          Spec version: $(grep 'version:' docs/openapi.yaml | head -1 | awk '{print $2}')"
+          
+          git push
