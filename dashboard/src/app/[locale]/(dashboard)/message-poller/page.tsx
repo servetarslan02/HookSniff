@@ -54,16 +54,16 @@ export default function MessagePollerPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Message Poller</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Message Poller</h1>
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
           Poll for messages using cursor-based pagination. Each consumer tracks their position in the stream.
         </p>
       </div>
 
       {/* Config Panel */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-        <h3 className="font-semibold text-gray-900 dark:text-white">Poll Configuration</h3>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 space-y-3 sm:space-y-4">
+        <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Poll Configuration</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Consumer ID</label>
             <input
@@ -119,8 +119,8 @@ export default function MessagePollerPage() {
       {/* Cursor Info */}
       {data?.cursor && (
         <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">📌 Cursor Position</h4>
-          <div className="flex gap-6 text-sm text-gray-600 dark:text-gray-400">
+          <h4 className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">📌 Cursor Position</h4>
+          <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             <span>Consumer: <code className="font-mono">{data.cursor.consumer_id}</code></span>
             <span>Last Message: <code className="font-mono">{data.cursor.last_message_id ?? '—'}</code></span>
             <span>Sequence: <code className="font-mono">{data.cursor.last_sequence_num}</code></span>
@@ -145,13 +145,13 @@ export default function MessagePollerPage() {
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900/50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Event</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Attempts</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Response</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Event</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Status</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Attempts</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Response</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Created</th>
+                <th className="px-3 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">

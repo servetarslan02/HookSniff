@@ -167,11 +167,11 @@ export default function ApplicationDetailPage() {
                 {app.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
                   {app.name}
                 </h1>
                 {app.description && (
-                  <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-0.5">
                     {app.description}
                   </p>
                 )}

@@ -15,10 +15,10 @@ export default function SettingsPage() {
   const t = useTranslations('settings');
 
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 max-w-2xl">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
           {t('subtitle')}
         </p>
       </div>

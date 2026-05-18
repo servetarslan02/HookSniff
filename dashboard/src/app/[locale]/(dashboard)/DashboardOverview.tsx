@@ -101,17 +101,17 @@ export function DashboardOverview() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
             {t('subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowWidgetSettings(!showWidgetSettings)}
-            className={`px-3 py-2 text-sm font-medium rounded-xl border transition ${
+            className={`px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-xl border transition ${
               showWidgetSettings
                 ? 'bg-brand-50 text-brand-700 border-brand-200 dark:bg-brand-900/20 dark:text-brand-400 dark:border-brand-800'
                 : 'text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700'
@@ -122,7 +122,7 @@ export function DashboardOverview() {
           </button>
           <button
             onClick={() => refetchStats()}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition"
           >
             ↻ {tc('refresh')}
           </button>
@@ -400,29 +400,29 @@ export function DashboardOverview() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-slate-700">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">ID</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('event')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('status')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('attempts')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('time')}</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">ID</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('event')}</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('status')}</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase hidden sm:table-cell">{t('attempts')}</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase hidden md:table-cell">{t('time')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
                 {recentDeliveries.map((d) => (
                   <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
-                    <td className="px-4 py-3">
+                    <td className="px-3 sm:px-4 py-2 sm:py-3">
                       <Link href={`/deliveries/${d.id}`} className="font-mono text-xs text-brand-600 dark:text-brand-400 hover:underline">
                         {d.id.slice(0, 8)}…
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300">{d.event || '—'}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[d.status] || ''}`}>
+                    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-700 dark:text-slate-300">{d.event || '—'}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-3">
+                      <span className={`inline-block px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[d.status] || ''}`}>
                         {d.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400">{d.attempt_count}</td>
-                    <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-500">
+                    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden sm:table-cell">{d.attempt_count}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs text-gray-500 dark:text-slate-500 hidden md:table-cell">
                       {new Date(d.created_at).toLocaleString()}
                     </td>
                   </tr>

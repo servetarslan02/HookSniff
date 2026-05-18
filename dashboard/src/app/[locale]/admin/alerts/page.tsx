@@ -156,16 +156,16 @@ export default function AdminAlertsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">🔔 {t('alerts') || 'Alerts'}</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">🔔 {t('alerts') || 'Alerts'}</h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
             {activeCount} {t('activeAlerts') || 'active'} · {alerts.length} {t('total') || 'total'}
           </p>
         </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
         >
           + {t('createAlert') || 'Create Alert'}
         </button>

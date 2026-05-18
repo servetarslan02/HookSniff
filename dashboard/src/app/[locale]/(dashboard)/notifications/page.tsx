@@ -92,14 +92,14 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
             {t("subtitle")}
           </p>
         </div>
         <button type="button"
           onClick={handleMarkAllAsRead}
-          className="px-4 py-2 text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-xl hover:bg-brand-100 dark:hover:bg-brand-500/20 transition"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-xl hover:bg-brand-100 dark:hover:bg-brand-500/20 transition"
         >
           {t('markAllRead')}
         </button>

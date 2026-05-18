@@ -74,14 +74,14 @@ export default function RateLimitingPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-        <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="glass-card p-4">
             <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">{t('totalEndpoints')}</div>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total_endpoints}</div>
@@ -103,19 +103,19 @@ export default function RateLimitingPage() {
 
       {limits.length > 0 && (
         <div className="glass-card overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('perEndpointLimits')}</h2>
+          <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200/50 dark:border-slate-700/50">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{t('perEndpointLimits')}</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('endpoint')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('rps')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('rpm')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('burst')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('actions')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('endpoint')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('rps')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">{t('rpm')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('burst')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">{t('status')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">

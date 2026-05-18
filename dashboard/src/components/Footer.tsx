@@ -47,9 +47,9 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Main Footer */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
           {/* Product */}
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">{t('product')}</h3>
