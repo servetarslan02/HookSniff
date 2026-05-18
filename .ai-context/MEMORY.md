@@ -203,7 +203,19 @@ HookSniff/
 
 - Tüm SDK registry publish işlemleri tamamlandı (Ruby, Java, Kotlin, C#, Elixir)
 - 11 SDK → 11 registry'de yüklü ✅
-- Sıradaki: test coverage artırma veya yeni feature
+- **Pagination Helper** tüm 11 SDK'ya eklendi ✅
+  - Python: `ListResponse` + `for msg in response:` auto-paginate
+  - Node.js: `listAll()` methodu + `createPaginator()` helper
+  - Go: generic `Paginator[T]` + `ListAll()` methodu
+  - PHP: `Paginator::paginate()` generator
+  - Java: `Paginator<T>` Iterable class
+  - Kotlin: `Paginator<T>` Iterable class
+  - Ruby: `Paginator` Enumerable class
+  - C#: `Paginator<T>` IAsyncEnumerable
+  - Elixir: `Paginator.paginate()` Stream
+  - Rust: `Paginator<T>` struct with async collect
+  - Swift: `Paginator<T>` AsyncSequence
+- Sıradaki: Error class çeşitliliği veya imza doğrulama
 
 ### Python SDK v1.2.0 Büyük Düzeltme (2026-05-18 22:52)
 - **Kritik sorun düzeltildi**: Tüm API yolları Svix'ten kalmıştı, HookSniff'e uyarlandı
