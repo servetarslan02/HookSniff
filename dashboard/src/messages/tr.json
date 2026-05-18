@@ -200,7 +200,12 @@
     "inboundWebhooks": "Gelen Webhooklar",
     "connectors": "Bağlayıcılar",
     "integrations": "Entegrasyonlar",
-    "streaming": "Yayın"
+    "streaming": "Yayın",
+    "sectionDeliveries": "Teslimatlar",
+    "sectionWebhooks": "Webhook'lar",
+    "sectionIntegrations": "Entegrasyonlar",
+    "sectionDevtools": "Geliştirici Araçları",
+    "sectionPortal": "Portal"
   },
   "dashboard": {
     "title": "Dashboard",

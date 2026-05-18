@@ -51,17 +51,32 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       items: [
         { name: t('core'), href: '/core', icon: '📊' },
         { name: t('applications'), href: '/applications', icon: '📱' },
-        { name: t('environments'), href: '/environments', icon: '🌐' },
-        { name: t('backgroundTasks'), href: '/background-tasks', icon: '⏳' },
+      ],
+    },
+    {
+      key: 'deliveries',
+      label: t('sectionDeliveries'),
+      items: [
         { name: t('deliveries'), href: '/deliveries', icon: '🔗' },
       ],
     },
     {
-      key: 'content',
-      label: t('sectionContent'),
+      key: 'webhooks',
+      label: t('sectionWebhooks'),
       items: [
-        { name: t('contentMgmt'), href: '/content-mgmt', icon: '📐' },
-        { name: t('devtools'), href: '/devtools', icon: '🛠️' },
+        { name: t('inboundWebhooks'), href: '/inbound', icon: '📥' },
+        { name: t('operationalWebhooks'), href: '/operational-webhooks', icon: '🪝' },
+        { name: t('messagePoller'), href: '/message-poller', icon: '📬' },
+        { name: t('backgroundTasks'), href: '/background-tasks', icon: '⏳' },
+      ],
+    },
+    {
+      key: 'integrations',
+      label: t('sectionIntegrations'),
+      items: [
+        { name: t('connectors'), href: '/connectors', icon: '🔌' },
+        { name: t('integrations'), href: '/integrations', icon: '🔗' },
+        { name: t('streaming'), href: '/streaming', icon: '📡' },
       ],
     },
     {
@@ -69,14 +84,30 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       label: t('sectionMonitoring'),
       items: [
         { name: t('observability'), href: '/observability', icon: '📡' },
-        { name: t('operationalWebhooks'), href: '/operational-webhooks', icon: '🪝' },
-        { name: t('messagePoller'), href: '/message-poller', icon: '📬' },
-        { name: t('inboundWebhooks'), href: '/inbound', icon: '📥' },
-        { name: t('connectors'), href: '/connectors', icon: '🔌' },
-        { name: t('integrations'), href: '/integrations', icon: '🔗' },
-        { name: t('streaming'), href: '/streaming', icon: '📡' },
-        { name: t('securitySection'), href: '/security-section', icon: '🔒' },
+      ],
+    },
+    {
+      key: 'devtools',
+      label: t('sectionDevtools'),
+      items: [
+        { name: t('devtools'), href: '/devtools', icon: '🛠️' },
+        { name: t('contentMgmt'), href: '/content-mgmt', icon: '📐' },
+      ],
+    },
+    {
+      key: 'config',
+      label: t('sectionConfig'),
+      items: [
         { name: t('routingConfig'), href: '/routing-config', icon: '🔀' },
+        { name: t('securitySection'), href: '/security-section', icon: '🔒' },
+        { name: t('environments'), href: '/environments', icon: '🌐' },
+      ],
+    },
+    {
+      key: 'portal',
+      label: t('sectionPortal'),
+      items: [
+        { name: t('portalSection'), href: '/portal-section', icon: '🪝' },
       ],
     },
     {
@@ -90,7 +121,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       key: 'account',
       label: t('sectionAccount'),
       items: [
-        { name: t('account'), href: '/account', icon: '👥' },
+        { name: t('account'), href: '/account', icon: '👤' },
       ],
     },
   ];
