@@ -1,28 +1,35 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 03:58 GMT+8
+> Son güncelleme: 2026-05-19 04:20 GMT+8
 
-## 🎯 Sıradaki: #12 — Test Coverage Artırma
+## ✅ Tamamlanan: Responsive Design Fix (Tüm Site)
 
-### Ne Yapılacak?
-SDK test coverage'ını %70'den %95+ seviyesine çıkar.
-Her SDK'da unit test'ler yazılacak.
-
-### Tahmini Süre: 12-16 saat
+38 dosyada responsive tasarım düzeltmesi yapıldı:
+- Dashboard layout, sidebar, header mobil uyumlu
+- 22 dashboard sayfası fixlendi
+- 10 admin sayfası fixlendi
+- 3 public sayfa fixlendi (landing, pricing, navbar)
+- Tablolar mobilde responsive
+- Commit: `ffa0dc4a`
 
 ---
 
-## 📊 SDK Kalite Skoru: %96
+## 🎯 Sıradaki: #10 — Typed Webhook Events
+
+### Ne Yapılacak?
+Compile-time type güvenliği için webhook event type'ları:
+- Node.js'de zaten var (`WebhookEventMap`)
+- Diğer SDK'lara benzer type-safe event mapping ekle
+
+### Tahmini Süre: 4-6 saat
+
+---
+
+## 📊 SDK Kalite Skoru: %92
 
 | # | Feature | Durum |
 |---|---------|-------|
-| 1-11 | Faz 1-5 | ✅ |
-| 12 | Test Coverage | ❌ Sıradaki |
-| 13 | CI/CD Otomatik Publish | ❌ |
-| 14-17 | Düşük öncelik | ❌ |
-
-## Son Yapılan İş (2026-05-19)
-- ✅ Typed Webhook Events (#10) — 11/11 SDK
-- ✅ SDK Version Header (#11) — 11/11 SDK
-  - `X-HookSniff-SDK: hooksniff-{dil}/{versiyon}` header'ı eklendi
-  - Tüm SDK'larda User-Agent ile birlikte otomatik gönderilir
+| 1-9 | Faz 1-3 | ✅ |
+| 10 | Typed Events | ❌ Sıradaki |
+| 11 | SDK Version Header | ❌ |
+| 12-17 | Düşük öncelik | ❌ |
