@@ -199,21 +199,26 @@ HookSniff/
 
 ---
 
-## 📝 Son Oturum (2026-05-19 03:51 — Responsive Design Fix)
+## 📝 Son Oturum (2026-05-19 04:50 — CI/CD Local Release)
 
 ### Yapılan İşler:
-- **38 dosyada responsive tasarım düzeltmesi** yapıldı
-- Dashboard layout, sidebar, header mobil uyumlu hale getirildi
-- 22 dashboard sayfası, 10 admin sayfası, 3 public sayfa fixlendi
-- Tablolar mobilde responsive (gizli sütunlar, küçük padding)
-- Landing page ve pricing page mobil uyumlu
-- PublicNavbar'a mobil menü eklendi
-- Commit: `ffa0dc4a`
+- **`local-release.sh` oluşturuldu** — GitHub Actions yerine local CI/CD
+- 11 SDK'yı tek komutla publish edebilir
+- Dry-run, tek SDK, version bump desteği
+- `.sdk-tokens.env.template` oluşturuldu
+- SDK kalite skoru: **%99**
+
+### Kullanım:
+```bash
+./local-release.sh dry-run        # Test et
+./local-release.sh patch           # 1.2.0 → 1.2.1 publish
+./local-release.sh node            # Sadece Node.js
+./local-release.sh status          # Durum raporu
+```
 
 ### Sıradaki:
-1. Vercel deploy kontrol
-2. Mobil görünüm test
-3. Typed Webhook Events (#10)
+1. Token'ları ayarla (`.sdk-tokens.env`)
+2. #14 JSDoc / Docstring (düşük öncelik)
 
 ---
 
