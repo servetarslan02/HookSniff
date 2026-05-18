@@ -58,7 +58,7 @@ HookSniff: ██████████████░░░░░░  72%
 | Go | `svix_http_client.go` loop | ✅ | ✅ | ❌ |
 | Rust | `execute_with_backoff()` | ✅ | ✅ | ❌ |
 | Ruby | `hooksniff_http_client.rb` loop | ✅ | ✅ | ❌ |
-| Java | `executeRequestWithRetry()` | ✅ | ✅ | ❌ |
+| Java | `executeRequestWithRetry()` | ✅ | ✅ | ✅ |
 | Kotlin | `executeRequestWithRetry()` | ✅ | ✅ | ❌ |
 | C# | retry loop | ✅ | ✅ | ❌ |
 | PHP | retry loop | ✅ | ✅ | ❌ |
