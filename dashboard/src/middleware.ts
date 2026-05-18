@@ -17,7 +17,6 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/search': '/deliveries',
   // Content section
   '/transforms': '/content-mgmt',
-  '/inbound': '/content-mgmt',
   '/schemas': '/content-mgmt',
   '/templates': '/content-mgmt',
   // DevTools section
@@ -25,7 +24,6 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/signature-verifier': '/devtools',
   '/api-importer': '/devtools',
   '/webhook-builder': '/devtools',
-  '/service-tokens': '/devtools',
   // Observability section
   '/health': '/observability',
   '/alerts': '/observability',
@@ -43,9 +41,10 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/notifications': '/account',
   '/billing': '/account',
   '/settings': '/account',
-  '/portal-customize': '/account',
-  '/portal-manage': '/account',
-  '/portal-section': '/account',
+  '/portal-customize': '/portal-section',
+  '/portal-manage': '/portal-section',
+  '/service-tokens': '/account',
+  // Deleted container pages (redirect to parent)
   '/team-mgmt': '/account',
   '/billing-overview': '/billing-section',
   '/settings-section': '/account',
@@ -104,8 +103,9 @@ export default function middleware(request: NextRequest) {
     '/get-started', '/startups',
     // Consolidated dashboard routes
     '/core', '/observability', '/devtools', '/content-mgmt', '/portal-section',
-    '/security-section', '/routing-config', '/team-mgmt', '/billing-overview',
-    '/settings-section',
+    '/security-section', '/routing-config', '/billing-section', '/account',
+    '/inbound', '/operational-webhooks', '/message-poller', '/background-tasks',
+    '/connectors', '/integrations', '/streaming', '/environments',
   ];
   const isPublic = withoutLocale === '/' || publicPaths.some((path) => withoutLocale.startsWith(path));
   if (!isPublic && !withoutLocale.startsWith('/admin')) {
