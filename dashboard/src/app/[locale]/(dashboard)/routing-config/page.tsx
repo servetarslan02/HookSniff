@@ -18,6 +18,7 @@ const tabSkeleton = (
 const RetryPolicyPage = dynamic(() => import('../retry-policy/page'), { ssr: false, loading: () => tabSkeleton });
 const RoutingPage = dynamic(() => import('../routing/page'), { ssr: false, loading: () => tabSkeleton });
 const CustomDomainPage = dynamic(() => import('../custom-domain/page'), { ssr: false, loading: () => tabSkeleton });
+const EnvironmentsPage = dynamic(() => import('../environments/page'), { ssr: false, loading: () => tabSkeleton });
 
 export default function RoutingConfigPage() {
   const t = useTranslations('nav');
@@ -25,9 +26,10 @@ export default function RoutingConfigPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'retry-policy', label: t('retryPolicy'), icon: '🔁', content: () => <RetryPolicyPage /> },
         { key: 'routing', label: t('routing'), icon: '🔀', content: () => <RoutingPage /> },
+        { key: 'retry-policy', label: t('retryPolicy'), icon: '🔁', content: () => <RetryPolicyPage /> },
         { key: 'custom-domain', label: t('customDomain'), icon: '🌐', content: () => <CustomDomainPage /> },
+        { key: 'environments', label: t('environments'), icon: '🌐', content: () => <EnvironmentsPage /> },
       ]}
     />
   );
