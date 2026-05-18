@@ -10,8 +10,6 @@ const storySlugs = [
   'saas-integration', 'healthcare-saas', 'devtools-platform',
 ] as const;
 
-type StorySlug = typeof storySlugs[number];
-
 function buildStories(t: (k: string) => string): Record<string, {
   company: string; logo: string; industry: string; tagline: string;
   website: string; size: string; events: string;
