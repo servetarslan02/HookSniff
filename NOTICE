@@ -1,0 +1,98 @@
+# Third-Party Notices
+
+HookSniff uses third-party software. Below is a list of these libraries and their licenses.
+
+---
+
+## Rust Dependencies (API + Worker)
+
+| Library | License | Copyright |
+|---------|---------|-----------|
+| axum | MIT | Copyright (c) 2019 Axum Contributors |
+| tokio | MIT | Copyright (c) 2019 Tokio Contributors |
+| serde | MIT OR Apache-2.0 | Copyright (c) 2014 David Tolnay |
+| serde_json | MIT OR Apache-2.0 | Copyright (c) 2014 David Tolnay |
+| uuid | MIT OR Apache-2.0 | Copyright (c) 2013 The Rust Project Developers |
+| chrono | MIT OR Apache-2.0 | Copyright (c) 2014 Kang Seonghoon |
+| sqlx | MIT OR Apache-2.0 | Copyright (c) 2019 Daniel Akhterov |
+| tower | MIT | Copyright (c) 2019 Tower Contributors |
+| tower-http | MIT | Copyright (c) 2019 Tower Contributors |
+| reqwest | MIT OR Apache-2.0 | Copyright (c) 2016 Sean McArthur |
+| redis (redis-rs) | MIT | Copyright (c) 2014 Armin Ronacher |
+| opentelemetry | Apache-2.0 | Copyright (c) OpenTelemetry Authors |
+| opentelemetry_sdk | Apache-2.0 | Copyright (c) OpenTelemetry Authors |
+| opentelemetry-otlp | Apache-2.0 | Copyright (c) OpenTelemetry Authors |
+| tonic | MIT | Copyright (c) 2019 Lucio Franco |
+| tracing | MIT | Copyright (c) 2019 Tokio Contributors |
+| tracing-subscriber | MIT | Copyright (c) 2019 Tokio Contributors |
+| tracing-opentelemetry | MIT | Copyright (c) 2019 Julian Tescher |
+| thiserror | MIT OR Apache-2.0 | Copyright (c) 2019 David Tolnay |
+| anyhow | MIT OR Apache-2.0 | Copyright (c) 2019 David Tolnay |
+| sha2 | MIT OR Apache-2.0 | Copyright (c) 2016 RustCrypto Developers |
+| hmac | MIT OR Apache-2.0 | Copyright (c) 2016 RustCrypto Developers |
+| hex | MIT OR Apache-2.0 | Copyright (c) 2013 KokaKiwi |
+| argon2 | MIT OR Apache-2.0 | Copyright (c) 2016 RustCrypto Developers |
+| jsonwebtoken | MIT | Copyright (c) 2015 Vincent Prouillet |
+| rustls | MIT OR Apache-2.0 | Copyright (c) 2016 Joseph Birr-Pixton |
+| prometheus | Apache-2.0 | Copyright (c) 2014 Prometheus Authors |
+| rand | MIT OR Apache-2.0 | Copyright (c) 2014 The Rust Project Developers |
+| regex | MIT OR Apache-2.0 | Copyright (c) 2014 The Rust Project Developers |
+| futures | MIT OR Apache-2.0 | Copyright (c) 2016 The Rust Project Developers |
+| async-trait | MIT OR Apache-2.0 | Copyright (c) 2018 David Tolnay |
+| aes-gcm | MIT OR Apache-2.0 | Copyright (c) 2016 RustCrypto Developers |
+| totp-rs | MIT OR Apache-2.0 | Copyright (c) 2021 Antoine Van Der Heyden |
+| base64 | MIT OR Apache-2.0 | Copyright (c) 2015 Alice Maz |
+| base32 | MIT OR Apache-2.0 | Copyright (c) 2015 Andrey Kutejko |
+| urlencoding | MIT OR Apache-2.0 | Copyright (c) 2016 Bertram Truong |
+| cookie | MIT OR Apache-2.0 | Copyright (c) 2014 Sergio Benitez |
+| once_cell | MIT OR Apache-2.0 | Copyright (c) 2018 David Tolnay |
+| proptest | MIT OR Apache-2.0 | Copyright (c) 2018 Jason Lingle |
+| criterion | MIT OR Apache-2.0 | Copyright (c) 2018 Brook Heisler |
+
+## TypeScript/Next.js Dependencies (Dashboard)
+
+| Library | License | Copyright |
+|---------|---------|-----------|
+| next | MIT | Copyright (c) 2024 Vercel, Inc. |
+| react | MIT | Copyright (c) Meta Platforms, Inc. |
+| react-dom | MIT | Copyright (c) Meta Platforms, Inc. |
+| next-intl | MIT | Copyright (c) 2022 Jan Amann |
+| zod | MIT | Copyright (c) 2020 Colin McDonnell |
+| recharts | MIT | Copyright (c) 2015 Recharts |
+| @tanstack/react-query | MIT | Copyright (c) 2021 Tanner Linsley |
+| @tanstack/react-virtual | MIT | Copyright (c) 2021 Tanner Linsley |
+| @sentry/nextjs | MIT | Copyright (c) 2019 Sentry (Functional Software, Inc.) |
+| @upstash/redis | MIT | Copyright (c) 2022 Upstash, Inc. |
+| @vercel/analytics | MIT | Copyright (c) 2022 Vercel, Inc. |
+| @vercel/speed-insights | MIT | Copyright (c) 2023 Vercel, Inc. |
+| clsx | MIT | Copyright (c) 2018 Luke Edwards |
+| dompurify | (Apache-2.0 OR MPL-2.0) | Copyright (c) 2015 Mario Heiderich |
+| tailwindcss | MIT | Copyright (c) 2022 Tailwind Labs, Inc. |
+| eslint | MIT | Copyright (c) 2013 Nicholas C. Zakas |
+| playwright | Apache-2.0 | Copyright (c) 2020 Microsoft Corporation |
+| typescript | Apache-2.0 | Copyright (c) 2012 Microsoft Corporation |
+
+## Licenses Requiring Attribution
+
+### Apache License 2.0
+Used by: opentelemetry, opentelemetry_sdk, opentelemetry-otlp, prometheus, dompurify, playwright, typescript
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+### MIT License
+The majority of dependencies are licensed under the MIT License.
+A copy of the MIT License is available in the LICENSE file at the root of this repository.
+
+---
+
+This file is automatically generated and may be updated. Last updated: 2026-05-19.
