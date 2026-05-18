@@ -1,5 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
 
@@ -8,58 +9,38 @@ export const metadata: Metadata = {
   description: 'Define and manage webhook event types in HookSniff',
 };
 
-export default function EventTypesPage() {
+export default async function EventTypesPage() {
+  const t = await getTranslations('docsEventTypes');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Event Types</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Event types let you categorize webhooks and route them to the right endpoints. Without them, every webhook goes everywhere.
+        {t('subtitle')}
       </p>
 
       {/* The Problem */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Problem</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          If your application sends different kinds of events — order updates, user signups, payment confirmations — you probably want different endpoints to handle them. Your order processing service shouldn&apos;t receive user signup events.
-        </p>
-        <p className="text-gray-600 dark:text-slate-400">
-          Without event types, you&apos;d need to filter on the consumer side, wasting bandwidth and processing time.
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('theProblem')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('problemDesc1')}</p>
+        <p className="text-gray-600 dark:text-slate-400">{t('problemDesc2')}</p>
       </section>
 
       {/* The Solution */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How Event Types Work</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Event types are string identifiers that describe what happened. They follow a <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">resource.action</code> pattern:
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('howWorks')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('howWorksDesc')}</p>
         <div className="grid grid-cols-2 gap-3 mb-4 not-prose">
-          {[
-            'order.created',
-            'order.updated',
-            'order.cancelled',
-            'payment.succeeded',
-            'payment.failed',
-            'user.created',
-            'user.updated',
-            'invoice.paid',
-          ].map((evt) => (
-            <code key={evt} className="bg-gray-100 dark:bg-slate-800 px-3 py-2 rounded-lg text-sm text-center">
-              {evt}
-            </code>
+          {['order.created', 'order.updated', 'order.cancelled', 'payment.succeeded', 'payment.failed', 'user.created', 'user.updated', 'invoice.paid'].map((evt) => (
+            <code key={evt} className="bg-gray-100 dark:bg-slate-800 px-3 py-2 rounded-lg text-sm text-center">{evt}</code>
           ))}
         </div>
-        <p className="text-gray-600 dark:text-slate-400">
-          You can use any string format, but <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">resource.action</code> is recommended for consistency.
-        </p>
+        <p className="text-gray-600 dark:text-slate-400">{t('anyFormat')}</p>
       </section>
 
       {/* Registering */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Registering Event Types</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Event types are automatically registered when you send a webhook. No pre-registration required:
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('registering')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('registeringDesc')}</p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
@@ -70,17 +51,13 @@ export default function EventTypesPage() {
     "data": {"order_id": "12345"}
   }'`}
         />
-        <p className="text-gray-600 dark:text-slate-400 mt-4">
-          The event type <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.created</code> is now available for filtering and search.
-        </p>
+        <p className="text-gray-600 dark:text-slate-400 mt-4">{t('nowAvailable')}</p>
       </section>
 
       {/* Filtering */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Filtering by Event Type</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Configure endpoints to only receive specific event types using the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">event_filter</code> field:
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('filtering')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('filteringDesc')}</p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
@@ -91,20 +68,18 @@ export default function EventTypesPage() {
     "event_filter": "order.*"
   }'`}
         />
-        <p className="text-gray-600 dark:text-slate-400 mt-4 mb-4">Supported filter patterns:</p>
+        <p className="text-gray-600 dark:text-slate-400 mt-4 mb-4">{t('filterPatterns')}</p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.created</code> — Exact match</li>
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.*</code> — Wildcard (all order events)</li>
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">*</code> — All events (default)</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.created</code> — {t('exactMatch')}</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.*</code> — {t('wildcard')}</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">*</code> — {t('allEvents')}</li>
         </ul>
       </section>
 
       {/* Schema Validation */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Schema Validation</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Optionally define JSON schemas for event types to validate payloads before delivery:
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('schemaValidation')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('schemaValidationDesc')}</p>
         <CodeBlock
           code={`{
   "event_type": "order.created",
@@ -119,20 +94,18 @@ export default function EventTypesPage() {
   }
 }`}
         />
-        <p className="text-gray-600 dark:text-slate-400 mt-4">
-          When a schema is defined, payloads that don&apos;t match are rejected with a <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">400 Bad Request</code> error before they even enter the delivery pipeline.
-        </p>
+        <p className="text-gray-600 dark:text-slate-400 mt-4">{t('schemaReject')}</p>
       </section>
 
       {/* Best Practices */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Best Practices</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('bestPractices')}</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><strong>Be specific:</strong> <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">invoice.payment_failed</code> is better than <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">invoice.error</code></li>
-          <li><strong>Use dots as separators:</strong> <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">resource.action</code> format</li>
-          <li><strong>Version when changing shapes:</strong> <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.created.v2</code></li>
-          <li><strong>Use wildcards for grouping:</strong> <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">payment.*</code> catches all payment events</li>
-          <li><strong>Document your event types:</strong> Keep a list of all event types your application emits</li>
+          <li><strong>{t('bpSpecific').split(':')[0]}:</strong> {t('bpSpecific').split(':').slice(1).join(':')}</li>
+          <li><strong>{t('bpDots').split(':')[0]}:</strong> {t('bpDots').split(':').slice(1).join(':')}</li>
+          <li><strong>{t('bpVersion').split(':')[0]}:</strong> {t('bpVersion').split(':').slice(1).join(':')}</li>
+          <li><strong>{t('bpWildcards').split(':')[0]}:</strong> {t('bpWildcards').split(':').slice(1).join(':')}</li>
+          <li><strong>{t('bpDocument').split(':')[0]}:</strong> {t('bpDocument').split(':').slice(1).join(':')}</li>
         </ul>
       </section>
     </article>
