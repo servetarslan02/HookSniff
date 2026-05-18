@@ -302,7 +302,7 @@
 - [ ] `cd dashboard && npm test` — Dashboard test
 - [ ] `cd dashboard && npx tsc --noEmit` — Tip kontrolü
 - [x] Tarayıcıda https://hooksniff.vercel.app aç
-- [x] Login ol (demo@hooksniff.com / Demo1234!)
+- [x] Login ol (demo@hooksniff.com (şifre: .sdk-tokens.env))
 - [x] Dashboard sayfalarını gez
 - [x] API health check: `curl https://hooksniff-api-*.run.app/health`
 - [ ] GitHub Actions durumunu kontrol et

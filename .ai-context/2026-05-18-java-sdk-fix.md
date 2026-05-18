@@ -33,7 +33,7 @@
 
 ## Sonatype Publish
 - Central Portal upload başarılı: Deployment ID `cd03e7b5-dc17-44a2-9601-210afae246b6` (AUTOMATIC)
-- Upload credential'ları: f0wXBf / EYLV763IsQVseaffdOXNScf2HZlcLDGEK
+- Upload credential'ları: [REDACTED]
 - Publish script eklendi: `publish.sh`
 - GPG key pair oluşturuldu (server'da, no passphrase)
 - deploy.gradle güncellendi (env-based credentials)

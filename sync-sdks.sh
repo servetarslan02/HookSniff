@@ -10,7 +10,7 @@ SDK_DIR="$SCRIPT_DIR/sdks"
 TMP_DIR="/tmp/hooksniff-sync"
 GITHUB_USER="servetarslan02"
 # Token from .sdk-tokens.env or hardcoded
-TOKEN="${GITHUB_TOKEN:-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}"
+TOKEN="${GITHUB_TOKEN:-}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
