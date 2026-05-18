@@ -46,7 +46,7 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/team': '/account',
   '/notifications': '/account',
   '/settings': '/account',
-  '/service-tokens': '/account',
+  '/service-tokens': '/core',
   '/portal-customize': '/account',
   '/portal-manage': '/account',
   '/billing': '/account',

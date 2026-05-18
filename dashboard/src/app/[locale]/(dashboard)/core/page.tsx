@@ -17,6 +17,7 @@ const tabSkeleton = (
 
 const DashboardOverview = dynamic(() => import('../DashboardOverview').then(mod => ({ default: mod.DashboardOverview })), { ssr: false, loading: () => tabSkeleton });
 const ApiKeysPage = dynamic(() => import('../api-keys/page'), { ssr: false, loading: () => tabSkeleton });
+const ServiceTokensPage = dynamic(() => import('../service-tokens/page'), { ssr: false, loading: () => tabSkeleton });
 
 export default function CorePage() {
   const t = useTranslations('nav');
@@ -26,6 +27,7 @@ export default function CorePage() {
       tabs={[
         { key: 'overview', label: t('dashboard'), icon: '📊', content: () => <DashboardOverview /> },
         { key: 'api-keys', label: t('apiKeys'), icon: '🔑', content: () => <ApiKeysPage /> },
+        { key: 'service-tokens', label: t('serviceTokens'), icon: '🎟️', content: () => <ServiceTokensPage /> },
       ]}
     />
   );
