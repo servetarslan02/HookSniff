@@ -243,3 +243,13 @@ Credentials → local `.env` dosyasında saklanır.
 - npm, PyPI, crates.io, Go tag, Swift tag publish edildi
 - Ruby, Java, Kotlin, C#, Elixir registry publish bekliyor (local build gerekli)
 - Migration 063 + 064 Neon DB'ye uygulandı
+
+### Python SDK v1.2.0 Büyük Düzeltme (2026-05-18 22:52)
+- **Kritik sorun düzeltildi**: Tüm API yolları Svix'ten kalmıştı, HookSniff'e uyarlandı
+- `/api/v1/app/{app_id}/...` → `/v1/...` (16 API modülü)
+- `app_id` parametresi kaldırıldı (JWT ile otomatik belirleniyor)
+- Model'ler HookSniff gerçek response'larıyla uyumlu hale getirildi
+- `application_id` field'ı EndpointOut'a eklendi (gerçek API'den doğrulandı)
+- 22 yeni model dosyası oluşturuldu
+- PyPI v1.2.0 yüklendi: https://pypi.org/project/hooksniff/1.2.0/
+- Demo hesapla gerçek API test edildi: ✅ Uyumlu
