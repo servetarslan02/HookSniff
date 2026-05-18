@@ -1,45 +1,35 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 02:48 GMT+8
+> Son güncelleme: 2026-05-19 02:56 GMT+8
 
-## 🎯 Sıradaki: #7 — Response Metadata Erişimi
+## 🎯 Sıradaki: #8 — Config Seçenekleri
 
 ### Ne Yapılacak?
-Tüm 11 SDK'da response header'larına erişim ekle:
-- `x-request-id` — debug için
-- `x-ratelimit-remaining` — rate limit takibi
-- `statusCode` — HTTP status code
+Tüm SDK'larda `baseUrl`, `timeout`, `debug`, `customHeaders` config options:
+- Sadece Node.js'de tam, diğerlerinde kısmen var
+- Self-hosted kullanıcılar için kritik
 
-### Örnek Kullanım:
-```go
-// Go
-resp, err := client.Endpoint.List(ctx, nil)
-fmt.Println(resp.Headers.Get("x-request-id"))
-fmt.Println(resp.Headers.Get("x-ratelimit-remaining"))
-```
-
-### Tahmini Süre: 2-3 saat
+### Tahmini Süre: 3-4 saat
 
 ---
 
-## 📊 SDK Kalite Skoru: %89
+## 📊 SDK Kalite Skoru: %90 🎉
 
 | # | Feature | Durum |
 |---|---------|-------|
 | 1-4 | Faz 1 (Kritik) | ✅ |
 | 5 | Payload Parsing | ✅ |
-| 6 | Idempotency Key | ✅ (zaten varmış) |
-| 7 | Response Metadata | ❌ Sıradaki |
-| 8 | Config | ❌ |
+| 6 | Idempotency Key | ✅ |
+| 7 | Response Metadata | ✅ |
+| 8 | Config | ❌ Sıradaki |
 | 9 | Debug Logging | ❌ |
 | 10 | Typed Events | ❌ |
 | 11 | SDK Version Header | ❌ |
-| 12 | Test Coverage | ❌ |
-| 13 | CI/CD | ❌ |
 
 ---
 
-## ⚠️ Bilinen Sorunlar
+## 🎉 %90 Hedefine Ulaşıldı!
 
-1. Kotlin SDK build sorunu (package çakışması)
-2. Test coverage düşük (%60-70)
+Svix'e göre %90 kalite skoruna ulaştık. Kalan işler:
+- Config + Debug Logging + Typed Events → %93-95
+- Test Coverage + CI/CD → %98-100
