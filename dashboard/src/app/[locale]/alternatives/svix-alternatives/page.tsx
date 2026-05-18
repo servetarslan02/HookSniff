@@ -9,57 +9,61 @@ export const metadata = {
   description: 'Looking for Svix alternatives? Compare HookSniff, Hookdeck, Hook0, and Convoy. Features, pricing, and honest pros/cons for each.',
 };
 
-const alternatives = [
-  {
-    name: 'HookSniff',
-    emoji: '🪝',
-    taglineKey: 'bestForStartups',
-    price: '$24/mo',
-    pros: ['20x cheaper than Svix', 'FIFO ordered delivery', 'Schema registry', 'Open source + self-hosted', 'English & Turkish dashboard', 'Smart routing'],
-    cons: ['Newer (less enterprise trust)', 'SOC 2 ready (not Type 2 yet)', '99.9% SLA (vs Svix 99.99%)', 'No HIPAA/PCI-DSS yet'],
-    bestForKey: 'bestForStartupsDesc',
-  },
-  {
-    name: 'Svix',
-    emoji: '🏢',
-    taglineKey: 'bestForEnterprise',
-    price: '$490/mo',
-    pros: ['SOC 2 Type 2 certified', '99.99% uptime SLA', 'Battle-tested at scale', 'Enterprise trust & compliance', 'Unlimited free tier events', 'Active open-source community'],
-    cons: ['Higher price point', 'Fewer SDKs (6 vs 11)', 'No FIFO delivery', 'No schema registry', 'No i18n support'],
-    bestForKey: 'bestForEnterpriseDesc',
-  },
-  {
-    name: 'Hookdeck',
-    emoji: '🔗',
-    taglineKey: 'bestForRouting',
-    price: '$39/mo + usage',
-    pros: ['Advanced event routing', 'Filtering and transformation', 'SOC 2 Type 2', '99.999% SLA', 'CLI for local dev'],
-    cons: ['Not open source', 'No self-hosted option', 'Usage-based pricing (unpredictable)', 'Fewer SDKs (8)'],
-    bestForKey: 'bestForRoutingDesc',
-  },
-  {
-    name: 'Hook0',
-    emoji: '🪝',
-    taglineKey: 'bestForEurope',
-    price: 'Free (self-hosted)',
-    pros: ['100% open source', 'European company (GDPR native)', 'No VC funding (bootstrapped)', 'Self-hosted or cloud'],
-    cons: ['Fewer features', 'Smaller community', 'Only 4 SDKs', 'No SOC 2'],
-    bestForKey: 'bestForEuropeDesc',
-  },
-  {
-    name: 'Convoy',
-    emoji: '📦',
-    taglineKey: 'bestForGo',
-    price: 'Free (self-hosted)',
-    pros: ['Written in Go', 'Open source', 'Good documentation'],
-    cons: ['Go-only SDK', 'Smaller ecosystem', 'No managed cloud offering', 'No longer actively maintained'],
-    bestForKey: 'bestForGoDesc',
-  },
-];
+// pros/cons keys are in alternatives translations (hsPro1-6, svixPro1-6, etc.)
+function getAlternatives(t: (key: string) => string) {
+  return [
+    {
+      name: 'HookSniff',
+      emoji: '🪝',
+      taglineKey: 'bestForStartups',
+      price: '$24/mo',
+      pros: [t('hsPro1'), t('hsPro2'), t('hsPro3'), t('hsPro4'), t('hsPro5'), t('hsPro6')],
+      cons: [t('hsCon1'), t('hsCon2'), t('hsCon3'), t('hsCon4')],
+      bestForKey: 'bestForStartupsDesc',
+    },
+    {
+      name: 'Svix',
+      emoji: '🏢',
+      taglineKey: 'bestForEnterprise',
+      price: '$490/mo',
+      pros: [t('svixPro1'), t('svixPro2'), t('svixPro3'), t('svixPro4'), t('svixPro5'), t('svixPro6')],
+      cons: [t('svixCon1'), t('svixCon2'), t('svixCon3'), t('svixCon4'), t('svixCon5')],
+      bestForKey: 'bestForEnterpriseDesc',
+    },
+    {
+      name: 'Hookdeck',
+      emoji: '🔗',
+      taglineKey: 'bestForRouting',
+      price: '$39/mo + usage',
+      pros: [t('hdPro1'), t('hdPro2'), t('hdPro3'), t('hdPro4'), t('hdPro5')],
+      cons: [t('hdCon1'), t('hdCon2'), t('hdCon3'), t('hdCon4')],
+      bestForKey: 'bestForRoutingDesc',
+    },
+    {
+      name: 'Hook0',
+      emoji: '🪝',
+      taglineKey: 'bestForEurope',
+      price: 'Free (self-hosted)',
+      pros: [t('h0Pro1'), t('h0Pro2'), t('h0Pro3'), t('h0Pro4')],
+      cons: [t('h0Con1'), t('h0Con2'), t('h0Con3'), t('h0Con4')],
+      bestForKey: 'bestForEuropeDesc',
+    },
+    {
+      name: 'Convoy',
+      emoji: '📦',
+      taglineKey: 'bestForGo',
+      price: 'Free (self-hosted)',
+      pros: [t('cvPro1'), t('cvPro2'), t('cvPro3')],
+      cons: [t('cvCon1'), t('cvCon2'), t('cvCon3'), t('cvCon4')],
+      bestForKey: 'bestForGoDesc',
+    },
+  ];
+}
 
 export default async function SvixAlternativesPage() {
   const t = await getTranslations('alternatives');
   const tc = await getTranslations('compare');
+  const alternatives = getAlternatives(t);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
