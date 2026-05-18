@@ -144,7 +144,7 @@ HookSniff/
 | 2 | Python | PyPI | 1.1.0 | ✅ Yüklendi |
 | 3 | Go | GitHub tag | v1.1.0 | ✅ |
 | 4 | Rust | crates.io | 1.1.0 | ✅ Yüklendi |
-| 5 | Ruby | RubyGems | — | ⏳ gem push gerekli |
+| 5 | Ruby | RubyGems | 1.2.0 | ✅ Yüklendi (30+ resource) |
 | 6 | Java | Maven Central | — | ⏳ mvn deploy gerekli |
 | 7 | Kotlin | Maven Central | — | ⏳ ./gradlew publish gerekli |
 | 8 | PHP | Packagist | — | ✅ Otomatik (GitHub push) |
