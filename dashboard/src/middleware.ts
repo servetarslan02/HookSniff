@@ -16,9 +16,9 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/logs': '/deliveries',
   '/search': '/deliveries',
   // Content/Webhooks section (content-mgmt now has inbound, operational, poller, tasks tabs)
-  '/transforms': '/content-mgmt',
-  '/schemas': '/content-mgmt',
-  '/templates': '/content-mgmt',
+  '/transforms': '/operational-webhooks',
+  '/schemas': '/operational-webhooks',
+  '/templates': '/operational-webhooks',
   '/inbound': '/operational-webhooks',
   // DevTools section
   '/playground': '/devtools',
@@ -108,7 +108,7 @@ export default function middleware(request: NextRequest) {
     '/privacy', '/terms', '/status', '/newsletter', '/build-vs-buy',
     '/get-started', '/startups',
     // Consolidated dashboard routes
-    '/core', '/applications', '/deliveries', '/content-mgmt', '/operational-webhooks',
+    '/core', '/applications', '/deliveries', '/operational-webhooks',
     '/integrations', '/observability', '/devtools', '/routing-config',
     '/account', '/billing-section',
   ];

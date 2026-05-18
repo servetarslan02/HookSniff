@@ -64,8 +64,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       key: 'webhooks',
       label: t('sectionWebhooks'),
       items: [
-        { name: t('contentMgmt'), href: '/content-mgmt', icon: '📐' },
-        { name: t('operationalWebhooks'), href: '/operational-webhooks', icon: '🪝' },
+        { name: t('webhookDashboard'), href: '/operational-webhooks', icon: '📥' },
       ],
     },
     {
