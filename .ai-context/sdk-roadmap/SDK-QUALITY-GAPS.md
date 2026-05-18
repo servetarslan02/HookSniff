@@ -279,30 +279,54 @@ fmt.Println(resp.Headers.Get("x-ratelimit-remaining"))
 
 ## 📋 Uygulama Sırası
 
-### Faz 1 — Kritik ✅ TAMAMLANDI
+### Faz 1 — Kritik ✅ TAMAMLANDI (4/4)
 1. ✅ Webhook imza doğrulama (11/11 SDK)
-2. ✅ Retry + exponential backoff (11/11 SDK — 1s/2s/4s, 3 retry, timeout)
+2. ✅ Retry + exponential backoff (11/11 SDK)
 3. ✅ Pagination helper (11/11 SDK)
 4. ✅ Error class çeşitliliği (11/11 SDK — 21 type)
 
-### Faz 1.5 — Yüksek Öncelik (4-6 saat)
-10. ❌ Webhook Payload Parsing (11 SDK)
-11. ❌ Idempotency Key Kontrolü (11 SDK)
+### Faz 2 — Temel Features (sırasıyla)
+5. ❌ Webhook Payload Parsing — 🔴 EN YÜKSEK (verify sonrası type-safe dönüş)
+6. ❌ Idempotency Key Kontrolü — 🔴 YÜKSEK (retry güvenliği için şart)
+7. ❌ Response Metadata Erişimi — 🟡 ORTA (debug için gerekli)
+8. ❌ Config Seçenekleri — 🟡 ORTA (self-hosted için(baseUrl, timeout, debug))
 
-### Faz 2 — Orta (20-28 saat)
-5. ❌ Config seçenekleri
-6. ❌ CI/CD otomatik publish
-7. ❌ Debug logging
-8. ❌ Typed webhook events
-9. ❌ Test coverage artırma
-12. ❌ Response Metadata erişimi
+### Faz 3 — Altyapı (sırasıyla)
+9. ❌ Debug Logging — 🟡 ORTA (config'e bağlı → #8'den sonra)
+10. ❌ Typed Webhook Events — 🟡 ORTA (type-safe geliştirme)
+11. ❌ SDK Version Header — 🟢 DÜŞÜK ama basit (1 saat, hemen yapılabilir)
 
-### Faz 3 — Düşük (22-33 saat)
-13. ❌ JSDoc/docstring
-14. ❌ Streaming/SSE desteği
-15. ❌ Rate limit header parsing
-16. ❌ Custom HTTP client desteği
-17. ❌ SDK version header
+### Faz 4 — Kalite & Dağıtım
+12. ❌ Test Coverage Artırma — 🟡 ORTA (features stabilize olunca)
+13. ❌ CI/CD Otomatik Publish — 🟡 ORTA (test coverage'dan sonra)
+14. ❌ JSDoc / Docstring — 🟢 DÜŞÜK
+
+### Faz 5 — İleri Features
+15. ❌ Streaming / SSE Desteği — 🟢 DÜŞÜK
+16. ❌ Rate Limit Header Parsing — 🟢 DÜŞÜK
+17. ❌ Custom HTTP Client Desteği — 🟢 DÜŞÜK
+
+---
+
+### Neden Bu Sıra?
+
+```
+Payload Parsing (#5)  ← verify() sonrası type-safe dönüş, en çok kullanılan özellik
+        ↓
+Idempotency (#6)     ← retry ile birlikte güvenli yeniden deneme
+        ↓
+Response Metadata (#7) ← debug ve rate limit takibi için
+        ↓
+Config (#8)           ← self-hosted ve timeout ayarı
+        ↓
+Debug Logging (#9)    ← config'e bağlı (debug flag gerekli)
+        ↓
+Typed Events (#10)    ← compile-time güvenlik
+        ↓
+Test (#12)            ← stabilize features test et
+        ↓
+CI/CD (#13)           ← test → publish pipeline
+```
 
 **Kalan toplam:** ~30-45 saat → %90+
 
