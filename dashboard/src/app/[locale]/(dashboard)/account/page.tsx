@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
 
-
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
     <div className="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl" />
@@ -16,11 +15,13 @@ const tabSkeleton = (
   </div>
 );
 
-// Lazy wrappers — only load when the factory is called (tab visited)
 const TeamPage = dynamic(() => import('../team/page'), { ssr: false, loading: () => tabSkeleton });
 const NotificationsPage = dynamic(() => import('../notifications/page'), { ssr: false, loading: () => tabSkeleton });
 const SettingsPage = dynamic(() => import('../settings/page'), { ssr: false, loading: () => tabSkeleton });
+const ServiceTokensPage = dynamic(() => import('../service-tokens/page'), { ssr: false, loading: () => tabSkeleton });
+const PortalCustomizePage = dynamic(() => import('../portal-customize/page'), { ssr: false, loading: () => tabSkeleton });
 const PortalManagePage = dynamic(() => import('../portal-manage/page'), { ssr: false, loading: () => tabSkeleton });
+const BillingPage = dynamic(() => import('../billing/page'), { ssr: false, loading: () => tabSkeleton });
 
 export default function AccountPage() {
   const t = useTranslations('nav');
@@ -28,10 +29,13 @@ export default function AccountPage() {
   return (
     <TabbedSection
       tabs={[
+        { key: 'settings', label: t('settings'), icon: '⚙️', content: () => <SettingsPage /> },
         { key: 'team', label: t('team'), icon: '👥', content: () => <TeamPage /> },
         { key: 'notifications', label: t('notifications'), icon: '🔔', content: () => <NotificationsPage /> },
-        { key: 'settings', label: t('settings'), icon: '⚙️', content: () => <SettingsPage /> },
-        { key: 'profile', label: t('profile') || 'Profil', icon: '🖼️', content: () => <PortalManagePage /> },
+        { key: 'tokens', label: t('serviceTokens'), icon: '🎟️', content: () => <ServiceTokensPage /> },
+        { key: 'portal-customize', label: t('portalCustomize'), icon: '🎨', content: () => <PortalCustomizePage /> },
+        { key: 'portal-manage', label: t('portalManage'), icon: '🖼️', content: () => <PortalManagePage /> },
+        { key: 'billing', label: t('billing'), icon: '💳', content: () => <BillingPage /> },
       ]}
     />
   );

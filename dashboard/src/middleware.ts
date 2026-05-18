@@ -15,10 +15,14 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   // Deliveries section
   '/logs': '/deliveries',
   '/search': '/deliveries',
-  // Content section
+  // Content/Webhooks section (content-mgmt now has inbound, operational, poller, tasks tabs)
   '/transforms': '/content-mgmt',
   '/schemas': '/content-mgmt',
   '/templates': '/content-mgmt',
+  '/inbound': '/content-mgmt',
+  '/operational-webhooks': '/content-mgmt',
+  '/message-poller': '/content-mgmt',
+  '/background-tasks': '/content-mgmt',
   // DevTools section
   '/playground': '/devtools',
   '/signature-verifier': '/devtools',
@@ -32,22 +36,28 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/rate-limiting': '/security-section',
   '/audit-log': '/security-section',
   '/sso': '/security-section',
-  // Routing section
+  // Routing/Config section (now has environments tab)
   '/retry-policy': '/routing-config',
   '/routing': '/routing-config',
   '/custom-domain': '/routing-config',
-  // Account section
+  '/environments': '/routing-config',
+  // Integrations section (now has connectors + streaming tabs)
+  '/connectors': '/integrations',
+  '/streaming': '/integrations',
+  // Account section (now has billing + portal tabs)
   '/team': '/account',
   '/notifications': '/account',
-  '/billing': '/account',
   '/settings': '/account',
-  '/portal-customize': '/portal-section',
-  '/portal-manage': '/portal-section',
   '/service-tokens': '/account',
-  // Deleted container pages (redirect to parent)
+  '/portal-customize': '/account',
+  '/portal-manage': '/account',
+  '/billing': '/account',
+  // Deleted container pages
   '/team-mgmt': '/account',
-  '/billing-overview': '/billing-section',
+  '/billing-overview': '/account',
   '/settings-section': '/account',
+  '/portal-section': '/account',
+  '/billing-section': '/account',
 };
 
 export default function middleware(request: NextRequest) {
@@ -102,10 +112,9 @@ export default function middleware(request: NextRequest) {
     '/privacy', '/terms', '/status', '/newsletter', '/build-vs-buy',
     '/get-started', '/startups',
     // Consolidated dashboard routes
-    '/core', '/observability', '/devtools', '/content-mgmt', '/portal-section',
-    '/security-section', '/routing-config', '/billing-section', '/account',
-    '/inbound', '/operational-webhooks', '/message-poller', '/background-tasks',
-    '/connectors', '/integrations', '/streaming', '/environments',
+    '/core', '/applications', '/deliveries', '/content-mgmt', '/integrations',
+    '/observability', '/devtools', '/routing-config', '/security-section',
+    '/account', '/billing-section',
   ];
   const isPublic = withoutLocale === '/' || publicPaths.some((path) => withoutLocale.startsWith(path));
   if (!isPublic && !withoutLocale.startsWith('/admin')) {
