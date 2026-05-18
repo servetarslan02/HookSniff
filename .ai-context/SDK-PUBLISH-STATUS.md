@@ -25,11 +25,9 @@ Tüm 11 SDK'nın **kodları** ayrı repolara push edildi (v1.1.0).
 **⚠️ Credentials local dosyalarda saklanır, GitHub'a push edilmez!**
 
 ### Ruby → RubyGems
-```bash
-cd hooksniff-ruby
-gem build hooksniff.gemspec
-gem push hooksniff-1.1.0.gem
-```
+- ✅ v1.2.0 yüklendi (2026-05-18)
+- 30+ resource, Faz 8-15 dahil
+- https://rubygems.org/gems/hooksniff
 
 ### Java → Maven Central (via Sonatype)
 ```bash
