@@ -4977,5 +4977,33 @@
     "retentionCol": "Saklama",
     "maxDlq": "Maks DLQ Kaydı",
     "retentionExpired": "Saklama süresi dolduktan sonra, DLQ kayıtları kalıcı olarak silinir. Süresi dolmadan önce önemli verileri dışa aktarın."
+  },
+  "docsEventTypes": {
+    "title": "Olay Türleri",
+    "subtitle": "Olay türleri, webhook'ları kategorize etmenizi ve doğru uç noktalara yönlendirmenizi sağlar. Onlar olmadan, her webhook her yere gider.",
+    "theProblem": "Sorun",
+    "problemDesc1": "Uygulamanız farklı türde olaylar gönderiyorsa — sipariş güncellemeleri, kullanıcı kayıtları, ödeme onayları — muhtemelen bunları işlemek için farklı uç noktalar istersiniz. Sipariş işleme servisiniz kullanıcı kayıt olaylarını almamalıdır.",
+    "problemDesc2": "Olay türleri olmadan, tüketici tarafında filtreleme yapmanız gerekir; bu da bant genişliği ve işlem süresi israfıdır.",
+    "howWorks": "Olay Türleri Nasıl Çalışır",
+    "howWorksDesc": "Olay türleri, ne olduğunu tanımlayan dizi tanımlayıcılarıdır. resource.action kalıbını izlerler:",
+    "anyFormat": "Herhangi bir dizi formatını kullanabilirsiniz, ancak tutarlılık için resource.action önerilir.",
+    "registering": "Olay Türlerini Kaydetme",
+    "registeringDesc": "Olay türleri, bir webhook gönderdiğinizde otomatik olarak kaydedilir. Ön kayıt gerekmez:",
+    "nowAvailable": "order.created olay türü artık filtreleme ve arama için kullanılabilir.",
+    "filtering": "Olay Türüne Göre Filtreleme",
+    "filteringDesc": "event_filter alanını kullanarak uç noktaları yalnızca belirli olay türlerini alacak şekilde yapılandırın:",
+    "filterPatterns": "Desteklenen filtre kalıpları:",
+    "exactMatch": "Tam eşleşme",
+    "wildcard": "Joker (tüm sipariş olayları)",
+    "allEvents": "Tüm olaylar (varsayılan)",
+    "schemaValidation": "Şema Doğrulaması",
+    "schemaValidationDesc": "İsteğe bağlı olarak, teslimattan önce payload'ları doğrulamak için olay türleri için JSON şemaları tanımlayın:",
+    "schemaReject": "Bir şema tanımlandığında, eşleşmeyen payload'lar teslimat pipeline'ına girmeden önce 400 Hatalı İstek hatasıyla reddedilir.",
+    "bestPractices": "En İyi Uygulamalar",
+    "bpSpecific": "Spesifik olun: invoice.payment_failed, invoice.error'dan daha iyidir",
+    "bpDots": "Noktaları ayırıcı olarak kullanın: resource.action formatı",
+    "bpVersion": "Şekilleri değiştirdiğinizde versiyonlayın: order.created.v2",
+    "bpWildcards": "Gruplamama için joker kullanın: payment.* tüm ödeme olaylarını yakalar",
+    "bpDocument": "Olay türlerinizi belgeleyin: Uygulamanızın yaydığı tüm olay türlerinin bir listesini tutun"
   }
 }
