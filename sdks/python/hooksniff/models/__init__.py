@@ -1,231 +1,191 @@
-# coding: utf-8
-
-# flake8: noqa
 """
-    HookSniff API
+HookSniff SDK — Models
+"""
 
-    Webhook delivery, monitoring, and management API. All endpoints under `/v1` require authentication via `Authorization: Bearer <api_key>` header unless marked as **Public**. 
+from .api_token_out import ApiTokenOut
+from .background_task_out import BackgroundTaskOut
+from .operational_webhook import OperationalWebhookEndpointOut, OperationalWebhookEndpointIn, OperationalWebhookDeliveryOut
+from .app_portal_capability import AppPortalCapability
+from .bulk_replay_in import BulkReplayIn
+from .common import Common
+from .create_stream_events_in import CreateStreamEventsIn
+from .create_stream_events_out import CreateStreamEventsOut
+from .dashboard_access_out import DashboardAccessOut
+from .empty_response import EmptyResponse
+from .endpoint_created_event import EndpointCreatedEvent
+from .endpoint_created_event_data import EndpointCreatedEventData
+from .endpoint_deleted_event import EndpointDeletedEvent
+from .endpoint_deleted_event_data import EndpointDeletedEventData
+from .endpoint_disabled_event import EndpointDisabledEvent
+from .endpoint_disabled_event_data import EndpointDisabledEventData
+from .endpoint_disabled_trigger import EndpointDisabledTrigger
+from .endpoint_enabled_event import EndpointEnabledEvent
+from .endpoint_enabled_event_data import EndpointEnabledEventData
+from .endpoint_headers_in import EndpointHeadersIn
+from .endpoint_headers_out import EndpointHeadersOut
+from .endpoint_headers_patch_in import EndpointHeadersPatchIn
+from .endpoint_in import EndpointIn
+from .endpoint_message_out import EndpointMessageOut
+from .endpoint_out import EndpointOut
+from .endpoint_patch import EndpointPatch
+from .endpoint_secret_out import EndpointSecretOut
+from .endpoint_secret_rotate_in import EndpointSecretRotateIn
+from .environment_in import EnvironmentIn
+from .environment_out import EnvironmentOut
+from .environment_patch import EnvironmentPatch
+from .environment_variable_in import EnvironmentVariableIn
+from .environment_variable_out import EnvironmentVariableOut
+from .environment_variable_bulk_upsert_in import EnvironmentVariableBulkUpsertIn
+from .endpoint_stats import EndpointStats
+from .endpoint_transformation_in import EndpointTransformationIn
+from .endpoint_transformation_out import EndpointTransformationOut
+from .endpoint_transformation_patch import EndpointTransformationPatch
+from .endpoint_update import EndpointUpdate
+from .endpoint_updated_event import EndpointUpdatedEvent
+from .endpoint_updated_event_data import EndpointUpdatedEventData
+from .event_example_in import EventExampleIn
+from .event_in import EventIn
+from .event_out import EventOut
+from .event_stream_out import EventStreamOut
+from .event_type_from_open_api import EventTypeFromOpenApi
+from .event_type_import_open_api_in import EventTypeImportOpenApiIn
+from .event_type_import_open_api_out import EventTypeImportOpenApiOut
+from .event_type_import_open_api_out_data import EventTypeImportOpenApiOutData
+from .event_type_in import EventTypeIn
+from .event_type_out import EventTypeOut
+from .event_type_patch import EventTypePatch
+from .event_type_update import EventTypeUpdate
+from .http_attempt_times import HttpAttemptTimes
+from .http_sink_headers_patch_in import HttpSinkHeadersPatchIn
+from .list_response_application_out import ListResponseApplicationOut
+from .list_response_endpoint_message_out import ListResponseEndpointMessageOut
+from .list_response_endpoint_out import ListResponseEndpointOut
+from .list_response_event_type_out import ListResponseEventTypeOut
+from .list_response_ingest_endpoint_out import ListResponseIngestEndpointOut
+from .list_response_message_attempt_out import ListResponseMessageAttemptOut
+from .list_response_message_endpoint_out import ListResponseMessageEndpointOut
+from .list_response_message_out import ListResponseMessageOut
+from .list_response_stream_event_type_out import ListResponseStreamEventTypeOut
+from .list_response_stream_out import ListResponseStreamOut
+from .list_response_stream_sink_out import ListResponseStreamSinkOut
+from .message_attempt_exhausted_event import MessageAttemptExhaustedEvent
+from .message_attempt_exhausted_event_data import MessageAttemptExhaustedEventData
+from .message_attempt_failed_data import MessageAttemptFailedData
+from .message_attempt_failing_event import MessageAttemptFailingEvent
+from .message_attempt_failing_event_data import MessageAttemptFailingEventData
+from .message_attempt_log import MessageAttemptLog
+from .message_attempt_log_event import MessageAttemptLogEvent
+from .message_attempt_out import MessageAttemptOut
+from .message_attempt_recovered_event import MessageAttemptRecoveredEvent
+from .message_attempt_recovered_event_data import MessageAttemptRecoveredEventData
+from .message_attempt_trigger_type import MessageAttemptTriggerType
+from .message_endpoint_out import MessageEndpointOut
+from .message_in import MessageIn
+from .message_out import MessageOut
+from .message_precheck_in import MessagePrecheckIn
+from .message_precheck_out import MessagePrecheckOut
+from .message_status import MessageStatus
+from .message_status_text import MessageStatusText
+from .ordering import Ordering
+from .recover_in import RecoverIn
+from .replay_in import ReplayIn
+from .rotate_poller_token_in import RotatePollerTokenIn
+from .rotate_token_out import RotateTokenOut
+from .sink_secret_out import SinkSecretOut
+from .sink_status import SinkStatus
+from .sink_status_in import SinkStatusIn
+from .sink_transform_in import SinkTransformIn
+from .sink_transformation_out import SinkTransformationOut
+from .status_code_class import StatusCodeClass
+from .subscribe_in import SubscribeIn
 
-    The version of the OpenAPI document: 1.0.0
-    Contact: support@hooksniff.vercel.app
-    Generated by OpenAPI Generator (https://openapi-generator.tech)
-
-    Do not edit the class manually.
-"""  # noqa: E501
-
-# import models into model package
-from hooksniff.models.admin_alert_rule import AdminAlertRule
-from hooksniff.models.admin_alerts_id_delete200_response import AdminAlertsIdDelete200Response
-from hooksniff.models.admin_audit_entry import AdminAuditEntry
-from hooksniff.models.admin_audit_log_response import AdminAuditLogResponse
-from hooksniff.models.admin_create_alert_request import AdminCreateAlertRequest
-from hooksniff.models.admin_feature_flags_get200_response import AdminFeatureFlagsGet200Response
-from hooksniff.models.admin_feature_flags_id_put_request import AdminFeatureFlagsIdPutRequest
-from hooksniff.models.admin_feature_flags_post_request import AdminFeatureFlagsPostRequest
-from hooksniff.models.admin_revenue_entry import AdminRevenueEntry
-from hooksniff.models.admin_revenue_response import AdminRevenueResponse
-from hooksniff.models.admin_sdk_update_post_request import AdminSdkUpdatePostRequest
-from hooksniff.models.admin_settings_put200_response import AdminSettingsPut200Response
-from hooksniff.models.admin_system_status import AdminSystemStatus
-from hooksniff.models.admin_test_webhook_request import AdminTestWebhookRequest
-from hooksniff.models.admin_test_webhook_response import AdminTestWebhookResponse
-from hooksniff.models.admin_update_alert_request import AdminUpdateAlertRequest
-from hooksniff.models.admin_user_list_response import AdminUserListResponse
-from hooksniff.models.admin_users_id_get200_response import AdminUsersIdGet200Response
-from hooksniff.models.admin_users_id_get200_response_endpoints_inner import AdminUsersIdGet200ResponseEndpointsInner
-from hooksniff.models.admin_users_id_get200_response_recent_deliveries_inner import AdminUsersIdGet200ResponseRecentDeliveriesInner
-from hooksniff.models.admin_users_id_get200_response_usage_stats import AdminUsersIdGet200ResponseUsageStats
-from hooksniff.models.admin_users_id_plan_put_request import AdminUsersIdPlanPutRequest
-from hooksniff.models.admin_users_id_status_put_request import AdminUsersIdStatusPutRequest
-from hooksniff.models.alert_notification_list_response import AlertNotificationListResponse
-from hooksniff.models.alert_notification_list_response_data_inner import AlertNotificationListResponseDataInner
-from hooksniff.models.alert_rule import AlertRule
-from hooksniff.models.alert_rule_list_response import AlertRuleListResponse
-from hooksniff.models.analytics_trend_point import AnalyticsTrendPoint
-from hooksniff.models.analytics_trend_response import AnalyticsTrendResponse
-from hooksniff.models.api_key_info import ApiKeyInfo
-from hooksniff.models.application import Application
-from hooksniff.models.applications_id_put_request import ApplicationsIdPutRequest
-from hooksniff.models.applications_post_request import ApplicationsPostRequest
-from hooksniff.models.apply_template_request import ApplyTemplateRequest
-from hooksniff.models.apply_template_response import ApplyTemplateResponse
-from hooksniff.models.audit_log_entry import AuditLogEntry
-from hooksniff.models.audit_log_list_response import AuditLogListResponse
-from hooksniff.models.auth2fa_enable_post200_response import Auth2faEnablePost200Response
-from hooksniff.models.auth2fa_status_get200_response import Auth2faStatusGet200Response
-from hooksniff.models.auth_consent_get200_response import AuthConsentGet200Response
-from hooksniff.models.auth_consent_post200_response import AuthConsentPost200Response
-from hooksniff.models.auth_consent_post_request import AuthConsentPostRequest
-from hooksniff.models.auth_login_post200_response import AuthLoginPost200Response
-from hooksniff.models.auth_response import AuthResponse
-from hooksniff.models.batch_replay_request import BatchReplayRequest
-from hooksniff.models.batch_response import BatchResponse
-from hooksniff.models.batch_response_errors_inner import BatchResponseErrorsInner
-from hooksniff.models.batch_webhook_request import BatchWebhookRequest
-from hooksniff.models.batch_webhook_response import BatchWebhookResponse
-from hooksniff.models.billing_portal_post200_response import BillingPortalPost200Response
-from hooksniff.models.billing_portal_response import BillingPortalResponse
-from hooksniff.models.cancel_subscription_request import CancelSubscriptionRequest
-from hooksniff.models.cancel_subscription_response import CancelSubscriptionResponse
-from hooksniff.models.change_password_request import ChangePasswordRequest
-from hooksniff.models.change_role_request import ChangeRoleRequest
-from hooksniff.models.churn_response import ChurnResponse
-from hooksniff.models.churned_user import ChurnedUser
-from hooksniff.models.confirm2fa_request import Confirm2faRequest
-from hooksniff.models.contact_request import ContactRequest
-from hooksniff.models.contact_response import ContactResponse
-from hooksniff.models.create_alert_request import CreateAlertRequest
-from hooksniff.models.create_alert_rule_request import CreateAlertRuleRequest
-from hooksniff.models.create_api_key_response import CreateApiKeyResponse
-from hooksniff.models.create_custom_domain_request import CreateCustomDomainRequest
-from hooksniff.models.create_endpoint_request import CreateEndpointRequest
-from hooksniff.models.create_routing_rule_request import CreateRoutingRuleRequest
-from hooksniff.models.create_sso_config_request import CreateSSOConfigRequest
-from hooksniff.models.create_team_request import CreateTeamRequest
-from hooksniff.models.create_transform_rule_request import CreateTransformRuleRequest
-from hooksniff.models.create_webhook_request import CreateWebhookRequest
-from hooksniff.models.custom_domain import CustomDomain
-from hooksniff.models.custom_domain_list_response import CustomDomainListResponse
-from hooksniff.models.custom_domains_post_request import CustomDomainsPostRequest
-from hooksniff.models.customer_response import CustomerResponse
-from hooksniff.models.daily_delivery_count import DailyDeliveryCount
-from hooksniff.models.delivery import Delivery
-from hooksniff.models.delivery_attempt import DeliveryAttempt
-from hooksniff.models.delivery_attempt_list_response import DeliveryAttemptListResponse
-from hooksniff.models.delivery_detail_response import DeliveryDetailResponse
-from hooksniff.models.delivery_list_response import DeliveryListResponse
-from hooksniff.models.delivery_trend_response import DeliveryTrendResponse
-from hooksniff.models.delivery_trend_response_buckets_inner import DeliveryTrendResponseBucketsInner
-from hooksniff.models.deploy_info import DeployInfo
-from hooksniff.models.device_list_response import DeviceListResponse
-from hooksniff.models.device_token_response import DeviceTokenResponse
-from hooksniff.models.disable2fa_request import Disable2faRequest
-from hooksniff.models.domain_dns_record import DomainDnsRecord
-from hooksniff.models.embed_config import EmbedConfig
-from hooksniff.models.embed_config_theme import EmbedConfigTheme
-from hooksniff.models.enable2fa_request import Enable2faRequest
-from hooksniff.models.enable2fa_response import Enable2faResponse
-from hooksniff.models.endpoint import Endpoint
-from hooksniff.models.endpoint_health import EndpointHealth
-from hooksniff.models.endpoint_list_response import EndpointListResponse
-from hooksniff.models.endpoints_endpoint_id_transforms_test_post_request import EndpointsEndpointIdTransformsTestPostRequest
-from hooksniff.models.endpoints_id_rotate_secret_post200_response import EndpointsIdRotateSecretPost200Response
-from hooksniff.models.error import Error
-from hooksniff.models.event_type import EventType
-from hooksniff.models.event_type_count import EventTypeCount
-from hooksniff.models.event_type_list_response import EventTypeListResponse
-from hooksniff.models.export_data_response import ExportDataResponse
-from hooksniff.models.feature_flag import FeatureFlag
-from hooksniff.models.forgot_password_request import ForgotPasswordRequest
-from hooksniff.models.inbound_config import InboundConfig
-from hooksniff.models.inbound_configs_id_put_request import InboundConfigsIdPutRequest
-from hooksniff.models.inbound_configs_post_request import InboundConfigsPostRequest
-from hooksniff.models.inbound_webhook_request import InboundWebhookRequest
-from hooksniff.models.inbound_webhook_response import InboundWebhookResponse
-from hooksniff.models.invite_member_request import InviteMemberRequest
-from hooksniff.models.invite_request import InviteRequest
-from hooksniff.models.invoice_list_response import InvoiceListResponse
-from hooksniff.models.invoice_response import InvoiceResponse
-from hooksniff.models.latency_response import LatencyResponse
-from hooksniff.models.latency_trend_response import LatencyTrendResponse
-from hooksniff.models.latency_trend_response_buckets_inner import LatencyTrendResponseBucketsInner
-from hooksniff.models.login_request import LoginRequest
-from hooksniff.models.logout_request import LogoutRequest
-from hooksniff.models.notification import Notification
-from hooksniff.models.notification_list_response import NotificationListResponse
-from hooksniff.models.notification_preferences import NotificationPreferences
-from hooksniff.models.notifications_unread_count_get200_response import NotificationsUnreadCountGet200Response
-from hooksniff.models.o_auth_callback_request import OAuthCallbackRequest
-from hooksniff.models.o_auth_login_redirect import OAuthLoginRedirect
-from hooksniff.models.o_auth_provider import OAuthProvider
-from hooksniff.models.o_auth_provider_list_response import OAuthProviderListResponse
-from hooksniff.models.outbound_ips_response import OutboundIPsResponse
-from hooksniff.models.outbound_ips_response import OutboundIpsResponse
-from hooksniff.models.paginated_users import PaginatedUsers
-from hooksniff.models.platform_settings import PlatformSettings
-from hooksniff.models.playground_get200_response import PlaygroundGet200Response
-from hooksniff.models.playground_test_request import PlaygroundTestRequest
-from hooksniff.models.playground_test_response import PlaygroundTestResponse
-from hooksniff.models.portal_config import PortalConfig
-from hooksniff.models.portal_notifications_put200_response import PortalNotificationsPut200Response
-from hooksniff.models.portal_profile import PortalProfile
-from hooksniff.models.portal_session import PortalSession
-from hooksniff.models.rate_limit_config import RateLimitConfig
-from hooksniff.models.rate_limit_usage import RateLimitUsage
-from hooksniff.models.refresh_token_request import RefreshTokenRequest
-from hooksniff.models.register_device_request import RegisterDeviceRequest
-from hooksniff.models.register_request import RegisterRequest
-from hooksniff.models.register_schema_request import RegisterSchemaRequest
-from hooksniff.models.replay_delivery_response import ReplayDeliveryResponse
-from hooksniff.models.resend_verification_request import ResendVerificationRequest
-from hooksniff.models.reset_password_request import ResetPasswordRequest
-from hooksniff.models.retry_policy import RetryPolicy
-from hooksniff.models.revenue_response import RevenueResponse
-from hooksniff.models.revenue_response_monthly_revenue_inner import RevenueResponseMonthlyRevenueInner
-from hooksniff.models.revenue_response_revenue_by_plan_inner import RevenueResponseRevenueByPlanInner
-from hooksniff.models.rotate_secret_response import RotateSecretResponse
-from hooksniff.models.routing_info import RoutingInfo
-from hooksniff.models.routing_rule_list_response import RoutingRuleListResponse
-from hooksniff.models.routing_rule_list_response_data_inner import RoutingRuleListResponseDataInner
-from hooksniff.models.sso_config import SSOConfig
-from hooksniff.models.sso_config_list_response import SSOConfigListResponse
-from hooksniff.models.schema_list_response import SchemaListResponse
-from hooksniff.models.schema_response import SchemaResponse
-from hooksniff.models.search_request import SearchRequest
-from hooksniff.models.search_request_filters import SearchRequestFilters
-from hooksniff.models.search_response import SearchResponse
-from hooksniff.models.search_result import SearchResult
-from hooksniff.models.service_token import ServiceToken
-from hooksniff.models.service_token_create_response import ServiceTokenCreateResponse
-from hooksniff.models.service_tokens_id_put_request import ServiceTokensIdPutRequest
-from hooksniff.models.service_tokens_id_reveal_post200_response import ServiceTokensIdRevealPost200Response
-from hooksniff.models.service_tokens_post_request import ServiceTokensPostRequest
-from hooksniff.models.simulator_post_request import SimulatorPostRequest
-from hooksniff.models.simulator_request import SimulatorRequest
-from hooksniff.models.simulator_response import SimulatorResponse
-from hooksniff.models.sso_config_post_request import SsoConfigPostRequest
-from hooksniff.models.stats_response import StatsResponse
-from hooksniff.models.stream_params import StreamParams
-from hooksniff.models.subscription_response import SubscriptionResponse
-from hooksniff.models.success_rate_response import SuccessRateResponse
-from hooksniff.models.system_stats import SystemStats
-from hooksniff.models.system_stats_plan_breakdown_inner import SystemStatsPlanBreakdownInner
-from hooksniff.models.system_status import SystemStatus
-from hooksniff.models.system_status_components_inner import SystemStatusComponentsInner
-from hooksniff.models.team import Team
-from hooksniff.models.team_detail_response import TeamDetailResponse
-from hooksniff.models.team_invite import TeamInvite
-from hooksniff.models.team_list_response import TeamListResponse
-from hooksniff.models.team_member import TeamMember
-from hooksniff.models.team_member_list_response import TeamMemberListResponse
-from hooksniff.models.template_list_response import TemplateListResponse
-from hooksniff.models.test_webhook_request import TestWebhookRequest
-from hooksniff.models.test_webhook_response import TestWebhookResponse
-from hooksniff.models.transform_rule import TransformRule
-from hooksniff.models.transform_rule_list_response import TransformRuleListResponse
-from hooksniff.models.two_factor_required_response import TwoFactorRequiredResponse
-from hooksniff.models.update_alert_rule_request import UpdateAlertRuleRequest
-from hooksniff.models.update_endpoint_request import UpdateEndpointRequest
-from hooksniff.models.update_notification_preferences import UpdateNotificationPreferences
-from hooksniff.models.update_profile_request import UpdateProfileRequest
-from hooksniff.models.update_routing_request import UpdateRoutingRequest
-from hooksniff.models.update_routing_rule_request import UpdateRoutingRuleRequest
-from hooksniff.models.update_sso_config_request import UpdateSSOConfigRequest
-from hooksniff.models.update_subscription_request import UpdateSubscriptionRequest
-from hooksniff.models.update_team_request import UpdateTeamRequest
-from hooksniff.models.update_transform_rule_request import UpdateTransformRuleRequest
-from hooksniff.models.upgrade_request import UpgradeRequest
-from hooksniff.models.upgrade_response import UpgradeResponse
-from hooksniff.models.usage_response import UsageResponse
-from hooksniff.models.usage_stats_response import UsageStatsResponse
-from hooksniff.models.user_analytics import UserAnalytics
-from hooksniff.models.user_summary import UserSummary
-from hooksniff.models.validate_event_request import ValidateEventRequest
-from hooksniff.models.validate_event_response import ValidateEventResponse
-from hooksniff.models.validate_event_response_errors_inner import ValidateEventResponseErrorsInner
-from hooksniff.models.verify2fa_request import Verify2faRequest
-from hooksniff.models.verify_custom_domain_response import VerifyCustomDomainResponse
-from hooksniff.models.verify_email_request import VerifyEmailRequest
-from hooksniff.models.webhook_filter import WebhookFilter
-from hooksniff.models.webhook_template import WebhookTemplate
-
+__all__ = [
+    "ApiTokenOut",
+    "AppPortalCapability",
+    "BulkReplayIn",
+    "Common",
+    "CreateStreamEventsIn",
+    "CreateStreamEventsOut",
+    "DashboardAccessOut",
+    "EmptyResponse",
+    "EndpointCreatedEvent",
+    "EndpointCreatedEventData",
+    "EndpointDeletedEvent",
+    "EndpointDeletedEventData",
+    "EndpointDisabledEvent",
+    "EndpointDisabledEventData",
+    "EndpointDisabledTrigger",
+    "EndpointEnabledEvent",
+    "EndpointEnabledEventData",
+    "EndpointHeadersIn",
+    "EndpointHeadersOut",
+    "EndpointHeadersPatchIn",
+    "EndpointIn",
+    "EndpointMessageOut",
+    "EndpointOut",
+    "EndpointPatch",
+    "EndpointSecretOut",
+    "EndpointSecretRotateIn",
+    "EndpointStats",
+    "EndpointTransformationIn",
+    "EndpointTransformationOut",
+    "EndpointTransformationPatch",
+    "EndpointUpdate",
+    "EndpointUpdatedEvent",
+    "EndpointUpdatedEventData",
+    "EventExampleIn",
+    "EventIn",
+    "EventOut",
+    "EventStreamOut",
+    "EventTypeFromOpenApi",
+    "EventTypeImportOpenApiIn",
+    "EventTypeImportOpenApiOut",
+    "EventTypeImportOpenApiOutData",
+    "EventTypeIn",
+    "EventTypeOut",
+    "EventTypePatch",
+    "EventTypeUpdate",
+    "HttpAttemptTimes",
+    "HttpSinkHeadersPatchIn",
+    "ListResponseApplicationOut",
+    "ListResponseEndpointMessageOut",
+    "ListResponseEndpointOut",
+    "ListResponseEventTypeOut",
+    "ListResponseIngestEndpointOut",
+    "ListResponseMessageAttemptOut",
+    "ListResponseMessageEndpointOut",
+    "ListResponseMessageOut",
+    "ListResponseStreamEventTypeOut",
+    "ListResponseStreamOut",
+    "ListResponseStreamSinkOut",
+    "MessageAttemptExhaustedEvent",
+    "MessageAttemptExhaustedEventData",
+    "MessageAttemptFailedData",
+    "MessageAttemptFailingEvent",
+    "MessageAttemptFailingEventData",
+    "MessageAttemptLog",
+    "MessageAttemptLogEvent",
+    "MessageAttemptOut",
+    "MessageAttemptRecoveredEvent",
+    "MessageAttemptRecoveredEventData",
+    "MessageAttemptTriggerType",
+    "MessageEndpointOut",
+    "MessageIn",
+    "MessageOut",
+    "MessagePrecheckIn",
+    "MessagePrecheckOut",
+    "MessageStatus",
+    "MessageStatusText",
+    "Ordering",
+    "RecoverIn",
+    "ReplayIn",
+    "RotatePollerTokenIn",
+    "RotateTokenOut",
+    "SinkSecretOut",
+    "SinkStatus",
+    "SinkStatusIn",
+    "SinkTransformIn",
+    "SinkTransformationOut",
+    "StatusCodeClass",
+    "SubscribeIn",
+]

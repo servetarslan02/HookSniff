@@ -22,7 +22,6 @@ generate() {
     --package-name "$pkg" \
     --global-property=models,apis,supportingFiles \
     --additional-properties=npmName=@hooksniff/sdk,npmVersion=0.3.0,packageName=hooksniff,packageVersion=0.3.0 \
-    --skip-validate-spec \
     2>&1 | tail -3
   
   echo "  Done: $(find $out -name '*.ts' -o -name '*.py' -o -name '*.go' -o -name '*.rs' -o -name '*.rb' -o -name '*.java' -o -name '*.kt' -o -name '*.php' -o -name '*.cs' -o -name '*.ex' -o -name '*.swift' 2>/dev/null | wc -l) files"

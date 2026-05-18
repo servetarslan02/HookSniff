@@ -7,11 +7,8 @@ Method | HTTP request | Description
 [**auth2faConfirmPost**](AuthAPI.md#auth2faconfirmpost) | **POST** /auth/2fa/confirm | Confirm 2FA setup with a code
 [**auth2faDisablePost**](AuthAPI.md#auth2fadisablepost) | **POST** /auth/2fa/disable | Disable 2FA
 [**auth2faEnablePost**](AuthAPI.md#auth2faenablepost) | **POST** /auth/2fa/enable | Enable 2FA (returns TOTP secret and QR URL)
-[**auth2faStatusGet**](AuthAPI.md#auth2fastatusget) | **GET** /auth/2fa/status | Get 2FA status
 [**auth2faVerifyPost**](AuthAPI.md#auth2faverifypost) | **POST** /auth/2fa/verify | Verify 2FA code during login
 [**authAccountDelete**](AuthAPI.md#authaccountdelete) | **DELETE** /auth/account | Delete account (GDPR)
-[**authConsentGet**](AuthAPI.md#authconsentget) | **GET** /auth/consent | Get consent preferences
-[**authConsentPost**](AuthAPI.md#authconsentpost) | **POST** /auth/consent | Update a consent preference
 [**authExportGet**](AuthAPI.md#authexportget) | **GET** /auth/export | Export user data (GDPR)
 [**authForgotPasswordPost**](AuthAPI.md#authforgotpasswordpost) | **POST** /auth/forgot-password | Request password reset email
 [**authLoginPost**](AuthAPI.md#authloginpost) | **POST** /auth/login | Login with email and password
@@ -170,52 +167,6 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **auth2faStatusGet**
-```swift
-    open class func auth2faStatusGet(completion: @escaping (_ data: Auth2faStatusGet200Response?, _ error: Error?) -> Void)
-```
-
-Get 2FA status
-
-Returns whether 2FA is enabled for the authenticated user
-
-### Example
-```swift
-// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
-import OpenAPIClient
-
-
-// Get 2FA status
-AuthAPI.auth2faStatusGet() { (response, error) in
-    guard error == nil else {
-        print(error)
-        return
-    }
-
-    if (response) {
-        dump(response)
-    }
-}
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-[**Auth2faStatusGet200Response**](Auth2faStatusGet200Response.md)
-
-### Authorization
-
-[BearerAuth](../README.md#BearerAuth)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **auth2faVerifyPost**
 ```swift
     open class func auth2faVerifyPost(verify2faRequest: Verify2faRequest, completion: @escaping (_ data: AuthResponse?, _ error: Error?) -> Void)
@@ -305,102 +256,6 @@ Void (empty response body)
 
  - **Content-Type**: Not defined
  - **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **authConsentGet**
-```swift
-    open class func authConsentGet(completion: @escaping (_ data: AuthConsentGet200Response?, _ error: Error?) -> Void)
-```
-
-Get consent preferences
-
-Returns the authenticated user's consent preferences
-
-### Example
-```swift
-// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
-import OpenAPIClient
-
-
-// Get consent preferences
-AuthAPI.authConsentGet() { (response, error) in
-    guard error == nil else {
-        print(error)
-        return
-    }
-
-    if (response) {
-        dump(response)
-    }
-}
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-[**AuthConsentGet200Response**](AuthConsentGet200Response.md)
-
-### Authorization
-
-[BearerAuth](../README.md#BearerAuth)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **authConsentPost**
-```swift
-    open class func authConsentPost(authConsentPostRequest: AuthConsentPostRequest, completion: @escaping (_ data: AuthConsentPost200Response?, _ error: Error?) -> Void)
-```
-
-Update a consent preference
-
-Sets a single consent key to true/false
-
-### Example
-```swift
-// The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
-import OpenAPIClient
-
-let authConsentPostRequest = _auth_consent_post_request(key: "key_example", value: false) // AuthConsentPostRequest | 
-
-// Update a consent preference
-AuthAPI.authConsentPost(authConsentPostRequest: authConsentPostRequest) { (response, error) in
-    guard error == nil else {
-        print(error)
-        return
-    }
-
-    if (response) {
-        dump(response)
-    }
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **authConsentPostRequest** | [**AuthConsentPostRequest**](AuthConsentPostRequest.md) |  | 
-
-### Return type
-
-[**AuthConsentPost200Response**](AuthConsentPost200Response.md)
-
-### Authorization
-
-[BearerAuth](../README.md#BearerAuth)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

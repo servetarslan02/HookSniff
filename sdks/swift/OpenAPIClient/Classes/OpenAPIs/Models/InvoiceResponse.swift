@@ -13,12 +13,12 @@ import AnyCodable
 public struct InvoiceResponse: Codable, JSONEncodable, Hashable {
 
     public var id: String
-    public var amountCents: Int64
+    public var amountCents: Int
     public var currency: String
     public var status: String
     public var createdAt: Date
 
-    public init(id: String, amountCents: Int64, currency: String, status: String, createdAt: Date) {
+    public init(id: String, amountCents: Int, currency: String, status: String, createdAt: Date) {
         self.id = id
         self.amountCents = amountCents
         self.currency = currency
