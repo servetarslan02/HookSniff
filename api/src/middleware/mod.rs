@@ -716,7 +716,7 @@ mod tests {
         assert!(cookie.starts_with("hooksniff_refresh=rt_abc"));
         assert!(cookie.contains("Max-Age=2592000"));
         assert!(cookie.contains("Secure"));
-        assert!(cookie.contains("SameSite=None"));
+        assert!(cookie.contains("SameSite=Lax"));
         assert!(cookie.contains("Path=/"));
     }
 
