@@ -1,59 +1,56 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 00:36 GMT+8 (Tüm SDK publish tamamlandı)
+> Son güncelleme: 2026-05-19 02:45 GMT+8
 > Bu dosya GitHub'da kalıcıdır. Her oturum başı okunur, oturum sonunda güncellenir.
 
-## 🎯 Sıradaki: Ne Yapalım?
+## 🎯 Sıradaki: #6 — Idempotency Key Kontrolü
 
-SDK Faz 0-15 tamamlandı ✅. Tüm 11 SDK registry'de yüklü ✅.
+### Ne Yapılacak?
+Tüm 11 SDK'ya `idempotencyKey` parametresi ekle:
+- Kullanıcı kendi key'ini verebilmeli (opsiyonel)
+- Verilmezse otomatik `auto_xxx` üretilmeli
+- Retry güvenliği için kritik
 
-### Seçenekler:
-
-1. **Test Coverage Artırma** (2-3 saat)
-   - Node.js: %60 → %90+
-   - Python: %65 → %90+
-   - Go: %70 → %90+
-
-2. **Yeni Feature** — Servet'in isteğine göre
-
-3. **Bug Fix / Polish** — Bilinen sorunlar varsa
-
-## 📋 Hızlı Başlangıç
-
-```powershell
-# Repo güncelle
-git pull origin main
-
-# Hafıza oku
-cat .ai-context/sdk-roadmap/MEMORY.md
-cat .ai-context/sdk-roadmap/TODO.md
-
-# Local CI
-bash local-ci.sh
-
-# SDK test
-bash local-sdk-test.sh all
-
-# OpenAPI codegen
-python3 openapi-codegen.py all
+### Örnek Kullanım:
+```typescript
+// Otomatik
+await client.message.create({ eventType: "order.created", payload: {...} });
+// Manuel
+await client.message.create({ eventType: "order.created", payload: {...} }, { idempotencyKey: "order_123" });
 ```
 
-## 🔑 Token'lar
+### Tahmini Süre: 1-2 saat
 
-`.sdk-tokens.env` dosyasında (gitignore'da):
-- npm, PyPI, crates.io, RubyGems, NuGet, Hex, Packagist, Maven
+---
 
-## 📊 Mevcut Durum
+## 📋 Tamamlanan Son İş
 
-- 11 SDK: v1.1.0/v1.2.0, tüm registry'lerde yüklü ✅
-- Faz 8-15: Tamamlandı ✅
-- Navigation Restructure: Tamamlandı ✅
-- Test coverage: %60-70 (hedef: %90+)
-- Benchmark: Tamamlandı
-- Security audit: Tamamlandı (7 minor sorun)
+### #5 — Webhook Payload Parsing ✅ (2026-05-19)
+- 11 SDK'da `verify()` → `WebhookEvent` döndürüyor
+- `event`, `data`, `timestamp` field'ları
+- Backward compatible (`verifyRaw()` / `verify_raw()`)
+
+---
+
+## 📊 SDK Kalite Skoru: %88
+
+| Faz | İçerik | Durum |
+|-----|--------|-------|
+| 1 | İmza doğrulama | ✅ 11/11 |
+| 2 | Retry/Backoff | ✅ 11/11 |
+| 3 | Pagination | ✅ 11/11 |
+| 4 | Error types (21) | ✅ 11/11 |
+| 5 | Payload Parsing | ✅ 11/11 |
+| 6 | Idempotency Key | ❌ Sıradaki |
+| 7 | Response Metadata | ❌ |
+| 8 | Config | ❌ |
+| 9 | Debug Logging | ❌ |
+| 10 | Typed Events | ❌ |
+
+---
 
 ## ⚠️ Bilinen Sorunlar
 
-1. Test coverage düşük (%60-70)
-2. Connector'lar eksik (Shopify, Stripe)
-3. Streaming eksik (UI tarafı)
+1. Kotlin SDK build sorunu devam ediyor (package çakışması)
+2. Test coverage düşük (%60-70)
+3. Connector'lar eksik (Shopify, Stripe)

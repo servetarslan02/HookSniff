@@ -210,9 +210,11 @@ HookSniff/
 - **Gerçek kalite skoru:** %72 (önceki tahmin: %62)
 
 ### Sıradaki:
-1. Error class çeşitliliği (6 SDK) — tek kalan kritik eksik
-2. Config options (tüm diller)
-3. CI/CD otomatik publish
+1. ~~Error class çeşitliliği (6 SDK) — tek kalan kritik eksik~~ ✅ TAMAMLANDI (11/11)
+2. ~~Webhook Payload Parsing~~ ✅ TAMAMLANDI (11/11) — verify() → WebhookEvent
+3. Idempotency Key — 🔴 YÜKSEK (1-2 saat)
+4. Config options (tüm diller)
+5. CI/CD otomatik publish
 
 ### Python SDK v1.2.0 Büyük Düzeltme (2026-05-18 22:52)
 - **Kritik sorun düzeltildi**: Tüm API yolları Svix'ten kalmıştı, HookSniff'e uyarlandı
