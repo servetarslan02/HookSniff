@@ -14,22 +14,24 @@ const ALLOWED_ATTRS = ['class', 'className', 'data-language', 'data-line'];
  * Allowlist-based — only permits known-safe tags and attributes.
  */
 function serverSanitize(html: string): string {
-  // Remove any script/event handler attributes
+  // Remove any script/event handler attributes (on*)
   let sanitized = html.replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '');
   sanitized = sanitized.replace(/\son\w+\s*=\s*[^\s>]*/gi, '');
 
-  // Remove javascript: URLs
-  sanitized = sanitized.replace(/href\s*=\s*["']javascript:[^"']*["']/gi, '');
-  sanitized = sanitized.replace(/src\s*=\s*["']javascript:[^"']*["']/gi, '');
+  // Remove javascript: and data: URLs in href, src, action, formaction, etc.
+  sanitized = sanitized.replace(/(?:href|src|action|formaction|data|cite|poster)\s*=\s*["'](?:javascript|data|vbscript):[^"']*["']/gi, '');
 
-  // Remove any tags not in the allowlist
+  // Remove any tags not in the allowlist (including <script>, <svg>, <object>, <embed>, <iframe>)
   sanitized = sanitized.replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/gi, (match, tag) => {
     if (ALLOWED_TAGS.includes(tag.toLowerCase())) {
-      // Strip non-allowed attributes
+      // Strip non-allowed attributes — only keep class/className
       return match.replace(/\s+(?!(?:class|className)(?:\s*=))[\w-]+=(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '');
     }
     return '';
   });
+
+  // Remove any remaining <script>...</script> blocks (belt-and-suspenders)
+  sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
   return sanitized;
 }
