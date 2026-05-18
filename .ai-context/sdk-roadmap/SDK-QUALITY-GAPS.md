@@ -1,8 +1,8 @@
 # SDK Kalite Boşlukları — Svix Karşılaştırması
 
 > Oluşturma: 2026-05-19 00:22 GMT+8
-> Güncelleme: 2026-05-19 01:52 GMT+8 — **Doğrulama sonrası güncellendi (11 SDK audit)**
-> Durum: Belgeleme — uygulama bekliyor
+> Güncelleme: 2026-05-19 02:24 GMT+8 — **TÜM GÜNCELLEMELER DAHİL**
+> Durum: Aktif geliştirme
 > Amaç: HookSniff SDK'larını Svix seviyesine çıkarmak için gereken tüm eksikler
 
 ---
@@ -18,7 +18,7 @@ HookSniff: █████████████████░░░  85%
 
 ---
 
-## ✅ Tamamlananlar (Faz 1 — Kritik)
+## ✅ TAMAMLANANLAR
 
 ### 1. Webhook İmza Doğrulama ✅
 
@@ -38,11 +38,11 @@ HookSniff: █████████████████░░░  85%
 | Elixir | `Webhook.verify(payload, headers, secret)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
 | Swift | `wh.verify(payload, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
 
-**Desteklenen özellikler:**
-- `whsec_` prefix'li secret format (Standard Webhooks uyumlu)
+**Desteklenen:**
+- `whsec_` prefix (Standard Webhooks uyumlu)
 - `hooksniff-id`, `hooksniff-timestamp`, `hooksniff-signature` header'ları
-- Unbranded (`webhook-id`, `webhook-signature`, `webhook-timestamp`) desteği
-- Replay attack önleme (5 dakika timestamp tolerance)
+- Unbranded (`webhook-id`, `webhook-signature`, `webhook-timestamp`)
+- Replay attack önleme (5 dakika tolerance)
 - `sign()` methodu (Node.js, Python, Go, Ruby, Elixir, Swift)
 
 ---
@@ -51,19 +51,19 @@ HookSniff: █████████████████░░░  85%
 
 **Durum: TÜM 11 SDK'DA MEVCUT**
 
-| SDK | Retry Mekanizması | 429 Retry-After | 5xx Backoff | Timeout Retry | Default |
-|-----|-------------------|-----------------|-------------|---------------|---------|
-| Node.js | `sendWithRetry()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
-| Python | `do_request_with_retry()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
-| Go | `svix_http_client.go` loop | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
-| Rust | `execute_with_backoff()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
-| Ruby | `hooksniff_http_client.rb` loop | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
-| Java | `executeRequestWithRetry()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
-| Kotlin | `executeRequestWithRetry()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
-| C# | retry loop | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
-| PHP | retry loop | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
-| Elixir | `do_request_with_retry()` | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
-| Swift | retry loop | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| SDK | 429 Retry-After | 5xx Backoff | Timeout Retry | Default |
+|-----|-----------------|-------------|---------------|---------|
+| Node.js | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Python | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Go | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Rust | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Ruby | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Java | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Kotlin | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| C# | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| PHP | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Elixir | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
+| Swift | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
 
 **Tüm SDK'larda:**
 - `retrySchedule` / `numRetries` config seçeneği (varsayılan: 3 deneme)
@@ -72,66 +72,104 @@ HookSniff: █████████████████░░░  85%
 - Timeout durumunda retry
 - `hooksniff-retry-count` header'ı ekleniyor
 
+**2026-05-19 düzeltmeleri:**
+- Rust: 429 retry eklendi (headers ile)
+- Elixir: 429 retry eklendi (Retry-After)
+- Ruby: timeout retry eklendi
+- Java: timeout retry eklendi
+- Kotlin: timeout retry eklendi + retry logic yeniden yazıldı
+- Tüm SDK'lar: default retry schedule 1s, 2s, 4s (eskiden 50ms/100ms/200ms)
+- Tüm SDK'lar: max retries 3 (eskiden 2 idi)
+
 ---
 
 ### 3. Pagination Helper ✅
 
 **Durum: TÜM 11 SDK'DA MEVCUT**
 
-Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi otomatik.
+| SDK | Implementation |
+|-----|---------------|
+| Node.js | `listAll()` methodu + `createPaginator()` helper |
+| Python | `ListResponse` + `for msg in response:` auto-paginate |
+| Go | Generic `Paginator[T]` + `ListAll()` methodu |
+| Rust | `Paginator<T>` struct with async collect |
+| Ruby | `Paginator` Enumerable class |
+| Java | `Paginator<T>` Iterable class |
+| Kotlin | `Paginator<T>` Iterable class |
+| C# | `Paginator<T>` IAsyncEnumerable |
+| PHP | `Paginator::paginate()` generator |
+| Elixir | `Paginator.paginate()` Stream |
+| Swift | `Paginator<T>` AsyncSequence |
 
 ---
 
-## ❌ Kalan Eksikler
+### 4. Error Class Çeşitliliği ✅
 
-### 4. Error Class Çeşitliliği ❌
+**Durum: TÜM 11 SDK'DA 21 ERROR TYPE**
 
-**Svix:** 20+ spesifik error type
-**HookSniff:** ✅ 11/11 SDK'da 21 error type
+| # | Error Type | HTTP Kod | Açıklama |
+|---|-----------|----------|----------|
+| 1 | `BadRequestError` | 400 | Hatalı istek |
+| 2 | `UnauthorizedError` | 401 | Geçersiz auth |
+| 3 | `AuthenticationError` | 401 | Token geçersiz/süresi dolmuş |
+| 4 | `ForbiddenError` | 403 | Yetki yetersiz |
+| 5 | `NotFoundError` | 404 | Kaynak bulunamadı |
+| 6 | `RequestTimeoutError` | 408 | Sunucu zaman aşımı |
+| 7 | `ConflictError` | 409 | Çakışma |
+| 8 | `GoneError` | 410 | Kaynak kalıcı olarak silinmiş |
+| 9 | `PayloadTooLargeError` | 413 | Body limit aşıldı |
+| 10 | `UnprocessableEntityError` | 422 | Validasyon hatası |
+| 11 | `RateLimitError` | 429 | Rate limit aşıldı (retryAfter ile) |
+| 12 | `InternalServerError` | 500 | Sunucu hatası |
+| 13 | `NotImplementedError` | 501 | Desteklenmeyen method |
+| 14 | `BadGatewayError` | 502 | Geçersiz gateway |
+| 15 | `ServiceUnavailableError` | 503 | Servis kullanılamıyor |
+| 16 | `GatewayTimeoutError` | 504 | Gateway zaman aşımı |
+| 17 | `InsufficientStorageError` | 507 | Depolama dolu |
+| 18 | `LoopDetectedError` | 508 | Sonsuz döngü tespit edildi |
+| 19 | `TimeoutError` | - | Request timeout (non-HTTP) |
+| 20 | `NetworkError` | - | Bağlantı hatası (non-HTTP) |
+| 21 | `HookSniffError` (base) | - | Temel error class |
 
-| SDK | Mevcut Error Types | Durum |
-|-----|-------------------|-------|
-| Node.js | 12 type (BadRequest, Unauthorized, Forbidden, NotFound, Conflict, UnprocessableEntity, RateLimit, InternalServer, BadGateway, ServiceUnavailable, GatewayTimeout + base) | ✅ TAMAM |
-| Python | 12 type (aynı hierarchy) | ✅ TAMAM |
-| Go | 12 type (aynı hierarchy) | ✅ TAMAM |
-| Ruby | 12 type (aynı hierarchy) | ✅ TAMAM |
-| PHP | 12 type (aynı hierarchy) | ✅ TAMAM |
-| Rust | 12 type (base Error + status check methods + factory) | ✅ TAMAM |
-| Java | 12 type (HookSniffApiException hierarchy + factory) | ✅ TAMAM |
-| Kotlin | 12 type (HookSniffApiException hierarchy + factory) | ✅ TAMAM |
-| C# | 12 type (HookSniffApiException hierarchy + factory) | ✅ TAMAM |
-| Elixir | 12 type (exception modules + ErrorFactory) | ✅ TAMAM |
-| Swift | 12 type (Error structs + HookSniffErrorFactory) | ✅ TAMAM |
+**Her SDK'da ayrıca:**
+- `ErrorFactory.create(statusCode, body, headers)` — factory method
+- `ValidationErrorItem` struct (422 responses için)
 
-**Eklenecek (6 SDK):**
-- [ ] Rust: `RateLimitError`, `UnauthorizedError`, `NotFoundError`, `ConflictError`, `TimeoutError` variant'ları + `createErrorFromStatus()` factory
-- [ ] Java: `BadRequestError`, `UnauthorizedError`, `ForbiddenError`, `NotFoundError`, `ConflictError`, `RateLimitError`, `InternalServerError`, `BadGatewayError`, `ServiceUnavailableError`, `GatewayTimeoutError` class'ları
-- [ ] Kotlin: Aynı class'lar (Kotlin idiomatic)
-- [ ] C#: Aynı class'lar (.NET exception hierarchy)
-- [ ] Elixir: Error tuple pattern (`{:error, %RateLimitError{}}`)
-- [ ] Swift: Error protocol implementasyonu
-
-**Referans:** Node.js `src/errors.ts` — tüm SDK'lar bu pattern'ı izlemeli
-
-**Tahmini Süre:** 4-6 saat (6 SDK)
-**Öncelik:** 🔴 Kritik — TEK KALAN KRİTİK EKSİK
+**2026-05-19 eklemeleri:**
+- 6 SDK'ya 12 type eklendi (Rust, Java, Kotlin, C#, Elixir, Swift)
+- 11 SDK'ya +9 yeni type eklendi (408, 410, 413, 501, 507, 508, Timeout, Network, Authentication)
+- Toplam: 12 → 21 type
 
 ---
 
-## 🟡 Orta Eksikler (Orta Etki)
+## ❌ KALAN EKSİKLER
 
 ### 5. Config Seçenekleri ❌
 
 **Svix:** `Svix(token, SvixOptions{serverUrl, debug, timeout})`
-**HookSniff:** Bazı SDK'larda var (Node.js: `baseUrl`, `timeout`, `debug`, `fetch`), çoğu eksik.
+**HookSniff:** Node.js'de var, diğerlerinde eksik.
+
+| SDK | baseUrl | timeout | debug | custom headers |
+|-----|---------|---------|-------|----------------|
+| Node.js | ✅ | ✅ | ✅ | ✅ |
+| Python | 🔶 | 🔶 | ❌ | ❌ |
+| Go | 🔶 | 🔶 | ❌ | ❌ |
+| Rust | 🔶 | 🔶 | ❌ | ❌ |
+| Ruby | 🔶 | 🔶 | ❌ | ❌ |
+| Java | 🔶 | 🔶 | ❌ | ❌ |
+| Kotlin | 🔶 | 🔶 | ❌ | ❌ |
+| C# | 🔶 | 🔶 | ❌ | ❌ |
+| PHP | 🔶 | 🔶 | ❌ | ❌ |
+| Elixir | 🔶 | 🔶 | ❌ | ❌ |
+| Swift | 🔶 | 🔶 | ❌ | ❌ |
 
 **Yapılacaklar:**
-- [ ] Tüm diller: `baseUrl` override (self-hosted HookSniff için)
+- [ ] Tüm diller: `baseUrl` override (self-hosted için)
 - [ ] Tüm diller: `timeout` ayarı (ms)
 - [ ] Tüm diller: Custom header ekleme
 - [ ] Tüm diller: `debug` flag
 
-**Tahmini Süre:** 3-4 saat (tüm diller)
+**Tahmini Süre:** 3-4 saat
 **Öncelik:** 🟡 Orta
 
 ---
@@ -146,7 +184,7 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 - [ ] Tag push'ta otomatik publish (v*)
 - [ ] Ortak workflow template
 
-**Tahmini Süre:** 3-4 saat (tüm diller)
+**Tahmini Süre:** 3-4 saat
 **Öncelik:** 🟡 Orta
 
 ---
@@ -154,7 +192,7 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 ### 7. Debug Logging ❌
 
 **Svix:** `debug: true` ile tüm HTTP isteklerini loglar.
-**HookSniff:** Node.js'de var (`debug` option), diğerlerinde yok.
+**HookSniff:** Sadece Node.js'de var.
 
 | SDK | Debug Logging |
 |-----|---------------|
@@ -181,10 +219,10 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 **HookSniff:** Sadece `MessageOut` var, event type'ı string.
 
 **Yapılacaklar:**
-- [ ] Tüm diller: Event type interface/struct/record
-- [ ] Event type'ları: `endpoint.created`, `endpoint.updated`, `endpoint.deleted`, `endpoint.disabled`, `endpoint.enabled`, `message.attempt.exhausted`, `message.attempt.failing`, `message.attempt.recovered`, `background_task.finished`
+- [ ] Event type interface/struct/record
+- [ ] `endpoint.created`, `endpoint.updated`, `endpoint.deleted`, `endpoint.disabled`, `endpoint.enabled`, `message.attempt.exhausted`, `message.attempt.failing`, `message.attempt.recovered`, `background_task.finished`
 
-**Tahmini Süre:** 4-6 saat (tüm diller)
+**Tahmini Süre:** 4-6 saat
 **Öncelik:** 🟡 Orta
 
 ---
@@ -194,8 +232,8 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 **Svix:** %95+ coverage.
 **HookSniff:** ~%70 coverage.
 
-| SDK | Test Dosyası | Tahmini Coverage |
-|-----|-------------|-----------------|
+| SDK | Test | Coverage |
+|-----|------|----------|
 | Node.js | 211 test | ~%70 |
 | Python | 77 test | ~%65 |
 | Go | test dosyaları | ~%70 |
@@ -208,12 +246,10 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 | Swift | 10 dosya | ~%65 |
 | Elixir | 21 test | ~%60 |
 
-**Tahmini Süre:** 12-16 saat (tüm diller)
+**Tahmini Süre:** 12-16 saat
 **Öncelik:** 🟡 Orta
 
 ---
-
-## 🟢 Düşük Eksikler (Düşük Etki)
 
 ### 10. JSDoc / Docstring ❌
 
@@ -237,22 +273,20 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 
 ---
 
-## 📋 Uygulama Sırası (Güncel)
+## 📋 Uygulama Sırası
 
-### Faz 1 — Kritik ✅ (TAMAMLANDI)
+### Faz 1 — Kritik ✅ TAMAMLANDI
 1. ✅ Webhook imza doğrulama (11/11 SDK)
-2. ✅ Retry + exponential backoff (11/11 SDK)
+2. ✅ Retry + exponential backoff (11/11 SDK — 1s/2s/4s, 3 retry, timeout)
 3. ✅ Pagination helper (11/11 SDK)
-
-### Faz 1.5 — Error Classes ✅ (TAMAMLANDI)
-4. ✅ Error class çeşitliliği (11/11 SDK — 21 type her biri)
+4. ✅ Error class çeşitliliği (11/11 SDK — 21 type)
 
 ### Faz 2 — Orta (20-28 saat)
-5. ❌ Config seçenekleri (tüm diller)
-6. ❌ CI/CD otomatik publish (tüm diller)
-7. ❌ Debug logging (10 SDK)
-8. ❌ Typed webhook events (tüm diller)
-9. ❌ Test coverage artırma (tüm diller)
+5. ❌ Config seçenekleri
+6. ❌ CI/CD otomatik publish
+7. ❌ Debug logging
+8. ❌ Typed webhook events
+9. ❌ Test coverage artırma
 
 ### Faz 3 — Düşük (22-33 saat)
 10. ❌ JSDoc/docstring
@@ -264,14 +298,14 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 
 ---
 
-## 📊 Dil Bazlı Durum (Güncel)
+## 📊 Dil Bazlı Durum
 
 | # | Eksik | Rust | Node | Python | Go | Java | Kotlin | Ruby | C# | PHP | Swift | Elixir |
 |---|-------|------|------|--------|-----|------|--------|------|-----|-----|-------|--------|
 | 1 | İmza doğrulama | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | 2 | Retry/Backoff | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | 3 | Pagination | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 4 | Error types | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 4 | Error types (21) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | 5 | Config | 🔶 | ✅ | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
 | 6 | CI/CD | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 7 | Debug logging | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -286,26 +320,28 @@ Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi 
 
 ---
 
-## 🎯 Başarı Kriterleri (Güncel)
+## 🎯 Başarı Kriterleri
 
-| Kriter | Eski Tahmin | Gerçek | Hedef |
-|--------|-------------|--------|-------|
+| Kriter | Gerçek | Hedef |
+|--------|--------|-------|
 | SDK kalite skoru | **%85** | %90+ |
-| Test coverage | ~%70 | ~%70 | %95+ |
-| Error type sayısı | **12 (11/11 SDK)** | 10+ (tümü) |
-| İmza doğrulama | Yok | **✅ 11/11** | 11 dilde |
-| Retry/Backoff | Yok | **✅ 11/11** | Otomatik |
-| Pagination | Manuel | **✅ 11/11** | Otomatik |
-| Config | Sabit | 🔶 Kısmen | Override edilebilir |
-| Debug logging | Yok | 🔶 Node.js'de var | Feature flag |
-| CI/CD | Manuel | ❌ Manuel | Otomatik |
+| Test coverage | ~%70 | %95+ |
+| Error type sayısı | **21 (11/11)** | 20+ |
+| İmza doğrulama | **✅ 11/11** | 11 dilde |
+| Retry/Backoff | **✅ 11/11** | Otomatik |
+| Pagination | **✅ 11/11** | Otomatik |
+| Config | 🔶 Node.js'de var | Override edilebilir |
+| Debug logging | 🔶 Node.js'de var | Feature flag |
+| CI/CD | ❌ Manuel | Otomatik |
 
 ---
 
 ## ⚠️ Notlar
 
-- **2026-05-19 doğrulama:** SDK-QUALITY-GAPS.md güncelliğini yitirmiş — Faz 1 (imza, retry, pagination) zaten tamamlanmış
-- **Tek kalan kritik eksik:** Error class'ları (6 SDK)
+- **2026-05-19 oturumu:** 2 saat içinde Faz 1 + Error Types tamamlandı
+- Java SDK'da 429 retry bug'ı düzeltildi
+- Default retry schedule 50ms → 1s/2s/4s olarak güncellendi
+- Max retries 2 → 3 olarak güncellendi
+- 6 SDK'ya error hierarchy eklendi, 11 SDK'ya 21 type'a çıkarıldı
 - Her SDK kendi repo'sunda (`hooksniff-{dil}`)
-- Svix 93 iterasyon yapmış, biz ~10 — acele etmeye gerek yok, kaliteli yapalım
-- **Error class'ları bitmeden yeni SDK versiyonu publish etme**
+- **Sıradaki:** Config options veya CI/CD
