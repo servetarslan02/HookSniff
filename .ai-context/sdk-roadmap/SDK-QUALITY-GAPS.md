@@ -9,7 +9,7 @@
 
 ```
 Svix:      ████████████████████ 100%
-HookSniff: ██████████████████░░  92%
+HookSniff: ████████████████████░  95%
 ```
 
 ---
@@ -103,11 +103,19 @@ Her SDK'da `debug=true` ile:
 
 ## ❌ KALAN EKSİKLER
 
-### 10. Typed Webhook Events ❌ — Sıradaki
+### 10. Typed Webhook Events ✅ (11/11 — 2026-05-19)
 - Compile-time type güvenliği
-- Node.js'de zaten var (`WebhookEventMap`)
-- Diğer SDK'lara type-safe event mapping ekle
-- Tahmini: 4-6 saat | 🟡 Orta
+- 8 typed data class + typed event subclass per SDK
+- Node.js: `WebhookEventMap` + `WebhookEventHandler<T>`
+- Python: `EndpointCreatedEventData` + `parse_webhook_event()`
+- Go: `ParseEndpointCreatedData()` generic helper
+- Rust: `TypedWebhookEvent` enum + `verify_and_parse_typed()`
+- Ruby: `EndpointCreatedEvent` subclass + `WebhookEvent.parse()`
+- Java/Kotlin: `EndpointCreatedData` + `parseData<T>()`
+- PHP: `EndpointCreatedData` + `parseEndpointCreatedData()`
+- C#: `EndpointCreatedData` + `ParseData<T>()`
+- Elixir: `EndpointCreatedData` struct + `parse_endpoint_created_data()`
+- Swift: `EndpointCreatedData` struct + `parseEndpointCreatedData()`
 
 ### 11. SDK Version Header ❌
 - `X-HookSniff-SDK: hooksniff-{dil}/{versiyon}`
