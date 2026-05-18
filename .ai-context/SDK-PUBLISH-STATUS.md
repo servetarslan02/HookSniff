@@ -1,4 +1,4 @@
-# 📦 SDK Publish Durumu — 2026-05-18 07:26 GMT+8
+# 📦 SDK Publish Durumu — 2026-05-18 20:39 GMT+8
 
 ## Genel Durum
 
@@ -16,7 +16,7 @@ Tüm 11 SDK'nın **kodları** ayrı repolara push edildi (v1.1.0).
 | Rust | crates.io | 1.1.0 | https://crates.io/crates/hooksniff |
 | Go | GitHub tag | v1.1.0 | github.com/servetarslan02/hooksniff-go/releases |
 | Swift | GitHub tag | v1.1.0 | github.com/servetarslan02/hooksniff-swift/releases |
-| PHP | Packagist | otomatik | github.com/servetarslan02/hooksniff-php |
+| PHP | Packagist | 1.2.0 | https://packagist.org/packages/hooksniff/hooksniff |
 
 ---
 
