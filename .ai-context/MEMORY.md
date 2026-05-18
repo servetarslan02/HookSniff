@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 06:24 GMT+8 (Node.js SDK v1.3.0 yayınlandı)
+> Son güncelleme: 2026-05-19 07:17 GMT+8 (API test + DB fix + SDK sync workflow)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -199,7 +199,38 @@ HookSniff/
 
 ---
 
-## 📝 Son Oturum (2026-05-19 06:10 — Grafana Alert Düzeltmeleri + Worker Health)
+## 📝 Son Oturum (2026-05-19 06:38 — API Entegrasyon Testi + DB Fix + SDK Sync)
+
+### Yapılan İşler:
+- **API entegrasyon testleri** — 15+ endpoint test edildi (curl ile)
+  - Health ✅, Login ✅, Endpoints ✅, Events ✅, Webhooks ✅, Plans ✅, Stats ✅, Templates ✅, Applications ✅, API Keys ✅, Notifications ✅
+- **`pgcrypto` extension eklendi** — Neon DB'ye `CREATE EXTENSION IF NOT EXISTS pgcrypto` çalıştırıldı
+  - Çözüm: `function digest(text, unknown) does not exist` hatası
+  - Webhook oluşturma artık çalışıyor
+- **`custom_headers` sütunu eklendi** — `deliveries` tablosuna `ALTER TABLE deliveries ADD COLUMN custom_headers jsonb`
+  - Çözüm: Worker orphaned delivery reaper hatası
+  - Worker processing artık çalışıyor (httpbin.org'a delivery test edildi, HTTP 200)
+- **Demo şifresi**: `Demo1234!` (RUNBOOK.md'den bulundu)
+- **OpenAPI SDK sync workflow** — `.github/workflows/openapi-sdk-sync.yml` oluşturuldu
+  - `docs/openapi.yaml` değiştiğinde 11 SDK'yı ayrı repolara push eder
+  - `SDK_PUSH_TOKEN` secret eklendi
+  - Billing yenilendiğinde otomatik çalışacak
+- **`sdks/` klasörü ana repodan kaldırıldı** — SDK'lar ayrı repolarda duruyor
+
+### DB Değişiklikleri (Neon PostgreSQL):
+```sql
+CREATE EXTENSION IF NOT EXISTS pgcrypto;  -- v1.3
+ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS custom_headers jsonb;
+```
+
+### Sıradaki:
+1. GitHub Actions billing yenilendiğinde SDK sync workflow test
+2. Onboarding/quickstart düzenlemeleri
+3. Token'ları ayarla (`.sdk-tokens.env`)
+
+---
+
+## 📝 Önceki Oturum (2026-05-19 06:10 — Grafana Alert Düzeltmeleri + Worker Health)
 
 ### Yapılan İşler:
 - **Grafana alert sistemi tamamen düzeltildi** (15 alert incelendi)
