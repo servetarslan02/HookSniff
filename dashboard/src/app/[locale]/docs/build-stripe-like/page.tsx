@@ -1,6 +1,7 @@
 import CodeBlock from '@/components/CodeBlock';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
 
@@ -9,35 +10,36 @@ export const metadata: Metadata = {
   description: 'Step-by-step guide to building a production-grade webhook system like Stripe',
 };
 
-export default function BuildStripeLikePage() {
+export default async function BuildStripeLikePage() {
+  const t = await getTranslations('docsBuildStripeLike');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Build Stripe-like Webhooks</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Stripe&apos;s webhook system is the gold standard. Here&apos;s how to build something similar with HookSniff.
+        {t('subtitle')}
       </p>
 
       {/* What Makes Stripe Webhooks Great */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">What Makes Stripe Webhooks Great?</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('whatMakesStripeGreat')}</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><strong>Event types</strong> — Clear naming: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">payment_intent.succeeded</code></li>
-          <li><strong>Idempotency</strong> — Events have unique IDs for deduplication</li>
-          <li><strong>Signatures</strong> — HMAC-SHA256 verification with timestamp</li>
-          <li><strong>Retries</strong> — Automatic retries with exponential backoff</li>
-          <li><strong>Dashboard</strong> — Full delivery visibility with replay</li>
-          <li><strong>API</strong> — Programmatic access to events and delivery status</li>
+          <li><strong>{t('eventTypes')}</strong> — {t('eventTypesDesc')} <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">payment_intent.succeeded</code></li>
+          <li><strong>{t('idempotency')}</strong> — {t('idempotencyDesc')}</li>
+          <li><strong>{t('signatures')}</strong> — {t('signaturesDesc')}</li>
+          <li><strong>{t('retries')}</strong> — {t('retriesDesc')}</li>
+          <li><strong>{t('dashboard')}</strong> — {t('dashboardDesc')}</li>
+          <li><strong>{t('api')}</strong> — {t('apiDesc')}</li>
         </ul>
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          HookSniff gives you all of this out of the box.
+          {t('hooksniffGivesAll')}
         </p>
       </section>
 
       {/* Step 1: Define Event Types */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Step 1: Define Event Types</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step1Title')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Use the <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">resource.action</code> pattern:
+          {t('step1Desc')}
         </p>
         <CodeBlock
           code={`order.created
@@ -54,9 +56,9 @@ invoice.overdue`}
 
       {/* Step 2: Create Endpoints */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Step 2: Create Endpoints for Customers</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step2Title')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          When a customer registers for webhooks, create an endpoint:
+          {t('step2Desc')}
         </p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \\
@@ -69,15 +71,15 @@ invoice.overdue`}
   }'`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          The response includes a <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">signing_secret</code> — share this with your customer for signature verification.
+          {t('step2Note')}
         </p>
       </section>
 
       {/* Step 3: Send Events */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Step 3: Send Events</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step3Title')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          When something happens in your app, send an event:
+          {t('step3Desc')}
         </p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \\
@@ -103,9 +105,9 @@ invoice.overdue`}
 
       {/* Step 4: Give Customers the Portal */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Step 4: Give Customers the Portal</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step4Title')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Embed the HookSniff portal so customers can manage their own webhooks:
+          {t('step4Desc')}
         </p>
         <CodeBlock
           code={`<script src="https://cdn.hooksniff.com/portal.js"></script>
@@ -126,19 +128,19 @@ invoice.overdue`}
 
       {/* Step 5: Document for Customers */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Step 5: Document for Customers</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step5Title')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Give your customers:
+          {t('step5Desc')}
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><strong>Signing secret</strong> — For verifying webhook signatures</li>
-          <li><strong>Event types list</strong> — What events you send</li>
-          <li><strong>Payload format</strong> — What the data looks like</li>
-          <li><strong>Verification code</strong> — Example code in their language</li>
-          <li><strong>Portal link</strong> — Where they can manage endpoints and view deliveries</li>
+          <li><strong>{t('signingSecret')}</strong> — {t('signingSecretDesc')}</li>
+          <li><strong>{t('eventTypesList')}</strong> — {t('eventTypesListDesc')}</li>
+          <li><strong>{t('payloadFormat')}</strong> — {t('payloadFormatDesc')}</li>
+          <li><strong>{t('verificationCode')}</strong> — {t('verificationCodeDesc')}</li>
+          <li><strong>{t('portalLink')}</strong> — {t('portalLinkDesc')}</li>
         </ul>
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          Copy the verification examples from <Link href="/docs/security" className="text-brand-600 hover:text-brand-700">Security</Link> for your docs.
+          {t('copyVerification')} <Link href="/docs/security" className="text-brand-600 hover:text-brand-700">Security</Link>
         </p>
       </section>
     </article>
