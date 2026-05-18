@@ -142,7 +142,7 @@ HookSniff/
 |---|-----|----------|----------|-------|
 | 1 | Node.js | npm | 1.3.0 | ✅ Yüklendi |
 | 2 | Python | PyPI | 1.1.0 | ✅ Yüklendi |
-| 3 | Go | GitHub tag | v1.1.0 | ✅ |
+| 3 | Go | GitHub tag | v1.3.0 | ✅ |
 | 4 | Rust | crates.io | 1.1.0 | ✅ Yüklendi |
 | 5 | Ruby | RubyGems | 1.2.0 | ✅ Yüklendi (30+ resource) |
 | 6 | Java | Maven Central | 1.1.0 | ✅ Yüklendi |
