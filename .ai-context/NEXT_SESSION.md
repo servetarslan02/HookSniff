@@ -45,7 +45,28 @@
 
 ---
 
+## ✅ Tamamlanan: Docs Sayfaları i18n (Bu Oturum — 2026-05-19 06:00)
+
+### Tüm 11 Docs Sayfası i18n'e Taşındı ✅
+- `retries/page.tsx` ✅ (2 eksik anahtar tamamlandı: `default`, `description`)
+- `build-stripe-like/page.tsx` ✅ (tamamen hardcoded'dan getTranslations'a geçirildi, 38 anahtar)
+- `rate-limiting/page.tsx` ✅
+- `error-handling/page.tsx` ✅
+- `dlq/page.tsx` ✅
+- `event-types/page.tsx` ✅
+- `embed-portal/page.tsx` ✅
+- `webhook-vs-polling/page.tsx` ✅
+- `debug-failed-webhooks/page.tsx` ✅
+- `event-processing/page.tsx` ✅
+- `multi-tenant/page.tsx` ✅
+
+### Toplam
+- **Docs sayfaları:** %100 çevrildi (18/18)
+- **Dashboard sayfaları:** %95+ çevrildi
+
+---
+
 ## 📊 Genel Durum
 - Dashboard sayfaları: %95+ çevrildi
-- Docs sayfaları: %45 çevrildi (8/18)
+- Docs sayfaları: %100 çevrildi ✅
 - SDK kalite skoru: %100
