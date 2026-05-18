@@ -253,3 +253,12 @@ Credentials → local `.env` dosyasında saklanır.
 - 22 yeni model dosyası oluşturuldu
 - PyPI v1.2.0 yüklendi: https://pypi.org/project/hooksniff/1.2.0/
 - Demo hesapla gerçek API test edildi: ✅ Uyumlu
+
+### Java SDK Düzeltmeleri (2026-05-18 23:17)
+- Aynı sorun: tüm API yolları `/api/v1/...` kullanıyordu
+- 17 dosya düzeltildi, 720 satır silindi, 224 satır eklendi
+- Endpoint.java: `app_id` kaldırıldı, `/v1/endpoints` kullanıyor
+- Message.java: `/v1/webhooks` formatına çevrildi
+- MessageAttempt.java: `/v1/webhooks/{id}/attempts` kullanıyor
+- Authentication.java: HookSniff auth endpoint'leri (login, register, me)
+- GitHub'a push edildi: ffb9786
