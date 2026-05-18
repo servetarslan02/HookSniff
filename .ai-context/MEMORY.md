@@ -199,7 +199,25 @@ HookSniff/
 
 ---
 
-## 📝 Son Oturum (2026-05-19 06:00 — Docs i18n Tamamlandı)
+## 📝 Son Oturum (2026-05-19 06:10 — Grafana Alert Düzeltmeleri + Worker Health)
+
+### Yapılan İşler:
+- **Grafana alert sistemi tamamen düzeltildi** (15 alert incelendi)
+- 3 LogQL alert pause edildi (eski/duplicate)
+- 4 hooksniff-critical alert pause edildi (duplicate veya metrik yok)
+- 5 alert düzeltildi (olmayan metrikler → doğru metriklerle değiştirildi)
+- **Worker health metriği eklendi**: `worker/src/metrics_push.rs`
+  - `hooksniff_worker_healthy = 1` her 60 saniyede bir OTLP ile push
+  - Worker Down alert aktif edildi
+- 2 commit push edildi
+
+### Alert Final Durumu:
+- **8 aktif**: API Down, Queue Backlog, Delivery Failures, DB Latency, Success Rate, Queue Latency (x2), Worker Down
+- **7 pause**: Eski LogQL (3), Duplicate critical (4)
+
+### Sıradaki:
+1. Cloud Build ile deploy (worker değişikliği)
+2. Token'ları ayarla (`.sdk-tokens.env`)
 
 ### Yapılan İşler:
 - **`build-stripe-like` sayfası i18n'e geçirildi** — 38 yeni çeviri anahtarı (en + tr)
