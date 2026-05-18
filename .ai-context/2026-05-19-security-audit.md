@@ -115,10 +115,10 @@ let sort_field = params.sort_field.as_deref().unwrap_or("created_at");
 
 | # | Bulgu | Risk | Durum |
 |---|-------|------|-------|
-| 1 | WS Origin localhost | 🔴 Yüksek | Düzeltilecek |
-| 2 | SameSite=None cookie | 🔴 Yüksek | Düzeltilecek |
-| 3 | Custom sanitizer | 🟡 Orta | İyileştirilecek |
-| 4 | Global rate limit | 🟡 Orta | Eklenecek |
+| 1 | WS Origin localhost | 🔴 Yüksek | ✅ Düzeltildi |
+| 2 | SameSite=None cookie | 🔴 Yüksek | ✅ Düzeltildi |
+| 3 | Custom sanitizer | 🟡 Orta | ✅ Düzeltildi |
+| 4 | Global rate limit | 🟡 Orta | ✅ Düzeltildi |
 | 5 | Admin sort field | 🟢 Düşük | Güvenli |
 | 6 | SQL injection | 🟢 Güvenli | ✅ |
 | 7 | SSRF koruması | 🟢 Güvenli | ✅ |
