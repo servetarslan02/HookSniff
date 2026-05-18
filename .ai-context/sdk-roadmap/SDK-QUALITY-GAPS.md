@@ -1,6 +1,6 @@
 # SDK Kalite Boşlukları — Svix Karşılaştırması
 
-> Güncelleme: 2026-05-19 04:05 GMT+8
+> Güncelleme: 2026-05-19 04:50 GMT+8
 > Durum: Aktif geliştirme
 
 ---
@@ -139,9 +139,13 @@ Her SDK'da `debug=true` ile:
 | Elixir | 18 | Typed Events, Edge Cases, Unicode, Snake_case |
 | Swift | 6+ | Typed Events, Backward Compat, Unicode, Empty Data |
 
-### 13. CI/CD Otomatik Publish ❌
-- Tag push'ta otomatik publish
-- Tahmini: 3-4 saat | 🟡 Orta
+### 13. CI/CD Otomatik Publish ✅ (2026-05-19)
+- `local-release.sh` — Local CI/CD script (GitHub Actions yerine)
+- Tek komutla tüm SDK'ları publish: `./local-release.sh patch`
+- Dry-run desteği: `./local-release.sh dry-run`
+- Tek SDK publish: `./local-release.sh node`
+- Otomatik version bump, git tag, repo sync
+- Token yönetimi: `.sdk-tokens.env`
 
 ### 14-17. Düşük öncelik
 - 14. JSDoc / Docstring (8-12 saat)
