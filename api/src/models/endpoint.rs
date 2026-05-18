@@ -9,12 +9,14 @@ pub struct Endpoint {
     pub url: String,
     pub description: Option<String>,
     pub is_active: bool,
+    #[serde(skip_serializing)]
     pub signing_secret: String,
     pub retry_policy: Option<serde_json::Value>,
     pub created_at: DateTime<Utc>,
     pub allowed_ips: Option<serde_json::Value>,
     pub event_filter: Option<Vec<String>>,
     pub custom_headers: Option<serde_json::Value>,
+    #[serde(skip_serializing)]
     pub old_signing_secret: Option<String>,
     pub secret_rotated_at: Option<DateTime<Utc>>,
     // Smart routing fields
