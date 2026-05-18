@@ -200,7 +200,12 @@
     "inboundWebhooks": "Inbound Webhooks",
     "connectors": "Connectors",
     "integrations": "Integrations",
-    "streaming": "Streaming"
+    "streaming": "Streaming",
+    "sectionDeliveries": "Deliveries",
+    "sectionWebhooks": "Webhooks",
+    "sectionIntegrations": "Integrations",
+    "sectionDevtools": "Dev Tools",
+    "sectionPortal": "Portal"
   },
   "dashboard": {
     "title": "Dashboard",
