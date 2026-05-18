@@ -199,7 +199,22 @@ HookSniff/
 
 ---
 
-## 📝 Son Oturum (2026-05-19 05:03 — Svix Temizliği + CI/CD + Güvenlik)
+## 📝 Son Oturum (2026-05-19 06:00 — Docs i18n Tamamlandı)
+
+### Yapılan İşler:
+- **`build-stripe-like` sayfası i18n'e geçirildi** — 38 yeni çeviri anahtarı (en + tr)
+- **`retries` sayfası eksik anahtarları tamamlandı** — `default` ve `description` eklendi
+- **Tüm 11 docs sayfası doğrulandı** — hepsi getTranslations kullanıyor, eksik anahtar yok
+- **Docs i18n oranı: %100** (18/18 sayfa)
+
+### Sıradaki:
+1. Dashboard sayfaları kalan %5 kontrol
+2. Yeni özellik geliştirme
+3. Token'ları ayarla (`.sdk-tokens.env`)
+
+---
+
+## 📝 Önceki Oturum (2026-05-19 05:03 — Svix Temizliği + CI/CD + Güvenlik)
 
 ### Yapılan İşler:
 - **`local-release.sh` oluşturuldu** — GitHub Actions yerine local CI/CD
