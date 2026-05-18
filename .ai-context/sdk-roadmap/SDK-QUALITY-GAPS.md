@@ -1,7 +1,7 @@
 # SDK Kalite Boşlukları — Svix Karşılaştırması
 
 > Oluşturma: 2026-05-19 00:22 GMT+8
-> Güncelleme: 2026-05-19 02:24 GMT+8 — **TÜM GÜNCELLEMELER DAHİL**
+> Güncelleme: 2026-05-19 02:28 GMT+8 — **Yeni features eklendi**
 > Durum: Aktif geliştirme
 > Amaç: HookSniff SDK'larını Svix seviyesine çıkarmak için gereken tüm eksikler
 
@@ -14,15 +14,13 @@ Svix:      ████████████████████ 100%
 HookSniff: █████████████████░░░  85%
 ```
 
-**Hedef: %90+ (10-20 saat kaldı)**
+**Hedef: %90+ (15-25 saat kaldı)**
 
 ---
 
-## ✅ TAMAMLANANLAR
+## ✅ TAMAMLANANLAR (1-4)
 
 ### 1. Webhook İmza Doğrulama ✅
-
-**Durum: TÜM 11 SDK'DA MEVCUT**
 
 | SDK | Method | Algoritma | Timestamp | Unbranded |
 |-----|--------|-----------|-----------|-----------|
@@ -38,18 +36,13 @@ HookSniff: █████████████████░░░  85%
 | Elixir | `Webhook.verify(payload, headers, secret)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
 | Swift | `wh.verify(payload, headers)` | HMAC-SHA256 | ✅ 5 dk | ✅ |
 
-**Desteklenen:**
 - `whsec_` prefix (Standard Webhooks uyumlu)
-- `hooksniff-id`, `hooksniff-timestamp`, `hooksniff-signature` header'ları
-- Unbranded (`webhook-id`, `webhook-signature`, `webhook-timestamp`)
 - Replay attack önleme (5 dakika tolerance)
 - `sign()` methodu (Node.js, Python, Go, Ruby, Elixir, Swift)
 
 ---
 
 ### 2. Retry + Exponential Backoff ✅
-
-**Durum: TÜM 11 SDK'DA MEVCUT**
 
 | SDK | 429 Retry-After | 5xx Backoff | Timeout Retry | Default |
 |-----|-----------------|-------------|---------------|---------|
@@ -65,50 +58,21 @@ HookSniff: █████████████████░░░  85%
 | Elixir | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
 | Swift | ✅ | ✅ 1s/2s/4s | ✅ | 3 retries |
 
-**Tüm SDK'larda:**
-- `retrySchedule` / `numRetries` config seçeneği (varsayılan: 3 deneme)
-- 429'da `Retry-After` header'ı okunuyor
-- 5xx'de exponential backoff (1s, 2s, 4s)
-- Timeout durumunda retry
+- `retrySchedule` / `numRetries` config seçeneği
 - `hooksniff-retry-count` header'ı ekleniyor
-
-**2026-05-19 düzeltmeleri:**
-- Rust: 429 retry eklendi (headers ile)
-- Elixir: 429 retry eklendi (Retry-After)
-- Ruby: timeout retry eklendi
-- Java: timeout retry eklendi
-- Kotlin: timeout retry eklendi + retry logic yeniden yazıldı
-- Tüm SDK'lar: default retry schedule 1s, 2s, 4s (eskiden 50ms/100ms/200ms)
-- Tüm SDK'lar: max retries 3 (eskiden 2 idi)
 
 ---
 
 ### 3. Pagination Helper ✅
 
-**Durum: TÜM 11 SDK'DA MEVCUT**
-
-| SDK | Implementation |
-|-----|---------------|
-| Node.js | `listAll()` methodu + `createPaginator()` helper |
-| Python | `ListResponse` + `for msg in response:` auto-paginate |
-| Go | Generic `Paginator[T]` + `ListAll()` methodu |
-| Rust | `Paginator<T>` struct with async collect |
-| Ruby | `Paginator` Enumerable class |
-| Java | `Paginator<T>` Iterable class |
-| Kotlin | `Paginator<T>` Iterable class |
-| C# | `Paginator<T>` IAsyncEnumerable |
-| PHP | `Paginator::paginate()` generator |
-| Elixir | `Paginator.paginate()` Stream |
-| Swift | `Paginator<T>` AsyncSequence |
+Her SDK'da `Paginator` / `ListResponse` class'ı var, iterator/cursor yönetimi otomatik.
 
 ---
 
-### 4. Error Class Çeşitliliği ✅
+### 4. Error Class Çeşitliliği ✅ (21 type)
 
-**Durum: TÜM 11 SDK'DA 21 ERROR TYPE**
-
-| # | Error Type | HTTP Kod | Açıklama |
-|---|-----------|----------|----------|
+| # | Error Type | Kod | Açıklama |
+|---|-----------|-----|----------|
 | 1 | `BadRequestError` | 400 | Hatalı istek |
 | 2 | `UnauthorizedError` | 401 | Geçersiz auth |
 | 3 | `AuthenticationError` | 401 | Token geçersiz/süresi dolmuş |
@@ -116,29 +80,22 @@ HookSniff: █████████████████░░░  85%
 | 5 | `NotFoundError` | 404 | Kaynak bulunamadı |
 | 6 | `RequestTimeoutError` | 408 | Sunucu zaman aşımı |
 | 7 | `ConflictError` | 409 | Çakışma |
-| 8 | `GoneError` | 410 | Kaynak kalıcı olarak silinmiş |
+| 8 | `GoneError` | 410 | Kaynak kalıcı silinmiş |
 | 9 | `PayloadTooLargeError` | 413 | Body limit aşıldı |
 | 10 | `UnprocessableEntityError` | 422 | Validasyon hatası |
-| 11 | `RateLimitError` | 429 | Rate limit aşıldı (retryAfter ile) |
+| 11 | `RateLimitError` | 429 | Rate limit (retryAfter ile) |
 | 12 | `InternalServerError` | 500 | Sunucu hatası |
 | 13 | `NotImplementedError` | 501 | Desteklenmeyen method |
 | 14 | `BadGatewayError` | 502 | Geçersiz gateway |
 | 15 | `ServiceUnavailableError` | 503 | Servis kullanılamıyor |
 | 16 | `GatewayTimeoutError` | 504 | Gateway zaman aşımı |
 | 17 | `InsufficientStorageError` | 507 | Depolama dolu |
-| 18 | `LoopDetectedError` | 508 | Sonsuz döngü tespit edildi |
+| 18 | `LoopDetectedError` | 508 | Sonsuz döngü |
 | 19 | `TimeoutError` | - | Request timeout (non-HTTP) |
 | 20 | `NetworkError` | - | Bağlantı hatası (non-HTTP) |
 | 21 | `HookSniffError` (base) | - | Temel error class |
 
-**Her SDK'da ayrıca:**
-- `ErrorFactory.create(statusCode, body, headers)` — factory method
-- `ValidationErrorItem` struct (422 responses için)
-
-**2026-05-19 eklemeleri:**
-- 6 SDK'ya 12 type eklendi (Rust, Java, Kotlin, C#, Elixir, Swift)
-- 11 SDK'ya +9 yeni type eklendi (408, 410, 413, 501, 507, 508, Timeout, Network, Authentication)
-- Toplam: 12 → 21 type
+Her SDK'da: `ErrorFactory.create(statusCode, body, headers)` + `ValidationErrorItem`
 
 ---
 
@@ -147,7 +104,6 @@ HookSniff: █████████████████░░░  85%
 ### 5. Config Seçenekleri ❌
 
 **Svix:** `Svix(token, SvixOptions{serverUrl, debug, timeout})`
-**HookSniff:** Node.js'de var, diğerlerinde eksik.
 
 | SDK | baseUrl | timeout | debug | custom headers |
 |-----|---------|---------|-------|----------------|
@@ -163,12 +119,6 @@ HookSniff: █████████████████░░░  85%
 | Elixir | 🔶 | 🔶 | ❌ | ❌ |
 | Swift | 🔶 | 🔶 | ❌ | ❌ |
 
-**Yapılacaklar:**
-- [ ] Tüm diller: `baseUrl` override (self-hosted için)
-- [ ] Tüm diller: `timeout` ayarı (ms)
-- [ ] Tüm diller: Custom header ekleme
-- [ ] Tüm diller: `debug` flag
-
 **Tahmini Süre:** 3-4 saat
 **Öncelik:** 🟡 Orta
 
@@ -176,10 +126,6 @@ HookSniff: █████████████████░░░  85%
 
 ### 6. CI/CD Otomatik Publish ❌
 
-**Svix:** GitHub Actions ile tag push'ta otomatik publish.
-**HookSniff:** Manuel publish (`publish-sdks.sh` script).
-
-**Yapılacaklar:**
 - [ ] Her SDK için `.github/workflows/publish.yml`
 - [ ] Tag push'ta otomatik publish (v*)
 - [ ] Ortak workflow template
@@ -191,34 +137,18 @@ HookSniff: █████████████████░░░  85%
 
 ### 7. Debug Logging ❌
 
-**Svix:** `debug: true` ile tüm HTTP isteklerini loglar.
-**HookSniff:** Sadece Node.js'de var.
-
-| SDK | Debug Logging |
-|-----|---------------|
+| SDK | Debug |
+|-----|-------|
 | Node.js | ✅ `console.log` |
-| Python | ❌ |
-| Go | ❌ |
-| Rust | ❌ |
-| Ruby | ❌ |
-| Java | ❌ |
-| Kotlin | ❌ |
-| C# | ❌ |
-| PHP | ❌ |
-| Swift | ❌ |
-| Elixir | ❌ |
+| Diğer 10 | ❌ |
 
-**Tahmini Süre:** 4-6 saat (10 SDK)
+**Tahmini Süre:** 4-6 saat
 **Öncelik:** 🟡 Orta
 
 ---
 
 ### 8. Typed Webhook Events ❌
 
-**Svix:** Event type'ları compile-time'da biliniyor.
-**HookSniff:** Sadece `MessageOut` var, event type'ı string.
-
-**Yapılacaklar:**
 - [ ] Event type interface/struct/record
 - [ ] `endpoint.created`, `endpoint.updated`, `endpoint.deleted`, `endpoint.disabled`, `endpoint.enabled`, `message.attempt.exhausted`, `message.attempt.failing`, `message.attempt.recovered`, `background_task.finished`
 
@@ -228,9 +158,6 @@ HookSniff: █████████████████░░░  85%
 ---
 
 ### 9. Test Coverage Artırma ❌
-
-**Svix:** %95+ coverage.
-**HookSniff:** ~%70 coverage.
 
 | SDK | Test | Coverage |
 |-----|------|----------|
@@ -251,24 +178,101 @@ HookSniff: █████████████████░░░  85%
 
 ---
 
-### 10. JSDoc / Docstring ❌
+### 10. Webhook Payload Parsing ❌
+
+**Svix:** `verify()` sonrası type-safe event objesi döndürüyor.
+**HookSniff:** `verify()` sadece `Any` / raw JSON döndürüyor.
+
+**Yapılacaklar:**
+- [ ] Tüm diller: `verify()` → `WebhookEvent` struct/record döndürsün
+- [ ] `WebhookEvent.type` → event type string
+- [ ] `WebhookEvent.data` → parsed payload (type-safe)
+- [ ] `WebhookEvent.timestamp` → DateTime
+- [ ] `WebhookEvent.payload` → raw JSON string
+
+**Örnek (Python):**
+```python
+event = wh.verify(body, headers)
+print(event.type)       # "endpoint.created"
+print(event.data.id)    # "ep_123"
+print(event.timestamp)  # datetime(2026, 5, 19, 2, 0, 0)
+```
+
+**Tahmini Süre:** 3-4 saat (tüm diller)
+**Öncelik:** 🔴 Yüksek
+
+---
+
+### 11. Idempotency Key Kontrolü ❌
+
+**Svix:** Kullanıcı kendi key'ini verebilir.
+**HookSniff:** Otomatik `auto_xxx` üretiliyor, kullanıcı override edemiyor.
+
+**Yapılacaklar:**
+- [ ] Tüm diller: `idempotencyKey` parametresi (opsiyonel)
+- [ ] Verilirse kullanıcı key'ini kullan, verilmezse auto üret
+
+**Örnek (Node.js):**
+```typescript
+// Otomatik
+await client.message.create({ eventType: "order.created", payload: {...} });
+// Manuel
+await client.message.create({ eventType: "order.created", payload: {...} }, { idempotencyKey: "order_123" });
+```
+
+**Tahmini Süre:** 1-2 saat (tüm diller)
+**Öncelik:** 🔴 Yüksek
+
+---
+
+### 12. Response Metadata Erişimi ❌
+
+**Svix:** Response header'ları erişilebilir.
+**HookSniff:** Sadece body dönüyor, header'lar kayıp.
+
+**Yapılacaklar:**
+- [ ] Tüm diller: Response objesinde `headers`, `statusCode`, `requestId` erişimi
+- [ ] `x-request-id` header'ı debug için
+- [ ] `x-ratelimit-remaining` header'ı rate limit takibi için
+
+**Örnek (Go):**
+```go
+resp, err := client.Endpoint.List(ctx, nil)
+fmt.Println(resp.Headers.Get("x-request-id"))
+fmt.Println(resp.Headers.Get("x-ratelimit-remaining"))
+```
+
+**Tahmini Süre:** 2-3 saat (tüm diller)
+**Öncelik:** 🟡 Orta
+
+---
+
+### 13. JSDoc / Docstring ❌
 
 **Tahmini Süre:** 8-12 saat
 **Öncelik:** 🟢 Düşük
 
-### 11. Streaming / SSE Desteği ❌
+### 14. Streaming / SSE Desteği ❌
 
 **Tahmini Süre:** 8-12 saat
 **Öncelik:** 🟢 Düşük
 
-### 12. Rate Limit Header Parsing ❌
+### 15. Rate Limit Header Parsing ❌
 
 **Tahmini Süre:** 2-3 saat
 **Öncelik:** 🟢 Düşük
 
-### 13. Custom HTTP Client Desteği ❌
+### 16. Custom HTTP Client Desteği ❌
 
 **Tahmini Süre:** 4-6 saat
+**Öncelik:** 🟢 Düşük
+
+### 17. SDK Version Header ❌
+
+**Yapılacaklar:**
+- [ ] Tüm diller: `X-HookSniff-SDK: hooksniff-{dil}/{versiyon}` header'ı ekle
+
+**Tahmini Süre:** 1 saat
 **Öncelik:** 🟢 Düşük
 
 ---
@@ -281,20 +285,26 @@ HookSniff: █████████████████░░░  85%
 3. ✅ Pagination helper (11/11 SDK)
 4. ✅ Error class çeşitliliği (11/11 SDK — 21 type)
 
+### Faz 1.5 — Yüksek Öncelik (4-6 saat)
+10. ❌ Webhook Payload Parsing (11 SDK)
+11. ❌ Idempotency Key Kontrolü (11 SDK)
+
 ### Faz 2 — Orta (20-28 saat)
 5. ❌ Config seçenekleri
 6. ❌ CI/CD otomatik publish
 7. ❌ Debug logging
 8. ❌ Typed webhook events
 9. ❌ Test coverage artırma
+12. ❌ Response Metadata erişimi
 
 ### Faz 3 — Düşük (22-33 saat)
-10. ❌ JSDoc/docstring
-11. ❌ Streaming/SSE desteği
-12. ❌ Rate limit header parsing
-13. ❌ Custom HTTP client desteği
+13. ❌ JSDoc/docstring
+14. ❌ Streaming/SSE desteği
+15. ❌ Rate limit header parsing
+16. ❌ Custom HTTP client desteği
+17. ❌ SDK version header
 
-**Kalan toplam:** ~25-35 saat → %90+
+**Kalan toplam:** ~30-45 saat → %90+
 
 ---
 
@@ -311,10 +321,14 @@ HookSniff: █████████████████░░░  85%
 | 7 | Debug logging | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 8 | Typed events | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 9 | Test coverage | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
-| 10 | JSDoc | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| 11 | Streaming | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| 12 | Rate limit | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| 13 | Custom client | ❌ | ✅ | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
+| 10 | Payload parsing | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 11 | Idempotency ctrl | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 12 | Response metadata | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 13 | JSDoc | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 14 | Streaming | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 15 | Rate limit | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 16 | Custom client | ❌ | ✅ | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 | 🔶 |
+| 17 | SDK version hdr | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 **Legend:** ✅ Var | 🔶 Kısmen | ❌ Yok
 
@@ -330,6 +344,8 @@ HookSniff: █████████████████░░░  85%
 | İmza doğrulama | **✅ 11/11** | 11 dilde |
 | Retry/Backoff | **✅ 11/11** | Otomatik |
 | Pagination | **✅ 11/11** | Otomatik |
+| Payload parsing | ❌ | Type-safe |
+| Idempotency ctrl | ❌ | Manuel override |
 | Config | 🔶 Node.js'de var | Override edilebilir |
 | Debug logging | 🔶 Node.js'de var | Feature flag |
 | CI/CD | ❌ Manuel | Otomatik |
@@ -338,10 +354,10 @@ HookSniff: █████████████████░░░  85%
 
 ## ⚠️ Notlar
 
-- **2026-05-19 oturumu:** 2 saat içinde Faz 1 + Error Types tamamlandı
+- **2026-05-19 oturumu:** 2 saat içinde Faz 1 tamamlandı
 - Java SDK'da 429 retry bug'ı düzeltildi
 - Default retry schedule 50ms → 1s/2s/4s olarak güncellendi
 - Max retries 2 → 3 olarak güncellendi
 - 6 SDK'ya error hierarchy eklendi, 11 SDK'ya 21 type'a çıkarıldı
 - Her SDK kendi repo'sunda (`hooksniff-{dil}`)
-- **Sıradaki:** Config options veya CI/CD
+- **Sıradaki:** Payload Parsing + Idempotency Key
