@@ -149,16 +149,16 @@ export default function StreamingPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Streaming</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Streaming</h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             Real-time event streaming — SSE and WebSocket channels
           </p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+          className="px-3 sm:px-4 py-2 bg-indigo-600 text-white text-xs sm:text-sm rounded-lg hover:bg-indigo-700 transition"
         >
           + New Channel
         </button>

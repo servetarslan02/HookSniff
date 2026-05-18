@@ -88,10 +88,10 @@ export default function ServiceTokensPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <a href="https://docs.hooksniff.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
@@ -106,10 +106,10 @@ export default function ServiceTokensPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                <th className="px-6 py-3">{t('name')}</th>
-                <th className="px-6 py-3">{t('token')}</th>
-                <th className="px-6 py-3">{t('createdAt')}</th>
-                <th className="px-6 py-3 text-right">{tc('actions')}</th>
+                <th className="px-3 sm:px-6 py-3">{t('name')}</th>
+                <th className="px-3 sm:px-6 py-3">{t('token')}</th>
+                <th className="px-3 sm:px-6 py-3 hidden sm:table-cell">{t('createdAt')}</th>
+                <th className="px-3 sm:px-6 py-3 text-right">{tc('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
@@ -117,7 +117,7 @@ export default function ServiceTokensPage() {
                 <tr><td colSpan={4} className="px-6 py-12 text-center text-sm text-gray-500 dark:text-slate-400">{t('noTokens')}</td></tr>
               ) : tokens.map((tok) => (
                 <tr key={tok.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                  <td className="px-6 py-3">
+                  <td className="px-3 sm:px-6 py-3">
                     {editingId === tok.id ? (
                       <div className="flex items-center gap-2">
                         <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="px-2 py-1 text-sm rounded-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent" autoFocus onKeyDown={(e) => { if (e.key === 'Enter') handleEditSave(); if (e.key === 'Escape') setEditingId(null); }} />
@@ -128,16 +128,16 @@ export default function ServiceTokensPage() {
                       <span className="font-medium text-gray-900 dark:text-white">{tok.name}</span>
                     )}
                   </td>
-                  <td className="px-6 py-3">
-                    <div className="flex items-center gap-2">
-                      <code className="text-xs font-mono text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-sm select-all">{revealedTokens[tok.id] || tok.token_prefix || '••••••••••••••••'}</code>
+                  <td className="px-3 sm:px-6 py-3">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <code className="text-xs font-mono text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-gray-700 px-1.5 sm:px-2 py-1 rounded-sm select-all truncate max-w-[120px] sm:max-w-none">{revealedTokens[tok.id] || tok.token_prefix || '••••••••••••••••'}</code>
                       <button onClick={() => handleReveal(tok.id)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={revealedTokens[tok.id] ? t('hide') : t('reveal')}>👁</button>
-                      <button onClick={() => handleCopy(revealedTokens[tok.id] || tok.token_prefix || '')} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={tc('copyToClipboard')}>📋</button>
+                      <button onClick={() => handleCopy(revealedTokens[tok.id] || tok.token_prefix || '')} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition hidden sm:inline-flex" title={tc('copyToClipboard')}>📋</button>
                     </div>
                   </td>
-                  <td className="px-6 py-3 text-gray-500 dark:text-slate-400 text-xs">{formatDate(tok.created_at)}</td>
-                  <td className="px-6 py-3">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="px-3 sm:px-6 py-3 text-gray-500 dark:text-slate-400 text-xs hidden sm:table-cell">{formatDate(tok.created_at)}</td>
+                  <td className="px-3 sm:px-6 py-3">
+                    <div className="flex items-center justify-end gap-1.5 sm:gap-2">
                       <button onClick={() => { setEditingId(tok.id); setEditName(tok.name); }} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition">{tc('edit')}</button>
                       <button onClick={() => setDeleteId(tok.id)} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition">{tc('delete')}</button>
                     </div>

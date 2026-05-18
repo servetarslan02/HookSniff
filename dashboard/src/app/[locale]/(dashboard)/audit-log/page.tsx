@@ -37,19 +37,19 @@ export default function AuditLogPage() {
   const loadMore = () => setPage((p) => p + 1);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-          <p className="text-gray-500 dark:text-slate-400 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
             {t('subtitle')}
           </p>
         </div>
         <select
           value={filter}
           onChange={(e) => { setFilter(e.target.value); setPage(1); }}
-          className="px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-sm text-gray-900 dark:text-white"
+          className="px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-xs sm:text-sm text-gray-900 dark:text-white"
         >
           <option value="">{t('filterAll')}</option>
           <option value="auth">{t('filterAuth')}</option>
@@ -82,38 +82,38 @@ export default function AuditLogPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colTime')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colAction')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colActor')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colResource')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colDetails')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colIp')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colTime')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colAction')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">{t('colActor')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">{t('colResource')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">{t('colDetails')}</th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">{t('colIp')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
                 {entries.map((entry) => (
                   <tr key={entry.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
-                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">
                       {new Date(entry.timestamp).toLocaleString()}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
                         <span>{ACTION_ICONS[entry.action] || '📌'}</span>
-                        <span className="text-sm font-mono text-gray-900 dark:text-white">{entry.action}</span>
+                        <span className="text-xs sm:text-sm font-mono text-gray-900 dark:text-white">{entry.action}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">{entry.actor_email || entry.actor}</td>
-                    <td className="px-6 py-4 text-sm font-mono text-gray-500 dark:text-slate-400">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden sm:table-cell">{entry.actor_email || entry.actor}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-400 hidden md:table-cell">
                       {entry.resource_type}/{entry.resource_id?.slice(0, 8)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 max-w-xs truncate">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 max-w-xs truncate hidden lg:table-cell">
                       {entry.details
                         ? typeof entry.details === 'string'
                           ? entry.details
                           : JSON.stringify(entry.details)
                         : '—'}
                     </td>
-                    <td className="px-6 py-4 text-sm font-mono text-gray-500 dark:text-slate-500">{entry.ip_address}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-500 hidden lg:table-cell">{entry.ip_address}</td>
                   </tr>
                 ))}
               </tbody>

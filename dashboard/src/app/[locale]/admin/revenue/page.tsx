@@ -198,8 +198,8 @@ export default function AdminRevenuePage() {
       {/* Header with date range + refresh */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("revenueTitle")}</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('revenueDesc')}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("revenueTitle")}</h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('revenueDesc')}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <label htmlFor="date-range" className="sr-only">{t('dateRange')}</label>

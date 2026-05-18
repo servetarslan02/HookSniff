@@ -74,8 +74,8 @@ export default function EndpointSettingsPage() {
           </svg>
         </button>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-          <p className="text-sm font-mono text-gray-500 dark:text-slate-400 mt-1">{endpoint.url}</p>
+          <h2 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+          <p className="text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-400 mt-1 truncate max-w-[250px] sm:max-w-none">{endpoint.url}</p>
         </div>
       </div>
 
