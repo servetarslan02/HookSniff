@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { messagePollerApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
@@ -14,7 +14,6 @@ function formatDate(s: string | null) {
 export default function MessagePollerPage() {
   const { token } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [consumerId, setConsumerId] = useState('default');
   const [limit, setLimit] = useState(50);
   const [eventType, setEventType] = useState('');

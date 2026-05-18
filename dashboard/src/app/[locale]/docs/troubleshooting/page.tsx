@@ -1,5 +1,3 @@
-import { useTranslations } from 'next-intl';
-import CodeBlock from '@/components/CodeBlock';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
