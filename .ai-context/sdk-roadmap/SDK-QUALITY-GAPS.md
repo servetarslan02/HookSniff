@@ -1,6 +1,6 @@
 # SDK Kalite Boşlukları — Svix Karşılaştırması
 
-> Güncelleme: 2026-05-19 02:56 GMT+8 — **#7 Response Metadata tamamlandı**
+> Güncelleme: 2026-05-19 03:05 GMT+8 — **#8 Config Seçenekleri tamamlandı**
 > Durum: Aktif geliştirme
 
 ---
@@ -9,14 +9,12 @@
 
 ```
 Svix:      ████████████████████ 100%
-HookSniff: ██████████████████░░  90%
+HookSniff: ██████████████████░░  91%
 ```
-
-**Hedef: %90+ → ULAŞILDI! 🎉**
 
 ---
 
-## ✅ TAMAMLANANLAR (1-7)
+## ✅ TAMAMLANANLAR (1-8)
 
 ### 1-4. Faz 1 (Kritik) ✅
 1. ✅ Webhook İmza Doğrulama (11/11)
@@ -25,70 +23,38 @@ HookSniff: ██████████████████░░  90%
 4. ✅ Error Class Çeşitliliği — 21 type (11/11)
 
 ### 5. Webhook Payload Parsing ✅ (11/11)
-- `verify()` → `WebhookEvent` (event, data, timestamp)
-
-### 6. Idempotency Key ✅ (11/11) — Zaten mevcutmuş
-- Tüm SDK'larda `idempotencyKey` parametresi + auto-generate
-
+### 6. Idempotency Key ✅ (11/11)
 ### 7. Response Metadata Erişimi ✅ (11/11)
-- `ResponseMetadata` class/struct her SDK'da
-- `statusCode`, `requestId`, `rateLimitRemaining`, `headers`
-- Otomatik capture: her API çağrısından sonra güncellenir
 
-| SDK | Erişim |
-|-----|--------|
-| Node.js | `client.lastResponse` |
-| Python | `client.endpoint.last_response` |
-| Go | `client.LastResponse` |
-| Rust | `ResponseMetadata::from_parts()` |
-| Ruby | `HookSniff.last_response` |
-| Java | `client.getLastResponse()` |
-| Kotlin | `ResponseMetadata(...)` |
-| PHP | `$lastResponse` |
-| C# | `client.LastResponse` |
-| Swift | `client.lastResponse` |
-| Elixir | `client.last_response` |
+### 8. Config Seçenekleri ✅ (11/11)
+Tüm SDK'larda artık tam config desteği:
+
+| SDK | serverUrl | timeout | debug | customHeaders |
+|-----|-----------|---------|-------|---------------|
+| Node.js | ✅ | ✅ | ✅ | ✅ |
+| Python | ✅ | ✅ | ✅ | ✅ |
+| Go | ✅ | ✅ | ✅ | ✅ |
+| Rust | ✅ | ✅ | ✅ | ✅ |
+| Ruby | ✅ | ✅ | ✅ | ✅ |
+| Java | ✅ | ✅ | ✅ | ✅ |
+| Kotlin | ✅ | ✅ | ✅ | ✅ |
+| PHP | ✅ | ✅ | ✅ | ✅ |
+| C# | ✅ | ✅ | ✅ | ✅ |
+| Swift | ✅ | ✅ | ✅ | ✅ |
+| Elixir | ✅ | ✅ | ✅ | ✅ |
 
 ---
 
 ## ❌ KALAN EKSİKLER
 
-### 8. Config Seçenekleri ❌ — Sıradaki
-- `baseUrl`, `timeout`, `debug`, custom headers
-- Sadece Node.js'de tam, diğerlerinde kısmen
-- Tahmini: 3-4 saat | 🟡 Orta
-
-### 9. Debug Logging ❌
-- Sadece Node.js'de var
+### 9. Debug Logging ❌ — Sıradaki
+- Config'deki `debug` flag'ini HTTP request/response loglamasına bağla
 - Tahmini: 4-6 saat | 🟡 Orta
 
 ### 10. Typed Webhook Events ❌
-- Compile-time type güvenliği
-- Tahmini: 4-6 saat | 🟡 Orta
-
 ### 11. SDK Version Header ❌
-- `X-HookSniff-SDK: hooksniff-{dil}/{versiyon}`
-- Tahmini: 1 saat | 🟢 Düşük
-
 ### 12-17. Düşük öncelik
-- Test Coverage, CI/CD, JSDoc, Streaming, Rate Limit, Custom Client
 
 ---
 
-## 📋 Uygulama Sırası
-
-```
-Config (#8)             ← self-hosted ve timeout
-        ↓
-Debug Logging (#9)      ← config'e bağlı
-        ↓
-Typed Events (#10)      ← compile-time güvenlik
-        ↓
-SDK Version Header (#11) ← basit, 1 saat
-        ↓
-Test Coverage (#12)     ← stabilize olunca
-        ↓
-CI/CD (#13)             ← test → publish pipeline
-```
-
-**Kalan toplam:** ~20-30 saat → %95+
+**Kalan toplam:** ~15-25 saat → %95+
