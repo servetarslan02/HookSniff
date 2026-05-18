@@ -1,6 +1,46 @@
 # SDK — Tamamlanan İşler
 
-> Son güncelleme: 2026-05-18 01:32 GMT+8
+> Son güncelleme: 2026-05-18 18:29 GMT+8
+
+---
+
+## ✅ Ruby SDK v1.2.0 — Full Resource Update — 2026-05-18
+
+### Yapılan:
+- 24 yeni API dosyası eklendi
+- Faz 8-15: Environment, BackgroundTask, OperationalWebhook, MessagePoller, Inbound, Connector
+- Ek Resource'lar: Application, ApiKey, Search, Alert, Analytics, Billing, Portal, Team, Notification, SSO, AuditLog, CustomDomain, RateLimit, Routing, Template, Schema, Playground, ServiceToken
+- hooksniff.rb güncellendi (tüm resource require + client accessor)
+- README güncellendi (30+ resource tablosu)
+- Ruby 3.2.4 kaynak koddan derlendi (libyaml + psych + openssl)
+- curl ile RubyGems API'ye push edildi
+- GitHub'a push edildi: `25d67cf`
+
+### Sonuç:
+- Versiyon: 1.0.0 → 1.2.0
+- 30+ API resource
+- %100 API kapsama
+- RubyGems: https://rubygems.org/gems/hooksniff
+
+---
+
+## ✅ C# SDK v1.2.0 — Full Resource Update — 2026-05-18
+
+### Yapılan:
+- 25+ yeni resource eklendi
+- Faz 8-15: Environment, BackgroundTask, OperationalWebhook, MessagePoller, Inbound, Connector, Integration, Stream
+- Ek Resource'lar: Application, ApiKey, Search, Alert, Analytics, Billing, Portal, Team, Notification, SSO, AuditLog, CustomDomain, RateLimit, Routing, Template, Schema, Playground, ServiceToken
+- 21 yeni model dosyası oluşturuldu
+- HookSniffClient.cs güncellendi (30+ resource property)
+- dotnet SDK 8.0 kuruldu
+- NuGet'e publish edildi
+- GitHub'a push edildi: `89fc6f2`
+
+### Sonuç:
+- Versiyon: 1.0.0 → 1.2.0
+- 30+ API resource, 53+ model
+- %100 API kapsama
+- NuGet: https://www.nuget.org/packages/HookSniff/1.2.0
 
 ---
 
