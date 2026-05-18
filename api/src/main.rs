@@ -547,7 +547,8 @@ async fn main() -> Result<()> {
         .layer(axum::middleware::from_fn(middleware::request_id_middleware))
         .layer(axum::middleware::from_fn(middleware::request_metrics_middleware))
         .layer(axum::middleware::from_fn(middleware::request_timeout_middleware))
-        .layer(axum::middleware::from_fn(middleware::security_headers_middleware));
+        .layer(axum::middleware::from_fn(middleware::security_headers_middleware))
+        .layer(axum::middleware::from_fn(rate_limit::rate_limit_middleware));
 
     let addr = format!("0.0.0.0:{}", cfg.port);
     tracing::info!("🚀 HookSniff API running on port {}", cfg.port);
