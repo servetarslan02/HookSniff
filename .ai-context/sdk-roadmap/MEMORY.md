@@ -68,21 +68,24 @@ Endpoint: https://2a7ee86912c49fd36cff048204c37f70.r2.cloudflarestorage.com
 ghaot-scyXJUiMzsXcNvV1
 ```
 
-## 📊 SDK Publish Durumu
+## 📊 SDK Publish Durumu (2026-05-18 16:54 Gerçek Durum)
 
-| # | SDK | Registry | Versiyon | Durum |
-|---|-----|----------|----------|-------|
-| 1 | **Node.js** | npm | 1.1.0 | ✅ Yüklendi |
-| 2 | **Python** | PyPI | 1.1.0 | ✅ Yüklendi |
-| 3 | **Go** | GitHub tag | v1.1.0 | ✅ |
-| 4 | **Rust** | crates.io | 1.1.0 | ✅ Yüklendi |
-| 5 | **Java** | Maven Central | 1.1.2 | ✅ Yüklendi (2026-05-18) |
-| 6 | **Kotlin** | Maven Central | 1.1.0 | ❌ Build hatalı, rewrite gerekiyor |
-| 7 | **Ruby** | RubyGems | — | ⏳ gem push gerekli |
-| 8 | **PHP** | Packagist | — | ✅ Otomatik (GitHub push) |
-| 9 | **C#** | NuGet | — | ⏳ dotnet nuget push gerekli |
-| 10 | **Elixir** | Hex.pm | — | ⏳ mix hex.publish gerekli |
-| 11 | **Swift** | GitHub tag | v1.1.0 | ✅ |
+| # | SDK | Registry | Versiyon | Faz 8-15 | Durum |
+|---|-----|----------|----------|----------|-------|
+| 1 | **Node.js** | npm | 1.1.0 | 8/8 ✅ | ✅ Yüklendi |
+| 2 | **Python** | PyPI | 1.1.0 | 8/8 ✅ | ✅ Yüklendi |
+| 3 | **Go** | GitHub tag | v1.1.0 | 5/8 ❌ | ⏳ background_task, op_webhook, poller, inbound eksik |
+| 4 | **Rust** | crates.io | 1.1.0 | 8/8 ✅ | ✅ Yüklendi |
+| 5 | **Java** | Maven Central | 1.1.2 | 8/8 ✅ | ✅ Yüklendi (2026-05-18) |
+| 6 | **Kotlin** | Maven Central | 1.1.0 | var/bozuk | ❌ Build hatalı, rewrite gerekiyor |
+| 7 | **Ruby** | RubyGems | 1.0.0 | 2/8 ❌ | ⏳ env, bg_task, op_webhook, poller, inbound, connector eksik |
+| 8 | **PHP** | Packagist | 1.1.0 | 2/8 ❌ | ⏳ Aynı eksikler |
+| 9 | **C#** | NuGet | 1.0.0 | 2/8 ❌ | ⏳ Aynı eksikler |
+| 10 | **Elixir** | Hex.pm | 1.1.1 | 0/8 ❌ | ⏳ Hiçbir faz resource'ı yok |
+| 11 | **Swift** | GitHub tag | v1.1.0 | 3/8 ❌ | ⏳ env, bg_task, op_webhook, poller, connector eksik |
+
+⚠️ **ÖNEMLİ:** MEMORY.md'nin eski halinde "tüm fazlar tamamlandı, 11 SDK v1.1.0" yazıyordu ama bu doğru değil.
+Sadece Node.js, Python ve Rust'ta tüm Faz 8-15 kaynakları mevcut.
 
 ## 📊 Faz İlerlemesi — TÜMÜ TAMAMLANDI
 

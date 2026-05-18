@@ -1,40 +1,38 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-18 16:45 GMT+8
+> Son güncelleme: 2026-05-18 16:54 GMT+8
 
-## ✅ Yapılan
+## ✅ Yapılan (Bu Oturum)
 - Java SDK v1.1.2 → Maven Central publish edildi
 - sdks/ klasörü ana repodan silindi
 - Credential'lar MEMORY.md'ye kaydedildi
+- Tüm SDK'ların gerçek durumu kontrol edildi
 
-## ⏳ Kalan İşler
+## ❌ Acil Düzeltmeler (Faz 8-15 Eksik Resource'lar)
 
-### 1. Kotlin SDK — EN KRİTİK
-hooksniff-kotlin repo'sunda build hataları var:
-- Package çakışması: bazı dosyalar `com.hooksniff`, bazıları `com.hooksniff.kotlin`
-- Eksik tipler: BackgroundTaskStatus, BackgroundTaskType, ApplicationIn
-- `client.request()` methodu tanımlı değil
-- **Çözüm:** Tüm dosyaları `com.hooksniff.kotlin` package'ına taşı, eksik tipleri ekle
+### Priority 1 — Kotlin Build Fix
+- Package çakışması: `com.hooksniff` vs `com.hooksniff.kotlin`
+- Tüm dosyaları `com.hooksniff.kotlin`'a taşı
+- Eksik tipleri ekle (BackgroundTaskStatus, BackgroundTaskType)
+- `client.request()` methodu ekle
+- Maven Central'a publish et
 
-### 2. Ruby SDK Publish
-```bash
-cd hooksniff-ruby
-gem build hooksniff.gemspec
-gem push hooksniff-*.gem
-```
+### Priority 2 — 6 SDK'ya Faz 8-15 Resource'ları Ekle
+Aşağıdaki SDK'larda environment, background_task, operational_webhook, message_poller, inbound, connector eksik:
 
-### 3. C# SDK Publish
-```bash
-cd hooksniff-csharp
-dotnet pack -c Release
-dotnet nuget push "bin/Release/*.nupkg" --api-key <NUGET_KEY> --source https://api.nuget.org/v3/index.json
-```
+| SDK | Eksik Resource'lar |
+|-----|-------------------|
+| **Go** | background_task, operational_webhook, message_poller, inbound |
+| **Ruby** | environment, background_task, op_webhook, poller, inbound, connector |
+| **PHP** | environment, background_task, op_webhook, poller, inbound, connector |
+| **C#** | environment, background_task, op_webhook, poller, inbound, connector |
+| **Swift** | environment, background_task, op_webhook, poller, connector |
+| **Elixir** | hepsi eksik (environment, bg_task, op_webhook, poller, inbound, connector, integration, stream) |
 
-### 4. Elixir SDK Publish
-```bash
-cd hooksniff-elixir
-mix hex.publish --yes
-```
+### Priority 3 — Registry Publish (Kalan SDK'lar)
+- Ruby → gem push
+- C# → dotnet nuget push
+- Elixir → mix hex.publish
 
-## 🔧credential Lokasyonu
+## 🔑 Credential Lokasyonu
 Tüm credential'lar `.ai-context/sdk-roadmap/MEMORY.md` içinde.
