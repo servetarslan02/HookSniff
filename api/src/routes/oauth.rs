@@ -361,7 +361,7 @@ fn verify_oauth_state(req: &axum::extract::Request, expected_state: &str) -> Res
         .and_then(|c| c.split('=').nth(1));
 
     match state_from_cookie {
-        Some(cookie_state) if cookie_state == expected_state => Ok(()),
+        Some(cookie_state) if constant_time_eq(cookie_state, expected_state) => Ok(()),
         _ => {
             tracing::warn!(
                 "OAuth state mismatch: expected={}, cookie={:?}",
@@ -642,6 +642,18 @@ async fn find_or_create_oauth_customer(
     tracing::info!("✅ New OAuth customer created ({}): {}", provider, email);
 
     Ok(customer)
+}
+
+/// Constant-time string comparison to prevent timing attacks.
+fn constant_time_eq(a: &str, b: &str) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    let mut diff = 0u8;
+    for (x, y) in a.bytes().zip(b.bytes()) {
+        diff |= x ^ y;
+    }
+    diff == 0
 }
 
 #[cfg(test)]
