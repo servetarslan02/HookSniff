@@ -1,50 +1,72 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-18 18:29 GMT+8
+> Son güncelleme: 2026-05-19 01:12 GMT+8
 
 ## ✅ Yapılan (Bu Oturum)
 
-### Ruby SDK v1.2.0
-- 24 yeni API dosyası eklendi (Faz 8-15 + 18 ek resource)
-- RubyGems'e publish edildi: https://rubygems.org/gems/hooksniff
-- GitHub'a push edildi
+### Pagination Helper — TÜM 11 SDK
+- Python: `pagination.py` + 17 test ✅
+- Node.js: `pagination.ts` + `listAll()` + build ✅
+- Go: `pagination.go` + `Paginator[T]` + `ListAll()`
+- PHP: `Paginator.php` + generator
+- Java: `Paginator.java` + Iterable
+- Kotlin: `Paginator.kt` + Iterable
+- Ruby: `paginator.rb` + Enumerable
+- C#: `Paginator.cs` + IAsyncEnumerable
+- Elixir: `paginator.ex` + Stream
+- Rust: `pagination.rs` + async
+- Swift: `Paginator.swift` + AsyncSequence
 
-### C# SDK v1.2.0
-- 25+ yeni resource eklendi (Faz 8-15 + 18 ek resource)
-- 21 yeni model dosyası oluşturuldu
-- NuGet'e publish edildi: https://www.nuget.org/packages/HookSniff/1.2.0
-- GitHub'a push edildi
+### SDK-QUALITY-GAPS.md Güncellendi
+- İmza doğrulama #1 kritik eklendi
+- Retry/backoff #2 kritik eklendi
+- Öncelikler yeniden düzenlendi
 
-### sdk-roadmap Dosyaları Güncellendi
-- STATUS.md → Ruby + C# ✅, tüm resource karşılaştırması eklendi
-- MEMORY.md → Publish durumu güncellendi
-- NEXT_SESSION.md → Bu dosya
-- TODO.md → Güncellendi
+## ❌ Sıradaki — Faz 1 Kritik (24-34 saat)
 
-## ❌ Kalan İşler
+### 1. Webhook İmza Doğrulama (EN KRİTİK)
+Her SDK'ya `verify(payload, headers, secret)` methodu ekle.
+- HMAC-SHA256 imza doğrulama
+- Timestamp kontrolü (replay attack önleme)
+- 11 dilde implementasyon
 
-### Priority 1 — Kotlin Build Fix
-- Package çakışması: `com.hooksniff` vs `com.hooksniff.kotlin`
-- Eksik tipleri ekle (BackgroundTaskStatus, BackgroundTaskType)
-- `client.request()` methodu ekle
-- Maven Central'a publish et
+### 2. Retry + Exponential Backoff
+- 429 → Retry-After header'ını oku
+- 500/502/503 → Exponential backoff (1s, 2s, 4s, 8s)
+- Max 3 deneme (varsayılan)
+- `maxRetries` config seçeneği
 
-### Priority 2 — Elixir Publish
-- Hex.pm'e publish edilmemiş
-- Key: `20e1faa34deb3e75d01dec3002e30bfc`
-- `mix hex.publish` çalıştır
+### 3. Error Class Çeşitliliği
+Mevcut: 3 error type → Hedef: 10+
+- BadRequestError (400)
+- UnauthorizedError (401)
+- ForbiddenError (403)
+- NotFoundError (404)
+- ConflictError (409)
+- RateLimitError (429)
+- InternalServerError (500)
+- TimeoutError
+- NetworkError
+- ValidationError
 
-### Priority 3 — Eksik Faz 8-15 Resource'ları (Düşük Öncelik)
-| SDK | Eksik Resource'lar |
-|-----|-------------------|
-| **Go** | background_task, operational_webhook, message_poller, inbound |
-| **PHP** | environment, background_task, op_webhook, poller, inbound, connector |
-| **Swift** | environment, background_task, op_webhook, poller, connector |
+## 📋 Önerilen Sıralama
 
-## 🔑 Credential Lokasyonu
-Tüm credential'lar `.ai-context/sdk-roadmap/MEMORY.md` içinde.
+```
+Oturum 2: İmza doğrulama → Python + Node.js + Go (Web/Backend)
+Oturum 3: İmza doğrulama → Java + Kotlin + C# (Enterprise)
+Oturum 4: İmza doğrulama → Rust + Swift + Ruby + PHP + Elixir (kalan)
+Oturum 5: Retry/backoff → Tüm SDK'lar
+Oturum 6: Error types → Tüm SDK'lar
+```
+
+## 🔑 Hesap Bilgileri
+- Admin: servetarslan02@gmail.com / Alayci_165
+- Dashboard: https://hooksniff.vercel.app
+- API: https://hooksniff-api-1046140057667.europe-west1.run.app
+- Demo: demo@hooksniff.com / Demo1234!
 
 ## 📊 Genel Durum
-- **9/11 SDK** registry'ye publish edildi
-- **2 SDK** kaldı (Kotlin build fix, Elixir publish)
-- **Ruby + C#** artık %100 API kapsıyor (30+ resource)
+- **11/11 SDK** registry'de yüklü ✅
+- **11/11 SDK** pagination helper var ✅
+- **Sıradaki:** İmza doğrulama → Retry → Error types
+- **Hedef:** SDK kalite %62 → %90+

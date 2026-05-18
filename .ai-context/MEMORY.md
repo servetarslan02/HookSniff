@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 00:36 GMT+8 (Tüm SDK registry publish tamamlandı)
+> Son güncelleme: 2026-05-19 01:11 GMT+8 (Pagination Helper tüm SDK'lara eklendi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
