@@ -1,6 +1,6 @@
 # SDK Kalite Boşlukları — Svix Karşılaştırması
 
-> Güncelleme: 2026-05-19 03:16 GMT+8
+> Güncelleme: 2026-05-19 04:05 GMT+8
 > Durum: Aktif geliştirme
 
 ---
@@ -14,7 +14,7 @@ HookSniff: ████████████████████░  96%
 
 ---
 
-## ✅ TAMAMLANANLAR (1-9)
+## ✅ TAMAMLANANLAR (1-11)
 
 ### 1. Webhook İmza Doğrulama ✅ (11/11)
 - HMAC-SHA256, `whsec_` prefix, 5 dk tolerance
@@ -99,10 +99,6 @@ Her SDK'da `debug=true` ile:
 | Swift | ✅ | ✅ |
 | Elixir | ✅ | ✅ |
 
----
-
-## ❌ KALAN EKSİKLER
-
 ### 10. Typed Webhook Events ✅ (11/11 — 2026-05-19)
 - Compile-time type güvenliği
 - 8 typed data class + typed event subclass per SDK
@@ -122,9 +118,9 @@ Her SDK'da `debug=true` ile:
 - Tüm SDK'larda User-Agent ile birlikte otomatik gönderilir
 - Her API çağrısında tracking için kullanılır
 
-### 12. Test Coverage Artırma ❌
-- `X-HookSniff-SDK: hooksniff-{dil}/{versiyon}`
-- Tahmini: 1 saat | 🟢 Düşük
+---
+
+## ❌ KALAN EKSİKLER
 
 ### 12. Test Coverage Artırma ❌
 - ~%70 → %95+
@@ -145,13 +141,11 @@ Her SDK'da `debug=true` ile:
 ## 📋 Uygulama Sırası
 
 ```
-Typed Events (#10)      ← compile-time güvenlik (sıradaki)
+✅ #1-11 tamamlandı
         ↓
-SDK Version Header (#11) ← basit, 1 saat
-        ↓
-Test Coverage (#12)     ← stabilize olunca
+Test Coverage (#12)     ← sıradaki
         ↓
 CI/CD (#13)             ← test → publish pipeline
 ```
 
-**Kalan toplam:** ~12-20 saat → %95+
+**Kalan toplam:** ~16-24 saat → %100
