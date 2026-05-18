@@ -22,13 +22,13 @@ rubygems_ab4a30751cbdea680577f44baadfeaaca376f6d0c1c97ccc
 **Java SDK:**
 ```
 Username: f0wXBf
-Password: EYLV763IsQVseaffdOXNScf2HZlcLDGEK
+Password: [REDACTED]
 ```
 
 **Kotlin SDK:**
 ```
 Username: 7cxUFC
-Password: kjwdGgyf22tr4tbRjDYN7X9VYrmRoqOJy
+Password: [REDACTED]
 ```
 
 ### npm

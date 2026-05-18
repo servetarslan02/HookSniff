@@ -64,7 +64,7 @@ HookSniff/
 | Servis | Bilgi |
 |--------|-------|
 | **Admin giriş** | email: servetarslan02@gmail.com |
-| **Demo giriş** | email: demo@hooksniff.com / şifre: Demo1234! |
+| **Demo giriş** | email: demo@hooksniff.com (şifre: .sdk-tokens.env) |
 | **Google Cloud** | proje: hooksniff-app |
 | **Neon DB** | proje: hookrelay (org: Servet, Free tier) |
 | **Dashboard URL** | https://hooksniff.vercel.app |
