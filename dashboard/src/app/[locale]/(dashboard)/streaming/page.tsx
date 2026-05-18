@@ -12,6 +12,12 @@ function formatDate(s: string | null) {
   return new Date(s).toLocaleString();
 }
 
+const CHANNEL_TYPES = [
+  { value: 'sse', icon: '📡', label: 'SSE (Server-Sent Events)' },
+  { value: 'websocket', icon: '🔌', label: 'WebSocket' },
+  { value: 'webhook', icon: '🪝', label: 'Webhook' },
+];
+
 export default function StreamingPage() {
   const t = useTranslations('streaming');
   const { token } = useAuth();
