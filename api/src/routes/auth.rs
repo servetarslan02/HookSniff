@@ -278,7 +278,7 @@ async fn login(
             customer.id, &customer.email, &customer.plan, &cfg.jwt_secret, Duration::minutes(5), customer.is_admin,
         )?;
         let mut headers = HeaderMap::new();
-        headers.insert("set-cookie", HeaderValue::from_static("hooksniff_token=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0"));
+        headers.insert("set-cookie", HeaderValue::from_static("hooksniff_token=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0"));
         return Ok((headers, Json(serde_json::json!(TwoFactorRequiredResponse {
             requires_2fa: true, temp_token,
             message: "Two-factor authentication required. Please provide your TOTP code.".into(),

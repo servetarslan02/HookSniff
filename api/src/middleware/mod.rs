@@ -493,10 +493,10 @@ pub fn generate_test_api_key() -> String {
 }
 
 /// Create a Set-Cookie header value for the auth token.
-/// HttpOnly, Secure, SameSite=None for cross-origin support.
+/// HttpOnly, Secure, SameSite=Lax for CSRF protection.
 pub fn create_auth_cookie(token: &str, max_age_secs: i64) -> String {
     format!(
-        "{}={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
+        "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
         AUTH_COOKIE_NAME, token, max_age_secs
     )
 }
@@ -504,24 +504,24 @@ pub fn create_auth_cookie(token: &str, max_age_secs: i64) -> String {
 /// Create a Set-Cookie header value to clear the auth cookie.
 pub fn clear_auth_cookie() -> String {
     format!(
-        "{}=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0",
+        "{}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
         AUTH_COOKIE_NAME
     )
 }
 
 /// Create a Set-Cookie header value for the refresh token.
-/// HttpOnly, Secure, SameSite=None, 30-day expiry.
+/// HttpOnly, Secure, SameSite=Lax, 30-day expiry.
 pub fn create_refresh_token_cookie(token: &str, max_age_secs: i64) -> String {
     format!(
-        "{}={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
+        "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
         REFRESH_COOKIE_NAME, token, max_age_secs
     )
 }
 
-/// Create a Set-Cookie header value to clear the refresh token cookie.
+/// Create a Set-Cookie header value to clear the refresh token.
 pub fn clear_refresh_token_cookie() -> String {
     format!(
-        "{}=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0",
+        "{}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
         REFRESH_COOKIE_NAME
     )
 }
