@@ -118,7 +118,7 @@ async fn google_login(
 
     // Save state in a short-lived cookie for CSRF verification
     let state_cookie = format!(
-        "{}={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
+        "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
         OAUTH_STATE_COOKIE, state, OAUTH_STATE_MAX_AGE
     );
     let mut headers = HeaderMap::new();
@@ -242,7 +242,7 @@ async fn github_login() -> Result<impl axum::response::IntoResponse, AppError> {
 
     // Save state in a short-lived cookie for CSRF verification
     let state_cookie = format!(
-        "{}={}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age={}",
+        "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
         OAUTH_STATE_COOKIE, state, OAUTH_STATE_MAX_AGE
     );
     let mut headers = HeaderMap::new();
@@ -378,7 +378,7 @@ fn verify_oauth_state(req: &axum::extract::Request, expected_state: &str) -> Res
 /// Clear the OAuth state cookie after successful verification.
 fn clear_oauth_state_cookie() -> String {
     format!(
-        "{}=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0",
+        "{}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
         OAUTH_STATE_COOKIE
     )
 }

@@ -39,14 +39,21 @@ pub async fn ws_handler(
 
 /// Origin header validation — only allow trusted domains.
 fn validate_origin(headers: &HeaderMap) -> Result<(), StatusCode> {
-    let allowed_origins = [
+    let mut allowed_origins = vec![
         "https://hooksniff.vercel.app",
         "https://www.hooksniff.vercel.app",
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
     ];
+
+    // Localhost sadece debug modunda izinli
+    #[cfg(debug_assertions)]
+    {
+        allowed_origins.extend([
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:3001",
+        ]);
+    }
 
     match headers.get("origin") {
         Some(origin) => {
