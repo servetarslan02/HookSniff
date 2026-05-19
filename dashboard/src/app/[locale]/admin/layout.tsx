@@ -84,10 +84,11 @@ function AdminShell({ children }: { children: React.ReactNode }) {
 
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-black/50 md:hidden"
-          onClick={(e) => { e.stopPropagation(); setSidebarOpen(false); }}
-          aria-hidden="true"
+        <button
+          type="button"
+          className="fixed inset-0 z-30 bg-black/50 md:hidden cursor-default"
+          onPointerDown={() => setSidebarOpen(false)}
+          aria-label="Close sidebar"
         />
       )}
 

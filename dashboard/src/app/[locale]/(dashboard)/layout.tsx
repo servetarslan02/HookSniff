@@ -115,10 +115,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile overlay — must be rendered BEFORE sidebar for click events */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-          onClick={(e) => { e.stopPropagation(); setSidebarOpen(false); }}
-          aria-hidden="true"
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden cursor-default"
+          onPointerDown={() => setSidebarOpen(false)}
+          aria-label="Close sidebar"
         />
       )}
 
