@@ -41,8 +41,8 @@ const mockHealth = {
 
 export default function AdminSystemPage() {
   const t = useTranslations('admin');
-  const locale = useLocale();
   const tc = useTranslations('common');
+  const locale = useLocale();
   const { toast } = useToast();
 
   // React Query hooks
