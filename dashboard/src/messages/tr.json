@@ -677,7 +677,8 @@
     "twoFactorAuth": "İki Faktörlü Doğrulama",
     "twoFactorDesc": "TOTP tabanlı 2FA ile hesabınıza ekstra güvenlik katmanı ekleyin.",
     "2faDisabled": "2FA şu anda devre dışı",
-    "enable2fa": "2FA Etkinleştir"
+    "enable2fa": "2FA Etkinleştir",
+    "preferences": "Tercihler"
   },
   "billing": {
     "title": "Faturalandırma",

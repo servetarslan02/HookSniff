@@ -15,21 +15,52 @@ export default function SettingsPage() {
   const t = useTranslations('settings');
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8 max-w-2xl">
+    <div className="max-w-3xl space-y-10">
+      {/* ── Header ── */}
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
-          {t('subtitle')}
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
-      <ProfileSection user={user} token={token} />
-      <PasswordSection token={token} />
-      <TwoFactorSection />
-      <ApiKeySection apiKey={apiKey} />
-      <NotificationSection />
-      <PrivacyConsentSection />
-      <DangerZoneSection />
+      {/* ── 1. Profile ── */}
+      <section>
+        <SectionLabel label={t('profile')} icon="👤" />
+        <ProfileSection user={user} token={token} />
+      </section>
+
+      {/* ── 2. Security ── */}
+      <section>
+        <SectionLabel label={t('security') || 'Security'} icon="🔒" />
+        <div className="space-y-4">
+          <PasswordSection token={token} />
+          <TwoFactorSection />
+          <ApiKeySection apiKey={apiKey} />
+        </div>
+      </section>
+
+      {/* ── 3. Preferences ── */}
+      <section>
+        <SectionLabel label={t('preferences') || 'Preferences'} icon="⚙️" />
+        <div className="space-y-4">
+          <NotificationSection />
+          <PrivacyConsentSection />
+        </div>
+      </section>
+
+      {/* ── 4. Danger Zone ── */}
+      <section>
+        <DangerZoneSection />
+      </section>
+    </div>
+  );
+}
+
+function SectionLabel({ label, icon }: { label: string; icon: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <span className="text-base">{icon}</span>
+      <h2 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{label}</h2>
+      <div className="flex-1 h-px bg-gray-200 dark:bg-slate-700 ml-2" />
     </div>
   );
 }
