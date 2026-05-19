@@ -26,19 +26,16 @@ export default function TeamPage() {
   const t = useTranslations('team');
   const searchParams = useSearchParams();
 
-  // React Query hooks for data fetching
   const { data: teams = [], isLoading: loading } = useTeams();
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const { data: members = [] } = useTeamMembers(selectedTeamId);
 
-  // Mutations
   const createTeamMutation = useCreateTeam();
   const inviteMemberMutation = useInviteTeamMember();
   const removeMemberMutation = useRemoveTeamMember();
   const updateRoleMutation = useUpdateTeamMemberRole();
   const acceptInviteMutation = useAcceptTeamInvite();
 
-  // UI state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<string | null>(null);
@@ -49,7 +46,6 @@ export default function TeamPage() {
   useEffect(() => {
     const inviteToken = searchParams.get('invite_token');
     if (!inviteToken) return;
-    // Prevent double-submit
     if (acceptInviteMutation.isPending) return;
     acceptInviteMutation.mutate(inviteToken, {
       onSuccess: (result) => {
@@ -120,22 +116,36 @@ export default function TeamPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
-            {t('subtitle')}
-          </p>
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-0.5">
+                {t('subtitle')}
+              </p>
+            </div>
+          </div>
         </div>
-        <button type="button"
+        <button
+          type="button"
           onClick={() => setShowCreateModal(true)}
-          className="px-3 sm:px-4 py-2 sm:py-2.5 bg-brand-600 dark:bg-brand-500 text-white rounded-xl text-xs sm:text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
+          className="flex items-center gap-2 px-4 py-2.5 bg-brand-600 dark:bg-brand-500 text-white rounded-xl text-sm font-semibold hover:bg-brand-700 dark:hover:bg-brand-600 transition shadow-sm shadow-brand-500/25"
         >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
           {t('createTeam')}
         </button>
       </div>
 
+      {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <TeamList
           teams={teams}
@@ -157,10 +167,15 @@ export default function TeamPage() {
               onRoleChange={handleRoleChange}
             />
           ) : (
-            <div className="glass-card p-12 text-center">
-              <div className="text-4xl mb-3">👈</div>
-              <p className="text-gray-500 dark:text-slate-400">
-                {t('selectTeam')}
+            <div className="glass-card p-16 text-center">
+              <div className="w-20 h-20 mx-auto mb-5 rounded-3xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center">
+                <svg className="w-10 h-10 text-gray-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('selectTeam')}</h3>
+              <p className="text-sm text-gray-400 dark:text-slate-500 max-w-xs mx-auto">
+                Select a team from the list to view members, manage roles, and send invitations
               </p>
             </div>
           )}
