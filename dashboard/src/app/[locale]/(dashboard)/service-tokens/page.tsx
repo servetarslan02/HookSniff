@@ -23,6 +23,7 @@ export default function ServiceTokensPage() {
   const [newName, setNewName] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [revealedTokens, setRevealedTokens] = useState<Record<string, string>>({});
+  const [newlyCreatedToken, setNewlyCreatedToken] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
 
@@ -30,7 +31,12 @@ export default function ServiceTokensPage() {
     e.preventDefault();
     if (!newName.trim()) return;
     createToken.mutate(newName.trim(), {
-      onSuccess: () => { setNewName(''); setShowCreate(false); toast(t('created'), 'success'); },
+      onSuccess: (data) => {
+        setNewName('');
+        setShowCreate(false);
+        if (data.token) setNewlyCreatedToken(data.token);
+        toast(t('created'), 'success');
+      },
       onError: (err) => toast(err instanceof Error ? err.message : tc('failedToCreate'), 'error'),
     });
   };
@@ -100,6 +106,18 @@ export default function ServiceTokensPage() {
           </a>
         </div>
       </div>
+
+      {/* Newly Created Token Banner */}
+      {newlyCreatedToken && (
+        <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-xl p-4">
+          <p className="text-sm text-green-800 dark:text-green-300 mb-2">{t('tokenCreated')}</p>
+          <code className="text-sm font-mono bg-green-100 dark:bg-green-500/20 px-3 py-1 rounded-sm select-all break-all">{newlyCreatedToken}</code>
+          <div className="flex items-center gap-3 mt-2">
+            <button onClick={() => { navigator.clipboard.writeText(newlyCreatedToken); toast(tc('copied'), 'success'); }} className="text-sm text-green-700 dark:text-green-400 hover:underline">{tc('copy')}</button>
+            <button onClick={() => setNewlyCreatedToken(null)} className="text-sm text-green-700 dark:text-green-400 hover:underline">{tc('close')}</button>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700">
         <div className="overflow-x-auto">
