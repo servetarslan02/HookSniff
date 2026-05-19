@@ -3055,7 +3055,13 @@
     "tag_code-review": "kod incelemesi",
     "tag_messaging": "mesajlaşma",
     "tag_sms": "sms",
-    "tag_voice": "ses"
+    "tag_voice": "ses",
+    "apply": "Uygula",
+    "applyTitle": "Şablon Uygula",
+    "endpointUrl": "Uç Nokta URL'si",
+    "enableAgents": "Agentları Etkinleştir",
+    "applyBtn": "Şablonu Uygula",
+    "viewDetails": "Detayları Gör"
   },
   "schemasPage": {
     "title": "📋 Şemalar",
