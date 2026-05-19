@@ -47,7 +47,7 @@ import { CommunicationsTab } from './components/CommunicationsTab';
 import { BillingTab } from './components/BillingTab';
 import { UserModals } from './components/UserModals';
 import type { TabKey } from './components/types';
-import { AlertCircle, BarChart3, ClipboardList, DollarSign, Eye, FileText, Key, Link2, Mail, MessageSquare, Notebook, Package, Pencil, Smartphone, TrendingUp } from 'lucide-react';
+import { AlertCircle, BarChart3, DollarSign, Eye, Key, Link2, Mail, MessageSquare, Notebook, Package, Smartphone, TrendingUp } from 'lucide-react';
 
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Inbox, Link as LinkIcon, Anchor } from 'lucide-react';
+import { Inbox, Anchor } from 'lucide-react';
 
 const tlDrKeys = ['tlDr1', 'tlDr2', 'tlDr3', 'tlDr4', 'tlDr5'];
 
