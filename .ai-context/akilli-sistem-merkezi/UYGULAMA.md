@@ -26,7 +26,7 @@ HookSniff iki ayrı binary'den oluşur:
 ├── api/           → Rust API (axum, port 3000) — background job'lar burada
 ├── worker/        → Rust Worker (ayrı binary) — HTTP teslimat burada olur
 ├── common/        → Paylaşılan kütüphane (signing, ssrf, http_client)
-└── dashboard/     → Next.js 15 (Vercel'de deploy)
+└── dashboard/     → Next.js 16 (Vercel'de deploy)
 
 KURAL: Teslimat worker'da olur. Signal toplama worker'da, aggregation API'de.
 Worker-API iletişimi: PostgreSQL üzerinden (worker yazar, API okur).
