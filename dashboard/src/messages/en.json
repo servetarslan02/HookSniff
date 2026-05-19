@@ -425,7 +425,12 @@
     "p95Latency": "P95 Latency",
     "consecutiveFailures": "{count} consecutive failure{plural}",
     "lastFailure": "Last failure {time}",
-    "failedToLoad": "Could not load health data. Please refresh the page."
+    "failedToLoad": "Could not load health data. Please refresh the page.",
+    "howItWorks": "How it works",
+    "step1": "Webhooks delivered to endpoints",
+    "step2": "Success/failure tracked per endpoint",
+    "step3": "Health status calculated from metrics",
+    "noEndpointsDesc": "Create an endpoint to start monitoring its health and performance."
   },
   "alerts": {
     "title": "Alert Rules",
@@ -462,7 +467,12 @@
     "conditionFailureRate": "Failure Rate >",
     "conditionLatency": "Avg Latency >",
     "conditionConsecutive": "Consecutive Failures >",
-    "alertUpdated": "Alert updated"
+    "alertUpdated": "Alert updated",
+    "alertPaused": "Alert paused",
+    "alertActivated": "Alert activated",
+    "toggleFailed": "Failed to toggle alert",
+    "updateFailed": "Failed to update alert",
+    "emptyDesc": "Create alert rules to get notified when webhooks fail or endpoints have issues."
   },
   "playground": {
     "title": "API Playground",
@@ -629,7 +639,11 @@
       "totalFailed": "Total Failed"
     },
     "latencyTrend": "Latency Trend",
-    "latencyTrendDesc": "Average response time over the selected period"
+    "latencyTrendDesc": "Average response time over the selected period",
+    "howItWorks": "How it works",
+    "step1": "Every delivery is tracked",
+    "step2": "Metrics aggregated over time",
+    "step3": "Charts show trends and patterns"
   },
   "settings": {
     "title": "Settings",
