@@ -2,7 +2,15 @@
 
 > Son güncelleme: 2026-05-19 23:35 GMT+8
 
-## ✅ Tamamlanan (Bu Oturum — 9+ Commit)
+## ✅ Tamamlanan (Bu Oturum — 10+ Commit)
+
+### 0. Landing Page Link Düzeltmesi (00:34–00:36)
+- Dashboard sidebar: HookSniff logosu → `https://hooksniff.vercel.app/`
+- Admin sidebar: Admin panel başlığı tıklanabilir yapıldı → landing page
+- Giriş sonrası landing page'e ulaşım sağlandı
+- Commit: `1d537eb3`
+
+## ✅ Tamamlanan (Onceki Oturum — 9+ Commit)
 
 ### -3. 2FA Sistemi Kapsamlı Düzeltme (23:28–23:35)
 - 4 sorun tespit edildi (2 kritik, 1 orta, 1 düşük), hepsi düzeltildi
