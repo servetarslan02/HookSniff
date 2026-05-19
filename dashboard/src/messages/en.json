@@ -369,7 +369,8 @@
     "clearSelection": "✕ Clear",
     "viewDetails": "View Details",
     "replayConfirm": "Replay delivery {id}… to the same endpoint?",
-    "selectAll": "Select all"
+    "selectAll": "Select all",
+    "replayFailed": "Could not replay the delivery. Please try again."
   },
   "logs": {
     "title": "Webhook Logs",
@@ -383,7 +384,11 @@
     "endpoint": "Endpoint",
     "status": "Status",
     "attempts": "Attempts",
-    "created": "Created"
+    "created": "Created",
+    "deliveryId": "Delivery ID",
+    "httpResponse": "HTTP Response",
+    "attempt": "Attempt",
+    "deliveryAttempts": "Delivery Attempts"
   },
   "search": {
     "title": "Webhook Search",
