@@ -224,7 +224,36 @@ HookSniff/
 
 ---
 
-## 📝 Son Oturum (2026-05-19 06:38 — API Entegrasyon Testi + DB Fix + SDK Sync)
+## 📝 Son Oturum (2026-05-19 08:13 — Login Error Fix + SESSION-PLAN Update)
+
+### Yapılan İşler:
+- **Login error mesajı düzeltildi** — "Unauthorized" → "Invalid email or password"
+  - Disabled account: "Account is disabled. Contact support."
+  - `api/src/routes/auth.rs` güncellendi
+- **SESSION-PLAN.md güncellendi** — 18 madde ⬜ → ✅ (önceki oturumlarda yapılmış)
+  - P0: 14/14 tamamlandı, P1: 44/44 tamamlandı
+  - Toplam: 75/103
+
+### Sıradaki:
+1. Cloud Build ile deploy (security fixes)
+2. P2 kalan sorunlar (21 adet)
+3. Token ayarları (.sdk-tokens.env)
+
+---
+
+## 📝 Önceki Oturum (2026-05-19 08:10 — Kapsamlı Güvenlik Denetimi)
+
+- 26 güvenlik bulgusu tespit edildi, 14 düzeltme yapıldı
+- Endpoint/Inbound secret sızıntısı düzeltildi
+- HTML sanitizer güçlendirildi
+- Cookie Secure flag eklendi
+- Password max length 128 karakter
+- rel="noopener noreferrer" eklendi
+- Detaylı rapor: `.ai-context/SECURITY-AUDIT-FULL.md`
+
+---
+
+## 📝 Önceki Oturum (2026-05-19 06:38 — API Entegrasyon Testi + DB Fix + SDK Sync)
 
 ### Yapılan İşler:
 - **API entegrasyon testleri** — 15+ endpoint test edildi (curl ile)
