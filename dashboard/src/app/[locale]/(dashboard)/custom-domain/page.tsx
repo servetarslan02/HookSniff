@@ -1,10 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
+
+interface ExistingDomain {
+  id: string;
+  domain: string;
+  verified: boolean;
+  ssl_active: boolean;
+  cname_target: string;
+  txt_record: string;
+  verified_at: string | null;
+  created_at: string;
+}
 
 export default function CustomDomainPage() {
   const t = useTranslations('customDomain');
@@ -12,54 +23,84 @@ export default function CustomDomainPage() {
   const { toast } = useToast();
   const [domain, setDomain] = useState('');
   const [saving, setSaving] = useState(false);
-  const [domainId, setDomainId] = useState<string | null>(null);
-  const [status, setStatus] = useState<'none' | 'pending' | 'verified' | 'error'>('none');
   const [dnsRecords, setDnsRecords] = useState<{ type: string; name: string; value: string }[]>([]);
-  const [existingDomains, setExistingDomains] = useState<Array<{ id: string; domain: string; verified: boolean; created_at: string }>>([]);
+  const [existingDomains, setExistingDomains] = useState<ExistingDomain[]>([]);
   const [loadingDomains, setLoadingDomains] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const [newDomainId, setNewDomainId] = useState<string | null>(null);
+  const [newDomainStatus, setNewDomainStatus] = useState<'none' | 'pending' | 'verified' | 'error'>('none');
 
   // Fetch existing domains on mount
-  useState(() => {
-    (async () => {
-      if (!token) return;
-      try {
-        const domains = await apiFetch<Array<{ id: string; domain: string; verified: boolean; created_at: string }>>('/custom-domains', { token });
-        setExistingDomains(domains);
-      } catch {
-        // Silent fail — domains list is not critical
-      } finally {
-        setLoadingDomains(false);
-      }
-    })();
-  });
+  const fetchDomains = useCallback(async () => {
+    if (!token) return;
+    try {
+      const domains = await apiFetch<ExistingDomain[]>('/custom-domains', { token });
+      setExistingDomains(domains);
+    } catch {
+      // Silent fail
+    } finally {
+      setLoadingDomains(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchDomains();
+  }, [fetchDomains]);
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast(t('copied'), 'success');
+    } catch {
+      // Fallback for older browsers
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.style.position = 'fixed';
+      el.style.left = '-9999px';
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      toast(t('copied'), 'success');
+    }
+  };
 
   const handleDeleteDomain = async (id: string) => {
     if (!token) return;
     try {
       await apiFetch(`/custom-domains/${id}`, { method: 'DELETE', token });
       setExistingDomains(prev => prev.filter(d => d.id !== id));
-      toast(t('domainDeleted') || 'Domain removed', 'success');
+      setDeleteConfirm(null);
+      toast(t('domainDeleted'), 'success');
     } catch (err) {
-      toast(err instanceof Error ? err.message : t('failedToDelete') || 'Failed to delete', 'error');
+      toast(err instanceof Error ? err.message : t('failedToDelete'), 'error');
     }
   };
 
   const handleAddDomain = async () => {
     if (!domain || !token) return;
+    // Basic frontend validation
+    if (!domain.includes('.')) {
+      toast(t('invalidDomain') || 'Please enter a valid domain (e.g., hooks.example.com)', 'error');
+      return;
+    }
     setSaving(true);
     try {
-      const data = await apiFetch<{ id: string; domain: string; cname_target: string; txt_record: string; instructions: Record<string, string> }>('/custom-domains', {
+      const data = await apiFetch<{ id: string; domain: string; cname_target: string; txt_record: string }>('/custom-domains', {
         method: 'POST',
         body: { domain },
         token,
       });
-      setDomainId(data.id);
-      setStatus('pending');
+      setNewDomainId(data.id);
+      setNewDomainStatus('pending');
       setDnsRecords([
         { type: 'CNAME', name: domain, value: data.cname_target },
         { type: 'TXT', name: `_hooksniff.${domain}`, value: data.txt_record },
       ]);
       toast(t('domainAdded'), 'success');
+      // Refresh existing domains list
+      fetchDomains();
     } catch (err) {
       toast(err instanceof Error ? err.message : t('failedToAdd'), 'error');
     } finally {
@@ -67,26 +108,35 @@ export default function CustomDomainPage() {
     }
   };
 
-  const handleVerify = async () => {
-    if (!token || !domainId) return;
-    setSaving(true);
+  const handleVerify = async (domainId: string) => {
+    if (!token) return;
+    setVerifyingId(domainId);
     try {
       const data = await apiFetch<{ verified: boolean; message?: string; issues?: string[]; hint?: string }>(`/custom-domains/${domainId}/verify`, {
         method: 'POST',
         token,
       });
       if (data.verified) {
-        setStatus('verified');
+        if (domainId === newDomainId) {
+          setNewDomainStatus('verified');
+        }
+        // Update in existing domains list
+        setExistingDomains(prev => prev.map(d =>
+          d.id === domainId ? { ...d, verified: true, ssl_active: true, verified_at: new Date().toISOString() } : d
+        ));
         toast(data.message || t('domainVerified'), 'success');
       } else {
-        setStatus('error');
+        if (domainId === newDomainId) {
+          setNewDomainStatus('error');
+        }
         const issues = data.issues?.join(', ') || t('verificationFailedCheck');
-        toast(`${t('verificationFailedPrefix')} ${issues}`, 'error');
+        const hint = data.hint ? ` ${data.hint}` : '';
+        toast(`${t('verificationFailedPrefix')} ${issues}${hint}`, 'error');
       }
     } catch (err) {
       toast(err instanceof Error ? err.message : t('verificationFailed'), 'error');
     } finally {
-      setSaving(false);
+      setVerifyingId(null);
     }
   };
 
@@ -94,9 +144,7 @@ export default function CustomDomainPage() {
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
-          {t('subtitle')}
-        </p>
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Add Domain */}
@@ -115,18 +163,16 @@ export default function CustomDomainPage() {
             disabled={saving || !domain}
             className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
           >
-            {t('addDomainBtn')}
+            {saving ? t('verifying') : t('addDomainBtn')}
           </button>
         </div>
       </div>
 
-      {/* DNS Records */}
+      {/* DNS Records for newly added domain */}
       {dnsRecords.length > 0 && (
         <div className="glass-card p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('dnsRecords')}</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-            {t('dnsRecordsDesc')}
-          </p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('dnsRecordsDesc')}</p>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -144,10 +190,7 @@ export default function CustomDomainPage() {
                     <td className="px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">{rec.name}</td>
                     <td className="px-4 py-3 font-mono text-sm text-gray-600 dark:text-slate-400 break-all">{rec.value}</td>
                     <td className="px-4 py-3">
-                      <button type="button"
-                        onClick={() => { navigator.clipboard.writeText(rec.value); toast(t('copied'), 'success'); }}
-                        className="text-brand-600 dark:text-brand-400 text-sm hover:underline"
-                      >
+                      <button type="button" onClick={() => handleCopy(rec.value)} className="text-brand-600 dark:text-brand-400 text-sm hover:underline">
                         {t('copy')}
                       </button>
                     </td>
@@ -156,20 +199,27 @@ export default function CustomDomainPage() {
               </tbody>
             </table>
           </div>
-          <div className="mt-4 flex gap-3">
-            <button type="button"
-              onClick={handleVerify}
-              disabled={saving}
-              className="px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition disabled:opacity-50"
-            >
-              {saving ? t('verifying') : t('verifyDomain')}
-            </button>
-            {status === 'verified' && (
+
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-3 mb-4">
+            ⏱️ {t('dnsPropagationHint') || 'DNS changes can take 5–30 minutes to propagate. Wait before verifying.'}
+          </p>
+
+          <div className="flex gap-3 items-center">
+            {newDomainId && (
+              <button type="button"
+                onClick={() => handleVerify(newDomainId)}
+                disabled={verifyingId === newDomainId}
+                className="px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition disabled:opacity-50"
+              >
+                {verifyingId === newDomainId ? t('verifying') : t('verifyDomain')}
+              </button>
+            )}
+            {newDomainStatus === 'verified' && (
               <span className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-medium">
                 ✅ {t('verified')}
               </span>
             )}
-            {status === 'error' && (
+            {newDomainStatus === 'error' && (
               <span className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm font-medium">
                 ❌ {t('verificationFailedCheck')}
               </span>
@@ -181,23 +231,81 @@ export default function CustomDomainPage() {
       {/* Existing Domains */}
       {!loadingDomains && existingDomains.length > 0 && (
         <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('existingDomains') || 'Your Domains'}</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('existingDomains')}</h2>
           <div className="space-y-3">
             {existingDomains.map((d) => (
-              <div key={d.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-slate-900">
-                <div className="flex items-center gap-3">
-                  <span className={`w-2 h-2 rounded-full ${d.verified ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                  <span className="font-mono text-sm text-gray-900 dark:text-white">{d.domain}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${d.verified ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'}`}>
-                    {d.verified ? (t('verified') || 'Verified') : (t('pending') || 'Pending')}
-                  </span>
+              <div key={d.id} className="rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                {/* Domain header */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-900">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${d.verified ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                    <span className="font-mono text-sm text-gray-900 dark:text-white truncate">{d.domain}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${d.verified
+                        ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
+                        : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'
+                      }`}>
+                      {d.verified ? t('verified') : t('pending')}
+                    </span>
+                    {d.verified && d.ssl_active && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 shrink-0">
+                        🔒 SSL
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 ml-4 shrink-0">
+                    {!d.verified && (
+                      <button type="button"
+                        onClick={() => handleVerify(d.id)}
+                        disabled={verifyingId === d.id}
+                        className="text-xs text-green-600 dark:text-green-400 hover:underline disabled:opacity-50"
+                      >
+                        {verifyingId === d.id ? t('verifying') : t('verifyDomain')}
+                      </button>
+                    )}
+                    {deleteConfirm === d.id ? (
+                      <div className="flex items-center gap-1">
+                        <button type="button" onClick={() => handleDeleteDomain(d.id)}
+                          className="text-xs text-red-600 dark:text-red-400 font-medium px-2 py-1 bg-red-50 dark:bg-red-500/10 rounded-lg">
+                          {t('confirmDelete') || 'Confirm'}
+                        </button>
+                        <button type="button" onClick={() => setDeleteConfirm(null)}
+                          className="text-xs text-gray-500 px-2 py-1 hover:text-gray-700">
+                          {t('cancel') || 'Cancel'}
+                        </button>
+                      </div>
+                    ) : (
+                      <button type="button" onClick={() => setDeleteConfirm(d.id)}
+                        className="text-xs text-red-600 dark:text-red-400 hover:underline">
+                        {t('delete')}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <button type="button"
-                  onClick={() => handleDeleteDomain(d.id)}
-                  className="text-xs text-red-600 dark:text-red-400 hover:underline"
-                >
-                  {t('delete') || 'Remove'}
-                </button>
+
+                {/* DNS details for unverified domains */}
+                {!d.verified && (
+                  <div className="px-4 py-3 border-t border-gray-100 dark:border-slate-800 space-y-2">
+                    <p className="text-xs text-gray-500 dark:text-slate-400">{t('dnsRecordsDesc')}</p>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="font-mono bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-sm text-gray-600 dark:text-slate-400">CNAME</span>
+                      <span className="font-mono text-gray-900 dark:text-white">{d.domain}</span>
+                      <span className="text-gray-400">→</span>
+                      <span className="font-mono text-gray-600 dark:text-slate-400">{d.cname_target}</span>
+                      <button type="button" onClick={() => handleCopy(d.cname_target)} className="text-brand-600 dark:text-brand-400 hover:underline ml-1">
+                        {t('copy')}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="font-mono bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-sm text-gray-600 dark:text-slate-400">TXT</span>
+                      <span className="font-mono text-gray-900 dark:text-white">_hooksniff.{d.domain}</span>
+                      <span className="text-gray-400">→</span>
+                      <span className="font-mono text-gray-600 dark:text-slate-400 truncate max-w-[200px]">{d.txt_record}</span>
+                      <button type="button" onClick={() => handleCopy(d.txt_record)} className="text-brand-600 dark:text-brand-400 hover:underline ml-1">
+                        {t('copy')}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
