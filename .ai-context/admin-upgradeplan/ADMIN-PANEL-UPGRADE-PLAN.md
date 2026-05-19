@@ -1,4 +1,4 @@
-# 🪝 HookSniff Dashboard — Kapsamlı Analiz Raporu
+# 🪝 HookSniff Kullanıcı Paneli — Kapsamlı Analiz Raporu
 
 > **Tarih:** 2026-05-20 00:46 GMT+8
 > **Hazırlayan:** AI Assistant (Oturum analizi)
