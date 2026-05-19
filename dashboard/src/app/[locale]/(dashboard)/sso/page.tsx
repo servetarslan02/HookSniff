@@ -479,8 +479,15 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
             </select>
           </div>
           {defaultTeamId && (
-            <div>
-              <label htmlFor="sso-default-role" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('defaultRole')}</label>
+            <>
+              <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-500/10 rounded-lg">
+                <span className="text-amber-500 mt-0.5">⚠️</span>
+                <p className="text-xs text-amber-700 dark:text-amber-300">
+                  {t('autoTeamJoinWarning') || 'All users who sign in via SSO will be automatically added to this team. Make sure this is the correct team.'}
+                </p>
+              </div>
+              <div>
+                <label htmlFor="sso-default-role" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('defaultRole')}</label>
               <select
                 id="sso-default-role"
                 value={defaultRole}
@@ -492,7 +499,8 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
                 <option value="editor">✏️ {t('roleEditor')}</option>
                 <option value="admin">🛡️ {t('roleAdmin')}</option>
               </select>
-            </div>
+              </div>
+            </>
           )}
         </div>
       </div>
