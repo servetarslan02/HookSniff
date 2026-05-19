@@ -2175,7 +2175,7 @@
     "active": "Active",
     "inactive": "Inactive",
     "createdDate": "Created {date}",
-    "lastUsed": "Last used {date}",
+    "lastUsed": "Last used",
     "rotate": "Rotate",
     "rotating": "Rotating…",
     "rotateTitle": "Rotate API Key?",
@@ -2183,7 +2183,11 @@
     "deleteTitle": "Delete API Key?",
     "deleteDesc": "This action cannot be undone. Any services using this key will immediately lose access.",
     "failedToLoad": "Could not load API keys. Please refresh the page.",
-    "create": "Create API Key"
+    "create": "Create API Key",
+    "unnamedKey": "Unnamed Key",
+    "keyCreated": "New API Key Created",
+    "created": "Created",
+    "delete": "Delete"
   },
   "onboarding": {
     "welcome": "Welcome to HookSniff! 🪝",
