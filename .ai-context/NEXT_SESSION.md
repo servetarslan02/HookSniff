@@ -54,8 +54,18 @@
 
 ## 📊 Güvenlik Durumu
 
-- **19 bulgu** tespit edildi (5 yüksek, 8 orta, 6 düşük)
-- **11 düzeltme** yapıldı (5 yüksek tamamı, 6 orta)
-- **8 açık** kaldı (hepsi düşük öncelik)
+- **26 bulgu** tespit edildi (5 yüksek, 8 orta, 13 düşük)
+- **14 düzeltme** yapıldı (5 yüksek tamamı, 6 orta, 3 düşük)
+- **12 açık** kaldı (hepsi düşük öncelik)
 - **npm audit:** 0 vulnerabilities
+- **unsafe blok:** yok
 - **Detaylı rapor:** `.ai-context/SECURITY-AUDIT-FULL.md`
+
+### Yapılan Düzeltmeler (Bu Oturum)
+1. Endpoint signing_secret → skip_serializing
+2. Inbound webhook secret → skip_serializing
+3. HTML sanitizer güçlendirildi (javascript:/data:/vbscript: + script removal)
+4. Cookie Secure flag (store.tsx, CookieConsent, ConsentToggle)
+5. Password max length 128 karakter
+6. rel="noopener noreferrer" (_blank links)
+7. Comprehensive security audit report
