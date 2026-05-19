@@ -174,21 +174,6 @@ export default function RateLimitingPage() {
       )}
 
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('howItWorks')}</h2>
-        <div className="space-y-3">
-          {[
-            { icon: '1️⃣', title: t('tokenBucket'), desc: t('tokenBucketDesc') },
-            { icon: '2️⃣', title: t('burstHandling'), desc: t('burstHandlingDesc') },
-            { icon: '3️⃣', title: t('queueRetry'), desc: t('queueRetryDesc') },
-            { icon: '4️⃣', title: t('perEndpointConfig'), desc: t('perEndpointConfigDesc') },
-          ].map((item) => (
-            <div key={item.icon} className="flex gap-3">
-              <span className="text-lg">{item.icon}</span>
-              <div><div className="font-medium text-gray-900 dark:text-white text-sm">{item.title}</div><div className="text-sm text-gray-500 dark:text-slate-400">{item.desc}</div></div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Edit Modal */}
       {editTarget && (
