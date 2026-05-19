@@ -49,16 +49,19 @@ export default function TeamPage() {
   useEffect(() => {
     const inviteToken = searchParams.get('invite_token');
     if (!inviteToken) return;
+    // Prevent double-submit
+    if (acceptInviteMutation.isPending) return;
     acceptInviteMutation.mutate(inviteToken, {
       onSuccess: (result) => {
-        toast(t('inviteAccepted') || `Invite accepted! Joined team as ${result.role}`, 'success');
+        toast(t('inviteAccepted', { role: result.role }) || `Invite accepted! Joined team as ${result.role}`, 'success');
       },
       onError: (err) => {
         const msg = err instanceof Error ? err.message : (t('inviteAcceptFailed') || 'Failed to accept invite');
         toast(msg, 'error');
       },
     });
-  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams.get('invite_token')]);
 
   const currentRole = members.find((m) => m.customer_id === user?.id)?.role || 'viewer';
   const canInvite = currentRole === 'admin';
