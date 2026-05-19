@@ -1,40 +1,46 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-20 04:10 GMT+8
+> Son güncelleme: 2026-05-20 06:20 GMT+8
 
-## ✅ Tamamlanan (Bu Oturum — Alert Evaluation Worker)
+## ✅ Tamamlanan (Bu Oturum)
 
-### 1. Alert Evaluation Worker (KRİTİK — Item 254)
-- ✅ Migration 078: `alert_history` tablosu + `last_triggered_at`, `webhook_url`, `cooldown_minutes` kolonları
-- ✅ `api/src/jobs/alert_eval.rs` — Background worker (her 5 dk)
-  - `failure_rate`: Son 30 dk'da failed/total * 100
-  - `latency`: Son 30 dk'da avg(duration_ms)
-  - `consecutive_failures`: endpoint.failure_streak max
-  - 15 dk cooldown (alert storms engeli)
-  - 3 kanal: email (Resend), slack (webhook), operational webhook
-  - In-app notification + alert_history log
-- ✅ `jobs/mod.rs` — modül kaydı
-- ✅ `main.rs` — background task spawn (5 dk interval, distributed lock)
+### 1. Login DATABASE_ERROR Fix (KRİTİK)
+- `CUSTOMER_SELECT` sorgusuna `paused_at`, `paused_until`, `pause_plan` eklendi
+- 3 dosya düzeltildi: auth.rs, sso.rs, gdpr.rs
+- Cloud Build tetiklendi
 
-### 2. Revenue Export Report Açıklaması
-- Admin → Revenue sayfasındaki "Export Report" butonu → son 12 aylık gelir CSV'si
+### 2. Email .await Fix
+- `send_email_with_fallback` 4 çağrıya `.await` eklendi
+- Artık email'ler düzgün gönderilecek
 
-### 3. Fatura/Ödeme Görüntüleme
-- Admin → Users → [Kullanıcı] → Billing sekmesi (invoices, payments, refunds)
-- Admin → Revenue → genel gelir özeti
+### 3. SSO Module Path Fix
+- `main.rs`: `sso::` → `routes::sso::`
+
+### 4. Dashboard Build Fixes (20+ dosya)
+- Unused imports temizlendi
+- Type errors düzeltildi
+- Corrupted imports onarıldı
 
 ## 📋 Sıradaki
 
-### 1. Deploy
-- Migration 078'i Neon DB'ye uygula (`node run-migrations.js`)
-- Cloud Build ile API deploy (alert_eval worker dahil)
-- Vercel otomatik deploy (dashboard değişiklik yok)
+### 1. Dashboard Build Kalan Hatalar
+- `RevenueContent.tsx` — PLAN_COLORS computed property type error
+- Dashboard'ı Vercel'e deploy et (auto-deploy tetiklenmiş olmalı)
 
-### 2. communication_history Tablosu
-- Bulk email iletişim loglaması için gerekli
-- Şu an eksik, `let _ =` ile sessizce geçiliyor
+### 2. Upstash Redis Limit
+- 500K request limiti dolu
+- Seçenekler:
+  a) Upstash planı yükselt ($10/ay)
+  b) Redis fallback eklensin (email queue → direct send)
+  c) Yeni Upstash instance oluştur
 
-### 3. P2 Kalan Sorunlar
+### 3. Email Verified Sorunu
+- Servet ve demo hesapları `email_verified = false`
+- Login "Please verify your email" hatası verecek
+- Neon DB'de `UPDATE customers SET email_verified = true WHERE email IN (...)`
+
+### 4. P2 Kalan Sorunlar
 - SSO state → Redis
 - OIDC JWKS imza doğrulaması
 - Verified domain TXT record verification
+- communication_history tablosu
