@@ -91,6 +91,13 @@ impl PolarConfig {
         }
     }
 
+    /// Check if a product ID is a yearly subscription.
+    fn is_yearly_product(&self, product_id: &str) -> bool {
+        product_id == self.product_startup_yearly
+            || product_id == self.product_pro_yearly
+            || product_id == self.product_business_yearly
+    }
+
 }
 
 // ── Polar.sh API types ────────────────────────────────────────
@@ -392,11 +399,21 @@ impl PaymentProviderImpl for PolarProvider {
                     .map(|pid| self.determine_plan(pid))
                     .unwrap_or(Plan::Pro);
 
+                let interval = sub
+                    .product_id
+                    .as_deref()
+                    .map(|pid| {
+                        if self.config.is_yearly_product(pid) { "year" } else { "month" }
+                    })
+                    .unwrap_or("month")
+                    .to_string();
+
                 Ok(WebhookResult::SubscriptionCreated {
                     customer_id,
                     plan,
                     provider_customer_id: sub.customer_id.clone(),
                     provider_subscription_id: sub.id.clone(),
+                    interval,
                 })
             }
             "subscription.updated" => {
@@ -414,10 +431,20 @@ impl PaymentProviderImpl for PolarProvider {
                     .map(|pid| self.determine_plan(pid))
                     .unwrap_or(Plan::Developer);
 
+                let interval = sub
+                    .product_id
+                    .as_deref()
+                    .map(|pid| {
+                        if self.config.is_yearly_product(pid) { "year" } else { "month" }
+                    })
+                    .unwrap_or("month")
+                    .to_string();
+
                 Ok(WebhookResult::SubscriptionUpdated {
                     provider_subscription_id: sub_id,
                     plan,
                     status,
+                    interval,
                 })
             }
             "subscription.canceled" | "subscription.revoked" => {

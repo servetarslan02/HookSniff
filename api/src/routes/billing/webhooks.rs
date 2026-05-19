@@ -124,16 +124,18 @@ async fn process_webhook_result(
             plan,
             provider_customer_id,
             provider_subscription_id,
+            interval,
         } => {
             let webhook_limit = plan.max_webhooks_per_day() as i64;
+            let period_interval = if interval == "year" { "365 days" } else { "30 days" };
             if let Some((cust_col, sub_col)) = provider_columns(provider) {
                 let query = format!(
                     "UPDATE customers SET plan = $1, payment_provider = $2, \
                      {} = $3, {} = $4, webhook_limit = $5, \
                      payment_failed_at = NULL, \
-                     current_period_end = NOW() + INTERVAL '30 days', \
+                     current_period_end = NOW() + INTERVAL '{}', \
                      updated_at = NOW() WHERE id = $6",
-                    cust_col, sub_col
+                    cust_col, sub_col, period_interval
                 );
                 sqlx::query(&query)
                     .bind(plan.as_str()).bind(provider)
@@ -195,15 +197,17 @@ async fn process_webhook_result(
             provider_subscription_id,
             plan,
             status,
+            interval,
         } => {
             let webhook_limit = plan.max_webhooks_per_day() as i64;
+            let period_interval = if interval == "year" { "365 days" } else { "30 days" };
             if let Some(sub_col) = provider_sub_col(provider) {
                 let query = format!(
                     "UPDATE customers SET plan = $1, webhook_limit = $2, \
                      payment_failed_at = NULL, \
-                     current_period_end = NOW() + INTERVAL '30 days', \
+                     current_period_end = NOW() + INTERVAL '{}', \
                      updated_at = NOW() WHERE {} = $3",
-                    sub_col
+                    period_interval, sub_col
                 );
                 sqlx::query(&query).bind(plan.as_str()).bind(webhook_limit)
                     .bind(provider_subscription_id).execute(pool).await?;
