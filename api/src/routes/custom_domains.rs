@@ -176,7 +176,7 @@ async fn add_domain(
     }
 
     let verification_token = generate_verification_token();
-    let cname_target = format!("{}.hooksniff.app", &customer.id.to_string()[..8]);
+    let cname_target = "cname.vercel-dns.com".to_string();
     let txt_record = format!("hooksniff-verify={}", verification_token);
 
     let id: (Uuid,) = sqlx::query_as(
@@ -190,6 +190,13 @@ async fn add_domain(
     .bind(&txt_record)
     .fetch_one(&pool)
     .await?;
+
+    // Add domain to Vercel project for automatic SSL
+    let vercel_result = add_domain_to_vercel(&domain).await;
+    match &vercel_result {
+        Ok(_) => tracing::info!("✅ Domain added to Vercel: {}", domain),
+        Err(e) => tracing::warn!("⚠️ Failed to add domain to Vercel (non-fatal): {}", e),
+    }
 
     tracing::info!(
         "🌐 Custom domain added: {} for customer {}",
@@ -216,6 +223,15 @@ async fn delete_domain(
     Extension(customer): Extension<Customer>,
     Path(domain_id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // Get domain name before deleting
+    let domain_name: Option<(String,)> = sqlx::query_as(
+        "SELECT domain FROM custom_domains WHERE id = $1 AND customer_id = $2"
+    )
+    .bind(domain_id)
+    .bind(customer.id)
+    .fetch_optional(&pool)
+    .await?;
+
     let result = sqlx::query("DELETE FROM custom_domains WHERE id = $1 AND customer_id = $2")
         .bind(domain_id)
         .bind(customer.id)
@@ -224,6 +240,11 @@ async fn delete_domain(
 
     if result.rows_affected() == 0 {
         return Err(AppError::NotFound);
+    }
+
+    // Remove domain from Vercel (best-effort)
+    if let Some((ref domain)) = domain_name {
+        let _ = remove_domain_from_vercel(domain).await;
     }
 
     Ok(Json(serde_json::json!({
@@ -348,6 +369,67 @@ async fn verify_dns_cname(domain: &str) -> bool {
                 Err(_) => false,
             }
         }
+    }
+}
+
+/// Add a custom domain to the Vercel project for automatic SSL provisioning.
+async fn add_domain_to_vercel(domain: &str) -> Result<(), String> {
+    let vercel_token = std::env::var("VERCEL_API_TOKEN").map_err(|_| "VERCEL_API_TOKEN not set")?;
+    let project_id = std::env::var("VERCEL_PROJECT_ID")
+        .unwrap_or_else(|_| "prj_cSIVYHpCoAtoihRp8xlXIun1KVSR".to_string());
+    let team_id = std::env::var("VERCEL_TEAM_ID")
+        .unwrap_or_else(|_| "team_5GY7N3j15cHYnQJQGjcA4KvR".to_string());
+
+    let client = crate::http_client::get_client().clone();
+    let url = format!(
+        "https://api.vercel.com/v10/projects/{}/domains?teamId={}",
+        project_id, team_id
+    );
+
+    let resp = client
+        .post(&url)
+        .header("Authorization", format!("Bearer {}", vercel_token))
+        .header("Content-Type", "application/json")
+        .json(&serde_json::json!({ "name": domain }))
+        .send()
+        .await
+        .map_err(|e| format!("HTTP error: {}", e))?;
+
+    let status = resp.status();
+    if status.is_success() {
+        Ok(())
+    } else {
+        let body = resp.text().await.unwrap_or_default();
+        Err(format!("Vercel API error ({}): {}", status, body))
+    }
+}
+
+/// Remove a custom domain from the Vercel project.
+async fn remove_domain_from_vercel(domain: &str) -> Result<(), String> {
+    let vercel_token = std::env::var("VERCEL_API_TOKEN").map_err(|_| "VERCEL_API_TOKEN not set")?;
+    let project_id = std::env::var("VERCEL_PROJECT_ID")
+        .unwrap_or_else(|_| "prj_cSIVYHpCoAtoihRp8xlXIun1KVSR".to_string());
+    let team_id = std::env::var("VERCEL_TEAM_ID")
+        .unwrap_or_else(|_| "team_5GY7N3j15cHYnQJQGjcA4KvR".to_string());
+
+    let client = crate::http_client::get_client().clone();
+    let url = format!(
+        "https://api.vercel.com/v9/projects/{}/domains/{}?teamId={}",
+        project_id, domain, team_id
+    );
+
+    let resp = client
+        .delete(&url)
+        .header("Authorization", format!("Bearer {}", vercel_token))
+        .send()
+        .await
+        .map_err(|e| format!("HTTP error: {}", e))?;
+
+    if resp.status().is_success() || resp.status().as_u16() == 404 {
+        Ok(())
+    } else {
+        let body = resp.text().await.unwrap_or_default();
+        Err(format!("Vercel API error ({}): {}", resp.status(), body))
     }
 }
 
