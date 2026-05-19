@@ -15,7 +15,6 @@ function formatDate(s: string | null) {
 
 export default function MessagePollerPage() {
   const t = useTranslations('messagePoller');
-  const tc = useTranslations('common');
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();

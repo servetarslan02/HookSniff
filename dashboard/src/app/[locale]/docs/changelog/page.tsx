@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 
 export default async function ChangelogPage() {
   const t = await getTranslations('docsChangelog');
-  const tSdk = (key: string) => t(`sdkList.${key}` as any);
 
   // Get arrays from translations
   const platformFeatures = t.raw('platformFeatures') as string[];

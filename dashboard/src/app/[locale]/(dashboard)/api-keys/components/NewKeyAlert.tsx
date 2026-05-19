@@ -10,8 +10,8 @@ export function NewKeyAlert({
   newKey: string;
   onDismiss: () => void;
 }) {
-  const tc = useTranslations('common');
   const t = useTranslations('apiKeys');
+  const tc = useTranslations('common');
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

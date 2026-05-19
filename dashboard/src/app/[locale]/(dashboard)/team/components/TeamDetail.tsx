@@ -89,6 +89,7 @@ export function TeamDetail({
   const t = useTranslations('team');
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(team.name);
+  const [dismissedInvite, setDismissedInvite] = useState(false);
 
   const adminCount = members.filter((m) => m.role === 'admin').length;
   const editorCount = members.filter((m) => m.role === 'editor').length;
@@ -333,11 +334,11 @@ export function TeamDetail({
       </div>
 
       {/* Last Invite Link Banner */}
-      {lastInviteLink && (
+      {lastInviteLink && !dismissedInvite && (
         <div className="glass-card p-4 bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/20 relative">
           <button
             type="button"
-            onClick={() => setLastInviteLink(null)}
+            onClick={() => setDismissedInvite(true)}
             className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded"
             title="Dismiss"
           >
