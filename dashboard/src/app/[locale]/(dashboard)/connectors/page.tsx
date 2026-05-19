@@ -111,47 +111,53 @@ export default function ConnectorsPage() {
         )}
       </div>
 
-      {/* Create Config */}
+      {/* Create Config Modal */}
       {showCreate && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white">{t('addConfiguration')}</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('connector')}</label>
-              <select
-                value={selectedConnector}
-                onChange={e => setSelectedConnector(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => { setShowCreate(false); setConfigName(''); setSelectedConnector(''); }} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('addConfiguration')}</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('selectConnector')}</p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('connector')}</label>
+                <select
+                  value={selectedConnector}
+                  onChange={e => setSelectedConnector(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                >
+                  <option value="">{t('selectConnector')}</option>
+                  {connectors.map(c => (
+                    <option key={c.id} value={c.id}>{PROVIDER_ICONS[c.name] || '🔌'} {c.display_name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('name')}</label>
+                <input
+                  value={configName}
+                  onChange={e => setConfigName(e.target.value)}
+                  placeholder={t('namePlaceholder')}
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end mt-6">
+              <button onClick={() => { setShowCreate(false); setConfigName(''); setSelectedConnector(''); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+                {t('cancel')}
+              </button>
+              <button
+                onClick={() => {
+                  if (selectedConnector && configName.trim()) {
+                    createMutation.mutate({ connector_id: selectedConnector, name: configName });
+                  }
+                }}
+                disabled={createMutation.isPending || !selectedConnector || !configName.trim()}
+                className="px-5 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60 shadow-sm"
               >
-                <option value="">{t('selectConnector')}</option>
-                {connectors.map(c => (
-                  <option key={c.id} value={c.id}>{PROVIDER_ICONS[c.name] || '🔌'} {c.display_name}</option>
-                ))}
-              </select>
+                {createMutation.isPending ? t('creating') : t('create')}
+              </button>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('name')}</label>
-              <input
-                value={configName}
-                onChange={e => setConfigName(e.target.value)}
-                placeholder={t('namePlaceholder')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                if (selectedConnector && configName.trim()) {
-                  createMutation.mutate({ connector_id: selectedConnector, name: configName });
-                }
-              }}
-              disabled={createMutation.isPending || !selectedConnector || !configName.trim()}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-            >
-              {createMutation.isPending ? t('creating') : t('create')}
-            </button>
-            <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800">{t('cancel')}</button>
           </div>
         </div>
       )}
