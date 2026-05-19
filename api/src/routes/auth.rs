@@ -151,6 +151,8 @@ pub fn router() -> Router {
         .route("/revoke-token", post(revoke_current_token))
         .route("/revoke-all-tokens", post(revoke_all_tokens))
         .route("/consent", get(get_consent).post(update_consent))
+        .route("/request-email-change", post(request_email_change))
+        .route("/confirm-email-change", post(confirm_email_change))
         .route("/export", get(export_data))
         .route("/account", axum::routing::delete(delete_account))
         .layer(axum::middleware::from_fn(crate::middleware::auth_middleware));
@@ -642,46 +644,15 @@ async fn get_me(Extension(customer): Extension<Customer>) -> Result<Json<Custome
 
 async fn update_profile(
     Extension(pool): Extension<PgPool>,
-    Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
-    Extension(email_provider): Extension<crate::email::EmailProvider>,
-    Extension(job_queue): Extension<Option<crate::jobs::job_queue::JobQueue>>,
-    headers: HeaderMap,
     Json(req): Json<UpdateProfileRequest>,
 ) -> Result<Json<CustomerResponse>, AppError> {
     if req.name.trim().is_empty() { return Err(AppError::BadRequest("Name cannot be empty".into())); }
-    if let Err(e) = crate::validation::validate_email(&req.email) { return Err(AppError::BadRequest(e)); }
 
-    // If email is changing, require password confirmation and reset verification
-    let email_changed = req.email.to_lowercase() != customer.email.to_lowercase();
-    if email_changed {
-        let password = req.password.as_ref().ok_or(AppError::BadRequest("Password is required to change email".into()))?;
-        let hash = customer.password_hash.as_ref().ok_or(AppError::BadRequest("Password not set".into()))?;
-        if !jwt::verify_password_async(password.clone(), hash.clone()).await? {
-            return Err(AppError::BadRequest("Invalid password".into()));
-        }
-        let existing: Option<Uuid> = sqlx::query_scalar("SELECT id FROM customers WHERE LOWER(email) = LOWER($1) AND id != $2")
-            .bind(&req.email).bind(customer.id).fetch_optional(&pool).await?;
-        if existing.is_some() { return Err(AppError::BadRequest("This email is already in use".into())); }
-    }
-
-    let updated = if email_changed {
-        // Reset email_verified when email changes
-        sqlx::query_as::<_, Customer>("UPDATE customers SET name = $1, email = $2, email_verified = false, updated_at = NOW() WHERE id = $3 RETURNING *")
-            .bind(&req.name).bind(&req.email).bind(customer.id).fetch_one(&pool).await?
-    } else {
-        sqlx::query_as::<_, Customer>("UPDATE customers SET name = $1, email = $2, updated_at = NOW() WHERE id = $3 RETURNING *")
-            .bind(&req.name).bind(&req.email).bind(customer.id).fetch_one(&pool).await?
-    };
+    let updated = sqlx::query_as::<_, Customer>("UPDATE customers SET name = $1, updated_at = NOW() WHERE id = $2 RETURNING *")
+        .bind(&req.name).bind(customer.id).fetch_one(&pool).await?;
 
     tracing::info!("✅ Profile updated for customer {}", customer.id);
-    if email_changed {
-        let lang = crate::email::Language::from_accept_language(
-            headers.get("accept-language").and_then(|v| v.to_str().ok()).unwrap_or("en")
-        );
-        send_verification_email_for_customer(&pool, &cfg, &email_provider, job_queue.as_ref(), customer.id, &req.email, lang).await;
-        tracing::info!("📧 Email changed for customer {}: verification email sent to {}", customer.id, &req.email);
-    }
     Ok(Json(updated.to_response(None)))
 }
 
@@ -850,6 +821,181 @@ async fn send_verification_email_for_customer(
 
 // ════════════════════════════════════════════════════════
 // Tests
+// ── Email Change ────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RequestEmailChangeRequest {
+    new_email: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ConfirmEmailChangeRequest {
+    code: String,
+}
+
+async fn request_email_change(
+    Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
+    Extension(customer): Extension<Customer>,
+    Extension(email_provider): Extension<crate::email::EmailProvider>,
+    Extension(job_queue): Extension<Option<crate::jobs::job_queue::JobQueue>>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    headers: HeaderMap,
+    Json(req): Json<RequestEmailChangeRequest>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Rate limit: 3 requests per 15 minutes per user
+    let rl_key = format!("email_change:{}", customer.id);
+    let rl_result = rate_limiter.check_with_window(&rl_key, 3, 900).await;
+    if !rl_result.allowed {
+        return Err(AppError::RateLimitExceeded);
+    }
+
+    if let Err(e) = crate::validation::validate_email(&req.new_email) {
+        return Err(AppError::BadRequest(e));
+    }
+
+    let new_email = req.new_email.to_lowercase();
+
+    // Can't change to same email
+    if new_email == customer.email.to_lowercase() {
+        return Err(AppError::BadRequest("This is already your current email".into()));
+    }
+
+    // Check if email is in use
+    let existing: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM customers WHERE LOWER(email) = LOWER($1) AND id != $2"
+    )
+    .bind(&new_email).bind(customer.id).fetch_optional(&pool).await?;
+    if existing.is_some() {
+        return Err(AppError::BadRequest("This email is already in use".into()));
+    }
+
+    // Delete old codes for this user
+    sqlx::query("DELETE FROM email_change_codes WHERE customer_id = $1")
+        .bind(customer.id).execute(&pool).await?;
+
+    // Generate 6-digit code
+    let code = generate_email_change_code();
+    let code_hash = jwt::hash_token(&code);
+    let expires_at = Utc::now() + chrono::Duration::minutes(15);
+
+    sqlx::query(
+        "INSERT INTO email_change_codes (customer_id, new_email, code_hash, expires_at) VALUES ($1, $2, $3, $4)"
+    )
+    .bind(customer.id).bind(&new_email).bind(&code_hash).bind(expires_at)
+    .execute(&pool).await?;
+
+    // Send code to new email
+    let lang = crate::email::Language::from_accept_language(
+        headers.get("accept-language").and_then(|v| v.to_str().ok()).unwrap_or("en")
+    );
+    let email_clone = new_email.clone();
+    let code_clone = code.clone();
+    send_email_with_fallback(job_queue.as_ref(), &email_provider, &new_email,
+        crate::jobs::job_queue::EmailTemplate::Verification {
+            verify_url: format!("Your HookSniff email change code: {}", code_clone),
+        }, lang,
+        move |ep, to, lang| {
+            tokio::spawn(async move {
+                // Use a simple text email for the code
+                if let Err(e) = ep.send_verification_email(&to, &format!("Your verification code is: {}", code_clone), lang).await {
+                    tracing::warn!("Failed to send email change code to {}: {:?}", to, e);
+                }
+            });
+        },
+    );
+
+    tracing::info!("📧 Email change code sent for customer {} to {}", customer.id, &email_clone);
+    Ok(Json(serde_json::json!({
+        "message": "A verification code has been sent to your new email address.",
+        "expires_in_minutes": 15
+    })))
+}
+
+async fn confirm_email_change(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    Json(req): Json<ConfirmEmailChangeRequest>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Rate limit: 5 attempts per 5 minutes
+    let rl_key = format!("email_change_confirm:{}", customer.id);
+    let rl_result = rate_limiter.check_with_window(&rl_key, 5, 300).await;
+    if !rl_result.allowed {
+        return Err(AppError::RateLimitExceeded);
+    }
+
+    if req.code.len() != 6 || !req.code.chars().all(|c| c.is_ascii_digit()) {
+        return Err(AppError::BadRequest("Invalid code format".into()));
+    }
+
+    // Get the latest code for this user
+    let row: Option<(Uuid, String, String, chrono::DateTime<chrono::Utc>, i32)> = sqlx::query_as(
+        "SELECT id, new_email, code_hash, expires_at, attempts FROM email_change_codes WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 1"
+    )
+    .bind(customer.id).fetch_optional(&pool).await?;
+
+    let (code_id, new_email, code_hash, expires_at, attempts) = match row {
+        Some(r) => r,
+        None => return Err(AppError::BadRequest("No pending email change. Please request a new code.".into())),
+    };
+
+    // Check attempts (max 5)
+    if attempts >= 5 {
+        sqlx::query("DELETE FROM email_change_codes WHERE id = $1").bind(code_id).execute(&pool).await?;
+        return Err(AppError::BadRequest("Too many attempts. Please request a new code.".into()));
+    }
+
+    // Check expiry
+    if Utc::now() > expires_at {
+        sqlx::query("DELETE FROM email_change_codes WHERE id = $1").bind(code_id).execute(&pool).await?;
+        return Err(AppError::BadRequest("Code has expired. Please request a new one.".into()));
+    }
+
+    // Increment attempts
+    sqlx::query("UPDATE email_change_codes SET attempts = attempts + 1 WHERE id = $1")
+        .bind(code_id).execute(&pool).await?;
+
+    // Verify code (constant-time comparison via hash)
+    let input_hash = jwt::hash_token(&req.code);
+    if input_hash != code_hash {
+        return Err(AppError::BadRequest("Invalid code. Try again.".into()));
+    }
+
+    // Check email still available
+    let existing: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM customers WHERE LOWER(email) = LOWER($1) AND id != $2"
+    )
+    .bind(&new_email).bind(customer.id).fetch_optional(&pool).await?;
+    if existing.is_some() {
+        sqlx::query("DELETE FROM email_change_codes WHERE id = $1").bind(code_id).execute(&pool).await?;
+        return Err(AppError::BadRequest("This email is no longer available.".into()));
+    }
+
+    // Update email
+    sqlx::query("UPDATE customers SET email = $1, email_verified = true, updated_at = NOW() WHERE id = $2")
+        .bind(&new_email).bind(customer.id).execute(&pool).await?;
+
+    // Delete the code
+    sqlx::query("DELETE FROM email_change_codes WHERE id = $1")
+        .bind(code_id).execute(&pool).await?;
+
+    tracing::info!("✅ Email changed for customer {} to {}", customer.id, &new_email);
+    Ok(Json(serde_json::json!({
+        "message": "Email address has been changed successfully.",
+        "new_email": new_email
+    })))
+}
+
+fn generate_email_change_code() -> String {
+    use rand::Rng;
+    let mut rng = rand::rng();
+    let code: u32 = rng.random_range(100000..999999);
+    code.to_string()
+}
+
 // ════════════════════════════════════════════════════════
 
 #[cfg(test)]
