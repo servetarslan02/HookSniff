@@ -323,13 +323,14 @@ async fn process_webhook_result(
                 .await?;
 
                 // Clean up excess endpoints on downgrade
-                cleanup_excess_endpoints(pool, cid, &Plan::Developer).await?;
+                cleanup_excess_endpoints(pool, *cid, &Plan::Developer).await?;
 
                 // Create in-app notification
                 let pool_clone = pool.clone();
+                let cid_owned = *cid;
                 let provider_clone = provider.to_string();
                 tokio::spawn(async move {
-                    crate::notifications::helpers::payment_failed(&pool_clone, cid, &provider_clone).await;
+                    crate::notifications::helpers::payment_failed(&pool_clone, cid_owned, &provider_clone).await;
                 });
 
                 tracing::warn!(
