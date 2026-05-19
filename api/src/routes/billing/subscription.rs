@@ -146,41 +146,22 @@ pub async fn pause_subscription(
     let days = req.days.clamp(1, 90);
     let paused_until = Utc::now() + chrono::Duration::days(days as i64);
 
-    // Cancel subscription at payment provider
-    let billing_svc = BillingService::new(pool.clone(), cfg.clone());
-    match billing_svc.cancel_customer_subscription(&customer).await {
-        Ok(()) => {
-            tracing::info!(
-                "✅ Subscription canceled at provider for customer {} (pause)",
-                customer.id
-            );
-        }
-        Err(e) => {
-            // Log but don't block pause — subscription may already be canceled
-            tracing::warn!(
-                "⚠️ Failed to cancel at provider for customer {}: {:?} — proceeding with pause",
-                customer.id,
-                e
-            );
-        }
-    }
-
-    // Reduce limits to free tier during pause
+    // Step 1: Mark for pause at period end (not immediate)
+    // Customer keeps access until current period ends
+    // cancel_at_period_end = true → Polar won't charge next cycle
+    // pause_plan → preserved for resume
     let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
 
     sqlx::query(
         "UPDATE customers SET \
-         paused_at = NOW(), \
-         paused_until = $1, \
-         pause_plan = $2, \
-         webhook_limit = $3, \
-         cancel_at_period_end = false, \
+         cancel_at_period_end = true, \
+         pause_plan = $1, \
+         paused_until = $2, \
          updated_at = NOW() \
-         WHERE id = $4",
+         WHERE id = $3",
     )
-    .bind(paused_until)
     .bind(current_plan.as_str())
-    .bind(free_limit)
+    .bind(paused_until)
     .bind(customer.id)
     .execute(&pool)
     .await?;
@@ -191,7 +172,7 @@ pub async fn pause_subscription(
         let _ = crate::audit::log_action(
             &pool,
             customer.id,
-            "SUBSCRIPTION_PAUSE",
+            "SUBSCRIPTION_PAUSE_SCHEDULED",
             "billing",
             Some(&rid),
             Some(serde_json::json!({
@@ -205,7 +186,7 @@ pub async fn pause_subscription(
         .await;
     }
 
-    // Notification
+    // Notification — inform customer they keep access until period end
     let pool_clone = pool.clone();
     let plan_name = current_plan.as_str().to_string();
     let cid = customer.id;
@@ -214,11 +195,10 @@ pub async fn pause_subscription(
             &pool_clone,
             cid,
             "billing",
-            "⏸️ Abonelik Donduruldu",
+            "⏸️ Abonelik Dondurma Planlandı",
             &format!(
-                "{} plan aboneliğiniz {} gün donduruldu. {} tarihine kadar devam edebilirsiniz.",
+                "{} plan aboneliğiniz dönem sonunda dondurulacak. Mevcut döneminizin sonuna kadar hizmeti kullanmaya devam edebilirsiniz. {} tarihine kadar dondurma süresi dolmadan devam edebilirsiniz.",
                 plan_name,
-                days,
                 paused_until.format("%d.%m.%Y")
             ),
             Some("/billing-section"),
@@ -227,7 +207,7 @@ pub async fn pause_subscription(
     });
 
     tracing::info!(
-        "⏸️ Customer {} paused {} plan for {} days (until {})",
+        "⏸️ Customer {} scheduled pause for {} plan (max {} days, until {})",
         customer.id,
         current_plan.as_str(),
         days,
@@ -235,9 +215,10 @@ pub async fn pause_subscription(
     );
 
     Ok(Json(serde_json::json!({
-        "message": format!("Subscription paused for {} days. You can resume anytime before {}.", days, paused_until.format("%d.%m.%Y")),
+        "message": format!("Your subscription will be paused at the end of the current billing period. You can resume anytime before {}.", paused_until.format("%d.%m.%Y")),
         "paused_until": paused_until.to_rfc3339(),
         "plan_preserved": current_plan.as_str(),
+        "keeps_access_until_period_end": true,
     })))
 }
 
