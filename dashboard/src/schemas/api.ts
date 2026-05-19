@@ -588,6 +588,9 @@ export const SsoConfigSchema = z.object({
   issuer_url: z.string().optional(),
   client_id: z.string().optional(),
   client_secret_set: z.boolean().optional(),
+  default_team_id: z.string().uuid().nullable().optional(),
+  default_role: z.string().optional(),
+  default_team_name: z.string().nullable().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 });
