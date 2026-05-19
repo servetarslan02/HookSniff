@@ -43,6 +43,9 @@ fn validate_password_strength(password: &str) -> Result<(), AppError> {
     if password.len() < 8 {
         return Err(AppError::BadRequest("Password must be at least 8 characters".into()));
     }
+    if password.len() > 128 {
+        return Err(AppError::BadRequest("Password must be at most 128 characters".into()));
+    }
     if !password.chars().any(|c| c.is_ascii_uppercase()) {
         return Err(AppError::BadRequest("Password must contain at least one uppercase letter".into()));
     }

@@ -38,7 +38,10 @@ function toSlug(input: string): string {
 
 function setAuthCookie(token: string) {
   // Set cookie for middleware auth check — 7 day expiry
-  document.cookie = `hooksniff_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+  // Secure flag: only sent over HTTPS. SameSite=Lax: CSRF protection.
+  // Note: NOT HttpOnly — the frontend needs to read this for API calls.
+  // The server also sets an HttpOnly cookie via auth_response_with_cookie.
+  document.cookie = `hooksniff_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax; Secure`;
 }
 
 function clearAuthCookie() {
