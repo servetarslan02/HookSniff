@@ -273,7 +273,7 @@ pub async fn resume_subscription(
     // Create a new checkout to resume
     let billing_svc = BillingService::new(pool.clone(), cfg.clone());
     let result = billing_svc
-        .checkout(&customer, &resume_plan, None, false)
+        .checkout(&customer, &resume_plan, None, false, None)
         .await?;
 
     // Clear pause state
@@ -351,6 +351,9 @@ pub(crate) struct UpgradeRequest {
     /// Billing period: "monthly" (default) or "annual"
     #[serde(default)]
     billing_period: Option<String>,
+    /// Discount/coupon code to apply at checkout.
+    #[serde(default)]
+    discount_code: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -542,7 +545,7 @@ pub async fn upgrade_plan(
     }
 
     let result = billing_svc
-        .checkout(&customer, &new_plan, Some(&provider_name), req.billing_period.as_deref() == Some("annual"))
+        .checkout(&customer, &new_plan, Some(&provider_name), req.billing_period.as_deref() == Some("annual"), req.discount_code.as_deref())
         .await?;
 
     // Item 259: Validate checkout URL server-side before returning to client
