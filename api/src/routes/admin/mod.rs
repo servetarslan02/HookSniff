@@ -1,5 +1,6 @@
 pub mod alerts;
 pub mod audit;
+pub mod broadcasts;
 pub mod customers;
 pub mod delivery;
 pub mod export;
@@ -8,6 +9,7 @@ pub mod gdpr;
 pub mod monitoring;
 pub mod refunds;
 pub mod revenue;
+pub mod security;
 pub mod settings;
 pub mod stats;
 pub mod users;
@@ -124,7 +126,7 @@ pub fn router() -> Router {
         .route("/users/{id}/refund", post(refunds::admin_refund_user))
         .route("/users/{id}/refunds", get(refunds::admin_user_refunds))
         .route("/refunds", get(refunds::admin_all_refunds))
-        // ── GDPR + Bulk Email ──
+        // ── GDPR + Bulk Email + Broadcasts ──
         .route(
             "/users/{id}/export",
             get(gdpr::admin_export_user_data),
@@ -134,6 +136,22 @@ pub fn router() -> Router {
             delete(gdpr::admin_delete_user_data),
         )
         .route("/bulk-email", post(gdpr::admin_bulk_email))
+        // ── Broadcasts (global announcements) ──
+        .route(
+            "/broadcasts",
+            get(broadcasts::list_broadcasts).post(broadcasts::create_broadcast),
+        )
+        .route(
+            "/broadcasts/{id}",
+            get(broadcasts::get_broadcast)
+                .put(broadcasts::update_broadcast)
+                .delete(broadcasts::delete_broadcast),
+        )
+        // ── Security Monitoring ──
+        .route("/security/events", get(security::list_security_events))
+        .route("/security/stats", get(security::security_stats))
+        .route("/security/events/{id}/resolve", put(security::resolve_security_event))
+        .route("/security/resolve-all", post(security::resolve_all_security_events))
 }
 
 // ── Common Types ──────────────────────────────────────────

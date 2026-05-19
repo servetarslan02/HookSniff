@@ -11,6 +11,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
+import { BroadcastBanner } from '@/components/BroadcastBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
 import { LayoutDashboard, Smartphone, Link2, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield, BookOpen, ExternalLink, LogOut } from 'lucide-react';
@@ -233,6 +234,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         {/* Page content */}
         <main className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
           <EmailVerificationBanner />
+          <BroadcastBanner />
           <ErrorBoundary>
             {children}
           </ErrorBoundary>

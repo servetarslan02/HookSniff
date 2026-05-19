@@ -8,6 +8,7 @@ pub mod auth;
 pub mod auth_2fa;
 pub mod background_tasks;
 pub mod billing;
+pub mod broadcasts;
 pub mod contact;
 pub mod custom_domains;
 pub mod customer_portal;
@@ -100,6 +101,7 @@ pub fn api_router() -> Router {
         .nest("/portal", portal_config::router())
         .nest("/teams", teams::router())
         .nest("/notifications", notifications::router())
+        .nest("/broadcasts", broadcasts::router())
         .nest("/devices", devices::router())
         .nest("/audit-log", audit_log::router())
         .nest("/sso", sso::router())
@@ -168,6 +170,7 @@ mod tests {
         let _ = customer_portal::router();
         let _ = analytics::router();
         let _ = notifications::router();
+        let _ = broadcasts::router();
         let _ = search::router();
         let _ = playground::router();
         let _ = alerts::router();
