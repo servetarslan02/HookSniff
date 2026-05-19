@@ -89,7 +89,6 @@ export function TeamDetail({
   const t = useTranslations('team');
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(team.name);
-  const t = useTranslations('team');
 
   const adminCount = members.filter((m) => m.role === 'admin').length;
   const editorCount = members.filter((m) => m.role === 'editor').length;
