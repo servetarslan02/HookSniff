@@ -6,6 +6,10 @@
 ALTER TABLE customers
     ADD COLUMN IF NOT EXISTS current_period_end TIMESTAMPTZ;
 
+-- Track billing interval (month/year) for dunning schedule
+ALTER TABLE customers
+    ADD COLUMN IF NOT EXISTS billing_interval VARCHAR(10) DEFAULT 'month';
+
 -- Set current_period_end for existing paid customers (30 days from now as approximation)
 UPDATE customers
 SET current_period_end = NOW() + INTERVAL '30 days'
