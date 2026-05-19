@@ -44,6 +44,9 @@ pub fn router() -> Router {
         .route("/config", delete(delete_sso_config))
         // Test (authenticated)
         .route("/test", post(test_sso_connection))
+        // Domain verification
+        .route("/verify-domain", post(initiate_domain_verification))
+        .route("/verify-domain/check", post(check_domain_verification))
         // Provider lookup (public)
         .route("/providers", get(list_sso_providers))
 }
@@ -160,9 +163,10 @@ use tokio::sync::Mutex;
 #[derive(Clone)]
 pub struct SsoStateStore {
     states: Arc<Mutex<HashMap<String, SsoLoginState>>>,
+    redis: Option<redis::aio::ConnectionManager>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct SsoLoginState {
     customer_id: Uuid,
     email: String,
@@ -173,29 +177,61 @@ struct SsoLoginState {
     created_at: DateTime<Utc>,
 }
 
+const SSO_STATE_TTL_SECS: u64 = 600; // 10 minutes
+
 impl SsoStateStore {
     pub fn new() -> Self {
-        let store = Self {
+        Self {
             states: Arc::new(Mutex::new(HashMap::new())),
-        };
-        // Spawn cleanup task
-        let states = store.states.clone();
-        tokio::spawn(async move {
-            loop {
-                tokio::time::sleep(std::time::Duration::from_secs(300)).await;
-                let mut map = states.lock().await;
-                let cutoff = Utc::now() - Duration::minutes(10);
-                map.retain(|_, v| v.created_at > cutoff);
-            }
-        });
-        store
+            redis: None,
+        }
+    }
+
+    pub fn with_redis(mut self, redis: redis::aio::ConnectionManager) -> Self {
+        self.redis = Some(redis);
+        self
     }
 
     async fn insert(&self, state: String, login_state: SsoLoginState) {
-        self.states.lock().await.insert(state, login_state);
+        // Always write to in-memory as fallback
+        self.states.lock().await.insert(state.clone(), login_state.clone());
+        // Also write to Redis if available
+        if let Some(ref mut redis) = self.redis.clone() {
+            match serde_json::to_string(&login_state) {
+                Ok(json) => {
+                    let key = format!("sso:state:{}", state);
+                    let _: Result<(), _> = redis::cmd("SETEX")
+                        .arg(&key)
+                        .arg(SSO_STATE_TTL_SECS)
+                        .arg(&json)
+                        .query_async(redis)
+                        .await;
+                }
+                Err(e) => tracing::warn!("Failed to serialize SSO state: {}", e),
+            }
+        }
     }
 
     async fn remove(&self, state: &str) -> Option<SsoLoginState> {
+        // Try Redis first
+        if let Some(ref mut redis) = self.redis.clone() {
+            let key = format!("sso:state:{}", state);
+            let result: Result<Option<String>, _> = redis::cmd("GET")
+                .arg(&key)
+                .query_async(redis)
+                .await;
+            if let Ok(Some(json)) = result {
+                // Delete from Redis
+                let _: Result<(), _> = redis::cmd("DEL")
+                    .arg(&key)
+                    .query_async(redis)
+                    .await;
+                // Also remove from in-memory
+                self.states.lock().await.remove(state);
+                return serde_json::from_str(&json).ok();
+            }
+        }
+        // Fallback to in-memory
         self.states.lock().await.remove(state)
     }
 }
@@ -528,6 +564,172 @@ async fn delete_sso_config(
     Ok(Json(serde_json::json!({
         "deleted": result.rows_affected() > 0,
     })))
+}
+
+// ── Domain Verification ──────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct VerifyDomainRequest {
+    domain: String,
+}
+
+#[derive(Debug, Serialize)]
+struct VerifyDomainResponse {
+    txt_record: String,
+    instructions: String,
+}
+
+/// POST /sso/verify-domain — Generate TXT record for domain verification
+async fn initiate_domain_verification(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<VerifyDomainRequest>,
+) -> Result<Json<VerifyDomainResponse>, AppError> {
+    let domain = req.domain.trim().to_lowercase();
+
+    // Basic domain validation
+    if domain.is_empty() || !domain.contains('.') || domain.contains(' ') {
+        return Err(AppError::BadRequest("Invalid domain format".into()));
+    }
+
+    // Block common public domains
+    let blocked = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "aol.com", "icloud.com", "protonmail.com", "mail.com"];
+    if blocked.contains(&domain.as_str()) {
+        return Err(AppError::BadRequest("Cannot verify public email domains".into()));
+    }
+
+    // Generate verification token
+    let verification_token = format!("hooksniff-verify-{}", Uuid::new_v4());
+
+    // Store in DB (pending verification)
+    sqlx::query(
+        r#"INSERT INTO domain_verifications (customer_id, domain, txt_value, verified, created_at)
+           VALUES ($1, $2, $3, false, NOW())
+           ON CONFLICT (customer_id, domain) DO UPDATE SET txt_value = $3, verified = false, created_at = NOW()"#
+    )
+    .bind(customer.id)
+    .bind(&domain)
+    .bind(&verification_token)
+    .execute(&pool)
+    .await?;
+
+    tracing::info!("Domain verification initiated: {} for customer {}", domain, customer.id);
+
+    Ok(Json(VerifyDomainResponse {
+        txt_record: verification_token,
+        instructions: format!(
+            "Add a TXT record to your DNS: name: _hooksniff.{} value: {}",
+            domain, verification_token
+        ),
+    }))
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CheckDomainRequest {
+    domain: String,
+}
+
+#[derive(Debug, Serialize)]
+struct CheckDomainResponse {
+    verified: bool,
+    message: String,
+}
+
+/// POST /sso/verify-domain/check — Verify domain via DNS TXT record lookup
+async fn check_domain_verification(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<CheckDomainRequest>,
+) -> Result<Json<CheckDomainResponse>, AppError> {
+    let domain = req.domain.trim().to_lowercase();
+
+    // Get the expected TXT value from DB
+    let row: Option<(String,)> = sqlx::query_as(
+        "SELECT txt_value FROM domain_verifications WHERE customer_id = $1 AND domain = $2"
+    )
+    .bind(customer.id)
+    .bind(&domain)
+    .fetch_optional(&pool)
+    .await?;
+
+    let (expected_txt,) = match row {
+        Some(r) => r,
+        None => return Err(AppError::BadRequest("No pending verification for this domain".into())),
+    };
+
+    // DNS TXT record lookup
+    let txt_name = format!("_hooksniff.{}", domain);
+    let verified = match tokio::net::lookup_host(format!("{}:53", txt_name)).await {
+        // lookup_host doesn't work for TXT records, use a different approach
+        _ => {
+            // Use std::net DNS resolver via a simple check
+            // For production, consider using the `trust-dns-resolver` crate
+            // For now, we'll do a basic check using command execution
+            match tokio::process::Command::new("dig")
+                .args(["+short", "TXT", &txt_name])
+                .output()
+                .await
+            {
+                Ok(output) => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
+                    stdout.contains(&expected_txt)
+                }
+                Err(_) => {
+                    // dig not available, try nslookup
+                    match tokio::process::Command::new("nslookup")
+                        .args(["-type=TXT", &txt_name])
+                        .output()
+                        .await
+                    {
+                        Ok(output) => {
+                            let stdout = String::from_utf8_lossy(&output.stdout);
+                            stdout.contains(&expected_txt)
+                        }
+                        Err(_) => {
+                            return Err(AppError::Internal("DNS verification unavailable on this server".into()));
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    if verified {
+        // Mark as verified in DB
+        sqlx::query(
+            "UPDATE domain_verifications SET verified = true, verified_at = NOW() WHERE customer_id = $1 AND domain = $2"
+        )
+        .bind(customer.id)
+        .bind(&domain)
+        .execute(&pool)
+        .await?;
+
+        // Also update the SSO config verified_domain
+        sqlx::query(
+            "UPDATE sso_configs SET verified_domain = $1, updated_at = NOW() WHERE customer_id = $2"
+        )
+        .bind(&domain)
+        .bind(customer.id)
+        .execute(&pool)
+        .await?;
+
+        tracing::info!("Domain {} verified for customer {}", domain, customer.id);
+
+        Ok(Json(CheckDomainResponse {
+            verified: true,
+            message: format!("Domain {} verified successfully!", domain),
+        }))
+    } else {
+        Ok(Json(CheckDomainResponse {
+            verified: false,
+            message: format!(
+                "TXT record not found. Add a TXT record: name: _hooksniff.{} value: {}",
+                domain, expected_txt
+            ),
+        }))
+    }
 }
 
 // ── POST /sso/test ──────────────────────────────────────────
