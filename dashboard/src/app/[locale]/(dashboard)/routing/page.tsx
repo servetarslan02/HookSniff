@@ -7,13 +7,13 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
-import { Pencil, RefreshCw, Shield, Shuffle } from 'lucide-react';
+import { Dice5, Pencil, RefreshCw, Shield, Shuffle } from 'lucide-react';
 
 const STRATEGIES = [
   { value: 'round-robin', icon: <RefreshCw size={16} strokeWidth={1.75} />, descKey: 'roundRobinDesc' },
   { value: 'failover', icon: <Shield size={16} strokeWidth={1.75} />, descKey: 'failoverDesc' },
   { value: 'weighted', icon: '⚖️', descKey: 'weightedDesc' },
-  { value: 'random', icon: '🎲', descKey: 'randomDesc' },
+  { value: 'random', icon: <Dice5 size={16} strokeWidth={1.75} />, descKey: 'randomDesc' },
 ];
 
 export default function RoutingPage() {

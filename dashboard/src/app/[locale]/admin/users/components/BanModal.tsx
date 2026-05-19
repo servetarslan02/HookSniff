@@ -1,6 +1,7 @@
 'use client';
 
 import type { AdminUser } from '@/lib/api';
+import { Ban } from 'lucide-react';
 
 interface BanModalProps {
   banTarget: AdminUser | null;
@@ -28,7 +29,7 @@ export function BanModal({
       <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setBanTarget(null)} />
       <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          🚫 {t('banUser')}
+          <Ban size={14} className="inline mr-1 -mt-0.5" /> {t('banUser')}
         </h3>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
           {t('banUserConfirm', { email: banTarget.email }) || `Are you sure you want to ban ${banTarget.email}?`}

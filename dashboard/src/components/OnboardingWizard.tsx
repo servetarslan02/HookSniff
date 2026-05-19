@@ -10,7 +10,7 @@ import { loadState, saveState, SDKS } from './onboarding/types';
 import { Confetti } from './onboarding/Confetti';
 import { SetupChecklist } from './onboarding/SetupChecklist';
 import { SuccessToast } from './onboarding/SuccessToast';
-import { BarChart3, Bot, Check, CheckCircle2, CreditCard, FlaskConical, Key, Lightbulb, Link2, Mail, Package, Settings, ShoppingBag, Target } from 'lucide-react';
+import { BarChart3, Bot, Check, CheckCircle2, CreditCard, FlaskConical, Key, Lightbulb, Link2, Mail, Package, PartyPopper, Settings, ShoppingBag, Target } from 'lucide-react';
 
 export { SetupChecklist, SuccessToast };
 
@@ -67,7 +67,7 @@ export function OnboardingWizard() {
   }, []);
 
   const steps: WizardStep[] = [
-    { id: 'welcome', title: t('welcomeTitle'), description: t('welcomeWizardDesc'), icon: '🎉' },
+    { id: 'welcome', title: t('welcomeTitle'), description: t('welcomeWizardDesc'), icon: <PartyPopper size={16} strokeWidth={1.75} /> },
     { id: 'usecase', title: t('whatBuilding'), description: t('whatBuildingDesc'), icon: <Target size={16} strokeWidth={1.75} /> },
     { id: 'sdk', title: t('chooseSdk'), description: t('chooseSdkDesc'), icon: <Package size={16} strokeWidth={1.75} /> },
     { id: 'endpoint', title: t('createFirstEndpoint'), description: t('createFirstEndpointDesc'), icon: <Link2 size={16} strokeWidth={1.75} /> },
@@ -332,7 +332,7 @@ export function OnboardingWizard() {
 
             {currentStep.id === 'done' && (
               <div className="text-center">
-                <div className="text-6xl mb-4">🎉</div>
+                <div className="flex justify-center mb-4 text-green-500"><PartyPopper size={56} strokeWidth={1.5} /></div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t('allSetTitle')}</h2>
                 <p className="text-gray-600 dark:text-slate-400 max-w-md mx-auto mb-6">
                   {t('allSetDesc')}

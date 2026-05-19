@@ -121,7 +121,7 @@ export default function TemplatesPage() {
                 {/* Stats */}
                 <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-slate-400 mb-4">
                   <span><Radio size={16} strokeWidth={1.75} className="inline mr-1" /> {tpl.event_types.length} events</span>
-                  {tpl.estimated_daily_volume && <span>📊 ~{tpl.estimated_daily_volume.toLocaleString()}/day</span>}
+                  {tpl.estimated_daily_volume && <span className="inline-flex items-center gap-1"><BarChart3 size={14} strokeWidth={1.75} /> ~{tpl.estimated_daily_volume.toLocaleString()}/day</span>}
                   {tpl.agents && tpl.agents.length > 0 && <span><Bot size={16} strokeWidth={1.75} className="inline mr-1" /> {tpl.agents.length} agents</span>}
                 </div>
 

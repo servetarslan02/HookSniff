@@ -1,16 +1,18 @@
 'use client';
 
+import { Inbox, type LucideIcon } from 'lucide-react';
+
 interface EmptyStateProps {
-  icon?: string;
+  icon?: React.ReactNode;
   title: string;
   description?: string;
   action?: { label: string; onClick: () => void };
 }
 
-export default function EmptyState({ icon = '📭', title, description, action }: EmptyStateProps) {
+export default function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
     <div className="glass-card p-6 sm:p-8 lg:p-12 text-center">
-      <div className="text-4xl sm:text-5xl mb-4">{icon}</div>
+      <div className="text-4xl sm:text-5xl mb-4 text-gray-400 dark:text-slate-500 flex justify-center">{icon || <Inbox size={48} strokeWidth={1.5} />}</div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
       {description && <p className="text-sm text-gray-500 dark:text-slate-400 mb-6 max-w-md mx-auto">{description}</p>}
       {action && (

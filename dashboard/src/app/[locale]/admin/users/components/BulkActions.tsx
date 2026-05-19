@@ -1,4 +1,4 @@
-import { CheckCircle2, ClipboardList, X } from 'lucide-react';
+import { Ban, CheckCircle2, ClipboardList, X } from 'lucide-react';
 'use client';
 
 interface PlanOption {
@@ -46,7 +46,7 @@ export function BulkActions({
               onClick={() => setBulkAction('ban')}
               className="px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 transition"
             >
-              🚫 {t('bulkBan') || 'Ban Selected'}
+              <Ban size={14} className="inline mr-1 -mt-0.5" /> {t('bulkBan') || 'Ban Selected'}
             </button>
             <button type="button"
               onClick={() => setBulkAction('unban')}

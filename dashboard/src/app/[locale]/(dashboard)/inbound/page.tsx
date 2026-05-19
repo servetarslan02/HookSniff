@@ -201,7 +201,7 @@ export default function InboundPage() {
                 <div key={cfg.id} className={`p-4 rounded-xl border transition ${isEditing ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-500/5' : 'border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-950'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="text-xl">{provider?.icon || '🔗'}</span>
+                      <span className="text-xl">{provider?.icon || <Link2 size={16} strokeWidth={1.75} />}</span>
                       <div>
                         <div className="text-sm font-medium text-gray-900 dark:text-white">{provider?.name || cfg.provider}</div>
                         <div className="text-xs text-gray-500 dark:text-slate-400 flex items-center gap-2">

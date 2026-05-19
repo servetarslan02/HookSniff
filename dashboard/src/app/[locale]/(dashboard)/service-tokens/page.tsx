@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useServiceTokens, useCreateServiceToken, useDeleteServiceToken, useRevealServiceToken, useUpdateServiceToken } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList, Eye, EyeOff } from 'lucide-react';
 
 export default function ServiceTokensPage() {
   const { user } = useAuth();
@@ -150,7 +150,7 @@ export default function ServiceTokensPage() {
                   <td className="px-3 sm:px-6 py-3">
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <code className="text-xs font-mono text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-gray-700 px-1.5 sm:px-2 py-1 rounded-sm select-all truncate max-w-[120px] sm:max-w-none">{revealedTokens[tok.id] || tok.token_prefix || '••••••••••••••••'}</code>
-                      <button onClick={() => handleReveal(tok.id)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={revealedTokens[tok.id] ? t('hide') : t('reveal')}>👁</button>
+                      <button onClick={() => handleReveal(tok.id)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={revealedTokens[tok.id] ? t('hide') : t('reveal')}>{revealedTokens[tok.id] ? <EyeOff size={16} strokeWidth={1.75} /> : <Eye size={16} strokeWidth={1.75} />}</button>
                       <button onClick={() => handleCopy(revealedTokens[tok.id] || tok.token_prefix || '')} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition hidden sm:inline-flex" title={tc('copyToClipboard')}><ClipboardList size={18} strokeWidth={1.75} /></button>
                     </div>
                   </td>

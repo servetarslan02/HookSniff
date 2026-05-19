@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
-import { BarChart3, Check, DollarSign, Link2, TrendingDown } from 'lucide-react';
+import { BarChart3, Check, DollarSign, Inbox, Link2, TrendingDown } from 'lucide-react';
 
 const PLAN_COLORS: Record<string, React.ReactNode> = {
   developer: '#94a3b8',
@@ -481,7 +481,7 @@ export default function RevenueContent({
           </div>
         ) : (
           <div className="px-6 py-8 text-center">
-            <div className="text-3xl mb-2" aria-hidden="true">💸</div>
+            <div className="flex justify-center mb-2 text-gray-400" aria-hidden="true"><Inbox size={28} strokeWidth={1.5} /></div>
             <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noRefunds') || 'No refunds yet'}</p>
           </div>
         )}

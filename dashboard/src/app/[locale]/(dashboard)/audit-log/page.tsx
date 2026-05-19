@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuditLogs } from '@/hooks/useDashboardData';
-import { ClipboardList, CreditCard, Image, Key, Link2, Package, Pencil, RefreshCw, Settings, Trash2, User, Users } from 'lucide-react';
+import { ClipboardList, CreditCard, Image, Key, Link2, LogOut, Package, Pencil, Pin, RefreshCw, Settings, Trash2, User, UserMinus, Users } from 'lucide-react';
 
 /* ─── Types ─── */
 const ACTION_ICONS: Record<string, React.ReactNode> = {
   'auth.login': <Key size={16} strokeWidth={1.75} />,
-  'auth.logout': '👋',
+  'auth.logout': <LogOut size={16} strokeWidth={1.75} />,
   'auth.register': <User size={16} strokeWidth={1.75} />,
   'endpoint.create': <Link2 size={16} strokeWidth={1.75} />,
   'endpoint.update': <Pencil size={16} strokeWidth={1.75} />,
@@ -19,7 +19,7 @@ const ACTION_ICONS: Record<string, React.ReactNode> = {
   'webhook.send': <Package size={16} strokeWidth={1.75} />,
   'webhook.replay': <RefreshCw size={16} strokeWidth={1.75} />,
   'team.invite': <Users size={16} strokeWidth={1.75} />,
-  'team.remove': '👋',
+  'team.remove': <UserMinus size={16} strokeWidth={1.75} />,
   'settings.update': <Settings size={16} strokeWidth={1.75} />,
   'billing.update': <CreditCard size={16} strokeWidth={1.75} />,
   'schema.create': <ClipboardList size={16} strokeWidth={1.75} />,
@@ -99,7 +99,7 @@ export default function AuditLogPage() {
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex items-center gap-1.5 sm:gap-2">
-                        <span>{ACTION_ICONS[entry.action] || '📌'}</span>
+                        <span>{ACTION_ICONS[entry.action] || <Pin size={16} strokeWidth={1.75} />}</span>
                         <span className="text-xs sm:text-sm font-mono text-gray-900 dark:text-white">{entry.action}</span>
                       </div>
                     </td>
