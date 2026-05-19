@@ -59,3 +59,43 @@ Custom Domain sayfası detaylı incelendi. 14 sorun tespit edildi, hepsi düzelt
 - `docs/monitor-performance/page.tsx`: Kullanılmayan `Link` import
 
 ### Commit: `e2507674`
+
+---
+
+# 2026-05-19 — Ortamlar Sayfası Kapsamlı Denetim + Upgrade
+
+## Yapılan İşler
+Environments sayfası detaylı incelendi. Backend'de tam CRUD + variable yönetimi varken frontend'de büyük eksikler tespit edildi. Sayfa baştan yeniden yazıldı.
+
+## Tespit Edilen Sorunlar ve Düzeltmeler
+
+### 🔴 Kritik (3)
+1. **Edit fonksiyonu yoktu** → Edit modal eklendi (name, description, color, set default)
+2. **Variable yönetimi yoktu** → Slide-over panel eklendi (list, create, delete variables)
+3. **Delete onayı yoktu** → Confirmation modal eklendi (default env uyarısı ile)
+
+### 🟡 Orta (3)
+4. **"Set as default" sadece creation'da** → Edit modalında da checkbox eklendi
+5. **Loading skeleton yoktu** → 3 kart skeleton eklendi
+6. **Hata durumu + retry yoktu** → Error state + retry butonu eklendi
+
+### 🟢 Düşük (1)
+7. **Boş durum butonu yoktu** → CTA butonu eklendi ("Create your first")
+
+## Yeni Özellikler
+- Renk seçici (preset swatch'lar + custom color picker)
+- Secret değişkenler gizli gösterim (••••••••)
+- Variable panelinde hover-reveal delete butonu
+- Default ortam silme uyarısı
+
+## Değişilen Dosyalar
+- `dashboard/.../environments/page.tsx` — Tam yeniden yazım
+- `dashboard/src/messages/en.json` — 22 yeni key
+- `dashboard/src/messages/tr.json` — 22 yeni key
+- `dashboard/src/__tests__/environments-page.test.tsx` — 17 test
+
+## Test Sonuçları
+- Vitest: 17/17 ✅
+- Build: ✅
+
+## Commit: `ed7d7715`
