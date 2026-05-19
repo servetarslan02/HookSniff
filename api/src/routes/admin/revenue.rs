@@ -443,7 +443,6 @@ mod tests {
         assert_eq!(json["cohort_month"], "2026-01");
         assert_eq!(json["retention_rate"], 70.0);
     }
-}
 
     #[test]
     fn test_payment_transaction_row_serialization() {
@@ -463,3 +462,4 @@ mod tests {
         assert_eq!(json["status"], "completed");
         assert_eq!(json["metadata"]["plan"], "pro");
     }
+}
