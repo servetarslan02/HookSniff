@@ -674,7 +674,7 @@ async fn initiate_domain_verification(
     tracing::info!("Domain verification initiated: {} for customer {}", domain, customer.id);
 
     Ok(Json(VerifyDomainResponse {
-        txt_record: verification_token,
+        txt_record: verification_token.clone(),
         instructions: format!(
             "Add a TXT record to your DNS: name: _hooksniff.{} value: {}",
             domain, verification_token
@@ -996,10 +996,10 @@ async fn initiate_sso_login(
 
     // Strategy 2: Find SSO config — try by customer_id, then by team membership, then by domain
     // Returns: (owner_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_enc, entity_id)
-    let config: Option<(Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)> = if let Some(ref customer) = existing_customer {
+    let config: Option<(Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)> = if let Some(ref customer) = existing_customer {
         // Existing user: look up by customer_id first (backward compat)
-        let by_customer = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-            "SELECT customer_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
+        let by_customer = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT customer_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
         )
         .bind(customer.id)
         .fetch_optional(&pool)
@@ -1009,8 +1009,8 @@ async fn initiate_sso_login(
             by_customer
         } else {
             // Try: find by team membership (user is in a team that has SSO)
-            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted
+            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id
                  FROM sso_configs s
                  INNER JOIN team_members tm ON tm.team_id = s.team_id
                  WHERE tm.customer_id = $1 AND s.enabled = true AND s.team_id IS NOT NULL
@@ -1125,6 +1125,9 @@ async fn initiate_sso_login(
         card_exp_month: None,
         card_exp_year: None,
         card_updated_at: None,
+        paused_at: None,
+        paused_until: None,
+        pause_plan: None,
     });
 
     if provider == "saml" {
