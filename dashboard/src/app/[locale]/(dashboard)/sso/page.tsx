@@ -7,12 +7,14 @@ import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import { useSsoConfig } from '@/hooks/useDashboardData';
 
-/* ─── SSO/SAML Configuration Page ─── */
+/* ─── SSO/SAML Configuration Page (Enterprise Only) ─── */
 export default function SsoSettingsPage() {
   const t = useTranslations('sso');
   const { token, user } = useAuth();
   const { toast } = useToast();
   const { data: ssoConfig, isLoading: loading } = useSsoConfig();
+
+  const isEnterprise = user?.plan === 'enterprise';
 
   const [provider, setProvider] = useState<'saml' | 'oidc'>('saml');
   const [metadata, setMetadata] = useState('');
@@ -32,7 +34,6 @@ export default function SsoSettingsPage() {
       setMetadata(ssoConfig.metadata_url || ssoConfig.issuer_url || '');
       setEntityId(ssoConfig.entity_id || ssoConfig.client_id || '');
       setSsoUrl(ssoConfig.sso_url || '');
-      // certificate_set tells us if one exists, but we don't load it for security
     }
   }, [ssoConfig]);
 
@@ -87,7 +88,6 @@ export default function SsoSettingsPage() {
       const { ssoApi } = await import('@/lib/api');
       await ssoApi.deleteSso(token);
       toast(t('deleted'), 'success');
-      // Reset form
       setEnabled(false);
       setMetadata('');
       setEntityId('');
@@ -115,6 +115,35 @@ export default function SsoSettingsPage() {
     );
   }
 
+  // ── Non-Enterprise: show upgrade prompt ──
+  if (!isEnterprise) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+        </div>
+
+        <div className="glass-card p-8 text-center">
+          <div className="text-5xl mb-4">🔐</div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            {t('enterpriseOnlyTitle') || 'SSO requires an Enterprise plan'}
+          </h2>
+          <p className="text-gray-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
+            {t('enterpriseOnlyDesc') || 'Single Sign-On is available for Enterprise customers. Contact sales to enable SSO for your organization.'}
+          </p>
+          <a
+            href="/pricing"
+            className="inline-block px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition"
+          >
+            {t('upgradeNow')}
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Enterprise: show full SSO config ──
   const hasConfig = ssoConfig?.provider;
 
   return (
@@ -320,13 +349,6 @@ export default function SsoSettingsPage() {
           </div>
         </div>
       )}
-
-      {/* Info */}
-      <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-4">
-        <p className="text-sm text-blue-700 dark:text-blue-400">
-          {t('upgradeHint1')}<strong>{t('upgradeHintBold')}</strong>{t('upgradeHint2')}<a href="/pricing" className="underline">{t('upgradeNow')}</a>{t('upgradeHintSuffix')}
-        </p>
-      </div>
     </div>
   );
 }

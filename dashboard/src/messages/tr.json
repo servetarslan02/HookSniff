@@ -2850,7 +2850,7 @@
   },
   "sso": {
     "title": "🔐 SSO / SAML",
-    "subtitle": "Kuruluşunuz için Tek Oturum Açma yapılandırması. Business planı veya üzeri gereklidir.",
+    "subtitle": "Kuruluşunuz için Tek Oturum Açma yapılandırması. Enterprise planı gereklidir.",
     "provider": "Sağlayıcı",
     "samlConfiguration": "SAML Yapılandırması",
     "metadataUrl": "Metadata URL'si",
@@ -2883,7 +2883,9 @@
     "certificateSet": "Sertifika yapılandırılmış",
     "clientSecretSet": "İstemci gizli anahtarı yapılandırılmış",
     "ssoLoginUrl": "SSO Giriş URLsi",
-    "ssoLoginUrlDesc": "SSO girişini başlatmak için bu URLyi ekip üyelerinizle paylaşın."
+    "ssoLoginUrlDesc": "SSO girişini başlatmak için bu URLyi ekip üyelerinizle paylaşın.",
+    "enterpriseOnlyTitle": "SSO için Enterprise planı gereklidir",
+    "enterpriseOnlyDesc": "Tek Oturum Açma (SSO) Enterprise müşterileri için kullanılabilir. Kuruluşunuzda SSO etkinleştirmek için satış ekibiyle iletişime geçin."
   },
   "endpointSettings": {
     "title": "Endpoint Ayarları",
