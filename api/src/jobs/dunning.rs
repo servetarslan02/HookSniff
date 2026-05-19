@@ -434,7 +434,7 @@ fn tpl_dunning_en(plan: &str, days_remaining: i64) -> (String, String) {
 
     <div style="text-align: center; margin-bottom: 24px;">
       <div style="display: inline-block; background: {urgency_color}; color: white; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600;">
-        {days_remaining} day{} left
+        {days_remaining} day{s} left
       </div>
     </div>
 
@@ -442,7 +442,7 @@ fn tpl_dunning_en(plan: &str, days_remaining: i64) -> (String, String) {
       Subscription Expiring
     </h1>
     <p style="color: #6b7280; text-align: center; font-size: 16px; margin-bottom: 32px;">
-      Your <strong>{plan}</strong> plan expires in <strong>{days_remaining} day{}</strong>.
+      Your <strong>{plan}</strong> plan expires in <strong>{days_remaining} day{s}</strong>.
     </p>
 
     <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin-bottom: 24px;">

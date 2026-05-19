@@ -762,7 +762,7 @@ async fn check_domain_verification(
                                     }
                                     Err(_) => {
                                         return Err(AppError::Internal(
-                                            "DNS verification unavailable. Please use the API to verify domain.".into()
+                                            anyhow::anyhow!("DNS verification unavailable. Please use the API to verify domain.")
                                         ));
                                     }
                                 }
@@ -1022,8 +1022,8 @@ async fn initiate_sso_login(
         }
     } else {
         // New user: find SSO config by verified_domain first, then by email domain
-        let by_verified_domain = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-            "SELECT COALESCE(customer_id, created_by), team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted
+        let by_verified_domain = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT COALESCE(customer_id, created_by), team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id
              FROM sso_configs WHERE enabled = true AND verified_domain = $1 LIMIT 1"
         )
         .bind(domain)
@@ -1035,8 +1035,8 @@ async fn initiate_sso_login(
         } else {
             // Fallback: match by email domain in customer table
             // Use SPLIT_PART for safe domain extraction (parameterized, no injection)
-            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted
+            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id
                  FROM sso_configs s
                  INNER JOIN customers c ON c.id = s.customer_id
                  WHERE s.enabled = true AND SPLIT_PART(c.email, '@', 2) = $1
@@ -1125,7 +1125,6 @@ async fn initiate_sso_login(
         card_exp_month: None,
         card_exp_year: None,
         card_updated_at: None,
-        platform: None,
     });
 
     if provider == "saml" {
@@ -1144,7 +1143,7 @@ async fn initiate_saml_login(
     sso_url: &Option<String>,
     entity_id: &Option<String>,
     request_id: Option<&str>,
-) -> Result<impl axum::response::IntoResponse, AppError> {
+) -> Result<(HeaderMap, Redirect), AppError> {
     let sso_url = sso_url.as_deref().ok_or_else(|| {
         AppError::Internal(anyhow::anyhow!("SAML SSO URL not configured"))
     })?;
@@ -1194,7 +1193,7 @@ async fn initiate_saml_login(
     let mut headers = HeaderMap::new();
     headers.insert(
         "location",
-        axum::http::HeaderValue::from_str(&redirect_url).unwrap_or_default(),
+        axum::http::HeaderValue::from_str(&redirect_url).unwrap(),
     );
     Ok((headers, Redirect::temporary(&redirect_url)))
 }
@@ -1208,7 +1207,7 @@ async fn initiate_oidc_login(
     issuer_url: &Option<String>,
     client_id: &Option<String>,
     client_secret_enc: &Option<String>,
-) -> Result<impl axum::response::IntoResponse, AppError> {
+) -> Result<(HeaderMap, Redirect), AppError> {
     let issuer = issuer_url.as_deref().ok_or_else(|| {
         AppError::Internal(anyhow::anyhow!("OIDC issuer URL not configured"))
     })?;
@@ -1258,7 +1257,7 @@ async fn initiate_oidc_login(
     let mut headers = HeaderMap::new();
     headers.insert(
         "location",
-        axum::http::HeaderValue::from_str(&auth_url).unwrap_or_default(),
+        axum::http::HeaderValue::from_str(&auth_url).unwrap(),
     );
     Ok((headers, Redirect::temporary(&auth_url)))
 }
@@ -1728,10 +1727,12 @@ async fn verify_jwt_signature(
         k.get("kid").and_then(|v| v.as_str()).unwrap_or("") == kid
     }).or_else(|| keys.first()); // Fallback to first key if kid not found
 
-    let jwk = matching_key.ok_or_else(|| AppError::BadRequest("No matching key found in JWKS".into()))?;
+    let jwk_value = matching_key.ok_or_else(|| AppError::BadRequest("No matching key found in JWKS".into()))?;
 
     // Use jsonwebtoken crate for verification
-    let decoding_key = jsonwebtoken::DecodingKey::from_jwk(jwk)
+    let jwk: jsonwebtoken::jwk::Jwk = serde_json::from_value(jwk_value.clone())
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to parse JWK: {}", e)))?;
+    let decoding_key = jsonwebtoken::DecodingKey::from_jwk(&jwk)
         .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to create DecodingKey from JWK: {}", e)))?;
 
     let algorithm = match alg.as_str() {
@@ -1788,18 +1789,18 @@ async fn find_or_create_sso_customer(
     }
 
     // Auto-provision new customer
-    let name = attributes.get("name")
+    let name: Option<String> = attributes.get("name")
         .or_else(|| attributes.get("displayName"))
+        .map(|s| s.clone())
         .or_else(|| {
             let first = attributes.get("given_name").or_else(|| attributes.get("firstName"));
             let last = attributes.get("family_name").or_else(|| attributes.get("lastName"));
             match (first, last) {
-                (Some(f), Some(l)) => Some(&format!("{} {}", f, l)[..].to_string()),
-                (Some(f), None) => Some(f),
+                (Some(f), Some(l)) => Some(format!("{} {}", f, l)),
+                (Some(f), None) => Some(f.clone()),
                 _ => None,
             }
-        })
-        .cloned();
+        });
 
     let api_key = generate_api_key();
     let api_key_hash = hash_api_key(&api_key);
@@ -1889,7 +1890,7 @@ async fn auto_join_default_team(
     .fetch_optional(pool)
     .await?;
 
-    let (Some(team_id), Some(role)) = config else {
+    let Some((Some(team_id), Some(role))) = config else {
         return Ok(()); // No default team configured
     };
 
@@ -1964,9 +1965,9 @@ async fn generate_sso_response(
     let refresh_cookie = create_refresh_token_cookie(&refresh_token, 30 * 86400);
 
     let mut headers = HeaderMap::new();
-    headers.insert("set-cookie", axum::http::HeaderValue::from_str(&auth_cookie).unwrap_or_default());
-    headers.append("set-cookie", axum::http::HeaderValue::from_str(&refresh_cookie).unwrap_or_default());
-    headers.insert("location", axum::http::HeaderValue::from_str(&redirect_url).unwrap_or_default());
+    headers.insert("set-cookie", axum::http::HeaderValue::from_str(&auth_cookie).unwrap());
+    headers.append("set-cookie", axum::http::HeaderValue::from_str(&refresh_cookie).unwrap());
+    headers.insert("location", axum::http::HeaderValue::from_str(&redirect_url).unwrap());
 
     Ok((headers, Redirect::temporary(&redirect_url)))
 }

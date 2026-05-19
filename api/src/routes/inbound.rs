@@ -327,7 +327,7 @@ fn verify_twilio(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &
         .ok_or("Missing x-twilio-signature header")?;
 
     // Twilio uses SHA1 for signature (not SHA256)
-    use hmac::{Hmac, Mac};
+    use hmac::{Hmac, KeyInit, Mac};
     use sha1::Sha1;
     type HmacSha1 = Hmac<Sha1>;
 
