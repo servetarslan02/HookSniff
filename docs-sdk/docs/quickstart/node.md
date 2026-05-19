@@ -7,159 +7,168 @@ sidebar_position: 1
 ## Installation
 
 ```bash
-npm install hooksniff-sdk
+npm install hooksniff
 ```
 
 ## Setup
 
-```javascript
-const { HookSniff, Webhook } = require('hooksniff-sdk');
+```typescript
+import { HookSniff } from 'hooksniff';
 
 // Initialize client
-const client = new HookSniff('sk_live_your_api_key');
+const hs = new HookSniff({ apiKey: process.env.HOOKSNIFF_API_KEY! });
 
-// Or with options
-const client = new HookSniff('sk_live_your_api_key', {
+// With custom options
+const hs = new HookSniff({
+  apiKey: process.env.HOOKSNIFF_API_KEY!,
   baseUrl: 'https://hooksniff-api-1046140057667.europe-west1.run.app',
   timeout: 30000,
 });
 ```
 
-## Endpoints
+## Create an Endpoint
 
-```javascript
-// List all endpoints
-const endpoints = await client.endpoints.list();
-
-// Create an endpoint
-const endpoint = await client.endpoints.create({
-  url: 'https://example.com/webhook',
-  description: 'My webhook endpoint',
-  rate_limit: 100,
+```typescript
+const endpoint = await hs.endpoint.create({
+  url: 'https://myapp.com/webhook',
+  description: 'Order notifications',
+  event_types: ['order.created', 'order.updated'],
 });
 
-// Get a specific endpoint
-const details = await client.endpoints.get(endpoint.id);
-
-// Update an endpoint
-const updated = await client.endpoints.update(endpoint.id, {
-  url: 'https://new-url.com/webhook',
-});
-
-// Delete an endpoint
-await client.endpoints.delete(endpoint.id);
-
-// Rotate signing secret
-const { key } = await client.endpoints.rotateSecret(endpoint.id);
+console.log('Endpoint ID:', endpoint.id);
+console.log('Signing secret:', endpoint.secret); // → whsec_...
 ```
 
-## Webhooks
+## Send a Webhook
 
-```javascript
-// Send a webhook
-const delivery = await client.webhooks.send({
+```typescript
+const delivery = await hs.message.create({
   endpoint_id: endpoint.id,
-  event_type: 'order.created',
-  data: { order_id: '12345', amount: 99.99 },
+  event: 'order.created',
+  data: {
+    order_id: 'ORD-12345',
+    amount: 99.99,
+    currency: 'USD',
+  },
 });
 
-// List deliveries
-const deliveries = await client.webhooks.list({
-  status: 'delivered',
-  page: 1,
-});
-
-// Replay a delivery
-await client.webhooks.replay(delivery.id);
-
-// Batch send
-const batch = await client.webhooks.batch({
-  endpoint_id: endpoint.id,
-  events: [
-    { event_type: 'order.created', data: { order_id: '1' } },
-    { event_type: 'order.created', data: { order_id: '2' } },
-  ],
-});
+console.log('Delivery ID:', delivery.id);
+console.log('Status:', delivery.status);
 ```
 
-## Webhook Verification
+## Verify Incoming Webhooks
 
-Verify incoming webhook signatures in your endpoint handler:
+```typescript
+import { Webhook } from 'hooksniff';
 
-```javascript
-const { Webhook } = require('hooksniff-sdk');
+const wh = new Webhook('whsec_your_signing_secret');
 
-const webhook = new Webhook('whsec_your_signing_secret');
-
-app.post('/webhook', (req, res) => {
+// Express handler
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   try {
-    const payload = webhook.verify(req.body, {
-      'webhook-id': req.headers['webhook-id'],
-      'webhook-timestamp': req.headers['webhook-timestamp'],
-      'webhook-signature': req.headers['webhook-signature'],
+    const payload = wh.verify(req.body, {
+      'webhook-id': req.headers['webhook-id']!,
+      'webhook-timestamp': req.headers['webhook-timestamp']!,
+      'webhook-signature': req.headers['webhook-signature']!,
     });
 
-    // Payload is verified — process it
-    console.log('Received event:', payload);
+    console.log('Event:', payload.event);
+    console.log('Data:', payload.data);
     res.status(200).send('OK');
   } catch (err) {
-    // Invalid signature
     res.status(401).send('Invalid signature');
   }
 });
 ```
 
+## List Deliveries
+
+```typescript
+// Single page
+const deliveries = await hs.message_attempt.list_by_endpoint({
+  endpoint_id: endpoint.id,
+  limit: 20,
+});
+
+for (const attempt of deliveries.data) {
+  console.log(`${attempt.id}: ${attempt.response_status_code}`);
+}
+
+// Auto-paginate all
+for await (const attempt of hs.message_attempt.listByEndpointIterator({
+  endpoint_id: endpoint.id,
+})) {
+  console.log(attempt.id, attempt.response_status_code);
+}
+```
+
 ## Other Resources
 
-```javascript
-// Auth
-await client.auth.register({ email: 'user@example.com', password: 'pass' });
-await client.auth.login({ email: 'user@example.com', password: 'pass' });
+```typescript
+// Authentication
+await hs.authentication.register({ email: 'user@example.com', password: 'pass' });
+const login = await hs.authentication.login({ email: 'user@example.com', password: 'pass' });
 
 // API Keys
-const keys = await client.apiKeys.list();
-const newKey = await client.apiKeys.create({ name: 'Production' });
+const keys = await hs.apiKey.list();
+const newKey = await hs.apiKey.create({ name: 'Production' });
 
 // Analytics
-const stats = await client.analytics.stats();
-const trends = await client.analytics.trends({ period: '7d' });
+const stats = await hs.analytics.delivery_trend({ period: '7d' });
+const successRate = await hs.analytics.success_rate();
 
 // Billing
-const plans = await client.billing.plans();
-await client.billing.upgrade({ plan: 'pro' });
+const plans = await hs.billing.plans();
+await hs.billing.upgrade({ plan: 'pro' });
 
 // Teams
-const members = await client.teams.members();
-await client.teams.invite({ email: 'colleague@example.com', role: 'member' });
+const members = await hs.team.list();
+await hs.team.invite({ email: 'colleague@example.com', role: 'member' });
 
 // Alerts
-const rules = await client.alerts.list();
-await client.alerts.create({
+const rules = await hs.alert.list();
+await hs.alert.create({
   name: 'High failure rate',
   condition: 'failure_rate > 10%',
   endpoint_id: endpoint.id,
 });
 
 // Search
-const results = await client.search.query({
+const results = await hs.search.query({
   query: 'order.created',
   filters: { status: 'failed' },
 });
 
+// Streaming
+const stream = hs.stream.subscribe({
+  event_types: ['delivery.completed', 'delivery.failed'],
+});
+stream.on('event', (event) => {
+  console.log(`[${event.event}]`, event.data);
+});
+
 // Health
-const health = await client.health.check();
+const health = await hs.health.check();
 ```
 
 ## Error Handling
 
-```javascript
+```typescript
+import { HookSniff, HttpError, ValidationError } from 'hooksniff';
+
 try {
-  await client.endpoints.get('nonexistent');
+  await hs.endpoint.get('nonexistent');
 } catch (err) {
-  if (err.name === 'ApiException') {
-    console.error(`API Error ${err.code}: ${err.body}`);
+  if (err instanceof HttpError) {
+    console.error(`HTTP ${err.statusCode}: ${err.message}`);
+    if (err.statusCode === 429) {
+      const retryAfter = err.headers['retry-after'];
+      console.log(`Retry after ${retryAfter} seconds`);
+    }
+  } else if (err instanceof ValidationError) {
+    console.error('Validation failed:', err.errors);
   } else {
-    console.error('Network error:', err.message);
+    throw err;
   }
 }
 ```

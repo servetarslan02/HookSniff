@@ -28,10 +28,10 @@ implementation 'io.github.servetarslan02:hooksniff-sdk:0.3.0'
 import com.hooksniff.sdk.HookSniff;
 
 // Initialize client
-HookSniff client = new HookSniff("sk_live_your_api_key");
+HookSniff client = new HookSniff("hr_live_your_api_key");
 
 // Or with options
-HookSniff client = new HookSniff("sk_live_your_api_key", 
+HookSniff client = new HookSniff("hr_live_your_api_key", 
     "https://hooksniff-api-1046140057667.europe-west1.run.app", 30000);
 ```
 

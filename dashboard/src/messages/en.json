@@ -1138,7 +1138,16 @@
     "developer": "Developer",
     "startup": "Startup",
     "enterprise": "Enterprise",
-    "unlimited": "Unlimited"
+    "unlimited": "Unlimited",
+    "javaSdk": "Java",
+    "kotlinSdk": "Kotlin",
+    "swiftSdk": "Swift",
+    "webhookVerification": "Webhook Verification",
+    "migrationFromSvix": "Migration from Svix",
+    "realWorldExamples": "Real-World Examples",
+    "streamingAndRateLimiting": "Streaming & Rate Limiting",
+    "paginationGuide": "Pagination",
+    "errorHandlingGuide": "Error Handling"
   },
   "status": {
     "title": "HookSniff Status",

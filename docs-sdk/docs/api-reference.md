@@ -15,7 +15,7 @@ https://hooksniff-api-1046140057667.europe-west1.run.app
 All API requests require a Bearer token in the Authorization header:
 
 ```
-Authorization: Bearer sk_live_your_api_key
+Authorization: Bearer hr_live_your_api_key
 ```
 
 ## Resources
