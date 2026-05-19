@@ -36,7 +36,7 @@ export default function ApiSpecImporterPage() {
         </p>
       </div>
 
-      <SpecInputPanel onParsed={setParsed} />
+      <SpecInputPanel onParsed={(spec) => setParsed(spec)} />
 
       {parsed && (
         <ParsedResultsPanel
