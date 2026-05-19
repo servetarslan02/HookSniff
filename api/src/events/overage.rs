@@ -4,6 +4,7 @@ use sqlx::PgPool;
 
 
 use crate::billing::Plan;
+use crate::email::EmailProvider;
 use crate::models::customer::Customer;
 
 /// Track daily event usage and return whether the customer is over their limit.
@@ -11,6 +12,7 @@ use crate::models::customer::Customer;
 pub async fn track_daily_event(
     pool: &PgPool,
     customer: &Customer,
+    email_client: Option<&EmailProvider>,
 ) -> Result<bool, sqlx::Error> {
     let plan = Plan::parse_str(&customer.plan);
     let daily_limit = plan.max_events_per_day();
@@ -45,6 +47,7 @@ pub async fn track_daily_event(
             let _ = send_limit_notification(
                 pool,
                 customer,
+                email_client,
                 "approaching",
                 current_count,
                 daily_limit,
@@ -55,6 +58,7 @@ pub async fn track_daily_event(
             let _ = send_limit_notification(
                 pool,
                 customer,
+                email_client,
                 "at_limit",
                 current_count,
                 daily_limit,
@@ -65,6 +69,7 @@ pub async fn track_daily_event(
             let _ = send_limit_notification(
                 pool,
                 customer,
+                email_client,
                 "exceeded",
                 current_count,
                 daily_limit,
@@ -80,6 +85,7 @@ pub async fn track_daily_event(
 async fn send_limit_notification(
     _pool: &PgPool,
     customer: &Customer,
+    email_client: Option<&EmailProvider>,
     status: &str,
     current: i64,
     limit: u64,
@@ -118,15 +124,28 @@ async fn send_limit_notification(
         _ => return Ok(()),
     };
 
-    // Use the existing email infrastructure
-    tracing::info!(
-        "📧 Limit notification for {}: {} (status={}, {}/{})",
-        customer.email, subject, status, current, limit
-    );
-
-    // TODO: Integrate with Resend email delivery
-    // For now, log the notification. Full email integration will use:
-    // crate::email::send_email(&customer.email, &subject, &body).await;
+    // Send email via the email client
+    if let Some(client) = email_client {
+        match client.send_contact_email(&customer.email, &subject, &body).await {
+            Ok(()) => {
+                tracing::info!(
+                    "📧 Overage notification sent to {}: {} ({}, {}/{})",
+                    customer.email, subject, status, current, limit
+                );
+            }
+            Err(e) => {
+                tracing::warn!(
+                    "⚠️ Failed to send overage notification to {}: {:?}",
+                    customer.email, e
+                );
+            }
+        }
+    } else {
+        tracing::info!(
+            "📧 Overage notification (no email provider): {} — {} ({}, {}/{})",
+            customer.email, subject, status, current, limit
+        );
+    }
 
     let _ = (subject, body);
     Ok(())

@@ -12,6 +12,7 @@ use uuid::Uuid;
 use crate::config::Config;
 use crate::db;
 use crate::error::AppError;
+use crate::events::overage::track_daily_event;
 use crate::feature_flags::FeatureFlagService;
 use crate::middleware::idempotency;
 use crate::models::customer::Customer;
@@ -279,6 +280,10 @@ async fn create_webhook(
     // Atomic check-and-increment: reserve webhook slot before creating delivery
     reserve_webhook_slot(&pool, &customer, 1).await?;
 
+    // Track daily event usage for overage notifications (best-effort)
+    // TODO: Pass EmailProvider from Extension when wiring up email notifications
+    let _ = track_daily_event(&pool, &customer, None).await;
+
     let delivery = sqlx::query_as::<_, Delivery>(
         "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) VALUES ($1, $2, $3, $4, 'pending', $5, $6) RETURNING *",
     )
@@ -371,6 +376,9 @@ async fn batch_webhooks(
     // Atomic check-and-increment for batch: reserve slots for all webhooks in the batch
     let batch_count = req.webhooks.len() as i64;
     reserve_webhook_slot(&pool, &customer, batch_count).await?;
+
+    // Track daily event usage for overage notifications (best-effort, once per batch)
+    let _ = track_daily_event(&pool, &customer, None).await;
 
     // Collect unique endpoint IDs and fetch all in one query (eliminates N+1)
     let endpoint_ids: Vec<Uuid> = req
@@ -555,6 +563,9 @@ async fn replay_webhook(
 
     // Atomic check-and-increment: reserve webhook slot before creating replay delivery
     reserve_webhook_slot(&pool, &customer, 1).await?;
+
+    // Track daily event usage for overage notifications (best-effort)
+    let _ = track_daily_event(&pool, &customer, None).await;
 
     let new_delivery = sqlx::query_as::<_, Delivery>(
         "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, replay_count) VALUES ($1, $2, $3, $4, 'pending', $5, 1) RETURNING *",
