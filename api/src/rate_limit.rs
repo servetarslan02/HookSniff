@@ -699,15 +699,15 @@ mod tests {
             .body(axum::body::Body::empty())
             .unwrap();
         let key = extract_key(&req);
-        // Without TRUST_PROXY_HEADERS, should return "unknown"
-        assert_eq!(key, "unknown");
+        // Without TRUST_PROXY_HEADERS, should return "unknown:/"
+        assert_eq!(key, "unknown:/");
     }
 
     #[test]
     fn extract_key_no_auth_no_forwarded_for() {
         let req = Request::builder().body(axum::body::Body::empty()).unwrap();
         let key = extract_key(&req);
-        assert_eq!(key, "unknown");
+        assert_eq!(key, "unknown:/");
     }
 
     #[test]
@@ -738,8 +738,8 @@ mod tests {
             .body(axum::body::Body::empty())
             .unwrap();
         let key = extract_key(&req);
-        // No "Bearer " prefix, falls back to "unknown" (no proxy trust)
-        assert_eq!(key, "unknown");
+        // No "Bearer " prefix, falls back to "unknown:/" (no proxy trust)
+        assert_eq!(key, "unknown:/");
     }
 
     // ── extract_api_key_prefix ─────────────────────────────────
