@@ -1,3 +1,4 @@
+import { CheckCircle2, ClipboardList, X } from 'lucide-react';
 'use client';
 
 interface PlanOption {
@@ -51,19 +52,19 @@ export function BulkActions({
               onClick={() => setBulkAction('unban')}
               className="px-3 py-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition"
             >
-              ✅ {t('bulkUnban') || 'Unban Selected'}
+              <CheckCircle2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('bulkUnban') || 'Unban Selected'}
             </button>
             <button type="button"
               onClick={() => { setBulkAction('plan'); setBulkPlan('developer'); }}
               className="px-3 py-1.5 text-xs font-medium text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-500/10 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-500/20 transition"
             >
-              📋 {t('bulkChangePlan') || 'Change Plan'}
+              <ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> {t('bulkChangePlan') || 'Change Plan'}
             </button>
             <button type="button"
               onClick={clearSelection}
               className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition"
             >
-              ✕ {tc('cancel')}
+              <X size={16} strokeWidth={1.75} className="inline mr-1" /> {tc('cancel')}
             </button>
           </div>
         </div>

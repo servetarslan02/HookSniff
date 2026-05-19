@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { ClipboardList, Package, Search } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -24,9 +25,9 @@ export default function DeliveriesSectionPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'logs', label: t('logs'), icon: '📋', content: () => <LogsPage /> },
-        { key: 'deliveries', label: t('deliveries'), icon: '📦', content: () => <DeliveriesList /> },
-        { key: 'search', label: t('search'), icon: '🔍', content: () => <SearchPage /> },
+        { key: 'logs', label: t('logs'), icon: <ClipboardList size={16} strokeWidth={1.75} />, content: () => <LogsPage /> },
+        { key: 'deliveries', label: t('deliveries'), icon: <Package size={16} strokeWidth={1.75} />, content: () => <DeliveriesList /> },
+        { key: 'search', label: t('search'), icon: <Search size={16} strokeWidth={1.75} />, content: () => <SearchPage /> },
       ]}
     />
   );

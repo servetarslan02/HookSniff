@@ -6,20 +6,21 @@ import { useAdminAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert } from '
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import type { AlertRuleAdmin } from '@/lib/api';
+import { TrendingDown, Timer, Circle, Mail, MessageSquare, Link2, Bell, ClipboardList, CheckCircle2, Pause, Pencil, Plus, Trash2, Globe, Clock, AlertTriangle } from 'lucide-react';
 
 export default function AdminAlertsPage() {
   const t = useTranslations('admin');
   
   const CONDITIONS = [
-    { value: 'failure_rate', label: t('conditionFailureRate'), icon: '📉' },
-    { value: 'latency', label: t('conditionLatency'), icon: '⏱️' },
-    { value: 'consecutive_failures', label: t('conditionConsecutive'), icon: '🔴' },
+    { value: 'failure_rate', label: t('conditionFailureRate'), icon: <TrendingDown size={16} strokeWidth={1.75} /> },
+    { value: 'latency', label: t('conditionLatency'), icon: <Timer size={16} strokeWidth={1.75} /> },
+    { value: 'consecutive_failures', label: t('conditionConsecutive'), icon: <Circle size={16} strokeWidth={1.75} className="text-red-500 fill-red-500" /> },
   ];
 
   const CHANNELS = [
-    { value: 'email', label: t('channelEmail'), icon: '📧' },
-    { value: 'slack', label: t('channelSlack'), icon: '💬' },
-    { value: 'webhook', label: t('channelWebhook'), icon: '🔗' },
+    { value: 'email', label: t('channelEmail'), icon: <Mail size={16} strokeWidth={1.75} /> },
+    { value: 'slack', label: t('channelSlack'), icon: <MessageSquare size={16} strokeWidth={1.75} /> },
+    { value: 'webhook', label: t('channelWebhook'), icon: <Link2 size={16} strokeWidth={1.75} /> },
   ];
 
   const CONDITION_DEFAULTS: Record<string, number> = {
@@ -158,7 +159,7 @@ export default function AdminAlertsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">🔔 {t('alerts') || 'Alerts'}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white"><Bell size={24} strokeWidth={1.75} className="inline mr-1" />{t('alerts') || 'Alerts'}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
             {activeCount} {t('activeAlerts') || 'active'} · {alerts.length} {t('total') || 'total'}
           </p>
@@ -183,7 +184,7 @@ export default function AdminAlertsPage() {
                 : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700'
             }`}
           >
-            {f === 'all' ? `📋 ${t('all') || 'All'}` : f === 'active' ? `✅ ${t('active') || 'Active'}` : `⏸️ ${t('inactive') || 'Inactive'}`}
+            {f === 'all' ? <><ClipboardList size={14} strokeWidth={1.75} className="inline mr-0.5" />{t('all') || 'All'}</> : f === 'active' ? <><CheckCircle2 size={14} strokeWidth={1.75} className="inline mr-0.5" />{t('active') || 'Active'}</> : <><Pause size={14} strokeWidth={1.75} className="inline mr-0.5" />{t('inactive') || 'Inactive'}</>}
             {f === 'all' && ` (${alerts.length})`}
             {f === 'active' && ` (${activeCount})`}
             {f === 'inactive' && ` (${alerts.length - activeCount})`}
@@ -197,7 +198,7 @@ export default function AdminAlertsPage() {
       {showForm && (
         <div className="glass-card p-6 border-2 border-red-200 dark:border-red-500/30">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {editingId ? `✏️ ${t('editAlert') || 'Edit Alert'}` : `➕ ${t('createAlert') || 'Create Alert'}`}
+            {editingId ? <><Pencil size={18} strokeWidth={1.75} className="inline mr-1" />{t('editAlert') || 'Edit Alert'}</> : <><Plus size={18} strokeWidth={1.75} className="inline mr-1" />{t('createAlert') || 'Create Alert'}</>}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -293,7 +294,7 @@ export default function AdminAlertsPage() {
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
                     alert.is_active ? 'bg-red-100 dark:bg-red-500/20' : 'bg-gray-100 dark:bg-slate-800'
                   }`}>
-                    {cond?.icon || '🔔'}
+                    {cond?.icon || <Bell size={18} strokeWidth={1.75} />}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -307,7 +308,7 @@ export default function AdminAlertsPage() {
                       </span>
                       {!alert.customer_id && (
                         <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400">
-                          🌐 {t('platform') || 'Platform'}
+                          <Globe size={12} strokeWidth={1.75} className="inline mr-0.5" />{t('platform') || 'Platform'}
                         </span>
                       )}
                     </div>
@@ -332,14 +333,14 @@ export default function AdminAlertsPage() {
                     } ${togglingId === alert.id ? 'opacity-50 cursor-wait' : ''}`}
                     title={alert.is_active ? (t('deactivate') || 'Deactivate') : (t('activate') || 'Activate')}
                   >
-                    {togglingId === alert.id ? '⏳' : alert.is_active ? '✅' : '⏸️'}
+                    {togglingId === alert.id ? <Clock size={16} strokeWidth={1.75} className="animate-spin" /> : alert.is_active ? <CheckCircle2 size={16} strokeWidth={1.75} className="text-emerald-500" /> : <Pause size={16} strokeWidth={1.75} />}
                   </button>
                   <button
                     onClick={() => openEdit(alert)}
                     className="p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                     title={t('edit') || 'Edit'}
                   >
-                    ✏️
+                    <Pencil size={16} strokeWidth={1.75} />
                   </button>
                   <button
                     onClick={() => handleDelete(alert.id, alert.name)}
@@ -347,7 +348,7 @@ export default function AdminAlertsPage() {
                     className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-40"
                     title={t('delete') || 'Delete'}
                   >
-                    {deleting === alert.id ? '⏳' : '🗑️'}
+                    {deleting === alert.id ? <Clock size={16} strokeWidth={1.75} className="animate-spin" /> : <Trash2 size={16} strokeWidth={1.75} />}
                   </button>
                 </div>
               </div>
@@ -356,7 +357,7 @@ export default function AdminAlertsPage() {
         </div>
       ) : (
         <div className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4" aria-hidden="true">🔔</div>
+          <Bell size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             {filter === 'all' ? (t('noAlerts') || 'No alerts configured') : (t('noFilteredAlerts') || `No ${filter} alerts`)}
           </h3>

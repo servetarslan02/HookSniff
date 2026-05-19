@@ -3,6 +3,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { GlobalRetryPolicy } from '../types';
+import { Lightbulb } from 'lucide-react';
 
 export function DelayPreviewCard({ policy }: { policy: GlobalRetryPolicy }) {
   const t = useTranslations('retryPolicy');
@@ -55,7 +56,7 @@ export function DelayPreviewCard({ policy }: { policy: GlobalRetryPolicy }) {
 
       <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl">
         <p className="text-sm text-blue-700 dark:text-blue-400">
-          💡 <strong>{t("tip")}</strong> {t('tipContent')} <a href={`/core`} className="underline">{t('endpointSettingsLink')}</a>.
+          <Lightbulb size={16} strokeWidth={1.75} className="inline mr-1" /> <strong>{t("tip")}</strong> {t('tipContent')} <a href={`/core`} className="underline">{t('endpointSettingsLink')}</a>.
         </p>
       </div>
     </div>

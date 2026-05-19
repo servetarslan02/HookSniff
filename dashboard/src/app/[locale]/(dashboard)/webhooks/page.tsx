@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { BookOpen, Plug, Search } from 'lucide-react';
 
 // Revalidate every hour for ISR
 export const revalidate = 3600;
@@ -34,11 +35,11 @@ export default function WebhooksPage() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {[
-            { icon: '📖', title: 'Guides', desc: 'Step-by-step guides from basics to advanced patterns.', href: '/webhooks/guides' },
+            { icon: <BookOpen size={16} strokeWidth={1.75} />, title: 'Guides', desc: 'Step-by-step guides from basics to advanced patterns.', href: '/webhooks/guides' },
             { icon: '📚', title: 'Glossary', desc: '35+ webhook terms defined. HMAC, DLQ, CloudEvents, and more.', href: '/webhooks/glossary' },
             { icon: '⚖️', title: 'Build vs Buy', desc: 'Should you build webhook infrastructure or use a service?', href: '/build-vs-buy' },
-            { icon: '🔍', title: 'Compare Tools', desc: 'HookSniff vs Svix vs Hookdeck vs Hook0 — side by side.', href: '/compare' },
-            { icon: '🔌', title: 'Provider Guides', desc: 'Stripe, GitHub, Shopify webhook setup guides.', href: '/webhooks/guides' },
+            { icon: <Search size={16} strokeWidth={1.75} />, title: 'Compare Tools', desc: 'HookSniff vs Svix vs Hookdeck vs Hook0 — side by side.', href: '/compare' },
+            { icon: <Plug size={16} strokeWidth={1.75} />, title: 'Provider Guides', desc: 'Stripe, GitHub, Shopify webhook setup guides.', href: '/webhooks/guides' },
             { icon: '🪝', title: 'What is a Webhook?', desc: 'The complete introduction to webhooks for beginners.', href: '/what-is-a-webhook' },
           ].map((card) => (
             <Link key={card.title} href={card.href} className="group p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">

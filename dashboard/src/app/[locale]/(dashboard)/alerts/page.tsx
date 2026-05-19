@@ -7,11 +7,12 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import type { AlertRule } from '@/lib/api';
 import { useAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert, useTestAlert } from '@/hooks/useDashboardData';
+import { Bell, Link2, Mail, MessageSquare } from 'lucide-react';
 
-const CHANNEL_ICONS: Record<string, string> = {
-  slack: '💬',
-  email: '📧',
-  webhook: '🔗',
+const CHANNEL_ICONS: Record<string, React.ReactNode> = {
+  slack: <MessageSquare size={16} strokeWidth={1.75} />,
+  email: <Mail size={16} strokeWidth={1.75} />,
+  webhook: <Link2 size={16} strokeWidth={1.75} />,
 };
 
 export default function AlertsPage() {
@@ -40,7 +41,7 @@ export default function AlertsPage() {
 
   const conditionLabel = (condition: string, threshold: number) => {
     const suffix = condition === 'failure_rate' ? '%' : condition === 'latency' ? 'ms' : '';
-    const labels: Record<string, string> = {
+    const labels: Record<string, React.ReactNode> = {
       failure_rate: t('conditionFailureRate'),
       latency: t('conditionLatency'),
       consecutive_failures: t('conditionConsecutive'),
@@ -186,7 +187,7 @@ export default function AlertsPage() {
         </div>
       ) : alerts.length === 0 ? (
         <div className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4">🔔</div>
+          <div className="text-5xl mb-4"><Bell size={18} strokeWidth={1.75} /></div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('empty')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('emptyDesc')}</p>
           <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">

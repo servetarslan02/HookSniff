@@ -3,6 +3,7 @@
 import { Link } from '@/i18n/navigation';
 import { StatusBadge } from '@/components/StatusBadge';
 import type { AdminUser } from '@/lib/api';
+import { Eye } from 'lucide-react';
 
 interface PlanBadgeColors {
   [key: string]: string;
@@ -182,7 +183,7 @@ export function UserTable({
                           className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 font-medium hidden md:inline"
                           title={t('viewAsUser')}
                         >
-                          👁️ {t('impersonateUser')}
+                          <Eye size={16} strokeWidth={1.75} className="inline mr-1" /> {t('impersonateUser')}
                         </button>
                       </div>
                     </td>

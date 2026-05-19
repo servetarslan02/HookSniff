@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { API_BASE } from '@/lib/api';
 import { useToast } from '@/components/Toast';
+import { Mail, X } from 'lucide-react';
 
 export function EmailVerificationBanner() {
   const t = useTranslations('emailVerification');
@@ -52,7 +53,7 @@ export function EmailVerificationBanner() {
     <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-4 mb-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-xl">📧</span>
+          <span className="text-xl"><Mail size={18} strokeWidth={1.75} /></span>
           <div>
             <div className="text-sm font-medium text-amber-800 dark:text-amber-400">
               {t('title')}
@@ -75,8 +76,7 @@ export function EmailVerificationBanner() {
             aria-label={tc('close')}
             className="text-amber-400 hover:text-amber-600 transition p-1"
           >
-            ✕
-          </button>
+            <X size={16} strokeWidth={1.75} className="inline mr-1" /> </button>
         </div>
       </div>
     </div>

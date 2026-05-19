@@ -4,6 +4,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { clsx } from 'clsx';
 import { usePortalProfile, usePortalUsage, useBillingUsage } from '@/hooks/useDashboardData';
 import { usePlans } from '@/hooks/usePlans';
+import { AlertTriangle, BarChart3, CheckCircle2, Link2, TrendingUp } from 'lucide-react';
 
 /** Values >= this threshold represent "unlimited" (max int from DB) */
 const UNLIMITED_THRESHOLD = 2147483647;
@@ -106,7 +107,7 @@ export default function PortalPage() {
       {usage && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-base">📊</span>
+            <span className="text-base"><BarChart3 size={18} strokeWidth={1.75} /></span>
             <h2 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('usage')}</h2>
             <div className="flex-1 h-px bg-gray-200 dark:bg-slate-700 ml-2" />
           </div>
@@ -136,7 +137,7 @@ export default function PortalPage() {
       {/* Plan Limits */}
       <div>
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-base">📈</span>
+          <span className="text-base"><TrendingUp size={18} strokeWidth={1.75} /></span>
           <h2 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tb('usageOverview')}</h2>
           <div className="flex-1 h-px bg-gray-200 dark:bg-slate-700 ml-2" />
         </div>
@@ -223,7 +224,7 @@ function UsageBar({ label, used, limit, percent, unlimited, warning }: { label: 
         </div>
       )}
       {warning && !unlimited && (
-        <p className="text-xs text-red-500 dark:text-red-400 mt-1.5">⚠️ {tb('approachingLimit')}</p>
+        <p className="text-xs text-red-500 dark:text-red-400 mt-1.5"><AlertTriangle size={16} strokeWidth={1.75} className="inline mr-1" /> {tb('approachingLimit')}</p>
       )}
     </div>
   );

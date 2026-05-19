@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { Skull, CheckCircle2 } from 'lucide-react';
 
 interface DeadLetter {
   id: string;
@@ -17,7 +18,7 @@ export default function DeadLetters({ deadLetters }: { deadLetters: DeadLetter[]
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💀 {t('deadLetters') || 'Dead Letters'}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><Skull size={18} strokeWidth={1.75} className="inline mr-1" />{t('deadLetters') || 'Dead Letters'}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('deadLettersDesc') || 'Permanently failed deliveries — no more retries'}</p>
       </div>
       {deadLetters.length > 0 ? (
@@ -48,7 +49,7 @@ export default function DeadLetters({ deadLetters }: { deadLetters: DeadLetter[]
           </table>
         </div>
       ) : (
-        <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">✅ {t('noDeadLetters') || 'No dead letters'}</div>
+        <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm"><CheckCircle2 size={16} strokeWidth={1.75} className="inline mr-1 text-emerald-500" />{t('noDeadLetters') || 'No dead letters'}</div>
       )}
     </div>
   );

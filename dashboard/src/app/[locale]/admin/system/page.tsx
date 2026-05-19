@@ -3,6 +3,7 @@
 import { LazySection, Skeletons } from '@/components/LazySection';
 import dynamic from 'next/dynamic';
 import { useTranslations, useLocale } from 'next-intl';
+import { AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import {
   useSystemHealth,
@@ -135,7 +136,7 @@ export default function AdminSystemPage() {
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-lg">⚠️</span>
+              <AlertTriangle size={18} strokeWidth={1.75} className="text-amber-500" />
               <span className="text-red-700 dark:text-red-400 text-sm font-medium">{t('healthCheckFailed') || 'Health check failed'}</span>
             </div>
             <button type="button" onClick={() => refetchHealth()} className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline">

@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { Link2, Plug, Radio } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -25,9 +26,9 @@ export default function IntegrationsPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'integrations', label: t('integrations'), icon: '🔗', content: () => <IntegrationsContent /> },
-        { key: 'connectors', label: t('connectors'), icon: '🔌', content: () => <ConnectorsPage /> },
-        { key: 'streaming', label: t('streaming'), icon: '📡', content: () => <StreamingPage /> },
+        { key: 'integrations', label: t('integrations'), icon: <Link2 size={16} strokeWidth={1.75} />, content: () => <IntegrationsContent /> },
+        { key: 'connectors', label: t('connectors'), icon: <Plug size={16} strokeWidth={1.75} />, content: () => <ConnectorsPage /> },
+        { key: 'streaming', label: t('streaming'), icon: <Radio size={16} strokeWidth={1.75} />, content: () => <StreamingPage /> },
       ]}
     />
   );

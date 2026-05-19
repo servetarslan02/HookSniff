@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { loadState } from './types';
+import { BarChart3, Check, FlaskConical, Key, Link2, Target, User } from 'lucide-react';
 
 interface ChecklistItem {
   id: string;
@@ -17,11 +18,11 @@ export function SetupChecklist() {
   const { user, token } = useAuth();
   const [dismissed, setDismissed] = useState(false);
   const items: ChecklistItem[] = [
-    { id: 'account', label: t('checklistAccount'), href: "/", icon: '👤' },
-    { id: 'apikey', label: t('checklistApikey'), href: `/core`, icon: '🔑' },
-    { id: 'endpoint', label: t('checklistEndpoint'), href: `/core`, icon: '🔗' },
-    { id: 'webhook', label: t('checklistWebhook'), href: `/devtools`, icon: '🧪' },
-    { id: 'monitor', label: t('checklistMonitor'), href: `/core`, icon: '📊' },
+    { id: 'account', label: t('checklistAccount'), href: "/", icon: <User size={16} strokeWidth={1.75} /> },
+    { id: 'apikey', label: t('checklistApikey'), href: `/core`, icon: <Key size={16} strokeWidth={1.75} /> },
+    { id: 'endpoint', label: t('checklistEndpoint'), href: `/core`, icon: <Link2 size={16} strokeWidth={1.75} /> },
+    { id: 'webhook', label: t('checklistWebhook'), href: `/devtools`, icon: <FlaskConical size={16} strokeWidth={1.75} /> },
+    { id: 'monitor', label: t('checklistMonitor'), href: `/core`, icon: <BarChart3 size={16} strokeWidth={1.75} /> },
   ];
   const [completed, setCompleted] = useState<string[]>([]);
   const [expanded, setExpanded] = useState(true);
@@ -56,7 +57,7 @@ export function SetupChecklist() {
         className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-750 transition"
       >
         <div className="flex items-center gap-3">
-          <div className="text-lg">🎯</div>
+          <div className="text-lg"><Target size={18} strokeWidth={1.75} /></div>
           <div className="text-left">
             <div className="text-sm font-semibold text-gray-900 dark:text-white">{t("setupProgress")}</div>
             <div className="text-xs text-gray-500 dark:text-slate-400">{t('checklistCompleted', { count: completed.length, total: items.length })}</div>

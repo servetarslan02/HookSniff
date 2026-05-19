@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { ConsentToggle } from './ConsentToggle';
+import { Shield } from 'lucide-react';
 
 export function PrivacyConsentSection() {
   const t = useTranslations('settings');
@@ -10,7 +11,7 @@ export function PrivacyConsentSection() {
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
       <div className="flex items-center gap-3 mb-5">
         <div className="w-9 h-9 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center">
-          <span className="text-base">🛡️</span>
+          <span className="text-base"><Shield size={18} strokeWidth={1.75} /></span>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('privacyConsent')}</h3>

@@ -6,6 +6,7 @@ import { environmentsApi, type EnvironmentOut } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { AlertTriangle, Globe, Lock } from 'lucide-react';
 
 export default function EnvironmentsPage() {
   const t = useTranslations('environments');
@@ -176,7 +177,7 @@ export default function EnvironmentsPage() {
       {!isLoading && error && (
         <div className="glass-card p-6">
           <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
-            <span className="text-lg">⚠️</span>
+            <span className="text-lg"><AlertTriangle size={18} strokeWidth={1.75} /></span>
             <div>
               <p className="font-medium">{t('loadError')}</p>
               <button type="button" onClick={() => refetch()} className="text-sm text-brand-600 dark:text-brand-400 hover:underline mt-1">
@@ -191,7 +192,7 @@ export default function EnvironmentsPage() {
       {!isLoading && !error && envs.length === 0 && (
         <div className="glass-card p-6">
           <div className="text-center py-8">
-            <div className="text-4xl mb-3">🌐</div>
+            <div className="text-4xl mb-3"><Globe size={18} strokeWidth={1.75} /></div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('noEnvironments')}</h3>
             <p className="text-gray-500 dark:text-gray-400 mt-1 mb-4">{t('noEnvironmentsDesc')}</p>
             <button onClick={() => setShowCreate(true)} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm">
@@ -350,7 +351,7 @@ export default function EnvironmentsPage() {
               {t('confirmDeleteDesc')} <strong className="text-gray-900 dark:text-white">{deleteTarget.name}</strong>?
             </p>
             {deleteTarget.is_default && (
-              <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">⚠️ {t('deleteDefaultWarning')}</p>
+              <p className="text-sm text-amber-600 dark:text-amber-400 mb-4"><AlertTriangle size={16} strokeWidth={1.75} className="inline mr-1" /> {t('deleteDefaultWarning')}</p>
             )}
             {!deleteTarget.is_default && <div className="mb-4" />}
             <div className="flex gap-3 justify-end">
@@ -423,7 +424,7 @@ export default function EnvironmentsPage() {
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-sm font-medium text-gray-900 dark:text-white">{v.key}</span>
                           {v.is_secret && (
-                            <span className="text-xs px-1.5 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 rounded">🔒</span>
+                            <span className="text-xs px-1.5 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 rounded"><Lock size={18} strokeWidth={1.75} /></span>
                           )}
                         </div>
                         <span className="font-mono text-xs text-gray-500 dark:text-slate-400 truncate block">

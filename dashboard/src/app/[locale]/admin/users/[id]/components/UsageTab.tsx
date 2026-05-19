@@ -2,6 +2,7 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { UsageTabProps } from './types';
+import { TrendingUp } from 'lucide-react';
 
 export function UsageTab({ userUsage, t }: UsageTabProps) {
   if (!userUsage) return null;
@@ -9,7 +10,7 @@ export function UsageTab({ userUsage, t }: UsageTabProps) {
   return (
     <LazySection fallback={Skeletons.chart} rootMargin={300}>
     <div className="space-y-6">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📈 {t("usageStats") || "Usage Statistics"}</h2>
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><TrendingUp size={16} strokeWidth={1.75} className="inline mr-1" /> {t("usageStats") || "Usage Statistics"}</h2>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-gray-900 dark:text-white">{userUsage.total_deliveries.toLocaleString()}</p><p className="text-xs text-gray-500 dark:text-slate-400">{t("totalDeliveries") || "Total"}</p></div>
         <div className="glass-card p-4 text-center"><p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{userUsage.success_rate}%</p><p className="text-xs text-gray-500 dark:text-slate-400">{t("successRate") || "Success Rate"}</p></div>

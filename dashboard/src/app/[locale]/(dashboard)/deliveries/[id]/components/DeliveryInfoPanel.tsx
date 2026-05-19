@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import type { DeliveryDetail } from '@/lib/api';
 import { DetailRow } from './DetailRow';
+import { ClipboardList } from 'lucide-react';
 
 export function DeliveryInfoPanel({
   delivery,
@@ -18,7 +19,7 @@ export function DeliveryInfoPanel({
   return (
     <div className="glass-card p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-        <span>📋</span> {t('deliveryInfo')}
+        <span><ClipboardList size={18} strokeWidth={1.75} /></span> {t('deliveryInfo')}
       </h3>
       <div className="space-y-4">
         <DetailRow label={t('deliveryId')} value={delivery.id} mono copyable onCopy={() => onCopy(delivery.id, 'id')} copied={copiedField === 'id'} />

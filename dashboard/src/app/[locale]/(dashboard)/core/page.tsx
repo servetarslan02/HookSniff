@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { BarChart3, Key, KeyRound } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -25,9 +26,9 @@ export default function CorePage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'overview', label: t('dashboard'), icon: '📊', content: () => <DashboardOverview /> },
-        { key: 'api-keys', label: t('apiKeys'), icon: '🔑', content: () => <ApiKeysPage /> },
-        { key: 'service-tokens', label: t('serviceTokens'), icon: '🎟️', content: () => <ServiceTokensPage /> },
+        { key: 'overview', label: t('dashboard'), icon: <BarChart3 size={16} strokeWidth={1.75} />, content: () => <DashboardOverview /> },
+        { key: 'api-keys', label: t('apiKeys'), icon: <Key size={16} strokeWidth={1.75} />, content: () => <ApiKeysPage /> },
+        { key: 'service-tokens', label: t('serviceTokens'), icon: <KeyRound size={16} strokeWidth={1.75} />, content: () => <ServiceTokensPage /> },
       ]}
     />
   );

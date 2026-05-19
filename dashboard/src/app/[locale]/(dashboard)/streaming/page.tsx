@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { Pencil, Plug, Radio, Trash2 } from 'lucide-react';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
@@ -14,8 +15,8 @@ function formatDate(s: string | null) {
 }
 
 const CHANNEL_TYPES = [
-  { value: 'sse', icon: '📡', label: 'SSE (Server-Sent Events)' },
-  { value: 'websocket', icon: '🔌', label: 'WebSocket' },
+  { value: 'sse', icon: <Radio size={16} strokeWidth={1.75} />, label: 'SSE (Server-Sent Events)' },
+  { value: 'websocket', icon: <Plug size={16} strokeWidth={1.75} />, label: 'WebSocket' },
   { value: 'webhook', icon: '🪝', label: 'Webhook' },
 ];
 
@@ -317,7 +318,7 @@ export default function StreamingPage() {
         </div>
       ) : channels.length === 0 ? (
         <div className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4">📡</div>
+          <div className="text-5xl mb-4"><Radio size={18} strokeWidth={1.75} /></div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noChannels')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noChannelsDesc')}</p>
           <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
@@ -359,8 +360,8 @@ export default function StreamingPage() {
               <div className="flex items-center justify-between pt-2 mt-2 border-t border-gray-100 dark:border-slate-700">
                 <span className="text-xs text-gray-500 dark:text-slate-400">{formatDate(ch.created_at)}</span>
                 <div className="flex gap-1">
-                  <button onClick={e => { e.stopPropagation(); openEdit(ch); }} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm">✏️</button>
-                  <button onClick={e => { e.stopPropagation(); setDeleteTarget(ch.id); }} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm">🗑️</button>
+                  <button onClick={e => { e.stopPropagation(); openEdit(ch); }} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm"><Pencil size={18} strokeWidth={1.75} /></button>
+                  <button onClick={e => { e.stopPropagation(); setDeleteTarget(ch.id); }} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm"><Trash2 size={18} strokeWidth={1.75} /></button>
                 </div>
               </div>
             </div>

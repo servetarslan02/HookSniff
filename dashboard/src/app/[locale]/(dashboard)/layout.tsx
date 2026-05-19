@@ -13,7 +13,7 @@ import { PrefetchLink } from '@/components/PrefetchLink';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
-import { LayoutDashboard, Smartphone, Link2, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield } from 'lucide-react';
+import { LayoutDashboard, Smartphone, Link2, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield, BookOpen, ExternalLink, LogOut } from 'lucide-react';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -192,7 +192,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                     onClick={() => setProfileOpen(false)}
                   >
-                    ⚙️ {t('settingsSection')}
+                    <Settings size={16} strokeWidth={1.75} className="text-gray-400" />
+                    {t('settingsSection')}
                   </Link>
                   <a
                     href="https://hooksniff.vercel.app/docs"
@@ -201,7 +202,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                     onClick={() => setProfileOpen(false)}
                   >
-                    📖 {tc('documentation') || 'Documentation'}
+                    <BookOpen size={16} strokeWidth={1.75} className="text-gray-400" />
+                    {tc('documentation') || 'Documentation'}
                   </a>
                   <a
                     href="https://hooksniff.vercel.app/docs/api-reference"
@@ -210,7 +212,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                     onClick={() => setProfileOpen(false)}
                   >
-                    🔗 API Reference
+                    <ExternalLink size={16} strokeWidth={1.75} className="text-gray-400" />
+                    API Reference
                   </a>
                   <div className="border-t border-gray-100 dark:border-gray-700 mt-1" />
                   <button
@@ -218,7 +221,8 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                     onClick={() => { setProfileOpen(false); logout(); router.push('/login'); }}
                     className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                   >
-                    🚪 {tc('logout')}
+                    <LogOut size={16} strokeWidth={1.75} />
+                    {tc('logout')}
                   </button>
                 </div>
               )}

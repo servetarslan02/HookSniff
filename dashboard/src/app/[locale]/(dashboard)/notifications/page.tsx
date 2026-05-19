@@ -12,15 +12,16 @@ import {
   useDeleteNotification,
 } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { Circle, AlertTriangle, Bell, CreditCard, Users, Inbox } from 'lucide-react';
 
 type NotifType = 'all' | 'webhook_failed' | 'alert' | 'system' | 'billing';
 
-const typeIcons: Record<string, string> = {
-  webhook_failed: '🔴',
-  alert: '⚠️',
-  system: '🔔',
-  billing: '💳',
-  team_invite: '👥',
+const typeIcons: Record<string, React.ReactNode> = {
+  webhook_failed: <Circle size={20} strokeWidth={1.75} className="text-red-500 fill-red-500" />,
+  alert: <AlertTriangle size={20} strokeWidth={1.75} className="text-amber-500" />,
+  system: <Bell size={20} strokeWidth={1.75} className="text-gray-400" />,
+  billing: <CreditCard size={20} strokeWidth={1.75} className="text-gray-400" />,
+  team_invite: <Users size={20} strokeWidth={1.75} className="text-gray-400" />,
 };
 
 const TYPE_FILTER_KEYS: NotifType[] = ['all', 'webhook_failed', 'alert', 'system', 'billing'];
@@ -206,7 +207,7 @@ export default function NotificationsPage() {
         {/* ── Error State ── */}
         {!isLoading && error && (
           <div className="p-12 text-center">
-            <div className="text-4xl mb-3">⚠️</div>
+            <AlertTriangle size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 dark:text-slate-400 mb-3">{t('failedToLoad')}</p>
             <button type="button" onClick={() => refetch()}
               className="px-4 py-2 text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-xl hover:bg-brand-100 dark:hover:bg-brand-500/20 transition">
@@ -218,7 +219,7 @@ export default function NotificationsPage() {
         {/* ── Empty State ── */}
         {!isLoading && !error && notifications.length === 0 && (
           <div className="p-12 text-center">
-            <div className="text-4xl mb-3">🔔</div>
+            <Bell size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 dark:text-slate-500">{t('noNotifications')}</p>
           </div>
         )}
@@ -235,7 +236,7 @@ export default function NotificationsPage() {
                   }`}
                 >
                   <div className="flex items-start gap-4">
-                    <span className="text-xl mt-0.5">{typeIcons[n.type] || '🔔'}</span>
+                    <span className="mt-0.5">{typeIcons[n.type] || <Bell size={20} strokeWidth={1.75} className="text-gray-400" />}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import type { PortalConfig } from '../types';
+import { ClipboardList, Link2, Zap } from 'lucide-react';
 
 export function EmbedCodePanel({
   config,
@@ -49,7 +50,7 @@ export function EmbedCodePanel({
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center">
-            <span className="text-base">🔗</span>
+            <span className="text-base"><Link2 size={18} strokeWidth={1.75} /></span>
           </div>
           <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('portalUrl') || 'Portal URL'}</h2>
         </div>
@@ -71,7 +72,7 @@ export function EmbedCodePanel({
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center">
-            <span className="text-base">📋</span>
+            <span className="text-base"><ClipboardList size={18} strokeWidth={1.75} /></span>
           </div>
           <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('embedCode')}</h2>
         </div>
@@ -96,7 +97,7 @@ export function EmbedCodePanel({
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
-            <span className="text-base">⚡</span>
+            <span className="text-base"><Zap size={18} strokeWidth={1.75} /></span>
           </div>
           <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Script Embed</h2>
         </div>

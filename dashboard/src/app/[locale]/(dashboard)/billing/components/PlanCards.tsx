@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { usePlans } from '@/hooks/usePlans';
+import { Check } from 'lucide-react';
 
 const PLAN_FEATURES: Record<string, string[]> = {
   developer: [
@@ -160,7 +161,7 @@ export function PlanCards({
               <ul className="space-y-2 mb-6">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
-                    <span className="text-green-500">✓</span> {t(`features.${f}`)}
+                    <span className="text-green-500"><Check size={18} strokeWidth={1.75} /></span> {t(`features.${f}`)}
                   </li>
                 ))}
               </ul>

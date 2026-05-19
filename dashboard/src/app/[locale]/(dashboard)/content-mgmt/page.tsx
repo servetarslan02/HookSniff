@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { FileText, RefreshCw, TriangleRight } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -25,9 +26,9 @@ export default function ContentMgmtPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'schemas', label: t('schemas'), icon: '📐', content: () => <SchemasPage /> },
-        { key: 'templates', label: t('templates'), icon: '📄', content: () => <TemplatesPage /> },
-        { key: 'transforms', label: t('transforms'), icon: '🔄', content: () => <TransformsPage /> },
+        { key: 'schemas', label: t('schemas'), icon: <TriangleRight size={16} strokeWidth={1.75} />, content: () => <SchemasPage /> },
+        { key: 'templates', label: t('templates'), icon: <FileText size={16} strokeWidth={1.75} />, content: () => <TemplatesPage /> },
+        { key: 'transforms', label: t('transforms'), icon: <RefreshCw size={16} strokeWidth={1.75} />, content: () => <TransformsPage /> },
       ]}
     />
   );

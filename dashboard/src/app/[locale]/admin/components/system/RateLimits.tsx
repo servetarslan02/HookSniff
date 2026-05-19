@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { CheckCircle2, CircleDot } from 'lucide-react';
 
 interface RateLimitViolation {
   id: string;
@@ -18,7 +19,7 @@ export default function RateLimits({ violations }: { violations: RateLimitViolat
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">🚦 {t('rateLimitViolations') || 'Rate Limit Violations'}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><CircleDot size={18} strokeWidth={1.75} className="inline mr-1" />{t('rateLimitViolations') || 'Rate Limit Violations'}</h2>
       </div>
       {violations.length > 0 ? (
         <div className="overflow-x-auto">
@@ -48,7 +49,7 @@ export default function RateLimits({ violations }: { violations: RateLimitViolat
           </table>
         </div>
       ) : (
-        <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">✅ {t('noViolations') || 'No rate limit violations'}</div>
+        <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm"><CheckCircle2 size={16} strokeWidth={1.75} className="inline mr-1 text-emerald-500" />{t('noViolations') || 'No rate limit violations'}</div>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { Timer } from 'lucide-react';
 
 interface LatencyEndpoint {
   endpoint_id: string;
@@ -18,7 +19,7 @@ export default function LatencyTable({ endpoints }: { endpoints: LatencyEndpoint
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">⏱️ {t('apiLatency') || 'API Latency'} (24h)</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><Timer size={18} strokeWidth={1.75} className="inline mr-1" />{t('apiLatency') || 'API Latency'} (24h)</h2>
       </div>
       {endpoints.length > 0 ? (
         <div className="overflow-x-auto">

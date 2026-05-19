@@ -13,6 +13,7 @@ import { PlanCards } from './components/PlanCards';
 import { InvoiceTable } from './components/InvoiceTable';
 import { SubscriptionDetails } from './components/SubscriptionDetails';
 import { OverageSettings } from './components/OverageSettings';
+import { CreditCard, BarChart3, Rocket, FileText } from 'lucide-react';
 
 export default function BillingPage() {
   const { user, token } = useAuth();
@@ -130,25 +131,25 @@ export default function BillingPage() {
 
       {/* 1. Subscription */}
       <section>
-        <SectionLabel label={t('subscriptionDetails')} icon="💳" />
+        <SectionLabel label={t('subscriptionDetails')} icon={<CreditCard size={16} strokeWidth={1.75} />} />
         <SubscriptionDetails onCancel={() => setShowCancelModal(true)} />
       </section>
 
       {/* 2. Overage */}
       <section>
-        <SectionLabel label={t('overageSettings')} icon="📊" />
+        <SectionLabel label={t('overageSettings')} icon={<BarChart3 size={16} strokeWidth={1.75} />} />
         <OverageSettings />
       </section>
 
       {/* 3. Plans */}
       <section>
-        <SectionLabel label={t('currentPlan')} icon="🚀" />
+        <SectionLabel label={t('currentPlan')} icon={<Rocket size={16} strokeWidth={1.75} />} />
         <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} />
       </section>
 
       {/* 4. Invoices */}
       <section>
-        <SectionLabel label={t('invoiceHistory')} icon="📄" />
+        <SectionLabel label={t('invoiceHistory')} icon={<FileText size={16} strokeWidth={1.75} />} />
         <InvoiceTable invoices={invoices ?? []} loading={loadingInvoices} />
       </section>
 
@@ -212,10 +213,10 @@ export default function BillingPage() {
   );
 }
 
-function SectionLabel({ label, icon }: { label: string; icon: string }) {
+function SectionLabel({ label, icon }: { label: string; icon: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2 mb-4">
-      <span className="text-base">{icon}</span>
+      <span className="text-gray-400">{icon}</span>
       <h2 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{label}</h2>
       <div className="flex-1 h-px bg-gray-200 dark:bg-slate-700 ml-2" />
     </div>

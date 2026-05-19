@@ -9,6 +9,7 @@ import type { PortalConfig } from './types';
 import { DEFAULT_CONFIG, FONT_OPTIONS } from './types';
 import { PortalPreview } from './components/PortalPreview';
 import { EmbedCodePanel } from './components/EmbedCodePanel';
+import { ClipboardList, Palette, X, Zap } from 'lucide-react';
 
 export default function PortalCustomizationPage() {
   const t = useTranslations('portalCustomize');
@@ -107,7 +108,7 @@ export default function PortalCustomizationPage() {
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-9 h-9 rounded-xl bg-pink-50 dark:bg-pink-500/10 flex items-center justify-center">
-                <span className="text-base">🎨</span>
+                <span className="text-base"><Palette size={18} strokeWidth={1.75} /></span>
               </div>
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('branding')}</h2>
             </div>
@@ -180,7 +181,7 @@ export default function PortalCustomizationPage() {
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
-                <span className="text-base">⚡</span>
+                <span className="text-base"><Zap size={18} strokeWidth={1.75} /></span>
               </div>
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('features')}</h2>
             </div>
@@ -210,7 +211,7 @@ export default function PortalCustomizationPage() {
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
-                <span className="text-base">📋</span>
+                <span className="text-base"><ClipboardList size={18} strokeWidth={1.75} /></span>
               </div>
               <div>
                 <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('allowedEvents')}</h2>
@@ -247,8 +248,7 @@ export default function PortalCustomizationPage() {
                     aria-label={`Remove ${event} event`}
                     className="text-gray-400 hover:text-red-500 transition ml-1"
                   >
-                    ✕
-                  </button>
+                    <X size={16} strokeWidth={1.75} className="inline mr-1" /> </button>
                 </span>
               ))}
               {config.allowed_events.length === 0 && (
