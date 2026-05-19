@@ -21,92 +21,85 @@ gem 'hooksniff'
 ```ruby
 require 'hooksniff'
 
-# Initialize client
-client = HookSniff::Client.new('hr_live_your_api_key')
-
-# Or with options
-client = HookSniff::Client.new('hr_live_your_api_key', {
-  base_url: 'https://hooksniff-api-1046140057667.europe-west1.run.app',
-  timeout: 30,
-})
+hs = HookSniff::Client.new(api_key: ENV['HOOKSNIFF_API_KEY'])
 ```
 
-## Endpoints
+## Create an Endpoint
 
 ```ruby
-# List all endpoints
-endpoints = client.endpoints.list
-
-# Create an endpoint
-endpoint = client.endpoints.create(
-  url: 'https://example.com/webhook',
-  description: 'My webhook endpoint',
-  rate_limit: 100
+endpoint = hs.endpoints.create(
+  url: 'https://myapp.com/webhook',
+  description: 'Order notifications',
+  event_types: ['order.created', 'order.updated'],
 )
 
-# Get a specific endpoint
-details = client.endpoints.get(endpoint['id'])
-
-# Update an endpoint
-updated = client.endpoints.update(endpoint['id'], url: 'https://new-url.com/webhook')
-
-# Delete an endpoint
-client.endpoints.delete(endpoint['id'])
-
-# Rotate signing secret
-key = client.endpoints.rotate_secret(endpoint['id'])
+puts "Endpoint ID: #{endpoint.id}"
+puts "Signing secret: #{endpoint.secret}"
 ```
 
-## Webhooks
+## Send a Webhook
 
 ```ruby
-# Send a webhook
-delivery = client.webhooks.send(
-  endpoint_id: endpoint['id'],
-  event_type: 'order.created',
-  data: { order_id: '12345', amount: 99.99 }
+delivery = hs.messages.create(
+  endpoint_id: endpoint.id,
+  event: 'order.created',
+  data: { order_id: 'ORD-12345', amount: 99.99, currency: 'USD' },
 )
 
-# List deliveries
-deliveries = client.webhooks.list(status: 'delivered', page: 1)
-
-# Replay a delivery
-client.webhooks.replay(delivery['id'])
-
-# Batch send
-batch = client.webhooks.batch(
-  endpoint_id: endpoint['id'],
-  events: [
-    { event_type: 'order.created', data: { order_id: '1' } },
-    { event_type: 'order.created', data: { order_id: '2' } }
-  ]
-)
+puts "Delivery ID: #{delivery.id}"
+puts "Status: #{delivery.status}"
 ```
 
-## Webhook Verification
+## Verify Incoming Webhooks
 
 ```ruby
-require 'hooksniff'
+wh = HookSniff::Webhook.new('whsec_your_signing_secret')
 
-webhook = HookSniff::Webhook.new('whsec_your_signing_secret')
+# Sinatra handler
+post '/webhook' do
+  payload = wh.verify(
+    request.body.read,
+    {
+      'webhook-id' => request.env['HTTP_WEBHOOK_ID'],
+      'webhook-timestamp' => request.env['HTTP_WEBHOOK_TIMESTAMP'],
+      'webhook-signature' => request.env['HTTP_WEBHOOK_SIGNATURE'],
+    },
+  )
 
-# In your endpoint handler
-def handle_webhook(request)
-  begin
-    payload = webhook.verify(
-      request.body.read,
-      headers: {
-        'webhook-id' => request.headers['HTTP_WEBHOOK_ID'],
-        'webhook-timestamp' => request.headers['HTTP_WEBHOOK_TIMESTAMP'],
-        'webhook-signature' => request.headers['HTTP_WEBHOOK_SIGNATURE']
-      }
-    )
-    # Payload is verified — process it
-    puts "Received event: #{payload}"
-    status 200
-  rescue HookSniff::SignatureError
-    status 401
+  puts "Event: #{payload['event']}"
+  puts "Data: #{payload['data']}"
+  status 200
+rescue HookSniff::SignatureVerificationError
+  status 401
+end
+
+# Rails controller
+class WebhooksController < ApplicationController
+  skip_before_action :verify_authenticity_token
+
+  def create
+    payload = wh.verify(request.body.read, {
+      'webhook-id' => request.headers['HTTP_WEBHOOK_ID'],
+      'webhook-timestamp' => request.headers['HTTP_WEBHOOK_TIMESTAMP'],
+      'webhook-signature' => request.headers['HTTP_WEBHOOK_SIGNATURE'],
+    })
+    render json: { received: true }
+  rescue HookSniff::SignatureVerificationError
+    head :unauthorized
   end
+end
+```
+
+## List Deliveries
+
+```ruby
+attempts = hs.message_attempts.list_by_endpoint(
+  endpoint_id: endpoint.id,
+  limit: 20,
+)
+
+attempts.data.each do |a|
+  puts "#{a.id}: #{a.response_status_code}"
 end
 ```
 
@@ -114,10 +107,14 @@ end
 
 ```ruby
 begin
-  client.endpoints.get('nonexistent')
-rescue HookSniff::ApiException => e
-  puts "API Error #{e.status_code}: #{e.message}"
-rescue StandardError => e
-  puts "Network error: #{e.message}"
+  hs.endpoints.get('nonexistent')
+rescue HookSniff::HttpError => e
+  puts "HTTP #{e.status_code}: #{e.message}"
+  if e.status_code == 429
+    retry_after = e.headers['retry-after']
+    puts "Retry after #{retry_after} seconds"
+  end
+rescue HookSniff::ValidationError => e
+  puts "Validation failed: #{e.errors}"
 end
 ```

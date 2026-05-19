@@ -6,105 +6,92 @@ sidebar_position: 7
 
 ## Installation
 
-### Gradle (Kotlin DSL)
+### Gradle Kotlin DSL
 
 ```kotlin
 dependencies {
-    implementation("io.github.servetarslan02:hooksniff-sdk-kotlin:0.3.0")
+    implementation("io.github.servetarslan02:hooksniff-sdk-kotlin:1.2.0")
 }
 ```
 
-### Gradle (Groovy)
+### Gradle Groovy
 
 ```groovy
-implementation 'io.github.servetarslan02:hooksniff-sdk-kotlin:0.3.0'
+implementation 'io.github.servetarslan02:hooksniff-sdk-kotlin:1.2.0'
 ```
 
 ## Setup
 
 ```kotlin
-import com.hooksniff.sdk.HookSniff
+import dev.hooksniff.HookSniff
 
-// Initialize client
-val client = HookSniff("hr_live_your_api_key")
-
-// Or with options
-val client = HookSniff(
-    apiKey = "hr_live_your_api_key",
-    baseUrl = "https://hooksniff-api-1046140057667.europe-west1.run.app",
-    timeout = 30000
-)
+val hs = HookSniff(apiKey = System.getenv("HOOKSNIFF_API_KEY"))
 ```
 
-## Endpoints
+## Create an Endpoint
 
 ```kotlin
-// List all endpoints
-val endpoints = client.endpoints.list()
-
-// Create an endpoint
-val endpoint = client.endpoints.create(
-    url = "https://example.com/webhook",
-    description = "My webhook endpoint",
-    rateLimit = 100
+val endpoint = hs.endpoints.create(
+    url = "https://myapp.com/webhook",
+    description = "Order notifications",
+    eventTypes = listOf("order.created", "order.updated"),
 )
 
-// Get a specific endpoint
-val details = client.endpoints.get(endpoint.id)
-
-// Update an endpoint
-val updated = client.endpoints.update(endpoint.id, url = "https://new-url.com/webhook")
-
-// Delete an endpoint
-client.endpoints.delete(endpoint.id)
-
-// Rotate signing secret
-val key = client.endpoints.rotateSecret(endpoint.id)
+println("Endpoint ID: ${endpoint.id}")
+println("Signing secret: ${endpoint.secret}")
 ```
 
-## Webhooks
+## Send a Webhook
 
 ```kotlin
-// Send a webhook
-val delivery = client.webhooks.send(
+val delivery = hs.webhooks.send(
     endpointId = endpoint.id,
-    eventType = "order.created",
-    data = mapOf("order_id" to "12345", "amount" to 99.99)
+    event = "order.created",
+    data = mapOf(
+        "order_id" to "ORD-12345",
+        "amount" to 99.99,
+        "currency" to "USD",
+    ),
 )
 
-// List deliveries
-val deliveries = client.webhooks.list(status = "delivered", page = 1)
-
-// Replay a delivery
-client.webhooks.replay(delivery.id)
-
-// Batch send
-val batch = client.webhooks.batch(
-    endpointId = endpoint.id,
-    events = listOf(
-        WebhookEvent("order.created", mapOf("order_id" to "1")),
-        WebhookEvent("order.created", mapOf("order_id" to "2"))
-    )
-)
+println("Delivery ID: ${delivery.id}")
+println("Status: ${delivery.status}")
 ```
 
-## Webhook Verification
+## Verify Incoming Webhooks
 
 ```kotlin
-import com.hooksniff.sdk.Webhook
+import dev.hooksniff.Webhook
 
-val webhook = Webhook("whsec_your_signing_secret")
+val wh = Webhook("whsec_your_signing_secret")
 
-// In your handler
-fun handleWebhook(body: String, headers: Map<String, String>): String {
-    return try {
-        val payload = webhook.verify(body, headers)
-        // Payload is verified — process it
-        println("Received event: $payload")
-        "OK"
+// Ktor handler
+post("/webhook") {
+    try {
+        val payload = wh.verify(
+            call.receiveText(),
+            call.request.headers,
+        )
+
+        println("Event: ${payload.event}")
+        println("Data: ${payload.data}")
+        call.respondText("OK")
     } catch (e: SignatureVerificationException) {
-        throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+        call.respondText("Invalid signature", status = HttpStatusCode.Unauthorized)
     }
+}
+```
+
+## List Deliveries
+
+```kotlin
+val deliveries = hs.webhooks.list(
+    endpointId = endpoint.id,
+    limit = 20,
+)
+
+deliveries.data.forEach { dlv ->
+    println("${dlv.id}: ${dlv.status}")
 }
 ```
 
@@ -112,10 +99,14 @@ fun handleWebhook(body: String, headers: Map<String, String>): String {
 
 ```kotlin
 try {
-    client.endpoints.get("nonexistent")
-} catch (e: ApiException) {
-    println("API Error ${e.statusCode}: ${e.body}")
-} catch (e: Exception) {
-    println("Network error: ${e.message}")
+    hs.endpoints.get("nonexistent")
+} catch (e: HttpError) {
+    println("HTTP ${e.statusCode}: ${e.message}")
+    if (e.statusCode == 429) {
+        val retryAfter = e.headers["retry-after"]
+        println("Retry after $retryAfter seconds")
+    }
+} catch (e: ValidationError) {
+    println("Validation failed: ${e.errors}")
 }
 ```
