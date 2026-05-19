@@ -4294,7 +4294,9 @@
     "actions": "İşlemler",
     "delete": "Sil",
     "edit": "Düzenle",
-    "view": "Görüntüle"
+    "view": "Görüntüle",
+    "created": "Şema oluşturuldu!",
+    "noSchemasDesc": "Webhook payload'larınızı teslimattan önce doğrulamak için JSON şemaları tanımlayın."
   },
   "customerStories": {
     "storyShopflowTagline": "ShopFlow webhook teslimatını günde 50K olaya nasıl ölçekledi ve altyapı maliyetlerini %60 nasıl azalttı",
