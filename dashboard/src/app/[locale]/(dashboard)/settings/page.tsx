@@ -12,7 +12,7 @@ import { TwoFactorSection } from './components/TwoFactorSection';
 import { useState } from 'react';
 import { clsx } from 'clsx';
 
-type Tab = 'profile' | 'security' | 'notifications' | 'privacy' | 'danger';
+type Tab = 'profile' | 'security' | 'api' | 'notifications' | 'privacy' | 'danger';
 
 const tabs: { id: Tab; icon: React.ReactNode; labelKey: string; fallback: string }[] = [
   {
@@ -34,6 +34,16 @@ const tabs: { id: Tab; icon: React.ReactNode; labelKey: string; fallback: string
     ),
     labelKey: 'security',
     fallback: 'Security',
+  },
+  {
+    id: 'api',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+      </svg>
+    ),
+    labelKey: 'api',
+    fallback: 'API',
   },
   {
     id: 'notifications',
@@ -123,6 +133,11 @@ export default function SettingsPage() {
             <div className="space-y-5 animate-slide-up">
               <PasswordSection token={token} />
               <TwoFactorSection />
+            </div>
+          )}
+
+          {activeTab === 'api' && (
+            <div className="animate-slide-up">
               <ApiKeySection apiKey={apiKey} />
             </div>
           )}
