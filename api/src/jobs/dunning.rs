@@ -13,8 +13,11 @@ use sqlx::PgPool;
 use crate::email::Language;
 use crate::resend_email::ResendEmailClient;
 
-/// Days before period end to send dunning emails (3, 2, 1 days remaining).
-const DUNNING_EMAIL_DAYS: [i64; 3] = [3, 2, 1];
+/// Days before period end to send dunning emails for MONTHLY plans (3, 2, 1).
+const DUNNING_DAYS_MONTHLY: [i64; 3] = [3, 2, 1];
+
+/// Days before period end to send dunning emails for ANNUAL plans (30, 7, 3, 2, 1).
+const DUNNING_DAYS_ANNUAL: [i64; 5] = [30, 7, 3, 2, 1];
 
 /// Run the dunning job. Call this daily.
 ///
@@ -27,13 +30,15 @@ pub async fn run_dunning(pool: &PgPool, email_client: &ResendEmailClient) -> Res
 
     let now = Utc::now();
 
-    // Find paid customers whose billing period ends within 3 days
-    let customers: Vec<(uuid::Uuid, String, String, chrono::DateTime<Utc>, String)> = sqlx::query_as(
-        "SELECT id, email, plan, current_period_end, COALESCE(language, 'tr') as language \
+    // Find paid customers whose billing period ends within 30 days (covers both monthly and annual)
+    let customers: Vec<(uuid::Uuid, String, String, chrono::DateTime<Utc>, String, String)> = sqlx::query_as(
+        "SELECT id, email, plan, current_period_end, \
+                COALESCE(language, 'tr') as language, \
+                COALESCE(billing_interval, 'month') as billing_interval \
          FROM customers \
          WHERE current_period_end IS NOT NULL \
          AND current_period_end > NOW() \
-         AND current_period_end <= NOW() + INTERVAL '3 days' \
+         AND current_period_end <= NOW() + INTERVAL '31 days' \
          AND plan NOT IN ('free', 'developer')"
     )
     .fetch_all(pool)
@@ -41,14 +46,21 @@ pub async fn run_dunning(pool: &PgPool, email_client: &ResendEmailClient) -> Res
 
     let mut emails_sent = 0u64;
 
-    for (customer_id, email, plan, period_end, lang_raw) in &customers {
+    for (customer_id, email, plan, period_end, lang_raw, billing_int) in &customers {
         let days_remaining = (*period_end - now).num_days().max(0);
 
         let lang = Language::parse_lang(lang_raw);
         let plan_display = crate::billing::Plan::parse_str(plan).as_str();
 
-        // Only send emails for specific days (3, 2, 1)
-        if !DUNNING_EMAIL_DAYS.contains(&days_remaining) {
+        // Select dunning schedule based on billing interval
+        let dunning_days: &[i64] = if billing_int == "year" {
+            &DUNNING_DAYS_ANNUAL
+        } else {
+            &DUNNING_DAYS_MONTHLY
+        };
+
+        // Only send emails on specific days
+        if !dunning_days.contains(&days_remaining) {
             continue;
         }
 
@@ -138,6 +150,20 @@ struct DunningNotif {
 fn dunning_notification(days_remaining: i64, plan: &str, lang: Language) -> DunningNotif {
     match lang {
         Language::Tr => match days_remaining {
+            30 => DunningNotif {
+                title: "📅 Yıllık Abonelik — Son Ay".into(),
+                message: format!(
+                    "{} plan yıllık aboneliğiniz 30 gün sonra sona erecek. Ödeme yönteminizin güncel olduğundan emin olun.",
+                    plan
+                ),
+            },
+            7 => DunningNotif {
+                title: "⚠️ Yıllık Abonelik — Son Hafta".into(),
+                message: format!(
+                    "{} plan yıllık aboneliğiniz 7 gün sonra sona erecek. Ödeme yönteminizi kontrol edin.",
+                    plan
+                ),
+            },
             3 => DunningNotif {
                 title: "⚠️ Abonelik Bitiyor — 3 Gün Kaldı".into(),
                 message: format!(
@@ -168,6 +194,20 @@ fn dunning_notification(days_remaining: i64, plan: &str, lang: Language) -> Dunn
             },
         },
         Language::En => match days_remaining {
+            30 => DunningNotif {
+                title: "📅 Annual Subscription — Final Month".into(),
+                message: format!(
+                    "Your {} annual subscription expires in 30 days. Make sure your payment method is up to date.",
+                    plan
+                ),
+            },
+            7 => DunningNotif {
+                title: "⚠️ Annual Subscription — Final Week".into(),
+                message: format!(
+                    "Your {} annual subscription expires in 7 days. Check your payment method.",
+                    plan
+                ),
+            },
             3 => DunningNotif {
                 title: "⚠️ Subscription Expiring — 3 Days Left".into(),
                 message: format!(
@@ -211,13 +251,21 @@ fn tpl_dunning_tr(plan: &str, days_remaining: i64) -> (String, String) {
     let (urgency_color, urgency_text) = match days_remaining {
         1 => ("#dc2626", "🚨 Son Uyarı"),
         2 => ("#ea580c", "🔴 Acil"),
+        7 => ("#d97706", "⚠️ Son Hafta"),
+        30 => ("#2563eb", "📅 Son Ay"),
         _ => ("#d97706", "⚠️ Dikkat"),
     };
 
-    let subject = format!(
-        "{} — {} plan aboneliğiniz {} gün sonra sona erecek",
-        urgency_text, plan, days_remaining
-    );
+    let subject = if days_remaining == 30 {
+        format!("📅 {} yıllık aboneliğiniz — son ay", plan)
+    } else if days_remaining == 7 {
+        format!("⚠️ {} yıllık aboneliğiniz — son hafta", plan)
+    } else {
+        format!(
+            "{} — {} plan aboneliğiniz {} gün sonra sona erecek",
+            urgency_text, plan, days_remaining
+        )
+    };
 
     let html = format!(
         r#"<!DOCTYPE html>
@@ -275,13 +323,21 @@ fn tpl_dunning_en(plan: &str, days_remaining: i64) -> (String, String) {
     let (urgency_color, urgency_text) = match days_remaining {
         1 => ("#dc2626", "🚨 Final Warning"),
         2 => ("#ea580c", "🔴 Urgent"),
+        7 => ("#d97706", "⚠️ Final Week"),
+        30 => ("#2563eb", "📅 Final Month"),
         _ => ("#d97706", "⚠️ Action Required"),
     };
 
-    let subject = format!(
-        "{} — Your {} plan expires in {} day{}",
-        urgency_text, plan, days_remaining, if days_remaining > 1 { "s" } else { "" }
-    );
+    let subject = if days_remaining == 30 {
+        format!("📅 Your {} annual subscription — final month", plan)
+    } else if days_remaining == 7 {
+        format!("⚠️ Your {} annual subscription — final week", plan)
+    } else {
+        format!(
+            "{} — Your {} plan expires in {} day{}",
+            urgency_text, plan, days_remaining, if days_remaining > 1 { "s" } else { "" }
+        )
+    };
 
     let html = format!(
         r#"<!DOCTYPE html>
