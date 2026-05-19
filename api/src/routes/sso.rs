@@ -80,6 +80,8 @@ pub struct UpsertSsoRequest {
     pub provider: Option<String>,
     pub enabled: Option<bool>,
     pub admin_bypass: Option<bool>,
+    // Team scope
+    pub team_id: Option<Uuid>,
     // Domain
     pub verified_domain: Option<String>,
     // SAML
@@ -167,6 +169,7 @@ struct SsoLoginState {
     provider: String,
     redirect: Option<String>,
     saml_request_id: Option<String>,
+    auto_join_team_id: Option<Uuid>,
     created_at: DateTime<Utc>,
 }
 
@@ -197,34 +200,42 @@ impl SsoStateStore {
     }
 }
 
+// ── Query params for team-scoped endpoints ──────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct TeamQuery {
+    pub team_id: Option<Uuid>,
+}
+
 // ── GET /sso/config ─────────────────────────────────────────
 
 async fn get_sso_config(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Query(query): Query<TeamQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let config = sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, DateTime<Utc>, DateTime<Utc>)>(
-        "SELECT id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, admin_bypass, verified_domain, created_at, updated_at
-         FROM sso_configs WHERE customer_id = $1 LIMIT 1"
-    )
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?;
+    // If team_id provided, verify membership and get team's SSO config
+    // Otherwise, fall back to customer's own SSO config (backward compat)
+    let config = if let Some(team_id) = query.team_id {
+        // Verify user is a member of this team
+        let _member = sqlx::query_as::<_, (Uuid, String)>(
+            "SELECT id, role FROM team_members WHERE team_id = $1 AND customer_id = $2"
+        )
+        .bind(team_id)
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+        .ok_or(AppError::Forbidden("Not a member of this team".into()))?;
 
-    match config {
-        Some((id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, verified_domain, created_at, updated_at)) => {
-            // Get default team info
-            let default_team = sqlx::query_as::<_, (Option<Uuid>, Option<String>, Option<String>)>(
-                "SELECT default_team_id, default_role, (SELECT name FROM teams WHERE id = sso_configs.default_team_id) FROM sso_configs WHERE customer_id = $1 LIMIT 1"
-            )
-            .bind(customer.id)
-            .fetch_optional(&pool)
-            .await?;
-
-            let (default_team_id, default_role, default_team_name) = default_team
-                .unwrap_or((None, None, None));
-
-            Ok(Json(serde_json::json!({
+        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, Option<Uuid>, Option<String>, DateTime<Utc>, DateTime<Utc>)>(
+            "SELECT s.id, s.provider, s.enabled, s.metadata_url, s.entity_id, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.admin_bypass, s.verified_domain, s.default_team_id, s.default_role, s.created_at, s.updated_at
+             FROM sso_configs s WHERE s.team_id = $1 LIMIT 1"
+        )
+        .bind(team_id)
+        .fetch_optional(&pool)
+        .await?
+        .map(|(id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at)| {
+            serde_json::json!({
                 "id": id,
                 "provider": provider,
                 "enabled": enabled,
@@ -239,11 +250,43 @@ async fn get_sso_config(
                 "admin_bypass": admin_bypass,
                 "default_team_id": default_team_id,
                 "default_role": default_role.unwrap_or_else(|| "viewer".to_string()),
-                "default_team_name": default_team_name,
                 "created_at": created_at,
                 "updated_at": updated_at,
-            })))
-        }
+            })
+        })
+    } else {
+        // Backward compat: find by customer_id (old behavior)
+        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, Option<Uuid>, Option<String>, DateTime<Utc>, DateTime<Utc>)>(
+            "SELECT id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at
+             FROM sso_configs WHERE customer_id = $1 LIMIT 1"
+        )
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+        .map(|(id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at)| {
+            serde_json::json!({
+                "id": id,
+                "provider": provider,
+                "enabled": enabled,
+                "verified_domain": verified_domain,
+                "metadata_url": metadata_url,
+                "entity_id": entity_id,
+                "sso_url": sso_url,
+                "certificate_set": certificate.is_some(),
+                "issuer_url": issuer_url,
+                "client_id": client_id,
+                "client_secret_set": client_secret_enc.is_some(),
+                "admin_bypass": admin_bypass,
+                "default_team_id": default_team_id,
+                "default_role": default_role.unwrap_or_else(|| "viewer".to_string()),
+                "created_at": created_at,
+                "updated_at": updated_at,
+            })
+        })
+    };
+
+    match config {
+        Some(json) => Ok(Json(json)),
         None => Ok(Json(serde_json::json!({
             "provider": "saml",
             "enabled": false,
@@ -274,6 +317,37 @@ async fn upsert_sso_config(
     let enabled = req.enabled.unwrap_or(false);
     let admin_bypass = req.admin_bypass.unwrap_or(true);
 
+    // Determine the scope: team_id (preferred) or customer_id (backward compat)
+    let scope_team_id: Option<Uuid> = if let Some(tid) = req.team_id {
+        // Verify user is admin of this team
+        let member = sqlx::query_as::<_, (String,)>(
+            "SELECT role FROM team_members WHERE team_id = $1 AND customer_id = $2"
+        )
+        .bind(tid)
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+        .ok_or(AppError::Forbidden("Not a member of this team".into()))?;
+
+        if member.0 != "admin" {
+            // Also check if user is team owner
+            let is_owner: Option<(Uuid,)> = sqlx::query_as(
+                "SELECT id FROM teams WHERE id = $1 AND owner_id = $2"
+            )
+            .bind(tid)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?;
+
+            if is_owner.is_none() {
+                return Err(AppError::Forbidden("Only team admins can manage SSO".into()));
+            }
+        }
+        Some(tid)
+    } else {
+        None
+    };
+
     // Validate required fields when enabling
     if enabled {
         if provider == "saml" {
@@ -282,13 +356,23 @@ async fn upsert_sso_config(
             }
             if req.certificate.is_none() {
                 // Check if existing certificate exists
-                let existing = sqlx::query_scalar::<_, Option<String>>(
-                    "SELECT certificate FROM sso_configs WHERE customer_id = $1"
-                )
-                .bind(customer.id)
-                .fetch_optional(&pool)
-                .await?
-                .flatten();
+                let existing = if let Some(tid) = scope_team_id {
+                    sqlx::query_scalar::<_, Option<String>>(
+                        "SELECT certificate FROM sso_configs WHERE team_id = $1"
+                    )
+                    .bind(tid)
+                    .fetch_optional(&pool)
+                    .await?
+                    .flatten()
+                } else {
+                    sqlx::query_scalar::<_, Option<String>>(
+                        "SELECT certificate FROM sso_configs WHERE customer_id = $1"
+                    )
+                    .bind(customer.id)
+                    .fetch_optional(&pool)
+                    .await?
+                    .flatten()
+                };
 
                 if existing.is_none() && req.certificate.is_none() {
                     return Err(AppError::BadRequest("SAML requires an X.509 certificate".into()));
@@ -298,15 +382,24 @@ async fn upsert_sso_config(
             if req.issuer_url.is_none() || req.client_id.is_none() {
                 return Err(AppError::BadRequest("OIDC requires an issuer URL and a client ID".into()));
             }
-            // Check for client secret (new or existing)
             if req.client_secret.is_none() {
-                let existing = sqlx::query_scalar::<_, Option<String>>(
-                    "SELECT client_secret_encrypted FROM sso_configs WHERE customer_id = $1"
-                )
-                .bind(customer.id)
-                .fetch_optional(&pool)
-                .await?
-                .flatten();
+                let existing = if let Some(tid) = scope_team_id {
+                    sqlx::query_scalar::<_, Option<String>>(
+                        "SELECT client_secret_encrypted FROM sso_configs WHERE team_id = $1"
+                    )
+                    .bind(tid)
+                    .fetch_optional(&pool)
+                    .await?
+                    .flatten()
+                } else {
+                    sqlx::query_scalar::<_, Option<String>>(
+                        "SELECT client_secret_encrypted FROM sso_configs WHERE customer_id = $1"
+                    )
+                    .bind(customer.id)
+                    .fetch_optional(&pool)
+                    .await?
+                    .flatten()
+                };
 
                 if existing.is_none() {
                     return Err(AppError::BadRequest("OIDC requires a client secret".into()));
@@ -333,43 +426,86 @@ async fn upsert_sso_config(
         _ => None,
     };
 
-    sqlx::query(
-        r#"INSERT INTO sso_configs (customer_id, provider, enabled, admin_bypass, verified_domain, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-           ON CONFLICT (customer_id) DO UPDATE SET
-               provider = EXCLUDED.provider,
-               enabled = EXCLUDED.enabled,
-               admin_bypass = EXCLUDED.admin_bypass,
-               verified_domain = EXCLUDED.verified_domain,
-               metadata_url = EXCLUDED.metadata_url,
-               entity_id = EXCLUDED.entity_id,
-               sso_url = EXCLUDED.sso_url,
-               certificate = COALESCE(EXCLUDED.certificate, sso_configs.certificate),
-               issuer_url = EXCLUDED.issuer_url,
-               client_id = EXCLUDED.client_id,
-               client_secret_encrypted = COALESCE(EXCLUDED.client_secret_encrypted, sso_configs.client_secret_encrypted),
-               default_team_id = EXCLUDED.default_team_id,
-               default_role = EXCLUDED.default_role,
-               updated_at = now()"#
-    )
-    .bind(customer.id)
-    .bind(&provider)
-    .bind(enabled)
-    .bind(admin_bypass)
-    .bind(&req.verified_domain)
-    .bind(&req.metadata_url)
-    .bind(&req.entity_id)
-    .bind(&req.sso_url)
-    .bind(&req.certificate)
-    .bind(&req.issuer_url)
-    .bind(&req.client_id)
-    .bind(&client_secret_enc)
-    .bind(&req.default_team_id.as_deref().and_then(|s| Uuid::parse_str(s).ok()))
-    .bind(req.default_role.as_deref().unwrap_or("viewer"))
-    .execute(&pool)
-    .await?;
+    if let Some(tid) = scope_team_id {
+        // Team-scoped SSO config (new behavior)
+        sqlx::query(
+            r#"INSERT INTO sso_configs (team_id, customer_id, created_by, provider, enabled, admin_bypass, verified_domain, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role)
+               VALUES ($1, $2, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+               ON CONFLICT (team_id) DO UPDATE SET
+                   provider = EXCLUDED.provider,
+                   enabled = EXCLUDED.enabled,
+                   admin_bypass = EXCLUDED.admin_bypass,
+                   verified_domain = EXCLUDED.verified_domain,
+                   metadata_url = EXCLUDED.metadata_url,
+                   entity_id = EXCLUDED.entity_id,
+                   sso_url = EXCLUDED.sso_url,
+                   certificate = COALESCE(EXCLUDED.certificate, sso_configs.certificate),
+                   issuer_url = EXCLUDED.issuer_url,
+                   client_id = EXCLUDED.client_id,
+                   client_secret_encrypted = COALESCE(EXCLUDED.client_secret_encrypted, sso_configs.client_secret_encrypted),
+                   default_team_id = EXCLUDED.default_team_id,
+                   default_role = EXCLUDED.default_role,
+                   updated_at = now()"#
+        )
+        .bind(tid)
+        .bind(customer.id)
+        .bind(&provider)
+        .bind(enabled)
+        .bind(admin_bypass)
+        .bind(&req.verified_domain)
+        .bind(&req.metadata_url)
+        .bind(&req.entity_id)
+        .bind(&req.sso_url)
+        .bind(&req.certificate)
+        .bind(&req.issuer_url)
+        .bind(&req.client_id)
+        .bind(&client_secret_enc)
+        .bind(&req.default_team_id.as_deref().and_then(|s| Uuid::parse_str(s).ok()))
+        .bind(req.default_role.as_deref().unwrap_or("viewer"))
+        .execute(&pool)
+        .await?;
 
-    tracing::info!("SSO config updated: customer={}, provider={}, enabled={}", customer.id, provider, enabled);
+        tracing::info!("SSO config updated: team={}, provider={}, enabled={}", tid, provider, enabled);
+    } else {
+        // Customer-scoped SSO config (backward compat)
+        sqlx::query(
+            r#"INSERT INTO sso_configs (customer_id, provider, enabled, admin_bypass, verified_domain, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+               ON CONFLICT (customer_id) DO UPDATE SET
+                   provider = EXCLUDED.provider,
+                   enabled = EXCLUDED.enabled,
+                   admin_bypass = EXCLUDED.admin_bypass,
+                   verified_domain = EXCLUDED.verified_domain,
+                   metadata_url = EXCLUDED.metadata_url,
+                   entity_id = EXCLUDED.entity_id,
+                   sso_url = EXCLUDED.sso_url,
+                   certificate = COALESCE(EXCLUDED.certificate, sso_configs.certificate),
+                   issuer_url = EXCLUDED.issuer_url,
+                   client_id = EXCLUDED.client_id,
+                   client_secret_encrypted = COALESCE(EXCLUDED.client_secret_encrypted, sso_configs.client_secret_encrypted),
+                   default_team_id = EXCLUDED.default_team_id,
+                   default_role = EXCLUDED.default_role,
+                   updated_at = now()"#
+        )
+        .bind(customer.id)
+        .bind(&provider)
+        .bind(enabled)
+        .bind(admin_bypass)
+        .bind(&req.verified_domain)
+        .bind(&req.metadata_url)
+        .bind(&req.entity_id)
+        .bind(&req.sso_url)
+        .bind(&req.certificate)
+        .bind(&req.issuer_url)
+        .bind(&req.client_id)
+        .bind(&client_secret_enc)
+        .bind(&req.default_team_id.as_deref().and_then(|s| Uuid::parse_str(s).ok()))
+        .bind(req.default_role.as_deref().unwrap_or("viewer"))
+        .execute(&pool)
+        .await?;
+
+        tracing::info!("SSO config updated: customer={}, provider={}, enabled={}", customer.id, provider, enabled);
+    }
 
     Ok(Json(serde_json::json!({
         "success": true,
@@ -567,19 +703,36 @@ async fn initiate_sso_login(
         }
     }
 
-    // Strategy 2: Find SSO config — try by customer_id first, then by email domain
-    let config = if let Some(ref customer) = existing_customer {
-        // Existing user: look up their own SSO config
-        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-            "SELECT customer_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
+    // Strategy 2: Find SSO config — try by customer_id, then by team membership, then by domain
+    // Returns: (owner_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_enc, entity_id)
+    let config: Option<(Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)> = if let Some(ref customer) = existing_customer {
+        // Existing user: look up by customer_id first (backward compat)
+        let by_customer = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT customer_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
         )
         .bind(customer.id)
         .fetch_optional(&pool)
-        .await?
+        .await?;
+
+        if by_customer.is_some() {
+            by_customer
+        } else {
+            // Try: find by team membership (user is in a team that has SSO)
+            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted
+                 FROM sso_configs s
+                 INNER JOIN team_members tm ON tm.team_id = s.team_id
+                 WHERE tm.customer_id = $1 AND s.enabled = true AND s.team_id IS NOT NULL
+                 LIMIT 1"
+            )
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+        }
     } else {
         // New user: find SSO config by verified_domain first, then by email domain
-        let by_verified_domain = sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-            "SELECT customer_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id
+        let by_verified_domain = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT COALESCE(customer_id, created_by), team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted
              FROM sso_configs WHERE enabled = true AND verified_domain = $1 LIMIT 1"
         )
         .bind(domain)
@@ -590,8 +743,8 @@ async fn initiate_sso_login(
             by_verified_domain
         } else {
             // Fallback: match by email domain in customer table
-            sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-                "SELECT s.customer_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id
+            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted
                  FROM sso_configs s
                  INNER JOIN customers c ON c.id = s.customer_id
                  WHERE s.enabled = true AND c.email LIKE $1
@@ -603,12 +756,25 @@ async fn initiate_sso_login(
         }
     };
 
-    let (sso_owner_id, provider, enabled, _metadata_url, sso_url, _certificate, issuer_url, client_id, client_secret_enc, entity_id) =
+    let (sso_owner_id, config_team_id, provider, enabled, _metadata_url, sso_url, _certificate, issuer_url, client_id, client_secret_enc, entity_id) =
         config.ok_or_else(|| AppError::BadRequest("SSO is not configured for this account. Contact your administrator.".into()))?;
 
     if !enabled {
         return Err(AppError::BadRequest("SSO is not enabled for this account. Contact your administrator.".into()));
     }
+
+    // Determine the team for auto-join (prefer config_team_id, fallback to default_team_id lookup)
+    let auto_join_team_id = if let Some(tid) = config_team_id {
+        Some(tid)
+    } else {
+        // Backward compat: look up default_team_id from sso_configs
+        sqlx::query_scalar::<_, Uuid>(
+            "SELECT default_team_id FROM sso_configs WHERE customer_id = $1 AND default_team_id IS NOT NULL LIMIT 1"
+        )
+        .bind(sso_owner_id)
+        .fetch_optional(&pool)
+        .await?
+    };
 
     // Generate state parameter for CSRF protection
     let state = Uuid::new_v4().to_string();
@@ -627,6 +793,7 @@ async fn initiate_sso_login(
         provider: provider.clone(),
         redirect: query.redirect.clone(),
         saml_request_id: saml_request_id.clone(),
+        auto_join_team_id,
         created_at: Utc::now(),
     }).await;
 
@@ -877,12 +1044,12 @@ async fn saml_callback(
     // Find or create customer
     let customer = find_or_create_sso_customer(&pool, &email, &assertion.attributes, "saml").await?;
 
-    // Extract SSO config owner's customer_id BEFORE login_state is consumed
-    let sso_owner_id = login_state.as_ref().map(|ls| ls.customer_id);
+    // Extract auto_join_team_id BEFORE login_state is consumed
+    let auto_join_team = login_state.as_ref().and_then(|ls| ls.auto_join_team_id);
 
-    // Auto-join to default team if configured (use SSO config owner's ID to find the config)
-    if let Some(owner_id) = sso_owner_id {
-        let _ = auto_join_default_team(&pool, customer.id, owner_id).await;
+    // Auto-join to team if configured
+    if let Some(team_id) = auto_join_team {
+        let _ = auto_join_team_direct(&pool, customer.id, team_id, "viewer").await;
     }
 
     // Log attempt
@@ -890,7 +1057,7 @@ async fn saml_callback(
 
     // Audit log for SSO login
     let _ = crate::audit::log_action(&pool, customer.id, "SSO_LOGIN", "auth", None,
-        Some(serde_json::json!({"provider": "saml", "auto_joined_team": sso_owner_id.is_some()})),
+        Some(serde_json::json!({"provider": "saml", "auto_joined_team": auto_join_team.is_some()})),
         None, None).await;
 
     // Generate JWT tokens
@@ -1017,18 +1184,20 @@ async fn oidc_callback(
     // Find or create customer
     let customer = find_or_create_sso_customer(&pool, email, &attributes, "oidc").await?;
 
-    // Extract SSO config owner's customer_id BEFORE login_state is consumed
-    let sso_owner_id = login_state.customer_id;
+    // Extract auto_join_team_id BEFORE login_state is consumed
+    let auto_join_team = login_state.auto_join_team_id;
 
-    // Auto-join to default team if configured (use SSO config owner's ID to find the config)
-    let _ = auto_join_default_team(&pool, customer.id, sso_owner_id).await;
+    // Auto-join to team if configured
+    if let Some(team_id) = auto_join_team {
+        let _ = auto_join_team_direct(&pool, customer.id, team_id, "viewer").await;
+    }
 
     // Log attempt
     log_sso_attempt(&pool, Some(customer.id), email, "oidc", true, None, &headers).await;
 
     // Audit log for SSO login
     let _ = crate::audit::log_action(&pool, customer.id, "SSO_LOGIN", "auth", None,
-        Some(serde_json::json!({"provider": "oidc", "auto_joined_team": true})),
+        Some(serde_json::json!({"provider": "oidc", "auto_joined_team": auto_join_team.is_some()})),
         None, None).await;
 
     // Generate JWT tokens and redirect
@@ -1246,6 +1415,55 @@ async fn find_or_create_sso_customer(
 }
 
 // ── Helper: Auto-join SSO user to default team ──────────────
+// ── Helper: Auto-join SSO user to a specific team (direct) ──
+//
+// Used by the new team-scoped SSO flow.
+// `sso_user_id` — the SSO user who just logged in
+// `team_id` — the team to join
+// `default_role` — role to assign (from SSO config)
+
+async fn auto_join_team_direct(
+    pool: &PgPool,
+    sso_user_id: Uuid,
+    team_id: Uuid,
+    default_role: &str,
+) -> Result<(), AppError> {
+    // Check if already a member
+    let already_member: Option<(Uuid,)> = sqlx::query_as(
+        "SELECT id FROM team_members WHERE team_id = $1 AND customer_id = $2"
+    )
+    .bind(team_id)
+    .bind(sso_user_id)
+    .fetch_optional(pool)
+    .await?;
+
+    if already_member.is_some() {
+        return Ok(()); // Already a member
+    }
+
+    // Add to team
+    sqlx::query(
+        "INSERT INTO team_members (team_id, customer_id, role, joined_at) VALUES ($1, $2, $3, NOW()) ON CONFLICT DO NOTHING"
+    )
+    .bind(team_id)
+    .bind(sso_user_id)
+    .bind(default_role)
+    .execute(pool)
+    .await?;
+
+    tracing::info!("✅ SSO auto-join: customer {} added to team {} as {}", sso_user_id, team_id, default_role);
+
+    // Audit log
+    let _ = crate::audit::log_action(pool, sso_user_id, "SSO_AUTO_JOIN_TEAM", "team",
+        Some(&team_id.to_string()),
+        Some(serde_json::json!({"role": default_role})),
+        None, None).await;
+
+    Ok(())
+}
+
+//
+// ── Helper: Auto-join SSO user to default team (legacy) ─────
 //
 // `sso_user_id` — the SSO user who just logged in (will be added to the team)
 // `sso_owner_id` — the customer who owns the SSO config (has default_team_id/default_role)
