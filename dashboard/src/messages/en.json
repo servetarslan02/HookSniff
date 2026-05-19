@@ -6067,5 +6067,26 @@
     "getStarted": "Get Started",
     "apiBase": "API Base URL",
     "auth": "Authentication"
-  }
+  },
+  "catIntegration": "Integration",
+  "q16": "Which programming languages do you support?",
+  "a16": "HookSniff provides official SDKs for 11 languages: Node.js, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, and Swift. All SDKs include auto-retry, webhook verification, and idempotency support. Install via your preferred package manager (npm, pip, go get, cargo, gem, maven, nuget, hex, etc.).",
+  "q17": "How do I migrate from Svix to HookSniff?",
+  "a17": "We provide a step-by-step migration guide. The API is similar — most code changes are just updating import paths and base URLs. SDKs are API-compatible. You can run both services in parallel during migration. See our Migration from Svix guide for details.",
+  "q18": "Do you support multi-tenant webhook systems?",
+  "a18": "Yes. HookSniff supports multi-tenancy through API key isolation. Each customer gets their own API key, and all resources (endpoints, deliveries, API keys) are scoped to that key. You can also use our embeddable portal to let customers manage their own webhooks.",
+  "q19": "Can I set up SSO for my team?",
+  "a19": "Yes. HookSniff supports SAML 2.0 (Okta, Azure AD, Google Workspace) and OpenID Connect (Auth0, Keycloak, AWS Cognito). SSO is available on the Enterprise plan. You can configure auto-team-join so new SSO users are automatically added to a team.",
+  "q20": "How does rate limiting work?",
+  "a20": "Each plan has a requests-per-minute limit and a daily event limit. Rate limits are per API key. If you exceed your limit, requests return HTTP 429 with a Retry-After header. You can upgrade your plan for higher limits.",
+  "q21": "Can I monitor webhook delivery health?",
+  "a21": "Yes. The dashboard provides real-time delivery stats, success rate charts, latency graphs, and endpoint health status. You can also set up alerts for failure rates, endpoint downtime, and DLQ depth. For advanced monitoring, we export OpenTelemetry traces and Prometheus metrics to Grafana.",
+  "q22": "What happens to my data if I delete my account?",
+  "a22": "When you delete your account, all your data is permanently deleted within 30 days. This includes endpoints, deliveries, API keys, team data, and webhook payloads. Deletion is irreversible. You can export your data before deletion via the GDPR endpoints.",
+  "q23": "Do you offer a SLA (Service Level Agreement)?",
+  "a23": "Yes. We offer a 99.9% uptime SLA for all paid plans. Enterprise customers get a custom SLA with priority support. You can check our current status at hooksniff.vercel.app/status.",
+  "q24": "Can I replay failed webhooks?",
+  "a24": "Yes. Failed webhooks are stored in the Dead Letter Queue (DLQ). You can inspect payloads, error messages, and response codes. Replay one or multiple failed deliveries with a single click from the dashboard or API.",
+  "q25": "How do I contact support?",
+  "a25": "For technical questions, open a GitHub Issue at github.com/servetarslan02/HookSniff/issues. For account and billing issues, email support@hooksniff.com. For security vulnerabilities, email security@hooksniff.com. Enterprise customers get priority support."
 }
