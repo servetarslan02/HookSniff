@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-20 02:07 GMT+8 (Grace period kaldırıldı)
+> Son güncelleme: 2026-05-20 03:47 GMT+8 (Broadcast + Security + Email sistemi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -253,6 +253,48 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-20 02:56–03:47 — Broadcast + Security + Email)
+
+### Özet
+Servet ile yeni oturum. Broadcast bildirim sistemi, güvenlik izleme sistemi ve e-posta düzeltmeleri yapıldı. 8+ commit, 3500+ satır kod.
+
+### Yapılan İşler:
+
+**1. Broadcast Bildirim Sistemi (02:57–03:10)**
+- `broadcasts` + `broadcast_dismissals` tabloları (migration 075)
+- Admin CRUD API: GET/POST/PUT/DELETE `/v1/admin/broadcasts`
+- User API: GET `/v1/broadcasts`, POST `/:id/dismiss`, GET `/unread-count`
+- Admin sayfası: E-posta/Bildirim toggle (tek sayfada birleştirildi)
+- NotificationCenter: broadcast'ler çan ikonunda
+- BroadcastBanner: warning/critical dashboard'da banner
+
+**2. E-posta Düzeltmeleri (03:12–03:25)**
+- Resend from_name: `HookSniff <onboarding@resend.dev>`
+- GCloud from_name: `HookSniff <noreply@example.com>`
+- RESEND_API_KEY Cloud Run'da doğrulandı
+- Test emaili gönderildi (servetarslan02@gmail.com)
+
+**3. Güvenlik İzleme Sistemi (03:28–03:40)**
+- `security_events` tablosu (migration 076)
+- `login_attempts` tablosu (brute force tracking)
+- `ip_blocklist` tablosu (migration 077)
+- `security_monitor.rs`: 11 saldırı tespiti
+  - Brute force, credential stuffing, password spray
+  - SQL injection, XSS, path traversal
+  - Scanner detection, suspicious UA
+- Auth akışına entegrasyon
+- Admin güvenlik sayfası: olaylar + IP blok listesi
+
+### Kritik Bulgu: Alert Evaluation Worker Eksik
+- `alert_rules` tablosu var, CRUD API var
+- Ama **background worker yok** — kurallar tetiklenmiyor
+- TODO: Item 254 olarak işaretli
+- Bir sonraki oturumda yapılacak
+
+### Neon DB: 5 tablo eklendi, 3 migration uygulandı
 
 ---
 

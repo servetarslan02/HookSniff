@@ -1,131 +1,56 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-20 01:58 GMT+8
+> Son güncelleme: 2026-05-20 03:47 GMT+8
 
-## ✅ Tamamlanan (Bu Oturum — 1 Commit)
+## ✅ Tamamlanan (Bu Oturum — 8+ Commit)
 
-### 1. Dunning Sistemi — Başarısız Ödeme Kurtarma (01:48–01:58)
-- **Dunning email serisi** — Son 3 gün kalan müşterilere otomatik email (gün 3, 2, 1)
-- **In-app notification** — Çan ikonunda bildirim (billing tipi)
-- **Payment retry job** — Grace period'daki müşteriler için 24 saatte bir otomatik retry
-- **Migration 072** — `dunning_reminders` + `payment_retry_attempts` tabloları
-- **Duplicate koruması** — Aynı gün tekrar email gitmez
-- **TR + EN email template'leri** — Urgency renkleri (amber → orange → red)
-- **Retention cleanup** — Eski reminder'lar (30 gün), retry logları (90 gün)
-- **Distributed lock** — Multi-instance desteği
-- **Neon DB'ye uygulandı** ✅
-- Commit: `adde3f2f`
+### 1. Broadcast Bildirim Sistemi
+- `broadcasts` + `broadcast_dismissals` tabloları (migration 075)
+- Admin CRUD API (5 endpoint)
+- User API (3 endpoint: list, dismiss, unread-count)
+- Admin sayfası: E-posta/Bildirim toggle
+- NotificationCenter'da broadcast gösterimi
+- BroadcastBanner (warning/critical)
+- i18n EN/TR
 
-## ✅ Tamamlanan (Onceki Oturum — 10+ Commit)
+### 2. Güvenlik İzleme Sistemi
+- `security_events` + `login_attempts` tabloları (migration 076)
+- `ip_blocklist` tablosu (migration 077)
+- Brute force, credential stuffing, injection, scanner detection
+- Auth akışına entegrasyon (login'de kontrol)
+- Admin güvenlik sayfası (olaylar + IP blok listesi)
+- IP blokla/kaldır API
 
-### 0. Landing Page Link Düzeltmesi (00:34–00:36)
-- Dashboard sidebar: HookSniff logosu → `https://hooksniff.vercel.app/`
-- Admin sidebar: Admin panel başlığı tıklanabilir yapıldı → landing page
-- Giriş sonrası landing page'e ulaşım sağlandı
-- Commit: `1d537eb3`
+### 3. E-posta Sistemi
+- HookSniff from_name (Resend + GCloud)
+- RESEND_API_KEY Cloud Run'da tanımlı
+- Test emaili gönderildi ✅
 
-## ✅ Tamamlanan (Onceki Oturum — 9+ Commit)
-
-### -3. 2FA Sistemi Kapsamlı Düzeltme (23:28–23:35)
-- 4 sorun tespit edildi (2 kritik, 1 orta, 1 düşük), hepsi düzeltildi
-- Login 2FA akışı tamamen çalışır hale getirildi
-- TOTP + backup code desteği login sayfasına eklendi
-- 2FA disable artık password istiyor (backend ile uyumlu)
-- 14 yeni i18n key (EN + TR)
-- Commit: `b8a34988`
-
-### -2. Özel Alan Adı Sayfası Kapsamlı Denetim (22:34–22:40)
-- 14 sorun tespit edildi, hepsi düzeltildi
-- CNAME doğrulama mantığı düzeltildi (vercel-dns.com kabul ediliyor)
-- Loading skeleton, empty state, load error + retry eklendi
-- Buton yazısı düzeltildi (Adding… / Verifying…)
-- DNS kayıtları mevcut unverified domain'lerde de gösteriliyor
-- Hardcoded Vercel fallback credentials kaldırıldı
-- Environments sekmesi ikonu düzeltildi (🌐 → 📦)
-- Test import path düzeltildi
-- 5 yeni i18n key (EN + TR)
-- Commit: `ef178b8d`
-
-### -1. Dokümantasyon Türkçe Çeviri (22:00–22:14)
-- 13 hardcoded İngilizce sayfa i18n'e geçirildi
-- 300+ i18n key (EN + TR) oluşturuldu
-- 2 mevcut çeviri kalite sorunu düzeltildi
-- Sayfalar: multi-tenant, security, dashboard, idempotency, inbound-webhooks, monitor-performance, cloudevents, playground, smart-routing, changelog, transforms, support, templates
-
-### 0. Dashboard Kapsamlı Denetim (20:25–20:30)
-- 50+ sayfa incelendi, API health check, sidebar, i18n, rotalar
-- 3 sorun bulundu ve düzeltildi:
-  - DashboardOverview `/monitoring` → `/observability` (kırık link)
-  - DashboardOverview `/endpoints` → `/applications` (eski rota)
-  - EN.json: 4 eksik çeviri eklendi
-- Commit: `d6cbf67e`
-
-### 1. Organization Sistemi Kapsamlı Denetim
-- 17 sorun tespit edildi, 10 düzeltme uygulandı
-- Rakip analizi (Clerk, WorkOS, Stripe, GitHub, Svix, Hookdeck)
-
-### 2. P0 Kritik Düzeltmeler
-- API key loglanması engellendi (sadece prefix)
-- SSO login rate limit eklendi (10/dakika)
-- Admin self-lockout koruması (son admin her zaman bypass)
-
-### 3. P1 Yüksek Öncelik
-- Team delete endpoint (DELETE /v1/teams/:id)
-- Team leave endpoint (POST /v1/teams/:id/leave)
-- Ownership transfer (POST /v1/teams/:id/transfer)
-- SAML InResponseTo + destination + audience doğrulaması
-- Verified domain sütunu (migration 068)
-
-### 4. SSO Organizasyona Taşındı (Migration 069)
-- `sso_configs.team_id` → SSO config organizasyona bağlı
-- `sso_configs.created_by` → audit trail
-- Login akışı: team membership + verified_domain ile config bulma
-- Auth enforcement: hem customer hem team bazlı kontrol
-- Rakiplerle (Clerk, WorkOS, GitHub) aynı mimari
-
-### 5. Frontend Güncellemeleri
-- Organization sayfasında takım seçici
-- SSO sayfası teamId prop alıyor, tüm API çağrılarında team_id gönderiyor
-- Verified domain gösterimi
-- i18n: verifiedDomain (en + tr)
-
-### 6. P2 Orta Öncelik
-- SSO login attempts cleanup (90 gün, retention job)
+### 4. Neon DB
+- 5 yeni tablo, 21 index
+- 3 migration uygulandı (075, 076, 077)
 
 ## 📋 Sıradaki
 
-### 1. Cloud Build ile Deploy
-- Tüm değişiklikler push edildi: `de70ebb0`
-- Migration 067 + 068 + 069 Neon DB'ye uygulandı ✅
-- API deploy tetiklenmeli
+### 1. Alert Evaluation Worker (KRİTİK — şu an çalışmıyor)
+- alert_rules tablosu var ama background worker yok
+- alarm oluşturabiliyorsun ama tetiklenmiyor
+- Yapılacak:
+  - Background job (her 1-5 dk)
+  - alert_history tablosu
+  - Notification dispatcher (email/slack/webhook)
+  - Cooldown mekanizması (15 dk)
+- Kodda TODO: `Item 254` olarak işaretli
 
-### 2. Manuel SSO Test
-- Dashboard → Organization → SSO sekmesi
-- Takım seç → SSO config kaydet
-- OIDC ile test et (Google, Auth0)
-- SAML ile test et (Okta, Azure AD)
-- Login URL test et
-- Auto-team-join test et
+### 2. Deploy
+- Cloud Build ile API deploy (tüm yeni endpoint'ler)
+- Vercel otomatik deploy (push edildi)
 
-### 3. Verified Domain Doğrulama
-- TXT record doğrulama mekanizması eklenebilir
-- Şimdilik sadece string olarak kaydediliyor
+### 3. communication_history Tablosu
+- Bulk email iletişim loglaması için gerekli
+- Şu an eksik, `let _ =` ile sessizce geçiliyor
 
 ### 4. P2 Kalan Sorunlar
-- OIDC JWKS imza doğrulaması
 - SSO state → Redis
-- SAML Single Logout (SLO)
-- Frontend SSO enforce sonrası auto-team ayarı değiştirme
-- Team davet email gönderimi
-
-## 🔧 Bilinen Sorunlar
-
-| Sorun | Durum | Not |
-|-------|-------|-----|
-| SSO login engelleme | ✅ | Backend login akışında SSO kontrolü eklendi |
-| auto_join_default_team | ✅ | Team_id bazlı auto-join |
-| Yeni kullanıcı SSO login | ✅ | Email domain'inden SSO config bulma |
-| SSO scope | ✅ | Organizasyona taşındı (migration 069) |
-| SSO state in-memory | ⚠️ | Production'da Redis'e taşınmalı |
-| ID token imza doğrulaması | ⚠️ | JWKS ile doğrulama eklenebilir |
-| Domain doğrulama | ⚠️ | TXT record verification henüz yok |
+- OIDC JWKS imza doğrulaması
+- Verified domain TXT record verification
