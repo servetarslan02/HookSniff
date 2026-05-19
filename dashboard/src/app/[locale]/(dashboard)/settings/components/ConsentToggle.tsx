@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { getErrorMessage } from '@/lib/errors';
+import { useTranslations } from 'next-intl';
 
 export function ConsentToggle({
   consentKey,
@@ -14,6 +15,7 @@ export function ConsentToggle({
 }) {
   const { token } = useAuth();
   const { toast } = useToast();
+  const t = useTranslations('settings');
   const [enabled, setEnabled] = useState(() => {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem(storageKey) === 'true';
@@ -73,7 +75,7 @@ export function ConsentToggle({
         // Revert on failure
         setEnabled(prevValue);
         localStorage.setItem(storageKey, String(prevValue));
-        toast(getErrorMessage(err, 'Failed to update consent'), 'error');
+        toast(getErrorMessage(err, t('failedToUpdateConsent')), 'error');
       }
     }
   };
