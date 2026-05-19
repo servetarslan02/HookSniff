@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 07:17 GMT+8 (API test + DB fix + SDK sync workflow)
+> Son güncelleme: 2026-05-19 08:25 GMT+8 (Kapsamlı güvenlik denetimi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -186,6 +186,31 @@ HookSniff/
 | **Polar.sh** | ✅ Aktif | Ödeme sistemi |
 | **Grafana Cloud** | ✅ Aktif | OTEL monitoring |
 | **Cloudflare R2** | ✅ Aktif | Dosya depolama |
+
+---
+
+## 🔒 Güvenlik Denetimi (2026-05-19 08:25)
+
+**Kapsamlı güvenlik taraması yapıldı — 26 bulgu, 14 düzeltme.**
+
+### Düzeltilen Yüksek Riskler
+1. Endpoint signing_secret API'de açık → skip_serializing
+2. Inbound webhook secret API'de açık → skip_serializing
+3. SameSite=None cookie (önceki oturumda)
+4. WS origin localhost production (önceki oturumda)
+5. Timing attack login (önceki oturumda)
+
+### Düzeltilen Orta Riskler
+6. HTML sanitizer bypass → javascript:/data:/vbscript: filtrelendi
+7. Cookie Secure flag eksik → tüm cookie'lerde Secure
+8. Password max length → 128 karakter limit
+9. Reverse tabnapping → rel="noopener noreferrer"
+
+### Rapor
+- Detaylı rapor: `.ai-context/SECURITY-AUDIT-FULL.md`
+- npm audit: 0 vulnerabilities
+- unsafe blok: yok
+- Kalan 12 bulgu: hepsi düşük öncelik
 
 ---
 
