@@ -7,15 +7,7 @@ import { usePlans } from '@/hooks/usePlans';
 
 const PLAN_FEATURES: Record<string, string[]> = {
   developer: [
-    '1,000 events/day',
-    '1 application',
-    'Unlimited endpoints',
-    '10 event types',
-    '10 subscriptions',
-    '7-day log retention',
-    'HMAC signatures',
-    '2FA support',
-    'Community support',
+    '10eventsDay', '1app', 'unlimitedEndpoints', '10eventTypes', '10subscriptions', '7dayLog', 'hmac', '2faSupport', 'communitySupport',
   ],
   startup: [
     '30kEventsDay', '1application', 'unlimitedEndpoints', '50eventTypes', '300subscriptions', '14dayLog', 'neverBlocked', '003overage', 'cloudevents', 'secretRotation', 'deadLetter', 'emailSupport',
@@ -124,11 +116,12 @@ export function PlanCards({
                 {plan.isEnterprise ? (
                   <>
                     <span className="text-3xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
-                    <span className="text-gray-500 dark:text-slate-400 text-sm">/month</span>
+                    <span className="text-gray-500 dark:text-slate-400 text-sm">{t('monthly')}</span>
                   </>
                 ) : plan.key === 'developer' ? (
                   <>
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">Free</span>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{t('free') || 'Free'}</span>
+                    <span className="text-gray-500 dark:text-slate-400 text-sm">{t('monthly')}</span>
                   </>
                 ) : (
                   <>
@@ -136,7 +129,7 @@ export function PlanCards({
                       ${plan.price}
                     </span>
                     <span className="text-gray-500 dark:text-slate-400 text-sm">
-                      {isAnnual ? '/month, billed annually' : '/month'}
+                      {isAnnual ? t('billedAnnually') : t('monthly')}
                     </span>
                     {isAnnual && (
                       <div className="mt-1">
@@ -157,7 +150,7 @@ export function PlanCards({
                 const fmt = (v: number) => v >= UNL ? '∞' : v.toLocaleString();
                 return (
                   <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-                    ∞ endpoints · {fmt(plan.limits.webhooks)} webhooks/mo · {plan.limits.retention >= UNL ? '∞' : plan.limits.retention + 'd'} retention
+                    ∞ {t('endpoints').toLowerCase()} · {fmt(plan.limits.webhooks)} {t('webhooksMonth').toLowerCase()} · {plan.limits.retention >= UNL ? '∞' : plan.limits.retention + 'd'} {t('dataRetention').toLowerCase()}
                   </p>
                 );
               })()}
@@ -182,6 +175,13 @@ export function PlanCards({
                 >
                   {t('contactSales')}
                 </button>
+              ) : isDowngrade ? (
+                <button type="button"
+                  onClick={() => onUpgrade(plan.key, billingPeriod)}
+                  className="w-full py-2.5 rounded-xl text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+                >
+                  {t('downgrade')}
+                </button>
               ) : (
                 <button type="button"
                   onClick={() => onUpgrade(plan.key, billingPeriod)}
@@ -192,7 +192,7 @@ export function PlanCards({
                       : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'
                   )}
                 >
-                  {t('upgradeTo', { action: isDowngrade ? t('downgrade') : t('upgrade'), plan: t(plan.nameKey) })}
+                  {t('upgradeTo', { action: t('upgrade'), plan: t(plan.nameKey) })}
                 </button>
               )}
             </div>

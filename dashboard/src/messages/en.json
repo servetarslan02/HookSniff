@@ -851,9 +851,14 @@
     "approachingLimit": "Approaching limit! Consider upgrading.",
     "enterpriseContact": "Enterprise plan requires a custom agreement. Opening contact…",
     "savePercent": "Save 20%",
-    "annual": "/year",
+    "annual": "Annual",
     "monthly": "/month",
-    "unlimited": "Unlimited"
+    "unlimited": "Unlimited",
+    "billedAnnually": "/month, billed annually",
+    "downgradePortal": "Opening billing portal to manage your plan…",
+    "upgradeFailed": "Upgrade failed. Please try again.",
+    "downgradeTo": "Switch to {plan}",
+    "free": "Free"
   },
   "auth": {
     "login": "Log In",
