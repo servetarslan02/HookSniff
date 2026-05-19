@@ -1,114 +1,89 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Pagination
 
-HookSniff API uses cursor-based pagination for list endpoints. Results are paginated with a default page size of 20.
+All list endpoints use **cursor-based pagination**. Faster and more reliable than offset-based pagination.
 
-## Query Parameters
+## How It Works
+
+```
+GET /v1/endpoints?limit=20
+→ { "data": [...], "cursor": "eyJpZCI6MTB9" }
+
+GET /v1/endpoints?limit=20&cursor=eyJpZCI6MTB9
+→ { "data": [...], "cursor": null }  // No more pages
+```
+
+## Parameters
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `page` | integer | 1 | Page number |
-| `per_page` | integer | 20 | Items per page (max 100) |
-| `sort` | string | `created_at` | Sort field |
-| `order` | string | `desc` | Sort order (`asc` or `desc`) |
+| `limit` | integer | 20 | Items per page (max 100) |
+| `cursor` | string | null | Cursor from previous response |
 
-## Examples
+## Node.js
 
-### Node.js
+```typescript
+// Manual pagination
+let cursor = undefined;
+do {
+  const page = await hs.endpoint.list({ limit: 20, cursor });
+  for (const ep of page.data) {
+    console.log(ep.url);
+  }
+  cursor = page.cursor;
+} while (cursor);
 
-```javascript
-// First page
-const page1 = await client.webhooks.list({ page: 1, per_page: 20 });
-
-// Next page
-const page2 = await client.webhooks.list({ page: 2, per_page: 20 });
-
-// With filters
-const filtered = await client.webhooks.list({
-  page: 1,
-  status: 'failed',
-  sort: 'created_at',
-  order: 'desc',
-});
-
-// Iterate all pages
-let page = 1;
-let allDeliveries = [];
-while (true) {
-  const result = await client.webhooks.list({ page, per_page: 100 });
-  allDeliveries.push(...result.data);
-  if (result.data.length < 100) break;
-  page++;
+// Auto-paginate
+for await (const ep of hs.endpoint.listIterator({ limit: 100 })) {
+  console.log(ep.url);
 }
 ```
 
-### Python
+## Python
 
 ```python
-# First page
-page1 = hs.webhooks.list(page=1, per_page=20)
-
-# With filters
-filtered = hs.webhooks.list(page=1, status="failed", sort="created_at", order="desc")
-
-# Iterate all pages
-page = 1
-all_deliveries = []
+# Manual pagination
+cursor = None
 while True:
-    result = hs.webhooks.list(page=page, per_page=100)
-    all_deliveries.extend(result["data"])
-    if len(result["data"]) < 100:
+    page = hs.endpoint.list(limit=20, cursor=cursor)
+    for ep in page.data:
+        print(ep.url)
+    cursor = page.cursor
+    if not cursor:
         break
-    page += 1
+
+# Auto-paginate
+for ep in hs.endpoint.list_iterator(limit=100):
+    print(ep.url)
 ```
 
-### Go
+## Go
 
 ```go
-// First page
-page1, err := client.Webhooks.List(&hooksniff.WebhookListInput{
-    Page:    1,
-    PerPage: 20,
-})
-
-// Iterate all pages
-var allDeliveries []hooksniff.Delivery
-page := 1
+// Manual pagination
+cursor := ""
 for {
-    result, _ := client.Webhooks.List(&hooksniff.WebhookListInput{
-        Page:    page,
-        PerPage: 100,
+    page, _ := hs.Endpoint.List(ctx, &hooksniff.EndpointListOptions{
+        Limit: hooksniff.Int32(20),
+        Cursor: &cursor,
     })
-    allDeliveries = append(allDeliveries, result.Data...)
-    if len(result.Data) < 100 {
+    for _, ep := range page.Data {
+        fmt.Println(ep.Url)
+    }
+    if page.Cursor == nil || *page.Cursor == "" {
         break
     }
-    page++
+    cursor = *page.Cursor
 }
 ```
 
-## Response Format
+## Filtering
 
-All list endpoints return a consistent response format:
-
-```json
-{
-  "data": [...],
-  "pagination": {
-    "page": 1,
-    "per_page": 20,
-    "total": 150,
-    "total_pages": 8
-  }
-}
 ```
-
-## Tips
-
-- Use `per_page=100` for bulk operations to minimize API calls
-- Always check `data.length < per_page` to detect the last page
-- Use `sort` and `order` to ensure consistent ordering across pages
-- Cache results when possible to reduce API usage
+GET /v1/webhooks?event_type=order.created&limit=20
+GET /v1/webhooks?endpoint_id=ep_abc123&limit=20
+GET /v1/webhooks?status=failed&limit=20
+```

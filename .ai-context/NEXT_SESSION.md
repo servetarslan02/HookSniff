@@ -1,42 +1,85 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 08:10 GMT+8
+> Son güncelleme: 2026-05-19 17:23 GMT+8
 
 ## ✅ Tamamlanan (Bu Oturum)
 
-### Güvenlik Denetimi (2026-05-19 08:10)
-- **Kapsamlı güvenlik taraması** — tüm API, Dashboard, Worker kodları incelendi
-- **Endpoint signing_secret sızıntısı** → `#[serde(skip_serializing)]` eklendi
-- **Inbound webhook secret sızıntısı** → `#[serde(skip_serializing)]` eklendi
-- **HTML sanitizer güçlendirildi** → `javascript:`/`data:`/`vbscript:` URL filtrelendi + script tag removal
-- **Rapor:** `.ai-context/SECURITY-AUDIT-FULL.md` oluşturuldu
+### Docs Yeniden Yazım (2026-05-19 17:02-17:23)
+- **SDK Libraries sayfası tamamen yeniden yazıldı** — 11 SDK (Java, Kotlin, Swift "Coming Soon" → "Stable")
+  - Her SDK için: installation, quick start, verification, feature tags, API resource sayısı
+  - 34 API resource tablosu eklendi
+  - SDK Feature Parity tablosu eklendi (11 SDK × 8 feature)
+  - "All SDKs Include" kartları eklendi (6 shared feature)
+- **Quickstart sayfası yeniden yazıldı** — 11 dilde quickstart (Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift)
+  - 5 adım: API key, install SDK, create endpoint + send, verify signatures, monitor deliveries
+  - Webhook verification her dilde gösterildi
+  - Standard Webheaders headers tablosu eklendi
+  - "What Happens Next?" kartları eklendi
+- **6 yeni rehber sayfası oluşturuldu (Dashboard):**
+  - `/docs/guides/webhook-verification` — HMAC-SHA256, Standard Webhooks, 11 dilde verification, key rotation, security tips
+  - `/docs/guides/error-handling` — API error codes, SDK error handling, delivery errors, best practices, resilient handler example
+  - `/docs/guides/pagination` — Cursor-based pagination, manual + auto-paginate, filtering
+  - `/docs/guides/streaming` — SSE streaming, rate limiting, rate limit headers, plan limits
+  - `/docs/guides/migration-from-svix` — Why migrate, SDK changes, API differences, step-by-step migration
+  - `/docs/guides/real-world-examples` — E-commerce, CI/CD, multi-channel notifications, multi-tenant, fintech
+- **Docusaurus docs-sdk güncellendi:**
+  - `sidebars.js` — Yeni "Guides" kategorisi eklendi
+  - `quickstart/node.md` — Yeniden yazıldı (TypeScript, correct API paths)
+  - `quickstart/python.md` — Yeniden yazıldı
+  - `quickstart/go.md` — Yeniden yazıldı
+  - 6 yeni guide sayfası oluşturuldu (Docusaurus)
+  - Tüm quickstart'larda `sk_live_` → `hr_live_` düzeltmesi
+- **i18n güncellendi** — `en.json` ve `tr.json`'a yeni docs key'leri eklendi
+- **Docs index sayfası güncellendi** — 6 yeni rehber "How-To Guides" section'ına eklendi
 
-### Önceki Oturumlar
-- API entegrasyon testleri (15+ endpoint)
-- `pgcrypto` extension eklendi (webhook oluşturma düzeldi)
-- `custom_headers` sütunu eklendi (worker processing düzeldi)
-- OpenAPI SDK sync workflow oluşturuldu
-- `SDK_PUSH_TOKEN` secret eklendi
-- `sdks/` klasörü ana repodan kaldırıldı
+### Değişen Dosyalar:
+```
+dashboard/src/app/[locale]/docs/sdk-libraries/page.tsx     (tamamen yeniden yazıldı)
+dashboard/src/app/[locale]/docs/quickstart/page.tsx         (tamamen yeniden yazıldı)
+dashboard/src/app/[locale]/docs/page.tsx                    (yeni rehberler eklendi)
+dashboard/src/app/[locale]/docs/guides/webhook-verification/page.tsx  (yeni)
+dashboard/src/app/[locale]/docs/guides/error-handling/page.tsx        (yeni)
+dashboard/src/app/[locale]/docs/guides/pagination/page.tsx            (yeni)
+dashboard/src/app/[locale]/docs/guides/streaming/page.tsx             (yeni)
+dashboard/src/app/[locale]/docs/guides/migration-from-svix/page.tsx   (yeni)
+dashboard/src/app/[locale]/docs/guides/real-world-examples/page.tsx   (yeni)
+dashboard/src/messages/en.json                              (yeni key'ler)
+dashboard/src/messages/tr.json                              (yeni key'ler)
+docs-sdk/sidebars.js                                        (guides kategorisi)
+docs-sdk/docs/quickstart/node.md                            (yeniden yazıldı)
+docs-sdk/docs/quickstart/python.md                          (yeniden yazıldı)
+docs-sdk/docs/quickstart/go.md                              (yeniden yazıldı)
+docs-sdk/docs/quickstart/java.md                            (prefix fix)
+docs-sdk/docs/quickstart/ruby.md                            (prefix fix)
+docs-sdk/docs/quickstart/elixir.md                          (prefix fix)
+docs-sdk/docs/quickstart/csharp.md                          (prefix fix)
+docs-sdk/docs/quickstart/rust.md                            (prefix fix)
+docs-sdk/docs/quickstart/kotlin.md                          (prefix fix)
+docs-sdk/docs/quickstart/swift.md                           (prefix fix)
+docs-sdk/docs/api-reference.md                              (prefix fix)
+docs-sdk/docs/guides/webhook-verification.md                (yeni)
+docs-sdk/docs/guides/error-handling.md                      (yeni)
+docs-sdk/docs/guides/pagination.md                          (yeni)
+docs-sdk/docs/guides/streaming.md                           (yeni)
+docs-sdk/docs/guides/migration-from-svix.md                 (yeni)
+docs-sdk/docs/guides/real-world-examples.md                 (yeni)
+docs/quickstart.md                                          (prefix fix)
+.ai-context/DOCS-REWRITE-PLAN.md                            (yeni)
+```
 
 ## 📋 Sıradaki
 
-### 1. Cloud Build ile Deploy (EN ÖNEMLİ)
-- **Endpoint secret fix** deploy edilmeli (`signing_secret` artık API'de dönmüyor)
-- **Inbound secret fix** deploy edilmeli
-- **Worker değişiklikleri** (custom_headers) deploy edilmeli
-- `pgcrypto` extension Neon DB'de aktif (deploy gerektirmez)
+### 1. Deploy (EN ÖNEMLİ)
+- Dashboard docs değişiklikleri Vercel'e deploy edilmeli
+- `git push origin main` → Vercel otomatik deploy
 
-### 2. GitHub Actions Billing (Otomatik)
-- Billing yenilendiğinde `openapi-sdk-sync.yml` otomatik çalışacak
-- `docs/openapi.yaml` değiştiğinde 11 SDK ayrı repolara push edilecek
+### 2. Kalan Düzeltmeler
+- Mevcut `/docs/security` sayfası — Standard Webheaders header'larını kullanmalı
+- Mevcut `/docs/retries` sayfası — Güncel retry policy bilgisi
+- Mevcut `/docs/best-practices` sayfası — Yeni SDK örnekleri
+- Docusaurus quickstart'ları (Ruby, Java, Kotlin, PHP, C#, Elixir, Swift) — Tam yeniden yazım
 
-### 3. Onboarding / Quickstart Düzenleme
-- Dashboard'da `Onboarding.tsx` component'i var
-- `/docs/quickstart` sayfası mevcut
-- İlk giriş deneyimini iyileştir
-
-### 4. Token Ayarları
+### 3. Token Ayarları
 - `.sdk-tokens.env` dosyasını oluştur
 - Demo şifresi: `Demo1234!`
 
@@ -44,28 +87,5 @@
 
 | Sorun | Durum | Not |
 |-------|-------|-----|
-| `/v1/event-type` 404 | ⚠️ | Route tanımlı değil, doğru path: `/v1/events` |
+| `/v1/event-type` 404 | ⚠️ | Doğru path: `/v1/events` |
 | `/v1/analytics/overview` 404 | ⚠️ | Doğru path: `/v1/analytics/deliveries` |
-| Webhook delivery "pending" kalıyor | ✅ Düzeldi | `custom_headers` sütunu eklendi |
-| `pgcrypto` yok | ✅ Düzeldi | Neon DB'ye extension eklendi |
-| Endpoint secret API'de açık | ✅ Düzeldi | `skip_serializing` eklendi |
-| Inbound secret API'de açık | ✅ Düzeldi | `skip_serializing` eklendi |
-| HTML sanitizer bypass | ✅ Düzeldi | Genişletilmiş filtre |
-
-## 📊 Güvenlik Durumu
-
-- **26 bulgu** tespit edildi (5 yüksek, 8 orta, 13 düşük)
-- **14 düzeltme** yapıldı (5 yüksek tamamı, 6 orta, 3 düşük)
-- **12 açık** kaldı (hepsi düşük öncelik)
-- **npm audit:** 0 vulnerabilities
-- **unsafe blok:** yok
-- **Detaylı rapor:** `.ai-context/SECURITY-AUDIT-FULL.md`
-
-### Yapılan Düzeltmeler (Bu Oturum)
-1. Endpoint signing_secret → skip_serializing
-2. Inbound webhook secret → skip_serializing
-3. HTML sanitizer güçlendirildi (javascript:/data:/vbscript: + script removal)
-4. Cookie Secure flag (store.tsx, CookieConsent, ConsentToggle)
-5. Password max length 128 karakter
-6. rel="noopener noreferrer" (_blank links)
-7. Comprehensive security audit report

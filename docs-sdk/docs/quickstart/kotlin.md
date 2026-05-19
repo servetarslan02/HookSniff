@@ -26,11 +26,11 @@ implementation 'io.github.servetarslan02:hooksniff-sdk-kotlin:0.3.0'
 import com.hooksniff.sdk.HookSniff
 
 // Initialize client
-val client = HookSniff("sk_live_your_api_key")
+val client = HookSniff("hr_live_your_api_key")
 
 // Or with options
 val client = HookSniff(
-    apiKey = "sk_live_your_api_key",
+    apiKey = "hr_live_your_api_key",
     baseUrl = "https://hooksniff-api-1046140057667.europe-west1.run.app",
     timeout = 30000
 )
