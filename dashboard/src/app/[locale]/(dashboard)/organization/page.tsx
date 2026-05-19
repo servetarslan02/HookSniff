@@ -9,7 +9,7 @@ const tabSkeleton = (
     <div className="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl" />
     <div className="space-y-2">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="h-10 bg-gray-200 dark:bg-slate-700 rounded-lg"} />
+        <div key={i} className="h-10 bg-gray-200 dark:bg-slate-700 rounded-lg" />
       ))}
     </div>
   </div>
