@@ -416,6 +416,26 @@ async fn main() -> Result<()> {
                     }
                     Err(e) => tracing::error!("❌ Payment retry job failed: {:?}", e),
                 }
+
+                // Activate pause for customers whose period ended with pause scheduled
+                match jobs::dunning::activate_paused_subscriptions(&dunning_pool).await {
+                    Ok(count) => {
+                        if count > 0 {
+                            tracing::info!("⏸️ Activated pause for {} subscriptions", count);
+                        }
+                    }
+                    Err(e) => tracing::error!("❌ Pause activation job failed: {:?}", e),
+                }
+
+                // Expire paused subscriptions that exceeded 90 days
+                match jobs::dunning::expire_paused_subscriptions(&dunning_pool).await {
+                    Ok(count) => {
+                        if count > 0 {
+                            tracing::info!("⏰ Expired {} paused subscriptions", count);
+                        }
+                    }
+                    Err(e) => tracing::error!("❌ Pause expiry job failed: {:?}", e),
+                }
             }
         }
     });
