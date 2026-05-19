@@ -266,7 +266,7 @@ export default function RevenueContent({
                 limits={{ endpoints: planForm.max_endpoints_free, webhooks: planForm.max_webhooks_free, rateLimit: planForm.rate_limit_free, retention: planForm.retention_days_free }}
                 editing={editingPlans}
                 onLimitChange={(field, value) => {
-                  const map: Record<string, React.ReactNode> = { endpoints: 'max_endpoints_free', webhooks: 'max_webhooks_free', rateLimit: 'rate_limit_free', retention: 'retention_days_free' };
+                  const map: Record<string, string> = { endpoints: 'max_endpoints_free', webhooks: 'max_webhooks_free', rateLimit: 'rate_limit_free', retention: 'retention_days_free' };
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
@@ -281,7 +281,7 @@ export default function RevenueContent({
                 editing={editingPlans}
                 onPriceChange={(v) => setPlanForm({ ...planForm, plan_price_startup: v })}
                 onLimitChange={(field, value) => {
-                  const map: Record<string, React.ReactNode> = { endpoints: 'max_endpoints_startup', webhooks: 'max_webhooks_startup', rateLimit: 'rate_limit_startup', retention: 'retention_days_startup' };
+                  const map: Record<string, string> = { endpoints: 'max_endpoints_startup', webhooks: 'max_webhooks_startup', rateLimit: 'rate_limit_startup', retention: 'retention_days_startup' };
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
@@ -295,7 +295,7 @@ export default function RevenueContent({
                 editing={editingPlans}
                 onPriceChange={(v) => setPlanForm({ ...planForm, plan_price_pro: v })}
                 onLimitChange={(field, value) => {
-                  const map: Record<string, React.ReactNode> = { endpoints: 'max_endpoints_pro', webhooks: 'max_webhooks_pro', rateLimit: 'rate_limit_pro', retention: 'retention_days_pro' };
+                  const map: Record<string, string> = { endpoints: 'max_endpoints_pro', webhooks: 'max_webhooks_pro', rateLimit: 'rate_limit_pro', retention: 'retention_days_pro' };
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
@@ -310,7 +310,7 @@ export default function RevenueContent({
                 editing={editingPlans}
                 onPriceChange={(v) => setPlanForm({ ...planForm, plan_price_enterprise: v })}
                 onLimitChange={(field, value) => {
-                  const map: Record<string, React.ReactNode> = { endpoints: 'max_endpoints_enterprise', webhooks: 'max_webhooks_enterprise', rateLimit: 'rate_limit_enterprise', retention: 'retention_days_enterprise' };
+                  const map: Record<string, string> = { endpoints: 'max_endpoints_enterprise', webhooks: 'max_webhooks_enterprise', rateLimit: 'rate_limit_enterprise', retention: 'retention_days_enterprise' };
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
