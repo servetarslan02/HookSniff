@@ -153,11 +153,15 @@ export function PlanCards({
                 )}
               </div>
               {/* Dynamic limits */}
-              {plan.limits && (
-                <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-                  {plan.limits.endpoints} endpoints · {plan.limits.webhooks.toLocaleString()} webhooks/mo · {plan.limits.retention}d retention
-                </p>
-              )}
+              {plan.limits && (() => {
+                const UNL = 2147483647;
+                const fmt = (v: number) => v >= UNL ? '∞' : v.toLocaleString();
+                return (
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
+                    {fmt(plan.limits.endpoints)} endpoints · {fmt(plan.limits.webhooks)} webhooks/mo · {plan.limits.retention >= UNL ? '∞' : plan.limits.retention + 'd'} retention
+                  </p>
+                );
+              })()}
               {!plan.limits && (
                 <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t(plan.key === 'enterprise' ? 'plans.enterpriseLimit' : `plans.${plan.key}Limit`)}</p>
               )}

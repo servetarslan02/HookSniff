@@ -846,7 +846,8 @@
     "enterpriseContact": "Enterprise plan requires a custom agreement. Opening contact…",
     "savePercent": "Save 20%",
     "annual": "/year",
-    "monthly": "/month"
+    "monthly": "/month",
+    "unlimited": "Unlimited"
   },
   "auth": {
     "login": "Log In",

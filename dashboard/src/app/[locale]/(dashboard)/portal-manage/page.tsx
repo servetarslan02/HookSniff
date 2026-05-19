@@ -5,6 +5,18 @@ import { clsx } from 'clsx';
 import { usePortalProfile, usePortalUsage, useBillingUsage } from '@/hooks/useDashboardData';
 import { usePlans } from '@/hooks/usePlans';
 
+/** Values >= this threshold represent "unlimited" (max int from DB) */
+const UNLIMITED_THRESHOLD = 2147483647;
+
+function isUnlimited(value: number | undefined | null): boolean {
+  return !value || value >= UNLIMITED_THRESHOLD;
+}
+
+function formatLimit(value: number): string {
+  if (isUnlimited(value)) return '∞';
+  return value.toLocaleString();
+}
+
 export default function PortalPage() {
   const t = useTranslations('portal');
   const tb = useTranslations('billing');
@@ -32,8 +44,10 @@ export default function PortalPage() {
     ? billingUsage.endpoints?.limit ?? billingUsage.endpoints_limit ?? 5
     : 5;
 
-  const webhookPercent = webhookLimit > 0 ? Math.round((webhookUsed / webhookLimit) * 100) : 0;
-  const endpointPercent = endpointLimit > 0 ? Math.round((endpointUsed / endpointLimit) * 100) : 0;
+  const webhookUnlimited = isUnlimited(webhookLimit);
+  const endpointUnlimited = isUnlimited(endpointLimit);
+  const webhookPercent = webhookUnlimited ? 0 : webhookLimit > 0 ? Math.round((webhookUsed / webhookLimit) * 100) : 0;
+  const endpointPercent = endpointUnlimited ? 0 : endpointLimit > 0 ? Math.round((endpointUsed / endpointLimit) * 100) : 0;
 
   if (loading) {
     return (
@@ -138,6 +152,7 @@ export default function PortalPage() {
             used={webhookUsed}
             limit={webhookLimit}
             percent={webhookPercent}
+            unlimited={webhookUnlimited}
             warning={webhookPercent > 80}
           />
 
@@ -147,6 +162,7 @@ export default function PortalPage() {
             used={endpointUsed}
             limit={endpointLimit}
             percent={endpointPercent}
+            unlimited={endpointUnlimited}
             warning={endpointPercent > 80}
           />
 
@@ -168,10 +184,10 @@ export default function PortalPage() {
           {planLimits && (
             <div className="pt-5 border-t border-gray-100 dark:border-slate-700/50">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <LimitCard value={planLimits.endpoints} label={tb('endpoints')} />
-                <LimitCard value={planLimits.webhooks.toLocaleString()} label={tb('webhooksMonth')} />
-                <LimitCard value={planLimits.rateLimit.toLocaleString()} label={tb('rateLimit')} />
-                <LimitCard value={`${planLimits.retention}d`} label={tb('dataRetention')} />
+                <LimitCard value={formatLimit(planLimits.endpoints)} label={tb('endpoints')} />
+                <LimitCard value={formatLimit(planLimits.webhooks)} label={tb('webhooksMonth')} />
+                <LimitCard value={formatLimit(planLimits.rateLimit)} label={tb('rateLimit')} />
+                <LimitCard value={isUnlimited(planLimits.retention) ? '∞' : `${planLimits.retention}d`} label={tb('dataRetention')} />
               </div>
             </div>
           )}
@@ -191,26 +207,37 @@ function StatCard({ label, value, color, icon }: { label: string; value: string;
   );
 }
 
-function UsageBar({ label, used, limit, percent, warning }: { label: string; used: number; limit: number; percent: number; warning?: boolean }) {
+function UsageBar({ label, used, limit, percent, unlimited, warning }: { label: string; used: number; limit: number; percent: number; unlimited?: boolean; warning?: boolean }) {
   const tb = useTranslations('billing');
   return (
     <div>
       <div className="flex justify-between text-sm mb-2">
         <span className="text-gray-600 dark:text-slate-400">{label}</span>
         <span className="font-medium text-gray-900 dark:text-white">
-          {used.toLocaleString()} / {limit.toLocaleString()}
+          {unlimited ? (
+            <>{used.toLocaleString()} / <span className="text-brand-500">∞ {tb('unlimited') || 'Sınırsız'}</span></>
+          ) : (
+            <>{used.toLocaleString()} / {limit.toLocaleString()}</>
+          )}
         </span>
       </div>
-      <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2">
-        <div
-          className={clsx(
-            'h-2 rounded-full transition-all duration-500',
-            warning ? 'bg-red-500' : percent > 50 ? 'bg-yellow-500' : 'bg-brand-500'
-          )}
-          style={{ width: `${percent}%` }}
-        />
-      </div>
-      {warning && (
+      {!unlimited && (
+        <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2">
+          <div
+            className={clsx(
+              'h-2 rounded-full transition-all duration-500',
+              warning ? 'bg-red-500' : percent > 50 ? 'bg-yellow-500' : 'bg-brand-500'
+            )}
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+      )}
+      {unlimited && (
+        <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2">
+          <div className="h-2 rounded-full bg-brand-500" style={{ width: '100%' }} />
+        </div>
+      )}
+      {warning && !unlimited && (
         <p className="text-xs text-red-500 dark:text-red-400 mt-1.5">⚠️ {tb('approachingLimit')}</p>
       )}
     </div>
