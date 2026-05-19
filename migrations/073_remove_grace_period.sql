@@ -16,6 +16,10 @@ SET current_period_end = NOW() + INTERVAL '30 days'
 WHERE plan NOT IN ('free', 'developer')
   AND current_period_end IS NULL;
 
+-- Track customer language preference for emails
+ALTER TABLE customers
+    ADD COLUMN IF NOT EXISTS language VARCHAR(5) DEFAULT 'tr';
+
 -- Clean up old grace period data (payment_failed_at no longer used for grace)
 -- Keep the column for audit/logging but it won't drive downgrade logic anymore
 UPDATE customers
