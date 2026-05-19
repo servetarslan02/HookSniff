@@ -20,30 +20,30 @@ pub async fn open_portal(
 
 #[derive(Serialize)]
 pub(crate) struct UsageResponse {
-    plan: String,
-    payment_provider: String,
-    webhooks: UsageCounter,
-    endpoints: UsageCounter,
-    rate_limit: RateLimitInfo,
-    period: PeriodInfo,
+    pub(crate) plan: String,
+    pub(crate) payment_provider: String,
+    pub(crate) webhooks: UsageCounter,
+    pub(crate) endpoints: UsageCounter,
+    pub(crate) rate_limit: RateLimitInfo,
+    pub(crate) period: PeriodInfo,
 }
 
 #[derive(Serialize)]
-struct UsageCounter {
-    used: u64,
-    limit: u64,
-    remaining: u64,
+pub(crate) struct UsageCounter {
+    pub(crate) used: u64,
+    pub(crate) limit: u64,
+    pub(crate) remaining: u64,
 }
 
 #[derive(Serialize)]
-struct RateLimitInfo {
-    requests_per_minute: u32,
+pub(crate) struct RateLimitInfo {
+    pub(crate) requests_per_minute: u32,
 }
 
 #[derive(Serialize)]
-struct PeriodInfo {
-    start: String,
-    end: String,
+pub(crate) struct PeriodInfo {
+    pub(crate) start: String,
+    pub(crate) end: String,
 }
 
 
@@ -97,11 +97,11 @@ pub async fn get_usage(
 
 #[derive(Serialize)]
 pub(crate) struct InvoiceResponse {
-    id: String,
-    date: String,
-    amount: f64,
-    status: String,
-    plan: String,
+    pub(crate) id: String,
+    pub(crate) date: String,
+    pub(crate) amount: f64,
+    pub(crate) status: String,
+    pub(crate) plan: String,
 }
 
 type InvoiceRow = (

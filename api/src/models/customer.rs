@@ -285,6 +285,14 @@ mod tests {
             allow_overage: false,
             overage_email_notification: false,
             role: "user".to_string(),
+            card_last4: Some("4242".to_string()),
+            card_brand: Some("visa".to_string()),
+            card_exp_month: Some(12),
+            card_exp_year: Some(2027),
+            card_updated_at: None,
+            paused_at: None,
+            paused_until: None,
+            pause_plan: None,
         }
     }
 
@@ -446,10 +454,9 @@ mod tests {
 
     #[test]
     fn test_update_profile_request_deserialization() {
-        let json = r#"{"name":"New Name","email":"new@email.com"}"#;
+        let json = r#"{"name":"New Name"}"#;
         let req: UpdateProfileRequest = serde_json::from_str(json).unwrap();
         assert_eq!(req.name, "New Name");
-        assert_eq!(req.email, "new@email.com");
     }
 
     #[test]

@@ -101,6 +101,8 @@ pub async fn cleanup_excess_endpoints(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::routes::billing::subscription::{UpgradeRequest, UpgradeResponse};
+    use crate::routes::billing::portal::{UsageResponse, UsageCounter, RateLimitInfo, PeriodInfo, InvoiceResponse};
 
     // ── SubscriptionResponse ────────────────────────────────
 
@@ -114,13 +116,20 @@ mod tests {
             polar_subscription_id: None,
             iyzico_subscription_id: None,
             webhook_limit: 50_000,
-            endpoint_limit: u32::MAX as u64,
+            endpoint_limit: u32::MAX,
             retention_days: 30,
             monthly_price_cents: 4900,
             monthly_price_kurus: 0,
             cancel_at_period_end: false,
             billing_period: "monthly".to_string(),
             current_period_end: Some("2026-06-01T00:00:00+00:00".to_string()),
+            card_last4: Some("4242".to_string()),
+            card_brand: Some("visa".to_string()),
+            card_exp_month: Some(12),
+            card_exp_year: Some(2027),
+            paused_at: None,
+            paused_until: None,
+            pause_plan: None,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["plan"], "pro");
@@ -141,13 +150,20 @@ mod tests {
             polar_subscription_id: Some("polar_sub".to_string()),
             iyzico_subscription_id: None,
             webhook_limit: 1000,
-            endpoint_limit: u32::MAX as u64,
+            endpoint_limit: u32::MAX,
             retention_days: 7,
             monthly_price_cents: 0,
             monthly_price_kurus: 0,
             cancel_at_period_end: false,
             billing_period: "monthly".to_string(),
             current_period_end: None,
+            card_last4: None,
+            card_brand: None,
+            card_exp_month: None,
+            card_exp_year: None,
+            paused_at: None,
+            paused_until: None,
+            pause_plan: None,
         };
         let _debug = format!("{:?}", resp);
     }
@@ -389,13 +405,20 @@ mod tests {
             polar_subscription_id: None,
             iyzico_subscription_id: None,
             webhook_limit: 50_000,
-            endpoint_limit: u32::MAX as u64,
+            endpoint_limit: u32::MAX,
             retention_days: 30,
             monthly_price_cents: 4900,
             monthly_price_kurus: 0,
             cancel_at_period_end: true,
             billing_period: "monthly".to_string(),
             current_period_end: Some("2026-06-01T00:00:00+00:00".to_string()),
+            card_last4: Some("4242".to_string()),
+            card_brand: Some("visa".to_string()),
+            card_exp_month: Some(12),
+            card_exp_year: Some(2027),
+            paused_at: None,
+            paused_until: None,
+            pause_plan: None,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["cancel_at_period_end"], true);
