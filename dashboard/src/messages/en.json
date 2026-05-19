@@ -1708,7 +1708,8 @@
       "featureFlags": "Feature Flags",
       "alerts": "Alerts",
       "email": "Email",
-      "broadcasts": "Broadcasts"
+      "broadcasts": "Broadcasts",
+      "security": "Security"
     },
     "noActivity": "No activity recorded yet",
     "noAdminPrivileges": "You don't have admin privileges.",

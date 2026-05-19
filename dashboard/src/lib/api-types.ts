@@ -245,6 +245,48 @@ export interface BroadcastListResponse {
   per_page: number;
 }
 
+// Security types
+export interface SecurityEvent {
+  id: string;
+  event_type: string;
+  severity: string;
+  customer_id: string | null;
+  email: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  details: Record<string, unknown>;
+  resolved: boolean;
+  resolved_by: string | null;
+  resolved_at: string | null;
+  created_at: string;
+}
+
+export interface SecurityStats {
+  total_events: number;
+  unresolved_events: number;
+  critical_events: number;
+  high_events: number;
+  events_by_type: Array<{ event_type: string; count: number }>;
+  events_by_severity: Array<{ severity: string; count: number }>;
+  top_ips: Array<{ ip_address: string; count: number }>;
+  recent_brute_force: number;
+  recent_credential_stuffing: number;
+  recent_injection_attempts: number;
+}
+
+export interface IpBlockEntry {
+  id: string;
+  ip_address: string;
+  reason: string | null;
+  blocked_by: string | null;
+  auto_blocked: boolean;
+  event_id: string | null;
+  is_active: boolean;
+  expires_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TimeBucket {
   timestamp: string;
   successful: number;

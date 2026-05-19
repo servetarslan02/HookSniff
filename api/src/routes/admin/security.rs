@@ -271,6 +271,176 @@ pub struct ResolveAllRequest {
     pub severity: Option<String>,
 }
 
+// ── IP Blocklist ───────────────────────────────────────────
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct IpBlockEntry {
+    pub id: Uuid,
+    pub ip_address: String,
+    pub reason: Option<String>,
+    pub blocked_by: Option<Uuid>,
+    pub auto_blocked: bool,
+    pub event_id: Option<Uuid>,
+    pub is_active: bool,
+    pub expires_at: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct BlockIpRequest {
+    pub ip_address: String,
+    pub reason: Option<String>,
+    pub expires_hours: Option<i64>,  // NULL = permanent
+}
+
+#[derive(Debug, Deserialize)]
+pub struct IpBlocklistFilters {
+    pub page: Option<i64>,
+    pub per_page: Option<i64>,
+    pub is_active: Option<bool>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct IpBlocklistResponse {
+    pub entries: Vec<IpBlockEntry>,
+    pub total: i64,
+    pub page: i64,
+    pub per_page: i64,
+}
+
+/// GET /v1/admin/security/blocklist — List IP blocklist.
+pub async fn list_ip_blocklist(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Query(params): Query<IpBlocklistFilters>,
+) -> Result<Json<IpBlocklistResponse>, AppError> {
+    require_admin(&customer)?;
+
+    let page = params.page.unwrap_or(1).max(1);
+    let per_page = params.per_page.unwrap_or(50).clamp(1, 200);
+    let offset = (page - 1) * per_page;
+
+    let active_filter = params.is_active;
+
+    let where_sql = if active_filter.is_some() {
+        "WHERE is_active = $1"
+    } else {
+        ""
+    };
+
+    let query_sql = format!(
+        "SELECT id, ip_address, reason, blocked_by, auto_blocked, event_id, is_active, expires_at, created_at, updated_at
+         FROM ip_blocklist {} ORDER BY created_at DESC LIMIT ${} OFFSET ${}",
+        where_sql,
+        if active_filter.is_some() { 2 } else { 1 },
+        if active_filter.is_some() { 3 } else { 2 }
+    );
+
+    let mut query = sqlx::query_as::<_, IpBlockEntry>(&query_sql);
+    if let Some(active) = active_filter {
+        query = query.bind(active);
+    }
+    query = query.bind(per_page).bind(offset);
+    let entries = query.fetch_all(&pool).await?;
+
+    let count_sql = format!("SELECT COUNT(*) FROM ip_blocklist {}", where_sql);
+    let mut count_query = sqlx::query_scalar::<_, i64>(&count_sql);
+    if let Some(active) = active_filter {
+        count_query = count_query.bind(active);
+    }
+    let total = count_query.fetch_one(&pool).await?;
+
+    Ok(Json(IpBlocklistResponse { entries, total, page, per_page }))
+}
+
+/// POST /v1/admin/security/blocklist — Block an IP address.
+pub async fn block_ip(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<BlockIpRequest>,
+) -> Result<Json<IpBlockEntry>, AppError> {
+    require_admin_write(&customer)?;
+
+    // Validate IP format (basic check)
+    if req.ip_address.trim().is_empty() || req.ip_address.len() > 45 {
+        return Err(AppError::BadRequest("Invalid IP address".into()));
+    }
+
+    let expires_at = req.expires_hours.map(|h| {
+        chrono::Utc::now() + chrono::Duration::hours(h)
+    });
+
+    let entry = sqlx::query_as::<_, IpBlockEntry>(
+        "INSERT INTO ip_blocklist (ip_address, reason, blocked_by, expires_at)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (ip_address) DO UPDATE SET
+            is_active = true,
+            reason = COALESCE(EXCLUDED.reason, ip_blocklist.reason),
+            blocked_by = EXCLUDED.blocked_by,
+            expires_at = EXCLUDED.expires_at,
+            updated_at = NOW()
+         RETURNING id, ip_address, reason, blocked_by, auto_blocked, event_id, is_active, expires_at, created_at, updated_at"
+    )
+    .bind(req.ip_address.trim())
+    .bind(req.reason.as_deref())
+    .bind(customer.id)
+    .bind(expires_at)
+    .fetch_one(&pool)
+    .await?;
+
+    tracing::info!("🚫 Admin blocked IP: {} (reason: {:?})", entry.ip_address, entry.reason);
+
+    Ok(Json(entry))
+}
+
+/// DELETE /v1/admin/security/blocklist/:id — Unblock an IP (soft delete).
+pub async fn unblock_ip(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin_write(&customer)?;
+
+    let result = sqlx::query(
+        "UPDATE ip_blocklist SET is_active = false, updated_at = NOW() WHERE id = $1"
+    )
+    .bind(id)
+    .execute(&pool)
+    .await?;
+
+    if result.rows_affected() == 0 {
+        return Err(AppError::NotFound);
+    }
+
+    tracing::info!("✅ Admin unblocked IP blocklist entry: {}", id);
+
+    Ok(Json(serde_json::json!({ "unblocked": true })))
+}
+
+/// POST /v1/admin/security/blocklist/check — Check if an IP is blocked.
+pub async fn check_ip_blocked(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<serde_json::Value>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&customer)?;
+
+    let ip = req["ip_address"].as_str().unwrap_or("");
+
+    let blocked: bool = sqlx::query_scalar(
+        "SELECT EXISTS(SELECT 1 FROM ip_blocklist WHERE ip_address = $1 AND is_active = true AND (expires_at IS NULL OR expires_at > NOW()))"
+    )
+    .bind(ip)
+    .fetch_one(&pool)
+    .await?;
+
+    Ok(Json(serde_json::json!({
+        "ip_address": ip,
+        "is_blocked": blocked
+    })))
+}
+
 // ── Tests ──────────────────────────────────────────────────
 
 #[cfg(test)]

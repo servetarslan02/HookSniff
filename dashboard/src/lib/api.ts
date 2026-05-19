@@ -1,4 +1,4 @@
-import type { ApiOptions, Application, RetryPolicyConfig, Endpoint, Delivery, DeliveryDetail, DeliveryAttempt, DeliveryListResponse, StatsResponse, AdminStatsResponse, DeployInfo, AdminUsersResponse, AdminUserDetail, RevenueResponse, Team, TeamMember, TeamDetailResponse, NotificationListResponse, DeliveryTrendResponse, SuccessRateData, LatencyTrendResponse, AuditLogResponse, AuditLogEntryResponse, EndpointHealthResponse, ApiKeyResponse, PortalConfigResponse, PortalEmbedCodeResponse, PortalProfileResponse, PortalUsageResponse, RateLimitResponse, SchemaRegistryListResponse, SearchResponseData, ServiceTokenResponse, TemplateItem, TemplateListResponse, UserAnalytics, ChurnUser, AlertRuleAdmin, FeatureFlag, PlatformSettings, Invoice, AlertRule, InboundConfig, TransformRule, BillingUsage, BillingSubscription, OverageSettings, PortalResponse, RefundResponse, Broadcast, UserBroadcast, BroadcastListResponse } from './api-types';
+import type { ApiOptions, Application, RetryPolicyConfig, Endpoint, Delivery, DeliveryDetail, DeliveryAttempt, DeliveryListResponse, StatsResponse, AdminStatsResponse, DeployInfo, AdminUsersResponse, AdminUserDetail, RevenueResponse, Team, TeamMember, TeamDetailResponse, NotificationListResponse, DeliveryTrendResponse, SuccessRateData, LatencyTrendResponse, AuditLogResponse, AuditLogEntryResponse, EndpointHealthResponse, ApiKeyResponse, PortalConfigResponse, PortalEmbedCodeResponse, PortalProfileResponse, PortalUsageResponse, RateLimitResponse, SchemaRegistryListResponse, SearchResponseData, ServiceTokenResponse, TemplateItem, TemplateListResponse, UserAnalytics, ChurnUser, AlertRuleAdmin, FeatureFlag, PlatformSettings, Invoice, AlertRule, InboundConfig, TransformRule, BillingUsage, BillingSubscription, OverageSettings, PortalResponse, RefundResponse, Broadcast, UserBroadcast, BroadcastListResponse, SecurityEvent, SecurityStats, IpBlockEntry } from './api-types';
 export type * from './api-types';
 
 import { getUserFriendlyMessage, extractErrorCode } from './error-catalog';
@@ -782,6 +782,36 @@ export const adminApi = {
 
   deleteBroadcast: (token: string, id: string) =>
     apiFetch<{ deleted: boolean }>(`/admin/broadcasts/${id}`, { method: 'DELETE', token }),
+
+  // ── Security Monitoring ──
+  listSecurityEvents: (token: string, params?: Record<string, string>) => {
+    const qs = params ? new URLSearchParams(params).toString() : '';
+    return apiFetch<{ events: SecurityEvent[]; total: number; page: number; per_page: number }>(`/admin/security/events${qs ? `?${qs}` : ''}`, { token });
+  },
+
+  getSecurityStats: (token: string) =>
+    apiFetch<SecurityStats>('/admin/security/stats', { token }),
+
+  resolveSecurityEvent: (token: string, id: string) =>
+    apiFetch<{ resolved: boolean }>(`/admin/security/events/${id}/resolve`, { method: 'PUT', token }),
+
+  resolveAllSecurityEvents: (token: string, data: { event_type?: string; severity?: string }) =>
+    apiFetch<{ resolved_count: number }>('/admin/security/resolve-all', { method: 'POST', body: data, token }),
+
+  // ── IP Blocklist ──
+  listIpBlocklist: (token: string, params?: Record<string, string>) => {
+    const qs = params ? new URLSearchParams(params).toString() : '';
+    return apiFetch<{ entries: IpBlockEntry[]; total: number; page: number; per_page: number }>(`/admin/security/blocklist${qs ? `?${qs}` : ''}`, { token });
+  },
+
+  blockIp: (token: string, data: { ip_address: string; reason?: string; expires_hours?: number }) =>
+    apiFetch<IpBlockEntry>('/admin/security/blocklist', { method: 'POST', body: data, token }),
+
+  unblockIp: (token: string, id: string) =>
+    apiFetch<{ unblocked: boolean }>(`/admin/security/blocklist/${id}`, { method: 'DELETE', token }),
+
+  checkIpBlocked: (token: string, ip: string) =>
+    apiFetch<{ ip_address: string; is_blocked: boolean }>('/admin/security/blocklist/check', { method: 'POST', body: { ip_address: ip }, token }),
 };
 
 
