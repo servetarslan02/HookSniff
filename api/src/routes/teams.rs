@@ -500,6 +500,29 @@ async fn accept_invite(
         invite.team_id
     );
 
+    // Notify team owner about the new member
+    {
+        let pool_clone = pool.clone();
+        let team_id = invite.team_id;
+        let member_name = customer.name.clone().unwrap_or_else(|| customer.email.clone());
+        let member_id = customer.id;
+        tokio::spawn(async move {
+            // Get team info
+            if let Ok(Some((team_name, owner_id))) = sqlx::query_as::<_, (String, uuid::Uuid)>(
+                "SELECT name, owner_id FROM teams WHERE id = $1"
+            )
+            .bind(team_id)
+            .fetch_optional(&pool_clone)
+            .await
+            {
+                // Don't notify if the new member is the owner themselves
+                if owner_id != member_id {
+                    crate::notifications::helpers::member_joined(&pool_clone, owner_id, &member_name, &team_name).await;
+                }
+            }
+        });
+    }
+
     // Audit log
     {
         let tid = invite.team_id.to_string();
@@ -645,6 +668,24 @@ async fn remove_member(
     }
 
     tracing::info!("✅ Member {} removed from team {}", uid, team_id);
+
+    // Notify the removed member
+    {
+        let pool_clone = pool.clone();
+        let team_name = team.name.clone();
+        let removed_id = uid;
+        tokio::spawn(async move {
+            // Get removed user's name
+            let member_name: String = sqlx::query_scalar("SELECT COALESCE(name, email) FROM customers WHERE id = $1")
+                .bind(removed_id)
+                .fetch_optional(&pool_clone)
+                .await
+                .ok()
+                .flatten()
+                .unwrap_or_else(|| "Bir üye".to_string());
+            crate::notifications::helpers::member_removed(&pool_clone, removed_id, &member_name, &team_name).await;
+        });
+    }
 
     // Audit log — MEMBER_REMOVE
     {
@@ -898,6 +939,17 @@ async fn transfer_ownership(
         .await?;
 
     tracing::info!("✅ Team '{}' ownership transferred from {} to {}", team.name, customer.id, req.new_owner_id);
+
+    // Notify the new owner
+    {
+        let pool_clone = pool.clone();
+        let team_name = team.name.clone();
+        let new_owner = req.new_owner_id;
+        let old_owner_name = customer.name.clone().unwrap_or_else(|| customer.email.clone());
+        tokio::spawn(async move {
+            crate::notifications::helpers::ownership_transferred(&pool_clone, new_owner, &team_name, &old_owner_name).await;
+        });
+    }
 
     let _ = crate::audit::log_action(&pool, customer.id, "TEAM_TRANSFER", "team", Some(&id.to_string()),
         Some(serde_json::json!({"new_owner": req.new_owner_id.to_string()})), None, None).await;
