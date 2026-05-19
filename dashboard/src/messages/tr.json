@@ -3201,7 +3201,12 @@
     "typeBool": "bool",
     "selectEndpoint": "Bir endpoint seçin",
     "noEndpoints": "Endpoint bulunamadı. Önce bir endpoint oluşturun.",
-    "goToCore": "Core → Endpoint'lere Git"
+    "goToCore": "Core → Endpoint'lere Git",
+    "clearAll": "Temizle",
+    "shortcutHint": "ile webhook gönder",
+    "addFieldFirst": "En az bir anahtarlı alan ekleyin",
+    "sent": "Gönderildi",
+    "previewChanged": "Son gönderimden sonra payload değişti. Güncellemek için Gönder'e tıklayın."
   },
   "apiImporter": {
     "title": "📥 API Spec İçe Aktarıcı",
