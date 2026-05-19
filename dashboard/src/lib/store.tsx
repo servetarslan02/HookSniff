@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { API_BASE } from './api';
+import { API_BASE, twoFactorApi } from './api';
 
 interface User {
   id: string;
@@ -18,6 +18,7 @@ interface AuthContextType {
   apiKey: string | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
+  verify2fa: (tempToken: string, code: string, backupCode?: string) => Promise<User>;
   register: (email: string, password: string, name?: string) => Promise<User>;
   logout: () => void;
   setApiKey: (key: string) => void;
@@ -131,6 +132,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(err.error?.message || 'Login failed');
     }
     const data = await res.json();
+    // 2FA required — throw a structured error so the login page can handle it
+    if (data.requires_2fa) {
+      const twoFaError = new Error('2FA required') as Error & { requires2fa: true; tempToken: string };
+      twoFaError.requires2fa = true;
+      twoFaError.tempToken = data.temp_token;
+      throw twoFaError;
+    }
+    const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
+    persistAuth(u, data.customer.api_key, data.token);
+    return u;
+  }, [persistAuth]);
+
+  const verify2fa = useCallback(async (tempToken: string, code: string, backupCode?: string) => {
+    const data = await twoFactorApi.verify(tempToken, code, backupCode);
     const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: data.customer.plan, is_admin: data.customer.is_admin ?? false };
     persistAuth(u, data.customer.api_key, data.token);
     return u;
@@ -174,7 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, apiKey, isLoading, login, register, logout, setApiKey }}>
+    <AuthContext.Provider value={{ user, token, apiKey, isLoading, login, verify2fa, register, logout, setApiKey }}>
       {children}
     </AuthContext.Provider>
   );
