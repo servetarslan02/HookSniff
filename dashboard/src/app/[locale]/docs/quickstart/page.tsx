@@ -429,7 +429,7 @@ export default function QuickstartPage() {
           </table>
         </div>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          The signature is computed as: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">v1,base64(hmac_sha256(secret, "{webhook-id}.{webhook-timestamp}.{body}"))</code>
+          The signature is computed as: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">v1,base64(hmac_sha256(secret, {"\"{webhook-id}.{webhook-timestamp}.{body}\""}))</code>
         </p>
         <SdkTabs tabs={verifyTabs} />
       </section>
