@@ -18,7 +18,7 @@ export interface ParsedSpec {
  */
 export function parseOpenApiSpec(content: string): ParsedSpec | null {
   try {
-    let spec: Record<string, unknown>;
+    let spec: Record<string, unknown> | null;
 
     // Try JSON first
     try {
@@ -29,22 +29,22 @@ export function parseOpenApiSpec(content: string): ParsedSpec | null {
       if (!spec) return null;
     }
 
-    const info = (spec.info as Record<string, unknown>) || {};
+    const info = (spec!.info as Record<string, unknown>) || {};
 
     // Handle servers (OpenAPI 3.x) and host+basePath (Swagger 2.0)
     let baseUrl = '';
-    if (spec.servers && Array.isArray(spec.servers) && spec.servers.length > 0) {
-      baseUrl = (spec.servers[0] as Record<string, string>).url || '';
-    } else if (spec.host) {
-      const scheme = (spec.schemes as string[])?.[0] || 'https';
-      const basePath = (spec.basePath as string) || '';
-      baseUrl = `${scheme}://${spec.host}${basePath}`;
+    if (spec!.servers && Array.isArray(spec!.servers) && spec!.servers.length > 0) {
+      baseUrl = (spec!.servers[0] as Record<string, string>).url || '';
+    } else if (spec!.host) {
+      const scheme = (spec!.schemes as string[])?.[0] || 'https';
+      const basePath = (spec!.basePath as string) || '';
+      baseUrl = `${scheme}://${spec!.host}${basePath}`;
     }
 
     const endpoints: ParsedEndpoint[] = [];
 
-    if (spec.paths && typeof spec.paths === 'object') {
-      for (const [path, methods] of Object.entries(spec.paths as Record<string, Record<string, unknown>>)) {
+    if (spec!.paths && typeof spec!.paths === 'object') {
+      for (const [path, methods] of Object.entries(spec!.paths as Record<string, Record<string, unknown>>)) {
         if (!methods || typeof methods !== 'object') continue;
         for (const [method, details] of Object.entries(methods)) {
           if (['get', 'post', 'put', 'patch', 'delete', 'head', 'options'].includes(method.toLowerCase())) {
