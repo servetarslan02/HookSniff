@@ -2175,7 +2175,7 @@
     "active": "Etkin",
     "inactive": "Pasif",
     "createdDate": "{date} tarihinde oluşturuldu",
-    "lastUsed": "Son kullanım {date}",
+    "lastUsed": "Son kullanım",
     "rotate": "Döndür",
     "rotating": "Döndürülüyor...",
     "rotateTitle": "API Anahtarı Döndürülsün mü?",
@@ -2183,7 +2183,11 @@
     "deleteTitle": "API Anahtarı Silinsin mi?",
     "deleteDesc": "Bu işlem geri alınamaz. Bu anahtarı kullanan tüm hizmetler erişimini hemen kaybedecek.",
     "failedToLoad": "API anahtarları yüklenemedi",
-    "create": "API Anahtarı Oluştur"
+    "create": "API Anahtarı Oluştur",
+    "unnamedKey": "İsimsiz Anahtar",
+    "keyCreated": "Yeni API Anahtarı Oluşturuldu",
+    "created": "Oluşturulma",
+    "delete": "Sil"
   },
   "onboarding": {
     "welcome": "HookSniff'e Hoş Geldiniz! 🪝",
