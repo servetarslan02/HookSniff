@@ -6032,5 +6032,26 @@
     "getStarted": "Başlayın",
     "apiBase": "API Taban URL'si",
     "auth": "Kimlik Doğrulama"
-  }
+  },
+  "catIntegration": "Entegrasyon",
+  "q16": "Hangi programlama dillerini destekliyorsunuz?",
+  "a16": "HookSniff, 11 dil için resmi SDK sunar: Node.js, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir ve Swift. Tüm SDK'lar otomatik yeniden deneme, webhook doğrulama ve idempotans desteği içerir. Tercih ettiğiniz paket yöneticisi (npm, pip, go get, cargo, gem, maven, nuget, hex vb.) ile kurun.",
+  "q17": "Svix'ten HookSniff'e nasıl geçiş yapabilirim?",
+  "a17": "Adım adım bir geçiş rehberi sunuyoruz. API benzer — çoğu kod değişikliği sadece import yolları ve temel URL'lerin güncellenmesinden ibaret. SDK'lar API uyumlu. Geçiş sırasında her iki hizmeti paralel olarak çalıştırabilirsiniz. Detaylar için Svix'ten Geçiş rehberimize bakın.",
+  "q18": "Multi-tenant webhook sistemlerini destekliyor musunuz?",
+  "a18": "Evet. HookSniff, API anahtar izolasyonu yoluyla multi-tenancy destekler. Her müşteri kendi API anahtarını alır ve tüm kaynaklar (endpoint'ler, teslimatlar, API anahtarları) bu anahtara göre daraltılır. Ayrıca gömülebilir portalımızı kullanarak müşterilerin kendi webhook'larını yönetmelerine izin verebilirsiniz.",
+  "q19": "Ekibim için SSO kurabilir miyim?",
+  "a19": "Evet. HookSniff, SAML 2.0 (Okta, Azure AD, Google Workspace) ve OpenID Connect (Auth0, Keycloak, AWS Cognito) destekler. SSO, Enterprise planında mevcuttur. Yeni SSO kullanıcılarının otomatik olarak bir ekibe eklenmesi için auto-team-join yapılandırabilirsiniz.",
+  "q20": "Hız sınırlaması nasıl çalışır?",
+  "a20": "Her planın dakika başına istek limiti ve günlük olay limiti vardır. Hız limitleri API anahtarı başına geçerlidir. Limitinizi aşarsanız, istekler HTTP 429 döndürür ve bir Retry-After başlığı içerir. Daha yüksek limitler için planınızı yükseltebilirsiniz.",
+  "q21": "Webhook teslimat sağlığını izleyebilir miyim?",
+  "a21": "Evet. Panel, gerçek zamanlı teslimat istatistikleri, başarı oranı grafikleri, gecikme grafikleri ve endpoint sağlık durumu sağlar. Ayrıca hata oranları, endpoint arızaları ve DLQ derinliği için uyarılar ayarlayabilirsiniz. Gelişmiş izleme için OpenTelemetry izleri ve Prometheus metriklerini Grafana'ya aktarıyoruz.",
+  "q22": "Hesabımı silersem verilerime ne olur?",
+  "a22": "Hesabınızı sildiğinizde, tüm verileriniz 30 gün içinde kalıcı olarak silinir. Bu, endpoint'ler, teslimatlar, API anahtarları, ekip verileri ve webhook payload'larını içerir. Silme işlemi geri alınamaz. Silme öncesi GDPR endpoint'lerimiz üzerinden verilerinizi dışa aktarabilirsiniz.",
+  "q23": "SLA (Hizmet Seviyesi Anlaşması) sunuyor musunuz?",
+  "a23": "Evet. Tüm ücretli planlar için %99.9 uptime SLA sunuyoruz. Enterprise müşterileri öncelikli destek ile özel SLA alır. Mevcut durumumuzu hooksniff.vercel.app/status adresinden kontrol edebilirsiniz.",
+  "q24": "Başarısız webhook'ları tekrar gönderebilir miyim?",
+  "a24": "Evet. Başarısız webhook'lar Dead Letter Queue'da (DLQ) saklanır. Payload'ları, hata mesajlarını ve yanıt kodlarını inceleyebilirsiniz. Panelden veya API'den tek tıklamayla bir veya birden fazla başarısız teslimatı tekrar gönderebilirsiniz.",
+  "q25": "Destek ile nasıl iletişime geçebilirim?",
+  "a25": "Teknik sorular için github.com/servetarslan02/HookSniff/issues adresinden GitHub Issue açın. Hesap ve faturalandırma sorunları için support@hooksniff.com adresine e-posta gönderin. Güvenlik açıkları için security@hooksniff.com adresine e-posta gönderin. Enterprise müşterileri öncelikli destek alır."
 }
