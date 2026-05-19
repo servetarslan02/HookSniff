@@ -243,7 +243,7 @@ async fn delete_domain(
     }
 
     // Remove domain from Vercel (best-effort)
-    if let Some(ref domain) = domain_name {
+    if let Some((ref domain,)) = domain_name {
         let _ = remove_domain_from_vercel(domain).await;
     }
 
