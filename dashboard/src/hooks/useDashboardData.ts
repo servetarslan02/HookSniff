@@ -355,6 +355,16 @@ export function useTeamMembers(teamId: string | null) {
   });
 }
 
+export function useTeamDetail(teamId: string | null) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['teams', teamId, 'detail'],
+    queryFn: () => teamsApi.getDetail(token!, teamId!),
+    enabled: !!token && !!teamId,
+    staleTime: 15_000,
+  });
+}
+
 export function useCreateTeam() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
@@ -444,6 +454,19 @@ export function useTransferOwnership() {
     onSettled: (_data, _error, { teamId }) => {
       queryClient.invalidateQueries({ queryKey: ['teams'] });
       queryClient.invalidateQueries({ queryKey: ['teams', teamId, 'members'] });
+    },
+  });
+}
+
+export function useRevokeInvite() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (inviteId: string) => teamsApi.revokeInvite(token!, inviteId),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      // Invalidate all team detail queries to refresh invites
+      queryClient.invalidateQueries({ queryKey: ['teams'], exact: false });
     },
   });
 }
