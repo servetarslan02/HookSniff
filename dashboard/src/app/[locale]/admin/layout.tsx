@@ -85,12 +85,13 @@ function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-xs md:hidden"
-          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={(e) => { e.stopPropagation(); setSidebarOpen(false); }}
+          aria-hidden="true"
         />
       )}
 
-      {/* Item 127 — Sidebar with ARIA landmark */}
+      {/* Sidebar */}
       <aside
         aria-label={t('adminPanel')}
         className={clsx(
