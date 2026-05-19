@@ -96,6 +96,13 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       ],
     },
     {
+      key: 'organization',
+      label: t('sectionOrganization'),
+      items: [
+        { name: t('organization'), href: '/organization', icon: '👥' },
+      ],
+    },
+    {
       key: 'billing',
       label: t('sectionBilling'),
       items: [

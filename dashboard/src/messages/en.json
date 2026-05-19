@@ -205,7 +205,9 @@
     "sectionWebhooks": "Webhooks",
     "sectionIntegrations": "Integrations",
     "sectionDevtools": "Dev Tools",
-    "sectionPortal": "Portal"
+    "sectionPortal": "Portal",
+    "organization": "Organization",
+    "sectionOrganization": "Organization"
   },
   "dashboard": {
     "title": "Dashboard",
