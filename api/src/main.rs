@@ -378,6 +378,48 @@ async fn main() -> Result<()> {
         jobs::metrics_push::run(metrics_pool).await;
     });
 
+    // Dunning job: send payment reminder emails + in-app notifications daily
+    // Sends emails at 3, 2, 1 days before grace period expiry
+    let dunning_pool = pool.clone();
+    let dunning_queue = job_queue.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(24 * 60 * 60)).await;
+
+            let should_run = if let Some(ref queue) = dunning_queue {
+                queue.try_acquire_lock("dunning", 3600).await.unwrap_or(true)
+            } else {
+                true
+            };
+
+            if should_run {
+                // Initialize Resend email client for dunning
+                if let Some(email_client) = hooksniff_api::resend_email::ResendEmailClient::from_env() {
+                    match jobs::dunning::run_dunning(&dunning_pool, &email_client).await {
+                        Ok(sent) => {
+                            if sent > 0 {
+                                tracing::info!("📧 Dunning: {} payment reminder emails sent", sent);
+                            }
+                        }
+                        Err(e) => tracing::error!("❌ Dunning job failed: {:?}", e),
+                    }
+                } else {
+                    tracing::warn!("⚠️ Resend not configured, dunning emails skipped");
+                }
+
+                // Also attempt payment retries for customers in grace period
+                match jobs::dunning::retry_failed_payments(&dunning_pool).await {
+                    Ok(retried) => {
+                        if retried > 0 {
+                            tracing::info!("🔄 Payment retry: {} retries attempted", retried);
+                        }
+                    }
+                    Err(e) => tracing::error!("❌ Payment retry job failed: {:?}", e),
+                }
+            }
+        }
+    });
+
     // Start auth cache cleanup (evicts expired entries every 60s)
     middleware::start_auth_cache_cleanup();
 
