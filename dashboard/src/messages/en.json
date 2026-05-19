@@ -2766,7 +2766,8 @@
     "limitUpdated": "Rate limit updated",
     "limitDeleted": "Rate limit deleted",
     "limitUpdateFailed": "Could not update the rate limit. Please try again.",
-    "limitDeleteFailed": "Could not delete the rate limit. Please try again."
+    "limitDeleteFailed": "Could not delete the rate limit. Please try again.",
+    "addRateLimit": "Add Rate Limit"
   },
   "portal": {
     "title": "👤 Customer Portal",
@@ -2888,7 +2889,9 @@
     "healthy": "Healthy",
     "msAvg": "{ms}ms avg",
     "noEndpoints": "No endpoints configured yet.",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "configure": "Configure",
+    "createEndpoint": "Create Endpoint"
   },
   "customDomain": {
     "title": "🌐 Custom Domain",
@@ -2919,7 +2922,12 @@
     "step2Title": "Add DNS records",
     "step2Desc": "We'll give you CNAME and TXT records to add to your DNS provider",
     "step3Title": "Verify & go live",
-    "step3Desc": "We verify ownership and automatically provision an SSL certificate"
+    "step3Desc": "We verify ownership and automatically provision an SSL certificate",
+    "existingDomains": "Your Domains",
+    "domainDeleted": "Domain removed",
+    "failedToDelete": "Failed to delete domain",
+    "delete": "Remove",
+    "pending": "Pending"
   },
   "signatureVerifier": {
     "title": "🔐 Signature Verifier",
@@ -3243,7 +3251,9 @@
     "tip": "Tip:",
     "tipContent": "Per-endpoint retry policies override these global defaults. Configure them in",
     "endpointSettingsLink": "Endpoint Settings",
-    "noEndpoints": "No endpoints found. Create an endpoint first to configure retry policy."
+    "noEndpoints": "No endpoints found. Create an endpoint first to configure retry policy.",
+    "configure": "Configure",
+    "createEndpoint": "Create Endpoint"
   },
   "inbound": {
     "title": "Inbound Webhooks",

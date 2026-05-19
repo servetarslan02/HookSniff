@@ -101,6 +101,16 @@ export default function RateLimitingPage() {
         </div>
       )}
 
+      {/* Add Rate Limit */}
+      {!stats && (
+        <div className="flex justify-end">
+          <button type="button" onClick={() => setEditTarget('__new__')}
+            className="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+            {t('addRateLimit') || 'Add Rate Limit'}
+          </button>
+        </div>
+      )}
+
       {limits.length > 0 && (
         <div className="glass-card overflow-hidden">
           <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200/50 dark:border-slate-700/50">
