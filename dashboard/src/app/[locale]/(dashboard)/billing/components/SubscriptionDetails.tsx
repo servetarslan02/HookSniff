@@ -8,7 +8,7 @@ import { billingApiExtended } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { useBillingSubscription } from '@/hooks/useDashboardData';
 import { getErrorMessage } from '@/lib/errors';
-import { AlertTriangle, CreditCard, DollarSign } from 'lucide-react';
+import { AlertTriangle, CreditCard, DollarSign, Pause, Play } from 'lucide-react';
 
 const PROVIDER_LABELS: Record<string, { name: string; icon: string }> = {
   stripe: { name: 'Stripe', icon: <CreditCard size={16} strokeWidth={1.75} /> },
@@ -31,9 +31,10 @@ const STATUS_STYLES: Record<string, React.ReactNode> = {
   canceled: 'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-600/20',
   past_due: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20',
   inactive: 'bg-gray-50 dark:bg-gray-500/10 text-gray-700 dark:text-gray-400 ring-gray-600/20',
+  paused: 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 ring-blue-600/20',
 };
 
-export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
+export function SubscriptionDetails({ onCancel, onPause, onResume }: { onCancel?: () => void; onPause?: () => void; onResume?: () => void }) {
   const { token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('billing');
@@ -110,20 +111,47 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
           )}>
             {t(`status.${sub.status}`)}
           </span>
-          {sub.cancel_at_period_end && (
+          {sub.cancel_at_period_end && !sub.paused_at && (
             <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-2">
               <AlertTriangle size={16} strokeWidth={1.75} className="inline mr-1" /> {t('cancelAtPeriodEnd')}
             </p>
           )}
-          {!isFree && !sub.cancel_at_period_end && (
-            <button
-              type="button"
-              onClick={onCancel}
-              className="text-xs text-red-600 dark:text-red-400 hover:underline mt-2 block"
-            >
-              {t('cancelSubscription')}
-            </button>
+          {sub.paused_at && (
+            <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+              <Pause size={14} strokeWidth={1.75} className="inline mr-1" />
+              {t('subscriptionPaused')}
+              {sub.paused_until && ` — ${t('resumeBefore')} ${new Date(sub.paused_until).toLocaleDateString()}`}
+            </p>
           )}
+          <div className="flex gap-3 mt-2">
+            {!isFree && !sub.paused_at && !sub.cancel_at_period_end && (
+              <button
+                type="button"
+                onClick={onPause}
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+              >
+                <Pause size={12} strokeWidth={1.75} /> {t('pauseSubscription')}
+              </button>
+            )}
+            {!isFree && !sub.paused_at && !sub.cancel_at_period_end && (
+              <button
+                type="button"
+                onClick={onCancel}
+                className="text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1"
+              >
+                {t('cancelSubscription')}
+              </button>
+            )}
+            {sub.paused_at && (
+              <button
+                type="button"
+                onClick={onResume}
+                className="text-xs text-green-600 dark:text-green-400 hover:underline flex items-center gap-1"
+              >
+                <Play size={12} strokeWidth={1.75} /> {t('resumeSubscription')}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Card on File */}
