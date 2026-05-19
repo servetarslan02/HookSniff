@@ -851,9 +851,14 @@
     "approachingLimit": "Limit yaklaşıyor! Yükseltmeyi düşünün.",
     "enterpriseContact": "Enterprise planı özel anlaşma gerektirir. İletişim açılıyor...",
     "savePercent": "%20 Tasarruf",
-    "annual": "/yıl",
+    "annual": "Yıllık",
     "monthly": "/ay",
-    "unlimited": "Sınırsız"
+    "unlimited": "Sınırsız",
+    "billedAnnually": "/ay, yıllık faturalandırılır",
+    "downgradePortal": "Planınızı yönetmek için fatura portalı açılıyor…",
+    "upgradeFailed": "Yükseltme başarısız oldu. Lütfen tekrar deneyin.",
+    "downgradeTo": "{plan} planına geç",
+    "free": "Ücretsiz"
   },
   "auth": {
     "login": "Giriş Yap",

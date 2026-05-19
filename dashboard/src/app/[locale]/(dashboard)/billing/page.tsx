@@ -49,10 +49,8 @@ export default function BillingPage() {
     if (!token) return;
     setCancelling(true);
     try {
-      await billingApiExtended.getSubscription(token).then(async () => {
-        const { api } = await import('@/lib/api');
-        await api.delete('/billing/subscription', token);
-      });
+      const { api } = await import('@/lib/api');
+      await api.delete('/billing/subscription', token);
       toast(t('cancelledMsg'), 'info');
       setShowCancelModal(false);
       router.refresh();
@@ -70,8 +68,27 @@ export default function BillingPage() {
     setShowUpgradeModal(planKey);
   };
 
+  const planOrder = ['developer', 'startup', 'pro', 'enterprise'];
+
   const confirmUpgrade = async () => {
     if (!showUpgradeModal || !token) return;
+
+    // Downgrade → open customer portal (backend only supports upgrades)
+    const isDowngrade = planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan);
+    if (isDowngrade) {
+      try {
+        const result = await billingApiExtended.openPortal(token);
+        if (result.url) {
+          window.open(result.url, '_blank');
+          toast(t('downgradePortal') || 'Opening billing portal to manage your plan…', 'info');
+        }
+      } catch (err: unknown) {
+        toast(getErrorMessage(err, tc('unknownError')) || tc('upgradeFailed'), 'error');
+      }
+      setShowUpgradeModal(null);
+      return;
+    }
+
     setUpgrading(true);
     try {
       const result = await billingApiExtended.upgrade(token, showUpgradeModal, billingPeriod);
@@ -135,21 +152,38 @@ export default function BillingPage() {
         <InvoiceTable invoices={invoices ?? []} loading={loadingInvoices} />
       </section>
 
-      {/* Upgrade Modal */}
+      {/* Upgrade/Downgrade Modal */}
       {showUpgradeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" aria-hidden="true" onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }} />
           <div ref={upgradeModalRef} tabIndex={-1} className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 outline-hidden">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {t('upgradeTo', { action: 'upgrade', plan: showUpgradeModal })}
+              {planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan)
+                ? t('downgradeTo', { plan: t(`plans.${showUpgradeModal}`) }) || `${t('downgrade')} → ${t(`plans.${showUpgradeModal}`)}`
+                : t('upgradeTo', { action: t('upgrade'), plan: t(`plans.${showUpgradeModal}`) })
+              }
             </h3>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{t('upgradeDesc')}</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
+              {planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan)
+                ? t('downgradeDesc')
+                : t('upgradeDesc')
+              }
+            </p>
             <div className="flex gap-3 justify-end">
               <button type="button" onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
                 {tc('cancel')}
               </button>
-              <button type="button" onClick={confirmUpgrade} disabled={upgrading} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60">
-                {upgrading ? t('redirecting') : tc('confirm')}
+              <button type="button" onClick={confirmUpgrade} disabled={upgrading} className={`px-4 py-2.5 text-sm font-medium text-white rounded-xl transition disabled:opacity-60 ${
+                showUpgradeModal && planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan)
+                  ? 'bg-yellow-600 hover:bg-yellow-700'
+                  : 'bg-brand-600 hover:bg-brand-700'
+              }`}>
+                {upgrading
+                  ? t('redirecting')
+                  : showUpgradeModal && planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan)
+                    ? t('downgrade')
+                    : tc('confirm')
+                }
               </button>
             </div>
           </div>
