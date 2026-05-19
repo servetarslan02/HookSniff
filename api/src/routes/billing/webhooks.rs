@@ -134,6 +134,7 @@ async fn process_webhook_result(
                      {} = $3, {} = $4, webhook_limit = $5, \
                      payment_failed_at = NULL, \
                      current_period_end = NOW() + INTERVAL '{}', \
+                     billing_interval = $7, \
                      updated_at = NOW() WHERE id = $6",
                     cust_col, sub_col, period_interval
                 );
@@ -141,6 +142,7 @@ async fn process_webhook_result(
                     .bind(plan.as_str()).bind(provider)
                     .bind(provider_customer_id).bind(provider_subscription_id)
                     .bind(webhook_limit).bind(customer_id)
+                    .bind(&interval)
                     .execute(pool).await?;
             } else {
                 return Ok(());
@@ -206,11 +208,12 @@ async fn process_webhook_result(
                     "UPDATE customers SET plan = $1, webhook_limit = $2, \
                      payment_failed_at = NULL, \
                      current_period_end = NOW() + INTERVAL '{}', \
+                     billing_interval = $4, \
                      updated_at = NOW() WHERE {} = $3",
                     period_interval, sub_col
                 );
                 sqlx::query(&query).bind(plan.as_str()).bind(webhook_limit)
-                    .bind(provider_subscription_id).execute(pool).await?;
+                    .bind(provider_subscription_id).bind(&interval).execute(pool).await?;
             } else {
                 return Ok(());
             }
