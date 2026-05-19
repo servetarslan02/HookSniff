@@ -1,5 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
 
@@ -8,19 +9,20 @@ export const metadata: Metadata = {
   description: 'Build multi-tenant webhook systems where each customer gets their own endpoints and signing secrets',
 };
 
-export default function MultiTenantPage() {
+export default async function MultiTenantPage() {
+  const t = await getTranslations('docsMultiTenant');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">🏢 Multi-Tenant Webhooks</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">🏢 {t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Let your customers register their own webhook endpoints. Each customer gets a unique signing secret and isolated delivery.
+        {t('subtitle')}
       </p>
 
       {/* Architecture */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Architecture</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('architecture')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Instead of one endpoint for all customers, each customer gets their own HookSniff endpoint. Your app sends events to HookSniff, which delivers to each customer's URL independently.
+          {t('architectureDesc')}
         </p>
         <CodeBlock
           code={`Your App → HookSniff → Customer A's endpoint (https://a.com/webhook)
@@ -37,9 +39,9 @@ Each customer has:
 
       {/* Registration Flow */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Customer Registration Flow</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('registrationFlow')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          When a customer registers for webhooks, create an endpoint in HookSniff and store the details in your database:
+          {t('registrationFlowDesc')}
         </p>
         <CodeBlock
           code={`// POST /api/webhooks/register
@@ -82,9 +84,9 @@ app.post('/api/webhooks/register', authenticate, async (req, res) => {
 
       {/* Sending Events */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Sending Events to All Customers</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('sendingEvents')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          When your app generates an event, find all subscribed customers and send to each:
+          {t('sendingEventsDesc')}
         </p>
         <CodeBlock
           code={`async function notifyCustomers(event, data) {
@@ -118,9 +120,9 @@ await notifyCustomers('order.created', {
 
       {/* Customer Portal */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Customer Self-Service Portal</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('customerPortal')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Let customers manage their own endpoints, view delivery logs, and rotate secrets — without contacting support:
+          {t('customerPortalDesc')}
         </p>
         <CodeBlock
           code={`// Generate a portal link for a customer
@@ -142,9 +144,9 @@ app.get('/api/webhooks/portal', authenticate, async (req, res) => {
 
       {/* Webhook Handler */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Handling Customer Webhooks</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('handlingWebhooks')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          If customers send webhooks <em>to you</em> (inbound), verify each one with its unique secret:
+          {t('handlingWebhooksDesc')}
         </p>
         <CodeBlock
           code={`app.post('/api/inbound-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
@@ -178,15 +180,15 @@ app.get('/api/webhooks/portal', authenticate, async (req, res) => {
 
       {/* Best Practices */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Best Practices</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('bestPractices')}</h2>
         <div className="space-y-4 not-prose">
           {[
-            { icon: '✅', title: 'One endpoint per customer', desc: 'Don\'t share endpoints between customers. Each gets their own URL and secret.' },
-            { icon: '✅', title: 'Encrypt signing secrets', desc: 'Store signing secrets encrypted at rest. Decrypt only when verifying.' },
-            { icon: '✅', title: 'Use event filtering', desc: 'Only send events the customer subscribed to. Use event_types on endpoint creation.' },
-            { icon: '✅', title: 'Rate limit per customer', desc: 'Set per-endpoint rate limits to prevent one customer from overwhelming your system.' },
-            { icon: '✅', title: 'Offer portal access', desc: 'Let customers view deliveries, rotate secrets, and manage endpoints themselves.' },
-            { icon: '❌', title: 'Don\'t share secrets', desc: 'Never share signing secrets between customers or expose them in logs.' },
+            { icon: '✅', title: t('bpOneEndpoint'), desc: t('bpOneEndpointDesc') },
+            { icon: '✅', title: t('bpEncryptSecrets'), desc: t('bpEncryptSecretsDesc') },
+            { icon: '✅', title: t('bpEventFiltering'), desc: t('bpEventFilteringDesc') },
+            { icon: '✅', title: t('bpRateLimit'), desc: t('bpRateLimitDesc') },
+            { icon: '✅', title: t('bpPortal'), desc: t('bpPortalDesc') },
+            { icon: '❌', title: t('bpDontShare'), desc: t('bpDontShareDesc') },
           ].map(({ icon, title, desc }) => (
             <div key={title} className="flex items-start gap-3 p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
               <span className="text-xl">{icon}</span>
@@ -201,9 +203,9 @@ app.get('/api/webhooks/portal', authenticate, async (req, res) => {
 
       {/* Full Example */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Full Example: SaaS Platform</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('fullExample')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          A complete example for a SaaS platform where each tenant can subscribe to events:
+          {t('fullExampleDesc')}
         </p>
         <CodeBlock
           code={`// Database schema
