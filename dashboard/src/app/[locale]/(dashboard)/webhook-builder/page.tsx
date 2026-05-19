@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
@@ -49,24 +49,33 @@ export default function WebhookBuilderPage() {
   const [fields, setFields] = useState<WebhookField[]>(TEMPLATES['order.created'].fields);
   const [endpointId, setEndpointId] = useState('');
   const [preview, setPreview] = useState('');
+  const [lastSentPayload, setLastSentPayload] = useState<string | null>(null);
 
-  const updatePreview = () => {
+  /** Build payload object from fields */
+  const buildPayload = useCallback(() => {
     const payload: Record<string, unknown> = {};
     fields.forEach((f) => {
-      if (f.key) {
+      if (f.key.trim()) {
         if (f.type === 'number') payload[f.key] = parseFloat(f.value) || 0;
         else if (f.type === 'boolean') payload[f.key] = f.value === 'true';
         else payload[f.key] = f.value;
       }
     });
-    setPreview(JSON.stringify({ event: eventType, data: payload }, null, 2));
-  };
+    return { event: eventType, data: payload };
+  }, [fields, eventType]);
+
+  /** Auto-update preview when fields or event type change */
+  useEffect(() => {
+    const payload = buildPayload();
+    setPreview(JSON.stringify(payload, null, 2));
+  }, [buildPayload]);
 
   const loadTemplate = (name: string) => {
     const template = TEMPLATES[name as keyof typeof TEMPLATES];
     if (template) {
       setEventType(name);
       setFields([...template.fields]);
+      setLastSentPayload(null);
     }
   };
 
@@ -84,21 +93,29 @@ export default function WebhookBuilderPage() {
     setFields(updated);
   };
 
+  const clearAll = useCallback(() => {
+    setEventType('');
+    setFields([{ key: '', value: '', type: 'string' }]);
+    setEndpointId('');
+    setPreview('');
+    setLastSentPayload(null);
+  }, []);
+
   const handleSend = () => {
     if (!endpointId) {
       toast(t('selectEndpointFirst'), 'error');
       return;
     }
-    const payload: Record<string, unknown> = {};
-    fields.forEach((f) => {
-      if (f.key) {
-        if (f.type === 'number') payload[f.key] = parseFloat(f.value) || 0;
-        else if (f.type === 'boolean') payload[f.key] = f.value === 'true';
-        else payload[f.key] = f.value;
-      }
-    });
+    // Validate: at least one non-empty key
+    const hasValidField = fields.some((f) => f.key.trim());
+    if (!hasValidField) {
+      toast(t('addFieldFirst'), 'error');
+      return;
+    }
+    const payload = buildPayload();
+    setLastSentPayload(JSON.stringify(payload, null, 2));
     createWebhook.mutate(
-      { endpoint_id: endpointId, event: eventType, data: payload },
+      { endpoint_id: endpointId, event: eventType, data: payload.data },
       {
         onSuccess: () => toast(t('webhookSent'), 'success'),
         onError: (err) => toast(err instanceof Error ? err.message : t('sendFailed'), 'error'),
@@ -106,13 +123,41 @@ export default function WebhookBuilderPage() {
     );
   };
 
+  /** Keyboard shortcut: Ctrl/Cmd + Enter to send */
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (endpointId && !createWebhook.isPending) {
+        handleSend();
+      }
+    }
+  }, [endpointId, createWebhook.isPending]);
+
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-        <p className="text-gray-500 dark:text-slate-400 mt-1">
-          {t('subtitle')}
-        </p>
+    <div className="space-y-8" onKeyDown={handleKeyDown}>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <p className="text-gray-500 dark:text-slate-400 mt-1">
+            {t('subtitle')}
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-400 dark:text-slate-500">
+            <kbd className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-slate-700 font-mono text-gray-500 dark:text-slate-400">Ctrl</kbd>
+            <span>+</span>
+            <kbd className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-slate-700 font-mono text-gray-500 dark:text-slate-400">Enter</kbd>
+            <span>{t('shortcutHint')}</span>
+          </div>
+          <button
+            type="button"
+            onClick={clearAll}
+            disabled={!eventType && fields.length === 1 && !fields[0].key && !endpointId}
+            className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+          >
+            🗑️ {t('clearAll')}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -152,7 +197,7 @@ export default function WebhookBuilderPage() {
               value={eventType}
               onChange={(e) => setEventType(e.target.value)}
               placeholder="order.created"
-              className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition font-mono text-sm"
+              className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition font-mono"
             />
           </div>
 
@@ -171,7 +216,7 @@ export default function WebhookBuilderPage() {
                   <select
                     value={field.type}
                     onChange={(e) => updateField(i, { type: e.target.value as WebhookField['type'] })}
-                    className="px-2.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition w-24"
+                    className="px-2.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition w-28"
                   >
                     <option value="string">{t('typeStr')}</option>
                     <option value="number">{t('typeNum')}</option>
@@ -225,7 +270,7 @@ export default function WebhookBuilderPage() {
               <select
                 value={endpointId}
                 onChange={(e) => setEndpointId(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition font-mono text-sm mb-3"
+                className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition font-mono mb-3"
               >
                 <option value="">{t('selectEndpoint')}</option>
                 {endpoints.map((ep) => (
@@ -253,16 +298,26 @@ export default function WebhookBuilderPage() {
                 <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center"><span className="text-base">👁️</span></div>
                 <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('preview')}</h2>
               </div>
-              <button type="button"
-                onClick={updatePreview}
-                className="text-sm text-brand-600 dark:text-brand-400 hover:underline"
-              >
-                {t('refresh')}
-              </button>
+              {lastSentPayload && (
+                <span className="text-xs px-2 py-1 rounded-full bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
+                  ✓ {t('sent')}
+                </span>
+              )}
             </div>
-            <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-sm font-mono overflow-x-auto min-h-[200px]">
+            <pre className={`p-4 rounded-xl text-sm font-mono overflow-x-auto min-h-[200px] ${
+              lastSentPayload
+                ? 'bg-gray-900 border-2 border-green-500/30 text-green-400'
+                : 'bg-gray-900 text-green-400'
+            }`}>
               <code>{preview || t('previewHint')}</code>
             </pre>
+            {lastSentPayload && lastSentPayload !== preview && (
+              <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  ⚠️ {t('previewChanged')}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
