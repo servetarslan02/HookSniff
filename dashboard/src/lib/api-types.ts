@@ -209,6 +209,42 @@ export interface NotificationListResponse {
   per_page: number;
 }
 
+// Broadcast types
+export interface Broadcast {
+  id: string;
+  title: string;
+  message: string;
+  broadcast_type: 'maintenance' | 'feature' | 'announcement' | 'incident';
+  severity: 'info' | 'warning' | 'critical';
+  link: string | null;
+  link_text: string | null;
+  target_plan: string | null;
+  is_active: boolean;
+  starts_at: string | null;
+  expires_at: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserBroadcast {
+  id: string;
+  title: string;
+  message: string;
+  broadcast_type: string;
+  severity: string;
+  link: string | null;
+  link_text: string | null;
+  created_at: string;
+}
+
+export interface BroadcastListResponse {
+  broadcasts: Broadcast[];
+  total: number;
+  page: number;
+  per_page: number;
+}
+
 export interface TimeBucket {
   timestamp: string;
   successful: number;
