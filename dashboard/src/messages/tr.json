@@ -3232,7 +3232,13 @@
     "supportedFormats": "Desteklenen Formatlar",
     "openapi30": "OpenAPI 3.0",
     "swagger20": "Swagger 2.0",
-    "failedToFetchError": "Getirilemedi: {error}"
+    "failedToFetchError": "Getirilemedi: {error}",
+    "clearAll": "Temizle",
+    "fetching": "Getiriliyor…",
+    "parsing": "Ayrıştırılıyor…",
+    "toFetch": "ile getir",
+    "toParse": "ile ayrıştır",
+    "yamlSupported": "JSON ve YAML destekler"
   },
   "portalCustomize": {
     "title": "Portal Özelleştirme",
