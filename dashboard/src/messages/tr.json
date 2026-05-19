@@ -5941,7 +5941,7 @@
     "ssoStep3": "Adım 3: Test Edin",
     "ssoStep3Desc": "Yapılandırmanızı doğrulamak için \"Bağlantıyı Test Et\" butonuna tıklayın. HookSniff kimlik sağlayıcınıza bağlanır ve ayarları doğrular.",
     "ssoStep4": "Adım 4: Zorunlu Kılın",
-    "ssoStep4Desc": "Başarlı bir testten sonra, \"SSO'yu Zorunlu Kıl\" butonuna tıklayın. Bir onay modal'ı görünür:",
+    "ssoStep4Desc": "Başarılı bir testten sonra, \"SSO'yu Zorunlu Kıl\" butonuna tıklayın. Bir onay modal'ı görünür:",
     "ssoEnforce1": "Tüm ekip üyelerinin SSO ile oturum açması zorunlu olacak",
     "ssoEnforce2": "Şifre ile oturum açma devre dışı bırakılacak",
     "ssoAdminBypass": "Admin Muafiyeti",
