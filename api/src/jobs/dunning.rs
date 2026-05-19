@@ -485,11 +485,15 @@ mod tests {
 
     #[test]
     fn test_dunning_email_days() {
-        assert!(DUNNING_EMAIL_DAYS.contains(&3));
-        assert!(DUNNING_EMAIL_DAYS.contains(&2));
-        assert!(DUNNING_EMAIL_DAYS.contains(&1));
-        assert!(!DUNNING_EMAIL_DAYS.contains(&0));
-        assert!(!DUNNING_EMAIL_DAYS.contains(&4));
+        // Monthly: 3, 2, 1 days before period end
+        assert!(DUNNING_DAYS_MONTHLY.contains(&3));
+        assert!(DUNNING_DAYS_MONTHLY.contains(&2));
+        assert!(DUNNING_DAYS_MONTHLY.contains(&1));
+        assert!(!DUNNING_DAYS_MONTHLY.contains(&0));
+        assert!(!DUNNING_DAYS_MONTHLY.contains(&4));
+        // Annual: 30, 7, 3, 2, 1 days before period end
+        assert!(DUNNING_DAYS_ANNUAL.contains(&30));
+        assert!(DUNNING_DAYS_ANNUAL.contains(&7));
     }
 
     #[test]

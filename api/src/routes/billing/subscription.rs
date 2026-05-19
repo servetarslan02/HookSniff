@@ -343,36 +343,36 @@ pub async fn resume_subscription(
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct UpgradeRequest {
-    plan: String,
+    pub(crate) plan: String,
     /// Payment provider: "stripe", "polar", or "iyzico"
     /// If not specified, uses the customer's existing provider or defaults to Stripe.
     #[serde(default)]
-    provider: Option<String>,
+    pub(crate) provider: Option<String>,
     /// Billing period: "monthly" (default) or "annual"
     #[serde(default)]
-    billing_period: Option<String>,
+    pub(crate) billing_period: Option<String>,
     /// Discount/coupon code to apply at checkout.
     #[serde(default)]
-    discount_code: Option<String>,
+    pub(crate) discount_code: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
 pub(crate) struct UpgradeResponse {
-    checkout_url: Option<String>,
-    provider: String,
-    message: String,
+    pub(crate) checkout_url: Option<String>,
+    pub(crate) provider: String,
+    pub(crate) message: String,
     /// Prorated amount in cents (if applicable)
     #[serde(skip_serializing_if = "Option::is_none")]
-    prorated_amount_cents: Option<u64>,
+    pub(crate) prorated_amount_cents: Option<u64>,
     /// Days remaining in current billing period
     #[serde(skip_serializing_if = "Option::is_none")]
-    days_remaining: Option<u32>,
+    pub(crate) days_remaining: Option<u32>,
     /// Whether this plan requires contacting sales
     #[serde(skip_serializing_if = "Option::is_none")]
-    requires_contact: Option<bool>,
+    pub(crate) requires_contact: Option<bool>,
     /// Contact URL for enterprise plans
     #[serde(skip_serializing_if = "Option::is_none")]
-    contact_url: Option<String>,
+    pub(crate) contact_url: Option<String>,
 }
 
 /// Calculate prorated amount for a mid-cycle upgrade.
