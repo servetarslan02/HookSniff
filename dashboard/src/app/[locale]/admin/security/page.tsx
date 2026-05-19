@@ -18,11 +18,7 @@ import {
   Search,
   Globe,
   Clock,
-  Filter,
-  ChevronDown,
   RefreshCw,
-  Eye,
-  EyeOff,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────

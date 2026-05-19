@@ -8,8 +8,7 @@ import { useToast } from '@/components/Toast';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import {
   Mail, Send, AlertTriangle, CheckCircle2, ClipboardList, XCircle,
-  Megaphone, Plus, Pencil, Trash2, Info, AlertCircle, Wrench, Sparkles,
-  Radio, Eye, EyeOff, Calendar,
+  Megaphone, Plus, Pencil, Trash2, Eye, EyeOff, Calendar,
 } from 'lucide-react';
 
 const BROADCAST_TYPES = [

@@ -2,7 +2,7 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { CommunicationsTabProps } from './types';
-import { Ban, ClipboardList, FileText, Mail, MessageSquare, Tag, User } from 'lucide-react';
+import { ClipboardList, FileText, Mail, MessageSquare, User } from 'lucide-react';
 
 export function CommunicationsTab({
   userComms,
