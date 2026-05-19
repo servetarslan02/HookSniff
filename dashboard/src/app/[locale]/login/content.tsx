@@ -35,11 +35,19 @@ function LoginForm() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
-  const { login, register } = useAuth();
+  const { login, verify2fa } = useAuth();
   const router = useRouter();
   const t = useTranslations('auth');
   const tc = useTranslations('common');
   const passwordStrength = mode === 'register' ? getPasswordStrength(password) : null;
+
+  // 2FA state
+  const [twoFaStep, setTwoFaStep] = useState(false);
+  const [tempToken, setTempToken] = useState('');
+  const [totpCode, setTotpCode] = useState('');
+  const [useBackupCode, setUseBackupCode] = useState(false);
+  const [backupCode, setBackupCode] = useState('');
+  const [verifying2fa, setVerifying2fa] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,10 +73,43 @@ function LoginForm() {
       const redirectTo = searchParams.get('redirect') || (user?.is_admin ? '/admin' : '/core');
       router.push(redirectTo);
     } catch (err: unknown) {
-      setError(getErrorMessage(err, tc('unknownError')) || tc('error'));
+      // 2FA required — show TOTP input
+      const twoFaErr = err as Error & { requires2fa?: boolean; tempToken?: string };
+      if (twoFaErr.requires2fa && twoFaErr.tempToken) {
+        setTempToken(twoFaErr.tempToken);
+        setTwoFaStep(true);
+        setError('');
+      } else {
+        setError(getErrorMessage(err, tc('unknownError')) || tc('error'));
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handle2faVerify = async () => {
+    setError('');
+    setVerifying2fa(true);
+    try {
+      const code = useBackupCode ? backupCode.trim() : totpCode.trim();
+      if (!code) return;
+      const user = await verify2fa(tempToken, useBackupCode ? '' : code, useBackupCode ? code : undefined);
+      const redirectTo = searchParams.get('redirect') || (user?.is_admin ? '/admin' : '/core');
+      router.push(redirectTo);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, t('invalid2faCode') || 'Invalid code. Try again.'));
+    } finally {
+      setVerifying2fa(false);
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setTwoFaStep(false);
+    setTempToken('');
+    setTotpCode('');
+    setBackupCode('');
+    setUseBackupCode(false);
+    setError('');
   };
 
   return (
@@ -104,6 +145,77 @@ function LoginForm() {
             </div>
           )}
 
+          {twoFaStep ? (
+            /* ─── 2FA Verification Step ─── */
+            <div className="space-y-4">
+              <div className="text-center mb-2">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
+                  <span className="text-2xl">🔐</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('twoFactorTitle') || 'Two-Factor Authentication'}</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('twoFactorPrompt') || 'Enter the 6-digit code from your authenticator app.'}</p>
+              </div>
+
+              {!useBackupCode ? (
+                <>
+                  <input
+                    type="text"
+                    value={totpCode}
+                    onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="000000"
+                    maxLength={6}
+                    className="w-full px-4 py-3 text-center text-2xl font-mono tracking-[0.5em] border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setUseBackupCode(true)}
+                    className="text-sm text-brand-600 dark:text-brand-400 hover:underline"
+                  >
+                    {t('useBackupCode') || 'Use a backup code instead'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    value={backupCode}
+                    onChange={(e) => setBackupCode(e.target.value.toUpperCase().slice(0, 8))}
+                    placeholder="XXXXXXXX"
+                    maxLength={8}
+                    className="w-full px-4 py-3 text-center text-xl font-mono tracking-[0.3em] border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setUseBackupCode(false)}
+                    className="text-sm text-brand-600 dark:text-brand-400 hover:underline"
+                  >
+                    {t('useTotpCode') || 'Use authenticator code instead'}
+                  </button>
+                </>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleBackToLogin}
+                  className="flex-1 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition"
+                >
+                  ← {tc('back')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handle2faVerify}
+                  disabled={verifying2fa || (useBackupCode ? backupCode.length < 8 : totpCode.length !== 6)}
+                  className="flex-1 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {verifying2fa && <LoadingSpinner size="sm" />}
+                  {verifying2fa ? (tc('verifying') || 'Verifying...') : t('verify') || 'Verify'}
+                </button>
+              </div>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'register' && (
               <div>
@@ -196,7 +308,10 @@ function LoginForm() {
               {mode === 'login' ? t('signIn') : t('createAccount')}
             </button>
           </form>
+          )}
 
+          {!twoFaStep && (
+          <>
           {/* OAuth Buttons */}
           <div className="mt-6">
             <div className="relative">
@@ -250,6 +365,8 @@ function LoginForm() {
               </>
             )}
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>
