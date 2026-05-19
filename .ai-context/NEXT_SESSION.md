@@ -1,78 +1,72 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 17:45 GMT+8
+> Son güncelleme: 2026-05-19 18:15 GMT+8
 
 ## ✅ Tamamlanan (Bu Oturum)
 
-### SSO/SAML/OIDC Full Implementation (2026-05-19 17:45)
+### 1. SSO/SAML/OIDC Full Implementasyon
 - **Migration 022** — `sso_configs` + `sso_login_attempts` tabloları Neon DB'ye uygulandı
-- **SAML 2.0 login akışı** — AuthnRequest oluşturma + ACS callback (Assertion Consumer Service)
-- **OIDC login akışı** — Discovery document + authorization redirect + code exchange + ID token decode
-- **Gerçek IdP bağlantı testi** — Metadata URL fetch (SAML) + OIDC discovery fetch
-- **SSO state store** — CSRF korumalı, 10 dakika otomatik temizleme
-- **Otomatik kullanıcı oluşturma** — SSO ile giriş yapan yeni kullanıcılar otomatik provision
-- **Audit log** — `sso_login_attempts` tablosuna tüm giriş denemeleri kaydediliyor
-- **Frontend düzeltmeleri:**
-  - Eksik i18n anahtarları eklendi (testing, testSuccess, testFailed)
-  - API response uyumsuzluğu düzeltildi (success → valid)
-  - Sertifika/gizli anahtar durumu gösteriliyor
-  - SSO silme butonu eklendi
-  - SSO Login URL gösterimi eklendi
-- **Route yapısı:**
-  - `/sso/login` — Public (auth yok, SSO giriş başlatma)
-  - `/sso/saml/callback` — Public (SAML IdP callback)
-  - `/sso/oidc/callback` — Public (OIDC IdP callback)
-  - `/sso/config` — Protected (CRUD)
-  - `/sso/test` — Protected (bağlantı testi)
-  - `/sso/providers` — Public (domain bazlı SSO sorgulama)
+- **Migration 023** — `admin_bypass` sütunu eklendi
+- **SAML 2.0 login akışı** — AuthnRequest oluşturma + ACS callback
+- **OIDC login akışı** — Discovery + authorization + code exchange + ID token
+- **Gerçek IdP bağlantı testi** — Metadata/discovery endpoint doğrulama
+- **SSO state store** — CSRF korumalı, in-memory
+- **Otomatik kullanıcı provision** — SSO ile gelen yeni kullanıcılar otomatik oluşturulur
+- **Audit log** — `sso_login_attempts` tablosuna tüm giriş denemeleri kaydedilir
 
-### Dosya Değişiklikleri
-| Dosya | Değişiklik |
-|-------|-----------|
-| `api/migrations/022_sso_configs.sql` | Yeni — SSO tabloları |
-| `api/src/routes/sso.rs` | Tamamen yeniden yazıldı — OIDC + SAML login akışları |
-| `api/src/routes/mod.rs` | Public SSO route'ları eklendi |
-| `api/src/main.rs` | SsoStateStore Extension eklendi |
-| `dashboard/src/app/[locale]/(dashboard)/sso/page.tsx` | Delete, cert status, login URL |
-| `dashboard/src/lib/api.ts` | ssoApi type düzeltmesi |
-| `dashboard/src/messages/en.json` | 10 yeni SSO çeviri anahtarı |
-| `dashboard/src/messages/tr.json` | 10 yeni SSO çeviri anahtarı |
-| `dashboard/src/schemas/api.ts` | SsoConfigSchema genişletildi |
+### 2. Navigasyon Düzenlemesi
+- **Yeni "Organization" bölümü** — Team + SSO + Audit Log
+- SSO Routing & Config'den çıkarıldı
+- Team Account'dan çıkarıldı
+- Sidebar'a Organization eklendi
+- Middleware: `/sso`, `/team`, `/audit-log` → `/organization`
 
-### Neon DB Değişiklikleri
-```sql
--- Migration 022 uygulandı
-CREATE TABLE sso_configs (...);
-CREATE TABLE sso_login_attempts (...);
-```
+### 3. SSO Plan Kısıtlaması
+- SSO sadece **Enterprise** planı müşterileri kullanabilir
+- Enterprise olmayan kullanıcılar upgrade prompt görür
+- Enterprise kullanıcılar tam SSO config formunu görür
+
+### 4. SSO Enforce Akışı (4 Adım)
+- **Adım 1:** Sağlayıcı seçimi (SAML 2.0 / OpenID Connect)
+- **Adım 2:** Yapılandırma (IdP bilgileri)
+- **Adım 3:** Kaydet ve Test Et (gerçek IdP bağlantısı)
+- **Adım 4:** SSO'yu Zorunlu Kıl (onay modal'ı + admin bypass)
+
+### 5. Frontend Düzeltmeleri
+- Eksik i18n: `testing`, `testSuccess`, `testFailed` eklendi
+- API uyumsuzluğu: `result.success` → `result.valid`
+- Sertifika/gizli anahtar durumu gösterimi
+- SSO silme butonu
+- SSO Login URL kopyalama
+- 20+ yeni çeviri anahtarı (en + tr)
 
 ## 📋 Sıradaki
 
-### 1. Cloud Build ile Deploy (EN ÖNEMLİ)
+### 1. Cloud Build ile Deploy
 - SSO implementasyonu deploy edilmeli
-- `pgcrypto` extension Neon DB'de aktif (deploy gerektirmez)
-- `custom_headers` sütunu eklendi (worker processing düzeldi)
+- Migration 022 + 023 Neon DB'ye uygulandı ✅
+- API kod değişiklikleri deploy gerektirir
 
-### 2. SSO Test (Manuel)
+### 2. SSO Login Engelleme (Backend)
+- Login akışında SSO kontrolü eklenmeli
+- SSO etkin hesaplarda şifre girişi reddedilmeli
+- Admin bypass kontrolü yapılmalı
+
+### 3. SSO Test (Manuel)
 - Dashboard'dan SSO config kaydet
-- OIDC ile test et (Google, Auth0 gibi)
-- SAML ile test et (Okta, Azure AD gibi)
-- Login URL'i test et
+- OIDC ile test et (Google, Auth0)
+- SAML ile test et (Okta, Azure AD)
+- Login URL test et
 
-### 3. P2 Kalan Sorunlar (21 adet)
-- Frontend performance (lucide-react, tablo overflow)
-- i18n eksiklikleri (920+ hardcoded string)
+### 4. P2 Kalan Sorunlar (21 adet)
+- Frontend performance
+- i18n eksiklikleri
 - DB index'leri
-- Monitoring iyileştirmeleri
-
-### 4. Token Ayarları
-- `.sdk-tokens.env` dosyasını oluştur
 
 ## 🔧 Bilinen Sorunlar
 
 | Sorun | Durum | Not |
 |-------|-------|-----|
-| SSO ID token imza doğrulaması | ⚠️ | JWKS ile doğrulama eklenebilir (şimdilik decode-only) |
+| SSO login engelleme | ⬜ | Backend login akışında SSO kontrolü yok |
 | SSO state in-memory | ⚠️ | Production'da Redis'e taşınmalı |
-| `/v1/event-type` 404 | ⚠️ | Route tanımlı değil |
-| `/v1/analytics/overview` 404 | ⚠️ | Doğru path: `/v1/analytics/deliveries` |
+| ID token imza doğrulaması | ⚠️ | JWKS ile doğrulama eklenebilir |

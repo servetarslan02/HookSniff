@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 17:45 GMT+8 (SSO/SAML/OIDC implementasyonu)
+> Son güncelleme: 2026-05-19 18:15 GMT+8 (SSO enforce akışı + navigasyon düzenlemesi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -224,52 +224,143 @@ HookSniff/
 
 ---
 
-## 📝 Son Oturum (2026-05-19 17:45 — SSO/SAML/OIDC Full Implementation)
+## 📝 Son Oturum (2026-05-19 17:23–18:15 — SSO Full Implementasyon + Navigasyon)
 
-### Yapılan İşler:
-- **SSO/SAML/OIDC tam implementasyon** — Sadece config formu değil, gerçek login akışları eklendi
-- **Migration 022** — `sso_configs` + `sso_login_attempts` tabloları Neon DB'ye uygulandı
-- **SAML 2.0** — AuthnRequest oluşturma, ACS callback, assertion parse, NameID çıkarma
-- **OIDC** — Discovery document fetch, authorization redirect, code exchange, ID token decode
-- **Gerçek IdP testi** — Metadata URL fetch (SAML), OIDC discovery endpoint doğrulama
-- **SSO state store** — CSRF korumalı, in-memory (production'da Redis'e taşınmalı)
-- **Otomatik kullanıcı provision** — SSO ile giriş yapan yeni kullanıcılar otomatik oluşturuluyor
-- **Audit log** — Tüm SSO giriş denemeleri `sso_login_attempts` tablosuna kaydediliyor
-- **Frontend düzeltmeleri:**
-  - Eksik i18n: `testing`, `testSuccess`, `testFailed` anahtarları eklendi (en + tr)
-  - API uyumsuzluğu: `result.success` → `result.valid` düzeltildi
-  - Sertifika/gizli anahtar durumu gösteriliyor (✓ işareti)
-  - SSO silme butonu eklendi
-  - SSO Login URL kopyalama butonu eklendi
-  - 10 yeni çeviri anahtarı (delete, certificate info, login URL)
-- **Route yapısı:**
-  - Public: `/sso/login`, `/sso/saml/callback`, `/sso/oidc/callback`, `/sso/providers`
-  - Protected: `/sso/config` (CRUD), `/sso/test`
-
-### DB Değişiklikleri (Neon PostgreSQL):
-```sql
-CREATE TABLE sso_configs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
-    provider VARCHAR(20) NOT NULL DEFAULT 'saml',
-    enabled BOOLEAN NOT NULL DEFAULT false,
-    metadata_url TEXT, entity_id TEXT, sso_url TEXT, certificate TEXT,
-    issuer_url TEXT, client_id TEXT, client_secret_encrypted TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT uq_sso_configs_customer UNIQUE (customer_id)
-);
-CREATE TABLE sso_login_attempts (...);
-```
-
-### Sıradaki:
-1. Cloud Build ile deploy (SSO implementasyonu)
-2. SSO test (gerçek IdP ile)
-3. P2 kalan sorunlar (21 adet)
+### Özet
+Servet ile ilk oturum. SSO sayfası incelendi, 6 sorun tespit edildi, tam SSO implementasyonu yapıldı, navigasyon düzenlendi, Enterprise plan kısıtlaması eklendi, enforce akışı kuruldu.
 
 ---
 
-## 📝 Önceki Oturum (2026-05-19 08:13 — Login Error Fix + SESSION-PLAN Update)
+### 🔐 SSO/SAML/OIDC — Nasıl Çalışır?
+
+#### Veritabanı Tabloları
+
+**`sso_configs`** — Her müşteri için tek SSO config (migration 022 + 023):
+```
+id              UUID (PK)
+customer_id     UUID (FK → customers, UNIQUE)
+provider        VARCHAR(20) — 'saml' veya 'oidc'
+enabled         BOOLEAN — SSO zorunlu mu?
+admin_bypass    BOOLEAN — Admin şifre ile girebilir mi?
+metadata_url    TEXT — SAML IdP metadata URL
+entity_id       TEXT — SAML SP entity ID
+sso_url         TEXT — SAML IdP SSO URL
+certificate     TEXT — SAML X.509 sertifika (PEM)
+issuer_url      TEXT — OIDC issuer URL
+client_id       TEXT — OIDC client ID
+client_secret_encrypted TEXT — OIDC client secret (AES-256-GCM)
+created_at      TIMESTAMPTZ
+updated_at      TIMESTAMPTZ
+```
+
+**`sso_login_attempts`** — Audit log (migration 022):
+```
+id, customer_id, email, provider, success, error_message, ip_address, user_agent, created_at
+```
+
+#### API Endpoint'leri
+
+**Config (Protected — JWT gerekir):**
+| Method | Path | İşlev |
+|--------|------|-------|
+| GET | `/sso/config` | SSO config'i getir |
+| POST | `/sso/config` | SSO config kaydet/güncelle |
+| DELETE | `/sso/config` | SSO config sil |
+| POST | `/sso/test` | Gerçek IdP bağlantısını test et |
+
+**Login (Public — JWT gerekmez):**
+| Method | Path | İşlev |
+|--------|------|-------|
+| GET | `/sso/login?email=...` | SSO login başlat (IdP'ye redirect) |
+| POST | `/sso/saml/callback` | SAML ACS callback (IdP'den dönüş) |
+| GET | `/sso/oidc/callback` | OIDC callback (IdP'den dönüş) |
+| GET | `/sso/providers?domain=...` | Domain bazlı SSO sorgulama |
+
+#### SAML Login Akışı
+```
+1. Kullanıcı → GET /sso/login?email=user@company.com
+2. Sistem → customer'ı bul, SSO config'i kontrol et
+3. Sistem → SAML AuthnRequest oluştur (XML)
+4. Sistem → Base64 encode + URL encode
+5. Sistem → IdP'ye redirect (SAMLRequest + RelayState=state)
+6. Kullanıcı → IdP'de giriş yapar
+7. IdP → POST /sso/saml/callback (SAMLResponse + RelayState)
+8. Sistem → Base64 decode → XML parse → assertion çıkar
+9. Sistem → NameID, attributes, NotOnOrAfter doğrula
+10. Sistem → customer bul veya otomatik oluştur
+11. Sistem → JWT token üret, cookie set et, dashboard'a redirect
+```
+
+#### OIDC Login Akışı
+```
+1. Kullanıcı → GET /sso/login?email=user@company.com
+2. Sistem → customer'ı bul, SSO config'i kontrol et
+3. Sistem → /.well-known/openid-configuration fetch
+4. Sistem → authorization_endpoint'i al
+5. Sistem → IdP'ye redirect (client_id, redirect_uri, scope, state, nonce)
+6. Kullanıcı → IdP'de giriş yapar
+7. IdP → GET /sso/oidc/callback?code=...&state=...
+8. Sistem → state'i doğrula (CSRF koruması)
+9. Sistem → code'u token ile exchange et
+10. Sistem → id_token'ı decode et (JWT payload)
+11. Sistem → email claim'ini çıkar
+12. Sistem → customer bul veya otomatik oluştur
+13. Sistem → JWT token üret, cookie set et, dashboard'a redirect
+```
+
+#### SSO Enforce Akışı (Frontend — 4 Adım)
+```
+Adım 1: Sağlayıcı Seçimi → SAML 2.0 veya OpenID Connect
+Adım 2: Yapılandırma → IdP bilgilerini gir, kaydet
+Adım 3: Test Et → Gerçek IdP'ye bağlan, bağlantıyı doğrula
+Adım 4: Zorunlu Kıl → Onay modal'ı:
+  ⚠️ "Tüm ekip üyeleri SSO ile giriş yapacak"
+  ⚠️ "Şifre girişi kapatılacak"
+  ✅ "Admin hariç" (checkbox, varsayılan açık)
+  → Onayla → SSO aktif
+```
+
+#### Enterprise Plan Kısıtlaması
+- SSO sadece `plan === 'enterprise'` olan müşteriler kullanabilir
+- Enterprise olmayan → upgrade prompt gösterilir
+- Enterprise olan → tam SSO config formu gösterilir
+
+#### Dosya Yapısı
+```
+api/src/routes/sso.rs           → SSO API (config + login + callback)
+api/migrations/022_sso_configs.sql → sso_configs + sso_login_attempts
+api/migrations/023_sso_admin_bypass.sql → admin_bypass sütunu
+
+dashboard/src/app/[locale]/(dashboard)/sso/page.tsx → SSO config sayfası
+dashboard/src/app/[locale]/(dashboard)/organization/page.tsx → Organization (Team + SSO + Audit Log)
+dashboard/src/lib/api.ts → ssoApi (testSso, deleteSso, getLoginUrl)
+dashboard/src/schemas/api.ts → SsoConfigSchema (Zod)
+dashboard/src/messages/en.json → sso.* i18n anahtarları
+dashboard/src/messages/tr.json → sso.* i18n anahtarları
+```
+
+#### Navigasyon Değişikliği
+```
+Eski yapı:
+  Routing & Config → SSO, Audit Log
+  Account → Team
+
+Yeni yapı:
+  Organization → Team, SSO, Audit Log
+  Routing & Config → (sadece routing/retry/domain/env/rate-limit)
+  Account → Settings, Notifications, Portal
+```
+
+#### Kritik Notlar
+- **SSO login engelleme henüz yok** — Backend login akışında SSO kontrolü eklenmeli
+- **SSO state in-memory** — Production'da Redis'e taşınmalı
+- **ID token imza doğrulaması yok** — Şimdilik decode-only, JWKS ile doğrulama eklenebilir
+- **Cloud Build manuel** — API deploy için tetikleme gerekli
+- **Vercel otomatik** — Dashboard push edildiğinde otomatik deploy olur
+
+---
+
+### 📝 Önceki Oturum (2026-05-19 08:13 — Login Error Fix + SESSION-PLAN Update)
 
 ### Yapılan İşler:
 - **Login error mesajı düzeltildi** — "Unauthorized" → "Invalid email or password"
