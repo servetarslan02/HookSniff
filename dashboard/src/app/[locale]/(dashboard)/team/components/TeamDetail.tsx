@@ -49,6 +49,7 @@ function StatusDot({ online }: { online?: boolean }) {
 export function TeamDetail({
   team,
   members,
+  invites,
   canInvite,
   canRemove,
   canChangeRole,
@@ -59,9 +60,13 @@ export function TeamDetail({
   onDeleteTeam,
   onLeaveTeam,
   onTransferOwnership,
+  onRevokeInvite,
+  lastInviteLink,
+  onCopyLink,
 }: {
   team: Team;
   members: TeamMember[];
+  invites: Array<{ id: string; email: string; role: string; expires_at: string; created_at: string }>;
   canInvite: boolean;
   canRemove: boolean;
   canChangeRole: boolean;
@@ -72,6 +77,9 @@ export function TeamDetail({
   onDeleteTeam: () => void;
   onLeaveTeam: () => void;
   onTransferOwnership: () => void;
+  onRevokeInvite: (inviteId: string) => void;
+  lastInviteLink: string | null;
+  onCopyLink: () => void;
 }) {
   const t = useTranslations('team');
 
@@ -173,6 +181,17 @@ export function TeamDetail({
               )}
             </div>
           </div>
+          {/* Plan limit warning */}
+          {members.length >= 5 && (
+            <div className="flex items-center gap-2 mt-2 p-2 bg-amber-50 dark:bg-amber-500/10 rounded-lg">
+              <span className="text-xs">⚠️</span>
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                {members.length >= 20
+                  ? (t('nearMemberLimit') || 'You\'re approaching the team member limit. Upgrade your plan for more members.')
+                  : (t('teamGrowing') || `Team has ${members.length} members. Consider upgrading for more capacity.`)}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -254,6 +273,73 @@ export function TeamDetail({
           </div>
         )}
       </div>
+
+      {/* Last Invite Link Banner */}
+      {lastInviteLink && (
+        <div className="glass-card p-4 bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/20">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-brand-600 dark:text-brand-400">🔗</span>
+            <p className="text-sm font-medium text-brand-800 dark:text-brand-300">{t('inviteLinkReady') || 'Invite link ready!'}</p>
+          </div>
+          <p className="text-xs text-brand-600 dark:text-brand-400 mb-2">{t('shareInviteLink') || 'Share this link with the invited person. They need to log in first, then the invite will be accepted automatically.'}</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-xs font-mono text-gray-800 dark:text-slate-200 break-all border border-brand-200 dark:border-brand-500/20">{lastInviteLink}</code>
+            <button
+              type="button"
+              onClick={onCopyLink}
+              className="px-3 py-2 bg-brand-600 text-white rounded-lg text-xs font-medium hover:bg-brand-700 transition"
+            >📋 {t('copy') || 'Copy'}</button>
+          </div>
+        </div>
+      )}
+
+      {/* Pending Invites */}
+      {invites.length > 0 && (
+        <div className="glass-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{t('pendingInvites') || 'Pending Invites'}</h4>
+            <span className="text-xs font-medium text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">{invites.length}</span>
+          </div>
+          <div className="divide-y divide-gray-100 dark:divide-slate-700/50">
+            {invites.map((inv) => {
+              const daysLeft = Math.max(0, Math.ceil((new Date(inv.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+              const isExpiringSoon = daysLeft <= 2;
+              return (
+                <div key={inv.id} className="group px-6 py-4 flex items-center gap-4 hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                  <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-500/15 flex items-center justify-center text-amber-600 dark:text-amber-400 text-sm shrink-0">
+                    ⏳
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{inv.email}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                        inv.role === 'admin' ? 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-500/15' :
+                        inv.role === 'editor' ? 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/15' :
+                        'text-gray-500 bg-gray-100 dark:text-slate-400 dark:bg-slate-700'
+                      }`}>
+                        {ROLE_ICONS[inv.role] || '👁️'} {inv.role}
+                      </span>
+                      <span className={`text-xs ${isExpiringSoon ? 'text-red-500 dark:text-red-400 font-medium' : 'text-gray-400 dark:text-slate-500'}`}>
+                        {daysLeft === 0 ? (t('expiresToday') || 'Expires today') : (t('expiresInDays') || `${daysLeft}d left`)}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onRevokeInvite(inv.id)}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition opacity-0 group-hover:opacity-100"
+                    title={t('revokeInvite') || 'Revoke invite'}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

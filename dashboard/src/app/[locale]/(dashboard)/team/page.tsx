@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
@@ -9,6 +9,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import {
   useTeams,
   useTeamMembers,
+  useTeamDetail,
   useCreateTeam,
   useInviteTeamMember,
   useRemoveTeamMember,
@@ -17,6 +18,7 @@ import {
   useDeleteTeam,
   useLeaveTeam,
   useTransferOwnership,
+  useRevokeInvite,
 } from '@/hooks/useDashboardData';
 import { TeamList } from './components/TeamList';
 import { TeamDetail } from './components/TeamDetail';
@@ -42,14 +44,17 @@ export default function TeamPageWrapper() {
 }
 
 function TeamPageInner() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('team');
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const { data: teams = [], isLoading: loading } = useTeams();
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const { data: members = [] } = useTeamMembers(selectedTeamId);
+  const { data: teamDetail } = useTeamDetail(selectedTeamId);
+  const invites = teamDetail?.invites ?? [];
 
   const createTeamMutation = useCreateTeam();
   const inviteMemberMutation = useInviteTeamMember();
@@ -59,6 +64,7 @@ function TeamPageInner() {
   const deleteTeamMutation = useDeleteTeam();
   const leaveTeamMutation = useLeaveTeam();
   const transferOwnershipMutation = useTransferOwnership();
+  const revokeInviteMutation = useRevokeInvite();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -66,6 +72,7 @@ function TeamPageInner() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [lastInviteLink, setLastInviteLink] = useState<string | null>(null);
 
   const selectedTeam = teams.find((t) => t.id === selectedTeamId) ?? null;
 
@@ -73,6 +80,12 @@ function TeamPageInner() {
   useEffect(() => {
     const inviteToken = searchParams.get('invite_token');
     if (!inviteToken) return;
+    // If not logged in, redirect to login with invite URL preserved
+    if (!token) {
+      const currentUrl = window.location.pathname + window.location.search;
+      router.push(`/login?redirect=${encodeURIComponent(currentUrl)}`);
+      return;
+    }
     if (acceptInviteMutation.isPending) return;
     acceptInviteMutation.mutate(inviteToken, {
       onSuccess: (result) => {
@@ -105,8 +118,13 @@ function TeamPageInner() {
   const handleInvite = async (email: string, role: string) => {
     if (!selectedTeamId) return;
     try {
-      await inviteMemberMutation.mutateAsync({ teamId: selectedTeamId, data: { email, role } });
+      const result = await inviteMemberMutation.mutateAsync({ teamId: selectedTeamId, data: { email, role } });
       toast(t('invitationSent'), 'success');
+      // Show invite link for copying
+      const link = (result as Record<string, unknown>)?.invite_link;
+      if (link && typeof link === 'string') {
+        setLastInviteLink(window.location.origin + link);
+      }
       setShowInviteModal(false);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('failedToInvite');
@@ -179,6 +197,24 @@ function TeamPageInner() {
     setShowTransferModal(false);
   };
 
+  const handleRevokeInvite = async (inviteId: string) => {
+    try {
+      await revokeInviteMutation.mutateAsync(inviteId);
+      toast(t('inviteRevoked') || 'Invite revoked', 'success');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (t('revokeFailed') || 'Failed to revoke invite');
+      toast(msg, 'error');
+    }
+  };
+
+  const handleCopyInviteLink = () => {
+    if (lastInviteLink) {
+      navigator.clipboard.writeText(lastInviteLink);
+      toast(t('linkCopied') || 'Link copied!', 'success');
+      setLastInviteLink(null);
+    }
+  };
+
   const isOwner = selectedTeam && user?.id === selectedTeam.owner_id;
 
   return (
@@ -226,6 +262,7 @@ function TeamPageInner() {
             <TeamDetail
               team={selectedTeam}
               members={members}
+              invites={invites}
               canInvite={canInvite}
               canRemove={canRemove}
               canChangeRole={canChangeRole}
@@ -236,6 +273,9 @@ function TeamPageInner() {
               onDeleteTeam={() => setShowDeleteConfirm(true)}
               onLeaveTeam={() => setShowLeaveConfirm(true)}
               onTransferOwnership={() => setShowTransferModal(true)}
+              onRevokeInvite={handleRevokeInvite}
+              lastInviteLink={lastInviteLink}
+              onCopyLink={handleCopyInviteLink}
             />
           ) : (
             <div className="glass-card p-16 text-center">
