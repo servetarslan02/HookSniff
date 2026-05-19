@@ -294,7 +294,6 @@ mod tests {
         assert_eq!(json["status"], "completed");
         assert_eq!(json["provider"], "polar");
     }
-}
 
     #[test]
     fn test_admin_refund_request_with_currency() {
@@ -341,3 +340,4 @@ mod tests {
         assert!(json["reason"].is_null());
         assert!(json["provider_refund_id"].is_null());
     }
+}
