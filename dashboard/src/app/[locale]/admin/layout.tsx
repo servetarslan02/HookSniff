@@ -94,7 +94,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
       <aside
         aria-label={t('adminPanel')}
         className={clsx(
-          'fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 z-40 transition-transform duration-200 md:translate-x-0',
+          'fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 z-40 transition-transform duration-200 md:translate-x-0 flex flex-col',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -107,7 +107,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="text-xs text-gray-500 dark:text-slate-400">{t("management")}</div>
           </div>
         </div>
-        <nav className="px-3 py-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
           {adminNavigation.map((item) => {
             const isActive =
               item.href === '/admin'
