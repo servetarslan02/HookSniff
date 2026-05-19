@@ -16,16 +16,27 @@ export function EmbedCodePanel({
   const t = useTranslations('portalCustomize');
   const { toast } = useToast();
 
-  const fallbackEmbedCode = `<iframe
-  src="https://hooksniff.vercel.app/portal/embed/YOUR_PORTAL_ID"
+  const apiBase = 'https://hooksniff-api-1046140057667.europe-west1.run.app';
+  const dashBase = 'https://hooksniff.vercel.app';
+
+  const fallbackIframe = `<iframe
+  src="${apiBase}/v1/embed/portal"
   width="100%"
   height="600"
   frameborder="0"
   style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.1);"
 />`;
 
-  const displayEmbedCode = embedCode || fallbackEmbedCode;
-  const displayPortalUrl = portalUrl || 'https://hooksniff.vercel.app/portal/embed/YOUR_PORTAL_ID';
+  const fallbackScript = `<script
+  src="${dashBase}/portal/embed.js"
+  data-api-key="YOUR_API_KEY"
+  data-api-url="${apiBase}/v1"
+  data-theme="${config.dark_mode ? 'dark' : 'light'}"
+  data-height="600px"
+></script>`;
+
+  const displayIframe = embedCode || fallbackIframe;
+  const displayPortalUrl = portalUrl || `${apiBase}/v1/embed/portal`;
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -34,7 +45,29 @@ export function EmbedCodePanel({
 
   return (
     <>
-      {/* Embed Code */}
+      {/* Portal URL */}
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center">
+            <span className="text-base">🔗</span>
+          </div>
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('portalUrl') || 'Portal URL'}</h2>
+        </div>
+        <div className="flex items-center gap-3">
+          <code className="flex-1 px-3.5 py-2.5 text-xs font-mono text-gray-700 dark:text-slate-300 bg-gray-50 dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 truncate select-all">
+            {displayPortalUrl}
+          </code>
+          <button
+            type="button"
+            onClick={() => handleCopy(displayPortalUrl)}
+            className="px-3 py-2.5 text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition whitespace-nowrap"
+          >
+            {t('copy')}
+          </button>
+        </div>
+      </div>
+
+      {/* iframe Embed */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center">
@@ -45,62 +78,41 @@ export function EmbedCodePanel({
         <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">
           {t('embedCodeDesc')}
         </p>
-        {portalUrl && (
-          <div className="mb-4 p-3 bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/20 rounded-xl">
-            <div className="text-xs font-medium text-brand-700 dark:text-brand-300 mb-1">{t('portalUrl') || 'Portal URL'}</div>
-            <a href={displayPortalUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-brand-600 dark:text-brand-400 hover:underline break-all">
-              {displayPortalUrl}
-            </a>
-          </div>
-        )}
         <div className="relative">
           <button
             type="button"
-            onClick={() => handleCopy(displayEmbedCode)}
+            onClick={() => handleCopy(displayIframe)}
             className="absolute top-2 right-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition z-10"
           >
             {t('copy')}
           </button>
           <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-x-auto">
-            <code>{displayEmbedCode}</code>
+            <code>{displayIframe}</code>
           </pre>
         </div>
       </div>
 
-      {/* React Integration */}
+      {/* Script Embed */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
-            <span className="text-base">⚛️</span>
+            <span className="text-base">⚡</span>
           </div>
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('reactIntegration')}</h2>
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Script Embed</h2>
         </div>
+        <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">
+          Doğrudan sayfanıza script olarak ekleyin. API anahtarınızı <code className="px-1 py-0.5 bg-gray-100 dark:bg-slate-700 rounded text-xs">data-api-key</code> alanına girin.
+        </p>
         <div className="relative">
           <button
             type="button"
-            onClick={() => {
-              handleCopy(`import { HookSniffPortal } from '@hooksniff/react';
-
-<HookSniffPortal
-  portalId="${portalUrl ? portalUrl.split('/').pop() : 'YOUR_PORTAL_ID'}"
-  primaryColor="${config.primary_color}"
-  darkMode={${config.dark_mode}}
-  companyName="${config.company_name || 'My App'}"
-/>`);
-            }}
+            onClick={() => handleCopy(fallbackScript)}
             className="absolute top-2 right-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition z-10"
           >
             {t('copy')}
           </button>
           <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-x-auto">
-            <code>{`import { HookSniffPortal } from '@hooksniff/react';
-
-<HookSniffPortal
-  portalId="${portalUrl ? portalUrl.split('/').pop() : 'YOUR_PORTAL_ID'}"
-  primaryColor="${config.primary_color}"
-  darkMode={${config.dark_mode}}
-  companyName="${config.company_name || 'My App'}"
-/>`}</code>
+            <code>{fallbackScript}</code>
           </pre>
         </div>
       </div>
