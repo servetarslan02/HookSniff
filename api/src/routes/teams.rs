@@ -14,8 +14,8 @@ pub fn router() -> Router {
     Router::new()
         .route("/", get(list_teams).post(create_team))
         .route("/accept-invite", post(accept_invite))
-        .route("/invites/{invite_id}", delete(revoke_invite))
-        .route("/{id}", get(get_team).delete(delete_team))
+        .route("/invites/{invite_id}", delete(revoke_invite).post(resend_invite))
+        .route("/{id}", get(get_team).delete(delete_team).patch(update_team))
         .route("/{id}/leave", post(leave_team))
         .route("/{id}/transfer", post(transfer_ownership))
         .route("/{id}/invite", post(invite_member))
@@ -549,6 +549,50 @@ async fn revoke_invite(
     Ok(Json(serde_json::json!({"revoked": true})))
 }
 
+/// POST /v1/teams/invites/:invite_id/resend — Resend a pending invite (extends expiry)
+async fn resend_invite(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(invite_id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Find the invite
+    let invite = sqlx::query_as::<_, TeamInvite>(
+        "SELECT id, team_id, email, role, token, expires_at, created_at FROM team_invites WHERE id = $1"
+    )
+    .bind(invite_id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    // Check that the user is admin of the team
+    require_team_admin(&pool, invite.team_id, customer.id).await?;
+
+    // Extend expiry by 7 days
+    let new_expires_at = Utc::now() + chrono::Duration::days(7);
+    sqlx::query("UPDATE team_invites SET expires_at = $1 WHERE id = $2")
+        .bind(new_expires_at)
+        .bind(invite_id)
+        .execute(&pool)
+        .await?;
+
+    let invite_link = format!("/organization?invite_token={}", invite.token);
+
+    tracing::info!("✅ Invite {} resent by {} (expires: {})", invite_id, customer.id, new_expires_at);
+
+    let _ = crate::audit::log_action(&pool, customer.id, "INVITE_RESEND", "team",
+        Some(&invite.team_id.to_string()),
+        Some(serde_json::json!({"email": &invite.email})), None, None).await;
+
+    Ok(Json(serde_json::json!({
+        "id": invite.id,
+        "email": invite.email,
+        "role": invite.role,
+        "expires_at": new_expires_at,
+        "invite_link": invite_link,
+        "message": "Invitation resent successfully"
+    })))
+}
+
 /// GET /v1/teams/:id/members — List members
 async fn list_members(
     Extension(pool): Extension<PgPool>,
@@ -665,6 +709,52 @@ async fn change_role(
         "role": req.role,
         "message": "Role updated successfully"
     })))
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct UpdateTeamRequest {
+    pub name: Option<String>,
+    pub description: Option<String>,
+}
+
+/// PATCH /v1/teams/:id — Update team name/description (admin only)
+async fn update_team(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+    Json(req): Json<UpdateTeamRequest>,
+) -> Result<Json<Team>, AppError> {
+    require_team_admin(&pool, id, customer.id).await?;
+
+    let team = sqlx::query_as::<_, Team>(
+        "SELECT id, name, owner_id, created_at, updated_at FROM teams WHERE id = $1"
+    )
+    .bind(id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    let new_name = req.name.as_deref().unwrap_or(&team.name);
+    if new_name.trim().is_empty() {
+        return Err(AppError::BadRequest("Team name cannot be empty".into()));
+    }
+
+    // Check if description column exists (it might not in older schemas)
+    let updated = sqlx::query_as::<_, Team>(
+        "UPDATE teams SET name = $1, updated_at = NOW() WHERE id = $2 RETURNING *"
+    )
+    .bind(new_name.trim())
+    .bind(id)
+    .fetch_one(&pool)
+    .await?;
+
+    tracing::info!("✅ Team '{}' ({}) updated by {}", new_name, id, customer.id);
+
+    let _ = crate::audit::log_action(&pool, customer.id, "TEAM_UPDATE", "team", Some(&id.to_string()),
+        Some(serde_json::json!({"name": new_name})), None, None).await;
+
+    Ok(Json(updated))
 }
 
 /// DELETE /v1/teams/:id — Delete team (owner only)

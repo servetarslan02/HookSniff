@@ -376,6 +376,18 @@ export function useCreateTeam() {
   });
 }
 
+export function useUpdateTeam() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ teamId, data }: { teamId: string; data: { name?: string; description?: string } }) =>
+      teamsApi.update(token!, teamId, data),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+    },
+  });
+}
+
 export function useInviteTeamMember() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
@@ -465,7 +477,18 @@ export function useRevokeInvite() {
     mutationFn: (inviteId: string) => teamsApi.revokeInvite(token!, inviteId),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['teams'] });
-      // Invalidate all team detail queries to refresh invites
+      queryClient.invalidateQueries({ queryKey: ['teams'], exact: false });
+    },
+  });
+}
+
+export function useResendInvite() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (inviteId: string) => teamsApi.resendInvite(token!, inviteId),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
       queryClient.invalidateQueries({ queryKey: ['teams'], exact: false });
     },
   });
