@@ -131,85 +131,90 @@ export default function AlertsPage() {
         </button>
       </div>
 
-      {/* Create Form */}
+      {/* Create Alert Modal */}
       {showCreate && (
-        <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createTitle')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="alert-name" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')}</label>
-              <input
-                id="alert-name"
-                type="text"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder={t('namePlaceholder')}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
-              />
-            </div>
-            <div>
-              <label htmlFor="alert-condition" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('condition')}</label>
-              <select
-                id="alert-condition"
-                value={form.condition}
-                onChange={(e) => setForm({ ...form, condition: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
-              >
-                <option value="failure_rate">{t('conditions.failureRate')}</option>
-                <option value="latency">{t('conditions.latency')}</option>
-                <option value="consecutive_failures">{t('conditions.consecutiveFailures')}</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="alert-threshold" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('threshold')}</label>
-              <input
-                id="alert-threshold"
-                type="number"
-                value={form.threshold}
-                onChange={(e) => setForm({ ...form, threshold: parseInt(e.target.value) || 0 })}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('channels')}</label>
-              <div className="flex gap-2">
-                {['slack', 'email', 'webhook'].map((ch) => (
-                  <button
-                    key={ch}
-                    onClick={() => {
-                      setForm({
-                        ...form,
-                        channels: form.channels.includes(ch)
-                          ? form.channels.filter((c) => c !== ch)
-                          : [...form.channels, ch],
-                      });
-                    }}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                      form.channels.includes(ch)
-                        ? 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400 border border-brand-300 dark:border-brand-500/30'
-                        : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-300 dark:border-slate-600'
-                    }`}
-                  >
-                    {CHANNEL_ICONS[ch]} {ch}
-                  </button>
-                ))}
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowCreate(false)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('createTitle')}</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('subtitle')}</p>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="alert-name" className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('name')}</label>
+                <input
+                  id="alert-name"
+                  type="text"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder={t('namePlaceholder')}
+                  autoFocus
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                />
+              </div>
+              <div>
+                <label htmlFor="alert-condition" className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('condition')}</label>
+                <select
+                  id="alert-condition"
+                  value={form.condition}
+                  onChange={(e) => setForm({ ...form, condition: e.target.value })}
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                >
+                  <option value="failure_rate">{t('conditions.failureRate')}</option>
+                  <option value="latency">{t('conditions.latency')}</option>
+                  <option value="consecutive_failures">{t('conditions.consecutiveFailures')}</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="alert-threshold" className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('threshold')}</label>
+                <input
+                  id="alert-threshold"
+                  type="number"
+                  value={form.threshold}
+                  onChange={(e) => setForm({ ...form, threshold: parseInt(e.target.value) || 0 })}
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('channels')}</label>
+                <div className="flex gap-2">
+                  {['slack', 'email', 'webhook'].map((ch) => (
+                    <button
+                      key={ch}
+                      type="button"
+                      onClick={() => {
+                        setForm({
+                          ...form,
+                          channels: form.channels.includes(ch)
+                            ? form.channels.filter((c) => c !== ch)
+                            : [...form.channels, ch],
+                        });
+                      }}
+                      className={`px-3.5 py-2 rounded-xl text-sm font-medium transition ${
+                        form.channels.includes(ch)
+                          ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-500/20'
+                          : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-600'
+                      }`}
+                    >
+                      {CHANNEL_ICONS[ch]} {ch}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="mt-4 flex justify-end">
-            <button type="button"
-              onClick={createAlert}
-              disabled={createAlertMutation.isPending || !form.name}
-              className="px-6 py-3 bg-gray-900 dark:bg-brand-600 text-white rounded-xl font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60"
-            >
-              {createAlertMutation.isPending ? tc('creating') : t('create')}
-            </button>
+            <div className="flex gap-3 justify-end mt-6">
+              <button type="button" onClick={() => { setShowCreate(false); setForm({ name: '', condition: 'failure_rate', threshold: 10, channels: ['email'] }); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+                {tc('cancel')}
+              </button>
+              <button type="button" onClick={createAlert} disabled={createAlertMutation.isPending || !form.name} className="px-5 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60 shadow-sm">
+                {createAlertMutation.isPending ? tc('creating') : t('create')}
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Alert List */}
-      <div className="glass-card overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-gray-500 dark:text-slate-500">{tc('loading')}</div>
         ) : alerts.length === 0 ? (
