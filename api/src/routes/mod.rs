@@ -124,6 +124,7 @@ pub fn api_router() -> Router {
     Router::new()
         .nest("/auth", auth::router())
         .nest("/oauth", oauth::router())
+        .nest("/sso", sso::public_router())
         .nest("/contact", contact::router())
         .route(
             "/status",
