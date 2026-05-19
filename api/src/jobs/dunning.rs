@@ -140,6 +140,93 @@ pub async fn retry_failed_payments(_pool: &PgPool) -> Result<u64> {
     Ok(0)
 }
 
+/// Activate pause for customers whose period has ended and have pause scheduled.
+///
+/// Runs daily. Finds customers with:
+/// - cancel_at_period_end = true
+/// - pause_plan IS NOT NULL (pause was scheduled)
+/// - current_period_end < NOW() (period has ended)
+///
+/// These customers are moved to "paused" state.
+pub async fn activate_paused_subscriptions(pool: &PgPool) -> Result<u64> {
+    tracing::info!("⏸️ Checking for subscriptions to pause...");
+
+    let free_limit = crate::billing::Plan::Developer.max_webhooks_per_day() as i64;
+
+    let result = sqlx::query(
+        "UPDATE customers SET \
+         paused_at = NOW(), \
+         plan = 'developer', \
+         webhook_limit = $1, \
+         cancel_at_period_end = false, \
+         updated_at = NOW() \
+         WHERE cancel_at_period_end = true \
+         AND pause_plan IS NOT NULL \
+         AND current_period_end < NOW() \
+         AND paused_at IS NULL"
+    )
+    .bind(free_limit)
+    .execute(pool)
+    .await?;
+
+    let count = result.rows_affected();
+    if count > 0 {
+        tracing::info!("⏸️ Activated pause for {} customers", count);
+
+        // Create notifications for paused customers
+        let customers: Vec<(uuid::Uuid, String)> = sqlx::query_as(
+            "SELECT id, pause_plan FROM customers WHERE paused_at > NOW() - INTERVAL '1 minute' AND pause_plan IS NOT NULL"
+        )
+        .fetch_all(pool)
+        .await?;
+
+        for (cid, plan) in &customers {
+            crate::notifications::helpers::create(
+                pool,
+                *cid,
+                "billing",
+                "⏸️ Abonelik Donduruldu",
+                &format!(
+                    "{} plan aboneliğiniz donduruldu. Devam etmek için \"Devam Et\" butonuna tıklayın.",
+                    plan
+                ),
+                Some("/billing-section"),
+            )
+            .await;
+        }
+    }
+
+    Ok(count)
+}
+
+/// Auto-downgrade paused subscriptions that exceeded the max pause period (90 days).
+pub async fn expire_paused_subscriptions(pool: &PgPool) -> Result<u64> {
+    tracing::info!("⏰ Checking for expired paused subscriptions...");
+
+    let result = sqlx::query(
+        "UPDATE customers SET \
+         paused_at = NULL, \
+         paused_until = NULL, \
+         pause_plan = NULL, \
+         plan = 'developer', \
+         webhook_limit = $1, \
+         updated_at = NOW() \
+         WHERE paused_at IS NOT NULL \
+         AND paused_until IS NOT NULL \
+         AND paused_until < NOW()"
+    )
+    .bind(crate::billing::Plan::Developer.max_webhooks_per_day() as i64)
+    .execute(pool)
+    .await?;
+
+    let count = result.rows_affected();
+    if count > 0 {
+        tracing::info!("⏰ Expired {} paused subscriptions (downgraded to free)", count);
+    }
+
+    Ok(count)
+}
+
 // ── Dunning email templates ─────────────────────────────────
 
 struct DunningNotif {
