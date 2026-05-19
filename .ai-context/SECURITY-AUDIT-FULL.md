@@ -13,8 +13,8 @@
 |----------|-------|-----------|------|
 | 🔴 Yüksek | 5 | 5 | 0 |
 | 🟡 Orta | 8 | 6 | 2 |
-| 🟢 Düşük | 6 | 0 | 6 |
-| **TOPLAM** | **19** | **11** | **8** |
+| 🟢 Düşük | 13 | 3 | 10 |
+| **TOPLAM** | **26** | **14** | **12** |
 
 ---
 
@@ -107,6 +107,7 @@
 - Localhost, private IP, metadata endpoint'leri bloklanmış
 - DNS resolution sonrası IP doğrulama
 - IPv4-mapped IPv6 engellemesi
+- Worker'da delivery sırasında da SSRF koruması var
 
 ### 17. JWT Güvenliği — İYİ ✅
 - RS256 tercih ediliyor, HS256 fallback
@@ -115,14 +116,51 @@
 - 2FA (TOTP) desteği
 
 ### 18. Password Hashing — GÜVENLİ ✅
-- Argon2id kullanılıyor
-- Minimum 8 karakter, büyük/küçük harf + rakam zorunlu
+- Argon2id (OWASP parametreleri: 47104 KiB, 3 iter, 1 paralel)
+- Minimum 8, maksimum 128 karakter
 - Password reset rate limited
 
 ### 19. Environment Variables — GÜVENLİ ✅
 - `.gitignore` `.env` dosyalarını exclude ediyor
 - `ENCRYPTION_KEY` startup'ta doğrulanıyor
 - CORS origins yapılandırılmış
+- Hardcoded credentials yok
+
+### 20. Cookie Güvenliği — DÜZELTİLDİ ✅
+- Tüm cookie'lerde `Secure` flag mevcut
+- `SameSite=Lax` CSRF koruması
+- `HttpOnly` auth cookie (server-side)
+
+### 21. Reverse Tabnapping — DÜZELTİLDİ ✅
+- Tüm `_blank` linklerinde `rel="noopener noreferrer"`
+
+### 22. Webhook Quota — İYİ ✅
+- Atomic webhook_count increment
+- Overage desteği (plan bazlı)
+- Replay endpoint'inde ownership check
+
+### 23. Idempotency — İYİ ✅
+- Webhook creation'da `Idempotency-Key` desteği
+- Body hash ile duplicate detection
+
+### 24. Body Size Limit — İYİ ✅
+- 2MB global body limit (`RequestBodyLimitLayer`)
+- Response body okuma limiti (1MB)
+
+### 25. Circuit Breaker — MEVCUT ✅
+- Worker'da circuit breaker modülü
+- Redis-backed state persistence
+- Failure threshold + cooldown
+
+### 26. Webhook Timestamp Tolerance — İYİ ✅
+- Configurable `webhook_timestamp_tolerance_secs`
+- Stripe webhook replay attack prevention
+
+### 27. HTTP Client Security — İYİ ✅
+- Request timeout (25s)
+- Connection timeout
+- Connection pooling
+- TCP keepalive
 
 ---
 
@@ -134,6 +172,13 @@
 | 2 | `api/src/routes/inbound.rs` | `InboundConfig.secret` → `#[serde(skip_serializing)]` |
 | 3 | `dashboard/src/lib/sanitize.ts` | `javascript:`/`data:`/`vbscript:` URL filtreleme genişletildi |
 | 4 | `dashboard/src/lib/sanitize.ts` | `<script>` tag removal eklendi |
+| 5 | `dashboard/src/lib/store.tsx` | Auth cookie'ye `Secure` flag eklendi |
+| 6 | `dashboard/src/components/CookieConsent.tsx` | Cookie consent cookie'ye `Secure` flag eklendi |
+| 7 | `dashboard/src/app/[locale]/(dashboard)/settings/components/ConsentToggle.tsx` | Consent cookie'ye `Secure` flag eklendi |
+| 8 | `api/src/routes/auth.rs` | Password max length 128 karakter (Argon2 DoS prevention) |
+| 9 | `dashboard/src/components/OnboardingWizard.tsx` | `rel="noopener noreferrer"` eklendi |
+| 10 | `dashboard/src/app/[locale]/(dashboard)/layout.tsx` | `rel="noopener noreferrer"` eklendi |
+| 11 | `dashboard/src/app/[locale]/changelog/[slug]/page.tsx` | `rel="noopener noreferrer"` eklendi |
 
 ## 🔧 Önceki Oturumlarda Yapılan Düzeltmeler
 
