@@ -4239,7 +4239,9 @@
     "aiCap3": "Debug & retry failed deliveries",
     "aiCap4": "Monitor endpoint health and performance",
     "quickStart": "Quick start",
-    "quickStartDesc": "Generate a service token, then add it as HOOKSNIFF_API_TOKEN in your MCP config."
+    "quickStartDesc": "Generate a service token, then add it as HOOKSNIFF_API_TOKEN in your MCP config.",
+    "createDesc": "Create a new service token for programmatic API access.",
+    "tokenCreated": "Service token created! Save this token now — it won't be shown again."
   },
   "featureFlags": {
     "loadFailed": "Could not load feature flags. Please refresh the page.",
