@@ -162,95 +162,101 @@ export default function IntegrationsContent() {
         </button>
       </div>
 
-      {/* Create Form */}
+      {/* Create Modal */}
       {showCreate && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Create Integration</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-              <input
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                placeholder="e.g. Stripe → Production Endpoint"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={resetForm} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">New Integration</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">Connect a connector to an endpoint</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Name</label>
+                  <input
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    placeholder="e.g. Stripe → Production"
+                    className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
+                  <input
+                    value={formDesc}
+                    onChange={(e) => setFormDesc(e.target.value)}
+                    placeholder="Optional"
+                    className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Connector Configuration</label>
+                <select
+                  value={formConnectorConfig}
+                  onChange={(e) => setFormConnectorConfig(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                >
+                  <option value="">Select connector...</option>
+                  {configs.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {PROVIDER_ICONS[c.connector_name] || '🔌'} {c.connector_display_name} — {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Target Endpoint</label>
+                <select
+                  value={formEndpoint}
+                  onChange={(e) => setFormEndpoint(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                >
+                  <option value="">Select endpoint...</option>
+                  {endpoints.map((ep: any) => (
+                    <option key={ep.id} value={ep.id}>{ep.url || ep.name || ep.id}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
+                  Event Filter <span className="normal-case tracking-normal font-normal text-gray-400">(comma-separated, empty = all)</span>
+                </label>
+                <input
+                  value={formEventFilter}
+                  onChange={(e) => setFormEventFilter(e.target.value)}
+                  placeholder="payment_intent.succeeded, charge.failed"
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white font-mono placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-              <input
-                value={formDesc}
-                onChange={(e) => setFormDesc(e.target.value)}
-                placeholder="Optional description"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Connector Configuration</label>
-              <select
-                value={formConnectorConfig}
-                onChange={(e) => setFormConnectorConfig(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            <div className="flex gap-3 justify-end mt-6">
+              <button onClick={resetForm} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (!formName.trim() || !formConnectorConfig || !formEndpoint) {
+                    toast('Fill in all required fields', 'error');
+                    return;
+                  }
+                  const filter = formEventFilter
+                    ? formEventFilter.split(',').map((s) => s.trim()).filter(Boolean)
+                    : undefined;
+                  createMutation.mutate({
+                    name: formName,
+                    description: formDesc || undefined,
+                    connector_config_id: formConnectorConfig,
+                    endpoint_id: formEndpoint,
+                    event_filter: filter,
+                  });
+                }}
+                disabled={createMutation.isPending}
+                className="px-5 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60 shadow-sm"
               >
-                <option value="">Select connector...</option>
-                {configs.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {PROVIDER_ICONS[c.connector_name] || '🔌'} {c.connector_display_name} — {c.name}
-                  </option>
-                ))}
-              </select>
+                {createMutation.isPending ? 'Creating...' : 'Create Integration'}
+              </button>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Endpoint</label>
-              <select
-                value={formEndpoint}
-                onChange={(e) => setFormEndpoint(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="">Select endpoint...</option>
-                {endpoints.map((ep: any) => (
-                  <option key={ep.id} value={ep.id}>{ep.url || ep.name || ep.id}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Event Filter <span className="text-gray-400 font-normal">(comma-separated, empty = all events)</span>
-            </label>
-            <input
-              value={formEventFilter}
-              onChange={(e) => setFormEventFilter(e.target.value)}
-              placeholder="e.g. payment_intent.succeeded, charge.failed"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            />
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                if (!formName.trim() || !formConnectorConfig || !formEndpoint) {
-                  toast('Fill in all required fields', 'error');
-                  return;
-                }
-                const filter = formEventFilter
-                  ? formEventFilter.split(',').map((s) => s.trim()).filter(Boolean)
-                  : undefined;
-                createMutation.mutate({
-                  name: formName,
-                  description: formDesc || undefined,
-                  connector_config_id: formConnectorConfig,
-                  endpoint_id: formEndpoint,
-                  event_filter: filter,
-                });
-              }}
-              disabled={createMutation.isPending}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-            >
-              {createMutation.isPending ? 'Creating...' : 'Create Integration'}
-            </button>
-            <button onClick={resetForm} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800">
-              Cancel
-            </button>
           </div>
         </div>
       )}
