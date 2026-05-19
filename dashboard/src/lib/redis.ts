@@ -24,7 +24,11 @@ const memoryStore = new Map<string, { data?: unknown; count?: number; expires: n
 export async function playgroundGet(key: string): Promise<unknown | null> {
   const r = getRedis();
   if (r) {
-    return r.get(key);
+    try {
+      return await r.get(key);
+    } catch {
+      console.warn('Redis playgroundGet failed, using in-memory fallback');
+    }
   }
   // Fallback
   const entry = memoryStore.get(key);
@@ -39,8 +43,13 @@ export async function playgroundGet(key: string): Promise<unknown | null> {
 export async function playgroundSet(key: string, value: unknown, ttlSeconds = 86400): Promise<void> {
   const r = getRedis();
   if (r) {
-    await r.set(key, value, { ex: ttlSeconds });
-    return;
+    try {
+      await r.set(key, value, { ex: ttlSeconds });
+      return;
+    } catch {
+      // Redis error (e.g. rate limit exceeded) — fall through to in-memory
+      console.warn('Redis playgroundSet failed, using in-memory fallback');
+    }
   }
   // Fallback
   memoryStore.set(key, { data: value, expires: Date.now() + ttlSeconds * 1000 });
@@ -49,8 +58,12 @@ export async function playgroundSet(key: string, value: unknown, ttlSeconds = 86
 export async function playgroundDelete(key: string): Promise<void> {
   const r = getRedis();
   if (r) {
-    await r.del(key);
-    return;
+    try {
+      await r.del(key);
+      return;
+    } catch {
+      console.warn('Redis playgroundDelete failed, using in-memory fallback');
+    }
   }
   memoryStore.delete(key);
 }
@@ -58,9 +71,13 @@ export async function playgroundDelete(key: string): Promise<void> {
 export async function playgroundLpush(key: string, value: unknown, ttlSeconds = 86400): Promise<void> {
   const r = getRedis();
   if (r) {
-    await r.lpush(key, value);
-    await r.expire(key, ttlSeconds);
-    return;
+    try {
+      await r.lpush(key, value);
+      await r.expire(key, ttlSeconds);
+      return;
+    } catch {
+      console.warn('Redis playgroundLpush failed, using in-memory fallback');
+    }
   }
   // Fallback — store as array
   const existing = (await playgroundGet(key)) as unknown[] | null;
@@ -73,8 +90,12 @@ export async function playgroundLpush(key: string, value: unknown, ttlSeconds = 
 export async function playgroundLrange(key: string, start = 0, stop = -1): Promise<unknown[]> {
   const r = getRedis();
   if (r) {
-    const data = await r.lrange(key, start, stop);
-    return Array.isArray(data) ? data : [];
+    try {
+      const data = await r.lrange(key, start, stop);
+      return Array.isArray(data) ? data : [];
+    } catch {
+      console.warn('Redis playgroundLrange failed, using in-memory fallback');
+    }
   }
   // Fallback
   const existing = (await playgroundGet(key)) as unknown[] | null;
