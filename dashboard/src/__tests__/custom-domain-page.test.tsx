@@ -48,7 +48,7 @@ Object.defineProperty(navigator, 'clipboard', {
   writable: true,
 });
 
-const { default: CustomDomainPage } = await import('@/app/[locale]/[username]/custom-domain/page');
+const { default: CustomDomainPage } = await import('@/app/[locale]/(dashboard)/custom-domain/page');
 
 const MOCK_DOMAIN_RESPONSE = {
   id: 'dom_123',
