@@ -112,6 +112,11 @@ export function PlanCards({
                   {t('mostPopular')}
                 </div>
               )}
+              {plan.key === 'startup' && (
+                <div className="absolute -top-3 right-3 bg-green-500 dark:bg-green-600 text-white px-2.5 py-0.5 rounded-full text-[11px] font-bold whitespace-nowrap">
+                  🎁 {t('firstMonthFree') || 'İlk Ay Ücretsiz'}
+                </div>
+              )}
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t(plan.nameKey)}</h3>
               <div className="mt-2 mb-4">
                 {plan.isEnterprise ? (
