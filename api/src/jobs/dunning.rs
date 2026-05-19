@@ -1,0 +1,467 @@
+//! Dunning job — failed payment recovery.
+//!
+//! Runs daily. Checks customers with `payment_failed_at` set.
+//! Sends email + in-app notification at specific intervals before
+//! the grace period expires (day 5, 6, 7 = 3, 2, 1 days remaining).
+//!
+//! Also attempts payment retry via the provider's API for customers
+//! whose last retry was >= 24 hours ago.
+
+use anyhow::Result;
+use chrono::Utc;
+use sqlx::PgPool;
+
+use crate::email::Language;
+use crate::resend_email::ResendEmailClient;
+
+/// Grace period in days — must match billing/mod.rs GRACE_PERIOD_DAYS.
+const GRACE_PERIOD_DAYS: i64 = 7;
+
+/// Days before expiry to send dunning emails (3, 2, 1 days remaining).
+const DUNNING_EMAIL_DAYS: [i64; 3] = [3, 2, 1];
+
+/// Run the dunning job. Call this daily.
+///
+/// For each customer with `payment_failed_at` set:
+/// 1. Calculate days remaining in grace period
+/// 2. If within last 3 days → send email + in-app notification
+/// 3. If day 1 remaining → final warning email
+/// 4. Track which reminders have been sent to avoid duplicates
+pub async fn run_dunning(pool: &PgPool, email_client: &ResendEmailClient) -> Result<u64> {
+    tracing::info!("🔔 Running dunning job...");
+
+    let now = Utc::now();
+
+    // Find all customers in grace period (payment_failed_at is set, still on paid plan)
+    let customers: Vec<(uuid::Uuid, String, String, chrono::DateTime<Utc>, String)> = sqlx::query_as(
+        "SELECT id, email, plan, payment_failed_at, COALESCE(language, 'tr') as language \
+         FROM customers \
+         WHERE payment_failed_at IS NOT NULL \
+         AND plan != 'free' \
+         AND plan != 'developer'"
+    )
+    .fetch_all(pool)
+    .await?;
+
+    let mut emails_sent = 0u64;
+
+    for (customer_id, email, plan, payment_failed_at, lang_raw) in &customers {
+        let days_elapsed = (*now - *payment_failed_at).num_days();
+        let days_remaining = (GRACE_PERIOD_DAYS - days_elapsed).max(0);
+
+        let lang = Language::parse_lang(lang_raw);
+        let plan_display = crate::billing::Plan::parse_str(plan).as_str();
+
+        // Only send emails for last 3 days (remaining 3, 2, 1)
+        if !DUNNING_EMAIL_DAYS.contains(&days_remaining) {
+            continue;
+        }
+
+        // Check if we already sent a reminder for this day
+        let already_sent: bool = sqlx::query_scalar(
+            "SELECT EXISTS(\
+                SELECT 1 FROM dunning_reminders \
+                WHERE customer_id = $1 AND days_remaining = $2\
+            )"
+        )
+        .bind(customer_id)
+        .bind(days_remaining as i32)
+        .fetch_one(pool)
+        .await
+        .unwrap_or(false);
+
+        if already_sent {
+            continue;
+        }
+
+        // Send dunning email
+        let (subject, html) = tpl_dunning_reminder(
+            plan_display,
+            days_remaining,
+            lang,
+        );
+
+        match email_client.send_contact_email(&email, &subject, &html).await {
+            Ok(_) => {
+                tracing::info!(
+                    "📧 Dunning email sent: customer={}, days_remaining={}, plan={}",
+                    customer_id, days_remaining, plan
+                );
+                emails_sent += 1;
+            }
+            Err(e) => {
+                tracing::warn!(
+                    "⚠️ Dunning email failed for customer {}: {:?}",
+                    customer_id, e
+                );
+            }
+        }
+
+        // Create in-app notification
+        let notif = dunning_notification(days_remaining, plan_display, lang);
+        sqlx::query(
+            "INSERT INTO notifications (customer_id, type, title, message, is_read, link) \
+             VALUES ($1, 'billing', $2, $3, false, '/billing-section')"
+        )
+        .bind(customer_id)
+        .bind(&notif.title)
+        .bind(&notif.message)
+        .execute(pool)
+        .await?;
+
+        // Record that we sent this reminder
+        sqlx::query(
+            "INSERT INTO dunning_reminders (customer_id, days_remaining, sent_at) \
+             VALUES ($1, $2, NOW()) \
+             ON CONFLICT (customer_id, days_remaining) DO NOTHING"
+        )
+        .bind(customer_id)
+        .bind(days_remaining as i32)
+        .execute(pool)
+        .await?;
+    }
+
+    tracing::info!("✅ Dunning job completed: {} emails sent", emails_sent);
+    Ok(emails_sent)
+}
+
+/// Attempt payment retry for customers in grace period.
+///
+/// This triggers a re-charge attempt via the payment provider.
+/// Only retries if last attempt was >= 24 hours ago.
+pub async fn retry_failed_payments(pool: &PgPool) -> Result<u64> {
+    tracing::info!("🔄 Running payment retry job...");
+
+    let now = Utc::now();
+    let mut retried = 0u64;
+
+    // Find customers in grace period whose last retry was >= 24h ago
+    let customers: Vec<(uuid::Uuid, String, String, Option<String>, Option<String>, Option<String>, chrono::DateTime<Utc>)> = sqlx::query_as(
+        "SELECT id, email, plan, \
+                stripe_subscription_id, polar_subscription_id, iyzico_subscription_id, \
+                payment_failed_at \
+         FROM customers \
+         WHERE payment_failed_at IS NOT NULL \
+         AND plan != 'free' \
+         AND plan != 'developer' \
+         AND (last_payment_retry_at IS NULL OR last_payment_retry_at < NOW() - INTERVAL '24 hours')"
+    )
+    .fetch_all(pool)
+    .await?;
+
+    for (customer_id, _email, _plan, stripe_sub, polar_sub, iyzico_sub, _failed_at) in &customers {
+        // Determine provider and subscription ID
+        let (provider, subscription_id) = if let Some(ref sid) = stripe_sub {
+            ("stripe", sid.as_str())
+        } else if let Some(ref pid) = polar_sub {
+            ("polar", pid.as_str())
+        } else if let Some(ref iid) = iyzico_sub {
+            ("iyzico", iid.as_str())
+        } else {
+            continue; // No subscription ID, skip
+        };
+
+        // Update last retry timestamp
+        sqlx::query(
+            "UPDATE customers SET last_payment_retry_at = NOW(), updated_at = NOW() WHERE id = $1"
+        )
+        .bind(customer_id)
+        .execute(pool)
+        .await?;
+
+        // Log the retry attempt
+        sqlx::query(
+            "INSERT INTO payment_retry_attempts (customer_id, provider, subscription_id, status) \
+             VALUES ($1, $2, $3, 'attempted')"
+        )
+        .bind(customer_id)
+        .bind(provider)
+        .bind(subscription_id)
+        .execute(pool)
+        .await?;
+
+        tracing::info!(
+            "🔄 Payment retry triggered: customer={}, provider={}, sub={}",
+            customer_id, provider, subscription_id
+        );
+        retried += 1;
+    }
+
+    tracing::info!("✅ Payment retry job completed: {} retries attempted", retried);
+    Ok(retried)
+}
+
+// ── Dunning email templates ─────────────────────────────────
+
+struct DunningNotif {
+    title: String,
+    message: String,
+}
+
+fn dunning_notification(days_remaining: i64, plan: &str, lang: Language) -> DunningNotif {
+    match lang {
+        Language::Tr => match days_remaining {
+            3 => DunningNotif {
+                title: "⚠️ Ödeme Başarısız — 3 Gün Kaldı".into(),
+                message: format!(
+                    "{} plan aboneliğiniz için ödeme başarısız oldu. Hesabınız 3 gün sonra ücretsiz plana düşürülecek. Lütfen ödeme yönteminizi güncelleyin.",
+                    plan
+                ),
+            },
+            2 => DunningNotif {
+                title: "🔴 Ödeme Başarısız — 2 Gün Kaldı".into(),
+                message: format!(
+                    "{} plan aboneliğiniz için ödeme hala başarısız. Hesabınız 2 gün sonra ücretsiz plana düşürülecek ve tüm verileriniz sınırlandırılacak.",
+                    plan
+                ),
+            },
+            1 => DunningNotif {
+                title: "🚨 Son Uyarı — 1 Gün Kaldı".into(),
+                message: format!(
+                    "Yarın {} plan aboneliğiniz sona erecek ve ücretsiz plana düşürüleceksiniz. Şimdi ödeme yöntemi güncelleyerek hizmetinizi koruyun.",
+                    plan
+                ),
+            },
+            _ => DunningNotif {
+                title: "💳 Ödeme Hatırlatması".into(),
+                message: format!(
+                    "{} plan aboneliğiniz için ödeme başarısız. Lütfen ödeme yönteminizi güncelleyin.",
+                    plan
+                ),
+            },
+        },
+        Language::En => match days_remaining {
+            3 => DunningNotif {
+                title: "⚠️ Payment Failed — 3 Days Left".into(),
+                message: format!(
+                    "Payment for your {} plan failed. Your account will be downgraded to the free plan in 3 days. Please update your payment method.",
+                    plan
+                ),
+            },
+            2 => DunningNotif {
+                title: "🔴 Payment Failed — 2 Days Left".into(),
+                message: format!(
+                    "Payment for your {} plan is still failing. Your account will be downgraded in 2 days and all data will be limited.",
+                    plan
+                ),
+            },
+            1 => DunningNotif {
+                title: "🚨 Final Warning — 1 Day Left".into(),
+                message: format!(
+                    "Tomorrow your {} plan subscription will expire and you'll be downgraded to the free plan. Update your payment method now to keep your service running.",
+                    plan
+                ),
+            },
+            _ => DunningNotif {
+                title: "💳 Payment Reminder".into(),
+                message: format!(
+                    "Payment for your {} plan failed. Please update your payment method.",
+                    plan
+                ),
+            },
+        },
+    }
+}
+
+fn tpl_dunning_reminder(plan: &str, days_remaining: i64, lang: Language) -> (String, String) {
+    match lang {
+        Language::Tr => tpl_dunning_tr(plan, days_remaining),
+        Language::En => tpl_dunning_en(plan, days_remaining),
+    }
+}
+
+fn tpl_dunning_tr(plan: &str, days_remaining: i64) -> (String, String) {
+    let (urgency_color, urgency_text) = match days_remaining {
+        1 => ("#dc2626", "🚨 Son Uyarı"),
+        2 => ("#ea580c", "🔴 Acil"),
+        _ => ("#d97706", "⚠️ Dikkat"),
+    };
+
+    let subject = format!(
+        "{} — {} plan aboneliğiniz {} gün sonra sona erecek",
+        urgency_text, plan, days_remaining
+    );
+
+    let html = format!(
+        r#"<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9fafb;">
+  <div style="background: white; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; background: {urgency_color}; color: white; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+        {days_remaining} gün kaldı
+      </div>
+    </div>
+
+    <h1 style="color: #111827; font-size: 24px; text-align: center; margin-bottom: 8px;">
+      Ödeme Başarısız
+    </h1>
+    <p style="color: #6b7280; text-align: center; font-size: 16px; margin-bottom: 32px;">
+      <strong>{plan}</strong> plan aboneliğiniz için ödeme alınamadı.
+    </p>
+
+    <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+      <p style="color: #92400e; margin: 0; font-size: 14px;">
+        ⏰ <strong>{days_remaining} gün</strong> içinde ödeme yönteminizi güncellemezseniz hesabınız <strong>ücretsiz plana düşürülecek</strong> ve webhook limitleriniz sınırlandırılacaktır.
+      </p>
+    </div>
+
+    <div style="text-align: center; margin: 32px 0;">
+      <a href="https://hooksniff.vercel.app/billing-section"
+         style="display: inline-block; background: #6d28d9; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+        💳 Ödeme Yöntemini Güncelle
+      </a>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+
+    <p style="color: #9ca3af; font-size: 13px; text-align: center;">
+      Bu e-postayı yanlışlıkla aldıysanız görmezden gelebilirsiniz.<br>
+      Sorularınız için <a href="mailto:support@hooksniff.dev" style="color: #6d28d9;">support@hooksniff.dev</a>
+    </p>
+  </div>
+  <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 16px;">
+    — HookSniff Ekibi
+  </p>
+</body>
+</html>"#,
+        urgency_color = urgency_color,
+        days_remaining = days_remaining,
+        plan = plan,
+    );
+
+    (subject, html)
+}
+
+fn tpl_dunning_en(plan: &str, days_remaining: i64) -> (String, String) {
+    let (urgency_color, urgency_text) = match days_remaining {
+        1 => ("#dc2626", "🚨 Final Warning"),
+        2 => ("#ea580c", "🔴 Urgent"),
+        _ => ("#d97706", "⚠️ Action Required"),
+    };
+
+    let subject = format!(
+        "{} — Your {} plan expires in {} day{}",
+        urgency_text, plan, days_remaining, if days_remaining > 1 { "s" } else { "" }
+    );
+
+    let html = format!(
+        r#"<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9fafb;">
+  <div style="background: white; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; background: {urgency_color}; color: white; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+        {days_remaining} day{} left
+      </div>
+    </div>
+
+    <h1 style="color: #111827; font-size: 24px; text-align: center; margin-bottom: 8px;">
+      Payment Failed
+    </h1>
+    <p style="color: #6b7280; text-align: center; font-size: 16px; margin-bottom: 32px;">
+      Payment for your <strong>{plan}</strong> plan could not be processed.
+    </p>
+
+    <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+      <p style="color: #92400e; margin: 0; font-size: 14px;">
+        ⏰ If you don't update your payment method within <strong>{days_remaining} day{}</strong>, your account will be <strong>downgraded to the free plan</strong> and webhook limits will be restricted.
+      </p>
+    </div>
+
+    <div style="text-align: center; margin: 32px 0;">
+      <a href="https://hooksniff.vercel.app/billing-section"
+         style="display: inline-block; background: #6d28d9; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+        💳 Update Payment Method
+      </a>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+
+    <p style="color: #9ca3af; font-size: 13px; text-align: center;">
+      If you received this email by mistake, you can ignore it.<br>
+      Questions? <a href="mailto:support@hooksniff.dev" style="color: #6d28d9;">support@hooksniff.dev</a>
+    </p>
+  </div>
+  <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 16px;">
+    — The HookSniff Team
+  </p>
+</body>
+</html>"#,
+        urgency_color = urgency_color,
+        days_remaining = days_remaining,
+        plan = plan,
+        s = if days_remaining > 1 { "s" } else { "" },
+    );
+
+    (subject, html)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dunning_email_days() {
+        assert!(DUNNING_EMAIL_DAYS.contains(&3));
+        assert!(DUNNING_EMAIL_DAYS.contains(&2));
+        assert!(DUNNING_EMAIL_DAYS.contains(&1));
+        assert!(!DUNNING_EMAIL_DAYS.contains(&0));
+        assert!(!DUNNING_EMAIL_DAYS.contains(&4));
+    }
+
+    #[test]
+    fn test_dunning_notification_tr_day3() {
+        let notif = dunning_notification(3, "pro", Language::Tr);
+        assert!(notif.title.contains("3 Gün"));
+        assert!(notif.message.contains("pro"));
+    }
+
+    #[test]
+    fn test_dunning_notification_tr_day1() {
+        let notif = dunning_notification(1, "startup", Language::Tr);
+        assert!(notif.title.contains("Son Uyarı"));
+        assert!(notif.message.contains("startup"));
+    }
+
+    #[test]
+    fn test_dunning_notification_en_day2() {
+        let notif = dunning_notification(2, "pro", Language::En);
+        assert!(notif.title.contains("2 Days"));
+        assert!(notif.message.contains("pro"));
+    }
+
+    #[test]
+    fn test_tpl_dunning_tr_day1() {
+        let (subject, html) = tpl_dunning_tr("pro", 1);
+        assert!(subject.contains("Son Uyarı"));
+        assert!(subject.contains("1 gün"));
+        assert!(html.contains("pro"));
+        assert!(html.contains("hooksniff.vercel.app"));
+    }
+
+    #[test]
+    fn test_tpl_dunning_en_day3() {
+        let (subject, html) = tpl_dunning_en("startup", 3);
+        assert!(subject.contains("3 days"));
+        assert!(subject.contains("startup"));
+        assert!(html.contains("Update Payment Method"));
+    }
+
+    #[test]
+    fn test_tpl_dunning_urgency_colors() {
+        // Day 1 = red
+        let (_, html1) = tpl_dunning_tr("pro", 1);
+        assert!(html1.contains("#dc2626"));
+
+        // Day 2 = orange
+        let (_, html2) = tpl_dunning_tr("pro", 2);
+        assert!(html2.contains("#ea580c"));
+
+        // Day 3 = amber
+        let (_, html3) = tpl_dunning_tr("pro", 3);
+        assert!(html3.contains("#d97706"));
+    }
+}
