@@ -119,8 +119,11 @@ export default function WebhookBuilderPage() {
         {/* Builder */}
         <div className="space-y-6">
           {/* Templates */}
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('templates')}</h2>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center"><span className="text-base">📋</span></div>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('templates')}</h2>
+            </div>
             <div className="flex gap-2">
               {Object.keys(TEMPLATES).map((name) => (
                 <button
@@ -139,21 +142,27 @@ export default function WebhookBuilderPage() {
           </div>
 
           {/* Event Type */}
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('eventType')}</h2>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center"><span className="text-base">⚡</span></div>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('eventType')}</h2>
+            </div>
             <input
               type="text"
               value={eventType}
               onChange={(e) => setEventType(e.target.value)}
               placeholder="order.created"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
+              className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition font-mono text-sm"
             />
           </div>
 
           {/* Fields */}
-          <div className="glass-card p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('payloadFields')}</h2>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center"><span className="text-base">📝</span></div>
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('payloadFields')}</h2>
+              </div>
               <button type="button" onClick={addField} className="text-sm text-brand-600 dark:text-brand-400 hover:underline">{t('addField')}</button>
             </div>
             <div className="space-y-3">
@@ -162,7 +171,7 @@ export default function WebhookBuilderPage() {
                   <select
                     value={field.type}
                     onChange={(e) => updateField(i, { type: e.target.value as WebhookField['type'] })}
-                    className="px-2 py-3 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-gray-900 dark:text-white w-24"
+                    className="px-2.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition w-24"
                   >
                     <option value="string">{t('typeStr')}</option>
                     <option value="number">{t('typeNum')}</option>
@@ -195,8 +204,11 @@ export default function WebhookBuilderPage() {
           </div>
 
           {/* Send */}
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('sendTo')}</h2>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center"><span className="text-base">🚀</span></div>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('sendTo')}</h2>
+            </div>
             {loadingEndpoints ? (
               <div className="flex items-center gap-2 py-3 text-gray-500 dark:text-slate-400 text-sm">
                 <div className="w-4 h-4 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
@@ -213,7 +225,7 @@ export default function WebhookBuilderPage() {
               <select
                 value={endpointId}
                 onChange={(e) => setEndpointId(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm mb-3"
+                className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition font-mono text-sm mb-3"
               >
                 <option value="">{t('selectEndpoint')}</option>
                 {endpoints.map((ep) => (
@@ -235,9 +247,12 @@ export default function WebhookBuilderPage() {
 
         {/* Preview */}
         <div className="space-y-6">
-          <div className="glass-card p-6 sticky top-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 sticky top-4">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('preview')}</h2>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center"><span className="text-base">👁️</span></div>
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('preview')}</h2>
+              </div>
               <button type="button"
                 onClick={updatePreview}
                 className="text-sm text-brand-600 dark:text-brand-400 hover:underline"
