@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-20 01:58 GMT+8 (Dunning sistemi)
+> Son güncelleme: 2026-05-20 02:07 GMT+8 (Grace period kaldırıldı)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -189,40 +189,35 @@ HookSniff/
 
 ---
 
-## 💳 Dunning Sistemi (2026-05-20 01:58)
+## 💳 Dunning Sistemi (2026-05-20 02:07)
 
-**Başarısız ödeme kurtarma sistemi eklendi.** Commit: `adde3f2f`
+**Ödeme akışı yeniden tasarlandı.** Commit: `0ae98f57`
 
-### Ne Yapıyor?
-- **Email serisi** — Grace period son 3 gününde müşteriye otomatik email gönderir
-- **In-app bildirim** — Çan ikonunda "X gün kaldı" uyarısı gösterir
-- **Payment retry** — 24 saatte bir otomatik ödeme tekrar dener
-- **Duplicate koruması** — Aynı gün aynı müşteriye tekrar email gitmez
+### Akış (Grace Period Yok!)
+```
+Dönem sonu → Polar ödeme dener
+├── Başarılı → plan devam, current_period_end yenilenir
+└── Başarısız → HEMEN free'ye düşür (grace period yok)
+
+Dunning email'leri dönem bitmeden GÖNDERİLİR:
+  3 gün kala → ⚠️ Amber email + bildirim
+  2 gün kala → 🔴 Orange email + bildirim
+  1 gün kala → 🚨 Red email + bildirim (son uyarı)
+```
 
 ### Dosyalar
 | Dosya | İşlev |
 |-------|-------|
-| `api/src/jobs/dunning.rs` | Dunning job + retry job + email template'leri |
-| `migrations/072_dunning_system.sql` | `dunning_reminders` + `payment_retry_attempts` tabloları |
-| `api/src/main.rs` | Job kaydı (24 saat interval, distributed lock) |
-| `api/src/jobs/retention.rs` | Eski verilerin temizlenmesi |
+| `api/src/jobs/dunning.rs` | Pre-expiry dunning email'leri |
+| `migrations/072_dunning_system.sql` | `dunning_reminders` tablosu |
+| `migrations/073_remove_grace_period.sql` | `current_period_end` sütunu |
+| `api/src/routes/billing/webhooks.rs` | Payment failed → immediate downgrade |
+| `api/src/main.rs` | Job kaydı (24 saat interval) |
 
-### Veritabanı Tabloları
+### Veritabanı
+- **`customers.current_period_end`** — Billing dönem sonu tarihi
 - **`dunning_reminders`** — Hangi müşteriye hangi gün email gönderildi
-- **`payment_retry_attempts`** — Retry logları (observability)
-- **`customers.last_payment_retry_at`** — Retry cooldown sütunu
-
-### Email Akışı
-```
-Gün 0: Ödeme başarısız → payment_failed_at set edilir
-Gün 5 (3 gün kaldı): ⚠️ Amber email + bildirim
-Gün 6 (2 gün kaldı): 🔴 Orange email + bildirim
-Gün 7 (1 gün kaldı): 🚨 Red email + bildirim (son uyarı)
-Gün 8: Grace period bitti → free'ye düşür
-```
-
-### Neon DB
-- Migration 072 uygulandı ✅
+- Grace period kaldırıldı ✅
 
 ---
 
