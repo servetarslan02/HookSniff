@@ -887,6 +887,7 @@
     "contactSales": "Satış Ekibiyle İletişim",
     "customPricing": "Özel",
     "mostPopular": "En Popüler",
+    "firstMonthFree": "İlk Ay Ücretsiz",
     "nextBilling": "Sonraki fatura tarihi",
     "webhooksThisMonth": "Bu ayki webhook sayısı",
     "used": "kullanıldı",
@@ -2144,6 +2145,7 @@
     "pricing": {
       "title": "Basit, şeffaf fiyatlandırma",
       "mostPopular": "En Popüler",
+      "firstMonthFree": "İlk Ay Ücretsiz",
       "developer": "Developer",
       "startup": "Startup",
       "pro": "Pro",
@@ -2485,6 +2487,7 @@
     "heroSubtitle": "12 aydan fazla webhook altyapı geliştirme süresinden tasarruf edin. Ücretsiz başlayın, hazır olduğunuzda ölçekleyin.",
     "heroNote": "Kredi kartı gerekmez. Sürpriz ücret yok. İstediğiniz zaman iptal edin.",
     "mostPopular": "En Popüler",
+    "firstMonthFree": "İlk Ay Ücretsiz",
     "free": "Geliştirici",
     "pro": "Pro",
     "business": "Enterprise",
