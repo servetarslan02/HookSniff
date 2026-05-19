@@ -448,7 +448,7 @@ signature = "v1," + base64(hmac_sha256(secret, signed_content))`}
         <ol className="list-decimal list-inside text-gray-600 dark:text-slate-400 space-y-2 mb-4">
           <li>Extract <code>webhook-id</code>, <code>webhook-timestamp</code>, and <code>webhook-signature</code> headers</li>
           <li>Check timestamp: reject if older than <strong>5 minutes</strong> (300 seconds)</li>
-          <li>Compute expected signature: <code>v1,base64(hmac_sha256(secret, "{id}.{timestamp}.{body}"))</code></li>
+          <li>Compute expected signature: <code>v1,base64(hmac_sha256(secret, {"\"{id}.{timestamp}.{body}\""}))</code></li>
           <li>Compare with received signature(s) using <strong>constant-time comparison</strong> (prevents timing attacks)</li>
           <li>If any signature matches → ✅ valid. Otherwise → ❌ reject</li>
         </ol>
