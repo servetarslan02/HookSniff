@@ -128,8 +128,7 @@ export function PlanCards({
                   </>
                 ) : plan.key === 'developer' ? (
                   <>
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">$0</span>
-                    <span className="text-gray-500 dark:text-slate-400 text-sm">/month</span>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">Free</span>
                   </>
                 ) : (
                   <>
