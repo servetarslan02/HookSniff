@@ -580,6 +580,7 @@ export const SsoConfigSchema = z.object({
   id: z.string().uuid().optional(),
   provider: z.string().optional(),
   enabled: z.boolean().optional(),
+  admin_bypass: z.boolean().optional(),
   metadata_url: z.string().optional(),
   entity_id: z.string().optional(),
   sso_url: z.string().optional(),
