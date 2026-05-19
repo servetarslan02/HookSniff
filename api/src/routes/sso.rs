@@ -79,6 +79,7 @@ pub struct SsoConfigResponse {
 pub struct UpsertSsoRequest {
     pub provider: Option<String>,
     pub enabled: Option<bool>,
+    pub admin_bypass: Option<bool>,
     // SAML
     pub metadata_url: Option<String>,
     pub entity_id: Option<String>,
@@ -193,8 +194,8 @@ async fn get_sso_config(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let config = sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, DateTime<Utc>, DateTime<Utc>)>(
-        "SELECT id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, created_at, updated_at
+    let config = sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, DateTime<Utc>, DateTime<Utc>)>(
+        "SELECT id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, admin_bypass, created_at, updated_at
          FROM sso_configs WHERE customer_id = $1 LIMIT 1"
     )
     .bind(customer.id)
@@ -202,7 +203,7 @@ async fn get_sso_config(
     .await?;
 
     match config {
-        Some((id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, created_at, updated_at)) => {
+        Some((id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, created_at, updated_at)) => {
             Ok(Json(serde_json::json!({
                 "id": id,
                 "provider": provider,
@@ -214,6 +215,7 @@ async fn get_sso_config(
                 "issuer_url": issuer_url,
                 "client_id": client_id,
                 "client_secret_set": client_secret_enc.is_some(),
+                "admin_bypass": admin_bypass,
                 "created_at": created_at,
                 "updated_at": updated_at,
             })))
@@ -246,6 +248,7 @@ async fn upsert_sso_config(
     }
 
     let enabled = req.enabled.unwrap_or(false);
+    let admin_bypass = req.admin_bypass.unwrap_or(true);
 
     // Validate required fields when enabling
     if enabled {
@@ -300,11 +303,12 @@ async fn upsert_sso_config(
     };
 
     sqlx::query(
-        r#"INSERT INTO sso_configs (customer_id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        r#"INSERT INTO sso_configs (customer_id, provider, enabled, admin_bypass, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
            ON CONFLICT (customer_id) DO UPDATE SET
                provider = EXCLUDED.provider,
                enabled = EXCLUDED.enabled,
+               admin_bypass = EXCLUDED.admin_bypass,
                metadata_url = EXCLUDED.metadata_url,
                entity_id = EXCLUDED.entity_id,
                sso_url = EXCLUDED.sso_url,
@@ -317,6 +321,7 @@ async fn upsert_sso_config(
     .bind(customer.id)
     .bind(&provider)
     .bind(enabled)
+    .bind(admin_bypass)
     .bind(&req.metadata_url)
     .bind(&req.entity_id)
     .bind(&req.sso_url)
