@@ -287,8 +287,27 @@ async fn login(
     if let Some((sso_enabled, admin_bypass)) = sso_config {
         if sso_enabled {
             let bypass = admin_bypass.unwrap_or(true);
-            if !bypass || !customer.is_admin {
-                tracing::warn!("🔒 SSO login blocked for {}: SSO enforced, admin_bypass={}", req.email, bypass);
+
+            // Safety: if this is the ONLY admin in the system, always allow
+            // to prevent total lockout
+            let admin_count: (i64,) = sqlx::query_as(
+                "SELECT COUNT(*) FROM customers WHERE is_admin = true AND is_active = true"
+            )
+            .fetch_one(&pool)
+            .await
+            .unwrap_or((1,));
+
+            let is_last_admin = customer.is_admin && admin_count.0 <= 1;
+
+            if is_last_admin {
+                // Last admin can always log in (prevent lockout)
+                tracing::info!("🔓 SSO bypass for last admin: {}", req.email);
+            } else if bypass && customer.is_admin {
+                // Admin bypass enabled → admin can log in
+                tracing::info!("🔓 SSO admin bypass for: {}", req.email);
+            } else {
+                // Everyone else must use SSO
+                tracing::warn!("🔒 SSO login blocked for {}: SSO enforced", req.email);
                 return Err(AppError::BadRequest(
                     "SSO is required for this account. Please use Single Sign-On to log in.".into()
                 ));
