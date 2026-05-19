@@ -4,7 +4,7 @@ const sidebars = {
     'intro',
     {
       type: 'category',
-      label: 'Quick Start',
+      label: 'Getting Started',
       items: [
         'quickstart/node',
         'quickstart/python',
@@ -21,32 +21,14 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Guides',
+      label: 'How-To Guides',
       items: [
         'guides/webhook-verification',
         'guides/error-handling',
         'guides/pagination',
         'guides/streaming',
-        'guides/rate-limiting',
         'guides/migration-from-svix',
         'guides/real-world-examples',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'SDK Reference',
-      items: [
-        'sdks/node',
-        'sdks/python',
-        'sdks/go',
-        'sdks/rust',
-        'sdks/ruby',
-        'sdks/java',
-        'sdks/kotlin',
-        'sdks/php',
-        'sdks/csharp',
-        'sdks/elixir',
-        'sdks/swift',
       ],
     },
     'api-reference',
