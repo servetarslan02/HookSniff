@@ -28,11 +28,11 @@ pod 'HookSniffSDK', '~> 0.3.0'
 import HookSniffSDK
 
 // Initialize client
-let client = HookSniffClient(apiKey: "sk_live_your_api_key")
+let client = HookSniffClient(apiKey: "hr_live_your_api_key")
 
 // Or with options
 let client = HookSniffClient(
-    apiKey: "sk_live_your_api_key",
+    apiKey: "hr_live_your_api_key",
     baseUrl: "https://hooksniff-api-1046140057667.europe-west1.run.app",
     timeout: 30
 )

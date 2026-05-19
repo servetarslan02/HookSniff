@@ -24,10 +24,10 @@ mix deps.get
 
 ```elixir
 # Initialize client
-{:ok, client} = HookSniff.Client.new("sk_live_your_api_key")
+{:ok, client} = HookSniff.Client.new("hr_live_your_api_key")
 
 # Or with options
-{:ok, client} = HookSniff.Client.new("sk_live_your_api_key",
+{:ok, client} = HookSniff.Client.new("hr_live_your_api_key",
   base_url: "https://hooksniff-api-1046140057667.europe-west1.run.app",
   timeout: 30_000
 )

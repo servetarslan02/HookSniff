@@ -19,11 +19,11 @@ hooksniff = "0.3.0"
 use hooksniff::Client;
 
 // Initialize client
-let client = Client::new("sk_live_your_api_key");
+let client = Client::new("hr_live_your_api_key");
 
 // Or with custom base URL
 let client = Client::with_options(
-    "sk_live_your_api_key",
+    "hr_live_your_api_key",
     "https://hooksniff-api-1046140057667.europe-west1.run.app",
 );
 ```

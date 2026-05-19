@@ -2,123 +2,103 @@
 sidebar_position: 1
 ---
 
-# Webhook Signature Verification
+# Webhook Verification
 
-All HookSniff webhooks are signed using **HMAC-SHA256** following the [Standard Webhooks](https://github.com/standard-webhooks/standard-webhooks) specification.
+Every webhook delivered by HookSniff includes a cryptographic signature. **Always verify it** before processing.
 
 ## How It Works
 
-When HookSniff sends a webhook to your endpoint, it includes three headers:
+Each delivery includes three [Standard Webhooks](https://www.standardwebhooks.com/) headers:
 
-| Header | Description |
-|--------|-------------|
-| `webhook-id` | Unique message ID |
-| `webhook-timestamp` | Unix timestamp |
-| `webhook-signature` | `v1,<base64-hmac>` |
+| Header | Example | Purpose |
+|--------|---------|---------|
+| `webhook-id` | `msg_abc123` | Unique message ID |
+| `webhook-timestamp` | `1716100000` | Unix timestamp (reject if > 5 min old) |
+| `webhook-signature` | `v1,abc123...` | Space-separated HMAC-SHA256 signatures |
 
-Your server computes an HMAC-SHA256 signature using `{id}.{timestamp}.{body}` and compares it against the provided signature.
-
-## Secret Format
-
-Signing secrets start with `whsec_` followed by a base64-encoded key:
+The signature is computed as:
 
 ```
-whsec_dGVzdHNlY3JldGtleWZvcmhvb2tzbmlmZg==
+signed_content = "{webhook-id}.{webhook-timestamp}.{body}"
+signature = "v1," + base64(hmac_sha256(secret, signed_content))
 ```
 
-## Verification by Language
+## Node.js
 
-### Node.js
+```typescript
+import { Webhook } from 'hooksniff';
 
-```javascript
-const { Webhook } = require('hooksniff-sdk');
+const wh = new Webhook('whsec_your_signing_secret');
 
-const webhook = new Webhook(process.env.WEBHOOK_SECRET);
-
-// In your Express handler:
 app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const isValid = webhook.verify(req.body, {
-    'webhook-id': req.headers['webhook-id'],
-    'webhook-timestamp': req.headers['webhook-timestamp'],
-    'webhook-signature': req.headers['webhook-signature'],
-  });
-  // ...
+  try {
+    const payload = wh.verify(req.body, {
+      'webhook-id': req.headers['webhook-id']!,
+      'webhook-timestamp': req.headers['webhook-timestamp']!,
+      'webhook-signature': req.headers['webhook-signature']!,
+    });
+    console.log('Event:', payload.event);
+    res.status(200).send('OK');
+  } catch (err) {
+    res.status(401).send('Invalid signature');
+  }
 });
 ```
 
-### Python
+## Python
 
 ```python
 from hooksniff import Webhook
 
-webhook = Webhook(secret="whsec_...")
+wh = Webhook("whsec_your_signing_secret")
 
-# In your Flask handler:
-@app.route('/webhook', methods=['POST'])
+@app.route("/webhook", methods=["POST"])
 def handle_webhook():
-    payload = webhook.verify(request.data, dict(request.headers))
-    # ...
+    try:
+        payload = wh.verify(
+            request.data,
+            {
+                "webhook-id": request.headers["webhook-id"],
+                "webhook-timestamp": request.headers["webhook-timestamp"],
+                "webhook-signature": request.headers["webhook-signature"],
+            },
+        )
+        print(f"Event: {payload['event']}")
+        return "", 200
+    except Exception:
+        return "Invalid signature", 401
 ```
 
-### Go
+## Go
 
 ```go
-webhook, _ := hooksniff.NewWebhook("whsec_...")
+wh, _ := hooksniff.NewWebhook("whsec_your_signing_secret")
 
-// In your handler:
-func handler(w http.ResponseWriter, r *http.Request) {
-    body, _ := io.ReadAll(r.Body)
-    err := webhook.Verify(body, map[string]string{
-        "webhook-id":        r.Header.Get("webhook-id"),
-        "webhook-timestamp": r.Header.Get("webhook-timestamp"),
-        "webhook-signature": r.Header.Get("webhook-signature"),
-    })
-    // ...
+func handleWebhook(w http.ResponseWriter, r *http.Request) {
+    payload, err := wh.Verify(r.Body, r.Header)
+    if err != nil {
+        w.WriteHeader(401)
+        w.Write([]byte("Invalid signature"))
+        return
+    }
+    fmt.Printf("Event: %s\n", payload.Event)
+    w.WriteHeader(200)
 }
 ```
 
-### Rust
+## Key Rotation
 
-```rust
-use hooksniff::webhook;
-use std::collections::HashMap;
+When you rotate a signing secret, HookSniff sends **both** old and new signatures (space-separated). Your code should verify that **at least one** matches:
 
-let mut headers = HashMap::new();
-headers.insert("webhook-id".to_string(), msg_id);
-headers.insert("webhook-timestamp".to_string(), timestamp);
-headers.insert("webhook-signature".to_string(), signature);
-
-webhook::verify_signature("whsec_...", &payload, &headers)?;
+```
+webhook-signature: v1,old_signature v1,new_signature
 ```
 
-### Ruby
+## Security Tips
 
-```ruby
-webhook = HookSniff::Webhook.new("whsec_...")
-
-# In your Sinatra/Rails handler:
-post '/webhook' do
-  payload = webhook.verify(request.body.read, {
-    'webhook-id' => request.env['HTTP_WEBHOOK_ID'],
-    'webhook-timestamp' => request.env['HTTP_WEBHOOK_TIMESTAMP'],
-    'webhook-signature' => request.env['HTTP_WEBHOOK_SIGNATURE'],
-  })
-end
-```
-
-### Java
-
-```java
-WebhookVerifier verifier = new WebhookVerifier("whsec_...");
-
-// In your handler:
-verifier.verify(payload, headers);
-```
-
-## Security Notes
-
-1. **Always verify signatures** — never process unverified webhooks
-2. **Timestamp tolerance** — 5 minutes by default; reject old timestamps
-3. **Timing-safe comparison** — prevents timing attacks
-4. **Multiple signatures** — space-separated for key rotation support
-5. **Use HTTPS** — webhooks should only be received over HTTPS
+- ✅ Always use HTTPS for your webhook endpoint
+- ✅ Use constant-time comparison (all SDKs do this automatically)
+- ✅ Reject webhooks older than 5 minutes
+- ✅ Rotate secrets periodically
+- ✅ Return 2xx quickly, process asynchronously
+- ❌ Never log signing secrets

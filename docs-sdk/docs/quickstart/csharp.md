@@ -24,10 +24,10 @@ dotnet add package HookSniff.Sdk
 using HookSniff;
 
 // Initialize client
-var client = new HookSniffClient("sk_live_your_api_key");
+var client = new HookSniffClient("hr_live_your_api_key");
 
 // Or with options
-var client = new HookSniffClient("sk_live_your_api_key", new HookSniffOptions
+var client = new HookSniffClient("hr_live_your_api_key", new HookSniffOptions
 {
     BaseUrl = "https://hooksniff-api-1046140057667.europe-west1.run.app",
     Timeout = TimeSpan.FromSeconds(30),

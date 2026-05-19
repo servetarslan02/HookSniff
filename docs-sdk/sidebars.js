@@ -26,13 +26,15 @@ const sidebars = {
         'guides/webhook-verification',
         'guides/error-handling',
         'guides/pagination',
-        'guides/migration',
+        'guides/streaming',
+        'guides/rate-limiting',
+        'guides/migration-from-svix',
+        'guides/real-world-examples',
       ],
     },
-    'api-reference',
     {
       type: 'category',
-      label: 'SDKs',
+      label: 'SDK Reference',
       items: [
         'sdks/node',
         'sdks/python',
@@ -47,6 +49,7 @@ const sidebars = {
         'sdks/swift',
       ],
     },
+    'api-reference',
   ],
 };
 

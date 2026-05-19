@@ -1139,7 +1139,16 @@
     "developer": "Geliştirici",
     "startup": "Startup",
     "enterprise": "Enterprise",
-    "unlimited": "Sınırsız"
+    "unlimited": "Sınırsız",
+    "javaSdk": "Java",
+    "kotlinSdk": "Kotlin",
+    "swiftSdk": "Swift",
+    "webhookVerification": "Webhook Doğrulama",
+    "migrationFromSvix": "Svix'ten Geçiş",
+    "realWorldExamples": "Gerçek Dünya Örnekleri",
+    "streamingAndRateLimiting": "Streaming ve Rate Limiting",
+    "paginationGuide": "Sayfalama",
+    "errorHandlingGuide": "Hata Yönetimi"
   },
   "status": {
     "title": "HookSniff Durumu",
