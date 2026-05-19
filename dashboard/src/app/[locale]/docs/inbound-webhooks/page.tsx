@@ -1,5 +1,4 @@
 import CodeBlock from '@/components/CodeBlock';
-import { Check } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Check } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
