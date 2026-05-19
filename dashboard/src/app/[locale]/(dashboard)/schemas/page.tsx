@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useQueryClient } from '@tanstack/react-query';
+
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
@@ -21,13 +21,13 @@ export default function SchemasPage() {
   const tc = useTranslations('common');
   const { token } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
+  
 
   const [schemas, setSchemas] = useState<Schema[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [viewSchema, setViewSchema] = useState<Schema | null>(null);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  
   const [validatingId, setValidatingId] = useState<string | null>(null);
   const [validationPayload, setValidationPayload] = useState('');
   const [validationResult, setValidationResult] = useState<{ valid: boolean; errors: Array<{ path: string; message: string }> } | null>(null);
