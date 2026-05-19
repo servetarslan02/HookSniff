@@ -386,7 +386,7 @@ export function TeamDetail({
                         inv.role === 'editor' ? 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/15' :
                         'text-gray-500 bg-gray-100 dark:text-slate-400 dark:bg-slate-700'
                       }`}>
-                        {ROLE_ICONS[inv.role] || '👁️'} {inv.role}
+                        {ROLE_ICONS[inv.role] || <Eye size={16} strokeWidth={1.75} />} {inv.role}
                       </span>
                       <span className={`text-xs ${isExpiringSoon ? 'text-red-500 dark:text-red-400 font-medium' : 'text-gray-400 dark:text-slate-500'}`}>
                         {daysLeft === 0 ? (t('expiresToday') || 'Expires today') : (t('expiresInDays') || `${daysLeft}d left`)}

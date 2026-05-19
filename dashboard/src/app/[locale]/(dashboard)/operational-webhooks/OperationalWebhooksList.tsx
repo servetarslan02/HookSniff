@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { ClipboardList, Pencil, Trash2 } from 'lucide-react';
+import { ClipboardList, Inbox, Pencil, Trash2 } from 'lucide-react';
 
 const OP_EVENTS = [
   { id: 'delivery.failed', label: 'Delivery Failed', desc: 'When a webhook delivery fails after all retries' },
@@ -256,7 +256,7 @@ export default function OperationalWebhooksList() {
           </div>
           {deliveries.length === 0 ? (
             <div className="px-6 py-12 text-center">
-              <div className="text-3xl mb-2">📭</div>
+              <div className="flex justify-center mb-2 text-gray-400"><Inbox size={28} strokeWidth={1.5} /></div>
               <p className="text-sm text-gray-500 dark:text-slate-400">{t('noDeliveries')}</p>
             </div>
           ) : (

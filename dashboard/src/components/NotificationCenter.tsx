@@ -173,7 +173,7 @@ export function NotificationCenter() {
                   }}
                 >
                   <div className="flex items-start gap-3">
-                    <span className="text-base mt-0.5">{typeIcons[n.type] || '🔔'}</span>
+                    <span className="text-base mt-0.5">{typeIcons[n.type] || <Bell size={16} strokeWidth={1.75} />}</span>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm ${!n.read ? 'font-semibold text-gray-900 dark:text-white' : 'text-gray-600 dark:text-slate-400'}`}>
                         {n.title}

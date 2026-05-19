@@ -1,6 +1,7 @@
 'use client';
 
 import { Component, type ReactNode, type ErrorInfo } from 'react';
+import { AlertTriangle } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
@@ -55,7 +56,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="glass-card p-8 text-center">
-          <div className="text-4xl mb-4" aria-hidden="true">💥</div>
+          <div className="flex justify-center mb-4 text-red-500" aria-hidden="true"><AlertTriangle size={40} strokeWidth={1.75} /></div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{description}</p>
           <button

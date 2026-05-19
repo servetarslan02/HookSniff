@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { X } from 'lucide-react';
+import { X, PartyPopper } from 'lucide-react';
 
 export function SuccessToast({ message, onClose }: { message: string; onClose: () => void }) {
   const t = useTranslations('onboarding');
@@ -15,7 +15,7 @@ export function SuccessToast({ message, onClose }: { message: string; onClose: (
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
       <div className="bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 max-w-sm">
-        <span className="text-2xl">🎉</span>
+        <span className="text-green-200"><PartyPopper size={24} strokeWidth={1.75} /></span>
         <div>
           <div className="font-semibold text-sm">{t('successTitle')}</div>
           <div className="text-sm opacity-90">{message}</div>

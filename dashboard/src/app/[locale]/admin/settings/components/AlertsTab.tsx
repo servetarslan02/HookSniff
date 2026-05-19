@@ -114,7 +114,7 @@ export default function AlertsTab({
             disabled={isSaving}
             className="px-6 py-3 bg-orange-600 dark:bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 dark:hover:bg-orange-700 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition disabled:opacity-60"
           >
-            {isSaving ? tc('saving') : (t('saveAlertSettings') || '🚨 Save Alert Settings')}
+            {isSaving ? tc('saving') : (t('saveAlertSettings') || 'Save Alert Settings')}
           </button>
         </div>
       </div>
