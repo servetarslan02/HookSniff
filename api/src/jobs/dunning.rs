@@ -1,11 +1,10 @@
-//! Dunning job — failed payment recovery.
+//! Dunning job — pre-expiry payment reminders.
 //!
-//! Runs daily. Checks customers with `payment_failed_at` set.
-//! Sends email + in-app notification at specific intervals before
-//! the grace period expires (day 5, 6, 7 = 3, 2, 1 days remaining).
+//! Runs daily. Checks customers whose billing period ends within 3 days.
+//! Sends email + in-app notification at 3, 2, 1 days before period end.
 //!
-//! Also attempts payment retry via the provider's API for customers
-//! whose last retry was >= 24 hours ago.
+//! Payment failure → immediate downgrade to free (no grace period).
+//! Dunning emails are PRE-EXPIRY warnings, not post-failure reminders.
 
 use anyhow::Result;
 use chrono::Utc;
@@ -14,45 +13,41 @@ use sqlx::PgPool;
 use crate::email::Language;
 use crate::resend_email::ResendEmailClient;
 
-/// Grace period in days — must match billing/mod.rs GRACE_PERIOD_DAYS.
-const GRACE_PERIOD_DAYS: i64 = 7;
-
-/// Days before expiry to send dunning emails (3, 2, 1 days remaining).
+/// Days before period end to send dunning emails (3, 2, 1 days remaining).
 const DUNNING_EMAIL_DAYS: [i64; 3] = [3, 2, 1];
 
 /// Run the dunning job. Call this daily.
 ///
-/// For each customer with `payment_failed_at` set:
-/// 1. Calculate days remaining in grace period
-/// 2. If within last 3 days → send email + in-app notification
-/// 3. If day 1 remaining → final warning email
-/// 4. Track which reminders have been sent to avoid duplicates
+/// For each paid customer whose `current_period_end` is within 3 days:
+/// 1. Calculate days remaining until period end
+/// 2. Send email + in-app notification
+/// 3. Track which reminders have been sent to avoid duplicates
 pub async fn run_dunning(pool: &PgPool, email_client: &ResendEmailClient) -> Result<u64> {
     tracing::info!("🔔 Running dunning job...");
 
     let now = Utc::now();
 
-    // Find all customers in grace period (payment_failed_at is set, still on paid plan)
+    // Find paid customers whose billing period ends within 3 days
     let customers: Vec<(uuid::Uuid, String, String, chrono::DateTime<Utc>, String)> = sqlx::query_as(
-        "SELECT id, email, plan, payment_failed_at, COALESCE(language, 'tr') as language \
+        "SELECT id, email, plan, current_period_end, COALESCE(language, 'tr') as language \
          FROM customers \
-         WHERE payment_failed_at IS NOT NULL \
-         AND plan != 'free' \
-         AND plan != 'developer'"
+         WHERE current_period_end IS NOT NULL \
+         AND current_period_end > NOW() \
+         AND current_period_end <= NOW() + INTERVAL '3 days' \
+         AND plan NOT IN ('free', 'developer')"
     )
     .fetch_all(pool)
     .await?;
 
     let mut emails_sent = 0u64;
 
-    for (customer_id, email, plan, payment_failed_at, lang_raw) in &customers {
-        let days_elapsed = (*now - *payment_failed_at).num_days();
-        let days_remaining = (GRACE_PERIOD_DAYS - days_elapsed).max(0);
+    for (customer_id, email, plan, period_end, lang_raw) in &customers {
+        let days_remaining = (*period_end - now).num_days().max(0);
 
         let lang = Language::parse_lang(lang_raw);
         let plan_display = crate::billing::Plan::parse_str(plan).as_str();
 
-        // Only send emails for last 3 days (remaining 3, 2, 1)
+        // Only send emails for specific days (3, 2, 1)
         if !DUNNING_EMAIL_DAYS.contains(&days_remaining) {
             continue;
         }
@@ -125,70 +120,12 @@ pub async fn run_dunning(pool: &PgPool, email_client: &ResendEmailClient) -> Res
     Ok(emails_sent)
 }
 
-/// Attempt payment retry for customers in grace period.
-///
-/// This triggers a re-charge attempt via the payment provider.
-/// Only retries if last attempt was >= 24 hours ago.
-pub async fn retry_failed_payments(pool: &PgPool) -> Result<u64> {
-    tracing::info!("🔄 Running payment retry job...");
-
-    let now = Utc::now();
-    let mut retried = 0u64;
-
-    // Find customers in grace period whose last retry was >= 24h ago
-    let customers: Vec<(uuid::Uuid, String, String, Option<String>, Option<String>, Option<String>, chrono::DateTime<Utc>)> = sqlx::query_as(
-        "SELECT id, email, plan, \
-                stripe_subscription_id, polar_subscription_id, iyzico_subscription_id, \
-                payment_failed_at \
-         FROM customers \
-         WHERE payment_failed_at IS NOT NULL \
-         AND plan != 'free' \
-         AND plan != 'developer' \
-         AND (last_payment_retry_at IS NULL OR last_payment_retry_at < NOW() - INTERVAL '24 hours')"
-    )
-    .fetch_all(pool)
-    .await?;
-
-    for (customer_id, _email, _plan, stripe_sub, polar_sub, iyzico_sub, _failed_at) in &customers {
-        // Determine provider and subscription ID
-        let (provider, subscription_id) = if let Some(ref sid) = stripe_sub {
-            ("stripe", sid.as_str())
-        } else if let Some(ref pid) = polar_sub {
-            ("polar", pid.as_str())
-        } else if let Some(ref iid) = iyzico_sub {
-            ("iyzico", iid.as_str())
-        } else {
-            continue; // No subscription ID, skip
-        };
-
-        // Update last retry timestamp
-        sqlx::query(
-            "UPDATE customers SET last_payment_retry_at = NOW(), updated_at = NOW() WHERE id = $1"
-        )
-        .bind(customer_id)
-        .execute(pool)
-        .await?;
-
-        // Log the retry attempt
-        sqlx::query(
-            "INSERT INTO payment_retry_attempts (customer_id, provider, subscription_id, status) \
-             VALUES ($1, $2, $3, 'attempted')"
-        )
-        .bind(customer_id)
-        .bind(provider)
-        .bind(subscription_id)
-        .execute(pool)
-        .await?;
-
-        tracing::info!(
-            "🔄 Payment retry triggered: customer={}, provider={}, sub={}",
-            customer_id, provider, subscription_id
-        );
-        retried += 1;
-    }
-
-    tracing::info!("✅ Payment retry job completed: {} retries attempted", retried);
-    Ok(retried)
+/// Payment retry is no longer needed — payment failure results in immediate downgrade.
+/// This function is kept as a no-op for backward compatibility.
+pub async fn retry_failed_payments(_pool: &PgPool) -> Result<u64> {
+    // No-op: payments are handled by Polar.sh.
+    // If payment fails, customer is downgraded immediately.
+    Ok(0)
 }
 
 // ── Dunning email templates ─────────────────────────────────
@@ -202,60 +139,60 @@ fn dunning_notification(days_remaining: i64, plan: &str, lang: Language) -> Dunn
     match lang {
         Language::Tr => match days_remaining {
             3 => DunningNotif {
-                title: "⚠️ Ödeme Başarısız — 3 Gün Kaldı".into(),
+                title: "⚠️ Abonelik Bitiyor — 3 Gün Kaldı".into(),
                 message: format!(
-                    "{} plan aboneliğiniz için ödeme başarısız oldu. Hesabınız 3 gün sonra ücretsiz plana düşürülecek. Lütfen ödeme yönteminizi güncelleyin.",
+                    "{} plan aboneliğiniz 3 gün sonra sona erecek. Ödeme yönteminizin güncel olduğundan emin olun. Ödeme alınamazsa hesabınız ücretsiz plana düşürülecek.",
                     plan
                 ),
             },
             2 => DunningNotif {
-                title: "🔴 Ödeme Başarısız — 2 Gün Kaldı".into(),
+                title: "🔴 Abonelik Bitiyor — 2 Gün Kaldı".into(),
                 message: format!(
-                    "{} plan aboneliğiniz için ödeme hala başarısız. Hesabınız 2 gün sonra ücretsiz plana düşürülecek ve tüm verileriniz sınırlandırılacak.",
+                    "{} plan aboneliğiniz 2 gün sonra sona erecek. Ödeme yönteminizi kontrol edin, aksi halde hesabınız ücretsiz plana düşürülecek.",
                     plan
                 ),
             },
             1 => DunningNotif {
-                title: "🚨 Son Uyarı — 1 Gün Kaldı".into(),
+                title: "🚨 Son Uyarı — Yarın Sona Eriyor".into(),
                 message: format!(
-                    "Yarın {} plan aboneliğiniz sona erecek ve ücretsiz plana düşürüleceksiniz. Şimdi ödeme yöntemi güncelleyerek hizmetinizi koruyun.",
+                    "Yarın {} plan aboneliğiniz sona erecek. Ödeme yönteminizi şimdi güncelleyerek hizmetinizi koruyun.",
                     plan
                 ),
             },
             _ => DunningNotif {
-                title: "💳 Ödeme Hatırlatması".into(),
+                title: "💳 Abonelik Hatırlatması".into(),
                 message: format!(
-                    "{} plan aboneliğiniz için ödeme başarısız. Lütfen ödeme yönteminizi güncelleyin.",
+                    "{} plan aboneliğiniz yakında sona erecek. Ödeme yönteminizi kontrol edin.",
                     plan
                 ),
             },
         },
         Language::En => match days_remaining {
             3 => DunningNotif {
-                title: "⚠️ Payment Failed — 3 Days Left".into(),
+                title: "⚠️ Subscription Expiring — 3 Days Left".into(),
                 message: format!(
-                    "Payment for your {} plan failed. Your account will be downgraded to the free plan in 3 days. Please update your payment method.",
+                    "Your {} plan subscription expires in 3 days. Make sure your payment method is up to date. If payment fails, your account will be downgraded to the free plan.",
                     plan
                 ),
             },
             2 => DunningNotif {
-                title: "🔴 Payment Failed — 2 Days Left".into(),
+                title: "🔴 Subscription Expiring — 2 Days Left".into(),
                 message: format!(
-                    "Payment for your {} plan is still failing. Your account will be downgraded in 2 days and all data will be limited.",
+                    "Your {} plan subscription expires in 2 days. Check your payment method or your account will be downgraded to the free plan.",
                     plan
                 ),
             },
             1 => DunningNotif {
-                title: "🚨 Final Warning — 1 Day Left".into(),
+                title: "🚨 Final Warning — Expires Tomorrow".into(),
                 message: format!(
-                    "Tomorrow your {} plan subscription will expire and you'll be downgraded to the free plan. Update your payment method now to keep your service running.",
+                    "Your {} plan subscription expires tomorrow. Update your payment method now to keep your service running.",
                     plan
                 ),
             },
             _ => DunningNotif {
-                title: "💳 Payment Reminder".into(),
+                title: "💳 Subscription Reminder".into(),
                 message: format!(
-                    "Payment for your {} plan failed. Please update your payment method.",
+                    "Your {} plan subscription is expiring soon. Check your payment method.",
                     plan
                 ),
             },
@@ -295,22 +232,22 @@ fn tpl_dunning_tr(plan: &str, days_remaining: i64) -> (String, String) {
     </div>
 
     <h1 style="color: #111827; font-size: 24px; text-align: center; margin-bottom: 8px;">
-      Ödeme Başarısız
+      Abonelik Sona Eriyor
     </h1>
     <p style="color: #6b7280; text-align: center; font-size: 16px; margin-bottom: 32px;">
-      <strong>{plan}</strong> plan aboneliğiniz için ödeme alınamadı.
+      <strong>{plan}</strong> plan aboneliğiniz <strong>{days_remaining} gün</strong> sonra sona erecek.
     </p>
 
     <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
       <p style="color: #92400e; margin: 0; font-size: 14px;">
-        ⏰ <strong>{days_remaining} gün</strong> içinde ödeme yönteminizi güncellemezseniz hesabınız <strong>ücretsiz plana düşürülecek</strong> ve webhook limitleriniz sınırlandırılacaktır.
+        💳 Ödeme yönteminizin güncel olduğundan emin olun. Ödeme alınamazsa hesabınız <strong>ücretsiz plana düşürülecek</strong> ve webhook limitleriniz sınırlandırılacaktır.
       </p>
     </div>
 
     <div style="text-align: center; margin: 32px 0;">
       <a href="https://hooksniff.vercel.app/billing-section"
          style="display: inline-block; background: #6d28d9; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
-        💳 Ödeme Yöntemini Güncelle
+        💳 Ödeme Yöntemini Kontrol Et
       </a>
     </div>
 
@@ -359,22 +296,22 @@ fn tpl_dunning_en(plan: &str, days_remaining: i64) -> (String, String) {
     </div>
 
     <h1 style="color: #111827; font-size: 24px; text-align: center; margin-bottom: 8px;">
-      Payment Failed
+      Subscription Expiring
     </h1>
     <p style="color: #6b7280; text-align: center; font-size: 16px; margin-bottom: 32px;">
-      Payment for your <strong>{plan}</strong> plan could not be processed.
+      Your <strong>{plan}</strong> plan expires in <strong>{days_remaining} day{}</strong>.
     </p>
 
     <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
       <p style="color: #92400e; margin: 0; font-size: 14px;">
-        ⏰ If you don't update your payment method within <strong>{days_remaining} day{}</strong>, your account will be <strong>downgraded to the free plan</strong> and webhook limits will be restricted.
+        💳 Make sure your payment method is up to date. If payment cannot be processed, your account will be <strong>downgraded to the free plan</strong> and webhook limits will be restricted.
       </p>
     </div>
 
     <div style="text-align: center; margin: 32px 0;">
       <a href="https://hooksniff.vercel.app/billing-section"
          style="display: inline-block; background: #6d28d9; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
-        💳 Update Payment Method
+        💳 Check Payment Method
       </a>
     </div>
 
@@ -447,20 +384,17 @@ mod tests {
         let (subject, html) = tpl_dunning_en("startup", 3);
         assert!(subject.contains("3 days"));
         assert!(subject.contains("startup"));
-        assert!(html.contains("Update Payment Method"));
+        assert!(html.contains("Check Payment Method"));
     }
 
     #[test]
     fn test_tpl_dunning_urgency_colors() {
-        // Day 1 = red
         let (_, html1) = tpl_dunning_tr("pro", 1);
         assert!(html1.contains("#dc2626"));
 
-        // Day 2 = orange
         let (_, html2) = tpl_dunning_tr("pro", 2);
         assert!(html2.contains("#ea580c"));
 
-        // Day 3 = amber
         let (_, html3) = tpl_dunning_tr("pro", 3);
         assert!(html3.contains("#d97706"));
     }
