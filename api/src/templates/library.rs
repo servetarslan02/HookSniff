@@ -7,6 +7,9 @@ pub fn all_templates() -> Vec<WebhookTemplate> {
         shopify_like_template(),
         github_like_template(),
         twilio_like_template(),
+        saas_platform_template(),
+        healthcare_template(),
+        slack_like_template(),
     ]
 }
 
@@ -269,6 +272,199 @@ fn twilio_like_template() -> WebhookTemplate {
     }
 }
 
+/// SaaS platform webhook template
+fn saas_platform_template() -> WebhookTemplate {
+    WebhookTemplate {
+        id: "saas-platform".to_string(),
+        name: "SaaS Platform Webhooks".to_string(),
+        description: "User lifecycle and subscription events for SaaS platforms — covers user management, subscription billing, usage tracking, and team collaboration events".to_string(),
+        industry: "saas".to_string(),
+        event_types: vec![
+            "user.created".to_string(),
+            "user.updated".to_string(),
+            "user.deleted".to_string(),
+            "user.suspended".to_string(),
+            "user.reactivated".to_string(),
+            "subscription.created".to_string(),
+            "subscription.changed".to_string(),
+            "subscription.cancelled".to_string(),
+            "subscription.renewed".to_string(),
+            "subscription.trial_ending".to_string(),
+            "subscription.past_due".to_string(),
+            "invoice.created".to_string(),
+            "invoice.paid".to_string(),
+            "invoice.payment_failed".to_string(),
+            "usage.threshold".to_string(),
+            "usage.limit_reached".to_string(),
+            "team.member_added".to_string(),
+            "team.member_removed".to_string(),
+            "team.role_changed".to_string(),
+        ],
+        endpoint_config: EndpointTemplateConfig {
+            url_placeholder: "https://your-app.com/api/webhooks".to_string(),
+            signing_algorithm: "hmac-sha256".to_string(),
+            content_type: "application/json".to_string(),
+            custom_headers: serde_json::json!({
+                "X-Webhook-Version": "2024-01-01"
+            }),
+            event_filter: vec!["user.*".to_string(), "subscription.*".to_string(), "invoice.*".to_string(), "usage.*".to_string(), "team.*".to_string()],
+        },
+        retry_policy: RetryTemplatePolicy {
+            max_attempts: 4,
+            backoff: "exponential".to_string(),
+            initial_delay_secs: 10,
+            max_delay_secs: 43200,
+        },
+        agents: vec![
+            TemplateAgent {
+                agent_name: "churn_predictor".to_string(),
+                description: "Predicts user churn based on usage patterns and subscription changes".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+            TemplateAgent {
+                agent_name: "usage_anomaly_detector".to_string(),
+                description: "Monitors for unusual usage spikes or drops".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+            TemplateAgent {
+                agent_name: "trial_conversion_tracker".to_string(),
+                description: "Tracks trial-to-paid conversion rates and sends reminders".to_string(),
+                enabled_by_default: false,
+                config: serde_json::json!({}),
+            },
+        ],
+        estimated_daily_volume: 5000,
+        tags: vec!["saas".to_string(), "subscriptions".to_string(), "users".to_string(), "billing".to_string()],
+    }
+}
+
+/// Healthcare webhook template
+fn healthcare_template() -> WebhookTemplate {
+    WebhookTemplate {
+        id: "healthcare-events".to_string(),
+        name: "Healthcare Events Webhooks".to_string(),
+        description: "Clinical event flow for healthcare systems — covers patient lifecycle, lab results, prescriptions, and appointment scheduling with HIPAA-aware patterns".to_string(),
+        industry: "healthcare".to_string(),
+        event_types: vec![
+            "patient.admitted".to_string(),
+            "patient.discharged".to_string(),
+            "patient.transferred".to_string(),
+            "patient.updated".to_string(),
+            "appointment.scheduled".to_string(),
+            "appointment.reminder".to_string(),
+            "appointment.cancelled".to_string(),
+            "appointment.completed".to_string(),
+            "lab.result.ready".to_string(),
+            "lab.result.critical".to_string(),
+            "lab.result.abnormal".to_string(),
+            "prescription.created".to_string(),
+            "prescription.filled".to_string(),
+            "prescription.denied".to_string(),
+            "prescription.expired".to_string(),
+            "vitals.alert".to_string(),
+            "insurance.verified".to_string(),
+            "insurance.claim_submitted".to_string(),
+        ],
+        endpoint_config: EndpointTemplateConfig {
+            url_placeholder: "https://your-his.com/api/webhooks".to_string(),
+            signing_algorithm: "hmac-sha256".to_string(),
+            content_type: "application/json".to_string(),
+            custom_headers: serde_json::json!({
+                "X-HIPAA-Audit": "true",
+                "X-Data-Classification": "PHI"
+            }),
+            event_filter: vec!["patient.*".to_string(), "lab.*".to_string(), "prescription.*".to_string(), "appointment.*".to_string()],
+        },
+        retry_policy: RetryTemplatePolicy {
+            max_attempts: 5,
+            backoff: "exponential".to_string(),
+            initial_delay_secs: 5,
+            max_delay_secs: 86400,
+        },
+        agents: vec![
+            TemplateAgent {
+                agent_name: "critical_alert_dispatcher".to_string(),
+                description: "Immediately dispatches critical lab results and vitals alerts to on-call staff".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+            TemplateAgent {
+                agent_name: "appointment_no_show_predictor".to_string(),
+                description: "Predicts no-show probability and triggers reminder sequences".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+            TemplateAgent {
+                agent_name: "bed_optimizer".to_string(),
+                description: "Optimizes bed allocation based on admission/discharge patterns".to_string(),
+                enabled_by_default: false,
+                config: serde_json::json!({}),
+            },
+        ],
+        estimated_daily_volume: 20000,
+        tags: vec!["healthcare".to_string(), "clinical".to_string(), "patients".to_string(), "hipaa".to_string()],
+    }
+}
+
+/// Slack-like notifications webhook template
+fn slack_like_template() -> WebhookTemplate {
+    WebhookTemplate {
+        id: "slack-like-notifications".to_string(),
+        name: "Slack-like Notification Webhooks".to_string(),
+        description: "Real-time notification events modeled after Slack's webhook system — covers channel messages, reactions, mentions, commands, and app interactions".to_string(),
+        industry: "communications".to_string(),
+        event_types: vec![
+            "message.created".to_string(),
+            "message.updated".to_string(),
+            "message.deleted".to_string(),
+            "channel.created".to_string(),
+            "channel.archived".to_string(),
+            "channel.renamed".to_string(),
+            "reaction.added".to_string(),
+            "reaction.removed".to_string(),
+            "app_mention".to_string(),
+            "app_command".to_string(),
+            "user.presence_changed".to_string(),
+            "file.shared".to_string(),
+            "workflow.triggered".to_string(),
+        ],
+        endpoint_config: EndpointTemplateConfig {
+            url_placeholder: "https://your-app.com/api/slack/events".to_string(),
+            signing_algorithm: "hmac-sha256".to_string(),
+            content_type: "application/json".to_string(),
+            custom_headers: serde_json::json!({
+                "X-Slack-Signature": "{{signature}}",
+                "X-Slack-Request-Timestamp": "{{timestamp}}"
+            }),
+            event_filter: vec!["message.*".to_string(), "channel.*".to_string(), "reaction.*".to_string(), "app_*".to_string()],
+        },
+        retry_policy: RetryTemplatePolicy {
+            max_attempts: 3,
+            backoff: "exponential".to_string(),
+            initial_delay_secs: 5,
+            max_delay_secs: 3600,
+        },
+        agents: vec![
+            TemplateAgent {
+                agent_name: "message_sentiment_analyzer".to_string(),
+                description: "Analyzes message sentiment and flags toxic content".to_string(),
+                enabled_by_default: false,
+                config: serde_json::json!({}),
+            },
+            TemplateAgent {
+                agent_name: "notification_aggregator".to_string(),
+                description: "Batches and deduplicates notifications to reduce noise".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+        ],
+        estimated_daily_volume: 100000,
+        tags: vec!["notifications".to_string(), "messaging".to_string(), "slack".to_string(), "real-time".to_string()],
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -276,7 +472,7 @@ mod tests {
     #[test]
     fn test_all_templates_count() {
         let templates = all_templates();
-        assert_eq!(templates.len(), 4);
+        assert_eq!(templates.len(), 7);
     }
 
     #[test]
