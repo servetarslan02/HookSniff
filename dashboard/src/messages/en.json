@@ -5704,7 +5704,8 @@
     "benefit2": "Consistent format — All webhooks delivered in the same format",
     "benefit3": "Unified monitoring — See all inbound webhooks in one dashboard",
     "benefit4": "Automatic retries — Failed deliveries are retried like any other webhook",
-    "benefit5": "Signature verification — Provider signatures verified before forwarding"
+    "benefit5": "Signature verification — Provider signatures verified before forwarding",
+    "configurable": "Configurable"
   },
   "docsMonitor": {
     "title": "Monitor Webhook Performance",
@@ -5736,7 +5737,11 @@
     "alert2": "Endpoint down alert — Notify when an endpoint has 5+ consecutive failures",
     "alert3": "DLQ alert — Notify when DLQ has 100+ unprocessed events",
     "alert4": "Latency alert — Notify when P95 latency exceeds 5 seconds",
-    "seeDashboard": "See Dashboard Guide for alert configuration."
+    "seeDashboard": "See Dashboard Guide for alert configuration.",
+    "metric1": "Total deliveries by status",
+    "metric2": "Delivery latency histogram",
+    "metric3": "Total retry attempts",
+    "metric4": "Current DLQ size"
   },
   "docsCloudevents": {
     "title": "CloudEvents v1.0",
@@ -5806,7 +5811,50 @@
     "addedCicd": "Added — CI/CD",
     "fixed": "Fixed",
     "earlier": "Earlier Releases",
-    "earlierDesc": "See the full changelog on GitHub."
+    "earlierDesc": "See the full changelog on GitHub.",
+    "platformFeatures": [
+      "GDPR endpoints: data export + account deletion",
+      "HttpOnly cookie authentication for refresh tokens",
+      "Environments system (dev/staging/prod)",
+      "Environment variables per environment",
+      "Service tokens for programmatic access",
+      "Custom domains support",
+      "SSO support",
+      "Embeddable customer portal",
+      "Inbound webhook proxy (Stripe, GitHub, Shopify)",
+      "Smart routing (round-robin, latency-based, failover)",
+      "Schema registry with JSON validation",
+      "Webhook templates",
+      "Payload transforms",
+      "FIFO ordered delivery",
+      "Per-endpoint throttling",
+      "CloudEvents v1.0 support"
+    ],
+    "sdkList": [
+      "Node.js SDK v1.0.0",
+      "Python SDK v1.0.0",
+      "Go SDK v1.0.0",
+      "Rust SDK v1.0.0",
+      "Ruby SDK v1.0.0",
+      "Java SDK v1.0.0",
+      "Kotlin SDK v1.0.0",
+      "PHP SDK v1.0.0",
+      "C# SDK v1.0.0",
+      "Swift SDK v1.0.0",
+      "Elixir SDK v1.0.0"
+    ],
+    "sdkNote": "All SDKs include: auto-retry with exponential backoff, webhook verification (HMAC-SHA256), auto-idempotency key.",
+    "cicdItems": [
+      "Local CI scripts",
+      "GitHub Actions workflows (CI, SDK publish, deploy, security scan)",
+      "SDK publish support for npm, PyPI, crates.io, RubyGems, Maven, NuGet, Hex, Packagist"
+    ],
+    "fixedItems": [
+      "Performance indexes for deliveries, delivery_attempts, dead_letters",
+      "ON DELETE CASCADE for foreign keys",
+      "Unbounded list queries capped with LIMIT",
+      "OTLP exporter graceful fallback"
+    ]
   },
   "docsTransforms": {
     "title": "Payload Transforms",
@@ -5840,7 +5888,15 @@
     "emailDesc": "For account issues, billing questions, and security reports:",
     "securityReports": "Security Reports",
     "securityDesc": "Found a security vulnerability? Please report it responsibly:",
-    "securityNote": "Do not open a public GitHub issue for security vulnerabilities."
+    "securityNote": "Do not open a public GitHub issue for security vulnerabilities.",
+    "troubleshootingLink": "Troubleshooting",
+    "troubleshootingDesc": "Common issues and solutions",
+    "errorCodesLink": "Error Codes",
+    "errorCodesDesc": "API error reference",
+    "debugLink": "Debug Failed Webhooks",
+    "debugDesc": "How to investigate delivery failures",
+    "faqLink": "FAQ",
+    "faqDesc": "Frequently asked questions"
   },
   "docsTemplates": {
     "title": "Webhook Templates",

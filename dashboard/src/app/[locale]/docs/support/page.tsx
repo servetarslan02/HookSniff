@@ -24,10 +24,10 @@ export default async function SupportPage() {
           {t('selfHelpDesc')}
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><Link href="/docs/troubleshooting" className="text-brand-600 hover:text-brand-700">Troubleshooting</Link> — Common issues and solutions</li>
-          <li><Link href="/docs/error-codes" className="text-brand-600 hover:text-brand-700">Error Codes</Link> — API error reference</li>
-          <li><Link href="/docs/debug-failed-webhooks" className="text-brand-600 hover:text-brand-700">Debug Failed Webhooks</Link> — How to investigate delivery failures</li>
-          <li><Link href="/docs/faq" className="text-brand-600 hover:text-brand-700">FAQ</Link> — Frequently asked questions</li>
+          <li><Link href="/docs/troubleshooting" className="text-brand-600 hover:text-brand-700">{t('troubleshootingLink')}</Link> — {t('troubleshootingDesc')}</li>
+          <li><Link href="/docs/error-codes" className="text-brand-600 hover:text-brand-700">{t('errorCodesLink')}</Link> — {t('errorCodesDesc')}</li>
+          <li><Link href="/docs/debug-failed-webhooks" className="text-brand-600 hover:text-brand-700">{t('debugLink')}</Link> — {t('debugDesc')}</li>
+          <li><Link href="/docs/faq" className="text-brand-600 hover:text-brand-700">{t('faqLink')}</Link> — {t('faqDesc')}</li>
         </ul>
       </section>
 
