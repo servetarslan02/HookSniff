@@ -99,7 +99,7 @@ export default function LogsPage() {
       {/* Status Filter Tabs */}
       <div className="flex flex-wrap gap-2">
         {(['all', 'delivered', 'failed', 'pending'] as StatusFilter[]).map((f) => {
-          const icons: Record<StatusFilter, string> = {
+          const icons: Record<StatusFilter, React.ReactNode> = {
             all: <ClipboardList size={16} strokeWidth={1.75} />,
             delivered: <CheckCircle2 size={16} strokeWidth={1.75} />,
             failed: <XCircle size={16} strokeWidth={1.75} />,
