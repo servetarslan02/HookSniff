@@ -18,7 +18,7 @@ function getStoredConsent(): ConsentStatus {
 function storeConsent(status: "accepted" | "rejected") {
   localStorage.setItem(CONSENT_KEY, status);
   // Set a cookie so the backend can also check consent
-  document.cookie = `cookie_consent=${status}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
+  document.cookie = `cookie_consent=${status}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax; Secure`;
 }
 
 export function CookieConsent() {
