@@ -22,7 +22,7 @@ vi.mock('@/components/Toast', () => ({
 
 const originalCrypto = globalThis.crypto;
 
-const { default: SignatureVerifierPage } = await import('@/app/[locale]/[username]/signature-verifier/page');
+const { default: SignatureVerifierPage } = await import('@/app/[locale]/(dashboard)/signature-verifier/page');
 
 describe('SignatureVerifierPage', () => {
   beforeEach(() => {
@@ -112,6 +112,47 @@ describe('SignatureVerifierPage', () => {
     });
     expect(screen.getAllByText(/Code Example/).length).toBeGreaterThan(0);
     expect(screen.getAllByText('Copy').length).toBeGreaterThan(0);
+  });
+
+  it('renders clear all button', async () => {
+    await act(async () => {
+      render(React.createElement(SignatureVerifierPage));
+    });
+    expect(screen.getAllByText(/Clear All|Temizle/).length).toBeGreaterThan(0);
+  });
+
+  it('renders code language tabs', async () => {
+    await act(async () => {
+      render(React.createElement(SignatureVerifierPage));
+    });
+    expect(screen.getAllByText('Node.js').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Python').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Go').length).toBeGreaterThan(0);
+  });
+
+  it('renders secret visibility toggle', async () => {
+    await act(async () => {
+      render(React.createElement(SignatureVerifierPage));
+    });
+    // The eye icon button should exist
+    const secretInput = screen.getAllByPlaceholderText('whsec_your_secret_key')[0];
+    expect(secretInput).toBeDefined();
+    expect(secretInput.getAttribute('type')).toBe('password');
+  });
+
+  it('renders keyboard shortcut hint', async () => {
+    await act(async () => {
+      render(React.createElement(SignatureVerifierPage));
+    });
+    expect(screen.getAllByText(/Ctrl/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Enter/).length).toBeGreaterThan(0);
+  });
+
+  it('renders signature format hint', async () => {
+    await act(async () => {
+      render(React.createElement(SignatureVerifierPage));
+    });
+    expect(screen.getAllByText(/sha256=/).length).toBeGreaterThan(0);
   });
 
   it('renders how it works section', async () => {

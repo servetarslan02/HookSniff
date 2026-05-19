@@ -3005,7 +3005,13 @@
     "toastComputeFailed": "Could not compute the signature. Please check your input.",
     "toastAllRequired": "All fields are required",
     "toastVerificationFailed": "Verification failed",
-    "toastCopied": "Copied!"
+    "toastCopied": "Copied!",
+    "toastCopyFailed": "Could not copy to clipboard",
+    "clearAll": "Clear All",
+    "shortcutHint": "to verify signature",
+    "hideSecret": "Hide secret",
+    "showSecret": "Show secret",
+    "signatureFormatHint": "Format: sha256=<hex> — if you paste just hex, the algorithm prefix is added automatically"
   },
   "endpointSettings": {
     "title": "Endpoint Settings",
