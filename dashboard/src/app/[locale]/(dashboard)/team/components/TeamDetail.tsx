@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Team, TeamMember } from '@/lib/api';
 
@@ -61,6 +62,8 @@ export function TeamDetail({
   onLeaveTeam,
   onTransferOwnership,
   onRevokeInvite,
+  onResendInvite,
+  onUpdateTeam,
   lastInviteLink,
   onCopyLink,
 }: {
@@ -78,9 +81,14 @@ export function TeamDetail({
   onLeaveTeam: () => void;
   onTransferOwnership: () => void;
   onRevokeInvite: (inviteId: string) => void;
+  onResendInvite: (inviteId: string) => void;
+  onUpdateTeam: (data: { name?: string; description?: string }) => void;
   lastInviteLink: string | null;
   onCopyLink: () => void;
 }) {
+  const t = useTranslations('team');
+  const [editingName, setEditingName] = useState(false);
+  const [nameValue, setNameValue] = useState(team.name);
   const t = useTranslations('team');
 
   const adminCount = members.filter((m) => m.role === 'admin').length;
@@ -98,7 +106,58 @@ export function TeamDetail({
                 {team.name[0]?.toUpperCase() || 'T'}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{team.name}</h3>
+                {editingName ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={nameValue}
+                      onChange={(e) => setNameValue(e.target.value)}
+                      className="px-2 py-1 text-lg font-bold border border-brand-300 dark:border-brand-500 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && nameValue.trim()) {
+                          onUpdateTeam({ name: nameValue.trim() });
+                          setEditingName(false);
+                        }
+                        if (e.key === 'Escape') {
+                          setNameValue(team.name);
+                          setEditingName(false);
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (nameValue.trim()) {
+                          onUpdateTeam({ name: nameValue.trim() });
+                          setEditingName(false);
+                        }
+                      }}
+                      className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded"
+                    >✓</button>
+                    <button
+                      type="button"
+                      onClick={() => { setNameValue(team.name); setEditingName(false); }}
+                      className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                    >✕</button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">{team.name}</h3>
+                    {isOwner && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingName(true)}
+                        className="p-1 text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded transition"
+                        title={t('editName') || 'Edit name'}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                )}
                 {team.description && (
                   <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{team.description}</p>
                 )}
@@ -276,7 +335,17 @@ export function TeamDetail({
 
       {/* Last Invite Link Banner */}
       {lastInviteLink && (
-        <div className="glass-card p-4 bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/20">
+        <div className="glass-card p-4 bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/20 relative">
+          <button
+            type="button"
+            onClick={() => setLastInviteLink(null)}
+            className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded"
+            title="Dismiss"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-brand-600 dark:text-brand-400">🔗</span>
             <p className="text-sm font-medium text-brand-800 dark:text-brand-300">{t('inviteLinkReady') || 'Invite link ready!'}</p>
@@ -324,6 +393,16 @@ export function TeamDetail({
                       </span>
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => onResendInvite(inv.id)}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition opacity-0 group-hover:opacity-100"
+                    title={t('resendInvite') || 'Resend invite'}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </button>
                   <button
                     type="button"
                     onClick={() => onRevokeInvite(inv.id)}

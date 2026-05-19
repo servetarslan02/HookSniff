@@ -782,6 +782,9 @@ export const teamsApi = {
   getDetail: (token: string, teamId: string) =>
     apiFetch<TeamDetailResponse>(`/teams/${teamId}`, { token }),
 
+  update: (token: string, teamId: string, data: { name?: string; description?: string }) =>
+    apiFetch<Team>(`/teams/${teamId}`, { method: 'PATCH', body: data, token }),
+
   inviteMember: (token: string, teamId: string, data: { email: string; role: string }) =>
     apiFetch<{ success: boolean }>(`/teams/${teamId}/invite`, { method: 'POST', body: data, token }),
 
@@ -805,6 +808,9 @@ export const teamsApi = {
 
   revokeInvite: (token: string, inviteId: string) =>
     apiFetch<{ revoked: boolean }>(`/teams/invites/${inviteId}`, { method: 'DELETE', token }),
+
+  resendInvite: (token: string, inviteId: string) =>
+    apiFetch<{ id: string; email: string; role: string; expires_at: string; invite_link: string }>(`/teams/invites/${inviteId}/resend`, { method: 'POST', token }),
 };
 
 // Notification API
