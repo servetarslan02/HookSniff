@@ -1,5 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
 
@@ -8,39 +9,37 @@ export const metadata: Metadata = {
   description: 'Receive webhooks from external providers through HookSniff',
 };
 
-export default function InboundWebhooksPage() {
+export default async function InboundWebhooksPage() {
+  const t = await getTranslations('docsInbound');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Inbound Webhooks</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Receive webhooks from Stripe, GitHub, Shopify and other providers — all through HookSniff.
+        {t('subtitle')}
       </p>
 
-      {/* The Problem */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Problem</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('theProblem')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          You use Stripe for payments, GitHub for code, Shopify for orders. Each sends webhooks in different formats, with different signature schemes. You need a separate handler for each one.
+          {t('problemDesc')}
         </p>
       </section>
 
-      {/* The Solution */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How Inbound Webhooks Work</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('howItWorks')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          HookSniff acts as a proxy: external providers send webhooks to HookSniff, HookSniff normalizes them and delivers to your endpoint with a consistent format and signature.
+          {t('howItWorksDesc')}
         </p>
         <ol className="space-y-3 text-gray-600 dark:text-slate-400">
-          <li><strong>1.</strong> Create an inbound config for the provider</li>
-          <li><strong>2.</strong> Give the provider HookSniff&apos;s inbound URL</li>
-          <li><strong>3.</strong> Provider sends webhooks to HookSniff</li>
-          <li><strong>4.</strong> HookSniff normalizes and forwards to your endpoint</li>
+          <li><strong>1.</strong> {t('step1')}</li>
+          <li><strong>2.</strong> {t('step2')}</li>
+          <li><strong>3.</strong> {t('step3')}</li>
+          <li><strong>4.</strong> {t('step4')}</li>
         </ol>
       </section>
 
-      {/* Configuration */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Create Inbound Config</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('createConfig')}</h2>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/inbound/configs \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
@@ -52,7 +51,7 @@ export default function InboundWebhooksPage() {
   }'`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          Response includes the inbound URL to give to Stripe:
+          {t('configResponse')}
         </p>
         <CodeBlock
           code={`{
@@ -64,16 +63,15 @@ export default function InboundWebhooksPage() {
         />
       </section>
 
-      {/* Supported Providers */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Supported Providers</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('supportedProviders')}</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Provider</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Signature Header</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Auto-Detection</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('provider')}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('signatureHeader')}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('autoDetection')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -86,15 +84,14 @@ export default function InboundWebhooksPage() {
         </div>
       </section>
 
-      {/* Benefits */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Benefits</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('benefits')}</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><strong>One endpoint</strong> — Receive from all providers through a single URL</li>
-          <li><strong>Consistent format</strong> — All webhooks delivered in the same format</li>
-          <li><strong>Unified monitoring</strong> — See all inbound webhooks in one dashboard</li>
-          <li><strong>Automatic retries</strong> — Failed deliveries are retried like any other webhook</li>
-          <li><strong>Signature verification</strong> — Provider signatures verified before forwarding</li>
+          <li><strong>{t('benefit1').split(' — ')[0]}</strong> — {t('benefit1').split(' — ')[1]}</li>
+          <li><strong>{t('benefit2').split(' — ')[0]}</strong> — {t('benefit2').split(' — ')[1]}</li>
+          <li><strong>{t('benefit3').split(' — ')[0]}</strong> — {t('benefit3').split(' — ')[1]}</li>
+          <li><strong>{t('benefit4').split(' — ')[0]}</strong> — {t('benefit4').split(' — ')[1]}</li>
+          <li><strong>{t('benefit5').split(' — ')[0]}</strong> — {t('benefit5').split(' — ')[1]}</li>
         </ul>
       </section>
     </article>

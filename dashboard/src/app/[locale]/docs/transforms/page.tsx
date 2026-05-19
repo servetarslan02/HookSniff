@@ -1,5 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
 
@@ -8,27 +9,26 @@ export const metadata: Metadata = {
   description: 'Transform webhook payloads before delivery',
 };
 
-export default function TransformsPage() {
+export default async function TransformsPage() {
+  const t = await getTranslations('docsTransforms');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Payload Transforms</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Reshape, filter, or enrich webhook payloads before they reach your endpoint.
+        {t('subtitle')}
       </p>
 
-      {/* The Problem */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Problem</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('theProblem')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Your internal event has 50 fields, but your customer only needs 5. Or the payload format doesn&apos;t match what their system expects. You could transform on your side, but that adds complexity.
+          {t('problemDesc')}
         </p>
       </section>
 
-      {/* The Solution */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How Transforms Work</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('howItWorks')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Transforms are rules that modify the payload before delivery. They run on HookSniff&apos;s side, so your endpoint receives exactly the data it needs.
+          {t('howItWorksDesc')}
         </p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints/ep_abc123/transforms \\
@@ -47,11 +47,10 @@ export default function TransformsPage() {
         />
       </section>
 
-      {/* Test */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Test a Transform</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('testTransform')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Test your transform before applying it:
+          {t('testDesc')}
         </p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints/ep_abc123/transforms/test \\
@@ -67,14 +66,13 @@ export default function TransformsPage() {
         />
       </section>
 
-      {/* Use Cases */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Use Cases</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('useCases')}</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><strong>Field filtering</strong> — Remove internal fields before sending to customers</li>
-          <li><strong>Field renaming</strong> — Match your customer&apos;s expected format</li>
-          <li><strong>Data enrichment</strong> — Add computed fields</li>
-          <li><strong>Payload reduction</strong> — Strip large fields to stay under size limits</li>
+          <li><strong>{t('uc1').split(' — ')[0]}</strong> — {t('uc1').split(' — ')[1]}</li>
+          <li><strong>{t('uc2').split(' — ')[0]}</strong> — {t('uc2').split(' — ')[1]}</li>
+          <li><strong>{t('uc3').split(' — ')[0]}</strong> — {t('uc3').split(' — ')[1]}</li>
+          <li><strong>{t('uc4').split(' — ')[0]}</strong> — {t('uc4').split(' — ')[1]}</li>
         </ul>
       </section>
     </article>
