@@ -1060,8 +1060,14 @@ export const twoFactorApi = {
   confirm: (token: string, code: string) =>
     apiFetch<{ success: boolean; backup_codes: string[] }>('/auth/2fa/confirm', { method: 'POST', body: { code }, token }),
 
-  disable: (token: string) =>
-    apiFetch<{ success: boolean }>('/auth/2fa/disable', { method: 'POST', token }),
+  verify: (tempToken: string, code: string, backupCode?: string) =>
+    apiFetch<{ token: string; customer: { id: string; email: string; name?: string; plan: string; is_admin?: boolean; api_key?: string }; refresh_token?: string }>('/auth/2fa/verify', {
+      method: 'POST',
+      body: backupCode ? { temp_token: tempToken, backup_code: backupCode } : { temp_token: tempToken, code },
+    }),
+
+  disable: (token: string, password: string) =>
+    apiFetch<{ success: boolean }>('/auth/2fa/disable', { method: 'POST', body: { password }, token }),
 
   getStatus: (token: string) =>
     apiFetch<{ enabled: boolean; last_used_at?: string }>('/auth/2fa/status', { token }),
