@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import type { PlaygroundRequest } from '../types';
 
@@ -13,12 +14,18 @@ export function HistoryPanel({
   onClear: () => void;
 }) {
   const t = useTranslations('playground');
+  const tc = useTranslations('common');
   const locale = useLocale();
+  const [confirmClear, setConfirmClear] = useState(false);
+
   if (history.length === 0) {
     return (
       <div className="glass-card p-6">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('requestHistory')}</h3>
-        <p className="text-xs text-gray-500 dark:text-slate-500">{t('noRequests')}</p>
+        <div className="text-center py-6">
+          <div className="text-3xl mb-2">📜</div>
+          <p className="text-xs text-gray-500 dark:text-slate-500">{t('noRequests')}</p>
+        </div>
       </div>
     );
   }
@@ -26,13 +33,21 @@ export function HistoryPanel({
   return (
     <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('requestHistory')}</h3>
-        <button type="button"
-          onClick={onClear}
-          className="text-xs text-red-500 hover:text-red-600 dark:text-red-400 transition"
-        >
-          Clear
-        </button>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('requestHistory')} ({history.length})</h3>
+        {!confirmClear ? (
+          <button type="button" onClick={() => setConfirmClear(true)}
+            className="text-xs text-red-500 hover:text-red-600 dark:text-red-400 transition">
+            {t('clear')}
+          </button>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 dark:text-slate-400">{t('confirmClear')}</span>
+            <button type="button" onClick={() => { onClear(); setConfirmClear(false); }}
+              className="text-xs text-red-600 font-medium hover:text-red-700 transition">{tc('yes')}</button>
+            <button type="button" onClick={() => setConfirmClear(false)}
+              className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 transition">{tc('no')}</button>
+          </div>
+        )}
       </div>
       <div className="space-y-2 max-h-[300px] overflow-y-auto">
         {history.map((req) => (
