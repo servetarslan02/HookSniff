@@ -207,7 +207,13 @@
     "sectionDevtools": "Geliştirici Araçları",
     "sectionPortal": "Portal",
     "organization": "Organizasyon",
-    "sectionOrganization": "Organizasyon"
+    "sectionOrganization": "Organizasyon",
+    "notificationsTitle": "Bildirimler",
+    "markAllRead": "Tümünü okundu işaretle",
+    "noNotifications": "Bildirim yok",
+    "viewAllNotifications": "Tüm bildirimleri gör →",
+    "acceptInvite": "Kabul Et",
+    "declineInvite": "Reddet"
   },
   "dashboard": {
     "title": "Kontrol Paneli",

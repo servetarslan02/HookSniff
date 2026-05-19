@@ -70,7 +70,7 @@ export function NotificationCenter() {
 
   const extractInviteToken = (n: Notification): string | null => {
     if (n.type !== 'team_invite' || !n.link) return null;
-    const match = n.link.match(/[?&]invite=([^&]+)/);
+    const match = n.link.match(/[?&]invite_token=([^&]+)/);
     return match ? match[1] : null;
   };
 
@@ -213,7 +213,7 @@ export function NotificationCenter() {
           </div>
           <div className="px-4 py-2.5 border-t border-gray-200 dark:border-slate-700 text-center">
             <Link
-              href="/team-mgmt"
+              href="/notifications"
               onClick={() => setOpen(false)}
               className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
             >
