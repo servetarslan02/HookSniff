@@ -1041,9 +1041,9 @@ async fn confirm_email_change(
 }
 
 fn generate_email_change_code() -> String {
-    use rand::RngCore;
+    use rand::RngExt;
     let mut rng = rand::rng();
-    let code: u32 = 100_000 + rng.next_u32() % 899_999;
+    let code: u32 = rng.random_range(100_000u32..999_999u32);
     code.to_string()
 }
 
