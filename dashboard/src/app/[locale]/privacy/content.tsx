@@ -136,7 +136,7 @@ export function PrivacyPageContent() {
 
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">{t('s13Title')}</h2>
-            <p>{t('s13Text')}</p>
+            <p>{t('s13Text')} <a href="/contact" className="text-brand-600 dark:text-brand-400 hover:underline">{t('contactForm')}</a></p>
           </section>
         </div>
       </main>

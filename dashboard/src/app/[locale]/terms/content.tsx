@@ -116,7 +116,7 @@ export function TermsPageContent() {
 
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">{t('s16Title')}</h2>
-            <p>{t('s16Text')} <a href="/contact" className="text-brand-600 dark:text-brand-400 hover:underline">contact form</a></p>
+            <p>{t('s16Text')} <a href="/contact" className="text-brand-600 dark:text-brand-400 hover:underline">{t('contactForm')}</a></p>
           </section>
         </div>
       </main>
