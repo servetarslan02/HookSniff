@@ -52,18 +52,26 @@ export function TeamDetail({
   canInvite,
   canRemove,
   canChangeRole,
+  isOwner,
   onInvite,
   onRemoveMember,
   onRoleChange,
+  onDeleteTeam,
+  onLeaveTeam,
+  onTransferOwnership,
 }: {
   team: Team;
   members: TeamMember[];
   canInvite: boolean;
   canRemove: boolean;
   canChangeRole: boolean;
+  isOwner: boolean;
   onInvite: () => void;
   onRemoveMember: (memberId: string) => void;
   onRoleChange: (memberId: string, newRole: string) => void;
+  onDeleteTeam: () => void;
+  onLeaveTeam: () => void;
+  onTransferOwnership: () => void;
 }) {
   const t = useTranslations('team');
 
@@ -99,6 +107,46 @@ export function TeamDetail({
               </svg>
               {t('inviteBtn')}
             </button>
+          </div>
+
+          {/* Team Actions */}
+          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-200/50 dark:border-slate-700/50">
+            {isOwner && (
+              <>
+                <button
+                  type="button"
+                  onClick={onTransferOwnership}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-500/10 rounded-lg transition"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                  {t('transferOwnership') || 'Transfer'}
+                </button>
+                <button
+                  type="button"
+                  onClick={onDeleteTeam}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  {t('deleteTeam') || 'Delete'}
+                </button>
+              </>
+            )}
+            {!isOwner && (
+              <button
+                type="button"
+                onClick={onLeaveTeam}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                {t('leaveTeam') || 'Leave'}
+              </button>
+            )}
           </div>
 
           {/* Stats Bar */}

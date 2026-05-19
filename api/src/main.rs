@@ -427,7 +427,22 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(ws_gateway))
         .layer(axum::Extension(qstash_client))
         .layer(axum::Extension(r2_client))
-        .layer(axum::Extension(sso::SsoStateStore::new()))
+        .layer(axum::Extension({
+            let mut sso_store = sso::SsoStateStore::new();
+            if let Some(url) = config::resolve_redis_url() {
+                match redis::Client::open(url.as_str()) {
+                    Ok(client) => match redis::aio::ConnectionManager::new(client).await {
+                        Ok(conn) => {
+                            tracing::info!("✅ SSO state store using Redis");
+                            sso_store = sso_store.with_redis(conn);
+                        }
+                        Err(e) => tracing::warn!("SSO state Redis unavailable ({e}), using in-memory"),
+                    },
+                    Err(e) => tracing::warn!("SSO state Redis client error ({e}), using in-memory"),
+                }
+            }
+            sso_store
+        }))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg
                 .cors_origins

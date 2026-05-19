@@ -14,11 +14,15 @@ import {
   useRemoveTeamMember,
   useUpdateTeamMemberRole,
   useAcceptTeamInvite,
+  useDeleteTeam,
+  useLeaveTeam,
+  useTransferOwnership,
 } from '@/hooks/useDashboardData';
 import { TeamList } from './components/TeamList';
 import { TeamDetail } from './components/TeamDetail';
 import { CreateTeamModal } from './components/CreateTeamModal';
 import { InviteMemberModal } from './components/InviteMemberModal';
+import { TransferOwnershipModal } from './components/TransferOwnershipModal';
 
 export default function TeamPage() {
   const { user } = useAuth();
@@ -35,10 +39,16 @@ export default function TeamPage() {
   const removeMemberMutation = useRemoveTeamMember();
   const updateRoleMutation = useUpdateTeamMemberRole();
   const acceptInviteMutation = useAcceptTeamInvite();
+  const deleteTeamMutation = useDeleteTeam();
+  const leaveTeamMutation = useLeaveTeam();
+  const transferOwnershipMutation = useTransferOwnership();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
 
   const selectedTeam = teams.find((t) => t.id === selectedTeamId) ?? null;
 
@@ -114,6 +124,46 @@ export default function TeamPage() {
     }
   };
 
+  const handleDeleteTeam = async () => {
+    if (!selectedTeamId) return;
+    try {
+      await deleteTeamMutation.mutateAsync(selectedTeamId);
+      toast(t('teamDeleted') || 'Team deleted', 'success');
+      setSelectedTeamId(null);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (t('deleteFailed') || 'Failed to delete team');
+      toast(msg, 'error');
+    }
+    setShowDeleteConfirm(false);
+  };
+
+  const handleLeaveTeam = async () => {
+    if (!selectedTeamId) return;
+    try {
+      await leaveTeamMutation.mutateAsync(selectedTeamId);
+      toast(t('leftTeam') || 'Left team', 'success');
+      setSelectedTeamId(null);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (t('leaveFailed') || 'Failed to leave team');
+      toast(msg, 'error');
+    }
+    setShowLeaveConfirm(false);
+  };
+
+  const handleTransfer = async (newOwnerId: string) => {
+    if (!selectedTeamId) return;
+    try {
+      await transferOwnershipMutation.mutateAsync({ teamId: selectedTeamId, newOwnerId });
+      toast(t('ownershipTransferred') || 'Ownership transferred', 'success');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (t('transferFailed') || 'Failed to transfer ownership');
+      toast(msg, 'error');
+    }
+    setShowTransferModal(false);
+  };
+
+  const isOwner = selectedTeam && user?.id === selectedTeam.owner_id;
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -162,9 +212,13 @@ export default function TeamPage() {
               canInvite={canInvite}
               canRemove={canRemove}
               canChangeRole={canChangeRole}
+              isOwner={!!isOwner}
               onInvite={() => setShowInviteModal(true)}
               onRemoveMember={setRemoveTarget}
               onRoleChange={handleRoleChange}
+              onDeleteTeam={() => setShowDeleteConfirm(true)}
+              onLeaveTeam={() => setShowLeaveConfirm(true)}
+              onTransferOwnership={() => setShowTransferModal(true)}
             />
           ) : (
             <div className="glass-card p-16 text-center">
@@ -202,6 +256,34 @@ export default function TeamPage() {
         onConfirm={confirmRemoveMember}
         onCancel={() => setRemoveTarget(null)}
       />
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title={t('deleteTeam') || 'Delete Team'}
+        message={t('deleteTeamConfirm') || 'Are you sure you want to delete this team? This action cannot be undone. All members will be removed.'}
+        variant="danger"
+        onConfirm={handleDeleteTeam}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
+
+      <ConfirmDialog
+        open={showLeaveConfirm}
+        title={t('leaveTeam') || 'Leave Team'}
+        message={t('leaveTeamConfirm') || 'Are you sure you want to leave this team?'}
+        variant="danger"
+        onConfirm={handleLeaveTeam}
+        onCancel={() => setShowLeaveConfirm(false)}
+      />
+
+      {/* Transfer Ownership Modal */}
+      {showTransferModal && selectedTeam && (
+        <TransferOwnershipModal
+          members={members}
+          currentOwnerId={selectedTeam.owner_id}
+          onTransfer={handleTransfer}
+          onClose={() => setShowTransferModal(false)}
+        />
+      )}
     </div>
   );
 }
