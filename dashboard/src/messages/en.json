@@ -472,7 +472,12 @@
     "alertActivated": "Alert activated",
     "toggleFailed": "Failed to toggle alert",
     "updateFailed": "Failed to update alert",
-    "emptyDesc": "Create alert rules to get notified when webhooks fail or endpoints have issues."
+    "emptyDesc": "Create alert rules to get notified when webhooks fail or endpoints have issues.",
+    "howItWorks": "How it works",
+    "step1": "Set condition & threshold",
+    "step2": "System monitors continuously",
+    "step3": "Alert sent to your channels",
+    "createDesc": "Set up a condition to monitor and get notified"
   },
   "playground": {
     "title": "API Playground",
