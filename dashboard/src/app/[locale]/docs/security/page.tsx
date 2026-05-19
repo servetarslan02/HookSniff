@@ -36,7 +36,7 @@ export default async function SecurityPage() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 dark:bg-slate-800">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">Header</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('headerName')}</th>
                 <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('headers')}</th>
               </tr>
             </thead>

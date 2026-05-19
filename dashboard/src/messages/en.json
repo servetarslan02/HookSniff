@@ -4881,7 +4881,8 @@
     "incident3": "Check audit log",
     "incident3Desc": "Settings → Audit Log for suspicious activity",
     "incident4": "Contact support",
-    "incident4Desc": "security@hooksniff.vercel.app"
+    "incident4Desc": "security@hooksniff.vercel.app",
+    "headerName": "Header"
   },
   "docsTroubleshooting": {
     "title": "Sorun Giderme",

@@ -4846,7 +4846,8 @@
     "incident3": "Denetim günlüğünü kontrol edin",
     "incident3Desc": "Ayarlar → Denetim Günlüğü — şüpheli aktivite için",
     "incident4": "Destek ile iletişime geçin",
-    "incident4Desc": "security@hooksniff.vercel.app"
+    "incident4Desc": "security@hooksniff.vercel.app",
+    "headerName": "Başlık"
   },
   "docsTroubleshooting": {
     "title": "Sorun Giderme",
@@ -5692,7 +5693,7 @@
     "builtIn2": "Endpoint sağlığı — Hata sayılarıyla birlikte endpoint başına sağlık durumu",
     "builtIn3": "Teslimat günlükleri — Her teslimat denemesinin aranabilir, filtrelenebilir günlüğü",
     "builtIn4": "Uyarılar — Hata eşikleri için bildirimler yapılandırın",
-    "builtIn5": "API endpoint'i — Programmatic erişim için GET /v1/stats",
+    "builtIn5": "API endpoint'i — programatik erişim için GET /v1/stats",
     "grafana": "Grafana + OpenTelemetry",
     "grafanaDesc": "Gelişmiş izleme için HookSniff, OpenTelemetry izleri ve Prometheus metrikleri dışa aktarır. Özel panolar ve uyarılar için Grafana Cloud'a bağlanın.",
     "grafanaMetrics": "Mevcut metrikler:",
