@@ -1,5 +1,4 @@
 import CodeBlock from '@/components/CodeBlock';
-import SdkTabs from '@/components/SdkTabs';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
