@@ -33,6 +33,7 @@ export default function BillingPage() {
   const [pausing, setPausing] = useState(false);
   const [resuming, setResuming] = useState(false);
   const [pauseDays, setPauseDays] = useState(30);
+  const [discountCode, setDiscountCode] = useState('');
   const upgradeModalRef = useRef<HTMLDivElement>(null);
   const cancelModalRef = useRef<HTMLDivElement>(null);
   const pauseModalRef = useRef<HTMLDivElement>(null);
@@ -139,7 +140,7 @@ export default function BillingPage() {
 
     setUpgrading(true);
     try {
-      const result = await billingApiExtended.upgrade(token, showUpgradeModal, billingPeriod);
+      const result = await billingApiExtended.upgrade(token, showUpgradeModal, billingPeriod, discountCode || undefined);
 
       if (result.requires_contact) {
         const contactUrl = result.contact_url || '/contact';
@@ -215,12 +216,25 @@ export default function BillingPage() {
                 : t('upgradeTo', { action: t('upgrade'), plan: t(`plans.${showUpgradeModal}`) })
               }
             </h3>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
               {planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan)
                 ? t('downgradeDesc')
                 : t('upgradeDesc')
               }
             </p>
+            {/* Coupon code input — only for upgrades */}
+            {planOrder.indexOf(showUpgradeModal) > planOrder.indexOf(currentPlan) && (
+              <div className="mb-4">
+                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('couponCode')}</label>
+                <input
+                  type="text"
+                  value={discountCode}
+                  onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                  placeholder={t('couponPlaceholder')}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm font-mono placeholder:text-gray-400"
+                />
+              </div>
+            )}
             <div className="flex gap-3 justify-end">
               <button type="button" onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
                 {tc('cancel')}
