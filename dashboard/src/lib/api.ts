@@ -1035,7 +1035,11 @@ export const twoFactorApi = {
 // SSO API
 export const ssoApi = {
   testSso: (token: string) =>
-    apiFetch<{ success: boolean; message: string; redirect_url?: string }>('/sso/test', { method: 'POST', token }),
+    apiFetch<{ valid: boolean; provider?: string; message?: string; issues?: string[]; details?: Record<string, unknown> }>('/sso/test', { method: 'POST', token }),
+  deleteSso: (token: string) =>
+    apiFetch<{ deleted: boolean }>('/sso/config', { method: 'DELETE', token }),
+  getLoginUrl: (email: string) =>
+    `/v1/sso/login?email=${encodeURIComponent(email)}`,
 };
 
 // Transform types

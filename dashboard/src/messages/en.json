@@ -2751,7 +2751,7 @@
   },
   "sso": {
     "title": "🔐 SSO / SAML",
-    "subtitle": "Configure Single Sign-On for your organization. Enterprise plan required.",
+    "subtitle": "Configure Single Sign-On for your organization. Business plan or higher required.",
     "provider": "Provider",
     "samlConfiguration": "SAML Configuration",
     "metadataUrl": "Metadata URL",
@@ -2773,7 +2773,18 @@
     "upgradeHint1": "💡 SSO is available on the ",
     "upgradeHintBold": "Business",
     "upgradeHint2": " plan. ",
-    "testConnection": "Test Connection"
+    "testConnection": "Test Connection",
+    "testing": "Testing connection...",
+    "testSuccess": "SSO connection test passed!",
+    "testFailed": "SSO connection test failed. Check your configuration.",
+    "deleteConfig": "Delete SSO Configuration",
+    "deleteConfirm": "Are you sure you want to delete your SSO configuration? All team members will revert to password login.",
+    "deleted": "SSO configuration deleted.",
+    "deleteFailed": "Could not delete SSO configuration.",
+    "certificateSet": "Certificate is configured",
+    "clientSecretSet": "Client secret is configured",
+    "ssoLoginUrl": "SSO Login URL",
+    "ssoLoginUrlDesc": "Share this URL with your team members to initiate SSO login."
   },
   "auditLog": {
     "title": "📋 Audit Log",

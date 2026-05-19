@@ -2848,7 +2848,7 @@
   },
   "sso": {
     "title": "🔐 SSO / SAML",
-    "subtitle": "Kuruluşunuz için Tek Oturum Açma'yı yapılandırın. Enterprise planı gereklidir.",
+    "subtitle": "Kuruluşunuz için Tek Oturum Açma yapılandırması. Business planı veya üzeri gereklidir.",
     "provider": "Sağlayıcı",
     "samlConfiguration": "SAML Yapılandırması",
     "metadataUrl": "Metadata URL'si",
@@ -2870,7 +2870,18 @@
     "upgradeHint2": " planında kullanılabilir. Kuruluşunuzda SSO'yu etkinleştirmek için ",
     "upgradeNow": "hemen yükseltin",
     "upgradeHintSuffix": ".",
-    "testConnection": "Bağlantıyı Test Et"
+    "testConnection": "Bağlantıyı Test Et",
+    "testing": "Bağlantı test ediliyor...",
+    "testSuccess": "SSO bağlantı testi başarılı!",
+    "testFailed": "SSO bağlantı testi başarısız. Yapılandırmanızı kontrol edin.",
+    "deleteConfig": "SSO Yapılandırmasını Sil",
+    "deleteConfirm": "SSO yapılandırmanızı silmek istediğinizden emin misiniz? Tüm ekip üyeleri şifreli girişe dönecektir.",
+    "deleted": "SSO yapılandırması silindi.",
+    "deleteFailed": "SSO yapılandırması silinemedi.",
+    "certificateSet": "Sertifika yapılandırılmış",
+    "clientSecretSet": "İstemci gizli anahtarı yapılandırılmış",
+    "ssoLoginUrl": "SSO Giriş URLsi",
+    "ssoLoginUrlDesc": "SSO girişini başlatmak için bu URLyi ekip üyelerinizle paylaşın."
   },
   "endpointSettings": {
     "title": "Endpoint Ayarları",
