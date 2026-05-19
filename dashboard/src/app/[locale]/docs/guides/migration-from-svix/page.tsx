@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function MigrationFromSvixPage() {
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">🔄 Migration from Svix</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><RefreshCw size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Migration from Svix</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Migrating from Svix to HookSniff is straightforward. The APIs are similar — HookSniff was designed as a Svix-compatible alternative with more features and a generous free tier.
       </p>
@@ -21,12 +21,12 @@ export default function MigrationFromSvixPage() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Why Migrate?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
           {[
-            { icon: '💰', title: 'Generous Free Tier', desc: '10,000 webhooks/month free. No credit card required.' },
-            { icon: '📡', title: 'More Delivery Methods', desc: 'HTTP, WebSocket, Email, and more. Svix is HTTP-only.' },
-            { icon: '🔀', title: 'Smart Routing', desc: 'Round-robin, latency-based, failover routing built-in.' },
-            { icon: '📊', title: 'Real-time Streaming', desc: 'SSE streaming for live delivery monitoring.' },
-            { icon: '🔌', title: '30+ API Resources', desc: 'Billing, analytics, alerts, SSO, connectors, and more.' },
-            { icon: '📦', title: '11 SDKs', desc: 'Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift.' },
+            { icon: <DollarSign size={16} strokeWidth={1.75} />, title: 'Generous Free Tier', desc: '10,000 webhooks/month free. No credit card required.' },
+            { icon: <Radio size={16} strokeWidth={1.75} />, title: 'More Delivery Methods', desc: 'HTTP, WebSocket, Email, and more. Svix is HTTP-only.' },
+            { icon: <Shuffle size={16} strokeWidth={1.75} />, title: 'Smart Routing', desc: 'Round-robin, latency-based, failover routing built-in.' },
+            { icon: <BarChart3 size={16} strokeWidth={1.75} />, title: 'Real-time Streaming', desc: 'SSE streaming for live delivery monitoring.' },
+            { icon: <Plug size={16} strokeWidth={1.75} />, title: '30+ API Resources', desc: 'Billing, analytics, alerts, SSO, connectors, and more.' },
+            { icon: <Package size={16} strokeWidth={1.75} />, title: '11 SDKs', desc: 'Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift.' },
           ].map(({ icon, title, desc }) => (
             <div key={title} className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
@@ -83,6 +83,7 @@ endpoints, _ := client.Endpoint.List(ctx, "app_id", nil)
 
 // After (HookSniff)
 import hooksniff "github.com/servetarslan02/hooksniff-go"
+import { BarChart3, Bug, DollarSign, Gamepad2, Mail, MessageSquare, Package, Plug, Radio, RefreshCw, Shuffle } from 'lucide-react';
 hs := hooksniff.NewClient("hr_live_xxx")
 endpoints, _ := hs.Endpoint.List(ctx, nil)
 // Note: No app_id needed`}
@@ -211,10 +212,10 @@ signature = "v1," + base64(hmac_sha256(secret, signed_content))
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Need Help?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
           {[
-            { href: 'https://github.com/servetarslan02/HookSniff/discussions', title: '💬 GitHub Discussions', desc: 'Ask questions and get help from the community.' },
-            { href: 'https://github.com/servetarslan02/HookSniff/issues', title: '🐛 Report Issues', desc: 'Found a bug? Let us know on GitHub.' },
-            { href: '/docs/support', title: '📧 Contact Support', desc: 'Reach out to the HookSniff team directly.' },
-            { href: '/docs/playground', title: '🎮 Playground', desc: 'Test webhooks interactively before going live.' },
+            { href: 'https://github.com/servetarslan02/HookSniff/discussions', title: '<MessageSquare size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> GitHub Discussions', desc: 'Ask questions and get help from the community.' },
+            { href: 'https://github.com/servetarslan02/HookSniff/issues', title: '<Bug size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Report Issues', desc: 'Found a bug? Let us know on GitHub.' },
+            { href: '/docs/support', title: '<Mail size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Contact Support', desc: 'Reach out to the HookSniff team directly.' },
+            { href: '/docs/playground', title: '<Gamepad2 size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Playground', desc: 'Test webhooks interactively before going live.' },
           ].map(({ href, title, desc }) => (
             <a key={href} href={href} className="block p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{title}</h3>

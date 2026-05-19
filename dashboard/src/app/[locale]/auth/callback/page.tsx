@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import { X } from 'lucide-react';
 
 /**
  * OAuth callback page.
@@ -65,7 +66,7 @@ export default function AuthCallbackPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950">
         <div className="glass-card p-8 max-w-md text-center">
-          <div className="text-4xl mb-4">❌</div>
+          <div className="text-4xl mb-4"><X size={48} strokeWidth={1.5} className="text-red-500" /></div>
           <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("loginFailed")}</h1>
           <p className="text-gray-500 dark:text-slate-400 mb-6">{error}</p>
           <button

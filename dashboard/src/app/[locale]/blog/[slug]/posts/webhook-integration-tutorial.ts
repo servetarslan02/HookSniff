@@ -253,14 +253,14 @@ await client.alerts.create({
 
 Before going live, verify:
 
-- ✅ HMAC signature verification is implemented
-- ✅ Timestamp validation prevents replay attacks
-- ✅ Endpoint responds within 5 seconds
-- ✅ Processing is idempotent (safe to receive duplicates)
-- ✅ Errors are thrown to trigger retries
-- ✅ Dashboard monitoring is set up
-- ✅ Alerts are configured for success rate and latency
-- ✅ Dead letter queue is reviewed periodically
+- [x] HMAC signature verification is implemented
+- [x] Timestamp validation prevents replay attacks
+- [x] Endpoint responds within 5 seconds
+- [x] Processing is idempotent (safe to receive duplicates)
+- [x] Errors are thrown to trigger retries
+- [x] Dashboard monitoring is set up
+- [x] Alerts are configured for success rate and latency
+- [x] Dead letter queue is reviewed periodically
 
 ### Common Pitfalls
 

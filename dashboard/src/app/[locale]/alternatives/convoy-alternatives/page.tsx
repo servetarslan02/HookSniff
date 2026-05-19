@@ -45,11 +45,11 @@ export default function ConvoyAlternativesPage() {
               </tr></thead>
               <tbody>
                 {[
-                  { name: 'Convoy', price: 'Free', sdks: '1 (Go)', cloud: '❌', oss: '✅', portal: 'Basic', hl: false },
-                  { name: 'HookSniff', price: '$24/mo', sdks: '11', cloud: '✅', oss: '✅', portal: 'Full', hl: true },
-                  { name: 'Svix', price: '$490/mo', sdks: '6', cloud: '✅', oss: '✅', portal: 'Full', hl: false },
-                  { name: 'Hookdeck', price: '$39/mo+', sdks: '8', cloud: '✅', oss: '❌', portal: 'Full', hl: false },
-                  { name: 'Hook0', price: 'Free', sdks: '4', cloud: '✅', oss: '✅', portal: 'Basic', hl: false },
+                  { name: 'Convoy', price: 'Free', sdks: '1 (Go)', cloud: <X size={14} strokeWidth={1.75} className="text-red-500" />, oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, portal: 'Basic', hl: false },
+                  { name: 'HookSniff', price: '$24/mo', sdks: '11', cloud: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, portal: 'Full', hl: true },
+                  { name: 'Svix', price: '$490/mo', sdks: '6', cloud: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, portal: 'Full', hl: false },
+                  { name: 'Hookdeck', price: '$39/mo+', sdks: '8', cloud: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, oss: <X size={14} strokeWidth={1.75} className="text-red-500" />, portal: 'Full', hl: false },
+                  { name: 'Hook0', price: 'Free', sdks: '4', cloud: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, portal: 'Basic', hl: false },
                 ].map((row) => (
                   <tr key={row.name} className={`border-b border-gray-100 dark:border-slate-700/50 last:border-0 ${row.hl ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
                     <td className={`py-3 px-6 font-medium ${row.hl ? 'text-brand-600 dark:text-brand-400' : 'text-gray-900 dark:text-white'}`}>{row.name}</td>

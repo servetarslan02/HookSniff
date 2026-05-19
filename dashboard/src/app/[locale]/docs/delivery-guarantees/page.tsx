@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Check } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -73,7 +74,7 @@ SELECT 1 FROM processed_webhooks WHERE delivery_id = $1;
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3">Endpoint returns 2xx</td><td className="px-4 py-3">Delivery marked as delivered ✅</td></tr>
+              <tr><td className="px-4 py-3">Endpoint returns 2xx</td><td className="px-4 py-3">Delivery marked as delivered <Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom text-emerald-500" /></td></tr>
               <tr><td className="px-4 py-3">Endpoint returns 5xx</td><td className="px-4 py-3">Retried with exponential backoff</td></tr>
               <tr><td className="px-4 py-3">Endpoint returns 429</td><td className="px-4 py-3">Retried with exponential backoff</td></tr>
               <tr><td className="px-4 py-3">Endpoint returns 4xx (other)</td><td className="px-4 py-3">Not retried — client error</td></tr>

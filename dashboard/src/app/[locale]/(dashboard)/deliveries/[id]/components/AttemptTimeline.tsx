@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { StatusBadge } from '@/components/StatusBadge';
 import type { DeliveryAttempt } from '@/lib/api';
-import { Check, X } from 'lucide-react';
+import { Check, Clock, X } from 'lucide-react';
 
 function getHttpStatusColor(code?: number): string {
   if (!code) return 'text-gray-500 dark:text-slate-500';
@@ -46,7 +46,7 @@ export function AttemptTimeline({
   return (
     <div className="glass-card p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-        <span>⏱️</span> {t('attemptTimeline')}
+        <span className="text-gray-500"><Clock size={16} strokeWidth={1.75} /></span> {t('attemptTimeline')}
         {attempts.length > 0 && (
           <span className="text-xs font-normal text-gray-500 dark:text-slate-500 ml-2">
             ({attempts.length} {tCommon('attempts').toLowerCase()})

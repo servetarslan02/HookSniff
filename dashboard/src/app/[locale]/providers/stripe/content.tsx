@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
+import { Code2, CreditCard, Zap } from 'lucide-react';
 
 export function StripeWebhooksPageContent() {
   const t = useTranslations('providers');
@@ -14,7 +15,7 @@ export function StripeWebhooksPageContent() {
       <main className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-500/10 rounded-full border border-purple-200 dark:border-purple-500/20 mb-4">
-            <span className="text-lg">💳</span>
+            <span className="text-lg"><CreditCard size={20} strokeWidth={1.75} /></span>
             <span className="text-sm font-medium text-purple-700 dark:text-purple-400">{t("stripeIntegration")}</span>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("stripeWebhooksGuide")}</h1>
@@ -25,7 +26,7 @@ export function StripeWebhooksPageContent() {
 
         {/* Quick Start */}
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">⚡ Quick Start</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4"><Zap size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Quick Start</h2>
           <ol className="space-y-4">
             <li className="flex gap-3">
               <span className="w-6 h-6 flex items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-bold shrink-0">1</span>
@@ -60,7 +61,7 @@ export function StripeWebhooksPageContent() {
 
         {/* Common Events */}
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">📋 Common Stripe Events</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4"><ClipboardList size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Common Stripe Events</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -94,7 +95,7 @@ export function StripeWebhooksPageContent() {
 
         {/* Code Example */}
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">💻 Node.js Example</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4"><Code2 size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Node.js Example</h2>
           <pre className="bg-gray-900 dark:bg-slate-800 text-gray-100 p-4 rounded-lg text-xs overflow-x-auto"><code>{`import { Webhook } from 'hooksniff-sdk';
 
 const webhook = new Webhook(process.env.HOOKSNIFF_SECRET);

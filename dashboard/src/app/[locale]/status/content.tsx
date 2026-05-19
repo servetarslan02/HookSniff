@@ -14,6 +14,7 @@ import { UptimeBar } from './components/UptimeBar';
 import { ComponentRow } from './components/ComponentRow';
 import { IncidentLog } from './components/IncidentLog';
 import { MaintenanceSection } from './components/MaintenanceSection';
+import { Bell, Cloud, Database, HardDrive, Mail, Monitor, Settings, Zap } from 'lucide-react';
 
 // ─── Fallback Data ───
 function unreachableData(): StatusData {
@@ -21,13 +22,13 @@ function unreachableData(): StatusData {
     overall_status: 'down',
     uptime_30d: 0,
     components: [
-      { name: 'API', icon: '⚡', status: 'unknown', latency_ms: null, description: 'HookSniff REST API (Cloud Run)', last_checked: new Date().toISOString() },
-      { name: 'Dashboard', icon: '🖥️', status: 'unknown', latency_ms: null, description: 'Next.js frontend (Vercel)', last_checked: new Date().toISOString() },
-      { name: 'Worker', icon: '⚙️', status: 'unknown', latency_ms: null, description: 'Background delivery worker (Cloud Run)', last_checked: new Date().toISOString() },
-      { name: 'Database', icon: '🗄️', status: 'unknown', latency_ms: null, description: 'PostgreSQL (Neon)', last_checked: new Date().toISOString() },
-      { name: 'Cache', icon: '💾', status: 'unknown', latency_ms: null, description: 'Redis (Upstash)', last_checked: new Date().toISOString() },
-      { name: 'Email Service', icon: '📧', status: 'unknown', latency_ms: null, description: 'Gmail API', last_checked: new Date().toISOString() },
-      { name: 'Storage', icon: '☁️', status: 'unknown', latency_ms: null, description: 'Cloudflare R2', last_checked: new Date().toISOString() },
+      { name: 'API', icon: <Zap size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'HookSniff REST API (Cloud Run)', last_checked: new Date().toISOString() },
+      { name: 'Dashboard', icon: <Monitor size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'Next.js frontend (Vercel)', last_checked: new Date().toISOString() },
+      { name: 'Worker', icon: <Settings size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'Background delivery worker (Cloud Run)', last_checked: new Date().toISOString() },
+      { name: 'Database', icon: <Database size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'PostgreSQL (Neon)', last_checked: new Date().toISOString() },
+      { name: 'Cache', icon: <HardDrive size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'Redis (Upstash)', last_checked: new Date().toISOString() },
+      { name: 'Email Service', icon: <Mail size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'Gmail API', last_checked: new Date().toISOString() },
+      { name: 'Storage', icon: <Cloud size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'Cloudflare R2', last_checked: new Date().toISOString() },
     ],
     checked_at: new Date().toISOString(),
     response_times: {},
@@ -154,7 +155,7 @@ export function StatusPageContent() {
           </Link>
           <div className="flex items-center gap-3">
             <button className="text-xs font-medium text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
-              🔔 {t('subscribeToUpdates')}
+              <Bell size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('subscribeToUpdates')}
             </button>
             <LanguageSwitcher />
           </div>

@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ShieldCheck, Mail, Anchor } from 'lucide-react';
 
 function getPasswordStrength(pw: string): { score: number; color: string } {
   let score = 0;
@@ -146,7 +147,7 @@ function LoginForm() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-xl bg-linear-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-2xl">
-              🪝
+              <Anchor size={24} strokeWidth={1.75} />
             </div>
             <span className="text-2xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </Link>
@@ -176,7 +177,7 @@ function LoginForm() {
           )}
           {success && (
             <div className="mb-4 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 text-sm border border-green-200 dark:border-green-500/20">
-              ✉️ {success}
+              <Mail size={14} strokeWidth={1.75} className="inline mr-1" /> {success}
             </div>
           )}
 
@@ -185,7 +186,7 @@ function LoginForm() {
             <div className="space-y-4">
               <div className="text-center mb-2">
                 <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
-                  <span className="text-2xl">🔐</span>
+                  <span className="text-2xl"><ShieldCheck size={24} strokeWidth={1.75} /></span>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('twoFactorTitle') || 'Two-Factor Authentication'}</h3>
                 <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('twoFactorPrompt') || 'Enter the 6-digit code from your authenticator app.'}</p>

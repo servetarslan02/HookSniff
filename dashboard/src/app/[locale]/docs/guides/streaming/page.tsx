@@ -1,5 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
+import { Radio } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 export default function StreamingPage() {
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">📡 Streaming & Rate Limiting</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Radio size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Streaming & Rate Limiting</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         HookSniff supports real-time delivery monitoring via SSE streaming, and per-endpoint rate limiting to protect your servers.
       </p>

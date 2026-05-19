@@ -18,13 +18,13 @@ In 2026, four services dominate the landscape: **HookSniff**, **Svix**, **Hookde
 | **Price (free tier)** | 10,000 events/mo | Unlimited events* | 10,000 events/mo | Free (self-hosted) |
 | **Paid plans** | $29–99/mo | Custom pricing | $39/mo+ | N/A |
 | **SDKs** | 11 | 6 | 8 | 3 |
-| **FIFO delivery** | ✅ | ❌ | ❌ | ❌ |
-| **Schema registry** | ✅ | ❌ | ❌ | ❌ |
-| **CloudEvents** | ✅ | ✅ | ❌ | ❌ |
-| **Dead letter queue** | ✅ | ✅ | ✅ | ✅ |
-| **Self-hosting** | Coming soon | ✅ | ❌ | ✅ |
+| **FIFO delivery** | Yes | No | No | No |
+| **Schema registry** | Yes | No | No | No |
+| **CloudEvents** | Yes | Yes | No | No |
+| **Dead letter queue** | Yes | Yes | Yes | Yes |
+| **Self-hosting** | Coming soon | Yes | No | Yes |
 | **Tech stack** | Rust/Axum | Python/Rust | Node.js | Rust |
-| **Inbound proxy** | ✅ | ❌ | ✅ | ❌ |
+| **Inbound proxy** | Yes | No | Yes | No |
 
 ### Pricing Deep-Dive
 

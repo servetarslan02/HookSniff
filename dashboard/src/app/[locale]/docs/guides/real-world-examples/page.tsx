@@ -1,5 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
+import { Bell, Building2, DollarSign, Globe, Rocket, ShoppingCart } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -11,14 +12,14 @@ export const metadata: Metadata = {
 export default function RealWorldExamplesPage() {
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">🌍 Real-World Examples</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Globe size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Real-World Examples</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Production webhook patterns you can copy and adapt. Each example includes the full flow: sending, receiving, and processing.
       </p>
 
       {/* E-Commerce */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🛒 E-Commerce: Order Lifecycle</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><ShoppingCart size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> E-Commerce: Order Lifecycle</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Track orders through creation, payment, fulfillment, and delivery. Notify your warehouse, accounting, and customer service systems.
         </p>
@@ -109,7 +110,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
 
       {/* CI/CD */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🚀 CI/CD: Deploy Pipeline</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><Rocket size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> CI/CD: Deploy Pipeline</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Trigger deployments on code push, run tests on pull requests, and notify your team on Slack.
         </p>
@@ -167,7 +168,7 @@ app.post('/github-webhook', async (req, res) => {
 
       {/* Notification System */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🔔 Multi-Channel Notifications</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><Bell size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Multi-Channel Notifications</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Send the same event to multiple channels: Slack, email, SMS, and push notifications. Each endpoint handles its own delivery.
         </p>
@@ -213,7 +214,7 @@ await hs.message.create({
 
       {/* Multi-Tenant */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🏢 Multi-Tenant Webhooks</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><Building2 size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Multi-Tenant Webhooks</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Let your customers register their own webhook endpoints. Each customer gets their own signing secret.
         </p>
@@ -270,7 +271,7 @@ async function notifyCustomers(event, data) {
 
       {/* Fintech */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">💰 Fintech: Payment Events</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><DollarSign size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Fintech: Payment Events</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           Handle payment events with idempotency and audit logging. Critical for financial systems.
         </p>

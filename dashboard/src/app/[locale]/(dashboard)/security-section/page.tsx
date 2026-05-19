@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
+import { Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 const tabSkeleton = (
@@ -23,7 +24,7 @@ export default function SecuritySectionPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'rate-limiting', label: t('rateLimiting'), icon: '⏱️', content: () => <RateLimitingPage /> },
+        { key: 'rate-limiting', label: t('rateLimiting'), icon: <Clock size={16} strokeWidth={1.75} />, content: () => <RateLimitingPage /> },
       ]}
     />
   );

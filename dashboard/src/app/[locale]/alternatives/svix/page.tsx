@@ -1,6 +1,7 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
+import { Building2, Lightbulb } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -12,15 +13,15 @@ export default async function SvixAlternativePage() {
     { featureKey: 'pricePro', hooksniff: '$24/mo', svix: '$490/mo', bestFor: 'hooksniff' },
     { featureKey: 'freeTier', hooksniff: `10,000 ${t('events')}`, svix: `Unlimited ${t('events')}`, bestFor: 'svix' },
     { featureKey: 'sdkCount', hooksniff: '11', svix: '6', bestFor: 'hooksniff' },
-    { featureKey: 'fifoDelivery', hooksniff: '✅', svix: '❌', bestFor: 'hooksniff' },
-    { featureKey: 'cloudEvents', hooksniff: '✅', svix: '✅', bestFor: 'tie' },
-    { featureKey: 'schemaRegistry', hooksniff: '✅', svix: '❌', bestFor: 'hooksniff' },
+    { featureKey: 'fifoDelivery', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, svix: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
+    { featureKey: 'cloudEvents', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, svix: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, bestFor: 'tie' },
+    { featureKey: 'schemaRegistry', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, svix: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
     { featureKey: 'deliveryMethods', hooksniff: t('httpWsGrpc'), svix: 'HTTP, WebSocket', bestFor: 'tie' },
-    { featureKey: 'selfHosted', hooksniff: '✅', svix: '✅', bestFor: 'tie' },
+    { featureKey: 'selfHosted', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, svix: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, bestFor: 'tie' },
     { featureKey: 'soc2', hooksniff: t('ready'), svix: t('type2'), bestFor: 'svix' },
     { featureKey: 'uptimeSla', hooksniff: '99.9%', svix: '99.99%', bestFor: 'svix' },
-    { featureKey: 'openSource', hooksniff: '✅', svix: '✅', bestFor: 'tie' },
-    { featureKey: 'i18n', hooksniff: '✅', svix: '❌', bestFor: 'hooksniff' },
+    { featureKey: 'openSource', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, svix: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, bestFor: 'tie' },
+    { featureKey: 'i18n', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, svix: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
   ];
 
   return (
@@ -71,13 +72,13 @@ export default async function SvixAlternativePage() {
           </div>
 
           <div className="p-6 bg-purple-50 dark:bg-purple-500/10 rounded-xl border border-purple-200 dark:border-purple-500/20">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🏢 {t('whenToChooseSvix')}</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Building2 size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('whenToChooseSvix')}</h2>
             <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{t('whenToChooseSvixDesc')}</p>
           </div>
         </div>
 
         <div className="p-6 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-200 dark:border-blue-500/20 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">💡 {t('bottomLine')}</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Lightbulb size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('bottomLine')}</h2>
           <p className="text-sm text-gray-600 dark:text-slate-400">Both are solid webhook services. HookSniff is better for cost-conscious teams that need FIFO and broad SDK coverage. Svix is better for enterprises that need proven SOC 2 Type 2 compliance and a 99.99% SLA. Choose based on your priorities.</p>
         </div>
         <div className="text-center"><Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('tryFree')}</Link></div>

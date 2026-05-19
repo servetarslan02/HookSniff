@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { FlaskConical } from 'lucide-react';
+import { Clock, FlaskConical } from 'lucide-react';
 
 export function ResponseInspector({
   response,
@@ -48,7 +48,7 @@ export function ResponseInspector({
         )}
         {duration !== null && (
           <span className="text-sm text-gray-500 dark:text-slate-400">
-            ⏱ {duration}ms
+            <Clock size={12} className="inline mr-1 -mt-0.5" /> {duration}ms
           </span>
         )}
       </div>

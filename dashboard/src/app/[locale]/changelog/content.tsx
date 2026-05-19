@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
+import { Check } from 'lucide-react';
   changelog,
   typeConfig,
   areaConfig,
@@ -116,7 +117,7 @@ export function ChangelogPageContent() {
         <div className="max-w-md mx-auto mb-10">
           {subscribed ? (
             <div className="text-center p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg border border-emerald-200 dark:border-emerald-500/20">
-              <p className="text-sm text-emerald-700 dark:text-emerald-400">✅ {t('subscribeSuccess')}</p>
+              <p className="text-sm text-emerald-700 dark:text-emerald-400"><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('subscribeSuccess')}</p>
             </div>
           ) : (
             <>
