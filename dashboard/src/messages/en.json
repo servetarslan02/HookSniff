@@ -3211,7 +3211,12 @@
     "typeBool": "bool",
     "selectEndpoint": "Select an endpoint",
     "noEndpoints": "No endpoints found. Create an endpoint first.",
-    "goToCore": "Go to Core → Endpoints"
+    "goToCore": "Go to Core → Endpoints",
+    "clearAll": "Clear All",
+    "shortcutHint": "to send webhook",
+    "addFieldFirst": "Add at least one field with a key",
+    "sent": "Sent",
+    "previewChanged": "Payload changed since last send. Click Send to update."
   },
   "apiImporter": {
     "title": "📥 API Spec Importer",
