@@ -3269,7 +3269,11 @@
     "retrySchedulePreview": "Retry Schedule",
     "policyUpdated": "Retry policy updated",
     "edit": "Edit",
-    "defaultPolicy": "Default (3 attempts, exponential)"
+    "defaultPolicy": "Default (3 attempts, exponential)",
+    "attempts": "attempts",
+    "resetToDefault": "Reset to Default",
+    "resetConfirm": "Reset retry policy to default values?",
+    "policyReset": "Retry policy reset to defaults"
   },
   "inbound": {
     "title": "Inbound Webhooks",

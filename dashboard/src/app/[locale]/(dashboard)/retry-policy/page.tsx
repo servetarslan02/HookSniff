@@ -31,10 +31,17 @@ export default function RetryPolicyPage() {
 
   const handleEdit = (ep: { id: string; retry_policy?: { max_attempts?: number; backoff?: string; initial_delay_secs?: number; max_delay_secs?: number } | null }) => {
     setEditId(ep.id);
-    setMaxAttempts(ep.retry_policy?.max_attempts ?? 5);
+    setMaxAttempts(ep.retry_policy?.max_attempts ?? 3);
     setBackoff(ep.retry_policy?.backoff ?? 'exponential');
     setInitialDelay(ep.retry_policy?.initial_delay_secs ?? 10);
     setMaxDelay(ep.retry_policy?.max_delay_secs ?? 3600);
+  };
+
+  const handleResetToDefault = () => {
+    setMaxAttempts(3);
+    setBackoff('exponential');
+    setInitialDelay(10);
+    setMaxDelay(3600);
   };
 
   const handleSave = async () => {
@@ -163,6 +170,9 @@ export default function RetryPolicyPage() {
                       </div>
 
                       <div className="flex gap-2 justify-end">
+                        <button type="button" onClick={handleResetToDefault} className="px-4 py-2 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 border border-gray-200 dark:border-slate-700 rounded-xl">
+                          {t('resetToDefault') || 'Reset to Default'}
+                        </button>
                         <button type="button" onClick={() => setEditId(null)} className="px-4 py-2 text-sm text-gray-600 dark:text-slate-400 hover:text-gray-800">
                           {tc('cancel')}
                         </button>
@@ -183,7 +193,7 @@ export default function RetryPolicyPage() {
                       <div className="flex items-center gap-3 ml-4 shrink-0">
                         {policy ? (
                           <div className="text-sm text-gray-600 dark:text-slate-400">
-                            <span className="font-medium">{policy.max_attempts ?? 3}</span> {t('attempts')} · {policy.backoff ?? 'exponential'} · {policy.initial_delay_secs ?? 1}s
+                            <span className="font-medium">{policy.max_attempts ?? 3}</span> {t('attempts')} · {t(policy.backoff ?? 'exponential') || policy.backoff ?? 'exponential'} · {policy.initial_delay_secs ?? 10}s
                           </div>
                         ) : (
                           <span className="text-xs text-gray-400 dark:text-slate-500">{t('defaultPolicy')}</span>
