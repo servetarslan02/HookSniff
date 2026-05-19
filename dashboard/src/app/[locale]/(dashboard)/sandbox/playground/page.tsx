@@ -158,8 +158,23 @@ ${Object.entries(headers)
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+      </div>
+      <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{t('subtitle')}</p>
+
+      {/* How it works */}
+      <div className="glass-card p-6 mb-6 bg-linear-to-r from-brand-50 to-purple-50 dark:from-brand-500/5 dark:to-purple-500/5">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('howItWorks')}</h3>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
+          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step1')}</span>
+          <span>→</span>
+          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step2')}</span>
+          <span>→</span>
+          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step3')}</span>
+          <span>→</span>
+          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step4')}</span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -231,7 +246,7 @@ ${Object.entries(headers)
             {/* Headers */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                Headers (auto-added)
+                {t('headersAuto')}
               </label>
               <pre className="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl text-xs font-mono text-gray-600 dark:text-slate-400 overflow-x-auto">
                 {JSON.stringify(headers, null, 2)}
