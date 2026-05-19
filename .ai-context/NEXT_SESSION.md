@@ -1,8 +1,16 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 20:18 GMT+8
+> Son güncelleme: 2026-05-19 20:30 GMT+8
 
-## ✅ Tamamlanan (Bu Oturum — 5 Commit)
+## ✅ Tamamlanan (Bu Oturum — 6 Commit)
+
+### 0. Dashboard Kapsamlı Denetim (20:25–20:30)
+- 50+ sayfa incelendi, API health check, sidebar, i18n, rotalar
+- 3 sorun bulundu ve düzeltildi:
+  - DashboardOverview `/monitoring` → `/observability` (kırık link)
+  - DashboardOverview `/endpoints` → `/applications` (eski rota)
+  - EN.json: 4 eksik çeviri eklendi
+- Commit: `d6cbf67e`
 
 ### 1. Organization Sistemi Kapsamlı Denetim
 - 17 sorun tespit edildi, 10 düzeltme uygulandı
