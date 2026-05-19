@@ -958,6 +958,8 @@
     "passwordMedium": "Orta",
     "passwordStrong": "Güçlü",
     "verifyEmailSent": "Doğrulama e-postası gönderildi! Lütfen gelen kutunuzu kontrol edin.",
+    "resendVerification": "Doğrulama e-postasını tekrar gönder",
+    "verificationResent": "Doğrulama e-postası gönderildi! Gelen kutunuzu kontrol edin.",
     "forgotPasswordTitle": "Şifreni mi unuttun?",
     "forgotPasswordSubtitle": "E-posta adresini gir, sana bir sıfırlama bağlantısı gönderelim.",
     "sendResetLink": "Sıfırlama Bağlantısı Gönder",

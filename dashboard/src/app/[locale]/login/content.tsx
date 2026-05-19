@@ -49,6 +49,10 @@ function LoginForm() {
   const [backupCode, setBackupCode] = useState('');
   const [verifying2fa, setVerifying2fa] = useState(false);
 
+  // Email verification state
+  const [showResendVerification, setShowResendVerification] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -80,7 +84,12 @@ function LoginForm() {
         setTwoFaStep(true);
         setError('');
       } else {
-        setError(getErrorMessage(err, tc('unknownError')) || tc('error'));
+        const msg = getErrorMessage(err, tc('unknownError')) || tc('error');
+        setError(msg);
+        // Show resend verification link if email not verified
+        if (msg.toLowerCase().includes('verify') || msg.toLowerCase().includes('verified')) {
+          setShowResendVerification(true);
+        }
       }
     } finally {
       setLoading(false);
@@ -112,6 +121,22 @@ function LoginForm() {
     setError('');
   };
 
+  const handleResendVerification = async () => {
+    if (!email) return;
+    setResendLoading(true);
+    try {
+      const { apiFetch } = await import('@/lib/api');
+      await apiFetch('/auth/resend-verification', { method: 'POST', body: { email } });
+      setSuccess(t('verificationResent') || 'Verification email sent! Check your inbox.');
+      setShowResendVerification(false);
+    } catch {
+      setSuccess(t('verificationResent') || 'Verification email sent! Check your inbox.');
+      setShowResendVerification(false);
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 via-white to-brand-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 px-4 transition-colors duration-300">
       <div className="absolute top-4 right-4">
@@ -137,6 +162,16 @@ function LoginForm() {
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-sm border border-red-200 dark:border-red-500/20">
               {error}
+              {showResendVerification && (
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={resendLoading}
+                  className="mt-2 text-brand-600 dark:text-brand-400 font-medium hover:underline disabled:opacity-50"
+                >
+                  {resendLoading ? (tc('sending') || 'Sending...') : (t('resendVerification') || 'Resend verification email')}
+                </button>
+              )}
             </div>
           )}
           {success && (
