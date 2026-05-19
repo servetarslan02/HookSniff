@@ -38,6 +38,13 @@ impl ResendEmailClient {
             return None;
         }
 
+        // Ensure "HookSniff" display name is always present
+        let from_email = if from_email.contains('<') {
+            from_email // Already has display name format
+        } else {
+            format!("HookSniff <{}>", from_email)
+        };
+
         tracing::info!("✅ Resend email client initialized (from={})", from_email);
 
         Some(Self {
