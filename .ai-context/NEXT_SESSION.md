@@ -1,33 +1,27 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 19:25 GMT+8
+> Son güncelleme: 2026-05-19 19:52 GMT+8
 
 ## ✅ Tamamlanan (Bu Oturum)
 
-### 1. Organization Sayfası Tam İnceleme
-- Team, SSO, Audit Log sayfaları detaylı analiz edildi
-- SSO ↔ Team ilişkisi araştırıldı
-- 6 kritik sorun tespit edildi ve düzeltildi
+### 1. Organization Sistemi Kapsamlı Denetim
+- 17 sorun tespit edildi (5 kritik, 8 orta, 4 düşük)
+- 10 düzeltme uygulandı
 
-### 2. auto_join_default_team Düzeltmesi (KRİTİK BUG)
-- SSO ile giriş yapan yeni kullanıcılar otomatik ekibe eklenemiyordu
-- Fonksiyon, SSO user'ın email'iyle config arıyordu → bulamıyordu
-- Çözüm: SSO config owner'ın customer_id'siyle arama yapıldı
-- Her iki callback (SAML + OIDC) güncellendi
+### 2. P0 Kritik Düzeltmeler
+- API key loglanması engellendi (sadece prefix)
+- SSO login rate limit eklendi (10/dakika)
+- Admin self-lockout koruması (son admin her zaman bypass)
 
-### 3. Yeni Kullanıcı SSO Login Düzeltmesi
-- `/sso/login?email=newuser@company.com` → "No account found" hatası
-- Çözüm: Email domain'inden SSO config bulma eklendi
-- Mevcut kullanıcı → kendi config'ini bulur
-- Yeni kullanıcı → domain eşleşmesiyle config bulur
+### 3. P1 Yüksek Öncelik
+- Team delete endpoint (DELETE /v1/teams/:id)
+- Team leave endpoint (POST /v1/teams/:id/leave)
+- Ownership transfer (POST /v1/teams/:id/transfer)
+- SAML InResponseTo + destination + audience doğrulaması
+- Verified domain sütunu (migration 068)
 
-### 4. SSO Login Engelleme
-- SSO zorunlu kılınmış hesaplarda şifre girişi engellendi
-- Admin bypass seçeneği korundu
-
-### 5. Eksik Migration + Audit Log
-- `migrations/067_sso_admin_bypass_and_attempts.sql` oluşturuldu
-- SSO login ve auto-join için audit log eklendi
+### 4. P2 Orta Öncelik
+- SSO login attempts cleanup (90 gün, retention job)
 
 ## 📋 Sıradaki
 
