@@ -60,7 +60,7 @@ pub struct InboundConfig {
     pub id: Uuid,
     pub customer_id: Uuid,
     pub provider: String,
-    #[serde(skip_serializing)]
+    #[serde(skip_serializing, default)]
     pub secret: String,
     pub endpoint_id: Option<Uuid>, // Default target endpoint
     pub enabled: bool,

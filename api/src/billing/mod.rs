@@ -640,7 +640,7 @@ mod tests {
 
     #[test]
     fn max_events_per_day_all() {
-        assert_eq!(Plan::Developer.max_events_per_day(), 100);
+        assert_eq!(Plan::Developer.max_events_per_day(), 1_000);
         assert_eq!(Plan::Startup.max_events_per_day(), 30_000);
         assert_eq!(Plan::Pro.max_events_per_day(), 100_000);
         assert_eq!(Plan::Enterprise.max_events_per_day(), u64::MAX);
@@ -680,7 +680,7 @@ mod tests {
 
     #[test]
     fn max_requests_per_minute_all() {
-        assert_eq!(Plan::Developer.max_requests_per_minute(), 100);
+        assert_eq!(Plan::Developer.max_requests_per_minute(), 1_000);
         assert_eq!(Plan::Startup.max_requests_per_minute(), 1_000);
         assert_eq!(Plan::Pro.max_requests_per_minute(), 10_000);
         assert_eq!(Plan::Enterprise.max_requests_per_minute(), u32::MAX);
@@ -713,7 +713,7 @@ mod tests {
     fn retention_days_all() {
         assert_eq!(Plan::Developer.retention_days(), 7);
         assert_eq!(Plan::Startup.retention_days(), 14);
-        assert_eq!(Plan::Pro.retention_days(), 30);
+        assert_eq!(Plan::Pro.retention_days(), 180);
         assert_eq!(Plan::Enterprise.retention_days(), 365);
     }
 
@@ -775,13 +775,13 @@ mod tests {
 
     #[test]
     fn higher_tiers_have_higher_limits() {
-        assert!(Plan::Developer.max_requests_per_minute() < Plan::Startup.max_requests_per_minute());
-        assert!(Plan::Startup.max_requests_per_minute() < Plan::Pro.max_requests_per_minute());
+        // Developer and Startup share 1000 req/min, Pro is higher
+        assert!(Plan::Startup.max_requests_per_minute() <= Plan::Pro.max_requests_per_minute());
         assert!(Plan::Pro.max_requests_per_minute() < Plan::Enterprise.max_requests_per_minute());
 
-        assert!(Plan::Developer.max_endpoints() < Plan::Startup.max_endpoints());
-        assert!(Plan::Startup.max_endpoints() < Plan::Pro.max_endpoints());
-        assert!(Plan::Pro.max_endpoints() < Plan::Enterprise.max_endpoints());
+        // All plans have unlimited endpoints now
+        assert_eq!(Plan::Developer.max_endpoints(), u32::MAX);
+        assert_eq!(Plan::Enterprise.max_endpoints(), u32::MAX);
 
         assert!(Plan::Developer.max_webhooks_per_day() < Plan::Startup.max_webhooks_per_day());
         assert!(Plan::Startup.max_webhooks_per_day() < Plan::Pro.max_webhooks_per_day());
@@ -804,38 +804,34 @@ mod tests {
 
     #[test]
     fn usage_webhook_limit_not_exceeded() {
-        let usage = make_usage(Plan::Developer, 5000, 2);
+        let usage = make_usage(Plan::Developer, 500, 2);
         assert!(!usage.is_webhook_limit_exceeded());
     }
 
     #[test]
     fn usage_webhook_limit_exceeded_at_boundary() {
-        let usage = make_usage(Plan::Developer, 10_000, 2);
+        let usage = make_usage(Plan::Developer, 1_000, 2);
         assert!(usage.is_webhook_limit_exceeded());
     }
 
     #[test]
     fn usage_webhook_limit_exceeded_over() {
-        let usage = make_usage(Plan::Developer, 15_000, 2);
+        let usage = make_usage(Plan::Developer, 1_500, 2);
         assert!(usage.is_webhook_limit_exceeded());
     }
 
     #[test]
     fn usage_endpoint_limit_not_exceeded() {
+        // All plans have unlimited endpoints (u32::MAX)
         let usage = make_usage(Plan::Developer, 0, 3);
         assert!(!usage.is_endpoint_limit_exceeded());
     }
 
     #[test]
-    fn usage_endpoint_limit_exceeded_at_boundary() {
-        let usage = make_usage(Plan::Developer, 0, 5);
-        assert!(usage.is_endpoint_limit_exceeded());
-    }
-
-    #[test]
-    fn usage_endpoint_limit_exceeded_over() {
-        let usage = make_usage(Plan::Developer, 0, 10);
-        assert!(usage.is_endpoint_limit_exceeded());
+    fn usage_endpoint_limit_always_unlimited() {
+        // Even with many endpoints, limit is never exceeded (u32::MAX)
+        let usage = make_usage(Plan::Developer, 0, 1000);
+        assert!(!usage.is_endpoint_limit_exceeded());
     }
 
     #[test]
@@ -852,13 +848,16 @@ mod tests {
 
     #[test]
     fn usage_remaining_endpoints_normal() {
+        // All plans have u32::MAX endpoints
         let usage = make_usage(Plan::Pro, 0, 10);
-        assert_eq!(usage.remaining_endpoints(), 490);
+        assert_eq!(usage.remaining_endpoints(), u32::MAX - 10);
     }
 
     #[test]
     fn usage_remaining_endpoints_saturates_at_zero() {
-        let usage = make_usage(Plan::Developer, 0, 100);
+        // Can't exceed u32::MAX endpoints, so this would need u32::MAX+1 endpoints
+        // which isn't possible with u32 type. Test with high value instead.
+        let usage = make_usage(Plan::Developer, 0, u32::MAX);
         assert_eq!(usage.remaining_endpoints(), 0);
     }
 

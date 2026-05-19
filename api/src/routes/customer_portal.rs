@@ -439,7 +439,7 @@ mod tests {
             last_used_at: Some("2024-06-01T12:00:00Z".to_string()),
         };
         let json = serde_json::to_value(&info).unwrap();
-        assert_eq!(json["prefix"], "hr_live_abc...");
+        assert_eq!(json["api_key_prefix"], "hr_live_abc...");
         assert_eq!(json["last_used_at"], "2024-06-01T12:00:00Z");
     }
 
