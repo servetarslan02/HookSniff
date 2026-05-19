@@ -16,6 +16,11 @@
 //! - Stripe (webhook signature v1)
 //! - GitHub (HMAC-SHA256)
 //! - Shopify (HMAC-SHA256)
+//! - Slack (HMAC-SHA256, v0 signature)
+//! - Twilio (HMAC-SHA1)
+//! - Discord (Ed25519)
+//! - Linear (HMAC-SHA256)
+//! - Notion (HMAC-SHA256 with timestamp)
 //! - Generic (custom header + HMAC)
 
 use axum::body::Bytes;
@@ -69,6 +74,11 @@ pub enum Provider {
     Stripe,
     GitHub,
     Shopify,
+    Slack,
+    Twilio,
+    Discord,
+    Linear,
+    Notion,
     Generic,
 }
 
@@ -78,6 +88,11 @@ impl std::fmt::Display for Provider {
             Provider::Stripe => write!(f, "stripe"),
             Provider::GitHub => write!(f, "github"),
             Provider::Shopify => write!(f, "shopify"),
+            Provider::Slack => write!(f, "slack"),
+            Provider::Twilio => write!(f, "twilio"),
+            Provider::Discord => write!(f, "discord"),
+            Provider::Linear => write!(f, "linear"),
+            Provider::Notion => write!(f, "notion"),
             Provider::Generic => write!(f, "generic"),
         }
     }
@@ -89,6 +104,11 @@ impl Provider {
             "stripe" => Self::Stripe,
             "github" => Self::GitHub,
             "shopify" => Self::Shopify,
+            "slack" => Self::Slack,
+            "twilio" => Self::Twilio,
+            "discord" => Self::Discord,
+            "linear" => Self::Linear,
+            "notion" => Self::Notion,
             _ => Self::Generic,
         }
     }
@@ -104,6 +124,11 @@ impl Provider {
             Provider::Stripe => verify_stripe(secret, headers, body),
             Provider::GitHub => verify_github(secret, headers, body),
             Provider::Shopify => verify_shopify(secret, headers, body),
+            Provider::Slack => verify_slack(secret, headers, body),
+            Provider::Twilio => verify_twilio(secret, headers, body),
+            Provider::Discord => verify_discord(secret, headers, body),
+            Provider::Linear => verify_linear(secret, headers, body),
+            Provider::Notion => verify_notion(secret, headers, body),
             Provider::Generic => verify_generic(secret, headers, body),
         }
     }
@@ -120,6 +145,31 @@ impl Provider {
             Provider::Shopify => json
                 .get("topic")
                 .or_else(|| json.get("event"))
+                .and_then(|v| v.as_str())
+                .map(String::from),
+            Provider::Slack => json
+                .get("event")
+                .and_then(|e| e.get("type"))
+                .and_then(|v| v.as_str())
+                .map(String::from)
+                .or_else(|| json.get("type").and_then(|v| v.as_str()).map(String::from)),
+            Provider::Twilio => json
+                .get("SmsStatus")
+                .or_else(|| json.get("MessageStatus"))
+                .or_else(|| json.get("CallStatus"))
+                .and_then(|v| v.as_str())
+                .map(String::from),
+            Provider::Discord => json
+                .get("t")
+                .and_then(|v| v.as_str())
+                .map(String::from),
+            Provider::Linear => json
+                .get("type")
+                .and_then(|v| v.as_str())
+                .map(String::from)
+                .or_else(|| json.get("action").and_then(|v| v.as_str()).map(String::from)),
+            Provider::Notion => json
+                .get("type")
                 .and_then(|v| v.as_str())
                 .map(String::from),
             Provider::Generic => json.get("event").and_then(|v| v.as_str()).map(String::from),
@@ -229,6 +279,197 @@ fn verify_generic(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), 
         Ok(())
     } else {
         Err("Signature mismatch")
+    }
+}
+
+/// Slack webhook signature verification (v0).
+/// Header: X-Slack-Signature: v0=<hex>
+/// Payload: v0:<timestamp>:<body>
+fn verify_slack(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &'static str> {
+    if secret.is_empty() {
+        return Err("Inbound webhook secret not configured");
+    }
+
+    let sig_header = headers
+        .get("x-slack-signature")
+        .and_then(|v| v.to_str().ok())
+        .ok_or("Missing x-slack-signature header")?;
+
+    let timestamp = headers
+        .get("x-slack-request-timestamp")
+        .and_then(|v| v.to_str().ok())
+        .ok_or("Missing x-slack-request-timestamp header")?;
+
+    let signature = sig_header.strip_prefix("v0=").ok_or("Invalid Slack signature format")?;
+
+    let payload = format!("v0:{}:{}", timestamp, String::from_utf8_lossy(body));
+    let expected = compute_hmac_hex(secret.as_bytes(), payload.as_bytes());
+
+    if constant_time_eq(&expected, signature) {
+        Ok(())
+    } else {
+        Err("Slack signature mismatch")
+    }
+}
+
+/// Twilio webhook signature verification.
+/// Header: X-Twilio-Signature (Base64 of HMAC-SHA1)
+/// Signed data: URL + sorted POST params
+fn verify_twilio(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &'static str> {
+    if secret.is_empty() {
+        return Err("Inbound webhook secret not configured");
+    }
+
+    let sig_header = headers
+        .get("x-twilio-signature")
+        .or_else(|| headers.get("x-twilio-signature-env"))
+        .and_then(|v| v.to_str().ok())
+        .ok_or("Missing x-twilio-signature header")?;
+
+    // Twilio uses SHA1 for signature (not SHA256)
+    use hmac::{Hmac, Mac};
+    use sha1::Sha1;
+    type HmacSha1 = Hmac<Sha1>;
+
+    // Parse form body and build sorted signature base
+    let body_str = String::from_utf8_lossy(body);
+    let url = headers
+        .get("x-forwarded-uri")
+        .or_else(|| headers.get("x-original-uri"))
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("");
+
+    // Build signed data: URL + sorted params
+    let mut params: Vec<(&str, &str)> = body_str
+        .split('&')
+        .filter_map(|pair| {
+            let mut parts = pair.splitn(2, '=');
+            Some((parts.next()?, parts.next().unwrap_or("")))
+        })
+        .collect();
+    params.sort_by_key(|(k, _)| *k);
+
+    let mut signed_data = url.to_string();
+    for (k, v) in &params {
+        signed_data.push_str(k);
+        signed_data.push_str(v);
+    }
+
+    let mut mac =
+        HmacSha1::new_from_slice(secret.as_bytes()).expect("HMAC can take key of any size");
+    mac.update(signed_data.as_bytes());
+    let expected_bytes = mac.finalize().into_bytes();
+
+    use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
+    let expected = BASE64.encode(&expected_bytes);
+
+    if constant_time_eq(&expected, sig_header) {
+        Ok(())
+    } else {
+        Err("Twilio signature mismatch")
+    }
+}
+
+/// Discord webhook signature verification (Ed25519).
+/// Header: X-Signature-Ed25519 (hex), X-Signature-Timestamp
+/// Signed data: timestamp + body
+fn verify_discord(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &'static str> {
+    if secret.is_empty() {
+        return Err("Inbound webhook secret not configured");
+    }
+
+    let signature_hex = headers
+        .get("x-signature-ed25519")
+        .and_then(|v| v.to_str().ok())
+        .ok_or("Missing x-signature-ed25519 header")?;
+
+    let timestamp = headers
+        .get("x-signature-timestamp")
+        .and_then(|v| v.to_str().ok())
+        .ok_or("Missing x-signature-timestamp header")?;
+
+    // Discord uses Ed25519 — the "secret" is the hex-encoded public key
+    // Parse public key from hex (32 bytes)
+    let public_key_bytes = hex::decode(secret).map_err(|_| "Invalid Discord public key hex")?;
+    if public_key_bytes.len() != 32 {
+        return Err("Discord public key must be 32 bytes (64 hex chars)");
+    }
+
+    // Parse signature from hex (64 bytes)
+    let signature_bytes = hex::decode(signature_hex).map_err(|_| "Invalid Discord signature hex")?;
+    if signature_bytes.len() != 64 {
+        return Err("Discord signature must be 64 bytes (128 hex chars)");
+    }
+
+    // Build signed message: timestamp + body
+    let mut message = timestamp.as_bytes().to_vec();
+    message.extend_from_slice(body);
+
+    // Verify Ed25519 signature
+    use ed25519_dalek::{Signature, Verifier, VerifyingKey};
+    let verifying_key =
+        VerifyingKey::from_bytes(&public_key_bytes.try_into().map_err(|_| "Invalid key length")?)
+            .map_err(|_| "Invalid Discord public key")?;
+    let signature = Signature::from_bytes(&signature_bytes.try_into().map_err(|_| "Invalid signature length")?);
+
+    verifying_key
+        .verify(&message, &signature)
+        .map_err(|_| "Discord signature mismatch")
+}
+
+/// Linear webhook signature verification.
+/// Header: Linear-Signature (hex HMAC-SHA256)
+/// Signed data: raw body
+fn verify_linear(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &'static str> {
+    if secret.is_empty() {
+        return Err("Inbound webhook secret not configured");
+    }
+
+    let sig_header = headers
+        .get("linear-signature")
+        .and_then(|v| v.to_str().ok())
+        .ok_or("Missing linear-signature header")?;
+
+    let expected = compute_hmac_hex(secret.as_bytes(), body);
+
+    if constant_time_eq(&expected, sig_header) {
+        Ok(())
+    } else {
+        Err("Linear signature mismatch")
+    }
+}
+
+/// Notion webhook signature verification.
+/// Header: X-Notion-Signature (hex HMAC-SHA256 with timestamp prefix)
+/// Signed data: timestamp.body
+fn verify_notion(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<(), &'static str> {
+    if secret.is_empty() {
+        return Err("Inbound webhook secret not configured");
+    }
+
+    let sig_header = headers
+        .get("x-notion-signature")
+        .and_then(|v| v.to_str().ok())
+        .ok_or("Missing x-notion-signature header")?;
+
+    let timestamp = headers
+        .get("x-notion-timestamp")
+        .and_then(|v| v.to_str().ok())
+        .ok_or("Missing x-notion-timestamp header")?;
+
+    // Notion signature: HMAC-SHA256(secret, "timestamp.body")
+    let payload = format!("{}.{}", timestamp, String::from_utf8_lossy(body));
+    let expected = compute_hmac_hex(secret.as_bytes(), payload.as_bytes());
+
+    // Notion may prefix with sha256=
+    let signature = sig_header
+        .strip_prefix("sha256=")
+        .unwrap_or(sig_header);
+
+    if constant_time_eq(&expected, signature) {
+        Ok(())
+    } else {
+        Err("Notion signature mismatch")
     }
 }
 
@@ -682,6 +923,16 @@ mod tests {
         assert_eq!(Provider::parse_str("GitHub"), Provider::GitHub);
         assert_eq!(Provider::parse_str("shopify"), Provider::Shopify);
         assert_eq!(Provider::parse_str("SHOPIFY"), Provider::Shopify);
+        assert_eq!(Provider::parse_str("slack"), Provider::Slack);
+        assert_eq!(Provider::parse_str("SLACK"), Provider::Slack);
+        assert_eq!(Provider::parse_str("twilio"), Provider::Twilio);
+        assert_eq!(Provider::parse_str("TWILIO"), Provider::Twilio);
+        assert_eq!(Provider::parse_str("discord"), Provider::Discord);
+        assert_eq!(Provider::parse_str("DISCORD"), Provider::Discord);
+        assert_eq!(Provider::parse_str("linear"), Provider::Linear);
+        assert_eq!(Provider::parse_str("LINEAR"), Provider::Linear);
+        assert_eq!(Provider::parse_str("notion"), Provider::Notion);
+        assert_eq!(Provider::parse_str("NOTION"), Provider::Notion);
         assert_eq!(Provider::parse_str("unknown"), Provider::Generic);
         assert_eq!(Provider::parse_str(""), Provider::Generic);
         assert_eq!(Provider::parse_str("random"), Provider::Generic);
@@ -692,6 +943,11 @@ mod tests {
         assert_eq!(Provider::Stripe.to_string(), "stripe");
         assert_eq!(Provider::GitHub.to_string(), "github");
         assert_eq!(Provider::Shopify.to_string(), "shopify");
+        assert_eq!(Provider::Slack.to_string(), "slack");
+        assert_eq!(Provider::Twilio.to_string(), "twilio");
+        assert_eq!(Provider::Discord.to_string(), "discord");
+        assert_eq!(Provider::Linear.to_string(), "linear");
+        assert_eq!(Provider::Notion.to_string(), "notion");
         assert_eq!(Provider::Generic.to_string(), "generic");
     }
 
@@ -701,6 +957,11 @@ mod tests {
             Provider::Stripe,
             Provider::GitHub,
             Provider::Shopify,
+            Provider::Slack,
+            Provider::Twilio,
+            Provider::Discord,
+            Provider::Linear,
+            Provider::Notion,
             Provider::Generic,
         ];
         for p in providers {
@@ -718,6 +979,16 @@ mod tests {
         assert_eq!(p, Provider::GitHub);
         let p: Provider = serde_json::from_str(r#""shopify""#).unwrap();
         assert_eq!(p, Provider::Shopify);
+        let p: Provider = serde_json::from_str(r#""slack""#).unwrap();
+        assert_eq!(p, Provider::Slack);
+        let p: Provider = serde_json::from_str(r#""twilio""#).unwrap();
+        assert_eq!(p, Provider::Twilio);
+        let p: Provider = serde_json::from_str(r#""discord""#).unwrap();
+        assert_eq!(p, Provider::Discord);
+        let p: Provider = serde_json::from_str(r#""linear""#).unwrap();
+        assert_eq!(p, Provider::Linear);
+        let p: Provider = serde_json::from_str(r#""notion""#).unwrap();
+        assert_eq!(p, Provider::Notion);
         let p: Provider = serde_json::from_str(r#""generic""#).unwrap();
         assert_eq!(p, Provider::Generic);
     }
@@ -791,6 +1062,159 @@ mod tests {
         let body = b"not json";
         let event = Provider::Stripe.extract_event_type(body);
         assert!(event.is_none());
+    }
+
+    // ── New provider extract_event_type ─────────────────────
+
+    #[test]
+    fn test_extract_event_type_slack_event_type() {
+        let body = r#"{"type":"event_callback","event":{"type":"message"}}"#;
+        let event = Provider::Slack.extract_event_type(body.as_bytes());
+        assert_eq!(event, Some("message".to_string()));
+    }
+
+    #[test]
+    fn test_extract_event_type_slack_fallback_type() {
+        let body = r#"{"type":"url_verification"}"#;
+        let event = Provider::Slack.extract_event_type(body.as_bytes());
+        assert_eq!(event, Some("url_verification".to_string()));
+    }
+
+    #[test]
+    fn test_extract_event_type_twilio_sms() {
+        let body = r#"{"SmsStatus":"delivered","MessageSid":"SM123"}"#;
+        let event = Provider::Twilio.extract_event_type(body.as_bytes());
+        assert_eq!(event, Some("delivered".to_string()));
+    }
+
+    #[test]
+    fn test_extract_event_type_twilio_call() {
+        let body = r#"{"CallStatus":"completed","CallSid":"CA123"}"#;
+        let event = Provider::Twilio.extract_event_type(body.as_bytes());
+        assert_eq!(event, Some("completed".to_string()));
+    }
+
+    #[test]
+    fn test_extract_event_type_discord() {
+        let body = r#"{"t":"MESSAGE_CREATE","d":{"content":"hello"}}"#;
+        let event = Provider::Discord.extract_event_type(body.as_bytes());
+        assert_eq!(event, Some("MESSAGE_CREATE".to_string()));
+    }
+
+    #[test]
+    fn test_extract_event_type_linear_type() {
+        let body = r#"{"type":"Issue","action":"create"}"#;
+        let event = Provider::Linear.extract_event_type(body.as_bytes());
+        assert_eq!(event, Some("Issue".to_string()));
+    }
+
+    #[test]
+    fn test_extract_event_type_linear_action_fallback() {
+        let body = r#"{"action":"update"}"#;
+        let event = Provider::Linear.extract_event_type(body.as_bytes());
+        assert_eq!(event, Some("update".to_string()));
+    }
+
+    #[test]
+    fn test_extract_event_type_notion() {
+        let body = r#"{"type":"page.created"}"#;
+        let event = Provider::Notion.extract_event_type(body.as_bytes());
+        assert_eq!(event, Some("page.created".to_string()));
+    }
+
+    // ── Slack signature verification ────────────────────────
+
+    #[test]
+    fn test_verify_slack_missing_header() {
+        let headers = HeaderMap::new();
+        let result = verify_slack("secret", &headers, b"body");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_verify_slack_valid_signature() {
+        let secret = "slack_secret";
+        let body = b"payload";
+        let timestamp = "1234567890";
+        let payload = format!("v0:{}:{}", timestamp, String::from_utf8_lossy(body));
+        let sig = compute_hmac_hex(secret.as_bytes(), payload.as_bytes());
+
+        let mut headers = HeaderMap::new();
+        headers.insert("x-slack-signature", HeaderValue::from_str(&format!("v0={}", sig)).unwrap());
+        headers.insert("x-slack-request-timestamp", HeaderValue::from_str(timestamp).unwrap());
+        let result = verify_slack(secret, &headers, body);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_verify_slack_signature_mismatch() {
+        let mut headers = HeaderMap::new();
+        headers.insert("x-slack-signature", HeaderValue::from_static("v0=wrong"));
+        headers.insert("x-slack-request-timestamp", HeaderValue::from_static("123"));
+        let result = verify_slack("secret", &headers, b"body");
+        assert!(result.is_err());
+    }
+
+    // ── Linear signature verification ───────────────────────
+
+    #[test]
+    fn test_verify_linear_missing_header() {
+        let headers = HeaderMap::new();
+        let result = verify_linear("secret", &headers, b"body");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_verify_linear_valid_signature() {
+        let secret = "linear_secret";
+        let body = b"payload";
+        let sig = compute_hmac_hex(secret.as_bytes(), body);
+
+        let mut headers = HeaderMap::new();
+        headers.insert("linear-signature", HeaderValue::from_str(&sig).unwrap());
+        let result = verify_linear(secret, &headers, body);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_verify_linear_signature_mismatch() {
+        let mut headers = HeaderMap::new();
+        headers.insert("linear-signature", HeaderValue::from_static("wrong_sig"));
+        let result = verify_linear("secret", &headers, b"body");
+        assert!(result.is_err());
+    }
+
+    // ── Notion signature verification ───────────────────────
+
+    #[test]
+    fn test_verify_notion_missing_header() {
+        let headers = HeaderMap::new();
+        let result = verify_notion("secret", &headers, b"body");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_verify_notion_valid_signature() {
+        let secret = "notion_secret";
+        let body = b"payload";
+        let timestamp = "1234567890";
+        let payload = format!("{}.{}", timestamp, String::from_utf8_lossy(body));
+        let sig = compute_hmac_hex(secret.as_bytes(), payload.as_bytes());
+
+        let mut headers = HeaderMap::new();
+        headers.insert("x-notion-signature", HeaderValue::from_str(&format!("sha256={}", sig)).unwrap());
+        headers.insert("x-notion-timestamp", HeaderValue::from_str(timestamp).unwrap());
+        let result = verify_notion(secret, &headers, body);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_verify_notion_signature_mismatch() {
+        let mut headers = HeaderMap::new();
+        headers.insert("x-notion-signature", HeaderValue::from_static("sha256=wrong"));
+        headers.insert("x-notion-timestamp", HeaderValue::from_static("123"));
+        let result = verify_notion("secret", &headers, b"body");
+        assert!(result.is_err());
     }
 
     // ── HMAC computation ────────────────────────────────────
