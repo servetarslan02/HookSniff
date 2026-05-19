@@ -2824,7 +2824,13 @@
     "toastComputeFailed": "İmza hesaplanamadı",
     "toastAllRequired": "Tüm alanlar gereklidir",
     "toastVerificationFailed": "Doğrulama başarısız",
-    "toastCopied": "Kopyalandı!"
+    "toastCopied": "Kopyalandı!",
+    "toastCopyFailed": "Panoya kopyalanamadı",
+    "clearAll": "Temizle",
+    "shortcutHint": "ile imzayı doğrula",
+    "hideSecret": "Gizli anahtarı gizle",
+    "showSecret": "Gizli anahtarı göster",
+    "signatureFormatHint": "Format: sha256=<hex> — sadece hex yapıştırırsanız algoritma prefix'i otomatik eklenir"
   },
   "transforms": {
     "title": "🔄 Webhook Dönüştürmeleri",
