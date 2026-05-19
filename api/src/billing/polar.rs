@@ -98,6 +98,13 @@ impl PolarConfig {
             || product_id == self.product_business_yearly
     }
 
+    /// Auto-apply discount ID for Startup plan (first month free).
+    /// Created in Polar Dashboard: 100% off, Once, Startup product only.
+    /// Set POLAR_STARTUP_TRIAL_DISCOUNT_ID env var with the discount ID from Polar.
+    fn startup_trial_discount_id(&self) -> Option<String> {
+        std::env::var("POLAR_STARTUP_TRIAL_DISCOUNT_ID").ok().filter(|s| !s.is_empty())
+    }
+
 }
 
 // ── Polar.sh API types ────────────────────────────────────────
@@ -124,6 +131,9 @@ struct CreateCheckoutRequest {
     /// Discount code to apply.
     #[serde(skip_serializing_if = "Option::is_none")]
     discount_code: Option<String>,
+    /// Discount ID to auto-apply (no code needed).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    discount_id: Option<String>,
     /// Metadata for the checkout.
     #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<std::collections::HashMap<String, String>>,
@@ -307,6 +317,13 @@ impl PaymentProviderImpl for PolarProvider {
         metadata.insert("customer_id".to_string(), customer_id.to_string());
         metadata.insert("plan".to_string(), plan.as_str().to_string());
 
+        // Auto-apply Startup trial discount (first month free) unless customer provided their own code
+        let auto_discount_id = if *plan == Plan::Startup && discount_code.is_none() {
+            self.config.startup_trial_discount_id()
+        } else {
+            None
+        };
+
         let req_body = CreateCheckoutRequest {
             products: vec![product_id.to_string()],
             external_customer_id: Some(customer_id.to_string()),
@@ -314,6 +331,7 @@ impl PaymentProviderImpl for PolarProvider {
             success_url: Some(format!("{}/dashboard/billing?upgraded=true", app_url)),
             locale: Some("en".to_string()),
             discount_code: discount_code.map(|s| s.to_string()),
+            discount_id: auto_discount_id,
             metadata: Some(metadata),
         };
 
