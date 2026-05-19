@@ -53,3 +53,27 @@
 - `dashboard/src/messages/en.json` + `tr.json` — 15'er satır
 
 ### Push: `d6f54bf8`
+
+## Gelen Webhooklar Sayfası İncelemesi (21:41–21:45)
+
+### Tespit Edilen Sorunlar
+1. ❌ PROVIDERS listesinde sadece 4 provider — 5 yeni eksik
+2. ❌ Edit/Düzenle butonu yok
+3. ❌ Delete/Sil butonu yok
+4. ❌ Enable/Disable toggle yok
+5. ❌ Config kartlarında detay yok (imza algoritması)
+6. ❌ Boş durum (empty state) yok
+
+### Yapılan Düzeltmeler
+1. **9 provider** — Slack, Twilio, Discord, Linear, Notion eklendi
+2. **Edit butonu** — Inline form: secret + endpoint güncelleme
+3. **Delete butonu** — ConfirmDialog ile silme
+4. **Toggle butonu** — Enable/Disable inline
+5. **İmza bilgisi** — Her provider'da algoritma gösterimi
+6. **Empty state** — İlk config yokken CTA butonu
+7. **useUpdateInboundConfig hook** — Yeni hook
+8. **useDeleteInboundConfig hook** — Yeni hook
+9. **inboundApi** — updateConfig() ve deleteConfig() eklendi
+10. **i18n** — 18 yeni çeviri anahtarı (en + tr)
+
+### Push: `fe0205ab`
