@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -26,33 +25,37 @@ export function ApiKeySection({ apiKey }: { apiKey: string | null }) {
   };
 
   return (
-    <div className="glass-card p-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('api')}</h3>
-      <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('apiDesc')}</p>
-      <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            value={apiKey ? '••••••••••••••••••••••••••••••••' : t('noApiKey')}
-            readOnly
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-950 font-mono text-sm text-gray-700 dark:text-slate-300"
-          />
-          <button
-            type="button"
-            onClick={copyApiKey}
-            disabled={!apiKey}
-            className="bg-gray-900 dark:bg-slate-700 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-slate-600 transition disabled:opacity-40 whitespace-nowrap"
-          >
-            {copied ? `✓ ${tc('copied')}` : tc('copy')}
-          </button>
+    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center">
+          <span className="text-base">🗝️</span>
         </div>
-        <p className="text-xs text-gray-500 dark:text-slate-400">
-          {t('keepSecret')}{' '}
-          <a href={`/core`} className="text-brand-600 dark:text-brand-400 hover:underline">
-            {t('manageApiKeys')} →
-          </a>
-        </p>
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('api')}</h3>
+          <p className="text-xs text-gray-500 dark:text-slate-400">{t('apiDesc')}</p>
+        </div>
       </div>
+
+      <div className="flex items-center gap-3">
+        <div className="flex-1 px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 font-mono text-sm text-gray-500 dark:text-slate-400 truncate">
+          {apiKey ? '••••••••••••••••••••••••••••••••' : t('noApiKey')}
+        </div>
+        <button
+          type="button"
+          onClick={copyApiKey}
+          disabled={!apiKey}
+          className="px-4 py-2.5 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition disabled:opacity-40 whitespace-nowrap"
+        >
+          {copied ? `✓ ${tc('copied')}` : tc('copy')}
+        </button>
+      </div>
+
+      <p className="text-xs text-gray-400 dark:text-slate-500 mt-3">
+        {t('keepSecret')}{' '}
+        <a href="/core" className="text-brand-600 dark:text-brand-400 hover:underline">
+          {t('manageApiKeys')} →
+        </a>
+      </p>
     </div>
   );
 }

@@ -36,35 +36,42 @@ export function DangerZoneSection() {
 
   return (
     <>
-      <div className="glass-card p-6 border-red-200 dark:border-red-500/20">
-        <h3 className="text-lg font-semibold text-red-700 dark:text-red-400 mb-4">{t('dangerZone')}</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-500/10 rounded-xl">
-            <div>
-              <div className="font-medium text-gray-900 dark:text-white">{t('signOut')}</div>
-              <div className="text-sm text-gray-500 dark:text-slate-400">{t('signOutDesc')}</div>
-            </div>
-            <button
-              type="button"
-              onClick={logout}
-              className="bg-red-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-700 transition"
-            >
-              {t('signOut')}
-            </button>
+      {/* Section divider */}
+      <div className="flex items-center gap-2 mb-4">
+        <span className="text-base">⚠️</span>
+        <h2 className="text-sm font-semibold text-red-500 dark:text-red-400 uppercase tracking-wider">{t('dangerZone')}</h2>
+        <div className="flex-1 h-px bg-red-200 dark:bg-red-500/20 ml-2" />
+      </div>
+
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-red-200 dark:border-red-500/20 divide-y divide-red-100 dark:divide-red-500/10">
+        {/* Sign out */}
+        <div className="flex items-center justify-between p-5">
+          <div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white">{t('signOut')}</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">{t('signOutDesc')}</div>
           </div>
-          <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-500/10 rounded-xl">
-            <div>
-              <div className="font-medium text-gray-900 dark:text-white">{t('deleteAccount')}</div>
-              <div className="text-sm text-gray-500 dark:text-slate-400">{t('deleteAccountDesc')}</div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowDeleteModal(true)}
-              className="border border-red-300 dark:border-red-500/30 text-red-600 dark:text-red-400 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-600 hover:text-white transition"
-            >
-              {t('deleteAccount')}
-            </button>
+          <button
+            type="button"
+            onClick={logout}
+            className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 rounded-xl hover:bg-red-100 dark:hover:bg-red-500/20 transition"
+          >
+            {t('signOut')}
+          </button>
+        </div>
+
+        {/* Delete account */}
+        <div className="flex items-center justify-between p-5">
+          <div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white">{t('deleteAccount')}</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">{t('deleteAccountDesc')}</div>
           </div>
+          <button
+            type="button"
+            onClick={() => setShowDeleteModal(true)}
+            className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20 rounded-xl hover:bg-red-600 hover:text-white hover:border-red-600 transition"
+          >
+            {t('deleteAccount')}
+          </button>
         </div>
       </div>
 
@@ -101,7 +108,7 @@ export function DangerZoneSection() {
               <button
                 type="button"
                 onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); setDeletePassword(''); }}
-                className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+                className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition"
               >
                 {tc('cancel')}
               </button>
