@@ -27,7 +27,7 @@ export function TwoFactorSection() {
   const [step, setStep] = useState<'qr' | 'verify' | 'done'>('qr');
 
   // Disable flow
-  const [disableCode, setDisableCode] = useState('');
+  const [disablePassword, setDisablePassword] = useState('');
   const [disabling, setDisabling] = useState(false);
 
   const fetchStatus = useCallback(async () => {
@@ -88,13 +88,13 @@ export function TwoFactorSection() {
 
   /* ─── Disable 2FA ─── */
   const handleDisable = async () => {
-    if (!token || !disableCode.trim()) return;
+    if (!token || !disablePassword.trim()) return;
     setDisabling(true);
     try {
-      await twoFactorApi.disable(token);
+      await twoFactorApi.disable(token, disablePassword.trim());
       setEnabled(false);
       setShowDisable(false);
-      setDisableCode('');
+      setDisablePassword('');
       toast(t('2faDisabled'), 'success');
     } catch (err) {
       toast(getErrorMessage(err, t('failedToDisable2fa')), 'error');
@@ -280,19 +280,18 @@ export function TwoFactorSection() {
             </p>
 
             <input
-              type="text"
-              value={disableCode}
-              onChange={(e) => setDisableCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="000000"
-              maxLength={6}
-              className="w-full px-4 py-3 text-center text-2xl font-mono tracking-[0.5em] border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4"
+              type="password"
+              value={disablePassword}
+              onChange={(e) => setDisablePassword(e.target.value)}
+              placeholder={t('enterPassword') || 'Enter your password'}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4"
               autoFocus
             />
 
             <div className="flex gap-3 justify-end">
               <button
                 type="button"
-                onClick={() => { setShowDisable(false); setDisableCode(''); }}
+                onClick={() => { setShowDisable(false); setDisablePassword(''); }}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition"
               >
                 {tc('cancel')}
@@ -300,7 +299,7 @@ export function TwoFactorSection() {
               <button
                 type="button"
                 onClick={handleDisable}
-                disabled={disabling || disableCode.length !== 6}
+                disabled={disabling || !disablePassword.trim()}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-50"
               >
                 {disabling ? tc('saving') : t('disable2fa')}
