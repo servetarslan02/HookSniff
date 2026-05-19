@@ -67,6 +67,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         { name: 'Payload Transforms', href: '/docs/transforms' },
         { name: 'Templates', href: '/docs/templates' },
         { name: 'Multi-Tenant', href: '/docs/multi-tenant' },
+        { name: 'Organization', href: '/docs/organization' },
         { name: 'Build Stripe-like', href: '/docs/build-stripe-like', badge: 'Popular' },
       ],
     },
