@@ -173,3 +173,49 @@ Bildirim sistemi trace edildi. 3 kritik sorun tespit edildi, hepsi düzeltildi.
 - `dashboard/src/messages/tr.json` — 6 nav key
 
 ## Commit: `498e0e87`
+
+---
+
+# 2026-05-19 — Kapsamlı Bildirim Sistemi
+
+## Yapılan İşler
+Sistemdeki tüm bildirim olayları tespit edildi. 4 → 12 kaynak çıkarıldı.
+
+## Yeni Notification Helper Modülü
+`api/src/notifications/helpers.rs` — Tüm bildirim oluşturma merkezileştirildi.
+
+## Bildirim Kaynakları (12)
+
+### Billing (4)
+1. `payment_failed` — Ödeme başarısız, grace period başladı
+2. `payment_recovered` — Ödeme düzeldi
+3. `subscription_canceled` — Abonelik iptal edildi
+4. `plan_upgraded` — Plan yükseltildi
+
+### Webhook/Delivery (3)
+5. `delivery_failed` — Webhook teslimat başarısız (dead letter)
+6. `endpoint_down` — Endpoint çöktü (failure_streak >= 5)
+7. `endpoint_recovered` — Endpoint kurtarıldı
+
+### Team (3)
+8. `member_joined` — Yeni üye katıldı (owner'a bildirim)
+9. `member_removed` — Üye çıkarıldı
+10. `ownership_transferred` — Sahiplik devredildi
+
+### System (2)
+11. `limit_approaching` — Webhook limiti yaklaşıyor (%80+)
+12. `limit_exceeded` — Webhook limiti aşıldı
+
+## Entegrasyon Noktaları
+- `billing/webhooks.rs` → payment_failed, subscription_canceled, plan_upgraded
+- `teams.rs` → member_joined, member_removed, ownership_transferred
+- `worker/main.rs` → delivery_failed (dead letter)
+
+## Değişilen Dosyalar
+- `api/src/notifications/helpers.rs` — Yeni dosya (187 satır)
+- `api/src/notifications/mod.rs` — Module declaration
+- `api/src/routes/billing/webhooks.rs` — 3 bildirim entegrasyonu
+- `api/src/routes/teams.rs` — 3 bildirim entegrasyonu
+- `worker/src/main.rs` — Helper refactor
+
+## Commit: `ee4cb7a1`
