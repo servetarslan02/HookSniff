@@ -41,7 +41,8 @@ describe('SignatureVerifierPage', () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
-    expect(screen.getAllByText(/Signature Verifier/).length).toBeGreaterThan(0);
+    // Title is i18n key "signatureVerifier.title"
+    expect(screen.getAllByText(/signatureVerifier\.title/).length).toBeGreaterThan(0);
   });
 
   it('renders algorithm selector buttons', async () => {
@@ -65,29 +66,28 @@ describe('SignatureVerifierPage', () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
-    expect(screen.getAllByText(/Verify Signature/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Compute Signature/).length).toBeGreaterThan(0);
+    // i18n keys: signatureVerifier.verifyBtn, signatureVerifier.computeBtn
+    expect(screen.getAllByText(/signatureVerifier\.verifyBtn/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/signatureVerifier\.computeBtn/).length).toBeGreaterThan(0);
   });
 
   it('shows toast when verifying with empty fields', async () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
-    // Buttons exist and are clickable
-    const verifyBtns = screen.getAllByText(/Verify Signature/);
+    const verifyBtns = screen.getAllByText(/signatureVerifier\.verifyBtn/);
     expect(verifyBtns.length).toBeGreaterThan(0);
     await act(async () => {
       fireEvent.click(verifyBtns[0]);
     });
-    // Toast mock should have been called (or component handles gracefully)
-    // Component uses useToast which is mocked — verify button is disabled when fields empty
+    // Button is disabled when fields are empty — toast not called
   });
 
   it('shows toast when computing with empty fields', async () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
-    const computeBtns = screen.getAllByText(/Compute Signature/);
+    const computeBtns = screen.getAllByText(/signatureVerifier\.computeBtn/);
     expect(computeBtns.length).toBeGreaterThan(0);
     await act(async () => {
       fireEvent.click(computeBtns[0]);
@@ -110,21 +110,25 @@ describe('SignatureVerifierPage', () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
-    expect(screen.getAllByText(/Code Example/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Copy').length).toBeGreaterThan(0);
+    // i18n key: signatureVerifier.codeExample
+    expect(screen.getAllByText(/signatureVerifier\.codeExample/).length).toBeGreaterThan(0);
+    // "Copy" button text is i18n key: signatureVerifier.copy
+    expect(screen.getAllByText(/signatureVerifier\.copy/).length).toBeGreaterThan(0);
   });
 
   it('renders clear all button', async () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
-    expect(screen.getAllByText(/Clear All|Temizle/).length).toBeGreaterThan(0);
+    // i18n key: signatureVerifier.clearAll
+    expect(screen.getAllByText(/signatureVerifier\.clearAll/).length).toBeGreaterThan(0);
   });
 
   it('renders code language tabs', async () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
+    // Language labels are hardcoded (not i18n)
     expect(screen.getAllByText('Node.js').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Python').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Go').length).toBeGreaterThan(0);
@@ -134,7 +138,6 @@ describe('SignatureVerifierPage', () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
-    // The eye icon button should exist
     const secretInput = screen.getAllByPlaceholderText('whsec_your_secret_key')[0];
     expect(secretInput).toBeDefined();
     expect(secretInput.getAttribute('type')).toBe('password');
@@ -152,6 +155,7 @@ describe('SignatureVerifierPage', () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
+    // i18n key: signatureVerifier.signatureFormatHint contains "sha256="
     expect(screen.getAllByText(/sha256=/).length).toBeGreaterThan(0);
   });
 
@@ -159,19 +163,21 @@ describe('SignatureVerifierPage', () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
-    expect(screen.getAllByText('How Webhook Signatures Work').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('HookSniff signs the payload').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Signature is included in headers').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('You verify on your server').length).toBeGreaterThan(0);
+    // i18n keys
+    expect(screen.getAllByText(/signatureVerifier\.howItWorks/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/signatureVerifier\.step1Title/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/signatureVerifier\.step2Title/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/signatureVerifier\.step3Title/).length).toBeGreaterThan(0);
   });
 
   it('renders all form labels', async () => {
     await act(async () => {
       render(React.createElement(SignatureVerifierPage));
     });
-    expect(screen.getAllByText(/Webhook Payload/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Webhook Secret').length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/x-hooksniff-signature/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Algorithm').length).toBeGreaterThan(0);
+    // i18n keys for labels
+    expect(screen.getAllByText(/signatureVerifier\.payloadLabel/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/signatureVerifier\.secretLabel/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/signatureVerifier\.signatureLabel/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/signatureVerifier\.algorithm/).length).toBeGreaterThan(0);
   });
 });
