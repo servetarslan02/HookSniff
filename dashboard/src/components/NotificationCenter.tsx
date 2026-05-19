@@ -213,7 +213,7 @@ export function NotificationCenter() {
           </div>
           <div className="px-4 py-2.5 border-t border-gray-200 dark:border-slate-700 text-center">
             <Link
-              href="/account?tab=notifications"
+              href="/team-mgmt"
               onClick={() => setOpen(false)}
               className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
             >
