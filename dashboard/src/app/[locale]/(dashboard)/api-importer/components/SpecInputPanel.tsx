@@ -42,20 +42,6 @@ export function SpecInputPanel({
   }
 }`;
 
-  const sampleYaml = `openapi: "3.0.0"
-info:
-  title: My API
-  version: "1.0.0"
-servers:
-  - url: https://api.example.com
-paths:
-  /orders:
-    post:
-      summary: Create order
-  /users:
-    get:
-      summary: List users`;
-
   const fetchSpec = async () => {
     if (!specUrl) return;
     setFetching(true);
