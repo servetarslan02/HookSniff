@@ -650,7 +650,11 @@
     "howItWorks": "Nas\u0131l \u00e7al\u0131\u015f\u0131r",
     "step1": "Her teslimat takip edilir",
     "step2": "Metrikler zaman i\u00e7inde toplan\u0131r",
-    "step3": "Grafikler trendleri ve desenleri g\u00f6sterir"
+    "step3": "Grafikler trendleri ve desenleri g\u00f6sterir",
+    "deliveryTrendsDesc": "Zaman i\u00e7inde ba\u015far\u0131l\u0131 ve ba\u015far\u0131s\u0131z teslimatlar",
+    "successRateDesc": "Genel teslimat ba\u015far\u0131 oran\u0131 d\u00f6k\u00fcm\u00fc",
+    "avgLabel": "Ort. (ms)",
+    "p95Label": "P95 (ms)"
   },
   "settings": {
     "title": "Ayarlar",
