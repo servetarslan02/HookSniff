@@ -2974,7 +2974,12 @@
     "confirmDelete": "Confirm",
     "cancel": "Cancel",
     "dnsPropagationHint": "DNS changes can take 5–30 minutes to propagate. Wait before verifying.",
-    "sslActive": "SSL Active"
+    "sslActive": "SSL Active",
+    "adding": "Adding…",
+    "loadError": "Could not load your domains",
+    "retry": "Retry",
+    "noDomains": "No domains yet",
+    "noDomainsDesc": "Add a custom domain to white-label your webhook portal."
   },
   "signatureVerifier": {
     "title": "🔐 Signature Verifier",

@@ -351,11 +351,14 @@ async fn verify_dns_cname(domain: &str) -> bool {
 
     match output {
         Ok(out) => {
-            let stdout = String::from_utf8_lossy(&out.stdout);
-            stdout.contains("hooksniff.app")
+            let stdout = String::from_utf8_lossy(&out.stdout).to_lowercase();
+            // Accept CNAME pointing to Vercel DNS or HookSniff domains
+            stdout.contains("vercel-dns.com")
+                || stdout.contains("hooksniff.app")
+                || stdout.contains("hooksniff.com")
         }
         Err(_) => {
-            // Fallback: nslookup
+            // Fallback: try nslookup
             let output = tokio::process::Command::new("nslookup")
                 .args(["-type=CNAME", domain])
                 .output()
@@ -363,8 +366,10 @@ async fn verify_dns_cname(domain: &str) -> bool {
 
             match output {
                 Ok(out) => {
-                    let stdout = String::from_utf8_lossy(&out.stdout);
-                    stdout.contains("hooksniff.app")
+                    let stdout = String::from_utf8_lossy(&out.stdout).to_lowercase();
+                    stdout.contains("vercel-dns.com")
+                        || stdout.contains("hooksniff.app")
+                        || stdout.contains("hooksniff.com")
                 }
                 Err(_) => false,
             }
@@ -376,9 +381,9 @@ async fn verify_dns_cname(domain: &str) -> bool {
 async fn add_domain_to_vercel(domain: &str) -> Result<(), String> {
     let vercel_token = std::env::var("VERCEL_API_TOKEN").map_err(|_| "VERCEL_API_TOKEN not set")?;
     let project_id = std::env::var("VERCEL_PROJECT_ID")
-        .unwrap_or_else(|_| "prj_cSIVYHpCoAtoihRp8xlXIun1KVSR".to_string());
+        .map_err(|_| "VERCEL_PROJECT_ID not set")?;
     let team_id = std::env::var("VERCEL_TEAM_ID")
-        .unwrap_or_else(|_| "team_5GY7N3j15cHYnQJQGjcA4KvR".to_string());
+        .map_err(|_| "VERCEL_TEAM_ID not set")?;
 
     let client = crate::http_client::get_client().clone();
     let url = format!(
@@ -408,9 +413,9 @@ async fn add_domain_to_vercel(domain: &str) -> Result<(), String> {
 async fn remove_domain_from_vercel(domain: &str) -> Result<(), String> {
     let vercel_token = std::env::var("VERCEL_API_TOKEN").map_err(|_| "VERCEL_API_TOKEN not set")?;
     let project_id = std::env::var("VERCEL_PROJECT_ID")
-        .unwrap_or_else(|_| "prj_cSIVYHpCoAtoihRp8xlXIun1KVSR".to_string());
+        .map_err(|_| "VERCEL_PROJECT_ID not set")?;
     let team_id = std::env::var("VERCEL_TEAM_ID")
-        .unwrap_or_else(|_| "team_5GY7N3j15cHYnQJQGjcA4KvR".to_string());
+        .map_err(|_| "VERCEL_TEAM_ID not set")?;
 
     let client = crate::http_client::get_client().clone();
     let url = format!(

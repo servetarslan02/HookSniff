@@ -2793,7 +2793,12 @@
     "confirmDelete": "Onayla",
     "cancel": "İptal",
     "dnsPropagationHint": "DNS değişikliklerinin yayılması 5-30 dakika sürebilir. Doğrulamadan önce bekleyin.",
-    "sslActive": "SSL Aktif"
+    "sslActive": "SSL Aktif",
+    "adding": "Ekleniyor…",
+    "loadError": "Alan adlarınız yüklenemedi",
+    "retry": "Tekrar dene",
+    "noDomains": "Henüz alan adı yok",
+    "noDomainsDesc": "Webhook portalınızı beyaz etiketlemek için özel bir alan adı ekleyin."
   },
   "signatureVerifier": {
     "title": "🔐 İmza Doğrulayıcı",
