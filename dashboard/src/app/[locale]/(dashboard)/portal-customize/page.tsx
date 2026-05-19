@@ -12,7 +12,6 @@ import { EmbedCodePanel } from './components/EmbedCodePanel';
 
 export default function PortalCustomizationPage() {
   const t = useTranslations('portalCustomize');
-  const tc = useTranslations('common');
   const { toast } = useToast();
   const { data: configData, isLoading } = usePortalConfig();
   const { data: embedData } = usePortalEmbedCode();
