@@ -161,11 +161,13 @@ export function TeamDetail({
                     <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                       {m.name || m.email.split('@')[0]}
                     </p>
-                    {m.role === 'admin' && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-purple-500 dark:text-purple-400">
-                        {t('roleAdmin')}
-                      </span>
-                    )}
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                      m.role === 'admin' ? 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-500/15' :
+                      m.role === 'editor' ? 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/15' :
+                      'text-gray-500 bg-gray-100 dark:text-slate-400 dark:bg-slate-700'
+                    }`}>
+                      {ROLE_ICONS[m.role]} {roleLabel(t, m.role)}
+                    </span>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-slate-400 truncate">{m.email}</p>
                   {m.joined_at && (
@@ -176,7 +178,7 @@ export function TeamDetail({
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   <select
                     value={m.role}
                     onChange={(e) => onRoleChange(m.id, e.target.value)}
