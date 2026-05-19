@@ -173,8 +173,6 @@ export default function RateLimitingPage() {
         </div>
       )}
 
-      <div className="glass-card p-6">
-
       {/* Edit Modal */}
       {editTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
