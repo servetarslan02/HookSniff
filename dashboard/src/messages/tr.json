@@ -1354,7 +1354,8 @@
     "s15Title": "15. Geçerli Hukuk",
     "s15Text": "Bu Şartlar Türkiye yasalarına tabidir. Herhangi bir uyuşmazlık Türkiye mahkemelerinde çözülecektir.",
     "s16Title": "16. İletişim",
-    "s16Text": "Bu Şartlarla ilgili sorularınız için iletişime geçin:"
+    "s16Text": "Bu Şartlarla ilgili sorularınız için bizimle iletişime geçin:",
+    "contactForm": "iletişim formu"
   },
   "privacy": {
     "title": "Gizlilik Politikası",
@@ -1456,7 +1457,8 @@
     "s12Title": "12. Bu Politikadaki Değişiklikler",
     "s12Text": "Bu Gizlilik Politikasını zaman zaman güncelleyebiliriz. Önemli değişiklikleri e-posta veya panel bildirimi ile size bildiririz.",
     "s13Title": "13. Bize Ulaşın",
-    "s13Text": "Gizlilikle ilgili sorularınız için iletişim formundan bize ulaşın"
+    "s13Text": "Gizlilikle ilgili sorularınız için bizimle iletişime geçin:",
+    "contactForm": "iletişim formu"
   },
   "admin": {
     "above": "üstünde",

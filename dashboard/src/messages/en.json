@@ -1352,7 +1352,8 @@
     "s15Title": "15. Governing Law",
     "s15Text": "These Terms are governed by the laws of Turkey. Any disputes shall be resolved in the courts of Turkey.",
     "s16Title": "16. Contact",
-    "s16Text": "For questions about these Terms, contact:"
+    "s16Text": "For questions about these Terms, contact us via the",
+    "contactForm": "contact form"
   },
   "privacy": {
     "title": "Privacy Policy",
@@ -1454,7 +1455,8 @@
     "s12Title": "12. Changes to This Policy",
     "s12Text": "We may update this Privacy Policy from time to time. We will notify you of material changes via email or dashboard notification.",
     "s13Title": "13. Contact Us",
-    "s13Text": "For privacy-related inquiries, contact us via the contact form"
+    "s13Text": "For privacy-related inquiries, contact us via the",
+    "contactForm": "contact form"
   },
   "admin": {
     "above": "above",
