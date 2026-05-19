@@ -642,7 +642,11 @@ async fn get_me(Extension(customer): Extension<Customer>) -> Result<Json<Custome
 
 async fn update_profile(
     Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
+    Extension(email_provider): Extension<crate::email::EmailProvider>,
+    Extension(job_queue): Extension<Option<crate::jobs::job_queue::JobQueue>>,
+    headers: HeaderMap,
     Json(req): Json<UpdateProfileRequest>,
 ) -> Result<Json<CustomerResponse>, AppError> {
     if req.name.trim().is_empty() { return Err(AppError::BadRequest("Name cannot be empty".into())); }
@@ -672,7 +676,11 @@ async fn update_profile(
 
     tracing::info!("✅ Profile updated for customer {}", customer.id);
     if email_changed {
-        tracing::info!("📧 Email changed for customer {}: email verification reset", customer.id);
+        let lang = crate::email::Language::from_accept_language(
+            headers.get("accept-language").and_then(|v| v.to_str().ok()).unwrap_or("en")
+        );
+        send_verification_email_for_customer(&pool, &cfg, &email_provider, job_queue.as_ref(), customer.id, &req.email, lang).await;
+        tracing::info!("📧 Email changed for customer {}: verification email sent to {}", customer.id, &req.email);
     }
     Ok(Json(updated.to_response(None)))
 }
