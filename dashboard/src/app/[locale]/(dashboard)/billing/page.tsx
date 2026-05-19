@@ -22,10 +22,8 @@ export default function BillingPage() {
   const router = useRouter();
   const currentPlan = user?.plan || 'developer';
 
-  // React Query hooks for data fetching
   const { data: invoices, isLoading: loadingInvoices } = useBillingInvoices();
 
-  // UI state (kept as useState)
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState<string | null>(null);
   const [upgrading, setUpgrading] = useState(false);
@@ -33,7 +31,6 @@ export default function BillingPage() {
   const upgradeModalRef = useRef<HTMLDivElement>(null);
   const cancelModalRef = useRef<HTMLDivElement>(null);
 
-  // Escape key to close modals + focus trap
   useEffect(() => {
     if (!showUpgradeModal && !showCancelModal) return;
     const handler = (e: KeyboardEvent) => {
@@ -79,7 +76,6 @@ export default function BillingPage() {
     try {
       const result = await billingApiExtended.upgrade(token, showUpgradeModal, billingPeriod);
 
-      // Enterprise requires contact
       if (result.requires_contact) {
         const contactUrl = result.contact_url || '/contact';
         window.open(contactUrl, '_blank');
@@ -108,52 +104,51 @@ export default function BillingPage() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+    <div className="max-w-5xl space-y-10">
+      {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
-          {t('subtitle')}
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
-      {/* Subscription Details */}
-      <SubscriptionDetails onCancel={() => setShowCancelModal(true)} />
+      {/* 1. Subscription */}
+      <section>
+        <SectionLabel label={t('subscriptionDetails')} icon="💳" />
+        <SubscriptionDetails onCancel={() => setShowCancelModal(true)} />
+      </section>
 
-      {/* Overage Settings */}
-      <OverageSettings />
+      {/* 2. Overage */}
+      <section>
+        <SectionLabel label={t('overageSettings')} icon="📊" />
+        <OverageSettings />
+      </section>
 
-      {/* Plans */}
-      <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} />
+      {/* 3. Plans */}
+      <section>
+        <SectionLabel label={t('currentPlan')} icon="🚀" />
+        <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} />
+      </section>
 
-      {/* Invoice History */}
-      <InvoiceTable invoices={invoices ?? []} loading={loadingInvoices} />
+      {/* 4. Invoices */}
+      <section>
+        <SectionLabel label={t('invoiceHistory')} icon="📄" />
+        <InvoiceTable invoices={invoices ?? []} loading={loadingInvoices} />
+      </section>
 
-      {/* Upgrade Confirmation Modal */}
+      {/* Upgrade Modal */}
       {showUpgradeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" aria-hidden="true" onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }} />
           <div ref={upgradeModalRef} tabIndex={-1} className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 outline-hidden">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {t('upgradeTo', {
-                action: 'upgrade',
-                plan: showUpgradeModal
-              })}
+              {t('upgradeTo', { action: 'upgrade', plan: showUpgradeModal })}
             </h3>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-              {t('upgradeDesc')}
-            </p>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{t('upgradeDesc')}</p>
             <div className="flex gap-3 justify-end">
-              <button type="button"
-                onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }}
-                className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
-              >
+              <button type="button" onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
                 {tc('cancel')}
               </button>
-              <button type="button"
-                onClick={confirmUpgrade}
-                disabled={upgrading}
-                className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60"
-              >
+              <button type="button" onClick={confirmUpgrade} disabled={upgrading} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60">
                 {upgrading ? t('redirecting') : tc('confirm')}
               </button>
             </div>
@@ -161,33 +156,34 @@ export default function BillingPage() {
         </div>
       )}
 
-      {/* Cancel Subscription Modal */}
+      {/* Cancel Modal */}
       {showCancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" aria-hidden="true" onClick={() => { setShowCancelModal(false); setCancelling(false); }} />
           <div ref={cancelModalRef} tabIndex={-1} className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 outline-hidden">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('cancelTitle')}</h3>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-              {t('cancelDesc')}
-            </p>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">{t('cancelDesc')}</p>
             <div className="flex gap-3 justify-end">
-              <button type="button"
-                onClick={() => { setShowCancelModal(false); setCancelling(false); }}
-                className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition"
-              >
+              <button type="button" onClick={() => { setShowCancelModal(false); setCancelling(false); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
                 {t('keepPlan')}
               </button>
-              <button type="button"
-                onClick={handleCancel}
-                disabled={cancelling}
-                className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-60"
-              >
+              <button type="button" onClick={handleCancel} disabled={cancelling} className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-60">
                 {cancelling ? t('redirecting') : t('cancelSubscription')}
               </button>
             </div>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function SectionLabel({ label, icon }: { label: string; icon: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <span className="text-base">{icon}</span>
+      <h2 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{label}</h2>
+      <div className="flex-1 h-px bg-gray-200 dark:bg-slate-700 ml-2" />
     </div>
   );
 }
