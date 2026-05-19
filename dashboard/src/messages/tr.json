@@ -847,7 +847,8 @@
     "enterpriseContact": "Enterprise planı özel anlaşma gerektirir. İletişim açılıyor...",
     "savePercent": "%20 Tasarruf",
     "annual": "/yıl",
-    "monthly": "/ay"
+    "monthly": "/ay",
+    "unlimited": "Sınırsız"
   },
   "auth": {
     "login": "Giriş Yap",
