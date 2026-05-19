@@ -296,7 +296,7 @@ function TeamPageInner() {
       {showTransferModal && selectedTeam && (
         <TransferOwnershipModal
           members={members}
-          currentOwnerId={selectedTeam.owner_id}
+          currentOwnerId={selectedTeam.owner_id ?? ''}
           onTransfer={handleTransfer}
           onClose={() => setShowTransferModal(false)}
         />
