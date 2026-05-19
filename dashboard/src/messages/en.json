@@ -2939,7 +2939,12 @@
     "domainDeleted": "Domain removed",
     "failedToDelete": "Failed to delete domain",
     "delete": "Remove",
-    "pending": "Pending"
+    "pending": "Pending",
+    "invalidDomain": "Please enter a valid domain (e.g., hooks.example.com)",
+    "confirmDelete": "Confirm",
+    "cancel": "Cancel",
+    "dnsPropagationHint": "DNS changes can take 5–30 minutes to propagate. Wait before verifying.",
+    "sslActive": "SSL Active"
   },
   "signatureVerifier": {
     "title": "🔐 Signature Verifier",
