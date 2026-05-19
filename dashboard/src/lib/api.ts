@@ -802,6 +802,9 @@ export const teamsApi = {
 
   transferOwnership: (token: string, teamId: string, newOwnerId: string) =>
     apiFetch<{ transferred: boolean; new_owner_id: string; message: string }>(`/teams/${teamId}/transfer`, { method: 'POST', body: { new_owner_id: newOwnerId }, token }),
+
+  revokeInvite: (token: string, inviteId: string) =>
+    apiFetch<{ revoked: boolean }>(`/teams/invites/${inviteId}`, { method: 'DELETE', token }),
 };
 
 // Notification API
