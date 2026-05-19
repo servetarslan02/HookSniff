@@ -97,6 +97,7 @@ pub trait PaymentProviderImpl: Send + Sync {
         plan: &Plan,
         app_url: &str,
         yearly: bool,
+        discount_code: Option<&str>,
     ) -> Result<CheckoutResult, AppError>;
 
     /// Process a webhook event from the provider.

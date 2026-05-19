@@ -257,6 +257,7 @@ impl BillingService {
         plan: &Plan,
         provider_name: Option<&str>,
         yearly: bool,
+        discount_code: Option<&str>,
     ) -> Result<CheckoutOutcome, AppError> {
         let effective_provider = provider_name
             .unwrap_or(&customer.payment_provider);
@@ -276,7 +277,7 @@ impl BillingService {
                 let base_url = self.cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
 
                 let result = provider_impl
-                    .create_checkout(customer.id, &customer.email, plan, base_url, yearly)
+                    .create_checkout(customer.id, &customer.email, plan, base_url, yearly, discount_code)
                     .await?;
 
                 Ok(CheckoutOutcome {

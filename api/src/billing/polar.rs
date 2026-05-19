@@ -121,6 +121,9 @@ struct CreateCheckoutRequest {
     /// Checkout locale.
     #[serde(skip_serializing_if = "Option::is_none")]
     locale: Option<String>,
+    /// Discount code to apply.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    discount_code: Option<String>,
     /// Metadata for the checkout.
     #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<std::collections::HashMap<String, String>>,
@@ -293,6 +296,7 @@ impl PaymentProviderImpl for PolarProvider {
         plan: &Plan,
         app_url: &str,
         yearly: bool,
+        discount_code: Option<&str>,
     ) -> Result<CheckoutResult, AppError> {
         let product_id = self
             .config
@@ -309,6 +313,7 @@ impl PaymentProviderImpl for PolarProvider {
             customer_email: Some(customer_email.to_string()),
             success_url: Some(format!("{}/dashboard/billing?upgraded=true", app_url)),
             locale: Some("en".to_string()),
+            discount_code: discount_code.map(|s| s.to_string()),
             metadata: Some(metadata),
         };
 

@@ -782,6 +782,8 @@
     "pauseFailed": "Dondurma işlemi başarısız oldu.",
     "pausing": "Donduruluyor...",
     "confirmPause": "Dondur",
+    "couponCode": "Kupon Kodu (opsiyonel)",
+    "couponPlaceholder": "KODU GİRİN",
     "subscriptionPaused": "Abonelik donduruldu",
     "resumeBefore": "Geri dönmek için son tarih:",
     "resumeSubscription": "Devam Et",
