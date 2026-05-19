@@ -2718,7 +2718,9 @@
     "healthy": "Sağlıklı",
     "msAvg": "{ms}ms ort.",
     "noEndpoints": "Henüz endpoint yapılandırılmamış.",
-    "loading": "Yükleniyor..."
+    "loading": "Yükleniyor...",
+    "configure": "Yapılandır",
+    "createEndpoint": "Endpoint Oluştur"
   },
   "customDomain": {
     "title": "🌐 Özel Alan Adı",
@@ -2749,7 +2751,12 @@
     "step2Title": "DNS kayıtlarını ekleyin",
     "step2Desc": "DNS sağlayıcınıza eklemeniz için CNAME ve TXT kayıtları vereceğiz",
     "step3Title": "Doğrulayın ve canlıya alın",
-    "step3Desc": "Sahipliği doğruluyoruz ve otomatik olarak SSL sertifikası sağlıyoruz"
+    "step3Desc": "Sahipliği doğruluyoruz ve otomatik olarak SSL sertifikası sağlıyoruz",
+    "existingDomains": "Alan Adlarınız",
+    "domainDeleted": "Alan adı kaldırıldı",
+    "failedToDelete": "Alan adı silinemedi",
+    "delete": "Kaldır",
+    "pending": "Beklemede"
   },
   "signatureVerifier": {
     "title": "🔐 İmza Doğrulayıcı",
@@ -2861,7 +2868,8 @@
     "limitUpdated": "Hız limiti güncellendi",
     "limitDeleted": "Hız limiti silindi",
     "limitUpdateFailed": "Hız limiti güncellenemedi",
-    "limitDeleteFailed": "Hız limiti silinemedi"
+    "limitDeleteFailed": "Hız limiti silinemedi",
+    "addRateLimit": "Rate Limit Ekle"
   },
   "portal": {
     "title": "👤 Müşteri Portalı",
@@ -3243,7 +3251,9 @@
     "tip": "İpucu:",
     "tipContent": "Uç nokta başına tekrar politikaları bu genel politikaları geçersiz kılar",
     "endpointSettingsLink": "Endpoint Ayarları",
-    "noEndpoints": "Endpoint bulunamadı. Retry policy oluşturmak için önce bir endpoint oluşturun"
+    "noEndpoints": "Endpoint bulunamadı. Retry policy oluşturmak için önce bir endpoint oluşturun",
+    "configure": "Yapılandır",
+    "createEndpoint": "Endpoint Oluştur"
   },
   "inbound": {
     "title": "Gelen Webhooklar",

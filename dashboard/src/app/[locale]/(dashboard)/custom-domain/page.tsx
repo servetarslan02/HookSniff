@@ -15,6 +15,34 @@ export default function CustomDomainPage() {
   const [domainId, setDomainId] = useState<string | null>(null);
   const [status, setStatus] = useState<'none' | 'pending' | 'verified' | 'error'>('none');
   const [dnsRecords, setDnsRecords] = useState<{ type: string; name: string; value: string }[]>([]);
+  const [existingDomains, setExistingDomains] = useState<Array<{ id: string; domain: string; verified: boolean; created_at: string }>>([]);
+  const [loadingDomains, setLoadingDomains] = useState(true);
+
+  // Fetch existing domains on mount
+  useState(() => {
+    (async () => {
+      if (!token) return;
+      try {
+        const domains = await apiFetch<Array<{ id: string; domain: string; verified: boolean; created_at: string }>>('/custom-domains', { token });
+        setExistingDomains(domains);
+      } catch {
+        // Silent fail — domains list is not critical
+      } finally {
+        setLoadingDomains(false);
+      }
+    })();
+  });
+
+  const handleDeleteDomain = async (id: string) => {
+    if (!token) return;
+    try {
+      await apiFetch(`/custom-domains/${id}`, { method: 'DELETE', token });
+      setExistingDomains(prev => prev.filter(d => d.id !== id));
+      toast(t('domainDeleted') || 'Domain removed', 'success');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : t('failedToDelete') || 'Failed to delete', 'error');
+    }
+  };
 
   const handleAddDomain = async () => {
     if (!domain || !token) return;
@@ -146,6 +174,32 @@ export default function CustomDomainPage() {
                 ❌ {t('verificationFailedCheck')}
               </span>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Existing Domains */}
+      {!loadingDomains && existingDomains.length > 0 && (
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('existingDomains') || 'Your Domains'}</h2>
+          <div className="space-y-3">
+            {existingDomains.map((d) => (
+              <div key={d.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-slate-900">
+                <div className="flex items-center gap-3">
+                  <span className={`w-2 h-2 rounded-full ${d.verified ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                  <span className="font-mono text-sm text-gray-900 dark:text-white">{d.domain}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${d.verified ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400'}`}>
+                    {d.verified ? (t('verified') || 'Verified') : (t('pending') || 'Pending')}
+                  </span>
+                </div>
+                <button type="button"
+                  onClick={() => handleDeleteDomain(d.id)}
+                  className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                >
+                  {t('delete') || 'Remove'}
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}
