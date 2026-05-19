@@ -13,6 +13,7 @@ import { PrefetchLink } from '@/components/PrefetchLink';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
+import { LayoutDashboard, Smartphone, Link2, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield } from 'lucide-react';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -40,62 +41,17 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   const navItems = [
-    { name: t('core'), href: '/core', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-      </svg>
-    )},
-    { name: t('applications'), href: '/applications', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="6" width="20" height="12" rx="2" /><path d="M12 6V2M7 6V2M17 6V2" /><circle cx="12" cy="12" r="2" />
-      </svg>
-    )},
-    { name: t('deliveries'), href: '/deliveries', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" />
-      </svg>
-    )},
-    { name: t('webhookDashboard'), href: '/operational-webhooks', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
-      </svg>
-    )},
-    { name: t('integrations'), href: '/integrations', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-        <circle cx="12" cy="12" r="3" />
-      </svg>
-    )},
-    { name: t('observability'), href: '/observability', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" />
-      </svg>
-    )},
-    { name: t('devtools'), href: '/devtools', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /><line x1="14" y1="4" x2="10" y2="20" />
-      </svg>
-    )},
-    { name: t('routingConfig'), href: '/routing-config', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-      </svg>
-    )},
-    { name: t('organization'), href: '/organization', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" />
-      </svg>
-    )},
-    { name: t('billingSection'), href: '/billing-section', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="4" width="22" height="16" rx="2" /><line x1="1" y1="10" x2="23" y2="10" />
-      </svg>
-    )},
-    { name: t('account'), href: '/account', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
-      </svg>
-    )},
+    { name: t('core'), href: '/core', icon: <LayoutDashboard size={20} strokeWidth={1.75} /> },
+    { name: t('applications'), href: '/applications', icon: <Smartphone size={20} strokeWidth={1.75} /> },
+    { name: t('deliveries'), href: '/deliveries', icon: <Link2 size={20} strokeWidth={1.75} /> },
+    { name: t('webhookDashboard'), href: '/operational-webhooks', icon: <Layers size={20} strokeWidth={1.75} /> },
+    { name: t('integrations'), href: '/integrations', icon: <Zap size={20} strokeWidth={1.75} /> },
+    { name: t('observability'), href: '/observability', icon: <Eye size={20} strokeWidth={1.75} /> },
+    { name: t('devtools'), href: '/devtools', icon: <Code2 size={20} strokeWidth={1.75} /> },
+    { name: t('routingConfig'), href: '/routing-config', icon: <Settings size={20} strokeWidth={1.75} /> },
+    { name: t('organization'), href: '/organization', icon: <Users size={20} strokeWidth={1.75} /> },
+    { name: t('billingSection'), href: '/billing-section', icon: <CreditCard size={20} strokeWidth={1.75} /> },
+    { name: t('account'), href: '/account', icon: <UserCircle size={20} strokeWidth={1.75} /> },
   ];
 
   return (
@@ -140,7 +96,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               href="/admin"
               className="flex items-center px-3 py-2 mb-2 text-sm font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
             >
-              <span className="mr-3">⚡</span>
+              <span className="mr-3"><Shield size={20} strokeWidth={1.75} /></span>
               {t('adminPanel') || 'Admin Panel'}
             </Link>
           )}
