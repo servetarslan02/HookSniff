@@ -1131,6 +1131,12 @@ export const billingApiExtended = {
   requestRefund: (token: string, reason: string) =>
     apiFetch<RefundResponse>('/billing/refund', { method: 'POST', body: { reason }, token }),
 
+  pause: (token: string, days?: number) =>
+    apiFetch<{ message?: string; paused_until?: string; plan_preserved?: string; keeps_access_until_period_end?: boolean }>('/billing/pause', { method: 'POST', body: { days: days || 30 }, token }),
+
+  resume: (token: string) =>
+    apiFetch<{ message?: string; checkout_url?: string; plan?: string }>('/billing/resume', { method: 'POST', token }),
+
   getOverageSettings: (token?: string) =>
     apiFetch<OverageSettings>('/billing/settings', { token }),
 
