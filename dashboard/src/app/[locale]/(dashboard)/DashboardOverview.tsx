@@ -319,7 +319,7 @@ export function DashboardOverview() {
             </h4>
             <div className="space-y-2">
               <Link
-                href="/endpoints"
+                href="/applications"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 🔗 {t('manageEndpoints')}
@@ -337,7 +337,7 @@ export function DashboardOverview() {
                 🧪 {t('openPlayground')}
               </Link>
               <Link
-                href="/monitoring"
+                href="/observability"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 📈 {t('viewAnalytics')}
