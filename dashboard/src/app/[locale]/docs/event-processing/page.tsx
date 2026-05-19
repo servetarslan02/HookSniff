@@ -81,8 +81,8 @@ export default async function EventProcessingPage() {
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li>İmza: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">v1,{'{'}base64(hmac_sha256(secret, body)){'}'}</code></li>
-          <li>Zaman damgası: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Timestamp</code> (Unix saniye)</li>
-          <li>Teslimat ID: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">X-HookSniff-Delivery-Id</code></li>
+          <li>Zaman damgası: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">webhook-timestamp</code> (Unix saniye)</li>
+          <li>Teslimat ID: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">webhook-id</code></li>
         </ul>
       </section>
 
