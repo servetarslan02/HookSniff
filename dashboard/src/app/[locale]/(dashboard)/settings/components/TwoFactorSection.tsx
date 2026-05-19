@@ -114,19 +114,22 @@ export function TwoFactorSection() {
 
   return (
     <>
-      <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">🔐 {t('twoFactorAuth')}</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">
-          {t('twoFactorDesc')}
-        </p>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
+            <span className="text-base">🔐</span>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('twoFactorAuth')}</h3>
+            <p className="text-xs text-gray-500 dark:text-slate-400">{t('twoFactorDesc')}</p>
+          </div>
+        </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-slate-900 rounded-xl">
           <div className="flex items-center gap-3">
-            <span className={`w-3 h-3 rounded-full ${enabled ? 'bg-emerald-500' : 'bg-gray-400 dark:bg-slate-600'}`} />
+            <span className={`w-2.5 h-2.5 rounded-full ${enabled ? 'bg-emerald-500' : 'bg-gray-400 dark:bg-slate-600'}`} />
             <span className="text-sm font-medium text-gray-900 dark:text-white">
-              {enabled
-                ? t('2faEnabled')
-                : t('2faDisabled')}
+              {enabled ? t('2faEnabled') : t('2faDisabled')}
             </span>
           </div>
 
