@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { CheckCircle2, Clock, RefreshCw, XCircle } from 'lucide-react';
+import { Ban, CheckCircle2, Clock, RefreshCw, XCircle } from 'lucide-react';
 
 const statusColors: Record<string, React.ReactNode> = {
   pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400',
@@ -22,7 +22,7 @@ const statusIcons: Record<string, React.ReactNode> = {
   running: <RefreshCw size={16} strokeWidth={1.75} />,
   completed: <CheckCircle2 size={16} strokeWidth={1.75} />,
   failed: <XCircle size={16} strokeWidth={1.75} />,
-  cancelled: '🚫',
+  cancelled: <Ban size={14} className="text-gray-500" />,
 };
 
 function formatDate(s: string | null) {

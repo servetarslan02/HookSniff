@@ -10,7 +10,7 @@ import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { LazySection, Skeletons } from '@/components/LazySection';
-import { CheckCircle2, ClipboardList, Key, Link2, Pause } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ClipboardList, Key, Link2, Pause } from 'lucide-react';
 
 /* ─── Application Detail — endpoint yönetimi ile birlikte ─── */
 
@@ -128,7 +128,7 @@ export default function ApplicationDetailPage() {
   if (!app) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="text-5xl mb-4">😕</div>
+        <div className="flex justify-center mb-4 text-gray-400"><AlertCircle size={48} strokeWidth={1.5} /></div>
         <p className="text-lg font-medium text-gray-900 dark:text-white mb-1">
           {t('notFound') || 'Application not found'}
         </p>

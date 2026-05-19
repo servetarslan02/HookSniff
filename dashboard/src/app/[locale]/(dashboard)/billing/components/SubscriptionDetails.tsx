@@ -12,17 +12,17 @@ import { AlertTriangle, CreditCard, DollarSign } from 'lucide-react';
 
 const PROVIDER_LABELS: Record<string, { name: string; icon: string }> = {
   stripe: { name: 'Stripe', icon: <CreditCard size={16} strokeWidth={1.75} /> },
-  polar: { name: 'Polar.sh', icon: '🔷' },
-  iyzico: { name: 'iyzico', icon: '🟡' },
+  polar: { name: 'Polar.sh', icon: <DollarSign size={16} strokeWidth={1.75} /> },
+  iyzico: { name: 'iyzico', icon: <CreditCard size={16} strokeWidth={1.75} /> },
 };
 
 function getCardIcon(brand?: string | null): string {
   switch (brand?.toLowerCase()) {
-    case 'visa': return '💳';
-    case 'mastercard': return '💳';
-    case 'amex': return '💳';
-    case 'discover': return '💳';
-    default: return '💳';
+    case 'visa': return <CreditCard size={16} strokeWidth={1.75} />;
+    case 'mastercard': return <CreditCard size={16} strokeWidth={1.75} />;
+    case 'amex': return <CreditCard size={16} strokeWidth={1.75} />;
+    case 'discover': return <CreditCard size={16} strokeWidth={1.75} />;
+    default: return <CreditCard size={16} strokeWidth={1.75} />;
   }
 }
 

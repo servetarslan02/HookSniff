@@ -47,7 +47,7 @@ import { CommunicationsTab } from './components/CommunicationsTab';
 import { BillingTab } from './components/BillingTab';
 import { UserModals } from './components/UserModals';
 import type { TabKey } from './components/types';
-import { BarChart3, DollarSign, Eye, FileText, Key, Link2, Mail, MessageSquare, Package, Smartphone, TrendingUp } from 'lucide-react';
+import { AlertCircle, BarChart3, ClipboardList, DollarSign, Eye, FileText, Key, Link2, Mail, MessageSquare, Notebook, Package, Pencil, Smartphone, TrendingUp } from 'lucide-react';
 
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -329,7 +329,7 @@ export default function AdminUserDetailPage() {
   if (!detail) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">😕</div>
+        <div className="flex justify-center mb-4 text-gray-400"><AlertCircle size={56} strokeWidth={1.5} /></div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("userNotFound")}</h2>
         <button type="button"
           onClick={() => router.push('/admin/users')}
@@ -385,26 +385,26 @@ export default function AdminUserDetailPage() {
       {/* Tab Navigation */}
       <div className="flex flex-wrap gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl">
         {([
-          { key: 'overview', label: '📊 ' + (t('overview') || 'Overview') },
-          { key: 'endpoints', label: '🔗 ' + (t('endpoints') || 'Endpoints') },
-          { key: 'webhooks', label: '📦 ' + (t('webhooks') || 'Webhooks') },
-          { key: 'apikeys', label: '🔑 ' + (t('apiKeys') || 'API Keys') },
-          { key: 'applications', label: '📱 ' + (t('applications') || 'Applications') },
-          { key: 'usage', label: '📈 ' + (t('usage') || 'Usage') },
-          { key: 'notes', label: '📝 ' + (t('notes') || 'Notes & Tags') },
-          { key: 'communications', label: '💬 ' + (t('communications') || 'Communications') },
-          { key: 'billing', label: '💰 ' + (t('billing') || 'Billing') },
-        ] as { key: TabKey; label: string }[]).map((tab) => (
+          { key: 'overview', label: t('overview') || 'Overview', icon: <BarChart3 size={14} strokeWidth={1.75} /> },
+          { key: 'endpoints', label: t('endpoints') || 'Endpoints', icon: <Link2 size={14} strokeWidth={1.75} /> },
+          { key: 'webhooks', label: t('webhooks') || 'Webhooks', icon: <Package size={14} strokeWidth={1.75} /> },
+          { key: 'apikeys', label: t('apiKeys') || 'API Keys', icon: <Key size={14} strokeWidth={1.75} /> },
+          { key: 'applications', label: t('applications') || 'Applications', icon: <Smartphone size={14} strokeWidth={1.75} /> },
+          { key: 'usage', label: t('usage') || 'Usage', icon: <TrendingUp size={14} strokeWidth={1.75} /> },
+          { key: 'notes', label: t('notes') || 'Notes & Tags', icon: <Notebook size={14} strokeWidth={1.75} /> },
+          { key: 'communications', label: t('communications') || 'Communications', icon: <MessageSquare size={14} strokeWidth={1.75} /> },
+          { key: 'billing', label: t('billing') || 'Billing', icon: <DollarSign size={14} strokeWidth={1.75} /> },
+        ] as { key: TabKey; label: string; icon?: React.ReactNode }[]).map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition ${
               activeTab === tab.key
                 ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
                 : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
-            {tab.label}
+            {tab.icon}{tab.label}
           </button>
         ))}
       </div>

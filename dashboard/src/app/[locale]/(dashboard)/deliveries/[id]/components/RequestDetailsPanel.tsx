@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { DeliveryDetail } from '@/lib/api';
+import { ArrowUpFromLine } from 'lucide-react';
 
 function formatHeaders(headers: Record<string, string>): string {
   return Object.entries(headers)
@@ -54,7 +55,7 @@ export function RequestDetailsPanel({
   return (
     <div className="glass-card p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-        <span>📤</span> {t('requestDetails')}
+        <span className="text-gray-500"><ArrowUpFromLine size={18} strokeWidth={1.75} /></span> {t('requestDetails')}
       </h3>
 
       {/* Request Headers */}

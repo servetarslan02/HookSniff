@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { getErrorMessage } from '@/lib/errors';
-import { Lock, Check } from 'lucide-react';
+import { Lock, Check, Mail } from 'lucide-react';
 
 interface User {
   name?: string | null;
@@ -254,7 +254,7 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
           ) : emailChangeStep === 'code-sent' ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2 p-3 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
-                <span className="text-base">📧</span>
+                <span className="text-base text-gray-500"><Mail size={16} strokeWidth={1.75} /></span>
                 <span className="text-sm text-blue-700 dark:text-blue-400">
                   {t('codeSentTo') || 'Code sent to'} <strong>{profileEmail}</strong>
                   {emailChangeTimer > 0 && <span className="ml-2 text-xs opacity-70">({formatTimer(emailChangeTimer)})</span>}
@@ -325,7 +325,7 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
               )}
               {emailChanged && emailValid && (
                 <p className="text-xs text-amber-600 dark:text-amber-400">
-                  🔒 {t('emailChangeNotice') || 'A verification code will be sent to the new email address.'}
+                  <Lock size={14} className="inline mr-1 -mt-0.5 text-gray-500" /> {t('emailChangeNotice') || 'A verification code will be sent to the new email address.'}
                 </p>
               )}
             </div>

@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { CreditCard, FileText, Gamepad2, GitBranch, MessageSquare, Pencil, Phone, Plug, ShoppingBag, Trash2, TriangleRight } from 'lucide-react';
+import { CreditCard, FileText, Gamepad2, GitBranch, Link2, MessageSquare, Pencil, Phone, Plug, ShoppingBag, Trash2, TriangleRight } from 'lucide-react';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
@@ -126,7 +126,7 @@ export default function ConnectorsPage() {
             {connectors.map(c => (
               <div key={c.id} className="glass-card p-4">
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl">{PROVIDER_ICONS[c.name] || '🔌'}</span>
+                  <span className="text-2xl">{PROVIDER_ICONS[c.name] || <Plug size={20} strokeWidth={1.75} />}</span>
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{c.display_name}</h3>
                     <span className="text-xs text-gray-500 dark:text-slate-400 font-mono">{c.name}</span>
@@ -162,7 +162,7 @@ export default function ConnectorsPage() {
                 <select value={selectedConnector} onChange={e => setSelectedConnector(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm">
                   <option value="">{t('selectConnector')}</option>
-                  {connectors.map(c => <option key={c.id} value={c.id}>{PROVIDER_ICONS[c.name] || '🔌'} {c.display_name}</option>)}
+                  {connectors.map(c => <option key={c.id} value={c.id}>{c.display_name}</option>)}
                 </select>
               </div>
               <div>
@@ -209,7 +209,7 @@ export default function ConnectorsPage() {
                 <div key={cfg.id} className={`glass-card p-5 transition ${selectedId === cfg.id ? 'ring-2 ring-brand-500' : ''} ${isEditing ? 'ring-2 ring-brand-500' : ''}`}>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">{PROVIDER_ICONS[cfg.connector_name] || '🔌'}</span>
+                      <span className="text-xl">{PROVIDER_ICONS[cfg.connector_name] || <Plug size={16} strokeWidth={1.75} />}</span>
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{cfg.name}</h3>
                         <span className="text-xs text-gray-500 dark:text-slate-400">{cfg.connector_display_name}</span>

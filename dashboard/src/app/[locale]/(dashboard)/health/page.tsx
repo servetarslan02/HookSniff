@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useEndpointHealth } from '@/hooks/useDashboardData';
-import { AlertTriangle } from 'lucide-react';
+import { Activity, AlertTriangle } from 'lucide-react';
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: string }> = {
   healthy: { color: 'text-green-700 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/20', labelKey: 'healthy' },
@@ -80,7 +80,7 @@ export default function EndpointHealthPage() {
           </div>
         ) : endpoints.length === 0 ? (
           <div className="p-12 text-center">
-            <div className="text-5xl mb-4">💓</div>
+            <div className="flex justify-center mb-4 text-green-500"><Activity size={48} strokeWidth={1.5} /></div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noEndpoints')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400">{t('noEndpointsDesc')}</p>
           </div>

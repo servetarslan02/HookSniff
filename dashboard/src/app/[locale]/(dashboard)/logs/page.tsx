@@ -9,7 +9,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
 import { useDeliveryLogs } from '@/hooks/useDashboardData';
 import { LazySection, Skeletons } from '@/components/LazySection';
-import { AlertTriangle, Check, CheckCircle2, ClipboardList, Clock, X, XCircle } from 'lucide-react';
+import { AlertTriangle, Check, CheckCircle2, ClipboardList, Clock, Inbox, X, XCircle } from 'lucide-react';
 
 type StatusFilter = 'all' | 'delivered' | 'failed' | 'pending';
 
@@ -168,7 +168,7 @@ export default function LogsPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center">
-            <div className="text-4xl mb-3">📭</div>
+            <div className="flex justify-center mb-3 text-gray-400"><Inbox size={36} strokeWidth={1.5} /></div>
             <p className="text-gray-500 dark:text-slate-500">
               {search ? t('noLogsSearch') : t('noLogs')}
             </p>

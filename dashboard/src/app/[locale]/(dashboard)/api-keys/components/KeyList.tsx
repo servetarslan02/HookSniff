@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { RefreshCw, ShieldCheck } from 'lucide-react';
+import { RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
 
 interface ApiKey {
   id: string;
@@ -94,7 +94,7 @@ export function KeyList({
                   disabled={actionLoading === key.id}
                   className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 dark:hover:bg-red-500 border border-red-300 dark:border-red-500/30 rounded-lg transition disabled:opacity-50"
                 >
-                  🗑 {tc('delete')}
+                  <Trash2 size={14} className="inline mr-1 -mt-0.5" /> {tc('delete')}
                 </button>
               </div>
             </div>
