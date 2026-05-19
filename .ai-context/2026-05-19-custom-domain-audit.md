@@ -138,3 +138,38 @@ Notifications sayfası detaylı incelendi. 7 sorun tespit edildi, hepsi düzelti
 - Build: ✅
 
 ## Commit: `14be5d42`
+
+---
+
+# 2026-05-19 — Bildirim Sistemi Düzeltmeleri
+
+## Yapılan İşler
+Bildirim sistemi trace edildi. 3 kritik sorun tespit edildi, hepsi düzeltildi.
+
+## Sorunlar ve Düzeltmeler
+
+### 1. Webhook Başarısızlık Bildirimi Oluşturulmuyordu 🔴
+- Worker'da `dead_letter_delivery` çağrısından sonra in-app notification oluşturulmuyordu
+- `notify_delivery_failed()` fonksiyonu vardı ama çağrılmıyordu
+- **Düzeltme:** `create_delivery_failure_notification()` fonksiyonu eklendi, her dead letter'da çağrılıyor
+- Tip: `webhook_failed`, link: `/deliveries/{id}`
+
+### 2. "View all notifications" Linki Yanlış 🟡
+- NotificationCenter'daki link `/team-mgmt`'e gidiyordu
+- **Düzeltme:** `/notifications` sayfasına yönlendiriyor
+
+### 3. Invite Token Extraction Yanlış 🟡
+- `invite=` arıyordu ama backend `invite_token=` gönderiyordu
+- **Düzeltme:** Regex düzeltildi
+
+### 4. Eksik i18n Key'leri 🟢
+- `nav` namespace'inde 6 key eksikti
+- **Düzeltme:** EN + TR eklendi
+
+## Değişilen Dosyalar
+- `worker/src/main.rs` — `create_delivery_failure_notification()` + 2 çağrı noktası
+- `dashboard/src/components/NotificationCenter.tsx` — Link + regex fix
+- `dashboard/src/messages/en.json` — 6 nav key
+- `dashboard/src/messages/tr.json` — 6 nav key
+
+## Commit: `498e0e87`
