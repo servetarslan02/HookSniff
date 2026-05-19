@@ -1083,8 +1083,14 @@ export const transformsApi = {
   create: (token: string, endpointId: string, data: { rule: TransformRule['rule_json'] }) =>
     apiFetch<TransformRule>(`/endpoints/${endpointId}/transforms`, { method: 'POST', body: data, token }),
 
+  update: (token: string, endpointId: string, ruleId: string, data: { rule: TransformRule['rule_json'] }) =>
+    apiFetch<TransformRule>(`/endpoints/${endpointId}/transforms/${ruleId}`, { method: 'PUT', body: data, token }),
+
   delete: (token: string, endpointId: string, ruleId: string) =>
     apiFetch<{ success: boolean }>(`/endpoints/${endpointId}/transforms/${ruleId}`, { method: 'DELETE', token }),
+
+  test: (token: string, endpointId: string, data: { payload: unknown; config: TransformRule['rule_json'] }) =>
+    apiFetch<Record<string, unknown>>(`/endpoints/${endpointId}/transforms/test`, { method: 'POST', body: data, token }),
 };
 
 // Billing usage types

@@ -532,6 +532,26 @@ export function useDeleteTransformRule() {
   });
 }
 
+export function useUpdateTransformRule() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ endpointId, ruleId, rule }: { endpointId: string; ruleId: string; rule: TransformRuleValidated['rule_json'] }) =>
+      transformsApi.update(token!, endpointId, ruleId, { rule }),
+    onSettled: (_data, _error, { endpointId }) => {
+      queryClient.invalidateQueries({ queryKey: ['transforms', endpointId] });
+    },
+  });
+}
+
+export function useTestTransform() {
+  const { token } = useAuth();
+  return useMutation({
+    mutationFn: ({ endpointId, payload, config }: { endpointId: string; payload: unknown; config: TransformRuleValidated['rule_json'] }) =>
+      transformsApi.test(token!, endpointId, { payload, config }),
+  });
+}
+
 // ── Inbound Configs ──
 export function useInboundConfigs() {
   const { token } = useAuth();
