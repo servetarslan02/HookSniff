@@ -99,3 +99,42 @@ Environments sayfası detaylı incelendi. Backend'de tam CRUD + variable yöneti
 - Build: ✅
 
 ## Commit: `ed7d7715`
+
+---
+
+# 2026-05-19 — Bildirimler Sayfası Denetim
+
+## Yapılan İşler
+Notifications sayfası detaylı incelendi. 7 sorun tespit edildi, hepsi düzeltildi.
+
+## Tespit Edilen ve Düzeltilen Sorunlar
+
+### 🔴 Kritik (1)
+1. **API hatası durumu yoktu** → Fail'de "Bildirim bulunamadı" gösteriyordu (yanıltıcı). Error state + retry butonu eklendi.
+
+### 🟡 Orta (3)
+2. **`handleMarkAsRead` hata yönetimi yoktu** → Artık toast gösteriyor
+3. **Loading skeleton yoktu** → 5 satır skeleton eklendi
+4. **`unread_count` type'da eksikti** → `NotificationListResponse`'a eklendi
+
+### 🟢 Düşük (3)
+5. **Type badge `_` → ` ` sadece ilkini değiştiriyordu** → `formatType()` fonksiyonu: "Webhook Failed"
+6. **"Tümünü okundu işaretle" boş listede görünüyordu** → Artık sadece unread > 0'da gösteriliyor
+7. **Relative time yoktu** → "5m ago", "1h ago", "1d ago" gösterimi eklendi
+
+## Ek Düzeltmeler (Build)
+- `api-importer/SpecInputPanel.tsx`: Kullanılmayan `sampleYaml` kaldırıldı
+- `api-importer/parser.ts`: Null type düzeltmesi
+
+## Değişilen Dosyalar
+- `dashboard/.../notifications/page.tsx` — Yeniden yazım
+- `dashboard/src/lib/api-types.ts` — `unread_count` eklendi
+- `dashboard/src/__tests__/notifications-page.test.tsx` — 18 test
+- `dashboard/.../api-importer/SpecInputPanel.tsx` — Unused var
+- `dashboard/.../api-importer/parser.ts` — Type fix
+
+## Test Sonuçları
+- Vitest: 18/18 ✅
+- Build: ✅
+
+## Commit: `14be5d42`
