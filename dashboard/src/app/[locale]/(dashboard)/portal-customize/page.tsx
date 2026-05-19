@@ -12,6 +12,7 @@ import { EmbedCodePanel } from './components/EmbedCodePanel';
 
 export default function PortalCustomizationPage() {
   const t = useTranslations('portalCustomize');
+  const tc = useTranslations('common');
   const { toast } = useToast();
   const { data: configData, isLoading } = usePortalConfig();
   const { data: embedData } = usePortalEmbedCode();
@@ -20,7 +21,6 @@ export default function PortalCustomizationPage() {
   const [config, setConfig] = useState<PortalConfig>(DEFAULT_CONFIG);
   const [newEvent, setNewEvent] = useState('');
 
-  // Sync fetched data into local state
   useEffect(() => {
     if (configData) {
       setConfig({
@@ -60,28 +60,27 @@ export default function PortalCustomizationPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="glass-card p-6 animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/3 mb-4" />
-          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2" />
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 animate-pulse">
+          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-4" />
+          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-6xl space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-          <p className="text-gray-500 dark:text-slate-400 mt-1">
-            {t('subtitle')}
-          </p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
-        <button type="button"
+        <button
+          type="button"
           onClick={handleSave}
           disabled={updateConfig.isPending}
-          className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
+          className="px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50 shadow-sm"
         >
           {updateConfig.isPending ? t('saving') : t('saveChanges')}
         </button>
@@ -89,58 +88,71 @@ export default function PortalCustomizationPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Config Panel */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Branding */}
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('branding')}</h2>
-            <div className="space-y-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-9 h-9 rounded-xl bg-pink-50 dark:bg-pink-500/10 flex items-center justify-center">
+                <span className="text-base">🎨</span>
+              </div>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('branding')}</h2>
+            </div>
+            <div className="space-y-3.5">
               <div>
-                <label htmlFor="portal-company-name" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('companyName')}</label>
+                <label htmlFor="portal-company-name" className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
+                  {t('companyName')}
+                </label>
                 <input
                   id="portal-company-name"
                   type="text"
                   value={config.company_name}
                   onChange={(e) => setConfig({ ...config, company_name: e.target.value })}
                   placeholder={t('companyNamePlaceholder')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                 />
               </div>
               <div>
-                <label htmlFor="portal-logo-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('logoUrl')}</label>
+                <label htmlFor="portal-logo-url" className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
+                  {t('logoUrl')}
+                </label>
                 <input
                   id="portal-logo-url"
                   type="url"
                   value={config.logo_url}
                   onChange={(e) => setConfig({ ...config, logo_url: e.target.value })}
                   placeholder={t('logoUrlPlaceholder')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                 />
               </div>
               <div>
-                <label htmlFor="portal-primary-color" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('primaryColor')}</label>
+                <label htmlFor="portal-primary-color" className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
+                  {t('primaryColor')}
+                </label>
                 <div className="flex items-center gap-3">
                   <input
                     id="portal-primary-color"
                     type="color"
                     value={config.primary_color}
                     onChange={(e) => setConfig({ ...config, primary_color: e.target.value })}
-                    className="w-12 h-12 rounded-xl cursor-pointer border border-gray-300 dark:border-slate-600"
+                    className="w-10 h-10 rounded-lg cursor-pointer border border-gray-200 dark:border-slate-600"
                   />
                   <input
                     type="text"
                     value={config.primary_color}
                     onChange={(e) => setConfig({ ...config, primary_color: e.target.value })}
-                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                    className="flex-1 px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                   />
                 </div>
               </div>
               <div>
-                <label htmlFor="portal-font-family" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('fontFamily')}</label>
+                <label htmlFor="portal-font-family" className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">
+                  {t('fontFamily')}
+                </label>
                 <select
                   id="portal-font-family"
                   value={config.font_family}
                   onChange={(e) => setConfig({ ...config, font_family: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                 >
                   {FONT_OPTIONS.map((font) => (
                     <option key={font} value={font}>{font}</option>
@@ -151,69 +163,46 @@ export default function PortalCustomizationPage() {
           </div>
 
           {/* Features */}
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('features')}</h2>
-            <div className="space-y-4">
-              <label className="flex items-center justify-between cursor-pointer">
-                <div>
-                  <div className="font-medium text-gray-900 dark:text-white text-sm">{t('darkMode')}</div>
-                  <div className="text-xs text-gray-500 dark:text-slate-400">{t('darkModeDesc')}</div>
-                </div>
-                <div className={`w-11 h-6 rounded-full transition-colors ${config.dark_mode ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
-                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${config.dark_mode ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
-                  <input
-                    role="switch"
-                    aria-checked={config.dark_mode}
-                    type="checkbox"
-                    checked={config.dark_mode}
-                    onChange={(e) => setConfig({ ...config, dark_mode: e.target.checked })}
-                    className="sr-only"
-                  />
-                </div>
-              </label>
-              <label className="flex items-center justify-between cursor-pointer">
-                <div>
-                  <div className="font-medium text-gray-900 dark:text-white text-sm">{t('showEvents')}</div>
-                  <div className="text-xs text-gray-500 dark:text-slate-400">{t('showEventsDesc')}</div>
-                </div>
-                <div className={`w-11 h-6 rounded-full transition-colors ${config.show_events ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
-                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${config.show_events ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
-                  <input
-                    role="switch"
-                    aria-checked={config.show_events}
-                    type="checkbox"
-                    checked={config.show_events}
-                    onChange={(e) => setConfig({ ...config, show_events: e.target.checked })}
-                    className="sr-only"
-                  />
-                </div>
-              </label>
-              <label className="flex items-center justify-between cursor-pointer">
-                <div>
-                  <div className="font-medium text-gray-900 dark:text-white text-sm">{t('showDeliveries')}</div>
-                  <div className="text-xs text-gray-500 dark:text-slate-400">{t('showDeliveriesDesc')}</div>
-                </div>
-                <div className={`w-11 h-6 rounded-full transition-colors ${config.show_deliveries ? 'bg-brand-600' : 'bg-gray-300 dark:bg-slate-600'} relative`}>
-                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${config.show_deliveries ? 'translate-x-5' : 'translate-x-0.5'} absolute top-0.5`} />
-                  <input
-                    role="switch"
-                    aria-checked={config.show_deliveries}
-                    type="checkbox"
-                    checked={config.show_deliveries}
-                    onChange={(e) => setConfig({ ...config, show_deliveries: e.target.checked })}
-                    className="sr-only"
-                  />
-                </div>
-              </label>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
+                <span className="text-base">⚡</span>
+              </div>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('features')}</h2>
+            </div>
+            <div className="divide-y divide-gray-100 dark:divide-slate-700/50">
+              <ToggleItem
+                label={t('darkMode')}
+                description={t('darkModeDesc')}
+                checked={config.dark_mode}
+                onChange={(v) => setConfig({ ...config, dark_mode: v })}
+              />
+              <ToggleItem
+                label={t('showEvents')}
+                description={t('showEventsDesc')}
+                checked={config.show_events}
+                onChange={(v) => setConfig({ ...config, show_events: v })}
+              />
+              <ToggleItem
+                label={t('showDeliveries')}
+                description={t('showDeliveriesDesc')}
+                checked={config.show_deliveries}
+                onChange={(v) => setConfig({ ...config, show_deliveries: v })}
+              />
             </div>
           </div>
 
           {/* Allowed Events */}
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('allowedEvents')}</h2>
-            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              {t('allowedEventsDesc')}
-            </p>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
+                <span className="text-base">📋</span>
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('allowedEvents')}</h2>
+                <p className="text-xs text-gray-500 dark:text-slate-400">{t('allowedEventsDesc')}</p>
+              </div>
+            </div>
             <div className="flex gap-2 mb-3">
               <input
                 type="text"
@@ -221,9 +210,10 @@ export default function PortalCustomizationPage() {
                 onChange={(e) => setNewEvent(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addEvent()}
                 placeholder="order.created"
-                className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                className="flex-1 px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white font-mono placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
               />
-              <button type="button"
+              <button
+                type="button"
                 onClick={addEvent}
                 className="px-4 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
               >
@@ -234,27 +224,28 @@ export default function PortalCustomizationPage() {
               {config.allowed_events.map((event) => (
                 <span
                   key={event}
-                  className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 rounded-full text-sm font-mono"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-lg text-xs font-mono"
                 >
                   {event}
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => removeEvent(event)}
                     aria-label={`Remove ${event} event`}
-                    className="text-gray-500 hover:text-red-500 transition ml-1"
+                    className="text-gray-400 hover:text-red-500 transition ml-1"
                   >
                     ✕
                   </button>
                 </span>
               ))}
               {config.allowed_events.length === 0 && (
-                <span className="text-sm text-gray-500 dark:text-slate-500">{t('allEventsAllowed')}</span>
+                <span className="text-xs text-gray-400 dark:text-slate-500">{t('allEventsAllowed')}</span>
               )}
             </div>
           </div>
         </div>
 
         {/* Preview Panel */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           <PortalPreview config={config} />
           <EmbedCodePanel
             config={config}
@@ -264,5 +255,25 @@ export default function PortalCustomizationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function ToggleItem({ label, description, checked, onChange }: { label: string; description: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="flex items-center justify-between cursor-pointer py-3.5">
+      <div>
+        <div className="text-sm font-medium text-gray-900 dark:text-white">{label}</div>
+        <div className="text-xs text-gray-500 dark:text-slate-400">{description}</div>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${checked ? 'bg-brand-600 dark:bg-brand-500' : 'bg-gray-300 dark:bg-slate-600'}`}
+      >
+        <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform duration-200 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
+      </button>
+    </label>
   );
 }
