@@ -204,6 +204,7 @@ export interface Notification {
 export interface NotificationListResponse {
   notifications: Notification[];
   total: number;
+  unread_count: number;
   page: number;
   per_page: number;
 }
