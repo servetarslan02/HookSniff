@@ -6,112 +6,99 @@ sidebar_position: 11
 
 ## Installation
 
-### Swift Package Manager
-
 Add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/servetarslan02/hooksniff-swift.git", from: "0.3.0")
+    .package(url: "https://github.com/servetarslan02/hooksniff-swift", from: "1.2.0"),
 ]
 ```
 
-### CocoaPods
+Then add to your target:
 
-```ruby
-pod 'HookSniffSDK', '~> 0.3.0'
+```swift
+.product(name: "HookSniff", package: "hooksniff-swift")
 ```
 
 ## Setup
 
 ```swift
-import HookSniffSDK
+import HookSniff
 
-// Initialize client
-let client = HookSniffClient(apiKey: "hr_live_your_api_key")
-
-// Or with options
-let client = HookSniffClient(
-    apiKey: "hr_live_your_api_key",
-    baseUrl: "https://hooksniff-api-1046140057667.europe-west1.run.app",
-    timeout: 30
-)
+let hs = HookSniff(apiKey: ProcessInfo.processInfo.environment["HOOKSNIFF_API_KEY"] ?? "")
 ```
 
-## Endpoints
+## Create an Endpoint
 
 ```swift
-// List all endpoints
-let endpoints = try await client.endpoints.list()
-
-// Create an endpoint
-let endpoint = try await client.endpoints.create(
-    url: "https://example.com/webhook",
-    description: "My webhook endpoint",
-    rateLimit: 100
+let endpoint = try await hs.endpoints.create(
+    url: "https://myapp.com/webhook",
+    description: "Order notifications",
+    eventTypes: ["order.created", "order.updated"]
 )
 
-// Get a specific endpoint
-let details = try await client.endpoints.get(id: endpoint.id)
-
-// Update an endpoint
-let updated = try await client.endpoints.update(
-    id: endpoint.id,
-    url: "https://new-url.com/webhook"
-)
-
-// Delete an endpoint
-try await client.endpoints.delete(id: endpoint.id)
-
-// Rotate signing secret
-let key = try await client.endpoints.rotateSecret(id: endpoint.id)
+print("Endpoint ID: \(endpoint.id)")
+print("Signing secret: \(endpoint.secret ?? "")")
 ```
 
-## Webhooks
+## Send a Webhook
 
 ```swift
-// Send a webhook
-let delivery = try await client.webhooks.send(
+let delivery = try await hs.webhooks.send(
     endpointId: endpoint.id,
-    eventType: "order.created",
-    data: ["order_id": "12345", "amount": 99.99]
-)
-
-// List deliveries
-let deliveries = try await client.webhooks.list(status: "delivered", page: 1)
-
-// Replay a delivery
-try await client.webhooks.replay(id: delivery.id)
-
-// Batch send
-let batch = try await client.webhooks.batch(
-    endpointId: endpoint.id,
-    events: [
-        WebhookEvent(eventType: "order.created", data: ["order_id": "1"]),
-        WebhookEvent(eventType: "order.created", data: ["order_id": "2"])
+    event: "order.created",
+    data: [
+        "order_id": "ORD-12345",
+        "amount": 99.99,
+        "currency": "USD"
     ]
 )
+
+print("Delivery ID: \(delivery.id)")
+print("Status: \(delivery.status)")
 ```
 
-## Webhook Verification
+## Verify Incoming Webhooks
 
 ```swift
-import HookSniffSDK
+import HookSniff
 
-let webhook = Webhook(signingSecret: "whsec_your_signing_secret")
+let wh = try Webhook(secret: "whsec_your_signing_secret")
 
-// In your handler
-func handleWebhook(request: URLRequest, body: Data) throws -> Data {
-    let headers = [
-        "webhook-id": request.value(forHTTPHeaderField: "webhook-id") ?? "",
-        "webhook-timestamp": request.value(forHTTPHeaderField: "webhook-timestamp") ?? "",
-        "webhook-signature": request.value(forHTTPHeaderField: "webhook-signature") ?? ""
-    ]
-    
-    let payload = try webhook.verify(body: body, headers: headers)
-    // Payload is verified — process it
-    print("Received event: \(payload)")
-    return "OK".data(using: .utf8)!
+// Vapor handler
+app.post("webhook") { req async throws -> Response in
+    let body = req.body.string ?? ""
+
+    do {
+        let payload = try wh.verify(
+            body: body,
+            headers: [
+                "webhook-id": req.headers["webhook-id"].first ?? "",
+                "webhook-timestamp": req.headers["webhook-timestamp"].first ?? "",
+                "webhook-signature": req.headers["webhook-signature"].first ?? "",
+            ]
+        )
+
+        print("Event: \(payload.event)")
+        print("Data: \(payload.data)")
+
+        return Response(status: .ok)
+    } catch {
+        return Response(status: .unauthorized, body: "Invalid signature")
+    }
+}
+```
+
+## List Deliveries
+
+```swift
+let deliveries = try await hs.webhooks.list(
+    endpointId: endpoint.id,
+    limit: 20
+)
+
+for dlv in deliveries.data {
+    print("\(dlv.id): \(dlv.status)")
 }
 ```
 
@@ -119,10 +106,16 @@ func handleWebhook(request: URLRequest, body: Data) throws -> Data {
 
 ```swift
 do {
-    let endpoint = try await client.endpoints.get(id: "nonexistent")
-} catch let error as ApiException {
-    print("API Error \(error.statusCode): \(error.message)")
+    let endpoint = try await hs.endpoints.get(id: "nonexistent")
+} catch let error as HttpError {
+    print("HTTP \(error.statusCode): \(error.message)")
+    if error.statusCode == 429 {
+        let retryAfter = error.headers["retry-after"]
+        print("Retry after \(retryAfter ?? "unknown") seconds")
+    }
+} catch let error as ValidationError {
+    print("Validation failed: \(error.errors)")
 } catch {
-    print("Network error: \(error.localizedDescription)")
+    print("Unexpected error: \(error)")
 }
 ```

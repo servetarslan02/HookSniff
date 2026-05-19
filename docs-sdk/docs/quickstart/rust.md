@@ -6,117 +6,123 @@ sidebar_position: 4
 
 ## Installation
 
-Add to your `Cargo.toml`:
-
 ```toml
 [dependencies]
-hooksniff = "0.3.0"
+hooksniff = "1.5"
+tokio = { version = "1", features = ["full"] }
 ```
 
 ## Setup
 
 ```rust
-use hooksniff::Client;
+use hooksniff::api::HookSniff;
 
-// Initialize client
-let client = Client::new("hr_live_your_api_key");
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let hs = HookSniff::new(
+        std::env::var("HOOKSNIFF_API_KEY")?,
+        None, // Uses default base URL
+    );
 
-// Or with custom base URL
-let client = Client::with_options(
-    "hr_live_your_api_key",
-    "https://hooksniff-api-1046140057667.europe-west1.run.app",
-);
+    // With custom base URL
+    let hs = HookSniff::new(
+        std::env::var("HOOKSNIFF_API_KEY")?,
+        Some("https://hooksniff-api-1046140057667.europe-west1.run.app".to_string()),
+    );
+
+    Ok(())
+}
 ```
 
-## Endpoints
+## Create an Endpoint
 
 ```rust
-// List all endpoints
-let endpoints = client.endpoints().list().await?;
+use hooksniff::models::EndpointIn;
 
-// Create an endpoint
-let endpoint = client.endpoints().create(
-    "https://example.com/webhook",
-    "My webhook endpoint",
-    Some(100),
-).await?;
-
-// Get a specific endpoint
-let details = client.endpoints().get(&endpoint.id).await?;
-
-// Update an endpoint
-let updated = client.endpoints().update(
-    &endpoint.id,
-    Some("https://new-url.com/webhook"),
-    None,
-).await?;
-
-// Delete an endpoint
-client.endpoints().delete(&endpoint.id).await?;
-
-// Rotate signing secret
-let key = client.endpoints().rotate_secret(&endpoint.id).await?;
-```
-
-## Webhooks
-
-```rust
-use hooksniff::models::WebhookSendInput;
-
-// Send a webhook
-let delivery = client.webhooks().send(WebhookSendInput {
-    endpoint_id: endpoint.id.clone(),
-    event_type: "order.created".to_string(),
-    data: serde_json::json!({"order_id": "12345", "amount": 99.99}),
+let endpoint = hs.endpoint().create(EndpointIn {
+    url: "https://myapp.com/webhook".to_string(),
+    description: Some("Order notifications".to_string()),
+    event_types: Some(vec![
+        "order.created".to_string(),
+        "order.updated".to_string(),
+    ]),
+    ..Default::default()
 }).await?;
 
-// List deliveries
-let deliveries = client.webhooks().list(Some("delivered"), Some(1)).await?;
-
-// Replay a delivery
-client.webhooks().replay(&delivery.id).await?;
-
-// Batch send
-let batch = client.webhooks().batch(&endpoint.id, vec![
-    WebhookSendInput {
-        endpoint_id: endpoint.id.clone(),
-        event_type: "order.created".to_string(),
-        data: serde_json::json!({"order_id": "1"}),
-    },
-    WebhookSendInput {
-        endpoint_id: endpoint.id.clone(),
-        event_type: "order.created".to_string(),
-        data: serde_json::json!({"order_id": "2"}),
-    },
-]).await?;
+println!("Endpoint ID: {}", endpoint.id);
+println!("Signing secret: {}", endpoint.secret.unwrap());
 ```
 
-## Webhook Verification
+## Send a Webhook
 
 ```rust
-use hooksniff::webhook::Webhook;
+use hooksniff::models::MessageIn;
 
-let webhook = Webhook::new("whsec_your_signing_secret");
+let delivery = hs.message().create(MessageIn {
+    endpoint_id: endpoint.id.clone(),
+    event: "order.created".to_string(),
+    data: serde_json::json!({
+        "order_id": "ORD-12345",
+        "amount": 99.99,
+        "currency": "USD"
+    }),
+    ..Default::default()
+}).await?;
 
-// In your handler
-fn handle_webhook(body: &str, headers: &HashMap<String, String>) -> Result<(), Error> {
-    let payload = webhook.verify(body, headers)?;
-    // Payload is verified — process it
-    println!("Received event: {:?}", payload);
-    Ok(())
+println!("Delivery ID: {}", delivery.id);
+println!("Status: {}", delivery.status);
+```
+
+## Verify Incoming Webhooks
+
+```rust
+use hooksniff::webhooks::Webhook;
+
+let wh = Webhook::new("whsec_your_signing_secret".to_string());
+
+// Axum handler
+async fn handle_webhook(
+    headers: axum::http::HeaderMap,
+    body: String,
+) -> Result<String, axum::http::StatusCode> {
+    let payload = wh.verify(body.as_bytes(), &headers)
+        .map_err(|_| axum::http::StatusCode::UNAUTHORIZED)?;
+
+    println!("Event: {}", payload.event);
+    println!("Data: {:?}", payload.data);
+    Ok("OK".to_string())
+}
+```
+
+## List Deliveries
+
+```rust
+use hooksniff::models::MessageAttemptListOptions;
+
+let attempts = hs.message_attempt().list_by_endpoint(
+    &endpoint.id,
+    Some(MessageAttemptListOptions {
+        limit: Some(20),
+        ..Default::default()
+    }),
+).await?;
+
+for attempt in &attempts.data {
+    println!("{}: {}", attempt.id, attempt.response_status_code);
 }
 ```
 
 ## Error Handling
 
 ```rust
-match client.endpoints().get("nonexistent").await {
-    Ok(endpoint) => println!("Got endpoint: {:?}", endpoint),
+match hs.endpoint().get("nonexistent").await {
+    Ok(ep) => println!("Got endpoint: {}", ep.id),
     Err(hooksniff::Error::Api { status, body }) => {
         eprintln!("API Error {}: {}", status, body);
+        if status == 429 {
+            eprintln!("Rate limited — retry after cooldown");
+        }
     }
-    Err(e) => {
-        eprintln!("Network error: {}", e);
-    }
+    Err(e) => eprintln!("Error: {}", e),
 }
 ```
