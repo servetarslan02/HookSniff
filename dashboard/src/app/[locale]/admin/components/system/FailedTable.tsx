@@ -2,6 +2,7 @@
 
 
 import { useTranslations } from 'next-intl';
+import { XCircle, CheckCircle2 } from 'lucide-react';
 
 interface FailedDelivery {
   id: string;
@@ -36,7 +37,7 @@ export default function FailedTable({
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">❌ {t('failedDeliveries') || 'Failed Deliveries'} (24h)</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><XCircle size={18} strokeWidth={1.75} className="inline mr-1 text-red-500" />{t('failedDeliveries') || 'Failed Deliveries'} (24h)</h2>
         {failedDeliveries.length > 0 && (
           <div className="flex items-center gap-2">
             {selectedFailed.size > 0 && (
@@ -89,7 +90,7 @@ export default function FailedTable({
           </table>
         </div>
       ) : (
-        <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm">✅ {t('noFailedDeliveries') || 'No failed deliveries in the last 24h'}</div>
+        <div className="p-6 text-center text-gray-500 dark:text-slate-400 text-sm"><CheckCircle2 size={16} strokeWidth={1.75} className="inline mr-1 text-emerald-500" />{t('noFailedDeliveries') || 'No failed deliveries in the last 24h'}</div>
       )}
     </div>
   );

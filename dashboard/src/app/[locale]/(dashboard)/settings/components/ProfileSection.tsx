@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { getErrorMessage } from '@/lib/errors';
+import { Lock, Check } from 'lucide-react';
 
 interface User {
   name?: string | null;
@@ -174,7 +175,7 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
         {/* Success / Error */}
         {profileSuccess && (
           <div className="mb-4 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-sm text-green-700 dark:text-green-400 flex items-center gap-2">
-            <span className="text-base">✓</span> {profileSuccess}
+            <Check size={16} strokeWidth={1.75} className="text-green-500" /> {profileSuccess}
           </div>
         )}
         {profileError && (
@@ -199,6 +200,35 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
               className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
             />
           </div>
+
+          {/* Password confirmation for email change */}
+          {showPasswordConfirm && (
+            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+              <p className="text-sm text-amber-800 dark:text-amber-300 mb-3">
+                <Lock size={16} strokeWidth={1.75} className="inline mr-1" />
+                {t('emailChangePasswordRequired') || 'Changing your email requires password confirmation. Your email will need to be verified again.'}
+              </p>
+              <input
+                type="password"
+                value={emailPassword}
+                onChange={(e) => setEmailPassword(e.target.value)}
+                placeholder={t('enterPassword') || 'Enter your password'}
+                className="w-full px-3.5 py-2.5 text-sm border border-amber-300 dark:border-amber-500/30 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition mb-3"
+                autoFocus
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={handleCancelEmailChange}
+                  className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition"
+                >
+                  {tc('cancel')}
+                </button>
+              </div>
+            </div>
+          )}
+
+
           <div className="flex justify-end pt-2">
             <button
               type="submit"

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
 import { useTeams } from '@/hooks/useDashboardData';
+import { Users, ShieldCheck, ScrollText } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -52,9 +53,9 @@ export default function OrganizationPage() {
 
       <TabbedSection
         tabs={[
-          { key: 'team', label: t('team'), icon: '👥', content: () => <TeamPage /> },
-          { key: 'sso', label: t('sso'), icon: '🔐', content: () => <SsoPage teamId={activeTeamId} /> },
-          { key: 'audit-log', label: t('auditLog'), icon: '📜', content: () => <AuditLogPage /> },
+          { key: 'team', label: t('team'), icon: <Users size={16} strokeWidth={1.75} />, content: () => <TeamPage /> },
+          { key: 'sso', label: t('sso'), icon: <ShieldCheck size={16} strokeWidth={1.75} />, content: () => <SsoPage teamId={activeTeamId} /> },
+          { key: 'audit-log', label: t('auditLog'), icon: <ScrollText size={16} strokeWidth={1.75} />, content: () => <AuditLogPage /> },
         ]}
       />
     </div>

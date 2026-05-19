@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
+import { Check, Key } from 'lucide-react';
 
 export function NewKeyAlert({
   newKey,
@@ -31,7 +32,7 @@ export function NewKeyAlert({
   return (
     <div className="glass-card p-6 border-l-4 border-green-500 bg-green-50/50 dark:bg-green-500/10">
       <div className="flex items-center gap-3 mb-2">
-        <span className="text-2xl">🔑</span>
+        <span className="text-2xl"><Key size={18} strokeWidth={1.75} /></span>
         <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">
           {t('newKeyCreated')}
         </h3>
@@ -47,7 +48,7 @@ export function NewKeyAlert({
           onClick={copyKey}
           className="px-4 py-3 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition whitespace-nowrap"
         >
-          {copied ? `✓ ${tc('copied')}` : tc('copyToClipboard')}
+          {copied ? <><Check size={14} strokeWidth={1.75} className="inline mr-0.5" />{tc('copied')}</> : tc('copyToClipboard')}
         </button>
       </div>
       <button type="button"

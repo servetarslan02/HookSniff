@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { FlaskConical, ShieldCheck, Wrench, Download } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -22,10 +23,10 @@ export default function DevToolsPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'playground', label: t('playground'), icon: '🧪', content: () => <PlaygroundPage /> },
-        { key: 'signature', label: t('signatureTool'), icon: '🔐', content: () => <SignatureVerifierPage /> },
-        { key: 'webhook-builder', label: t('webhookBuilder'), icon: '🔧', content: () => <WebhookBuilderPage /> },
-        { key: 'api-importer', label: t('apiImporter'), icon: '📥', content: () => <ApiImporterPage /> },
+        { key: 'playground', label: t('playground'), icon: <FlaskConical size={16} strokeWidth={1.75} />, content: () => <PlaygroundPage /> },
+        { key: 'signature', label: t('signatureTool'), icon: <ShieldCheck size={16} strokeWidth={1.75} />, content: () => <SignatureVerifierPage /> },
+        { key: 'webhook-builder', label: t('webhookBuilder'), icon: <Wrench size={16} strokeWidth={1.75} />, content: () => <WebhookBuilderPage /> },
+        { key: 'api-importer', label: t('apiImporter'), icon: <Download size={16} strokeWidth={1.75} />, content: () => <ApiImporterPage /> },
       ]}
     />
   );

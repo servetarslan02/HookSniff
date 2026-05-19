@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { X } from 'lucide-react';
 
 export function SuccessToast({ message, onClose }: { message: string; onClose: () => void }) {
   const t = useTranslations('onboarding');
@@ -19,7 +20,7 @@ export function SuccessToast({ message, onClose }: { message: string; onClose: (
           <div className="font-semibold text-sm">{t('successTitle')}</div>
           <div className="text-sm opacity-90">{message}</div>
         </div>
-        <button onClick={onClose} aria-label={tc('close')} className="ml-4 text-white/70 hover:text-white transition">✕</button>
+        <button onClick={onClose} aria-label={tc('close')} className="ml-4 text-white/70 hover:text-white transition"><X size={18} strokeWidth={1.75} /></button>
       </div>
     </div>
   );

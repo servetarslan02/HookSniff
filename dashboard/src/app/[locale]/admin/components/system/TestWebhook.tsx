@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useTestWebhook } from '@/hooks/useAdminData';
+import { Rocket, CheckCircle2 } from 'lucide-react';
 
 export default function TestWebhook() {
   const t = useTranslations('admin');
@@ -93,7 +94,7 @@ export default function TestWebhook() {
           disabled={testWebhookMutation.isPending || !testUrl}
           className="px-6 py-2.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {testWebhookMutation.isPending ? t('testSending') : `🚀 ${t('sendTest')}`}
+          {testWebhookMutation.isPending ? t('testSending') : <><Rocket size={14} strokeWidth={1.75} className="inline mr-1" />{t('sendTest')}</>}
         </button>
 
         {testError && (
@@ -105,7 +106,7 @@ export default function TestWebhook() {
         {testResult && (
           <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-xl p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-lg" aria-hidden="true">✅</span>
+              <CheckCircle2 size={18} strokeWidth={1.75} className="text-emerald-500" />
               <span className="text-sm font-medium text-green-700 dark:text-green-400">{t('testSuccess')}</span>
             </div>
             <div className="grid grid-cols-2 gap-4">

@@ -6,6 +6,7 @@ import { useToast } from '@/components/Toast';
 import { twoFactorApi } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 import { useTranslations } from 'next-intl';
+import { ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export function TwoFactorSection() {
   const { token } = useAuth();
@@ -117,7 +118,7 @@ export function TwoFactorSection() {
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-3 mb-5">
           <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
-            <span className="text-base">🔐</span>
+            <ShieldCheck size={16} strokeWidth={1.75} className="text-emerald-500" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('twoFactorAuth')}</h3>
@@ -240,7 +241,8 @@ export function TwoFactorSection() {
             {step === 'done' && (
               <>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  ✅ {t('2faEnabledSuccess')}
+                  <CheckCircle2 size={18} strokeWidth={1.75} className="inline mr-1 text-emerald-500" />
+                  {t('2faEnabledSuccess')}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
                   {t('backupCodesDesc')}

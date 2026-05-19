@@ -2,6 +2,7 @@
 
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import { Flag, Repeat, Rocket, CheckCircle2, Triangle } from 'lucide-react';
 
 interface InfraTabProps {
   featureFlags: any[];
@@ -16,7 +17,7 @@ export default function InfraTab({ featureFlags, deployInfo }: InfraTabProps) {
       {/* Feature Flags */}
       <div className="glass-card p-6">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xl">🚩</span>
+          <Flag size={20} strokeWidth={1.75} className="text-gray-400" />
           <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('featureFlagStatus')}</h2>
         </div>
         {featureFlags.length > 0 ? (
@@ -46,7 +47,7 @@ export default function InfraTab({ featureFlags, deployInfo }: InfraTabProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-xl">📐</span>
+            <Triangle size={20} strokeWidth={1.75} className="text-gray-400" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('standardWebhooks')}</h2>
           </div>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('standardWebhooksDesc')}</p>
@@ -66,7 +67,7 @@ export default function InfraTab({ featureFlags, deployInfo }: InfraTabProps) {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
                   {isEnabled ? (
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">✅ {t('active') || 'Active'}</span>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"><CheckCircle2 size={12} strokeWidth={1.75} className="inline mr-0.5" />{t('active') || 'Active'}</span>
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">{t('notConfigured')}</span>
                   )}
@@ -78,7 +79,7 @@ export default function InfraTab({ featureFlags, deployInfo }: InfraTabProps) {
 
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-xl">🔁</span>
+            <Repeat size={20} strokeWidth={1.75} className="text-gray-400" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('deduplication')}</h2>
           </div>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('deduplicationDesc')}</p>
@@ -98,7 +99,7 @@ export default function InfraTab({ featureFlags, deployInfo }: InfraTabProps) {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-slate-400">{t('complianceStatus')}</span>
                   {isEnabled ? (
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">✅ {t('active') || 'Active'}</span>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"><CheckCircle2 size={12} strokeWidth={1.75} className="inline mr-0.5" />{t('active') || 'Active'}</span>
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">{t('notConfigured')}</span>
                   )}
@@ -112,7 +113,7 @@ export default function InfraTab({ featureFlags, deployInfo }: InfraTabProps) {
       {/* Last Deploy */}
       <div className="glass-card p-6">
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-xl">🚀</span>
+          <Rocket size={20} strokeWidth={1.75} className="text-gray-400" />
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('lastDeploy')}</h2>
         </div>
         {deployInfo ? (

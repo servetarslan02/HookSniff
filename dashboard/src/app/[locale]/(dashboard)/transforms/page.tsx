@@ -6,6 +6,7 @@ import { useToast } from '@/components/Toast';
 import { useEndpoints, useTransformRules, useCreateTransformRule, useDeleteTransformRule, useUpdateTransformRule, useTestTransform } from '@/hooks/useDashboardData';
 import type { TransformRuleValidated } from '@/schemas/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { FlaskConical, Pencil, X } from 'lucide-react';
 
 export default function TransformsPage() {
   const t = useTranslations('transforms');
@@ -248,9 +249,9 @@ export default function TransformsPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-1 ml-4">
-                  <button type="button" onClick={() => openTest(rule.id)} title={t('test')} className="text-gray-500 dark:text-slate-400 hover:text-blue-600 transition p-2">🧪</button>
-                  <button type="button" onClick={() => handleEdit(rule)} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-2">✏️</button>
-                  <button type="button" onClick={() => handleDelete(rule.id)} aria-label={t('deleteTransform')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-2">✕</button>
+                  <button type="button" onClick={() => openTest(rule.id)} title={t('test')} className="text-gray-500 dark:text-slate-400 hover:text-blue-600 transition p-2"><FlaskConical size={18} strokeWidth={1.75} /></button>
+                  <button type="button" onClick={() => handleEdit(rule)} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-2"><Pencil size={18} strokeWidth={1.75} /></button>
+                  <button type="button" onClick={() => handleDelete(rule.id)} aria-label={t('deleteTransform')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-2"><X size={18} strokeWidth={1.75} /></button>
                 </div>
               </div>
             </div>
@@ -265,7 +266,7 @@ export default function TransformsPage() {
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-2xl w-full mx-4 max-h-[85dvh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('testTransform')}</h3>
-              <button onClick={() => setShowTest(false)} className="text-gray-500 hover:text-gray-700 dark:hover:text-slate-300">✕</button>
+              <button onClick={() => setShowTest(false)} className="text-gray-500 hover:text-gray-700 dark:hover:text-slate-300"><X size={18} strokeWidth={1.75} /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>

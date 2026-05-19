@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { useAdminStats, useAdminRevenue, useAdminAuditLogs, useAdminFeatureFlags, useAdminDeployInfo, useRateLimitViolations, useFailedDeliveries, useQueueStatus } from '@/hooks/useAdminData';
 import { StatCard } from '@/components/tremor/StatCard';
 import { useTranslations } from 'next-intl';
+import { BarChart3, ClipboardList, Heart, Building2, RefreshCw, Download, Users, Package, DollarSign, Flame } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="space-y-6 animate-pulse">
@@ -152,10 +153,10 @@ export default function AdminOverviewPage() {
   }
 
   const tabs = [
-    { key: 'overview', icon: '📊', label: t('overview') || 'Overview' },
-    { key: 'activity', icon: '📋', label: t('activity') || 'Activity' },
-    { key: 'health', icon: '💚', label: t('health') || 'Health' },
-    { key: 'infra', icon: '🏗️', label: t('infrastructure') || 'Infrastructure' },
+    { key: 'overview', icon: <BarChart3 size={14} strokeWidth={1.75} />, label: t('overview') || 'Overview' },
+    { key: 'activity', icon: <ClipboardList size={14} strokeWidth={1.75} />, label: t('activity') || 'Activity' },
+    { key: 'health', icon: <Heart size={14} strokeWidth={1.75} />, label: t('health') || 'Health' },
+    { key: 'infra', icon: <Building2 size={14} strokeWidth={1.75} />, label: t('infrastructure') || 'Infrastructure' },
   ] as const;
 
   return (
@@ -169,12 +170,13 @@ export default function AdminOverviewPage() {
         <div className="flex items-center gap-3">
           <button type="button" onClick={handleRefreshAll} disabled={refreshing}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition ${refreshing ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700'}`}>
-            <span className={`inline-block transition-transform duration-500 ${refreshing ? 'animate-spin' : ''}`}>🔄</span>
+            <RefreshCw size={14} strokeWidth={1.75} className={`transition-transform duration-500 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? (t('refreshing') || 'Refreshing...') : (tc('refresh') || 'Refresh')}
           </button>
           <button type="button" onClick={exportDashboard} disabled={exporting}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700 transition disabled:opacity-50">
-            📥 {exporting ? t('exporting') : t('exportDashboard')}
+            <Download size={14} strokeWidth={1.75} className="inline mr-1" />
+            {exporting ? t('exporting') : t('exportDashboard')}
           </button>
         </div>
       </div>
@@ -191,13 +193,13 @@ export default function AdminOverviewPage() {
 
       {/* Stats Cards — always visible, above the fold */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label={t('totalUsers')} value={stats?.total_users?.toLocaleString() || '0'} icon={<span className="text-lg">👥</span>} color="blue"
+        <StatCard label={t('totalUsers')} value={stats?.total_users?.toLocaleString() || '0'} icon={<Users size={18} strokeWidth={1.75} />} color="blue"
           trend={stats?.trends ? (() => { const prev = stats.trends.total_users_yesterday; const diff = stats.total_users - prev; if (diff === 0 || prev === 0) return undefined; const pct = Math.round(Math.abs(diff / prev) * 100); return pct > 0 ? { value: pct, label: t('vsYesterday') || 'vs yesterday', direction: diff > 0 ? 'up' as const : 'down' as const } : undefined; })() : undefined} />
-        <StatCard label={t('totalDeliveries')} value={stats?.total_deliveries?.toLocaleString() || '0'} icon={<span className="text-lg">📦</span>} color="emerald"
+        <StatCard label={t('totalDeliveries')} value={stats?.total_deliveries?.toLocaleString() || '0'} icon={<Package size={18} strokeWidth={1.75} />} color="emerald"
           trend={stats?.trends ? (() => { const prev = stats.trends.total_deliveries_yesterday; const diff = stats.total_deliveries - prev; if (diff === 0 || prev === 0) return undefined; const pct = Math.round(Math.abs(diff / prev) * 100); return pct > 0 ? { value: pct, label: t('vsYesterday') || 'vs yesterday', direction: diff > 0 ? 'up' as const : 'down' as const } : undefined; })() : undefined} />
-        <StatCard label={t('totalRevenue')} value={`$${(stats?.total_revenue || 0).toLocaleString()}`} icon={<span className="text-lg">💰</span>} color="violet"
+        <StatCard label={t('totalRevenue')} value={`$${(stats?.total_revenue || 0).toLocaleString()}`} icon={<DollarSign size={18} strokeWidth={1.75} />} color="violet"
           trend={stats?.trends ? (() => { const prev = stats.trends.revenue_yesterday; const diff = stats.total_revenue - prev; if (diff === 0 || prev === 0) return undefined; const pct = Math.round(Math.abs(diff / prev) * 100); return pct > 0 ? { value: pct, label: t('vsYesterday') || 'vs yesterday', direction: diff > 0 ? 'up' as const : 'down' as const } : undefined; })() : undefined} />
-        <StatCard label={t('activeUsersToday')} value={stats?.active_users_today?.toLocaleString() || '0'} icon={<span className="text-lg">🔥</span>} color="amber"
+        <StatCard label={t('activeUsersToday')} value={stats?.active_users_today?.toLocaleString() || '0'} icon={<Flame size={18} strokeWidth={1.75} />} color="amber"
           trend={stats?.trends ? (() => { const prev = stats.trends.active_users_yesterday; const diff = stats.active_users_today - prev; if (diff === 0 || prev === 0) return undefined; const pct = Math.round(Math.abs(diff / prev) * 100); return pct > 0 ? { value: pct, label: t('vsYesterday') || 'vs yesterday', direction: diff > 0 ? 'up' as const : 'down' as const } : undefined; })() : undefined} />
       </div>
 

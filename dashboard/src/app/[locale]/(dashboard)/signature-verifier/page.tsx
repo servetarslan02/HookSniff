@@ -201,6 +201,7 @@ if not is_valid:
       code: `package main
 
 import (
+import { CheckCircle2, Laptop, ShieldCheck, Trash2, XCircle } from 'lucide-react';
     "crypto/hmac"
     "crypto/sha256"
     "encoding/hex"
@@ -249,7 +250,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
           disabled={!payload && !secret && !signature}
           className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
         >
-          🗑️ {t('clearAll')}
+          <Trash2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('clearAll')}
         </button>
       </div>
 
@@ -264,7 +265,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
       {/* Algorithm Selector */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center"><span className="text-base">🔐</span></div>
+          <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center"><span className="text-base"><ShieldCheck size={18} strokeWidth={1.75} /></span></div>
           <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('algorithm')}</h2>
         </div>
         <div className="flex gap-3">
@@ -359,7 +360,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
                 : 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20'
             }`}>
               <div className="flex items-center gap-2">
-                <span className="text-2xl">{result === 'valid' ? '✅' : '❌'}</span>
+                <span className="text-2xl">{result === 'valid' ? '✅' : <XCircle size={16} strokeWidth={1.75} />}</span>
                 <div>
                   <div className={`font-semibold ${result === 'valid' ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
                     {result === 'valid' ? t('signatureValid') : t('signatureInvalid')}
@@ -379,7 +380,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
       {/* Code Example — Multi-language tabs */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center"><span className="text-base">💻</span></div>
+          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center"><span className="text-base"><Laptop size={18} strokeWidth={1.75} /></span></div>
           <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('codeExample')}</h2>
         </div>
         {/* Language tabs */}

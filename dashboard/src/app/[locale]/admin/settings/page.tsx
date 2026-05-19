@@ -6,6 +6,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useAdminSettings, useUpdateSettings, useAdminAlerts, useCreateAlert, useUpdateAlert } from '@/hooks/useAdminData';
 import type { PlatformSettings } from '@/lib/api';
+import { AlertTriangle, Check, CheckCircle2, FlaskConical, Mail, Settings } from 'lucide-react';
 
 interface AlertRule {
   id: string;
@@ -229,10 +230,10 @@ export default function AdminSettingsPage() {
   }
 
   const tabs = [
-    { key: 'general', icon: '⚙️', label: t('general') || 'General' },
-    { key: 'email', icon: '📧', label: t('emailSecurity') || 'Email & Security' },
-    { key: 'alerts', icon: '🚨', label: t('alertsRetry') || 'Alerts & Retry' },
-    { key: 'dev', icon: '🧪', label: 'Dev Tools' },
+    { key: 'general', icon: <Settings size={16} strokeWidth={1.75} />, label: t('general') || 'General' },
+    { key: 'email', icon: <Mail size={16} strokeWidth={1.75} />, label: t('emailSecurity') || 'Email & Security' },
+    { key: 'alerts', icon: <AlertTriangle size={16} strokeWidth={1.75} />, label: t('alertsRetry') || 'Alerts & Retry' },
+    { key: 'dev', icon: <FlaskConical size={16} strokeWidth={1.75} />, label: 'Dev Tools' },
   ] as const;
 
   return (
@@ -252,7 +253,7 @@ export default function AdminSettingsPage() {
           aria-live="polite"
           className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-xl p-4 flex items-center gap-2"
         >
-          <span className="text-green-600 dark:text-green-400" aria-hidden="true">✅</span>
+          <span className="text-green-600 dark:text-green-400" aria-hidden="true"><CheckCircle2 size={18} strokeWidth={1.75} /></span>
           <span className="text-green-700 dark:text-green-400 text-sm font-medium">{t('settingsSaved')}</span>
         </div>
       )}
@@ -315,7 +316,7 @@ export default function AdminSettingsPage() {
       <div className="flex items-center gap-3 justify-end">
         {showSuccess && (
           <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
-            <span aria-hidden="true">✓</span> {t('settingsSaved')}
+            <span aria-hidden="true"><Check size={18} strokeWidth={1.75} /></span> {t('settingsSaved')}
           </span>
         )}
         <button type="button"

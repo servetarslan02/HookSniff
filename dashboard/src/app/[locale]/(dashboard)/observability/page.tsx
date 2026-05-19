@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { Activity, Bell, TrendingUp } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -25,9 +26,9 @@ export default function MonitoringPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'health', label: t('health'), icon: '💓', content: () => <HealthPage /> },
-        { key: 'alerts', label: t('alerts'), icon: '🔔', content: () => <AlertsPage /> },
-        { key: 'analytics', label: t('analytics'), icon: '📈', content: () => <AnalyticsPage /> },
+        { key: 'health', label: t('health'), icon: <Activity size={16} strokeWidth={1.75} />, content: () => <HealthPage /> },
+        { key: 'alerts', label: t('alerts'), icon: <Bell size={16} strokeWidth={1.75} />, content: () => <AlertsPage /> },
+        { key: 'analytics', label: t('analytics'), icon: <TrendingUp size={16} strokeWidth={1.75} />, content: () => <AnalyticsPage /> },
       ]}
     />
   );

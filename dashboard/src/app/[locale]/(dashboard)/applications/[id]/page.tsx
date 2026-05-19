@@ -10,6 +10,7 @@ import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { LazySection, Skeletons } from '@/components/LazySection';
+import { CheckCircle2, ClipboardList, Key, Link2, Pause } from 'lucide-react';
 
 /* ─── Application Detail — endpoint yönetimi ile birlikte ─── */
 
@@ -189,7 +190,7 @@ export default function ApplicationDetailPage() {
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
-              <span className="text-xl">🔗</span>
+              <span className="text-xl"><Link2 size={18} strokeWidth={1.75} /></span>
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{endpoints.length}</p>
@@ -200,7 +201,7 @@ export default function ApplicationDetailPage() {
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
-              <span className="text-xl">✅</span>
+              <span className="text-xl"><CheckCircle2 size={18} strokeWidth={1.75} /></span>
             </div>
             <div>
               <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{activeCount}</p>
@@ -211,7 +212,7 @@ export default function ApplicationDetailPage() {
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-500/10 flex items-center justify-center">
-              <span className="text-xl">⏸️</span>
+              <span className="text-xl"><Pause size={18} strokeWidth={1.75} /></span>
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-400 dark:text-slate-500">{inactiveCount}</p>
@@ -303,7 +304,7 @@ export default function ApplicationDetailPage() {
         {endpoints.length === 0 ? (
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-12 text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
-              <span className="text-3xl">🔗</span>
+              <span className="text-3xl"><Link2 size={18} strokeWidth={1.75} /></span>
             </div>
             <p className="text-base font-medium text-gray-900 dark:text-white mb-1">
               {te('noEndpointsYet') || 'No endpoints yet'}
@@ -460,7 +461,7 @@ export default function ApplicationDetailPage() {
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
-                <span className="text-xl">🔑</span>
+                <span className="text-xl"><Key size={18} strokeWidth={1.75} /></span>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {te('newSecret') || 'New Secret'}
@@ -483,7 +484,7 @@ export default function ApplicationDetailPage() {
                 }}
                 className="px-5 py-2.5 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-xl hover:opacity-90 transition"
               >
-                📋 {te('copy') || 'Copy'}
+                <ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> {te('copy') || 'Copy'}
               </button>
               <button
                 type="button"

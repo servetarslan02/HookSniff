@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { getErrorMessage } from '@/lib/errors';
 import { ToggleRow } from './ToggleRow';
+import { Bell } from 'lucide-react';
 
 export function NotificationSection() {
   const t = useTranslations('settings');
@@ -98,7 +99,7 @@ export function NotificationSection() {
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
       <div className="flex items-center gap-3 mb-5">
         <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
-          <span className="text-base">🔔</span>
+          <Bell size={16} strokeWidth={1.75} className="text-blue-500" />
         </div>
         <div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('notifications')}</h3>

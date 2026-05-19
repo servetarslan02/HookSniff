@@ -10,6 +10,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazySection, Skeletons } from '@/components/LazySection';
+import { AlertTriangle, ClipboardList, Key } from 'lucide-react';
 
 export default function EndpointsPage() {
   const { token } = useAuth();
@@ -150,7 +151,7 @@ export default function EndpointsPage() {
   if (queryError && endpoints.length === 0) {
     return (
       <div className="glass-card p-12 text-center">
-        <div className="text-4xl mb-3">⚠️</div>
+        <div className="text-4xl mb-3"><AlertTriangle size={18} strokeWidth={1.75} /></div>
         <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error || tc('error')}</p>
         <button type="button" onClick={() => queryClient.invalidateQueries({ queryKey: ['endpoints'] })} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
           {tc('retry')}
@@ -348,7 +349,7 @@ export default function EndpointsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setNewSecret(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-3 sm:mx-4 p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">🔑 {t('newSecret')}</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2"><Key size={16} strokeWidth={1.75} className="inline mr-1" /> {t('newSecret')}</h3>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mb-3 sm:mb-4">
               {t('newSecretDesc')}
             </p>
@@ -364,7 +365,7 @@ export default function EndpointsPage() {
                 }}
                 className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition"
               >
-                📋 {t('copy')}
+                <ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> {t('copy')}
               </button>
               <button
                 type="button"

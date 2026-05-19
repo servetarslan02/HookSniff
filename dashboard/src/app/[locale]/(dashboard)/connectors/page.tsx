@@ -7,15 +7,16 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { CreditCard, FileText, Gamepad2, GitBranch, MessageSquare, Pencil, Phone, Plug, ShoppingBag, Trash2, TriangleRight } from 'lucide-react';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
   return new Date(s).toLocaleString();
 }
 
-const PROVIDER_ICONS: Record<string, string> = {
-  stripe: '💳', shopify: '🛒', github: '🐙', slack: '💬',
-  twilio: '📞', discord: '🎮', linear: '📐', notion: '📝',
+const PROVIDER_ICONS: Record<string, React.ReactNode> = {
+  stripe: <CreditCard size={16} strokeWidth={1.75} />, shopify: <ShoppingBag size={16} strokeWidth={1.75} />, github: <GitBranch size={16} strokeWidth={1.75} />, slack: <MessageSquare size={16} strokeWidth={1.75} />,
+  twilio: <Phone size={16} strokeWidth={1.75} />, discord: <Gamepad2 size={16} strokeWidth={1.75} />, linear: <TriangleRight size={16} strokeWidth={1.75} />, notion: <FileText size={16} strokeWidth={1.75} />,
 };
 
 export default function ConnectorsPage() {
@@ -193,7 +194,7 @@ export default function ConnectorsPage() {
           </div>
         ) : configs.length === 0 ? (
           <div className="glass-card p-12 text-center">
-            <div className="text-5xl mb-4">🔌</div>
+            <div className="text-5xl mb-4"><Plug size={18} strokeWidth={1.75} /></div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noConnectors')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noConnectorsDesc')}</p>
             <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
@@ -222,8 +223,8 @@ export default function ConnectorsPage() {
 
                   <div className="flex items-center gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">
                     <span className="text-xs text-gray-500 dark:text-slate-400 flex-1">{formatDate(cfg.created_at)}</span>
-                    <button onClick={() => handleEdit(cfg)} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm">✏️</button>
-                    <button onClick={() => setDeleteTarget(cfg.id)} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm">🗑️</button>
+                    <button onClick={() => handleEdit(cfg)} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm"><Pencil size={18} strokeWidth={1.75} /></button>
+                    <button onClick={() => setDeleteTarget(cfg.id)} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm"><Trash2 size={18} strokeWidth={1.75} /></button>
                   </div>
 
                   {/* Edit form inline */}

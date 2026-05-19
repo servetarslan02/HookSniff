@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { PlatformSettings } from '@/lib/api';
+import { DollarSign } from 'lucide-react';
 
 interface GeneralTabProps {
   settings: PlatformSettings;
@@ -76,7 +77,7 @@ export default function GeneralTab({ settings, update }: GeneralTabProps) {
       <div className="glass-card p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💰 {t('planPrices') || 'Plan Prices & Limits'}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><DollarSign size={16} strokeWidth={1.75} className="inline mr-1" /> {t('planPrices') || 'Plan Prices & Limits'}</h2>
             <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('planPricesMoved') || 'Plan prices and limits are now managed from the Revenue page.'}</p>
           </div>
           <a

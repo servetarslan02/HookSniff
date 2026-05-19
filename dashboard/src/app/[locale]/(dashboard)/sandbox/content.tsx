@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from '@/i18n/navigation';
+import { AlertTriangle, FlaskConical, Lightbulb, Lock, ShieldCheck, Zap } from 'lucide-react';
 
 /* ─── Timeout-aware fetch helper ─── */
 const FETCH_TIMEOUT_MS = 15_000;
@@ -27,8 +28,8 @@ type WebhookRecord = {
   id: string;
   method: string;
   path: string;
-  query: Record<string, string>;
-  headers: Record<string, string>;
+  query: Record<string, React.ReactNode>;
+  headers: Record<string, React.ReactNode>;
   body: string | null;
   body_json: unknown;
   content_type: string | null;
@@ -228,7 +229,7 @@ export function PlaygroundPageContent() {
 
   /* ─── Format Helpers ─── */
 
-  const formatHeaders = (headers: Record<string, string>) =>
+  const formatHeaders = (headers: Record<string, React.ReactNode>) =>
     Object.entries(headers)
       .filter(([k]) => !k.startsWith('sec-') && k !== 'connection')
       .map(([k, v]) => `${k}: ${v}`)
@@ -259,7 +260,7 @@ export function PlaygroundPageContent() {
         {/* Idle State — Generate Token */}
         {state === 'idle' && (
           <div className="max-w-md mx-auto text-center py-16">
-            <span className="text-6xl mb-4 block">🧪</span>
+            <span className="text-6xl mb-4 block"><FlaskConical size={18} strokeWidth={1.75} /></span>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('idleTitle')}</h2>
             <p className="text-gray-600 dark:text-slate-400 mb-6">{t('idleDesc')}</p>
             <button onClick={generateToken} className="px-8 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">
@@ -280,7 +281,7 @@ export function PlaygroundPageContent() {
         {/* Error State */}
         {state === 'error' && (
           <div className="max-w-md mx-auto text-center py-16">
-            <span className="text-5xl mb-4 block">⚠️</span>
+            <span className="text-5xl mb-4 block"><AlertTriangle size={18} strokeWidth={1.75} /></span>
             <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
             <button onClick={generateToken} className="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">
               {t('tryAgain')}
@@ -426,7 +427,7 @@ export function PlaygroundPageContent() {
                     {/* Signature */}
                     {selectedRecord.headers['svix-signature'] || selectedRecord.headers['x-hooksniff-signature'] ? (
                       <div className="p-3 bg-brand-50 dark:bg-brand-500/10 rounded-lg border border-brand-200 dark:border-brand-500/20">
-                        <h4 className="text-xs font-bold text-gray-900 dark:text-white mb-1">🔐 Webhook {t('signature')}</h4>
+                        <h4 className="text-xs font-bold text-gray-900 dark:text-white mb-1"><ShieldCheck size={16} strokeWidth={1.75} className="inline mr-1" /> Webhook {t('signature')}</h4>
                         <p className="text-xs font-mono text-gray-600 dark:text-slate-400 break-all">
                           {selectedRecord.headers['svix-signature'] || selectedRecord.headers['x-hooksniff-signature']}
                         </p>
@@ -452,15 +453,15 @@ export function PlaygroundPageContent() {
             {/* Info */}
             <div className="grid md:grid-cols-3 gap-4">
               <div className="p-4 bg-blue-50 dark:bg-blue-500/10 rounded-lg border border-blue-200 dark:border-blue-500/20">
-                <h4 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">💡 {t('worksAnyService')}</h4>
+                <h4 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1"><Lightbulb size={16} strokeWidth={1.75} className="inline mr-1" /> {t('worksAnyService')}</h4>
                 <p className="text-xs text-blue-700 dark:text-blue-400">{t('worksAnyServiceDesc')}</p>
               </div>
               <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg border border-emerald-200 dark:border-emerald-500/20">
-                <h4 className="text-sm font-medium text-emerald-900 dark:text-emerald-300 mb-1">🔒 {t('secureDefault')}</h4>
+                <h4 className="text-sm font-medium text-emerald-900 dark:text-emerald-300 mb-1"><Lock size={16} strokeWidth={1.75} className="inline mr-1" /> {t('secureDefault')}</h4>
                 <p className="text-xs text-emerald-700 dark:text-emerald-400">{t('secureDefaultDesc')}</p>
               </div>
               <div className="p-4 bg-purple-50 dark:bg-purple-500/10 rounded-lg border border-purple-200 dark:border-purple-500/20">
-                <h4 className="text-sm font-medium text-purple-900 dark:text-purple-300 mb-1">⚡ {t('realtime')}</h4>
+                <h4 className="text-sm font-medium text-purple-900 dark:text-purple-300 mb-1"><Zap size={16} strokeWidth={1.75} className="inline mr-1" /> {t('realtime')}</h4>
                 <p className="text-xs text-purple-700 dark:text-purple-400">{t('realtimeDesc')}</p>
               </div>
             </div>

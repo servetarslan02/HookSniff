@@ -10,6 +10,7 @@ import { useToast } from '@/components/Toast';
 import { useApplications } from '@/hooks/useDashboardData';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazySection, Skeletons } from '@/components/LazySection';
+import { Smartphone, Pencil } from 'lucide-react';
 
 /* ─── Hook0-style: Application card grid ─── */
 
@@ -245,7 +246,7 @@ export default function ApplicationsPage() {
       <LazySection fallback={Skeletons.card} rootMargin={300}>
       {filteredApps.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 px-5 py-16 text-center">
-          <div className="text-4xl mb-3">📱</div>
+          <Smartphone size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-3" />
           <p className="text-gray-900 dark:text-white font-medium">
             {search ? (tc('noResults') || 'No results found') : (t('empty') || 'No applications')}
           </p>
@@ -356,7 +357,8 @@ export default function ApplicationsPage() {
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setEditApp(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-3 sm:mx-4 p-4 sm:p-6">
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
-              ✏️ {t('editApp') || 'Edit Application'}
+              <Pencil size={18} strokeWidth={1.75} className="inline mr-1" />
+              {t('editApp') || 'Edit Application'}
             </h3>
             <form onSubmit={handleEdit} className="space-y-4">
               <div>

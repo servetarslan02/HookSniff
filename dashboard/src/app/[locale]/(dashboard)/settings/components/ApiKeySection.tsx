@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
+import { Check } from 'lucide-react';
 
 export function ApiKeySection({ apiKey }: { apiKey: string | null }) {
   const t = useTranslations('settings');
@@ -61,7 +62,7 @@ export function ApiKeySection({ apiKey }: { apiKey: string | null }) {
           disabled={!apiKey}
           className="px-4 py-2.5 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition disabled:opacity-40 whitespace-nowrap"
         >
-          {copied ? `✓ ${tc('copied')}` : tc('copy')}
+          {copied ? <><Check size={14} strokeWidth={1.75} className="inline mr-0.5" />{tc('copied')}</> : tc('copy')}
         </button>
       </div>
 

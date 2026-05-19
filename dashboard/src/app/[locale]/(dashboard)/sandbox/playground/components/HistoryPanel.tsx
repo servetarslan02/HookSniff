@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import type { PlaygroundRequest } from '../types';
+import { ScrollText } from 'lucide-react';
 
 export function HistoryPanel({
   history,
@@ -23,7 +24,7 @@ export function HistoryPanel({
       <div className="glass-card p-6">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('requestHistory')}</h3>
         <div className="text-center py-6">
-          <div className="text-3xl mb-2">📜</div>
+          <div className="text-3xl mb-2"><ScrollText size={18} strokeWidth={1.75} /></div>
           <p className="text-xs text-gray-500 dark:text-slate-500">{t('noRequests')}</p>
         </div>
       </div>

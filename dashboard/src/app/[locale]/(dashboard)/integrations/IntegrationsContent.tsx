@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { CreditCard, ShoppingBag, GitBranch, MessageSquare, Phone, Gamepad2, TriangleRight, FileText, Plug, Link2, Pencil, Trash2 } from 'lucide-react';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
@@ -19,9 +20,15 @@ function formatDuration(ms: number | null) {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
-const PROVIDER_ICONS: Record<string, string> = {
-  stripe: '💳', shopify: '🛒', github: '🐙', slack: '💬',
-  twilio: '📞', discord: '🎮', linear: '📐', notion: '📝',
+const PROVIDER_ICONS: Record<string, React.ReactNode> = {
+  stripe: <CreditCard size={16} strokeWidth={1.75} />,
+  shopify: <ShoppingBag size={16} strokeWidth={1.75} />,
+  github: <GitBranch size={16} strokeWidth={1.75} />,
+  slack: <MessageSquare size={16} strokeWidth={1.75} />,
+  twilio: <Phone size={16} strokeWidth={1.75} />,
+  discord: <Gamepad2 size={16} strokeWidth={1.75} />,
+  linear: <TriangleRight size={16} strokeWidth={1.75} />,
+  notion: <FileText size={16} strokeWidth={1.75} />,
 };
 
 const HEALTH_COLORS: Record<string, string> = {
@@ -221,7 +228,7 @@ export default function IntegrationsContent() {
                 <select value={formConnectorConfig} onChange={e => setFormConnectorConfig(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm">
                   <option value="">{t('selectConnector')}</option>
-                  {configs.map(c => <option key={c.id} value={c.id}>{PROVIDER_ICONS[c.connector_name] || '🔌'} {c.connector_display_name} — {c.name}</option>)}
+                  {configs.map(c => <option key={c.id} value={c.id}>{PROVIDER_ICONS[c.connector_name] || <Plug size={16} strokeWidth={1.75} />} {c.connector_display_name} — {c.name}</option>)}
                 </select>
               </div>
               <div>
@@ -259,7 +266,7 @@ export default function IntegrationsContent() {
         </div>
       ) : integrations.length === 0 ? (
         <div className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4">🔗</div>
+          <Link2 size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noIntegrations')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noIntegrationsDesc')}</p>
           <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
@@ -274,7 +281,7 @@ export default function IntegrationsContent() {
               onClick={() => { setSelectedId(selectedId === ig.id ? null : ig.id); setTab('overview'); }}>
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">{PROVIDER_ICONS[ig.connector_name] || '🔌'}</span>
+                  <span className="text-gray-400">{PROVIDER_ICONS[ig.connector_name] || <Plug size={20} strokeWidth={1.75} />}</span>
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{ig.name}</h3>
                     <span className="text-xs text-gray-500 dark:text-slate-400">{ig.connector_display_name} → endpoint</span>
@@ -305,13 +312,13 @@ export default function IntegrationsContent() {
               <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-slate-700">
                 <span className="text-xs text-gray-500 dark:text-slate-400">{formatDate(ig.last_triggered_at)}</span>
                 <div className="flex gap-1">
-                  <button onClick={e => { e.stopPropagation(); openEdit(ig); }} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm">✏️</button>
+                  <button onClick={e => { e.stopPropagation(); openEdit(ig); }} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5"><Pencil size={16} strokeWidth={1.75} /></button>
                   <button onClick={e => { e.stopPropagation(); toggleMutation.mutate({ id: ig.id, enabled: !ig.enabled }); }}
                     title={ig.enabled ? t('disable') : t('enable')}
                     className={`p-1.5 text-sm ${ig.enabled ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}`}>
                     {ig.enabled ? '⏸' : '▶'}
                   </button>
-                  <button onClick={e => { e.stopPropagation(); setDeleteTarget(ig.id); }} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm">🗑️</button>
+                  <button onClick={e => { e.stopPropagation(); setDeleteTarget(ig.id); }} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5"><Trash2 size={16} strokeWidth={1.75} /></button>
                 </div>
               </div>
             </div>

@@ -2,12 +2,13 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { ApiKeysTabProps } from './types';
+import { Key } from 'lucide-react';
 
 export function ApiKeysTab({ userApiKeys, t }: ApiKeysTabProps) {
   return (
     <LazySection fallback={Skeletons.card} rootMargin={300}>
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">🔑 {t("apiKeys") || "API Keys"}</h2>
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><Key size={16} strokeWidth={1.75} className="inline mr-1" /> {t("apiKeys") || "API Keys"}</h2>
       {userApiKeys.length > 0 ? (
         <div className="glass-card p-6">
           {userApiKeys.map((k, i) => (

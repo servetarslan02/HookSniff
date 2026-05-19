@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAdminAuditLogs } from '@/hooks/useAdminData';
 import { useTranslations, useLocale } from 'next-intl';
+import { AlertTriangle, ClipboardList, CreditCard, Eye, Flag, FlaskConical, Inbox, Key, Lock, Mail, Pencil, Plus, Settings, Shield, ShieldCheck, Trash2, User } from 'lucide-react';
 
-const ACTION_COLORS: Record<string, string> = {
+const ACTION_COLORS: Record<string, React.ReactNode> = {
   LOGIN: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400',
   REGISTER: 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400',
   ENDPOINT_CREATE: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
@@ -45,44 +46,44 @@ const ACTION_COLORS: Record<string, string> = {
   SUBSCRIPTION_CANCEL: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
 };
 
-const ACTION_ICONS: Record<string, string> = {
-  LOGIN: '🔑',
-  REGISTER: '👤',
-  ENDPOINT_CREATE: '➕',
-  ENDPOINT_DELETE: '🗑️',
-  ENDPOINT_UPDATE: '✏️',
-  API_KEY_CREATE: '🔐',
-  API_KEY_DELETE: '🗑️',
-  IMPERSONATE: '👁️',
-  PASSWORD_CHANGE: '🔒',
-  '2FA_ENABLE': '🛡️',
-  '2FA_DISABLE': '🛡️',
-  SETTINGS_UPDATE: '⚙️',
-  FEATURE_FLAG_CREATE: '🚩',
-  FEATURE_FLAG_UPDATE: '🚩',
-  FEATURE_FLAG_DELETE: '🚩',
-  FEATURE_FLAG_LIST: '🚩',
-  ALERT_CREATE: '🚨',
-  ALERT_UPDATE: '🚨',
-  ALERT_DELETE: '🚨',
+const ACTION_ICONS: Record<string, React.ReactNode> = {
+  LOGIN: <Key size={16} strokeWidth={1.75} />,
+  REGISTER: <User size={16} strokeWidth={1.75} />,
+  ENDPOINT_CREATE: <Plus size={16} strokeWidth={1.75} />,
+  ENDPOINT_DELETE: <Trash2 size={16} strokeWidth={1.75} />,
+  ENDPOINT_UPDATE: <Pencil size={16} strokeWidth={1.75} />,
+  API_KEY_CREATE: <ShieldCheck size={16} strokeWidth={1.75} />,
+  API_KEY_DELETE: <Trash2 size={16} strokeWidth={1.75} />,
+  IMPERSONATE: <Eye size={16} strokeWidth={1.75} />,
+  PASSWORD_CHANGE: <Lock size={16} strokeWidth={1.75} />,
+  '2FA_ENABLE': <Shield size={16} strokeWidth={1.75} />,
+  '2FA_DISABLE': <Shield size={16} strokeWidth={1.75} />,
+  SETTINGS_UPDATE: <Settings size={16} strokeWidth={1.75} />,
+  FEATURE_FLAG_CREATE: <Flag size={16} strokeWidth={1.75} />,
+  FEATURE_FLAG_UPDATE: <Flag size={16} strokeWidth={1.75} />,
+  FEATURE_FLAG_DELETE: <Flag size={16} strokeWidth={1.75} />,
+  FEATURE_FLAG_LIST: <Flag size={16} strokeWidth={1.75} />,
+  ALERT_CREATE: <AlertTriangle size={16} strokeWidth={1.75} />,
+  ALERT_UPDATE: <AlertTriangle size={16} strokeWidth={1.75} />,
+  ALERT_DELETE: <AlertTriangle size={16} strokeWidth={1.75} />,
   DELIVERY_REPLAY: '↩️',
-  USER_PLAN_CHANGE: '💳',
-  USER_STATUS_CHANGE: '👤',
-  USER_EMAIL_SEND: '📧',
+  USER_PLAN_CHANGE: <CreditCard size={16} strokeWidth={1.75} />,
+  USER_STATUS_CHANGE: <User size={16} strokeWidth={1.75} />,
+  USER_EMAIL_SEND: <Mail size={16} strokeWidth={1.75} />,
   USER_GDPR_EXPORT: '📤',
-  USER_GDPR_DELETE: '🗑️',
-  ADMIN_TEST_WEBHOOK: '🧪',
+  USER_GDPR_DELETE: <Trash2 size={16} strokeWidth={1.75} />,
+  ADMIN_TEST_WEBHOOK: <FlaskConical size={16} strokeWidth={1.75} />,
   BULK_REPLAY: '↩️',
   ADMIN_REFUND: '💸',
-  BULK_EMAIL_SENT: '📧',
+  BULK_EMAIL_SENT: <Mail size={16} strokeWidth={1.75} />,
   GDPR_EXPORT: '📤',
-  GDPR_DATA_DELETE: '🗑️',
-  SERVICE_TOKEN_CREATE: '🔑',
-  SERVICE_TOKEN_DELETE: '🗑️',
-  MEMBER_INVITE: '📨',
+  GDPR_DATA_DELETE: <Trash2 size={16} strokeWidth={1.75} />,
+  SERVICE_TOKEN_CREATE: <Key size={16} strokeWidth={1.75} />,
+  SERVICE_TOKEN_DELETE: <Trash2 size={16} strokeWidth={1.75} />,
+  MEMBER_INVITE: <Inbox size={16} strokeWidth={1.75} />,
   MEMBER_REMOVE: '👋',
   ROLE_CHANGE: '👔',
-  SUBSCRIPTION_CANCEL: '💳',
+  SUBSCRIPTION_CANCEL: <CreditCard size={16} strokeWidth={1.75} />,
 };
 
 const KNOWN_ACTIONS = [
@@ -221,7 +222,7 @@ export default function AdminActivityPage() {
           </div>
         ) : entries.length === 0 ? (
           <div className="px-6 py-12 text-center">
-            <span className="text-4xl block mb-3" aria-hidden="true">📋</span>
+            <span className="text-4xl block mb-3" aria-hidden="true"><ClipboardList size={18} strokeWidth={1.75} /></span>
             <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noActivity')}</p>
           </div>
         ) : (

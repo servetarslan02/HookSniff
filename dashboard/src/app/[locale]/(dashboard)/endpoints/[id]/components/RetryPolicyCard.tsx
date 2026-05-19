@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { RetryPolicyConfig } from '@/lib/api';
+import { RefreshCw } from 'lucide-react';
 
 const BACKOFF_OPTIONS = [
   { value: 'exponential', labelKey: 'exponential', descKey: 'exponentialDesc' },
@@ -66,7 +67,7 @@ export function RetryPolicyCard({
   return (
     <div className="glass-card p-6">
       <div className="flex items-center gap-2 mb-6">
-        <span className="text-xl">🔄</span>
+        <span className="text-xl"><RefreshCw size={18} strokeWidth={1.75} /></span>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('retryPolicy')}</h3>
       </div>
 

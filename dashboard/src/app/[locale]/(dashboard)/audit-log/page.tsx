@@ -3,26 +3,27 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuditLogs } from '@/hooks/useDashboardData';
+import { ClipboardList, CreditCard, Image, Key, Link2, Package, Pencil, RefreshCw, Settings, Trash2, User, Users } from 'lucide-react';
 
 /* ─── Types ─── */
-const ACTION_ICONS: Record<string, string> = {
-  'auth.login': '🔑',
+const ACTION_ICONS: Record<string, React.ReactNode> = {
+  'auth.login': <Key size={16} strokeWidth={1.75} />,
   'auth.logout': '👋',
-  'auth.register': '👤',
-  'endpoint.create': '🔗',
-  'endpoint.update': '✏️',
-  'endpoint.delete': '🗑️',
-  'apikey.create': '🔑',
-  'apikey.rotate': '🔄',
-  'apikey.delete': '🗑️',
-  'webhook.send': '📦',
-  'webhook.replay': '🔄',
-  'team.invite': '👥',
+  'auth.register': <User size={16} strokeWidth={1.75} />,
+  'endpoint.create': <Link2 size={16} strokeWidth={1.75} />,
+  'endpoint.update': <Pencil size={16} strokeWidth={1.75} />,
+  'endpoint.delete': <Trash2 size={16} strokeWidth={1.75} />,
+  'apikey.create': <Key size={16} strokeWidth={1.75} />,
+  'apikey.rotate': <RefreshCw size={16} strokeWidth={1.75} />,
+  'apikey.delete': <Trash2 size={16} strokeWidth={1.75} />,
+  'webhook.send': <Package size={16} strokeWidth={1.75} />,
+  'webhook.replay': <RefreshCw size={16} strokeWidth={1.75} />,
+  'team.invite': <Users size={16} strokeWidth={1.75} />,
   'team.remove': '👋',
-  'settings.update': '⚙️',
-  'billing.update': '💳',
-  'schema.create': '📋',
-  'portal.update': '🖼️',
+  'settings.update': <Settings size={16} strokeWidth={1.75} />,
+  'billing.update': <CreditCard size={16} strokeWidth={1.75} />,
+  'schema.create': <ClipboardList size={16} strokeWidth={1.75} />,
+  'portal.update': <Image size={16} strokeWidth={1.75} />,
 };
 
 export default function AuditLogPage() {
@@ -70,7 +71,7 @@ export default function AuditLogPage() {
         </div>
       ) : entries.length === 0 ? (
         <div className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4">📋</div>
+          <div className="text-5xl mb-4"><ClipboardList size={18} strokeWidth={1.75} /></div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('noActivity')}</h2>
           <p className="text-gray-500 dark:text-slate-400 max-w-md mx-auto">
             {t('noActivityDesc')}

@@ -3,23 +3,24 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Team, TeamMember } from '@/lib/api';
+import { AlertTriangle, Check, ClipboardList, Clock, Eye, Link2, Pencil, Shield, User, X } from 'lucide-react';
 
 const ROLE_OPTIONS = ['admin', 'editor', 'viewer'] as const;
 
-const ROLE_STYLES: Record<string, string> = {
+const ROLE_STYLES: Record<string, React.ReactNode> = {
   admin: 'bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400',
   editor: 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400',
   viewer: 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-slate-400',
 };
 
-const ROLE_ICONS: Record<string, string> = {
-  admin: '🛡️',
-  editor: '✏️',
-  viewer: '👁️',
+const ROLE_ICONS: Record<string, React.ReactNode> = {
+  admin: <Shield size={16} strokeWidth={1.75} />,
+  editor: <Pencil size={16} strokeWidth={1.75} />,
+  viewer: <Eye size={16} strokeWidth={1.75} />,
 };
 
 function roleLabel(t: ReturnType<typeof useTranslations>, role: string): string {
-  const map: Record<string, string> = { admin: t('roleAdmin'), editor: t('roleEditor'), viewer: t('roleViewer') };
+  const map: Record<string, React.ReactNode> = { admin: t('roleAdmin'), editor: t('roleEditor'), viewer: t('roleViewer') };
   return map[role] || role;
 }
 
@@ -134,12 +135,12 @@ export function TeamDetail({
                         }
                       }}
                       className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded"
-                    >✓</button>
+                    ><Check size={18} strokeWidth={1.75} /></button>
                     <button
                       type="button"
                       onClick={() => { setNameValue(team.name); setEditingName(false); }}
                       className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
-                    >✕</button>
+                    ><X size={18} strokeWidth={1.75} /></button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
@@ -225,17 +226,17 @@ export function TeamDetail({
             <div className="flex items-center gap-3">
               {adminCount > 0 && (
                 <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400">
-                  🛡️ {adminCount} admin{adminCount > 1 ? 's' : ''}
+                  <Shield size={16} strokeWidth={1.75} className="inline mr-1" /> {adminCount} admin{adminCount > 1 ? 's' : ''}
                 </span>
               )}
               {editorCount > 0 && (
                 <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400">
-                  ✏️ {editorCount} editor{editorCount > 1 ? 's' : ''}
+                  <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {editorCount} editor{editorCount > 1 ? 's' : ''}
                 </span>
               )}
               {viewerCount > 0 && (
                 <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-slate-400">
-                  👁️ {viewerCount} viewer{viewerCount > 1 ? 's' : ''}
+                  <Eye size={16} strokeWidth={1.75} className="inline mr-1" /> {viewerCount} viewer{viewerCount > 1 ? 's' : ''}
                 </span>
               )}
             </div>
@@ -243,7 +244,7 @@ export function TeamDetail({
           {/* Plan limit warning */}
           {members.length >= 5 && (
             <div className="flex items-center gap-2 mt-2 p-2 bg-amber-50 dark:bg-amber-500/10 rounded-lg">
-              <span className="text-xs">⚠️</span>
+              <span className="text-xs"><AlertTriangle size={18} strokeWidth={1.75} /></span>
               <p className="text-xs text-amber-700 dark:text-amber-300">
                 {members.length >= 20
                   ? (t('nearMemberLimit') || 'You\'re approaching the team member limit. Upgrade your plan for more members.')
@@ -263,7 +264,7 @@ export function TeamDetail({
         {members.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-100 dark:bg-slate-700/50 flex items-center justify-center">
-              <span className="text-2xl">👤</span>
+              <span className="text-2xl"><User size={18} strokeWidth={1.75} /></span>
             </div>
             <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{t('noMembers')}</p>
             <p className="text-xs text-gray-400 dark:text-slate-500">Invite team members to collaborate</p>
@@ -347,7 +348,7 @@ export function TeamDetail({
             </svg>
           </button>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-brand-600 dark:text-brand-400">🔗</span>
+            <span className="text-brand-600 dark:text-brand-400"><Link2 size={18} strokeWidth={1.75} /></span>
             <p className="text-sm font-medium text-brand-800 dark:text-brand-300">{t('inviteLinkReady') || 'Invite link ready!'}</p>
           </div>
           <p className="text-xs text-brand-600 dark:text-brand-400 mb-2">{t('shareInviteLink') || 'Share this link with the invited person. They need to log in first, then the invite will be accepted automatically.'}</p>
@@ -357,7 +358,7 @@ export function TeamDetail({
               type="button"
               onClick={onCopyLink}
               className="px-3 py-2 bg-brand-600 text-white rounded-lg text-xs font-medium hover:bg-brand-700 transition"
-            >📋 {t('copy') || 'Copy'}</button>
+            ><ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> {t('copy') || 'Copy'}</button>
           </div>
         </div>
       )}
@@ -376,8 +377,7 @@ export function TeamDetail({
               return (
                 <div key={inv.id} className="group px-6 py-4 flex items-center gap-4 hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
                   <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-500/15 flex items-center justify-center text-amber-600 dark:text-amber-400 text-sm shrink-0">
-                    ⏳
-                  </div>
+                    <Clock size={16} strokeWidth={1.75} className="inline mr-1" /> </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{inv.email}</p>
                     <div className="flex items-center gap-2 mt-0.5">

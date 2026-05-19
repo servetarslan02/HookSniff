@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { Settings, Bell, Palette, Image } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -26,10 +27,10 @@ export default function AccountPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'settings', label: t('settings'), icon: '⚙️', content: () => <SettingsPage /> },
-        { key: 'notifications', label: t('notifications'), icon: '🔔', content: () => <NotificationsPage /> },
-        { key: 'portal-customize', label: t('portalCustomize'), icon: '🎨', content: () => <PortalCustomizePage /> },
-        { key: 'portal-manage', label: t('portalManage'), icon: '🖼️', content: () => <PortalManagePage /> },
+        { key: 'settings', label: t('settings'), icon: <Settings size={16} strokeWidth={1.75} />, content: () => <SettingsPage /> },
+        { key: 'notifications', label: t('notifications'), icon: <Bell size={16} strokeWidth={1.75} />, content: () => <NotificationsPage /> },
+        { key: 'portal-customize', label: t('portalCustomize'), icon: <Palette size={16} strokeWidth={1.75} />, content: () => <PortalCustomizePage /> },
+        { key: 'portal-manage', label: t('portalManage'), icon: <Image size={16} strokeWidth={1.75} />, content: () => <PortalManagePage /> },
       ]}
     />
   );

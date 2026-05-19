@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { Shuffle, Repeat, Globe, Package, Timer } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -27,11 +28,11 @@ export default function RoutingConfigPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'routing', label: t('routing'), icon: '🔀', content: () => <RoutingPage /> },
-        { key: 'retry-policy', label: t('retryPolicy'), icon: '🔁', content: () => <RetryPolicyPage /> },
-        { key: 'custom-domain', label: t('customDomain'), icon: '🌐', content: () => <CustomDomainPage /> },
-        { key: 'environments', label: t('environments'), icon: '📦', content: () => <EnvironmentsPage /> },
-        { key: 'rate-limiting', label: t('rateLimiting'), icon: '⏱️', content: () => <RateLimitingPage /> },
+        { key: 'routing', label: t('routing'), icon: <Shuffle size={16} strokeWidth={1.75} />, content: () => <RoutingPage /> },
+        { key: 'retry-policy', label: t('retryPolicy'), icon: <Repeat size={16} strokeWidth={1.75} />, content: () => <RetryPolicyPage /> },
+        { key: 'custom-domain', label: t('customDomain'), icon: <Globe size={16} strokeWidth={1.75} />, content: () => <CustomDomainPage /> },
+        { key: 'environments', label: t('environments'), icon: <Package size={16} strokeWidth={1.75} />, content: () => <EnvironmentsPage /> },
+        { key: 'rate-limiting', label: t('rateLimiting'), icon: <Timer size={16} strokeWidth={1.75} />, content: () => <RateLimitingPage /> },
       ]}
     />
   );

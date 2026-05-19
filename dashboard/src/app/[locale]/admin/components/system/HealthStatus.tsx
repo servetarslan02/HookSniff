@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
+import { Database, Zap, Inbox, RefreshCw, Bell, HardDrive } from 'lucide-react';
 
 
 interface HealthStatusProps {
@@ -44,7 +45,7 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
   const services = [
     {
       name: t('database') || 'Database',
-      icon: '🐘',
+      icon: <Database size={24} strokeWidth={1.75} />,
       status: health.checks?.database?.status || health.database?.status || 'unknown',
       latency: health.checks?.database?.latency_ms ?? health.database?.latency_ms ?? null,
       detail: (health.checks?.database?.latency_ms || health.database?.latency_ms)
@@ -53,7 +54,7 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
     },
     {
       name: t('redis') || 'Redis',
-      icon: '🔴',
+      icon: <HardDrive size={24} strokeWidth={1.75} className="text-red-500" />,
       status: health.checks?.redis?.status || health.redis?.status || 'unknown',
       latency: health.checks?.redis?.latency_ms ?? health.redis?.latency_ms ?? null,
       detail: (health.checks?.redis?.latency_ms || health.redis?.latency_ms)
@@ -62,7 +63,7 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
     },
     {
       name: t('apiStatus') || 'API',
-      icon: '⚡',
+      icon: <Zap size={24} strokeWidth={1.75} />,
       status: health.api?.status || 'unknown',
       latency: null,
       detail: health.api?.uptime_seconds
@@ -71,7 +72,7 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
     },
     {
       name: t('queue') || 'Queue',
-      icon: '📬',
+      icon: <Inbox size={24} strokeWidth={1.75} />,
       status: health.checks?.queue?.status || health.queue?.pending !== undefined ? 'ok' : 'unknown',
       latency: health.checks?.queue?.latency_ms ?? null,
       detail: health.queue
@@ -104,7 +105,7 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
             onClick={onRefresh}
             className="sm:ml-auto px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition"
           >
-            🔄 {t('refresh')}
+            <RefreshCw size={14} strokeWidth={1.75} className="inline mr-1" />{t('refresh')}
           </button>
         </div>
         <p className="text-xs text-gray-500 dark:text-slate-400">
@@ -114,7 +115,7 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
 
       {/* Active Alerts Banner */}
       <div className={`glass-card p-4 flex items-center gap-3 ${activeAlerts > 0 ? 'border-l-4 border-amber-500' : ''}`}>
-        <span className="text-xl">🔔</span>
+        <Bell size={20} strokeWidth={1.75} className="text-gray-400" />
         <div className="flex-1">
           <span className="text-sm font-medium text-gray-900 dark:text-white">
             {activeAlerts > 0
