@@ -15,13 +15,9 @@ const tabSkeleton = (
   </div>
 );
 
-const SchemasPage = dynamic(() => import('../schemas/page'), { ssr: false, loading: () => tabSkeleton });
-const TemplatesPage = dynamic(() => import('../templates/page'), { ssr: false, loading: () => tabSkeleton });
-const TransformsPage = dynamic(() => import('../transforms/page'), { ssr: false, loading: () => tabSkeleton });
 const InboundPage = dynamic(() => import('../inbound/page'), { ssr: false, loading: () => tabSkeleton });
 const OperationalWebhooksListPage = dynamic(() => import('./OperationalWebhooksList'), { ssr: false, loading: () => tabSkeleton });
 const MessagePollerPage = dynamic(() => import('../message-poller/page'), { ssr: false, loading: () => tabSkeleton });
-const BackgroundTasksPage = dynamic(() => import('../background-tasks/page'), { ssr: false, loading: () => tabSkeleton });
 
 export default function OperationalWebhooksPage() {
   const t = useTranslations('nav');
@@ -29,13 +25,9 @@ export default function OperationalWebhooksPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'schemas', label: t('schemas'), icon: '📐', content: () => <SchemasPage /> },
-        { key: 'templates', label: t('templates'), icon: '📄', content: () => <TemplatesPage /> },
-        { key: 'transforms', label: t('transforms'), icon: '🔄', content: () => <TransformsPage /> },
         { key: 'inbound', label: t('inboundWebhooks'), icon: '📥', content: () => <InboundPage /> },
         { key: 'operational', label: t('operationalWebhooks'), icon: '🪝', content: () => <OperationalWebhooksListPage /> },
         { key: 'poller', label: t('messagePoller'), icon: '📬', content: () => <MessagePollerPage /> },
-        { key: 'tasks', label: t('backgroundTasks'), icon: '⏳', content: () => <BackgroundTasksPage /> },
       ]}
     />
   );
