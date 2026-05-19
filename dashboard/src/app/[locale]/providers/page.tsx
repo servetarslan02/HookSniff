@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { CreditCard, Github, ShoppingBag } from 'lucide-react';
 
 // Revalidate every hour for ISR
 export const revalidate = 3600;
@@ -12,9 +13,9 @@ export const metadata = {
 };
 
 const providers = [
-  { name: 'Stripe', emoji: '💳', desc: 'Payments, subscriptions, disputes, and refunds.', href: '/providers/stripe', color: 'purple' },
-  { name: 'GitHub', emoji: '🐙', desc: 'Push, PR, issues, deployments, and CI/CD events.', href: '/providers/github', color: 'gray' },
-  { name: 'Shopify', emoji: '🛍️', desc: 'Orders, products, customers, and inventory.', href: '/providers/shopify', color: 'green' },
+  { name: 'Stripe', icon: <CreditCard size={32} strokeWidth={1.5} className="text-purple-600 dark:text-purple-400" />, desc: 'Payments, subscriptions, disputes, and refunds.', href: '/providers/stripe', color: 'purple' },
+  { name: 'GitHub', icon: <Github size={32} strokeWidth={1.5} />, desc: 'Push, PR, issues, deployments, and CI/CD events.', href: '/providers/github', color: 'gray' },
+  { name: 'Shopify', icon: <ShoppingBag size={32} strokeWidth={1.5} className="text-green-600 dark:text-green-400" />, desc: 'Orders, products, customers, and inventory.', href: '/providers/shopify', color: 'green' },
 ];
 
 export default function ProvidersPage() {
@@ -41,7 +42,7 @@ export default function ProvidersPage() {
         <div className="grid md:grid-cols-3 gap-6 mb-16">
           {providers.map((p) => (
             <Link key={p.name} href={p.href} className="group p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors text-center">
-              <span className="text-4xl mb-3 block">{p.emoji}</span>
+              <span className="text-4xl mb-3 block">{p.icon}</span>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mb-2">{p.name}</h2>
               <p className="text-sm text-gray-600 dark:text-slate-400">{p.desc}</p>
             </Link>

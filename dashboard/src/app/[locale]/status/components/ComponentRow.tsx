@@ -5,6 +5,7 @@ import type { ComponentStatus } from './types';
 import { latencyColor } from './utils';
 import { StatusBadge } from './StatusBadge';
 import { Sparkline } from './Sparkline';
+import { Wrench } from 'lucide-react';
 
 export function ComponentRow({ component, responseTimes }: { component: ComponentStatus; responseTimes: number[] }) {
   const t = useTranslations('status');
@@ -15,7 +16,7 @@ export function ComponentRow({ component, responseTimes }: { component: Componen
     <div className="py-4 first:pt-0 last:pb-0">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
-          <span className="text-lg">{component.icon || '🔧'}</span>
+          <span className="text-lg">{component.icon || <Wrench size={16} strokeWidth={1.75} />}</span>
           <div>
             <div className="font-medium text-gray-900 dark:text-white">{component.name}</div>
             <div className="text-sm text-gray-500 dark:text-slate-400">{component.description}</div>

@@ -1,10 +1,12 @@
 'use client';
+import React from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Inbox, Link as LinkIcon, Anchor } from 'lucide-react';
 
 const tlDrKeys = ['tlDr1', 'tlDr2', 'tlDr3', 'tlDr4', 'tlDr5'];
 
@@ -35,70 +37,70 @@ const sectionKeys = [
     hook0: { text: 'sdkHook0', badge: '4 SDKs' },
   },
   { titleKey: 'sectionFifoTitle', descKey: 'sectionFifoDesc', bestFitKey: 'bestFitFifo', winner: 'hooksniff',
-    hooksniff: { text: 'fifoHooksniff', badge: '✅' },
-    svix: { text: 'fifoSvix', badge: '❌' },
-    hookdeck: { text: 'fifoHookdeck', badge: '❌' },
-    hook0: { text: 'fifoHook0', badge: '❌' },
+    hooksniff: { text: 'fifoHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    svix: { text: 'fifoSvix', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
+    hookdeck: { text: 'fifoHookdeck', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
+    hook0: { text: 'fifoHook0', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
   },
   { titleKey: 'sectionCloudEventsTitle', descKey: 'sectionCloudEventsDesc', bestFitKey: 'bestFitCloudEvents', winner: 'hooksniff',
-    hooksniff: { text: 'ceHooksniff', badge: '✅' },
-    svix: { text: 'ceSvix', badge: '❌' },
-    hookdeck: { text: 'ceHookdeck', badge: '❌' },
-    hook0: { text: 'ceHook0', badge: '❌' },
+    hooksniff: { text: 'ceHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    svix: { text: 'ceSvix', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
+    hookdeck: { text: 'ceHookdeck', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
+    hook0: { text: 'ceHook0', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
   },
   { titleKey: 'sectionSchemaTitle', descKey: 'sectionSchemaDesc', bestFitKey: 'bestFitSchema', winner: 'hooksniff',
-    hooksniff: { text: 'schemaHooksniff', badge: '✅' },
-    svix: { text: 'schemaSvix', badge: '❌' },
-    hookdeck: { text: 'schemaHookdeck', badge: '❌' },
-    hook0: { text: 'schemaHook0', badge: '❌' },
+    hooksniff: { text: 'schemaHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    svix: { text: 'schemaSvix', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
+    hookdeck: { text: 'schemaHookdeck', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
+    hook0: { text: 'schemaHook0', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
   },
   { titleKey: 'sectionPortalTitle', descKey: 'sectionPortalDesc', bestFitKey: 'bestFitPortal', winner: 'svix',
-    hooksniff: { text: 'portalHooksniff', badge: '✅' },
+    hooksniff: { text: 'portalHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
     svix: { text: 'portalSvix', badge: 'badgeBest' },
-    hookdeck: { text: 'portalHookdeck', badge: '❌' },
-    hook0: { text: 'portalHook0', badge: '❌' },
+    hookdeck: { text: 'portalHookdeck', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
+    hook0: { text: 'portalHook0', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
   },
   { titleKey: 'sectionRoutingTitle', descKey: 'sectionRoutingDesc', bestFitKey: 'bestFitRouting', winner: 'hookdeck',
-    hooksniff: { text: 'routingHooksniff', badge: '✅' },
-    svix: { text: 'routingSvix', badge: '❌' },
+    hooksniff: { text: 'routingHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    svix: { text: 'routingSvix', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
     hookdeck: { text: 'routingHookdeck', badge: 'badgeBest' },
-    hook0: { text: 'routingHook0', badge: '❌' },
+    hook0: { text: 'routingHook0', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
   },
   { titleKey: 'sectionTransformTitle', descKey: 'sectionTransformDesc', bestFitKey: 'bestFitTransform', winner: 'svix',
-    hooksniff: { text: 'transformHooksniff', badge: '✅' },
-    svix: { text: 'transformSvix', badge: '✅' },
-    hookdeck: { text: 'transformHookdeck', badge: '✅' },
-    hook0: { text: 'transformHook0', badge: '❌' },
+    hooksniff: { text: 'transformHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    svix: { text: 'transformSvix', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    hookdeck: { text: 'transformHookdeck', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    hook0: { text: 'transformHook0', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
   },
   { titleKey: 'sectionInboundTitle', descKey: 'sectionInboundDesc', bestFitKey: 'bestFitInbound', winner: 'hookdeck',
-    hooksniff: { text: 'inboundHooksniff', badge: '✅' },
-    svix: { text: 'inboundSvix', badge: '✅' },
+    hooksniff: { text: 'inboundHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    svix: { text: 'inboundSvix', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
     hookdeck: { text: 'inboundHookdeck', badge: 'badgeBest' },
-    hook0: { text: 'inboundHook0', badge: '❌' },
+    hook0: { text: 'inboundHook0', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
   },
   { titleKey: 'sectionStreamingTitle', descKey: 'sectionStreamingDesc', bestFitKey: 'bestFitStreaming', winner: 'svix',
-    hooksniff: { text: 'streamingHooksniff', badge: '✅' },
+    hooksniff: { text: 'streamingHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
     svix: { text: 'streamingSvix', badge: 'badgeBest' },
-    hookdeck: { text: 'streamingHookdeck', badge: '❌' },
-    hook0: { text: 'streamingHook0', badge: '❌' },
+    hookdeck: { text: 'streamingHookdeck', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
+    hook0: { text: 'streamingHook0', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
   },
   { titleKey: 'sectionRateLimitTitle', descKey: 'sectionRateLimitDesc', bestFitKey: 'bestFitRateLimit', winner: 'hooksniff',
-    hooksniff: { text: 'rlHooksniff', badge: '✅' },
-    svix: { text: 'rlSvix', badge: '✅' },
-    hookdeck: { text: 'rlHookdeck', badge: '✅' },
-    hook0: { text: 'rlHook0', badge: '❌' },
+    hooksniff: { text: 'rlHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    svix: { text: 'rlSvix', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    hookdeck: { text: 'rlHookdeck', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    hook0: { text: 'rlHook0', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
   },
   { titleKey: 'sectionLatencyTitle', descKey: 'sectionLatencyDesc', bestFitKey: 'bestFitLatency', winner: 'hookdeck',
-    hooksniff: { text: 'latencyHooksniff', badge: '✅' },
-    svix: { text: 'latencySvix', badge: '❌' },
+    hooksniff: { text: 'latencyHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
+    svix: { text: 'latencySvix', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
     hookdeck: { text: 'latencyHookdeck', badge: 'badgeBest' },
-    hook0: { text: 'latencyHook0', badge: '❌' },
+    hook0: { text: 'latencyHook0', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
   },
   { titleKey: 'sectionStandardTitle', descKey: 'sectionStandardDesc', bestFitKey: 'bestFitStandard', winner: 'svix',
-    hooksniff: { text: 'standardHooksniff', badge: '✅' },
+    hooksniff: { text: 'standardHooksniff', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
     svix: { text: 'standardSvix', badge: 'badgeAuthor' },
-    hookdeck: { text: 'standardHookdeck', badge: '⚠️' },
-    hook0: { text: 'standardHook0', badge: '✅' },
+    hookdeck: { text: 'standardHookdeck', badge: <AlertTriangle size={14} strokeWidth={1.75} className="text-amber-500" /> },
+    hook0: { text: 'standardHook0', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
   },
   { titleKey: 'sectionComplianceTitle', descKey: 'sectionComplianceDesc', bestFitKey: 'bestFitCompliance', winner: 'svix',
     hooksniff: { text: 'complianceHooksniff', badge: 'SOC 2 Ready' },
@@ -113,10 +115,10 @@ const sectionKeys = [
     hook0: { text: 'residencyHook0', badge: 'Any' },
   },
   { titleKey: 'sectionOpenSourceTitle', descKey: 'sectionOpenSourceDesc', bestFitKey: 'bestFitOpenSource', winner: 'hooksniff',
-    hooksniff: { text: 'ossHooksniff', badge: '✅ MIT' },
-    svix: { text: 'ossSvix', badge: '✅ MIT' },
-    hookdeck: { text: 'ossHookdeck', badge: '❌' },
-    hook0: { text: 'ossHook0', badge: '✅' },
+    hooksniff: { text: 'ossHooksniff', badge: <><Check size={14} strokeWidth={1.75} className="text-emerald-500" /> MIT</> },
+    svix: { text: 'ossSvix', badge: <><Check size={14} strokeWidth={1.75} className="text-emerald-500" /> MIT</> },
+    hookdeck: { text: 'ossHookdeck', badge: <X size={14} strokeWidth={1.75} className="text-red-500" /> },
+    hook0: { text: 'ossHook0', badge: <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> },
   },
   { titleKey: 'sectionDxTitle', descKey: 'sectionDxDesc', bestFitKey: 'bestFitDx', winner: 'svix',
     hooksniff: { text: 'dxHooksniff', badge: 'badgeStrong' },
@@ -201,7 +203,7 @@ export default function CompareContent() {
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
+            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white"><Anchor size={20} strokeWidth={1.75} className="inline mr-1" /> HookSniff</Link>
             <span className="text-gray-500 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
@@ -257,10 +259,10 @@ export default function CompareContent() {
               <thead>
                 <tr className="border-b border-gray-200 dark:border-slate-700">
                   <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white">{t("category")}</th>
-                  <th className="text-center py-2 px-4 font-semibold text-brand-600 dark:text-brand-400">🪝 HookSniff</th>
-                  <th className="text-center py-2 px-4 font-semibold text-gray-900 dark:text-white">📨 Svix</th>
-                  <th className="text-center py-2 px-4 font-semibold text-gray-900 dark:text-white">🔗 Hookdeck</th>
-                  <th className="text-center py-2 px-4 font-semibold text-gray-900 dark:text-white">🪝 Hook0</th>
+                  <th className="text-center py-2 px-4 font-semibold text-brand-600 dark:text-brand-400"><Anchor size={14} strokeWidth={1.75} className="inline mr-1" /> HookSniff</th>
+                  <th className="text-center py-2 px-4 font-semibold text-gray-900 dark:text-white"><Inbox size={14} strokeWidth={1.75} className="inline mr-1" /> Svix</th>
+                  <th className="text-center py-2 px-4 font-semibold text-gray-900 dark:text-white"><LinkIcon size={14} strokeWidth={1.75} className="inline mr-1" /> Hookdeck</th>
+                  <th className="text-center py-2 px-4 font-semibold text-gray-900 dark:text-white"><Anchor size={14} strokeWidth={1.75} className="inline mr-1" /> Hook0</th>
                 </tr>
               </thead>
               <tbody>
@@ -310,7 +312,7 @@ export default function CompareContent() {
                   {(['hooksniff', 'svix', 'hookdeck', 'hook0'] as const).map((name) => {
                     const data = section[name];
                     const isWinner = section.winner === name;
-                    const labels: Record<string, string> = { hooksniff: '🪝 HookSniff', svix: '📨 Svix', hookdeck: '🔗 Hookdeck', hook0: '🪝 Hook0' };
+                    const labels: Record<string, React.ReactNode> = { hooksniff: <><Anchor size={12} strokeWidth={1.75} className="inline mr-1" /> HookSniff</>, svix: <><Inbox size={12} strokeWidth={1.75} className="inline mr-1" /> Svix</>, hookdeck: <><LinkIcon size={12} strokeWidth={1.75} className="inline mr-1" /> Hookdeck</>, hook0: <><Anchor size={12} strokeWidth={1.75} className="inline mr-1" /> Hook0</> };
                     return (
                       <div key={name} className={`p-4 ${isWinner ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
                         <div className="flex items-center justify-between mb-2">

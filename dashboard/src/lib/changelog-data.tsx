@@ -27,21 +27,23 @@ export type ChangelogItem = {
 
 /* ─── Config ─── */
 
-export const typeConfig: Record<ChangeType, { label: string; color: string; bg: string; icon: string }> = {
-  feature: { label: 'Feature', color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', icon: '✨' },
-  fix: { label: 'Fix', color: 'text-red-700 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-500/10', icon: '🐛' },
-  improvement: { label: 'Improvement', color: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-500/10', icon: '⚡' },
-  security: { label: 'Security', color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', icon: '🔐' },
-  breaking: { label: 'Breaking', color: 'text-purple-700 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-500/10', icon: '💥' },
+import { Sparkles, Bug, Zap, ShieldAlert, Expand, Plug, BarChart3, Package, Settings, Building, BookOpen } from 'lucide-react';
+
+export const typeConfig: Record<ChangeType, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
+  feature: { label: 'Feature', color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', icon: <Sparkles size={14} strokeWidth={1.75} /> },
+  fix: { label: 'Fix', color: 'text-red-700 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-500/10', icon: <Bug size={14} strokeWidth={1.75} /> },
+  improvement: { label: 'Improvement', color: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-500/10', icon: <Zap size={14} strokeWidth={1.75} /> },
+  security: { label: 'Security', color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', icon: <ShieldAlert size={14} strokeWidth={1.75} /> },
+  breaking: { label: 'Breaking', color: 'text-purple-700 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-500/10', icon: <Expand size={14} strokeWidth={1.75} /> },
 };
 
-export const areaConfig: Record<ProductArea, { label: string; icon: string }> = {
-  api: { label: 'API', icon: '🔌' },
-  dashboard: { label: 'Dashboard', icon: '📊' },
-  sdk: { label: 'SDK', icon: '📦' },
-  worker: { label: 'Worker', icon: '⚙️' },
-  infra: { label: 'Infra', icon: '🏗️' },
-  docs: { label: 'Docs', icon: '📖' },
+export const areaConfig: Record<ProductArea, { label: string; icon: React.ReactNode }> = {
+  api: { label: 'API', icon: <Plug size={14} strokeWidth={1.75} /> },
+  dashboard: { label: 'Dashboard', icon: <BarChart3 size={14} strokeWidth={1.75} /> },
+  sdk: { label: 'SDK', icon: <Package size={14} strokeWidth={1.75} /> },
+  worker: { label: 'Worker', icon: <Settings size={14} strokeWidth={1.75} /> },
+  infra: { label: 'Infra', icon: <Building size={14} strokeWidth={1.75} /> },
+  docs: { label: 'Docs', icon: <BookOpen size={14} strokeWidth={1.75} /> },
 };
 
 export const allTypes: ChangeType[] = ['feature', 'fix', 'improvement', 'security', 'breaking'];

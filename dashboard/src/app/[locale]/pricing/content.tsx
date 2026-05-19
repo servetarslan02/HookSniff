@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import Footer from '@/components/Footer';
 import PublicNavbar from '@/components/PublicNavbar';
+import { DollarSign, Lock, Shield, Key, ShieldCheck, ClipboardList, Globe, MapPin, Rocket, Star, Anchor, XCircle, CheckCircle, Clock } from 'lucide-react';
 
 
 
@@ -23,7 +24,7 @@ function RoiCalculator() {
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xs dark:shadow-lg p-6 md:p-8">
-      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">💰 {t('roiTitle')}</h3>
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2"><DollarSign size={20} strokeWidth={1.75} className="inline mr-1" /> {t('roiTitle')}</h3>
       <p className="text-sm text-gray-600 dark:text-slate-400 mb-6">{t('roiDesc')}</p>
 
       <div className="mb-6">
@@ -58,7 +59,7 @@ function RoiCalculator() {
           <p className="text-xs text-amber-500 dark:text-amber-500">{t('month')}</p>
         </div>
         <div className="text-center p-4 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border-2 border-emerald-400 dark:border-emerald-500/40">
-          <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mb-1">🪝 HookSniff</p>
+          <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mb-1"><Anchor size={14} strokeWidth={1.75} className="inline mr-1" /> HookSniff</p>
           <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">${hooksniffCost}</p>
           <p className="text-xs text-emerald-500 dark:text-emerald-500">{t('month')}</p>
         </div>
@@ -139,43 +140,43 @@ export function PricingPageContent() {
       items: [
         { feature: t('deliveryMethods'), developer: t('http'), startup: `${t('http')}, WebSocket`, pro: `${t('http')}, WebSocket`, enterprise: `${t('http')}, WebSocket` },
         { feature: t('retryAttempts'), developer: '3', startup: '5', pro: '10', enterprise: t('custom') },
-        { feature: t('customRetryPolicies'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: t('fifoDelivery'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
-        { feature: t('exponentialBackoff'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: t('dlq'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('customRetryPolicies'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('fifoDelivery'), developer: '—', startup: '—', pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('exponentialBackoff'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('dlq'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
       ],
     },
     {
       category: t('security'),
       items: [
-        { feature: t('hmacSignatures'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: t('secretRotation'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: `${t('ipWhitelisting')} (Coming Soon)`, developer: '—', startup: '—', pro: '🔜', enterprise: '🔜' },
-        { feature: t('ssoSaml'), developer: '—', startup: '—', pro: '—', enterprise: '✅' },
-        { feature: t('twoFactor'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: t('cloudevents'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('hmacSignatures'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('secretRotation'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: `${t('ipWhitelisting')} (Coming Soon)`, developer: '—', startup: '—', pro : <Clock size={16} className="text-amber-500 mx-auto" />, enterprise : <Clock size={16} className="text-amber-500 mx-auto" /> },
+        { feature: t('ssoSaml'), developer: '—', startup: '—', pro: '—', enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('twoFactor'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('cloudevents'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
       ],
     },
     {
       category: t('monitoringLogs'),
       items: [
-        { feature: t('dashboard'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('dashboard'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('logRetention'), developer: `7 ${t('days')}`, startup: `14 ${t('days')}`, pro: `180 ${t('days')}`, enterprise: t('custom') },
-        { feature: t('realtimeLogs'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: t('analyticsGraphs'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: t('schemaRegistry'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
-        { feature: t('webhookPlayground'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
+        { feature: t('realtimeLogs'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('analyticsGraphs'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('schemaRegistry'), developer: '—', startup: '—', pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('webhookPlayground'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
       ],
     },
     {
       category: t('support'),
       items: [
-        { feature: t('communitySupport'), developer: '✅', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: t('emailSupport'), developer: '—', startup: '✅', pro: '✅', enterprise: '✅' },
-        { feature: t('prioritySupport'), developer: '—', startup: '—', pro: '✅', enterprise: '✅' },
-        { feature: t('dedicatedManager'), developer: '—', startup: '—', pro: '—', enterprise: '✅' },
+        { feature: t('communitySupport'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('emailSupport'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('prioritySupport'), developer: '—', startup: '—', pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('dedicatedManager'), developer: '—', startup: '—', pro: '—', enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('slaGuarantee'), developer: '—', startup: '—', pro: '—', enterprise: '99.9%' },
-        { feature: t('customIntegrations'), developer: '—', startup: '—', pro: '—', enterprise: '✅' },
+        { feature: t('customIntegrations'), developer: '—', startup: '—', pro: '—', enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
       ],
     },
   ];
@@ -247,7 +248,7 @@ export function PricingPageContent() {
               {/* Popular badge */}
               {plan.popular && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-600 to-purple-600 text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-lg z-10 whitespace-nowrap">
-                  ⭐ {t('mostPopular')}
+                  <Star size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> {t('mostPopular')}
                 </div>
               )}
               {/* Header */}
@@ -363,17 +364,17 @@ export function PricingPageContent() {
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white text-center mb-4 sm:mb-8">{t('securityTitle')}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {[
-              { icon: '🔒', titleKey: 'securityItem1Title', descKey: 'securityItem1Desc' },
-              { icon: '🛡️', titleKey: 'securityItem2Title', descKey: 'securityItem2Desc' },
-              { icon: '🇪🇺', titleKey: 'securityItem3Title', descKey: 'securityItem3Desc' },
-              { icon: '🔑', titleKey: 'securityItem4Title', descKey: 'securityItem4Desc' },
-              { icon: '🔐', titleKey: 'securityItem5Title', descKey: 'securityItem5Desc' },
-              { icon: '📋', titleKey: 'securityItem6Title', descKey: 'securityItem6Desc' },
-              { icon: '🌐', titleKey: 'securityItem7Title', descKey: 'securityItem7Desc' },
-              { icon: '📍', titleKey: 'securityItem8Title', descKey: 'securityItem8Desc' },
+              { icon: <Lock size={24} strokeWidth={1.75} />, titleKey: 'securityItem1Title', descKey: 'securityItem1Desc' },
+              { icon: <Shield size={24} strokeWidth={1.75} />, titleKey: 'securityItem2Title', descKey: 'securityItem2Desc' },
+              { icon: <Globe size={24} strokeWidth={1.75} />, titleKey: 'securityItem3Title', descKey: 'securityItem3Desc' },
+              { icon: <Key size={24} strokeWidth={1.75} />, titleKey: 'securityItem4Title', descKey: 'securityItem4Desc' },
+              { icon: <ShieldCheck size={24} strokeWidth={1.75} />, titleKey: 'securityItem5Title', descKey: 'securityItem5Desc' },
+              { icon: <ClipboardList size={24} strokeWidth={1.75} />, titleKey: 'securityItem6Title', descKey: 'securityItem6Desc' },
+              { icon: <Globe size={24} strokeWidth={1.75} />, titleKey: 'securityItem7Title', descKey: 'securityItem7Desc' },
+              { icon: <MapPin size={24} strokeWidth={1.75} />, titleKey: 'securityItem8Title', descKey: 'securityItem8Desc' },
             ].map((item) => (
               <div key={item.titleKey} className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 text-center">
-                <span className="text-2xl">{item.icon}</span>
+                <span className="text-gray-600 dark:text-slate-400">{item.icon}</span>
                 <h4 className="font-semibold text-gray-900 dark:text-white text-sm mt-2">{t(item.titleKey)}</h4>
                 <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{t(item.descKey)}</p>
               </div>
@@ -420,7 +421,7 @@ export function PricingPageContent() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">{t('buildVsBuy')}</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-lg font-semibold text-red-700 dark:text-red-400 mb-4">❌ {t('buildingOwn')}</h3>
+              <h3 className="text-lg font-semibold text-red-700 dark:text-red-400 mb-4"><XCircle size={18} strokeWidth={1.75} className="inline mr-1" /> {t('buildingOwn')}</h3>
               <ul className="space-y-3">
                 {(t.raw('buildOwnItems') as string[]).map((item: string) => (
                   <li key={item} className="flex items-start gap-2 text-sm text-gray-600 dark:text-slate-400">
@@ -431,7 +432,7 @@ export function PricingPageContent() {
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-emerald-700 dark:text-emerald-400 mb-4">✅ {t('usingHookSniff')}</h3>
+              <h3 className="text-lg font-semibold text-emerald-700 dark:text-emerald-400 mb-4"><CheckCircle size={18} strokeWidth={1.75} className="inline mr-1" /> {t('usingHookSniff')}</h3>
               <ul className="space-y-3">
                 {(t.raw('useHookSniffItems') as string[]).map((item: string) => (
                   <li key={item} className="flex items-start gap-2 text-sm text-gray-700 dark:text-slate-300">
@@ -448,7 +449,7 @@ export function PricingPageContent() {
 
         {/* Startup Discount */}
         <div className="mb-16 text-center p-8 bg-linear-to-r from-brand-50 to-blue-50 dark:from-brand-500/10 dark:to-blue-500/10 rounded-xl border border-brand-100 dark:border-brand-500/20">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">🚀 {t('startupTitle')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2"><Rocket size={24} strokeWidth={1.75} className="inline mr-1" /> {t('startupTitle')}</h2>
           <p className="text-gray-600 dark:text-slate-400 max-w-xl mx-auto mb-4">
             {t('startupDesc')}
           </p>

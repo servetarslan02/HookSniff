@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Star } from 'lucide-react';
 
 const POSTS_PER_PAGE = 6;
 
@@ -195,7 +196,7 @@ export function BlogPageContent() {
           <Link key={post.slug} href={`/blog/${post.slug}`} className="block group mb-8">
             <article className="bg-linear-to-br from-white to-gray-50 dark:from-slate-900 dark:to-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-700 p-8 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-xs font-medium bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 px-2.5 py-1 rounded-full">⭐ {t('featured')}</span>
+                <span className="text-xs font-medium bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 px-2.5 py-1 rounded-full"><Star size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> {t('featured')}</span>
                 <span className="text-xs font-medium bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 px-2.5 py-1 rounded-full">{t(post.categoryKey)}</span>
                 <span className="text-sm text-gray-500 dark:text-slate-500">{post.date}</span>
                 <span className="text-sm text-gray-500 dark:text-slate-600">·</span>

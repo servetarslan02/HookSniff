@@ -1,6 +1,7 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
+import { Link } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -53,11 +54,11 @@ export default async function HookdeckAlternativesPage() {
               </thead>
               <tbody>
                 {[
-                  { name: 'Hookdeck', price: '$39/mo+', oss: '❌', self: '❌', sdks: '8', soc2: 'Type 2', hl: false },
-                  { name: 'HookSniff', price: '$24/mo', oss: '✅', self: '✅', sdks: '11', soc2: t('ready'), hl: true },
-                  { name: 'Svix', price: '$490/mo', oss: '✅', self: '✅', sdks: '6', soc2: 'Type 2', hl: false },
-                  { name: 'Hook0', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', oss: '✅', self: '✅', sdks: '4', soc2: '❌', hl: false },
-                  { name: 'Convoy', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', oss: '✅', self: '✅', sdks: '1', soc2: '❌', hl: false },
+                  { name: 'Hookdeck', price: '$39/mo+', oss: <X size={14} strokeWidth={1.75} className="text-red-500" />, self: <X size={14} strokeWidth={1.75} className="text-red-500" />, sdks: '8', soc2: 'Type 2', hl: false },
+                  { name: 'HookSniff', price: '$24/mo', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, sdks: '11', soc2: t('ready'), hl: true },
+                  { name: 'Svix', price: '$490/mo', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, sdks: '6', soc2: 'Type 2', hl: false },
+                  { name: 'Hook0', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, sdks: '4', soc2: <X size={14} strokeWidth={1.75} className="text-red-500" />, hl: false },
+                  { name: 'Convoy', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, sdks: '1', soc2: <X size={14} strokeWidth={1.75} className="text-red-500" />, hl: false },
                 ].map((row) => (
                   <tr key={row.name} className={`border-b border-gray-100 dark:border-slate-700/50 last:border-0 ${row.hl ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
                     <td className={`py-3 px-6 font-medium ${row.hl ? 'text-brand-600 dark:text-brand-400' : 'text-gray-900 dark:text-white'}`}>{row.name}</td>
@@ -85,7 +86,7 @@ export default async function HookdeckAlternativesPage() {
           </div>
 
           <div className="p-6 bg-purple-50 dark:bg-purple-500/10 rounded-xl border border-purple-200 dark:border-purple-500/20">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🔗 {t('whenToChooseHookdeck')}</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Link size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('whenToChooseHookdeck')}</h2>
             <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{t('whenToChooseHookdeckDesc')}</p>
           </div>
         </div>

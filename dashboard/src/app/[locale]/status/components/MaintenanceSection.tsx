@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import type { Maintenance } from './types';
 import { formatDate, formatDateTime } from './utils';
 import { StatusBadge } from './StatusBadge';
+import { Calendar, Wrench } from 'lucide-react';
 
 export function MaintenanceSection({ maintenance }: { maintenance: Maintenance[] }) {
   const t = useTranslations('status');
@@ -19,12 +20,12 @@ export function MaintenanceSection({ maintenance }: { maintenance: Maintenance[]
             {upcoming.map((m) => (
               <div key={m.id} className="border border-blue-200 dark:border-blue-500/20 bg-blue-50/50 dark:bg-blue-500/5 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-gray-900 dark:text-white text-sm">🔧 {m.title}</span>
+                  <span className="font-medium text-gray-900 dark:text-white text-sm"><Wrench size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {m.title}</span>
                   <StatusBadge status={m.status === 'in_progress' ? 'monitoring' : 'identified'} />
                 </div>
                 <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{m.description}</p>
                 <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-500">
-                  <span>📅 {formatDateTime(m.scheduled_start)} — {formatDateTime(m.scheduled_end)}</span>
+                  <span><Calendar size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {formatDateTime(m.scheduled_start)} — {formatDateTime(m.scheduled_end)}</span>
                   <span>• Affects: {m.affected_components.join(', ')}</span>
                 </div>
               </div>

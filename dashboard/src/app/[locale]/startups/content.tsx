@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
+import { DollarSign, TrendingUp, Handshake } from 'lucide-react';
 
 export function StartupsPageContent() {
   const t = useTranslations('startups');
@@ -20,12 +21,12 @@ export function StartupsPageContent() {
 
         <div className="grid md:grid-cols-3 gap-6 mb-16">
           {[
-            { icon: '💰', titleKey: 'benefit50Title', descKey: 'benefit50Desc' },
-            { icon: '📈', titleKey: 'benefitFreeTitle', descKey: 'benefitFreeDesc' },
-            { icon: '🤝', titleKey: 'benefitPriorityTitle', descKey: 'benefitPriorityDesc' },
+            { icon: <DollarSign size={32} strokeWidth={1.75} />, titleKey: 'benefit50Title', descKey: 'benefit50Desc' },
+            { icon: <TrendingUp size={32} strokeWidth={1.75} />, titleKey: 'benefitFreeTitle', descKey: 'benefitFreeDesc' },
+            { icon: <Handshake size={32} strokeWidth={1.75} />, titleKey: 'benefitPriorityTitle', descKey: 'benefitPriorityDesc' },
           ].map((b) => (
             <div key={b.titleKey} className="text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
-              <span className="text-3xl">{b.icon}</span>
+              <span className="text-gray-600 dark:text-slate-400">{b.icon}</span>
               <h3 className="font-bold text-gray-900 dark:text-white mt-3 mb-2">{t(b.titleKey)}</h3>
               <p className="text-sm text-gray-600 dark:text-slate-400">{t(b.descKey)}</p>
             </div>

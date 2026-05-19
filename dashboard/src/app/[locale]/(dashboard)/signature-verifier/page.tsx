@@ -201,7 +201,7 @@ if not is_valid:
       code: `package main
 
 import (
-import { CheckCircle2, Laptop, ShieldCheck, Trash2, XCircle } from 'lucide-react';
+import { CheckCircle2, Laptop, PenLine, ShieldCheck, Trash2, XCircle } from 'lucide-react';
     "crypto/hmac"
     "crypto/sha256"
     "encoding/hex"
@@ -288,7 +288,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
       {/* Verify Tool */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center"><span className="text-base">✍️</span></div>
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600"><PenLine size={16} strokeWidth={1.75} /></div>
           <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('verifySignature')}</h2>
         </div>
         <div className="space-y-4">
@@ -360,7 +360,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
                 : 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20'
             }`}>
               <div className="flex items-center gap-2">
-                <span className="text-2xl">{result === 'valid' ? '✅' : <XCircle size={16} strokeWidth={1.75} />}</span>
+                <span className="text-2xl">{result === 'valid' ? <CheckCircle2 size={20} strokeWidth={1.75} className="text-green-500" /> : <XCircle size={20} strokeWidth={1.75} className="text-red-500" />}</span>
                 <div>
                   <div className={`font-semibold ${result === 'valid' ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
                     {result === 'valid' ? t('signatureValid') : t('signatureInvalid')}

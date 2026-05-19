@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { getErrorMessage } from '@/lib/errors';
-import { Lock, Check, Mail } from 'lucide-react';
+import { CheckCircle2, Lock, Check, Mail } from 'lucide-react';
 
 interface User {
   name?: string | null;
@@ -248,7 +248,7 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
 
           {emailChangeStep === 'done' ? (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20">
-              <span className="text-base">✅</span>
+              <span className="text-base text-green-500"><CheckCircle2 size={16} strokeWidth={1.75} /></span>
               <span className="text-sm text-green-700 dark:text-green-400">{t('emailChangedSuccess') || 'Email changed successfully'}</span>
             </div>
           ) : emailChangeStep === 'code-sent' ? (

@@ -109,7 +109,7 @@ export default function BackgroundTasksPage() {
                   onClick={() => setExpandedTask(expandedTask === task.id ? null : task.id)}>
                   <div className="flex items-center gap-4">
                     {/* Status icon */}
-                    <span className="text-lg">{statusIcons[task.status] || '⏳'}</span>
+                    <span className="text-lg">{statusIcons[task.status] || <Clock size={14} className="text-gray-400" />}</span>
 
                     {/* Type */}
                     <div className="flex-1 min-w-0">

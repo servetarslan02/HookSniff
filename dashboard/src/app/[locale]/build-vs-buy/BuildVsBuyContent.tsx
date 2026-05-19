@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { DollarSign, Lightbulb, Wrench } from 'lucide-react';
 
 export default function BuildVsBuyContent() {
   const t = useTranslations('buildVsBuy');
@@ -113,12 +114,12 @@ export default function BuildVsBuyContent() {
                     <p className="text-sm text-gray-700 dark:text-slate-300">{dim.hooksniff}</p>
                   </div>
                   <div className="p-4 rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-                    <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">🔧 {t('dimEngineeringCost')}</p>
+                    <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2"><Wrench size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('dimEngineeringCost')}</p>
                     <p className="text-sm text-gray-700 dark:text-slate-300">{dim.build}</p>
                   </div>
                 </div>
                 <div className="p-3 bg-blue-50 dark:bg-blue-500/10 rounded-lg border border-blue-200 dark:border-blue-500/20">
-                  <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 mb-1">💡 {t('timeToMarketWhy').split('.')[0]}</p>
+                  <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 mb-1"><Lightbulb size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('timeToMarketWhy').split('.')[0]}</p>
                   <p className="text-sm text-gray-600 dark:text-slate-400">{dim.whyItMatters}</p>
                 </div>
               </div>
@@ -128,10 +129,10 @@ export default function BuildVsBuyContent() {
 
         {/* Cost Breakdown */}
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-8 mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">💰 {t('costYear1')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center"><DollarSign size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('costYear1')}</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h3 className="font-bold text-gray-900 dark:text-white mb-4">🔧 {t('dimEngineeringCost')}</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-4"><Wrench size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('dimEngineeringCost')}</h3>
               <ul className="space-y-3">
                 {buildCostRows.map((row) => (
                   <li key={row.item} className="flex justify-between items-start text-sm">

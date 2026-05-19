@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { Building2, Clock, CreditCard, Eye, FileText, Globe, Key, KeyRound, Link, Package, Pencil, ScrollText, Settings, Shield, ShieldCheck, Star, Target, User, Users, Zap } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -12,7 +13,7 @@ export default async function OrganizationDocsPage() {
   const t = await getTranslations('docsOrganization');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">🏢 {t('title')}</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Building2 size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         {t('subtitle')}
       </p>
@@ -24,19 +25,19 @@ export default async function OrganizationDocsPage() {
           {t('overviewDesc')}
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>👥 {t('tabTeam')}</li>
-          <li>🔐 {t('tabSso')}</li>
-          <li>📜 {t('tabAudit')}</li>
+          <li><Users size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('tabTeam')}</li>
+          <li><ShieldCheck size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('tabSso')}</li>
+          <li><ScrollText size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('tabAudit')}</li>
         </ul>
         <div className="mt-4 p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-1">🎯 {t('teamSelector')}</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-1"><Target size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('teamSelector')}</h3>
           <p className="text-sm text-gray-600 dark:text-slate-400">{t('teamSelectorDesc')}</p>
         </div>
       </section>
 
       {/* ━━━ TEAM MANAGEMENT ━━━ */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">👥 {t('teamMgmt')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><Users size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('teamMgmt')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-6">
           {t('teamMgmtDesc')}
         </p>
@@ -58,21 +59,21 @@ export default async function OrganizationDocsPage() {
         <div className="space-y-3 not-prose mb-6">
           <div className="p-4 border border-purple-200 dark:border-purple-900/30 rounded-xl bg-purple-50/50 dark:bg-purple-900/10">
             <div className="flex items-center gap-2 mb-1">
-              <span>🛡️</span>
+              <span><Shield size={16} strokeWidth={1.75} /></span>
               <h4 className="font-semibold text-purple-800 dark:text-purple-400 text-sm">{t('roleAdmin')}</h4>
             </div>
             <p className="text-sm text-purple-700 dark:text-purple-300">{t('roleAdminDesc')}</p>
           </div>
           <div className="p-4 border border-blue-200 dark:border-blue-900/30 rounded-xl bg-blue-50/50 dark:bg-blue-900/10">
             <div className="flex items-center gap-2 mb-1">
-              <span>✏️</span>
+              <span><Pencil size={16} strokeWidth={1.75} /></span>
               <h4 className="font-semibold text-blue-800 dark:text-blue-400 text-sm">{t('roleEditor')}</h4>
             </div>
             <p className="text-sm text-blue-700 dark:text-blue-300">{t('roleEditorDesc')}</p>
           </div>
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <div className="flex items-center gap-2 mb-1">
-              <span>👁️</span>
+              <span><Eye size={16} strokeWidth={1.75} /></span>
               <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t('roleViewer')}</h4>
             </div>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('roleViewerDesc')}</p>
@@ -106,9 +107,9 @@ export default async function OrganizationDocsPage() {
                 ].map(({ action, admin, editor, viewer }) => (
                   <tr key={action}>
                     <td className="px-4 py-3 text-gray-900 dark:text-white">{action}</td>
-                    <td className="px-4 py-3 text-center">{admin ? '✅' : '❌'}</td>
-                    <td className="px-4 py-3 text-center">{editor ? '✅' : '❌'}</td>
-                    <td className="px-4 py-3 text-center">{viewer ? '✅' : '❌'}</td>
+                    <td className="px-4 py-3 text-center">{admin ? <Check size={14} strokeWidth={1.75} className=\"text-emerald-500\" /> : <X size={14} strokeWidth={1.75} className=\"text-red-500\" />}</td>
+                    <td className="px-4 py-3 text-center">{editor ? <Check size={14} strokeWidth={1.75} className=\"text-emerald-500\" /> : <X size={14} strokeWidth={1.75} className=\"text-red-500\" />}</td>
+                    <td className="px-4 py-3 text-center">{viewer ? <Check size={14} strokeWidth={1.75} className=\"text-emerald-500\" /> : <X size={14} strokeWidth={1.75} className=\"text-red-500\" />}</td>
                   </tr>
                 ))}
               </tbody>
@@ -134,14 +135,14 @@ export default async function OrganizationDocsPage() {
 
       {/* ━━━ SSO ━━━ */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🔐 {t('ssoTitle')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><ShieldCheck size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('ssoTitle')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           {t('ssoDesc')}
         </p>
 
         <div className="p-4 border border-amber-200 dark:border-amber-900/30 rounded-xl bg-amber-50/50 dark:bg-amber-900/10 mb-6">
           <div className="flex items-center gap-2 mb-1">
-            <span>⭐</span>
+            <span><Star size={16} strokeWidth={1.75} className="text-amber-500" /></span>
             <h4 className="font-semibold text-amber-800 dark:text-amber-400 text-sm">{t('ssoEnterprise')}</h4>
           </div>
           <p className="text-sm text-amber-700 dark:text-amber-300">{t('ssoEnterpriseDesc')}</p>
@@ -151,14 +152,14 @@ export default async function OrganizationDocsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-6">
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">🏛️</span>
+              <span className="text-xl"><Building2 size={20} strokeWidth={1.75} /></span>
               <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t('ssoSaml')}</h4>
             </div>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('ssoSamlDesc')}</p>
           </div>
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">🔑</span>
+              <span className="text-xl"><Key size={20} strokeWidth={1.75} /></span>
               <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t('ssoOidc')}</h4>
             </div>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('ssoOidcDesc')}</p>
@@ -197,8 +198,8 @@ export default async function OrganizationDocsPage() {
             </div>
             <p className="text-sm text-orange-700 dark:text-orange-300 mb-2">{t('ssoStep4Desc')}</p>
             <ul className="text-sm text-orange-700 dark:text-orange-300 space-y-1">
-              <li>⚠️ {t('ssoEnforce1')}</li>
-              <li>⚠️ {t('ssoEnforce2')}</li>
+              <li><AlertTriangle size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> {t('ssoEnforce1')}</li>
+              <li><AlertTriangle size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> {t('ssoEnforce2')}</li>
             </ul>
           </div>
         </div>
@@ -254,7 +255,7 @@ export default async function OrganizationDocsPage() {
 
       {/* ━━━ AUDIT LOG ━━━ */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">📜 {t('auditTitle')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><ScrollText size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditTitle')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-6">
           {t('auditDesc')}
         </p>
@@ -266,23 +267,23 @@ export default async function OrganizationDocsPage() {
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('auditColumns')}</h3>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400 mb-6">
-          <li>🕐 {t('auditColTime')}</li>
-          <li>⚡ {t('auditColAction')}</li>
-          <li>👤 {t('auditColActor')}</li>
-          <li>📦 {t('auditColResource')}</li>
-          <li>📝 {t('auditColDetails')}</li>
-          <li>🌐 {t('auditColIp')}</li>
+          <li><Clock size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditColTime')}</li>
+          <li><Zap size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditColAction')}</li>
+          <li><User size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditColActor')}</li>
+          <li><Package size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditColResource')}</li>
+          <li><FileText size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditColDetails')}</li>
+          <li><Globe size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditColIp')}</li>
         </ul>
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('auditActions')}</h3>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>🔑 {t('auditAuth')}</li>
-          <li>🔗 {t('auditEndpoint')}</li>
-          <li>🗝️ {t('auditApiKey')}</li>
-          <li>📦 {t('auditWebhook')}</li>
-          <li>👥 {t('auditTeam')}</li>
-          <li>⚙️ {t('auditSettings')}</li>
-          <li>💳 {t('auditBilling')}</li>
+          <li><Key size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditAuth')}</li>
+          <li><Link size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditEndpoint')}</li>
+          <li><KeyRound size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditApiKey')}</li>
+          <li><Package size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditWebhook')}</li>
+          <li><Users size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditTeam')}</li>
+          <li><Settings size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditSettings')}</li>
+          <li><CreditCard size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('auditBilling')}</li>
         </ul>
       </section>
 
@@ -292,7 +293,7 @@ export default async function OrganizationDocsPage() {
         <div className="space-y-4 not-prose">
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">👥</span>
+              <span className="text-xl"><Users size={20} strokeWidth={1.75} /></span>
               <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t('apiTeams')}</h4>
             </div>
             <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('apiTeamsDesc')}</p>
@@ -309,7 +310,7 @@ export default async function OrganizationDocsPage() {
           </div>
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">🔐</span>
+              <span className="text-xl"><ShieldCheck size={20} strokeWidth={1.75} /></span>
               <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t('apiSso')}</h4>
             </div>
             <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('apiSsoDesc')}</p>
@@ -326,7 +327,7 @@ export default async function OrganizationDocsPage() {
           </div>
           <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">📜</span>
+              <span className="text-xl"><ScrollText size={20} strokeWidth={1.75} /></span>
               <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t('apiAudit')}</h4>
             </div>
             <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('apiAuditDesc')}</p>

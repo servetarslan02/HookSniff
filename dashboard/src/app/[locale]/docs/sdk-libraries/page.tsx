@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const sdks = [
   {
-    icon: '📦',
+    icon: <Package size={16} strokeWidth={1.75} />,
     nameKey: 'nodeSdk',
     lang: 'Node.js',
     pkg: 'hooksniff',
@@ -74,7 +74,7 @@ app.post('/webhook', (req, res) => {
     resources: 35,
   },
   {
-    icon: '🐍',
+    icon: <Code2 size={16} strokeWidth={1.75} className="text-yellow-600" />,
     nameKey: 'pythonSdk',
     lang: 'Python',
     pkg: 'hooksniff',
@@ -136,7 +136,7 @@ def handle_webhook():
     resources: 30,
   },
   {
-    icon: '🐹',
+    icon: <Box size={16} strokeWidth={1.75} className="text-blue-500" />,
     nameKey: 'goSdk',
     lang: 'Go',
     pkg: 'github.com/servetarslan02/hooksniff-go',
@@ -208,7 +208,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
     resources: 30,
   },
   {
-    icon: '🦀',
+    icon: <Gem size={16} strokeWidth={1.75} className="text-orange-600" />,
     nameKey: 'rustSdk',
     lang: 'Rust',
     pkg: 'hooksniff',
@@ -280,7 +280,7 @@ async fn handle_webhook(
     resources: 35,
   },
   {
-    icon: '💎',
+    icon: <Gem size={16} strokeWidth={1.75} />,
     nameKey: 'rubySdk',
     lang: 'Ruby',
     pkg: 'hooksniff',
@@ -341,7 +341,7 @@ end`,
     resources: 30,
   },
   {
-    icon: '☕',
+    icon: <Coffee size={16} strokeWidth={1.75} className="text-red-700" />,
     nameKey: 'javaSdk',
     lang: 'Java',
     pkg: 'io.github.servetarslan02:hooksniff-sdk',
@@ -357,6 +357,7 @@ end`,
     features: ['Java 8+', 'Auto-retry', 'Pagination', 'Builder pattern', 'Idempotency keys'],
     quickStart: `import dev.hooksniff.HookSniff;
 import dev.hooksniff.models.*;
+import { Box, Circle, Code2, Coffee, FileCode, FileText, FlaskConical, Gem, Hash, Key, Package, Radio, RefreshCw, ShieldCheck, Smartphone, Zap } from 'lucide-react';
 
 HookSniff hs = new HookSniff(System.getenv("HOOKSNIFF_API_KEY"));
 
@@ -404,7 +405,7 @@ public ResponseEntity<String> handleWebhook(
     resources: 30,
   },
   {
-    icon: '🟣',
+    icon: <Circle size={16} strokeWidth={1.75} />,
     nameKey: 'kotlinSdk',
     lang: 'Kotlin',
     pkg: 'io.github.servetarslan02:hooksniff-sdk-kotlin',
@@ -459,7 +460,7 @@ post("/webhook") {
     resources: 30,
   },
   {
-    icon: '🐘',
+    icon: <FileCode size={16} strokeWidth={1.75} className="text-purple-600" />,
     nameKey: 'phpSdk',
     lang: 'PHP',
     pkg: 'hooksniff/hooksniff',
@@ -513,7 +514,7 @@ public function handleWebhook(Request $request) {
     resources: 28,
   },
   {
-    icon: '☕',
+    icon: <Hash size={16} strokeWidth={1.75} className="text-purple-600" />,
     nameKey: 'csharpSdk',
     lang: 'C#',
     pkg: 'HookSniff',
@@ -576,7 +577,7 @@ public async Task<IActionResult> HandleWebhook()
     resources: 30,
   },
   {
-    icon: '🧪',
+    icon: <FlaskConical size={16} strokeWidth={1.75} />,
     nameKey: 'elixirSdk',
     lang: 'Elixir',
     pkg: 'hooksniff',
@@ -623,7 +624,7 @@ end`,
     resources: 25,
   },
   {
-    icon: '🍎',
+    icon: <Smartphone size={16} strokeWidth={1.75} className="text-orange-500" />,
     nameKey: 'swiftSdk',
     lang: 'Swift',
     pkg: 'HookSniff',
@@ -684,12 +685,12 @@ app.post("webhook") { req async throws -> Response in
 ];
 
 const sharedFeatures = [
-  { icon: '🔐', title: 'HMAC-SHA256 Verification', desc: 'Standard Webhooks compliant. Every SDK verifies signatures with replay protection (5 min tolerance).' },
-  { icon: '🔄', title: 'Auto-Retry with Backoff', desc: 'Failed requests retry automatically with exponential backoff + jitter. Respects 429 Retry-After headers.' },
-  { icon: '📄', title: 'Cursor-Based Pagination', desc: 'All list endpoints support limit/cursor pagination. SDKs provide auto-paginate helpers.' },
-  { icon: '🔑', title: 'Idempotency Keys', desc: 'Pass idempotency_key to prevent duplicate deliveries on retry.' },
-  { icon: '📡', title: 'SSE Streaming', desc: 'Real-time delivery event stream via Server-Sent Events.' },
-  { icon: '⚡', title: 'Rate Limit Parsing', desc: 'SDKs parse X-RateLimit-* headers and throw typed errors on 429.' },
+  { icon: <ShieldCheck size={16} strokeWidth={1.75} />, title: 'HMAC-SHA256 Verification', desc: 'Standard Webhooks compliant. Every SDK verifies signatures with replay protection (5 min tolerance).' },
+  { icon: <RefreshCw size={16} strokeWidth={1.75} />, title: 'Auto-Retry with Backoff', desc: 'Failed requests retry automatically with exponential backoff + jitter. Respects 429 Retry-After headers.' },
+  { icon: <FileText size={16} strokeWidth={1.75} />, title: 'Cursor-Based Pagination', desc: 'All list endpoints support limit/cursor pagination. SDKs provide auto-paginate helpers.' },
+  { icon: <Key size={16} strokeWidth={1.75} />, title: 'Idempotency Keys', desc: 'Pass idempotency_key to prevent duplicate deliveries on retry.' },
+  { icon: <Radio size={16} strokeWidth={1.75} />, title: 'SSE Streaming', desc: 'Real-time delivery event stream via Server-Sent Events.' },
+  { icon: <Zap size={16} strokeWidth={1.75} />, title: 'Rate Limit Parsing', desc: 'SDKs parse X-RateLimit-* headers and throw typed errors on 429.' },
 ];
 
 export default function SdksPage() {
@@ -857,7 +858,7 @@ export default function SdksPage() {
                 <tr key={feature as string}>
                   <td className="px-3 py-3 font-medium text-gray-900 dark:text-white text-sm">{feature as string}</td>
                   {(support as boolean[]).map((s, i) => (
-                    <td key={i} className="px-2 py-3 text-center text-lg">{s ? '✅' : '—'}</td>
+                    <td key={i} className="px-2 py-3 text-center text-lg">{s ? <Check size={14} strokeWidth={1.75} className=\"text-emerald-500\" /> : '—'}</td>
                   ))}
                 </tr>
               ))}
