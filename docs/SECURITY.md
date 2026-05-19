@@ -16,8 +16,8 @@ Every webhook delivery includes these headers:
 
 Legacy headers are also included for backward compatibility:
 - Legacy header — use Standard Webhooks headers instead
-- `X-HookSniff-Delivery-Id`: Same as `webhook-id`
-- `X-HookSniff-Delivery-Attempt`: Attempt number
+- `webhook-id`: Same as `webhook-id`
+- `webhook-attempt`: Attempt number
 
 ### Signature Computation
 
