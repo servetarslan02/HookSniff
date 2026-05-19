@@ -1,12 +1,12 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 19:52 GMT+8
+> Son güncelleme: 2026-05-19 20:18 GMT+8
 
-## ✅ Tamamlanan (Bu Oturum)
+## ✅ Tamamlanan (Bu Oturum — 5 Commit)
 
 ### 1. Organization Sistemi Kapsamlı Denetim
-- 17 sorun tespit edildi (5 kritik, 8 orta, 4 düşük)
-- 10 düzeltme uygulandı
+- 17 sorun tespit edildi, 10 düzeltme uygulandı
+- Rakip analizi (Clerk, WorkOS, Stripe, GitHub, Svix, Hookdeck)
 
 ### 2. P0 Kritik Düzeltmeler
 - API key loglanması engellendi (sadece prefix)
@@ -20,34 +20,56 @@
 - SAML InResponseTo + destination + audience doğrulaması
 - Verified domain sütunu (migration 068)
 
-### 4. P2 Orta Öncelik
+### 4. SSO Organizasyona Taşındı (Migration 069)
+- `sso_configs.team_id` → SSO config organizasyona bağlı
+- `sso_configs.created_by` → audit trail
+- Login akışı: team membership + verified_domain ile config bulma
+- Auth enforcement: hem customer hem team bazlı kontrol
+- Rakiplerle (Clerk, WorkOS, GitHub) aynı mimari
+
+### 5. Frontend Güncellemeleri
+- Organization sayfasında takım seçici
+- SSO sayfası teamId prop alıyor, tüm API çağrılarında team_id gönderiyor
+- Verified domain gösterimi
+- i18n: verifiedDomain (en + tr)
+
+### 6. P2 Orta Öncelik
 - SSO login attempts cleanup (90 gün, retention job)
 
 ## 📋 Sıradaki
 
 ### 1. Cloud Build ile Deploy
-- SSO değişiklikleri deploy edilmeli
-- Migration 067 Neon DB'ye uygulanmalı
+- Tüm değişiklikler push edildi: `de70ebb0`
+- Migration 067 + 068 + 069 Neon DB'ye uygulandı ✅
+- API deploy tetiklenmeli
 
-### 2. SSO Test (Manuel)
-- Dashboard'dan SSO config kaydet
+### 2. Manuel SSO Test
+- Dashboard → Organization → SSO sekmesi
+- Takım seç → SSO config kaydet
 - OIDC ile test et (Google, Auth0)
 - SAML ile test et (Okta, Azure AD)
 - Login URL test et
 - Auto-team-join test et
 
-### 3. P2 Kalan Sorunlar (21 adet)
-- Frontend performance
-- i18n eksiklikleri
-- DB index'leri
+### 3. Verified Domain Doğrulama
+- TXT record doğrulama mekanizması eklenebilir
+- Şimdilik sadece string olarak kaydediliyor
+
+### 4. P2 Kalan Sorunlar
+- OIDC JWKS imza doğrulaması
+- SSO state → Redis
+- SAML Single Logout (SLO)
+- Frontend SSO enforce sonrası auto-team ayarı değiştirme
+- Team davet email gönderimi
 
 ## 🔧 Bilinen Sorunlar
 
 | Sorun | Durum | Not |
 |-------|-------|-----|
 | SSO login engelleme | ✅ | Backend login akışında SSO kontrolü eklendi |
-| auto_join_default_team | ✅ | SSO config owner'ın ID'siyle arama yapılıyor |
-| Yeni kullanıcı SSO login | ✅ | Email domain'inden SSO config bulma eklendi |
+| auto_join_default_team | ✅ | Team_id bazlı auto-join |
+| Yeni kullanıcı SSO login | ✅ | Email domain'inden SSO config bulma |
+| SSO scope | ✅ | Organizasyona taşındı (migration 069) |
 | SSO state in-memory | ⚠️ | Production'da Redis'e taşınmalı |
 | ID token imza doğrulaması | ⚠️ | JWKS ile doğrulama eklenebilir |
-| SSO domain eşleşmesi | ⚠️ | Email domain'inden config bulma — admin farklı domain kullanıyorsa çalışmaz |
+| Domain doğrulama | ⚠️ | TXT record verification henüz yok |

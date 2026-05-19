@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 19:25 GMT+8 (Organization sayfası inceleme + 6 bug düzeltmesi)
+> Son güncelleme: 2026-05-19 20:18 GMT+8 (SSO organizasyona taşındı + frontend güncellendi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -224,28 +224,37 @@ HookSniff/
 
 ---
 
-## 📝 Son Oturum (2026-05-19 19:20–19:25 — Organization Tam İnceleme + 6 Bug Düzeltmesi)
+## 📝 Son Oturum (2026-05-19 19:20–20:18 — Organization Kapsamlı Denetim + SSO Organizasyona Taşıma)
 
 ### Özet
-Organization sayfası (Team + SSO + Audit Log) detaylı incelendi. SSO ↔ Team ilişkisinde 6 kritik sorun tespit edildi ve düzeltildi.
+Organization sistemi (Team + SSO + Audit Log) kapsamlı denetim yapıldı. 17 sorun tespit edildi, 10 düzeltme uygulandı. SSO organizasyona taşındı. Frontend güncellendi. 5 commit, 1000+ satır değişiklik.
 
 ### Yapılan İşler:
-1. **auto_join_default_team bug düzeltmesi** — SSO user'ın customer_id'si yerine SSO config owner'ın customer_id'siyle arama yapılıyor
-2. **Yeni kullanıcı SSO login** — Email domain'inden SSO config bulma eklendi
-3. **SSO login engelleme** — SSO zorunlu hesaplarda şifre girişi engellendi (admin bypass ile)
-4. **Eksik migration** — `migrations/067_sso_admin_bypass_and_attempts.sql` oluşturuldu
-5. **Audit log** — SSO login ve auto-join için audit log eklendi
-6. **UUID/String tip hatası** — `default_team_id` doğru tiple okunuyor
+1. **Organization denetimi** — 17 sorun, 10 düzeltme
+2. **P0 düzeltmeler** — API key log, rate limit, admin lockout
+3. **P1 düzeltmeler** — Team CRUD (delete/leave/transfer), SAML validation
+4. **SSO organizasyona taşıma** — migration 069 (team_id + created_by)
+5. **Frontend** — takım seçici, verified domain, i18n
+6. **P2** — SSO login attempts cleanup
 
 ### Değişiklikler:
-- `api/src/routes/sso.rs` — 152 satır değişiklik
+- `api/src/routes/sso.rs` — 400+ satır değişiklik
 - `api/src/routes/auth.rs` — 20 satır ekleme
-- `migrations/067_sso_admin_bypass_and_attempts.sql` — yeni dosya
+- `api/src/routes/teams.rs` — 150 satır ekleme
+- `api/src/jobs/retention.rs` — 18 satır ekleme
+- `dashboard/` — 7 dosya, 83 satır
+- `migrations/067 + 068 + 069` — 3 yeni migration
+
+### Rakip Analizi:
+- Clerk, WorkOS, Stripe, GitHub, Svix, Hookdeck, Hook0 incelendi
+- SSO scope: rakipler organizasyon bazlı → HookSniff de organizasyona taşındı
+- Auto-join: rakiplerde yok → HookSniff'de var (avantaj)
+- Admin bypass: rakiplerde yok → HookSniff'de var (avantaj)
 
 ### Sıradaki:
-- Cloud Build ile deploy
-- Migration 067 Neon DB'ye uygula
+- Cloud Build deploy
 - Manuel SSO test
+- Verified domain doğrulama
 
 ---
 
