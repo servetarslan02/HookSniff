@@ -578,6 +578,30 @@ export function useCreateInboundConfig() {
   });
 }
 
+export function useUpdateInboundConfig() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { secret?: string; endpoint_id?: string | null; enabled?: boolean } }) =>
+      inboundApi.updateConfig(token!, id, data),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['inbound-configs'] });
+    },
+  });
+}
+
+export function useDeleteInboundConfig() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      inboundApi.deleteConfig(token!, id),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['inbound-configs'] });
+    },
+  });
+}
+
 // ── SSO Config ──
 export function useSsoConfig(teamId?: string | null) {
   const { token } = useAuth();
