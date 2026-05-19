@@ -2753,7 +2753,7 @@
   },
   "sso": {
     "title": "🔐 SSO / SAML",
-    "subtitle": "Configure Single Sign-On for your organization. Business plan or higher required.",
+    "subtitle": "Configure Single Sign-On for your organization. Enterprise plan required.",
     "provider": "Provider",
     "samlConfiguration": "SAML Configuration",
     "metadataUrl": "Metadata URL",
@@ -2786,7 +2786,9 @@
     "certificateSet": "Certificate is configured",
     "clientSecretSet": "Client secret is configured",
     "ssoLoginUrl": "SSO Login URL",
-    "ssoLoginUrlDesc": "Share this URL with your team members to initiate SSO login."
+    "ssoLoginUrlDesc": "Share this URL with your team members to initiate SSO login.",
+    "enterpriseOnlyTitle": "SSO requires an Enterprise plan",
+    "enterpriseOnlyDesc": "Single Sign-On is available for Enterprise customers. Contact sales to enable SSO for your organization."
   },
   "auditLog": {
     "title": "📋 Audit Log",
