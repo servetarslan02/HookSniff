@@ -37,17 +37,8 @@ export default function PortalPage() {
   const webhookLimit = billingUsage
     ? billingUsage.webhooks?.limit ?? billingUsage.deliveries_limit ?? 10000
     : 10000;
-  const endpointUsed = billingUsage
-    ? billingUsage.endpoints?.used ?? billingUsage.endpoints_count ?? 0
-    : 0;
-  const endpointLimit = billingUsage
-    ? billingUsage.endpoints?.limit ?? billingUsage.endpoints_limit ?? 5
-    : 5;
-
   const webhookUnlimited = isUnlimited(webhookLimit);
-  const endpointUnlimited = isUnlimited(endpointLimit);
   const webhookPercent = webhookUnlimited ? 0 : webhookLimit > 0 ? Math.round((webhookUsed / webhookLimit) * 100) : 0;
-  const endpointPercent = endpointUnlimited ? 0 : endpointLimit > 0 ? Math.round((endpointUsed / endpointLimit) * 100) : 0;
 
   if (loading) {
     return (
@@ -124,7 +115,7 @@ export default function PortalPage() {
             />
             <StatCard
               label={t('endpoints')}
-              value={String(usage.total_endpoints || 0)}
+              value={`${usage.total_endpoints || 0} (∞)`}
               color="text-blue-500"
               icon="🔗"
             />
@@ -156,16 +147,6 @@ export default function PortalPage() {
             warning={webhookPercent > 80}
           />
 
-          {/* Endpoint Usage */}
-          <UsageBar
-            label={tb('endpoints')}
-            used={endpointUsed}
-            limit={endpointLimit}
-            percent={endpointPercent}
-            unlimited={endpointUnlimited}
-            warning={endpointPercent > 80}
-          />
-
           {/* Data Retention */}
           <div>
             <div className="flex justify-between text-sm mb-2">
@@ -184,7 +165,7 @@ export default function PortalPage() {
           {planLimits && (
             <div className="pt-5 border-t border-gray-100 dark:border-slate-700/50">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <LimitCard value={formatLimit(planLimits.endpoints)} label={tb('endpoints')} />
+                <LimitCard value="∞" label={tb('endpoints')} />
                 <LimitCard value={formatLimit(planLimits.webhooks)} label={tb('webhooksMonth')} />
                 <LimitCard value={formatLimit(planLimits.rateLimit)} label={tb('rateLimit')} />
                 <LimitCard value={isUnlimited(planLimits.retention) ? '∞' : `${planLimits.retention}d`} label={tb('dataRetention')} />
