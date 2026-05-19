@@ -277,12 +277,28 @@ async fn login(
     if !password_ok { return Err(AppError::BadRequest("Invalid email or password".into())); }
 
     // SSO enforcement check — block password login if SSO is required
+    // Check both customer-scoped (legacy) and team-scoped configs
     let sso_config = sqlx::query_as::<_, (bool, Option<bool>)>(
-        "SELECT enabled, admin_bypass FROM sso_configs WHERE customer_id = $1 LIMIT 1"
+        "SELECT enabled, admin_bypass FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
     )
     .bind(customer.id)
     .fetch_optional(&pool)
     .await?;
+
+    // If no customer-scoped config, check team-scoped
+    let sso_config = if sso_config.is_none() {
+        sqlx::query_as::<_, (bool, Option<bool>)>(
+            "SELECT s.enabled, s.admin_bypass FROM sso_configs s
+             INNER JOIN team_members tm ON tm.team_id = s.team_id
+             WHERE tm.customer_id = $1 AND s.enabled = true AND s.team_id IS NOT NULL
+             LIMIT 1"
+        )
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+    } else {
+        sso_config
+    };
 
     if let Some((sso_enabled, admin_bypass)) = sso_config {
         if sso_enabled {
