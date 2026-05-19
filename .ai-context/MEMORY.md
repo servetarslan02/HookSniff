@@ -224,6 +224,34 @@ HookSniff/
 
 ---
 
+## 📝 Son Oturum (2026-05-19 21:00–21:10 — Endpoint Limits Kaldırıldı)
+
+### Özet
+Tüm planlardan endpoint limiti kaldırıldı — artık tüm planlarda sınırsız endpoint. 9 dosya değişti, 30 satır eklendi, 53 satır silindi.
+
+### Yapılan İşler:
+1. **Backend** — `max_endpoints()` tüm planlarda `u32::MAX` döndürüyor
+2. **Admin settings** — Tüm plan default'ları `i32::MAX`
+3. **Portal sayfası** — Endpoint usage bar kaldırıldı, "∞" gösteriliyor
+4. **Plan kartları** — Tüm planlarda "Unlimited endpoints"
+5. **i18n** — en.json + tr.json güncellendi
+6. **Landing page** — Free/Pro/Business "Unlimited endpoints"
+7. **Tests** — Grace ve billing test'leri güncellendi
+
+### Değişiklikler:
+- `api/src/billing/mod.rs` — max_endpoints() → u32::MAX
+- `api/src/routes/admin/settings.rs` — default'lar i32::MAX
+- `api/src/routes/billing/grace.rs` — test data
+- `api/src/routes/billing/tests.rs` — test data
+- `dashboard/.../billing/components/PlanCards.tsx` — features + limits display
+- `dashboard/.../portal-manage/page.tsx` — endpoint bar kaldırıldı
+- `dashboard/src/messages/en.json` + `tr.json` — i18n
+- `landing/index.html` — pricing section
+
+### Push: `3388a752`
+
+---
+
 ## 📝 Son Oturum (2026-05-19 20:48–20:55 — Settings Tabbed Redesign)
 
 ### Özet
