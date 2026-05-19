@@ -440,6 +440,36 @@ async fn main() -> Result<()> {
         }
     });
 
+    // Alert evaluation worker: check alert rules every 5 minutes
+    let alert_pool = pool.clone();
+    let alert_queue = job_queue.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(5 * 60)).await;
+
+            let should_run = if let Some(ref queue) = alert_queue {
+                queue.try_acquire_lock("alert_eval", 300).await.unwrap_or(true)
+            } else {
+                true
+            };
+
+            if should_run {
+                if let Some(email_client) = hooksniff_api::resend_email::ResendEmailClient::from_env() {
+                    match jobs::alert_eval::run_alert_evaluation(&alert_pool, &email_client).await {
+                        Ok(triggered) => {
+                            if triggered > 0 {
+                                tracing::info!("🚨 Alert eval: {} alerts triggered", triggered);
+                            }
+                        }
+                        Err(e) => tracing::error!("❌ Alert evaluation job failed: {:?}", e),
+                    }
+                } else {
+                    tracing::warn!("⚠️ Resend not configured, alert emails skipped");
+                }
+            }
+        }
+    });
+
     // Start auth cache cleanup (evicts expired entries every 60s)
     middleware::start_auth_cache_cleanup();
 
