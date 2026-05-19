@@ -3269,7 +3269,11 @@
     "retrySchedulePreview": "Tekrar Programı",
     "policyUpdated": "Tekrar deneme politikası güncellendi",
     "edit": "Düzenle",
-    "defaultPolicy": "Varsayılan (3 deneme, üstel)"
+    "defaultPolicy": "Varsayılan (3 deneme, üstel)",
+    "attempts": "deneme",
+    "resetToDefault": "Varsayılana Sıfırla",
+    "resetConfirm": "Tekrar deneme politikası varsayılan değerlere sıfırlansın mı?",
+    "policyReset": "Tekrar deneme politikası varsayılana sıfırlandı"
   },
   "inbound": {
     "title": "Gelen Webhooklar",
