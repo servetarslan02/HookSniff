@@ -478,12 +478,12 @@ export function useCreateInboundConfig() {
 }
 
 // ── SSO Config ──
-export function useSsoConfig() {
+export function useSsoConfig(teamId?: string | null) {
   const { token } = useAuth();
   return useQuery<SsoConfigValidated>({
-    queryKey: ['sso-config'],
+    queryKey: ['sso-config', teamId],
     queryFn: validated(
-      () => apiFetch<SsoConfigValidated>('/sso/config', { token: token! }),
+      () => apiFetch<SsoConfigValidated>(`/sso/config${teamId ? `?team_id=${teamId}` : ''}`, { token: token! }),
       SsoConfigSchema
     ),
     enabled: !!token,
