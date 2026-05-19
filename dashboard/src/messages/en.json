@@ -956,6 +956,8 @@
     "passwordMedium": "Medium",
     "passwordStrong": "Strong",
     "verifyEmailSent": "Verification email sent! Please check your inbox.",
+    "resendVerification": "Resend verification email",
+    "verificationResent": "Verification email sent! Check your inbox.",
     "forgotPasswordTitle": "Forgot your password?",
     "forgotPasswordSubtitle": "Enter your email and we'll send you a reset link.",
     "sendResetLink": "Send Reset Link",
