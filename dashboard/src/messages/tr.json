@@ -2806,7 +2806,20 @@
     "mapTag": "Eşle",
     "enrichTag": "Zenginleştir",
     "deleteTransform": "Dönüşüm Kuralını Sil",
-    "deleteConfirm": "Bu dönüşüm kuralını silmek istediğinizden emin misiniz?"
+    "deleteConfirm": "Bu dönüşüm kuralını silmek istediğinizden emin misiniz?",
+    "editTransformRule": "Dönüştürme Kuralını Düzenle",
+    "update": "Güncelle",
+    "updated": "Dönüştürme kuralı güncellendi!",
+    "updateFailed": "Kural güncellenemedi. Lütfen tekrar deneyin.",
+    "edit": "Düzenle",
+    "test": "Test Et",
+    "testTransform": "Dönüştürmeyi Test Et",
+    "testPayload": "Test Verisi (JSON)",
+    "runTest": "Testi Çalıştır",
+    "testing": "Test ediliyor...",
+    "testResult": "Sonuç",
+    "testFailed": "Dönüştürme testi başarısız. Yapılandırmanızı kontrol edin.",
+    "invalidJson": "Geçersiz JSON verisi"
   },
   "rateLimiting": {
     "title": "⚡ Hız Sınırı",
