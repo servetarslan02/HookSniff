@@ -679,6 +679,7 @@
     "emailPlaceholder": "siz@sirket.com",
     "namePlaceholder": "Adınız",
     "changeEmail": "E-posta Değiştir",
+    "invalidEmail": "Geçerli bir e-posta adresi girin (örn. ad@ornek.com).",
     "emailChangeNotice": "Yeni e-posta adresine bir doğrulama kodu gönderilecektir.",
     "emailChangeCodeSent": "Yeni e-posta adresinize bir doğrulama kodu gönderildi.",
     "codeSentTo": "Kod gönderildi:",
