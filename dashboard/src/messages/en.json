@@ -648,7 +648,11 @@
     "howItWorks": "How it works",
     "step1": "Every delivery is tracked",
     "step2": "Metrics aggregated over time",
-    "step3": "Charts show trends and patterns"
+    "step3": "Charts show trends and patterns",
+    "deliveryTrendsDesc": "Successful and failed deliveries over time",
+    "successRateDesc": "Overall delivery success rate breakdown",
+    "avgLabel": "Avg (ms)",
+    "p95Label": "P95 (ms)"
   },
   "settings": {
     "title": "Settings",
