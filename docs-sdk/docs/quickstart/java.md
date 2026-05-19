@@ -35,7 +35,7 @@ HookSniff hs = new HookSniff(System.getenv("HOOKSNIFF_API_KEY"));
 ```java
 import dev.hooksniff.models.*;
 
-Endpoint endpoint = hs.endpoints().create(
+Endpoint endpoint = hs.endpoint().create(
     CreateEndpointRequest.builder()
         .url("https://myapp.com/webhook")
         .description("Order notifications")
@@ -108,7 +108,7 @@ for (Delivery dlv : deliveries.getData()) {
 
 ```java
 try {
-    hs.endpoints().get("nonexistent");
+    hs.endpoint().get("nonexistent");
 } catch (HttpErrorException e) {
     System.err.println("HTTP " + e.getStatusCode() + ": " + e.getMessage());
     if (e.getStatusCode() == 429) {
