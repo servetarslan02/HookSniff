@@ -14,6 +14,7 @@ pub fn router() -> Router {
     Router::new()
         .route("/", get(list_teams).post(create_team))
         .route("/accept-invite", post(accept_invite))
+        .route("/invites/{invite_id}", delete(revoke_invite))
         .route("/{id}", get(get_team).delete(delete_team))
         .route("/{id}/leave", post(leave_team))
         .route("/{id}/transfer", post(transfer_ownership))
@@ -414,11 +415,15 @@ async fn invite_member(
         .await;
     }
 
+    // Build invite link for frontend
+    let invite_link = format!("/organization?invite_token={}", token);
+
     Ok(Json(serde_json::json!({
         "id": invite.id,
         "email": invite.email,
         "role": invite.role,
         "expires_at": invite.expires_at,
+        "invite_link": invite_link,
         "message": "Invitation sent successfully"
     })))
 }
@@ -509,6 +514,39 @@ async fn accept_invite(
         "role": invite.role,
         "message": "Successfully joined the team"
     })))
+}
+
+/// DELETE /v1/teams/invites/:invite_id — Revoke a pending invite
+async fn revoke_invite(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(invite_id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Find the invite
+    let invite = sqlx::query_as::<_, TeamInvite>(
+        "SELECT id, team_id, email, role, token, expires_at, created_at FROM team_invites WHERE id = $1"
+    )
+    .bind(invite_id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    // Check that the user is admin of the team
+    require_team_admin(&pool, invite.team_id, customer.id).await?;
+
+    // Delete the invite
+    sqlx::query("DELETE FROM team_invites WHERE id = $1")
+        .bind(invite_id)
+        .execute(&pool)
+        .await?;
+
+    tracing::info!("✅ Invite {} revoked by {}", invite_id, customer.id);
+
+    let _ = crate::audit::log_action(&pool, customer.id, "INVITE_REVOKE", "team",
+        Some(&invite.team_id.to_string()),
+        Some(serde_json::json!({"email": &invite.email})), None, None).await;
+
+    Ok(Json(serde_json::json!({"revoked": true})))
 }
 
 /// GET /v1/teams/:id/members — List members
