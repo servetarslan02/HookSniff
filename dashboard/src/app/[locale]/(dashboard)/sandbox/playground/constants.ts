@@ -7,6 +7,9 @@ export const ENDPOINT_PATHS: Record<string, string> = {
   'List Endpoints': '/endpoints',
   'List Deliveries': '/webhooks',
   'Get Stats': '/stats',
+  'List Templates': '/templates',
+  'Health Check': '/health',
+  'List API Keys': '/api-keys',
 };
 
 // ─── AI Payload Templates ───

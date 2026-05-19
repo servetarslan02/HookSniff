@@ -514,7 +514,14 @@
     "statusRedirect": "Redirect",
     "statusClientError": "Client Error",
     "statusServerError": "Server Error",
-    "generatedPayload": "Generated {type} payload"
+    "generatedPayload": "Generated {type} payload",
+    "subtitle": "Test your API endpoints interactively — send requests and inspect responses",
+    "howItWorks": "How it works",
+    "step1": "Choose method & endpoint",
+    "step2": "Add request body",
+    "step3": "Send request",
+    "step4": "Inspect response",
+    "confirmClear": "Clear history?"
   },
   "team": {
     "title": "Team Management",
