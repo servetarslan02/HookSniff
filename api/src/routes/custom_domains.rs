@@ -29,6 +29,7 @@ pub fn router() -> Router {
         .route("/", post(add_domain))
         .route("/{id}", delete(delete_domain))
         .route("/{id}/verify", post(verify_domain))
+        .route("/lookup/{domain}", get(lookup_domain_internal))
 }
 
 /// Custom domain response
@@ -346,6 +347,45 @@ async fn verify_dns_cname(domain: &str) -> bool {
                 }
                 Err(_) => false,
             }
+        }
+    }
+}
+
+/// GET /custom-domains/lookup/:domain — Internal: look up customer by custom domain
+/// Used by Cloudflare Worker to route custom domain requests to the right customer.
+/// Returns customer_id and cname_target if domain is verified.
+async fn lookup_domain_internal(
+    Extension(pool): Extension<PgPool>,
+    Path(domain): Path<String>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let domain = domain.trim().to_lowercase();
+
+    let row: Option<(uuid::Uuid, String, bool)> = sqlx::query_as(
+        "SELECT customer_id, cname_target, verified FROM custom_domains WHERE domain = $1"
+    )
+    .bind(&domain)
+    .fetch_optional(&pool)
+    .await?;
+
+    match row {
+        Some((customer_id, cname_target, verified)) => {
+            if !verified {
+                return Ok(Json(serde_json::json!({
+                    "found": false,
+                    "reason": "domain_not_verified"
+                })));
+            }
+            Ok(Json(serde_json::json!({
+                "found": true,
+                "customer_id": customer_id,
+                "cname_target": cname_target,
+            })))
+        }
+        None => {
+            Ok(Json(serde_json::json!({
+                "found": false,
+                "reason": "domain_not_found"
+            })))
         }
     }
 }
