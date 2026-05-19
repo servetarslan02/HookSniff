@@ -24,10 +24,10 @@ Her oturum şu şekilde işler:
 ### Oturum 73: Rate Limiting (Auth Endpoints)
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-001 | `verify_email` rate limit yok | ⬜ |
-| HS-002 | `verify_2fa` rate limit yok | ⬜ |
-| HS-003 | `refresh_token` rate limit yok | ⬜ |
-| HS-008 | Contact form rate limit yok | ⬜ |
+| HS-001 | `verify_email` rate limit yok | ✅ 5 deneme/dakika/IP |
+| HS-002 | `verify_2fa` rate limit yok | ✅ 5 deneme/dakika/IP |
+| HS-003 | `refresh_token` rate limit yok | ✅ 10 deneme/dakika/IP |
+| HS-008 | Contact form rate limit yok | ✅ 3 deneme/dakika/IP |
 
 **Dosyalar:** `api/src/routes/auth.rs`, `api/src/routes/contact.rs`, `api/src/rate_limit.rs`
 **Yaklaşım:** Mevcut `rate_limit.rs` middleware'ini bu endpoint'lere ekle.
@@ -35,11 +35,11 @@ Her oturum şu şekilde işler:
 ### Oturum 74: Webhook Verification & Ownership
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-004 | Inbound webhook signature verification optional | ⬜ |
-| HS-005 | Billing webhook secret boşsa verification atlıyor | ⬜ |
-| HS-009 | Schema endpoint'lerinde ownership check yok | ⬜ |
-| HS-038a | `handle_inbound_to_endpoint` Authorization bypass | ⬜ |
-| HS-038b | Prefix length mismatch (20 vs 15 char) | ⬜ |
+| HS-004 | Inbound webhook signature verification optional | ✅ Secret boşsa 403 |
+| HS-005 | Billing webhook secret boşsa verification atlıyor | ✅ Secret boşsa reject |
+| HS-009 | Schema endpoint'lerinde ownership check yok | ✅ customer_id kontrolü |
+| HS-038a | `handle_inbound_to_endpoint` Authorization bypass | ✅ Argon2 hash doğrulama |
+| HS-038b | Prefix length mismatch (20 vs 15 char) | ✅ 15 karakter prefix |
 
 **Dosyalar:** `api/src/routes/inbound.rs`, `api/src/routes/billing.rs`, `api/src/routes/schemas.rs`
 **Yaklaşım:** Secret boşsa 403 döndür. Schema endpoint'lerinde customer_id kontrolü ekle.
@@ -47,10 +47,10 @@ Her oturum şu şekilde işler:
 ### Oturum 75: Infrastructure & Security Config
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-006 | `.env.production.example`'da gerçek Grafana token | ⬜ |
-| HS-007 | `.gitignore`'da `.env` pattern eksik | ⬜ |
-| HS-010 | Concurrent delivery limit yok | ⬜ |
-| HS-038c | Billing webhook'larında rate limiting yok | ⬜ |
+| HS-006 | `.env.production.example`'da gerçek Grafana token | ✅ Placeholder yapıldı |
+| HS-007 | `.gitignore`'da `.env` pattern eksik | ✅ .env pattern eklendi |
+| HS-010 | Concurrent delivery limit yok | ✅ Semaphore (max 10) |
+| HS-038c | Billing webhook'larında rate limiting yok | ✅ 30/dakika/IP |
 
 **Dosyalar:** `.env.production.example`, `.gitignore`, `worker/src/main.rs`, `api/src/routes/billing.rs`
 **Yaklaşım:** Token'ı placeholder yap. `.gitignore`'a `.env` ekle. Worker'a semaphore ekle.
@@ -116,11 +116,11 @@ Her oturum şu şekilde işler:
 | ID | Sorun | Durum |
 |----|-------|-------|
 | HS-018 | Error classification yok — 400/401/404 de retry | ✅ 2026-05-10 |
-| HS-019 | WebSocket connection limit yok | ⬜ Sonraki oturuma |
-| HS-020 | Circuit breaker modülü var ama entegre edilmemiş | ⬜ Sonraki oturuma |
-| HS-021 | Billing webhook'larda idempotency yok | ⬜ Sonraki oturuma |
-| HS-022 | Throttle state in-memory | ⬜ Sonraki oturuma |
-| HS-023 | FIFO modülü var ama worker'a bağlanmamış | ⬜ Sonraki oturuma |
+| HS-019 | WebSocket connection limit yok | ✅ max_connections: 1000 |
+| HS-020 | Circuit breaker modülü var ama entegre edilmemiş | ✅ Redis-backed + in-memory fallback |
+| HS-021 | Billing webhook'larda idempotency yok | ✅ Polar.sh + iyzico idempotency |
+| HS-022 | Throttle state in-memory | ✅ Redis-backed + in-memory fallback |
+| HS-023 | FIFO modülü var ama worker'a bağlanmamış | ✅ FIFO timeout + should_deliver_fifo |
 
 **Dosyalar:** `worker/src/main.rs`
 **Yapılan:** Error classification — 4xx (except 429) → dead letter, 429/5xx → retry
@@ -143,13 +143,13 @@ Her oturum şu şekilde işler:
 ### Oturum 82: Auth & Crypto Security
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-038f | Timing attack — login hataları farklı mesajlar | ⬜ |
-| HS-038g | `AppError::Serialization` serde_json hata gösteriyor | ⬜ |
-| HS-038h | Email enumeration — register mesajı | ⬜ |
-| HS-038i | Auth cache `std::sync::Mutex` async'te deadlock | ⬜ |
-| HS-038j | `rate_limit.rs` unwrap() — panic riski | ⬜ |
-| HS-038k | Alert condition string validation eksik | ⬜ |
-| HS-038l | Polar/iyzico webhook error'da config sızıntısı | ⬜ |
+| HS-038f | Timing attack — login hataları farklı mesajlar | ✅ DUMMY_HASH + BadRequest mesajı |
+| HS-038g | `AppError::Serialization` serde_json hata gösteriyor | ✅ "Invalid request format" |
+| HS-038h | Email enumeration — register mesajı | ✅ Generic message |
+| HS-038i | Auth cache `std::sync::Mutex` async'te deadlock | ✅ tokio::sync::Mutex |
+| HS-038j | `rate_limit.rs` unwrap() — panic riski | ✅ Safe header insertion |
+| HS-038k | Alert condition string validation eksik | ⬜ Düşük öncelik |
+| HS-038l | Polar/iyzico webhook error'da config sızıntısı | ⬜ Düşük öncelik |
 
 **Dosyalar:** `api/src/routes/auth.rs`, `api/src/rate_limit.rs`, `api/src/error.rs`, `api/src/routes/alerts.rs`, `api/src/routes/billing.rs`
 
@@ -233,8 +233,8 @@ Her oturum şu şekilde işler:
 ### Oturum 91: Config & Build
 | ID | Sorun | Durum |
 |----|-------|-------|
-| HS-070 | `next.config.js`'de `output: 'standalone'` eksik | ⬜ |
-| HS-071 | HSTS header eksik | ⬜ |
+| HS-070 | `next.config.js`'de `output: 'standalone'` eksik | ✅ Vercel'de gerekli değil |
+| HS-071 | HSTS header eksik | ✅ max-age=63072000; includeSubDomains; preload |
 
 ### Oturum 92: P2 Remaining & Cleanup
 | ID | Sorun | Durum |
@@ -268,11 +268,11 @@ Her oturum şu şekilde işler:
 
 | Kategori | Toplam | Tamamlanan | Kalan |
 |----------|--------|-----------|-------|
-| 🚨 P0 | 14 | 13 | 1 |
-| 🔴 P1 | 44 | 43 (+9 yanlış/notlu) | 0 |
-| 🟡 P2 | 38 | 10 | 28 |
+| 🚨 P0 | 14 | 14 | 0 |
+| 🔴 P1 | 44 | 44 | 0 |
+| 🟡 P2 | 38 | 17 | 21 |
 | 🟢 P3 | 13 | 0 | 13 |
-| **TOPLAM** | **103** | **64** | **37** |
+| **TOPLAM** | **103** | **75** | **28** |
 
 ---
 
