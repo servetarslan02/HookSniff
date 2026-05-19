@@ -602,9 +602,16 @@ impl GCloudEmailClient {
             cfg.notify_from_email
         );
 
+        // Ensure "HookSniff" display name is always present
+        let from_email = if cfg.notify_from_email.contains('<') {
+            cfg.notify_from_email.clone()
+        } else {
+            format!("HookSniff <{}>", cfg.notify_from_email)
+        };
+
         Some(Self {
             service_account_key: sa_key,
-            from_email: cfg.notify_from_email.clone(),
+            from_email,
             access_token: std::sync::Arc::new(tokio::sync::RwLock::new(None)),
             client: reqwest::Client::new(),
         })
@@ -1000,7 +1007,7 @@ mod tests {
         let client = GCloudEmailClient::from_config(&cfg);
         assert!(client.is_some());
         let client = client.unwrap();
-        assert_eq!(client.from_email, "noreply@example.com");
+        assert_eq!(client.from_email, "HookSniff <noreply@example.com>");
         std::env::remove_var("GCP_SA_JSON");
     }
 
@@ -1024,7 +1031,7 @@ mod tests {
             .expect("should be valid base64url");
         let mime = String::from_utf8(decoded).expect("should be valid UTF-8");
 
-        assert!(mime.contains("From: noreply@example.com"));
+        assert!(mime.contains("From: HookSniff <noreply@example.com>"));
         assert!(mime.contains("To: user@example.com"));
         assert!(mime.contains("Subject: Test Subject"));
         assert!(mime.contains("MIME-Version: 1.0"));
