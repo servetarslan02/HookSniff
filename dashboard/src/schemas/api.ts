@@ -468,10 +468,10 @@ export type InvoiceValidated = z.infer<typeof InvoiceSchema>;
 
 // ── Billing Usage Schema ──
 export const BillingUsageSchema = z.object({
-  deliveries_used: z.number(),
-  deliveries_limit: z.number(),
-  endpoints_count: z.number(),
-  endpoints_limit: z.number(),
+  deliveries_used: z.number().optional(),
+  deliveries_limit: z.number().optional(),
+  endpoints_count: z.number().optional(),
+  endpoints_limit: z.number().optional(),
   webhooks: z.object({
     used: z.number(),
     limit: z.number(),
