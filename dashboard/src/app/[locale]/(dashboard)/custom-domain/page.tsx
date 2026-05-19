@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
-import { AlertTriangle, CheckCircle2, Globe, Lock, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Clock, Globe, Lock, XCircle } from 'lucide-react';
 
 interface ExistingDomain {
   id: string;

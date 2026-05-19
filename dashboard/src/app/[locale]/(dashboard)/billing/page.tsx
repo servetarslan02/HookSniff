@@ -31,7 +31,7 @@ export default function BillingPage() {
   const [upgrading, setUpgrading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [pausing, setPausing] = useState(false);
-  const [resuming, setResuming] = useState(false);
+  const [_resuming, setResuming] = useState(false);
   const [pauseDays, setPauseDays] = useState(30);
   const [discountCode, setDiscountCode] = useState('');
   const upgradeModalRef = useRef<HTMLDivElement>(null);

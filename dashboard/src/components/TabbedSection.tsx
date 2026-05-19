@@ -2,13 +2,13 @@
 
 import { useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
+import { BarChart3, ClipboardList, Heart } from 'lucide-react';
 
 export interface Tab {
   key: string;
   label: string;
   icon?: ReactNode;
   /** Component to render (supports dynamic import factories) */
-import { BarChart3, ClipboardList, Heart } from 'lucide-react';
   content: ReactNode | (() => ReactNode);
   /** Prefetch this tab's content on hover (default: true) */
   prefetch?: boolean;
