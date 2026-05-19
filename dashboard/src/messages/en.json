@@ -2813,7 +2813,15 @@
     "adminBypassDesc": "Admin users can still log in with password (recommended)",
     "cancel": "Cancel",
     "enforcing": "Enforcing...",
-    "enforceConfirm": "Enforce SSO"
+    "enforceConfirm": "Enforce SSO",
+    "autoTeamJoin": "Auto Team Join",
+    "autoTeamJoinDesc": "Automatically add SSO users to a team when they log in for the first time.",
+    "defaultTeam": "Default Team",
+    "noAutoJoin": "Disabled — do not auto-join",
+    "defaultRole": "Default Role",
+    "roleViewer": "Viewer",
+    "roleEditor": "Editor",
+    "roleAdmin": "Admin"
   },
   "auditLog": {
     "title": "📋 Audit Log",

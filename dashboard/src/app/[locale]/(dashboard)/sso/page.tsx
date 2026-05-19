@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
-import { useSsoConfig } from '@/hooks/useDashboardData';
+import { useSsoConfig, useTeams } from '@/hooks/useDashboardData';
 
 /* ─── SSO/SAML Configuration Page (Enterprise Only) ─── */
 export default function SsoSettingsPage() {
@@ -23,6 +23,10 @@ export default function SsoSettingsPage() {
   const [certificate, setCertificate] = useState('');
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [defaultTeamId, setDefaultTeamId] = useState<string>('');
+  const [defaultRole, setDefaultRole] = useState<string>('viewer');
+
+  const { data: teams = [] } = useTeams();
   const [testPassed, setTestPassed] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [enforcing, setEnforcing] = useState(false);
@@ -39,6 +43,8 @@ export default function SsoSettingsPage() {
       setMetadata(ssoConfig.metadata_url || ssoConfig.issuer_url || '');
       setEntityId(ssoConfig.entity_id || ssoConfig.client_id || '');
       setSsoUrl(ssoConfig.sso_url || '');
+      setDefaultTeamId(ssoConfig.default_team_id || '');
+      setDefaultRole(ssoConfig.default_role || 'viewer');
     }
   }, [ssoConfig]);
 
@@ -59,6 +65,9 @@ export default function SsoSettingsPage() {
         body.client_id = entityId || null;
         if (certificate) body.client_secret = certificate;
       }
+      // Auto team join settings
+      body.default_team_id = defaultTeamId || null;
+      body.default_role = defaultRole || 'viewer';
       await apiFetch('/sso/config', { method: 'POST', body, token });
       toast(t('saved'), 'success');
       refetch();
@@ -315,6 +324,48 @@ export default function SsoSettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Auto Team Join */}
+      <div className="glass-card p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-sm font-bold">👥</span>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('autoTeamJoin')}</h2>
+        </div>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('autoTeamJoinDesc')}</p>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="sso-default-team" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('defaultTeam')}</label>
+            <select
+              id="sso-default-team"
+              value={defaultTeamId}
+              onChange={(e) => setDefaultTeamId(e.target.value)}
+              disabled={isEnforced}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <option value="">{t('noAutoJoin')}</option>
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>{team.name}</option>
+              ))}
+            </select>
+          </div>
+          {defaultTeamId && (
+            <div>
+              <label htmlFor="sso-default-role" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('defaultRole')}</label>
+              <select
+                id="sso-default-role"
+                value={defaultRole}
+                onChange={(e) => setDefaultRole(e.target.value)}
+                disabled={isEnforced}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <option value="viewer">👁️ {t('roleViewer')}</option>
+                <option value="editor">✏️ {t('roleEditor')}</option>
+                <option value="admin">🛡️ {t('roleAdmin')}</option>
+              </select>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Step 3: Save & Test */}
       <div className="glass-card p-6">
