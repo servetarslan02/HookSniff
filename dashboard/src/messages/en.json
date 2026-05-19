@@ -3138,7 +3138,6 @@
     "embedCodeDesc": "Copy this code into your dashboard to embed the portal.",
     "copy": "Copy",
     "copied": "Copied!",
-    "reactIntegration": "React Integration",
     "portalSaved": "Portal configuration saved!",
     "portalSaveFailed": "Could not save portal settings. Please try again.",
     "portalUrl": "Portal URL"

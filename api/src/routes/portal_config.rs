@@ -212,46 +212,35 @@ async fn upsert_portal_config(
 /// GET /portal/embed-code — Get the embed code snippet
 async fn get_embed_code(Extension(customer): Extension<Customer>) -> Json<serde_json::Value> {
     let portal_id = customer.id.to_string();
+    let api_base = "https://hooksniff-api-1046140057667.europe-west1.run.app";
+    let dashboard_base = "https://hooksniff.vercel.app";
+
     let iframe_code = format!(
         r#"<iframe
-  src="https://hooksniff.vercel.app/portal/embed/{}"
+  src="{}/v1/embed/portal"
   width="100%"
   height="600"
   frameborder="0"
   style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.1);"
 ></iframe>"#,
-        portal_id
-    );
-
-    let react_code = format!(
-        r##"import {{ HookSniffPortal }} from 'hooksniff-react';
-
-<HookSniffPortal
-  portalId="{}"
-  theme="dark"
-  primaryColor="#6366f1"
-/>"##,
-        portal_id
+        api_base
     );
 
     let script_code = format!(
-        r##"<script src="https://hooksniff.vercel.app/portal/widget.js"></script>
-<script>
-  HookSniffPortal.init({{
-    portalId: '{}',
-    target: '#hooksniff-portal',
-    theme: 'dark',
-  }});
-</script>
-<div id="hooksniff-portal"></div>"##,
-        portal_id
+        r##"<script
+  src="{}/portal/embed.js"
+  data-api-key="YOUR_API_KEY"
+  data-api-url="{}/v1"
+  data-theme="dark"
+  data-height="600px"
+></script>"##,
+        dashboard_base, api_base
     );
 
     Json(serde_json::json!({
         "iframe": iframe_code,
-        "react": react_code,
         "script": script_code,
-        "portal_url": format!("https://hooksniff.vercel.app/portal/embed/{}", portal_id),
+        "portal_url": format!("{}/v1/embed/portal", api_base),
     }))
 }
 
