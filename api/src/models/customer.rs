@@ -75,6 +75,15 @@ pub struct Customer {
     /// When card info was last updated
     #[serde(default)]
     pub card_updated_at: Option<DateTime<Utc>>,
+    /// When subscription was paused (NULL = not paused)
+    #[serde(default)]
+    pub paused_at: Option<DateTime<Utc>>,
+    /// Pause expiration date (auto-downgrade after this)
+    #[serde(default)]
+    pub paused_until: Option<DateTime<Utc>>,
+    /// Plan preserved during pause (for resume)
+    #[serde(default)]
+    pub pause_plan: Option<String>,
 }
 
 fn default_payment_provider() -> String {

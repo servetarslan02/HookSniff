@@ -74,7 +74,7 @@ mod grace;
 
 pub use grace::process_expired_grace_periods;
 pub(crate) use grace::cleanup_excess_endpoints;
-use subscription::{get_subscription, cancel_subscription, upgrade_plan};
+use subscription::{get_subscription, cancel_subscription, upgrade_plan, pause_subscription, resume_subscription};
 use portal::{open_portal, get_usage, get_invoices, request_refund, get_overage_settings, update_overage_settings};
 use webhooks::{handle_stripe_webhook, handle_polar_webhook, handle_iyzico_webhook};
 
@@ -91,6 +91,8 @@ pub fn router() -> Router {
             get(get_subscription).delete(cancel_subscription),
         )
         .route("/upgrade", post(upgrade_plan))
+        .route("/pause", post(pause_subscription))
+        .route("/resume", post(resume_subscription))
         .route("/portal", post(open_portal))
         .route("/usage", get(get_usage))
         .route("/invoices", get(get_invoices))
@@ -132,4 +134,13 @@ struct SubscriptionResponse {
     card_exp_month: Option<i16>,
     /// Card expiry year (e.g. 2027)
     card_exp_year: Option<i16>,
+    /// Whether the subscription is paused
+    #[serde(skip_serializing_if = "Option::is_none")]
+    paused_at: Option<String>,
+    /// Pause expiration date
+    #[serde(skip_serializing_if = "Option::is_none")]
+    paused_until: Option<String>,
+    /// Plan preserved during pause
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pause_plan: Option<String>,
 }
