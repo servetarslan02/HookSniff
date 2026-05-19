@@ -295,7 +295,7 @@ async fn handle_webhook(
 hs = HookSniff::Client.new(api_key: ENV['HOOKSNIFF_API_KEY'])
 
 # 1. Create an endpoint
-endpoint = hs.endpoints.create(
+endpoint = hs.endpoint.create(
   url: 'https://myapp.com/webhook',
   description: 'Production webhook',
   event_types: ['order.created', 'order.updated'],
@@ -304,7 +304,7 @@ puts "Endpoint: #{endpoint.id}"
 puts "Secret: #{endpoint.secret}"
 
 # 2. Send a webhook
-delivery = hs.messages.create(
+delivery = hs.message.create(
   endpoint_id: endpoint.id,
   event: 'order.created',
   data: { order_id: 'ORD-123', amount: 99.99, currency: 'USD' },
@@ -361,7 +361,7 @@ import dev.hooksniff.models.*;
 HookSniff hs = new HookSniff(System.getenv("HOOKSNIFF_API_KEY"));
 
 // 1. Create an endpoint
-Endpoint endpoint = hs.endpoints().create(
+Endpoint endpoint = hs.endpoint().create(
     CreateEndpointRequest.builder()
         .url("https://myapp.com/webhook")
         .description("Production webhook")
@@ -420,7 +420,7 @@ implementation("io.github.servetarslan02:hooksniff-sdk-kotlin:1.2.0")`,
 val hs = HookSniff(apiKey = System.getenv("HOOKSNIFF_API_KEY"))
 
 // 1. Create an endpoint
-val endpoint = hs.endpoints.create(
+val endpoint = hs.endpoint.create(
     url = "https://myapp.com/webhook",
     description = "Production webhook",
     eventTypes = listOf("order.created", "order.updated"),
@@ -429,7 +429,7 @@ println("Endpoint: \${endpoint.id}")
 println("Secret: \${endpoint.secret}")
 
 // 2. Send a webhook
-val delivery = hs.webhooks.send(
+val delivery = hs.message.create(
     endpointId = endpoint.id,
     event = "order.created",
     data = mapOf(
@@ -641,7 +641,7 @@ dependencies: [
 let hs = HookSniff(apiKey: ProcessInfo.processInfo.environment["HOOKSNIFF_API_KEY"] ?? "")
 
 // 1. Create an endpoint
-let endpoint = try await hs.endpoints.create(
+let endpoint = try await hs.endpoint.create(
     url: "https://myapp.com/webhook",
     description: "Production webhook",
     eventTypes: ["order.created", "order.updated"]
@@ -650,7 +650,7 @@ print("Endpoint: \\(endpoint.id)")
 print("Secret: \\(endpoint.secret ?? "")")
 
 // 2. Send a webhook
-let delivery = try await hs.webhooks.send(
+let delivery = try await hs.message.create(
     endpointId: endpoint.id,
     event: "order.created",
     data: ["order_id": "ORD-123", "amount": 99.99, "currency": "USD"]
