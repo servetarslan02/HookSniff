@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 08:25 GMT+8 (Kapsamlı güvenlik denetimi)
+> Son güncelleme: 2026-05-19 17:45 GMT+8 (SSO/SAML/OIDC implementasyonu)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -224,7 +224,52 @@ HookSniff/
 
 ---
 
-## 📝 Son Oturum (2026-05-19 08:13 — Login Error Fix + SESSION-PLAN Update)
+## 📝 Son Oturum (2026-05-19 17:45 — SSO/SAML/OIDC Full Implementation)
+
+### Yapılan İşler:
+- **SSO/SAML/OIDC tam implementasyon** — Sadece config formu değil, gerçek login akışları eklendi
+- **Migration 022** — `sso_configs` + `sso_login_attempts` tabloları Neon DB'ye uygulandı
+- **SAML 2.0** — AuthnRequest oluşturma, ACS callback, assertion parse, NameID çıkarma
+- **OIDC** — Discovery document fetch, authorization redirect, code exchange, ID token decode
+- **Gerçek IdP testi** — Metadata URL fetch (SAML), OIDC discovery endpoint doğrulama
+- **SSO state store** — CSRF korumalı, in-memory (production'da Redis'e taşınmalı)
+- **Otomatik kullanıcı provision** — SSO ile giriş yapan yeni kullanıcılar otomatik oluşturuluyor
+- **Audit log** — Tüm SSO giriş denemeleri `sso_login_attempts` tablosuna kaydediliyor
+- **Frontend düzeltmeleri:**
+  - Eksik i18n: `testing`, `testSuccess`, `testFailed` anahtarları eklendi (en + tr)
+  - API uyumsuzluğu: `result.success` → `result.valid` düzeltildi
+  - Sertifika/gizli anahtar durumu gösteriliyor (✓ işareti)
+  - SSO silme butonu eklendi
+  - SSO Login URL kopyalama butonu eklendi
+  - 10 yeni çeviri anahtarı (delete, certificate info, login URL)
+- **Route yapısı:**
+  - Public: `/sso/login`, `/sso/saml/callback`, `/sso/oidc/callback`, `/sso/providers`
+  - Protected: `/sso/config` (CRUD), `/sso/test`
+
+### DB Değişiklikleri (Neon PostgreSQL):
+```sql
+CREATE TABLE sso_configs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    provider VARCHAR(20) NOT NULL DEFAULT 'saml',
+    enabled BOOLEAN NOT NULL DEFAULT false,
+    metadata_url TEXT, entity_id TEXT, sso_url TEXT, certificate TEXT,
+    issuer_url TEXT, client_id TEXT, client_secret_encrypted TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT uq_sso_configs_customer UNIQUE (customer_id)
+);
+CREATE TABLE sso_login_attempts (...);
+```
+
+### Sıradaki:
+1. Cloud Build ile deploy (SSO implementasyonu)
+2. SSO test (gerçek IdP ile)
+3. P2 kalan sorunlar (21 adet)
+
+---
+
+## 📝 Önceki Oturum (2026-05-19 08:13 — Login Error Fix + SESSION-PLAN Update)
 
 ### Yapılan İşler:
 - **Login error mesajı düzeltildi** — "Unauthorized" → "Invalid email or password"

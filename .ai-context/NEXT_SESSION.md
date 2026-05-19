@@ -1,91 +1,78 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 17:23 GMT+8
+> Son güncelleme: 2026-05-19 17:45 GMT+8
 
 ## ✅ Tamamlanan (Bu Oturum)
 
-### Docs Yeniden Yazım (2026-05-19 17:02-17:23)
-- **SDK Libraries sayfası tamamen yeniden yazıldı** — 11 SDK (Java, Kotlin, Swift "Coming Soon" → "Stable")
-  - Her SDK için: installation, quick start, verification, feature tags, API resource sayısı
-  - 34 API resource tablosu eklendi
-  - SDK Feature Parity tablosu eklendi (11 SDK × 8 feature)
-  - "All SDKs Include" kartları eklendi (6 shared feature)
-- **Quickstart sayfası yeniden yazıldı** — 11 dilde quickstart (Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift)
-  - 5 adım: API key, install SDK, create endpoint + send, verify signatures, monitor deliveries
-  - Webhook verification her dilde gösterildi
-  - Standard Webheaders headers tablosu eklendi
-  - "What Happens Next?" kartları eklendi
-- **6 yeni rehber sayfası oluşturuldu (Dashboard):**
-  - `/docs/guides/webhook-verification` — HMAC-SHA256, Standard Webhooks, 11 dilde verification, key rotation, security tips
-  - `/docs/guides/error-handling` — API error codes, SDK error handling, delivery errors, best practices, resilient handler example
-  - `/docs/guides/pagination` — Cursor-based pagination, manual + auto-paginate, filtering
-  - `/docs/guides/streaming` — SSE streaming, rate limiting, rate limit headers, plan limits
-  - `/docs/guides/migration-from-svix` — Why migrate, SDK changes, API differences, step-by-step migration
-  - `/docs/guides/real-world-examples` — E-commerce, CI/CD, multi-channel notifications, multi-tenant, fintech
-- **Docusaurus docs-sdk güncellendi:**
-  - `sidebars.js` — Yeni "Guides" kategorisi eklendi
-  - `quickstart/node.md` — Yeniden yazıldı (TypeScript, correct API paths)
-  - `quickstart/python.md` — Yeniden yazıldı
-  - `quickstart/go.md` — Yeniden yazıldı
-  - 6 yeni guide sayfası oluşturuldu (Docusaurus)
-  - Tüm quickstart'larda `sk_live_` → `hr_live_` düzeltmesi
-- **i18n güncellendi** — `en.json` ve `tr.json`'a yeni docs key'leri eklendi
-- **Docs index sayfası güncellendi** — 6 yeni rehber "How-To Guides" section'ına eklendi
+### SSO/SAML/OIDC Full Implementation (2026-05-19 17:45)
+- **Migration 022** — `sso_configs` + `sso_login_attempts` tabloları Neon DB'ye uygulandı
+- **SAML 2.0 login akışı** — AuthnRequest oluşturma + ACS callback (Assertion Consumer Service)
+- **OIDC login akışı** — Discovery document + authorization redirect + code exchange + ID token decode
+- **Gerçek IdP bağlantı testi** — Metadata URL fetch (SAML) + OIDC discovery fetch
+- **SSO state store** — CSRF korumalı, 10 dakika otomatik temizleme
+- **Otomatik kullanıcı oluşturma** — SSO ile giriş yapan yeni kullanıcılar otomatik provision
+- **Audit log** — `sso_login_attempts` tablosuna tüm giriş denemeleri kaydediliyor
+- **Frontend düzeltmeleri:**
+  - Eksik i18n anahtarları eklendi (testing, testSuccess, testFailed)
+  - API response uyumsuzluğu düzeltildi (success → valid)
+  - Sertifika/gizli anahtar durumu gösteriliyor
+  - SSO silme butonu eklendi
+  - SSO Login URL gösterimi eklendi
+- **Route yapısı:**
+  - `/sso/login` — Public (auth yok, SSO giriş başlatma)
+  - `/sso/saml/callback` — Public (SAML IdP callback)
+  - `/sso/oidc/callback` — Public (OIDC IdP callback)
+  - `/sso/config` — Protected (CRUD)
+  - `/sso/test` — Protected (bağlantı testi)
+  - `/sso/providers` — Public (domain bazlı SSO sorgulama)
 
-### Değişen Dosyalar:
-```
-dashboard/src/app/[locale]/docs/sdk-libraries/page.tsx     (tamamen yeniden yazıldı)
-dashboard/src/app/[locale]/docs/quickstart/page.tsx         (tamamen yeniden yazıldı)
-dashboard/src/app/[locale]/docs/page.tsx                    (yeni rehberler eklendi)
-dashboard/src/app/[locale]/docs/guides/webhook-verification/page.tsx  (yeni)
-dashboard/src/app/[locale]/docs/guides/error-handling/page.tsx        (yeni)
-dashboard/src/app/[locale]/docs/guides/pagination/page.tsx            (yeni)
-dashboard/src/app/[locale]/docs/guides/streaming/page.tsx             (yeni)
-dashboard/src/app/[locale]/docs/guides/migration-from-svix/page.tsx   (yeni)
-dashboard/src/app/[locale]/docs/guides/real-world-examples/page.tsx   (yeni)
-dashboard/src/messages/en.json                              (yeni key'ler)
-dashboard/src/messages/tr.json                              (yeni key'ler)
-docs-sdk/sidebars.js                                        (guides kategorisi)
-docs-sdk/docs/quickstart/node.md                            (yeniden yazıldı)
-docs-sdk/docs/quickstart/python.md                          (yeniden yazıldı)
-docs-sdk/docs/quickstart/go.md                              (yeniden yazıldı)
-docs-sdk/docs/quickstart/java.md                            (prefix fix)
-docs-sdk/docs/quickstart/ruby.md                            (prefix fix)
-docs-sdk/docs/quickstart/elixir.md                          (prefix fix)
-docs-sdk/docs/quickstart/csharp.md                          (prefix fix)
-docs-sdk/docs/quickstart/rust.md                            (prefix fix)
-docs-sdk/docs/quickstart/kotlin.md                          (prefix fix)
-docs-sdk/docs/quickstart/swift.md                           (prefix fix)
-docs-sdk/docs/api-reference.md                              (prefix fix)
-docs-sdk/docs/guides/webhook-verification.md                (yeni)
-docs-sdk/docs/guides/error-handling.md                      (yeni)
-docs-sdk/docs/guides/pagination.md                          (yeni)
-docs-sdk/docs/guides/streaming.md                           (yeni)
-docs-sdk/docs/guides/migration-from-svix.md                 (yeni)
-docs-sdk/docs/guides/real-world-examples.md                 (yeni)
-docs/quickstart.md                                          (prefix fix)
-.ai-context/DOCS-REWRITE-PLAN.md                            (yeni)
+### Dosya Değişiklikleri
+| Dosya | Değişiklik |
+|-------|-----------|
+| `api/migrations/022_sso_configs.sql` | Yeni — SSO tabloları |
+| `api/src/routes/sso.rs` | Tamamen yeniden yazıldı — OIDC + SAML login akışları |
+| `api/src/routes/mod.rs` | Public SSO route'ları eklendi |
+| `api/src/main.rs` | SsoStateStore Extension eklendi |
+| `dashboard/src/app/[locale]/(dashboard)/sso/page.tsx` | Delete, cert status, login URL |
+| `dashboard/src/lib/api.ts` | ssoApi type düzeltmesi |
+| `dashboard/src/messages/en.json` | 10 yeni SSO çeviri anahtarı |
+| `dashboard/src/messages/tr.json` | 10 yeni SSO çeviri anahtarı |
+| `dashboard/src/schemas/api.ts` | SsoConfigSchema genişletildi |
+
+### Neon DB Değişiklikleri
+```sql
+-- Migration 022 uygulandı
+CREATE TABLE sso_configs (...);
+CREATE TABLE sso_login_attempts (...);
 ```
 
 ## 📋 Sıradaki
 
-### 1. Deploy (EN ÖNEMLİ)
-- Dashboard docs değişiklikleri Vercel'e deploy edilmeli
-- `git push origin main` → Vercel otomatik deploy
+### 1. Cloud Build ile Deploy (EN ÖNEMLİ)
+- SSO implementasyonu deploy edilmeli
+- `pgcrypto` extension Neon DB'de aktif (deploy gerektirmez)
+- `custom_headers` sütunu eklendi (worker processing düzeldi)
 
-### 2. Kalan Düzeltmeler
-- Mevcut `/docs/security` sayfası — Standard Webheaders header'larını kullanmalı
-- Mevcut `/docs/retries` sayfası — Güncel retry policy bilgisi
-- Mevcut `/docs/best-practices` sayfası — Yeni SDK örnekleri
-- Docusaurus quickstart'ları (Ruby, Java, Kotlin, PHP, C#, Elixir, Swift) — Tam yeniden yazım
+### 2. SSO Test (Manuel)
+- Dashboard'dan SSO config kaydet
+- OIDC ile test et (Google, Auth0 gibi)
+- SAML ile test et (Okta, Azure AD gibi)
+- Login URL'i test et
 
-### 3. Token Ayarları
+### 3. P2 Kalan Sorunlar (21 adet)
+- Frontend performance (lucide-react, tablo overflow)
+- i18n eksiklikleri (920+ hardcoded string)
+- DB index'leri
+- Monitoring iyileştirmeleri
+
+### 4. Token Ayarları
 - `.sdk-tokens.env` dosyasını oluştur
-- Demo şifresi: `Demo1234!`
 
 ## 🔧 Bilinen Sorunlar
 
 | Sorun | Durum | Not |
 |-------|-------|-----|
-| `/v1/event-type` 404 | ⚠️ | Doğru path: `/v1/events` |
+| SSO ID token imza doğrulaması | ⚠️ | JWKS ile doğrulama eklenebilir (şimdilik decode-only) |
+| SSO state in-memory | ⚠️ | Production'da Redis'e taşınmalı |
+| `/v1/event-type` 404 | ⚠️ | Route tanımlı değil |
 | `/v1/analytics/overview` 404 | ⚠️ | Doğru path: `/v1/analytics/deliveries` |
