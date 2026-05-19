@@ -179,23 +179,6 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {/* Global Quick Search */}
-            <div className="hidden md:block relative">
-              <input
-                type="text"
-                placeholder={t('quickSearch') || 'Search...'}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                    router.push(`/admin/users?search=${encodeURIComponent(e.currentTarget.value.trim())}`);
-                  }
-                }}
-                className="w-48 px-3 py-1.5 pl-9 text-sm border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
-                aria-label={t('quickSearch') || 'Search users'}
-              />
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
             <ThemeToggle />
             <LanguageSwitcher />
             {/* Notification Bell */}
