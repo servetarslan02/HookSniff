@@ -780,6 +780,8 @@
     "pauseFailed": "Failed to pause subscription.",
     "pausing": "Pausing…",
     "confirmPause": "Pause",
+    "couponCode": "Coupon Code (optional)",
+    "couponPlaceholder": "ENTER CODE",
     "subscriptionPaused": "Subscription paused",
     "resumeBefore": "Resume before:",
     "resumeSubscription": "Resume",
