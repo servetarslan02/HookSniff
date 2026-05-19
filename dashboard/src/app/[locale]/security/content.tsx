@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
+import { Lock, Shield, ShieldCheck, Globe, MapPin, Key, ClipboardList, Clock, RefreshCw, Search } from 'lucide-react';
 
 // features are now rendered via i18n keys
 
@@ -30,21 +31,21 @@ export function SecurityPageContent() {
         {/* Security Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {[
-            { icon: '🔒', titleKey: 'featureTls', descKey: 'featureTlsDesc' },
-            { icon: '🛡️', titleKey: 'featureHmac', descKey: 'featureHmacDesc' },
-            { icon: '🔐', titleKey: 'feature2fa', descKey: 'feature2faDesc' },
-            { icon: '🌐', titleKey: 'featureSso', descKey: 'featureSsoDesc' },
-            { icon: '📍', titleKey: 'featureIpWhitelist', descKey: 'featureIpWhitelistDesc' },
-            { icon: '🛡️', titleKey: 'featureSsrf', descKey: 'featureSsrfDesc' },
-            { icon: '🔑', titleKey: 'featureArgon2', descKey: 'featureArgon2Desc' },
-            { icon: '📋', titleKey: 'featureAuditLogs', descKey: 'featureAuditLogsDesc' },
-            { icon: '🇪🇺', titleKey: 'featureEuData', descKey: 'featureEuDataDesc' },
-            { icon: '🔑', titleKey: 'featureKeyRotation', descKey: 'featureKeyRotationDesc' },
-            { icon: '⏱️', titleKey: 'featureRateLimit', descKey: 'featureRateLimitDesc' },
-            { icon: '🔄', titleKey: 'featureSecretRotation', descKey: 'featureSecretRotationDesc' },
+            { icon: <Lock size={32} strokeWidth={1.75} />, titleKey: 'featureTls', descKey: 'featureTlsDesc' },
+            { icon: <Shield size={32} strokeWidth={1.75} />, titleKey: 'featureHmac', descKey: 'featureHmacDesc' },
+            { icon: <ShieldCheck size={32} strokeWidth={1.75} />, titleKey: 'feature2fa', descKey: 'feature2faDesc' },
+            { icon: <Globe size={32} strokeWidth={1.75} />, titleKey: 'featureSso', descKey: 'featureSsoDesc' },
+            { icon: <MapPin size={32} strokeWidth={1.75} />, titleKey: 'featureIpWhitelist', descKey: 'featureIpWhitelistDesc' },
+            { icon: <Shield size={32} strokeWidth={1.75} />, titleKey: 'featureSsrf', descKey: 'featureSsrfDesc' },
+            { icon: <Key size={32} strokeWidth={1.75} />, titleKey: 'featureArgon2', descKey: 'featureArgon2Desc' },
+            { icon: <ClipboardList size={32} strokeWidth={1.75} />, titleKey: 'featureAuditLogs', descKey: 'featureAuditLogsDesc' },
+            { icon: <Globe size={32} strokeWidth={1.75} />, titleKey: 'featureEuData', descKey: 'featureEuDataDesc' },
+            { icon: <Key size={32} strokeWidth={1.75} />, titleKey: 'featureKeyRotation', descKey: 'featureKeyRotationDesc' },
+            { icon: <Clock size={32} strokeWidth={1.75} />, titleKey: 'featureRateLimit', descKey: 'featureRateLimitDesc' },
+            { icon: <RefreshCw size={32} strokeWidth={1.75} />, titleKey: 'featureSecretRotation', descKey: 'featureSecretRotationDesc' },
           ].map((f) => (
             <div key={f.titleKey} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
-              <span className="text-3xl mb-3 block">{f.icon}</span>
+              <span className="text-gray-600 dark:text-slate-400 mb-3 block">{f.icon}</span>
               <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t(f.titleKey)}</h3>
               <p className="text-sm text-gray-600 dark:text-slate-400">{t(f.descKey)}</p>
             </div>
@@ -101,7 +102,7 @@ export function SecurityPageContent() {
 
         {/* Responsible Disclosure */}
         <div className="mb-16 p-6 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🔍 {t("responsibleDisclosure")}</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Search size={16} strokeWidth={1.75} className="inline mr-1" /> {t("responsibleDisclosure")}</h2>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">
             {t("responsibleDisclosureDesc")}
           </p>

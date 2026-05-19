@@ -13,7 +13,7 @@ export default async function SecurityPage() {
   const t = await getTranslations('docsSecurity');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">🔒 {t('title')}</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Lock size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         {t('subtitle')}
       </p>
@@ -70,6 +70,7 @@ signature = "v1," + base64(hmac_sha256(secret, signed_content))`}
         <CodeBlock
           code={`// Node.js
 import { Webhook } from 'hooksniff';
+import { AlertTriangle, Key, KeyRound, Lock, Shield, ShieldCheck } from 'lucide-react';
 const wh = new Webhook('whsec_your_secret');
 const payload = wh.verify(req.body, {
   'webhook-id': req.headers['webhook-id'],
@@ -93,7 +94,7 @@ payload, err := wh.Verify(r.Body, r.Header)`}
 
       {/* SSRF Protection */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🛡️ {t('ssrfProtection')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><Shield size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('ssrfProtection')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           {t('ssrfDesc')}
         </p>
@@ -129,7 +130,7 @@ payload, err := wh.Verify(r.Body, r.Header)`}
 
       {/* TLS */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🔐 {t('tlsEnforcement')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><ShieldCheck size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('tlsEnforcement')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           {t('tlsDesc')}
         </p>
@@ -142,7 +143,7 @@ payload, err := wh.Verify(r.Body, r.Header)`}
 
       {/* 2FA */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🔑 {t('twoFactor')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><Key size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('twoFactor')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           {t('twoFactorDesc')}
         </p>
@@ -159,15 +160,15 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/2f
 
       {/* API Key Security */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🗝️ {t('apiKeySecurity')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><KeyRound size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('apiKeySecurity')}</h2>
         <div className="space-y-4 not-prose">
           {[
-            { icon: '✅', title: t('akUseEnv'), desc: t('akUseEnvDesc') },
-            { icon: '✅', title: t('akRotate'), desc: t('akRotateDesc') },
-            { icon: '✅', title: t('akSeparate'), desc: t('akSeparateDesc') },
-            { icon: '✅', title: t('akScope'), desc: t('akScopeDesc') },
-            { icon: '❌', title: t('akNoCommit'), desc: t('akNoCommitDesc') },
-            { icon: '❌', title: t('akNoExpose'), desc: t('akNoExposeDesc') },
+            { icon: <Check size={16} strokeWidth={1.75} className="text-emerald-500" />, title: t('akUseEnv'), desc: t('akUseEnvDesc') },
+            { icon: <Check size={16} strokeWidth={1.75} className="text-emerald-500" />, title: t('akRotate'), desc: t('akRotateDesc') },
+            { icon: <Check size={16} strokeWidth={1.75} className="text-emerald-500" />, title: t('akSeparate'), desc: t('akSeparateDesc') },
+            { icon: <Check size={16} strokeWidth={1.75} className="text-emerald-500" />, title: t('akScope'), desc: t('akScopeDesc') },
+            { icon: <X size={16} strokeWidth={1.75} className="text-red-500" />, title: t('akNoCommit'), desc: t('akNoCommitDesc') },
+            { icon: <X size={16} strokeWidth={1.75} className="text-red-500" />, title: t('akNoExpose'), desc: t('akNoExposeDesc') },
           ].map(({ icon, title, desc }) => (
             <div key={title} className="flex items-start gap-3 p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
               <span className="text-xl">{icon}</span>
@@ -182,7 +183,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/2f
 
       {/* Incident Response */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">🚨 {t('incidentResponse')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4"><AlertTriangle size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('incidentResponse')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           {t('incidentDesc')}
         </p>

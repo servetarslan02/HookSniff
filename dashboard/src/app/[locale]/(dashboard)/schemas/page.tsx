@@ -243,7 +243,7 @@ export default function SchemasPage() {
               {validationResult && (
                 <div className={`p-4 rounded-xl ${validationResult.valid ? 'bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30' : 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30'}`}>
                   <p className={`text-sm font-medium ${validationResult.valid ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
-                    {validationResult.valid ? '✓ Valid' : '✗ Invalid'}
+                    {validationResult.valid ? '<Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom text-emerald-500" /> Valid' : '<X size={14} strokeWidth={1.75} className="inline-block align-text-bottom text-red-500" /> Invalid'}
                   </p>
                   {validationResult.errors.length > 0 && (
                     <ul className="mt-2 space-y-1">

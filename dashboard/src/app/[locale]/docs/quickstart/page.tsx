@@ -38,6 +38,7 @@ console.log('Status:', delivery.status); // → "pending"`,
     label: 'Python',
     code: `from hooksniff import HookSniff
 import os
+import { BarChart3, Bell, BookOpen, Building2, Lightbulb, Lock, Package, Plug, RefreshCw, Shuffle } from 'lucide-react';
 
 hs = HookSniff(api_key=os.environ["HOOKSNIFF_API_KEY"])
 
@@ -351,7 +352,7 @@ export default function QuickstartPage() {
         </ol>
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
           <p className="text-sm text-yellow-800 dark:text-yellow-300">
-            <strong>⚠️ Keep your API key secret.</strong> Never expose it in client-side code or public repos. Use environment variables.
+            <strong><AlertTriangle size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> Keep your API key secret.</strong> Never expose it in client-side code or public repos. Use environment variables.
           </p>
         </div>
       </section>
@@ -393,7 +394,7 @@ export default function QuickstartPage() {
         <SdkTabs tabs={quickstartTabs} />
         <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
           <p className="text-sm text-blue-800 dark:text-blue-300">
-            <strong>💡 Save the signing secret!</strong> The <code>endpoint.secret</code> (starts with <code>whsec_</code>) is needed to verify incoming webhooks. You can also rotate it later via the dashboard or API.
+            <strong><Lightbulb size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Save the signing secret!</strong> The <code>endpoint.secret</code> (starts with <code>whsec_</code>) is needed to verify incoming webhooks. You can also rotate it later via the dashboard or API.
           </p>
         </div>
       </section>
@@ -460,10 +461,10 @@ curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/MSG_ID
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">What Happens Next?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
           {[
-            { icon: '🔄', title: 'Automatic Retries', desc: 'If your endpoint returns a non-2xx status, HookSniff retries with exponential backoff (up to 5 attempts by default).' },
-            { icon: '📊', title: 'Analytics', desc: 'Track delivery success rates, latency, and failure reasons in the dashboard.' },
-            { icon: '🔔', title: 'Alerts', desc: 'Get notified when delivery rates drop or endpoints fail repeatedly.' },
-            { icon: '📦', title: 'Dead Letter Queue', desc: 'Failed deliveries are preserved for debugging. Replay them when your endpoint is back up.' },
+            { icon: <RefreshCw size={16} strokeWidth={1.75} />, title: 'Automatic Retries', desc: 'If your endpoint returns a non-2xx status, HookSniff retries with exponential backoff (up to 5 attempts by default).' },
+            { icon: <BarChart3 size={16} strokeWidth={1.75} />, title: 'Analytics', desc: 'Track delivery success rates, latency, and failure reasons in the dashboard.' },
+            { icon: <Bell size={16} strokeWidth={1.75} />, title: 'Alerts', desc: 'Get notified when delivery rates drop or endpoints fail repeatedly.' },
+            { icon: <Package size={16} strokeWidth={1.75} />, title: 'Dead Letter Queue', desc: 'Failed deliveries are preserved for debugging. Replay them when your endpoint is back up.' },
           ].map(({ icon, title, desc }) => (
             <div key={title} className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
@@ -481,12 +482,12 @@ curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/MSG_ID
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Next Steps</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
           {[
-            { href: '/docs/sdk-libraries', title: '📚 Full SDK Reference', desc: 'All 30+ API resources for each language.' },
-            { href: '/docs/security', title: '🔒 Security Best Practices', desc: 'SSRF protection, TLS, 2FA, key rotation.' },
-            { href: '/docs/retries', title: '🔄 Retries & DLQ', desc: 'Configure retry policies and replay failed webhooks.' },
-            { href: '/docs/smart-routing', title: '🔀 Smart Routing', desc: 'Round-robin, latency-based, failover routing.' },
-            { href: '/docs/integrations', title: '🔌 Integrations', desc: 'GitHub, Stripe, Shopify inbound webhooks.' },
-            { href: '/docs/build-stripe-like', title: '🏗️ Build Stripe-like Webhooks', desc: 'Production-grade webhook system guide.' },
+            { href: '/docs/sdk-libraries', title: '<BookOpen size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Full SDK Reference', desc: 'All 30+ API resources for each language.' },
+            { href: '/docs/security', title: '<Lock size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Security Best Practices', desc: 'SSRF protection, TLS, 2FA, key rotation.' },
+            { href: '/docs/retries', title: '<RefreshCw size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Retries & DLQ', desc: 'Configure retry policies and replay failed webhooks.' },
+            { href: '/docs/smart-routing', title: '<Shuffle size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Smart Routing', desc: 'Round-robin, latency-based, failover routing.' },
+            { href: '/docs/integrations', title: '<Plug size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Integrations', desc: 'GitHub, Stripe, Shopify inbound webhooks.' },
+            { href: '/docs/build-stripe-like', title: '<Building2 size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Build Stripe-like Webhooks', desc: 'Production-grade webhook system guide.' },
           ].map(({ href, title, desc }) => (
             <a key={href} href={href} className="block p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{title}</h3>

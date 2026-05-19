@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { usePlans } from '@/hooks/usePlans';
 import Footer from '@/components/Footer';
+import { Inbox, Link2, ShieldCheck, Star, Zap } from 'lucide-react';
 
 // Lazy load ThemeToggle
 const ThemeToggleBtn = dynamic(() => import('@/components/ThemeToggle').then(m => m.ThemeToggle), { ssr: false });
@@ -219,10 +220,10 @@ function SocialProof() {
   const t = useTranslations('landing.socialProof');
 
   const features = [
-    { icon: '📨', title: t('featureWebhookTitle'), desc: t('featureWebhookDesc') },
-    { icon: '🔌', title: t('featureEndpointTitle'), desc: t('featureEndpointDesc') },
-    { icon: '🛡️', title: t('featureReliabilityTitle'), desc: t('featureReliabilityDesc') },
-    { icon: '⚡', title: t('featureSpeedTitle'), desc: t('featureSpeedDesc') },
+    { icon: <Inbox size={16} strokeWidth={1.75} />, title: t('featureWebhookTitle'), desc: t('featureWebhookDesc') },
+    { icon: <Link2 size={16} strokeWidth={1.75} />, title: t('featureEndpointTitle'), desc: t('featureEndpointDesc') },
+    { icon: <ShieldCheck size={16} strokeWidth={1.75} />, title: t('featureReliabilityTitle'), desc: t('featureReliabilityDesc') },
+    { icon: <Zap size={16} strokeWidth={1.75} />, title: t('featureSpeedTitle'), desc: t('featureSpeedDesc') },
   ];
 
   return (
@@ -490,7 +491,7 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
               {/* Popular badge */}
               {plan.popular && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-600 to-purple-600 text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-lg z-10 whitespace-nowrap">
-                  ⭐ {tPricing('mostPopular')}
+                  <Star size={14} className="inline mr-1 -mt-0.5 text-amber-500" /> {tPricing('mostPopular')}
                 </div>
               )}
               {/* Header */}

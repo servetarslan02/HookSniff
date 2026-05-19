@@ -1,5 +1,7 @@
 import CodeBlock from '@/components/CodeBlock';
+import { Check, X } from 'lucide-react';
 import type { Metadata } from 'next';
+import { Check, X } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
@@ -60,7 +62,7 @@ export default async function RetriesPage() {
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('whatCountsDesc')}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-4">
           <div className="p-4 border border-green-200 dark:border-green-900/30 rounded-xl bg-green-50/50 dark:bg-green-900/10">
-            <h4 className="text-sm font-semibold text-green-800 dark:text-green-400 mb-2">✅ {t('retryable')}</h4>
+            <h4 className="text-sm font-semibold text-green-800 dark:text-green-400 mb-2"><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('retryable')}</h4>
             <ul className="space-y-1 text-sm text-green-700 dark:text-green-300">
               <li><code className="bg-green-100 dark:bg-green-900/30 px-1 py-0.5 rounded text-xs">5xx</code> {t('retryable5xx')}</li>
               <li><code className="bg-green-100 dark:bg-green-900/30 px-1 py-0.5 rounded text-xs">429</code> {t('retryable429')}</li>
@@ -71,7 +73,7 @@ export default async function RetriesPage() {
             </ul>
           </div>
           <div className="p-4 border border-red-200 dark:border-red-900/30 rounded-xl bg-red-50/50 dark:bg-red-900/10">
-            <h4 className="text-sm font-semibold text-red-800 dark:text-red-400 mb-2">❌ {t('notRetried')}</h4>
+            <h4 className="text-sm font-semibold text-red-800 dark:text-red-400 mb-2"><X size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-red-500" /> {t('notRetried')}</h4>
             <ul className="space-y-1 text-sm text-red-700 dark:text-red-300">
               <li><code className="bg-red-100 dark:bg-red-900/30 px-1 py-0.5 rounded text-xs">400</code> {t('notRetried400')}</li>
               <li><code className="bg-red-100 dark:bg-red-900/30 px-1 py-0.5 rounded text-xs">401</code> {t('notRetried401')}</li>

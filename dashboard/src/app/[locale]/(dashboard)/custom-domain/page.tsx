@@ -230,7 +230,7 @@ export default function CustomDomainPage() {
           </div>
 
           <p className="text-xs text-gray-400 dark:text-slate-500 mt-3 mb-4">
-            ⏱️ {t('dnsPropagationHint')}
+            <Clock size={14} className="inline mr-1 -mt-0.5 text-gray-500" /> {t('dnsPropagationHint')}
           </p>
 
           <div className="flex gap-3 items-center">

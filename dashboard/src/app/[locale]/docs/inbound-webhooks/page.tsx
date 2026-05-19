@@ -1,5 +1,7 @@
 import CodeBlock from '@/components/CodeBlock';
+import { Check } from 'lucide-react';
 import type { Metadata } from 'next';
+import { Check } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
@@ -75,9 +77,9 @@ export default async function InboundWebhooksPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-medium">Stripe</td><td className="px-4 py-3 font-mono text-sm">stripe-signature</td><td className="px-4 py-3">✅</td></tr>
-              <tr><td className="px-4 py-3 font-medium">GitHub</td><td className="px-4 py-3 font-mono text-sm">x-hub-signature-256</td><td className="px-4 py-3">✅</td></tr>
-              <tr><td className="px-4 py-3 font-medium">Shopify</td><td className="px-4 py-3 font-mono text-sm">x-shopify-hmac-sha256</td><td className="px-4 py-3">✅</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Stripe</td><td className="px-4 py-3 font-mono text-sm">stripe-signature</td><td className="px-4 py-3"><Check size={14} strokeWidth={1.75} className="text-emerald-500" /></td></tr>
+              <tr><td className="px-4 py-3 font-medium">GitHub</td><td className="px-4 py-3 font-mono text-sm">x-hub-signature-256</td><td className="px-4 py-3"><Check size={14} strokeWidth={1.75} className="text-emerald-500" /></td></tr>
+              <tr><td className="px-4 py-3 font-medium">Shopify</td><td className="px-4 py-3 font-mono text-sm">x-shopify-hmac-sha256</td><td className="px-4 py-3"><Check size={14} strokeWidth={1.75} className="text-emerald-500" /></td></tr>
               <tr><td className="px-4 py-3 font-medium">Custom</td><td className="px-4 py-3 font-mono text-sm">{t('configurable')}</td><td className="px-4 py-3">—</td></tr>
             </tbody>
           </table></div>

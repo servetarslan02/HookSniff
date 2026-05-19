@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { API_BASE } from '@/lib/api';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { Mail } from 'lucide-react';
 
 function ForgotPasswordContent() {
   const t = useTranslations('auth');
@@ -65,7 +66,7 @@ function ForgotPasswordContent() {
 
           {sent ? (
             <div className="text-center">
-              <div className="text-6xl mb-4">✉️</div>
+              <div className="text-6xl mb-4"><Mail size={48} strokeWidth={1.5} className="text-brand-600 dark:text-brand-400" /></div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {t('resetEmailSent')}
               </h3>

@@ -128,7 +128,7 @@ export default function PortalPage() {
               label={t('successRate')}
               value={`${usage.success_rate?.toFixed(1) || 0}%`}
               color="text-emerald-500"
-              icon="✅"
+              icon={<CheckCircle2 size={16} strokeWidth={1.75} className="text-green-500" />}
             />
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
+import { Lightbulb, Shuffle } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -33,12 +34,12 @@ export default async function WebhookRelayAlternativePage() {
             </tr></thead>
             <tbody>{[
               { featureKey: 'sdkCount', hooksniff: '11', relay: '0', bestFor: 'hooksniff' },
-              { featureKey: 'fifoDelivery', hooksniff: '✅', relay: '❌', bestFor: 'hooksniff' },
-              { featureKey: 'cloudEvents', hooksniff: '✅', relay: '❌', bestFor: 'hooksniff' },
-              { featureKey: 'schemaRegistry', hooksniff: '✅', relay: '❌', bestFor: 'hooksniff' },
-              { featureKey: 'selfHosted', hooksniff: '✅', relay: '❌', bestFor: 'hooksniff' },
-              { featureKey: 'openSource', hooksniff: '✅', relay: '❌', bestFor: 'hooksniff' },
-              { featureKey: 'i18n', hooksniff: '✅', relay: '❌', bestFor: 'hooksniff' },
+              { featureKey: 'fifoDelivery', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, relay: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
+              { featureKey: 'cloudEvents', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, relay: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
+              { featureKey: 'schemaRegistry', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, relay: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
+              { featureKey: 'selfHosted', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, relay: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
+              { featureKey: 'openSource', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, relay: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
+              { featureKey: 'i18n', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, relay: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
             ].map((r) => (
               <tr key={r.featureKey} className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
                 <td className="py-3 px-6 text-gray-700 dark:text-slate-300">{t(r.featureKey)}</td>
@@ -61,13 +62,13 @@ export default async function WebhookRelayAlternativePage() {
           </div>
 
           <div className="p-6 bg-purple-50 dark:bg-purple-500/10 rounded-xl border border-purple-200 dark:border-purple-500/20">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">🔀 {t('whenToChooseWebhookRelay')}</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Shuffle size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('whenToChooseWebhookRelay')}</h2>
             <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{t('whenToChooseWebhookRelayDesc')}</p>
           </div>
         </div>
 
         <div className="p-6 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-200 dark:border-blue-500/20 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">💡 {t('bottomLine')}</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Lightbulb size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('bottomLine')}</h2>
           <p className="text-sm text-gray-600 dark:text-slate-400">These serve different use cases. Webhook Relay is for simple webhook forwarding/tunneling. HookSniff is a full webhook delivery platform with retries, monitoring, SDKs, and a dashboard. If you need a production webhook system, HookSniff is the better fit. If you just need to forward webhooks to localhost, Webhook Relay might suffice.</p>
         </div>
         <div className="text-center"><Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('tryFree')}</Link></div>

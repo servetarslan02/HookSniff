@@ -1,4 +1,4 @@
-import { Check, Repeat, X } from 'lucide-react';
+import { Check, Repeat, SkipForward, X } from 'lucide-react';
 'use client';
 
 interface StatusBadgeProps {
@@ -92,7 +92,7 @@ const statusStyles: Record<string, { bg: string; text: string; ring: string; dot
     text: 'text-gray-500 dark:text-gray-400',
     ring: 'ring-gray-400/20 dark:ring-gray-500/30',
     dot: 'bg-gray-400',
-    icon: '⏭',
+    icon: <SkipForward size={16} strokeWidth={1.75} />,
   },
 };
 

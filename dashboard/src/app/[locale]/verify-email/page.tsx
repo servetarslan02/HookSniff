@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
+import { Clock } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { useToast } from '@/components/Toast';
@@ -71,7 +72,7 @@ function VerifyEmailContent() {
 
           {status === 'success' && (
             <>
-              <div className="text-6xl mb-4">✅</div>
+              <div className="text-6xl mb-4"><Check size={48} strokeWidth={1.5} className="text-emerald-500" /></div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{tv('verified')}</h2>
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <Link
@@ -85,7 +86,7 @@ function VerifyEmailContent() {
 
           {status === 'expired' && (
             <>
-              <div className="text-6xl mb-4">⏰</div>
+              <div className="flex justify-center mb-4 text-amber-500"><Clock size={56} strokeWidth={1.5} /></div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('linkExpired')}</h2>
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <button
@@ -102,7 +103,7 @@ function VerifyEmailContent() {
 
           {status === 'error' && (
             <>
-              <div className="text-6xl mb-4">❌</div>
+              <div className="text-6xl mb-4"><X size={48} strokeWidth={1.5} className="text-red-500" /></div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('verificationFailed')}</h2>
               <p className="text-gray-500 dark:text-slate-400 mb-6">{message}</p>
               <Link

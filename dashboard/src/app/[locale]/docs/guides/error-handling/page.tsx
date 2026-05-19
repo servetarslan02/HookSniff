@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function ErrorHandlingPage() {
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">🛡️ Error Handling</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Shield size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Error Handling</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Webhook delivery can fail for many reasons — your server is down, network issues, or invalid responses. Here's how HookSniff handles errors and how to build resilient webhook handlers.
       </p>
@@ -164,35 +164,35 @@ if err != nil {
             <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
               <tr>
                 <td className="px-4 py-3 font-mono text-sm">2xx</td>
-                <td className="px-4 py-3 text-green-600 dark:text-green-400">✅ Success — delivery complete</td>
+                <td className="px-4 py-3 text-green-600 dark:text-green-400"><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> Success — delivery complete</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 font-mono text-sm">3xx</td>
-                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400">⚠️ Follow redirect (up to 3 hops)</td>
+                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400"><AlertTriangle size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> Follow redirect (up to 3 hops)</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 font-mono text-sm">4xx (except 429)</td>
-                <td className="px-4 py-3 text-red-600 dark:text-red-400">❌ No retry — your client error</td>
+                <td className="px-4 py-3 text-red-600 dark:text-red-400"><X size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-red-500" /> No retry — your client error</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 font-mono text-sm">429</td>
-                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400">🔄 Retry after <code>Retry-After</code> header</td>
+                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400"><RefreshCw size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Retry after <code>Retry-After</code> header</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 font-mono text-sm">5xx</td>
-                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400">🔄 Retry with exponential backoff</td>
+                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400"><RefreshCw size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Retry with exponential backoff</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 font-mono text-sm">Timeout (30s)</td>
-                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400">🔄 Retry</td>
+                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400"><RefreshCw size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Retry</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 font-mono text-sm">Connection refused</td>
-                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400">🔄 Retry</td>
+                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400"><RefreshCw size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Retry</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 font-mono text-sm">DNS failure</td>
-                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400">🔄 Retry</td>
+                <td className="px-4 py-3 text-yellow-600 dark:text-yellow-400"><RefreshCw size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Retry</td>
               </tr>
             </tbody>
           </table>
@@ -204,12 +204,12 @@ if err != nil {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Webhook Handler Best Practices</h2>
         <div className="space-y-4 not-prose">
           {[
-            { icon: '⚡', title: 'Return 200 immediately', desc: 'Don\'t process the webhook synchronously. Acknowledge receipt, then handle the event in a background job.' },
-            { icon: '🔍', title: 'Verify signature first', desc: 'Always verify the webhook signature before parsing the body. Reject invalid signatures with 401.' },
-            { icon: '🔑', title: 'Use idempotency keys', desc: 'The webhook-id header is unique per delivery. Use it to deduplicate if HookSniff retries.' },
-            { icon: '📝', title: 'Log everything', desc: 'Log the webhook-id, timestamp, and event type. Essential for debugging delivery issues.' },
-            { icon: '🔄', title: 'Handle retries gracefully', desc: 'Your handler may be called multiple times for the same event. Design for idempotency.' },
-            { icon: '⏱️', title: 'Respond within 30 seconds', desc: 'HookSniff times out after 30s. If you need more time, queue the event and respond immediately.' },
+            { icon: <Zap size={16} strokeWidth={1.75} />, title: 'Return 200 immediately', desc: 'Don\'t process the webhook synchronously. Acknowledge receipt, then handle the event in a background job.' },
+            { icon: <Search size={16} strokeWidth={1.75} />, title: 'Verify signature first', desc: 'Always verify the webhook signature before parsing the body. Reject invalid signatures with 401.' },
+            { icon: <Key size={16} strokeWidth={1.75} />, title: 'Use idempotency keys', desc: 'The webhook-id header is unique per delivery. Use it to deduplicate if HookSniff retries.' },
+            { icon: <FileText size={16} strokeWidth={1.75} />, title: 'Log everything', desc: 'Log the webhook-id, timestamp, and event type. Essential for debugging delivery issues.' },
+            { icon: <RefreshCw size={16} strokeWidth={1.75} />, title: 'Handle retries gracefully', desc: 'Your handler may be called multiple times for the same event. Design for idempotency.' },
+            { icon: <Timer size={16} strokeWidth={1.75} />, title: 'Respond within 30 seconds', desc: 'HookSniff times out after 30s. If you need more time, queue the event and respond immediately.' },
           ].map(({ icon, title, desc }) => (
             <div key={title} className="flex items-start gap-3 p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
               <span className="text-xl">{icon}</span>
@@ -228,6 +228,7 @@ if err != nil {
         <CodeBlock
           code={`import express from 'express';
 import { Webhook } from 'hooksniff';
+import { FileText, Key, RefreshCw, Search, Shield, Timer, Zap } from 'lucide-react';
 
 const app = express();
 const wh = new Webhook(process.env.WEBHOOK_SECRET!);

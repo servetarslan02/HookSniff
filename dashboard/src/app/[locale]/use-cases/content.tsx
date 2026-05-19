@@ -5,12 +5,13 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Cloud, ShoppingCart, CreditCard, Bot, Wrench, HeartPulse, Anchor, XCircle, CheckCircle } from 'lucide-react';
 
 /* ─── Data ─── */
 
 type UseCase = {
   id: string;
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   tagline: string;
   description: string;
@@ -18,14 +19,14 @@ type UseCase = {
   solutions: string[];
   events: { name: string; desc: string }[];
   codeExample: { lang: string; label: string; code: string };
-  metrics: { label: string; value: string }[];
+  metrics: { label: string; value: React.ReactNode }[];
   testimonial?: { quote: string; author: string; company: string };
 };
 
 const useCases: UseCase[] = [
   {
     id: 'saas',
-    icon: '☁️',
+    icon: <Cloud size={16} strokeWidth={1.75} />,
     title: 'SaaS Platforms',
     tagline: 'Power your integrations with reliable webhooks',
     description: 'Your customers expect real-time notifications when something happens in your app. HookSniff delivers their events reliably so you can focus on your core product.',
@@ -76,7 +77,7 @@ await hs.webhooks.send({
   },
   {
     id: 'ecommerce',
-    icon: '🛒',
+    icon: <ShoppingCart size={16} strokeWidth={1.75} />,
     title: 'E-Commerce',
     tagline: 'Never miss an order, payment, or inventory event',
     description: 'E-commerce runs on events — orders, payments, shipping, inventory. One missed webhook can mean a lost order, an angry customer, or an accounting discrepancy.',
@@ -122,14 +123,14 @@ hs.webhooks.send(
     },
     metrics: [
       { label: 'eventsProcessedDay', value: '50K+' },
-      { label: 'orderedDelivery', value: '✅' },
+      { label: 'orderedDelivery', value: <CheckCircle size={16} className="text-emerald-500" /> },
       { label: 'retryOnFailure', value: '5x / 24h' },
-      { label: 'multiEndpoint', value: '✅' },
+      { label: 'multiEndpoint', value: <CheckCircle size={16} className="text-emerald-500" /> },
     ],
   },
   {
     id: 'fintech',
-    icon: '💳',
+    icon: <CreditCard size={16} strokeWidth={1.75} />,
     title: 'Fintech & Payments',
     tagline: 'Real-time financial event delivery with zero loss',
     description: 'In fintech, every event matters. A missed transaction webhook can mean regulatory non-compliance, reconciliation errors, or fraud going undetected.',
@@ -182,7 +183,7 @@ await hs.webhooks.send({
   },
   {
     id: 'ai',
-    icon: '🤖',
+    icon: <Bot size={16} strokeWidth={1.75} />,
     title: 'AI & Agents',
     tagline: 'Event-driven AI agents with real-time webhooks',
     description: 'AI agents are autonomous — they need to react to events in real-time. Webhooks are the nervous system of the agent ecosystem, triggering actions when something changes.',
@@ -227,15 +228,15 @@ hs.webhooks.send(
 )`,
     },
     metrics: [
-      { label: 'eventDriven', value: '✅' },
-      { label: 'MCP compatible', value: '✅' },
+      { label: 'eventDriven', value: <CheckCircle size={16} className="text-emerald-500" /> },
+      { label: 'MCP compatible', value: <CheckCircle size={16} className="text-emerald-500" /> },
       { label: 'cloudevents', value: 'v1.0' },
-      { label: 'schemaRegistry', value: '✅' },
+      { label: 'schemaRegistry', value: <CheckCircle size={16} className="text-emerald-500" /> },
     ],
   },
   {
     id: 'devtools',
-    icon: '🛠️',
+    icon: <Wrench size={16} strokeWidth={1.75} />,
     title: 'Developer Tools',
     tagline: 'Webhooks your developers will actually love',
     description: 'If you\'re building a developer platform — CI/CD, monitoring, analytics, or any API — your users need webhooks. But most webhook experiences are terrible.',
@@ -287,14 +288,14 @@ func main() {
     },
     metrics: [
       { label: 'SDKs', value: '11 languages' },
-      { label: 'Playground', value: '✅' },
-      { label: 'embeddablePortal', value: '✅' },
-      { label: 'openSource', value: '✅' },
+      { label: 'Playground', value: <CheckCircle size={16} className="text-emerald-500" /> },
+      { label: 'embeddablePortal', value: <CheckCircle size={16} className="text-emerald-500" /> },
+      { label: 'openSource', value: <CheckCircle size={16} className="text-emerald-500" /> },
     ],
   },
   {
     id: 'healthcare',
-    icon: '🏥',
+    icon: <HeartPulse size={16} strokeWidth={1.75} />,
     title: 'Healthcare',
     tagline: 'HIPAA-aware event delivery for healthcare systems',
     description: 'Healthcare systems need reliable, auditable event delivery. Appointment reminders, lab results, patient updates — every event must arrive, and every delivery must be logged.',
@@ -361,7 +362,7 @@ export function UseCasesPageContent() {
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
+            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white"><Anchor size={20} strokeWidth={1.75} className="inline mr-1" /> HookSniff</Link>
             <span className="text-gray-500 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
@@ -404,7 +405,7 @@ export function UseCasesPageContent() {
           <div className="lg:col-span-3 space-y-8">
             {/* Header */}
             <div>
-              <span className="text-4xl mb-3 block">{current.icon}</span>
+              <span className="text-gray-600 dark:text-slate-400 mb-3 block">{current.icon}</span>
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{current.title}</h2>
               <p className="text-lg text-brand-600 dark:text-brand-400 font-medium mb-4">{current.tagline}</p>
               <p className="text-gray-600 dark:text-slate-400 leading-relaxed">{current.description}</p>
@@ -413,7 +414,7 @@ export function UseCasesPageContent() {
             {/* Pain Points → Solutions */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-sm font-bold text-red-700 dark:text-red-400 uppercase tracking-wider mb-3">❌ The problem</h3>
+                <h3 className="text-sm font-bold text-red-700 dark:text-red-400 uppercase tracking-wider mb-3"><XCircle size={14} strokeWidth={1.75} className="inline mr-1" /> The problem</h3>
                 <ul className="space-y-2">
                   {current.painPoints.map((p) => (
                     <li key={p} className="flex items-start gap-2 text-sm text-gray-600 dark:text-slate-400">
@@ -424,7 +425,7 @@ export function UseCasesPageContent() {
                 </ul>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-3">✅ How HookSniff helps</h3>
+                <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-3"><CheckCircle size={14} strokeWidth={1.75} className="inline mr-1" /> How HookSniff helps</h3>
                 <ul className="space-y-2">
                   {current.solutions.map((s) => (
                     <li key={s} className="flex items-start gap-2 text-sm text-gray-700 dark:text-slate-300">

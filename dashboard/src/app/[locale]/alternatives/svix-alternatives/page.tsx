@@ -1,6 +1,7 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
+import { Building2, Link2, Package, Check, X } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -23,7 +24,7 @@ function getAlternatives(t: (key: string) => string) {
     },
     {
       name: 'Svix',
-      emoji: '🏢',
+      icon: <Building2 size={24} strokeWidth={1.75} />,
       taglineKey: 'bestForEnterprise',
       price: '$490/mo',
       pros: [t('svixPro1'), t('svixPro2'), t('svixPro3'), t('svixPro4'), t('svixPro5'), t('svixPro6')],
@@ -32,7 +33,7 @@ function getAlternatives(t: (key: string) => string) {
     },
     {
       name: 'Hookdeck',
-      emoji: '🔗',
+      icon: <Link2 size={24} strokeWidth={1.75} />,
       taglineKey: 'bestForRouting',
       price: '$39/mo + usage',
       pros: [t('hdPro1'), t('hdPro2'), t('hdPro3'), t('hdPro4'), t('hdPro5')],
@@ -50,7 +51,7 @@ function getAlternatives(t: (key: string) => string) {
     },
     {
       name: 'Convoy',
-      emoji: '📦',
+      icon: <Package size={24} strokeWidth={1.75} />,
       taglineKey: 'bestForGo',
       price: 'Free (self-hosted)',
       pros: [t('cvPro1'), t('cvPro2'), t('cvPro3')],
@@ -107,11 +108,11 @@ export default async function SvixAlternativesPage() {
               </thead>
               <tbody>
                 {[
-                  { name: 'Svix', price: '$490/mo', sdks: '6', oss: '✅', self: '✅', soc2: 'Type 2', sla: '99.99%', highlight: false },
-                  { name: 'HookSniff', price: '$24/mo', sdks: '11', oss: '✅', self: '✅', soc2: t('ready'), sla: '99.9%', highlight: true },
-                  { name: 'Hookdeck', price: '$39/mo+', sdks: '8', oss: '❌', self: '❌', soc2: 'Type 2', sla: '99.999%', highlight: false },
-                  { name: 'Hook0', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', sdks: '4', oss: '✅', self: '✅', soc2: '❌', sla: 'N/A', highlight: false },
-                  { name: 'Convoy', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', sdks: '1 (Go)', oss: '✅', self: '✅', soc2: '❌', sla: 'N/A', highlight: false },
+                  { name: 'Svix', price: '$490/mo', sdks: '6', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, soc2: 'Type 2', sla: '99.99%', highlight: false },
+                  { name: 'HookSniff', price: '$24/mo', sdks: '11', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, soc2: t('ready'), sla: '99.9%', highlight: true },
+                  { name: 'Hookdeck', price: '$39/mo+', sdks: '8', oss: <X size={14} strokeWidth={1.75} className="text-red-500" />, self: <X size={14} strokeWidth={1.75} className="text-red-500" />, soc2: 'Type 2', sla: '99.999%', highlight: false },
+                  { name: 'Hook0', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', sdks: '4', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, soc2: <X size={14} strokeWidth={1.75} className="text-red-500" />, sla: 'N/A', highlight: false },
+                  { name: 'Convoy', price: t('pricePro').includes('$') ? 'Free' : 'Ücretsiz', sdks: '1 (Go)', oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, self: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, soc2: <X size={14} strokeWidth={1.75} className="text-red-500" />, sla: 'N/A', highlight: false },
                 ].map((row) => (
                   <tr key={row.name} className={`border-b border-gray-100 dark:border-slate-700/50 last:border-0 ${row.highlight ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
                     <td className={`py-3 px-6 font-medium ${row.highlight ? 'text-brand-600 dark:text-brand-400' : 'text-gray-900 dark:text-white'}`}>{row.name}</td>
@@ -134,14 +135,14 @@ export default async function SvixAlternativesPage() {
             <div key={alt.name} className={`rounded-xl border overflow-hidden ${alt.name === 'HookSniff' ? 'border-brand-300 dark:border-brand-500/40 ring-1 ring-brand-300 dark:ring-brand-500/40' : 'border-gray-200 dark:border-slate-700'}`}>
               <div className={`p-6 ${alt.name === 'HookSniff' ? 'bg-brand-50 dark:bg-brand-500/10' : 'bg-white dark:bg-slate-800'}`}>
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl">{alt.emoji}</span>
+                  <span className="text-2xl">{alt.icon}</span>
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">{alt.name}</h2>
                   {alt.name === 'HookSniff' && <span className="px-2 py-0.5 bg-brand-600 text-white text-xs rounded-full">{t('recommended')}</span>}
                 </div>
                 <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{alt.price}</p>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-2">✅ {t('pros')}</p>
+                    <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-2"><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('pros')}</p>
                     <ul className="space-y-1">
                       {alt.pros.map((pro) => (
                         <li key={pro} className="text-sm text-gray-600 dark:text-slate-400 flex items-start gap-2">
@@ -152,7 +153,7 @@ export default async function SvixAlternativesPage() {
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-red-700 dark:text-red-400 uppercase tracking-wider mb-2">❌ {t('cons')}</p>
+                    <p className="text-xs font-semibold text-red-700 dark:text-red-400 uppercase tracking-wider mb-2"><X size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-red-500" /> {t('cons')}</p>
                     <ul className="space-y-1">
                       {alt.cons.map((con) => (
                         <li key={con} className="text-sm text-gray-600 dark:text-slate-400 flex items-start gap-2">

@@ -1,6 +1,7 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
+import { Package } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -34,12 +35,12 @@ export default async function ConvoyAlternativePage() {
             <tbody>{[
               { featureKey: 'pricePro', hooksniff: '$24/mo', convoy: 'Free (self-hosted)', bestFor: 'convoy' },
               { featureKey: 'sdkCount', hooksniff: '11', convoy: '1 (Go)', bestFor: 'hooksniff' },
-              { featureKey: 'fifoDelivery', hooksniff: '✅', convoy: '❌', bestFor: 'hooksniff' },
-              { featureKey: 'cloudEvents', hooksniff: '✅', convoy: '❌', bestFor: 'hooksniff' },
-              { featureKey: 'schemaRegistry', hooksniff: '✅', convoy: '❌', bestFor: 'hooksniff' },
-              { featureKey: 'selfHosted', hooksniff: '✅', convoy: '✅', bestFor: 'tie' },
-              { featureKey: 'openSource', hooksniff: '✅', convoy: '✅', bestFor: 'tie' },
-              { featureKey: 'i18n', hooksniff: '✅', convoy: '❌', bestFor: 'hooksniff' },
+              { featureKey: 'fifoDelivery', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, convoy: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
+              { featureKey: 'cloudEvents', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, convoy: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
+              { featureKey: 'schemaRegistry', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, convoy: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
+              { featureKey: 'selfHosted', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, convoy: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, bestFor: 'tie' },
+              { featureKey: 'openSource', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, convoy: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, bestFor: 'tie' },
+              { featureKey: 'i18n', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, convoy: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
             ].map((r) => (
               <tr key={r.featureKey} className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
                 <td className="py-3 px-6 text-gray-700 dark:text-slate-300">{t(r.featureKey)}</td>
@@ -62,13 +63,13 @@ export default async function ConvoyAlternativePage() {
           </div>
 
           <div className="p-6 bg-purple-50 dark:bg-purple-500/10 rounded-xl border border-purple-200 dark:border-purple-500/20">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">📦 {t('whenToChooseConvoy')}</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Package size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('whenToChooseConvoy')}</h2>
             <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{t('whenToChooseConvoyDesc')}</p>
           </div>
         </div>
 
         <div className="p-6 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">⚠️ Note on Convoy</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><AlertTriangle size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> Note on Convoy</h2>
           <p className="text-sm text-gray-600 dark:text-slate-400">Convoy&apos;s GitHub repository is no longer actively maintained. If you&apos;re currently using Convoy, consider migrating to an actively maintained alternative. HookSniff, Svix, and Hook0 are all good options depending on your needs.</p>
         </div>
         <div className="text-center"><Link href="/login" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors">{t('tryFree')}</Link></div>

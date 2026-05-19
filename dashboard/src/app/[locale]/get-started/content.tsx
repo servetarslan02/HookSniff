@@ -6,13 +6,14 @@ import { useAuth } from '@/lib/store';
 import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import Footer from '@/components/Footer';
+import { Box, Circle, Code2, Globe, CreditCard, User, Package, Mail, Bot, Bell, EyeOff, Eye, Gem, Lightbulb, Monitor, Zap, FlaskConical, BarChart3, RefreshCw, ClipboardList, Image, Terminal } from 'lucide-react';
 
 /* ─── SDK Code Examples ─── */
 
 const SDK_EXAMPLES = {
   nodejs: {
     label: 'Node.js',
-    icon: '🟢',
+    icon: <Circle size={16} strokeWidth={1.75} className="text-green-500" />,
     install: 'npm install hooksniff-sdk',
     code: `import { HookSniff } from 'hooksniff-sdk';
 
@@ -35,7 +36,7 @@ console.log('Delivery ID:', delivery.id);`,
   },
   python: {
     label: 'Python',
-    icon: '🐍',
+    icon: <Code2 size={16} strokeWidth={1.75} className="text-yellow-600" />,
     install: 'pip install hooksniff',
     code: `import hooksniff
 
@@ -58,7 +59,7 @@ print(f"Delivery ID: {delivery.id}")`,
   },
   go: {
     label: 'Go',
-    icon: '🔵',
+    icon: <Box size={16} strokeWidth={1.75} className="text-blue-500" />,
     install: 'go get github.com/hooksniff/hooksniff-go',
     code: `package main
 
@@ -86,7 +87,7 @@ func main() {
   },
   rust: {
     label: 'Rust',
-    icon: '🦀',
+    icon: <Gem size={16} strokeWidth={1.75} className="text-orange-600" />,
     install: 'cargo add hooksniff',
     code: `use hooksniff::Client;
 
@@ -111,7 +112,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   },
   curl: {
     label: 'curl',
-    icon: '🌐',
+    icon: <Globe size={16} strokeWidth={1.75} />,
     install: '',
     code: `# 1. Create an endpoint
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \\
@@ -130,12 +131,12 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
 type SdkKey = keyof typeof SDK_EXAMPLES;
 
 const EVENT_TYPES = [
-  { category: '💳 Payments', events: ['payment.completed', 'payment.failed', 'payment.refunded', 'subscription.created', 'subscription.cancelled'] },
-  { category: '👤 Users', events: ['user.created', 'user.updated', 'user.deleted', 'user.login', 'user.password_reset'] },
-  { category: '📦 Orders', events: ['order.created', 'order.shipped', 'order.delivered', 'order.cancelled', 'order.refunded'] },
-  { category: '📧 Email', events: ['email.sent', 'email.delivered', 'email.opened', 'email.bounced', 'email.complained'] },
-  { category: '🤖 AI / Agents', events: ['agent.task_started', 'agent.task_completed', 'agent.task_failed', 'model.response_completed'] },
-  { category: '🔔 Notifications', events: ['notification.created', 'notification.read', 'notification.dismissed'] },
+  { category: <><CreditCard size={14} strokeWidth={1.75} className="inline mr-1" /> Payments</>, events: ['payment.completed', 'payment.failed', 'payment.refunded', 'subscription.created', 'subscription.cancelled'] },
+  { category: <><User size={14} strokeWidth={1.75} className="inline mr-1" /> Users</>, events: ['user.created', 'user.updated', 'user.deleted', 'user.login', 'user.password_reset'] },
+  { category: <><Package size={14} strokeWidth={1.75} className="inline mr-1" /> Orders</>, events: ['order.created', 'order.shipped', 'order.delivered', 'order.cancelled', 'order.refunded'] },
+  { category: <><Mail size={14} strokeWidth={1.75} className="inline mr-1" /> Email</>, events: ['email.sent', 'email.delivered', 'email.opened', 'email.bounced', 'email.complained'] },
+  { category: <><Bot size={14} strokeWidth={1.75} className="inline mr-1" /> AI / Agents</>, events: ['agent.task_started', 'agent.task_completed', 'agent.task_failed', 'model.response_completed'] },
+  { category: <><Bell size={14} strokeWidth={1.75} className="inline mr-1" /> Notifications</>, events: ['notification.created', 'notification.read', 'notification.dismissed'] },
 ];
 
 function CopyButton({ text }: { text: string }) {
@@ -150,7 +151,7 @@ function CopyButton({ text }: { text: string }) {
       onClick={handleCopy}
       className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
     >
-      {copied ? '✓ Copied!' : 'Copy'}
+      {copied ? '<Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Copied!' : 'Copy'}
     </button>
   );
 }
@@ -193,10 +194,10 @@ export function GetStartedPageContent() {
           {t('subtitle')}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-gray-500 dark:text-slate-400">
-          <span className="flex items-center gap-2"><span className="text-green-500">✓</span> {t('freeForever')}</span>
-          <span className="flex items-center gap-2"><span className="text-green-500">✓</span> {t('elevenSdks')}</span>
-          <span className="flex items-center gap-2"><span className="text-green-500">✓</span> {t('noCreditCard')}</span>
-          <span className="flex items-center gap-2"><span className="text-green-500">✓</span> {t('fiveMinSetup')}</span>
+          <span className="flex items-center gap-2"><span className="text-green-500"><Check size={14} strokeWidth={1.75} /></span> {t('freeForever')}</span>
+          <span className="flex items-center gap-2"><span className="text-green-500"><Check size={14} strokeWidth={1.75} /></span> {t('elevenSdks')}</span>
+          <span className="flex items-center gap-2"><span className="text-green-500"><Check size={14} strokeWidth={1.75} /></span> {t('noCreditCard')}</span>
+          <span className="flex items-center gap-2"><span className="text-green-500"><Check size={14} strokeWidth={1.75} /></span> {t('fiveMinSetup')}</span>
         </div>
       </div>
 
@@ -212,7 +213,7 @@ export function GetStartedPageContent() {
             </Link>
           ) : (
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 rounded-xl text-sm font-medium">
-              ✓ {t('signedInAs')} {user.email}
+              <Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('signedInAs')} {user.email}
             </div>
           )}
         </Step>
@@ -237,11 +238,11 @@ export function GetStartedPageContent() {
                 onClick={() => setApiKeyRevealed(!apiKeyRevealed)}
                 className="text-gray-500 hover:text-gray-300 transition text-xs"
               >
-                {apiKeyRevealed ? `🙈 ${t('hide')}` : `👁 ${t('show')}`}
+                {apiKeyRevealed ? <><EyeOff size={14} strokeWidth={1.75} className="inline mr-1" />{t('hide')}</> : <><Eye size={14} strokeWidth={1.75} className="inline mr-1" />{t('show')}</>}
               </button>
             </div>
           </div>
-          <p className="mt-3 text-sm text-gray-500 dark:text-slate-500">💡 {t('keepSecret')}</p>
+          <p className="mt-3 text-sm text-gray-500 dark:text-slate-500"><Lightbulb size={14} strokeWidth={1.75} className="inline mr-1" /> {t('keepSecret')}</p>
         </Step>
 
         {/* Step 3 */}
@@ -290,20 +291,20 @@ export function GetStartedPageContent() {
           <p className="mb-4">{t('step4Desc')}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4">
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">🖥️ {t('viaDashboard')}</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-2"><Monitor size={16} strokeWidth={1.75} className="inline mr-1" /> {t('viaDashboard')}</h4>
               <p className="text-sm text-gray-500 dark:text-slate-400">
                 {t('viaDashboardDesc')}
               </p>
             </div>
             <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4">
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">⚡ {t('viaApi')}</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-2"><Zap size={16} strokeWidth={1.75} className="inline mr-1" /> {t('viaApi')}</h4>
               <p className="text-sm text-gray-500 dark:text-slate-400">
                 {t('viaApiDesc')} <code className="text-xs bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded-sm">/v1/endpoints</code>.
               </p>
             </div>
           </div>
           <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-4">
-            <p className="text-sm text-blue-700 dark:text-blue-400">💡 {t('tipPlayground')}</p>
+            <p className="text-sm text-blue-700 dark:text-blue-400"><Lightbulb size={14} strokeWidth={1.75} className="inline mr-1" /> {t('tipPlayground')}</p>
           </div>
         </Step>
 
@@ -328,10 +329,10 @@ export function GetStartedPageContent() {
           </div>
           <div className="flex gap-3">
             <Link href={`/playground`} className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-              🧪 {t('tryPlayground')}
+              <FlaskConical size={16} strokeWidth={1.75} className="inline mr-1" /> {t('tryPlayground')}
             </Link>
             <Link href={`/deliveries`} className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition">
-              📦 {t('viewDeliveries')}
+              <Package size={16} strokeWidth={1.75} className="inline mr-1" /> {t('viewDeliveries')}
             </Link>
           </div>
         </Step>
@@ -341,17 +342,17 @@ export function GetStartedPageContent() {
           <p className="mb-4">{t('step6Desc')}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-center">
-              <div className="text-3xl mb-2">📊</div>
+              <div className="text-3xl mb-2"><BarChart3 size={32} strokeWidth={1.75} /></div>
               <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t('realtimeDashboard')}</h4>
               <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('realtimeDashboardDesc')}</p>
             </div>
             <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-center">
-              <div className="text-3xl mb-2">🔄</div>
+              <div className="text-3xl mb-2"><RefreshCw size={32} strokeWidth={1.75} /></div>
               <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t('autoRetries')}</h4>
               <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('autoRetriesDesc')}</p>
             </div>
             <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-center">
-              <div className="text-3xl mb-2">🔔</div>
+              <div className="text-3xl mb-2"><Bell size={32} strokeWidth={1.75} /></div>
               <h4 className="font-semibold text-gray-900 dark:text-white text-sm">{t('alerts')}</h4>
               <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('alertsDesc')}</p>
             </div>
@@ -365,7 +366,7 @@ export function GetStartedPageContent() {
       {/* Event Types */}
       <div className="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700">
         <div className="max-w-5xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">📋 {t('eventTypesTitle')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2"><ClipboardList size={24} strokeWidth={1.75} className="inline mr-1" /> {t('eventTypesTitle')}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-8">{t('eventTypesDesc')}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {EVENT_TYPES.map((cat) => (
@@ -386,7 +387,7 @@ export function GetStartedPageContent() {
 
       {/* Embed Portal */}
       <div className="max-w-5xl mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">🖼️ {t('embedTitle')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2"><Image size={24} strokeWidth={1.75} className="inline mr-1" /> {t('embedTitle')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-8">{t('embedDesc')}</p>
         <div className="bg-gray-900 rounded-xl p-4">
           <div className="flex items-center justify-between mb-2">
@@ -409,7 +410,7 @@ export function GetStartedPageContent() {
       {/* CLI */}
       <div className="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700">
         <div className="max-w-5xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">⌨️ {t('cliTitle')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2"><Terminal size={24} strokeWidth={1.75} className="inline mr-1" /> {t('cliTitle')}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-8">{t('cliDesc')}</p>
           <div className="bg-gray-900 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
