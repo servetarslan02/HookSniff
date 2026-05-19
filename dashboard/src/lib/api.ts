@@ -780,6 +780,15 @@ export const teamsApi = {
 
   acceptInvite: (token: string, inviteToken: string) =>
     apiFetch<{ team_id: string; role: string; message: string }>('/teams/accept-invite', { method: 'POST', body: { token: inviteToken }, token }),
+
+  delete: (token: string, teamId: string) =>
+    apiFetch<{ deleted: boolean }>(`/teams/${teamId}`, { method: 'DELETE', token }),
+
+  leave: (token: string, teamId: string) =>
+    apiFetch<{ left: boolean }>(`/teams/${teamId}/leave`, { method: 'POST', token }),
+
+  transferOwnership: (token: string, teamId: string, newOwnerId: string) =>
+    apiFetch<{ transferred: boolean; new_owner_id: string; message: string }>(`/teams/${teamId}/transfer`, { method: 'POST', body: { new_owner_id: newOwnerId }, token }),
 };
 
 // Notification API

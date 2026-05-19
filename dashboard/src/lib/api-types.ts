@@ -157,6 +157,7 @@ export interface Team {
   id: string;
   name: string;
   description?: string;
+  owner_id?: string;
   created_at: string;
   updated_at?: string;
   member_count?: number;

@@ -413,6 +413,41 @@ export function useAcceptTeamInvite() {
   });
 }
 
+export function useDeleteTeam() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (teamId: string) => teamsApi.delete(token!, teamId),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+    },
+  });
+}
+
+export function useLeaveTeam() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (teamId: string) => teamsApi.leave(token!, teamId),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+    },
+  });
+}
+
+export function useTransferOwnership() {
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ teamId, newOwnerId }: { teamId: string; newOwnerId: string }) =>
+      teamsApi.transferOwnership(token!, teamId, newOwnerId),
+    onSettled: (_data, _error, { teamId }) => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      queryClient.invalidateQueries({ queryKey: ['teams', teamId, 'members'] });
+    },
+  });
+}
+
 // ── Transform Rules ──
 export function useTransformRules(endpointId: string) {
   const { token } = useAuth();
