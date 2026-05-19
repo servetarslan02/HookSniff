@@ -38,6 +38,11 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
   const [enforcing, setEnforcing] = useState(false);
   const [showEnforceModal, setShowEnforceModal] = useState(false);
   const [adminBypass, setAdminBypass] = useState(true);
+  const [domainInput, setDomainInput] = useState('');
+  const [txtRecord, setTxtRecord] = useState('');
+  const [generatingTxt, setGeneratingTxt] = useState(false);
+  const [verifyingDomain, setVerifyingDomain] = useState(false);
+  const [domainVerified, setDomainVerified] = useState<boolean | null>(null);
 
   const isConfigured = ssoConfig?.provider;
   const isEnforced = ssoConfig?.enabled;
@@ -168,6 +173,50 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
     }
   };
 
+  const handleGenerateTxtRecord = async () => {
+    if (!token || !domainInput.trim()) return;
+    setGeneratingTxt(true);
+    setTxtRecord('');
+    setDomainVerified(null);
+    try {
+      const result = await apiFetch<{ txt_record: string; instructions: string }>('/sso/verify-domain', {
+        method: 'POST',
+        body: { domain: domainInput.trim() },
+        token,
+      });
+      setTxtRecord(result.txt_record);
+    } catch (err) {
+      toast(err instanceof Error ? err.message : (t('generateTxtFailed') || 'Failed to generate TXT record'), 'error');
+    } finally {
+      setGeneratingTxt(false);
+    }
+  };
+
+  const handleVerifyDomain = async () => {
+    if (!token || !domainInput.trim()) return;
+    setVerifyingDomain(true);
+    setDomainVerified(null);
+    try {
+      const result = await apiFetch<{ verified: boolean; message: string }>('/sso/verify-domain/check', {
+        method: 'POST',
+        body: { domain: domainInput.trim() },
+        token,
+      });
+      setDomainVerified(result.verified);
+      if (result.verified) {
+        toast(result.message, 'success');
+        refetch();
+      } else {
+        toast(result.message, 'error');
+      }
+    } catch (err) {
+      toast(err instanceof Error ? err.message : (t('verifyFailed') || 'Verification failed'), 'error');
+      setDomainVerified(false);
+    } finally {
+      setVerifyingDomain(false);
+    }
+  };
+
   const ssoLoginUrl = user?.email
     ? `${typeof window !== 'undefined' ? window.location.origin : ''}/v1/sso/login?email=${encodeURIComponent(user.email)}`
     : null;
@@ -274,15 +323,69 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('verifiedDomain') || 'Verified Domain'}</h2>
         </div>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('verifiedDomainDesc') || 'Email domain for automatic SSO user discovery. Users with this domain will be matched to this organization.'}</p>
-        <input
-          type="text"
-          value={ssoConfig?.verified_domain || ''}
-          placeholder="company.com"
-          disabled={isEnforced}
-          className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-          readOnly
-        />
-        <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">{t('verifiedDomainHint') || 'Set during SSO configuration. Contact support to change.'}</p>
+
+        {ssoConfig?.verified_domain ? (
+          <div className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
+            <span className="text-emerald-600 dark:text-emerald-400">✅</span>
+            <span className="text-sm font-mono font-medium text-emerald-800 dark:text-emerald-300">{ssoConfig.verified_domain}</span>
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 ml-auto">{t('verified') || 'Verified'}</span>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={domainInput}
+                onChange={(e) => setDomainInput(e.target.value)}
+                placeholder="company.com"
+                disabled={isEnforced}
+                className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+              />
+              <button
+                type="button"
+                onClick={handleGenerateTxtRecord}
+                disabled={!domainInput.trim() || generatingTxt || isEnforced}
+                className="px-4 py-3 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition disabled:opacity-50"
+              >
+                {generatingTxt ? '...' : (t('generateTxt') || 'Generate')}
+              </button>
+            </div>
+
+            {txtRecord && (
+              <div className="space-y-3">
+                <div className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('addTxtRecord') || 'Add this TXT record to your DNS:'}</p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 text-xs font-mono text-gray-800 dark:text-slate-200 break-all">{txtRecord}</code>
+                    <button
+                      type="button"
+                      onClick={() => { navigator.clipboard.writeText(txtRecord); toast('Copied!', 'success'); }}
+                      className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+                    >📋</button>
+                  </div>
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">
+                    {t('txtRecordName') || 'Name'}: <code className="font-mono">_hooksniff.{domainInput}</code>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleVerifyDomain}
+                  disabled={verifyingDomain}
+                  className="px-4 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50"
+                >
+                  {verifyingDomain ? (t('verifying') || 'Verifying...') : (t('verifyDomain') || 'Verify Domain')}
+                </button>
+                {domainVerified === true && (
+                  <p className="text-sm text-emerald-600 dark:text-emerald-400">✅ {t('domainVerified') || 'Domain verified successfully!'}</p>
+                )}
+                {domainVerified === false && (
+                  <p className="text-sm text-red-600 dark:text-red-400">❌ {t('domainVerifyFailed') || 'TXT record not found. Please add the record and try again.'}</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+        <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">{t('verifiedDomainHint') || 'TXT record verification. Users with this email domain will be auto-matched.'}</p>
       </div>
 
       {/* Step 2: SAML Configuration */}
