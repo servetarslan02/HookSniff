@@ -1,152 +1,100 @@
-# 🧠 Admin Upgrade Plan — Hafıza
+# 🧠 HookSniff — Uygulama Hafızası
 
-> Son güncelleme: 2026-05-16 02:57 GMT+8
-
----
-
-## Aşama İlerleme
-
-| Aşama | İçerik | Durum | Tarih |
-|-------|--------|-------|-------|
-| 0 | DB migration (5 tablo, 11 index) | ✅ TAMAMLANDI | 2026-05-16 |
-| 1 | Kullanıcı kaynakları (7 endpoint, 6 sekme) | ✅ TAMAMLANDI | 2026-05-16 |
-| 2 | Sistem geneli (failed, dead letters, queue, latency) | ✅ TAMAMLANDI | 2026-05-16 |
-| 3 | Müşteri notları, etiketler, iletişim geçmişi | ✅ TAMAMLANDI | 2026-05-16 |
-| 4 | Fatura, ödeme, gelir metrikleri | ✅ TAMAMLANDI | 2026-05-16 |
-| 5 | Refund + Polar.sh webhook handler | ✅ TAMAMLANDI | 2026-05-16 |
-| 6 | Alerts sayfası | ✅ TAMAMLANDI | 2026-05-16 |
-| 7 | Bulk email + GDPR | ✅ TAMAMLANDI | 2026-05-16 |
+> **Son güncelleme:** 2026-05-20 01:04 GMT+8
+> **Bu dosya:** Her oturum başı okunur, oturum sonunda güncellenir.
 
 ---
 
-## UI Düzenlemeleri (2026-05-16)
+## 📋 Proje Durumu
 
-### Overview Sayfası — Tab Yapısı
-- 4 tab: **📊 Genel Bakış** | **📋 Aktivite** | **💚 Sağlık** | **🏗️ Altyapı**
-- Genel Bakış: Stats cards, MRR/ARR, Users by Plan, Weekly Comparison
-- Aktivite: Recent Activity (Audit Log), Recent Signups, Quick Actions
-- Sağlık: Endpoint Status, Security Warnings, Uptime, Service Status
-- Altyapı: Feature Flags, Standard Webhooks, Deduplication, Last Deploy
+**HookSniff** bir webhook altyapı platformu.
 
-### Settings Sayfası — Tab Yapısı
-- 3 tab: **⚙️ Genel** | **📧 Email & Güvenlik** | **🚨 Uyarı & Retry**
-- Genel: General, Plan Limits, Plan Prices
-- Email & Güvenlik: Email Settings, Security, Backup
-- Uyarı & Retry: Retry Settings, Alert Thresholds
-
-### Sidebar Navigasyonu (Güncel)
-```
-📊 Genel Bakış
-👥 Kullanıcılar
-💰 Gelir
-🚩 Feature Flags
-🖥️ Sistem
-⚙️ Ayarlar
-📋 Aktivite Günlüğü
-🔔 Uyarılar
-📧 E-posta        ← ayrı sayfa (bulk email)
-📁 Kullanıcı Paneli
-```
+- **Dil:** Rust (API + Worker), TypeScript/Next.js (Dashboard)
+- **Veritabanı:** Neon PostgreSQL
+- **Cache/Queue:** Upstash Redis
+- **Deploy:** Google Cloud Build → Cloud Run (API), Vercel (Dashboard)
 
 ---
 
-## Karar Verilen Noktalar
+## 🎯 Aktif Görev: Admin Panel Yükseltmesi
 
-| # | Konu | Karar | Tarih |
-|---|------|-------|-------|
-| 1 | `api_keys` tablosu | Production'da mevcut. Admin panelinde yönetim gereksiz. | 2026-05-15 |
-| 2 | Refund provider | Mevcut `billing/refund.rs` + `billing/polar.rs` kullanıldı. | 2026-05-16 |
-| 3 | Bulk email | Ayrı `/admin/email` sayfasına taşındı (settings'den çıkarıldı). | 2026-05-16 |
-| 4 | GDPR export | Hassas alanlar (password_hash, api_key_hash, totp_secret) export'ta yok. | 2026-05-16 |
-| 5 | Overview yapısı | 4 tab'a ayrıldı (877 satır tek sayfa → organize). | 2026-05-16 |
-| 6 | Settings yapısı | 3 tab'a ayrıldı. | 2026-05-16 |
+### Uygulama Planı
+- **Dosya:** `UYGULAMA-PLAN.md`
+- **Aşama sayısı:** 12
+- **Toplam özellik:** 35+
+- **Tahmini süre:** 15.5 oturum
 
----
-
-## Son Yapılan İş
-
-### Refactor — UI Düzenlemeleri (2026-05-16)
-
-**Overview Tab Yapısı:**
-- [x] Tab navigation eklendi (4 tab)
-- [x] Section'lar tab'lara göre organize edildi
-- [x] Hidden class ile show/hide
-- [x] i18n: tr + en tab label'ları
-
-**Settings Tab Yapısı:**
-- [x] Tab navigation eklendi (3 tab)
-- [x] Section'lar tab'lara göre organize edildi
-- [x] i18n: tr + en tab label'ları
-
-**Bulk Email Ayrı Sayfa:**
-- [x] `/admin/email` sayfası oluşturuldu
-- [x] Compose formu (plan/status filtre, subject, body)
-- [x] Sonuç gösterimi + session geçmişi
-- [x] Settings'den bulk email çıkarıldı
-- [x] Sidebar'a 📧 E-posta linki eklendi
-
-**i18n Düzeltmeleri:**
-- [x] `nav.alerts` çevirisi eklendi (tr + en)
-- [x] `nav.email` çevirisi eklendi (tr + en)
-- [x] Tab label'ları eklendi
-
-**Bug Fix:**
-- [x] Duplicate Stats Cards section kaldırıldı
-- [x] Turbofish syntax hatası düzeltildi (`row.get::<i32>, _` → `row.get::<i32, _>`)
-
-**Git Commits:**
-- `82ed4abb` — Settings tab yapısı
-- `7bfd2c7a` — Duplicate section fix
-- `cacd5275` — Turbofish syntax fix
-- `0846867f` — Bulk email ayrı sayfa
-- `b4a73c10` — i18n nav.alerts fix
-- `5b0add80` — Overview tab yapısı
+### Sıradaki Aşama
+- **Aşama 1:** Kullanıcı Davet Sistemi
+- **Durum:** ⬜ Başlanmadı
 
 ---
 
-## Dosya Haritası (Güncel)
+## 📁 Oluşturulan Raporlar (Bu Oturum)
 
-```
-api/migrations/019_admin_upgrade.sql       ← ✅ Aşama 0
-api/src/routes/admin.rs                    ← ✅ Aşama 1-7 (+2000+ satır, 49 route, 64 test)
-dashboard/src/lib/api.ts                   ← ✅ Aşama 1-7 (+30+ adminApi fonksiyonu)
-dashboard/src/app/[locale]/admin/page.tsx  ← ✅ Overview (4 tab yapısı)
-dashboard/src/app/[locale]/admin/users/[id]/page.tsx ← ✅ User detail (9 sekme + GDPR + Refund)
-dashboard/src/app/[locale]/admin/revenue/page.tsx ← ✅ Revenue (metrics + cohort + refund)
-dashboard/src/app/[locale]/admin/system/page.tsx ← ✅ System monitoring
-dashboard/src/app/[locale]/admin/alerts/page.tsx ← ✅ Alerts sayfası
-dashboard/src/app/[locale]/admin/email/page.tsx ← ✅ Bulk email sayfası
-dashboard/src/app/[locale]/admin/settings/page.tsx ← ✅ Settings (3 tab yapısı)
-dashboard/src/app/[locale]/admin/layout.tsx ← ✅ Sidebar (10 link)
-dashboard/src/messages/tr.json             ← ✅ Türkçe çeviriler
-dashboard/src/messages/en.json             ← ✅ İngilizce çeviriler
-```
+| Dosya | İçerik | Tarih |
+|-------|--------|-------|
+| `ADMIN-PANEL-UPGRADE-PLAN.md` | Kullanıcı paneli analizi (50+ sayfa) | 2026-05-20 |
+| `ADMIN-PANEL-ANALIZ.md` | Admin paneli analizi (9 sayfa, 45+ endpoint) | 2026-05-20 |
+| `RAKIP-ANALIZ.md` | 8 rakip karşılaştırma (Stripe, Svix, vb.) | 2026-05-20 |
+| `EKSIKLER-REVIZE.md` | 35 eksik + ROI + öncelik matrisi | 2026-05-20 |
+| `UYGULAMA-PLAN.md` | 12 aşamalı uygulama planı | 2026-05-20 |
 
 ---
 
-## Ortam Notları
+## 📊 Eksikler Özeti
 
-- **Rust kurulu değil** — son oturumda kurulacak
-- `cargo test` ve `next build` atlandı
-- Vercel auto-deploy çalışıyor (GitHub webhook)
-- Google Cloud Build ayrı (Rust backend)
+### 🔴 Kritik (6)
+1. Kullanıcı Davet Sistemi
+2. Şifre Sıfırlama (Admin)
+3. Dunning (Ödeme Kurtarma)
+4. Customer Health Score
+5. Promosyon/Kupon Kodu
+6. Revenue Forecast
+
+### 🟡 Önemli (12)
+- Platform Status Page, Session Yönetimi, Cancel Flow, Broadcast Notification, Webhook Queue Yönetimi, PDF Fatura, Event Deduplication, Circuit Breaker UI, Kullanıcı Davet Geçmişi, Onboarding Tracker, API Usage Dashboard, Şüpheli Aktivite
+
+### 🟢 İyi Olur (17)
+- IP Blocklist, Manual Invoice, Deploy History, SMS, A/B Testing, Geographic, Multi-Project, White Label, API Versioning, Debug Timeline, Benchmark, Cache Mgmt, DB Migration, Support Ticket, Changelog, ProfitWell, Customer Segmentation
 
 ---
 
-## Öğrenilenler
+## 🔑 Hesap Bilgileri
 
-1. `deliveries` tablosunda `error_message` yok — `delivery_attempts` tablosunda
-2. `deliveries` tablosunda `event` yok — doğrusu `event_type`
-3. `api_keys` tablosu migration'da yok ama `inbound.rs`'de aktif sorgu var
-4. `invoices`/`payment_transactions` tabloları boş — Polar.sh webhook handler gerekli
-5. `applications` tablosu migration 013'te mevcut
-6. Admin: 49 route, 64 test, 58 async function
-7. `refunds` tablosu zaten migration 019'da mevcut
-8. `billing/refund.rs` modülü zaten var (14 gün pencere)
-9. `billing/polar.rs` Polar.sh entegrasyonu zaten var
-10. JSX'te `&& (...)` içinde tek root element olmalı, `<>...</>` ile sar
-11. Turbofish syntax: `row.get::<i32, _>` (virgül inside brackets)
-12. GDPR export'ta hassas alanlar çıkarılmalı
-13. Bulk email'de her kullanıcı için ayrı sorgu yerine SQL'de filtre
-14. Transaction kullanılmayan multi-step DB işlemleri tutarsızlık riski taşır
-15. Overview/Settings gibi büyük sayfalar tab'lara ayrılmalı
+| Servis | Bilgi |
+|--------|-------|
+| **Dashboard** | https://hooksniff.vercel.app |
+| **API** | https://hooksniff-api-1046140057667.europe-west1.run.app |
+| **Repo** | https://github.com/servetarslan02/HookSniff |
+| **Admin** | servetarslan02@gmail.com |
+
+---
+
+## ⚠️ Kritik Kurallar
+
+1. **SDK sıfırdan yazılmaz** — Svix SDK'dan kopyala, adapte et
+2. **Eksik iş bırakma** — Her faz: Migration + API + Dashboard + i18n + Push
+3. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
+4. **Her aşamadan sonra:** cargo test + next build + commit + push
+
+---
+
+## 📝 Oturum Logu
+
+### 2026-05-20 00:37–01:04 — İlk Tanışma + Analiz
+**Yapılan:**
+- Repo klonlandı, token temizlendi
+- Kullanıcı paneli analizi (50+ sayfa)
+- Admin paneli analizi (9 sayfa, 45+ endpoint)
+- 8 rakip karşılaştırması (Stripe, Svix, Hookdeck, Convoy, Hook0, Baremetrics, ChurnBuster, Paddle)
+- 35 eksik tespit edildi, ROI analizi yapıldı
+- 12 aşamalı uygulama planı oluşturuldu
+- 5 rapor dosyası oluşturuldu ve push edildi
+
+**Push edilen commit'ler:**
+- `1c8d7416` — Kullanıcı paneli analiz raporu
+- `1fcf0826` — Admin paneli analiz raporu
+- `14aa2184` — Rakip analiz raporu
+- `5b6a6d2c` — Revize eksikler listesi
+- `d1ffb6e6` — Uygulama planı
