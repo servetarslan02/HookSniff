@@ -574,39 +574,111 @@ CREATE INDEX idx_coupon_usages_customer ON coupon_usages(customer_id);
 **Backend endpoint:** `GET /admin/revenue/forecast`
 
 **Hesaplama:**
-```
-Forecast MRR = Current MRR × (1 + growth_rate) ^ months
-- Growth rate: Son 3 aylık ortalama büyüme
-- Churn etkisi dahil
-- Expansion revenue dahil
+```rust
+// Son 3 aylık ortalama büyüme oranı
+let growth_rate = (mrr_current / mrr_3_months_ago).powf(1.0/3.0) - 1.0;
+
+// 3 senaryo
+let best_case  = mrr_current * (1.0 + growth_rate * 1.5).powi(months);
+let base_case  = mrr_current * (1.0 + growth_rate).powi(months);
+let worst_case = mrr_current * (1.0 + growth_rate * 0.5).powi(months);
+
+// Churn etkisi dahil
+let net_growth = growth_rate - churn_rate;
 ```
 
 **Frontend:** `admin/revenue/components/RevenueContent.tsx`
-- Forecast grafiği (3/6/12 ay)
-- 3 senaryo: Best/Base/Worst case
+- Forecast grafiği (3/6/12 ay, area chart)
+- 3 senaryo çizgisi: Best (yeşil), Base (mavi), Worst (kırmızı)
+- Forecast kartları: "3 ay sonra: $X", "6 ay: $Y", "12 ay: $Z"
+
+**i18n:**
+```json
+{
+  "admin": {
+    "revenueForecast": "Revenue Forecast",
+    "bestCase": "Best Case",
+    "baseCase": "Base Case",
+    "worstCase": "Worst Case",
+    "forecastMonths": "Forecast Period",
+    "growthRate": "Growth Rate"
+  }
+}
+```
 
 ### 6.2 Cancel Flow (1 oturum)
+**DB Migration:** `api/migrations/069_cancel_feedback.sql`
+```sql
+CREATE TABLE IF NOT EXISTS cancel_feedback (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    reason TEXT NOT NULL, -- too_expensive, not_using, missing_features, found_alternative, other
+    feedback_text TEXT,
+    offer_made TEXT, -- discount, pause, roadmap, none
+    offer_accepted BOOLEAN DEFAULT false,
+    original_plan TEXT NOT NULL,
+    canceled_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_cancel_feedback_customer ON cancel_feedback(customer_id);
+CREATE INDEX idx_cancel_feedback_reason ON cancel_feedback(reason);
+```
+
 **Backend endpoint:** `POST /billing/cancel-feedback`
-
-**İptal Akışı:**
-```
-1. Kullanıcı "Cancel" butonuna basar
-2. Modal açılır: "Neden iptal ediyorsunuz?"
-   - Too expensive
-   - Not using it
-   - Missing features
-   - Found alternative
-   - Other
-3. Çözüm önerisi (sebebe göre):
-   - Too expensive → %20 indirim teklifi
-   - Not using it → Pause subscription teklifi
-   - Missing features → Roadmap göster
-4. Son onay
-5. İptal gerçekleşir + feedback kaydedilir
+```rust
+// İptal akışı:
+// 1. Kullanıcı cancel butonuna basar
+// 2. Modal açılır: sebep seçimi
+// 3. Sebebe göre teklif:
+//    - too_expensive → %20 indirim (3 ay)
+//    - not_using → Pause subscription (6 aya kadar)
+//    - missing_features → Roadmap linki
+//    - found_alternative → Geri bildirim formu
+//    - other → Serbest metin
+// 4. Teklif kabul edilirse → plan güncelle, feedback kaydet
+// 5. Teklif reddedilirse → iptal gerçekleş, feedback kaydet
 ```
 
-**DB:** `cancel_feedback` tablosu
-**Frontend:** Billing sayfasında cancel modal
+**Frontend:** `billing/page.tsx` → Cancel modal
+- Adım 1: Sebep seçimi (radio butonlar)
+- Adım 2: Teklif gösterimi (sebebe göre değişir)
+- Adım 3: Son onay
+- Sonuç: Başarı mesajı veya teklif kabul mesajı
+
+**i18n:**
+```json
+{
+  "billing": {
+    "cancelSubscription": "Cancel Subscription",
+    "cancelReason": "Why are you canceling?",
+    "reasonTooExpensive": "Too expensive",
+    "reasonNotUsing": "Not using it enough",
+    "reasonMissingFeatures": "Missing features",
+    "reasonFoundAlternative": "Found an alternative",
+    "reasonOther": "Other",
+    "cancelOffer": "We have an offer for you",
+    "offerDiscount": "Get 20% off for 3 months",
+    "offerPause": "Pause your subscription for up to 6 months",
+    "offerRoadmap": "See what's coming next",
+    "acceptOffer": "Accept Offer",
+    "declineAndCancel": "Decline and Cancel",
+    "cancelConfirm": "Are you sure? This cannot be undone.",
+    "cancelSuccess": "Subscription canceled",
+    "offerAccepted": "Offer applied successfully"
+  }
+}
+```
+
+### Kabul Kriterleri (AŞAMA 6)
+- [ ] Forecast grafiği 3/6/12 ay gösteriyor
+- [ ] 3 senaryo doğru hesaplanıyor
+- [ ] Cancel modal açılıyor
+- [ ] Sebep seçimi çalışıyor
+- [ ] Sebebe göre teklif gösteriliyor
+- [ ] Teklif kabul → plan güncelleniyor
+- [ ] Teklif red → iptal gerçekleşiyor
+- [ ] Feedback kaydediliyor
+- [ ] cargo test geçiyor
+- [ ] next build geçiyor
 
 ---
 
@@ -614,28 +686,129 @@ Forecast MRR = Current MRR × (1 + growth_rate) ^ months
 **Süre:** 1 oturum | **Öncelik:** 🟡 Önemli
 
 ### 7.1 Status Page (0.5 oturum)
+**DB Migration:** `api/migrations/070_incidents.sql`
+```sql
+CREATE TABLE IF NOT EXISTS incidents (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    description TEXT,
+    status TEXT NOT NULL DEFAULT 'investigating', -- investigating, identified, monitoring, resolved
+    severity TEXT NOT NULL DEFAULT 'minor', -- minor, major, critical
+    affected_services TEXT[], -- api, dashboard, webhook, db, redis
+    created_by UUID REFERENCES customers(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    resolved_at TIMESTAMPTZ
+);
+CREATE INDEX idx_incidents_status ON incidents(status);
+CREATE INDEX idx_incidents_created ON incidents(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS incident_updates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    incident_id UUID NOT NULL REFERENCES incidents(id) ON DELETE CASCADE,
+    status TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_by UUID REFERENCES customers(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_incident_updates_incident ON incident_updates(incident_id);
+```
+
+**Backend endpoint'ler:**
+| Method | Path | İşlev |
+|--------|------|-------|
+| GET | `/status/incidents` | Aktif incident'ler (public) |
+| GET | `/status/incidents/history` | Geçmiş incident'ler (public) |
+| POST | `/admin/incidents` | Incident oluştur (admin) |
+| PUT | `/admin/incidents/{id}` | Incident güncelle (admin) |
+| POST | `/admin/incidents/{id}/updates` | Güncelleme ekle (admin) |
+| PUT | `/admin/incidents/{id}/resolve` | Incident çöz (admin) |
+
+**Frontend — Public:**
 **Dosya:** `app/[locale]/status/page.tsx` (auth gerektirmez)
+- Sistem durumu kartı (operational ✅ / degraded ⚠️ / outage 🔴)
+- Aktif incident'ler (timeline)
+- Geçmiş incident'ler (son 30 gün)
+- Subscribe butonu (email ile bildirim)
 
-**İçerik:**
-- Sistem durumu kartı (operational/degraded/outage)
-- Incident timeline (başlangıç, güncelleme, çözüm)
-- Geçmiş incident'ler
-- Subscribe (email ile bildirim)
+**Frontend — Admin:**
+**Dosya:** `admin/status/page.tsx`
+- Incident oluşturma formu (title, severity, affected services)
+- Incident listesi (aktif/çözülmüş)
+- Güncelleme ekleme formu
+- Çöz butonu
 
-**Admin:** `admin/status/page.tsx`
-- Incident oluşturma formu
-- Incident güncelleme
-- Incident çözme
+**i18n:**
+```json
+{
+  "status": {
+    "title": "System Status",
+    "operational": "All Systems Operational",
+    "degraded": "Some Systems Degraded",
+    "outage": "Major Outage",
+    "incident": "Incident",
+    "investigating": "Investigating",
+    "identified": "Identified",
+    "monitoring": "Monitoring",
+    "resolved": "Resolved",
+    "subscribe": "Subscribe to Updates",
+    "affectedServices": "Affected Services"
+  },
+  "admin": {
+    "createIncident": "Create Incident",
+    "incidentTitle": "Incident Title",
+    "incidentSeverity": "Severity",
+    "incidentServices": "Affected Services",
+    "addUpdate": "Add Update",
+    "resolveIncident": "Resolve Incident"
+  }
+}
+```
 
 ### 7.2 Broadcast Notification (0.5 oturum)
 **Backend endpoint:** `POST /admin/broadcast`
-
-**İşlev:**
-- Hedef: tüm kullanıcılar, plan bazlı, segment bazlı
-- Kanal: in-app + email
-- Şablon desteği
+```rust
+// Body: { subject, body, target: "all"|"plan"|"segment", plan_filter, channel: "email"|"in-app"|"both" }
+// 1. Hedef kullanıcıları belirle
+// 2. Email → Resend API (batch 50'şer)
+// 3. In-app → notifications tablosuna ekle
+// 4. Audit log kaydı
+```
 
 **Frontend:** `admin/email/page.tsx` → "Broadcast" sekmesi
+- Konu + içerik formu
+- Hedef seçimi: Tüm kullanıcılar / Plan bazlı / Segment
+- Kanal seçimi: Email + In-app / Sadece email / Sadece in-app
+- Gönderim geçmişi
+
+**i18n:**
+```json
+{
+  "admin": {
+    "broadcast": "Broadcast Notification",
+    "broadcastTarget": "Target",
+    "broadcastAll": "All Users",
+    "broadcastPlan": "By Plan",
+    "broadcastChannel": "Channel",
+    "broadcastEmail": "Email",
+    "broadcastInApp": "In-App",
+    "broadcastBoth": "Both",
+    "broadcastSend": "Send Broadcast",
+    "broadcastSent": "Broadcast sent to {count} users"
+  }
+}
+```
+
+### Kabul Kriterleri (AŞAMA 7)
+- [ ] Public status page çalışıyor (auth gerektirmez)
+- [ ] Sistem durumu doğru gösteriliyor
+- [ ] Incident oluşturulabiliyor (admin)
+- [ ] Incident güncellenebiliyor
+- [ ] Incident çözülebiliyor
+- [ ] Broadcast gönderilebiliyor
+- [ ] Plan bazlı filtre çalışıyor
+- [ ] Email + in-app kanal seçimi çalışıyor
+- [ ] cargo test geçiyor
+- [ ] next build geçiyor
 
 ---
 
@@ -643,21 +816,78 @@ Forecast MRR = Current MRR × (1 + growth_rate) ^ months
 **Süre:** 0.5 oturum | **Öncelik:** 🟡 Önemli
 
 ### 8.1 Queue Yönetimi
-**Frontend:** `admin/components/system/QueueStatus.tsx` (güncelleme)
+**Backend endpoint:** `GET /admin/queue/details`
+```rust
+// Response: {
+//   pending: int,
+//   processing: int,
+//   failed: int,
+//   oldest_pending_at: timestamp,
+//   stuck_deliveries: Vec<{id, endpoint_url, created_at, attempts}>,
+//   capacity: { max_concurrent: int, current_concurrent: int }
+// }
+```
 
-**Yeni özellikler:**
-- Queue depth grafiği (zaman serisi)
-- Manuel queue temizleme butonu
-- Stuck delivery tespiti
-- Queue capacity göstergesi
+**Frontend:** `admin/components/system/QueueStatus.tsx` (güncelleme)
+- Queue depth grafiği (zaman serisi — son 24 saat)
+- Manuel queue temizleme butonu (onay dialogu)
+- Stuck delivery listesi (5 dakikadan eski pending'ler)
+- Capacity progress bar (current/max)
+
+**i18n:**
+```json
+{
+  "admin": {
+    "queueDetails": "Queue Details",
+    "stuckDeliveries": "Stuck Deliveries",
+    "queueCapacity": "Queue Capacity",
+    "clearQueue": "Clear Failed Queue",
+    "clearQueueConfirm": "This will remove all failed deliveries. Continue?"
+  }
+}
+```
 
 ### 8.2 Circuit Breaker UI
-**Frontend:** `admin/components/system/HealthStatus.tsx` (güncelleme)
+**Backend endpoint:** `GET /admin/circuit-breakers`
+```rust
+// Response: Vec<{
+//   endpoint_id: uuid,
+//   endpoint_url: string,
+//   state: "closed"|"open"|"half-open",
+//   failure_count: int,
+//   last_failure_at: timestamp,
+//   next_retry_at: timestamp,
+//   success_count: int
+// }>
+```
 
-**Yeni özellikler:**
-- Endpoint bazlı circuit breaker durumu (closed/open/half-open)
+**Frontend:** `admin/components/system/HealthStatus.tsx` (güncelleme)
+- Circuit breaker listesi tablosu
+- Durum badge: closed (yeşil), open (kırmızı), half-open (sarı)
 - Manuel reset butonu
-- Circuit breaker geçmişi
+- Son hata tarihi
+
+**i18n:**
+```json
+{
+  "admin": {
+    "circuitBreakers": "Circuit Breakers",
+    "circuitClosed": "Closed",
+    "circuitOpen": "Open",
+    "circuitHalfOpen": "Half-Open",
+    "circuitReset": "Reset Circuit Breaker"
+  }
+}
+```
+
+### Kabul Kriterleri (AŞAMA 8)
+- [ ] Queue detayları görünüyor (pending/processing/failed)
+- [ ] Stuck delivery listesi var
+- [ ] Manuel queue temizleme çalışıyor
+- [ ] Circuit breaker durumları görünüyor
+- [ ] Manuel reset çalışıyor
+- [ ] cargo test geçiyor
+- [ ] next build geçiyor
 
 ---
 
@@ -665,19 +895,87 @@ Forecast MRR = Current MRR × (1 + growth_rate) ^ months
 **Süre:** 1.5 oturum | **Öncelik:** 🟡 Önemli
 
 ### 9.1 Event Deduplication (1 oturum)
-**Backend:** Event ID bazlı deduplication
-- Zaman penceresi (varsayılan: 5 dakika)
-- Aynı event ID → tek teslimat
-- Admin ayarları: enable/disable, zaman penceresi
+**DB Migration:** `api/migrations/071_deduplication.sql`
+```sql
+CREATE TABLE IF NOT EXISTS event_dedup_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_id TEXT NOT NULL,
+    endpoint_id UUID NOT NULL REFERENCES endpoints(id) ON DELETE CASCADE,
+    original_delivery_id UUID,
+    duplicate_count INT NOT NULL DEFAULT 1,
+    first_seen TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_seen TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_dedup_event ON event_dedup_log(event_id, endpoint_id);
+CREATE INDEX idx_dedup_last_seen ON event_dedup_log(last_seen DESC);
+```
 
-**Frontend:** Admin settings'de deduplication ayarları
+**Backend:** `api/src/deduplication.rs` (yeni module)
+```rust
+// Worker'da delivery öncesi kontrol:
+// 1. Event ID + Endpoint ID → son X dakika içinde teslim edildi mi?
+// 2. Evet → duplicate_count artır, teslim etme
+// 3. Hayır → teslim et, dedup_log'a kaydet
+// Zaman penceresi: settings'ten oku (varsayılan: 5 dakika)
+```
+
+**Backend endpoint'ler:**
+| Method | Path | İşlev |
+|--------|------|-------|
+| GET | `/admin/dedup/stats` | Dedup istatistikleri (filtrelenen sayısı) |
+| PUT | `/admin/dedup/settings` | Dedup ayarları (enable/disable, pencere) |
+
+**Frontend:** `admin/settings/components/GeneralTab.tsx` → Deduplication section
+- Enable/disable toggle
+- Zaman penceresi input (dakika)
+- İstatistik kartları: bugün filtrenen, toplam filtrenen, tasarruf
+
+**i18n:**
+```json
+{
+  "admin": {
+    "deduplication": "Event Deduplication",
+    "dedupEnabled": "Enabled",
+    "dedupWindow": "Time Window (minutes)",
+    "dedupFiltered": "Filtered Today",
+    "dedupTotalFiltered": "Total Filtered",
+    "dedupSavings": "Cost Savings"
+  }
+}
+```
 
 ### 9.2 PDF Fatura (0.5 oturum)
-**Backend:** Fatura PDF oluşturma
-- HTML template → PDF (headless browser veya library)
-- Logo, adres, vergi bilgisi
+**Backend:** `api/src/pdf_invoice.rs`
+```rust
+// HTML template → PDF
+// İçerik: Logo, şirket adı, fatura no, tarih, kalemler, toplam, vergi
+// Library: wkhtmltopdf veya headless Chrome
+// Endpoint: GET /admin/users/{id}/invoices/{invoice_id}/pdf
+```
 
-**Frontend:** Fatura listesinde PDF indirme butonu
+**Frontend:** `admin/users/[id]/components/BillingTab.tsx`
+- Fatura listesinde "PDF" indirme butonu (her satırda)
+- Tıklanınca → PDF yeni sekmede açılır veya indirilir
+
+**i18n:**
+```json
+{
+  "admin": {
+    "downloadPdf": "Download PDF",
+    "invoicePdf": "Invoice PDF"
+  }
+}
+```
+
+### Kabul Kriterleri (AŞAMA 9)
+- [ ] Aynı event ID filtrelenebiliyor
+- [ ] Dedup ayarları çalışıyor (enable/disable, pencere)
+- [ ] Dedup istatistikleri görünüyor
+- [ ] Fatura PDF'i oluşturulabiliyor
+- [ ] PDF indirme butonu çalışıyor
+- [ ] PDF içeriği doğru (logo, kalemler, toplam)
+- [ ] cargo test geçiyor
+- [ ] next build geçiyor
 
 ---
 
@@ -685,22 +983,97 @@ Forecast MRR = Current MRR × (1 + growth_rate) ^ months
 **Süre:** 1.5 oturum | **Öncelik:** 🟢 İyi Olur
 
 ### 10.1 Onboarding Tracker (1 oturum)
-**Backend:** Funnel analytics endpoint
-
-**Funnel:**
+**DB Migration:** `api/migrations/072_onboarding_events.sql`
+```sql
+CREATE TABLE IF NOT EXISTS onboarding_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    step TEXT NOT NULL, -- registered, first_endpoint, first_webhook, first_delivery, active_user
+    metadata JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_onboarding_customer ON onboarding_events(customer_id);
+CREATE INDEX idx_onboarding_step ON onboarding_events(step);
 ```
-Kayıt → İlk Endpoint → İlk Webhook → İlk Teslimat → Aktif Kullanıcı
+
+**Backend endpoint:** `GET /admin/onboarding/funnel`
+```rust
+// Response: {
+//   registered: 1000,
+//   first_endpoint: 650,   // %65
+//   first_webhook: 400,    // %40
+//   first_delivery: 300,   // %30
+//   active_user: 200,      // %20
+//   avg_time_to_first_endpoint: "2.3 days",
+//   avg_time_to_first_delivery: "4.1 days"
+// }
 ```
 
 **Frontend:** `admin/page.tsx` → Overview tab'ında funnel grafiği
+- Funnel chart (büyükten küçüğe)
+- Her adım için conversion oranı
+- Drop-off noktaları (kırmızı ok)
+- Ortalama süreler
+
+**i18n:**
+```json
+{
+  "admin": {
+    "onboardingFunnel": "Onboarding Funnel",
+    "stepRegistered": "Registered",
+    "stepFirstEndpoint": "First Endpoint",
+    "stepFirstWebhook": "First Webhook",
+    "stepFirstDelivery": "First Delivery",
+    "stepActiveUser": "Active User",
+    "conversionRate": "Conversion Rate",
+    "avgTime": "Avg Time",
+    "dropOff": "Drop-off"
+  }
+}
+```
 
 ### 10.2 API Usage Dashboard (0.5 oturum)
-**Frontend:** `admin/users/[id]/components/UsageTab.tsx` (güncelleme)
+**Backend endpoint:** `GET /admin/users/{id}/api-usage`
+```rust
+// Response: {
+//   total_calls_30d: 15000,
+//   daily_calls: [{date: "2026-05-01", count: 500}, ...],
+//   rate_limit: { limit: 1000, used: 750, remaining: 250 },
+//   top_endpoints: [{url: "...", calls: 5000}, ...],
+//   error_rate: 2.3
+// }
+```
 
-**Yeni özellikler:**
-- API çağrı trendi (grafik)
-- Rate limit kullanımı (progress bar)
-- En çok API kullanan kullanıcılar listesi
+**Frontend:** `admin/users/[id]/components/UsageTab.tsx` (güncelleme)
+- API çağrı trendi (line chart — son 30 gün)
+- Rate limit kullanımı (progress bar: 750/1000)
+- En çok kullanılan endpoint'ler (bar chart)
+- Hata oranı kartı
+
+**i18n:**
+```json
+{
+  "admin": {
+    "apiUsage": "API Usage",
+    "totalCalls": "Total Calls (30d)",
+    "dailyCalls": "Daily Calls",
+    "rateLimitUsage": "Rate Limit Usage",
+    "topEndpoints": "Top Endpoints",
+    "errorRate": "Error Rate"
+  }
+}
+```
+
+### Kabul Kriterleri (AŞAMA 10)
+- [ ] Funnel grafiği görünüyor (5 adım)
+- [ ] Conversion oranları doğru
+- [ ] Drop-off noktaları işaretli
+- [ ] Ortalama süreler hesaplanıyor
+- [ ] API çağrı trendi grafikte
+- [ ] Rate limit progress bar çalışıyor
+- [ ] Top endpoint'ler listeleniyor
+- [ ] cargo test geçiyor
+- [ ] next build geçiyor
 
 ---
 
@@ -708,21 +1081,134 @@ Kayıt → İlk Endpoint → İlk Webhook → İlk Teslimat → Aktif Kullanıc�
 **Süre:** 1.5 oturum | **Öncelik:** 🟢 İyi Olur
 
 ### 11.1 Şüpheli Aktivite Tespiti (1 oturum)
-**Backend:** Anomali tespiti
-- Birden fazla başarısız login (5+ / 10 dakika)
-- Farklı IP'den giriş
-- Ani API kullanım artışı (%200+)
-- Alert: şüpheli aktivite
+**DB Migration:** `api/migrations/073_suspicious_activity.sql`
+```sql
+CREATE TABLE IF NOT EXISTS suspicious_activities (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
+    activity_type TEXT NOT NULL, -- brute_force, ip_change, api_spike, unusual_endpoint
+    severity TEXT NOT NULL DEFAULT 'medium', -- low, medium, high, critical
+    details JSONB, -- {ip, user_agent, attempts, threshold, ...}
+    resolved BOOLEAN NOT NULL DEFAULT false,
+    resolved_by UUID REFERENCES customers(id),
+    resolved_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_suspicious_customer ON suspicious_activities(customer_id);
+CREATE INDEX idx_suspicious_type ON suspicious_activities(activity_type);
+CREATE INDEX idx_suspicious_resolved ON suspicious_activities(resolved);
+```
 
-**Frontend:** `admin/page.tsx` → Health tab'ında suspicious activity listesi
+**Backend:** `api/src/suspicious.rs` (yeni module)
+```rust
+// Tespit kuralları:
+// 1. Brute Force: Aynı IP'den 5+ başarısız login / 10 dakika
+// 2. IP Change: Farklı IP'den giriş (son 24 saatte 3+ farklı IP)
+// 3. API Spike: Son 1 saatte normal kullanımın %200+ üzeri
+// 4. Unusual Endpoint: Ani endpoint oluşturma artışı (10+ / saat)
+
+// Her tespit → suspicious_activities tablosuna kayıt
+// Critical severity → admin alert (email + in-app)
+```
+
+**Backend endpoint'ler:**
+| Method | Path | İşlev |
+|--------|------|-------|
+| GET | `/admin/suspicious` | Şüpheli aktivite listesi (filtre: type, severity, resolved) |
+| PUT | `/admin/suspicious/{id}/resolve` | Çözüldü işaretle |
+| DELETE | `/admin/suspicious/{id}` | Sil |
+
+**Frontend:** `admin/page.tsx` → Health tab'ında suspicious activity section
+- Şüpheli aktivite listesi tablosu
+- Tür ikonları: brute_force 🔐, ip_change 🌐, api_spike 📈, unusual_endpoint 🔗
+- Severity badge'leri: low (sarı), medium (turuncu), high (kırmızı), critical (koyu kırmızı)
+- Çöz butonu
+- Son 24 saat filtresi
+
+**i18n:**
+```json
+{
+  "admin": {
+    "suspiciousActivity": "Suspicious Activity",
+    "bruteForce": "Brute Force",
+    "ipChange": "IP Change",
+    "apiSpike": "API Spike",
+    "unusualEndpoint": "Unusual Endpoint",
+    "severityLow": "Low",
+    "severityMedium": "Medium",
+    "severityHigh": "High",
+    "severityCritical": "Critical",
+    "resolveActivity": "Mark as Resolved"
+  }
+}
+```
 
 ### 11.2 IP Blocklist (0.5 oturum)
-**Backend:** IP kara liste yönetimi
-- IP ekleme/kaldırma
-- CIDR desteği
-- Otomatik engelleme (şüpheli aktivite sonrası)
+**DB Migration:** `api/migrations/074_ip_blocklist.sql`
+```sql
+CREATE TABLE IF NOT EXISTS ip_blocklist (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    ip_address TEXT NOT NULL,
+    cidr_mask INT, -- null = tek IP, /24 = tüm subnet
+    reason TEXT,
+    blocked_by UUID REFERENCES customers(id),
+    auto_blocked BOOLEAN NOT NULL DEFAULT false, -- suspicious activity sonrası
+    expires_at TIMESTAMPTZ, null = süresiz
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_ip_blocklist_ip ON ip_blocklist(ip_address);
+CREATE INDEX idx_ip_blocklist_expires ON ip_blocklist(expires_at);
+```
 
-**Frontend:** `admin/settings/components/GeneralTab.tsx` → IP blocklist section
+**Backend:** `api/src/ip_blocklist.rs` (yeni module)
+```rust
+// Middleware: Her istekte IP kontrol
+// - ip_blocklist tablosunda var mı?
+// - CIDR mask ile eşleşme kontrolü
+// - Süresi dolmuş kayıtları yoksay
+// - Eşleşen → 403 Forbidden döndür
+```
+
+**Backend endpoint'ler:**
+| Method | Path | İşlev |
+|--------|------|-------|
+| GET | `/admin/ip-blocklist` | Blocklist |
+| POST | `/admin/ip-blocklist` | IP ekle |
+| DELETE | `/admin/ip-blocklist/{id}` | IP kaldır |
+
+**Frontend:** `admin/settings/components/GeneralTab.tsx` → IP Blocklist section
+- IP blocklist tablosu (IP, sebep, tarih, süre)
+- IP ekleme formu (IP + sebep + süre)
+- IP kaldırma butonu
+- Otomatik engellenen IP'ler (suspicious activity sonrası)
+
+**i18n:**
+```json
+{
+  "admin": {
+    "ipBlocklist": "IP Blocklist",
+    "addIp": "Add IP",
+    "ipAddress": "IP Address",
+    "blockReason": "Reason",
+    "blockDuration": "Duration",
+    "autoBlocked": "Auto-blocked",
+    "removeBlock": "Remove Block"
+  }
+}
+```
+
+### Kabul Kriterleri (AŞAMA 11)
+- [ ] Brute force tespiti çalışıyor (5+ başarısız login)
+- [ ] IP change tespiti çalışıyor (3+ farklı IP)
+- [ ] API spike tespiti çalışıyor (%200+ artış)
+- [ ] Şüpheli aktivite listesi görünüyor
+- [ ] Severity badge'leri doğru
+- [ ] Çöz butonu çalışıyor
+- [ ] IP blocklist yönetimi çalışıyor
+- [ ] Blocklist'teki IP → 403 alıyor
+- [ ] Otomatik engelleme çalışıyor
+- [ ] cargo test geçiyor
+- [ ] next build geçiyor
 
 ---
 
