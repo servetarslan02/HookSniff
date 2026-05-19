@@ -2821,7 +2821,10 @@
     "endpoints": "Endpoints",
     "apiCallsToday": "API calls today",
     "failedToLoad": "Could not load portal data. Please refresh the page.",
-    "logo": "Logo"
+    "logo": "Logo",
+    "successRate": "Success Rate",
+    "subtitle": "Your account overview and usage",
+    "retry": "Retry"
   },
   "sso": {
     "title": "🔐 SSO / SAML",
@@ -3293,7 +3296,8 @@
     "copied": "Copied!",
     "portalSaved": "Portal configuration saved!",
     "portalSaveFailed": "Could not save portal settings. Please try again.",
-    "portalUrl": "Portal URL"
+    "portalUrl": "Portal URL",
+    "retry": "Retry"
   },
   "retryPolicy": {
     "title": "🔄 Retry Policy",
