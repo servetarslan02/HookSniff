@@ -27,11 +27,11 @@ export function PasswordSection({ token }: { token: string | null }) {
     setPasswordSuccess('');
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('New passwords do not match');
+      setPasswordError(t('passwordsDoNotMatch'));
       return;
     }
     if (newPassword.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
+      setPasswordError(t('passwordTooShort'));
       return;
     }
 
