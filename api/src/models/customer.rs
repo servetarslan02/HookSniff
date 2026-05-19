@@ -108,8 +108,6 @@ pub struct LoginRequest {
 #[serde(deny_unknown_fields)]
 pub struct UpdateProfileRequest {
     pub name: String,
-    pub email: String,
-    pub password: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
