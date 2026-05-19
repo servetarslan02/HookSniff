@@ -408,7 +408,7 @@ async fn main() -> Result<()> {
             "/v1",
             routes::create_routes(
                 pool.clone(),
-                rate_limiter,
+                rate_limiter.clone(),
                 throttle_manager,
                 metrics.clone(),
             ),
@@ -427,6 +427,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(ws_gateway))
         .layer(axum::Extension(qstash_client))
         .layer(axum::Extension(r2_client))
+        .layer(axum::Extension(rate_limiter))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg
                 .cors_origins
