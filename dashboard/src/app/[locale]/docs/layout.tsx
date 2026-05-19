@@ -59,6 +59,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         { name: 'Best Practices', href: '/docs/best-practices' },
         { name: 'Security', href: '/docs/security' },
         { name: 'Retries & DLQ', href: '/docs/retries' },
+        { name: 'Dead Letter Queue', href: '/docs/dlq' },
         { name: 'Debug Failed Webhooks', href: '/docs/debug-failed-webhooks' },
         { name: 'Monitor Performance', href: '/docs/monitor-performance' },
         { name: 'Integrations', href: '/docs/integrations' },
