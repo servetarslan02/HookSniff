@@ -62,37 +62,49 @@ export default function EnvironmentsPage() {
         </button>
       </div>
 
+      {/* Create Environment Modal */}
       {showCreate && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white">{t('createEnvironment')}</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('name')}</label>
-              <input value={newName} onChange={e => setNewName(e.target.value)} placeholder={t('namePlaceholder')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowCreate(false)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('createEnvironment')}</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('subtitle')}</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('name')}</label>
+                  <input value={newName} onChange={e => setNewName(e.target.value)} placeholder={t('namePlaceholder')} autoFocus
+                    className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('slug')}</label>
+                  <input value={newSlug} onChange={e => setNewSlug(e.target.value)} placeholder={t('slugPlaceholder')}
+                    className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white font-mono placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('description')}</label>
+                <input value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder={t('descriptionPlaceholder')}
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('color')}</label>
+                <div className="flex items-center gap-3">
+                  <input type="color" value={newColor} onChange={e => setNewColor(e.target.value)}
+                    className="w-10 h-10 rounded-lg cursor-pointer border border-gray-200 dark:border-slate-600" />
+                  <input value={newColor} onChange={e => setNewColor(e.target.value)}
+                    className="flex-1 px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent transition" />
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('slug')}</label>
-              <input value={newSlug} onChange={e => setNewSlug(e.target.value)} placeholder={t('slugPlaceholder')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+            <div className="flex gap-3 justify-end mt-6">
+              <button onClick={() => { setShowCreate(false); setNewName(''); setNewSlug(''); setNewDesc(''); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+                {t('cancel')}
+              </button>
+              <button onClick={handleCreate} disabled={createMutation.isPending || !newName.trim()} className="px-5 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60 shadow-sm">
+                {createMutation.isPending ? t('creating') : t('create')}
+              </button>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('description')}</label>
-              <input value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder={t('descriptionPlaceholder')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('color')}</label>
-              <input type="color" value={newColor} onChange={e => setNewColor(e.target.value)}
-                className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer" />
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={handleCreate} disabled={createMutation.isPending}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
-              {createMutation.isPending ? t('creating') : t('create')}
-            </button>
-            <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800">{t('cancel')}</button>
           </div>
         </div>
       )}
