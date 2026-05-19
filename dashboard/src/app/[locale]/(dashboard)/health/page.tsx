@@ -84,7 +84,10 @@ export default function EndpointHealthPage() {
       {/* Endpoint List */}
       <div className="glass-card overflow-hidden">
         {isLoading ? (
-          <div className="p-8 text-center text-gray-500 dark:text-slate-400">{tc('loading')}</div>
+          <div className="p-12 text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-4" />
+            <p className="text-gray-500 dark:text-slate-400">{tc('loading')}</p>
+          </div>
         ) : endpoints.length === 0 ? (
           <div className="p-12 text-center">
             <div className="text-5xl mb-4">💓</div>
@@ -120,7 +123,7 @@ export default function EndpointHealthPage() {
                   </div>
 
                   {/* Stats Row */}
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-3">
+                  <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mt-3">
                     {[
                       { label: t('total'), value: ep.total_deliveries.toLocaleString() },
                       { label: t('successful'), value: ep.successful.toLocaleString() },
@@ -143,7 +146,7 @@ export default function EndpointHealthPage() {
                           ep.health_status === 'healthy' ? 'bg-green-500' :
                           ep.health_status === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
                         }`}
-                        style={{ width: `${ep.success_rate}%` }}
+                        style={{ width: `${Math.min(100, ep.success_rate)}%` }}
                       />
                     </div>
                   </div>
