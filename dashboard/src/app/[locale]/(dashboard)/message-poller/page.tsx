@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { Inbox } from 'lucide-react';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
@@ -135,7 +136,7 @@ export default function MessagePollerPage() {
         </div>
       ) : !data || data.messages.length === 0 ? (
         <div className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4">📬</div>
+          <div className="text-5xl mb-4"><Inbox size={18} strokeWidth={1.75} /></div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noMessages')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
             {data?.done ? t('allCaughtUp') : t('pollToFetch')}

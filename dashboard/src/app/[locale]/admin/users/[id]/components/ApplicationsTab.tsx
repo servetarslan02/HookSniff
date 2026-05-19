@@ -2,12 +2,13 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { ApplicationsTabProps } from './types';
+import { Smartphone } from 'lucide-react';
 
 export function ApplicationsTab({ userApps, t }: ApplicationsTabProps) {
   return (
     <LazySection fallback={Skeletons.card} rootMargin={300}>
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📱 {t("applications") || "Applications"}</h2>
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><Smartphone size={16} strokeWidth={1.75} className="inline mr-1" /> {t("applications") || "Applications"}</h2>
       {userApps.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {userApps.map((app) => (

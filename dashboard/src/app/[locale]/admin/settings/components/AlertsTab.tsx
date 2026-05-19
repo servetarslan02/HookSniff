@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { PlatformSettings } from '@/lib/api';
+import { AlertTriangle, Link2, Mail, MessageSquare } from 'lucide-react';
 
 interface AlertRule {
   id: string;
@@ -53,7 +54,7 @@ export default function AlertsTab({
 
       {/* Alert Thresholds */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🚨 {t('alertThresholds')}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4"><AlertTriangle size={16} strokeWidth={1.75} className="inline mr-1" /> {t('alertThresholds')}</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('alertThresholdsDesc')}</p>
 
         {alertRules.length > 0 && (
@@ -94,15 +95,15 @@ export default function AlertsTab({
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={alertChannels.email} onChange={() => toggleChannel('email')} className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
-              <span className="text-sm text-gray-700 dark:text-slate-300">📧 Email</span>
+              <span className="text-sm text-gray-700 dark:text-slate-300"><Mail size={16} strokeWidth={1.75} className="inline mr-1" /> Email</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={alertChannels.slack} onChange={() => toggleChannel('slack')} className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
-              <span className="text-sm text-gray-700 dark:text-slate-300">💬 Slack</span>
+              <span className="text-sm text-gray-700 dark:text-slate-300"><MessageSquare size={16} strokeWidth={1.75} className="inline mr-1" /> Slack</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={alertChannels.webhook} onChange={() => toggleChannel('webhook')} className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500" />
-              <span className="text-sm text-gray-700 dark:text-slate-300">🔗 Webhook</span>
+              <span className="text-sm text-gray-700 dark:text-slate-300"><Link2 size={16} strokeWidth={1.75} className="inline mr-1" /> Webhook</span>
             </label>
           </div>
         </div>

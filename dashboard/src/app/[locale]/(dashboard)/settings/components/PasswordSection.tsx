@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { getErrorMessage } from '@/lib/errors';
+import { Key, Check } from 'lucide-react';
 
 export function PasswordSection({ token }: { token: string | null }) {
   const t = useTranslations('settings');
@@ -56,7 +57,7 @@ export function PasswordSection({ token }: { token: string | null }) {
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
       <div className="flex items-center gap-3 mb-5">
         <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
-          <span className="text-base">🔑</span>
+          <Key size={16} strokeWidth={1.75} className="text-amber-500" />
         </div>
         <div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('changePassword')}</h3>
@@ -66,7 +67,7 @@ export function PasswordSection({ token }: { token: string | null }) {
 
       {passwordSuccess && (
         <div className="mb-4 p-3 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-sm text-green-700 dark:text-green-400 flex items-center gap-2">
-          <span className="text-base">✓</span> {passwordSuccess}
+          <Check size={16} strokeWidth={1.75} className="text-green-500" /> {passwordSuccess}
         </div>
       )}
       {passwordError && (

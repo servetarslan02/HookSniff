@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
+import { AlertTriangle, CheckCircle2, Globe, Lock, XCircle } from 'lucide-react';
 
 interface ExistingDomain {
   id: string;
@@ -244,12 +245,12 @@ export default function CustomDomainPage() {
             )}
             {newDomainStatus === 'verified' && (
               <span className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-medium">
-                ✅ {t('verified')}
+                <CheckCircle2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('verified')}
               </span>
             )}
             {newDomainStatus === 'error' && (
               <span className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm font-medium">
-                ❌ {t('verificationFailedCheck')}
+                <XCircle size={16} strokeWidth={1.75} className="inline mr-1" /> {t('verificationFailedCheck')}
               </span>
             )}
           </div>
@@ -271,7 +272,7 @@ export default function CustomDomainPage() {
       {!loadingDomains && loadError && (
         <div className="glass-card p-6">
           <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
-            <span className="text-lg">⚠️</span>
+            <span className="text-lg"><AlertTriangle size={18} strokeWidth={1.75} /></span>
             <div>
               <p className="font-medium">{t('loadError')}</p>
               <button type="button" onClick={fetchDomains} className="text-sm text-brand-600 dark:text-brand-400 hover:underline mt-1">
@@ -286,7 +287,7 @@ export default function CustomDomainPage() {
       {!loadingDomains && !loadError && existingDomains.length === 0 && !newDomainId && (
         <div className="glass-card p-6">
           <div className="text-center py-8">
-            <div className="text-4xl mb-3">🌐</div>
+            <div className="text-4xl mb-3"><Globe size={18} strokeWidth={1.75} /></div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">{t('noDomains')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400">{t('noDomainsDesc')}</p>
           </div>
@@ -313,7 +314,7 @@ export default function CustomDomainPage() {
                     </span>
                     {d.verified && d.ssl_active && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 shrink-0">
-                        🔒 SSL
+                        <Lock size={16} strokeWidth={1.75} className="inline mr-1" /> SSL
                       </span>
                     )}
                   </div>

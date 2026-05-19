@@ -2,6 +2,7 @@
 
 import { Link } from '@/i18n/navigation';
 import { useTranslations, useLocale } from 'next-intl';
+import { Monitor, Users, DollarSign, Settings } from 'lucide-react';
 
 interface ActivityTabProps {
   auditLogs: any[];
@@ -72,28 +73,28 @@ export default function ActivityTab({ auditLogs, stats, mrr }: ActivityTabProps)
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('quickActions')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link href="/admin/system" className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
-              <span className="text-2xl">🖥️</span>
+              <Monitor size={24} strokeWidth={1.75} className="text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{t('viewSystemHealth')}</p>
                 <p className="text-xs text-gray-500 dark:text-slate-400">{t('systemHealth')}</p>
               </div>
             </Link>
             <Link href="/admin/users" className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
-              <span className="text-2xl">👥</span>
+              <Users size={24} strokeWidth={1.75} className="text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{t('userManagement')}</p>
                 <p className="text-xs text-gray-500 dark:text-slate-400">{t('totalUsers')}: {stats?.total_users || 0}</p>
               </div>
             </Link>
             <Link href="/admin/revenue" className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
-              <span className="text-2xl">💰</span>
+              <DollarSign size={24} strokeWidth={1.75} className="text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{t('revenue')}</p>
                 <p className="text-xs text-gray-500 dark:text-slate-400">MRR: {t('currencySymbol')}{mrr.toLocaleString()}</p>
               </div>
             </Link>
             <Link href="/admin/settings" className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
-              <span className="text-2xl">⚙️</span>
+              <Settings size={24} strokeWidth={1.75} className="text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{t('platformSettings')}</p>
                 <p className="text-xs text-gray-500 dark:text-slate-400">{t('settingsNav')}</p>

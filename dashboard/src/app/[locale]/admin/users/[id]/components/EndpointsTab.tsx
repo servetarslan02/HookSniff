@@ -2,12 +2,13 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { EndpointsTabProps } from './types';
+import { Link2 } from 'lucide-react';
 
 export function EndpointsTab({ userEndpoints, t }: EndpointsTabProps) {
   return (
     <LazySection fallback={Skeletons.table()} rootMargin={300}>
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">🔗 {t("endpoints") || "Endpoints"}</h2>
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><Link2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t("endpoints") || "Endpoints"}</h2>
       {userEndpoints.length > 0 ? (
         <div className="glass-card overflow-hidden">
           <div className="overflow-x-auto">

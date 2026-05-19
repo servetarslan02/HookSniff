@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { ParsedSpec } from './parser';
 import { SpecInputPanel } from './components/SpecInputPanel';
 import { ParsedResultsPanel } from './components/ParsedResultsPanel';
+import { FileText, Link2 } from 'lucide-react';
 
 export default function ApiSpecImporterPage() {
   const t = useTranslations('apiImporter');
@@ -51,9 +52,9 @@ export default function ApiSpecImporterPage() {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('supportedFormats')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { name: t('openapi30'), ext: '.json / .yaml', icon: '📄' },
-            { name: t('swagger20'), ext: '.json', icon: '📄' },
-            { name: 'URL', ext: 'https://...', icon: '🔗' },
+            { name: t('openapi30'), ext: '.json / .yaml', icon: <FileText size={16} strokeWidth={1.75} /> },
+            { name: t('swagger20'), ext: '.json', icon: <FileText size={16} strokeWidth={1.75} /> },
+            { name: 'URL', ext: 'https://...', icon: <Link2 size={16} strokeWidth={1.75} /> },
           ].map((fmt) => (
             <div key={fmt.name} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-xl">
               <span className="text-xl">{fmt.icon}</span>

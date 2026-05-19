@@ -2,6 +2,7 @@
 
 import { StatusBadge } from '@/components/StatusBadge';
 import type { UserModalsProps } from './types';
+import { AlertTriangle, Mail, Search, Trash2, X } from 'lucide-react';
 
 export function UserModals({
   detail,
@@ -102,10 +103,10 @@ export function UserModals({
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowGdprDeleteModal(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">
-              🗑️ {t('deleteAllData') || 'Delete All User Data'}
+              <Trash2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('deleteAllData') || 'Delete All User Data'}
             </h3>
             <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg p-3 mb-4">
-              <p className="text-sm text-red-700 dark:text-red-400 font-medium">⚠️ {t('gdprDeleteWarning') || 'This action is permanent and cannot be undone.'}</p>
+              <p className="text-sm text-red-700 dark:text-red-400 font-medium"><AlertTriangle size={16} strokeWidth={1.75} className="inline mr-1" /> {t('gdprDeleteWarning') || 'This action is permanent and cannot be undone.'}</p>
               <p className="text-xs text-red-600 dark:text-red-400 mt-1">
                 {t('gdprDeleteDesc') || 'All endpoints, deliveries, invoices, notes, tags, and communication history will be deleted. The account will be downgraded to Free.'}
               </p>
@@ -205,7 +206,7 @@ export function UserModals({
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowEmailModal(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              📧 {t('sendEmail') || 'Send Email'}
+              <Mail size={16} strokeWidth={1.75} className="inline mr-1" /> {t('sendEmail') || 'Send Email'}
             </h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
               {t('sendEmailTo', { email: detail.user.email }) || `Send email to ${detail.user.email}`}
@@ -340,14 +341,13 @@ export function UserModals({
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                🔍 {t("deliveryDetails") || "Delivery Details"}
+                <Search size={16} strokeWidth={1.75} className="inline mr-1" /> {t("deliveryDetails") || "Delivery Details"}
               </h3>
               <button type="button"
                 onClick={() => setSelectedDeliveryId(null)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition"
               >
-                ✕
-              </button>
+                <X size={16} strokeWidth={1.75} className="inline mr-1" /> </button>
             </div>
 
             {deliveryLoading ? (

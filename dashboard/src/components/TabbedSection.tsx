@@ -6,8 +6,9 @@ import dynamic from 'next/dynamic';
 export interface Tab {
   key: string;
   label: string;
-  icon?: string;
+  icon?: ReactNode;
   /** Component to render (supports dynamic import factories) */
+import { BarChart3, ClipboardList, Heart } from 'lucide-react';
   content: ReactNode | (() => ReactNode);
   /** Prefetch this tab's content on hover (default: true) */
   prefetch?: boolean;
@@ -43,9 +44,9 @@ interface TabbedSectionProps {
  * @example
  * <TabbedSection
  *   tabs={[
- *     { key: 'overview', label: 'Overview', icon: '📊', content: <OverviewTab /> },
- *     { key: 'activity', label: 'Activity', icon: '📋', content: () => <ActivityTab /> },
- *     { key: 'health', label: 'Health', icon: '💚', content: <HealthTab /> },
+ *     { key: 'overview', label: 'Overview', icon: <BarChart3 size={16} strokeWidth={1.75} />, content: <OverviewTab /> },
+ *     { key: 'activity', label: 'Activity', icon: <ClipboardList size={16} strokeWidth={1.75} />, content: () => <ActivityTab /> },
+ *     { key: 'health', label: 'Health', icon: <Heart size={16} strokeWidth={1.75} />, content: <HealthTab /> },
  *   ]}
  *   urlParam="section"
  * />

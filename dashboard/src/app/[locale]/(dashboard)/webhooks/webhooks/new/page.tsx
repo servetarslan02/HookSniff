@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
 import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
+import { AlertTriangle, Radio } from 'lucide-react';
 
 export default function SendWebhookPage() {
   const { toast } = useToast();
@@ -95,7 +96,7 @@ export default function SendWebhookPage() {
                 className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl font-mono text-sm focus:ring-2 focus:ring-brand-500 resize-none"
                 spellCheck={false}
               />
-              {jsonError && <p className="text-xs text-red-600 mt-1">⚠️ {jsonError}</p>}
+              {jsonError && <p className="text-xs text-red-600 mt-1"><AlertTriangle size={16} strokeWidth={1.75} className="inline mr-1" /> {jsonError}</p>}
             </div>
             <button type="button"
               onClick={handleSend}
@@ -116,7 +117,7 @@ export default function SendWebhookPage() {
             </pre>
           ) : (
             <div className="text-center text-gray-500 dark:text-slate-500 py-12">
-              <div className="text-4xl mb-3">📡</div>
+              <div className="text-4xl mb-3"><Radio size={18} strokeWidth={1.75} /></div>
               <p>{t('sendToSeeResponse')}</p>
             </div>
           )}

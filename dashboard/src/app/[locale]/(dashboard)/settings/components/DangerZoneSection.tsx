@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useRouter } from '@/i18n/navigation';
 import { getErrorMessage } from '@/lib/errors';
+import { AlertTriangle } from 'lucide-react';
 
 export function DangerZoneSection() {
   const t = useTranslations('settings');
@@ -38,7 +39,7 @@ export function DangerZoneSection() {
     <>
       {/* Section divider */}
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-base">⚠️</span>
+        <AlertTriangle size={16} strokeWidth={1.75} className="text-red-400" />
         <h2 className="text-sm font-semibold text-red-500 dark:text-red-400 uppercase tracking-wider">{t('dangerZone')}</h2>
         <div className="flex-1 h-px bg-red-200 dark:bg-red-500/20 ml-2" />
       </div>
@@ -80,7 +81,7 @@ export function DangerZoneSection() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" aria-hidden="true" onClick={() => setShowDeleteModal(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">⚠️ {t('deleteAccount')}</h3>
+            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2"><AlertTriangle size={18} strokeWidth={1.75} className="inline mr-1" />{t('deleteAccount')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
               {t('deleteAccountWarning')}
             </p>

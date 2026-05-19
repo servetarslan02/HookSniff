@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
 import { useTemplates } from '@/hooks/useDashboardData';
+import { BarChart3, Bot, ClipboardList, Radio, X } from 'lucide-react';
 
 interface Template {
   id: string;
@@ -89,7 +90,7 @@ export default function TemplatesPage() {
         </div>
       ) : templates.length === 0 ? (
         <div className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4">📋</div>
+          <div className="text-5xl mb-4"><ClipboardList size={18} strokeWidth={1.75} /></div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('noTemplates')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400">{t('noTemplatesDesc')}</p>
         </div>
@@ -119,9 +120,9 @@ export default function TemplatesPage() {
 
                 {/* Stats */}
                 <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-slate-400 mb-4">
-                  <span>📡 {tpl.event_types.length} events</span>
+                  <span><Radio size={16} strokeWidth={1.75} className="inline mr-1" /> {tpl.event_types.length} events</span>
                   {tpl.estimated_daily_volume && <span>📊 ~{tpl.estimated_daily_volume.toLocaleString()}/day</span>}
-                  {tpl.agents && tpl.agents.length > 0 && <span>🤖 {tpl.agents.length} agents</span>}
+                  {tpl.agents && tpl.agents.length > 0 && <span><Bot size={16} strokeWidth={1.75} className="inline mr-1" /> {tpl.agents.length} agents</span>}
                 </div>
 
                 {/* Event Types Preview */}
@@ -165,7 +166,7 @@ export default function TemplatesPage() {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{getTemplateName(selectedTemplate.id) || selectedTemplate.name}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{selectedTemplate.industry}</p>
               </div>
-              <button onClick={() => setSelectedTemplate(null)} className="text-gray-500 hover:text-gray-700 dark:hover:text-slate-300">✕</button>
+              <button onClick={() => setSelectedTemplate(null)} className="text-gray-500 hover:text-gray-700 dark:hover:text-slate-300"><X size={18} strokeWidth={1.75} /></button>
             </div>
             <div className="p-6 space-y-6">
               <p className="text-sm text-gray-600 dark:text-slate-400">{getTemplateDesc(selectedTemplate.id) || selectedTemplate.description}</p>
@@ -187,7 +188,7 @@ export default function TemplatesPage() {
                   <div className="space-y-2">
                     {selectedTemplate.agents.map((agent) => (
                       <div key={agent.agent_name} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-slate-900 rounded-lg">
-                        <span className="text-lg">🤖</span>
+                        <span className="text-lg"><Bot size={18} strokeWidth={1.75} /></span>
                         <div>
                           <p className="text-sm font-medium text-gray-900 dark:text-white">{agent.agent_name}</p>
                           <p className="text-xs text-gray-500 dark:text-slate-400">{agent.description}</p>
@@ -235,7 +236,7 @@ export default function TemplatesPage() {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('applyTitle') || 'Apply Template'}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{getTemplateName(showApply.id) || showApply.name}</p>
               </div>
-              <button onClick={() => setShowApply(null)} className="text-gray-500 hover:text-gray-700 dark:hover:text-slate-300">✕</button>
+              <button onClick={() => setShowApply(null)} className="text-gray-500 hover:text-gray-700 dark:hover:text-slate-300"><X size={18} strokeWidth={1.75} /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>

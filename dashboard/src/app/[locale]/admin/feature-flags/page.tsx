@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import type { FeatureFlagValidated } from '@/schemas/api';
+import { Flag } from 'lucide-react';
 import {
   useAdminFeatureFlags,
   useCreateFeatureFlag,
@@ -129,7 +130,7 @@ export default function FeatureFlagsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">🚩 {t('pageTitle')}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white"><Flag size={16} strokeWidth={1.75} className="inline mr-1" /> {t('pageTitle')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
             {t('pageDesc')}
           </p>
@@ -150,7 +151,7 @@ export default function FeatureFlagsPage() {
           <div className="p-12 text-center animate-pulse text-gray-500 dark:text-slate-400">{t('loading')}</div>
         ) : flags.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400">
-            <span className="text-4xl mb-3 block">🚩</span>
+            <span className="text-4xl mb-3 block"><Flag size={18} strokeWidth={1.75} /></span>
             <p>{t('emptyState')}</p>
           </div>
         ) : (

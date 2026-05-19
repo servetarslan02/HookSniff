@@ -2,6 +2,7 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { BillingTabProps } from './types';
+import { CheckCircle2, Clock, CreditCard, DollarSign, FileText, Package, ShieldCheck, Trash2, XCircle } from 'lucide-react';
 
 export function BillingTab({
   detail,
@@ -28,7 +29,7 @@ export function BillingTab({
     <LazySection fallback={Skeletons.table()} rootMargin={300}>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💰 {t("billing") || "Billing"}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><DollarSign size={16} strokeWidth={1.75} className="inline mr-1" /> {t("billing") || "Billing"}</h2>
         {detail && detail.user.plan !== 'free' && detail.user.plan !== 'developer' && (
           <button
             onClick={() => setShowRefundModal(true)}
@@ -42,16 +43,16 @@ export function BillingTab({
       {/* Invoices */}
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400">📄 {t("invoices") || "Invoices"}</h3>
+          <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400"><FileText size={16} strokeWidth={1.75} className="inline mr-1" /> {t("invoices") || "Invoices"}</h3>
           <select
             value={invoiceFilter}
             onChange={(e) => { setInvoiceFilter(e.target.value); setInvoicesPage(1); }}
             className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
           >
             <option value="">{t("allStatuses") || "All Statuses"}</option>
-            <option value="paid">✅ Paid</option>
-            <option value="pending">⏳ Pending</option>
-            <option value="failed">❌ Failed</option>
+            <option value="paid"><CheckCircle2 size={16} strokeWidth={1.75} className="inline mr-1" /> Paid</option>
+            <option value="pending"><Clock size={16} strokeWidth={1.75} className="inline mr-1" /> Pending</option>
+            <option value="failed"><XCircle size={16} strokeWidth={1.75} className="inline mr-1" /> Failed</option>
           </select>
         </div>
         {userInvoices.length > 0 ? (
@@ -99,7 +100,7 @@ export function BillingTab({
 
       {/* Payment Transactions */}
       <div className="glass-card p-6">
-        <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4">💳 {t("payments") || "Payment Transactions"}</h3>
+        <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4"><CreditCard size={16} strokeWidth={1.75} className="inline mr-1" /> {t("payments") || "Payment Transactions"}</h3>
         {userPayments.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -177,7 +178,7 @@ export function BillingTab({
 
       {/* GDPR Data Management */}
       <div className="glass-card p-6 border-2 border-amber-200 dark:border-amber-500/30">
-        <h3 className="text-sm font-medium text-amber-700 dark:text-amber-400 mb-2">🔐 {t("gdprDataManagement") || "GDPR Data Management"}</h3>
+        <h3 className="text-sm font-medium text-amber-700 dark:text-amber-400 mb-2"><ShieldCheck size={16} strokeWidth={1.75} className="inline mr-1" /> {t("gdprDataManagement") || "GDPR Data Management"}</h3>
         <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">
           {t("gdprDesc") || "Export or permanently delete all user data per GDPR requirements."}
         </p>
@@ -187,13 +188,13 @@ export function BillingTab({
             disabled={gdprExportMutation.isPending}
             className="px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded-lg transition-colors disabled:opacity-50"
           >
-            {gdprExportMutation.isPending ? (t('exporting') || 'Exporting...') : `📦 ${t('exportData') || 'Export All Data'}`}
+            {gdprExportMutation.isPending ? (t('exporting') || 'Exporting...') : <><Package size={14} strokeWidth={1.75} className="inline mr-0.5" />{t('exportData') || 'Export All Data'}</>}
           </button>
           <button
             onClick={() => setShowGdprDeleteModal(true)}
             className="px-4 py-2 text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition-colors"
           >
-            🗑️ {t('deleteAllData') || 'Delete All Data'}
+            <Trash2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('deleteAllData') || 'Delete All Data'}
           </button>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { FlaskConical } from 'lucide-react';
 
 export default function DevTab() {
   const { toast } = useToast();
@@ -11,7 +12,7 @@ export default function DevTab() {
     <div className="space-y-6">
       {/* Dev Tools — Sentry Test */}
       <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">🧪 Dev Tools</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4"><FlaskConical size={16} strokeWidth={1.75} className="inline mr-1" /> Dev Tools</h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
           Development and debugging tools. Only visible in dev mode.
         </p>

@@ -15,6 +15,7 @@ import { VirtualTable } from '@/components/VirtualTable';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
+import { AlertTriangle, X } from 'lucide-react';
 
 export default function DeliveriesPage() {
   const { token } = useAuth();
@@ -195,7 +196,7 @@ export default function DeliveriesPage() {
       {/* Error state */}
       {error && (
         <div className="glass-card p-6 text-center">
-          <div className="text-4xl mb-3">⚠️</div>
+          <div className="text-4xl mb-3"><AlertTriangle size={18} strokeWidth={1.75} /></div>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error}</p>
           <button type="button" onClick={() => refetch()} className="bg-brand-600 dark:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition">
             {tc('retry')}
@@ -359,7 +360,7 @@ export default function DeliveriesPage() {
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80dvh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('details')}</h3>
-              <button type="button" onClick={() => setSelected(null)} aria-label={t("closeDetails")} className="text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400">✕</button>
+              <button type="button" onClick={() => setSelected(null)} aria-label={t("closeDetails")} className="text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:text-slate-400"><X size={18} strokeWidth={1.75} /></button>
             </div>
             <div className="p-6 space-y-4">
               <DetailRow label="ID" value={selected.id} mono />

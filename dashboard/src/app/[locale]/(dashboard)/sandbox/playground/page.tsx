@@ -11,6 +11,7 @@ import { LiveRequestViewer } from './components/LiveRequestViewer';
 import { METHODS, API_BASE, ENDPOINT_PATHS, AI_PAYLOAD_TEMPLATES } from './constants';
 import { loadHistory, saveHistory } from './history';
 import type { PlaygroundRequest } from './types';
+import { Bot, ClipboardList } from 'lucide-react';
 
 export default function PlaygroundPage() {
   const { apiKey } = useAuth();
@@ -22,7 +23,7 @@ export default function PlaygroundPage() {
   const [body, setBody] = useState('');
   const [response, setResponse] = useState<unknown>(null);
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
-  const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
+  const [responseHeaders, setResponseHeaders] = useState<Record<string, React.ReactNode>>({});
   const [responseDuration, setResponseDuration] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState('');
@@ -73,7 +74,7 @@ ${Object.entries(headers)
     setResponseDuration(null);
 
     const startTime = performance.now();
-    const capturedHeaders: Record<string, string> = {};
+    const capturedHeaders: Record<string, React.ReactNode> = {};
 
     try {
       const res = await fetch(`${API_BASE}${path}`, {
@@ -173,7 +174,7 @@ ${Object.entries(headers)
             {/* AI Payload Generator */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                🤖 AI Payload Generator
+                <Bot size={16} strokeWidth={1.75} className="inline mr-1" /> AI Payload Generator
               </label>
               <div className="flex flex-wrap gap-2">
                 {Object.keys(AI_PAYLOAD_TEMPLATES).map((eventType) => (
@@ -278,7 +279,7 @@ ${Object.entries(headers)
                 onClick={copyCurl}
                 className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
               >
-                📋 Copy
+                <ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> Copy
               </button>
             </div>
             <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-x-auto">

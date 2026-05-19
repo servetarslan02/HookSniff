@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useEndpointHealth } from '@/hooks/useDashboardData';
+import { AlertTriangle } from 'lucide-react';
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: string }> = {
   healthy: { color: 'text-green-700 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/20', labelKey: 'healthy' },
@@ -142,7 +143,7 @@ export default function EndpointHealthPage() {
 
                   {ep.consecutive_failures > 0 && (
                     <div className="mt-2 text-xs text-red-600 dark:text-red-400">
-                      ⚠️ {t('consecutiveFailures', { count: ep.consecutive_failures, plural: ep.consecutive_failures > 1 ? 's' : '' })}
+                      <AlertTriangle size={16} strokeWidth={1.75} className="inline mr-1" /> {t('consecutiveFailures', { count: ep.consecutive_failures, plural: ep.consecutive_failures > 1 ? 's' : '' })}
                       {ep.last_failure_at && ` · ${t('lastFailure', { time: new Date(ep.last_failure_at).toLocaleString() })}`}
                     </div>
                   )}

@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { Endpoint } from '@/lib/api';
+import { Zap } from 'lucide-react';
 
 export function RateLimitCard({ endpoint }: { endpoint: Endpoint }) {
   const t = useTranslations('endpointSettings');
@@ -9,7 +10,7 @@ export function RateLimitCard({ endpoint }: { endpoint: Endpoint }) {
   return (
     <div className="glass-card p-6">
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-xl">⚡</span>
+        <span className="text-xl"><Zap size={18} strokeWidth={1.75} /></span>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('rateLimits')}</h3>
       </div>
 

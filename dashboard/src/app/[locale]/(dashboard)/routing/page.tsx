@@ -7,10 +7,11 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
+import { Pencil, RefreshCw, Shield, Shuffle } from 'lucide-react';
 
 const STRATEGIES = [
-  { value: 'round-robin', icon: '🔄', descKey: 'roundRobinDesc' },
-  { value: 'failover', icon: '🛡️', descKey: 'failoverDesc' },
+  { value: 'round-robin', icon: <RefreshCw size={16} strokeWidth={1.75} />, descKey: 'roundRobinDesc' },
+  { value: 'failover', icon: <Shield size={16} strokeWidth={1.75} />, descKey: 'failoverDesc' },
   { value: 'weighted', icon: '⚖️', descKey: 'weightedDesc' },
   { value: 'random', icon: '🎲', descKey: 'randomDesc' },
 ];
@@ -75,7 +76,7 @@ export default function RoutingPage() {
           <div className="p-8 text-center text-gray-500 dark:text-slate-400">{tc('loading')}</div>
         ) : endpoints.length === 0 ? (
           <div className="p-12 text-center">
-            <div className="text-4xl mb-3">🔀</div>
+            <div className="text-4xl mb-3"><Shuffle size={18} strokeWidth={1.75} /></div>
             <p className="text-gray-500 dark:text-slate-400 mb-4">{t('noEndpoints')}</p>
             <a href="/webhooks" className="inline-block px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
               {t('createEndpoint') || 'Create Endpoint'}
@@ -150,7 +151,7 @@ export default function RoutingPage() {
                       {ep.description && <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{ep.description}</p>}
                       {ep.fallback_url && (
                         <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
-                          🛡️ {t('fallback') || 'Fallback'}: <code className="font-mono">{ep.fallback_url}</code>
+                          <Shield size={16} strokeWidth={1.75} className="inline mr-1" /> {t('fallback') || 'Fallback'}: <code className="font-mono">{ep.fallback_url}</code>
                         </p>
                       )}
                     </div>
@@ -162,7 +163,7 @@ export default function RoutingPage() {
                         {ep.is_active ? tc('active') : tc('inactive')}
                       </span>
                       <button type="button" onClick={() => handleEdit(ep)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline ml-2">
-                        ✏️ {t('edit') || 'Edit'}
+                        <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('edit') || 'Edit'}
                       </button>
                     </div>
                   </div>

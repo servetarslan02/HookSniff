@@ -2,6 +2,7 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import type { Team } from '@/lib/api';
+import { Users } from 'lucide-react';
 
 function TeamAvatar({ name }: { name: string }) {
   const initials = name
@@ -54,7 +55,7 @@ export function TeamList({
       ) : teams.length === 0 ? (
         <div className="p-8 text-center">
           <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-100 dark:bg-slate-700/50 flex items-center justify-center">
-            <span className="text-2xl">👥</span>
+            <span className="text-2xl"><Users size={18} strokeWidth={1.75} /></span>
           </div>
           <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{t('noTeams')}</p>
           <p className="text-xs text-gray-400 dark:text-slate-500">Create your first team to get started</p>

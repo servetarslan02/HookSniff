@@ -3,8 +3,9 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
+import { BarChart3, Check, DollarSign, Link2, TrendingDown } from 'lucide-react';
 
-const PLAN_COLORS: Record<string, string> = {
+const PLAN_COLORS: Record<string, React.ReactNode> = {
   developer: '#94a3b8',
   startup: '#10b981',
   pro: '#4c6ef5',
@@ -109,7 +110,7 @@ function PlanCard({ name, color, price, limits, editing, onPriceChange, onLimitC
           <ul className="space-y-1">
             {PLAN_FEATURES[planId].map((f, i) => (
               <li key={i} className="flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-slate-400">
-                <span className="text-emerald-500">✓</span> {f}
+                <span className="text-emerald-500"><Check size={18} strokeWidth={1.75} /></span> {f}
               </li>
             ))}
           </ul>
@@ -221,7 +222,7 @@ export default function RevenueContent({
       <div className="glass-card overflow-hidden">
         <div className="px-4 sm:px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💰 {t('planManagement') || 'Plan Management'}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><DollarSign size={16} strokeWidth={1.75} className="inline mr-1" /> {t('planManagement') || 'Plan Management'}</h2>
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('planManagementDesc') || 'Configure plan prices and limits. Changes sync to Polar.'}</p>
           </div>
           {!editingPlans ? (
@@ -265,7 +266,7 @@ export default function RevenueContent({
                 limits={{ endpoints: planForm.max_endpoints_free, webhooks: planForm.max_webhooks_free, rateLimit: planForm.rate_limit_free, retention: planForm.retention_days_free }}
                 editing={editingPlans}
                 onLimitChange={(field, value) => {
-                  const map: Record<string, string> = { endpoints: 'max_endpoints_free', webhooks: 'max_webhooks_free', rateLimit: 'rate_limit_free', retention: 'retention_days_free' };
+                  const map: Record<string, React.ReactNode> = { endpoints: 'max_endpoints_free', webhooks: 'max_webhooks_free', rateLimit: 'rate_limit_free', retention: 'retention_days_free' };
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
@@ -280,7 +281,7 @@ export default function RevenueContent({
                 editing={editingPlans}
                 onPriceChange={(v) => setPlanForm({ ...planForm, plan_price_startup: v })}
                 onLimitChange={(field, value) => {
-                  const map: Record<string, string> = { endpoints: 'max_endpoints_startup', webhooks: 'max_webhooks_startup', rateLimit: 'rate_limit_startup', retention: 'retention_days_startup' };
+                  const map: Record<string, React.ReactNode> = { endpoints: 'max_endpoints_startup', webhooks: 'max_webhooks_startup', rateLimit: 'rate_limit_startup', retention: 'retention_days_startup' };
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
@@ -294,7 +295,7 @@ export default function RevenueContent({
                 editing={editingPlans}
                 onPriceChange={(v) => setPlanForm({ ...planForm, plan_price_pro: v })}
                 onLimitChange={(field, value) => {
-                  const map: Record<string, string> = { endpoints: 'max_endpoints_pro', webhooks: 'max_webhooks_pro', rateLimit: 'rate_limit_pro', retention: 'retention_days_pro' };
+                  const map: Record<string, React.ReactNode> = { endpoints: 'max_endpoints_pro', webhooks: 'max_webhooks_pro', rateLimit: 'rate_limit_pro', retention: 'retention_days_pro' };
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
@@ -309,7 +310,7 @@ export default function RevenueContent({
                 editing={editingPlans}
                 onPriceChange={(v) => setPlanForm({ ...planForm, plan_price_enterprise: v })}
                 onLimitChange={(field, value) => {
-                  const map: Record<string, string> = { endpoints: 'max_endpoints_enterprise', webhooks: 'max_webhooks_enterprise', rateLimit: 'rate_limit_enterprise', retention: 'retention_days_enterprise' };
+                  const map: Record<string, React.ReactNode> = { endpoints: 'max_endpoints_enterprise', webhooks: 'max_webhooks_enterprise', rateLimit: 'rate_limit_enterprise', retention: 'retention_days_enterprise' };
                   setPlanForm({ ...planForm, [map[field]]: value });
                 }}
                 t={t}
@@ -320,7 +321,7 @@ export default function RevenueContent({
 
           {/* ── Polar Sync Info ── */}
           <div className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
-            <span className="text-lg">🔗</span>
+            <span className="text-lg"><Link2 size={18} strokeWidth={1.75} /></span>
             <p className="text-xs text-emerald-700 dark:text-emerald-400">
               {t('polarSyncActive') || 'Prices auto-sync to Polar on save. Product IDs must be configured in POLAR_PRODUCT_* env vars.'}
             </p>
@@ -390,7 +391,7 @@ export default function RevenueContent({
         </div>
       ) : (
         <div className="glass-card p-8 sm:p-12 text-center">
-          <div className="text-4xl sm:text-5xl mb-4" aria-hidden="true">📊</div>
+          <div className="text-4xl sm:text-5xl mb-4" aria-hidden="true"><BarChart3 size={18} strokeWidth={1.75} /></div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noRevenueData')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 max-w-md mx-auto">{t('revenueDesc')}</p>
         </div>
@@ -400,7 +401,7 @@ export default function RevenueContent({
       {cohorts.length > 0 && (
         <div className="glass-card overflow-hidden">
           <div className="px-4 sm:px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📊 {t('cohortAnalysis') || 'Cohort Analysis'}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><BarChart3 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('cohortAnalysis') || 'Cohort Analysis'}</h2>
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('cohortDesc') || 'Monthly customer cohorts — signups, retention, and revenue'}</p>
           </div>
           <div className="overflow-x-auto">
@@ -522,7 +523,7 @@ export default function RevenueContent({
           </div>
         ) : (
           <div className="px-6 py-8 text-center">
-            <div className="text-3xl mb-2" aria-hidden="true">📉</div>
+            <div className="text-3xl mb-2" aria-hidden="true"><TrendingDown size={18} strokeWidth={1.75} /></div>
             <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noChurn')}</p>
           </div>
         )}

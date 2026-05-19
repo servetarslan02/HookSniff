@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { notificationsApi, teamsApi, type Notification } from '@/lib/api';
+import { AlertTriangle, Bell, Circle, CreditCard, Users } from 'lucide-react';
 
 export function NotificationCenter() {
   const t = useTranslations('nav');
@@ -109,12 +110,12 @@ export function NotificationCenter() {
     }
   };
 
-  const typeIcons: Record<string, string> = {
-    webhook_failed: '🔴',
-    alert: '⚠️',
-    system: '🔔',
-    billing: '💳',
-    team_invite: '👥',
+  const typeIcons: Record<string, React.ReactNode> = {
+    webhook_failed: <Circle size={16} strokeWidth={1.75} />,
+    alert: <AlertTriangle size={16} strokeWidth={1.75} />,
+    system: <Bell size={16} strokeWidth={1.75} />,
+    billing: <CreditCard size={16} strokeWidth={1.75} />,
+    team_invite: <Users size={16} strokeWidth={1.75} />,
   };
 
   return (

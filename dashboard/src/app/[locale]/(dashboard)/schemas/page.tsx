@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
+import { Check, ClipboardList, X } from 'lucide-react';
 
 interface Schema {
   id: string;
@@ -147,7 +148,7 @@ export default function SchemasPage() {
           <div className="p-8 text-center text-gray-500 dark:text-slate-400">{tc('loading')}</div>
         ) : schemas.length === 0 ? (
           <div className="p-12 text-center">
-            <div className="text-4xl mb-3">📋</div>
+            <div className="text-4xl mb-3"><ClipboardList size={18} strokeWidth={1.75} /></div>
             <p className="text-gray-500 dark:text-slate-400 mb-1">{t('noSchemas')}</p>
             <p className="text-xs text-gray-400 dark:text-slate-500">{t('noSchemasDesc')}</p>
           </div>
@@ -195,7 +196,7 @@ export default function SchemasPage() {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{viewSchema.name}</h3>
                 <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">v{viewSchema.version} · {new Date(viewSchema.created_at).toLocaleString()}</p>
               </div>
-              <button onClick={() => setViewSchema(null)} className="text-gray-500 hover:text-gray-700 dark:hover:text-slate-300">✕</button>
+              <button onClick={() => setViewSchema(null)} className="text-gray-500 hover:text-gray-700 dark:hover:text-slate-300"><X size={18} strokeWidth={1.75} /></button>
             </div>
             <div className="p-6">
               <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-2 uppercase tracking-wider">JSON Schema</label>
@@ -219,7 +220,7 @@ export default function SchemasPage() {
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[80dvh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Validate Event</h3>
-              <button onClick={() => { setValidatingId(null); setValidationResult(null); }} className="text-gray-500 hover:text-gray-700 dark:hover:text-slate-300">✕</button>
+              <button onClick={() => { setValidatingId(null); setValidationResult(null); }} className="text-gray-500 hover:text-gray-700 dark:hover:text-slate-300"><X size={18} strokeWidth={1.75} /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -237,7 +238,7 @@ export default function SchemasPage() {
                 disabled={!validationPayload.trim()}
                 className="w-full px-4 py-2.5 bg-brand-600 text-white text-sm font-medium rounded-xl hover:bg-brand-700 transition disabled:opacity-50"
               >
-                ✓ Validate
+                <Check size={16} strokeWidth={1.75} className="inline mr-1" /> Validate
               </button>
               {validationResult && (
                 <div className={`p-4 rounded-xl ${validationResult.valid ? 'bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30' : 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30'}`}>

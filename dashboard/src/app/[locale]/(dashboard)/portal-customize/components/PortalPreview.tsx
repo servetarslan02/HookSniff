@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import type { PortalConfig } from '../types';
+import { Eye } from 'lucide-react';
 
 export function PortalPreview({ config }: { config: PortalConfig }) {
   const t = useTranslations('portalCustomize');
@@ -11,7 +12,7 @@ export function PortalPreview({ config }: { config: PortalConfig }) {
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center">
-          <span className="text-base">👁️</span>
+          <span className="text-base"><Eye size={18} strokeWidth={1.75} /></span>
         </div>
         <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('preview')}</h2>
       </div>

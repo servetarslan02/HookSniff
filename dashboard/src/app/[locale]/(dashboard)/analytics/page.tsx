@@ -17,6 +17,7 @@ import {
 } from '@/components/LazyCharts';
 import { ChartCard, StatCard } from '@/components/tremor';
 import { useTranslations } from 'next-intl';
+import { BarChart3 } from 'lucide-react';
 
 type TimeRange = '24h' | '7d' | '30d' | '90d';
 
@@ -57,7 +58,7 @@ export default function AnalyticsPage() {
 
   const ChartEmpty = ({ message }: { message: string }) => (
     <div className="h-full flex flex-col items-center justify-center gap-2">
-      <span className="text-3xl">📊</span>
+      <span className="text-3xl"><BarChart3 size={18} strokeWidth={1.75} /></span>
       <span className="text-sm text-gray-500 dark:text-slate-400">{message}</span>
     </div>
   );

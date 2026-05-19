@@ -9,6 +9,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
 import { useDeliveryLogs } from '@/hooks/useDashboardData';
 import { LazySection, Skeletons } from '@/components/LazySection';
+import { AlertTriangle, Check, CheckCircle2, ClipboardList, Clock, X, XCircle } from 'lucide-react';
 
 type StatusFilter = 'all' | 'delivered' | 'failed' | 'pending';
 
@@ -99,10 +100,10 @@ export default function LogsPage() {
       <div className="flex flex-wrap gap-2">
         {(['all', 'delivered', 'failed', 'pending'] as StatusFilter[]).map((f) => {
           const icons: Record<StatusFilter, string> = {
-            all: '📋',
-            delivered: '✅',
-            failed: '❌',
-            pending: '⏳',
+            all: <ClipboardList size={16} strokeWidth={1.75} />,
+            delivered: <CheckCircle2 size={16} strokeWidth={1.75} />,
+            failed: <XCircle size={16} strokeWidth={1.75} />,
+            pending: <Clock size={16} strokeWidth={1.75} />,
           };
           return (
             <button
@@ -141,7 +142,7 @@ export default function LogsPage() {
       {/* Error state */}
       {error && (
         <div className="glass-card p-6 text-center">
-          <div className="text-4xl mb-3">⚠️</div>
+          <div className="text-4xl mb-3"><AlertTriangle size={18} strokeWidth={1.75} /></div>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{error.message}</p>
           <button type="button"
             onClick={() => refetch()}
@@ -327,8 +328,7 @@ export default function LogsPage() {
                 aria-label={tc('close')}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
               >
-                ✕
-              </button>
+                <X size={16} strokeWidth={1.75} className="inline mr-1" /> </button>
             </div>
             <div className="p-6 space-y-4">
               <DetailRow label={t('deliveryId')} value={selected.id} mono />

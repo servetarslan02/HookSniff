@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import { useSsoConfig, useTeams } from '@/hooks/useDashboardData';
+import { AlertTriangle, Check, CheckCircle2, ClipboardList, Eye, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from 'lucide-react';
 
 /* ─── SSO/SAML Configuration Page (Enterprise Only) ─── */
 export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: string } = {}) {
@@ -242,7 +243,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
           <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
         <div className="glass-card p-8 text-center">
-          <div className="text-5xl mb-4">🔐</div>
+          <div className="text-5xl mb-4"><ShieldCheck size={18} strokeWidth={1.75} /></div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('enterpriseOnlyTitle')}</h2>
           <p className="text-gray-500 dark:text-slate-400 mb-6 max-w-md mx-auto">{t('enterpriseOnlyDesc')}</p>
           <a href="/billing-section" className="inline-block px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition">
@@ -266,7 +267,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
       {isEnforced && (
         <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">✅</span>
+            <span className="text-2xl"><CheckCircle2 size={18} strokeWidth={1.75} /></span>
             <div>
               <div className="font-semibold text-emerald-800 dark:text-emerald-300">{t('ssoActive')}</div>
               <div className="text-sm text-emerald-600 dark:text-emerald-400">{t('ssoActiveDesc')}</div>
@@ -292,7 +293,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             { id: 'saml' as const, name: 'SAML 2.0', desc: 'Okta, OneLogin, Azure AD, Google Workspace', icon: '🏛️' },
-            { id: 'oidc' as const, name: 'OpenID Connect', desc: 'Auth0, Keycloak, AWS Cognito', icon: '🔑' },
+            { id: 'oidc' as const, name: 'OpenID Connect', desc: 'Auth0, Keycloak, AWS Cognito', icon: <Key size={16} strokeWidth={1.75} /> },
           ].map((p) => (
             <button
               key={p.id}
@@ -319,14 +320,14 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
       {/* Verified Domain */}
       <div className="glass-card p-6">
         <div className="flex items-center gap-2 mb-4">
-          <span className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">🌐</span>
+          <span className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold"><Globe size={18} strokeWidth={1.75} /></span>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('verifiedDomain') || 'Verified Domain'}</h2>
         </div>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('verifiedDomainDesc') || 'Email domain for automatic SSO user discovery. Users with this domain will be matched to this organization.'}</p>
 
         {ssoConfig?.verified_domain ? (
           <div className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
-            <span className="text-emerald-600 dark:text-emerald-400">✅</span>
+            <span className="text-emerald-600 dark:text-emerald-400"><CheckCircle2 size={18} strokeWidth={1.75} /></span>
             <span className="text-sm font-mono font-medium text-emerald-800 dark:text-emerald-300">{ssoConfig.verified_domain}</span>
             <span className="text-xs text-emerald-600 dark:text-emerald-400 ml-auto">{t('verified') || 'Verified'}</span>
           </div>
@@ -361,7 +362,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
                       type="button"
                       onClick={() => { navigator.clipboard.writeText(txtRecord); toast('Copied!', 'success'); }}
                       className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition"
-                    >📋</button>
+                    ><ClipboardList size={18} strokeWidth={1.75} /></button>
                   </div>
                   <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">
                     {t('txtRecordName') || 'Name'}: <code className="font-mono">_hooksniff.{domainInput}</code>
@@ -376,10 +377,10 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
                   {verifyingDomain ? (t('verifying') || 'Verifying...') : (t('verifyDomain') || 'Verify Domain')}
                 </button>
                 {domainVerified === true && (
-                  <p className="text-sm text-emerald-600 dark:text-emerald-400">✅ {t('domainVerified') || 'Domain verified successfully!'}</p>
+                  <p className="text-sm text-emerald-600 dark:text-emerald-400"><CheckCircle2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('domainVerified') || 'Domain verified successfully!'}</p>
                 )}
                 {domainVerified === false && (
-                  <p className="text-sm text-red-600 dark:text-red-400">❌ {t('domainVerifyFailed') || 'TXT record not found. Please add the record and try again.'}</p>
+                  <p className="text-sm text-red-600 dark:text-red-400"><XCircle size={16} strokeWidth={1.75} className="inline mr-1" /> {t('domainVerifyFailed') || 'TXT record not found. Please add the record and try again.'}</p>
                 )}
               </div>
             )}
@@ -414,7 +415,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
             <div>
               <label htmlFor="sso-certificate" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 {t('x509Certificate')}
-                {ssoConfig?.certificate_set && <span className="ml-2 text-emerald-600 dark:text-emerald-400 text-xs">✓ {t('certificateSet')}</span>}
+                {ssoConfig?.certificate_set && <span className="ml-2 text-emerald-600 dark:text-emerald-400 text-xs"><Check size={16} strokeWidth={1.75} className="inline mr-1" /> {t('certificateSet')}</span>}
               </label>
               <textarea id="sso-certificate" value={certificate} onChange={(e) => setCertificate(e.target.value)} rows={4} disabled={isEnforced}
                 placeholder={ssoConfig?.certificate_set ? '•••••••• (leave empty to keep)' : '-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'}
@@ -445,7 +446,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
             <div>
               <label htmlFor="sso-client-secret" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 {t('clientSecret')}
-                {ssoConfig?.client_secret_set && <span className="ml-2 text-emerald-600 dark:text-emerald-400 text-xs">✓ {t('clientSecretSet')}</span>}
+                {ssoConfig?.client_secret_set && <span className="ml-2 text-emerald-600 dark:text-emerald-400 text-xs"><Check size={16} strokeWidth={1.75} className="inline mr-1" /> {t('clientSecretSet')}</span>}
               </label>
               <input id="sso-client-secret" type="password" autoComplete="off" value={certificate} onChange={(e) => setCertificate(e.target.value)} disabled={isEnforced}
                 placeholder={ssoConfig?.client_secret_set ? '•••••••• (leave empty to keep)' : 'your-client-secret'}
@@ -458,7 +459,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
       {/* Auto Team Join */}
       <div className="glass-card p-6">
         <div className="flex items-center gap-2 mb-4">
-          <span className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-sm font-bold">👥</span>
+          <span className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-sm font-bold"><Users size={18} strokeWidth={1.75} /></span>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('autoTeamJoin')}</h2>
         </div>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('autoTeamJoinDesc')}</p>
@@ -481,7 +482,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
           {defaultTeamId && (
             <>
               <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-500/10 rounded-lg">
-                <span className="text-amber-500 mt-0.5">⚠️</span>
+                <span className="text-amber-500 mt-0.5"><AlertTriangle size={18} strokeWidth={1.75} /></span>
                 <p className="text-xs text-amber-700 dark:text-amber-300">
                   {t('autoTeamJoinWarning') || 'All users who sign in via SSO will be automatically added to this team. Make sure this is the correct team.'}
                 </p>
@@ -495,9 +496,9 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
                 disabled={isEnforced}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <option value="viewer">👁️ {t('roleViewer')}</option>
-                <option value="editor">✏️ {t('roleEditor')}</option>
-                <option value="admin">🛡️ {t('roleAdmin')}</option>
+                <option value="viewer"><Eye size={16} strokeWidth={1.75} className="inline mr-1" /> {t('roleViewer')}</option>
+                <option value="editor"><Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('roleEditor')}</option>
+                <option value="admin"><Shield size={16} strokeWidth={1.75} className="inline mr-1" /> {t('roleAdmin')}</option>
               </select>
               </div>
             </>
@@ -523,7 +524,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
           </button>
           {testPassed && (
             <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm font-medium">
-              ✅ {t('testPassed')}
+              <CheckCircle2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('testPassed')}
             </span>
           )}
         </div>
@@ -559,7 +560,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
           <div className="flex items-center gap-2">
             <code className="flex-1 px-4 py-3 bg-gray-100 dark:bg-slate-800 rounded-xl text-sm font-mono text-gray-800 dark:text-slate-200 break-all">{ssoLoginUrl}</code>
             <button type="button" onClick={() => { navigator.clipboard.writeText(ssoLoginUrl); toast('Copied!', 'success'); }}
-              className="px-4 py-3 bg-gray-200 dark:bg-slate-700 rounded-xl hover:bg-gray-300 dark:hover:bg-slate-600 transition" title="Copy">📋</button>
+              className="px-4 py-3 bg-gray-200 dark:bg-slate-700 rounded-xl hover:bg-gray-300 dark:hover:bg-slate-600 transition" title="Copy"><ClipboardList size={18} strokeWidth={1.75} /></button>
           </div>
         </div>
       )}
@@ -582,11 +583,11 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
 
             <div className="space-y-3 mb-6">
               <div className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-500/10 rounded-lg">
-                <span className="text-orange-500 mt-0.5">⚠️</span>
+                <span className="text-orange-500 mt-0.5"><AlertTriangle size={18} strokeWidth={1.75} /></span>
                 <p className="text-sm text-orange-700 dark:text-orange-300">{t('enforceWarning1')}</p>
               </div>
               <div className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-500/10 rounded-lg">
-                <span className="text-orange-500 mt-0.5">⚠️</span>
+                <span className="text-orange-500 mt-0.5"><AlertTriangle size={18} strokeWidth={1.75} /></span>
                 <p className="text-sm text-orange-700 dark:text-orange-300">{t('enforceWarning2')}</p>
               </div>
             </div>
