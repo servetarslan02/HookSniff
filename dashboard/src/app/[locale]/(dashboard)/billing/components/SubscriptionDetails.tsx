@@ -10,13 +10,13 @@ import { useBillingSubscription } from '@/hooks/useDashboardData';
 import { getErrorMessage } from '@/lib/errors';
 import { AlertTriangle, CreditCard, DollarSign, Pause, Play } from 'lucide-react';
 
-const PROVIDER_LABELS: Record<string, { name: string; icon: string }> = {
+const PROVIDER_LABELS: Record<string, { name: string; icon: React.ReactNode }> = {
   stripe: { name: 'Stripe', icon: <CreditCard size={16} strokeWidth={1.75} /> },
   polar: { name: 'Polar.sh', icon: <DollarSign size={16} strokeWidth={1.75} /> },
   iyzico: { name: 'iyzico', icon: <CreditCard size={16} strokeWidth={1.75} /> },
 };
 
-function getCardIcon(brand?: string | null): string {
+function getCardIcon(brand?: string | null): React.ReactNode {
   switch (brand?.toLowerCase()) {
     case 'visa': return <CreditCard size={16} strokeWidth={1.75} />;
     case 'mastercard': return <CreditCard size={16} strokeWidth={1.75} />;

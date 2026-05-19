@@ -1,7 +1,7 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
-import { Link } from 'lucide-react';
+import { Link as LinkIcon } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -86,7 +86,7 @@ export default async function HookdeckAlternativesPage() {
           </div>
 
           <div className="p-6 bg-purple-50 dark:bg-purple-500/10 rounded-xl border border-purple-200 dark:border-purple-500/20">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><Link size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('whenToChooseHookdeck')}</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2"><LinkIcon size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('whenToChooseHookdeck')}</h2>
             <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{t('whenToChooseHookdeckDesc')}</p>
           </div>
         </div>
