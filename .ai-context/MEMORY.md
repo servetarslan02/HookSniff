@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 22:14 GMT+8 (Dokümantasyon sayfaları Türkçe'ye çevrildi)
+> Son güncelleme: 2026-05-19 22:35 GMT+8 (İmza Aracı kapsamlı UX overhaul)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -221,6 +221,31 @@ HookSniff/
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-19 22:31–22:35 — İmza Aracı Kapsamlı İnceleme)
+
+### Özet
+İmza Aracı (Signature Verifier) sayfası detaylı incelendi. 8 sorun tespit edildi, hepsi düzeltildi. 4 dosya değişti, 252 satır eklendi.
+
+### Yapılan İşler:
+1. **CSS mükerrerleri düzeltildi** — textarea ve input'larda tekrarlanan sınıflar temizlendi
+2. **Temizleme butonu eklendi** — "🗑️ Temizle" butonu (tüm alanları sıfırlar)
+3. **Gizli anahtar toggle** — göz ikonu ile password/text geçişi
+4. **İmza format otomatik normalize** — hex yapıştırınca `sha256=` prefix ekleniyor
+5. **Çok dilli kod örnekleri** — Node.js + Python + Go (tab'lı geçiş)
+6. **Kopyalama fallback** — HTTPS olmayan ortamlarda textarea+execCommand
+7. **Klavye kısayolu** — Ctrl/Cmd + Enter ile doğrulama
+8. **Test import yolu düzeltildi** — `[username]` → `(dashboard)`
+
+### Değişiklikler:
+- `dashboard/src/app/[locale]/(dashboard)/signature-verifier/page.tsx` — +223/-30
+- `dashboard/src/__tests__/signature-verifier-page.test.tsx` — +43/-1
+- `dashboard/src/messages/en.json` — +8
+- `dashboard/src/messages/tr.json` — +8
+
+### Push: `f8b0bbde`
 
 ---
 
