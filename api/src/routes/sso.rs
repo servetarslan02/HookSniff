@@ -47,6 +47,8 @@ pub fn router() -> Router {
         // Domain verification
         .route("/verify-domain", post(initiate_domain_verification))
         .route("/verify-domain/check", post(check_domain_verification))
+        // Login attempts
+        .route("/login-attempts", get(get_login_attempts))
         // Provider lookup (public)
         .route("/providers", get(list_sso_providers))
 }
@@ -578,6 +580,58 @@ struct VerifyDomainRequest {
 struct VerifyDomainResponse {
     txt_record: String,
     instructions: String,
+}
+
+// ── GET /sso/login-attempts ──────────────────────────────────
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+struct LoginAttempt {
+    id: Uuid,
+    email: String,
+    provider: String,
+    success: bool,
+    error_message: Option<String>,
+    ip_address: Option<String>,
+    created_at: DateTime<Utc>,
+}
+
+/// GET /sso/login-attempts — List recent SSO login attempts (admin only)
+async fn get_login_attempts(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Query(query): Query<std::collections::HashMap<String, String>>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Only admins can view login attempts
+    if !customer.is_admin {
+        return Err(AppError::Forbidden("Admin access required".into()));
+    }
+
+    let page: i64 = query.get("page").and_then(|p| p.parse().ok()).unwrap_or(1).max(1);
+    let limit: i64 = query.get("limit").and_then(|l| l.parse().ok()).unwrap_or(50).min(100);
+    let offset = (page - 1) * limit;
+
+    let attempts = sqlx::query_as::<_, LoginAttempt>(
+        "SELECT id, email, provider, success, error_message, ip_address, created_at
+         FROM sso_login_attempts
+         ORDER BY created_at DESC
+         LIMIT $1 OFFSET $2"
+    )
+    .bind(limit)
+    .bind(offset)
+    .fetch_all(&pool)
+    .await?;
+
+    let total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM sso_login_attempts")
+        .fetch_one(&pool)
+        .await?;
+
+    Ok(Json(serde_json::json!({
+        "attempts": attempts,
+        "total": total.0,
+        "page": page,
+        "limit": limit,
+        "has_more": offset + limit < total.0,
+    })))
 }
 
 /// POST /sso/verify-domain — Generate TXT record for domain verification

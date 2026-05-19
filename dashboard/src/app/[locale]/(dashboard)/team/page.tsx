@@ -19,6 +19,8 @@ import {
   useLeaveTeam,
   useTransferOwnership,
   useRevokeInvite,
+  useUpdateTeam,
+  useResendInvite,
 } from '@/hooks/useDashboardData';
 import { TeamList } from './components/TeamList';
 import { TeamDetail } from './components/TeamDetail';
@@ -56,6 +58,18 @@ function TeamPageInner() {
   const { data: teamDetail } = useTeamDetail(selectedTeamId);
   const invites = teamDetail?.invites ?? [];
 
+  // Auth guard — redirect to login if not authenticated
+  const [authChecked, setAuthChecked] = useState(false);
+  useEffect(() => {
+    if (authChecked) return;
+    if (!token && !loading) {
+      const currentUrl = window.location.pathname + window.location.search;
+      router.push(`/login?redirect=${encodeURIComponent(currentUrl)}`);
+    } else if (token) {
+      setAuthChecked(true);
+    }
+  }, [token, loading, router, authChecked]);
+
   const createTeamMutation = useCreateTeam();
   const inviteMemberMutation = useInviteTeamMember();
   const removeMemberMutation = useRemoveTeamMember();
@@ -65,6 +79,8 @@ function TeamPageInner() {
   const leaveTeamMutation = useLeaveTeam();
   const transferOwnershipMutation = useTransferOwnership();
   const revokeInviteMutation = useRevokeInvite();
+  const updateTeamMutation = useUpdateTeam();
+  const resendInviteMutation = useResendInvite();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -106,9 +122,13 @@ function TeamPageInner() {
 
   const handleCreate = async (name: string) => {
     try {
-      await createTeamMutation.mutateAsync({ name });
+      const newTeam = await createTeamMutation.mutateAsync({ name });
       toast(t('teamCreated'), 'success');
       setShowCreateModal(false);
+      // Auto-select the newly created team
+      if (newTeam && typeof newTeam === 'object' && 'id' in newTeam) {
+        setSelectedTeamId((newTeam as { id: string }).id);
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('failedToCreateTeam');
       toast(msg, 'error');
@@ -120,10 +140,12 @@ function TeamPageInner() {
     try {
       const result = await inviteMemberMutation.mutateAsync({ teamId: selectedTeamId, data: { email, role } });
       toast(t('invitationSent'), 'success');
-      // Show invite link for copying
+      // Show invite link for copying (with locale prefix)
       const link = (result as Record<string, unknown>)?.invite_link;
       if (link && typeof link === 'string') {
-        setLastInviteLink(window.location.origin + link);
+        const locale = window.location.pathname.split('/')[1] || 'en';
+        const fullLink = `/${locale}${link}`;
+        setLastInviteLink(window.location.origin + fullLink);
       }
       setShowInviteModal(false);
     } catch (err: unknown) {
@@ -167,7 +189,12 @@ function TeamPageInner() {
       setSelectedTeamId(null);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : (t('deleteFailed') || 'Failed to delete team');
-      toast(msg, 'error');
+      // Show specific SSO warning if team is referenced
+      if (msg.includes('SSO') || msg.includes('sso')) {
+        toast(t('teamDeleteSsoWarning') || 'This team is used by SSO auto-join. Remove the SSO reference first, then delete the team.', 'error');
+      } else {
+        toast(msg, 'error');
+      }
     }
     setShowDeleteConfirm(false);
   };
@@ -207,11 +234,39 @@ function TeamPageInner() {
     }
   };
 
+  const handleResendInvite = async (inviteId: string) => {
+    try {
+      const result = await resendInviteMutation.mutateAsync(inviteId);
+      toast(t('inviteResent') || 'Invite resent!', 'success');
+      // Show the new invite link
+      const link = (result as Record<string, unknown>)?.invite_link;
+      if (link && typeof link === 'string') {
+        const locale = window.location.pathname.split('/')[1] || 'en';
+        const fullLink = `/${locale}${link}`;
+        setLastInviteLink(window.location.origin + fullLink);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (t('resendFailed') || 'Failed to resend invite');
+      toast(msg, 'error');
+    }
+  };
+
   const handleCopyInviteLink = () => {
     if (lastInviteLink) {
       navigator.clipboard.writeText(lastInviteLink);
       toast(t('linkCopied') || 'Link copied!', 'success');
       setLastInviteLink(null);
+    }
+  };
+
+  const handleUpdateTeam = async (data: { name?: string; description?: string }) => {
+    if (!selectedTeamId) return;
+    try {
+      await updateTeamMutation.mutateAsync({ teamId: selectedTeamId, data });
+      toast(t('teamUpdated') || 'Team updated', 'success');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (t('updateFailed') || 'Failed to update team');
+      toast(msg, 'error');
     }
   };
 
@@ -274,6 +329,8 @@ function TeamPageInner() {
               onLeaveTeam={() => setShowLeaveConfirm(true)}
               onTransferOwnership={() => setShowTransferModal(true)}
               onRevokeInvite={handleRevokeInvite}
+              onResendInvite={handleResendInvite}
+              onUpdateTeam={handleUpdateTeam}
               lastInviteLink={lastInviteLink}
               onCopyLink={handleCopyInviteLink}
             />
