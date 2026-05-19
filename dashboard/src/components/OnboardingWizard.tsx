@@ -310,6 +310,7 @@ export function OnboardingWizard() {
                   <a
                     href="/devtools"
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
                   >
                     🧪 {t('playground')}
