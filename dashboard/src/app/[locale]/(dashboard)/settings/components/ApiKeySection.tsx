@@ -15,9 +15,24 @@ export function ApiKeySection({ apiKey }: { apiKey: string | null }) {
     };
   }, []);
 
-  const copyApiKey = () => {
+  const copyApiKey = async () => {
     if (apiKey) {
-      navigator.clipboard.writeText(apiKey);
+      try {
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(apiKey);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = apiKey;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+      } catch {
+        // Silent fail
+      }
       setCopied(true);
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => setCopied(false), 2000);

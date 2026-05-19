@@ -55,7 +55,7 @@ export function TwoFactorSection() {
       setStep('qr');
       setShowEnable(true);
     } catch (err) {
-      toast(getErrorMessage(err, 'Failed to enable 2FA'), 'error');
+      toast(getErrorMessage(err, t('failedToEnable2fa')), 'error');
     } finally {
       setEnabling(false);
     }
@@ -69,9 +69,9 @@ export function TwoFactorSection() {
       setBackupCodes(data.backup_codes || []);
       setStep('done');
       setEnabled(true);
-      toast('2FA enabled successfully', 'success');
+      toast(t('2faEnabledSuccess'), 'success');
     } catch (err) {
-      toast(getErrorMessage(err, 'Invalid code. Try again.'), 'error');
+      toast(getErrorMessage(err, t('invalidTotpCode')), 'error');
     } finally {
       setEnabling(false);
     }
@@ -95,9 +95,9 @@ export function TwoFactorSection() {
       setEnabled(false);
       setShowDisable(false);
       setDisableCode('');
-      toast('2FA disabled', 'success');
+      toast(t('2faDisabled'), 'success');
     } catch (err) {
-      toast(getErrorMessage(err, 'Failed to disable 2FA'), 'error');
+      toast(getErrorMessage(err, t('failedToDisable2fa')), 'error');
     } finally {
       setDisabling(false);
     }
@@ -175,7 +175,7 @@ export function TwoFactorSection() {
                     <img src={qrCode} alt="2FA QR Code" className="w-48 h-48 rounded-lg" />
                   ) : (
                     <div className="w-48 h-48 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center text-gray-500 dark:text-slate-400 text-sm">
-                      Loading QR...
+                      {t('loadingQr')}
                     </div>
                   )}
                 </div>
