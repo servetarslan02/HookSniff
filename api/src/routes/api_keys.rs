@@ -20,6 +20,7 @@ pub fn router() -> Router {
 struct ApiKeyInfo {
     id: Uuid,
     name: Option<String>,
+    #[serde(rename = "api_key_prefix")]
     prefix: String,
     created_at: String,
     last_used_at: Option<String>,
