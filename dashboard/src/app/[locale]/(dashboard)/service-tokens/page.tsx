@@ -152,17 +152,37 @@ export default function ServiceTokensPage() {
         </div>
       </div>
 
+      {/* Create Token Modal */}
       {showCreate && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('createTitle')}</h3>
-          <form onSubmit={handleCreate} className="flex items-end gap-3">
-            <div className="flex-1">
-              <label htmlFor="token-name" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{t('name')}</label>
-              <input id="token-name" type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t('namePlaceholder')} required className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
-            </div>
-            <button type="submit" disabled={createToken.isPending} className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-60">{createToken.isPending ? tc('creating') : tc('create')}</button>
-            <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition">{tc('cancel')}</button>
-          </form>
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowCreate(false)} />
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('createTitle')}</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('createDesc') || t('subtitle')}</p>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <label htmlFor="token-name" className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('name')}</label>
+                <input
+                  id="token-name"
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder={t('namePlaceholder')}
+                  required
+                  autoFocus
+                  className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                />
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button type="button" onClick={() => { setShowCreate(false); setNewName(''); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+                  {tc('cancel')}
+                </button>
+                <button type="submit" disabled={createToken.isPending || !newName.trim()} className="px-5 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60 shadow-sm">
+                  {createToken.isPending ? tc('creating') : tc('create')}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
