@@ -3140,7 +3140,6 @@
     "embedCodeDesc": "Portalı gömmek için bu kodu dashboard'unuza kopyalayın.",
     "copy": "Kopyala",
     "copied": "Kopyalandı!",
-    "reactIntegration": "React Entegrasyonu",
     "portalSaved": "Portal yapılandırması kaydedildi!",
     "portalSaveFailed": "Portal yapılandırması kaydedilemedi",
     "portalUrl": "Portal URL'si"
