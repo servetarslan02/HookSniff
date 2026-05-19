@@ -10,6 +10,9 @@ pub fn all_templates() -> Vec<WebhookTemplate> {
         saas_platform_template(),
         healthcare_template(),
         slack_like_template(),
+        discord_template(),
+        linear_template(),
+        notion_template(),
     ]
 }
 
@@ -465,6 +468,182 @@ fn slack_like_template() -> WebhookTemplate {
     }
 }
 
+/// Discord webhook template
+fn discord_template() -> WebhookTemplate {
+    WebhookTemplate {
+        id: "discord-interactions".to_string(),
+        name: "Discord Interaction Webhooks".to_string(),
+        description: "Community and bot interaction events from Discord — covers slash commands, button clicks, modal submissions, member joins, message reactions, and moderation events".to_string(),
+        industry: "community".to_string(),
+        event_types: vec![
+            "INTERACTION_CREATE".to_string(),
+            "MESSAGE_CREATE".to_string(),
+            "MESSAGE_UPDATE".to_string(),
+            "MESSAGE_DELETE".to_string(),
+            "GUILD_MEMBER_ADD".to_string(),
+            "GUILD_MEMBER_REMOVE".to_string(),
+            "GUILD_MEMBER_UPDATE".to_string(),
+            "MESSAGE_REACTION_ADD".to_string(),
+            "MESSAGE_REACTION_REMOVE".to_string(),
+            "CHANNEL_CREATE".to_string(),
+            "CHANNEL_UPDATE".to_string(),
+            "CHANNEL_DELETE".to_string(),
+            "VOICE_STATE_UPDATE".to_string(),
+            "THREAD_CREATE".to_string(),
+            "THREAD_UPDATE".to_string(),
+            "MODERATION_ACTION".to_string(),
+        ],
+        endpoint_config: EndpointTemplateConfig {
+            url_placeholder: "https://your-app.com/api/discord/interactions".to_string(),
+            signing_algorithm: "ed25519".to_string(),
+            content_type: "application/json".to_string(),
+            custom_headers: serde_json::json!({
+                "X-Signature-Ed25519": "{{signature}}",
+                "X-Signature-Timestamp": "{{timestamp}}"
+            }),
+            event_filter: vec!["INTERACTION_CREATE".to_string(), "MESSAGE_*".to_string(), "GUILD_MEMBER_*".to_string()],
+        },
+        retry_policy: RetryTemplatePolicy {
+            max_attempts: 3,
+            backoff: "exponential".to_string(),
+            initial_delay_secs: 5,
+            max_delay_secs: 3600,
+        },
+        agents: vec![
+            TemplateAgent {
+                agent_name: "toxicity_filter".to_string(),
+                description: "Filters toxic messages and spam in community channels".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+            TemplateAgent {
+                agent_name: "engagement_tracker".to_string(),
+                description: "Tracks member engagement, active users, and channel activity patterns".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+            TemplateAgent {
+                agent_name: "moderation_assistant".to_string(),
+                description: "Automated moderation suggestions based on message patterns".to_string(),
+                enabled_by_default: false,
+                config: serde_json::json!({}),
+            },
+        ],
+        estimated_daily_volume: 50000,
+        tags: vec!["community".to_string(), "discord".to_string(), "bot".to_string(), "gaming".to_string(), "real-time".to_string()],
+    }
+}
+
+/// Linear webhook template
+fn linear_template() -> WebhookTemplate {
+    WebhookTemplate {
+        id: "linear-project-events".to_string(),
+        name: "Linear Project Webhooks".to_string(),
+        description: "Project management events from Linear — covers issue lifecycle, project updates, cycle progress, team changes, and comment activity for development teams".to_string(),
+        industry: "devtools".to_string(),
+        event_types: vec![
+            "Issue.create".to_string(),
+            "Issue.update".to_string(),
+            "Issue.remove".to_string(),
+            "IssueComment.create".to_string(),
+            "Project.create".to_string(),
+            "Project.update".to_string(),
+            "ProjectArchive".to_string(),
+            "Cycle.create".to_string(),
+            "Cycle.update".to_string(),
+            "Team.create".to_string(),
+            "Team.update".to_string(),
+            "Label.create".to_string(),
+            "Label.update".to_string(),
+        ],
+        endpoint_config: EndpointTemplateConfig {
+            url_placeholder: "https://your-app.com/api/linear/webhooks".to_string(),
+            signing_algorithm: "hmac-sha256".to_string(),
+            content_type: "application/json".to_string(),
+            custom_headers: serde_json::json!({
+                "Linear-Signature": "{{signature}}"
+            }),
+            event_filter: vec!["Issue.*".to_string(), "Project.*".to_string(), "Cycle.*".to_string()],
+        },
+        retry_policy: RetryTemplatePolicy {
+            max_attempts: 3,
+            backoff: "exponential".to_string(),
+            initial_delay_secs: 5,
+            max_delay_secs: 3600,
+        },
+        agents: vec![
+            TemplateAgent {
+                agent_name: "sprint_velocity_tracker".to_string(),
+                description: "Tracks issue completion rates and sprint velocity metrics".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+            TemplateAgent {
+                agent_name: "stale_issue_detector".to_string(),
+                description: "Detects stale issues and blocked tasks, sends alerts".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+        ],
+        estimated_daily_volume: 2000,
+        tags: vec!["devtools".to_string(), "project-management".to_string(), "linear".to_string(), "issues".to_string()],
+    }
+}
+
+/// Notion webhook template
+fn notion_template() -> WebhookTemplate {
+    WebhookTemplate {
+        id: "notion-workspace-events".to_string(),
+        name: "Notion Workspace Webhooks".to_string(),
+        description: "Workspace and database events from Notion — covers page creation, updates, comments, database entries, and team collaboration for knowledge management workflows".to_string(),
+        industry: "productivity".to_string(),
+        event_types: vec![
+            "page.created".to_string(),
+            "page.updated".to_string(),
+            "page.deleted".to_string(),
+            "database.created".to_string(),
+            "database.updated".to_string(),
+            "comment.created".to_string(),
+            "comment.updated".to_string(),
+            "block.created".to_string(),
+            "block.updated".to_string(),
+            "workspace.updated".to_string(),
+        ],
+        endpoint_config: EndpointTemplateConfig {
+            url_placeholder: "https://your-app.com/api/notion/webhooks".to_string(),
+            signing_algorithm: "hmac-sha256".to_string(),
+            content_type: "application/json".to_string(),
+            custom_headers: serde_json::json!({
+                "X-Notion-Signature": "{{signature}}",
+                "X-Notion-Timestamp": "{{timestamp}}"
+            }),
+            event_filter: vec!["page.*".to_string(), "database.*".to_string(), "comment.*".to_string()],
+        },
+        retry_policy: RetryTemplatePolicy {
+            max_attempts: 3,
+            backoff: "exponential".to_string(),
+            initial_delay_secs: 5,
+            max_delay_secs: 3600,
+        },
+        agents: vec![
+            TemplateAgent {
+                agent_name: "content_sync_agent".to_string(),
+                description: "Syncs Notion content changes to external systems and databases".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+            TemplateAgent {
+                agent_name: "wiki_change_monitor".to_string(),
+                description: "Monitors wiki/documentation changes and notifies relevant team members".to_string(),
+                enabled_by_default: true,
+                config: serde_json::json!({}),
+            },
+        ],
+        estimated_daily_volume: 5000,
+        tags: vec!["productivity".to_string(), "notion".to_string(), "wiki".to_string(), "documentation".to_string()],
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -472,7 +651,7 @@ mod tests {
     #[test]
     fn test_all_templates_count() {
         let templates = all_templates();
-        assert_eq!(templates.len(), 7);
+        assert_eq!(templates.len(), 10);
     }
 
     #[test]
