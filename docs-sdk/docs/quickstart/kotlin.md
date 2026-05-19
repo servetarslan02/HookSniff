@@ -31,7 +31,7 @@ val hs = HookSniff(apiKey = System.getenv("HOOKSNIFF_API_KEY"))
 ## Create an Endpoint
 
 ```kotlin
-val endpoint = hs.endpoints.create(
+val endpoint = hs.endpoint.create(
     url = "https://myapp.com/webhook",
     description = "Order notifications",
     eventTypes = listOf("order.created", "order.updated"),
@@ -44,7 +44,7 @@ println("Signing secret: ${endpoint.secret}")
 ## Send a Webhook
 
 ```kotlin
-val delivery = hs.webhooks.send(
+val delivery = hs.message.create(
     endpointId = endpoint.id,
     event = "order.created",
     data = mapOf(
@@ -85,7 +85,7 @@ post("/webhook") {
 ## List Deliveries
 
 ```kotlin
-val deliveries = hs.webhooks.list(
+val deliveries = hs.message.list(
     endpointId = endpoint.id,
     limit = 20,
 )
@@ -99,7 +99,7 @@ deliveries.data.forEach { dlv ->
 
 ```kotlin
 try {
-    hs.endpoints.get("nonexistent")
+    hs.endpoint.get("nonexistent")
 } catch (e: HttpError) {
     println("HTTP ${e.statusCode}: ${e.message}")
     if (e.statusCode == 429) {

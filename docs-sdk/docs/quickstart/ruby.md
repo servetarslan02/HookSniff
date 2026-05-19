@@ -27,7 +27,7 @@ hs = HookSniff::Client.new(api_key: ENV['HOOKSNIFF_API_KEY'])
 ## Create an Endpoint
 
 ```ruby
-endpoint = hs.endpoints.create(
+endpoint = hs.endpoint.create(
   url: 'https://myapp.com/webhook',
   description: 'Order notifications',
   event_types: ['order.created', 'order.updated'],
@@ -40,7 +40,7 @@ puts "Signing secret: #{endpoint.secret}"
 ## Send a Webhook
 
 ```ruby
-delivery = hs.messages.create(
+delivery = hs.message.create(
   endpoint_id: endpoint.id,
   event: 'order.created',
   data: { order_id: 'ORD-12345', amount: 99.99, currency: 'USD' },
@@ -107,7 +107,7 @@ end
 
 ```ruby
 begin
-  hs.endpoints.get('nonexistent')
+  hs.endpoint.get('nonexistent')
 rescue HookSniff::HttpError => e
   puts "HTTP #{e.status_code}: #{e.message}"
   if e.status_code == 429

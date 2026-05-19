@@ -107,7 +107,7 @@ println!("Delivery ID: {}", delivery.id);`,
     code: `hs = HookSniff::Client.new(api_key: ENV['HOOKSNIFF_API_KEY'])
 
 # 1. Create an endpoint
-endpoint = hs.endpoints.create(
+endpoint = hs.endpoint.create(
   url: 'https://myapp.com/webhook',
   description: 'My first endpoint',
 )
@@ -115,7 +115,7 @@ puts "Endpoint ID: #{endpoint.id}"
 puts "Signing secret: #{endpoint.secret}"
 
 # 2. Send a webhook
-delivery = hs.messages.create(
+delivery = hs.message.create(
   endpoint_id: endpoint.id,
   event: 'order.created',
   data: { order_id: 'ORD-001', amount: 49.99 },
@@ -128,7 +128,7 @@ puts "Status: #{delivery.status}"`,
     code: `HookSniff hs = new HookSniff(System.getenv("HOOKSNIFF_API_KEY"));
 
 // 1. Create an endpoint
-Endpoint endpoint = hs.endpoints().create(
+Endpoint endpoint = hs.endpoint().create(
     CreateEndpointRequest.builder()
         .url("https://myapp.com/webhook")
         .description("My first endpoint")
@@ -152,7 +152,7 @@ System.out.println("Delivery ID: " + delivery.getId());`,
     code: `val hs = HookSniff(apiKey = System.getenv("HOOKSNIFF_API_KEY"))
 
 // 1. Create an endpoint
-val endpoint = hs.endpoints.create(
+val endpoint = hs.endpoint.create(
     url = "https://myapp.com/webhook",
     description = "My first endpoint",
 )
@@ -160,7 +160,7 @@ println("Endpoint ID: \${endpoint.id}")
 println("Signing secret: \${endpoint.secret}")
 
 // 2. Send a webhook
-val delivery = hs.webhooks.send(
+val delivery = hs.message.create(
     endpointId = endpoint.id,
     event = "order.created",
     data = mapOf("order_id" to "ORD-001", "amount" to 49.99),
@@ -236,7 +236,7 @@ IO.puts("Delivery ID: #{delivery.id}")`,
     code: `let hs = HookSniff(apiKey: ProcessInfo.processInfo.environment["HOOKSNIFF_API_KEY"] ?? "")
 
 // 1. Create an endpoint
-let endpoint = try await hs.endpoints.create(
+let endpoint = try await hs.endpoint.create(
     url: "https://myapp.com/webhook",
     description: "My first endpoint"
 )
@@ -244,7 +244,7 @@ print("Endpoint ID: \\(endpoint.id)")
 print("Signing secret: \\(endpoint.secret ?? "")")
 
 // 2. Send a webhook
-let delivery = try await hs.webhooks.send(
+let delivery = try await hs.message.create(
     endpointId: endpoint.id,
     event: "order.created",
     data: ["order_id": "ORD-001", "amount": 49.99]
