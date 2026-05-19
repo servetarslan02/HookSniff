@@ -6,16 +6,14 @@ sidebar_position: 9
 
 ## Installation
 
-### NuGet Package Manager
-
-```powershell
-Install-Package HookSniff.Sdk
+```bash
+dotnet add package HookSniff
 ```
 
-### .NET CLI
+### Package Reference
 
-```bash
-dotnet add package HookSniff.Sdk
+```xml
+<PackageReference Include="HookSniff" Version="1.2.0" />
 ```
 
 ## Setup
@@ -23,109 +21,85 @@ dotnet add package HookSniff.Sdk
 ```csharp
 using HookSniff;
 
-// Initialize client
-var client = new HookSniffClient("hr_live_your_api_key");
-
-// Or with options
-var client = new HookSniffClient("hr_live_your_api_key", new HookSniffOptions
-{
-    BaseUrl = "https://hooksniff-api-1046140057667.europe-west1.run.app",
-    Timeout = TimeSpan.FromSeconds(30),
-});
+var hs = new HookSniffClient(
+    apiKey: Environment.GetEnvironmentVariable("HOOKSNIFF_API_KEY")
+);
 ```
 
-## Endpoints
+## Create an Endpoint
 
 ```csharp
-// List all endpoints
-var endpoints = await client.Endpoints.ListAsync();
-
-// Create an endpoint
-var endpoint = await client.Endpoints.CreateAsync(new EndpointCreateInput
+var endpoint = await hs.Endpoints.CreateAsync(new CreateEndpointRequest
 {
-    Url = "https://example.com/webhook",
-    Description = "My webhook endpoint",
-    RateLimit = 100,
+    Url = "https://myapp.com/webhook",
+    Description = "Order notifications",
+    EventTypes = new[] { "order.created", "order.updated" }
 });
 
-// Get a specific endpoint
-var details = await client.Endpoints.GetAsync(endpoint.Id);
-
-// Update an endpoint
-var updated = await client.Endpoints.UpdateAsync(endpoint.Id, new EndpointUpdateInput
-{
-    Url = "https://new-url.com/webhook",
-});
-
-// Delete an endpoint
-await client.Endpoints.DeleteAsync(endpoint.Id);
-
-// Rotate signing secret
-var key = await client.Endpoints.RotateSecretAsync(endpoint.Id);
+Console.WriteLine($"Endpoint ID: {endpoint.Id}");
+Console.WriteLine($"Signing secret: {endpoint.Secret}");
 ```
 
-## Webhooks
+## Send a Webhook
 
 ```csharp
-// Send a webhook
-var delivery = await client.Webhooks.SendAsync(new WebhookSendInput
+var delivery = await hs.Webhooks.SendAsync(new SendWebhookRequest
 {
     EndpointId = endpoint.Id,
-    EventType = "order.created",
-    Data = new { order_id = "12345", amount = 99.99 },
-});
-
-// List deliveries
-var deliveries = await client.Webhooks.ListAsync(new WebhookListInput
-{
-    Status = "delivered",
-    Page = 1,
-});
-
-// Replay a delivery
-await client.Webhooks.ReplayAsync(delivery.Id);
-
-// Batch send
-var batch = await client.Webhooks.BatchAsync(new WebhookBatchInput
-{
-    EndpointId = endpoint.Id,
-    Events = new[]
+    Event = "order.created",
+    Data = new Dictionary<string, object>
     {
-        new WebhookEvent { EventType = "order.created", Data = new { order_id = "1" } },
-        new WebhookEvent { EventType = "order.created", Data = new { order_id = "2" } },
-    },
+        { "order_id", "ORD-12345" },
+        { "amount", 99.99 },
+        { "currency", "USD" }
+    }
 });
+
+Console.WriteLine($"Delivery ID: {delivery.Id}");
+Console.WriteLine($"Status: {delivery.Status}");
 ```
 
-## Webhook Verification
+## Verify Incoming Webhooks
 
 ```csharp
 using HookSniff;
 
-var webhook = new Webhook("whsec_your_signing_secret");
+var wh = new WebhookVerifier("whsec_your_signing_secret");
 
-// In your endpoint handler
+// ASP.NET controller
 [HttpPost("webhook")]
-public IActionResult HandleWebhook()
+public async Task<IActionResult> HandleWebhook()
 {
     try
     {
         using var reader = new StreamReader(Request.Body);
         var body = await reader.ReadToEndAsync();
-        
-        var payload = webhook.Verify(body, new Dictionary<string, string>
-        {
-            ["webhook-id"] = Request.Headers["webhook-id"],
-            ["webhook-timestamp"] = Request.Headers["webhook-timestamp"],
-            ["webhook-signature"] = Request.Headers["webhook-signature"],
-        });
-        // Payload is verified — process it
+        var payload = wh.Verify(body, Request.Headers);
+
+        Console.WriteLine($"Event: {payload.EventType}");
+        Console.WriteLine($"Data: {payload.Data}");
+
         return Ok();
     }
     catch (SignatureVerificationException)
     {
-        return Unauthorized();
+        return Unauthorized("Invalid signature");
     }
+}
+```
+
+## List Deliveries
+
+```csharp
+var deliveries = await hs.Webhooks.ListAsync(new ListWebhooksRequest
+{
+    EndpointId = endpoint.Id,
+    Limit = 20
+});
+
+foreach (var dlv in deliveries.Data)
+{
+    Console.WriteLine($"{dlv.Id}: {dlv.Status}");
 }
 ```
 
@@ -134,14 +108,19 @@ public IActionResult HandleWebhook()
 ```csharp
 try
 {
-    await client.Endpoints.GetAsync("nonexistent");
+    await hs.Endpoints.GetAsync("nonexistent");
 }
-catch (ApiException e)
+catch (HttpException ex)
 {
-    Console.WriteLine($"API Error {e.StatusCode}: {e.Message}");
+    Console.WriteLine($"HTTP {ex.StatusCode}: {ex.Message}");
+    if (ex.StatusCode == 429)
+    {
+        var retryAfter = ex.Headers["retry-after"];
+        Console.WriteLine($"Retry after {retryAfter} seconds");
+    }
 }
-catch (Exception e)
+catch (ValidationException ex)
 {
-    Console.WriteLine($"Network error: {e.Message}");
+    Console.WriteLine($"Validation failed: {ex.Errors}");
 }
 ```

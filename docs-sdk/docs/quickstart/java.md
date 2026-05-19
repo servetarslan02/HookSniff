@@ -12,117 +12,95 @@ sidebar_position: 6
 <dependency>
     <groupId>io.github.servetarslan02</groupId>
     <artifactId>hooksniff-sdk</artifactId>
-    <version>0.3.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'io.github.servetarslan02:hooksniff-sdk:0.3.0'
+implementation 'io.github.servetarslan02:hooksniff-sdk:1.1.0'
 ```
 
 ## Setup
 
 ```java
-import com.hooksniff.sdk.HookSniff;
+import dev.hooksniff.HookSniff;
 
-// Initialize client
-HookSniff client = new HookSniff("hr_live_your_api_key");
-
-// Or with options
-HookSniff client = new HookSniff("hr_live_your_api_key", 
-    "https://hooksniff-api-1046140057667.europe-west1.run.app", 30000);
+HookSniff hs = new HookSniff(System.getenv("HOOKSNIFF_API_KEY"));
 ```
 
-## Endpoints
+## Create an Endpoint
 
 ```java
-// List all endpoints
-var endpoints = client.endpoints().list();
+import dev.hooksniff.models.*;
 
-// Create an endpoint
-var endpoint = client.endpoints().create(
-    EndpointCreateInput.builder()
-        .url("https://example.com/webhook")
-        .description("My webhook endpoint")
-        .rateLimit(100)
+Endpoint endpoint = hs.endpoints().create(
+    CreateEndpointRequest.builder()
+        .url("https://myapp.com/webhook")
+        .description("Order notifications")
+        .eventTypes(List.of("order.created", "order.updated"))
         .build()
 );
 
-// Get a specific endpoint
-var details = client.endpoints().get(endpoint.getId());
-
-// Update an endpoint
-var updated = client.endpoints().update(endpoint.getId(),
-    EndpointUpdateInput.builder()
-        .url("https://new-url.com/webhook")
-        .build()
-);
-
-// Delete an endpoint
-client.endpoints().delete(endpoint.getId());
-
-// Rotate signing secret
-var key = client.endpoints().rotateSecret(endpoint.getId());
+System.out.println("Endpoint ID: " + endpoint.getId());
+System.out.println("Signing secret: " + endpoint.getSecret());
 ```
 
-## Webhooks
+## Send a Webhook
 
 ```java
-// Send a webhook
-var delivery = client.webhooks().send(
-    WebhookSendInput.builder()
+Delivery delivery = hs.webhooks().send(
+    SendWebhookRequest.builder()
         .endpointId(endpoint.getId())
-        .eventType("order.created")
-        .data(Map.of("order_id", "12345", "amount", 99.99))
-        .build()
-);
-
-// List deliveries
-var deliveries = client.webhooks().list(
-    WebhookListInput.builder().status("delivered").page(1).build()
-);
-
-// Replay a delivery
-client.webhooks().replay(delivery.getId());
-
-// Batch send
-var batch = client.webhooks().batch(
-    WebhookBatchInput.builder()
-        .endpointId(endpoint.getId())
-        .events(List.of(
-            WebhookEvent.builder().eventType("order.created").data(Map.of("order_id", "1")).build(),
-            WebhookEvent.builder().eventType("order.created").data(Map.of("order_id", "2")).build()
+        .event("order.created")
+        .data(Map.of(
+            "order_id", "ORD-12345",
+            "amount", 99.99,
+            "currency", "USD"
         ))
         .build()
 );
+
+System.out.println("Delivery ID: " + delivery.getId());
+System.out.println("Status: " + delivery.getStatus());
 ```
 
-## Webhook Verification
+## Verify Incoming Webhooks
 
 ```java
-import com.hooksniff.sdk.Webhook;
+import dev.hooksniff.Webhook;
 
-Webhook webhook = new Webhook("whsec_your_signing_secret");
+Webhook wh = new Webhook("whsec_your_signing_secret");
 
-// In your handler
+// Spring controller
 @PostMapping("/webhook")
-public ResponseEntity<?> handleWebhook(HttpServletRequest request) {
+public ResponseEntity<String> handleWebhook(
+        @RequestBody String body,
+        @RequestHeader Map<String, String> headers) {
     try {
-        var payload = webhook.verify(
-            request.getReader().lines().collect(Collectors.joining()),
-            Map.of(
-                "webhook-id", request.getHeader("webhook-id"),
-                "webhook-timestamp", request.getHeader("webhook-timestamp"),
-                "webhook-signature", request.getHeader("webhook-signature")
-            )
-        );
-        // Payload is verified — process it
-        return ResponseEntity.ok().build();
-    } catch (SignatureVerificationException e) {
-        return ResponseEntity.status(401).build();
+        WebhookPayload payload = wh.verify(body, headers);
+        System.out.println("Event: " + payload.getEvent());
+        System.out.println("Data: " + payload.getData());
+        return ResponseEntity.ok("OK");
+    } catch (WebhookVerificationException e) {
+        return ResponseEntity.status(401).body("Invalid signature");
     }
+}
+```
+
+## List Deliveries
+
+```java
+DeliveryListResponse deliveries = hs.webhooks().list(
+    ListWebhooksRequest.builder()
+        .endpointId(endpoint.getId())
+        .limit(20)
+        .build()
+);
+
+for (Delivery dlv : deliveries.getData()) {
+    System.out.printf("%s: %s%n", dlv.getId(), dlv.getStatus());
 }
 ```
 
@@ -130,10 +108,14 @@ public ResponseEntity<?> handleWebhook(HttpServletRequest request) {
 
 ```java
 try {
-    client.endpoints().get("nonexistent");
-} catch (ApiException e) {
-    System.err.println("API Error " + e.getStatusCode() + ": " + e.getBody());
-} catch (Exception e) {
-    System.err.println("Network error: " + e.getMessage());
+    hs.endpoints().get("nonexistent");
+} catch (HttpErrorException e) {
+    System.err.println("HTTP " + e.getStatusCode() + ": " + e.getMessage());
+    if (e.getStatusCode() == 429) {
+        String retryAfter = e.getHeaders().get("retry-after");
+        System.err.println("Retry after " + retryAfter + " seconds");
+    }
+} catch (ValidationException e) {
+    System.err.println("Validation failed: " + e.getErrors());
 }
 ```
