@@ -376,6 +376,7 @@ export interface ServiceTokenResponse {
   id: string;
   name: string;
   token_prefix: string;
+  token?: string; // only present on creation
   created_at: string;
   last_used_at: string | null;
 }
