@@ -577,6 +577,7 @@ export type InboundConfigValidated = z.infer<typeof InboundConfigSchema>;
 
 // ── SSO Config Schema ──
 export const SsoConfigSchema = z.object({
+  id: z.string().uuid().optional(),
   provider: z.string().optional(),
   enabled: z.boolean().optional(),
   metadata_url: z.string().optional(),
@@ -586,6 +587,8 @@ export const SsoConfigSchema = z.object({
   issuer_url: z.string().optional(),
   client_id: z.string().optional(),
   client_secret_set: z.boolean().optional(),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
 });
 export type SsoConfigValidated = z.infer<typeof SsoConfigSchema>;
 

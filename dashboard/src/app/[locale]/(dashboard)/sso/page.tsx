@@ -10,7 +10,7 @@ import { useSsoConfig } from '@/hooks/useDashboardData';
 /* ─── SSO/SAML Configuration Page ─── */
 export default function SsoSettingsPage() {
   const t = useTranslations('sso');
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const { toast } = useToast();
   const { data: ssoConfig, isLoading: loading } = useSsoConfig();
 
@@ -21,6 +21,7 @@ export default function SsoSettingsPage() {
   const [certificate, setCertificate] = useState('');
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [enabled, setEnabled] = useState(false);
 
   // Populate form fields when config loads
@@ -31,7 +32,7 @@ export default function SsoSettingsPage() {
       setMetadata(ssoConfig.metadata_url || ssoConfig.issuer_url || '');
       setEntityId(ssoConfig.entity_id || ssoConfig.client_id || '');
       setSsoUrl(ssoConfig.sso_url || '');
-      // certificate_set tells us if one exists, but we don't load it
+      // certificate_set tells us if one exists, but we don't load it for security
     }
   }, [ssoConfig]);
 
@@ -39,10 +40,7 @@ export default function SsoSettingsPage() {
     if (!token) return;
     setSaving(true);
     try {
-      const body: Record<string, unknown> = {
-        provider,
-        enabled,
-      };
+      const body: Record<string, unknown> = { provider, enabled };
       if (provider === 'saml') {
         body.metadata_url = metadata || null;
         body.entity_id = entityId || null;
@@ -68,10 +66,11 @@ export default function SsoSettingsPage() {
     try {
       const { ssoApi } = await import('@/lib/api');
       const result = await ssoApi.testSso(token);
-      if (result.success) {
+      if (result.valid) {
         toast(result.message || t('testSuccess'), 'success');
       } else {
-        toast(result.message || t('testFailed'), 'error');
+        const issues = result.issues ? (Array.isArray(result.issues) ? result.issues.join(', ') : result.issues) : null;
+        toast(issues || result.message || t('testFailed'), 'error');
       }
     } catch (err) {
       toast(err instanceof Error ? err.message : t('testFailed'), 'error');
@@ -79,6 +78,31 @@ export default function SsoSettingsPage() {
       setTesting(false);
     }
   };
+
+  const handleDelete = async () => {
+    if (!token) return;
+    if (!window.confirm(t('deleteConfirm'))) return;
+    setDeleting(true);
+    try {
+      const { ssoApi } = await import('@/lib/api');
+      await ssoApi.deleteSso(token);
+      toast(t('deleted'), 'success');
+      // Reset form
+      setEnabled(false);
+      setMetadata('');
+      setEntityId('');
+      setSsoUrl('');
+      setCertificate('');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : t('deleteFailed'), 'error');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const ssoLoginUrl = user?.email
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/v1/sso/login?email=${encodeURIComponent(user.email)}`
+    : null;
 
   if (loading) {
     return (
@@ -91,13 +115,13 @@ export default function SsoSettingsPage() {
     );
   }
 
+  const hasConfig = ssoConfig?.provider;
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-        <p className="text-gray-500 dark:text-slate-400 mt-1">
-          {t('subtitle')}
-        </p>
+        <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Provider Selection */}
@@ -168,12 +192,17 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label htmlFor="sso-certificate" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('x509Certificate')}</label>
+              <label htmlFor="sso-certificate" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                {t('x509Certificate')}
+                {ssoConfig?.certificate_set && (
+                  <span className="ml-2 text-emerald-600 dark:text-emerald-400 text-xs">✓ {t('certificateSet')}</span>
+                )}
+              </label>
               <textarea
                 id="sso-certificate"
                 value={certificate}
                 onChange={(e) => setCertificate(e.target.value)}
-                placeholder="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
+                placeholder={ssoConfig?.certificate_set ? '•••••••• (leave empty to keep existing certificate)' : '-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'}
                 rows={4}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
               />
@@ -210,14 +239,19 @@ export default function SsoSettingsPage() {
               />
             </div>
             <div>
-              <label htmlFor="sso-client-secret" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('clientSecret')}</label>
+              <label htmlFor="sso-client-secret" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                {t('clientSecret')}
+                {ssoConfig?.client_secret_set && (
+                  <span className="ml-2 text-emerald-600 dark:text-emerald-400 text-xs">✓ {t('clientSecretSet')}</span>
+                )}
+              </label>
               <input
                 id="sso-client-secret"
                 type="password"
                 autoComplete="off"
                 value={certificate}
                 onChange={(e) => setCertificate(e.target.value)}
-                placeholder="your-client-secret"
+                placeholder={ssoConfig?.client_secret_set ? '•••••••• (leave empty to keep existing secret)' : 'your-client-secret'}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
               />
             </div>
@@ -225,7 +259,7 @@ export default function SsoSettingsPage() {
         </div>
       )}
 
-      {/* Enable/Save */}
+      {/* Enable/Save/Test */}
       {provider && (
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
@@ -238,7 +272,7 @@ export default function SsoSettingsPage() {
               <div className="w-11 h-6 bg-gray-300 dark:bg-slate-600 peer-focus:ring-2 peer-focus:ring-brand-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600" />
             </label>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             <button type="button"
               onClick={handleSave}
               disabled={saving}
@@ -248,10 +282,40 @@ export default function SsoSettingsPage() {
             </button>
             <button type="button"
               onClick={handleTest}
-              disabled={testing}
+              disabled={testing || !hasConfig}
               className="px-6 py-3 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition disabled:opacity-50"
             >
               {testing ? t('testing') : t('testConnection')}
+            </button>
+            {hasConfig && (
+              <button type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition disabled:opacity-50"
+              >
+                {deleting ? '...' : t('deleteConfig')}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* SSO Login URL */}
+      {hasConfig?.enabled && ssoLoginUrl && (
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('ssoLoginUrl')}</h2>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mb-3">{t('ssoLoginUrlDesc')}</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 px-4 py-3 bg-gray-100 dark:bg-slate-800 rounded-xl text-sm font-mono text-gray-800 dark:text-slate-200 break-all">
+              {ssoLoginUrl}
+            </code>
+            <button
+              type="button"
+              onClick={() => { navigator.clipboard.writeText(ssoLoginUrl); toast('Copied!', 'success'); }}
+              className="px-4 py-3 bg-gray-200 dark:bg-slate-700 rounded-xl hover:bg-gray-300 dark:hover:bg-slate-600 transition"
+              title="Copy"
+            >
+              📋
             </button>
           </div>
         </div>
