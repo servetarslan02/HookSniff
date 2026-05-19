@@ -186,7 +186,7 @@ pub async fn run_alert_evaluation(pool: &PgPool, email_client: &ResendEmailClien
 // ── Stat evaluation helpers ──────────────────────────────────────
 
 /// Calculate failure rate (0-100) for a customer's deliveries in the last N minutes.
-async fn evaluate_failure_rate(pool: PgPool, customer_id: Uuid, window_minutes: i64) -> Result<f64> {
+async fn evaluate_failure_rate(pool: &PgPool, customer_id: Uuid, window_minutes: i64) -> Result<f64> {
     let stats: (i64, i64) = sqlx::query_as(
         "SELECT \
             COUNT(*) as total, \
@@ -208,7 +208,7 @@ async fn evaluate_failure_rate(pool: PgPool, customer_id: Uuid, window_minutes: 
 }
 
 /// Calculate average latency (ms) for a customer's deliveries in the last N minutes.
-async fn evaluate_latency(pool: PgPool, customer_id: Uuid, window_minutes: i64) -> Result<f64> {
+async fn evaluate_latency(pool: &PgPool, customer_id: Uuid, window_minutes: i64) -> Result<f64> {
     let avg: Option<f64> = sqlx::query_scalar(
         "SELECT AVG(duration_ms)::DOUBLE PRECISION \
          FROM delivery_attempts da \
@@ -226,7 +226,7 @@ async fn evaluate_latency(pool: PgPool, customer_id: Uuid, window_minutes: i64) 
 }
 
 /// Get max consecutive failures across all endpoints for a customer.
-async fn evaluate_consecutive_failures(pool: PgPool, customer_id: Uuid) -> Result<f64> {
+async fn evaluate_consecutive_failures(pool: &PgPool, customer_id: Uuid) -> Result<f64> {
     let max_streak: Option<i32> = sqlx::query_scalar(
         "SELECT MAX(failure_streak) FROM endpoints WHERE customer_id = $1 AND is_active = true"
     )
@@ -284,7 +284,7 @@ async fn send_alert_email(
         ),
     };
 
-    email_client.send_contact_email(to, &subject, &html).await
+    email_client.send_contact_email(to, &subject, &html).await.map_err(|e| anyhow::anyhow!("{}", e))
 }
 
 /// Send alert to Slack via incoming webhook.
