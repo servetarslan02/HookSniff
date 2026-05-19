@@ -369,7 +369,8 @@
     "clearSelection": "✕ Temizle",
     "viewDetails": "Detayları Gör",
     "replayConfirm": "{id}… teslimatı aynı endpoint'e tekrar oynatılsın mı?",
-    "selectAll": "Tümünü seç"
+    "selectAll": "Tümünü seç",
+    "replayFailed": "Teslimat tekrar oynatılamadı. Lütfen tekrar deneyin."
   },
   "logs": {
     "title": "Webhook Logları",
@@ -383,7 +384,11 @@
     "endpoint": "Endpoint'ler",
     "status": "Durum",
     "attempts": "Deneme",
-    "created": "Oluşturuldu"
+    "created": "Oluşturuldu",
+    "deliveryId": "Teslimat ID",
+    "httpResponse": "HTTP Yanıt",
+    "attempt": "Deneme",
+    "deliveryAttempts": "Teslimat Denemeleri"
   },
   "search": {
     "title": "Webhook Arama",
