@@ -520,7 +520,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(qstash_client))
         .layer(axum::Extension(r2_client))
         .layer(axum::Extension({
-            let mut sso_store = sso::SsoStateStore::new();
+            let mut sso_store = routes::sso::SsoStateStore::new();
             if let Some(url) = config::resolve_redis_url() {
                 match redis::Client::open(url.as_str()) {
                     Ok(client) => match redis::aio::ConnectionManager::new(client).await {

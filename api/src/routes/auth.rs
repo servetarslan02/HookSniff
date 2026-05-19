@@ -232,7 +232,7 @@ async fn register(
                 }
             });
         },
-    );
+    ).await;
 
     send_verification_email_for_customer(&pool, &cfg, &email_provider, job_queue.as_ref(), customer.id, &req.email, lang).await;
 
@@ -453,7 +453,7 @@ async fn forgot_password(
                     }
                 });
             },
-        );
+        ).await;
 
         tracing::info!("📧 Password reset email sent to: {}", email);
     }
@@ -870,7 +870,7 @@ async fn send_verification_email_for_customer(
                 }
             });
         },
-    );
+    ).await;
 }
 
 // ════════════════════════════════════════════════════════
@@ -951,13 +951,12 @@ async fn request_email_change(
         }, lang,
         move |ep, to, lang| {
             tokio::spawn(async move {
-                // Use a simple text email for the code
                 if let Err(e) = ep.send_verification_email(&to, &format!("Your verification code is: {}", code_clone), lang).await {
                     tracing::warn!("Failed to send email change code to {}: {:?}", to, e);
                 }
             });
         },
-    );
+    ).await;
 
     tracing::info!("📧 Email change code sent for customer {} to {}", customer.id, &email_clone);
     Ok(Json(serde_json::json!({
