@@ -4,8 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
-import { notificationsApi, teamsApi, type Notification } from '@/lib/api';
-import { AlertTriangle, Bell, Circle, CreditCard, Users } from 'lucide-react';
+import { notificationsApi, broadcastsApi, teamsApi, type Notification, type UserBroadcast } from '@/lib/api';
+import { AlertTriangle, Bell, Circle, CreditCard, Users, Megaphone, Wrench, Sparkles, Radio, XCircle } from 'lucide-react';
 
 export function NotificationCenter() {
   const t = useTranslations('nav');
@@ -13,19 +13,25 @@ export function NotificationCenter() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [broadcasts, setBroadcasts] = useState<UserBroadcast[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [broadcastCount, setBroadcastCount] = useState(0);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchNotifications = useCallback(async () => {
     if (!token) return;
     try {
-      const [notifData, countData] = await Promise.all([
+      const [notifData, countData, broadcastData, broadcastCountData] = await Promise.all([
         notificationsApi.list(token, { page: 1 }).catch(() => null),
         notificationsApi.getUnreadCount(token).catch(() => null),
+        broadcastsApi.listActive(token).catch(() => null),
+        broadcastsApi.getUnreadCount(token).catch(() => null),
       ]);
       if (notifData) setNotifications(notifData.notifications || []);
       if (countData) setUnreadCount(countData.unread_count || 0);
+      if (broadcastData) setBroadcasts(broadcastData || []);
+      if (broadcastCountData) setBroadcastCount(broadcastCountData.unread_count || 0);
     } catch {
       // Silently fail - notifications are non-critical
     }
@@ -110,6 +116,32 @@ export function NotificationCenter() {
     }
   };
 
+  const handleDismissBroadcast = async (id: string) => {
+    if (!token) return;
+    try {
+      await broadcastsApi.dismiss(token, id);
+      setBroadcasts((prev) => prev.filter((b) => b.id !== id));
+      setBroadcastCount((c) => Math.max(0, c - 1));
+    } catch {
+      // ignore
+    }
+  };
+
+  const totalCount = unreadCount + broadcastCount;
+
+  const broadcastTypeIcons: Record<string, React.ReactNode> = {
+    maintenance: <Wrench size={16} strokeWidth={1.75} className="text-amber-500" />,
+    feature: <Sparkles size={16} strokeWidth={1.75} className="text-emerald-500" />,
+    announcement: <Radio size={16} strokeWidth={1.75} className="text-blue-500" />,
+    incident: <XCircle size={16} strokeWidth={1.75} className="text-red-500" />,
+  };
+
+  const severityColors: Record<string, string> = {
+    info: 'border-l-blue-500',
+    warning: 'border-l-amber-500',
+    critical: 'border-l-red-500',
+  };
+
   const typeIcons: Record<string, React.ReactNode> = {
     webhook_failed: <Circle size={16} strokeWidth={1.75} />,
     alert: <AlertTriangle size={16} strokeWidth={1.75} />,
@@ -133,9 +165,9 @@ export function NotificationCenter() {
             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
           />
         </svg>
-        {unreadCount > 0 && (
+        {totalCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {totalCount > 9 ? '9+' : totalCount}
           </span>
         )}
       </button>
@@ -154,7 +186,53 @@ export function NotificationCenter() {
             )}
           </div>
           <div className="max-h-80 overflow-y-auto">
-            {notifications.length === 0 ? (
+            {/* Broadcasts first */}
+            {broadcasts.map((b) => (
+              <div
+                key={`b-${b.id}`}
+                className={`px-4 py-3 border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition border-l-3 ${severityColors[b.severity] || 'border-l-blue-500'} cursor-pointer`}
+                onClick={() => {
+                  handleDismissBroadcast(b.id);
+                  if (b.link) router.push(b.link);
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5">
+                    {broadcastTypeIcons[b.broadcast_type] || <Megaphone size={16} strokeWidth={1.75} className="text-blue-500" />}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-slate-500">
+                        {b.broadcast_type}
+                      </span>
+                      {b.severity === 'critical' && (
+                        <span className="px-1.5 py-0.5 text-[10px] font-bold bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 rounded">
+                          URGENT
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">
+                      {b.title}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5 line-clamp-2">
+                      {b.message}
+                    </p>
+                    {b.link_text && (
+                      <p className="text-xs text-brand-600 dark:text-brand-400 mt-1 font-medium">
+                        → {b.link_text}
+                      </p>
+                    )}
+                    <p className="text-[11px] text-gray-500 dark:text-slate-600 mt-1">
+                      {new Date(b.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                  <Megaphone size={14} strokeWidth={1.75} className="text-gray-300 dark:text-slate-600 shrink-0 mt-1" />
+                </div>
+              </div>
+            ))}
+
+            {/* Notifications */}
+            {notifications.length === 0 && broadcasts.length === 0 ? (
               <div className="p-6 text-center text-gray-500 dark:text-slate-500 text-sm">
                 {t('noNotifications') || 'No notifications'}
               </div>

@@ -1709,7 +1709,8 @@
       "activityLog": "Aktivite Günlüğü",
       "featureFlags": "Feature Flags",
       "alerts": "Uyarılar",
-      "email": "E-posta"
+      "email": "E-posta",
+      "broadcasts": "Duyurular"
     },
     "noActivity": "Henüz aktivite kaydı yok",
     "noAdminPrivileges": "Yönetici yetkiniz yok.",
@@ -1927,6 +1928,15 @@
     "bulkEmailConfirmCancel": "İptal",
     "emailSent": "E-posta başarıyla gönderildi",
     "emailSendFailed": "E-posta gönderilemedi",
+
+    "broadcasts": "Duyurular",
+    "broadcastsDesc": "Tüm kullanıcılara global duyuru gönder. Bildirim çanında ve dashboard banner'ında gösterilir.",
+    "newBroadcast": "Yeni Duyuru",
+    "createBroadcast": "Duyuru Oluştur",
+    "editBroadcast": "Duyuruyu Düzenle",
+    "broadcastCreated": "Duyuru başarıyla oluşturuldu",
+    "broadcastUpdated": "Duyuru başarıyla güncellendi",
+    "broadcastDeleted": "Duyuru silindi",
     "invalidAmount": "Geçersiz iade tutarı",
     "refundSuccess": "İade işlendi. Kullanıcı Ücretsiz plana düşürüldü.",
     "refundFailed": "İade başarısız",
