@@ -1,5 +1,6 @@
-import { Check, Repeat, SkipForward, X } from 'lucide-react';
 'use client';
+
+import { Check, Repeat, SkipForward, X } from 'lucide-react';
 
 interface StatusBadgeProps {
   status: string;

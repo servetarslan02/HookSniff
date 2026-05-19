@@ -1,5 +1,6 @@
-import { Ban, CheckCircle2, ClipboardList, X } from 'lucide-react';
 'use client';
+
+import { Ban, CheckCircle2, ClipboardList, X } from 'lucide-react';
 
 interface PlanOption {
   value: string;

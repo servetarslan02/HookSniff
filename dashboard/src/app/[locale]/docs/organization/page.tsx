@@ -107,9 +107,9 @@ export default async function OrganizationDocsPage() {
                 ].map(({ action, admin, editor, viewer }) => (
                   <tr key={action}>
                     <td className="px-4 py-3 text-gray-900 dark:text-white">{action}</td>
-                    <td className="px-4 py-3 text-center">{admin ? <Check size={14} strokeWidth={1.75} className=\"text-emerald-500\" /> : <X size={14} strokeWidth={1.75} className=\"text-red-500\" />}</td>
-                    <td className="px-4 py-3 text-center">{editor ? <Check size={14} strokeWidth={1.75} className=\"text-emerald-500\" /> : <X size={14} strokeWidth={1.75} className=\"text-red-500\" />}</td>
-                    <td className="px-4 py-3 text-center">{viewer ? <Check size={14} strokeWidth={1.75} className=\"text-emerald-500\" /> : <X size={14} strokeWidth={1.75} className=\"text-red-500\" />}</td>
+                    <td className="px-4 py-3 text-center">{admin ? <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> : <X size={14} strokeWidth={1.75} className="text-red-500" />}</td>
+                    <td className="px-4 py-3 text-center">{editor ? <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> : <X size={14} strokeWidth={1.75} className="text-red-500" />}</td>
+                    <td className="px-4 py-3 text-center">{viewer ? <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> : <X size={14} strokeWidth={1.75} className="text-red-500" />}</td>
                   </tr>
                 ))}
               </tbody>
