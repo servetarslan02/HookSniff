@@ -78,7 +78,7 @@ export default async function InboundWebhooksPage() {
               <tr><td className="px-4 py-3 font-medium">Stripe</td><td className="px-4 py-3 font-mono text-sm">stripe-signature</td><td className="px-4 py-3">✅</td></tr>
               <tr><td className="px-4 py-3 font-medium">GitHub</td><td className="px-4 py-3 font-mono text-sm">x-hub-signature-256</td><td className="px-4 py-3">✅</td></tr>
               <tr><td className="px-4 py-3 font-medium">Shopify</td><td className="px-4 py-3 font-mono text-sm">x-shopify-hmac-sha256</td><td className="px-4 py-3">✅</td></tr>
-              <tr><td className="px-4 py-3 font-medium">Custom</td><td className="px-4 py-3 font-mono text-sm">Configurable</td><td className="px-4 py-3">—</td></tr>
+              <tr><td className="px-4 py-3 font-medium">Custom</td><td className="px-4 py-3 font-mono text-sm">{t('configurable')}</td><td className="px-4 py-3">—</td></tr>
             </tbody>
           </table></div>
         </div>
