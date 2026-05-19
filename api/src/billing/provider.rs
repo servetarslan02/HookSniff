@@ -55,12 +55,16 @@ pub enum WebhookResult {
         plan: Plan,
         provider_customer_id: Option<String>,
         provider_subscription_id: Option<String>,
+        /// Billing interval: "month" or "year"
+        interval: String,
     },
     /// Subscription updated (plan change, renewal).
     SubscriptionUpdated {
         provider_subscription_id: String,
         plan: Plan,
         status: String,
+        /// Billing interval: "month" or "year"
+        interval: String,
     },
     /// Subscription canceled.
     SubscriptionCanceled { provider_subscription_id: String },
@@ -223,6 +227,7 @@ mod tests {
             plan: Plan::Pro,
             provider_customer_id: Some("cust_123".to_string()),
             provider_subscription_id: Some("sub_456".to_string()),
+            interval: "month".to_string(),
         };
         match result {
             WebhookResult::SubscriptionCreated {
@@ -230,11 +235,31 @@ mod tests {
                 plan,
                 provider_customer_id,
                 provider_subscription_id,
+                interval,
             } => {
                 assert_eq!(cid, customer_id);
                 assert_eq!(plan, Plan::Pro);
                 assert_eq!(provider_customer_id.as_deref(), Some("cust_123"));
                 assert_eq!(provider_subscription_id.as_deref(), Some("sub_456"));
+                assert_eq!(interval, "month");
+            }
+            _ => panic!("Expected SubscriptionCreated"),
+        }
+    }
+
+    #[test]
+    fn webhook_result_subscription_created_yearly() {
+        let customer_id = Uuid::new_v4();
+        let result = WebhookResult::SubscriptionCreated {
+            customer_id,
+            plan: Plan::Pro,
+            provider_customer_id: Some("cust_123".to_string()),
+            provider_subscription_id: Some("sub_456".to_string()),
+            interval: "year".to_string(),
+        };
+        match result {
+            WebhookResult::SubscriptionCreated { interval, .. } => {
+                assert_eq!(interval, "year");
             }
             _ => panic!("Expected SubscriptionCreated"),
         }
@@ -247,6 +272,7 @@ mod tests {
             plan: Plan::Developer,
             provider_customer_id: None,
             provider_subscription_id: None,
+            interval: "month".to_string(),
         };
         match result {
             WebhookResult::SubscriptionCreated {
@@ -267,16 +293,19 @@ mod tests {
             provider_subscription_id: "sub_789".to_string(),
             plan: Plan::Enterprise,
             status: "active".to_string(),
+            interval: "month".to_string(),
         };
         match result {
             WebhookResult::SubscriptionUpdated {
                 provider_subscription_id,
                 plan,
                 status,
+                interval,
             } => {
                 assert_eq!(provider_subscription_id, "sub_789");
                 assert_eq!(plan, Plan::Enterprise);
                 assert_eq!(status, "active");
+                assert_eq!(interval, "month");
             }
             _ => panic!("Expected SubscriptionUpdated"),
         }
