@@ -228,10 +228,23 @@
 
 ### Adım 1.6 — Retention
 ```
-□ api/src/jobs/retention.rs'ye ekle:
-  - 7 günden eski delivery_signals sil
-  - 90 günden eski hourly_stats sil
-□ Git commit
+□ api/src/jobs/retention.rs'de, run_retention() fonksiyonuna ekle:
+
+  // Cortex: 7 günden eski delivery_signals temizle
+  let r = sqlx::query("DELETE FROM delivery_signals WHERE created_at < NOW() - INTERVAL '7 days'")
+      .execute(pool).await?;
+  if r.rows_affected() > 0 {
+      tracing::info!("🧹 Cleaned {} old delivery_signals", r.rows_affected());
+  }
+
+  // Cortex: 90 günden eski hourly_stats temizle
+  let r = sqlx::query("DELETE FROM endpoint_hourly_stats WHERE hour_start < NOW() - INTERVAL '90 days'")
+      .execute(pool).await?;
+  if r.rows_affected() > 0 {
+      tracing::info!("🧹 Cleaned {} old hourly_stats", r.rows_affected());
+  }
+
+□ Git commit: "feat(cortex): retention for delivery_signals + hourly_stats"
 ```
 
 ### Adım 1.7 — Test
@@ -359,8 +372,21 @@
 
 ### Adım 2.3 — Güncelleme Job'u
 ```
-□ api/src/main.rs'de: her 15 dakikada update_all_profiles() çağır
-□ Git commit
+□ api/src/main.rs'de, mevcut job'ların yanına ekle:
+
+  // Cortex: Profile güncelleme (her 15 dakika)
+  let profile_pool = pool.clone();
+  tokio::spawn(async move {
+      loop {
+          tokio::time::sleep(std::time::Duration::from_secs(900)).await;
+          match hooksniff_api::cortex::profile_engine::update_all_profiles(&profile_pool).await {
+              Ok(n) => tracing::info!("📊 Cortex: Updated {} profiles", n),
+              Err(e) => tracing::error!("❌ Profile update failed: {:?}", e),
+          }
+      }
+  });
+
+□ Git commit: "feat(cortex): profile update job every 15 minutes"
 ```
 
 ### Adım 2.4 — Test
@@ -479,8 +505,33 @@
 
 ### Adım 3.3 — Entegrasyon
 ```
-□ signal_collector.rs'de collect_signal() sonrası score() çağır
-□ Git commit
+□ api/src/cortex/signal_collector.rs'de, collect_signal() fonksiyonunun SONUNA ekle:
+
+  // Anomaly scoring
+  let profile = sqlx::query_as::<_, (i32, i32, Option<String>)>(
+      "SELECT latency_p95, latency_p99, dominant_error_type FROM endpoint_profiles WHERE endpoint_id = $1"
+  )
+  .bind(endpoint_id)
+  .fetch_optional(pool)
+  .await
+  .unwrap_or(None);
+
+  if let Some((p95, p99, dom_error)) = profile {
+      let anomaly = super::anomaly_scorer::score(
+          latency_ms, p95, p99,
+          error_category, dom_error.as_deref(),
+          0.0, 0.0, attempt_number,
+      );
+      let _ = sqlx::query(
+          "INSERT INTO anomaly_scores (delivery_id, endpoint_id, score, factors, category)
+           VALUES ($1, $2, $3, $4, $5)"
+      )
+      .bind(delivery_id).bind(endpoint_id)
+      .bind(anomaly.score).bind(&anomaly.factors).bind(&anomaly.category)
+      .execute(pool).await;
+  }
+
+□ Git commit: "feat(cortex): integrate anomaly scorer with signal collector"
 ```
 
 ### Adım 3.4 — Test
@@ -587,18 +638,60 @@
 
 ### Adım 4.3 — Adaptive Circuit Breaker
 ```
-□ api/src/circuit_breaker.rs'yi güncelle:
-  - Sabit eşik (5) yerine profile-based eşik
-  - Eşik = max(3, endpoint'in normal failure_streak * 1.5)
-□ Git commit
+□ api/src/circuit_breaker.rs'de, record_failure() fonksiyonunu güncelle:
+
+  // Eski (sabit eşik):
+  // if circuit.consecutive_failures >= self.config.failure_threshold {
+
+  // Yeni (profile-based eşik):
+  let threshold = get_adaptive_threshold(pool, endpoint_id).await
+      .unwrap_or(self.config.failure_threshold);
+  if circuit.consecutive_failures >= threshold {
+
+  // Dosyanın sonuna ekle:
+  async fn get_adaptive_threshold(pool: &PgPool, endpoint_id: Uuid) -> Option<u32> {
+      let profile = sqlx::query_as::<_, (i32,)>(
+          "SELECT COALESCE(sample_size, 0) FROM endpoint_profiles WHERE endpoint_id = $1"
+      )
+      .bind(endpoint_id)
+      .fetch_optional(pool)
+      .await
+      .ok()??;
+
+      if profile.0 > 100 {
+          // Yeterli veri var, profile-based eşik kullan
+          Some(3) // Düşük eşik (daha agresif)
+      } else {
+          None // Varsayılan eşik kullan
+      }
+  }
+
+□ Git commit: "feat(cortex): adaptive circuit breaker from profiles"
 ```
 
 ### Adım 4.4 — Alert Evaluation Geliştir
 ```
-□ api/src/jobs/alert_eval.rs'yi güncelle:
-  - Sabit eşikler yerine profile-based eşikler
-  - endpoint_profiles'dan normal latency'yi al
-□ Git commit
+□ api/src/jobs/alert_eval.rs'de, her rule değerlendirilirken ekle:
+
+  // Eski (sabit eşik):
+  // if actual_value > rule.threshold { alert }
+
+  // Yeni (profile-based eşik):
+  let profile_threshold = sqlx::query_as::<_, (i32,)>(
+      "SELECT COALESCE(p95_latency_ms, $2) FROM endpoint_profiles WHERE endpoint_id = $1"
+  )
+  .bind(endpoint_id)
+  .bind(rule.threshold as i32)
+  .fetch_optional(pool)
+  .await
+  .unwrap_or(None)
+  .map(|r| r.0 as f64)
+  .unwrap_or(rule.threshold as f64);
+
+  // Eşik: profile-based (p95'in 1.5 katı) veya sabit eşik (hangisi büyükse)
+  let effective_threshold = profile_threshold.max(rule.threshold as f64);
+
+□ Git commit: "feat(cortex): profile-based alert evaluation"
 ```
 
 ### Adım 4.5 — Test
@@ -713,10 +806,31 @@
 
 ### Adım 5.3 — Proactive Alerting
 ```
-□ alert_eval.rs'ye ekle:
-  - failure_probability > 0.7 → "Bu endpoint 2 saat içinde fail olabilir"
-  - capacity_forecast → "12 gün sonra limit aşılacak"
-□ Git commit
+□ api/src/jobs/alert_eval.rs'de, run_alert_evaluation() fonksiyonunun SONUNA ekle:
+
+  // Cortex: Proactive failure prediction
+  let endpoints: Vec<(Uuid,)> = sqlx::query_as(
+      "SELECT DISTINCT endpoint_id FROM endpoint_hourly_stats WHERE hour_start > NOW() - INTERVAL '3 hours'"
+  )
+  .fetch_all(pool).await.unwrap_or_default();
+
+  for (endpoint_id,) in endpoints {
+      let probability = hooksniff_api::cortex::predictive_engine::predict_failure(pool, endpoint_id)
+          .await.unwrap_or(0.0);
+      if probability > 0.7 {
+          tracing::warn!("⚠️ Endpoint {} failure probability: {:.0}%", endpoint_id, probability * 100.0);
+          // In-app notification oluştur
+          let _ = sqlx::query(
+              "INSERT INTO notifications (customer_id, type, title, body)
+               SELECT customer_id, 'warning', 'Endpoint Failure Risk',
+                      'Endpoint has a high failure probability. Check your server.'
+               FROM endpoints WHERE id = $1"
+          )
+          .bind(endpoint_id).execute(pool).await;
+      }
+  }
+
+□ Git commit: "feat(cortex): proactive alerting from predictions"
 ```
 
 ### Adım 5.4 — Test
@@ -900,17 +1014,95 @@
 
 ### Adım 6.3 — Haftalık Rapor Job'u
 ```
-□ api/src/main.rs'de: her Pazartesi 09:00'da rapor oluştur + email gönder
-□ Git commit
+□ api/src/main.rs'de, mevcut job'ların yanına ekle:
+
+  // Cortex: Haftalık rapor (her Pazartesi 09:00)
+  let report_pool = pool.clone();
+  let report_email = email_client.clone();
+  tokio::spawn(async move {
+      loop {
+          // Bir sonraki Pazartesi 09:00'a kadar bekle
+          let now = chrono::Utc::now();
+          let days_until_monday = (8 - now.weekday().num_days_from_monday() % 7) % 7;
+          let next_monday = (now + chrono::Duration::days(days_until_monday as i64))
+              .with_hour(9).unwrap().with_minute(0).unwrap().with_second(0).unwrap();
+          let wait = (next_monday - now).num_milliseconds().max(0) as u64;
+          tokio::time::sleep(std::time::Duration::from_millis(wait)).await;
+
+          // Tüm müşteriler için rapor oluştur
+          let customers: Vec<(Uuid,)> = sqlx::query_as(
+              "SELECT DISTINCT customer_id FROM endpoints WHERE is_active = true"
+          )
+          .fetch_all(&report_pool).await.unwrap_or_default();
+
+          for (customer_id,) in customers {
+              let _ = hooksniff_api::cortex::insights_engine::generate_weekly_report(
+                  &report_pool, customer_id
+              ).await;
+              let _ = hooksniff_api::cortex::insights_engine::calculate_customer_health(
+                  &report_pool, customer_id
+              ).await;
+          }
+          tracing::info!("📊 Cortex: Weekly reports generated for {} customers", customers.len());
+      }
+  });
+
+□ Git commit: "feat(cortex): weekly report job every Monday 09:00"
 ```
 
 ### Adım 6.4 — Dashboard Sayfası
 ```
-□ dashboard/src/app/[locale]/(dashboard)/insights/page.tsx
-  - Customer health score
-  - Recommendations listesi
-  - Haftalık rapor geçmişi
-□ Git commit
+□ Dosya oluştur: dashboard/src/app/[locale]/(dashboard)/insights/page.tsx
+
+İçerik (basit başla, sonra geliştir):
+
+  "use client";
+  import { useState, useEffect } from "react";
+
+  export default function InsightsPage() {
+      const [health, setHealth] = useState<any>(null);
+      const [reports, setReports] = useState<any[]>([]);
+
+      useEffect(() => {
+          fetch("/api/v1/insights/health").then(r => r.json()).then(setHealth);
+          fetch("/api/v1/insights/reports").then(r => r.json()).then(setReports);
+      }, []);
+
+      return (
+          <div className="p-6">
+              <h1 className="text-2xl font-bold mb-6">Insights</h1>
+
+              {/* Customer Health */}
+              {health && (
+                  <div className="bg-white rounded-lg p-4 mb-6 shadow">
+                      <h2 className="text-lg font-semibold mb-2">Health Score</h2>
+                      <div className="text-4xl font-bold">{health.health_score}/100</div>
+                      <div className="text-sm text-gray-500">Grade: {health.health_grade}</div>
+                      <div className="text-sm text-gray-500">Churn Risk: {(health.churn_risk * 100).toFixed(0)}%</div>
+                  </div>
+              )}
+
+              {/* Weekly Reports */}
+              <div className="bg-white rounded-lg p-4 shadow">
+                  <h2 className="text-lg font-semibold mb-2">Weekly Reports</h2>
+                  {reports.map((r: any, i: number) => (
+                      <div key={i} className="border-b py-2">
+                          <div className="font-medium">{r.week_start} — {r.week_end}</div>
+                          <div className="text-sm text-gray-500">
+                              {r.total_deliveries} deliveries, {r.success_rate?.toFixed(1)}% success
+                          </div>
+                      </div>
+                  ))}
+              </div>
+          </div>
+      );
+  }
+
+□ API route ekle: api/src/routes/insights.rs
+  - GET /v1/insights/health → customer_health tablosundan oku
+  - GET /v1/insights/reports → weekly_reports tablosundan oku
+
+□ Git commit: "feat(cortex): insights dashboard page + API routes"
 ```
 
 ### Adım 6.5 — Test
@@ -1022,8 +1214,25 @@
 
 ### Adım 7.3 — Worker Entegrasyonu
 ```
-□ worker/src/delivery/http.rs'de fallback URL varsa choose_url() çağır
-□ Git commit
+□ worker/src/delivery/http.rs'de, delivery URL'i belirlenirken ekle:
+
+  // Eski:
+  // let url = endpoint.url;
+
+  // Yeni (fallback URL varsa akıllı seçim):
+  let url = if let Some(ref fallbacks) = endpoint.fallback_urls {
+      if !fallbacks.is_empty() {
+          hooksniff_api::cortex::smart_routing::choose_url(
+              &pool, endpoint.id, &endpoint.url, fallbacks
+          ).await
+      } else {
+          endpoint.url.clone()
+      }
+  } else {
+      endpoint.url.clone()
+  };
+
+□ Git commit: "feat(cortex): integrate smart routing with worker"
 ```
 
 ### Adım 7.4 — Test
