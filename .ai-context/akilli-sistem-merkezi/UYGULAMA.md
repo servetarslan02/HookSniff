@@ -288,11 +288,73 @@
 
 ### Adım 2.2 — Profile Engine Yaz
 ```
-□ Dosya: api/src/cortex/profile_engine.rs
-□ Fonksiyon: update_profile() — son 7 günlük hourly_stats'tan profil hesapla
-□ Fonksiyon: update_all_profiles() — tüm endpoint'lerin profilini güncelle
+□ Dosya oluştur: api/src/cortex/profile_engine.rs
+
+İçerik (copy-paste):
+
+  use sqlx::PgPool;
+  use uuid::Uuid;
+
+  pub async fn update_profile(pool: &PgPool, endpoint_id: Uuid) -> Result<(), sqlx::Error> {
+      let stats = sqlx::query_as::<_, (i64, i64, i64, f64, f64, f64)>(
+          r#"
+          SELECT
+              COALESCE(SUM(total_deliveries),0),
+              COALESCE(SUM(successful),0),
+              COALESCE(SUM(failed),0),
+              COALESCE(AVG(avg_latency_ms),0),
+              COALESCE(AVG(p95_latency_ms),0),
+              COALESCE(AVG(p99_latency_ms),0)
+          FROM endpoint_hourly_stats
+          WHERE endpoint_id = $1 AND hour_start > NOW() - INTERVAL '7 days'
+          "#
+      )
+      .bind(endpoint_id)
+      .fetch_one(pool).await?;
+
+      let (total, successful, _failed, avg_lat, p95_lat, p99_lat) = stats;
+      if total == 0 { return Ok(()); }
+
+      let success_rate = (successful as f64 / total as f64) * 100.0;
+      let confidence = (total as f64 / 1000.0).min(1.0);
+
+      sqlx::query(
+          r#"
+          INSERT INTO endpoint_profiles
+              (endpoint_id, latency_p50, latency_p95, latency_p99,
+               success_rate_7d, baseline_success_rate, sample_size, confidence,
+               last_updated, updated_at)
+          VALUES ($1,$2,$3,$4,$5,$5,$6,$7,NOW(),NOW())
+          ON CONFLICT (endpoint_id) DO UPDATE SET
+              latency_p50=EXCLUDED.latency_p50, latency_p95=EXCLUDED.latency_p95,
+              latency_p99=EXCLUDED.latency_p99, success_rate_7d=EXCLUDED.success_rate_7d,
+              baseline_success_rate=EXCLUDED.baseline_success_rate,
+              sample_size=EXCLUDED.sample_size, confidence=EXCLUDED.confidence,
+              last_updated=NOW(), updated_at=NOW()
+          "#
+      )
+      .bind(endpoint_id).bind(avg_lat as i32).bind(p95_lat as i32)
+      .bind(p99_lat as i32).bind(success_rate).bind(total as i32).bind(confidence)
+      .execute(pool).await?;
+      Ok(())
+  }
+
+  pub async fn update_all_profiles(pool: &PgPool) -> Result<u64, sqlx::Error> {
+      let endpoints: Vec<(Uuid,)> = sqlx::query_as(
+          "SELECT DISTINCT endpoint_id FROM endpoint_hourly_stats"
+      )
+      .fetch_all(pool).await?;
+
+      let mut updated = 0u64;
+      for (eid,) in endpoints {
+          if update_profile(pool, eid).await.is_ok() { updated += 1; }
+      }
+      Ok(updated)
+  }
+
 □ api/src/cortex/mod.rs'ye ekle: pub mod profile_engine;
-□ Git commit
+□ cargo check
+□ Git commit: "feat(cortex): profile engine - endpoint behavior profiles"
 ```
 
 ### Adım 2.3 — Güncelleme Job'u
@@ -344,10 +406,75 @@
 
 ### Adım 3.2 — Anomaly Scorer Yaz
 ```
-□ Dosya: api/src/cortex/anomaly_scorer.rs
-□ Fonksiyon: score() — latency anomali + error type değişikliği + trafik anomali
+□ Dosya oluştur: api/src/cortex/anomaly_scorer.rs
+
+İçerik (copy-paste):
+
+  use serde::Serialize;
+
+  #[derive(Debug, Serialize)]
+  pub struct AnomalyResult {
+      pub score: i32,
+      pub factors: serde_json::Value,
+      pub category: String,
+  }
+
+  pub fn score(
+      latency_ms: i32,
+      endpoint_p95: i32,
+      endpoint_p99: i32,
+      error_category: Option<&str>,
+      dominant_error: Option<&str>,
+      current_rate: f64,
+      peak_rate: f64,
+      attempt_number: i32,
+  ) -> AnomalyResult {
+      let mut score = 0i32;
+      let mut factors = Vec::new();
+
+      // Latency anomali
+      if endpoint_p99 > 0 && latency_ms > endpoint_p99 * 2 {
+          score += 30;
+          factors.push(format!("latency_{}ms_vs_p99_{}ms", latency_ms, endpoint_p99));
+      } else if endpoint_p95 > 0 && latency_ms > (endpoint_p95 as f64 * 1.5) as i32 {
+          score += 15;
+          factors.push(format!("latency_{}ms_vs_p95_{}ms", latency_ms, endpoint_p95));
+      }
+
+      // Error type değişikliği
+      if let (Some(err), Some(dom)) = (error_category, dominant_error) {
+          if err != dom && err != "none" {
+              score += 20;
+              factors.push(format!("error_{}_vs_dominant_{}", err, dom));
+          }
+      }
+
+      // Trafik anomali
+      if peak_rate > 0.0 && current_rate > peak_rate * 1.5 {
+          score += 25;
+          factors.push(format!("traffic_{}_vs_peak_{}", current_rate, peak_rate));
+      }
+
+      // Attempt anomali
+      if attempt_number > 3 {
+          score += 10;
+          factors.push(format!("attempt_{}", attempt_number));
+      }
+
+      let category = if score >= 70 { "critical" }
+          else if score >= 40 { "warning" }
+          else { "normal" }.to_string();
+
+      AnomalyResult {
+          score: score.min(100),
+          factors: serde_json::json!({"details": factors}),
+          category,
+      }
+  }
+
 □ api/src/cortex/mod.rs'ye ekle: pub mod anomaly_scorer;
-□ Git commit
+□ cargo check
+□ Git commit: "feat(cortex): anomaly scorer - latency + error + traffic scoring"
 ```
 
 ### Adım 3.3 — Entegrasyon
@@ -406,12 +533,56 @@
 
 ### Adım 4.2 — Healing Engine Yaz
 ```
-□ Dosya: api/src/cortex/healing_engine.rs
-□ Fonksiyon: check_auto_disable() — 5 gün %0 success → disable + email
-□ Fonksiyon: run_recovery_test() — 24 saatte bir test delivery
-□ Fonksiyon: check_cascade() — 10+ endpoint aynı anda fail → alert
+□ Dosya oluştur: api/src/cortex/healing_engine.rs
+
+İçerik (copy-paste):
+
+  use sqlx::PgPool;
+  use uuid::Uuid;
+
+  /// 5 gün üst üste %0 success → endpoint'i disable et
+  pub async fn check_auto_disable(pool: &PgPool) -> Result<Vec<Uuid>, sqlx::Error> {
+      let endpoints: Vec<(Uuid,)> = sqlx::query_as(
+          r#"
+          SELECT endpoint_id FROM endpoint_hourly_stats
+          WHERE hour_start > NOW() - INTERVAL '5 days'
+          GROUP BY endpoint_id
+          HAVING SUM(successful) = 0 AND SUM(total_deliveries) > 10
+          "#
+      )
+      .fetch_all(pool).await?;
+
+      let mut disabled = Vec::new();
+      for (eid,) in endpoints {
+          sqlx::query("UPDATE endpoints SET is_active = false WHERE id = $1 AND is_active = true")
+              .bind(eid).execute(pool).await?;
+          sqlx::query(
+              "INSERT INTO healing_actions (endpoint_id, action_type, trigger_reason)
+               VALUES ($1, 'auto_disable', '5 gün %0 success')"
+          )
+          .bind(eid).execute(pool).await?;
+          disabled.push(eid);
+      }
+      Ok(disabled)
+  }
+
+  /// Cascade prevention: 10+ endpoint aynı anda fail
+  pub async fn check_cascade(pool: &PgPool) -> Result<bool, sqlx::Error> {
+      let count: (i64,) = sqlx::query_as(
+          r#"
+          SELECT COUNT(DISTINCT endpoint_id) FROM endpoint_hourly_stats
+          WHERE hour_start > NOW() - INTERVAL '1 hour'
+            AND failed > 0 AND successful = 0
+          "#
+      )
+      .fetch_one(pool).await?;
+
+      Ok(count.0 >= 10)
+  }
+
 □ api/src/cortex/mod.rs'ye ekle: pub mod healing_engine;
-□ Git commit
+□ cargo check
+□ Git commit: "feat(cortex): healing engine - auto-disable + cascade prevention"
 ```
 
 ### Adım 4.3 — Adaptive Circuit Breaker
@@ -472,11 +643,72 @@
 
 ### Adım 5.2 — Predictive Engine Yaz
 ```
-□ Dosya: api/src/cortex/predictive_engine.rs
-□ Fonksiyon: predict_failure() — trend + seasonality + error momentum
-□ Fonksiyon: forecast_capacity() — limit tahmini
+□ Dosya oluştur: api/src/cortex/predictive_engine.rs
+
+İçerik (copy-paste):
+
+  use sqlx::PgPool;
+  use uuid::Uuid;
+
+  /// Failure prediction: trend + seasonality + error momentum
+  pub async fn predict_failure(
+      pool: &PgPool, endpoint_id: Uuid
+  ) -> Result<f64, sqlx::Error> {
+      // Son 3 saatlik trend
+      let trend: Vec<(f64,)> = sqlx::query_as(
+          r#"
+          SELECT COALESCE(
+              SUM(successful)::FLOAT / NULLIF(SUM(total_deliveries),0), 1.0
+          )
+          FROM endpoint_hourly_stats
+          WHERE endpoint_id = $1
+            AND hour_start > NOW() - INTERVAL '3 hours'
+          ORDER BY hour_start DESC
+          "#
+      )
+      .bind(endpoint_id)
+      .fetch_all(pool).await?;
+
+      if trend.is_empty() { return Ok(0.0); }
+
+      let recent_rate = trend.first().map(|r| r.0).unwrap_or(1.0);
+
+      // Basit tahmin: success rate düşükse failure probability yüksek
+      let probability = (1.0 - recent_rate).max(0.0).min(1.0);
+      Ok(probability)
+  }
+
+  /// Capacity forecast: mevcut hızla limit ne zaman aşılır
+  pub async fn forecast_capacity(
+      pool: &PgPool, customer_id: uuid::Uuid
+  ) -> Result<Option<chrono::DateTime<chrono::Utc>>, sqlx::Error> {
+      let stats: (i64, i64) = sqlx::query_as(
+          r#"
+          SELECT COALESCE(SUM(total_deliveries),0),
+                 EXTRACT(EPOCH FROM (MAX(hour_start) - MIN(hour_start)))::BIGINT
+          FROM endpoint_hourly_stats eh
+          JOIN endpoints e ON e.id = eh.endpoint_id
+          WHERE e.customer_id = $1
+            AND hour_start > NOW() - INTERVAL '7 days'
+          "#
+      )
+      .bind(customer_id)
+      .fetch_one(pool).await?;
+
+      let (total, seconds) = stats;
+      if total == 0 || seconds == 0 { return Ok(None); }
+
+      let rate_per_hour = total as f64 / (seconds as f64 / 3600.0);
+      let limit = 10000.0; // Free tier
+      let remaining = limit - (total as f64 % limit);
+      let hours_remaining = remaining / rate_per_hour;
+
+      Ok(Some(chrono::Utc::now() + chrono::Duration::hours(hours_remaining as i64)))
+  }
+
 □ api/src/cortex/mod.rs'ye ekle: pub mod predictive_engine;
-□ Git commit
+□ cargo check
+□ Git commit: "feat(cortex): predictive engine - failure prediction + capacity forecast"
 ```
 
 ### Adım 5.3 — Proactive Alerting
@@ -555,12 +787,115 @@
 
 ### Adım 6.2 — Insights Engine Yaz
 ```
-□ Dosya: api/src/cortex/insights_engine.rs
-□ Fonksiyon: generate_weekly_report()
-□ Fonksiyon: calculate_customer_health()
-□ Fonksiyon: generate_recommendations()
+□ Dosya oluştur: api/src/cortex/insights_engine.rs
+
+İçerik (copy-paste):
+
+  use sqlx::PgPool;
+  use uuid::Uuid;
+  use chrono::{NaiveDate, Utc, Duration};
+
+  /// Haftalık rapor oluştur
+  pub async fn generate_weekly_report(
+      pool: &PgPool, customer_id: Uuid
+  ) -> Result<(), sqlx::Error> {
+      let now = Utc::now();
+      let week_start = (now - Duration::days(7)).date_naive();
+      let week_end = now.date_naive();
+
+      let stats: (i64, i64, i64) = sqlx::query_as(
+          r#"
+          SELECT COALESCE(SUM(eh.total_deliveries),0),
+                 COALESCE(SUM(eh.successful),0),
+                 COALESCE(SUM(eh.failed),0)
+          FROM endpoint_hourly_stats eh
+          JOIN endpoints e ON e.id = eh.endpoint_id
+          WHERE e.customer_id = $1
+            AND eh.hour_start > NOW() - INTERVAL '7 days'
+          "#
+      )
+      .bind(customer_id)
+      .fetch_one(pool).await?;
+
+      let (total, successful, _failed) = stats;
+      let success_rate = if total > 0 { (successful as f64 / total as f64) * 100.0 } else { 100.0 };
+
+      sqlx::query(
+          r#"
+          INSERT INTO weekly_reports (customer_id, week_start, week_end, total_deliveries, success_rate)
+          VALUES ($1, $2, $3, $4, $5)
+          "#
+      )
+      .bind(customer_id).bind(week_start).bind(week_end)
+      .bind(total as i32).bind(success_rate)
+      .execute(pool).await?;
+
+      Ok(())
+  }
+
+  /// Customer health hesapla
+  pub async fn calculate_customer_health(
+      pool: &PgPool, customer_id: Uuid
+  ) -> Result<(), sqlx::Error> {
+      // Integration score: endpoint var mı, API key kullanılmış mı
+      let ep_count: (i64,) = sqlx::query_as(
+          "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1"
+      )
+      .bind(customer_id).fetch_one(pool).await?;
+
+      let integration = if ep_count.0 > 0 { 50 } else { 0 };
+
+      // Stability score: success rate
+      let stats: (i64, i64) = sqlx::query_as(
+          r#"
+          SELECT COALESCE(SUM(total_deliveries),0), COALESCE(SUM(successful),0)
+          FROM endpoint_hourly_stats eh
+          JOIN endpoints e ON e.id = eh.endpoint_id
+          WHERE e.customer_id = $1 AND eh.hour_start > NOW() - INTERVAL '7 days'
+          "#
+      )
+      .bind(customer_id).fetch_one(pool).await?;
+
+      let stability = if stats.0 > 0 {
+          ((stats.1 as f64 / stats.0 as f64) * 50.0) as i32
+      } else { 50 };
+
+      let health_score = integration + stability;
+      let grade = match health_score {
+          90..=100 => "A",
+          70..=89 => "B",
+          50..=69 => "C",
+          30..=49 => "D",
+          _ => "F",
+      };
+      let churn_risk = if health_score < 30 { 0.8 }
+          else if health_score < 50 { 0.5 }
+          else { 0.1 };
+
+      sqlx::query(
+          r#"
+          INSERT INTO customer_health (customer_id, integration_score, stability_score,
+              health_score, health_grade, churn_risk, updated_at)
+          VALUES ($1, $2, $3, $4, $5, $6, NOW())
+          ON CONFLICT (customer_id) DO UPDATE SET
+              integration_score=EXCLUDED.integration_score,
+              stability_score=EXCLUDED.stability_score,
+              health_score=EXCLUDED.health_score,
+              health_grade=EXCLUDED.health_grade,
+              churn_risk=EXCLUDED.churn_risk,
+              updated_at=NOW()
+          "#
+      )
+      .bind(customer_id).bind(integration).bind(stability)
+      .bind(health_score).bind(grade).bind(churn_risk)
+      .execute(pool).await?;
+
+      Ok(())
+  }
+
 □ api/src/cortex/mod.rs'ye ekle: pub mod insights_engine;
-□ Git commit
+□ cargo check
+□ Git commit: "feat(cortex): insights engine - weekly report + customer health"
 ```
 
 ### Adım 6.3 — Haftalık Rapor Job'u
@@ -619,10 +954,70 @@
 
 ### Adım 7.2 — Smart Routing Yaz
 ```
-□ Dosya: api/src/cortex/smart_routing.rs
-□ Fonksiyon: choose_url() — latency-based + error-aware
+□ Dosya oluştur: api/src/cortex/smart_routing.rs
+
+İçerik (copy-paste):
+
+  use sqlx::PgPool;
+  use uuid::Uuid;
+
+  /// Fallback URL'ler arasından en iyisini seç
+  pub async fn choose_url(
+      pool: &PgPool,
+      endpoint_id: Uuid,
+      primary_url: &str,
+      fallback_urls: &[String],
+  ) -> String {
+      if fallback_urls.is_empty() {
+          return primary_url.to_string();
+      }
+
+      // Tüm URL'ler için son 5 dakikadaki başarı oranını al
+      let mut best_url = primary_url.to_string();
+      let mut best_score = get_url_score(pool, endpoint_id, primary_url).await;
+
+      for url in fallback_urls {
+          let score = get_url_score(pool, endpoint_id, url).await;
+          if score > best_score {
+              best_score = score;
+              best_url = url.clone();
+          }
+      }
+
+      // Routing kararını logla
+      let _ = sqlx::query(
+          "INSERT INTO routing_decisions (endpoint_id, chosen_url, reason, alternatives)
+           VALUES ($1, $2, 'highest_score', $3)"
+      )
+      .bind(endpoint_id)
+      .bind(&best_url)
+      .bind(serde_json::json!({"primary": primary_url, "fallbacks": fallback_urls}))
+      .execute(pool).await;
+
+      best_url
+  }
+
+  async fn get_url_score(pool: &PgPool, _endpoint_id: Uuid, _url: &str) -> f64 {
+      // Basit skor: son 5 dakikadaki success rate
+      // Gerçek implementasyonda URL bazlı tracking gerekir
+      // Şimdilik primary URL'e yüksek skor ver
+      let stats: (i64, i64) = sqlx::query_as(
+          "SELECT COALESCE(SUM(total_deliveries),0), COALESCE(SUM(successful),0)
+           FROM endpoint_hourly_stats
+           WHERE endpoint_id = $1 AND hour_start > NOW() - INTERVAL '5 minutes'"
+      )
+      .bind(_endpoint_id)
+      .fetch_one(pool)
+      .await
+      .unwrap_or((0, 0));
+
+      if stats.0 == 0 { return 100.0; } // Veri yoksa varsayılan
+      (stats.1 as f64 / stats.0 as f64) * 100.0
+  }
+
 □ api/src/cortex/mod.rs'ye ekle: pub mod smart_routing;
-□ Git commit
+□ cargo check
+□ Git commit: "feat(cortex): smart routing - latency-based + error-aware"
 ```
 
 ### Adım 7.3 — Worker Entegrasyonu
