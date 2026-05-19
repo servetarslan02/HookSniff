@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -24,7 +24,24 @@ import { CreateTeamModal } from './components/CreateTeamModal';
 import { InviteMemberModal } from './components/InviteMemberModal';
 import { TransferOwnershipModal } from './components/TransferOwnershipModal';
 
-export default function TeamPage() {
+export default function TeamPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="animate-pulse space-y-4">
+        <div className="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl" />
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-10 bg-gray-200 dark:bg-slate-700 rounded-lg" />
+          ))}
+        </div>
+      </div>
+    }>
+      <TeamPageInner />
+    </Suspense>
+  );
+}
+
+function TeamPageInner() {
   const { user } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('team');
