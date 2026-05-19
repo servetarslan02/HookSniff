@@ -193,7 +193,7 @@ export default function RetryPolicyPage() {
                       <div className="flex items-center gap-3 ml-4 shrink-0">
                         {policy ? (
                           <div className="text-sm text-gray-600 dark:text-slate-400">
-                            <span className="font-medium">{policy.max_attempts ?? 3}</span> {t('attempts')} · {t(policy.backoff ?? 'exponential') || policy.backoff ?? 'exponential'} · {policy.initial_delay_secs ?? 10}s
+                            <span className="font-medium">{policy.max_attempts ?? 3}</span> {t('attempts')} · {(t(policy.backoff ?? 'exponential') || policy.backoff) ?? 'exponential'} · {policy.initial_delay_secs ?? 10}s
                           </div>
                         ) : (
                           <span className="text-xs text-gray-400 dark:text-slate-500">{t('defaultPolicy')}</span>
