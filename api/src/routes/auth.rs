@@ -845,7 +845,7 @@ async fn request_email_change(
     Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
     Extension(email_provider): Extension<crate::email::EmailProvider>,
-    Extension(job_queue): Extension<Option<crate::jobs::job_queue::JobQueue>>,
+    job_queue: Option<Extension<crate::jobs::job_queue::JobQueue>>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
     headers: HeaderMap,
     Json(req): Json<RequestEmailChangeRequest>,
@@ -898,7 +898,8 @@ async fn request_email_change(
     );
     let email_clone = new_email.clone();
     let code_clone = code.clone();
-    send_email_with_fallback(job_queue.as_ref(), &email_provider, &new_email,
+    let job_queue_ref = job_queue.as_ref().map(|ext| ext.as_ref());
+    send_email_with_fallback(job_queue_ref, &email_provider, &new_email,
         crate::jobs::job_queue::EmailTemplate::Verification {
             verify_url: format!("Your HookSniff email change code: {}", code_clone),
         }, lang,
@@ -997,7 +998,7 @@ async fn confirm_email_change(
 fn generate_email_change_code() -> String {
     use rand::Rng;
     let mut rng = rand::rng();
-    let code: u32 = rng.random_range(100000..999999);
+    let code: u32 = rng.gen_range(100000..999999);
     code.to_string()
 }
 
