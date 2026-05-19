@@ -427,7 +427,6 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(ws_gateway))
         .layer(axum::Extension(qstash_client))
         .layer(axum::Extension(r2_client))
-        .layer(axum::Extension(rate_limiter))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg
                 .cors_origins
@@ -549,7 +548,8 @@ async fn main() -> Result<()> {
         .layer(axum::middleware::from_fn(middleware::request_metrics_middleware))
         .layer(axum::middleware::from_fn(middleware::request_timeout_middleware))
         .layer(axum::middleware::from_fn(middleware::security_headers_middleware))
-        .layer(axum::middleware::from_fn(rate_limit::rate_limit_middleware));
+        .layer(axum::middleware::from_fn(rate_limit::rate_limit_middleware))
+        .layer(axum::Extension(rate_limiter));
 
     let addr = format!("0.0.0.0:{}", cfg.port);
     tracing::info!("🚀 HookSniff API running on port {}", cfg.port);
