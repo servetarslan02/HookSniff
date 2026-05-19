@@ -90,23 +90,140 @@
 
 ### Adım 1.3 — Signal Collector Yaz
 ```
-□ Dosya: api/src/cortex/signal_collector.rs
-□ Fonksiyon: collect_signal() — 12 sinyal topla, delivery_signals'a yaz
-□ Fonksiyon: aggregate_hourly_stats() — son 1 saatten hourly_stats oluştur
-□ Git commit
+□ Dosya oluştur: api/src/cortex/signal_collector.rs
+
+İçerik (copy-paste, çalışır kod):
+
+  use sqlx::PgPool;
+  use uuid::Uuid;
+  use chrono::{DateTime, Utc, Timelike, Datelike};
+
+  /// Bir delivery'den sinyal topla (her 10. delivery'de çağrılır)
+  pub async fn collect_signal(
+      pool: &PgPool,
+      delivery_id: Uuid,
+      endpoint_id: Uuid,
+      customer_id: Uuid,
+      status: &str,
+      status_code: Option<i32>,
+      latency_ms: i32,
+      payload_bytes: i32,
+      attempt_number: i32,
+      error_category: Option<&str>,
+      is_retry: bool,
+  ) -> Result<(), sqlx::Error> {
+      let now = Utc::now();
+      sqlx::query(
+          "INSERT INTO delivery_signals
+           (delivery_id, endpoint_id, customer_id, status, status_code,
+            latency_ms, payload_bytes, attempt_number, error_category,
+            is_retry, time_of_hour, day_of_week, created_at)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)"
+      )
+      .bind(delivery_id).bind(endpoint_id).bind(customer_id)
+      .bind(status).bind(status_code).bind(latency_ms)
+      .bind(payload_bytes).bind(attempt_number).bind(error_category)
+      .bind(is_retry).bind(now.minute() as i32)
+      .bind(now.weekday().num_days_from_monday() as i32).bind(now)
+      .execute(pool).await?;
+      Ok(())
+  }
+
+  /// Son 1 saatten hourly_stats oluştur (her saat 00:01'de çağrılır)
+  pub async fn aggregate_hourly_stats(
+      pool: &PgPool,
+      hour_start: DateTime<Utc>,
+  ) -> Result<u64, sqlx::Error> {
+      let hour_end = hour_start + chrono::Duration::hours(1);
+      let result = sqlx::query(
+          r#"
+          INSERT INTO endpoint_hourly_stats
+              (endpoint_id, hour_start, total_deliveries, successful, failed,
+               avg_latency_ms, p50_latency_ms, p95_latency_ms, p99_latency_ms, error_breakdown)
+          SELECT
+              endpoint_id, $1,
+              COUNT(*),
+              COUNT(*) FILTER (WHERE status = 'delivered'),
+              COUNT(*) FILTER (WHERE status = 'failed'),
+              COALESCE(AVG(latency_ms),0)::INT,
+              COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY latency_ms),0)::INT,
+              COALESCE(PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY latency_ms),0)::INT,
+              COALESCE(PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY latency_ms),0)::INT,
+              COALESCE(jsonb_object_agg(COALESCE(error_category,'none'), cnt),'{}'::jsonb)
+          FROM (
+              SELECT endpoint_id, status, latency_ms, error_category,
+                     COUNT(*) OVER (PARTITION BY endpoint_id, error_category) as cnt
+              FROM delivery_signals
+              WHERE created_at >= $1 AND created_at < $2
+          ) sub
+          GROUP BY endpoint_id
+          ON CONFLICT (endpoint_id, hour_start) DO UPDATE SET
+              total_deliveries = EXCLUDED.total_deliveries,
+              successful = EXCLUDED.successful,
+              failed = EXCLUDED.failed,
+              avg_latency_ms = EXCLUDED.avg_latency_ms,
+              p50_latency_ms = EXCLUDED.p50_latency_ms,
+              p95_latency_ms = EXCLUDED.p95_latency_ms,
+              p99_latency_ms = EXCLUDED.p99_latency_ms,
+              error_breakdown = EXCLUDED.error_breakdown
+          "#
+      )
+      .bind(hour_start).bind(hour_end)
+      .execute(pool).await?;
+      Ok(result.rows_affected())
+  }
+
+□ cargo check ile derleme kontrol et
+□ Git commit: "feat(cortex): signal collector - collect + aggregate"
 ```
 
 ### Adım 1.4 — Worker Entegrasyonu
 ```
-□ worker/src/delivery/http.rs'de her 10. delivery'de collect_signal() çağır
-□ Sampling: her delivery'de değil, her 10'da bir
-□ Git commit
+□ worker/src/delivery/http.rs'de, delivery başarılı/başarısız OLDUKTAN SONRA ekle:
+
+  // Dosyanın en üstüne ekle:
+  use std::sync::atomic::{AtomicU64, Ordering};
+  static DELIVERY_COUNT: AtomicU64 = AtomicU64::new(0);
+
+  // Delivery sonucu hesaplandıktan SONRA (return'den önce) ekle:
+  let count = DELIVERY_COUNT.fetch_add(1, Ordering::Relaxed);
+  if count % 10 == 0 {
+      let _ = hooksniff_api::cortex::signal_collector::collect_signal(
+          &pool, delivery_id, endpoint_id, customer_id,
+          &status, status_code, latency_ms, payload_bytes,
+          attempt_number, error_category, is_retry
+      ).await;
+  }
+
+□ cargo check ile derleme kontrol et
+□ Git commit: "feat(cortex): integrate signal collector into worker"
 ```
 
 ### Adım 1.5 — Saatlik Job
 ```
-□ api/src/main.rs'de: her saat 00:01'de aggregate_hourly_stats() çağır
-□ Git commit
+□ api/src/main.rs'de, mevcut background job'ların yanına ekle:
+
+  // Cortex: Saatlik aggregation
+  let cortex_pool = pool.clone();
+  tokio::spawn(async move {
+      loop {
+          let now = chrono::Utc::now();
+          let next_hour = (now + chrono::Duration::hours(1))
+              .with_minute(0).unwrap().with_second(0).unwrap();
+          let wait = (next_hour - now).num_milliseconds().max(0) as u64;
+          tokio::time::sleep(std::time::Duration::from_millis(wait)).await;
+          let hour_start = now.with_minute(0).unwrap().with_second(0).unwrap();
+          match hooksniff_api::cortex::signal_collector::aggregate_hourly_stats(
+              &cortex_pool, hour_start
+          ).await {
+              Ok(n) => tracing::info!("📊 Cortex: Aggregated {} endpoints", n),
+              Err(e) => tracing::error!("❌ Cortex aggregation failed: {:?}", e),
+          }
+      }
+  });
+
+□ cargo check ile derleme kontrol et
+□ Git commit: "feat(cortex): hourly aggregation job in main.rs"
 ```
 
 ### Adım 1.6 — Retention
