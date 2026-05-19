@@ -1,30 +1,25 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { TabbedSection } from '@/components/TabbedSection';
-import { useTranslations } from 'next-intl';
 
-const tabSkeleton = (
-  <div className="animate-pulse space-y-4">
-    <div className="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl" />
-    <div className="space-y-2">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="h-10 bg-gray-200 dark:bg-slate-700 rounded-lg" />
+const BillingPage = dynamic(() => import('../billing/page'), {
+  ssr: false,
+  loading: () => (
+    <div className="max-w-5xl space-y-10 animate-pulse">
+      <div>
+        <div className="h-8 w-48 bg-gray-200 dark:bg-slate-700 rounded" />
+        <div className="h-4 w-64 bg-gray-200 dark:bg-slate-700 rounded mt-2" />
+      </div>
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="space-y-4">
+          <div className="h-5 w-40 bg-gray-200 dark:bg-slate-700 rounded" />
+          <div className="h-32 bg-gray-200 dark:bg-slate-700 rounded-xl" />
+        </div>
       ))}
     </div>
-  </div>
-);
-
-const BillingPage = dynamic(() => import('../billing/page'), { ssr: false, loading: () => tabSkeleton });
+  ),
+});
 
 export default function BillingSectionPage() {
-  const t = useTranslations('nav');
-
-  return (
-    <TabbedSection
-      tabs={[
-        { key: 'billing', label: t('billing'), icon: '💳', content: () => <BillingPage /> },
-      ]}
-    />
-  );
+  return <BillingPage />;
 }
