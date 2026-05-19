@@ -773,7 +773,8 @@
       "HMAC signatures": "HMAC signatures",
       "2FA support": "2FA support",
       "Community support": "Community support",
-      "unlimitedEndpoints": "Unlimited endpoints"
+      "unlimitedEndpoints": "Unlimited endpoints",
+      "100 events/day": "1,000 events/day"
     },
     "plans.free": "Free",
     "plans.pro": "Pro",
@@ -2023,7 +2024,8 @@
       "dlq": "Dead Letter Queue",
       "dlqDesc": "Failed deliveries are preserved for debugging. Nothing gets lost.",
       "global": "Global Infrastructure",
-      "globalDesc": "Deploy worldwide for low-latency webhook delivery to any endpoint."
+      "globalDesc": "Deploy worldwide for low-latency webhook delivery to any endpoint.",
+      "portalDesc": "Embeddable portal — your customers manage their own webhook subscriptions, view logs, and replay events"
     },
     "howItWorks": {
       "title": "How it works",
@@ -3778,7 +3780,8 @@
     "qualify5": "Registered company or active incorporation",
     "ctaDesc": "Tell us about your startup. We usually respond within 24 hours.",
     "ctaButton": "Apply now →",
-    "ctaStartup": "Start for $24/mo"
+    "ctaStartup": "Start for $24/mo",
+    "ctaPro": "Start for $49/mo"
   },
   "useCases": {
     "title": "Use Cases",
@@ -4531,7 +4534,8 @@
     "disconnect": "Disconnect",
     "disabled": "Disabled",
     "totalMessages": "Total Messages",
-    "status": "Status"
+    "status": "Status",
+    "actions": "Actions"
   },
   "whatIsHookSniff": {
     "title": "What is HookSniff?",
