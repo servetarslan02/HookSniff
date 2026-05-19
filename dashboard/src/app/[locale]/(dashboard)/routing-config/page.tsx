@@ -30,7 +30,7 @@ export default function RoutingConfigPage() {
         { key: 'routing', label: t('routing'), icon: '🔀', content: () => <RoutingPage /> },
         { key: 'retry-policy', label: t('retryPolicy'), icon: '🔁', content: () => <RetryPolicyPage /> },
         { key: 'custom-domain', label: t('customDomain'), icon: '🌐', content: () => <CustomDomainPage /> },
-        { key: 'environments', label: t('environments'), icon: '🌐', content: () => <EnvironmentsPage /> },
+        { key: 'environments', label: t('environments'), icon: '📦', content: () => <EnvironmentsPage /> },
         { key: 'rate-limiting', label: t('rateLimiting'), icon: '⏱️', content: () => <RateLimitingPage /> },
       ]}
     />

@@ -26,6 +26,7 @@ export default function CustomDomainPage() {
   const [dnsRecords, setDnsRecords] = useState<{ type: string; name: string; value: string }[]>([]);
   const [existingDomains, setExistingDomains] = useState<ExistingDomain[]>([]);
   const [loadingDomains, setLoadingDomains] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [newDomainId, setNewDomainId] = useState<string | null>(null);
@@ -35,10 +36,11 @@ export default function CustomDomainPage() {
   const fetchDomains = useCallback(async () => {
     if (!token) return;
     try {
+      setLoadError(false);
       const domains = await apiFetch<ExistingDomain[]>('/custom-domains', { token });
       setExistingDomains(domains);
     } catch {
-      // Silent fail
+      setLoadError(true);
     } finally {
       setLoadingDomains(false);
     }
@@ -53,7 +55,6 @@ export default function CustomDomainPage() {
       await navigator.clipboard.writeText(text);
       toast(t('copied'), 'success');
     } catch {
-      // Fallback for older browsers
       const el = document.createElement('textarea');
       el.value = text;
       el.style.position = 'fixed';
@@ -72,6 +73,12 @@ export default function CustomDomainPage() {
       await apiFetch(`/custom-domains/${id}`, { method: 'DELETE', token });
       setExistingDomains(prev => prev.filter(d => d.id !== id));
       setDeleteConfirm(null);
+      // Clear new domain state if we deleted the newly added one
+      if (id === newDomainId) {
+        setNewDomainId(null);
+        setNewDomainStatus('none');
+        setDnsRecords([]);
+      }
       toast(t('domainDeleted'), 'success');
     } catch (err) {
       toast(err instanceof Error ? err.message : t('failedToDelete'), 'error');
@@ -80,24 +87,35 @@ export default function CustomDomainPage() {
 
   const handleAddDomain = async () => {
     if (!domain || !token) return;
-    // Basic frontend validation
-    if (!domain.includes('.')) {
-      toast(t('invalidDomain') || 'Please enter a valid domain (e.g., hooks.example.com)', 'error');
+
+    // Strip protocol prefix if user accidentally included it
+    let cleanDomain = domain.trim();
+    cleanDomain = cleanDomain.replace(/^https?:\/\//, '');
+
+    // Validate
+    if (!cleanDomain.includes('.')) {
+      toast(t('invalidDomain'), 'error');
       return;
     }
+    if (cleanDomain.length > 253) {
+      toast(t('invalidDomain'), 'error');
+      return;
+    }
+
     setSaving(true);
     try {
       const data = await apiFetch<{ id: string; domain: string; cname_target: string; txt_record: string }>('/custom-domains', {
         method: 'POST',
-        body: { domain },
+        body: { domain: cleanDomain },
         token,
       });
       setNewDomainId(data.id);
       setNewDomainStatus('pending');
       setDnsRecords([
-        { type: 'CNAME', name: domain, value: data.cname_target },
-        { type: 'TXT', name: `_hooksniff.${domain}`, value: data.txt_record },
+        { type: 'CNAME', name: cleanDomain, value: data.cname_target },
+        { type: 'TXT', name: `_hooksniff.${cleanDomain}`, value: data.txt_record },
       ]);
+      setDomain('');
       toast(t('domainAdded'), 'success');
       // Refresh existing domains list
       fetchDomains();
@@ -120,10 +138,8 @@ export default function CustomDomainPage() {
         if (domainId === newDomainId) {
           setNewDomainStatus('verified');
         }
-        // Update in existing domains list
-        setExistingDomains(prev => prev.map(d =>
-          d.id === domainId ? { ...d, verified: true, ssl_active: true, verified_at: new Date().toISOString() } : d
-        ));
+        // Refresh the full domain list from API to get correct ssl_active status
+        fetchDomains();
         toast(data.message || t('domainVerified'), 'success');
       } else {
         if (domainId === newDomainId) {
@@ -139,6 +155,12 @@ export default function CustomDomainPage() {
       setVerifyingId(null);
     }
   };
+
+  // Build DNS records for an unverified existing domain
+  const getDnsRecordsForDomain = (d: ExistingDomain) => [
+    { type: 'CNAME', name: d.domain, value: d.cname_target, copyValue: d.cname_target },
+    { type: 'TXT', name: `_hooksniff.${d.domain}`, value: d.txt_record, copyValue: d.txt_record },
+  ];
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
@@ -157,13 +179,14 @@ export default function CustomDomainPage() {
             onChange={(e) => setDomain(e.target.value.toLowerCase().replace(/[^a-z0-9.-]/g, ''))}
             placeholder={t('placeholder')}
             className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
+            onKeyDown={(e) => { if (e.key === 'Enter' && domain && !saving) handleAddDomain(); }}
           />
           <button type="button"
             onClick={handleAddDomain}
             disabled={saving || !domain}
             className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
           >
-            {saving ? t('verifying') : t('addDomainBtn')}
+            {saving ? t('adding') : t('addDomainBtn')}
           </button>
         </div>
       </div>
@@ -187,7 +210,12 @@ export default function CustomDomainPage() {
                 {dnsRecords.map((rec, i) => (
                   <tr key={i}>
                     <td className="px-4 py-3"><span className="font-mono text-sm bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-sm">{rec.type}</span></td>
-                    <td className="px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">{rec.name}</td>
+                    <td className="px-4 py-3">
+                      <span className="font-mono text-sm text-gray-900 dark:text-white">{rec.name}</span>
+                      <button type="button" onClick={() => handleCopy(rec.name)} className="text-brand-600 dark:text-brand-400 text-xs hover:underline ml-2">
+                        {t('copy')}
+                      </button>
+                    </td>
                     <td className="px-4 py-3 font-mono text-sm text-gray-600 dark:text-slate-400 break-all">{rec.value}</td>
                     <td className="px-4 py-3">
                       <button type="button" onClick={() => handleCopy(rec.value)} className="text-brand-600 dark:text-brand-400 text-sm hover:underline">
@@ -201,7 +229,7 @@ export default function CustomDomainPage() {
           </div>
 
           <p className="text-xs text-gray-400 dark:text-slate-500 mt-3 mb-4">
-            ⏱️ {t('dnsPropagationHint') || 'DNS changes can take 5–30 minutes to propagate. Wait before verifying.'}
+            ⏱️ {t('dnsPropagationHint')}
           </p>
 
           <div className="flex gap-3 items-center">
@@ -228,7 +256,44 @@ export default function CustomDomainPage() {
         </div>
       )}
 
-      {/* Existing Domains */}
+      {/* Existing Domains — Loading */}
+      {loadingDomains && (
+        <div className="glass-card p-6">
+          <div className="animate-pulse space-y-3">
+            <div className="h-5 bg-gray-200 dark:bg-slate-700 rounded w-1/4" />
+            <div className="h-12 bg-gray-200 dark:bg-slate-700 rounded-xl" />
+            <div className="h-12 bg-gray-200 dark:bg-slate-700 rounded-xl" />
+          </div>
+        </div>
+      )}
+
+      {/* Existing Domains — Load Error */}
+      {!loadingDomains && loadError && (
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+            <span className="text-lg">⚠️</span>
+            <div>
+              <p className="font-medium">{t('loadError')}</p>
+              <button type="button" onClick={fetchDomains} className="text-sm text-brand-600 dark:text-brand-400 hover:underline mt-1">
+                {t('retry')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Existing Domains — Empty State */}
+      {!loadingDomains && !loadError && existingDomains.length === 0 && !newDomainId && (
+        <div className="glass-card p-6">
+          <div className="text-center py-8">
+            <div className="text-4xl mb-3">🌐</div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">{t('noDomains')}</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400">{t('noDomainsDesc')}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Existing Domains — List */}
       {!loadingDomains && existingDomains.length > 0 && (
         <div className="glass-card p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('existingDomains')}</h2>
@@ -266,11 +331,11 @@ export default function CustomDomainPage() {
                       <div className="flex items-center gap-1">
                         <button type="button" onClick={() => handleDeleteDomain(d.id)}
                           className="text-xs text-red-600 dark:text-red-400 font-medium px-2 py-1 bg-red-50 dark:bg-red-500/10 rounded-lg">
-                          {t('confirmDelete') || 'Confirm'}
+                          {t('confirmDelete')}
                         </button>
                         <button type="button" onClick={() => setDeleteConfirm(null)}
                           className="text-xs text-gray-500 px-2 py-1 hover:text-gray-700">
-                          {t('cancel') || 'Cancel'}
+                          {t('cancel')}
                         </button>
                       </div>
                     ) : (
@@ -286,24 +351,17 @@ export default function CustomDomainPage() {
                 {!d.verified && (
                   <div className="px-4 py-3 border-t border-gray-100 dark:border-slate-800 space-y-2">
                     <p className="text-xs text-gray-500 dark:text-slate-400">{t('dnsRecordsDesc')}</p>
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="font-mono bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-sm text-gray-600 dark:text-slate-400">CNAME</span>
-                      <span className="font-mono text-gray-900 dark:text-white">{d.domain}</span>
-                      <span className="text-gray-400">→</span>
-                      <span className="font-mono text-gray-600 dark:text-slate-400">{d.cname_target}</span>
-                      <button type="button" onClick={() => handleCopy(d.cname_target)} className="text-brand-600 dark:text-brand-400 hover:underline ml-1">
-                        {t('copy')}
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="font-mono bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-sm text-gray-600 dark:text-slate-400">TXT</span>
-                      <span className="font-mono text-gray-900 dark:text-white">_hooksniff.{d.domain}</span>
-                      <span className="text-gray-400">→</span>
-                      <span className="font-mono text-gray-600 dark:text-slate-400 truncate max-w-[200px]">{d.txt_record}</span>
-                      <button type="button" onClick={() => handleCopy(d.txt_record)} className="text-brand-600 dark:text-brand-400 hover:underline ml-1">
-                        {t('copy')}
-                      </button>
-                    </div>
+                    {getDnsRecordsForDomain(d).map((rec, i) => (
+                      <div key={i} className="flex items-center gap-2 text-xs">
+                        <span className="font-mono bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-sm text-gray-600 dark:text-slate-400">{rec.type}</span>
+                        <span className="font-mono text-gray-900 dark:text-white">{rec.name}</span>
+                        <span className="text-gray-400">→</span>
+                        <span className="font-mono text-gray-600 dark:text-slate-400 truncate max-w-[200px]">{rec.value}</span>
+                        <button type="button" onClick={() => handleCopy(rec.copyValue)} className="text-brand-600 dark:text-brand-400 hover:underline ml-1 shrink-0">
+                          {t('copy')}
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
