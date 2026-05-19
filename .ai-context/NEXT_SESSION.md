@@ -1,56 +1,40 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-20 03:47 GMT+8
+> Son güncelleme: 2026-05-20 04:10 GMT+8
 
-## ✅ Tamamlanan (Bu Oturum — 8+ Commit)
+## ✅ Tamamlanan (Bu Oturum — Alert Evaluation Worker)
 
-### 1. Broadcast Bildirim Sistemi
-- `broadcasts` + `broadcast_dismissals` tabloları (migration 075)
-- Admin CRUD API (5 endpoint)
-- User API (3 endpoint: list, dismiss, unread-count)
-- Admin sayfası: E-posta/Bildirim toggle
-- NotificationCenter'da broadcast gösterimi
-- BroadcastBanner (warning/critical)
-- i18n EN/TR
+### 1. Alert Evaluation Worker (KRİTİK — Item 254)
+- ✅ Migration 078: `alert_history` tablosu + `last_triggered_at`, `webhook_url`, `cooldown_minutes` kolonları
+- ✅ `api/src/jobs/alert_eval.rs` — Background worker (her 5 dk)
+  - `failure_rate`: Son 30 dk'da failed/total * 100
+  - `latency`: Son 30 dk'da avg(duration_ms)
+  - `consecutive_failures`: endpoint.failure_streak max
+  - 15 dk cooldown (alert storms engeli)
+  - 3 kanal: email (Resend), slack (webhook), operational webhook
+  - In-app notification + alert_history log
+- ✅ `jobs/mod.rs` — modül kaydı
+- ✅ `main.rs` — background task spawn (5 dk interval, distributed lock)
 
-### 2. Güvenlik İzleme Sistemi
-- `security_events` + `login_attempts` tabloları (migration 076)
-- `ip_blocklist` tablosu (migration 077)
-- Brute force, credential stuffing, injection, scanner detection
-- Auth akışına entegrasyon (login'de kontrol)
-- Admin güvenlik sayfası (olaylar + IP blok listesi)
-- IP blokla/kaldır API
+### 2. Revenue Export Report Açıklaması
+- Admin → Revenue sayfasındaki "Export Report" butonu → son 12 aylık gelir CSV'si
 
-### 3. E-posta Sistemi
-- HookSniff from_name (Resend + GCloud)
-- RESEND_API_KEY Cloud Run'da tanımlı
-- Test emaili gönderildi ✅
-
-### 4. Neon DB
-- 5 yeni tablo, 21 index
-- 3 migration uygulandı (075, 076, 077)
+### 3. Fatura/Ödeme Görüntüleme
+- Admin → Users → [Kullanıcı] → Billing sekmesi (invoices, payments, refunds)
+- Admin → Revenue → genel gelir özeti
 
 ## 📋 Sıradaki
 
-### 1. Alert Evaluation Worker (KRİTİK — şu an çalışmıyor)
-- alert_rules tablosu var ama background worker yok
-- alarm oluşturabiliyorsun ama tetiklenmiyor
-- Yapılacak:
-  - Background job (her 1-5 dk)
-  - alert_history tablosu
-  - Notification dispatcher (email/slack/webhook)
-  - Cooldown mekanizması (15 dk)
-- Kodda TODO: `Item 254` olarak işaretli
+### 1. Deploy
+- Migration 078'i Neon DB'ye uygula (`node run-migrations.js`)
+- Cloud Build ile API deploy (alert_eval worker dahil)
+- Vercel otomatik deploy (dashboard değişiklik yok)
 
-### 2. Deploy
-- Cloud Build ile API deploy (tüm yeni endpoint'ler)
-- Vercel otomatik deploy (push edildi)
-
-### 3. communication_history Tablosu
+### 2. communication_history Tablosu
 - Bulk email iletişim loglaması için gerekli
 - Şu an eksik, `let _ =` ile sessizce geçiliyor
 
-### 4. P2 Kalan Sorunlar
+### 3. P2 Kalan Sorunlar
 - SSO state → Redis
 - OIDC JWKS imza doğrulaması
 - Verified domain TXT record verification
