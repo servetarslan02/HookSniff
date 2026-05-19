@@ -441,18 +441,17 @@ async fn create_delivery_failure_notification(
     endpoint_url: &str,
     error_msg: &str,
 ) {
-    let title = format!("⚠️ Webhook Teslimat Başarısız");
-    let message = format!(
-        "{} adresine teslimat başarısız oldu: {}",
-        endpoint_url, error_msg
-    );
+    // Use the shared helper from the API crate
+    // Note: worker imports api::notifications::helpers
+    let title = "⚠️ Webhook Teslimat Başarısız";
+    let message = format!("{} adresine teslimat başarısız oldu: {}", endpoint_url, error_msg);
     let link = format!("/deliveries/{}", delivery_id);
 
     let _ = sqlx::query(
         "INSERT INTO notifications (customer_id, type, title, message, is_read, link) VALUES ($1, 'webhook_failed', $2, $3, false, $4)"
     )
     .bind(customer_id)
-    .bind(&title)
+    .bind(title)
     .bind(&message)
     .bind(&link)
     .execute(pool)
