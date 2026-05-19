@@ -748,10 +748,30 @@ async fn delete_account(
         .bind(customer.id).execute(&mut *tx).await?;
 
     let tables = [
+        // Core
         "deliveries", "endpoints", "api_keys", "refresh_tokens",
         "password_reset_tokens", "email_verification_tokens", "notifications",
         "installed_agents", "payment_transactions", "invoices", "audit_log",
         "sso_configs", "custom_domains", "portal_configs", "device_tokens",
+        // User data
+        "applications", "environments", "environment_variables",
+        "notification_preferences", "customer_consents", "tfa_backup_codes",
+        "background_tasks", "idempotency_keys", "dead_letters",
+        "delivery_events", "daily_event_usage",
+        // Organization
+        "team_members", "sso_login_attempts", "domain_verifications",
+        // Connectors & integrations
+        "connector_configs", "integrations", "inbound_configs",
+        "event_schemas", "fanout_rules",
+        // Operational
+        "operational_webhook_deliveries", "operational_webhook_endpoints",
+        "alert_rules", "stream_channels", "stream_subscriptions",
+        "message_cursors", "ws_subscriptions",
+        // Agents
+        "agents", "agent_routes", "agent_events", "agent_audit_log",
+        "ai_agent_configs", "ai_agent_executions",
+        // Token management
+        "token_revocation_events",
     ];
     for table in tables {
         sqlx::query(&format!("DELETE FROM {} WHERE customer_id = $1", table))
