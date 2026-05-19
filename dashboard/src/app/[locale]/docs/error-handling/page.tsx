@@ -31,7 +31,11 @@ export default async function ErrorHandlingPage() {
         <CodeBlock
           code={`app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   // 1. Verify signature (fast)
-  if (!verifySignature(req.body, req.headers['x-hooksniff-signature'], secret)) {
+  if (!verifySignature(req.body, {
+    'webhook-id': req.headers['webhook-id'],
+    'webhook-timestamp': req.headers['webhook-timestamp'],
+    'webhook-signature': req.headers['webhook-signature'],
+  }, secret)) {
     return res.status(401).send('Invalid signature');
   }
 
