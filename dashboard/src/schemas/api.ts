@@ -872,7 +872,7 @@ export const RateLimitSchema = z.object({
 export const SchemaRegistryItemSchema = z.object({
   id: z.string(),
   name: z.string(),
-  description: z.string().nullable(),
+  description: z.string().nullable().optional(),
   schema: z.any(),
   version: z.number(),
   created_at: z.string(),
