@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 18:15 GMT+8 (SSO enforce akışı + navigasyon düzenlemesi)
+> Son güncelleme: 2026-05-19 19:25 GMT+8 (Organization sayfası inceleme + 6 bug düzeltmesi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -224,7 +224,32 @@ HookSniff/
 
 ---
 
-## 📝 Son Oturum (2026-05-19 17:23–18:15 — SSO Full Implementasyon + Navigasyon)
+## 📝 Son Oturum (2026-05-19 19:20–19:25 — Organization Tam İnceleme + 6 Bug Düzeltmesi)
+
+### Özet
+Organization sayfası (Team + SSO + Audit Log) detaylı incelendi. SSO ↔ Team ilişkisinde 6 kritik sorun tespit edildi ve düzeltildi.
+
+### Yapılan İşler:
+1. **auto_join_default_team bug düzeltmesi** — SSO user'ın customer_id'si yerine SSO config owner'ın customer_id'siyle arama yapılıyor
+2. **Yeni kullanıcı SSO login** — Email domain'inden SSO config bulma eklendi
+3. **SSO login engelleme** — SSO zorunlu hesaplarda şifre girişi engellendi (admin bypass ile)
+4. **Eksik migration** — `migrations/067_sso_admin_bypass_and_attempts.sql` oluşturuldu
+5. **Audit log** — SSO login ve auto-join için audit log eklendi
+6. **UUID/String tip hatası** — `default_team_id` doğru tiple okunuyor
+
+### Değişiklikler:
+- `api/src/routes/sso.rs` — 152 satır değişiklik
+- `api/src/routes/auth.rs` — 20 satır ekleme
+- `migrations/067_sso_admin_bypass_and_attempts.sql` — yeni dosya
+
+### Sıradaki:
+- Cloud Build ile deploy
+- Migration 067 Neon DB'ye uygula
+- Manuel SSO test
+
+---
+
+## 📝 Önceki Oturum (2026-05-19 17:23–18:15 — SSO Full Implementasyon + Navigasyon)
 
 ### Özet
 Servet ile ilk oturum. SSO sayfası incelendi, 6 sorun tespit edildi, tam SSO implementasyonu yapıldı, navigasyon düzenlendi, Enterprise plan kısıtlaması eklendi, enforce akışı kuruldu.
