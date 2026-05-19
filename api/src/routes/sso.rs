@@ -89,6 +89,9 @@ pub struct UpsertSsoRequest {
     pub issuer_url: Option<String>,
     pub client_id: Option<String>,
     pub client_secret: Option<String>,
+    // Auto team join
+    pub default_team_id: Option<String>,
+    pub default_role: Option<String>,
 }
 
 // ── OIDC Discovery Document ─────────────────────────────────
@@ -204,6 +207,17 @@ async fn get_sso_config(
 
     match config {
         Some((id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, created_at, updated_at)) => {
+            // Get default team info
+            let default_team = sqlx::query_as::<_, (Option<Uuid>, Option<String>, Option<String>)>(
+                "SELECT default_team_id, default_role, (SELECT name FROM teams WHERE id = sso_configs.default_team_id) FROM sso_configs WHERE customer_id = $1 LIMIT 1"
+            )
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?;
+
+            let (default_team_id, default_role, default_team_name) = default_team
+                .unwrap_or((None, None, None));
+
             Ok(Json(serde_json::json!({
                 "id": id,
                 "provider": provider,
@@ -216,6 +230,9 @@ async fn get_sso_config(
                 "client_id": client_id,
                 "client_secret_set": client_secret_enc.is_some(),
                 "admin_bypass": admin_bypass,
+                "default_team_id": default_team_id,
+                "default_role": default_role.unwrap_or_else(|| "viewer".to_string()),
+                "default_team_name": default_team_name,
                 "created_at": created_at,
                 "updated_at": updated_at,
             })))
@@ -291,6 +308,13 @@ async fn upsert_sso_config(
         }
     }
 
+    // Validate default_role if provided
+    if let Some(ref role) = req.default_role {
+        if !["admin", "editor", "viewer"].contains(&role.as_str()) {
+            return Err(AppError::BadRequest("default_role must be 'admin', 'editor', or 'viewer'".into()));
+        }
+    }
+
     // Encrypt client secret if provided
     let client_secret_enc = match req.client_secret {
         Some(ref secret) if !secret.is_empty() => {
@@ -303,8 +327,8 @@ async fn upsert_sso_config(
     };
 
     sqlx::query(
-        r#"INSERT INTO sso_configs (customer_id, provider, enabled, admin_bypass, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        r#"INSERT INTO sso_configs (customer_id, provider, enabled, admin_bypass, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
            ON CONFLICT (customer_id) DO UPDATE SET
                provider = EXCLUDED.provider,
                enabled = EXCLUDED.enabled,
@@ -316,6 +340,8 @@ async fn upsert_sso_config(
                issuer_url = EXCLUDED.issuer_url,
                client_id = EXCLUDED.client_id,
                client_secret_encrypted = COALESCE(EXCLUDED.client_secret_encrypted, sso_configs.client_secret_encrypted),
+               default_team_id = EXCLUDED.default_team_id,
+               default_role = EXCLUDED.default_role,
                updated_at = now()"#
     )
     .bind(customer.id)
@@ -329,6 +355,8 @@ async fn upsert_sso_config(
     .bind(&req.issuer_url)
     .bind(&req.client_id)
     .bind(&client_secret_enc)
+    .bind(&req.default_team_id.as_deref().and_then(|s| Uuid::parse_str(s).ok()))
+    .bind(req.default_role.as_deref().unwrap_or("viewer"))
     .execute(&pool)
     .await?;
 
@@ -727,6 +755,9 @@ async fn saml_callback(
     // Find or create customer
     let customer = find_or_create_sso_customer(&pool, &email, &assertion.attributes, "saml").await?;
 
+    // Auto-join to default team if configured
+    let _ = auto_join_default_team(&pool, customer.id, &email).await;
+
     // Log attempt
     log_sso_attempt(&pool, Some(customer.id), &email, "saml", true, None, &headers).await;
 
@@ -853,6 +884,9 @@ async fn oidc_callback(
 
     // Find or create customer
     let customer = find_or_create_sso_customer(&pool, email, &attributes, "oidc").await?;
+
+    // Auto-join to default team if configured
+    let _ = auto_join_default_team(&pool, customer.id, email).await;
 
     // Log attempt
     log_sso_attempt(&pool, Some(customer.id), email, "oidc", true, None, &headers).await;
@@ -1057,6 +1091,54 @@ async fn find_or_create_sso_customer(
     tracing::info!("New SSO customer created ({}): {} — API key: {}", provider, email, api_key);
 
     Ok(customer)
+}
+
+// ── Helper: Auto-join SSO user to default team ──────────────
+
+async fn auto_join_default_team(
+    pool: &PgPool,
+    customer_id: Uuid,
+    customer_email: &str,
+) -> Result<(), AppError> {
+    // Find SSO config with default_team_id
+    let config = sqlx::query_as::<_, (Option<Uuid>, Option<String>)>(
+        "SELECT default_team_id, default_role FROM sso_configs WHERE default_team_id IS NOT NULL AND customer_id IN (
+            SELECT id FROM customers WHERE email = $1
+        ) LIMIT 1"
+    )
+    .bind(customer_email)
+    .fetch_optional(pool)
+    .await?;
+
+    let (Some(team_id), Some(role)) = config else {
+        return Ok(()); // No default team configured
+    };
+
+    // Check if already a member
+    let already_member: Option<(Uuid,)> = sqlx::query_as(
+        "SELECT id FROM team_members WHERE team_id = $1 AND customer_id = $2"
+    )
+    .bind(team_id)
+    .bind(customer_id)
+    .fetch_optional(pool)
+    .await?;
+
+    if already_member.is_some() {
+        return Ok(()); // Already a member
+    }
+
+    // Add to team
+    sqlx::query(
+        "INSERT INTO team_members (team_id, customer_id, role, joined_at) VALUES ($1, $2, $3, NOW()) ON CONFLICT DO NOTHING"
+    )
+    .bind(team_id)
+    .bind(customer_id)
+    .bind(&role)
+    .execute(pool)
+    .await?;
+
+    tracing::info!("✅ SSO auto-join: customer {} added to team {} as {}", customer_id, team_id, role);
+    Ok(())
 }
 
 // ── Helper: Generate SSO Login Response ─────────────────────
