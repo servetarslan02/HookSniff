@@ -97,6 +97,7 @@ async fn update_profile(
 #[derive(serde::Serialize)]
 struct ApiKeyInfo {
     id: String,
+    #[serde(rename = "api_key_prefix")]
     prefix: String,
     created_at: String,
     last_used_at: Option<String>,
