@@ -130,7 +130,9 @@ async fn process_webhook_result(
                 let query = format!(
                     "UPDATE customers SET plan = $1, payment_provider = $2, \
                      {} = $3, {} = $4, webhook_limit = $5, \
-                     payment_failed_at = NULL, updated_at = NOW() WHERE id = $6",
+                     payment_failed_at = NULL, \
+                     current_period_end = NOW() + INTERVAL '30 days', \
+                     updated_at = NOW() WHERE id = $6",
                     cust_col, sub_col
                 );
                 sqlx::query(&query)
@@ -198,7 +200,9 @@ async fn process_webhook_result(
             if let Some(sub_col) = provider_sub_col(provider) {
                 let query = format!(
                     "UPDATE customers SET plan = $1, webhook_limit = $2, \
-                     payment_failed_at = NULL, updated_at = NOW() WHERE {} = $3",
+                     payment_failed_at = NULL, \
+                     current_period_end = NOW() + INTERVAL '30 days', \
+                     updated_at = NOW() WHERE {} = $3",
                     sub_col
                 );
                 sqlx::query(&query).bind(plan.as_str()).bind(webhook_limit)
@@ -282,30 +286,37 @@ async fn process_webhook_result(
             amount_cents,
             currency,
         } => {
-            // HS-059: Clear grace period on successful payment
-            // Find the customer by provider subscription ID and clear payment_failed_at
-            // This is handled by SubscriptionUpdated on renewal, but also clear here for safety
+            // Payment succeeded — extend billing period and clear any failure state
             tracing::info!(
-                "✅ {} payment succeeded: {} ({} {}) — clearing any grace period",
+                "✅ {} payment succeeded: {} ({} {}) — extending billing period",
                 provider,
                 provider_tx_id,
                 *amount_cents as f64 / 100.0,
                 currency
             );
+            // Note: SubscriptionUpdated already handles period extension.
+            // This is a safety net for providers that only send PaymentSucceeded.
         }
         WebhookResult::PaymentFailed {
             provider_tx_id,
             customer_id,
         } => {
-            // HS-059: Set grace period on payment failure (all providers)
+            // Payment failed — immediately downgrade to free (no grace period)
             if let Some(cid) = customer_id {
+                let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
+
                 sqlx::query(
-                    "UPDATE customers SET payment_failed_at = NOW(), updated_at = NOW() \
-                     WHERE id = $1 AND payment_failed_at IS NULL",
+                    "UPDATE customers SET plan = 'developer', webhook_limit = $1, \
+                     payment_failed_at = NOW(), cancel_at_period_end = false, \
+                     updated_at = NOW() WHERE id = $2",
                 )
+                .bind(free_limit)
                 .bind(cid)
                 .execute(pool)
                 .await?;
+
+                // Clean up excess endpoints on downgrade
+                cleanup_excess_endpoints(pool, cid, &Plan::Developer).await?;
 
                 // Create in-app notification
                 let pool_clone = pool.clone();
@@ -315,14 +326,14 @@ async fn process_webhook_result(
                 });
 
                 tracing::warn!(
-                    "⚠️ {} payment failed: {} — grace period started for customer {}",
+                    "⚠️ {} payment failed: {} — customer {} downgraded to free immediately",
                     provider,
                     provider_tx_id,
                     cid
                 );
             } else {
                 tracing::warn!(
-                    "⚠️ {} payment failed: {} — no customer_id, grace period not set",
+                    "⚠️ {} payment failed: {} — no customer_id, downgrade skipped",
                     provider,
                     provider_tx_id
                 );
