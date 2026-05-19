@@ -3,6 +3,8 @@
 //! Sends push notifications to registered device tokens when webhook
 //! deliveries succeed or fail (configurable per customer).
 
+pub mod helpers;
+
 use serde::Serialize;
 use sqlx::PgPool;
 use uuid::Uuid;
