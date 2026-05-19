@@ -2910,7 +2910,15 @@
     "adminBypassDesc": "Admin kullanıcılar şifre ile giriş yapabilir (önerilir)",
     "cancel": "İptal",
     "enforcing": "Zorunlu kılınıyor...",
-    "enforceConfirm": "SSO'yu Zorunlu Kıl"
+    "enforceConfirm": "SSO'yu Zorunlu Kıl",
+    "autoTeamJoin": "Otomatik Ekip Katılımı",
+    "autoTeamJoinDesc": "SSO ile giriş yapan kullanıcıları ilk girişlerinde otomatik olarak bir ekibe ekleyin.",
+    "defaultTeam": "Varsayılan Ekip",
+    "noAutoJoin": "Devre dışı — otomatik katılma",
+    "defaultRole": "Varsayılan Rol",
+    "roleViewer": "Görüntüleyici",
+    "roleEditor": "Editör",
+    "roleAdmin": "Yönetici"
   },
   "endpointSettings": {
     "title": "Endpoint Ayarları",
