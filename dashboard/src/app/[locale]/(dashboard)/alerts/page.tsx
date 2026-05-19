@@ -85,9 +85,9 @@ export default function AlertsPage() {
         id: alert.id,
         data: { is_active: !alert.is_active },
       });
-      toast(alert.is_active ? 'Alert paused' : 'Alert activated', 'success');
+      toast(alert.is_active ? t('alertPaused') : t('alertActivated'), 'success');
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to toggle', 'error');
+      toast(err instanceof Error ? err.message : t('toggleFailed'), 'error');
     } finally {
       setTogglingId(null);
     }
@@ -110,7 +110,7 @@ export default function AlertsPage() {
       toast(t('alertUpdated'), 'success');
       setEditTarget(null);
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Failed to update', 'error');
+      toast(err instanceof Error ? err.message : t('updateFailed'), 'error');
     }
   };
 
@@ -218,8 +218,13 @@ export default function AlertsPage() {
         {loading ? (
           <div className="p-8 text-center text-gray-500 dark:text-slate-500">{tc('loading')}</div>
         ) : alerts.length === 0 ? (
-          <div className="p-12 text-center text-gray-500 dark:text-slate-500">
-            {t('empty')}
+          <div className="p-12 text-center">
+            <div className="text-5xl mb-4">🔔</div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('empty')}</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('emptyDesc')}</p>
+            <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+              + {t('newAlert')}
+            </button>
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
