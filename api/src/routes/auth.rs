@@ -648,16 +648,32 @@ async fn update_profile(
     if req.name.trim().is_empty() { return Err(AppError::BadRequest("Name cannot be empty".into())); }
     if let Err(e) = crate::validation::validate_email(&req.email) { return Err(AppError::BadRequest(e)); }
 
-    if req.email != customer.email {
-        let existing: Option<Uuid> = sqlx::query_scalar("SELECT id FROM customers WHERE email = $1 AND id != $2")
+    // If email is changing, require password confirmation and reset verification
+    let email_changed = req.email.to_lowercase() != customer.email.to_lowercase();
+    if email_changed {
+        let password = req.password.as_ref().ok_or(AppError::BadRequest("Password is required to change email".into()))?;
+        let hash = customer.password_hash.as_ref().ok_or(AppError::BadRequest("Password not set".into()))?;
+        if !jwt::verify_password_async(password.clone(), hash.clone()).await? {
+            return Err(AppError::BadRequest("Invalid password".into()));
+        }
+        let existing: Option<Uuid> = sqlx::query_scalar("SELECT id FROM customers WHERE LOWER(email) = LOWER($1) AND id != $2")
             .bind(&req.email).bind(customer.id).fetch_optional(&pool).await?;
-        if existing.is_some() { return Err(AppError::BadRequest("Invalid email".into())); }
+        if existing.is_some() { return Err(AppError::BadRequest("This email is already in use".into())); }
     }
 
-    let updated = sqlx::query_as::<_, Customer>("UPDATE customers SET name = $1, email = $2, updated_at = NOW() WHERE id = $3 RETURNING *")
-        .bind(&req.name).bind(&req.email).bind(customer.id).fetch_one(&pool).await?;
+    let updated = if email_changed {
+        // Reset email_verified when email changes
+        sqlx::query_as::<_, Customer>("UPDATE customers SET name = $1, email = $2, email_verified = false, updated_at = NOW() WHERE id = $3 RETURNING *")
+            .bind(&req.name).bind(&req.email).bind(customer.id).fetch_one(&pool).await?
+    } else {
+        sqlx::query_as::<_, Customer>("UPDATE customers SET name = $1, email = $2, updated_at = NOW() WHERE id = $3 RETURNING *")
+            .bind(&req.name).bind(&req.email).bind(customer.id).fetch_one(&pool).await?
+    };
 
     tracing::info!("✅ Profile updated for customer {}", customer.id);
+    if email_changed {
+        tracing::info!("📧 Email changed for customer {}: email verification reset", customer.id);
+    }
     Ok(Json(updated.to_response(None)))
 }
 
