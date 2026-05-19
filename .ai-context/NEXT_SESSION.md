@@ -1,8 +1,22 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 23:35 GMT+8
+> Son güncelleme: 2026-05-20 01:58 GMT+8
 
-## ✅ Tamamlanan (Bu Oturum — 10+ Commit)
+## ✅ Tamamlanan (Bu Oturum — 1 Commit)
+
+### 1. Dunning Sistemi — Başarısız Ödeme Kurtarma (01:48–01:58)
+- **Dunning email serisi** — Son 3 gün kalan müşterilere otomatik email (gün 3, 2, 1)
+- **In-app notification** — Çan ikonunda bildirim (billing tipi)
+- **Payment retry job** — Grace period'daki müşteriler için 24 saatte bir otomatik retry
+- **Migration 072** — `dunning_reminders` + `payment_retry_attempts` tabloları
+- **Duplicate koruması** — Aynı gün tekrar email gitmez
+- **TR + EN email template'leri** — Urgency renkleri (amber → orange → red)
+- **Retention cleanup** — Eski reminder'lar (30 gün), retry logları (90 gün)
+- **Distributed lock** — Multi-instance desteği
+- **Neon DB'ye uygulandı** ✅
+- Commit: `adde3f2f`
+
+## ✅ Tamamlanan (Onceki Oturum — 10+ Commit)
 
 ### 0. Landing Page Link Düzeltmesi (00:34–00:36)
 - Dashboard sidebar: HookSniff logosu → `https://hooksniff.vercel.app/`
