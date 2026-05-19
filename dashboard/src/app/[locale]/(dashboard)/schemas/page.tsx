@@ -6,7 +6,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
-import ConfirmDialog from '@/components/ConfirmDialog';
 
 interface Schema {
   id: string;
