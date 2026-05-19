@@ -4239,7 +4239,9 @@
     "aiCap3": "Başarısız teslimatları hata ayıklayın ve tekrar deneyin",
     "aiCap4": "Endpoint sağlığını ve performansını izleyin",
     "quickStart": "Hızlı Başlangıç",
-    "quickStartDesc": "Bir hizmet tokenı oluşturun, ardından MCP yapılandırmanızda HOOKSNIFF_API_TOKEN olarak ekleyin."
+    "quickStartDesc": "Bir hizmet tokenı oluşturun, ardından MCP yapılandırmanızda HOOKSNIFF_API_TOKEN olarak ekleyin.",
+    "createDesc": "Programmatic API erişimi için yeni bir hizmet jetonu oluşturun.",
+    "tokenCreated": "Hizmet jetonu oluşturuldu! Bu jetonu şimdi kaydedin — bir daha gösterilmeyecek."
   },
   "featureFlags": {
     "loadFailed": "Feature flaglar yüklenemedi",
