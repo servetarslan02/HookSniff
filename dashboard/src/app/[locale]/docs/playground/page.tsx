@@ -1,5 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
 
@@ -8,27 +9,26 @@ export const metadata: Metadata = {
   description: 'Test webhooks instantly with the HookSniff playground',
 };
 
-export default function PlaygroundPage() {
+export default async function PlaygroundPage() {
+  const t = await getTranslations('docsPlayground');
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Playground</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        Test webhooks without writing code. Send a test event and see what happens.
+        {t('subtitle')}
       </p>
 
-      {/* The Problem */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Problem</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('theProblem')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          You want to test your webhook endpoint before going live. But setting up a real event source just for testing is tedious.
+          {t('problemDesc')}
         </p>
       </section>
 
-      {/* The Solution */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">The Playground</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('thePlayground')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          The Playground lets you send test webhooks from the dashboard or API. No real event source needed.
+          {t('playgroundDesc')}
         </p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/playground/test \\
@@ -41,15 +41,14 @@ export default function PlaygroundPage() {
   }'`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          The test webhook goes through the full delivery pipeline — signing, delivery, retry logic — just like a real event.
+          {t('playgroundNote')}
         </p>
       </section>
 
-      {/* Simulator */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Simulator</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('simulator')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          The Simulator generates realistic webhook traffic for load testing:
+          {t('simulatorDesc')}
         </p>
         <CodeBlock
           code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/simulator \\
@@ -63,21 +62,20 @@ export default function PlaygroundPage() {
   }'`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
-          Sends 100 test events with 100ms intervals. Use this to test your endpoint&apos;s throughput and your retry configuration.
+          {t('simulatorNote')}
         </p>
       </section>
 
-      {/* Dashboard */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Dashboard Playground</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('dashboardPlayground')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Access the Playground from the dashboard sidebar. It provides a UI for:
+          {t('dashboardPlaygroundDesc')}
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>Sending test webhooks with custom payloads</li>
-          <li>Viewing delivery results in real-time</li>
-          <li>Inspecting request/response details</li>
-          <li>Testing signature verification</li>
+          <li>{t('dp1')}</li>
+          <li>{t('dp2')}</li>
+          <li>{t('dp3')}</li>
+          <li>{t('dp4')}</li>
         </ul>
       </section>
     </article>

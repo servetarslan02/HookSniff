@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 20:18 GMT+8 (SSO organizasyona taşındı + frontend güncellendi)
+> Son güncelleme: 2026-05-19 22:14 GMT+8 (Dokümantasyon sayfaları Türkçe'ye çevrildi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -221,6 +221,27 @@ HookSniff/
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-19 22:00–22:14 — Dokümantasyon Türkçe Çeviri)
+
+### Özet
+13 hardcoded İngilizce dokümantasyon sayfası Türkçe'ye çevrildi. 300+ i18n key oluşturuldu. 2 mevcut çeviri kalite sorunu düzeltildi.
+
+### Yapılan İşler:
+1. **13 sayfa i18n'e geçirildi** — multi-tenant, security, dashboard, idempotency, inbound-webhooks, monitor-performance, cloudevents, playground, smart-routing, changelog, transforms, support, templates
+2. **300+ i18n key oluşturuldu** — EN + TR JSON dosyalarına eklendi
+3. **2 kalite düzeltmesi** — `gettingStartedDesc` ve `sdksDesc` eksik cümleler tamamlandı
+4. **TSX dosyaları güncellendi** — Tüm hardcoded İngilizce metinler `t()` ile değiştirildi
+
+### Değişiklikler:
+- `dashboard/src/messages/en.json` — 300+ yeni key
+- `dashboard/src/messages/tr.json` — 300+ yeni key
+- `dashboard/src/app/[locale]/docs/*/page.tsx` — 13 dosya i18n'e geçirildi
+
+### Teknik terimler çevrilmedi:
+- endpoint, webhook, payload, retry, signature, SDK, API, DLQ, FIFO, HMAC, TLS, SSRF, CloudEvents, Round-Robin, Failover, Token Bucket, OpenTelemetry, Prometheus, Grafana
 
 ---
 

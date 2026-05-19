@@ -1,8 +1,14 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 20:30 GMT+8
+> Son güncelleme: 2026-05-19 22:14 GMT+8
 
-## ✅ Tamamlanan (Bu Oturum — 6 Commit)
+## ✅ Tamamlanan (Bu Oturum — 7+ Commit)
+
+### -1. Dokümantasyon Türkçe Çeviri (22:00–22:14)
+- 13 hardcoded İngilizce sayfa i18n'e geçirildi
+- 300+ i18n key (EN + TR) oluşturuldu
+- 2 mevcut çeviri kalite sorunu düzeltildi
+- Sayfalar: multi-tenant, security, dashboard, idempotency, inbound-webhooks, monitor-performance, cloudevents, playground, smart-routing, changelog, transforms, support, templates
 
 ### 0. Dashboard Kapsamlı Denetim (20:25–20:30)
 - 50+ sayfa incelendi, API health check, sidebar, i18n, rotalar
