@@ -6,7 +6,9 @@ pub async fn get_subscription(
     let plan = Plan::parse_str(&customer.plan);
 
     // Item 247: Derive subscription status dynamically from actual customer state
-    let status = if customer.cancel_at_period_end {
+    let status = if customer.paused_at.is_some() {
+        "paused".to_string()
+    } else if customer.cancel_at_period_end {
         "canceled".to_string()
     } else if customer.payment_failed_at.is_some() {
         "past_due".to_string()
@@ -48,6 +50,9 @@ pub async fn get_subscription(
         card_brand: customer.card_brand.clone(),
         card_exp_month: customer.card_exp_month,
         card_exp_year: customer.card_exp_year,
+        paused_at: customer.paused_at.map(|d| d.to_rfc3339()),
+        paused_until: customer.paused_until.map(|d| d.to_rfc3339()),
+        pause_plan: customer.pause_plan.clone(),
     }))
 }
 
@@ -90,6 +95,264 @@ pub async fn cancel_subscription(
     Ok(Json(serde_json::json!({
         "message": "Your subscription will be cancelled at the end of the current billing period.",
         "cancel_at_period_end": true,
+    })))
+}
+
+// ──────────────────────────────────────────────────────────────
+// POST /v1/billing/pause — Pause subscription (freeze)
+// ──────────────────────────────────────────────────────────────
+
+/// POST /v1/billing/pause — Temporarily pause the subscription.
+///
+/// Pausing means:
+/// - Subscription is canceled at the payment provider (Polar)
+/// - Customer is marked as "paused" instead of "canceled"
+/// - Plan info is preserved (for easy resume)
+/// - Webhook limits reduced to free tier during pause
+/// - Max pause duration: 90 days (auto-downgrade after)
+#[derive(Debug, Deserialize)]
+pub(crate) struct PauseRequest {
+    /// Duration in days to pause (default: 30, max: 90)
+    #[serde(default = "default_pause_days")]
+    days: i32,
+}
+
+fn default_pause_days() -> i32 {
+    30
+}
+
+pub async fn pause_subscription(
+    Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<PauseRequest>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Validate: can't pause free plan
+    let current_plan = Plan::parse_str(&customer.plan);
+    if current_plan == Plan::Developer {
+        return Err(AppError::BadRequest(
+            "Free plan cannot be paused".into(),
+        ));
+    }
+
+    // Validate: can't pause if already paused
+    if customer.paused_at.is_some() {
+        return Err(AppError::BadRequest(
+            "Subscription is already paused. Use /billing/resume to continue.".into(),
+        ));
+    }
+
+    // Validate pause duration
+    let days = req.days.clamp(1, 90);
+    let paused_until = Utc::now() + chrono::Duration::days(days as i64);
+
+    // Cancel subscription at payment provider
+    let billing_svc = BillingService::new(pool.clone(), cfg.clone());
+    match billing_svc.cancel_customer_subscription(&customer).await {
+        Ok(()) => {
+            tracing::info!(
+                "✅ Subscription canceled at provider for customer {} (pause)",
+                customer.id
+            );
+        }
+        Err(e) => {
+            // Log but don't block pause — subscription may already be canceled
+            tracing::warn!(
+                "⚠️ Failed to cancel at provider for customer {}: {:?} — proceeding with pause",
+                customer.id,
+                e
+            );
+        }
+    }
+
+    // Reduce limits to free tier during pause
+    let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
+
+    sqlx::query(
+        "UPDATE customers SET \
+         paused_at = NOW(), \
+         paused_until = $1, \
+         pause_plan = $2, \
+         webhook_limit = $3, \
+         cancel_at_period_end = false, \
+         updated_at = NOW() \
+         WHERE id = $4",
+    )
+    .bind(paused_until)
+    .bind(current_plan.as_str())
+    .bind(free_limit)
+    .bind(customer.id)
+    .execute(&pool)
+    .await?;
+
+    // Audit log
+    {
+        let rid = customer.id.to_string();
+        let _ = crate::audit::log_action(
+            &pool,
+            customer.id,
+            "SUBSCRIPTION_PAUSE",
+            "billing",
+            Some(&rid),
+            Some(serde_json::json!({
+                "plan": current_plan.as_str(),
+                "days": days,
+                "paused_until": paused_until.to_rfc3339(),
+            })),
+            None,
+            None,
+        )
+        .await;
+    }
+
+    // Notification
+    let pool_clone = pool.clone();
+    let plan_name = current_plan.as_str().to_string();
+    let cid = customer.id;
+    tokio::spawn(async move {
+        crate::notifications::helpers::create(
+            &pool_clone,
+            cid,
+            "billing",
+            "⏸️ Abonelik Donduruldu",
+            &format!(
+                "{} plan aboneliğiniz {} gün donduruldu. {} tarihine kadar devam edebilirsiniz.",
+                plan_name,
+                days,
+                paused_until.format("%d.%m.%Y")
+            ),
+            Some("/billing-section"),
+        )
+        .await;
+    });
+
+    tracing::info!(
+        "⏸️ Customer {} paused {} plan for {} days (until {})",
+        customer.id,
+        current_plan.as_str(),
+        days,
+        paused_until
+    );
+
+    Ok(Json(serde_json::json!({
+        "message": format!("Subscription paused for {} days. You can resume anytime before {}.", days, paused_until.format("%d.%m.%Y")),
+        "paused_until": paused_until.to_rfc3339(),
+        "plan_preserved": current_plan.as_str(),
+    })))
+}
+
+// ──────────────────────────────────────────────────────────────
+// POST /v1/billing/resume — Resume paused subscription
+// ──────────────────────────────────────────────────────────────
+
+/// POST /v1/billing/resume — Resume a paused subscription.
+///
+/// Creates a new checkout at the payment provider to re-activate the subscription.
+/// The customer's previous plan is restored.
+pub async fn resume_subscription(
+    Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
+    Extension(customer): Extension<Customer>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Validate: must be paused
+    if customer.paused_at.is_none() {
+        return Err(AppError::BadRequest(
+            "Subscription is not paused".into(),
+        ));
+    }
+
+    // Check if pause has expired (auto-downgrade)
+    if let Some(paused_until) = customer.paused_until {
+        if Utc::now() > paused_until {
+            // Pause expired — downgrade to free
+            sqlx::query(
+                "UPDATE customers SET \
+                 paused_at = NULL, paused_until = NULL, pause_plan = NULL, \
+                 plan = 'developer', webhook_limit = $1, updated_at = NOW() \
+                 WHERE id = $2",
+            )
+            .bind(Plan::Developer.max_webhooks_per_day() as i64)
+            .bind(customer.id)
+            .execute(&pool)
+            .await?;
+
+            return Err(AppError::BadRequest(
+                "Pause period has expired. Your account has been downgraded to the free plan. Please upgrade to continue.".into(),
+            ));
+        }
+    }
+
+    // Get the preserved plan
+    let resume_plan = customer
+        .pause_plan
+        .as_deref()
+        .map(Plan::parse_str)
+        .unwrap_or(Plan::Startup);
+
+    // Create a new checkout to resume
+    let billing_svc = BillingService::new(pool.clone(), cfg.clone());
+    let result = billing_svc
+        .checkout(&customer, &resume_plan, None, false)
+        .await?;
+
+    // Clear pause state
+    sqlx::query(
+        "UPDATE customers SET \
+         paused_at = NULL, paused_until = NULL, pause_plan = NULL, \
+         updated_at = NOW() \
+         WHERE id = $1",
+    )
+    .bind(customer.id)
+    .execute(&pool)
+    .await?;
+
+    // Audit log
+    {
+        let rid = customer.id.to_string();
+        let _ = crate::audit::log_action(
+            &pool,
+            customer.id,
+            "SUBSCRIPTION_RESUME",
+            "billing",
+            Some(&rid),
+            Some(serde_json::json!({
+                "plan": resume_plan.as_str(),
+            })),
+            None,
+            None,
+        )
+        .await;
+    }
+
+    // Notification
+    let pool_clone = pool.clone();
+    let plan_name = resume_plan.as_str().to_string();
+    let cid = customer.id;
+    tokio::spawn(async move {
+        crate::notifications::helpers::create(
+            &pool_clone,
+            cid,
+            "billing",
+            "▶️ Abonelik Devam Ediyor",
+            &format!(
+                "{} plan aboneliğiniz devam ediyor. Ödeme sayfasına yönlendiriliyorsunuz.",
+                plan_name
+            ),
+            Some("/billing-section"),
+        )
+        .await;
+    });
+
+    tracing::info!(
+        "▶️ Customer {} resuming {} plan",
+        customer.id,
+        resume_plan.as_str()
+    );
+
+    Ok(Json(serde_json::json!({
+        "message": "Redirecting to checkout to resume your subscription.",
+        "checkout_url": result.checkout_url,
+        "plan": resume_plan.as_str(),
     })))
 }
 
