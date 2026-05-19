@@ -858,7 +858,7 @@ export default function SdksPage() {
                 <tr key={feature as string}>
                   <td className="px-3 py-3 font-medium text-gray-900 dark:text-white text-sm">{feature as string}</td>
                   {(support as boolean[]).map((s, i) => (
-                    <td key={i} className="px-2 py-3 text-center text-lg">{s ? <Check size={14} strokeWidth={1.75} className=\"text-emerald-500\" /> : '—'}</td>
+                    <td key={i} className="px-2 py-3 text-center text-lg">{s ? <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> : '—'}</td>
                   ))}
                 </tr>
               ))}
