@@ -178,10 +178,28 @@ pub async fn run_retention(pool: &PgPool, retention_days: i64) -> Result<()> {
     cleanup_webhook_queue(pool).await?;
     cleanup_seen_webhooks(pool).await?;
     cleanup_sso_login_attempts(pool).await?;
+    cleanup_daily_event_usage(pool).await?;
     reset_monthly_webhook_counts(pool).await?;
 
     tracing::info!("✅ Retention job completed");
     Ok(())
+}
+
+/// Clean up daily_event_usage rows older than 90 days.
+async fn cleanup_daily_event_usage(pool: &PgPool) -> Result<u64> {
+    let cutoff = Utc::now() - chrono::Duration::days(90);
+    let result = sqlx::query("DELETE FROM daily_event_usage WHERE event_date < $1")
+        .bind(cutoff)
+        .execute(pool)
+        .await?;
+
+    if result.rows_affected() > 0 {
+        tracing::info!(
+            "🧹 Cleaned up {} old daily_event_usage rows",
+            result.rows_affected()
+        );
+    }
+    Ok(result.rows_affected())
 }
 
 #[cfg(test)]
