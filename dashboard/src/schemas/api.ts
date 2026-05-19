@@ -505,6 +505,9 @@ export const BillingSubscriptionSchema = z.object({
   card_brand: z.string().nullish(),
   card_exp_month: z.number().nullish(),
   card_exp_year: z.number().nullish(),
+  paused_at: z.string().nullish(),
+  paused_until: z.string().nullish(),
+  pause_plan: z.string().nullish(),
 });
 export type BillingSubscriptionValidated = z.infer<typeof BillingSubscriptionSchema>;
 

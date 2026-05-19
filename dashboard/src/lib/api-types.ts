@@ -535,6 +535,9 @@ export interface BillingSubscription {
   card_brand?: string;
   card_exp_month?: number;
   card_exp_year?: number;
+  paused_at?: string;
+  paused_until?: string;
+  pause_plan?: string;
 }
 
 export interface OverageSettings {
