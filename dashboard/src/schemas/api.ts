@@ -578,9 +578,11 @@ export type InboundConfigValidated = z.infer<typeof InboundConfigSchema>;
 // ── SSO Config Schema ──
 export const SsoConfigSchema = z.object({
   id: z.string().uuid().optional(),
+  team_id: z.string().uuid().nullable().optional(),
   provider: z.string().optional(),
   enabled: z.boolean().optional(),
   admin_bypass: z.boolean().optional(),
+  verified_domain: z.string().nullable().optional(),
   metadata_url: z.string().optional(),
   entity_id: z.string().optional(),
   sso_url: z.string().optional(),

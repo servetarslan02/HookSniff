@@ -41,3 +41,11 @@ Organization sistemi (Team + SSO + Audit Log) uçtan uca incelendi. 17 sorun tes
 ## DB Uygulanan Migrations
 - 067: `admin_bypass` + `sso_login_attempts` ✅
 - 068: `verified_domain` ✅
+- 069: `team_id` + `created_by` (SSO organizasyona taşındı) ✅
+
+## SSO Scope Değişikliği (Migration 069)
+SSO config artık müşteriye değil, takıma/organizasyona bağlı:
+- `sso_configs.team_id` → hangi organizasyonun SSO'su
+- `sso_configs.created_by` → kim oluşturdu (audit)
+- Login akışı: team membership + verified_domain ile config bulma
+- Auth enforcement: hem customer hem team bazlı kontrol
