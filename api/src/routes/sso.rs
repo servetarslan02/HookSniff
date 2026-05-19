@@ -18,7 +18,7 @@
 
 use axum::{
     extract::{Extension, Query},
-    http::{HeaderMap, StatusCode},
+    http::HeaderMap,
     response::Redirect,
     routing::{delete, get, post},
     Json, Router,
