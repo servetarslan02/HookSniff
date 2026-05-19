@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Mailbox, Mail, Radio, Lock, Rocket, Wrench, BarChart3, Package, Anchor, CheckCircle } from 'lucide-react';
 
 
 
@@ -99,7 +100,7 @@ export function NewsletterPageContent() {
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
+            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white"><Anchor size={20} strokeWidth={1.75} className="inline mr-1" /> HookSniff</Link>
             <span className="text-gray-500 dark:text-slate-500">/</span>
             <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
           </div>
@@ -110,17 +111,17 @@ export function NewsletterPageContent() {
       <main className="max-w-4xl mx-auto px-6 py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <span className="text-5xl mb-4 block">📬</span>
+          <span className="text-5xl mb-4 block"><Mailbox size={56} strokeWidth={1.5} /></span>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("theWebhookDigest")}</h1>
           <p className="text-lg text-gray-600 dark:text-slate-400 max-w-xl mx-auto">
             Webhook tips, product updates, and engineering insights. Delivered to your inbox. No spam. Unsubscribe anytime.
           </p>
           <div className="flex items-center justify-center gap-4 mt-4 text-sm text-gray-500 dark:text-slate-500">
-            <span>📧 1-2x per week</span>
+            <span><Mail size={14} strokeWidth={1.75} className="inline mr-1" /> 1-2x per week</span>
             <span>·</span>
-            <a href="/blog/rss" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">📡 RSS feed</a>
+            <a href="/blog/rss" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors"><Radio size={14} strokeWidth={1.75} className="inline mr-1" /> RSS feed</a>
             <span>·</span>
-            <span>🔒 Privacy first</span>
+            <span><Lock size={14} strokeWidth={1.75} className="inline mr-1" /> Privacy first</span>
           </div>
         </div>
 
@@ -128,7 +129,7 @@ export function NewsletterPageContent() {
         <div className="max-w-md mx-auto mb-16">
           {status === 'success' ? (
             <div className="text-center p-6 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/20">
-              <span className="text-3xl mb-2 block">✅</span>
+              <span className="text-3xl mb-2 block"><CheckCircle size={32} strokeWidth={1.75} /></span>
               <p className="text-emerald-700 dark:text-emerald-400 font-medium mb-1">You&apos;re in!</p>
               <p className="text-sm text-emerald-600 dark:text-emerald-500">{message}</p>
             </div>
@@ -160,26 +161,26 @@ export function NewsletterPageContent() {
         <div className="grid md:grid-cols-3 gap-6 mb-16">
           {[
             {
-              icon: '🚀',
+              icon: <Rocket size={16} strokeWidth={1.75} />,
               title: 'Product updates',
               desc: 'New features, SDK releases, platform improvements, and changelog highlights.',
               example: 'v0.5.0: Blog v2, Status Page, Docs v2 — 31 strategy reports completed',
             },
             {
-              icon: '🔧',
+              icon: <Wrench size={16} strokeWidth={1.75} />,
               title: 'Engineering insights',
               desc: 'Deep dives into webhook architecture, Rust, distributed systems, and developer tools.',
               example: 'How we built FIFO webhook delivery with PostgreSQL LISTEN/NOTIFY',
             },
             {
-              icon: '📊',
+              icon: <BarChart3 size={16} strokeWidth={1.75} />,
               title: 'Industry trends',
               desc: 'Webhook standards, AI agents, event-driven architecture, and developer ecosystem news.',
               example: 'Why every AI agent needs webhooks (and how to build them right)',
             },
           ].map((item) => (
             <div key={item.title} className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
-              <span className="text-3xl">{item.icon}</span>
+              <span className="text-gray-600 dark:text-slate-400">{item.icon}</span>
               <h3 className="font-bold text-gray-900 dark:text-white mt-3 mb-2">{item.title}</h3>
               <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">{item.desc}</p>
               <p className="text-xs text-gray-500 dark:text-slate-500 italic bg-gray-50 dark:bg-slate-800 rounded-lg px-3 py-2">
@@ -270,18 +271,18 @@ export function NewsletterPageContent() {
           <div className="grid md:grid-cols-2 gap-4">
             {[
               {
-                icon: '🔧',
+                icon: <Wrench size={16} strokeWidth={1.75} />,
                 title: 'Engineering deep dives',
                 desc: 'Webhook architecture, Rust internals, distributed systems patterns — written for developers who want to understand the how and why.',
               },
               {
-                icon: '📦',
+                icon: <Package size={16} strokeWidth={1.75} />,
                 title: 'Product updates',
                 desc: 'New features, SDK releases, and platform improvements. Concise, well-structured, and always relevant to your integration.',
               },
             ].map((item) => (
               <div key={item.title} className="p-5 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
-                <span className="text-2xl mb-2 block">{item.icon}</span>
+                <span className="text-gray-600 dark:text-slate-400 mb-2 block">{item.icon}</span>
                 <h3 className="font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
                 <p className="text-sm text-gray-600 dark:text-slate-400">{item.desc}</p>
               </div>
@@ -342,7 +343,7 @@ export function NewsletterPageContent() {
 
         {/* Privacy */}
         <div className="text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 mb-16">
-          <span className="text-2xl mb-2 block">🔒</span>
+          <span className="text-2xl mb-2 block"><Lock size={24} strokeWidth={1.75} /></span>
           <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("privacyMatters")}</h3>
           <p className="text-sm text-gray-600 dark:text-slate-400 max-w-lg mx-auto">
             We use your email only for our newsletter. No spam, no selling, no sharing.

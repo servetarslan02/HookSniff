@@ -7,12 +7,12 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi, type RetryPolicyConfig } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
-import { BarChart3, Pencil, Repeat, TrendingUp } from 'lucide-react';
+import { ArrowRight, BarChart3, Pencil, Repeat, TrendingUp } from 'lucide-react';
 
 const BACKOFF_OPTIONS = [
   { value: 'exponential', icon: <TrendingUp size={16} strokeWidth={1.75} /> },
   { value: 'linear', icon: <BarChart3 size={16} strokeWidth={1.75} /> },
-  { value: 'fixed', icon: '➡️' },
+  { value: 'fixed', icon: <ArrowRight size={16} strokeWidth={1.75} /> },
 ];
 
 export default function RetryPolicyPage() {

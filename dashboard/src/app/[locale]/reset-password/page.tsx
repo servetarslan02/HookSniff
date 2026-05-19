@@ -86,7 +86,7 @@ function ResetPasswordContent() {
             <span className="text-2xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </Link>
           <div className="glass-card p-8">
-            <div className="text-6xl mb-4">❌</div>
+            <div className="text-6xl mb-4"><X size={48} strokeWidth={1.5} className="text-red-500" /></div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('invalidResetLink')}</h2>
             <p className="text-gray-500 dark:text-slate-400 mb-6">{t('invalidResetLinkDesc')}</p>
             <Link href="/forgot-password" className="inline-block px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition">
@@ -107,7 +107,7 @@ function ResetPasswordContent() {
             <span className="text-2xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </Link>
           <div className="glass-card p-8">
-            <div className="text-6xl mb-4">✅</div>
+            <div className="text-6xl mb-4"><Check size={48} strokeWidth={1.5} className="text-emerald-500" /></div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('passwordResetSuccess')}</h2>
             <p className="text-gray-500 dark:text-slate-400 mb-6">{t('passwordResetSuccessDesc')}</p>
             <Link href="/login" className="inline-block px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition">

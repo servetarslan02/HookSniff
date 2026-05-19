@@ -361,7 +361,7 @@ export default function LogsPage() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
                             {t('attempt')} {a.attempt_number}
-                            {a.status === 'delivered' && ' ✓'}
+                            {a.status === 'delivered' && <Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom text-emerald-500" />'}
                           </p>
                           <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
                             {a.response_status && (

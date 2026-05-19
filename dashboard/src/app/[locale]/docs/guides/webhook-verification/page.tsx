@@ -374,7 +374,7 @@ export default function WebhookVerificationPage() {
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">
-        🔒 Webhook Signature Verification
+        <Lock size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Webhook Signature Verification
       </h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
         Every webhook delivered by HookSniff includes a cryptographic signature. <strong>Always verify it</strong> before processing — this prevents attackers from sending fake webhooks to your endpoint.
@@ -385,9 +385,9 @@ export default function WebhookVerificationPage() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Why Verify?</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 not-prose">
           {[
-            { icon: '🛡️', title: 'Prevent Spoofing', desc: 'Without verification, anyone can POST to your endpoint with fake data.' },
-            { icon: '🔄', title: 'Replay Protection', desc: 'Timestamps older than 5 minutes are rejected automatically.' },
-            { icon: '📐', title: 'Standard Webhooks', desc: 'HookSniff follows the Standard Webhooks spec — same as Svix, Clerk, and others.' },
+            { icon: <Shield size={16} strokeWidth={1.75} />, title: 'Prevent Spoofing', desc: 'Without verification, anyone can POST to your endpoint with fake data.' },
+            { icon: <RefreshCw size={16} strokeWidth={1.75} />, title: 'Replay Protection', desc: 'Timestamps older than 5 minutes are rejected automatically.' },
+            { icon: <Ruler size={16} strokeWidth={1.75} />, title: 'Standard Webhooks', desc: 'HookSniff follows the Standard Webhooks spec — same as Svix, Clerk, and others.' },
           ].map(({ icon, title, desc }) => (
             <div key={title} className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
@@ -449,7 +449,7 @@ export default function WebhookVerificationPage() {
           <li>Check timestamp: reject if older than <strong>5 minutes</strong> (300 seconds)</li>
           <li>Compute expected signature: <code>v1,base64(hmac_sha256(secret, {"\"{id}.{timestamp}.{body}\""}))</code></li>
           <li>Compare with received signature(s) using <strong>constant-time comparison</strong> (prevents timing attacks)</li>
-          <li>If any signature matches → ✅ valid. Otherwise → ❌ reject</li>
+          <li>If any signature matches → <Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom text-emerald-500" /> valid. Otherwise → <X size={14} strokeWidth={1.75} className="inline-block align-text-bottom text-red-500" /> reject</li>
         </ol>
       </section>
 
@@ -473,6 +473,7 @@ export default function WebhookVerificationPage() {
 import hashlib
 import base64
 import time
+import { Lock, RefreshCw, Ruler, Shield } from 'lucide-react';
 
 def verify_webhook(body: bytes, headers: dict, secret: str) -> dict:
     """Verify a Standard Webhooks signature."""
@@ -513,12 +514,12 @@ def verify_webhook(body: bytes, headers: dict, secret: str) -> dict:
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Security Tips</h2>
         <div className="space-y-4 not-prose">
           {[
-            { icon: '✅', title: 'Always use HTTPS', desc: 'Your webhook endpoint must use TLS. HookSniff refuses to deliver to HTTP endpoints.' },
-            { icon: '✅', title: 'Use constant-time comparison', desc: 'Prevents timing attacks. All SDKs do this automatically.' },
-            { icon: '✅', title: 'Check timestamp', desc: 'Reject webhooks older than 5 minutes to prevent replay attacks.' },
-            { icon: '✅', title: 'Rotate secrets periodically', desc: 'Use the dashboard or API to rotate signing secrets. Old secrets remain valid during rotation.' },
-            { icon: '✅', title: 'Return 2xx quickly', desc: 'Process webhooks asynchronously. Return 200 immediately, then handle the event in a background job.' },
-            { icon: '❌', title: 'Never log the secret', desc: 'Signing secrets are credentials. Never log them or expose them in error messages.' },
+            { icon: <Check size={16} strokeWidth={1.75} className="text-emerald-500" />, title: 'Always use HTTPS', desc: 'Your webhook endpoint must use TLS. HookSniff refuses to deliver to HTTP endpoints.' },
+            { icon: <Check size={16} strokeWidth={1.75} className="text-emerald-500" />, title: 'Use constant-time comparison', desc: 'Prevents timing attacks. All SDKs do this automatically.' },
+            { icon: <Check size={16} strokeWidth={1.75} className="text-emerald-500" />, title: 'Check timestamp', desc: 'Reject webhooks older than 5 minutes to prevent replay attacks.' },
+            { icon: <Check size={16} strokeWidth={1.75} className="text-emerald-500" />, title: 'Rotate secrets periodically', desc: 'Use the dashboard or API to rotate signing secrets. Old secrets remain valid during rotation.' },
+            { icon: <Check size={16} strokeWidth={1.75} className="text-emerald-500" />, title: 'Return 2xx quickly', desc: 'Process webhooks asynchronously. Return 200 immediately, then handle the event in a background job.' },
+            { icon: <X size={16} strokeWidth={1.75} className="text-red-500" />, title: 'Never log the secret', desc: 'Signing secrets are credentials. Never log them or expose them in error messages.' },
           ].map(({ icon, title, desc }) => (
             <div key={title} className="flex items-start gap-3 p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
               <span className="text-xl">{icon}</span>

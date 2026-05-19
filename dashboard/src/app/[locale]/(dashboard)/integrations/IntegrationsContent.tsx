@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { CreditCard, ShoppingBag, GitBranch, MessageSquare, Phone, Gamepad2, TriangleRight, FileText, Plug, Link2, Pencil, Trash2 } from 'lucide-react';
+import { CreditCard, ShoppingBag, GitBranch, MessageSquare, Pause, Phone, Play, Gamepad2, TriangleRight, FileText, Plug, Link2, Pencil, Trash2 } from 'lucide-react';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
@@ -316,7 +316,7 @@ export default function IntegrationsContent() {
                   <button onClick={e => { e.stopPropagation(); toggleMutation.mutate({ id: ig.id, enabled: !ig.enabled }); }}
                     title={ig.enabled ? t('disable') : t('enable')}
                     className={`p-1.5 text-sm ${ig.enabled ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}`}>
-                    {ig.enabled ? '⏸' : '▶'}
+                    {ig.enabled ? <Pause size={14} /> : <Play size={14} />}
                   </button>
                   <button onClick={e => { e.stopPropagation(); setDeleteTarget(ig.id); }} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5"><Trash2 size={16} strokeWidth={1.75} /></button>
                 </div>

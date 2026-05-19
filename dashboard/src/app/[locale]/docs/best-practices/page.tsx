@@ -1,5 +1,7 @@
 import CodeBlock from '@/components/CodeBlock';
+import { Check, X } from 'lucide-react';
 import type { Metadata } from 'next';
+import { Check, X } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;
@@ -64,7 +66,7 @@ webhook-id: msg_abc123`}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-4">
           <div className="p-4 border border-green-200 dark:border-green-900/30 rounded-xl bg-green-50/50 dark:bg-green-900/10">
-            <h4 className="text-sm font-semibold text-green-800 dark:text-green-400 mb-2">✅ {t('goodSelfContained')}</h4>
+            <h4 className="text-sm font-semibold text-green-800 dark:text-green-400 mb-2"><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('goodSelfContained')}</h4>
             <pre className="text-xs font-mono text-green-700 dark:text-green-300 overflow-x-auto">
 {`{
   "event": "order.shipped",
@@ -78,7 +80,7 @@ webhook-id: msg_abc123`}
             </pre>
           </div>
           <div className="p-4 border border-red-200 dark:border-red-900/30 rounded-xl bg-red-50/50 dark:bg-red-900/10">
-            <h4 className="text-sm font-semibold text-red-800 dark:text-red-400 mb-2">❌ {t('badFollowUp')}</h4>
+            <h4 className="text-sm font-semibold text-red-800 dark:text-red-400 mb-2"><X size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-red-500" /> {t('badFollowUp')}</h4>
             <pre className="text-xs font-mono text-red-700 dark:text-red-300 overflow-x-auto">
 {`{
   "event": "order.shipped",

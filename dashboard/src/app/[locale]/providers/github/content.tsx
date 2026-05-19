@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
+import { Github, Zap } from 'lucide-react';
 
 export function GitHubWebhooksPageContent() {
   const t = useTranslations('providers');
@@ -14,7 +15,7 @@ export function GitHubWebhooksPageContent() {
       <main className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-800 rounded-full border border-gray-200 dark:border-slate-700 mb-4">
-            <span className="text-lg">🐙</span>
+            <span className="text-lg"><Github size={20} strokeWidth={1.75} /></span>
             <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("githubIntegration")}</span>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("githubWebhooksGuide")}</h1>
@@ -24,7 +25,7 @@ export function GitHubWebhooksPageContent() {
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">⚡ Quick Start</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4"><Zap size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Quick Start</h2>
           <ol className="space-y-4">
             <li className="flex gap-3">
               <span className="w-6 h-6 flex items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-bold shrink-0">1</span>
@@ -51,7 +52,7 @@ export function GitHubWebhooksPageContent() {
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">📋 Common GitHub Events</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4"><ClipboardList size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Common GitHub Events</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

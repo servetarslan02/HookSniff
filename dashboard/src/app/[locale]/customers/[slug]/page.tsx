@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { AlertTriangle } from 'lucide-react';
 
 export const revalidate = 3600;
 export const metadata = { title: 'Customer Stories — HookSniff' };
@@ -152,7 +153,7 @@ export default async function CustomerStoryPage({ params }: { params: Promise<{ 
       <article className="max-w-4xl mx-auto px-6 py-16">
         {/* Disclaimer */}
         <div className="mb-8 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-sm">
-          ⚠️ {tc('disclaimer')}
+          <AlertTriangle size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> {tc('disclaimer')}
         </div>
 
         {/* Header */}

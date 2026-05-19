@@ -4,6 +4,7 @@ import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import Footer from '@/components/Footer';
+import { Lock, DollarSign, Globe } from 'lucide-react';
 
 
 
@@ -70,23 +71,23 @@ export function AboutPageContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {[
             {
-              icon: '🔒',
+              icon: <Lock size={32} strokeWidth={1.75} />,
               title: t('about.securityFirst'),
               desc: t('about.securityFirstDesc'),
             },
             {
-              icon: '💰',
+              icon: <DollarSign size={32} strokeWidth={1.75} />,
               title: t('about.transparentPricing'),
               desc: t('about.transparentPricingDesc'),
             },
             {
-              icon: '🌍',
+              icon: <Globe size={32} strokeWidth={1.75} />,
               title: t('about.globalInfrastructure'),
               desc: t('about.globalInfrastructureDesc'),
             },
           ].map(v => (
             <div key={v.title} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6">
-              <div className="text-3xl mb-3">{v.icon}</div>
+              <div className="mb-3 text-gray-600 dark:text-slate-400">{v.icon}</div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{v.title}</h3>
               <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed">{v.desc}</p>
             </div>

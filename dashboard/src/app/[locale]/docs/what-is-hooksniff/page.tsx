@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { Building2, Rocket, Ruler } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -43,21 +44,21 @@ export default async function WhatIsHookSniffPage() {
           <div className="p-5 border border-red-200 dark:border-red-900/30 rounded-xl bg-red-50/50 dark:bg-red-900/10">
             <h3 className="text-base font-semibold text-red-800 dark:text-red-400 mb-3">{t('withoutHooksniff')}</h3>
             <ul className="space-y-2 text-sm text-red-700 dark:text-red-300">
-              <li>❌ {t('without1')}</li>
-              <li>❌ {t('without2')}</li>
-              <li>❌ {t('without3')}</li>
-              <li>❌ {t('without4')}</li>
-              <li>❌ {t('without5')}</li>
+              <li><X size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-red-500" /> {t('without1')}</li>
+              <li><X size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-red-500" /> {t('without2')}</li>
+              <li><X size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-red-500" /> {t('without3')}</li>
+              <li><X size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-red-500" /> {t('without4')}</li>
+              <li><X size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-red-500" /> {t('without5')}</li>
             </ul>
           </div>
           <div className="p-5 border border-green-200 dark:border-green-900/30 rounded-xl bg-green-50/50 dark:bg-green-900/10">
             <h3 className="text-base font-semibold text-green-800 dark:text-green-400 mb-3">{t('withHooksniff')}</h3>
             <ul className="space-y-2 text-sm text-green-700 dark:text-green-300">
-              <li>✅ {t('with1')}</li>
-              <li>✅ {t('with2')}</li>
-              <li>✅ {t('with3')}</li>
-              <li>✅ {t('with4')}</li>
-              <li>✅ {t('with5')}</li>
+              <li><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('with1')}</li>
+              <li><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('with2')}</li>
+              <li><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('with3')}</li>
+              <li><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('with4')}</li>
+              <li><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('with5')}</li>
             </ul>
           </div>
         </div>
@@ -138,19 +139,19 @@ export default async function WhatIsHookSniffPage() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('nextSteps')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
           <Link href="/docs/quickstart" className="block p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">🚀 {t('nextQuickstart')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1"><Rocket size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('nextQuickstart')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400">{t('nextQuickstartDesc')}</p>
           </Link>
           <Link href="/docs/concepts" className="block p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">📐 {t('nextConcepts')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1"><Ruler size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('nextConcepts')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400">{t('nextConceptsDesc')}</p>
           </Link>
           <Link href="/docs/best-practices" className="block p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">✅ {t('nextBestPractices')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1"><Check size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-emerald-500" /> {t('nextBestPractices')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400">{t('nextBestPracticesDesc')}</p>
           </Link>
           <Link href="/docs/architecture" className="block p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">🏗️ {t('nextArchitecture')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1"><Building2 size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('nextArchitecture')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400">{t('nextArchitectureDesc')}</p>
           </Link>
         </div>

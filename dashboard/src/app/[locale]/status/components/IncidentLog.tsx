@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { Incident } from './types';
 import { formatDate, formatRelativeTime } from './utils';
 import { StatusBadge } from './StatusBadge';
+import { PartyPopper } from 'lucide-react';
 
 export function IncidentLog({ incidents }: { incidents: Incident[] }) {
   const t = useTranslations('status');
@@ -24,7 +25,7 @@ export function IncidentLog({ incidents }: { incidents: Incident[] }) {
   if (incidents.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-slate-500">
-        <div className="text-3xl mb-2">🎉</div>
+        <div className="text-3xl mb-2"><PartyPopper size={40} strokeWidth={1.5} className="text-emerald-500" /></div>
         <p>{t('noIncidents')}</p>
       </div>
     );
