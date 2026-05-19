@@ -59,7 +59,11 @@ export default function PortalPage() {
       <div className="max-w-4xl">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('title')}</h1>
         <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm">
-          {error instanceof Error ? error.message : t('failedToLoad')}
+          <p className="mb-2">{error instanceof Error ? error.message : t('failedToLoad')}</p>
+          <button type="button" onClick={() => window.location.reload()}
+            className="text-xs text-red-600 dark:text-red-400 hover:underline font-medium">
+            ↻ {t('retry') || 'Retry'}
+          </button>
         </div>
       </div>
     );

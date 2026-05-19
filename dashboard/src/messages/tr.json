@@ -2941,7 +2941,10 @@
     "endpoints": "Endpoint'ler",
     "apiCallsToday": "Bugünkü API çağrıları",
     "failedToLoad": "Portal verileri yüklenemedi",
-    "logo": "Logo"
+    "logo": "Logo",
+    "successRate": "Başarı Oranı",
+    "subtitle": "Hesap genel bakışınız ve kullanımınız",
+    "retry": "Tekrar dene"
   },
   "sso": {
     "title": "🔐 SSO / SAML",
@@ -3283,7 +3286,8 @@
     "copied": "Kopyalandı!",
     "portalSaved": "Portal yapılandırması kaydedildi!",
     "portalSaveFailed": "Portal yapılandırması kaydedilemedi",
-    "portalUrl": "Portal URL'si"
+    "portalUrl": "Portal URL'si",
+    "retry": "Tekrar dene"
   },
   "retryPolicy": {
     "title": "🔄 Yeniden Deneme Politikası",
