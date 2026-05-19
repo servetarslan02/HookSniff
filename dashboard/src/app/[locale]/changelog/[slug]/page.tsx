@@ -101,7 +101,7 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${release.version}: ${release.title}`)}&url=${encodeURIComponent(`https://hooksniff.vercel.app/changelog/${release.slug}`)}`}
               target="_blank"
              rel="noopener noreferrer"
-              rel="noopener noreferrer"
+              
               className="text-xs text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
             >
               𝕏 Twitter
@@ -110,7 +110,7 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
               href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://hooksniff.vercel.app/changelog/${release.slug}`)}`}
               target="_blank"
              rel="noopener noreferrer"
-              rel="noopener noreferrer"
+              
               className="text-xs text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
             >
               LinkedIn
@@ -119,7 +119,7 @@ export default async function ChangelogEntryPage({ params }: { params: Promise<{
               href={`https://news.ycombinator.com/submitlink?u=${encodeURIComponent(`https://hooksniff.vercel.app/changelog/${release.slug}`)}&t=${encodeURIComponent(`${release.version}: ${release.title}`)}`}
               target="_blank"
              rel="noopener noreferrer"
-              rel="noopener noreferrer"
+              
               className="text-xs text-gray-500 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
             >
               HN
