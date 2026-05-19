@@ -1710,7 +1710,8 @@
       "featureFlags": "Feature Flags",
       "alerts": "Uyarılar",
       "email": "E-posta",
-      "broadcasts": "Duyurular"
+      "broadcasts": "Duyurular",
+      "security": "Güvenlik"
     },
     "noActivity": "Henüz aktivite kaydı yok",
     "noAdminPrivileges": "Yönetici yetkiniz yok.",

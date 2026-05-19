@@ -10,7 +10,7 @@ import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
 import { notificationsApi } from '@/lib/api';
 import { useRealtime } from '@/hooks/useRealtime';
-import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, FolderOpen, Lock, Megaphone } from 'lucide-react';
+import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, FolderOpen, Lock, Megaphone, Shield } from 'lucide-react';
 
 const adminNavigation = [
   { nameKey: 'overview', href: '/admin', icon: <BarChart3 size={18} strokeWidth={1.75} /> },
@@ -22,7 +22,7 @@ const adminNavigation = [
   { nameKey: 'activityLog', href: '/admin/activity', icon: <ClipboardList size={18} strokeWidth={1.75} /> },
   { nameKey: 'alerts', href: '/admin/alerts', icon: <Bell size={18} strokeWidth={1.75} /> },
   { nameKey: 'email', href: '/admin/email', icon: <Mail size={18} strokeWidth={1.75} /> },
-  { nameKey: 'broadcasts', href: '/admin/broadcasts', icon: <Megaphone size={18} strokeWidth={1.75} /> },
+  { nameKey: 'security', href: '/admin/security', icon: <Shield size={18} strokeWidth={1.75} /> },
 ];
 
 function AdminShell({ children }: { children: React.ReactNode }) {
