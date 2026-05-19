@@ -203,7 +203,7 @@ impl PolarProvider {
             Plan::Enterprise
         } else if product_id == self.config.product_pro || product_id == self.config.product_pro_yearly {
             Plan::Pro
-        } else if product_id == self.config.product_startup_yearly {
+        } else if product_id == self.config.product_startup || product_id == self.config.product_startup_yearly {
             Plan::Startup
         } else {
             Plan::Developer
