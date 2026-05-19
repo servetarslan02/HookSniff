@@ -543,7 +543,9 @@
     "roleEditor": "Editor",
     "roleViewer": "Viewer",
     "roleMember": "Member",
-    "removeBtn": "Remove"
+    "removeBtn": "Remove",
+    "inviteAccepted": "Invite accepted! Joined team as {role}",
+    "inviteAcceptFailed": "Failed to accept invite. The link may have expired."
   },
   "notifications": {
     "title": "Notifications",
