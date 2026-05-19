@@ -125,8 +125,11 @@ if (!isValid) {
       </div>
 
       {/* Algorithm Selector */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('algorithm')}</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center"><span className="text-base">🔐</span></div>
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('algorithm')}</h2>
+        </div>
         <div className="flex gap-3">
           {(['sha256', 'sha512'] as const).map((alg) => (
             <button
@@ -145,8 +148,11 @@ if (!isValid) {
       </div>
 
       {/* Verify Tool */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('verifySignature')}</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center"><span className="text-base">✍️</span></div>
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('verifySignature')}</h2>
+        </div>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('payloadLabel')}</label>
@@ -155,7 +161,7 @@ if (!isValid) {
               onChange={(e) => { setPayload(e.target.value); setResult(null); }}
               placeholder='{"event":"order.created","data":{"id":"ord_123"}}'
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+              className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
             />
           </div>
           <div>
@@ -165,7 +171,7 @@ if (!isValid) {
               value={secret}
               onChange={(e) => { setSecret(e.target.value); setResult(null); }}
               placeholder="whsec_your_secret_key"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+              className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
             />
           </div>
           <div>
@@ -175,7 +181,7 @@ if (!isValid) {
               value={signature}
               onChange={(e) => { setSignature(e.target.value); setResult(null); }}
               placeholder="sha256=abc123..."
-              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+              className="w-full px-3.5 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
             />
           </div>
           <div className="flex gap-3">
@@ -219,8 +225,11 @@ if (!isValid) {
       </div>
 
       {/* Code Example */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('codeExample')}</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center"><span className="text-base">💻</span></div>
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('codeExample')}</h2>
+        </div>
         <div className="relative">
           <button
             onClick={() => { navigator.clipboard.writeText(sampleCode); toast(t('toastCopied'), 'success'); }}
@@ -235,8 +244,11 @@ if (!isValid) {
       </div>
 
       {/* How it works */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('howItWorks')}</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center"><span className="text-base">📖</span></div>
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('howItWorks')}</h2>
+        </div>
         <div className="space-y-4">
           {[
             { step: '1', title: t('step1Title'), desc: t('step1Desc') },
