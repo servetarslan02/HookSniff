@@ -1,4 +1,4 @@
-import type { ApiOptions, Application, RetryPolicyConfig, Endpoint, Delivery, DeliveryDetail, DeliveryAttempt, DeliveryListResponse, StatsResponse, AdminStatsResponse, DeployInfo, AdminUsersResponse, AdminUserDetail, RevenueResponse, Team, TeamMember, TeamDetailResponse, NotificationListResponse, DeliveryTrendResponse, SuccessRateData, LatencyTrendResponse, AuditLogResponse, AuditLogEntryResponse, EndpointHealthResponse, ApiKeyResponse, PortalConfigResponse, PortalEmbedCodeResponse, PortalProfileResponse, PortalUsageResponse, RateLimitResponse, SchemaRegistryListResponse, SearchResponseData, ServiceTokenResponse, TemplateListResponse, UserAnalytics, ChurnUser, AlertRuleAdmin, FeatureFlag, PlatformSettings, Invoice, AlertRule, InboundConfig, TransformRule, BillingUsage, BillingSubscription, OverageSettings, PortalResponse, RefundResponse } from './api-types';
+import type { ApiOptions, Application, RetryPolicyConfig, Endpoint, Delivery, DeliveryDetail, DeliveryAttempt, DeliveryListResponse, StatsResponse, AdminStatsResponse, DeployInfo, AdminUsersResponse, AdminUserDetail, RevenueResponse, Team, TeamMember, TeamDetailResponse, NotificationListResponse, DeliveryTrendResponse, SuccessRateData, LatencyTrendResponse, AuditLogResponse, AuditLogEntryResponse, EndpointHealthResponse, ApiKeyResponse, PortalConfigResponse, PortalEmbedCodeResponse, PortalProfileResponse, PortalUsageResponse, RateLimitResponse, SchemaRegistryListResponse, SearchResponseData, ServiceTokenResponse, TemplateItem, TemplateListResponse, UserAnalytics, ChurnUser, AlertRuleAdmin, FeatureFlag, PlatformSettings, Invoice, AlertRule, InboundConfig, TransformRule, BillingUsage, BillingSubscription, OverageSettings, PortalResponse, RefundResponse } from './api-types';
 export type * from './api-types';
 
 import { getUserFriendlyMessage, extractErrorCode } from './error-catalog';
@@ -450,7 +450,7 @@ export const api = {
     return apiFetch<TemplateListResponse>(`/templates${qs}`, { token });
   },
   getTemplate: (token: string, id: string) =>
-    apiFetch<WebhookTemplate>(`/templates/${id}`, { token }),
+    apiFetch<TemplateItem>(`/templates/${id}`, { token }),
   applyTemplate: (token: string, id: string, data: { endpoint_url: string; enabled_agents?: string[] }) =>
     apiFetch<{ template_id: string; endpoint_id: string; message: string }>(`/templates/${id}/apply`, { method: 'POST', body: data, token }),
 };
