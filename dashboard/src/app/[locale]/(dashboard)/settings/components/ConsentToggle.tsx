@@ -55,7 +55,7 @@ export function ConsentToggle({
 
     // Update cookie
     if (newValue) {
-      document.cookie = `${storageKey}=true; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
+      document.cookie = `${storageKey}=true; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax; Secure`;
     } else {
       document.cookie = `${storageKey}=; path=/; max-age=0`;
     }
