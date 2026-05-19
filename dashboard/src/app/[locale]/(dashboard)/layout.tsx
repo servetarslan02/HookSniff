@@ -113,6 +113,15 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Mobile overlay — must be rendered BEFORE sidebar for click events */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={(e) => { e.stopPropagation(); setSidebarOpen(false); }}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar */}
       <aside
         className={clsx(
@@ -189,14 +198,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
       </aside>
-
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
