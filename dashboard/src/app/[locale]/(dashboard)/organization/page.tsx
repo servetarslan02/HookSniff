@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { useTeams } from '@/hooks/useDashboardData';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -21,14 +23,40 @@ const AuditLogPage = dynamic(() => import('../audit-log/page'), { ssr: false, lo
 
 export default function OrganizationPage() {
   const t = useTranslations('nav');
+  const { data: teams = [] } = useTeams();
+  const [selectedTeamId, setSelectedTeamId] = useState<string>('');
+
+  // Default to first team if none selected
+  const activeTeamId = selectedTeamId || teams[0]?.id || '';
 
   return (
-    <TabbedSection
-      tabs={[
-        { key: 'team', label: t('team'), icon: '👥', content: () => <TeamPage /> },
-        { key: 'sso', label: t('sso'), icon: '🔐', content: () => <SsoPage /> },
-        { key: 'audit-log', label: t('auditLog'), icon: '📜', content: () => <AuditLogPage /> },
-      ]}
-    />
+    <div className="space-y-6">
+      {/* Team selector */}
+      {teams.length > 1 && (
+        <div className="flex items-center gap-3">
+          <label htmlFor="org-team-select" className="text-sm font-medium text-gray-700 dark:text-slate-300">
+            {t('organization')}:
+          </label>
+          <select
+            id="org-team-select"
+            value={activeTeamId}
+            onChange={(e) => setSelectedTeamId(e.target.value)}
+            className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-sm text-gray-900 dark:text-white"
+          >
+            {teams.map((team) => (
+              <option key={team.id} value={team.id}>{team.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <TabbedSection
+        tabs={[
+          { key: 'team', label: t('team'), icon: '👥', content: () => <TeamPage /> },
+          { key: 'sso', label: t('sso'), icon: '🔐', content: () => <SsoPage teamId={activeTeamId} /> },
+          { key: 'audit-log', label: t('auditLog'), icon: '📜', content: () => <AuditLogPage /> },
+        ]}
+      />
+    </div>
   );
 }

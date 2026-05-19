@@ -2,17 +2,23 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import { useSsoConfig, useTeams } from '@/hooks/useDashboardData';
 
 /* ─── SSO/SAML Configuration Page (Enterprise Only) ─── */
-export default function SsoSettingsPage() {
+export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: string } = {}) {
   const t = useTranslations('sso');
   const { token, user } = useAuth();
   const { toast } = useToast();
-  const { data: ssoConfig, isLoading: loading, refetch } = useSsoConfig();
+  const searchParams = useSearchParams();
+  
+  // team_id: prop > URL param > null
+  const teamId = teamIdProp || searchParams.get('team_id') || undefined;
+  
+  const { data: ssoConfig, isLoading: loading, refetch } = useSsoConfig(teamId);
 
   const isEnterprise = user?.plan === 'enterprise';
 
@@ -55,6 +61,7 @@ export default function SsoSettingsPage() {
     setSaving(true);
     try {
       const body: Record<string, unknown> = { provider, enabled: false };
+      if (teamId) body.team_id = teamId;
       if (provider === 'saml') {
         body.metadata_url = metadata || null;
         body.entity_id = entityId || null;
@@ -108,6 +115,7 @@ export default function SsoSettingsPage() {
         enabled: true,
         admin_bypass: adminBypass,
       };
+      if (teamId) body.team_id = teamId;
       await apiFetch('/sso/config', { method: 'POST', body, token });
       toast(t('enforced'), 'success');
       setShowEnforceModal(false);
@@ -128,6 +136,7 @@ export default function SsoSettingsPage() {
         provider: ssoConfig?.provider || provider,
         enabled: false,
       };
+      if (teamId) body.team_id = teamId;
       await apiFetch('/sso/config', { method: 'POST', body, token });
       toast(t('disabled'), 'success');
       refetch();
@@ -256,6 +265,24 @@ export default function SsoSettingsPage() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Verified Domain */}
+      <div className="glass-card p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">🌐</span>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('verifiedDomain') || 'Verified Domain'}</h2>
+        </div>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('verifiedDomainDesc') || 'Email domain for automatic SSO user discovery. Users with this domain will be matched to this organization.'}</p>
+        <input
+          type="text"
+          value={ssoConfig?.verified_domain || ''}
+          placeholder="company.com"
+          disabled={isEnforced}
+          className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          readOnly
+        />
+        <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">{t('verifiedDomainHint') || 'Set during SSO configuration. Contact support to change.'}</p>
       </div>
 
       {/* Step 2: SAML Configuration */}
