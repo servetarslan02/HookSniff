@@ -18,6 +18,8 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [emailPassword, setEmailPassword] = useState('');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -28,20 +30,41 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
 
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setProfileSaving(true);
     setProfileError('');
     setProfileSuccess('');
+
+    // If email changed, show password confirmation first
+    const emailChanged = profileEmail.toLowerCase() !== (user?.email || '').toLowerCase();
+    if (emailChanged && !showPasswordConfirm) {
+      setShowPasswordConfirm(true);
+      return;
+    }
+
+    setProfileSaving(true);
     try {
       const { api } = await import('@/lib/api');
-      await api.put('/auth/profile', { name: profileName, email: profileEmail }, token ?? undefined);
-      setProfileSuccess(tc('success'));
+      const body: Record<string, string> = { name: profileName, email: profileEmail };
+      if (emailChanged && emailPassword) {
+        body.password = emailPassword;
+      }
+      await api.put('/auth/profile', body, token ?? undefined);
+      setProfileSuccess(emailChanged ? (t('emailChangedVerify') || 'Email changed. Please verify your new email address.') : tc('success'));
+      setShowPasswordConfirm(false);
+      setEmailPassword('');
       if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => setProfileSuccess(''), 3000);
+      timerRef.current = setTimeout(() => setProfileSuccess(''), 5000);
     } catch (e: unknown) {
       setProfileError(getErrorMessage(e, tc('unknownError')));
     } finally {
       setProfileSaving(false);
     }
+  };
+
+  const handleCancelEmailChange = () => {
+    setShowPasswordConfirm(false);
+    setEmailPassword('');
+    setProfileEmail(user?.email || '');
+    setProfileError('');
   };
 
   return (
@@ -112,6 +135,32 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
               />
             </div>
           </div>
+
+          {/* Password confirmation for email change */}
+          {showPasswordConfirm && (
+            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+              <p className="text-sm text-amber-800 dark:text-amber-300 mb-3">
+                🔒 {t('emailChangePasswordRequired') || 'Changing your email requires password confirmation. Your email will need to be verified again.'}
+              </p>
+              <input
+                type="password"
+                value={emailPassword}
+                onChange={(e) => setEmailPassword(e.target.value)}
+                placeholder={t('enterPassword') || 'Enter your password'}
+                className="w-full px-3.5 py-2.5 text-sm border border-amber-300 dark:border-amber-500/30 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition mb-3"
+                autoFocus
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={handleCancelEmailChange}
+                  className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition"
+                >
+                  {tc('cancel')}
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-end pt-2">
             <button

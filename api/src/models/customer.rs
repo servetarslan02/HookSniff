@@ -109,6 +109,7 @@ pub struct LoginRequest {
 pub struct UpdateProfileRequest {
     pub name: String,
     pub email: String,
+    pub password: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
