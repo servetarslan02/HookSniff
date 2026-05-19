@@ -77,3 +77,33 @@
 10. **i18n** — 18 yeni çeviri anahtarı (en + tr)
 
 ### Push: `fe0205ab`
+
+## Operasyonel Webhooklar Sayfası İncelemesi (21:43–21:48)
+
+### Tespit Edilen Sorunlar
+1. ❌ i18n yok — tüm metinler İngilizce hardcoded
+2. ❌ Edit/Update butonu yok
+3. ❌ Delete onaysız — ConfirmDialog yok
+4. ❌ Enable/Disable toggle yok
+5. ❌ Event type seçimi yok
+6. ❌ Delivery detay görünümü yok (payload/response)
+7. ❌ glass-card kullanılmıyor
+8. ❌ Empty state'de CTA yok
+
+### Yapılan Düzeltmeler
+1. **i18n** — 32 çeviri anahtarı (en + tr), tüm metinler çevrilebilir
+2. **Edit butonu** — Inline form: URL, açıklama, event type güncelleme
+3. **Delete butonu** — ConfirmDialog ile onaylı silme
+4. **Toggle** — Aktif/Pasif badge tıklanabilir
+5. **Event type seçimi** — delivery.failed + endpoint.disabled checkbox'ları
+6. **Delivery detay** — Satır genişletme, JSON payload görünümü
+7. **glass-card** — Tüm kartlar tasarım sistemiyle uyumlu
+8. **Empty state** — 🪝 ikonu + CTA butonu
+9. **How it works** — Akış şeması (System event → Check → URL → Signed)
+10. **API** — update() zaten var, artık kullanılıyor
+
+### Değişiklikler
+- `OperationalWebhooksList.tsx` — 306 satır değişiklik
+- `en.json` + `tr.json` — 34'er satır ekleme
+
+### Push: `6ff536d0`
