@@ -12,7 +12,7 @@ import {
   useDeleteNotification,
 } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { Circle, AlertTriangle, Bell, CreditCard, Users, Inbox } from 'lucide-react';
+import { Circle, AlertTriangle, Bell, CreditCard, Users } from 'lucide-react';
 
 type NotifType = 'all' | 'webhook_failed' | 'alert' | 'system' | 'billing';
 

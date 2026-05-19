@@ -74,7 +74,7 @@ ${Object.entries(headers)
     setResponseDuration(null);
 
     const startTime = performance.now();
-    const capturedHeaders: Record<string, React.ReactNode> = {};
+    const capturedHeaders: Record<string, string> = {};
 
     try {
       const res = await fetch(`${API_BASE}${path}`, {

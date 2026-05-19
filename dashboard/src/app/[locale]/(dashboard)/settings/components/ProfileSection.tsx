@@ -25,6 +25,8 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
   const [emailChangeCode, setEmailChangeCode] = useState('');
   const [emailChangeLoading, setEmailChangeLoading] = useState(false);
   const [emailChangeTimer, setEmailChangeTimer] = useState(0);
+  const [showPasswordConfirm, _setShowPasswordConfirm] = useState(false);
+  const [emailPassword, setEmailPassword] = useState('');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 

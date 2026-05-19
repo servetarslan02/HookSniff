@@ -34,7 +34,7 @@ const VERIFY_EMAIL_RATE_LIMIT: u32 = 10;
 const REFRESH_RATE_LIMIT: u32 = 30;
 
 /// Full SELECT for Customer — used by auth and auth_2fa modules.
-pub(crate) const CUSTOMER_SELECT: &str = "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers";
+pub(crate) const CUSTOMER_SELECT: &str = "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at, paused_at, paused_until, pause_plan FROM customers";
 
 // ════════════════════════════════════════════════════════
 // Helpers
@@ -273,11 +273,7 @@ async fn login(
     }
 
     // ── Security: Brute force detection ──
-    let brute_result = crate::security_monitor::detect_brute_force(&pool, &req.email, &client_ip).await;
-    if let Err(ref e) = brute_result {
-        tracing::warn!("⚠️ detect_brute_force error for {}: {:?}", req.email, e);
-    }
-    if let Some(detected) = brute_result.unwrap_or(None) {
+    if let Some(detected) = crate::security_monitor::detect_brute_force(&pool, &req.email, &client_ip).await.unwrap_or(None) {
         let _ = crate::security_monitor::log_security_event(
             &pool, &detected.event_type, detected.severity.as_str(),
             None, Some(&req.email), Some(&client_ip), Some(user_agent), detected.details.clone(),
@@ -289,15 +285,8 @@ async fn login(
     }
 
     // HS-038f: Timing attack mitigation — always verify password
-    let customer = match sqlx::query_as::<_, Customer>(&format!("{} WHERE email = $1", CUSTOMER_SELECT))
-        .bind(&req.email).fetch_optional(&pool).await
-    {
-        Ok(c) => c,
-        Err(e) => {
-            tracing::error!("❌ Login DB query failed for {}: {:?}", req.email, e);
-            return Err(AppError::Database(e));
-        }
-    };
+    let customer = sqlx::query_as::<_, Customer>(&format!("{} WHERE email = $1", CUSTOMER_SELECT))
+        .bind(&req.email).fetch_optional(&pool).await?;
 
     static DUMMY_HASH: once_cell::sync::Lazy<String> = once_cell::sync::Lazy::new(|| {
         jwt::hash_password("dummy_password_for_timing_mitigation_2026")
