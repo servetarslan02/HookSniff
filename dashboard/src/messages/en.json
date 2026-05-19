@@ -1707,7 +1707,8 @@
       "activityLog": "Activity Log",
       "featureFlags": "Feature Flags",
       "alerts": "Alerts",
-      "email": "Email"
+      "email": "Email",
+      "broadcasts": "Broadcasts"
     },
     "noActivity": "No activity recorded yet",
     "noAdminPrivileges": "You don't have admin privileges.",
@@ -1925,6 +1926,15 @@
     "bulkEmailConfirmCancel": "Cancel",
     "emailSent": "Email sent successfully",
     "emailSendFailed": "Could not send the email. Please try again.",
+
+    "broadcasts": "Broadcasts",
+    "broadcastsDesc": "Send global announcements to all users. Shows in notification bell and dashboard banner.",
+    "newBroadcast": "New Broadcast",
+    "createBroadcast": "Create Broadcast",
+    "editBroadcast": "Edit Broadcast",
+    "broadcastCreated": "Broadcast created successfully",
+    "broadcastUpdated": "Broadcast updated successfully",
+    "broadcastDeleted": "Broadcast deleted",
     "invalidAmount": "Invalid refund amount",
     "refundSuccess": "Refund processed. User downgraded to Free.",
     "refundFailed": "Refund failed",

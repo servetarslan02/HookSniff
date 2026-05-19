@@ -1,4 +1,4 @@
-import type { ApiOptions, Application, RetryPolicyConfig, Endpoint, Delivery, DeliveryDetail, DeliveryAttempt, DeliveryListResponse, StatsResponse, AdminStatsResponse, DeployInfo, AdminUsersResponse, AdminUserDetail, RevenueResponse, Team, TeamMember, TeamDetailResponse, NotificationListResponse, DeliveryTrendResponse, SuccessRateData, LatencyTrendResponse, AuditLogResponse, AuditLogEntryResponse, EndpointHealthResponse, ApiKeyResponse, PortalConfigResponse, PortalEmbedCodeResponse, PortalProfileResponse, PortalUsageResponse, RateLimitResponse, SchemaRegistryListResponse, SearchResponseData, ServiceTokenResponse, TemplateItem, TemplateListResponse, UserAnalytics, ChurnUser, AlertRuleAdmin, FeatureFlag, PlatformSettings, Invoice, AlertRule, InboundConfig, TransformRule, BillingUsage, BillingSubscription, OverageSettings, PortalResponse, RefundResponse } from './api-types';
+import type { ApiOptions, Application, RetryPolicyConfig, Endpoint, Delivery, DeliveryDetail, DeliveryAttempt, DeliveryListResponse, StatsResponse, AdminStatsResponse, DeployInfo, AdminUsersResponse, AdminUserDetail, RevenueResponse, Team, TeamMember, TeamDetailResponse, NotificationListResponse, DeliveryTrendResponse, SuccessRateData, LatencyTrendResponse, AuditLogResponse, AuditLogEntryResponse, EndpointHealthResponse, ApiKeyResponse, PortalConfigResponse, PortalEmbedCodeResponse, PortalProfileResponse, PortalUsageResponse, RateLimitResponse, SchemaRegistryListResponse, SearchResponseData, ServiceTokenResponse, TemplateItem, TemplateListResponse, UserAnalytics, ChurnUser, AlertRuleAdmin, FeatureFlag, PlatformSettings, Invoice, AlertRule, InboundConfig, TransformRule, BillingUsage, BillingSubscription, OverageSettings, PortalResponse, RefundResponse, Broadcast, UserBroadcast, BroadcastListResponse } from './api-types';
 export type * from './api-types';
 
 import { getUserFriendlyMessage, extractErrorCode } from './error-catalog';
@@ -764,6 +764,24 @@ export const adminApi = {
 
   sendBulkEmail: (token: string, data: { subject: string; body: string; plan_filter?: string; status_filter?: string }) =>
     apiFetch<{ total_sent: number; total_failed: number; message: string }>(`/admin/bulk-email`, { method: 'POST', body: data, token }),
+
+  // ── Broadcasts ──
+  listBroadcasts: (token: string, params?: Record<string, string>) => {
+    const qs = params ? new URLSearchParams(params).toString() : '';
+    return apiFetch<BroadcastListResponse>(`/admin/broadcasts${qs ? `?${qs}` : ''}`, { token });
+  },
+
+  getBroadcast: (token: string, id: string) =>
+    apiFetch<Broadcast>(`/admin/broadcasts/${id}`, { token }),
+
+  createBroadcast: (token: string, data: Record<string, unknown>) =>
+    apiFetch<Broadcast>(`/admin/broadcasts`, { method: 'POST', body: data, token }),
+
+  updateBroadcast: (token: string, id: string, data: Record<string, unknown>) =>
+    apiFetch<Broadcast>(`/admin/broadcasts/${id}`, { method: 'PUT', body: data, token }),
+
+  deleteBroadcast: (token: string, id: string) =>
+    apiFetch<{ deleted: boolean }>(`/admin/broadcasts/${id}`, { method: 'DELETE', token }),
 };
 
 
@@ -835,6 +853,20 @@ export const notificationsApi = {
 
   deleteNotification: (token: string, id: string) =>
     apiFetch<{ success: boolean }>(`/notifications/${id}`, { method: 'DELETE', token }),
+};
+
+// Broadcast API (user-facing)
+export const broadcastsApi = {
+  listActive: (token: string, includeDismissed?: boolean) => {
+    const qs = includeDismissed ? '?include_dismissed=true' : '';
+    return apiFetch<UserBroadcast[]>(`/broadcasts${qs}`, { token });
+  },
+
+  dismiss: (token: string, id: string) =>
+    apiFetch<{ dismissed: boolean }>(`/broadcasts/${id}/dismiss`, { method: 'POST', token }),
+
+  getUnreadCount: (token: string) =>
+    apiFetch<{ unread_count: number }>('/broadcasts/unread-count', { token }),
 };
 
 // Billing types

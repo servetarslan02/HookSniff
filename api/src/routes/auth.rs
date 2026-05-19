@@ -250,11 +250,37 @@ async fn login(
     Json(req): Json<LoginRequest>,
 ) -> Result<impl IntoResponse, AppError> {
     let client_ip = extract_client_ip(&headers);
+    let user_agent = headers.get("user-agent")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("unknown");
     let rl_key = format!("login:{}", client_ip);
     let rl_result = rate_limiter.check_with_headers(&rl_key, LOGIN_RATE_LIMIT).await;
     if !rl_result.allowed {
         tracing::warn!("⚠️ Login rate limit exceeded for IP: {}", client_ip);
         return Err(AppError::RateLimitExceeded);
+    }
+
+    // ── Security: Suspicious user agent detection ──
+    if let Some(detected) = crate::security_monitor::detect_suspicious_user_agent(user_agent) {
+        let _ = crate::security_monitor::log_security_event(
+            &pool, &detected.event_type, detected.severity.as_str(),
+            None, Some(&req.email), Some(&client_ip), Some(user_agent), detected.details,
+        ).await;
+        if detected.should_block {
+            return Err(AppError::BadRequest("Request blocked".into()));
+        }
+    }
+
+    // ── Security: Brute force detection ──
+    if let Some(detected) = crate::security_monitor::detect_brute_force(&pool, &req.email, &client_ip).await.unwrap_or(None) {
+        let _ = crate::security_monitor::log_security_event(
+            &pool, &detected.event_type, detected.severity.as_str(),
+            None, Some(&req.email), Some(&client_ip), Some(user_agent), detected.details.clone(),
+        ).await;
+        if detected.should_block {
+            tracing::warn!("🔒 Login blocked — brute force detected: {} from {}", req.email, client_ip);
+            return Err(AppError::BadRequest("Too many failed attempts. Please try again later.".into()));
+        }
     }
 
     // HS-038f: Timing attack mitigation — always verify password
@@ -275,8 +301,30 @@ async fn login(
     };
 
     let customer = customer.ok_or(AppError::BadRequest("Invalid email or password".into()))?;
-    if !customer.is_active { return Err(AppError::BadRequest("Account is disabled. Contact support.".into())); }
-    if !password_ok { return Err(AppError::BadRequest("Invalid email or password".into())); }
+    if !customer.is_active {
+        // Record disabled account login attempt
+        let _ = crate::security_monitor::record_login_attempt(
+            &pool, &req.email, &client_ip, Some(user_agent), false, Some("account_disabled"),
+        ).await;
+        let _ = crate::security_monitor::log_security_event(
+            &pool, crate::security_monitor::event_types::DISABLED_ACCOUNT_LOGIN,
+            "medium", Some(customer.id), Some(&req.email), Some(&client_ip), Some(user_agent),
+            serde_json::json!({"reason": "Disabled account login attempt"}),
+        ).await;
+        return Err(AppError::BadRequest("Account is disabled. Contact support.".into()));
+    }
+    if !password_ok {
+        // Record failed login attempt
+        let _ = crate::security_monitor::record_login_attempt(
+            &pool, &req.email, &client_ip, Some(user_agent), false, Some("wrong_password"),
+        ).await;
+        return Err(AppError::BadRequest("Invalid email or password".into()));
+    }
+
+    // Record successful login attempt
+    let _ = crate::security_monitor::record_login_attempt(
+        &pool, &req.email, &client_ip, Some(user_agent), true, None,
+    ).await;
 
     // Email verification check — block login if email is not verified
     if !customer.email_verified {
