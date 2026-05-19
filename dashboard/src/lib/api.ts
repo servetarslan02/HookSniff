@@ -868,6 +868,12 @@ export const inboundApi = {
 
   createConfig: (token: string | undefined, data: { provider: string; endpoint_id?: string | null; secret: string }) =>
     apiFetch<InboundConfig>('/inbound/configs', { method: 'POST', body: data, token }),
+
+  updateConfig: (token: string | undefined, id: string, data: { secret?: string; endpoint_id?: string | null; enabled?: boolean }) =>
+    apiFetch<InboundConfig>(`/inbound/configs/${id}`, { method: 'PUT', body: data, token }),
+
+  deleteConfig: (token: string | undefined, id: string) =>
+    apiFetch<{ deleted: boolean }>(`/inbound/configs/${id}`, { method: 'DELETE', token }),
 };
 
 export interface ConnectorOut {
