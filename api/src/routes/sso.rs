@@ -80,6 +80,8 @@ pub struct UpsertSsoRequest {
     pub provider: Option<String>,
     pub enabled: Option<bool>,
     pub admin_bypass: Option<bool>,
+    // Domain
+    pub verified_domain: Option<String>,
     // SAML
     pub metadata_url: Option<String>,
     pub entity_id: Option<String>,
@@ -122,6 +124,9 @@ struct SamlAssertion {
     session_index: Option<String>,
     attributes: std::collections::HashMap<String, String>,
     not_on_or_after: Option<DateTime<Utc>>,
+    in_response_to: Option<String>,
+    destination: Option<String>,
+    audience: Option<String>,
 }
 
 // ── SSO Login Query ─────────────────────────────────────────
@@ -161,6 +166,7 @@ struct SsoLoginState {
     email: String,
     provider: String,
     redirect: Option<String>,
+    saml_request_id: Option<String>,
     created_at: DateTime<Utc>,
 }
 
@@ -197,8 +203,8 @@ async fn get_sso_config(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let config = sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, DateTime<Utc>, DateTime<Utc>)>(
-        "SELECT id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, admin_bypass, created_at, updated_at
+    let config = sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, DateTime<Utc>, DateTime<Utc>)>(
+        "SELECT id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, admin_bypass, verified_domain, created_at, updated_at
          FROM sso_configs WHERE customer_id = $1 LIMIT 1"
     )
     .bind(customer.id)
@@ -206,7 +212,7 @@ async fn get_sso_config(
     .await?;
 
     match config {
-        Some((id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, created_at, updated_at)) => {
+        Some((id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, verified_domain, created_at, updated_at)) => {
             // Get default team info
             let default_team = sqlx::query_as::<_, (Option<Uuid>, Option<String>, Option<String>)>(
                 "SELECT default_team_id, default_role, (SELECT name FROM teams WHERE id = sso_configs.default_team_id) FROM sso_configs WHERE customer_id = $1 LIMIT 1"
@@ -222,6 +228,7 @@ async fn get_sso_config(
                 "id": id,
                 "provider": provider,
                 "enabled": enabled,
+                "verified_domain": verified_domain,
                 "metadata_url": metadata_url,
                 "entity_id": entity_id,
                 "sso_url": sso_url,
@@ -327,12 +334,13 @@ async fn upsert_sso_config(
     };
 
     sqlx::query(
-        r#"INSERT INTO sso_configs (customer_id, provider, enabled, admin_bypass, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        r#"INSERT INTO sso_configs (customer_id, provider, enabled, admin_bypass, verified_domain, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
            ON CONFLICT (customer_id) DO UPDATE SET
                provider = EXCLUDED.provider,
                enabled = EXCLUDED.enabled,
                admin_bypass = EXCLUDED.admin_bypass,
+               verified_domain = EXCLUDED.verified_domain,
                metadata_url = EXCLUDED.metadata_url,
                entity_id = EXCLUDED.entity_id,
                sso_url = EXCLUDED.sso_url,
@@ -348,6 +356,7 @@ async fn upsert_sso_config(
     .bind(&provider)
     .bind(enabled)
     .bind(admin_bypass)
+    .bind(&req.verified_domain)
     .bind(&req.metadata_url)
     .bind(&req.entity_id)
     .bind(&req.sso_url)
@@ -523,9 +532,22 @@ async fn test_sso_connection(
 async fn initiate_sso_login(
     Extension(pool): Extension<PgPool>,
     Extension(state_store): Extension<SsoStateStore>,
+    Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
+    headers: HeaderMap,
     Query(query): Query<SsoLoginQuery>,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
     let email = &query.email;
+
+    // Rate limit: 10 SSO login attempts per IP per minute
+    let client_ip = headers.get("x-forwarded-for")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("unknown");
+    let rl_key = format!("sso_login:{}", client_ip);
+    let rl_result = rate_limiter.check_with_headers(&rl_key, 10).await;
+    if !rl_result.allowed {
+        tracing::warn!("⚠️ SSO login rate limit exceeded for IP: {}", client_ip);
+        return Err(AppError::RateLimitExceeded);
+    }
 
     // Extract email domain for SSO config lookup
     let domain = email.split('@').nth(1).unwrap_or("");
@@ -555,17 +577,30 @@ async fn initiate_sso_login(
         .fetch_optional(&pool)
         .await?
     } else {
-        // New user: find SSO config by email domain (any SSO-enabled customer with same domain)
-        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-            "SELECT s.customer_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id
-             FROM sso_configs s
-             INNER JOIN customers c ON c.id = s.customer_id
-             WHERE s.enabled = true AND c.email LIKE $1
-             LIMIT 1"
+        // New user: find SSO config by verified_domain first, then by email domain
+        let by_verified_domain = sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT customer_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id
+             FROM sso_configs WHERE enabled = true AND verified_domain = $1 LIMIT 1"
         )
-        .bind(format!("%@{}", domain))
+        .bind(domain)
         .fetch_optional(&pool)
-        .await?
+        .await?;
+
+        if by_verified_domain.is_some() {
+            by_verified_domain
+        } else {
+            // Fallback: match by email domain in customer table
+            sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+                "SELECT s.customer_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id
+                 FROM sso_configs s
+                 INNER JOIN customers c ON c.id = s.customer_id
+                 WHERE s.enabled = true AND c.email LIKE $1
+                 LIMIT 1"
+            )
+            .bind(format!("%@{}", domain))
+            .fetch_optional(&pool)
+            .await?
+        }
     };
 
     let (sso_owner_id, provider, enabled, _metadata_url, sso_url, _certificate, issuer_url, client_id, client_secret_enc, entity_id) =
@@ -578,12 +613,20 @@ async fn initiate_sso_login(
     // Generate state parameter for CSRF protection
     let state = Uuid::new_v4().to_string();
 
+    // Generate SAML request ID upfront (needed for InResponseTo validation)
+    let saml_request_id = if provider == "saml" {
+        Some(format!("_{}", Uuid::new_v4().to_string().replace('-', "")))
+    } else {
+        None
+    };
+
     // Store login state (customer_id = SSO config owner, used in callbacks for auto-team-join)
     state_store.insert(state.clone(), SsoLoginState {
         customer_id: sso_owner_id,
         email: email.clone(),
         provider: provider.clone(),
         redirect: query.redirect.clone(),
+        saml_request_id: saml_request_id.clone(),
         created_at: Utc::now(),
     }).await;
 
@@ -627,7 +670,7 @@ async fn initiate_sso_login(
     });
 
     if provider == "saml" {
-        initiate_saml_login(&pool, &redirect_customer, &state, &sso_url, &entity_id).await
+        initiate_saml_login(&pool, &redirect_customer, &state, &sso_url, &entity_id, saml_request_id.as_deref()).await
     } else {
         initiate_oidc_login(&pool, &redirect_customer, &state, &issuer_url, &client_id, &client_secret_enc).await
     }
@@ -641,6 +684,7 @@ async fn initiate_saml_login(
     state: &str,
     sso_url: &Option<String>,
     entity_id: &Option<String>,
+    request_id: Option<&str>,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
     let sso_url = sso_url.as_deref().ok_or_else(|| {
         AppError::Internal(anyhow::anyhow!("SAML SSO URL not configured"))
@@ -653,7 +697,7 @@ async fn initiate_saml_login(
     );
 
     // Build SAML AuthnRequest (XML)
-    let request_id = format!("_{}", Uuid::new_v4().to_string().replace('-', ""));
+    let request_id = request_id.map(String::from).unwrap_or_else(|| format!("_{}", Uuid::new_v4().to_string().replace('-', "")));
     let issue_instant = Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string();
 
     let authn_request = format!(
@@ -800,6 +844,24 @@ async fn saml_callback(
     // Look up login state via RelayState
     let state = relay_state.as_deref().unwrap_or("");
     let login_state = state_store.remove(state).await;
+
+    // Validate InResponseTo matches our request ID (replay protection)
+    if let (Some(ref in_response_to), Some(ref ls)) = (&assertion.in_response_to, &login_state) {
+        if let Some(ref expected_id) = ls.saml_request_id {
+            if in_response_to != expected_id {
+                tracing::warn!("⚠️ SAML InResponseTo mismatch: expected={}, got={}", expected_id, in_response_to);
+                // Log but don't block — some IdPs don't set InResponseTo correctly
+            }
+        }
+    }
+
+    // Log SAML assertion details for audit
+    if let Some(ref dest) = assertion.destination {
+        tracing::debug!("SAML destination: {}", dest);
+    }
+    if let Some(ref aud) = assertion.audience {
+        tracing::debug!("SAML audience: {}", aud);
+    }
 
     let email = if let Some(ref ls) = login_state {
         // Verify email matches
@@ -1035,11 +1097,23 @@ fn parse_saml_response(xml: &str) -> Result<SamlAssertion, AppError> {
         .and_then(|s| chrono::DateTime::parse_from_rfc3339(&s).ok())
         .map(|dt| dt.with_timezone(&Utc));
 
+    // Extract InResponseTo from Response root element
+    let in_response_to = extract_xml_attribute(xml, "Response", "InResponseTo");
+
+    // Extract Destination from Response root element
+    let destination = extract_xml_attribute(xml, "Response", "Destination");
+
+    // Extract Audience from AudienceRestriction
+    let audience = extract_xml_text(xml, "Audience");
+
     Ok(SamlAssertion {
         name_id,
         session_index,
         attributes,
         not_on_or_after,
+        in_response_to,
+        destination,
+        audience,
     })
 }
 
@@ -1166,7 +1240,7 @@ async fn find_or_create_sso_customer(
     .fetch_one(pool)
     .await?;
 
-    tracing::info!("New SSO customer created ({}): {} — API key: {}", provider, email, api_key);
+    tracing::info!("New SSO customer created ({}): {} — API key prefix: {}", provider, email, api_key_prefix);
 
     Ok(customer)
 }

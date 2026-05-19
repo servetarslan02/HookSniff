@@ -147,6 +147,23 @@ async fn cleanup_seen_webhooks(pool: &PgPool) -> Result<u64> {
     Ok(result.rows_affected())
 }
 
+/// Clean up old SSO login attempts (keep 90 days).
+async fn cleanup_sso_login_attempts(pool: &PgPool) -> Result<u64> {
+    let result = sqlx::query(
+        "DELETE FROM sso_login_attempts WHERE created_at < now() - INTERVAL '90 days'"
+    )
+    .execute(pool)
+    .await?;
+
+    if result.rows_affected() > 0 {
+        tracing::info!(
+            "🧹 Cleaned up {} old SSO login attempts",
+            result.rows_affected()
+        );
+    }
+    Ok(result.rows_affected())
+}
+
 /// Run the retention job. Call this periodically (e.g., daily).
 pub async fn run_retention(pool: &PgPool, retention_days: i64) -> Result<()> {
     tracing::info!(
@@ -160,6 +177,7 @@ pub async fn run_retention(pool: &PgPool, retention_days: i64) -> Result<()> {
     cleanup_idempotency_keys(pool).await?;
     cleanup_webhook_queue(pool).await?;
     cleanup_seen_webhooks(pool).await?;
+    cleanup_sso_login_attempts(pool).await?;
     reset_monthly_webhook_counts(pool).await?;
 
     tracing::info!("✅ Retention job completed");

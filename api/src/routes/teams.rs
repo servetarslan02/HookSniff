@@ -14,7 +14,9 @@ pub fn router() -> Router {
     Router::new()
         .route("/", get(list_teams).post(create_team))
         .route("/accept-invite", post(accept_invite))
-        .route("/{id}", get(get_team))
+        .route("/{id}", get(get_team).delete(delete_team))
+        .route("/{id}/leave", post(leave_team))
+        .route("/{id}/transfer", post(transfer_ownership))
         .route("/{id}/invite", post(invite_member))
         .route("/{id}/members", get(list_members))
         .route("/{id}/members/{uid}", delete(remove_member))
@@ -629,6 +631,151 @@ async fn change_role(
     Ok(Json(serde_json::json!({
         "role": req.role,
         "message": "Role updated successfully"
+    })))
+}
+
+/// DELETE /v1/teams/:id — Delete team (owner only)
+async fn delete_team(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let team = sqlx::query_as::<_, Team>(
+        "SELECT id, name, owner_id, created_at, updated_at FROM teams WHERE id = $1"
+    )
+    .bind(id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    // Only owner can delete
+    if team.owner_id != customer.id {
+        return Err(AppError::Forbidden("Only the team owner can delete the team".into()));
+    }
+
+    // Check if SSO config references this team as default
+    let sso_refs: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM sso_configs WHERE default_team_id = $1"
+    )
+    .bind(id)
+    .fetch_one(&pool)
+    .await?;
+
+    if sso_refs.0 > 0 {
+        return Err(AppError::BadRequest(
+            "This team is used as the default SSO auto-join team. Remove the SSO reference first.".into()
+        ));
+    }
+
+    // Delete team (CASCADE will remove members and invites)
+    sqlx::query("DELETE FROM teams WHERE id = $1")
+        .bind(id)
+        .execute(&pool)
+        .await?;
+
+    tracing::info!("✅ Team '{}' ({}) deleted by {}", team.name, id, customer.id);
+
+    let _ = crate::audit::log_action(&pool, customer.id, "TEAM_DELETE", "team", Some(&id.to_string()),
+        Some(serde_json::json!({"team_name": &team.name})), None, None).await;
+
+    Ok(Json(serde_json::json!({"deleted": true})))
+}
+
+/// POST /v1/teams/:id/leave — Leave team (non-owner only)
+async fn leave_team(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let team = sqlx::query_as::<_, Team>(
+        "SELECT id, name, owner_id, created_at, updated_at FROM teams WHERE id = $1"
+    )
+    .bind(id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    // Owner cannot leave — must transfer ownership first
+    if team.owner_id == customer.id {
+        return Err(AppError::BadRequest(
+            "Team owner cannot leave. Transfer ownership first.".into()
+        ));
+    }
+
+    let result = sqlx::query(
+        "DELETE FROM team_members WHERE team_id = $1 AND customer_id = $2"
+    )
+    .bind(id)
+    .bind(customer.id)
+    .execute(&pool)
+    .await?;
+
+    if result.rows_affected() == 0 {
+        return Err(AppError::NotFound);
+    }
+
+    tracing::info!("✅ {} left team {}", customer.id, id);
+
+    let _ = crate::audit::log_action(&pool, customer.id, "MEMBER_LEAVE", "team", Some(&id.to_string()),
+        None, None, None).await;
+
+    Ok(Json(serde_json::json!({"left": true})))
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TransferOwnershipRequest {
+    pub new_owner_id: Uuid,
+}
+
+/// POST /v1/teams/:id/transfer — Transfer team ownership (owner only)
+async fn transfer_ownership(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Path(id): Path<Uuid>,
+    Json(req): Json<TransferOwnershipRequest>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let team = sqlx::query_as::<_, Team>(
+        "SELECT id, name, owner_id, created_at, updated_at FROM teams WHERE id = $1"
+    )
+    .bind(id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    // Only owner can transfer
+    if team.owner_id != customer.id {
+        return Err(AppError::Forbidden("Only the team owner can transfer ownership".into()));
+    }
+
+    // New owner must be a team member
+    let new_owner_member = require_team_member(&pool, id, req.new_owner_id).await?;
+
+    // Update team owner
+    sqlx::query("UPDATE teams SET owner_id = $1, updated_at = NOW() WHERE id = $2")
+        .bind(req.new_owner_id)
+        .bind(id)
+        .execute(&pool)
+        .await?;
+
+    // Promote new owner to admin if not already
+    if new_owner_member.role != "admin" {
+        sqlx::query("UPDATE team_members SET role = 'admin' WHERE team_id = $1 AND customer_id = $2")
+            .bind(id)
+            .bind(req.new_owner_id)
+            .execute(&pool)
+            .await?;
+    }
+
+    tracing::info!("✅ Team '{}' ownership transferred from {} to {}", team.name, customer.id, req.new_owner_id);
+
+    let _ = crate::audit::log_action(&pool, customer.id, "TEAM_TRANSFER", "team", Some(&id.to_string()),
+        Some(serde_json::json!({"new_owner": req.new_owner_id.to_string()})), None, None).await;
+
+    Ok(Json(serde_json::json!({
+        "transferred": true,
+        "new_owner_id": req.new_owner_id,
+        "message": "Ownership transferred successfully"
     })))
 }
 
