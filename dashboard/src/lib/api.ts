@@ -449,6 +449,10 @@ export const api = {
     const qs = industry ? `?industry=${industry}` : '';
     return apiFetch<TemplateListResponse>(`/templates${qs}`, { token });
   },
+  getTemplate: (token: string, id: string) =>
+    apiFetch<WebhookTemplate>(`/templates/${id}`, { token }),
+  applyTemplate: (token: string, id: string, data: { endpoint_url: string; enabled_agents?: string[] }) =>
+    apiFetch<{ template_id: string; endpoint_id: string; message: string }>(`/templates/${id}/apply`, { method: 'POST', body: data, token }),
 };
 
 // Types
