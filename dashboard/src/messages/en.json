@@ -3242,7 +3242,13 @@
     "supportedFormats": "Supported Formats",
     "openapi30": "OpenAPI 3.0",
     "swagger20": "Swagger 2.0",
-    "failedToFetchError": "Could not fetch the specification: {error}"
+    "failedToFetchError": "Could not fetch the specification: {error}",
+    "clearAll": "Clear",
+    "fetching": "Fetching…",
+    "parsing": "Parsing…",
+    "toFetch": "to fetch",
+    "toParse": "to parse",
+    "yamlSupported": "Supports JSON and YAML"
   },
   "portalCustomize": {
     "title": "Portal Customization",
