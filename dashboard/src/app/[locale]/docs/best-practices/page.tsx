@@ -27,9 +27,9 @@ export default async function BestPracticesPage() {
           {t('signPayloadDesc')}
         </p>
         <CodeBlock
-          code={`X-HookSniff-Signature: v1,base64(hmac_sha256(secret, payload))
-X-HookSniff-Timestamp: 1705312200
-X-HookSniff-Delivery-Id: wh_abc123`}
+          code={`webhook-signature: v1,base64(hmac_sha256(secret, "{id}.{timestamp}.{body}"))
+webhook-timestamp: 1705312200
+webhook-id: msg_abc123`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4 mb-4">
           {t('neverResign')}
@@ -113,16 +113,25 @@ X-HookSniff-Delivery-Id: wh_abc123`}
           {t('verifyFirstDesc')}
         </p>
         <CodeBlock
-          code={`import hmac, hashlib
+          code={`from hooksniff import Webhook
 
-def verify_signature(payload: bytes, signature_header: str, secret: str) -> bool:
-    parts = signature_header.split(',')
-    if len(parts) != 2 or parts[0] != 'v1':
-        return False
-    expected = hmac.new(secret.encode(), payload, hashlib.sha256).digest()
-    import base64
-    expected_b64 = base64.b64encode(expected).decode()
-    return hmac.compare_digest(parts[1], expected_b64)`}
+wh = Webhook("whsec_your_secret")
+
+@app.route("/webhook", methods=["POST"])
+def handle_webhook():
+    try:
+        payload = wh.verify(
+            request.data,
+            {
+                "webhook-id": request.headers["webhook-id"],
+                "webhook-timestamp": request.headers["webhook-timestamp"],
+                "webhook-signature": request.headers["webhook-signature"],
+            },
+        )
+        # ✅ Valid — process event
+        return "", 200
+    except Exception:
+        return "Invalid signature", 401`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">
           {t('verifyFirstTip')}
@@ -133,9 +142,18 @@ def verify_signature(payload: bytes, signature_header: str, secret: str) -> bool
           {t('respondFastDesc')}
         </p>
         <CodeBlock
-          code={`app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+          code={`import { Webhook } from 'hooksniff';
+const wh = new Webhook('whsec_your_secret');
+
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   // 1. Verify signature (fast)
-  if (!verifySignature(req.body, req.headers['x-hooksniff-signature'], secret)) {
+  try {
+    const payload = wh.verify(req.body, {
+      'webhook-id': req.headers['webhook-id'],
+      'webhook-timestamp': req.headers['webhook-timestamp'],
+      'webhook-signature': req.headers['webhook-signature'],
+    });
+  } catch (err) {
     return res.status(401).send('Invalid signature');
   }
 
