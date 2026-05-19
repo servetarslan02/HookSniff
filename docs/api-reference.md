@@ -741,8 +741,8 @@ When HookSniff delivers a webhook to your endpoint:
 POST https://myapp.com/webhook HTTP/1.1
 Content-Type: application/json
 webhook-signature: v1,<base64(hmac)>
-X-HookSniff-Delivery-Id: wh_xyz789
-X-HookSniff-Attempt: 1
+webhook-id: wh_xyz789
+webhook-attempt: 1
 
 {
   "event": "order.created",
