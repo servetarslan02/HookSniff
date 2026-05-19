@@ -68,9 +68,9 @@ impl Default for PlatformSettings {
     fn default() -> Self {
         Self {
             default_plan: "developer".into(),
-            max_endpoints_free: 5,
-            max_endpoints_startup: 50,
-            max_endpoints_pro: 500,
+            max_endpoints_free: i32::MAX,
+            max_endpoints_startup: i32::MAX,
+            max_endpoints_pro: i32::MAX,
             max_endpoints_enterprise: i32::MAX,
             max_webhooks_free: 1000,
             max_webhooks_startup: 30000,
