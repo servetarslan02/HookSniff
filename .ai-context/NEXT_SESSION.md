@@ -1,64 +1,48 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 18:15 GMT+8
+> Son güncelleme: 2026-05-19 19:25 GMT+8
 
 ## ✅ Tamamlanan (Bu Oturum)
 
-### 1. SSO/SAML/OIDC Full Implementasyon
-- **Migration 022** — `sso_configs` + `sso_login_attempts` tabloları Neon DB'ye uygulandı
-- **Migration 023** — `admin_bypass` sütunu eklendi
-- **SAML 2.0 login akışı** — AuthnRequest oluşturma + ACS callback
-- **OIDC login akışı** — Discovery + authorization + code exchange + ID token
-- **Gerçek IdP bağlantı testi** — Metadata/discovery endpoint doğrulama
-- **SSO state store** — CSRF korumalı, in-memory
-- **Otomatik kullanıcı provision** — SSO ile gelen yeni kullanıcılar otomatik oluşturulur
-- **Audit log** — `sso_login_attempts` tablosuna tüm giriş denemeleri kaydedilir
+### 1. Organization Sayfası Tam İnceleme
+- Team, SSO, Audit Log sayfaları detaylı analiz edildi
+- SSO ↔ Team ilişkisi araştırıldı
+- 6 kritik sorun tespit edildi ve düzeltildi
 
-### 2. Navigasyon Düzenlemesi
-- **Yeni "Organization" bölümü** — Team + SSO + Audit Log
-- SSO Routing & Config'den çıkarıldı
-- Team Account'dan çıkarıldı
-- Sidebar'a Organization eklendi
-- Middleware: `/sso`, `/team`, `/audit-log` → `/organization`
+### 2. auto_join_default_team Düzeltmesi (KRİTİK BUG)
+- SSO ile giriş yapan yeni kullanıcılar otomatik ekibe eklenemiyordu
+- Fonksiyon, SSO user'ın email'iyle config arıyordu → bulamıyordu
+- Çözüm: SSO config owner'ın customer_id'siyle arama yapıldı
+- Her iki callback (SAML + OIDC) güncellendi
 
-### 3. SSO Plan Kısıtlaması
-- SSO sadece **Enterprise** planı müşterileri kullanabilir
-- Enterprise olmayan kullanıcılar upgrade prompt görür
-- Enterprise kullanıcılar tam SSO config formunu görür
+### 3. Yeni Kullanıcı SSO Login Düzeltmesi
+- `/sso/login?email=newuser@company.com` → "No account found" hatası
+- Çözüm: Email domain'inden SSO config bulma eklendi
+- Mevcut kullanıcı → kendi config'ini bulur
+- Yeni kullanıcı → domain eşleşmesiyle config bulur
 
-### 4. SSO Enforce Akışı (4 Adım)
-- **Adım 1:** Sağlayıcı seçimi (SAML 2.0 / OpenID Connect)
-- **Adım 2:** Yapılandırma (IdP bilgileri)
-- **Adım 3:** Kaydet ve Test Et (gerçek IdP bağlantısı)
-- **Adım 4:** SSO'yu Zorunlu Kıl (onay modal'ı + admin bypass)
+### 4. SSO Login Engelleme
+- SSO zorunlu kılınmış hesaplarda şifre girişi engellendi
+- Admin bypass seçeneği korundu
 
-### 5. Frontend Düzeltmeleri
-- Eksik i18n: `testing`, `testSuccess`, `testFailed` eklendi
-- API uyumsuzluğu: `result.success` → `result.valid`
-- Sertifika/gizli anahtar durumu gösterimi
-- SSO silme butonu
-- SSO Login URL kopyalama
-- 20+ yeni çeviri anahtarı (en + tr)
+### 5. Eksik Migration + Audit Log
+- `migrations/067_sso_admin_bypass_and_attempts.sql` oluşturuldu
+- SSO login ve auto-join için audit log eklendi
 
 ## 📋 Sıradaki
 
 ### 1. Cloud Build ile Deploy
-- SSO implementasyonu deploy edilmeli
-- Migration 022 + 023 Neon DB'ye uygulandı ✅
-- API kod değişiklikleri deploy gerektirir
+- SSO değişiklikleri deploy edilmeli
+- Migration 067 Neon DB'ye uygulanmalı
 
-### 2. SSO Login Engelleme (Backend)
-- Login akışında SSO kontrolü eklenmeli
-- SSO etkin hesaplarda şifre girişi reddedilmeli
-- Admin bypass kontrolü yapılmalı
-
-### 3. SSO Test (Manuel)
+### 2. SSO Test (Manuel)
 - Dashboard'dan SSO config kaydet
 - OIDC ile test et (Google, Auth0)
 - SAML ile test et (Okta, Azure AD)
 - Login URL test et
+- Auto-team-join test et
 
-### 4. P2 Kalan Sorunlar (21 adet)
+### 3. P2 Kalan Sorunlar (21 adet)
 - Frontend performance
 - i18n eksiklikleri
 - DB index'leri
@@ -67,6 +51,9 @@
 
 | Sorun | Durum | Not |
 |-------|-------|-----|
-| SSO login engelleme | ⬜ | Backend login akışında SSO kontrolü yok |
+| SSO login engelleme | ✅ | Backend login akışında SSO kontrolü eklendi |
+| auto_join_default_team | ✅ | SSO config owner'ın ID'siyle arama yapılıyor |
+| Yeni kullanıcı SSO login | ✅ | Email domain'inden SSO config bulma eklendi |
 | SSO state in-memory | ⚠️ | Production'da Redis'e taşınmalı |
 | ID token imza doğrulaması | ⚠️ | JWKS ile doğrulama eklenebilir |
+| SSO domain eşleşmesi | ⚠️ | Email domain'inden config bulma — admin farklı domain kullanıyorsa çalışmaz |
