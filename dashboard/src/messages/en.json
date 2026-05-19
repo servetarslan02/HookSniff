@@ -2711,7 +2711,20 @@
     "mapTag": "Map",
     "enrichTag": "Enrich",
     "deleteTransform": "Delete Transform Rule",
-    "deleteConfirm": "Are you sure you want to delete this transform rule?"
+    "deleteConfirm": "Are you sure you want to delete this transform rule?",
+    "editTransformRule": "Edit Transform Rule",
+    "update": "Update",
+    "updated": "Transform rule updated!",
+    "updateFailed": "Could not update the rule. Please try again.",
+    "edit": "Edit",
+    "test": "Test",
+    "testTransform": "Test Transform",
+    "testPayload": "Test Payload (JSON)",
+    "runTest": "Run Test",
+    "testing": "Testing...",
+    "testResult": "Result",
+    "testFailed": "Transform test failed. Check your configuration.",
+    "invalidJson": "Invalid JSON payload"
   },
   "rateLimiting": {
     "title": "⚡ Rate Limiting",
