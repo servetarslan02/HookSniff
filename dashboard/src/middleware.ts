@@ -37,7 +37,6 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/custom-domain': '/routing-config',
   '/environments': '/routing-config',
   '/rate-limiting': '/routing-config',
-  '/audit-log': '/routing-config',
   '/sso': '/organization',
   '/team': '/organization',
   '/audit-log': '/organization',
@@ -45,7 +44,6 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/connectors': '/integrations',
   '/streaming': '/integrations',
   // Account section (now has billing + portal tabs)
-  '/team': '/account',
   '/notifications': '/account',
   '/settings': '/account',
   '/service-tokens': '/core',
@@ -53,7 +51,7 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/portal-manage': '/account',
   '/billing': '/account',
   // Deleted container pages
-  '/team-mgmt': '/account',
+  '/team-mgmt': '/organization',
   '/settings-section': '/account',
   '/portal-section': '/account',
 };

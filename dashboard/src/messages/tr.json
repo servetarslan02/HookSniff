@@ -543,7 +543,9 @@
     "roleEditor": "Editör",
     "roleViewer": "Görüntüleyici",
     "roleMember": "Üye",
-    "removeBtn": "Kaldır"
+    "removeBtn": "Kaldır",
+    "inviteAccepted": "Davet kabul edildi! {role} olarak katıldınız",
+    "inviteAcceptFailed": "Davet kabul edilemedi. Linkin süresi dolmuş olabilir."
   },
   "notifications": {
     "title": "Bildirimler",
