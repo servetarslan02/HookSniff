@@ -272,8 +272,9 @@ async fn login(
         },
     };
 
-    let customer = customer.ok_or(AppError::Unauthorized)?;
-    if !customer.is_active || !password_ok { return Err(AppError::Unauthorized); }
+    let customer = customer.ok_or(AppError::BadRequest("Invalid email or password".into()))?;
+    if !customer.is_active { return Err(AppError::BadRequest("Account is disabled. Contact support.".into())); }
+    if !password_ok { return Err(AppError::BadRequest("Invalid email or password".into())); }
 
     // 2FA check
     if customer.totp_enabled {
