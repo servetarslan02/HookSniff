@@ -11,15 +11,16 @@ const LOCALE_REGEX = new RegExp(`^/(${routing.locales.join('|')})(/|$)`);
 const ROUTE_REDIRECTS: Record<string, string> = {
   // Core section
   '/endpoints': '/applications',
-  '/api-keys': '/core',
   // Deliveries section
   '/logs': '/deliveries',
   '/search': '/deliveries',
-  // Content/Webhooks section (content-mgmt now has inbound, operational, poller, tasks tabs)
-  '/transforms': '/operational-webhooks',
-  '/schemas': '/operational-webhooks',
-  '/templates': '/operational-webhooks',
+  // Content section (schemas, templates, transforms)
+  '/transforms': '/content-mgmt',
+  '/schemas': '/content-mgmt',
+  '/templates': '/content-mgmt',
+  // Webhooks section (inbound, operational, poller)
   '/inbound': '/operational-webhooks',
+  '/message-poller': '/operational-webhooks',
   // DevTools section
   '/playground': '/devtools',
   '/signature-verifier': '/devtools',
@@ -29,31 +30,34 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/health': '/observability',
   '/alerts': '/observability',
   '/analytics': '/observability',
-  // Security section (now inside routing-config)
-  '/security-section': '/routing-config',
-  // Routing/Config section (now has security + environments tabs)
+  // Security section (SSO, audit log, background tasks)
+  '/security-section': '/security',
+  '/sso': '/security',
+  '/audit-log': '/security',
+  '/background-tasks': '/security',
+  // Config section (routing, retry, domain, rate limiting, environments)
   '/retry-policy': '/routing-config',
   '/routing': '/routing-config',
   '/custom-domain': '/routing-config',
   '/environments': '/routing-config',
   '/rate-limiting': '/routing-config',
-  '/sso': '/organization',
-  '/team': '/organization',
-  '/audit-log': '/organization',
-  // Integrations section (now has connectors + streaming tabs)
+  // Integrations section (connectors, integrations, streaming)
   '/connectors': '/integrations',
   '/streaming': '/integrations',
-  // Account section (now has billing + portal tabs)
+  // Account section (settings, team, notifications, service tokens)
   '/notifications': '/account',
   '/settings': '/account',
-  '/service-tokens': '/core',
-  '/portal-customize': '/account',
-  '/portal-manage': '/account',
-  '/billing': '/account',
-  // Deleted container pages
-  '/team-mgmt': '/organization',
+  '/service-tokens': '/account',
+  '/team': '/account',
+  // Portal section
+  '/portal-customize': '/portal-section',
+  '/portal-manage': '/portal-section',
+  // Billing section
+  '/billing': '/billing-section',
+  // Deleted/renamed container pages
+  '/team-mgmt': '/account',
   '/settings-section': '/account',
-  '/portal-section': '/account',
+  '/organization': '/security',
 };
 
 export default function middleware(request: NextRequest) {
@@ -110,7 +114,8 @@ export default function middleware(request: NextRequest) {
     // Consolidated dashboard routes
     '/core', '/applications', '/deliveries', '/operational-webhooks',
     '/integrations', '/observability', '/devtools', '/routing-config',
-    '/account', '/billing-section', '/organization',
+    '/account', '/billing-section', '/organization', '/security',
+    '/content-mgmt', '/portal-section',
   ];
   const isPublic = withoutLocale === '/' || publicPaths.some((path) => withoutLocale.startsWith(path));
   if (!isPublic && !withoutLocale.startsWith('/admin')) {

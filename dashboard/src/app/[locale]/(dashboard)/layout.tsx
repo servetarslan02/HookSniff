@@ -50,6 +50,13 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       label: t('sectionCore'),
       items: [
         { name: t('core'), href: '/core', icon: '📊' },
+        { name: t('apiKeys'), href: '/api-keys', icon: '🔑' },
+      ],
+    },
+    {
+      key: 'applications',
+      label: t('applications'),
+      items: [
         { name: t('applications'), href: '/applications', icon: '📱' },
       ],
     },
@@ -57,14 +64,16 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       key: 'deliveries',
       label: t('sectionDeliveries'),
       items: [
-        { name: t('deliveries'), href: '/deliveries', icon: '🔗' },
+        { name: t('deliveries'), href: '/deliveries', icon: '📦' },
       ],
     },
     {
       key: 'webhooks',
       label: t('sectionWebhooks'),
       items: [
-        { name: t('webhookDashboard'), href: '/operational-webhooks', icon: '📥' },
+        { name: t('inboundWebhooks'), href: '/inbound', icon: '📥' },
+        { name: t('operationalWebhooks'), href: '/operational-webhooks', icon: '⚙️' },
+        { name: t('messagePoller'), href: '/message-poller', icon: '📡' },
       ],
     },
     {
@@ -75,7 +84,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       ],
     },
     {
-      key: 'monitoring',
+      key: 'observability',
       label: t('sectionMonitoring'),
       items: [
         { name: t('observability'), href: '/observability', icon: '📡' },
@@ -89,6 +98,13 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       ],
     },
     {
+      key: 'content',
+      label: t('sectionContent'),
+      items: [
+        { name: t('contentMgmt'), href: '/content-mgmt', icon: '📐' },
+      ],
+    },
+    {
       key: 'config',
       label: t('sectionConfig'),
       items: [
@@ -96,10 +112,17 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       ],
     },
     {
-      key: 'organization',
-      label: t('sectionOrganization'),
+      key: 'security',
+      label: t('securitySection'),
       items: [
-        { name: t('organization'), href: '/organization', icon: '👥' },
+        { name: t('securitySection'), href: '/security', icon: '🔒' },
+      ],
+    },
+    {
+      key: 'portal',
+      label: t('sectionPortal'),
+      items: [
+        { name: t('portalSection'), href: '/portal-section', icon: '🪝' },
       ],
     },
     {
@@ -272,11 +295,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                     </div>
                   </div>
                   <Link
-                    href="/settings-section"
+                    href="/account?tab=settings"
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                     onClick={() => setProfileOpen(false)}
                   >
-                    ⚙️ {t('settingsSection')}
+                    ⚙️ {t('settings')}
                   </Link>
                   <a
                     href="https://hooksniff.vercel.app/docs"

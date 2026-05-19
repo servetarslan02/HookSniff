@@ -17,8 +17,9 @@ const tabSkeleton = (
 
 const SsoPage = dynamic(() => import('../sso/page'), { ssr: false, loading: () => tabSkeleton });
 const AuditLogPage = dynamic(() => import('../audit-log/page'), { ssr: false, loading: () => tabSkeleton });
+const BackgroundTasksPage = dynamic(() => import('../background-tasks/page'), { ssr: false, loading: () => tabSkeleton });
 
-export default function OrganizationPage() {
+export default function SecurityPage() {
   const t = useTranslations('nav');
 
   return (
@@ -26,6 +27,7 @@ export default function OrganizationPage() {
       tabs={[
         { key: 'sso', label: t('sso'), icon: '🔐', content: () => <SsoPage /> },
         { key: 'audit-log', label: t('auditLog'), icon: '📜', content: () => <AuditLogPage /> },
+        { key: 'background-tasks', label: t('backgroundTasks'), icon: '⏳', content: () => <BackgroundTasksPage /> },
       ]}
     />
   );
