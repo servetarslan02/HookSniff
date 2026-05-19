@@ -42,7 +42,7 @@ An endpoint is where HookSniff delivers your webhooks.
 ```python
 from hooksniff import HookSniff
 
-client = HookSniff("hs_xxx")
+client = HookSniff("hr_live_xxx")
 
 endpoint = client.endpoint.create(
     url="https://your-app.com/webhook",

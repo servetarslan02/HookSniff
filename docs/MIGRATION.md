@@ -19,7 +19,7 @@ npm install hooksniff
 + import { HookSniff } from 'hooksniff';
 
 - const client = new Svix({ apiKey: 'sk_xxx' });
-+ const client = new HookSniff({ apiKey: 'hs_xxx' });
++ const client = new HookSniff({ apiKey: 'hr_live_xxx' });
 ```
 
 ### Python
@@ -34,7 +34,7 @@ pip install hooksniff
 + from hooksniff import HookSniff
 
 - client = Svix("sk_xxx")
-+ client = HookSniff("hs_xxx")
++ client = HookSniff("hr_live_xxx")
 ```
 
 ### Go
@@ -48,7 +48,7 @@ go get github.com/servetarslan02/hooksniff-go
 + import hooksniff "github.com/servetarslan02/hooksniff-go"
 
 - client := svix.New("sk_xxx")
-+ client := hooksniff.New("hs_xxx")
++ client := hooksniff.New("hr_live_xxx")
 ```
 
 ## What Changed
