@@ -19,7 +19,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const t = useTranslations('nav');
@@ -40,82 +39,18 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const toggleSection = (key: string) => {
-    setCollapsedSections((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const sections = [
-    {
-      key: 'core',
-      label: t('sectionCore'),
-      items: [
-        { name: t('core'), href: '/core', icon: '📊' },
-        { name: t('applications'), href: '/applications', icon: '📱' },
-      ],
-    },
-    {
-      key: 'deliveries',
-      label: t('sectionDeliveries'),
-      items: [
-        { name: t('deliveries'), href: '/deliveries', icon: '🔗' },
-      ],
-    },
-    {
-      key: 'webhooks',
-      label: t('sectionWebhooks'),
-      items: [
-        { name: t('webhookDashboard'), href: '/operational-webhooks', icon: '📥' },
-      ],
-    },
-    {
-      key: 'integrations',
-      label: t('sectionIntegrations'),
-      items: [
-        { name: t('integrations'), href: '/integrations', icon: '🔗' },
-      ],
-    },
-    {
-      key: 'monitoring',
-      label: t('sectionMonitoring'),
-      items: [
-        { name: t('observability'), href: '/observability', icon: '📡' },
-      ],
-    },
-    {
-      key: 'devtools',
-      label: t('sectionDevtools'),
-      items: [
-        { name: t('devtools'), href: '/devtools', icon: '🛠️' },
-      ],
-    },
-    {
-      key: 'config',
-      label: t('sectionConfig'),
-      items: [
-        { name: t('routingConfig'), href: '/routing-config', icon: '🔀' },
-      ],
-    },
-    {
-      key: 'organization',
-      label: t('sectionOrganization'),
-      items: [
-        { name: t('organization'), href: '/organization', icon: '👥' },
-      ],
-    },
-    {
-      key: 'billing',
-      label: t('sectionBilling'),
-      items: [
-        { name: t('billingSection'), href: '/billing-section', icon: '💳' },
-      ],
-    },
-    {
-      key: 'account',
-      label: t('sectionAccount'),
-      items: [
-        { name: t('account'), href: '/account', icon: '👤' },
-      ],
-    },
+  const navItems = [
+    { name: t('core'), href: '/core', icon: '📊' },
+    { name: t('applications'), href: '/applications', icon: '📱' },
+    { name: t('deliveries'), href: '/deliveries', icon: '🔗' },
+    { name: t('webhookDashboard'), href: '/operational-webhooks', icon: '📥' },
+    { name: t('integrations'), href: '/integrations', icon: '🔗' },
+    { name: t('observability'), href: '/observability', icon: '📡' },
+    { name: t('devtools'), href: '/devtools', icon: '🛠️' },
+    { name: t('routingConfig'), href: '/routing-config', icon: '🔀' },
+    { name: t('organization'), href: '/organization', icon: '👥' },
+    { name: t('billingSection'), href: '/billing-section', icon: '💳' },
+    { name: t('account'), href: '/account', icon: '👤' },
   ];
 
   return (
@@ -153,57 +88,37 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
           {/* Admin Panel link — only for admin users */}
           {user?.is_admin && (
             <Link
               href="/admin"
-              className="flex items-center px-3 py-2 mb-3 text-sm font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
+              className="flex items-center px-3 py-2 mb-2 text-sm font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
             >
               <span className="mr-3">⚡</span>
               {t('adminPanel') || 'Admin Panel'}
             </Link>
           )}
-          {sections.map((section) => (
-            <div key={section.key} className="mb-2">
-              <button
-                onClick={() => toggleSection(section.key)}
-                className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          {navItems.map((item) => {
+            const isActive = cleanPath === item.href || cleanPath.startsWith(item.href + '/');
+            return (
+              <PrefetchLink
+                key={item.href}
+                href={item.href}
+                hoverDelay={80}
+                className={clsx(
+                  'flex items-center px-3 py-2 text-sm rounded-lg transition-colors',
+                  isActive
+                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                )}
+                onClick={() => setSidebarOpen(false)}
               >
-                {section.label}
-                <svg
-                  className={clsx('w-4 h-4 transition-transform', collapsedSections[section.key] && '-rotate-90')}
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {!collapsedSections[section.key] && (
-                <div className="mt-1 space-y-0.5">
-                  {section.items.map((item) => {
-                    const isActive = cleanPath === item.href || cleanPath.startsWith(item.href + '/');
-                    return (
-                      <PrefetchLink
-                        key={item.href}
-                        href={item.href}
-                        hoverDelay={80}
-                        className={clsx(
-                          'flex items-center px-3 py-2 text-sm rounded-lg transition-colors',
-                          isActive
-                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
-                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-                        )}
-                        onClick={() => setSidebarOpen(false)}
-                      >
-                        <span className="mr-3">{item.icon}</span>
-                        {item.name}
-                      </PrefetchLink>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          ))}
+                <span className="mr-3">{item.icon}</span>
+                {item.name}
+              </PrefetchLink>
+            );
+          })}
         </nav>
       </aside>
 
