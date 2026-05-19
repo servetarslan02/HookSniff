@@ -183,7 +183,7 @@ export default function PortalPage() {
   );
 }
 
-function StatCard({ label, value, color, icon }: { label: string; value: string; color: string; icon: string }) {
+function StatCard({ label, value, color, icon }: { label: string; value: string; color: string; icon: React.ReactNode }) {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-5 text-center">
       <span className="text-lg mb-2 block">{icon}</span>
