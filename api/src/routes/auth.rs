@@ -278,6 +278,11 @@ async fn login(
     if !customer.is_active { return Err(AppError::BadRequest("Account is disabled. Contact support.".into())); }
     if !password_ok { return Err(AppError::BadRequest("Invalid email or password".into())); }
 
+    // Email verification check — block login if email is not verified
+    if !customer.email_verified {
+        return Err(AppError::BadRequest("Please verify your email address before logging in. Check your inbox for the verification link.".into()));
+    }
+
     // SSO enforcement check — block password login if SSO is required
     // Check both customer-scoped (legacy) and team-scoped configs
     let sso_config = sqlx::query_as::<_, (bool, Option<bool>)>(
