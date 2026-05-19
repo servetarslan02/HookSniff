@@ -9,7 +9,7 @@ const PLAN_FEATURES: Record<string, string[]> = {
   developer: [
     '1,000 events/day',
     '1 application',
-    '5 endpoints',
+    'Unlimited endpoints',
     '10 event types',
     '10 subscriptions',
     '7-day log retention',
@@ -18,10 +18,10 @@ const PLAN_FEATURES: Record<string, string[]> = {
     'Community support',
   ],
   startup: [
-    '30kEventsDay', '1application', '50endpoints', '50eventTypes', '300subscriptions', '14dayLog', 'neverBlocked', '003overage', 'cloudevents', 'secretRotation', 'deadLetter', 'emailSupport',
+    '30kEventsDay', '1application', 'unlimitedEndpoints', '50eventTypes', '300subscriptions', '14dayLog', 'neverBlocked', '003overage', 'cloudevents', 'secretRotation', 'deadLetter', 'emailSupport',
   ],
   pro: [
-    '100kEventsDay', 'unlimitedApps', '500endpoints', 'unlimitedEventTypes', 'unlimitedSubs', '30dayLog', '0001overage', 'fifo', 'ipWhitelist', 'analytics', 'schemaRegistry', 'prioritySupport',
+    '100kEventsDay', 'unlimitedApps', 'unlimitedEndpoints', 'unlimitedEventTypes', 'unlimitedSubs', '30dayLog', '0001overage', 'fifo', 'ipWhitelist', 'analytics', 'schemaRegistry', 'prioritySupport',
   ],
   enterprise: [
     'unlimitedEvents', 'unlimitedApps', 'unlimitedEndpoints', 'unlimitedEventTypes', 'unlimitedSubs', 'customLog', 'customPricing', 'ssoSaml', 'accountManager', 'sla99', 'customIntegrations', 'onPremise',
@@ -158,7 +158,7 @@ export function PlanCards({
                 const fmt = (v: number) => v >= UNL ? '∞' : v.toLocaleString();
                 return (
                   <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-                    {fmt(plan.limits.endpoints)} endpoints · {fmt(plan.limits.webhooks)} webhooks/mo · {plan.limits.retention >= UNL ? '∞' : plan.limits.retention + 'd'} retention
+                    ∞ endpoints · {fmt(plan.limits.webhooks)} webhooks/mo · {plan.limits.retention >= UNL ? '∞' : plan.limits.retention + 'd'} retention
                   </p>
                 );
               })()}

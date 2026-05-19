@@ -138,14 +138,9 @@ impl Plan {
         }
     }
 
-    /// Max endpoints
+    /// Max endpoints (unlimited for all plans)
     pub fn max_endpoints(&self) -> u32 {
-        match self {
-            Plan::Developer => 5,
-            Plan::Startup => 50,
-            Plan::Pro => 500,
-            Plan::Enterprise => u32::MAX,
-        }
+        u32::MAX
     }
 
     /// Max payload size in bytes
@@ -694,9 +689,10 @@ mod tests {
 
     #[test]
     fn max_endpoints_all() {
-        assert_eq!(Plan::Developer.max_endpoints(), 5);
-        assert_eq!(Plan::Startup.max_endpoints(), 50);
-        assert_eq!(Plan::Pro.max_endpoints(), 500);
+        // All plans have unlimited endpoints
+        assert_eq!(Plan::Developer.max_endpoints(), u32::MAX);
+        assert_eq!(Plan::Startup.max_endpoints(), u32::MAX);
+        assert_eq!(Plan::Pro.max_endpoints(), u32::MAX);
         assert_eq!(Plan::Enterprise.max_endpoints(), u32::MAX);
     }
 
