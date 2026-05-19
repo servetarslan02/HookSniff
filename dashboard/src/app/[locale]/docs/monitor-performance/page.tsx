@@ -66,10 +66,10 @@ export default async function MonitorPerformancePage() {
         </p>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('grafanaMetrics')}</p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hooksniff_deliveries_total</code> — Total deliveries by status</li>
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hooksniff_delivery_duration_seconds</code> — Delivery latency histogram</li>
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hooksniff_retries_total</code> — Total retry attempts</li>
-          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hooksniff_dlq_depth</code> — Current DLQ size</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hooksniff_deliveries_total</code> — {t('metric1')}</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hooksniff_delivery_duration_seconds</code> — {t('metric2')}</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hooksniff_retries_total</code> — {t('metric3')}</li>
+          <li><code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">hooksniff_dlq_depth</code> — {t('metric4')}</li>
         </ul>
       </section>
 
