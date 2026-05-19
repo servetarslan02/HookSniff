@@ -13,7 +13,7 @@ import { EmbedCodePanel } from './components/EmbedCodePanel';
 export default function PortalCustomizationPage() {
   const t = useTranslations('portalCustomize');
   const { toast } = useToast();
-  const { data: configData, isLoading } = usePortalConfig();
+  const { data: configData, isLoading, error: configError } = usePortalConfig();
   const { data: embedData } = usePortalEmbedCode();
   const updateConfig = useUpdatePortalConfig();
 
@@ -62,6 +62,21 @@ export default function PortalCustomizationPage() {
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 animate-pulse">
           <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-4" />
           <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2" />
+        </div>
+      </div>
+    );
+  }
+
+  if (configError) {
+    return (
+      <div className="max-w-6xl">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('title')}</h1>
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm">
+          <p className="mb-2">{t('portalSaveFailed')}</p>
+          <button type="button" onClick={() => window.location.reload()}
+            className="text-xs text-red-600 dark:text-red-400 hover:underline font-medium">
+            ↻ {t('retry') || 'Retry'}
+          </button>
         </div>
       </div>
     );
