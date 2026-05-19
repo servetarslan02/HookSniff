@@ -54,10 +54,9 @@ export function InvoiceTable({
 
   return (
     <>
-      <div className="glass-card overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('invoiceHistory')}</h2>
-          <span className="text-sm text-gray-500 dark:text-slate-400">{invoices.length} {t('invoices')}</span>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700/50 flex items-center justify-between">
+          <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{invoices.length} {t('invoices')}</span>
         </div>
         {loading ? (
           <div className="px-6 py-12 text-center">

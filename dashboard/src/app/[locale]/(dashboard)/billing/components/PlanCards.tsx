@@ -110,7 +110,7 @@ export function PlanCards({
             <div
               key={plan.key}
               className={clsx(
-                'glass-card p-6 hover-lift relative',
+                'bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 hover-lift relative',
                 plan.popular && 'ring-2 ring-brand-500'
               )}
             >

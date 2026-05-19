@@ -34,12 +34,10 @@ export function OverageSettings() {
 
   if (isLoading) {
     return (
-      <div className="glass-card p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-5 w-40 bg-gray-200 dark:bg-slate-700 rounded" />
-          <div className="h-10 w-full bg-gray-200 dark:bg-slate-700 rounded" />
-          <div className="h-10 w-full bg-gray-200 dark:bg-slate-700 rounded" />
-        </div>
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 animate-pulse space-y-4">
+        <div className="h-5 w-40 bg-gray-200 dark:bg-slate-700 rounded" />
+        <div className="h-10 w-full bg-gray-200 dark:bg-slate-700 rounded" />
+        <div className="h-10 w-full bg-gray-200 dark:bg-slate-700 rounded" />
       </div>
     );
   }
@@ -49,17 +47,14 @@ export function OverageSettings() {
   const isFree = settings.plan === 'developer' || settings.plan === 'free';
 
   return (
-    <div className="glass-card p-6">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-        {t('overageSettings')}
-      </h2>
-      <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
+      <p className="text-xs text-gray-500 dark:text-slate-400 mb-5">
         {t('overageSettingsDesc')}
       </p>
 
       <div className="space-y-4">
         {/* Allow Overage Toggle */}
-        <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+        <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
           <div>
             <p className="text-sm font-medium text-gray-900 dark:text-white">
               {t('allowOverage')}
@@ -87,7 +82,7 @@ export function OverageSettings() {
         </div>
 
         {/* Email Notification Toggle */}
-        <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+        <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
           <div>
             <p className="text-sm font-medium text-gray-900 dark:text-white">
               {t('overageEmailNotification')}
@@ -116,7 +111,7 @@ export function OverageSettings() {
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
             <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('dailyLimit')}</p>
             <p className="text-xl font-bold text-gray-900 dark:text-white">
               {settings.daily_limit.toLocaleString()}
@@ -125,7 +120,7 @@ export function OverageSettings() {
               {t('eventsPerDay')}
             </p>
           </div>
-          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
             <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('overagePrice')}</p>
             <p className="text-xl font-bold text-gray-900 dark:text-white">
               {settings.overage_price === 0
