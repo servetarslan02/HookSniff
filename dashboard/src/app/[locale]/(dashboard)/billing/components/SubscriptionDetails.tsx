@@ -57,7 +57,7 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
 
   if (isLoading) {
     return (
-      <div className="glass-card p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <div className="animate-pulse space-y-4">
           <div className="h-5 w-40 bg-gray-200 dark:bg-slate-700 rounded" />
           <div className="h-4 w-64 bg-gray-200 dark:bg-slate-700 rounded" />
@@ -69,7 +69,7 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
 
   if (error) {
     return (
-      <div className="glass-card p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
           {t('subscriptionDetails')}
         </h2>
@@ -89,14 +89,10 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
   const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
 
   return (
-    <div className="glass-card p-6">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        {t('subscriptionDetails')}
-      </h2>
-
+    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Plan */}
-        <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+        <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
           <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('currentPlan')}</p>
           <p className="text-lg font-semibold text-gray-900 dark:text-white capitalize">{sub.plan}</p>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
@@ -105,7 +101,7 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
         </div>
 
         {/* Status */}
-        <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+        <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
           <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('status')}</p>
           <span className={clsx(
             'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset',
@@ -130,7 +126,7 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
         </div>
 
         {/* Card on File */}
-        <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+        <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
           <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('cardOnFile')}</p>
           {sub.card_last4 ? (
             <>
@@ -162,7 +158,7 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
 
         {/* Next Billing Date */}
         {periodEnd && !isFree && (
-          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
             <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('nextBilling')}</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {periodEnd.toLocaleDateString()}
@@ -175,7 +171,7 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
 
         {/* Subscription ID (debug) */}
         {(sub.stripe_subscription_id || sub.polar_subscription_id || sub.iyzico_subscription_id) && (
-          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+          <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
             <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('subscriptionId')}</p>
             <p className="text-xs font-mono text-gray-600 dark:text-slate-400 break-all">
               {sub.stripe_subscription_id || sub.polar_subscription_id || sub.iyzico_subscription_id}
