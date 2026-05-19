@@ -35,7 +35,7 @@ function LoginForm() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
-  const { login, verify2fa } = useAuth();
+  const { login, verify2fa, register } = useAuth();
   const router = useRouter();
   const t = useTranslations('auth');
   const tc = useTranslations('common');

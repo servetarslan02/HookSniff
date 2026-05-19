@@ -411,6 +411,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
           </pre>
         </div>
       </div>
+    </div>
 
   );
 }
