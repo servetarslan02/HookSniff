@@ -205,7 +205,9 @@
     "sectionWebhooks": "Webhook'lar",
     "sectionIntegrations": "Entegrasyonlar",
     "sectionDevtools": "Geliştirici Araçları",
-    "sectionPortal": "Portal"
+    "sectionPortal": "Portal",
+    "organization": "Organizasyon",
+    "sectionOrganization": "Organizasyon"
   },
   "dashboard": {
     "title": "Kontrol Paneli",

@@ -9,7 +9,7 @@ const tabSkeleton = (
     <div className="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl" />
     <div className="space-y-2">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="h-10 bg-gray-200 dark:bg-slate-700 rounded-lg" />
+        <div key={i} className="h-10 bg-gray-200 dark:bg-slate-700 rounded-lg"} />
       ))}
     </div>
   </div>
@@ -20,8 +20,6 @@ const RetryPolicyPage = dynamic(() => import('../retry-policy/page'), { ssr: fal
 const CustomDomainPage = dynamic(() => import('../custom-domain/page'), { ssr: false, loading: () => tabSkeleton });
 const EnvironmentsPage = dynamic(() => import('../environments/page'), { ssr: false, loading: () => tabSkeleton });
 const RateLimitingPage = dynamic(() => import('../rate-limiting/page'), { ssr: false, loading: () => tabSkeleton });
-const AuditLogPage = dynamic(() => import('../audit-log/page'), { ssr: false, loading: () => tabSkeleton });
-const SsoPage = dynamic(() => import('../sso/page'), { ssr: false, loading: () => tabSkeleton });
 
 export default function RoutingConfigPage() {
   const t = useTranslations('nav');
@@ -34,8 +32,6 @@ export default function RoutingConfigPage() {
         { key: 'custom-domain', label: t('customDomain'), icon: '🌐', content: () => <CustomDomainPage /> },
         { key: 'environments', label: t('environments'), icon: '🌐', content: () => <EnvironmentsPage /> },
         { key: 'rate-limiting', label: t('rateLimiting'), icon: '⏱️', content: () => <RateLimitingPage /> },
-        { key: 'audit-log', label: t('auditLog'), icon: '📜', content: () => <AuditLogPage /> },
-        { key: 'sso', label: t('sso'), icon: '🔒', content: () => <SsoPage /> },
       ]}
     />
   );

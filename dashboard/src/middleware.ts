@@ -38,7 +38,9 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/environments': '/routing-config',
   '/rate-limiting': '/routing-config',
   '/audit-log': '/routing-config',
-  '/sso': '/routing-config',
+  '/sso': '/organization',
+  '/team': '/organization',
+  '/audit-log': '/organization',
   // Integrations section (now has connectors + streaming tabs)
   '/connectors': '/integrations',
   '/streaming': '/integrations',
@@ -110,7 +112,7 @@ export default function middleware(request: NextRequest) {
     // Consolidated dashboard routes
     '/core', '/applications', '/deliveries', '/operational-webhooks',
     '/integrations', '/observability', '/devtools', '/routing-config',
-    '/account', '/billing-section',
+    '/account', '/billing-section', '/organization',
   ];
   const isPublic = withoutLocale === '/' || publicPaths.some((path) => withoutLocale.startsWith(path));
   if (!isPublic && !withoutLocale.startsWith('/admin')) {
