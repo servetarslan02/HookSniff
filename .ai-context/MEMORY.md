@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-20 04:10 GMT+8 (Alert Evaluation Worker)
+> Son güncelleme: 2026-05-20 06:20 GMT+8 (Login Fix + Dashboard Build)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -253,6 +253,24 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-20 05:24–06:20 — Login Fix + Dashboard Build)
+
+### Özet
+Servet ile oturum. Login DATABASE_ERROR fix, dashboard build fix, gcloud CLI kurulumu. 8+ commit.
+
+### Yapılan İşler:
+1. **Login DATABASE_ERROR** — `ColumnNotFound("paused_at")` tespit edildi, CUSTOMER_SELECT'e 3 kolon eklendi
+2. **Email .await bug** — 4 send_email_with_fallback çağrısına .await eklendi
+3. **SSO module path** — main.rs'de `sso::` → `routes::sso::`
+4. **Dashboard** — 20+ dosyada unused imports, type errors, corrupted imports düzeltildi
+5. **gcloud CLI** — kuruldu, Cloud Build tetikleme ve log okuma için kullanıldı
+
+### Kritik Bulgular:
+- **Upstash Redis 500K limit dolu** — plan yükseltme veya fallback gerekli
+- **email_verified = false** — Servet ve demo hesapları login yapamaz
 
 ---
 
