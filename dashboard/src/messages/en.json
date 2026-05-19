@@ -207,7 +207,13 @@
     "sectionDevtools": "Dev Tools",
     "sectionPortal": "Portal",
     "organization": "Organization",
-    "sectionOrganization": "Organization"
+    "sectionOrganization": "Organization",
+    "notificationsTitle": "Notifications",
+    "markAllRead": "Mark all read",
+    "noNotifications": "No notifications",
+    "viewAllNotifications": "View all notifications →",
+    "acceptInvite": "Accept",
+    "declineInvite": "Decline"
   },
   "dashboard": {
     "title": "Dashboard",

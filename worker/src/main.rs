@@ -433,6 +433,32 @@ async fn shutdown_signal() {
 
 // ── Delivery outcome helpers ────────────────────────────────
 
+/// Create an in-app notification for a dead-lettered delivery.
+async fn create_delivery_failure_notification(
+    pool: &sqlx::PgPool,
+    customer_id: uuid::Uuid,
+    delivery_id: uuid::Uuid,
+    endpoint_url: &str,
+    error_msg: &str,
+) {
+    let title = format!("⚠️ Webhook Teslimat Başarısız");
+    let message = format!(
+        "{} adresine teslimat başarısız oldu: {}",
+        endpoint_url, error_msg
+    );
+    let link = format!("/deliveries/{}", delivery_id);
+
+    let _ = sqlx::query(
+        "INSERT INTO notifications (customer_id, type, title, message, is_read, link) VALUES ($1, 'webhook_failed', $2, $3, false, $4)"
+    )
+    .bind(customer_id)
+    .bind(&title)
+    .bind(&message)
+    .bind(&link)
+    .execute(pool)
+    .await;
+}
+
 /// Move a delivery to dead_letter (non-retryable or max attempts exceeded).
 /// Returns (new_failure_streak, customer_id) for the endpoint.
 async fn dead_letter_delivery(
@@ -846,6 +872,16 @@ async fn process_pending(
                 let dl_err = format!("{} (HTTP {}, non-retryable)", error_msg, status_code);
                 let (new_streak, customer_id) = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &dl_err, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "non-retryable dead letter").await?;
 
+                // Create in-app notification for the customer
+                {
+                    let pool_clone = pool.clone();
+                    let url_clone = item.endpoint_url.clone();
+                    let err_clone = dl_err.clone();
+                    tokio::spawn(async move {
+                        create_delivery_failure_notification(&pool_clone, customer_id, delivery_id, &url_clone, &err_clone).await;
+                    });
+                }
+
                 {
                     let pool_clone = pool.clone();
                     let url_clone = item.endpoint_url.clone();
@@ -877,6 +913,16 @@ async fn process_pending(
                 tracing::error!("❌ Delivery {} → {} — max attempts, dead letter", delivery_id, error_msg);
 
                 let (new_streak, customer_id) = dead_letter_delivery(&pool, item.id, delivery_id, item.endpoint_id, attempt, &error_msg, attempt_status, attempt_body, attempt_headers, duration_ms, trace_id.as_deref(), "max attempts dead letter").await?;
+
+                // Create in-app notification for the customer
+                {
+                    let pool_clone = pool.clone();
+                    let url_clone = item.endpoint_url.clone();
+                    let err_clone = error_msg.clone();
+                    tokio::spawn(async move {
+                        create_delivery_failure_notification(&pool_clone, customer_id, delivery_id, &url_clone, &err_clone).await;
+                    });
+                }
 
                 {
                     let pool_clone = pool.clone();
