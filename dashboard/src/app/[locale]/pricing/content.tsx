@@ -251,6 +251,12 @@ export function PricingPageContent() {
                   <Star size={14} strokeWidth={1.75} className="inline-block align-text-bottom mr-1 text-amber-500" /> {t('mostPopular')}
                 </div>
               )}
+              {/* Startup: First month free badge */}
+              {plan.key === 'startup' && (
+                <div className="absolute -top-3.5 right-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg z-10 whitespace-nowrap">
+                  🎁 {t('firstMonthFree') || 'İlk Ay Ücretsiz'}
+                </div>
+              )}
               {/* Header */}
               <div className={`p-6 pb-4 ${plan.popular ? 'pt-8 bg-gradient-to-br from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10' : ''}`}>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t(plan.key)}</h3>

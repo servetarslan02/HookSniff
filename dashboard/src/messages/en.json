@@ -885,6 +885,7 @@
     "contactSales": "Contact Sales",
     "customPricing": "Custom",
     "mostPopular": "Most Popular",
+    "firstMonthFree": "First Month Free",
     "nextBilling": "Next billing date",
     "webhooksThisMonth": "Webhooks this month",
     "used": "used",
@@ -2142,6 +2143,7 @@
     "pricing": {
       "title": "Simple, transparent pricing",
       "mostPopular": "Most Popular",
+      "firstMonthFree": "First Month Free",
       "developer": "Developer",
       "startup": "Startup",
       "pro": "Pro",
@@ -2483,6 +2485,7 @@
     "heroSubtitle": "Save 12+ months of webhook infrastructure development. Start free, scale when ready.",
     "heroNote": "No credit card required. No surprise charges. Cancel anytime.",
     "mostPopular": "Most Popular",
+    "firstMonthFree": "First Month Free",
     "free": "Developer",
     "pro": "Pro",
     "business": "Enterprise",
