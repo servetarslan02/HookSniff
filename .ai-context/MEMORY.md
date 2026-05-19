@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-19 22:35 GMT+8 (İmza Aracı kapsamlı UX overhaul)
+> Son güncelleme: 2026-05-19 22:40 GMT+8 (Özel Alan Adı denetimi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -221,6 +221,38 @@ HookSniff/
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-19 22:34–22:40 — Özel Alan Adı Kapsamlı Denetim)
+
+### Özet
+Custom Domain sayfası detaylı incelendi. 14 sorun tespit edildi, hepsi düzeltildi. 2 commit push edildi.
+
+### Tespit Edilen ve Düzeltilen Sorunlar:
+1. CNAME doğrulama mantığı hatalı → `vercel-dns.com` artık kabul ediliyor
+2. DNS kayıtları sayfa yenilendeğinde kayboluyordu → mevcut unverified domain'lerde gösteriliyor
+3. Verify sonrası domain listesi yenilenmiyordu → `fetchDomains()` çağrısı eklendi
+4. Buton yazısı "Verifying..." → "Adding…" olarak düzeltildi
+5. Loading skeleton eklendi
+6. Empty state eklendi
+7. Environments sekmesi ikonu 🌐 → 📦
+8. Test import path düzeltildi
+9. Hardcoded Vercel credentials kaldırıldı
+10. http/https prefix otomatik temizleniyor
+11. Load error + retry butonu
+12. İngilizce fallback kaldırıldı
+13. TXT record name kopyalanabiliyor
+14. Enter tuşu ile form gönderimi
+
+### Değişilen Dosyalar:
+- `api/src/routes/custom_domains.rs` — CNAME verification + credentials
+- `dashboard/.../custom-domain/page.tsx` — 396 satır
+- `dashboard/.../routing-config/page.tsx` — ikon
+- `dashboard/src/messages/en.json` + `tr.json` — 5 yeni key
+- `dashboard/src/__tests__/custom-domain-page.test.tsx` — import path
+
+### Commit: `ef178b8d`
 
 ---
 
