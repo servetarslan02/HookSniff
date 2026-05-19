@@ -6,6 +6,7 @@ import { useToast } from '@/components/Toast';
 import { useAuth } from '@/lib/store';
 import { endpointsApi } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { Key } from 'lucide-react';
 
 export function SignatureCard({
   endpointId,
@@ -42,7 +43,7 @@ export function SignatureCard({
     <>
       <div className="glass-card p-6">
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-xl">🔑</span>
+          <span className="text-xl"><Key size={18} strokeWidth={1.75} /></span>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('signingSecret')}</h3>
         </div>
 

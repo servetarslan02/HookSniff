@@ -2,6 +2,7 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { CommunicationsTabProps } from './types';
+import { ClipboardList, FileText, Mail, MessageSquare, User } from 'lucide-react';
 
 export function CommunicationsTab({
   userComms,
@@ -16,7 +17,7 @@ export function CommunicationsTab({
     <LazySection fallback={Skeletons.table()} rootMargin={300}>
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">💬 {t("communications") || "Communication History"}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><MessageSquare size={16} strokeWidth={1.75} className="inline mr-1" /> {t("communications") || "Communication History"}</h2>
         <div className="flex gap-2">
           <select
             value={commFilter}
@@ -24,11 +25,11 @@ export function CommunicationsTab({
             className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
           >
             <option value="">{t("allTypes") || "All Types"}</option>
-            <option value="email">📧 Email</option>
-            <option value="impersonate">👤 Impersonate</option>
-            <option value="plan_change">📋 Plan Change</option>
+            <option value="email"><Mail size={16} strokeWidth={1.75} className="inline mr-1" /> Email</option>
+            <option value="impersonate"><User size={16} strokeWidth={1.75} className="inline mr-1" /> Impersonate</option>
+            <option value="plan_change"><ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> Plan Change</option>
             <option value="ban">🚫 Ban/Activate</option>
-            <option value="note">📝 Note</option>
+            <option value="note"><FileText size={16} strokeWidth={1.75} className="inline mr-1" /> Note</option>
             <option value="tag_added">🏷️ Tag Added</option>
             <option value="tag_removed">🏷️ Tag Removed</option>
           </select>

@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
+import { Clock, Download, FileText, Inbox, RefreshCw, TriangleRight } from 'lucide-react';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -29,13 +30,13 @@ export default function OperationalWebhooksPage() {
   return (
     <TabbedSection
       tabs={[
-        { key: 'schemas', label: t('schemas'), icon: '📐', content: () => <SchemasPage /> },
-        { key: 'templates', label: t('templates'), icon: '📄', content: () => <TemplatesPage /> },
-        { key: 'transforms', label: t('transforms'), icon: '🔄', content: () => <TransformsPage /> },
-        { key: 'inbound', label: t('inboundWebhooks'), icon: '📥', content: () => <InboundPage /> },
+        { key: 'schemas', label: t('schemas'), icon: <TriangleRight size={16} strokeWidth={1.75} />, content: () => <SchemasPage /> },
+        { key: 'templates', label: t('templates'), icon: <FileText size={16} strokeWidth={1.75} />, content: () => <TemplatesPage /> },
+        { key: 'transforms', label: t('transforms'), icon: <RefreshCw size={16} strokeWidth={1.75} />, content: () => <TransformsPage /> },
+        { key: 'inbound', label: t('inboundWebhooks'), icon: <Download size={16} strokeWidth={1.75} />, content: () => <InboundPage /> },
         { key: 'operational', label: t('operationalWebhooks'), icon: '🪝', content: () => <OperationalWebhooksListPage /> },
-        { key: 'poller', label: t('messagePoller'), icon: '📬', content: () => <MessagePollerPage /> },
-        { key: 'tasks', label: t('backgroundTasks'), icon: '⏳', content: () => <BackgroundTasksPage /> },
+        { key: 'poller', label: t('messagePoller'), icon: <Inbox size={16} strokeWidth={1.75} />, content: () => <MessagePollerPage /> },
+        { key: 'tasks', label: t('backgroundTasks'), icon: <Clock size={16} strokeWidth={1.75} />, content: () => <BackgroundTasksPage /> },
       ]}
     />
   );

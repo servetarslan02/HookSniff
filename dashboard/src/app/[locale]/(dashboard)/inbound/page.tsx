@@ -7,17 +7,18 @@ import { useTranslations } from 'next-intl';
 import { useEndpoints, useInboundConfigs, useCreateInboundConfig, useUpdateInboundConfig, useDeleteInboundConfig } from '@/hooks/useDashboardData';
 import type { InboundConfigValidated } from '@/schemas/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { CreditCard, Download, FileText, Gamepad2, GitBranch, Inbox, Link2, MessageSquare, Pencil, ShoppingBag, Smartphone, Trash2, TriangleRight } from 'lucide-react';
 
 const PROVIDERS = [
-  { id: 'stripe', name: 'Stripe', icon: '💳', docs: 'https://stripe.com/docs/webhooks', sig: 'HMAC-SHA256 (v1)' },
-  { id: 'github', name: 'GitHub', icon: '🐙', docs: 'https://docs.github.com/en/webhooks', sig: 'HMAC-SHA256' },
-  { id: 'shopify', name: 'Shopify', icon: '🛒', docs: 'https://shopify.dev/docs/api/admin-rest/resources/webhook', sig: 'HMAC-SHA256' },
-  { id: 'slack', name: 'Slack', icon: '💬', docs: 'https://api.slack.com/apis/events-api', sig: 'HMAC-SHA256 (v0)' },
-  { id: 'twilio', name: 'Twilio', icon: '📱', docs: 'https://www.twilio.com/docs/usage/webhooks', sig: 'HMAC-SHA1' },
-  { id: 'discord', name: 'Discord', icon: '🎮', docs: 'https://discord.com/developers/docs/interactions/receiving-and-responding', sig: 'Ed25519' },
-  { id: 'linear', name: 'Linear', icon: '📐', docs: 'https://developers.linear.app/docs/notifications/webhooks', sig: 'HMAC-SHA256' },
-  { id: 'notion', name: 'Notion', icon: '📝', docs: 'https://developers.notion.com/docs/webhooks', sig: 'HMAC-SHA256' },
-  { id: 'generic', name: 'Generic', icon: '🔗', docs: '#', sig: 'HMAC-SHA256 (custom header)' },
+  { id: 'stripe', name: 'Stripe', icon: <CreditCard size={16} strokeWidth={1.75} />, docs: 'https://stripe.com/docs/webhooks', sig: 'HMAC-SHA256 (v1)' },
+  { id: 'github', name: 'GitHub', icon: <GitBranch size={16} strokeWidth={1.75} />, docs: 'https://docs.github.com/en/webhooks', sig: 'HMAC-SHA256' },
+  { id: 'shopify', name: 'Shopify', icon: <ShoppingBag size={16} strokeWidth={1.75} />, docs: 'https://shopify.dev/docs/api/admin-rest/resources/webhook', sig: 'HMAC-SHA256' },
+  { id: 'slack', name: 'Slack', icon: <MessageSquare size={16} strokeWidth={1.75} />, docs: 'https://api.slack.com/apis/events-api', sig: 'HMAC-SHA256 (v0)' },
+  { id: 'twilio', name: 'Twilio', icon: <Smartphone size={16} strokeWidth={1.75} />, docs: 'https://www.twilio.com/docs/usage/webhooks', sig: 'HMAC-SHA1' },
+  { id: 'discord', name: 'Discord', icon: <Gamepad2 size={16} strokeWidth={1.75} />, docs: 'https://discord.com/developers/docs/interactions/receiving-and-responding', sig: 'Ed25519' },
+  { id: 'linear', name: 'Linear', icon: <TriangleRight size={16} strokeWidth={1.75} />, docs: 'https://developers.linear.app/docs/notifications/webhooks', sig: 'HMAC-SHA256' },
+  { id: 'notion', name: 'Notion', icon: <FileText size={16} strokeWidth={1.75} />, docs: 'https://developers.notion.com/docs/webhooks', sig: 'HMAC-SHA256' },
+  { id: 'generic', name: 'Generic', icon: <Link2 size={16} strokeWidth={1.75} />, docs: '#', sig: 'HMAC-SHA256 (custom header)' },
 ];
 
 export default function InboundPage() {
@@ -117,7 +118,7 @@ export default function InboundPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">📨 {t('inbound.title')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white"><Inbox size={24} strokeWidth={1.75} className="inline mr-1" />{t('inbound.title')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('inbound.subtitle')}</p>
         </div>
         <button onClick={() => { setShowCreate(!showCreate); setEditTarget(null); resetForm(); }} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
@@ -214,8 +215,8 @@ export default function InboundPage() {
                         className={`px-2.5 py-1 rounded-full text-xs font-medium transition ${cfg.enabled ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                         {cfg.enabled ? t('inbound.active') : t('inbound.disabled')}
                       </button>
-                      <button onClick={() => handleEdit(cfg)} title={t('inbound.edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-2">✏️</button>
-                      <button onClick={() => handleDelete(cfg.id)} title={t('inbound.delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-2">🗑️</button>
+                      <button onClick={() => handleEdit(cfg)} title={t('inbound.edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-2"><Pencil size={18} strokeWidth={1.75} /></button>
+                      <button onClick={() => handleDelete(cfg.id)} title={t('inbound.delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-2"><Trash2 size={18} strokeWidth={1.75} /></button>
                     </div>
                   </div>
 
@@ -251,7 +252,7 @@ export default function InboundPage() {
       {/* Empty state */}
       {configs.length === 0 && !showCreate && (
         <div className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4">📥</div>
+          <div className="text-5xl mb-4"><Download size={18} strokeWidth={1.75} /></div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('inbound.noConfigs')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('inbound.noConfigsDesc')}</p>
           <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">

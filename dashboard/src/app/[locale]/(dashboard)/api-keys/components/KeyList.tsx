@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { RefreshCw, ShieldCheck } from 'lucide-react';
 
 interface ApiKey {
   id: string;
@@ -45,7 +46,7 @@ export function KeyList({
         </div>
       ) : keys.length === 0 ? (
         <div className="p-12 text-center">
-          <div className="text-4xl mb-3">🔐</div>
+          <div className="text-4xl mb-3"><ShieldCheck size={18} strokeWidth={1.75} /></div>
           <p className="text-gray-500 dark:text-slate-400">{t('noKeys')}</p>
         </div>
       ) : (
@@ -86,7 +87,7 @@ export function KeyList({
                   disabled={actionLoading === key.id}
                   className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50"
                 >
-                  🔄 {t('rotate')}
+                  <RefreshCw size={16} strokeWidth={1.75} className="inline mr-1" /> {t('rotate')}
                 </button>
                 <button type="button"
                   onClick={() => onDelete(key.id)}

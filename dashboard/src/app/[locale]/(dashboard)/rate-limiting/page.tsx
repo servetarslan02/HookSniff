@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useRateLimits, useSetRateLimit, useDeleteRateLimit } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { BarChart3, Bell, Pencil, RefreshCw, Trash2, Zap } from 'lucide-react';
 
 export default function RateLimitingPage() {
   const t = useTranslations('rateLimiting');
@@ -144,11 +145,11 @@ export default function RateLimitingPage() {
                       <div className="flex items-center justify-end gap-2">
                         <button type="button" onClick={() => handleEdit(limit.endpoint_id)}
                           className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium">
-                          ✏️ {t('editLimit')}
+                          <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('editLimit')}
                         </button>
                         <button type="button" onClick={() => setDeleteTarget(limit.endpoint_id)}
                           className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 font-medium">
-                          🗑️ {t('deleteLimit')}
+                          <Trash2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('deleteLimit')}
                         </button>
                       </div>
                     </td>
@@ -162,13 +163,13 @@ export default function RateLimitingPage() {
 
       {!stats && (
         <div className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4">⚡</div>
+          <div className="text-5xl mb-4"><Zap size={18} strokeWidth={1.75} /></div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('emptyTitle')}</h2>
           <p className="text-gray-500 dark:text-slate-400 max-w-md mx-auto mb-6">{t('emptyDesc')}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-lg mx-auto">
-            <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center"><div className="text-2xl mb-2">🔄</div><div className="text-sm font-medium text-gray-900 dark:text-white">{t('autoRetry')}</div><div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('exponentialBackoff')}</div></div>
-            <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center"><div className="text-2xl mb-2">📊</div><div className="text-sm font-medium text-gray-900 dark:text-white">{t('perEndpoint')}</div><div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('customLimits')}</div></div>
-            <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center"><div className="text-2xl mb-2">🔔</div><div className="text-sm font-medium text-gray-900 dark:text-white">{t('alerts')}</div><div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('throttleNotifications')}</div></div>
+            <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center"><div className="text-2xl mb-2"><RefreshCw size={18} strokeWidth={1.75} /></div><div className="text-sm font-medium text-gray-900 dark:text-white">{t('autoRetry')}</div><div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('exponentialBackoff')}</div></div>
+            <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center"><div className="text-2xl mb-2"><BarChart3 size={18} strokeWidth={1.75} /></div><div className="text-sm font-medium text-gray-900 dark:text-white">{t('perEndpoint')}</div><div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('customLimits')}</div></div>
+            <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center"><div className="text-2xl mb-2"><Bell size={18} strokeWidth={1.75} /></div><div className="text-sm font-medium text-gray-900 dark:text-white">{t('alerts')}</div><div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t('throttleNotifications')}</div></div>
           </div>
         </div>
       )}
@@ -178,7 +179,7 @@ export default function RateLimitingPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setEditTarget(null)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">✏️ {t('editLimit')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4"><Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('editLimit')}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('requestsPerSecond')}</label>

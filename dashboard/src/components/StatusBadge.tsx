@@ -1,3 +1,4 @@
+import { Check, Repeat, X } from 'lucide-react';
 'use client';
 
 interface StatusBadgeProps {
@@ -12,28 +13,28 @@ const statusStyles: Record<string, { bg: string; text: string; ring: string; dot
     text: 'text-emerald-700 dark:text-emerald-400',
     ring: 'ring-emerald-600/20 dark:ring-emerald-500/30',
     dot: 'bg-emerald-500',
-    icon: '✓',
+    icon: <Check size={16} strokeWidth={1.75} />,
   },
   success: {
     bg: 'bg-emerald-50 dark:bg-emerald-500/10',
     text: 'text-emerald-700 dark:text-emerald-400',
     ring: 'ring-emerald-600/20 dark:ring-emerald-500/30',
     dot: 'bg-emerald-500',
-    icon: '✓',
+    icon: <Check size={16} strokeWidth={1.75} />,
   },
   failed: {
     bg: 'bg-red-50 dark:bg-red-500/10',
     text: 'text-red-700 dark:text-red-400',
     ring: 'ring-red-600/20 dark:ring-red-500/30',
     dot: 'bg-red-500',
-    icon: '✕',
+    icon: <X size={16} strokeWidth={1.75} />,
   },
   error: {
     bg: 'bg-red-50 dark:bg-red-500/10',
     text: 'text-red-700 dark:text-red-400',
     ring: 'ring-red-600/20 dark:ring-red-500/30',
     dot: 'bg-red-500',
-    icon: '✕',
+    icon: <X size={16} strokeWidth={1.75} />,
   },
   pending: {
     bg: 'bg-amber-50 dark:bg-amber-500/10',
@@ -84,7 +85,7 @@ const statusStyles: Record<string, { bg: string; text: string; ring: string; dot
     text: 'text-cyan-700 dark:text-cyan-400',
     ring: 'ring-cyan-600/20 dark:ring-cyan-500/30',
     dot: 'bg-cyan-500',
-    icon: '🔁',
+    icon: <Repeat size={16} strokeWidth={1.75} />,
   },
   filtered: {
     bg: 'bg-gray-50 dark:bg-gray-500/10',

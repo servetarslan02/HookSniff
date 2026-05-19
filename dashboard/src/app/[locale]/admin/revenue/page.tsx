@@ -9,6 +9,7 @@ import { useToast } from '@/components/Toast';
 import { adminApi, API_BASE } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { useQueryClient } from '@tanstack/react-query';
+import { DollarSign, Landmark, RefreshCw, Rocket, TrendingDown, TrendingUp, User, Users } from 'lucide-react';
 
 type DateRange = '7d' | '30d' | '90d' | '12m' | 'all';
 
@@ -219,11 +220,11 @@ export default function AdminRevenuePage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard label={t('mrr')} value={`$${(revenue?.mrr || 0).toLocaleString()}`} icon={<span className="text-lg" aria-hidden="true">💰</span>} color="violet"
+        <StatCard label={t('mrr')} value={`$${(revenue?.mrr || 0).toLocaleString()}`} icon={<span className="text-lg" aria-hidden="true"><DollarSign size={18} strokeWidth={1.75} /></span>} color="violet"
           trend={revenue?.mrr_trend != null && revenue.mrr_trend !== 0 ? { value: Math.abs(revenue.mrr_trend), label: t('vsLastMonth') || 'vs last month', direction: revenue.mrr_trend > 0 ? 'up' : 'down' } : undefined} />
-        <StatCard label={t('totalRevenueLabel')} value={`$${(revenue?.monthly_revenue?.reduce((sum, m) => sum + m.revenue, 0) || 0).toLocaleString()}`} icon={<span className="text-lg" aria-hidden="true">📈</span>} color="emerald" />
-        <StatCard label={t('collectedRevenue') || 'Collected Revenue'} value={`$${(revenue?.collected_revenue || 0).toLocaleString()}`} icon={<span className="text-lg" aria-hidden="true">🏦</span>} color="emerald" />
-        <StatCard label={t('churnRate')} value={revenue?.churn_rate?.toFixed(1) || '0'} icon={<span className="text-lg" aria-hidden="true">📉</span>} color="red" isPercent />
+        <StatCard label={t('totalRevenueLabel')} value={`$${(revenue?.monthly_revenue?.reduce((sum, m) => sum + m.revenue, 0) || 0).toLocaleString()}`} icon={<span className="text-lg" aria-hidden="true"><TrendingUp size={18} strokeWidth={1.75} /></span>} color="emerald" />
+        <StatCard label={t('collectedRevenue') || 'Collected Revenue'} value={`$${(revenue?.collected_revenue || 0).toLocaleString()}`} icon={<span className="text-lg" aria-hidden="true"><Landmark size={18} strokeWidth={1.75} /></span>} color="emerald" />
+        <StatCard label={t('churnRate')} value={revenue?.churn_rate?.toFixed(1) || '0'} icon={<span className="text-lg" aria-hidden="true"><TrendingDown size={18} strokeWidth={1.75} /></span>} color="red" isPercent />
         <button type="button" onClick={handleExportCSV}
           className="glass-card p-4 sm:p-6 flex flex-col items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 transition cursor-pointer border border-gray-200 dark:border-slate-700">
           <span className="text-2xl" aria-hidden="true">⬇</span>
@@ -234,17 +235,17 @@ export default function AdminRevenuePage() {
       {/* Advanced Metrics */}
       {revenueMetrics && (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <StatCard label={t('arpu') || 'ARPU'} value={`$${revenueMetrics.arpu.toFixed(2)}`} icon={<span className="text-lg" aria-hidden="true">👤</span>} color="blue" />
+          <StatCard label={t('arpu') || 'ARPU'} value={`$${revenueMetrics.arpu.toFixed(2)}`} icon={<span className="text-lg" aria-hidden="true"><User size={18} strokeWidth={1.75} /></span>} color="blue" />
           <StatCard label={t('ltv') || 'LTV'} value={`$${revenueMetrics.ltv.toFixed(2)}`} icon={<span className="text-lg" aria-hidden="true">🏆</span>} color="amber" />
-          <StatCard label={t('nrr') || 'NRR'} value={`${revenueMetrics.nrr.toFixed(1)}%`} icon={<span className="text-lg" aria-hidden="true">🔄</span>} color={revenueMetrics.nrr >= 100 ? 'emerald' : 'red'} />
-          <StatCard label={t('expansionRevenue') || 'Expansion'} value={`$${revenueMetrics.expansion_revenue.toFixed(2)}`} icon={<span className="text-lg" aria-hidden="true">🚀</span>} color="violet" />
+          <StatCard label={t('nrr') || 'NRR'} value={`${revenueMetrics.nrr.toFixed(1)}%`} icon={<span className="text-lg" aria-hidden="true"><RefreshCw size={18} strokeWidth={1.75} /></span>} color={revenueMetrics.nrr >= 100 ? 'emerald' : 'red'} />
+          <StatCard label={t('expansionRevenue') || 'Expansion'} value={`$${revenueMetrics.expansion_revenue.toFixed(2)}`} icon={<span className="text-lg" aria-hidden="true"><Rocket size={18} strokeWidth={1.75} /></span>} color="violet" />
         </div>
       )}
 
       {/* Customer Breakdown */}
       {revenueMetrics && (
         <div className="glass-card p-4 flex flex-wrap items-center gap-6 text-sm">
-          <span className="text-gray-500 dark:text-slate-400 font-medium">👥 {t('customers') || 'Customers'}:</span>
+          <span className="text-gray-500 dark:text-slate-400 font-medium"><Users size={16} strokeWidth={1.75} className="inline mr-1" /> {t('customers') || 'Customers'}:</span>
           <span className="text-gray-900 dark:text-white"><strong>{revenueMetrics.total_customers}</strong> {t('total') || 'total'}</span>
           <span className="text-emerald-600 dark:text-emerald-400"><strong>{revenueMetrics.paying_customers}</strong> {t('paying') || 'paying'}</span>
           <span className="text-amber-600 dark:text-amber-400">{t('avgRetention') || 'Avg retention'}: <strong>{revenueMetrics.avg_months_retained.toFixed(1)}</strong> {t('months') || 'mo'}</span>

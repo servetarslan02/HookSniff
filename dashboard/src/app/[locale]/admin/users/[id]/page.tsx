@@ -47,6 +47,7 @@ import { CommunicationsTab } from './components/CommunicationsTab';
 import { BillingTab } from './components/BillingTab';
 import { UserModals } from './components/UserModals';
 import type { TabKey } from './components/types';
+import { BarChart3, DollarSign, Eye, FileText, Key, Link2, Mail, MessageSquare, Package, Smartphone, TrendingUp } from 'lucide-react';
 
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -371,13 +372,13 @@ export default function AdminUserDetailPage() {
             onClick={() => setShowEmailModal(true)}
             className="px-4 py-2 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 rounded-xl text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/20 transition"
           >
-            📧 {t('sendEmail') || 'Send Email'}
+            <Mail size={16} strokeWidth={1.75} className="inline mr-1" /> {t('sendEmail') || 'Send Email'}
           </button>
           <button
             onClick={handleImpersonate}
             className="px-4 py-2 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-xl text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-500/20 border border-amber-200 dark:border-amber-500/20 transition"
           >
-            👁️ {t('impersonateUser')}
+            <Eye size={16} strokeWidth={1.75} className="inline mr-1" /> {t('impersonateUser')}
           </button>
         </div>
       </div>

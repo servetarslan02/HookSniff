@@ -2,6 +2,7 @@
 
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import { AlertTriangle, CheckCircle2, Circle, CalendarDays } from 'lucide-react';
 
 interface HealthTabProps {
   stats: any;
@@ -62,19 +63,19 @@ export default function HealthTab({ stats: _stats, rateLimitData, failedDeliveri
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-slate-400">{t('rateLimitViolations') || 'Rate Limit Violations'}</span>
               <span className={`text-sm font-medium ${(rateLimitData?.count ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                {(rateLimitData?.count ?? 0) > 0 ? `⚠️ ${rateLimitData?.count}` : '✅ 0'}
+                {(rateLimitData?.count ?? 0) > 0 ? <><AlertTriangle size={14} strokeWidth={1.75} className="inline mr-0.5 text-amber-500" />{rateLimitData?.count}</> : <><CheckCircle2 size={14} strokeWidth={1.75} className="inline mr-0.5 text-emerald-500" />0</>}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-slate-400">{t('failedDeliveries') || 'Failed Deliveries (24h)'}</span>
               <span className={`text-sm font-medium ${(failedDeliveriesData?.count ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                {(failedDeliveriesData?.count ?? 0) > 0 ? `⚠️ ${failedDeliveriesData?.count}` : '✅ 0'}
+                {(failedDeliveriesData?.count ?? 0) > 0 ? <><AlertTriangle size={14} strokeWidth={1.75} className="inline mr-0.5 text-amber-500" />{failedDeliveriesData?.count}</> : <><CheckCircle2 size={14} strokeWidth={1.75} className="inline mr-0.5 text-emerald-500" />0</>}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-slate-400">{t('queueStatus') || 'Queue Status'}</span>
               <span className={`text-sm font-medium ${(queueStatus?.pending ?? 0) > 10 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                {queueStatus ? `✅ ${queueStatus.pending} pending` : '✅ Healthy'}
+                {queueStatus ? <><CheckCircle2 size={14} strokeWidth={1.75} className="inline mr-0.5 text-emerald-500" />{queueStatus.pending} pending</> : <><CheckCircle2 size={14} strokeWidth={1.75} className="inline mr-0.5 text-emerald-500" />Healthy</>}
               </span>
             </div>
           </div>
@@ -85,7 +86,7 @@ export default function HealthTab({ stats: _stats, rateLimitData, failedDeliveri
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xl">🟢</span>
+            <Circle size={20} strokeWidth={1.75} className="text-emerald-500 fill-emerald-500" />
             <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('uptime')}</h2>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">{t('na') || '—'}</p>
@@ -93,13 +94,13 @@ export default function HealthTab({ stats: _stats, rateLimitData, failedDeliveri
         </div>
         <div className="glass-card p-6">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xl">📅</span>
+            <CalendarDays size={20} strokeWidth={1.75} className="text-gray-400" />
             <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('serviceStatus')}</h2>
           </div>
           {queueStatus ? (
             <div>
               <p className={`text-3xl font-bold ${(queueStatus.pending ?? 0) > 10 || (queueStatus.failed ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                {(queueStatus.pending ?? 0) > 10 || (queueStatus.failed ?? 0) > 0 ? `⚠️ ${t('issuesDetected') || 'Issues Detected'}` : `✅ ${t('allSystemsOperational')}`}
+                {(queueStatus.pending ?? 0) > 10 || (queueStatus.failed ?? 0) > 0 ? <><AlertTriangle size={18} strokeWidth={1.75} className="inline mr-1 text-amber-500" />{t('issuesDetected') || 'Issues Detected'}</> : <><CheckCircle2 size={18} strokeWidth={1.75} className="inline mr-1 text-emerald-500" />{t('allSystemsOperational')}</>}
               </p>
               <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{queueStatus.pending} pending · {queueStatus.failed} failed · {queueStatus.processing} processing</p>
             </div>

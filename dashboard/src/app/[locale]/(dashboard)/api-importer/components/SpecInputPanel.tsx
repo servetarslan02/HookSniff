@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { parseOpenApiSpec, type ParsedSpec } from '../parser';
+import { Trash2 } from 'lucide-react';
 
 export function SpecInputPanel({
   onParsed,
@@ -134,7 +135,7 @@ export function SpecInputPanel({
             disabled={!specUrl && !specContent}
             className="px-3 py-2 text-sm font-medium rounded-xl border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            🗑️ {t('clearAll')}
+            <Trash2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('clearAll')}
           </button>
         </div>
       </div>

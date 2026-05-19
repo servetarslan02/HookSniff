@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
+import { Gem, BarChart3 } from 'lucide-react';
 
 const PLAN_COLORS: Record<string, string> = {
   developer: '#94a3b8',
@@ -35,7 +36,7 @@ export default function OverviewTab({ stats, revenue, mrr, arr }: OverviewTabPro
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="glass-card p-6 border-l-4 border-violet-500">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-2xl" aria-hidden="true">💎</span>
+            <Gem size={24} strokeWidth={1.75} className="text-violet-400" />
             <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('mrrCard')}</h2>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -49,7 +50,7 @@ export default function OverviewTab({ stats, revenue, mrr, arr }: OverviewTabPro
         </div>
         <div className="glass-card p-6 border-l-4 border-blue-500">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-2xl" aria-hidden="true">📊</span>
+            <BarChart3 size={24} strokeWidth={1.75} className="text-blue-400" />
             <h2 className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('arrCard')}</h2>
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white">

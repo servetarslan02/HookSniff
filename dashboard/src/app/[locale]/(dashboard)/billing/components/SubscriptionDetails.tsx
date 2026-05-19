@@ -8,9 +8,10 @@ import { billingApiExtended } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { useBillingSubscription } from '@/hooks/useDashboardData';
 import { getErrorMessage } from '@/lib/errors';
+import { AlertTriangle, CreditCard, DollarSign } from 'lucide-react';
 
 const PROVIDER_LABELS: Record<string, { name: string; icon: string }> = {
-  stripe: { name: 'Stripe', icon: '💳' },
+  stripe: { name: 'Stripe', icon: <CreditCard size={16} strokeWidth={1.75} /> },
   polar: { name: 'Polar.sh', icon: '🔷' },
   iyzico: { name: 'iyzico', icon: '🟡' },
 };
@@ -25,7 +26,7 @@ function getCardIcon(brand?: string | null): string {
   }
 }
 
-const STATUS_STYLES: Record<string, string> = {
+const STATUS_STYLES: Record<string, React.ReactNode> = {
   active: 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-green-600/20',
   canceled: 'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-600/20',
   past_due: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20',
@@ -82,7 +83,7 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
 
   if (!sub) return null;
 
-  const provider = PROVIDER_LABELS[sub.payment_provider] || { name: sub.payment_provider, icon: '💰' };
+  const provider = PROVIDER_LABELS[sub.payment_provider] || { name: sub.payment_provider, icon: <DollarSign size={16} strokeWidth={1.75} /> };
   const statusStyle = STATUS_STYLES[sub.status] || STATUS_STYLES.inactive;
   const isFree = sub.plan === 'developer' || sub.plan === 'free';
   const priceDisplay = isFree ? '$0' : `$${(sub.monthly_price_cents / 100).toFixed(0)}`;
@@ -111,7 +112,7 @@ export function SubscriptionDetails({ onCancel }: { onCancel?: () => void }) {
           </span>
           {sub.cancel_at_period_end && (
             <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-2">
-              ⚠️ {t('cancelAtPeriodEnd')}
+              <AlertTriangle size={16} strokeWidth={1.75} className="inline mr-1" /> {t('cancelAtPeriodEnd')}
             </p>
           )}
           {!isFree && !sub.cancel_at_period_end && (

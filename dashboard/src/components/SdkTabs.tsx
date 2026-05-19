@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Check } from 'lucide-react';
 
 interface Tab {
   label: string;
@@ -40,7 +41,7 @@ export default function SdkTabs({ tabs }: { tabs: Tab[] }) {
           onClick={handleCopy}
           className="mr-2 px-2 py-1 text-xs font-medium rounded-sm bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
         >
-          {copied ? `✓ ${t('copied')}` : t('copy')}
+          {copied ? <><Check size={14} strokeWidth={1.75} className="inline mr-0.5" />{t('copied')}</> : t('copy')}
         </button>
       </div>
       <pre className="bg-gray-900 text-green-400 p-4 text-sm font-mono overflow-x-auto m-0">

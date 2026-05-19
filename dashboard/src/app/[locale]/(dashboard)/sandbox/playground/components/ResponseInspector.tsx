@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { FlaskConical } from 'lucide-react';
 
 export function ResponseInspector({
   response,
@@ -11,7 +12,7 @@ export function ResponseInspector({
 }: {
   response: unknown;
   status: number | null;
-  headers: Record<string, string>;
+  headers: Record<string, React.ReactNode>;
   duration: number | null;
 }) {
   const t = useTranslations('playground');
@@ -20,7 +21,7 @@ export function ResponseInspector({
   if (!response && !status) {
     return (
       <div className="text-center text-gray-500 dark:text-slate-500 py-16">
-        <div className="text-4xl mb-3">🧪</div>
+        <div className="text-4xl mb-3"><FlaskConical size={18} strokeWidth={1.75} /></div>
         <p>{t('sendToInspect')}</p>
       </div>
     );

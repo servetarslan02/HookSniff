@@ -7,10 +7,11 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi, type RetryPolicyConfig } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
+import { BarChart3, Pencil, Repeat, TrendingUp } from 'lucide-react';
 
 const BACKOFF_OPTIONS = [
-  { value: 'exponential', icon: '📈' },
-  { value: 'linear', icon: '📊' },
+  { value: 'exponential', icon: <TrendingUp size={16} strokeWidth={1.75} /> },
+  { value: 'linear', icon: <BarChart3 size={16} strokeWidth={1.75} /> },
   { value: 'fixed', icon: '➡️' },
 ];
 
@@ -101,7 +102,7 @@ export default function RetryPolicyPage() {
           <div className="p-8 text-center text-gray-500 dark:text-slate-400">{tc('loading')}</div>
         ) : endpoints.length === 0 ? (
           <div className="p-12 text-center">
-            <div className="text-4xl mb-3">🔁</div>
+            <div className="text-4xl mb-3"><Repeat size={18} strokeWidth={1.75} /></div>
             <p className="text-gray-500 dark:text-slate-400 mb-4">{t('noEndpoints')}</p>
             <a href="/webhooks" className="inline-block px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
               {t('createEndpoint') || 'Create Endpoint'}
@@ -199,7 +200,7 @@ export default function RetryPolicyPage() {
                           <span className="text-xs text-gray-400 dark:text-slate-500">{t('defaultPolicy')}</span>
                         )}
                         <button type="button" onClick={() => handleEdit(ep)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">
-                          ✏️ {t('edit') || 'Edit'}
+                          <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('edit') || 'Edit'}
                         </button>
                       </div>
                     </div>

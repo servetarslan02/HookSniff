@@ -3,6 +3,7 @@
 import { useToast } from '@/components/Toast';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { NotesTabProps } from './types';
+import { ClipboardList, FileText, X } from 'lucide-react';
 
 export function NotesTab({
   userTags,
@@ -22,7 +23,7 @@ export function NotesTab({
   return (
     <LazySection fallback={Skeletons.card} rootMargin={300}>
     <div className="space-y-6">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📝 {t("notesAndTags") || "Notes & Tags"}</h2>
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><FileText size={16} strokeWidth={1.75} className="inline mr-1" /> {t("notesAndTags") || "Notes & Tags"}</h2>
 
       {/* Tags Section */}
       <div className="glass-card p-6">
@@ -39,7 +40,7 @@ export function NotesTab({
                   } catch { toast(t("tagRemoveFailed") || "Failed", "error"); }
                 }}
                 className="ml-1 text-brand-500 hover:text-red-500 transition"
-              >✕</button>
+              ><X size={18} strokeWidth={1.75} /></button>
             </span>
           )) : <span className="text-xs text-gray-400 dark:text-slate-500">{t("noTags") || "No tags yet"}</span>}
         </div>
@@ -77,7 +78,7 @@ export function NotesTab({
 
       {/* Notes Section */}
       <div className="glass-card p-6">
-        <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-3">📋 {t("notes") || "Notes"}</h3>
+        <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-3"><ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> {t("notes") || "Notes"}</h3>
         <div className="space-y-3 mb-4">
           {userNotes.length > 0 ? userNotes.map((note) => (
             <div key={note.id} className="p-3 bg-gray-50 dark:bg-slate-900/50 rounded-lg">

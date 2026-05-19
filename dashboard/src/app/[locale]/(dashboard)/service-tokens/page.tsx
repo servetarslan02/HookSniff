@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useServiceTokens, useCreateServiceToken, useDeleteServiceToken, useRevealServiceToken, useUpdateServiceToken } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
+import { ClipboardList } from 'lucide-react';
 
 export default function ServiceTokensPage() {
   const { user } = useAuth();
@@ -22,7 +23,7 @@ export default function ServiceTokensPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [revealedTokens, setRevealedTokens] = useState<Record<string, string>>({});
+  const [revealedTokens, setRevealedTokens] = useState<Record<string, React.ReactNode>>({});
   const [newlyCreatedToken, setNewlyCreatedToken] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
@@ -150,7 +151,7 @@ export default function ServiceTokensPage() {
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <code className="text-xs font-mono text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-gray-700 px-1.5 sm:px-2 py-1 rounded-sm select-all truncate max-w-[120px] sm:max-w-none">{revealedTokens[tok.id] || tok.token_prefix || '••••••••••••••••'}</code>
                       <button onClick={() => handleReveal(tok.id)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={revealedTokens[tok.id] ? t('hide') : t('reveal')}>👁</button>
-                      <button onClick={() => handleCopy(revealedTokens[tok.id] || tok.token_prefix || '')} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition hidden sm:inline-flex" title={tc('copyToClipboard')}>📋</button>
+                      <button onClick={() => handleCopy(revealedTokens[tok.id] || tok.token_prefix || '')} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition hidden sm:inline-flex" title={tc('copyToClipboard')}><ClipboardList size={18} strokeWidth={1.75} /></button>
                     </div>
                   </td>
                   <td className="px-3 sm:px-6 py-3 text-gray-500 dark:text-slate-400 text-xs hidden sm:table-cell">{formatDate(tok.created_at)}</td>
@@ -210,7 +211,7 @@ export default function ServiceTokensPage() {
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-gray-600 dark:text-slate-300 whitespace-nowrap">{t('orgId')}:</span>
           <code className="flex-1 text-xs font-mono text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg select-all">{orgId}</code>
-          <button onClick={() => handleCopy(orgId)} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={tc('copyToClipboard')}>📋</button>
+          <button onClick={() => handleCopy(orgId)} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={tc('copyToClipboard')}><ClipboardList size={18} strokeWidth={1.75} /></button>
         </div>
       </div>
 

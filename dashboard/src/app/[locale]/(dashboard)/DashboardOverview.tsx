@@ -16,6 +16,7 @@ import {
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { Link } from '@/i18n/navigation';
+import { Settings, Eye, EyeOff, Link2, Package, FlaskConical, TrendingUp, Inbox, RefreshCw } from 'lucide-react';
 
 export function DashboardOverview() {
   const t = useTranslations('dashboard');
@@ -118,13 +119,14 @@ export function DashboardOverview() {
             }`}
             title={t('customizeWidgets')}
           >
-            ⚙️
+            <Settings size={16} strokeWidth={1.75} />
           </button>
           <button
             onClick={() => refetchStats()}
             className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition"
           >
-            ↻ {tc('refresh')}
+            <RefreshCw size={14} strokeWidth={1.75} className="inline mr-1" />
+            {tc('refresh')}
           </button>
         </div>
       </div>
@@ -149,7 +151,7 @@ export function DashboardOverview() {
                     : 'bg-gray-100 text-gray-500 border-gray-200 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700'
                 }`}
               >
-                {w.visible ? '👁️' : '🚫'} {w.id.replace(/-/g, ' ')}
+                {w.visible ? <Eye size={14} strokeWidth={1.75} className="inline mr-1" /> : <EyeOff size={14} strokeWidth={1.75} className="inline mr-1" />} {w.id.replace(/-/g, ' ')}
               </button>
             ))}
           </div>
@@ -322,25 +324,29 @@ export function DashboardOverview() {
                 href="/applications"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
-                🔗 {t('manageEndpoints')}
+                <Link2 size={16} strokeWidth={1.75} className="text-gray-400" />
+                {t('manageEndpoints')}
               </Link>
               <Link
                 href="/deliveries"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
-                📦 {t('viewDeliveries')}
+                <Package size={16} strokeWidth={1.75} className="text-gray-400" />
+                {t('viewDeliveries')}
               </Link>
               <Link
                 href="/devtools"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
-                🧪 {t('openPlayground')}
+                <FlaskConical size={16} strokeWidth={1.75} className="text-gray-400" />
+                {t('openPlayground')}
               </Link>
               <Link
                 href="/observability"
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
-                📈 {t('viewAnalytics')}
+                <TrendingUp size={16} strokeWidth={1.75} className="text-gray-400" />
+                {t('viewAnalytics')}
               </Link>
             </div>
           </div>
@@ -384,7 +390,7 @@ export function DashboardOverview() {
           </div>
         ) : recentDeliveries.length === 0 ? (
           <div className="text-center py-8">
-            <span className="text-4xl mb-3 block">📭</span>
+            <Inbox size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 dark:text-slate-500 text-sm">
               {t('noDeliveries')}
             </p>

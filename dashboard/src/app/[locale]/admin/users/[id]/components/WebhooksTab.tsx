@@ -3,6 +3,7 @@
 import { StatusBadge } from '@/components/StatusBadge';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { WebhooksTabProps } from './types';
+import { Package, Search } from 'lucide-react';
 
 export function WebhooksTab({
   userWebhooks,
@@ -20,7 +21,7 @@ export function WebhooksTab({
     <LazySection fallback={Skeletons.table()} rootMargin={300}>
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📦 {t("webhooks") || "Webhooks"}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><Package size={16} strokeWidth={1.75} className="inline mr-1" /> {t("webhooks") || "Webhooks"}</h2>
         <div className="flex items-center gap-2">
           <select value={webhookFilter.status || ""} onChange={(e) => { setWebhookFilter((f: any) => ({ ...f, status: e.target.value || undefined })); setWebhooksPage(1); }} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
             <option value="">{t("allStatuses") || "All Statuses"}</option>
@@ -53,7 +54,7 @@ export function WebhooksTab({
                     <td className="px-4 py-3"><StatusBadge status={d.status} /></td>
                     <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400">{d.attempt_count}</td>
                     <td className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">{new Date(d.created_at).toLocaleString()}</td>
-                    <td className="px-4 py-3"><div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}><button onClick={() => handleViewDelivery(d.id)} className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium">🔍</button><button onClick={() => handleReplay(d.id)} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">↩</button></div></td>
+                    <td className="px-4 py-3"><div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}><button onClick={() => handleViewDelivery(d.id)} className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium"><Search size={18} strokeWidth={1.75} /></button><button onClick={() => handleReplay(d.id)} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">↩</button></div></td>
                   </tr>
                 ))}
               </tbody>

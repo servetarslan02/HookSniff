@@ -7,8 +7,9 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { CheckCircle2, Clock, RefreshCw, XCircle } from 'lucide-react';
 
-const statusColors: Record<string, string> = {
+const statusColors: Record<string, React.ReactNode> = {
   pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400',
   running: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
   completed: 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400',
@@ -16,11 +17,11 @@ const statusColors: Record<string, string> = {
   cancelled: 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-slate-400',
 };
 
-const statusIcons: Record<string, string> = {
-  pending: '⏳',
-  running: '🔄',
-  completed: '✅',
-  failed: '❌',
+const statusIcons: Record<string, React.ReactNode> = {
+  pending: <Clock size={16} strokeWidth={1.75} />,
+  running: <RefreshCw size={16} strokeWidth={1.75} />,
+  completed: <CheckCircle2 size={16} strokeWidth={1.75} />,
+  failed: <XCircle size={16} strokeWidth={1.75} />,
   cancelled: '🚫',
 };
 
@@ -87,7 +88,7 @@ export default function BackgroundTasksPage() {
         </div>
       ) : tasks.length === 0 ? (
         <div className="glass-card p-12 text-center">
-          <div className="text-5xl mb-4">⏳</div>
+          <div className="text-5xl mb-4"><Clock size={18} strokeWidth={1.75} /></div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noTasks')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noTasksDesc')}</p>
           <p className="text-xs text-gray-400 dark:text-slate-500">{t('tasksCreatedHint')}</p>

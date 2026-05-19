@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
+import { AlertTriangle, Check, ClipboardList, Eye, FileText, Rocket, Trash2, X, Zap } from 'lucide-react';
 
 /* ─── Webhook Builder — Visual webhook creator ─── */
 interface WebhookField {
@@ -155,7 +156,7 @@ export default function WebhookBuilderPage() {
             disabled={!eventType && fields.length === 1 && !fields[0].key && !endpointId}
             className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
           >
-            🗑️ {t('clearAll')}
+            <Trash2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('clearAll')}
           </button>
         </div>
       </div>
@@ -166,7 +167,7 @@ export default function WebhookBuilderPage() {
           {/* Templates */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center"><span className="text-base">📋</span></div>
+              <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center"><span className="text-base"><ClipboardList size={18} strokeWidth={1.75} /></span></div>
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('templates')}</h2>
             </div>
             <div className="flex gap-2">
@@ -189,7 +190,7 @@ export default function WebhookBuilderPage() {
           {/* Event Type */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center"><span className="text-base">⚡</span></div>
+              <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center"><span className="text-base"><Zap size={18} strokeWidth={1.75} /></span></div>
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('eventType')}</h2>
             </div>
             <input
@@ -205,7 +206,7 @@ export default function WebhookBuilderPage() {
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center"><span className="text-base">📝</span></div>
+                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center"><span className="text-base"><FileText size={18} strokeWidth={1.75} /></span></div>
                 <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('payloadFields')}</h2>
               </div>
               <button type="button" onClick={addField} className="text-sm text-brand-600 dark:text-brand-400 hover:underline">{t('addField')}</button>
@@ -241,8 +242,7 @@ export default function WebhookBuilderPage() {
                     aria-label={tc('delete')}
                     className="px-3 py-3 text-red-500 hover:text-red-700 transition"
                   >
-                    ✕
-                  </button>
+                    <X size={16} strokeWidth={1.75} className="inline mr-1" /> </button>
                 </div>
               ))}
             </div>
@@ -251,7 +251,7 @@ export default function WebhookBuilderPage() {
           {/* Send */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center"><span className="text-base">🚀</span></div>
+              <div className="w-9 h-9 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center"><span className="text-base"><Rocket size={18} strokeWidth={1.75} /></span></div>
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('sendTo')}</h2>
             </div>
             {loadingEndpoints ? (
@@ -295,12 +295,12 @@ export default function WebhookBuilderPage() {
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 sticky top-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center"><span className="text-base">👁️</span></div>
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center"><span className="text-base"><Eye size={18} strokeWidth={1.75} /></span></div>
                 <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('preview')}</h2>
               </div>
               {lastSentPayload && (
                 <span className="text-xs px-2 py-1 rounded-full bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
-                  ✓ {t('sent')}
+                  <Check size={16} strokeWidth={1.75} className="inline mr-1" /> {t('sent')}
                 </span>
               )}
             </div>
@@ -314,7 +314,7 @@ export default function WebhookBuilderPage() {
             {lastSentPayload && lastSentPayload !== preview && (
               <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
                 <p className="text-xs text-amber-700 dark:text-amber-400">
-                  ⚠️ {t('previewChanged')}
+                  <AlertTriangle size={16} strokeWidth={1.75} className="inline mr-1" /> {t('previewChanged')}
                 </p>
               </div>
             )}

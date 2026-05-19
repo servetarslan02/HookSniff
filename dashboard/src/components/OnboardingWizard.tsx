@@ -10,6 +10,7 @@ import { loadState, saveState, SDKS } from './onboarding/types';
 import { Confetti } from './onboarding/Confetti';
 import { SetupChecklist } from './onboarding/SetupChecklist';
 import { SuccessToast } from './onboarding/SuccessToast';
+import { BarChart3, Bot, Check, CheckCircle2, CreditCard, FlaskConical, Key, Lightbulb, Link2, Mail, Package, Settings, ShoppingBag, Target } from 'lucide-react';
 
 export { SetupChecklist, SuccessToast };
 
@@ -29,12 +30,12 @@ export function OnboardingWizard() {
   const t = useTranslations('onboarding');
 
   const USE_CASES = [
-    { id: 'payments', icon: '💳', label: t('useCasePayments'), desc: t('useCasePaymentsDesc') },
-    { id: 'email', icon: '📧', label: t('useCaseEmail'), desc: t('useCaseEmailDesc') },
-    { id: 'ecommerce', icon: '🛒', label: t('useCaseEcommerce'), desc: t('useCaseEcommerceDesc') },
-    { id: 'saas', icon: '📊', label: t('useCaseSaas'), desc: t('useCaseSaasDesc') },
-    { id: 'ai', icon: '🤖', label: t('useCaseAi'), desc: t('useCaseAiDesc') },
-    { id: 'other', icon: '⚙️', label: t('useCaseOther'), desc: t('useCaseOtherDesc') },
+    { id: 'payments', icon: <CreditCard size={16} strokeWidth={1.75} />, label: t('useCasePayments'), desc: t('useCasePaymentsDesc') },
+    { id: 'email', icon: <Mail size={16} strokeWidth={1.75} />, label: t('useCaseEmail'), desc: t('useCaseEmailDesc') },
+    { id: 'ecommerce', icon: <ShoppingBag size={16} strokeWidth={1.75} />, label: t('useCaseEcommerce'), desc: t('useCaseEcommerceDesc') },
+    { id: 'saas', icon: <BarChart3 size={16} strokeWidth={1.75} />, label: t('useCaseSaas'), desc: t('useCaseSaasDesc') },
+    { id: 'ai', icon: <Bot size={16} strokeWidth={1.75} />, label: t('useCaseAi'), desc: t('useCaseAiDesc') },
+    { id: 'other', icon: <Settings size={16} strokeWidth={1.75} />, label: t('useCaseOther'), desc: t('useCaseOtherDesc') },
   ];
 
   useEffect(() => {
@@ -67,11 +68,11 @@ export function OnboardingWizard() {
 
   const steps: WizardStep[] = [
     { id: 'welcome', title: t('welcomeTitle'), description: t('welcomeWizardDesc'), icon: '🎉' },
-    { id: 'usecase', title: t('whatBuilding'), description: t('whatBuildingDesc'), icon: '🎯' },
-    { id: 'sdk', title: t('chooseSdk'), description: t('chooseSdkDesc'), icon: '📦' },
-    { id: 'endpoint', title: t('createFirstEndpoint'), description: t('createFirstEndpointDesc'), icon: '🔗' },
-    { id: 'test', title: t('sendTestWebhook'), description: t('sendTestWebhookDesc'), icon: '🧪' },
-    { id: 'done', title: t('allSetTitle'), description: t('allSetDesc'), icon: '✅' },
+    { id: 'usecase', title: t('whatBuilding'), description: t('whatBuildingDesc'), icon: <Target size={16} strokeWidth={1.75} /> },
+    { id: 'sdk', title: t('chooseSdk'), description: t('chooseSdkDesc'), icon: <Package size={16} strokeWidth={1.75} /> },
+    { id: 'endpoint', title: t('createFirstEndpoint'), description: t('createFirstEndpointDesc'), icon: <Link2 size={16} strokeWidth={1.75} /> },
+    { id: 'test', title: t('sendTestWebhook'), description: t('sendTestWebhookDesc'), icon: <FlaskConical size={16} strokeWidth={1.75} /> },
+    { id: 'done', title: t('allSetTitle'), description: t('allSetDesc'), icon: <CheckCircle2 size={16} strokeWidth={1.75} /> },
   ];
 
   const currentStep = steps[state.currentStep];
@@ -165,7 +166,7 @@ export function OnboardingWizard() {
                   {t('welcomeDesc')}
                 </p>
                 <div className="flex items-center justify-center gap-6 text-sm text-gray-500 dark:text-slate-400">
-                  <span>✓ {t('freeForever')}</span>
+                  <span><Check size={16} strokeWidth={1.75} className="inline mr-1" /> {t('freeForever')}</span>
                   <span>✓ 11 SDK</span>
                   <span>✓ 5 dk kurulum</span>
                 </div>
@@ -272,7 +273,7 @@ export function OnboardingWizard() {
                   </div>
                   <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl p-3">
                     <p className="text-xs text-blue-700 dark:text-blue-400">
-                      💡 <strong>{t('noRealUrl')}</strong> {t('usePlayground')}
+                      <Lightbulb size={16} strokeWidth={1.75} className="inline mr-1" /> <strong>{t('noRealUrl')}</strong> {t('usePlayground')}
                     </p>
                   </div>
                 </div>
@@ -313,7 +314,7 @@ export function OnboardingWizard() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition"
                   >
-                    🧪 {t('playground')}
+                    <FlaskConical size={16} strokeWidth={1.75} className="inline mr-1" /> {t('playground')}
                   </a>
                   <button
                     onClick={() => {
@@ -323,7 +324,7 @@ export function OnboardingWizard() {
                     }}
                     className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                   >
-                    ✓ {t('iveSentTest')}
+                    <Check size={16} strokeWidth={1.75} className="inline mr-1" /> {t('iveSentTest')}
                   </button>
                 </div>
               </div>
@@ -338,19 +339,19 @@ export function OnboardingWizard() {
                 </p>
                 <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-6">
                   <a href="/core" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
-                    <div className="text-xl mb-1">🔗</div>
+                    <div className="text-xl mb-1"><Link2 size={18} strokeWidth={1.75} /></div>
                     <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("endpoints")}</div>
                   </a>
                   <a href="/core" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
-                    <div className="text-xl mb-1">📦</div>
+                    <div className="text-xl mb-1"><Package size={18} strokeWidth={1.75} /></div>
                     <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("deliveries")}</div>
                   </a>
                   <a href="/devtools" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
-                    <div className="text-xl mb-1">🧪</div>
+                    <div className="text-xl mb-1"><FlaskConical size={18} strokeWidth={1.75} /></div>
                     <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("playground")}</div>
                   </a>
                   <a href="/core" className="p-3 bg-gray-50 dark:bg-slate-800 rounded-xl text-center hover:bg-gray-100 dark:hover:bg-slate-700 transition">
-                    <div className="text-xl mb-1">🔑</div>
+                    <div className="text-xl mb-1"><Key size={18} strokeWidth={1.75} /></div>
                     <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{t("apiKeys")}</div>
                   </a>
                 </div>

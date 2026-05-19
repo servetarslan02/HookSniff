@@ -10,17 +10,18 @@ import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
 import { notificationsApi } from '@/lib/api';
 import { useRealtime } from '@/hooks/useRealtime';
+import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, FolderOpen, Lock } from 'lucide-react';
 
 const adminNavigation = [
-  { nameKey: 'overview', href: '/admin', icon: '📊' },
-  { nameKey: 'users', href: '/admin/users', icon: '👥' },
-  { nameKey: 'revenue', href: '/admin/revenue', icon: '💰' },
-  { nameKey: 'featureFlags', href: '/admin/feature-flags', icon: '🚩' },
-  { nameKey: 'system', href: '/admin/system', icon: '🖥️' },
-  { nameKey: 'settingsNav', href: '/admin/settings', icon: '⚙️' },
-  { nameKey: 'activityLog', href: '/admin/activity', icon: '📋' },
-  { nameKey: 'alerts', href: '/admin/alerts', icon: '🔔' },
-  { nameKey: 'email', href: '/admin/email', icon: '📧' },
+  { nameKey: 'overview', href: '/admin', icon: <BarChart3 size={18} strokeWidth={1.75} /> },
+  { nameKey: 'users', href: '/admin/users', icon: <Users size={18} strokeWidth={1.75} /> },
+  { nameKey: 'revenue', href: '/admin/revenue', icon: <DollarSign size={18} strokeWidth={1.75} /> },
+  { nameKey: 'featureFlags', href: '/admin/feature-flags', icon: <Flag size={18} strokeWidth={1.75} /> },
+  { nameKey: 'system', href: '/admin/system', icon: <Monitor size={18} strokeWidth={1.75} /> },
+  { nameKey: 'settingsNav', href: '/admin/settings', icon: <Settings size={18} strokeWidth={1.75} /> },
+  { nameKey: 'activityLog', href: '/admin/activity', icon: <ClipboardList size={18} strokeWidth={1.75} /> },
+  { nameKey: 'alerts', href: '/admin/alerts', icon: <Bell size={18} strokeWidth={1.75} /> },
+  { nameKey: 'email', href: '/admin/email', icon: <Mail size={18} strokeWidth={1.75} /> },
 ];
 
 function AdminShell({ children }: { children: React.ReactNode }) {
@@ -58,7 +59,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🔒</div>
+          <Lock size={64} strokeWidth={1.75} className="text-gray-300 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("accessDenied")}</h2>
           <p className="text-gray-500 dark:text-slate-400 mb-4">{t("noAdminPrivileges")}</p>
           <Link
@@ -101,8 +102,8 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-700">
-          <div className="w-9 h-9 rounded-lg bg-linear-to-br from-red-500 to-purple-600 flex items-center justify-center text-white text-lg">
-            ⚡
+          <div className="w-9 h-9 rounded-lg bg-linear-to-br from-red-500 to-purple-600 flex items-center justify-center text-white">
+            <Zap size={18} strokeWidth={1.75} />
           </div>
           <div>
             <div className="font-bold text-gray-900 dark:text-white">{t("adminPanel")}</div>
@@ -128,7 +129,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                     : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
                 )}
               >
-                <span className="text-lg">{item.icon}</span>
+                <span className="text-gray-400">{item.icon}</span>
                 {t(`nav.${item.nameKey}`)}
               </PrefetchLink>
             );
@@ -139,7 +140,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             href={"/applications"}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
           >
-            <span className="text-lg">📁</span>
+            <FolderOpen size={18} strokeWidth={1.75} className="text-gray-400" />
             {t('userPanel') || 'Kullanıcı Paneli'}
           </Link>
         </div>

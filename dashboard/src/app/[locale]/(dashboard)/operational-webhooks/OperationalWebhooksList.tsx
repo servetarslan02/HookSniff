@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { ClipboardList, Pencil, Trash2 } from 'lucide-react';
 
 const OP_EVENTS = [
   { id: 'delivery.failed', label: 'Delivery Failed', desc: 'When a webhook delivery fails after all retries' },
@@ -203,11 +204,11 @@ export default function OperationalWebhooksList() {
                 </div>
 
                 <div className="flex items-center gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">
-                  <button onClick={() => handleEdit(ep)} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm">✏️</button>
-                  <button onClick={() => setDeleteTarget(ep.id)} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm">🗑️</button>
+                  <button onClick={() => handleEdit(ep)} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm"><Pencil size={18} strokeWidth={1.75} /></button>
+                  <button onClick={() => setDeleteTarget(ep.id)} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm"><Trash2 size={18} strokeWidth={1.75} /></button>
                   <button onClick={() => setSelectedId(selectedId === ep.id ? null : ep.id)} title={t('deliveries')}
                     className={`ml-auto text-xs px-2.5 py-1 rounded-lg transition ${selectedId === ep.id ? 'bg-brand-100 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700'}`}>
-                    📋 {t('deliveries')}
+                    <ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> {t('deliveries')}
                   </button>
                 </div>
 
