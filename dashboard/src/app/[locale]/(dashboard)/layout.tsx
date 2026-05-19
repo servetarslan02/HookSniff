@@ -272,6 +272,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                   <a
                     href="https://hooksniff.vercel.app/docs"
                     target="_blank"
+                   rel="noopener noreferrer"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                     onClick={() => setProfileOpen(false)}
@@ -281,6 +282,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                   <a
                     href="https://hooksniff.vercel.app/docs/api-reference"
                     target="_blank"
+                   rel="noopener noreferrer"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                     onClick={() => setProfileOpen(false)}
