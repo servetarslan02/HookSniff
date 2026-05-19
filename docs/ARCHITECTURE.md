@@ -190,8 +190,8 @@ PostgreSQL Queue Poller (Worker)
   │     POST {endpoint_url}
   │     Content-Type: application/json
   │     webhook-signature: v1,{base64(hmac)}
-  │     X-HookSniff-Delivery-Id: {id}
-  │     X-HookSniff-Attempt: {n}
+  │     webhook-id: {id}
+  │     webhook-attempt: {n}
   │     Body: {event, data, timestamp}
   │
   ├─► Send with timeout (30s default)
