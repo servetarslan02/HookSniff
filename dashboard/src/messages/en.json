@@ -4294,7 +4294,9 @@
     "actions": "Actions",
     "delete": "Delete",
     "edit": "Edit",
-    "view": "View"
+    "view": "View",
+    "created": "Schema created!",
+    "noSchemasDesc": "Define JSON schemas to validate your webhook payloads before delivery."
   },
   "customerStories": {
     "storyShopflowTagline": "How ShopFlow scaled webhook delivery to 50K events/day and cut infrastructure costs by 60%",

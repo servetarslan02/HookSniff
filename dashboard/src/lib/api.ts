@@ -422,6 +422,12 @@ export const api = {
 
   getSchemas: (token: string) =>
     apiFetch<SchemaRegistryListResponse>('/schemas', { token }),
+  createSchema: (token: string, data: { name: string; schema: Record<string, unknown> }) =>
+    apiFetch<{ id: string; name: string; version: number }>('/schemas', { method: 'POST', body: data, token }),
+  getSchema: (token: string, id: string) =>
+    apiFetch<{ id: string; name: string; version: number; schema: unknown; created_at: string }>(`/schemas/${id}`, { token }),
+  validateSchema: (token: string, id: string, event: unknown) =>
+    apiFetch<{ valid: boolean; errors: Array<{ path: string; message: string }> }>(`/schemas/${id}/validate`, { method: 'POST', body: { event }, token }),
 
   search: (token: string, params: Record<string, string>) => {
     const qs = new URLSearchParams(params).toString();
