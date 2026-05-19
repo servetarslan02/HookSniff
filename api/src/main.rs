@@ -427,6 +427,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(ws_gateway))
         .layer(axum::Extension(qstash_client))
         .layer(axum::Extension(r2_client))
+        .layer(axum::Extension(sso::SsoStateStore::new()))
         .layer({
             let origins: Vec<axum::http::HeaderValue> = cfg
                 .cors_origins
