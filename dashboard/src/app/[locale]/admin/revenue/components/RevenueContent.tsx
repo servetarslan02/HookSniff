@@ -5,7 +5,7 @@ import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
 import { BarChart3, Check, DollarSign, Inbox, Link2, TrendingDown } from 'lucide-react';
 
-const PLAN_COLORS: Record<string, React.ReactNode> = {
+const PLAN_COLORS: Record<string, string> = {
   developer: '#94a3b8',
   startup: '#10b981',
   pro: '#4c6ef5',
