@@ -677,6 +677,7 @@
     "emailPlaceholder": "you@company.com",
     "namePlaceholder": "Your name",
     "changeEmail": "Change Email",
+    "invalidEmail": "Please enter a valid email address (e.g. name@example.com).",
     "emailChangeNotice": "A verification code will be sent to the new email address.",
     "emailChangeCodeSent": "A verification code has been sent to your new email address.",
     "codeSentTo": "Code sent to",

@@ -132,7 +132,20 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
+  const isValidEmail = (email: string): boolean => {
+    const e = email.trim();
+    if (!e || e.length > 254) return false;
+    if (e.includes(' ') || e.includes('\t')) return false;
+    const parts = e.split('@');
+    if (parts.length !== 2) return false;
+    const [local, domain] = parts;
+    if (!local || local.length > 64) return false;
+    if (!domain || !domain.includes('.') || domain.startsWith('.') || domain.endsWith('.')) return false;
+    return true;
+  };
+
   const emailChanged = profileEmail.toLowerCase().trim() !== (user?.email || '').toLowerCase();
+  const emailValid = isValidEmail(profileEmail);
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
@@ -269,13 +282,18 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
                 <button
                   type="button"
                   onClick={handleRequestEmailChange}
-                  disabled={emailChangeLoading || !emailChanged}
+                  disabled={emailChangeLoading || !emailChanged || !emailValid}
                   className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-40 whitespace-nowrap"
                 >
                   {emailChangeLoading ? tc('sending') || 'Sending...' : t('changeEmail') || 'Change Email'}
                 </button>
               </div>
-              {emailChanged && (
+              {emailChanged && !emailValid && (
+                <p className="text-xs text-red-500 dark:text-red-400">
+                  {t('invalidEmail') || 'Please enter a valid email address.'}
+                </p>
+              )}
+              {emailChanged && emailValid && (
                 <p className="text-xs text-amber-600 dark:text-amber-400">
                   🔒 {t('emailChangeNotice') || 'A verification code will be sent to the new email address.'}
                 </p>
