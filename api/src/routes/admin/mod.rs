@@ -152,6 +152,10 @@ pub fn router() -> Router {
         .route("/security/stats", get(security::security_stats))
         .route("/security/events/{id}/resolve", put(security::resolve_security_event))
         .route("/security/resolve-all", post(security::resolve_all_security_events))
+        // ── IP Blocklist ──
+        .route("/security/blocklist", get(security::list_ip_blocklist).post(security::block_ip))
+        .route("/security/blocklist/{id}", delete(security::unblock_ip))
+        .route("/security/blocklist/check", post(security::check_ip_blocked))
 }
 
 // ── Common Types ──────────────────────────────────────────
