@@ -3055,7 +3055,13 @@
     "tag_code-review": "code-review",
     "tag_messaging": "messaging",
     "tag_sms": "sms",
-    "tag_voice": "voice"
+    "tag_voice": "voice",
+    "apply": "Apply",
+    "applyTitle": "Apply Template",
+    "endpointUrl": "Endpoint URL",
+    "enableAgents": "Enable Agents",
+    "applyBtn": "Apply Template",
+    "viewDetails": "View Details"
   },
   "schemasPage": {
     "title": "📋 Schemas",
