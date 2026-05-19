@@ -9,7 +9,7 @@ pub struct Endpoint {
     pub url: String,
     pub description: Option<String>,
     pub is_active: bool,
-    #[serde(skip_serializing)]
+    #[serde(skip_serializing, default)]
     pub signing_secret: String,
     pub retry_policy: Option<serde_json::Value>,
     pub created_at: DateTime<Utc>,
