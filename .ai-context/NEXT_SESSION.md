@@ -1,8 +1,20 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-19 22:14 GMT+8
+> Son güncelleme: 2026-05-19 22:40 GMT+8
 
-## ✅ Tamamlanan (Bu Oturum — 7+ Commit)
+## ✅ Tamamlanan (Bu Oturum — 8+ Commit)
+
+### -2. Özel Alan Adı Sayfası Kapsamlı Denetim (22:34–22:40)
+- 14 sorun tespit edildi, hepsi düzeltildi
+- CNAME doğrulama mantığı düzeltildi (vercel-dns.com kabul ediliyor)
+- Loading skeleton, empty state, load error + retry eklendi
+- Buton yazısı düzeltildi (Adding… / Verifying…)
+- DNS kayıtları mevcut unverified domain'lerde de gösteriliyor
+- Hardcoded Vercel fallback credentials kaldırıldı
+- Environments sekmesi ikonu düzeltildi (🌐 → 📦)
+- Test import path düzeltildi
+- 5 yeni i18n key (EN + TR)
+- Commit: `ef178b8d`
 
 ### -1. Dokümantasyon Türkçe Çeviri (22:00–22:14)
 - 13 hardcoded İngilizce sayfa i18n'e geçirildi
