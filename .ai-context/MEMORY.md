@@ -224,6 +224,27 @@ HookSniff/
 
 ---
 
+## 📝 Son Oturum (2026-05-19 20:48–20:55 — Settings Tabbed Redesign)
+
+### Özet
+Account → Settings sayfası uzun dikey scroll'dan tab'lı layout'a çevrildi. 3 dosya değişti, 124 satır eklendi.
+
+### Yapılan İşler:
+1. **Settings sayfası tab'lı yapı** — Profile, Security, Notifications, Privacy, Danger Zone
+2. **Sol sidebar navigasyon** — SVG ikonlar, aktif tab highlight, brand renk
+3. **Mobil uyum** — Yatay scroll tab'lar
+4. **Animasyon** — Tab geçişlerinde slide-up
+5. **TypeScript düzeltmeleri** — ServiceTokenResponse.token optional, Team.owner_id fallback
+
+### Değişiklikler:
+- `dashboard/src/app/[locale]/(dashboard)/settings/page.tsx` — 159 satır
+- `dashboard/src/app/[locale]/(dashboard)/team/page.tsx` — 1 satır
+- `dashboard/src/lib/api-types.ts` — 1 satır
+
+### Push: `866fe21c`
+
+---
+
 ## 📝 Son Oturum (2026-05-19 20:32–20:47 — Documentation Premium Redesign)
 
 ### Özet
