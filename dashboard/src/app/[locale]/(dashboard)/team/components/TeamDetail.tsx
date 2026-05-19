@@ -20,7 +20,7 @@ const ROLE_ICONS: Record<string, React.ReactNode> = {
 };
 
 function roleLabel(t: ReturnType<typeof useTranslations>, role: string): string {
-  const map: Record<string, React.ReactNode> = { admin: t('roleAdmin'), editor: t('roleEditor'), viewer: t('roleViewer') };
+  const map: Record<string, string> = { admin: t('roleAdmin'), editor: t('roleEditor'), viewer: t('roleViewer') };
   return map[role] || role;
 }
 

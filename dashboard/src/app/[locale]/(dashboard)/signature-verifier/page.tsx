@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
+import { CheckCircle2, Laptop, PenLine, ShieldCheck, Trash2, XCircle } from 'lucide-react';
 
 /** Constant-time string comparison to prevent timing attacks (Item 168) */
 function timingSafeEqual(a: string, b: string): boolean {
@@ -201,7 +202,6 @@ if not is_valid:
       code: `package main
 
 import (
-import { CheckCircle2, Laptop, PenLine, ShieldCheck, Trash2, XCircle } from 'lucide-react';
     "crypto/hmac"
     "crypto/sha256"
     "encoding/hex"
