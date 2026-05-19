@@ -178,6 +178,16 @@ async fn process_webhook_result(
                 plan.as_str(),
                 provider
             );
+
+            // Create in-app notification for plan upgrade
+            {
+                let pool_clone = pool.clone();
+                let plan_name = plan.as_str().to_string();
+                let cid = *customer_id;
+                tokio::spawn(async move {
+                    crate::notifications::helpers::plan_upgraded(&pool_clone, cid, "free", &plan_name).await;
+                });
+            }
         }
         WebhookResult::SubscriptionUpdated {
             provider_subscription_id,
@@ -253,6 +263,19 @@ async fn process_webhook_result(
                 provider,
                 provider_subscription_id
             );
+
+            // Create in-app notification
+            if let Some(sub_col) = provider_sub_col(provider) {
+                let cid_query = format!("SELECT id FROM customers WHERE {} = $1", sub_col);
+                if let Ok(Some((cid,))) = sqlx::query_as::<_, (uuid::Uuid,)>(&cid_query)
+                    .bind(provider_subscription_id).fetch_optional(pool).await
+                {
+                    let pool_clone = pool.clone();
+                    tokio::spawn(async move {
+                        crate::notifications::helpers::subscription_canceled(&pool_clone, cid, "free").await;
+                    });
+                }
+            }
         }
         WebhookResult::PaymentSucceeded {
             provider_tx_id,
@@ -283,6 +306,13 @@ async fn process_webhook_result(
                 .bind(cid)
                 .execute(pool)
                 .await?;
+
+                // Create in-app notification
+                let pool_clone = pool.clone();
+                let provider_clone = provider.to_string();
+                tokio::spawn(async move {
+                    crate::notifications::helpers::payment_failed(&pool_clone, cid, &provider_clone).await;
+                });
 
                 tracing::warn!(
                     "⚠️ {} payment failed: {} — grace period started for customer {}",
