@@ -429,19 +429,14 @@ async fn accept_invite(
     Extension(customer): Extension<Customer>,
     Json(req): Json<AcceptInviteRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    // Find the invite by token
+    // Find the invite by token — also check expiry in query for safety
     let invite = sqlx::query_as::<_, TeamInvite>(
-        "SELECT id, team_id, email, role, token, expires_at, created_at FROM team_invites WHERE token = $1",
+        "SELECT id, team_id, email, role, token, expires_at, created_at FROM team_invites WHERE token = $1 AND expires_at > NOW()",
     )
     .bind(&req.token)
     .fetch_optional(&pool)
     .await?
     .ok_or(AppError::NotFound)?;
-
-    // Check expiry
-    if invite.expires_at < chrono::Utc::now() {
-        return Err(AppError::BadRequest("Invitation has expired".into()));
-    }
 
     // Check email matches
     if invite.email != customer.email {
@@ -766,6 +761,13 @@ async fn transfer_ownership(
             .execute(&pool)
             .await?;
     }
+
+    // Demote old owner to editor (they're no longer the owner)
+    sqlx::query("UPDATE team_members SET role = 'editor' WHERE team_id = $1 AND customer_id = $2")
+        .bind(id)
+        .bind(customer.id)
+        .execute(&pool)
+        .await?;
 
     tracing::info!("✅ Team '{}' ownership transferred from {} to {}", team.name, customer.id, req.new_owner_id);
 

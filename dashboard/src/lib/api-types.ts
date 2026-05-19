@@ -173,6 +173,24 @@ export interface TeamMember {
   joined_at: string | null;
 }
 
+export interface TeamInvite {
+  id: string;
+  email: string;
+  role: string;
+  expires_at: string;
+  created_at: string;
+}
+
+export interface TeamDetailResponse {
+  id: string;
+  name: string;
+  owner_id: string;
+  members: TeamMember[];
+  invites: TeamInvite[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Notification {
   id: string;
   type: 'webhook_failed' | 'alert' | 'system' | 'billing' | 'team_invite';
