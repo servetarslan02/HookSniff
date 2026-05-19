@@ -1595,22 +1595,18 @@ fn parse_saml_response(xml: &str) -> Result<SamlAssertion, AppError> {
 
 /// Extract text content from an XML element by tag name
 fn extract_xml_text(xml: &str, tag: &str) -> Option<String> {
-    // Try both plain tag and namespaced tag (e.g., "NameID" and ":NameID")
-    let patterns = [
-        format!("<{}", tag),
-        format!(":{}", tag),
-    ];
+    // Try multiple tag patterns: plain, namespaced with common prefixes
+    let prefixes = ["", "saml:", "saml2p:", "md:"];
+    for prefix in &prefixes {
+        let full_tag = format!("{}{}", prefix, tag);
+        let start_tag = format!("<{}", full_tag);
+        let end_tag = format!("</{}", full_tag);
 
-    for start_tag in &patterns {
-        if let Some(start) = xml.find(start_tag.as_str()) {
+        if let Some(start) = xml.find(&start_tag) {
             let content_start = xml[start..].find('>')? + start + 1;
-            let end_tag = format!("</{}", tag);
-            // Also try namespaced end tag
-            let end_tag_ns = format!(":{}", tag);
-            let content_end = xml[content_start..].find(&end_tag)
-                .or_else(|| xml[content_start..].find(&end_tag_ns))
-                .map(|pos| pos + content_start)?;
-            return Some(xml[content_start..content_end].trim().to_string());
+            if let Some(content_end) = xml[content_start..].find(&end_tag) {
+                return Some(xml[content_start..content_start + content_end].trim().to_string());
+            }
         }
     }
     None
