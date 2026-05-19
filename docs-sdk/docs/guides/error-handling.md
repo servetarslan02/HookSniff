@@ -1,141 +1,82 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 # Error Handling
 
-All HookSniff SDKs follow a consistent error handling pattern. Errors are categorized into two types:
+## API Error Codes
 
-## API Errors
+| Code | Meaning | SDK Behavior |
+|------|---------|--------------|
+| 400 | Bad Request | Validation error with details |
+| 401 | Unauthorized | Authentication error |
+| 404 | Not Found | Resource not found error |
+| 429 | Rate Limited | Auto-retries after `Retry-After` header |
+| 500 | Server Error | Auto-retries up to 2 times |
 
-API errors occur when the server returns a non-2xx response. These include:
+## Node.js
 
-| Status Code | Meaning |
-|-------------|---------|
-| 400 | Bad Request — invalid parameters |
-| 401 | Unauthorized — invalid or missing API key |
-| 403 | Forbidden — insufficient permissions |
-| 404 | Not Found — resource doesn't exist |
-| 409 | Conflict — resource already exists |
-| 422 | Unprocessable Entity — validation error |
-| 429 | Too Many Requests — rate limit exceeded |
-| 500 | Internal Server Error |
+```typescript
+import { HttpError, ValidationError } from 'hooksniff';
 
-### Node.js
-
-```javascript
 try {
-  await client.endpoints.get('nonexistent');
+  await hs.endpoint.create({ url: 'invalid' });
 } catch (err) {
-  if (err.name === 'ApiException') {
-    console.error(`API Error ${err.code}: ${err.body}`);
-  } else {
-    console.error('Network error:', err.message);
+  if (err instanceof HttpError) {
+    console.error(`HTTP ${err.statusCode}: ${err.message}`);
+    if (err.statusCode === 429) {
+      const retryAfter = err.headers['retry-after'];
+      await new Promise(r => setTimeout(r, retryAfter * 1000));
+    }
+  } else if (err instanceof ValidationError) {
+    console.error('Validation:', err.errors);
   }
 }
 ```
 
-### Python
+## Python
 
 ```python
-from hooksniff import HookSniff, ApiException
+from hooksniff.exceptions import HttpError, ValidationError
 
 try:
-    hs.endpoints.get("nonexistent")
-except ApiException as e:
-    print(f"API Error {e.status_code}: {e.message}")
-except Exception as e:
-    print(f"Network error: {e}")
+    hs.endpoint.create(url="invalid")
+except HttpError as e:
+    print(f"HTTP {e.status_code}: {e.message}")
+except ValidationError as e:
+    print(f"Validation: {e.errors}")
 ```
 
-### Go
+## Go
 
 ```go
-endpoint, err := client.Endpoints.Get("nonexistent")
+endpoint, err := hs.Endpoint.Create(ctx, &hooksniff.EndpointIn{Url: "invalid"})
 if err != nil {
-    if apiErr, ok := err.(*hooksniff.ApiException); ok {
-        fmt.Printf("API Error %d: %s\n", apiErr.StatusCode, apiErr.Body)
-    } else {
-        fmt.Printf("Network error: %v\n", err)
+    var httpErr *hooksniff.HttpError
+    if errors.As(err, &httpErr) {
+        fmt.Printf("HTTP %d: %s\n", httpErr.StatusCode, httpErr.Message)
     }
 }
 ```
 
-### Java / Kotlin
+## Webhook Delivery Errors
 
-```java
-try {
-    client.endpoints().get("nonexistent");
-} catch (ApiException e) {
-    System.err.println("API Error " + e.getStatusCode() + ": " + e.getBody());
-} catch (Exception e) {
-    System.err.println("Network error: " + e.getMessage());
-}
-```
+When HookSniff delivers to **your** endpoint:
 
-### Ruby
+| Your Response | HookSniff Action |
+|---------------|------------------|
+| 2xx | ✅ Success |
+| 4xx (except 429) | ❌ No retry — your client error |
+| 429 | 🔄 Retry after `Retry-After` header |
+| 5xx | 🔄 Retry with exponential backoff |
+| Timeout (30s) | 🔄 Retry |
+| Connection refused | 🔄 Retry |
 
-```ruby
-begin
-  client.endpoints.get('nonexistent')
-rescue HookSniff::ApiException => e
-  puts "API Error #{e.status_code}: #{e.message}"
-rescue StandardError => e
-  puts "Network error: #{e.message}"
-end
-```
+## Best Practices
 
-### C\#
-
-```csharp
-try {
-    await client.Endpoints.GetAsync("nonexistent");
-} catch (ApiException e) {
-    Console.WriteLine($"API Error {e.StatusCode}: {e.Message}");
-} catch (Exception e) {
-    Console.WriteLine($"Network error: {e.Message}");
-}
-```
-
-### PHP
-
-```php
-try {
-    $client->endpoints->get('nonexistent');
-} catch (\HookSniff\ApiException $e) {
-    echo "API Error {$e->getStatusCode()}: {$e->getMessage()}\n";
-} catch (\Exception $e) {
-    echo "Network error: {$e->getMessage()}\n";
-}
-```
-
-## Rate Limiting
-
-When you receive a 429 response, the SDK will automatically retry after the `Retry-After` header duration (up to `num_retries` times). You can also handle it manually:
-
-```python
-import time
-from hooksniff import ApiException
-
-try:
-    hs.webhooks.send(...)
-except ApiException as e:
-    if e.status_code == 429:
-        retry_after = int(e.headers.get('Retry-After', 5))
-        time.sleep(retry_after)
-        # Retry the request
-```
-
-## Network Errors
-
-Network errors (timeouts, DNS failures, connection refused) are thrown as generic exceptions. All SDKs support configurable timeouts and retries:
-
-| SDK | Default Timeout | Default Retries |
-|-----|----------------|-----------------|
-| Node.js | 30s | 2 |
-| Python | 30s | 2 |
-| Go | 30s | 2 |
-| Java/Kotlin | 30s | 2 |
-| Ruby | 30s | 2 |
-| C# | 30s | 2 |
-| PHP | 30s | 2 |
+1. **Return 200 immediately** — process asynchronously
+2. **Verify signature first** — reject invalid signatures with 401
+3. **Use idempotency keys** — the `webhook-id` header is unique per delivery
+4. **Log everything** — webhook-id, timestamp, event type
+5. **Handle retries** — your handler may be called multiple times
+6. **Respond within 30 seconds** — HookSniff times out after 30s

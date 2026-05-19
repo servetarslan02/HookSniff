@@ -21,6 +21,12 @@ const sections = [
   {
     title: 'How-To Guides',
     cards: [
+      { title: '🔒 Webhook Verification', desc: 'Verify HMAC-SHA256 signatures. Standard Webheaders compliant.', href: '/docs/guides/webhook-verification' },
+      { title: '🛡️ Error Handling', desc: 'Handle API errors, 429s, delivery failures gracefully.', href: '/docs/guides/error-handling' },
+      { title: '📄 Pagination', desc: 'Cursor-based pagination, auto-paginate helpers.', href: '/docs/guides/pagination' },
+      { title: '📡 Streaming & Rate Limiting', desc: 'Real-time SSE events and per-endpoint rate limits.', href: '/docs/guides/streaming' },
+      { title: '🔄 Migration from Svix', desc: 'Step-by-step guide to migrate from Svix.', href: '/docs/guides/migration-from-svix' },
+      { title: '🌍 Real-World Examples', desc: 'E-commerce, CI/CD, notifications, multi-tenant patterns.', href: '/docs/guides/real-world-examples' },
       { title: '✅ Best Practices', desc: 'Production patterns for webhook integrations.', href: '/docs/best-practices' },
       { title: '🔒 Security', desc: 'HMAC-SHA256 verification, SSRF protection, TLS, 2FA.', href: '/docs/security' },
       { title: '🔄 Retries & DLQ', desc: 'Exponential backoff, replay failed webhooks.', href: '/docs/retries' },

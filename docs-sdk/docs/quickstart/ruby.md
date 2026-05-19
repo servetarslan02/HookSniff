@@ -22,10 +22,10 @@ gem 'hooksniff'
 require 'hooksniff'
 
 # Initialize client
-client = HookSniff::Client.new('sk_live_your_api_key')
+client = HookSniff::Client.new('hr_live_your_api_key')
 
 # Or with options
-client = HookSniff::Client.new('sk_live_your_api_key', {
+client = HookSniff::Client.new('hr_live_your_api_key', {
   base_url: 'https://hooksniff-api-1046140057667.europe-west1.run.app',
   timeout: 30,
 })

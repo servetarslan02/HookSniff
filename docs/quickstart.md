@@ -6,7 +6,7 @@ Get started with HookSniff in 5 minutes.
 
 1. Sign up at [hooksniff.com](https://hooksniff.com)
 2. Go to **Settings → API Keys**
-3. Create a new API key (starts with `hs_`)
+3. Create a new API key (starts with `hr_live_`)
 
 ## 2. Install SDK
 
