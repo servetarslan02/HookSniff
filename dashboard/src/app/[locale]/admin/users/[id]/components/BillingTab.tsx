@@ -35,7 +35,7 @@ export function BillingTab({
             onClick={() => setShowRefundModal(true)}
             className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
           >
-            💸 {t("processRefund") || "Process Refund"}
+            <DollarSign size={14} className="inline mr-1 -mt-0.5" /> {t("processRefund") || "Process Refund"}
           </button>
         )}
       </div>
@@ -139,7 +139,7 @@ export function BillingTab({
 
       {/* Refund History */}
       <div className="glass-card p-6">
-        <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4">💸 {t("refundHistory") || "Refund History"}</h3>
+        <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-4 inline-flex items-center gap-1.5"><DollarSign size={14} strokeWidth={1.75} /> {t("refundHistory") || "Refund History"}</h3>
         {userRefunds.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">

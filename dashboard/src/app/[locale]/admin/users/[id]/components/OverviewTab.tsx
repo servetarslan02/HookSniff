@@ -1,6 +1,7 @@
 'use client';
 
 import { StatusBadge } from '@/components/StatusBadge';
+import { ClipboardList, Eye } from 'lucide-react';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { OverviewTabProps } from './types';
@@ -163,7 +164,7 @@ export function OverviewTab({
       <LazySection fallback={Skeletons.card} rootMargin={300}>
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">📋 {t("planHistory") || "Plan History"}</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white inline-flex items-center gap-2"><ClipboardList size={18} strokeWidth={1.75} /> {t("planHistory") || "Plan History"}</h2>
         </div>
         <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
           {planHistory.map((entry: any, i: number) => (
@@ -229,7 +230,7 @@ export function OverviewTab({
                         onClick={() => handleViewDelivery(d.id)}
                         className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium"
                       >
-                        🔍 {t("viewDetails") || "Details"}
+                        <Eye size={14} className="inline mr-1 -mt-0.5" /> {t("viewDetails") || "Details"}
                       </button>
                       <button type="button"
                         onClick={() => handleReplay(d.id)}

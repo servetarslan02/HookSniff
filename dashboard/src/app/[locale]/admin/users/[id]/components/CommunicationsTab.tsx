@@ -2,7 +2,7 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { CommunicationsTabProps } from './types';
-import { ClipboardList, FileText, Mail, MessageSquare, User } from 'lucide-react';
+import { Ban, ClipboardList, FileText, Mail, MessageSquare, Tag, User } from 'lucide-react';
 
 export function CommunicationsTab({
   userComms,
@@ -28,10 +28,10 @@ export function CommunicationsTab({
             <option value="email"><Mail size={16} strokeWidth={1.75} className="inline mr-1" /> Email</option>
             <option value="impersonate"><User size={16} strokeWidth={1.75} className="inline mr-1" /> Impersonate</option>
             <option value="plan_change"><ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> Plan Change</option>
-            <option value="ban">🚫 Ban/Activate</option>
+            <option value="ban">Ban/Activate</option>
             <option value="note"><FileText size={16} strokeWidth={1.75} className="inline mr-1" /> Note</option>
-            <option value="tag_added">🏷️ Tag Added</option>
-            <option value="tag_removed">🏷️ Tag Removed</option>
+            <option value="tag_added">Tag Added</option>
+            <option value="tag_removed">Tag Removed</option>
           </select>
         </div>
       </div>

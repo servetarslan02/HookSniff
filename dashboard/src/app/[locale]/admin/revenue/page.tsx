@@ -236,7 +236,7 @@ export default function AdminRevenuePage() {
       {revenueMetrics && (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatCard label={t('arpu') || 'ARPU'} value={`$${revenueMetrics.arpu.toFixed(2)}`} icon={<span className="text-lg" aria-hidden="true"><User size={18} strokeWidth={1.75} /></span>} color="blue" />
-          <StatCard label={t('ltv') || 'LTV'} value={`$${revenueMetrics.ltv.toFixed(2)}`} icon={<span className="text-lg" aria-hidden="true">🏆</span>} color="amber" />
+          <StatCard label={t('ltv') || 'LTV'} value={`$${revenueMetrics.ltv.toFixed(2)}`} icon={<TrendingUp size={18} strokeWidth={1.75} />} color="amber" />
           <StatCard label={t('nrr') || 'NRR'} value={`${revenueMetrics.nrr.toFixed(1)}%`} icon={<span className="text-lg" aria-hidden="true"><RefreshCw size={18} strokeWidth={1.75} /></span>} color={revenueMetrics.nrr >= 100 ? 'emerald' : 'red'} />
           <StatCard label={t('expansionRevenue') || 'Expansion'} value={`$${revenueMetrics.expansion_revenue.toFixed(2)}`} icon={<span className="text-lg" aria-hidden="true"><Rocket size={18} strokeWidth={1.75} /></span>} color="violet" />
         </div>

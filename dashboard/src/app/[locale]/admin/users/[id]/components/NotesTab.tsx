@@ -3,7 +3,7 @@
 import { useToast } from '@/components/Toast';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { NotesTabProps } from './types';
-import { ClipboardList, FileText, X } from 'lucide-react';
+import { ClipboardList, FileText, Tag, X } from 'lucide-react';
 
 export function NotesTab({
   userTags,
@@ -27,7 +27,7 @@ export function NotesTab({
 
       {/* Tags Section */}
       <div className="glass-card p-6">
-        <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-3">🏷️ {t("tags") || "Tags"}</h3>
+        <h3 className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-3 inline-flex items-center gap-1.5"><Tag size={14} strokeWidth={1.75} /> {t("tags") || "Tags"}</h3>
         <div className="flex flex-wrap gap-2 mb-4">
           {userTags.length > 0 ? userTags.map((tag) => (
             <span key={tag.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300">

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAdminAuditLogs } from '@/hooks/useAdminData';
 import { useTranslations, useLocale } from 'next-intl';
-import { AlertTriangle, ClipboardList, CreditCard, Eye, Flag, FlaskConical, Inbox, Key, Lock, Mail, Pencil, Plus, Settings, Shield, ShieldCheck, Trash2, User } from 'lucide-react';
+import { AlertTriangle, ArrowUpFromLine, Ban, ClipboardList, CreditCard, DollarSign, Eye, FileOutput, Flag, FlaskConical, Inbox, Key, Lock, LogOut, Mail, Pencil, Plus, Settings, Shield, ShieldCheck, Tag, Trash2, User, UserMinus, Users } from 'lucide-react';
 
 const ACTION_COLORS: Record<string, React.ReactNode> = {
   LOGIN: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400',
@@ -66,23 +66,23 @@ const ACTION_ICONS: Record<string, React.ReactNode> = {
   ALERT_CREATE: <AlertTriangle size={16} strokeWidth={1.75} />,
   ALERT_UPDATE: <AlertTriangle size={16} strokeWidth={1.75} />,
   ALERT_DELETE: <AlertTriangle size={16} strokeWidth={1.75} />,
-  DELIVERY_REPLAY: '↩️',
+  DELIVERY_REPLAY: <ArrowUpFromLine size={16} strokeWidth={1.75} />,
   USER_PLAN_CHANGE: <CreditCard size={16} strokeWidth={1.75} />,
   USER_STATUS_CHANGE: <User size={16} strokeWidth={1.75} />,
   USER_EMAIL_SEND: <Mail size={16} strokeWidth={1.75} />,
-  USER_GDPR_EXPORT: '📤',
+  USER_GDPR_EXPORT: <FileOutput size={16} strokeWidth={1.75} />,
   USER_GDPR_DELETE: <Trash2 size={16} strokeWidth={1.75} />,
   ADMIN_TEST_WEBHOOK: <FlaskConical size={16} strokeWidth={1.75} />,
-  BULK_REPLAY: '↩️',
-  ADMIN_REFUND: '💸',
+  BULK_REPLAY: <ArrowUpFromLine size={16} strokeWidth={1.75} />,
+  ADMIN_REFUND: <DollarSign size={16} strokeWidth={1.75} />,
   BULK_EMAIL_SENT: <Mail size={16} strokeWidth={1.75} />,
-  GDPR_EXPORT: '📤',
+  GDPR_EXPORT: <FileOutput size={16} strokeWidth={1.75} />,
   GDPR_DATA_DELETE: <Trash2 size={16} strokeWidth={1.75} />,
   SERVICE_TOKEN_CREATE: <Key size={16} strokeWidth={1.75} />,
   SERVICE_TOKEN_DELETE: <Trash2 size={16} strokeWidth={1.75} />,
   MEMBER_INVITE: <Inbox size={16} strokeWidth={1.75} />,
-  MEMBER_REMOVE: '👋',
-  ROLE_CHANGE: '👔',
+  MEMBER_REMOVE: <UserMinus size={16} strokeWidth={1.75} />,
+  ROLE_CHANGE: <Users size={16} strokeWidth={1.75} />,
   SUBSCRIPTION_CANCEL: <CreditCard size={16} strokeWidth={1.75} />,
 };
 
@@ -154,7 +154,7 @@ export default function AdminActivityPage() {
   };
 
   const getActionIcon = (action: string) => {
-    return ACTION_ICONS[action] || '📋';
+    return ACTION_ICONS[action] || <ClipboardList size={16} strokeWidth={1.75} />;
   };
 
   return (

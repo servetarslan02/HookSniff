@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import { useSsoConfig, useTeams } from '@/hooks/useDashboardData';
-import { AlertTriangle, Check, CheckCircle2, ClipboardList, Eye, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from 'lucide-react';
+import { AlertTriangle, Building2, Check, CheckCircle2, ClipboardList, Eye, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from 'lucide-react';
 
 /* ─── SSO/SAML Configuration Page (Enterprise Only) ─── */
 export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: string } = {}) {
@@ -292,7 +292,7 @@ export default function SsoSettingsPage({ teamId: teamIdProp }: { teamId?: strin
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { id: 'saml' as const, name: 'SAML 2.0', desc: 'Okta, OneLogin, Azure AD, Google Workspace', icon: '🏛️' },
+            { id: 'saml' as const, name: 'SAML 2.0', desc: 'Okta, OneLogin, Azure AD, Google Workspace', icon: <Building2 size={16} strokeWidth={1.75} /> },
             { id: 'oidc' as const, name: 'OpenID Connect', desc: 'Auth0, Keycloak, AWS Cognito', icon: <Key size={16} strokeWidth={1.75} /> },
           ].map((p) => (
             <button

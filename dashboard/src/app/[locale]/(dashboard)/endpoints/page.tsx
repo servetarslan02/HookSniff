@@ -10,7 +10,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazySection, Skeletons } from '@/components/LazySection';
-import { AlertTriangle, ClipboardList, Key } from 'lucide-react';
+import { AlertTriangle, ClipboardList, Key, Trash2 } from 'lucide-react';
 
 export default function EndpointsPage() {
   const { token } = useAuth();
@@ -252,7 +252,7 @@ export default function EndpointsPage() {
                   disabled={bulkDeleting}
                   className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition disabled:opacity-50"
                 >
-                  {bulkDeleting ? tc('deleting') : `🗑 ${tc('deleteSelected', { count: selected.size })}`}
+                  {bulkDeleting ? tc('deleting') : <><Trash2 size={14} className="inline mr-1 -mt-0.5" />{tc('deleteSelected', { count: selected.size })}</>}
                 </button>
               )}
             </div>

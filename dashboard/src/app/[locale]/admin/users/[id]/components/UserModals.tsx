@@ -2,7 +2,7 @@
 
 import { StatusBadge } from '@/components/StatusBadge';
 import type { UserModalsProps } from './types';
-import { AlertTriangle, Mail, Search, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Ban, DollarSign, Mail, Search, Trash2, X } from 'lucide-react';
 
 export function UserModals({
   detail,
@@ -61,7 +61,7 @@ export function UserModals({
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowBanModal(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              🚫 {t('banUser')}
+              <Ban size={14} className="inline mr-1 -mt-0.5" /> {t('banUser')}
             </h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
               {t('banUserConfirm', { email: detail.user.email }) || `Are you sure you want to ban ${detail.user.email}?`}
@@ -150,7 +150,7 @@ export function UserModals({
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowRefundModal(false)} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              💸 {t('processRefund') || 'Process Refund'}
+              <DollarSign size={14} className="inline mr-1 -mt-0.5" /> {t('processRefund') || 'Process Refund'}
             </h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
               {t('refundFor', { email: detail.user.email }) || `Refund for ${detail.user.email} (${detail.user.plan} plan)`}

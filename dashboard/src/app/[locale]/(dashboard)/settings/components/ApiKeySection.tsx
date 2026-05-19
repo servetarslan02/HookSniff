@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check } from 'lucide-react';
+import { Check, KeyRound } from 'lucide-react';
 
 export function ApiKeySection({ apiKey }: { apiKey: string | null }) {
   const t = useTranslations('settings');
@@ -44,7 +44,7 @@ export function ApiKeySection({ apiKey }: { apiKey: string | null }) {
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center">
-          <span className="text-base">🗝️</span>
+          <span className="text-base text-gray-500"><KeyRound size={16} strokeWidth={1.75} /></span>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('api')}</h3>
