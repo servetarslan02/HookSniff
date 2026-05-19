@@ -1595,14 +1595,25 @@ fn parse_saml_response(xml: &str) -> Result<SamlAssertion, AppError> {
 
 /// Extract text content from an XML element by tag name
 fn extract_xml_text(xml: &str, tag: &str) -> Option<String> {
-    let start_tag = format!("<{}", tag);
-    let end_tag = format!("</{}>", tag);
+    // Try both plain tag and namespaced tag (e.g., "NameID" and ":NameID")
+    let patterns = [
+        format!("<{}", tag),
+        format!(":{}", tag),
+    ];
 
-    let start = xml.find(&start_tag)?;
-    let content_start = xml[start..].find('>')? + start + 1;
-    let content_end = xml[content_start..].find(&end_tag)? + content_start;
-
-    Some(xml[content_start..content_end].trim().to_string())
+    for start_tag in &patterns {
+        if let Some(start) = xml.find(start_tag.as_str()) {
+            let content_start = xml[start..].find('>')? + start + 1;
+            let end_tag = format!("</{}", tag);
+            // Also try namespaced end tag
+            let end_tag_ns = format!(":{}", tag);
+            let content_end = xml[content_start..].find(&end_tag)
+                .or_else(|| xml[content_start..].find(&end_tag_ns))
+                .map(|pos| pos + content_start)?;
+            return Some(xml[content_start..content_end].trim().to_string());
+        }
+    }
+    None
 }
 
 /// Extract an attribute value from an XML element
@@ -2049,7 +2060,7 @@ mod tests {
             "exp": 9999999999i64
         });
         use base64::Engine;
-        let header = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"alg":"none","typ":"JWT"}"#);
+        let header = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"alg":"RS256","typ":"JWT"}"#);
         let payload_b64 = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(payload.to_string());
         let token = format!("{}.{}.sig", header, payload_b64);
 

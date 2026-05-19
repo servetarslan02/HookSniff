@@ -262,7 +262,7 @@ mod tests {
         std::env::set_var("RESEND_API_KEY", "re_test");
         std::env::set_var("NOTIFY_FROM_EMAIL", "custom@example.com");
         let client = ResendEmailClient::from_env().unwrap();
-        assert_eq!(client.from_email, "custom@example.com");
+        assert_eq!(client.from_email, "HookSniff <custom@example.com>");
         std::env::remove_var("RESEND_API_KEY");
         std::env::remove_var("NOTIFY_FROM_EMAIL");
     }

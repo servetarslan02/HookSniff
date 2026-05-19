@@ -204,7 +204,7 @@ mod tests {
             is_active: true,
         };
         let json = serde_json::to_value(&info).unwrap();
-        assert_eq!(json["prefix"], "hr_live_abc123...");
+        assert_eq!(json["api_key_prefix"], "hr_live_abc123...");
         assert_eq!(json["is_active"], true);
         assert_eq!(json["last_used_at"], "2024-01-02T00:00:00Z");
     }
