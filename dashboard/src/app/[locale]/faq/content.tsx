@@ -22,6 +22,16 @@ const faqKeys = [
   { cat: 'catSecurity', q: 'q13', a: 'a13' },
   { cat: 'catSecurity', q: 'q14', a: 'a14' },
   { cat: 'catSecurity', q: 'q15', a: 'a15' },
+  { cat: 'catIntegration', q: 'q16', a: 'a16' },
+  { cat: 'catIntegration', q: 'q17', a: 'a17' },
+  { cat: 'catIntegration', q: 'q18', a: 'a18' },
+  { cat: 'catIntegration', q: 'q19', a: 'a19' },
+  { cat: 'catTechnical', q: 'q20', a: 'a20' },
+  { cat: 'catTechnical', q: 'q21', a: 'a21' },
+  { cat: 'catSecurity', q: 'q22', a: 'a22' },
+  { cat: 'catGeneral', q: 'q23', a: 'a23' },
+  { cat: 'catTechnical', q: 'q24', a: 'a24' },
+  { cat: 'catGeneral', q: 'q25', a: 'a25' },
 ];
 
 function FAQAccordion({ question, answer }: { question: string; answer: string }) {
@@ -51,7 +61,7 @@ function FAQAccordion({ question, answer }: { question: string; answer: string }
 
 export function FAQPageContent() {
   const t = useTranslations();
-  const categories = ['catGeneral', 'catGettingStarted', 'catBilling', 'catTechnical', 'catSecurity'];
+  const categories = ['catGeneral', 'catGettingStarted', 'catBilling', 'catTechnical', 'catSecurity', 'catIntegration'];
   const [activeCategory, setActiveCategory] = useState('catGeneral');
 
   return (
