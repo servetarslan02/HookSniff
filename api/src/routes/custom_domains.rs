@@ -243,7 +243,7 @@ async fn delete_domain(
     }
 
     // Remove domain from Vercel (best-effort)
-    if let Some((ref domain)) = domain_name {
+    if let Some(ref domain) = domain_name {
         let _ = remove_domain_from_vercel(domain).await;
     }
 
@@ -430,11 +430,12 @@ async fn remove_domain_from_vercel(domain: &str) -> Result<(), String> {
         .await
         .map_err(|e| format!("HTTP error: {}", e))?;
 
-    if resp.status().is_success() || resp.status().as_u16() == 404 {
+    let status = resp.status();
+    if status.is_success() || status.as_u16() == 404 {
         Ok(())
     } else {
         let body = resp.text().await.unwrap_or_default();
-        Err(format!("Vercel API error ({}): {}", resp.status(), body))
+        Err(format!("Vercel API error ({}): {}", status, body))
     }
 }
 
