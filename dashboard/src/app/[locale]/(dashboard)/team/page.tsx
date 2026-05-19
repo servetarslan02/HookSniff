@@ -276,8 +276,8 @@ function TeamPageInner() {
 
       <ConfirmDialog
         open={showDeleteConfirm}
-        title={t('deleteTeam') || 'Delete Team'}
-        message={t('deleteTeamConfirm') || 'Are you sure you want to delete this team? This action cannot be undone. All members will be removed.'}
+        title={(t('deleteTeam') as string) || 'Delete Team'}
+        message={(t('deleteTeamConfirm') as string) || 'Are you sure you want to delete this team? This action cannot be undone. All members will be removed.'}
         variant="danger"
         onConfirm={handleDeleteTeam}
         onCancel={() => setShowDeleteConfirm(false)}
@@ -285,8 +285,8 @@ function TeamPageInner() {
 
       <ConfirmDialog
         open={showLeaveConfirm}
-        title={t('leaveTeam') || 'Leave Team'}
-        message={t('leaveTeamConfirm') || 'Are you sure you want to leave this team?'}
+        title={(t('leaveTeam') as string) || 'Leave Team'}
+        message={(t('leaveTeamConfirm') as string) || 'Are you sure you want to leave this team?'}
         variant="danger"
         onConfirm={handleLeaveTeam}
         onCancel={() => setShowLeaveConfirm(false)}
