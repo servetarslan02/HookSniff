@@ -4572,7 +4572,19 @@
     "payloadPreview": "Payload Preview (first message)",
     "cursorCommitted": "Cursor committed",
     "cursorSeeked": "Cursor seeked",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "howItWorks": "How it works",
+    "step1": "Poll messages",
+    "step2": "Process each",
+    "step3": "Commit cursor",
+    "step4": "Next poll returns new",
+    "messages": "Messages",
+    "payload": "Payload",
+    "commitTitle": "Commit Cursor",
+    "commitConfirm": "This will mark this message as processed and move the cursor forward. Continue?",
+    "seekTitle": "Seek Cursor",
+    "seekConfirm": "This will move the cursor to this message. Previous messages will be skipped. Continue?",
+    "status": "Status"
   },
   "streaming": {
     "title": "Streaming",
