@@ -58,6 +58,18 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
+      {/* How it works */}
+      <div className="glass-card p-6 bg-linear-to-r from-brand-50 to-purple-50 dark:from-brand-500/5 dark:to-purple-500/5">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('howItWorks')}</h3>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
+          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step1')}</span>
+          <span>→</span>
+          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step2')}</span>
+          <span>→</span>
+          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step3')}</span>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard label={t("analytics.successRate")} value={`${rate.toFixed(1)}%`} color="emerald" isPercent={false}
           icon={<svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 3v18h18" /><path d="M7 16l4-8 4 4 4-6" /></svg>} />

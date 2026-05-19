@@ -17,11 +17,26 @@ export default function EndpointHealthPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
-          {t('subtitle')}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+        </div>
+        <button onClick={() => refetch()} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+          ↻ {tc('refresh') || 'Refresh'}
+        </button>
+      </div>
+
+      {/* How it works */}
+      <div className="glass-card p-6 bg-linear-to-r from-brand-50 to-purple-50 dark:from-brand-500/5 dark:to-purple-500/5">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('howItWorks')}</h3>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
+          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step1')}</span>
+          <span>→</span>
+          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step2')}</span>
+          <span>→</span>
+          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step3')}</span>
+        </div>
       </div>
 
       {/* Error banner */}
@@ -71,8 +86,10 @@ export default function EndpointHealthPage() {
         {isLoading ? (
           <div className="p-8 text-center text-gray-500 dark:text-slate-400">{tc('loading')}</div>
         ) : endpoints.length === 0 ? (
-          <div className="p-12 text-center text-gray-500 dark:text-slate-400">
-            {t('noEndpoints')}
+          <div className="p-12 text-center">
+            <div className="text-5xl mb-4">💓</div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noEndpoints')}</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400">{t('noEndpointsDesc')}</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-slate-800">
