@@ -276,6 +276,26 @@ async fn login(
     if !customer.is_active { return Err(AppError::BadRequest("Account is disabled. Contact support.".into())); }
     if !password_ok { return Err(AppError::BadRequest("Invalid email or password".into())); }
 
+    // SSO enforcement check — block password login if SSO is required
+    let sso_config = sqlx::query_as::<_, (bool, Option<bool>)>(
+        "SELECT enabled, admin_bypass FROM sso_configs WHERE customer_id = $1 LIMIT 1"
+    )
+    .bind(customer.id)
+    .fetch_optional(&pool)
+    .await?;
+
+    if let Some((sso_enabled, admin_bypass)) = sso_config {
+        if sso_enabled {
+            let bypass = admin_bypass.unwrap_or(true);
+            if !bypass || !customer.is_admin {
+                tracing::warn!("🔒 SSO login blocked for {}: SSO enforced, admin_bypass={}", req.email, bypass);
+                return Err(AppError::BadRequest(
+                    "SSO is required for this account. Please use Single Sign-On to log in.".into()
+                ));
+            }
+        }
+    }
+
     // 2FA check
     if customer.totp_enabled {
         let temp_token = jwt::generate_token_with_duration(

@@ -517,7 +517,8 @@ async fn test_sso_connection(
 }
 
 // ── GET /sso/login ──────────────────────────────────────────
-// Initiates SSO login by redirecting to IdP
+// Initiates SSO login by redirecting to IdP.
+// Works for BOTH existing users and new (auto-provisioned) users.
 
 async fn initiate_sso_login(
     Extension(pool): Extension<PgPool>,
@@ -526,28 +527,48 @@ async fn initiate_sso_login(
 ) -> Result<impl axum::response::IntoResponse, AppError> {
     let email = &query.email;
 
-    // Find customer by email
-    let customer = sqlx::query_as::<_, Customer>(
+    // Extract email domain for SSO config lookup
+    let domain = email.split('@').nth(1).unwrap_or("");
+
+    // Strategy 1: Find existing customer by email
+    let existing_customer = sqlx::query_as::<_, Customer>(
         "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE email = $1"
     )
     .bind(email)
     .fetch_optional(&pool)
-    .await?
-    .ok_or_else(|| AppError::BadRequest("No account found with this email address.".into()))?;
-
-    if !customer.is_active {
-        return Err(AppError::BadRequest("Account is disabled. Contact support.".into()));
-    }
-
-    // Get SSO config for this customer
-    let config = sqlx::query_as::<_, (String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-        "SELECT provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id, metadata_url FROM sso_configs WHERE customer_id = $1 LIMIT 1"
-    )
-    .bind(customer.id)
-    .fetch_optional(&pool)
     .await?;
 
-    let (provider, enabled, _metadata_url, sso_url, _certificate, issuer_url, client_id, client_secret_enc, entity_id, _meta2) =
+    // Check if existing customer is active
+    if let Some(ref c) = existing_customer {
+        if !c.is_active {
+            return Err(AppError::BadRequest("Account is disabled. Contact support.".into()));
+        }
+    }
+
+    // Strategy 2: Find SSO config — try by customer_id first, then by email domain
+    let config = if let Some(ref customer) = existing_customer {
+        // Existing user: look up their own SSO config
+        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT customer_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
+        )
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+    } else {
+        // New user: find SSO config by email domain (any SSO-enabled customer with same domain)
+        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT s.customer_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id
+             FROM sso_configs s
+             INNER JOIN customers c ON c.id = s.customer_id
+             WHERE s.enabled = true AND c.email LIKE $1
+             LIMIT 1"
+        )
+        .bind(format!("%@{}", domain))
+        .fetch_optional(&pool)
+        .await?
+    };
+
+    let (sso_owner_id, provider, enabled, _metadata_url, sso_url, _certificate, issuer_url, client_id, client_secret_enc, entity_id) =
         config.ok_or_else(|| AppError::BadRequest("SSO is not configured for this account. Contact your administrator.".into()))?;
 
     if !enabled {
@@ -557,19 +578,58 @@ async fn initiate_sso_login(
     // Generate state parameter for CSRF protection
     let state = Uuid::new_v4().to_string();
 
-    // Store login state
+    // Store login state (customer_id = SSO config owner, used in callbacks for auto-team-join)
     state_store.insert(state.clone(), SsoLoginState {
-        customer_id: customer.id,
+        customer_id: sso_owner_id,
         email: email.clone(),
         provider: provider.clone(),
         redirect: query.redirect.clone(),
         created_at: Utc::now(),
     }).await;
 
+    // Create a minimal Customer struct for the redirect functions
+    // (they only use customer.id and customer.email for logging)
+    let redirect_customer = existing_customer.clone().unwrap_or_else(|| Customer {
+        id: sso_owner_id,
+        email: email.clone(),
+        api_key_hash: String::new(),
+        api_key_prefix: String::new(),
+        plan: "free".to_string(),
+        webhook_limit: 100,
+        webhook_count: 0,
+        created_at: Utc::now(),
+        password_hash: None,
+        stripe_customer_id: None,
+        stripe_subscription_id: None,
+        payment_provider: "none".to_string(),
+        polar_customer_id: None,
+        polar_subscription_id: None,
+        iyzico_customer_id: None,
+        iyzico_subscription_id: None,
+        name: None,
+        is_active: true,
+        is_admin: false,
+        role: "member".to_string(),
+        updated_at: Utc::now(),
+        email_verified: false,
+        totp_secret: None,
+        totp_enabled: false,
+        cancel_at_period_end: false,
+        payment_failed_at: None,
+        allow_overage: true,
+        overage_email_notification: true,
+        card_last4: None,
+        card_brand: None,
+        card_exp_month: None,
+        card_exp_year: None,
+        card_updated_at: None,
+        platform: None,
+    });
+
     if provider == "saml" {
-        initiate_saml_login(&pool, &customer, &state, &sso_url, &entity_id).await
+        initiate_saml_login(&pool, &redirect_customer, &state, &sso_url, &entity_id).await
     } else {
-        initiate_oidc_login(&pool, &customer, &state, &issuer_url, &client_id, &client_secret_enc).await
+        initiate_oidc_login(&pool, &redirect_customer, &state, &issuer_url, &client_id, &client_secret_enc).await
     }
 }
 
@@ -755,11 +815,21 @@ async fn saml_callback(
     // Find or create customer
     let customer = find_or_create_sso_customer(&pool, &email, &assertion.attributes, "saml").await?;
 
-    // Auto-join to default team if configured
-    let _ = auto_join_default_team(&pool, customer.id, &email).await;
+    // Extract SSO config owner's customer_id BEFORE login_state is consumed
+    let sso_owner_id = login_state.as_ref().map(|ls| ls.customer_id);
+
+    // Auto-join to default team if configured (use SSO config owner's ID to find the config)
+    if let Some(owner_id) = sso_owner_id {
+        let _ = auto_join_default_team(&pool, customer.id, owner_id).await;
+    }
 
     // Log attempt
     log_sso_attempt(&pool, Some(customer.id), &email, "saml", true, None, &headers).await;
+
+    // Audit log for SSO login
+    let _ = crate::audit::log_action(&pool, customer.id, "SSO_LOGIN", "auth", None,
+        Some(serde_json::json!({"provider": "saml", "auto_joined_team": sso_owner_id.is_some()})),
+        None, None).await;
 
     // Generate JWT tokens
     generate_sso_response(&pool, &customer, &cfg, login_state.and_then(|ls| ls.redirect)).await
@@ -885,11 +955,19 @@ async fn oidc_callback(
     // Find or create customer
     let customer = find_or_create_sso_customer(&pool, email, &attributes, "oidc").await?;
 
-    // Auto-join to default team if configured
-    let _ = auto_join_default_team(&pool, customer.id, email).await;
+    // Extract SSO config owner's customer_id BEFORE login_state is consumed
+    let sso_owner_id = login_state.customer_id;
+
+    // Auto-join to default team if configured (use SSO config owner's ID to find the config)
+    let _ = auto_join_default_team(&pool, customer.id, sso_owner_id).await;
 
     // Log attempt
     log_sso_attempt(&pool, Some(customer.id), email, "oidc", true, None, &headers).await;
+
+    // Audit log for SSO login
+    let _ = crate::audit::log_action(&pool, customer.id, "SSO_LOGIN", "auth", None,
+        Some(serde_json::json!({"provider": "oidc", "auto_joined_team": true})),
+        None, None).await;
 
     // Generate JWT tokens and redirect
     generate_sso_response(&pool, &customer, &cfg, login_state.redirect).await
@@ -1094,19 +1172,20 @@ async fn find_or_create_sso_customer(
 }
 
 // ── Helper: Auto-join SSO user to default team ──────────────
+//
+// `sso_user_id` — the SSO user who just logged in (will be added to the team)
+// `sso_owner_id` — the customer who owns the SSO config (has default_team_id/default_role)
 
 async fn auto_join_default_team(
     pool: &PgPool,
-    customer_id: Uuid,
-    customer_email: &str,
+    sso_user_id: Uuid,
+    sso_owner_id: Uuid,
 ) -> Result<(), AppError> {
-    // Find SSO config with default_team_id
+    // Find SSO config by the config OWNER's customer_id (not the SSO user)
     let config = sqlx::query_as::<_, (Option<Uuid>, Option<String>)>(
-        "SELECT default_team_id, default_role FROM sso_configs WHERE default_team_id IS NOT NULL AND customer_id IN (
-            SELECT id FROM customers WHERE email = $1
-        ) LIMIT 1"
+        "SELECT default_team_id, default_role FROM sso_configs WHERE customer_id = $1 AND default_team_id IS NOT NULL LIMIT 1"
     )
-    .bind(customer_email)
+    .bind(sso_owner_id)
     .fetch_optional(pool)
     .await?;
 
@@ -1119,7 +1198,7 @@ async fn auto_join_default_team(
         "SELECT id FROM team_members WHERE team_id = $1 AND customer_id = $2"
     )
     .bind(team_id)
-    .bind(customer_id)
+    .bind(sso_user_id)
     .fetch_optional(pool)
     .await?;
 
@@ -1132,12 +1211,19 @@ async fn auto_join_default_team(
         "INSERT INTO team_members (team_id, customer_id, role, joined_at) VALUES ($1, $2, $3, NOW()) ON CONFLICT DO NOTHING"
     )
     .bind(team_id)
-    .bind(customer_id)
+    .bind(sso_user_id)
     .bind(&role)
     .execute(pool)
     .await?;
 
-    tracing::info!("✅ SSO auto-join: customer {} added to team {} as {}", customer_id, team_id, role);
+    tracing::info!("✅ SSO auto-join: customer {} added to team {} as {}", sso_user_id, team_id, role);
+
+    // Audit log for auto-join
+    let _ = crate::audit::log_action(pool, sso_user_id, "SSO_AUTO_JOIN_TEAM", "team",
+        Some(&team_id.to_string()),
+        Some(serde_json::json!({"role": &role, "sso_owner": sso_owner_id.to_string()})),
+        None, None).await;
+
     Ok(())
 }
 
