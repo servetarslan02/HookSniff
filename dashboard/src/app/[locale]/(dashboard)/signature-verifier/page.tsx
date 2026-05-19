@@ -412,30 +412,5 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
         </div>
       </div>
 
-      {/* How it works */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center"><span className="text-base">📖</span></div>
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('howItWorks')}</h2>
-        </div>
-        <div className="space-y-4">
-          {[
-            { step: '1', title: t('step1Title'), desc: t('step1Desc') },
-            { step: '2', title: t('step2Title'), desc: t('step2Desc') },
-            { step: '3', title: t('step3Title'), desc: t('step3Desc') },
-          ].map((item) => (
-            <div key={item.step} className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm shrink-0">
-                {item.step}
-              </div>
-              <div>
-                <div className="font-medium text-gray-900 dark:text-white">{item.title}</div>
-                <div className="text-sm text-gray-500 dark:text-slate-400">{item.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
   );
 }

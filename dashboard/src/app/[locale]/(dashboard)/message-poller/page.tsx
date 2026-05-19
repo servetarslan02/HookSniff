@@ -81,19 +81,6 @@ export default function MessagePollerPage() {
         <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
-      {/* How it works */}
-      <div className="glass-card p-6 bg-linear-to-r from-brand-50 to-purple-50 dark:from-brand-500/5 dark:to-purple-500/5">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('howItWorks')}</h3>
-        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
-          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step1')}</span>
-          <span>→</span>
-          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step2')}</span>
-          <span>→</span>
-          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step3')}</span>
-          <span>→</span>
-          <span className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 font-mono text-xs">{t('step4')}</span>
-        </div>
-      </div>
 
       {/* Config Panel */}
       <div className="glass-card p-4 sm:p-6 space-y-3 sm:space-y-4">
