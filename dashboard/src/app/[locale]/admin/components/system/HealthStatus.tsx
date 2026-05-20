@@ -73,7 +73,7 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
     {
       name: t('queue') || 'Queue',
       icon: <Inbox size={24} strokeWidth={1.75} />,
-      status: health.checks?.queue?.status || health.queue?.pending !== undefined ? 'ok' : 'unknown',
+      status: (health.checks?.queue?.status) || (health.queue?.pending !== undefined ? 'ok' : 'unknown'),
       latency: health.checks?.queue?.latency_ms ?? null,
       detail: health.queue
         ? `${health.queue.pending} ${t('pending') || 'pending'} · ${health.queue.processing} ${t('processing') || 'processing'}`
