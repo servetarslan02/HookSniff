@@ -74,75 +74,55 @@ export default function SettingsPage() {
   return (
     <div className="max-w-5xl">
       {/* ── Header ── */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
-        {/* ── Tab Navigation ── */}
-        <nav className="lg:w-52 shrink-0">
-          <div className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-1 px-1">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={clsx(
-                    'flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-150',
-                    isActive
-                      ? 'bg-gray-100 dark:bg-white/[0.06] text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/[0.03]'
-                  )}
-                >
-                  <span className={clsx(
-                    'transition-colors',
-                    isActive ? 'text-[#4c6ef5] dark:text-[#748ffc]' : 'text-gray-400 dark:text-slate-600'
-                  )}>
-                    {tab.icon}
-                  </span>
-                  {tab.labelKey === 'privacyConsent' ? (t('privacyConsent') || tab.fallback) : (t(tab.labelKey) || tab.fallback)}
-                </button>
-              );
-            })}
-          </div>
+      {/* ── Horizontal Tabs ── */}
+      <div className="border-b border-gray-200 dark:border-slate-700 mb-6">
+        <nav className="flex gap-1 overflow-x-auto -mb-px" role="tablist">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveTab(tab.id)}
+                className={clsx(
+                  'flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-all duration-150',
+                  isActive
+                    ? 'border-brand-500 text-brand-600 dark:text-brand-400'
+                    : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:hover:border-slate-600'
+                )}
+              >
+                <span className={clsx(
+                  'transition-colors',
+                  isActive ? 'text-brand-500 dark:text-brand-400' : 'text-gray-400 dark:text-slate-600'
+                )}>
+                  {tab.icon}
+                </span>
+                {tab.labelKey === 'privacyConsent' ? (t('privacyConsent') || tab.fallback) : (t(tab.labelKey) || tab.fallback)}
+              </button>
+            );
+          })}
         </nav>
+      </div>
 
-        {/* ── Tab Content ── */}
-        <div className="flex-1 min-w-0">
-          {activeTab === 'profile' && (
-            <div className="animate-slide-up">
-              <ProfileSection user={user} token={token} />
-            </div>
-          )}
-
-          {activeTab === 'security' && (
-            <div className="space-y-5 animate-slide-up">
-              <PasswordSection token={token} />
-              <TwoFactorSection />
-            </div>
-          )}
-
-          {activeTab === 'notifications' && (
-            <div className="animate-slide-up">
-              <NotificationSection />
-            </div>
-          )}
-
-          {activeTab === 'privacy' && (
-            <div className="animate-slide-up">
-              <PrivacyConsentSection />
-            </div>
-          )}
-
-          {activeTab === 'danger' && (
-            <div className="animate-slide-up">
-              <DangerZoneSection />
-            </div>
-          )}
-        </div>
+      {/* ── Tab Content ── */}
+      <div className="animate-slide-up">
+        {activeTab === 'profile' && <ProfileSection user={user} token={token} />}
+        {activeTab === 'security' && (
+          <div className="space-y-5">
+            <PasswordSection token={token} />
+            <TwoFactorSection />
+          </div>
+        )}
+        {activeTab === 'notifications' && <NotificationSection />}
+        {activeTab === 'privacy' && <PrivacyConsentSection />}
+        {activeTab === 'danger' && <DangerZoneSection />}
       </div>
     </div>
   );
