@@ -102,7 +102,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <a href="https://hooksniff.vercel.app/" className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+        <Link href="/admin" className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
           <div className="w-9 h-9 rounded-lg bg-linear-to-br from-red-500 to-purple-600 flex items-center justify-center text-white">
             <Zap size={18} strokeWidth={1.75} />
           </div>
@@ -110,7 +110,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="font-bold text-gray-900 dark:text-white">{t("adminPanel")}</div>
             <div className="text-xs text-gray-500 dark:text-slate-400">{t("management")}</div>
           </div>
-        </a>
+        </Link>
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
           {adminNavigation.map((item) => {
             const isActive =
