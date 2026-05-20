@@ -89,6 +89,11 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
+
+  /* Tailwind v4 preflight sets svg to display:block — revert to inline so icons sit beside text */
+  svg {
+    display: inline;
+  }
 }
 
 @utility glass-card {

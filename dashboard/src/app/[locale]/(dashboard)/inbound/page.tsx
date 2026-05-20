@@ -136,8 +136,7 @@ export default function InboundPage() {
             {PROVIDERS.map(p => (
               <button key={p.id} onClick={() => setSelectedProvider(p.id)}
                 className={`p-4 rounded-xl border-2 text-center transition ${selectedProvider === p.id ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}>
-                <div className="text-2xl mb-1">{p.icon}</div>
-                <div className="text-sm font-medium text-gray-900 dark:text-white">{p.name}</div>
+                <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center justify-center gap-1.5"><span className="text-2xl flex-shrink-0">{p.icon}</span>{p.name}</div>
                 <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-0.5">{p.sig}</div>
               </button>
             ))}

@@ -43,8 +43,7 @@ export default function WebhooksPage() {
             { icon: <Webhook size={16} strokeWidth={1.75} />, title: 'What is a Webhook?', desc: 'The complete introduction to webhooks for beginners.', href: '/what-is-a-webhook' },
           ].map((card) => (
             <Link key={card.title} href={card.href} className="group p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors">
-              <span className="text-3xl mb-3 block">{card.icon}</span>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mb-2">{card.title}</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors mb-2 flex items-center gap-2"><span className="text-3xl flex-shrink-0">{card.icon}</span>{card.title}</h2>
               <p className="text-sm text-gray-600 dark:text-slate-400">{card.desc}</p>
             </Link>
           ))}
