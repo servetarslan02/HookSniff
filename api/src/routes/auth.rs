@@ -328,7 +328,8 @@ async fn login(
     ).await;
 
     // Email verification check — block login if email is not verified
-    if !customer.email_verified {
+    // Admin bypass: admin accounts can login without verification
+    if !customer.email_verified && !customer.is_admin {
         return Err(AppError::BadRequest("Please verify your email address before logging in. Check your inbox for the verification link.".into()));
     }
 
