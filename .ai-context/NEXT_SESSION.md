@@ -1,10 +1,15 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-21 01:10 GMT+8
+> Son güncelleme: 2026-05-21 03:00 GMT+8
 
 ## ⚠️ KRİTİK: Deploy Gerekli
 
-2 fix seti push edildi ama Cloud Run hala eski kodu çalışıyor:
+3 fix seti push edildi ama Cloud Run hala eski kodu çalışıyor:
+
+### Admin Performance (commit `9795ed74`)
+- Layout lazy-load + memoized sidebar
+- Security/Broadcasts/Email → React Query
+- Loading skeleton iyileştirme
 
 ### SSO Fix'ler (commit `d18c5301`)
 - Dashboard SSO form fix
