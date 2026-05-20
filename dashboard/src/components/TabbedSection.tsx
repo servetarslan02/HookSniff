@@ -48,7 +48,7 @@ export function TabbedSection({
   defaultTab,
   urlParam = 'tab',
   onTabChange,
-  fadeMs = 200,
+  fadeMs = 150,
   tabClassName,
   contentClassName,
   persistUrl = true,
