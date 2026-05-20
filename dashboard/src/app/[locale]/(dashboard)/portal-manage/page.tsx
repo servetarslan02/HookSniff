@@ -32,9 +32,10 @@ export default function PortalPage() {
   const planLimits = getPlanLimits(currentPlan);
 
   const webhookUsed = billingUsage?.webhooks?.used ?? 0;
-  const webhookLimit = billingUsage?.webhooks?.limit ?? 10000;
+  const webhookRawLimit = billingUsage?.webhooks?.limit;
+  const webhookLimit = webhookRawLimit ?? 10000;
   const endpointUsed = billingUsage?.endpoints?.used ?? 0;
-  const webhookUnlimited = webhookLimit === null || isUnlimited(webhookLimit);
+  const webhookUnlimited = webhookRawLimit === null || isUnlimited(webhookLimit);
   const webhookPercent = webhookUnlimited ? 0 : webhookLimit > 0 ? Math.round((webhookUsed / webhookLimit) * 100) : 0;
 
   if (loading) {
