@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-20 21:19 GMT+8 (SSO Test + Bug Fixes)
+> Son güncelleme: 2026-05-21 01:00 GMT+8 (Health Range + GCP Filter)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -253,6 +253,26 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-21 00:30–01:00 — GCP Filter + Health Range)
+
+### Özet
+Servet ile oturum. GCP Cloud Build kota sorunu ve sağlık sayfası sıfır veri sorunu çözüldü. 2 ana iş yapıldı.
+
+### Yapılan İşler:
+1. **GCP Cloud Build Path Filter** — Trigger'a `includedFiles` eklendi. Sadece backend dosyaları değişirse deploy olur (dashboard/docs/SDK değişiklikleri deploy tetiklemez)
+2. **Sağlık Sayfası Zaman Aralığı** — 24h/7d/30d/90d seçici eklendi. Varsayılan 7 gün. Servet'in hesabında son 24 saatte delivery yoktu, 7 günde 23 delivery var.
+3. **Servet'in hesabı tespit edildi** — `servetarslan02@gmail.com` (customer_id: 03006b76), demo hesabı `demo@hooksniff.com`
+
+### Değişen Dosyalar:
+- `api/src/routes/health_endpoints.rs` — `?range=` query parametresi
+- `dashboard/src/app/[locale]/(dashboard)/health/page.tsx` — zaman aralığı toggle
+- `dashboard/src/hooks/useDashboardData.ts` — range parametre geçişi
+- `dashboard/src/lib/api.ts` — range query string
+
+### Push: `fde61846`
 
 ---
 
