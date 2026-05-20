@@ -176,7 +176,7 @@ export function TabbedSection({
                 onClick={() => handleTabClick(tab.key)}
                 onMouseEnter={prefetch ? () => handleTabHover(tab.key) : undefined}
                 className={`
-                  relative px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap
+                  relative px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap inline-flex items-center
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
                   ${
                     isActive
