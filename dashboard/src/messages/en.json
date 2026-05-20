@@ -2186,7 +2186,20 @@
     "generate": "Generate",
     "couponCreatedSynced": "Coupon created and synced with Polar.sh",
     "couponCreatedSyncFailed": "Coupon created but Polar sync failed. Click Sync to retry.",
-    "couponUpdatedSynced": "Coupon updated and synced with Polar.sh"
+    "couponUpdatedSynced": "Coupon updated and synced with Polar.sh",
+    "backupRetention": "Backup Retention (days)",
+    "backupRetentionDesc": "Number of days to keep database backups.",
+    "backupSettings": "Backup Settings",
+    "corsOrigins": "Allowed CORS Origins",
+    "corsOriginsDesc": "Comma-separated list of allowed origins. Leave empty for default.",
+    "emailSettings": "Email Settings",
+    "emailSettingsDesc": "Configure email delivery via Resend.",
+    "features": "Features",
+    "globalRateLimit": "Global API Rate Limit (req/min)",
+    "securitySettings": "Security & Webhook Settings",
+    "senderAddress": "Sender Address",
+    "webhookSecret": "Default Webhook Secret",
+    "webhookSecretDesc": "Default signing secret for webhook payloads."
   },
   "landing": {
     "nav": {
