@@ -29,6 +29,7 @@ export default function FeatureFlagsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [editTarget, setEditTarget] = useState<FeatureFlagValidated | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FeatureFlagValidated | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   // Create form
   const [newName, setNewName] = useState('');
@@ -102,10 +103,12 @@ export default function FeatureFlagsPage() {
   /* ─── Quick Toggle ─── */
   const handleToggle = (flag: FeatureFlagValidated) => {
     if (!token) return;
+    setTogglingId(flag.id);
     updateMutation.mutate(
       { id: flag.id, data: { is_enabled: !flag.is_enabled } },
       {
         onError: () => toast(t('updateFailed'), 'error'),
+        onSettled: () => setTogglingId(null),
       },
     );
   };
@@ -151,7 +154,7 @@ export default function FeatureFlagsPage() {
           <div className="p-12 text-center animate-pulse text-gray-500 dark:text-slate-400">{t('loading')}</div>
         ) : flags.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400">
-            <span className="text-4xl mb-3 block"><Flag size={18} strokeWidth={1.75} /></span>
+            <span className="text-4xl mb-3 block"><Flag size={48} strokeWidth={1.75} className="text-gray-300 dark:text-slate-600" /></span>
             <p>{t('emptyState')}</p>
           </div>
         ) : (
@@ -165,14 +168,19 @@ export default function FeatureFlagsPage() {
                       type="button"
                       role="switch"
                       aria-checked={flag.is_enabled}
+                      disabled={togglingId === flag.id}
                       onClick={() => handleToggle(flag)}
                       className={`relative w-11 h-6 rounded-full transition-colors duration-200 shrink-0 ${
                         flag.is_enabled ? 'bg-emerald-600' : 'bg-gray-300 dark:bg-slate-600'
-                      }`}
+                      } ${togglingId === flag.id ? 'opacity-60 cursor-wait' : ''}`}
                     >
-                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform duration-200 ${
-                        flag.is_enabled ? 'translate-x-5' : 'translate-x-0'
-                      }`} />
+                      {togglingId === flag.id ? (
+                        <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs animate-pulse" />
+                      ) : (
+                        <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-xs transition-transform duration-200 ${
+                          flag.is_enabled ? 'translate-x-5' : 'translate-x-0'
+                        }`} />
+                      )}
                     </button>
 
                     {/* Info */}
@@ -230,13 +238,13 @@ export default function FeatureFlagsPage() {
       {/* ─── Create Modal ─── */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowCreate(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => { setShowCreate(false); setNewName(''); setNewDesc(''); setNewEnabled(false); setNewRollout(100); setNewPlans([]); }} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createTitle')}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')} *</label>
-                <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t('namePlaceholder')} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono" />
+                <input type="text" value={newName} onChange={(e) => setNewName(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))} placeholder={t('namePlaceholder')} maxLength={100} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('description')}</label>
@@ -254,6 +262,9 @@ export default function FeatureFlagsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('plansLabel')}</label>
+                {newPlans.length === 0 && (
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mb-1.5">{t('allPlansHint') || 'No plans selected = available for all plans'}</p>
+                )}
                 <div className="flex gap-2 flex-wrap">
                   {PLAN_OPTIONS.map((plan) => (
                     <button key={plan} type="button" onClick={() => togglePlan(plan, newPlans, setNewPlans)} className={`px-3 py-1 rounded-full text-xs font-medium transition ${newPlans.includes(plan) ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400'}`}>
@@ -264,7 +275,7 @@ export default function FeatureFlagsPage() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{ta('cancel')}</button>
+              <button type="button" onClick={() => { setShowCreate(false); setNewName(''); setNewDesc(''); setNewEnabled(false); setNewRollout(100); setNewPlans([]); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{ta('cancel')}</button>
               <button type="button" onClick={handleCreate} disabled={createMutation.isPending || !newName.trim()} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">{createMutation.isPending ? t('creating') : t('createFlag')}</button>
             </div>
           </div>
@@ -274,13 +285,13 @@ export default function FeatureFlagsPage() {
       {/* ─── Edit Modal ─── */}
       {editTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setEditTarget(null)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" onClick={() => { setEditTarget(null); setEditName(''); setEditDesc(''); setEditEnabled(false); setEditRollout(100); setEditPlans([]); }} />
           <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('editTitle')}: {editTarget.name}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('name')}</label>
-                <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono" />
+                <input type="text" value={editName} onChange={(e) => setEditName(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))} maxLength={100} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('description')}</label>
@@ -298,6 +309,9 @@ export default function FeatureFlagsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('plansLabel')}</label>
+                {editPlans.length === 0 && (
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mb-1.5">{t('allPlansHint') || 'No plans selected = available for all plans'}</p>
+                )}
                 <div className="flex gap-2 flex-wrap">
                   {PLAN_OPTIONS.map((plan) => (
                     <button key={plan} type="button" onClick={() => togglePlan(plan, editPlans, setEditPlans)} className={`px-3 py-1 rounded-full text-xs font-medium transition ${editPlans.includes(plan) ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400'}`}>
@@ -308,7 +322,7 @@ export default function FeatureFlagsPage() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button type="button" onClick={() => setEditTarget(null)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{ta('cancel')}</button>
+              <button type="button" onClick={() => { setEditTarget(null); setEditName(''); setEditDesc(''); setEditEnabled(false); setEditRollout(100); setEditPlans([]); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{ta('cancel')}</button>
               <button type="button" onClick={handleSave} disabled={updateMutation.isPending} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">{updateMutation.isPending ? t('saving') : ta('save')}</button>
             </div>
           </div>
@@ -326,7 +340,7 @@ export default function FeatureFlagsPage() {
             </p>
             <div className="flex gap-3 justify-end">
               <button type="button" onClick={() => setDeleteTarget(null)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{ta('cancel')}</button>
-              <button type="button" onClick={handleDelete} className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition">{ta('delete')}</button>
+              <button type="button" onClick={handleDelete} disabled={deleteMutation.isPending} className="px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition disabled:opacity-50">{deleteMutation.isPending ? t('deleting') || 'Deleting…' : ta('delete')}</button>
             </div>
           </div>
         </div>
