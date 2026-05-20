@@ -910,6 +910,7 @@
     "expires": "Expires",
     "managePayment": "Manage payment method →",
     "openingPortal": "Opening portal…",
+    "portalNotAvailable": "No external billing portal available. Please contact support to manage your payment method.",
     "subscriptionId": "Subscription ID",
     "month": "month",
     "billingPeriod": "Billing period",
@@ -946,6 +947,7 @@
     "unlimited": "Unlimited",
     "billedAnnually": "/month, billed annually",
     "downgradePortal": "Opening billing portal to manage your plan…",
+    "downgradePortalOwn": "Please contact support to downgrade your plan.",
     "upgradeFailed": "Upgrade failed. Please try again.",
     "downgradeTo": "Switch to {plan}",
     "free": "Free"
