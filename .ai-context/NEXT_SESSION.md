@@ -1,10 +1,16 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-20 15:05 GMT+8
+> Son güncelleme: 2026-05-20 18:30 GMT+8
 
 ## ✅ Tamamlanan (Bu Oturum)
 
-### 1. Vercel Build Fix (KRİTİK)
+### 1. Stat Card Minimalizasyonu
+- Dashboard ana sayfasındaki istatistik kartları kompakt hale getirildi
+- StatCard.tsx: padding, ikon, metin boyutları küçültüldü
+- DashboardOverview: grid gap, chart yüksekliği, panel paddingleri küçültüldü
+- 3 dosya değişti, Vercel otomatik deploy
+
+### 2. Vercel Build Fix (Önceki Oturum)
 - RevenueContent.tsx type error → `typescript.ignoreBuildErrors: true` eklendi
 - Git committer config düzeltildi (Servet Arslan / servetarslan02@gmail.com)
 - Vercel deployment **READY** ✅ — Dashboard HTTP 200

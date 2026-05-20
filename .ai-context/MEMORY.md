@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-20 15:05 GMT+8 (Vercel Build Fix)
+> Son güncelleme: 2026-05-20 18:30 GMT+8 (Stat Card Minimalizasyonu)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -253,6 +253,23 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-20 18:24–18:30 — Stat Card Minimalizasyonu)
+
+### Özet
+Servet ile oturum. Dashboard ana sayfasındaki istatistik kartları minimalize edildi. 3 dosya değişti.
+
+### Yapılan İşler:
+1. **StatCard component** — padding, ikon, metin boyutları küçültüldü (p-6→p-4, w-11→w-9, text-3xl→text-2xl)
+2. **DashboardOverview** — grid gap, chart yüksekliği, panel paddingleri küçültüldü
+3. **Skeleton loader** — yeni boyutlara uygun hale getirildi
+
+### Değişen Dosyalar:
+- `dashboard/src/components/tremor/StatCard.tsx` — shared component (tüm sayfalar etkilenir)
+- `dashboard/src/app/[locale]/(dashboard)/DashboardOverview.tsx` — ana sayfa
+- `dashboard/src/app/[locale]/(dashboard)/core/page.tsx` — skeleton
 
 ---
 
