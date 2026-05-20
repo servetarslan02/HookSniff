@@ -256,7 +256,26 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-21 00:30–01:00 — GCP Filter + Health Range)
+## 📝 Son Oturum (2026-05-21 01:37 — Teslimatlar İzleme Sayfasına Taşındı)
+
+### Özet
+Servet ile oturum. Teslimatlar sayfası İzleme (Observability) sayfasının içine taşındı. Artık 4 tab'lı yapı: Teslimatlar, Sağlık, Uyarılar, Analitik.
+
+### Yapılan İşler:
+1. **Observability sayfası** — DeliveriesContent dynamic import eklendi, ilk tab olarak
+2. **Sidebar** — Ayrı `/deliveries` linki kaldırıldı
+3. **Prefetch** — `/deliveries` case kaldırıldı, `/observability` ile birleştirildi
+4. **Mükerrer temizliği** — İki `/observability` prefetch case birleştirildi
+
+### Değişen Dosyalar:
+- `dashboard/src/app/[locale]/(dashboard)/observability/page.tsx` — Deliveries tab eklendi
+- `dashboard/src/app/[locale]/(dashboard)/layout.tsx` — Sidebar + prefetch düzenlendi
+
+### Push: `16f69bbd`
+
+---
+
+## 📝 Önceki Oturum (2026-05-21 00:30–01:00 — GCP Filter + Health Range)
 
 ### Özet
 Servet ile oturum. GCP Cloud Build kota sorunu ve sağlık sayfası sıfır veri sorunu çözüldü. 2 ana iş yapıldı.
