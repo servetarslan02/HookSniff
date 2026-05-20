@@ -569,7 +569,7 @@ async fn delete_sso_config(
         .await?;
 
         if member.is_none() {
-            return Err(AppError::forbidden("You are not a member of this team"));
+            return Err(AppError::Forbidden("You are not a member of this team".into()));
         }
 
         sqlx::query("DELETE FROM sso_configs WHERE team_id = $1")
