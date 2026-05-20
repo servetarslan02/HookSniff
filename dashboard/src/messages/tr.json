@@ -3354,6 +3354,8 @@
     "copied": "Kopyalandı!",
     "portalSaved": "Portal yapılandırması kaydedildi!",
     "portalSaveFailed": "Portal yapılandırması kaydedilemedi",
+    "portalLoadFailed": "Portal ayarları yüklenemedi",
+    "portalLoadFailedDesc": "Varsayılan ayarlarla devam edebilirsiniz. Değişiklik yapıp kaydetmeyi deneyin.",
     "portalUrl": "Portal URL'si",
     "retry": "Tekrar dene"
   },
