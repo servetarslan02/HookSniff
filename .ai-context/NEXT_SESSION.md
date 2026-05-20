@@ -1,28 +1,20 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-21 03:00 GMT+8
+> Son güncelleme: 2026-05-21 03:50 GMT+8
 
-## ⚠️ KRİTİK: Deploy Gerekli
+## 🔴 KRİTİK: Deploy Gerekli
 
-3 fix seti push edildi ama Cloud Run hala eski kodu çalışıyor:
+4 fix seti push edildi ama Cloud Run eski kodu çalışıyor:
 
-### Admin Performance (commit `9795ed74`)
-- Layout lazy-load + memoized sidebar
-- Security/Broadcasts/Email → React Query
-- Loading skeleton iyileştirme
+### Bu Oturum Fix'leri (commit fb230584)
+1. **Settings i18n** — 13 key eklendi (en.json + tr.json)
+2. **CouponCode sqlx rename** — `#[sqlx(rename = "type")]` eklendi
+3. **Plan features** — Hardcoded endpoint counts kaldırıldı
 
-### SSO Fix'ler (commit `d18c5301`)
-- Dashboard SSO form fix
-- Login sayfası SSO algılama
-- DB migration 082
-- i18n fix
-- DELETE endpoint fix
-
-### Worker Performans Fix'leri (commit `e3c46903`)
-- DB pool: 10 → 25
-- DB acquire timeout: 30s → 5s
-- HTTP timeout: 10s → 5s
-- DNS: sync → async
+### Önceki Fix'ler (henüz deploy edilmedi)
+- Admin Performance (commit 9795ed74)
+- SSO Fix'ler (commit d18c5301)
+- Worker Performans Fix'leri (commit e3c46903)
 
 ### Deploy Komutları
 ```bash
@@ -31,48 +23,17 @@
 
 # VEYA gcloud CLI:
 gcloud builds submit --config cloudbuild.yaml
-
-# VEYA sadece worker:
-gcloud run deploy hooksniff-worker --source . --region europe-west1
 ```
 
-### Not: DB Migration 082 Neon'da zaten çalıştırıldı
-`customer_id UNIQUE` constraint kaldırıldı, multi-team SSO çalışıyor.
+## Deploy Sonrası Test Listesi
+1. Coupon Create → POST /v1/admin/coupons
+2. Alert Create → POST /v1/admin/alerts
+3. Revenue Metrics → GET /v1/admin/revenue/metrics
+4. Security Events → GET /v1/admin/security/events
+5. Feature Flag Toggle → PUT /v1/admin/feature-flags/:id
+6. System Health → GET /health
 
-## Yapılan Fix'ler (Bu Oturum)
-
-### 1. DB Migration 082 — Multi-team SSO ✅ (Neon'da çalıştırıldı)
-- `customer_id UNIQUE` constraint kaldırıldı
-- Artık aynı kullanıcı farklı takımlarda SSO oluşturabilir
-
-### 2. Dashboard SSO Form Fix ✅
-- `verified_domain` → API'ye gönderiliyor
-- `admin_bypass` → API'ye gönderiliyor
-- `enabled` → mevcut config durumunu koruyor (hardcoded false değil)
-- `domainInput` ve `adminBypass` → config'den populate ediliyor
-
-### 3. Login Page SSO Detection ✅
-- Email input'a yazarken 500ms debounce ile SSO providers kontrolü
-- SSO varsa "Login with SSO (OIDC/SAML)" butonu görünüyor
-- `/api/sso-check` proxy route oluşturuldu
-
-### 4. i18n Fix ✅
-- `sso.generateTxt` → EN+TR eklendi
-- `sso.autoTeamJoinWarning` → EN+TR eklendi
-
-### 5. DELETE Endpoint Fix ✅
-- Team_id doğrulama eklendi
-- Takım üyeliği kontrolü eklendi
-
-### 6. API testSso/deleteSso ✅
-- Artık teamId parametresi alıyor
-
-### 7. SSO Config Restore
-- MegaCorp SSO config eski DELETE bug tarafından silindi, geri yüklendi
-
-## Sıradaki
-1. **Cloud Build deploy** — API fix'leri canlıya al
-2. **Dashboard deploy** — Vercel otomatik tetikleyecek
-3. **Test Connection butonu** — Config yüklendikten sonra aktif olmalı (düzeltildi, deploy bekliyor)
-4. **SSO callback handler** — Gerçek OIDC token exchange test
-5. **SSO enforce modal** — "Tüm ekip üyeleri SSO ile giriş yapacak" onayı
+## Hâlâ Açık Olan Sorunlar
+- CSP violation (Cloudflare analytics)
+- System health check failed
+- Revenue cohorts/refunds 500
