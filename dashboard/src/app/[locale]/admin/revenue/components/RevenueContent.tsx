@@ -28,16 +28,28 @@ const PLAN_FEATURES: Record<string, string[]> = {
 
 // ── Inline helper components for plan editing ──
 function PlanLimitRow({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+ const UNL = 2147483647;
+ const isUnlimited = value >= UNL;
  return (
   <div className="flex items-center justify-between gap-2">
    <span className="text-xs text-gray-600 dark:text-slate-400">{label}</span>
-   <input
-    type="number"
-    min="0"
-    value={value}
-    onChange={(e) => onChange(Number(e.target.value))}
-    className="w-20 px-2 py-1 text-sm font-semibold text-gray-900 dark:text-white bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg text-right focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-   />
+   {isUnlimited ? (
+    <div className="flex items-center gap-1.5">
+     <span className="text-sm font-semibold text-gray-900 dark:text-white">Sınırsız</span>
+     <button type="button" onClick={() => onChange(100)} className="text-[10px] text-brand-600 hover:underline">Düzenle</button>
+    </div>
+   ) : (
+    <div className="flex items-center gap-1.5">
+     <input
+      type="number"
+      min="0"
+      value={value}
+      onChange={(e) => onChange(Number(e.target.value))}
+      className="w-20 px-2 py-1 text-sm font-semibold text-gray-900 dark:text-white bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg text-right focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+     />
+     <button type="button" onClick={() => onChange(UNL)} className="text-[10px] text-gray-400 hover:text-brand-600" title="Sınırsız yap">∞</button>
+    </div>
+   )}
   </div>
  );
 }
@@ -95,10 +107,10 @@ function PlanCard({ name, color, price, limits, editing, onPriceChange, onLimitC
      </>
     ) : (
      <>
-      <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('maxEndpoints') || 'Endpoints'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.endpoints}</span></div>
-      <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('maxWebhooks') || 'Webhooks/mo'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.webhooks.toLocaleString()}</span></div>
-      <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('rateLimit') || 'Rate/min'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.rateLimit.toLocaleString()}</span></div>
-      <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('retentionDays') || 'Retention'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.retention}d</span></div>
+      <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('maxEndpoints') || 'Endpoints'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.endpoints >= 2147483647 ? '∞ Sınırsız' : limits.endpoints}</span></div>
+      <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('maxWebhooks') || 'Webhooks/mo'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.webhooks >= 2147483647 ? '∞ Sınırsız' : limits.webhooks.toLocaleString()}</span></div>
+      <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('rateLimit') || 'Rate/min'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.rateLimit >= 2147483647 ? '∞ Sınırsız' : limits.rateLimit.toLocaleString()}</span></div>
+      <div className="flex justify-between"><span className="text-gray-500 dark:text-slate-400">{t('retentionDays') || 'Retention'}</span><span className="font-semibold text-gray-900 dark:text-white">{limits.retention >= 2147483647 ? '∞ Sınırsız' : limits.retention + 'd'}</span></div>
      </>
     )}
    </div>
