@@ -10,18 +10,16 @@
 //! - `GET /oauth/github/callback` — GitHub OAuth callback
 //! - `GET /oauth/providers` — List available OAuth providers
 //!
-//! ## TODO (Item 264): Add PKCE (Proof Key for Code Exchange)
+//! ## PKCE (Proof Key for Code Exchange) — IMPLEMENTED
 //!
-//! Currently using plain authorization code flow. Should add PKCE for defense-in-depth:
+//! Both Google and GitHub OAuth flows now use PKCE for defense-in-depth:
 //!
-//! 1. Generate `code_verifier` (43-128 char random string using [A-Z][a-z][0-9]-._~)
-//! 2. Compute `code_challenge = BASE64URL(SHA256(code_verifier))`
-//! 3. Add `code_challenge` and `code_challenge_method=S256` to auth URL
-//! 4. Store `code_verifier` in HttpOnly cookie (alongside state)
-//! 5. Send `code_verifier` in token exchange POST body
+//! 1. `code_verifier` (64 char random string) generated on login
+//! 2. `code_challenge = BASE64URL(SHA256(code_verifier))` sent to IdP
+//! 3. `code_verifier` stored in HttpOnly cookie (`hr_oauth_pkce`)
+//! 4. `code_verifier` sent in token exchange POST body
 //!
 //! This protects against authorization code interception attacks.
-//! Both Google and GitHub support PKCE.
 //!
 //! ## Configuration
 //!
@@ -53,8 +51,27 @@ use crate::models::customer::Customer;
 
 /// OAuth state cookie name (short-lived, CSRF protection)
 const OAUTH_STATE_COOKIE: &str = "hr_oauth_state";
+/// OAuth PKCE code_verifier cookie name
+const OAUTH_PKCE_COOKIE: &str = "hr_oauth_pkce";
 /// OAuth state cookie max age (5 minutes)
 const OAUTH_STATE_MAX_AGE: i64 = 300;
+
+/// Generate a PKCE code_verifier (43-128 chars, [A-Z][a-z][0-9]-._~)
+fn generate_pkce_verifier() -> String {
+    use rand::Rng;
+    const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+    let mut rng = rand::rng();
+    (0..64)
+        .map(|_| CHARSET[rng.random_range(0..CHARSET.len())] as char)
+        .collect()
+}
+
+/// Compute PKCE code_challenge = BASE64URL(SHA256(code_verifier))
+fn compute_pkce_challenge(verifier: &str) -> String {
+    use sha2::Digest;
+    let hash = sha2::Sha256::digest(verifier.as_bytes());
+    base64::Engine::encode(&base64::engine::general_purpose::URL_SAFE_NO_PAD, &hash)
+}
 
 pub fn router() -> Router {
     Router::new()
@@ -109,22 +126,36 @@ async fn google_login(
     let redirect_uri = format!("{}/v1/oauth/google/callback", redirect_base);
     let state = uuid::Uuid::new_v4().to_string();
 
+    // PKCE: generate code_verifier and code_challenge
+    let pkce_verifier = generate_pkce_verifier();
+    let pkce_challenge = compute_pkce_challenge(&pkce_verifier);
+
     let url = format!(
-        "https://accounts.google.com/o/oauth2/v2/auth?client_id={}&redirect_uri={}&response_type=code&scope=openid%20email%20profile&state={}&access_type=offline",
+        "https://accounts.google.com/o/oauth2/v2/auth?client_id={}&redirect_uri={}&response_type=code&scope=openid%20email%20profile&state={}&access_type=offline&code_challenge={}&code_challenge_method=S256",
         client_id,
         urlencoding::encode(&redirect_uri),
-        state
+        state,
+        pkce_challenge
     );
 
-    // Save state in a short-lived cookie for CSRF verification
+    // Save state + PKCE verifier in short-lived cookies
     let state_cookie = format!(
         "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
         OAUTH_STATE_COOKIE, state, OAUTH_STATE_MAX_AGE
+    );
+    let pkce_cookie = format!(
+        "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
+        OAUTH_PKCE_COOKIE, pkce_verifier, OAUTH_STATE_MAX_AGE
     );
     let mut headers = HeaderMap::new();
     headers.insert(
         "set-cookie",
         axum::http::HeaderValue::from_str(&state_cookie)
+            .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
+    );
+    headers.append(
+        "set-cookie",
+        axum::http::HeaderValue::from_str(&pkce_cookie)
             .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
     );
     headers.insert(
@@ -157,6 +188,9 @@ async fn google_callback(
         .ok_or_else(|| AppError::BadRequest("Missing state parameter".into()))?;
     verify_oauth_state(&req, &expected_state)?;
 
+    // Extract PKCE code_verifier from cookie
+    let pkce_verifier = extract_pkce_verifier(&req);
+
     let client_id = std::env::var("GOOGLE_CLIENT_ID")
         .map_err(|_| AppError::BadRequest("Google OAuth not configured".into()))?;
 
@@ -167,9 +201,9 @@ async fn google_callback(
         .unwrap_or_else(|_| "https://hooksniff-api-1046140057667.europe-west1.run.app".to_string());
     let redirect_uri = format!("{}/v1/oauth/google/callback", redirect_base);
 
-    // Exchange code for token
+    // Exchange code for token (with PKCE verifier if available)
     let token_response =
-        exchange_google_code(&code, &client_id, &client_secret, &redirect_uri).await?;
+        exchange_google_code(&code, &client_id, &client_secret, &redirect_uri, pkce_verifier.as_deref()).await?;
 
     // Get user info
     let user_info = get_google_user_info(&token_response.access_token).await?;
@@ -196,6 +230,7 @@ async fn google_callback(
     let auth_cookie = create_auth_cookie(&token, 86400);
     let refresh_cookie = create_refresh_token_cookie(&refresh_token_value, 30 * 86400);
     let state_clear = clear_oauth_state_cookie();
+    let pkce_clear = clear_pkce_cookie();
 
     let mut headers = HeaderMap::new();
     headers.insert(
@@ -211,6 +246,11 @@ async fn google_callback(
     headers.append(
         "set-cookie",
         axum::http::HeaderValue::from_str(&state_clear)
+            .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
+    );
+    headers.append(
+        "set-cookie",
+        axum::http::HeaderValue::from_str(&pkce_clear)
             .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
     );
 
@@ -233,22 +273,36 @@ async fn github_login() -> Result<impl axum::response::IntoResponse, AppError> {
     let redirect_uri = format!("{}/v1/oauth/github/callback", redirect_base);
     let state = uuid::Uuid::new_v4().to_string();
 
+    // PKCE: generate code_verifier and code_challenge
+    let pkce_verifier = generate_pkce_verifier();
+    let pkce_challenge = compute_pkce_challenge(&pkce_verifier);
+
     let url = format!(
-        "https://github.com/login/oauth/authorize?client_id={}&redirect_uri={}&scope=user:email&state={}",
+        "https://github.com/login/oauth/authorize?client_id={}&redirect_uri={}&scope=user:email&state={}&code_challenge={}&code_challenge_method=S256",
         client_id,
         urlencoding::encode(&redirect_uri),
-        state
+        state,
+        pkce_challenge
     );
 
-    // Save state in a short-lived cookie for CSRF verification
+    // Save state + PKCE verifier in short-lived cookies
     let state_cookie = format!(
         "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
         OAUTH_STATE_COOKIE, state, OAUTH_STATE_MAX_AGE
+    );
+    let pkce_cookie = format!(
+        "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
+        OAUTH_PKCE_COOKIE, pkce_verifier, OAUTH_STATE_MAX_AGE
     );
     let mut headers = HeaderMap::new();
     headers.insert(
         "set-cookie",
         axum::http::HeaderValue::from_str(&state_cookie)
+            .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
+    );
+    headers.append(
+        "set-cookie",
+        axum::http::HeaderValue::from_str(&pkce_cookie)
             .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
     );
     headers.insert(
@@ -281,14 +335,17 @@ async fn github_callback(
         .ok_or_else(|| AppError::BadRequest("Missing state parameter".into()))?;
     verify_oauth_state(&req, &expected_state)?;
 
+    // Extract PKCE code_verifier from cookie
+    let pkce_verifier = extract_pkce_verifier(&req);
+
     let client_id = std::env::var("GITHUB_CLIENT_ID")
         .map_err(|_| AppError::BadRequest("GitHub OAuth not configured".into()))?;
 
     let client_secret = std::env::var("GITHUB_CLIENT_SECRET")
         .map_err(|_| AppError::BadRequest("GitHub OAuth not configured".into()))?;
 
-    // Exchange code for token
-    let access_token = exchange_github_code(&code, &client_id, &client_secret).await?;
+    // Exchange code for token (with PKCE verifier if available)
+    let access_token = exchange_github_code(&code, &client_id, &client_secret, pkce_verifier.as_deref()).await?;
 
     // Get user info
     let user_info = get_github_user_info(&access_token).await?;
@@ -315,6 +372,7 @@ async fn github_callback(
     let auth_cookie = create_auth_cookie(&token, 86400);
     let refresh_cookie = create_refresh_token_cookie(&refresh_token_value, 30 * 86400);
     let state_clear = clear_oauth_state_cookie();
+    let pkce_clear = clear_pkce_cookie();
 
     let mut headers = HeaderMap::new();
     headers.insert(
@@ -332,6 +390,11 @@ async fn github_callback(
         axum::http::HeaderValue::from_str(&state_clear)
             .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
     );
+    headers.append(
+        "set-cookie",
+        axum::http::HeaderValue::from_str(&pkce_clear)
+            .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
+    );
 
     let redirect_url = format!("{}/auth/callback?token={}&refresh={}", app_url, urlencoding::encode(&token), urlencoding::encode(&refresh_token_value));
     headers.insert(
@@ -345,6 +408,17 @@ async fn github_callback(
 // ── OAuth helpers ────────────────────────────────────────────
 
 use crate::auth::jwt;
+
+/// Extract PKCE code_verifier from cookie.
+fn extract_pkce_verifier(req: &axum::extract::Request) -> Option<String> {
+    let cookie_header = req.headers().get("cookie").and_then(|v| v.to_str().ok()).unwrap_or("");
+    cookie_header
+        .split(';')
+        .map(|c| c.trim())
+        .find(|c| c.starts_with(&format!("{}=", OAUTH_PKCE_COOKIE)))
+        .and_then(|c| c.split('=').nth(1))
+        .map(|v| v.to_string())
+}
 
 /// Verify the OAuth state parameter matches the cookie (CSRF protection).
 fn verify_oauth_state(req: &axum::extract::Request, expected_state: &str) -> Result<(), AppError> {
@@ -375,11 +449,18 @@ fn verify_oauth_state(req: &axum::extract::Request, expected_state: &str) -> Res
     }
 }
 
-/// Clear the OAuth state cookie after successful verification.
+/// Clear the OAuth state and PKCE cookies after successful verification.
 fn clear_oauth_state_cookie() -> String {
     format!(
         "{}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
         OAUTH_STATE_COOKIE
+    )
+}
+
+fn clear_pkce_cookie() -> String {
+    format!(
+        "{}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
+        OAUTH_PKCE_COOKIE
     )
 }
 
@@ -421,16 +502,20 @@ async fn exchange_google_code(
     client_id: &str,
     client_secret: &str,
     redirect_uri: &str,
+    code_verifier: Option<&str>,
 ) -> Result<GoogleTokenResponse, AppError> {
     let client = crate::http_client::get_client().clone();
 
-    let params = [
-        ("code", code),
-        ("client_id", client_id),
-        ("client_secret", client_secret),
-        ("redirect_uri", redirect_uri),
-        ("grant_type", "authorization_code"),
+    let mut params = vec![
+        ("code", code.to_string()),
+        ("client_id", client_id.to_string()),
+        ("client_secret", client_secret.to_string()),
+        ("redirect_uri", redirect_uri.to_string()),
+        ("grant_type", "authorization_code".to_string()),
     ];
+    if let Some(verifier) = code_verifier {
+        params.push(("code_verifier", verifier.to_string()));
+    }
 
     let resp = client
         .post("https://oauth2.googleapis.com/token")
@@ -493,14 +578,18 @@ async fn exchange_github_code(
     code: &str,
     client_id: &str,
     client_secret: &str,
+    code_verifier: Option<&str>,
 ) -> Result<String, AppError> {
     let client = crate::http_client::get_client().clone();
 
-    let params = [
-        ("code", code),
-        ("client_id", client_id),
-        ("client_secret", client_secret),
+    let mut params = vec![
+        ("code", code.to_string()),
+        ("client_id", client_id.to_string()),
+        ("client_secret", client_secret.to_string()),
     ];
+    if let Some(verifier) = code_verifier {
+        params.push(("code_verifier", verifier.to_string()));
+    }
 
     let resp = client
         .post("https://github.com/login/oauth/access_token")
