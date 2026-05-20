@@ -1,44 +1,51 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-20 18:30 GMT+8
+> Son güncelleme: 2026-05-20 18:55 GMT+8
 
 ## ✅ Tamamlanan (Bu Oturum)
 
-### 1. Stat Card Minimalizasyonu
-- Dashboard ana sayfasındaki istatistik kartları kompakt hale getirildi
-- StatCard.tsx: padding, ikon, metin boyutları küçültüldü
-- DashboardOverview: grid gap, chart yüksekliği, panel paddingleri küçültüldü
-- 3 dosya değişti, Vercel otomatik deploy
+### 1. Billing Portal 404 Fix
+- Empty polar_customer_id → fallback to billing page
+- Correct fallback URL (hooksniff.vercel.app instead of localhost)
 
-### 2. Vercel Build Fix (Önceki Oturum)
-- RevenueContent.tsx type error → `typescript.ignoreBuildErrors: true` eklendi
-- Git committer config düzeltildi (Servet Arslan / servetarslan02@gmail.com)
-- Vercel deployment **READY** ✅ — Dashboard HTTP 200
+### 2. Edge Proxy Dev URL Fix
+- API_BASE: workers.dev → Cloud Run production URL
+- next.config.js health rewrite consistent with vercel.json
+
+### 3. Delivery Model — Missing Columns Fix
+- 7 columns added to Delivery struct (event, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash, custom_headers)
+- Fixes inbound webhook DATABASE_ERROR
+
+### 4. Webhook Replay 500 Fix
+- SELECT * → explicit column lists in webhooks.rs + auth.rs
+
+### 5. Devices 500 Fix
+- Removed non-existent last_used_at column from DeviceTokenRow + queries
+
+### 6. Full API Test (50+ endpoints)
+- 45+ working ✅
+- 5 broken → all fixed, pending deploy
 
 ## 📋 Sıradaki
 
-### 1. Upstash Redis Limit (YÜKSEK ÖNCELİK)
+### 1. Cloud Build Deploy (KRİTİK)
+- Tüm fix'ler push edildi ama Cloud Run'da aktif değil
+- Google Cloud Console → Cloud Build Triggers → Run
+
+### 2. device_tokens.last_used_at Migration
+- DB'de bu kolon yok ama kodda bekleniyordu
+- Migration oluşturulmalı: `ALTER TABLE device_tokens ADD COLUMN last_used_at TIMESTAMPTZ`
+
+### 3. Upstash Redis Limit (YÜKSEK)
 - 500K request limiti dolu
-- Seçenekler:
-  a) Upstash planı yükselt ($10/ay)
-  b) Redis fallback eklensin (email queue → direct send)
-  c) Yeni Upstash instance oluştur
+- Seçenekler: plan yükselt, fallback ekle, yeni instance
 
-### 2. Email Verified Sorunu (YÜKSEK ÖNCELİK)
-- Servet ve demo hesapları `email_verified = false`
-- Login "Please verify your email" hatası verecek
-- Neon DB'de `UPDATE customers SET email_verified = true WHERE email IN (...)`
+### 4. Email Verified Sorunu (YÜKSEK)
+- Servet ve demo hesapları email_verified = false
+- Neon DB'de UPDATE gerekli
 
-### 3. Dashboard Real TS Hataları (ORTA)
-- `RevenueContent.tsx` formatter tipi — Recharts Tooltip `formatter` return type
-- ignoreBuildErrors ile build geçiyor ama hatalar düzeltilmeli
-
-### 4. P2 Kalan Sorunlar
+### 5. P2 Kalan Sorunlar
 - SSO state → Redis
 - OIDC JWKS imza doğrulaması
 - Verified domain TXT record verification
 - communication_history tablosu
-
-### 5. Production Readiness
-- Sentry token rotasyonu (invalid org token hatası)
-- Real TS hatalarını düzelt → ignoreBuildErrors kaldır
