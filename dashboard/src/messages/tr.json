@@ -927,6 +927,7 @@
     "overageEmailNotification": "Aşım Email Uyarıları",
     "overageEmailNotificationDesc": "Limitinizin %80'ine ve %100'üne ulaştığınızda email alın.",
     "dailyLimit": "Günlük Limit",
+    "unlimited": "Sınırsız",
     "eventsPerDay": "olay/gün",
     "overagePrice": "Aşım Fiyatı",
     "perEvent": "olay başına",

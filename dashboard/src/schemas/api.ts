@@ -519,7 +519,7 @@ export const OverageSettingsSchema = z.object({
   allow_overage: z.boolean(),
   overage_email_notification: z.boolean(),
   plan: z.string(),
-  daily_limit: z.number(),
+  daily_limit: z.number().nullable(),
   overage_price: z.number(),
 });
 export type OverageSettingsValidated = z.infer<typeof OverageSettingsSchema>;
