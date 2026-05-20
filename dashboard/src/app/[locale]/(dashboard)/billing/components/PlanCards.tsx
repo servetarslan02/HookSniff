@@ -24,19 +24,13 @@ const PLAN_FEATURES: Record<string, string[]> = {
 export function PlanCards({
   currentPlan,
   onUpgrade,
-  discountCode,
-  onDiscountCodeChange,
 }: {
   currentPlan: string;
   onUpgrade: (planKey: string, billingPeriod: 'monthly' | 'annual') => void;
-  discountCode?: string;
-  onDiscountCodeChange?: (code: string) => void;
 }) {
   const t = useTranslations('billing');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const isAnnual = billingPeriod === 'annual';
-  const [showCoupon, setShowCoupon] = useState(false);
-  const [couponInput, setCouponInput] = useState(discountCode || '');
   const { getPlan } = usePlans();
 
   const planOrder = ['developer', 'startup', 'pro', 'enterprise'];
@@ -67,8 +61,8 @@ export function PlanCards({
 
   return (
     <div>
-      {/* Billing toggle (left) + Coupon code (right) — same row */}
-      <div className="flex items-center justify-between mb-6">
+      {/* Billing toggle — centered */}
+      <div className="flex items-center justify-center mb-6">
         {/* Billing period toggle */}
         <div className="flex items-center gap-1 bg-gray-100 dark:bg-slate-800 rounded-xl p-1">
           <button
@@ -99,45 +93,6 @@ export function PlanCards({
             </span>
           </button>
         </div>
-        {/* Coupon code — button that expands to input + confirm */}
-        {onDiscountCodeChange && (
-          <div className="flex items-center gap-2">
-            {showCoupon ? (
-              <>
-                <input
-                  type="text"
-                  value={couponInput}
-                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                  placeholder={t('couponPlaceholder')}
-                  autoFocus
-                  className="px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm font-mono placeholder:text-gray-400 w-44"
-                />
-                <button
-                  type="button"
-                  onClick={() => { onDiscountCodeChange(couponInput); setShowCoupon(false); }}
-                  className="px-3 py-1.5 rounded-xl text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition"
-                >
-                  {t('confirmCoupon') || 'Onayla'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setShowCoupon(false); setCouponInput(''); onDiscountCodeChange(''); }}
-                  className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-slate-300"
-                >
-                  ✕
-                </button>
-              </>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setShowCoupon(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium border border-gray-300 dark:border-slate-600 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
-              >
-                {discountCode ? `🎟️ ${discountCode}` : (t('enterCoupon') || 'Kupon Kodu Gir')}
-              </button>
-            )}
-          </div>
-        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
