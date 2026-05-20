@@ -2169,7 +2169,21 @@
     "deactivate": "Pasifleştir",
     "editAlert": "Uyarıyı Düzenle",
     "noFilteredAlerts": "Filtrelenmiş uyarı yok",
-    "threshold": "Eşik Değeri"
+    "threshold": "Eşik Değeri",
+    "searchUsers": "Kullanıcı ara...",
+    "exportCsv": "CSV İndir",
+    "impersonate": "Taklit Et",
+    "impersonateConfirm": "Bu kullanıcı taklit edilsin mi?",
+    "changeStatus": "Durum Değiştir",
+    "ban": "Yasakla",
+    "unban": "Yasağı Kaldır",
+    "planChanged": "Plan değiştirildi",
+    "statusChanged": "Durum değiştirildi",
+    "revenueExport": "Gelir İndir",
+    "broadcastSent": "Yayın gönderildi",
+    "broadcastFailed": "Yayın gönderilemedi",
+    "noBroadcasts": "Yayın yok",
+    "bulkEmailSent": "Toplu e-posta gönderildi"
   },
   "landing": {
     "nav": {
