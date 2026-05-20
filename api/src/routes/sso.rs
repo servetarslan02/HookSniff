@@ -715,60 +715,35 @@ async fn check_domain_verification(
         None => return Err(AppError::BadRequest("No pending verification for this domain".into())),
     };
 
-    // DNS TXT record lookup — use trust-dns-resolver for safety
+    // DNS TXT record lookup — use trust-dns-resolver (pure Rust, no subprocess)
     let txt_name = format!("_hooksniff.{}", domain);
     let verified = {
-        // Use tokio DNS resolver to check TXT records
-        // This avoids command injection risks from dig/nslookup
-        match tokio::net::lookup_host(format!("{}:53", txt_name)).await {
-            _ => {
-                // tokio::net::lookup_host doesn't support TXT records directly.
-                // Use a safe subprocess approach with strict input validation.
-                // The domain is already validated above (alphanumeric + hyphens + dots only).
-                match tokio::process::Command::new("dig")
-                    .args(["+short", "TXT", &txt_name])
-                    .output()
-                    .await
-                {
-                    Ok(output) => {
-                        let stdout = String::from_utf8_lossy(&output.stdout);
-                        stdout.contains(&expected_txt)
+        use trust_dns_resolver::TokioAsyncResolver;
+        use trust_dns_resolver::config::*;
+
+        match TokioAsyncResolver::tokio(ResolverConfig::google(), ResolverOpts::default()).await {
+            Ok(resolver) => {
+                match resolver.txt_lookup(txt_name.as_str()).await {
+                    Ok(lookup) => {
+                        let expected_clean = expected_txt.trim_matches('"');
+                        lookup.iter().any(|record| {
+                            record.iter().any(|data| {
+                                let txt = String::from_utf8_lossy(data);
+                                txt.trim_matches('"') == expected_clean
+                            })
+                        })
                     }
-                    Err(_) => {
-                        // dig not available, try nslookup
-                        match tokio::process::Command::new("nslookup")
-                            .args(["-type=TXT", &txt_name])
-                            .output()
-                            .await
-                        {
-                            Ok(output) => {
-                                let stdout = String::from_utf8_lossy(&output.stdout);
-                                stdout.contains(&expected_txt)
-                            }
-                            Err(_) => {
-                                // Neither dig nor nslookup available — try Python DNS
-                                match tokio::process::Command::new("python3")
-                                    .args(["-c", &format!(
-                                        "import dns.resolver; answers = dns.resolver.resolve('{}', 'TXT'); print('\\n'.join(str(r) for r in answers))",
-                                        txt_name
-                                    )])
-                                    .output()
-                                    .await
-                                {
-                                    Ok(output) => {
-                                        let stdout = String::from_utf8_lossy(&output.stdout);
-                                        stdout.contains(&expected_txt)
-                                    }
-                                    Err(_) => {
-                                        return Err(AppError::Internal(
-                                            anyhow::anyhow!("DNS verification unavailable. Please use the API to verify domain.")
-                                        ));
-                                    }
-                                }
-                            }
-                        }
+                    Err(e) => {
+                        tracing::warn!("DNS TXT lookup failed for {}: {}", txt_name, e);
+                        false
                     }
                 }
+            }
+            Err(e) => {
+                tracing::error!("Failed to create DNS resolver: {}", e);
+                return Err(AppError::Internal(
+                    anyhow::anyhow!("DNS verification unavailable: {}", e)
+                ));
             }
         }
     };
