@@ -71,7 +71,7 @@ export default function CouponsContent() {
     if (!token || !form.code.trim()) return;
     setCreating(true);
     try {
-      await apiFetch('/admin/coupons', {
+      const result = await apiFetch<Coupon>('/admin/coupons', {
         method: 'POST',
         token,
         body: {
@@ -84,7 +84,19 @@ export default function CouponsContent() {
           expires_at: form.expires_at || null,
         },
       });
-      toast(t('couponCreated') || 'Kupon oluşturuldu', 'success');
+
+      // Auto-sync Polar coupons after creation
+      if (form.type === 'polar' && result?.id) {
+        try {
+          await apiFetch(`/admin/coupons/${result.id}/sync`, { method: 'POST', token });
+          toast(t('couponCreatedSynced') || 'Kupon oluşturuldu ve Polar.sh ile senkronize edildi', 'success');
+        } catch {
+          toast(t('couponCreatedSyncFailed') || 'Kupon oluşturuldu ama Polar sync başarısız. Sync butonuna basarak tekrar deneyin.', 'error');
+        }
+      } else {
+        toast(t('couponCreated') || 'Kupon oluşturuldu', 'success');
+      }
+
       setShowCreate(false);
       setForm(INITIAL_FORM);
       fetchCoupons();
@@ -127,7 +139,19 @@ export default function CouponsContent() {
           expires_at: form.expires_at || null,
         },
       });
-      toast(t('couponUpdated') || 'Kupon güncellendi', 'success');
+
+      // Auto-sync Polar coupons after edit (if not already synced)
+      if (editTarget.type === 'polar' && !editTarget.polar_discount_id) {
+        try {
+          await apiFetch(`/admin/coupons/${editTarget.id}/sync`, { method: 'POST', token });
+          toast(t('couponUpdatedSynced') || 'Kupon güncellendi ve Polar.sh ile senkronize edildi', 'success');
+        } catch {
+          toast(t('couponUpdated') || 'Kupon güncellendi', 'success');
+        }
+      } else {
+        toast(t('couponUpdated') || 'Kupon güncellendi', 'success');
+      }
+
       setEditTarget(null);
       setForm(INITIAL_FORM);
       fetchCoupons();
@@ -338,10 +362,26 @@ export default function CouponsContent() {
         <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
           <p className="text-sm font-medium text-blue-700 dark:text-blue-400">{t('internalCodeInfo') || '🔵 Internal Kod'}</p>
           <p className="text-xs text-blue-600 dark:text-blue-400/70 mt-1">{t('internalCodeDesc') || 'Müşteri kodu girdiğinde plan direkt uygulanır. Polar\'a gitmez.'}</p>
+          <div className="mt-2 flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
+            <span className="font-medium">Akış:</span>
+            <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-500/20 rounded">Kod oluştur</span>
+            <span>→</span>
+            <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-500/20 rounded">Müşteri girer</span>
+            <span>→</span>
+            <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-500/20 rounded">Direkt uygulanır</span>
+          </div>
         </div>
         <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20">
           <p className="text-sm font-medium text-purple-700 dark:text-purple-400">{t('polarCodeInfo') || '🟣 Polar Kod'}</p>
-          <p className="text-xs text-purple-600 dark:text-purple-400/70 mt-1">{t('polarCodeDesc') || 'Polar.sh ile sync edilir. Ödeme sayfasında indirim uygulanır.'}</p>
+          <p className="text-xs text-purple-600 dark:text-purple-400/70 mt-1">{t('polarCodeDesc') || 'Girdiğin kod Polar.sh\'a gönderilir. Polar\'da aynı kod indirim olarak çalışır.'}</p>
+          <div className="mt-2 flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+            <span className="font-medium">Akış:</span>
+            <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-500/20 rounded">Kod oluştur</span>
+            <span>→</span>
+            <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-500/20 rounded">Sync et</span>
+            <span>→</span>
+            <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-500/20 rounded">Polar\'da çalışır</span>
+          </div>
         </div>
       </div>
 
