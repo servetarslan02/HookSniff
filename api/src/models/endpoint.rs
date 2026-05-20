@@ -14,6 +14,7 @@ pub struct Endpoint {
     pub retry_policy: Option<serde_json::Value>,
     pub created_at: DateTime<Utc>,
     pub allowed_ips: Option<serde_json::Value>,
+    #[sqlx(default)]
     pub event_filter: Option<Vec<String>>,
     pub custom_headers: Option<serde_json::Value>,
     #[serde(skip_serializing)]
