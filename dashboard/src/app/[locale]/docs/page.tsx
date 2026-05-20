@@ -69,7 +69,7 @@ const sections = [
     cards: [
       { title: 'Security', desc: 'HMAC-SHA256 signatures, SSRF protection, TLS, and 2FA.', href: '/docs/security' },
       { title: 'Retries & DLQ', desc: 'Exponential backoff, jitter, and replay failed webhooks.', href: '/docs/retries' },
-      { title: 'Smart Routing', desc: 'Round-robin, latency-based, and failover routing.', href: '/docs/smart-routing' },
+      { title: 'Smart Routing', desc: 'Round-robin and failover routing.', href: '/docs/smart-routing' },
       { title: 'Inbound Webhooks', desc: 'Receive webhooks from Stripe, GitHub, and Shopify.', href: '/docs/inbound-webhooks' },
       { title: 'Multi-Tenant', desc: 'Build multi-tenant webhook systems with isolation.', href: '/docs/multi-tenant' },
       { title: 'Organization', desc: 'Teams, SSO, roles, and audit logs.', href: '/docs/organization' },
