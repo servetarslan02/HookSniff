@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { getErrorMessage } from '@/lib/errors';
-import { Key, Check } from 'lucide-react';
+import { Key, Check } from '@/components/icons';
 
 export function PasswordSection({ token }: { token: string | null }) {
  const t = useTranslations('settings');

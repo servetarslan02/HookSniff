@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check, KeyRound } from 'lucide-react';
+import { Check, KeyRound } from '@/components/icons';
 
 export function ApiKeySection({ apiKey }: { apiKey: string | null }) {
  const t = useTranslations('settings');

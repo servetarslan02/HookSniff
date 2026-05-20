@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/store';
 import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import Footer from '@/components/Footer';
-import { Box, Circle, Code2, Globe, CreditCard, User, Package, Mail, Bot, Bell, EyeOff, Eye, Gem, Lightbulb, Monitor, Zap, FlaskConical, BarChart3, RefreshCw, ClipboardList, Image, Terminal , Check } from 'lucide-react';
+import { Box, Circle, Code2, Globe, CreditCard, User, Package, Mail, Bot, Bell, EyeOff, Eye, Gem, Lightbulb, Monitor, Zap, FlaskConical, BarChart3, RefreshCw, ClipboardList, Image, Terminal , Check } from '@/components/icons';
 
 /* ─── SDK Code Examples ─── */
 

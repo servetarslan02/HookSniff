@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { CreditCard, ShoppingBag } from 'lucide-react';
+import { CreditCard, ShoppingBag } from '@/components/icons';
 
 function GithubIcon({ size = 32, strokeWidth = 1.5, ...props }: { size?: number; strokeWidth?: number; [key: string]: unknown }) {
   return (

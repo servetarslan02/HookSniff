@@ -10,7 +10,7 @@ import { useToast } from '@/components/Toast';
 import { useApplications } from '@/hooks/useDashboardData';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazySection, Skeletons } from '@/components/LazySection';
-import { Smartphone, Pencil } from 'lucide-react';
+import { Smartphone, Pencil } from '@/components/icons';
 
 /* ─── Hook0-style: Application card grid ─── */
 

@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
-import { Code2, CreditCard, Zap, ClipboardList } from 'lucide-react';
+import { Code2, CreditCard, Zap, ClipboardList } from '@/components/icons';
 
 export function StripeWebhooksPageContent() {
   const t = useTranslations('providers');

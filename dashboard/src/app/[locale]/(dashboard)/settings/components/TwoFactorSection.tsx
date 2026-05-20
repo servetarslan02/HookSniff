@@ -6,7 +6,7 @@ import { useToast } from '@/components/Toast';
 import { twoFactorApi } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 import { useTranslations } from 'next-intl';
-import { ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, CheckCircle2 } from '@/components/icons';
 
 export function TwoFactorSection() {
   const { token } = useAuth();

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuditLogs } from '@/hooks/useDashboardData';
-import { ClipboardList, CreditCard, Image, Key, Link2, LogOut, Package, Pencil, Pin, RefreshCw, Settings, Trash2, User, UserMinus, Users } from 'lucide-react';
+import { ClipboardList, CreditCard, Image, Key, Link2, LogOut, Package, Pencil, Pin, RefreshCw, Settings, Trash2, User, UserMinus, Users } from '@/components/icons';
 
 /* ─── Types ─── */
 const ACTION_ICONS: Record<string, React.ReactNode> = {

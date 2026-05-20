@@ -2,7 +2,7 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { UsageTabProps } from './types';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp } from '@/components/icons';
 
 export function UsageTab({ userUsage, t }: UsageTabProps) {
   if (!userUsage) return null;

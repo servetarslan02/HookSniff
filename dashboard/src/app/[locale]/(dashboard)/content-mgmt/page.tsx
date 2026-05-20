@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
-import { FileText, RefreshCw, TriangleRight } from 'lucide-react';
+import { FileText, RefreshCw, TriangleRight } from '@/components/icons';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { CheckCircle2, CircleDot } from 'lucide-react';
+import { CheckCircle2, CircleDot } from '@/components/icons';
 
 interface RateLimitViolation {
   id: string;

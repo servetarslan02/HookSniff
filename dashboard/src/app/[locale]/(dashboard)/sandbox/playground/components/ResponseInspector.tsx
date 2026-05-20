@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Clock, FlaskConical } from 'lucide-react';
+import { Clock, FlaskConical } from '@/components/icons';
 
 export function ResponseInspector({
   response,

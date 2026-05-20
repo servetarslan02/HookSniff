@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Cloud, ShoppingCart, CreditCard, Bot, Wrench, HeartPulse, Anchor, XCircle, CheckCircle } from 'lucide-react';
+import { Cloud, ShoppingCart, CreditCard, Bot, Wrench, HeartPulse, Anchor, XCircle, CheckCircle } from '@/components/icons';
 
 /* ─── Data ─── */
 

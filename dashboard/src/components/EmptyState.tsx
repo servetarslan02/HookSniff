@@ -1,6 +1,6 @@
 'use client';
 
-import {Inbox} from 'lucide-react';
+import {Inbox} from '@/components/icons';
 
 interface EmptyStateProps {
  icon?: React.ReactNode;

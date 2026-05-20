@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { X, PartyPopper } from 'lucide-react';
+import { X, PartyPopper } from '@/components/icons';
 
 export function SuccessToast({ message, onClose }: { message: string; onClose: () => void }) {
  const t = useTranslations('onboarding');

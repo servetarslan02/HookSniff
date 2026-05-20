@@ -3,7 +3,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { GlobalRetryPolicy } from '../types';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb } from '@/components/icons';
 
 export function DelayPreviewCard({ policy }: { policy: GlobalRetryPolicy }) {
   const t = useTranslations('retryPolicy');

@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
-import { Check, ClipboardList, X } from 'lucide-react';
+import { Check, ClipboardList, X } from '@/components/icons';
 
 interface Schema {
   id: string;

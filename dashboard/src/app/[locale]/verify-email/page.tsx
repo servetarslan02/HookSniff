@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
-import { Clock , Check, X } from 'lucide-react';
+import { Clock , Check, X } from '@/components/icons';
 import { useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { useToast } from '@/components/Toast';

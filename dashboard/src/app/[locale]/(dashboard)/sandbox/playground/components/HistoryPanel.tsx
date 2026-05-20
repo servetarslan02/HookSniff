@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import type { PlaygroundRequest } from '../types';
-import { ScrollText } from 'lucide-react';
+import { ScrollText } from '@/components/icons';
 
 export function HistoryPanel({
   history,

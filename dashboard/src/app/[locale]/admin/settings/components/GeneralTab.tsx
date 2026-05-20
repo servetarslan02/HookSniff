@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { PlatformSettings } from '@/lib/api';
-import { DollarSign } from 'lucide-react';
+import { DollarSign } from '@/components/icons';
 
 interface GeneralTabProps {
   settings: PlatformSettings;

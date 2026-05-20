@@ -3,7 +3,7 @@
 import { useToast } from '@/components/Toast';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { NotesTabProps } from './types';
-import { ClipboardList, FileText, Tag, X } from 'lucide-react';
+import { ClipboardList, FileText, Tag, X } from '@/components/icons';
 
 export function NotesTab({
  userTags,

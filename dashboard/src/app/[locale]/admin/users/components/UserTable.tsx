@@ -3,7 +3,7 @@
 import { Link } from '@/i18n/navigation';
 import { StatusBadge } from '@/components/StatusBadge';
 import type { AdminUser } from '@/lib/api';
-import { Eye } from 'lucide-react';
+import { Eye } from '@/components/icons';
 
 interface PlanBadgeColors {
   [key: string]: string;

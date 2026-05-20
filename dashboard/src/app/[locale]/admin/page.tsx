@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import { useAdminStats, useAdminRevenue, useAdminAuditLogs, useAdminFeatureFlags, useAdminDeployInfo, useRateLimitViolations, useFailedDeliveries, useQueueStatus } from '@/hooks/useAdminData';
 import { StatCard } from '@/components/tremor/StatCard';
 import { useTranslations } from 'next-intl';
-import { BarChart3, ClipboardList, Heart, Building2, RefreshCw, Download, Users, Package, DollarSign, Flame } from 'lucide-react';
+import { BarChart3, ClipboardList, Heart, Building2, RefreshCw, Download, Users, Package, DollarSign, Flame } from '@/components/icons';
 
 const tabSkeleton = (
   <div className="space-y-6 animate-pulse">

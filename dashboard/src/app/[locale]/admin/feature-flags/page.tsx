@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import type { FeatureFlagValidated } from '@/schemas/api';
-import { Flag } from 'lucide-react';
+import { Flag } from '@/components/icons';
 import {
   useAdminFeatureFlags,
   useCreateFeatureFlag,

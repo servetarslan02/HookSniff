@@ -3,7 +3,7 @@
 import { StatusBadge } from '@/components/StatusBadge';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { WebhooksTabProps } from './types';
-import { Package, Search } from 'lucide-react';
+import { Package, Search } from '@/components/icons';
 
 export function WebhooksTab({
   userWebhooks,

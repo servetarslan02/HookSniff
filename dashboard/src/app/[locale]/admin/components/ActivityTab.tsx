@@ -2,7 +2,7 @@
 
 import { Link } from '@/i18n/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import { Monitor, Users, DollarSign, Settings } from 'lucide-react';
+import { Monitor, Users, DollarSign, Settings } from '@/components/icons';
 
 interface ActivityTabProps {
   auditLogs: any[];

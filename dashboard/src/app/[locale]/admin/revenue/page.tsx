@@ -9,7 +9,7 @@ import { useToast } from '@/components/Toast';
 import { adminApi, API_BASE } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { useQueryClient } from '@tanstack/react-query';
-import { DollarSign, Landmark, RefreshCw, Rocket, TrendingDown, TrendingUp, User, Users } from 'lucide-react';
+import { DollarSign, Landmark, RefreshCw, Rocket, TrendingDown, TrendingUp, User, Users } from '@/components/icons';
 
 type DateRange = '7d' | '30d' | '90d' | '12m' | 'all';
 

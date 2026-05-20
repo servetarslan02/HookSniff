@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { LazyPieChart as PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from '@/components/LazyCharts';
 import { useTranslations } from 'next-intl';
-import { Gem, BarChart3 } from 'lucide-react';
+import { Gem, BarChart3 } from '@/components/icons';
 
 const PLAN_COLORS: Record<string, string> = {
   developer: '#94a3b8',

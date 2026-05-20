@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import type { PortalConfig } from '../types';
-import { Eye } from 'lucide-react';
+import { Eye } from '@/components/icons';
 
 export function PortalPreview({ config }: { config: PortalConfig }) {
   const t = useTranslations('portalCustomize');

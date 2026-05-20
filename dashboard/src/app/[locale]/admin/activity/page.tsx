@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useAdminAuditLogs } from '@/hooks/useAdminData';
 import { useTranslations, useLocale } from 'next-intl';
-import { AlertTriangle, ArrowUpFromLine, ClipboardList, CreditCard, DollarSign, Eye, FileOutput, Flag, FlaskConical, Inbox, Key, Lock, Mail, Pencil, Plus, Settings, Shield, ShieldCheck, Trash2, User, UserMinus, Users } from 'lucide-react';
+import { AlertTriangle, ArrowUpFromLine, ClipboardList, CreditCard, DollarSign, Eye, FileOutput, Flag, FlaskConical, Inbox, Key, Lock, Mail, Pencil, Plus, Settings, Shield, ShieldCheck, Trash2, User, UserMinus, Users } from '@/components/icons';
 
 const ACTION_COLORS: Record<string, React.ReactNode> = {
   LOGIN: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400',

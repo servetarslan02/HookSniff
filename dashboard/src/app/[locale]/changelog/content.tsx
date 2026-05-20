@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Check } from 'lucide-react';
+import { Check } from '@/components/icons';
 import {
  changelog,
  typeConfig,

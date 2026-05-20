@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi, type RetryPolicyConfig } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, BarChart3, Pencil, Repeat, TrendingUp } from 'lucide-react';
+import { ArrowRight, BarChart3, Pencil, Repeat, TrendingUp } from '@/components/icons';
 
 const BACKOFF_OPTIONS = [
   { value: 'exponential', icon: <TrendingUp size={16} strokeWidth={1.75} /> },

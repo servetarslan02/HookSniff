@@ -2,7 +2,7 @@
 
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { AlertTriangle, CheckCircle2, Circle, CalendarDays } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Circle, CalendarDays } from '@/components/icons';
 
 interface HealthTabProps {
   stats: any;

@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { PlatformSettings } from '@/lib/api';
-import { HardDrive, Mail, ShieldCheck } from 'lucide-react';
+import { HardDrive, Mail, ShieldCheck } from '@/components/icons';
 
 interface EmailTabProps {
   settings: PlatformSettings;

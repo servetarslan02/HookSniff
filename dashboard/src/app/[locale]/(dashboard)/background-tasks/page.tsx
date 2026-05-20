@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { Ban, CheckCircle2, Clock, RefreshCw, XCircle } from 'lucide-react';
+import { Ban, CheckCircle2, Clock, RefreshCw, XCircle } from '@/components/icons';
 
 const statusColors: Record<string, React.ReactNode> = {
   pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400',

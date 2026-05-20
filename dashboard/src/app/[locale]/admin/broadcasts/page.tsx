@@ -21,7 +21,7 @@ import {
   Eye,
   EyeOff,
   Calendar,
-} from 'lucide-react';
+} from '@/components/icons';
 
 const BROADCAST_TYPES = [
   { value: 'announcement', label: 'Announcement', icon: <Radio size={14} strokeWidth={1.75} /> },

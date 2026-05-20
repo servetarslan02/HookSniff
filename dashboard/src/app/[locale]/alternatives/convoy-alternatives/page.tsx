@@ -1,6 +1,6 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { X, Check } from 'lucide-react';
+import { X, Check } from '@/components/icons';
 
 // Revalidate every hour for ISR
 export const revalidate = 3600;

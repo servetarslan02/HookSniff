@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { CreditCard, ShoppingBag, GitBranch, MessageSquare, Pause, Phone, Play, Gamepad2, TriangleRight, FileText, Plug, Link2, Pencil, Trash2 } from 'lucide-react';
+import { CreditCard, ShoppingBag, GitBranch, MessageSquare, Pause, Phone, Play, Gamepad2, TriangleRight, FileText, Plug, Link2, Pencil, Trash2 } from '@/components/icons';
 
 function formatDate(s: string | null) {
   if (!s) return '—';

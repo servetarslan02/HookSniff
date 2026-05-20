@@ -2,7 +2,7 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { EndpointsTabProps } from './types';
-import { Link2 } from 'lucide-react';
+import { Link2 } from '@/components/icons';
 
 export function EndpointsTab({ userEndpoints, t }: EndpointsTabProps) {
   return (

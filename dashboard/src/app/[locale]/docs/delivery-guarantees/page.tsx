@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Check } from 'lucide-react';
+import { Check } from '@/components/icons';
 
 export const revalidate = 3600;
 

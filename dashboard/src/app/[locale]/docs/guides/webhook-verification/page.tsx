@@ -1,5 +1,5 @@
 import SdkTabs from '@/components/SdkTabs';
-import { Check, Lock, RefreshCw, Ruler, Shield, X } from 'lucide-react';
+import { Check, Lock, RefreshCw, Ruler, Shield, X } from '@/components/icons';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 

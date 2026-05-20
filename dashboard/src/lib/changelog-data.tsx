@@ -27,7 +27,7 @@ export type ChangelogItem = {
 
 /* ─── Config ─── */
 
-import { Sparkles, Bug, Zap, ShieldAlert, Expand, Plug, BarChart3, Package, Settings, Building, BookOpen } from 'lucide-react';
+import { Sparkles, Bug, Zap, ShieldAlert, Expand, Plug, BarChart3, Package, Settings, Building, BookOpen } from '@/components/icons';
 
 export const typeConfig: Record<ChangeType, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
   feature: { label: 'Feature', color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', icon: <Sparkles size={14} strokeWidth={1.75} /> },

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check, Key } from 'lucide-react';
+import { Check, Key } from '@/components/icons';
 
 export function NewKeyAlert({
   newKey,

@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useRateLimits, useSetRateLimit, useDeleteRateLimit } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { BarChart3, Bell, Pencil, RefreshCw, Trash2, Zap } from 'lucide-react';
+import { BarChart3, Bell, Pencil, RefreshCw, Trash2, Zap } from '@/components/icons';
 
 export default function RateLimitingPage() {
   const t = useTranslations('rateLimiting');
