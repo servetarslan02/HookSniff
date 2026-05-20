@@ -154,8 +154,8 @@ WEBHOOK_SECRET = os.environ['HOOKSNIFF_WEBHOOK_SECRET']
 @app.route('/webhooks/hooksniff', methods=['POST'])
 def handle_webhook():
     # 1. Extract signature
-    signature = request.headers.get('X-HookSniff-Signature')
-    timestamp = request.headers.get('X-HookSniff-Timestamp')
+    signature = request.headers.get('webhook-signature')
+    timestamp = request.headers.get('webhook-timestamp')
 
     if not signature or not timestamp:
         return jsonify({'error': 'Missing headers'}), 401

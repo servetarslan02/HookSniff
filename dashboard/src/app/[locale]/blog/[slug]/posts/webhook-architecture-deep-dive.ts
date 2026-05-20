@@ -208,8 +208,8 @@ async fn deliver_webhook(
 
     let response = client
         .post(&delivery.endpoint_url)
-        .header("X-HookSniff-Signature", compute_signature(&payload))
-        .header("X-HookSniff-Timestamp", chrono::Utc::now().timestamp())
+        .header("webhook-signature", compute_signature(&payload))
+        .header("webhook-timestamp", chrono::Utc::now().timestamp())
         .body(payload)
         .timeout(Duration::from_secs(10))
         .send()

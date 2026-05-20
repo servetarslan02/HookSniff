@@ -18,7 +18,7 @@ const glossary = [
   { term: 'Payload', definition: 'The data sent in the webhook request body, typically JSON. Contains the event details and metadata.' },
   { term: 'HMAC (Hash-based Message Authentication Code)', definition: 'A cryptographic signature mechanism. HMAC-SHA256 is the standard for webhook signing — the sender hashes the payload with a secret, the receiver verifies it.' },
   { term: 'Signing Secret', definition: 'A shared secret key (typically prefixed with whsec_) used to generate and verify HMAC signatures. Must be kept confidential.' },
-  { term: 'Standard Webhooks', definition: 'An open specification for webhook signing and verification. Defines headers: X-HookSniff-ID, X-HookSniff-Timestamp, X-HookSniff-Signature. Used by HookSniff and Svix.' },
+  { term: 'Standard Webhooks', definition: 'An open specification for webhook signing and verification. Defines headers: webhook-id, webhook-timestamp, webhook-signature. Used by HookSniff and Svix.' },
   { term: 'CloudEvents', definition: 'A CNCF specification (v1.0) for describing event data in a common way. Provides a standard envelope format with required attributes (specversion, type, source, id).' },
   { term: 'Retry Policy', definition: 'Rules governing how failed webhook deliveries are retried. Typically exponential backoff with jitter to avoid thundering herd problems.' },
   { term: 'Exponential Backoff', definition: 'A retry strategy where wait time between retries increases exponentially (e.g., 1s, 2s, 4s, 8s, 16s). Combined with jitter to spread load.' },
