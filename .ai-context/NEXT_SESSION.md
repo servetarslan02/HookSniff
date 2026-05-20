@@ -1,51 +1,45 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-20 18:55 GMT+8
+> Son güncelleme: 2026-05-20 20:16 GMT+8
 
-## ✅ Tamamlanan (Bu Oturum)
+## ⚠️ KRİTİK: Vercel Deploy Sorunu
 
-### 1. Billing Portal 404 Fix
-- Empty polar_customer_id → fallback to billing page
-- Correct fallback URL (hooksniff.vercel.app instead of localhost)
+Son 3 commit Vercel'de FAILED:
+- `2e8ce0cc` — dashboard optimization v2 (shared icons + lazy loading)
+- `0da7f3dc` — animation durations reduced
+- `68b934b6` — tab icons vertical alignment
 
-### 2. Edge Proxy Dev URL Fix
-- API_BASE: workers.dev → Cloud Run production URL
-- next.config.js health rewrite consistent with vercel.json
+**Sorun:** `components/icons.ts` barrel dosyasında eksik ikonlar vardı. Düzeltildi ama Vercel yeni commit'leri almıyor.
 
-### 3. Delivery Model — Missing Columns Fix
-- 7 columns added to Delivery struct (event, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash, custom_headers)
-- Fixes inbound webhook DATABASE_ERROR
+**Çözüm:**
+1. Vercel Dashboard'dan manuel redeploy dene
+2. veya GitHub webhook'ı kontrol et
+3. veya `git push --force` ile trigger et
 
-### 4. Webhook Replay 500 Fix
-- SELECT * → explicit column lists in webhooks.rs + auth.rs
+## Yapılan Optimizasyonlar (Bu Oturum)
 
-### 5. Devices 500 Fix
-- Removed non-existent last_used_at column from DeviceTokenRow + queries
+### 1. SVG Display Fix
+- `globals.css` → `svg { display: inline; }` (Tailwind v4 preflight override)
+- Tüm sayfalardaki ikonlar artık metnin yanında
 
-### 6. Full API Test (50+ endpoints)
-- 45+ working ✅
-- 5 broken → all fixed, pending deploy
+### 2. Animation Durations (✅ Deploy edildi)
+- page-enter: 400ms → 150ms
+- glass-card: 300ms → 150ms
+- hover-lift: 200ms → 100ms
+- btn-ripple: 500ms → 150ms
+- card-tilt: 300ms → 150ms
+- btn-glow: 300ms → 150ms
+- TabbedSection fade: 200ms → 150ms
 
-## 📋 Sıradaki
+### 3. Shared Icon Barrel
+- `components/icons.ts` — 124+ ikon tek barrel'da
+- 184 dosyadaki lucide-react import'ları ortak modüle geçti
 
-### 1. Cloud Build Deploy (KRİTİK)
-- Tüm fix'ler push edildi ama Cloud Run'da aktif değil
-- Google Cloud Console → Cloud Build Triggers → Run
+### 4. Dynamic Imports (Top 10 Slowest Pages)
+- SSO, applications/[id], streaming, environments, logs, connectors, inbound, custom-domain, endpoints, message-poller
+- Her biri content + wrapper yapısına çevrildi
 
-### 2. device_tokens.last_used_at Migration
-- DB'de bu kolon yok ama kodda bekleniyordu
-- Migration oluşturulmalı: `ALTER TABLE device_tokens ADD COLUMN last_used_at TIMESTAMPTZ`
-
-### 3. Upstash Redis Limit (YÜKSEK)
-- 500K request limiti dolu
-- Seçenekler: plan yükselt, fallback ekle, yeni instance
-
-### 4. Email Verified Sorunu (YÜKSEK)
-- Servet ve demo hesapları email_verified = false
-- Neon DB'de UPDATE gerekli
-
-### 5. P2 Kalan Sorunlar
-- SSO state → Redis
-- OIDC JWKS imza doğrulaması
-- Verified domain TXT record verification
-- communication_history tablosu
+## Sıradaki
+1. Vercel deploy sorununu çöz
+2. Build başarılı olursa gerçek yükleme sürelerini ölç
+3. Kalan 20 sayfaya da dynamic import uygula
