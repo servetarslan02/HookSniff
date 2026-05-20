@@ -49,8 +49,6 @@ pub fn router() -> Router {
         .route("/verify-domain/check", post(check_domain_verification))
         // Login attempts
         .route("/login-attempts", get(get_login_attempts))
-        // Provider lookup (public)
-        .route("/providers", get(list_sso_providers))
 }
 
 /// Public SSO routes (login + callbacks) — no auth required
@@ -59,6 +57,7 @@ pub fn public_router() -> Router {
         .route("/login", get(initiate_sso_login))
         .route("/saml/callback", post(saml_callback))
         .route("/oidc/callback", get(oidc_callback))
+        .route("/providers", get(list_sso_providers))
 }
 
 // ── Config Response ─────────────────────────────────────────
