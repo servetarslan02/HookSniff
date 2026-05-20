@@ -256,6 +256,26 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
+## 📝 Son Oturum (2026-05-21 02:15 — Alerts Sayfası İnceleme + 2 Fix)
+
+### Özet
+Servet ile oturum. Alerts (Admin) sayfası detaylı incelendi. 2 sorun tespit edildi, hepsi düzeltildi. 3 dosya değişti.
+
+### Tespit Edilen ve Düzeltilen Sorunlar:
+1. **Channel ikonları select içinde render olmuyordu** — `<option>` React element desteklemez, ikonlar kaldırıldı (label only)
+2. **Alert listesinde channel ikonları `[object Object]` gösteriliyordu** — `chDef.icon + ' ' + chDef.label` string concat yerine JSX `<span>` ile render edildi
+3. **12 eksik i18n anahtarı** — activate, alertName, alertNamePlaceholder, alerts, alertsDescription, channels, condition, createFirstAlert, deactivate, editAlert, noFilteredAlerts, threshold
+
+### Değişen Dosyalar:
+- `dashboard/src/app/[locale]/admin/alerts/page.tsx`
+- `dashboard/src/messages/en.json`
+- `dashboard/src/messages/tr.json`
+
+### Push: `ee4fff9d`
+### TypeScript: ✅ 0 hata
+
+---
+
 ## 📝 Son Oturum (2026-05-21 02:11 — System Sayfası İnceleme + 2 Fix)
 
 ### Özet
