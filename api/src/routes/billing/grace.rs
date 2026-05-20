@@ -130,6 +130,7 @@ mod tests {
             paused_at: None,
             paused_until: None,
             pause_plan: None,
+            has_used_startup_trial: false,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["plan"], "pro");
@@ -164,6 +165,7 @@ mod tests {
             paused_at: None,
             paused_until: None,
             pause_plan: None,
+            has_used_startup_trial: false,
         };
         let _debug = format!("{:?}", resp);
     }
@@ -419,6 +421,7 @@ mod tests {
             paused_at: None,
             paused_until: None,
             pause_plan: None,
+            has_used_startup_trial: false,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["cancel_at_period_end"], true);
