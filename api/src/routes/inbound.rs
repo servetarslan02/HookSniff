@@ -647,7 +647,7 @@ async fn handle_inbound(
     // Also check api_keys table
     if customer.is_none() {
         let api_key_rows: Vec<(String, uuid::Uuid)> = sqlx::query_as(
-            "SELECT key_hash, customer_id FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
+            "SELECT api_key_hash, customer_id FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
         )
         .bind(prefix)
         .fetch_all(&pool)
@@ -796,7 +796,7 @@ async fn handle_inbound_to_endpoint(
     // Also check api_keys table
     if customer.is_none() {
         let api_key_rows: Vec<(String, uuid::Uuid)> = sqlx::query_as(
-            "SELECT key_hash, customer_id FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
+            "SELECT api_key_hash, customer_id FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
         )
         .bind(prefix)
         .fetch_all(&pool)
