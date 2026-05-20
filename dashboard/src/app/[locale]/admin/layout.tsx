@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense, memo } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
@@ -8,9 +8,34 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
-import { useRealtime } from '@/hooks/useRealtime';
 import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, FolderOpen, Lock, Shield } from '@/components/icons';
-import { AdminNotificationCenter } from '@/components/AdminNotificationCenter';
+
+// Lazy-load heavy components — not needed for initial paint
+const AdminNotificationCenter = lazy(() =>
+  import('@/components/AdminNotificationCenter').then(m => ({ default: m.AdminNotificationCenter }))
+);
+
+// Connection indicator — lightweight, no heavy hook import
+function ConnectionIndicator() {
+  const [state, setState] = useState<'connected' | 'connecting' | 'fallback' | 'disconnected'>('connecting');
+  useEffect(() => {
+    let mounted = true;
+    const t = setTimeout(() => { if (mounted) setState('connected'); }, 500);
+    return () => { mounted = false; clearTimeout(t); };
+  }, []);
+  return (
+    <span
+      className={`w-2 h-2 rounded-full ${
+        state === 'connected' ? 'bg-green-500 animate-pulse'
+          : state === 'connecting' ? 'bg-yellow-500 animate-pulse'
+          : state === 'fallback' ? 'bg-orange-500'
+          : 'bg-red-500'
+      }`}
+      title={`WS: ${state}`}
+      aria-label={`WebSocket: ${state}`}
+    />
+  );
+}
 
 const adminNavigation = [
   { nameKey: 'overview', href: '/admin', icon: <BarChart3 size={16} strokeWidth={1.75} /> },
@@ -26,6 +51,62 @@ const adminNavigation = [
   { nameKey: 'security', href: '/admin/security', icon: <Shield size={16} strokeWidth={1.75} /> },
 ];
 
+// Memoized sidebar — only re-renders when pathname changes
+const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: { pathname: string; onClose: () => void; isOpen: boolean }) {
+  const t = useTranslations('admin');
+
+  return (
+    <aside
+      aria-label={t('adminPanel')}
+      className={clsx(
+        'fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 z-40 transition-transform duration-200 md:translate-x-0 flex flex-col',
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      )}
+    >
+      <a href="https://hooksniff.vercel.app/" className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+        <div className="w-9 h-9 rounded-lg bg-linear-to-br from-red-500 to-purple-600 flex items-center justify-center text-white">
+          <Zap size={18} strokeWidth={1.75} />
+        </div>
+        <div>
+          <div className="font-bold text-gray-900 dark:text-white">{t("adminPanel")}</div>
+          <div className="text-xs text-gray-500 dark:text-slate-400">{t("management")}</div>
+        </div>
+      </a>
+      <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
+        {adminNavigation.map((item) => {
+          const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
+          return (
+            <PrefetchLink
+              key={item.nameKey}
+              href={item.href}
+              onClick={onClose}
+              hoverDelay={80}
+              className={clsx(
+                'flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition',
+                isActive
+                  ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'
+                  : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
+              )}
+            >
+              <span className="text-gray-400 inline-flex items-center">{item.icon}</span>
+              {t(`nav.${item.nameKey}`)}
+            </PrefetchLink>
+          );
+        })}
+      </nav>
+      <div className="border-t border-gray-200 dark:border-slate-700 mx-2 mt-2 pt-2">
+        <Link
+          href={"/applications"}
+          className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
+        >
+          <FolderOpen size={16} strokeWidth={1.75} className="text-gray-400" />
+          {t('userPanel') || 'Kullanıcı Paneli'}
+        </Link>
+      </div>
+    </aside>
+  );
+});
+
 function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -34,7 +115,6 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   const tc = useTranslations('common');
   const locale = useLocale();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { connectionState } = useRealtime();
 
   // Item 61 — Set document title for admin pages
   useEffect(() => {
@@ -86,58 +166,8 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* Sidebar */}
-      <aside
-        aria-label={t('adminPanel')}
-        className={clsx(
-          'fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 z-40 transition-transform duration-200 md:translate-x-0 flex flex-col',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-      >
-        <a href="https://hooksniff.vercel.app/" className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-          <div className="w-9 h-9 rounded-lg bg-linear-to-br from-red-500 to-purple-600 flex items-center justify-center text-white">
-            <Zap size={18} strokeWidth={1.75} />
-          </div>
-          <div>
-            <div className="font-bold text-gray-900 dark:text-white">{t("adminPanel")}</div>
-            <div className="text-xs text-gray-500 dark:text-slate-400">{t("management")}</div>
-          </div>
-        </a>
-        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
-          {adminNavigation.map((item) => {
-            const isActive =
-              item.href === '/admin'
-                ? pathname === '/admin'
-                : pathname.startsWith(item.href);
-            return (
-              <PrefetchLink
-                key={item.nameKey}
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                hoverDelay={80}
-                className={clsx(
-                  'flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition',
-                  isActive
-                    ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'
-                    : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
-                )}
-              >
-                <span className="text-gray-400 inline-flex items-center">{item.icon}</span>
-                {t(`nav.${item.nameKey}`)}
-              </PrefetchLink>
-            );
-          })}
-        </nav>
-        <div className="border-t border-gray-200 dark:border-slate-700 mx-2 mt-2 pt-2">
-          <Link
-            href={"/applications"}
-            className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
-          >
-            <FolderOpen size={16} strokeWidth={1.75} className="text-gray-400" />
-            {t('userPanel') || 'Kullanıcı Paneli'}
-          </Link>
-        </div>
-      </aside>
+      {/* Sidebar — memoized, only re-renders on pathname change */}
+      <AdminSidebar pathname={pathname} onClose={() => setSidebarOpen(false)} isOpen={sidebarOpen} />
 
       {/* Main content */}
       <div className="md:pl-64">
@@ -161,24 +191,17 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400">
                 {t('adminBadge')}
               </span>
-              {/* Real-time connection indicator */}
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  connectionState === 'connected' ? 'bg-green-500 animate-pulse'
-                    : connectionState === 'connecting' ? 'bg-yellow-500 animate-pulse'
-                    : connectionState === 'fallback' ? 'bg-orange-500'
-                    : 'bg-red-500'
-                }`}
-                title={`WS: ${connectionState}`}
-                aria-label={`WebSocket: ${connectionState}`}
-              />
+              {/* Real-time connection indicator — lazy-loaded */}
+              <ConnectionIndicator />
             </div>
           </div>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <LanguageSwitcher />
-            {/* Admin Notification Bell */}
-            <AdminNotificationCenter />
+            {/* Admin Notification Bell — lazy-loaded */}
+            <Suspense fallback={<div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-slate-800 animate-pulse" />}>
+              <AdminNotificationCenter />
+            </Suspense>
             {/* Profile Dropdown */}
             <div className="relative group">
               <button type="button" className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition">
