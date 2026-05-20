@@ -81,7 +81,7 @@ export function UserTable({
                       className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
                     />
                   </th>
-                  <th scope="col" className="px-3 py-3 hidden lg:table-cell">
+                  <th scope="col" className="px-3 py-3 hidden xl:table-cell">
                     <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('id')}</span>
                   </th>
                   <th scope="col">
@@ -99,12 +99,12 @@ export function UserTable({
                       {tc('plan')} {sortField === 'plan' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
                   </th>
-                  <th scope="col" className="hidden md:table-cell">
+                  <th scope="col" className="hidden lg:table-cell">
                     <button type="button" onClick={() => handleSort('status')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByStatus')}>
                       {tc('status')} {sortField === 'status' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
                   </th>
-                  <th scope="col" className="hidden lg:table-cell">
+                  <th scope="col" className="hidden xl:table-cell">
                     <button type="button" onClick={() => handleSort('created_at')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByCreated')}>
                       {tc('created')} {sortField === 'created_at' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
@@ -124,7 +124,7 @@ export function UserTable({
                         className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
                       />
                     </td>
-                    <td className="px-3 py-3 sm:py-4 text-xs font-mono text-gray-600 dark:text-slate-400 hidden lg:table-cell">
+                    <td className="px-3 py-3 sm:py-4 text-xs font-mono text-gray-600 dark:text-slate-400 hidden xl:table-cell">
                       {u.id.slice(0, 8)}…
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -148,10 +148,10 @@ export function UserTable({
                         )}
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
                         <StatusBadge status={u.status} />
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 hidden lg:table-cell">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 hidden xl:table-cell">
                       {new Date(u.created_at).toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -164,13 +164,13 @@ export function UserTable({
                         </Link>
                         <button type="button"
                           onClick={() => { setPlanChangeTarget(u); setNewPlan(u.plan); }}
-                          className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium hidden sm:inline"
+                          className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium hidden md:inline"
                         >
                           {t('changePlan')}
                         </button>
                         <button type="button"
                           onClick={() => handleToggleStatus(u)}
-                          className={`text-xs font-medium hidden sm:inline ${
+                          className={`text-xs font-medium hidden md:inline ${
                             u.status === 'active'
                               ? 'text-red-600 dark:text-red-400 hover:text-red-700'
                               : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'
