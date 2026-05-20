@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/store';
 import { adminApi } from '@/lib/api';
-import { useTranslations } from 'next-intl';
+
 import { useToast } from '@/components/Toast';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import {
@@ -119,7 +119,7 @@ function relativeTime(dateStr: string): string {
 export default function AdminSecurityPage() {
   const { token } = useAuth();
   const { toast } = useToast();
-  const t = useTranslations('admin');
+
 
   const [tab, setTab] = useState<'events' | 'blocklist'>('events');
   const [stats, setStats] = useState<SecurityStats | null>(null);
@@ -188,7 +188,7 @@ export default function AdminSecurityPage() {
     if (!token || !blockForm.ip_address.trim()) return;
     setBlocking(true);
     try {
-      const payload: Record<string, unknown> = { ip_address: blockForm.ip_address.trim() };
+      const payload: { ip_address: string; reason?: string; expires_hours?: number } = { ip_address: blockForm.ip_address.trim() };
       if (blockForm.reason.trim()) payload.reason = blockForm.reason.trim();
       if (blockForm.expires_hours) payload.expires_hours = parseInt(blockForm.expires_hours);
       await adminApi.blockIp(token, payload);
@@ -395,11 +395,14 @@ export default function AdminSecurityPage() {
                         )}
                         <span><Clock size={12} strokeWidth={1.75} className="inline" /> {relativeTime(event.created_at)}</span>
                       </div>
-                      {event.details && typeof event.details === 'object' && (event.details as Record<string, unknown>).reason && (
-                        <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
-                          {(event.details as Record<string, unknown>).reason as string}
-                        </p>
-                      )}
+                      {(() => {
+                        const d = event.details as Record<string, unknown> | undefined;
+                        return d?.reason ? (
+                          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
+                            {String(d.reason)}
+                          </p>
+                        ) : null;
+                      })()}
                     </div>
                     {!event.resolved && (
                       <button
