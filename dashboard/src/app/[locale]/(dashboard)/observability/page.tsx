@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
-import { Activity, Bell, TrendingUp } from '@/components/icons';
+import { Activity, Bell, Link2, TrendingUp } from '@/components/icons';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -16,6 +16,7 @@ const tabSkeleton = (
   </div>
 );
 
+const DeliveriesPage = dynamic(() => import('../deliveries/DeliveriesContent').then(m => ({ default: m.default })), { ssr: false, loading: () => tabSkeleton });
 const HealthPage = dynamic(() => import('../health/page'), { ssr: false, loading: () => tabSkeleton });
 const AlertsPage = dynamic(() => import('../alerts/page'), { ssr: false, loading: () => tabSkeleton });
 const AnalyticsPage = dynamic(() => import('../analytics/page'), { ssr: false, loading: () => tabSkeleton });
@@ -26,6 +27,7 @@ export default function MonitoringPage() {
   return (
     <TabbedSection
       tabs={[
+        { key: 'deliveries', label: t('deliveries'), icon: <Link2 size={16} strokeWidth={1.75} />, content: () => <DeliveriesPage /> },
         { key: 'health', label: t('health'), icon: <Activity size={16} strokeWidth={1.75} />, content: () => <HealthPage /> },
         { key: 'alerts', label: t('alerts'), icon: <Bell size={16} strokeWidth={1.75} />, content: () => <AlertsPage /> },
         { key: 'analytics', label: t('analytics'), icon: <TrendingUp size={16} strokeWidth={1.75} />, content: () => <AnalyticsPage /> },
