@@ -12,6 +12,6 @@ const SsoContent = dynamic(() => import('./SsoContent').then(m => ({ default: m.
   ),
 });
 
-export default function SsoSettingsPage() {
-  return <SsoContent />;
+export default function SsoSettingsPage({ teamId }: { teamId?: string } = {}) {
+  return <SsoContent teamId={teamId} />;
 }
