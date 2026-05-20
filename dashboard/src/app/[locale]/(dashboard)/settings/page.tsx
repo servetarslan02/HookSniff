@@ -8,7 +8,7 @@ import { NotificationSection } from './components/NotificationSection';
 import { PrivacyConsentSection } from './components/PrivacyConsentSection';
 import { DangerZoneSection } from './components/DangerZoneSection';
 import { TwoFactorSection } from './components/TwoFactorSection';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { clsx } from 'clsx';
 
 type Tab = 'profile' | 'security' | 'notifications' | 'privacy' | 'danger';
@@ -66,10 +66,43 @@ const tabs: { id: Tab; icon: React.ReactNode; labelKey: string; fallback: string
   },
 ];
 
+function getInitialTab(): Tab {
+  if (typeof window === 'undefined') return 'profile';
+  const urlTab = new URLSearchParams(window.location.search).get('tab');
+  if (urlTab && tabs.some((t) => t.id === urlTab)) return urlTab as Tab;
+  return 'profile';
+}
+
 export default function SettingsPage() {
   const { user, token } = useAuth();
   const t = useTranslations('settings');
-  const [activeTab, setActiveTab] = useState<Tab>('profile');
+  const [activeTab, setActiveTab] = useState<Tab>(getInitialTab);
+
+  // Sync with URL on browser back/forward
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlTab = new URLSearchParams(window.location.search).get('tab');
+      if (urlTab && tabs.some((t) => t.id === urlTab)) {
+        setActiveTab(urlTab as Tab);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleTabClick = useCallback((id: Tab) => {
+    setActiveTab(id);
+    // Persist in URL
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (id === 'profile') {
+        url.searchParams.delete('tab');
+      } else {
+        url.searchParams.set('tab', id);
+      }
+      window.history.replaceState(null, '', url.toString());
+    }
+  }, []);
 
   return (
     <div className="max-w-5xl">
@@ -90,7 +123,7 @@ export default function SettingsPage() {
                 type="button"
                 role="tab"
                 aria-selected={isActive}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabClick(tab.id)}
                 className={clsx(
                   'flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-all duration-150',
                   isActive
