@@ -3453,7 +3453,10 @@
     "noConfigsDesc": "Add a provider to start receiving webhooks from external services.",
     "deleteConfig": "Delete Configuration",
     "deleteConfirm": "Are you sure you want to delete this inbound configuration? Webhooks from this provider will no longer be received.",
-    "copied": "URL copied to clipboard!"
+    "copied": "URL copied to clipboard!",
+    "urlExplanation": "These URLs verify provider signatures automatically — no API key needed. Copy the URL for your configured provider and paste it in the provider's webhook settings.",
+    "noEndpointsConfigured": "No endpoints configured. Edit your inbound config to set a target endpoint.",
+    "createConfigFirst": "Add an inbound provider above to get your working webhook URLs."
   },
   "contact": {
     "title": "Contact Us",

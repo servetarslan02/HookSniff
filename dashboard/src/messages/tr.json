@@ -3435,7 +3435,10 @@
     "noConfigsDesc": "Dış servislerden webhook almaya başlamak için bir sağlayıcı ekleyin.",
     "deleteConfig": "Yapılandırmayı Sil",
     "deleteConfirm": "Bu inbound yapılandırmasını silmek istediğinizden emin misiniz? Bu sağlayıcıdan gelen webhook'lar artık alınmayacak.",
-    "copied": "URL panoya kopyalandı!"
+    "copied": "URL panoya kopyalandı!",
+    "urlExplanation": "Bu URL'ler sağlayıcı imzalarını otomatik doğrular — API key gerekmez. Yapılandırdığınız sağlayıcının URL'sini kopyalayıp sağlayıcı webhook ayarlarına yapıştırın.",
+    "noEndpointsConfigured": "Yapılandırılmış endpoint yok. Inbound config'inizi düzenleyerek bir hedef endpoint belirleyin.",
+    "createConfigFirst": "Çalışan webhook URL'lerinizi almak için yukarıdan bir inbound sağlayıcı ekleyin."
   },
   "contact": {
     "title": "Bize Ulaşın",
