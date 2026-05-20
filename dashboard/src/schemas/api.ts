@@ -486,6 +486,9 @@ export const BillingUsageSchema = z.object({
     remaining: z.number(),
   }).optional(),
   plan: z.string().optional(),
+  rate_limit: z.object({
+    requests_per_minute: z.number(),
+  }).optional(),
 });
 export type BillingUsageValidated = z.infer<typeof BillingUsageSchema>;
 
@@ -511,6 +514,7 @@ export const BillingSubscriptionSchema = z.object({
   paused_at: z.string().nullish(),
   paused_until: z.string().nullish(),
   pause_plan: z.string().nullish(),
+  has_used_startup_trial: z.boolean().optional(),
 });
 export type BillingSubscriptionValidated = z.infer<typeof BillingSubscriptionSchema>;
 
@@ -843,7 +847,7 @@ export const PortalConfigSchema = z.object({
   show_events: z.boolean().optional(),
   show_deliveries: z.boolean().optional(),
   allowed_events: z.array(z.string()).optional(),
-  custom_css: z.string().nullish(),
+  custom_css: z.string().optional(),
 });
 export const PortalEmbedCodeSchema = z.object({
   iframe: z.string().optional(),
