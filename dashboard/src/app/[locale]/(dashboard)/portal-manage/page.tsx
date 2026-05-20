@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { clsx } from 'clsx';
 import { usePortalProfile, usePortalUsage, useBillingUsage } from '@/hooks/useDashboardData';
 import { usePlans } from '@/hooks/usePlans';
-import { AlertTriangle, BarChart3, CheckCircle2, LinkIcon, TrendingUp } from 'lucide-react';
+import { AlertTriangle, BarChart3, CheckCircle2, LinkIcon, TrendingUp, Zap, Globe, Clock, Gauge } from 'lucide-react';
 
 /** Values >= this threshold represent "unlimited" (max int from DB) */
 const UNLIMITED_THRESHOLD = 2147483647;
@@ -45,12 +45,10 @@ export default function PortalPage() {
     return (
       <div className="max-w-4xl space-y-6">
         <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-48 animate-pulse" />
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 animate-pulse">
-          <div className="h-20 bg-gray-200 dark:bg-slate-700 rounded-xl mb-4" />
-          <div className="grid grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => <div key={i} className="h-16 bg-gray-200 dark:bg-slate-700 rounded-xl" />)}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => <div key={i} className="h-28 bg-gray-200 dark:bg-slate-700 rounded-2xl animate-pulse" />)}
         </div>
+        <div className="h-48 bg-gray-200 dark:bg-slate-700 rounded-2xl animate-pulse" />
       </div>
     );
   }
@@ -59,19 +57,26 @@ export default function PortalPage() {
     return (
       <div className="max-w-4xl">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('title')}</h1>
-        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-sm">
-          <p className="mb-2">{error instanceof Error ? error.message : t('failedToLoad')}</p>
-          <button type="button" onClick={() => window.location.reload()}
-            className="text-xs text-red-600 dark:text-red-400 hover:underline font-medium">
-            ↻ {t('retry') || 'Retry'}
-          </button>
+        <div className="p-5 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
+              <AlertTriangle size={18} className="text-red-600 dark:text-red-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-red-800 dark:text-red-300">{error instanceof Error ? error.message : t('failedToLoad')}</p>
+            </div>
+            <button type="button" onClick={() => window.location.reload()}
+              className="px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-500/20 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/30 transition">
+              ↻ {t('retry') || 'Retry'}
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl space-y-8">
+    <div className="max-w-4xl space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
@@ -80,77 +85,85 @@ export default function PortalPage() {
 
       {/* Profile Card */}
       {profile && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
-          <div className="h-16 bg-linear-to-r from-brand-500 via-purple-500 to-pink-500" />
-          <div className="px-6 pb-5 -mt-6">
-            <div className="flex items-end gap-4 mb-5">
-              <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold ring-4 ring-white dark:ring-slate-800 shadow-lg">
-                {(profile.email || 'U')[0].toUpperCase()}
-              </div>
-              <div className="pb-0.5">
-                <div className="text-base font-semibold text-gray-900 dark:text-white">{profile.email}</div>
-                <div className="text-xs text-gray-500 dark:text-slate-400">
-                  {t('memberSince')}: {new Date(profile.created_at).toLocaleDateString(locale)}
-                </div>
-              </div>
-              <div className="ml-auto pb-0.5">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-500/20 capitalize">
-                  {profile.plan}
-                </span>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-5">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold shadow-md">
+              {(profile.email || 'U')[0].toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">{profile.email}</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400 flex items-center gap-2 mt-0.5">
+                <Clock size={12} strokeWidth={1.75} />
+                {t('memberSince')}: {new Date(profile.created_at).toLocaleDateString(locale)}
               </div>
             </div>
+            <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-500/20 capitalize">
+              {profile.plan}
+            </span>
           </div>
         </div>
       )}
 
-      {/* Usage Stats */}
+      {/* Usage Stats — 3 compact cards */}
       {usage && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-base"><BarChart3 size={18} strokeWidth={1.75} /></span>
-            <h2 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('usage')}</h2>
-            <div className="flex-1 h-px bg-gray-200 dark:bg-slate-700 ml-2" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <StatCard
-              label={t('webhooksUsed')}
-              value={usage.total_deliveries?.toLocaleString() || '0'}
-              color="text-purple-500"
-              icon="🪝"
-            />
-            <StatCard
-              label={t('endpoints')}
-              value={`${usage.total_endpoints || 0} (∞)`}
-              color="text-blue-500"
-              icon={<LinkIcon size={16} strokeWidth={1.75} />}
-            />
-            <StatCard
-              label={t('successRate')}
-              value={`${usage.success_rate?.toFixed(1) || 0}%`}
-              color="text-emerald-500"
-              icon={<CheckCircle2 size={16} strokeWidth={1.75} className="text-green-500" />}
-            />
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <UsageCard
+            icon={<Zap size={18} strokeWidth={1.75} />}
+            label={t('webhooksUsed')}
+            value={usage.total_deliveries?.toLocaleString() || '0'}
+            color="purple"
+          />
+          <UsageCard
+            icon={<Globe size={18} strokeWidth={1.75} />}
+            label={t('endpoints')}
+            value={`${usage.total_endpoints || 0}`}
+            badge="∞"
+            color="blue"
+          />
+          <UsageCard
+            icon={<Gauge size={18} strokeWidth={1.75} />}
+            label={t('successRate')}
+            value={`${usage.success_rate?.toFixed(1) || 0}%`}
+            color="emerald"
+          />
         </div>
       )}
 
-      {/* Plan Limits */}
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-base"><TrendingUp size={18} strokeWidth={1.75} /></span>
-          <h2 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tb('usageOverview')}</h2>
-          <div className="flex-1 h-px bg-gray-200 dark:bg-slate-700 ml-2" />
+      {/* Plan Limits & Usage Bar */}
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-5">
+        <div className="flex items-center gap-2 mb-5">
+          <TrendingUp size={16} strokeWidth={1.75} className="text-gray-400 dark:text-slate-500" />
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-slate-300">{tb('usageOverview')}</h2>
         </div>
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 space-y-5">
-          {/* Webhook Usage */}
-          <UsageBar
-            label={tb('webhooksThisMonth')}
-            used={webhookUsed}
-            limit={webhookLimit}
-            percent={webhookPercent}
-            unlimited={webhookUnlimited}
-            warning={webhookPercent > 80}
-          />
+
+        <div className="space-y-5">
+          {/* Webhook Usage Bar */}
+          <div>
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-gray-600 dark:text-slate-400">{tb('webhooksThisMonth')}</span>
+              <span className="font-medium text-gray-900 dark:text-white">
+                {webhookUnlimited ? (
+                  <>{webhookUsed.toLocaleString()} / <span className="text-brand-500">∞ {tb('unlimited') || 'Sınırsız'}</span></>
+                ) : (
+                  <>{webhookUsed.toLocaleString()} / {webhookLimit.toLocaleString()}</>
+                )}
+              </span>
+            </div>
+            <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2">
+              <div
+                className={clsx(
+                  'h-2 rounded-full transition-all duration-500',
+                  webhookPercent > 80 ? 'bg-red-500' : webhookPercent > 50 ? 'bg-amber-500' : 'bg-brand-500'
+                )}
+                style={{ width: webhookUnlimited ? '100%' : `${webhookPercent}%` }}
+              />
+            </div>
+            {webhookPercent > 80 && !webhookUnlimited && (
+              <p className="text-xs text-red-500 dark:text-red-400 mt-1.5 flex items-center gap-1">
+                <AlertTriangle size={12} strokeWidth={1.75} /> {tb('approachingLimit')}
+              </p>
+            )}
+          </div>
 
           {/* Data Retention */}
           <div>
@@ -168,12 +181,12 @@ export default function PortalPage() {
 
           {/* Plan Limits Grid */}
           {planLimits && (
-            <div className="pt-5 border-t border-gray-100 dark:border-slate-700/50">
+            <div className="pt-4 border-t border-gray-100 dark:border-slate-700/50">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <LimitCard value="∞" label={tb('endpoints')} />
-                <LimitCard value={formatLimit(planLimits.webhooks)} label={tb('webhooksMonth')} />
-                <LimitCard value={formatLimit(planLimits.rateLimit)} label={tb('rateLimit')} />
-                <LimitCard value={isUnlimited(planLimits.retention) ? '∞' : `${planLimits.retention}d`} label={tb('dataRetention')} />
+                <LimitChip value="∞" label={tb('endpoints')} />
+                <LimitChip value={formatLimit(planLimits.webhooks)} label={tb('webhooksMonth')} />
+                <LimitChip value={formatLimit(planLimits.rateLimit)} label={tb('rateLimit')} />
+                <LimitChip value={isUnlimited(planLimits.retention) ? '∞' : `${planLimits.retention}d`} label={tb('dataRetention')} />
               </div>
             </div>
           )}
@@ -183,58 +196,43 @@ export default function PortalPage() {
   );
 }
 
-function StatCard({ label, value, color, icon }: { label: string; value: string; color: string; icon: React.ReactNode }) {
+/* ─── Compact Usage Card ─── */
+function UsageCard({ icon, label, value, badge, color }: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  badge?: string;
+  color: 'purple' | 'blue' | 'emerald';
+}) {
+  const colorMap = {
+    purple: 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400',
+    blue: 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400',
+    emerald: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  };
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-5 text-center">
-      <span className="text-lg mb-2 block">{icon}</span>
-      <p className={`text-2xl font-bold ${color}`}>{value}</p>
-      <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{label}</p>
-    </div>
-  );
-}
-
-function UsageBar({ label, used, limit, percent, unlimited, warning }: { label: string; used: number; limit: number; percent: number; unlimited?: boolean; warning?: boolean }) {
-  const tb = useTranslations('billing');
-  return (
-    <div>
-      <div className="flex justify-between text-sm mb-2">
-        <span className="text-gray-600 dark:text-slate-400">{label}</span>
-        <span className="font-medium text-gray-900 dark:text-white">
-          {unlimited ? (
-            <>{used.toLocaleString()} / <span className="text-brand-500">∞ {tb('unlimited') || 'Sınırsız'}</span></>
-          ) : (
-            <>{used.toLocaleString()} / {limit.toLocaleString()}</>
-          )}
-        </span>
+    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-4">
+      <div className="flex items-center gap-3 mb-3">
+        <div className={clsx('w-8 h-8 rounded-lg flex items-center justify-center', colorMap[color])}>
+          {icon}
+        </div>
+        <span className="text-xs text-gray-500 dark:text-slate-400">{label}</span>
       </div>
-      {!unlimited && (
-        <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2">
-          <div
-            className={clsx(
-              'h-2 rounded-full transition-all duration-500',
-              warning ? 'bg-red-500' : percent > 50 ? 'bg-yellow-500' : 'bg-brand-500'
-            )}
-            style={{ width: `${percent}%` }}
-          />
-        </div>
-      )}
-      {unlimited && (
-        <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2">
-          <div className="h-2 rounded-full bg-brand-500" style={{ width: '100%' }} />
-        </div>
-      )}
-      {warning && !unlimited && (
-        <p className="text-xs text-red-500 dark:text-red-400 mt-1.5"><AlertTriangle size={16} strokeWidth={1.75} className="inline mr-1" /> {tb('approachingLimit')}</p>
-      )}
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-2xl font-bold text-gray-900 dark:text-white">{value}</span>
+        {badge && (
+          <span className="text-xs font-medium text-brand-500 dark:text-brand-400">{badge}</span>
+        )}
+      </div>
     </div>
   );
 }
 
-function LimitCard({ value, label }: { value: string; label: string }) {
+/* ─── Compact Limit Chip ─── */
+function LimitChip({ value, label }: { value: string; label: string }) {
   return (
-    <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-slate-900">
-      <p className="text-xl font-bold text-gray-900 dark:text-white">{value}</p>
-      <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{label}</p>
+    <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900">
+      <span className="text-sm font-bold text-gray-900 dark:text-white">{value}</span>
+      <span className="text-xs text-gray-500 dark:text-slate-400 truncate">{label}</span>
     </div>
   );
 }
