@@ -59,6 +59,7 @@ pub struct ConnectorConfig {
     pub connector_id: Uuid,
     pub name: String,
     pub config: serde_json::Value,
+    #[serde(skip_serializing)]
     pub credentials: serde_json::Value,
     pub is_active: bool,
     pub last_sync_at: Option<DateTime<Utc>>,
