@@ -154,6 +154,42 @@ pub async fn update_coupon(
 ) -> Result<Json<CouponCode>, AppError> {
     require_admin(&customer)?;
 
+    // Validate type if provided
+    if let Some(ref coupon_type) = req.coupon_type {
+        if coupon_type != "polar" && coupon_type != "internal" {
+            return Err(AppError::BadRequest("Type must be 'polar' or 'internal'".into()));
+        }
+    }
+
+    // Validate discount_type if provided
+    if let Some(ref discount_type) = req.discount_type {
+        if discount_type != "percentage" && discount_type != "free_month" {
+            return Err(AppError::BadRequest("Discount type must be 'percentage' or 'free_month'".into()));
+        }
+    }
+
+    // Validate discount_value if provided
+    if let Some(discount_value) = req.discount_value {
+        if discount_value < 0 || discount_value > 100 {
+            return Err(AppError::BadRequest("Discount value must be between 0 and 100".into()));
+        }
+    }
+
+    // Check code uniqueness if code is being changed
+    if let Some(ref code) = req.code {
+        let existing = sqlx::query_scalar::<_, i64>(
+            "SELECT COUNT(*) FROM coupon_codes WHERE UPPER(code) = UPPER($1) AND id != $2"
+        )
+        .bind(code)
+        .bind(id)
+        .fetch_one(&pool)
+        .await?;
+
+        if existing > 0 {
+            return Err(AppError::BadRequest("Coupon code already exists".into()));
+        }
+    }
+
     let expires_at = req.expires_at.as_deref().map(|s| {
         chrono::DateTime::parse_from_rfc3339(s)
             .map(|dt| dt.with_timezone(&Utc))
@@ -164,13 +200,23 @@ pub async fn update_coupon(
 
     let coupon = sqlx::query_as::<_, CouponCode>(
         "UPDATE coupon_codes SET \
-         is_active = COALESCE($2, is_active), \
-         max_redemptions = COALESCE($3, max_redemptions), \
-         expires_at = COALESCE($4, expires_at), \
+         code = COALESCE($2, code), \
+         type = COALESCE($3, type), \
+         discount_type = COALESCE($4, discount_type), \
+         discount_value = COALESCE($5, discount_value), \
+         target_plan = COALESCE($6, target_plan), \
+         is_active = COALESCE($7, is_active), \
+         max_redemptions = COALESCE($8, max_redemptions), \
+         expires_at = COALESCE($9, expires_at), \
          updated_at = NOW() \
          WHERE id = $1 RETURNING *"
     )
     .bind(id)
+    .bind(req.code.map(|c| c.to_uppercase()))
+    .bind(req.coupon_type)
+    .bind(req.discount_type)
+    .bind(req.discount_value)
+    .bind(req.target_plan)
     .bind(req.is_active)
     .bind(req.max_redemptions)
     .bind(expires_at)
