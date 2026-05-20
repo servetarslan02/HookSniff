@@ -40,6 +40,7 @@ export default async function SmartRoutingPage() {
       {/* Routing Strategies */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('routingStrategies')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('routingDesc')}</p>
         <div className="space-y-4 not-prose">
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🔄 {t('roundRobinTitle')}</h3>
@@ -50,15 +51,6 @@ export default async function SmartRoutingPage() {
             <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🛡️ {t('failoverTitle')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('failoverDesc')}</p>
             <code className="text-xs text-gray-500 dark:text-slate-500">{t('failoverExample')}</code>
-          </div>
-          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">⚖️ {t('weightedTitle')}</h3>
-            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('weightedDesc')}</p>
-            <code className="text-xs text-gray-500 dark:text-slate-500">{t('weightedExample')}</code>
-          </div>
-          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🎲 {t('randomTitle')}</h3>
-            <p className="text-sm text-gray-600 dark:text-slate-400">{t('randomDesc')}</p>
           </div>
         </div>
       </section>

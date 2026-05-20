@@ -32,7 +32,7 @@
 | Simulator | `routes/simulator.rs` | ✅ |
 | Embeddable Portal | `routes/embed.rs` | ✅ |
 | Endpoint Health Monitoring | `routes/health_endpoints.rs` | ✅ |
-| Smart Routing (round-robin, latency, failover) | `routes/routing.rs` | ✅ |
+| Smart Routing (round-robin, failover) | `routes/routing.rs` | ✅ |
 | Schema Registry + Validation | `routes/schemas.rs` | ✅ |
 | Templates | `routes/templates.rs` | ✅ |
 | Transforms | `routes/transforms.rs` | ✅ |
