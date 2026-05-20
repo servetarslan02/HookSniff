@@ -10,7 +10,7 @@ import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRealtime } from '@/hooks/useRealtime';
 import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, FolderOpen, Lock, Shield } from '@/components/icons';
-import { NotificationCenter } from '@/components/NotificationCenter';
+import { AdminNotificationCenter } from '@/components/AdminNotificationCenter';
 
 const adminNavigation = [
   { nameKey: 'overview', href: '/admin', icon: <BarChart3 size={16} strokeWidth={1.75} /> },
@@ -177,8 +177,8 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <LanguageSwitcher />
-            {/* Notification Bell */}
-            <NotificationCenter />
+            {/* Admin Notification Bell */}
+            <AdminNotificationCenter />
             {/* Profile Dropdown */}
             <div className="relative group">
               <button type="button" className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition">
