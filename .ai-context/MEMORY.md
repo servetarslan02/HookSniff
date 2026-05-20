@@ -256,6 +256,30 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
+## 📝 Son Oturum (2026-05-21 02:03 — Feature Flags İnceleme + 7 Fix)
+
+### Özet
+Servet ile oturum. Feature Flags sayfası detaylı incelendi. 7 sorun tespit edildi, hepsi düzeltildi. 3 dosya değişti.
+
+### Tespit Edilen ve Düzeltilen Sorunlar:
+1. **Delete butonu disable edilmiyordu** — `deleteMutation.isPending` kontrolü eklendi
+2. **Create modal kapatılınca form sıfırlanmıyordu** — Overlay click + cancel butonunda form reset eklendi
+3. **Edit modal kapatılınca form sıfırlanmıyordu** — Aynı düzeltme edit modalına da uygulandı
+4. **Toggle switch loading göstergesi yoktu** — `togglingId` state eklendi, pulse animasyonu
+5. **Boş durum ikonu çok küçüktü** — `size={18}` → `size={48}`
+6. **Plan seçilmediğinde bilgi eksikti** — "No plans selected = all plans" hint eklendi
+7. **İsim alanına özel karakter girilebiliyordu** — Regex filtre + maxLength=100
+
+### Değişen Dosyalar:
+- `dashboard/src/app/[locale]/admin/feature-flags/page.tsx`
+- `dashboard/src/messages/en.json`
+- `dashboard/src/messages/tr.json`
+
+### Push: `2af289b0`
+### TypeScript: ✅ 0 hata
+
+---
+
 ## 📝 Son Oturum (2026-05-21 01:57 — Dashboard Overview İnceleme + 7 Fix)
 
 ### Özet
