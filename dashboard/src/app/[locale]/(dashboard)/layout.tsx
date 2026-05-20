@@ -14,9 +14,8 @@ import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { BroadcastBanner } from '@/components/BroadcastBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
-import { useQueryClient } from '@tanstack/react-query';
-import { API_BASE, apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
-import { LayoutDashboard, Smartphone, Link2, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield, BookOpen, ExternalLink, LogOut } from '@/components/icons';
+import { apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
+import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield, BookOpen, ExternalLink, LogOut } from '@/components/icons';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -29,7 +28,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const tc = useTranslations('common');
   const locale = useLocale();
   const { connectionState } = useRealtime();
-  const queryClient = useQueryClient();
 
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
