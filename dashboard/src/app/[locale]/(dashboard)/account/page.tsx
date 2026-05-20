@@ -26,6 +26,7 @@ export default function AccountPage() {
 
   return (
     <TabbedSection
+      urlParam="section"
       tabs={[
         { key: 'settings', label: t('settings'), icon: <Settings size={16} strokeWidth={1.75} />, content: () => <SettingsPage /> },
         { key: 'notifications', label: t('notifications'), icon: <Bell size={16} strokeWidth={1.75} />, content: () => <NotificationsPage /> },
