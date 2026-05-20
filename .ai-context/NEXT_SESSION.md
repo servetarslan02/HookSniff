@@ -1,20 +1,23 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-21 03:50 GMT+8
+> Son güncelleme: 2026-05-21 06:20 GMT+8
+
+## ✅ Bu Oturumda Yapılan İşler
+
+### 1. Rakip Analizi (Hook0 + Svix)
+- Hook0 dokümantasyonu incelendi (architecture, features, comparisons, best practices)
+- Svix dokümantasyonu incelendi
+- Karşılaştırma raporu: `.ai-context/2026-05-21-competitive-deep-dive.md`
+- **Sonuç:** HookSniff birçok alanda rakiplerden önde (11 SDK, multi-destination, inbound proxy, smart routing, FIFO, embeddable portal, $0/ay hosting)
+
+### 2. Kullanıcı Paneli Dökümantasyonu
+- 41+ dashboard sayfası tek tek incelendi
+- Kapsamlı dökümantasyon: `.ai-context/2026-05-21-user-panel-docs.md`
+- Her sayfa için: özellikler, bileşenler, teknik detaylar
 
 ## 🔴 KRİTİK: Deploy Gerekli
 
-4 fix seti push edildi ama Cloud Run eski kodu çalışıyor:
-
-### Bu Oturum Fix'leri (commit fb230584)
-1. **Settings i18n** — 13 key eklendi (en.json + tr.json)
-2. **CouponCode sqlx rename** — `#[sqlx(rename = "type")]` eklendi
-3. **Plan features** — Hardcoded endpoint counts kaldırıldı
-
-### Önceki Fix'ler (henüz deploy edilmedi)
-- Admin Performance (commit 9795ed74)
-- SSO Fix'ler (commit d18c5301)
-- Worker Performans Fix'leri (commit e3c46903)
+Birçok fix push edildi ama Cloud Run eski kodu çalışıyor:
 
 ### Deploy Komutları
 ```bash
@@ -32,6 +35,18 @@ gcloud builds submit --config cloudbuild.yaml
 4. Security Events → GET /v1/admin/security/events
 5. Feature Flag Toggle → PUT /v1/admin/feature-flags/:id
 6. System Health → GET /health
+
+## 📋 Önerilen Sonraki Adımlar
+
+### Kısa Vadeli
+1. **Deploy** — Cloud Build tetikle
+2. **Application Modeli** — Multi-tenant için Organization → Application hiyerarşisi
+3. **Public Webhook Tester** — play.hooksniff.com (signup gerektirmez)
+
+### Orta Vadeli
+4. **Two-Phase Retry** — Hızlı + yavaş faz
+5. **Documentation Overhaul** — Diataxis metodu
+6. **Status Page** — Public uptime monitoring
 
 ## Hâlâ Açık Olan Sorunlar
 - CSP violation (Cloudflare analytics)
