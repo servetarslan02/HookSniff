@@ -2183,7 +2183,9 @@
     "broadcastSent": "Yayın gönderildi",
     "broadcastFailed": "Yayın gönderilemedi",
     "noBroadcasts": "Yayın yok",
-    "bulkEmailSent": "Toplu e-posta gönderildi"
+    "bulkEmailSent": "Toplu e-posta gönderildi",
+    "generateCode": "Rastgele kod üret",
+    "generate": "Üret"
   },
   "landing": {
     "nav": {

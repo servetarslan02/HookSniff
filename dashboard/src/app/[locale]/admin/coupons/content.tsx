@@ -6,7 +6,7 @@ import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useTranslations } from 'next-intl';
-import { Plus, Trash2, RefreshCw, Check, X, ClipboardList, Search, Pencil, Clock } from '@/components/icons';
+import { Plus, Trash2, RefreshCw, Check, X, ClipboardList, Search, Pencil, Clock, Shuffle } from '@/components/icons';
 
 interface Coupon {
   id: string;
@@ -198,6 +198,16 @@ export default function CouponsContent() {
     toast(t('codeCopied') || 'Kod kopyalandı', 'success');
   };
 
+  // ── Generate Random Code ──
+  const generateCode = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setForm({ ...form, code });
+  };
+
   // ── Filter ──
   const filteredCoupons = coupons.filter((c) => {
     if (search && !c.code.toLowerCase().includes(search.toLowerCase())) return false;
@@ -270,7 +280,12 @@ export default function CouponsContent() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">{t('couponCode') || 'Kupon Kodu'}</label>
-              <input type="text" value={form.code} onChange={e => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="INDIRIM50" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm font-mono" />
+              <div className="flex gap-2">
+                <input type="text" value={form.code} onChange={e => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="INDIRIM50" className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm font-mono" />
+                <button type="button" onClick={generateCode} className="px-3 py-2 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition flex items-center gap-1" title={t('generateCode') || 'Rastgele kod üret'}>
+                  <Shuffle size={14} /> {t('generate') || 'Üret'}
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">{t('couponType') || 'Tip'}</label>
