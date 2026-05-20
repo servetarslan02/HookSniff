@@ -71,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Endpoints**: CRUD, secret rotation (`POST /v1/endpoints/{id}/rotate-secret`), retry policy configuration
 - **Webhooks**: Send, list, get, replay, batch send (`POST /v1/webhooks/batch`), batch replay, CSV/JSON export
 - **Standard Webhooks**: HMAC-SHA256 signatures, `whsec_` prefixed secrets, ±5 min replay protection, dual headers (Standard + Svix)
-- **Smart Routing**: Round-robin, latency-based, failover strategies with fallback URLs
+- **Smart Routing**: Round-robin, failover, weighted, random strategies with fallback URLs
 - **FIFO Delivery**: Ordered delivery with sequence numbers, max-wait protection
 - **Per-Endpoint Throttling**: Token bucket / sliding window per endpoint
 - **Retry Policy**: Exponential backoff with jitter, per-endpoint customization
