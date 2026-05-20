@@ -236,7 +236,12 @@ export default function IntegrationsContent() {
                 <select value={formEndpoint} onChange={e => setFormEndpoint(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm">
                   <option value="">{t('selectEndpoint')}</option>
-                  {endpoints.map((ep: { id: string; url: string }) => <option key={ep.id} value={ep.id}>{ep.url}</option>)}
+                  {endpoints
+                    .filter((ep: { url: string }) => ep.url.startsWith('http') && !ep.url.includes('#'))
+                    .map((ep: { id: string; url: string; description?: string }) => {
+                    const label = ep.description ? `${ep.description} (${ep.url})` : ep.url;
+                    return <option key={ep.id} value={ep.id}>{label}</option>;
+                  })}
                 </select>
               </div>
               <div>
