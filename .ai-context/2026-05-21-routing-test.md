@@ -14,14 +14,16 @@
 | Fallback URL tanımlı | ✅ |
 | Routing API çalışıyor | ✅ |
 
-### 2. Retry Policy — ⚠️ Worker Çalışmıyor
+### 2. Retry Policy — ✅ Çalışıyor (Düzeltildi)
 | Test | Sonuç |
 |------|-------|
 | Retry policy endpoint'te tanımlı | ✅ |
 | Delivery oluşturuldu | ✅ |
-| **Worker retry yapmıyor** | ❌ **KRİTİK** |
-| Queue: 1 pending, 0 processing | ❌ |
-| Delivery 15+ saniye pending kaldı | ❌ |
+| Worker retry yapıyor | ✅ |
+| Queue processing çalışıyor | ✅ |
+| Delivery ~5 saniyede teslim | ✅ |
+
+**Not:** İlk testte API health cache eski veri gösterdi. Database'den doğrulandı — worker tüm delivery'leri teslim etmiş.
 
 ### 3. Custom Domain — ✅ Çalışıyor
 | Test | Sonuç |
@@ -46,23 +48,14 @@
 
 ---
 
-## 🔴 KRİTİK SORUN: Worker Çalışmıyor
+## ✅ SONUÇ: Worker Çalışıyor
 
-**Belirtiler:**
-- Queue'da 1 pending item var
-- 0 processing
-- Delivery'ler 15+ saniye pending kalıyor
-- Yeni delivery'ler de işlenmiyor
+**İlk testte API health endpoint'i eski/cache veri döndürdü.** Database'den doğrulandı:
+- `webhook_queue` tablosunda tüm entry'ler `delivered`
+- `deliveries` tablosunda tüm pending'ler işlenmiş
+- Yeni gönderilen webhook 5 saniyede teslim edildi (HTTP 200)
 
-**Olası Nedenler:**
-1. Worker Cloud Run instance'ı crash olmuş olabilir
-2. Worker'ın DB connection'ı kesilmiş olabilir
-3. Worker queue polling'i durmuş olabilir
-
-**Çözüm:** Worker'ı yeniden deploy etmek gerekiyor:
-```bash
-gcloud run deploy hooksniff-worker --source . --region europe-west1
-```
+**Sorun:** API `/health` endpoint'i queue durumunu anlık göstermiyor, cache'li veri döndürüyor.
 
 ---
 
@@ -70,7 +63,6 @@ gcloud run deploy hooksniff-worker --source . --region europe-west1
 
 | # | Aksiyon | Öncelik |
 |---|---------|---------|
-| 1 | **Worker'ı yeniden deploy et** | 🔴 KRİTİK |
-| 2 | Custom domain DNS doğrulama | 🟡 Orta |
-| 3 | Per-endpoint throttle ayarla | 🟡 Düşük |
-| 4 | Cloud Build deploy (tüm fix'ler) | 🔴 Yüksek |
+| 1 | Custom domain DNS doğrulama | 🟡 Orta |
+| 2 | Per-endpoint throttle ayarla | 🟡 Düşük |
+| 3 | Cloud Build deploy (tüm fix'ler) | 🔴 Yüksek |
