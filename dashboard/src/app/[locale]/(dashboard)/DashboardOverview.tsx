@@ -29,14 +29,15 @@ export function DashboardOverview() {
   const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | '90d'>('7d');
 
   // React Query — replaces loadData + useState + useEffect
-  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useDashboardStats();
-  const { data: trendData } = useDeliveryTrend(timeRange);
-  const { data: deliveriesData } = useWebhooks({ page: 1 });
-  const { data: endpoints } = useEndpoints();
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats, error: statsError } = useDashboardStats();
+  const { data: trendData, refetch: refetchTrend, error: trendError, isFetching: trendFetching } = useDeliveryTrend(timeRange);
+  const { data: deliveriesData, refetch: refetchDeliveries, error: deliveriesError } = useWebhooks({ page: 1 });
+  const { data: endpoints, refetch: refetchEndpoints, error: endpointsError } = useEndpoints();
 
   const recentDeliveries = deliveriesData?.deliveries?.slice(0, 5) ?? [];
   const endpointCount = endpoints?.length ?? 0;
   const loading = statsLoading;
+  const hasError = statsError || trendError || deliveriesError || endpointsError;
 
   // Widget management
   const handleDragStart = useCallback((id: string) => (e: DragEvent) => {
@@ -95,12 +96,37 @@ export function DashboardOverview() {
 
   const statusColors: Record<string, string> = {
     delivered: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-    pending: 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-emerald-400',
+    pending: 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400',
     failed: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400',
   };
 
   return (
     <div className="space-y-6">
+      {/* Error Banner */}
+      {hasError && (
+        <div className="glass-card p-4 border-l-4 border-red-500 bg-red-50 dark:bg-red-500/10">
+          <div className="flex items-center gap-3">
+            <svg className="w-5 h-5 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <p className="text-sm font-medium text-red-800 dark:text-red-300">
+                {tc('error') || 'Some data could not be loaded'}
+              </p>
+              <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">
+                {tc('tryAgain') || 'Try refreshing the page or check your connection.'}
+              </p>
+            </div>
+            <button
+              onClick={() => { refetchStats(); refetchTrend(); refetchDeliveries(); refetchEndpoints(); }}
+              className="ml-auto px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-500/20 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/30 transition"
+            >
+              {tc('retry') || 'Retry'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -122,7 +148,7 @@ export function DashboardOverview() {
             <Settings size={16} strokeWidth={1.75} />
           </button>
           <button
-            onClick={() => refetchStats()}
+            onClick={() => { refetchStats(); refetchTrend(); refetchDeliveries(); refetchEndpoints(); }}
             className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition"
           >
             <RefreshCw size={14} strokeWidth={1.75} className="inline mr-1" />
@@ -240,7 +266,12 @@ export function DashboardOverview() {
             timeRange={timeRange}
             onTimeRangeChange={setTimeRange}
           >
-            <div className="h-56">
+            <div className="h-56 relative">
+              {trendFetching && !loading && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 dark:bg-slate-900/60 rounded-lg">
+                  <div className="animate-pulse text-sm text-gray-500 dark:text-slate-400">{tc('loading')}</div>
+                </div>
+              )}
               {loading ? (
                 <div className="h-full flex items-center justify-center">
                   <div className="animate-pulse text-gray-500 dark:text-slate-500">{tc('loading')}</div>

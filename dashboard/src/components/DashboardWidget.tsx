@@ -74,11 +74,22 @@ export function loadWidgetConfig(): WidgetConfig[] {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved) as WidgetConfig[];
-      // Merge with defaults to handle new widgets
-      const merged = DEFAULT_WIDGETS.map((def) => {
-        const found = parsed.find((p) => p.id === def.id);
-        return found || def;
-      });
+      // Merge with defaults: preserve saved order + visibility, add any new widgets at end
+      const savedIds = parsed.map((p) => p.id);
+      const defaultIds = DEFAULT_WIDGETS.map((d) => d.id);
+      // Keep saved items in their saved order
+      const merged = parsed
+        .filter((p) => defaultIds.includes(p.id))
+        .map((p) => {
+          const def = DEFAULT_WIDGETS.find((d) => d.id === p.id);
+          return { id: p.id, visible: p.visible ?? def?.visible ?? true };
+        });
+      // Append any new default widgets not in saved config
+      for (const def of DEFAULT_WIDGETS) {
+        if (!savedIds.includes(def.id)) {
+          merged.push(def);
+        }
+      }
       return merged;
     }
   } catch {
