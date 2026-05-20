@@ -103,7 +103,7 @@ pub fn generate_admin_token(
     generate_token_with_duration(customer_id, email, plan, secret, Duration::hours(24), true)
 }
 
-/// Generate a short-lived JWT (15 min) — used with refresh token flow.
+/// Generate a JWT (1 hour) — used with refresh token flow.
 pub fn generate_access_token(
     customer_id: Uuid,
     email: &str,
@@ -111,7 +111,7 @@ pub fn generate_access_token(
     secret: &str,
     is_admin: bool,
 ) -> Result<String, AppError> {
-    generate_token_with_duration(customer_id, email, plan, secret, Duration::minutes(15), is_admin)
+    generate_token_with_duration(customer_id, email, plan, secret, Duration::hours(1), is_admin)
 }
 
 pub fn generate_token_with_duration(
@@ -367,9 +367,9 @@ mod tests {
         let before = Utc::now().timestamp() as usize;
         let token = generate_access_token(Uuid::new_v4(), "a@b.com", "developer", secret, false).unwrap();
         let claims = verify_token(&token, secret).unwrap();
-        // 15 min = 900s, allow 5s tolerance
-        assert!(claims.exp >= before + 895);
-        assert!(claims.exp <= before + 905);
+        // 1 hour = 3600s, allow 5s tolerance
+        assert!(claims.exp >= before + 3595);
+        assert!(claims.exp <= before + 3605);
     }
 
     // ── generate_token_with_duration ──────────────────────────
