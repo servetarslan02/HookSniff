@@ -99,7 +99,7 @@ export default function AdminUsersPage() {
         status: statusFilter || undefined,
         created_after: dateParams || undefined,
       });
-      const res = await fetch(`${API_BASE}${url}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_BASE}${url}`, { headers: { Authorization: `Bearer ${token}`, 'Origin': window.location.origin } });
       if (!res.ok) throw new Error(t('exportFailed'));
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
@@ -117,9 +117,11 @@ export default function AdminUsersPage() {
     if (!token) return;
     try {
       const result = await adminApi.impersonateUser(token, user.id);
+      // Store token in sessionStorage (not URL) to prevent log/history leakage
+      sessionStorage.setItem('impersonate_token', result.token);
       const newWindow = window.open('about:blank', '_blank');
       if (newWindow) {
-        newWindow.location.href = `/${locale}/dashboard?impersonate_token=${result.token}`;
+        newWindow.location.href = `/${locale}/dashboard?impersonate=1`;
       }
       toast(t('impersonating') + `: ${user.email}`, 'success');
     } catch {

@@ -33,12 +33,10 @@ export default function AuthCallbackPage() {
   const refresh = params.get('refresh');
 
   if (token) {
-   // Set cookies on Vercel domain
-   const cookieOpts = 'Path=/; HttpOnly; Secure; SameSite=Lax';
-   document.cookie = `hooksniff_token=${token}; ${cookieOpts}; Max-Age=${24 * 60 * 60}`;
-   if (refresh) {
-    document.cookie = `hooksniff_refresh=${refresh}; ${cookieOpts}; Max-Age=${30 * 24 * 60 * 60}`;
-   }
+   // NOTE: The backend already set HttpOnly auth cookies before redirecting.
+   // We only store the token in localStorage for the frontend API client.
+   // Do NOT set cookies via document.cookie — it cannot set HttpOnly flag.
+   localStorage.setItem('hooksniff_token', token);
    // Clean URL and redirect
    window.history.replaceState({}, '', '/auth/callback');
    router.replace('/core');
