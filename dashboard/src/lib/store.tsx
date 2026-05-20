@@ -67,11 +67,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-    // Verify session by calling /auth/me
+    // Verify session by calling Next.js API route (same domain, cookies included)
     const savedToken = localStorage.getItem('hooksniff_token');
     if (savedToken) {
-      fetch(`${API_BASE}/auth/me`, {
-        headers: { 'Authorization': `Bearer ${savedToken}` },
+      fetch('/api/auth/me', {
+        credentials: 'include',
       })
         .then((res) => {
           if (res.ok) return res.json();
@@ -94,6 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setAuthCookie(savedToken);
         })
         .catch(() => {
+          // Don't clear auth on network errors — only on definitive auth failures.
+          // The middleware will handle redirects if the cookie is truly invalid.
           setUser(null);
           setToken(null);
           setApiKeyState(null);
@@ -122,7 +124,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await fetch(`${API_BASE}/auth/login`, {
+    // Use the Next.js API route — it sets HttpOnly cookies on the same domain
+    // via Set-Cookie headers, which persist across navigations.
+    const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -152,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [persistAuth]);
 
   const register = useCallback(async (email: string, password: string, name?: string) => {
-    const res = await fetch(`${API_BASE}/auth/register`, {
+    const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, name }),

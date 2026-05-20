@@ -4,8 +4,8 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-10461
 
 export async function GET(request: NextRequest) {
   try {
-    const cookie = request.headers.get('cookie') || '';
-    const token = cookie.split(';').find(c => c.trim().startsWith('hooksniff_token='))?.trim().split('=')[1];
+    // Read token from HttpOnly cookie set by /api/auth/login
+    const token = request.cookies.get('hooksniff_token')?.value;
 
     if (!token) {
       return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'No token' } }, { status: 401 });
