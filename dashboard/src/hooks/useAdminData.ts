@@ -255,12 +255,12 @@ export function useAdminRevenueMetrics() {
 }
 
 // ── Admin Revenue Cohorts ──
-export function useAdminRevenueCohorts(months = 12) {
+export function useAdminRevenueCohorts(months?: number) {
   const { token } = useAuth();
   return useQuery({
-    queryKey: ['admin', 'revenue-cohorts', months],
-    queryFn: validated(() => adminApi.getRevenueCohorts(token!, months), RevenueCohortsResponseSchema),
-    enabled: !!token,
+    queryKey: ['admin', 'revenue-cohorts', months ?? 12],
+    queryFn: validated(() => adminApi.getRevenueCohorts(token!, months ?? 12), RevenueCohortsResponseSchema),
+    enabled: !!token && months !== undefined,
     staleTime: 60_000,
   });
 }
@@ -271,13 +271,13 @@ export function useAdminRefunds(params?: { per_page?: number }) {
   return useQuery({
     queryKey: ['admin', 'refunds', params],
     queryFn: validated(() => adminApi.getAllRefunds(token!, params), RefundsResponseSchema),
-    enabled: !!token,
+    enabled: !!token && !!params,
     staleTime: 30_000,
   });
 }
 
 // ── Admin Churn Users ──
-export function useAdminChurn() {
+export function useAdminChurn(enabled = true) {
   const { token } = useAuth();
   return useQuery({
     queryKey: ['admin', 'churn'],
@@ -285,7 +285,7 @@ export function useAdminChurn() {
       const data = await adminApi.getChurn(token!);
       return data?.users ?? [];
     },
-    enabled: !!token,
+    enabled: !!token && enabled,
     staleTime: 60_000,
   });
 }
