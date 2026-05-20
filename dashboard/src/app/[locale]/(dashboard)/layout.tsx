@@ -47,9 +47,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           { queryKey: ['analytics', 'delivery-trend', '7d'], queryFn: () => analyticsApi.deliveryTrend(token, '7d'), staleTime: 30_000 },
           { queryKey: ['endpoints'], queryFn: () => apiFetch('/endpoints', { token }), staleTime: 30_000 },
         ];
-      case '/deliveries':
+      case '/observability':
         return [
+          ...base,
           { queryKey: ['delivery-logs', { page: 1 }], queryFn: () => webhooksApi.list(token, { page: 1 }), staleTime: 15_000 },
+          { queryKey: ['analytics', 'success-rate', '24h'], queryFn: () => analyticsApi.successRate(token, '24h'), staleTime: 30_000 },
         ];
       case '/applications':
         return [
@@ -59,10 +61,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         return [
           { queryKey: ['portal-profile'], queryFn: () => apiFetch('/portal/me', { token }), staleTime: 30_000 },
           { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
-        ];
-      case '/observability':
-        return [
-          { queryKey: ['analytics', 'success-rate', '24h'], queryFn: () => analyticsApi.successRate(token, '24h'), staleTime: 30_000 },
         ];
       case '/billing-section':
         return [
@@ -92,7 +90,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const navItems = [
     { name: t('core'), href: '/core', icon: <LayoutDashboard size={16} strokeWidth={1.75} /> },
     { name: t('applications'), href: '/applications', icon: <Smartphone size={16} strokeWidth={1.75} /> },
-    { name: t('deliveries'), href: '/deliveries', icon: <Link2 size={16} strokeWidth={1.75} /> },
     { name: t('webhookDashboard'), href: '/operational-webhooks', icon: <Layers size={16} strokeWidth={1.75} /> },
     { name: t('integrations'), href: '/integrations', icon: <Zap size={16} strokeWidth={1.75} /> },
     { name: t('observability'), href: '/observability', icon: <Eye size={16} strokeWidth={1.75} /> },
