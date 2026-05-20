@@ -2,9 +2,9 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { clsx } from 'clsx';
-import { usePortalProfile, usePortalUsage, useBillingUsage } from '@/hooks/useDashboardData';
+import { usePortalProfile, useBillingUsage } from '@/hooks/useDashboardData';
 import { usePlans } from '@/hooks/usePlans';
-import { AlertTriangle, BarChart3, CheckCircle2, LinkIcon, TrendingUp, Zap, Globe, Clock, Gauge } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Zap, Globe, Clock, Gauge } from 'lucide-react';
 
 /** Values >= this threshold represent "unlimited" (max int from DB) */
 const UNLIMITED_THRESHOLD = 2147483647;
@@ -23,21 +23,17 @@ export default function PortalPage() {
   const tb = useTranslations('billing');
   const locale = useLocale();
   const { data: profile, isLoading: profileLoading, error: profileError } = usePortalProfile();
-  const { data: usage, isLoading: usageLoading } = usePortalUsage();
   const { data: billingUsage, isLoading: billingLoading } = useBillingUsage();
   const { getPlanLimits } = usePlans();
 
-  const loading = profileLoading || usageLoading || billingLoading;
+  const loading = profileLoading || billingLoading;
   const error = profileError;
-  const currentPlan = profile?.plan || 'developer';
+  const currentPlan = profile?.plan || billingUsage?.plan || 'developer';
   const planLimits = getPlanLimits(currentPlan);
 
-  const webhookUsed = billingUsage
-    ? billingUsage.webhooks?.used ?? billingUsage.deliveries_used ?? 0
-    : 0;
-  const webhookLimit = billingUsage
-    ? billingUsage.webhooks?.limit ?? billingUsage.deliveries_limit ?? 10000
-    : 10000;
+  const webhookUsed = billingUsage?.webhooks?.used ?? 0;
+  const webhookLimit = billingUsage?.webhooks?.limit ?? 10000;
+  const endpointUsed = billingUsage?.endpoints?.used ?? 0;
   const webhookUnlimited = isUnlimited(webhookLimit);
   const webhookPercent = webhookUnlimited ? 0 : webhookLimit > 0 ? Math.round((webhookUsed / webhookLimit) * 100) : 0;
 
@@ -104,26 +100,26 @@ export default function PortalPage() {
         </div>
       )}
 
-      {/* Usage Stats — 3 compact cards */}
-      {usage && (
+      {/* Usage Stats — 3 compact cards (all from billingUsage) */}
+      {billingUsage && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <UsageCard
             icon={<Zap size={18} strokeWidth={1.75} />}
             label={t('webhooksUsed')}
-            value={usage.total_deliveries?.toLocaleString() || '0'}
+            value={webhookUsed.toLocaleString()}
             color="purple"
           />
           <UsageCard
             icon={<Globe size={18} strokeWidth={1.75} />}
             label={t('endpoints')}
-            value={`${usage.total_endpoints || 0}`}
+            value={`${endpointUsed}`}
             badge="∞"
             color="blue"
           />
           <UsageCard
             icon={<Gauge size={18} strokeWidth={1.75} />}
             label={t('successRate')}
-            value={`${usage.success_rate?.toFixed(1) || 0}%`}
+            value={billingUsage?.rate_limit ? `${billingUsage.rate_limit.requests_per_minute}/min` : '—'}
             color="emerald"
           />
         </div>
