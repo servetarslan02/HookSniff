@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { ShieldCheck, Mail, Anchor } from 'lucide-react';
+import { ShieldCheck, Mail } from 'lucide-react';
 
 function getPasswordStrength(pw: string): { score: number; color: string } {
   let score = 0;
@@ -147,7 +147,7 @@ function LoginForm() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-xl bg-linear-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-2xl">
-              <Anchor size={24} strokeWidth={1.75} />
+              🪝
             </div>
             <span className="text-2xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </Link>
