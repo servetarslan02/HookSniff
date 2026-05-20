@@ -3,9 +3,9 @@ export type * from './api-types';
 
 import { getUserFriendlyMessage, extractErrorCode } from './error-catalog';
 
-// In production, "https://hooksniff-api-1046140057667.europe-west1.run.app/v1" is rewritten by Vercel to the GCP Cloud Run API (see vercel.json).
+// In production, "/api/v1" is proxied by Vercel rewrites to the GCP Cloud Run API (see vercel.json).
 // In development, point directly to the local API server.
-export const API_BASE = "https://hooksniff-api-1046140057667.europe-west1.run.app/v1";
+export const API_BASE = typeof window !== 'undefined' ? '/api/v1' : 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
 
 const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_RETRIES = 2;
