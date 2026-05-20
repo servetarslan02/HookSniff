@@ -134,10 +134,10 @@ export default function AdminOverviewPage() {
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Header — always visible */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 max-w-3xl">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('overviewDesc')}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('overviewDesc')}</p>
         </div>
         <div className="flex items-center gap-3">
           <button type="button" onClick={handleRefreshAll} disabled={refreshing}
