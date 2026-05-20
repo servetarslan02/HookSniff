@@ -65,8 +65,8 @@ export function PlanCards({
 
   return (
     <div>
-      {/* Centered: billing toggle + coupon code */}
-      <div className="flex flex-col items-center gap-3 mb-6">
+      {/* Billing toggle (left) + Coupon code (right) — same row */}
+      <div className="flex items-center justify-between mb-6">
         {/* Billing period toggle */}
         <div className="flex items-center gap-1 bg-gray-100 dark:bg-slate-800 rounded-xl p-1">
           <button
@@ -97,7 +97,7 @@ export function PlanCards({
             </span>
           </button>
         </div>
-        {/* Coupon code input */}
+        {/* Coupon code input — right aligned */}
         {onDiscountCodeChange && (
           <div className="flex items-center gap-2">
             <label className="text-xs font-medium text-gray-500 dark:text-slate-400 whitespace-nowrap">{t('couponCode')}</label>
