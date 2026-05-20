@@ -485,7 +485,7 @@ curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/MSG_ID
       {href: '/docs/sdk-libraries', title: '<BookOpen size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Full SDK Reference', desc: 'All 30+ API resources for each language.'},
       {href: '/docs/security', title: '<Lock size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Security Best Practices', desc: 'SSRF protection, TLS, 2FA, key rotation.'},
       {href: '/docs/retries', title: '<RefreshCw size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Retries & DLQ', desc: 'Configure retry policies and replay failed webhooks.'},
-      {href: '/docs/smart-routing', title: '<Shuffle size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Smart Routing', desc: 'Round-robin, latency-based, failover routing.'},
+      {href: '/docs/smart-routing', title: '<Shuffle size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Smart Routing', desc: 'Round-robin and failover routing.'},
       {href: '/docs/integrations', title: '<Plug size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Integrations', desc: 'GitHub, Stripe, Shopify inbound webhooks.'},
       {href: '/docs/build-stripe-like', title: '<Building2 size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Build Stripe-like Webhooks', desc: 'Production-grade webhook system guide.'},
      ].map(({href, title, desc}) => (

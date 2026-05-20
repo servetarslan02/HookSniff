@@ -33,7 +33,7 @@ Webhook delivery pazarı 2026'da olgunlaşıyor. Büyük oyuncular var ama hala 
 | **Inbound Proxy** | ❌ | ❌ | ❌ | ❌ | ✅ (Stripe, GitHub, Shopify) |
 | **Embeddable Widget** | ❌ | ❌ | ❌ | ❌ | ✅ |
 | **Standard Webhooks** | ✅ | ❌ | ❌ | ❌ | ✅ |
-| **Smart Routing** | ❌ | ✅ | ❌ | ❌ | ✅ (round-robin, latency, failover) |
+| **Smart Routing** | ❌ | ✅ | ❌ | ❌ | ✅ (round-robin, failover) |
 | **Firma Durumu** | a16z backed, aktif | Aktif | Bootstrapped, EU | ⚠️ Kapandı | Bireysel |
 
 ---
