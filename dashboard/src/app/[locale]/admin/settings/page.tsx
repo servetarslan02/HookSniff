@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/lib/store';
 import { useAdminSettings, useUpdateSettings, useAdminAlerts, useCreateAlert, useUpdateAlert } from '@/hooks/useAdminData';
 import type { PlatformSettings } from '@/lib/api';
 import { AlertTriangle, Check, CheckCircle2, FlaskConical, Mail, Settings } from '@/components/icons';
@@ -71,6 +72,9 @@ const AlertsTab = dynamic(() => import('./components/AlertsTab'), { ssr: false, 
 const DevTab = dynamic(() => import('./components/DevTab'), { ssr: false, loading: () => tabSkeleton });
 
 export default function AdminSettingsPage() {
+ const { user } = useAuth();
+ if (!user?.is_admin) return null;
+
  const { toast } = useToast();
  const t = useTranslations('admin');
  const tc = useTranslations('common');

@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useAuth } from '@/lib/store';
 
 const CouponsContent = dynamic(() => import('./content'), {
   ssr: false,
@@ -13,5 +14,8 @@ const CouponsContent = dynamic(() => import('./content'), {
 });
 
 export default function CouponsPage() {
+  const { user } = useAuth();
+  if (!user?.is_admin) return null;
+
   return <CouponsContent />;
 }
