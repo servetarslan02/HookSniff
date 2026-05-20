@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { adminApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { useTranslations } from 'next-intl';
 import {
   Shield, AlertTriangle, AlertCircle, Info, Ban, Unlock,
   CheckCircle2, XCircle, Search, Globe, Clock, RefreshCw,
@@ -60,8 +61,8 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 const SEVERITY_OPTIONS = ['all', 'critical', 'high', 'medium', 'low'];
 const RESOLVED_OPTIONS = ['all', 'unresolved', 'resolved'];
 const DATE_RANGE_OPTIONS = [
-  { value: '', label: 'Tüm zamanlar' }, { value: '24h', label: 'Son 24 saat' },
-  { value: '7d', label: 'Son 7 gün' }, { value: '30d', label: 'Son 30 gün' },
+  { value: '', label: t('allTime') }, { value: '24h', label: t('last24h') },
+  { value: '7d', label: t('last7d') }, { value: '30d', label: t('last30d') },
 ];
 
 // ── Helpers ───────────────────────────────────────────────
@@ -94,6 +95,7 @@ export default function AdminSecurityPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
+  const t = useTranslations('security');
 
   const [tab, setTab] = useState<'events' | 'blocklist' | 'analytics'>('events');
   const [showBlockForm, setShowBlockForm] = useState(false);
@@ -144,15 +146,15 @@ export default function AdminSecurityPage() {
   // ── Mutations ──
   const resolveMutation = useMutation({
     mutationFn: (id: string) => adminApi.resolveSecurityEvent(token!, id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'security'] }); toast('Olay çözüldü', 'success'); },
-    onError: () => toast('Çözülemedi', 'error'),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'security'] }); toast(t('eventResolved'), 'success'); },
+    onError: () => toast(t('resolveFailed'), 'error'),
   });
 
   const resolveAllMutation = useMutation({
     mutationFn: () => adminApi.resolveAllSecurityEvents(token!, {}),
     onSuccess: (data: { resolved_count: number }) => {
       qc.invalidateQueries({ queryKey: ['admin', 'security'] });
-      toast(`${data.resolved_count} olay çözüldü`, 'success');
+      toast(`${data.resolved_count} ${t('eventsResolved')}`, 'success');
       setResolveAllTarget(false);
     },
     onError: () => toast('Toplu çözümleme başarısız', 'error'),
@@ -167,7 +169,7 @@ export default function AdminSecurityPage() {
       setBlockForm(emptyBlockForm);
       setShowBlockForm(false);
     },
-    onError: () => toast('Bloklanamadı', 'error'),
+    onError: () => toast(t('blockFailed'), 'error'),
   });
 
   const unblockMutation = useMutation({
@@ -193,7 +195,7 @@ export default function AdminSecurityPage() {
   };
 
   const handleBlockFromEvent = (ip: string) => {
-    setBlockForm({ ip_address: ip, reason: 'Güvenlik olayından otomatik', expires_hours: '' });
+    setBlockForm({ ip_address: ip, reason: t('autoFromSecurity'), expires_hours: '' });
     setBlockIpError('');
     setShowBlockForm(true);
     setTab('blocklist');
@@ -201,7 +203,7 @@ export default function AdminSecurityPage() {
 
   const handleExport = () => {
     if (!events.length) return;
-    const csv = ['ID,Tip,Severity,Email,IP,User Agent,Çözüldü,Tarih',
+    const csv = ['ID,Tip,Severity,Email,IP,User Agent,Resolved,Date',
       ...events.map(e => `"${e.id}","${e.event_type}","${e.severity}","${e.email || ''}","${e.ip_address || ''}","${(e.user_agent || '').replace(/"/g, '""')}","${e.resolved}","${e.created_at}"`)
     ].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -217,9 +219,9 @@ export default function AdminSecurityPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            <Shield size={24} strokeWidth={1.75} className="inline mr-2" />Güvenlik İzleme
+            <Shield size={24} strokeWidth={1.75} className="inline mr-2" />{t('title')}
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">Şüpheli aktiviteleri izleyin, IP adreslerini bloklayın.</p>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
         <div className="flex gap-2">
           {tab === 'events' && events.length > 0 && (
@@ -229,7 +231,7 @@ export default function AdminSecurityPage() {
           )}
           {stats && stats.unresolved_events > 0 && (
             <button onClick={() => setResolveAllTarget(true)} className="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-500/10 rounded-lg hover:bg-green-100 dark:hover:bg-green-500/20 transition flex items-center gap-1.5">
-              <CheckCircle2 size={14} strokeWidth={1.75} /> Tümünü Çöz ({stats.unresolved_events})
+              <CheckCircle2 size={14} strokeWidth={1.75} /> {t('resolveAll')} ({stats.unresolved_events})
             </button>
           )}
         </div>
@@ -238,10 +240,10 @@ export default function AdminSecurityPage() {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="glass-card p-4"><div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">Toplam Olay</div></div>
-          <div className="glass-card p-4 border-l-4 border-red-500"><div className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.unresolved_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">Çözülmemiş</div></div>
-          <div className="glass-card p-4 border-l-4 border-orange-500"><div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.critical_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">Kritik (7 gün)</div></div>
-          <div className="glass-card p-4 border-l-4 border-amber-500"><div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.high_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">Yüksek (7 gün)</div></div>
+          <div className="glass-card p-4"><div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('totalEvents')}</div></div>
+          <div className="glass-card p-4 border-l-4 border-red-500"><div className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.unresolved_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('unresolved')}</div></div>
+          <div className="glass-card p-4 border-l-4 border-orange-500"><div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.critical_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('criticalDays')}</div></div>
+          <div className="glass-card p-4 border-l-4 border-amber-500"><div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.high_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('highDays')}</div></div>
         </div>
       )}
 
@@ -257,9 +259,9 @@ export default function AdminSecurityPage() {
       {/* Tab Toggle */}
       <div className="flex bg-gray-100 dark:bg-slate-800 rounded-xl p-1 w-fit">
         {([
-          { key: 'events' as const, label: 'Güvenlik Olayları', icon: <AlertTriangle size={14} strokeWidth={1.75} /> },
-          { key: 'analytics' as const, label: 'Analitik', icon: <Eye size={14} strokeWidth={1.75} /> },
-          { key: 'blocklist' as const, label: 'IP Blok Listesi', icon: <Ban size={14} strokeWidth={1.75} /> },
+          { key: 'events' as const, label: t('securityEvents'), icon: <AlertTriangle size={14} strokeWidth={1.75} /> },
+          { key: 'analytics' as const, label: 'Analytics', icon: <Eye size={14} strokeWidth={1.75} /> },
+          { key: 'blocklist' as const, label: 'IP Blocklist', icon: <Ban size={14} strokeWidth={1.75} /> },
         ]).map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${tab === t.key ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}>
@@ -272,7 +274,7 @@ export default function AdminSecurityPage() {
       {tab === 'analytics' && stats && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="glass-card p-5">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Olay Tipleri (30 gün)</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{t('eventTypes')}</h3>
             {stats.events_by_type.length > 0 ? (
               <div className="space-y-2.5">
                 {stats.events_by_type.map((item) => {
@@ -337,10 +339,10 @@ export default function AdminSecurityPage() {
         <>
           <div className="flex items-center gap-3 flex-wrap">
             <select value={filterSeverity} onChange={(e) => setFilterSeverity(e.target.value)} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
-              {SEVERITY_OPTIONS.map(s => <option key={s} value={s}>{s === 'all' ? 'Tüm Severity' : s.toUpperCase()}</option>)}
+              {SEVERITY_OPTIONS.map(s => <option key={s} value={s}>{s === 'all' ? t('allSeverity') : s.toUpperCase()}</option>)}
             </select>
             <select value={filterResolved} onChange={(e) => setFilterResolved(e.target.value)} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
-              {RESOLVED_OPTIONS.map(r => <option key={r} value={r}>{r === 'all' ? 'Tüm Durum' : r === 'unresolved' ? 'Çözülmemiş' : 'Çözülmüş'}</option>)}
+              {RESOLVED_OPTIONS.map(r => <option key={r} value={r}>{r === 'all' ? t('allStatus') : r === 'unresolved' ? t('unresolved') : t('resolvedFilter')}</option>)}
             </select>
             <select value={filterDateRange} onChange={(e) => setFilterDateRange(e.target.value)} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
               {DATE_RANGE_OPTIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
@@ -357,7 +359,7 @@ export default function AdminSecurityPage() {
           {eventsLoading ? (
             <div className="space-y-2">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="glass-card p-4 animate-pulse"><div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-2" /><div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-1/2" /></div>)}</div>
           ) : events.length === 0 ? (
-            <div className="glass-card p-12 text-center"><Shield size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" /><p className="text-gray-500 dark:text-slate-400 text-sm">Güvenlik olayı bulunamadı</p></div>
+            <div className="glass-card p-12 text-center"><Shield size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" /><p className="text-gray-500 dark:text-slate-400 text-sm">{t('noEvents')}</p></div>
           ) : (
             <div className="space-y-2">
               {events.map((event) => {
@@ -370,7 +372,7 @@ export default function AdminSecurityPage() {
                           <div className="flex items-center gap-2 flex-wrap mb-1">
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${SEVERITY_COLORS[event.severity]}`}>{SEVERITY_ICONS[event.severity]}{event.severity.toUpperCase()}</span>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">{EVENT_TYPE_LABELS[event.event_type] || event.event_type}</span>
-                            {event.resolved && <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 rounded-full"><CheckCircle2 size={12} strokeWidth={1.75} /> Çözüldü</span>}
+                            {event.resolved && <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 rounded-full"><CheckCircle2 size={12} strokeWidth={1.75} /> {t('resolvedBadge')}</span>}
                           </div>
                           <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400 flex-wrap">
                             {event.email && <span>📧 {event.email}</span>}
@@ -402,7 +404,7 @@ export default function AdminSecurityPage() {
                           <div><span className="text-[11px] text-gray-400 uppercase">IP Adresi</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.ip_address || '—'}</p></div>
                           <div className="sm:col-span-2"><span className="text-[11px] text-gray-400 uppercase">User Agent</span><p className="text-xs text-gray-700 dark:text-slate-300 break-all">{event.user_agent || '—'}</p></div>
                           <div><span className="text-[11px] text-gray-400 uppercase">Tarih</span><p className="text-xs text-gray-700 dark:text-slate-300">{new Date(event.created_at).toLocaleString()}</p></div>
-                          <div><span className="text-[11px] text-gray-400 uppercase">Çözüldü</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.resolved ? `Evet (${event.resolved_at ? new Date(event.resolved_at).toLocaleString() : ''})` : 'Hayır'}</p></div>
+                          <div><span className="text-[11px] text-gray-400 uppercase">{t('resolvedBadge')}</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.resolved ? `Evet (${event.resolved_at ? new Date(event.resolved_at).toLocaleString() : ''})` : 'Hayır'}</p></div>
                         </div>
                         {event.details && Object.keys(event.details).length > 0 && (
                           <div className="mt-3"><span className="text-[11px] text-gray-400 uppercase">Detaylar</span><pre className="mt-1 text-xs font-mono text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800 rounded-lg p-3 overflow-x-auto max-h-32">{JSON.stringify(event.details, null, 2)}</pre></div>
@@ -422,12 +424,12 @@ export default function AdminSecurityPage() {
         <>
           {!showBlockForm ? (
             <button onClick={() => { setBlockForm(emptyBlockForm); setBlockIpError(''); setShowBlockForm(true); }} className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors flex items-center gap-1.5">
-              <Ban size={16} strokeWidth={1.75} /> IP Blokla
+              <Ban size={16} strokeWidth={1.75} /> {t('blockIp')}
             </button>
           ) : (
             <div className="glass-card p-6 border-2 border-red-200 dark:border-red-500/30">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><Ban size={18} strokeWidth={1.75} className="inline mr-1.5" />IP Blokla</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white"><Ban size={18} strokeWidth={1.75} className="inline mr-1.5" />{t('blockIp')}</h2>
                 <button onClick={() => setShowBlockForm(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300"><XCircle size={20} strokeWidth={1.75} /></button>
               </div>
               <div className="space-y-4">
@@ -447,7 +449,7 @@ export default function AdminSecurityPage() {
                 <div className="flex gap-3 justify-end">
                   <button onClick={() => setShowBlockForm(false)} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl transition">İptal</button>
                   <button onClick={handleBlockIp} disabled={blockMutation.isPending || !blockForm.ip_address.trim()} className="px-6 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl transition">
-                    {blockMutation.isPending ? 'Bloklanıyor...' : 'Blokle'}
+                    {blockMutation.isPending ? t('blocking') : t('block')}
                   </button>
                 </div>
               </div>
@@ -457,7 +459,7 @@ export default function AdminSecurityPage() {
           {blocklistLoading ? (
             <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="glass-card p-4 animate-pulse"><div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/4 mb-2" /><div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-1/3" /></div>)}</div>
           ) : blocklist.length === 0 ? (
-            <div className="glass-card p-12 text-center"><Ban size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" /><p className="text-gray-500 dark:text-slate-400 text-sm">Bloklu IP yok</p></div>
+            <div className="glass-card p-12 text-center"><Ban size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" /><p className="text-gray-500 dark:text-slate-400 text-sm">{t('noBlockedIps')}</p></div>
           ) : (
             <div className="glass-card overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700">
@@ -492,8 +494,8 @@ export default function AdminSecurityPage() {
       )}
 
       {/* Confirm Dialogs */}
-      <ConfirmDialog open={!!unblockTarget} title="IP Bloğunu Kaldır" message="Bu IP adresinin bloğunu kaldırmak istediğinize emin misiniz?" confirmLabel="Bloğu Kaldır" cancelLabel="İptal" variant="default" onConfirm={() => unblockTarget && unblockMutation.mutate(unblockTarget)} onCancel={() => setUnblockTarget(null)} />
-      <ConfirmDialog open={resolveAllTarget} title="Tüm Olayları Çöz" message={`${stats?.unresolved_events || 0} çözülmemiş olay var. Tümünü çözmek istediğinize emin misiniz?`} confirmLabel="Tümünü Çöz" cancelLabel="İptal" variant="default" onConfirm={() => resolveAllMutation.mutate()} onCancel={() => setResolveAllTarget(false)} loading={resolveAllMutation.isPending} />
+      <ConfirmDialog open={!!unblockTarget} title="IP Bloğunu Kaldır" message="Bu IP adresinin bloğunu kaldırmak istediğinize emin misiniz?" confirmLabel="Bloğu Kaldır" cancelLabel={t('cancel')} variant="default" onConfirm={() => unblockTarget && unblockMutation.mutate(unblockTarget)} onCancel={() => setUnblockTarget(null)} />
+      <ConfirmDialog open={resolveAllTarget} title={t('resolveAllTitle')} message={`${stats?.unresolved_events || 0} çözülmemiş olay var. Tümünü çözmek istediğinize emin misiniz?`} confirmLabel={t('resolveAll')} cancelLabel={t('cancel')} variant="default" onConfirm={() => resolveAllMutation.mutate()} onCancel={() => setResolveAllTarget(false)} loading={resolveAllMutation.isPending} />
     </div>
   );
 }

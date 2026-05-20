@@ -121,7 +121,8 @@
     "networkErrorCheck": "Network error — check your connection",
     "placeholderSearch": "Search…",
     "placeholderEmail": "you@example.com",
-    "noData": "No data"
+    "noData": "No data",
+    "unlimited": "Unlimited"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -585,7 +586,13 @@
     "deleteTeam": "Delete Team",
     "deleteTeamConfirm": "Are you sure you want to delete this team? This action cannot be undone. All members will be removed.",
     "leaveTeam": "Leave Team",
-    "leaveTeamConfirm": "Are you sure you want to leave this team?"
+    "leaveTeamConfirm": "Are you sure you want to leave this team?",
+    "editName": "Edit name",
+    "transferOwnership": "Transfer Ownership",
+    "teamGrowing": "Team is growing! Consider upgrading for more capacity.",
+    "inviteLinkReady": "Invite link ready!",
+    "shareInviteLink": "Share this link with the invited person. They need to log in first, then the invite will be accepted automatically.",
+    "copy": "Copy"
   },
   "notifications": {
     "title": "Notifications",
@@ -950,7 +957,8 @@
     "downgradePortalOwn": "Please contact support to downgrade your plan.",
     "upgradeFailed": "Upgrade failed. Please try again.",
     "downgradeTo": "Switch to {plan}",
-    "free": "Free"
+    "free": "Free",
+    "statusLabel": "Status"
   },
   "auth": {
     "login": "Log In",
@@ -2187,19 +2195,7 @@
     "couponCreatedSynced": "Coupon created and synced with Polar.sh",
     "couponCreatedSyncFailed": "Coupon created but Polar sync failed. Click Sync to retry.",
     "couponUpdatedSynced": "Coupon updated and synced with Polar.sh",
-    "backupRetention": "Backup Retention (days)",
-    "backupRetentionDesc": "Number of days to keep database backups.",
-    "backupSettings": "Backup Settings",
-    "corsOrigins": "Allowed CORS Origins",
-    "corsOriginsDesc": "Comma-separated list of allowed origins. Leave empty for default.",
-    "emailSettings": "Email Settings",
-    "emailSettingsDesc": "Configure email delivery via Resend.",
-    "features": "Features",
-    "globalRateLimit": "Global API Rate Limit (req/min)",
-    "securitySettings": "Security & Webhook Settings",
-    "senderAddress": "Sender Address",
-    "webhookSecret": "Default Webhook Secret",
-    "webhookSecretDesc": "Default signing secret for webhook payloads."
+    "features": "Features"
   },
   "landing": {
     "nav": {
@@ -4076,7 +4072,7 @@
     "startReceivingShopify": "Start receiving Shopify webhooks"
   },
   "security": {
-    "title": "Security",
+    "title": "Security Monitoring",
     "architecture": "Architecture security",
     "dataAtRest": "Data at rest",
     "dataInTransit": "Data in transit",
@@ -4129,7 +4125,45 @@
     "contactForm": "contact form",
     "ctaTitle": "Security questions?",
     "ctaDesc": "Our team is happy to discuss your security requirements.",
-    "ctaContact": "Contact us →"
+    "ctaContact": "Contact us →",
+    "subtitle": "Monitor suspicious activities and block IP addresses.",
+    "resolveAll": "Resolve All",
+    "totalEvents": "Total Events",
+    "unresolved": "Unresolved",
+    "criticalDays": "Critical (7 days)",
+    "highDays": "High (7 days)",
+    "securityEvents": "Security Events",
+    "eventTypes": "Event Types (30 days)",
+    "topIps": "Top IPs with Events (7 days)",
+    "allSeverity": "All Severity",
+    "allStatus": "All Status",
+    "unresolvedFilter": "Unresolved",
+    "resolvedFilter": "Resolved",
+    "noEvents": "No security events found",
+    "resolvedBadge": "Resolved",
+    "eventResolved": "Event resolved",
+    "resolveFailed": "Could not resolve",
+    "eventsResolved": "events resolved",
+    "autoFromSecurity": "Auto from security event",
+    "csvHeader": "ID,Type,Severity,Email,IP,User Agent,Resolved,Date",
+    "suspiciousUA": "Suspicious UA",
+    "disabledAccountLogin": "Disabled Account Login",
+    "allTime": "All time",
+    "last24h": "Last 24 hours",
+    "last7d": "Last 7 days",
+    "last30d": "Last 30 days",
+    "blockFailed": "Could not block IP",
+    "blocking": "Blocking...",
+    "block": "Block",
+    "blockIp": "Block IP",
+    "noBlockedIps": "No blocked IPs",
+    "blockedIps": "Blocked IPs",
+    "active": "active",
+    "resolveAllTitle": "Resolve All Events",
+    "resolveAllConfirm": "Are you sure you want to resolve all unresolved events?",
+    "cancel": "Cancel",
+    "topIpsTitle": "Top IPs with Events (7 days)",
+    "eventId": "Event ID"
   },
   "startups": {
     "title": "Startups",
@@ -6333,5 +6367,20 @@
   "q24": "Can I replay failed webhooks?",
   "a24": "Yes. Failed webhooks are stored in the Dead Letter Queue (DLQ). You can inspect payloads, error messages, and response codes. Replay one or multiple failed deliveries with a single click from the dashboard or API.",
   "q25": "How do I contact support?",
-  "a25": "For technical questions, open a GitHub Issue at github.com/servetarslan02/HookSniff/issues. For account and billing issues, email support@hooksniff.com. For security vulnerabilities, email security@hooksniff.com. Enterprise customers get priority support."
+  "a25": "For technical questions, open a GitHub Issue at github.com/servetarslan02/HookSniff/issues. For account and billing issues, email support@hooksniff.com. For security vulnerabilities, email security@hooksniff.com. Enterprise customers get priority support.",
+  "coupons": {
+    "couponsLoadFailed": "Failed to load coupons",
+    "editCoupon": "Edit Coupon",
+    "createCoupon": "Create Coupon",
+    "internalType": "Internal (Applied directly)",
+    "internalCodeDesc": "Applied directly when customer enters code. Does not go to Polar.",
+    "polarCodeDesc": "Code is synced with Polar.sh. Discount applied at checkout.",
+    "flowLabel": "Flow:",
+    "flowCreate": "Create code",
+    "flowCustomerEnter": "Customer enters code",
+    "flowApplied": "Applied directly",
+    "flowSync": "Sync to Polar",
+    "flowPolarWorks": "Works at Polar",
+    "create": "Create"
+  }
 }

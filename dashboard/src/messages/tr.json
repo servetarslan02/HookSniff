@@ -121,7 +121,8 @@
     "networkErrorCheck": "Ağ hatası — bağlantınızı kontrol edin",
     "placeholderSearch": "Ara...",
     "placeholderEmail": "siz@ornek.com",
-    "noData": "Veri yok"
+    "noData": "Veri yok",
+    "unlimited": "Sınırsız"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -587,7 +588,13 @@
     "deleteTeam": "Takımı Sil",
     "deleteTeamConfirm": "Bu takımı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz. Tüm üyeler kaldırılacak.",
     "leaveTeam": "Takımdan Ayrıl",
-    "leaveTeamConfirm": "Bu takımdan ayrılmak istediğinizden emin misiniz?"
+    "leaveTeamConfirm": "Bu takımdan ayrılmak istediğinizden emin misiniz?",
+    "editName": "İsmi düzenle",
+    "transferOwnership": "Sahipliği devret",
+    "teamGrowing": "Takım büyüyor! Daha fazla kapasite için planınızı yükseltin.",
+    "inviteLinkReady": "Davet linki hazır!",
+    "shareInviteLink": "Bu linki davet ettiğiniz kişiyle paylaşın. Önce giriş yapmaları gerekiyor, ardından davet otomatik olarak kabul edilecek.",
+    "copy": "Kopyala"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -952,7 +959,8 @@
     "downgradePortalOwn": "Planınızı düşürmek için destek ekibiyle iletişime geçin.",
     "upgradeFailed": "Yükseltme başarısız oldu. Lütfen tekrar deneyin.",
     "downgradeTo": "{plan} planına geç",
-    "free": "Ücretsiz"
+    "free": "Ücretsiz",
+    "statusLabel": "Durum"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -2189,19 +2197,7 @@
     "couponCreatedSynced": "Kupon oluşturuldu ve Polar.sh ile senkronize edildi",
     "couponCreatedSyncFailed": "Kupon oluşturuldu ama Polar sync başarısız. Sync butonuna basarak tekrar deneyin.",
     "couponUpdatedSynced": "Kupon güncellendi ve Polar.sh ile senkronize edildi",
-    "backupRetention": "Yedekleme Süresi (gün)",
-    "backupRetentionDesc": "Veritabanı yedeklerinin saklanacağı gün sayısı.",
-    "backupSettings": "Yedekleme Ayarları",
-    "corsOrigins": "İzin Verilen CORS Kaynakları",
-    "corsOriginsDesc": "İzin verilen kaynakların virgülle ayrılmış listesi. Varsayılan için boş bırakın.",
-    "emailSettings": "E-posta Ayarları",
-    "emailSettingsDesc": "Resend üzerinden e-posta teslimatını yapılandırın.",
-    "features": "Özellikler",
-    "globalRateLimit": "Global API Hız Limiti (istek/dk)",
-    "securitySettings": "Güvenlik ve Webhook Ayarları",
-    "senderAddress": "Gönderen Adresi",
-    "webhookSecret": "Varsayılan Webhook Secret",
-    "webhookSecretDesc": "Webhook payloadları için varsayılan imzalama secret'ı."
+    "features": "Özellikler"
   },
   "landing": {
     "nav": {
@@ -4058,7 +4054,7 @@
     "startReceivingShopify": "Shopify webhooklarını almaya başlayın"
   },
   "security": {
-    "title": "Güvenlik",
+    "title": "Güvenlik İzleme",
     "architecture": "Mimari güvenlik",
     "dataAtRest": "Depodaki veri",
     "dataInTransit": "İletimdeki veri",
@@ -4111,7 +4107,45 @@
     "contactForm": "iletişim formumuz",
     "ctaTitle": "Güvenlik sorularınız mı var?",
     "ctaDesc": "Ekibimiz güvenlik gereksinimlerinizi tartışmaktan memnuniyet duyar.",
-    "ctaContact": "Bizimle konuşun →"
+    "ctaContact": "Bizimle konuşun →",
+    "subtitle": "Şüpheli aktiviteleri izleyin, IP adreslerini bloklayın.",
+    "resolveAll": "Tümünü Çöz",
+    "totalEvents": "Toplam Olay",
+    "unresolved": "Çözülmemiş",
+    "criticalDays": "Kritik (7 gün)",
+    "highDays": "Yüksek (7 gün)",
+    "securityEvents": "Güvenlik Olayları",
+    "eventTypes": "Olay Tipleri (30 gün)",
+    "topIps": "En Çok Olay Olan IP'ler (7 gün)",
+    "allSeverity": "Tüm Severity",
+    "allStatus": "Tüm Durum",
+    "unresolvedFilter": "Çözülmemiş",
+    "resolvedFilter": "Çözülmüş",
+    "noEvents": "Güvenlik olayı bulunamadı",
+    "resolvedBadge": "Çözüldü",
+    "eventResolved": "Olay çözüldü",
+    "resolveFailed": "Çözülemedi",
+    "eventsResolved": "olandı çözüldü",
+    "autoFromSecurity": "Güvenlik olayından otomatik",
+    "csvHeader": "ID,Tip,Severity,Email,IP,User Agent,Çözüldü,Tarih",
+    "suspiciousUA": "Şüpheli UA",
+    "disabledAccountLogin": "Pasif Hesap Girişi",
+    "allTime": "Tüm zamanlar",
+    "last24h": "Son 24 saat",
+    "last7d": "Son 7 gün",
+    "last30d": "Son 30 gün",
+    "blockFailed": "Bloklanamadı",
+    "blocking": "Bloklanıyor...",
+    "block": "Blokle",
+    "blockIp": "IP Blokla",
+    "noBlockedIps": "Bloklu IP yok",
+    "blockedIps": "Bloklu IP'ler",
+    "active": "aktif",
+    "resolveAllTitle": "Tüm Olayları Çöz",
+    "resolveAllConfirm": "çözülmemiş olay var. Tümünü çözmek istediğinize emin misiniz?",
+    "cancel": "İptal",
+    "topIpsTitle": "En Çok Olay Olan IP'ler (7 gün)",
+    "eventId": "Olay ID"
   },
   "startups": {
     "title": "Girişimler",
@@ -6298,5 +6332,20 @@
   "q24": "Başarısız webhook'ları tekrar gönderebilir miyim?",
   "a24": "Evet. Başarısız webhook'lar Dead Letter Queue'da (DLQ) saklanır. Payload'ları, hata mesajlarını ve yanıt kodlarını inceleyebilirsiniz. Panelden veya API'den tek tıklamayla bir veya birden fazla başarısız teslimatı tekrar gönderebilirsiniz.",
   "q25": "Destek ile nasıl iletişime geçebilirim?",
-  "a25": "Teknik sorular için github.com/servetarslan02/HookSniff/issues adresinden GitHub Issue açın. Hesap ve faturalandırma sorunları için support@hooksniff.com adresine e-posta gönderin. Güvenlik açıkları için security@hooksniff.com adresine e-posta gönderin. Enterprise müşterileri öncelikli destek alır."
+  "a25": "Teknik sorular için github.com/servetarslan02/HookSniff/issues adresinden GitHub Issue açın. Hesap ve faturalandırma sorunları için support@hooksniff.com adresine e-posta gönderin. Güvenlik açıkları için security@hooksniff.com adresine e-posta gönderin. Enterprise müşterileri öncelikli destek alır.",
+  "coupons": {
+    "couponsLoadFailed": "Kuponlar yüklenemedi",
+    "editCoupon": "Kuponu Düzenle",
+    "createCoupon": "Yeni Kupon Oluştur",
+    "internalType": "Internal (Direkt uygulanır)",
+    "internalCodeDesc": "Müşteri kodu girdiğinde plan direkt uygulanır. Polar'a gitmez.",
+    "polarCodeDesc": "Girdiğin kod Polar.sh'a gönderilir. Polar'da aynı kod indirim olarak çalışır.",
+    "flowLabel": "Akış:",
+    "flowCreate": "Kod oluştur",
+    "flowCustomerEnter": "Müşteri girer",
+    "flowApplied": "Direkt uygulanır",
+    "flowSync": "Sync et",
+    "flowPolarWorks": "Polar'da çalışır",
+    "create": "Oluştur"
+  }
 }
