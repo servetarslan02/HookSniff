@@ -256,7 +256,30 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-21 01:37 — Teslimatlar İzleme Sayfasına Taşındı)
+## 📝 Son Oturum (2026-05-21 01:57 — Dashboard Overview İnceleme + 7 Fix)
+
+### Özet
+Servet ile oturum. Dashboard Overview sayfası detaylı incelendi. 7 sorun tespit edildi, hepsi düzeltildi. 2 dosya değişti, 54 satır eklendi.
+
+### Tespit Edilen ve Düzeltilen Sorunlar:
+1. **Dark mode 'pending' rengi** — `text-emerald-400` → `text-amber-400` (yeşil yerine amber)
+2. **Widget sürükleme sırası kayboluyordu** — `loadWidgetConfig` merge mantığı düzeltildi, sıralama artık korunuyor
+3. **'Yenile' butonu eksik çalışıyordu** — Sadece stats yeniliyordu, şimdi stats+trend+deliveries+endpoints hepsini yeniliyor
+4. **Hata durumunda bilgi yoktu** — Error banner eklendi (retry butonu ile birlikte)
+5. **Grafik loading göstergesi eksik** — Zaman aralığı değişirken overlay loading eklendi
+6. **Widget config yeni widget'ları kaybediyordu** — Merge mantığı düzeltildi, yeni widget'lar sona ekleniyor
+7. **Error state'ler gösterilmiyordu** — React Query error'ları alınıyor, banner'da gösteriliyor
+
+### Değişen Dosyalar:
+- `dashboard/src/app/[locale]/(dashboard)/DashboardOverview.tsx` — 45 satır değişiklik
+- `dashboard/src/components/DashboardWidget.tsx` — 21 satır değişiklik
+
+### Push: `44772e88`
+### TypeScript: ✅ 0 hata
+
+---
+
+## 📝 Önceki Oturum (2026-05-21 01:37 — Teslimatlar İzleme Sayfasına Taşındı)
 
 ### Özet
 Servet ile oturum. Teslimatlar sayfası İzleme (Observability) sayfasının içine taşındı. Artık 4 tab'lı yapı: Teslimatlar, Sağlık, Uyarılar, Analitik.
