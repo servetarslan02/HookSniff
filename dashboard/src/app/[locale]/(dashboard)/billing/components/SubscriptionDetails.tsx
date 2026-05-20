@@ -113,7 +113,7 @@ export function SubscriptionDetails({ onCancel, onPause, onResume }: { onCancel?
 
         {/* Status */}
         <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
-          <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('status')}</p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('statusLabel')}</p>
           <span className={clsx(
             'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset',
             statusStyle
