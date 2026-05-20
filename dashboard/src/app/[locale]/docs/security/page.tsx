@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import { AlertTriangle, Check, Key, KeyRound, Lock, Shield, ShieldCheck, X } from 'lucide-react';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
@@ -70,7 +71,6 @@ signature = "v1," + base64(hmac_sha256(secret, signed_content))`}
         <CodeBlock
           code={`// Node.js
 import { Webhook } from 'hooksniff';
-import { AlertTriangle, Key, KeyRound, Lock, Shield, ShieldCheck } from 'lucide-react';
 const wh = new Webhook('whsec_your_secret');
 const payload = wh.verify(req.body, {
   'webhook-id': req.headers['webhook-id'],

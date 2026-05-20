@@ -8,7 +8,7 @@ interface StatusBadgeProps {
   className?: string;
 }
 
-const statusStyles: Record<string, { bg: string; text: string; ring: string; dot: string; icon?: string }> = {
+const statusStyles: Record<string, { bg: string; text: string; ring: string; dot: string; icon?: React.ReactNode }> = {
   delivered: {
     bg: 'bg-emerald-50 dark:bg-emerald-500/10',
     text: 'text-emerald-700 dark:text-emerald-400',
