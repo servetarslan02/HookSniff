@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { Incident } from './types';
 import { formatDate, formatRelativeTime } from './utils';
 import { StatusBadge } from './StatusBadge';
-import { PartyPopper } from 'lucide-react';
+import { PartyPopper } from '@/components/icons';
 
 export function IncidentLog({ incidents }: { incidents: Incident[] }) {
   const t = useTranslations('status');

@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from '@/i18n/navigation';
-import { AlertTriangle, FlaskConical, Lightbulb, Lock, ShieldCheck, Zap } from 'lucide-react';
+import { AlertTriangle, FlaskConical, Lightbulb, Lock, ShieldCheck, Zap } from '@/components/icons';
 
 /* ─── Timeout-aware fetch helper ─── */
 const FETCH_TIMEOUT_MS = 15_000;

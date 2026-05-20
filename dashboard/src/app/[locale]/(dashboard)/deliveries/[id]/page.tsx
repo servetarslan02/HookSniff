@@ -11,7 +11,7 @@ import { DeliveryOverviewCards } from './components/DeliveryOverviewCards';
 import { DeliveryInfoPanel } from './components/DeliveryInfoPanel';
 import { RequestDetailsPanel } from './components/RequestDetailsPanel';
 import { AttemptTimeline } from './components/AttemptTimeline';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '@/components/icons';
 
 export default function DeliveryDetailPage() {
   const t = useTranslations('deliveryDetail');

@@ -7,7 +7,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import type { AlertRule } from '@/lib/api';
 import { useAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert, useTestAlert } from '@/hooks/useDashboardData';
-import { Bell, Link2, Mail, MessageSquare } from 'lucide-react';
+import { Bell, Link2, Mail, MessageSquare } from '@/components/icons';
 
 const CHANNEL_ICONS: Record<string, React.ReactNode> = {
   slack: <MessageSquare size={16} strokeWidth={1.75} />,

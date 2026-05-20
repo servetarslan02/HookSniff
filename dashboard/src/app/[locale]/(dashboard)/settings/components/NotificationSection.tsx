@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { getErrorMessage } from '@/lib/errors';
 import { ToggleRow } from './ToggleRow';
-import { Bell } from 'lucide-react';
+import { Bell } from '@/components/icons';
 
 export function NotificationSection() {
   const t = useTranslations('settings');

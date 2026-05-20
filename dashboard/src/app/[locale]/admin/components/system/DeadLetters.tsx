@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Skull, CheckCircle2 } from 'lucide-react';
+import { Skull, CheckCircle2 } from '@/components/icons';
 
 interface DeadLetter {
   id: string;

@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { usePlans } from '@/hooks/usePlans';
-import { Check } from 'lucide-react';
+import { Check } from '@/components/icons';
 
 const PLAN_FEATURES: Record<string, string[]> = {
   developer: [

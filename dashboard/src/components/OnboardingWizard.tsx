@@ -10,7 +10,7 @@ import { loadState, saveState, SDKS } from './onboarding/types';
 import { Confetti } from './onboarding/Confetti';
 import { SetupChecklist } from './onboarding/SetupChecklist';
 import { SuccessToast } from './onboarding/SuccessToast';
-import { BarChart3, Bot, Check, CheckCircle2, CreditCard, FlaskConical, Key, Lightbulb, Link2, Mail, Package, PartyPopper, Settings, ShoppingBag, Target } from 'lucide-react';
+import { BarChart3, Bot, Check, CheckCircle2, CreditCard, FlaskConical, Key, Lightbulb, Link2, Mail, Package, PartyPopper, Settings, ShoppingBag, Target } from '@/components/icons';
 
 export { SetupChecklist, SuccessToast };
 

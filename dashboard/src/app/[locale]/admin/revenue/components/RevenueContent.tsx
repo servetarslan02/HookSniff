@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
-import { BarChart3, Check, DollarSign, Inbox, Link2, TrendingDown } from 'lucide-react';
+import { BarChart3, Check, DollarSign, Inbox, Link2, TrendingDown } from '@/components/icons';
 
 const PLAN_COLORS: Record<string, string> = {
  developer: '#94a3b8',

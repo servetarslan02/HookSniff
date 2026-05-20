@@ -2,7 +2,7 @@
 
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { Flag, Repeat, Rocket, CheckCircle2, Triangle } from 'lucide-react';
+import { Flag, Repeat, Rocket, CheckCircle2, Triangle } from '@/components/icons';
 
 interface InfraTabProps {
   featureFlags: any[];

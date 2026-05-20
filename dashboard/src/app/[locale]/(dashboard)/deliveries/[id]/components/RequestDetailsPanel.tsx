@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { DeliveryDetail } from '@/lib/api';
-import { ArrowUpFromLine } from 'lucide-react';
+import { ArrowUpFromLine } from '@/components/icons';
 
 function formatHeaders(headers: Record<string, string>): string {
   return Object.entries(headers)

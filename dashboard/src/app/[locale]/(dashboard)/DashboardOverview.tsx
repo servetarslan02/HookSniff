@@ -16,7 +16,7 @@ import {
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { Link } from '@/i18n/navigation';
-import { Settings, Eye, EyeOff, Link2, Package, FlaskConical, TrendingUp, Inbox, RefreshCw } from 'lucide-react';
+import { Settings, Eye, EyeOff, Link2, Package, FlaskConical, TrendingUp, Inbox, RefreshCw } from '@/components/icons';
 
 export function DashboardOverview() {
   const t = useTranslations('dashboard');

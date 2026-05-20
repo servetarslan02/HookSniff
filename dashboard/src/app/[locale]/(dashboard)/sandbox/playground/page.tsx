@@ -11,7 +11,7 @@ import { LiveRequestViewer } from './components/LiveRequestViewer';
 import { METHODS, API_BASE, ENDPOINT_PATHS, AI_PAYLOAD_TEMPLATES } from './constants';
 import { loadHistory, saveHistory } from './history';
 import type { PlaygroundRequest } from './types';
-import { Bot, ClipboardList } from 'lucide-react';
+import { Bot, ClipboardList } from '@/components/icons';
 
 export default function PlaygroundPage() {
   const { apiKey } = useAuth();

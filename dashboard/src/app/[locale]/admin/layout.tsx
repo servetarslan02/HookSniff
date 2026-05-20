@@ -10,7 +10,7 @@ import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
 import { notificationsApi } from '@/lib/api';
 import { useRealtime } from '@/hooks/useRealtime';
-import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, FolderOpen, Lock, Shield } from 'lucide-react';
+import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, FolderOpen, Lock, Shield } from '@/components/icons';
 
 const adminNavigation = [
   { nameKey: 'overview', href: '/admin', icon: <BarChart3 size={18} strokeWidth={1.75} /> },

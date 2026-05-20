@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { Building2, Rocket, Ruler , Check, X } from 'lucide-react';
+import { Building2, Rocket, Ruler , Check, X } from '@/components/icons';
 
 export const revalidate = 3600;
 

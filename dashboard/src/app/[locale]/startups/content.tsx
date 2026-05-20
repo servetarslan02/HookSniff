@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
-import { DollarSign, TrendingUp, Handshake } from 'lucide-react';
+import { DollarSign, TrendingUp, Handshake } from '@/components/icons';
 
 export function StartupsPageContent() {
   const t = useTranslations('startups');

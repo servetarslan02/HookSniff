@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { DollarSign, Lightbulb, Wrench } from 'lucide-react';
+import { DollarSign, Lightbulb, Wrench } from '@/components/icons';
 
 export default function BuildVsBuyContent() {
   const t = useTranslations('buildVsBuy');

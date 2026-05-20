@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { notificationsApi, broadcastsApi, teamsApi, type Notification, type UserBroadcast } from '@/lib/api';
-import { AlertTriangle, Bell, Circle, CreditCard, Users, Megaphone, Wrench, Sparkles, Radio, XCircle } from 'lucide-react';
+import { AlertTriangle, Bell, Circle, CreditCard, Users, Megaphone, Wrench, Sparkles, Radio, XCircle } from '@/components/icons';
 
 export function NotificationCenter() {
   const t = useTranslations('nav');

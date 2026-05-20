@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { usePlans } from '@/hooks/usePlans';
 import Footer from '@/components/Footer';
-import { Inbox, Link2, ShieldCheck, Star, Zap } from 'lucide-react';
+import { Inbox, Link2, ShieldCheck, Star, Zap } from '@/components/icons';
 
 // Lazy load ThemeToggle
 const ThemeToggleBtn = dynamic(() => import('@/components/ThemeToggle').then(m => m.ThemeToggle), { ssr: false });

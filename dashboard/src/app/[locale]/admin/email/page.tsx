@@ -9,7 +9,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import {
   Mail, Send, AlertTriangle, CheckCircle2, ClipboardList, XCircle,
   Megaphone, Plus, Pencil, Trash2, Eye, EyeOff, Calendar,
-} from 'lucide-react';
+} from '@/components/icons';
 
 const BROADCAST_TYPES = [
   { value: 'announcement', label: 'Duyuru' },

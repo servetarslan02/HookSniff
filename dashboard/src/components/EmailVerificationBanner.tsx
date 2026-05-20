@@ -5,7 +5,7 @@ import {useTranslations} from 'next-intl';
 import {useAuth} from '@/lib/store';
 import {API_BASE} from '@/lib/api';
 import {useToast} from '@/components/Toast';
-import {Mail, X} from 'lucide-react';
+import {Mail, X} from '@/components/icons';
 
 export function EmailVerificationBanner() {
  const t = useTranslations('emailVerification');

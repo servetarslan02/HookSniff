@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import type { Maintenance } from './types';
 import { formatDate, formatDateTime } from './utils';
 import { StatusBadge } from './StatusBadge';
-import { Calendar, Wrench } from 'lucide-react';
+import { Calendar, Wrench } from '@/components/icons';
 
 export function MaintenanceSection({ maintenance }: { maintenance: Maintenance[] }) {
   const t = useTranslations('status');

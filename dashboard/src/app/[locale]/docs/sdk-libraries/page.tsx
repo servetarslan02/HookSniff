@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape -- Code examples contain intentional escapes (Elixir, Ruby, etc.) */
 import {useTranslations} from 'next-intl';
-import {Box, Check, Circle, Code2, Coffee, FileCode, FileText, FlaskConical, Gem, Hash, Key, Package, Radio, RefreshCw, ShieldCheck, Smartphone,  Zap} from 'lucide-react';
+import {Box, Check, Circle, Code2, Coffee, FileCode, FileText, FlaskConical, Gem, Hash, Key, Package, Radio, RefreshCw, ShieldCheck, Smartphone,  Zap} from '@/components/icons';
 import type {Metadata} from 'next';
 
 export const dynamic = 'force-dynamic';

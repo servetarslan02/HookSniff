@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { RetryPolicyConfig } from '@/lib/api';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw } from '@/components/icons';
 
 const BACKOFF_OPTIONS = [
   { value: 'exponential', labelKey: 'exponential', descKey: 'exponentialDesc' },

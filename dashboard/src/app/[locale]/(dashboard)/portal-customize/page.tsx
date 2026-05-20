@@ -9,7 +9,7 @@ import type { PortalConfig } from './types';
 import { DEFAULT_CONFIG, FONT_OPTIONS } from './types';
 import { PortalPreview } from './components/PortalPreview';
 import { EmbedCodePanel } from './components/EmbedCodePanel';
-import { ClipboardList, Palette, X, Zap, AlertTriangle } from 'lucide-react';
+import { ClipboardList, Palette, X, Zap, AlertTriangle } from '@/components/icons';
 
 export default function PortalCustomizationPage() {
   const t = useTranslations('portalCustomize');

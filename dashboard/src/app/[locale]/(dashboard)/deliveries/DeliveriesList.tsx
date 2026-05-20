@@ -15,7 +15,7 @@ import { VirtualTable } from '@/components/VirtualTable';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, X } from '@/components/icons';
 
 export default function DeliveriesPage() {
   const { token } = useAuth();

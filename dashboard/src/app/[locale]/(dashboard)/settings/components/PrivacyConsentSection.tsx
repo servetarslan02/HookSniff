@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { ConsentToggle } from './ConsentToggle';
-import { Shield } from 'lucide-react';
+import { Shield } from '@/components/icons';
 
 export function PrivacyConsentSection() {
   const t = useTranslations('settings');

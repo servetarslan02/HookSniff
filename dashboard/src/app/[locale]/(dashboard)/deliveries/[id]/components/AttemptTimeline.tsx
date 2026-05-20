@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { StatusBadge } from '@/components/StatusBadge';
 import type { DeliveryAttempt } from '@/lib/api';
-import { Check, Clock, X } from 'lucide-react';
+import { Check, Clock, X } from '@/components/icons';
 
 function getHttpStatusColor(code?: number): string {
   if (!code) return 'text-gray-500 dark:text-slate-500';

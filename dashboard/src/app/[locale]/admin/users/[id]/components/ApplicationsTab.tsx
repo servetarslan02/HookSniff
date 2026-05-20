@@ -2,7 +2,7 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { ApplicationsTabProps } from './types';
-import { Smartphone } from 'lucide-react';
+import { Smartphone } from '@/components/icons';
 
 export function ApplicationsTab({ userApps, t }: ApplicationsTabProps) {
   return (

@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Star } from 'lucide-react';
+import { Star } from '@/components/icons';
 
 const POSTS_PER_PAGE = 6;
 

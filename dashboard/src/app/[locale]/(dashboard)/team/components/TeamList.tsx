@@ -2,7 +2,7 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import type { Team } from '@/lib/api';
-import { Users } from 'lucide-react';
+import { Users } from '@/components/icons';
 
 function TeamAvatar({ name }: { name: string }) {
   const initials = name

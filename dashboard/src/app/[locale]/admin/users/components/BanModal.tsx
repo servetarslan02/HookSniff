@@ -1,7 +1,7 @@
 'use client';
 
 import type { AdminUser } from '@/lib/api';
-import { Ban } from 'lucide-react';
+import { Ban } from '@/components/icons';
 
 interface BanModalProps {
   banTarget: AdminUser | null;

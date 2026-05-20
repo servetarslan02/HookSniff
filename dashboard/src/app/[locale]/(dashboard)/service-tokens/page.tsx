@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useServiceTokens, useCreateServiceToken, useDeleteServiceToken, useRevealServiceToken, useUpdateServiceToken } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
-import { ClipboardList, Eye, EyeOff } from 'lucide-react';
+import { ClipboardList, Eye, EyeOff } from '@/components/icons';
 
 export default function ServiceTokensPage() {
   const { user } = useAuth();

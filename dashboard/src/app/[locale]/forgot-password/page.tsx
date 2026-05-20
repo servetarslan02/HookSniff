@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { API_BASE } from '@/lib/api';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { Mail } from 'lucide-react';
+import { Mail } from '@/components/icons';
 
 function ForgotPasswordContent() {
   const t = useTranslations('auth');

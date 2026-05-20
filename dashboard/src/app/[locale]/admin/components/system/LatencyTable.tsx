@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Timer } from 'lucide-react';
+import { Timer } from '@/components/icons';
 
 interface LatencyEndpoint {
   endpoint_id: string;

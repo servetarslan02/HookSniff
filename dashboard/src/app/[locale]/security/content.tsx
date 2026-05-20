@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
-import { Lock, Shield, ShieldCheck, Globe, MapPin, Key, ClipboardList, Clock, RefreshCw, Search } from 'lucide-react';
+import { Lock, Shield, ShieldCheck, Globe, MapPin, Key, ClipboardList, Clock, RefreshCw, Search } from '@/components/icons';
 
 // features are now rendered via i18n keys
 

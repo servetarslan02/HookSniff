@@ -1,5 +1,5 @@
 import {useTranslations} from 'next-intl';
-import {AlertTriangle, BarChart3, Bell, Lightbulb, Package, RefreshCw} from 'lucide-react';
+import {AlertTriangle, BarChart3, Bell, Lightbulb, Package, RefreshCw} from '@/components/icons';
 import SdkTabs from '@/components/SdkTabs';
 import CodeBlock from '@/components/CodeBlock';
 import type {Metadata} from 'next';

@@ -8,7 +8,7 @@ import { billingApiExtended } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { useBillingSubscription } from '@/hooks/useDashboardData';
 import { getErrorMessage } from '@/lib/errors';
-import { AlertTriangle, CreditCard, DollarSign, Pause, Play } from 'lucide-react';
+import { AlertTriangle, CreditCard, DollarSign, Pause, Play } from '@/components/icons';
 
 const PROVIDER_LABELS: Record<string, { name: string; icon: React.ReactNode }> = {
   stripe: { name: 'Stripe', icon: <CreditCard size={16} strokeWidth={1.75} /> },
