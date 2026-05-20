@@ -75,10 +75,10 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="flex items-center justify-between h-16 px-4 sm:px-6 border-b border-gray-200 dark:border-gray-700">
-          <a href="https://hooksniff.vercel.app/" className="flex items-center space-x-2">
+          <Link href="/core" className="flex items-center space-x-2">
             <span className="text-2xl">🪝</span>
             <span className="text-xl font-bold text-gray-900 dark:text-white">HookSniff</span>
-          </a>
+          </Link>
           <button
             className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 lg:hidden rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
             onClick={() => setSidebarOpen(false)}
