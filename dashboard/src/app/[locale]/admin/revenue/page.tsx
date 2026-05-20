@@ -36,11 +36,17 @@ const RevenueContent = dynamic(() => import('./components/RevenueContent'), { ss
 
 export default function AdminRevenuePage() {
   const { token } = useAuth();
+  // Primary data — needed immediately
   const { data: revenue, isLoading, error, refetch } = useAdminRevenue();
   const { data: revenueMetrics } = useAdminRevenueMetrics();
-  const { data: cohortsData } = useAdminRevenueCohorts(12);
-  const { data: refundsData } = useAdminRefunds({ per_page: 50 });
-  const { data: churnUsers = [] } = useAdminChurn();
+
+  // Secondary data — deferred (don't block initial render)
+  const [deferredReady, setDeferredReady] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setDeferredReady(true), 300); return () => clearTimeout(t); }, []);
+
+  const { data: cohortsData } = useAdminRevenueCohorts(deferredReady ? 12 : undefined);
+  const { data: refundsData } = useAdminRefunds(deferredReady ? { per_page: 50 } : undefined);
+  const { data: churnUsers = [] } = useAdminChurn(deferredReady);
   const { data: settings } = useAdminSettings();
   const updateSettingsMutation = useUpdateSettings();
   const queryClient = useQueryClient();
