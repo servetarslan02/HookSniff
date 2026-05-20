@@ -1,4 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
+import { AlertTriangle, Check, FileText, Key, RefreshCw, Search, Shield, Timer, X, Zap } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -228,7 +229,6 @@ if err != nil {
         <CodeBlock
           code={`import express from 'express';
 import { Webhook } from 'hooksniff';
-import { FileText, Key, RefreshCw, Search, Shield, Timer, Zap } from 'lucide-react';
 
 const app = express();
 const wh = new Webhook(process.env.WEBHOOK_SECRET!);

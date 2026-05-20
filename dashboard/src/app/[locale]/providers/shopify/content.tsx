@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
-import { ShoppingBag, Zap } from 'lucide-react';
+import { ShoppingBag, Zap, ClipboardList } from 'lucide-react';
 
 export function ShopifyWebhooksPageContent() {
   const t = useTranslations('providers');
