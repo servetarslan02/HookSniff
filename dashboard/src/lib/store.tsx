@@ -67,35 +67,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-    // Verify session by calling Next.js API route (same domain, cookies included)
+    // Verify session by calling the backend directly
     const savedToken = localStorage.getItem('hooksniff_token');
     if (savedToken) {
-      fetch('/api/auth/me', {
-        credentials: 'include',
+      fetch(`${API_BASE}/auth/me`, {
+        headers: { 'Authorization': `Bearer ${savedToken}` },
       })
         .then((res) => {
           if (res.ok) return res.json();
-          throw new Error('Not authenticated');
+          // 401 = definitive auth failure → clear everything
+          if (res.status === 401) {
+            throw new Error('Unauthorized');
+          }
+          // Other errors (500, network, CORS) → don't clear auth, just use localStorage
+          return null;
         })
         .then((data) => {
-          const username = toSlug(data.email.split('@')[0]);
-          const u: User = {
-            id: data.id,
-            email: data.email,
-            name: data.name,
-            username,
-            plan: data.plan,
-            is_admin: data.is_admin ?? false,
-          };
-          setUser(u);
-          setApiKeyState(null);
-          setToken(savedToken);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
-          setAuthCookie(savedToken);
+          if (data && data.id) {
+            const username = toSlug(data.email.split('@')[0]);
+            const u: User = {
+              id: data.id,
+              email: data.email,
+              name: data.name,
+              username,
+              plan: data.plan,
+              is_admin: data.is_admin ?? false,
+            };
+            setUser(u);
+            setApiKeyState(null);
+            setToken(savedToken);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
+            setAuthCookie(savedToken);
+          }
+          // If data is null (non-401 error), keep localStorage user as-is
         })
         .catch(() => {
-          // Don't clear auth on network errors — only on definitive auth failures.
-          // The middleware will handle redirects if the cookie is truly invalid.
+          // Only clear on definitive auth failure (401).
+          // Network/CORS errors → keep the user from localStorage.
           setUser(null);
           setToken(null);
           setApiKeyState(null);
@@ -124,9 +132,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    // Use the Next.js API route — it sets HttpOnly cookies on the same domain
-    // via Set-Cookie headers, which persist across navigations.
-    const res = await fetch('/api/auth/login', {
+    // Call backend directly — token comes from response body
+    const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -156,7 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [persistAuth]);
 
   const register = useCallback(async (email: string, password: string, name?: string) => {
-    const res = await fetch('/api/auth/register', {
+    const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, name }),
