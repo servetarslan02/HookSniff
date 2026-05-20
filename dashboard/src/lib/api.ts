@@ -630,7 +630,7 @@ export const adminApi = {
     apiFetch<AlertRuleAdmin>(`/admin/alerts/${id}`, { method: 'PUT', body: data, token }),
 
   deleteAlert: (token: string, id: string) =>
-    apiFetch<{ success: boolean }>(`/admin/alerts/${id}`, { method: 'DELETE', token }),
+    apiFetch<{ deleted: boolean }>(`/admin/alerts/${id}`, { method: 'DELETE', token }),
 
   // Feature Flags
   listFeatureFlags: (token: string) =>
