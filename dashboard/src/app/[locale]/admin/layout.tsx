@@ -71,7 +71,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
         </div>
         <div>
           <div className="font-bold text-gray-900 dark:text-white">{t("adminPanel")}</div>
-          <div className="text-xs text-gray-500 dark:text-slate-400">{t("management")}</div>
+          <div className="text-sm text-gray-500 dark:text-slate-400">{t("management")}</div>
         </div>
       </a>
       <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
@@ -84,7 +84,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
               onClick={onClose}
               hoverDelay={80}
               className={clsx(
-                'flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition',
+                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition',
                 isActive
                   ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'
                   : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
@@ -99,7 +99,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
       <div className="border-t border-gray-200 dark:border-slate-700 mx-2 mt-2 pt-2">
         <Link
           href={"/applications"}
-          className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
         >
           <FolderOpen size={16} strokeWidth={1.75} className="text-gray-400" />
           {t('userPanel') || 'Kullanıcı Paneli'}
