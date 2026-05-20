@@ -24,7 +24,7 @@ export default function MigrationFromSvixPage() {
      {[
       { icon: <DollarSign size={16} strokeWidth={1.75} />, title: 'Generous Free Tier', desc: '10,000 webhooks/month free. No credit card required.' },
       { icon: <Radio size={16} strokeWidth={1.75} />, title: 'More Delivery Methods', desc: 'HTTP, WebSocket, Email, and more. Svix is HTTP-only.' },
-      { icon: <Shuffle size={16} strokeWidth={1.75} />, title: 'Smart Routing', desc: 'Round-robin, latency-based, failover routing built-in.' },
+      { icon: <Shuffle size={16} strokeWidth={1.75} />, title: 'Smart Routing', desc: 'Round-robin and failover routing built-in.' },
       { icon: <BarChart3 size={16} strokeWidth={1.75} />, title: 'Real-time Streaming', desc: 'SSE streaming for live delivery monitoring.' },
       { icon: <Plug size={16} strokeWidth={1.75} />, title: '30+ API Resources', desc: 'Billing, analytics, alerts, SSO, connectors, and more.' },
       { icon: <Package size={16} strokeWidth={1.75} />, title: '11 SDKs', desc: 'Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift.' },
