@@ -33,6 +33,14 @@ interface TabbedSectionProps {
 }
 
 /**
+ * Read a URL search param safely (client-only).
+ */
+function getUrlParam(key: string): string | null {
+  if (typeof window === 'undefined') return null;
+  return new URLSearchParams(window.location.search).get(key);
+}
+
+/**
  * Production-grade tabbed section with lazy rendering and hover prefetch.
  */
 export function TabbedSection({
@@ -45,33 +53,48 @@ export function TabbedSection({
   contentClassName,
   persistUrl = true,
 }: TabbedSectionProps) {
-  // Resolve initial tab from URL (if persistUrl) or fallback to default/first
-  const [active, setActive] = useState(() => {
-    if (persistUrl && typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const urlTab = params.get(urlParam);
+  // Resolve initial tab: URL param > default > first tab
+  const resolveInitial = useCallback((): string => {
+    if (persistUrl) {
+      const urlTab = getUrlParam(urlParam);
       if (urlTab && tabs.some((t) => t.key === urlTab)) return urlTab;
     }
     return defaultTab || tabs[0]?.key || '';
-  });
+  }, [urlParam, tabs, defaultTab, persistUrl]);
 
-  // FIX: Initialize visited with the active tab (not just the first tab)
+  const [active, setActive] = useState<string>(resolveInitial);
+
+  // FIX: visited includes the active tab from URL on init
   const [visited, setVisited] = useState<Set<string>>(() => {
-    const initial = defaultTab || tabs[0]?.key || '';
-    if (persistUrl && typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const urlTab = params.get(urlParam);
-      if (urlTab && tabs.some((t) => t.key === urlTab)) {
-        return new Set([urlTab]);
-      }
-    }
-    return new Set([initial]);
+    return new Set([resolveInitial()]);
   });
 
   const [fadingIn, setFadingIn] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Mark tab as visited (triggers lazy render)
+  // Sync with URL on popstate (browser back/forward)
+  useEffect(() => {
+    if (!persistUrl) return;
+
+    const handlePopState = () => {
+      const urlTab = getUrlParam(urlParam);
+      const resolved = urlTab && tabs.some((t) => t.key === urlTab)
+        ? urlTab
+        : defaultTab || tabs[0]?.key || '';
+      setActive(resolved);
+      setVisited((prev) => {
+        if (prev.has(resolved)) return prev;
+        const next = new Set(prev);
+        next.add(resolved);
+        return next;
+      });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [persistUrl, urlParam, tabs, defaultTab]);
+
+  // Mark tab as visited
   const visit = useCallback((key: string) => {
     setVisited((prev) => {
       if (prev.has(key)) return prev;
@@ -88,7 +111,7 @@ export function TabbedSection({
       visit(key);
       onTabChange?.(key);
 
-      // Update URL param (only if persistUrl is enabled)
+      // Update URL param
       if (persistUrl && typeof window !== 'undefined') {
         const url = new URL(window.location.href);
         if (key === defaultTab || key === tabs[0]?.key) {
@@ -110,14 +133,23 @@ export function TabbedSection({
     [visit]
   );
 
-  // Fade-in effect when tab changes
+  // Fade-in effect
   useEffect(() => {
     setFadingIn(active);
     const timer = setTimeout(() => setFadingIn(null), fadeMs);
     return () => clearTimeout(timer);
   }, [active, fadeMs]);
 
-  // Resolve tab content (supports factory functions)
+  // Guard: if active tab no longer exists, reset to first
+  useEffect(() => {
+    if (!tabs.some((t) => t.key === active) && tabs.length > 0) {
+      const fallback = defaultTab || tabs[0].key;
+      setActive(fallback);
+      visit(fallback);
+    }
+  }, [tabs, active, defaultTab, visit]);
+
+  // Resolve tab content
   const resolveContent = useCallback((tab: Tab): ReactNode => {
     if (typeof tab.content === 'function') {
       return (tab.content as () => ReactNode)();
