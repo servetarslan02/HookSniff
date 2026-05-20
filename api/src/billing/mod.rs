@@ -358,6 +358,16 @@ impl BillingService {
         customer: &Customer,
     ) -> Result<PortalOutcome, AppError> {
         let provider_name = &customer.payment_provider;
+        let base_url = self.cfg.app_url.as_deref().unwrap_or("https://hooksniff.vercel.app");
+
+        // If no payment provider configured, send them to billing page to upgrade
+        if provider_name.is_empty() || provider_name == "none" {
+            return Ok(PortalOutcome {
+                url: format!("{}/dashboard/billing", base_url),
+                provider: "none".to_string(),
+            });
+        }
+
         let provider_enum = provider::PaymentProvider::parse_str(provider_name);
 
         match provider_enum {
@@ -374,13 +384,25 @@ impl BillingService {
                     "polar" => customer.polar_customer_id.as_deref(),
                     "iyzico" => customer.iyzico_customer_id.as_deref(),
                     _ => None,
-                }
-                .unwrap_or("");
+                };
 
-                let base_url = self.cfg.app_url.as_deref().unwrap_or("http://localhost:3001");
+                // If no customer ID from provider, fall back to billing page
+                let customer_id = match provider_customer_id {
+                    Some(id) if !id.is_empty() => id,
+                    _ => {
+                        tracing::warn!(
+                            "No {} customer ID for customer {}, falling back to billing page",
+                            provider_name, customer.id
+                        );
+                        return Ok(PortalOutcome {
+                            url: format!("{}/dashboard/billing", base_url),
+                            provider: provider_name.to_string(),
+                        });
+                    }
+                };
 
                 let url = provider_impl
-                    .create_customer_portal(provider_customer_id, base_url)
+                    .create_customer_portal(customer_id, base_url)
                     .await?;
 
                 Ok(PortalOutcome {
@@ -389,14 +411,15 @@ impl BillingService {
                 })
             }
             provider::PaymentProvider::Stripe => {
-                let stripe_customer_id = customer
-                    .stripe_customer_id
-                    .as_ref()
-                    .ok_or_else(|| {
-                        AppError::BadRequest(
-                            "No Stripe customer found. Upgrade your plan first.".into(),
-                        )
-                    })?;
+                let stripe_customer_id = match customer.stripe_customer_id.as_ref() {
+                    Some(id) if !id.is_empty() => id,
+                    _ => {
+                        return Ok(PortalOutcome {
+                            url: format!("{}/dashboard/billing", base_url),
+                            provider: "stripe".to_string(),
+                        });
+                    }
+                };
 
                 let url = stripe::create_customer_portal(&self.cfg, stripe_customer_id).await?;
 
