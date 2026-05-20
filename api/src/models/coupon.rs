@@ -8,6 +8,7 @@ pub struct CouponCode {
     pub code: String,
     /// "polar" or "internal"
     #[serde(rename = "type")]
+    #[sqlx(rename = "type")]
     pub coupon_type: String,
     /// "percentage" or "free_month"
     pub discount_type: String,
