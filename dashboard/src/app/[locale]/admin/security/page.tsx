@@ -60,10 +60,6 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 };
 const SEVERITY_OPTIONS = ['all', 'critical', 'high', 'medium', 'low'];
 const RESOLVED_OPTIONS = ['all', 'unresolved', 'resolved'];
-const DATE_RANGE_OPTIONS = [
-  { value: '', label: t('allTime') }, { value: '24h', label: t('last24h') },
-  { value: '7d', label: t('last7d') }, { value: '30d', label: t('last30d') },
-];
 
 // ── Helpers ───────────────────────────────────────────────
 
@@ -96,6 +92,11 @@ export default function AdminSecurityPage() {
   const { toast } = useToast();
   const qc = useQueryClient();
   const t = useTranslations('security');
+
+  const DATE_RANGE_OPTIONS = [
+    { value: '', label: t('allTime') }, { value: '24h', label: t('last24h') },
+    { value: '7d', label: t('last7d') }, { value: '30d', label: t('last30d') },
+  ];
 
   const [tab, setTab] = useState<'events' | 'blocklist' | 'analytics'>('events');
   const [showBlockForm, setShowBlockForm] = useState(false);
