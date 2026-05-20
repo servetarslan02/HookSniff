@@ -739,7 +739,6 @@
     "enable2fa": "2FA Etkinleştir",
     "disable2fa": "2FA Devre Dışı Bırak",
     "disable2faDesc": "İki faktörlü doğrulamayı devre dışı bırakmak için şifrenizi girin.",
-    "2faEnabled": "2FA etkin",
     "scanQrCode": "QR Kodu Tara",
     "scanQrDesc": "Bu QR kodu authenticator uygulamanızla tarayın (Google Authenticator, Authy, vb.)",
     "manualSecret": "Veya bu gizli anahtarı manuel girin:",
@@ -905,7 +904,6 @@
     "webhooksMonth": "Webhook/ay",
     "rateLimit": "Hız/dk",
     "dataRetention": "Veri Saklama",
-    "days": "gün",
     "retentionDesc": "Webhook teslimat logları bu kadar gün saklanır.",
     "subscriptionDetails": "Abonelik Detayları",
     "paymentProvider": "Ödeme Sağlayıcı",
@@ -1941,7 +1939,6 @@
     "bulkEmailConfirmCancel": "İptal",
     "emailSent": "E-posta başarıyla gönderildi",
     "emailSendFailed": "E-posta gönderilemedi",
-
     "broadcasts": "Duyurular",
     "broadcastsDesc": "Tüm kullanıcılara global duyuru gönder. Bildirim çanında ve dashboard banner'ında gösterilir.",
     "newBroadcast": "Yeni Duyuru",
@@ -3097,7 +3094,9 @@
     "defaultRole": "Varsayılan Rol",
     "roleViewer": "Görüntüleyici",
     "roleEditor": "Editör",
-    "roleAdmin": "Yönetici"
+    "roleAdmin": "Yönetici",
+    "generateTxt": "TXT Kaydı Oluştur",
+    "autoTeamJoinWarning": "Yeni SSO kullanıcıları ilk girişlerinde bu takıma otomatik olarak katılacaktır."
   },
   "endpointSettings": {
     "title": "Endpoint Ayarları",
@@ -6095,7 +6094,7 @@
     "ssoAutoJoinRole": "Varsayılan Rol",
     "ssoAutoJoinRoleDesc": "Yeni SSO kullanıcılarına atanan rol (görüntüleyici, editör veya admin).",
     "ssoVerifiedDomain": "Doğrulanmış Alan Adı",
-    "ssoVerifiedDomainDesc": "E-posta alan adınızı doğrulayın (ör. company.com), böylece HookSniff kullanıcıları otomatik olarak organizasyonunuzla eşleştirebilir. Bu e-posta alan adına sahip kullanıcılar SSO yapılandırmanıza bağlanır.",
+    "ssoVerifiedDomainDesc": "Otomatik SSO kullanıcı keşfi için e-posta alan adı. Bu alan adındaki kullanıcılar bu organizasyonla eşleştirilecek.",
     "ssoVerifiedDomainHow": "Alan adı doğrulama nasıl çalışır:",
     "ssoDomainStep1": "Alan adınızı girin (ör. company.com)",
     "ssoDomainStep2": "HookSniff bir TXT kaydı oluşturur",
@@ -6113,7 +6112,6 @@
     "ssoAddTxtRecord": "Bu TXT kaydını DNS'inize ekleyin:",
     "ssoTxtRecordName": "Ad",
     "ssoVerifiedDomainHint": "TXT kaydı doğrulaması. Bu e-posta alan adındaki kullanıcılar otomatik olarak eşleştirilecek.",
-    "ssoVerifiedDomainDesc": "Otomatik SSO kullanıcı keşfi için e-posta alan adı. Bu alan adındaki kullanıcılar bu organizasyonla eşleştirilecek.",
     "ssoLoginUrl": "SSO Giriş URL'si",
     "ssoLoginUrlDesc": "SSO zorunlu kılındıktan sonra bir giriş URL'si oluşturulur. Bunu ekibinizle paylaşın:",
     "ssoLoginUrlNote": "Kullanıcılar ayrıca normal giriş sayfasına gidip e-postalarını girebilir — HookSniff SSO sağlayıcısını otomatik olarak algılar.",

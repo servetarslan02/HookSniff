@@ -737,7 +737,6 @@
     "enable2fa": "Enable 2FA",
     "disable2fa": "Disable 2FA",
     "disable2faDesc": "Enter your password to disable two-factor authentication.",
-    "2faEnabled": "2FA is enabled",
     "scanQrCode": "Scan QR Code",
     "scanQrDesc": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
     "manualSecret": "Or enter this secret manually:",
@@ -903,7 +902,6 @@
     "webhooksMonth": "Webhooks/mo",
     "rateLimit": "Rate/min",
     "dataRetention": "Data Retention",
-    "days": "days",
     "retentionDesc": "Webhook delivery logs are kept for this many days.",
     "subscriptionDetails": "Subscription Details",
     "paymentProvider": "Payment Provider",
@@ -1939,7 +1937,6 @@
     "bulkEmailConfirmCancel": "Cancel",
     "emailSent": "Email sent successfully",
     "emailSendFailed": "Could not send the email. Please try again.",
-
     "broadcasts": "Broadcasts",
     "broadcastsDesc": "Send global announcements to all users. Shows in notification bell and dashboard banner.",
     "newBroadcast": "New Broadcast",
@@ -2977,7 +2974,9 @@
     "defaultRole": "Default Role",
     "roleViewer": "Viewer",
     "roleEditor": "Editor",
-    "roleAdmin": "Admin"
+    "roleAdmin": "Admin",
+    "generateTxt": "Generate TXT Record",
+    "autoTeamJoinWarning": "New SSO users will automatically join this team on first login."
   },
   "auditLog": {
     "title": "📋 Audit Log",
@@ -6130,7 +6129,7 @@
     "ssoAutoJoinRole": "Default Role",
     "ssoAutoJoinRoleDesc": "The role assigned to new SSO users (viewer, editor, or admin).",
     "ssoVerifiedDomain": "Verified Domain",
-    "ssoVerifiedDomainDesc": "Verify your email domain (e.g., company.com) so HookSniff can automatically match users to your organization. Users with this email domain are linked to your SSO config.",
+    "ssoVerifiedDomainDesc": "Email domain for automatic SSO user discovery. Users with this domain will be matched to this organization.",
     "ssoVerifiedDomainHow": "How domain verification works:",
     "ssoDomainStep1": "Enter your domain (e.g., company.com)",
     "ssoDomainStep2": "HookSniff generates a TXT record",
@@ -6148,7 +6147,6 @@
     "ssoAddTxtRecord": "Add this TXT record to your DNS:",
     "ssoTxtRecordName": "Name",
     "ssoVerifiedDomainHint": "TXT record verification. Users with this email domain will be auto-matched.",
-    "ssoVerifiedDomainDesc": "Email domain for automatic SSO user discovery. Users with this domain will be matched to this organization.",
     "ssoLoginUrl": "SSO Login URL",
     "ssoLoginUrlDesc": "After SSO is enforced, a login URL is generated. Share this with your team:",
     "ssoLoginUrlNote": "Users can also go to the normal login page and enter their email — HookSniff detects the SSO provider automatically.",
