@@ -89,11 +89,11 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     { name: t('core'), href: '/core', icon: <LayoutDashboard size={16} strokeWidth={1.75} /> },
     { name: t('applications'), href: '/applications', icon: <Smartphone size={16} strokeWidth={1.75} /> },
     { name: t('organization'), href: '/organization', icon: <Users size={16} strokeWidth={1.75} /> },
-    { name: t('integrations'), href: '/integrations', icon: <Zap size={16} strokeWidth={1.75} /> },
-    { name: t('routingConfig'), href: '/routing-config', icon: <Settings size={16} strokeWidth={1.75} /> },
     { name: t('webhookDashboard'), href: '/operational-webhooks', icon: <Layers size={16} strokeWidth={1.75} /> },
     { name: t('observability'), href: '/observability', icon: <Eye size={16} strokeWidth={1.75} /> },
     { name: t('devtools'), href: '/devtools', icon: <Code2 size={16} strokeWidth={1.75} /> },
+    { name: t('integrations'), href: '/integrations', icon: <Zap size={16} strokeWidth={1.75} /> },
+    { name: t('routingConfig'), href: '/routing-config', icon: <Settings size={16} strokeWidth={1.75} /> },
     { name: t('billingSection'), href: '/billing-section', icon: <CreditCard size={16} strokeWidth={1.75} /> },
     { name: t('account'), href: '/account', icon: <UserCircle size={16} strokeWidth={1.75} /> },
   ];
