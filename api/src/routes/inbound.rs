@@ -47,6 +47,12 @@ pub fn router() -> Router {
             "/configs/{id}",
             put(update_config).delete(delete_config),
         )
+}
+
+/// Public router — no auth middleware. External services call these.
+/// Provider endpoints verify signatures themselves.
+pub fn public_router() -> Router {
+    Router::new()
         .route("/{provider}", post(handle_inbound))
         .route(
             "/{provider}/{endpoint_id}",

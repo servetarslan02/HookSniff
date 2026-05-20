@@ -742,11 +742,11 @@ async fn reserve_webhook_slot(
     customer: &Customer,
     count: i64,
 ) -> Result<(), AppError> {
-    let updated: Option<Customer> = if customer.allow_overage {
-        sqlx::query_as("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 RETURNING *")
+    let updated: Option<(Uuid, i64)> = if customer.allow_overage {
+        sqlx::query_as("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 RETURNING id, webhook_count")
             .bind(count).bind(customer.id).fetch_optional(pool).await?
     } else {
-        sqlx::query_as("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 AND webhook_count + $1 <= $3 RETURNING *")
+        sqlx::query_as("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 AND webhook_count + $1 <= $3 RETURNING id, webhook_count")
             .bind(count).bind(customer.id).bind(customer.webhook_limit).fetch_optional(pool).await?
     };
     if updated.is_none() { Err(AppError::RateLimitExceeded) } else { Ok(()) }
