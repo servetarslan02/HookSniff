@@ -833,3 +833,19 @@ export function useIsFeatureEnabled(flagName: string): boolean {
   const { data } = useFeatureFlags();
   return data?.enabled_flags?.includes(flagName) ?? false;
 }
+
+// ── Admin Broadcasts ──
+export function useAdminBroadcasts(params?: { is_active?: string; broadcast_type?: string }) {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'broadcasts', params],
+    queryFn: async () => {
+      const qs: Record<string, string> = { per_page: '100' };
+      if (params?.is_active) qs.is_active = params.is_active;
+      if (params?.broadcast_type) qs.broadcast_type = params.broadcast_type;
+      return adminApi.listBroadcasts(token!, qs);
+    },
+    enabled: !!token,
+    staleTime: 30_000,
+  });
+}
