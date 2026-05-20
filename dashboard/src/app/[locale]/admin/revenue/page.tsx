@@ -37,7 +37,7 @@ const RevenueContent = dynamic(() => import('./components/RevenueContent'), { ss
 export default function AdminRevenuePage() {
   const { token } = useAuth();
   // Primary data — needed immediately
-  const { data: revenue, isLoading, error, refetch } = useAdminRevenue();
+  const { data: revenue, refetch } = useAdminRevenue();
   const { data: revenueMetrics } = useAdminRevenueMetrics();
 
   // Secondary data — deferred (don't block initial render)
@@ -173,36 +173,11 @@ export default function AdminRevenuePage() {
     count: item.count,
   })) || [];
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('revenue')}</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{tc('loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('revenue')}</h1>
-        </div>
-        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
-          <span className="text-red-700 dark:text-red-400 text-sm">{t("failedToLoadRevenue")}</span>
-          <button type="button" onClick={() => refetch()} className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline">{tc('retry')}</button>
-        </div>
-      </div>
-    );
-  }
-
   const hasRevenueData = monthlyData.length > 0 || planData.length > 0;
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      {/* Header with date range + refresh */}
+      {/* Header — always visible immediately */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("revenueTitle")}</h1>

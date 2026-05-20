@@ -89,13 +89,13 @@ export function useAdminAuditLogs(params?: {
       () => adminApi.getAuditLogs(token!, params),
       AuditLogResponseSchema
     ),
-    enabled: !!token,
+    enabled: !!token && !!params,
     staleTime: 15_000,
   });
 }
 
 // ── Admin Feature Flags ──
-export function useAdminFeatureFlags() {
+export function useAdminFeatureFlags(enabled = true) {
   const { token } = useAuth();
   return useQuery({
     queryKey: ['admin', 'feature-flags'],
@@ -103,18 +103,18 @@ export function useAdminFeatureFlags() {
       () => adminApi.listFeatureFlags(token!),
       FeatureFlagsResponseSchema
     ),
-    enabled: !!token,
+    enabled: !!token && enabled,
     staleTime: 30_000,
   });
 }
 
 // ── Admin Deploy Info ──
-export function useAdminDeployInfo() {
+export function useAdminDeployInfo(enabled = true) {
   const { token } = useAuth();
   return useQuery<DeployInfoValidated>({
     queryKey: ['admin', 'deploy-info'],
     queryFn: validated(() => adminApi.getDeployInfo(token!), DeployInfoSchema),
-    enabled: !!token,
+    enabled: !!token && enabled,
     staleTime: 5 * 60_000,
   });
 }
@@ -329,12 +329,12 @@ export function useSystemHealth() {
 }
 
 // ── Queue Status ──
-export function useQueueStatus() {
+export function useQueueStatus(enabled = true) {
   const { token } = useAuth();
   return useQuery({
     queryKey: ['admin', 'queue-status'],
     queryFn: validated(() => adminApi.getQueueStatus(token!), QueueStatusSchema),
-    enabled: !!token,
+    enabled: !!token && enabled,
     staleTime: 15_000,
   });
 }
@@ -345,7 +345,7 @@ export function useFailedDeliveries(params?: { limit?: number; since?: string })
   return useQuery({
     queryKey: ['admin', 'failed-deliveries', params],
     queryFn: validated(() => adminApi.getFailedDeliveries(token!, params), FailedDeliveriesResponseSchema),
-    enabled: !!token,
+    enabled: !!token && !!params,
     staleTime: 15_000,
   });
 }
@@ -367,7 +367,7 @@ export function useRateLimitViolations(params?: { limit?: number; since?: string
   return useQuery({
     queryKey: ['admin', 'rate-limit-violations', params],
     queryFn: validated(() => adminApi.getRateLimitViolations(token!, params), RateLimitViolationsResponseSchema),
-    enabled: !!token,
+    enabled: !!token && !!params,
     staleTime: 15_000,
   });
 }
