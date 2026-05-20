@@ -108,8 +108,12 @@ export default function InboundPage() {
     setDeleteTarget(null);
   };
 
-  const copyUrl = (providerId: string) => {
-    navigator.clipboard.writeText(`${API_BASE}/inbound/${providerId}`);
+  const copyUrl = (providerId: string, endpointId?: string) => {
+    if (endpointId) {
+      navigator.clipboard.writeText(`${API_BASE}/inbound/${providerId}/${endpointId}`);
+    } else {
+      navigator.clipboard.writeText(`${API_BASE}/inbound/${providerId}/{endpoint_id}`);
+    }
     toast(t('inbound.copied'), 'success');
   };
 
@@ -172,18 +176,47 @@ export default function InboundPage() {
       {/* Inbound URL info */}
       <div className="glass-card p-6">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{t('inbound.yourUrls')}</h3>
-        <div className="space-y-2">
-          {PROVIDERS.filter(p => p.id !== 'generic').map(p => (
-            <div key={p.id} className="flex items-center gap-3">
-              <span className="text-lg w-8 text-center">{p.icon}</span>
-              <code className="flex-1 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-950 text-xs font-mono text-gray-700 dark:text-slate-300 truncate">
-                POST {API_BASE}/inbound/{p.id}
-              </code>
-              <span className="text-[10px] text-gray-400 dark:text-slate-500 w-24 text-right">{p.sig}</span>
-              <button onClick={() => copyUrl(p.id)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline whitespace-nowrap">{t('inbound.copy')}</button>
-            </div>
-          ))}
-        </div>
+        <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">
+          {t('inbound.urlExplanation')}
+        </p>
+        {configs.length > 0 ? (
+          <div className="space-y-2">
+            {configs.filter(c => c.enabled && c.endpoint_id).map(cfg => {
+              const provider = PROVIDERS.find(p => p.id === cfg.provider);
+              if (!provider) return null;
+              return (
+                <div key={cfg.id} className="flex items-center gap-3">
+                  <span className="text-lg w-8 text-center">{provider.icon}</span>
+                  <code className="flex-1 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-950 text-xs font-mono text-gray-700 dark:text-slate-300 truncate">
+                    POST {API_BASE}/inbound/{provider.id}/{cfg.endpoint_id}
+                  </code>
+                  <span className="text-[10px] text-gray-400 dark:text-slate-500 w-24 text-right">{provider.sig}</span>
+                  <button onClick={() => copyUrl(provider.id, cfg.endpoint_id ?? undefined)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline whitespace-nowrap">{t('inbound.copy')}</button>
+                </div>
+              );
+            })}
+            {configs.filter(c => c.enabled && c.endpoint_id).length === 0 && (
+              <p className="text-sm text-amber-600 dark:text-amber-400">
+                {t('inbound.noEndpointsConfigured')}
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {PROVIDERS.filter(p => p.id !== 'generic').map(p => (
+              <div key={p.id} className="flex items-center gap-3 opacity-50">
+                <span className="text-lg w-8 text-center">{p.icon}</span>
+                <code className="flex-1 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-950 text-xs font-mono text-gray-700 dark:text-slate-300 truncate">
+                  POST {API_BASE}/inbound/{p.id}/{'{endpoint_id}'}
+                </code>
+                <span className="text-[10px] text-gray-400 dark:text-slate-500 w-24 text-right">{p.sig}</span>
+              </div>
+            ))}
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-2">
+              {t('inbound.createConfigFirst')}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Existing configs */}
