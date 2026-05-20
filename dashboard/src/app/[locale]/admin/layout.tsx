@@ -13,17 +13,17 @@ import { useRealtime } from '@/hooks/useRealtime';
 import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, FolderOpen, Lock, Shield } from '@/components/icons';
 
 const adminNavigation = [
-  { nameKey: 'overview', href: '/admin', icon: <BarChart3 size={18} strokeWidth={1.75} /> },
-  { nameKey: 'users', href: '/admin/users', icon: <Users size={18} strokeWidth={1.75} /> },
-  { nameKey: 'revenue', href: '/admin/revenue', icon: <DollarSign size={18} strokeWidth={1.75} /> },
-  { nameKey: 'featureFlags', href: '/admin/feature-flags', icon: <Flag size={18} strokeWidth={1.75} /> },
-  { nameKey: 'coupons', href: '/admin/coupons', icon: <Zap size={18} strokeWidth={1.75} /> },
-  { nameKey: 'system', href: '/admin/system', icon: <Monitor size={18} strokeWidth={1.75} /> },
-  { nameKey: 'settingsNav', href: '/admin/settings', icon: <Settings size={18} strokeWidth={1.75} /> },
-  { nameKey: 'activityLog', href: '/admin/activity', icon: <ClipboardList size={18} strokeWidth={1.75} /> },
-  { nameKey: 'alerts', href: '/admin/alerts', icon: <Bell size={18} strokeWidth={1.75} /> },
-  { nameKey: 'email', href: '/admin/email', icon: <Mail size={18} strokeWidth={1.75} /> },
-  { nameKey: 'security', href: '/admin/security', icon: <Shield size={18} strokeWidth={1.75} /> },
+  { nameKey: 'overview', href: '/admin', icon: <BarChart3 size={16} strokeWidth={1.75} /> },
+  { nameKey: 'users', href: '/admin/users', icon: <Users size={16} strokeWidth={1.75} /> },
+  { nameKey: 'revenue', href: '/admin/revenue', icon: <DollarSign size={16} strokeWidth={1.75} /> },
+  { nameKey: 'featureFlags', href: '/admin/feature-flags', icon: <Flag size={16} strokeWidth={1.75} /> },
+  { nameKey: 'coupons', href: '/admin/coupons', icon: <Zap size={16} strokeWidth={1.75} /> },
+  { nameKey: 'system', href: '/admin/system', icon: <Monitor size={16} strokeWidth={1.75} /> },
+  { nameKey: 'settingsNav', href: '/admin/settings', icon: <Settings size={16} strokeWidth={1.75} /> },
+  { nameKey: 'activityLog', href: '/admin/activity', icon: <ClipboardList size={16} strokeWidth={1.75} /> },
+  { nameKey: 'alerts', href: '/admin/alerts', icon: <Bell size={16} strokeWidth={1.75} /> },
+  { nameKey: 'email', href: '/admin/email', icon: <Mail size={16} strokeWidth={1.75} /> },
+  { nameKey: 'security', href: '/admin/security', icon: <Shield size={16} strokeWidth={1.75} /> },
 ];
 
 function AdminShell({ children }: { children: React.ReactNode }) {
@@ -112,7 +112,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="text-xs text-gray-500 dark:text-slate-400">{t("management")}</div>
           </div>
         </a>
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
           {adminNavigation.map((item) => {
             const isActive =
               item.href === '/admin'
@@ -125,7 +125,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                 onClick={() => setSidebarOpen(false)}
                 hoverDelay={80}
                 className={clsx(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition',
+                  'flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition',
                   isActive
                     ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'
                     : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
@@ -137,12 +137,12 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="border-t border-gray-200 dark:border-slate-700 mx-3 mt-2 pt-3">
+        <div className="border-t border-gray-200 dark:border-slate-700 mx-2 mt-2 pt-2">
           <Link
             href={"/applications"}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
+            className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white transition"
           >
-            <FolderOpen size={18} strokeWidth={1.75} className="text-gray-400" />
+            <FolderOpen size={16} strokeWidth={1.75} className="text-gray-400" />
             {t('userPanel') || 'Kullanıcı Paneli'}
           </Link>
         </div>
