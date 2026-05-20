@@ -130,7 +130,7 @@ async fn process_webhook_result(
             let period_interval = if interval == "year" { "365 days" } else { "30 days" };
             if let Some((cust_col, sub_col)) = provider_columns(provider) {
                 // Mark startup trial as used when customer subscribes to Startup plan
-                let trial_flag = if plan == Plan::Startup {
+                let trial_flag = if *plan == Plan::Startup {
                     ", has_used_startup_trial = true"
                 } else {
                     ""
