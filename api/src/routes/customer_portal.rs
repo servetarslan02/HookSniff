@@ -74,12 +74,11 @@ async fn update_profile(
         if !email.contains('@') {
             return Err(AppError::BadRequest("Invalid email".into()));
         }
-        sqlx::query("UPDATE customers SET email = $1 WHERE id = $2")
-            .bind(email)
-            .bind(customer.id)
-            .execute(&pool)
-            .await?;
-        customer.email = email.clone();
+        // SECURITY: Direct email change is not allowed — must use /auth/request-email-change
+        // followed by /auth/confirm-email-change to prevent account takeover.
+        return Err(AppError::BadRequest(
+            "Email cannot be changed directly. Use /auth/request-email-change to verify your new email first.".into()
+        ));
     }
 
     Ok(Json(ProfileResponse {
