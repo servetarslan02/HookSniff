@@ -14,15 +14,7 @@ use crate::error::AppError;
 use crate::models::customer::Customer;
 
 use super::require_admin;
-use super::stats::{SystemStats, RevenueResponse, PlanCount, RecentSignup, StatsTrends, RevenueRow, RevenueByPlan, ChurnedUser};
-use super::audit;
-use super::feature_flags;
-use super::monitoring;
-use super::settings;
-use super::alerts;
-use super::broadcasts;
-use super::security;
-use super::users;
+use super::stats::{SystemStats, RevenueResponse, PlanCount, RecentSignup, StatsTrends, RevenueRow, RevenueByPlan};
 
 // ── Response Type ──────────────────────────────────────────
 
@@ -89,7 +81,7 @@ pub struct AlertSummary {
     pub id: String,
     pub name: String,
     pub condition: String,
-    pub threshold: f64,
+    pub threshold: i32,
     pub is_active: bool,
 }
 
@@ -319,9 +311,9 @@ async fn fetch_revenue(pool: &PgPool) -> Result<RevenueResponse, AppError> {
 }
 
 async fn fetch_audit_logs(pool: &PgPool) -> Result<AuditLogsSummary, AppError> {
-    let rows: Vec<(uuid::Uuid, String, String, Option<String>, Option<String>, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
+    let rows: Vec<(uuid::Uuid, String, String, Option<String>, Option<serde_json::Value>, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
         "SELECT id, action, resource_type, resource_id, details, created_at \
-         FROM audit_logs ORDER BY created_at DESC LIMIT 5"
+         FROM audit_log ORDER BY created_at DESC LIMIT 5"
     ).fetch_all(pool).await?;
 
     let entries: Vec<serde_json::Value> = rows.iter().map(|r| {
@@ -331,21 +323,21 @@ async fn fetch_audit_logs(pool: &PgPool) -> Result<AuditLogsSummary, AppError> {
         })
     }).collect();
 
-    let total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM audit_logs").fetch_one(pool).await?;
+    let total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM audit_log").fetch_one(pool).await?;
 
     Ok(AuditLogsSummary { entries, total: total.0 })
 }
 
 async fn fetch_feature_flags(pool: &PgPool) -> Result<FeatureFlagsSummary, AppError> {
-    let rows: Vec<(uuid::Uuid, String, String, bool, Option<String>, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
-        "SELECT id, name, description, is_enabled, allowed_plans, created_at \
+    let rows: Vec<(uuid::Uuid, String, String, bool, Option<serde_json::Value>, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
+        "SELECT id, name, description, is_enabled, enabled_for_plans, created_at \
          FROM feature_flags ORDER BY created_at DESC"
     ).fetch_all(pool).await?;
 
     let flags: Vec<serde_json::Value> = rows.iter().map(|r| {
         serde_json::json!({
             "id": r.0, "name": r.1, "description": r.2,
-            "is_enabled": r.3, "allowed_plans": r.4, "created_at": r.5
+            "is_enabled": r.3, "enabled_for_plans": r.4, "created_at": r.5
         })
     }).collect();
 
@@ -358,7 +350,7 @@ async fn fetch_queue_status(pool: &PgPool) -> Result<QueueStatusSummary, AppErro
     let pending: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM deliveries WHERE status = 'pending'").fetch_one(pool).await?;
     let processing: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM deliveries WHERE status = 'processing'").fetch_one(pool).await?;
     let failed: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM deliveries WHERE status = 'failed'").fetch_one(pool).await?;
-    let dead_letter: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM deliveries WHERE status = 'dead'").fetch_one(pool).await?;
+    let dead_letter: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM dead_letters").fetch_one(pool).await?;
     let oldest: (Option<chrono::DateTime<chrono::Utc>>,) = sqlx::query_as(
         "SELECT MIN(created_at) FROM deliveries WHERE status = 'pending'"
     ).fetch_one(pool).await?;
@@ -376,14 +368,14 @@ async fn fetch_queue_status(pool: &PgPool) -> Result<QueueStatusSummary, AppErro
 }
 
 async fn fetch_failed_deliveries(pool: &PgPool) -> Result<FailedDeliveriesSummary, AppError> {
-    let rows: Vec<serde_json::Value> = sqlx::query_as::<_, (uuid::Uuid, String, String, chrono::DateTime<chrono::Utc>)>(
+    let raw: Vec<(uuid::Uuid, String, String, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
         "SELECT id, status, event_type, created_at FROM deliveries \
          WHERE status = 'failed' ORDER BY created_at DESC LIMIT 5"
-    ).fetch_all(pool).await.iter().map(|r| {
-        r.iter().map(|row| serde_json::json!({
-            "id": row.0, "status": row.1, "event_type": row.2, "created_at": row.3
-        })).collect()
-    }).unwrap_or_default();
+    ).fetch_all(pool).await?;
+
+    let rows: Vec<serde_json::Value> = raw.iter().map(|row| serde_json::json!({
+        "id": row.0, "status": row.1, "event_type": row.2, "created_at": row.3
+    })).collect();
 
     let total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM deliveries WHERE status = 'failed'").fetch_one(pool).await?;
 
@@ -391,14 +383,14 @@ async fn fetch_failed_deliveries(pool: &PgPool) -> Result<FailedDeliveriesSummar
 }
 
 async fn fetch_rate_limit_violations(pool: &PgPool) -> Result<RateLimitSummary, AppError> {
-    let rows: Vec<serde_json::Value> = sqlx::query_as::<_, (uuid::Uuid, String, String, chrono::DateTime<chrono::Utc>)>(
+    let raw: Vec<(uuid::Uuid, String, String, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
         "SELECT id, ip_address, reason, created_at FROM ip_blocklist \
          WHERE auto_blocked = true ORDER BY created_at DESC LIMIT 5"
-    ).fetch_all(pool).await.iter().map(|r| {
-        r.iter().map(|row| serde_json::json!({
-            "id": row.0, "ip": row.1, "reason": row.2, "created_at": row.3
-        })).collect()
-    }).unwrap_or_default();
+    ).fetch_all(pool).await?;
+
+    let rows: Vec<serde_json::Value> = raw.iter().map(|row| serde_json::json!({
+        "id": row.0, "ip": row.1, "reason": row.2, "created_at": row.3
+    })).collect();
 
     let total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM ip_blocklist WHERE auto_blocked = true").fetch_one(pool).await?;
 
@@ -406,7 +398,7 @@ async fn fetch_rate_limit_violations(pool: &PgPool) -> Result<RateLimitSummary, 
 }
 
 async fn fetch_alerts(pool: &PgPool) -> Result<Vec<AlertSummary>, AppError> {
-    let rows: Vec<(uuid::Uuid, String, String, f64, bool)> = sqlx::query_as(
+    let rows: Vec<(uuid::Uuid, String, String, i32, bool)> = sqlx::query_as(
         "SELECT id, name, condition, threshold, is_active FROM alert_rules ORDER BY created_at DESC LIMIT 10"
     ).fetch_all(pool).await?;
 
@@ -465,16 +457,16 @@ async fn fetch_security_stats(pool: &PgPool) -> Result<SecurityStatsSummary, App
 }
 
 async fn fetch_users(pool: &PgPool) -> Result<UsersSummary, AppError> {
-    let rows: Vec<serde_json::Value> = sqlx::query_as::<_, (uuid::Uuid, String, Option<String>, String, bool, bool, chrono::DateTime<chrono::Utc>)>(
+    let raw: Vec<(uuid::Uuid, String, Option<String>, String, bool, bool, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
         "SELECT id, email, name, plan, is_active, is_admin, created_at \
          FROM customers ORDER BY created_at DESC LIMIT 25"
-    ).fetch_all(pool).await.iter().map(|r| {
-        r.iter().map(|row| serde_json::json!({
-            "id": row.0, "email": row.1, "name": row.2, "plan": row.3,
-            "status": if row.4 { "active" } else { "banned" },
-            "is_admin": row.5, "created_at": row.6
-        })).collect()
-    }).unwrap_or_default();
+    ).fetch_all(pool).await?;
+
+    let rows: Vec<serde_json::Value> = raw.iter().map(|row| serde_json::json!({
+        "id": row.0, "email": row.1, "name": row.2, "plan": row.3,
+        "status": if row.4 { "active" } else { "banned" },
+        "is_admin": row.5, "created_at": row.6
+    })).collect();
 
     let total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM customers").fetch_one(pool).await?;
 
