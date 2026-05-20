@@ -841,12 +841,12 @@ export function useAuditLogs(params?: { page?: number; limit?: number; action?: 
 }
 
 // ── Endpoint Health ──
-export function useEndpointHealth() {
+export function useEndpointHealth(range = '24h') {
   const { token } = useAuth();
   return useQuery<EndpointHealthResponse[]>({
-    queryKey: ['endpoint-health'],
+    queryKey: ['endpoint-health', range],
     queryFn: validated(
-      () => api.getEndpointHealth(token || undefined),
+      () => api.getEndpointHealth(token || undefined, range),
       EndpointHealthSchema.array()
     ),
     enabled: true,

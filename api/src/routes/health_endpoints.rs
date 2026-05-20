@@ -1,13 +1,12 @@
-use axum::extract::Extension;
+use axum::extract::{Extension, Query};
 use axum::routing::get;
 use axum::{Json, Router};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
-
 
 /// Determine health status based on failure streak and success rate.
 fn determine_health_status(failure_streak: i32, success_rate: f64) -> &'static str {
@@ -19,10 +18,26 @@ fn determine_health_status(failure_streak: i32, success_rate: f64) -> &'static s
         "healthy"
     }
 }
+
+/// Map range string to PostgreSQL interval.
+fn range_to_interval(range: &str) -> &str {
+    match range {
+        "7d" => "7 days",
+        "30d" => "30 days",
+        "90d" => "90 days",
+        _ => "24 hours", // default
+    }
+}
+
 pub fn router() -> Router {
     Router::new()
         .route("/", get(list_endpoint_health))
         .route("/{id}", get(get_endpoint_health))
+}
+
+#[derive(Deserialize)]
+struct HealthQuery {
+    range: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -46,7 +61,7 @@ struct EndpointHealth {
     uptime_7d: f64,
 }
 
-/// Delivery stats per endpoint (24h window).
+/// Delivery stats per endpoint.
 #[derive(sqlx::FromRow)]
 struct EndpointStatsRow {
     endpoint_id: Uuid,
@@ -55,7 +70,7 @@ struct EndpointStatsRow {
     failed: i64,
 }
 
-/// Percentile stats from delivery_attempts (24h window).
+/// Percentile stats from delivery_attempts.
 #[derive(sqlx::FromRow)]
 struct PercentileRow {
     endpoint_id: Uuid,
@@ -82,7 +97,10 @@ struct LastSuccessRow {
 async fn list_endpoint_health(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Query(params): Query<HealthQuery>,
 ) -> Result<Json<Vec<EndpointHealth>>, AppError> {
+    let interval = range_to_interval(params.range.as_deref().unwrap_or("24h"));
+
     let endpoints = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
         "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 500",
     )
@@ -96,36 +114,41 @@ async fn list_endpoint_health(
         return Ok(Json(vec![]));
     }
 
-    // 1. Delivery stats (24h)
-    let stats_rows: Vec<EndpointStatsRow> = sqlx::query_as::<_, EndpointStatsRow>(
+    // 1. Delivery stats (selected range)
+    let stats_sql = format!(
         "SELECT endpoint_id, \
          COUNT(*) as total, \
          COUNT(*) FILTER (WHERE status = 'delivered') as successful, \
          COUNT(*) FILTER (WHERE status = 'failed') as failed \
          FROM deliveries \
-         WHERE endpoint_id = ANY($1) AND created_at > NOW() - INTERVAL '24 hours' \
+         WHERE endpoint_id = ANY($1) AND created_at > NOW() - INTERVAL '{}' \
          GROUP BY endpoint_id",
-    )
-    .bind(&endpoint_ids)
-    .fetch_all(&pool)
-    .await
-    .unwrap_or_default();
+        interval
+    );
+    let stats_rows: Vec<EndpointStatsRow> = sqlx::query_as::<_, EndpointStatsRow>(&stats_sql)
+        .bind(&endpoint_ids)
+        .fetch_all(&pool)
+        .await
+        .unwrap_or_default();
 
-    // 2. Real p95/p99 from delivery_attempts (24h)
-    let percentile_rows: Vec<PercentileRow> = sqlx::query_as::<_, PercentileRow>(
+    // 2. Real p95/p99 from delivery_attempts (selected range)
+    let percentile_sql = format!(
         "SELECT d.endpoint_id, \
          percentile_cont(0.95) WITHIN GROUP (ORDER BY da.duration_ms) as p95_ms, \
          percentile_cont(0.99) WITHIN GROUP (ORDER BY da.duration_ms) as p99_ms, \
          AVG(da.duration_ms) as avg_ms \
          FROM delivery_attempts da \
          JOIN deliveries d ON d.id = da.delivery_id \
-         WHERE d.endpoint_id = ANY($1) AND da.created_at > NOW() - INTERVAL '24 hours' \
+         WHERE d.endpoint_id = ANY($1) AND da.created_at > NOW() - INTERVAL '{}' \
          GROUP BY d.endpoint_id",
-    )
-    .bind(&endpoint_ids)
-    .fetch_all(&pool)
-    .await
-    .unwrap_or_default();
+        interval
+    );
+    let percentile_rows: Vec<PercentileRow> =
+        sqlx::query_as::<_, PercentileRow>(&percentile_sql)
+            .bind(&endpoint_ids)
+            .fetch_all(&pool)
+            .await
+            .unwrap_or_default();
 
     // 3. 7-day delivery stats
     let stats_7d_rows: Vec<Stats7dRow> = sqlx::query_as::<_, Stats7dRow>(
@@ -183,7 +206,7 @@ async fn list_endpoint_health(
     let health_list: Vec<EndpointHealth> = endpoints
         .into_iter()
         .map(|ep| {
-            // 24h stats
+            // Range stats
             let (total, successful, failed) = stats_map.get(&ep.id).copied().unwrap_or((0, 0, 0));
             let success_rate = if total > 0 {
                 (successful as f64 / total as f64) * 100.0
@@ -233,7 +256,10 @@ async fn get_endpoint_health(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
+    Query(params): Query<HealthQuery>,
 ) -> Result<Json<EndpointHealth>, AppError> {
+    let interval = range_to_interval(params.range.as_deref().unwrap_or("24h"));
+
     let ep = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
         "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2",
     )
@@ -243,15 +269,17 @@ async fn get_endpoint_health(
     .await?
     .ok_or(AppError::NotFound)?;
 
-    // 24h stats
-    let (total, successful, failed): (i64, i64, i64) = sqlx::query_as(
+    // Range stats
+    let stats_sql = format!(
         "SELECT COUNT(*), COUNT(*) FILTER (WHERE status = 'delivered'), COUNT(*) FILTER (WHERE status = 'failed') \
-         FROM deliveries WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '24 hours'",
-    )
-    .bind(ep.id)
-    .fetch_one(&pool)
-    .await
-    .unwrap_or((0, 0, 0));
+         FROM deliveries WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '{}'",
+        interval
+    );
+    let (total, successful, failed): (i64, i64, i64) = sqlx::query_as(&stats_sql)
+        .bind(ep.id)
+        .fetch_one(&pool)
+        .await
+        .unwrap_or((0, 0, 0));
 
     let success_rate = if total > 0 {
         (successful as f64 / total as f64) * 100.0
@@ -260,19 +288,22 @@ async fn get_endpoint_health(
     };
 
     // Real p95/p99 from delivery_attempts
-    let (p95, p99, avg): (Option<f64>, Option<f64>, Option<f64>) = sqlx::query_as(
+    let percentile_sql = format!(
         "SELECT \
          percentile_cont(0.95) WITHIN GROUP (ORDER BY da.duration_ms), \
          percentile_cont(0.99) WITHIN GROUP (ORDER BY da.duration_ms), \
          AVG(da.duration_ms) \
          FROM delivery_attempts da \
          JOIN deliveries d ON d.id = da.delivery_id \
-         WHERE d.endpoint_id = $1 AND da.created_at > NOW() - INTERVAL '24 hours'",
-    )
-    .bind(ep.id)
-    .fetch_one(&pool)
-    .await
-    .unwrap_or((None, None, None));
+         WHERE d.endpoint_id = $1 AND da.created_at > NOW() - INTERVAL '{}'",
+        interval
+    );
+    let (p95, p99, avg): (Option<f64>, Option<f64>, Option<f64>) =
+        sqlx::query_as(&percentile_sql)
+            .bind(ep.id)
+            .fetch_one(&pool)
+            .await
+            .unwrap_or((None, None, None));
 
     // 7d stats
     let (total_7d, successful_7d): (i64, i64) = sqlx::query_as(
@@ -329,6 +360,16 @@ mod tests {
     #[test]
     fn test_router_construction() {
         let _r = router();
+    }
+
+    #[test]
+    fn test_range_to_interval() {
+        assert_eq!(range_to_interval("24h"), "24 hours");
+        assert_eq!(range_to_interval("7d"), "7 days");
+        assert_eq!(range_to_interval("30d"), "30 days");
+        assert_eq!(range_to_interval("90d"), "90 days");
+        assert_eq!(range_to_interval("invalid"), "24 hours");
+        assert_eq!(range_to_interval(""), "24 hours");
     }
 
     #[test]
