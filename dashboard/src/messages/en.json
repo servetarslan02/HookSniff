@@ -789,6 +789,8 @@
     "confirmPause": "Pause",
     "couponCode": "Coupon Code (optional)",
     "couponPlaceholder": "ENTER CODE",
+    "enterCoupon": "Enter Coupon Code",
+    "confirmCoupon": "Apply",
     "subscriptionPaused": "Subscription paused",
     "resumeBefore": "Resume before:",
     "resumeSubscription": "Resume",
