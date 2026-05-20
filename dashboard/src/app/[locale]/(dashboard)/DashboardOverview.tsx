@@ -100,7 +100,7 @@ export function DashboardOverview() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -172,13 +172,13 @@ export function DashboardOverview() {
             isOver: overId === 'stat-cards',
           }}
         >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label={t('totalDeliveries')}
           value={loading ? '—' : (stats?.total_deliveries?.toLocaleString() ?? '0')}
           color="blue"
           icon={
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           }
@@ -188,7 +188,7 @@ export function DashboardOverview() {
           value={loading ? '—' : `${successRate.toFixed(1)}%`}
           color={successRate >= 95 ? 'emerald' : successRate >= 80 ? 'amber' : 'red'}
           icon={
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           }
@@ -198,7 +198,7 @@ export function DashboardOverview() {
           value={loading ? '—' : endpointCount.toString()}
           color="violet"
           icon={
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
           }
@@ -208,7 +208,7 @@ export function DashboardOverview() {
           value={loading ? '—' : (stats?.failed?.toLocaleString() ?? '0')}
           color="red"
           icon={
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           }
@@ -240,7 +240,7 @@ export function DashboardOverview() {
             timeRange={timeRange}
             onTimeRangeChange={setTimeRange}
           >
-            <div className="h-72">
+            <div className="h-56">
               {loading ? (
                 <div className="h-full flex items-center justify-center">
                   <div className="animate-pulse text-gray-500 dark:text-slate-500">{tc('loading')}</div>
@@ -283,8 +283,8 @@ export function DashboardOverview() {
         </div>
 
         {/* Quick Stats Summary */}
-        <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="glass-card p-4">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
             {t('quickStats')}
           </h3>
           {loading ? (
@@ -315,8 +315,8 @@ export function DashboardOverview() {
           )}
 
           {/* Quick Links */}
-          <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-700">
-            <h4 className="text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-3">
+          <div className="mt-4 pt-3 border-t border-gray-100 dark:border-slate-700">
+            <h4 className="text-[11px] font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wider mb-2">
               {t('quickActions')}
             </h4>
             <div className="space-y-2">
@@ -369,9 +369,9 @@ export function DashboardOverview() {
             isOver: overId === 'recent-deliveries',
           }}
         >
-      <div className="glass-card p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+      <div className="glass-card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
             {t('recentDeliveries')}
           </h3>
           <Link
