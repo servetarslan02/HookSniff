@@ -556,11 +556,32 @@ async fn upsert_sso_config(
 async fn delete_sso_config(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Query(query): Query<TeamQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let result = sqlx::query("DELETE FROM sso_configs WHERE customer_id = $1")
+    let result = if let Some(team_id) = query.team_id {
+        // Verify team membership first
+        let member = sqlx::query_scalar::<_, String>(
+            "SELECT role FROM team_members WHERE team_id = $1 AND customer_id = $2"
+        )
+        .bind(team_id)
         .bind(customer.id)
-        .execute(&pool)
+        .fetch_optional(&pool)
         .await?;
+
+        if member.is_none() {
+            return Err(AppError::forbidden("You are not a member of this team"));
+        }
+
+        sqlx::query("DELETE FROM sso_configs WHERE team_id = $1")
+            .bind(team_id)
+            .execute(&pool)
+            .await?
+    } else {
+        sqlx::query("DELETE FROM sso_configs WHERE customer_id = $1 AND team_id IS NULL")
+            .bind(customer.id)
+            .execute(&pool)
+            .await?
+    };
 
     Ok(Json(serde_json::json!({
         "deleted": result.rows_affected() > 0,
