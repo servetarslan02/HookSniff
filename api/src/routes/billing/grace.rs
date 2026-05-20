@@ -277,12 +277,12 @@ mod tests {
             payment_provider: "stripe".to_string(),
             webhooks: UsageCounter {
                 used: 100,
-                limit: 50_000,
+                limit: Some(50_000),
                 remaining: 49_900,
             },
             endpoints: UsageCounter {
                 used: 5,
-                limit: 50,
+                limit: Some(50),
                 remaining: 45,
             },
             rate_limit: RateLimitInfo {
@@ -306,7 +306,7 @@ mod tests {
     fn test_usage_counter_serialization() {
         let counter = UsageCounter {
             used: 0,
-            limit: 1000,
+            limit: Some(1000),
             remaining: 1000,
         };
         let json = serde_json::to_value(&counter).unwrap();
