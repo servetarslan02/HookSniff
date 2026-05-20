@@ -912,6 +912,7 @@
     "expires": "Son kullanma",
     "managePayment": "Ödeme yöntemini yönet →",
     "openingPortal": "Portal açılıyor...",
+    "portalNotAvailable": "Dış ödeme portalı mevcut değil. Ödeme yönteminizi yönetmek için destek ekibiyle iletişime geçin.",
     "subscriptionId": "Abonelik ID",
     "month": "ay",
     "billingPeriod": "Fatura dönemi",
@@ -948,6 +949,7 @@
     "unlimited": "Sınırsız",
     "billedAnnually": "/ay, yıllık faturalandırılır",
     "downgradePortal": "Planınızı yönetmek için fatura portalı açılıyor…",
+    "downgradePortalOwn": "Planınızı düşürmek için destek ekibiyle iletişime geçin.",
     "upgradeFailed": "Yükseltme başarısız oldu. Lütfen tekrar deneyin.",
     "downgradeTo": "{plan} planına geç",
     "free": "Ücretsiz"

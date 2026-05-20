@@ -128,8 +128,12 @@ export default function BillingPage() {
       try {
         const result = await billingApiExtended.openPortal(token);
         if (result.url) {
-          window.open(result.url, '_blank');
-          toast(t('downgradePortal') || 'Opening billing portal to manage your plan…', 'info');
+          const isOwnPage = result.url.includes('/dashboard/billing') || result.url.includes('/billing');
+          if (isOwnPage) {
+            toast(t('downgradePortalOwn') || 'Please contact support to downgrade your plan.', 'info');
+          } else {
+            window.location.href = result.url;
+          }
         }
       } catch (err: unknown) {
         toast(getErrorMessage(err, tc('unknownError')) || tc('upgradeFailed'), 'error');
