@@ -361,17 +361,8 @@ export function HomeContent() {
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                       onClick={() => setProfileOpen(false)}
                     >
-                      {user?.is_admin ? 'Admin Panel' : tNav('dashboard')}
+                      {tNav('dashboard')}
                     </Link>
-                    {!user?.is_admin && (
-                      <Link
-                        href="/core"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                        onClick={() => setProfileOpen(false)}
-                      >
-                        {tNav('dashboard')}
-                      </Link>
-                    )}
                     <div className="border-t border-gray-100 dark:border-gray-700 mt-1" />
                     <button
                       type="button"
