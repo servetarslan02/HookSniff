@@ -6,9 +6,16 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
+    // Forward client IP for rate limiting
+    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    
     const apiRes = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Forwarded-For': clientIp,
+        'X-Real-IP': clientIp,
+      },
       body: JSON.stringify(body),
     });
 

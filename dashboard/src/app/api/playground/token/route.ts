@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { playgroundSet } from '@/lib/redis';
 
-// Generate a unique playground token
+// Generate a cryptographically secure playground token
 function generateToken(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  const randomValues = new Uint8Array(20);
+  crypto.getRandomValues(randomValues);
   let result = 'hs_';
   for (let i = 0; i < 20; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+    result += chars.charAt(randomValues[i] % chars.length);
   }
   return result;
 }
