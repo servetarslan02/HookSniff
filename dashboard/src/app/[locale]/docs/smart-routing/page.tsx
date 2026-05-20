@@ -6,7 +6,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Smart Routing',
-  description: 'Route webhooks intelligently with round-robin, latency-based, and failover strategies',
+  description: 'Distribute webhooks intelligently across endpoints',
 };
 
 export default async function SmartRoutingPage() {
@@ -14,68 +14,113 @@ export default async function SmartRoutingPage() {
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
-      <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-        {t('subtitle')}
-      </p>
+      <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">{t('subtitle')}</p>
 
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('theProblem')}</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          {t('problemDesc')}
-        </p>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('problemDesc')}</p>
       </section>
 
+      {/* Quick Start */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('routingStrategies')}</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          {t('routingDesc')}
-        </p>
-        <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700 mb-4">
-          <div className="overflow-x-auto"><table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('strategy')}</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('howItWorks')}</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('bestFor')}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              <tr><td className="px-4 py-3 font-medium">{t('roundRobin')}</td><td className="px-4 py-3">{t('roundRobinDesc')}</td><td className="px-4 py-3">{t('roundRobinBest')}</td></tr>
-              <tr><td className="px-4 py-3 font-medium">{t('latencyBased')}</td><td className="px-4 py-3">{t('latencyBasedDesc')}</td><td className="px-4 py-3">{t('latencyBest')}</td></tr>
-              <tr><td className="px-4 py-3 font-medium">{t('failover')}</td><td className="px-4 py-3">{t('failoverDesc')}</td><td className="px-4 py-3">{t('failoverBest')}</td></tr>
-            </tbody>
-          </table></div>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('quickStart')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('quickStartDesc')}</p>
+        <div className="space-y-4 not-prose">
+          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('step1Title')}</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400">{t('step1Desc')}</p>
+          </div>
+          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('step2Title')}</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400">{t('step2Desc')}</p>
+          </div>
         </div>
       </section>
 
+      {/* Routing Strategies */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('configuration')}</h2>
-        <CodeBlock
-          code={`curl -X PUT https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints/ep_abc123/routing \\
-  -H "Authorization: Bearer hr_live_YOUR_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "strategy": "failover",
-    "endpoints": [
-      { "url": "https://primary.myapp.com/webhook", "priority": 1 },
-      { "url": "https://backup.myapp.com/webhook", "priority": 2 }
-    ]
-  }'`}
-        />
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('routingStrategies')}</h2>
+        <div className="space-y-4 not-prose">
+          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🔄 {t('roundRobinTitle')}</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('roundRobinDesc')}</p>
+            <code className="text-xs text-gray-500 dark:text-slate-500">{t('roundRobinExample')}</code>
+          </div>
+          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🛡️ {t('failoverTitle')}</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('failoverDesc')}</p>
+            <code className="text-xs text-gray-500 dark:text-slate-500">{t('failoverExample')}</code>
+          </div>
+          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">⚖️ {t('weightedTitle')}</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{t('weightedDesc')}</p>
+            <code className="text-xs text-gray-500 dark:text-slate-500">{t('weightedExample')}</code>
+          </div>
+          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🎲 {t('randomTitle')}</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400">{t('randomDesc')}</p>
+          </div>
+        </div>
       </section>
 
-      <section>
+      {/* Configuration */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('configuration')}</h2>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('configDesc')}</p>
+        <CodeBlock code={t('configCurl')} />
+      </section>
+
+      {/* Health Monitoring */}
+      <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('healthMonitoring')}</h2>
-        <p className="text-gray-600 dark:text-slate-400 mb-4">
-          {t('healthDesc')}
-        </p>
-        <CodeBlock
-          code={`curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints/ep_abc123/health \\
-  -H "Authorization: Bearer hr_live_YOUR_KEY"`}
-        />
-        <p className="text-gray-600 dark:text-slate-400 mt-4">
-          {t('healthNote')}
-        </p>
+        <p className="text-gray-600 dark:text-slate-400 mb-4">{t('healthDesc')}</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('healthMetrics')}</h3>
+        <ul className="space-y-2">
+          <li className="text-gray-600 dark:text-slate-400">• {t('hm1')}</li>
+          <li className="text-gray-600 dark:text-slate-400">• {t('hm2')}</li>
+          <li className="text-gray-600 dark:text-slate-400">• {t('hm3')}</li>
+          <li className="text-gray-600 dark:text-slate-400">• {t('hm4')}</li>
+        </ul>
+      </section>
+
+      {/* Best Practices */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('bestPractices')}</h2>
+        <ul className="space-y-2">
+          <li className="text-gray-600 dark:text-slate-400">• {t('bp1')}</li>
+          <li className="text-gray-600 dark:text-slate-400">• {t('bp2')}</li>
+          <li className="text-gray-600 dark:text-slate-400">• {t('bp3')}</li>
+          <li className="text-gray-600 dark:text-slate-400">• {t('bp4')}</li>
+        </ul>
+      </section>
+
+      {/* FAQ */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('faq')}</h2>
+        <div className="space-y-4 not-prose">
+          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('faq1q')}</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400">{t('faq1a')}</p>
+          </div>
+          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('faq2q')}</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400">{t('faq2a')}</p>
+          </div>
+          <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('faq3q')}</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400">{t('faq3a')}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Further Reading */}
+      <section>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('furtherReading')}</h2>
+        <ul className="space-y-2">
+          <li className="text-gray-600 dark:text-slate-400">• {t('fr1')}</li>
+          <li className="text-gray-600 dark:text-slate-400">• {t('fr2')}</li>
+          <li className="text-gray-600 dark:text-slate-400">• {t('fr3')}</li>
+        </ul>
       </section>
     </article>
   );
