@@ -3364,6 +3364,8 @@
     "copied": "Copied!",
     "portalSaved": "Portal configuration saved!",
     "portalSaveFailed": "Could not save portal settings. Please try again.",
+    "portalLoadFailed": "Could not load portal settings",
+    "portalLoadFailedDesc": "You can continue with default settings. Make changes and try saving.",
     "portalUrl": "Portal URL",
     "retry": "Retry"
   },
