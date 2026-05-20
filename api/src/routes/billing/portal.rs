@@ -198,7 +198,7 @@ pub(crate) struct OverageSettingsResponse {
     allow_overage: bool,
     overage_email_notification: bool,
     plan: String,
-    daily_limit: u64,
+    daily_limit: Option<u64>,
     overage_price: f64,
 }
 
@@ -208,11 +208,12 @@ pub async fn get_overage_settings(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<OverageSettingsResponse>, AppError> {
     let plan = Plan::parse_str(&customer.plan);
+    let limit = plan.max_events_per_day();
     Ok(Json(OverageSettingsResponse {
         allow_overage: customer.allow_overage,
         overage_email_notification: customer.overage_email_notification,
         plan: plan.as_str().to_string(),
-        daily_limit: plan.max_events_per_day(),
+        daily_limit: if limit >= u64::MAX / 2 { None } else { Some(limit) },
         overage_price: plan.overage_price_per_event(),
     }))
 }
@@ -245,11 +246,12 @@ pub async fn update_overage_settings(
     .await?;
 
     let plan = Plan::parse_str(&updated.plan);
+    let limit = plan.max_events_per_day();
     Ok(Json(OverageSettingsResponse {
         allow_overage: updated.allow_overage,
         overage_email_notification: updated.overage_email_notification,
         plan: plan.as_str().to_string(),
-        daily_limit: plan.max_events_per_day(),
+        daily_limit: if limit >= u64::MAX / 2 { None } else { Some(limit) },
         overage_price: plan.overage_price_per_event(),
     }))
 }

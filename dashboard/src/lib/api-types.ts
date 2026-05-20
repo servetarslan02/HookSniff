@@ -626,7 +626,7 @@ export interface OverageSettings {
   allow_overage: boolean;
   overage_email_notification: boolean;
   plan: string;
-  daily_limit: number;
+  daily_limit: number | null;
   overage_price: number;
 }
 
