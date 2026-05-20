@@ -2153,7 +2153,11 @@
     "syncPolar": "Polar.sh ile senkronize et",
     "deleteCoupon": "Kuponu Sil",
     "deleteCouponConfirm": "Bu kuponu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
-    "create": "Oluştur"
+    "create": "Oluştur",
+    "degradedPerformance": "Performans Düşüklüğü",
+    "redis": "Redis",
+    "apiStatus": "API",
+    "refresh": "Yenile"
   },
   "landing": {
     "nav": {
