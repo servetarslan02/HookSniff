@@ -2181,7 +2181,9 @@
     "broadcastSent": "Broadcast sent",
     "broadcastFailed": "Failed to send broadcast",
     "noBroadcasts": "No broadcasts",
-    "bulkEmailSent": "Bulk email sent"
+    "bulkEmailSent": "Bulk email sent",
+    "generateCode": "Generate random code",
+    "generate": "Generate"
   },
   "landing": {
     "nav": {
