@@ -58,7 +58,7 @@ export default function CouponsContent() {
       const data = await apiFetch<Coupon[]>('/admin/coupons', { token });
       setCoupons(data);
     } catch {
-      toast(t('couponsLoadFailed') || 'Kuponlar yüklenemedi', 'error');
+      toast(t('couponsLoadFailed') || t('couponsLoadFailed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -298,7 +298,7 @@ export default function CouponsContent() {
       {(showCreate || editTarget) && (
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {editTarget ? (t('editCoupon') || 'Kuponu Düzenle') : (t('createCoupon') || 'Yeni Kupon Oluştur')}
+            {editTarget ? (t('editCoupon') || t('editCoupon')) : (t('createCoupon') || t('createCoupon'))}
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -314,7 +314,7 @@ export default function CouponsContent() {
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">{t('couponType') || 'Tip'}</label>
               <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm">
-                <option value="internal">{t('internalType') || 'Internal (Direkt uygulanır)'}</option>
+                <option value="internal">{t('internalType') || t('internalType')}</option>
                 <option value="polar">{t('polarType') || 'Polar.sh (Sync)'}</option>
               </select>
             </div>
@@ -351,7 +351,7 @@ export default function CouponsContent() {
           <div className="flex gap-3 justify-end">
             <button type="button" onClick={() => { setShowCreate(false); setEditTarget(null); setForm(INITIAL_FORM); }} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
             <button type="button" onClick={editTarget ? handleEdit : handleCreate} disabled={creating || !form.code.trim()} className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50">
-              {creating ? (tc('saving') || 'Kaydediliyor...') : editTarget ? (tc('save') || 'Kaydet') : (t('create') || 'Oluştur')}
+              {creating ? (tc('saving') || 'Kaydediliyor...') : editTarget ? (tc('save') || 'Kaydet') : (t('create') || t('create'))}
             </button>
           </div>
         </div>
@@ -363,19 +363,19 @@ export default function CouponsContent() {
           <p className="text-sm font-medium text-blue-700 dark:text-blue-400">{t('internalCodeInfo') || '🔵 Internal Kod'}</p>
           <p className="text-xs text-blue-600 dark:text-blue-400/70 mt-1">{t('internalCodeDesc') || 'Müşteri kodu girdiğinde plan direkt uygulanır. Polar\'a gitmez.'}</p>
           <div className="mt-2 flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
-            <span className="font-medium">Akış:</span>
+            <span className="font-medium">{t('flowLabel')}</span>
             <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-500/20 rounded">Kod oluştur</span>
             <span>→</span>
-            <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-500/20 rounded">Müşteri girer</span>
+            <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-500/20 rounded">{t('flowCustomerEnter')}</span>
             <span>→</span>
-            <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-500/20 rounded">Direkt uygulanır</span>
+            <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-500/20 rounded">{t('flowApplied')}</span>
           </div>
         </div>
         <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20">
           <p className="text-sm font-medium text-purple-700 dark:text-purple-400">{t('polarCodeInfo') || '🟣 Polar Kod'}</p>
           <p className="text-xs text-purple-600 dark:text-purple-400/70 mt-1">{t('polarCodeDesc') || 'Girdiğin kod Polar.sh\'a gönderilir. Polar\'da aynı kod indirim olarak çalışır.'}</p>
           <div className="mt-2 flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
-            <span className="font-medium">Akış:</span>
+            <span className="font-medium">{t('flowLabel')}</span>
             <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-500/20 rounded">Kod oluştur</span>
             <span>→</span>
             <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-500/20 rounded">Sync et</span>
