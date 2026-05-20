@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
@@ -14,6 +14,7 @@ import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { BroadcastBanner } from '@/components/BroadcastBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
+import { useIdleTimeout } from '@/hooks/useIdleTimeout';
 import { apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
 import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield, BookOpen, ExternalLink, LogOut } from '@/components/icons';
 
@@ -28,6 +29,13 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const tc = useTranslations('common');
   const locale = useLocale();
   const { connectionState } = useRealtime();
+
+  // Auto-logout after 1 hour of inactivity
+  const handleIdle = useCallback(() => {
+    logout();
+    router.push('/login');
+  }, [logout, router]);
+  useIdleTimeout(handleIdle);
 
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
