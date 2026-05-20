@@ -2188,7 +2188,20 @@
     "generate": "Üret",
     "couponCreatedSynced": "Kupon oluşturuldu ve Polar.sh ile senkronize edildi",
     "couponCreatedSyncFailed": "Kupon oluşturuldu ama Polar sync başarısız. Sync butonuna basarak tekrar deneyin.",
-    "couponUpdatedSynced": "Kupon güncellendi ve Polar.sh ile senkronize edildi"
+    "couponUpdatedSynced": "Kupon güncellendi ve Polar.sh ile senkronize edildi",
+    "backupRetention": "Yedekleme Süresi (gün)",
+    "backupRetentionDesc": "Veritabanı yedeklerinin saklanacağı gün sayısı.",
+    "backupSettings": "Yedekleme Ayarları",
+    "corsOrigins": "İzin Verilen CORS Kaynakları",
+    "corsOriginsDesc": "İzin verilen kaynakların virgülle ayrılmış listesi. Varsayılan için boş bırakın.",
+    "emailSettings": "E-posta Ayarları",
+    "emailSettingsDesc": "Resend üzerinden e-posta teslimatını yapılandırın.",
+    "features": "Özellikler",
+    "globalRateLimit": "Global API Hız Limiti (istek/dk)",
+    "securitySettings": "Güvenlik ve Webhook Ayarları",
+    "senderAddress": "Gönderen Adresi",
+    "webhookSecret": "Varsayılan Webhook Secret",
+    "webhookSecretDesc": "Webhook payloadları için varsayılan imzalama secret'ı."
   },
   "landing": {
     "nav": {
