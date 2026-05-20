@@ -47,7 +47,7 @@ pub async fn deliver_http(
     // HS-042: SSRF protection — resolve DNS and validate IP before delivery.
     // Prevents DNS rebinding attacks where a domain resolves to a public IP during
     // endpoint creation but to a private IP during actual delivery.
-    if let Err(e) = validate_delivery_url(&webhook.endpoint_url) {
+    if let Err(e) = validate_delivery_url(&webhook.endpoint_url).await {
         warn!("🚫 SSRF blocked delivery {} to {}: {}", webhook.delivery_id, webhook.endpoint_url, e);
         return Ok(DeliveryResult {
             success: false,
@@ -174,7 +174,7 @@ fn is_valid_header_name(name: &str) -> bool {
 /// SSRF protection for webhook delivery.
 /// Resolves DNS and validates that the target IP is not private/internal.
 /// Prevents DNS rebinding attacks.
-fn validate_delivery_url(url: &str) -> Result<(), String> {
+async fn validate_delivery_url(url: &str) -> Result<(), String> {
     use std::net::IpAddr;
 
     // Normalize to lowercase to prevent scheme bypass (e.g. HTTP://)
@@ -235,8 +235,9 @@ fn validate_delivery_url(url: &str) -> Result<(), String> {
         return Err(format!("Blocked decimal IP representation: {}", host_str));
     }
 
-    // DNS resolution and IP validation
-    let addrs: Vec<IpAddr> = std::net::ToSocketAddrs::to_socket_addrs(&(host_str, 0))
+    // DNS resolution and IP validation (async via tokio)
+    let addrs: Vec<IpAddr> = tokio::net::lookup_host((host_str, 0))
+        .await
         .map_err(|_| format!("DNS resolution failed: {}", host_str))?
         .map(|addr| addr.ip())
         .collect();
