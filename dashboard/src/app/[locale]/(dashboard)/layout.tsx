@@ -145,7 +145,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               href="/admin"
               className="flex items-center px-3 py-2 mb-2 text-sm font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
             >
-              <span className="mr-3"><Shield size={20} strokeWidth={1.75} /></span>
+              <span className="mr-3 inline-flex items-center"><Shield size={20} strokeWidth={1.75} /></span>
               {t('adminPanel') || 'Admin Panel'}
             </Link>
           )}
@@ -165,7 +165,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 )}
                 onClick={() => setSidebarOpen(false)}
               >
-                <span className="mr-3 flex-shrink-0">{item.icon}</span>
+                <span className="mr-3 flex-shrink-0 inline-flex items-center">{item.icon}</span>
                 {item.name}
               </PrefetchLink>
             );

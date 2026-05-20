@@ -90,8 +90,7 @@ export default function RetryPolicyPage() {
       <div className="grid grid-cols-3 gap-3">
         {BACKOFF_OPTIONS.map((s) => (
           <div key={s.value} className="glass-card p-4 text-center">
-            <div className="text-2xl mb-1">{s.icon}</div>
-            <div className="text-sm font-medium text-gray-900 dark:text-white">{t(s.value) || s.value}</div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center justify-center gap-1.5"><span className="text-2xl flex-shrink-0">{s.icon}</span>{t(s.value) || s.value}</div>
             <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{t(`${s.value}Desc`) || ''}</div>
           </div>
         ))}
