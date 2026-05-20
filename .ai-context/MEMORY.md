@@ -256,6 +256,26 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
+## 📝 Son Oturum (2026-05-21 02:11 — System Sayfası İnceleme + 2 Fix)
+
+### Özet
+Servet ile oturum. System (Admin) sayfası detaylı incelendi. 2 sorun tespit edildi, hepsi düzeltildi. 3 dosya değişti.
+
+### Tespit Edilen ve Düzeltilen Sorunlar:
+1. **Queue status koşulunda mantık hatası** — `||` ve `?:` operatör önceliği hatası. `status || pending !== undefined ? 'ok' : 'unknown'` her zaman `'ok'` döndürüyordu. Parantez ile düzeltildi.
+2. **3 eksik i18n anahtarı** — `degradedPerformance`, `redis`, `apiStatus` admin namespace'de eksikti (fallback vardı ama eksik). Eklendi.
+3. **refresh anahtarı** — Admin namespace'de eksikti, eklendi.
+
+### Değişen Dosyalar:
+- `dashboard/src/app/[locale]/admin/components/system/HealthStatus.tsx`
+- `dashboard/src/messages/en.json`
+- `dashboard/src/messages/tr.json`
+
+### Push: `9ac49b43`
+### TypeScript: ✅ 0 hata
+
+---
+
 ## 📝 Son Oturum (2026-05-21 02:03 — Feature Flags İnceleme + 7 Fix)
 
 ### Özet
