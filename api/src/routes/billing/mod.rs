@@ -143,4 +143,6 @@ struct SubscriptionResponse {
     /// Plan preserved during pause
     #[serde(skip_serializing_if = "Option::is_none")]
     pause_plan: Option<String>,
+    /// Whether the customer has already used the Startup first-month-free trial.
+    has_used_startup_trial: bool,
 }

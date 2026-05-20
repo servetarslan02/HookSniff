@@ -84,6 +84,9 @@ pub struct Customer {
     /// Plan preserved during pause (for resume)
     #[serde(default)]
     pub pause_plan: Option<String>,
+    /// Whether the customer has already used the Startup first-month-free trial.
+    #[serde(default)]
+    pub has_used_startup_trial: bool,
 }
 
 fn default_payment_provider() -> String {
@@ -293,6 +296,7 @@ mod tests {
             paused_at: None,
             paused_until: None,
             pause_plan: None,
+            has_used_startup_trial: false,
         }
     }
 

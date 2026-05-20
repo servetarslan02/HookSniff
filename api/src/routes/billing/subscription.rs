@@ -53,6 +53,7 @@ pub async fn get_subscription(
         paused_at: customer.paused_at.map(|d| d.to_rfc3339()),
         paused_until: customer.paused_until.map(|d| d.to_rfc3339()),
         pause_plan: customer.pause_plan.clone(),
+        has_used_startup_trial: customer.has_used_startup_trial,
     }))
 }
 

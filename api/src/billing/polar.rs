@@ -351,6 +351,7 @@ impl PaymentProviderImpl for PolarProvider {
         app_url: &str,
         yearly: bool,
         discount_code: Option<&str>,
+        has_used_startup_trial: bool,
     ) -> Result<CheckoutResult, AppError> {
         let product_id = self
             .config
@@ -361,8 +362,9 @@ impl PaymentProviderImpl for PolarProvider {
         metadata.insert("customer_id".to_string(), customer_id.to_string());
         metadata.insert("plan".to_string(), plan.as_str().to_string());
 
-        // Auto-apply Startup trial discount (first month free) unless customer provided their own code
-        let auto_discount_id = if *plan == Plan::Startup && discount_code.is_none() {
+        // Auto-apply Startup trial discount (first month free) ONLY for first-time buyers
+        // Skip if customer already used the trial or provided their own code
+        let auto_discount_id = if *plan == Plan::Startup && discount_code.is_none() && !has_used_startup_trial {
             self.config.startup_trial_discount_id()
         } else {
             None

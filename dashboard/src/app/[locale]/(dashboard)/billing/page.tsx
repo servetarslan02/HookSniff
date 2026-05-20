@@ -8,7 +8,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { billingApiExtended } from '@/lib/api';
-import { useBillingInvoices } from '@/hooks/useDashboardData';
+import { useBillingInvoices, useBillingSubscription } from '@/hooks/useDashboardData';
 import { PlanCards } from './components/PlanCards';
 import { InvoiceTable } from './components/InvoiceTable';
 import { SubscriptionDetails } from './components/SubscriptionDetails';
@@ -24,6 +24,7 @@ export default function BillingPage() {
   const currentPlan = user?.plan || 'developer';
 
   const { data: invoices, isLoading: loadingInvoices } = useBillingInvoices();
+  const { data: subscription } = useBillingSubscription();
 
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPauseModal, setShowPauseModal] = useState(false);
@@ -200,7 +201,7 @@ export default function BillingPage() {
       {/* 3. Plans */}
       <section>
         <SectionLabel label={t('currentPlan')} icon={<Rocket size={16} strokeWidth={1.75} />} />
-        <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} discountCode={discountCode} onDiscountCodeChange={setDiscountCode} />
+        <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} discountCode={discountCode} onDiscountCodeChange={setDiscountCode} hasUsedStartupTrial={subscription?.has_used_startup_trial ?? false} />
       </section>
 
       {/* 4. Invoices */}
