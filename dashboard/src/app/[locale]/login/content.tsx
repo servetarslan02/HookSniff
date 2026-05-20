@@ -2,7 +2,7 @@
 
 import { getErrorMessage } from '@/lib/errors';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, Link } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
@@ -53,6 +53,48 @@ function LoginForm() {
   // Email verification state
   const [showResendVerification, setShowResendVerification] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+
+  // SSO detection state
+  const [ssoProvider, setSsoProvider] = useState<string | null>(null);
+  const [ssoChecking, setSsoChecking] = useState(false);
+  const ssoDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Check SSO providers when email changes
+  useEffect(() => {
+    if (ssoDebounceRef.current) clearTimeout(ssoDebounceRef.current);
+    setSsoProvider(null);
+
+    const domain = email.split('@')[1];
+    if (!domain || mode !== 'login') return;
+
+    ssoDebounceRef.current = setTimeout(async () => {
+      setSsoChecking(true);
+      try {
+        const res = await fetch(`/api/sso-check?domain=${encodeURIComponent(domain)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.sso_available && data.providers?.length > 0) {
+            setSsoProvider(data.providers[0].provider);
+          }
+        }
+      } catch {
+        // silently ignore — SSO is optional
+      } finally {
+        setSsoChecking(false);
+      }
+    }, 500);
+
+    return () => {
+      if (ssoDebounceRef.current) clearTimeout(ssoDebounceRef.current);
+    };
+  }, [email, mode]);
+
+  const handleSsoLogin = () => {
+    const domain = email.split('@')[1];
+    if (!domain) return;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-1046140057667.europe-west1.run.app';
+    window.location.href = `${apiUrl}/v1/sso/login?email=${encodeURIComponent(email)}`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,6 +318,20 @@ function LoginForm() {
                 autoComplete="email"
                 className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"
               />
+              {/* SSO detection */}
+              {mode === 'login' && ssoProvider && (
+                <button
+                  type="button"
+                  onClick={handleSsoLogin}
+                  className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition"
+                >
+                  <ShieldCheck size={18} />
+                  {ssoProvider === 'oidc' ? 'Login with SSO (OIDC)' : 'Login with SSO (SAML)'}
+                </button>
+              )}
+              {mode === 'login' && ssoChecking && (
+                <p className="mt-2 text-xs text-gray-400 dark:text-slate-500">Checking SSO...</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('password')}</label>

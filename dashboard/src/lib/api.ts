@@ -1139,10 +1139,10 @@ export const twoFactorApi = {
 
 // SSO API
 export const ssoApi = {
-  testSso: (token: string) =>
-    apiFetch<{ valid: boolean; provider?: string; message?: string; issues?: string[]; details?: Record<string, unknown> }>('/sso/test', { method: 'POST', token }),
-  deleteSso: (token: string) =>
-    apiFetch<{ deleted: boolean }>('/sso/config', { method: 'DELETE', token }),
+  testSso: (token: string, teamId?: string) =>
+    apiFetch<{ valid: boolean; provider?: string; message?: string; issues?: string[]; details?: Record<string<string, unknown> }>(`/sso/test${teamId ? `?team_id=${teamId}` : ''}`, { method: 'POST', token }),
+  deleteSso: (token: string, teamId?: string) =>
+    apiFetch<{ deleted: boolean }>(`/sso/config${teamId ? `?team_id=${teamId}` : ''}`, { method: 'DELETE', token }),
   getLoginUrl: (email: string) =>
     `/v1/sso/login?email=${encodeURIComponent(email)}`,
 };
