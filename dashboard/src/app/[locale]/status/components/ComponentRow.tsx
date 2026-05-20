@@ -5,7 +5,7 @@ import type { ComponentStatus } from './types';
 import { latencyColor } from './utils';
 import { StatusBadge } from './StatusBadge';
 import { Sparkline } from './Sparkline';
-import { Wrench } from 'lucide-react';
+import { Wrench } from '@/components/icons';
 
 export function ComponentRow({ component, responseTimes }: { component: ComponentStatus; responseTimes: number[] }) {
   const t = useTranslations('status');

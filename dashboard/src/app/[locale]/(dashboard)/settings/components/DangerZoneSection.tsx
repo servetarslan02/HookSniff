@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useRouter } from '@/i18n/navigation';
 import { getErrorMessage } from '@/lib/errors';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '@/components/icons';
 
 export function DangerZoneSection() {
   const t = useTranslations('settings');

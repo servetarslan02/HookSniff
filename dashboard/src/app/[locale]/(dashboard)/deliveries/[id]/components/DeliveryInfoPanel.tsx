@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import type { DeliveryDetail } from '@/lib/api';
 import { DetailRow } from './DetailRow';
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList } from '@/components/icons';
 
 export function DeliveryInfoPanel({
   delivery,

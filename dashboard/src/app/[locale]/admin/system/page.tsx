@@ -3,7 +3,7 @@
 import { LazySection, Skeletons } from '@/components/LazySection';
 import dynamic from 'next/dynamic';
 import { useTranslations, useLocale } from 'next-intl';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '@/components/icons';
 import { useToast } from '@/components/Toast';
 import {
   useSystemHealth,

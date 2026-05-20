@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Eye, Pencil, Shield } from 'lucide-react';
+import { Eye, Pencil, Shield } from '@/components/icons';
 
 const ROLE_OPTIONS = ['admin', 'editor', 'viewer'] as const;
 

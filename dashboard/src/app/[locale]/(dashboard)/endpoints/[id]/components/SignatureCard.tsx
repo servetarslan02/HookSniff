@@ -6,7 +6,7 @@ import { useToast } from '@/components/Toast';
 import { useAuth } from '@/lib/store';
 import { endpointsApi } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { Key } from 'lucide-react';
+import { Key } from '@/components/icons';
 
 export function SignatureCard({
   endpointId,

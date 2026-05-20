@@ -19,7 +19,7 @@ import {
   Globe,
   Clock,
   RefreshCw,
-} from 'lucide-react';
+} from '@/components/icons';
 
 // ── Types ─────────────────────────────────────────────────
 

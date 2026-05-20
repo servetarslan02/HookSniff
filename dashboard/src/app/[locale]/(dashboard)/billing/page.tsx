@@ -13,7 +13,7 @@ import { PlanCards } from './components/PlanCards';
 import { InvoiceTable } from './components/InvoiceTable';
 import { SubscriptionDetails } from './components/SubscriptionDetails';
 import { OverageSettings } from './components/OverageSettings';
-import { CreditCard, BarChart3, Rocket, FileText } from 'lucide-react';
+import { CreditCard, BarChart3, Rocket, FileText } from '@/components/icons';
 
 export default function BillingPage() {
   const { user, token } = useAuth();

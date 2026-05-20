@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useEndpointHealth } from '@/hooks/useDashboardData';
-import { Activity, AlertTriangle } from 'lucide-react';
+import { Activity, AlertTriangle } from '@/components/icons';
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: string }> = {
   healthy: { color: 'text-green-700 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/20', labelKey: 'healthy' },

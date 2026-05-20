@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
-import { AlertTriangle, Check, ClipboardList, Eye, FileText, Rocket, Trash2, X, Zap } from 'lucide-react';
+import { AlertTriangle, Check, ClipboardList, Eye, FileText, Rocket, Trash2, X, Zap } from '@/components/icons';
 
 /* ─── Webhook Builder — Visual webhook creator ─── */
 interface WebhookField {

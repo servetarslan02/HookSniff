@@ -1,7 +1,7 @@
 'use client';
 
 import { StatusBadge } from '@/components/StatusBadge';
-import { ClipboardList, Eye } from 'lucide-react';
+import { ClipboardList, Eye } from '@/components/icons';
 import { LazyBarChart as BarChart, LazyPieChart as PieChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Pie, Cell } from '@/components/LazyCharts';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { OverviewTabProps } from './types';

@@ -2,7 +2,7 @@
 
 import { StatusBadge } from '@/components/StatusBadge';
 import type { UserModalsProps } from './types';
-import { AlertTriangle, Ban, DollarSign, Mail, Search, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Ban, DollarSign, Mail, Search, Trash2, X } from '@/components/icons';
 
 export function UserModals({
  detail,

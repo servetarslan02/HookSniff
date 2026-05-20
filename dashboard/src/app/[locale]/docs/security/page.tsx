@@ -1,5 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
-import { AlertTriangle, Check, Key, KeyRound, Lock, Shield, ShieldCheck, X } from 'lucide-react';
+import { AlertTriangle, Check, Key, KeyRound, Lock, Shield, ShieldCheck, X } from '@/components/icons';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 

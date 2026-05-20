@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
 import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
-import { AlertTriangle, Radio } from 'lucide-react';
+import { AlertTriangle, Radio } from '@/components/icons';
 
 export default function SendWebhookPage() {
   const { toast } = useToast();

@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
-import { Clock } from 'lucide-react';
+import { Clock } from '@/components/icons';
 import { useTranslations } from 'next-intl';
 
 const tabSkeleton = (

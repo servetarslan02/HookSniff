@@ -1,7 +1,7 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
-import { Lightbulb, X, Check } from 'lucide-react';
+import { Lightbulb, X, Check } from '@/components/icons';
 
 export const revalidate = 3600;
 

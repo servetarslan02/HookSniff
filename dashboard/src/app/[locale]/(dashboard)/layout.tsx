@@ -16,7 +16,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
 import { useQueryClient } from '@tanstack/react-query';
 import { API_BASE, apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
-import { LayoutDashboard, Smartphone, Link2, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield, BookOpen, ExternalLink, LogOut } from 'lucide-react';
+import { LayoutDashboard, Smartphone, Link2, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield, BookOpen, ExternalLink, LogOut } from '@/components/icons';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

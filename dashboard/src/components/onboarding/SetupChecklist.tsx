@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { loadState } from './types';
-import { BarChart3, FlaskConical, Key, Link2, Target, User } from 'lucide-react';
+import { BarChart3, FlaskConical, Key, Link2, Target, User } from '@/components/icons';
 
 interface ChecklistItem {
  id: string;

@@ -2,7 +2,7 @@
 
 
 import { useTranslations } from 'next-intl';
-import { XCircle, CheckCircle2 } from 'lucide-react';
+import { XCircle, CheckCircle2 } from '@/components/icons';
 
 interface FailedDelivery {
   id: string;

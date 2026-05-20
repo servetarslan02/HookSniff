@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { ClipboardList, Inbox, Pencil, Trash2 } from 'lucide-react';
+import { ClipboardList, Inbox, Pencil, Trash2 } from '@/components/icons';
 
 const OP_EVENTS = [
   { id: 'delivery.failed', label: 'Delivery Failed', desc: 'When a webhook delivery fails after all retries' },

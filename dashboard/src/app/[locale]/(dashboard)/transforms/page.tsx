@@ -6,7 +6,7 @@ import { useToast } from '@/components/Toast';
 import { useEndpoints, useTransformRules, useCreateTransformRule, useDeleteTransformRule, useUpdateTransformRule, useTestTransform } from '@/hooks/useDashboardData';
 import type { TransformRuleValidated } from '@/schemas/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { FlaskConical, Pencil, X } from 'lucide-react';
+import { FlaskConical, Pencil, X } from '@/components/icons';
 
 export default function TransformsPage() {
  const t = useTranslations('transforms');

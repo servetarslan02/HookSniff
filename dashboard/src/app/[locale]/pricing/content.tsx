@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import Footer from '@/components/Footer';
 import PublicNavbar from '@/components/PublicNavbar';
-import { DollarSign, Lock, Shield, Key, ShieldCheck, ClipboardList, Globe, MapPin, Rocket, Star, Anchor, XCircle, CheckCircle, Clock } from 'lucide-react';
+import { DollarSign, Lock, Shield, Key, ShieldCheck, ClipboardList, Globe, MapPin, Rocket, Star, Anchor, XCircle, CheckCircle, Clock } from '@/components/icons';
 
 
 

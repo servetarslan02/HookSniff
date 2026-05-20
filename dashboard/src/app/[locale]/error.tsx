@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '@/components/icons';
 
 export default function Error({
   error,

@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
 import { useTeams } from '@/hooks/useDashboardData';
-import { Users, ShieldCheck, ScrollText } from 'lucide-react';
+import { Users, ShieldCheck, ScrollText } from '@/components/icons';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { AlertTriangle, Building2, Check, Clock, CreditCard, Eye, FileText, Globe, Key, KeyRound, Link, Package, Pencil, ScrollText, Settings, Shield, ShieldCheck, Star, Target, User, Users, X, Zap } from 'lucide-react';
+import { AlertTriangle, Building2, Check, Clock, CreditCard, Eye, FileText, Globe, Key, KeyRound, Link, Package, Pencil, ScrollText, Settings, Shield, ShieldCheck, Star, Target, User, Users, X, Zap } from '@/components/icons';
 import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 3600;

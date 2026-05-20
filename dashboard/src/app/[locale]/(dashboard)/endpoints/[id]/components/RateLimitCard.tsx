@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { Endpoint } from '@/lib/api';
-import { Zap } from 'lucide-react';
+import { Zap } from '@/components/icons';
 
 export function RateLimitCard({ endpoint }: { endpoint: Endpoint }) {
   const t = useTranslations('endpointSettings');

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { getErrorMessage } from '@/lib/errors';
-import { Check, Mail, Lock, Shield } from 'lucide-react';
+import { Check, Mail, Lock, Shield } from '@/components/icons';
 
 interface User {
   name?: string | null;
