@@ -288,7 +288,7 @@ export function HomeContent() {
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { token, user, logout } = useAuth();
+  const { token, user, logout, isLoading } = useAuth();
 
   // No auto-redirect — all users (including admins) can view the landing page
 
@@ -339,7 +339,9 @@ export function HomeContent() {
             <Link href="/status" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{tNav('status')}</Link>
             <LanguageSwitcherBtn />
             <ThemeToggleBtn />
-            {token ? (
+            {isLoading ? (
+              <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            ) : token ? (
               <div className="relative" ref={profileRef}>
                 <button
                   type="button"
@@ -404,9 +406,13 @@ export function HomeContent() {
               <LanguageSwitcherBtn />
               <ThemeToggleBtn />
             </div>
-            <Link href={token ? (user?.is_admin ? '/admin' : '/core') : '/register'} onClick={() => setMobileNavOpen(false)} className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center">
-              {token ? (user?.is_admin ? 'Admin Panel' : tNav('dashboard')) : tNav('register')}
-            </Link>
+            {isLoading ? (
+              <div className="h-10 rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            ) : (
+              <Link href={token ? (user?.is_admin ? '/admin' : '/core') : '/register'} onClick={() => setMobileNavOpen(false)} className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center">
+                {token ? (user?.is_admin ? 'Admin Panel' : tNav('dashboard')) : tNav('register')}
+              </Link>
+            )}
           </div>
         )}
       </nav>
@@ -429,8 +435,8 @@ export function HomeContent() {
               {tHero('subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0">
-              <Link href={token ? (user?.is_admin ? '/admin' : '/core') : '/register'} className="bg-gray-900 dark:bg-brand-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow">
-                {token ? tHero('ctaDashboard') : tHero('cta')}
+              <Link href={isLoading ? '/register' : token ? (user?.is_admin ? '/admin' : '/core') : '/register'} className="bg-gray-900 dark:bg-brand-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow">
+                {isLoading ? tHero('cta') : token ? tHero('ctaDashboard') : tHero('cta')}
               </Link>
               <Link href="/docs" className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition btn-ripple">
                 {tHero('ctaSecondary')}
