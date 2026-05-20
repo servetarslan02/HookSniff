@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { useAuth } from '@/lib/store';
 import { useAdminAuditLogs } from '@/hooks/useAdminData';
 import { useTranslations, useLocale } from 'next-intl';
 import { AlertTriangle, ArrowUpFromLine, ClipboardList, CreditCard, DollarSign, Eye, FileOutput, Flag, FlaskConical, Inbox, Key, Lock, Mail, Pencil, Plus, Settings, Shield, ShieldCheck, Trash2, User, UserMinus, Users } from '@/components/icons';
@@ -129,6 +130,9 @@ const KNOWN_ACTIONS = [
 const perPage = 20;
 
 export default function AdminActivityPage() {
+  const { user } = useAuth();
+  if (!user?.is_admin) return null;
+
   const [page, setPage] = useState(1);
   const [actionFilter, setActionFilter] = useState('');
   const t = useTranslations('admin');
