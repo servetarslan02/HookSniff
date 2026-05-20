@@ -1,8 +1,8 @@
 {
-  "buildCommand": "rm -rf .next && npm ci && npm run build && sh scripts/fix-manifest.sh",
-  "outputDirectory": ".next",
+  "buildCommand": "cd dashboard && rm -rf .next && npm ci && npm run build && sh ../scripts/fix-manifest.sh",
+  "outputDirectory": "dashboard/.next",
   "framework": "nextjs",
-  "installCommand": "npm ci",
+  "installCommand": "cd dashboard && npm ci",
   "rewrites": [
     { "source": "/api/health", "destination": "https://hooksniff-api-1046140057667.europe-west1.run.app/health" }
   ],
