@@ -3,6 +3,7 @@ pub mod audit;
 pub mod broadcasts;
 pub mod coupons;
 pub mod customers;
+pub mod dashboard;
 pub mod delivery;
 pub mod export;
 pub mod feature_flags;
@@ -29,6 +30,8 @@ pub use settings::public_plans;
 /// Build the admin router with all sub-routes.
 pub fn router() -> Router {
     Router::new()
+        // ── Dashboard (batch endpoint) ──
+        .route("/dashboard", get(dashboard::admin_dashboard))
         // ── Users ──
         .route("/users", get(users::list_users))
         .route("/users/export", get(export::export_users_csv))

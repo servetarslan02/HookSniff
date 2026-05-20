@@ -54,6 +54,17 @@ function validated<T>(
   };
 }
 
+// ── Admin Dashboard (batch — single request for all admin data) ──
+export function useAdminDashboard() {
+  const { token } = useAuth();
+  return useQuery({
+    queryKey: ['admin', 'dashboard'],
+    queryFn: () => adminApi.getDashboard(token!),
+    enabled: !!token,
+    staleTime: 30_000, // 30s (backend caches 30s too)
+  });
+}
+
 // ── Admin Stats ──
 export function useAdminStats() {
   const { token } = useAuth();
