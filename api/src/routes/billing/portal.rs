@@ -31,7 +31,7 @@ pub(crate) struct UsageResponse {
 #[derive(Serialize)]
 pub(crate) struct UsageCounter {
     pub(crate) used: u64,
-    pub(crate) limit: u64,
+    pub(crate) limit: Option<u64>,
     pub(crate) remaining: u64,
 }
 
@@ -60,19 +60,20 @@ pub async fn get_usage(
             .fetch_one(&pool)
             .await?;
 
+    let webhook_limit = plan.max_webhooks_per_day();
+    let endpoint_limit = plan.max_endpoints() as u64;
+
     Ok(Json(UsageResponse {
         plan: plan.as_str().to_string(),
         payment_provider: customer.payment_provider.clone(),
         webhooks: UsageCounter {
             used: customer.webhook_count as u64,
-            limit: plan.max_webhooks_per_day(),
-            remaining: plan
-                .max_webhooks_per_day()
-                .saturating_sub(customer.webhook_count as u64),
+            limit: if webhook_limit >= u64::MAX / 2 { None } else { Some(webhook_limit) },
+            remaining: webhook_limit.saturating_sub(customer.webhook_count as u64),
         },
         endpoints: UsageCounter {
             used: endpoint_count.0 as u64,
-            limit: plan.max_endpoints() as u64,
+            limit: if endpoint_limit >= u32::MAX as u64 { None } else { Some(endpoint_limit) },
             remaining: (plan.max_endpoints() as i64 - endpoint_count.0).max(0) as u64,
         },
         rate_limit: RateLimitInfo {
