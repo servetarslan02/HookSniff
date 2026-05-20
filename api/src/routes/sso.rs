@@ -1519,13 +1519,13 @@ async fn list_sso_providers(
 ) -> Result<Json<serde_json::Value>, AppError> {
     let domain = &query.domain;
 
-    // Find customers with this email domain that have SSO enabled
+    // Find SSO configs matching this domain (by verified_domain or customer email domain)
     let providers = sqlx::query_as::<_, (String, String)>(
-        "SELECT DISTINCT s.provider, c.email
+        "SELECT DISTINCT s.provider, COALESCE(s.verified_domain, SPLIT_PART(c.email, '@', 2)) as domain
          FROM sso_configs s
          JOIN customers c ON c.id = s.customer_id
          WHERE s.enabled = true
-         AND SPLIT_PART(c.email, '@', 2) = $1
+         AND (s.verified_domain = $1 OR SPLIT_PART(c.email, '@', 2) = $1)
          LIMIT 5"
     )
     .bind(domain)
