@@ -4,8 +4,7 @@ import { useState, useEffect, lazy, Suspense, memo } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
-import { useQueryClient } from '@tanstack/react-query';
-import { adminApi } from '@/lib/api';
+import { useAdminDashboard } from '@/hooks/useAdminData';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PrefetchLink } from '@/components/PrefetchLink';
@@ -112,7 +111,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
 function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const locale = useLocale();
@@ -130,8 +129,6 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     }
   }, [user, router, locale]);
 
-  const queryClient = useQueryClient();
-
   // Prefetch all admin routes on mount — instant navigation after first load
   useEffect(() => {
     const routes = [
@@ -144,14 +141,8 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     });
   }, [router]);
 
-  // Prefetch common admin API calls — data ready before user navigates
-  useEffect(() => {
-    if (!token) return;
-    setTimeout(() => queryClient.prefetchQuery({ queryKey: ['admin', 'users'], queryFn: () => adminApi.listUsers(token), staleTime: 5 * 60_000 }), 200);
-    setTimeout(() => queryClient.prefetchQuery({ queryKey: ['admin', 'alerts'], queryFn: () => adminApi.listAlerts(token), staleTime: 5 * 60_000 }), 400);
-    setTimeout(() => queryClient.prefetchQuery({ queryKey: ['admin', 'security-stats'], queryFn: () => adminApi.getSecurityStats(token), staleTime: 5 * 60_000 }), 600);
-    setTimeout(() => queryClient.prefetchQuery({ queryKey: ['admin', 'broadcasts'], queryFn: () => adminApi.listBroadcasts(token, {}), staleTime: 5 * 60_000 }), 800);
-  }, [token, queryClient]);
+  // Prefetch all admin data with single batch endpoint
+  useAdminDashboard();
 
   if (!user?.is_admin) {
     return (

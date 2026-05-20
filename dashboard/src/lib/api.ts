@@ -1,4 +1,4 @@
-import type { ApiOptions, Application, RetryPolicyConfig, Endpoint, Delivery, DeliveryDetail, DeliveryAttempt, DeliveryListResponse, StatsResponse, AdminStatsResponse, DeployInfo, AdminUsersResponse, AdminUserDetail, RevenueResponse, Team, TeamMember, TeamDetailResponse, NotificationListResponse, DeliveryTrendResponse, SuccessRateData, LatencyTrendResponse, AuditLogResponse, AuditLogEntryResponse, EndpointHealthResponse, ApiKeyResponse, PortalConfigResponse, PortalEmbedCodeResponse, PortalProfileResponse, PortalUsageResponse, RateLimitResponse, SchemaRegistryListResponse, SearchResponseData, ServiceTokenResponse, TemplateItem, TemplateListResponse, UserAnalytics, ChurnUser, AlertRuleAdmin, FeatureFlag, PlatformSettings, Invoice, AlertRule, InboundConfig, TransformRule, BillingUsage, BillingSubscription, OverageSettings, PortalResponse, RefundResponse, Broadcast, UserBroadcast, BroadcastListResponse, SecurityEvent, SecurityStats, IpBlockEntry } from './api-types';
+import type { ApiOptions, Application, RetryPolicyConfig, Endpoint, Delivery, DeliveryDetail, DeliveryAttempt, DeliveryListResponse, StatsResponse, AdminStatsResponse, AdminDashboardResponse, DeployInfo, AdminUsersResponse, AdminUserDetail, RevenueResponse, Team, TeamMember, TeamDetailResponse, NotificationListResponse, DeliveryTrendResponse, SuccessRateData, LatencyTrendResponse, AuditLogResponse, AuditLogEntryResponse, EndpointHealthResponse, ApiKeyResponse, PortalConfigResponse, PortalEmbedCodeResponse, PortalProfileResponse, PortalUsageResponse, RateLimitResponse, SchemaRegistryListResponse, SearchResponseData, ServiceTokenResponse, TemplateItem, TemplateListResponse, UserAnalytics, ChurnUser, AlertRuleAdmin, FeatureFlag, PlatformSettings, Invoice, AlertRule, InboundConfig, TransformRule, BillingUsage, BillingSubscription, OverageSettings, PortalResponse, RefundResponse, Broadcast, UserBroadcast, BroadcastListResponse, SecurityEvent, SecurityStats, IpBlockEntry } from './api-types';
 export type * from './api-types';
 
 import { getUserFriendlyMessage, extractErrorCode } from './error-catalog';
@@ -504,6 +504,10 @@ export const api = {
 
 // Admin API
 export const adminApi = {
+  // ── Batch Dashboard (single request for all admin data) ──
+  getDashboard: (token: string) =>
+    apiFetch<AdminDashboardResponse>('/admin/dashboard', { token }),
+
   getStats: (token: string) =>
     apiFetch<AdminStatsResponse>('/admin/stats', { token }),
 
