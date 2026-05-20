@@ -24,9 +24,13 @@ const PLAN_FEATURES: Record<string, string[]> = {
 export function PlanCards({
   currentPlan,
   onUpgrade,
+  discountCode,
+  onDiscountCodeChange,
 }: {
   currentPlan: string;
   onUpgrade: (planKey: string, billingPeriod: 'monthly' | 'annual') => void;
+  discountCode?: string;
+  onDiscountCodeChange?: (code: string) => void;
 }) {
   const t = useTranslations('billing');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
@@ -61,8 +65,8 @@ export function PlanCards({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('currentPlan')}</h2>
+      {/* Centered: billing toggle + coupon code */}
+      <div className="flex flex-col items-center gap-3 mb-6">
         {/* Billing period toggle */}
         <div className="flex items-center gap-1 bg-gray-100 dark:bg-slate-800 rounded-xl p-1">
           <button
@@ -93,6 +97,19 @@ export function PlanCards({
             </span>
           </button>
         </div>
+        {/* Coupon code input */}
+        {onDiscountCodeChange && (
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-medium text-gray-500 dark:text-slate-400 whitespace-nowrap">{t('couponCode')}</label>
+            <input
+              type="text"
+              value={discountCode || ''}
+              onChange={(e) => onDiscountCodeChange(e.target.value.toUpperCase())}
+              placeholder={t('couponPlaceholder')}
+              className="px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm font-mono placeholder:text-gray-400 w-48"
+            />
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
