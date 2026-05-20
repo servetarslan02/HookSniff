@@ -6,6 +6,7 @@ use uuid::Uuid;
 pub struct Customer {
     pub id: Uuid,
     pub email: String,
+    #[serde(skip_serializing)]
     pub api_key_hash: String,
     pub api_key_prefix: String,
     pub plan: String,
@@ -14,6 +15,7 @@ pub struct Customer {
     /// Database column is BIGINT (migration 011) — use i64 to match
     pub webhook_count: i64,
     pub created_at: DateTime<Utc>,
+    #[serde(skip_serializing)]
     pub password_hash: Option<String>,
     pub stripe_customer_id: Option<String>,
     pub stripe_subscription_id: Option<String>,
