@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import type { PortalConfig } from '../types';
-import { ClipboardList, Link2, Zap } from 'lucide-react';
+import { ClipboardList, Link2, Zap } from '@/components/icons';
 
 export function EmbedCodePanel({
   config,

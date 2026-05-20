@@ -1,5 +1,5 @@
 'use client';
-import { Check, X } from 'lucide-react';
+import { Check, X } from '@/components/icons';
 
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations } from 'next-intl';

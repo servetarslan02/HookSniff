@@ -17,7 +17,7 @@ import {
 } from '@/components/LazyCharts';
 import { ChartCard, StatCard } from '@/components/tremor';
 import { useTranslations } from 'next-intl';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3 } from '@/components/icons';
 
 type TimeRange = '24h' | '7d' | '30d' | '90d';
 

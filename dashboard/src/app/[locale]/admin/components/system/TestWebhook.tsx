@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useTestWebhook } from '@/hooks/useAdminData';
-import { Rocket, CheckCircle2 } from 'lucide-react';
+import { Rocket, CheckCircle2 } from '@/components/icons';
 
 export default function TestWebhook() {
   const t = useTranslations('admin');

@@ -1,6 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type {Metadata} from 'next';
-import {Check} from 'lucide-react';
+import {Check} from '@/components/icons';
 import {getTranslations} from 'next-intl/server';
 
 export const revalidate = 3600;

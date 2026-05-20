@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import type { PlatformSettings } from '@/lib/api';
-import { AlertTriangle, Link2, Mail, MessageSquare } from 'lucide-react';
+import { AlertTriangle, Link2, Mail, MessageSquare } from '@/components/icons';
 
 interface AlertRule {
   id: string;

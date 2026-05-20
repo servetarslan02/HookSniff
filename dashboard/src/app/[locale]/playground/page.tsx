@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import PublicNavbar from '@/components/PublicNavbar';
-import { FlaskConical, ShieldCheck, Lightbulb, Lock, Zap, AlertTriangle } from 'lucide-react';
+import { FlaskConical, ShieldCheck, Lightbulb, Lock, Zap, AlertTriangle } from '@/components/icons';
 
 const FETCH_TIMEOUT_MS = 15_000;
 

@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { formatRelativeTime } from './utils';
-import { CircleDot , Check, AlertTriangle } from 'lucide-react';
+import { CircleDot , Check, AlertTriangle } from '@/components/icons';
 
 export function StatusBanner({ status, checkedAt }: { status: string; checkedAt: string }) {
  const router = useRouter();

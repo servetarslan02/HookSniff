@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { clsx } from 'clsx';
 import { usePortalProfile, useBillingUsage } from '@/hooks/useDashboardData';
 import { usePlans } from '@/hooks/usePlans';
-import { AlertTriangle, TrendingUp, Zap, Globe, Clock, Gauge } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Zap, Globe, Clock, Gauge } from '@/components/icons';
 
 /** Values >= this threshold represent "unlimited" (max int from DB) */
 const UNLIMITED_THRESHOLD = 2147483647;

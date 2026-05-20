@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
+import { RefreshCw, ShieldCheck, Trash2 } from '@/components/icons';
 
 interface ApiKey {
   id: string;

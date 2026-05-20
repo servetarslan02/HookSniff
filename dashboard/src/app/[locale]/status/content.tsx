@@ -14,7 +14,7 @@ import { UptimeBar } from './components/UptimeBar';
 import { ComponentRow } from './components/ComponentRow';
 import { IncidentLog } from './components/IncidentLog';
 import { MaintenanceSection } from './components/MaintenanceSection';
-import { Bell, Cloud, Database, HardDrive, Mail, Monitor, Settings, Zap } from 'lucide-react';
+import { Bell, Cloud, Database, HardDrive, Mail, Monitor, Settings, Zap } from '@/components/icons';
 
 // ─── Fallback Data ───
 function unreachableData(): StatusData {

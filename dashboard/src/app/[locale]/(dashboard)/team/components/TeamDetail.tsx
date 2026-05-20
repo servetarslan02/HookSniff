@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Team, TeamMember } from '@/lib/api';
-import { AlertTriangle, Check, ClipboardList, Clock, Eye, Link2, Pencil, Shield, User, X } from 'lucide-react';
+import { AlertTriangle, Check, ClipboardList, Clock, Eye, Link2, Pencil, Shield, User, X } from '@/components/icons';
 
 const ROLE_OPTIONS = ['admin', 'editor', 'viewer'] as const;
 

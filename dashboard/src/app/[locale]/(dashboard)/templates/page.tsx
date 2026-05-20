@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
 import { useTemplates } from '@/hooks/useDashboardData';
-import { BarChart3, Bot, ClipboardList, Radio, X } from 'lucide-react';
+import { BarChart3, Bot, ClipboardList, Radio, X } from '@/components/icons';
 
 interface Template {
  id: string;

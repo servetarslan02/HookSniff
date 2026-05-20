@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { BookOpen, HelpCircle, Plug, Scale, Search, Webhook } from 'lucide-react';
+import { BookOpen, HelpCircle, Plug, Scale, Search, Webhook } from '@/components/icons';
 
 // Revalidate every hour for ISR
 export const revalidate = 3600;

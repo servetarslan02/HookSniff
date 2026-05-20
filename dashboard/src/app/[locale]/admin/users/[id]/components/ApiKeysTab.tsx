@@ -2,7 +2,7 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { ApiKeysTabProps } from './types';
-import { Key } from 'lucide-react';
+import { Key } from '@/components/icons';
 
 export function ApiKeysTab({ userApiKeys, t }: ApiKeysTabProps) {
   return (

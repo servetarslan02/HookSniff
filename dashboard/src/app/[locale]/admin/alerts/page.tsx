@@ -6,7 +6,7 @@ import { useAdminAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert } from '
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import type { AlertRuleAdmin } from '@/lib/api';
-import { TrendingDown, Timer, Circle, Mail, MessageSquare, Link2, Bell, ClipboardList, CheckCircle2, Pause, Pencil, Plus, Trash2, Globe, Clock } from 'lucide-react';
+import { TrendingDown, Timer, Circle, Mail, MessageSquare, Link2, Bell, ClipboardList, CheckCircle2, Pause, Pencil, Plus, Trash2, Globe, Clock } from '@/components/icons';
 
 export default function AdminAlertsPage() {
   const t = useTranslations('admin');

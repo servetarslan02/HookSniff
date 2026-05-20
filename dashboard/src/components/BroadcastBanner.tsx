@@ -4,7 +4,7 @@ import {useState, useEffect, useCallback} from 'react';
 import {useAuth} from '@/lib/store';
 import {broadcastsApi, type UserBroadcast} from '@/lib/api';
 import {useRouter} from '@/i18n/navigation';
-import {X, AlertTriangle, AlertCircle, Info, ExternalLink} from 'lucide-react';
+import {X, AlertTriangle, AlertCircle, Info, ExternalLink} from '@/components/icons';
 
 const severityConfig: Record<string, {bg: string; border: string; text: string; icon: React.ReactNode}> = {
  critical: {

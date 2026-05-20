@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { ParsedSpec } from './parser';
 import { SpecInputPanel } from './components/SpecInputPanel';
 import { ParsedResultsPanel } from './components/ParsedResultsPanel';
-import { FileText, Link2 } from 'lucide-react';
+import { FileText, Link2 } from '@/components/icons';
 
 export default function ApiSpecImporterPage() {
   const t = useTranslations('apiImporter');

@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
-import { Dice5, Pencil, RefreshCw, Scale, Shield, Shuffle } from 'lucide-react';
+import { Dice5, Pencil, RefreshCw, Scale, Shield, Shuffle } from '@/components/icons';
 
 const STRATEGIES = [
   { value: 'round-robin', icon: <RefreshCw size={16} strokeWidth={1.75} />, descKey: 'roundRobinDesc' },

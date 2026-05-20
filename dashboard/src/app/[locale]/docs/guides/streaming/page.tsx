@@ -1,6 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
-import { Radio } from 'lucide-react';
+import { Radio } from '@/components/icons';
 
 export const revalidate = 3600;
 

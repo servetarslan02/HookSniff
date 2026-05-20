@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { Database, Zap, Inbox, RefreshCw, Bell, HardDrive } from 'lucide-react';
+import { Database, Zap, Inbox, RefreshCw, Bell, HardDrive } from '@/components/icons';
 
 
 interface HealthStatusProps {

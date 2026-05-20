@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { ShieldCheck, Mail } from 'lucide-react';
+import { ShieldCheck, Mail } from '@/components/icons';
 
 function getPasswordStrength(pw: string): { score: number; color: string } {
   let score = 0;

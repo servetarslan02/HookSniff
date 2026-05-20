@@ -6,7 +6,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useAdminSettings, useUpdateSettings, useAdminAlerts, useCreateAlert, useUpdateAlert } from '@/hooks/useAdminData';
 import type { PlatformSettings } from '@/lib/api';
-import { AlertTriangle, Check, CheckCircle2, FlaskConical, Mail, Settings } from 'lucide-react';
+import { AlertTriangle, Check, CheckCircle2, FlaskConical, Mail, Settings } from '@/components/icons';
 
 interface AlertRule {
  id: string;

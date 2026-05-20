@@ -1,6 +1,6 @@
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
-import { FileText } from 'lucide-react';
+import { FileText } from '@/components/icons';
 
 export const revalidate = 3600;
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Database, Inbox, AlertTriangle, Circle } from 'lucide-react';
+import { Database, Inbox, AlertTriangle, Circle } from '@/components/icons';
 
 interface QueueStatusData {
   pending?: number;

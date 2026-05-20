@@ -2,7 +2,7 @@
 
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
-import { FlaskConical } from 'lucide-react';
+import { FlaskConical } from '@/components/icons';
 
 export default function DevTab() {
   const { toast } = useToast();

@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { parseOpenApiSpec, type ParsedSpec } from '../parser';
-import { Trash2 } from 'lucide-react';
+import { Trash2 } from '@/components/icons';
 
 export function SpecInputPanel({
   onParsed,

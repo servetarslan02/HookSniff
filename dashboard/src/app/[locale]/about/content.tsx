@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import Footer from '@/components/Footer';
-import { Lock, DollarSign, Globe } from 'lucide-react';
+import { Lock, DollarSign, Globe } from '@/components/icons';
 
 
 

@@ -1,7 +1,7 @@
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
-import { Package, X, Check, AlertTriangle } from 'lucide-react';
+import { Package, X, Check, AlertTriangle } from '@/components/icons';
 
 export const revalidate = 3600;
 
