@@ -4990,7 +4990,8 @@
     "disabled": "Devre dışı",
     "totalMessages": "Toplam Mesaj",
     "status": "Durum",
-    "actions": "İşlemler"
+    "actions": "İşlemler",
+    "createChannelDesc": "Canlı teslimat izleme için gerçek zamanlı olay akış kanalı oluşturun"
   },
   "whatIsHookSniff": {
     "title": "HookSniff Nedir?",
