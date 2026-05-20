@@ -746,7 +746,7 @@ impl PolarProvider {
         Ok(())
     }
 
-    /// Sync all plan prices to Polar.
+    /// Sync all plan prices to Polar (monthly + yearly).
     /// Called from admin settings update.
     pub async fn sync_prices_to_polar(
         &self,
@@ -754,10 +754,16 @@ impl PolarProvider {
         pro_price: f64,
         enterprise_price: f64,
     ) -> Vec<(String, Result<(), String>)> {
+        let yearly_multiplier = 12.0 * 0.8; // 20% annual discount
         let plans = [
-            ("startup", &self.config.product_startup, startup_price),
-            ("pro", &self.config.product_pro, pro_price),
-            ("enterprise", &self.config.product_business, enterprise_price),
+            // Monthly products
+            ("startup_monthly", &self.config.product_startup, startup_price),
+            ("pro_monthly", &self.config.product_pro, pro_price),
+            ("enterprise_monthly", &self.config.product_business, enterprise_price),
+            // Yearly products
+            ("startup_yearly", &self.config.product_startup_yearly, (startup_price * yearly_multiplier).round()),
+            ("pro_yearly", &self.config.product_pro_yearly, (pro_price * yearly_multiplier).round()),
+            ("enterprise_yearly", &self.config.product_business_yearly, (enterprise_price * yearly_multiplier).round()),
         ];
 
         let mut results = Vec::new();
