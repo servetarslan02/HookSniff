@@ -17,11 +17,10 @@ pub fn router() -> Router {
 #[derive(Debug, sqlx::FromRow)]
 struct DeviceTokenRow {
     id: Uuid,
-    _customer_id: Uuid,
+    customer_id: Uuid,
     token: String,
     platform: String,
     created_at: DateTime<Utc>,
-    _last_used_at: DateTime<Utc>,
 }
 
 /// POST /v1/devices — Register a device token for push notifications
@@ -45,8 +44,8 @@ async fn register_device(
     let row = sqlx::query_as::<_, DeviceTokenRow>(
         r#"INSERT INTO device_tokens (customer_id, token, platform)
            VALUES ($1, $2, $3)
-           ON CONFLICT (customer_id, token) DO UPDATE SET last_used_at = NOW()
-           RETURNING id, customer_id, token, platform, created_at, last_used_at"#,
+           ON CONFLICT (customer_id, token) DO UPDATE SET created_at = NOW()
+           RETURNING id, customer_id, token, platform, created_at"#,
     )
     .bind(customer.id)
     .bind(&req.token)
@@ -70,7 +69,7 @@ async fn list_devices(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<DeviceTokenResponse>>, AppError> {
     let rows = sqlx::query_as::<_, DeviceTokenRow>(
-        "SELECT id, customer_id, token, platform, created_at, last_used_at FROM device_tokens WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100",
+        "SELECT id, customer_id, token, platform, created_at FROM device_tokens WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100",
     )
     .bind(customer.id)
     .fetch_all(&pool)
