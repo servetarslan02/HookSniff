@@ -2183,7 +2183,10 @@
     "noBroadcasts": "No broadcasts",
     "bulkEmailSent": "Bulk email sent",
     "generateCode": "Generate random code",
-    "generate": "Generate"
+    "generate": "Generate",
+    "couponCreatedSynced": "Coupon created and synced with Polar.sh",
+    "couponCreatedSyncFailed": "Coupon created but Polar sync failed. Click Sync to retry.",
+    "couponUpdatedSynced": "Coupon updated and synced with Polar.sh"
   },
   "landing": {
     "nav": {

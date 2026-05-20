@@ -2185,7 +2185,10 @@
     "noBroadcasts": "Yayın yok",
     "bulkEmailSent": "Toplu e-posta gönderildi",
     "generateCode": "Rastgele kod üret",
-    "generate": "Üret"
+    "generate": "Üret",
+    "couponCreatedSynced": "Kupon oluşturuldu ve Polar.sh ile senkronize edildi",
+    "couponCreatedSyncFailed": "Kupon oluşturuldu ama Polar sync başarısız. Sync butonuna basarak tekrar deneyin.",
+    "couponUpdatedSynced": "Kupon güncellendi ve Polar.sh ile senkronize edildi"
   },
   "landing": {
     "nav": {
