@@ -47,6 +47,7 @@ import { CommunicationsTab } from './components/CommunicationsTab';
 import { BillingTab } from './components/BillingTab';
 import { UserModals } from './components/UserModals';
 import type { TabKey } from './components/types';
+import { StatusBadge } from '@/components/StatusBadge';
 import { AlertCircle, BarChart3, DollarSign, Eye, Key, Link2, Mail, MessageSquare, Notebook, Package, Smartphone, TrendingUp } from '@/components/icons';
 
 export default function AdminUserDetailPage() {
@@ -352,10 +353,21 @@ export default function AdminUserDetailPage() {
           {tc("back")}
         </button>
         <div className="flex-1">
-          <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
-            {detail.user.name || detail.user.email}
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{t("userDetail")}</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
+              {detail.user.name || detail.user.email}
+            </h1>
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              detail.user.plan === 'enterprise' ? 'bg-violet-100 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400'
+              : detail.user.plan === 'pro' ? 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400'
+              : detail.user.plan === 'startup' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+              : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300'
+            }`}>
+              {detail.user.plan}
+            </span>
+            <StatusBadge status={detail.user.status} />
+          </div>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{detail.user.email}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
