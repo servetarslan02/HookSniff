@@ -743,7 +743,7 @@ async fn export_data(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let endpoints: Vec<serde_json::Value> = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
-        "SELECT * FROM endpoints WHERE customer_id = $1 ORDER BY created_at",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE customer_id = $1 ORDER BY created_at",
     )
     .bind(customer.id).fetch_all(&pool).await?
     .into_iter().map(|e| serde_json::to_value(e).unwrap_or_default()).collect();
