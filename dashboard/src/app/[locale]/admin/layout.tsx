@@ -130,7 +130,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                     : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
                 )}
               >
-                <span className="text-gray-400">{item.icon}</span>
+                <span className="text-gray-400 inline-flex items-center">{item.icon}</span>
                 {t(`nav.${item.nameKey}`)}
               </PrefetchLink>
             );

@@ -185,7 +185,7 @@ export function TabbedSection({
                   }
                 `}
               >
-                {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
+                {tab.icon && <span className="mr-1.5 inline-flex items-center">{tab.icon}</span>}
                 {tab.label}
                 {tab.badge != null && (
                   <span
