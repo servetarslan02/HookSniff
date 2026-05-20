@@ -16,11 +16,16 @@ pub async fn run(pool: PgPool) {
 
     // Parse OTLP headers (format: "key1=value1,key2=value2")
     let mut auth_header = String::new();
+    let mut extra_headers: Vec<(String, String)> = Vec::new();
     for header in otlp_headers.split(',') {
         let h = header.trim();
         if let Some((key, value)) = h.split_once('=').or_else(|| h.split_once(':')) {
-            if key.trim().eq_ignore_ascii_case("authorization") {
-                auth_header = value.trim().to_string();
+            let k = key.trim().to_string();
+            let v = value.trim().to_string();
+            if k.eq_ignore_ascii_case("authorization") {
+                auth_header = v;
+            } else if k.eq_ignore_ascii_case("x-sentry-auth") {
+                extra_headers.push((k, v));
             }
         }
     }
@@ -214,6 +219,9 @@ pub async fn run(pool: PgPool) {
 
                 if !auth_header.is_empty() {
                     req = req.header("Authorization", &auth_header);
+                }
+                for (k, v) in &extra_headers {
+                    req = req.header(k.as_str(), v.as_str());
                 }
 
                 match req.json(&payload).send().await {
