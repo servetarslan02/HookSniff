@@ -2157,7 +2157,19 @@
     "degradedPerformance": "Performans Düşüklüğü",
     "redis": "Redis",
     "apiStatus": "API",
-    "refresh": "Yenile"
+    "refresh": "Yenile",
+    "activate": "Aktifleştir",
+    "alertName": "Uyarı Adı",
+    "alertNamePlaceholder": "örn. Yüksek Başarısızlık Oranı",
+    "alerts": "Uyarılar",
+    "alertsDescription": "Önemli olaylar gerçekleştiğinde bilgilendirilmek için uyarılar oluşturun.",
+    "channels": "Bildirim Kanalları",
+    "condition": "Koşul",
+    "createFirstAlert": "İlk Uyarınızı Oluşturun",
+    "deactivate": "Pasifleştir",
+    "editAlert": "Uyarıyı Düzenle",
+    "noFilteredAlerts": "Filtrelenmiş uyarı yok",
+    "threshold": "Eşik Değeri"
   },
   "landing": {
     "nav": {

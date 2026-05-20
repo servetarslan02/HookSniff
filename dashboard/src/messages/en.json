@@ -2155,7 +2155,19 @@
     "degradedPerformance": "Degraded Performance",
     "redis": "Redis",
     "apiStatus": "API",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "activate": "Activate",
+    "alertName": "Alert Name",
+    "alertNamePlaceholder": "e.g. High Failure Rate",
+    "alerts": "Alerts",
+    "alertsDescription": "Set up alerts to get notified when important events happen.",
+    "channels": "Notification Channels",
+    "condition": "Condition",
+    "createFirstAlert": "Create Your First Alert",
+    "deactivate": "Deactivate",
+    "editAlert": "Edit Alert",
+    "noFilteredAlerts": "No filtered alerts",
+    "threshold": "Threshold"
   },
   "landing": {
     "nav": {
