@@ -36,6 +36,10 @@ const nextConfig = {
         source: '/api/health',
         destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/health',
       },
+      {
+        source: '/api/:path*',
+        destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/:path*',
+      },
     ];
   },
 };
