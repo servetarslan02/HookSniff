@@ -619,6 +619,7 @@ export interface BillingSubscription {
   paused_at?: string;
   paused_until?: string;
   pause_plan?: string;
+  has_used_startup_trial?: boolean;
 }
 
 export interface OverageSettings {

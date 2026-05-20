@@ -26,11 +26,13 @@ export function PlanCards({
   onUpgrade,
   discountCode,
   onDiscountCodeChange,
+  hasUsedStartupTrial,
 }: {
   currentPlan: string;
   onUpgrade: (planKey: string, billingPeriod: 'monthly' | 'annual') => void;
   discountCode?: string;
   onDiscountCodeChange?: (code: string) => void;
+  hasUsedStartupTrial?: boolean;
 }) {
   const t = useTranslations('billing');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
@@ -157,7 +159,7 @@ export function PlanCards({
                   {t('mostPopular')}
                 </div>
               )}
-              {plan.key === 'startup' && (
+              {plan.key === 'startup' && !hasUsedStartupTrial && (
                 <div className="absolute -top-3 right-3 bg-green-500 dark:bg-green-600 text-white px-2.5 py-0.5 rounded-full text-[11px] font-bold whitespace-nowrap">
                   🎁 {t('firstMonthFree') || 'İlk Ay Ücretsiz'}
                 </div>

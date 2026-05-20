@@ -129,14 +129,20 @@ async fn process_webhook_result(
             let webhook_limit = plan.max_webhooks_per_day() as i64;
             let period_interval = if interval == "year" { "365 days" } else { "30 days" };
             if let Some((cust_col, sub_col)) = provider_columns(provider) {
+                // Mark startup trial as used when customer subscribes to Startup plan
+                let trial_flag = if plan == Plan::Startup {
+                    ", has_used_startup_trial = true"
+                } else {
+                    ""
+                };
                 let query = format!(
                     "UPDATE customers SET plan = $1, payment_provider = $2, \
                      {} = $3, {} = $4, webhook_limit = $5, \
                      payment_failed_at = NULL, \
                      current_period_end = NOW() + INTERVAL '{}', \
                      billing_interval = $7, \
-                     updated_at = NOW() WHERE id = $6",
-                    cust_col, sub_col, period_interval
+                     updated_at = NOW(){} WHERE id = $6",
+                    cust_col, sub_col, period_interval, trial_flag
                 );
                 sqlx::query(&query)
                     .bind(plan.as_str()).bind(provider)
