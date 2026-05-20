@@ -2,15 +2,37 @@
 
 > Son güncelleme: 2026-05-21 01:10 GMT+8
 
-## ⚠️ KRİTİK: API Deploy Gerekli
+## ⚠️ KRİTİK: Deploy Gerekli
 
-7 fix push edildi ama API (Cloud Run) hala eski kodu çalışıyor:
-- `d18c5301` — SSO critical bugs — 7 fixes
+2 fix seti push edildi ama Cloud Run hala eski kodu çalışıyor:
 
-**Yapılacak:** Cloud Build tetikle veya manuel deploy
+### SSO Fix'ler (commit `d18c5301`)
+- Dashboard SSO form fix
+- Login sayfası SSO algılama
+- DB migration 082
+- i18n fix
+- DELETE endpoint fix
+
+### Worker Performans Fix'leri (commit `e3c46903`)
+- DB pool: 10 → 25
+- DB acquire timeout: 30s → 5s
+- HTTP timeout: 10s → 5s
+- DNS: sync → async
+
+### Deploy Komutları
 ```bash
-gcloud builds submit --config cloudbuild.yaml --substitutions=_DEPLOY_TARGET=api
+# GCP Console'dan tetikle:
+# https://console.cloud.google.com/cloud-build/triggers?project=hooksniff-app
+
+# VEYA gcloud CLI:
+gcloud builds submit --config cloudbuild.yaml
+
+# VEYA sadece worker:
+gcloud run deploy hooksniff-worker --source . --region europe-west1
 ```
+
+### Not: DB Migration 082 Neon'da zaten çalıştırıldı
+`customer_id UNIQUE` constraint kaldırıldı, multi-team SSO çalışıyor.
 
 ## Yapılan Fix'ler (Bu Oturum)
 
