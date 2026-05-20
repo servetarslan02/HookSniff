@@ -360,12 +360,15 @@ export interface EndpointHealthResponse {
   success_rate: number;
   avg_response_ms: number;
   p95_response_ms: number;
+  p99_response_ms?: number;
   total_deliveries: number;
   successful: number;
   failed: number;
   consecutive_failures: number;
+  last_success_at?: string | null;
   last_failure_at: string | null;
   uptime_24h: number;
+  uptime_7d?: number;
 }
 
 export interface ApiKeyResponse {

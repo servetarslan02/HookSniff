@@ -127,12 +127,15 @@ export const EndpointHealthSchema = z.object({
   success_rate: z.number(),
   avg_response_ms: z.number(),
   p95_response_ms: z.number(),
+  p99_response_ms: z.number().optional(),
   total_deliveries: z.number(),
   successful: z.number(),
   failed: z.number(),
   consecutive_failures: z.number(),
+  last_success_at: z.string().nullable().optional(),
   last_failure_at: z.string().nullable(),
   uptime_24h: z.number(),
+  uptime_7d: z.number().optional(),
 });
 export type EndpointHealthValidated = z.infer<typeof EndpointHealthSchema>;
 
