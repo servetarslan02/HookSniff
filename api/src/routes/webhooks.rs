@@ -224,7 +224,7 @@ async fn create_webhook(
 
     // Verify endpoint exists and belongs to customer
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
     )
     .bind(req.endpoint_id)
     .bind(customer.id)
@@ -390,7 +390,7 @@ async fn batch_webhooks(
         .collect();
 
     let endpoints: Vec<Endpoint> = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = ANY($1) AND customer_id = $2 AND is_active = true",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = ANY($1) AND customer_id = $2 AND is_active = true",
     )
     .bind(&endpoint_ids)
     .bind(customer.id)
@@ -539,7 +539,7 @@ async fn replay_webhook(
     Path(id): Path<Uuid>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
     let original = sqlx::query_as::<_, Delivery>(
-        "SELECT * FROM deliveries WHERE id = $1 AND customer_id = $2",
+        "SELECT id, endpoint_id, customer_id, payload, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, response_body, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test, event, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash, custom_headers FROM deliveries WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
@@ -548,7 +548,7 @@ async fn replay_webhook(
     .ok_or(AppError::NotFound)?;
 
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
     )
     .bind(original.endpoint_id)
     .bind(customer.id)
@@ -663,7 +663,7 @@ async fn batch_replay(
     for id in &req.delivery_ids {
         // Get original delivery
         let original = sqlx::query_as::<_, Delivery>(
-            "SELECT * FROM deliveries WHERE id = $1 AND customer_id = $2",
+            "SELECT id, endpoint_id, customer_id, payload, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, response_body, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test, event, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash, custom_headers FROM deliveries WHERE id = $1 AND customer_id = $2",
         )
         .bind(id)
         .bind(customer.id)
@@ -677,7 +677,7 @@ async fn batch_replay(
 
         // Get endpoint
         let endpoint = sqlx::query_as::<_, Endpoint>(
-            "SELECT * FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+            "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
         )
         .bind(original.endpoint_id)
         .bind(customer.id)
@@ -854,7 +854,7 @@ async fn get_delivery(
     Path(id): Path<Uuid>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
     let delivery = sqlx::query_as::<_, Delivery>(
-        "SELECT * FROM deliveries WHERE id = $1 AND customer_id = $2",
+        "SELECT id, endpoint_id, customer_id, payload, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, response_body, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test, event, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash, custom_headers FROM deliveries WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
@@ -871,7 +871,7 @@ async fn get_delivery_attempts(
     Path(id): Path<Uuid>,
 ) -> Result<Json<Vec<DeliveryAttemptResponse>>, AppError> {
     let _delivery = sqlx::query_as::<_, Delivery>(
-        "SELECT * FROM deliveries WHERE id = $1 AND customer_id = $2",
+        "SELECT id, endpoint_id, customer_id, payload, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, response_body, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test, event, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash, custom_headers FROM deliveries WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
