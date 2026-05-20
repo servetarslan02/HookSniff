@@ -139,11 +139,11 @@ Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift
 
 ## 🔴 HookSniff'in EKSİK OLDUĞU ALANLAR
 
-### 1. ❌ Multi-Tenant Application Modeli
+### 1. ⚠️ Multi-Tenant Application Modeli — MEVCUT AMA GELİŞTİRİLMELİ
 - Hook0: Organization → Application → Subscription hiyerarşisi
 - Svix: Application-based tenant isolation
-- **HookSniff**: Sadece User → Endpoint (application kavramı yok)
-- **Etki**: Müşteriler kendi uygulamalarını yönetemiyor
+- **HookSniff**: `applicationsApi` mevcut — CRUD + endpoint filtering + delivery filtering var
+- **Etki**: Temel multi-tenant altyapı mevcut ama label-based routing ve subscription kavramı eksik
 
 ### 2. ❌ Event Type Hiyerarşisi
 - Hook0: `service.resource_type.verb` (dot-notation, hiyerarşik)
