@@ -593,8 +593,8 @@ export interface BillingUsage {
   endpoints_count: number;
   endpoints_limit: number;
   // Backend returns nested objects — these are computed at fetch time
-  webhooks?: { used: number; limit: number; remaining: number };
-  endpoints?: { used: number; limit: number; remaining: number };
+  webhooks?: { used: number; limit: number | null; remaining: number };
+  endpoints?: { used: number; limit: number | null; remaining: number };
   plan?: string;
 }
 

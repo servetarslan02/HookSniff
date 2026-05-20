@@ -477,12 +477,12 @@ export const BillingUsageSchema = z.object({
   endpoints_limit: z.number().optional(),
   webhooks: z.object({
     used: z.number(),
-    limit: z.number(),
+    limit: z.number().nullable(),
     remaining: z.number(),
   }).optional(),
   endpoints: z.object({
     used: z.number(),
-    limit: z.number(),
+    limit: z.number().nullable(),
     remaining: z.number(),
   }).optional(),
   plan: z.string().optional(),
