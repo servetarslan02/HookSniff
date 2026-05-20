@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { getErrorMessage } from '@/lib/errors';
-import { CheckCircle2, Lock, Check, Mail, User, Shield, Crown, Camera } from 'lucide-react';
+import { Check, Mail, Lock, Shield } from 'lucide-react';
 
 interface User {
   name?: string | null;
@@ -15,12 +15,11 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
   const t = useTranslations('settings');
   const tc = useTranslations('common');
   const [profileName, setProfileName] = useState(user?.name || '');
-  const [profileEmail, setProfileEmail] = useState(user?.email || '');
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
 
-  // Email change flow
+  const [profileEmail, setProfileEmail] = useState(user?.email || '');
   const [emailChangeStep, setEmailChangeStep] = useState<'idle' | 'code-sent' | 'done'>('idle');
   const [emailChangeCode, setEmailChangeCode] = useState('');
   const [emailChangeLoading, setEmailChangeLoading] = useState(false);
@@ -80,7 +79,7 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
           return prev - 1;
         });
       }, 1000);
-      setProfileSuccess(t('emailChangeCodeSent') || 'A verification code has been sent to your new email address.');
+      setProfileSuccess(t('emailChangeCodeSent') || 'Verification code sent.');
     } catch (e: unknown) {
       setProfileError(getErrorMessage(e, tc('unknownError')));
     } finally {
@@ -101,7 +100,7 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
         token: token ?? undefined,
       });
       setEmailChangeStep('done');
-      setProfileSuccess(t('emailChangedSuccess') || `Email changed successfully to ${data.new_email}`);
+      setProfileSuccess(t('emailChangedSuccess') || `Email changed to ${data.new_email}`);
       setProfileEmail(data.new_email);
       if (intervalRef.current) clearInterval(intervalRef.current);
     } catch (e: unknown) {
@@ -146,81 +145,44 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
 
   const emailChanged = profileEmail.toLowerCase().trim() !== (user?.email || '').toLowerCase();
   const emailValid = isValidEmail(profileEmail);
-  const planLabel = (user?.plan || 'developer').charAt(0).toUpperCase() + (user?.plan || 'developer').slice(1);
 
   return (
-    <div className="space-y-6">
-      {/* ── Profile Header Card ── */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
-        {/* Gradient Banner */}
-        <div className="h-28 bg-gradient-to-br from-brand-500 via-purple-500 to-pink-500 relative">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent)]" />
-        </div>
-
-        {/* Avatar + Info */}
-        <div className="px-6 pb-6 -mt-12">
-          <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-            {/* Avatar */}
-            <div className="relative group">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold ring-4 ring-white dark:ring-slate-800 shadow-xl">
-                {(profileName || user?.email || 'U')[0].toUpperCase()}
-              </div>
-              <button
-                type="button"
-                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                title={t('changeAvatar') || 'Change avatar'}
-              >
-                <Camera size={13} strokeWidth={1.75} className="text-gray-500 dark:text-slate-400" />
-              </button>
-            </div>
-
-            {/* Name + Email */}
-            <div className="flex-1 min-w-0 pb-0.5">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                {user?.name || user?.email?.split('@')[0] || 'User'}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-slate-400 truncate">{user?.email}</p>
-            </div>
-
-            {/* Plan Badge */}
-            <div className="flex items-center gap-2 pb-0.5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-brand-50 to-purple-50 dark:from-brand-500/10 dark:to-purple-500/10 text-brand-700 dark:text-brand-300 border border-brand-200/60 dark:border-brand-500/20">
-                <Crown size={13} strokeWidth={1.75} />
-                {planLabel}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Success / Error Messages ── */}
+    <div className="space-y-5">
+      {/* ── Toast ── */}
       {profileSuccess && (
-        <div className="flex items-center gap-3 p-4 rounded-2xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20">
-          <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-500/20 flex items-center justify-center shrink-0">
-            <Check size={16} strokeWidth={1.75} className="text-green-600 dark:text-green-400" />
-          </div>
-          <p className="text-sm text-green-700 dark:text-green-400">{profileSuccess}</p>
+        <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
+          <Check size={15} strokeWidth={2} className="text-emerald-500 shrink-0" />
+          <span className="text-sm text-emerald-700 dark:text-emerald-400">{profileSuccess}</span>
         </div>
       )}
       {profileError && (
-        <div className="flex items-center gap-3 p-4 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
-          <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-500/20 flex items-center justify-center shrink-0">
-            <Shield size={16} strokeWidth={1.75} className="text-red-600 dark:text-red-400" />
-          </div>
-          <p className="text-sm text-red-700 dark:text-red-400">{profileError}</p>
+        <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
+          <Shield size={15} strokeWidth={2} className="text-red-500 shrink-0" />
+          <span className="text-sm text-red-700 dark:text-red-400">{profileError}</span>
         </div>
       )}
 
-      {/* ── Profile Form ── */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
-        <div className="flex items-center gap-2 mb-5">
-          <User size={16} strokeWidth={1.75} className="text-gray-400 dark:text-slate-500" />
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300">{t('personalInfo') || 'Personal Information'}</h3>
+      {/* ── Profile Card ── */}
+      <section className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700">
+        {/* Header row */}
+        <div className="flex items-center gap-4 px-5 py-4 border-b border-gray-100 dark:border-slate-700/60">
+          <div className="w-10 h-10 rounded-full bg-gray-900 dark:bg-slate-600 flex items-center justify-center text-white text-sm font-semibold">
+            {(profileName || user?.email || 'U')[0].toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+              {user?.name || user?.email?.split('@')[0] || 'User'}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-slate-400 truncate">{user?.email}</div>
+          </div>
+          <span className="px-2 py-0.5 rounded-md text-[11px] font-medium uppercase tracking-wide bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300">
+            {user?.plan || 'free'}
+          </span>
         </div>
 
-        <form onSubmit={handleProfileSave} className="space-y-4">
-          {/* Name Field */}
-          <div>
+        {/* Name field */}
+        <form onSubmit={handleProfileSave}>
+          <div className="px-5 py-4">
             <label htmlFor="profile-name" className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5">
               {t('displayName')}
             </label>
@@ -231,145 +193,122 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
               placeholder={t('namePlaceholder')}
-              className="w-full px-4 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+              className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-gray-900 dark:focus:ring-brand-500 focus:border-transparent transition"
             />
           </div>
-
-          {/* Password confirmation for email change */}
           {showPasswordConfirm && (
-            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
-              <p className="text-sm text-amber-800 dark:text-amber-300 mb-3">
-                <Lock size={16} strokeWidth={1.75} className="inline mr-1" />
-                {t('emailChangePasswordRequired') || 'Changing your email requires password confirmation.'}
-              </p>
-              <input
-                type="password"
-                value={emailPassword}
-                onChange={(e) => setEmailPassword(e.target.value)}
-                placeholder={t('enterPassword') || 'Enter your password'}
-                className="w-full px-4 py-2.5 text-sm border border-amber-300 dark:border-amber-500/30 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition mb-3"
-                autoFocus
-              />
-              <div className="flex gap-2 justify-end">
-                <button
-                  type="button"
-                  onClick={handleCancelEmailChange}
-                  className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition"
-                >
-                  {tc('cancel')}
-                </button>
+            <div className="px-5 pb-4">
+              <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+                <p className="text-xs text-amber-700 dark:text-amber-400 mb-2">
+                  <Lock size={12} className="inline mr-1" />
+                  {t('emailChangePasswordRequired') || 'Password confirmation required.'}
+                </p>
+                <input
+                  type="password"
+                  value={emailPassword}
+                  onChange={(e) => setEmailPassword(e.target.value)}
+                  placeholder={t('enterPassword') || 'Password'}
+                  className="w-full px-3 py-2 text-sm border border-amber-200 dark:border-amber-500/30 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
+                  autoFocus
+                />
               </div>
             </div>
           )}
-
-          <div className="flex justify-end pt-1">
+          <div className="px-5 py-3 border-t border-gray-100 dark:border-slate-700/60 flex justify-end">
             <button
               type="submit"
               disabled={profileSaving}
-              className="px-5 py-2.5 bg-gray-900 dark:bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition disabled:opacity-60 shadow-sm"
+              className="px-4 py-1.5 bg-gray-900 dark:bg-slate-600 text-white rounded-lg text-xs font-medium hover:bg-gray-800 dark:hover:bg-slate-500 transition disabled:opacity-50"
             >
               {profileSaving ? tc('saving') : tc('save')}
             </button>
           </div>
         </form>
-      </div>
+      </section>
 
-      {/* ── Email Change Section ── */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6">
-        <div className="flex items-center gap-2 mb-5">
-          <Mail size={16} strokeWidth={1.75} className="text-gray-400 dark:text-slate-500" />
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300">{t('emailAddress')}</h3>
+      {/* ── Email Card ── */}
+      <section className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700">
+        <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-700/60">
+          <div className="flex items-center gap-2">
+            <Mail size={14} strokeWidth={1.75} className="text-gray-400" />
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white">{t('emailAddress')}</h3>
+          </div>
         </div>
 
-        {emailChangeStep === 'done' ? (
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20">
-            <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-500/20 flex items-center justify-center">
-              <CheckCircle2 size={16} strokeWidth={1.75} className="text-green-600 dark:text-green-400" />
+        <div className="px-5 py-4">
+          {emailChangeStep === 'done' ? (
+            <div className="flex items-center gap-2.5 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
+              <Check size={15} strokeWidth={2} className="text-emerald-500" />
+              <span className="text-sm text-emerald-700 dark:text-emerald-400">{t('emailChangedSuccess') || 'Email changed'}</span>
             </div>
-            <span className="text-sm text-green-700 dark:text-green-400">{t('emailChangedSuccess') || 'Email changed successfully'}</span>
-          </div>
-        ) : emailChangeStep === 'code-sent' ? (
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center">
-                <Mail size={16} strokeWidth={1.75} className="text-blue-600 dark:text-blue-400" />
+          ) : emailChangeStep === 'code-sent' ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
+                <Mail size={14} strokeWidth={1.75} className="text-blue-500" />
+                <span className="text-xs text-blue-700 dark:text-blue-400">
+                  {t('codeSentTo') || 'Code sent to'} <strong>{profileEmail}</strong>
+                  {emailChangeTimer > 0 && <span className="ml-1 opacity-60">({formatTimer(emailChangeTimer)})</span>}
+                </span>
               </div>
-              <span className="text-sm text-blue-700 dark:text-blue-400">
-                {t('codeSentTo') || 'Code sent to'} <strong>{profileEmail}</strong>
-                {emailChangeTimer > 0 && <span className="ml-2 text-xs opacity-70">({formatTimer(emailChangeTimer)})</span>}
-              </span>
+              <input
+                type="text"
+                value={emailChangeCode}
+                onChange={(e) => setEmailChangeCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                maxLength={6}
+                className="w-full px-3 py-2.5 text-center text-lg font-mono tracking-[0.4em] border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-brand-500 focus:border-transparent"
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <button type="button" onClick={handleCancelEmailChange}
+                  className="flex-1 py-2 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+                  {tc('cancel')}
+                </button>
+                {emailChangeTimer === 0 && (
+                  <button type="button" onClick={handleResendCode} disabled={emailChangeLoading}
+                    className="flex-1 py-2 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition disabled:opacity-50">
+                    {t('resendCode') || 'Resend'}
+                  </button>
+                )}
+                <button type="button" onClick={handleConfirmEmailChange} disabled={emailChangeLoading || emailChangeCode.length !== 6}
+                  className="flex-1 py-2 text-xs font-medium text-white bg-gray-900 dark:bg-slate-600 rounded-lg hover:bg-gray-800 dark:hover:bg-slate-500 transition disabled:opacity-50">
+                  {emailChangeLoading ? tc('verifying') || 'Verifying...' : t('verifyCode') || 'Verify'}
+                </button>
+              </div>
             </div>
-            <input
-              type="text"
-              value={emailChangeCode}
-              onChange={(e) => setEmailChangeCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="000000"
-              maxLength={6}
-              className="w-full px-4 py-3.5 text-center text-2xl font-mono tracking-[0.5em] border border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-              autoFocus
-            />
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={handleCancelEmailChange}
-                className="flex-1 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition"
-              >
-                {tc('cancel')}
-              </button>
-              {emailChangeTimer === 0 && (
+          ) : (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  id="profile-email"
+                  type="email"
+                  autoComplete="email"
+                  value={profileEmail}
+                  onChange={(e) => setProfileEmail(e.target.value)}
+                  placeholder={t('emailPlaceholder')}
+                  className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-gray-900 dark:focus:ring-brand-500 focus:border-transparent transition"
+                />
                 <button
                   type="button"
-                  onClick={handleResendCode}
-                  disabled={emailChangeLoading}
-                  className="flex-1 py-2.5 text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-xl hover:bg-brand-100 dark:hover:bg-brand-500/20 transition disabled:opacity-50"
+                  onClick={handleRequestEmailChange}
+                  disabled={emailChangeLoading || !emailChanged || !emailValid}
+                  className="px-4 py-2 text-xs font-medium text-white bg-gray-900 dark:bg-slate-600 rounded-lg hover:bg-gray-800 dark:hover:bg-slate-500 transition disabled:opacity-40"
                 >
-                  {t('resendCode') || 'Resend Code'}
+                  {emailChangeLoading ? tc('sending') || 'Sending...' : t('changeEmail') || 'Change'}
                 </button>
+              </div>
+              {emailChanged && !emailValid && (
+                <p className="text-xs text-red-500 dark:text-red-400">{t('invalidEmail') || 'Invalid email.'}</p>
               )}
-              <button
-                type="button"
-                onClick={handleConfirmEmailChange}
-                disabled={emailChangeLoading || emailChangeCode.length !== 6}
-                className="flex-1 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-50"
-              >
-                {emailChangeLoading ? tc('verifying') || 'Verifying...' : t('verifyCode') || 'Verify'}
-              </button>
+              {emailChanged && emailValid && (
+                <p className="text-xs text-gray-400 dark:text-slate-500">
+                  <Lock size={11} className="inline mr-0.5 -mt-0.5" /> {t('emailChangeNotice') || 'Verification code will be sent.'}
+                </p>
+              )}
             </div>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="flex gap-2">
-              <input
-                id="profile-email"
-                type="email"
-                autoComplete="email"
-                value={profileEmail}
-                onChange={(e) => setProfileEmail(e.target.value)}
-                placeholder={t('emailPlaceholder')}
-                className="flex-1 px-4 py-2.5 text-sm border border-gray-200 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
-              />
-              <button
-                type="button"
-                onClick={handleRequestEmailChange}
-                disabled={emailChangeLoading || !emailChanged || !emailValid}
-                className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-40 whitespace-nowrap"
-              >
-                {emailChangeLoading ? tc('sending') || 'Sending...' : t('changeEmail') || 'Change Email'}
-              </button>
-            </div>
-            {emailChanged && !emailValid && (
-              <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1">
-                <Shield size={12} strokeWidth={1.75} /> {t('invalidEmail') || 'Please enter a valid email address.'}
-              </p>
-            )}
-            {emailChanged && emailValid && (
-              <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                <Lock size={12} strokeWidth={1.75} /> {t('emailChangeNotice') || 'A verification code will be sent to the new email address.'}
-              </p>
-            )}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
