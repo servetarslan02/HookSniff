@@ -2151,7 +2151,11 @@
     "syncPolar": "Sync with Polar.sh",
     "deleteCoupon": "Delete Coupon",
     "deleteCouponConfirm": "Are you sure you want to delete this coupon? This action cannot be undone.",
-    "create": "Create"
+    "create": "Create",
+    "degradedPerformance": "Degraded Performance",
+    "redis": "Redis",
+    "apiStatus": "API",
+    "refresh": "Refresh"
   },
   "landing": {
     "nav": {
