@@ -715,35 +715,41 @@ async fn check_domain_verification(
         None => return Err(AppError::BadRequest("No pending verification for this domain".into())),
     };
 
-    // DNS TXT record lookup — use trust-dns-resolver (pure Rust, no subprocess)
+    // DNS TXT record lookup — use Google DNS-over-HTTPS (no subprocess, no extra crate)
     let txt_name = format!("_hooksniff.{}", domain);
     let verified = {
-        use trust_dns_resolver::TokioAsyncResolver;
-        use trust_dns_resolver::config::*;
-
-        match TokioAsyncResolver::tokio(ResolverConfig::google(), ResolverOpts::default()).await {
-            Ok(resolver) => {
-                match resolver.txt_lookup(txt_name.as_str()).await {
-                    Ok(lookup) => {
+        let client = crate::http_client::get_client().clone();
+        let doh_url = format!("https://dns.google/resolve?name={}&type=TXT", txt_name);
+        match client.get(&doh_url).send().await {
+            Ok(resp) if resp.status().is_success() => {
+                match resp.json::<serde_json::Value>().await {
+                    Ok(dns_response) => {
                         let expected_clean = expected_txt.trim_matches('"');
-                        lookup.iter().any(|record| {
-                            record.iter().any(|data| {
-                                let txt = String::from_utf8_lossy(data);
-                                txt.trim_matches('"') == expected_clean
+                        if let Some(answers) = dns_response["Answer"].as_array() {
+                            answers.iter().any(|answer| {
+                                if let Some(data) = answer["data"].as_str() {
+                                    data.trim_matches('"') == expected_clean
+                                } else {
+                                    false
+                                }
                             })
-                        })
+                        } else {
+                            false
+                        }
                     }
                     Err(e) => {
-                        tracing::warn!("DNS TXT lookup failed for {}: {}", txt_name, e);
+                        tracing::warn!("Failed to parse DNS response for {}: {}", txt_name, e);
                         false
                     }
                 }
             }
+            Ok(resp) => {
+                tracing::warn!("DNS lookup returned HTTP {} for {}", resp.status(), txt_name);
+                false
+            }
             Err(e) => {
-                tracing::error!("Failed to create DNS resolver: {}", e);
-                return Err(AppError::Internal(
-                    anyhow::anyhow!("DNS verification unavailable: {}", e)
-                ));
+                tracing::warn!("DNS lookup failed for {}: {}", txt_name, e);
+                false
             }
         }
     };
