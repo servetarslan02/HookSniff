@@ -468,6 +468,122 @@ pub async fn upgrade_plan(
     .ok()
     .flatten();
 
+    // ── Check for internal coupon (direct plan application, no payment provider) ──
+    if let Some(ref code) = req.discount_code {
+        let code_upper = code.to_uppercase();
+        if let Ok(Some(coupon)) = sqlx::query_as::<_, crate::models::coupon::CouponCode>(
+            "SELECT * FROM coupon_codes WHERE UPPER(code) = $1 AND type = 'internal' AND is_active = true"
+        )
+        .bind(&code_upper)
+        .fetch_optional(&pool)
+        .await
+        {
+            // Validate coupon
+            let now = Utc::now();
+
+            // Check expiry
+            if let Some(expires_at) = coupon.expires_at {
+                if now > expires_at {
+                    return Err(AppError::BadRequest("This coupon has expired".into()));
+                }
+            }
+
+            // Check max redemptions
+            if let Some(max) = coupon.max_redemptions {
+                if coupon.redemption_count >= max {
+                    return Err(AppError::BadRequest("This coupon has reached its maximum usage".into()));
+                }
+            }
+
+            // Check if already used by this customer
+            let already_used: i64 = sqlx::query_scalar(
+                "SELECT COUNT(*) FROM coupon_redemptions WHERE coupon_id = $1 AND customer_id = $2"
+            )
+            .bind(coupon.id)
+            .bind(customer.id)
+            .fetch_one(&pool)
+            .await
+            .unwrap_or(0);
+
+            if already_used > 0 {
+                return Err(AppError::BadRequest("You have already used this coupon".into()));
+            }
+
+            // Check plan match
+            if let Some(ref target) = coupon.target_plan {
+                if *target != new_plan.as_str() {
+                    return Err(AppError::BadRequest(format!(
+                        "This coupon is only valid for the {} plan", target
+                    )));
+                }
+            }
+
+            // Apply coupon: directly upgrade plan
+            let webhook_limit = new_plan.max_webhooks_per_day() as i64;
+            sqlx::query(
+                "UPDATE customers SET plan = $1, webhook_limit = $2, updated_at = NOW() WHERE id = $3"
+            )
+            .bind(new_plan.as_str())
+            .bind(webhook_limit)
+            .bind(customer.id)
+            .execute(&pool)
+            .await?;
+
+            // Record redemption
+            sqlx::query(
+                "INSERT INTO coupon_redemptions (coupon_id, customer_id) VALUES ($1, $2)"
+            )
+            .bind(coupon.id)
+            .bind(customer.id)
+            .execute(&pool)
+            .await?;
+
+            // Increment redemption count
+            sqlx::query(
+                "UPDATE coupon_codes SET redemption_count = redemption_count + 1, updated_at = NOW() WHERE id = $1"
+            )
+            .bind(coupon.id)
+            .execute(&pool)
+            .await?;
+
+            // Create invoice with $0 (free via coupon)
+            sqlx::query(
+                "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) VALUES ($1, 0, 'USD', 'paid', $2)"
+            )
+            .bind(customer.id)
+            .bind(new_plan.as_str())
+            .execute(&pool)
+            .await?;
+
+            // Audit log
+            {
+                let rid = customer.id.to_string();
+                let _ = crate::audit::log_action(
+                    &pool, customer.id, "PLAN_CHANGE_COUPON", "billing",
+                    Some(&rid),
+                    Some(serde_json::json!({
+                        "new_plan": new_plan.as_str(),
+                        "coupon_code": coupon.code,
+                        "coupon_type": coupon.coupon_type,
+                        "discount_type": coupon.discount_type,
+                        "discount_value": coupon.discount_value,
+                    })),
+                    None, None,
+                ).await;
+            }
+
+            return Ok(Json(UpgradeResponse {
+                checkout_url: None,
+                provider: "internal".to_string(),
+                message: format!("Plan upgraded to {} using coupon {}", new_plan.as_str(), coupon.code),
+                prorated_amount_cents: None,
+                days_remaining: None,
+                requires_contact: None,
+                contact_url: None,
+            }));
+        }
+    }
+
     let proration = calculate_proration(&current_plan, &new_plan, period_start.as_ref());
 
     // Determine which provider to use

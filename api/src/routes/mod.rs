@@ -10,6 +10,7 @@ pub mod background_tasks;
 pub mod billing;
 pub mod broadcasts;
 pub mod contact;
+pub mod coupons;
 pub mod custom_domains;
 pub mod customer_portal;
 pub mod delivery_details;
@@ -97,6 +98,7 @@ pub fn api_router() -> Router {
         .nest("/templates", templates::router())
         .nest("/schemas", schemas::router())
         .nest("/billing", billing::router())
+        .nest("/coupons", coupons::router())
         .nest("/portal", customer_portal::router())
         .nest("/portal", portal_config::router())
         .nest("/teams", teams::router())

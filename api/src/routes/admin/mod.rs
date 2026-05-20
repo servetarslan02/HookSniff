@@ -1,6 +1,7 @@
 pub mod alerts;
 pub mod audit;
 pub mod broadcasts;
+pub mod coupons;
 pub mod customers;
 pub mod delivery;
 pub mod export;
@@ -83,6 +84,16 @@ pub fn router() -> Router {
             "/feature-flags/{id}",
             put(feature_flags::update_feature_flag).delete(feature_flags::delete_feature_flag),
         )
+        // ── Coupons ──
+        .route(
+            "/coupons",
+            get(coupons::list_coupons).post(coupons::create_coupon),
+        )
+        .route(
+            "/coupons/{id}",
+            get(coupons::get_coupon).put(coupons::update_coupon).delete(coupons::delete_coupon),
+        )
+        .route("/coupons/{id}/sync", post(coupons::sync_to_polar))
         // ── Deploy Info ──
         .route("/deploy-info", get(settings::deploy_info))
         // ── System Monitoring ──
