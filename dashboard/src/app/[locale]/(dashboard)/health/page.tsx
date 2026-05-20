@@ -113,13 +113,14 @@ export default function EndpointHealthPage() {
                   </div>
 
                   {/* Stats Row */}
-                  <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mt-3">
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-3">
                     {[
                       { label: t('total'), value: ep.total_deliveries.toLocaleString() },
                       { label: t('successful'), value: ep.successful.toLocaleString() },
                       { label: t('failed'), value: ep.failed.toLocaleString() },
                       { label: t('avgLatency'), value: `${ep.avg_response_ms}ms` },
-                      { label: t('p95Latency'), value: `${ep.p95_response_ms}ms` },
+                      { label: t('p95Latency') || 'P95', value: `${ep.p95_response_ms}ms` },
+                      { label: t('p99Latency') || 'P99', value: `${ep.p99_response_ms ?? ep.p95_response_ms}ms` },
                     ].map((stat) => (
                       <div key={stat.label}>
                         <div className="text-sm font-semibold text-gray-900 dark:text-white">{stat.value}</div>
@@ -147,6 +148,16 @@ export default function EndpointHealthPage() {
                       {ep.last_failure_at && ` · ${t('lastFailure', { time: new Date(ep.last_failure_at).toLocaleString() })}`}
                     </div>
                   )}
+
+                  {/* Uptime + Last Success */}
+                  <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-500 dark:text-slate-400">
+                    {ep.uptime_7d != null && (
+                      <span>{t('uptime7d') || 'Uptime 7d'}: <strong className="text-gray-700 dark:text-slate-300">{ep.uptime_7d.toFixed(1)}%</strong></span>
+                    )}
+                    {ep.last_success_at && (
+                      <span>{t('lastSuccess') || 'Son başarılı'}: <strong className="text-gray-700 dark:text-slate-300">{new Date(ep.last_success_at).toLocaleString()}</strong></span>
+                    )}
+                  </div>
                 </div>
               );
             })}
