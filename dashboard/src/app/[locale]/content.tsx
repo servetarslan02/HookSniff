@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useRouter } from '@/i18n/navigation';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
@@ -285,15 +285,24 @@ function HowItWorks() {
 /* ─── Landing Page ─── */
 export function HomeContent() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { token, user } = useAuth();
+  const { token, user, logout } = useAuth();
 
-  // Admin users go to admin panel
+  // No auto-redirect — all users (including admins) can view the landing page
+
+  // Close profile dropdown on outside click
   useEffect(() => {
-    if (user?.is_admin) {
-      router.replace('/admin');
+    function handleClick(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
     }
-  }, [user, router]);
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
   const tNav = useTranslations('landing.nav');
   const tHero = useTranslations('landing.hero');
   const tFeatures = useTranslations('landing.features');
@@ -331,9 +340,49 @@ export function HomeContent() {
             <LanguageSwitcherBtn />
             <ThemeToggleBtn />
             {token ? (
-              <Link href="/register" className="bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition btn-glow">
-                {tNav('dashboard')}
-              </Link>
+              <div className="relative" ref={profileRef}>
+                <button
+                  type="button"
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                >
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                    {(user?.name?.charAt(0) || user?.email?.charAt(0) || '?').toUpperCase()}
+                  </div>
+                </button>
+                {profileOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.name || user?.email}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
+                    </div>
+                    <Link
+                      href={user?.is_admin ? '/admin' : '/core'}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      {user?.is_admin ? 'Admin Panel' : tNav('dashboard')}
+                    </Link>
+                    {!user?.is_admin && (
+                      <Link
+                        href="/core"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                        onClick={() => setProfileOpen(false)}
+                      >
+                        {tNav('dashboard')}
+                      </Link>
+                    )}
+                    <div className="border-t border-gray-100 dark:border-gray-700 mt-1" />
+                    <button
+                      type="button"
+                      onClick={() => { setProfileOpen(false); logout(); router.push('/login'); }}
+                      className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                    >
+                      Çıkış Yap
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link href="/login" className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition font-medium">
@@ -364,8 +413,8 @@ export function HomeContent() {
               <LanguageSwitcherBtn />
               <ThemeToggleBtn />
             </div>
-            <Link href="/register" onClick={() => setMobileNavOpen(false)} className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center">
-              {token ? tNav('dashboard') : tNav('register')}
+            <Link href={token ? (user?.is_admin ? '/admin' : '/core') : '/register'} onClick={() => setMobileNavOpen(false)} className="block bg-gray-900 dark:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-brand-700 transition text-center">
+              {token ? (user?.is_admin ? 'Admin Panel' : tNav('dashboard')) : tNav('register')}
             </Link>
           </div>
         )}
@@ -389,7 +438,7 @@ export function HomeContent() {
               {tHero('subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0">
-              <Link href="/register" className="bg-gray-900 dark:bg-brand-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow">
+              <Link href={token ? (user?.is_admin ? '/admin' : '/core') : '/register'} className="bg-gray-900 dark:bg-brand-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold hover:bg-gray-800 dark:hover:bg-brand-700 transition shadow-lg shadow-gray-900/20 dark:shadow-brand-500/30 btn-ripple btn-glow">
                 {token ? tHero('ctaDashboard') : tHero('cta')}
               </Link>
               <Link href="/docs" className="border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 transition btn-ripple">
