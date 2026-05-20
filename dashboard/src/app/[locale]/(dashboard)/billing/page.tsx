@@ -200,7 +200,7 @@ export default function BillingPage() {
       {/* 3. Plans */}
       <section>
         <SectionLabel label={t('currentPlan')} icon={<Rocket size={16} strokeWidth={1.75} />} />
-        <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} />
+        <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} discountCode={discountCode} onDiscountCodeChange={setDiscountCode} />
       </section>
 
       {/* 4. Invoices */}
@@ -226,19 +226,6 @@ export default function BillingPage() {
                 : t('upgradeDesc')
               }
             </p>
-            {/* Coupon code input — only for upgrades */}
-            {planOrder.indexOf(showUpgradeModal) > planOrder.indexOf(currentPlan) && (
-              <div className="mb-4">
-                <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">{t('couponCode')}</label>
-                <input
-                  type="text"
-                  value={discountCode}
-                  onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
-                  placeholder={t('couponPlaceholder')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm font-mono placeholder:text-gray-400"
-                />
-              </div>
-            )}
             <div className="flex gap-3 justify-end">
               <button type="button" onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
                 {tc('cancel')}
