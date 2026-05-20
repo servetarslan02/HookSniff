@@ -218,10 +218,12 @@ export default function AdminUserDetailPage() {
     if (!id || !detail) return;
     try {
       const result = await impersonateMutation.mutateAsync(id);
+      // Store token in sessionStorage (not URL) to prevent log/history leakage
+      sessionStorage.setItem('impersonate_token', result.token);
       // Open window synchronously before async operations (avoids popup blocker)
       const newWindow = window.open('about:blank', '_blank');
       if (newWindow) {
-        newWindow.location.href = `/${locale}/dashboard?impersonate_token=${result.token}`;
+        newWindow.location.href = `/${locale}/dashboard?impersonate=1`;
       }
       toast(t('impersonating') + `: ${detail.user.email}`, 'success');
     } catch {

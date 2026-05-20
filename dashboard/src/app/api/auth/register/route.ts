@@ -5,9 +5,17 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-10461
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    
+    // Forward client IP for rate limiting
+    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    
     const apiRes = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Forwarded-For': clientIp,
+        'X-Real-IP': clientIp,
+      },
       body: JSON.stringify(body),
     });
     const data = await apiRes.json();
