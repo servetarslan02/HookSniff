@@ -14,12 +14,14 @@ import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { BroadcastBanner } from '@/components/BroadcastBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
+import { useQueryClient } from '@tanstack/react-query';
+import { API_BASE, apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
 import { LayoutDashboard, Smartphone, Link2, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield, BookOpen, ExternalLink, LogOut } from 'lucide-react';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -27,8 +29,54 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const tc = useTranslations('common');
   const locale = useLocale();
   const { connectionState } = useRealtime();
+  const queryClient = useQueryClient();
 
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
+
+  // Prefetch API data for a route on hover
+  const prefetchForRoute = (href: string) => {
+    if (!token) return [];
+    const base = [
+      { queryKey: ['stats'], queryFn: () => statsApi.get(token), staleTime: 30_000 },
+    ];
+    switch (href) {
+      case '/core':
+        return [
+          ...base,
+          { queryKey: ['webhooks', { page: 1 }], queryFn: () => webhooksApi.list(token, { page: 1 }), staleTime: 15_000 },
+          { queryKey: ['analytics', 'delivery-trend', '7d'], queryFn: () => analyticsApi.deliveryTrend(token, '7d'), staleTime: 30_000 },
+          { queryKey: ['endpoints'], queryFn: () => apiFetch('/endpoints', { token }), staleTime: 30_000 },
+        ];
+      case '/deliveries':
+        return [
+          { queryKey: ['delivery-logs', { page: 1 }], queryFn: () => webhooksApi.list(token, { page: 1 }), staleTime: 15_000 },
+        ];
+      case '/applications':
+        return [
+          { queryKey: ['applications'], queryFn: () => apiFetch('/applications', { token }), staleTime: 30_000 },
+        ];
+      case '/account':
+        return [
+          { queryKey: ['portal-profile'], queryFn: () => apiFetch('/portal/me', { token }), staleTime: 30_000 },
+          { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
+        ];
+      case '/observability':
+        return [
+          { queryKey: ['analytics', 'success-rate', '24h'], queryFn: () => analyticsApi.successRate(token, '24h'), staleTime: 30_000 },
+        ];
+      case '/billing-section':
+        return [
+          { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
+          { queryKey: ['billing', 'subscription'], queryFn: () => apiFetch('/billing/subscription', { token }), staleTime: 60_000 },
+        ];
+      case '/organization':
+        return [
+          { queryKey: ['teams'], queryFn: () => apiFetch('/teams', { token }), staleTime: 30_000 },
+        ];
+      default:
+        return base;
+    }
+  };
 
   // Close profile dropdown on outside click
   useEffect(() => {
@@ -108,6 +156,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 hoverDelay={80}
+                prefetchData={prefetchForRoute(item.href)}
                 className={clsx(
                   'flex items-center px-3 py-2 text-sm rounded-lg transition-colors',
                   isActive
