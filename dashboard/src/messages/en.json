@@ -4595,7 +4595,9 @@
     "saving": "Saving…",
     "nameImmutable": "Flag name cannot be changed after creation",
     "nameTooLong": "Flag name must be 100 characters or less",
-    "nameInvalid": "Flag name may only contain letters, numbers, underscore, or hyphen"
+    "nameInvalid": "Flag name may only contain letters, numbers, underscore, or hyphen",
+    "allPlansHint": "No plans selected = available for all plans",
+    "deleting": "Deleting…"
   },
   "schemas": {
     "title": "Schema Registry",

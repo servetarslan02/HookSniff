@@ -4577,7 +4577,9 @@
     "saving": "Kaydediliyor...",
     "nameImmutable": "Flag adı oluşturulduktan sonra değiştirilemez",
     "nameTooLong": "Flag adı 100 karakterden kısa olmalı",
-    "nameInvalid": "Flag adı sadece harf, rakam, alt çizgi veya tire içerebilir"
+    "nameInvalid": "Flag adı sadece harf, rakam, alt çizgi veya tire içerebilir",
+    "allPlansHint": "Plan seçilmedi = tüm planlar için geçerli",
+    "deleting": "Siliniyor…"
   },
   "schemas": {
     "title": "Şema Kaydı",
