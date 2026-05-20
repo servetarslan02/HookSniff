@@ -111,10 +111,12 @@ pub fn api_router() -> Router {
         .nest("/ws", ws::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
-    // Inbound webhooks — uses API key auth (not JWT), so external services can call it
-    let inbound_routes = Router::new()
+    // Inbound webhooks — config routes need auth, provider routes are public (signature-verified)
+    let inbound_config_routes = Router::new()
         .nest("/inbound", inbound::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
+    let inbound_public_routes = Router::new()
+        .nest("/inbound", inbound::public_router());
 
     let admin_routes = Router::new()
         .nest("/admin", admin::router())
@@ -141,7 +143,8 @@ pub fn api_router() -> Router {
             axum::routing::get(admin::public_plans),
         )
         .merge(protected)
-        .merge(inbound_routes)
+        .merge(inbound_config_routes)
+        .merge(inbound_public_routes)
         .merge(admin_routes)
 }
 
@@ -167,6 +170,7 @@ mod tests {
         let _ = admin::router();
         let _ = teams::router();
         let _ = inbound::router();
+        let _ = inbound::public_router();
         let _ = customer_portal::router();
         let _ = analytics::router();
         let _ = notifications::router();
