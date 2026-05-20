@@ -34,7 +34,7 @@ const nextConfig = {
     return [
       {
         source: '/api/health',
-        destination: 'https://hooksniff-edge-proxy.servetarslan02.workers.dev/health',
+        destination: 'https://hooksniff-api-1046140057667.europe-west1.run.app/health',
       },
     ];
   },
