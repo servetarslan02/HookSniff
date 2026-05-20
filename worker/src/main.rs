@@ -35,13 +35,13 @@
 
 // Item 294: Named constants for magic numbers
 /// Maximum database connections in the pool
-const DB_MAX_CONNECTIONS: u32 = 10;
+const DB_MAX_CONNECTIONS: u32 = 25;
 /// Database connection acquisition timeout
-const DB_ACQUIRE_TIMEOUT_SECS: u64 = 30;
+const DB_ACQUIRE_TIMEOUT_SECS: u64 = 5;
 /// HTTP client request timeout
-const HTTP_TIMEOUT_SECS: u64 = 10;
+const HTTP_TIMEOUT_SECS: u64 = 5;
 /// HTTP client connection timeout
-const HTTP_CONNECT_TIMEOUT_SECS: u64 = 3;
+const HTTP_CONNECT_TIMEOUT_SECS: u64 = 2;
 /// Maximum idle connections per host in HTTP pool
 const HTTP_POOL_MAX_IDLE_PER_HOST: usize = 30;
 /// Maximum concurrent HTTP deliveries (global)
