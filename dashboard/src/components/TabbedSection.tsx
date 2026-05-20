@@ -28,27 +28,12 @@ interface TabbedSectionProps {
   tabClassName?: string;
   /** Extra class names for the content area */
   contentClassName?: string;
+  /** Persist active tab in URL (default: true). Disable for nested tabs to avoid param conflicts. */
+  persistUrl?: boolean;
 }
 
 /**
  * Production-grade tabbed section with lazy rendering and hover prefetch.
- *
- * Stripe/Linear pattern:
- * - Only the active tab's content is mounted (saves memory)
- * - Hover over a tab → content starts loading before click
- * - Smooth fade-in when switching tabs
- * - URL param persistence (deep-linkable tabs)
- * - Visited tabs stay mounted (no re-fetch on switch)
- *
- * @example
- * <TabbedSection
- *   tabs={[
- *     { key: 'overview', label: 'Overview', icon: <BarChart3 size={16} strokeWidth={1.75} />, content: <OverviewTab /> },
- *     { key: 'activity', label: 'Activity', icon: <ClipboardList size={16} strokeWidth={1.75} />, content: () => <ActivityTab /> },
- *     { key: 'health', label: 'Health', icon: <Heart size={16} strokeWidth={1.75} />, content: <HealthTab /> },
- *   ]}
- *   urlParam="section"
- * />
  */
 export function TabbedSection({
   tabs,
@@ -58,9 +43,11 @@ export function TabbedSection({
   fadeMs = 200,
   tabClassName,
   contentClassName,
+  persistUrl = true,
 }: TabbedSectionProps) {
+  // Resolve initial tab from URL (if persistUrl) or fallback to default/first
   const [active, setActive] = useState(() => {
-    if (typeof window !== 'undefined') {
+    if (persistUrl && typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const urlTab = params.get(urlParam);
       if (urlTab && tabs.some((t) => t.key === urlTab)) return urlTab;
@@ -68,9 +55,19 @@ export function TabbedSection({
     return defaultTab || tabs[0]?.key || '';
   });
 
-  const [visited, setVisited] = useState<Set<string>>(
-    () => new Set([defaultTab || tabs[0]?.key || ''])
-  );
+  // FIX: Initialize visited with the active tab (not just the first tab)
+  const [visited, setVisited] = useState<Set<string>>(() => {
+    const initial = defaultTab || tabs[0]?.key || '';
+    if (persistUrl && typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlTab = params.get(urlParam);
+      if (urlTab && tabs.some((t) => t.key === urlTab)) {
+        return new Set([urlTab]);
+      }
+    }
+    return new Set([initial]);
+  });
+
   const [fadingIn, setFadingIn] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -91,8 +88,8 @@ export function TabbedSection({
       visit(key);
       onTabChange?.(key);
 
-      // Update URL param
-      if (typeof window !== 'undefined') {
+      // Update URL param (only if persistUrl is enabled)
+      if (persistUrl && typeof window !== 'undefined') {
         const url = new URL(window.location.href);
         if (key === defaultTab || key === tabs[0]?.key) {
           url.searchParams.delete(urlParam);
@@ -102,10 +99,10 @@ export function TabbedSection({
         window.history.replaceState(null, '', url.toString());
       }
     },
-    [visit, onTabChange, urlParam, defaultTab, tabs]
+    [visit, onTabChange, urlParam, defaultTab, tabs, persistUrl]
   );
 
-  // Prefetch on hover (Stripe pattern)
+  // Prefetch on hover
   const handleTabHover = useCallback(
     (key: string) => {
       visit(key);
@@ -135,7 +132,7 @@ export function TabbedSection({
         <nav className="flex gap-1 min-w-max" role="tablist">
           {tabs.map((tab) => {
             const isActive = tab.key === active;
-            const prefetch = tab.prefetch !== false; // default true
+            const prefetch = tab.prefetch !== false;
 
             return (
               <button
@@ -209,16 +206,6 @@ export function TabbedSection({
 
 /**
  * Helper: Create a lazy-loaded tab content using dynamic import.
- * Use this in parent components to code-split tab content.
- *
- * @example
- * const OverviewTab = createLazyTab(() => import('./components/OverviewTab'));
- * const ActivityTab = createLazyTab(() => import('./components/ActivityTab'));
- *
- * <TabbedSection tabs={[
- *   { key: 'overview', label: 'Overview', content: <OverviewTab /> },
- *   { key: 'activity', label: 'Activity', content: <ActivityTab /> },
- * ]} />
  */
 export function createLazyTab(importFn: () => Promise<{ default: React.ComponentType }>) {
   return dynamic(importFn, {
