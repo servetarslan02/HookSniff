@@ -130,6 +130,15 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <span className="text-2xl">🪝</span>
             <span className="text-xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </a>
+          {user?.is_admin && (
+            <Link
+              href="/admin"
+              className="shrink-0 px-2.5 py-1 text-xs font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition"
+            >
+              <Shield size={14} strokeWidth={1.75} className="inline mr-1" />
+              {t('adminPanel') || 'Admin'}
+            </Link>
+          )}
           <button
             className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 lg:hidden rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
             onClick={() => setSidebarOpen(false)}
@@ -142,16 +151,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
-          {/* Admin Panel link — only for admin users */}
-          {user?.is_admin && (
-            <Link
-              href="/admin"
-              className="flex items-center px-3 py-2.5 mb-2 text-[14px] font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
-            >
-              <span className="mr-3 inline-flex items-center"><Shield size={16} strokeWidth={1.75} /></span>
-              {t('adminPanel') || 'Admin Panel'}
-            </Link>
-          )}
           {navItems.map((item) => {
             const isActive = cleanPath === item.href || cleanPath.startsWith(item.href + '/');
             return (
