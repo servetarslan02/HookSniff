@@ -791,6 +791,8 @@
     "confirmPause": "Dondur",
     "couponCode": "Kupon Kodu (opsiyonel)",
     "couponPlaceholder": "KODU GİRİN",
+    "enterCoupon": "Kupon Kodu Gir",
+    "confirmCoupon": "Onayla",
     "subscriptionPaused": "Abonelik donduruldu",
     "resumeBefore": "Geri dönmek için son tarih:",
     "resumeSubscription": "Devam Et",
