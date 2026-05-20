@@ -11,7 +11,7 @@
 import { test, expect } from '@playwright/test';
 
 // ─── Constants ───
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'https://hooksniff.vercel.app';
+// eslint-disable-next-line @typescript-eslint-no-unused-vars
 const LOCALES = ['en', 'tr'];
 
 // ─── Auth helper ───
@@ -121,7 +121,7 @@ test.describe('E2E — Dashboard Pages', () => {
 
       // Should not show error boundary or blank page
       const errorBoundary = page.locator('[data-testid="error-boundary"], :has-text("Something went wrong")');
-      const errorCount = await errorBoundary.count();
+      await errorBoundary.count();
 
       // Page should have content
       const body = await page.textContent('body');
@@ -137,7 +137,7 @@ test.describe('E2E — Dashboard Pages', () => {
 
     // Should have navigation elements (sidebar or nav)
     const nav = page.locator('nav, aside, [role="navigation"], [data-testid="sidebar"]');
-    const navCount = await nav.count();
+    await nav.count();
     // At minimum, page should load
     expect(await page.textContent('body')).toBeTruthy();
   });
