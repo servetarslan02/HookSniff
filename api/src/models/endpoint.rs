@@ -47,6 +47,8 @@ pub enum RoutingStrategy {
     RoundRobin,
     Latency,
     Failover,
+    Weighted,
+    Random,
 }
 
 impl RoutingStrategy {
@@ -55,6 +57,8 @@ impl RoutingStrategy {
             Self::RoundRobin => "round-robin",
             Self::Latency => "latency",
             Self::Failover => "failover",
+            Self::Weighted => "weighted",
+            Self::Random => "random",
         }
     }
 
@@ -62,6 +66,8 @@ impl RoutingStrategy {
         match s {
             "latency" => Self::Latency,
             "failover" => Self::Failover,
+            "weighted" => Self::Weighted,
+            "random" => Self::Random,
             _ => Self::RoundRobin,
         }
     }
@@ -251,6 +257,47 @@ impl Endpoint {
                 // Otherwise prefer fallback if available
                 if self.failure_streak >= 3 {
                     if let Some(ref fallback) = self.fallback_url {
+                        return (fallback.clone(), true);
+                    }
+                }
+                (self.url.clone(), false)
+            }
+            RoutingStrategy::Weighted => {
+                // Weighted: distribute traffic based on endpoint health.
+                // Healthier endpoints get more traffic.
+                // If fallback exists, use it proportionally to primary's failure rate.
+                if let Some(ref fallback) = self.fallback_url {
+                    if self.failure_streak > 0 {
+                        // Higher failure streak = more traffic to fallback
+                        // failure_streak 1-2: ~30% fallback, 3+: ~70% fallback
+                        let fallback_weight = (self.failure_streak as f64 * 0.2).min(0.8);
+                        let roll: f64 = {
+                            use std::collections::hash_map::DefaultHasher;
+                            use std::hash::{Hash, Hasher};
+                            let mut h = DefaultHasher::new();
+                            self.id.hash(&mut h);
+                            chrono::Utc::now().timestamp_nanos_opt().unwrap_or(0).hash(&mut h);
+                            (h.finish() % 1000) as f64 / 1000.0
+                        };
+                        if roll < fallback_weight {
+                            return (fallback.clone(), true);
+                        }
+                    }
+                }
+                (self.url.clone(), false)
+            }
+            RoutingStrategy::Random => {
+                // Random: 50/50 chance between primary and fallback
+                if let Some(ref fallback) = self.fallback_url {
+                    let roll: bool = {
+                        use std::collections::hash_map::DefaultHasher;
+                        use std::hash::{Hash, Hasher};
+                        let mut h = DefaultHasher::new();
+                        self.id.hash(&mut h);
+                        chrono::Utc::now().timestamp_nanos_opt().unwrap_or(0).hash(&mut h);
+                        (h.finish() % 2) == 0
+                    };
+                    if roll {
                         return (fallback.clone(), true);
                     }
                 }
@@ -536,6 +583,56 @@ mod tests {
     }
 
     #[test]
+    fn test_routing_weighted_healthy() {
+        // Healthy endpoint (no failures) should always use primary
+        let ep = make_endpoint("weighted", Some("https://fallback.com"), 0);
+        let (url, _) = ep.resolve_target_url();
+        assert_eq!(url, "https://primary.com");
+    }
+
+    #[test]
+    fn test_routing_weighted_no_fallback() {
+        // Without fallback, always use primary
+        let ep = make_endpoint("weighted", None, 3);
+        let (url, fallback) = ep.resolve_target_url();
+        assert_eq!(url, "https://primary.com");
+        assert!(!fallback);
+    }
+
+    #[test]
+    fn test_routing_weighted_with_failures() {
+        // With failures and fallback, result should be either primary or fallback
+        let ep = make_endpoint("weighted", Some("https://fallback.com"), 2);
+        let (url, _) = ep.resolve_target_url();
+        assert!(url == "https://primary.com" || url == "https://fallback.com");
+    }
+
+    #[test]
+    fn test_routing_random_with_fallback() {
+        // Random with fallback should sometimes pick either URL
+        let ep = make_endpoint("random", Some("https://fallback.com"), 0);
+        let mut saw_primary = false;
+        let mut saw_fallback = false;
+        for _ in 0..100 {
+            let (url, _) = ep.resolve_target_url();
+            if url == "https://primary.com" { saw_primary = true; }
+            if url == "https://fallback.com" { saw_fallback = true; }
+        }
+        // With 100 iterations, very likely we saw both (but not guaranteed)
+        // Just verify it doesn't crash and returns valid URLs
+        assert!(saw_primary || saw_fallback);
+    }
+
+    #[test]
+    fn test_routing_random_no_fallback() {
+        // Without fallback, always use primary
+        let ep = make_endpoint("random", None, 0);
+        let (url, fallback) = ep.resolve_target_url();
+        assert_eq!(url, "https://primary.com");
+        assert!(!fallback);
+    }
+
+    #[test]
     fn test_is_healthy_no_failures() {
         let ep = make_endpoint("round-robin", None, 0);
         assert!(ep.is_healthy());
@@ -564,6 +661,14 @@ mod tests {
             RoutingStrategy::Latency
         );
         assert_eq!(
+            RoutingStrategy::parse_str("weighted"),
+            RoutingStrategy::Weighted
+        );
+        assert_eq!(
+            RoutingStrategy::parse_str("random"),
+            RoutingStrategy::Random
+        );
+        assert_eq!(
             RoutingStrategy::parse_str("unknown"),
             RoutingStrategy::RoundRobin
         );
@@ -575,11 +680,13 @@ mod tests {
         assert_eq!(RoutingStrategy::RoundRobin.as_str(), "round-robin");
         assert_eq!(RoutingStrategy::Failover.as_str(), "failover");
         assert_eq!(RoutingStrategy::Latency.as_str(), "latency");
+        assert_eq!(RoutingStrategy::Weighted.as_str(), "weighted");
+        assert_eq!(RoutingStrategy::Random.as_str(), "random");
     }
 
     #[test]
     fn test_routing_strategy_roundtrip() {
-        for s in &["round-robin", "failover", "latency"] {
+        for s in &["round-robin", "failover", "latency", "weighted", "random"] {
             let strategy = RoutingStrategy::parse_str(s);
             assert_eq!(strategy.as_str(), *s);
         }

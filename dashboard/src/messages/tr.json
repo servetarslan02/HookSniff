@@ -6120,7 +6120,7 @@
     "theProblem": "Sorun",
     "problemDesc": "Webhook'ları alan birden fazla sunucunuz varsa, her teslimatın hangisine gideceğine karar vermeniz gerekir. Basit round-robin, sunucu sağlığını veya yanıt sürelerini dikkate almaz.",
     "routingStrategies": "Yönlendirme Stratejileri",
-    "routingDesc": "HookSniff her endpoint için iki yönlendirme stratejisi destekler:",
+    "routingDesc": "HookSniff her endpoint için dört yönlendirme stratejisi destekler:",
     "strategy": "Strateji",
     "howItWorks": "Nasıl Çalışır",
     "bestFor": "En Uygun Olduğu Durum",
@@ -6154,7 +6154,7 @@
     "hm4": "Son başarılı teslimat — son başarılı teslimattan bu yana geçen süre",
     "bestPractices": "En İyi Uygulamalar",
     "bp1": "Kritik webhooklar için failover kullanın — birincil down olsa bile teslimatı sağlayın",
-    "bp2": "Karışık kapasiteli sunucular için failover kullanın — birincil yükü taşır, yedek taşma için",
+    "bp2": "Kademeli failover için weighted kullanın — sağlık bozuldukça trafik otomatik kayar",
     "bp3": "Sağlık metriklerini izleyin — sağlıksız endpointler için uyarılar ayarlayın",
     "bp4": "Failover ı düzenli olarak test edin — fallback endpointinizin çalıştığını doğrulayın",
     "faq": "SSS",
@@ -6167,7 +6167,13 @@
     "furtherReading": "Daha Fazla Okuma",
     "fr1": "Retry Policy — Retry davranışını yapılandırın",
     "fr2": "Health Monitoring — Endpoint sağlığını izleyin",
-    "fr3": "Rate Limiting — Endpointleri aşırı yükten koruyun"
+    "fr3": "Rate Limiting — Endpointleri aşırı yükten koruyun",
+    "weighted": "Ağırlıklı",
+    "weightedDesc": "Trafiği endpoint sağlık durumuna göre dağıtır. Daha sağlıklı endpointler daha fazla trafik alır. Hatalar arttığında trafik otomatik olarak fallback URL ye kayar.",
+    "weightedBest": "Kademeli failover",
+    "random": "Rastgele",
+    "randomDesc": "Birincil ve fallback URL arasında rastgele seçim yapar. Her ikisi de mevcut olduğunda 50/50 dağılım.",
+    "randomBest": "Test ve yedeklilik"
   },
   "docsChangelog": {
     "title": "Değişiklik Günlüğü",
