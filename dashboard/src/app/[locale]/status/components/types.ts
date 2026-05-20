@@ -1,7 +1,7 @@
 // ─── Types ───
 export interface ComponentStatus {
   name: string;
-  icon?: string;
+  icon?: React.ReactNode;
   status: 'healthy' | 'degraded' | 'down' | 'unhealthy' | 'unknown';
   latency_ms: number | null;
   description: string;

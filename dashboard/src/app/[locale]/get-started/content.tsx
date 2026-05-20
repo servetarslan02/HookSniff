@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/store';
 import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import Footer from '@/components/Footer';
-import { Box, Circle, Code2, Globe, CreditCard, User, Package, Mail, Bot, Bell, EyeOff, Eye, Gem, Lightbulb, Monitor, Zap, FlaskConical, BarChart3, RefreshCw, ClipboardList, Image, Terminal } from 'lucide-react';
+import { Box, Circle, Code2, Globe, CreditCard, User, Package, Mail, Bot, Bell, EyeOff, Eye, Gem, Lightbulb, Monitor, Zap, FlaskConical, BarChart3, RefreshCw, ClipboardList, Image, Terminal , Check } from 'lucide-react';
 
 /* ─── SDK Code Examples ─── */
 
@@ -369,8 +369,8 @@ export function GetStartedPageContent() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2"><ClipboardList size={24} strokeWidth={1.75} className="inline mr-1" /> {t('eventTypesTitle')}</h2>
           <p className="text-gray-600 dark:text-slate-400 mb-8">{t('eventTypesDesc')}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {EVENT_TYPES.map((cat) => (
-              <div key={cat.category} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4">
+            {EVENT_TYPES.map((cat, idx) => (
+              <div key={idx} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{cat.category}</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {cat.events.map((ev) => (

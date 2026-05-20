@@ -6,7 +6,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Inbox, Anchor } from 'lucide-react';
+import { Inbox, Anchor, Check, X, AlertTriangle, LinkIcon } from 'lucide-react';
 
 const tlDrKeys = ['tlDr1', 'tlDr2', 'tlDr3', 'tlDr4', 'tlDr5'];
 
@@ -154,7 +154,7 @@ const scorecard = [
   { categoryKey: 'scoreOpenSource', hooksniff: 10, svix: 10, hookdeck: 0, hook0: 10 },
 ];
 
-function Badge({ text, variant }: { text: string; variant: 'green' | 'red' | 'yellow' | 'gray' | 'blue' }) {
+function Badge({ text, variant }: { text: React.ReactNode; variant: 'green' | 'red' | 'yellow' | 'gray' | 'blue' }) {
   const colors = {
     green: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400',
     red: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400',
@@ -317,7 +317,7 @@ export default function CompareContent() {
                       <div key={name} className={`p-4 ${isWinner ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold text-gray-500 dark:text-slate-500">{labels[name]}</span>
-                          <Badge text={t(data.badge)} variant={getBadgeVariant(section.winner, name)} />
+                          <Badge text={typeof data.badge === 'string' ? t(data.badge) : data.badge} variant={getBadgeVariant(section.winner, name)} />
                         </div>
                         <p className="text-sm text-gray-600 dark:text-slate-400">{t(data.text)}</p>
                       </div>

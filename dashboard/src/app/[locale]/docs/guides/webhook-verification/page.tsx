@@ -1,4 +1,5 @@
 import SdkTabs from '@/components/SdkTabs';
+import { Check, Lock, RefreshCw, Ruler, Shield, X } from 'lucide-react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 
@@ -473,7 +474,6 @@ export default function WebhookVerificationPage() {
 import hashlib
 import base64
 import time
-import { Lock, RefreshCw, Ruler, Shield } from 'lucide-react';
 
 def verify_webhook(body: bytes, headers: dict, secret: str) -> dict:
     """Verify a Standard Webhooks signature."""

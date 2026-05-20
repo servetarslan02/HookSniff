@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
-import { Zap } from 'lucide-react';
+import { Zap, ClipboardList } from 'lucide-react';
 
 function GithubIcon({ size = 20, strokeWidth = 1.75, ...props }: { size?: number; strokeWidth?: number; [key: string]: unknown }) {
   return (
