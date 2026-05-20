@@ -29,6 +29,27 @@ pub struct Delivery {
     /// Custom headers to send with the delivery.
     #[sqlx(default)]
     pub custom_headers: Option<serde_json::Value>,
+    /// Event name alias.
+    #[sqlx(default)]
+    pub event: Option<String>,
+    /// When the delivery was processed.
+    #[sqlx(default)]
+    pub processed_at: Option<DateTime<Utc>>,
+    /// Idempotency key for duplicate prevention.
+    #[sqlx(default)]
+    pub idempotency_key: Option<String>,
+    /// Source IP of the webhook sender.
+    #[sqlx(default)]
+    pub source_ip: Option<String>,
+    /// Original request headers.
+    #[sqlx(default)]
+    pub request_headers: Option<serde_json::Value>,
+    /// Application this delivery belongs to.
+    #[sqlx(default)]
+    pub application_id: Option<Uuid>,
+    /// Hash of the payload for deduplication.
+    #[sqlx(default)]
+    pub payload_hash: Option<String>,
 }
 
 /// Lightweight delivery struct for list queries.
