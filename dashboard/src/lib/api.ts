@@ -390,8 +390,8 @@ export const api = {
     return apiFetch<{ entries: AuditLogEntryResponse[]; has_more: boolean }>(`/audit-log${qs.toString() ? `?${qs}` : ''}`, { token });
   },
 
-  getEndpointHealth: (token?: string) =>
-    apiFetch<EndpointHealthResponse[]>('/endpoint-health', { token: token || undefined }),
+  getEndpointHealth: (token?: string, range?: string) =>
+    apiFetch<EndpointHealthResponse[]>(`/endpoint-health${range ? `?range=${range}` : ''}`, { token: token || undefined }),
 
   getApiKeys: (token: string) =>
     apiFetch<ApiKeyResponse[]>('/api-keys', { token }),

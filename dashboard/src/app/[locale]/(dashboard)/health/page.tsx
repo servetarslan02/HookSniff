@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useEndpointHealth } from '@/hooks/useDashboardData';
 import { Activity, AlertTriangle } from '@/components/icons';
+
+type TimeRange = '24h' | '7d' | '30d' | '90d';
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: string }> = {
   healthy: { color: 'text-green-700 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/20', labelKey: 'healthy' },
@@ -10,22 +13,48 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: strin
   unhealthy: { color: 'text-red-700 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-500/20', labelKey: 'unhealthy' },
 };
 
+const RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
+  { value: '24h', label: '24s' },
+  { value: '7d', label: '7g' },
+  { value: '30d', label: '30g' },
+  { value: '90d', label: '90g' },
+];
+
 export default function EndpointHealthPage() {
   const t = useTranslations('health');
   const tc = useTranslations('common');
+  const [timeRange, setTimeRange] = useState<TimeRange>('7d');
 
-  const { data: endpoints = [], isLoading, error, refetch } = useEndpointHealth();
+  const { data: endpoints = [], isLoading, error, refetch } = useEndpointHealth(timeRange);
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
-        <button onClick={() => refetch()} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
-          ↻ {tc('refresh') || 'Refresh'}
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Time Range Selector */}
+          <div className="flex bg-gray-100 dark:bg-slate-700 rounded-xl p-1">
+            {RANGE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setTimeRange(opt.value)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
+                  timeRange === opt.value
+                    ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => refetch()} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+            ↻ {tc('refresh') || 'Refresh'}
+          </button>
+        </div>
       </div>
 
 
