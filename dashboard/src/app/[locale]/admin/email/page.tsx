@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/store';
 import { adminApi, type Broadcast } from '@/lib/api';
+import { useAdminBroadcasts } from '@/hooks/useAdminData';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import ConfirmDialog from '@/components/ConfirmDialog';
@@ -72,13 +74,13 @@ export default function AdminEmailPage() {
   const [result, setResult] = useState<{ total_sent: number; total_failed: number; message: string } | null>(null);
   const [history, setHistory] = useState<Array<{ subject: string; sent: number; failed: number; date: string; plan: string }>>([]);
 
-  // ── Broadcast state ──
-  const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
-  const [broadcastLoading, setBroadcastLoading] = useState(true);
+  // ── Broadcast state (React Query) ──
+  const qc = useQueryClient();
+  const { data: broadcastsData, isLoading: broadcastLoading } = useAdminBroadcasts();
+  const broadcasts: Broadcast[] = broadcastsData?.broadcasts || [];
   const [bForm, setBForm] = useState<BroadcastForm>(emptyBroadcastForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showBForm, setShowBForm] = useState(false);
-  const [savingBroadcast, setSavingBroadcast] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   // ── Email handlers ──
@@ -103,16 +105,27 @@ export default function AdminEmailPage() {
     setShowConfirm(true);
   }, [subject, body]);
 
-  // ── Broadcast handlers ──
-  const fetchBroadcasts = useCallback(async () => {
-    if (!token) return;
-    setBroadcastLoading(true);
-    try { const res = await adminApi.listBroadcasts(token, { per_page: '100' }); setBroadcasts(res.broadcasts); }
-    catch { /* silent */ }
-    finally { setBroadcastLoading(false); }
-  }, [token]);
+  // ── Broadcast mutations ──
+  const saveBroadcastMutation = useMutation({
+    mutationFn: async (payload: Record<string, unknown>) => {
+      if (editingId) { await adminApi.updateBroadcast(token!, editingId, payload); return 'updated'; }
+      else { await adminApi.createBroadcast(token!, payload); return 'created'; }
+    },
+    onSuccess: (action) => { qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] }); toast(`Bildirim ${action === 'created' ? 'oluşturuldu' : 'güncellendi'}`, 'success'); resetBForm(); },
+    onError: () => toast('Bildirim kaydedilemedi', 'error'),
+  });
 
-  useEffect(() => { if (mode === 'broadcast') fetchBroadcasts(); }, [mode, fetchBroadcasts]);
+  const deleteBroadcastMutation = useMutation({
+    mutationFn: (id: string) => adminApi.deleteBroadcast(token!, id),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] }); toast('Bildirim silindi', 'success'); setDeleteTarget(null); },
+    onError: () => toast('Bildirim silinemedi', 'error'),
+  });
+
+  const toggleBroadcastMutation = useMutation({
+    mutationFn: (b: Broadcast) => adminApi.updateBroadcast(token!, b.id, { is_active: !b.is_active }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] }),
+    onError: () => toast('Bildirim güncellenemedi', 'error'),
+  });
 
   const resetBForm = () => { setBForm(emptyBroadcastForm); setEditingId(null); setShowBForm(false); };
 
@@ -126,37 +139,28 @@ export default function AdminEmailPage() {
     setEditingId(b.id); setShowBForm(true);
   };
 
-  const handleSaveBroadcast = async () => {
+  const handleSaveBroadcast = () => {
     if (!token || !bForm.title.trim() || !bForm.message.trim()) return;
-    setSavingBroadcast(true);
-    try {
-      const payload: Record<string, unknown> = {
-        title: bForm.title.trim(), message: bForm.message.trim(),
-        broadcast_type: bForm.broadcast_type, severity: bForm.severity,
-      };
-      if (bForm.link.trim()) payload.link = bForm.link.trim();
-      if (bForm.link_text.trim()) payload.link_text = bForm.link_text.trim();
-      if (bForm.target_plan) payload.target_plan = bForm.target_plan;
-      if (bForm.starts_at) payload.starts_at = new Date(bForm.starts_at).toISOString();
-      if (bForm.expires_at) payload.expires_at = new Date(bForm.expires_at).toISOString();
-
-      if (editingId) { await adminApi.updateBroadcast(token, editingId, payload); toast('Bildirim güncellendi', 'success'); }
-      else { await adminApi.createBroadcast(token, payload); toast('Bildirim oluşturuldu', 'success'); }
-      resetBForm(); fetchBroadcasts();
-    } catch { toast('Bildirim kaydedilemedi', 'error'); }
-    finally { setSavingBroadcast(false); }
+    const payload: Record<string, unknown> = {
+      title: bForm.title.trim(), message: bForm.message.trim(),
+      broadcast_type: bForm.broadcast_type, severity: bForm.severity,
+    };
+    if (bForm.link.trim()) payload.link = bForm.link.trim();
+    if (bForm.link_text.trim()) payload.link_text = bForm.link_text.trim();
+    if (bForm.target_plan) payload.target_plan = bForm.target_plan;
+    if (bForm.starts_at) payload.starts_at = new Date(bForm.starts_at).toISOString();
+    if (bForm.expires_at) payload.expires_at = new Date(bForm.expires_at).toISOString();
+    saveBroadcastMutation.mutate(payload);
   };
 
-  const handleDeleteBroadcast = async () => {
+  const handleDeleteBroadcast = () => {
     if (!token || !deleteTarget) return;
-    try { await adminApi.deleteBroadcast(token, deleteTarget); toast('Bildirim silindi', 'success'); setDeleteTarget(null); fetchBroadcasts(); }
-    catch { toast('Bildirim silinemedi', 'error'); }
+    deleteBroadcastMutation.mutate(deleteTarget);
   };
 
-  const handleToggleActive = async (b: Broadcast) => {
+  const handleToggleBroadcast = (b: Broadcast) => {
     if (!token) return;
-    try { await adminApi.updateBroadcast(token, b.id, { is_active: !b.is_active }); fetchBroadcasts(); }
-    catch { /* silent */ }
+    toggleBroadcastMutation.mutate(b);
   };
 
   const severityBadge = (severity: string) => {
@@ -303,7 +307,7 @@ export default function AdminEmailPage() {
                 </div>
                 <div className="flex gap-3 justify-end pt-2">
                   <button onClick={resetBForm} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl transition-colors">İptal</button>
-                  <button onClick={handleSaveBroadcast} disabled={savingBroadcast || !bForm.title.trim() || !bForm.message.trim()} className="px-6 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors">{savingBroadcast ? 'Kaydediliyor...' : editingId ? 'Güncelle' : 'Oluştur'}</button>
+                  <button onClick={handleSaveBroadcast} disabled={saveBroadcastMutation.isPending || !bForm.title.trim() || !bForm.message.trim()} className="px-6 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors">{saveBroadcastMutation.isPending ? 'Kaydediliyor...' : editingId ? 'Güncelle' : 'Oluştur'}</button>
                 </div>
               </div>
             </div>
@@ -325,7 +329,7 @@ export default function AdminEmailPage() {
                       <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-400 dark:text-slate-500">{b.target_plan && <span>Plan: {b.target_plan}</span>}<span>{new Date(b.created_at).toLocaleDateString()}</span></div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                      <button onClick={() => handleToggleActive(b)} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title={b.is_active ? 'Pasifleştir' : 'Aktifleştir'}>{b.is_active ? <Eye size={15} strokeWidth={1.75} /> : <EyeOff size={15} strokeWidth={1.75} />}</button>
+                      <button onClick={() => handleToggleBroadcast(b)} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title={b.is_active ? 'Pasifleştir' : 'Aktifleştir'}>{b.is_active ? <Eye size={15} strokeWidth={1.75} /> : <EyeOff size={15} strokeWidth={1.75} />}</button>
                       <button onClick={() => handleEditBroadcast(b)} className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title="Düzenle"><Pencil size={15} strokeWidth={1.75} /></button>
                       <button onClick={() => setDeleteTarget(b.id)} className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title="Sil"><Trash2 size={15} strokeWidth={1.75} /></button>
                     </div>

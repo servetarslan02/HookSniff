@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/store';
 import { adminApi, type Broadcast } from '@/lib/api';
+import { useAdminBroadcasts } from '@/hooks/useAdminData';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import ConfirmDialog from '@/components/ConfirmDialog';
@@ -72,34 +74,56 @@ export default function AdminBroadcastsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('admin');
+  const qc = useQueryClient();
 
-  const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<BroadcastFormData>(emptyForm);
-  const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [filterActive, setFilterActive] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
 
-  const fetchBroadcasts = useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const params: Record<string, string> = { per_page: '100' };
-      if (filterActive !== 'all') params.is_active = filterActive === 'active' ? 'true' : 'false';
-      if (filterType !== 'all') params.broadcast_type = filterType;
-      const res = await adminApi.listBroadcasts(token, params);
-      setBroadcasts(res.broadcasts);
-    } catch {
-      toast('Failed to load broadcasts', 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [token, filterActive, filterType, toast]);
+  // React Query — cached, no loading on revisit
+  const { data: broadcastsData, isLoading: loading } = useAdminBroadcasts({
+    is_active: filterActive !== 'all' ? (filterActive === 'active' ? 'true' : 'false') : undefined,
+    broadcast_type: filterType !== 'all' ? filterType : undefined,
+  });
+  const broadcasts: Broadcast[] = broadcastsData?.broadcasts || [];
 
-  useEffect(() => { fetchBroadcasts(); }, [fetchBroadcasts]);
+  // React Query mutations
+  const saveMutation = useMutation({
+    mutationFn: async (payload: Record<string, unknown>) => {
+      if (editingId) {
+        await adminApi.updateBroadcast(token!, editingId, payload);
+        return 'updated';
+      } else {
+        await adminApi.createBroadcast(token!, payload);
+        return 'created';
+      }
+    },
+    onSuccess: (action) => {
+      qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] });
+      toast(`Broadcast ${action}`, 'success');
+      resetForm();
+    },
+    onError: () => toast('Failed to save broadcast', 'error'),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => adminApi.deleteBroadcast(token!, id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] });
+      toast('Broadcast deleted', 'success');
+      setDeleteTarget(null);
+    },
+    onError: () => toast('Failed to delete broadcast', 'error'),
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: (b: Broadcast) => adminApi.updateBroadcast(token!, b.id, { is_active: !b.is_active }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] }),
+    onError: () => toast('Failed to update broadcast', 'error'),
+  });
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -123,58 +147,30 @@ export default function AdminBroadcastsPage() {
     setShowForm(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!token || !form.title.trim() || !form.message.trim()) return;
-    setSaving(true);
-    try {
-      const payload: Record<string, unknown> = {
-        title: form.title.trim(),
-        message: form.message.trim(),
-        broadcast_type: form.broadcast_type,
-        severity: form.severity,
-      };
-      if (form.link.trim()) payload.link = form.link.trim();
-      if (form.link_text.trim()) payload.link_text = form.link_text.trim();
-      if (form.target_plan) payload.target_plan = form.target_plan;
-      if (form.starts_at) payload.starts_at = new Date(form.starts_at).toISOString();
-      if (form.expires_at) payload.expires_at = new Date(form.expires_at).toISOString();
-
-      if (editingId) {
-        await adminApi.updateBroadcast(token, editingId, payload);
-        toast('Broadcast updated', 'success');
-      } else {
-        await adminApi.createBroadcast(token, payload);
-        toast('Broadcast created', 'success');
-      }
-      resetForm();
-      fetchBroadcasts();
-    } catch {
-      toast('Failed to save broadcast', 'error');
-    } finally {
-      setSaving(false);
-    }
+    const payload: Record<string, unknown> = {
+      title: form.title.trim(),
+      message: form.message.trim(),
+      broadcast_type: form.broadcast_type,
+      severity: form.severity,
+    };
+    if (form.link.trim()) payload.link = form.link.trim();
+    if (form.link_text.trim()) payload.link_text = form.link_text.trim();
+    if (form.target_plan) payload.target_plan = form.target_plan;
+    if (form.starts_at) payload.starts_at = new Date(form.starts_at).toISOString();
+    if (form.expires_at) payload.expires_at = new Date(form.expires_at).toISOString();
+    saveMutation.mutate(payload);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!token || !deleteTarget) return;
-    try {
-      await adminApi.deleteBroadcast(token, deleteTarget);
-      toast('Broadcast deleted', 'success');
-      setDeleteTarget(null);
-      fetchBroadcasts();
-    } catch {
-      toast('Failed to delete broadcast', 'error');
-    }
+    deleteMutation.mutate(deleteTarget);
   };
 
-  const handleToggleActive = async (b: Broadcast) => {
+  const handleToggleActive = (b: Broadcast) => {
     if (!token) return;
-    try {
-      await adminApi.updateBroadcast(token, b.id, { is_active: !b.is_active });
-      fetchBroadcasts();
-    } catch {
-      toast('Failed to update broadcast', 'error');
-    }
+    toggleMutation.mutate(b);
   };
 
   const severityBadge = (severity: string) => {
@@ -385,10 +381,10 @@ export default function AdminBroadcastsPage() {
               </button>
               <button
                 onClick={handleSave}
-                disabled={saving || !form.title.trim() || !form.message.trim()}
+                disabled={saveMutation.isPending || !form.title.trim() || !form.message.trim()}
                 className="px-6 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
               >
-                {saving ? 'Saving...' : editingId ? 'Update' : 'Create'}
+                {saveMutation.isPending ? 'Saving...' : editingId ? 'Update' : 'Create'}
               </button>
             </div>
           </div>
