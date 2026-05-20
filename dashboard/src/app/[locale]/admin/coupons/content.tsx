@@ -89,19 +89,19 @@ export default function CouponsContent() {
       if (form.type === 'polar' && result?.id) {
         try {
           await apiFetch(`/admin/coupons/${result.id}/sync`, { method: 'POST', token });
-          toast(t('couponCreatedSynced') || 'Kupon oluşturuldu ve Polar.sh ile senkronize edildi', 'success');
+          toast(t('couponCreatedSynced') || t('couponCreatedSynced'), 'success');
         } catch {
-          toast(t('couponCreatedSyncFailed') || 'Kupon oluşturuldu ama Polar sync başarısız. Sync butonuna basarak tekrar deneyin.', 'error');
+          toast(t('couponCreatedSyncFailed') || t('couponCreatedSyncFailed'), 'error');
         }
       } else {
-        toast(t('couponCreated') || 'Kupon oluşturuldu', 'success');
+        toast(t('couponCreated') || t('couponCreated'), 'success');
       }
 
       setShowCreate(false);
       setForm(INITIAL_FORM);
       fetchCoupons();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : (t('couponCreateFailed') || 'Kupon oluşturulamadı');
+      const msg = err instanceof Error ? err.message : (t('couponCreateFailed') || t('couponCreateFailed'));
       toast(msg, 'error');
     } finally {
       setCreating(false);
@@ -144,19 +144,19 @@ export default function CouponsContent() {
       if (editTarget.type === 'polar' && !editTarget.polar_discount_id) {
         try {
           await apiFetch(`/admin/coupons/${editTarget.id}/sync`, { method: 'POST', token });
-          toast(t('couponUpdatedSynced') || 'Kupon güncellendi ve Polar.sh ile senkronize edildi', 'success');
+          toast(t('couponUpdatedSynced') || t('couponUpdatedSynced'), 'success');
         } catch {
-          toast(t('couponUpdated') || 'Kupon güncellendi', 'success');
+          toast(t('couponUpdated') || t('couponUpdated'), 'success');
         }
       } else {
-        toast(t('couponUpdated') || 'Kupon güncellendi', 'success');
+        toast(t('couponUpdated') || t('couponUpdated'), 'success');
       }
 
       setEditTarget(null);
       setForm(INITIAL_FORM);
       fetchCoupons();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : (t('couponUpdateFailed') || 'Kupon güncellenemedi');
+      const msg = err instanceof Error ? err.message : (t('couponUpdateFailed') || t('couponUpdateFailed'));
       toast(msg, 'error');
     } finally {
       setCreating(false);
@@ -185,10 +185,10 @@ export default function CouponsContent() {
     setToggling(id);
     try {
       await apiFetch(`/admin/coupons/${id}`, { method: 'PUT', token, body: { is_active: !isActive } });
-      toast(isActive ? (t('couponDeactivated') || 'Kupon pasif edildi') : (t('couponActivated') || 'Kupon aktif edildi'), 'success');
+      toast(isActive ? (t('couponDeactivated') || t('couponDeactivated')) : (t('couponActivated') || t('couponActivated')), 'success');
       fetchCoupons();
     } catch {
-      toast(t('couponToggleFailed') || 'Kupon durumu değiştirilemedi', 'error');
+      toast(t('couponToggleFailed') || t('couponToggleFailed'), 'error');
     } finally {
       setToggling(null);
     }
@@ -199,11 +199,11 @@ export default function CouponsContent() {
     if (!token || !deleteTarget) return;
     try {
       await apiFetch(`/admin/coupons/${deleteTarget}`, { method: 'DELETE', token });
-      toast(t('couponDeleted') || 'Kupon silindi', 'success');
+      toast(t('couponDeleted') || t('couponDeleted'), 'success');
       setDeleteTarget(null);
       fetchCoupons();
     } catch {
-      toast(t('couponDeleteFailed') || 'Kupon silinemedi', 'error');
+      toast(t('couponDeleteFailed') || t('couponDeleteFailed'), 'error');
     }
   };
 
@@ -263,11 +263,11 @@ export default function CouponsContent() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('coupons') || 'Kupon Kodları'}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('coupons') || t('coupons')}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('couponsDesc') || 'İndirim kodlarını oluştur ve yönet'}</p>
         </div>
         <button type="button" onClick={() => { setShowCreate(!showCreate); setEditTarget(null); setForm(INITIAL_FORM); }} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition">
-          <Plus size={16} strokeWidth={1.75} /> {t('newCoupon') || 'Yeni Kupon'}
+          <Plus size={16} strokeWidth={1.75} /> {t('newCoupon') || t('newCoupon')}
         </button>
       </div>
 
@@ -279,7 +279,7 @@ export default function CouponsContent() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('searchCoupons') || 'Kupon ara...'}
+            placeholder={t('searchCoupons') || t('searchCoupons')}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
           />
         </div>
@@ -404,7 +404,7 @@ export default function CouponsContent() {
             </p>
             {coupons.length === 0 && (
               <button type="button" onClick={() => setShowCreate(true)} className="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition">
-                <Plus size={16} className="inline mr-1" /> {t('newCoupon') || 'Yeni Kupon'}
+                <Plus size={16} className="inline mr-1" /> {t('newCoupon') || t('newCoupon')}
               </button>
             )}
           </div>
