@@ -23,7 +23,7 @@ pub fn router() -> Router {
 // GET /admin/coupons — List all coupons
 // ──────────────────────────────────────────────────────────────
 
-async fn list_coupons(
+pub async fn list_coupons(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
 ) -> Result<Json<Vec<CouponCode>>, AppError> {
@@ -42,7 +42,7 @@ async fn list_coupons(
 // GET /admin/coupons/:id — Get single coupon
 // ──────────────────────────────────────────────────────────────
 
-async fn get_coupon(
+pub async fn get_coupon(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(id): Path<Uuid>,
@@ -55,7 +55,7 @@ async fn get_coupon(
     .bind(id)
     .fetch_optional(&pool)
     .await?
-    .ok_or_else(|| AppError::NotFound("Coupon not found".into()))?;
+    .ok_or(AppError::NotFound)?;
 
     Ok(Json(coupon))
 }
@@ -64,7 +64,7 @@ async fn get_coupon(
 // POST /admin/coupons — Create a new coupon
 // ──────────────────────────────────────────────────────────────
 
-async fn create_coupon(
+pub async fn create_coupon(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Json(req): Json<CreateCouponRequest>,
@@ -146,7 +146,7 @@ async fn create_coupon(
 // PUT /admin/coupons/:id — Update coupon (toggle active, limits)
 // ──────────────────────────────────────────────────────────────
 
-async fn update_coupon(
+pub async fn update_coupon(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(id): Path<Uuid>,
@@ -176,7 +176,7 @@ async fn update_coupon(
     .bind(expires_at)
     .fetch_optional(&pool)
     .await?
-    .ok_or_else(|| AppError::NotFound("Coupon not found".into()))?;
+    .ok_or(AppError::NotFound)?;
 
     Ok(Json(coupon))
 }
@@ -185,7 +185,7 @@ async fn update_coupon(
 // DELETE /admin/coupons/:id — Delete coupon
 // ──────────────────────────────────────────────────────────────
 
-async fn delete_coupon(
+pub async fn delete_coupon(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(id): Path<Uuid>,
@@ -198,7 +198,7 @@ async fn delete_coupon(
         .await?;
 
     if result.rows_affected() == 0 {
-        return Err(AppError::NotFound("Coupon not found".into()));
+        return Err(AppError::NotFound);
     }
 
     Ok(StatusCode::NO_CONTENT)
@@ -208,7 +208,7 @@ async fn delete_coupon(
 // POST /admin/coupons/:id/sync — Sync polar coupon to Polar.sh
 // ──────────────────────────────────────────────────────────────
 
-async fn sync_to_polar(
+pub async fn sync_to_polar(
     Extension(pool): Extension<PgPool>,
     Extension(cfg): Extension<crate::config::Config>,
     Extension(customer): Extension<crate::models::customer::Customer>,
@@ -222,14 +222,15 @@ async fn sync_to_polar(
     .bind(id)
     .fetch_optional(&pool)
     .await?
-    .ok_or_else(|| AppError::NotFound("Coupon not found".into()))?;
+    .ok_or(AppError::NotFound)?;
 
     if coupon.coupon_type != "polar" {
         return Err(AppError::BadRequest("Only polar-type coupons can be synced to Polar.sh".into()));
     }
 
     // Create discount in Polar
-    let polar_cfg = PolarConfig::from_env();
+    let polar_cfg = PolarConfig::from_env()
+        .ok_or(AppError::Internal(anyhow::anyhow!("Polar not configured")))?;
     let client = crate::http_client::get_client();
 
     let basis_points = (coupon.discount_value as u64) * 100; // e.g., 50% = 5000 basis points
