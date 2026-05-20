@@ -2167,7 +2167,21 @@
     "deactivate": "Deactivate",
     "editAlert": "Edit Alert",
     "noFilteredAlerts": "No filtered alerts",
-    "threshold": "Threshold"
+    "threshold": "Threshold",
+    "searchUsers": "Search users...",
+    "exportCsv": "Export CSV",
+    "impersonate": "Impersonate",
+    "impersonateConfirm": "Impersonate this user?",
+    "changeStatus": "Change Status",
+    "ban": "Ban",
+    "unban": "Unban",
+    "planChanged": "Plan changed",
+    "statusChanged": "Status changed",
+    "revenueExport": "Export Revenue",
+    "broadcastSent": "Broadcast sent",
+    "broadcastFailed": "Failed to send broadcast",
+    "noBroadcasts": "No broadcasts",
+    "bulkEmailSent": "Bulk email sent"
   },
   "landing": {
     "nav": {
