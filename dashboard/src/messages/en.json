@@ -581,7 +581,11 @@
     "roleMember": "Member",
     "removeBtn": "Remove",
     "inviteAccepted": "Invite accepted! Joined team as {role}",
-    "inviteAcceptFailed": "Failed to accept invite. The link may have expired."
+    "inviteAcceptFailed": "Failed to accept invite. The link may have expired.",
+    "deleteTeam": "Delete Team",
+    "deleteTeamConfirm": "Are you sure you want to delete this team? This action cannot be undone. All members will be removed.",
+    "leaveTeam": "Leave Team",
+    "leaveTeamConfirm": "Are you sure you want to leave this team?"
   },
   "notifications": {
     "title": "Notifications",
@@ -4462,7 +4466,8 @@
     "endpointCreated": "Endpoint created",
     "noEndpointsDesc": "Create your first endpoint to start receiving webhooks.",
     "notFoundDesc": "This application may have been deleted or you don't have access.",
-    "manageEndpoints": "Manage endpoints"
+    "manageEndpoints": "Manage endpoints",
+    "edit": "Edit"
   },
   "serviceTokens": {
     "title": "Service Tokens",

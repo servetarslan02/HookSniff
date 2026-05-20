@@ -583,7 +583,11 @@
     "roleMember": "Üye",
     "removeBtn": "Kaldır",
     "inviteAccepted": "Davet kabul edildi! {role} olarak katıldınız",
-    "inviteAcceptFailed": "Davet kabul edilemedi. Linkin süresi dolmuş olabilir."
+    "inviteAcceptFailed": "Davet kabul edilemedi. Linkin süresi dolmuş olabilir.",
+    "deleteTeam": "Takımı Sil",
+    "deleteTeamConfirm": "Bu takımı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz. Tüm üyeler kaldırılacak.",
+    "leaveTeam": "Takımdan Ayrıl",
+    "leaveTeamConfirm": "Bu takımdan ayrılmak istediğinizden emin misiniz?"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -4444,7 +4448,8 @@
     "endpointCreated": "Endpoint oluşturuldu",
     "noEndpointsDesc": "Webhook almaya başlamak için ilk endpoint'inizi oluşturun.",
     "notFoundDesc": "Bu uygulama silinmiş olabilir veya erişim izniniz yok.",
-    "manageEndpoints": "Endpoint'leri yönet"
+    "manageEndpoints": "Endpoint'leri yönet",
+    "edit": "Düzenle"
   },
   "serviceTokens": {
     "title": "Hizmet Jetonları",

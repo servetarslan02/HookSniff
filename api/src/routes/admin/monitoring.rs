@@ -265,7 +265,8 @@ pub async fn admin_rate_limit_violations(
     ))
     .bind(limit)
     .fetch_all(&pool)
-    .await?;
+    .await
+    .unwrap_or_default();
 
     Ok(Json(serde_json::json!({
         "violations": rows,
