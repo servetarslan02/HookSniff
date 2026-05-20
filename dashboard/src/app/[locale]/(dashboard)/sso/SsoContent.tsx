@@ -58,6 +58,8 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    setSsoUrl(ssoConfig.sso_url || '');
    setDefaultTeamId(ssoConfig.default_team_id || '');
    setDefaultRole(ssoConfig.default_role || 'viewer');
+   setDomainInput(ssoConfig.verified_domain || '');
+   setAdminBypass(ssoConfig.admin_bypass ?? true);
   }
  }, [ssoConfig]);
 
@@ -67,7 +69,11 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
   if (!token) return;
   setSaving(true);
   try {
-   const body: Record<string, unknown> = { provider, enabled: false };
+   const body: Record<string, unknown> = {
+    provider,
+    enabled: isEnforced ?? false,
+    admin_bypass: adminBypass,
+   };
    if (teamId) body.team_id = teamId;
    if (provider === 'saml') {
     body.metadata_url = metadata || null;
@@ -79,6 +85,8 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
     body.client_id = entityId || null;
     if (certificate) body.client_secret = certificate;
    }
+   // Verified domain
+   if (domainInput.trim()) body.verified_domain = domainInput.trim();
    // Auto team join settings
    body.default_team_id = defaultTeamId || null;
    body.default_role = defaultRole || 'viewer';
@@ -98,7 +106,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
   setTestPassed(false);
   try {
    const { ssoApi } = await import('@/lib/api');
-   const result = await ssoApi.testSso(token);
+   const result = await ssoApi.testSso(token, teamId);
    if (result.valid) {
     setTestPassed(true);
     toast(result.message || t('testSuccess'), 'success');
@@ -160,7 +168,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
   setDeleting(true);
   try {
    const { ssoApi } = await import('@/lib/api');
-   await ssoApi.deleteSso(token);
+   await ssoApi.deleteSso(token, teamId);
    toast(t('deleted'), 'success');
    setMetadata('');
    setEntityId('');
