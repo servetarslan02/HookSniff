@@ -24,8 +24,6 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
   const [emailChangeCode, setEmailChangeCode] = useState('');
   const [emailChangeLoading, setEmailChangeLoading] = useState(false);
   const [emailChangeTimer, setEmailChangeTimer] = useState(0);
-  const [showPasswordConfirm, _setShowPasswordConfirm] = useState(false);
-  const [emailPassword, setEmailPassword] = useState('');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -196,24 +194,6 @@ export function ProfileSection({ user, token }: { user: User | null; token: stri
               className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-gray-900 dark:focus:ring-brand-500 focus:border-transparent transition"
             />
           </div>
-          {showPasswordConfirm && (
-            <div className="px-5 pb-4">
-              <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
-                <p className="text-xs text-amber-700 dark:text-amber-400 mb-2">
-                  <Lock size={12} className="inline mr-1" />
-                  {t('emailChangePasswordRequired') || 'Password confirmation required.'}
-                </p>
-                <input
-                  type="password"
-                  value={emailPassword}
-                  onChange={(e) => setEmailPassword(e.target.value)}
-                  placeholder={t('enterPassword') || 'Password'}
-                  className="w-full px-3 py-2 text-sm border border-amber-200 dark:border-amber-500/30 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-                  autoFocus
-                />
-              </div>
-            </div>
-          )}
           <div className="px-5 py-3 border-t border-gray-100 dark:border-slate-700/60 flex justify-end">
             <button
               type="submit"
