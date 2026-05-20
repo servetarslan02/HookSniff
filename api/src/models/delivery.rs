@@ -26,6 +26,9 @@ pub struct Delivery {
     /// True if this delivery was created with a test API key (hr_test_*).
     #[sqlx(default)]
     pub is_test: bool,
+    /// Custom headers to send with the delivery.
+    #[sqlx(default)]
+    pub custom_headers: Option<serde_json::Value>,
 }
 
 /// Lightweight delivery struct for list queries.
