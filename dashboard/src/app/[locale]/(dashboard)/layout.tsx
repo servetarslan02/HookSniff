@@ -146,9 +146,9 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           {user?.is_admin && (
             <Link
               href="/admin"
-              className="flex items-center px-2.5 py-1.5 mb-2 text-xs font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
+              className="flex items-center px-3 py-2 mb-2 text-sm font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
             >
-              <span className="mr-2.5 inline-flex items-center"><Shield size={16} strokeWidth={1.75} /></span>
+              <span className="mr-3 inline-flex items-center"><Shield size={16} strokeWidth={1.75} /></span>
               {t('adminPanel') || 'Admin Panel'}
             </Link>
           )}
@@ -161,14 +161,14 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 hoverDelay={80}
                 prefetchData={prefetchForRoute(item.href)}
                 className={clsx(
-                  'flex items-center px-2.5 py-1.5 text-xs rounded-lg transition-colors',
+                  'flex items-center px-3 py-2 text-sm rounded-lg transition-colors',
                   isActive
                     ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
                     : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                 )}
                 onClick={() => setSidebarOpen(false)}
               >
-                <span className="mr-2.5 flex-shrink-0 inline-flex items-center">{item.icon}</span>
+                <span className="mr-3 flex-shrink-0 inline-flex items-center">{item.icon}</span>
                 {item.name}
               </PrefetchLink>
             );
