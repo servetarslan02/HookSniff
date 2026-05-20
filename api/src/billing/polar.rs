@@ -217,6 +217,50 @@ impl PolarProvider {
         }
     }
 
+    /// Look up a discount ID by code via the Polar API.
+    /// Returns Some(discount_id) if found, None if not found.
+    async fn lookup_discount_id(&self, code: &str) -> Result<Option<String>, AppError> {
+        let resp = self
+            .client
+            .get(format!("{}/v1/discounts/", self.config.base_url))
+            .header(
+                "Authorization",
+                format!("Bearer {}", self.config.access_token),
+            )
+            .send()
+            .await
+            .map_err(|e| AppError::Internal(anyhow::anyhow!("Polar discount lookup failed: {}", e)))?;
+
+        if !resp.status().is_success() {
+            return Ok(None);
+        }
+
+        #[derive(serde::Deserialize)]
+        struct DiscountItem {
+            id: String,
+            code: Option<String>,
+        }
+        #[derive(serde::Deserialize)]
+        struct DiscountsResponse {
+            items: Vec<DiscountItem>,
+        }
+
+        let data: DiscountsResponse = resp.json().await.map_err(|e| {
+            AppError::Internal(anyhow::anyhow!("Failed to parse Polar discounts: {}", e))
+        })?;
+
+        let code_upper = code.to_uppercase();
+        for item in data.items {
+            if let Some(ref c) = item.code {
+                if c.to_uppercase() == code_upper {
+                    return Ok(Some(item.id));
+                }
+            }
+        }
+
+        Ok(None)
+    }
+
     /// Determine plan from Polar product ID.
     fn determine_plan(&self, product_id: &str) -> Plan {
         if product_id == self.config.product_business || product_id == self.config.product_business_yearly {
@@ -324,14 +368,32 @@ impl PaymentProviderImpl for PolarProvider {
             None
         };
 
+        // If user provided a discount code, look up its ID via Polar API
+        // (discount_code only prefills the input; discount_id auto-applies)
+        let resolved_discount_id = if let Some(code) = discount_code {
+            match self.lookup_discount_id(code).await {
+                Ok(Some(id)) => Some(id),
+                Ok(None) => {
+                    tracing::warn!("Discount code '{}' not found in Polar", code);
+                    None
+                }
+                Err(e) => {
+                    tracing::warn!("Failed to lookup discount code '{}': {}", code, e);
+                    None
+                }
+            }
+        } else {
+            auto_discount_id
+        };
+
         let req_body = CreateCheckoutRequest {
             products: vec![product_id.to_string()],
             external_customer_id: Some(customer_id.to_string()),
             customer_email: Some(customer_email.to_string()),
             success_url: Some(format!("{}/dashboard/billing?upgraded=true", app_url)),
             locale: Some("en".to_string()),
-            discount_code: discount_code.map(|s| s.to_string()),
-            discount_id: auto_discount_id,
+            discount_code: None, // Don't use discount_code — it only prefills, doesn't apply
+            discount_id: resolved_discount_id,
             metadata: Some(metadata),
         };
 
