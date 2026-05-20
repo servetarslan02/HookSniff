@@ -23,7 +23,7 @@ Send webhooks. We deliver them. If they fail, we retry. Simple.
 - **Multiple delivery methods** — HTTP, WebSocket, Email (gRPC, SQS planned)
 - **Dead letter queue** — Failed deliveries preserved for debugging
 - **OpenTelemetry** — Distributed tracing (Grafana Cloud), structured JSON logging
-- **Smart routing** — Round-robin, latency-based, failover with fallback URLs
+- **Smart routing** — Round-robin, failover, weighted, random with fallback URLs
 - **FIFO delivery** — Ordered delivery with sequence numbers
 - **Per-endpoint throttling** — Token bucket / sliding window to protect customer servers
 - **SSRF protection** — Blocks private IPs, metadata endpoints, DNS validation

@@ -96,18 +96,19 @@ Rakiplerin hepsinin en az bir sertifikası var, bizim hiç yok:
 - Webhook verisini filtreleme, dönüştürme, zenginleştirme
 - **Bizde:** FEATURES.md'de "başlanmadı"
 
-### 10. SDK Eksiklikleri
-Rakiplerde 10+ SDK var, bizde 3:
+### 10. SDK'lar — 11 Dil Destekleniyor
+HookSniff 11 dilde SDK sunuyor (rakiplerin çoğundan fazla):
 - ✅ Node.js
 - ✅ Python
 - ✅ Go
-- ❌ Ruby
-- ❌ Java/Kotlin
-- ❌ C# (.NET)
-- ❌ PHP
-- ❌ Rust
-- ❌ Elixir
-- ❌ Swift
+- ✅ Rust
+- ✅ Ruby
+- ✅ Java
+- ✅ Kotlin
+- ✅ PHP
+- ✅ C#
+- ✅ Elixir
+- ✅ Swift
 
 ---
 
