@@ -29,7 +29,6 @@ export default function DeliveriesContent() {
   // ── URL-driven state ──
   const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
   const filter = (searchParams.get('status') || 'all') as StatusFilter;
-  const viewMode = searchParams.get('view') || 'table'; // 'table' | 'modal'
 
   const setParam = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -114,7 +113,7 @@ export default function DeliveriesContent() {
   // ── Determine which data source to use ──
   const isSearching = debouncedSearch.length > 0;
 
-  type DisplayDelivery = { id: string; endpoint_id?: string; endpoint_url?: string; event?: string; status: string; attempt_count: number; response_status?: number; created_at: string };
+  type DisplayDelivery = { id: string; endpoint_id?: string; endpoint_url?: string; event?: string | null; status: string; attempt_count: number; response_status?: number; created_at: string };
 
   const deliveries: DisplayDelivery[] = useMemo(() => {
     if (isSearching) {
@@ -122,7 +121,7 @@ export default function DeliveriesContent() {
       return (searchResults?.deliveries ?? []) as DisplayDelivery[];
     }
     // Merge SSE into main list
-    const mainDeliveries = data?.deliveries ?? [];
+    const mainDeliveries: DisplayDelivery[] = (data?.deliveries ?? []) as DisplayDelivery[];
     if (sseDeliveries.length === 0) return mainDeliveries;
     const existingIds = new Set(mainDeliveries.map((d) => d.id));
     const newFromSse = sseDeliveries

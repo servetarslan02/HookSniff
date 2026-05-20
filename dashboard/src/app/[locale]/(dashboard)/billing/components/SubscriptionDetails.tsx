@@ -48,7 +48,16 @@ export function SubscriptionDetails({ onCancel, onPause, onResume }: { onCancel?
     try {
       const result = await billingApiExtended.openPortal(token);
       if (result.url) {
-        window.open(result.url, '_blank');
+        // If the URL points back to our own billing page, just navigate in the same tab
+        const isOwnPage = result.url.includes('/dashboard/billing') || result.url.includes('/billing');
+        if (isOwnPage) {
+          toast(t('portalNotAvailable') || 'No external billing portal available for your account.', 'info');
+        } else {
+          // Use location.href to avoid popup blockers (must be in async context)
+          window.location.href = result.url;
+        }
+      } else {
+        toast(t('portalNotAvailable') || 'No external billing portal available for your account.', 'info');
       }
     } catch (err: unknown) {
       toast(getErrorMessage(err, tc('unknownError')), 'error');
