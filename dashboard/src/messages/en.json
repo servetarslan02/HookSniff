@@ -5025,7 +5025,8 @@
     "publishBtn": "Publish",
     "publishing": "Publishing...",
     "invalidJson": "Invalid JSON payload",
-    "events": "events"
+    "events": "events",
+    "createChannelDesc": "Create a real-time event stream channel for live delivery monitoring"
   },
   "whatIsHookSniff": {
     "title": "What is HookSniff?",
