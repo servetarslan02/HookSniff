@@ -1413,20 +1413,26 @@ async fn oidc_callback(
         ])
         .send()
         .await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!("OIDC token exchange failed: {}", e)))?;
+        .map_err(|e| {
+            tracing::error!("OIDC token exchange request failed: {}", e);
+            AppError::BadRequest("SSO login failed: could not reach identity provider. Please try again.".into())
+        })?;
 
     if !token_response.status().is_success() {
         let body = token_response.text().await.unwrap_or_default();
         tracing::error!("OIDC token exchange failed: {}", body);
         log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "oidc", false, Some("Token exchange failed"), &headers).await;
-        return Err(AppError::Internal(anyhow::anyhow!("OIDC token exchange failed")));
+        return Err(AppError::BadRequest("SSO login failed: authorization code rejected by identity provider. Please try again or contact your administrator.".into()));
     }
 
     let tokens: OidcTokenResponse = token_response.json().await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to parse OIDC token response: {}", e)))?;
+        .map_err(|e| {
+            tracing::error!("Failed to parse OIDC token response: {}", e);
+            AppError::BadRequest("SSO login failed: invalid response from identity provider. Please contact your administrator.".into())
+        })?;
 
     let id_token = tokens.id_token.ok_or_else(|| {
-        AppError::Internal(anyhow::anyhow!("No id_token in OIDC response"))
+        AppError::BadRequest("SSO login failed: identity provider did not return an ID token. Please contact your administrator.".into())
     })?;
 
     // Decode the ID token and verify signature against JWKS
