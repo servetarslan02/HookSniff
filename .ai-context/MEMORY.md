@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-21 01:00 GMT+8 (Health Range + GCP Filter)
+> Son güncelleme: 2026-05-21 03:00 GMT+8 (Admin Performance Optimization)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -256,7 +256,50 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-21 02:15 — Alerts Sayfası İnceleme + 2 Fix)
+## 📝 Son Oturum (2026-05-21 02:36–03:00 — Admin Sayfa Performans Optimizasyonu)
+
+### Özet
+Servet ile oturum. Tüm admin sayfaları ölçüldü (13 sayfa). 100-200ms hedefi için 6 dosyada optimizasyon yapıldı. Push: `9795ed74`
+
+### Ölçüm Sonuçları (İlk Yükleme — Soğuk)
+| Sayfa | Süre |
+|-------|------|
+| Overview | 833ms |
+| Users | 1,458ms |
+| Revenue | 1,789ms |
+| Feature Flags | 1,300ms |
+| Coupons | 1,589ms |
+| System | 1,416ms |
+| Settings | 1,313ms |
+| Activity Log | 1,200ms |
+| Alerts | 1,141ms |
+| Email | 1,061ms |
+| **Security** | **⚠️ 2,049ms** |
+| Broadcasts | 1,112ms |
+| Users Detail | 1,598ms |
+
+### Yapılan Optimizasyonlar:
+1. **Layout lazy-load** — AdminNotificationCenter + useRealtime dynamic import (~400KB bundle'dan çıkarıldı)
+2. **Memoized AdminSidebar** — `React.memo` ile sadece pathname değişince re-render
+3. **Security sayfası** — useEffect → React Query dönüşümü (staleTime 15-30s, useMutation)
+4. **Broadcasts sayfası** — useEffect → React Query dönüşümü
+5. **Email sayfası** — Broadcast bölümü React Query'ye geçirildi
+6. **Loading skeleton** — Stats cards placeholder eklendi
+7. **ConnectionIndicator** — Ağır useRealtime hook yerine hafif bileşen
+
+### Değişen Dosyalar:
+- `dashboard/src/app/[locale]/admin/layout.tsx` — lazy-load + memo
+- `dashboard/src/app/[locale]/admin/security/page.tsx` — React Query
+- `dashboard/src/app/[locale]/admin/broadcasts/page.tsx` — React Query
+- `dashboard/src/app/[locale]/admin/email/page.tsx` — React Query
+- `dashboard/src/app/[locale]/admin/loading.tsx` — improved skeleton
+- `dashboard/src/hooks/useAdminData.ts` — useAdminBroadcasts hook
+
+### Beklenen Sonuç:
+- İlk yükleme: ~800-1200ms (API çağrılarına bağlı)
+- Sıcak navigasyon (React Query cache): **100-200ms** ✅
+- SSO callback handler test
+- SSO enforce modal
 
 ### Özet
 Servet ile oturum. Alerts (Admin) sayfası detaylı incelendi. 2 sorun tespit edildi, hepsi düzeltildi. 3 dosya değişti.
