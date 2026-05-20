@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -26,15 +26,20 @@ const HealthTab = dynamic(() => import('./components/HealthTab'), { ssr: false, 
 const InfraTab = dynamic(() => import('./components/InfraTab'), { ssr: false, loading: () => tabSkeleton });
 
 export default function AdminOverviewPage() {
-  // Shared data — fetched once, passed to tabs as props
-  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useAdminStats();
+  // Primary data — needed for above-the-fold stats
+  const { data: stats, refetch: refetchStats } = useAdminStats();
   const { data: revenue, refetch: refetchRevenue } = useAdminRevenue();
-  const { data: auditLogsData, refetch: refetchAuditLogs } = useAdminAuditLogs({ limit: 5 });
-  const { data: featureFlagsData, refetch: refetchFeatureFlags } = useAdminFeatureFlags();
-  const { data: deployInfo, refetch: refetchDeployInfo } = useAdminDeployInfo();
-  const { data: rateLimitData, refetch: refetchRateLimit } = useRateLimitViolations({ limit: 1 });
-  const { data: failedDeliveriesData, refetch: refetchFailed } = useFailedDeliveries({ limit: 1 });
-  const { data: queueStatus, refetch: refetchQueue } = useQueueStatus();
+
+  // Secondary data — deferred 500ms (not needed for initial render)
+  const [deferredReady, setDeferredReady] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setDeferredReady(true), 500); return () => clearTimeout(t); }, []);
+
+  const { data: auditLogsData, refetch: refetchAuditLogs } = useAdminAuditLogs(deferredReady ? { limit: 5 } : undefined);
+  const { data: featureFlagsData, refetch: refetchFeatureFlags } = useAdminFeatureFlags(deferredReady);
+  const { data: deployInfo, refetch: refetchDeployInfo } = useAdminDeployInfo(deferredReady);
+  const { data: rateLimitData, refetch: refetchRateLimit } = useRateLimitViolations(deferredReady ? { limit: 1 } : undefined);
+  const { data: failedDeliveriesData, refetch: refetchFailed } = useFailedDeliveries(deferredReady ? { limit: 1 } : undefined);
+  const { data: queueStatus, refetch: refetchQueue } = useQueueStatus(deferredReady);
 
   const auditLogs = auditLogsData?.entries ?? [];
   const featureFlags = featureFlagsData?.flags ?? [];
@@ -83,8 +88,6 @@ export default function AdminOverviewPage() {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
 
-  const loading = statsLoading;
-  const error = statsError ? t('failedToLoadStats') : null;
   const mrr = revenue?.mrr || 0;
   const arr = mrr * 12;
 
@@ -121,37 +124,6 @@ export default function AdminOverviewPage() {
     }
   }, [stats, mrr, arr, t]);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('overview')}</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('loadingDashboard')}</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="glass-card p-6 animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2 mb-4" />
-              <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded-sm w-3/4" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <div><h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('overview')}</h1></div>
-        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4 flex items-center justify-between">
-          <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
-          <button type="button" onClick={() => refetchStats()} className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline">{tc('retry')}</button>
-        </div>
-      </div>
-    );
-  }
-
   const tabs = [
     { key: 'overview', icon: <BarChart3 size={14} strokeWidth={1.75} />, label: t('overview') || 'Overview' },
     { key: 'activity', icon: <ClipboardList size={14} strokeWidth={1.75} />, label: t('activity') || 'Activity' },
@@ -161,7 +133,7 @@ export default function AdminOverviewPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      {/* Header */}
+      {/* Header — always visible */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
