@@ -33,6 +33,7 @@ export default function BillingPage() {
   const [pausing, setPausing] = useState(false);
   const [_resuming, setResuming] = useState(false);
   const [pauseDays, setPauseDays] = useState(30);
+  const [discountCode, setDiscountCode] = useState('');
   const upgradeModalRef = useRef<HTMLDivElement>(null);
   const cancelModalRef = useRef<HTMLDivElement>(null);
   const pauseModalRef = useRef<HTMLDivElement>(null);
@@ -143,7 +144,7 @@ export default function BillingPage() {
 
     setUpgrading(true);
     try {
-      const result = await billingApiExtended.upgrade(token, showUpgradeModal, billingPeriod);
+      const result = await billingApiExtended.upgrade(token, showUpgradeModal, billingPeriod, discountCode || undefined);
 
       if (result.requires_contact) {
         const contactUrl = result.contact_url || '/contact';
@@ -199,7 +200,7 @@ export default function BillingPage() {
       {/* 3. Plans */}
       <section>
         <SectionLabel label={t('currentPlan')} icon={<Rocket size={16} strokeWidth={1.75} />} />
-        <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} />
+        <PlanCards currentPlan={currentPlan} onUpgrade={handleUpgrade} discountCode={discountCode} onDiscountCodeChange={setDiscountCode} />
       </section>
 
       {/* 4. Invoices */}
