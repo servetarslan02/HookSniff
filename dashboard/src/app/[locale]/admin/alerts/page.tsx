@@ -226,7 +226,7 @@ export default function AdminAlertsPage() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
               >
                 {CONDITIONS.map((c) => (
-                  <option key={c.value} value={c.value}>{c.icon} {c.label}</option>
+                  <option key={c.value} value={c.value}>{c.label}</option>
                 ))}
               </select>
             </div>
@@ -317,8 +317,12 @@ export default function AdminAlertsPage() {
                       {' · '}
                       {alert.channels.map((ch) => {
                         const chDef = CHANNELS.find((c) => c.value === ch);
-                        return chDef ? chDef.icon + ' ' + chDef.label : ch;
-                      }).join(', ')}
+                        return chDef ? (
+                          <span key={ch} className="inline-flex items-center gap-0.5 mr-1">{chDef.icon} {chDef.label}</span>
+                        ) : (
+                          <span key={ch} className="mr-1">{ch}</span>
+                        );
+                      })}
                     </p>
                   </div>
                 </div>
