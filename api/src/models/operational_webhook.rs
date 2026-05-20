@@ -9,6 +9,7 @@ pub struct OperationalWebhookEndpoint {
     pub url: String,
     pub description: Option<String>,
     pub is_active: bool,
+    #[serde(skip_serializing)]
     pub signing_secret: String,
     pub event_types: Option<Vec<String>>,
     pub created_at: DateTime<Utc>,
