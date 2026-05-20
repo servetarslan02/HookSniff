@@ -997,3 +997,11 @@ ALTER TABLE deliveries ADD COLUMN IF NOT EXISTS custom_headers jsonb;
 - MessageAttempt.java: `/v1/webhooks/{id}/attempts` kullanıyor
 - Authentication.java: HookSniff auth endpoint'leri (login, register, me)
 - GitHub'a push edildi: ffb9786
+
+## ⚠️ Git Config Kuralı
+Her oturumda ilk olarak:
+```
+git config user.email servetarslan02@gmail.com
+git config user.name servetarslan02
+```
+ai@hooksniff.dev KULLANMA — Vercel BLOCKED deploy yapıyor.
