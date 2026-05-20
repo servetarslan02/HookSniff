@@ -114,10 +114,10 @@ export function OverageSettings() {
           <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
             <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('dailyLimit')}</p>
             <p className="text-xl font-bold text-gray-900 dark:text-white">
-              {settings.daily_limit.toLocaleString()}
+              {settings.daily_limit === null ? tc('unlimited') : settings.daily_limit.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-              {t('eventsPerDay')}
+              {settings.daily_limit !== null && t('eventsPerDay')}
             </p>
           </div>
           <div className="p-4 rounded-xl bg-gray-50 dark:bg-slate-900">

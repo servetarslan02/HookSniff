@@ -925,6 +925,7 @@
     "overageEmailNotification": "Overage Email Alerts",
     "overageEmailNotificationDesc": "Receive an email when you reach 80% and 100% of your limit.",
     "dailyLimit": "Daily Limit",
+    "unlimited": "Unlimited",
     "eventsPerDay": "events/day",
     "overagePrice": "Overage Price",
     "perEvent": "per event",
