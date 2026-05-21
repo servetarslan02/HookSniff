@@ -14,6 +14,13 @@
 2. **activate_paused_subscriptions çalışmıyor** → `paused_at IS NULL` koşulu kaldırıldı
 3. **Yıllık dunning email gönderilemiyor** → CHECK constraint 1-7 → 1-30
 
+### RBAC Rol Testleri — TÜMÜ BAŞARILI ✅
+- Viewer: sadece okuma (200), yazma/silme engellendi (403)
+- Analyst: sadece okuma (200), yazma/silme engellendi (403)
+- Developer: okuma+yazma (200), silme engellendi (403)
+- Admin: tüm operasyonlar başarılı (200)
+- 6 üyenin "member" rolü "viewer" olarak güncellendi DB'de
+
 ### Session 5 — RBAC Enforcement (önceki oturum)
 
 ### Team Role-Based Access Control (RBAC) — Full Enforcement
