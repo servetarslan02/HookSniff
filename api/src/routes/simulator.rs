@@ -8,6 +8,7 @@ use axum::extract::Extension;
 use axum::routing::post;
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -46,9 +47,13 @@ struct SimulateResponse {
 }
 
 async fn simulate_webhook(
+    Extension(pool): Extension<PgPool>,
     Extension(_customer): Extension<Customer>,
     Json(req): Json<SimulateRequest>,
 ) -> Result<Json<SimulateResponse>, AppError> {
+    // RBAC: developer or higher
+    super::teams::check_user_team_role(&pool, _customer.id, "developer").await?;
+
     let start = std::time::Instant::now();
 
     // Simulate delay if requested
