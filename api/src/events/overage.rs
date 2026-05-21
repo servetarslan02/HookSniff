@@ -112,7 +112,10 @@ pub async fn track_daily_event(
             let cfg = crate::billing::polar::PolarConfig::from_env();
             if let Some(cfg) = cfg {
                 let provider = crate::billing::polar::PolarProvider::new(cfg);
-                let _ = provider.ingest_overage_event(&ext_id, overage_count).await;
+                // Use tokio::spawn to not block the request
+                tokio::spawn(async move {
+                    let _ = provider.ingest_overage_event(&ext_id, overage_count).await;
+                });
             }
         }
     }
