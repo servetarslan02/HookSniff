@@ -48,8 +48,8 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
       icon: <Database size={24} strokeWidth={1.75} />,
       status: health.checks?.database?.status || health.database?.status || 'unknown',
       latency: health.checks?.database?.latency_ms ?? health.database?.latency_ms ?? null,
-      detail: (health.checks?.database?.latency_ms || health.database?.latency_ms)
-        ? `${t('latencyLabel') || 'Latency'}: ${health.checks?.database?.latency_ms || health.database?.latency_ms}ms`
+      detail: (health.checks?.database?.latency_ms != null || health.database?.latency_ms != null)
+        ? `${t('latencyLabel') || 'Latency'}: ${health.checks?.database?.latency_ms ?? health.database?.latency_ms}ms`
         : t('checking'),
     },
     {
@@ -57,8 +57,8 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
       icon: <HardDrive size={24} strokeWidth={1.75} className="text-red-500" />,
       status: health.checks?.redis?.status || health.redis?.status || 'unknown',
       latency: health.checks?.redis?.latency_ms ?? health.redis?.latency_ms ?? null,
-      detail: (health.checks?.redis?.latency_ms || health.redis?.latency_ms)
-        ? `${t('latencyLabel') || 'Latency'}: ${health.checks?.redis?.latency_ms || health.redis?.latency_ms}ms`
+      detail: (health.checks?.redis?.latency_ms != null || health.redis?.latency_ms != null)
+        ? `${t('latencyLabel') || 'Latency'}: ${health.checks?.redis?.latency_ms ?? health.redis?.latency_ms}ms`
         : t('checking'),
     },
     {
