@@ -1,0 +1,28 @@
+// Blog post slugs — shared between sitemap.ts and blog sitemap
+// Keep in sync with app/[locale]/blog/[slug]/data.ts
+export const blogSlugs = [
+  'hooksniff-vs-svix-vs-hookdeck',
+  'may-2026-changelog',
+  'building-mcp-ready-webhooks',
+  'webhook-integration-tutorial',
+  'webhook-architecture-deep-dive',
+  'customer-spotlight-ecommerce',
+  'why-ai-agents-need-webhooks',
+  'gemini-webhook-integration',
+  'stripe-webhook-guide',
+  'changelog-may-2026',
+  'introducing-hooksniff',
+  'webhook-best-practices',
+  'fifo-webhook-delivery',
+  'github-webhook-guide',
+  'cloudevents-standard',
+  'webhook-security-guide',
+  'shopify-webhook-incident-analysis',
+  'what-is-a-webhook',
+  'webhook-vs-polling',
+  'best-free-webhook-services-2026',
+  'webhook-vs-api',
+  'webhook-examples',
+  'how-to-use-webhooks',
+  'webhook-tutorial',
+];
