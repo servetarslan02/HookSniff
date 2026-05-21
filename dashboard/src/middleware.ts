@@ -109,7 +109,7 @@ export default function middleware(request: NextRequest) {
     // Consolidated dashboard routes
     '/core', '/applications', '/deliveries', '/operational-webhooks',
     '/integrations', '/observability', '/devtools', '/routing-config',
-    '/account', '/billing-section', '/organization',
+    '/account', '/billing-section', '/billing', '/organization',
   ];
   const isPublic = withoutLocale === '/' || publicPaths.some((path) => withoutLocale.startsWith(path));
   if (!isPublic && !withoutLocale.startsWith('/admin')) {

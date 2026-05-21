@@ -108,7 +108,7 @@ pub async fn run_dunning(pool: &PgPool, email_client: &ResendEmailClient) -> Res
         let notif = dunning_notification(days_remaining, plan_display, lang);
         sqlx::query(
             "INSERT INTO notifications (customer_id, type, title, message, is_read, link) \
-             VALUES ($1, 'billing', $2, $3, false, '/billing-section')"
+             VALUES ($1, 'billing', $2, $3, false, '/billing')"
         )
         .bind(customer_id)
         .bind(&notif.title)
@@ -190,7 +190,7 @@ pub async fn activate_paused_subscriptions(pool: &PgPool) -> Result<u64> {
                     "{} plan aboneliğiniz donduruldu. Devam etmek için \"Devam Et\" butonuna tıklayın.",
                     plan
                 ),
-                Some("/billing-section"),
+                Some("/billing"),
             )
             .await;
         }
@@ -380,7 +380,7 @@ fn tpl_dunning_tr(plan: &str, days_remaining: i64) -> (String, String) {
     </div>
 
     <div style="text-align: center; margin: 32px 0;">
-      <a href="https://hooksniff.vercel.app/billing-section"
+      <a href="https://hooksniff.vercel.app/billing"
          style="display: inline-block; background: #6d28d9; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
         💳 Ödeme Yöntemini Kontrol Et
       </a>
@@ -452,7 +452,7 @@ fn tpl_dunning_en(plan: &str, days_remaining: i64) -> (String, String) {
     </div>
 
     <div style="text-align: center; margin: 32px 0;">
-      <a href="https://hooksniff.vercel.app/billing-section"
+      <a href="https://hooksniff.vercel.app/billing"
          style="display: inline-block; background: #6d28d9; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
         💳 Check Payment Method
       </a>

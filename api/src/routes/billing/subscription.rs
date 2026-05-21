@@ -204,7 +204,7 @@ pub async fn pause_subscription(
                 plan_name,
                 paused_until.format("%d.%m.%Y")
             ),
-            Some("/billing-section"),
+            Some("/billing"),
         )
         .await;
     });
@@ -331,7 +331,7 @@ pub async fn resume_subscription(
                 "{} plan aboneliğiniz devam ediyor. Ödeme sayfasına yönlendiriliyorsunuz.",
                 plan_name
             ),
-            Some("/billing-section"),
+            Some("/billing"),
         )
         .await;
     });

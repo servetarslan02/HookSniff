@@ -188,6 +188,9 @@ struct CustomerSessionResponse {
 }
 
 /// Polar.sh subscription object (from webhook data).
+///
+/// Fields align with Polar's Subscription schema:
+/// https://docs.polar.sh/api-reference/subscriptions/get
 #[derive(Debug, Deserialize)]
 struct PolarSubscription {
     #[serde(default)]
@@ -200,6 +203,18 @@ struct PolarSubscription {
     product_id: Option<String>,
     #[serde(default)]
     status: Option<String>,
+    /// Billing interval: "month" or "year"
+    #[serde(default)]
+    interval: Option<String>,
+    /// Whether the subscription is scheduled to cancel at period end.
+    #[serde(default)]
+    cancel_at_period_end: Option<bool>,
+    /// Current billing period end (ISO 8601) — Polar sends this on renewals.
+    #[serde(default)]
+    current_period_end: Option<String>,
+    /// Current billing period start (ISO 8601).
+    #[serde(default)]
+    current_period_start: Option<String>,
 }
 
 // ── Polar.sh implementation ───────────────────────────────────
@@ -392,7 +407,7 @@ impl PaymentProviderImpl for PolarProvider {
             products: vec![product_id.to_string()],
             external_customer_id: Some(customer_id.to_string()),
             customer_email: Some(customer_email.to_string()),
-            success_url: Some(format!("{}/billing-section?upgraded=true", app_url)),
+            success_url: Some(format!("{}/billing?upgraded=true", app_url)),
             locale: Some("en".to_string()),
             discount_code: None, // Don't use discount_code — it only prefills, doesn't apply
             discount_id: resolved_discount_id,
@@ -498,15 +513,18 @@ impl PaymentProviderImpl for PolarProvider {
                 };
 
                 let plan = self.determine_plan(product_id);
-                let interval = if self.config.is_yearly_product(product_id) { "year" } else { "month" };
+                let interval = sub.interval.clone()
+                    .unwrap_or_else(|| if self.config.is_yearly_product(product_id) { "year".to_string() } else { "month".to_string() });
 
                 Ok(WebhookResult::SubscriptionCreated {
                     customer_id,
                     plan,
                     provider_customer_id: sub.customer_id.clone(),
                     provider_subscription_id: sub.id.clone(),
-                    interval: interval.to_string(),
+                    interval,
                     event_id: event.id.clone(),
+                    cancel_at_period_end: sub.cancel_at_period_end.unwrap_or(false),
+                    current_period_end: sub.current_period_end.clone(),
                 })
             }
             "subscription.updated" => {
@@ -534,18 +552,50 @@ impl PaymentProviderImpl for PolarProvider {
                     });
                 }
 
-                // POL-08: Handle past_due status — treat as payment failure
-                if status == "past_due" {
-                    tracing::warn!(
-                        "Polar subscription {} is past_due — marking as payment failed",
+                // Handle cancel_at_period_end — customer requested cancellation via Polar portal
+                if sub.cancel_at_period_end == Some(true) {
+                    tracing::info!(
+                        "Polar subscription {} marked for cancellation at period end",
                         sub_id
                     );
-                    // Find customer by subscription ID to trigger downgrade
+                    // Find customer and set cancel_at_period_end in our DB
+                    if let Some(cid) = sub.external_customer_id.as_deref()
+                        .or(sub.customer_id.as_deref())
+                        .and_then(|s| Uuid::parse_str(s).ok())
+                    {
+                        let _ = sqlx::query(
+                            "UPDATE customers SET cancel_at_period_end = true, updated_at = NOW() WHERE id = $1"
+                        )
+                        .bind(cid)
+                        .execute(pool)
+                        .await;
+                    }
+                    // Still process as updated so plan/period info stays in sync
+                }
+
+                // POL-08: Handle past_due status — DON'T downgrade immediately!
+                // Polar has its own retry schedule (2, 7, 14, 21 days).
+                // We mark the customer as having a payment issue but keep their plan.
+                if status == "past_due" {
+                    tracing::warn!(
+                        "Polar subscription {} is past_due — marking payment failure (NOT downgrading)",
+                        sub_id
+                    );
                     let customer_id = sub
                         .external_customer_id
                         .as_deref()
                         .or(sub.customer_id.as_deref())
                         .and_then(|s| Uuid::parse_str(s).ok());
+
+                    // Mark payment_failed_at but do NOT change plan — Polar is retrying
+                    if let Some(cid) = customer_id {
+                        let _ = sqlx::query(
+                            "UPDATE customers SET payment_failed_at = NOW(), updated_at = NOW() WHERE id = $1 AND payment_failed_at IS NULL"
+                        )
+                        .bind(cid)
+                        .execute(pool)
+                        .await;
+                    }
 
                     return Ok(WebhookResult::PaymentFailed {
                         provider_tx_id: sub_id.clone(),
@@ -562,14 +612,17 @@ impl PaymentProviderImpl for PolarProvider {
                 };
 
                 let plan = self.determine_plan(product_id);
-                let interval = if self.config.is_yearly_product(product_id) { "year" } else { "month" };
+                let interval = sub.interval.clone()
+                    .unwrap_or_else(|| if self.config.is_yearly_product(product_id) { "year".to_string() } else { "month".to_string() });
 
                 Ok(WebhookResult::SubscriptionUpdated {
                     provider_subscription_id: sub_id,
                     plan,
                     status,
-                    interval: interval.to_string(),
+                    interval,
                     event_id: event.id.clone(),
+                    cancel_at_period_end: sub.cancel_at_period_end.unwrap_or(false),
+                    current_period_end: sub.current_period_end.clone(),
                 })
             }
             "subscription.canceled" | "subscription.revoked" => {
@@ -586,8 +639,10 @@ impl PaymentProviderImpl for PolarProvider {
                     event_id: event.id.clone(),
                 })
             }
-            "order.completed" => {
-                // Payment succeeded (order.created = legacy, order.completed = current Polar event)
+            "order.completed" | "order.created" => {
+                // Payment succeeded — Polar sends both order.created and order.completed
+                // order.created fires first (when payment starts), order.completed after confirmation
+                // We handle both for robustness; idempotency check in webhooks.rs prevents duplicates
                 let order = &event.data;
                 let tx_id = order
                     .get("id")
@@ -622,36 +677,9 @@ impl PaymentProviderImpl for PolarProvider {
                     .and_then(|v| v.as_str())
                     .map(|s| s.to_string());
 
-                // Try to extract card details from Polar order data
-                // Polar may include billing details in the order object
-                let card_info = extract_polar_card_info(order);
-
-                if let Some((brand, last4, exp_month, exp_year)) = card_info {
-                    // Get customer_id from the order to save card info
-                    let customer_id = order
-                        .get("customer_id")
-                        .or_else(|| order.get("external_customer_id"))
-                        .and_then(|v| v.as_str())
-                        .and_then(|s| Uuid::parse_str(s).ok());
-
-                    if let Some(cid) = customer_id {
-                        let _ = sqlx::query(
-                            "UPDATE customers SET card_last4 = $1, card_brand = $2, card_exp_month = $3, card_exp_year = $4, card_updated_at = NOW() WHERE id = $5"
-                        )
-                        .bind(&last4)
-                        .bind(&brand)
-                        .bind(exp_month as i16)
-                        .bind(exp_year as i16)
-                        .bind(cid)
-                        .execute(pool)
-                        .await;
-
-                        tracing::info!(
-                            "💳 Saved Polar card details for customer {}: {} {}",
-                            cid, brand, last4
-                        );
-                    }
-                }
+                // NOTE: Card info is NOT available from Polar (MoR — card data stays at Polar).
+                // Card fields (card_last4, card_brand etc.) will be NULL for Polar customers.
+                // UI should show "Managed by Polar.sh" instead of card details.
 
                 Ok(WebhookResult::PaymentSucceeded {
                     provider_tx_id: tx_id,
@@ -946,47 +974,6 @@ impl PolarProvider {
     }
 }
 
-/// Extract card details from Polar.sh order data.
-///
-/// Polar may include payment method info in various locations within the order object.
-/// Tries multiple paths to find card brand, last4, and expiry.
-fn extract_polar_card_info(data: &serde_json::Value) -> Option<(String, String, u32, u32)> {
-    // Polar might include card info in billing_details, payment_method, or nested objects
-    let paths = [
-        ("billing_details", "card"),
-        ("payment_method", "card"),
-        ("payment_method_details", "card"),
-        ("charge", "payment_method_details"),
-    ];
-
-    for (outer, inner) in paths {
-        if let Some(card) = data.get(outer).and_then(|o| o.get(inner)) {
-            let brand = card.get("brand").and_then(|v| v.as_str());
-            let last4 = card.get("last4").and_then(|v| v.as_str());
-            let exp_month = card.get("exp_month").and_then(|v| v.as_u64());
-            let exp_year = card.get("exp_year").and_then(|v| v.as_u64());
-
-            if let (Some(b), Some(l), Some(m), Some(y)) = (brand, last4, exp_month, exp_year) {
-                return Some((b.to_string(), l.to_string(), m as u32, y as u32));
-            }
-        }
-    }
-
-    // Also try direct "card" object at root level
-    if let Some(card) = data.get("card") {
-        let brand = card.get("brand").and_then(|v| v.as_str());
-        let last4 = card.get("last4").and_then(|v| v.as_str());
-        let exp_month = card.get("exp_month").and_then(|v| v.as_u64());
-        let exp_year = card.get("exp_year").and_then(|v| v.as_u64());
-
-        if let (Some(b), Some(l), Some(m), Some(y)) = (brand, last4, exp_month, exp_year) {
-            return Some((b.to_string(), l.to_string(), m as u32, y as u32));
-        }
-    }
-
-    None
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1179,13 +1166,16 @@ mod tests {
 
     #[test]
     fn deserialize_polar_subscription_with_all_fields() {
-        let json = r#"{"id":"sub_1","customer_id":"cust_1","external_customer_id":"ext_1","product_id":"prod_1","status":"active"}"#;
+        let json = r#"{"id":"sub_1","customer_id":"cust_1","external_customer_id":"ext_1","product_id":"prod_1","status":"active","interval":"month","cancel_at_period_end":false,"current_period_end":"2026-06-21T00:00:00Z"}"#;
         let sub: PolarSubscription = serde_json::from_str(json).unwrap();
         assert_eq!(sub.id.as_deref(), Some("sub_1"));
         assert_eq!(sub.customer_id.as_deref(), Some("cust_1"));
         assert_eq!(sub.external_customer_id.as_deref(), Some("ext_1"));
         assert_eq!(sub.product_id.as_deref(), Some("prod_1"));
         assert_eq!(sub.status.as_deref(), Some("active"));
+        assert_eq!(sub.interval.as_deref(), Some("month"));
+        assert_eq!(sub.cancel_at_period_end, Some(false));
+        assert!(sub.current_period_end.is_some());
     }
 
     #[test]
