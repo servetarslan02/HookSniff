@@ -3743,6 +3743,12 @@
     "post16Excerpt": "CloudEvents v1.0 provides a standardized way to describe event data. Here is why we adopted it and how it benefits your integrations.",
     "post17Title": "Webhook Security: A Complete Guide",
     "post17Excerpt": "HMAC signatures, replay attack prevention, IP whitelisting, and TLS — everything you need to secure your webhook endpoints.",
+    "post18Title": "What is a Webhook? A Complete Guide for Beginners",
+    "post18Excerpt": "A simple, jargon-free explanation of webhooks — how they work, real-world examples, and why they are essential for modern applications.",
+    "post19Title": "Webhook vs Polling: Which Should You Use in 2026?",
+    "post19Excerpt": "An honest comparison of webhooks and polling — latency, bandwidth, scalability, and when to use each approach.",
+    "post20Title": "Best Free Webhook Services in 2026 (Honest Comparison)",
+    "post20Excerpt": "We compared HookSniff, Svix, Hookdeck, and Hook0 — pricing, features, free tiers, and which one fits your needs.",
     "backToList": "← Back to Blog"
   },
   "changelog": {
