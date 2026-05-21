@@ -3007,7 +3007,8 @@
     "logo": "Logo",
     "successRate": "Success Rate",
     "subtitle": "Your account overview and usage",
-    "retry": "Retry"
+    "retry": "Retry",
+    "rateLimit": "Rate Limit"
   },
   "sso": {
     "title": "🔐 SSO / SAML",
