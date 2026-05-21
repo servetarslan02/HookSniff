@@ -18,6 +18,11 @@ const posts = [
   'cloudevents-standard',
   'webhook-security-guide',
   'shopify-webhook-incident-analysis',
+  'what-is-a-webhook',
+  'webhook-vs-polling',
+  'best-free-webhook-services-2026',
+  'webhook-vs-api',
+  'webhook-examples',
 ];
 
 export async function GET() {
