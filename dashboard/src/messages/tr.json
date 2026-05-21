@@ -1297,7 +1297,11 @@
     "paginationGuide": "Sayfalama",
     "errorHandlingGuide": "Hata Yönetimi",
     "step5": "Teslimat başarısız olursa, otomatik olarak yeniden denenir (varsayılan: üstel geri çekilmeli 5 deneme)",
-    "conceptRetryPolicyDesc": "Endpoint başına yapılandırılabilir. Varsayılan: üstel geri çekilmeli 5 deneme (1s, 2s, 4s, 8s, 16s). Tükenmeden sonra teslimat DLQ ya gider."
+    "conceptRetryPolicyDesc": "Endpoint başına yapılandırılabilir. Varsayılan: üstel geri çekilmeli 5 deneme (1s, 2s, 4s, 8s, 16s). Tükenmeden sonra teslimat DLQ ya gider.",
+    "retryAttempt": "Attempt",
+    "retryDelay": "Delay",
+    "retryCumulative": "Cumulative",
+    "endpointSecret": "Signing secret — HMAC-SHA256 secret for payload verification (whsec_ prefix)"
   },
   "status": {
     "title": "HookSniff Durumu",
@@ -2050,7 +2054,6 @@
     "topEvents": "En Çok Kullanılan Eventler",
     "delivered": "Teslim Edildi",
     "failed": "Başarısız",
-    "pending": "Beklemede",
     "lastDelivery": "Son Teslimat",
     "transactionId": "İşlem ID",
     "refundHistory": "İade Geçmişi",
@@ -2970,7 +2973,19 @@
     "noEndpoints": "Henüz endpoint yapılandırılmamış.",
     "loading": "Yükleniyor...",
     "configure": "Yapılandır",
-    "createEndpoint": "Endpoint Oluştur"
+    "createEndpoint": "Endpoint Oluştur",
+    "round-robin": "Round Robin",
+    "failover": "Failover",
+    "weighted": "Ağırlıklı",
+    "random": "Rastgele",
+    "roundRobinDesc": "İstekleri tüm endpointler arasında eşit olarak dağıtır",
+    "failoverDesc": "Birincil endpoint başarısız olduğunda yedek endpoint kullanır",
+    "weightedDesc": "Yapılandırılmış ağırlıklara göre yönlendirir",
+    "randomDesc": "Rastgele bir endpoint seçer",
+    "fallbackUrl": "Yedek URL",
+    "fallbackHint": "Birincil endpoint başarısız olduğunda kullanılır (failover stratejisi)",
+    "routingUpdated": "Yönlendirme yapılandırması güncellendi",
+    "edit": "Düzenle"
   },
   "customDomain": {
     "title": "🌐 Özel Alan Adı",
@@ -3545,7 +3560,15 @@
     "endpointSettingsLink": "Endpoint Ayarları",
     "noEndpoints": "Endpoint bulunamadı. Retry policy oluşturmak için önce bir endpoint oluşturun",
     "configure": "Yapılandır",
-    "createEndpoint": "Endpoint Oluştur"
+    "createEndpoint": "Endpoint Oluştur",
+    "retrySchedulePreview": "Retry Schedule",
+    "policyUpdated": "Retry policy updated",
+    "edit": "Edit",
+    "defaultPolicy": "Default (5 attempts, exponential)",
+    "attempts": "attempts",
+    "resetToDefault": "Reset to Default",
+    "resetConfirm": "Reset retry policy to default values?",
+    "policyReset": "Retry policy reset to defaults"
   },
   "inbound": {
     "title": "Gelen Webhooklar",
@@ -5035,7 +5058,24 @@
     "totalMessages": "Toplam Mesaj",
     "status": "Durum",
     "actions": "İşlemler",
-    "createChannelDesc": "Canlı teslimat izleme için gerçek zamanlı olay akış kanalı oluşturun"
+    "createChannelDesc": "Canlı teslimat izleme için gerçek zamanlı olay akış kanalı oluşturun",
+    "howItWorks": "How it works",
+    "step1": "Create a channel",
+    "step2": "Clients subscribe",
+    "step3": "Publish events",
+    "step4": "Real-time delivery",
+    "editChannel": "Edit Channel",
+    "saveChanges": "Save Changes",
+    "edit": "Edit",
+    "deleteChannel": "Delete Channel",
+    "deleteConfirmMsg": "Are you sure you want to delete this channel? All subscribers will be disconnected.",
+    "publishDesc": "Send a test event to all subscribers",
+    "eventType": "Event Type",
+    "payload": "Payload",
+    "publishBtn": "Publish",
+    "publishing": "Publishing...",
+    "invalidJson": "Invalid JSON payload",
+    "events": "events"
   },
   "whatIsHookSniff": {
     "title": "HookSniff Nedir?",
@@ -5412,7 +5452,8 @@
     "urls": "URL'ler",
     "apiBaseUrl": "API sunucu taban URL'si",
     "dashboardUrl": "Dashboard URL'si",
-    "exampleEnv": "Örnek .env"
+    "exampleEnv": "Örnek .env",
+    "maxDeliveryAttempts": "Maximum delivery attempts (default: 5)"
   },
   "docsRetries": {
     "title": "Tekrar Denemeler ve Tekrar Politikası",
@@ -5462,7 +5503,8 @@
     "slowReceivers": "Yavaş alıcılar — Daha fazla toparlanma süresi vermek için base_delay_ms'yi artırın",
     "highVolume": "Yüksek hacimli uç noktalar — Tekrar denemeleri yaymak için daha yüksek çarpan kullanın",
     "default": "Varsayılan",
-    "description": "Açıklama"
+    "description": "Açıklama",
+    "maxRetry": "Default max retry attempts"
   },
   "docsRateLimiting": {
     "title": "Hız Sınırı",
