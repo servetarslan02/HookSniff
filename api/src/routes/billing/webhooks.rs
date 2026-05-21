@@ -254,10 +254,16 @@ async fn process_webhook_result(
         } => {
             let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
             if let Some(sub_col) = provider_sub_col(provider) {
+                // POL-06: Also clear polar_customer_id on cancellation
+                let cust_col = match provider {
+                    "polar" => ", polar_customer_id = NULL",
+                    "iyzico" => ", iyzico_customer_id = NULL",
+                    _ => "",
+                };
                 let query = format!(
                     "UPDATE customers SET plan = 'free', {} = NULL, webhook_limit = $2, \
-                     cancel_at_period_end = false, updated_at = NOW() WHERE {} = $1",
-                    sub_col, sub_col
+                     cancel_at_period_end = false, updated_at = NOW(){} WHERE {} = $1",
+                    sub_col, cust_col, sub_col
                 );
                 sqlx::query(&query).bind(provider_subscription_id).bind(free_limit)
                     .execute(pool).await?;
@@ -298,17 +304,54 @@ async fn process_webhook_result(
             provider_tx_id,
             amount_cents,
             currency,
+            customer_id,
         } => {
-            // Payment succeeded — extend billing period and clear any failure state
+            // POL-04: Extend billing period on successful payment
             tracing::info!(
-                "✅ {} payment succeeded: {} ({} {}) — extending billing period",
+                "✅ {} payment succeeded: {} ({} {})",
                 provider,
                 provider_tx_id,
                 *amount_cents as f64 / 100.0,
                 currency
             );
-            // Note: SubscriptionUpdated already handles period extension.
-            // This is a safety net for providers that only send PaymentSucceeded.
+
+            // Extend billing period for the customer (safety net)
+            if let Some(cid) = customer_id {
+                let period_ext = if *currency == "TRY" { "30 days" } else { "30 days" };
+                sqlx::query(
+                    &format!(
+                        "UPDATE customers SET \
+                         current_period_end = NOW() + INTERVAL '{}', \
+                         payment_failed_at = NULL, \
+                         updated_at = NOW() \
+                         WHERE id = $1",
+                        period_ext
+                    )
+                )
+                .bind(cid)
+                .execute(pool)
+                .await?;
+
+                tracing::info!(
+                    "📅 Billing period extended for customer {} after successful payment",
+                    cid
+                );
+
+                // Record payment transaction
+                let _ = sqlx::query(
+                    "INSERT INTO payment_transactions \
+                     (customer_id, provider, provider_event_id, status, amount_cents, currency) \
+                     VALUES ($1, $2, $3, 'completed', $4, $5) \
+                     ON CONFLICT DO NOTHING",
+                )
+                .bind(cid)
+                .bind(provider)
+                .bind(provider_tx_id)
+                .bind(*amount_cents as i64)
+                .bind(currency)
+                .execute(pool)
+                .await;
+            }
         }
         WebhookResult::PaymentFailed {
             provider_tx_id,

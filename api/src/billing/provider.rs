@@ -73,6 +73,8 @@ pub enum WebhookResult {
         provider_tx_id: String,
         amount_cents: u64,
         currency: String,
+        /// Customer ID if available from the payment event (POL-04: period extension)
+        customer_id: Option<Uuid>,
     },
     /// Payment failed.
     PaymentFailed {
@@ -334,16 +336,19 @@ mod tests {
             provider_tx_id: "tx_001".to_string(),
             amount_cents: 4900,
             currency: "USD".to_string(),
+            customer_id: Some(Uuid::new_v4()),
         };
         match result {
             WebhookResult::PaymentSucceeded {
                 provider_tx_id,
                 amount_cents,
                 currency,
+                customer_id,
             } => {
                 assert_eq!(provider_tx_id, "tx_001");
                 assert_eq!(amount_cents, 4900);
                 assert_eq!(currency, "USD");
+                assert!(customer_id.is_some());
             }
             _ => panic!("Expected PaymentSucceeded"),
         }

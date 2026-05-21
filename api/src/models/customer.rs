@@ -92,7 +92,7 @@ pub struct Customer {
 }
 
 fn default_payment_provider() -> String {
-    "stripe".to_string()
+    "polar".to_string()
 }
 
 fn default_true() -> bool {

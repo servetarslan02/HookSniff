@@ -480,27 +480,21 @@ impl PaymentProviderImpl for PolarProvider {
                         AppError::BadRequest("Invalid webhook data".into())
                     })?;
 
-                let plan = sub
-                    .product_id
-                    .as_deref()
-                    .map(|pid| self.determine_plan(pid))
-                    .unwrap_or(Plan::Pro);
+                let product_id = sub.product_id.as_deref()
+                    .ok_or_else(|| {
+                        tracing::warn!("Missing product_id in Polar subscription.created event");
+                        AppError::BadRequest("Missing product_id in subscription data".into())
+                    })?;
 
-                let interval = sub
-                    .product_id
-                    .as_deref()
-                    .map(|pid| {
-                        if self.config.is_yearly_product(pid) { "year" } else { "month" }
-                    })
-                    .unwrap_or("month")
-                    .to_string();
+                let plan = self.determine_plan(product_id);
+                let interval = if self.config.is_yearly_product(product_id) { "year" } else { "month" };
 
                 Ok(WebhookResult::SubscriptionCreated {
                     customer_id,
                     plan,
                     provider_customer_id: sub.customer_id.clone(),
                     provider_subscription_id: sub.id.clone(),
-                    interval,
+                    interval: interval.to_string(),
                 })
             }
             "subscription.updated" => {
@@ -512,26 +506,52 @@ impl PaymentProviderImpl for PolarProvider {
 
                 let sub_id = sub.id.unwrap_or_default();
                 let status = sub.status.unwrap_or_else(|| "active".to_string());
-                let plan = sub
-                    .product_id
-                    .as_deref()
-                    .map(|pid| self.determine_plan(pid))
-                    .unwrap_or(Plan::Developer);
 
-                let interval = sub
-                    .product_id
-                    .as_deref()
-                    .map(|pid| {
-                        if self.config.is_yearly_product(pid) { "year" } else { "month" }
-                    })
-                    .unwrap_or("month")
-                    .to_string();
+                // POL-03: Handle canceled/revoked status in subscription.updated
+                // Polar may send status change via updated event instead of canceled event
+                if status == "canceled" || status == "revoked" {
+                    tracing::info!(
+                        "Polar subscription {} canceled via updated event (status={})",
+                        sub_id, status
+                    );
+                    return Ok(WebhookResult::SubscriptionCanceled {
+                        provider_subscription_id: sub_id,
+                    });
+                }
+
+                // POL-08: Handle past_due status — treat as payment failure
+                if status == "past_due" {
+                    tracing::warn!(
+                        "Polar subscription {} is past_due — marking as payment failed",
+                        sub_id
+                    );
+                    // Find customer by subscription ID to trigger downgrade
+                    let customer_id = sub
+                        .external_customer_id
+                        .as_deref()
+                        .or(sub.customer_id.as_deref())
+                        .and_then(|s| Uuid::parse_str(s).ok());
+
+                    return Ok(WebhookResult::PaymentFailed {
+                        provider_tx_id: sub_id.clone(),
+                        customer_id,
+                    });
+                }
+
+                let product_id = sub.product_id.as_deref()
+                    .ok_or_else(|| {
+                        tracing::warn!("Missing product_id in Polar subscription.updated event");
+                        AppError::BadRequest("Missing product_id in subscription data".into())
+                    })?;
+
+                let plan = self.determine_plan(product_id);
+                let interval = if self.config.is_yearly_product(product_id) { "year" } else { "month" };
 
                 Ok(WebhookResult::SubscriptionUpdated {
                     provider_subscription_id: sub_id,
                     plan,
                     status,
-                    interval,
+                    interval: interval.to_string(),
                 })
             }
             "subscription.canceled" | "subscription.revoked" => {
@@ -597,6 +617,11 @@ impl PaymentProviderImpl for PolarProvider {
                     provider_tx_id: tx_id,
                     amount_cents: amount,
                     currency,
+                    customer_id: order
+                        .get("customer_id")
+                        .or_else(|| order.get("external_customer_id"))
+                        .and_then(|v| v.as_str())
+                        .and_then(|s| Uuid::parse_str(s).ok()),
                 })
             }
             "order.refunded" => {
