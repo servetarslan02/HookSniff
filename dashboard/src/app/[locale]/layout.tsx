@@ -12,6 +12,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import Script from 'next/script';
 import { CookieConsent } from '@/components/CookieConsent';
+import { AnalyticsWrapper } from '@/components/AnalyticsWrapper';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -179,26 +180,7 @@ export default async function LocaleLayout({
                 <ToastProvider>
                   {children}
                   <CookieConsent />
-                  <Analytics />
-                  <SpeedInsights />
-                  <Script
-                    defer
-                    src="https://static.cloudflareinsights.com/beacon.min.js"
-                    data-cf-beacon='{"token": "27a349759d954a7c84fe74ded3846abe"}'
-                  />
-                  {/* Google Analytics 4 */}
-                  <Script
-                    src="https://www.googletagmanager.com/gtag/js?id=G-BKZM7CMBJR"
-                    strategy="afterInteractive"
-                  />
-                  <Script id="google-analytics" strategy="afterInteractive">
-                    {`
-                      window.dataLayer = window.dataLayer || [];
-                      function gtag(){dataLayer.push(arguments);}
-                      gtag('js', new Date());
-                      gtag('config', 'G-BKZM7CMBJR');
-                    `}
-                  </Script>
+                  <AnalyticsWrapper />
                 </ToastProvider>
               </ReactQueryProvider>
             </AuthProvider>
