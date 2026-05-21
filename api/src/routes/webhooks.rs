@@ -10,6 +10,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::config::Config;
+use crate::error::ErrorCode;
 use crate::db;
 use crate::error::AppError;
 use crate::events::overage::track_daily_event;
@@ -395,7 +396,7 @@ async fn batch_webhooks(
     }
 
     if req.webhooks.len() > 100 {
-        return Err(AppError::BadRequest("A batch cannot contain more than 100 webhooks".into()));
+        return Err(AppError::coded(ErrorCode::BatchTooLarge));
     }
 
     // Atomic check-and-increment for batch: reserve slots for all webhooks in the batch
@@ -591,7 +592,7 @@ async fn replay_webhook(
     .bind(customer.id)
     .fetch_optional(&pool)
     .await?
-    .ok_or(AppError::BadRequest("The endpoint is no longer active".into()))?;
+    .ok_or(AppError::coded(ErrorCode::EndpointInactive))?;
 
     let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
@@ -692,11 +693,11 @@ async fn batch_replay(
 
     // Gate behind bulk_replay feature flag
     if !feature_flags.is_enabled("bulk_replay").await {
-        return Err(AppError::BadRequest("Bulk replay is not enabled. Contact support to enable this feature.".into()));
+        return Err(AppError::coded(ErrorCode::BulkReplayDisabled));
     }
 
     if req.delivery_ids.is_empty() {
-        return Err(AppError::BadRequest("Please provide at least one delivery ID to replay".into()));
+        return Err(AppError::coded(ErrorCode::NoDeliveryIds));
     }
     if req.delivery_ids.len() > 100 {
         return Err(AppError::BadRequest(

@@ -7,6 +7,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::billing::polar::PolarConfig;
+use crate::error::ErrorCode;
 use crate::error::AppError;
 use crate::models::coupon::*;
 
@@ -73,20 +74,20 @@ pub async fn create_coupon(
 
     // Validate type
     if req.coupon_type != "polar" && req.coupon_type != "internal" {
-        return Err(AppError::BadRequest("Type must be 'polar' or 'internal'".into()));
+        return Err(AppError::coded(ErrorCode::InvalidPaymentType));
     }
 
     // Validate discount_type
     if req.discount_type != "percentage" && req.discount_type != "free_month" {
-        return Err(AppError::BadRequest("Discount type must be 'percentage' or 'free_month'".into()));
+        return Err(AppError::coded(ErrorCode::InvalidDiscountType));
     }
 
     // Validate discount_value
     if req.discount_type == "percentage" && (req.discount_value < 0 || req.discount_value > 100) {
-        return Err(AppError::BadRequest("Percentage must be between 0 and 100".into()));
+        return Err(AppError::coded(ErrorCode::InvalidPercentage));
     }
     if req.discount_type == "free_month" && req.discount_value < 1 {
-        return Err(AppError::BadRequest("Free month count must be at least 1".into()));
+        return Err(AppError::coded(ErrorCode::InvalidFreeMonths));
     }
 
     // Check code uniqueness
@@ -98,7 +99,7 @@ pub async fn create_coupon(
     .await?;
 
     if existing > 0 {
-        return Err(AppError::BadRequest("Coupon code already exists".into()));
+        return Err(AppError::coded(ErrorCode::CouponDuplicate));
     }
 
     // Parse expires_at if provided
@@ -157,21 +158,21 @@ pub async fn update_coupon(
     // Validate type if provided
     if let Some(ref coupon_type) = req.coupon_type {
         if coupon_type != "polar" && coupon_type != "internal" {
-            return Err(AppError::BadRequest("Type must be 'polar' or 'internal'".into()));
+            return Err(AppError::coded(ErrorCode::InvalidPaymentType));
         }
     }
 
     // Validate discount_type if provided
     if let Some(ref discount_type) = req.discount_type {
         if discount_type != "percentage" && discount_type != "free_month" {
-            return Err(AppError::BadRequest("Discount type must be 'percentage' or 'free_month'".into()));
+            return Err(AppError::coded(ErrorCode::InvalidDiscountType));
         }
     }
 
     // Validate discount_value if provided
     if let Some(discount_value) = req.discount_value {
         if discount_value < 0 || discount_value > 100 {
-            return Err(AppError::BadRequest("Discount value must be between 0 and 100".into()));
+            return Err(AppError::coded(ErrorCode::InvalidDiscountValue));
         }
     }
 
@@ -186,7 +187,7 @@ pub async fn update_coupon(
         .await?;
 
         if existing > 0 {
-            return Err(AppError::BadRequest("Coupon code already exists".into()));
+            return Err(AppError::coded(ErrorCode::CouponDuplicate));
         }
     }
 
@@ -271,7 +272,7 @@ pub async fn sync_to_polar(
     .ok_or(AppError::NotFound)?;
 
     if coupon.coupon_type != "polar" {
-        return Err(AppError::BadRequest("Only polar-type coupons can be synced to Polar.sh".into()));
+        return Err(AppError::coded(ErrorCode::PolarSyncOnly));
     }
 
     // Create discount in Polar

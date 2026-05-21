@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::billing::Plan;
+use crate::error::ErrorCode;
 use crate::error::AppError;
 use crate::feature_flags::FeatureFlagService;
 use crate::models::customer::Customer;
@@ -429,7 +430,7 @@ async fn update_retry_policy(
 
     // Gate behind custom_retry_schedules feature flag
     if !feature_flags.is_enabled("custom_retry_schedules").await {
-        return Err(AppError::BadRequest("Custom retry schedules are not enabled. Contact support to enable this feature.".into()));
+        return Err(AppError::coded(ErrorCode::CustomRetryDisabled));
     }
 
     // Verify ownership

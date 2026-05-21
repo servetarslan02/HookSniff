@@ -8,6 +8,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::config::Config;
+use crate::error::ErrorCode;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
@@ -56,10 +57,10 @@ pub async fn admin_refund_user(
     require_admin_write(&customer)?;
 
     if req.amount_cents <= 0 {
-        return Err(AppError::BadRequest("Refund amount must be positive".into()));
+        return Err(AppError::coded(ErrorCode::InvalidRefundAmount));
     }
     if req.reason.trim().is_empty() {
-        return Err(AppError::BadRequest("Refund reason cannot be empty".into()));
+        return Err(AppError::coded(ErrorCode::RefundReasonRequired));
     }
 
     // Get full customer record for the target user
@@ -72,7 +73,7 @@ pub async fn admin_refund_user(
     .ok_or(AppError::NotFound)?;
 
     if target.plan == "free" || target.plan == "developer" {
-        return Err(AppError::BadRequest("Cannot refund a free plan".into()));
+        return Err(AppError::coded(ErrorCode::CannotRefundFree));
     }
 
     let provider = if target.payment_provider.is_empty() { "polar" } else { &target.payment_provider };

@@ -25,6 +25,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::models::customer::Customer;
 
 pub fn router() -> Router {
@@ -109,7 +110,7 @@ async fn create_alert(
     // HS-038k: Validate condition string against allowed values
     let valid_conditions = ["failure_rate", "latency", "consecutive_failures"];
     if !valid_conditions.contains(&req.condition.as_str()) {
-        return Err(AppError::BadRequest("Invalid alert condition".into()));
+        return Err(AppError::coded(ErrorCode::InvalidAlertCondition));
     }
 
     // Validate threshold is positive
@@ -123,7 +124,7 @@ async fn create_alert(
     let valid_channels = ["slack", "email", "webhook"];
     for ch in &req.channels {
         if !valid_channels.contains(&ch.as_str()) {
-            return Err(AppError::BadRequest("Invalid notification channel".into()));
+            return Err(AppError::coded(ErrorCode::InvalidNotificationChannel));
         }
     }
 
@@ -193,7 +194,7 @@ async fn update_alert(
     if let Some(ref cond) = req.condition {
         let valid_conditions = ["failure_rate", "latency", "consecutive_failures"];
         if !valid_conditions.contains(&cond.as_str()) {
-            return Err(AppError::BadRequest("Invalid alert condition".into()));
+            return Err(AppError::coded(ErrorCode::InvalidAlertCondition));
         }
     }
 
@@ -211,7 +212,7 @@ async fn update_alert(
         let valid_channels = ["slack", "email", "webhook"];
         for ch in channels {
             if !valid_channels.contains(&ch.as_str()) {
-                return Err(AppError::BadRequest("Invalid notification channel".into()));
+                return Err(AppError::coded(ErrorCode::InvalidNotificationChannel));
             }
         }
     }

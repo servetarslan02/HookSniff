@@ -19,6 +19,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::models::customer::Customer;
 
 pub fn router() -> Router {
@@ -148,7 +149,7 @@ async fn upsert_portal_config(
     // Validate custom CSS length and sanitize
     if let Some(ref css) = req.custom_css {
         if css.len() > 10_000 {
-            return Err(AppError::BadRequest("custom_css must be under 10KB".into()));
+            return Err(AppError::coded(ErrorCode::CssTooLarge));
         }
         // Reject CSS containing dangerous patterns (XSS prevention)
         let lower = css.to_lowercase();

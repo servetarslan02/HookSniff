@@ -1,4 +1,5 @@
 use super::*;
+use crate::error::ErrorCode;
 
 pub async fn get_subscription(
     Extension(pool): Extension<PgPool>,
@@ -482,7 +483,7 @@ pub async fn upgrade_plan(
 
     // Prevent same-plan upgrade
     if new_plan == current_plan {
-        return Err(AppError::BadRequest("You are already on this plan".into()));
+        return Err(AppError::coded(ErrorCode::AlreadyOnPlan));
     }
 
     // If subscription was scheduled for cancellation, uncancel it (upgrade overrides cancellation)
@@ -543,7 +544,7 @@ pub async fn upgrade_plan(
             // Check expiry
             if let Some(expires_at) = coupon.expires_at {
                 if now > expires_at {
-                    return Err(AppError::BadRequest("This coupon has expired".into()));
+                    return Err(AppError::coded(ErrorCode::CouponExpired));
                 }
             }
 
@@ -571,7 +572,7 @@ pub async fn upgrade_plan(
             };
 
             if updated_rows == 0 {
-                return Err(AppError::BadRequest("This coupon has reached its maximum usage".into()));
+                return Err(AppError::coded(ErrorCode::CouponMaxUsage));
             }
 
             // Check if already used by this customer
@@ -585,7 +586,7 @@ pub async fn upgrade_plan(
             .unwrap_or(0);
 
             if already_used > 0 {
-                return Err(AppError::BadRequest("You have already used this coupon".into()));
+                return Err(AppError::coded(ErrorCode::CouponAlreadyUsed));
             }
 
             // Check plan match

@@ -8,6 +8,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::feature_flags::FeatureFlagService;
 use crate::models::customer::Customer;
 
@@ -268,7 +269,7 @@ pub async fn admin_delete_user_data(
             .fetch_one(&pool)
             .await?;
     if is_target_admin {
-        return Err(AppError::BadRequest("Cannot delete admin user data".into()));
+        return Err(AppError::coded(ErrorCode::CannotDeleteAdmin));
     }
 
     let mut tx = pool.begin().await?;
@@ -377,10 +378,10 @@ pub async fn admin_bulk_email(
     }
 
     if req.subject.trim().is_empty() {
-        return Err(AppError::BadRequest("Email subject cannot be empty".into()));
+        return Err(AppError::coded(ErrorCode::EmailSubjectRequired));
     }
     if req.body.trim().is_empty() {
-        return Err(AppError::BadRequest("Email body cannot be empty".into()));
+        return Err(AppError::coded(ErrorCode::EmailBodyRequired));
     }
     if req.subject.len() > 500 {
         return Err(AppError::BadRequest(
