@@ -302,6 +302,7 @@ mod tests {
             paused_until: None,
             pause_plan: None,
             has_used_startup_trial: false,
+            billing_interval: None,
         }
     }
 
