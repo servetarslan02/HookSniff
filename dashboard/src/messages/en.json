@@ -959,7 +959,8 @@
     "downgradeTo": "Switch to {plan}",
     "free": "Free",
     "statusLabel": "Status",
-    "noPaymentMethod": "No payment method on file. Add one when upgrading to a paid plan."
+    "noPaymentMethod": "No payment method on file. Add one when upgrading to a paid plan.",
+    "includedInPlan": "Included in your plan"
   },
   "auth": {
     "login": "Log In",
