@@ -627,7 +627,7 @@ async fn get_login_attempts(
     }
 
     let page: i64 = query.get("page").and_then(|p| p.parse().ok()).unwrap_or(1).max(1);
-    let limit: i64 = query.get("limit").and_then(|l| l.parse().ok()).unwrap_or(50).min(100);
+    let limit: i64 = query.get("limit").and_then(|l| l.parse().ok()).unwrap_or(50).min(200);
     let offset = (page - 1) * limit;
 
     let attempts = sqlx::query_as::<_, LoginAttempt>(

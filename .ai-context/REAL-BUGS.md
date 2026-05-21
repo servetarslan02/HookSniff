@@ -26,11 +26,9 @@
 **Risk:** Geçersiz emailler DB'ye yazılabilir
 **Çözüm:** `validator` crate ile RFC 5322 email validation ekle veya mevcut `validation.rs`'deki `validate_email` fonksiyonunu kullan
 
-### BUG-004: NOTIFY_EMAIL Hardcoded Kişisel Email
-**Dosya:** `api/src/routes/contact.rs:91`
-**Sorun:** `NOTIFY_EMAIL` env var yoksa `servetarslan02@gmail.com` kişisel email'i fallback olarak kullanılıyor
-**Risk:** Contact form mesajları yanlış yere gidebilir, kişisel email ifşa
-**Çözüm:** Config'den oku veya env var zorunlu yap
+### BUG-004: NOTIFY_EMAIL Hardcoded Kişisel Email ✅ DÜZELTİLDİ
+**Dosya:** `api/src/routes/contact.rs`
+**Durum:** Hardcoded email kaldırıldı, config'den okunuyor
 
 ---
 
@@ -121,17 +119,13 @@
 **Durum:** `RequestBodyLimitLayer::new(2MB)` middleware eklendi
 **Commit:** 7bbd9afc
 
-### BUG-020: 2FA Backup Codes Yok
-**Dosya:** `api/src/routes/auth.rs`
-**Sorun:** 2FA etkinleştirildiğinde backup/recovery code üretilmiyor. Kullanıcı TOTP cihazını kaybederse hesabı kilitlenir.
-**Risk:** Hesap erişimi kalıcı kayıp
-**Çözüm:** 2FA aktifleştirme sırasında 8-10 backup code üret, DB'de hash'le sakla
+### BUG-020: 2FA Backup Codes ✅ DÜZELTİLDİ
+**Dosya:** `api/src/routes/auth_2fa.rs`
+**Durum:** 8 backup code üretiliyor, hash'leniyor, `tfa_backup_codes` tablosuna kaydediliyor. Login'de backup code ile doğrulama destekleniyor.
 
-### BUG-021: Password Policy Çok Zayıf
-**Dosya:** `api/src/routes/auth.rs:148`
-**Sorun:** Sadece minimum 8 karakter kontrolü. Büyük/küçük harf, rakam, özel karakter zorunlu değil.
-**Risk:** Zayıf şifreler
-**Çözüm:** En az 1 büyük harf + 1 rakam + minimum 8 karakter
+### BUG-021: Password Policy ✅ DÜZELTİLDİ
+**Dosya:** `api/src/routes/auth.rs:43`
+**Durum:** `validate_password_strength()` — min 8, max 128, uppercase + lowercase + digit zorunlu
 
 ### BUG-022: CSP'de unsafe-inline + unsafe-eval
 **Dosya:** `dashboard/next.config.js`
@@ -167,10 +161,9 @@
 **Sorun:** Cloud Run'da IP'ler değişebilir, statik env var'dan okunuyor
 **Çözüm:** Cache'le (TTL 5dk) veya Cloud Run metadata API'den dinamik çek
 
-### BUG-028: Pagination Per-Page Limit Tutarlı Değil
+### BUG-028: Pagination Per-Page Limit ✅ DÜZELTİLDİ (2026-05-21)
 **Dosya:** Çeşitli route handler'lar
-**Sorun:** Bazıları min(200), bazıları min(100), bazıları limitsiz
-**Çözüm:** Global `MAX_PER_PAGE = 200` sabiti
+**Durum:** `sso.rs` hariç tüm endpoint'ler `.min(200)` kullanıyordu. `sso.rs:630` da `.min(200)`'e düzeltildi. Tutarlılık sağlandı.
 
 ### BUG-029: deny_unknown_fields Kullanılmıyor
 **Dosya:** Tüm request struct'ları
