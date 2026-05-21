@@ -423,18 +423,7 @@ pub async fn upgrade_plan(
             ));
         }
         Plan::Enterprise => {
-            // Item 256: Enterprise requires contact — return contact info instead of checkout
-            return Ok(Json(UpgradeResponse {
-                checkout_url: None,
-                provider: customer.payment_provider.clone(),
-                message: "Enterprise plan requires a custom agreement. Contact us to get started.".into(),
-                prorated_amount_cents: None,
-                days_remaining: None,
-                requires_contact: Some(true),
-                contact_url: Some(
-                    "mailto:enterprise@hooksniff.dev?subject=Enterprise%20Plan%20Inquiry".into(),
-                ),
-            }));
+            // Enterprise goes through normal checkout like other plans
         }
         _ => {}
     }
