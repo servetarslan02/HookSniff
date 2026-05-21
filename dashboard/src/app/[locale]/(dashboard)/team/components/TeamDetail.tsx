@@ -308,7 +308,7 @@ export function TeamDetail({
                 <div className="flex items-center gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   <select
                     value={m.role}
-                    onChange={(e) => onRoleChange(m.id, e.target.value)}
+                    onChange={(e) => onRoleChange(m.customer_id, e.target.value)}
                     disabled={!canChangeRole}
                     className={`text-xs font-medium px-2.5 py-1.5 rounded-lg border-0 cursor-pointer focus:ring-2 focus:ring-brand-500 transition ${ROLE_STYLES[m.role] || ROLE_STYLES.viewer}`}
                   >
@@ -318,7 +318,7 @@ export function TeamDetail({
                   </select>
                   <button
                     type="button"
-                    onClick={() => onRemoveMember(m.id)}
+                    onClick={() => onRemoveMember(m.customer_id)}
                     disabled={!canRemove}
                     className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
                     title={t('removeBtn')}
