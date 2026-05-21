@@ -133,7 +133,10 @@ export default function FeatureFlagsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white"><Flag size={16} strokeWidth={1.75} className="inline mr-1" /> {t('pageTitle')}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <Flag size={20} strokeWidth={1.75} />
+            {t('pageTitle')}
+          </h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
             {t('pageDesc')}
           </p>
@@ -160,9 +163,9 @@ export default function FeatureFlagsPage() {
         ) : (
           <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
             {flags.map((flag) => (
-              <div key={flag.id} className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 flex-1 min-w-0">
+              <div key={flag.id} className="px-4 sm:px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                     {/* Toggle */}
                     <button
                       type="button"
@@ -184,15 +187,19 @@ export default function FeatureFlagsPage() {
                     </button>
 
                     {/* Info */}
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900 dark:text-white">{flag.name}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-gray-900 dark:text-white truncate">{flag.name}</span>
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                           flag.is_enabled
                             ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
                             : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400'
                         }`}>
                           {flag.is_enabled ? ta('flagActive') : ta('flagInactive')}
+                        </span>
+                        {/* Rollout - inline on mobile */}
+                        <span className="text-xs text-gray-500 dark:text-slate-400 sm:hidden">
+                          {flag.rollout_percentage ?? 100}% {t('rollout')}
                         </span>
                       </div>
                       {flag.description && (
@@ -201,15 +208,15 @@ export default function FeatureFlagsPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    {/* Rollout */}
-                    <div className="text-right">
+                  <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+                    {/* Rollout - desktop */}
+                    <div className="text-right hidden sm:block">
                       <span className="text-sm font-medium text-gray-900 dark:text-white">{flag.rollout_percentage ?? 100}%</span>
                       <p className="text-xs text-gray-500 dark:text-slate-400">{t('rollout')}</p>
                     </div>
 
                     {/* Plans */}
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 flex-wrap">
                       {flag.enabled_for_plans && flag.enabled_for_plans.length > 0 ? (
                         flag.enabled_for_plans.map((plan) => (
                           <span key={plan} className="px-2 py-0.5 rounded-full text-xs bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400">
@@ -217,7 +224,7 @@ export default function FeatureFlagsPage() {
                           </span>
                         ))
                       ) : (
-                        <span className="text-xs text-gray-400 dark:text-slate-500">{t('allPlans')}</span>
+                        <span className="text-xs text-gray-400 dark:text-slate-500 hidden sm:block">{t('allPlans')}</span>
                       )}
                     </div>
 
