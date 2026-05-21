@@ -55,6 +55,7 @@ totp-rs = { version = "5", features = ["otpauth"] }
 base32 = "0.5"
 urlencoding = "2"
 aes-gcm = "0.10"
+quick-xml = { version = "0.37", features = ["serialize"] }
 
 [dev-dependencies]
 proptest = "1"
