@@ -175,6 +175,7 @@ struct SsoLoginState {
     redirect: Option<String>,
     saml_request_id: Option<String>,
     auto_join_team_id: Option<Uuid>,
+    default_role: String,
     created_at: DateTime<Utc>,
 }
 
@@ -996,11 +997,11 @@ async fn initiate_sso_login(
     }
 
     // Strategy 2: Find SSO config — try by customer_id, then by team membership, then by domain
-    // Returns: (owner_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_enc, entity_id)
-    let config: Option<(Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)> = if let Some(ref customer) = existing_customer {
+    // Returns: (owner_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_enc, entity_id, default_role)
+    let config: Option<(Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)> = if let Some(ref customer) = existing_customer {
         // Existing user: look up by customer_id first (backward compat)
-        let by_customer = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-            "SELECT customer_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
+        let by_customer = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT customer_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id, default_role FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
         )
         .bind(customer.id)
         .fetch_optional(&pool)
@@ -1010,8 +1011,8 @@ async fn initiate_sso_login(
             by_customer
         } else {
             // Try: find by team membership (user is in a team that has SSO)
-            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id
+            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id, s.default_role
                  FROM sso_configs s
                  INNER JOIN team_members tm ON tm.team_id = s.team_id
                  WHERE tm.customer_id = $1 AND s.enabled = true AND s.team_id IS NOT NULL
@@ -1023,8 +1024,8 @@ async fn initiate_sso_login(
         }
     } else {
         // New user: find SSO config by verified_domain first, then by email domain
-        let by_verified_domain = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-            "SELECT COALESCE(customer_id, created_by), team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id
+        let by_verified_domain = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT COALESCE(customer_id, created_by), team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id, default_role
              FROM sso_configs WHERE enabled = true AND verified_domain = $1 LIMIT 1"
         )
         .bind(domain)
@@ -1036,8 +1037,8 @@ async fn initiate_sso_login(
         } else {
             // Fallback: match by email domain in customer table
             // Use SPLIT_PART for safe domain extraction (parameterized, no injection)
-            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id
+            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id, s.default_role
                  FROM sso_configs s
                  INNER JOIN customers c ON c.id = s.customer_id
                  WHERE s.enabled = true AND SPLIT_PART(c.email, '@', 2) = $1
@@ -1049,8 +1050,10 @@ async fn initiate_sso_login(
         }
     };
 
-    let (sso_owner_id, config_team_id, provider, enabled, _metadata_url, sso_url, _certificate, issuer_url, client_id, client_secret_enc, entity_id) =
+    let (sso_owner_id, config_team_id, provider, enabled, _metadata_url, sso_url, _certificate, issuer_url, client_id, client_secret_enc, entity_id, default_role) =
         config.ok_or_else(|| AppError::BadRequest("SSO is not configured for this account. Contact your administrator.".into()))?;
+
+    let default_role = default_role.unwrap_or_else(|| "viewer".to_string());
 
     if !enabled {
         return Err(AppError::BadRequest("SSO is not enabled for this account. Contact your administrator.".into()));
@@ -1087,6 +1090,7 @@ async fn initiate_sso_login(
         redirect: query.redirect.clone(),
         saml_request_id: saml_request_id.clone(),
         auto_join_team_id,
+        default_role: default_role.clone(),
         created_at: Utc::now(),
     }).await;
 
@@ -1348,7 +1352,8 @@ async fn saml_callback(
 
     // Auto-join to team if configured
     if let Some(team_id) = auto_join_team {
-        let _ = auto_join_team_direct(&pool, customer.id, team_id, "viewer").await;
+        let role = login_state.as_ref().map(|ls| ls.default_role.clone()).unwrap_or_else(|| "viewer".to_string());
+        let _ = auto_join_team_direct(&pool, customer.id, team_id, &role).await;
     }
 
     // Log attempt
@@ -1505,7 +1510,8 @@ async fn oidc_callback(
 
     // Auto-join to team if configured
     if let Some(team_id) = auto_join_team {
-        let _ = auto_join_team_direct(&pool, customer.id, team_id, "viewer").await;
+        let role = login_state.default_role.clone();
+        let _ = auto_join_team_direct(&pool, customer.id, team_id, &role).await;
     }
 
     // Log attempt
