@@ -1,6 +1,7 @@
 /// Analytics API endpoints for dashboard charts and metrics.
 ///
 /// Provides time-bucketed delivery data, success rates, and latency metrics.
+/// Analyst role (level 20+) can access all analytics endpoints via service token.
 use axum::extract::{Extension, Query};
 use axum::routing::get;
 use axum::{Json, Router};
@@ -16,6 +17,7 @@ pub fn router() -> Router {
         .route("/deliveries", get(delivery_trend))
         .route("/success-rate", get(success_rate))
         .route("/latency", get(latency_trend))
+        .route("/analyst-dashboard", get(analyst_dashboard))
 }
 
 #[derive(Debug, Deserialize)]
@@ -223,6 +225,132 @@ async fn latency_trend(
             .collect(),
         overall_avg_ms: overall.0,
     }))
+}
+
+/// GET /v1/analytics/analyst-dashboard
+/// Comprehensive dashboard for analyst role — combines key metrics in one call.
+/// Requires analyst role (level 20+) when using service token.
+///
+/// Returns:
+/// - Total deliveries (24h, 7d, 30d)
+/// - Success rate (24h)
+/// - Top 5 failing endpoints
+/// - Top 5 event types
+/// - Average latency (24h)
+/// - Active endpoints count
+async fn analyst_dashboard(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require analyst for dashboard ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_analyst(&pool, scope.team_id, customer.id).await?;
+    }
+
+    // Team filter
+    let team_filter = service_token.as_ref().map(|s| s.team_id);
+
+    // Total deliveries by period
+    let deliveries_24h: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND created_at >= now() - INTERVAL '24 hours'"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    let deliveries_7d: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND created_at >= now() - INTERVAL '7 days'"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    let deliveries_30d: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM deliveries WHERE customer_id = $1 AND created_at >= now() - INTERVAL '30 days'"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    // Success rate (24h)
+    let success: (i64, i64, i64) = sqlx::query_as(
+        "SELECT \
+            COUNT(*) FILTER (WHERE status = 'delivered'), \
+            COUNT(*) FILTER (WHERE status = 'failed'), \
+            COUNT(*) \
+         FROM deliveries WHERE customer_id = $1 AND created_at >= now() - INTERVAL '24 hours'"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    let success_rate = if success.2 > 0 {
+        (success.0 as f64 / success.2 as f64) * 100.0
+    } else {
+        100.0
+    };
+
+    // Top 5 failing endpoints
+    let failing_endpoints: Vec<(String, String, i64)> = sqlx::query_as(
+        "SELECT e.name, e.url, COUNT(*) as fail_count \
+         FROM deliveries d JOIN endpoints e ON d.endpoint_id = e.id \
+         WHERE d.customer_id = $1 AND d.status = 'failed' AND d.created_at >= now() - INTERVAL '7 days' \
+         GROUP BY e.name, e.url ORDER BY fail_count DESC LIMIT 5"
+    )
+    .bind(customer.id)
+    .fetch_all(&pool)
+    .await?;
+
+    // Top 5 event types
+    let top_events: Vec<(String, i64)> = sqlx::query_as(
+        "SELECT event_type, COUNT(*) as cnt \
+         FROM deliveries WHERE customer_id = $1 AND created_at >= now() - INTERVAL '7 days' \
+         GROUP BY event_type ORDER BY cnt DESC LIMIT 5"
+    )
+    .bind(customer.id)
+    .fetch_all(&pool)
+    .await?;
+
+    // Average latency (24h)
+    let latency: (f64,) = sqlx::query_as(
+        "SELECT COALESCE(AVG(da.duration_ms), 0)::FLOAT \
+         FROM delivery_attempts da JOIN deliveries d ON d.id = da.delivery_id \
+         WHERE d.customer_id = $1 AND da.created_at >= now() - INTERVAL '24 hours' AND da.duration_ms IS NOT NULL"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    // Active endpoints count
+    let active_endpoints: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1 AND is_active = true"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    Ok(Json(serde_json::json!({
+        "period": {
+            "deliveries_24h": deliveries_24h.0,
+            "deliveries_7d": deliveries_7d.0,
+            "deliveries_30d": deliveries_30d.0,
+        },
+        "success_rate_24h": {
+            "rate": success_rate,
+            "successful": success.0,
+            "failed": success.1,
+            "total": success.2,
+        },
+        "top_failing_endpoints": failing_endpoints.iter().map(|(name, url, count)| {
+            serde_json::json!({"name": name, "url": url, "fail_count": count})
+        }).collect::<Vec<_>>(),
+        "top_event_types": top_events.iter().map(|(event, count)| {
+            serde_json::json!({"event": event, "count": count})
+        }).collect::<Vec<_>>(),
+        "avg_latency_24h_ms": latency.0,
+        "active_endpoints": active_endpoints.0,
+    })))
 }
 
 #[cfg(test)]
