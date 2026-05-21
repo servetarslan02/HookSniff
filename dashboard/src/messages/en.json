@@ -942,6 +942,7 @@
     "overageSettingsSaved": "Overage settings saved.",
     "actions": "Actions",
     "requestRefund": "Request Refund",
+    "downloadInvoice": "Download Invoice",
     "refundTitle": "Request Refund",
     "refundDesc": "Refunds are available within 14 days of purchase. Your plan will be downgraded to Free.",
     "refundReasonPlaceholder": "Why are you requesting a refund?",

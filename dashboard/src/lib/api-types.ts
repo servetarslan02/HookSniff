@@ -555,6 +555,8 @@ export interface Invoice {
   amount: number;
   status: 'paid' | 'pending' | 'failed';
   plan: string;
+  provider: string;
+  provider_invoice_id?: string | null;
 }
 
 export interface AlertRule {

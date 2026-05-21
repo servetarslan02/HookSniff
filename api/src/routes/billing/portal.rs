@@ -103,6 +103,8 @@ pub(crate) struct InvoiceResponse {
     pub(crate) amount: f64,
     pub(crate) status: String,
     pub(crate) plan: String,
+    pub(crate) provider: String,
+    pub(crate) provider_invoice_id: Option<String>,
 }
 
 type InvoiceRow = (
@@ -113,6 +115,8 @@ type InvoiceRow = (
     String,
     Option<chrono::DateTime<chrono::Utc>>,
     chrono::DateTime<chrono::Utc>,
+    String,
+    Option<String>,
 );
 
 
@@ -121,7 +125,7 @@ pub async fn get_invoices(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<InvoiceResponse>>, AppError> {
     let rows: Vec<InvoiceRow> = sqlx::query_as(
-        "SELECT id, amount_cents, currency, status, plan, paid_at, created_at \
+        "SELECT id, amount_cents, currency, status, plan, paid_at, created_at, provider, provider_invoice_id \
              FROM invoices WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100",
     )
     .bind(customer.id)
@@ -131,7 +135,7 @@ pub async fn get_invoices(
     let invoices: Vec<InvoiceResponse> = rows
         .into_iter()
         .map(
-            |(id, amount_cents, _currency, status, plan, paid_at, created_at)| {
+            |(id, amount_cents, _currency, status, plan, paid_at, created_at, provider, provider_invoice_id)| {
                 let date = paid_at.unwrap_or(created_at);
                 InvoiceResponse {
                     id: id.to_string(),
@@ -139,6 +143,8 @@ pub async fn get_invoices(
                     amount: amount_cents as f64 / 100.0,
                     status,
                     plan,
+                    provider,
+                    provider_invoice_id,
                 }
             },
         )
