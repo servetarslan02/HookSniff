@@ -33,6 +33,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
  const [testing, setTesting] = useState(false);
  const [defaultTeamId, setDefaultTeamId] = useState<string>('');
  const [defaultRole, setDefaultRole] = useState<string>('viewer');
+ const [clientSecret, setClientSecret] = useState('');
 
  const { data: teams = [] } = useTeams();
  const [testPassed, setTestPassed] = useState(false);
@@ -83,7 +84,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    } else {
     body.issuer_url = metadata || null;
     body.client_id = entityId || null;
-    if (certificate) body.client_secret = certificate;
+    if (clientSecret) body.client_secret = clientSecret;
    }
    // Verified domain
    if (domainInput.trim()) body.verified_domain = domainInput.trim();
@@ -174,6 +175,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    setEntityId('');
    setSsoUrl('');
    setCertificate('');
+   setClientSecret('');
    setTestPassed(false);
    refetch();
   } catch (err) {
@@ -457,7 +459,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
         {t('clientSecret')}
         {ssoConfig?.client_secret_set && <span className="ml-2 text-emerald-600 dark:text-emerald-400 text-xs"><Check size={16} strokeWidth={1.75} className="inline mr-1" /> {t('clientSecretSet')}</span>}
        </label>
-       <input id="sso-client-secret" type="password" autoComplete="off" value={certificate} onChange={(e) => setCertificate(e.target.value)} disabled={isEnforced}
+       <input id="sso-client-secret" type="password" autoComplete="off" value={clientSecret} onChange={(e) => setClientSecret(e.target.value)} disabled={isEnforced}
         placeholder={ssoConfig?.client_secret_set ? '•••••••• (leave empty to keep)' : 'your-client-secret'}
         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed" />
       </div>

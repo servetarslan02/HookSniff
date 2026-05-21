@@ -1,0 +1,10 @@
+{
+  "name": "hooksniff-sso-test",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.18.0",
+    "jsonwebtoken": "^9.0.0",
+    "jose": "^5.0.0"
+  }
+}
