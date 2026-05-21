@@ -463,6 +463,24 @@ pub async fn upgrade_plan(
         return Err(AppError::BadRequest("You are already on this plan".into()));
     }
 
+    // If subscription was scheduled for cancellation, uncancel it (upgrade overrides cancellation)
+    if customer.cancel_at_period_end {
+        sqlx::query("UPDATE customers SET cancel_at_period_end = false, updated_at = NOW() WHERE id = $1")
+            .bind(customer.id)
+            .execute(&pool)
+            .await?;
+    }
+
+    // If subscription was paused, clear pause state (upgrade overrides pause)
+    if customer.paused_at.is_some() {
+        sqlx::query(
+            "UPDATE customers SET paused_at = NULL, paused_until = NULL, pause_plan = NULL, updated_at = NOW() WHERE id = $1"
+        )
+        .bind(customer.id)
+        .execute(&pool)
+        .await?;
+    }
+
     // Item 258: Validate plan transition — only allow upgrading to a higher tier
     let plan_tier = |p: &Plan| match p {
         Plan::Developer => 0,
