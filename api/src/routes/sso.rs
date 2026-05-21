@@ -1371,7 +1371,7 @@ async fn saml_callback(
     let assertion = parse_saml_response(&saml_xml)?;
 
     // Verify SAML response has a signature element
-    let has_signature = saml_xml.contains("<ds:Signature") || saml_xml.contains("<Signature");
+    let has_signature = xml_has_element(&saml_xml, "Signature");
     if !has_signature {
         tracing::warn!("SAML response missing digital signature");
         log_sso_attempt(&pool, None, &assertion.name_id, "saml", false, Some("Missing signature"), &headers).await;
@@ -1801,52 +1801,199 @@ fn parse_saml_response(xml: &str) -> Result<SamlAssertion, AppError> {
     })
 }
 
-/// Extract text content from an XML element by tag name
+/// Extract text content from an XML element by tag name (namespace-agnostic).
+///
+/// Uses `quick-xml` to properly parse XML and find the first element whose
+/// local name matches `tag`, regardless of namespace prefix (saml:, saml2p:, ds:, etc).
 fn extract_xml_text(xml: &str, tag: &str) -> Option<String> {
-    // Try multiple tag patterns: plain, namespaced with common prefixes
-    let prefixes = ["", "saml:", "saml2p:", "md:", "ds:"];
-    for prefix in &prefixes {
-        let full_tag = format!("{}{}", prefix, tag);
-        let start_tag = format!("<{}", full_tag);
-        let end_tag = format!("</{}", full_tag);
+    use quick_xml::events::Event;
+    use quick_xml::Reader;
 
-        if let Some(start) = xml.find(&start_tag) {
-            let content_start = xml[start..].find('>')? + start + 1;
-            if let Some(content_end) = xml[content_start..].find(&end_tag) {
-                return Some(xml[content_start..content_start + content_end].trim().to_string());
+    let mut reader = Reader::from_str(xml);
+    reader.trim_text(true);
+    let mut buf = Vec::new();
+    let mut depth: u32 = 0;
+    let mut in_target = false;
+    let mut result = String::new();
+
+    loop {
+        match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) => {
+                if local_name_matches(e.name(), tag) {
+                    in_target = true;
+                    depth = 1;
+                    result.clear();
+                } else if in_target {
+                    depth += 1;
+                }
             }
+            Ok(Event::Empty(ref e)) => {
+                // Self-closing tag — text is empty, return empty string only if we haven't found anything yet
+                if local_name_matches(e.name(), tag) && !in_target {
+                    return Some(String::new());
+                }
+            }
+            Ok(Event::Text(ref e)) if in_target && depth == 1 => {
+                if let Ok(text) = e.unescape() {
+                    result.push_str(&text);
+                }
+            }
+            Ok(Event::End(ref e)) => {
+                if in_target {
+                    if local_name_matches(e.name(), tag) {
+                        return Some(result.trim().to_string());
+                    }
+                    depth = depth.saturating_sub(1);
+                    if depth == 0 {
+                        in_target = false;
+                    }
+                }
+            }
+            Ok(Event::Eof) => break,
+            _ => {}
         }
+        buf.clear();
     }
     None
 }
 
-/// Extract an attribute value from an XML element
+/// Extract an attribute value from the first XML element matching `element` by local name.
+///
+/// Namespace-agnostic: matches `element` regardless of prefix.
 fn extract_xml_attribute(xml: &str, element: &str, attr: &str) -> Option<String> {
-    let element_tag = format!("<{}", element);
-    let start = xml.find(&element_tag)?;
-    let tag_end = xml[start..].find('>')? + start;
-    let tag_content = &xml[start..tag_end];
+    use quick_xml::events::Event;
+    use quick_xml::Reader;
 
-    let attr_pattern = format!("{}=\"", attr);
-    let attr_start = tag_content.find(&attr_pattern)? + attr_pattern.len();
-    let attr_end = tag_content[attr_start..].find('"')? + attr_start;
+    let mut reader = Reader::from_str(xml);
+    reader.trim_text(true);
+    let mut buf = Vec::new();
 
-    Some(tag_content[attr_start..attr_end].to_string())
+    loop {
+        match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) | Ok(Event::Empty(ref e)) => {
+                if local_name_matches(e.name(), element) {
+                    for a in e.attributes().flatten() {
+                        if local_name_matches(a.key, attr) {
+                            return std::str::from_utf8(&a.value).ok().map(|s| s.to_string());
+                        }
+                    }
+                }
+            }
+            Ok(Event::Eof) => break,
+            _ => {}
+        }
+        buf.clear();
+    }
+    None
 }
 
-/// Extract a SAML AttributeValue by AttributeName
+/// Extract a SAML AttributeValue by AttributeName.
+///
+/// Finds `<saml:Attribute Name="xxx">` then extracts the text of its `<saml:AttributeValue>` child.
 fn extract_saml_attribute(xml: &str, name: &str) -> Option<String> {
-    let attr_pattern = format!("Name=\"{}\"", name);
-    let attr_pos = xml.find(&attr_pattern)?;
+    use quick_xml::events::Event;
+    use quick_xml::Reader;
 
-    // Find the AttributeValue within this Attribute element
-    let after_attr = &xml[attr_pos..];
-    let value_start_tag = "<saml:AttributeValue";
-    let value_start = after_attr.find(value_start_tag)?;
-    let content_start = after_attr[value_start..].find('>')? + value_start + 1;
-    let content_end = after_attr[content_start..].find("</saml:AttributeValue>")? + content_start;
+    let mut reader = Reader::from_str(xml);
+    reader.trim_text(true);
+    let mut buf = Vec::new();
+    let mut in_attr = false;
+    let mut in_value = false;
+    let mut depth: u32 = 0;
+    let mut result = String::new();
 
-    Some(after_attr[content_start..content_end].trim().to_string())
+    loop {
+        match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) => {
+                if local_name_matches(e.name(), "Attribute") {
+                    // Check if this Attribute has Name="xxx"
+                    for a in e.attributes().flatten() {
+                        if local_name_matches(a.key, "Name") {
+                            if std::str::from_utf8(&a.value).ok() == Some(name) {
+                                in_attr = true;
+                            }
+                            break;
+                        }
+                    }
+                } else if in_attr && local_name_matches(e.name(), "AttributeValue") {
+                    in_value = true;
+                    depth = 1;
+                    result.clear();
+                } else if in_value {
+                    depth += 1;
+                }
+            }
+            Ok(Event::Empty(ref e)) => {
+                if in_attr && local_name_matches(e.name(), "AttributeValue") {
+                    // Self-closing AttributeValue = empty
+                    return Some(String::new());
+                }
+            }
+            Ok(Event::Text(ref e)) if in_value && depth == 1 => {
+                if let Ok(text) = e.unescape() {
+                    result.push_str(&text);
+                }
+            }
+            Ok(Event::End(ref e)) => {
+                if in_value {
+                    if local_name_matches(e.name(), "AttributeValue") {
+                        return Some(result.trim().to_string());
+                    }
+                    depth = depth.saturating_sub(1);
+                    if depth == 0 {
+                        in_value = false;
+                    }
+                }
+                if in_attr && local_name_matches(e.name(), "Attribute") {
+                    in_attr = false;
+                }
+            }
+            Ok(Event::Eof) => break,
+            _ => {}
+        }
+        buf.clear();
+    }
+    None
+}
+
+/// Check if an XML name (possibly namespaced like `saml:NameID`) matches a local name (`NameID`).
+///
+/// `quick-xml` returns names with namespace prefix stripped for `name()` calls,
+/// but we handle both cases for robustness.
+fn local_name_matches(xml_name: &[u8], target: &str) -> bool {
+    let name = std::str::from_utf8(xml_name).unwrap_or("");
+    // Direct match
+    if name == target {
+        return true;
+    }
+    // Strip namespace prefix: "saml:NameID" → "NameID"
+    if let Some(local) = name.rsplit(':').next() {
+        return local == target;
+    }
+    false
+}
+
+/// Check if XML contains an element with the given local name (namespace-agnostic).
+fn xml_has_element(xml: &str, tag: &str) -> bool {
+    use quick_xml::events::Event;
+    use quick_xml::Reader;
+
+    let mut reader = Reader::from_str(xml);
+    let mut buf = Vec::new();
+
+    loop {
+        match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) | Ok(Event::Empty(ref e)) => {
+                if local_name_matches(e.name(), tag) {
+                    return true;
+                }
+            }
+            Ok(Event::Eof) => break,
+            _ => {}
+        }
+        buf.clear();
+    }
+    false
 }
 
 // ── Helper: Decode OIDC ID Token ────────────────────────────
@@ -2217,21 +2364,42 @@ fn verify_saml_signature(xml: &str, certificate_pem: &str) -> Result<(), AppErro
 
 /// Extract the raw XML content of `<ds:SignedInfo>...</ds:SignedInfo>`
 fn extract_signed_info_xml(xml: &str) -> Option<String> {
-    // Try with and without ds: prefix
-    for prefix in &["ds:", ""] {
-        let start_tag = format!("<{}SignedInfo", prefix);
-        let end_tag = format!("</{}SignedInfo>", prefix);
+    use quick_xml::events::Event;
+    use quick_xml::Reader;
 
-        if let Some(start) = xml.find(&start_tag) {
-            // Find the closing > of the opening tag
-            let content_start = xml[start..].find('>')? + start + 1;
-            if let Some(content_end) = xml[content_start..].find(&end_tag) {
-                // Include the opening and closing tags for canonicalization
-                let full_start = start;
-                let full_end = content_start + content_end + end_tag.len();
-                return Some(xml[full_start..full_end].to_string());
+    let mut reader = Reader::from_str(xml);
+    let mut buf = Vec::new();
+    let mut start_offset: Option<usize> = None;
+    let mut depth: u32 = 0;
+
+    loop {
+        let offset = reader.buffer_position();
+        match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) => {
+                if local_name_matches(e.name(), "SignedInfo") {
+                    start_offset = Some(offset);
+                    depth = 1;
+                } else if start_offset.is_some() {
+                    depth += 1;
+                }
             }
+            Ok(Event::End(ref e)) => {
+                if start_offset.is_some() {
+                    if local_name_matches(e.name(), "SignedInfo") {
+                        // Found the closing tag — extract raw XML including both tags
+                        let end_offset = reader.buffer_position();
+                        return Some(xml[start_offset.unwrap()..end_offset].to_string());
+                    }
+                    depth = depth.saturating_sub(1);
+                    if depth == 0 {
+                        start_offset = None;
+                    }
+                }
+            }
+            Ok(Event::Eof) => break,
+            _ => {}
         }
+        buf.clear();
     }
     None
 }
@@ -2577,5 +2745,163 @@ mod tests {
         let haystack = b"hello world";
         assert_eq!(find_byte_sequence(haystack, b"world"), Some(6));
         assert_eq!(find_byte_sequence(haystack, b"xyz"), None);
+    }
+
+    // ── quick-xml SAML parsing tests ────────────────────────
+
+    #[test]
+    fn test_extract_xml_text_namespaced() {
+        let xml = r#"<saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+            <saml:Subject>
+                <saml:NameID>user@example.com</saml:NameID>
+            </saml:Subject>
+        </saml:Assertion>"#;
+        assert_eq!(extract_xml_text(xml, "NameID"), Some("user@example.com".into()));
+    }
+
+    #[test]
+    fn test_extract_xml_text_no_namespace() {
+        let xml = r#"<Response><NameID>test@test.com</NameID></Response>"#;
+        assert_eq!(extract_xml_text(xml, "NameID"), Some("test@test.com".into()));
+    }
+
+    #[test]
+    fn test_extract_xml_text_nested() {
+        let xml = r#"<root>
+            <parent><child>inner text</child></parent>
+            <parent><child>other</child></parent>
+        </root>"#;
+        // Should find the FIRST matching element
+        assert_eq!(extract_xml_text(xml, "child"), Some("inner text".into()));
+    }
+
+    #[test]
+    fn test_extract_xml_text_missing() {
+        let xml = r#"<root><other>value</other></root>"#;
+        assert_eq!(extract_xml_text(xml, "NameID"), None);
+    }
+
+    #[test]
+    fn test_extract_xml_text_audience() {
+        let xml = r#"<saml:AudienceRestriction>
+            <saml:Audience>https://hooksniff.com</saml:Audience>
+        </saml:AudienceRestriction>"#;
+        assert_eq!(extract_xml_text(xml, "Audience"), Some("https://hooksniff.com".into()));
+    }
+
+    #[test]
+    fn test_extract_xml_attribute_response() {
+        let xml = r#"<samlp:Response InResponseTo="_abc123" Destination="https://example.com/callback">
+            <saml:Assertion/>
+        </samlp:Response>"#;
+        assert_eq!(extract_xml_attribute(xml, "Response", "InResponseTo"), Some("_abc123".into()));
+        assert_eq!(extract_xml_attribute(xml, "Response", "Destination"), Some("https://example.com/callback".into()));
+    }
+
+    #[test]
+    fn test_extract_xml_attribute_session_index() {
+        let xml = r#"<saml:Assertion>
+            <saml:AuthnStatement SessionIndex="_session456">
+            </saml:AuthnStatement>
+        </saml:Assertion>"#;
+        assert_eq!(extract_xml_attribute(xml, "AuthnStatement", "SessionIndex"), Some("_session456".into()));
+    }
+
+    #[test]
+    fn test_extract_xml_attribute_not_on_or_after() {
+        let xml = r#"<saml:SubjectConfirmationData NotOnOrAfter="2026-12-31T23:59:59Z" Recipient="https://example.com"/>"#;
+        assert_eq!(
+            extract_xml_attribute(xml, "SubjectConfirmationData", "NotOnOrAfter"),
+            Some("2026-12-31T23:59:59Z".into())
+        );
+    }
+
+    #[test]
+    fn test_extract_saml_attribute_email() {
+        let xml = r#"<saml:AttributeStatement>
+            <saml:Attribute Name="email">
+                <saml:AttributeValue>user@example.com</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute Name="firstName">
+                <saml:AttributeValue>John</saml:AttributeValue>
+            </saml:Attribute>
+        </saml:AttributeStatement>"#;
+        assert_eq!(extract_saml_attribute(xml, "email"), Some("user@example.com".into()));
+        assert_eq!(extract_saml_attribute(xml, "firstName"), Some("John".into()));
+    }
+
+    #[test]
+    fn test_extract_saml_attribute_missing() {
+        let xml = r#"<saml:AttributeStatement>
+            <saml:Attribute Name="email">
+                <saml:AttributeValue>user@example.com</saml:AttributeValue>
+            </saml:Attribute>
+        </saml:AttributeStatement>"#;
+        assert_eq!(extract_saml_attribute(xml, "nonexistent"), None);
+    }
+
+    #[test]
+    fn test_parse_saml_full_assertion() {
+        let xml = r#"<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+                                   xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+                                   InResponseTo="_req123"
+                                   Destination="https://app.example.com/sso/callback">
+            <saml:Assertion>
+                <saml:Subject>
+                    <saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">admin@company.com</saml:NameID>
+                    <saml:SubjectConfirmation>
+                        <saml:SubjectConfirmationData NotOnOrAfter="2099-12-31T23:59:59Z"/>
+                    </saml:SubjectConfirmation>
+                </saml:Subject>
+                <saml:Conditions>
+                    <saml:AudienceRestriction>
+                        <saml:Audience>https://hooksniff.com</saml:Audience>
+                    </saml:AudienceRestriction>
+                </saml:Conditions>
+                <saml:AuthnStatement SessionIndex="_session789">
+                </saml:AuthnStatement>
+                <saml:AttributeStatement>
+                    <saml:Attribute Name="email">
+                        <saml:AttributeValue>admin@company.com</saml:AttributeValue>
+                    </saml:Attribute>
+                    <saml:Attribute Name="firstName">
+                        <saml:AttributeValue>Admin</saml:AttributeValue>
+                    </saml:Attribute>
+                    <saml:Attribute Name="lastName">
+                        <saml:AttributeValue>User</saml:AttributeValue>
+                    </saml:Attribute>
+                </saml:AttributeStatement>
+            </saml:Assertion>
+        </samlp:Response>"#;
+
+        let result = parse_saml_response(xml);
+        assert!(result.is_ok(), "parse_saml_response failed: {:?}", result.err());
+        let assertion = result.unwrap();
+
+        assert_eq!(assertion.name_id, "admin@company.com");
+        assert_eq!(assertion.session_index.as_deref(), Some("_session789"));
+        assert_eq!(assertion.in_response_to.as_deref(), Some("_req123"));
+        assert_eq!(assertion.destination.as_deref(), Some("https://app.example.com/sso/callback"));
+        assert_eq!(assertion.audience.as_deref(), Some("https://hooksniff.com"));
+        assert_eq!(assertion.attributes.get("email").map(|s| s.as_str()), Some("admin@company.com"));
+        assert_eq!(assertion.attributes.get("firstName").map(|s| s.as_str()), Some("Admin"));
+        assert_eq!(assertion.attributes.get("lastName").map(|s| s.as_str()), Some("User"));
+        assert!(assertion.not_on_or_after.is_some());
+    }
+
+    #[test]
+    fn test_local_name_matches() {
+        assert!(local_name_matches(b"NameID", "NameID"));
+        assert!(local_name_matches(b"saml:NameID", "NameID"));
+        assert!(local_name_matches(b"ds:Signature", "Signature"));
+        assert!(!local_name_matches(b"Other", "NameID"));
+    }
+
+    #[test]
+    fn test_xml_has_element() {
+        let xml = r#"<samlp:Response><ds:Signature><ds:SignatureValue>abc</ds:SignatureValue></ds:Signature></samlp:Response>"#;
+        assert!(xml_has_element(xml, "Signature"));
+        assert!(xml_has_element(xml, "SignatureValue"));
+        assert!(!xml_has_element(xml, "NonExistent"));
     }
 }
