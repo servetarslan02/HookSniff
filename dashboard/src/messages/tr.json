@@ -3192,6 +3192,8 @@
   "sso": {
     "title": "🔐 SSO / SAML",
     "subtitle": "Kuruluşunuz için Tek Oturum Açma yapılandırması. Enterprise planı gereklidir.",
+    "setupGuide": "SSO kurulum rehberini görüntüle →",
+    "learnMore": "SSO nasıl çalışır? →",
     "provider": "Sağlayıcı",
     "samlConfiguration": "SAML Yapılandırması",
     "metadataUrl": "Metadata URL'si",

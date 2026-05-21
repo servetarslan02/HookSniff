@@ -3054,6 +3054,8 @@
   "sso": {
     "title": "🔐 SSO / SAML",
     "subtitle": "Configure Single Sign-On for your organization. Enterprise plan required.",
+    "setupGuide": "View SSO setup guide →",
+    "learnMore": "Learn how SSO works →",
     "provider": "Provider",
     "samlConfiguration": "SAML Configuration",
     "metadataUrl": "Metadata URL",
