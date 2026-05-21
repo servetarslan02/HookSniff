@@ -522,13 +522,15 @@ async fn batch_webhooks(
     }
 
     // Rollback excess webhook_count for failed/filtered items
+    // When in team context, rollback on the team owner's record (not the individual member)
     let excess = batch_count - created_count;
     if excess > 0 {
+        let (tracking_id, _, _) = resolve_team_tracking(&pool, &customer, team_id).await;
         let _ = sqlx::query(
             "UPDATE customers SET webhook_count = GREATEST(0, webhook_count - $1) WHERE id = $2",
         )
         .bind(excess)
-        .bind(customer.id)
+        .bind(tracking_id)
         .execute(&pool)
         .await;
     }
@@ -743,18 +745,17 @@ async fn batch_replay(
     })))
 }
 
-/// Resolve the effective webhook limit for a customer.
-/// If the customer is operating within a team (via service token), the team owner's plan limit applies.
-/// Otherwise, the customer's own plan limit is used.
-async fn resolve_effective_webhook_limit(
+/// Resolve the effective webhook limit and the customer_id to track usage against.
+/// When operating within a team, the team owner's plan limit and their webhook_count apply.
+/// Returns (tracking_customer_id, webhook_limit).
+async fn resolve_team_tracking(
     pool: &PgPool,
     customer: &Customer,
     team_id: Option<Uuid>,
-) -> i64 {
+) -> (Uuid, i64, bool) {
     if let Some(tid) = team_id {
-        // Look up the team owner's plan
-        let result: Option<(String, i64)> = sqlx::query_as(
-            "SELECT c.plan, c.webhook_limit FROM teams t JOIN customers c ON c.id = t.owner_id WHERE t.id = $1"
+        let result: Option<(Uuid, String, i64, bool)> = sqlx::query_as(
+            "SELECT c.id, c.plan, c.webhook_limit, c.allow_overage FROM teams t JOIN customers c ON c.id = t.owner_id WHERE t.id = $1"
         )
         .bind(tid)
         .fetch_optional(pool)
@@ -762,30 +763,31 @@ async fn resolve_effective_webhook_limit(
         .ok()
         .flatten();
 
-        if let Some((_plan, limit)) = result {
-            return limit;
+        if let Some((owner_id, _plan, limit, allow_overage)) = result {
+            return (owner_id, limit, allow_overage);
         }
     }
-    customer.webhook_limit
+    (customer.id, customer.webhook_limit, customer.allow_overage)
 }
 
 /// Atomically increment webhook_count with overage support.
-/// If team_id is provided, uses the team owner's plan limit (team-based billing).
-/// Returns Err if the customer is at their limit (and overage is not allowed).
+/// When team_id is provided, webhook_count is tracked on the team owner's record
+/// (team-level counting), and the team owner's plan limit applies.
+/// Returns Err if at the limit (and overage is not allowed).
 async fn reserve_webhook_slot(
     pool: &PgPool,
     customer: &Customer,
     count: i64,
     team_id: Option<Uuid>,
 ) -> Result<(), AppError> {
-    let effective_limit = resolve_effective_webhook_limit(pool, customer, team_id).await;
+    let (tracking_id, effective_limit, allow_overage) = resolve_team_tracking(pool, customer, team_id).await;
 
-    let updated: Option<(Uuid, i64)> = if customer.allow_overage {
+    let updated: Option<(Uuid, i64)> = if allow_overage {
         sqlx::query_as("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 RETURNING id, webhook_count")
-            .bind(count).bind(customer.id).fetch_optional(pool).await?
+            .bind(count).bind(tracking_id).fetch_optional(pool).await?
     } else {
         sqlx::query_as("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 AND webhook_count + $1 <= $3 RETURNING id, webhook_count")
-            .bind(count).bind(customer.id).bind(effective_limit).fetch_optional(pool).await?
+            .bind(count).bind(tracking_id).bind(effective_limit).fetch_optional(pool).await?
     };
     if updated.is_none() { Err(AppError::RateLimitExceeded) } else { Ok(()) }
 }
