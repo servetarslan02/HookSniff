@@ -26,6 +26,7 @@ pub struct Notification {
     pub notification_type: String,
     pub title: String,
     pub message: Option<String>,
+    #[serde(rename = "read")]
     pub is_read: bool,
     pub link: Option<String>,
     pub created_at: DateTime<Utc>,
