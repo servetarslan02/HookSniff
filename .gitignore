@@ -77,3 +77,4 @@ deploy/keys/
 *.pem
 .sdk-tokens.env
 hooksniff-app-*.json
+gcp-key.json
