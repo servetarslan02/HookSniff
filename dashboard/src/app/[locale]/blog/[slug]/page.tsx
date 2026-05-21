@@ -3,7 +3,7 @@ import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { posts, authors, categoryGradients, getRelatedPosts, getAdjacentPosts, tokenizeCode } from './data';
+import { posts, authors, categoryGradients, getRelatedPosts, getAdjacentPosts, tokenizeCode } from '@/lib/blog/data';
 import { sanitizeHighlightHtml } from '@/lib/sanitize';
 
 // Revalidate every hour for ISR

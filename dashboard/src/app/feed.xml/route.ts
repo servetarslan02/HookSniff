@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { posts } from './[locale]/blog/[slug]/data';
+import { posts } from '@/lib/blog/data';
 
 const BASE_URL = 'https://hooksniff.vercel.app';
 
