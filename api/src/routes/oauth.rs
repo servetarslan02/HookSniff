@@ -58,7 +58,7 @@ const OAUTH_STATE_MAX_AGE: i64 = 300;
 
 /// Generate a PKCE code_verifier (43-128 chars, [A-Z][a-z][0-9]-._~)
 fn generate_pkce_verifier() -> String {
-    use rand::Rng;
+    use rand::RngExt;
     const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
     let mut rng = rand::rng();
     (0..64)
