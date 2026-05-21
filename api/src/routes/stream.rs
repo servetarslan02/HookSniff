@@ -290,6 +290,7 @@ async fn delete_channel(
 }
 
 /// SSE subscribe to a channel.
+async fn subscribe_to_channel(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -445,6 +446,7 @@ async fn delete_channel(
 }
 
 /// List recent messages for a channel.
+async fn list_messages(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -495,6 +497,7 @@ async fn delete_channel(
 }
 
 /// List active subscriptions.
+async fn list_subscriptions(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<StreamSubscription>>, AppError> {
@@ -517,6 +520,7 @@ async fn delete_channel(
 }
 
 /// Get a specific subscription.
+async fn get_subscription(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -539,6 +543,7 @@ async fn delete_channel(
 }
 
 /// Disconnect a subscription.
+async fn disconnect_subscription(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -570,6 +575,7 @@ async fn delete_channel(
 }
 
 /// SSE delivery stream (legacy compatibility endpoint).
+async fn sse_deliveries_legacy(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<PublishEventRequest>,
