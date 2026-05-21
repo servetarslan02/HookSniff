@@ -328,6 +328,7 @@ async fn process_webhook_result(
             amount_cents,
             currency,
             customer_id,
+            invoice_number,
         } => {
             // POL-04: Extend billing period on successful payment
             tracing::info!(
@@ -393,7 +394,7 @@ async fn process_webhook_result(
                 .execute(pool)
                 .await;
 
-                // Create invoice with actual payment amount (not hardcoded plan price)
+                // Create invoice with actual payment amount and correct provider
                 let plan_name: Option<String> = sqlx::query_scalar(
                     "SELECT plan FROM customers WHERE id = $1"
                 )
@@ -404,13 +405,15 @@ async fn process_webhook_result(
                 .flatten();
                 if let Some(plan) = plan_name {
                     let _ = sqlx::query(
-                        "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) \
-                         VALUES ($1, $2, $3, 'paid', $4)",
+                        "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan, provider, provider_invoice_id, paid_at) \
+                         VALUES ($1, $2, $3, 'paid', $4, $5, $6, NOW())",
                     )
                     .bind(cid)
                     .bind(*amount_cents as i64)
                     .bind(currency)
                     .bind(&plan)
+                    .bind(provider)
+                    .bind(invoice_number.as_deref())
                     .execute(pool)
                     .await;
                 }
