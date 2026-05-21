@@ -186,12 +186,21 @@ export function SubscriptionDetails({ onCancel, onPause, onResume, onRefundReque
                 </p>
               )}
             </>
+          ) : sub.payment_provider === 'polar' ? (
+            <>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                {provider.icon} Polar.sh
+              </p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                {t('polarManaged') || 'Payments managed by Polar.sh'}
+              </p>
+            </>
           ) : (
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
               {provider.icon} {provider.name}
             </p>
           )}
-          {!isFree && (
+          {!isFree && sub.payment_provider !== 'polar' && (
             <button
               type="button"
               onClick={handleOpenPortal}
@@ -199,6 +208,16 @@ export function SubscriptionDetails({ onCancel, onPause, onResume, onRefundReque
               className="text-xs text-brand-600 dark:text-brand-400 hover:underline mt-2 disabled:opacity-50"
             >
               {openingPortal ? t('openingPortal') : t('changeCard')}
+            </button>
+          )}
+          {!isFree && sub.payment_provider === 'polar' && (
+            <button
+              type="button"
+              onClick={handleOpenPortal}
+              disabled={openingPortal}
+              className="text-xs text-brand-600 dark:text-brand-400 hover:underline mt-2 disabled:opacity-50"
+            >
+              {openingPortal ? t('openingPortal') : t('manageInPolar') || 'Manage in Polar Portal'}
             </button>
           )}
         </div>

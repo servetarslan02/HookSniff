@@ -124,7 +124,7 @@ pub async fn subscription_canceled(pool: &PgPool, customer_id: Uuid, plan: &str)
             format!("Your {} plan subscription has been canceled. You can continue using your current features until the end of the billing period.", plan),
         ),
     };
-    create(pool, customer_id, "billing", title, &message, Some("/billing-section")).await;
+    create(pool, customer_id, "billing", title, &message, Some("/billing")).await;
 }
 
 /// Plan upgraded — deduplicated: same plan upgrade within 24h is ignored.
@@ -160,7 +160,7 @@ pub async fn plan_upgraded(pool: &PgPool, customer_id: Uuid, old_plan: &str, new
         Lang::Tr => format!("{} planından {} planına yükseltildiniz. Yeni özellikleriniz aktif!", old_plan, new_plan),
         Lang::En => format!("You've been upgraded from {} to {} plan. Your new features are now active!", old_plan, new_plan),
     };
-    create(pool, customer_id, "billing", title, &message, Some("/billing-section")).await;
+    create(pool, customer_id, "billing", title, &message, Some("/billing")).await;
 }
 
 // ── Webhook / Delivery Notifications ───────────────────────
@@ -383,7 +383,7 @@ pub async fn limit_approaching(pool: &PgPool, customer_id: Uuid, current: i64, l
             format!("Your webhook usage is at {}% ({}/{}). Exceeding the limit may suspend your service.", pct, current, limit),
         ),
     };
-    create(pool, customer_id, "alert", title, &message, Some("/billing-section")).await;
+    create(pool, customer_id, "alert", title, &message, Some("/billing")).await;
 }
 
 /// Webhook limit exceeded.
@@ -399,7 +399,7 @@ pub async fn limit_exceeded(pool: &PgPool, customer_id: Uuid, current: i64, limi
             format!("Your webhook limit has been exceeded ({}/{}). New webhooks may be rejected. Consider upgrading your plan.", current, limit),
         ),
     };
-    create(pool, customer_id, "alert", title, &message, Some("/billing-section")).await;
+    create(pool, customer_id, "alert", title, &message, Some("/billing")).await;
 }
 
 /// Notify customer about payment failure (first attempt — grace period).

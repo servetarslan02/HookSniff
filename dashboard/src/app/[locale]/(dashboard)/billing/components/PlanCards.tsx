@@ -168,8 +168,8 @@ export function PlanCards({
               <div className="mt-2 mb-4">
                 {plan.isEnterprise ? (
                   <>
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
-                    <span className="text-gray-500 dark:text-slate-400 text-sm">{t('monthly')}</span>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{t('customPricing') || 'Custom'}</span>
+                    <span className="text-gray-500 dark:text-slate-400 text-sm">{t('contactSales') || 'Contact Sales'}</span>
                   </>
                 ) : plan.key === 'developer' ? (
                   <>
