@@ -944,6 +944,7 @@
     "overageSettingsSaved": "Aşım ayarları kaydedildi.",
     "actions": "İşlemler",
     "requestRefund": "İade Talebi",
+    "downloadInvoice": "Fatura İndir",
     "refundTitle": "İade Talebi",
     "refundDesc": "Satın alma tarihinden itibaren 14 gün içinde iade yapılabilir. Planınız Ücretsiz'e düşürülecek.",
     "refundReasonPlaceholder": "Neden iade talep ediyorsunuz?",

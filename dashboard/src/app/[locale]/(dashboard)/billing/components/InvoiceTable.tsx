@@ -9,6 +9,7 @@ import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { getErrorMessage } from '@/lib/errors';
 import { InvoiceStatusBadge } from './InvoiceStatusBadge';
+import { Download } from '@/components/icons';
 
 export function InvoiceTable({
   invoices,
@@ -26,6 +27,34 @@ export function InvoiceTable({
   const [refundModal, setRefundModal] = useState<string | null>(null);
   const [refundReason, setRefundReason] = useState('');
   const [refunding, setRefunding] = useState(false);
+  const [downloadingInvoice, setDownloadingInvoice] = useState<string | null>(null);
+
+  // Open Polar customer portal to download invoice
+  const handleDownloadInvoice = async (inv: Invoice) => {
+    if (!token) return;
+    setDownloadingInvoice(inv.id);
+    try {
+      // For Polar invoices, open the customer portal where invoices are available
+      if (inv.provider === 'polar') {
+        const result = await billingApiExtended.openPortal(token);
+        if (result.url && !result.url.includes('/dashboard/billing') && !result.url.includes('/account')) {
+          window.open(result.url, '_blank', 'noopener,noreferrer');
+        } else {
+          toast(t('portalNotAvailable') || 'Billing portal not available', 'info');
+        }
+      } else {
+        // For other providers, try portal
+        const result = await billingApiExtended.openPortal(token);
+        if (result.url) {
+          window.open(result.url, '_blank', 'noopener,noreferrer');
+        }
+      }
+    } catch {
+      toast(t('portalNotAvailable') || 'Could not open billing portal', 'error');
+    } finally {
+      setDownloadingInvoice(null);
+    }
+  };
 
   // Check if an invoice is within 14-day refund window
   const isRefundable = (inv: Invoice) => {
@@ -111,15 +140,26 @@ export function InvoiceTable({
                       <InvoiceStatusBadge status={inv.status} />
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {isRefundable(inv) && (
+                      <div className="flex items-center justify-end gap-2">
                         <button
                           type="button"
-                          onClick={() => setRefundModal(inv.id)}
-                          className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                          onClick={() => handleDownloadInvoice(inv)}
+                          disabled={downloadingInvoice === inv.id}
+                          className="text-xs text-gray-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 disabled:opacity-50 flex items-center gap-1"
+                          title={t('downloadInvoice') || 'Download invoice'}
                         >
-                          {t('requestRefund')}
+                          <Download size={14} strokeWidth={1.75} />
                         </button>
-                      )}
+                        {isRefundable(inv) && (
+                          <button
+                            type="button"
+                            onClick={() => setRefundModal(inv.id)}
+                            className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                          >
+                            {t('requestRefund')}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
