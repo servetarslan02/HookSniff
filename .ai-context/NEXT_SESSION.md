@@ -33,17 +33,9 @@
 ## 📋 Sonraki Adımlar
 
 ### Kısa Vadeli (1-2 oturum)
-1. **Blog içerikleri yaz** — SEO için en kritik. Hedef anahtar kelimeler:
-   - "webhooks explained" / "what is a webhook"
-   - "webhook vs api" / "webhook vs polling"
-   - "free webhook service 2026"
-   - "svix alternative" / "hookdeck alternative"
-   - "webhook best practices" / "webhook security"
-   - "how to implement webhooks in node.js"
-   - "stripe webhooks guide" / "github webhooks guide"
-2. **Sitemap'e blog sayfalarını ekle** — Mevcut sitemap sadece ana sayfaları içeriyor
-3. **Search Console performans** — 2-3 gün içinde veri gelmeye başlar, kontrol et
-4. **Dashboard Billing Sayfası** — Frontend'de `billing-section` URL'i ile `dashboard/billing` tutarsızlığı var
+1. **Search Console performans** — 2-3 gün içinde veri gelmeye başlar, kontrol et
+2. **Dashboard Billing Sayfası** — Frontend'de `billing-section` URL'i ile `dashboard/billing` tutarsızlığı var
+3. **E2E Billing Test** — Gerçek Polar sandbox ile checkout → webhook → plan güncelleme akışı test edilmeli
 
 ### Orta Vadeli (3-5 oturum)
 4. **Dunning Test** — E-posta hatırlatma sistemi test edilmeli (Polar sandbox)
