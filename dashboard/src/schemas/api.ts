@@ -464,8 +464,10 @@ export const InvoiceSchema = z.object({
   id: z.string(),
   date: z.string(),
   amount: z.number(),
-  status: z.enum(['paid', 'pending', 'failed']),
+  status: z.enum(['paid', 'pending', 'failed', 'refunded']),
   plan: z.string(),
+  provider: z.string().optional(),
+  provider_invoice_id: z.string().nullish(),
 });
 export type InvoiceValidated = z.infer<typeof InvoiceSchema>;
 
@@ -504,6 +506,7 @@ export const BillingSubscriptionSchema = z.object({
   endpoint_limit: z.number(),
   retention_days: z.number(),
   monthly_price_cents: z.number(),
+  monthly_price_kurus: z.number().optional(),
   cancel_at_period_end: z.boolean(),
   billing_period: z.string(),
   current_period_end: z.string().nullish(),

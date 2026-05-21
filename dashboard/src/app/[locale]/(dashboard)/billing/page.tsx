@@ -96,7 +96,7 @@ export default function BillingPage() {
       const result = await billingApiExtended.resume(token);
       if (result.checkout_url) {
         const url = new URL(result.checkout_url);
-        const trustedHosts = ['polar.sh', 'checkout.polar.sh', 'sandbox.polar.sh', 'sandbox.checkout.polar.sh', 'pay.stripe.com'];
+        const trustedHosts = ['polar.sh', 'checkout.polar.sh', 'sandbox-api.polar.sh', 'sandbox.polar.sh', 'sandbox.checkout.polar.sh', 'checkout.stripe.com', 'pay.stripe.com', 'secure.iyzipay.com', 'sandbox-api.iyzipay.com', 'api.iyzipay.com'];
         if (trustedHosts.some(h => url.hostname === h || url.hostname.endsWith(`.${h}`))) {
           window.location.href = result.checkout_url;
         } else {
@@ -129,7 +129,7 @@ export default function BillingPage() {
 
       if (result.checkout_url) {
         const url = new URL(result.checkout_url);
-        const trustedHosts = ['polar.sh', 'checkout.polar.sh', 'sandbox.polar.sh', 'sandbox.checkout.polar.sh', 'pay.stripe.com', 'sandbox-api.iyzipay.com', 'api.iyzipay.com'];
+        const trustedHosts = ['polar.sh', 'checkout.polar.sh', 'sandbox-api.polar.sh', 'sandbox.polar.sh', 'sandbox.checkout.polar.sh', 'checkout.stripe.com', 'pay.stripe.com', 'secure.iyzipay.com', 'sandbox-api.iyzipay.com', 'api.iyzipay.com'];
         if (trustedHosts.some(h => url.hostname === h || url.hostname.endsWith(`.${h}`))) {
           window.location.href = result.checkout_url;
         } else {
