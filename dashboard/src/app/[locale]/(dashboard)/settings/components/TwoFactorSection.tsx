@@ -7,6 +7,8 @@ import { twoFactorApi } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 import { useTranslations } from 'next-intl';
 import { ShieldCheck, CheckCircle2 } from '@/components/icons';
+import { generateQrSvg } from '@/lib/qr';
+import DOMPurify from 'dompurify';
 
 export function TwoFactorSection() {
   const { token } = useAuth();
@@ -20,7 +22,7 @@ export function TwoFactorSection() {
   const [showDisable, setShowDisable] = useState(false);
 
   // Enable flow
-  const [qrCode, setQrCode] = useState('');
+  const [qrSvg, setQrSvg] = useState('');
   const [secret, setSecret] = useState('');
   const [totpCode, setTotpCode] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
@@ -51,7 +53,9 @@ export function TwoFactorSection() {
     setEnabling(true);
     try {
       const data = await twoFactorApi.enable(token);
-      setQrCode(data.qr_code);
+      // Generate QR code client-side using otpauth:// URI (not external URL)
+      const otpauthUrl = data.otpauth_url || `otpauth://totp/HookSniff:${encodeURIComponent('user')}?secret=${data.secret}&issuer=HookSniff&digits=6&period=30`;
+      setQrSvg(generateQrSvg(otpauthUrl));
       setSecret(data.secret);
       setStep('qr');
       setShowEnable(true);
@@ -80,7 +84,7 @@ export function TwoFactorSection() {
 
   const handleCloseEnable = () => {
     setShowEnable(false);
-    setQrCode('');
+    setQrSvg('');
     setSecret('');
     setTotpCode('');
     setBackupCodes([]);
@@ -171,9 +175,11 @@ export function TwoFactorSection() {
 
                 {/* QR Code */}
                 <div className="flex justify-center mb-4">
-                  {qrCode ? (
-                     
-                    <img src={qrCode} alt="2FA QR Code" className="w-48 h-48 rounded-lg" />
+                  {qrSvg ? (
+                    <div
+                      className="w-48 h-48 rounded-lg overflow-hidden"
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(qrSvg) }}
+                    />
                   ) : (
                     <div className="w-48 h-48 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center text-gray-500 dark:text-slate-400 text-sm">
                       {t('loadingQr')}
