@@ -961,7 +961,8 @@
     "downgradeTo": "{plan} planına geç",
     "free": "Ücretsiz",
     "statusLabel": "Durum",
-    "noPaymentMethod": "Kayıtlı ödeme yöntemi yok. Ücretli plana geçişte ekleyebilirsiniz."
+    "noPaymentMethod": "Kayıtlı ödeme yöntemi yok. Ücretli plana geçişte ekleyebilirsiniz.",
+    "includedInPlan": "Planınızda dahil"
   },
   "auth": {
     "login": "Giriş Yap",
