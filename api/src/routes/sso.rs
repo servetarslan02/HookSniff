@@ -447,8 +447,8 @@ async fn upsert_sso_config(
 
     // Validate default_role if provided
     if let Some(ref role) = req.default_role {
-        if !["admin", "editor", "viewer"].contains(&role.as_str()) {
-            return Err(AppError::BadRequest("default_role must be 'admin', 'editor', or 'viewer'".into()));
+        if !["admin", "developer", "analyst", "viewer"].contains(&role.as_str()) {
+            return Err(AppError::BadRequest("default_role must be 'admin', 'developer', 'analyst', or 'viewer'".into()));
         }
     }
 

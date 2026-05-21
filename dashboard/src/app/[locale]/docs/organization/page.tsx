@@ -90,25 +90,30 @@ export default async function OrganizationDocsPage() {
                   <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-slate-300">{t('permAction')}</th>
                   <th className="px-4 py-3 text-center font-medium text-purple-700 dark:text-purple-400">{t('permAdmin')}</th>
                   <th className="px-4 py-3 text-center font-medium text-blue-700 dark:text-blue-400">{t('permEditor')}</th>
+                  <th className="px-4 py-3 text-center font-medium text-gray-500 dark:text-slate-400">{t('permAdmin')}</th>
+                  <th className="px-4 py-3 text-center font-medium text-gray-500 dark:text-slate-400">{t('permDeveloper')}</th>
+                  <th className="px-4 py-3 text-center font-medium text-gray-500 dark:text-slate-400">{t('permAnalyst')}</th>
                   <th className="px-4 py-3 text-center font-medium text-gray-500 dark:text-slate-400">{t('permViewer')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                 {[
-                  { action: t('permCreateEndpoint'), admin: true, editor: true, viewer: false },
-                  { action: t('permSendWebhook'), admin: true, editor: true, viewer: false },
-                  { action: t('permViewDelivery'), admin: true, editor: true, viewer: true },
-                  { action: t('permManageApiKey'), admin: true, editor: true, viewer: false },
-                  { action: t('permInviteMember'), admin: true, editor: false, viewer: false },
-                  { action: t('permRemoveMember'), admin: true, editor: false, viewer: false },
-                  { action: t('permChangeRole'), admin: true, editor: false, viewer: false },
-                  { action: t('permDeleteTeam'), admin: true, editor: false, viewer: false },
-                  { action: t('permManageSso'), admin: true, editor: false, viewer: false },
-                ].map(({ action, admin, editor, viewer }) => (
+                  { action: t('permCreateEndpoint'), admin: true, developer: true, analyst: false, viewer: false },
+                  { action: t('permSendWebhook'), admin: true, developer: true, analyst: false, viewer: false },
+                  { action: t('permViewDelivery'), admin: true, developer: true, analyst: true, viewer: true },
+                  { action: t('permManageApiKey'), admin: true, developer: true, analyst: false, viewer: false },
+                  { action: t('permViewAnalytics'), admin: true, developer: true, analyst: true, viewer: false },
+                  { action: t('permInviteMember'), admin: true, developer: false, analyst: false, viewer: false },
+                  { action: t('permRemoveMember'), admin: true, developer: false, analyst: false, viewer: false },
+                  { action: t('permChangeRole'), admin: true, developer: false, analyst: false, viewer: false },
+                  { action: t('permDeleteTeam'), admin: true, developer: false, analyst: false, viewer: false },
+                  { action: t('permManageSso'), admin: true, developer: false, analyst: false, viewer: false },
+                ].map(({ action, admin, developer, analyst, viewer }) => (
                   <tr key={action}>
                     <td className="px-4 py-3 text-gray-900 dark:text-white">{action}</td>
                     <td className="px-4 py-3 text-center">{admin ? <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> : <X size={14} strokeWidth={1.75} className="text-red-500" />}</td>
-                    <td className="px-4 py-3 text-center">{editor ? <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> : <X size={14} strokeWidth={1.75} className="text-red-500" />}</td>
+                    <td className="px-4 py-3 text-center">{developer ? <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> : <X size={14} strokeWidth={1.75} className="text-red-500" />}</td>
+                    <td className="px-4 py-3 text-center">{analyst ? <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> : <X size={14} strokeWidth={1.75} className="text-red-500" />}</td>
                     <td className="px-4 py-3 text-center">{viewer ? <Check size={14} strokeWidth={1.75} className="text-emerald-500" /> : <X size={14} strokeWidth={1.75} className="text-red-500" />}</td>
                   </tr>
                 ))}
