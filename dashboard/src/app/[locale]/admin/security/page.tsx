@@ -240,11 +240,11 @@ export default function AdminSecurityPage() {
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="glass-card p-4"><div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('totalEvents')}</div></div>
-          <div className="glass-card p-4 border-l-4 border-red-500"><div className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.unresolved_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('unresolved')}</div></div>
-          <div className="glass-card p-4 border-l-4 border-orange-500"><div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.critical_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('criticalDays')}</div></div>
-          <div className="glass-card p-4 border-l-4 border-amber-500"><div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.high_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('highDays')}</div></div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="glass-card p-3 sm:p-4"><div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{stats.total_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('totalEvents')}</div></div>
+          <div className="glass-card p-3 sm:p-4 border-l-4 border-red-500"><div className="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">{stats.unresolved_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('unresolved')}</div></div>
+          <div className="glass-card p-3 sm:p-4 border-l-4 border-orange-500"><div className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.critical_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('criticalDays')}</div></div>
+          <div className="glass-card p-3 sm:p-4 border-l-4 border-amber-500"><div className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.high_events}</div><div className="text-xs text-gray-500 dark:text-slate-400">{t('highDays')}</div></div>
         </div>
       )}
 
@@ -258,14 +258,14 @@ export default function AdminSecurityPage() {
       )}
 
       {/* Tab Toggle */}
-      <div className="flex bg-gray-100 dark:bg-slate-800 rounded-xl p-1 w-fit">
+      <div className="flex flex-wrap bg-gray-100 dark:bg-slate-800 rounded-xl p-1 w-fit max-w-full overflow-x-auto">
         {([
           { key: 'events' as const, label: t('securityEvents'), icon: <AlertTriangle size={14} strokeWidth={1.75} /> },
           { key: 'analytics' as const, label: 'Analytics', icon: <Eye size={14} strokeWidth={1.75} /> },
           { key: 'blocklist' as const, label: 'IP Blocklist', icon: <Ban size={14} strokeWidth={1.75} /> },
         ]).map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${tab === t.key ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}>
+            className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${tab === t.key ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}>
             {t.icon}{t.label}
           </button>
         ))}

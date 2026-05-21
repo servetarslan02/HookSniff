@@ -263,13 +263,13 @@ export default function AdminSettingsPage() {
    )}
 
    {/* Tab Navigation */}
-   <div className="flex gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl w-fit">
+   <div className="flex gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl w-fit max-w-full overflow-x-auto">
     {tabs.map((tab) => (
      <button
       key={tab.key}
       onClick={() => setTab(tab.key)}
       onMouseEnter={() => handleTabHover(tab.key)}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+      className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition ${
        settingsTab === tab.key
         ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs'
         : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'

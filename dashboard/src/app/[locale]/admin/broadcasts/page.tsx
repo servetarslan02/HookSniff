@@ -198,7 +198,7 @@ export default function AdminBroadcastsPage() {
   return (
     <div className="space-y-4 sm:space-y-6 max-w-4xl">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             <Megaphone size={24} strokeWidth={1.75} className="inline mr-2" />
@@ -210,7 +210,7 @@ export default function AdminBroadcastsPage() {
         </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors flex items-center gap-1.5"
+          className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors flex items-center gap-1.5 shrink-0"
         >
           <Plus size={16} strokeWidth={1.75} />
           {t('newBroadcast') || 'New Broadcast'}
