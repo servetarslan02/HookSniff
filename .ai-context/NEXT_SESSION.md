@@ -2,6 +2,17 @@
 
 > Son güncelleme: 2026-05-22 03:02 GMT+8
 
+## ✅ Migration 072 — Zaten Uygulanmış (2026-05-22 doğrulandı)
+
+Tüm migration'lar canlı DB'de mevcut:
+- 072: dunning_reminders, payment_retry_attempts ✅
+- 073: customers.current_period_end ✅
+- 074: customers.paused_at ✅
+- 075: broadcasts ✅
+- 076: security_events ✅
+- 077: ip_blocklist ✅
+- 082: sso_configs.team_id ✅
+
 ## 🔴 Öncelik 1: Keycloak ile SSO Test
 
 1. Docker kur: `apt install docker.io`
