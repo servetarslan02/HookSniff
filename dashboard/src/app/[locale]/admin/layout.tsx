@@ -86,7 +86,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
                 href={item.href}
                 onClick={onClose}
                 hoverDelay={80}
-                className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
+                className="flex items-center gap-2.5 px-3 py-2 text-[15px] font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
               >
                 <span className="inline-flex items-center">{item.icon}</span>
                 {t(`nav.${item.nameKey}`)}
