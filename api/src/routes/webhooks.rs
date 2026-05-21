@@ -139,9 +139,11 @@ async fn create_webhook(
     Extension(is_test): Extension<crate::middleware::IsTestKey>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Extension(feature_flags): Extension<FeatureFlagService>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     headers: axum::http::header::HeaderMap,
     Json(req): Json<CreateWebhookRequest>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
+    let team_id = service_token.as_ref().map(|s| s.team_id);
     // Check idempotency key
     let idempotency_key = headers.get("Idempotency-Key").and_then(|v| v.to_str().ok());
 
@@ -278,7 +280,7 @@ async fn create_webhook(
     let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
     // Atomic check-and-increment: reserve webhook slot before creating delivery
-    reserve_webhook_slot(&pool, &customer, 1).await?;
+    reserve_webhook_slot(&pool, &customer, 1, team_id).await?;
 
     // Track daily event usage for overage notifications (best-effort)
     // TODO: Pass EmailProvider from Extension when wiring up email notifications
@@ -367,15 +369,17 @@ async fn batch_webhooks(
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<BatchWebhookRequest>,
 ) -> Result<Json<BatchResponse>, AppError> {
+    let team_id = service_token.as_ref().map(|s| s.team_id);
     if req.webhooks.len() > 100 {
         return Err(AppError::BadRequest("A batch cannot contain more than 100 webhooks".into()));
     }
 
     // Atomic check-and-increment for batch: reserve slots for all webhooks in the batch
     let batch_count = req.webhooks.len() as i64;
-    reserve_webhook_slot(&pool, &customer, batch_count).await?;
+    reserve_webhook_slot(&pool, &customer, batch_count, team_id).await?;
 
     // Track daily event usage for overage notifications (best-effort, once per batch)
     let _ = track_daily_event(&pool, &customer, None).await;
@@ -536,8 +540,10 @@ async fn replay_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(_cfg): Extension<Config>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
+    let team_id = service_token.as_ref().map(|s| s.team_id);
     let original = sqlx::query_as::<_, Delivery>(
         "SELECT id, endpoint_id, customer_id, payload, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, response_body, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test, event, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash, custom_headers FROM deliveries WHERE id = $1 AND customer_id = $2",
     )
@@ -562,7 +568,7 @@ async fn replay_webhook(
         serde_json::to_string(&original.payload).map_err(|e| AppError::Internal(e.into()))?;
 
     // Atomic check-and-increment: reserve webhook slot before creating replay delivery
-    reserve_webhook_slot(&pool, &customer, 1).await?;
+    reserve_webhook_slot(&pool, &customer, 1, team_id).await?;
 
     // Track daily event usage for overage notifications (best-effort)
     let _ = track_daily_event(&pool, &customer, None).await;
@@ -641,8 +647,10 @@ async fn batch_replay(
     Extension(customer): Extension<Customer>,
     Extension(_cfg): Extension<Config>,
     Extension(feature_flags): Extension<FeatureFlagService>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<BatchReplayRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    let team_id = service_token.as_ref().map(|s| s.team_id);
     // Gate behind bulk_replay feature flag
     if !feature_flags.is_enabled("bulk_replay").await {
         return Err(AppError::BadRequest("Bulk replay is not enabled. Contact support to enable this feature.".into()));
@@ -690,7 +698,7 @@ async fn batch_replay(
         };
 
         // Rate limit check — never-blocked mode support
-        if reserve_webhook_slot(&pool, &customer, 1).await.is_err() {
+        if reserve_webhook_slot(&pool, &customer, 1, team_id).await.is_err() {
             errors.push(serde_json::json!({ "id": id, "error": "Rate limit exceeded" }));
             continue;
         }
@@ -735,19 +743,49 @@ async fn batch_replay(
     })))
 }
 
+/// Resolve the effective webhook limit for a customer.
+/// If the customer is operating within a team (via service token), the team owner's plan limit applies.
+/// Otherwise, the customer's own plan limit is used.
+async fn resolve_effective_webhook_limit(
+    pool: &PgPool,
+    customer: &Customer,
+    team_id: Option<Uuid>,
+) -> i64 {
+    if let Some(tid) = team_id {
+        // Look up the team owner's plan
+        let result: Option<(String, i64)> = sqlx::query_as(
+            "SELECT c.plan, c.webhook_limit FROM teams t JOIN customers c ON c.id = t.owner_id WHERE t.id = $1"
+        )
+        .bind(tid)
+        .fetch_optional(pool)
+        .await
+        .ok()
+        .flatten();
+
+        if let Some((_plan, limit)) = result {
+            return limit;
+        }
+    }
+    customer.webhook_limit
+}
+
 /// Atomically increment webhook_count with overage support.
+/// If team_id is provided, uses the team owner's plan limit (team-based billing).
 /// Returns Err if the customer is at their limit (and overage is not allowed).
 async fn reserve_webhook_slot(
     pool: &PgPool,
     customer: &Customer,
     count: i64,
+    team_id: Option<Uuid>,
 ) -> Result<(), AppError> {
+    let effective_limit = resolve_effective_webhook_limit(pool, customer, team_id).await;
+
     let updated: Option<(Uuid, i64)> = if customer.allow_overage {
         sqlx::query_as("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 RETURNING id, webhook_count")
             .bind(count).bind(customer.id).fetch_optional(pool).await?
     } else {
         sqlx::query_as("UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 AND webhook_count + $1 <= $3 RETURNING id, webhook_count")
-            .bind(count).bind(customer.id).bind(customer.webhook_limit).fetch_optional(pool).await?
+            .bind(count).bind(customer.id).bind(effective_limit).fetch_optional(pool).await?
     };
     if updated.is_none() { Err(AppError::RateLimitExceeded) } else { Ok(()) }
 }
