@@ -68,7 +68,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           { queryKey: ['portal-profile'], queryFn: () => apiFetch('/portal/me', { token }), staleTime: 30_000 },
           { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
         ];
-      case '/billing-section':
       case '/billing':
         return [
           { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
