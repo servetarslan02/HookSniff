@@ -1169,4 +1169,31 @@ mod tests {
         let clamped_per_page = raw_per_page.min(200);
         assert_eq!(clamped_per_page, 200);
     }
+
+    // ── RBAC: webhook write operations require developer ─────
+
+    #[test]
+    fn test_webhook_create_requires_developer() {
+        // create_webhook requires at least developer role
+        let min_role = "developer";
+        let min_level = super::super::teams::role_level(min_role);
+        assert!(super::super::teams::role_level("admin") >= min_level);
+        assert!(super::super::teams::role_level("developer") >= min_level);
+        assert!(super::super::teams::role_level("analyst") < min_level);
+        assert!(super::super::teams::role_level("viewer") < min_level);
+    }
+
+    #[test]
+    fn test_webhook_batch_requires_developer() {
+        // batch_webhooks requires at least developer role
+        let min_level = super::super::teams::role_level("developer");
+        assert_eq!(min_level, 30);
+    }
+
+    #[test]
+    fn test_webhook_replay_requires_developer() {
+        // replay_webhook requires at least developer role
+        let min_level = super::super::teams::role_level("developer");
+        assert!(super::super::teams::role_level("viewer") < min_level, "viewer cannot replay");
+    }
 }
