@@ -70,6 +70,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         { name: 'Templates', href: '/docs/templates' },
         { name: 'Multi-Tenant', href: '/docs/multi-tenant' },
         { name: 'Organization', href: '/docs/organization' },
+        { name: 'SSO', href: '/docs/sso', badge: 'Enterprise' },
         { name: 'Build Stripe-like', href: '/docs/build-stripe-like', badge: 'Popular' },
       ],
     },
