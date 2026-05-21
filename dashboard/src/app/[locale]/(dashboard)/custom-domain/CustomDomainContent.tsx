@@ -178,14 +178,18 @@ export function CustomDomainContent() {
           <input
             type="text"
             value={domain}
-            onChange={(e) => setDomain(e.target.value.toLowerCase().replace(/[^a-z0-9.-]/g, ''))}
+            onChange={(e) => {
+              // Strip protocol prefix first, then filter invalid chars
+              const raw = e.target.value.toLowerCase().replace(/^https?:\/\//, '');
+              setDomain(raw.replace(/[^a-z0-9.-]/g, ''));
+            }}
             placeholder={t('placeholder')}
             className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
             onKeyDown={(e) => { if (e.key === 'Enter' && domain && !saving) handleAddDomain(); }}
           />
           <button type="button"
             onClick={handleAddDomain}
-            disabled={saving || !domain}
+            disabled={saving || !domain || !domain.includes('.')}
             className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
           >
             {saving ? t('adding') : t('addDomainBtn')}
@@ -193,8 +197,8 @@ export function CustomDomainContent() {
         </div>
       </div>
 
-      {/* DNS Records for newly added domain */}
-      {dnsRecords.length > 0 && (
+      {/* DNS Records for newly added domain — hide if already in existing list */}
+      {dnsRecords.length > 0 && !existingDomains.some(d => d.id === newDomainId) && (
         <div className="glass-card p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('dnsRecords')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('dnsRecordsDesc')}</p>
