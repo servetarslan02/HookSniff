@@ -66,8 +66,8 @@ async fn list_events(
     Extension(customer): Extension<Customer>,
     Query(params): Query<EventsParams>,
 ) -> Result<Json<EventsResponse>, AppError> {
-    // RBAC: analyst or higher required to view events
-    super::teams::check_user_team_role(&pool, customer.id, "analyst").await?;
+    // RBAC: viewer or higher required to view events
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
     let page = params.page.unwrap_or(1).max(1);
     let per_page = params.per_page.unwrap_or(50).min(200);
