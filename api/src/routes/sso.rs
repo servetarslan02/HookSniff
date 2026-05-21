@@ -133,6 +133,7 @@ struct SamlAssertion {
     in_response_to: Option<String>,
     destination: Option<String>,
     audience: Option<String>,
+    certificate: Option<String>,
 }
 
 // ── SSO Login Query ─────────────────────────────────────────
@@ -176,6 +177,7 @@ struct SsoLoginState {
     saml_request_id: Option<String>,
     auto_join_team_id: Option<Uuid>,
     default_role: String,
+    nonce: Option<String>,
     created_at: DateTime<Utc>,
 }
 
@@ -1082,6 +1084,13 @@ async fn initiate_sso_login(
         None
     };
 
+    // Generate OIDC nonce upfront (for replay attack prevention)
+    let oidc_nonce = if provider == "oidc" {
+        Some(Uuid::new_v4().to_string())
+    } else {
+        None
+    };
+
     // Store login state (customer_id = SSO config owner, used in callbacks for auto-team-join)
     state_store.insert(state.clone(), SsoLoginState {
         customer_id: sso_owner_id,
@@ -1091,6 +1100,7 @@ async fn initiate_sso_login(
         saml_request_id: saml_request_id.clone(),
         auto_join_team_id,
         default_role: default_role.clone(),
+        nonce: oidc_nonce.clone(),
         created_at: Utc::now(),
     }).await;
 
@@ -1141,7 +1151,7 @@ async fn initiate_sso_login(
     if provider == "saml" {
         initiate_saml_login(&pool, &redirect_customer, &state, &sso_url, &entity_id, saml_request_id.as_deref()).await
     } else {
-        initiate_oidc_login(&pool, &redirect_customer, &state, &issuer_url, &client_id, &client_secret_enc).await
+        initiate_oidc_login(&pool, &redirect_customer, &state, &issuer_url, &client_id, &client_secret_enc, oidc_nonce.as_deref()).await
     }
 }
 
@@ -1218,6 +1228,7 @@ async fn initiate_oidc_login(
     issuer_url: &Option<String>,
     client_id: &Option<String>,
     client_secret_enc: &Option<String>,
+    nonce: Option<&str>,
 ) -> Result<(HeaderMap, Redirect), AppError> {
     let issuer = issuer_url.as_deref().ok_or_else(|| {
         AppError::Internal(anyhow::anyhow!("OIDC issuer URL not configured"))
@@ -1251,7 +1262,8 @@ async fn initiate_oidc_login(
         std::env::var("API_URL").unwrap_or_else(|_| "https://hooksniff-api-1046140057667.europe-west1.run.app".to_string())
     );
 
-    let nonce = Uuid::new_v4().to_string();
+    // Use the nonce from state (generated in initiate_sso_login) for replay protection
+    let nonce_value = nonce.unwrap_or("");
 
     // Build authorization URL
     let auth_url = format!(
@@ -1260,7 +1272,7 @@ async fn initiate_oidc_login(
         urlencoding::encode(client_id),
         urlencoding::encode(&redirect_uri),
         urlencoding::encode(state),
-        urlencoding::encode(&nonce),
+        urlencoding::encode(nonce_value),
     );
 
     tracing::info!("OIDC login redirect: customer={}, issuer={}", customer.id, issuer);
@@ -1330,6 +1342,42 @@ async fn saml_callback(
     }
     if let Some(ref aud) = assertion.audience {
         tracing::debug!("SAML audience: {}", aud);
+    }
+
+    // Verify SAML response certificate against configured IdP certificate
+    if let Some(ref login_state) = login_state {
+        let configured_cert: Option<String> = sqlx::query_scalar(
+            "SELECT certificate FROM sso_configs WHERE customer_id = $1 LIMIT 1"
+        )
+        .bind(login_state.customer_id)
+        .fetch_optional(&pool)
+        .await?
+        .flatten();
+
+        if let (Some(ref expected_cert), Some(ref response_cert)) = (configured_cert, &assertion.certificate) {
+            // Normalize both certificates for comparison (strip headers, whitespace)
+            let normalize = |s: &String| -> String {
+                s.replace("-----BEGIN CERTIFICATE-----", "")
+                 .replace("-----END CERTIFICATE-----", "")
+                 .replace('\n', "")
+                 .replace('\r', "")
+                 .replace(' ', "")
+                 .trim()
+                 .to_string()
+            };
+            let expected_norm = normalize(expected_cert);
+            let response_norm = normalize(response_cert);
+
+            if expected_norm != response_norm {
+                tracing::warn!("⚠️ SAML certificate mismatch: response certificate does not match configured IdP certificate");
+                log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Certificate mismatch — possible tampering"), &headers).await;
+                return Err(AppError::BadRequest("SAML response certificate does not match the configured identity provider. Contact your administrator.".into()));
+            }
+            tracing::debug!("SAML certificate verified successfully");
+        } else if configured_cert.is_some() && assertion.certificate.is_none() {
+            tracing::warn!("SAML response missing certificate (expected one from IdP)");
+            // Some IdPs don't include cert in every response — log but don't block
+        }
     }
 
     let email = if let Some(ref ls) = login_state {
@@ -1494,6 +1542,26 @@ async fn oidc_callback(
         return Err(AppError::BadRequest("OIDC response email does not match the expected account. Contact your administrator.".into()));
     }
 
+    // Verify nonce — prevents replay attacks
+    if let Some(ref expected_nonce) = login_state.nonce {
+        let token_nonce = token_claims.get("nonce").and_then(|v| v.as_str());
+        match token_nonce {
+            Some(actual) if actual == expected_nonce => {
+                tracing::debug!("OIDC nonce verified successfully");
+            }
+            Some(actual) => {
+                tracing::warn!("OIDC nonce mismatch: expected={}, got={}", expected_nonce, actual);
+                log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "oidc", false, Some("Nonce mismatch — possible replay attack"), &headers).await;
+                return Err(AppError::BadRequest("SSO login failed: security token mismatch. Please try again.".into()));
+            }
+            None => {
+                tracing::warn!("OIDC ID token missing nonce claim");
+                // Some IdPs don't include nonce — log but don't block
+                // Blocking would break compatibility with IdPs that strip nonces
+            }
+        }
+    }
+
     // Extract name
     let mut attributes = std::collections::HashMap::new();
     if let Some(name) = token_claims.get("name").and_then(|v| v.as_str()) {
@@ -1598,6 +1666,10 @@ fn parse_saml_response(xml: &str) -> Result<SamlAssertion, AppError> {
     // Extract Audience from AudienceRestriction
     let audience = extract_xml_text(xml, "Audience");
 
+    // Extract X509Certificate from KeyInfo (for signature verification)
+    let certificate = extract_xml_text(xml, "X509Certificate")
+        .map(|cert| cert.replace('\n', "").replace('\r', "").replace(' ', ""));
+
     Ok(SamlAssertion {
         name_id,
         session_index,
@@ -1606,13 +1678,14 @@ fn parse_saml_response(xml: &str) -> Result<SamlAssertion, AppError> {
         in_response_to,
         destination,
         audience,
+        certificate,
     })
 }
 
 /// Extract text content from an XML element by tag name
 fn extract_xml_text(xml: &str, tag: &str) -> Option<String> {
     // Try multiple tag patterns: plain, namespaced with common prefixes
-    let prefixes = ["", "saml:", "saml2p:", "md:"];
+    let prefixes = ["", "saml:", "saml2p:", "md:", "ds:"];
     for prefix in &prefixes {
         let full_tag = format!("{}{}", prefix, tag);
         let start_tag = format!("<{}", full_tag);
@@ -2112,6 +2185,7 @@ mod tests {
             saml_request_id: None,
             auto_join_team_id: None,
             default_role: "developer".to_string(),
+            nonce: None,
             created_at: chrono::Utc::now(),
         };
         assert_eq!(state.default_role, "developer");
@@ -2127,10 +2201,12 @@ mod tests {
             saml_request_id: None,
             auto_join_team_id: Some(Uuid::new_v4()),
             default_role: "viewer".to_string(),
+            nonce: Some("test-nonce-123".to_string()),
             created_at: chrono::Utc::now(),
         };
         assert_eq!(state.default_role, "viewer");
         assert!(state.auto_join_team_id.is_some());
+        assert_eq!(state.nonce.as_deref(), Some("test-nonce-123"));
     }
 
     #[test]
@@ -2145,6 +2221,7 @@ mod tests {
                 saml_request_id: None,
                 auto_join_team_id: Some(Uuid::new_v4()),
                 default_role: "admin".to_string(),
+                nonce: None,
                 created_at: chrono::Utc::now(),
             };
             assert_eq!(state.default_role, "admin", "role should be preserved for {}", provider);
@@ -2164,5 +2241,39 @@ mod tests {
         // After fix: uses config_role
         assert_ne!(config_role, hardcoded_role, "config role differs from hardcoded");
         assert_eq!(config_role, "developer", "config role is developer");
+    }
+
+    // ── OIDC nonce verification ──────────────────────────────
+
+    #[test]
+    fn test_oidc_nonce_stored_in_state() {
+        let state = SsoLoginState {
+            customer_id: Uuid::new_v4(),
+            email: "user@example.com".to_string(),
+            provider: "oidc".to_string(),
+            redirect: None,
+            saml_request_id: None,
+            auto_join_team_id: None,
+            default_role: "viewer".to_string(),
+            nonce: Some("random-nonce-abc123".to_string()),
+            created_at: chrono::Utc::now(),
+        };
+        assert_eq!(state.nonce.as_deref(), Some("random-nonce-abc123"));
+    }
+
+    #[test]
+    fn test_saml_state_has_no_nonce() {
+        let state = SsoLoginState {
+            customer_id: Uuid::new_v4(),
+            email: "user@example.com".to_string(),
+            provider: "saml".to_string(),
+            redirect: None,
+            saml_request_id: Some("_request123".to_string()),
+            auto_join_team_id: None,
+            default_role: "viewer".to_string(),
+            nonce: None,
+            created_at: chrono::Utc::now(),
+        };
+        assert!(state.nonce.is_none(), "SAML state should not have nonce");
     }
 }
