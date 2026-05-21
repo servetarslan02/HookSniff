@@ -145,12 +145,12 @@ export default function TransformsPage() {
  return (
   <div className="space-y-6">
    {/* Header */}
-   <div className="flex items-center justify-between">
+   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
     <div>
-     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
-     <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
+     <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
     </div>
-    <button type="button" onClick={() => { setShowCreate(!showCreate); setEditTarget(null); resetForm(); }} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+    <button type="button" onClick={() => { setShowCreate(!showCreate); setEditTarget(null); resetForm(); }} className="bg-brand-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
      {t('newRule')}
     </button>
    </div>
@@ -170,7 +170,7 @@ export default function TransformsPage() {
     <div className="glass-card p-6 space-y-4">
      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{isEditing ? t('editTransformRule') : t('newTransformRule')}</h3>
 
-     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       <div>
        <label htmlFor="transform-filter-include" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('filterInclude')}</label>
        <input id="transform-filter-include" value={filterInclude} onChange={e => setFilterInclude(e.target.value)} placeholder="order_id, amount" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
@@ -191,7 +191,7 @@ export default function TransformsPage() {
       </div>
      </div>
 
-     <div className="flex gap-2 items-end">
+     <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-end">
       <div className="flex-1">
        <label htmlFor="transform-enrich-key" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('enrichKey')}</label>
        <input id="transform-enrich-key" value={enrichKey} onChange={e => setEnrichKey(e.target.value)} placeholder="source" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />

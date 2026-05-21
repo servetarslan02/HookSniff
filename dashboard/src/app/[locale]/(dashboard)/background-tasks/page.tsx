@@ -66,10 +66,10 @@ export default function BackgroundTasksPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
         {activeTasks.length > 0 && (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-medium">
@@ -107,25 +107,25 @@ export default function BackgroundTasksPage() {
                 {/* Main row */}
                 <div className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer"
                   onClick={() => setExpandedTask(expandedTask === task.id ? null : task.id)}>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 sm:gap-4">
                     {/* Status icon */}
                     <span className="text-lg">{statusIcons[task.status] || <Clock size={14} className="text-gray-400" />}</span>
 
                     {/* Type */}
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">{task.task_type}</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{task.task_type}</div>
                       {task.error && (
                         <div className="text-xs text-red-500 dark:text-red-400 truncate max-w-md">{task.error}</div>
                       )}
                     </div>
 
                     {/* Status badge */}
-                    <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium ${statusColors[task.status] || ''}`}>
+                    <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium hidden sm:inline-block ${statusColors[task.status] || ''}`}>
                       {task.status}
                     </span>
 
                     {/* Progress bar */}
-                    <div className="w-32 flex items-center gap-2">
+                    <div className="hidden md:flex w-32 items-center gap-2">
                       <div className="flex-1 bg-gray-200 dark:bg-slate-700 rounded-full h-2">
                         <div className={`h-2 rounded-full transition-all ${task.status === 'failed' ? 'bg-red-500' : task.status === 'completed' ? 'bg-green-500' : 'bg-brand-600'}`}
                           style={{ width: `${task.progress}%` }} />
@@ -134,10 +134,10 @@ export default function BackgroundTasksPage() {
                     </div>
 
                     {/* Created */}
-                    <span className="text-xs text-gray-500 dark:text-slate-400 w-32 text-right">{formatDate(task.created_at)}</span>
+                    <span className="text-xs text-gray-500 dark:text-slate-400 hidden sm:block w-32 text-right shrink-0">{formatDate(task.created_at)}</span>
 
                     {/* Expand arrow */}
-                    <span className="text-gray-400 text-xs">{expandedTask === task.id ? '▲' : '▼'}</span>
+                    <span className="text-gray-400 text-xs shrink-0">{expandedTask === task.id ? '▲' : '▼'}</span>
                   </div>
                 </div>
 
