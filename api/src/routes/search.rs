@@ -39,6 +39,9 @@ async fn search_deliveries(
     Extension(customer): Extension<Customer>,
     axum::extract::Query(params): axum::extract::Query<SearchParams>,
 ) -> Result<Json<SearchResult>, AppError> {
+    // RBAC: analyst or higher required to search deliveries
+    super::teams::check_user_team_role(&pool, customer.id, "analyst").await?;
+
     let page = params.page.unwrap_or(1).max(1);
     let per_page = params.per_page.unwrap_or(20).min(200);
     let offset = (page - 1) * per_page;

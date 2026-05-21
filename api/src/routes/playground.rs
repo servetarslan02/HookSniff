@@ -48,6 +48,9 @@ async fn get_playground(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<PlaygroundResponse>, AppError> {
+    // RBAC: developer or higher required to use playground
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
     // Get user's endpoints
     let endpoints: Vec<(Uuid, String, Option<String>, bool)> = sqlx::query_as(
         "SELECT id, url, description, is_active FROM endpoints WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 5"
@@ -108,6 +111,8 @@ async fn test_webhook(
     Extension(customer): Extension<Customer>,
     Json(req): Json<TestWebhookRequest>,
 ) -> Result<Json<TestWebhookResponse>, AppError> {
+    // RBAC: developer or higher required to send test webhooks
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     // Send a test webhook to the specified endpoint
     let endpoint = sqlx::query_as::<_, crate::models::endpoint::Endpoint>(
         "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",

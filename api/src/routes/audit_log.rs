@@ -77,6 +77,9 @@ async fn list_audit_entries(
     Extension(customer): Extension<Customer>,
     Query(query): Query<AuditLogQuery>,
 ) -> Result<Json<AuditLogResponse>, AppError> {
+    // RBAC: analyst or higher required to view audit log
+    super::teams::check_user_team_role(&pool, customer.id, "analyst").await?;
+
     let limit = query.limit.unwrap_or(50).min(200);
     // Support both page (1-indexed) and offset (0-indexed)
     let offset = if let Some(page) = query.page {
@@ -203,6 +206,9 @@ async fn get_audit_entry(
     Extension(customer): Extension<Customer>,
     Path(entry_id): Path<Uuid>,
 ) -> Result<Json<AuditEntry>, AppError> {
+    // RBAC: analyst or higher required to view audit log entries
+    super::teams::check_user_team_role(&pool, customer.id, "analyst").await?;
+
     let row: Option<AuditLogRow> = sqlx::query_as(
         "SELECT a.id, a.action, a.resource_type, a.resource_id, a.details, a.ip_address, a.user_agent, a.created_at,
                 COALESCE(c.name, 'Unknown') as actor, COALESCE(c.email, 'unknown') as actor_email

@@ -65,6 +65,9 @@ async fn get_portal_config(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<PortalConfigResponse>, AppError> {
+    // RBAC: developer or higher to view portal config
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
     let config = sqlx::query_as::<_, (Uuid, Option<String>, Option<String>, Option<String>, Option<String>, Option<bool>, Option<bool>, Option<bool>, Option<Vec<String>>, Option<String>, Option<DateTime<Utc>>, Option<DateTime<Utc>>)>(
         "SELECT id, company_name, logo_url, primary_color, font_family, dark_mode, show_events, show_deliveries, allowed_events, custom_css, created_at, updated_at
          FROM portal_configs WHERE customer_id = $1"
@@ -124,6 +127,9 @@ async fn upsert_portal_config(
     Extension(customer): Extension<Customer>,
     Json(req): Json<UpdatePortalRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: developer or higher to update portal config
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
     // Validate color format
     if let Some(ref color) = req.primary_color {
         if !color.starts_with('#') || color.len() != 7 {
