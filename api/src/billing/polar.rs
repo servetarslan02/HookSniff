@@ -495,6 +495,7 @@ impl PaymentProviderImpl for PolarProvider {
                     provider_customer_id: sub.customer_id.clone(),
                     provider_subscription_id: sub.id.clone(),
                     interval: interval.to_string(),
+                    event_id: event.id.clone(),
                 })
             }
             "subscription.updated" => {
@@ -516,6 +517,7 @@ impl PaymentProviderImpl for PolarProvider {
                     );
                     return Ok(WebhookResult::SubscriptionCanceled {
                         provider_subscription_id: sub_id,
+                        event_id: event.id.clone(),
                     });
                 }
 
@@ -552,6 +554,7 @@ impl PaymentProviderImpl for PolarProvider {
                     plan,
                     status,
                     interval: interval.to_string(),
+                    event_id: event.id.clone(),
                 })
             }
             "subscription.canceled" | "subscription.revoked" => {
@@ -563,6 +566,7 @@ impl PaymentProviderImpl for PolarProvider {
 
                 Ok(WebhookResult::SubscriptionCanceled {
                     provider_subscription_id: sub.id.unwrap_or_default(),
+                    event_id: event.id.clone(),
                 })
             }
             "order.created" | "order.completed" => {

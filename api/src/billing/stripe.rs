@@ -260,7 +260,7 @@ pub async fn handle_webhook_event(
 
     // HS-021: Idempotency check — skip already-processed events
     let already_processed: bool = sqlx::query_scalar(
-        "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider_event_id = $1)",
+        "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider_tx_id = $1)",
     )
     .bind(&event.id)
     .fetch_one(pool)

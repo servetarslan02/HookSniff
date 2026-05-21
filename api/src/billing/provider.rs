@@ -57,6 +57,8 @@ pub enum WebhookResult {
         provider_subscription_id: Option<String>,
         /// Billing interval: "month" or "year"
         interval: String,
+        /// Webhook event ID for idempotency
+        event_id: Option<String>,
     },
     /// Subscription updated (plan change, renewal).
     SubscriptionUpdated {
@@ -65,9 +67,15 @@ pub enum WebhookResult {
         status: String,
         /// Billing interval: "month" or "year"
         interval: String,
+        /// Webhook event ID for idempotency
+        event_id: Option<String>,
     },
     /// Subscription canceled.
-    SubscriptionCanceled { provider_subscription_id: String },
+    SubscriptionCanceled {
+        provider_subscription_id: String,
+        /// Webhook event ID for idempotency
+        event_id: Option<String>,
+    },
     /// Payment succeeded.
     PaymentSucceeded {
         provider_tx_id: String,
@@ -232,6 +240,7 @@ mod tests {
             provider_customer_id: Some("cust_123".to_string()),
             provider_subscription_id: Some("sub_456".to_string()),
             interval: "month".to_string(),
+            event_id: Some("evt_001".to_string()),
         };
         match result {
             WebhookResult::SubscriptionCreated {
@@ -240,12 +249,14 @@ mod tests {
                 provider_customer_id,
                 provider_subscription_id,
                 interval,
+                event_id,
             } => {
                 assert_eq!(cid, customer_id);
                 assert_eq!(plan, Plan::Pro);
                 assert_eq!(provider_customer_id.as_deref(), Some("cust_123"));
                 assert_eq!(provider_subscription_id.as_deref(), Some("sub_456"));
                 assert_eq!(interval, "month");
+                assert_eq!(event_id.as_deref(), Some("evt_001"));
             }
             _ => panic!("Expected SubscriptionCreated"),
         }
@@ -260,6 +271,7 @@ mod tests {
             provider_customer_id: Some("cust_123".to_string()),
             provider_subscription_id: Some("sub_456".to_string()),
             interval: "year".to_string(),
+            event_id: None,
         };
         match result {
             WebhookResult::SubscriptionCreated { interval, .. } => {
@@ -277,6 +289,7 @@ mod tests {
             provider_customer_id: None,
             provider_subscription_id: None,
             interval: "month".to_string(),
+            event_id: None,
         };
         match result {
             WebhookResult::SubscriptionCreated {
@@ -298,6 +311,7 @@ mod tests {
             plan: Plan::Enterprise,
             status: "active".to_string(),
             interval: "month".to_string(),
+            event_id: Some("evt_002".to_string()),
         };
         match result {
             WebhookResult::SubscriptionUpdated {
@@ -305,11 +319,13 @@ mod tests {
                 plan,
                 status,
                 interval,
+                event_id,
             } => {
                 assert_eq!(provider_subscription_id, "sub_789");
                 assert_eq!(plan, Plan::Enterprise);
                 assert_eq!(status, "active");
                 assert_eq!(interval, "month");
+                assert_eq!(event_id.as_deref(), Some("evt_002"));
             }
             _ => panic!("Expected SubscriptionUpdated"),
         }
@@ -319,12 +335,15 @@ mod tests {
     fn webhook_result_subscription_canceled() {
         let result = WebhookResult::SubscriptionCanceled {
             provider_subscription_id: "sub_cancel".to_string(),
+            event_id: Some("evt_003".to_string()),
         };
         match result {
             WebhookResult::SubscriptionCanceled {
                 provider_subscription_id,
+                event_id,
             } => {
                 assert_eq!(provider_subscription_id, "sub_cancel");
+                assert_eq!(event_id.as_deref(), Some("evt_003"));
             }
             _ => panic!("Expected SubscriptionCanceled"),
         }
