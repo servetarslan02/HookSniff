@@ -21,6 +21,8 @@ pub async fn handle_stripe_webhook(
 }
 
 /// POST /v1/billing/webhook/polar — Polar.sh webhook handler
+/// IMPORTANT: Always returns 200 to prevent Polar from auto-disabling the webhook.
+/// Errors are logged but never returned to Polar.
 
 pub async fn handle_polar_webhook(
     Extension(pool): Extension<PgPool>,
@@ -28,14 +30,47 @@ pub async fn handle_polar_webhook(
     headers: axum::http::HeaderMap,
     body: String,
 ) -> Result<StatusCode, AppError> {
+    // Rate limit check — 429 is acceptable (Polar retries)
     check_billing_webhook_rate_limit(&rate_limiter, &headers).await?;
-    check_webhook_idempotency(&pool, &body, "polar").await?;
 
-    let config = crate::billing::polar::PolarConfig::from_env()
-        .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Polar.sh not configured")))?;
+    // Idempotency — if already processed, return 200 (not error)
+    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&body) {
+        if let Some(event_id) = parsed.get("id").and_then(|v| v.as_str()) {
+            let already_processed: bool = sqlx::query_scalar(
+                "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider = $1 AND provider_tx_id = $2)"
+            )
+            .bind("polar").bind(event_id).fetch_one(&pool).await.unwrap_or(false);
+            if already_processed {
+                tracing::info!("♻️ Polar event {} already processed, skipping", event_id);
+                return Ok(StatusCode::OK);
+            }
+        }
+    }
+
+    // Load config — if not configured, log and return 200
+    let config = match crate::billing::polar::PolarConfig::from_env() {
+        Some(c) => c,
+        None => {
+            tracing::error!("Polar.sh not configured — webhook ignored");
+            return Ok(StatusCode::OK);
+        }
+    };
+
+    // Process webhook — handle_webhook now always returns Ok (never errors)
     let provider = crate::billing::polar::PolarProvider::new(config);
-    let result = provider.handle_webhook(&headers, &body, &pool).await?;
-    process_webhook_result(&pool, &result, "polar").await?;
+    let result = match provider.handle_webhook(&headers, &body, &pool).await {
+        Ok(r) => r,
+        Err(e) => {
+            tracing::error!("Polar webhook handler error: {:?} — returning 200 anyway", e);
+            return Ok(StatusCode::OK);
+        }
+    };
+
+    // Process result — if DB write fails, log but return 200
+    if let Err(e) = process_webhook_result(&pool, &result, "polar").await {
+        tracing::error!("Polar webhook DB error: {:?} — returning 200 anyway", e);
+    }
+
     Ok(StatusCode::OK)
 }
 
