@@ -9,7 +9,7 @@ use crate::auth::jwt;
 use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::{
-    AuthResponse, Confirm2faRequest, Customer, Disable2faRequest, Enable2faRequest,
+    AuthResponse, Confirm2faRequest, Customer, Disable2faRequest,
     TwoFactorRequiredResponse, Verify2faRequest,
 };
 use crate::routes::auth::{auth_response_with_cookie, extract_client_ip, send_audit_log};
@@ -85,17 +85,7 @@ pub async fn verify_2fa_login(
 pub async fn enable_2fa(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
-    Json(req): Json<Enable2faRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let hash = customer
-        .password_hash
-        .as_ref()
-        .ok_or(AppError::BadRequest("Password not set".into()))?;
-
-    if !jwt::verify_password_async(req.password.clone(), hash.clone()).await? {
-        return Err(AppError::BadRequest("Invalid password".into()));
-    }
-
     if customer.totp_enabled {
         return Err(AppError::BadRequest("2FA is already enabled".into()));
     }
