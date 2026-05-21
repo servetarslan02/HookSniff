@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
-import { posts } from './[locale]/blog/[slug]/data';
+import { blogSlugs } from '@/lib/blog-slugs';
 
 const BASE_URL = 'https://hooksniff.vercel.app';
 
@@ -62,7 +62,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }
 
   // Blog posts
-  const blogSlugs = Object.keys(posts);
   for (const slug of blogSlugs) {
     for (const locale of locales) {
       entries.push({
