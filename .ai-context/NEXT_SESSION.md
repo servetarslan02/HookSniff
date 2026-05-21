@@ -4,13 +4,15 @@
 
 ## ✅ Bu Oturumda Yapılan İşler (Session 5)
 
-### Team Role-Based Access Control (RBAC) Enforcement
+### Team Role-Based Access Control (RBAC) — Full Enforcement
 - `require_team_developer` ve `require_team_analyst` artık aktif kullanılıyor
-- 18 route dosyasına rol kontrolü eklendi (532 satır)
+- 18 route dosyasına rol kontrolü eklendi (532+ satır)
+- `check_user_team_role()` merkezi fonksiyon — TÜM takım üyeliklerini kontrol eder
 - Viewer artık endpoint/webhook/API key oluşturamaz
 - SSO `default_role` artık enforce ediliyor
 - Rol hiyerarşisi: owner > admin(40) > developer(30) > analyst(20) > viewer(10)
 - Write ops → developer, Destructive ops → admin
+- Commits: `5b22428e` + `a9929b3a`
 
 ## 📋 Sonraki Adımlar
 
