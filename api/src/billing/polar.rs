@@ -595,13 +595,32 @@ impl PaymentProviderImpl for PolarProvider {
                     .unwrap_or_default()
                     .to_string();
 
-                let amount = order.get("amount").and_then(|v| v.as_i64()).unwrap_or(0) as u64;
+                // Use total_amount (what customer actually paid) instead of amount (which may be 0)
+                // Fallback chain: total_amount → net_amount → amount → subtotal_amount
+                let amount = order
+                    .get("total_amount")
+                    .and_then(|v| v.as_i64())
+                    .or_else(|| order.get("net_amount").and_then(|v| v.as_i64()))
+                    .or_else(|| order.get("amount").and_then(|v| v.as_i64()))
+                    .unwrap_or(0) as u64;
+
+                // Store subtotal for reference (original price before discount)
+                let _subtotal = order
+                    .get("subtotal_amount")
+                    .and_then(|v| v.as_i64())
+                    .unwrap_or(0);
 
                 let currency = order
                     .get("currency")
                     .and_then(|v| v.as_str())
                     .unwrap_or("USD")
                     .to_string();
+
+                // Polar invoice number for customer reference
+                let invoice_number = order
+                    .get("invoice_number")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string());
 
                 // Try to extract card details from Polar order data
                 // Polar may include billing details in the order object
@@ -643,6 +662,7 @@ impl PaymentProviderImpl for PolarProvider {
                         .or_else(|| order.get("external_customer_id"))
                         .and_then(|v| v.as_str())
                         .and_then(|s| Uuid::parse_str(s).ok()),
+                    invoice_number,
                 })
             }
             "order.refunded" => {
