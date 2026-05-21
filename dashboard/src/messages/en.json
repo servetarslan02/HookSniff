@@ -1733,7 +1733,8 @@
       "alerts": "Alerts",
       "email": "Email",
       "broadcasts": "Broadcasts",
-      "security": "Security"
+      "security": "Security",
+      "userPanel": "User Panel"
     },
     "noActivity": "No activity recorded yet",
     "noAdminPrivileges": "You don't have admin privileges.",
