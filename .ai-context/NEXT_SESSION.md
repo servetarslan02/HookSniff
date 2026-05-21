@@ -33,14 +33,17 @@
 ## 📋 Sonraki Adımlar
 
 ### Kısa Vadeli (1-2 oturum)
-1. **E2E Billing Test** — Gerçek Polar sandbox ile checkout → webhook → plan güncelleme akışı test edilmeli
-2. **Dashboard Billing Sayfası** — Frontend'de `billing-section` URL'i ile `dashboard/billing` tutarsızlığı var
-3. **Card Info Extraction** — Polar MoR olduğu için kart bilgileri gelmiyor, bu alanlar UI'da gizlenmeli
-4. **track_daily_event takım bazlı** — overage notifications da takım planına göre çalışmalı
-5. **Team role change fix** — `m.id` → `m.customer_id` düzeltildi (commit: `f992c9b9`)
-6. **Team plan limits** — `reserve_webhook_slot` takım bazlı yapıldı (commit: `ded9fe76`)
-7. **track_daily_event takım bazlı** — overage notifications da takım planına göre çalışır (commit: `1986ea0d`)
-8. **KRİTİK FIX: Team-level sayaç** — webhook_count ve daily_event sayaçları takım sahibinde artıyor (commit: `f96b3939`)
+1. **Blog içerikleri yaz** — SEO için en kritik. Hedef anahtar kelimeler:
+   - "webhooks explained" / "what is a webhook"
+   - "webhook vs api" / "webhook vs polling"
+   - "free webhook service 2026"
+   - "svix alternative" / "hookdeck alternative"
+   - "webhook best practices" / "webhook security"
+   - "how to implement webhooks in node.js"
+   - "stripe webhooks guide" / "github webhooks guide"
+2. **Sitemap'e blog sayfalarını ekle** — Mevcut sitemap sadece ana sayfaları içeriyor
+3. **Search Console performans** — 2-3 gün içinde veri gelmeye başlar, kontrol et
+4. **Dashboard Billing Sayfası** — Frontend'de `billing-section` URL'i ile `dashboard/billing` tutarsızlığı var
 
 ### Orta Vadeli (3-5 oturum)
 4. **Dunning Test** — E-posta hatırlatma sistemi test edilmeli (Polar sandbox)
