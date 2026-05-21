@@ -74,6 +74,9 @@ export async function generateMetadata({
       index: true,
       follow: true,
     },
+    verification: {
+      google: 'TQD51mWwYf0O3V5DviqzU5MZ4I-fKtrrEC66qPOPXzM',
+    },
     alternates: {
       canonical: `https://hooksniff.vercel.app/${locale}`,
       languages: Object.fromEntries(
