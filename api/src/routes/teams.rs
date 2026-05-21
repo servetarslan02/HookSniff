@@ -124,13 +124,25 @@ pub struct InviteResponse {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const VALID_ROLES: &[&str] = &["admin", "editor", "viewer"];
+const VALID_ROLES: &[&str] = &["admin", "developer", "analyst", "viewer"];
+
+/// Role hierarchy: higher number = more permissions.
+/// Owner is not a stored role — it's derived from teams.owner_id.
+fn role_level(role: &str) -> u8 {
+    match role {
+        "admin" => 40,
+        "developer" => 30,
+        "analyst" => 20,
+        "viewer" => 10,
+        _ => 0,
+    }
+}
 
 fn validate_role(role: &str) -> Result<(), AppError> {
     if VALID_ROLES.contains(&role) {
         Ok(())
     } else {
-        Err(AppError::BadRequest("Invalid role".into()))
+        Err(AppError::BadRequest("Invalid role. Must be one of: admin, developer, analyst, viewer".into()))
     }
 }
 
@@ -150,11 +162,13 @@ async fn require_team_member(
     .ok_or(AppError::Forbidden("Not a member of this team".into()))
 }
 
-/// Check that the user is an admin or owner of the team.
-async fn require_team_admin(
+/// Check that the user meets the minimum role level (or is the team owner).
+/// Hierarchy: owner > admin > developer > analyst > viewer
+async fn require_role(
     pool: &PgPool,
     team_id: Uuid,
     customer_id: Uuid,
+    min_role: &str,
 ) -> Result<(), AppError> {
     let team = sqlx::query_as::<_, Team>("SELECT id, name, owner_id, created_at, updated_at FROM teams WHERE id = $1")
         .bind(team_id)
@@ -162,19 +176,47 @@ async fn require_team_admin(
         .await?
         .ok_or(AppError::NotFound)?;
 
+    // Owner always has full access
     if team.owner_id == customer_id {
         return Ok(());
     }
 
     let member = require_team_member(pool, team_id, customer_id).await?;
-    if member.role == "admin" {
+    if role_level(&member.role) >= role_level(min_role) {
         Ok(())
     } else {
-        Err(AppError::Forbidden(
-            "Admin role required for this action".into(),
-        ))
+        Err(AppError::Forbidden(format!("{} role or higher required", min_role)))
     }
 }
+
+/// Check that the user is an admin or owner of the team.
+async fn require_team_admin(
+    pool: &PgPool,
+    team_id: Uuid,
+    customer_id: Uuid,
+) -> Result<(), AppError> {
+    require_role(pool, team_id, customer_id, "admin").await
+}
+
+/// Check that the user is at least a developer (can manage endpoints, webhooks, etc.)
+async fn require_team_developer(
+    pool: &PgPool,
+    team_id: Uuid,
+    customer_id: Uuid,
+) -> Result<(), AppError> {
+    require_role(pool, team_id, customer_id, "developer").await
+}
+
+/// Check that the user is at least an analyst (can view dashboards, analytics)
+async fn require_team_analyst(
+    pool: &PgPool,
+    team_id: Uuid,
+    customer_id: Uuid,
+) -> Result<(), AppError> {
+    require_role(pool, team_id, customer_id, "analyst").await
+}
+
+// ── Routes ───────────────────────────────────────────────────────────────────
 
 // ── Handlers ─────────────────────────────────────────────────────────────────
 
@@ -931,8 +973,8 @@ async fn transfer_ownership(
             .await?;
     }
 
-    // Demote old owner to editor (they're no longer the owner)
-    sqlx::query("UPDATE team_members SET role = 'editor' WHERE team_id = $1 AND customer_id = $2")
+    // Demote old owner to developer (they're no longer the owner)
+    sqlx::query("UPDATE team_members SET role = 'developer' WHERE team_id = $1 AND customer_id = $2")
         .bind(id)
         .bind(customer.id)
         .execute(&pool)
@@ -1047,14 +1089,14 @@ mod tests {
             id: Uuid::new_v4(),
             team_id: Uuid::new_v4(),
             email: "invite@example.com".to_string(),
-            role: "editor".to_string(),
+            role: "developer".to_string(),
             token: "inv_abc123".to_string(),
             expires_at: Utc::now() + chrono::Duration::days(7),
             created_at: Utc::now(),
         };
         let json = serde_json::to_value(&invite).unwrap();
         assert_eq!(json["email"], "invite@example.com");
-        assert_eq!(json["role"], "editor");
+        assert_eq!(json["role"], "developer");
     }
 
     // ── CreateTeamRequest ───────────────────────────────────
@@ -1070,10 +1112,10 @@ mod tests {
 
     #[test]
     fn test_invite_request_with_role() {
-        let json = r#"{"email":"a@b.com","role":"editor"}"#;
+        let json = r#"{"email":"a@b.com","role":"developer"}"#;
         let req: InviteRequest = serde_json::from_str(json).unwrap();
         assert_eq!(req.email, "a@b.com");
-        assert_eq!(req.role, Some("editor".to_string()));
+        assert_eq!(req.role, Some("developer".to_string()));
     }
 
     #[test]
@@ -1154,13 +1196,13 @@ mod tests {
             customer_id: Uuid::new_v4(),
             email: "member@team.com".to_string(),
             name: Some("Member Name".to_string()),
-            role: "editor".to_string(),
+            role: "developer".to_string(),
             invited_at: Utc::now(),
             joined_at: Some(Utc::now()),
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["email"], "member@team.com");
-        assert_eq!(json["role"], "editor");
+        assert_eq!(json["role"], "developer");
     }
 
     // ── InviteResponse ──────────────────────────────────────
@@ -1184,7 +1226,7 @@ mod tests {
     #[test]
     fn test_valid_roles_contains_expected() {
         assert!(VALID_ROLES.contains(&"admin"));
-        assert!(VALID_ROLES.contains(&"editor"));
+        assert!(VALID_ROLES.contains(&"developer"));
         assert!(VALID_ROLES.contains(&"viewer"));
         assert!(!VALID_ROLES.contains(&"owner"));
         assert!(!VALID_ROLES.contains(&"superadmin"));
@@ -1195,7 +1237,7 @@ mod tests {
     #[test]
     fn test_validate_role_valid() {
         assert!(validate_role("admin").is_ok());
-        assert!(validate_role("editor").is_ok());
+        assert!(validate_role("developer").is_ok());
         assert!(validate_role("viewer").is_ok());
     }
 

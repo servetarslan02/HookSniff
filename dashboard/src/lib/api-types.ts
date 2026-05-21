@@ -168,7 +168,7 @@ export interface TeamMember {
   customer_id: string;
   email: string;
   name?: string;
-  role: 'admin' | 'editor' | 'viewer';
+  role: 'admin' | 'developer' | 'analyst' | 'viewer';
   invited_at: string;
   joined_at: string | null;
 }

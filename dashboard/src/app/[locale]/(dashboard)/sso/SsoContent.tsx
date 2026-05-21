@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import { useSsoConfig, useTeams } from '@/hooks/useDashboardData';
-import { AlertTriangle, Building2, Check, CheckCircle2, ClipboardList, Eye, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
+import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
 
 /* ─── SSO/SAML Configuration Page (Enterprise Only) ─── */
 export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
@@ -506,7 +506,8 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white disabled:opacity-60 disabled:cursor-not-allowed"
        >
         <option value="viewer"><Eye size={16} strokeWidth={1.75} className="inline mr-1" /> {t('roleViewer')}</option>
-        <option value="editor"><Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('roleEditor')}</option>
+        <option value="analyst"><BarChart3 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('roleAnalyst')}</option>
+        <option value="developer"><Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('roleDeveloper')}</option>
         <option value="admin"><Shield size={16} strokeWidth={1.75} className="inline mr-1" /> {t('roleAdmin')}</option>
        </select>
        </div>

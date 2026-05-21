@@ -594,7 +594,9 @@
     "teamGrowing": "Takım büyüyor! Daha fazla kapasite için planınızı yükseltin.",
     "inviteLinkReady": "Davet linki hazır!",
     "shareInviteLink": "Bu linki davet ettiğiniz kişiyle paylaşın. Önce giriş yapmaları gerekiyor, ardından davet otomatik olarak kabul edilecek.",
-    "copy": "Kopyala"
+    "copy": "Kopyala",
+    "roleDeveloper": "Geliştirici",
+    "roleAnalyst": "Analist"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -1301,7 +1303,11 @@
     "retryAttempt": "Attempt",
     "retryDelay": "Delay",
     "retryCumulative": "Cumulative",
-    "endpointSecret": "Signing secret — HMAC-SHA256 secret for payload verification (whsec_ prefix)"
+    "endpointSecret": "Signing secret — HMAC-SHA256 secret for payload verification (whsec_ prefix)",
+    "permDeveloper": "Geliştirici",
+    "permAnalyst": "Analist",
+    "permViewAnalytics": "Analitik Görüntüle",
+    "permAdmin": "Admin"
   },
   "status": {
     "title": "HookSniff Durumu",

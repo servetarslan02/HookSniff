@@ -592,7 +592,9 @@
     "teamGrowing": "Team is growing! Consider upgrading for more capacity.",
     "inviteLinkReady": "Invite link ready!",
     "shareInviteLink": "Share this link with the invited person. They need to log in first, then the invite will be accepted automatically.",
-    "copy": "Copy"
+    "copy": "Copy",
+    "roleDeveloper": "Developer",
+    "roleAnalyst": "Analyst"
   },
   "notifications": {
     "title": "Notifications",
@@ -1299,7 +1301,11 @@
     "retryCumulative": "Cumulative",
     "endpointSecret": "Signing secret — HMAC-SHA256 secret for payload verification (whsec_ prefix)",
     "step5": "If the delivery fails, it's automatically retried (default: 5 attempts with exponential backoff)",
-    "conceptRetryPolicyDesc": "Configurable per endpoint. Default: 5 attempts with exponential backoff (1s, 2s, 4s, 8s, 16s). After exhaustion, delivery goes to DLQ."
+    "conceptRetryPolicyDesc": "Configurable per endpoint. Default: 5 attempts with exponential backoff (1s, 2s, 4s, 8s, 16s). After exhaustion, delivery goes to DLQ.",
+    "permDeveloper": "Developer",
+    "permAnalyst": "Analyst",
+    "permViewAnalytics": "View Analytics",
+    "permAdmin": "Admin"
   },
   "status": {
     "title": "HookSniff Status",
@@ -2052,7 +2058,6 @@
     "topEvents": "Top Events",
     "delivered": "Delivered",
     "failed": "Failed",
-    "pending": "Pending",
     "lastDelivery": "Last Delivery",
     "transactionId": "Transaction ID",
     "refundHistory": "Refund History",
