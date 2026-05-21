@@ -116,6 +116,13 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className="h-full" suppressHydrationWarning>
       <head>
+        {/* Preconnect for performance */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://static.cloudflareinsights.com" />
+        {/* RSS Feed */}
+        <link rel="alternate" type="application/rss+xml" title="HookSniff Blog RSS" href="/feed.xml" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
