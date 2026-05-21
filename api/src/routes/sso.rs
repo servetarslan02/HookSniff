@@ -1130,6 +1130,7 @@ async fn initiate_sso_login(
         paused_until: None,
         pause_plan: None,
         has_used_startup_trial: false,
+            billing_interval: None,
     });
 
     if provider == "saml" {
