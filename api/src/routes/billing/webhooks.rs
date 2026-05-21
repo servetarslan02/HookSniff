@@ -341,6 +341,23 @@ async fn process_webhook_result(
                     cid
                 );
 
+                // HS-039: If customer had a previous payment failure, notify recovery
+                let had_failure: Option<chrono::DateTime<chrono::Utc>> = sqlx::query_scalar(
+                    "SELECT payment_failed_at FROM customers WHERE id = $1"
+                )
+                .bind(cid)
+                .fetch_optional(pool)
+                .await?
+                .flatten();
+
+                if had_failure.is_some() {
+                    let pool_clone = pool.clone();
+                    let provider_clone = provider.to_string();
+                    tokio::spawn(async move {
+                        crate::notifications::helpers::payment_recovered(&pool_clone, cid, &provider_clone).await;
+                    });
+                }
+
                 // Record payment transaction
                 let _ = sqlx::query(
                     "INSERT INTO payment_transactions \

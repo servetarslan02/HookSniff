@@ -157,6 +157,9 @@ pub async fn confirm_2fa(
     tracing::info!("✅ 2FA enabled for customer {}", customer.id);
     send_audit_log(&pool, customer.id, "2FA_ENABLE", &headers).await;
 
+    // HS-039: Notify user of 2FA enablement
+    crate::notifications::helpers::two_factor_enabled(&pool, customer.id).await;
+
     Ok(Json(serde_json::json!({
         "message": "Two-factor authentication has been enabled.",
         "backup_codes": backup_codes,
@@ -197,6 +200,9 @@ pub async fn disable_2fa(
 
     tracing::info!("✅ 2FA disabled for customer {}", customer.id);
     send_audit_log(&pool, customer.id, "2FA_DISABLE", &headers).await;
+
+    // HS-039: Notify user of 2FA disablement
+    crate::notifications::helpers::two_factor_disabled(&pool, customer.id).await;
 
     Ok(Json(
         serde_json::json!({"message": "Two-factor authentication has been disabled."}),

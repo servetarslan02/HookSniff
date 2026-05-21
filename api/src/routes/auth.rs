@@ -740,6 +740,9 @@ async fn change_password(
     tracing::info!("✅ Password changed for customer {}", customer.id);
     send_audit_log(&pool, customer.id, "PASSWORD_CHANGE", &headers).await;
 
+    // HS-039: Notify user of password change
+    crate::notifications::helpers::password_changed(&pool, customer.id).await;
+
     Ok(Json(serde_json::json!({"message": "Password updated successfully"})))
 }
 
@@ -1041,6 +1044,10 @@ async fn confirm_email_change(
         .bind(code_id).execute(&pool).await?;
 
     tracing::info!("✅ Email changed for customer {} to {}", customer.id, &new_email);
+
+    // HS-039: Notify user of email change
+    crate::notifications::helpers::email_changed(&pool, customer.id, &new_email).await;
+
     Ok(Json(serde_json::json!({
         "message": "Email address has been changed successfully.",
         "new_email": new_email
