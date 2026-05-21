@@ -119,8 +119,12 @@ export default function PortalPage() {
           />
           <UsageCard
             icon={<Gauge size={18} strokeWidth={1.75} />}
-            label={t('successRate')}
-            value={billingUsage?.rate_limit ? `${billingUsage.rate_limit.requests_per_minute}/min` : '—'}
+            label={t('rateLimit')}
+            value={billingUsage?.rate_limit
+              ? (isUnlimited(billingUsage.rate_limit.requests_per_minute)
+                  ? '∞'
+                  : `${billingUsage.rate_limit.requests_per_minute.toLocaleString()}/min`)
+              : '—'}
             color="emerald"
           />
         </div>
