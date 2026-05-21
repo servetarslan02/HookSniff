@@ -227,7 +227,7 @@ async fn google_callback(
         .app_url
         .as_deref()
         .unwrap_or("https://hooksniff.vercel.app");
-    let auth_cookie = create_auth_cookie(&token, 86400);
+    let auth_cookie = create_auth_cookie(&token, 900);
     let refresh_cookie = create_refresh_token_cookie(&refresh_token_value, 30 * 86400);
     let state_clear = clear_oauth_state_cookie();
     let pkce_clear = clear_pkce_cookie();
@@ -369,7 +369,7 @@ async fn github_callback(
         .app_url
         .as_deref()
         .unwrap_or("https://hooksniff.vercel.app");
-    let auth_cookie = create_auth_cookie(&token, 86400);
+    let auth_cookie = create_auth_cookie(&token, 900);
     let refresh_cookie = create_refresh_token_cookie(&refresh_token_value, 30 * 86400);
     let state_clear = clear_oauth_state_cookie();
     let pkce_clear = clear_pkce_cookie();

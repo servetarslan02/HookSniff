@@ -1979,7 +1979,7 @@ async fn generate_sso_response(
     let app_url = cfg.app_url.as_deref().unwrap_or("https://hooksniff.vercel.app");
     let redirect_url = redirect.unwrap_or_else(|| format!("{}/dashboard", app_url));
 
-    let auth_cookie = create_auth_cookie(&token, 86400);
+    let auth_cookie = create_auth_cookie(&token, 900); // HS-039: 15 min (matches JWT)
     let refresh_cookie = create_refresh_token_cookie(&refresh_token, 30 * 86400);
 
     let mut headers = HeaderMap::new();
