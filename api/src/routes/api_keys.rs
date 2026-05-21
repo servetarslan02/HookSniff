@@ -72,11 +72,7 @@ async fn create_api_key(
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
     } else {
-        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = team_id {
-            super::teams::require_team_developer(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     let api_key = generate_api_key();
@@ -125,11 +121,7 @@ async fn delete_api_key(
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
     } else {
-        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = team_id {
-            super::teams::require_team_admin(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
     }
 
     // Get the prefix and name before deleting for cache invalidation and notification
@@ -178,11 +170,7 @@ async fn rotate_api_key(
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
     } else {
-        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = team_id {
-            super::teams::require_team_admin(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
     }
 
     // Verify ownership and get old prefix for cache invalidation
