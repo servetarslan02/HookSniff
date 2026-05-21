@@ -765,7 +765,8 @@
     "failedToUpdateConsent": "Onay güncellenemedi",
     "enterPassword": "Şifrenizi girin",
     "next": "İleri",
-    "preferences": "Tercihler"
+    "preferences": "Tercihler",
+    "openInAuthenticator": "Authenticator uygulamasında aç"
   },
   "billing": {
     "title": "Faturalandırma",
