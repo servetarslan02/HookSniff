@@ -44,6 +44,7 @@ const adminNavigation = [
   { nameKey: 'overview', href: '/admin', icon: <BarChart3 size={16} strokeWidth={1.75} /> },
   { nameKey: 'users', href: '/admin/users', icon: <Users size={16} strokeWidth={1.75} /> },
   { nameKey: 'revenue', href: '/admin/revenue', icon: <DollarSign size={16} strokeWidth={1.75} /> },
+  { nameKey: 'refundRequests', href: '/admin/refund-requests', icon: <RefreshCw size={16} strokeWidth={1.75} /> },
   { nameKey: 'featureFlags', href: '/admin/feature-flags', icon: <Flag size={16} strokeWidth={1.75} /> },
   { nameKey: 'coupons', href: '/admin/coupons', icon: <Zap size={16} strokeWidth={1.75} /> },
   { nameKey: 'system', href: '/admin/system', icon: <Monitor size={16} strokeWidth={1.75} /> },
