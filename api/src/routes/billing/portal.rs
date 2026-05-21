@@ -107,7 +107,7 @@ pub(crate) struct InvoiceResponse {
 
 type InvoiceRow = (
     uuid::Uuid,
-    i32,
+    i64,
     String,
     String,
     String,

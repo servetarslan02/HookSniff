@@ -44,7 +44,7 @@ pub async fn get_subscription(
         monthly_price_cents: plan.monthly_price_cents(),
         monthly_price_kurus: plan.monthly_price_kurus(),
         cancel_at_period_end: customer.cancel_at_period_end,
-        billing_period: "monthly".to_string(), // Default; annual tracked via provider
+        billing_period: customer.billing_interval.clone().unwrap_or_else(|| "month".to_string()),
         current_period_end,
         card_last4: customer.card_last4.clone(),
         card_brand: customer.card_brand.clone(),
@@ -157,6 +157,7 @@ pub async fn pause_subscription(
         "UPDATE customers SET \
          cancel_at_period_end = true, \
          pause_plan = $1, \
+         paused_at = NOW(), \
          paused_until = $2, \
          updated_at = NOW() \
          WHERE id = $3",

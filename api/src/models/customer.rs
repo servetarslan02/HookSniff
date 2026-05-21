@@ -89,6 +89,9 @@ pub struct Customer {
     /// Whether the customer has already used the Startup first-month-free trial.
     #[serde(default)]
     pub has_used_startup_trial: bool,
+    /// Billing interval: "month" or "year"
+    #[serde(default)]
+    pub billing_interval: Option<String>,
 }
 
 fn default_payment_provider() -> String {
