@@ -348,11 +348,14 @@ mod tests {
             amount: 49.00,
             status: "paid".to_string(),
             plan: "pro".to_string(),
+            provider: "polar".to_string(),
+            provider_invoice_id: Some("pi_abc123".to_string()),
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["id"], "inv_123");
         assert_eq!(json["amount"], 49.0);
         assert_eq!(json["status"], "paid");
+        assert_eq!(json["provider"], "polar");
     }
 
     // ── Router construction ─────────────────────────────────

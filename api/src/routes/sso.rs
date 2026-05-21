@@ -1123,6 +1123,7 @@ async fn initiate_sso_login(
         totp_enabled: false,
         cancel_at_period_end: false,
         payment_failed_at: None,
+        current_period_end: None,
         allow_overage: true,
         overage_email_notification: true,
         card_last4: None,

@@ -241,6 +241,14 @@ mod tests {
             updated_at: Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap(),
             error_message: None,
             is_test: false,
+            custom_headers: None,
+            event: None,
+            processed_at: None,
+            idempotency_key: None,
+            source_ip: None,
+            request_headers: None,
+            application_id: None,
+            payload_hash: None,
         }
     }
 

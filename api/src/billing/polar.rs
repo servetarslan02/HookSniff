@@ -890,8 +890,9 @@ impl PaymentProviderImpl for PolarProvider {
             .map_err(|e| AppError::Internal(anyhow::anyhow!("Polar cancel_at_period_end failed: {}", e)))?;
 
         if !resp.status().is_success() {
+            let status = resp.status();
             let body = resp.text().await.unwrap_or_default();
-            tracing::error!("Polar cancel_at_period_end failed ({}): {}", resp.status(), body);
+            tracing::error!("Polar cancel_at_period_end failed ({}): {}", status, body);
             // Fallback: if PATCH doesn't work, just set it in our DB (Polar will still charge)
             tracing::warn!("⚠️ Could not set cancel_at_period_end at Polar — customer will need to cancel manually via portal");
         }
