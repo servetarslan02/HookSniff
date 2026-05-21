@@ -181,22 +181,24 @@ export default function AdminActivityPage() {
 
       {/* Filter */}
       <div className="glass-card p-4">
-        <div className="flex items-center gap-3">
-          <label htmlFor="action-filter" className="text-sm font-medium text-gray-700 dark:text-slate-300">
-            {t('filterByAction')}:
-          </label>
-          <select
-            id="action-filter"
-            value={actionFilter}
-            onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
-            className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
-          >
-            <option value="">{t('allActions')}</option>
-            {KNOWN_ACTIONS.map((a) => (
-              <option key={a} value={a}>{formatAction(a)}</option>
-            ))}
-          </select>
-          <span className="text-sm text-gray-500 dark:text-slate-400 ml-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex items-center gap-3">
+            <label htmlFor="action-filter" className="text-sm font-medium text-gray-700 dark:text-slate-300 whitespace-nowrap">
+              {t('filterByAction')}:
+            </label>
+            <select
+              id="action-filter"
+              value={actionFilter}
+              onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
+              className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
+            >
+              <option value="">{t('allActions')}</option>
+              {KNOWN_ACTIONS.map((a) => (
+                <option key={a} value={a}>{formatAction(a)}</option>
+              ))}
+            </select>
+          </div>
+          <span className="text-sm text-gray-500 dark:text-slate-400 sm:ml-auto">
             {tc('showing', { from: Math.min((page - 1) * perPage + 1, total), to: Math.min(page * perPage, total), total })}
           </span>
         </div>
@@ -305,7 +307,7 @@ export default function AdminActivityPage() {
 
             {/* Pagination */}
             {total > perPage && (
-              <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
+              <div className="px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
                 <span className="text-sm text-gray-500 dark:text-slate-400">
                   {t('page')} {page} / {totalPages}
                 </span>

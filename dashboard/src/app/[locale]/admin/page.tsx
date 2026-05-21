@@ -134,12 +134,12 @@ export default function AdminOverviewPage() {
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Header — always visible */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 max-w-3xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('overviewDesc')}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <button type="button" onClick={handleRefreshAll} disabled={refreshing}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition ${refreshing ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700'}`}>
             <RefreshCw size={14} strokeWidth={1.75} className={`transition-transform duration-500 ${refreshing ? 'animate-spin' : ''}`} />
@@ -154,10 +154,10 @@ export default function AdminOverviewPage() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl w-fit">
+      <div className="flex gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl w-fit max-w-full overflow-x-auto">
         {tabs.map((tab) => (
           <button key={tab.key} onClick={() => setOverviewTab(tab.key)} onMouseEnter={() => handleTabHover(tab.key)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition ${overviewTab === tab.key ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}>
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition ${overviewTab === tab.key ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-xs' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}>
             <span className="text-xs">{tab.icon}</span>{tab.label}
           </button>
         ))}
