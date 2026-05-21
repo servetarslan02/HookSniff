@@ -131,8 +131,15 @@ pub trait PaymentProviderImpl: Send + Sync {
         app_url: &str,
     ) -> Result<String, AppError>;
 
-    /// Cancel a subscription.
+    /// Cancel a subscription immediately.
     async fn cancel_subscription(&self, provider_subscription_id: &str) -> Result<(), AppError>;
+
+    /// Cancel a subscription at the end of the current billing period.
+    /// The customer keeps access until the period ends, then it auto-cancels.
+    async fn cancel_subscription_at_period_end(&self, provider_subscription_id: &str) -> Result<(), AppError> {
+        // Default: cancel immediately (providers that don't support period-end cancel)
+        self.cancel_subscription(provider_subscription_id).await
+    }
 }
 
 #[cfg(test)]

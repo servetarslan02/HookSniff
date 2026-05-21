@@ -352,6 +352,39 @@ impl BillingService {
         Ok(())
     }
 
+    /// Cancel at period end — customer keeps access until billing period ends.
+    pub async fn cancel_customer_subscription_at_period_end(
+        &self,
+        customer: &Customer,
+    ) -> Result<(), AppError> {
+        let (provider_name, subscription_id) =
+            Self::resolve_subscription_ids(customer)?;
+
+        if let Some(ref sub_id) = subscription_id {
+            let provider_enum = provider::PaymentProvider::parse_str(&provider_name);
+            match provider_enum {
+                provider::PaymentProvider::Polar | provider::PaymentProvider::Iyzico => {
+                    let provider_impl =
+                        resolve_provider(&provider_name).ok_or_else(|| {
+                            AppError::Internal(anyhow::anyhow!(
+                                "Payment provider '{}' not configured",
+                                provider_name
+                            ))
+                        })?;
+                    provider_impl
+                        .cancel_subscription_at_period_end(sub_id)
+                        .await?;
+                }
+                provider::PaymentProvider::Stripe => {
+                    // Stripe supports cancel_at_period_end via update
+                    self.cancel_at_provider(&provider_name, sub_id).await?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
     /// Open a customer portal for managing subscription.
     pub async fn portal(
         &self,

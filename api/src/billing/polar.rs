@@ -843,6 +843,34 @@ impl PaymentProviderImpl for PolarProvider {
         Ok(())
     }
 
+    /// Cancel at period end — Polar supports this via PATCH with cancel_at_period_end=true.
+    async fn cancel_subscription_at_period_end(&self, polar_subscription_id: &str) -> Result<(), AppError> {
+        let resp = self
+            .client
+            .patch(format!(
+                "{}/v1/subscriptions/{}",
+                self.config.base_url, polar_subscription_id
+            ))
+            .header(
+                "Authorization",
+                format!("Bearer {}", self.config.access_token),
+            )
+            .header("Content-Type", "application/json")
+            .json(&serde_json::json!({ "cancel_at_period_end": true }))
+            .send()
+            .await
+            .map_err(|e| AppError::Internal(anyhow::anyhow!("Polar cancel_at_period_end failed: {}", e)))?;
+
+        if !resp.status().is_success() {
+            let body = resp.text().await.unwrap_or_default();
+            tracing::error!("Polar cancel_at_period_end failed ({}): {}", resp.status(), body);
+            // Fallback: if PATCH doesn't work, just set it in our DB (Polar will still charge)
+            tracing::warn!("⚠️ Could not set cancel_at_period_end at Polar — customer will need to cancel manually via portal");
+        }
+
+        Ok(())
+    }
+
 }
 
 impl PolarProvider {

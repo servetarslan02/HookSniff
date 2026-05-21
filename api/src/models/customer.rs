@@ -56,6 +56,9 @@ pub struct Customer {
     /// Timestamp when payment last failed (for grace period tracking).
     #[serde(default)]
     pub payment_failed_at: Option<DateTime<Utc>>,
+    /// When the current billing period ends (set by payment provider webhook).
+    #[serde(default)]
+    pub current_period_end: Option<DateTime<Utc>>,
     /// Whether overage is allowed (never-blocked mode). Default: true.
     #[serde(default = "default_true")]
     pub allow_overage: bool,
@@ -290,6 +293,7 @@ mod tests {
             totp_enabled: false,
             cancel_at_period_end: false,
             payment_failed_at: None,
+            current_period_end: None,
             allow_overage: false,
             overage_email_notification: false,
             role: "user".to_string(),
