@@ -1,8 +1,16 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-21 23:15 GMT+8 (Session 5 — RBAC Enforcement)
+> Son güncelleme: 2026-05-22 01:30 GMT+8 (Session 6 — Sitemap Fix)
 
-## ✅ Bu Oturumda Yapılan İşler (Session 5)
+## ✅ Bu Oturumda Yapılan İşler (Session 6 — Sitemap Fix)
+
+### Google Search Console Sitemap Düzeltmesi
+- İki hatalı sitemap silindi: `/blog/sitemap` (HTML hatası) ve `/sitemap.xml` (Getirilemedi)
+- `/sitemap.xml` temiz olarak tekrar gönderildi
+- Googlebot erişimi doğrulandı (200 OK, application/xml)
+- 1-2 saat içinde Google'ın tekrar çekmesi bekleniyor
+
+### Session 5 — RBAC Enforcement (önceki oturum)
 
 ### Team Role-Based Access Control (RBAC) — Full Enforcement
 - `require_team_developer` ve `require_team_analyst` artık aktif kullanılıyor
