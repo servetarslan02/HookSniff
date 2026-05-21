@@ -443,6 +443,7 @@ impl PaymentProviderImpl for IyzicoProvider {
                     amount_cents: 0, // Amount needs to be looked up from the payment
                     currency: "TRY".to_string(),
                     customer_id: notification.conversation_id.as_deref().and_then(|s| Uuid::parse_str(s).ok()),
+                    invoice_number: None,
                 })
             }
             "BKM_POS_PAYMENT_FAILURE" | "CARD_PAYMENT_FAILURE" => {
