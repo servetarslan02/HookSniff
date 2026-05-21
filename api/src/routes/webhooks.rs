@@ -144,6 +144,18 @@ async fn create_webhook(
     Json(req): Json<CreateWebhookRequest>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
     let team_id = service_token.as_ref().map(|s| s.team_id);
+
+    // ── Role enforcement: require at least developer for write ops ──
+    if let Some(tid) = team_id {
+        super::teams::require_team_developer(&pool, tid, customer.id).await?;
+    } else {
+        let member_team: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = member_team {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Check idempotency key
     let idempotency_key = headers.get("Idempotency-Key").and_then(|v| v.to_str().ok());
 
@@ -373,6 +385,18 @@ async fn batch_webhooks(
     Json(req): Json<BatchWebhookRequest>,
 ) -> Result<Json<BatchResponse>, AppError> {
     let team_id = service_token.as_ref().map(|s| s.team_id);
+
+    // ── Role enforcement: require at least developer for write ops ──
+    if let Some(tid) = team_id {
+        super::teams::require_team_developer(&pool, tid, customer.id).await?;
+    } else {
+        let member_team: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = member_team {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     if req.webhooks.len() > 100 {
         return Err(AppError::BadRequest("A batch cannot contain more than 100 webhooks".into()));
     }
@@ -546,6 +570,18 @@ async fn replay_webhook(
     Path(id): Path<Uuid>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
     let team_id = service_token.as_ref().map(|s| s.team_id);
+
+    // ── Role enforcement: require at least developer for write ops ──
+    if let Some(tid) = team_id {
+        super::teams::require_team_developer(&pool, tid, customer.id).await?;
+    } else {
+        let member_team: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = member_team {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     let original = sqlx::query_as::<_, Delivery>(
         "SELECT id, endpoint_id, customer_id, payload, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, response_body, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test, event, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash, custom_headers FROM deliveries WHERE id = $1 AND customer_id = $2",
     )
@@ -653,6 +689,18 @@ async fn batch_replay(
     Json(req): Json<BatchReplayRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let team_id = service_token.as_ref().map(|s| s.team_id);
+
+    // ── Role enforcement: require at least developer for write ops ──
+    if let Some(tid) = team_id {
+        super::teams::require_team_developer(&pool, tid, customer.id).await?;
+    } else {
+        let member_team: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = member_team {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Gate behind bulk_replay feature flag
     if !feature_flags.is_enabled("bulk_replay").await {
         return Err(AppError::BadRequest("Bulk replay is not enabled. Contact support to enable this feature.".into()));

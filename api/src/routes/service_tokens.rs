@@ -89,6 +89,9 @@ async fn create_service_token(
     .await?
     .ok_or_else(|| AppError::NotFound)?;
 
+    // ── Role enforcement: require admin for service token management ──
+    super::teams::require_team_admin(&pool, team_id.0, customer.id).await?;
+
     let raw_token = generate_api_key();
     let token_hash = hash_api_key(&raw_token);
     let token_prefix = raw_token[..24].to_string();

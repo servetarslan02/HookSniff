@@ -3,6 +3,7 @@ use axum::routing::{get, post};
 use axum::{Json, Router};
 use serde::Deserialize;
 use sqlx::PgPool;
+use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -50,9 +51,21 @@ async fn get_template(Path(id): Path<String>) -> Result<Json<WebhookTemplate>, A
 async fn apply_template(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<String>,
     Json(req): Json<ApplyTemplateRequest>,
 ) -> Result<Json<ApplyTemplateResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     let template = WebhookTemplate::find_by_id(&id).ok_or(AppError::NotFound)?;
 
     // Create endpoint from template

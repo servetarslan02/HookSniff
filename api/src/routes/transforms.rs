@@ -47,9 +47,21 @@ async fn list_rules(
 async fn create_rule(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(endpoint_id): Path<Uuid>,
     Json(req): Json<CreateTransformRuleRequest>,
 ) -> Result<Json<TransformRule>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Verify endpoint ownership
     let _ =
         sqlx::query_as::<_, EndpointOwnerCheck>("SELECT id, customer_id, is_active FROM endpoints WHERE id = $1 AND customer_id = $2")
@@ -66,9 +78,21 @@ async fn create_rule(
 async fn update_rule(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path((endpoint_id, rule_id)): Path<(Uuid, Uuid)>,
     Json(config): Json<TransformRuleConfig>,
 ) -> Result<Json<TransformRule>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Verify endpoint ownership
     let _ =
         sqlx::query_as::<_, EndpointOwnerCheck>("SELECT id, customer_id, is_active FROM endpoints WHERE id = $1 AND customer_id = $2")
@@ -85,8 +109,20 @@ async fn update_rule(
 async fn delete_rule(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path((endpoint_id, rule_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require admin for destructive ops ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_admin(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Verify endpoint ownership
     let _ =
         sqlx::query_as::<_, EndpointOwnerCheck>("SELECT id, customer_id, is_active FROM endpoints WHERE id = $1 AND customer_id = $2")

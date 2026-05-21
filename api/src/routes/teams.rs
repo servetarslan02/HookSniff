@@ -147,7 +147,7 @@ fn validate_role(role: &str) -> Result<(), AppError> {
 }
 
 /// Check that the user is a member of the team and return their role.
-async fn require_team_member(
+pub async fn require_team_member(
     pool: &PgPool,
     team_id: Uuid,
     customer_id: Uuid,
@@ -164,7 +164,7 @@ async fn require_team_member(
 
 /// Check that the user meets the minimum role level (or is the team owner).
 /// Hierarchy: owner > admin > developer > analyst > viewer
-async fn require_role(
+pub async fn require_role(
     pool: &PgPool,
     team_id: Uuid,
     customer_id: Uuid,
@@ -190,7 +190,7 @@ async fn require_role(
 }
 
 /// Check that the user is an admin or owner of the team.
-async fn require_team_admin(
+pub async fn require_team_admin(
     pool: &PgPool,
     team_id: Uuid,
     customer_id: Uuid,
@@ -199,7 +199,7 @@ async fn require_team_admin(
 }
 
 /// Check that the user is at least a developer (can manage endpoints, webhooks, etc.)
-async fn require_team_developer(
+pub async fn require_team_developer(
     pool: &PgPool,
     team_id: Uuid,
     customer_id: Uuid,
@@ -208,7 +208,7 @@ async fn require_team_developer(
 }
 
 /// Check that the user is at least an analyst (can view dashboards, analytics)
-async fn require_team_analyst(
+pub async fn require_team_analyst(
     pool: &PgPool,
     team_id: Uuid,
     customer_id: Uuid,
