@@ -46,7 +46,7 @@ export function usePlans() {
     developer: { monthly: 0, yearly: 0 },
     startup: { monthly: 29, yearly: 278 },
     pro: { monthly: 49, yearly: 470 },
-    enterprise: { monthly: 0, yearly: 0 },
+    enterprise: { monthly: 149, yearly: 1430 },
   };
 
   const getPlan = (id: string) => plans.find(p => p.id === id);
