@@ -271,10 +271,14 @@ Servet ile oturum. Team üyelerinin rol değiştirme "Not Found" hatası düzelt
    - Service token ile gelen isteklerde takım sahibinin plan limiti uygulanır
    - `create_webhook`, `batch_webhooks`, `replay_webhook`, `batch_replay` handler'larına `ServiceTokenScope` eklendi
    - Commit: `ded9fe76`
+3. **track_daily_event takım bazlı** — overage notifications da takım planına göre çalışır
+   - `resolve_effective_daily_limit()` fonksiyonu eklendi
+   - Commit: `1986ea0d`
 
 ### Değişen Dosyalar:
 - `dashboard/src/app/[locale]/(dashboard)/team/components/TeamDetail.tsx` — 2 satır değişiklik
-- `api/src/routes/webhooks.rs` — 43 satır eklendi
+- `api/src/routes/webhooks.rs` — 43+3 satır değişiklik
+- `api/src/events/overage.rs` — 29 satır eklendi
 
 ---
 
