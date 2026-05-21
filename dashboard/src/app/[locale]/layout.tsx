@@ -179,6 +179,19 @@ export default async function LocaleLayout({
                     src="https://static.cloudflareinsights.com/beacon.min.js"
                     data-cf-beacon='{"token": "27a349759d954a7c84fe74ded3846abe"}'
                   />
+                  {/* Google Analytics 4 */}
+                  <Script
+                    src="https://www.googletagmanager.com/gtag/js?id=G-BKZM7CMBJR"
+                    strategy="afterInteractive"
+                  />
+                  <Script id="google-analytics" strategy="afterInteractive">
+                    {`
+                      window.dataLayer = window.dataLayer || [];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('js', new Date());
+                      gtag('config', 'G-BKZM7CMBJR');
+                    `}
+                  </Script>
                 </ToastProvider>
               </ReactQueryProvider>
             </AuthProvider>
