@@ -25,7 +25,6 @@ const globalMessageListeners: Set<(event: WsEvent) => void> = new Set();
 let globalLastSeq = 0;
 let fallbackActive = false;
 let globalTokenGetter: (() => string | null) | null = null;
-let globalRefreshTimer: NodeJS.Timeout | null = null;
 
 function notifyState(state: ConnectionState) {
   globalState = state;
@@ -34,27 +33,6 @@ function notifyState(state: ConnectionState) {
 
 function notifyEvent(event: WsEvent) {
   globalMessageListeners.forEach(fn => fn(event));
-}
-
-/** Refresh the JWT token via the API refresh endpoint */
-async function refreshAccessToken(): Promise<string | null> {
-  try {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/v1';
-    const res = await fetch(`${API_BASE}/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (data.token) {
-      // Update the store
-      localStorage.setItem('hooksniff_token', data.token);
-      return data.token;
-    }
-    return null;
-  } catch {
-    return null;
-  }
 }
 
 function scheduleReconnect(token: string, maxAttempts: number) {
@@ -98,20 +76,6 @@ function connectGlobal(token: string, maxAttempts: number) {
     globalReconnectAttempts = 0;
     fallbackActive = false;
     notifyState('connected');
-
-    // Proactive token refresh — renew 2 min before expiry (token is 15min)
-    // This prevents the connection from ever dropping due to token expiry
-    if (globalRefreshTimer) clearTimeout(globalRefreshTimer);
-    globalRefreshTimer = setTimeout(async () => {
-      wsDebug('[WS] Proactive token refresh (before expiry)');
-      const newToken = await refreshAccessToken();
-      if (newToken && globalWs) {
-        wsDebug('[WS] Token refreshed, reconnecting proactively');
-        globalReconnectAttempts = 0;
-        globalWs.close();
-        connectGlobal(newToken, maxAttempts);
-      }
-    }, 13 * 60 * 1000); // 13 minutes (2 min before 15min expiry)
   };
 
   ws.onmessage = (event) => {
@@ -156,15 +120,14 @@ function connectGlobal(token: string, maxAttempts: number) {
     });
     globalWs = null;
 
-    // If connection lasted > 10s, it was a real connection that dropped
-    // (likely token expiry). Try to refresh the token first.
+    // HS-039: If connection lasted > 10s and dropped, token may have rotated.
+    // Get the current token from the store (updated by proactive refresh).
     if (connectDuration > 10000 && globalTokenGetter) {
-      wsDebug('[WS] Long-lived connection dropped, attempting token refresh...');
-      const newToken = await refreshAccessToken();
-      if (newToken) {
-        wsDebug('[WS] Token refreshed, reconnecting with new token');
+      const currentToken = globalTokenGetter();
+      if (currentToken && currentToken !== token) {
+        wsDebug('[WS] Token rotated by proactive refresh, reconnecting with new token');
         globalReconnectAttempts = 0;
-        connectGlobal(newToken, maxAttempts);
+        connectGlobal(currentToken, maxAttempts);
         return;
       }
     }
@@ -188,10 +151,6 @@ function disconnectGlobal() {
     clearTimeout(globalReconnectTimer);
     globalReconnectTimer = null;
   }
-  if (globalRefreshTimer) {
-    clearTimeout(globalRefreshTimer);
-    globalRefreshTimer = null;
-  }
   if (globalWs) {
     globalWs.close();
     globalWs = null;
@@ -212,10 +171,21 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     maxReconnectAttempts = 5,
   } = options;
 
-  // Store token getter for refresh
+  // Store token getter for reconnect-on-rotate
   useEffect(() => {
     globalTokenGetter = () => token;
   }, [token]);
+
+  // When token changes (proactive refresh), reconnect WS with new token
+  const prevTokenRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (token && prevTokenRef.current && token !== prevTokenRef.current && globalWs) {
+      wsDebug('[WS] Token changed, reconnecting with new token');
+      globalReconnectAttempts = 0;
+      connectGlobal(token, maxReconnectAttempts);
+    }
+    prevTokenRef.current = token;
+  }, [token, maxReconnectAttempts]);
 
   // Register state listener
   useEffect(() => {

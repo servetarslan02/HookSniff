@@ -592,8 +592,12 @@ async fn refresh_token(
         .ok_or(AppError::BadRequest("Refresh token required".into()))?;
 
     let token_hash = jwt::hash_token(&refresh_token_value);
+    // HS-039: Accept refresh token even if recently revoked (grace period for multi-tab).
+    // Without this, two tabs refreshing simultaneously would cause one to get logged out.
     let record: Option<(Uuid, Uuid, chrono::DateTime<Utc>)> = sqlx::query_as(
-        "SELECT id, customer_id, expires_at FROM refresh_tokens WHERE token_hash = $1 AND revoked = false AND expires_at > NOW()",
+        "SELECT id, customer_id, expires_at FROM refresh_tokens \
+         WHERE token_hash = $1 AND expires_at > NOW() \
+         AND (revoked = false OR revoked_at > NOW() - INTERVAL '60 seconds')",
     )
     .bind(&token_hash).fetch_optional(&pool).await?;
 
@@ -604,7 +608,7 @@ async fn refresh_token(
 
     if !customer.is_active { return Err(AppError::Unauthorized); }
 
-    sqlx::query("UPDATE refresh_tokens SET revoked = true WHERE id = $1")
+    sqlx::query("UPDATE refresh_tokens SET revoked = true, revoked_at = NOW() WHERE id = $1")
         .bind(token_id).execute(&pool).await?;
 
     let new_access = jwt::generate_access_token(customer.id, &customer.email, &customer.plan, &cfg.jwt_secret, customer.is_admin)?;
