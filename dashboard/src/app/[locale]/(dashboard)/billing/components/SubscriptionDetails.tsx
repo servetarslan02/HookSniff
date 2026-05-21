@@ -48,8 +48,8 @@ export function SubscriptionDetails({ onCancel, onPause, onResume }: { onCancel?
     try {
       const result = await billingApiExtended.openPortal(token);
       if (result.url) {
-        // If the URL points back to our own billing page, just navigate in the same tab
-        const isOwnPage = result.url.includes('/dashboard/billing') || result.url.includes('/billing');
+        // If the URL points back to our own pages, just navigate in the same tab
+        const isOwnPage = result.url.includes('/dashboard/billing') || result.url.includes('/billing') || result.url.includes('/account');
         if (isOwnPage) {
           toast(t('noPaymentMethod') || 'No payment method on file. Add one when upgrading to a paid plan.', 'info');
         } else {

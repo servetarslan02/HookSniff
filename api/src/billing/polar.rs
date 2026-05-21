@@ -665,7 +665,7 @@ impl PaymentProviderImpl for PolarProvider {
         // This generates a tokenized URL for the customer to manage their subscription.
         let req_body = CreateCustomerSessionRequest {
             external_customer_id: polar_customer_id.to_string(),
-            return_url: Some(format!("{}/account", app_url)),
+            return_url: Some(format!("{}/dashboard/billing", app_url)),
         };
 
         let resp = self
@@ -695,7 +695,7 @@ impl PaymentProviderImpl for PolarProvider {
                 body
             );
             // Fall back to our own billing page if Polar portal fails
-            return Ok(format!("{}/account", app_url));
+            return Ok(format!("{}/dashboard/billing", app_url));
         }
 
         let session: CustomerSessionResponse = resp.json().await.map_err(|e| {
@@ -722,7 +722,7 @@ impl PaymentProviderImpl for PolarProvider {
 
         // Fallback to our billing page
         tracing::warn!("Polar customer session returned no token or portal URL");
-        Ok(format!("{}/account", app_url))
+        Ok(format!("{}/dashboard/billing", app_url))
     }
 
     async fn cancel_subscription(&self, polar_subscription_id: &str) -> Result<(), AppError> {
