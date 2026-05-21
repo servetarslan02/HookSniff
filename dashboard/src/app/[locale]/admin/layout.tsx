@@ -10,7 +10,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
-import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, Lock, Shield } from '@/components/icons';
+import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, Lock, Shield, FolderOpen } from '@/components/icons';
 
 // Lazy-load heavy components — not needed for initial paint
 const AdminNotificationCenter = lazy(() =>
@@ -40,6 +40,7 @@ function ConnectionIndicator() {
 }
 
 const adminNavigation = [
+  { nameKey: 'userPanel', href: '/core', icon: <FolderOpen size={16} strokeWidth={1.75} /> },
   { nameKey: 'overview', href: '/admin', icon: <BarChart3 size={16} strokeWidth={1.75} /> },
   { nameKey: 'users', href: '/admin/users', icon: <Users size={16} strokeWidth={1.75} /> },
   { nameKey: 'revenue', href: '/admin/revenue', icon: <DollarSign size={16} strokeWidth={1.75} /> },
