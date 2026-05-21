@@ -98,6 +98,11 @@ pub fn router() -> Router {
         .route("/invoices", get(get_invoices))
         .route("/refund", post(request_refund))
         .route("/settings", get(get_overage_settings).put(update_overage_settings))
+}
+
+/// Public webhook routes — no JWT auth required (providers verify via signature).
+pub fn webhook_router() -> Router {
+    Router::new()
         .route("/webhook", post(handle_stripe_webhook))
         .route("/webhook/polar", post(handle_polar_webhook))
         .route("/webhook/iyzico", post(handle_iyzico_webhook))
