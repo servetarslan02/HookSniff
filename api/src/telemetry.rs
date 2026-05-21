@@ -63,6 +63,18 @@ fn init_otel(
         }
     }
 
+    // If endpoint requires auth (e.g. Sentry) but no headers provided, skip OTEL
+    // to avoid spamming error logs every few seconds
+    if headers.is_empty() && (otlp_endpoint.contains("sentry.io") || otlp_endpoint.contains("ingest")) {
+        tracing::warn!(
+            "⚠️ OTEL endpoint ({}) requires auth but OTEL_EXPORTER_OTLP_HEADERS is empty — disabling OTEL. \
+             Set OTEL_EXPORTER_OTLP_HEADERS or remove OTEL_EXPORTER_OTLP_ENDPOINT to suppress this warning.",
+            otlp_endpoint
+        );
+        init_plain(env_filter, use_json, "production");
+        return TracerGuard(None);
+    }
+
     tracing::info!(
         "🔧 OTEL config — endpoint: {}, headers count: {}",
         otlp_endpoint,
