@@ -3178,7 +3178,13 @@
     "loadError": "Could not load your domains",
     "retry": "Retry",
     "noDomains": "No domains yet",
-    "noDomainsDesc": "Add a custom domain to white-label your webhook portal."
+    "noDomainsDesc": "Add a custom domain to white-label your webhook portal.",
+    "viewDocs": "📖 View full documentation",
+    "dnsStepsTitle": "What to do with these records:",
+    "dnsStep1": "Log in to your domain provider (Cloudflare, GoDaddy, Namecheap, etc.)",
+    "dnsStep2": "Add the CNAME and TXT records shown below",
+    "dnsStep3": "Come back here and click \"Verify Domain\" (wait 5-30 min for DNS to update)",
+    "verificationFailedFriendly": "DNS records not found yet. If you just added them, wait a few minutes and try again."
   },
   "signatureVerifier": {
     "title": "🔐 Signature Verifier",

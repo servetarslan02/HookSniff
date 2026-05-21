@@ -2987,7 +2987,13 @@
     "loadError": "Alan adlarınız yüklenemedi",
     "retry": "Tekrar dene",
     "noDomains": "Henüz alan adı yok",
-    "noDomainsDesc": "Webhook portalınızı beyaz etiketlemek için özel bir alan adı ekleyin."
+    "noDomainsDesc": "Webhook portalınızı beyaz etiketlemek için özel bir alan adı ekleyin.",
+    "viewDocs": "📖 Tam dokümantasyonu görüntüle",
+    "dnsStepsTitle": "Bu kayıtlarla ne yapacaksınız:",
+    "dnsStep1": "Domain sağlayıcınıza giriş yapın (Cloudflare, GoDaddy, Namecheap, vb.)",
+    "dnsStep2": "Aşağıda gösterilen CNAME ve TXT kayıtlarını ekleyin",
+    "dnsStep3": "Buraya geri dönün ve \"Domain Doğrula\" butonuna tıklayın (DNS güncellemesi için 5-30 dk bekleyin)",
+    "verificationFailedFriendly": "DNS kayıtları henüz bulunamadı. Yeni eklediyseniz birkaç dakika bekleyip tekrar deneyin."
   },
   "signatureVerifier": {
     "title": "🔐 İmza Doğrulayıcı",
