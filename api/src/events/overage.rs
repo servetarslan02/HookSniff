@@ -7,15 +7,40 @@ use crate::billing::Plan;
 use crate::email::EmailProvider;
 use crate::models::customer::Customer;
 
+/// Resolve the effective daily event limit for a customer.
+/// If operating within a team, the team owner's plan limit applies.
+async fn resolve_effective_daily_limit(
+    pool: &PgPool,
+    customer: &Customer,
+    team_id: Option<uuid::Uuid>,
+) -> u64 {
+    if let Some(tid) = team_id {
+        let result: Option<(String,)> = sqlx::query_as(
+            "SELECT c.plan FROM teams t JOIN customers c ON c.id = t.owner_id WHERE t.id = $1"
+        )
+        .bind(tid)
+        .fetch_optional(pool)
+        .await
+        .ok()
+        .flatten();
+
+        if let Some((plan_str,)) = result {
+            return Plan::parse_str(&plan_str).max_events_per_day();
+        }
+    }
+    Plan::parse_str(&customer.plan).max_events_per_day()
+}
+
 /// Track daily event usage and return whether the customer is over their limit.
 /// Also sends email notifications when approaching or exceeding limits.
+/// If team_id is provided, uses the team owner's plan limit (team-based billing).
 pub async fn track_daily_event(
     pool: &PgPool,
     customer: &Customer,
     email_client: Option<&EmailProvider>,
+    team_id: Option<uuid::Uuid>,
 ) -> Result<bool, sqlx::Error> {
-    let plan = Plan::parse_str(&customer.plan);
-    let daily_limit = plan.max_events_per_day();
+    let daily_limit = resolve_effective_daily_limit(pool, customer, team_id).await;
 
     // Upsert daily counter
     let row: (i64, i64,) = sqlx::query_as(
