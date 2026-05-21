@@ -71,11 +71,13 @@ mod subscription;
 mod portal;
 mod webhooks;
 mod grace;
+pub mod refund_requests;
 
 pub use grace::process_expired_grace_periods;
 pub(crate) use grace::cleanup_excess_endpoints;
 use subscription::{get_subscription, cancel_subscription, upgrade_plan, pause_subscription, resume_subscription};
 use portal::{open_portal, get_usage, get_invoices, request_refund, get_overage_settings, update_overage_settings};
+use refund_requests::{create_refund_request, list_my_refund_requests};
 use webhooks::{handle_stripe_webhook, handle_polar_webhook, handle_iyzico_webhook};
 
 #[derive(Serialize)]
@@ -97,6 +99,8 @@ pub fn router() -> Router {
         .route("/usage", get(get_usage))
         .route("/invoices", get(get_invoices))
         .route("/refund", post(request_refund))
+        .route("/refund-request", post(create_refund_request))
+        .route("/refund-requests", get(list_my_refund_requests))
         .route("/settings", get(get_overage_settings).put(update_overage_settings))
 }
 

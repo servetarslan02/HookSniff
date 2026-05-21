@@ -10,6 +10,7 @@ pub mod feature_flags;
 pub mod gdpr;
 pub mod monitoring;
 pub mod refunds;
+pub mod refund_requests;
 pub mod revenue;
 pub mod security;
 pub mod settings;
@@ -140,6 +141,9 @@ pub fn router() -> Router {
         .route("/users/{id}/refund", post(refunds::admin_refund_user))
         .route("/users/{id}/refunds", get(refunds::admin_user_refunds))
         .route("/refunds", get(refunds::admin_all_refunds))
+        .route("/refund-requests", get(refund_requests::admin_list_refund_requests))
+        .route("/refund-requests/{id}/approve", post(refund_requests::admin_approve_refund))
+        .route("/refund-requests/{id}/deny", post(refund_requests::admin_deny_refund))
         // ── GDPR + Bulk Email + Broadcasts ──
         .route(
             "/users/{id}/export",
