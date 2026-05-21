@@ -83,16 +83,29 @@ export function BillingTab({
                     <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{inv.provider}</td>
                     <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
                     <td className="px-4 py-3 text-right">
-                      {inv.provider_invoice_id && (
-                        <button
-                          type="button"
-                          onClick={() => { navigator.clipboard.writeText(inv.provider_invoice_id); }}
-                          className="text-xs text-gray-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 flex items-center gap-1 ml-auto"
-                          title={inv.provider_invoice_id}
-                        >
-                          <ClipboardList size={12} strokeWidth={1.75} /> {inv.provider_invoice_id.slice(-8)}
-                        </button>
-                      )}
+                      <div className="flex items-center justify-end gap-1">
+                        {inv.provider_invoice_id && (
+                          <button
+                            type="button"
+                            onClick={() => { navigator.clipboard.writeText(inv.provider_invoice_id); }}
+                            className="text-xs text-gray-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 flex items-center gap-1"
+                            title={inv.provider_invoice_id}
+                          >
+                            <ClipboardList size={12} strokeWidth={1.75} /> {inv.provider_invoice_id.slice(-8)}
+                          </button>
+                        )}
+                        {inv.provider === 'polar' && inv.provider_invoice_id && (
+                          <a
+                            href={`https://polar.sh/dashboard/orders?invoice=${inv.provider_invoice_id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-gray-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 flex items-center gap-1"
+                            title="View in Polar"
+                          >
+                            <ExternalLink size={12} strokeWidth={1.75} />
+                          </a>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
