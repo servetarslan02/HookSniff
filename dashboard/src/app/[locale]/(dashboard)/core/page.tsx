@@ -3,9 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
-import { BarChart3, Key, KeyRound, Shield } from '@/components/icons';
-import { Link } from '@/i18n/navigation';
-import { useAuth } from '@/lib/store';
+import { BarChart3, Key, KeyRound } from '@/components/icons';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -24,27 +22,14 @@ const ServiceTokensPage = dynamic(() => import('../service-tokens/page'), { ssr:
 
 export default function CorePage() {
   const t = useTranslations('nav');
-  const { user } = useAuth();
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Admin Panel shortcut — only for admin users */}
-      {user?.is_admin && (
-        <Link
-          href="/admin"
-          className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 border border-amber-200 dark:border-amber-800 transition w-fit"
-        >
-          <Shield size={14} strokeWidth={1.75} />
-          {t('adminPanel') || 'Yönetim Paneli'}
-        </Link>
-      )}
-      <TabbedSection
-        tabs={[
-          { key: 'overview', label: t('dashboard'), icon: <BarChart3 size={16} strokeWidth={1.75} />, content: () => <DashboardOverview /> },
-          { key: 'api-keys', label: t('apiKeys'), icon: <Key size={16} strokeWidth={1.75} />, content: () => <ApiKeysPage /> },
-          { key: 'service-tokens', label: t('serviceTokens'), icon: <KeyRound size={16} strokeWidth={1.75} />, content: () => <ServiceTokensPage /> },
-        ]}
-      />
-    </div>
+    <TabbedSection
+      tabs={[
+        { key: 'overview', label: t('dashboard'), icon: <BarChart3 size={16} strokeWidth={1.75} />, content: () => <DashboardOverview /> },
+        { key: 'api-keys', label: t('apiKeys'), icon: <Key size={16} strokeWidth={1.75} />, content: () => <ApiKeysPage /> },
+        { key: 'service-tokens', label: t('serviceTokens'), icon: <KeyRound size={16} strokeWidth={1.75} />, content: () => <ServiceTokensPage /> },
+      ]}
+    />
   );
 }

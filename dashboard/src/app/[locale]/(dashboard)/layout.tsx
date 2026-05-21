@@ -16,7 +16,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
 import { useIdleTimeout } from '@/hooks/useIdleTimeout';
 import { apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
-import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, BookOpen, ExternalLink, LogOut } from '@/components/icons';
+import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, BookOpen, ExternalLink, LogOut, Shield } from '@/components/icons';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -94,6 +94,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   const navItems = [
+    ...(user?.is_admin ? [{ name: t('adminPanel') || 'Admin Panel', href: '/admin', icon: <Shield size={16} strokeWidth={1.75} /> }] : []),
     { name: t('core'), href: '/core', icon: <LayoutDashboard size={16} strokeWidth={1.75} /> },
     { name: t('applications'), href: '/applications', icon: <Smartphone size={16} strokeWidth={1.75} /> },
     { name: t('organization'), href: '/organization', icon: <Users size={16} strokeWidth={1.75} /> },
