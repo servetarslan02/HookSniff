@@ -25,6 +25,9 @@ async fn get_stats(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<StatsResponse>, AppError> {
+    // RBAC: analyst or higher required to view stats
+    super::teams::check_user_team_role(&pool, customer.id, "analyst").await?;
+
     let stats: (i64, i64, i64, i64) = sqlx::query_as(
         r#"
         SELECT
