@@ -13,6 +13,7 @@ import { PlanCards } from './components/PlanCards';
 import { InvoiceTable } from './components/InvoiceTable';
 import { SubscriptionDetails } from './components/SubscriptionDetails';
 import { OverageSettings } from './components/OverageSettings';
+import { RefundRequestModal } from './components/RefundRequestModal';
 import { CreditCard, BarChart3, Rocket, FileText } from '@/components/icons';
 
 export default function BillingPage() {
@@ -29,6 +30,7 @@ export default function BillingPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPauseModal, setShowPauseModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState<string | null>(null);
+  const [showRefundRequestModal, setShowRefundRequestModal] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [pausing, setPausing] = useState(false);
@@ -159,6 +161,7 @@ export default function BillingPage() {
           onCancel={() => setShowCancelModal(true)}
           onPause={() => setShowPauseModal(true)}
           onResume={handleResume}
+          onRefundRequest={() => setShowRefundRequestModal(true)}
         />
       </section>
 
@@ -236,6 +239,12 @@ export default function BillingPage() {
           </div>
         </div>
       )}
+
+      {/* Refund Request Modal */}
+      <RefundRequestModal
+        isOpen={showRefundRequestModal}
+        onClose={() => setShowRefundRequestModal(false)}
+      />
 
       {/* Cancel Modal */}
       {showCancelModal && (
