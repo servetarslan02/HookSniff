@@ -58,6 +58,11 @@ async fn list_deliveries(
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Query(params): Query<ListParams>,
 ) -> Result<Json<DeliveryListResponse>, AppError> {
+    // ── Role enforcement: analyst can view deliveries ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_analyst(&pool, scope.team_id, customer.id).await?;
+    }
+
     let page = params.page.unwrap_or(1).max(1);
     let per_page = params.per_page.unwrap_or(20).min(200);
     let offset = (page - 1) * per_page;

@@ -37,6 +37,11 @@ async fn list_endpoints(
     Extension(customer): Extension<Customer>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
 ) -> Result<Json<Vec<EndpointResponse>>, AppError> {
+    // ── Role enforcement: analyst can view endpoints ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_analyst(&pool, scope.team_id, customer.id).await?;
+    }
+
     let endpoints = if let Some(Extension(scope)) = service_token {
         // Service token: only return endpoints belonging to this team
         sqlx::query_as::<_, Endpoint>(
