@@ -16,7 +16,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
 import { useIdleTimeout } from '@/hooks/useIdleTimeout';
 import { apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
-import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, Shield, BookOpen, ExternalLink, LogOut } from '@/components/icons';
+import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, BookOpen, ExternalLink, LogOut } from '@/components/icons';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -130,15 +130,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             <span className="text-2xl">🪝</span>
             <span className="text-xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </a>
-          {user?.is_admin && (
-            <Link
-              href="/admin"
-              className="shrink-0 px-2.5 py-1 text-xs font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition"
-            >
-              <Shield size={14} strokeWidth={1.75} className="inline mr-1" />
-              {t('adminPanel') || 'Admin'}
-            </Link>
-          )}
+
           <button
             className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 lg:hidden rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
             onClick={() => setSidebarOpen(false)}
