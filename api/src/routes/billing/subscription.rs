@@ -549,7 +549,7 @@ pub async fn upgrade_plan(
             // Create invoice with $0 (free via coupon)
             let provider_name = &customer.payment_provider;
             sqlx::query(
-                "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan, provider) VALUES ($1, 0, 'USD', 'paid', $2, $3)"
+                "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan, provider, paid_at) VALUES ($1, 0, 'USD', 'paid', $2, $3, NOW())"
             )
             .bind(customer.id)
             .bind(new_plan.as_str())
