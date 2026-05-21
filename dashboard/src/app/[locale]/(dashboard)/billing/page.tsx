@@ -127,14 +127,6 @@ export default function BillingPage() {
     try {
       const result = await billingApiExtended.upgrade(token, showUpgradeModal, billingPeriod, discountCode || undefined);
 
-      if (result.requires_contact) {
-        const contactUrl = result.contact_url || '/contact';
-        window.open(contactUrl, '_blank');
-        toast(t('enterpriseContact') || 'Enterprise plan requires a custom agreement. Opening contact...', 'info');
-        setShowUpgradeModal(null);
-        return;
-      }
-
       if (result.checkout_url) {
         const url = new URL(result.checkout_url);
         const trustedHosts = ['polar.sh', 'checkout.polar.sh', 'pay.stripe.com', 'sandbox-api.iyzipay.com', 'api.iyzipay.com'];
