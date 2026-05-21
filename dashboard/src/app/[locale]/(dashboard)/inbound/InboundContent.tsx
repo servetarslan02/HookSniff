@@ -121,12 +121,12 @@ export function InboundContent() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white"><Inbox size={24} strokeWidth={1.75} className="inline mr-1" />{t('inbound.title')}</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('inbound.subtitle')}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white"><Inbox size={24} strokeWidth={1.75} className="inline mr-1" />{t('inbound.title')}</h2>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('inbound.subtitle')}</p>
         </div>
-        <button onClick={() => { setShowCreate(!showCreate); setEditTarget(null); resetForm(); }} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+        <button onClick={() => { setShowCreate(!showCreate); setEditTarget(null); resetForm(); }} className="bg-brand-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
           + {t('inbound.addProvider')}
         </button>
       </div>
@@ -137,7 +137,7 @@ export function InboundContent() {
         <div className="glass-card p-6 space-y-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('inbound.addProvider')}</h3>
 
-          <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
             {PROVIDERS.map(p => (
               <button key={p.id} onClick={() => setSelectedProvider(p.id)}
                 className={`p-4 rounded-xl border-2 text-center transition ${selectedProvider === p.id ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}>

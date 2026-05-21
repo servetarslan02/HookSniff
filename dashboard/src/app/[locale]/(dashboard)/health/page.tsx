@@ -29,7 +29,7 @@ export default function EndpointHealthPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
@@ -142,7 +142,7 @@ export default function EndpointHealthPage() {
                   </div>
 
                   {/* Stats Row */}
-                  <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mt-3">
                     {[
                       { label: t('total'), value: ep.total_deliveries.toLocaleString() },
                       { label: t('successful'), value: ep.successful.toLocaleString() },

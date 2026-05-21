@@ -348,13 +348,13 @@ export default function IntegrationsContent() {
             {/* Overview Tab */}
             {tab === 'overview' && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('status')}</span><div className={`mt-1 inline-block px-2 py-0.5 text-xs rounded-full ${HEALTH_COLORS[selected.health_status]}`}>{selected.health_status}</div></div>
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('connector')}</span><p className="text-sm font-medium text-gray-900 dark:text-white">{selected.connector_display_name}</p></div>
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('totalDeliveries')}</span><p className="text-sm font-medium text-gray-900 dark:text-white">{selected.total_deliveries}</p></div>
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('failureRate')}</span><p className="text-sm font-medium text-gray-900 dark:text-white">{selected.total_deliveries > 0 ? `${((selected.total_failures / selected.total_deliveries) * 100).toFixed(1)}%` : '—'}</p></div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('lastTriggered')}</span><p className="text-sm text-gray-700 dark:text-slate-300">{formatDate(selected.last_triggered_at)}</p></div>
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('lastSuccess')}</span><p className="text-sm text-gray-700 dark:text-slate-300">{formatDate(selected.last_success_at)}</p></div>
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('lastFailure')}</span><p className="text-sm text-gray-700 dark:text-slate-300">{formatDate(selected.last_failure_at)}</p></div>
@@ -417,13 +417,13 @@ export default function IntegrationsContent() {
             {/* Stats Tab */}
             {tab === 'stats' && stats && (
               <div className="space-y-6">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="glass-card p-4"><span className="text-xs text-gray-500 dark:text-slate-400">{t('totalEvents')}</span><p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total_events}</p></div>
                   <div className="p-4 rounded-xl bg-green-50 dark:bg-green-500/10"><span className="text-xs text-green-600 dark:text-green-400">{t('delivered')}</span><p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.delivered}</p></div>
                   <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10"><span className="text-xs text-red-600 dark:text-red-400">{t('failed')}</span><p className="text-2xl font-bold text-red-700 dark:text-red-400">{stats.failed}</p></div>
                   <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10"><span className="text-xs text-blue-600 dark:text-blue-400">{t('successRate')}</span><p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{stats.success_rate.toFixed(1)}%</p></div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="glass-card p-4"><span className="text-xs text-gray-500 dark:text-slate-400">{t('pending')}</span><p className="text-xl font-semibold text-gray-900 dark:text-white">{stats.pending}</p></div>
                   <div className="glass-card p-4"><span className="text-xs text-gray-500 dark:text-slate-400">{t('filtered')}</span><p className="text-xl font-semibold text-gray-900 dark:text-white">{stats.filtered}</p></div>
                   <div className="glass-card p-4"><span className="text-xs text-gray-500 dark:text-slate-400">{t('avgDuration')}</span><p className="text-xl font-semibold text-gray-900 dark:text-white">{formatDuration(stats.avg_duration_ms)}</p></div>

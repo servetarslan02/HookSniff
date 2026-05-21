@@ -247,7 +247,7 @@ export function EnvironmentsContent() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('createEnvironment')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">{t('subtitle')}</p>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('name')}</label>
                   <input value={newName} onChange={e => setNewName(e.target.value)} placeholder={t('namePlaceholder')} autoFocus
