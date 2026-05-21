@@ -439,52 +439,63 @@ impl PaymentProviderImpl for PolarProvider {
         body: &str,
         pool: &sqlx::PgPool,
     ) -> Result<WebhookResult, AppError> {
-        // Verify signature
+        // Verify signature — log failure but ALWAYS return 200 to prevent Polar auto-disable
         let sig_header = headers
             .get("polar-signature")
             .and_then(|v| v.to_str().ok())
             .unwrap_or("");
 
         if sig_header.is_empty() {
-            return Err(AppError::BadRequest(
-                "Missing Polar signature header".into(),
-            ));
+            tracing::warn!("Polar webhook: missing signature header — ignoring");
+            return Ok(WebhookResult::Ignored);
         }
 
-        Self::verify_signature(body, sig_header, &self.config.webhook_secret)?;
+        if let Err(e) = Self::verify_signature(body, sig_header, &self.config.webhook_secret) {
+            tracing::warn!("Polar webhook: signature verification failed: {:?} — ignoring", e);
+            return Ok(WebhookResult::Ignored);
+        }
 
-        // Parse event
-        let event: PolarWebhookEvent = serde_json::from_str(body).map_err(|e| {
-            // HS-038l: Log details internally, return generic message to client
-            tracing::warn!("Invalid Polar webhook payload: {:?}", e);
-            AppError::BadRequest("Invalid webhook payload".into())
-        })?;
+        // Parse event — NEVER return error to Polar (causes webhook auto-disable)
+        let event: PolarWebhookEvent = match serde_json::from_str(body) {
+            Ok(e) => e,
+            Err(e) => {
+                tracing::warn!("Invalid Polar webhook payload: {:?} — ignoring", e);
+                return Ok(WebhookResult::Ignored);
+            }
+        };
 
         tracing::info!("Polar webhook: {}", event.event_type);
 
         match event.event_type.as_str() {
             "subscription.created" => {
-                let sub: PolarSubscription =
-                    serde_json::from_value(event.data.clone()).map_err(|e| {
-                        tracing::warn!("Invalid Polar subscription data: {:?}", e);
-                        AppError::BadRequest("Invalid webhook data".into())
-                    })?;
+                let sub: PolarSubscription = match serde_json::from_value(event.data.clone()) {
+                    Ok(s) => s,
+                    Err(e) => {
+                        tracing::warn!("Invalid Polar subscription data: {:?} — ignoring", e);
+                        return Ok(WebhookResult::Ignored);
+                    }
+                };
 
-                let customer_id = sub
+                let customer_id = match sub
                     .external_customer_id
                     .as_deref()
                     .or(sub.customer_id.as_deref())
                     .and_then(|s| Uuid::parse_str(s).ok())
-                    .ok_or_else(|| {
-                        tracing::warn!("Missing customer_id in Polar subscription event");
-                        AppError::BadRequest("Invalid webhook data".into())
-                    })?;
+                {
+                    Some(id) => id,
+                    None => {
+                        tracing::warn!("Missing/invalid customer_id in Polar subscription.created — ignoring");
+                        return Ok(WebhookResult::Ignored);
+                    }
+                };
 
-                let product_id = sub.product_id.as_deref()
-                    .ok_or_else(|| {
-                        tracing::warn!("Missing product_id in Polar subscription.created event");
-                        AppError::BadRequest("Missing product_id in subscription data".into())
-                    })?;
+                let product_id = match sub.product_id.as_deref() {
+                    Some(id) => id,
+                    None => {
+                        tracing::warn!("Missing product_id in Polar subscription.created — ignoring");
+                        return Ok(WebhookResult::Ignored);
+                    }
+                };
 
                 let plan = self.determine_plan(product_id);
                 let interval = if self.config.is_yearly_product(product_id) { "year" } else { "month" };
@@ -499,11 +510,13 @@ impl PaymentProviderImpl for PolarProvider {
                 })
             }
             "subscription.updated" => {
-                let sub: PolarSubscription =
-                    serde_json::from_value(event.data.clone()).map_err(|e| {
-                        tracing::warn!("Invalid Polar subscription update data: {:?}", e);
-                        AppError::BadRequest("Invalid webhook data".into())
-                    })?;
+                let sub: PolarSubscription = match serde_json::from_value(event.data.clone()) {
+                    Ok(s) => s,
+                    Err(e) => {
+                        tracing::warn!("Invalid Polar subscription update data: {:?} — ignoring", e);
+                        return Ok(WebhookResult::Ignored);
+                    }
+                };
 
                 let sub_id = sub.id.unwrap_or_default();
                 let status = sub.status.unwrap_or_else(|| "active".to_string());
@@ -540,11 +553,13 @@ impl PaymentProviderImpl for PolarProvider {
                     });
                 }
 
-                let product_id = sub.product_id.as_deref()
-                    .ok_or_else(|| {
-                        tracing::warn!("Missing product_id in Polar subscription.updated event");
-                        AppError::BadRequest("Missing product_id in subscription data".into())
-                    })?;
+                let product_id = match sub.product_id.as_deref() {
+                    Some(id) => id,
+                    None => {
+                        tracing::warn!("Missing product_id in Polar subscription.updated — ignoring");
+                        return Ok(WebhookResult::Ignored);
+                    }
+                };
 
                 let plan = self.determine_plan(product_id);
                 let interval = if self.config.is_yearly_product(product_id) { "year" } else { "month" };
@@ -558,11 +573,13 @@ impl PaymentProviderImpl for PolarProvider {
                 })
             }
             "subscription.canceled" | "subscription.revoked" => {
-                let sub: PolarSubscription =
-                    serde_json::from_value(event.data.clone()).map_err(|e| {
-                        tracing::warn!("Invalid Polar subscription cancel data: {:?}", e);
-                        AppError::BadRequest("Invalid webhook data".into())
-                    })?;
+                let sub: PolarSubscription = match serde_json::from_value(event.data.clone()) {
+                    Ok(s) => s,
+                    Err(e) => {
+                        tracing::warn!("Invalid Polar subscription cancel data: {:?} — ignoring", e);
+                        return Ok(WebhookResult::Ignored);
+                    }
+                };
 
                 Ok(WebhookResult::SubscriptionCanceled {
                     provider_subscription_id: sub.id.unwrap_or_default(),
