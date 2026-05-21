@@ -7,6 +7,7 @@ import { Database, Zap, Inbox, RefreshCw, Bell, HardDrive } from '@/components/i
 interface HealthStatusProps {
   health: any;
   isHealthError: boolean;
+  isFetching?: boolean;
   alerts: Array<{ is_active: boolean }>;
   onRefresh: () => void;
 }
@@ -37,7 +38,7 @@ const formatUptime = (seconds: number, t: any) => {
   return `${mins}${m}`;
 };
 
-export default function HealthStatus({ health, isHealthError, alerts, onRefresh }: HealthStatusProps) {
+export default function HealthStatus({ health, isHealthError, isFetching, alerts, onRefresh }: HealthStatusProps) {
   const t = useTranslations('admin');
   const locale = useLocale();
   const activeAlerts = alerts.filter((a) => a.is_active).length;
@@ -105,13 +106,17 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
           <button
             type="button"
             onClick={onRefresh}
-            className="sm:ml-auto px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition"
+            disabled={isFetching}
+            className="sm:ml-auto px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition disabled:opacity-50"
           >
-            <RefreshCw size={14} strokeWidth={1.75} className="inline mr-1" />{t('refresh')}
+            <RefreshCw size={14} strokeWidth={1.75} className={`inline mr-1 ${isFetching ? 'animate-spin' : ''}`} />{isFetching ? (t('loading') || 'Loading...') : t('refresh')}
           </button>
         </div>
         <p className="text-xs text-gray-500 dark:text-slate-400">
-          {t('lastChecked', { time: new Intl.DateTimeFormat(locale === 'tr' ? 'tr-TR' : 'en-US', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · {t('autoRefresh30s')}
+          {isFetching
+            ? (t('refreshing') || 'Refreshing...')
+            : `${t('lastChecked', { time: new Intl.DateTimeFormat(locale === 'tr' ? 'tr-TR' : 'en-US', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date()) })} · ${t('autoRefresh30s')}`
+          }
         </p>
       </div>
 
