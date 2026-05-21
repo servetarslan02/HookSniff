@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-22 06:35 GMT+8 (SAML XML Parsing Refactor — quick-xml)
+> Son güncelleme: 2026-05-22 06:40 GMT+8 (Error Messages i18n — TR/EN)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -253,6 +253,34 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-22 06:36–06:40 — Error Messages i18n)
+
+### Özet
+Servet ile oturum. Tüm hata mesajları kullanıcı dostu hale getirildi. 137 i18n anahtarı oluşturuldu (TR + EN).
+
+### Yapılan İşler:
+1. **error-messages.ts** — 100+ API hata mesajını i18n anahtarlarına eşleyen mapping
+2. **api-errors.ts** — `HookSniffError` sınıfı (code + rawMessage + status)
+3. **useFriendlyToast.ts** — Kullanıcı dostu hata toast'ları gösteren hook
+4. **api.ts** — API hata yönetimi `HookSniffError` sınıfına geçirildi
+5. **en.json + tr.json** — `errors` namespace eklendi (137 key)
+
+### Hata Kategorileri:
+- generic (12), auth (24), sso (13), saml (16), oidc (11)
+- billing (16), endpoint (7), domain (6), team (4), alert (9), system (13)
+
+### Değişen Dosyalar:
+- `dashboard/src/lib/error-messages.ts` — yeni
+- `dashboard/src/lib/api-errors.ts` — yeni
+- `dashboard/src/hooks/useFriendlyToast.ts` — yeni
+- `dashboard/src/lib/api.ts` — error handling güncellendi
+- `dashboard/src/messages/en.json` — errors namespace
+- `dashboard/src/messages/tr.json` — errors namespace
+
+### Push: `d6d86156`
 
 ---
 
