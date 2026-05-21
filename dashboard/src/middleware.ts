@@ -34,7 +34,6 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   // Routing/Config section (now has security + environments tabs)
   '/retry-policy': '/routing-config',
   '/routing': '/routing-config',
-  '/custom-domain': '/routing-config',
   '/environments': '/routing-config',
   '/rate-limiting': '/routing-config',
   '/sso': '/organization',
