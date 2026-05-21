@@ -1,38 +1,24 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-22 03:02 GMT+8
+> Son güncelleme: 2026-05-22 06:15 GMT+8
 
-## ✅ Migration 072 — Zaten Uygulanmış (2026-05-22 doğrulandı)
+## ✅ SSO Analiz + 6 Düzeltme Tamamlandı (2026-05-22)
 
-Tüm migration'lar canlı DB'de mevcut:
-- 072: dunning_reminders, payment_retry_attempts ✅
-- 073: customers.current_period_end ✅
-- 074: customers.paused_at ✅
-- 075: broadcasts ✅
-- 076: security_events ✅
-- 077: ip_blocklist ✅
-- 082: sso_configs.team_id ✅
+14 sorun tespit edildi, 6'sı düzeltildi. 103 test çalıştırıldı (100 PASS).
+Detay: `.ai-context/sso-test/SSO-ANALYSIS-REPORT.md`
+Commit: `d6666e30`
 
-## 🔴 Öncelik 1: Keycloak ile SSO Test
+## 🔴 Öncelik 1: Keycloak ile Gerçek SSO Test
 
-1. Docker kur: `apt install docker.io`
-2. Keycloak başlat: `docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:latest start-dev`
-3. Keycloak'ta realm + kullanıcı oluştur
-4. HookSniff dashboard'dan SSO config gir (OIDC veya SAML)
-5. Login sayfasında SSO ile giriş dene
-6. Auto-team join test et
-7. RBAC rollerini test et (viewer, developer, admin)
+Mock IdP testleri geçti. Şimdi gerçek Keycloak ile test gerekli:
+- Docker kur (veya mevcut ortamda Keycloak çalıştır)
+- SAML + OIDC akışlarını gerçek IdP ile test et
+- Auto-join, rol atama, domain verification test et
 
-## 🟡 Öncelik 2: Dashboard RBAC Frontend
+## 🟡 Öncelik 2: SAML XML Parsing İyileştirme
 
-Backend'de 164 RBAC check var ama frontend'de rol bazlı UI yok:
-- Viewer: sadece okuma butonlarını göster, yazma butonlarını gizle
-- Developer: tüm butonları göster
-- Admin: yönetim butonlarını göster
+String-based XML parsing → `quick-xml` crate. 1-2 saat.
 
-## 🟢 Öncelik 3: Blog İçerikleri
+## 🟢 Öncelik 3: Dashboard RBAC Frontend
 
-SEO için kritik:
-- "webhooks explained"
-- "free webhook service 2026"
-- "svix alternative"
+Backend'de 164 RBAC check var ama frontend'de rol bazlı UI yok.
