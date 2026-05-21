@@ -7,16 +7,17 @@ use crate::billing::Plan;
 use crate::email::EmailProvider;
 use crate::models::customer::Customer;
 
-/// Resolve the effective daily event limit for a customer.
-/// If operating within a team, the team owner's plan limit applies.
-async fn resolve_effective_daily_limit(
+/// Resolve the effective daily event limit and the customer_id to track usage against.
+/// When operating within a team, the team owner's plan limit and their daily counter apply.
+/// Returns (tracking_customer_id, daily_limit, allow_overage, overage_email_notification).
+async fn resolve_team_tracking(
     pool: &PgPool,
     customer: &Customer,
     team_id: Option<uuid::Uuid>,
-) -> u64 {
+) -> (uuid::Uuid, u64, bool, bool) {
     if let Some(tid) = team_id {
-        let result: Option<(String,)> = sqlx::query_as(
-            "SELECT c.plan FROM teams t JOIN customers c ON c.id = t.owner_id WHERE t.id = $1"
+        let result: Option<(uuid::Uuid, String, bool, bool)> = sqlx::query_as(
+            "SELECT c.id, c.plan, c.allow_overage, c.overage_email_notification FROM teams t JOIN customers c ON c.id = t.owner_id WHERE t.id = $1"
         )
         .bind(tid)
         .fetch_optional(pool)
@@ -24,25 +25,28 @@ async fn resolve_effective_daily_limit(
         .ok()
         .flatten();
 
-        if let Some((plan_str,)) = result {
-            return Plan::parse_str(&plan_str).max_events_per_day();
+        if let Some((owner_id, plan_str, allow_overage, overage_email)) = result {
+            let daily_limit = Plan::parse_str(&plan_str).max_events_per_day();
+            return (owner_id, daily_limit, allow_overage, overage_email);
         }
     }
-    Plan::parse_str(&customer.plan).max_events_per_day()
+    let daily_limit = Plan::parse_str(&customer.plan).max_events_per_day();
+    (customer.id, daily_limit, customer.allow_overage, customer.overage_email_notification)
 }
 
 /// Track daily event usage and return whether the customer is over their limit.
 /// Also sends email notifications when approaching or exceeding limits.
-/// If team_id is provided, uses the team owner's plan limit (team-based billing).
+/// When team_id is provided, daily event counting is tracked on the team owner's record
+/// (team-level counting), and the team owner's plan limit applies.
 pub async fn track_daily_event(
     pool: &PgPool,
     customer: &Customer,
     email_client: Option<&EmailProvider>,
     team_id: Option<uuid::Uuid>,
 ) -> Result<bool, sqlx::Error> {
-    let daily_limit = resolve_effective_daily_limit(pool, customer, team_id).await;
+    let (tracking_id, daily_limit, _allow_overage, overage_email_notification) = resolve_team_tracking(pool, customer, team_id).await;
 
-    // Upsert daily counter
+    // Upsert daily counter — tracked on the team owner when in team context
     let row: (i64, i64,) = sqlx::query_as(
         "INSERT INTO daily_event_usage (customer_id, event_date, event_count, overage_count) \
          VALUES ($1, CURRENT_DATE, 1, 0) \
@@ -54,7 +58,7 @@ pub async fn track_daily_event(
          END \
          RETURNING event_count, overage_count",
     )
-    .bind(customer.id)
+    .bind(tracking_id)
     .bind(daily_limit as i64)
     .fetch_one(pool)
     .await?;
@@ -62,44 +66,32 @@ pub async fn track_daily_event(
     let (current_count, overage_count) = row;
     let is_over_limit = current_count > daily_limit as i64;
 
-    // Email notification logic
-    if customer.overage_email_notification {
+    // Email notification logic — send to the team owner when in team context
+    if overage_email_notification {
+        // Resolve the notification recipient (team owner when in team context)
+        let notify_customer: Option<Customer> = if team_id.is_some() && tracking_id != customer.id {
+            sqlx::query_as::<_, Customer>(
+                "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at, paused_at, paused_until, pause_plan, billing_interval, has_used_startup_trial FROM customers WHERE id = $1"
+            )
+            .bind(tracking_id)
+            .fetch_optional(pool)
+            .await
+            .ok()
+            .flatten()
+        } else {
+            None
+        };
+        let notify_ref = notify_customer.as_ref().unwrap_or(customer);
+
         let threshold_80 = (daily_limit as f64 * 0.8) as i64;
         let threshold_100 = daily_limit as i64;
 
         if current_count == threshold_80 {
-            // Approaching limit — 80%
-            let _ = send_limit_notification(
-                pool,
-                customer,
-                email_client,
-                "approaching",
-                current_count,
-                daily_limit,
-            )
-            .await;
+            let _ = send_limit_notification(pool, notify_ref, email_client, "approaching", current_count, daily_limit).await;
         } else if current_count == threshold_100 {
-            // At limit — 100%
-            let _ = send_limit_notification(
-                pool,
-                customer,
-                email_client,
-                "at_limit",
-                current_count,
-                daily_limit,
-            )
-            .await;
-        } else if overage_count == 1 && customer.allow_overage {
-            // First overage event
-            let _ = send_limit_notification(
-                pool,
-                customer,
-                email_client,
-                "exceeded",
-                current_count,
-                daily_limit,
-            )
-            .await;
+            let _ = send_limit_notification(pool, notify_ref, email_client, "at_limit", current_count, daily_limit).await;
+        } else if overage_count == 1 && _allow_overage {
+            let _ = send_limit_notification(pool, notify_ref, email_client, "exceeded", current_count, daily_limit).await;
         }
     }
 
