@@ -169,7 +169,7 @@ impl Plan {
             Plan::Developer => 0,
             Plan::Startup => 2900,    // $29/mo
             Plan::Pro => 4900,        // $49/mo
-            Plan::Enterprise => 0,    // Custom pricing
+            Plan::Enterprise => 14900, // $149/mo
         }
     }
 
@@ -179,7 +179,7 @@ impl Plan {
             Plan::Developer => 0,
             Plan::Startup => 59900,   // ₺599.00
             Plan::Pro => 99900,       // ₺999.00
-            Plan::Enterprise => 0,
+            Plan::Enterprise => 299900, // ₺2,999.00
         }
     }
 
