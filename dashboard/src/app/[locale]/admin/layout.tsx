@@ -10,7 +10,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
-import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, FolderOpen, Lock, Shield } from '@/components/icons';
+import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, Lock, Shield } from '@/components/icons';
 
 // Lazy-load heavy components — not needed for initial paint
 const AdminNotificationCenter = lazy(() =>
@@ -73,14 +73,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
           <div className="font-bold text-gray-900 dark:text-white">{t("adminPanel")}</div>
           <div className="text-sm text-gray-500 dark:text-slate-400">{t("management")}</div>
         </div>
-        <Link
-          href={"/applications"}
-          className="shrink-0 px-2.5 py-1 text-xs font-medium rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition"
-          title={t('userPanel') || 'Kullanıcı Paneli'}
-        >
-          <FolderOpen size={14} strokeWidth={1.75} className="inline mr-1" />
-          {t('userPanel') || 'User Panel'}
-        </Link>
+
       </a>
       <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
         {adminNavigation.map((item) => {
