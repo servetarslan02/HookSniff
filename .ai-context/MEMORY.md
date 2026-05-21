@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-21 17:36 GMT+8 (Session 3 — Billing Audit + Polar Fixes + Deploy)
+> Son güncelleme: 2026-05-22 06:35 GMT+8 (SAML XML Parsing Refactor — quick-xml)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -253,6 +253,27 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-22 06:22–06:35 — SAML XML Parsing Refactor)
+
+### Özet
+Servet ile oturum. SAML response parsing'deki string-based XML extraction quick-xml crate ile değiştirildi. 5 fonksiyon yeniden yazıldı, 12 yeni test eklendi.
+
+### Yapılan İşler:
+1. **quick-xml 0.37 eklendi** — workspace + api Cargo.toml
+2. **5 fonksiyon rewrite** — `extract_xml_text`, `extract_xml_attribute`, `extract_saml_attribute`, `extract_signed_info_xml`, `xml_has_element`
+3. **Namespace-agnostic parsing** — saml:, saml2p:, md:, ds: prefix'leri otomatik tanınır
+4. **12 yeni test** — tüm parsing fonksiyonları için kapsamlı testler
+5. **String-based has_signature** — `xml_has_element` ile değiştirildi
+
+### Değişen Dosyalar:
+- `Cargo.toml` — quick-xml workspace dep
+- `api/Cargo.toml` — quick-xml api dep (features: serialize)
+- `api/src/routes/sso.rs` — +374/-46 satır
+
+### Push: `c1b168d8`
 
 ---
 
