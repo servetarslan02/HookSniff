@@ -3745,6 +3745,12 @@
     "post16Excerpt": "CloudEvents v1.0, olay verilerini tanımlamak için standartlaştırılmış bir yol sunar. İşte neden benimsediğimiz ve entegrasyonlarınıza nasıl fayda sağladığı.",
     "post17Title": "Webhook Güvenliği: Eksiksiz Rehber",
     "post17Excerpt": "HMAC imzaları, tekrar saldırısı önleme, IP beyaz listesi ve TLS — webhook uç noktalarınızı korumak için bilmeniz gereken her şey.",
+    "post18Title": "Webhook Nedir? Başlangıçlar İçin Eksiksiz Rehber",
+    "post18Excerpt": "Webhook'ların basit, jargon içermeyen açıklaması — nasıl çalıştığı, gerçek dünya örnekleri ve modern uygulamalar için neden vazgeçilmez olduğu.",
+    "post19Title": "Webhook vs Polling: 2026'da Hangisini Kullanmalısınız?",
+    "post19Excerpt": "Webhook ve polling'in dürüst karşılaştırması — gecikme, bant genişliği, ölçeklenebilirlik ve her yaklaşımı ne zaman kullanmanız gerektiği.",
+    "post20Title": "2026'nın En İyi Ücretsiz Webhook Servisleri (Dürüst Karşılaştırma)",
+    "post20Excerpt": "HookSniff, Svix, Hookdeck ve Hook0'ı karşılaştırdık — fiyatlandırma, özellikler, ücretsiz katmanlar ve hangisi ihtiyaçlarınıza uygun.",
     "backToList": "← Bloga Dön"
   },
   "changelog": {
