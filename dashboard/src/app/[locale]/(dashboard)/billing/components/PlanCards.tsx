@@ -221,13 +221,6 @@ export function PlanCards({
                 <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
                   {t('currentPlanLabel')}
                 </div>
-              ) : plan.isEnterprise ? (
-                <button type="button"
-                  onClick={() => window.open('/contact', '_blank')}
-                  className="w-full py-2.5 rounded-xl text-sm font-medium bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 transition"
-                >
-                  {t('contactSales')}
-                </button>
               ) : isDowngrade ? (
                 <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-50 dark:bg-slate-900 text-gray-400 dark:text-slate-600 border border-dashed border-gray-200 dark:border-slate-700">
                   {t('includedInPlan') || 'Included in your plan'}
