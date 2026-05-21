@@ -861,7 +861,6 @@ async fn test_sso_connection(
         .fetch_optional(&pool)
         .await?
     };
-    .await?;
 
     let (provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_enc, _meta2, _entity) =
         config.ok_or_else(|| AppError::BadRequest("No SSO configuration found. Please set up SSO first.".into()))?;
@@ -994,7 +993,6 @@ async fn initiate_sso_login(
 ) -> Result<impl axum::response::IntoResponse, AppError> {
     let email = &query.email;
 
-    // Rate limit: 10 SSO login attempts per IP per minute
     // Extract real client IP from X-Forwarded-For (Cloud Run / load balancer)
     let client_ip = headers.get("x-forwarded-for")
         .and_then(|v| v.to_str().ok())
@@ -1006,10 +1004,13 @@ async fn initiate_sso_login(
                 .and_then(|v| v.to_str().ok())
                 .unwrap_or("unknown")
         });
-    let rl_key = format!("sso_login:{}", client_ip);
+
+    // Rate limit: 10 SSO login attempts per email+IP per minute
+    // Using email+IP combo prevents one user from blocking others on same IP
+    let rl_key = format!("sso_login:{}:{}", email, client_ip);
     let rl_result = rate_limiter.check_with_headers(&rl_key, 10).await;
     if !rl_result.allowed {
-        tracing::warn!("⚠️ SSO login rate limit exceeded for IP: {}", client_ip);
+        tracing::warn!("⚠️ SSO login rate limit exceeded for email={} IP={}", email, client_ip);
         return Err(AppError::RateLimitExceeded);
     }
 
@@ -1343,6 +1344,12 @@ async fn saml_callback(
     headers: HeaderMap,
     body: String,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
+    // Body size limit: 1MB (SAML responses can be large but shouldn't exceed this)
+    if body.len() > 1_048_576 {
+        tracing::warn!("SAML callback body too large: {} bytes", body.len());
+        return Err(AppError::BadRequest("SAML response too large".into()));
+    }
+
     // Parse form-encoded body: SAMLResponse + RelayState
     let params: HashMap<String, String> = url::form_urlencoded::parse(body.as_bytes())
         .into_owned()
@@ -1439,8 +1446,16 @@ async fn saml_callback(
             }
             tracing::debug!("SAML cryptographic signature verified successfully");
         } else if configured_cert.is_some() && assertion.certificate.is_none() {
-            tracing::warn!("SAML response missing certificate (expected one from IdP)");
-            // Some IdPs don't include cert in every response — log but don't block
+            // Assertion doesn't include cert — try verification with configured cert
+            tracing::info!("SAML response missing embedded certificate, attempting verification with configured IdP certificate");
+            if let Some(ref expected_cert) = configured_cert {
+                if let Err(e) = verify_saml_signature(&saml_xml, expected_cert) {
+                    tracing::warn!("⚠️ SAML signature verification failed (using configured cert): {}", e);
+                    log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Signature verification failed with configured cert"), &headers).await;
+                    return Err(e);
+                }
+                tracing::debug!("SAML cryptographic signature verified using configured IdP certificate");
+            }
         }
     }
 
@@ -1457,8 +1472,19 @@ async fn saml_callback(
     }
     let email = assertion.name_id.clone();
 
+    // Check if SSO config has verified domain matching user's email
+    let email_domain = email.split('@').nth(1).unwrap_or("");
+    let verified_domain: Option<String> = sqlx::query_scalar(
+        "SELECT verified_domain FROM sso_configs WHERE customer_id = $1 AND verified_domain IS NOT NULL LIMIT 1"
+    )
+    .bind(login_state.customer_id)
+    .fetch_optional(&pool)
+    .await?
+    .flatten();
+    let domain_verified = verified_domain.as_deref() == Some(email_domain);
+
     // Find or create customer
-    let customer = find_or_create_sso_customer(&pool, &email, &assertion.attributes, "saml").await?;
+    let customer = find_or_create_sso_customer(&pool, &email, &assertion.attributes, "saml", domain_verified).await?;
 
     // Extract auto_join_team_id BEFORE login_state is consumed
     let auto_join_team = login_state.auto_join_team_id;
@@ -1648,7 +1674,16 @@ async fn oidc_callback(
     }
 
     // Find or create customer
-    let customer = find_or_create_sso_customer(&pool, email, &attributes, "oidc").await?;
+    let email_domain = email.split('@').nth(1).unwrap_or("");
+    let verified_domain: Option<String> = sqlx::query_scalar(
+        "SELECT verified_domain FROM sso_configs WHERE customer_id = $1 AND verified_domain IS NOT NULL LIMIT 1"
+    )
+    .bind(login_state.customer_id)
+    .fetch_optional(&pool)
+    .await?
+    .flatten();
+    let domain_verified = verified_domain.as_deref() == Some(email_domain);
+    let customer = find_or_create_sso_customer(&pool, email, &attributes, "oidc", domain_verified).await?;
 
     // Extract auto_join_team_id BEFORE login_state is consumed
     let auto_join_team = login_state.auto_join_team_id;
@@ -1954,6 +1989,7 @@ async fn find_or_create_sso_customer(
     email: &str,
     attributes: &std::collections::HashMap<String, String>,
     provider: &str,
+    domain_verified: bool,
 ) -> Result<Customer, AppError> {
     // Try to find existing customer
     let existing = sqlx::query_as::<_, Customer>(
@@ -1991,17 +2027,18 @@ async fn find_or_create_sso_customer(
 
     let customer = sqlx::query_as::<_, Customer>(
         "INSERT INTO customers (email, api_key_hash, api_key_prefix, name, is_active, email_verified)
-         VALUES ($1, $2, $3, $4, true, true)
+         VALUES ($1, $2, $3, $4, true, $5)
          RETURNING *"
     )
     .bind(email)
     .bind(&api_key_hash)
     .bind(&api_key_prefix)
     .bind(&name)
+    .bind(domain_verified)
     .fetch_one(pool)
     .await?;
 
-    tracing::info!("New SSO customer created ({}): {} — API key prefix: {}", provider, email, api_key_prefix);
+    tracing::info!("New SSO customer created ({}): {} — API key prefix: {} — email_verified: {}", provider, email, api_key_prefix, domain_verified);
 
     Ok(customer)
 }
