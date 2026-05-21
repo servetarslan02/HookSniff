@@ -97,7 +97,7 @@ async fn send_limit_notification(
                 "Merhaba,\n\nGünlük event limitinizin %80'ine ulaştınız.\n\
                  Mevcut kullanım: {}/{}\n\n\
                  Limit aşımında ek ücret uygulanacaktır.\n\
-                 Ayarlarınızı kontrol etmek için: https://hooksniff.vercel.app/dashboard/billing",
+                 Ayarlarınızı kontrol etmek için: https://hooksniff.vercel.app/account",
                 current, limit
             ),
         ),
@@ -107,7 +107,7 @@ async fn send_limit_notification(
                 "Merhaba,\n\nGünlük event limitinize ulaştınız.\n\
                  Mevcut kullanım: {}/{}\n\n\
                  Overage modunuz aktif ise ek ücret karşılığında events almaya devam edersiniz.\n\
-                 https://hooksniff.vercel.app/dashboard/billing",
+                 https://hooksniff.vercel.app/account",
                 current, limit
             ),
         ),
@@ -117,7 +117,7 @@ async fn send_limit_notification(
                 "Merhaba,\n\nGünlük event limitinizi aştınız.\n\
                  Mevcut kullanım: {}/{}\n\n\
                  Her ek event için overage ücreti uygulanacaktır.\n\
-                 https://hooksniff.vercel.app/dashboard/billing",
+                 https://hooksniff.vercel.app/account",
                 current, limit
             ),
         ),
