@@ -1,19 +1,8 @@
 'use client';
 
-import {useTranslations} from 'next-intl';
-import {AlertTriangle, CheckCircle2, Copy, ExternalLink, Globe, Key, Shield, ShieldCheck, Users} from '@/components/icons';
-import {useState} from 'react';
+import {AlertTriangle, Globe, Key, Shield, ShieldCheck} from '@/components/icons';
 
 export default function SsoDocsPage() {
-  const t = useTranslations('docs.sso');
-  const [copiedText, setCopiedText] = useState('');
-
-  const copy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedText(text);
-    setTimeout(() => setCopiedText(''), 2000);
-  };
-
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       {/* Hero */}
