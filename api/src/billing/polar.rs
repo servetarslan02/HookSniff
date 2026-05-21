@@ -392,7 +392,7 @@ impl PaymentProviderImpl for PolarProvider {
             products: vec![product_id.to_string()],
             external_customer_id: Some(customer_id.to_string()),
             customer_email: Some(customer_email.to_string()),
-            success_url: Some(format!("{}/login?redirect=/account&upgraded=true", app_url)),
+            success_url: Some(format!("{}/billing-section?upgraded=true", app_url)),
             locale: Some("en".to_string()),
             discount_code: None, // Don't use discount_code — it only prefills, doesn't apply
             discount_id: resolved_discount_id,
