@@ -1,8 +1,12 @@
 use super::*;
 
 pub async fn get_subscription(
+    Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<SubscriptionResponse>, AppError> {
+    // RBAC: viewer or higher to view subscription
+    super::super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let plan = Plan::parse_str(&customer.plan);
 
     // Item 247: Derive subscription status dynamically from actual customer state
@@ -59,6 +63,9 @@ pub async fn cancel_subscription(
     Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: admin required to cancel subscription
+    super::super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
+
     if customer.plan == "free" || customer.plan == "developer" {
         return Err(AppError::BadRequest(
             "You are already on the free plan".into(),
@@ -141,6 +148,9 @@ pub async fn pause_subscription(
     Extension(customer): Extension<Customer>,
     Json(req): Json<PauseRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: admin required to pause subscription
+    super::super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
+
     // Validate: can't pause free plan
     let current_plan = Plan::parse_str(&customer.plan);
     if current_plan == Plan::Developer {
@@ -270,6 +280,8 @@ pub async fn resume_subscription(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: admin required to resume subscription
+    super::super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
     // Validate: must be paused
     if customer.paused_at.is_none() {
         return Err(AppError::BadRequest(
@@ -450,6 +462,9 @@ pub async fn upgrade_plan(
     Extension(customer): Extension<Customer>,
     Json(req): Json<UpgradeRequest>,
 ) -> Result<Json<UpgradeResponse>, AppError> {
+    // RBAC: admin required to upgrade plan
+    super::super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
+
     let new_plan = Plan::parse_str(&req.plan);
     let current_plan = Plan::parse_str(&customer.plan);
 

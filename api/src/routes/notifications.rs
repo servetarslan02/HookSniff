@@ -73,6 +73,9 @@ async fn list_notifications(
     Extension(customer): Extension<Customer>,
     Query(params): Query<ListParams>,
 ) -> Result<Json<NotificationListResponse>, AppError> {
+    // RBAC: viewer or higher required to view notifications
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let page = params.page.unwrap_or(1).max(1);
     let per_page = params.per_page.unwrap_or(20).clamp(1, 200);
     let offset = (page - 1) * per_page;
@@ -142,6 +145,8 @@ async fn unread_count(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: viewer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
     let count: (i64,) = sqlx::query_as(
         "SELECT COUNT(*) FROM notifications WHERE customer_id = $1 AND is_read = FALSE",
     )
@@ -158,6 +163,9 @@ async fn mark_read(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: viewer or higher (marking read is harmless)
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let result =
         sqlx::query("UPDATE notifications SET is_read = TRUE WHERE id = $1 AND customer_id = $2")
             .bind(id)
@@ -177,6 +185,8 @@ async fn mark_all_read(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: viewer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
     let result = sqlx::query(
         "UPDATE notifications SET is_read = TRUE WHERE customer_id = $1 AND is_read = FALSE",
     )
@@ -195,6 +205,8 @@ async fn delete_notification(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: developer or higher required to delete notifications
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     let result = sqlx::query("DELETE FROM notifications WHERE id = $1 AND customer_id = $2")
         .bind(id)
         .bind(customer.id)
