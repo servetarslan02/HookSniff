@@ -422,42 +422,71 @@ async fn process_webhook_result(
             provider_tx_id,
             customer_id,
         } => {
-            // Payment failed — immediately downgrade to free (no grace period)
             if let Some(cid) = customer_id {
-                let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
-
-                sqlx::query(
-                    "UPDATE customers SET plan = 'developer', webhook_limit = $1, \
-                     payment_failed_at = NOW(), cancel_at_period_end = false, \
-                     updated_at = NOW() WHERE id = $2",
+                // Check if already in grace period (first failure)
+                let existing_failure: Option<chrono::DateTime<chrono::Utc>> = sqlx::query_scalar(
+                    "SELECT payment_failed_at FROM customers WHERE id = $1"
                 )
-                .bind(free_limit)
                 .bind(cid)
-                .execute(pool)
-                .await?;
+                .fetch_optional(pool)
+                .await?
+                .flatten();
 
-                // Clean up excess endpoints on downgrade
-                cleanup_excess_endpoints(pool, *cid, &Plan::Developer).await?;
+                if existing_failure.is_some() {
+                    // Second failure — downgrade immediately
+                    let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
+                    sqlx::query(
+                        "UPDATE customers SET plan = 'developer', webhook_limit = $1, \
+                         payment_failed_at = NOW(), payment_grace_until = NULL, \
+                         cancel_at_period_end = false, updated_at = NOW() WHERE id = $2",
+                    )
+                    .bind(free_limit)
+                    .bind(cid)
+                    .execute(pool)
+                    .await?;
 
-                // Create in-app notification
-                let pool_clone = pool.clone();
-                let cid_owned = *cid;
-                let provider_clone = provider.to_string();
-                tokio::spawn(async move {
-                    crate::notifications::helpers::payment_failed(&pool_clone, cid_owned, &provider_clone).await;
-                });
+                    cleanup_excess_endpoints(pool, *cid, &Plan::Developer).await?;
 
-                tracing::warn!(
-                    "⚠️ {} payment failed: {} — customer {} downgraded to free immediately",
-                    provider,
-                    provider_tx_id,
-                    cid
-                );
+                    let pool_clone = pool.clone();
+                    let cid_owned = *cid;
+                    let provider_clone = provider.to_string();
+                    tokio::spawn(async move {
+                        crate::notifications::helpers::payment_failed(&pool_clone, cid_owned, &provider_clone).await;
+                    });
+
+                    tracing::warn!(
+                        "⚠️ {} payment failed AGAIN: {} — customer {} downgraded to free (grace period expired)",
+                        provider, provider_tx_id, cid
+                    );
+                } else {
+                    // First failure — enter grace period (3 days to fix payment)
+                    sqlx::query(
+                        "UPDATE customers SET \
+                         payment_failed_at = NOW(), \
+                         payment_grace_until = NOW() + INTERVAL '3 days', \
+                         updated_at = NOW() WHERE id = $1",
+                    )
+                    .bind(cid)
+                    .execute(pool)
+                    .await?;
+
+                    // Notify customer about the failure
+                    let pool_clone = pool.clone();
+                    let cid_owned = *cid;
+                    let provider_clone = provider.to_string();
+                    tokio::spawn(async move {
+                        crate::notifications::helpers::payment_failed_warning(&pool_clone, cid_owned, &provider_clone).await;
+                    });
+
+                    tracing::warn!(
+                        "⚠️ {} payment failed: {} — customer {} entered 3-day grace period",
+                        provider, provider_tx_id, cid
+                    );
+                }
             } else {
                 tracing::warn!(
                     "⚠️ {} payment failed: {} — no customer_id, downgrade skipped",
-                    provider,
-                    provider_tx_id
+                    provider, provider_tx_id
                 );
             }
         }
