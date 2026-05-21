@@ -917,6 +917,8 @@
     "paymentProvider": "Payment Provider",
     "cardOnFile": "Card on File",
     "changeCard": "Change card →",
+    "manageInPolar": "Manage in Polar Portal →",
+    "polarManaged": "Payments managed by Polar.sh",
     "expires": "Expires",
     "managePayment": "Manage payment method →",
     "openingPortal": "Opening portal…",

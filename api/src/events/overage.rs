@@ -100,45 +100,92 @@ pub async fn track_daily_event(
 
 /// Send a limit notification email.
 async fn send_limit_notification(
-    _pool: &PgPool,
+    pool: &PgPool,
     customer: &Customer,
     email_client: Option<&EmailProvider>,
     status: &str,
     current: i64,
     limit: u64,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let (subject, body) = match status {
-        "approaching" => (
-            "⚠️ HookSniff: Event limitinizin %80'ine ulaştınız".to_string(),
-            format!(
-                "Merhaba,\n\nGünlük event limitinizin %80'ine ulaştınız.\n\
-                 Mevcut kullanım: {}/{}\n\n\
-                 Limit aşımında ek ücret uygulanacaktır.\n\
-                 Ayarlarınızı kontrol etmek için: https://hooksniff.vercel.app/account",
-                current, limit
+    // Query customer language preference
+    let lang_raw: String = sqlx::query_scalar(
+        "SELECT COALESCE(language, 'tr') FROM customers WHERE id = $1"
+    )
+    .bind(customer.id)
+    .fetch_one(pool)
+    .await
+    .unwrap_or_else(|_| "tr".to_string());
+
+    let is_en = lang_raw.starts_with("en");
+
+    let (subject, body) = if is_en {
+        match status {
+            "approaching" => (
+                "⚠️ HookSniff: You've reached 80% of your event limit".to_string(),
+                format!(
+                    "Hello,\n\nYou've reached 80% of your daily event limit.\n\
+                     Current usage: {}/{}\n\n\
+                     Overage charges will apply if you exceed the limit.\n\
+                     Check your settings: https://hooksniff.vercel.app/account",
+                    current, limit
+                ),
             ),
-        ),
-        "at_limit" => (
-            "🔴 HookSniff: Günlük event limitinize ulaştınız".to_string(),
-            format!(
-                "Merhaba,\n\nGünlük event limitinize ulaştınız.\n\
-                 Mevcut kullanım: {}/{}\n\n\
-                 Overage modunuz aktif ise ek ücret karşılığında events almaya devam edersiniz.\n\
-                 https://hooksniff.vercel.app/account",
-                current, limit
+            "at_limit" => (
+                "🔴 HookSniff: You've reached your daily event limit".to_string(),
+                format!(
+                    "Hello,\n\nYou've reached your daily event limit.\n\
+                     Current usage: {}/{}\n\n\
+                     If overage mode is enabled, you'll continue receiving events with overage charges.\n\
+                     https://hooksniff.vercel.app/account",
+                    current, limit
+                ),
             ),
-        ),
-        "exceeded" => (
-            "💰 HookSniff: Event limiti aşıldı — overage ücreti uygulanıyor".to_string(),
-            format!(
-                "Merhaba,\n\nGünlük event limitinizi aştınız.\n\
-                 Mevcut kullanım: {}/{}\n\n\
-                 Her ek event için overage ücreti uygulanacaktır.\n\
-                 https://hooksniff.vercel.app/account",
-                current, limit
+            "exceeded" => (
+                "💰 HookSniff: Event limit exceeded — overage charges apply".to_string(),
+                format!(
+                    "Hello,\n\nYou've exceeded your daily event limit.\n\
+                     Current usage: {}/{}\n\n\
+                     Overage charges will apply for each additional event.\n\
+                     https://hooksniff.vercel.app/account",
+                    current, limit
+                ),
             ),
-        ),
-        _ => return Ok(()),
+            _ => return Ok(()),
+        }
+    } else {
+        match status {
+            "approaching" => (
+                "⚠️ HookSniff: Event limitinizin %80'ine ulaştınız".to_string(),
+                format!(
+                    "Merhaba,\n\nGünlük event limitinizin %80'ine ulaştınız.\n\
+                     Mevcut kullanım: {}/{}\n\n\
+                     Limit aşımında ek ücret uygulanacaktır.\n\
+                     Ayarlarınızı kontrol etmek için: https://hooksniff.vercel.app/account",
+                    current, limit
+                ),
+            ),
+            "at_limit" => (
+                "🔴 HookSniff: Günlük event limitinize ulaştınız".to_string(),
+                format!(
+                    "Merhaba,\n\nGünlük event limitinize ulaştınız.\n\
+                     Mevcut kullanım: {}/{}\n\n\
+                     Overage modunuz aktif ise ek ücret karşılığında events almaya devam edersiniz.\n\
+                     https://hooksniff.vercel.app/account",
+                    current, limit
+                ),
+            ),
+            "exceeded" => (
+                "💰 HookSniff: Event limiti aşıldı — overage ücreti uygulanıyor".to_string(),
+                format!(
+                    "Merhaba,\n\nGünlük event limitinizi aştınız.\n\
+                     Mevcut kullanım: {}/{}\n\n\
+                     Her ek event için overage ücreti uygulanacaktır.\n\
+                     https://hooksniff.vercel.app/account",
+                    current, limit
+                ),
+            ),
+            _ => return Ok(()),
+        }
     };
 
     // Send email via the email client

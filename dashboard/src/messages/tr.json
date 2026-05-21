@@ -816,11 +816,11 @@
       "developer": "Developer",
       "startup": "Startup",
       "developerLimit": "Günlük 1.000 event",
-      "startupLimit": "Gunluk 30.000 event",
-      "proLimit": "Gunluk 100.000 event",
-      "enterpriseLimit": "Sinirsiz",
+      "startupLimit": "Günlük 30.000 event",
+      "proLimit": "Günlük 100.000 event",
+      "enterpriseLimit": "Sınırsız",
       "freeLimit": "Gunluk 1.000 event",
-      "businessLimit": "Sinirsiz"
+      "businessLimit": "Sınırsız"
     },
     "features": {
       "deliveries": "Ayda {count} teslimat",
@@ -919,6 +919,8 @@
     "paymentProvider": "Ödeme Sağlayıcı",
     "cardOnFile": "Kayıtlı Kart",
     "changeCard": "Kart değiştir →",
+    "manageInPolar": "Polar Portal'da yönet →",
+    "polarManaged": "Ödemeler Polar.sh tarafından yönetilir",
     "expires": "Son kullanma",
     "managePayment": "Ödeme yöntemini yönet →",
     "openingPortal": "Portal açılıyor...",
@@ -2317,7 +2319,7 @@
       "startTrial": "Ücretsiz deneyin",
       "contactSales": "Satışla iletişime geçin",
       "proFeatures": [
-        "Gunluk 100.000 event",
+        "Günlük 100.000 event",
         "Sinirsiz uygulama",
         "500 endpoint",
         "Sinirsiz event tipi",
@@ -2671,7 +2673,7 @@
       "11 SDK erişimi"
     ],
     "proFeatures": [
-      "Gunluk 100.000 event",
+      "Günlük 100.000 event",
       "Sinirsiz uygulama",
       "500 endpoint",
       "Sinirsiz event tipi",
