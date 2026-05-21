@@ -32,6 +32,9 @@ import { post as github_webhook_guide } from './posts/github-webhook-guide';
 import { post as cloudevents_standard } from './posts/cloudevents-standard';
 import { post as webhook_security_guide } from './posts/webhook-security-guide';
 import { post as shopify_webhook_incident_analysis } from './posts/shopify-webhook-incident-analysis';
+import { post as what_is_a_webhook } from './posts/what-is-a-webhook';
+import { post as webhook_vs_polling } from './posts/webhook-vs-polling';
+import { post as best_free_webhook_services_2026 } from './posts/best-free-webhook-services-2026';
 
 export const posts: Record<string, Post> = {
   'hooksniff-vs-svix-vs-hookdeck': hooksniff_vs_svix_vs_hookdeck,
@@ -51,6 +54,9 @@ export const posts: Record<string, Post> = {
   'cloudevents-standard': cloudevents_standard,
   'webhook-security-guide': webhook_security_guide,
   'shopify-webhook-incident-analysis': shopify_webhook_incident_analysis,
+  'what-is-a-webhook': what_is_a_webhook,
+  'webhook-vs-polling': webhook_vs_polling,
+  'best-free-webhook-services-2026': best_free_webhook_services_2026,
 };
 
 
@@ -73,6 +79,9 @@ export const orderedSlugs = [
   'github-webhook-guide',
   'cloudevents-standard',
   'webhook-security-guide',
+  'what-is-a-webhook',
+  'webhook-vs-polling',
+  'best-free-webhook-services-2026',
 ];
 
 export function getRelatedPosts(currentSlug: string, tags: string[]) {
