@@ -48,7 +48,6 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/service-tokens': '/core',
   '/portal-customize': '/account',
   '/portal-manage': '/account',
-  '/billing': '/account',
   // Deleted container pages
   '/team-mgmt': '/organization',
   '/settings-section': '/account',
