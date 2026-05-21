@@ -91,6 +91,9 @@ async fn create_api_key(
         { let _ = crate::audit::log_action(&pool, customer.id, "API_KEY_CREATE", "api_key", Some(&kid), None, None, None).await; }
     }
 
+    // HS-039: Notify user of new API key
+    crate::notifications::helpers::api_key_created(&pool, customer.id, &name).await;
+
     Ok(Json(CreateApiKeyResponse {
         id: id.0,
         key: api_key,
@@ -105,8 +108,8 @@ async fn delete_api_key(
     Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    // Get the prefix before deleting for cache invalidation
-    let old_prefix: Option<(String,)> = sqlx::query_as("SELECT api_key_prefix FROM api_keys WHERE id = $1 AND customer_id = $2")
+    // Get the prefix and name before deleting for cache invalidation and notification
+    let old_key: Option<(String, Option<String>)> = sqlx::query_as("SELECT api_key_prefix, name FROM api_keys WHERE id = $1 AND customer_id = $2")
         .bind(id)
         .bind(customer.id)
         .fetch_optional(&pool)
@@ -123,7 +126,7 @@ async fn delete_api_key(
     }
 
     // Invalidate Redis cache for the deleted key
-    if let (Some(ref c), Some((prefix,))) = (&cache, &old_prefix) {
+    if let (Some(ref c), Some((prefix, _))) = (&cache, &old_key) {
         c.invalidate("apikey", prefix).await;
     }
 
@@ -132,6 +135,10 @@ async fn delete_api_key(
         let kid = id.to_string();
         { let _ = crate::audit::log_action(&pool, customer.id, "API_KEY_DELETE", "api_key", Some(&kid), None, None, None).await; }
     }
+
+    // HS-039: Notify user of API key revocation
+    let key_name = old_key.and_then(|(_, n)| n).unwrap_or_else(|| "Unnamed".to_string());
+    crate::notifications::helpers::api_key_revoked(&pool, customer.id, &key_name).await;
 
     Ok(Json(serde_json::json!({"deleted": true})))
 }
