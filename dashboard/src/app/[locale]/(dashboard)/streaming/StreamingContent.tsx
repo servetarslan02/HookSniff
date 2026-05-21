@@ -386,7 +386,7 @@ export function StreamingContent() {
             {/* Overview */}
             {tab === 'overview' && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('type')}</span><p className="text-sm font-medium text-gray-900 dark:text-white">{selected.channel_type.toUpperCase()}</p></div>
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('subscribers')}</span><p className="text-sm font-medium text-gray-900 dark:text-white">{selected.current_subscribers}/{selected.max_subscribers}</p></div>
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('totalMessages')}</span><p className="text-sm font-medium text-gray-900 dark:text-white">{selected.total_messages}</p></div>
