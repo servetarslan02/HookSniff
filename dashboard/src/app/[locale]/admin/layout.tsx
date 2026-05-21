@@ -86,7 +86,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
                 href={item.href}
                 onClick={onClose}
                 hoverDelay={80}
-                className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
+                className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
               >
                 <span className="inline-flex items-center">{item.icon}</span>
                 {t(`nav.${item.nameKey}`)}
@@ -100,7 +100,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
               onClick={onClose}
               hoverDelay={80}
               className={clsx(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium transition',
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] font-medium transition',
                 isActive
                   ? 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'
                   : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
