@@ -65,8 +65,8 @@ async fn get_delivery_details(
     Extension(customer): Extension<Customer>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<DeliveryDetails>, AppError> {
-    // RBAC: analyst or higher required to view delivery details
-    super::teams::check_user_team_role(&pool, customer.id, "analyst").await?;
+    // RBAC: viewer or higher required to view delivery details
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
     // Get delivery with endpoint info
     let delivery = sqlx::query_as::<_, (Uuid, Uuid, serde_json::Value, Option<String>, String, i32, i32, Option<chrono::DateTime<chrono::Utc>>, Option<i32>, Option<String>, Option<chrono::DateTime<chrono::Utc>>, chrono::DateTime<chrono::Utc>, Option<serde_json::Value>, Option<chrono::DateTime<chrono::Utc>>, Option<String>)>(
@@ -144,8 +144,8 @@ async fn get_attempt_detail(
     Extension(customer): Extension<Customer>,
     axum::extract::Path((delivery_id, attempt_id)): axum::extract::Path<(Uuid, Uuid)>,
 ) -> Result<Json<AttemptDetail>, AppError> {
-    // RBAC: analyst or higher required to view attempt details
-    super::teams::check_user_team_role(&pool, customer.id, "analyst").await?;
+    // RBAC: viewer or higher required to view attempt details
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
     // Verify delivery belongs to customer
     let _delivery: (Uuid,) =
