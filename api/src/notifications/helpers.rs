@@ -7,6 +7,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 /// Create a notification for a customer.
+/// Deduplication: skips if an identical unread notification exists in the last 24 hours.
 pub async fn create(
     pool: &PgPool,
     customer_id: Uuid,
@@ -15,6 +16,25 @@ pub async fn create(
     message: &str,
     link: Option<&str>,
 ) {
+    // Check for duplicate unread notification in last 24 hours
+    let exists: (bool,) = sqlx::query_as(
+        "SELECT EXISTS(\
+            SELECT 1 FROM notifications \
+            WHERE customer_id = $1 AND type = $2 AND title = $3 AND is_read = false \
+            AND created_at > NOW() - INTERVAL '24 hours'\
+        )"
+    )
+    .bind(customer_id)
+    .bind(notif_type)
+    .bind(title)
+    .fetch_one(pool)
+    .await
+    .unwrap_or((false,));
+
+    if exists.0 {
+        return; // Duplicate — skip
+    }
+
     let _ = sqlx::query(
         "INSERT INTO notifications (customer_id, type, title, message, is_read, link) VALUES ($1, $2, $3, $4, false, $5)"
     )
@@ -65,8 +85,27 @@ pub async fn subscription_canceled(pool: &PgPool, customer_id: Uuid, plan: &str)
     ).await;
 }
 
-/// Plan upgraded.
+/// Plan upgraded — deduplicated: same plan upgrade within 24h is ignored.
 pub async fn plan_upgraded(pool: &PgPool, customer_id: Uuid, old_plan: &str, new_plan: &str) {
+    // Check if we already sent this exact notification in the last 24 hours
+    let exists: (bool,) = sqlx::query_as(
+        "SELECT EXISTS(\
+            SELECT 1 FROM notifications \
+            WHERE customer_id = $1 AND type = 'billing' AND title = '🚀 Plan Yükseltildi' \
+            AND message LIKE '%' || $2 || '%' \
+            AND created_at > NOW() - INTERVAL '24 hours'\
+        )"
+    )
+    .bind(customer_id)
+    .bind(new_plan)
+    .fetch_one(pool)
+    .await
+    .unwrap_or((false,));
+
+    if exists.0 {
+        return; // Already notified about this upgrade
+    }
+
     create(
         pool,
         customer_id,
