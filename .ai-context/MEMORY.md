@@ -256,6 +256,28 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
+## 📝 Son Oturum (2026-05-21 21:53–22:05 — Team Role Fix + Team Plan Limits)
+
+### Özet
+Servet ile oturum. Team üyelerinin rol değiştirme "Not Found" hatası düzeltildi. Plan limitleri takım bazlı yapıldı.
+
+### Yapılan İşler:
+1. **Team role change fix** — `TeamDetail.tsx`'de `onRoleChange(m.id)` → `onRoleChange(m.customer_id)` düzeltildi
+   - Aynı sorun `onRemoveMember` için de vardı, o da düzeltildi
+   - Backend `customer_id` bekliyordu, frontend `team_members.id` gönderiyordu
+   - Commit: `f992c9b9`
+2. **Team-based plan limits** — `reserve_webhook_slot` fonksiyonu takım bazlı hale getirildi
+   - Yeni `resolve_effective_webhook_limit()` fonksiyonu eklendi
+   - Service token ile gelen isteklerde takım sahibinin plan limiti uygulanır
+   - `create_webhook`, `batch_webhooks`, `replay_webhook`, `batch_replay` handler'larına `ServiceTokenScope` eklendi
+   - Commit: `ded9fe76`
+
+### Değişen Dosyalar:
+- `dashboard/src/app/[locale]/(dashboard)/team/components/TeamDetail.tsx` — 2 satır değişiklik
+- `api/src/routes/webhooks.rs` — 43 satır eklendi
+
+---
+
 ## 📝 Son Oturum (2026-05-21 15:35–16:15 — Bug Taraması + Pagination Fix)
 
 ### Özet
