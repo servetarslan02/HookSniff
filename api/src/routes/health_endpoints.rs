@@ -3,6 +3,7 @@ use axum::routing::get;
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use tracing::warn;
 use uuid::Uuid;
 
 use crate::error::AppError;
@@ -125,33 +126,46 @@ async fn list_endpoint_health(
          GROUP BY endpoint_id",
         interval
     );
-    let stats_rows: Vec<EndpointStatsRow> = sqlx::query_as::<_, EndpointStatsRow>(&stats_sql)
+    let stats_rows: Vec<EndpointStatsRow> = match sqlx::query_as::<_, EndpointStatsRow>(&stats_sql)
         .bind(&endpoint_ids)
         .fetch_all(&pool)
         .await
-        .unwrap_or_default();
+    {
+        Ok(rows) => rows,
+        Err(e) => {
+            warn!("⚠️ Health stats query failed: {:?}", e);
+            Vec::new()
+        }
+    };
 
     // 2. Real p95/p99 from delivery_attempts (selected range)
+    // Cast AVG to DOUBLE PRECISION — PostgreSQL AVG(INT) returns NUMERIC
+    // which sqlx cannot deserialize into f64, causing silent query failure.
     let percentile_sql = format!(
         "SELECT d.endpoint_id, \
-         percentile_cont(0.95) WITHIN GROUP (ORDER BY da.duration_ms) as p95_ms, \
-         percentile_cont(0.99) WITHIN GROUP (ORDER BY da.duration_ms) as p99_ms, \
-         AVG(da.duration_ms) as avg_ms \
+         percentile_cont(0.95) WITHIN GROUP (ORDER BY da.duration_ms)::DOUBLE PRECISION as p95_ms, \
+         percentile_cont(0.99) WITHIN GROUP (ORDER BY da.duration_ms)::DOUBLE PRECISION as p99_ms, \
+         AVG(da.duration_ms)::DOUBLE PRECISION as avg_ms \
          FROM delivery_attempts da \
          JOIN deliveries d ON d.id = da.delivery_id \
          WHERE d.endpoint_id = ANY($1) AND da.created_at > NOW() - INTERVAL '{}' \
          GROUP BY d.endpoint_id",
         interval
     );
-    let percentile_rows: Vec<PercentileRow> =
-        sqlx::query_as::<_, PercentileRow>(&percentile_sql)
-            .bind(&endpoint_ids)
-            .fetch_all(&pool)
-            .await
-            .unwrap_or_default();
+    let percentile_rows: Vec<PercentileRow> = match sqlx::query_as::<_, PercentileRow>(&percentile_sql)
+        .bind(&endpoint_ids)
+        .fetch_all(&pool)
+        .await
+    {
+        Ok(rows) => rows,
+        Err(e) => {
+            warn!("⚠️ Health percentile query failed: {:?} — falling back to empty", e);
+            Vec::new()
+        }
+    };
 
     // 3. 7-day delivery stats
-    let stats_7d_rows: Vec<Stats7dRow> = sqlx::query_as::<_, Stats7dRow>(
+    let stats_7d_rows: Vec<Stats7dRow> = match sqlx::query_as::<_, Stats7dRow>(
         "SELECT endpoint_id, \
          COUNT(*) as total, \
          COUNT(*) FILTER (WHERE status = 'delivered') as successful \
@@ -162,10 +176,16 @@ async fn list_endpoint_health(
     .bind(&endpoint_ids)
     .fetch_all(&pool)
     .await
-    .unwrap_or_default();
+    {
+        Ok(rows) => rows,
+        Err(e) => {
+            warn!("⚠️ Health 7d stats query failed: {:?}", e);
+            Vec::new()
+        }
+    };
 
     // 4. Last successful delivery per endpoint
-    let last_success_rows: Vec<LastSuccessRow> = sqlx::query_as::<_, LastSuccessRow>(
+    let last_success_rows: Vec<LastSuccessRow> = match sqlx::query_as::<_, LastSuccessRow>(
         "SELECT endpoint_id, MAX(created_at) as last_success_at \
          FROM deliveries \
          WHERE endpoint_id = ANY($1) AND status = 'delivered' \
@@ -174,7 +194,13 @@ async fn list_endpoint_health(
     .bind(&endpoint_ids)
     .fetch_all(&pool)
     .await
-    .unwrap_or_default();
+    {
+        Ok(rows) => rows,
+        Err(e) => {
+            warn!("⚠️ Health last success query failed: {:?}", e);
+            Vec::new()
+        }
+    };
 
     // Build lookup maps
     let stats_map: std::collections::HashMap<Uuid, (i64, i64, i64)> = stats_rows
@@ -275,11 +301,17 @@ async fn get_endpoint_health(
          FROM deliveries WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '{}'",
         interval
     );
-    let (total, successful, failed): (i64, i64, i64) = sqlx::query_as(&stats_sql)
+    let (total, successful, failed): (i64, i64, i64) = match sqlx::query_as(&stats_sql)
         .bind(ep.id)
         .fetch_one(&pool)
         .await
-        .unwrap_or((0, 0, 0));
+    {
+        Ok(row) => row,
+        Err(e) => {
+            warn!("⚠️ Health stats query failed for endpoint {}: {:?}", ep.id, e);
+            (0, 0, 0)
+        }
+    };
 
     let success_rate = if total > 0 {
         (successful as f64 / total as f64) * 100.0
@@ -288,32 +320,46 @@ async fn get_endpoint_health(
     };
 
     // Real p95/p99 from delivery_attempts
+    // Cast AVG to DOUBLE PRECISION — PostgreSQL AVG(INT) returns NUMERIC
+    // which sqlx cannot deserialize into f64, causing silent query failure.
     let percentile_sql = format!(
         "SELECT \
-         percentile_cont(0.95) WITHIN GROUP (ORDER BY da.duration_ms), \
-         percentile_cont(0.99) WITHIN GROUP (ORDER BY da.duration_ms), \
-         AVG(da.duration_ms) \
+         percentile_cont(0.95) WITHIN GROUP (ORDER BY da.duration_ms)::DOUBLE PRECISION, \
+         percentile_cont(0.99) WITHIN GROUP (ORDER BY da.duration_ms)::DOUBLE PRECISION, \
+         AVG(da.duration_ms)::DOUBLE PRECISION \
          FROM delivery_attempts da \
          JOIN deliveries d ON d.id = da.delivery_id \
          WHERE d.endpoint_id = $1 AND da.created_at > NOW() - INTERVAL '{}'",
         interval
     );
     let (p95, p99, avg): (Option<f64>, Option<f64>, Option<f64>) =
-        sqlx::query_as(&percentile_sql)
+        match sqlx::query_as(&percentile_sql)
             .bind(ep.id)
             .fetch_one(&pool)
             .await
-            .unwrap_or((None, None, None));
+        {
+            Ok(row) => row,
+            Err(e) => {
+                warn!("⚠️ Health percentile query failed for endpoint {}: {:?}", ep.id, e);
+                (None, None, None)
+            }
+        };
 
     // 7d stats
-    let (total_7d, successful_7d): (i64, i64) = sqlx::query_as(
+    let (total_7d, successful_7d): (i64, i64) = match sqlx::query_as(
         "SELECT COUNT(*), COUNT(*) FILTER (WHERE status = 'delivered') \
          FROM deliveries WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '7 days'",
     )
     .bind(ep.id)
     .fetch_one(&pool)
     .await
-    .unwrap_or((0, 0));
+    {
+        Ok(row) => row,
+        Err(e) => {
+            warn!("⚠️ Health 7d stats query failed for endpoint {}: {:?}", ep.id, e);
+            (0, 0)
+        }
+    };
 
     let uptime_7d = if total_7d > 0 {
         (successful_7d as f64 / total_7d as f64) * 100.0
@@ -322,13 +368,19 @@ async fn get_endpoint_health(
     };
 
     // Last successful delivery
-    let last_success: Option<chrono::DateTime<chrono::Utc>> = sqlx::query_scalar(
+    let last_success: Option<chrono::DateTime<chrono::Utc>> = match sqlx::query_scalar(
         "SELECT MAX(created_at) FROM deliveries WHERE endpoint_id = $1 AND status = 'delivered'",
     )
     .bind(ep.id)
     .fetch_one(&pool)
     .await
-    .unwrap_or(None);
+    {
+        Ok(val) => val,
+        Err(e) => {
+            warn!("⚠️ Health last success query failed for endpoint {}: {:?}", ep.id, e);
+            None
+        }
+    };
 
     let health_status = determine_health_status(ep.failure_streak, success_rate);
 
