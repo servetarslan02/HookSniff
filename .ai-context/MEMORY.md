@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-22 06:40 GMT+8 (Error Messages i18n — TR/EN)
+> Son güncelleme: 2026-05-22 06:50 GMT+8 (Error Codes Refactor — Backend + Frontend)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -253,6 +253,35 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-22 06:45–06:50 — Error Codes Refactor)
+
+### Özet
+Servet ile oturum. Backend hata mesajları kod bazlı sisteme geçirildi. 25 route dosyasında 137 değişiklik.
+
+### Yapılan İşler:
+1. **ErrorCode enum** — 137 kod (error.rs)
+2. **AppError::coded()** — tüm route'larda BadRequest(String) yerine
+3. **API response** — `{ error: { code: "INVALID_CREDENTIALS" } }` (mesaj yok)
+4. **Frontend code-based mapping** — string matching kaldırıldı, direkt kod lookup
+5. **29 dosya değişti** — 733 satır eklendi, 625 satır silindi
+
+### Mimari:
+```
+Backend → ErrorCode::X → API response { code: "X" }
+Frontend → code → CODE_MAP[code] → i18n key → t('errors:auth.invalidCredentials')
+```
+
+### Değişen Dosyalar:
+- `api/src/error.rs` — ErrorCode enum + AppError::coded
+- `api/src/routes/*.rs` — 25 dosya
+- `dashboard/src/lib/error-messages.ts` — code-based mapping
+- `dashboard/src/lib/api-errors.ts` — HookSniffError
+- `dashboard/src/hooks/useFriendlyToast.ts` — showError hook
+
+### Push: `9755beff`
 
 ---
 
