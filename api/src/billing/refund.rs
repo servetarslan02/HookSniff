@@ -23,17 +23,17 @@ pub async fn is_within_refund_window(
     pool: &PgPool,
     customer_id: Uuid,
 ) -> Result<bool, AppError> {
-    let subscription_start: Option<DateTime<Utc>> = sqlx::query_scalar(
-        "SELECT MIN(created_at) FROM invoices \
+    let latest_payment: Option<DateTime<Utc>> = sqlx::query_scalar(
+        "SELECT MAX(paid_at) FROM invoices \
          WHERE customer_id = $1 AND status = 'paid'",
     )
     .bind(customer_id)
     .fetch_one(pool)
     .await?;
 
-    match subscription_start {
-        Some(start) => {
-            let elapsed = Utc::now() - start;
+    match latest_payment {
+        Some(paid_at) => {
+            let elapsed = Utc::now() - paid_at;
             Ok(elapsed.num_days() <= REFUND_WINDOW_DAYS)
         }
         None => Ok(false), // No paid invoice — no refund possible

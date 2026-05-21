@@ -586,7 +586,7 @@ impl PaymentProviderImpl for PolarProvider {
                     event_id: event.id.clone(),
                 })
             }
-            "order.created" | "order.completed" => {
+            "order.completed" => {
                 // Payment succeeded (order.created = legacy, order.completed = current Polar event)
                 let order = &event.data;
                 let tx_id = order
@@ -666,7 +666,79 @@ impl PaymentProviderImpl for PolarProvider {
                 })
             }
             "order.refunded" => {
-                tracing::info!("Polar order refunded");
+                // Polar refund completed — update invoice status and downgrade customer
+                let order = &event.data;
+                let tx_id = order
+                    .get("id")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_default()
+                    .to_string();
+
+                let amount = order
+                    .get("total_amount")
+                    .and_then(|v| v.as_i64())
+                    .or_else(|| order.get("amount").and_then(|v| v.as_i64()))
+                    .unwrap_or(0) as i64;
+
+                let customer_id = order
+                    .get("customer_id")
+                    .or_else(|| order.get("external_customer_id"))
+                    .and_then(|v| v.as_str())
+                    .and_then(|s| Uuid::parse_str(s).ok());
+
+                tracing::info!(
+                    "💰 Polar order refunded: {} (amount: {} cents)",
+                    tx_id,
+                    amount
+                );
+
+                if let Some(cid) = customer_id {
+                    // Update latest paid invoice to "refunded"
+                    let _ = sqlx::query(
+                        "UPDATE invoices SET status = 'refunded' \
+                         WHERE id = (\
+                           SELECT id FROM invoices \
+                           WHERE customer_id = $1 AND status = 'paid' \
+                           ORDER BY created_at DESC LIMIT 1\
+                         )",
+                    )
+                    .bind(cid)
+                    .execute(pool)
+                    .await;
+
+                    // Downgrade to free
+                    let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
+                    let _ = sqlx::query(
+                        "UPDATE customers SET \
+                         plan = 'free', webhook_limit = $1, \
+                         cancel_at_period_end = false, \
+                         updated_at = NOW() \
+                         WHERE id = $2",
+                    )
+                    .bind(free_limit)
+                    .bind(cid)
+                    .execute(pool)
+                    .await;
+
+                    // Log refund transaction
+                    let _ = sqlx::query(
+                        "INSERT INTO payment_transactions \
+                         (customer_id, provider, provider_tx_id, status, amount_cents, currency) \
+                         VALUES ($1, 'polar', $2, 'refunded', $3, 'USD') \
+                         ON CONFLICT DO NOTHING",
+                    )
+                    .bind(cid)
+                    .bind(&tx_id)
+                    .bind(amount)
+                    .execute(pool)
+                    .await;
+
+                    tracing::info!(
+                        "✅ Customer {} refunded via Polar order.refunded — downgraded to free",
+                        cid
+                    );
+                }
+
                 Ok(WebhookResult::Ignored)
             }
             _ => {
@@ -1051,7 +1123,7 @@ mod tests {
             .create_customer_portal("cust_123", "https://app.hooksniff.com")
             .await
             .unwrap();
-        assert_eq!(url, "https://app.hooksniff.com/account");
+        assert_eq!(url, "https://app.hooksniff.com/dashboard/billing");
     }
 
     // ── PolarProvider::cancel_subscription (network fail) ──────
