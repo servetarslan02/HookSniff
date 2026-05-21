@@ -37,6 +37,8 @@ import { post as webhook_vs_polling } from './posts/webhook-vs-polling';
 import { post as best_free_webhook_services_2026 } from './posts/best-free-webhook-services-2026';
 import { post as webhook_vs_api } from './posts/webhook-vs-api';
 import { post as webhook_examples } from './posts/webhook-examples';
+import { post as how_to_use_webhooks } from './posts/how-to-use-webhooks';
+import { post as webhook_tutorial } from './posts/webhook-tutorial';
 
 export const posts: Record<string, Post> = {
   'hooksniff-vs-svix-vs-hookdeck': hooksniff_vs_svix_vs_hookdeck,
@@ -61,6 +63,8 @@ export const posts: Record<string, Post> = {
   'best-free-webhook-services-2026': best_free_webhook_services_2026,
   'webhook-vs-api': webhook_vs_api,
   'webhook-examples': webhook_examples,
+  'how-to-use-webhooks': how_to_use_webhooks,
+  'webhook-tutorial': webhook_tutorial,
 };
 
 
@@ -88,6 +92,8 @@ export const orderedSlugs = [
   'best-free-webhook-services-2026',
   'webhook-vs-api',
   'webhook-examples',
+  'how-to-use-webhooks',
+  'webhook-tutorial',
 ];
 
 export function getRelatedPosts(currentSlug: string, tags: string[]) {

@@ -23,6 +23,8 @@ const posts = [
   'best-free-webhook-services-2026',
   'webhook-vs-api',
   'webhook-examples',
+  'how-to-use-webhooks',
+  'webhook-tutorial',
 ];
 
 export async function GET() {
