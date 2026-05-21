@@ -47,7 +47,7 @@ export default function AdminSystemPage() {
   const { toast } = useToast();
 
   // React Query hooks
-  const { data: health, isLoading, error: healthError, refetch: refetchHealth } = useSystemHealth();
+  const { data: health, isLoading, isFetching, error: healthError, refetch: refetchHealth } = useSystemHealth();
   const { data: alerts = [] } = useAdminAlerts();
   const { data: queueStatus } = useQueueStatus();
   const { data: failedData } = useFailedDeliveries({ limit: 20, since: '24h' });
@@ -151,6 +151,7 @@ export default function AdminSystemPage() {
         <HealthStatus
           health={displayHealth}
           isHealthError={isHealthError}
+          isFetching={isFetching}
           alerts={alerts}
           onRefresh={() => refetchHealth()}
         />
