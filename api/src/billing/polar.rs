@@ -973,6 +973,119 @@ impl PolarProvider {
         }
         results
     }
+    /// Create a meter for webhook overage billing.
+    /// Returns the meter ID. Idempotent — if meter already exists, returns existing ID.
+    pub async fn ensure_overage_meter(&self) -> Result<String, String> {
+        // First, check if meter already exists
+        let list_resp = self
+            .client
+            .get(format!("{}/v1/meters/", self.config.base_url))
+            .header("Authorization", format!("Bearer {}", self.config.access_token))
+            .send()
+            .await
+            .map_err(|e| format!("Polar meters list failed: {}", e))?;
+
+        if list_resp.status().is_success() {
+            #[derive(serde::Deserialize)]
+            struct MeterItem {
+                id: String,
+                name: String,
+            }
+            #[derive(serde::Deserialize)]
+            struct MetersResponse {
+                items: Vec<MeterItem>,
+            }
+            if let Ok(data) = list_resp.json::<MetersResponse>().await {
+                for item in data.items {
+                    if item.name == "webhook_overage" {
+                        return Ok(item.id);
+                    }
+                }
+            }
+        }
+
+        // Create the meter
+        let body = serde_json::json!({
+            "name": "webhook_overage",
+            "filter": {
+                "conjunction": "and",
+                "clauses": [{
+                    "property": "name",
+                    "operator": "eq",
+                    "value": "webhook_overage"
+                }]
+            },
+            "aggregation": {
+                "func": "sum",
+                "property": "overage_count"
+            }
+        });
+
+        let resp = self
+            .client
+            .post(format!("{}/v1/meters/", self.config.base_url))
+            .header("Authorization", format!("Bearer {}", self.config.access_token))
+            .header("Content-Type", "application/json")
+            .json(&body)
+            .send()
+            .await
+            .map_err(|e| format!("Polar meter creation failed: {}", e))?;
+
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            return Err(format!("Polar API error ({}): {}", status, body));
+        }
+
+        #[derive(serde::Deserialize)]
+        struct MeterResponse {
+            id: String,
+        }
+        let data: MeterResponse = resp.json().await.map_err(|e| format!("Parse error: {}", e))?;
+        Ok(data.id)
+    }
+
+    /// Ingest a webhook overage event to Polar for metered billing.
+    /// Call this when a customer exceeds their daily limit.
+    pub async fn ingest_overage_event(
+        &self,
+        customer_id: &str,
+        overage_count: i64,
+    ) -> Result<(), String> {
+        if overage_count <= 0 {
+            return Ok(());
+        }
+
+        let body = serde_json::json!({
+            "events": [{
+                "name": "webhook_overage",
+                "external_customer_id": customer_id,
+                "metadata": {
+                    "overage_count": overage_count,
+                    "source": "hooksniff",
+                    "timestamp": chrono::Utc::now().to_rfc3339()
+                }
+            }]
+        });
+
+        let resp = self
+            .client
+            .post(format!("{}/v1/events/ingest", self.config.base_url))
+            .header("Authorization", format!("Bearer {}", self.config.access_token))
+            .header("Content-Type", "application/json")
+            .json(&body)
+            .send()
+            .await
+            .map_err(|e| format!("Polar event ingest failed: {}", e))?;
+
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            return Err(format!("Polar event ingest error ({}): {}", status, body));
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]

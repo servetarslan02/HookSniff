@@ -119,6 +119,26 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
         .execute(pool)
         .await?;
 
+        // Also send the total overage to Polar.sh for metered billing
+        let polar_id: Option<String> = sqlx::query_scalar(
+            "SELECT polar_customer_id FROM customers WHERE id = $1 AND polar_customer_id IS NOT NULL"
+        )
+        .bind(customer_id)
+        .fetch_optional(pool)
+        .await
+        .ok()
+        .flatten();
+
+        if let Some(ext_id) = polar_id {
+            if let Some(cfg) = crate::billing::polar::PolarConfig::from_env() {
+                let provider = crate::billing::polar::PolarProvider::new(cfg);
+                match provider.ingest_overage_event(&ext_id, total_overage).await {
+                    Ok(()) => tracing::info!("📊 Overage event sent to Polar for {}", email),
+                    Err(e) => tracing::warn!("⚠️ Failed to send overage event to Polar for {}: {}", email, e),
+                }
+            }
+        }
+
         invoices_created += 1;
 
         // Send overage invoice email
