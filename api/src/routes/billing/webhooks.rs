@@ -77,7 +77,7 @@ async fn check_webhook_idempotency(pool: &PgPool, body: &str, provider: &str) ->
     if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(body) {
         if let Some(event_id) = parsed.get("id").and_then(|v| v.as_str()) {
             let already_processed: bool = sqlx::query_scalar(
-                "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider = $1 AND provider_event_id = $2)"
+                "SELECT EXISTS(SELECT 1 FROM payment_transactions WHERE provider = $1 AND provider_tx_id = $2)"
             )
             .bind(provider).bind(event_id).fetch_one(pool).await.unwrap_or(false);
             if already_processed {
@@ -125,6 +125,7 @@ async fn process_webhook_result(
             provider_customer_id,
             provider_subscription_id,
             interval,
+            event_id,
         } => {
             let webhook_limit = plan.max_webhooks_per_day() as i64;
             let period_interval = if interval == "year" { "365 days" } else { "30 days" };
@@ -160,11 +161,12 @@ async fn process_webhook_result(
             // Log transaction
             sqlx::query(
                 "INSERT INTO payment_transactions \
-                 (customer_id, provider, status, plan, currency) \
-                 VALUES ($1, $2, 'completed', $3, $4)",
+                 (customer_id, provider, provider_tx_id, status, plan, currency) \
+                 VALUES ($1, $2, $3, 'completed', $4, $5)",
             )
             .bind(customer_id)
             .bind(provider)
+            .bind(event_id.as_deref())
             .bind(plan.as_str())
             .bind(if provider == "iyzico" { "TRY" } else { "USD" })
             .execute(pool)
@@ -206,6 +208,7 @@ async fn process_webhook_result(
             plan,
             status,
             interval,
+            event_id,
         } => {
             let webhook_limit = plan.max_webhooks_per_day() as i64;
             let period_interval = if interval == "year" { "365 days" } else { "30 days" };
@@ -251,6 +254,7 @@ async fn process_webhook_result(
         }
         WebhookResult::SubscriptionCanceled {
             provider_subscription_id,
+            event_id,
         } => {
             let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
             if let Some(sub_col) = provider_sub_col(provider) {
@@ -340,7 +344,7 @@ async fn process_webhook_result(
                 // Record payment transaction
                 let _ = sqlx::query(
                     "INSERT INTO payment_transactions \
-                     (customer_id, provider, provider_event_id, status, amount_cents, currency) \
+                     (customer_id, provider, provider_tx_id, status, amount_cents, currency) \
                      VALUES ($1, $2, $3, 'completed', $4, $5) \
                      ON CONFLICT DO NOTHING",
                 )
