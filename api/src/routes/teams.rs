@@ -128,12 +128,13 @@ const VALID_ROLES: &[&str] = &["admin", "developer", "analyst", "viewer"];
 
 /// Role hierarchy: higher number = more permissions.
 /// Owner is not a stored role — it's derived from teams.owner_id.
+/// "member" is a legacy role treated as "viewer" for backward compatibility.
 pub fn role_level(role: &str) -> u8 {
     match role {
         "admin" => 40,
         "developer" => 30,
         "analyst" => 20,
-        "viewer" => 10,
+        "viewer" | "member" => 10,
         _ => 0,
     }
 }
