@@ -6,7 +6,7 @@
 CREATE TABLE IF NOT EXISTS dunning_reminders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
-    days_remaining INTEGER NOT NULL CHECK (days_remaining BETWEEN 1 AND 7),
+    days_remaining INTEGER NOT NULL CHECK (days_remaining BETWEEN 1 AND 30),
     sent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(customer_id, days_remaining)
 );
