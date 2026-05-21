@@ -896,7 +896,8 @@
       "active": "Aktif",
       "canceled": "İptal Edildi",
       "past_due": "Ödeme Gecikmiş",
-      "inactive": "Pasif"
+      "inactive": "Pasif",
+      "paused": "Duraklatıldı"
     },
     "invalidCheckoutUrl": "Geçersiz ödeme URL'si",
     "contactSales": "Satış Ekibiyle İletişim",
@@ -4321,7 +4322,9 @@
     "realtimeDesc": "Her 2 saniyede bir yoklanır. Yeni istekler listede anında görünür.",
     "likeSignup": "Hoşunuza mı gitti? Kayıt olun ve gerçek webhook gönderin.",
     "startFree": "Ücretsiz başlayın →",
-    "signature": "İmza"
+    "signature": "İmza",
+    "copy": "Kopyala",
+    "requestHistory": "İstek Geçmişi"
   },
   "buildVsBuy": {
     "title": "Kendin Yap mı, Satın Al mı",
@@ -4602,7 +4605,8 @@
     "noEndpointsDesc": "Webhook almaya başlamak için ilk endpoint'inizi oluşturun.",
     "notFoundDesc": "Bu uygulama silinmiş olabilir veya erişim izniniz yok.",
     "manageEndpoints": "Endpoint'leri yönet",
-    "edit": "Düzenle"
+    "edit": "Düzenle",
+    "created": "Uygulama oluşturuldu"
   },
   "serviceTokens": {
     "title": "Hizmet Jetonları",
