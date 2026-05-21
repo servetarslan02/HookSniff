@@ -353,8 +353,9 @@ async fn process_webhook_result(
                 if had_failure.is_some() {
                     let pool_clone = pool.clone();
                     let provider_clone = provider.to_string();
+                    let cid_owned = *cid;
                     tokio::spawn(async move {
-                        crate::notifications::helpers::payment_recovered(&pool_clone, *cid, &provider_clone).await;
+                        crate::notifications::helpers::payment_recovered(&pool_clone, cid_owned, &provider_clone).await;
                     });
                 }
 
