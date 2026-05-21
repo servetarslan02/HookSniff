@@ -7,7 +7,6 @@ import { twoFactorApi } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 import { useTranslations } from 'next-intl';
 import { ShieldCheck, CheckCircle2 } from '@/components/icons';
-import { generateQrSvg } from '@/lib/qr';
 import DOMPurify from 'dompurify';
 
 export function TwoFactorSection() {
@@ -22,7 +21,8 @@ export function TwoFactorSection() {
   const [showDisable, setShowDisable] = useState(false);
 
   // Enable flow
-  const [qrSvg, setQrSvg] = useState('');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [otpauthUri, setOtpauthUri] = useState('');
   const [secret, setSecret] = useState('');
   const [totpCode, setTotpCode] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
@@ -53,9 +53,8 @@ export function TwoFactorSection() {
     setEnabling(true);
     try {
       const data = await twoFactorApi.enable(token);
-      // Generate QR code client-side using otpauth:// URI (not external URL)
-      const otpauthUrl = data.otpauth_url || `otpauth://totp/HookSniff:${encodeURIComponent('user')}?secret=${data.secret}&issuer=HookSniff&digits=6&period=30`;
-      setQrSvg(generateQrSvg(otpauthUrl));
+      setQrCodeUrl(data.qr_code);
+      setOtpauthUri(data.otpauth_url || `otpauth://totp/HookSniff:${encodeURIComponent('user')}?secret=${data.secret}&issuer=HookSniff&digits=6&period=30`);
       setSecret(data.secret);
       setStep('qr');
       setShowEnable(true);
@@ -84,7 +83,8 @@ export function TwoFactorSection() {
 
   const handleCloseEnable = () => {
     setShowEnable(false);
-    setQrSvg('');
+    setQrCodeUrl('');
+    setOtpauthUri('');
     setSecret('');
     setTotpCode('');
     setBackupCodes([]);
@@ -175,10 +175,12 @@ export function TwoFactorSection() {
 
                 {/* QR Code */}
                 <div className="flex justify-center mb-4">
-                  {qrSvg ? (
-                    <div
-                      className="w-48 h-48 rounded-lg overflow-hidden"
-                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(qrSvg) }}
+                  {qrCodeUrl ? (
+                    <img
+                      src={qrCodeUrl}
+                      alt="2FA QR Code"
+                      className="w-48 h-48 rounded-lg"
+                      crossOrigin="anonymous"
                     />
                   ) : (
                     <div className="w-48 h-48 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center text-gray-500 dark:text-slate-400 text-sm">
@@ -186,6 +188,21 @@ export function TwoFactorSection() {
                     </div>
                   )}
                 </div>
+
+                {/* Open in authenticator app directly */}
+                {otpauthUri && (
+                  <div className="mb-4">
+                    <a
+                      href={otpauthUri}
+                      className="block w-full text-center py-2.5 text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-xl hover:bg-brand-100 dark:hover:bg-brand-500/20 transition"
+                    >
+                      📱 {t('openInAuthenticator') || 'Authenticator uygulamasında aç'}
+                    </a>
+                    <p className="text-xs text-gray-400 dark:text-slate-500 mt-2 text-center">
+                      QR kod okutmuyorsa bu linke tıklayın
+                    </p>
+                  </div>
+                )}
 
                 {/* Manual secret */}
                 <div className="mb-4">
