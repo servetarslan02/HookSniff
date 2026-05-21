@@ -7,6 +7,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::models::customer::Customer;
 
 use super::{require_admin, require_admin_write};
@@ -95,15 +96,15 @@ pub async fn create_platform_alert(
 
     let valid_conditions = ["failure_rate", "latency", "consecutive_failures"];
     if !valid_conditions.contains(&req.condition.as_str()) {
-        return Err(AppError::BadRequest("Invalid alert condition".into()));
+        return Err(AppError::coded(ErrorCode::InvalidAlertCondition));
     }
     if req.threshold <= 0 {
-        return Err(AppError::BadRequest("Threshold must be positive".into()));
+        return Err(AppError::coded(ErrorCode::InvalidThreshold));
     }
     let valid_channels = ["slack", "email", "webhook"];
     for ch in &req.channels {
         if !valid_channels.contains(&ch.as_str()) {
-            return Err(AppError::BadRequest("Invalid notification channel".into()));
+            return Err(AppError::coded(ErrorCode::InvalidNotificationChannel));
         }
     }
 
@@ -150,19 +151,19 @@ pub async fn update_alert_admin(
     if let Some(ref cond) = req.condition {
         let valid_conditions = ["failure_rate", "latency", "consecutive_failures"];
         if !valid_conditions.contains(&cond.as_str()) {
-            return Err(AppError::BadRequest("Invalid alert condition".into()));
+            return Err(AppError::coded(ErrorCode::InvalidAlertCondition));
         }
     }
     if let Some(thresh) = req.threshold {
         if thresh <= 0 {
-            return Err(AppError::BadRequest("Threshold must be positive".into()));
+            return Err(AppError::coded(ErrorCode::InvalidThreshold));
         }
     }
     if let Some(ref channels) = req.channels {
         let valid_channels = ["slack", "email", "webhook"];
         for ch in channels {
             if !valid_channels.contains(&ch.as_str()) {
-                return Err(AppError::BadRequest("Invalid notification channel".into()));
+                return Err(AppError::coded(ErrorCode::InvalidNotificationChannel));
             }
         }
     }

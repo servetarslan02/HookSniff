@@ -1,242 +1,206 @@
 /**
- * HookSniff Error Message Mapping
- * 
- * Maps raw API error messages to user-friendly i18n keys.
- * The API returns { error: { code: string, message: string } }.
- * This file maps the raw `message` to a user-friendly key in messages/*.json.
- * 
+ * HookSniff Error Message Mapping — Code-based (v2)
+ *
+ * Maps API error codes to user-friendly i18n keys.
+ * The API returns { error: { code: string } }.
+ * No string matching needed — direct code → i18n key lookup.
+ *
  * Usage:
  *   import { getFriendlyError } from '@/lib/error-messages';
- *   const msg = getFriendlyError(apiError, t);
+ *   const msg = getFriendlyError(errorCode, t);
  */
 
 import type { TFunction } from 'i18next';
 
 /**
- * Map of raw API error message → i18n key in the `errors` namespace.
- * Case-insensitive matching. First match wins.
+ * Map of API error code → i18n key in the `errors` namespace.
  */
-const ERROR_MAP: Record<string, string> = {
-  // ── Auth & Login ──────────────────────────────────────────
-  'invalid email or password': 'auth.invalidCredentials',
-  'account is disabled. contact support.': 'auth.accountDisabled',
-  'please verify your email address before logging in. check your inbox for the verification link.': 'auth.emailNotVerified',
-  'too many failed attempts. please try again later.': 'auth.tooManyAttempts',
-  'request blocked': 'auth.requestBlocked',
-  'password login not set up': 'auth.passwordLoginNotSetup',
-  'password not set': 'auth.passwordNotSet',
-  'invalid or expired reset token': 'auth.invalidResetToken',
-  'invalid or expired verification token': 'auth.invalidVerificationToken',
-  'this email is already in use': 'auth.emailInUse',
-  'this email is no longer available.': 'auth.emailUnavailable',
-  'this is already your current email': 'auth.sameEmail',
-  'current password is incorrect': 'auth.wrongPassword',
-  'refresh token required': 'auth.refreshTokenRequired',
+const CODE_MAP: Record<string, string> = {
+  // ── Generic ──────────────────────────────────────────────
+  NOT_FOUND: 'generic.notFound',
+  UNAUTHORIZED: 'generic.unauthorized',
+  FORBIDDEN: 'generic.forbidden',
+  PAYLOAD_TOO_LARGE: 'generic.payloadTooLarge',
+  RATE_LIMIT_EXCEEDED: 'generic.rateLimited',
+  INTERNAL_ERROR: 'generic.internalError',
+  DATABASE_ERROR: 'generic.internalError',
+  INVALID_FORMAT: 'generic.invalidFormat',
+  CONFLICT: 'generic.conflict',
+
+  // ── Auth ─────────────────────────────────────────────────
+  INVALID_CREDENTIALS: 'auth.invalidCredentials',
+  ACCOUNT_DISABLED: 'auth.accountDisabled',
+  EMAIL_NOT_VERIFIED: 'auth.emailNotVerified',
+  TOO_MANY_ATTEMPTS: 'auth.tooManyAttempts',
+  REQUEST_BLOCKED: 'auth.requestBlocked',
+  PASSWORD_LOGIN_NOT_SETUP: 'auth.passwordLoginNotSetup',
+  PASSWORD_NOT_SET: 'auth.passwordNotSet',
+  PASSWORD_REQUIRED: 'auth.passwordRequired',
+  PASSWORD_TOO_SHORT: 'auth.passwordTooShort',
+  PASSWORD_TOO_LONG: 'auth.passwordTooLong',
+  PASSWORD_NEEDS_UPPERCASE: 'auth.passwordNeedsUppercase',
+  PASSWORD_NEEDS_LOWERCASE: 'auth.passwordNeedsLowercase',
+  PASSWORD_NEEDS_DIGIT: 'auth.passwordNeedsDigit',
+  WRONG_PASSWORD: 'auth.wrongPassword',
+  EMAIL_IN_USE: 'auth.emailInUse',
+  EMAIL_UNAVAILABLE: 'auth.emailUnavailable',
+  SAME_EMAIL: 'auth.sameEmail',
+  INVALID_RESET_TOKEN: 'auth.invalidResetToken',
+  INVALID_VERIFICATION_TOKEN: 'auth.invalidVerificationToken',
+  REFRESH_TOKEN_REQUIRED: 'auth.refreshTokenRequired',
 
   // ── 2FA ──────────────────────────────────────────────────
-  '2fa is already enabled': 'auth.2faAlreadyEnabled',
-  '2fa is not enabled': 'auth.2faNotEnabled',
-  'invalid code. try again.': 'auth.invalid2faCode',
-  'code has expired. please request a new one.': 'auth.codeExpired',
-  'too many attempts. please request a new code.': 'auth.tooMany2faAttempts',
-  'invalid code format': 'auth.invalidCodeFormat',
-
-  // ── Password Requirements ─────────────────────────────────
-  'password must be at least 8 characters': 'auth.passwordTooShort',
-  'password must be at most 128 characters': 'auth.passwordTooLong',
-  'password must contain at least one uppercase letter': 'auth.passwordNeedsUppercase',
-  'password must contain at least one lowercase letter': 'auth.passwordNeedsLowercase',
-  'password must contain at least one digit': 'auth.passwordNeedsDigit',
-  'password is required': 'auth.passwordRequired',
-  'password is required for account deletion': 'auth.passwordRequiredForDeletion',
+  '2FA_ALREADY_ENABLED': 'auth.2faAlreadyEnabled',
+  '2FA_NOT_ENABLED': 'auth.2faNotEnabled',
+  INVALID_2FA_CODE: 'auth.invalid2faCode',
+  CODE_EXPIRED: 'auth.codeExpired',
+  TOO_MANY_2FA_ATTEMPTS: 'auth.tooMany2faAttempts',
+  INVALID_CODE_FORMAT: 'auth.invalidCodeFormat',
 
   // ── SSO ──────────────────────────────────────────────────
-  'sso is not configured for this account. contact your administrator.': 'sso.notConfigured',
-  'sso is not enabled for this account. contact your administrator.': 'sso.notEnabled',
-  'sso configuration not found': 'sso.configNotFound',
-  'sso provider must be either \'saml\' or \'oidc\'': 'sso.invalidProvider',
-  'invalid or expired sso state. please try again.': 'sso.stateExpired',
-  'sso login session expired or invalid. please try again.': 'sso.sessionExpired',
-  'sso login failed: authorization code rejected by identity provider. please try again or contact your administrator.': 'sso.codeRejected',
-  'sso login failed: could not reach identity provider. please try again.': 'sso.idpUnreachable',
-  'sso login failed: identity provider did not return an id token. please contact your administrator.': 'sso.noIdToken',
-  'sso login failed: invalid response from identity provider. please contact your administrator.': 'sso.invalidIdpResponse',
-  'sso login failed: security token mismatch. please try again.': 'sso.tokenMismatch',
-  'cannot impersonate yourself': 'sso.cannotImpersonateSelf',
+  SSO_NOT_CONFIGURED: 'sso.notConfigured',
+  SSO_NOT_ENABLED: 'sso.notEnabled',
+  SSO_CONFIG_NOT_FOUND: 'sso.configNotFound',
+  SSO_INVALID_PROVIDER: 'sso.invalidProvider',
+  SSO_STATE_EXPIRED: 'sso.stateExpired',
+  SSO_SESSION_EXPIRED: 'sso.sessionExpired',
+  SSO_CODE_REJECTED: 'sso.codeRejected',
+  SSO_IDP_UNREACHABLE: 'sso.idpUnreachable',
+  SSO_NO_ID_TOKEN: 'sso.noIdToken',
+  SSO_INVALID_IDP_RESPONSE: 'sso.invalidIdpResponse',
+  SSO_TOKEN_MISMATCH: 'sso.tokenMismatch',
+  CANNOT_IMPERSONATE_SELF: 'sso.cannotImpersonateSelf',
 
-  // ── SAML ──────────────────────────────────────────────────
-  'saml requires either a metadata url or an sso url': 'saml.missingUrl',
-  'saml requires an x.509 certificate': 'saml.missingCertificate',
-  'saml response is not signed. contact your administrator.': 'saml.notSigned',
-  'saml response missing signaturevalue': 'saml.missingSignature',
-  'saml response missing signedinfo': 'saml.missingSignedInfo',
-  'saml response signature verification failed. the response may have been tampered with.': 'saml.signatureFailed',
-  'saml response certificate does not match the configured identity provider. contact your administrator.': 'saml.certMismatch',
-  'saml response email does not match the expected account. contact your administrator.': 'saml.emailMismatch',
-  'saml assertion has expired': 'saml.assertionExpired',
-  'samlresponse is not valid utf-8': 'saml.invalidEncoding',
-  'saml response too large': 'saml.responseTooLarge',
-  'certificate does not contain rsa public key': 'saml.invalidCertificate',
-  'could not extract rsa public key from certificate': 'saml.certKeyError',
-  'invalid base64 in samlresponse': 'saml.invalidBase64',
-  'invalid base64 in saml signaturevalue': 'saml.invalidSignatureBase64',
-  'invalid base64 in x.509 certificate': 'saml.invalidCertBase64',
+  // ── SAML ─────────────────────────────────────────────────
+  SAML_MISSING_URL: 'saml.missingUrl',
+  SAML_MISSING_CERTIFICATE: 'saml.missingCertificate',
+  SAML_NOT_SIGNED: 'saml.notSigned',
+  SAML_MISSING_SIGNATURE: 'saml.missingSignature',
+  SAML_MISSING_SIGNED_INFO: 'saml.missingSignedInfo',
+  SAML_SIGNATURE_FAILED: 'saml.signatureFailed',
+  SAML_CERT_MISMATCH: 'saml.certMismatch',
+  SAML_EMAIL_MISMATCH: 'saml.emailMismatch',
+  SAML_ASSERTION_EXPIRED: 'saml.assertionExpired',
+  SAML_INVALID_ENCODING: 'saml.invalidEncoding',
+  SAML_RESPONSE_TOO_LARGE: 'saml.responseTooLarge',
+  SAML_INVALID_CERTIFICATE: 'saml.invalidCertificate',
+  SAML_CERT_KEY_ERROR: 'saml.certKeyError',
+  SAML_INVALID_BASE64: 'saml.invalidBase64',
 
-  // ── OIDC ──────────────────────────────────────────────────
-  'google oauth not configured': 'oidc.googleNotConfigured',
-  'github oauth not configured': 'oidc.githubNotConfigured',
-  'id token has expired': 'oidc.tokenExpired',
-  'id token algorithm \'none\' is not allowed': 'oidc.algorithmNone',
-  'invalid id token format': 'oidc.invalidTokenFormat',
-  'invalid base64 in id token header': 'oidc.invalidTokenHeader',
-  'invalid base64 in id token payload': 'oidc.invalidTokenPayload',
-  'invalid json in id token header': 'oidc.invalidTokenHeaderJson',
-  'invalid json in id token payload': 'oidc.invalidTokenPayloadJson',
-  'missing state parameter': 'oidc.missingState',
-  'missing authorization code': 'oidc.missingCode',
+  // ── OIDC ─────────────────────────────────────────────────
+  GOOGLE_OAUTH_NOT_CONFIGURED: 'oidc.googleNotConfigured',
+  GITHUB_OAUTH_NOT_CONFIGURED: 'oidc.githubNotConfigured',
+  OIDC_TOKEN_EXPIRED: 'oidc.tokenExpired',
+  OIDC_ALGORITHM_NONE: 'oidc.algorithmNone',
+  OIDC_INVALID_TOKEN_FORMAT: 'oidc.invalidTokenFormat',
+  OIDC_INVALID_TOKEN_HEADER: 'oidc.invalidTokenHeader',
+  OIDC_INVALID_TOKEN_PAYLOAD: 'oidc.invalidTokenPayload',
+  OIDC_MISSING_STATE: 'oidc.missingState',
+  OIDC_MISSING_CODE: 'oidc.missingCode',
 
-  // ── Billing & Plans ──────────────────────────────────────
-  'you are already on this plan': 'billing.alreadyOnPlan',
-  'cannot refund a free plan': 'billing.cannotRefundFree',
-  'this coupon has expired': 'billing.couponExpired',
-  'this coupon has reached its maximum usage': 'billing.couponMaxUsage',
-  'you have already used this coupon': 'billing.couponAlreadyUsed',
-  'coupon code already exists': 'billing.couponDuplicate',
-  'plan prices cannot be negative': 'billing.negativePrice',
-  'discount type must be \'percentage\' or \'free_month\'': 'billing.invalidDiscountType',
-  'discount value must be between 0 and 100': 'billing.invalidDiscountValue',
-  'percentage must be between 0 and 100': 'billing.invalidPercentage',
-  'free month count must be at least 1': 'billing.invalidFreeMonths',
-  'refund amount must be positive': 'billing.invalidRefundAmount',
-  'refund reason cannot be empty': 'billing.refundReasonRequired',
-  'type must be \'polar\' or \'internal\'': 'billing.invalidType',
-  'only polar-type coupons can be synced to polar.sh': 'billing.polarSyncOnly',
-  'invalid checkout url format': 'billing.invalidCheckoutUrl',
-  'only format=csv is supported': 'billing.csvOnly',
+  // ── Billing ──────────────────────────────────────────────
+  ALREADY_ON_PLAN: 'billing.alreadyOnPlan',
+  CANNOT_REFUND_FREE: 'billing.cannotRefundFree',
+  COUPON_EXPIRED: 'billing.couponExpired',
+  COUPON_MAX_USAGE: 'billing.couponMaxUsage',
+  COUPON_ALREADY_USED: 'billing.couponAlreadyUsed',
+  COUPON_DUPLICATE: 'billing.couponDuplicate',
+  NEGATIVE_PRICE: 'billing.negativePrice',
+  INVALID_DISCOUNT_TYPE: 'billing.invalidDiscountType',
+  INVALID_DISCOUNT_VALUE: 'billing.invalidDiscountValue',
+  INVALID_PERCENTAGE: 'billing.invalidPercentage',
+  INVALID_FREE_MONTHS: 'billing.invalidFreeMonths',
+  INVALID_REFUND_AMOUNT: 'billing.invalidRefundAmount',
+  REFUND_REASON_REQUIRED: 'billing.refundReasonRequired',
+  INVALID_PAYMENT_TYPE: 'billing.invalidType',
+  POLAR_SYNC_ONLY: 'billing.polarSyncOnly',
+  INVALID_CHECKOUT_URL: 'billing.invalidCheckoutUrl',
+  CSV_ONLY: 'billing.csvOnly',
 
-  // ── Webhook & Endpoints ──────────────────────────────────
-  'the endpoint is no longer active': 'endpoint.inactive',
-  'a batch cannot contain more than 100 webhooks': 'endpoint.batchTooLarge',
-  'bulk replay is not enabled. contact support to enable this feature.': 'endpoint.bulkReplayDisabled',
-  'custom retry schedules are not enabled. contact support to enable this feature.': 'endpoint.customRetryDisabled',
-  'please provide at least one delivery id to replay': 'endpoint.noDeliveryIds',
-  'endpoint not found': 'endpoint.notFound',
-  'delivery not found': 'endpoint.deliveryNotFound',
+  // ── Endpoints ────────────────────────────────────────────
+  ENDPOINT_INACTIVE: 'endpoint.inactive',
+  BATCH_TOO_LARGE: 'endpoint.batchTooLarge',
+  BULK_REPLAY_DISABLED: 'endpoint.bulkReplayDisabled',
+  CUSTOM_RETRY_DISABLED: 'endpoint.customRetryDisabled',
+  NO_DELIVERY_IDS: 'endpoint.noDeliveryIds',
+  ENDPOINT_NOT_FOUND: 'endpoint.notFound',
+  DELIVERY_NOT_FOUND: 'endpoint.deliveryNotFound',
 
-  // ── Domain ────────────────────────────────────────────────
-  'domain already registered': 'domain.alreadyRegistered',
-  'cannot use this domain': 'domain.cannotUse',
-  'cannot verify public email domains': 'domain.publicDomain',
-  'domain contains invalid characters': 'domain.invalidChars',
-  'invalid domain format': 'domain.invalidFormat',
+  // ── Domain ───────────────────────────────────────────────
+  DOMAIN_ALREADY_REGISTERED: 'domain.alreadyRegistered',
+  DOMAIN_CANNOT_USE: 'domain.cannotUse',
+  DOMAIN_PUBLIC_DOMAIN: 'domain.publicDomain',
+  DOMAIN_INVALID_CHARS: 'domain.invalidChars',
+  DOMAIN_INVALID_FORMAT: 'domain.invalidFormat',
 
-  // ── Team ──────────────────────────────────────────────────
-  'cannot remove the team owner': 'team.cannotRemoveOwner',
-  'not a member of this team': 'team.notMember',
-  'team name cannot be empty': 'team.nameRequired',
-  'default_role must be \'admin\', \'developer\', \'analyst\', or \'viewer\'': 'team.invalidRole',
+  // ── Team ─────────────────────────────────────────────────
+  CANNOT_REMOVE_OWNER: 'team.cannotRemoveOwner',
+  NOT_TEAM_MEMBER: 'team.notMember',
+  TEAM_NAME_REQUIRED: 'team.nameRequired',
+  INVALID_ROLE: 'team.invalidRole',
 
-  // ── Alerts ────────────────────────────────────────────────
-  'invalid alert condition': 'alert.invalidCondition',
-  'threshold must be positive': 'alert.invalidThreshold',
-  'invalid notification channel': 'alert.invalidChannel',
-  'invalid notification url': 'alert.invalidUrl',
-  'channel is disabled': 'alert.channelDisabled',
-  'title is required': 'alert.titleRequired',
-  'schema name is required': 'alert.schemaNameRequired',
-  'tag cannot be empty': 'alert.tagEmpty',
-  'tag too long (max 50 chars)': 'alert.tagTooLong',
+  // ── Alerts ───────────────────────────────────────────────
+  INVALID_ALERT_CONDITION: 'alert.invalidCondition',
+  INVALID_THRESHOLD: 'alert.invalidThreshold',
+  INVALID_NOTIFICATION_CHANNEL: 'alert.invalidChannel',
+  INVALID_NOTIFICATION_URL: 'alert.invalidUrl',
+  CHANNEL_DISABLED: 'alert.channelDisabled',
+  TITLE_REQUIRED: 'alert.titleRequired',
+  SCHEMA_NAME_REQUIRED: 'alert.schemaNameRequired',
+  TAG_EMPTY: 'alert.tagEmpty',
+  TAG_TOO_LONG: 'alert.tagTooLong',
 
-  // ── System ────────────────────────────────────────────────
-  'rate_limit must be at least 1': 'system.invalidRateLimit',
-  'retention_days must be at least 1': 'system.invalidRetention',
-  'retry_max_attempts must be 0-10': 'system.invalidRetryAttempts',
-  'custom_css must be under 10kb': 'system.cssTooLarge',
-  'email subject cannot be empty': 'system.emailSubjectRequired',
-  'email body cannot be empty': 'system.emailBodyRequired',
-  'device token cannot be empty': 'system.deviceTokenRequired',
-  'cannot delete admin user data': 'system.cannotDeleteAdmin',
-  'invalid ip address': 'system.invalidIp',
-  'invalid jwt format': 'system.invalidJwt',
-  'invalid jwt header': 'system.invalidJwtHeader',
-  'invalid jwt header json': 'system.invalidJwtHeaderJson',
-  'invalid date format for \'since\' parameter. please use iso 8601 format (e.g. 2024-01-01t00:00:00z).': 'system.invalidDateFormat',
-
-  // ── Generic ───────────────────────────────────────────────
-  'not found': 'generic.notFound',
-  'unauthorized': 'generic.unauthorized',
-  'internal server error': 'generic.internalError',
-  'invalid request format': 'generic.invalidFormat',
-  'payload too large': 'generic.payloadTooLarge',
+  // ── System ───────────────────────────────────────────────
+  INVALID_RATE_LIMIT: 'system.invalidRateLimit',
+  INVALID_RETENTION: 'system.invalidRetention',
+  INVALID_RETRY_ATTEMPTS: 'system.invalidRetryAttempts',
+  CSS_TOO_LARGE: 'system.cssTooLarge',
+  EMAIL_SUBJECT_REQUIRED: 'system.emailSubjectRequired',
+  EMAIL_BODY_REQUIRED: 'system.emailBodyRequired',
+  DEVICE_TOKEN_REQUIRED: 'system.deviceTokenRequired',
+  CANNOT_DELETE_ADMIN: 'system.cannotDeleteAdmin',
+  INVALID_IP_ADDRESS: 'system.invalidIp',
+  INVALID_JWT: 'system.invalidJwt',
+  INVALID_DATE_FORMAT: 'system.invalidDateFormat',
 };
 
 /**
- * Get a user-friendly error message for a raw API error.
- * Tries exact match first, then partial match, then falls back to generic.
+ * Get a user-friendly error message for an API error code.
+ * Direct lookup — no string matching, no fallback guessing.
  */
 export function getFriendlyError(
-  rawMessage: string | undefined | null,
+  code: string | undefined | null,
   t: TFunction,
   fallback?: string
 ): string {
-  if (!rawMessage) {
+  if (!code) {
     return fallback ?? t('errors:generic.unknown');
   }
 
-  const normalized = rawMessage.toLowerCase().trim();
+  const normalized = code.toUpperCase().trim();
+  const i18nKey = CODE_MAP[normalized];
 
-  // 1. Exact match
-  if (ERROR_MAP[normalized]) {
-    return t(`errors:${ERROR_MAP[normalized]}`);
-  }
-
-  // 2. Partial match (for messages that have dynamic parts)
-  for (const [pattern, key] of Object.entries(ERROR_MAP)) {
-    if (normalized.includes(pattern) || pattern.includes(normalized)) {
-      return t(`errors:${key}`);
-    }
+  if (i18nKey) {
+    return t(`errors:${i18nKey}`);
   }
 
-  // 3. Category-based fallback
-  if (normalized.includes('saml') || normalized.includes('sso')) {
-    return t('errors:sso.genericError');
-  }
-  if (normalized.includes('password')) {
-    return t('errors:auth.passwordError');
-  }
-  if (normalized.includes('coupon')) {
-    return t('errors:billing.couponError');
-  }
-  if (normalized.includes('domain')) {
-    return t('errors:domain.genericError');
-  }
-
-  // 4. Return the original message if it looks user-friendly (short, no technical jargon)
-  if (rawMessage.length < 100 && !rawMessage.includes('&&') && !rawMessage.includes('||')) {
-    return rawMessage;
-  }
-
-  // 5. Generic fallback
   return fallback ?? t('errors:generic.unknown');
 }
 
 /**
- * Extract error message from various error shapes.
+ * Extract error code from API response.
  */
-export function extractErrorMessage(err: unknown): string | null {
+export function extractErrorCode(err: unknown): string | null {
   if (!err) return null;
-  if (typeof err === 'string') return err;
-
-  if (err instanceof Error) return err.message;
 
   if (typeof err === 'object') {
-    // { error: { message: "..." } }
-    if ('error' in err && err.error && typeof err.error === 'object' && 'message' in err.error) {
-      return String((err.error as { message: unknown }).message);
+    // { error: { code: "..." } }
+    if ('error' in err && err.error && typeof err.error === 'object' && 'code' in err.error) {
+      return String((err.error as { code: unknown }).code);
     }
-    // { message: "..." }
-    if ('message' in err) {
-      return String((err as { message: unknown }).message);
+    // { code: "..." }
+    if ('code' in err) {
+      return String((err as { code: unknown }).code);
     }
   }
 

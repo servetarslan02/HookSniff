@@ -29,6 +29,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::auth::jwt;
+use crate::error::ErrorCode;
 use crate::crypto;
 use crate::error::AppError;
 use crate::middleware::{create_auth_cookie, create_refresh_token_cookie, generate_api_key, hash_api_key};
@@ -366,7 +367,7 @@ async fn upsert_sso_config(
     let provider = req.provider.unwrap_or_else(|| "saml".to_string());
 
     if !["saml", "oidc"].contains(&provider.as_str()) {
-        return Err(AppError::BadRequest("SSO provider must be either 'saml' or 'oidc'".into()));
+        return Err(AppError::coded(ErrorCode::SsoInvalidProvider));
     }
 
     let enabled = req.enabled.unwrap_or(false);
@@ -407,7 +408,7 @@ async fn upsert_sso_config(
     if enabled {
         if provider == "saml" {
             if req.sso_url.is_none() && req.metadata_url.is_none() {
-                return Err(AppError::BadRequest("SAML requires either a metadata URL or an SSO URL".into()));
+                return Err(AppError::coded(ErrorCode::SamlMissingUrl));
             }
             if req.certificate.is_none() {
                 // Check if existing certificate exists
@@ -430,7 +431,7 @@ async fn upsert_sso_config(
                 };
 
                 if existing.is_none() && req.certificate.is_none() {
-                    return Err(AppError::BadRequest("SAML requires an X.509 certificate".into()));
+                    return Err(AppError::coded(ErrorCode::SamlMissingCertificate));
                 }
             }
         } else if provider == "oidc" {
@@ -466,7 +467,7 @@ async fn upsert_sso_config(
     // Validate default_role if provided
     if let Some(ref role) = req.default_role {
         if !["admin", "developer", "analyst", "viewer"].contains(&role.as_str()) {
-            return Err(AppError::BadRequest("default_role must be 'admin', 'developer', 'analyst', or 'viewer'".into()));
+            return Err(AppError::coded(ErrorCode::InvalidRole));
         }
     }
 
@@ -682,16 +683,16 @@ async fn initiate_domain_verification(
 
     // Strict domain validation — only allow valid domain characters
     if domain.is_empty() || !domain.contains('.') || domain.contains(' ') {
-        return Err(AppError::BadRequest("Invalid domain format".into()));
+        return Err(AppError::coded(ErrorCode::DomainInvalidFormat));
     }
     // Only allow alphanumeric, hyphens, and dots in domain
     if !domain.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '.') {
-        return Err(AppError::BadRequest("Domain contains invalid characters".into()));
+        return Err(AppError::coded(ErrorCode::DomainInvalidChars));
     }
     // Block common public domains
     let blocked = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "aol.com", "icloud.com", "protonmail.com", "mail.com"];
     if blocked.contains(&domain.as_str()) {
-        return Err(AppError::BadRequest("Cannot verify public email domains".into()));
+        return Err(AppError::coded(ErrorCode::DomainPublicDomain));
     }
 
     // Generate verification token
@@ -1031,7 +1032,7 @@ async fn initiate_sso_login(
     // Check if existing customer is active
     if let Some(ref c) = existing_customer {
         if !c.is_active {
-            return Err(AppError::BadRequest("Account is disabled. Contact support.".into()));
+            return Err(AppError::coded(ErrorCode::AccountDisabled));
         }
     }
 
@@ -1090,12 +1091,12 @@ async fn initiate_sso_login(
     };
 
     let (sso_owner_id, config_team_id, provider, enabled, _metadata_url, sso_url, _certificate, issuer_url, client_id, client_secret_enc, entity_id, default_role) =
-        config.ok_or_else(|| AppError::BadRequest("SSO is not configured for this account. Contact your administrator.".into()))?;
+        config.ok_or_else(|| AppError::coded(ErrorCode::SsoNotConfigured))?;
 
     let default_role = default_role.unwrap_or_else(|| "viewer".to_string());
 
     if !enabled {
-        return Err(AppError::BadRequest("SSO is not enabled for this account. Contact your administrator.".into()));
+        return Err(AppError::coded(ErrorCode::SsoNotEnabled));
     }
 
     // Determine the team for auto-join (prefer config_team_id, fallback to default_team_id lookup)
@@ -1347,7 +1348,7 @@ async fn saml_callback(
     // Body size limit: 1MB (SAML responses can be large but shouldn't exceed this)
     if body.len() > 1_048_576 {
         tracing::warn!("SAML callback body too large: {} bytes", body.len());
-        return Err(AppError::BadRequest("SAML response too large".into()));
+        return Err(AppError::coded(ErrorCode::SamlResponseTooLarge));
     }
 
     // Parse form-encoded body: SAMLResponse + RelayState
@@ -1363,9 +1364,9 @@ async fn saml_callback(
     use base64::Engine;
     let saml_xml = base64::engine::general_purpose::STANDARD
         .decode(saml_response_b64)
-        .map_err(|_| AppError::BadRequest("Invalid base64 in SAMLResponse".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::SamlInvalidBase64))?;
     let saml_xml = String::from_utf8(saml_xml)
-        .map_err(|_| AppError::BadRequest("SAMLResponse is not valid UTF-8".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::SamlInvalidEncoding))?;
 
     // Parse SAML assertion
     let assertion = parse_saml_response(&saml_xml)?;
@@ -1375,13 +1376,13 @@ async fn saml_callback(
     if !has_signature {
         tracing::warn!("SAML response missing digital signature");
         log_sso_attempt(&pool, None, &assertion.name_id, "saml", false, Some("Missing signature"), &headers).await;
-        return Err(AppError::BadRequest("SAML response is not signed. Contact your administrator.".into()));
+        return Err(AppError::coded(ErrorCode::SamlNotSigned));
     }
 
     // Validate assertion timing
     if let Some(not_on_or_after) = assertion.not_on_or_after {
         if Utc::now() > not_on_or_after {
-            return Err(AppError::BadRequest("SAML assertion has expired".into()));
+            return Err(AppError::coded(ErrorCode::SamlAssertionExpired));
         }
     }
 
@@ -1434,7 +1435,7 @@ async fn saml_callback(
             if expected_norm != response_norm {
                 tracing::warn!("⚠️ SAML certificate mismatch: response certificate does not match configured IdP certificate");
                 log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Certificate mismatch — possible tampering"), &headers).await;
-                return Err(AppError::BadRequest("SAML response certificate does not match the configured identity provider. Contact your administrator.".into()));
+                return Err(AppError::coded(ErrorCode::SamlCertMismatch));
             }
             tracing::debug!("SAML certificate verified successfully");
 
@@ -1461,14 +1462,14 @@ async fn saml_callback(
 
     let login_state = login_state.ok_or_else(|| {
         tracing::warn!("SAML callback: no valid state found (expired or invalid RelayState)");
-        AppError::BadRequest("SSO login session expired or invalid. Please try again.".into())
+        AppError::coded(ErrorCode::SsoSessionExpired)
     })?;
 
     // Verify email matches — strict check
     if assertion.name_id != login_state.email {
         tracing::warn!("SAML email mismatch: expected={}, got={}", login_state.email, assertion.name_id);
         log_sso_attempt(&pool, Some(login_state.customer_id), &assertion.name_id, "saml", false, Some("Email mismatch"), &headers).await;
-        return Err(AppError::BadRequest("SAML response email does not match the expected account. Contact your administrator.".into()));
+        return Err(AppError::coded(ErrorCode::SamlEmailMismatch));
     }
     let email = assertion.name_id.clone();
 
@@ -1523,12 +1524,12 @@ async fn oidc_callback(
         return Err(AppError::BadRequest(format!("SSO login failed: {}", error)));
     }
 
-    let code = query.code.ok_or_else(|| AppError::BadRequest("Missing authorization code".into()))?;
-    let state = query.state.ok_or_else(|| AppError::BadRequest("Missing state parameter".into()))?;
+    let code = query.code.ok_or_else(|| AppError::coded(ErrorCode::OidcMissingCode))?;
+    let state = query.state.ok_or_else(|| AppError::coded(ErrorCode::OidcMissingState))?;
 
     // Retrieve and validate login state
     let login_state = state_store.remove(&state).await
-        .ok_or_else(|| AppError::BadRequest("Invalid or expired SSO state. Please try again.".into()))?;
+        .ok_or_else(|| AppError::coded(ErrorCode::SsoStateExpired))?;
 
     // Get SSO config
     let config = sqlx::query_as::<_, (String, Option<String>, Option<String>, Option<String>, Option<String>)>(
@@ -1537,7 +1538,7 @@ async fn oidc_callback(
     .bind(login_state.customer_id)
     .fetch_optional(&pool)
     .await?
-    .ok_or_else(|| AppError::BadRequest("SSO configuration not found".into()))?;
+    .ok_or_else(|| AppError::coded(ErrorCode::SsoConfigNotFound))?;
 
     let (_provider, issuer_url, client_id, client_secret_enc, _entity_id) = config;
 
@@ -2002,16 +2003,16 @@ fn decode_oidc_id_token(token: &str) -> Result<serde_json::Value, AppError> {
     // Split JWT into parts
     let parts: Vec<&str> = token.split('.').collect();
     if parts.len() != 3 {
-        return Err(AppError::BadRequest("Invalid ID token format".into()));
+        return Err(AppError::coded(ErrorCode::OidcInvalidTokenFormat));
     }
 
     // Decode header to get kid and alg
     use base64::Engine;
     let header_bytes = base64::engine::general_purpose::URL_SAFE_NO_PAD
         .decode(parts[0])
-        .map_err(|_| AppError::BadRequest("Invalid base64 in ID token header".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::OidcInvalidTokenHeader))?;
     let header: serde_json::Value = serde_json::from_slice(&header_bytes)
-        .map_err(|_| AppError::BadRequest("Invalid JSON in ID token header".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::OidcInvalidTokenHeader))?;
 
     let _kid = header.get("kid").and_then(|v| v.as_str()).unwrap_or("");
     let alg = header.get("alg").and_then(|v| v.as_str()).unwrap_or("RS256");
@@ -2019,15 +2020,15 @@ fn decode_oidc_id_token(token: &str) -> Result<serde_json::Value, AppError> {
     // Decode payload (second part)
     let payload = base64::engine::general_purpose::URL_SAFE_NO_PAD
         .decode(parts[1])
-        .map_err(|_| AppError::BadRequest("Invalid base64 in ID token payload".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::OidcInvalidTokenPayload))?;
 
     let claims: serde_json::Value = serde_json::from_slice(&payload)
-        .map_err(|_| AppError::BadRequest("Invalid JSON in ID token payload".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::OidcInvalidTokenPayload))?;
 
     // Validate basic claims
     if let Some(exp) = claims.get("exp").and_then(|v| v.as_i64()) {
         if Utc::now().timestamp() > exp {
-            return Err(AppError::BadRequest("ID token has expired".into()));
+            return Err(AppError::coded(ErrorCode::OidcTokenExpired));
         }
     }
 
@@ -2040,7 +2041,7 @@ fn decode_oidc_id_token(token: &str) -> Result<serde_json::Value, AppError> {
     // This function only decodes and validates claims (exp, iat, etc).
     // Full JWKS verification is done before calling this function in oidc_callback.
     if alg == "none" {
-        return Err(AppError::BadRequest("ID token algorithm 'none' is not allowed".into()));
+        return Err(AppError::coded(ErrorCode::OidcAlgorithmNone));
     }
 
     Ok(claims)
@@ -2053,16 +2054,16 @@ async fn verify_jwt_signature(
 ) -> Result<(), AppError> {
     let parts: Vec<&str> = token.split('.').collect();
     if parts.len() != 3 {
-        return Err(AppError::BadRequest("Invalid JWT format".into()));
+        return Err(AppError::coded(ErrorCode::InvalidJwt));
     }
 
     // Decode header
     use base64::Engine;
     let header_bytes = base64::engine::general_purpose::URL_SAFE_NO_PAD
         .decode(parts[0])
-        .map_err(|_| AppError::BadRequest("Invalid JWT header".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::InvalidJwt))?;
     let header: serde_json::Value = serde_json::from_slice(&header_bytes)
-        .map_err(|_| AppError::BadRequest("Invalid JWT header JSON".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::InvalidJwt))?;
 
     let kid = header.get("kid").and_then(|v| v.as_str()).unwrap_or("").to_string();
     let alg = header.get("alg").and_then(|v| v.as_str()).unwrap_or("RS256").to_string();
@@ -2148,7 +2149,7 @@ async fn find_or_create_sso_customer(
 
     if let Some(customer) = existing {
         if !customer.is_active {
-            return Err(AppError::BadRequest("Account is disabled. Contact support.".into()));
+            return Err(AppError::coded(ErrorCode::AccountDisabled));
         }
         tracing::info!("SSO login ({}): {}", provider, email);
         return Ok(customer);
@@ -2331,14 +2332,14 @@ fn verify_saml_signature(xml: &str, certificate_pem: &str) -> Result<(), AppErro
 
     // 1. Extract SignatureValue
     let sig_value_b64 = extract_xml_text(xml, "SignatureValue")
-        .ok_or_else(|| AppError::BadRequest("SAML response missing SignatureValue".into()))?;
+        .ok_or_else(|| AppError::coded(ErrorCode::SamlMissingSignature))?;
     let sig_bytes = base64::engine::general_purpose::STANDARD
         .decode(sig_value_b64.trim())
-        .map_err(|_| AppError::BadRequest("Invalid base64 in SAML SignatureValue".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::SamlInvalidBase64))?;
 
     // 2. Extract SignedInfo (raw XML between <ds:SignedInfo> and </ds:SignedInfo>)
     let signed_info = extract_signed_info_xml(xml)
-        .ok_or_else(|| AppError::BadRequest("SAML response missing SignedInfo".into()))?;
+        .ok_or_else(|| AppError::coded(ErrorCode::SamlMissingSignedInfo))?;
 
     // 3. Extract public key from X.509 certificate
     let cert_der = extract_certificate_der(certificate_pem)?;
@@ -2355,7 +2356,7 @@ fn verify_saml_signature(xml: &str, certificate_pem: &str) -> Result<(), AppErro
         .verify(signed_info.as_bytes(), &sig_bytes)
         .map_err(|e| {
             tracing::warn!("SAML signature verification failed: {}", e);
-            AppError::BadRequest("SAML response signature verification failed. The response may have been tampered with.".into())
+            AppError::coded(ErrorCode::SamlSignatureFailed)
         })?;
 
     tracing::debug!("SAML signature verified successfully");
@@ -2416,7 +2417,7 @@ fn extract_certificate_der(pem: &str) -> Result<Vec<u8>, AppError> {
 
     base64::engine::general_purpose::STANDARD
         .decode(&pem_clean)
-        .map_err(|_| AppError::BadRequest("Invalid base64 in X.509 certificate".into()))
+        .map_err(|_| AppError::coded(ErrorCode::SamlInvalidBase64))
 }
 
 /// Extract RSA public key from DER-encoded X.509 certificate
@@ -2432,7 +2433,7 @@ fn extract_rsa_public_key_from_der(der: &[u8]) -> Result<Vec<u8>, AppError> {
 
     // Find the OID position in the DER
     let oid_pos = find_byte_sequence(der, rsa_oid)
-        .ok_or_else(|| AppError::BadRequest("Certificate does not contain RSA public key".into()))?;
+        .ok_or_else(|| AppError::coded(ErrorCode::SamlInvalidCertificate))?;
 
     // After the OID, there's a NULL byte, then the BIT STRING containing the public key
     // Skip: OID (9 bytes) + NULL (2 bytes) + BIT STRING tag/length
@@ -2466,7 +2467,7 @@ fn extract_rsa_public_key_from_der(der: &[u8]) -> Result<Vec<u8>, AppError> {
         pos += 1;
     }
 
-    Err(AppError::BadRequest("Could not extract RSA public key from certificate".into()))
+    Err(AppError::coded(ErrorCode::SamlCertKeyError))
 }
 
 /// Find a byte sequence in a slice

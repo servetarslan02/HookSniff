@@ -9,6 +9,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::models::customer::Customer;
 
 use super::{require_admin, require_admin_write};
@@ -175,10 +176,10 @@ pub async fn admin_add_tag(
 
     let tag = req.tag.trim().to_lowercase();
     if tag.is_empty() {
-        return Err(AppError::BadRequest("Tag cannot be empty".into()));
+        return Err(AppError::coded(ErrorCode::TagEmpty));
     }
     if tag.len() > 50 {
-        return Err(AppError::BadRequest("Tag too long (max 50 chars)".into()));
+        return Err(AppError::coded(ErrorCode::TagTooLong));
     }
 
     let exists: bool =

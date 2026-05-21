@@ -43,6 +43,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::config::Config;
+use crate::error::ErrorCode;
 use crate::error::AppError;
 use crate::middleware::{
     create_auth_cookie, create_refresh_token_cookie, generate_api_key, hash_api_key,
@@ -118,7 +119,7 @@ async fn google_login(
     Extension(_cfg): Extension<Config>,
 ) -> Result<impl axum::response::IntoResponse, AppError> {
     let client_id = std::env::var("GOOGLE_CLIENT_ID")
-        .map_err(|_| AppError::BadRequest("Google OAuth not configured".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::GoogleOauthNotConfigured))?;
 
     let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
         .unwrap_or_else(|_| "https://hooksniff-api-1046140057667.europe-west1.run.app".to_string());
@@ -180,22 +181,22 @@ async fn google_callback(
 
     let code = params
         .code
-        .ok_or_else(|| AppError::BadRequest("Missing authorization code".into()))?;
+        .ok_or_else(|| AppError::coded(ErrorCode::OidcMissingCode))?;
 
     // Verify CSRF state parameter
     let expected_state = params
         .state
-        .ok_or_else(|| AppError::BadRequest("Missing state parameter".into()))?;
+        .ok_or_else(|| AppError::coded(ErrorCode::OidcMissingState))?;
     verify_oauth_state(&req, &expected_state)?;
 
     // Extract PKCE code_verifier from cookie
     let pkce_verifier = extract_pkce_verifier(&req);
 
     let client_id = std::env::var("GOOGLE_CLIENT_ID")
-        .map_err(|_| AppError::BadRequest("Google OAuth not configured".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::GoogleOauthNotConfigured))?;
 
     let client_secret = std::env::var("GOOGLE_CLIENT_SECRET")
-        .map_err(|_| AppError::BadRequest("Google OAuth not configured".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::GoogleOauthNotConfigured))?;
 
     let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
         .unwrap_or_else(|_| "https://hooksniff-api-1046140057667.europe-west1.run.app".to_string());
@@ -266,7 +267,7 @@ async fn google_callback(
 /// GET /oauth/github — Redirect to GitHub OAuth consent screen
 async fn github_login() -> Result<impl axum::response::IntoResponse, AppError> {
     let client_id = std::env::var("GITHUB_CLIENT_ID")
-        .map_err(|_| AppError::BadRequest("GitHub OAuth not configured".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::GithubOauthNotConfigured))?;
 
     let redirect_base = std::env::var("OAUTH_REDIRECT_BASE")
         .unwrap_or_else(|_| "https://hooksniff-api-1046140057667.europe-west1.run.app".to_string());
@@ -327,22 +328,22 @@ async fn github_callback(
 
     let code = params
         .code
-        .ok_or_else(|| AppError::BadRequest("Missing authorization code".into()))?;
+        .ok_or_else(|| AppError::coded(ErrorCode::OidcMissingCode))?;
 
     // Verify CSRF state parameter
     let expected_state = params
         .state
-        .ok_or_else(|| AppError::BadRequest("Missing state parameter".into()))?;
+        .ok_or_else(|| AppError::coded(ErrorCode::OidcMissingState))?;
     verify_oauth_state(&req, &expected_state)?;
 
     // Extract PKCE code_verifier from cookie
     let pkce_verifier = extract_pkce_verifier(&req);
 
     let client_id = std::env::var("GITHUB_CLIENT_ID")
-        .map_err(|_| AppError::BadRequest("GitHub OAuth not configured".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::GithubOauthNotConfigured))?;
 
     let client_secret = std::env::var("GITHUB_CLIENT_SECRET")
-        .map_err(|_| AppError::BadRequest("GitHub OAuth not configured".into()))?;
+        .map_err(|_| AppError::coded(ErrorCode::GithubOauthNotConfigured))?;
 
     // Exchange code for token (with PKCE verifier if available)
     let access_token = exchange_github_code(&code, &client_id, &client_secret, pkce_verifier.as_deref()).await?;

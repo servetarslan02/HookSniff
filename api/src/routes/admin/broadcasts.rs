@@ -8,6 +8,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::models::customer::Customer;
 
 use super::{require_admin, require_admin_write};
@@ -190,7 +191,7 @@ pub async fn create_broadcast(
 
     // Validate
     if req.title.trim().is_empty() {
-        return Err(AppError::BadRequest("Title is required".into()));
+        return Err(AppError::coded(ErrorCode::TitleRequired));
     }
     if req.message.trim().is_empty() {
         return Err(AppError::BadRequest("Message is required".into()));

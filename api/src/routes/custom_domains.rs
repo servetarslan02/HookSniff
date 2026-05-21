@@ -21,6 +21,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::models::customer::Customer;
 
 pub fn router() -> Router {
@@ -140,7 +141,7 @@ async fn add_domain(
 
     // Validate domain format: max 253 chars, valid hostname pattern
     if domain.is_empty() || domain.len() > 253 || !domain.contains('.') {
-        return Err(AppError::BadRequest("Invalid domain format".into()));
+        return Err(AppError::coded(ErrorCode::DomainInvalidFormat));
     }
     // Reject domains with invalid characters (only allow a-z, 0-9, hyphen, dot)
     if !domain
@@ -169,7 +170,7 @@ async fn add_domain(
         .iter()
         .any(|b| domain == *b || domain.ends_with(&format!(".{}", b)))
     {
-        return Err(AppError::BadRequest("Cannot use this domain".into()));
+        return Err(AppError::coded(ErrorCode::DomainCannotUse));
     }
 
     // Check if domain already exists
@@ -180,7 +181,7 @@ async fn add_domain(
             .await?;
 
     if existing.is_some() {
-        return Err(AppError::BadRequest("Domain already registered".into()));
+        return Err(AppError::coded(ErrorCode::DomainAlreadyRegistered));
     }
 
     let verification_token = generate_verification_token();

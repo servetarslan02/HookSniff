@@ -7,6 +7,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::models::customer::Customer;
 
 use super::{require_admin, require_admin_write};
@@ -230,16 +231,16 @@ pub async fn update_settings(
         return Err(AppError::BadRequest("max_webhooks cannot be negative".into()));
     }
     if settings.rate_limit_free < 1 || settings.rate_limit_startup < 1 || settings.rate_limit_pro < 1 || settings.rate_limit_enterprise < 1 {
-        return Err(AppError::BadRequest("rate_limit must be at least 1".into()));
+        return Err(AppError::coded(ErrorCode::InvalidRateLimit));
     }
     if settings.retention_days_free < 1 || settings.retention_days_startup < 1 || settings.retention_days_pro < 1 || settings.retention_days_enterprise < 1 {
-        return Err(AppError::BadRequest("retention_days must be at least 1".into()));
+        return Err(AppError::coded(ErrorCode::InvalidRetention));
     }
     if settings.retry_max_attempts < 0 || settings.retry_max_attempts > 10 {
-        return Err(AppError::BadRequest("retry_max_attempts must be 0-10".into()));
+        return Err(AppError::coded(ErrorCode::InvalidRetryAttempts));
     }
     if settings.plan_price_startup < 0.0 || settings.plan_price_pro < 0.0 || settings.plan_price_enterprise < 0.0 {
-        return Err(AppError::BadRequest("plan prices cannot be negative".into()));
+        return Err(AppError::coded(ErrorCode::NegativePrice));
     }
 
     let mut saved_settings = settings;
