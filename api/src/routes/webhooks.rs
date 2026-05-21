@@ -149,11 +149,7 @@ async fn create_webhook(
     if let Some(tid) = team_id {
         super::teams::require_team_developer(&pool, tid, customer.id).await?;
     } else {
-        let member_team: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = member_team {
-            super::teams::require_team_developer(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     // Check idempotency key
@@ -390,11 +386,7 @@ async fn batch_webhooks(
     if let Some(tid) = team_id {
         super::teams::require_team_developer(&pool, tid, customer.id).await?;
     } else {
-        let member_team: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = member_team {
-            super::teams::require_team_developer(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     if req.webhooks.len() > 100 {
@@ -575,11 +567,7 @@ async fn replay_webhook(
     if let Some(tid) = team_id {
         super::teams::require_team_developer(&pool, tid, customer.id).await?;
     } else {
-        let member_team: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = member_team {
-            super::teams::require_team_developer(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     let original = sqlx::query_as::<_, Delivery>(
@@ -694,11 +682,7 @@ async fn batch_replay(
     if let Some(tid) = team_id {
         super::teams::require_team_developer(&pool, tid, customer.id).await?;
     } else {
-        let member_team: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = member_team {
-            super::teams::require_team_developer(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     // Gate behind bulk_replay feature flag

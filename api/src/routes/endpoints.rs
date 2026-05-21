@@ -11,18 +11,6 @@ use crate::feature_flags::FeatureFlagService;
 use crate::models::customer::Customer;
 use crate::models::endpoint::{CreateEndpointRequest, Endpoint, EndpointResponse, RetryPolicy};
 
-/// Find the primary team this customer belongs to (if any).
-/// Returns the first team_id where the customer is a member, or None for personal accounts.
-async fn find_primary_team(pool: &PgPool, customer_id: Uuid) -> Result<Option<Uuid>, AppError> {
-    let team_id: Option<(Uuid,)> = sqlx::query_as(
-        "SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1",
-    )
-    .bind(customer_id)
-    .fetch_optional(pool)
-    .await?;
-    Ok(team_id.map(|(id,)| id))
-}
-
 /// Generate a cryptographically random signing secret (32 bytes, hex-encoded).
 fn generate_signing_secret() -> String {
     use aes_gcm::aead::rand_core::RngCore;
@@ -86,10 +74,8 @@ async fn create_endpoint(
         // Service token: verify the caller has developer role in this team
         super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
     } else {
-        // JWT: if user belongs to any team, enforce their team role
-        if let Some(team_id) = find_primary_team(&pool, customer.id).await? {
-            super::teams::require_team_developer(&pool, team_id, customer.id).await?;
-        }
+        // JWT: check if user has developer role in ANY team they belong to
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     // Gate custom retry schedules behind feature flag
@@ -238,8 +224,8 @@ async fn delete_endpoint(
     // ── Role enforcement: require admin for destructive ops ──
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
-    } else if let Some(team_id) = find_primary_team(&pool, customer.id).await? {
-        super::teams::require_team_admin(&pool, team_id, customer.id).await?;
+    } else {
+        super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
     }
 
     let result = sqlx::query("DELETE FROM endpoints WHERE id = $1 AND customer_id = $2")
@@ -299,8 +285,8 @@ async fn update_endpoint(
     // ── Role enforcement: require at least developer ──
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
-    } else if let Some(team_id) = find_primary_team(&pool, customer.id).await? {
-        super::teams::require_team_developer(&pool, team_id, customer.id).await?;
+    } else {
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     // Gate custom retry schedules behind feature flag
@@ -432,8 +418,8 @@ async fn update_retry_policy(
     // ── Role enforcement: require at least developer ──
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
-    } else if let Some(team_id) = find_primary_team(&pool, customer.id).await? {
-        super::teams::require_team_developer(&pool, team_id, customer.id).await?;
+    } else {
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     // Gate behind custom_retry_schedules feature flag
@@ -475,8 +461,8 @@ async fn rotate_secret(
     // ── Role enforcement: require admin for secret rotation ──
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
-    } else if let Some(team_id) = find_primary_team(&pool, customer.id).await? {
-        super::teams::require_team_admin(&pool, team_id, customer.id).await?;
+    } else {
+        super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
     }
 
     // Get current endpoint

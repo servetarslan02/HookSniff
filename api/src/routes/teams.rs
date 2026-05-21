@@ -128,7 +128,7 @@ const VALID_ROLES: &[&str] = &["admin", "developer", "analyst", "viewer"];
 
 /// Role hierarchy: higher number = more permissions.
 /// Owner is not a stored role — it's derived from teams.owner_id.
-fn role_level(role: &str) -> u8 {
+pub fn role_level(role: &str) -> u8 {
     match role {
         "admin" => 40,
         "developer" => 30,
@@ -214,6 +214,50 @@ pub async fn require_team_analyst(
     customer_id: Uuid,
 ) -> Result<(), AppError> {
     require_role(pool, team_id, customer_id, "analyst").await
+}
+
+/// Check if user has at least `min_role` in ANY team they belong to.
+/// Returns Ok(()) if user has the role in any team, or is a team owner.
+/// Returns Ok(()) for personal accounts (no team membership).
+/// Returns Err if user belongs to teams but has insufficient role in all of them.
+pub async fn check_user_team_role(
+    pool: &PgPool,
+    customer_id: Uuid,
+    min_role: &str,
+) -> Result<(), AppError> {
+    // Get all teams the user belongs to with their roles
+    let memberships: Vec<(Uuid, String)> = sqlx::query_as(
+        "SELECT team_id, role FROM team_members WHERE customer_id = $1",
+    )
+    .bind(customer_id)
+    .fetch_all(pool)
+    .await?;
+
+    if memberships.is_empty() {
+        return Ok(()); // Personal account, no team — allow
+    }
+
+    // Check if user has the required role in ANY team
+    let min_level = role_level(min_role);
+    for (_team_id, role) in &memberships {
+        if role_level(role) >= min_level {
+            return Ok(());
+        }
+    }
+
+    // Also check if user is owner of any team (owner always has full access)
+    let owned: Option<(Uuid,)> = sqlx::query_as(
+        "SELECT id FROM teams WHERE owner_id = $1",
+    )
+    .bind(customer_id)
+    .fetch_optional(pool)
+    .await?;
+
+    if owned.is_some() {
+        return Ok(());
+    }
+
+    Err(AppError::Forbidden(format!("{} role or higher required in any team", min_role)))
 }
 
 // ── Routes ───────────────────────────────────────────────────────────────────

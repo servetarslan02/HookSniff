@@ -213,11 +213,7 @@ async fn create_config(
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
     } else {
-        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = team_id {
-            super::teams::require_team_developer(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     // Verify connector exists
@@ -280,11 +276,7 @@ async fn update_config(
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
     } else {
-        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = team_id {
-            super::teams::require_team_developer(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     let config = sqlx::query_as::<_, ConnectorConfig>(
@@ -339,11 +331,7 @@ async fn delete_config(
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
     } else {
-        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = team_id {
-            super::teams::require_team_admin(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
     }
 
     let result = sqlx::query(
