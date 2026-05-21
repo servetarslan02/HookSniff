@@ -9,10 +9,35 @@ use std::time::Duration;
 
 /// Run the metrics push loop. Call this once at startup via `tokio::spawn`.
 pub async fn run(pool: PgPool) {
-    // OTLP endpoint + auth from env (same as OTEL config)
-    let otlp_endpoint = std::env::var("OTEL_EXPORTER_OTLP_ENDPOINT")
-        .unwrap_or_else(|_| "https://otlp-gateway-prod-eu-west-2.grafana.net".to_string());
-    let otlp_headers = std::env::var("OTEL_EXPORTER_OTLP_HEADERS").unwrap_or_default();
+    // Use dedicated GRAFANA_OTLP_ENDPOINT if available, otherwise fall back to OTEL endpoint
+    // Note: OTEL_EXPORTER_OTLP_ENDPOINT may point to Sentry (for traces), not Grafana (for metrics)
+    let otlp_endpoint = match std::env::var("GRAFANA_OTLP_ENDPOINT") {
+        Ok(v) => v,
+        Err(_) => match std::env::var("OTEL_EXPORTER_OTLP_ENDPOINT") {
+            Ok(v) => {
+                // If the OTEL endpoint is Sentry, metrics push won't work — skip it
+                if v.contains("sentry.io") || v.contains("ingest") {
+                    tracing::info!("📊 Metrics push disabled — OTEL endpoint is Sentry (not Grafana). Set GRAFANA_OTLP_ENDPOINT to enable.");
+                    loop {
+                        tokio::time::sleep(Duration::from_secs(3600)).await;
+                    }
+                }
+                v
+            }
+            Err(_) => "https://otlp-gateway-prod-eu-west-2.grafana.net".to_string(),
+        },
+    };
+    let otlp_headers = std::env::var("GRAFANA_OTLP_HEADERS")
+        .or_else(|_| std::env::var("OTEL_EXPORTER_OTLP_HEADERS"))
+        .unwrap_or_default();
+
+    // If no auth headers available, metrics push will fail — disable gracefully
+    if otlp_headers.is_empty() {
+        tracing::info!("📊 Metrics push disabled — no OTLP auth headers set. Set GRAFANA_OTLP_HEADERS or OTEL_EXPORTER_OTLP_HEADERS to enable.");
+        loop {
+            tokio::time::sleep(Duration::from_secs(3600)).await;
+        }
+    }
 
     // Parse OTLP headers (format: "key1=value1,key2=value2")
     let mut auth_header = String::new();

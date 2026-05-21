@@ -1288,10 +1288,22 @@ async fn initiate_oidc_login(
         .get(&discovery_url)
         .send()
         .await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to fetch OIDC discovery: {}", e)))?
+        .map_err(|e| {
+            tracing::error!("Failed to fetch OIDC discovery from {}: {}", discovery_url, e);
+            AppError::BadRequest(format!(
+                "Cannot reach OIDC discovery endpoint ({}). Ensure the issuer URL is correct and the identity provider is running. Error: {}",
+                discovery_url, e
+            ))
+        })?
         .json::<OidcDiscovery>()
         .await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!("Invalid OIDC discovery document: {}", e)))?;
+        .map_err(|e| {
+            tracing::error!("Invalid OIDC discovery document from {}: {}", discovery_url, e);
+            AppError::BadRequest(format!(
+                "OIDC discovery document from {} is invalid or unreachable. Verify the issuer URL points to a valid OIDC provider (e.g. Keycloak, Auth0, Google). Error: {}",
+                discovery_url, e
+            ))
+        })?;
 
     let redirect_uri = format!(
         "{}/v1/sso/oidc/callback",
@@ -1526,10 +1538,22 @@ async fn oidc_callback(
         .get(&discovery_url)
         .send()
         .await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to fetch OIDC discovery: {}", e)))?
+        .map_err(|e| {
+            tracing::error!("Failed to fetch OIDC discovery from {}: {}", discovery_url, e);
+            AppError::BadRequest(format!(
+                "Cannot reach OIDC discovery endpoint ({}). Ensure the issuer URL is correct and the identity provider is running. Error: {}",
+                discovery_url, e
+            ))
+        })?
         .json::<OidcDiscovery>()
         .await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!("Invalid OIDC discovery: {}", e)))?;
+        .map_err(|e| {
+            tracing::error!("Invalid OIDC discovery document from {}: {}", discovery_url, e);
+            AppError::BadRequest(format!(
+                "OIDC discovery document from {} is invalid or unreachable. Verify the issuer URL points to a valid OIDC provider. Error: {}",
+                discovery_url, e
+            ))
+        })?;
 
     let redirect_uri = format!(
         "{}/v1/sso/oidc/callback",
