@@ -470,6 +470,36 @@ async fn main() -> Result<()> {
         }
     });
 
+    // Overage invoicing job: generate monthly overage invoices on the 1st of each month
+    let overage_pool = pool.clone();
+    let overage_queue = job_queue.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(24 * 60 * 60)).await;
+
+            let should_run = if let Some(ref queue) = overage_queue {
+                queue.try_acquire_lock("overage_invoicing", 3600).await.unwrap_or(true)
+            } else {
+                true
+            };
+
+            if should_run {
+                if let Some(email_client) = hooksniff_api::resend_email::ResendEmailClient::from_env() {
+                    match jobs::overage_invoicing::run_overage_invoicing(&overage_pool, &email_client).await {
+                        Ok(created) => {
+                            if created > 0 {
+                                tracing::info!("💰 Overage invoicing: {} invoices created", created);
+                            }
+                        }
+                        Err(e) => tracing::error!("❌ Overage invoicing job failed: {:?}", e),
+                    }
+                } else {
+                    tracing::warn!("⚠️ Resend not configured, overage invoice emails skipped");
+                }
+            }
+        }
+    });
+
     // Start auth cache cleanup (evicts expired entries every 60s)
     middleware::start_auth_cache_cleanup();
 
