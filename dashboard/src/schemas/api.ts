@@ -266,7 +266,7 @@ export const SystemHealthSchema = z.object({
   checks: z.object({
     database: z.object({ status: z.string(), latency_ms: z.number() }).optional(),
     queue: z.object({ status: z.string(), latency_ms: z.number(), pending_count: z.number().optional() }).optional(),
-    redis: z.object({ status: z.string(), latency_ms: z.number() }).optional(),
+    redis: z.object({ status: z.string(), latency_ms: z.number(), note: z.string().optional() }).optional(),
     last_delivery: z.object({ status: z.string(), last_delivered_at: z.string().optional() }).optional(),
     db_size: z.object({ status: z.string(), size: z.string().optional() }).optional(),
     recent_errors: z.object({
