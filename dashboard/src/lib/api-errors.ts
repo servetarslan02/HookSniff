@@ -1,34 +1,17 @@
 /**
  * HookSniff Custom Error Classes
- * 
- * Preserves error codes and raw messages for i18n-friendly error handling.
+ *
+ * Preserves error codes for i18n-friendly error handling.
+ * The API returns { error: { code: string } }.
  */
-
-/** Error code from the API */
-export type ApiErrorCode =
-  | 'NOT_FOUND'
-  | 'UNAUTHORIZED'
-  | 'FORBIDDEN'
-  | 'BAD_REQUEST'
-  | 'PAYLOAD_TOO_LARGE'
-  | 'CONFLICT'
-  | 'VALIDATION_ERROR'
-  | 'RATE_LIMIT_EXCEEDED'
-  | 'INTERNAL_ERROR'
-  | 'SERVICE_UNAVAILABLE'
-  | 'DATABASE_ERROR'
-  | 'SERIALIZATION_ERROR'
-  | string;
 
 /**
- * Structured API error with code and raw message.
- * Components can use `errorKey` for i18n lookup, or fall back to `message`.
+ * Structured API error with error code.
+ * Components use `code` for i18n lookup.
  */
 export class HookSniffError extends Error {
-  /** API error code (e.g., 'BAD_REQUEST', 'UNAUTHORIZED') */
-  public readonly code: ApiErrorCode;
-  /** Raw message from the API (may be technical) */
-  public readonly rawMessage: string;
+  /** API error code (e.g., 'INVALID_CREDENTIALS', 'SAML_MISSING_SIGNATURE') */
+  public readonly code: string;
   /** HTTP status code */
   public readonly status: number;
   /** Whether this is a network/timeout error */
@@ -36,14 +19,13 @@ export class HookSniffError extends Error {
 
   constructor(params: {
     message: string;
-    code: ApiErrorCode;
+    code: string;
     status: number;
     isNetworkError?: boolean;
   }) {
     super(params.message);
     this.name = 'HookSniffError';
     this.code = params.code;
-    this.rawMessage = params.message;
     this.status = params.status;
     this.isNetworkError = params.isNetworkError ?? false;
   }

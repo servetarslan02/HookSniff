@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::auth::jwt;
+use crate::error::ErrorCode;
 use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::{
@@ -87,7 +88,7 @@ pub async fn enable_2fa(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     if customer.totp_enabled {
-        return Err(AppError::BadRequest("2FA is already enabled".into()));
+        return Err(AppError::coded(ErrorCode::TwoFaAlreadyEnabled));
     }
 
     let secret = generate_totp_secret();
@@ -175,13 +176,13 @@ pub async fn disable_2fa(
     Json(req): Json<Disable2faRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     if !customer.totp_enabled {
-        return Err(AppError::BadRequest("2FA is not enabled".into()));
+        return Err(AppError::coded(ErrorCode::TwoFaNotEnabled));
     }
 
     let hash = customer
         .password_hash
         .as_ref()
-        .ok_or(AppError::BadRequest("Password not set".into()))?;
+        .ok_or(AppError::coded(ErrorCode::PasswordNotSet))?;
 
     if !jwt::verify_password_async(req.password.clone(), hash.clone()).await? {
         return Err(AppError::BadRequest("Invalid password".into()));

@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::billing::provider::PaymentProviderImpl;
+use crate::error::ErrorCode;
 use crate::billing::stripe;
 use crate::billing::{BillingService, Plan};
 use crate::config::Config;
@@ -38,7 +39,7 @@ const ALLOWED_CHECKOUT_DOMAINS: &[&str] = &[
 /// - Matches an allowed payment provider domain
 fn validate_checkout_url(url: &str) -> Result<(), AppError> {
     let parsed = url::Url::parse(url).map_err(|_| {
-        AppError::BadRequest("Invalid checkout URL format".into())
+        AppError::coded(ErrorCode::InvalidCheckoutUrl)
     })?;
 
     // Require HTTPS (except localhost for dev)

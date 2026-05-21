@@ -16,6 +16,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::billing::Plan;
+use crate::error::ErrorCode;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 use crate::schemas::registry::SchemaRegistry;
@@ -45,7 +46,7 @@ async fn register_schema(
     let registry = SchemaRegistry::new(pool.clone());
 
     if request.name.is_empty() {
-        return Err(AppError::BadRequest("Schema name is required".into()));
+        return Err(AppError::coded(ErrorCode::SchemaNameRequired));
     }
 
     // Plan-based event type limit check

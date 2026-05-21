@@ -9,6 +9,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::models::customer::Customer;
 
 use super::{require_admin, stats::RevenueRow};
@@ -34,7 +35,7 @@ pub async fn export_users_csv(
 
     let format = params.format.unwrap_or_else(|| "csv".to_string());
     if format != "csv" {
-        return Err(AppError::BadRequest("Only format=csv is supported".into()));
+        return Err(AppError::coded(ErrorCode::CsvOnly));
     }
 
     let mut conditions: Vec<String> = Vec::new();
@@ -131,7 +132,7 @@ pub async fn export_revenue_csv(
 
     let format = params.format.unwrap_or_else(|| "csv".to_string());
     if format != "csv" {
-        return Err(AppError::BadRequest("Only format=csv is supported".into()));
+        return Err(AppError::coded(ErrorCode::CsvOnly));
     }
 
     let months = params.months.unwrap_or(12).clamp(1, 60);

@@ -7,6 +7,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::billing::Plan;
+use crate::error::ErrorCode;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
@@ -272,7 +273,7 @@ async fn create_team(
     Json(req): Json<CreateTeamRequest>,
 ) -> Result<Json<Team>, AppError> {
     if req.name.trim().is_empty() {
-        return Err(AppError::BadRequest("Team name cannot be empty".into()));
+        return Err(AppError::coded(ErrorCode::TeamNameRequired));
     }
 
     let mut tx = pool.begin().await?;
@@ -741,7 +742,7 @@ async fn remove_member(
         .ok_or(AppError::NotFound)?;
 
     if uid == team.owner_id {
-        return Err(AppError::BadRequest("Cannot remove the team owner".into()));
+        return Err(AppError::coded(ErrorCode::CannotRemoveOwner));
     }
 
     let result = sqlx::query("DELETE FROM team_members WHERE team_id = $1 AND customer_id = $2")
@@ -865,7 +866,7 @@ async fn update_team(
 
     let new_name = req.name.as_deref().unwrap_or(&team.name);
     if new_name.trim().is_empty() {
-        return Err(AppError::BadRequest("Team name cannot be empty".into()));
+        return Err(AppError::coded(ErrorCode::TeamNameRequired));
     }
 
     // Check if description column exists (it might not in older schemas)

@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::models::customer::{Customer, DeviceTokenResponse, RegisterDeviceRequest};
 
 pub fn router() -> Router {
@@ -33,7 +34,7 @@ async fn register_device(
     super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
 
     if req.token.trim().is_empty() {
-        return Err(AppError::BadRequest("Device token cannot be empty".into()));
+        return Err(AppError::coded(ErrorCode::DeviceTokenRequired));
     }
 
     let platform = req.platform.unwrap_or_else(|| "android".to_string());

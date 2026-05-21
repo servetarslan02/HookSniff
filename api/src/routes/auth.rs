@@ -9,6 +9,7 @@ use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
 use crate::auth::jwt;
+use crate::error::ErrorCode;
 use crate::config::Config;
 use crate::error::AppError;
 use crate::middleware::{
@@ -45,19 +46,19 @@ pub(crate) const CUSTOMER_SELECT: &str = "SELECT id, email, api_key_hash, api_ke
 
 fn validate_password_strength(password: &str) -> Result<(), AppError> {
     if password.len() < 8 {
-        return Err(AppError::BadRequest("Password must be at least 8 characters".into()));
+        return Err(AppError::coded(ErrorCode::PasswordTooShort));
     }
     if password.len() > 128 {
-        return Err(AppError::BadRequest("Password must be at most 128 characters".into()));
+        return Err(AppError::coded(ErrorCode::PasswordTooLong));
     }
     if !password.chars().any(|c| c.is_ascii_uppercase()) {
-        return Err(AppError::BadRequest("Password must contain at least one uppercase letter".into()));
+        return Err(AppError::coded(ErrorCode::PasswordNeedsUppercase));
     }
     if !password.chars().any(|c| c.is_ascii_lowercase()) {
-        return Err(AppError::BadRequest("Password must contain at least one lowercase letter".into()));
+        return Err(AppError::coded(ErrorCode::PasswordNeedsLowercase));
     }
     if !password.chars().any(|c| c.is_ascii_digit()) {
-        return Err(AppError::BadRequest("Password must contain at least one digit".into()));
+        return Err(AppError::coded(ErrorCode::PasswordNeedsDigit));
     }
     Ok(())
 }
@@ -185,7 +186,7 @@ async fn register(
         return Err(AppError::BadRequest(e));
     }
 
-    let password = req.password.ok_or_else(|| AppError::BadRequest("Password is required".into()))?;
+    let password = req.password.ok_or_else(|| AppError::coded(ErrorCode::PasswordRequired))?;
     validate_password_strength(&password)?;
 
     let api_key = generate_api_key();
@@ -271,7 +272,7 @@ async fn login(
             None, Some(&req.email), Some(&client_ip), Some(user_agent), detected.details,
         ).await;
         if detected.should_block {
-            return Err(AppError::BadRequest("Request blocked".into()));
+            return Err(AppError::coded(ErrorCode::RequestBlocked));
         }
     }
 
@@ -283,7 +284,7 @@ async fn login(
         ).await;
         if detected.should_block {
             tracing::warn!("🔒 Login blocked — brute force detected: {} from {}", req.email, client_ip);
-            return Err(AppError::BadRequest("Too many failed attempts. Please try again later.".into()));
+            return Err(AppError::coded(ErrorCode::TooManyAttempts));
         }
     }
 
@@ -304,7 +305,7 @@ async fn login(
         },
     };
 
-    let customer = customer.ok_or(AppError::BadRequest("Invalid email or password".into()))?;
+    let customer = customer.ok_or(AppError::coded(ErrorCode::InvalidCredentials))?;
     if !customer.is_active {
         // Record disabled account login attempt
         let _ = crate::security_monitor::record_login_attempt(
@@ -315,14 +316,14 @@ async fn login(
             "medium", Some(customer.id), Some(&req.email), Some(&client_ip), Some(user_agent),
             serde_json::json!({"reason": "Disabled account login attempt"}),
         ).await;
-        return Err(AppError::BadRequest("Account is disabled. Contact support.".into()));
+        return Err(AppError::coded(ErrorCode::AccountDisabled));
     }
     if !password_ok {
         // Record failed login attempt
         let _ = crate::security_monitor::record_login_attempt(
             &pool, &req.email, &client_ip, Some(user_agent), false, Some("wrong_password"),
         ).await;
-        return Err(AppError::BadRequest("Invalid email or password".into()));
+        return Err(AppError::coded(ErrorCode::InvalidCredentials));
     }
 
     // Record successful login attempt
@@ -332,7 +333,7 @@ async fn login(
 
     // Email verification check — block login if email is not verified
     if !customer.email_verified {
-        return Err(AppError::BadRequest("Please verify your email address before logging in. Check your inbox for the verification link.".into()));
+        return Err(AppError::coded(ErrorCode::EmailNotVerified));
     }
 
     // SSO enforcement check — block password login if SSO is required
@@ -483,7 +484,7 @@ async fn reset_password(
     )
     .bind(&token_hash).fetch_optional(&pool).await?;
 
-    let (token_id, customer_id) = record.ok_or(AppError::BadRequest("Invalid or expired reset token".into()))?;
+    let (token_id, customer_id) = record.ok_or(AppError::coded(ErrorCode::InvalidResetToken))?;
 
     sqlx::query("UPDATE password_reset_tokens SET used = true WHERE id = $1")
         .bind(token_id).execute(&pool).await?;
@@ -518,7 +519,7 @@ async fn verify_email(
     )
     .bind(&token_hash).fetch_optional(&pool).await?;
 
-    let (token_id, customer_id) = record.ok_or(AppError::BadRequest("Invalid or expired verification token".into()))?;
+    let (token_id, customer_id) = record.ok_or(AppError::coded(ErrorCode::InvalidVerificationToken))?;
 
     sqlx::query("UPDATE email_verification_tokens SET used = true WHERE id = $1")
         .bind(token_id).execute(&pool).await?;
@@ -589,7 +590,7 @@ async fn refresh_token(
             c.trim().strip_prefix("hooksniff_refresh=").map(|s| s.to_string())
         }))
         .or_else(|| body.map(|b| b.refresh_token.clone()))
-        .ok_or(AppError::BadRequest("Refresh token required".into()))?;
+        .ok_or(AppError::coded(ErrorCode::RefreshTokenRequired))?;
 
     let token_hash = jwt::hash_token(&refresh_token_value);
     // HS-039: Accept refresh token even if recently revoked (grace period for multi-tab).
@@ -724,9 +725,9 @@ async fn change_password(
     Json(req): Json<ChangePasswordRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     validate_password_strength(&req.new_password)?;
-    let hash = customer.password_hash.as_ref().ok_or(AppError::BadRequest("Password login not set up".into()))?;
+    let hash = customer.password_hash.as_ref().ok_or(AppError::coded(ErrorCode::PasswordLoginNotSetup))?;
     if !jwt::verify_password_async(req.current_password.clone(), hash.clone()).await? {
-        return Err(AppError::BadRequest("Current password is incorrect".into()));
+        return Err(AppError::coded(ErrorCode::WrongPassword));
     }
 
     let new_hash = jwt::hash_password_async(req.new_password.clone()).await?;
@@ -794,8 +795,8 @@ async fn delete_account(
     Json(req): Json<serde_json::Value>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let password = req.get("password").and_then(|v| v.as_str())
-        .ok_or_else(|| AppError::BadRequest("Password is required for account deletion".into()))?;
-    let hash = customer.password_hash.as_ref().ok_or(AppError::BadRequest("Password not set".into()))?;
+        .ok_or_else(|| AppError::coded(ErrorCode::PasswordRequired))?;
+    let hash = customer.password_hash.as_ref().ok_or(AppError::coded(ErrorCode::PasswordNotSet))?;
     if !jwt::verify_password_async(password.to_string(), hash.clone()).await? {
         return Err(AppError::BadRequest("Invalid password".into()));
     }
@@ -922,7 +923,7 @@ async fn request_email_change(
 
     // Can't change to same email
     if new_email == customer.email.to_lowercase() {
-        return Err(AppError::BadRequest("This is already your current email".into()));
+        return Err(AppError::coded(ErrorCode::SameEmail));
     }
 
     // Check if email is in use
@@ -931,7 +932,7 @@ async fn request_email_change(
     )
     .bind(&new_email).bind(customer.id).fetch_optional(&pool).await?;
     if existing.is_some() {
-        return Err(AppError::BadRequest("This email is already in use".into()));
+        return Err(AppError::coded(ErrorCode::EmailInUse));
     }
 
     // Delete old codes for this user
@@ -989,7 +990,7 @@ async fn confirm_email_change(
     }
 
     if req.code.len() != 6 || !req.code.chars().all(|c| c.is_ascii_digit()) {
-        return Err(AppError::BadRequest("Invalid code format".into()));
+        return Err(AppError::coded(ErrorCode::InvalidCodeFormat));
     }
 
     // Get the latest code for this user
@@ -1006,13 +1007,13 @@ async fn confirm_email_change(
     // Check attempts (max 5)
     if attempts >= 5 {
         sqlx::query("DELETE FROM email_change_codes WHERE id = $1").bind(code_id).execute(&pool).await?;
-        return Err(AppError::BadRequest("Too many attempts. Please request a new code.".into()));
+        return Err(AppError::coded(ErrorCode::TooMany2faAttempts));
     }
 
     // Check expiry
     if Utc::now() > expires_at {
         sqlx::query("DELETE FROM email_change_codes WHERE id = $1").bind(code_id).execute(&pool).await?;
-        return Err(AppError::BadRequest("Code has expired. Please request a new one.".into()));
+        return Err(AppError::coded(ErrorCode::CodeExpired));
     }
 
     // Increment attempts
@@ -1022,7 +1023,7 @@ async fn confirm_email_change(
     // Verify code (constant-time comparison via hash)
     let input_hash = jwt::hash_token(&req.code);
     if input_hash != code_hash {
-        return Err(AppError::BadRequest("Invalid code. Try again.".into()));
+        return Err(AppError::coded(ErrorCode::Invalid2faCode));
     }
 
     // Check email still available
@@ -1032,7 +1033,7 @@ async fn confirm_email_change(
     .bind(&new_email).bind(customer.id).fetch_optional(&pool).await?;
     if existing.is_some() {
         sqlx::query("DELETE FROM email_change_codes WHERE id = $1").bind(code_id).execute(&pool).await?;
-        return Err(AppError::BadRequest("This email is no longer available.".into()));
+        return Err(AppError::coded(ErrorCode::EmailUnavailable));
     }
 
     // Update email
