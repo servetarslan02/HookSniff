@@ -147,6 +147,7 @@ pub fn api_router() -> Router {
         .merge(protected)
         .merge(inbound_config_routes)
         .merge(inbound_public_routes)
+        .nest("/billing", billing::webhook_router())
         .merge(admin_routes)
 }
 
