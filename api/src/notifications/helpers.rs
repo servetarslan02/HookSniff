@@ -401,3 +401,43 @@ pub async fn limit_exceeded(pool: &PgPool, customer_id: Uuid, current: i64, limi
     };
     create(pool, customer_id, "alert", title, &message, Some("/billing-section")).await;
 }
+
+/// Notify customer that their refund was processed.
+pub async fn refund_processed(pool: &PgPool, customer_id: Uuid, amount_cents: i64) {
+    let lang = get_customer_lang(pool, customer_id).await;
+    let (title, message) = match lang {
+        Lang::Tr => (
+            "💰 İade İşlendi",
+            format!("${:.2} tutarındaki iade talebiniz onaylandı ve işlendi. Planınız Free'ye düşürüldü.", amount_cents as f64 / 100.0),
+        ),
+        Lang::En => (
+            "💰 Refund Processed",
+            format!("Your refund request for ${:.2} has been approved and processed. Your plan has been downgraded to Free.", amount_cents as f64 / 100.0),
+        ),
+    };
+    create(pool, customer_id, "billing", title, &message, Some("/billing")).await;
+}
+
+/// Notify customer that their refund request was denied.
+pub async fn refund_denied(pool: &PgPool, customer_id: Uuid, reason: &str) {
+    let lang = get_customer_lang(pool, customer_id).await;
+    let (title, message) = match lang {
+        Lang::Tr => (
+            "❌ İade Talebi Reddedildi",
+            if reason.is_empty() {
+                "İade talebiniz reddedildi. Daha fazla bilgi için destek ekibiyle iletişime geçin.".to_string()
+            } else {
+                format!("İade talebiniz reddedildi. Sebep: {}", reason)
+            },
+        ),
+        Lang::En => (
+            "❌ Refund Request Denied",
+            if reason.is_empty() {
+                "Your refund request has been denied. Contact support for more information.".to_string()
+            } else {
+                format!("Your refund request has been denied. Reason: {}", reason)
+            },
+        ),
+    };
+    create(pool, customer_id, "billing", title, &message, Some("/billing")).await;
+}

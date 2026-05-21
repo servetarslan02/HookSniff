@@ -34,7 +34,7 @@ const STATUS_STYLES: Record<string, React.ReactNode> = {
   paused: 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 ring-blue-600/20',
 };
 
-export function SubscriptionDetails({ onCancel, onPause, onResume }: { onCancel?: () => void; onPause?: () => void; onResume?: () => void }) {
+export function SubscriptionDetails({ onCancel, onPause, onResume, onRefundRequest }: { onCancel?: () => void; onPause?: () => void; onResume?: () => void; onRefundRequest?: () => void }) {
   const { token } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('billing');
@@ -149,6 +149,15 @@ export function SubscriptionDetails({ onCancel, onPause, onResume }: { onCancel?
                 className="text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1"
               >
                 {t('cancelSubscription')}
+              </button>
+            )}
+            {!isFree && !sub.paused_at && !sub.cancel_at_period_end && onRefundRequest && (
+              <button
+                type="button"
+                onClick={onRefundRequest}
+                className="text-xs text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
+              >
+                {t('requestRefund') || 'Request Refund'}
               </button>
             )}
             {sub.paused_at && (
