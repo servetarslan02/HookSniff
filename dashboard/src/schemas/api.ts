@@ -850,7 +850,7 @@ export const PortalConfigSchema = z.object({
   show_events: z.boolean().optional(),
   show_deliveries: z.boolean().optional(),
   allowed_events: z.array(z.string()).optional(),
-  custom_css: z.string().optional(),
+  custom_css: z.string().nullable().optional(),
 });
 export const PortalEmbedCodeSchema = z.object({
   iframe: z.string().optional(),
