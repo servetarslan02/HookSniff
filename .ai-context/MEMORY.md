@@ -274,6 +274,11 @@ Servet ile oturum. Team üyelerinin rol değiştirme "Not Found" hatası düzelt
 3. **track_daily_event takım bazlı** — overage notifications da takım planına göre çalışır
    - `resolve_effective_daily_limit()` fonksiyonu eklendi
    - Commit: `1986ea0d`
+4. **KRİTİK FIX: Team-level sayaç** — webhook_count ve daily_event sayaçları takım sahibinde artıyor
+   - Önceki: her üye kendi sayacını artırıyordu → N üye × limit = N katı kapasite
+   - Şimdi: sayaç takım sahibinde artıyor → gerçek takım limiti uygulanıyor
+   - Rollback ve overage email'leri de takım sahibine gidiyor
+   - Commit: `f96b3939`
 
 ### Değişen Dosyalar:
 - `dashboard/src/app/[locale]/(dashboard)/team/components/TeamDetail.tsx` — 2 satır değişiklik
