@@ -21,7 +21,11 @@ pub async fn process_expired_grace_periods(pool: &sqlx::PgPool) -> Result<u64, A
 
         sqlx::query(
             "UPDATE customers SET plan = 'free', webhook_limit = $1, \
-             payment_failed_at = NULL, cancel_at_period_end = false, updated_at = NOW() \
+             payment_failed_at = NULL, cancel_at_period_end = false, \
+             paused_at = NULL, paused_until = NULL, pause_plan = NULL, \
+             card_last4 = NULL, card_brand = NULL, card_exp_month = NULL, card_exp_year = NULL, \
+             billing_interval = NULL, \
+             updated_at = NOW() \
              WHERE id = $2",
         )
         .bind(free_limit)

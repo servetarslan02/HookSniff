@@ -419,16 +419,18 @@ async fn handle_subscription_deleted(
         .and_then(|v| v.as_str())
         .unwrap_or_default();
 
-    // Downgrade to developer plan
+    // Downgrade to free plan
+    let free_limit = crate::billing::Plan::Developer.max_webhooks_per_day() as i64;
     sqlx::query(
-        "UPDATE customers SET plan = 'developer', stripe_subscription_id = NULL WHERE stripe_subscription_id = $1"
+        "UPDATE customers SET plan = 'free', webhook_limit = $1, stripe_subscription_id = NULL, cancel_at_period_end = false, updated_at = NOW() WHERE stripe_subscription_id = $2"
     )
+    .bind(free_limit)
     .bind(stripe_subscription_id)
     .execute(pool)
     .await?;
 
     tracing::info!(
-        "✅ Subscription {} canceled, customer downgraded to developer",
+        "✅ Subscription {} canceled, customer downgraded to free",
         stripe_subscription_id
     );
 

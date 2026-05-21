@@ -311,6 +311,9 @@ pub async fn admin_delete_user_data(
     sqlx::query(
         "UPDATE customers SET \
          plan = 'free', webhook_limit = 1000, webhook_count = 0, \
+         paused_at = NULL, paused_until = NULL, pause_plan = NULL, \
+         card_last4 = NULL, card_brand = NULL, card_exp_month = NULL, card_exp_year = NULL, \
+         billing_interval = NULL, 
          stripe_subscription_id = NULL, polar_subscription_id = NULL, iyzico_subscription_id = NULL, \
          cancel_at_period_end = false, payment_failed_at = NULL, \
          updated_at = NOW() \

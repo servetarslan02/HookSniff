@@ -169,13 +169,7 @@ async fn process_webhook_result(
             current_period_end,
         } => {
             let webhook_limit = plan.max_webhooks_per_day() as i64;
-            // Use Polar's current_period_end if available, otherwise calculate
-            let period_end_expr = if let Some(ref pe) = current_period_end {
-                format!("'{}'::timestamptz", pe)
-            } else {
-                let period_interval = if interval == "year" { "365 days" } else { "30 days" };
-                format!("NOW() + INTERVAL '{}'", period_interval)
-            };
+            let period_interval = if interval == "year" { "365 days" } else { "30 days" };
             if let Some((cust_col, sub_col)) = provider_columns(provider) {
                 // Mark startup trial as used when customer subscribes to Startup plan
                 let trial_flag = if *plan == Plan::Startup {
@@ -183,15 +177,16 @@ async fn process_webhook_result(
                 } else {
                     ""
                 };
+                // Use parameterized query for current_period_end to avoid SQL injection
                 let query = format!(
                     "UPDATE customers SET plan = $1, payment_provider = $2, \
                      {} = $3, {} = $4, webhook_limit = $5, \
                      payment_failed_at = NULL, \
-                     current_period_end = {}, \
+                     current_period_end = COALESCE($9::timestamptz, NOW() + INTERVAL '{}'), \
                      billing_interval = $7, \
                      cancel_at_period_end = $8, \
                      updated_at = NOW(){} WHERE id = $6",
-                    cust_col, sub_col, period_end_expr, trial_flag
+                    cust_col, sub_col, period_interval, trial_flag
                 );
                 sqlx::query(&query)
                     .bind(plan.as_str()).bind(provider)
@@ -199,6 +194,7 @@ async fn process_webhook_result(
                     .bind(webhook_limit).bind(customer_id)
                     .bind(&interval)
                     .bind(cancel_at_period_end)
+                    .bind(current_period_end.as_deref())
                     .execute(pool).await?;
             } else {
                 return Ok(());
@@ -252,26 +248,21 @@ async fn process_webhook_result(
             current_period_end,
         } => {
             let webhook_limit = plan.max_webhooks_per_day() as i64;
-            // Use Polar's current_period_end if available, otherwise calculate
-            let period_end_expr = if let Some(ref pe) = current_period_end {
-                format!("'{}'::timestamptz", pe)
-            } else {
-                let period_interval = if interval == "year" { "365 days" } else { "30 days" };
-                format!("NOW() + INTERVAL '{}'", period_interval)
-            };
+            let period_interval = if interval == "year" { "365 days" } else { "30 days" };
             if let Some(sub_col) = provider_sub_col(provider) {
                 let query = format!(
                     "UPDATE customers SET plan = $1, webhook_limit = $2, \
                      payment_failed_at = NULL, \
-                     current_period_end = {}, \
+                     current_period_end = COALESCE($6::timestamptz, NOW() + INTERVAL '{}'), \
                      billing_interval = $4, \
                      cancel_at_period_end = $5, \
                      updated_at = NOW() WHERE {} = $3",
-                    period_end_expr, sub_col
+                    period_interval, sub_col
                 );
                 sqlx::query(&query).bind(plan.as_str()).bind(webhook_limit)
                     .bind(provider_subscription_id).bind(&interval)
                     .bind(cancel_at_period_end)
+                    .bind(current_period_end.as_deref())
                     .execute(pool).await?;
             } else {
                 return Ok(());
@@ -305,7 +296,11 @@ async fn process_webhook_result(
                 // Only clear subscription_id, NOT customer_id (needed for re-subscribe & portal)
                 let query = format!(
                     "UPDATE customers SET plan = 'free', {} = NULL, webhook_limit = $2, \
-                     cancel_at_period_end = false, updated_at = NOW() WHERE {} = $1",
+                     cancel_at_period_end = false, payment_failed_at = NULL, \
+                     paused_at = NULL, paused_until = NULL, pause_plan = NULL, \
+                     card_last4 = NULL, card_brand = NULL, card_exp_month = NULL, card_exp_year = NULL, \
+                     billing_interval = NULL, \
+                     updated_at = NOW() WHERE {} = $1",
                     sub_col, sub_col
                 );
                 sqlx::query(&query).bind(provider_subscription_id).bind(free_limit)
