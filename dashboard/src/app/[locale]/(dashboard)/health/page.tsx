@@ -147,9 +147,9 @@ export default function EndpointHealthPage() {
                       { label: t('total'), value: ep.total_deliveries.toLocaleString() },
                       { label: t('successful'), value: ep.successful.toLocaleString() },
                       { label: t('failed'), value: ep.failed.toLocaleString() },
-                      { label: t('avgLatency'), value: `${ep.avg_response_ms}ms` },
-                      { label: t('p95Latency') || 'P95', value: `${ep.p95_response_ms}ms` },
-                      { label: t('p99Latency') || 'P99', value: `${ep.p99_response_ms ?? ep.p95_response_ms}ms` },
+                      { label: t('avgLatency'), value: ep.total_deliveries > 0 && ep.avg_response_ms > 0 ? `${ep.avg_response_ms}ms` : '—' },
+                      { label: t('p95Latency') || 'P95', value: ep.total_deliveries > 0 && ep.p95_response_ms > 0 ? `${ep.p95_response_ms}ms` : '—' },
+                      { label: t('p99Latency') || 'P99', value: ep.total_deliveries > 0 && (ep.p99_response_ms ?? ep.p95_response_ms) > 0 ? `${ep.p99_response_ms ?? ep.p95_response_ms}ms` : '—' },
                     ].map((stat) => (
                       <div key={stat.label}>
                         <div className="text-sm font-semibold text-gray-900 dark:text-white">{stat.value}</div>
