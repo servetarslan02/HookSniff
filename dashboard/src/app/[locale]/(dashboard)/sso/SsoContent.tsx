@@ -1,14 +1,158 @@
 'use client';
 
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import { useSsoConfig, useTeams } from '@/hooks/useDashboardData';
-import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
+import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, ExternalLink, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
+
+// ── IdP Templates ───────────────────────────────────────────
+const IDP_TEMPLATES = [
+  {
+    id: 'azure',
+    name: 'Microsoft Azure AD',
+    icon: '🪟',
+    provider: 'oidc' as const,
+    issuerPrefix: 'https://login.microsoftonline.com/',
+    issuerSuffix: '/v2.0',
+    issuerPlaceholder: 'https://login.microsoftonline.com/{tenant-id}/v2.0',
+    clientIdPlaceholder: 'Application (client) ID',
+    helpUrl: 'https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app',
+    hint: 'Find your Tenant ID in Azure Portal → Azure Active Directory → Overview',
+  },
+  {
+    id: 'google',
+    name: 'Google Workspace',
+    icon: '🔴',
+    provider: 'oidc' as const,
+    issuerUrl: 'https://accounts.google.com',
+    clientIdPlaceholder: 'Client ID from Google Cloud Console',
+    helpUrl: 'https://console.cloud.google.com/apis/credentials',
+    hint: 'Create OAuth 2.0 Client ID in Google Cloud Console → APIs & Services → Credentials',
+  },
+  {
+    id: 'okta',
+    name: 'Okta',
+    icon: '🔵',
+    provider: 'oidc' as const,
+    issuerPrefix: 'https://',
+    issuerSuffix: '.okta.com',
+    issuerPlaceholder: 'https://{your-org}.okta.com',
+    clientIdPlaceholder: 'Client ID from Okta Admin',
+    helpUrl: 'https://help.okta.com/en-us/Content/Topics/Apps/Apps_App_Integration_Wizard_OIDC.htm',
+    hint: 'Create a Web Application in Okta Admin → Applications → Create App Integration',
+  },
+  {
+    id: 'keycloak',
+    name: 'Keycloak',
+    icon: '🦁',
+    provider: 'oidc' as const,
+    issuerPrefix: 'https://',
+    issuerSuffix: '/realms/{realm}',
+    issuerPlaceholder: 'https://{your-keycloak}/realms/{realm-name}',
+    clientIdPlaceholder: 'Client ID (e.g. hooksniff)',
+    helpUrl: 'https://www.keycloak.org/docs/latest/server_admin/',
+    hint: 'Create a Client in Keycloak Admin → Clients → Create client',
+  },
+  {
+    id: 'auth0',
+    name: 'Auth0',
+    icon: '🔑',
+    provider: 'oidc' as const,
+    issuerPrefix: 'https://',
+    issuerSuffix: '.auth0.com',
+    issuerPlaceholder: 'https://{your-tenant}.auth0.com',
+    clientIdPlaceholder: 'Client ID from Auth0 Dashboard',
+    helpUrl: 'https://auth0.com/docs/get-started/auth0-overview/create-applications',
+    hint: 'Create a Regular Web Application in Auth0 Dashboard → Applications',
+  },
+  {
+    id: 'onelogin',
+    name: 'OneLogin',
+    icon: '🟢',
+    provider: 'saml' as const,
+    metadataPlaceholder: 'https://{your-org}.onelogin.com/saml/metadata/{app-id}',
+    ssoUrlPlaceholder: 'https://{your-org}.onelogin.com/trust/saml2/http-post/sso/{app-id}',
+    entityIdPlaceholder: 'urn:hooksniff:sp',
+    helpUrl: 'https://onelogin.servicecloud.support/s/article/SAML-connector',
+    hint: 'Create a SAML Custom Connector (Advanced) in OneLogin Admin → Applications',
+  },
+  {
+    id: 'adfs',
+    name: 'AD FS',
+    icon: '🏛️',
+    provider: 'saml' as const,
+    metadataPlaceholder: 'https://{your-adfs}/FederationMetadata/2007-06/FederationMetadata.xml',
+    ssoUrlPlaceholder: 'https://{your-adfs}/adfs/ls/',
+    entityIdPlaceholder: 'urn:hooksniff:sp',
+    helpUrl: 'https://learn.microsoft.com/en-us/windows-server/identity/ad-fs/development/ad-fs-openid-connect-oauth-flows-scenarios',
+    hint: 'Add a Relying Party Trust in AD FS Management → Trust Relationships',
+  },
+];
+
+// ── Friendly error messages ─────────────────────────────────
+function getFriendlyError(error: string): { title: string; message: string; action?: string } {
+  const lower = error.toLowerCase();
+  
+  if (lower.includes('oidc discovery') || lower.includes('openid-configuration')) {
+    return {
+      title: 'Issuer URL yanıt vermiyor',
+      message: 'Issuer URL\'niz doğru çalışmıyor. URL\'in sonunda /.well-known/openid-configuration ekleyerek tarayıcınızda kontrol edin.',
+      action: 'URL\'i kontrol et',
+    };
+  }
+  if (lower.includes('token exchange') || lower.includes('authorization code')) {
+    return {
+      title: 'Token alınamadı',
+      message: 'Client ID veya Client Secret hatalı olabilir. Bilgileri IdP konsolundan kontrol edin.',
+      action: 'Bilgileri kontrol et',
+    };
+  }
+  if (lower.includes('certificate') || lower.includes('x509')) {
+    return {
+      title: 'Sertifika hatası',
+      message: 'Sertifika PEM formatında olmalı. IdP\'den indirdiğiniz sertifikayı olduğu gibi yapıştırın.',
+      action: 'Sertifikayı yeniden yapıştır',
+    };
+  }
+  if (lower.includes('metadata') || lower.includes('entitydescriptor')) {
+    return {
+      title: 'Metadata URL geçersiz',
+      message: 'Metadata URL\'niz SAML metadata döndürmüyor. URL\'i tarayıcınızda açıp XML içerdiğini kontrol edin.',
+      action: 'URL\'i kontrol et',
+    };
+  }
+  if (lower.includes('domain') || lower.includes('dns') || lower.includes('txt')) {
+    return {
+      title: 'Domain doğrulanamadı',
+      message: 'DNS TXT kaydı bulunamadı. Kaydı eklediyseniz, DNS yayılması 48 saat sürebilir.',
+      action: 'DNS kaydını kontrol et',
+    };
+  }
+  if (lower.includes('network') || lower.includes('timeout') || lower.includes('fetch')) {
+    return {
+      title: 'Bağlantı hatası',
+      message: 'IdP sunucusuna bağlanılamıyor. URL\'in doğru olduğundan ve sunucunun çalıştığından emin olun.',
+      action: 'URL\'i kontrol et',
+    };
+  }
+  if (lower.includes('unauthorized') || lower.includes('401')) {
+    return {
+      title: 'Yetkilendirme hatası',
+      message: 'Client Secret yanlış veya süresi dolmuş. IdP konsolundan yeni bir secret oluşturun.',
+      action: 'Secret\'ı yenile',
+    };
+  }
+  
+  return {
+    title: 'Bir hata oluştu',
+    message: error,
+  };
+}
 
 /* ─── SSO/SAML Configuration Page (Enterprise Only) ─── */
 export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
@@ -46,6 +190,9 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
  const [generatingTxt, setGeneratingTxt] = useState(false);
  const [verifyingDomain, setVerifyingDomain] = useState(false);
  const [domainVerified, setDomainVerified] = useState<boolean | null>(null);
+ const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+ const [testAndActivateLoading, setTestAndActivateLoading] = useState(false);
+ const [friendlyError, setFriendlyError] = useState<{ title: string; message: string; action?: string } | null>(null);
 
  const isConfigured = ssoConfig?.provider;
  const isEnforced = ssoConfig?.enabled;
@@ -65,6 +212,121 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
  }, [ssoConfig]);
 
  // ── Handlers ──
+
+ // Apply IdP template
+ const handleTemplateSelect = (templateId: string) => {
+  setSelectedTemplate(templateId);
+  const template = IDP_TEMPLATES.find(t => t.id === templateId);
+  if (!template) return;
+  
+  setProvider(template.provider);
+  setFriendlyError(null);
+  
+  if (template.provider === 'oidc') {
+   if ('issuerUrl' in template && template.issuerUrl) {
+    setMetadata(template.issuerUrl);
+   } else {
+    setMetadata('');
+   }
+   setEntityId('');
+   setClientSecret('');
+  } else {
+   setMetadata('');
+   setSsoUrl('');
+   setEntityId(template.entityIdPlaceholder || 'urn:hooksniff:sp');
+   setCertificate('');
+  }
+ };
+
+ // Auto-detect: when issuer URL changes, try to identify IdP
+ const handleMetadataChange = useCallback((value: string) => {
+  setMetadata(value);
+  setFriendlyError(null);
+  
+  if (!value || selectedTemplate) return;
+  
+  const lower = value.toLowerCase();
+  if (lower.includes('login.microsoftonline.com')) {
+   setSelectedTemplate('azure');
+   setProvider('oidc');
+  } else if (lower.includes('accounts.google.com')) {
+   setSelectedTemplate('google');
+   setProvider('oidc');
+  } else if (lower.includes('.okta.com')) {
+   setSelectedTemplate('okta');
+   setProvider('oidc');
+  } else if (lower.includes('auth0.com')) {
+   setSelectedTemplate('auth0');
+   setProvider('oidc');
+  } else if (lower.includes('/realms/')) {
+   setSelectedTemplate('keycloak');
+   setProvider('oidc');
+  } else if (lower.includes('onelogin.com')) {
+   setSelectedTemplate('onelogin');
+   setProvider('saml');
+  } else if (lower.includes('/adfs/') || lower.includes('federationmetadata')) {
+   setSelectedTemplate('adfs');
+   setProvider('saml');
+  }
+ }, [selectedTemplate]);
+
+ // Test & Activate in one step
+ const handleTestAndActivate = async () => {
+  if (!token) return;
+  setTestAndActivateLoading(true);
+  setFriendlyError(null);
+  
+  try {
+   // Step 1: Save config
+   const body: Record<string, unknown> = {
+    provider,
+    enabled: false,
+    admin_bypass: adminBypass,
+   };
+   if (teamId) body.team_id = teamId;
+   if (provider === 'saml') {
+    body.metadata_url = metadata || null;
+    body.entity_id = entityId || null;
+    body.sso_url = ssoUrl || null;
+    if (certificate) body.certificate = certificate;
+   } else {
+    body.issuer_url = metadata || null;
+    body.client_id = entityId || null;
+    if (clientSecret) body.client_secret = clientSecret;
+   }
+   if (domainInput.trim()) body.verified_domain = domainInput.trim();
+   body.default_team_id = defaultTeamId || null;
+   body.default_role = defaultRole || 'viewer';
+   
+   await apiFetch('/sso/config', { method: 'POST', body, token });
+   
+   // Step 2: Test connection
+   const { ssoApi } = await import('@/lib/api');
+   const result = await ssoApi.testSso(token, teamId);
+   
+   if (!result.valid) {
+    const errorMsg = result.issues ? (Array.isArray(result.issues) ? result.issues[0] : result.issues) : result.message || 'Test failed';
+    setFriendlyError(getFriendlyError(errorMsg));
+    toast(errorMsg, 'error');
+    setTestAndActivateLoading(false);
+    return;
+   }
+   
+   // Step 3: Activate SSO
+   body.enabled = true;
+   await apiFetch('/sso/config', { method: 'POST', body, token });
+   
+   setTestPassed(true);
+   toast(t('ssoActivated') || 'SSO activated successfully! 🎉', 'success');
+   refetch();
+  } catch (err) {
+   const msg = err instanceof Error ? err.message : 'Unknown error';
+   setFriendlyError(getFriendlyError(msg));
+   toast(msg, 'error');
+  } finally {
+   setTestAndActivateLoading(false);
+  }
+ };
 
  const handleSave = async () => {
   if (!token) return;
@@ -93,9 +355,12 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    body.default_role = defaultRole || 'viewer';
    await apiFetch('/sso/config', { method: 'POST', body, token });
    toast(t('saved'), 'success');
+   setFriendlyError(null);
    refetch();
   } catch (err) {
-   toast(err instanceof Error ? err.message : t('saveFailed'), 'error');
+   const msg = err instanceof Error ? err.message : t('saveFailed');
+   setFriendlyError(getFriendlyError(msg));
+   toast(msg, 'error');
   } finally {
    setSaving(false);
   }
@@ -110,13 +375,18 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    const result = await ssoApi.testSso(token, teamId);
    if (result.valid) {
     setTestPassed(true);
+    setFriendlyError(null);
     toast(result.message || t('testSuccess'), 'success');
    } else {
     const issues = result.issues ? (Array.isArray(result.issues) ? result.issues.join(', ') : result.issues) : null;
-    toast(issues || result.message || t('testFailed'), 'error');
+    const errorMsg = issues || result.message || t('testFailed');
+    setFriendlyError(getFriendlyError(errorMsg));
+    toast(errorMsg, 'error');
    }
   } catch (err) {
-   toast(err instanceof Error ? err.message : t('testFailed'), 'error');
+   const msg = err instanceof Error ? err.message : t('testFailed');
+   setFriendlyError(getFriendlyError(msg));
+   toast(msg, 'error');
   } finally {
    setTesting(false);
   }
@@ -304,10 +574,59 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
     </div>
    )}
 
-   {/* Step 1: Provider Selection */}
+   {/* Step 1: IdP Template Selection */}
    <div className="glass-card p-6">
     <div className="flex items-center gap-2 mb-4">
      <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">1</span>
+     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('selectIdP') || 'Select Your Identity Provider'}</h2>
+    </div>
+    <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('selectIdPHint') || 'Choose your IdP to auto-configure settings. You can also set up manually.'}</p>
+    
+    {/* Template Grid */}
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
+     {IDP_TEMPLATES.map((tmpl) => (
+      <button
+       key={tmpl.id}
+       type="button"
+       onClick={() => handleTemplateSelect(tmpl.id)}
+       disabled={isEnforced}
+       className={`p-3 rounded-xl border-2 text-left transition ${
+        selectedTemplate === tmpl.id
+         ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10'
+         : 'border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-600'
+       } ${isEnforced ? 'opacity-60 cursor-not-allowed' : ''}`}
+      >
+       <div className="text-2xl mb-1">{tmpl.icon}</div>
+       <div className="text-sm font-medium text-gray-900 dark:text-white">{tmpl.name}</div>
+       <div className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{tmpl.provider === 'oidc' ? 'OIDC' : 'SAML'}</div>
+      </button>
+     ))}
+    </div>
+    
+    {/* Selected template hint */}
+    {selectedTemplate && (() => {
+     const tmpl = IDP_TEMPLATES.find(t => t.id === selectedTemplate);
+     if (!tmpl) return null;
+     return (
+      <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-200 dark:border-blue-500/20">
+       <span className="text-blue-500 mt-0.5">💡</span>
+       <div className="flex-1">
+        <p className="text-sm text-blue-700 dark:text-blue-300">{tmpl.hint}</p>
+        {tmpl.helpUrl && (
+         <a href={tmpl.helpUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-1 text-xs text-blue-600 dark:text-blue-400 hover:underline">
+          <ExternalLink size={12} /> {t('viewGuide') || 'View setup guide'}
+         </a>
+        )}
+       </div>
+      </div>
+     );
+    })()}
+   </div>
+
+   {/* Step 2: Provider Selection (Manual) */}
+   <div className="glass-card p-6">
+    <div className="flex items-center gap-2 mb-4">
+     <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">2</span>
      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('provider')}</h2>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -409,27 +728,27 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
     <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">{t('verifiedDomainHint') || 'TXT record verification. Users with this email domain will be auto-matched.'}</p>
    </div>
 
-   {/* Step 2: SAML Configuration */}
+   {/* Step 3: SAML Configuration */}
    {provider === 'saml' && (
     <div className="glass-card p-6">
      <div className="flex items-center gap-2 mb-4">
-      <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">2</span>
+      <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">3</span>
       <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('samlConfiguration')}</h2>
      </div>
      <div className="space-y-4">
       <div>
        <label htmlFor="sso-metadata-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('metadataUrl')}</label>
-       <input id="sso-metadata-url" type="url" value={metadata} onChange={(e) => setMetadata(e.target.value)} placeholder="https://idp.example.com/metadata.xml" disabled={isEnforced}
+       <input id="sso-metadata-url" type="url" value={metadata} onChange={(e) => handleMetadataChange(e.target.value)} placeholder={IDP_TEMPLATES.find(t => t.id === selectedTemplate)?.metadataPlaceholder || "https://idp.example.com/metadata.xml"} disabled={isEnforced}
         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed" />
       </div>
       <div>
        <label htmlFor="sso-entity-id" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('entityId')}</label>
-       <input id="sso-entity-id" type="text" value={entityId} onChange={(e) => setEntityId(e.target.value)} placeholder="urn:hooksniff:sp" disabled={isEnforced}
+       <input id="sso-entity-id" type="text" value={entityId} onChange={(e) => setEntityId(e.target.value)} placeholder={IDP_TEMPLATES.find(t => t.id === selectedTemplate)?.entityIdPlaceholder || "urn:hooksniff:sp"} disabled={isEnforced}
         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed" />
       </div>
       <div>
        <label htmlFor="sso-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('ssoUrl')}</label>
-       <input id="sso-url" type="url" value={ssoUrl} onChange={(e) => setSsoUrl(e.target.value)} placeholder="https://idp.example.com/sso" disabled={isEnforced}
+       <input id="sso-url" type="url" value={ssoUrl} onChange={(e) => setSsoUrl(e.target.value)} placeholder={IDP_TEMPLATES.find(t => t.id === selectedTemplate)?.ssoUrlPlaceholder || "https://idp.example.com/sso"} disabled={isEnforced}
         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed" />
       </div>
       <div>
@@ -445,22 +764,25 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
     </div>
    )}
 
-   {/* Step 2: OIDC Configuration */}
+   {/* Step 3: OIDC Configuration */}
    {provider === 'oidc' && (
     <div className="glass-card p-6">
      <div className="flex items-center gap-2 mb-4">
-      <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">2</span>
+      <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">3</span>
       <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('oidcConfiguration')}</h2>
      </div>
      <div className="space-y-4">
       <div>
        <label htmlFor="sso-issuer-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('issuerUrl')}</label>
-       <input id="sso-issuer-url" type="url" value={metadata} onChange={(e) => setMetadata(e.target.value)} placeholder="https://accounts.google.com" disabled={isEnforced}
+       <input id="sso-issuer-url" type="url" value={metadata} onChange={(e) => handleMetadataChange(e.target.value)} placeholder={IDP_TEMPLATES.find(t => t.id === selectedTemplate)?.issuerPlaceholder || "https://accounts.google.com"} disabled={isEnforced}
         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed" />
+       {selectedTemplate && IDP_TEMPLATES.find(t => t.id === selectedTemplate)?.hint && (
+        <p className="mt-1.5 text-xs text-blue-600 dark:text-blue-400">💡 {IDP_TEMPLATES.find(t => t.id === selectedTemplate)?.hint}</p>
+       )}
       </div>
       <div>
        <label htmlFor="sso-client-id" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('clientId')}</label>
-       <input id="sso-client-id" type="text" value={entityId} onChange={(e) => setEntityId(e.target.value)} placeholder="your-client-id" disabled={isEnforced}
+       <input id="sso-client-id" type="text" value={entityId} onChange={(e) => setEntityId(e.target.value)} placeholder={IDP_TEMPLATES.find(t => t.id === selectedTemplate)?.clientIdPlaceholder || "your-client-id"} disabled={isEnforced}
         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed" />
       </div>
       <div>
@@ -527,10 +849,33 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
     </div>
    </div>
 
-   {/* Step 3: Save & Test */}
+   {/* Friendly Error Display */}
+   {friendlyError && (
+    <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-4">
+     <div className="flex items-start gap-3">
+      <span className="text-red-500 mt-0.5">⚠️</span>
+      <div className="flex-1">
+       <div className="font-semibold text-red-800 dark:text-red-300">{friendlyError.title}</div>
+       <p className="text-sm text-red-700 dark:text-red-400 mt-1">{friendlyError.message}</p>
+       {friendlyError.action && (
+        <button
+         type="button"
+         onClick={() => setFriendlyError(null)}
+         className="mt-2 text-sm text-red-600 dark:text-red-400 font-medium hover:underline"
+        >
+         {friendlyError.action} →
+        </button>
+       )}
+      </div>
+      <button type="button" onClick={() => setFriendlyError(null)} className="text-red-400 hover:text-red-600">×</button>
+     </div>
+    </div>
+   )}
+
+   {/* Step 4: Save & Test */}
    <div className="glass-card p-6">
     <div className="flex items-center gap-2 mb-4">
-     <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">3</span>
+     <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">4</span>
      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('saveAndTest')}</h2>
     </div>
     <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('saveAndTestDesc')}</p>
@@ -543,6 +888,16 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
       className="px-6 py-3 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition disabled:opacity-50">
       {testing ? t('testing') : t('testConnection')}
      </button>
+     {!isEnforced && (
+      <button type="button" onClick={handleTestAndActivate} disabled={testAndActivateLoading || !isConfigured}
+      className="px-6 py-3 bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 transition disabled:opacity-50 flex items-center gap-2">
+      {testAndActivateLoading ? (
+       <><span className="animate-spin">⏳</span> {t('testingAndActivating') || 'Testing & Activating...'}</>
+      ) : (
+       <><ShieldCheck size={16} /> {t('testAndActivate') || 'Test & Activate'}</>
+      )}
+     </button>
+     )}
      {testPassed && (
       <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm font-medium">
        <CheckCircle2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('testPassed')}
@@ -551,11 +906,11 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
     </div>
    </div>
 
-   {/* Step 4: Enforce SSO */}
+   {/* Step 5: Enforce SSO (legacy, kept for manual enforce) */}
    {isConfigured && !isEnforced && (
     <div className="glass-card p-6">
      <div className="flex items-center gap-2 mb-4">
-      <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">4</span>
+      <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">5</span>
       <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('enforceSso')}</h2>
      </div>
      <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('enforceSsoDesc')}</p>
