@@ -553,7 +553,7 @@ export interface Invoice {
   id: string;
   date: string;
   amount: number;
-  status: 'paid' | 'pending' | 'failed';
+  status: 'paid' | 'pending' | 'failed' | 'refunded';
   plan: string;
   provider: string;
   provider_invoice_id?: string | null;
@@ -611,6 +611,7 @@ export interface BillingSubscription {
   endpoint_limit: number;
   retention_days: number;
   monthly_price_cents: number;
+  monthly_price_kurus?: number;
   cancel_at_period_end: boolean;
   billing_period: string;
   current_period_end?: string;

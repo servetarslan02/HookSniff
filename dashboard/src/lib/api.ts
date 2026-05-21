@@ -1231,7 +1231,7 @@ export const billingApiExtended = {
     apiFetch<BillingSubscription>('/billing/subscription', { token }),
 
   upgrade: (token: string, plan: string, billingPeriod?: string, discountCode?: string) =>
-    apiFetch<{ checkout_url?: string; message?: string; requires_contact?: boolean; contact_url?: string; prorated_amount_cents?: number }>('/billing/upgrade', { method: 'POST', body: { plan, provider: 'polar', billing_period: billingPeriod || 'monthly', ...(discountCode ? { discount_code: discountCode } : {}) }, token }),
+    apiFetch<{ checkout_url?: string; message?: string; requires_contact?: boolean; contact_url?: string; prorated_amount_cents?: number }>('/billing/upgrade', { method: 'POST', body: { plan, billing_period: billingPeriod || 'monthly', ...(discountCode ? { discount_code: discountCode } : {}) }, token }),
 
   getInvoices: (token: string) =>
     apiFetch<Invoice[]>('/billing/invoices', { token }),

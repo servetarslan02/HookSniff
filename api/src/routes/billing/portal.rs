@@ -175,7 +175,7 @@ pub async fn request_refund(
     Extension(customer): Extension<Customer>,
     Json(req): Json<RefundRequest>,
 ) -> Result<Json<RefundResponse>, AppError> {
-    if customer.plan == "developer" {
+    if customer.plan == "free" || customer.plan == "developer" {
         return Err(AppError::BadRequest(
             "Cannot refund a free plan".into(),
         ));
