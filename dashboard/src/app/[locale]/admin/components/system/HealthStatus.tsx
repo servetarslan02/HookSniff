@@ -56,10 +56,12 @@ export default function HealthStatus({ health, isHealthError, alerts, onRefresh 
       name: t('redis') || 'Redis',
       icon: <HardDrive size={24} strokeWidth={1.75} className="text-red-500" />,
       status: health.checks?.redis?.status || health.redis?.status || 'unknown',
-      latency: health.checks?.redis?.latency_ms ?? health.redis?.latency_ms ?? null,
-      detail: (health.checks?.redis?.latency_ms != null || health.redis?.latency_ms != null)
-        ? `${t('latencyLabel') || 'Latency'}: ${health.checks?.redis?.latency_ms ?? health.redis?.latency_ms}ms`
-        : t('checking'),
+      latency: health.checks?.redis?.note ? null : (health.checks?.redis?.latency_ms ?? health.redis?.latency_ms ?? null),
+      detail: health.checks?.redis?.note
+        ? health.checks.redis.note
+        : (health.checks?.redis?.latency_ms != null || health.redis?.latency_ms != null)
+          ? `${t('latencyLabel') || 'Latency'}: ${health.checks?.redis?.latency_ms ?? health.redis?.latency_ms}ms`
+          : t('checking'),
     },
     {
       name: t('apiStatus') || 'API',
