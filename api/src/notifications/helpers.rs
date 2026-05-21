@@ -160,6 +160,80 @@ pub async fn endpoint_recovered(pool: &PgPool, customer_id: Uuid, endpoint_id: U
     ).await;
 }
 
+// ── Security Notifications ────────────────────────────────────
+
+/// Password changed — important security event.
+pub async fn password_changed(pool: &PgPool, customer_id: Uuid) {
+    create(
+        pool,
+        customer_id,
+        "security",
+        "🔒 Şifre Değiştirildi",
+        "Hesap şifreniz değiştirildi. Bu işlemi siz yapmadıysanız hemen şifrenizi sıfırlayın.",
+        Some("/account?tab=security"),
+    ).await;
+}
+
+/// Email address changed — important security event.
+pub async fn email_changed(pool: &PgPool, customer_id: Uuid, new_email: &str) {
+    create(
+        pool,
+        customer_id,
+        "security",
+        "📧 E-posta Adresi Değiştirildi",
+        &format!("Hesap e-posta adresiniz {} olarak güncellendi. Bu işlemi siz yapmadıysanız hemen destek ile iletişime geçin.", new_email),
+        Some("/account?tab=security"),
+    ).await;
+}
+
+/// Two-factor authentication enabled.
+pub async fn two_factor_enabled(pool: &PgPool, customer_id: Uuid) {
+    create(
+        pool,
+        customer_id,
+        "security",
+        "🔐 İki Faktörlü Doğrulama Aktif",
+        "Hesabınız için iki faktörlü doğrulama (2FA) etkinleştirildi. Hesabınız artık daha güvende.",
+        Some("/account?tab=security"),
+    ).await;
+}
+
+/// Two-factor authentication disabled.
+pub async fn two_factor_disabled(pool: &PgPool, customer_id: Uuid) {
+    create(
+        pool,
+        customer_id,
+        "security",
+        "⚠️ İki Faktörlü Doğrulama Kapatıldı",
+        "Hesabınız için iki faktörlü doğrulama (2FA) devre dışı bırakıldı. Güvenliğiniz için tekrar açmanız önerilir.",
+        Some("/account?tab=security"),
+    ).await;
+}
+
+/// New API key created.
+pub async fn api_key_created(pool: &PgPool, customer_id: Uuid, key_name: &str) {
+    create(
+        pool,
+        customer_id,
+        "security",
+        "🔑 Yeni API Key Oluşturuldu",
+        &format!("\"{}\" adında yeni bir API key oluşturuldu. Bu işlemi siz yapmadıysanız hemen iptal edin.", key_name),
+        Some("/core"),
+    ).await;
+}
+
+/// API key revoked.
+pub async fn api_key_revoked(pool: &PgPool, customer_id: Uuid, key_name: &str) {
+    create(
+        pool,
+        customer_id,
+        "security",
+        "🗑️ API Key İptal Edildi",
+        &format!("\"{}\" adındaki API key iptal edildi.", key_name),
+        Some("/core"),
+    ).await;
+}
+
 // ── Team Notifications ─────────────────────────────────────
 
 /// Member joined a team.
