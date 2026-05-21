@@ -1,19 +1,14 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-21 06:20 GMT+8
+> Son güncelleme: 2026-05-21 16:15 GMT+8 (Session 2)
 
-## ✅ Bu Oturumda Yapılan İşler
+## ✅ Bu Oturumda Yapılan İşler (Session 2)
 
-### 1. Rakip Analizi (Hook0 + Svix)
-- Hook0 dokümantasyonu incelendi (architecture, features, comparisons, best practices)
-- Svix dokümantasyonu incelendi
-- Karşılaştırma raporu: `.ai-context/2026-05-21-competitive-deep-dive.md`
-- **Sonuç:** HookSniff birçok alanda rakiplerden önde (11 SDK, multi-destination, inbound proxy, smart routing, FIFO, embeddable portal, $0/ay hosting)
-
-### 2. Kullanıcı Paneli Dökümantasyonu
-- 41+ dashboard sayfası tek tek incelendi
-- Kapsamlı dökümantasyon: `.ai-context/2026-05-21-user-panel-docs.md`
-- Her sayfa için: özellikler, bileşenler, teknik detaylar
+1. **Proje inceleme** — Tüm hafıza dosyaları okundu, durum analizi
+2. **Bug taraması** — 29 bug kontrol edildi, çoğu zaten düzeltilmiş
+3. **BUG-028 fix** — `sso.rs` pagination limit `.min(100)` → `.min(200)`
+4. **Dashboard build** — `npm install` + `next build` başarılı, 0 hata
+5. **REAL-BUGS.md güncellendi** — BUG-004, 020, 021, 028 düzeltildi olarak işaretlendi
 
 ## 🔴 KRİTİK: Deploy Gerekli
 
@@ -28,27 +23,43 @@ Birçok fix push edildi ama Cloud Run eski kodu çalışıyor:
 gcloud builds submit --config cloudbuild.yaml
 ```
 
-## Deploy Sonrası Test Listesi
-1. Coupon Create → POST /v1/admin/coupons
-2. Alert Create → POST /v1/admin/alerts
-3. Revenue Metrics → GET /v1/admin/revenue/metrics
-4. Security Events → GET /v1/admin/security/events
-5. Feature Flag Toggle → PUT /v1/admin/feature-flags/:id
-6. System Health → GET /health
+## 📋 Açık Kalan Bug'lar (REAL-BUGS.md)
+
+| Bug | Öncelik | Açıklama |
+|-----|---------|----------|
+| BUG-002 | 🟡 | CORS health endpoint hardcoded |
+| BUG-006 | 🟡 | Contact form rate limit sadece IP bazlı |
+| BUG-008 | 🟡 | Outbound IP'ler statik (Cloud Run'da değişebilir) |
+| BUG-009 | 🟢 | SELECT * — coupons tablosunda |
+| BUG-010 | 🟢 | Error context eksik |
+| BUG-011 | 🟢 | Test secret'ları production code'da |
+| BUG-022 | 🟡 | CSP unsafe-inline + unsafe-eval |
+| BUG-024 | 🟡 | Webhook retry state in-memory |
+| BUG-025 | 🟢 | Events endpoint SELECT * |
+| BUG-029 | 🟢 | deny_unknown_fields kullanılmıyor |
 
 ## 📋 Önerilen Sonraki Adımlar
 
-### Kısa Vadeli
-1. **Deploy** — Cloud Build tetikle
-2. **Application Modeli** — Multi-tenant için Organization → Application hiyerarşisi
-3. **Public Webhook Tester** — play.hooksniff.com (signup gerektirmez)
+### Kısa Vadeli (1-2 oturum)
+1. **Deploy** — Cloud Build tetikle (GCP erişimi gerek)
+2. **Alert Evaluation Worker** — Item 254, `alert_rules` tablosu var ama worker yok
+3. **BUG-022** — CSP nonce-based'e çevir (XSS koruması)
 
-### Orta Vadeli
-4. **Two-Phase Retry** — Hızlı + yavaş faz
-5. **Documentation Overhaul** — Diataxis metodu
-6. **Status Page** — Public uptime monitoring
+### Orta Vadeli (3-5 oturum)
+4. **Application Modeli** — Multi-tenant Organization → Application hiyerarşisi
+5. **Public Webhook Tester** — play.hooksniff.com (signup gerektirmez)
+6. **Two-Phase Retry** — Hızlı + yavaş faz
 
-## Hâlâ Açık Olan Sorunlar
-- CSP violation (Cloudflare analytics)
-- System health check failed
-- Revenue cohorts/refunds 500
+### Uzun Vadeli
+7. **Documentation Overhaul** — Diataxis metodu
+8. **Status Page** — Public uptime monitoring
+9. **SOC 2 hazırlık**
+
+## 🔧 Teknik Notlar
+
+- Dashboard build: `cd dashboard && npm install && npx next build` ✅
+- Git config: `user.email = servetarslan02@gmail.com`, `user.name = servetarslan02`
+- `ai@hooksniff.dev` KULLANMA — Vercel BLOCKED deploy yapıyor
+- 11 SDK hepsi ayrı repolarda, ana repo'da `sdks/` klasörü yok
+- Neon DB: 77+ migration uygulanmış
+- Upstash Redis: 500K limit dolu olabilir
