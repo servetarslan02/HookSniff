@@ -110,8 +110,8 @@ pub async fn create_checkout_session(
     let session = CreateCheckoutSession {
         customer: None, // Will be created by Stripe if not exists
         client_reference_id: customer_id.to_string(),
-        success_url: format!("{}/dashboard/billing?upgraded=true", base_url),
-        cancel_url: format!("{}/dashboard/billing?cancelled=true", base_url),
+        success_url: format!("{}/account?upgraded=true", base_url),
+        cancel_url: format!("{}/account?cancelled=true", base_url),
         mode: "subscription".to_string(),
         line_items: vec![CheckoutLineItem {
             price: price_id.to_string(),
@@ -170,7 +170,7 @@ pub async fn create_customer_portal(
         .bearer_auth(stripe_secret)
         .form(&[
             ("customer", stripe_customer_id),
-            ("return_url", &format!("{}/dashboard/billing", base_url)),
+            ("return_url", &format!("{}/account", base_url)),
         ])
         .send()
         .await

@@ -172,19 +172,9 @@ async fn process_webhook_result(
             .execute(pool)
             .await?;
 
-            // Create invoice record
-            let amount_cents = plan.monthly_price_cents() as i32;
-            let currency = if provider == "iyzico" { "TRY" } else { "USD" };
-            sqlx::query(
-                "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) \
-                 VALUES ($1, $2, $3, 'paid', $4)",
-            )
-            .bind(customer_id)
-            .bind(amount_cents)
-            .bind(currency)
-            .bind(plan.as_str())
-            .execute(pool)
-            .await?;
+            // NOTE: Invoice is NOT created here — the actual payment amount is unknown
+            // at subscription.created time (discounts, coupons, trials may apply).
+            // The invoice is created in the order.completed handler with the real amount.
 
             tracing::info!(
                 "✅ Customer {} upgraded to {} via {}",
@@ -234,13 +224,7 @@ async fn process_webhook_result(
                     .bind(provider_subscription_id).fetch_optional(pool).await?;
                 if let Some((cid,)) = customer_id {
                     cleanup_excess_endpoints(pool, cid, plan).await?;
-                    let amount_cents = plan.monthly_price_cents() as i32;
-                    let currency = if provider == "iyzico" { "TRY" } else { "USD" };
-                    if let Err(e) = sqlx::query(
-                        "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) VALUES ($1, $2, $3, 'paid', $4)",
-                    ).bind(cid).bind(amount_cents).bind(currency).bind(plan.as_str()).execute(pool).await {
-                        tracing::warn!("Failed to insert invoice for customer {}: {:?}", cid, e);
-                    }
+                    // Invoice is created in order.completed with actual payment amount
                 }
             }
 
@@ -373,6 +357,28 @@ async fn process_webhook_result(
                 .bind(currency)
                 .execute(pool)
                 .await;
+
+                // Create invoice with actual payment amount (not hardcoded plan price)
+                let plan_name: Option<String> = sqlx::query_scalar(
+                    "SELECT plan FROM customers WHERE id = $1"
+                )
+                .bind(cid)
+                .fetch_optional(pool)
+                .await
+                .ok()
+                .flatten();
+                if let Some(plan) = plan_name {
+                    let _ = sqlx::query(
+                        "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan) \
+                         VALUES ($1, $2, $3, 'paid', $4)",
+                    )
+                    .bind(cid)
+                    .bind(*amount_cents as i64)
+                    .bind(currency)
+                    .bind(&plan)
+                    .execute(pool)
+                    .await;
+                }
             }
         }
         WebhookResult::PaymentFailed {

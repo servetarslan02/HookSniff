@@ -319,7 +319,7 @@ impl PaymentProviderImpl for IyzicoProvider {
         let price_str = format!("{:.2}", price_kurus as f64 / 100.0);
         let uri = "/payment/iyzipos/checkoutform/initialize/auth/ecompose";
 
-        let callback_url = format!("{}/dashboard/billing?iyzico_callback=true", app_url);
+        let callback_url = format!("{}/account?iyzico_callback=true", app_url);
 
         let req_body = CreatePaymentRequest {
             locale: "tr".to_string(),
@@ -405,7 +405,7 @@ impl PaymentProviderImpl for IyzicoProvider {
         // iyzico returns a 3D Secure HTML page that the customer must complete
         // For now, we return the payment ID. The frontend will handle 3DS redirect.
         let checkout_url = format!(
-            "{}/dashboard/billing/iyzico-3ds?paymentId={}",
+            "{}/account/iyzico-3ds?paymentId={}",
             app_url,
             init_resp.payment_id.as_deref().unwrap_or("pending")
         );

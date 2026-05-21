@@ -363,7 +363,7 @@ impl BillingService {
         // If no payment provider configured, send them to billing page to upgrade
         if provider_name.is_empty() || provider_name == "none" {
             return Ok(PortalOutcome {
-                url: format!("{}/dashboard/billing", base_url),
+                url: format!("{}/account", base_url),
                 provider: "none".to_string(),
             });
         }
@@ -395,7 +395,7 @@ impl BillingService {
                             provider_name, customer.id
                         );
                         return Ok(PortalOutcome {
-                            url: format!("{}/dashboard/billing", base_url),
+                            url: format!("{}/account", base_url),
                             provider: provider_name.to_string(),
                         });
                     }
@@ -415,7 +415,7 @@ impl BillingService {
                     Some(id) if !id.is_empty() => id,
                     _ => {
                         return Ok(PortalOutcome {
-                            url: format!("{}/dashboard/billing", base_url),
+                            url: format!("{}/account", base_url),
                             provider: "stripe".to_string(),
                         });
                     }
