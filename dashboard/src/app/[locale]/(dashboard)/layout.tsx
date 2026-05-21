@@ -94,7 +94,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   const navItems = [
-    ...(user?.is_admin ? [{ name: t('adminPanel') || 'Admin Panel', href: '/admin', icon: <Shield size={16} strokeWidth={1.75} /> }] : []),
+    ...(user?.is_admin ? [{ name: t('adminPanel') || 'Admin Panel', href: '/admin', icon: <Shield size={16} strokeWidth={1.75} />, isSpecial: true }] : []),
     { name: t('core'), href: '/core', icon: <LayoutDashboard size={16} strokeWidth={1.75} /> },
     { name: t('applications'), href: '/applications', icon: <Smartphone size={16} strokeWidth={1.75} /> },
     { name: t('organization'), href: '/organization', icon: <Users size={16} strokeWidth={1.75} /> },
@@ -146,6 +146,21 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
           {navItems.map((item) => {
             const isActive = cleanPath === item.href || cleanPath.startsWith(item.href + '/');
+            if (item.isSpecial) {
+              return (
+                <PrefetchLink
+                  key={item.href}
+                  href={item.href}
+                  hoverDelay={80}
+                  prefetchData={prefetchForRoute(item.href)}
+                  className="flex items-center px-3 py-2 text-xs font-semibold rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <span className="mr-2.5 flex-shrink-0 inline-flex items-center">{item.icon}</span>
+                  {item.name}
+                </PrefetchLink>
+              );
+            }
             return (
               <PrefetchLink
                 key={item.href}
