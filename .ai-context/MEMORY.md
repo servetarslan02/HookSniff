@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-21 06:20 GMT+8 (Kullanıcı Paneli Dökümantasyonu)
+> Son güncelleme: 2026-05-21 16:15 GMT+8 (Session 2 — Bug Taraması + Fix)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -256,7 +256,32 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-21 02:36–03:00 — Admin Sayfa Performans Optimizasyonu)
+## 📝 Son Oturum (2026-05-21 15:35–16:15 — Bug Taraması + Pagination Fix)
+
+### Özet
+Servet ile oturum. Proje incelendi, 29 bug kontrol edildi, pagination limit düzeltildi, dashboard build doğrulandı, hafıza dosyaları güncellendi.
+
+### Yapılan İşler:
+1. **Proje inceleme** — Tüm `.ai-context/` dosyaları okundu, durum analizi
+2. **Bug taraması** — REAL-BUGS.md'deki 29 bug tek tek kontrol edildi
+   - BUG-004, 020, 021 zaten düzeltilmiş ama işaretlenmemiş
+   - REAL-BUGS.md güncellendi
+3. **BUG-028 fix** — `sso.rs:630` `.min(100)` → `.min(200)` (tutarlılık)
+4. **Dashboard build** — `npm install` + `next build` başarılı, 0 hata
+5. **Hafıza dosyaları** — NEXT_SESSION.md, REAL-BUGS.md, MEMORY.md güncellendi
+
+### Değişen Dosyalar:
+- `api/src/routes/sso.rs` — pagination limit fix
+- `.ai-context/2026-05-21-session-2.md` — session log
+- `.ai-context/REAL-BUGS.md` — 4 bug düzeltildi olarak işaretlendi
+- `.ai-context/NEXT_SESSION.md` — sonraki oturum planı
+- `.ai-context/MEMORY.md` — bu dosya
+
+### Push: (pending)
+
+---
+
+## 📝 Önceki Oturum (2026-05-21 02:36–03:00 — Admin Sayfa Performans Optimizasyonu)
 
 ### Özet
 Servet ile oturum. Tüm admin sayfaları ölçüldü (13 sayfa). 100-200ms hedefi için 6 dosyada optimizasyon yapıldı. Push: `9795ed74`
