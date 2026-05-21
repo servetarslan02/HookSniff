@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
-import { API_BASE, twoFactorApi, startProactiveRefresh, stopProactiveRefresh } from './api';
+import { API_BASE, twoFactorApi, startProactiveRefresh, stopProactiveRefresh, setTokenRefreshCallback } from './api';
 
 interface User {
   id: string;
@@ -37,13 +37,12 @@ function toSlug(input: string): string {
     .slice(0, 50);
 }
 
-function setAuthCookie(token: string) {
-  // HS-039: Cookie matches JWT lifetime (15 min), NOT 7 days.
-  // Proactive refresh keeps it alive while user is active.
-  // Secure flag: only sent over HTTPS. SameSite=Lax: CSRF protection.
-  // Note: NOT HttpOnly — the frontend needs to read this for API calls.
-  // The server also sets an HttpOnly cookie via auth_response_with_cookie.
-  document.cookie = `hooksniff_token=${token}; path=/; max-age=${15 * 60}; SameSite=Lax; Secure`;
+function setAuthCookie(_token: string) {
+  // HS-039: Do NOT set a non-HttpOnly cookie with the same name as the server's HttpOnly cookie.
+  // Two cookies named "hooksniff_token" cause unpredictable behavior.
+  // The middleware reads the HttpOnly cookie set by the server.
+  // The frontend uses localStorage + Authorization header for API calls.
+  // This function is now a no-op kept for API compatibility.
 }
 
 function clearAuthCookie() {
@@ -73,6 +72,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    */
   const startSessionRefresh = useCallback(() => {
     startProactiveRefresh((newToken: string) => {
+      updateToken(newToken);
+    });
+  }, [updateToken]);
+
+  // HS-039: Register token sync callback for 401 handler in api.ts
+  useEffect(() => {
+    setTokenRefreshCallback((newToken: string) => {
       updateToken(newToken);
     });
   }, [updateToken]);
@@ -141,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             };
             setUser(u);
             setApiKeyState(null);
-            updateToken(savedToken);
+            updateToken(savedToken); // This sets cookie + localStorage
             localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
             startSessionRefresh();
           }

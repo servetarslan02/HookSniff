@@ -25,6 +25,15 @@ let refreshPromise: Promise<string | null> | null = null;
 // HS-039: Proactive refresh interval — renews token at ~12 min (before 15 min expiry).
 let proactiveRefreshTimer: ReturnType<typeof setInterval> | null = null;
 
+// HS-039: Global callback for syncing new tokens to the store.
+// Registered by AuthProvider on mount. Used by 401 handler and proactive refresh.
+let onTokenRefreshed: ((newToken: string) => void) | null = null;
+
+/** Register a callback that fires when a new token is obtained via refresh. */
+export function setTokenRefreshCallback(cb: (newToken: string) => void): void {
+  onTokenRefreshed = cb;
+}
+
 /**
  * Refresh the access token. Returns the new token string on success, null on failure.
  * Deduplicates concurrent calls (only one refresh request at a time).
@@ -136,8 +145,9 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
         if (res.status === 401 && typeof window !== 'undefined') {
           const newToken = await doRefresh();
           if (newToken) {
-            // HS-039: Refresh succeeded — update stored token and retry with new token
-            localStorage.setItem('hooksniff_token', newToken);
+            // HS-039: Refresh succeeded — sync token to store, cookie, and localStorage
+            if (onTokenRefreshed) onTokenRefreshed(newToken);
+            else localStorage.setItem('hooksniff_token', newToken);
             headers["Authorization"] = `Bearer ${newToken}`;
             const retryRes = await fetch(`${API_BASE}${path}`, {
               method,
@@ -151,7 +161,8 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
             }
           }
           // Refresh failed — clear auth and redirect
-          localStorage.removeItem('hooksniff_auth');
+          localStorage.removeItem('hooksniff_user');
+          localStorage.removeItem('hooksniff_token');
           window.location.href = '/login';
         }
 
