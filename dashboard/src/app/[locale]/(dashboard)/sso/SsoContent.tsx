@@ -580,27 +580,25 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
      <span className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm font-bold">1</span>
      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('selectIdP') || 'Select Your Identity Provider'}</h2>
     </div>
-    <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('selectIdPHint') || 'Choose your IdP to auto-configure settings. You can also set up manually.'}</p>
     
-    {/* Template Grid */}
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
-     {IDP_TEMPLATES.map((tmpl) => (
-      <button
-       key={tmpl.id}
-       type="button"
-       onClick={() => handleTemplateSelect(tmpl.id)}
+    <div className="flex gap-3 items-start">
+     {/* Compact dropdown */}
+     <div className="flex-1">
+      <select
+       value={selectedTemplate}
+       onChange={(e) => handleTemplateSelect(e.target.value)}
        disabled={isEnforced}
-       className={`p-3 rounded-xl border-2 text-left transition ${
-        selectedTemplate === tmpl.id
-         ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10'
-         : 'border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-600'
-       } ${isEnforced ? 'opacity-60 cursor-not-allowed' : ''}`}
+       className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white disabled:opacity-60 disabled:cursor-not-allowed appearance-none"
       >
-       <div className="text-2xl mb-1">{tmpl.icon}</div>
-       <div className="text-sm font-medium text-gray-900 dark:text-white">{tmpl.name}</div>
-       <div className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{tmpl.provider === 'oidc' ? 'OIDC' : 'SAML'}</div>
-      </button>
-     ))}
+       <option value="">{t('manualSetup') || '⚙️ Manual Setup'}</option>
+       {IDP_TEMPLATES.map((tmpl) => (
+        <option key={tmpl.id} value={tmpl.id}>
+         {tmpl.icon} {tmpl.name} ({tmpl.provider === 'oidc' ? 'OIDC' : 'SAML'})
+        </option>
+       ))}
+      </select>
+      <p className="mt-1.5 text-xs text-gray-400 dark:text-slate-500">{t('selectIdPHint') || 'Choose your IdP to auto-configure settings.'}</p>
+     </div>
     </div>
     
     {/* Selected template hint */}
@@ -608,7 +606,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
      const tmpl = IDP_TEMPLATES.find(t => t.id === selectedTemplate);
      if (!tmpl) return null;
      return (
-      <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-200 dark:border-blue-500/20">
+      <div className="flex items-start gap-3 mt-4 p-3 bg-blue-50 dark:bg-blue-500/10 rounded-xl border border-blue-200 dark:border-blue-500/20">
        <span className="text-blue-500 mt-0.5">💡</span>
        <div className="flex-1">
         <p className="text-sm text-blue-700 dark:text-blue-300">{tmpl.hint}</p>
