@@ -63,6 +63,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         { name: 'Debug Failed Webhooks', href: '/docs/debug-failed-webhooks' },
         { name: 'Monitor Performance', href: '/docs/monitor-performance' },
         { name: 'Integrations', href: '/docs/integrations' },
+        { name: 'Custom Domain', href: '/docs/custom-domain' },
         { name: 'Inbound Webhooks', href: '/docs/inbound-webhooks' },
         { name: 'Smart Routing', href: '/docs/smart-routing' },
         { name: 'Payload Transforms', href: '/docs/transforms' },

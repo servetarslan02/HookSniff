@@ -1,12 +1,11 @@
 'use client';
 
-
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
-import { AlertTriangle, CheckCircle2, Clock, Globe, Lock, XCircle } from '@/components/icons';
+import { AlertTriangle, CheckCircle2, Clock, Globe, Lock, XCircle, ExternalLink } from '@/components/icons';
 
 interface ExistingDomain {
   id: string;
@@ -75,7 +74,6 @@ export function CustomDomainContent() {
       await apiFetch(`/custom-domains/${id}`, { method: 'DELETE', token });
       setExistingDomains(prev => prev.filter(d => d.id !== id));
       setDeleteConfirm(null);
-      // Clear new domain state if we deleted the newly added one
       if (id === newDomainId) {
         setNewDomainId(null);
         setNewDomainStatus('none');
@@ -90,11 +88,9 @@ export function CustomDomainContent() {
   const handleAddDomain = async () => {
     if (!domain || !token) return;
 
-    // Strip protocol prefix if user accidentally included it
     let cleanDomain = domain.trim();
     cleanDomain = cleanDomain.replace(/^https?:\/\//, '');
 
-    // Validate
     if (!cleanDomain.includes('.')) {
       toast(t('invalidDomain'), 'error');
       return;
@@ -119,7 +115,6 @@ export function CustomDomainContent() {
       ]);
       setDomain('');
       toast(t('domainAdded'), 'success');
-      // Refresh existing domains list
       fetchDomains();
     } catch (err) {
       toast(err instanceof Error ? err.message : t('failedToAdd'), 'error');
@@ -140,16 +135,14 @@ export function CustomDomainContent() {
         if (domainId === newDomainId) {
           setNewDomainStatus('verified');
         }
-        // Refresh the full domain list from API to get correct ssl_active status
         fetchDomains();
         toast(data.message || t('domainVerified'), 'success');
       } else {
         if (domainId === newDomainId) {
           setNewDomainStatus('error');
         }
-        const issues = data.issues?.join(', ') || t('verificationFailedCheck');
-        const hint = data.hint ? ` ${data.hint}` : '';
-        toast(`${t('verificationFailedPrefix')} ${issues}${hint}`, 'error');
+        // User-friendly error message
+        toast(t('verificationFailedFriendly'), 'error');
       }
     } catch (err) {
       toast(err instanceof Error ? err.message : t('verificationFailed'), 'error');
@@ -158,7 +151,6 @@ export function CustomDomainContent() {
     }
   };
 
-  // Build DNS records for an unverified existing domain
   const getDnsRecordsForDomain = (d: ExistingDomain) => [
     { type: 'CNAME', name: d.domain, value: d.cname_target, copyValue: d.cname_target },
     { type: 'TXT', name: `_hooksniff.${d.domain}`, value: d.txt_record, copyValue: d.txt_record },
@@ -166,9 +158,49 @@ export function CustomDomainContent() {
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+      {/* Header */}
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+      </div>
+
+      {/* How it works — Step by step guide */}
+      <div className="glass-card p-4 sm:p-6">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('howItWorks')}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm">1</div>
+            <div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">{t('step1Title')}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{t('step1Desc')}</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm">2</div>
+            <div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">{t('step2Title')}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{t('step2Desc')}</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm">3</div>
+            <div>
+              <p className="font-medium text-sm text-gray-900 dark:text-white">{t('step3Title')}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{t('step3Desc')}</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 pt-3 border-t border-gray-100 dark:border-slate-800">
+          <a
+            href="https://hooksniff.vercel.app/docs/custom-domain"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm text-brand-600 dark:text-brand-400 hover:underline font-medium"
+          >
+            <ExternalLink size={14} strokeWidth={1.75} />
+            {t('viewDocs')}
+          </a>
+        </div>
       </div>
 
       {/* Add Domain */}
@@ -179,13 +211,12 @@ export function CustomDomainContent() {
             type="text"
             value={domain}
             onChange={(e) => {
-              // Strip protocol prefix first, then filter invalid chars
               const raw = e.target.value.toLowerCase().replace(/^https?:\/\//, '');
               setDomain(raw.replace(/[^a-z0-9.-]/g, ''));
             }}
             placeholder={t('placeholder')}
             className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
-            onKeyDown={(e) => { if (e.key === 'Enter' && domain && !saving) handleAddDomain(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && domain && domain.includes('.') && !saving) handleAddDomain(); }}
           />
           <button type="button"
             onClick={handleAddDomain}
@@ -202,6 +233,17 @@ export function CustomDomainContent() {
         <div className="glass-card p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('dnsRecords')}</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('dnsRecordsDesc')}</p>
+
+          {/* Step-by-step DNS instructions */}
+          <div className="mb-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
+            <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-2">{t('dnsStepsTitle')}</p>
+            <ol className="text-xs text-blue-700 dark:text-blue-400 space-y-1 list-decimal list-inside">
+              <li>{t('dnsStep1')}</li>
+              <li>{t('dnsStep2')}</li>
+              <li>{t('dnsStep3')}</li>
+            </ol>
+          </div>
+
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -292,7 +334,7 @@ export function CustomDomainContent() {
       {!loadingDomains && !loadError && existingDomains.length === 0 && !newDomainId && (
         <div className="glass-card p-6">
           <div className="text-center py-8">
-            <div className="text-4xl mb-3"><Globe size={18} strokeWidth={1.75} /></div>
+            <div className="text-4xl mb-3"><Globe size={48} strokeWidth={1.5} className="mx-auto text-gray-300 dark:text-slate-600" /></div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">{t('noDomains')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400">{t('noDomainsDesc')}</p>
           </div>
@@ -356,7 +398,12 @@ export function CustomDomainContent() {
                 {/* DNS details for unverified domains */}
                 {!d.verified && (
                   <div className="px-4 py-3 border-t border-gray-100 dark:border-slate-800 space-y-2">
-                    <p className="text-xs text-gray-500 dark:text-slate-400">{t('dnsRecordsDesc')}</p>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 font-medium mb-2">{t('dnsStepsTitle')}</p>
+                    <ol className="text-xs text-gray-600 dark:text-slate-400 space-y-1 list-decimal list-inside mb-3">
+                      <li>{t('dnsStep1')}</li>
+                      <li>{t('dnsStep2')}</li>
+                      <li>{t('dnsStep3')}</li>
+                    </ol>
                     {getDnsRecordsForDomain(d).map((rec, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs">
                         <span className="font-mono bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-sm text-gray-600 dark:text-slate-400">{rec.type}</span>
