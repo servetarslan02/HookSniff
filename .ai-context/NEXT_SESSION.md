@@ -39,6 +39,7 @@
 4. **track_daily_event takım bazlı** — overage notifications da takım planına göre çalışmalı
 5. **Team role change fix** — `m.id` → `m.customer_id` düzeltildi (commit: `f992c9b9`)
 6. **Team plan limits** — `reserve_webhook_slot` takım bazlı yapıldı (commit: `ded9fe76`)
+7. **track_daily_event takım bazlı** — overage notifications da takım planına göre çalışır (commit: `1986ea0d`)
 
 ### Orta Vadeli (3-5 oturum)
 4. **Dunning Test** — E-posta hatırlatma sistemi test edilmeli (Polar sandbox)
