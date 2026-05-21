@@ -563,6 +563,15 @@ async fn main() -> Result<()> {
                     Err(e) => tracing::warn!("SSO state Redis client error ({e}), using in-memory"),
                 }
             }
+            // Spawn periodic cleanup for expired in-memory SSO states
+            let cleanup_store = sso_store.clone();
+            tokio::spawn(async move {
+                let mut interval = tokio::time::interval(std::time::Duration::from_secs(300)); // every 5 min
+                loop {
+                    interval.tick().await;
+                    cleanup_store.cleanup_expired().await;
+                }
+            });
             sso_store
         }))
         .layer({
