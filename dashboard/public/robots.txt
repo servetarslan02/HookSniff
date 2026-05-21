@@ -5,3 +5,4 @@ Disallow: /admin/
 Disallow: /api/
 
 Sitemap: https://hooksniff.vercel.app/sitemap.xml
+# Last updated: Thu May 21 10:43:45 PM CST 2026
