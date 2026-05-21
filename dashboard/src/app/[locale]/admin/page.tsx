@@ -7,8 +7,7 @@ import dynamic from 'next/dynamic';
 import { useAdminStats, useAdminRevenue, useAdminAuditLogs, useAdminFeatureFlags, useAdminDeployInfo, useRateLimitViolations, useFailedDeliveries, useQueueStatus } from '@/hooks/useAdminData';
 import { StatCard } from '@/components/tremor/StatCard';
 import { useTranslations } from 'next-intl';
-import { BarChart3, ClipboardList, Heart, Building2, RefreshCw, Download, Users, Package, DollarSign, Flame, FolderOpen } from '@/components/icons';
-import { Link } from '@/i18n/navigation';
+import { BarChart3, ClipboardList, Heart, Building2, RefreshCw, Download, Users, Package, DollarSign, Flame } from '@/components/icons';
 
 const tabSkeleton = (
   <div className="space-y-6 animate-pulse">
@@ -134,15 +133,6 @@ export default function AdminOverviewPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      {/* User Panel shortcut */}
-      <Link
-        href="/core"
-        className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 border border-blue-200 dark:border-blue-800 transition w-fit"
-      >
-        <FolderOpen size={14} strokeWidth={1.75} />
-        {t('userPanel') || 'Kullanıcı Paneli'}
-      </Link>
-
       {/* Header — always visible */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 max-w-3xl">
         <div>
