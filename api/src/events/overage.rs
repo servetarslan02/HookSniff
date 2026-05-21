@@ -95,6 +95,28 @@ pub async fn track_daily_event(
         }
     }
 
+    // Send overage event to Polar.sh for metered billing
+    if is_over_limit && _allow_overage {
+        // Get polar_customer_id for the tracking customer
+        let polar_id: Option<String> = sqlx::query_scalar(
+            "SELECT polar_customer_id FROM customers WHERE id = $1 AND polar_customer_id IS NOT NULL"
+        )
+        .bind(tracking_id)
+        .fetch_optional(pool)
+        .await
+        .ok()
+        .flatten();
+
+        if let Some(ext_id) = polar_id {
+            // Send event to Polar (best-effort, don't block)
+            let cfg = crate::billing::polar::PolarConfig::from_env();
+            if let Some(cfg) = cfg {
+                let provider = crate::billing::polar::PolarProvider::new(cfg);
+                let _ = provider.ingest_overage_event(&ext_id, overage_count).await;
+            }
+        }
+    }
+
     Ok(is_over_limit)
 }
 
