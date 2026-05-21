@@ -1,7 +1,7 @@
 import type { ApiOptions, Application, RetryPolicyConfig, Endpoint, Delivery, DeliveryDetail, DeliveryAttempt, DeliveryListResponse, StatsResponse, AdminStatsResponse, DeployInfo, AdminUsersResponse, AdminUserDetail, RevenueResponse, Team, TeamMember, TeamDetailResponse, NotificationListResponse, DeliveryTrendResponse, SuccessRateData, LatencyTrendResponse, AuditLogResponse, AuditLogEntryResponse, EndpointHealthResponse, ApiKeyResponse, PortalConfigResponse, PortalEmbedCodeResponse, PortalProfileResponse, PortalUsageResponse, RateLimitResponse, SchemaRegistryListResponse, SearchResponseData, ServiceTokenResponse, TemplateItem, TemplateListResponse, UserAnalytics, ChurnUser, AlertRuleAdmin, FeatureFlag, PlatformSettings, Invoice, AlertRule, InboundConfig, TransformRule, BillingUsage, BillingSubscription, OverageSettings, PortalResponse, RefundResponse, Broadcast, UserBroadcast, BroadcastListResponse, SecurityEvent, SecurityStats, IpBlockEntry } from './api-types';
 export type * from './api-types';
 
-import { getUserFriendlyMessage, extractErrorCode } from './error-catalog';
+import { HookSniffError, createApiError, createNetworkError } from './api-errors';
 
 // In production, "/api/v1" is proxied by Vercel rewrites to the GCP Cloud Run API (see vercel.json).
 // In development, point directly to the local API server.
@@ -173,33 +173,26 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
         }
 
         const error = await res.json().catch(() => ({ message: `API error: ${res.status}` }));
-        // Item 282: Use error catalog for user-friendly messages
-        const errorCode = extractErrorCode(error);
-        const specificMessage = error.error?.message || error.message;
-        const message = specificMessage
-          ? specificMessage
-          : errorCode
-            ? getUserFriendlyMessage(errorCode)
-            : `API error: ${res.status}`;
-        throw new Error(message);
+        throw createApiError(error, res.status);
       }
 
       return res.json();
     } catch (err: unknown) {
+      if (err instanceof HookSniffError) throw err;
       if (err instanceof DOMException && err.name === 'AbortError') {
-        throw new Error('Request timed out. Please try again.', { cause: err });
+        throw createNetworkError('Request timed out. Please try again.');
       }
       lastError = err;
       // Don't retry non-network errors (already parsed API errors)
       if (err instanceof Error && err.message.startsWith('API error:')) {
-        throw err;
+        throw createNetworkError(err.message);
       }
       // Network error — retry with backoff
       if (attempt < MAX_RETRIES) {
         await delay(RETRY_BASE_DELAY_MS * Math.pow(2, attempt));
         continue;
       }
-      throw err;
+      throw createNetworkError('Network error. Please check your connection and try again.');
     }
   }
 
