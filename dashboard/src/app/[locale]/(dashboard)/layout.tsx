@@ -16,7 +16,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
 import { useIdleTimeout } from '@/hooks/useIdleTimeout';
 import { apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
-import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, BookOpen, ExternalLink, LogOut, Shield } from '@/components/icons';
+import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, BookOpen, ExternalLink, LogOut, Shield, Globe } from '@/components/icons';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -102,6 +102,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     { name: t('observability'), href: '/observability', icon: <Eye size={16} strokeWidth={1.75} /> },
     { name: t('devtools'), href: '/devtools', icon: <Code2 size={16} strokeWidth={1.75} /> },
     { name: t('integrations'), href: '/integrations', icon: <Zap size={16} strokeWidth={1.75} /> },
+    { name: t('customDomain') || 'Custom Domain', href: '/custom-domain', icon: <Globe size={16} strokeWidth={1.75} /> },
     { name: t('routingConfig'), href: '/routing-config', icon: <Settings size={16} strokeWidth={1.75} /> },
     { name: t('billingSection'), href: '/billing-section', icon: <CreditCard size={16} strokeWidth={1.75} /> },
     { name: t('account'), href: '/account', icon: <UserCircle size={16} strokeWidth={1.75} /> },

@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
-import { Shuffle, Repeat, Globe, Package, Timer } from '@/components/icons';
+import { Shuffle, Repeat, Package, Timer } from '@/components/icons';
 
 const tabSkeleton = (
   <div className="animate-pulse space-y-4">
@@ -18,7 +18,6 @@ const tabSkeleton = (
 
 const RoutingPage = dynamic(() => import('../routing/page'), { ssr: false, loading: () => tabSkeleton });
 const RetryPolicyPage = dynamic(() => import('../retry-policy/page'), { ssr: false, loading: () => tabSkeleton });
-const CustomDomainPage = dynamic(() => import('../custom-domain/page'), { ssr: false, loading: () => tabSkeleton });
 const EnvironmentsPage = dynamic(() => import('../environments/page'), { ssr: false, loading: () => tabSkeleton });
 const RateLimitingPage = dynamic(() => import('../rate-limiting/page'), { ssr: false, loading: () => tabSkeleton });
 
@@ -30,7 +29,6 @@ export default function RoutingConfigPage() {
       tabs={[
         { key: 'routing', label: t('routing'), icon: <Shuffle size={16} strokeWidth={1.75} />, content: () => <RoutingPage /> },
         { key: 'retry-policy', label: t('retryPolicy'), icon: <Repeat size={16} strokeWidth={1.75} />, content: () => <RetryPolicyPage /> },
-        { key: 'custom-domain', label: t('customDomain'), icon: <Globe size={16} strokeWidth={1.75} />, content: () => <CustomDomainPage /> },
         { key: 'environments', label: t('environments'), icon: <Package size={16} strokeWidth={1.75} />, content: () => <EnvironmentsPage /> },
         { key: 'rate-limiting', label: t('rateLimiting'), icon: <Timer size={16} strokeWidth={1.75} />, content: () => <RateLimitingPage /> },
       ]}
