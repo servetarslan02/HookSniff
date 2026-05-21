@@ -766,7 +766,9 @@
     "enterPassword": "Şifrenizi girin",
     "next": "İleri",
     "preferences": "Tercihler",
-    "openInAuthenticator": "Authenticator uygulamasında aç"
+    "openInAuthenticator": "Authenticator uygulamasında aç",
+    "secretCopied": "Kopyalandı",
+    "manualSecretDesc": "QR kod çalışmazsa bu anahtarı manuel olarak girin"
   },
   "billing": {
     "title": "Faturalandırma",

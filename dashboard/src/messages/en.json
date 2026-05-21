@@ -764,7 +764,9 @@
     "enterPassword": "Enter your password",
     "next": "Next",
     "preferences": "Preferences",
-    "openInAuthenticator": "Open in authenticator app"
+    "openInAuthenticator": "Open in authenticator app",
+    "secretCopied": "Copied!",
+    "manualSecretDesc": "If QR code doesn't work, enter this key manually"
   },
   "billing": {
     "title": "Billing",

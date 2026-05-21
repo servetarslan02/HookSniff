@@ -53,8 +53,11 @@ export function TwoFactorSection() {
     setEnabling(true);
     try {
       const data = await twoFactorApi.enable(token);
-      setQrCodeUrl(data.qr_code);
-      setOtpauthUri(data.otpauth_url || `otpauth://totp/HookSniff:${encodeURIComponent('user')}?secret=${data.secret}&issuer=HookSniff&digits=6&period=30`);
+      // Build otpauth URI and QR code URL on frontend to avoid backend encoding issues
+      const otpauth = data.otpauth_url || `otpauth://totp/HookSniff?secret=${data.secret}&issuer=HookSniff&digits=6&period=30`;
+      setOtpauthUri(otpauth);
+      // Generate QR code URL — encode the otpauth URI properly
+      setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauth)}`);
       setSecret(data.secret);
       setStep('qr');
       setShowEnable(true);
@@ -180,7 +183,6 @@ export function TwoFactorSection() {
                       src={qrCodeUrl}
                       alt="2FA QR Code"
                       className="w-48 h-48 rounded-lg"
-                      crossOrigin="anonymous"
                     />
                   ) : (
                     <div className="w-48 h-48 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center text-gray-500 dark:text-slate-400 text-sm">
@@ -189,20 +191,28 @@ export function TwoFactorSection() {
                   )}
                 </div>
 
-                {/* Open in authenticator app directly */}
-                {otpauthUri && (
-                  <div className="mb-4">
-                    <a
-                      href={otpauthUri}
-                      className="block w-full text-center py-2.5 text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-xl hover:bg-brand-100 dark:hover:bg-brand-500/20 transition"
+                {/* Manual secret — for QR scan issues */}
+                <div className="mb-4">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('manualSecret')}</p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 block px-3 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm font-mono text-gray-900 dark:text-white break-all select-all">
+                      {secret}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(secret);
+                        toast(t('secretCopied') || 'Kopyalandı', 'success');
+                      }}
+                      className="px-3 py-2 text-xs font-medium text-gray-600 dark:text-slate-300 bg-gray-200 dark:bg-slate-600 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-500 transition"
                     >
-                      📱 {t('openInAuthenticator') || 'Authenticator uygulamasında aç'}
-                    </a>
-                    <p className="text-xs text-gray-400 dark:text-slate-500 mt-2 text-center">
-                      QR kod okutmuyorsa bu linke tıklayın
-                    </p>
+                      📋
+                    </button>
                   </div>
-                )}
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">
+                    {t('manualSecretDesc') || 'QR kod çalışmazsa bu anahtarı manuel olarak girin'}
+                  </p>
+                </div>
 
                 {/* Manual secret */}
                 <div className="mb-4">
