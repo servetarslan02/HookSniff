@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-21 16:15 GMT+8 (Session 2 — Bug Taraması + Fix)
+> Son güncelleme: 2026-05-21 17:36 GMT+8 (Session 3 — Billing Audit + Polar Fixes + Deploy)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
