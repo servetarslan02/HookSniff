@@ -1166,7 +1166,7 @@ export const streamApi = {
 // Two-Factor Authentication API
 export const twoFactorApi = {
   enable: (token: string) =>
-    apiFetch<{ secret: string; qr_code: string; backup_codes: string[] }>('/auth/2fa/enable', { method: 'POST', token }),
+    apiFetch<{ secret: string; qr_code: string; otpauth_url?: string; backup_codes: string[] }>('/auth/2fa/enable', { method: 'POST', token }),
 
   confirm: (token: string, code: string) =>
     apiFetch<{ success: boolean; backup_codes: string[] }>('/auth/2fa/confirm', { method: 'POST', body: { code }, token }),
