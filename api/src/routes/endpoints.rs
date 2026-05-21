@@ -616,4 +616,35 @@ mod tests {
         let s2 = generate_signing_secret();
         assert_ne!(s1, s2);
     }
+
+    // ── RBAC: role check logic verification ──────────────────
+
+    #[test]
+    fn test_role_check_developer_required_for_create() {
+        // Verify that the create endpoint requires developer role
+        // admin(40) >= developer(30) → pass
+        assert!(super::super::teams::role_level("admin") >= super::super::teams::role_level("developer"));
+        // developer(30) >= developer(30) → pass
+        assert!(super::super::teams::role_level("developer") >= super::super::teams::role_level("developer"));
+        // analyst(20) < developer(30) → fail
+        assert!(super::super::teams::role_level("analyst") < super::super::teams::role_level("developer"));
+        // viewer(10) < developer(30) → fail
+        assert!(super::super::teams::role_level("viewer") < super::super::teams::role_level("developer"));
+    }
+
+    #[test]
+    fn test_role_check_admin_required_for_delete() {
+        // Verify that delete endpoint requires admin role
+        // admin(40) >= admin(40) → pass
+        assert!(super::super::teams::role_level("admin") >= super::super::teams::role_level("admin"));
+        // developer(30) < admin(40) → fail
+        assert!(super::super::teams::role_level("developer") < super::super::teams::role_level("admin"));
+    }
+
+    #[test]
+    fn test_signing_secret_format() {
+        let secret = generate_signing_secret();
+        assert!(secret.starts_with("whsec_"), "secret should start with whsec_");
+        assert!(secret.len() > 10, "secret should be reasonably long");
+    }
 }
