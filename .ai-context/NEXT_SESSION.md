@@ -1,56 +1,48 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-21 17:36 GMT+8 (Session 3)
+> Son güncelleme: 2026-05-21 23:15 GMT+8 (Session 5 — RBAC Enforcement)
 
-## ✅ Bu Oturumda Yapılan İşler (Session 3)
+## ✅ Bu Oturumda Yapılan İşler (Session 5)
 
-### 1. Billing Sistemi Tam İnceleme
-- Polar, Stripe, iyzico tüm ödeme sağlayıcıları incelendi
-- 12+ bug tespit edildi (POL-01'den POL-12'ye)
-- Sadece Polar kullanıldığı doğrulandı → Polar'a özel fix'ler yapıldı
-
-### 2. Polar Billing Fix'leri (8 kritik bug düzeltildi)
-| Fix | Açıklama |
-|-----|----------|
-| POL-01 | Default `payment_provider` "stripe" → "polar" |
-| POL-02 | `subscription.created` → `product_id` yoksa hata ver (Pro default kaldırıldı) |
-| POL-03 | `subscription.updated` → canceled/revoked/past_due status'ları artık işleniyor |
-| POL-04 | `PaymentSucceeded` → billing period uzatılıyor + transaction kaydediliyor |
-| POL-05 | `Plan::Developer.as_str()` → "free" döndürüyor (DB tutarlılığı) |
-| POL-06 | `SubscriptionCanceled` → `polar_customer_id` temizleniyor |
-| POL-08 | `past_due` status → `PaymentFailed` tetikleniyor (downgrade) |
-| EXTRA | `rand::Rng` → `rand::RngExt` import fix (oauth.rs derleme hatası) |
-
-### 3. Production Deploy
-- GCP Cloud Build ile 4 API region + 1 Worker deploy edildi
-- Tüm servisler sağlıklı çalışıyor
-- Production testler başarılı (health, billing endpoints, webhook signature)
-
-### 4. GCP Service Account
-- `gcp-key.json` eklendi (.gitignore'da)
-- `hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com`
+### Team Role-Based Access Control (RBAC) Enforcement
+- `require_team_developer` ve `require_team_analyst` artık aktif kullanılıyor
+- 18 route dosyasına rol kontrolü eklendi (532 satır)
+- Viewer artık endpoint/webhook/API key oluşturamaz
+- SSO `default_role` artık enforce ediliyor
+- Rol hiyerarşisi: owner > admin(40) > developer(30) > analyst(20) > viewer(10)
+- Write ops → developer, Destructive ops → admin
 
 ## 📋 Sonraki Adımlar
 
 ### Kısa Vadeli (1-2 oturum)
-1. **Search Console performans** — 2-3 gün içinde veri gelmeye başlar, kontrol et
-2. **Dashboard Billing Sayfası** — Frontend'de `billing-section` URL'i ile `dashboard/billing` tutarsızlığı var
-3. **E2E Billing Test** — Gerçek Polar sandbox ile checkout → webhook → plan güncelleme akışı test edilmeli
+1. **Blog içerikleri yaz** — SEO için en kritik. Hedef anahtar kelimeler:
+   - "webhooks explained" / "what is a webhook"
+   - "webhook vs api" / "webhook vs polling"
+   - "free webhook service 2026"
+   - "svix alternative" / "hookdeck alternative"
+   - "webhook best practices" / "webhook security"
+   - "how to implement webhooks in node.js"
+   - "stripe webhooks guide" / "github webhooks guide"
+2. **Sitemap'e blog sayfalarını ekle** — Mevcut sitemap sadece ana sayfaları içeriyor
+3. **Search Console performans** — 2-3 gün içinde veri gelmeye başlar, kontrol et
+4. **Dashboard Billing Sayfası** — Frontend'de `billing-section` URL'i ile `dashboard/billing` tutarsızlığı var
 
 ### Orta Vadeli (3-5 oturum)
-4. **Dunning Test** — E-posta hatırlatma sistemi test edilmeli (Polar sandbox)
-5. **Pause/Resume Test** — Abonelik dondurma akışı end-to-end test
-6. **Overage Faturası** — `track_daily_event` overage sayıyor ama fatura oluşturmuyor
+5. **Dunning Test** — E-posta hatırlatma sistemi test edilmeli (Polar sandbox)
+6. **Pause/Resume Test** — Abonelik dondurma akışı end-to-end test
+7. **Overage Faturası** — `track_daily_event` overage sayıyor ama fatura oluşturmuyor
 
 ### Uzun Vadeli
-7. **Monitoring** — Billing webhook'ları için alert sistemi kurulmalı
-8. **Polar SDK Migration** — Manuel HTTP çağrıları yerine `polar-sdk` Rust crate kullanılabilir
+8. **Monitoring** — Billing webhook'ları için alert sistemi kurulmalı
+9. **Polar SDK Migration** — Manuel HTTP çağrıları yerine `polar-sdk` Rust crate kullanılabilir
+10. **RBAC Test** — Rol kontrollerinin doğru çalıştığını doğrulayan unit/integration testler yaz
 
 ## 🔧 Teknik Notlar
 
-- GCloud SDK: `/opt/google-cloud-sdk/bin/gcloud` (yeni kuruldu)
+- GCloud SDK: `/opt/google-cloud-sdk/bin/gcloud`
 - GCP key: `gcp-key.json` (repo root, .gitignore'da)
 - Deploy: `gcloud builds submit --config cloudbuild.yaml --project hooksniff-app`
 - Polar API: `https://api.polar.sh` (production), `https://sandbox-api.polar.sh` (test)
 - Vercel dashboard: `https://hooksniff.vercel.app`
 - API URL'ler: `hooksniff-api-1046140057667.{region}.run.app`
+- RBAC: `find_primary_team()` helper endpoints.rs'te, JWT kullanıcıları için team bulma
