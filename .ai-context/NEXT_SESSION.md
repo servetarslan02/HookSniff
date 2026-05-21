@@ -36,6 +36,9 @@
 1. **E2E Billing Test** — Gerçek Polar sandbox ile checkout → webhook → plan güncelleme akışı test edilmeli
 2. **Dashboard Billing Sayfası** — Frontend'de `billing-section` URL'i ile `dashboard/billing` tutarsızlığı var
 3. **Card Info Extraction** — Polar MoR olduğu için kart bilgileri gelmiyor, bu alanlar UI'da gizlenmeli
+4. **track_daily_event takım bazlı** — overage notifications da takım planına göre çalışmalı
+5. **Team role change fix** — `m.id` → `m.customer_id` düzeltildi (commit: `f992c9b9`)
+6. **Team plan limits** — `reserve_webhook_slot` takım bazlı yapıldı (commit: `ded9fe76`)
 
 ### Orta Vadeli (3-5 oturum)
 4. **Dunning Test** — E-posta hatırlatma sistemi test edilmeli (Polar sandbox)
