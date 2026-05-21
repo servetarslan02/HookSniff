@@ -11,6 +11,18 @@ use crate::feature_flags::FeatureFlagService;
 use crate::models::customer::Customer;
 use crate::models::endpoint::{CreateEndpointRequest, Endpoint, EndpointResponse, RetryPolicy};
 
+/// Find the primary team this customer belongs to (if any).
+/// Returns the first team_id where the customer is a member, or None for personal accounts.
+async fn find_primary_team(pool: &PgPool, customer_id: Uuid) -> Result<Option<Uuid>, AppError> {
+    let team_id: Option<(Uuid,)> = sqlx::query_as(
+        "SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1",
+    )
+    .bind(customer_id)
+    .fetch_optional(pool)
+    .await?;
+    Ok(team_id.map(|(id,)| id))
+}
+
 /// Generate a cryptographically random signing secret (32 bytes, hex-encoded).
 fn generate_signing_secret() -> String {
     use aes_gcm::aead::rand_core::RngCore;
@@ -69,6 +81,17 @@ async fn create_endpoint(
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<CreateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        // Service token: verify the caller has developer role in this team
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        // JWT: if user belongs to any team, enforce their team role
+        if let Some(team_id) = find_primary_team(&pool, customer.id).await? {
+            super::teams::require_team_developer(&pool, team_id, customer.id).await?;
+        }
+    }
+
     // Gate custom retry schedules behind feature flag
     let retry_policy_json = if feature_flags.is_enabled("custom_retry_schedules").await {
         req.retry_policy.and_then(|rp| serde_json::to_value(rp).ok())
@@ -209,8 +232,16 @@ async fn delete_endpoint(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require admin for destructive ops ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else if let Some(team_id) = find_primary_team(&pool, customer.id).await? {
+        super::teams::require_team_admin(&pool, team_id, customer.id).await?;
+    }
+
     let result = sqlx::query("DELETE FROM endpoints WHERE id = $1 AND customer_id = $2")
         .bind(id)
         .bind(customer.id)
@@ -261,9 +292,17 @@ async fn update_endpoint(
     Extension(customer): Extension<Customer>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Extension(feature_flags): Extension<FeatureFlagService>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateEndpointRequest>,
 ) -> Result<Json<EndpointResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else if let Some(team_id) = find_primary_team(&pool, customer.id).await? {
+        super::teams::require_team_developer(&pool, team_id, customer.id).await?;
+    }
+
     // Gate custom retry schedules behind feature flag
     let retry_policy_json = if feature_flags.is_enabled("custom_retry_schedules").await {
         req.retry_policy.and_then(|rp| serde_json::to_value(rp).ok())
@@ -386,9 +425,17 @@ async fn update_retry_policy(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(feature_flags): Extension<FeatureFlagService>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
     Json(policy): Json<RetryPolicy>,
 ) -> Result<Json<EndpointResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else if let Some(team_id) = find_primary_team(&pool, customer.id).await? {
+        super::teams::require_team_developer(&pool, team_id, customer.id).await?;
+    }
+
     // Gate behind custom_retry_schedules feature flag
     if !feature_flags.is_enabled("custom_retry_schedules").await {
         return Err(AppError::BadRequest("Custom retry schedules are not enabled. Contact support to enable this feature.".into()));
@@ -422,8 +469,16 @@ async fn update_retry_policy(
 async fn rotate_secret(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require admin for secret rotation ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else if let Some(team_id) = find_primary_team(&pool, customer.id).await? {
+        super::teams::require_team_admin(&pool, team_id, customer.id).await?;
+    }
+
     // Get current endpoint
     let endpoint =
         sqlx::query_as::<_, Endpoint>("SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2")

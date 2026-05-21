@@ -96,8 +96,20 @@ async fn list_alerts(
 async fn create_alert(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<CreateAlertRequest>,
 ) -> Result<Json<AlertRule>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     // HS-038k: Validate condition string against allowed values
     let valid_conditions = ["failure_rate", "latency", "consecutive_failures"];
     if !valid_conditions.contains(&req.condition.as_str()) {
@@ -161,9 +173,21 @@ struct UpdateAlertRequest {
 async fn update_alert(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
     Json(req): Json<UpdateAlertRequest>,
 ) -> Result<Json<AlertRule>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Verify ownership (allow platform alerts too)
     let _existing: (Uuid,) =
         sqlx::query_as("SELECT id FROM alert_rules WHERE id = $1 AND (customer_id = $2 OR customer_id IS NULL)")
@@ -281,8 +305,20 @@ async fn get_alert(
 async fn delete_alert(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require admin for destructive ops ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_admin(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Allow deleting both user's own alerts AND platform alerts (customer_id IS NULL)
     let result = sqlx::query("DELETE FROM alert_rules WHERE id = $1 AND (customer_id = $2 OR customer_id IS NULL)")
         .bind(id)

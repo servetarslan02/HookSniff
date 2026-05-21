@@ -147,9 +147,21 @@ async fn get_rate_limit(
 async fn set_rate_limit(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(endpoint_id): Path<Uuid>,
     Json(req): Json<SetRateLimitRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     verify_endpoint_ownership(&pool, customer.id, endpoint_id).await?;
 
     let rps = req.requests_per_second.unwrap_or(10).clamp(1, 10000);
@@ -192,8 +204,20 @@ async fn set_rate_limit(
 async fn delete_rate_limit(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(endpoint_id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require admin for destructive ops ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_admin(&pool, tid, customer.id).await?;
+        }
+    }
+
     verify_endpoint_ownership(&pool, customer.id, endpoint_id).await?;
 
     let result = sqlx::query("DELETE FROM rate_limit_configs WHERE endpoint_id = $1")

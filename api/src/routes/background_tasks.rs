@@ -53,8 +53,20 @@ async fn get_task(
 async fn cancel_task(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<BackgroundTaskResponse>, AppError> {
+    // ── Role enforcement: require admin for task cancellation ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_admin(&pool, tid, customer.id).await?;
+        }
+    }
+
     let task = sqlx::query_as::<_, BackgroundTask>(
         "UPDATE background_tasks SET status = 'cancelled', finished_at = now() \
          WHERE id = $1 AND customer_id = $2 AND status IN ('pending', 'running') \

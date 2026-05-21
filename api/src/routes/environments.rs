@@ -86,8 +86,20 @@ async fn get_environment(
 async fn create_environment(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<CreateEnvironmentRequest>,
 ) -> Result<Json<EnvironmentResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     req.validate().map_err(AppError::BadRequest)?;
 
     let slug = req.resolve_slug();
@@ -137,9 +149,21 @@ async fn create_environment(
 async fn update_environment(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateEnvironmentRequest>,
 ) -> Result<Json<EnvironmentResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Check ownership
     let _existing = sqlx::query_as::<_, Environment>(
         "SELECT id, customer_id, name, slug, description, is_default, color, created_at, updated_at \
@@ -193,8 +217,20 @@ async fn update_environment(
 async fn delete_environment(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require admin for destructive ops ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_admin(&pool, tid, customer.id).await?;
+        }
+    }
+
     let result = sqlx::query(
         "DELETE FROM environments WHERE id = $1 AND customer_id = $2",
     )
@@ -274,9 +310,21 @@ async fn get_variable(
 async fn create_variable(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
     Json(req): Json<crate::models::environment_variable::CreateVariableRequest>,
 ) -> Result<Json<crate::models::environment_variable::VariableResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     req.validate().map_err(AppError::BadRequest)?;
 
     // Verify environment ownership
@@ -325,9 +373,21 @@ async fn create_variable(
 async fn update_variable(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path((id, var_id)): Path<(Uuid, Uuid)>,
     Json(req): Json<crate::models::environment_variable::CreateVariableRequest>,
 ) -> Result<Json<crate::models::environment_variable::VariableResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     req.validate().map_err(AppError::BadRequest)?;
 
     // Verify environment ownership
@@ -361,8 +421,20 @@ async fn update_variable(
 async fn delete_variable(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path((id, var_id)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require admin for destructive ops ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_admin(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Verify environment ownership
     let _env = sqlx::query_as::<_, Environment>(
         "SELECT id, customer_id, name, slug, description, is_default, color, created_at, updated_at \

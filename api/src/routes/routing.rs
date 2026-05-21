@@ -81,9 +81,21 @@ async fn get_routing(
 async fn update_routing(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateRoutingRequest>,
 ) -> Result<Json<RoutingInfo>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Validate routing strategy if provided
     if let Some(ref strategy) = req.routing_strategy {
         RoutingStrategy::parse_str(strategy); // Accept any string, default to round-robin

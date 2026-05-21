@@ -84,8 +84,20 @@ async fn create_application(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<CreateApplicationRequest>,
 ) -> Result<Json<ApplicationResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Validate input
     req.validate()
         .map_err(AppError::BadRequest)?;
@@ -136,9 +148,21 @@ async fn update_application(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateApplicationRequest>,
 ) -> Result<Json<ApplicationResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Validate input
     req.validate()
         .map_err(AppError::BadRequest)?;
@@ -210,8 +234,20 @@ async fn delete_application(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require admin for destructive ops ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_admin(&pool, tid, customer.id).await?;
+        }
+    }
+
     let result = sqlx::query(
         "DELETE FROM applications WHERE id = $1 AND customer_id = $2",
     )
