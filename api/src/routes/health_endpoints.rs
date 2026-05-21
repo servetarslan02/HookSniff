@@ -100,8 +100,8 @@ async fn list_endpoint_health(
     Extension(customer): Extension<Customer>,
     Query(params): Query<HealthQuery>,
 ) -> Result<Json<Vec<EndpointHealth>>, AppError> {
-    // RBAC: analyst or higher required to view endpoint health
-    super::teams::check_user_team_role(&pool, customer.id, "analyst").await?;
+    // RBAC: viewer or higher required to view endpoint health
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
     let interval = range_to_interval(params.range.as_deref().unwrap_or("24h"));
 
@@ -287,8 +287,8 @@ async fn get_endpoint_health(
     axum::extract::Path(id): axum::extract::Path<Uuid>,
     Query(params): Query<HealthQuery>,
 ) -> Result<Json<EndpointHealth>, AppError> {
-    // RBAC: analyst or higher required to view endpoint health
-    super::teams::check_user_team_role(&pool, customer.id, "analyst").await?;
+    // RBAC: viewer or higher required to view endpoint health
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
     let interval = range_to_interval(params.range.as_deref().unwrap_or("24h"));
 
