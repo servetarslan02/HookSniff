@@ -392,7 +392,7 @@ impl PaymentProviderImpl for PolarProvider {
             products: vec![product_id.to_string()],
             external_customer_id: Some(customer_id.to_string()),
             customer_email: Some(customer_email.to_string()),
-            success_url: Some(format!("{}/dashboard/billing?upgraded=true", app_url)),
+            success_url: Some(format!("{}/account?upgraded=true", app_url)),
             locale: Some("en".to_string()),
             discount_code: None, // Don't use discount_code — it only prefills, doesn't apply
             discount_id: resolved_discount_id,
@@ -648,7 +648,7 @@ impl PaymentProviderImpl for PolarProvider {
         // This generates a tokenized URL for the customer to manage their subscription.
         let req_body = CreateCustomerSessionRequest {
             external_customer_id: polar_customer_id.to_string(),
-            return_url: Some(format!("{}/dashboard/billing", app_url)),
+            return_url: Some(format!("{}/account", app_url)),
         };
 
         let resp = self
@@ -678,7 +678,7 @@ impl PaymentProviderImpl for PolarProvider {
                 body
             );
             // Fall back to our own billing page if Polar portal fails
-            return Ok(format!("{}/dashboard/billing", app_url));
+            return Ok(format!("{}/account", app_url));
         }
 
         let session: CustomerSessionResponse = resp.json().await.map_err(|e| {
@@ -705,7 +705,7 @@ impl PaymentProviderImpl for PolarProvider {
 
         // Fallback to our billing page
         tracing::warn!("Polar customer session returned no token or portal URL");
-        Ok(format!("{}/dashboard/billing", app_url))
+        Ok(format!("{}/account", app_url))
     }
 
     async fn cancel_subscription(&self, polar_subscription_id: &str) -> Result<(), AppError> {
@@ -1014,7 +1014,7 @@ mod tests {
             .create_customer_portal("cust_123", "https://app.hooksniff.com")
             .await
             .unwrap();
-        assert_eq!(url, "https://app.hooksniff.com/dashboard/billing");
+        assert_eq!(url, "https://app.hooksniff.com/account");
     }
 
     // ── PolarProvider::cancel_subscription (network fail) ──────
