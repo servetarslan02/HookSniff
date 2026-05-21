@@ -123,26 +123,6 @@ export default function BillingPage() {
   const confirmUpgrade = async () => {
     if (!showUpgradeModal || !token) return;
 
-    // Downgrade → open customer portal (backend only supports upgrades)
-    const isDowngrade = planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan);
-    if (isDowngrade) {
-      try {
-        const result = await billingApiExtended.openPortal(token);
-        if (result.url) {
-          const isOwnPage = result.url.includes('/dashboard/billing') || result.url.includes('/billing');
-          if (isOwnPage) {
-            toast(t('downgradePortalOwn') || 'Please contact support to downgrade your plan.', 'info');
-          } else {
-            window.location.href = result.url;
-          }
-        }
-      } catch (err: unknown) {
-        toast(getErrorMessage(err, tc('unknownError')) || tc('upgradeFailed'), 'error');
-      }
-      setShowUpgradeModal(null);
-      return;
-    }
-
     setUpgrading(true);
     try {
       const result = await billingApiExtended.upgrade(token, showUpgradeModal, billingPeriod, discountCode || undefined);
@@ -216,32 +196,17 @@ export default function BillingPage() {
           <div className="fixed inset-0 bg-black/40 backdrop-blur-xs" aria-hidden="true" onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }} />
           <div ref={upgradeModalRef} tabIndex={-1} className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 outline-hidden">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan)
-                ? t('downgradeTo', { plan: t(`plans.${showUpgradeModal}`) }) || `${t('downgrade')} → ${t(`plans.${showUpgradeModal}`)}`
-                : t('upgradeTo', { action: t('upgrade'), plan: t(`plans.${showUpgradeModal}`) })
-              }
+              {t('upgradeTo', { action: t('upgrade'), plan: t(`plans.${showUpgradeModal}`) })}
             </h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
-              {planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan)
-                ? t('downgradeDesc')
-                : t('upgradeDesc')
-              }
+              {t('upgradeDesc')}
             </p>
             <div className="flex gap-3 justify-end">
               <button type="button" onClick={() => { setShowUpgradeModal(null); setUpgrading(false); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
                 {tc('cancel')}
               </button>
-              <button type="button" onClick={confirmUpgrade} disabled={upgrading} className={`px-4 py-2.5 text-sm font-medium text-white rounded-xl transition disabled:opacity-60 ${
-                showUpgradeModal && planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan)
-                  ? 'bg-yellow-600 hover:bg-yellow-700'
-                  : 'bg-brand-600 hover:bg-brand-700'
-              }`}>
-                {upgrading
-                  ? t('redirecting')
-                  : showUpgradeModal && planOrder.indexOf(showUpgradeModal) < planOrder.indexOf(currentPlan)
-                    ? t('downgrade')
-                    : tc('confirm')
-                }
+              <button type="button" onClick={confirmUpgrade} disabled={upgrading} className="px-4 py-2.5 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition disabled:opacity-60">
+                {upgrading ? t('redirecting') : tc('confirm')}
               </button>
             </div>
           </div>
