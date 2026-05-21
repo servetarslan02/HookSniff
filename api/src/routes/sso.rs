@@ -238,6 +238,20 @@ impl SsoStateStore {
         // Fallback to in-memory
         self.states.lock().await.remove(state)
     }
+
+    /// Remove expired states from in-memory store (call periodically)
+    pub async fn cleanup_expired(&self) {
+        let mut states = self.states.lock().await;
+        let now = Utc::now();
+        let before_count = states.len();
+        states.retain(|_, state| {
+            (now - state.created_at).num_seconds() < SSO_STATE_TTL_SECS as i64
+        });
+        let removed = before_count - states.len();
+        if removed > 0 {
+            tracing::info!("SSO state cleanup: removed {} expired states", removed);
+        }
+    }
 }
 
 // ── Query params for team-scoped endpoints ──────────────────
@@ -330,6 +344,7 @@ async fn get_sso_config(
         None => Ok(Json(serde_json::json!({
             "provider": "saml",
             "enabled": false,
+            "admin_bypass": true,
             "metadata_url": null,
             "entity_id": null,
             "sso_url": null,
@@ -819,12 +834,33 @@ async fn check_domain_verification(
 async fn test_sso_connection(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    Query(query): Query<TeamQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    let config = sqlx::query_as::<_, (String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-        "SELECT provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, metadata_url, entity_id FROM sso_configs WHERE customer_id = $1 LIMIT 1"
-    )
-    .bind(customer.id)
-    .fetch_optional(&pool)
+    let config = if let Some(team_id) = query.team_id {
+        // Verify team membership
+        let _member = sqlx::query_scalar::<_, String>(
+            "SELECT role FROM team_members WHERE team_id = $1 AND customer_id = $2"
+        )
+        .bind(team_id)
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+        .ok_or(AppError::Forbidden("Not a member of this team".into()))?;
+
+        sqlx::query_as::<_, (String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, metadata_url, entity_id FROM sso_configs WHERE team_id = $1 LIMIT 1"
+        )
+        .bind(team_id)
+        .fetch_optional(&pool)
+        .await?
+    } else {
+        sqlx::query_as::<_, (String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
+            "SELECT provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, metadata_url, entity_id FROM sso_configs WHERE customer_id = $1 LIMIT 1"
+        )
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+    };
     .await?;
 
     let (provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_enc, _meta2, _entity) =
@@ -1315,6 +1351,14 @@ async fn saml_callback(
     // Parse SAML assertion
     let assertion = parse_saml_response(&saml_xml)?;
 
+    // Verify SAML response has a signature element
+    let has_signature = saml_xml.contains("<ds:Signature") || saml_xml.contains("<Signature");
+    if !has_signature {
+        tracing::warn!("SAML response missing digital signature");
+        log_sso_attempt(&pool, None, &assertion.name_id, "saml", false, Some("Missing signature"), &headers).await;
+        return Err(AppError::BadRequest("SAML response is not signed. Contact your administrator.".into()));
+    }
+
     // Validate assertion timing
     if let Some(not_on_or_after) = assertion.not_on_or_after {
         if Utc::now() > not_on_or_after {
@@ -1380,28 +1424,28 @@ async fn saml_callback(
         }
     }
 
-    let email = if let Some(ref ls) = login_state {
-        // Verify email matches — strict check
-        if assertion.name_id != ls.email {
-            tracing::warn!("SAML email mismatch: expected={}, got={}", ls.email, assertion.name_id);
-            log_sso_attempt(&pool, None, &assertion.name_id, "saml", false, Some("Email mismatch"), &headers).await;
-            return Err(AppError::BadRequest("SAML response email does not match the expected account. Contact your administrator.".into()));
-        }
-        assertion.name_id.clone()
-    } else {
-        // No state found — use assertion email directly
-        assertion.name_id.clone()
-    };
+    let login_state = login_state.ok_or_else(|| {
+        tracing::warn!("SAML callback: no valid state found (expired or invalid RelayState)");
+        AppError::BadRequest("SSO login session expired or invalid. Please try again.".into())
+    })?;
+
+    // Verify email matches — strict check
+    if assertion.name_id != login_state.email {
+        tracing::warn!("SAML email mismatch: expected={}, got={}", login_state.email, assertion.name_id);
+        log_sso_attempt(&pool, Some(login_state.customer_id), &assertion.name_id, "saml", false, Some("Email mismatch"), &headers).await;
+        return Err(AppError::BadRequest("SAML response email does not match the expected account. Contact your administrator.".into()));
+    }
+    let email = assertion.name_id.clone();
 
     // Find or create customer
     let customer = find_or_create_sso_customer(&pool, &email, &assertion.attributes, "saml").await?;
 
     // Extract auto_join_team_id BEFORE login_state is consumed
-    let auto_join_team = login_state.as_ref().and_then(|ls| ls.auto_join_team_id);
+    let auto_join_team = login_state.auto_join_team_id;
 
     // Auto-join to team if configured
     if let Some(team_id) = auto_join_team {
-        let role = login_state.as_ref().map(|ls| ls.default_role.clone()).unwrap_or_else(|| "viewer".to_string());
+        let role = login_state.default_role.clone();
         let _ = auto_join_team_direct(&pool, customer.id, team_id, &role).await;
     }
 
@@ -1414,7 +1458,7 @@ async fn saml_callback(
         None, None).await;
 
     // Generate JWT tokens
-    generate_sso_response(&pool, &customer, &cfg, login_state.and_then(|ls| ls.redirect)).await
+    generate_sso_response(&pool, &customer, &cfg, login_state.redirect).await
 }
 
 // ── GET /sso/oidc/callback ──────────────────────────────────
@@ -1604,13 +1648,21 @@ async fn list_sso_providers(
 ) -> Result<Json<serde_json::Value>, AppError> {
     let domain = &query.domain;
 
-    // Find SSO configs matching this domain (by verified_domain or customer email domain)
+    // Find SSO configs matching this domain (by verified_domain, team membership, or customer email domain)
     let providers = sqlx::query_as::<_, (String, String)>(
         "SELECT DISTINCT s.provider, COALESCE(s.verified_domain, SPLIT_PART(c.email, '@', 2)) as domain
          FROM sso_configs s
          JOIN customers c ON c.id = s.customer_id
          WHERE s.enabled = true
-         AND (s.verified_domain = $1 OR SPLIT_PART(c.email, '@', 2) = $1)
+         AND (
+             s.verified_domain = $1
+             OR SPLIT_PART(c.email, '@', 2) = $1
+             OR s.team_id IN (
+                 SELECT tm.team_id FROM team_members tm
+                 JOIN customers c2 ON c2.id = tm.customer_id
+                 WHERE SPLIT_PART(c2.email, '@', 2) = $1
+             )
+         )
          LIMIT 5"
     )
     .bind(domain)
@@ -1965,63 +2017,6 @@ async fn auto_join_team_direct(
     let _ = crate::audit::log_action(pool, sso_user_id, "SSO_AUTO_JOIN_TEAM", "team",
         Some(&team_id.to_string()),
         Some(serde_json::json!({"role": default_role})),
-        None, None).await;
-
-    Ok(())
-}
-
-//
-// ── Helper: Auto-join SSO user to default team (legacy) ─────
-//
-// `sso_user_id` — the SSO user who just logged in (will be added to the team)
-// `sso_owner_id` — the customer who owns the SSO config (has default_team_id/default_role)
-
-async fn auto_join_default_team(
-    pool: &PgPool,
-    sso_user_id: Uuid,
-    sso_owner_id: Uuid,
-) -> Result<(), AppError> {
-    // Find SSO config by the config OWNER's customer_id (not the SSO user)
-    let config = sqlx::query_as::<_, (Option<Uuid>, Option<String>)>(
-        "SELECT default_team_id, default_role FROM sso_configs WHERE customer_id = $1 AND default_team_id IS NOT NULL LIMIT 1"
-    )
-    .bind(sso_owner_id)
-    .fetch_optional(pool)
-    .await?;
-
-    let Some((Some(team_id), Some(role))) = config else {
-        return Ok(()); // No default team configured
-    };
-
-    // Check if already a member
-    let already_member: Option<(Uuid,)> = sqlx::query_as(
-        "SELECT id FROM team_members WHERE team_id = $1 AND customer_id = $2"
-    )
-    .bind(team_id)
-    .bind(sso_user_id)
-    .fetch_optional(pool)
-    .await?;
-
-    if already_member.is_some() {
-        return Ok(()); // Already a member
-    }
-
-    // Add to team
-    sqlx::query(
-        "INSERT INTO team_members (team_id, customer_id, role, joined_at) VALUES ($1, $2, $3, NOW()) ON CONFLICT DO NOTHING"
-    )
-    .bind(team_id)
-    .bind(sso_user_id)
-    .bind(&role)
-    .execute(pool)
-    .await?;
-
-    tracing::info!("✅ SSO auto-join: customer {} added to team {} as {}", sso_user_id, team_id, role);
-
-    // Audit log for auto-join
-    let _ = crate::audit::log_action(pool, sso_user_id, "SSO_AUTO_JOIN_TEAM", "team",
-        Some(&team_id.to_string()),
-        Some(serde_json::json!({"role": &role, "sso_owner": sso_owner_id.to_string()})),
         None, None).await;
 
     Ok(())
