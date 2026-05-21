@@ -83,6 +83,8 @@ pub enum WebhookResult {
         currency: String,
         /// Customer ID if available from the payment event (POL-04: period extension)
         customer_id: Option<Uuid>,
+        /// Polar invoice number (e.g. "SERVET-ARSLAN-UDWXOAIHPR-0002")
+        invoice_number: Option<String>,
     },
     /// Payment failed.
     PaymentFailed {
@@ -356,6 +358,7 @@ mod tests {
             amount_cents: 4900,
             currency: "USD".to_string(),
             customer_id: Some(Uuid::new_v4()),
+            invoice_number: Some("INV-001".to_string()),
         };
         match result {
             WebhookResult::PaymentSucceeded {
@@ -363,11 +366,13 @@ mod tests {
                 amount_cents,
                 currency,
                 customer_id,
+                invoice_number,
             } => {
                 assert_eq!(provider_tx_id, "tx_001");
                 assert_eq!(amount_cents, 4900);
                 assert_eq!(currency, "USD");
                 assert!(customer_id.is_some());
+                assert_eq!(invoice_number, Some("INV-001".to_string()));
             }
             _ => panic!("Expected PaymentSucceeded"),
         }
