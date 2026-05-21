@@ -3123,7 +3123,8 @@
     "logo": "Logo",
     "successRate": "Başarı Oranı",
     "subtitle": "Hesap genel bakışınız ve kullanımınız",
-    "retry": "Tekrar dene"
+    "retry": "Tekrar dene",
+    "rateLimit": "Hız Limiti"
   },
   "sso": {
     "title": "🔐 SSO / SAML",
