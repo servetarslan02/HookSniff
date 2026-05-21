@@ -960,7 +960,8 @@
     "upgradeFailed": "Yükseltme başarısız oldu. Lütfen tekrar deneyin.",
     "downgradeTo": "{plan} planına geç",
     "free": "Ücretsiz",
-    "statusLabel": "Durum"
+    "statusLabel": "Durum",
+    "noPaymentMethod": "Kayıtlı ödeme yöntemi yok. Ücretli plana geçişte ekleyebilirsiniz."
   },
   "auth": {
     "login": "Giriş Yap",

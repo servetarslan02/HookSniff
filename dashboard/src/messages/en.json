@@ -958,7 +958,8 @@
     "upgradeFailed": "Upgrade failed. Please try again.",
     "downgradeTo": "Switch to {plan}",
     "free": "Free",
-    "statusLabel": "Status"
+    "statusLabel": "Status",
+    "noPaymentMethod": "No payment method on file. Add one when upgrading to a paid plan."
   },
   "auth": {
     "login": "Log In",

@@ -51,7 +51,7 @@ export function SubscriptionDetails({ onCancel, onPause, onResume }: { onCancel?
         // If the URL points back to our own billing page, just navigate in the same tab
         const isOwnPage = result.url.includes('/dashboard/billing') || result.url.includes('/billing');
         if (isOwnPage) {
-          toast(t('portalNotAvailable') || 'No external billing portal available for your account.', 'info');
+          toast(t('noPaymentMethod') || 'No payment method on file. Add one when upgrading to a paid plan.', 'info');
         } else {
           // Use location.href to avoid popup blockers (must be in async context)
           window.location.href = result.url;
