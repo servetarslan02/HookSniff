@@ -40,7 +40,7 @@ function ConnectionIndicator() {
 }
 
 const adminNavigation = [
-  { nameKey: 'userPanel', href: '/core', icon: <FolderOpen size={16} strokeWidth={1.75} /> },
+  { nameKey: 'userPanel', href: '/core', icon: <FolderOpen size={16} strokeWidth={1.75} />, isSpecial: true },
   { nameKey: 'overview', href: '/admin', icon: <BarChart3 size={16} strokeWidth={1.75} /> },
   { nameKey: 'users', href: '/admin/users', icon: <Users size={16} strokeWidth={1.75} /> },
   { nameKey: 'revenue', href: '/admin/revenue', icon: <DollarSign size={16} strokeWidth={1.75} /> },
@@ -79,6 +79,20 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
       <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
         {adminNavigation.map((item) => {
           const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
+          if (item.isSpecial) {
+            return (
+              <PrefetchLink
+                key={item.nameKey}
+                href={item.href}
+                onClick={onClose}
+                hoverDelay={80}
+                className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
+              >
+                <span className="inline-flex items-center">{item.icon}</span>
+                {t(`nav.${item.nameKey}`)}
+              </PrefetchLink>
+            );
+          }
           return (
             <PrefetchLink
               key={item.nameKey}
