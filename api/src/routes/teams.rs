@@ -1298,4 +1298,144 @@ mod tests {
     fn test_teams_router_construction() {
         let _router = router();
     }
+
+    // ── role_level — RBAC hierarchy tests ───────────────────
+
+    #[test]
+    fn test_role_level_hierarchy() {
+        // Higher roles should have higher levels
+        assert!(role_level("admin") > role_level("developer"));
+        assert!(role_level("developer") > role_level("analyst"));
+        assert!(role_level("analyst") > role_level("viewer"));
+    }
+
+    #[test]
+    fn test_role_level_exact_values() {
+        assert_eq!(role_level("admin"), 40);
+        assert_eq!(role_level("developer"), 30);
+        assert_eq!(role_level("analyst"), 20);
+        assert_eq!(role_level("viewer"), 10);
+    }
+
+    #[test]
+    fn test_role_level_unknown_is_zero() {
+        assert_eq!(role_level("owner"), 0);
+        assert_eq!(role_level("superadmin"), 0);
+        assert_eq!(role_level(""), 0);
+        assert_eq!(role_level("unknown"), 0);
+    }
+
+    #[test]
+    fn test_admin_passes_developer_check() {
+        // admin (40) >= developer (30) → should pass
+        assert!(role_level("admin") >= role_level("developer"));
+    }
+
+    #[test]
+    fn test_developer_passes_developer_check() {
+        // developer (30) >= developer (30) → should pass
+        assert!(role_level("developer") >= role_level("developer"));
+    }
+
+    #[test]
+    fn test_analyst_fails_developer_check() {
+        // analyst (20) >= developer (30) → should fail
+        assert!(role_level("analyst") < role_level("developer"));
+    }
+
+    #[test]
+    fn test_viewer_fails_developer_check() {
+        // viewer (10) >= developer (30) → should fail
+        assert!(role_level("viewer") < role_level("developer"));
+    }
+
+    #[test]
+    fn test_admin_passes_admin_check() {
+        // admin (40) >= admin (40) → should pass
+        assert!(role_level("admin") >= role_level("admin"));
+    }
+
+    #[test]
+    fn test_developer_fails_admin_check() {
+        // developer (30) >= admin (40) → should fail
+        assert!(role_level("developer") < role_level("admin"));
+    }
+
+    // ── check_user_team_role — logic verification ───────────
+
+    #[test]
+    fn test_check_user_team_role_requires_any_team_membership() {
+        // If user has no teams, they should pass (personal account)
+        // This is a logic test, not an integration test
+        let memberships: Vec<(Uuid, String)> = vec![];
+        let min_level = role_level("developer");
+        let has_role = memberships.iter().any(|(_, role)| role_level(role) >= min_level);
+        assert!(!has_role); // No teams → no role match (but function returns Ok for personal accounts)
+    }
+
+    #[test]
+    fn test_check_user_team_role_passes_with_matching_role() {
+        let memberships = vec![
+            (Uuid::new_v4(), "viewer".to_string()),
+            (Uuid::new_v4(), "developer".to_string()),
+        ];
+        let min_level = role_level("developer");
+        let has_role = memberships.iter().any(|(_, role)| role_level(role) >= min_level);
+        assert!(has_role); // Has developer in one team → pass
+    }
+
+    #[test]
+    fn test_check_user_team_role_fails_when_all_below() {
+        let memberships = vec![
+            (Uuid::new_v4(), "viewer".to_string()),
+            (Uuid::new_v4(), "analyst".to_string()),
+        ];
+        let min_level = role_level("developer");
+        let has_role = memberships.iter().any(|(_, role)| role_level(role) >= min_level);
+        assert!(!has_role); // All below developer → fail
+    }
+
+    #[test]
+    fn test_check_user_team_role_mixed_teams() {
+        // User is viewer in team A, admin in team B
+        let memberships = vec![
+            (Uuid::new_v4(), "viewer".to_string()),
+            (Uuid::new_v4(), "admin".to_string()),
+        ];
+        let min_level = role_level("developer");
+        let has_role = memberships.iter().any(|(_, role)| role_level(role) >= min_level);
+        assert!(has_role); // Admin in team B → pass (checks ALL teams)
+    }
+
+    // ── Role permission matrix ──────────────────────────────
+
+    #[test]
+    fn test_permission_matrix_write_ops() {
+        // Write ops require at least developer
+        let write_min = role_level("developer");
+        assert!(role_level("admin") >= write_min, "admin can write");
+        assert!(role_level("developer") >= write_min, "developer can write");
+        assert!(role_level("analyst") < write_min, "analyst cannot write");
+        assert!(role_level("viewer") < write_min, "viewer cannot write");
+    }
+
+    #[test]
+    fn test_permission_matrix_destructive_ops() {
+        // Destructive ops require at least admin
+        let destructive_min = role_level("admin");
+        assert!(role_level("admin") >= destructive_min, "admin can delete");
+        assert!(role_level("developer") < destructive_min, "developer cannot delete");
+        assert!(role_level("analyst") < destructive_min, "analyst cannot delete");
+        assert!(role_level("viewer") < destructive_min, "viewer cannot delete");
+    }
+
+    #[test]
+    fn test_permission_matrix_read_ops() {
+        // Read ops require at least analyst (or no check)
+        let read_min = role_level("analyst");
+        assert!(role_level("admin") >= read_min, "admin can read");
+        assert!(role_level("developer") >= read_min, "developer can read");
+        assert!(role_level("analyst") >= read_min, "analyst can read");
+        assert!(role_level("viewer") < read_min, "viewer cannot read analytics");
+    }
 }
