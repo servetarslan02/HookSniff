@@ -290,11 +290,7 @@ async fn create_integration(
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
     } else {
-        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = team_id {
-            super::teams::require_team_developer(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     // Verify connector_config belongs to customer
@@ -368,11 +364,7 @@ async fn update_integration(
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
     } else {
-        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = team_id {
-            super::teams::require_team_developer(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     // Verify endpoint if changed
@@ -443,11 +435,7 @@ async fn delete_integration(
     if let Some(Extension(ref scope)) = service_token {
         super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
     } else {
-        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
-            .bind(customer.id).fetch_optional(&pool).await?;
-        if let Some((tid,)) = team_id {
-            super::teams::require_team_admin(&pool, tid, customer.id).await?;
-        }
+        super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
     }
 
     let result = sqlx::query("DELETE FROM integrations WHERE id = $1 AND customer_id = $2")
