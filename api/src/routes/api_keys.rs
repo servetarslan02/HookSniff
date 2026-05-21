@@ -65,8 +65,20 @@ async fn list_api_keys(
 async fn create_api_key(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<CreateKeyRequest>,
 ) -> Result<Json<CreateApiKeyResponse>, AppError> {
+    // ── Role enforcement: require at least developer ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        }
+    }
+
     let api_key = generate_api_key();
     let api_key_hash = hash_api_key(&api_key);
     let api_key_prefix = api_key[..24].to_string();
@@ -106,8 +118,20 @@ async fn delete_api_key(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // ── Role enforcement: require admin for destructive ops ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_admin(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Get the prefix and name before deleting for cache invalidation and notification
     let old_key: Option<(String, Option<String>)> = sqlx::query_as("SELECT api_key_prefix, name FROM api_keys WHERE id = $1 AND customer_id = $2")
         .bind(id)
@@ -147,8 +171,20 @@ async fn rotate_api_key(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
+    service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<CreateApiKeyResponse>, AppError> {
+    // ── Role enforcement: require admin for secret rotation ──
+    if let Some(Extension(ref scope)) = service_token {
+        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+    } else {
+        let team_id: Option<(Uuid,)> = sqlx::query_as("SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1")
+            .bind(customer.id).fetch_optional(&pool).await?;
+        if let Some((tid,)) = team_id {
+            super::teams::require_team_admin(&pool, tid, customer.id).await?;
+        }
+    }
+
     // Verify ownership and get old prefix for cache invalidation
     let existing: Option<(Uuid, String)> =
         sqlx::query_as("SELECT id, api_key_prefix FROM api_keys WHERE id = $1 AND customer_id = $2")
