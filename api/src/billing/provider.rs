@@ -59,6 +59,10 @@ pub enum WebhookResult {
         interval: String,
         /// Webhook event ID for idempotency
         event_id: Option<String>,
+        /// Whether the subscription is scheduled to cancel at period end.
+        cancel_at_period_end: bool,
+        /// Current billing period end (ISO 8601) from provider.
+        current_period_end: Option<String>,
     },
     /// Subscription updated (plan change, renewal).
     SubscriptionUpdated {
@@ -69,6 +73,10 @@ pub enum WebhookResult {
         interval: String,
         /// Webhook event ID for idempotency
         event_id: Option<String>,
+        /// Whether the subscription is scheduled to cancel at period end.
+        cancel_at_period_end: bool,
+        /// Current billing period end (ISO 8601) from provider.
+        current_period_end: Option<String>,
     },
     /// Subscription canceled.
     SubscriptionCanceled {
@@ -250,6 +258,8 @@ mod tests {
             provider_subscription_id: Some("sub_456".to_string()),
             interval: "month".to_string(),
             event_id: Some("evt_001".to_string()),
+            cancel_at_period_end: false,
+            current_period_end: Some("2026-06-21T00:00:00Z".to_string()),
         };
         match result {
             WebhookResult::SubscriptionCreated {
@@ -259,6 +269,8 @@ mod tests {
                 provider_subscription_id,
                 interval,
                 event_id,
+                cancel_at_period_end,
+                current_period_end,
             } => {
                 assert_eq!(cid, customer_id);
                 assert_eq!(plan, Plan::Pro);
@@ -266,6 +278,8 @@ mod tests {
                 assert_eq!(provider_subscription_id.as_deref(), Some("sub_456"));
                 assert_eq!(interval, "month");
                 assert_eq!(event_id.as_deref(), Some("evt_001"));
+                assert!(!cancel_at_period_end);
+                assert!(current_period_end.is_some());
             }
             _ => panic!("Expected SubscriptionCreated"),
         }
@@ -281,6 +295,8 @@ mod tests {
             provider_subscription_id: Some("sub_456".to_string()),
             interval: "year".to_string(),
             event_id: None,
+            cancel_at_period_end: false,
+            current_period_end: None,
         };
         match result {
             WebhookResult::SubscriptionCreated { interval, .. } => {
@@ -299,6 +315,8 @@ mod tests {
             provider_subscription_id: None,
             interval: "month".to_string(),
             event_id: None,
+            cancel_at_period_end: false,
+            current_period_end: None,
         };
         match result {
             WebhookResult::SubscriptionCreated {
@@ -321,6 +339,8 @@ mod tests {
             status: "active".to_string(),
             interval: "month".to_string(),
             event_id: Some("evt_002".to_string()),
+            cancel_at_period_end: false,
+            current_period_end: Some("2026-07-21T00:00:00Z".to_string()),
         };
         match result {
             WebhookResult::SubscriptionUpdated {
@@ -329,12 +349,16 @@ mod tests {
                 status,
                 interval,
                 event_id,
+                cancel_at_period_end,
+                current_period_end,
             } => {
                 assert_eq!(provider_subscription_id, "sub_789");
                 assert_eq!(plan, Plan::Enterprise);
                 assert_eq!(status, "active");
                 assert_eq!(interval, "month");
                 assert_eq!(event_id.as_deref(), Some("evt_002"));
+                assert!(!cancel_at_period_end);
+                assert!(current_period_end.is_some());
             }
             _ => panic!("Expected SubscriptionUpdated"),
         }

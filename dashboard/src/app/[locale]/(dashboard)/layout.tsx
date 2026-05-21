@@ -69,6 +69,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
         ];
       case '/billing-section':
+      case '/billing':
         return [
           { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
           { queryKey: ['billing', 'subscription'], queryFn: () => apiFetch('/billing/subscription', { token }), staleTime: 60_000 },
@@ -104,7 +105,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     { name: t('integrations'), href: '/integrations', icon: <Zap size={16} strokeWidth={1.75} /> },
     { name: t('customDomain') || 'Custom Domain', href: '/custom-domain', icon: <Globe size={16} strokeWidth={1.75} /> },
     { name: t('routingConfig'), href: '/routing-config', icon: <Settings size={16} strokeWidth={1.75} /> },
-    { name: t('billingSection'), href: '/billing-section', icon: <CreditCard size={16} strokeWidth={1.75} /> },
+    { name: t('billingSection'), href: '/billing', icon: <CreditCard size={16} strokeWidth={1.75} /> },
     { name: t('account'), href: '/account', icon: <UserCircle size={16} strokeWidth={1.75} /> },
   ];
 
