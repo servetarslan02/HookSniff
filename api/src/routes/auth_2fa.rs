@@ -91,9 +91,10 @@ pub async fn enable_2fa(
     }
 
     let secret = generate_totp_secret();
+    // Account label = "HookSniff" (not "HookSniff:email") — shows as just "HookSniff" in authenticator
     let otpauth_url = format!(
-        "otpauth://totp/HookSniff:{}?secret={}&issuer=HookSniff&digits=6&period=30",
-        customer.email, secret
+        "otpauth://totp/HookSniff?secret={}&issuer=HookSniff&digits=6&period=30",
+        secret
     );
 
     sqlx::query("UPDATE customers SET totp_secret = $1, updated_at = NOW() WHERE id = $2")
