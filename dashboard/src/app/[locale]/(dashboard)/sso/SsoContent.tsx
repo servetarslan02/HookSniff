@@ -260,6 +260,11 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
      <a href="/billing" className="inline-block px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition">
       {t('upgradeNow')}
      </a>
+     <p className="mt-4 text-sm text-gray-500 dark:text-slate-400">
+      <a href="/docs/sso" target="_blank" rel="noopener noreferrer" className="text-brand-600 dark:text-brand-400 hover:underline">
+       {t('learnMore') || 'Learn how SSO works →'}
+      </a>
+     </p>
     </div>
    </div>
   );
@@ -272,6 +277,10 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    <div>
     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
     <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+    <a href="/docs/sso" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 mt-2 text-sm text-brand-600 dark:text-brand-400 hover:underline">
+     <ShieldCheck size={14} strokeWidth={1.75} />
+     {t('setupGuide') || 'View SSO setup guide →'}
+    </a>
    </div>
 
    {/* Status Banner */}
