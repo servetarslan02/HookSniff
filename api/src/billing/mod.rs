@@ -401,8 +401,16 @@ impl BillingService {
                     }
                 };
 
+                // For Polar, use the HookSniff customer UUID as external_customer_id
+                // (Polar's API expects the external system's ID, not Polar's internal customer ID)
+                let portal_id = if provider_name == "polar" {
+                    customer.id.to_string()
+                } else {
+                    customer_id.to_string()
+                };
+
                 let url = provider_impl
-                    .create_customer_portal(customer_id, base_url)
+                    .create_customer_portal(&portal_id, base_url)
                     .await?;
 
                 Ok(PortalOutcome {
