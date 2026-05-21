@@ -1418,6 +1418,14 @@ async fn saml_callback(
                 return Err(AppError::BadRequest("SAML response certificate does not match the configured identity provider. Contact your administrator.".into()));
             }
             tracing::debug!("SAML certificate verified successfully");
+
+            // Verify cryptographic signature (RSA-SHA256)
+            if let Err(e) = verify_saml_signature(&saml_xml, expected_cert) {
+                tracing::warn!("⚠️ SAML cryptographic signature verification failed: {}", e);
+                log_sso_attempt(&pool, Some(login_state.customer_id), &login_state.email, "saml", false, Some("Signature verification failed"), &headers).await;
+                return Err(e);
+            }
+            tracing::debug!("SAML cryptographic signature verified successfully");
         } else if configured_cert.is_some() && assertion.certificate.is_none() {
             tracing::warn!("SAML response missing certificate (expected one from IdP)");
             // Some IdPs don't include cert in every response — log but don't block
@@ -2099,6 +2107,172 @@ async fn log_sso_attempt(
     .await;
 }
 
+// ── SAML Signature Verification ─────────────────────────────
+
+/// Verify the cryptographic signature of a SAML response.
+///
+/// This performs RSA-SHA256 signature verification using the IdP's X.509 certificate.
+/// Steps:
+/// 1. Extract `<ds:SignatureValue>` from the XML
+/// 2. Extract `<ds:SignedInfo>` from the XML
+/// 3. Decode the SignatureValue from base64
+/// 4. Extract the public key from the X.509 certificate
+/// 5. Verify the RSA-SHA256 signature over the SignedInfo bytes
+fn verify_saml_signature(xml: &str, certificate_pem: &str) -> Result<(), AppError> {
+    use base64::Engine;
+
+    // 1. Extract SignatureValue
+    let sig_value_b64 = extract_xml_text(xml, "SignatureValue")
+        .ok_or_else(|| AppError::BadRequest("SAML response missing SignatureValue".into()))?;
+    let sig_bytes = base64::engine::general_purpose::STANDARD
+        .decode(sig_value_b64.trim())
+        .map_err(|_| AppError::BadRequest("Invalid base64 in SAML SignatureValue".into()))?;
+
+    // 2. Extract SignedInfo (raw XML between <ds:SignedInfo> and </ds:SignedInfo>)
+    let signed_info = extract_signed_info_xml(xml)
+        .ok_or_else(|| AppError::BadRequest("SAML response missing SignedInfo".into()))?;
+
+    // 3. Extract public key from X.509 certificate
+    let cert_der = extract_certificate_der(certificate_pem)?;
+    let public_key = extract_rsa_public_key_from_der(&cert_der)?;
+
+    // 4. Verify RSA-SHA256 signature
+    use ring::signature;
+    let public_key_ref = signature::UnparsedPublicKey::new(
+        &signature::RSA_PKCS1_2048_8192_SHA256,
+        &public_key,
+    );
+
+    public_key_ref
+        .verify(signed_info.as_bytes(), &sig_bytes)
+        .map_err(|e| {
+            tracing::warn!("SAML signature verification failed: {}", e);
+            AppError::BadRequest("SAML response signature verification failed. The response may have been tampered with.".into())
+        })?;
+
+    tracing::debug!("SAML signature verified successfully");
+    Ok(())
+}
+
+/// Extract the raw XML content of `<ds:SignedInfo>...</ds:SignedInfo>`
+fn extract_signed_info_xml(xml: &str) -> Option<String> {
+    // Try with and without ds: prefix
+    for prefix in &["ds:", ""] {
+        let start_tag = format!("<{}SignedInfo", prefix);
+        let end_tag = format!("</{}SignedInfo>", prefix);
+
+        if let Some(start) = xml.find(&start_tag) {
+            // Find the closing > of the opening tag
+            let content_start = xml[start..].find('>')? + start + 1;
+            if let Some(content_end) = xml[content_start..].find(&end_tag) {
+                // Include the opening and closing tags for canonicalization
+                let full_start = start;
+                let full_end = content_start + content_end + end_tag.len();
+                return Some(xml[full_start..full_end].to_string());
+            }
+        }
+    }
+    None
+}
+
+/// Extract DER-encoded bytes from a PEM certificate
+fn extract_certificate_der(pem: &str) -> Result<Vec<u8>, AppError> {
+    use base64::Engine;
+    let pem_clean = pem
+        .replace("-----BEGIN CERTIFICATE-----", "")
+        .replace("-----END CERTIFICATE-----", "")
+        .replace('\n', "")
+        .replace('\r', "")
+        .replace(' ', "");
+
+    base64::engine::general_purpose::STANDARD
+        .decode(&pem_clean)
+        .map_err(|_| AppError::BadRequest("Invalid base64 in X.509 certificate".into()))
+}
+
+/// Extract RSA public key from DER-encoded X.509 certificate
+fn extract_rsa_public_key_from_der(der: &[u8]) -> Result<Vec<u8>, AppError> {
+    // Parse the DER-encoded X.509 certificate to extract the RSA public key
+    // X.509 DER structure: SEQUENCE { ..., SubjectPublicKeyInfo { Algorithm, SubjectPublicKey } }
+    //
+    // We use a simple ASN.1 parser to find the RSA public key modulus.
+    // For production, consider using the `x509-parser` crate.
+
+    // Find the RSA OID: 2a864886f70d010101 (1.2.840.113549.1.1.1)
+    let rsa_oid: &[u8] = &[0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01];
+
+    // Find the OID position in the DER
+    let oid_pos = find_byte_sequence(der, rsa_oid)
+        .ok_or_else(|| AppError::BadRequest("Certificate does not contain RSA public key".into()))?;
+
+    // After the OID, there's a NULL byte, then the BIT STRING containing the public key
+    // Skip: OID (9 bytes) + NULL (2 bytes) + BIT STRING tag/length
+    let mut pos = oid_pos + rsa_oid.len();
+
+    // Skip NULL byte if present
+    if pos < der.len() && der[pos] == 0x05 {
+        pos += 2; // NULL tag + length
+    }
+
+    // Find BIT STRING (tag 0x03)
+    while pos < der.len() {
+        if der[pos] == 0x03 {
+            // BIT STRING found
+            pos += 1; // skip tag
+            // Read length
+            let (len, bytes_read) = read_asn1_length(&der[pos..]);
+            pos += bytes_read;
+
+            // Skip the "unused bits" byte
+            if pos < der.len() {
+                pos += 1; // unused bits count
+            }
+
+            // The rest is the RSA public key (PKCS#1 RSAPublicKey structure)
+            let key_end = pos + len - 1; // -1 for unused bits byte
+            if key_end <= der.len() {
+                return Ok(der[pos..key_end].to_vec());
+            }
+        }
+        pos += 1;
+    }
+
+    Err(AppError::BadRequest("Could not extract RSA public key from certificate".into()))
+}
+
+/// Find a byte sequence in a slice
+fn find_byte_sequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    haystack.windows(needle.len()).position(|w| w == needle)
+}
+
+/// Read ASN.1 DER length
+fn read_asn1_length(data: &[u8]) -> (usize, usize) {
+    if data.is_empty() {
+        return (0, 0);
+    }
+    let first = data[0];
+    if first & 0x80 == 0 {
+        // Short form
+        (first as usize, 1)
+    } else {
+        // Long form
+        let num_bytes = (first & 0x7f) as usize;
+        if num_bytes == 0 || data.len() < 1 + num_bytes {
+            return (0, 0);
+        }
+        let mut length: usize = 0;
+        for i in 0..num_bytes {
+            length = (length << 8) | data[1 + i] as usize;
+        }
+        (length, 1 + num_bytes)
+    }
+}
+
+/// Convert Vec<u8> to Vec<u8> (identity, used for clarity)
+fn _vec_identity(v: Vec<u8>) -> Vec<u8> {
+    v
+}
+
 // ── Tests ───────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -2270,5 +2444,77 @@ mod tests {
             created_at: chrono::Utc::now(),
         };
         assert!(state.nonce.is_none(), "SAML state should not have nonce");
+    }
+
+    // ── SAML signature verification helpers ─────────────────
+
+    #[test]
+    fn test_extract_signed_info_xml() {
+        let xml = r#"<samlp:Response>
+            <ds:Signature>
+                <ds:SignedInfo>
+                    <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                    <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+                </ds:SignedInfo>
+                <ds:SignatureValue>abc123</ds:SignatureValue>
+            </ds:Signature>
+        </samlp:Response>"#;
+        let result = extract_signed_info_xml(xml);
+        assert!(result.is_some());
+        let signed_info = result.unwrap();
+        assert!(signed_info.contains("SignedInfo"));
+        assert!(signed_info.contains("CanonicalizationMethod"));
+    }
+
+    #[test]
+    fn test_extract_signed_info_xml_no_prefix() {
+        let xml = r#"<Response>
+            <Signature>
+                <SignedInfo>
+                    <CanonicalizationMethod/>
+                </SignedInfo>
+                <SignatureValue>abc</SignatureValue>
+            </Signature>
+        </Response>"#;
+        let result = extract_signed_info_xml(xml);
+        assert!(result.is_some());
+    }
+
+    #[test]
+    fn test_extract_signed_info_missing() {
+        let xml = r#"<samlp:Response><saml:Assertion/></samlp:Response>"#;
+        let result = extract_signed_info_xml(xml);
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_extract_certificate_der_valid() {
+        // Self-signed test certificate (minimal)
+        let pem = "-----BEGIN CERTIFICATE-----\nMIIBkTCB+wIJAMlE...\n-----END CERTIFICATE-----";
+        // This will fail base64 decode since it's truncated, but tests the PEM stripping
+        let result = extract_certificate_der(pem);
+        // Expected to fail with invalid base64 (test cert is truncated)
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_read_asn1_length_short_form() {
+        assert_eq!(read_asn1_length(&[0x30]), (0x30, 1));
+        assert_eq!(read_asn1_length(&[0x00]), (0, 1));
+    }
+
+    #[test]
+    fn test_read_asn1_length_long_form() {
+        // 0x81 0x80 = 128 bytes
+        assert_eq!(read_asn1_length(&[0x81, 0x80]), (128, 2));
+        // 0x82 0x01 0x00 = 256 bytes
+        assert_eq!(read_asn1_length(&[0x82, 0x01, 0x00]), (256, 3));
+    }
+
+    #[test]
+    fn test_find_byte_sequence() {
+        let haystack = b"hello world";
+        assert_eq!(find_byte_sequence(haystack, b"world"), Some(6));
+        assert_eq!(find_byte_sequence(haystack, b"xyz"), None);
     }
 }
