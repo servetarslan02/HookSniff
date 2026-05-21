@@ -3,7 +3,7 @@ import CodeBlock from '@/components/CodeBlock';
 
 export const metadata: Metadata = {
   title: 'Custom Domain — HookSniff',
-  description: 'Use your own domain for the webhook portal. White-label your customers' experience.',
+  description: 'Use your own domain for the webhook portal. White-label your customers experience.',
 };
 
 export default function CustomDomainDocsPage() {
