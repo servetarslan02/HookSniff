@@ -10,6 +10,7 @@ use axum::extract::Extension;
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use sqlx::Row;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -57,7 +58,7 @@ pub struct CreateRefundRequest {
     pub description: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, sqlx::FromRow)]
 pub struct RefundRequestRow {
     pub id: uuid::Uuid,
     pub customer_id: uuid::Uuid,

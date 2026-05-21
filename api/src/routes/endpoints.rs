@@ -642,7 +642,7 @@ mod tests {
     }
 
     #[test]
-    fn test_signing_secret_format() {
+    fn test_signing_secret_prefix_and_length() {
         let secret = generate_signing_secret();
         assert!(secret.starts_with("whsec_"), "secret should start with whsec_");
         assert!(secret.len() > 10, "secret should be reasonably long");
