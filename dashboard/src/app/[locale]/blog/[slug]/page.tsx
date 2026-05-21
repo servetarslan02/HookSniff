@@ -21,6 +21,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${post.title} — HookSniff Blog`,
     description,
+    metadataBase: new URL('https://hooksniff.vercel.app'),
+    alternates: {
+      canonical: `/blog/${slug}`,
+    },
     openGraph: {
       title: post.title,
       description,
@@ -92,6 +96,37 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       </nav>
 
       <article className={`max-w-3xl mx-auto px-6 py-16 ${hasTOC ? 'lg:mr-64' : ''}`}>
+        {/* Article Schema Markup for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Article',
+              headline: post.title,
+              description: post.content.split('\n\n').find((p: string) => !p.startsWith('#') && !p.startsWith('```') && !p.startsWith('-'))?.slice(0, 160) || post.title,
+              datePublished: post.date,
+              dateModified: post.date,
+              author: {
+                '@type': 'Person',
+                name: post.author,
+              },
+              publisher: {
+                '@type': 'Organization',
+                name: 'HookSniff',
+                logo: {
+                  '@type': 'ImageObject',
+                  url: 'https://hooksniff.vercel.app/favicon.svg',
+                },
+              },
+              mainEntityOfPage: {
+                '@type': 'WebPage',
+                '@id': `https://hooksniff.vercel.app/blog/${slug}`,
+              },
+              keywords: post.tags.join(', '),
+            }),
+          }}
+        />
         {/* Cover Image / Gradient Header */}
         <div className={`relative rounded-xl bg-linear-to-br ${gradient} p-8 mb-8 overflow-hidden`}>
           <div className="absolute inset-0 opacity-10">
