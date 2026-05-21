@@ -29,6 +29,9 @@ async fn register_device(
     Extension(customer): Extension<Customer>,
     Json(req): Json<RegisterDeviceRequest>,
 ) -> Result<Json<DeviceTokenResponse>, AppError> {
+    // RBAC: developer or higher required to register devices
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
     if req.token.trim().is_empty() {
         return Err(AppError::BadRequest("Device token cannot be empty".into()));
     }
@@ -68,6 +71,8 @@ async fn list_devices(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<DeviceTokenResponse>>, AppError> {
+    // RBAC: viewer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
     let rows = sqlx::query_as::<_, DeviceTokenRow>(
         "SELECT id, customer_id, token, platform, created_at FROM device_tokens WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100",
     )
@@ -93,6 +98,9 @@ async fn remove_device(
     Extension(customer): Extension<Customer>,
     Path(token): Path<String>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: developer or higher required to remove devices
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
     let result = sqlx::query("DELETE FROM device_tokens WHERE customer_id = $1 AND token = $2")
         .bind(customer.id)
         .bind(&token)

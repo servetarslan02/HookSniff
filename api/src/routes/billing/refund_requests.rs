@@ -82,6 +82,9 @@ pub async fn create_refund_request(
     Extension(customer): Extension<Customer>,
     Json(req): Json<CreateRefundRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: admin required to create refund requests
+    super::super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
+
     // Can't request refund on free plan
     if customer.plan == "developer" || customer.plan == "free" {
         return Err(AppError::BadRequest(
@@ -165,6 +168,9 @@ pub async fn list_my_refund_requests(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<RefundRequestRow>>, AppError> {
+    // RBAC: viewer or higher to view refund requests
+    super::super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let rows = sqlx::query_as::<_, RefundRequestRow>(
         "SELECT id, customer_id, category, description, invoice_id, amount_cents, currency, \
                 status, reviewed_by, reviewed_at, admin_notes, refund_id, created_at, updated_at \

@@ -44,6 +44,9 @@ pub async fn list_active_broadcasts(
     Extension(customer): Extension<Customer>,
     Query(params): Query<BroadcastQueryParams>,
 ) -> Result<Json<Vec<UserBroadcast>>, AppError> {
+    // RBAC: viewer or higher (everyone should see broadcasts)
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let include_dismissed = params.include_dismissed.unwrap_or(false);
 
     let broadcasts = if include_dismissed {
@@ -108,6 +111,8 @@ pub async fn dismiss_broadcast(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: viewer or higher (dismissing is harmless)
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
     // Check broadcast exists
     let exists: bool =
         sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM broadcasts WHERE id = $1)")
@@ -138,6 +143,8 @@ pub async fn broadcast_unread_count(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: viewer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
     let count: (i64,) = sqlx::query_as(
         "SELECT COUNT(*)
          FROM broadcasts b

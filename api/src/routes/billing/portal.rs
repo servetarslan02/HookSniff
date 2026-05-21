@@ -5,6 +5,9 @@ pub async fn open_portal(
     Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<PortalResponse>, AppError> {
+    // RBAC: admin required to open billing portal
+    super::super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
+
     let billing_svc = BillingService::new(pool, cfg);
     let result = billing_svc.portal(&customer).await?;
 
@@ -51,6 +54,9 @@ pub async fn get_usage(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<UsageResponse>, AppError> {
+    // RBAC: viewer or higher to view usage
+    super::super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let plan = Plan::parse_str(&customer.plan);
 
     // Count endpoints
@@ -124,6 +130,9 @@ pub async fn get_invoices(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<InvoiceResponse>>, AppError> {
+    // RBAC: viewer or higher to view invoices
+    super::super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let rows: Vec<InvoiceRow> = sqlx::query_as(
         "SELECT id, amount_cents, currency, status, plan, paid_at, created_at, provider, provider_invoice_id \
              FROM invoices WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 100",
@@ -175,6 +184,8 @@ pub async fn request_refund(
     Extension(customer): Extension<Customer>,
     Json(req): Json<RefundRequest>,
 ) -> Result<Json<RefundResponse>, AppError> {
+    // RBAC: admin required to request refunds
+    super::super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
     if customer.plan == "free" || customer.plan == "developer" {
         return Err(AppError::BadRequest(
             "Cannot refund a free plan".into(),
@@ -212,8 +223,12 @@ pub(crate) struct OverageSettingsResponse {
 /// GET /v1/billing/settings — Get current overage settings
 
 pub async fn get_overage_settings(
+    Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<OverageSettingsResponse>, AppError> {
+    // RBAC: viewer or higher to view overage settings
+    super::super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let plan = Plan::parse_str(&customer.plan);
     let limit = plan.max_events_per_day();
     Ok(Json(OverageSettingsResponse {
@@ -238,6 +253,9 @@ pub async fn update_overage_settings(
     Extension(customer): Extension<Customer>,
     Json(req): Json<UpdateOverageSettingsRequest>,
 ) -> Result<Json<OverageSettingsResponse>, AppError> {
+    // RBAC: admin required to update overage settings
+    super::super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
+
     let updated = sqlx::query_as::<_, Customer>(
         "UPDATE customers SET \
          allow_overage = COALESCE($1, allow_overage), \
