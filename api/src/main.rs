@@ -500,6 +500,46 @@ async fn main() -> Result<()> {
         }
     });
 
+    // Weekly digest email job: send summary every Monday at 09:00 UTC
+    let digest_pool = pool.clone();
+    let digest_queue = job_queue.clone();
+    tokio::spawn(async move {
+        loop {
+            // Calculate seconds until next Monday 09:00 UTC
+            let now = chrono::Utc::now();
+            let next_monday = {
+                let days_until_monday = (8 - now.date_naive().weekday().num_days_from_monday()) % 7;
+                let target = if days_until_monday == 0 && now.time() >= chrono::NaiveTime::from_hms_opt(9, 0, 0).unwrap() {
+                    now.date_naive() + chrono::Days::new(7)
+                } else {
+                    now.date_naive() + chrono::Days::new(days_until_monday.max(1) as u64)
+                };
+                target.and_hms_opt(9, 0, 0).unwrap()
+            };
+            let sleep_secs = (next_monday - now.naive_utc()).num_seconds().max(60) as u64;
+            tokio::time::sleep(std::time::Duration::from_secs(sleep_secs)).await;
+
+            let should_run = if let Some(ref queue) = digest_queue {
+                queue.try_acquire_lock("weekly_digest", 3600).await.unwrap_or(true)
+            } else {
+                true
+            };
+
+            if should_run {
+                if let Some(email_client) = hooksniff_api::resend_email::ResendEmailClient::from_env() {
+                    match jobs::weekly_digest::run_weekly_digest(&digest_pool, &email_client).await {
+                        Ok(sent) => {
+                            tracing::info!("📊 Weekly digest: {} emails sent", sent);
+                        }
+                        Err(e) => tracing::error!("❌ Weekly digest job failed: {:?}", e),
+                    }
+                } else {
+                    tracing::warn!("⚠️ Resend not configured, weekly digest emails skipped");
+                }
+            }
+        }
+    });
+
     // Start auth cache cleanup (evicts expired entries every 60s)
     middleware::start_auth_cache_cleanup();
 
