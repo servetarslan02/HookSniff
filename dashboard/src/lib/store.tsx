@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { API_BASE, twoFactorApi } from './api';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
+import { API_BASE, twoFactorApi, startProactiveRefresh, stopProactiveRefresh } from './api';
 
 interface User {
   id: string;
@@ -38,11 +38,12 @@ function toSlug(input: string): string {
 }
 
 function setAuthCookie(token: string) {
-  // Set cookie for middleware auth check — 7 day expiry
+  // HS-039: Cookie matches JWT lifetime (15 min), NOT 7 days.
+  // Proactive refresh keeps it alive while user is active.
   // Secure flag: only sent over HTTPS. SameSite=Lax: CSRF protection.
   // Note: NOT HttpOnly — the frontend needs to read this for API calls.
   // The server also sets an HttpOnly cookie via auth_response_with_cookie.
-  document.cookie = `hooksniff_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax; Secure`;
+  document.cookie = `hooksniff_token=${token}; path=/; max-age=${15 * 60}; SameSite=Lax; Secure`;
 }
 
 function clearAuthCookie() {
@@ -54,6 +55,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [apiKey, setApiKeyState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const tokenRef = useRef<string | null>(null);
+
+  // Keep ref in sync with state (for use in callbacks without re-renders)
+  const updateToken = useCallback((newToken: string | null) => {
+    setToken(newToken);
+    tokenRef.current = newToken;
+    if (newToken) {
+      localStorage.setItem('hooksniff_token', newToken);
+      setAuthCookie(newToken);
+    }
+  }, []);
+
+  /**
+   * HS-039: Start proactive token refresh for the current session.
+   * Called after login or session restore. Renews token every 12 min.
+   */
+  const startSessionRefresh = useCallback(() => {
+    startProactiveRefresh((newToken: string) => {
+      updateToken(newToken);
+    });
+  }, [updateToken]);
 
   // On mount: restore user info from localStorage, then verify session with backend
   useEffect(() => {
@@ -75,15 +97,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
         .then((res) => {
           if (res.ok) return res.json();
-          // 401 = definitive auth failure → clear everything
+          // 401 = definitive auth failure → try refresh
           if (res.status === 401) {
-            throw new Error('Unauthorized');
+            return fetch(`${API_BASE}/auth/refresh`, {
+              method: 'POST',
+              credentials: 'include',
+            }).then((refreshRes) => {
+              if (!refreshRes.ok) throw new Error('Refresh failed');
+              return refreshRes.json();
+            });
           }
           // Other errors (500, network, CORS) → don't clear auth, just use localStorage
           return null;
         })
         .then((data) => {
-          if (data && data.id) {
+          if (data && data.token) {
+            // Refresh returned a new token — use it
+            updateToken(data.token);
+            if (data.customer) {
+              const u: User = {
+                id: data.customer.id,
+                email: data.customer.email,
+                name: data.customer.name,
+                username: toSlug(data.customer.email.split('@')[0]),
+                plan: data.customer.plan,
+                is_admin: data.customer.is_admin ?? false,
+              };
+              setUser(u);
+              setApiKeyState(null);
+              localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
+            }
+            startSessionRefresh();
+          } else if (data && data.id) {
+            // /auth/me returned valid user — session is good
             const username = toSlug(data.email.split('@')[0]);
             const u: User = {
               id: data.id,
@@ -95,9 +141,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             };
             setUser(u);
             setApiKeyState(null);
-            setToken(savedToken);
+            updateToken(savedToken);
             localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
-            setAuthCookie(savedToken);
+            startSessionRefresh();
           }
           // If data is null (non-401 error), keep localStorage user as-is
         })
@@ -105,17 +151,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Only clear on definitive auth failure (401).
           // Network/CORS errors → keep the user from localStorage.
           setUser(null);
-          setToken(null);
+          updateToken(null);
           setApiKeyState(null);
           localStorage.removeItem(STORAGE_KEY);
           localStorage.removeItem('hooksniff_token');
           clearAuthCookie();
+          stopProactiveRefresh();
         })
         .finally(() => setIsLoading(false));
     } else {
       setIsLoading(false);
     }
-  }, []);
+
+    // Cleanup: stop refresh on unmount
+    return () => stopProactiveRefresh();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const persistAuth = useCallback((u: User, k?: string, authToken?: string) => {
     // Generate username slug from email prefix (unique per user)
@@ -124,12 +174,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userWithUsername);
     setApiKeyState(k || null); // Keep in memory only for one-time display
     if (authToken) {
-      setToken(authToken);
-      localStorage.setItem('hooksniff_token', authToken);
+      updateToken(authToken);
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: userWithUsername }));
-    if (authToken) setAuthCookie(authToken);
-  }, []);
+    // HS-039: Start proactive refresh after login
+    startSessionRefresh();
+  }, [updateToken, startSessionRefresh]);
 
   const login = useCallback(async (email: string, password: string) => {
     // Call backend directly — token comes from response body
@@ -186,7 +236,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [persistAuth]);
 
   const logout = useCallback(async () => {
+    // Stop proactive refresh first
+    stopProactiveRefresh();
+    // Call backend logout to revoke refresh token
+    const currentToken = tokenRef.current;
+    if (currentToken) {
+      fetch(`${API_BASE}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${currentToken}` },
+        credentials: 'include',
+      }).catch(() => {}); // Fire-and-forget
+    }
     setToken(null);
+    tokenRef.current = null;
     setUser(null);
     setApiKeyState(null);
     localStorage.removeItem(STORAGE_KEY);

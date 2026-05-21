@@ -20,22 +20,58 @@ function assertOnline(): void {
 
 // Shared refresh promise — prevents multiple concurrent 401s from
 // each firing their own refresh request (Item 138).
-let refreshPromise: Promise<boolean> | null = null;
+let refreshPromise: Promise<string | null> | null = null;
 
-function doRefresh(): Promise<boolean> {
+// HS-039: Proactive refresh interval — renews token at ~12 min (before 15 min expiry).
+let proactiveRefreshTimer: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * Refresh the access token. Returns the new token string on success, null on failure.
+ * Deduplicates concurrent calls (only one refresh request at a time).
+ */
+function doRefresh(): Promise<string | null> {
   if (!refreshPromise) {
     refreshPromise = fetch(`${API_BASE}/auth/refresh`, {
       method: 'POST',
       credentials: 'include',
       headers: { ...getCSRFHeaders('POST') },
     })
-      .then((r) => r.ok)
-      .catch(() => false)
+      .then(async (r) => {
+        if (!r.ok) return null;
+        const data = await r.json();
+        return data.token ?? null;
+      })
+      .catch(() => null)
       .finally(() => {
         refreshPromise = null;
       });
   }
   return refreshPromise;
+}
+
+/**
+ * HS-039: Start proactive token refresh.
+ * Renews the access token every 12 minutes (3 min before 15-min expiry).
+ * While the user is active, the session never drops.
+ * Call this after login. Call stopProactiveRefresh() on logout.
+ */
+export function startProactiveRefresh(onRefresh: (newToken: string) => void): void {
+  stopProactiveRefresh();
+  proactiveRefreshTimer = setInterval(async () => {
+    const newToken = await doRefresh();
+    if (newToken) {
+      onRefresh(newToken);
+    }
+    // If refresh fails, don't panic — the reactive 401 handler will catch it
+  }, 12 * 60 * 1000); // 12 minutes
+}
+
+/** Stop proactive token refresh. Call on logout. */
+export function stopProactiveRefresh(): void {
+  if (proactiveRefreshTimer) {
+    clearInterval(proactiveRefreshTimer);
+    proactiveRefreshTimer = null;
+  }
 }
 
 function isTransientError(status: number): boolean {
@@ -98,9 +134,11 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
       if (!res.ok) {
         // Auto-logout on 401 (token expired or invalid)
         if (res.status === 401 && typeof window !== 'undefined') {
-          const refreshed = await doRefresh();
-          if (refreshed) {
-            // Refresh succeeded — retry the original request once
+          const newToken = await doRefresh();
+          if (newToken) {
+            // HS-039: Refresh succeeded — update stored token and retry with new token
+            localStorage.setItem('hooksniff_token', newToken);
+            headers["Authorization"] = `Bearer ${newToken}`;
             const retryRes = await fetch(`${API_BASE}${path}`, {
               method,
               headers,
