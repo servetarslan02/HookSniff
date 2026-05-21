@@ -763,7 +763,8 @@
     "failedToUpdateConsent": "Failed to update consent",
     "enterPassword": "Enter your password",
     "next": "Next",
-    "preferences": "Preferences"
+    "preferences": "Preferences",
+    "openInAuthenticator": "Open in authenticator app"
   },
   "billing": {
     "title": "Billing",
