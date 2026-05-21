@@ -134,20 +134,19 @@ pub async fn run_alert_evaluation(pool: &PgPool, email_client: &ResendEmailClien
             }
         }
 
-        // Create in-app notification
-        let _ = sqlx::query(
-            "INSERT INTO notifications (customer_id, type, title, message, is_read) \
-             VALUES ($1, 'alert', $2, $3, false)"
-        )
-        .bind(rule.customer_id)
-        .bind(format!("🚨 Alert: {}", rule.name))
-        .bind(format!(
-            "{} = {:.1} (threshold: {}). Channels: {}",
-            rule.condition, actual_value, rule.threshold,
-            if channels_sent.is_empty() { "none".to_string() } else { channels_sent.join(", ") }
-        ))
-        .execute(pool)
-        .await;
+        // Create in-app notification (uses centralized create with deduplication)
+        crate::notifications::helpers::create(
+            pool,
+            rule.customer_id,
+            "alert",
+            &format!("🚨 Alert: {}", rule.name),
+            &format!(
+                "{} = {:.1} (threshold: {}). Channels: {}",
+                rule.condition, actual_value, rule.threshold,
+                if channels_sent.is_empty() { "none".to_string() } else { channels_sent.join(", ") }
+            ),
+            None,
+        ).await;
 
         // Record in alert_history
         let _ = sqlx::query(
