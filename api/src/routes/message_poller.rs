@@ -115,6 +115,9 @@ async fn poll_messages(
     Extension(customer): Extension<Customer>,
     Query(params): Query<PollParams>,
 ) -> Result<Json<PollResponse>, AppError> {
+    // RBAC: viewer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let limit = params.limit.unwrap_or(50).min(200);
 
     // Get or create cursor
@@ -212,6 +215,9 @@ async fn seek_cursor(
     Extension(customer): Extension<Customer>,
     Json(req): Json<SeekRequest>,
 ) -> Result<Json<SeekResponse>, AppError> {
+    // RBAC: developer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
     // Verify the message exists and belongs to this customer
     let msg_exists: bool = sqlx::query_scalar(
         "SELECT EXISTS(SELECT 1 FROM deliveries WHERE id = $1 AND customer_id = $2)",
@@ -268,6 +274,8 @@ async fn commit_cursor(
     Extension(customer): Extension<Customer>,
     Json(req): Json<CommitRequest>,
 ) -> Result<Json<CommitResponse>, AppError> {
+    // RBAC: developer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     // Get the sequence number for this message
     let seq: i64 = sqlx::query_scalar(
         "SELECT COALESCE(sequence_num, 0) FROM deliveries WHERE id = $1 AND customer_id = $2",

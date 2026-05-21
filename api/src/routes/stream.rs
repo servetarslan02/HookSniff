@@ -154,6 +154,9 @@ async fn list_channels(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<StreamChannel>>, AppError> {
+    // RBAC: viewer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let channels = sqlx::query_as::<_, StreamChannel>(
         "SELECT id, customer_id, name, description, channel_type, event_filter, enabled, \
          max_subscribers, current_subscribers, total_messages, created_at, updated_at \
@@ -172,6 +175,8 @@ async fn create_channel(
     Extension(customer): Extension<Customer>,
     Json(req): Json<CreateChannelRequest>,
 ) -> Result<Json<StreamChannel>, AppError> {
+    // RBAC: developer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     let channel = sqlx::query_as::<_, StreamChannel>(
         "INSERT INTO stream_channels \
          (customer_id, name, description, channel_type, event_filter, max_subscribers, enabled) \
@@ -198,6 +203,9 @@ async fn get_channel(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<ChannelResponse>, AppError> {
+    // RBAC: viewer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let channel = sqlx::query_as::<_, StreamChannel>(
         "SELECT id, customer_id, name, description, channel_type, event_filter, enabled, \
          max_subscribers, current_subscribers, total_messages, created_at, updated_at \
@@ -230,6 +238,9 @@ async fn update_channel(
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateChannelRequest>,
 ) -> Result<Json<StreamChannel>, AppError> {
+    // RBAC: developer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
     let channel = sqlx::query_as::<_, StreamChannel>(
         "UPDATE stream_channels SET \
          name = COALESCE($3, name), \
@@ -262,6 +273,9 @@ async fn delete_channel(
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: admin or higher to delete channels
+    super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
+
     let result = sqlx::query("DELETE FROM stream_channels WHERE id = $1 AND customer_id = $2")
         .bind(id)
         .bind(customer.id)
@@ -276,12 +290,14 @@ async fn delete_channel(
 }
 
 /// SSE subscribe to a channel.
-async fn subscribe_channel(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
     Query(params): Query<StreamParams>,
 ) -> Result<Sse<impl Stream<Item = Result<Event, Infallible>>>, AppError> {
+    // RBAC: developer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
     // Verify channel exists and belongs to customer
     let channel = sqlx::query_as::<_, StreamChannel>(
         "SELECT id, customer_id, name, description, channel_type, event_filter, enabled, \
@@ -429,12 +445,14 @@ async fn subscribe_channel(
 }
 
 /// List recent messages for a channel.
-async fn list_messages(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
     Query(filter): Query<MessageFilter>,
 ) -> Result<Json<Vec<StreamMessage>>, AppError> {
+    // RBAC: viewer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     // Verify channel belongs to customer
     let exists: bool = sqlx::query_scalar(
         "SELECT EXISTS(SELECT 1 FROM stream_channels WHERE id = $1 AND customer_id = $2)",
@@ -477,10 +495,12 @@ async fn list_messages(
 }
 
 /// List active subscriptions.
-async fn list_subscriptions(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<StreamSubscription>>, AppError> {
+    // RBAC: viewer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let subs = sqlx::query_as::<_, StreamSubscription>(
         "SELECT s.id, s.channel_id, s.customer_id, s.connection_type, s.client_id, \
          s.event_filter, s.connected_at, s.last_heartbeat_at, s.messages_sent, s.metadata \
@@ -497,11 +517,13 @@ async fn list_subscriptions(
 }
 
 /// Get a specific subscription.
-async fn get_subscription(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<StreamSubscription>, AppError> {
+    // RBAC: viewer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+
     let sub = sqlx::query_as::<_, StreamSubscription>(
         "SELECT id, channel_id, customer_id, connection_type, client_id, event_filter, \
          connected_at, last_heartbeat_at, messages_sent, metadata \
@@ -517,11 +539,13 @@ async fn get_subscription(
 }
 
 /// Disconnect a subscription.
-async fn disconnect_subscription(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: developer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
     let sub = sqlx::query_as::<_, StreamSubscription>(
         "DELETE FROM stream_subscriptions \
          WHERE id = $1 AND customer_id = $2 \
@@ -546,82 +570,13 @@ async fn disconnect_subscription(
 }
 
 /// SSE delivery stream (legacy compatibility endpoint).
-async fn delivery_stream(
-    Extension(pool): Extension<PgPool>,
-    Extension(customer): Extension<Customer>,
-    Query(params): Query<StreamParams>,
-) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let customer_id = customer.id;
-
-    let stream = async_stream::stream! {
-        let mut tick = interval(Duration::from_secs(2));
-        let mut last_check = Utc::now();
-
-        if let Some(ref since) = params.since {
-            if since != "now" {
-                if let Ok(dt) = chrono::DateTime::parse_from_rfc3339(since) {
-                    last_check = dt.with_timezone(&Utc);
-                }
-            }
-        }
-
-        loop {
-            tick.tick().await;
-
-            let deliveries = sqlx::query_as::<_, DeliverySnapshot>(
-                "SELECT d.id, d.endpoint_id, d.event_type, d.status, d.attempt_count, \
-                 d.created_at, e.url as endpoint_url \
-                 FROM deliveries d \
-                 JOIN endpoints e ON d.endpoint_id = e.id \
-                 WHERE d.customer_id = $1 AND d.created_at > $2 \
-                 ORDER BY d.created_at DESC LIMIT 50",
-            )
-            .bind(customer_id)
-            .bind(last_check)
-            .fetch_all(&pool)
-            .await
-            .unwrap_or_default();
-
-            for d in deliveries {
-                let data = serde_json::json!({
-                    "id": d.id,
-                    "endpoint_id": d.endpoint_id,
-                    "event": d.event_type,
-                    "status": d.status,
-                    "attempts": d.attempt_count,
-                    "endpoint_url": d.endpoint_url,
-                    "created_at": d.created_at.to_rfc3339(),
-                });
-
-                let event = Event::default()
-                    .event("delivery")
-                    .data(serde_json::to_string(&data).unwrap_or_default());
-
-                yield Ok(event);
-            }
-
-            last_check = Utc::now();
-
-            let heartbeat = Event::default()
-                .event("heartbeat")
-                .data(Utc::now().to_rfc3339());
-            yield Ok(heartbeat);
-        }
-    };
-
-    Sse::new(stream).keep_alive(
-        axum::response::sse::KeepAlive::new()
-            .interval(Duration::from_secs(15))
-            .text("ping"),
-    )
-}
-
-/// Publish an event to a channel.
-async fn publish_event(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<PublishEventRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: developer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
     // Verify channel belongs to customer
     let channel = sqlx::query_as::<_, StreamChannel>(
         "SELECT id, customer_id, name, description, channel_type, event_filter, enabled, \
