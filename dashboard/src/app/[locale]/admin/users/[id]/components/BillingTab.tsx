@@ -2,7 +2,7 @@
 
 import { LazySection, Skeletons } from '@/components/LazySection';
 import type { BillingTabProps } from './types';
-import { CheckCircle2, Clock, CreditCard, DollarSign, FileText, Package, ShieldCheck, Trash2, XCircle } from '@/components/icons';
+import { CheckCircle2, Clock, CreditCard, DollarSign, FileText, Package, ShieldCheck, Trash2, XCircle, ClipboardList, ExternalLink } from '@/components/icons';
 
 export function BillingTab({
   detail,
@@ -65,6 +65,7 @@ export function BillingTab({
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("status") || "Status"}</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("provider") || "Provider"}</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400">{t("date") || "Date"}</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400">{t("actions") || "Actions"}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
@@ -81,6 +82,18 @@ export function BillingTab({
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{inv.provider}</td>
                     <td className="px-4 py-3 text-xs text-gray-500 dark:text-slate-400">{new Date(inv.created_at).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-right">
+                      {inv.provider_invoice_id && (
+                        <button
+                          type="button"
+                          onClick={() => { navigator.clipboard.writeText(inv.provider_invoice_id); }}
+                          className="text-xs text-gray-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 flex items-center gap-1 ml-auto"
+                          title={inv.provider_invoice_id}
+                        >
+                          <ClipboardList size={12} strokeWidth={1.75} /> {inv.provider_invoice_id.slice(-8)}
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
