@@ -18,18 +18,9 @@ pub async fn get_subscription(
         "active".to_string()
     };
 
-    // Calculate current_period_end: 1st of next month for paid plans
-    let current_period_end = if plan != Plan::Developer {
-        let now = chrono::Utc::now();
-        let next_month = if now.month() == 12 {
-            chrono::NaiveDate::from_ymd_opt(now.year() + 1, 1, 1)
-        } else {
-            chrono::NaiveDate::from_ymd_opt(now.year(), now.month() + 1, 1)
-        };
-        next_month.map(|d| d.and_hms_opt(0, 0, 0).expect("midnight is valid time").and_utc().to_rfc3339())
-    } else {
-        None
-    };
+    // Use current_period_end from DB (set by webhook), don't recalculate
+    let current_period_end = customer.current_period_end
+        .map(|d| d.to_rfc3339());
 
     Ok(Json(SubscriptionResponse {
         plan: plan.as_str().to_string(),
@@ -65,6 +56,7 @@ pub async fn get_subscription(
 
 pub async fn cancel_subscription(
     Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     if customer.plan == "developer" {
@@ -80,6 +72,15 @@ pub async fn cancel_subscription(
     .bind(customer.id)
     .execute(&pool)
     .await?;
+
+    // Notify payment provider to cancel at period end
+    let billing_svc = BillingService::new(pool.clone(), cfg.clone());
+    if let Err(e) = billing_svc.cancel_customer_subscription_at_period_end(&customer).await {
+        tracing::warn!(
+            "⚠️ Failed to set cancel_at_period_end at provider for customer {}: {:?}",
+            customer.id, e
+        );
+    }
 
     tracing::info!(
         "✅ Subscription cancellation requested for customer {} (plan: {})",
@@ -215,6 +216,15 @@ pub async fn pause_subscription(
         days,
         paused_until
     );
+
+    // Notify payment provider to cancel at period end
+    let billing_svc = BillingService::new(pool.clone(), cfg.clone());
+    if let Err(e) = billing_svc.cancel_customer_subscription_at_period_end(&customer).await {
+        tracing::warn!(
+            "⚠️ Failed to set cancel_at_period_end at provider for paused customer {}: {:?}",
+            customer.id, e
+        );
+    }
 
     Ok(Json(serde_json::json!({
         "message": format!("Your subscription will be paused at the end of the current billing period. You can resume anytime before {}.", paused_until.format("%d.%m.%Y")),

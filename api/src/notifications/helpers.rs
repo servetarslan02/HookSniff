@@ -402,6 +402,22 @@ pub async fn limit_exceeded(pool: &PgPool, customer_id: Uuid, current: i64, limi
     create(pool, customer_id, "alert", title, &message, Some("/billing-section")).await;
 }
 
+/// Notify customer about payment failure (first attempt — grace period).
+pub async fn payment_failed_warning(pool: &PgPool, customer_id: Uuid, provider: &str) {
+    let lang = get_customer_lang(pool, customer_id).await;
+    let (title, message) = match lang {
+        Lang::Tr => (
+            "⚠️ Ödeme Başarısız",
+            format!("{} üzerinden ödemeniz başarısız oldu. Lütfen ödeme yönteminizi 3 gün içinde güncelleyin, aksi takdirde planınız Ücretsiz'e düşürülecektir.", provider),
+        ),
+        Lang::En => (
+            "⚠️ Payment Failed",
+            format!("Your payment via {} failed. Please update your payment method within 3 days, or your plan will be downgraded to Free.", provider),
+        ),
+    };
+    create(pool, customer_id, "billing", title, &message, Some("/billing")).await;
+}
+
 /// Notify customer that their refund was processed.
 pub async fn refund_processed(pool: &PgPool, customer_id: Uuid, amount_cents: i64) {
     let lang = get_customer_lang(pool, customer_id).await;
