@@ -153,7 +153,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   hoverDelay={80}
                   prefetchData={prefetchForRoute(item.href)}
-                  className="flex items-center px-3 py-2 text-sm font-semibold rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
+                  className="flex items-center px-3 py-2 text-[15px] font-semibold rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
                   onClick={() => setSidebarOpen(false)}
                 >
                   <span className="mr-2.5 flex-shrink-0 inline-flex items-center">{item.icon}</span>
