@@ -14,10 +14,10 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; labelKey: strin
 };
 
 const RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
-  { value: '24h', label: '24s' },
-  { value: '7d', label: '7g' },
-  { value: '30d', label: '30g' },
-  { value: '90d', label: '90g' },
+  { value: '24h', label: '24h' },
+  { value: '7d', label: '7d' },
+  { value: '30d', label: '30d' },
+  { value: '90d', label: '90d' },
 ];
 
 export default function EndpointHealthPage() {
