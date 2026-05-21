@@ -81,7 +81,7 @@ export function UserTable({
                       className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
                     />
                   </th>
-                  <th scope="col" className="px-3 py-3 hidden xl:table-cell">
+                  <th scope="col" className="px-3 py-3">
                     <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('id')}</span>
                   </th>
                   <th scope="col">
@@ -89,7 +89,7 @@ export function UserTable({
                       {tc('email')} {sortField === 'email' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
                   </th>
-                  <th scope="col" className="hidden sm:table-cell">
+                  <th scope="col">
                     <button type="button" onClick={() => handleSort('name')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByName')}>
                       {tc('name')} {sortField === 'name' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
@@ -99,12 +99,12 @@ export function UserTable({
                       {tc('plan')} {sortField === 'plan' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
                   </th>
-                  <th scope="col" className="hidden lg:table-cell">
+                  <th scope="col">
                     <button type="button" onClick={() => handleSort('status')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByStatus')}>
                       {tc('status')} {sortField === 'status' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
                   </th>
-                  <th scope="col" className="hidden xl:table-cell">
+                  <th scope="col">
                     <button type="button" onClick={() => handleSort('created_at')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByCreated')}>
                       {tc('created')} {sortField === 'created_at' && (sortDir === 'asc' ? '↑' : '↓')}
                     </button>
@@ -124,7 +124,7 @@ export function UserTable({
                         className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
                       />
                     </td>
-                    <td className="px-3 py-3 sm:py-4 text-xs font-mono text-gray-600 dark:text-slate-400 hidden xl:table-cell">
+                    <td className="px-3 py-3 sm:py-4 text-xs font-mono text-gray-600 dark:text-slate-400">
                       {u.id.slice(0, 8)}…
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -135,7 +135,7 @@ export function UserTable({
                         <span className="text-xs sm:text-sm text-gray-900 dark:text-white truncate max-w-[150px] sm:max-w-none">{u.email}</span>
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden sm:table-cell">{u.name || '—'}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400">{u.name || '—'}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex items-center gap-1 sm:gap-1.5">
                         <span className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${planBadgeColors[u.plan] || planBadgeColors.developer}`}>
@@ -148,10 +148,10 @@ export function UserTable({
                         )}
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
                         <StatusBadge status={u.status} />
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 hidden xl:table-cell">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400">
                       {new Date(u.created_at).toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
