@@ -45,8 +45,8 @@ export function PlanCards({
 
   const plans = planOrder.map((key) => {
     const apiPlan = getPlan(key);
-    const priceMonthly = apiPlan?.price_monthly ?? (key === 'developer' ? 0 : key === 'startup' ? 29 : key === 'pro' ? 49 : 0);
-    const priceYearly = apiPlan?.price_yearly ?? (key === 'developer' ? 0 : key === 'startup' ? 278 : key === 'pro' ? 470 : 0);
+    const priceMonthly = apiPlan?.price_monthly ?? (key === 'developer' ? 0 : key === 'startup' ? 29 : key === 'pro' ? 49 : key === 'enterprise' ? 149 : 0);
+    const priceYearly = apiPlan?.price_yearly ?? (key === 'developer' ? 0 : key === 'startup' ? 278 : key === 'pro' ? 470 : key === 'enterprise' ? 1430 : 0);
     const limits = apiPlan ? {
       endpoints: apiPlan.max_endpoints,
       webhooks: apiPlan.max_webhooks,
@@ -168,8 +168,22 @@ export function PlanCards({
               <div className="mt-2 mb-4">
                 {plan.isEnterprise ? (
                   <>
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">{t('customPricing') || 'Custom'}</span>
-                    <span className="text-gray-500 dark:text-slate-400 text-sm">{t('contactSales') || 'Contact Sales'}</span>
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                      ${plan.price}
+                    </span>
+                    <span className="text-gray-500 dark:text-slate-400 text-sm">
+                      {isAnnual ? t('billedAnnually') : t('monthly')}
+                    </span>
+                    {isAnnual && (
+                      <div className="mt-1">
+                        <span className="text-xs text-gray-400 dark:text-slate-500 line-through">
+                          ${plan.monthlyPrice}
+                        </span>
+                        <span className="ml-1.5 text-xs font-medium text-green-600 dark:text-green-400">
+                          {t('savePercent')}
+                        </span>
+                      </div>
+                    )}
                   </>
                 ) : plan.key === 'developer' ? (
                   <>
