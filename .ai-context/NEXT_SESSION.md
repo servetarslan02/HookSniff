@@ -1,14 +1,18 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-22 01:30 GMT+8 (Session 6 — Sitemap Fix)
+> Son güncelleme: 2026-05-22 01:35 GMT+8 (Session 6 — Sitemap + Dunning/Pause Test)
 
-## ✅ Bu Oturumda Yapılan İşler (Session 6 — Sitemap Fix)
+## ✅ Bu Oturumda Yapılan İşler (Session 6)
 
 ### Google Search Console Sitemap Düzeltmesi
 - İki hatalı sitemap silindi: `/blog/sitemap` (HTML hatası) ve `/sitemap.xml` (Getirilemedi)
 - `/sitemap.xml` temiz olarak tekrar gönderildi
 - Googlebot erişimi doğrulandı (200 OK, application/xml)
-- 1-2 saat içinde Google'ın tekrar çekmesi bekleniyor
+
+### Dunning + Pause/Resume Test — 3 Kritik Bug Düzeltildi
+1. **Resume INTERNAL_ERROR** → checkout() kaldırıldı, DB'de plan restore ediliyor
+2. **activate_paused_subscriptions çalışmıyor** → `paused_at IS NULL` koşulu kaldırıldı
+3. **Yıllık dunning email gönderilemiyor** → CHECK constraint 1-7 → 1-30
 
 ### Session 5 — RBAC Enforcement (önceki oturum)
 
@@ -25,7 +29,9 @@
 ## 📋 Sonraki Adımlar
 
 ### Kısa Vadeli (1-2 oturum)
-1. **Blog içerikleri yaz** — SEO için en kritik. Hedef anahtar kelimeler:
+0. **⚠️ Migration 072 canlı DB'ye uygulanmalı** — CHECK constraint fix (days_remaining 1-7 → 1-30)
+1. **Resume + activate_paused_subscriptions deploy edilmeli** — 3 bug fix commit
+2. **Blog içerikleri yaz** — SEO için en kritik. Hedef anahtar kelimeler:
    - "webhooks explained" / "what is a webhook"
    - "webhook vs api" / "webhook vs polling"
    - "free webhook service 2026"
