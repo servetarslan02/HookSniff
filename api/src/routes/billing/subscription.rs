@@ -59,9 +59,21 @@ pub async fn cancel_subscription(
     Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    if customer.plan == "developer" {
+    if customer.plan == "free" || customer.plan == "developer" {
         return Err(AppError::BadRequest(
             "You are already on the free plan".into(),
+        ));
+    }
+
+    if customer.cancel_at_period_end {
+        return Err(AppError::BadRequest(
+            "Your subscription is already scheduled for cancellation.".into(),
+        ));
+    }
+
+    if customer.paused_at.is_some() {
+        return Err(AppError::BadRequest(
+            "Your subscription is paused. Use /billing/resume first, then cancel if needed.".into(),
         ));
     }
 
@@ -141,6 +153,13 @@ pub async fn pause_subscription(
     if customer.paused_at.is_some() {
         return Err(AppError::BadRequest(
             "Subscription is already paused. Use /billing/resume to continue.".into(),
+        ));
+    }
+
+    // Validate: can't pause if already scheduled for cancellation
+    if customer.cancel_at_period_end {
+        return Err(AppError::BadRequest(
+            "Subscription is scheduled for cancellation. Cancel the cancellation first, then pause.".into(),
         ));
     }
 
@@ -261,7 +280,7 @@ pub async fn resume_subscription(
             sqlx::query(
                 "UPDATE customers SET \
                  paused_at = NULL, paused_until = NULL, pause_plan = NULL, \
-                 plan = 'developer', webhook_limit = $1, updated_at = NOW() \
+                 plan = 'free', webhook_limit = $1, updated_at = NOW() \
                  WHERE id = $2",
             )
             .bind(Plan::Developer.max_webhooks_per_day() as i64)
@@ -488,11 +507,31 @@ pub async fn upgrade_plan(
                 }
             }
 
-            // Check max redemptions
-            if let Some(max) = coupon.max_redemptions {
-                if coupon.redemption_count >= max {
-                    return Err(AppError::BadRequest("This coupon has reached its maximum usage".into()));
-                }
+            // Atomically check max redemptions and increment count
+            // If max_redemptions is set and already reached, this returns 0 rows
+            let updated_rows: i64 = if let Some(max) = coupon.max_redemptions {
+                sqlx::query_scalar(
+                    "UPDATE coupon_codes SET redemption_count = redemption_count + 1, updated_at = NOW() \
+                     WHERE id = $1 AND (max_redemptions IS NULL OR redemption_count < max_redemptions) \
+                     RETURNING 1"
+                )
+                .bind(coupon.id)
+                .fetch_optional(&pool)
+                .await?
+                .unwrap_or(0)
+            } else {
+                // No limit — just increment
+                sqlx::query_scalar(
+                    "UPDATE coupon_codes SET redemption_count = redemption_count + 1, updated_at = NOW() \
+                     WHERE id = $1 RETURNING 1"
+                )
+                .bind(coupon.id)
+                .fetch_one(&pool)
+                .await?
+            };
+
+            if updated_rows == 0 {
+                return Err(AppError::BadRequest("This coupon has reached its maximum usage".into()));
             }
 
             // Check if already used by this customer
@@ -535,14 +574,6 @@ pub async fn upgrade_plan(
             )
             .bind(coupon.id)
             .bind(customer.id)
-            .execute(&pool)
-            .await?;
-
-            // Increment redemption count
-            sqlx::query(
-                "UPDATE coupon_codes SET redemption_count = redemption_count + 1, updated_at = NOW() WHERE id = $1"
-            )
-            .bind(coupon.id)
             .execute(&pool)
             .await?;
 

@@ -156,7 +156,7 @@ pub async fn activate_paused_subscriptions(pool: &PgPool) -> Result<u64> {
     let result = sqlx::query(
         "UPDATE customers SET \
          paused_at = NOW(), \
-         plan = 'developer', \
+         plan = 'free', \
          webhook_limit = $1, \
          cancel_at_period_end = false, \
          updated_at = NOW() \
@@ -208,7 +208,7 @@ pub async fn expire_paused_subscriptions(pool: &PgPool) -> Result<u64> {
          paused_at = NULL, \
          paused_until = NULL, \
          pause_plan = NULL, \
-         plan = 'developer', \
+         plan = 'free', \
          webhook_limit = $1, \
          updated_at = NOW() \
          WHERE paused_at IS NOT NULL \

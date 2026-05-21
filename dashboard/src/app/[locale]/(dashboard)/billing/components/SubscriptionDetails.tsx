@@ -96,7 +96,10 @@ export function SubscriptionDetails({ onCancel, onPause, onResume, onRefundReque
   const provider = PROVIDER_LABELS[sub.payment_provider] || { name: sub.payment_provider, icon: <DollarSign size={16} strokeWidth={1.75} /> };
   const statusStyle = STATUS_STYLES[sub.status] || STATUS_STYLES.inactive;
   const isFree = sub.plan === 'developer' || sub.plan === 'free';
-  const priceDisplay = isFree ? '$0' : `$${(sub.monthly_price_cents / 100).toFixed(0)}`;
+  const isIyzico = sub.payment_provider === 'iyzico';
+  const priceDisplay = isFree ? '$0' : isIyzico && sub.monthly_price_kurus
+    ? `₺${(sub.monthly_price_kurus / 100).toFixed(0)}`
+    : `$${(sub.monthly_price_cents / 100).toFixed(0)}`;
   const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
 
   return (
@@ -230,7 +233,7 @@ export function SubscriptionDetails({ onCancel, onPause, onResume, onRefundReque
               {periodEnd.toLocaleDateString()}
             </p>
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-              {t('billingPeriod')}: {t(sub.billing_period === 'annual' ? 'periodAnnual' : 'periodMonthly')}
+              {t('billingPeriod')}: {t(sub.billing_period === 'annual' || sub.billing_period === 'year' ? 'periodAnnual' : 'periodMonthly')}
             </p>
           </div>
         )}

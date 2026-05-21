@@ -126,6 +126,9 @@ pub async fn admin_refund_user(
     sqlx::query(
         "UPDATE customers SET \
          plan = 'free', webhook_limit = $1, \
+         paused_at = NULL, paused_until = NULL, pause_plan = NULL, \
+         card_last4 = NULL, card_brand = NULL, card_exp_month = NULL, card_exp_year = NULL, \
+         billing_interval = NULL, 
          stripe_subscription_id = NULL, polar_subscription_id = NULL, iyzico_subscription_id = NULL, \
          cancel_at_period_end = false, payment_failed_at = NULL, \
          updated_at = NOW() \
