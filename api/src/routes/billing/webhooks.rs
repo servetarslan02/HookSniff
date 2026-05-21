@@ -83,7 +83,11 @@ pub async fn handle_iyzico_webhook(
     body: String,
 ) -> Result<StatusCode, AppError> {
     check_billing_webhook_rate_limit(&rate_limiter, &headers).await?;
-    check_webhook_idempotency(&pool, &body, "iyzico").await?;
+
+    // Return 200 for duplicate events (iyzico may disable webhook on errors)
+    if check_webhook_idempotency(&pool, &body, "iyzico").await.is_err() {
+        return Ok(StatusCode::OK);
+    }
 
     let config = crate::billing::iyzico::IyzicoConfig::from_env()
         .ok_or_else(|| AppError::Internal(anyhow::anyhow!("iyzico not configured")))?;
@@ -277,16 +281,11 @@ async fn process_webhook_result(
         } => {
             let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
             if let Some(sub_col) = provider_sub_col(provider) {
-                // POL-06: Also clear polar_customer_id on cancellation
-                let cust_col = match provider {
-                    "polar" => ", polar_customer_id = NULL",
-                    "iyzico" => ", iyzico_customer_id = NULL",
-                    _ => "",
-                };
+                // Only clear subscription_id, NOT customer_id (needed for re-subscribe & portal)
                 let query = format!(
                     "UPDATE customers SET plan = 'free', {} = NULL, webhook_limit = $2, \
-                     cancel_at_period_end = false, updated_at = NOW(){} WHERE {} = $1",
-                    sub_col, cust_col, sub_col
+                     cancel_at_period_end = false, updated_at = NOW() WHERE {} = $1",
+                    sub_col, sub_col
                 );
                 sqlx::query(&query).bind(provider_subscription_id).bind(free_limit)
                     .execute(pool).await?;
