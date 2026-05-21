@@ -147,7 +147,7 @@ pub async fn retry_failed_payments(_pool: &PgPool) -> Result<u64> {
 /// - pause_plan IS NOT NULL (pause was scheduled)
 /// - current_period_end < NOW() (period has ended)
 ///
-/// These customers are moved to "paused" state.
+/// These customers are moved to "paused" state (free plan, limits reduced).
 pub async fn activate_paused_subscriptions(pool: &PgPool) -> Result<u64> {
     tracing::info!("⏸️ Checking for subscriptions to pause...");
 
@@ -155,7 +155,6 @@ pub async fn activate_paused_subscriptions(pool: &PgPool) -> Result<u64> {
 
     let result = sqlx::query(
         "UPDATE customers SET \
-         paused_at = NOW(), \
          plan = 'free', \
          webhook_limit = $1, \
          cancel_at_period_end = false, \
@@ -163,7 +162,7 @@ pub async fn activate_paused_subscriptions(pool: &PgPool) -> Result<u64> {
          WHERE cancel_at_period_end = true \
          AND pause_plan IS NOT NULL \
          AND current_period_end < NOW() \
-         AND paused_at IS NULL"
+         AND plan != 'free'"
     )
     .bind(free_limit)
     .execute(pool)

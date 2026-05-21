@@ -259,11 +259,15 @@ pub async fn pause_subscription(
 
 /// POST /v1/billing/resume — Resume a paused subscription.
 ///
-/// Creates a new checkout at the payment provider to re-activate the subscription.
-/// The customer's previous plan is restored.
+/// Clears the pause state and restores the customer's previous plan.
+/// If the pause period hasn't expired yet, the customer keeps access
+/// under the restored plan. The payment provider subscription remains
+/// canceled at period end — the customer will need to re-subscribe
+/// when the current billing period ends.
+///
+/// If the pause period HAS expired, the customer is downgraded to free.
 pub async fn resume_subscription(
     Extension(pool): Extension<PgPool>,
-    Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Validate: must be paused
@@ -273,14 +277,15 @@ pub async fn resume_subscription(
         ));
     }
 
-    // Check if pause has expired (auto-downgrade)
+    // Check if pause has expired (auto-downgrade to free)
     if let Some(paused_until) = customer.paused_until {
         if Utc::now() > paused_until {
             // Pause expired — downgrade to free
             sqlx::query(
                 "UPDATE customers SET \
                  paused_at = NULL, paused_until = NULL, pause_plan = NULL, \
-                 plan = 'free', webhook_limit = $1, updated_at = NOW() \
+                 plan = 'free', webhook_limit = $1, cancel_at_period_end = false, \
+                 updated_at = NOW() \
                  WHERE id = $2",
             )
             .bind(Plan::Developer.max_webhooks_per_day() as i64)
@@ -301,19 +306,21 @@ pub async fn resume_subscription(
         .map(Plan::parse_str)
         .unwrap_or(Plan::Startup);
 
-    // Create a new checkout to resume
-    let billing_svc = BillingService::new(pool.clone(), cfg.clone());
-    let result = billing_svc
-        .checkout(&customer, &resume_plan, None, false, None)
-        .await?;
+    // Restore plan and clear pause state — customer keeps access until current period ends
+    let plan_limit = resume_plan.max_webhooks_per_day() as i64;
+    let endpoint_limit = resume_plan.max_endpoints() as i64;
 
-    // Clear pause state
     sqlx::query(
         "UPDATE customers SET \
          paused_at = NULL, paused_until = NULL, pause_plan = NULL, \
+         plan = $1, webhook_limit = $2, endpoint_limit = $3, \
+         cancel_at_period_end = false, \
          updated_at = NOW() \
-         WHERE id = $1",
+         WHERE id = $4",
     )
+    .bind(resume_plan.as_str())
+    .bind(plan_limit)
+    .bind(endpoint_limit)
     .bind(customer.id)
     .execute(&pool)
     .await?;
@@ -347,7 +354,7 @@ pub async fn resume_subscription(
             "billing",
             "▶️ Abonelik Devam Ediyor",
             &format!(
-                "{} plan aboneliğiniz devam ediyor. Ödeme sayfasına yönlendiriliyorsunuz.",
+                "{} plan aboneliğiniz yeniden aktif edildi. Dönem sonuna kadar hizmeti kullanmaya devam edebilirsiniz.",
                 plan_name
             ),
             Some("/billing"),
@@ -356,15 +363,15 @@ pub async fn resume_subscription(
     });
 
     tracing::info!(
-        "▶️ Customer {} resuming {} plan",
+        "▶️ Customer {} resumed {} plan (pause cleared)",
         customer.id,
         resume_plan.as_str()
     );
 
     Ok(Json(serde_json::json!({
-        "message": "Redirecting to checkout to resume your subscription.",
-        "checkout_url": result.checkout_url,
+        "message": format!("Your {} plan subscription has been restored. You can continue using the service until the end of your current billing period.", resume_plan.as_str()),
         "plan": resume_plan.as_str(),
+        "status": "active",
     })))
 }
 
