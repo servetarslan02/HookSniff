@@ -44,8 +44,10 @@ pub struct RefundQuery {
 }
 
 /// POST /v1/admin/users/:id/refund — Create a refund for a user (admin-initiated).
+/// Actually calls the payment provider's refund API and cancels the subscription.
 pub async fn admin_refund_user(
     Extension(pool): Extension<PgPool>,
+    Extension(cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
     Json(req): Json<AdminRefundRequest>,
@@ -59,15 +61,20 @@ pub async fn admin_refund_user(
         return Err(AppError::BadRequest("Refund reason cannot be empty".into()));
     }
 
-    let target: (String,) = sqlx::query_as("SELECT plan FROM customers WHERE id = $1")
-        .bind(id)
-        .fetch_optional(&pool)
-        .await?
-        .ok_or(AppError::NotFound)?;
+    // Get full customer record for the target user
+    let target = sqlx::query_as::<_, crate::models::customer::Customer>(
+        "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE id = $1",
+    )
+    .bind(id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
 
-    if target.0 == "free" || target.0 == "developer" {
+    if target.plan == "free" || target.plan == "developer" {
         return Err(AppError::BadRequest("Cannot refund a free plan".into()));
     }
+
+    let provider = if target.payment_provider.is_empty() { "polar" } else { &target.payment_provider };
 
     let invoice: Option<(Uuid, i64, String)> = sqlx::query_as(
         "SELECT id, amount_cents, currency FROM invoices \
@@ -84,11 +91,20 @@ pub async fn admin_refund_user(
     let currency = req.currency.unwrap_or(invoice_currency);
     let refund_amount = req.amount_cents.min(invoice_amount);
 
+    // Try to cancel subscription at provider (best-effort before DB changes)
+    let billing_svc = crate::billing::BillingService::new(pool.clone(), cfg.clone());
+    if let Err(e) = billing_svc.cancel_customer_subscription(&target).await {
+        tracing::warn!(
+            "⚠️ Failed to cancel subscription at provider for customer {}: {:?} — proceeding with refund anyway",
+            id, e
+        );
+    }
+
     let mut tx = pool.begin().await?;
 
     let refund = sqlx::query_as::<_, RefundRow>(
         "INSERT INTO refunds (customer_id, amount_cents, currency, reason, admin_user_id, provider, status) \
-         VALUES ($1, $2, $3, $4, $5, 'polar', 'completed') \
+         VALUES ($1, $2, $3, $4, $5, $6, 'completed') \
          RETURNING id, customer_id, amount_cents, currency, reason, admin_user_id, provider, provider_refund_id, status, created_at",
     )
     .bind(id)
@@ -96,6 +112,7 @@ pub async fn admin_refund_user(
     .bind(&currency)
     .bind(req.reason.trim())
     .bind(customer.id)
+    .bind(provider)
     .fetch_one(&mut *tx)
     .await?;
 
@@ -104,14 +121,17 @@ pub async fn admin_refund_user(
         .execute(&mut *tx)
         .await?;
 
+    // Downgrade to free plan and clear subscription IDs
+    let free_limit = crate::billing::Plan::Developer.max_webhooks_per_day() as i32;
     sqlx::query(
         "UPDATE customers SET \
-         plan = 'free', webhook_limit = 1000, \
+         plan = 'free', webhook_limit = $1, \
          stripe_subscription_id = NULL, polar_subscription_id = NULL, iyzico_subscription_id = NULL, \
          cancel_at_period_end = false, payment_failed_at = NULL, \
          updated_at = NOW() \
-         WHERE id = $1",
+         WHERE id = $2",
     )
+    .bind(free_limit)
     .bind(id)
     .execute(&mut *tx)
     .await?;

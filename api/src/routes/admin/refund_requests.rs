@@ -200,10 +200,19 @@ pub async fn admin_approve_refund(
     .execute(&mut *tx)
     .await?;
 
-    // Create refund record
+    // Create refund record with correct provider
+    let provider_name = sqlx::query_scalar::<_, String>(
+        "SELECT payment_provider FROM customers WHERE id = $1",
+    )
+    .bind(customer_id)
+    .fetch_one(&mut *tx)
+    .await
+    .unwrap_or_else(|_| "polar".to_string());
+    let provider = if provider_name.is_empty() { "polar" } else { &provider_name };
+
     let refund = sqlx::query(
         "INSERT INTO refunds (customer_id, amount_cents, currency, reason, admin_user_id, provider, status) \
-         VALUES ($1, $2, $3, $4, $5, 'polar', 'completed') \
+         VALUES ($1, $2, $3, $4, $5, $6, 'completed') \
          RETURNING id",
     )
     .bind(customer_id)
@@ -211,6 +220,7 @@ pub async fn admin_approve_refund(
     .bind(&request.currency)
     .bind(&reason)
     .bind(admin.id)
+    .bind(provider)
     .fetch_one(&mut *tx)
     .await?;
 
