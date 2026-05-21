@@ -53,7 +53,7 @@ export default function PortalPage() {
   if (error) {
     return (
       <div className="max-w-4xl">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('title')}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('title')}</h1>
         <div className="p-5 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-500/20 flex items-center justify-center">

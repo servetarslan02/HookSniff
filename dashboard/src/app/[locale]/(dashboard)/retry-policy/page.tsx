@@ -90,14 +90,14 @@ export default function RetryPolicyPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
-        <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Quick explanation */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {BACKOFF_OPTIONS.map((s) => (
           <div key={s.value} className="glass-card p-4 text-center">
             <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center justify-center gap-1.5"><span className="text-2xl flex-shrink-0">{s.icon}</span>{t(s.value) || s.value}</div>
