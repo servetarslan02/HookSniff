@@ -8,6 +8,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
+use crate::error::ErrorCode;
 use crate::models::customer::Customer;
 
 use super::{require_admin, require_admin_write};
@@ -364,7 +365,7 @@ pub async fn block_ip(
 
     // Validate IP format (basic check)
     if req.ip_address.trim().is_empty() || req.ip_address.len() > 45 {
-        return Err(AppError::BadRequest("Invalid IP address".into()));
+        return Err(AppError::coded(ErrorCode::InvalidIpAddress));
     }
 
     let expires_at = req.expires_hours.map(|h| {

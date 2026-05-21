@@ -7,6 +7,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::auth::jwt;
+use crate::error::ErrorCode;
 use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -367,7 +368,7 @@ pub async fn send_user_email(
     }
 
     if req.subject.trim().is_empty() {
-        return Err(AppError::BadRequest("Email subject cannot be empty".into()));
+        return Err(AppError::coded(ErrorCode::EmailSubjectRequired));
     }
     if req.subject.len() > 500 {
         return Err(AppError::BadRequest(
@@ -487,7 +488,7 @@ pub async fn impersonate_user(
     require_admin_write(&customer)?;
 
     if id == customer.id {
-        return Err(AppError::BadRequest("Cannot impersonate yourself".into()));
+        return Err(AppError::coded(ErrorCode::CannotImpersonateSelf));
     }
 
     let target = sqlx::query_as::<_, (Uuid, String, String, bool)>(
