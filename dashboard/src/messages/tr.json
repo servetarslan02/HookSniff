@@ -1731,7 +1731,8 @@
       "alerts": "Uyarılar",
       "email": "E-posta",
       "broadcasts": "Duyurular",
-      "security": "Güvenlik"
+      "security": "Güvenlik",
+      "userPanel": "Kullanıcı Paneli"
     },
     "noActivity": "Henüz aktivite kaydı yok",
     "noAdminPrivileges": "Yönetici yetkiniz yok.",
