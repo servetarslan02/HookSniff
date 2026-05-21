@@ -178,12 +178,12 @@ export default function AdminRevenuePage() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Header — always visible immediately */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("revenueTitle")}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('revenueDesc')}</p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
           <label htmlFor="date-range" className="sr-only">{t('dateRange')}</label>
           <select id="date-range" value={dateRange} onChange={(e) => setDateRange(e.target.value as DateRange)} aria-label={t('dateRange')}
             className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm">
@@ -200,7 +200,7 @@ export default function AdminRevenuePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         <StatCard label={t('mrr')} value={`$${(revenue?.mrr || 0).toLocaleString()}`} icon={<span className="text-lg" aria-hidden="true"><DollarSign size={18} strokeWidth={1.75} /></span>} color="violet"
           trend={revenue?.mrr_trend != null && revenue.mrr_trend !== 0 ? { value: Math.abs(revenue.mrr_trend), label: t('vsLastMonth') || 'vs last month', direction: revenue.mrr_trend > 0 ? 'up' : 'down' } : undefined} />
         <StatCard label={t('totalRevenueLabel')} value={`$${(revenue?.monthly_revenue?.reduce((sum, m) => sum + m.revenue, 0) || 0).toLocaleString()}`} icon={<span className="text-lg" aria-hidden="true"><TrendingUp size={18} strokeWidth={1.75} /></span>} color="emerald" />

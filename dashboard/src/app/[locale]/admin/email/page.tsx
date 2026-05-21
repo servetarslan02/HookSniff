@@ -174,7 +174,7 @@ export default function AdminEmailPage() {
   return (
     <div className="space-y-4 sm:space-y-6 max-w-3xl">
       {/* ── Header + Mode Toggle ── */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             {mode === 'email' ? <><Mail size={24} strokeWidth={1.75} className="inline mr-1" />{t('bulkEmail') || 'Toplu E-posta'}</> : <><Megaphone size={24} strokeWidth={1.75} className="inline mr-1" />{t('broadcasts') || 'Bildirim'}</>}
@@ -183,11 +183,11 @@ export default function AdminEmailPage() {
             {mode === 'email' ? (t('bulkEmailDesc') || 'Kullanıcılara toplu e-posta gönder.') : (t('broadcastsDesc') || 'Tüm kullanıcılara global bildirim gönder. Çan ikonunda ve banner olarak gösterilir.')}
           </p>
         </div>
-        <div className="flex bg-gray-100 dark:bg-slate-800 rounded-xl p-1 shrink-0">
-          <button onClick={() => setMode('email')} className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${mode === 'email' ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}>
+        <div className="flex bg-gray-100 dark:bg-slate-800 rounded-xl p-1 shrink-0 w-fit">
+          <button onClick={() => setMode('email')} className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${mode === 'email' ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}>
             <Mail size={14} strokeWidth={1.75} className="inline mr-1.5" />E-posta
           </button>
-          <button onClick={() => setMode('broadcast')} className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${mode === 'broadcast' ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}>
+          <button onClick={() => setMode('broadcast')} className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${mode === 'broadcast' ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}>
             <Megaphone size={14} strokeWidth={1.75} className="inline mr-1.5" />Bildirim
           </button>
         </div>
