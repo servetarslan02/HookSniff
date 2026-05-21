@@ -79,5 +79,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
+  // RSS Feed
+  entries.push({
+    url: `${BASE_URL}/feed.xml`,
+    lastModified: new Date(),
+    changeFrequency: 'daily',
+    priority: 0.6,
+  });
+
   return entries;
 }
