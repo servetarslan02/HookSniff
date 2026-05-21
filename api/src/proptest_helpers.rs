@@ -336,6 +336,14 @@ proptest! {
             updated_at: Utc::now(),
             error_message: None,
             is_test: false,
+            custom_headers: None,
+            event: None,
+            processed_at: None,
+            idempotency_key: None,
+            source_ip: None,
+            request_headers: None,
+            application_id: None,
+            payload_hash: None,
         };
 
         let json = serde_json::to_string(&d).unwrap();

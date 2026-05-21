@@ -7,6 +7,7 @@ use sqlx::FromRow;
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
