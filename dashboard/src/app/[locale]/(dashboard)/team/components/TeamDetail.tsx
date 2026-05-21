@@ -3,24 +3,26 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Team, TeamMember } from '@/lib/api';
-import { AlertTriangle, Check, ClipboardList, Clock, Eye, Link2, Pencil, Shield, User, X } from '@/components/icons';
+import { AlertTriangle, BarChart3, Check, ClipboardList, Clock, Eye, Link2, Pencil, Shield, User, X } from '@/components/icons';
 
-const ROLE_OPTIONS = ['admin', 'editor', 'viewer'] as const;
+const ROLE_OPTIONS = ['admin', 'developer', 'analyst', 'viewer'] as const;
 
 const ROLE_STYLES: Record<string, React.ReactNode> = {
   admin: 'bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400',
-  editor: 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400',
+  developer: 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400',
+  analyst: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400',
   viewer: 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-slate-400',
 };
 
 const ROLE_ICONS: Record<string, React.ReactNode> = {
   admin: <Shield size={16} strokeWidth={1.75} />,
-  editor: <Pencil size={16} strokeWidth={1.75} />,
+  developer: <Pencil size={16} strokeWidth={1.75} />,
+  analyst: <BarChart3 size={16} strokeWidth={1.75} />,
   viewer: <Eye size={16} strokeWidth={1.75} />,
 };
 
 function roleLabel(t: ReturnType<typeof useTranslations>, role: string): string {
-  const map: Record<string, string> = { admin: t('roleAdmin'), editor: t('roleEditor'), viewer: t('roleViewer') };
+  const map: Record<string, string> = { admin: t('roleAdmin'), developer: t('roleDeveloper'), analyst: t('roleAnalyst'), viewer: t('roleViewer') };
   return map[role] || role;
 }
 
@@ -93,7 +95,8 @@ export function TeamDetail({
   const [dismissedInvite, setDismissedInvite] = useState(false);
 
   const adminCount = members.filter((m) => m.role === 'admin').length;
-  const editorCount = members.filter((m) => m.role === 'editor').length;
+  const developerCount = members.filter((m) => m.role === 'developer').length;
+  const analystCount = members.filter((m) => m.role === 'analyst').length;
   const viewerCount = members.filter((m) => m.role === 'viewer').length;
 
   return (
@@ -229,9 +232,14 @@ export function TeamDetail({
                   <Shield size={16} strokeWidth={1.75} className="inline mr-1" /> {adminCount} admin{adminCount > 1 ? 's' : ''}
                 </span>
               )}
-              {editorCount > 0 && (
+              {developerCount > 0 && (
                 <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400">
-                  <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {editorCount} editor{editorCount > 1 ? 's' : ''}
+                  <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {developerCount} developer{developerCount > 1 ? 's' : ''}
+                </span>
+              )}
+              {analystCount > 0 && (
+                <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
+                  <BarChart3 size={16} strokeWidth={1.75} className="inline mr-1" /> {analystCount} analyst{analystCount > 1 ? 's' : ''}
                 </span>
               )}
               {viewerCount > 0 && (
@@ -290,7 +298,8 @@ export function TeamDetail({
                     </p>
                     <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
                       m.role === 'admin' ? 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-500/15' :
-                      m.role === 'editor' ? 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/15' :
+                      m.role === 'developer' ? 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/15' :
+                      m.role === 'analyst' ? 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-500/15' :
                       'text-gray-500 bg-gray-100 dark:text-slate-400 dark:bg-slate-700'
                     }`}>
                       {ROLE_ICONS[m.role]} {roleLabel(t, m.role)}
@@ -383,7 +392,8 @@ export function TeamDetail({
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
                         inv.role === 'admin' ? 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-500/15' :
-                        inv.role === 'editor' ? 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/15' :
+                        inv.role === 'developer' ? 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/15' :
+                        inv.role === 'analyst' ? 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-500/15' :
                         'text-gray-500 bg-gray-100 dark:text-slate-400 dark:bg-slate-700'
                       }`}>
                         {ROLE_ICONS[inv.role] || <Eye size={16} strokeWidth={1.75} />} {inv.role}

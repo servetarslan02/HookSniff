@@ -2,18 +2,19 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Eye, Pencil, Shield } from '@/components/icons';
+import { BarChart3, Eye, Pencil, Shield } from '@/components/icons';
 
-const ROLE_OPTIONS = ['admin', 'editor', 'viewer'] as const;
+const ROLE_OPTIONS = ['admin', 'developer', 'analyst', 'viewer'] as const;
 
 const ROLE_META: Record<string, { icon: React.ReactNode; desc: string; style: string }> = {
-  admin: { icon: <Shield size={16} strokeWidth={1.75} />, desc: 'Full access to manage team and settings', style: 'border-purple-200 dark:border-purple-500/30 bg-purple-50/50 dark:bg-purple-500/5' },
-  editor: { icon: <Pencil size={16} strokeWidth={1.75} />, desc: 'Can create and edit resources', style: 'border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5' },
-  viewer: { icon: <Eye size={16} strokeWidth={1.75} />, desc: 'Read-only access to view resources', style: 'border-gray-200 dark:border-slate-600 bg-gray-50/50 dark:bg-slate-700/30' },
+  admin: { icon: <Shield size={16} strokeWidth={1.75} />, desc: 'Full access — team settings, billing, member management', style: 'border-purple-200 dark:border-purple-500/30 bg-purple-50/50 dark:bg-purple-500/5' },
+  developer: { icon: <Pencil size={16} strokeWidth={1.75} />, desc: 'Manage endpoints, webhooks, API keys, routing, retries', style: 'border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5' },
+  analyst: { icon: <BarChart3 size={16} strokeWidth={1.75} />, desc: 'View dashboards, analytics, delivery logs — read only', style: 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-500/5' },
+  viewer: { icon: <Eye size={16} strokeWidth={1.75} />, desc: 'Minimal read-only access', style: 'border-gray-200 dark:border-slate-600 bg-gray-50/50 dark:bg-slate-700/30' },
 };
 
 function roleLabel(t: ReturnType<typeof useTranslations>, role: string): string {
-  const map: Record<string, string> = { admin: t('roleAdmin'), editor: t('roleEditor'), viewer: t('roleViewer') };
+  const map: Record<string, string> = { admin: t('roleAdmin'), developer: t('roleDeveloper'), analyst: t('roleAnalyst'), viewer: t('roleViewer') };
   return map[role] || role;
 }
 
