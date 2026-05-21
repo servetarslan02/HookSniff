@@ -165,9 +165,17 @@ async fn process_webhook_result(
             provider_subscription_id,
             interval,
             event_id,
+            cancel_at_period_end,
+            current_period_end,
         } => {
             let webhook_limit = plan.max_webhooks_per_day() as i64;
-            let period_interval = if interval == "year" { "365 days" } else { "30 days" };
+            // Use Polar's current_period_end if available, otherwise calculate
+            let period_end_expr = if let Some(ref pe) = current_period_end {
+                format!("'{}'::timestamptz", pe)
+            } else {
+                let period_interval = if interval == "year" { "365 days" } else { "30 days" };
+                format!("NOW() + INTERVAL '{}'", period_interval)
+            };
             if let Some((cust_col, sub_col)) = provider_columns(provider) {
                 // Mark startup trial as used when customer subscribes to Startup plan
                 let trial_flag = if *plan == Plan::Startup {
@@ -179,16 +187,18 @@ async fn process_webhook_result(
                     "UPDATE customers SET plan = $1, payment_provider = $2, \
                      {} = $3, {} = $4, webhook_limit = $5, \
                      payment_failed_at = NULL, \
-                     current_period_end = NOW() + INTERVAL '{}', \
+                     current_period_end = {}, \
                      billing_interval = $7, \
+                     cancel_at_period_end = $8, \
                      updated_at = NOW(){} WHERE id = $6",
-                    cust_col, sub_col, period_interval, trial_flag
+                    cust_col, sub_col, period_end_expr, trial_flag
                 );
                 sqlx::query(&query)
                     .bind(plan.as_str()).bind(provider)
                     .bind(provider_customer_id).bind(provider_subscription_id)
                     .bind(webhook_limit).bind(customer_id)
                     .bind(&interval)
+                    .bind(cancel_at_period_end)
                     .execute(pool).await?;
             } else {
                 return Ok(());
@@ -238,20 +248,31 @@ async fn process_webhook_result(
             status,
             interval,
             event_id,
+            cancel_at_period_end,
+            current_period_end,
         } => {
             let webhook_limit = plan.max_webhooks_per_day() as i64;
-            let period_interval = if interval == "year" { "365 days" } else { "30 days" };
+            // Use Polar's current_period_end if available, otherwise calculate
+            let period_end_expr = if let Some(ref pe) = current_period_end {
+                format!("'{}'::timestamptz", pe)
+            } else {
+                let period_interval = if interval == "year" { "365 days" } else { "30 days" };
+                format!("NOW() + INTERVAL '{}'", period_interval)
+            };
             if let Some(sub_col) = provider_sub_col(provider) {
                 let query = format!(
                     "UPDATE customers SET plan = $1, webhook_limit = $2, \
                      payment_failed_at = NULL, \
-                     current_period_end = NOW() + INTERVAL '{}', \
+                     current_period_end = {}, \
                      billing_interval = $4, \
+                     cancel_at_period_end = $5, \
                      updated_at = NOW() WHERE {} = $3",
-                    period_interval, sub_col
+                    period_end_expr, sub_col
                 );
                 sqlx::query(&query).bind(plan.as_str()).bind(webhook_limit)
-                    .bind(provider_subscription_id).bind(&interval).execute(pool).await?;
+                    .bind(provider_subscription_id).bind(&interval)
+                    .bind(cancel_at_period_end)
+                    .execute(pool).await?;
             } else {
                 return Ok(());
             }
@@ -423,7 +444,10 @@ async fn process_webhook_result(
             customer_id,
         } => {
             if let Some(cid) = customer_id {
-                // Check if already in grace period (first failure)
+                // Mark payment failure — but do NOT downgrade yet!
+                // Polar has its own retry schedule (4 retries over 21 days).
+                // If all retries fail, Polar will send subscription.canceled.
+                // If a retry succeeds, Polar will send subscription.updated (active).
                 let existing_failure: Option<chrono::DateTime<chrono::Utc>> = sqlx::query_scalar(
                     "SELECT payment_failed_at FROM customers WHERE id = $1"
                 )
@@ -432,38 +456,11 @@ async fn process_webhook_result(
                 .await?
                 .flatten();
 
-                if existing_failure.is_some() {
-                    // Second failure — downgrade immediately
-                    let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
-                    sqlx::query(
-                        "UPDATE customers SET plan = 'developer', webhook_limit = $1, \
-                         payment_failed_at = NOW(), payment_grace_until = NULL, \
-                         cancel_at_period_end = false, updated_at = NOW() WHERE id = $2",
-                    )
-                    .bind(free_limit)
-                    .bind(cid)
-                    .execute(pool)
-                    .await?;
-
-                    cleanup_excess_endpoints(pool, *cid, &Plan::Developer).await?;
-
-                    let pool_clone = pool.clone();
-                    let cid_owned = *cid;
-                    let provider_clone = provider.to_string();
-                    tokio::spawn(async move {
-                        crate::notifications::helpers::payment_failed(&pool_clone, cid_owned, &provider_clone).await;
-                    });
-
-                    tracing::warn!(
-                        "⚠️ {} payment failed AGAIN: {} — customer {} downgraded to free (grace period expired)",
-                        provider, provider_tx_id, cid
-                    );
-                } else {
-                    // First failure — enter grace period (3 days to fix payment)
+                if existing_failure.is_none() {
+                    // First failure — mark it, Polar will handle retries
                     sqlx::query(
                         "UPDATE customers SET \
                          payment_failed_at = NOW(), \
-                         payment_grace_until = NOW() + INTERVAL '3 days', \
                          updated_at = NOW() WHERE id = $1",
                     )
                     .bind(cid)
@@ -479,7 +476,12 @@ async fn process_webhook_result(
                     });
 
                     tracing::warn!(
-                        "⚠️ {} payment failed: {} — customer {} entered 3-day grace period",
+                        "⚠️ {} payment failed: {} — customer {} marked (Polar will retry)",
+                        provider, provider_tx_id, cid
+                    );
+                } else {
+                    tracing::info!(
+                        "⚠️ {} payment failed again: {} — customer {} (Polar retry in progress)",
                         provider, provider_tx_id, cid
                     );
                 }
