@@ -30,7 +30,7 @@ export default function AuthCallbackPage() {
 
   // Check if token is passed in URL (from OAuth callback)
   const token = params.get('token');
-  const refresh = params.get('refresh');
+  // Note: 'refresh' param is not needed — backend sets HttpOnly cookies
 
   if (token) {
    // NOTE: The backend already set HttpOnly auth cookies before redirecting.

@@ -118,8 +118,6 @@ export default function BillingPage() {
     setShowUpgradeModal(planKey);
   };
 
-  const planOrder = ['developer', 'startup', 'pro', 'enterprise'];
-
   const confirmUpgrade = async () => {
     if (!showUpgradeModal || !token) return;
 

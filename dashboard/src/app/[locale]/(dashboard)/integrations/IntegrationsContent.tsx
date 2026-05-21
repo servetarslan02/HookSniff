@@ -237,8 +237,8 @@ export default function IntegrationsContent() {
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm">
                   <option value="">{t('selectEndpoint')}</option>
                   {endpoints
-                    .filter((ep: { url: string }) => ep.url.startsWith('http') && !ep.url.includes('#'))
-                    .map((ep: { id: string; url: string; description?: string }) => {
+                    .filter((ep) => ep.url.startsWith('http') && !ep.url.includes('#'))
+                    .map((ep) => {
                     const label = ep.description ? `${ep.description} (${ep.url})` : ep.url;
                     return <option key={ep.id} value={ep.id}>{label}</option>;
                   })}
