@@ -3071,6 +3071,19 @@ async fn scim_create_user(
         &std::collections::HashMap::new(),
     ).await;
 
+    // Auto-join to team if SSO config has a team
+    let sso_team: Option<(Option<Uuid>, Option<String>)> = sqlx::query_as(
+        "SELECT team_id, default_role FROM sso_configs WHERE id = $1"
+    )
+    .bind(config_id)
+    .fetch_optional(&pool)
+    .await?;
+
+    if let Some((Some(team_id), role_opt)) = sso_team {
+        let role = role_opt.unwrap_or_else(|| "viewer".to_string());
+        let _ = auto_join_team_direct(&pool, customer.id, team_id, &role).await;
+    }
+
     // Log
     let _ = crate::audit::log_action(&pool, customer.id, "SCIM_CREATE_USER", "user",
         Some(&customer.id.to_string()),
@@ -3309,13 +3322,28 @@ async fn scim_list_groups(
 ) -> Result<Json<serde_json::Value>, AppError> {
     let config_id = validate_scim_token(&pool, &headers).await?;
 
-    // Get teams associated with this SSO config
-    let teams: Vec<(Uuid, String)> = sqlx::query_as(
-        "SELECT t.id, t.name FROM teams t INNER JOIN sso_configs s ON s.team_id = t.id WHERE s.id = $1"
+    // Get the SSO config owner to find all their teams
+    let owner_id: Option<(Uuid,)> = sqlx::query_as(
+        "SELECT COALESCE(customer_id, created_by) FROM sso_configs WHERE id = $1"
     )
     .bind(config_id)
-    .fetch_all(&pool)
+    .fetch_optional(&pool)
     .await?;
+
+    let teams: Vec<(Uuid, String)> = if let Some((oid)) = owner_id {
+        // Return all teams where the owner is a member or owner
+        sqlx::query_as(
+            "SELECT DISTINCT t.id, t.name FROM teams t
+             LEFT JOIN team_members tm ON tm.team_id = t.id
+             WHERE t.owner_id = $1 OR tm.customer_id = $1
+             ORDER BY t.name"
+        )
+        .bind(oid)
+        .fetch_all(&pool)
+        .await?
+    } else {
+        vec![]
+    };
 
     let resources: Vec<serde_json::Value> = teams
         .iter()
