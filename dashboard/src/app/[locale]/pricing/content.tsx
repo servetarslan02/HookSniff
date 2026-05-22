@@ -16,9 +16,9 @@ function RoiCalculator() {
   const [events, setEvents] = useState(10000);
   const t = useTranslations('pricing');
 
-  const svixCost = events <= 0 ? 0 : 490;
-  const hookdeckCost = events <= 10000 ? 0 : 39 + Math.max(0, Math.ceil((events - 10000) / 100000)) * 1;
-  const hooksniffCost = events <= 1000 ? 0 : events <= 30000 ? 24 : events <= 100000 ? 49 : 149 + Math.max(0, Math.ceil((events - 100000) / 1000)) * 0.0001;
+  const svixCost = events <= 0 ? 0 : events <= 10000 ? 0 : events <= 50000 ? 99 : events <= 100000 ? 249 : 499;
+  const hookdeckCost = events <= 10000 ? 0 : events <= 100000 ? 49 : 99;
+  const hooksniffCost = events <= 1000 ? 0 : events <= 30000 ? 29 : events <= 100000 ? 49 : 149;
   const savingsVsSvix = svixCost - hooksniffCost;
   const savingsPercent = svixCost > 0 ? Math.round((savingsVsSvix / svixCost) * 100) : 0;
 
@@ -90,10 +90,10 @@ export function PricingPageContent() {
   const t = useTranslations('pricing');
   const tf = useTranslations('pricingFaq');
 
-  const monthlyPrices = { developer: 0, startup: 24, pro: 49, enterprise: 149 };
+  const monthlyPrices = { developer: 0, startup: 29, pro: 49, enterprise: 149 };
   const annualPrices = {
     developer: 0,
-    startup: Math.round(24 * 12 * 0.8),
+    startup: Math.round(29 * 12 * 0.8),
     pro: Math.round(49 * 12 * 0.8),
     enterprise: Math.round(149 * 12 * 0.8),
   };
@@ -147,9 +147,9 @@ export function PricingPageContent() {
     {
       category: t('delivery'),
       items: [
-        { feature: t('deliveryMethods'), developer: t('http'), startup: `${t('http')}, WebSocket`, pro: `${t('http')}, WebSocket`, enterprise: `${t('http')}, WebSocket` },
-        { feature: t('retryAttempts'), developer: '3', startup: '5', pro: '10', enterprise: t('custom') },
-        { feature: t('customRetryPolicies'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
+        { feature: t('deliveryMethods'), developer: `${t('http')}, WebSocket`, startup: `${t('http')}, WebSocket`, pro: `${t('http')}, WebSocket`, enterprise: `${t('http')}, WebSocket` },
+        { feature: t('retryAttempts'), developer: '3', startup: '3', pro: '3', enterprise: t('custom') },
+        { feature: t('customRetryPolicies'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('fifoDelivery'), developer: '—', startup: '—', pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('exponentialBackoff'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('dlq'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
@@ -170,7 +170,7 @@ export function PricingPageContent() {
       category: t('monitoringLogs'),
       items: [
         { feature: t('dashboard'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
-        { feature: t('logRetention'), developer: `7 ${t('days')}`, startup: `14 ${t('days')}`, pro: `180 ${t('days')}`, enterprise: t('custom') },
+        { feature: t('logRetention'), developer: `7 ${t('days')}`, startup: `14 ${t('days')}`, pro: `180 ${t('days')}`, enterprise: `365 ${t('days')}` },
         { feature: t('realtimeLogs'), developer : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('analyticsGraphs'), developer: '—', startup : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
         { feature: t('schemaRegistry'), developer: '—', startup: '—', pro : <CheckCircle size={16} className="text-emerald-500 mx-auto" />, enterprise : <CheckCircle size={16} className="text-emerald-500 mx-auto" /> },
@@ -407,6 +407,7 @@ export function PricingPageContent() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {[
               { plan: t('developer'), level: t('communitySupport'), features: t.raw('supportDeveloperFeatures') as string[], response: t('supportBestEffort'), highlight: false },
+              { plan: t('startup'), level: t('emailSupport'), features: t.raw('supportProFeatures') as string[], response: t('supportResponse48h'), highlight: false },
               { plan: t('pro'), level: t('prioritySupport'), features: t.raw('supportProFeatures') as string[], response: t('supportResponse48h'), highlight: true },
               { plan: t('enterprise'), level: t('dedicatedManager'), features: t.raw('supportEnterpriseFeatures') as string[], response: t('supportResponse24h'), highlight: false },
             ].map((s) => (
