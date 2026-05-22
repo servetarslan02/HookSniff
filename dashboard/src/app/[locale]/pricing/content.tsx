@@ -100,13 +100,22 @@ export function PricingPageContent() {
 
   const getPrice = (plan: string) => {
     if (plan === 'developer') return '$0';
-    if (plan === 'enterprise') return '$149';
     const prices = billingPeriod === 'annual' ? annualPrices : monthlyPrices;
     const val = prices[plan as keyof typeof prices];
     return `$${val}`;
   };
 
-  const getPeriodLabel = () => billingPeriod === 'annual' ? t('billedAnnually') : t('month');
+  const getPeriodLabel = (plan: string) => {
+    if (plan === 'enterprise' && billingPeriod === 'annual') return t('billedAnnually');
+    return billingPeriod === 'annual' ? t('billedAnnually') : t('month');
+  };
+
+  const getMonthlyEquiv = (plan: string) => {
+    if (billingPeriod !== 'annual' || plan === 'developer') return null;
+    const annual = annualPrices[plan as keyof typeof annualPrices];
+    const monthly = Math.round(annual / 12);
+    return `$${monthly}/${t('month')}`;
+  };
 
   const planData = [
     { key: 'developer', ctaStyle: 'outline-solid', popular: false },
@@ -231,6 +240,10 @@ export function PricingPageContent() {
               </span>
             </button>
           </div>
+          {/* Always-visible discount hint */}
+          <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+            💡 {t('savePercent', { percent: 20 })} {t('annual') || 'yıllık'} {t('billedAnnually') || 'ödeme ile'}
+          </p>
         </div>
 
         {/* Plan Cards */}
@@ -263,11 +276,11 @@ export function PricingPageContent() {
                 <p className="text-sm text-gray-500 dark:text-slate-400 mt-1 leading-relaxed min-h-[2.5rem]">{t(`${plan.key}Desc`)}</p>
                 <div className="mt-4 flex items-baseline gap-1 min-h-[3.5rem]">
                   <span className="text-5xl font-extrabold text-gray-900 dark:text-white">{getPrice(plan.key)}</span>
-                  <span className="text-gray-500 dark:text-slate-500 text-sm font-medium">{getPeriodLabel()}</span>
+                  <span className="text-gray-500 dark:text-slate-500 text-sm font-medium">{getPeriodLabel(plan.key)}</span>
                 </div>
-                {billingPeriod === 'annual' && plan.key !== 'developer' && plan.key !== 'enterprise' && (
+                {billingPeriod === 'annual' && plan.key !== 'developer' && (
                   <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-medium min-h-[1rem]">
-                    {t('billedAnnually')}
+                    ≈ {getMonthlyEquiv(plan.key)} {t('billedAnnually')}
                   </p>
                 )}
               </div>
