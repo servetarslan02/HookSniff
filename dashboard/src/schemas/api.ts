@@ -606,6 +606,9 @@ export const SsoConfigSchema = z.object({
   default_team_id: z.string().uuid().nullable().optional(),
   default_role: z.string().optional(),
   default_team_name: z.string().nullable().optional(),
+  role_mapping: z.record(z.string(), z.string()).nullable().optional(),
+  team_mapping: z.record(z.string(), z.string()).nullable().optional(),
+  scim_enabled: z.boolean().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 });
