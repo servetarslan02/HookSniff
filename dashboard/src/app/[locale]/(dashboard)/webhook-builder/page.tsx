@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
 import { AlertTriangle, Check, ClipboardList, Eye, FileText, Rocket, Trash2, X, Zap } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 /* ─── Webhook Builder — Visual webhook creator ─── */
 interface WebhookField {
@@ -142,6 +143,7 @@ export default function WebhookBuilderPage() {
           <p className="text-gray-500 dark:text-slate-400 mt-1">
             {t('subtitle')}
           </p>
+          <ReadOnlyBadge />
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-400 dark:text-slate-500">
@@ -280,13 +282,15 @@ export default function WebhookBuilderPage() {
                 ))}
               </select>
             )}
-            <button type="button"
-              onClick={handleSend}
-              disabled={createWebhook.isPending || !endpointId}
-              className="w-full px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
-            >
-              {createWebhook.isPending ? t('sending') : t('sendWebhook')}
-            </button>
+            <RoleGuard require="canManageWebhooks">
+              <button type="button"
+                onClick={handleSend}
+                disabled={createWebhook.isPending || !endpointId}
+                className="w-full px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
+              >
+                {createWebhook.isPending ? t('sending') : t('sendWebhook')}
+              </button>
+            </RoleGuard>
           </div>
         </div>
 
