@@ -214,9 +214,6 @@ pub struct UserSummary {
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
-fn default_role_summary() -> String {
-    "member".to_string()
-}
 
 fn serialize_status<S: serde::Serializer>(is_active: &bool, s: S) -> Result<S::Ok, S::Error> {
     if *is_active {

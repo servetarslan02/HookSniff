@@ -18,6 +18,7 @@ pub fn router() -> Router {
 #[derive(Debug, sqlx::FromRow)]
 struct DeviceTokenRow {
     id: Uuid,
+    #[allow(dead_code)]
     customer_id: Uuid,
     token: String,
     platform: String,
