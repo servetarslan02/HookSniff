@@ -595,10 +595,12 @@ async fn refresh_token(
     let token_hash = jwt::hash_token(&refresh_token_value);
     // HS-039: Accept refresh token even if recently revoked (grace period for multi-tab).
     // Without this, two tabs refreshing simultaneously would cause one to get logged out.
+    // BUG FIX: Grace period increased to 5 minutes for multi-tab support.
+    // Without this, two tabs refreshing simultaneously would cause one to get logged out.
     let record: Option<(Uuid, Uuid, chrono::DateTime<Utc>)> = sqlx::query_as(
         "SELECT id, customer_id, expires_at FROM refresh_tokens \
          WHERE token_hash = $1 AND expires_at > NOW() \
-         AND (revoked = false OR revoked_at > NOW() - INTERVAL '60 seconds')",
+         AND (revoked = false OR revoked_at > NOW() - INTERVAL '5 minutes')",
     )
     .bind(&token_hash).fetch_optional(&pool).await?;
 

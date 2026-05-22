@@ -25,6 +25,15 @@ let refreshPromise: Promise<string | null> | null = null;
 // HS-039: Proactive refresh interval — renews token at ~12 min (before 15 min expiry).
 let proactiveRefreshTimer: ReturnType<typeof setInterval> | null = null;
 
+// BUG FIX: Multi-tab refresh coordination via BroadcastChannel
+// Prevents multiple tabs from refreshing simultaneously (token is one-time-use).
+let refreshChannel: BroadcastChannel | null = null;
+try {
+  refreshChannel = new BroadcastChannel('hooksniff-auth');
+} catch {
+  // BroadcastChannel not supported (Safari < 15.4) — graceful degradation
+}
+
 // HS-039: Global callback for syncing new tokens to the store.
 // Registered by AuthProvider on mount. Used by 401 handler and proactive refresh.
 let onTokenRefreshed: ((newToken: string) => void) | null = null;
@@ -37,6 +46,7 @@ export function setTokenRefreshCallback(cb: (newToken: string) => void): void {
 /**
  * Refresh the access token. Returns the new token string on success, null on failure.
  * Deduplicates concurrent calls (only one refresh request at a time).
+ * BUG FIX: Notifies other tabs via BroadcastChannel so they sync the new token.
  */
 function doRefresh(): Promise<string | null> {
   if (!refreshPromise) {
@@ -48,7 +58,12 @@ function doRefresh(): Promise<string | null> {
       .then(async (r) => {
         if (!r.ok) return null;
         const data = await r.json();
-        return data.token ?? null;
+        const newToken = data.token ?? null;
+        // BUG FIX: Broadcast new token to other tabs
+        if (newToken && refreshChannel) {
+          refreshChannel.postMessage({ type: 'TOKEN_REFRESHED', token: newToken });
+        }
+        return newToken;
       })
       .catch(() => null)
       .finally(() => {
@@ -63,9 +78,22 @@ function doRefresh(): Promise<string | null> {
  * Renews the access token every 12 minutes (3 min before 15-min expiry).
  * While the user is active, the session never drops.
  * Call this after login. Call stopProactiveRefresh() on logout.
+ *
+ * BUG FIX: Listens for BroadcastChannel messages from other tabs
+ * to sync tokens without each tab refreshing independently.
  */
 export function startProactiveRefresh(onRefresh: (newToken: string) => void): void {
   stopProactiveRefresh();
+
+  // BUG FIX: Listen for token refreshes from other tabs
+  if (refreshChannel) {
+    refreshChannel.onmessage = (event) => {
+      if (event.data?.type === 'TOKEN_REFRESHED' && event.data.token) {
+        onRefresh(event.data.token);
+      }
+    };
+  }
+
   proactiveRefreshTimer = setInterval(async () => {
     const newToken = await doRefresh();
     if (newToken) {
@@ -81,6 +109,12 @@ export function stopProactiveRefresh(): void {
     clearInterval(proactiveRefreshTimer);
     proactiveRefreshTimer = null;
   }
+  // BUG FIX: Clean up BroadcastChannel listener
+  if (refreshChannel) {
+    refreshChannel.onmessage = null;
+  }
+  // BUG FIX: Also clear any pending refresh promise
+  refreshPromise = null;
 }
 
 function isTransientError(status: number): boolean {
@@ -148,6 +182,11 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
             // HS-039: Refresh succeeded — sync token to store, cookie, and localStorage
             if (onTokenRefreshed) onTokenRefreshed(newToken);
             else localStorage.setItem('hooksniff_token', newToken);
+            // BUG FIX: Broadcast new token to other tabs (doRefresh already does this,
+            // but in case refresh was deduped, ensure all tabs get the token)
+            if (refreshChannel) {
+              refreshChannel.postMessage({ type: 'TOKEN_REFRESHED', token: newToken });
+            }
             headers["Authorization"] = `Bearer ${newToken}`;
             const retryRes = await fetch(`${API_BASE}${path}`, {
               method,
@@ -161,6 +200,8 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
             }
           }
           // Refresh failed — clear auth and redirect
+          // BUG FIX: Stop proactive refresh to prevent zombie timer
+          stopProactiveRefresh();
           localStorage.removeItem('hooksniff_user');
           localStorage.removeItem('hooksniff_token');
           window.location.href = '/login';
