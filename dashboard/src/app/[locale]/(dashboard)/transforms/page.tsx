@@ -7,6 +7,7 @@ import { useEndpoints, useTransformRules, useCreateTransformRule, useDeleteTrans
 import type { TransformRuleValidated } from '@/schemas/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { FlaskConical, Pencil, X } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 export default function TransformsPage() {
  const t = useTranslations('transforms');
@@ -149,10 +150,13 @@ export default function TransformsPage() {
     <div>
      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
      <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+     <ReadOnlyBadge />
     </div>
-    <button type="button" onClick={() => { setShowCreate(!showCreate); setEditTarget(null); resetForm(); }} className="bg-brand-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-     {t('newRule')}
-    </button>
+    <RoleGuard require="canManageRouting">
+      <button type="button" onClick={() => { setShowCreate(!showCreate); setEditTarget(null); resetForm(); }} className="bg-brand-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+       {t('newRule')}
+      </button>
+    </RoleGuard>
    </div>
 
    {/* Endpoint selector */}
@@ -250,8 +254,10 @@ export default function TransformsPage() {
         </div>
         <div className="flex items-center gap-1 ml-4">
          <button type="button" onClick={() => openTest(rule.id)} title={t('test')} className="text-gray-500 dark:text-slate-400 hover:text-blue-600 transition p-2"><FlaskConical size={18} strokeWidth={1.75} /></button>
-         <button type="button" onClick={() => handleEdit(rule)} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-2"><Pencil size={18} strokeWidth={1.75} /></button>
-         <button type="button" onClick={() => handleDelete(rule.id)} aria-label={t('deleteTransform')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-2"><X size={18} strokeWidth={1.75} /></button>
+         <RoleGuard require="canManageRouting">
+           <button type="button" onClick={() => handleEdit(rule)} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-2"><Pencil size={18} strokeWidth={1.75} /></button>
+           <button type="button" onClick={() => handleDelete(rule.id)} aria-label={t('deleteTransform')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-2"><X size={18} strokeWidth={1.75} /></button>
+         </RoleGuard>
         </div>
        </div>
       </div>
