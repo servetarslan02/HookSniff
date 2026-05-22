@@ -225,9 +225,13 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
                 onClick={() => setProfileOpen(!profileOpen)}
                 className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition"
               >
-                <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
-                  {(user?.name?.charAt(0) || user?.email?.charAt(0) || '?').toUpperCase()}
-                </div>
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt={user.name || user.email} className="w-8 h-8 rounded-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                    {(user?.name?.charAt(0) || user?.email?.charAt(0) || '?').toUpperCase()}
+                  </div>
+                )}
               </button>
 
               {profileOpen && (
