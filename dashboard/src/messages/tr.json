@@ -2597,7 +2597,7 @@
     "noCreditCard": "Kredi kartı yok",
     "fiveMinSetup": "5 dk kurulum",
     "step1Title": "Hesabınızı oluşturun",
-    "step1Desc": "Ücretsiz kaydolun — kredi kartı gerekmez. Ücretsiz planda ayda 1.000 webhook teslimatı alırsınız.",
+    "step1Desc": "Ücretsiz kaydolun — kredi kartı gerekmez. Ücretsiz planda günde 1.000 event alırsınız.",
     "createFreeAccount": "Ücretsiz Hesap Oluştur",
     "signedInAs": "Giriş yapıldı",
     "step2Title": "API anahtarınızı alın",
