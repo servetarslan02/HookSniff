@@ -1139,3 +1139,25 @@ git config user.email servetarslan02@gmail.com
 git config user.name servetarslan02
 ```
 ai@hooksniff.dev KULLANMA — Vercel BLOCKED deploy yapıyor.
+
+## 📝 Son Oturum (2026-05-22 16:28–16:55 — Build Fix)
+
+### Özet
+Servet ile oturum. GCloud Cloud Build'de 5/5 build FAILURE tespit edildi. Local compile ile 47 Rust + 21 TypeScript hatası bulundu ve hepsi düzeltildi.
+
+### Yapılan İşler:
+1. **GCloud Build API** — SA key ile son build'ler çekildi, `build-api` step'inde exit code 101
+2. **47 Rust hatası düzeltildi**:
+   - AppError::Forbidden/Conflict parametre kaldırma (23 site)
+   - quick-xml 0.37 QName API migrasyonu
+   - configured_cert borrow fix
+   - overage_invoicing dereference
+   - chrono::Datelike import
+   - stream.rs fonksiyon isimleri + publish_event handler
+3. **21 TypeScript hatası düzeltildi**:
+   - i18next → local type
+   - PortalConfigResponse/Invoice type fixes
+   - Unused imports/variables cleanup
+4. **Push**: `f76161f8` → main
+
+### Değişen Dosyalar: 37 dosya, +293/-89 satır
