@@ -6,6 +6,7 @@ import { useToast } from '@/components/Toast';
 import { useRateLimits, useSetRateLimit, useDeleteRateLimit } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { BarChart3, Bell, Pencil, RefreshCw, Trash2, Zap } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 export default function RateLimitingPage() {
   const t = useTranslations('rateLimiting');
@@ -79,6 +80,7 @@ export default function RateLimitingPage() {
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+        <ReadOnlyBadge />
       </div>
 
       {stats && (
@@ -105,10 +107,12 @@ export default function RateLimitingPage() {
       {/* Add Rate Limit */}
       {!stats && (
         <div className="flex justify-end">
-          <button type="button" onClick={() => setEditTarget('__new__')}
-            className="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-            {t('addRateLimit') || 'Add Rate Limit'}
-          </button>
+          <RoleGuard require="canManageRateLimits">
+            <button type="button" onClick={() => setEditTarget('__new__')}
+              className="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+              {t('addRateLimit') || 'Add Rate Limit'}
+            </button>
+          </RoleGuard>
         </div>
       )}
 
@@ -143,14 +147,16 @@ export default function RateLimitingPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button type="button" onClick={() => handleEdit(limit.endpoint_id)}
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium">
-                          <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('editLimit')}
-                        </button>
-                        <button type="button" onClick={() => setDeleteTarget(limit.endpoint_id)}
-                          className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 font-medium">
-                          <Trash2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('deleteLimit')}
-                        </button>
+                        <RoleGuard require="canManageRateLimits">
+                          <button type="button" onClick={() => handleEdit(limit.endpoint_id)}
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium">
+                            <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('editLimit')}
+                          </button>
+                          <button type="button" onClick={() => setDeleteTarget(limit.endpoint_id)}
+                            className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 font-medium">
+                            <Trash2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('deleteLimit')}
+                          </button>
+                        </RoleGuard>
                       </div>
                     </td>
                   </tr>
