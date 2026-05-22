@@ -250,7 +250,7 @@ function placeFinders(m: (boolean | null)[][], r: boolean[][], size: number) {
   placeFinder(3, size - 4);
 }
 
-function placeAlignment(m: (boolean | null)[][], r: boolean[][], version: number, size: number) {
+function placeAlignment(m: (boolean | null)[][], r: boolean[][], version: number, _size: number) {
   if (version < 2) return;
   const positions = ALIGN_PATTERNS[version];
   for (const py of positions) {
@@ -383,13 +383,8 @@ function placeFormatInfo(m: boolean[][], mask: number, size: number) {
 }
 
 function placeVersionInfo(m: boolean[][], version: number, size: number) {
-  let bits = version;
-  for (let i = 0; i < 6; i++) {
-    const rem = bits % 3;
-    bits = Math.floor(bits / 3);
-    // Actually we need the full 18-bit version info with BCH error correction
-    // For simplicity, use precomputed values for v7-10
-  }
+  // Version info uses BCH(18,6) error correction
+  // For simplicity, use precomputed values for v7-10
   // Precomputed version info strings (18 bits, EC Level doesn't matter for version info)
   const versionInfo: Record<number, number> = {
     7: 0x07C94, 8: 0x085BC, 9: 0x09A99, 10: 0x0A4D3,

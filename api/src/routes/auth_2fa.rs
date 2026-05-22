@@ -10,8 +10,7 @@ use crate::error::ErrorCode;
 use crate::config::Config;
 use crate::error::AppError;
 use crate::models::customer::{
-    AuthResponse, Confirm2faRequest, Customer, Disable2faRequest,
-    TwoFactorRequiredResponse, Verify2faRequest,
+    AuthResponse, Confirm2faRequest, Customer, Disable2faRequest, Verify2faRequest,
 };
 use crate::routes::auth::{auth_response_with_cookie, extract_client_ip, send_audit_log};
 

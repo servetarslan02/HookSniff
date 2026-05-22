@@ -67,8 +67,8 @@ struct UpdateProfileRequest {
 }
 
 async fn update_profile(
-    Extension(pool): Extension<PgPool>,
-    Extension(mut customer): Extension<Customer>,
+    Extension(_pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
     Json(req): Json<UpdateProfileRequest>,
 ) -> Result<Json<ProfileResponse>, AppError> {
     if let Some(email) = &req.email {

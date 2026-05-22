@@ -132,7 +132,7 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
         if let Some(ext_id) = polar_id {
             if let Some(cfg) = crate::billing::polar::PolarConfig::from_env() {
                 let provider = crate::billing::polar::PolarProvider::new(cfg);
-                match provider.ingest_overage_event(&ext_id, total_overage).await {
+                match provider.ingest_overage_event(&ext_id, *total_overage).await {
                     Ok(()) => tracing::info!("📊 Overage event sent to Polar for {}", email),
                     Err(e) => tracing::warn!("⚠️ Failed to send overage event to Polar for {}: {}", email, e),
                 }

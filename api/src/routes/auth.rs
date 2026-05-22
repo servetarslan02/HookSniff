@@ -226,7 +226,7 @@ async fn register(
     );
     let to = req.email.clone();
     let name = req.name.clone();
-    let ep = email_provider.clone();
+    let _ep = email_provider.clone();
     send_email_with_fallback(job_queue.as_ref(), &email_provider, &to,
         crate::jobs::job_queue::EmailTemplate::Welcome { name: name.clone() }, lang,
         move |ep, to, lang| {
@@ -900,7 +900,7 @@ struct ConfirmEmailChangeRequest {
 
 async fn request_email_change(
     Extension(pool): Extension<PgPool>,
-    Extension(cfg): Extension<Config>,
+    Extension(_cfg): Extension<Config>,
     Extension(customer): Extension<Customer>,
     Extension(email_provider): Extension<crate::email::EmailProvider>,
     Extension(job_queue): Extension<Option<crate::jobs::job_queue::JobQueue>>,
