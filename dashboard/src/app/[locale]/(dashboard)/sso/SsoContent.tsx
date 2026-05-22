@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import { useSsoConfig, useTeams } from '@/hooks/useDashboardData';
-import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, ExternalLink, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
+import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, EyeOff, ExternalLink, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 // ── IdP Templates ───────────────────────────────────────────
@@ -179,6 +179,15 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
  const [defaultTeamId, setDefaultTeamId] = useState<string>('');
  const [defaultRole, setDefaultRole] = useState<string>('viewer');
  const [clientSecret, setClientSecret] = useState('');
+ // Role & Team mapping
+ const [roleMapping, setRoleMapping] = useState<string>('{}');
+ const [teamMapping, setTeamMapping] = useState<string>('{}');
+ const [roleMappingError, setRoleMappingError] = useState<string>('');
+ const [teamMappingError, setTeamMappingError] = useState<string>('');
+ // SCIM
+ const [scimEnabled, setScimEnabled] = useState(false);
+ const [scimToken, setScimToken] = useState('');
+ const [showScimToken, setShowScimToken] = useState(false);
 
  const { data: teams = [] } = useTeams();
  const [testPassed, setTestPassed] = useState(false);
@@ -298,6 +307,24 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    if (domainInput.trim()) body.verified_domain = domainInput.trim();
    body.default_team_id = defaultTeamId || null;
    body.default_role = defaultRole || 'viewer';
+   // Role & Team mapping
+   try {
+     body.role_mapping = JSON.parse(roleMapping);
+     setRoleMappingError('');
+   } catch {
+     setRoleMappingError('Invalid JSON');
+     return;
+   }
+   try {
+     body.team_mapping = JSON.parse(teamMapping);
+     setTeamMappingError('');
+   } catch {
+     setTeamMappingError('Invalid JSON');
+     return;
+   }
+   // SCIM
+   body.scim_enabled = scimEnabled;
+   if (scimToken) body.scim_token = scimToken;
    
    await apiFetch('/sso/config', { method: 'POST', body, token });
    
@@ -843,6 +870,114 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
         <option value="developer"><Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('roleDeveloper')}</option>
         <option value="admin"><Shield size={16} strokeWidth={1.75} className="inline mr-1" /> {t('roleAdmin')}</option>
        </select>
+       </div>
+
+       {/* Role Mapping */}
+       <div>
+        <label htmlFor="sso-role-mapping" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+         {t('roleMapping') || 'Role Mapping (JSON)'}
+        </label>
+        <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">
+         {t('roleMappingDesc') || 'Map IdP groups to roles. Example: {"Engineering": "developer", "Management": "admin", "default": "viewer"}'}
+        </p>
+        <textarea
+         id="sso-role-mapping"
+         value={roleMapping}
+         onChange={(e) => setRoleMapping(e.target.value)}
+         disabled={isEnforced}
+         rows={4}
+         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+         placeholder='{"Engineering": "developer", "Management": "admin", "default": "viewer"}'
+        />
+        {roleMappingError && <p className="text-xs text-red-500 mt-1">{roleMappingError}</p>}
+       </div>
+
+       {/* Team Mapping */}
+       <div>
+        <label htmlFor="sso-team-mapping" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+         {t('teamMapping') || 'Team Mapping (JSON)'}
+        </label>
+        <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">
+         {t('teamMappingDesc') || 'Map email domains to team IDs. Example: {"engineering.company.com": "team-uuid", "default": "default-team-uuid"}'}
+        </p>
+        <textarea
+         id="sso-team-mapping"
+         value={teamMapping}
+         onChange={(e) => setTeamMapping(e.target.value)}
+         disabled={isEnforced}
+         rows={4}
+         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+         placeholder='{"engineering.company.com": "team-uuid", "default": "default-team-uuid"}'
+        />
+        {teamMappingError && <p className="text-xs text-red-500 mt-1">{teamMappingError}</p>}
+       </div>
+
+       {/* SCIM Provisioning */}
+       <div className="border-t border-gray-200 dark:border-slate-700 pt-4 mt-4">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+         {t('scimProvisioning') || 'SCIM Provisioning'}
+        </h3>
+        <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
+         <div>
+          <p className="text-sm font-medium text-gray-900 dark:text-white">
+           {t('enableScim') || 'Enable SCIM'}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+           {t('enableScimDesc') || 'Allow identity providers to provision users via SCIM 2.0 protocol'}
+          </p>
+         </div>
+         <button
+          type="button"
+          role="switch"
+          aria-checked={scimEnabled}
+          onClick={() => setScimEnabled(!scimEnabled)}
+          disabled={isEnforced}
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+           scimEnabled ? 'bg-brand-600' : 'bg-gray-200 dark:bg-slate-600'
+          }`}
+         >
+          <span
+           className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-xs ring-0 transition-transform duration-200 ease-in-out ${
+            scimEnabled ? 'translate-x-5' : 'translate-x-0'
+           }`}
+          />
+         </button>
+        </div>
+
+        {scimEnabled && (
+         <div className="mt-4 space-y-3">
+          <div>
+           <label htmlFor="sso-scim-token" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+            {t('scimToken') || 'SCIM Bearer Token'}
+           </label>
+           <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">
+            {t('scimTokenDesc') || 'Token for SCIM API authentication. Generate a strong random token.'}
+           </p>
+           <div className="flex gap-2">
+            <input
+             id="sso-scim-token"
+             type={showScimToken ? 'text' : 'password'}
+             value={scimToken}
+             onChange={(e) => setScimToken(e.target.value)}
+             className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
+             placeholder="Enter SCIM token"
+            />
+            <button
+             type="button"
+             onClick={() => setShowScimToken(!showScimToken)}
+             className="px-3 py-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            >
+             {showScimToken ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+           </div>
+          </div>
+          <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
+           <p className="text-xs text-blue-700 dark:text-blue-300">
+            <strong>{t('scimEndpoint') || 'SCIM Endpoint'}:</strong> {typeof window !== 'undefined' ? window.location.origin : ''}/v1/sso/scim/v2/
+           </p>
+          </div>
+         </div>
+        )}
        </div>
       </>
      )}
