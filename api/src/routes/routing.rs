@@ -107,7 +107,7 @@ async fn update_routing(
         // SSRF protection: block internal/private IPs
         if let Err(e) = crate::ssrf::validate_url(url) {
             tracing::warn!("SSRF blocked on fallback_url: {} — {:?}", url, e);
-            return Err(AppError::Forbidden("Internal URLs are not allowed as fallback".into()));
+            return Err(AppError::Forbidden);
         }
     }
 

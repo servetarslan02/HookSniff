@@ -439,7 +439,7 @@ pub async fn admin_middleware(req: Request, next: Next) -> Result<Response, AppE
         .ok_or(AppError::Unauthorized)?;
 
     if !customer.is_admin {
-        return Err(AppError::Forbidden("Admin access required".into()));
+        return Err(AppError::Forbidden);
     }
 
     Ok(next.run(req).await)

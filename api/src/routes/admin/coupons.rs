@@ -1,7 +1,7 @@
 use axum::extract::{Extension, Path};
 use axum::http::StatusCode;
 use axum::{Json, Router};
-use axum::routing::{get, post, put, delete};
+use axum::routing::{get, post};
 use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -257,7 +257,7 @@ pub async fn delete_coupon(
 
 pub async fn sync_to_polar(
     Extension(pool): Extension<PgPool>,
-    Extension(cfg): Extension<crate::config::Config>,
+    Extension(_cfg): Extension<crate::config::Config>,
     Extension(customer): Extension<crate::models::customer::Customer>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<CouponCode>, AppError> {

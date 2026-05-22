@@ -8,9 +8,6 @@ import { AuthProvider } from '@/lib/store';
 import { ToastProvider } from '@/components/Toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ReactQueryProvider } from './providers';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
-import Script from 'next/script';
 import { CookieConsent } from '@/components/CookieConsent';
 import { AnalyticsWrapper } from '@/components/AnalyticsWrapper';
 

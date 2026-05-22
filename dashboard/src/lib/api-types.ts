@@ -390,7 +390,7 @@ export interface PortalConfigResponse {
   show_events?: boolean;
   show_deliveries?: boolean;
   allowed_events?: string[];
-  custom_css?: string;
+  custom_css?: string | null;
 }
 
 export interface PortalEmbedCodeResponse {
@@ -555,7 +555,7 @@ export interface Invoice {
   amount: number;
   status: 'paid' | 'pending' | 'failed' | 'refunded';
   plan: string;
-  provider: string;
+  provider?: string;
   provider_invoice_id?: string | null;
 }
 

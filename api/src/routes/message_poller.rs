@@ -193,7 +193,7 @@ async fn poll_messages(
         })
         .collect();
 
-    let last_msg = messages.last().map(|m| m.id);
+    let _last_msg = messages.last().map(|m| m.id);
 
     Ok(Json(PollResponse {
         messages,

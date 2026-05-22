@@ -9,7 +9,7 @@ use uuid::Uuid;
 use crate::error::AppError;
 use crate::models::customer::Customer;
 
-use super::{require_admin, require_admin_write};
+use super::require_admin_write;
 
 // ── Test Webhook ──────────────────────────────────────────
 

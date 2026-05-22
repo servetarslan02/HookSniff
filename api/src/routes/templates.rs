@@ -3,7 +3,6 @@ use axum::routing::{get, post};
 use axum::{Json, Router};
 use serde::Deserialize;
 use sqlx::PgPool;
-use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;

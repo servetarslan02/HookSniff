@@ -25,7 +25,7 @@ const AuditLogPage = dynamic(() => import('../audit-log/page'), { ssr: false, lo
 export default function OrganizationPage() {
   const t = useTranslations('nav');
   const { data: teams = [] } = useTeams();
-  const [selectedTeamId, setSelectedTeamId] = useState<string>('');
+  const [selectedTeamId, _setSelectedTeamId] = useState<string>('');
 
   // Default to first team if none selected
   const activeTeamId = selectedTeamId || teams[0]?.id || '';

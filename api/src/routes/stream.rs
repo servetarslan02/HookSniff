@@ -37,11 +37,11 @@ pub fn router() -> Router {
             "/channels/{id}",
             get(get_channel).put(update_channel).delete(delete_channel),
         )
-        .route("/channels/{id}/subscribe", get(subscribe_channel))
+        .route("/channels/{id}/subscribe", get(subscribe_to_channel))
         .route("/channels/{id}/messages", get(list_messages))
         .route("/subscriptions", get(list_subscriptions))
         .route("/subscriptions/{id}", get(get_subscription).delete(disconnect_subscription))
-        .route("/deliveries", get(delivery_stream))
+        .route("/deliveries", get(sse_deliveries_legacy))
         .route("/publish", post(publish_event))
 }
 
@@ -576,6 +576,59 @@ async fn disconnect_subscription(
 
 /// SSE delivery stream (legacy compatibility endpoint).
 async fn sse_deliveries_legacy(
+    Extension(pool): Extension<PgPool>,
+    Extension(customer): Extension<Customer>,
+    Json(req): Json<PublishEventRequest>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // RBAC: developer or higher
+    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+
+    // Verify channel belongs to customer
+    let channel = sqlx::query_as::<_, StreamChannel>(
+        "SELECT id, customer_id, name, description, channel_type, event_filter, enabled, \
+         max_subscribers, current_subscribers, total_messages, created_at, updated_at \
+         FROM stream_channels WHERE id = $1 AND customer_id = $2",
+    )
+    .bind(req.channel_id)
+    .bind(customer.id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    if !channel.enabled {
+        return Err(AppError::Validation("Channel is disabled".into()));
+    }
+
+    // Store message
+    let msg = sqlx::query_as::<_, StreamMessage>(
+        "INSERT INTO stream_messages (channel_id, event_type, payload, delivered_count) \
+         VALUES ($1, $2, $3, $4) \
+         RETURNING id, channel_id, event_type, payload, delivered_count, created_at",
+    )
+    .bind(req.channel_id)
+    .bind(&req.event_type)
+    .bind(&req.payload)
+    .bind(channel.current_subscribers)
+    .fetch_one(&pool)
+    .await?;
+
+    // Update channel total messages
+    sqlx::query(
+        "UPDATE stream_channels SET total_messages = total_messages + 1, updated_at = now() WHERE id = $1",
+    )
+    .bind(req.channel_id)
+    .execute(&pool)
+    .await?;
+
+    Ok(Json(serde_json::json!({
+        "success": true,
+        "message_id": msg.id,
+        "delivered_to": channel.current_subscribers,
+    })))
+}
+
+/// Publish an event to a stream channel.
+async fn publish_event(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<PublishEventRequest>,

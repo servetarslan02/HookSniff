@@ -6,7 +6,6 @@
 //! 3. Sends a summary email in the customer's preferred language
 
 use anyhow::Result;
-use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
 

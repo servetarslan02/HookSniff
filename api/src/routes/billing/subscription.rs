@@ -182,7 +182,7 @@ pub async fn pause_subscription(
     // Customer keeps access until current period ends
     // cancel_at_period_end = true → Polar won't charge next cycle
     // pause_plan → preserved for resume
-    let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
+    let _free_limit = Plan::Developer.max_webhooks_per_day() as i64;
 
     sqlx::query(
         "UPDATE customers SET \
@@ -550,7 +550,7 @@ pub async fn upgrade_plan(
 
             // Atomically check max redemptions and increment count
             // If max_redemptions is set and already reached, this returns 0 rows
-            let updated_rows: i64 = if let Some(max) = coupon.max_redemptions {
+            let updated_rows: i64 = if let Some(_max) = coupon.max_redemptions {
                 sqlx::query_scalar(
                     "UPDATE coupon_codes SET redemption_count = redemption_count + 1, updated_at = NOW() \
                      WHERE id = $1 AND (max_redemptions IS NULL OR redemption_count < max_redemptions) \
