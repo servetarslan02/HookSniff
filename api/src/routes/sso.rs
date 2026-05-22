@@ -17,7 +17,7 @@
 //! - `GET  /sso/providers` — List configured SSO providers for a domain
 
 use axum::{
-    extract::{Extension, Query},
+    extract::{Extension, Path, Query},
     http::{HeaderMap, StatusCode},
     response::Redirect,
     routing::{delete, get, post},
@@ -289,6 +289,45 @@ pub struct TeamQuery {
 
 // ── GET /sso/config ─────────────────────────────────────────
 
+/// Row struct for get_sso_config queries (19 fields — too many for tuple)
+#[derive(sqlx::FromRow)]
+struct SsoConfigRow {
+    id: Uuid,
+    provider: String,
+    enabled: bool,
+    metadata_url: Option<String>,
+    entity_id: Option<String>,
+    sso_url: Option<String>,
+    certificate: Option<String>,
+    issuer_url: Option<String>,
+    client_id: Option<String>,
+    client_secret_encrypted: Option<String>,
+    admin_bypass: bool,
+    verified_domain: Option<String>,
+    default_team_id: Option<Uuid>,
+    default_role: Option<String>,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+    role_mapping: Option<serde_json::Value>,
+    team_mapping: Option<serde_json::Value>,
+    scim_enabled: bool,
+}
+
+fn sso_config_to_json(r: &SsoConfigRow) -> serde_json::Value {
+    serde_json::json!({
+        "id": r.id, "provider": &r.provider, "enabled": r.enabled,
+        "verified_domain": &r.verified_domain, "metadata_url": &r.metadata_url,
+        "entity_id": &r.entity_id, "sso_url": &r.sso_url,
+        "certificate_set": r.certificate.is_some(), "issuer_url": &r.issuer_url,
+        "client_id": &r.client_id, "client_secret_set": r.client_secret_encrypted.is_some(),
+        "admin_bypass": r.admin_bypass, "default_team_id": r.default_team_id,
+        "default_role": r.default_role.as_deref().unwrap_or("viewer"),
+        "created_at": r.created_at, "updated_at": r.updated_at,
+        "role_mapping": &r.role_mapping, "team_mapping": &r.team_mapping,
+        "scim_enabled": r.scim_enabled,
+    })
+}
+
 async fn get_sso_config(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
@@ -307,68 +346,24 @@ async fn get_sso_config(
         .await?
         .ok_or(AppError::Forbidden)?;
 
-        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, Option<Uuid>, Option<String>, DateTime<Utc>, DateTime<Utc>, Option<serde_json::Value>, Option<serde_json::Value>, bool)>(
+        sqlx::query_as::<_, SsoConfigRow>(
             "SELECT s.id, s.provider, s.enabled, s.metadata_url, s.entity_id, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.admin_bypass, s.verified_domain, s.default_team_id, s.default_role, s.created_at, s.updated_at, s.role_mapping, s.team_mapping, s.scim_enabled
              FROM sso_configs s WHERE s.team_id = $1 LIMIT 1"
         )
         .bind(team_id)
         .fetch_optional(&pool)
         .await?
-        .map(|(id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at, role_mapping, team_mapping, scim_enabled)| {
-            serde_json::json!({
-                "id": id,
-                "provider": provider,
-                "enabled": enabled,
-                "verified_domain": verified_domain,
-                "metadata_url": metadata_url,
-                "entity_id": entity_id,
-                "sso_url": sso_url,
-                "certificate_set": certificate.is_some(),
-                "issuer_url": issuer_url,
-                "client_id": client_id,
-                "client_secret_set": client_secret_enc.is_some(),
-                "admin_bypass": admin_bypass,
-                "default_team_id": default_team_id,
-                "default_role": default_role.unwrap_or_else(|| "viewer".to_string()),
-                "created_at": created_at,
-                "updated_at": updated_at,
-                "role_mapping": role_mapping,
-                "team_mapping": team_mapping,
-                "scim_enabled": scim_enabled,
-            })
-        })
+        .map(|r| sso_config_to_json(&r))
     } else {
         // Backward compat: find by customer_id (old behavior)
-        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, Option<Uuid>, Option<String>, DateTime<Utc>, DateTime<Utc>, Option<serde_json::Value>, Option<serde_json::Value>, bool)>(
+        sqlx::query_as::<_, SsoConfigRow>(
             "SELECT id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at, role_mapping, team_mapping, scim_enabled
              FROM sso_configs WHERE customer_id = $1 LIMIT 1"
         )
         .bind(customer.id)
         .fetch_optional(&pool)
         .await?
-        .map(|(id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at, role_mapping, team_mapping, scim_enabled)| {
-            serde_json::json!({
-                "id": id,
-                "provider": provider,
-                "enabled": enabled,
-                "verified_domain": verified_domain,
-                "metadata_url": metadata_url,
-                "entity_id": entity_id,
-                "sso_url": sso_url,
-                "certificate_set": certificate.is_some(),
-                "issuer_url": issuer_url,
-                "client_id": client_id,
-                "client_secret_set": client_secret_enc.is_some(),
-                "admin_bypass": admin_bypass,
-                "default_team_id": default_team_id,
-                "default_role": default_role.unwrap_or_else(|| "viewer".to_string()),
-                "created_at": created_at,
-                "updated_at": updated_at,
-                "role_mapping": role_mapping,
-                "team_mapping": team_mapping,
-                "scim_enabled": scim_enabled,
-            })
-        })
+        .map(|r| sso_config_to_json(&r))
     };
 
     match config {
@@ -1075,7 +1070,7 @@ async fn initiate_sso_login(
 
     // Strategy 1: Find existing customer by email
     let existing_customer = sqlx::query_as::<_, Customer>(
-        "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, current_period_end, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at, paused_at, paused_until, pause_plan, billing_interval, has_used_startup_trial FROM customers WHERE email = $1"
+        "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, current_period_end, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at, paused_at, paused_until, pause_plan, billing_interval, has_used_startup_trial, avatar_url FROM customers WHERE email = $1"
     )
     .bind(email)
     .fetch_optional(&pool)
@@ -1239,6 +1234,7 @@ async fn initiate_sso_login(
         pause_plan: None,
         has_used_startup_trial: false,
             billing_interval: None,
+            avatar_url: None,
     });
 
     if provider == "saml" {
@@ -2279,7 +2275,7 @@ async fn find_or_create_sso_customer(
 ) -> Result<Customer, AppError> {
     // Try to find existing customer
     let existing = sqlx::query_as::<_, Customer>(
-        "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, current_period_end, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at, paused_at, paused_until, pause_plan, billing_interval, has_used_startup_trial FROM customers WHERE email = $1"
+        "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, current_period_end, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at, paused_at, paused_until, pause_plan, billing_interval, has_used_startup_trial, avatar_url FROM customers WHERE email = $1"
     )
     .bind(email)
     .fetch_optional(pool)
@@ -2941,14 +2937,15 @@ struct ScimUserRow {
     overage_email_notification: bool,
     card_last4: Option<String>,
     card_brand: Option<String>,
-    card_exp_month: Option<i32>,
-    card_exp_year: Option<i32>,
+    card_exp_month: Option<i16>,
+    card_exp_year: Option<i16>,
     card_updated_at: Option<DateTime<Utc>>,
     paused_at: Option<DateTime<Utc>>,
     paused_until: Option<DateTime<Utc>>,
     pause_plan: Option<String>,
     billing_interval: Option<String>,
     has_used_startup_trial: bool,
+    avatar_url: Option<String>,
     // SSO attribute fields
     idp_user_id: Option<String>,
     idp_groups: Option<Vec<String>>,
@@ -3019,6 +3016,7 @@ async fn scim_list_users(
                 card_exp_year: r.card_exp_year, card_updated_at: r.card_updated_at,
                 paused_at: r.paused_at, paused_until: r.paused_until, pause_plan: r.pause_plan.clone(),
                 billing_interval: r.billing_interval.clone(), has_used_startup_trial: r.has_used_startup_trial,
+                avatar_url: r.avatar_url.clone(),
             };
             let attrs = SsoUserAttributesRow {
                 idp_user_id: r.idp_user_id.clone(), idp_groups: r.idp_groups.clone(),
