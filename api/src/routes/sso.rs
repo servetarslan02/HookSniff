@@ -18,7 +18,7 @@
 
 use axum::{
     extract::{Extension, Query},
-    http::HeaderMap,
+    http::{HeaderMap, StatusCode},
     response::Redirect,
     routing::{delete, get, post},
     Json, Router,
@@ -3330,7 +3330,9 @@ async fn scim_list_groups(
     .fetch_optional(&pool)
     .await?;
 
-    let teams: Vec<(Uuid, String)> = if let Some((oid)) = owner_id {
+    let owner_uuid = owner_id.map(|(id,)| id);
+
+    let teams: Vec<(Uuid, String)> = if let Some(oid) = owner_uuid {
         // Return all teams where the owner is a member or owner
         sqlx::query_as(
             "SELECT DISTINCT t.id, t.name FROM teams t
