@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
 import { Check, ClipboardList, X } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 interface Schema {
   id: string;
@@ -93,13 +94,16 @@ export default function SchemasPage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+          <ReadOnlyBadge />
         </div>
-        <button
-          onClick={() => setShowCreate(!showCreate)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-xl hover:bg-brand-700 transition"
-        >
-          + {t('createSchema')}
-        </button>
+        <RoleGuard require="canManageWebhooks">
+          <button
+            onClick={() => setShowCreate(!showCreate)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-xl hover:bg-brand-700 transition"
+          >
+            + {t('createSchema')}
+          </button>
+        </RoleGuard>
       </div>
 
       {/* Create Form */}
