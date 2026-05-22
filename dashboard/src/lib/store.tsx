@@ -157,15 +157,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // If data is null (non-401 error), keep localStorage user as-is
         })
         .catch(() => {
-          // Only clear on definitive auth failure (401).
-          // Network/CORS errors → keep the user from localStorage.
-          setUser(null);
-          updateToken(null);
-          setApiKeyState(null);
-          localStorage.removeItem(STORAGE_KEY);
-          localStorage.removeItem('hooksniff_token');
-          clearAuthCookie();
-          stopProactiveRefresh();
+          // BUG FIX: Do NOT clear auth on network/CORS errors.
+          // Keep the user from localStorage — they might still be valid.
+          // Only clear auth on definitive 401 (handled above in the refresh flow).
+          // If the network is down, the user stays "logged in" with cached data.
+          // Next page load or API call will re-validate.
         })
         .finally(() => setIsLoading(false));
     } else {

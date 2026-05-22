@@ -81,9 +81,12 @@ function doRefresh(): Promise<string | null> {
  *
  * BUG FIX: Listens for BroadcastChannel messages from other tabs
  * to sync tokens without each tab refreshing independently.
+ * BUG FIX: Re-registers onTokenRefreshed callback (cleared by stopProactiveRefresh on logout).
  */
 export function startProactiveRefresh(onRefresh: (newToken: string) => void): void {
   stopProactiveRefresh();
+  // BUG FIX: Re-register the callback that was cleared by stopProactiveRefresh
+  onTokenRefreshed = onRefresh;
 
   // BUG FIX: Listen for token refreshes from other tabs
   if (refreshChannel) {
@@ -113,8 +116,11 @@ export function stopProactiveRefresh(): void {
   if (refreshChannel) {
     refreshChannel.onmessage = null;
   }
-  // BUG FIX: Also clear any pending refresh promise
+  // BUG FIX: Clear any pending refresh promise to prevent stale callbacks
   refreshPromise = null;
+  // BUG FIX: Clear the token refresh callback to prevent race condition
+  // (logout clears state, then refresh callback fires and restores token)
+  onTokenRefreshed = null;
 }
 
 function isTransientError(status: number): boolean {
@@ -154,17 +160,23 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const controller = new AbortController();
-  void setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
   // If caller provided an external signal, forward its abort
+  const externalController = new AbortController();
   if (signal) {
-    signal.addEventListener('abort', () => controller.abort(), { once: true });
+    signal.addEventListener('abort', () => externalController.abort(), { once: true });
   }
 
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    // BUG FIX: Create a fresh AbortController for each attempt.
+    // Reusing a controller after timeout would make retries immediately fail.
+    const controller = new AbortController();
+    void setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    // Link external signal
+    if (externalController.signal.aborted) controller.abort();
+    else externalController.signal.addEventListener('abort', () => controller.abort(), { once: true });
+
     try {
       const res = await fetch(`${API_BASE}${path}`, {
         method,
