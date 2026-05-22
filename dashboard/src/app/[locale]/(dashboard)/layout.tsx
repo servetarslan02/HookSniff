@@ -32,9 +32,12 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   // Auto-logout after 1 hour of inactivity
   const handleIdle = useCallback(() => {
-    logout();
-    router.push('/login');
-  }, [logout, router]);
+    // BUG FIX: Only logout if user is actually logged in
+    if (token) {
+      logout();
+      router.push('/login');
+    }
+  }, [logout, router, token]);
   useIdleTimeout(handleIdle);
 
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
