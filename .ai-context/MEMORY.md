@@ -256,7 +256,33 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-23 — RBAC Frontend Implementation)
+## 📝 Son Oturum (2026-05-23 — RBAC Frontend Part 2)
+
+### Özet
+Servet ile oturum. 6 sayfaya daha RBAC uygulandı. 6 dosya, 130 satır.
+
+### Yapılan İşler:
+1. **Integrations** — create/edit/delete/toggle → admin+
+2. **Alerts** — create/edit/delete/toggle → admin+, test herkese açık
+3. **Custom Domain** — add/delete → admin+, verify herkese açık
+4. **API Keys** — create/rotate/delete → admin+
+5. **Service Tokens** — create/edit/delete → admin+
+6. **Team** — owner detection fix (isOwner → isTeamOwner)
+
+### Değişen Dosyalar:
+- `dashboard/src/app/[locale]/(dashboard)/alerts/page.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/api-keys/page.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/custom-domain/CustomDomainContent.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/integrations/IntegrationsContent.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/service-tokens/page.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/team/page.tsx`
+
+### Push: `2d8d7181`
+### TypeScript: ✅ 0 hata
+
+---
+
+## 📝 Önceki Oturum (2026-05-23 — RBAC Frontend Part 1)
 
 ### Özet
 Servet ile oturum. Frontend RBAC implementasyonu yapıldı. 5 dosya değişti, 260 satır eklendi.
