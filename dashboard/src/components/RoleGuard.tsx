@@ -15,17 +15,24 @@ type PermissionKey = keyof Permissions;
  * <RoleGuard require="canManageTeam" fallback={<span>Read-only</span>}>
  *   <TeamSettings />
  * </RoleGuard>
+ *
+ * @example With specific team context
+ * <RoleGuard require="canManageTeam" teamId={selectedTeamId}>
+ *   <button>Manage Team</button>
+ * </RoleGuard>
  */
 export function RoleGuard({
   require,
+  teamId,
   children,
   fallback = null,
 }: {
   require: PermissionKey;
+  teamId?: string | null;
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }) {
-  const perms = usePermissions();
+  const perms = usePermissions(teamId);
 
   if (perms.isLoading) return null;
 
@@ -36,8 +43,8 @@ export function RoleGuard({
 /**
  * Shows a read-only badge when user doesn't have write access.
  */
-export function ReadOnlyBadge() {
-  const { role, isLoading } = usePermissions();
+export function ReadOnlyBadge({ teamId }: { teamId?: string | null }) {
+  const { role, isLoading } = usePermissions(teamId);
   if (isLoading || !role || role === 'owner' || role === 'admin') return null;
 
   return (

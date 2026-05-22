@@ -262,6 +262,64 @@ pub async fn check_user_team_role(
     Err(AppError::Forbidden)
 }
 
+/// Check user's role in a SPECIFIC team (not any team).
+/// This is the secure version — use this for team-scoped operations.
+pub async fn check_user_team_role_for_team(
+    pool: &PgPool,
+    customer_id: Uuid,
+    team_id: Uuid,
+    min_role: &str,
+) -> Result<(), AppError> {
+    // Check if user is team owner (owner always has full access)
+    let team: Option<(Uuid,)> = sqlx::query_as(
+        "SELECT id FROM teams WHERE id = $1 AND owner_id = $2",
+    )
+    .bind(team_id)
+    .bind(customer_id)
+    .fetch_optional(pool)
+    .await?;
+
+    if team.is_some() {
+        return Ok(());
+    }
+
+    // Check user's role in this specific team
+    let member: Option<(String,)> = sqlx::query_as(
+        "SELECT role FROM team_members WHERE team_id = $1 AND customer_id = $2",
+    )
+    .bind(team_id)
+    .bind(customer_id)
+    .fetch_optional(pool)
+    .await?;
+
+    match member {
+        Some((role,)) => {
+            if role_level(&role) >= role_level(min_role) {
+                Ok(())
+            } else {
+                Err(AppError::Forbidden)
+            }
+        }
+        None => {
+            // User is not a member of this team
+            // Fall back to personal account check (no team = allow)
+            let has_any_team: Option<(Uuid,)> = sqlx::query_as(
+                "SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1",
+            )
+            .bind(customer_id)
+            .fetch_optional(pool)
+            .await?;
+
+            if has_any_team.is_none() {
+                // Personal account, no team — allow
+                Ok(())
+            } else {
+                Err(AppError::Forbidden)
+            }
+        }
+    }
+}
+
 // ── Routes ───────────────────────────────────────────────────────────────────
 
 // ── Handlers ─────────────────────────────────────────────────────────────────
