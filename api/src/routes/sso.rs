@@ -307,14 +307,14 @@ async fn get_sso_config(
         .await?
         .ok_or(AppError::Forbidden)?;
 
-        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, Option<Uuid>, Option<String>, DateTime<Utc>, DateTime<Utc>)>(
-            "SELECT s.id, s.provider, s.enabled, s.metadata_url, s.entity_id, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.admin_bypass, s.verified_domain, s.default_team_id, s.default_role, s.created_at, s.updated_at
+        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, Option<Uuid>, Option<String>, DateTime<Utc>, DateTime<Utc>, Option<serde_json::Value>, Option<serde_json::Value>, bool)>(
+            "SELECT s.id, s.provider, s.enabled, s.metadata_url, s.entity_id, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.admin_bypass, s.verified_domain, s.default_team_id, s.default_role, s.created_at, s.updated_at, s.role_mapping, s.team_mapping, s.scim_enabled
              FROM sso_configs s WHERE s.team_id = $1 LIMIT 1"
         )
         .bind(team_id)
         .fetch_optional(&pool)
         .await?
-        .map(|(id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at)| {
+        .map(|(id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at, role_mapping, team_mapping, scim_enabled)| {
             serde_json::json!({
                 "id": id,
                 "provider": provider,
@@ -332,18 +332,21 @@ async fn get_sso_config(
                 "default_role": default_role.unwrap_or_else(|| "viewer".to_string()),
                 "created_at": created_at,
                 "updated_at": updated_at,
+                "role_mapping": role_mapping,
+                "team_mapping": team_mapping,
+                "scim_enabled": scim_enabled,
             })
         })
     } else {
         // Backward compat: find by customer_id (old behavior)
-        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, Option<Uuid>, Option<String>, DateTime<Utc>, DateTime<Utc>)>(
-            "SELECT id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at
+        sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, Option<Uuid>, Option<String>, DateTime<Utc>, DateTime<Utc>, Option<serde_json::Value>, Option<serde_json::Value>, bool)>(
+            "SELECT id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at, role_mapping, team_mapping, scim_enabled
              FROM sso_configs WHERE customer_id = $1 LIMIT 1"
         )
         .bind(customer.id)
         .fetch_optional(&pool)
         .await?
-        .map(|(id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at)| {
+        .map(|(id, provider, enabled, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_enc, admin_bypass, verified_domain, default_team_id, default_role, created_at, updated_at, role_mapping, team_mapping, scim_enabled)| {
             serde_json::json!({
                 "id": id,
                 "provider": provider,
@@ -361,6 +364,9 @@ async fn get_sso_config(
                 "default_role": default_role.unwrap_or_else(|| "viewer".to_string()),
                 "created_at": created_at,
                 "updated_at": updated_at,
+                "role_mapping": role_mapping,
+                "team_mapping": team_mapping,
+                "scim_enabled": scim_enabled,
             })
         })
     };
@@ -1458,11 +1464,12 @@ async fn saml_callback(
     }
 
     // Verify SAML response certificate against configured IdP certificate
+    // Use sso_config_id for team-scoped SSO (not customer_id)
     if let Some(ref login_state) = login_state {
         let configured_cert: Option<String> = sqlx::query_scalar(
-            "SELECT certificate FROM sso_configs WHERE customer_id = $1 LIMIT 1"
+            "SELECT certificate FROM sso_configs WHERE id = $1 LIMIT 1"
         )
-        .bind(login_state.customer_id)
+        .bind(login_state.sso_config_id)
         .fetch_optional(&pool)
         .await?
         .flatten();
@@ -1621,11 +1628,11 @@ async fn oidc_callback(
     let login_state = state_store.remove(&state).await
         .ok_or_else(|| AppError::coded(ErrorCode::SsoStateExpired))?;
 
-    // Get SSO config
+    // Get SSO config — use sso_config_id for team-scoped SSO
     let config = sqlx::query_as::<_, (String, Option<String>, Option<String>, Option<String>, Option<String>)>(
-        "SELECT provider, issuer_url, client_id, client_secret_encrypted, entity_id FROM sso_configs WHERE customer_id = $1 LIMIT 1"
+        "SELECT provider, issuer_url, client_id, client_secret_encrypted, entity_id FROM sso_configs WHERE id = $1 LIMIT 1"
     )
-    .bind(login_state.customer_id)
+    .bind(login_state.sso_config_id)
     .fetch_optional(&pool)
     .await?
     .ok_or_else(|| AppError::coded(ErrorCode::SsoConfigNotFound))?;

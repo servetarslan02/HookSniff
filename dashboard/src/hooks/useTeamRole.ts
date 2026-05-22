@@ -52,7 +52,13 @@ export function useTeamRole(teamId?: string | null) {
 
   // Find user in members list
   const member = members?.find((m) => m.customer_id === user.id);
-  const role = (member?.role ?? 'viewer') as TeamRole;
+
+  // If user is not a member and not the owner, return null (no role)
+  if (!member) {
+    return { role: null as TeamRole | null, teamId: effectiveTeamId, isLoading };
+  }
+
+  const role = member.role as TeamRole;
 
   return { role, teamId: effectiveTeamId, isLoading };
 }
