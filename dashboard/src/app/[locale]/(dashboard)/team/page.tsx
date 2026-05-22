@@ -116,9 +116,11 @@ function TeamPageInner() {
   }, [searchParams.get('invite_token')]);
 
   const currentRole = members.find((m) => m.customer_id === user?.id)?.role || 'viewer';
-  const canInvite = currentRole === 'admin';
-  const canRemove = currentRole === 'admin';
-  const canChangeRole = currentRole === 'admin';
+  const isTeamOwner = teamDetail?.owner_id === user?.id;
+  const isAdmin = currentRole === 'admin' || isTeamOwner;
+  const canInvite = isAdmin;
+  const canRemove = isAdmin;
+  const canChangeRole = isAdmin;
 
   const handleCreate = async (name: string) => {
     try {
