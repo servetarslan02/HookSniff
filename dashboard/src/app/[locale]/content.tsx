@@ -315,10 +315,10 @@ export function HomeContent() {
   const { formatPrice } = usePlans();
   const [yearly, setYearly] = useState(false);
   const plans = [
-    { name: tPricing('developer'), desc: tPricing('developerDesc'), price: '$0', period: tPricing('month'), features: tPricing.raw('developerFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('startup'), desc: tPricing('startupDesc'), price: formatPrice('startup', yearly), period: yearly ? tPricing('year') : tPricing('month'), features: tPricing.raw('startupFeatures') as string[], cta: tPricing('getStarted'), popular: false },
-    { name: tPricing('pro'), desc: tPricing('proDesc'), price: formatPrice('pro', yearly), period: yearly ? tPricing('year') : tPricing('month'), features: tPricing.raw('proFeatures') as string[], cta: tPricing('getStarted'), popular: true },
-    { name: tPricing('enterprise'), desc: tPricing('enterpriseDesc'), price: '$149', period: yearly ? tPricing('year') : tPricing('month'), features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('getStarted'), popular: false },
+    { name: tPricing('developer'), desc: tPricing('developerDesc'), price: '$0', period: tPricing('month'), monthlyEquiv: null, features: tPricing.raw('developerFeatures') as string[], cta: tPricing('getStarted'), popular: false },
+    { name: tPricing('startup'), desc: tPricing('startupDesc'), price: formatPrice('startup', yearly), period: yearly ? tPricing('year') : tPricing('month'), monthlyEquiv: yearly ? `$${Math.round(230/12)}/${tPricing('month')}` : null, features: tPricing.raw('startupFeatures') as string[], cta: tPricing('getStarted'), popular: false },
+    { name: tPricing('pro'), desc: tPricing('proDesc'), price: formatPrice('pro', yearly), period: yearly ? tPricing('year') : tPricing('month'), monthlyEquiv: yearly ? `$${Math.round(470/12)}/${tPricing('month')}` : null, features: tPricing.raw('proFeatures') as string[], cta: tPricing('getStarted'), popular: true },
+    { name: tPricing('enterprise'), desc: tPricing('enterpriseDesc'), price: formatPrice('enterprise', yearly), period: yearly ? tPricing('year') : tPricing('month'), monthlyEquiv: yearly ? `$${Math.round(1430/12)}/${tPricing('month')}` : null, features: tPricing.raw('enterpriseFeatures') as string[], cta: tPricing('getStarted'), popular: false },
   ];
 
   return (
@@ -519,11 +519,9 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
             <span className={`text-sm font-medium transition ${yearly ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-slate-400'}`}>
               {tPricing('year') || 'Yearly'}
             </span>
-            {yearly && (
-              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                -20%
-              </span>
-            )}
+            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              -20%
+            </span>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-16">
@@ -550,6 +548,11 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhook
                   <span className="text-5xl font-extrabold text-gray-900 dark:text-white">{plan.price}</span>
                   <span className="text-gray-500 dark:text-slate-400 text-sm font-medium">{plan.period}</span>
                 </div>
+                {plan.monthlyEquiv && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+                    ≈ {plan.monthlyEquiv}
+                  </p>
+                )}
               </div>
               {/* Divider */}
               <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-slate-600 to-transparent" />

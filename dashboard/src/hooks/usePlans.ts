@@ -44,7 +44,7 @@ export function usePlans() {
   // Hardcoded fallback prices (used when API is unavailable / rate limited)
   const FALLBACK_PRICES: Record<string, { monthly: number; yearly: number }> = {
     developer: { monthly: 0, yearly: 0 },
-    startup: { monthly: 29, yearly: 278 },
+    startup: { monthly: 24, yearly: 230 },
     pro: { monthly: 49, yearly: 470 },
     enterprise: { monthly: 149, yearly: 1430 },
   };
