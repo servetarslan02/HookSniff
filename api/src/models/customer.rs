@@ -95,6 +95,9 @@ pub struct Customer {
     /// Billing interval: "month" or "year"
     #[serde(default)]
     pub billing_interval: Option<String>,
+    /// Profile picture URL (from Google/GitHub OAuth)
+    #[serde(default)]
+    pub avatar_url: Option<String>,
 }
 
 fn default_payment_provider() -> String {
@@ -227,6 +230,7 @@ pub struct CustomerResponse {
     pub webhook_count: i64,
     pub is_admin: bool,
     pub created_at: DateTime<Utc>,
+    pub avatar_url: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -257,6 +261,7 @@ impl Customer {
             webhook_count: self.webhook_count,
             is_admin: self.is_admin,
             created_at: self.created_at,
+            avatar_url: self.avatar_url,
         }
     }
 }
@@ -307,6 +312,7 @@ mod tests {
             pause_plan: None,
             has_used_startup_trial: false,
             billing_interval: None,
+            avatar_url: None,
         }
     }
 
