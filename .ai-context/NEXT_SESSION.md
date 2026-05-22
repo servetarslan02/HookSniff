@@ -1,8 +1,16 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-23 GMT+8
+> Son güncelleme: 2026-05-23 GMT+8 (OpenClaw oturumu)
 
 ## ✅ Tamamlanan İşler (Bu Oturum)
+
+### SSO + SCIM Testleri (2 dosya, 26 test)
+- `dashboard/src/__tests__/sso-page.test.tsx` — 11 test (IdP templates, SAML/OIDC validation, enforce flow, role/team mapping)
+- `dashboard/src/__tests__/scim-endpoints.test.ts` — 15 test (SCIM schemas, auth, pagination, provisioning, group sync)
+- ✅ 26/26 test geçti
+
+### OAuth Kurulum Rehberi
+- `.ai-context/OAUTH-SETUP-GUIDE.md` — Servet için adım adım Google + GitHub OAuth kurulumu
 
 ### RBAC Implementasyonu (32 dosya)
 - Frontend: useTeamRole, usePermissions, RoleGuard, ReadOnlyBadge
@@ -92,18 +100,18 @@
 
 ## 🟡 EKSİKLER — Test
 
-### 1. SCIM Integration Tests
-- SCIM 2.0 endpoint'leri eklendi ama test yok
-- User CRUD operations test et
-- Group listing test et
-- Token authentication test et
-- Error handling test et
+### 1. SCIM Integration Tests — ✅ YAZILDI (15 test)
+- `dashboard/src/__tests__/scim-endpoints.test.ts`
+- User CRUD, Group listing, Token auth, Error handling, Filter, Pagination
 
-### 2. SSO Callback Tests
-- SAML callback test et
-- OIDC callback test et
-- Role mapping test et
-- Team mapping test et
+### 2. SSO Callback Tests — ✅ YAZILDI (11 test)
+- `dashboard/src/__tests__/sso-page.test.tsx`
+- SAML/OIDC validation, Role mapping, Team mapping, Enforce flow
+
+### 3. Backend Integration Tests (henüz yok)
+- Gerçek API ile çalışan test'ler (backend çalışırken)
+- SAML/OIDC callback akışı end-to-end
+- SCIM provisioning akışı end-to-end
 
 ---
 
@@ -117,6 +125,7 @@
 | RBAC Enhancements | ✅ | 2 |
 | SSO Enhancements | ✅ | 3 |
 | SCIM 2.0 | ✅ | 1 |
+| SSO + SCIM Tests | ✅ | 2 (26 test) |
 | SDK Roadmap (Faz 8-15) | ✅ | 11 |
 
 ### Bekleyen İşler
@@ -131,5 +140,4 @@
 | Migration Uygula | 🔴 | Servet (psql) |
 | Cloud Build | 🔴 | Servet (GCP) |
 | Keycloak Test | 🔴 | Servet (Docker) |
-| SCIM Tests | 🟡 | Test yazma |
-| SSO Tests | 🟡 | Test yazma |
+| Backend Integration Tests | 🟡 | Backend çalışırken |
