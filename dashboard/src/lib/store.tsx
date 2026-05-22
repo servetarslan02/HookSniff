@@ -10,6 +10,7 @@ interface User {
   username?: string;
   plan: 'developer' | 'startup' | 'pro' | 'enterprise';
   is_admin?: boolean;
+  avatar_url?: string;
 }
 
 interface AuthContextType {
@@ -128,6 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 username: toSlug(data.customer.email.split('@')[0]),
                 plan: data.customer.plan,
                 is_admin: data.customer.is_admin ?? false,
+                avatar_url: data.customer.avatar_url,
               };
               setUser(u);
               setApiKeyState(null);
@@ -144,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               username,
               plan: data.plan,
               is_admin: data.is_admin ?? false,
+              avatar_url: data.avatar_url,
             };
             setUser(u);
             setApiKeyState(null);
@@ -206,14 +209,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       twoFaError.tempToken = data.temp_token;
       throw twoFaError;
     }
-    const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: (data.customer.plan || 'developer') as User['plan'], is_admin: data.customer.is_admin ?? false };
+    const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: (data.customer.plan || 'developer') as User['plan'], is_admin: data.customer.is_admin ?? false, avatar_url: data.customer.avatar_url };
     persistAuth(u, data.customer.api_key, data.token);
     return u;
   }, [persistAuth]);
 
   const verify2fa = useCallback(async (tempToken: string, code: string, backupCode?: string) => {
     const data = await twoFactorApi.verify(tempToken, code, backupCode);
-    const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: (data.customer.plan || 'developer') as User['plan'], is_admin: data.customer.is_admin ?? false };
+    const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: (data.customer.plan || 'developer') as User['plan'], is_admin: data.customer.is_admin ?? false, avatar_url: data.customer.avatar_url };
     persistAuth(u, data.customer.api_key, data.token);
     return u;
   }, [persistAuth]);
@@ -232,7 +235,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Backend returns { message } for email-verification flow (no auto-login)
     // or { token, customer } for direct registration
     if (data.customer) {
-      const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: (data.customer.plan || 'developer') as User['plan'], is_admin: data.customer.is_admin ?? false };
+      const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: (data.customer.plan || 'developer') as User['plan'], is_admin: data.customer.is_admin ?? false, avatar_url: data.customer.avatar_url };
       persistAuth(u, data.customer.api_key, data.token);
       return u;
     }
