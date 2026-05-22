@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { ClipboardList, Inbox, Pencil, Trash2 } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 const OP_EVENTS = [
   { id: 'delivery.failed', label: 'Delivery Failed', desc: 'When a webhook delivery fails after all retries' },
@@ -118,10 +119,13 @@ export default function OperationalWebhooksList() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+          <ReadOnlyBadge />
         </div>
-        <button onClick={() => { setShowCreate(true); setEditTarget(null); }} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-          + {t('newEndpoint')}
-        </button>
+        <RoleGuard require="canManageOperationalWebhooks">
+          <button onClick={() => { setShowCreate(true); setEditTarget(null); }} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+            + {t('newEndpoint')}
+          </button>
+        </RoleGuard>
       </div>
 
 
@@ -174,9 +178,11 @@ export default function OperationalWebhooksList() {
           <div className="text-5xl mb-4">🪝</div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noEndpoints')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noEndpointsDesc')}</p>
-          <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-            + {t('newEndpoint')}
-          </button>
+          <RoleGuard require="canManageOperationalWebhooks">
+            <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+              + {t('newEndpoint')}
+            </button>
+          </RoleGuard>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -204,8 +210,10 @@ export default function OperationalWebhooksList() {
                 </div>
 
                 <div className="flex items-center gap-1 mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">
-                  <button onClick={() => handleEdit(ep)} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm"><Pencil size={18} strokeWidth={1.75} /></button>
-                  <button onClick={() => setDeleteTarget(ep.id)} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm"><Trash2 size={18} strokeWidth={1.75} /></button>
+                  <RoleGuard require="canManageOperationalWebhooks">
+                    <button onClick={() => handleEdit(ep)} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm"><Pencil size={18} strokeWidth={1.75} /></button>
+                    <button onClick={() => setDeleteTarget(ep.id)} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm"><Trash2 size={18} strokeWidth={1.75} /></button>
+                  </RoleGuard>
                   <button onClick={() => setSelectedId(selectedId === ep.id ? null : ep.id)} title={t('deliveries')}
                     className={`ml-auto text-xs px-2.5 py-1 rounded-lg transition ${selectedId === ep.id ? 'bg-brand-100 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700'}`}>
                     <ClipboardList size={16} strokeWidth={1.75} className="inline mr-1" /> {t('deliveries')}

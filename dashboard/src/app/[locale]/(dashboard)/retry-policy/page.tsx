@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import { endpointsApi, type RetryPolicyConfig } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, BarChart3, Pencil, Repeat, TrendingUp, X } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 const BACKOFF_OPTIONS = [
   { value: 'exponential', icon: <TrendingUp size={16} strokeWidth={1.75} /> },
@@ -94,6 +95,7 @@ export default function RetryPolicyPage() {
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+        <ReadOnlyBadge />
       </div>
 
       {/* Quick explanation */}
@@ -138,9 +140,11 @@ export default function RetryPolicyPage() {
                       ) : (
                         <span className="text-xs text-gray-400 dark:text-slate-500">{t('defaultPolicy')}</span>
                       )}
-                      <button type="button" onClick={() => handleEdit(ep)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">
-                        <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('edit') || 'Edit'}
-                      </button>
+                      <RoleGuard require="canManageRouting">
+                        <button type="button" onClick={() => handleEdit(ep)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">
+                          <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('edit') || 'Edit'}
+                        </button>
+                      </RoleGuard>
                     </div>
                   </div>
                 </div>
