@@ -12,6 +12,7 @@ import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import { AlertTriangle, ClipboardList, Key, Trash2 } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 export function EndpointsContent() {
   const { token } = useAuth();
@@ -167,14 +168,17 @@ export function EndpointsContent() {
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+          <ReadOnlyBadge />
         </div>
-        <button
-          type="button"
-          onClick={() => setShowCreate(!showCreate)}
-          className="bg-brand-600 dark:bg-brand-500 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
-        >
-          {t('newEndpoint')}
-        </button>
+        <RoleGuard require="canManageWebhooks">
+          <button
+            type="button"
+            onClick={() => setShowCreate(!showCreate)}
+            className="bg-brand-600 dark:bg-brand-500 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium hover:bg-brand-700 dark:hover:bg-brand-600 transition"
+          >
+            {t('newEndpoint')}
+          </button>
+        </RoleGuard>
       </div>
 
       {showCreate && (
@@ -247,14 +251,16 @@ export function EndpointsContent() {
                 <span className="text-sm text-gray-600 dark:text-slate-400">{t('selectAllLabel', { count: endpoints.length })}</span>
               </label>
               {selected.size > 0 && (
-                <button
-                  type="button"
-                  onClick={handleBulkDelete}
-                  disabled={bulkDeleting}
-                  className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition disabled:opacity-50"
-                >
-                  {bulkDeleting ? tc('deleting') : <><Trash2 size={14} className="inline mr-1 -mt-0.5" />{tc('deleteSelected', { count: selected.size })}</>}
-                </button>
+                <RoleGuard require="canManageWebhooks">
+                  <button
+                    type="button"
+                    onClick={handleBulkDelete}
+                    disabled={bulkDeleting}
+                    className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                  >
+                    {bulkDeleting ? tc('deleting') : <><Trash2 size={14} className="inline mr-1 -mt-0.5" />{tc('deleteSelected', { count: selected.size })}</>}
+                  </button>
+                </RoleGuard>
               )}
             </div>
           )}
@@ -317,16 +323,18 @@ export function EndpointsContent() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(ep.id)}
-                    className="text-gray-500 dark:text-slate-500 hover:text-red-600 transition p-2"
-                    aria-label={t('deleteTitle')}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                  <RoleGuard require="canManageWebhooks">
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(ep.id)}
+                      className="text-gray-500 dark:text-slate-500 hover:text-red-600 transition p-2"
+                      aria-label={t('deleteTitle')}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </RoleGuard>
                 </div>
               </div>
             </div>
