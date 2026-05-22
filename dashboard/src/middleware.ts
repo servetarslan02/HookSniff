@@ -104,7 +104,7 @@ export default function middleware(request: NextRequest) {
     '/faq', '/changelog', '/customers', '/alternatives', '/providers',
     '/use-cases', '/webhooks', '/what-is-a-webhook', '/security',
     '/privacy', '/terms', '/status', '/newsletter', '/build-vs-buy',
-    '/get-started', '/startups',
+    '/get-started', '/startups', '/compare', '/playground',
     // Consolidated dashboard routes
     '/core', '/applications', '/deliveries', '/operational-webhooks',
     '/integrations', '/observability', '/devtools', '/routing-config',
