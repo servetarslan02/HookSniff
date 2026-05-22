@@ -1,12 +1,14 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-22 16:55 GMT+8
+> Son güncelleme: 2026-05-23 GMT+8
 
-## ✅ Build Fix Tamamlandı (2026-05-22)
+## ✅ RBAC Frontend Tamamlandı (2026-05-23)
 
-47 Rust compile hatası + 21 TypeScript hatası düzeltildi.
-Cloud Build tetiklenmeli (push `f76161f8` → main).
-Detay: `.ai-context/2026-05-22-build-fix.md`
+Frontend RBAC implementasyonu yapıldı. 5 dosya, 260 satır.
+- useTeamRole, usePermissions, RoleGuard, ReadOnlyBadge
+- Sidebar filtreleme + Endpoints sayfası RBAC
+- Push: `bf8e9682`
+- Detay: `.ai-context/2026-05-23-rbac-frontend.md`
 
 ## 🔴 Öncelik 1: Cloud Build Doğrula
 
@@ -21,13 +23,15 @@ Mock IdP testleri geçti. Şimdi gerçek Keycloak ile test gerekli:
 - SAML + OIDC akışlarını gerçek IdP ile test et
 - Auto-join, rol atama, domain verification test et
 
-## 🟡 Öncelik 3: Dashboard RBAC Frontend
+## 🟡 Öncelik 3: RBAC — Kalan Sayfalar
 
-Backend'de 164 RBAC check var ama frontend'de rol bazlı UI yok.
-- Kullanıcı rolüne göre menü öğelerini gizle/göster
-- Developer: sadece webhook + endpoint erişimi
-- Analyst: sadece okuma erişimi
-- Admin: tam erişim
+RBAC altyapısı kuruldu (usePermissions, RoleGuard). Şimdi diğer sayfalara da uygulanmalı:
+- Integrations sayfası → create/edit/delete butonları
+- Alerts sayfası → create/edit/delete butonları
+- Custom Domain → create/edit/delete butonları
+- API Keys → create/revoke butonları
+- Service Tokens → create/revoke butonları
+- Team sayfası → invite/remove/role change butonları
 
 ## 🟢 Öncelik 4: Alert Evaluation Worker
 
