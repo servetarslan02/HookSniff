@@ -53,9 +53,12 @@ export interface Permissions {
  * - require_role("developer"): developer + admin + owner
  * - require_role("analyst"): analyst + developer + admin + owner
  * - require_team_member: all roles
+ *
+ * @param teamId - Optional team ID to check permissions for.
+ *                 If not provided, uses the first team.
  */
-export function usePermissions(): Permissions {
-  const { role, teamId, isLoading } = useTeamRole();
+export function usePermissions(teamId?: string | null): Permissions {
+  const { role, teamId: resolvedTeamId, isLoading } = useTeamRole(teamId);
 
   const isAdmin = role === 'owner' || role === 'admin';
   const isDeveloper = isAdmin || role === 'developer';
@@ -90,7 +93,7 @@ export function usePermissions(): Permissions {
     isOwner: role === 'owner',
     isAdmin,
     role,
-    teamId,
+    teamId: resolvedTeamId,
     isLoading,
   };
 }
