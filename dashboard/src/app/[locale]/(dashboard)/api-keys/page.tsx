@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useApiKeys, useCreateApiKey, useDeleteApiKey, useRotateApiKey } from '@/hooks/useDashboardData';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 export default function ApiKeysPage() {
   const t = useTranslations('apiKeys');
@@ -41,28 +42,31 @@ export default function ApiKeysPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+        <ReadOnlyBadge />
       </div>
 
       {/* Create Key */}
-      <div className="glass-card p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createKey')}</h2>
-        <div className="flex gap-3">
-          <input
-            type="text"
-            value={newKeyName}
-            onChange={(e) => setNewKeyName(e.target.value)}
-            placeholder={t('keyNamePlaceholder')}
-            className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-sm text-gray-900 dark:text-white"
-          />
-          <button
-            onClick={handleCreate}
-            disabled={createKey.isPending || !newKeyName.trim()}
-            className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition"
-          >
-            {createKey.isPending ? tc('loading') : t('create')}
-          </button>
+      <RoleGuard require="canManageApiKeys">
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createKey')}</h2>
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={newKeyName}
+              onChange={(e) => setNewKeyName(e.target.value)}
+              placeholder={t('keyNamePlaceholder')}
+              className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-sm text-gray-900 dark:text-white"
+            />
+            <button
+              onClick={handleCreate}
+              disabled={createKey.isPending || !newKeyName.trim()}
+              className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition"
+            >
+              {createKey.isPending ? tc('loading') : t('create')}
+            </button>
+          </div>
         </div>
-      </div>
+      </RoleGuard>
 
       {/* Revealed Key Banner */}
       {revealedKey && (
@@ -95,15 +99,17 @@ export default function ApiKeysPage() {
                   <span className={`px-2 py-0.5 rounded-full text-xs ${key.is_active ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'}`}>
                     {key.is_active ? tc('active') : tc('inactive')}
                   </span>
-                  <button onClick={() => handleRotate(key.id)} disabled={rotateKey.isPending} className="text-sm text-brand-600 dark:text-brand-400 hover:underline">{t('rotate')}</button>
-                  {deleteConfirm === key.id ? (
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => handleDelete(key.id)} disabled={deleteKey.isPending} className="text-sm text-red-600 hover:underline">{tc('confirm')}</button>
-                      <button onClick={() => setDeleteConfirm(null)} className="text-sm text-gray-500 hover:underline">{tc('cancel')}</button>
-                    </div>
+                  <RoleGuard require="canManageApiKeys">
+                    <button onClick={() => handleRotate(key.id)} disabled={rotateKey.isPending} className="text-sm text-brand-600 dark:text-brand-400 hover:underline">{t('rotate')}</button>
+                    {deleteConfirm === key.id ? (
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => handleDelete(key.id)} disabled={deleteKey.isPending} className="text-sm text-red-600 hover:underline">{tc('confirm')}</button>
+                        <button onClick={() => setDeleteConfirm(null)} className="text-sm text-gray-500 hover:underline">{tc('cancel')}</button>
+                      </div>
                   ) : (
                     <button onClick={() => setDeleteConfirm(key.id)} className="text-sm text-red-600 dark:text-red-400 hover:underline">{tc('delete')}</button>
                   )}
+                  </RoleGuard>
                 </div>
               </div>
             ))}

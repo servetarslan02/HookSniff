@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { CreditCard, ShoppingBag, GitBranch, MessageSquare, Pause, Phone, Play, Gamepad2, TriangleRight, FileText, Plug, Link2, Pencil, Trash2 } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
@@ -196,11 +197,14 @@ export default function IntegrationsContent() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{t('subtitle')}</p>
+          <ReadOnlyBadge />
         </div>
-        <button onClick={() => { resetForm(); setShowCreate(true); }}
-          className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-          + {t('newIntegration')}
-        </button>
+        <RoleGuard require="canManageIntegrations">
+          <button onClick={() => { resetForm(); setShowCreate(true); }}
+            className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+            + {t('newIntegration')}
+          </button>
+        </RoleGuard>
       </div>
 
       {/* Create / Edit Modal */}
@@ -274,9 +278,11 @@ export default function IntegrationsContent() {
           <Link2 size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noIntegrations')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noIntegrationsDesc')}</p>
-          <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-            + {t('newIntegration')}
-          </button>
+          <RoleGuard require="canManageIntegrations">
+            <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+              + {t('newIntegration')}
+            </button>
+          </RoleGuard>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -316,15 +322,17 @@ export default function IntegrationsContent() {
 
               <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-slate-700">
                 <span className="text-xs text-gray-500 dark:text-slate-400">{formatDate(ig.last_triggered_at)}</span>
-                <div className="flex gap-1">
-                  <button onClick={e => { e.stopPropagation(); openEdit(ig); }} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5"><Pencil size={16} strokeWidth={1.75} /></button>
-                  <button onClick={e => { e.stopPropagation(); toggleMutation.mutate({ id: ig.id, enabled: !ig.enabled }); }}
-                    title={ig.enabled ? t('disable') : t('enable')}
-                    className={`p-1.5 text-sm ${ig.enabled ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}`}>
-                    {ig.enabled ? <Pause size={14} /> : <Play size={14} />}
-                  </button>
-                  <button onClick={e => { e.stopPropagation(); setDeleteTarget(ig.id); }} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5"><Trash2 size={16} strokeWidth={1.75} /></button>
-                </div>
+                <RoleGuard require="canManageIntegrations">
+                  <div className="flex gap-1">
+                    <button onClick={e => { e.stopPropagation(); openEdit(ig); }} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5"><Pencil size={16} strokeWidth={1.75} /></button>
+                    <button onClick={e => { e.stopPropagation(); toggleMutation.mutate({ id: ig.id, enabled: !ig.enabled }); }}
+                      title={ig.enabled ? t('disable') : t('enable')}
+                      className={`p-1.5 text-sm ${ig.enabled ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}`}>
+                      {ig.enabled ? <Pause size={14} /> : <Play size={14} />}
+                    </button>
+                    <button onClick={e => { e.stopPropagation(); setDeleteTarget(ig.id); }} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5"><Trash2 size={16} strokeWidth={1.75} /></button>
+                  </div>
+                </RoleGuard>
               </div>
             </div>
           ))}
