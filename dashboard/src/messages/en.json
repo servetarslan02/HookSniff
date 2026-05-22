@@ -2889,11 +2889,11 @@
     },
     {
       "q": "Do I need a credit card to start?",
-      "a": "No. You can sign up and start sending webhooks on the Free plan without a credit card. Upgrade when you need more volume or features."
+      "a": "No. You can sign up and start sending webhooks on the Developer plan without a credit card. Upgrade when you need more volume or features."
     },
     {
       "q": "What happens if I exceed my plan limit?",
-      "a": "We never drop webhooks. If you exceed your monthly limit, additional events are metered at the per-plan rate. You can also set a hard cap in your dashboard settings."
+      "a": "We never drop webhooks. If you exceed your daily limit, additional events are metered at the per-plan rate. You can also set a hard cap in your dashboard settings."
     },
     {
       "q": "Are retries really free?",
@@ -2908,12 +2908,12 @@
       "a": "Yes! If you're an early-stage startup (pre-Series A), contact us via the contact form with your details. We offer significant discounts and extended free tiers."
     },
     {
-      "q": "What's the difference between Pro and Business?",
-      "a": "Pro is for growing teams that need more volume and better monitoring. Business is for teams that need SLA guarantees, FIFO delivery, SSO, and dedicated support."
+      "q": "What's the difference between Pro and Enterprise?",
+      "a": "Pro is for growing teams that need more volume and better monitoring. Enterprise is for teams that need SLA guarantees, SSO/SAML, dedicated support, and custom integrations."
     },
     {
       "q": "Do you offer annual billing?",
-      "a": "Yes. Annual billing saves you 20% compared to monthly. That's $278/year for Pro and $950/year for Business."
+      "a": "Yes. Annual billing saves you 20% compared to monthly. That's $470/year for Pro and $1,430/year for Enterprise."
     },
     {
       "q": "What payment methods do you accept?",
@@ -2937,11 +2937,11 @@
     },
     {
       "q": "What's your uptime SLA?",
-      "a": "Free and Pro plans have a 99.9% uptime target (best effort). Business plans include a 99.9% uptime SLA with credits if we miss it."
+      "a": "Developer and Pro plans have a 99.9% uptime target (best effort). Enterprise plans include a 99.9% uptime SLA with credits if we miss it."
     },
     {
       "q": "How does HookSniff compare to Svix?",
-      "a": "HookSniff offers similar features at 10x lower cost. Svix starts at $490/month; HookSniff Pro is $49/month. We also support more SDKs (11 vs 6), FIFO delivery, and CloudEvents."
+      "a": "HookSniff offers similar features at lower cost. Svix starts at $490/month; HookSniff Pro is $49/month. We also support more SDKs (11 vs 6), FIFO delivery, and CloudEvents."
     },
     {
       "q": "Can I export my data?",
