@@ -256,33 +256,40 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-23 — RBAC Frontend Part 2)
+## 📝 Son Oturum (2026-05-23 — RBAC Frontend Part 3 - Complete)
 
 ### Özet
-Servet ile oturum. 6 sayfaya daha RBAC uygulandı. 6 dosya, 130 satır.
+Servet ile oturum. RBAC implementasyonu tamamlandı. 8 dosya, 94 satır.
 
 ### Yapılan İşler:
-1. **Integrations** — create/edit/delete/toggle → admin+
-2. **Alerts** — create/edit/delete/toggle → admin+, test herkese açık
-3. **Custom Domain** — add/delete → admin+, verify herkese açık
-4. **API Keys** — create/rotate/delete → admin+
-5. **Service Tokens** — create/edit/delete → admin+
-6. **Team** — owner detection fix (isOwner → isTeamOwner)
+1. **Background Tasks** — cancel → admin+
+2. **Operational Webhooks** — create/edit/delete → admin+
+3. **Connectors** — create/edit/delete → admin+
+4. **Inbound** — create/edit/delete → admin+
+5. **Routing** — edit → admin+
+6. **Retry Policy** — edit → admin+
+7. **Rate Limiting** — add/edit/delete → admin+
+8. **Environments** — create/edit/delete → admin+
 
 ### Değişen Dosyalar:
-- `dashboard/src/app/[locale]/(dashboard)/alerts/page.tsx`
-- `dashboard/src/app/[locale]/(dashboard)/api-keys/page.tsx`
-- `dashboard/src/app/[locale]/(dashboard)/custom-domain/CustomDomainContent.tsx`
-- `dashboard/src/app/[locale]/(dashboard)/integrations/IntegrationsContent.tsx`
-- `dashboard/src/app/[locale]/(dashboard)/service-tokens/page.tsx`
-- `dashboard/src/app/[locale]/(dashboard)/team/page.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/background-tasks/page.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/connectors/ConnectorsContent.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/environments/EnvironmentsContent.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/inbound/InboundContent.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/operational-webhooks/OperationalWebhooksList.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/rate-limiting/page.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/retry-policy/page.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/routing/page.tsx`
 
-### Push: `2d8d7181`
+### Push: `74e6f077`
 ### TypeScript: ✅ 0 hata
+
+### 🎉 RBAC IMPLEMENTASYONU TAMAMLANDI
+Toplam 16 sayfaya RBAC uygulandı.
 
 ---
 
-## 📝 Önceki Oturum (2026-05-23 — RBAC Frontend Part 1)
+## 📝 Önceki Oturum (2026-05-23 — RBAC Frontend Part 2)
 
 ### Özet
 Servet ile oturum. Frontend RBAC implementasyonu yapıldı. 5 dosya değişti, 260 satır eklendi.
