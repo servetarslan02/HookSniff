@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { AlertTriangle, Globe, Lock } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 export function EnvironmentsContent() {
   const t = useTranslations('environments');
@@ -152,10 +153,13 @@ export function EnvironmentsContent() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
+          <ReadOnlyBadge />
         </div>
-        <button onClick={() => setShowCreate(true)} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-          {t('newEnvironment')}
-        </button>
+        <RoleGuard require="canManageSettings">
+          <button onClick={() => setShowCreate(true)} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+            {t('newEnvironment')}
+          </button>
+        </RoleGuard>
       </div>
 
       {/* ── Loading Skeleton ── */}
@@ -226,12 +230,14 @@ export function EnvironmentsContent() {
                   {env.variable_count ?? 0} {t('variables')}
                 </button>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => openEdit(env)} className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-slate-300">
-                    {t('edit')}
-                  </button>
-                  <button onClick={() => setDeleteTarget(env)} className="text-xs text-red-500 hover:text-red-700">
-                    {t('delete')}
-                  </button>
+                  <RoleGuard require="canManageSettings">
+                    <button onClick={() => openEdit(env)} className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-slate-300">
+                      {t('edit')}
+                    </button>
+                    <button onClick={() => setDeleteTarget(env)} className="text-xs text-red-500 hover:text-red-700">
+                      {t('delete')}
+                    </button>
+                  </RoleGuard>
                 </div>
               </div>
             </div>

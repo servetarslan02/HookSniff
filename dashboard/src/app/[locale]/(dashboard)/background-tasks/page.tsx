@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { Ban, CheckCircle2, Clock, RefreshCw, XCircle } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 const statusColors: Record<string, React.ReactNode> = {
   pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400',
@@ -70,6 +71,7 @@ export default function BackgroundTasksPage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+          <ReadOnlyBadge />
         </div>
         {activeTasks.length > 0 && (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-medium">
@@ -192,10 +194,12 @@ export default function BackgroundTasksPage() {
 
                     {/* Cancel action */}
                     {(task.status === 'pending' || task.status === 'running') && (
-                      <button onClick={(e) => { e.stopPropagation(); setCancelTarget(task.id); }}
-                        className="px-4 py-2 text-xs font-medium bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/20 transition">
-                        {t('cancelTask')}
-                      </button>
+                      <RoleGuard require="canManageBackgroundTasks">
+                        <button onClick={(e) => { e.stopPropagation(); setCancelTarget(task.id); }}
+                          className="px-4 py-2 text-xs font-medium bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/20 transition">
+                          {t('cancelTask')}
+                        </button>
+                      </RoleGuard>
                     )}
                   </div>
                 )}
