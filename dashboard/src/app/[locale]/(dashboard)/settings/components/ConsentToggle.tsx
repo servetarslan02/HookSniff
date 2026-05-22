@@ -18,7 +18,9 @@ export function ConsentToggle({
   const t = useTranslations('settings');
   const [enabled, setEnabled] = useState(() => {
     if (typeof window === 'undefined') return false;
-    return localStorage.getItem(storageKey) === 'true';
+    const val = localStorage.getItem(storageKey);
+    // BUG FIX: Support both "accepted"/"rejected" (CookieConsent banner) and "true"/"false" (legacy)
+    return val === 'true' || val === 'accepted';
   });
   const [loading, setLoading] = useState(true);
 
@@ -35,8 +37,10 @@ export function ConsentToggle({
           if (cancelled) return;
           const serverValue = data.consents?.[consentKey];
           if (serverValue !== undefined) {
+            // BUG FIX: Backend stores true/false, normalize to accepted/rejected
+            const consentStr = serverValue ? 'accepted' : 'rejected';
             setEnabled(serverValue);
-            localStorage.setItem(storageKey, String(serverValue));
+            localStorage.setItem(storageKey, consentStr);
           }
         })
         .catch(() => {
@@ -53,13 +57,15 @@ export function ConsentToggle({
     const newValue = !enabled;
     const prevValue = enabled;
     setEnabled(newValue);
-    localStorage.setItem(storageKey, String(newValue));
+    // BUG FIX: Use "accepted"/"rejected" to match CookieConsent banner format
+    const consentValue = newValue ? 'accepted' : 'rejected';
+    localStorage.setItem(storageKey, consentValue);
 
-    // Update cookie
+    // Update cookie (also set legacy "true"/"false" for backward compat)
     if (newValue) {
-      document.cookie = `${storageKey}=true; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax; Secure`;
+      document.cookie = `${consentKey}=accepted; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax; Secure`;
     } else {
-      document.cookie = `${storageKey}=; path=/; max-age=0`;
+      document.cookie = `${consentKey}=; path=/; max-age=0`;
     }
 
     // Persist to backend
@@ -74,7 +80,8 @@ export function ConsentToggle({
       } catch (err) {
         // Revert on failure
         setEnabled(prevValue);
-        localStorage.setItem(storageKey, String(prevValue));
+        // BUG FIX: Use consistent format for revert
+        localStorage.setItem(storageKey, prevValue ? 'accepted' : 'rejected');
         toast(getErrorMessage(err, t('failedToUpdateConsent')), 'error');
       }
     }
