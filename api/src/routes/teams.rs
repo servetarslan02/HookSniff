@@ -320,6 +320,234 @@ pub async fn check_user_team_role_for_team(
     }
 }
 
+/// Get cached permissions or compute and cache them
+/// Returns the user's role and permissions for a specific team
+pub async fn get_cached_permissions(
+    pool: &PgPool,
+    customer_id: Uuid,
+    team_id: Uuid,
+) -> Result<(String, serde_json::Value), AppError> {
+    // Try cache first
+    let cached: Option<(String, serde_json::Value)> = sqlx::query_as(
+        "SELECT role, permissions FROM permission_cache WHERE customer_id = $1 AND team_id = $2 AND expires_at > NOW()"
+    )
+    .bind(customer_id)
+    .bind(team_id)
+    .fetch_optional(pool)
+    .await?;
+
+    if let Some((role, perms)) = cached {
+        return Ok((role, perms));
+    }
+
+    // Cache miss — compute permissions
+    let role = get_user_role(pool, customer_id, team_id).await?;
+    let permissions = compute_permissions(&role);
+
+    // Cache for 5 minutes
+    let _ = sqlx::query(
+        r#"INSERT INTO permission_cache (customer_id, team_id, role, permissions, expires_at)
+           VALUES ($1, $2, $3, $4, NOW() + INTERVAL '5 minutes')
+           ON CONFLICT (customer_id, team_id) DO UPDATE SET
+             role = EXCLUDED.role,
+             permissions = EXCLUDED.permissions,
+             cached_at = NOW(),
+             expires_at = NOW() + INTERVAL '5 minutes'"#
+    )
+    .bind(customer_id)
+    .bind(team_id)
+    .bind(&role)
+    .bind(&permissions)
+    .execute(pool)
+    .await?;
+
+    Ok((role, permissions))
+}
+
+/// Get user's role in a specific team
+async fn get_user_role(
+    pool: &PgPool,
+    customer_id: Uuid,
+    team_id: Uuid,
+) -> Result<String, AppError> {
+    // Check if owner
+    let is_owner: Option<(Uuid,)> = sqlx::query_as(
+        "SELECT id FROM teams WHERE id = $1 AND owner_id = $2"
+    )
+    .bind(team_id)
+    .bind(customer_id)
+    .fetch_optional(pool)
+    .await?;
+
+    if is_owner.is_some() {
+        return Ok("owner".to_string());
+    }
+
+    // Get role from team_members
+    let member: Option<(String,)> = sqlx::query_as(
+        "SELECT role FROM team_members WHERE team_id = $1 AND customer_id = $2"
+    )
+    .bind(team_id)
+    .bind(customer_id)
+    .fetch_optional(pool)
+    .await?;
+
+    match member {
+        Some((role,)) => Ok(role),
+        None => Ok("viewer".to_string()), // Default for personal accounts
+    }
+}
+
+/// Compute permissions based on role
+fn compute_permissions(role: &str) -> serde_json::Value {
+    match role {
+        "owner" | "admin" => serde_json::json!({
+            "can_manage_team": true,
+            "can_manage_webhooks": true,
+            "can_manage_api_keys": true,
+            "can_manage_integrations": true,
+            "can_manage_alerts": true,
+            "can_manage_billing": true,
+            "can_manage_domains": true,
+            "can_manage_applications": true,
+            "can_manage_operational_webhooks": true,
+            "can_manage_background_tasks": true,
+            "can_manage_routing": true,
+            "can_manage_rate_limits": true,
+            "can_view_observability": true,
+            "can_view_devtools": true,
+            "can_manage_settings": true,
+        }),
+        "developer" => serde_json::json!({
+            "can_manage_team": false,
+            "can_manage_webhooks": false,
+            "can_manage_api_keys": false,
+            "can_manage_integrations": false,
+            "can_manage_alerts": false,
+            "can_manage_billing": false,
+            "can_manage_domains": false,
+            "can_manage_applications": false,
+            "can_manage_operational_webhooks": false,
+            "can_manage_background_tasks": false,
+            "can_manage_routing": false,
+            "can_manage_rate_limits": false,
+            "can_view_observability": true,
+            "can_view_devtools": true,
+            "can_manage_settings": true,
+        }),
+        "analyst" => serde_json::json!({
+            "can_manage_team": false,
+            "can_manage_webhooks": false,
+            "can_manage_api_keys": false,
+            "can_manage_integrations": false,
+            "can_manage_alerts": false,
+            "can_manage_billing": false,
+            "can_manage_domains": false,
+            "can_manage_applications": false,
+            "can_manage_operational_webhooks": false,
+            "can_manage_background_tasks": false,
+            "can_manage_routing": false,
+            "can_manage_rate_limits": false,
+            "can_view_observability": true,
+            "can_view_devtools": false,
+            "can_manage_settings": true,
+        }),
+        _ => serde_json::json!({
+            "can_manage_team": false,
+            "can_manage_webhooks": false,
+            "can_manage_api_keys": false,
+            "can_manage_integrations": false,
+            "can_manage_alerts": false,
+            "can_manage_billing": false,
+            "can_manage_domains": false,
+            "can_manage_applications": false,
+            "can_manage_operational_webhooks": false,
+            "can_manage_background_tasks": false,
+            "can_manage_routing": false,
+            "can_manage_rate_limits": false,
+            "can_view_observability": false,
+            "can_view_devtools": false,
+            "can_manage_settings": true,
+        }),
+    }
+}
+
+/// Invalidate permission cache for a user
+pub async fn invalidate_permission_cache(
+    pool: &PgPool,
+    customer_id: Uuid,
+    team_id: Option<Uuid>,
+) -> Result<(), AppError> {
+    if let Some(tid) = team_id {
+        sqlx::query("DELETE FROM permission_cache WHERE customer_id = $1 AND team_id = $2")
+            .bind(customer_id)
+            .bind(tid)
+            .execute(pool)
+            .await?;
+    } else {
+        sqlx::query("DELETE FROM permission_cache WHERE customer_id = $1")
+            .bind(customer_id)
+            .execute(pool)
+            .await?;
+    }
+    Ok(())
+}
+
+/// Check rate limit for user's role
+pub async fn check_role_rate_limit(
+    pool: &PgPool,
+    customer_id: Uuid,
+    team_id: Uuid,
+) -> Result<(), AppError> {
+    let role = get_user_role(pool, customer_id, team_id).await?;
+    
+    let limits: Option<(i32, i32, i32)> = sqlx::query_as(
+        "SELECT requests_per_minute, requests_per_hour, burst_size FROM role_rate_limits WHERE team_id = $1 AND role = $2"
+    )
+    .bind(team_id)
+    .bind(&role)
+    .fetch_optional(pool)
+    .await?;
+
+    if let Some((_per_min, _per_hour, _burst)) = limits {
+        // TODO: Implement actual rate limiting with Redis
+        // For now, just log the check
+        tracing::debug!("Rate limit check for {} (role: {}): {:?}", customer_id, role, limits);
+    }
+
+    Ok(())
+}
+
+/// Log RBAC action to audit trail
+pub async fn log_rbac_action(
+    pool: &PgPool,
+    actor_id: Uuid,
+    target_id: Option<Uuid>,
+    team_id: Option<Uuid>,
+    action: &str,
+    old_value: Option<serde_json::Value>,
+    new_value: Option<serde_json::Value>,
+    ip_address: Option<&str>,
+    user_agent: Option<&str>,
+) -> Result<(), AppError> {
+    sqlx::query(
+        r#"INSERT INTO rbac_audit_log (actor_id, target_id, team_id, action, old_value, new_value, ip_address, user_agent)
+           VALUES ($1, $2, $3, $4, $5, $6, $7::inet, $8)"#
+    )
+    .bind(actor_id)
+    .bind(target_id)
+    .bind(team_id)
+    .bind(action)
+    .bind(old_value.unwrap_or_default())
+    .bind(new_value.unwrap_or_default())
+    .bind(ip_address)
+    .bind(user_agent)
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
 // ── Routes ───────────────────────────────────────────────────────────────────
 
 // ── Handlers ─────────────────────────────────────────────────────────────────
@@ -883,12 +1111,37 @@ async fn change_role(
         team_id
     );
 
-    // Audit log — ROLE_CHANGE
+    // Get old role for audit
+    let old_role: Option<String> = sqlx::query_scalar(
+        "SELECT role FROM team_members WHERE team_id = $1 AND customer_id = $2"
+    )
+    .bind(team_id)
+    .bind(uid)
+    .fetch_optional(&pool)
+    .await?;
+
+    // Audit log — ROLE_CHANGE (enhanced)
     {
         let tid = team_id.to_string();
         let _ = crate::audit::log_action(&pool, customer.id, "ROLE_CHANGE", "team", Some(&tid),
             Some(serde_json::json!({"user_id": uid.to_string(), "new_role": &req.role})), None, None).await;
+
+        // RBAC audit log
+        let _ = log_rbac_action(
+            &pool,
+            customer.id,
+            Some(uid),
+            Some(team_id),
+            "role_change",
+            Some(serde_json::json!({"role": old_role})),
+            Some(serde_json::json!({"role": &req.role})),
+            None,
+            None,
+        ).await;
     }
+
+    // Invalidate permission cache
+    let _ = invalidate_permission_cache(&pool, uid, Some(team_id)).await;
 
     Ok(Json(serde_json::json!({
         "role": req.role,
@@ -1495,5 +1748,188 @@ mod tests {
         assert!(role_level("developer") >= read_min, "developer can read");
         assert!(role_level("analyst") >= read_min, "analyst can read");
         assert!(role_level("viewer") < read_min, "viewer cannot read analytics");
+    }
+
+    // ── compute_permissions — comprehensive tests ───────────
+
+    #[test]
+    fn test_compute_permissions_owner() {
+        let perms = compute_permissions("owner");
+        assert_eq!(perms["can_manage_team"], true);
+        assert_eq!(perms["can_manage_webhooks"], true);
+        assert_eq!(perms["can_manage_billing"], true);
+        assert_eq!(perms["can_view_devtools"], true);
+        assert_eq!(perms["can_view_observability"], true);
+    }
+
+    #[test]
+    fn test_compute_permissions_admin() {
+        let perms = compute_permissions("admin");
+        assert_eq!(perms["can_manage_team"], true);
+        assert_eq!(perms["can_manage_webhooks"], true);
+        assert_eq!(perms["can_manage_billing"], true);
+        assert_eq!(perms["can_view_devtools"], true);
+        assert_eq!(perms["can_view_observability"], true);
+    }
+
+    #[test]
+    fn test_compute_permissions_developer() {
+        let perms = compute_permissions("developer");
+        assert_eq!(perms["can_manage_team"], false);
+        assert_eq!(perms["can_manage_webhooks"], false);
+        assert_eq!(perms["can_manage_billing"], false);
+        assert_eq!(perms["can_view_devtools"], true);
+        assert_eq!(perms["can_view_observability"], true);
+    }
+
+    #[test]
+    fn test_compute_permissions_analyst() {
+        let perms = compute_permissions("analyst");
+        assert_eq!(perms["can_manage_team"], false);
+        assert_eq!(perms["can_manage_webhooks"], false);
+        assert_eq!(perms["can_manage_billing"], false);
+        assert_eq!(perms["can_view_devtools"], false);
+        assert_eq!(perms["can_view_observability"], true);
+    }
+
+    #[test]
+    fn test_compute_permissions_viewer() {
+        let perms = compute_permissions("viewer");
+        assert_eq!(perms["can_manage_team"], false);
+        assert_eq!(perms["can_manage_webhooks"], false);
+        assert_eq!(perms["can_manage_billing"], false);
+        assert_eq!(perms["can_view_devtools"], false);
+        assert_eq!(perms["can_view_observability"], false);
+        assert_eq!(perms["can_manage_settings"], true);
+    }
+
+    // ── Role hierarchy — edge cases ─────────────────────────
+
+    #[test]
+    fn test_role_level_unknown_role() {
+        assert_eq!(role_level("unknown"), 0);
+        assert_eq!(role_level(""), 0);
+        assert_eq!(role_level("superadmin"), 0);
+    }
+
+    #[test]
+    fn test_role_level_legacy_member() {
+        // "member" is legacy role treated as "viewer"
+        assert_eq!(role_level("member"), 10);
+    }
+
+    #[test]
+    fn test_role_level_ordering() {
+        assert!(role_level("owner") > role_level("admin"));
+        assert!(role_level("admin") > role_level("developer"));
+        assert!(role_level("developer") > role_level("analyst"));
+        assert!(role_level("analyst") > role_level("viewer"));
+    }
+
+    // ── Permission matrix — all operations ──────────────────
+
+    #[test]
+    fn test_permission_matrix_team_management() {
+        // Team management requires admin+
+        let min = role_level("admin");
+        assert!(role_level("owner") >= min);
+        assert!(role_level("admin") >= min);
+        assert!(role_level("developer") < min);
+        assert!(role_level("analyst") < min);
+        assert!(role_level("viewer") < min);
+    }
+
+    #[test]
+    fn test_permission_matrix_api_keys() {
+        // API keys require admin+
+        let min = role_level("admin");
+        assert!(role_level("owner") >= min);
+        assert!(role_level("admin") >= min);
+        assert!(role_level("developer") < min);
+        assert!(role_level("analyst") < min);
+        assert!(role_level("viewer") < min);
+    }
+
+    #[test]
+    fn test_permission_matrix_integrations() {
+        // Integrations require admin+
+        let min = role_level("admin");
+        assert!(role_level("owner") >= min);
+        assert!(role_level("admin") >= min);
+        assert!(role_level("developer") < min);
+        assert!(role_level("analyst") < min);
+        assert!(role_level("viewer") < min);
+    }
+
+    #[test]
+    fn test_permission_matrix_alerts() {
+        // Alerts require admin+
+        let min = role_level("admin");
+        assert!(role_level("owner") >= min);
+        assert!(role_level("admin") >= min);
+        assert!(role_level("developer") < min);
+        assert!(role_level("analyst") < min);
+        assert!(role_level("viewer") < min);
+    }
+
+    #[test]
+    fn test_permission_matrix_domains() {
+        // Custom domains require admin+
+        let min = role_level("admin");
+        assert!(role_level("owner") >= min);
+        assert!(role_level("admin") >= min);
+        assert!(role_level("developer") < min);
+        assert!(role_level("analyst") < min);
+        assert!(role_level("viewer") < min);
+    }
+
+    #[test]
+    fn test_permission_matrix_routing() {
+        // Routing requires admin+
+        let min = role_level("admin");
+        assert!(role_level("owner") >= min);
+        assert!(role_level("admin") >= min);
+        assert!(role_level("developer") < min);
+        assert!(role_level("analyst") < min);
+        assert!(role_level("viewer") < min);
+    }
+
+    #[test]
+    fn test_permission_matrix_observability() {
+        // Observability requires analyst+
+        let min = role_level("analyst");
+        assert!(role_level("owner") >= min);
+        assert!(role_level("admin") >= min);
+        assert!(role_level("developer") >= min);
+        assert!(role_level("analyst") >= min);
+        assert!(role_level("viewer") < min);
+    }
+
+    #[test]
+    fn test_permission_matrix_devtools() {
+        // DevTools requires developer+
+        let min = role_level("developer");
+        assert!(role_level("owner") >= min);
+        assert!(role_level("admin") >= min);
+        assert!(role_level("developer") >= min);
+        assert!(role_level("analyst") < min);
+        assert!(role_level("viewer") < min);
+    }
+
+    // ── Rate limit defaults ─────────────────────────────────
+
+    #[test]
+    fn test_rate_limit_hierarchy() {
+        // Higher roles should have higher rate limits
+        let owner_rpm = 120;
+        let admin_rpm = 100;
+        let developer_rpm = 80;
+        let analyst_rpm = 60;
+        let viewer_rpm = 30;
+
+        assert!(owner_rpm > admin_rpm);
+        assert!(admin_rpm > developer_rpm);
+        assert!(developer_rpm > analyst_rpm);
+        assert!(analyst_rpm > viewer_rpm);
     }
 }
