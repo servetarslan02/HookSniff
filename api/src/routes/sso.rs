@@ -280,7 +280,7 @@ async fn get_sso_config(
         .bind(customer.id)
         .fetch_optional(&pool)
         .await?
-        .ok_or(AppError::Forbidden("Not a member of this team".into()))?;
+        .ok_or(AppError::Forbidden)?;
 
         sqlx::query_as::<_, (Uuid, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, bool, Option<String>, Option<Uuid>, Option<String>, DateTime<Utc>, DateTime<Utc>)>(
             "SELECT s.id, s.provider, s.enabled, s.metadata_url, s.entity_id, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.admin_bypass, s.verified_domain, s.default_team_id, s.default_role, s.created_at, s.updated_at
@@ -383,7 +383,7 @@ async fn upsert_sso_config(
         .bind(customer.id)
         .fetch_optional(&pool)
         .await?
-        .ok_or(AppError::Forbidden("Not a member of this team".into()))?;
+        .ok_or(AppError::Forbidden)?;
 
         if member.0 != "admin" {
             // Also check if user is team owner
@@ -396,7 +396,7 @@ async fn upsert_sso_config(
             .await?;
 
             if is_owner.is_none() {
-                return Err(AppError::Forbidden("Only team admins can manage SSO".into()));
+                return Err(AppError::Forbidden);
             }
         }
         Some(tid)
@@ -588,7 +588,7 @@ async fn delete_sso_config(
         .await?;
 
         if member.is_none() {
-            return Err(AppError::Forbidden("You are not a member of this team".into()));
+            return Err(AppError::Forbidden);
         }
 
         sqlx::query("DELETE FROM sso_configs WHERE team_id = $1")
@@ -642,7 +642,7 @@ async fn get_login_attempts(
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Only admins can view login attempts
     if !customer.is_admin {
-        return Err(AppError::Forbidden("Admin access required".into()));
+        return Err(AppError::Forbidden);
     }
 
     let page: i64 = query.get("page").and_then(|p| p.parse().ok()).unwrap_or(1).max(1);
@@ -846,7 +846,7 @@ async fn test_sso_connection(
         .bind(customer.id)
         .fetch_optional(&pool)
         .await?
-        .ok_or(AppError::Forbidden("Not a member of this team".into()))?;
+        .ok_or(AppError::Forbidden)?;
 
         sqlx::query_as::<_, (String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
             "SELECT provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, metadata_url, entity_id FROM sso_configs WHERE team_id = $1 LIMIT 1"
@@ -1196,7 +1196,7 @@ async fn initiate_sso_login(
 // ── SAML Login: Generate AuthnRequest and redirect ──────────
 
 async fn initiate_saml_login(
-    pool: &PgPool,
+    _pool: &PgPool,
     customer: &Customer,
     state: &str,
     sso_url: &Option<String>,
@@ -1260,7 +1260,7 @@ async fn initiate_saml_login(
 // ── OIDC Login: Redirect to authorization endpoint ──────────
 
 async fn initiate_oidc_login(
-    pool: &PgPool,
+    _pool: &PgPool,
     customer: &Customer,
     state: &str,
     issuer_url: &Option<String>,
@@ -1418,7 +1418,7 @@ async fn saml_callback(
         .await?
         .flatten();
 
-        if let (Some(ref expected_cert), Some(ref response_cert)) = (configured_cert, &assertion.certificate) {
+        if let (Some(ref expected_cert), Some(ref response_cert)) = (&configured_cert, &assertion.certificate) {
             // Normalize both certificates for comparison (strip headers, whitespace)
             let normalize = |s: &String| -> String {
                 s.replace("-----BEGIN CERTIFICATE-----", "")
@@ -1737,7 +1737,7 @@ async fn list_sso_providers(
     .fetch_all(&pool)
     .await?;
 
-    let provider_list: Vec<serde_json::Value> = providers.iter().map(|(provider, email)| {
+    let provider_list: Vec<serde_json::Value> = providers.iter().map(|(provider, _email)| {
         serde_json::json!({
             "provider": provider,
             "email_domain": domain,
@@ -1811,7 +1811,7 @@ fn extract_xml_text(xml: &str, tag: &str) -> Option<String> {
     use quick_xml::Reader;
 
     let mut reader = Reader::from_str(xml);
-    reader.trim_text(true);
+    reader.config_mut().trim_text(true);
     let mut buf = Vec::new();
     let mut depth: u32 = 0;
     let mut in_target = false;
@@ -1866,7 +1866,7 @@ fn extract_xml_attribute(xml: &str, element: &str, attr: &str) -> Option<String>
     use quick_xml::Reader;
 
     let mut reader = Reader::from_str(xml);
-    reader.trim_text(true);
+    reader.config_mut().trim_text(true);
     let mut buf = Vec::new();
 
     loop {
@@ -1896,7 +1896,7 @@ fn extract_saml_attribute(xml: &str, name: &str) -> Option<String> {
     use quick_xml::Reader;
 
     let mut reader = Reader::from_str(xml);
-    reader.trim_text(true);
+    reader.config_mut().trim_text(true);
     let mut buf = Vec::new();
     let mut in_attr = false;
     let mut in_value = false;
@@ -1961,8 +1961,8 @@ fn extract_saml_attribute(xml: &str, name: &str) -> Option<String> {
 ///
 /// `quick-xml` returns names with namespace prefix stripped for `name()` calls,
 /// but we handle both cases for robustness.
-fn local_name_matches(xml_name: &[u8], target: &str) -> bool {
-    let name = std::str::from_utf8(xml_name).unwrap_or("");
+fn local_name_matches(xml_name: quick_xml::name::QName<'_>, target: &str) -> bool {
+    let name = std::str::from_utf8(xml_name.as_ref()).unwrap_or("");
     // Direct match
     if name == target {
         return true;
@@ -2374,7 +2374,7 @@ fn extract_signed_info_xml(xml: &str) -> Option<String> {
     let mut depth: u32 = 0;
 
     loop {
-        let offset = reader.buffer_position();
+        let offset = reader.buffer_position() as usize;
         match reader.read_event_into(&mut buf) {
             Ok(Event::Start(ref e)) => {
                 if local_name_matches(e.name(), "SignedInfo") {
@@ -2388,7 +2388,7 @@ fn extract_signed_info_xml(xml: &str) -> Option<String> {
                 if start_offset.is_some() {
                     if local_name_matches(e.name(), "SignedInfo") {
                         // Found the closing tag — extract raw XML including both tags
-                        let end_offset = reader.buffer_position();
+                        let end_offset = reader.buffer_position() as usize;
                         return Some(xml[start_offset.unwrap()..end_offset].to_string());
                     }
                     depth = depth.saturating_sub(1);

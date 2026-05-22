@@ -243,7 +243,7 @@ async fn process_webhook_result(
             plan,
             status,
             interval,
-            event_id,
+            event_id: _,
             cancel_at_period_end,
             current_period_end,
         } => {
@@ -289,7 +289,7 @@ async fn process_webhook_result(
         }
         WebhookResult::SubscriptionCanceled {
             provider_subscription_id,
-            event_id,
+            event_id: _,
         } => {
             let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
             if let Some(sub_col) = provider_sub_col(provider) {

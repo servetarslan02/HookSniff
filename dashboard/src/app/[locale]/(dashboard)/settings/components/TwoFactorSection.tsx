@@ -7,7 +7,7 @@ import { twoFactorApi } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
 import { useTranslations } from 'next-intl';
 import { ShieldCheck, CheckCircle2 } from '@/components/icons';
-import DOMPurify from 'dompurify';
+// import DOMPurify from 'dompurify';
 
 export function TwoFactorSection() {
   const { token } = useAuth();
@@ -22,7 +22,7 @@ export function TwoFactorSection() {
 
   // Enable flow
   const [qrCodeUrl, setQrCodeUrl] = useState('');
-  const [otpauthUri, setOtpauthUri] = useState('');
+  const [_otpauthUri, setOtpauthUri] = useState('');
   const [secret, setSecret] = useState('');
   const [totpCode, setTotpCode] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);

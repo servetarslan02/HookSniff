@@ -249,7 +249,7 @@ async fn analyst_dashboard(
     }
 
     // Team filter
-    let team_filter = service_token.as_ref().map(|s| s.team_id);
+    let _team_filter = service_token.as_ref().map(|s| s.team_id);
 
     // Total deliveries by period
     let deliveries_24h: (i64,) = sqlx::query_as(

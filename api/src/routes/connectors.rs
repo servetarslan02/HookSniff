@@ -13,7 +13,7 @@
 //! - `DELETE /v1/connectors/configs/{id}` — Delete connector config
 
 use axum::extract::{Extension, Path};
-use axum::routing::{get, post};
+use axum::routing::get;
 use axum::{Json, Router};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};

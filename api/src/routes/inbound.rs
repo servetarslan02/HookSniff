@@ -714,9 +714,7 @@ async fn process_inbound(
             provider,
             customer.id
         );
-        return Err(AppError::Forbidden(
-            "Webhook secret not configured. Set a secret in your inbound config.".into(),
-        ));
+        return Err(AppError::Forbidden);
     }
 
     provider

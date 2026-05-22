@@ -161,7 +161,7 @@ pub async fn require_team_member(
     .bind(customer_id)
     .fetch_optional(pool)
     .await?
-    .ok_or(AppError::Forbidden("Not a member of this team".into()))
+    .ok_or(AppError::Forbidden)
 }
 
 /// Check that the user meets the minimum role level (or is the team owner).
@@ -187,7 +187,7 @@ pub async fn require_role(
     if role_level(&member.role) >= role_level(min_role) {
         Ok(())
     } else {
-        Err(AppError::Forbidden(format!("{} role or higher required", min_role)))
+        Err(AppError::Forbidden)
     }
 }
 
@@ -259,7 +259,7 @@ pub async fn check_user_team_role(
         return Ok(());
     }
 
-    Err(AppError::Forbidden(format!("{} role or higher required in any team", min_role)))
+    Err(AppError::Forbidden)
 }
 
 // ── Routes ───────────────────────────────────────────────────────────────────
@@ -533,9 +533,7 @@ async fn accept_invite(
 
     // Check email matches
     if invite.email != customer.email {
-        return Err(AppError::Forbidden(
-            "This invitation was sent to a different email address".into(),
-        ));
+        return Err(AppError::Forbidden);
     }
 
     // Check not already a member
@@ -902,7 +900,7 @@ async fn delete_team(
 
     // Only owner can delete
     if team.owner_id != customer.id {
-        return Err(AppError::Forbidden("Only the team owner can delete the team".into()));
+        return Err(AppError::Forbidden);
     }
 
     // Check if SSO config references this team as default
@@ -997,7 +995,7 @@ async fn transfer_ownership(
 
     // Only owner can transfer
     if team.owner_id != customer.id {
-        return Err(AppError::Forbidden("Only the team owner can transfer ownership".into()));
+        return Err(AppError::Forbidden);
     }
 
     // New owner must be a team member

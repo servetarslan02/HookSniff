@@ -108,9 +108,7 @@ async fn create_application(
     .await?;
 
     if exists.0 {
-        return Err(AppError::Conflict(
-            "An application with this name already exists".into(),
-        ));
+        return Err(AppError::Conflict);
     }
 
     let app = sqlx::query_as::<_, Application>(
@@ -183,9 +181,7 @@ async fn update_application(
             .await?;
 
             if exists.0 {
-                return Err(AppError::Conflict(
-                    "An application with this name already exists".into(),
-                ));
+                return Err(AppError::Conflict);
             }
         }
     }

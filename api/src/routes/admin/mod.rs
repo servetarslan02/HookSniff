@@ -283,7 +283,7 @@ pub struct SendEmailRequest {
 /// Require admin or support role for read operations.
 pub fn require_admin(customer: &Customer) -> Result<(), AppError> {
     if !customer.is_admin && !matches!(customer.role.as_str(), "admin" | "support") {
-        return Err(AppError::Forbidden("Admin access required".into()));
+        return Err(AppError::Forbidden);
     }
     Ok(())
 }
@@ -291,7 +291,7 @@ pub fn require_admin(customer: &Customer) -> Result<(), AppError> {
 /// Require admin role (not support) for write operations.
 pub fn require_admin_write(customer: &Customer) -> Result<(), AppError> {
     if !customer.is_admin && customer.role != "admin" {
-        return Err(AppError::Forbidden("Admin write access required".into()));
+        return Err(AppError::Forbidden);
     }
     Ok(())
 }
