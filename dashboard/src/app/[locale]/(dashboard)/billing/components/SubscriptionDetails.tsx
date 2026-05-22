@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/store';
 import { useBillingSubscription } from '@/hooks/useDashboardData';
 import { getErrorMessage } from '@/lib/errors';
 import { AlertTriangle, CreditCard, DollarSign, Pause, Play } from '@/components/icons';
+import { RoleGuard } from '@/components/RoleGuard';
 
 const PROVIDER_LABELS: Record<string, { name: string; icon: React.ReactNode }> = {
   stripe: { name: 'Stripe', icon: <CreditCard size={16} strokeWidth={1.75} /> },
@@ -136,42 +137,44 @@ export function SubscriptionDetails({ onCancel, onPause, onResume, onRefundReque
             </p>
           )}
           <div className="flex gap-3 mt-2">
-            {!isFree && !sub.paused_at && !sub.cancel_at_period_end && (
-              <button
-                type="button"
-                onClick={onPause}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-              >
-                <Pause size={12} strokeWidth={1.75} /> {t('pauseSubscription')}
-              </button>
-            )}
-            {!isFree && !sub.paused_at && !sub.cancel_at_period_end && (
-              <button
-                type="button"
-                onClick={onCancel}
-                className="text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1"
-              >
-                {t('cancelSubscription')}
-              </button>
-            )}
-            {!isFree && !sub.paused_at && !sub.cancel_at_period_end && onRefundRequest && (
-              <button
-                type="button"
-                onClick={onRefundRequest}
-                className="text-xs text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
-              >
-                {t('requestRefund') || 'Request Refund'}
-              </button>
-            )}
-            {sub.paused_at && (
-              <button
-                type="button"
-                onClick={onResume}
-                className="text-xs text-green-600 dark:text-green-400 hover:underline flex items-center gap-1"
-              >
-                <Play size={12} strokeWidth={1.75} /> {t('resumeSubscription')}
-              </button>
-            )}
+            <RoleGuard require="canManageBilling">
+              {!isFree && !sub.paused_at && !sub.cancel_at_period_end && (
+                <button
+                  type="button"
+                  onClick={onPause}
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                >
+                  <Pause size={12} strokeWidth={1.75} /> {t('pauseSubscription')}
+                </button>
+              )}
+              {!isFree && !sub.paused_at && !sub.cancel_at_period_end && (
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  className="text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1"
+                >
+                  {t('cancelSubscription')}
+                </button>
+              )}
+              {!isFree && !sub.paused_at && !sub.cancel_at_period_end && onRefundRequest && (
+                <button
+                  type="button"
+                  onClick={onRefundRequest}
+                  className="text-xs text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
+                >
+                  {t('requestRefund') || 'Request Refund'}
+                </button>
+              )}
+              {sub.paused_at && (
+                <button
+                  type="button"
+                  onClick={onResume}
+                  className="text-xs text-green-600 dark:text-green-400 hover:underline flex items-center gap-1"
+                >
+                  <Play size={12} strokeWidth={1.75} /> {t('resumeSubscription')}
+                </button>
+              )}
+            </RoleGuard>
           </div>
         </div>
 

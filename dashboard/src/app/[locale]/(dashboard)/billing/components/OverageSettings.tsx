@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/store';
 import { useOverageSettings } from '@/hooks/useDashboardData';
 import { useQueryClient } from '@tanstack/react-query';
 import { getErrorMessage } from '@/lib/errors';
+import { RoleGuard } from '@/components/RoleGuard';
 
 export function OverageSettings() {
   const { token } = useAuth();
@@ -54,25 +55,26 @@ export function OverageSettings() {
 
       <div className="space-y-4">
         {/* Allow Overage Toggle */}
-        <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
-          <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {t('allowOverage')}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-              {t('allowOverageDesc')}
-            </p>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={settings.allow_overage}
-            disabled={saving || isFree}
-            onClick={() => handleToggle('allow_overage', !settings.allow_overage)}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-              settings.allow_overage ? 'bg-brand-600' : 'bg-gray-200 dark:bg-slate-600'
-            }`}
-          >
+        <RoleGuard require="canManageBilling">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {t('allowOverage')}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                {t('allowOverageDesc')}
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={settings.allow_overage}
+              disabled={saving || isFree}
+              onClick={() => handleToggle('allow_overage', !settings.allow_overage)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                settings.allow_overage ? 'bg-brand-600' : 'bg-gray-200 dark:bg-slate-600'
+              }`}
+            >
             <span
               className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-xs ring-0 transition-transform duration-200 ease-in-out ${
                 settings.allow_overage ? 'translate-x-5' : 'translate-x-0'
@@ -80,34 +82,37 @@ export function OverageSettings() {
             />
           </button>
         </div>
+        </RoleGuard>
 
         {/* Email Notification Toggle */}
-        <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
-          <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {t('overageEmailNotification')}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-              {t('overageEmailNotificationDesc')}
-            </p>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={settings.overage_email_notification}
-            disabled={saving || isFree}
-            onClick={() => handleToggle('overage_email_notification', !settings.overage_email_notification)}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-              settings.overage_email_notification ? 'bg-brand-600' : 'bg-gray-200 dark:bg-slate-600'
-            }`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-xs ring-0 transition-transform duration-200 ease-in-out ${
-                settings.overage_email_notification ? 'translate-x-5' : 'translate-x-0'
+        <RoleGuard require="canManageBilling">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-900">
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {t('overageEmailNotification')}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                {t('overageEmailNotificationDesc')}
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={settings.overage_email_notification}
+              disabled={saving || isFree}
+              onClick={() => handleToggle('overage_email_notification', !settings.overage_email_notification)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                settings.overage_email_notification ? 'bg-brand-600' : 'bg-gray-200 dark:bg-slate-600'
               }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-xs ring-0 transition-transform duration-200 ease-in-out ${
+                  settings.overage_email_notification ? 'translate-x-5' : 'translate-x-0'
+                }`}
             />
           </button>
         </div>
+        </RoleGuard>
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
