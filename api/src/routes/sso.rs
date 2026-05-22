@@ -2906,6 +2906,56 @@ struct SsoUserAttributesRow {
     raw_attributes: Option<serde_json::Value>,
 }
 
+/// Combined row for SCIM list query (Customer + SSO attributes)
+#[derive(sqlx::FromRow)]
+struct ScimUserRow {
+    // Customer fields
+    id: Uuid,
+    email: String,
+    api_key_hash: String,
+    api_key_prefix: String,
+    plan: String,
+    webhook_limit: i64,
+    webhook_count: i64,
+    created_at: DateTime<Utc>,
+    password_hash: Option<String>,
+    stripe_customer_id: Option<String>,
+    stripe_subscription_id: Option<String>,
+    payment_provider: String,
+    polar_customer_id: Option<String>,
+    polar_subscription_id: Option<String>,
+    iyzico_customer_id: Option<String>,
+    iyzico_subscription_id: Option<String>,
+    name: Option<String>,
+    is_active: bool,
+    is_admin: bool,
+    role: String,
+    updated_at: DateTime<Utc>,
+    email_verified: bool,
+    totp_secret: Option<String>,
+    totp_enabled: bool,
+    cancel_at_period_end: bool,
+    payment_failed_at: Option<DateTime<Utc>>,
+    current_period_end: Option<DateTime<Utc>>,
+    allow_overage: bool,
+    overage_email_notification: bool,
+    card_last4: Option<String>,
+    card_brand: Option<String>,
+    card_exp_month: Option<i32>,
+    card_exp_year: Option<i32>,
+    card_updated_at: Option<DateTime<Utc>>,
+    paused_at: Option<DateTime<Utc>>,
+    paused_until: Option<DateTime<Utc>>,
+    pause_plan: Option<String>,
+    billing_interval: Option<String>,
+    has_used_startup_trial: bool,
+    // SSO attribute fields
+    idp_user_id: Option<String>,
+    idp_groups: Option<Vec<String>>,
+    idp_roles: Option<Vec<String>>,
+    raw_attributes: Option<serde_json::Value>,
+}
+
 /// GET /scim/v2/Users — List users
 async fn scim_list_users(
     Extension(pool): Extension<PgPool>,
@@ -2934,7 +2984,7 @@ async fn scim_list_users(
     };
 
     // Get all customers who logged in via this SSO config
-    let customers: Vec<(Customer, Option<SsoUserAttributesRow>)> = sqlx::query_as(
+    let rows: Vec<ScimUserRow> = sqlx::query_as(
         r#"SELECT c.*, sa.idp_user_id, sa.idp_groups, sa.idp_roles, sa.raw_attributes
            FROM customers c
            INNER JOIN sso_user_attributes sa ON sa.customer_id = c.id
@@ -2946,10 +2996,36 @@ async fn scim_list_users(
     .fetch_all(&pool)
     .await?;
 
-    let total = customers.len();
-    let resources: Vec<serde_json::Value> = customers
+    let total = rows.len();
+    let resources: Vec<serde_json::Value> = rows
         .iter()
-        .map(|(c, attrs)| scim_user_response(c, attrs.as_ref()))
+        .map(|r| {
+            let customer = Customer {
+                id: r.id, email: r.email.clone(), api_key_hash: r.api_key_hash.clone(),
+                api_key_prefix: r.api_key_prefix.clone(), plan: r.plan.clone(),
+                webhook_limit: r.webhook_limit, webhook_count: r.webhook_count,
+                created_at: r.created_at, password_hash: r.password_hash.clone(),
+                stripe_customer_id: r.stripe_customer_id.clone(), stripe_subscription_id: r.stripe_subscription_id.clone(),
+                payment_provider: r.payment_provider.clone(), polar_customer_id: r.polar_customer_id.clone(),
+                polar_subscription_id: r.polar_subscription_id.clone(), iyzico_customer_id: r.iyzico_customer_id.clone(),
+                iyzico_subscription_id: r.iyzico_subscription_id.clone(), name: r.name.clone(),
+                is_active: r.is_active, is_admin: r.is_admin, role: r.role.clone(),
+                updated_at: r.updated_at, email_verified: r.email_verified,
+                totp_secret: r.totp_secret.clone(), totp_enabled: r.totp_enabled,
+                cancel_at_period_end: r.cancel_at_period_end, payment_failed_at: r.payment_failed_at,
+                current_period_end: r.current_period_end, allow_overage: r.allow_overage,
+                overage_email_notification: r.overage_email_notification, card_last4: r.card_last4.clone(),
+                card_brand: r.card_brand.clone(), card_exp_month: r.card_exp_month,
+                card_exp_year: r.card_exp_year, card_updated_at: r.card_updated_at,
+                paused_at: r.paused_at, paused_until: r.paused_until, pause_plan: r.pause_plan.clone(),
+                billing_interval: r.billing_interval.clone(), has_used_startup_trial: r.has_used_startup_trial,
+            };
+            let attrs = SsoUserAttributesRow {
+                idp_user_id: r.idp_user_id.clone(), idp_groups: r.idp_groups.clone(),
+                idp_roles: r.idp_roles.clone(), raw_attributes: r.raw_attributes.clone(),
+            };
+            scim_user_response(&customer, Some(&attrs))
+        })
         .collect();
 
     Ok(Json(serde_json::json!({
