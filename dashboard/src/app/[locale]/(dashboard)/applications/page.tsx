@@ -11,6 +11,7 @@ import { useApplications } from '@/hooks/useDashboardData';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import { Smartphone, Pencil } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 /* ─── Hook0-style: Application card grid ─── */
 
@@ -161,14 +162,17 @@ export default function ApplicationsPage() {
           <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
             {apps.length}
           </span>
+          <ReadOnlyBadge />
         </div>
-        <button
-          type="button"
-          onClick={() => setShowCreate(!showCreate)}
-          className="px-3 sm:px-4 py-2 bg-indigo-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-indigo-700 transition"
-        >
-          {t('create') || 'Create application'}
-        </button>
+        <RoleGuard require="canManageApplications">
+          <button
+            type="button"
+            onClick={() => setShowCreate(!showCreate)}
+            className="px-3 sm:px-4 py-2 bg-indigo-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-indigo-700 transition"
+          >
+            {t('create') || 'Create application'}
+          </button>
+        </RoleGuard>
       </div>
 
       {/* ── Search ── */}
@@ -322,28 +326,30 @@ export default function ApplicationsPage() {
                 </div>
 
                 {/* Action buttons (small, top-right) */}
-                <div className="absolute top-4 right-4 flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => { setEditApp(app); setEditName(app.name); setEditDesc(app.description || ''); }}
-                    className="p-1 text-gray-300 hover:text-indigo-500 dark:text-gray-600 dark:hover:text-indigo-400 transition"
-                    title={t('edit') || 'Edit'}
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDeleteId(app.id)}
-                    className="p-1 text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 transition"
-                    title={t('delete') || 'Delete'}
-                  >
+                <RoleGuard require="canManageApplications">
+                  <div className="absolute top-4 right-4 flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => { setEditApp(app); setEditName(app.name); setEditDesc(app.description || ''); }}
+                      className="p-1 text-gray-300 hover:text-indigo-500 dark:text-gray-600 dark:hover:text-indigo-400 transition"
+                      title={t('edit') || 'Edit'}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteId(app.id)}
+                      className="p-1 text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 transition"
+                      title={t('delete') || 'Delete'}
+                    >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
-                </div>
+                  </div>
+                </RoleGuard>
               </div>
             );
           })}
