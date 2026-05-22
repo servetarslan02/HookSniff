@@ -256,32 +256,36 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-23 — RBAC Frontend Part 4 - Final)
+## 📝 Son Oturum (2026-05-23 — RBAC Frontend Part 5 - Sub-components)
 
 ### Özet
-Servet ile oturum. RBAC implementasyonu tamamlandı (son 4 sayfa). 4 dosya, 74 satır.
+Servet ile oturum. RBAC sub-components tamamlandı. 7 dosya, 64 satır.
 
 ### Yapılan İşler:
-1. **Applications** — create/edit/delete → admin+
-2. **SSO** — enforce/delete config → admin+
-3. **Transforms** — create/edit/delete → admin+
-4. **Streaming** — create/edit/delete → admin+
+1. **Billing** — ReadOnlyBadge header
+2. **Deliveries** — batch replay → admin+
+3. **API Keys sub-components** — create/rotate/delete → admin+
+4. **API Importer** — import → admin+
+5. **RetryPolicyCard** — save → admin+
 
 ### Değişen Dosyalar:
-- `dashboard/src/app/[locale]/(dashboard)/applications/page.tsx`
-- `dashboard/src/app/[locale]/(dashboard)/sso/SsoContent.tsx`
-- `dashboard/src/app/[locale]/(dashboard)/streaming/StreamingContent.tsx`
-- `dashboard/src/app/[locale]/(dashboard)/transforms/page.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/api-importer/components/ParsedResultsPanel.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/api-keys/components/CreateKeyForm.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/api-keys/components/KeyList.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/billing/page.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/deliveries/DeliveriesContent.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/deliveries/DeliveriesList.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/endpoints/[id]/components/RetryPolicyCard.tsx`
 
-### Push: `e3da258f`
+### Push: `5d810022`
 ### TypeScript: ✅ 0 hata
 
 ### 🎉 RBAC IMPLEMENTASYONU TAMAMLANDI (FINAL)
-Toplam 20 sayfaya RBAC uygulandı.
+Kalan sayfalar RBAC gerekmez (read-only veya user-level).
 
 ---
 
-## 📝 Önceki Oturum (2026-05-23 — RBAC Frontend Part 3)
+## 📝 Önceki Oturum (2026-05-23 — RBAC Frontend Part 4)
 
 ### Özet
 Servet ile oturum. Frontend RBAC implementasyonu yapıldı. 5 dosya değişti, 260 satır eklendi.
