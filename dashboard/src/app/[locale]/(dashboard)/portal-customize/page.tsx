@@ -10,6 +10,7 @@ import { DEFAULT_CONFIG, FONT_OPTIONS } from './types';
 import { PortalPreview } from './components/PortalPreview';
 import { EmbedCodePanel } from './components/EmbedCodePanel';
 import { ClipboardList, Palette, X, Zap, AlertTriangle } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 export default function PortalCustomizationPage() {
   const t = useTranslations('portalCustomize');
@@ -114,15 +115,18 @@ export default function PortalCustomizationPage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+          <ReadOnlyBadge />
         </div>
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={updateConfig.isPending}
-          className="px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50 shadow-sm"
-        >
-          {updateConfig.isPending ? t('saving') : t('saveChanges')}
-        </button>
+        <RoleGuard require="canManageApplications">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={updateConfig.isPending}
+            className="px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50 shadow-sm"
+          >
+            {updateConfig.isPending ? t('saving') : t('saveChanges')}
+          </button>
+        </RoleGuard>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

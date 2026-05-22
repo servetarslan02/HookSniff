@@ -12,6 +12,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import { AlertCircle, CheckCircle2, ClipboardList, Key, Link2, Pause } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 /* ─── Application Detail — endpoint yönetimi ile birlikte ─── */
 
@@ -177,6 +178,7 @@ export function AppDetailContent() {
                     {app.description}
                   </p>
                 )}
+                <ReadOnlyBadge />
               </div>
             </div>
           </div>
@@ -230,16 +232,18 @@ export function AppDetailContent() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             {te('title') || 'Endpoints'}
           </h2>
-          <button
-            type="button"
-            onClick={() => setShowCreate(!showCreate)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium rounded-xl hover:opacity-90 transition"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            {te('newEndpoint') || 'New Endpoint'}
-          </button>
+          <RoleGuard require="canManageApplications">
+            <button
+              type="button"
+              onClick={() => setShowCreate(!showCreate)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium rounded-xl hover:opacity-90 transition"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              {te('newEndpoint') || 'New Endpoint'}
+            </button>
+          </RoleGuard>
         </div>
 
         {/* ── Create Form ── */}
@@ -422,16 +426,18 @@ export function AppDetailContent() {
                     </button>
 
                     {/* Delete */}
-                    <button
-                      type="button"
-                      onClick={() => setDeleteId(ep.id)}
-                      className="p-2 text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition"
-                      title={te('deleteTitle') || 'Delete'}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    <RoleGuard require="canManageApplications">
+                      <button
+                        type="button"
+                        onClick={() => setDeleteId(ep.id)}
+                        className="p-2 text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition"
+                        title={te('deleteTitle') || 'Delete'}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </RoleGuard>
                   </div>
                 </div>
               </div>
