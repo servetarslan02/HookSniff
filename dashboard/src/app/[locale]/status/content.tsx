@@ -213,7 +213,7 @@ export function StatusPageContent() {
               <ComponentRow
                 key={comp.name}
                 component={comp}
-                responseTimes={data.response_times?.[comp.name] || []}
+                responseTimes={[]}
               />
             ))}
           </div>
