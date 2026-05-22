@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { RetryPolicyConfig } from '@/lib/api';
 import { RefreshCw } from '@/components/icons';
+import { RoleGuard } from '@/components/RoleGuard';
 
 const BACKOFF_OPTIONS = [
   { value: 'exponential', labelKey: 'exponential', descKey: 'exponentialDesc' },
@@ -165,13 +166,15 @@ export function RetryPolicyCard({
       </div>
 
       <div className="mt-6">
-        <button type="button"
-          onClick={handleSave}
-          disabled={saving}
-          className="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-60"
-        >
-          {saving ? t('saving') : t('saveRetryPolicy')}
-        </button>
+        <RoleGuard require="canManageWebhooks">
+          <button type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-60"
+          >
+            {saving ? t('saving') : t('saveRetryPolicy')}
+          </button>
+        </RoleGuard>
       </div>
     </div>
   );

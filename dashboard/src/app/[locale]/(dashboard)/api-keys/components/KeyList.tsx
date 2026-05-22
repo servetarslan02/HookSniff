@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { RefreshCw, ShieldCheck, Trash2 } from '@/components/icons';
+import { RoleGuard } from '@/components/RoleGuard';
 
 interface ApiKey {
   id: string;
@@ -82,20 +83,22 @@ export function KeyList({
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button type="button"
-                  onClick={() => onRotate(key.id)}
-                  disabled={actionLoading === key.id}
-                  className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50"
-                >
-                  <RefreshCw size={16} strokeWidth={1.75} className="inline mr-1" /> {t('rotate')}
-                </button>
-                <button type="button"
-                  onClick={() => onDelete(key.id)}
-                  disabled={actionLoading === key.id}
-                  className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 dark:hover:bg-red-500 border border-red-300 dark:border-red-500/30 rounded-lg transition disabled:opacity-50"
-                >
-                  <Trash2 size={14} className="inline mr-1 -mt-0.5" /> {tc('delete')}
-                </button>
+                <RoleGuard require="canManageApiKeys">
+                  <button type="button"
+                    onClick={() => onRotate(key.id)}
+                    disabled={actionLoading === key.id}
+                    className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50"
+                  >
+                    <RefreshCw size={16} strokeWidth={1.75} className="inline mr-1" /> {t('rotate')}
+                  </button>
+                  <button type="button"
+                    onClick={() => onDelete(key.id)}
+                    disabled={actionLoading === key.id}
+                    className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 dark:hover:bg-red-500 border border-red-300 dark:border-red-500/30 rounded-lg transition disabled:opacity-50"
+                  >
+                    <Trash2 size={14} className="inline mr-1 -mt-0.5" /> {tc('delete')}
+                  </button>
+                </RoleGuard>
               </div>
             </div>
           ))}
