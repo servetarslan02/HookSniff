@@ -256,7 +256,68 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-23 — RBAC Frontend Part 5 - Sub-components)
+## 📝 Son Oturum (2026-05-23 — SSO Enhancements)
+
+### Özet
+Servet ile oturum. SSO endüstri standardına uygun hale getirildi. 3 dosya, 1129 satır.
+
+### Yapılan İşler:
+1. **Rol Eşleme** — IdP grupları → HookSniff rolleri
+2. **Dinamik Takım Ataması** — email domaini → takım
+3. **SCIM 2.0 Desteği** — tam CRUD endpoint'leri
+4. **Grup Senkronizasyonu** — IdP gruplarına göre takım üyeliği
+5. **Frontend** — Rol/takım eşleme JSON editörleri, SCIM yapılandırması
+
+### Değişen Dosyalar:
+- `api/src/routes/sso.rs` — 1129 satır eklendi
+- `dashboard/src/app/[locale]/(dashboard)/sso/SsoContent.tsx` — SCIM UI
+- `migrations/087_sso_enhancements.sql` — yeni tablolar
+
+### Push: `11d6abe9`
+### TypeScript: ✅ 0 hata
+
+---
+
+## 📝 Önceki Oturum (2026-05-23 — RBAC Security Fix)
+
+### Özet
+Servet ile oturum. RBAC güvenlik analizi ve düzeltmeleri. 5 dosya, 118 satır.
+
+### Yapılan İşler:
+1. **Frontend Team Context** — useTeamRole(teamId?) parametresi
+2. **Backend Team-Specific RBAC** — check_user_team_role_for_team()
+3. **Güvenlik Analizi** — Veri izolasyonu doğrulandı
+
+### Değişen Dosyalar:
+- `api/src/routes/teams.rs` — yeni fonksiyon
+- `dashboard/src/hooks/useTeamRole.ts` — teamId parametresi
+- `dashboard/src/hooks/usePermissions.ts` — teamId geçişi
+- `dashboard/src/components/RoleGuard.tsx` — teamId prop
+
+### Push: `fa8f5ff4`
+### TypeScript: ✅ 0 hata
+
+---
+
+## 📝 Önceki Oturum (2026-05-23 — RBAC Frontend Part 6)
+
+### Özet
+Servet ile oturum. RBAC sub-components tamamlandı. 2 dosya, 85 satır.
+
+### Yapılan İşler:
+1. **OverageSettings** — toggle → admin+
+2. **SubscriptionDetails** — pause/cancel/refund/resume → admin+
+
+### Değişen Dosyalar:
+- `dashboard/src/app/[locale]/(dashboard)/billing/components/OverageSettings.tsx`
+- `dashboard/src/app/[locale]/(dashboard)/billing/components/SubscriptionDetails.tsx`
+
+### Push: `3462ee37`
+### TypeScript: ✅ 0 hata
+
+---
+
+## 📝 Önceki Oturum (2026-05-23 — RBAC Frontend Part 5 - Sub-components)
 
 ### Özet
 Servet ile oturum. RBAC sub-components tamamlandı. 7 dosya, 64 satır.
