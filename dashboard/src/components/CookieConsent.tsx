@@ -23,7 +23,7 @@ function storeConsent(status: "accepted" | "rejected") {
 
 export function CookieConsent() {
   const t = useTranslations("cookieConsent");
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState<boolean | null>(null);
 
   useEffect(() => {
     const consent = getStoredConsent();
@@ -31,10 +31,14 @@ export function CookieConsent() {
       // Small delay to avoid layout shift on page load
       const timer = setTimeout(() => setVisible(true), 1000);
       return () => clearTimeout(timer);
+    } else {
+      setVisible(false);
     }
   }, []);
 
-  if (!visible) return null;
+  // BUG FIX: Don't render until client-side hydration is complete
+  // Prevents banner from flashing on every page load
+  if (visible !== true) return null;
 
   return (
     <div
