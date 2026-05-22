@@ -3270,7 +3270,15 @@
     "roleEditor": "Editör",
     "roleAdmin": "Yönetici",
     "generateTxt": "TXT Kaydı Oluştur",
-    "autoTeamJoinWarning": "Yeni SSO kullanıcıları ilk girişlerinde bu takıma otomatik olarak katılacaktır."
+    "autoTeamJoinWarning": "Yeni SSO kullanıcıları ilk girişlerinde bu takıma otomatik olarak katılacaktır.",
+    "groupName": "Grup adı (ör. Mühendislik)",
+    "emailDomain": "E-posta alanı (ör. mühendislik.sirket.com)",
+    "selectTeam": "Takım seç...",
+    "addMapping": "Eşleme Ekle",
+    "defaultRoleLabel": "Varsayılan (eşleşmeyen gruplar)",
+    "fetchMetadata": "Getir",
+    "metadataUrlHint": "IdP metadata URL'nizi girin, sertifika ve SSO URL otomatik çekilsin.",
+    "metadataFetched": "Metadata başarıyla çekildi!"
   },
   "endpointSettings": {
     "title": "Endpoint Ayarları",

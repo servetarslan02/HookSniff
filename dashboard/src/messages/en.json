@@ -3132,7 +3132,15 @@
     "roleEditor": "Editor",
     "roleAdmin": "Admin",
     "generateTxt": "Generate TXT Record",
-    "autoTeamJoinWarning": "New SSO users will automatically join this team on first login."
+    "autoTeamJoinWarning": "New SSO users will automatically join this team on first login.",
+    "groupName": "Group name (e.g. Engineering)",
+    "emailDomain": "Email domain (e.g. engineering.company.com)",
+    "selectTeam": "Select team...",
+    "addMapping": "Add Mapping",
+    "defaultRoleLabel": "Default (unmatched groups)",
+    "fetchMetadata": "Fetch",
+    "metadataUrlHint": "Enter your IdP metadata URL to auto-fetch certificate and SSO URL.",
+    "metadataFetched": "Metadata fetched successfully!"
   },
   "auditLog": {
     "title": "📋 Audit Log",
