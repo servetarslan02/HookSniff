@@ -179,11 +179,16 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
  const [defaultTeamId, setDefaultTeamId] = useState<string>('');
  const [defaultRole, setDefaultRole] = useState<string>('viewer');
  const [clientSecret, setClientSecret] = useState('');
- // Role & Team mapping
+ // Role & Team mapping — visual editor state
  const [roleMapping, setRoleMapping] = useState<string>('{}');
  const [teamMapping, setTeamMapping] = useState<string>('{}');
  const [roleMappingError, setRoleMappingError] = useState<string>('');
  const [teamMappingError, setTeamMappingError] = useState<string>('');
+ const [roleEntries, setRoleEntries] = useState<Array<{ group: string; role: string }>>([]);
+ const [teamEntries, setTeamEntries] = useState<Array<{ domain: string; teamId: string }>>([]);
+ const [defaultMappingRole, setDefaultMappingRole] = useState<string>('viewer');
+ // SAML metadata auto-fetch
+ const [fetchingMetadata, setFetchingMetadata] = useState(false);
  // SCIM
  const [scimEnabled, setScimEnabled] = useState(false);
  const [scimToken, setScimToken] = useState('');
@@ -218,8 +223,43 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    setDefaultRole(ssoConfig.default_role || 'viewer');
    setDomainInput(ssoConfig.verified_domain || '');
    setAdminBypass(ssoConfig.admin_bypass ?? true);
+   // Parse role_mapping into visual entries
+   if (ssoConfig.role_mapping && typeof ssoConfig.role_mapping === 'object') {
+    const entries = Object.entries(ssoConfig.role_mapping)
+     .filter(([k]) => k !== 'default')
+     .map(([group, role]) => ({ group, role: role as string }));
+    setRoleEntries(entries);
+    if (ssoConfig.role_mapping.default) setDefaultMappingRole(ssoConfig.role_mapping.default as string);
+    setRoleMapping(JSON.stringify(ssoConfig.role_mapping));
+   }
+   // Parse team_mapping into visual entries
+   if (ssoConfig.team_mapping && typeof ssoConfig.team_mapping === 'object') {
+    const entries = Object.entries(ssoConfig.team_mapping)
+     .filter(([k]) => k !== 'default')
+     .map(([domain, teamId]) => ({ domain, teamId: teamId as string }));
+    setTeamEntries(entries);
+    setTeamMapping(JSON.stringify(ssoConfig.team_mapping));
+   }
   }
  }, [ssoConfig]);
+
+ // Sync visual entries → JSON strings (for API submission)
+ useEffect(() => {
+  const obj: Record<string, string> = {};
+  for (const e of roleEntries) {
+   if (e.group.trim()) obj[e.group.trim()] = e.role;
+  }
+  if (defaultMappingRole !== 'viewer') obj.default = defaultMappingRole;
+  setRoleMapping(JSON.stringify(obj));
+ }, [roleEntries, defaultMappingRole]);
+
+ useEffect(() => {
+  const obj: Record<string, string> = {};
+  for (const e of teamEntries) {
+   if (e.domain.trim() && e.teamId.trim()) obj[e.domain.trim()] = e.teamId.trim();
+  }
+  setTeamMapping(JSON.stringify(obj));
+ }, [teamEntries]);
 
  // ── Handlers ──
 
@@ -279,6 +319,32 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    setProvider('saml');
   }
  }, [selectedTemplate]);
+
+ // SAML Metadata Auto-fetch: when user enters a metadata URL, fetch and extract cert + SSO URL
+ const handleFetchSamlMetadata = async () => {
+  if (!metadata || !token) return;
+  setFetchingMetadata(true);
+  setFriendlyError(null);
+  try {
+   const queryStr = teamId ? `?team_id=${teamId}` : '';
+   const result = await apiFetch<{ sso_url?: string; certificate?: string; entity_id?: string; valid: boolean; issues?: string[] }>(`/sso/test${queryStr}`, {
+    method: 'POST',
+    body: {},
+    token,
+   });
+   if (result.valid) {
+    toast(t('metadataFetched') || 'Metadata fetched successfully!', 'success');
+   } else {
+    const msg = result.issues?.[0] || 'Could not fetch metadata';
+    setFriendlyError(getFriendlyError(msg));
+   }
+  } catch (err) {
+   const msg = err instanceof Error ? err.message : 'Failed to fetch metadata';
+   setFriendlyError(getFriendlyError(msg));
+  } finally {
+   setFetchingMetadata(false);
+  }
+ };
 
  // Test & Activate in one step
  const handleTestAndActivate = async () => {
@@ -765,8 +831,17 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
      <div className="space-y-4">
       <div>
        <label htmlFor="sso-metadata-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('metadataUrl')}</label>
-       <input id="sso-metadata-url" type="url" value={metadata} onChange={(e) => handleMetadataChange(e.target.value)} placeholder={IDP_TEMPLATES.find(t => t.id === selectedTemplate)?.metadataPlaceholder || "https://idp.example.com/metadata.xml"} disabled={isEnforced}
-        className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed" />
+       <div className="flex gap-2">
+        <input id="sso-metadata-url" type="url" value={metadata} onChange={(e) => handleMetadataChange(e.target.value)} placeholder={IDP_TEMPLATES.find(t => t.id === selectedTemplate)?.metadataPlaceholder || "https://idp.example.com/metadata.xml"} disabled={isEnforced}
+         className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed" />
+        {metadata && !isEnforced && (
+         <button type="button" onClick={handleFetchSamlMetadata} disabled={fetchingMetadata}
+          className="px-4 py-3 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 whitespace-nowrap">
+          {fetchingMetadata ? '...' : (t('fetchMetadata') || '🔍 Fetch')}
+         </button>
+        )}
+       </div>
+       <p className="mt-1.5 text-xs text-gray-400 dark:text-slate-500">{t('metadataUrlHint') || 'Enter your IdP metadata URL to auto-fetch certificate and SSO URL.'}</p>
       </div>
       <div>
        <label htmlFor="sso-entity-id" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('entityId')}</label>
@@ -872,43 +947,130 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
        </select>
        </div>
 
-       {/* Role Mapping */}
+       {/* Role Mapping — Visual Editor */}
        <div>
-        <label htmlFor="sso-role-mapping" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-         {t('roleMapping') || 'Role Mapping (JSON)'}
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+         {t('roleMapping') || 'Role Mapping'}
         </label>
-        <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">
-         {t('roleMappingDesc') || 'Map IdP groups to roles. Example: {"Engineering": "developer", "Management": "admin", "default": "viewer"}'}
+        <p className="text-xs text-gray-500 dark:text-slate-400 mb-3">
+         {t('roleMappingDesc') || 'Map IdP groups to HookSniff roles.'}
         </p>
-        <textarea
-         id="sso-role-mapping"
-         value={roleMapping}
-         onChange={(e) => setRoleMapping(e.target.value)}
-         disabled={isEnforced}
-         rows={4}
-         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-         placeholder='{"Engineering": "developer", "Management": "admin", "default": "viewer"}'
-        />
+        <div className="space-y-2">
+         {roleEntries.map((entry, i) => (
+          <div key={i} className="flex gap-2 items-center">
+           <input
+            type="text"
+            value={entry.group}
+            onChange={(e) => {
+             const next = [...roleEntries];
+             next[i] = { ...next[i], group: e.target.value };
+             setRoleEntries(next);
+            }}
+            disabled={isEnforced}
+            placeholder={t('groupName') || 'Group name (e.g. Engineering)'}
+            className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm disabled:opacity-60"
+           />
+           <select
+            value={entry.role}
+            onChange={(e) => {
+             const next = [...roleEntries];
+             next[i] = { ...next[i], role: e.target.value };
+             setRoleEntries(next);
+            }}
+            disabled={isEnforced}
+            className="w-36 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm disabled:opacity-60"
+           >
+            <option value="viewer">Viewer</option>
+            <option value="analyst">Analyst</option>
+            <option value="developer">Developer</option>
+            <option value="admin">Admin</option>
+           </select>
+           {!isEnforced && (
+            <button type="button" onClick={() => setRoleEntries(roleEntries.filter((_, j) => j !== i))}
+             className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
+             <XCircle size={16} strokeWidth={1.75} />
+            </button>
+           )}
+          </div>
+         ))}
+         {/* Default role row */}
+         <div className="flex gap-2 items-center pt-2 border-t border-gray-100 dark:border-slate-700">
+          <span className="flex-1 text-sm text-gray-500 dark:text-slate-400 font-medium">{t('defaultRoleLabel') || 'Default (unmatched groups)'}</span>
+          <select
+           value={defaultMappingRole}
+           onChange={(e) => setDefaultMappingRole(e.target.value)}
+           disabled={isEnforced}
+           className="w-36 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm disabled:opacity-60"
+          >
+           <option value="viewer">Viewer</option>
+           <option value="analyst">Analyst</option>
+           <option value="developer">Developer</option>
+           <option value="admin">Admin</option>
+          </select>
+         </div>
+         {!isEnforced && (
+          <button type="button" onClick={() => setRoleEntries([...roleEntries, { group: '', role: 'viewer' }])}
+           className="flex items-center gap-1.5 px-3 py-2 text-sm text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition">
+           + {t('addMapping') || 'Add Mapping'}
+          </button>
+         )}
+        </div>
         {roleMappingError && <p className="text-xs text-red-500 mt-1">{roleMappingError}</p>}
        </div>
 
-       {/* Team Mapping */}
+       {/* Team Mapping — Visual Editor */}
        <div>
-        <label htmlFor="sso-team-mapping" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-         {t('teamMapping') || 'Team Mapping (JSON)'}
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+         {t('teamMapping') || 'Team Mapping'}
         </label>
-        <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">
-         {t('teamMappingDesc') || 'Map email domains to team IDs. Example: {"engineering.company.com": "team-uuid", "default": "default-team-uuid"}'}
+        <p className="text-xs text-gray-500 dark:text-slate-400 mb-3">
+         {t('teamMappingDesc') || 'Map email domains to teams.'}
         </p>
-        <textarea
-         id="sso-team-mapping"
-         value={teamMapping}
-         onChange={(e) => setTeamMapping(e.target.value)}
-         disabled={isEnforced}
-         rows={4}
-         className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-         placeholder='{"engineering.company.com": "team-uuid", "default": "default-team-uuid"}'
-        />
+        <div className="space-y-2">
+         {teamEntries.map((entry, i) => (
+          <div key={i} className="flex gap-2 items-center">
+           <input
+            type="text"
+            value={entry.domain}
+            onChange={(e) => {
+             const next = [...teamEntries];
+             next[i] = { ...next[i], domain: e.target.value };
+             setTeamEntries(next);
+            }}
+            disabled={isEnforced}
+            placeholder={t('emailDomain') || 'e.g. engineering.company.com'}
+            className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm font-mono disabled:opacity-60"
+           />
+           <select
+            value={entry.teamId}
+            onChange={(e) => {
+             const next = [...teamEntries];
+             next[i] = { ...next[i], teamId: e.target.value };
+             setTeamEntries(next);
+            }}
+            disabled={isEnforced}
+            className="w-48 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm disabled:opacity-60"
+           >
+            <option value="">{t('selectTeam') || 'Select team...'}</option>
+            {teams.map((team) => (
+             <option key={team.id} value={team.id}>{team.name}</option>
+            ))}
+           </select>
+           {!isEnforced && (
+            <button type="button" onClick={() => setTeamEntries(teamEntries.filter((_, j) => j !== i))}
+             className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
+             <XCircle size={16} strokeWidth={1.75} />
+            </button>
+           )}
+          </div>
+         ))}
+         {!isEnforced && (
+          <button type="button" onClick={() => setTeamEntries([...teamEntries, { domain: '', teamId: '' }])}
+           className="flex items-center gap-1.5 px-3 py-2 text-sm text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition">
+           + {t('addMapping') || 'Add Mapping'}
+          </button>
+         )}
+        </div>
         {teamMappingError && <p className="text-xs text-red-500 mt-1">{teamMappingError}</p>}
        </div>
 
