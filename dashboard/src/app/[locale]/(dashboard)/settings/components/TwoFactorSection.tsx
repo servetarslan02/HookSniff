@@ -214,14 +214,6 @@ export function TwoFactorSection() {
                   </p>
                 </div>
 
-                {/* Manual secret */}
-                <div className="mb-4">
-                  <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{t('manualSecret')}</p>
-                  <code className="block px-3 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm font-mono text-gray-900 dark:text-white break-all">
-                    {secret}
-                  </code>
-                </div>
-
                 <button
                   type="button"
                   onClick={() => setStep('verify')}
