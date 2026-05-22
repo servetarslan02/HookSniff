@@ -16,6 +16,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
 import { useIdleTimeout } from '@/hooks/useIdleTimeout';
 import { apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
+import { usePermissions } from '@/hooks/usePermissions';
 import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, BookOpen, ExternalLink, LogOut, Shield, Globe } from '@/components/icons';
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
@@ -29,6 +30,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const tc = useTranslations('common');
   const locale = useLocale();
   const { connectionState } = useRealtime();
+  const perms = usePermissions();
 
   // Auto-logout after 1 hour of inactivity
   const handleIdle = useCallback(() => {
@@ -99,15 +101,15 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const navItems = [
     ...(user?.is_admin ? [{ name: t('adminPanel') || 'Admin Panel', href: '/admin', icon: <Shield size={16} strokeWidth={1.75} />, isSpecial: true }] : []),
     { name: t('core'), href: '/core', icon: <LayoutDashboard size={16} strokeWidth={1.75} /> },
-    { name: t('applications'), href: '/applications', icon: <Smartphone size={16} strokeWidth={1.75} /> },
+    ...(perms.canManageApplications ? [{ name: t('applications'), href: '/applications', icon: <Smartphone size={16} strokeWidth={1.75} /> }] : []),
     { name: t('organization'), href: '/organization', icon: <Users size={16} strokeWidth={1.75} /> },
-    { name: t('webhookDashboard'), href: '/operational-webhooks', icon: <Layers size={16} strokeWidth={1.75} /> },
-    { name: t('observability'), href: '/observability', icon: <Eye size={16} strokeWidth={1.75} /> },
-    { name: t('devtools'), href: '/devtools', icon: <Code2 size={16} strokeWidth={1.75} /> },
-    { name: t('integrations'), href: '/integrations', icon: <Zap size={16} strokeWidth={1.75} /> },
-    { name: t('customDomain') || 'Custom Domain', href: '/custom-domain', icon: <Globe size={16} strokeWidth={1.75} /> },
-    { name: t('routingConfig'), href: '/routing-config', icon: <Settings size={16} strokeWidth={1.75} /> },
-    { name: t('billingSection'), href: '/billing', icon: <CreditCard size={16} strokeWidth={1.75} /> },
+    ...(perms.canManageOperationalWebhooks ? [{ name: t('webhookDashboard'), href: '/operational-webhooks', icon: <Layers size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canViewObservability ? [{ name: t('observability'), href: '/observability', icon: <Eye size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canViewDevtools ? [{ name: t('devtools'), href: '/devtools', icon: <Code2 size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canManageIntegrations ? [{ name: t('integrations'), href: '/integrations', icon: <Zap size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canManageDomains ? [{ name: t('customDomain') || 'Custom Domain', href: '/custom-domain', icon: <Globe size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canManageRouting ? [{ name: t('routingConfig'), href: '/routing-config', icon: <Settings size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canManageBilling ? [{ name: t('billingSection'), href: '/billing', icon: <CreditCard size={16} strokeWidth={1.75} /> }] : []),
     { name: t('account'), href: '/account', icon: <UserCircle size={16} strokeWidth={1.75} /> },
   ];
 
