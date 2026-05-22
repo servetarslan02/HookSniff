@@ -44,8 +44,7 @@ export default function AuthCallbackPage() {
   }
 
   // Fallback: verify session via /auth/me
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000/v1');
-  fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
+  fetch('/api/v1/auth/me', { credentials: 'include' })
    .then((res) => {
     if (res.ok) {
      // Session is valid — redirect to dashboard
