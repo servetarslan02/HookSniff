@@ -10,6 +10,13 @@
 - Backend: check_user_team_role_for_team() eklendi
 - Push: `3462ee37`
 
+### RBAC Enhancements (2 dosya, 521 satır)
+- Permission cache (5 dk)
+- Role-based rate limiting
+- RBAC audit log
+- 25 unit test
+- Push: `a90e7675`
+
 ### SSO Enhancements (3 dosya, 1129 satır)
 - Rol Eşleme: IdP grupları → HookSniff rolleri
 - Dinamik Takım Ataması: email domaini → takım
@@ -25,44 +32,78 @@
 
 ---
 
-## 🔴 Öncelik 1: Cloud Build Doğrula
+## 🔴 EKSİKLER — Backend (Rust cargo gerekli)
 
-Push yapıldı, Cloud Build otomatik tetiklenmeli. Build başarılı olursa deploy gerçekleşecek.
+### 1. Alert Evaluation Worker
+- `alert_rules` tablosu var, CRUD API var ama background worker yok
+- Kurallar tetiklenmiyor
+- Dosya: `api/src/jobs/alert_eval.rs` (yeni)
+- Plan: Her 60 saniyede bir kuralları kontrol et, eşleşen varsa alert tetikle
+
+### 2. Redis State Migration
+- SSO state şu an in-memory (HashMap)
+- Production'da Redis'e taşınmalı
+- `SsoStateStore` zaten Redis destekliyor, sadece connection sağlanmalı
+- Dosya: `api/src/routes/sso.rs` — `state_store` başlatma
+
+### 3. Rate Limiting Implementasyonu
+- `role_rate_limits` tablosu var ama Redis ile gerçek rate limiting yok
+- `check_role_rate_limit()` placeholder
+- Plan: Redis ile sliding window rate limiting implementasyonu
+
+---
+
+## 🔴 EKSİKLER — Servet İşleri
+
+### 1. Google OAuth Client ID
+- https://console.cloud.google.com/apis/credentials → proje: hooksniff-app
+- Mevcut OAuth 2.0 Client ID'yi bul
+- Client ID'yi kopyala (xxx.apps.googleusercontent.com formatında)
+
+### 2. GitHub OAuth App
+- https://github.com/settings/developers → New OAuth App
+- Application name: HookSniff
+- Homepage URL: https://hooksniff.vercel.app
+- Callback URL: https://hooksniff-api-1046140057667.europe-west1.run.app/v1/oauth/github/callback
+
+### 3. Secret Manager Güncelle
+- `google-client-id` → gerçek değer gir
+- `github-client-id` → gerçek değer gir
+- `github-client-secret` → gerçek değer gir
+
+### 4. Migration Uygula
+- Migration 087: SSO Enhancements (sso_user_attributes, scim_audit_log)
+- Migration 088: RBAC Enhancements (permission_cache, role_rate_limits, rbac_audit_log)
+- Neon DB'ye uygula: `psql <connection_string> < migrations/087_sso_enhancements.sql`
+- `psql <connection_string> < migrations/088_rbac_enhancements.sql`
+
+### 5. Cloud Build Tetikle
+- Push yapıldı, Cloud Build otomatik tetiklenmeli
 - Build log: https://console.cloud.google.com/cloud-build/history?project=hooksniff-app
-- Eğer build yine başarısızsa, logları kontrol et
+- Eğer build başarısızsa logları kontrol et
 
-## 🔴 Öncelik 2: Keycloak ile Gerçek SSO Test
-
-Mock IdP testleri geçti. Şimdi gerçek Keycloak ile test gerekli:
+### 6. Keycloak SSO Test
 - Docker kur (veya mevcut ortamda Keycloak çalıştır)
 - SAML + OIDC akışlarını gerçek IdP ile test et
 - Auto-join, rol atama, domain verification test et
 - Yeni özellikler: role_mapping, team_mapping, SCIM test et
 
-## 🟡 Öncelik 3: Alert Evaluation Worker
+---
 
-`alert_rules` tablosu var, CRUD API var ama background worker yok.
-Kurallar tetiklenmiyor — worker implementasyonu gerekli.
+## 🟡 EKSİKLER — Test
 
-## 🟡 Öncelik 4: Redis State Migration
+### 1. SCIM Integration Tests
+- SCIM 2.0 endpoint'leri eklendi ama test yok
+- User CRUD operations test et
+- Group listing test et
+- Token authentication test et
+- Error handling test et
 
-SSO state şu an in-memory (HashMap). Production'da Redis'e taşınmalı.
-`SsoStateStore` zaten Redis destekliyor, sadece connection sağlanmalı.
-
-## 🟢 Öncelik 5: SCIM Integration Tests
-
-SCIM 2.0 endpoint'leri eklendi. Entegrasyon testleri yazılmalı:
-- User CRUD operations
-- Group listing
-- Token authentication
-- Error handling
-
-## 🟢 Öncelik 6: Dashboard Build Doğrulama
-
-TypeScript hataları yok ama production build test edilmeli:
-- `npm run build` başarılı mı?
-- Tüm sayfalar doğru render oluyor mu?
-- RBAC filtreleme çalışıyor mu?
+### 2. SSO Callback Tests
+- SAML callback test et
+- OIDC callback test et
+- Role mapping test et
+- Team mapping test et
 
 ---
 
@@ -73,17 +114,22 @@ TypeScript hataları yok ama production build test edilmeli:
 |-------|-------|--------------|
 | RBAC Frontend | ✅ | 32 |
 | RBAC Backend | ✅ | 5 |
+| RBAC Enhancements | ✅ | 2 |
 | SSO Enhancements | ✅ | 3 |
 | SCIM 2.0 | ✅ | 1 |
 | SDK Roadmap (Faz 8-15) | ✅ | 11 |
 
-### Bekleyen Servet İşleri
-- Google OAuth Client ID ayarla
-- GitHub OAuth App oluştur
-- Secret Manager değerlerini güncelle
-- Keycloak SSO test et
-
-### Teknik Borç
-- Alert Evaluation Worker implementasyonu
-- Redis State Migration
-- SCIM integration tests
+### Bekleyen İşler
+| İş | Öncelik | Gereken |
+|---|---------|---------|
+| Alert Evaluation Worker | 🔴 | Rust cargo |
+| Redis State Migration | 🔴 | Rust cargo |
+| Rate Limiting | 🔴 | Rust cargo |
+| Google OAuth | 🔴 | Servet |
+| GitHub OAuth | 🔴 | Servet |
+| Secret Manager | 🔴 | Servet |
+| Migration Uygula | 🔴 | Servet (psql) |
+| Cloud Build | 🔴 | Servet (GCP) |
+| Keycloak Test | 🔴 | Servet (Docker) |
+| SCIM Tests | 🟡 | Test yazma |
+| SSO Tests | 🟡 | Test yazma |
