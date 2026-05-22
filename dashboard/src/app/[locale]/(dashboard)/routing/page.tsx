@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import { endpointsApi } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { Dice5, Pencil, RefreshCw, Scale, Shield, Shuffle, X } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 const STRATEGIES = [
   { value: 'round-robin', icon: <RefreshCw size={16} strokeWidth={1.75} />, descKey: 'roundRobinDesc' },
@@ -69,6 +70,7 @@ export default function RoutingPage() {
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+        <ReadOnlyBadge />
       </div>
 
       {/* Strategy explanation cards */}
@@ -115,9 +117,11 @@ export default function RoutingPage() {
                     <span className={`px-2 py-0.5 rounded-full text-xs ${ep.is_active ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'}`}>
                       {ep.is_active ? tc('active') : tc('inactive')}
                     </span>
-                    <button type="button" onClick={() => handleEdit(ep)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline ml-2">
-                      <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('edit') || 'Edit'}
-                    </button>
+                    <RoleGuard require="canManageRouting">
+                      <button type="button" onClick={() => handleEdit(ep)} className="text-xs text-brand-600 dark:text-brand-400 hover:underline ml-2">
+                        <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('edit') || 'Edit'}
+                      </button>
+                    </RoleGuard>
                   </div>
                 </div>
               </div>
