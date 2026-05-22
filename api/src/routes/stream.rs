@@ -134,16 +134,6 @@ pub struct MessageFilter {
     pub limit: Option<i64>,
 }
 
-#[derive(sqlx::FromRow)]
-struct DeliverySnapshot {
-    id: Uuid,
-    endpoint_id: Uuid,
-    event_type: Option<String>,
-    status: String,
-    attempt_count: i32,
-    created_at: DateTime<Utc>,
-    endpoint_url: String,
-}
 
 // ──────────────────────────────────────────────────────────────
 // Handlers

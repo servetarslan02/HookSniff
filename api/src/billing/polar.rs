@@ -214,6 +214,7 @@ struct PolarSubscription {
     current_period_end: Option<String>,
     /// Current billing period start (ISO 8601).
     #[serde(default)]
+    #[allow(dead_code)]
     current_period_start: Option<String>,
 }
 

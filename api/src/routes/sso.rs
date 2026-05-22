@@ -117,9 +117,12 @@ struct OidcDiscovery {
 
 #[derive(Debug, Deserialize)]
 struct OidcTokenResponse {
+    #[allow(dead_code)]
     access_token: Option<String>,
     id_token: Option<String>,
+    #[allow(dead_code)]
     token_type: Option<String>,
+    #[allow(dead_code)]
     expires_in: Option<i64>,
 }
 
@@ -128,6 +131,7 @@ struct OidcTokenResponse {
 #[derive(Debug)]
 struct SamlAssertion {
     name_id: String,
+    #[allow(dead_code)]
     session_index: Option<String>,
     attributes: std::collections::HashMap<String, String>,
     not_on_or_after: Option<DateTime<Utc>>,

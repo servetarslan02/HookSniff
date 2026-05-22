@@ -36,6 +36,7 @@ struct R2Response<T> {
 
 #[derive(Debug, Deserialize)]
 struct R2Error {
+    #[allow(dead_code)]
     code: u32,
     message: String,
 }

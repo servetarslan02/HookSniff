@@ -365,13 +365,18 @@ async fn get_or_create_cursor(
 
 #[derive(Debug, sqlx::FromRow)]
 struct CursorRow {
+    #[allow(dead_code)]
     id: Uuid,
+    #[allow(dead_code)]
     customer_id: Uuid,
     consumer_id: String,
+    #[allow(dead_code)]
     endpoint_id: Option<Uuid>,
     last_message_id: Option<Uuid>,
     last_sequence_num: i64,
+    #[allow(dead_code)]
     created_at: DateTime<Utc>,
+    #[allow(dead_code)]
     updated_at: DateTime<Utc>,
 }
 
@@ -386,5 +391,6 @@ struct DeliveryRow {
     created_at: DateTime<Utc>,
     #[sqlx(default)]
     payload: Option<serde_json::Value>,
+    #[allow(dead_code)]
     customer_id: Uuid,
 }

@@ -75,6 +75,7 @@ pub async fn list_feature_flags(
 }
 
 /// POST /v1/admin/feature-flags — Create a feature flag.
+#[allow(private_interfaces)]
 pub async fn create_feature_flag(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
@@ -141,6 +142,7 @@ pub async fn create_feature_flag(
 }
 
 /// PUT /v1/admin/feature-flags/:id — Update a feature flag.
+#[allow(private_interfaces)]
 pub async fn update_feature_flag(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
