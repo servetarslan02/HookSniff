@@ -238,13 +238,17 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             {/* Profile Dropdown */}
             <div className="relative group">
               <button type="button" className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition">
-                <div className="w-8 h-8 rounded-full bg-linear-to-br from-red-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
-                  {(user?.email?.charAt(0) || 'A').toUpperCase()}
-                </div>
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt={user.name || user.email} className="w-8 h-8 rounded-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-red-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                    {(user?.name?.charAt(0) || user?.email?.charAt(0) || 'A').toUpperCase()}
+                  </div>
+                )}
               </button>
               <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                 <div className="px-4 py-2 border-b border-gray-100 dark:border-slate-700">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.email}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.name || user?.email}</p>
                   <p className="text-xs text-gray-500 dark:text-slate-400">Admin</p>
                 </div>
                 <button type="button"
