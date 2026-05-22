@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import type { AlertRule } from '@/lib/api';
 import { useAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert, useTestAlert } from '@/hooks/useDashboardData';
 import { Bell, Link2, Mail, MessageSquare } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 const CHANNEL_ICONS: Record<string, React.ReactNode> = {
   slack: <MessageSquare size={16} strokeWidth={1.75} />,
@@ -121,11 +122,14 @@ export default function AlertsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+          <ReadOnlyBadge />
         </div>
-        <button type="button" onClick={() => setShowCreate(true)}
-          className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-          + {t('newAlert')}
-        </button>
+        <RoleGuard require="canManageAlerts">
+          <button type="button" onClick={() => setShowCreate(true)}
+            className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+            + {t('newAlert')}
+          </button>
+        </RoleGuard>
       </div>
 
 
@@ -211,13 +215,17 @@ export default function AlertsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button type="button" role="switch" aria-checked={alert.is_active} onClick={() => toggleAlert(alert)} disabled={togglingId === alert.id}
-                    className={`relative w-10 h-5 rounded-full transition-colors duration-200 shrink-0 ${alert.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'} ${togglingId === alert.id ? 'opacity-60' : ''}`}>
-                    <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-xs transition-transform duration-200 ${alert.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </button>
-                  <button type="button" onClick={() => openEdit(alert)} className="px-3 py-1.5 text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 border border-brand-300 dark:border-brand-500/30 rounded-lg transition">{t('edit')}</button>
+                  <RoleGuard require="canManageAlerts">
+                    <button type="button" role="switch" aria-checked={alert.is_active} onClick={() => toggleAlert(alert)} disabled={togglingId === alert.id}
+                      className={`relative w-10 h-5 rounded-full transition-colors duration-200 shrink-0 ${alert.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-600'} ${togglingId === alert.id ? 'opacity-60' : ''}`}>
+                      <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-xs transition-transform duration-200 ${alert.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
+                    </button>
+                    <button type="button" onClick={() => openEdit(alert)} className="px-3 py-1.5 text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 border border-brand-300 dark:border-brand-500/30 rounded-lg transition">{t('edit')}</button>
+                  </RoleGuard>
                   <button type="button" onClick={() => testAlert(alert.id)} className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition">{t('test')}</button>
-                  <button type="button" onClick={() => setDeleteId(alert.id)} className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-500/30 rounded-lg transition">{t('delete')}</button>
+                  <RoleGuard require="canManageAlerts">
+                    <button type="button" onClick={() => setDeleteId(alert.id)} className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-500/30 rounded-lg transition">{t('delete')}</button>
+                  </RoleGuard>
                 </div>
               </div>
             ))}

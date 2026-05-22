@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import { AlertTriangle, CheckCircle2, Clock, Globe, Lock, XCircle, ExternalLink } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 interface ExistingDomain {
   id: string;
@@ -162,6 +163,7 @@ export function CustomDomainContent() {
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+        <ReadOnlyBadge />
       </div>
 
       {/* How it works — Step by step guide */}
@@ -204,29 +206,31 @@ export function CustomDomainContent() {
       </div>
 
       {/* Add Domain */}
-      <div className="glass-card p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">{t('addDomain')}</h2>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-          <input
-            type="text"
-            value={domain}
-            onChange={(e) => {
-              const raw = e.target.value.toLowerCase().replace(/^https?:\/\//, '');
-              setDomain(raw.replace(/[^a-z0-9.-]/g, ''));
-            }}
-            placeholder={t('placeholder')}
-            className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
-            onKeyDown={(e) => { if (e.key === 'Enter' && domain && domain.includes('.') && !saving) handleAddDomain(); }}
-          />
-          <button type="button"
-            onClick={handleAddDomain}
-            disabled={saving || !domain || !domain.includes('.')}
-            className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
-          >
-            {saving ? t('adding') : t('addDomainBtn')}
-          </button>
+      <RoleGuard require="canManageDomains">
+        <div className="glass-card p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">{t('addDomain')}</h2>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <input
+              type="text"
+              value={domain}
+              onChange={(e) => {
+                const raw = e.target.value.toLowerCase().replace(/^https?:\/\//, '');
+                setDomain(raw.replace(/[^a-z0-9.-]/g, ''));
+              }}
+              placeholder={t('placeholder')}
+              className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-mono text-sm"
+              onKeyDown={(e) => { if (e.key === 'Enter' && domain && domain.includes('.') && !saving) handleAddDomain(); }}
+            />
+            <button type="button"
+              onClick={handleAddDomain}
+              disabled={saving || !domain || !domain.includes('.')}
+              className="px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition disabled:opacity-50"
+            >
+              {saving ? t('adding') : t('addDomainBtn')}
+            </button>
+          </div>
         </div>
-      </div>
+      </RoleGuard>
 
       {/* DNS Records for newly added domain — hide if already in existing list */}
       {dnsRecords.length > 0 && !existingDomains.some(d => d.id === newDomainId) && (
@@ -375,23 +379,25 @@ export function CustomDomainContent() {
                         {verifyingId === d.id ? t('verifying') : t('verifyDomain')}
                       </button>
                     )}
-                    {deleteConfirm === d.id ? (
-                      <div className="flex items-center gap-1">
-                        <button type="button" onClick={() => handleDeleteDomain(d.id)}
-                          className="text-xs text-red-600 dark:text-red-400 font-medium px-2 py-1 bg-red-50 dark:bg-red-500/10 rounded-lg">
-                          {t('confirmDelete')}
+                    <RoleGuard require="canManageDomains">
+                      {deleteConfirm === d.id ? (
+                        <div className="flex items-center gap-1">
+                          <button type="button" onClick={() => handleDeleteDomain(d.id)}
+                            className="text-xs text-red-600 dark:text-red-400 font-medium px-2 py-1 bg-red-50 dark:bg-red-500/10 rounded-lg">
+                            {t('confirmDelete')}
+                          </button>
+                          <button type="button" onClick={() => setDeleteConfirm(null)}
+                            className="text-xs text-gray-500 px-2 py-1 hover:text-gray-700">
+                            {t('cancel')}
+                          </button>
+                        </div>
+                      ) : (
+                        <button type="button" onClick={() => setDeleteConfirm(d.id)}
+                          className="text-xs text-red-600 dark:text-red-400 hover:underline">
+                          {t('delete')}
                         </button>
-                        <button type="button" onClick={() => setDeleteConfirm(null)}
-                          className="text-xs text-gray-500 px-2 py-1 hover:text-gray-700">
-                          {t('cancel')}
-                        </button>
-                      </div>
-                    ) : (
-                      <button type="button" onClick={() => setDeleteConfirm(d.id)}
-                        className="text-xs text-red-600 dark:text-red-400 hover:underline">
-                        {t('delete')}
-                      </button>
-                    )}
+                      )}
+                    </RoleGuard>
                   </div>
                 </div>
 

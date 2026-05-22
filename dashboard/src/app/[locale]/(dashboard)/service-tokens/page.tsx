@@ -7,6 +7,7 @@ import { useServiceTokens, useCreateServiceToken, useDeleteServiceToken, useReve
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { ClipboardList, Eye, EyeOff } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 export default function ServiceTokensPage() {
   const { user } = useAuth();
@@ -99,6 +100,7 @@ export default function ServiceTokensPage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+          <ReadOnlyBadge />
         </div>
         <div className="flex items-center gap-3">
           <a href="https://docs.hooksniff.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
@@ -157,8 +159,10 @@ export default function ServiceTokensPage() {
                   <td className="px-3 sm:px-6 py-3 text-gray-500 dark:text-slate-400 text-xs hidden sm:table-cell">{formatDate(tok.created_at)}</td>
                   <td className="px-3 sm:px-6 py-3">
                     <div className="flex items-center justify-end gap-1.5 sm:gap-2">
-                      <button onClick={() => { setEditingId(tok.id); setEditName(tok.name); }} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition">{tc('edit')}</button>
-                      <button onClick={() => setDeleteId(tok.id)} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition">{tc('delete')}</button>
+                      <RoleGuard require="canManageApiKeys">
+                        <button onClick={() => { setEditingId(tok.id); setEditName(tok.name); }} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition">{tc('edit')}</button>
+                        <button onClick={() => setDeleteId(tok.id)} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition">{tc('delete')}</button>
+                      </RoleGuard>
                     </div>
                   </td>
                 </tr>
@@ -167,7 +171,9 @@ export default function ServiceTokensPage() {
           </table>
         </div>
         <div className="flex justify-end px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-          <button onClick={() => setShowCreate(!showCreate)} className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">+ {t('createToken')}</button>
+          <RoleGuard require="canManageApiKeys">
+            <button onClick={() => setShowCreate(!showCreate)} className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">+ {t('createToken')}</button>
+          </RoleGuard>
         </div>
       </div>
 
