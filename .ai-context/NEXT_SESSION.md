@@ -23,15 +23,24 @@ Mock IdP testleri geçti. Şimdi gerçek Keycloak ile test gerekli:
 - SAML + OIDC akışlarını gerçek IdP ile test et
 - Auto-join, rol atama, domain verification test et
 
-## 🟡 Öncelik 3: RBAC — Kalan Sayfalar
+## 🟡 Öncelik 3: RBAC — Kalan Sayfalar (Kısmen Tamamlandı)
 
-RBAC altyapısı kuruldu (usePermissions, RoleGuard). Şimdi diğer sayfalara da uygulanmalı:
-- Integrations sayfası → create/edit/delete butonları
-- Alerts sayfası → create/edit/delete butonları
-- Custom Domain → create/edit/delete butonları
-- API Keys → create/revoke butonları
-- Service Tokens → create/revoke butonları
-- Team sayfası → invite/remove/role change butonları
+RBAC altyapısı kuruldu. Uygulanan sayfalar:
+- ✅ Endpoints — create/delete → admin+
+- ✅ Integrations — create/edit/delete/toggle → admin+
+- ✅ Alerts — create/edit/delete/toggle → admin+
+- ✅ Custom Domain — add/delete → admin+
+- ✅ API Keys — create/rotate/delete → admin+
+- ✅ Service Tokens — create/edit/delete → admin+
+- ✅ Team — owner detection fix
+
+Kalan sayfalar (düşük öncelik):
+- Background Tasks → create/edit/delete
+- Operational Webhooks → create/edit/delete
+- Connectors → create/edit/delete
+- Inbound → config değişiklikleri
+- Routing Config → değişiklikler
+- Rate Limiting → değişiklikler
 
 ## 🟢 Öncelik 4: Alert Evaluation Worker
 
