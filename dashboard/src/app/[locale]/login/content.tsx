@@ -418,7 +418,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => {
-                  window.location.href = '/api/v1/oauth/google';
+                  window.location.href = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/oauth/google';
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
               >
@@ -428,7 +428,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => {
-                  window.location.href = '/api/v1/oauth/github';
+                  window.location.href = 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/oauth/github';
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
               >
