@@ -2667,8 +2667,8 @@
     "businessDesc": "SLA garantisine ihtiyacı olan ekipler için.",
     "freeFeatures": [
       "Günlük 1.000 event",
-      "5 endpoint",
-      "3 yeniden deneme",
+      "Sınırsız endpoint",
+      "Otomatik yeniden deneme",
       "HMAC-SHA256 imzaları",
       "Panel erişimi",
       "Topluluk desteği",
@@ -2850,7 +2850,7 @@
     "developerFeatures": [
       "Günlük 1.000 event",
       "1 uygulama",
-      "5 endpoint",
+      "Sınırsız endpoint",
       "10 event tipi",
       "10 abonelik",
       "7 günlük log",
@@ -2862,7 +2862,7 @@
     "startupFeatures": [
       "Günlük 30.000 event",
       "1 uygulama",
-      "50 endpoint",
+      "Sınırsız endpoint",
       "50 event tipi",
       "300 abonelik",
       "14 günlük log",
