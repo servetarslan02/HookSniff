@@ -50,6 +50,13 @@ pub fn router() -> Router {
         .route("/verify-domain/check", post(check_domain_verification))
         // Login attempts
         .route("/login-attempts", get(get_login_attempts))
+        // SCIM endpoints (authenticated with SCIM token)
+        .route("/scim/v2/Users", get(scim_list_users).post(scim_create_user))
+        .route("/scim/v2/Users/:id", get(scim_get_user).put(scim_update_user).patch(scim_patch_user).delete(scim_delete_user))
+        .route("/scim/v2/Groups", get(scim_list_groups))
+        .route("/scim/v2/ServiceProviderConfig", get(scim_service_provider_config))
+        .route("/scim/v2/ResourceTypes", get(scim_resource_types))
+        .route("/scim/v2/Schemas", get(scim_schemas))
 }
 
 /// Public SSO routes (login + callbacks) — no auth required
@@ -77,6 +84,10 @@ pub struct SsoConfigResponse {
     pub client_secret_set: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    // New fields
+    pub role_mapping: Option<serde_json::Value>,
+    pub team_mapping: Option<serde_json::Value>,
+    pub scim_enabled: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -101,6 +112,12 @@ pub struct UpsertSsoRequest {
     // Auto team join
     pub default_team_id: Option<String>,
     pub default_role: Option<String>,
+    // Role & Team mapping
+    pub role_mapping: Option<serde_json::Value>,
+    pub team_mapping: Option<serde_json::Value>,
+    // SCIM
+    pub scim_enabled: Option<bool>,
+    pub scim_token: Option<String>,
 }
 
 // ── OIDC Discovery Document ─────────────────────────────────
@@ -184,6 +201,10 @@ struct SsoLoginState {
     default_role: String,
     nonce: Option<String>,
     created_at: DateTime<Utc>,
+    // New fields for role/team mapping
+    sso_config_id: Uuid,
+    role_mapping: Option<serde_json::Value>,
+    team_mapping: Option<serde_json::Value>,
 }
 
 const SSO_STATE_TTL_SECS: u64 = 600; // 10 minutes
@@ -488,9 +509,12 @@ async fn upsert_sso_config(
 
     if let Some(tid) = scope_team_id {
         // Team-scoped SSO config (new behavior)
+        // Hash SCIM token if provided
+        let scim_token_hash = req.scim_token.as_ref().map(|t| hash_api_key(t));
+
         sqlx::query(
-            r#"INSERT INTO sso_configs (team_id, customer_id, created_by, provider, enabled, admin_bypass, verified_domain, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role)
-               VALUES ($1, $2, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+            r#"INSERT INTO sso_configs (team_id, customer_id, created_by, provider, enabled, admin_bypass, verified_domain, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role, role_mapping, team_mapping, scim_enabled, scim_token_hash)
+               VALUES ($1, $2, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
                ON CONFLICT (team_id) DO UPDATE SET
                    provider = EXCLUDED.provider,
                    enabled = EXCLUDED.enabled,
@@ -505,6 +529,10 @@ async fn upsert_sso_config(
                    client_secret_encrypted = COALESCE(EXCLUDED.client_secret_encrypted, sso_configs.client_secret_encrypted),
                    default_team_id = EXCLUDED.default_team_id,
                    default_role = EXCLUDED.default_role,
+                   role_mapping = EXCLUDED.role_mapping,
+                   team_mapping = EXCLUDED.team_mapping,
+                   scim_enabled = EXCLUDED.scim_enabled,
+                   scim_token_hash = COALESCE(EXCLUDED.scim_token_hash, sso_configs.scim_token_hash),
                    updated_at = now()"#
         )
         .bind(tid)
@@ -522,15 +550,21 @@ async fn upsert_sso_config(
         .bind(&client_secret_enc)
         .bind(&req.default_team_id.as_deref().and_then(|s| Uuid::parse_str(s).ok()))
         .bind(req.default_role.as_deref().unwrap_or("viewer"))
+        .bind(&req.role_mapping)
+        .bind(&req.team_mapping)
+        .bind(req.scim_enabled.unwrap_or(false))
+        .bind(&scim_token_hash)
         .execute(&pool)
         .await?;
 
         tracing::info!("SSO config updated: team={}, provider={}, enabled={}", tid, provider, enabled);
     } else {
         // Customer-scoped SSO config (backward compat)
+        let scim_token_hash = req.scim_token.as_ref().map(|t| hash_api_key(t));
+
         sqlx::query(
-            r#"INSERT INTO sso_configs (customer_id, provider, enabled, admin_bypass, verified_domain, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            r#"INSERT INTO sso_configs (customer_id, provider, enabled, admin_bypass, verified_domain, metadata_url, entity_id, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, default_team_id, default_role, role_mapping, team_mapping, scim_enabled, scim_token_hash)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
                ON CONFLICT (customer_id) DO UPDATE SET
                    provider = EXCLUDED.provider,
                    enabled = EXCLUDED.enabled,
@@ -545,6 +579,10 @@ async fn upsert_sso_config(
                    client_secret_encrypted = COALESCE(EXCLUDED.client_secret_encrypted, sso_configs.client_secret_encrypted),
                    default_team_id = EXCLUDED.default_team_id,
                    default_role = EXCLUDED.default_role,
+                   role_mapping = EXCLUDED.role_mapping,
+                   team_mapping = EXCLUDED.team_mapping,
+                   scim_enabled = EXCLUDED.scim_enabled,
+                   scim_token_hash = COALESCE(EXCLUDED.scim_token_hash, sso_configs.scim_token_hash),
                    updated_at = now()"#
         )
         .bind(customer.id)
@@ -561,6 +599,10 @@ async fn upsert_sso_config(
         .bind(&client_secret_enc)
         .bind(&req.default_team_id.as_deref().and_then(|s| Uuid::parse_str(s).ok()))
         .bind(req.default_role.as_deref().unwrap_or("viewer"))
+        .bind(&req.role_mapping)
+        .bind(&req.team_mapping)
+        .bind(req.scim_enabled.unwrap_or(false))
+        .bind(&scim_token_hash)
         .execute(&pool)
         .await?;
 
@@ -1041,11 +1083,11 @@ async fn initiate_sso_login(
     }
 
     // Strategy 2: Find SSO config — try by customer_id, then by team membership, then by domain
-    // Returns: (owner_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_enc, entity_id, default_role)
-    let config: Option<(Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)> = if let Some(ref customer) = existing_customer {
+    // Returns: (owner_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_enc, entity_id, default_role, sso_config_id, role_mapping, team_mapping)
+    let config: Option<(Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Uuid, Option<serde_json::Value>, Option<serde_json::Value>)> = if let Some(ref customer) = existing_customer {
         // Existing user: look up by customer_id first (backward compat)
-        let by_customer = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-            "SELECT customer_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id, default_role FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
+        let by_customer = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Uuid, Option<serde_json::Value>, Option<serde_json::Value>)>(
+            "SELECT customer_id, team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id, default_role, id, role_mapping, team_mapping FROM sso_configs WHERE customer_id = $1 AND enabled = true LIMIT 1"
         )
         .bind(customer.id)
         .fetch_optional(&pool)
@@ -1055,8 +1097,8 @@ async fn initiate_sso_login(
             by_customer
         } else {
             // Try: find by team membership (user is in a team that has SSO)
-            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id, s.default_role
+            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Uuid, Option<serde_json::Value>, Option<serde_json::Value>)>(
+                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id, s.default_role, s.id, s.role_mapping, s.team_mapping
                  FROM sso_configs s
                  INNER JOIN team_members tm ON tm.team_id = s.team_id
                  WHERE tm.customer_id = $1 AND s.enabled = true AND s.team_id IS NOT NULL
@@ -1068,8 +1110,8 @@ async fn initiate_sso_login(
         }
     } else {
         // New user: find SSO config by verified_domain first, then by email domain
-        let by_verified_domain = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-            "SELECT COALESCE(customer_id, created_by), team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id, default_role
+        let by_verified_domain = sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Uuid, Option<serde_json::Value>, Option<serde_json::Value>)>(
+            "SELECT COALESCE(customer_id, created_by), team_id, provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_encrypted, entity_id, default_role, id, role_mapping, team_mapping
              FROM sso_configs WHERE enabled = true AND verified_domain = $1 LIMIT 1"
         )
         .bind(domain)
@@ -1081,8 +1123,8 @@ async fn initiate_sso_login(
         } else {
             // Fallback: match by email domain in customer table
             // Use SPLIT_PART for safe domain extraction (parameterized, no injection)
-            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>)>(
-                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id, s.default_role
+            sqlx::query_as::<_, (Uuid, Option<Uuid>, String, bool, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, Uuid, Option<serde_json::Value>, Option<serde_json::Value>)>(
+                "SELECT s.customer_id, s.team_id, s.provider, s.enabled, s.metadata_url, s.sso_url, s.certificate, s.issuer_url, s.client_id, s.client_secret_encrypted, s.entity_id, s.default_role, s.id, s.role_mapping, s.team_mapping
                  FROM sso_configs s
                  INNER JOIN customers c ON c.id = s.customer_id
                  WHERE s.enabled = true AND SPLIT_PART(c.email, '@', 2) = $1
@@ -1094,7 +1136,7 @@ async fn initiate_sso_login(
         }
     };
 
-    let (sso_owner_id, config_team_id, provider, enabled, _metadata_url, sso_url, _certificate, issuer_url, client_id, client_secret_enc, entity_id, default_role) =
+    let (sso_owner_id, config_team_id, provider, enabled, _metadata_url, sso_url, _certificate, issuer_url, client_id, client_secret_enc, entity_id, default_role, sso_config_id, role_mapping, team_mapping) =
         config.ok_or_else(|| AppError::coded(ErrorCode::SsoNotConfigured))?;
 
     let default_role = default_role.unwrap_or_else(|| "viewer".to_string());
@@ -1144,6 +1186,9 @@ async fn initiate_sso_login(
         default_role: default_role.clone(),
         nonce: oidc_nonce.clone(),
         created_at: Utc::now(),
+        sso_config_id,
+        role_mapping: role_mapping.clone(),
+        team_mapping: team_mapping.clone(),
     }).await;
 
     // Create a minimal Customer struct for the redirect functions
@@ -1491,13 +1536,54 @@ async fn saml_callback(
     // Find or create customer
     let customer = find_or_create_sso_customer(&pool, &email, &assertion.attributes, "saml", domain_verified).await?;
 
-    // Extract auto_join_team_id BEFORE login_state is consumed
-    let auto_join_team = login_state.auto_join_team_id;
+    // Extract IdP attributes for role/team mapping
+    let idp_groups: Vec<String> = assertion.attributes.get("groups")
+        .or_else(|| assertion.attributes.get("memberOf"))
+        .map(|s| s.split(',').map(|g| g.trim().to_string()).collect())
+        .unwrap_or_default();
+    let idp_roles: Vec<String> = assertion.attributes.get("role")
+        .or_else(|| assertion.attributes.get("roles"))
+        .map(|s| s.split(',').map(|r| r.trim().to_string()).collect())
+        .unwrap_or_default();
+
+    // Resolve role using role_mapping
+    let resolved_role = resolve_role_from_mapping(
+        &login_state.role_mapping,
+        &idp_groups,
+        &idp_roles,
+        &login_state.default_role,
+    );
+
+    // Resolve team using team_mapping
+    let resolved_team = resolve_team_from_mapping(
+        &login_state.team_mapping,
+        &email,
+        &login_state.auto_join_team_id,
+    );
+
+    // Store SSO user attributes
+    let _ = store_sso_user_attributes(
+        &pool,
+        customer.id,
+        login_state.sso_config_id,
+        assertion.attributes.get("uid").or(assertion.attributes.get("user_id")).map(|s| s.as_str()),
+        &idp_groups,
+        &idp_roles,
+        &assertion.attributes,
+    ).await;
+
+    // Sync team memberships based on IdP groups
+    let _ = sync_team_memberships(
+        &pool,
+        customer.id,
+        &idp_groups,
+        &login_state.team_mapping,
+        &resolved_role,
+    ).await;
 
     // Auto-join to team if configured
-    if let Some(team_id) = auto_join_team {
-        let role = login_state.default_role.clone();
-        let _ = auto_join_team_direct(&pool, customer.id, team_id, &role).await;
+    if let Some(team_id) = resolved_team {
+        let _ = auto_join_team_direct(&pool, customer.id, team_id, &resolved_role).await;
     }
 
     // Log attempt
@@ -1505,7 +1591,7 @@ async fn saml_callback(
 
     // Audit log for SSO login
     let _ = crate::audit::log_action(&pool, customer.id, "SSO_LOGIN", "auth", None,
-        Some(serde_json::json!({"provider": "saml", "auto_joined_team": auto_join_team.is_some()})),
+        Some(serde_json::json!({"provider": "saml", "auto_joined_team": resolved_team.is_some(), "role": resolved_role})),
         None, None).await;
 
     // Generate JWT tokens
@@ -1690,13 +1776,54 @@ async fn oidc_callback(
     let domain_verified = verified_domain.as_deref() == Some(email_domain);
     let customer = find_or_create_sso_customer(&pool, email, &attributes, "oidc", domain_verified).await?;
 
-    // Extract auto_join_team_id BEFORE login_state is consumed
-    let auto_join_team = login_state.auto_join_team_id;
+    // Extract IdP attributes for role/team mapping
+    let idp_groups: Vec<String> = attributes.get("groups")
+        .or_else(|| attributes.get("memberOf"))
+        .map(|s| s.split(',').map(|g| g.trim().to_string()).collect())
+        .unwrap_or_default();
+    let idp_roles: Vec<String> = attributes.get("role")
+        .or_else(|| attributes.get("roles"))
+        .map(|s| s.split(',').map(|r| r.trim().to_string()).collect())
+        .unwrap_or_default();
+
+    // Resolve role using role_mapping
+    let resolved_role = resolve_role_from_mapping(
+        &login_state.role_mapping,
+        &idp_groups,
+        &idp_roles,
+        &login_state.default_role,
+    );
+
+    // Resolve team using team_mapping
+    let resolved_team = resolve_team_from_mapping(
+        &login_state.team_mapping,
+        email,
+        &login_state.auto_join_team_id,
+    );
+
+    // Store SSO user attributes
+    let _ = store_sso_user_attributes(
+        &pool,
+        customer.id,
+        login_state.sso_config_id,
+        attributes.get("sub").or(attributes.get("uid")).map(|s| s.as_str()),
+        &idp_groups,
+        &idp_roles,
+        &attributes,
+    ).await;
+
+    // Sync team memberships based on IdP groups
+    let _ = sync_team_memberships(
+        &pool,
+        customer.id,
+        &idp_groups,
+        &login_state.team_mapping,
+        &resolved_role,
+    ).await;
 
     // Auto-join to team if configured
-    if let Some(team_id) = auto_join_team {
-        let role = login_state.default_role.clone();
-        let _ = auto_join_team_direct(&pool, customer.id, team_id, &role).await;
+    if let Some(team_id) = resolved_team {
+        let _ = auto_join_team_direct(&pool, customer.id, team_id, &resolved_role).await;
     }
 
     // Log attempt
@@ -1704,7 +1831,7 @@ async fn oidc_callback(
 
     // Audit log for SSO login
     let _ = crate::audit::log_action(&pool, customer.id, "SSO_LOGIN", "auth", None,
-        Some(serde_json::json!({"provider": "oidc", "auto_joined_team": auto_join_team.is_some()})),
+        Some(serde_json::json!({"provider": "oidc", "auto_joined_team": resolved_team.is_some(), "role": resolved_role})),
         None, None).await;
 
     // Generate JWT tokens and redirect
@@ -2243,6 +2370,206 @@ async fn auto_join_team_direct(
     Ok(())
 }
 
+// ── Helper: Resolve role from IdP attributes using role_mapping ──
+//
+// role_mapping format:
+// {
+//   "Engineering": "developer",
+//   "Management": "admin",
+//   "Sales": "analyst",
+//   "default": "viewer"
+// }
+//
+// Checks IdP groups and roles attributes against the mapping.
+// Returns the mapped role or the default_role fallback.
+
+fn resolve_role_from_mapping(
+    role_mapping: &Option<serde_json::Value>,
+    idp_groups: &[String],
+    idp_roles: &[String],
+    default_role: &str,
+) -> String {
+    let mapping = match role_mapping {
+        Some(m) => m,
+        None => return default_role.to_string(),
+    };
+
+    let obj = match mapping.as_object() {
+        Some(o) => o,
+        None => return default_role.to_string(),
+    };
+
+    // Check IdP groups first
+    for group in idp_groups {
+        if let Some(role) = obj.get(group.as_str()) {
+            if let Some(r) = role.as_str() {
+                tracing::debug!("Role mapping: group '{}' → role '{}'", group, r);
+                return r.to_string();
+            }
+        }
+    }
+
+    // Check IdP roles
+    for role in idp_roles {
+        if let Some(mapped_role) = obj.get(role.as_str()) {
+            if let Some(r) = mapped_role.as_str() {
+                tracing::debug!("Role mapping: role '{}' → mapped '{}'", role, r);
+                return r.to_string();
+            }
+        }
+    }
+
+    // Return default from mapping or fallback
+    obj.get("default")
+        .and_then(|v| v.as_str())
+        .unwrap_or(default_role)
+        .to_string()
+}
+
+// ── Helper: Resolve team from email domain using team_mapping ──
+//
+// team_mapping format:
+// {
+//   "engineering.company.com": "team-uuid-1",
+//   "sales.company.com": "team-uuid-2",
+//   "default": "default-team-uuid"
+// }
+//
+// Extracts domain from email, looks up in mapping.
+// Returns the mapped team_id or None.
+
+fn resolve_team_from_mapping(
+    team_mapping: &Option<serde_json::Value>,
+    email: &str,
+    default_team_id: &Option<Uuid>,
+) -> Option<Uuid> {
+    let mapping = match team_mapping {
+        Some(m) => m,
+        None => return *default_team_id,
+    };
+
+    let obj = match mapping.as_object() {
+        Some(o) => o,
+        None => return *default_team_id,
+    };
+
+    // Extract domain from email
+    let domain = email.split('@').nth(1).unwrap_or("");
+
+    // Check domain mapping
+    if let Some(team_id_str) = obj.get(domain) {
+        if let Some(s) = team_id_str.as_str() {
+            if let Ok(tid) = Uuid::parse_str(s) {
+                tracing::debug!("Team mapping: domain '{}' → team '{}'", domain, tid);
+                return Some(tid);
+            }
+        }
+    }
+
+    // Return default from mapping or fallback
+    obj.get("default")
+        .and_then(|v| v.as_str())
+        .and_then(|s| Uuid::parse_str(s).ok())
+        .or(*default_team_id)
+}
+
+// ── Helper: Store SSO user attributes ───────────────────────
+
+async fn store_sso_user_attributes(
+    pool: &PgPool,
+    customer_id: Uuid,
+    sso_config_id: Uuid,
+    idp_user_id: Option<&str>,
+    idp_groups: &[String],
+    idp_roles: &[String],
+    raw_attributes: &std::collections::HashMap<String, String>,
+) -> Result<(), AppError> {
+    sqlx::query(
+        r#"INSERT INTO sso_user_attributes (customer_id, sso_config_id, idp_user_id, idp_groups, idp_roles, raw_attributes, last_synced_at)
+           VALUES ($1, $2, $3, $4, $5, $6, NOW())
+           ON CONFLICT (customer_id, sso_config_id) DO UPDATE SET
+             idp_user_id = EXCLUDED.idp_user_id,
+             idp_groups = EXCLUDED.idp_groups,
+             idp_roles = EXCLUDED.idp_roles,
+             raw_attributes = EXCLUDED.raw_attributes,
+             last_synced_at = NOW()"#
+    )
+    .bind(customer_id)
+    .bind(sso_config_id)
+    .bind(idp_user_id)
+    .bind(idp_groups)
+    .bind(idp_roles)
+    .bind(serde_json::to_value(raw_attributes).unwrap_or_default())
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+// ── Helper: Sync team membership based on IdP groups ────────
+//
+// If team_mapping maps a group to a team, ensure the user is a member.
+// If the user was previously in a team but is no longer in the mapped group,
+// they are NOT automatically removed (safety — manual removal required).
+
+async fn sync_team_memberships(
+    pool: &PgPool,
+    customer_id: Uuid,
+    idp_groups: &[String],
+    team_mapping: &Option<serde_json::Value>,
+    default_role: &str,
+) -> Result<(), AppError> {
+    let mapping = match team_mapping {
+        Some(m) => m,
+        None => return Ok(()),
+    };
+
+    let obj = match mapping.as_object() {
+        Some(o) => o,
+        None => return Ok(()),
+    };
+
+    // Check each IdP group against team mapping
+    for group in idp_groups {
+        if let Some(team_id_str) = obj.get(group.as_str()) {
+            if let Some(s) = team_id_str.as_str() {
+                if let Ok(team_id) = Uuid::parse_str(s) {
+                    // Check if already a member
+                    let existing: Option<(Uuid,)> = sqlx::query_as(
+                        "SELECT id FROM team_members WHERE team_id = $1 AND customer_id = $2"
+                    )
+                    .bind(team_id)
+                    .bind(customer_id)
+                    .fetch_optional(pool)
+                    .await?;
+
+                    if existing.is_none() {
+                        // Add to team
+                        sqlx::query(
+                            "INSERT INTO team_members (team_id, customer_id, role, joined_at) VALUES ($1, $2, $3, NOW()) ON CONFLICT DO NOTHING"
+                        )
+                        .bind(team_id)
+                        .bind(customer_id)
+                        .bind(default_role)
+                        .execute(pool)
+                        .await?;
+
+                        tracing::info!("✅ Group sync: customer {} added to team {} (group '{}')", customer_id, team_id, group);
+
+                        // Audit log
+                        let _ = crate::audit::log_action(pool, customer_id, "SSO_GROUP_SYNC_JOIN", "team",
+                            Some(&team_id.to_string()),
+                            Some(serde_json::json!({"group": group, "role": default_role})),
+                            None, None).await;
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
 // ── Helper: Generate SSO Login Response ─────────────────────
 
 async fn generate_sso_response(
@@ -2505,6 +2832,596 @@ fn read_asn1_length(data: &[u8]) -> (usize, usize) {
 /// Convert Vec<u8> to Vec<u8> (identity, used for clarity)
 fn _vec_identity(v: Vec<u8>) -> Vec<u8> {
     v
+}
+
+// ── SCIM 2.0 Endpoints ──────────────────────────────────────
+
+/// Validate SCIM bearer token and return sso_config_id
+async fn validate_scim_token(
+    pool: &PgPool,
+    headers: &HeaderMap,
+) -> Result<Uuid, AppError> {
+    let auth = headers.get("authorization")
+        .and_then(|v| v.to_str().ok())
+        .ok_or(AppError::Unauthorized)?;
+
+    let token = auth.strip_prefix("Bearer ").unwrap_or(auth);
+    let token_hash = hash_api_key(token);
+
+    let config_id: Option<(Uuid,)> = sqlx::query_as(
+        "SELECT id FROM sso_configs WHERE scim_enabled = true AND scim_token_hash = $1"
+    )
+    .bind(&token_hash)
+    .fetch_optional(pool)
+    .await?;
+
+    config_id
+        .map(|(id,)| id)
+        .ok_or(AppError::Unauthorized)
+}
+
+/// SCIM User response builder
+fn scim_user_response(customer: &Customer, attributes: Option<&SsoUserAttributesRow>) -> serde_json::Value {
+    let groups = attributes
+        .and_then(|a| a.idp_groups.as_ref())
+        .cloned()
+        .unwrap_or_default();
+
+    serde_json::json!({
+        "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
+        "id": customer.id.to_string(),
+        "externalId": attributes.and_then(|a| a.idp_user_id.clone()),
+        "userName": customer.email,
+        "name": {
+            "formatted": customer.name,
+        },
+        "emails": [{
+            "value": customer.email,
+            "primary": true,
+            "type": "work"
+        }],
+        "active": customer.is_active,
+        "groups": groups.iter().map(|g| serde_json::json!({"value": g, "display": g})).collect::<Vec<_>>(),
+        "meta": {
+            "resourceType": "User",
+            "created": customer.created_at.to_rfc3339(),
+            "lastModified": customer.updated_at.to_rfc3339(),
+            "location": format!("/v1/sso/scim/v2/Users/{}", customer.id)
+        }
+    })
+}
+
+#[derive(sqlx::FromRow)]
+struct SsoUserAttributesRow {
+    idp_user_id: Option<String>,
+    idp_groups: Option<Vec<String>>,
+    idp_roles: Option<Vec<String>>,
+    raw_attributes: Option<serde_json::Value>,
+}
+
+/// GET /scim/v2/Users — List users
+async fn scim_list_users(
+    Extension(pool): Extension<PgPool>,
+    headers: HeaderMap,
+    Query(query): Query<std::collections::HashMap<String, String>>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let config_id = validate_scim_token(&pool, &headers).await?;
+
+    // Get customer_id from config to scope results
+    let owner_id: Option<(Uuid,)> = sqlx::query_as(
+        "SELECT customer_id FROM sso_configs WHERE id = $1"
+    )
+    .bind(config_id)
+    .fetch_optional(&pool)
+    .await?;
+
+    let owner_id = match owner_id {
+        Some((id,)) => id,
+        None => return Ok(Json(serde_json::json!({
+            "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
+            "totalResults": 0,
+            "startIndex": 1,
+            "itemsPerPage": 0,
+            "Resources": []
+        }))),
+    };
+
+    // Get all customers who logged in via this SSO config
+    let customers: Vec<(Customer, Option<SsoUserAttributesRow>)> = sqlx::query_as(
+        r#"SELECT c.*, sa.idp_user_id, sa.idp_groups, sa.idp_roles, sa.raw_attributes
+           FROM customers c
+           INNER JOIN sso_user_attributes sa ON sa.customer_id = c.id
+           WHERE sa.sso_config_id = $1
+           ORDER BY c.created_at DESC
+           LIMIT 100"#
+    )
+    .bind(config_id)
+    .fetch_all(&pool)
+    .await?;
+
+    let total = customers.len();
+    let resources: Vec<serde_json::Value> = customers
+        .iter()
+        .map(|(c, attrs)| scim_user_response(c, attrs.as_ref()))
+        .collect();
+
+    Ok(Json(serde_json::json!({
+        "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
+        "totalResults": total,
+        "startIndex": 1,
+        "itemsPerPage": total,
+        "Resources": resources
+    })))
+}
+
+/// GET /scim/v2/Users/:id — Get user
+async fn scim_get_user(
+    Extension(pool): Extension<PgPool>,
+    headers: HeaderMap,
+    Path(id): Path<String>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let config_id = validate_scim_token(&pool, &headers).await?;
+
+    let customer_id = Uuid::parse_str(&id)
+        .map_err(|_| AppError::BadRequest("Invalid user ID".into()))?;
+
+    let customer = sqlx::query_as::<_, Customer>(
+        "SELECT * FROM customers WHERE id = $1"
+    )
+    .bind(customer_id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    let attrs: Option<SsoUserAttributesRow> = sqlx::query_as(
+        "SELECT idp_user_id, idp_groups, idp_roles, raw_attributes FROM sso_user_attributes WHERE customer_id = $1 AND sso_config_id = $2"
+    )
+    .bind(customer_id)
+    .bind(config_id)
+    .fetch_optional(&pool)
+    .await?;
+
+    Ok(Json(scim_user_response(&customer, attrs.as_ref())))
+}
+
+/// POST /scim/v2/Users — Create user (provision)
+async fn scim_create_user(
+    Extension(pool): Extension<PgPool>,
+    headers: HeaderMap,
+    Json(body): Json<serde_json::Value>,
+) -> Result<(StatusCode, Json<serde_json::Value>), AppError> {
+    let config_id = validate_scim_token(&pool, &headers).await?;
+
+    let email = body.get("userName")
+        .or_else(|| body.get("emails").and_then(|e| e.as_array()?.first()?.get("value")))
+        .and_then(|v| v.as_str())
+        .ok_or(AppError::BadRequest("Missing userName or email".into()))?;
+
+    let external_id = body.get("externalId").and_then(|v| v.as_str()).map(|s| s.to_string());
+    let name = body.get("name").and_then(|n| n.get("formatted")).and_then(|v| v.as_str()).map(|s| s.to_string());
+    let active = body.get("active").and_then(|v| v.as_bool()).unwrap_or(true);
+
+    let idp_groups: Vec<String> = body.get("groups")
+        .and_then(|g| g.as_array())
+        .map(|arr| arr.iter().filter_map(|g| g.get("value")?.as_str().map(|s| s.to_string())).collect())
+        .unwrap_or_default();
+
+    // Get default role from SSO config
+    let config = sqlx::query_as::<_, (Option<String>,)>(
+        "SELECT default_role FROM sso_configs WHERE id = $1"
+    )
+    .bind(config_id)
+    .fetch_optional(&pool)
+    .await?;
+
+    let default_role = config.and_then(|(r,)| r).unwrap_or_else(|| "viewer".to_string());
+
+    // Find or create customer
+    let existing = sqlx::query_as::<_, Customer>(
+        "SELECT * FROM customers WHERE email = $1"
+    )
+    .bind(email)
+    .fetch_optional(&pool)
+    .await?;
+
+    let customer = if let Some(c) = existing {
+        // Update existing
+        sqlx::query(
+            "UPDATE customers SET is_active = $1, name = COALESCE($2, name), updated_at = NOW() WHERE id = $3"
+        )
+        .bind(active)
+        .bind(&name)
+        .bind(c.id)
+        .execute(&pool)
+        .await?;
+        c
+    } else {
+        // Create new
+        let api_key = generate_api_key();
+        let api_key_hash = hash_api_key(&api_key);
+        let api_key_prefix = api_key[..15].to_string();
+
+        sqlx::query_as::<_, Customer>(
+            "INSERT INTO customers (email, api_key_hash, api_key_prefix, name, is_active, email_verified) VALUES ($1, $2, $3, $4, $5, true) RETURNING *"
+        )
+        .bind(email)
+        .bind(&api_key_hash)
+        .bind(&api_key_prefix)
+        .bind(&name)
+        .bind(active)
+        .fetch_one(&pool)
+        .await?
+    };
+
+    // Store SSO attributes
+    let _ = store_sso_user_attributes(
+        &pool,
+        customer.id,
+        config_id,
+        external_id.as_deref(),
+        &idp_groups,
+        &[],
+        &std::collections::HashMap::new(),
+    ).await;
+
+    // Log
+    let _ = crate::audit::log_action(&pool, customer.id, "SCIM_CREATE_USER", "user",
+        Some(&customer.id.to_string()),
+        Some(serde_json::json!({"email": email, "active": active})),
+        None, None).await;
+
+    let attrs: Option<SsoUserAttributesRow> = sqlx::query_as(
+        "SELECT idp_user_id, idp_groups, idp_roles, raw_attributes FROM sso_user_attributes WHERE customer_id = $1 AND sso_config_id = $2"
+    )
+    .bind(customer.id)
+    .bind(config_id)
+    .fetch_optional(&pool)
+    .await?;
+
+    Ok((StatusCode::CREATED, Json(scim_user_response(&customer, attrs.as_ref()))))
+}
+
+/// PUT /scim/v2/Users/:id — Update user
+async fn scim_update_user(
+    Extension(pool): Extension<PgPool>,
+    headers: HeaderMap,
+    Path(id): Path<String>,
+    Json(body): Json<serde_json::Value>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let config_id = validate_scim_token(&pool, &headers).await?;
+
+    let customer_id = Uuid::parse_str(&id)
+        .map_err(|_| AppError::BadRequest("Invalid user ID".into()))?;
+
+    let customer = sqlx::query_as::<_, Customer>(
+        "SELECT * FROM customers WHERE id = $1"
+    )
+    .bind(customer_id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or(AppError::NotFound)?;
+
+    let active = body.get("active").and_then(|v| v.as_bool());
+    let name = body.get("name").and_then(|n| n.get("formatted")).and_then(|v| v.as_str()).map(|s| s.to_string());
+    let external_id = body.get("externalId").and_then(|v| v.as_str()).map(|s| s.to_string());
+
+    let idp_groups: Vec<String> = body.get("groups")
+        .and_then(|g| g.as_array())
+        .map(|arr| arr.iter().filter_map(|g| g.get("value")?.as_str().map(|s| s.to_string())).collect())
+        .unwrap_or_default();
+
+    // Update customer
+    sqlx::query(
+        "UPDATE customers SET is_active = COALESCE($1, is_active), name = COALESCE($2, name), updated_at = NOW() WHERE id = $3"
+    )
+    .bind(active)
+    .bind(&name)
+    .bind(customer_id)
+    .execute(&pool)
+    .await?;
+
+    // Update SSO attributes
+    let _ = store_sso_user_attributes(
+        &pool,
+        customer_id,
+        config_id,
+        external_id.as_deref(),
+        &idp_groups,
+        &[],
+        &std::collections::HashMap::new(),
+    ).await;
+
+    // Log
+    let _ = crate::audit::log_action(&pool, customer_id, "SCIM_UPDATE_USER", "user",
+        Some(&customer_id.to_string()),
+        Some(serde_json::json!({"active": active, "name": name})),
+        None, None).await;
+
+    let attrs: Option<SsoUserAttributesRow> = sqlx::query_as(
+        "SELECT idp_user_id, idp_groups, idp_roles, raw_attributes FROM sso_user_attributes WHERE customer_id = $1 AND sso_config_id = $2"
+    )
+    .bind(customer_id)
+    .bind(config_id)
+    .fetch_optional(&pool)
+    .await?;
+
+    let updated_customer = sqlx::query_as::<_, Customer>(
+        "SELECT * FROM customers WHERE id = $1"
+    )
+    .bind(customer_id)
+    .fetch_one(&pool)
+    .await?;
+
+    Ok(Json(scim_user_response(&updated_customer, attrs.as_ref())))
+}
+
+/// PATCH /scim/v2/Users/:id — Partial update
+async fn scim_patch_user(
+    Extension(pool): Extension<PgPool>,
+    headers: HeaderMap,
+    Path(id): Path<String>,
+    Json(body): Json<serde_json::Value>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let config_id = validate_scim_token(&pool, &headers).await?;
+
+    let customer_id = Uuid::parse_str(&id)
+        .map_err(|_| AppError::BadRequest("Invalid user ID".into()))?;
+
+    // Handle SCIM PATCH operations
+    if let Some(operations) = body.get("Operations").and_then(|o| o.as_array()) {
+        for op in operations {
+            let op_type = op.get("op").and_then(|v| v.as_str()).unwrap_or("");
+            let path = op.get("path").and_then(|v| v.as_str()).unwrap_or("");
+            let value = op.get("value");
+
+            match (op_type, path) {
+                ("replace", "active") => {
+                    if let Some(active) = value.and_then(|v| v.as_bool()) {
+                        sqlx::query("UPDATE customers SET is_active = $1, updated_at = NOW() WHERE id = $2")
+                            .bind(active)
+                            .bind(customer_id)
+                            .execute(&pool)
+                            .await?;
+
+                        let _ = crate::audit::log_action(&pool, customer_id, "SCIM_PATCH_USER", "user",
+                            Some(&customer_id.to_string()),
+                            Some(serde_json::json!({"field": "active", "value": active})),
+                            None, None).await;
+                    }
+                }
+                ("replace", "name.formatted") => {
+                    if let Some(name) = value.and_then(|v| v.as_str()) {
+                        sqlx::query("UPDATE customers SET name = $1, updated_at = NOW() WHERE id = $2")
+                            .bind(name)
+                            .bind(customer_id)
+                            .execute(&pool)
+                            .await?;
+                    }
+                }
+                ("add", "groups") | ("replace", "groups") => {
+                    if let Some(groups) = value.and_then(|v| v.as_array()) {
+                        let group_list: Vec<String> = groups.iter()
+                            .filter_map(|g| g.get("value")?.as_str().map(|s| s.to_string()))
+                            .collect();
+
+                        // Update groups in sso_user_attributes
+                        sqlx::query(
+                            "UPDATE sso_user_attributes SET idp_groups = $1, last_synced_at = NOW() WHERE customer_id = $2 AND sso_config_id = $3"
+                        )
+                        .bind(&group_list)
+                        .bind(customer_id)
+                        .bind(config_id)
+                        .execute(&pool)
+                        .await?;
+                    }
+                }
+                ("remove", "groups") => {
+                    if let Some(groups) = value.and_then(|v| v.as_array()) {
+                        let group_list: Vec<String> = groups.iter()
+                            .filter_map(|g| g.get("value")?.as_str().map(|s| s.to_string()))
+                            .collect();
+
+                        // Remove specific groups
+                        let current: Option<(Option<Vec<String>>,)> = sqlx::query_as(
+                            "SELECT idp_groups FROM sso_user_attributes WHERE customer_id = $1 AND sso_config_id = $2"
+                        )
+                        .bind(customer_id)
+                        .bind(config_id)
+                        .fetch_optional(&pool)
+                        .await?;
+
+                        if let Some((Some(mut existing))) = current {
+                            existing.retain(|g| !group_list.contains(g));
+                            sqlx::query(
+                                "UPDATE sso_user_attributes SET idp_groups = $1, last_synced_at = NOW() WHERE customer_id = $2 AND sso_config_id = $3"
+                            )
+                            .bind(&existing)
+                            .bind(customer_id)
+                            .bind(config_id)
+                            .execute(&pool)
+                            .await?;
+                        }
+                    }
+                }
+                _ => {
+                    tracing::warn!("SCIM PATCH: unsupported operation '{}' on path '{}'", op_type, path);
+                }
+            }
+        }
+    }
+
+    let customer = sqlx::query_as::<_, Customer>(
+        "SELECT * FROM customers WHERE id = $1"
+    )
+    .bind(customer_id)
+    .fetch_one(&pool)
+    .await?;
+
+    let attrs: Option<SsoUserAttributesRow> = sqlx::query_as(
+        "SELECT idp_user_id, idp_groups, idp_roles, raw_attributes FROM sso_user_attributes WHERE customer_id = $1 AND sso_config_id = $2"
+    )
+    .bind(customer_id)
+    .bind(config_id)
+    .fetch_optional(&pool)
+    .await?;
+
+    Ok(Json(scim_user_response(&customer, attrs.as_ref())))
+}
+
+/// DELETE /scim/v2/Users/:id — Deactivate user
+async fn scim_delete_user(
+    Extension(pool): Extension<PgPool>,
+    headers: HeaderMap,
+    Path(id): Path<String>,
+) -> Result<StatusCode, AppError> {
+    let config_id = validate_scim_token(&pool, &headers).await?;
+
+    let customer_id = Uuid::parse_str(&id)
+        .map_err(|_| AppError::BadRequest("Invalid user ID".into()))?;
+
+    // Soft delete — deactivate instead of hard delete
+    sqlx::query("UPDATE customers SET is_active = false, updated_at = NOW() WHERE id = $1")
+        .bind(customer_id)
+        .execute(&pool)
+        .await?;
+
+    let _ = crate::audit::log_action(&pool, customer_id, "SCIM_DEACTIVATE_USER", "user",
+        Some(&customer_id.to_string()),
+        Some(serde_json::json!({"config_id": config_id})),
+        None, None).await;
+
+    tracing::info!("SCIM: deactivated user {}", customer_id);
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
+/// GET /scim/v2/Groups — List groups (team-based)
+async fn scim_list_groups(
+    Extension(pool): Extension<PgPool>,
+    headers: HeaderMap,
+) -> Result<Json<serde_json::Value>, AppError> {
+    let config_id = validate_scim_token(&pool, &headers).await?;
+
+    // Get teams associated with this SSO config
+    let teams: Vec<(Uuid, String)> = sqlx::query_as(
+        "SELECT t.id, t.name FROM teams t INNER JOIN sso_configs s ON s.team_id = t.id WHERE s.id = $1"
+    )
+    .bind(config_id)
+    .fetch_all(&pool)
+    .await?;
+
+    let resources: Vec<serde_json::Value> = teams
+        .iter()
+        .map(|(id, name)| serde_json::json!({
+            "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+            "id": id.to_string(),
+            "displayName": name,
+            "meta": {
+                "resourceType": "Group",
+                "location": format!("/v1/sso/scim/v2/Groups/{}", id)
+            }
+        }))
+        .collect();
+
+    Ok(Json(serde_json::json!({
+        "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
+        "totalResults": resources.len(),
+        "Resources": resources
+    })))
+}
+
+/// GET /scim/v2/ServiceProviderConfig — SCIM service provider config
+async fn scim_service_provider_config() -> Json<serde_json::Value> {
+    Json(serde_json::json!({
+        "schemas": ["urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"],
+        "patch": {"supported": true},
+        "bulk": {"supported": false},
+        "filter": {"supported": true, "maxResults": 100},
+        "changePassword": {"supported": false},
+        "sort": {"supported": false},
+        "etag": {"supported": false},
+        "authenticationSchemes": [{
+            "type": "oauthbearertoken",
+            "name": "OAuth Bearer Token",
+            "description": "Authentication scheme using the OAuth Bearer Token Standard",
+            "specUri": "https://www.rfc-editor.org/info/rfc6750",
+            "primary": true
+        }]
+    }))
+}
+
+/// GET /scim/v2/ResourceTypes — SCIM resource types
+async fn scim_resource_types() -> Json<serde_json::Value> {
+    Json(serde_json::json!({
+        "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
+        "totalResults": 2,
+        "Resources": [
+            {
+                "schemas": ["urn:ietf:params:scim:schemas:core:2.0:ResourceType"],
+                "id": "User",
+                "name": "User",
+                "endpoint": "/scim/v2/Users",
+                "schema": "urn:ietf:params:scim:schemas:core:2.0:User",
+                "meta": {"resourceType": "ResourceType"}
+            },
+            {
+                "schemas": ["urn:ietf:params:scim:schemas:core:2.0:ResourceType"],
+                "id": "Group",
+                "name": "Group",
+                "endpoint": "/scim/v2/Groups",
+                "schema": "urn:ietf:params:scim:schemas:core:2.0:Group",
+                "meta": {"resourceType": "ResourceType"}
+            }
+        ]
+    }))
+}
+
+/// GET /scim/v2/Schemas — SCIM schemas
+async fn scim_schemas() -> Json<serde_json::Value> {
+    Json(serde_json::json!({
+        "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
+        "totalResults": 2,
+        "Resources": [
+            {
+                "id": "urn:ietf:params:scim:schemas:core:2.0:User",
+                "name": "User",
+                "attributes": [
+                    {"name": "id", "type": "string", "readOnly": true},
+                    {"name": "externalId", "type": "string"},
+                    {"name": "userName", "type": "string", "required": true},
+                    {"name": "name", "type": "complex", "subAttributes": [
+                        {"name": "formatted", "type": "string"},
+                        {"name": "familyName", "type": "string"},
+                        {"name": "givenName", "type": "string"}
+                    ]},
+                    {"name": "emails", "type": "complex", "multiValued": true, "subAttributes": [
+                        {"name": "value", "type": "string"},
+                        {"name": "type", "type": "string"},
+                        {"name": "primary", "type": "boolean"}
+                    ]},
+                    {"name": "active", "type": "boolean"},
+                    {"name": "groups", "type": "complex", "multiValued": true, "readOnly": true, "subAttributes": [
+                        {"name": "value", "type": "string"},
+                        {"name": "display", "type": "string"}
+                    ]}
+                ],
+                "meta": {"resourceType": "Schema"}
+            },
+            {
+                "id": "urn:ietf:params:scim:schemas:core:2.0:Group",
+                "name": "Group",
+                "attributes": [
+                    {"name": "id", "type": "string", "readOnly": true},
+                    {"name": "displayName", "type": "string"},
+                    {"name": "members", "type": "complex", "multiValued": true, "subAttributes": [
+                        {"name": "value", "type": "string"},
+                        {"name": "$ref", "type": "reference"}
+                    ]}
+                ],
+                "meta": {"resourceType": "Schema"}
+            }
+        ]
+    }))
 }
 
 // ── Tests ───────────────────────────────────────────────────
