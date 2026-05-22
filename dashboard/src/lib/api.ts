@@ -1218,7 +1218,7 @@ export const twoFactorApi = {
     apiFetch<{ success: boolean; backup_codes: string[] }>('/auth/2fa/confirm', { method: 'POST', body: { code }, token }),
 
   verify: (tempToken: string, code: string, backupCode?: string) =>
-    apiFetch<{ token: string; customer: { id: string; email: string; name?: string; plan: string; is_admin?: boolean; api_key?: string }; refresh_token?: string }>('/auth/2fa/verify', {
+    apiFetch<{ token: string; customer: { id: string; email: string; name?: string; plan: string; is_admin?: boolean; api_key?: string; avatar_url?: string }; refresh_token?: string }>('/auth/2fa/verify', {
       method: 'POST',
       body: backupCode ? { temp_token: tempToken, backup_code: backupCode } : { temp_token: tempToken, code },
     }),
