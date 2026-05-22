@@ -2891,11 +2891,11 @@
     },
     {
       "q": "Başlamak için kredi kartı gerekli mi?",
-      "a": "Hayır. Ücretsiz plan ile kredi kartı olmadan kayıt olup webhook göndermeye başlayabilirsiniz. Daha fazla hacim veya özellik gerektiğinde yükseltebilirsiniz."
+      "a": "Hayır. Developer plan ile kredi kartı olmadan kayıt olup webhook göndermeye başlayabilirsiniz. Daha fazla hacim veya özellik gerektiğinde yükseltebilirsiniz."
     },
     {
       "q": "Plan limitini aşarsam ne olur?",
-      "a": "Webhook'ları asla düşürmeyiz. Aylık limitinizi aşarsanız, ek etkinlikler plan bazlı ücretlendirilir. Ayrıca panel ayarlarınızdan sabit bir sınır belirleyebilirsiniz."
+      "a": "Webhook'ları asla düşürmeyiz. Günlük limitinizi aşarsanız, ek etkinlikler plan bazlı ücretlendirilir. Ayrıca panel ayarlarınızdan sabit bir sınır belirleyebilirsiniz."
     },
     {
       "q": "Yeniden denemeler gerçekten ücretsiz mi?",
@@ -2910,16 +2910,16 @@
       "a": "Evet! Erken aşama girişimseniz (Seri A öncesi), iletişim formundan bize ulaşın. Önemli indirimler ve genişletilmiş ücretsiz katmanlar sunuyoruz."
     },
     {
-      "q": "Pro ile Business arasındaki fark ne?",
-      "a": "Pro, daha fazla hacim ve daha iyi izleme isteyen büyüyen ekipler içindir. Business, SLA garantileri, FIFO teslimat, SSO ve özel destek isteyen ekipler içindir."
+      "q": "Pro ile Enterprise arasındaki fark ne?",
+      "a": "Pro, daha fazla hacim ve daha iyi izleme isteyen büyüyen ekipler içindir. Enterprise, SLA garantileri, SSO/SAML, özel destek ve özel entegrasyonlar isteyen ekipler içindir."
     },
     {
       "q": "Yıllık faturalandırma var mı?",
-      "a": "Evet. Yıllık faturalandırma, aylığa göre %20 tasarruf sağlar. Pro için yılda $278, Business için yılda $950."
+      "a": "Evet. Yıllık faturalandırma, aylığa göre %20 tasarruf sağlar. Pro için yılda $470, Enterprise için yılda $1.430."
     },
     {
       "q": "Hangi ödeme yöntemlerini kabul ediyorsunuz?",
-      "a": "Stripe üzerinden tüm büyük kredi kartlarını kabul ediyoruz. Business ve Enterprise planları için fatura ve banka havalesi de desteklenir."
+      "a": "Stripe üzerinden tüm büyük kredi kartlarını kabul ediyoruz. Enterprise planları için fatura ve banka havalesi de desteklenir."
     },
     {
       "q": "HookSniff'i kendi sunucumda çalıştırabilir miyim?",
@@ -2939,11 +2939,11 @@
     },
     {
       "q": "Uptime SLA'nız nedir?",
-      "a": "Ücretsiz ve Pro planlarında %99.9 uptime hedefi (en iyi çaba) vardır. Business planları, kaçırdığımızda kredi ile %99.9 uptime SLA içerir."
+      "a": "Developer ve Pro planlarında %99.9 uptime hedefi (en iyi çaba) vardır. Enterprise planları, kaçırdığımızda kredi ile %99.9 uptime SLA içerir."
     },
     {
       "q": "HookSniff Svix ile nasıl karşılaştırılır?",
-      "a": "HookSniff, Svix'ten 10x daha düşük maliyetle benzer özellikler sunar. Svix $490/ay'dan başlar; HookSniff Pro $49/ay'dır. Ayrıca daha fazla SDK (11'e karşı 6), FIFO teslimat ve CloudEvents destekliyoruz."
+      "a": "HookSniff, Svix'ten daha düşük maliyetle benzer özellikler sunar. Svix $490/ay'dan başlar; HookSniff Pro $49/ay'dır. Ayrıca daha fazla SDK (11'e karşı 6), FIFO teslimat ve CloudEvents destekliyoruz."
     },
     {
       "q": "Verilerimi dışa aktarabilir miyim?",
