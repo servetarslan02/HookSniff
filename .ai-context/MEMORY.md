@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-22 06:50 GMT+8 (Error Codes Refactor — Backend + Frontend)
+> Son güncelleme: 2026-05-23 GMT+8 (RBAC Frontend Implementation)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -256,7 +256,32 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-22 06:45–06:50 — Error Codes Refactor)
+## 📝 Son Oturum (2026-05-23 — RBAC Frontend Implementation)
+
+### Özet
+Servet ile oturum. Frontend RBAC implementasyonu yapıldı. 5 dosya değişti, 260 satır eklendi.
+
+### Yapılan İşler:
+1. **useTeamRole hook** — kullanıcının takım rolünü getirir (owner/admin/developer/analyst/viewer)
+2. **usePermissions hook** — role göre 15+ granüler yetki hesaplar
+3. **RoleGuard component** — `<RoleGuard require="canManageWebhooks">` ile yetki bazlı render
+4. **ReadOnlyBadge** — viewer/analyst roller için "Read-only" badge
+5. **Sidebar RBAC** — nav items rol bazlı filtreleniyor
+6. **Endpoints RBAC** — create/delete butonları admin+ rollerde görünür
+
+### Değişen Dosyalar:
+- `dashboard/src/hooks/useTeamRole.ts` — yeni
+- `dashboard/src/hooks/usePermissions.ts` — yeni
+- `dashboard/src/components/RoleGuard.tsx` — yeni
+- `dashboard/src/app/[locale]/(dashboard)/layout.tsx` — sidebar filtreleme
+- `dashboard/src/app/[locale]/(dashboard)/endpoints/EndpointsContent.tsx` — RBAC butonlar
+
+### Push: `253d3086`
+### TypeScript: ✅ 0 hata
+
+---
+
+## 📝 Önceki Oturum (2026-05-22 06:45–06:50 — Error Codes Refactor)
 
 ### Özet
 Servet ile oturum. Backend hata mesajları kod bazlı sisteme geçirildi. 25 route dosyasında 137 değişiklik.
