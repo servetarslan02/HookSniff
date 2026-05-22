@@ -7,10 +7,12 @@ import { teamsApi } from '@/lib/api';
 export type TeamRole = 'owner' | 'admin' | 'developer' | 'analyst' | 'viewer';
 
 /**
- * Returns the user's role in their first (active) team.
+ * Returns the user's role in a specific team.
+ * If no teamId is provided, uses the first team (backward compatible).
+ *
  * Hierarchy: owner > admin > developer > analyst > viewer
  */
-export function useTeamRole() {
+export function useTeamRole(teamId?: string | null) {
   const { token, user } = useAuth();
 
   const { data: teams } = useQuery({
@@ -20,38 +22,68 @@ export function useTeamRole() {
     staleTime: 60_000,
   });
 
-  const teamId = teams?.[0]?.id ?? null;
+  // Use provided teamId, or fall back to first team
+  const effectiveTeamId = teamId ?? teams?.[0]?.id ?? null;
 
   const { data: members, isLoading: membersLoading } = useQuery({
-    queryKey: ['teams', teamId, 'members'],
-    queryFn: () => teamsApi.listMembers(token!, teamId!),
-    enabled: !!token && !!teamId,
+    queryKey: ['teams', effectiveTeamId, 'members'],
+    queryFn: () => teamsApi.listMembers(token!, effectiveTeamId!),
+    enabled: !!token && !!effectiveTeamId,
     staleTime: 30_000,
   });
 
   const { data: teamDetail, isLoading: detailLoading } = useQuery({
-    queryKey: ['teams', teamId, 'detail'],
-    queryFn: () => teamsApi.getDetail(token!, teamId!),
-    enabled: !!token && !!teamId,
+    queryKey: ['teams', effectiveTeamId, 'detail'],
+    queryFn: () => teamsApi.getDetail(token!, effectiveTeamId!),
+    enabled: !!token && !!effectiveTeamId,
     staleTime: 30_000,
   });
 
   const isLoading = membersLoading || detailLoading;
 
-  if (!teamId || !user) {
+  if (!effectiveTeamId || !user) {
     return { role: null as TeamRole | null, teamId: null, isLoading };
   }
 
   // Check if user is team owner
   if (teamDetail?.owner_id === user.id) {
-    return { role: 'owner' as TeamRole, teamId, isLoading };
+    return { role: 'owner' as TeamRole, teamId: effectiveTeamId, isLoading };
   }
 
   // Find user in members list
   const member = members?.find((m) => m.customer_id === user.id);
   const role = (member?.role ?? 'viewer') as TeamRole;
 
-  return { role, teamId, isLoading };
+  return { role, teamId: effectiveTeamId, isLoading };
+}
+
+/**
+ * Returns the user's role in ALL their teams.
+ * Useful for checking if user has a role in ANY team.
+ */
+export function useAllTeamRoles() {
+  const { token, user } = useAuth();
+
+  const { data: teams } = useQuery({
+    queryKey: ['teams'],
+    queryFn: () => teamsApi.list(token!),
+    enabled: !!token,
+    staleTime: 60_000,
+  });
+
+  const teamRoles: Array<{ teamId: string; role: TeamRole }> = [];
+
+  if (teams && user) {
+    for (const team of teams) {
+      // We can't fetch all members here without additional queries
+      // This is a lightweight version that returns team ownership info
+      if (team.owner_id === user.id) {
+        teamRoles.push({ teamId: team.id, role: 'owner' });
+      }
+    }
+  }
+
+  return { teamRoles, teams: teams ?? [] };
 }
 
 /** Role hierarchy level (higher = more access) */
