@@ -2595,7 +2595,7 @@
     "noCreditCard": "No credit card",
     "fiveMinSetup": "5 min setup",
     "step1Title": "Create your account",
-    "step1Desc": "Sign up for free — no credit card required. You get 1,000 webhook deliveries per month on the free plan.",
+    "step1Desc": "Sign up for free — no credit card required. You get 1,000 events per day on the free plan.",
     "createFreeAccount": "Create Free Account",
     "signedInAs": "Signed in as",
     "step2Title": "Get your API key",

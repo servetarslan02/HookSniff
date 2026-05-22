@@ -60,12 +60,12 @@ print(f"Delivery ID: {delivery.id}")`,
   go: {
     label: 'Go',
     icon: <Box size={16} strokeWidth={1.75} className="text-blue-500" />,
-    install: 'go get github.com/hooksniff/hooksniff-go',
+    install: 'go get github.com/servetarslan02/hooksniff-go',
     code: `package main
 
 import (
     "fmt"
-    hooksniff "github.com/hooksniff/hooksniff-go"
+    hooksniff "github.com/servetarslan02/hooksniff-go"
 )
 
 func main() {
@@ -415,10 +415,12 @@ export function GetStartedPageContent() {
           <div className="bg-gray-900 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-gray-500 uppercase tracking-wider">{t('installAndUse')}</span>
-              <CopyButton text={`npm install -g hooksniff-cli\nhooksniff login\nhooksniff endpoints create --url https://myapp.com/webhooks\nhooksniff webhooks send --endpoint ep_abc123 --event order.created`} />
+              <CopyButton text={`npm install -g github:servetarslan02/hooksniff-cli\nhooksniff login\nhooksniff endpoints create --url https://myapp.com/webhooks\nhooksniff webhooks send --endpoint ep_abc123 --event order.created`} />
             </div>
             <pre className="text-sm font-mono text-green-400 overflow-x-auto">
-              <code>{`npm install -g hooksniff-cli
+              <code>{`# Install from GitHub
+npm install -g github:servetarslan02/hooksniff-cli
+
 hooksniff login
 hooksniff endpoints create --url https://myapp.com/webhooks
 hooksniff webhooks send --endpoint ep_abc123 --event order.created
