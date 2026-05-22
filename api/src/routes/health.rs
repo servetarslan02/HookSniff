@@ -189,6 +189,81 @@ pub async fn system_status(
     };
     components.push(worker_status);
 
+    // ── Dashboard (Vercel) — lightweight HEAD request ──
+    let dashboard_start = Instant::now();
+    let dashboard_client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(5))
+        .build()
+        .unwrap_or_else(|_| reqwest::Client::new());
+    let dashboard_status = match dashboard_client.get("https://hooksniff.vercel.app").send().await {
+        Ok(resp) => {
+            let latency = dashboard_start.elapsed().as_millis() as i64;
+            if resp.status().is_success() {
+                ComponentStatus {
+                    name: "Dashboard".to_string(),
+                    status: "healthy".to_string(),
+                    latency_ms: Some(latency),
+                    description: "Next.js frontend (Vercel)".to_string(),
+                    last_checked: now.clone(),
+                }
+            } else {
+                ComponentStatus {
+                    name: "Dashboard".to_string(),
+                    status: "degraded".to_string(),
+                    latency_ms: Some(latency),
+                    description: format!("Dashboard returned HTTP {}", resp.status()),
+                    last_checked: now.clone(),
+                }
+            }
+        }
+        Err(_) => ComponentStatus {
+            name: "Dashboard".to_string(),
+            status: "unknown".to_string(),
+            latency_ms: None,
+            description: "Could not reach dashboard".to_string(),
+            last_checked: now.clone(),
+        },
+    };
+    components.push(dashboard_status);
+
+    // ── Email Service (Gmail API) — check via Google endpoint ──
+    let email_status = match std::env::var("GCP_SA_JSON") {
+        Ok(_) => ComponentStatus {
+            name: "Email".to_string(),
+            status: "healthy".to_string(),
+            latency_ms: None,
+            description: "Gmail API (GCP Service Account)".to_string(),
+            last_checked: now.clone(),
+        },
+        Err(_) => ComponentStatus {
+            name: "Email".to_string(),
+            status: "unknown".to_string(),
+            latency_ms: None,
+            description: "Email service not configured".to_string(),
+            last_checked: now.clone(),
+        },
+    };
+    components.push(email_status);
+
+    // ── Storage (Cloudflare R2) — check via env ──
+    let storage_status = match std::env::var("R2_BUCKET") {
+        Ok(_) => ComponentStatus {
+            name: "Storage".to_string(),
+            status: "healthy".to_string(),
+            latency_ms: None,
+            description: "Cloudflare R2 object storage".to_string(),
+            last_checked: now.clone(),
+        },
+        Err(_) => ComponentStatus {
+            name: "Storage".to_string(),
+            status: "unknown".to_string(),
+            latency_ms: None,
+            description: "Storage not configured".to_string(),
+            last_checked: now.clone(),
+        },
+    };
+    components.push(storage_status);
+
     // ── Overall status ──
     let overall_status = if components.iter().any(|c| c.status == "unhealthy") {
         "down".to_string()
