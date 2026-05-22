@@ -2665,8 +2665,8 @@
     "businessDesc": "For teams that need guarantees",
     "freeFeatures": [
       "1,000 events/day",
-      "5 endpoints",
-      "3 retry attempts",
+      "Unlimited endpoints",
+      "Automatic retries",
       "HMAC-SHA256 signatures",
       "Dashboard access",
       "Community support",
@@ -2848,7 +2848,7 @@
     "developerFeatures": [
       "1,000 events/day",
       "1 application",
-      "5 endpoints",
+      "Unlimited endpoints",
       "10 event types",
       "10 subscriptions",
       "7-day log retention",
@@ -2860,7 +2860,7 @@
     "startupFeatures": [
       "30,000 events/day",
       "1 application",
-      "50 endpoints",
+      "Unlimited endpoints",
       "50 event types",
       "300 subscriptions",
       "14-day log retention",

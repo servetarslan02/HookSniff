@@ -617,7 +617,7 @@ footer {
 <!-- Nav -->
 <nav>
   <div class="container nav-inner">
-    <a href="#" class="logo">Hook<span>Relay</span></a>
+    <a href="#" class="logo">Hook<span>Sniff</span></a>
     <button class="nav-toggle" aria-label="Toggle menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
@@ -632,9 +632,9 @@ footer {
 <!-- Hero -->
 <section class="hero">
   <div class="container">
-    <div class="hero-badge"><span class="dot"></span> Now in private beta</div>
+    <div class="hero-badge"><span class="dot"></span> 99.9% uptime — Live in production</div>
     <h1>Reliable <span class="highlight">webhook delivery</span> for developers</h1>
-    <p>Send webhooks. We deliver them. If they fail, we retry. Simple.</p>
+    <p>Send webhooks with confidence. Automatic retries, HMAC signatures, real-time monitoring. Built for developers who need reliability.</p>
     <div class="hero-actions">
       <a href="#waitlist" class="btn-primary">Get Early Access →</a>
       <a href="#features" class="btn-secondary">See how it works</a>
@@ -702,16 +702,35 @@ footer {
     <p class="section-desc reveal">No credit card required. No surprise charges. Upgrade when your webhook volume grows.</p>
     <div class="pricing-grid">
       <div class="pricing-card reveal">
-        <div class="pricing-name">Free</div>
+        <div class="pricing-name">Developer</div>
         <div class="pricing-price">Free</div>
-        <div class="pricing-desc">For side projects and experiments</div>
+        <div class="pricing-desc">Perfect for trying out HookSniff. Free forever for side projects.</div>
         <ul class="pricing-features">
-          <li>10,000 webhooks / month</li>
+          <li>1,000 events / day</li>
           <li>Unlimited endpoints</li>
           <li>Automatic retries</li>
-          <li>HMAC signatures</li>
+          <li>HMAC-SHA256 signatures</li>
           <li>Dashboard access</li>
+          <li>11 SDK access</li>
+          <li>7-day log retention</li>
           <li>Community support</li>
+        </ul>
+        <a href="https://hooksniff.vercel.app/register" class="pricing-btn outline">Get Started</a>
+      </div>
+      <div class="pricing-card reveal">
+        <div class="pricing-name">Startup</div>
+        <div class="pricing-price">$24<span>/mo</span></div>
+        <div class="pricing-desc">For early stage startups ready to scale.</div>
+        <ul class="pricing-features">
+          <li>30,000 events / day</li>
+          <li>Unlimited endpoints</li>
+          <li>Everything in Developer</li>
+          <li>14-day log retention</li>
+          <li>CloudEvents v1.0</li>
+          <li>Secret rotation</li>
+          <li>Dead letter queue</li>
+          <li>Custom retry policies</li>
+          <li>Email support</li>
         </ul>
         <a href="https://hooksniff.vercel.app/register" class="pricing-btn outline">Get Started</a>
       </div>
@@ -719,28 +738,34 @@ footer {
         <span class="popular-badge">Most Popular</span>
         <div class="pricing-name">Pro</div>
         <div class="pricing-price">$49<span>/mo</span></div>
-        <div class="pricing-desc">For production applications</div>
+        <div class="pricing-desc">For production applications that need reliability.</div>
         <ul class="pricing-features">
-          <li>50,000 webhooks / month</li>
+          <li>100,000 events / day</li>
           <li>Unlimited endpoints</li>
-          <li>Everything in Free</li>
-          <li>Webhook logs (30 days)</li>
-          <li>Custom retry policies</li>
+          <li>Everything in Startup</li>
+          <li>180-day log retention</li>
+          <li>FIFO ordered delivery</li>
+          <li>Analytics & graphs</li>
+          <li>Schema registry</li>
+          <li>Webhook playground</li>
           <li>Priority support</li>
         </ul>
         <a href="https://hooksniff.vercel.app/register" class="pricing-btn filled">Get Started</a>
       </div>
       <div class="pricing-card reveal">
-        <div class="pricing-name">Business</div>
-        <div class="pricing-price">$99<span>/mo</span></div>
-        <div class="pricing-desc">For teams that need guarantees</div>
+        <div class="pricing-name">Enterprise</div>
+        <div class="pricing-price">$149<span>/mo</span></div>
+        <div class="pricing-desc">For teams that need guarantees and custom solutions.</div>
         <ul class="pricing-features">
-          <li>500,000 webhooks / month</li>
+          <li>Unlimited events</li>
           <li>Unlimited endpoints</li>
           <li>Everything in Pro</li>
-          <li>99.9% SLA</li>
-          <li>Webhook logs (90 days)</li>
-          <li>Priority support</li>
+          <li>99.9% SLA guarantee</li>
+          <li>SSO / SAML</li>
+          <li>Dedicated account manager</li>
+          <li>Custom integrations</li>
+          <li>Custom data retention</li>
+          <li>On-call support</li>
         </ul>
         <a href="https://hooksniff.vercel.app/contact" class="pricing-btn outline">Contact Sales</a>
       </div>
@@ -758,7 +783,7 @@ footer {
         <input type="email" placeholder="you@company.com" required aria-label="Email address">
         <button type="submit">Join Waitlist</button>
       </form>
-      <p class="waitlist-count">Join <strong>1,247</strong> developers already waiting</p>
+      <p class="waitlist-count">Join <strong>developers</strong> building with HookSniff</p>
     </div>
   </div>
 </section>
