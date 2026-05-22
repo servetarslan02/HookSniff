@@ -912,7 +912,7 @@ export function usePortalConfig() {
   const { token } = useAuth();
   return useQuery<PortalConfigResponse>({
     queryKey: ['portal-config'],
-    queryFn: validated(() => api.getPortalConfig(token!), PortalConfigSchema),
+    queryFn: validated(() => api.getPortalConfig(token!), PortalConfigSchema) as () => Promise<PortalConfigResponse>,
     enabled: !!token,
     staleTime: 30_000,
   });

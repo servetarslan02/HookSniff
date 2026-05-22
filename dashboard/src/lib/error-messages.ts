@@ -10,7 +10,7 @@
  *   const msg = getFriendlyError(errorCode, t);
  */
 
-import type { TFunction } from 'i18next';
+type TFunction = (key: string, values?: Record<string, unknown>) => string;
 
 /**
  * Map of API error code → i18n key in the `errors` namespace.

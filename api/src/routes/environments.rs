@@ -110,9 +110,7 @@ async fn create_environment(
     .await?;
 
     if exists.0 {
-        return Err(AppError::Conflict(
-            "An environment with this slug already exists".into(),
-        ));
+        return Err(AppError::Conflict);
     }
 
     // If marking as default, unset other defaults first
@@ -332,9 +330,7 @@ async fn create_variable(
     .await?;
 
     if exists.0 {
-        return Err(AppError::Conflict(
-            "A variable with this key already exists in this environment".into(),
-        ));
+        return Err(AppError::Conflict);
     }
 
     let var = sqlx::query_as::<_, crate::models::environment_variable::EnvironmentVariable>(

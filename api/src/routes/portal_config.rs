@@ -218,7 +218,7 @@ async fn upsert_portal_config(
 
 /// GET /portal/embed-code — Get the embed code snippet
 async fn get_embed_code(Extension(customer): Extension<Customer>) -> Json<serde_json::Value> {
-    let portal_id = customer.id.to_string();
+    let _portal_id = customer.id.to_string();
     let api_base = "https://hooksniff-api-1046140057667.europe-west1.run.app";
     let dashboard_base = "https://hooksniff.vercel.app";
 

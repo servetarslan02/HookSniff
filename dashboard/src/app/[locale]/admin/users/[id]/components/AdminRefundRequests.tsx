@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { getErrorMessage } from '@/lib/errors';
-import { CheckCircle2, XCircle, Clock, DollarSign, MessageSquare } from '@/components/icons';
+import { CheckCircle2, DollarSign, MessageSquare, XCircle } from '@/components/icons';
 
 interface RefundRequest {
   id: string;
@@ -47,7 +47,7 @@ export function AdminRefundRequests() {
     try {
       const { api } = await import('@/lib/api');
       const statusParam = filter ? `?status=${filter}` : '';
-      const data = await api.get(`/admin/refund-requests${statusParam}`, token);
+      const data = await api.get(`/admin/refund-requests${statusParam}`, token) as { requests?: RefundRequest[] };
       setRequests(data.requests || []);
     } catch (err: unknown) {
       toast(getErrorMessage(err, 'Failed to load refund requests'), 'error');

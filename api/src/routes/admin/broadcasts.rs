@@ -130,7 +130,7 @@ pub async fn list_broadcasts(
     let mut where_clauses = Vec::new();
     let mut param_idx = 1;
 
-    if let Some(active) = params.is_active {
+    if let Some(_active) = params.is_active {
         where_clauses.push(format!("is_active = ${}", param_idx));
         param_idx += 1;
         // bind later
