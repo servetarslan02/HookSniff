@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi } from '@/lib/api';
 import type { ParsedSpec } from '../parser';
+import { RoleGuard } from '@/components/RoleGuard';
 
 export function ParsedResultsPanel({
   spec,
@@ -70,13 +71,15 @@ export function ParsedResultsPanel({
             >
               {allSelected ? t('deselectAll') : t('selectAll')}
             </button>
-            <button
-              onClick={importEndpoints}
-              disabled={importing || selectedCount === 0}
-              className="px-6 py-2 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition disabled:opacity-50"
-            >
-              {importing ? t('importing', { count: imported }) : t('importEndpoints', { count: selectedCount })}
-            </button>
+            <RoleGuard require="canManageWebhooks">
+              <button
+                onClick={importEndpoints}
+                disabled={importing || selectedCount === 0}
+                className="px-6 py-2 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition disabled:opacity-50"
+              >
+                {importing ? t('importing', { count: imported }) : t('importEndpoints', { count: selectedCount })}
+              </button>
+            </RoleGuard>
           </div>
         </div>
 

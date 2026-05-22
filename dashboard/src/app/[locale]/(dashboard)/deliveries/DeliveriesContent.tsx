@@ -13,6 +13,7 @@ import { useIsFeatureEnabled } from '@/hooks/useAdminData';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
+import { RoleGuard } from '@/components/RoleGuard';
 import { AlertTriangle, Check, CheckCircle2, ClipboardList, Clock, Inbox, Package, X, XCircle } from '@/components/icons';
 
 type StatusFilter = 'all' | 'delivered' | 'failed' | 'pending';
@@ -342,9 +343,11 @@ export default function DeliveriesContent() {
             {bulkReplayEnabled && selectedIds.size > 0 && (
               <div className="px-6 py-3 flex items-center gap-3 bg-brand-50 dark:bg-brand-500/10 border-b border-brand-200 dark:border-brand-500/20">
                 <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('selectedCount', { count: selectedIds.size })}</span>
-                <button type="button" onClick={handleBatchReplay} disabled={batchReplaying} className="px-4 py-1.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition disabled:opacity-50">
-                  {batchReplaying ? t('batchReplaying') : t('batchReplay', { count: selectedIds.size })}
-                </button>
+                <RoleGuard require="canManageWebhooks">
+                  <button type="button" onClick={handleBatchReplay} disabled={batchReplaying} className="px-4 py-1.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition disabled:opacity-50">
+                    {batchReplaying ? t('batchReplaying') : t('batchReplay', { count: selectedIds.size })}
+                  </button>
+                </RoleGuard>
                 <button type="button" onClick={() => setSelectedIds(new Set())} className="px-3 py-1.5 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">
                   {t('clearSelection')}
                 </button>
