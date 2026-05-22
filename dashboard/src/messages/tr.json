@@ -2260,7 +2260,7 @@
       "playground": "Playground"
     },
     "hero": {
-      "uptime": "%99.9 SLA garantisi",
+      "uptime": "%99.9 uptime hedefi",
       "title": "Asla başarısız olmayan",
       "typewriter": [
         "webhook'lar",
@@ -2292,11 +2292,11 @@
       "dashboard": "Gerçek Zamanlı Panel",
       "dashboardDesc": "Teslimatları izleyin, başarı oranlarını takip edin.",
       "lowLatency": "Düşük Gecikme",
-      "lowLatencyDesc": "Hız için Rust ile inşa edildi.",
+      "lowLatencyDesc": "Hız için Rust ile inşa edildi. Webhook teslimatında minimum gecikme.",
       "dlq": "Başarısız Teslimat Kuyruğu",
       "dlqDesc": "Başarısız teslimatlar hata ayıklama için korunur.",
       "global": "Küresel Altyapı",
-      "globalDesc": "Düşük gecikmeli webhook teslimatı için dünya çapında dağıtın.",
+      "globalDesc": "ABD, Avrupa ve Orta Doğu'da düşük gecikmeli webhook teslimatı için çoklu bölge dağıtımı.",
       "portalDesc": "Gömülebilir portal — müşterileriniz kendi webhook aboneliklerini yönetir, logları görüntüler, olayları tekrar oynatır"
     },
     "howItWorks": {
@@ -2649,7 +2649,7 @@
   },
   "pricing": {
     "title": "Fiyatlandırma",
-    "badge": "Svix'ten 20 kat daha ucuz",
+    "badge": "Svix'ten 10x daha ucuz",
     "heroTitle": "Sizinle birlikte büyüyen fiyatlandırma",
     "heroSubtitle": "12 aydan fazla webhook altyapı geliştirme süresinden tasarruf edin. Ücretsiz başlayın, hazır olduğunuzda ölçekleyin.",
     "heroNote": "Kredi kartı gerekmez. Sürpriz ücret yok. İstediğiniz zaman iptal edin.",
