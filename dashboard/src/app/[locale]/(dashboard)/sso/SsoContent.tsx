@@ -9,6 +9,7 @@ import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import { useSsoConfig, useTeams } from '@/hooks/useDashboardData';
 import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, ExternalLink, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 // ── IdP Templates ───────────────────────────────────────────
 const IDP_TEMPLATES = [
@@ -547,6 +548,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    <div>
     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
     <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+    <ReadOnlyBadge />
     <a href="/docs/sso" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 mt-2 text-sm text-brand-600 dark:text-brand-400 hover:underline">
      <ShieldCheck size={14} strokeWidth={1.75} />
      {t('setupGuide') || 'View SSO setup guide →'}
@@ -912,14 +914,16 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
       <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('enforceSso')}</h2>
      </div>
      <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('enforceSsoDesc')}</p>
-     <button
-      type="button"
-      onClick={() => setShowEnforceModal(true)}
-      disabled={!testPassed && !ssoConfig?.enabled}
-      className="px-6 py-3 bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 transition disabled:opacity-50"
-     >
-      {t('enforceSsoButton')}
-     </button>
+     <RoleGuard require="canManageTeam">
+       <button
+        type="button"
+        onClick={() => setShowEnforceModal(true)}
+        disabled={!testPassed && !ssoConfig?.enabled}
+        className="px-6 py-3 bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 transition disabled:opacity-50"
+       >
+        {t('enforceSsoButton')}
+       </button>
+     </RoleGuard>
      {!testPassed && !ssoConfig?.enabled && (
       <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">{t('testFirst')}</p>
      )}
@@ -942,10 +946,12 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    {/* Delete */}
    {isConfigured && !isEnforced && (
     <div className="pt-4 border-t border-gray-200 dark:border-slate-700">
-     <button type="button" onClick={handleDelete} disabled={deleting}
-      className="px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
-      {deleting ? '...' : t('deleteConfig')}
-     </button>
+     <RoleGuard require="canManageTeam">
+       <button type="button" onClick={handleDelete} disabled={deleting}
+        className="px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
+        {deleting ? '...' : t('deleteConfig')}
+       </button>
+     </RoleGuard>
     </div>
    )}
 

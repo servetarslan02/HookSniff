@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { Pencil, Plug, Radio, Trash2 } from '@/components/icons';
+import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 function formatDate(s: string | null) {
   if (!s) return '—';
@@ -227,11 +228,14 @@ export function StreamingContent() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{t('subtitle')}</p>
+          <ReadOnlyBadge />
         </div>
-        <button onClick={() => { resetForm(); setShowCreate(true); }}
-          className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-          + {t('newChannel')}
-        </button>
+        <RoleGuard require="canManageWebhooks">
+          <button onClick={() => { resetForm(); setShowCreate(true); }}
+            className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+            + {t('newChannel')}
+          </button>
+        </RoleGuard>
       </div>
 
 
@@ -360,10 +364,12 @@ export function StreamingContent() {
               )}
               <div className="flex items-center justify-between pt-2 mt-2 border-t border-gray-100 dark:border-slate-700">
                 <span className="text-xs text-gray-500 dark:text-slate-400">{formatDate(ch.created_at)}</span>
-                <div className="flex gap-1">
-                  <button onClick={e => { e.stopPropagation(); openEdit(ch); }} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm"><Pencil size={18} strokeWidth={1.75} /></button>
-                  <button onClick={e => { e.stopPropagation(); setDeleteTarget(ch.id); }} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm"><Trash2 size={18} strokeWidth={1.75} /></button>
-                </div>
+                <RoleGuard require="canManageWebhooks">
+                  <div className="flex gap-1">
+                    <button onClick={e => { e.stopPropagation(); openEdit(ch); }} title={t('edit')} className="text-gray-500 dark:text-slate-400 hover:text-brand-600 transition p-1.5 text-sm"><Pencil size={18} strokeWidth={1.75} /></button>
+                    <button onClick={e => { e.stopPropagation(); setDeleteTarget(ch.id); }} title={t('delete')} className="text-gray-500 dark:text-slate-400 hover:text-red-600 transition p-1.5 text-sm"><Trash2 size={18} strokeWidth={1.75} /></button>
+                  </div>
+                </RoleGuard>
               </div>
             </div>
           ))}
