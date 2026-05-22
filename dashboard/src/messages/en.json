@@ -2258,13 +2258,13 @@
       "playground": "Playground"
     },
     "hero": {
-      "uptime": "99.9% SLA guaranteed",
+      "uptime": "99.9% uptime target",
       "title": "Webhooks that",
       "typewriter": [
         "actually deliver",
         "never fail",
         "always retry",
-        "scale infinitely",
+        "scale effortlessly",
         "just work"
       ],
       "subtitle": "Send webhooks with confidence. Automatic retries, HMAC signatures, real-time monitoring. Built for developers who need reliability.",
@@ -2290,11 +2290,11 @@
       "dashboard": "Real-time Dashboard",
       "dashboardDesc": "Monitor deliveries, track success rates, debug failures. Everything in one place.",
       "lowLatency": "Low Latency",
-      "lowLatencyDesc": "Built on Rust for speed. Sub-millisecond overhead on webhook delivery.",
+      "lowLatencyDesc": "Built on Rust for speed. Minimal overhead on webhook delivery.",
       "dlq": "Dead Letter Queue",
       "dlqDesc": "Failed deliveries are preserved for debugging. Nothing gets lost.",
       "global": "Global Infrastructure",
-      "globalDesc": "Deploy worldwide for low-latency webhook delivery to any endpoint.",
+      "globalDesc": "Multi-region deployment across US, Europe, and Middle East for low-latency webhook delivery.",
       "portalDesc": "Embeddable portal — your customers manage their own webhook subscriptions, view logs, and replay events"
     },
     "howItWorks": {
@@ -2647,7 +2647,7 @@
   },
   "pricing": {
     "title": "Pricing",
-    "badge": "20x cheaper than Svix",
+    "badge": "10x cheaper than Svix",
     "heroTitle": "Pricing that grows with you",
     "heroSubtitle": "Save 12+ months of webhook infrastructure development. Start free, scale when ready.",
     "heroNote": "No credit card required. No surprise charges. Cancel anytime.",
@@ -3826,7 +3826,7 @@
     "whenChooseSvix": "Choose Svix if...",
     "whenChooseHookdeck": "Choose Hookdeck if...",
     "whenChooseHook0": "Choose Hook0 if...",
-    "tlDr1": "HookSniff is 20x cheaper than Svix ($24/mo vs $490/mo) with more features.",
+    "tlDr1": "HookSniff is 10x cheaper than Svix ($24/mo vs $490/mo) with more features.",
     "tlDr2": "Both have 11 SDKs. HookSniff adds FIFO delivery, CloudEvents, and schema registry — Svix doesn't.",
     "tlDr3": "Svix leads in compliance (SOC 2 Type 2, HIPAA, PCI-DSS) and enterprise trust (30+ Fortune 500 logos).",
     "tlDr4": "Hookdeck has the best routing and 99.999% SLA, but is closed-source and usage-based.",
@@ -4597,7 +4597,7 @@
     "readyToSwitch": "Ready to switch from {competitor}?",
     "switchCta": "Get the same features at 10x lower cost. Start free, scale when ready.",
     "migrateToHooksniff": "Migrate to HookSniff →",
-    "hsPro1": "20x cheaper than Svix",
+    "hsPro1": "10x cheaper than Svix",
     "hsPro2": "FIFO ordered delivery",
     "hsPro3": "Schema registry",
     "hsPro4": "Open source + self-hosted",
@@ -4810,7 +4810,7 @@
     "storyCloudsyncSolution1": "HookSniff's free tier handles 10K events/month — enough for launch",
     "storyCloudsyncSolution2": "11 SDKs meant their customers could integrate in any language",
     "storyCloudsyncSolution3": "Schema registry catches breaking changes before they ship",
-    "storyCloudsyncSolution4": "Upgraded to Pro ($24/mo) when volume grew — 20x cheaper than Svix",
+    "storyCloudsyncSolution4": "Upgraded to Pro ($24/mo) when volume grew — 10x cheaper than Svix",
     "storyMedconnectQuote": "GDPR compliance and EU data processing were non-negotiable. HookSniff checked every box.",
     "storyBuildkitQuote": "The webhook playground and 11 SDKs made integration a breeze. Our developers love it.",
     "metricEngineeringTime": "Engineering time",
