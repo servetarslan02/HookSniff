@@ -13,6 +13,7 @@ import { PlanCards } from './components/PlanCards';
 import { InvoiceTable } from './components/InvoiceTable';
 import { SubscriptionDetails } from './components/SubscriptionDetails';
 import { OverageSettings } from './components/OverageSettings';
+import { ReadOnlyBadge } from '@/components/RoleGuard';
 import { RefundRequestModal } from './components/RefundRequestModal';
 import { CreditCard, BarChart3, Rocket, FileText } from '@/components/icons';
 
@@ -152,6 +153,7 @@ export default function BillingPage() {
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
         <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+        <ReadOnlyBadge />
       </div>
 
       {/* 1. Subscription */}
