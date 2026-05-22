@@ -211,7 +211,7 @@ async fn google_callback(
 
     // Find or create customer
     let customer =
-        find_or_create_oauth_customer(&pool, &user_info.email, &user_info.name, "google").await?;
+        find_or_create_oauth_customer(&pool, &user_info.email, &user_info.name, "google", user_info.picture.as_deref()).await?;
 
     // Generate JWT (access + refresh)
     let token = jwt::generate_access_token(
@@ -353,7 +353,7 @@ async fn github_callback(
 
     // Find or create customer
     let customer =
-        find_or_create_oauth_customer(&pool, &user_info.email, &user_info.name, "github").await?;
+        find_or_create_oauth_customer(&pool, &user_info.email, &user_info.name, "github", user_info.avatar_url.as_deref()).await?;
 
     // Generate JWT (access + refresh)
     let token = jwt::generate_access_token(
@@ -491,11 +491,13 @@ struct GoogleTokenResponse {
 struct GoogleUserInfo {
     email: String,
     name: Option<String>,
+    picture: Option<String>,
 }
 
 struct GitHubUserInfo {
     email: String,
     name: Option<String>,
+    avatar_url: Option<String>,
 }
 
 async fn exchange_google_code(
@@ -571,8 +573,9 @@ async fn get_google_user_info(access_token: &str) -> Result<GoogleUserInfo, AppE
         .to_string();
 
     let name = json["name"].as_str().map(|s| s.to_string());
+    let picture = json["picture"].as_str().map(|s| s.to_string());
 
-    Ok(GoogleUserInfo { email, name })
+    Ok(GoogleUserInfo { email, name, picture })
 }
 
 async fn exchange_github_code(
@@ -651,6 +654,7 @@ async fn get_github_user_info(access_token: &str) -> Result<GitHubUserInfo, AppE
 
     let mut email = json["email"].as_str().map(|s| s.to_string());
     let name = json["name"].as_str().map(|s| s.to_string());
+    let avatar_url = json["avatar_url"].as_str().map(|s| s.to_string());
 
     // If email is null, try /user/emails
     if email.is_none() {
@@ -691,7 +695,7 @@ async fn get_github_user_info(access_token: &str) -> Result<GitHubUserInfo, AppE
         )
     })?;
 
-    Ok(GitHubUserInfo { email, name })
+    Ok(GitHubUserInfo { email, name, avatar_url })
 }
 
 /// Find existing customer by email or create a new one via OAuth
@@ -700,14 +704,24 @@ async fn find_or_create_oauth_customer(
     email: &str,
     name: &Option<String>,
     provider: &str,
+    avatar_url: Option<&str>,
 ) -> Result<Customer, AppError> {
     // Try to find existing customer
-    let existing = sqlx::query_as::<_, Customer>("SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, current_period_end, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at FROM customers WHERE email = $1")
+    let existing = sqlx::query_as::<_, Customer>(&format!("{} WHERE email = $1", crate::routes::auth::CUSTOMER_SELECT))
         .bind(email)
         .fetch_optional(pool)
         .await?;
 
-    if let Some(customer) = existing {
+    if let Some(mut customer) = existing {
+        // Update avatar if we got one and customer doesn't have one yet
+        if avatar_url.is_some() && customer.avatar_url.is_none() {
+            sqlx::query("UPDATE customers SET avatar_url = $1 WHERE id = $2")
+                .bind(avatar_url)
+                .bind(customer.id)
+                .execute(pool)
+                .await?;
+            customer.avatar_url = avatar_url.map(|s| s.to_string());
+        }
         tracing::info!("✅ OAuth login ({}): {}", provider, email);
         return Ok(customer);
     }
@@ -718,14 +732,15 @@ async fn find_or_create_oauth_customer(
     let api_key_prefix = api_key[..15].to_string();
 
     let customer = sqlx::query_as::<_, Customer>(
-        "INSERT INTO customers (email, api_key_hash, api_key_prefix, name, is_active, email_verified)
-         VALUES ($1, $2, $3, $4, true, true)
+        "INSERT INTO customers (email, api_key_hash, api_key_prefix, name, is_active, email_verified, avatar_url)
+         VALUES ($1, $2, $3, $4, true, true, $5)
          RETURNING *"
     )
     .bind(email)
     .bind(&api_key_hash)
     .bind(&api_key_prefix)
     .bind(name)
+    .bind(avatar_url)
     .fetch_one(pool)
     .await?;
 
