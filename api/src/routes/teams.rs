@@ -498,6 +498,7 @@ pub async fn check_role_rate_limit(
     pool: &PgPool,
     customer_id: Uuid,
     team_id: Uuid,
+    rate_limiter: &crate::rate_limit::RateLimiter,
 ) -> Result<(), AppError> {
     let role = get_user_role(pool, customer_id, team_id).await?;
     
@@ -509,10 +510,14 @@ pub async fn check_role_rate_limit(
     .fetch_optional(pool)
     .await?;
 
-    if let Some((_per_min, _per_hour, _burst)) = limits {
-        // TODO: Implement actual rate limiting with Redis
-        // For now, just log the check
-        tracing::debug!("Rate limit check for {} (role: {}): {:?}", customer_id, role, limits);
+    if let Some((per_min, _per_hour, _burst)) = limits {
+        let key = format!("rbac:{}:{}", team_id, customer_id);
+        let result = rate_limiter.check_with_headers(&key, per_min as u32).await;
+        if !result.allowed {
+            tracing::warn!("⚠️ Rate limit exceeded for {} (role: {}): {}/min", customer_id, role, per_min);
+            return Err(AppError::RateLimitExceeded);
+        }
+        tracing::debug!("Rate limit check for {} (role: {}): {}/min OK", customer_id, role, per_min);
     }
 
     Ok(())
