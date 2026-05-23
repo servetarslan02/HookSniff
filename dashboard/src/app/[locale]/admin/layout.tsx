@@ -10,7 +10,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
-import { BarChart3, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, Lock, Shield, FolderOpen, RefreshCw } from '@/components/icons';
+import { BarChart3, Brain, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, Lock, Shield, FolderOpen, RefreshCw } from '@/components/icons';
 
 // Lazy-load heavy components — not needed for initial paint
 const AdminNotificationCenter = lazy(() =>
@@ -53,6 +53,7 @@ const adminNavigation = [
   { nameKey: 'alerts', href: '/admin/alerts', icon: <Bell size={16} strokeWidth={1.75} /> },
   { nameKey: 'email', href: '/admin/email', icon: <Mail size={16} strokeWidth={1.75} /> },
   { nameKey: 'security', href: '/admin/security', icon: <Shield size={16} strokeWidth={1.75} /> },
+  { nameKey: 'cortex', href: '/admin/cortex', icon: <Brain size={16} strokeWidth={1.75} /> },
 ];
 
 // Memoized sidebar — only re-renders when pathname changes
