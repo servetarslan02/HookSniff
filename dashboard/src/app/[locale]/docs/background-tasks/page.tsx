@@ -1,5 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
-import { Cog } from '@/components/icons';
+import { Settings } from '@/components/icons';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
@@ -15,7 +15,7 @@ export default async function BackgroundTasksPage() {
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">
-        <Cog size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('title')}
+        <Settings size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('title')}
       </h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">{t('subtitle')}</p>
 

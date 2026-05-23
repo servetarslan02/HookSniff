@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Understand HookSniff pricing plans, usage limits, and payment options.',
 };
 
-export default async function Billing&PlansPage() {
+export default async function BillingPlansPage() {
   const t = await getTranslations('docsBilling');
   return (
     <article className="prose prose-gray max-w-none">
