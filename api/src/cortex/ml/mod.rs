@@ -13,6 +13,7 @@ pub mod bandit;
 pub mod time_series;
 pub mod contextual_bandit;
 pub mod quality_tracker;
+pub mod bootstrap;
 
 use sqlx::PgPool;
 
