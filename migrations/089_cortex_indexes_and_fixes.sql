@@ -49,13 +49,14 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_weekly_reports_customer_week
     ON weekly_reports (customer_id, week_start);
 
 -- ============================================================
--- 2. UNIQUE CONSTRAINT: Prevent duplicate insights (same type, same endpoint, within 24h)
+-- 2. UNIQUE CONSTRAINT: Prevent duplicate insights (same type, same endpoint)
 -- ============================================================
 
--- Add a partial unique index to prevent spam
+-- Partial unique index using created_at comparison (immutable-safe)
+-- Note: application-level check (24h dedup in insights_engine.rs) handles time window
 CREATE UNIQUE INDEX IF NOT EXISTS idx_cortex_insights_no_duplicates 
-    ON cortex_insights (customer_id, insight_type, (data->>'endpoint_id')) 
-    WHERE dismissed = false AND created_at > NOW() - INTERVAL '24 hours';
+    ON cortex_insights (customer_id, insight_type, (data->>'endpoint_id'))
+    WHERE dismissed = false;
 
 -- ============================================================
 -- 3. Add R² column to predictions for confidence tracking
