@@ -50,15 +50,23 @@ export function setTokenRefreshCallback(cb: (newToken: string) => void): void {
  */
 function doRefresh(): Promise<string | null> {
   if (!refreshPromise) {
+    // Try to get refresh token from localStorage (fallback for when cookies don't work through proxy)
+    const storedRefreshToken = typeof window !== 'undefined' ? localStorage.getItem('hooksniff_refresh') : null;
+    
     refreshPromise = fetch(`${API_BASE}/auth/refresh`, {
       method: 'POST',
       credentials: 'include',
-      headers: { ...getCSRFHeaders('POST') },
+      headers: { 'Content-Type': 'application/json', ...getCSRFHeaders('POST') },
+      body: storedRefreshToken ? JSON.stringify({ refresh_token: storedRefreshToken }) : undefined,
     })
       .then(async (r) => {
         if (!r.ok) return null;
         const data = await r.json();
         const newToken = data.token ?? null;
+        // Save new refresh token for proxy fallback (Vercel doesn't forward Set-Cookie)
+        if (data.refresh_token && typeof window !== 'undefined') {
+          localStorage.setItem('hooksniff_refresh', data.refresh_token);
+        }
         // BUG FIX: Broadcast new token to other tabs
         if (newToken && refreshChannel) {
           refreshChannel.postMessage({ type: 'TOKEN_REFRESHED', token: newToken });

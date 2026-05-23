@@ -73,8 +73,13 @@ pub(crate) fn auth_response_with_cookie(body: AuthResponse) -> (HeaderMap, Json<
         headers.append("set-cookie", HeaderValue::from_str(&refresh_cookie).unwrap_or_else(|_| HeaderValue::from_static("")));
     }
 
-    let response_body = serde_json::json!({ "token": body.token, "customer": body.customer });
-    (headers, Json(response_body))
+    // Include refresh_token in body so frontend can store it in localStorage as fallback
+    // (Vercel proxy doesn't forward Set-Cookie from upstream API)
+    let mut response = serde_json::json!({ "token": body.token, "customer": body.customer });
+    if let Some(ref rt) = body.refresh_token {
+        response["refresh_token"] = serde_json::json!(rt);
+    }
+    (headers, Json(response))
 }
 
 pub fn extract_client_ip(headers: &HeaderMap) -> String {
