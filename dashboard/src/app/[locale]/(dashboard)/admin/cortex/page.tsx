@@ -175,22 +175,27 @@ function AnomaliesTab({ token }: { token: string | null }) {
           {anomalies.slice(0, 20).map((a: any, i: number) => (
             <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold ${
-                a[2] >= 80 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                a[2] >= 60 ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                a[3] >= 80 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                a[3] >= 60 ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
                 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
               }`}>
-                {a[2]}
+                {a[3]}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{a[4] || 'unknown'}</p>
-                <p className="text-xs text-gray-500 dark:text-slate-400">{new Date(a[5]).toLocaleString()}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{typeof a[5] === 'string' ? a[5] : 'unknown'}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">{a[6] ? new Date(a[6]).toLocaleString() : ''}</p>
+                {a[4] && typeof a[4] === 'object' && (
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
+                    {Object.entries(a[4]).map(([k, v]) => `${k}: ${typeof v === 'number' ? Math.round(v as number) : v}`).join(' · ')}
+                  </p>
+                )}
               </div>
               <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                a[4] === 'critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                a[4] === 'high' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                a[5] === 'critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                a[5] === 'high' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
                 'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300'
               }`}>
-                {a[4]}
+                {typeof a[5] === 'string' ? a[5] : ''}
               </span>
             </div>
           ))}
