@@ -128,7 +128,7 @@ pub async fn run_healing(
 /// If they pass, re-enable them.
 async fn run_recovery_tests(pool: &sqlx::PgPool, config: &CortexConfig) -> Result<(), sqlx::Error> {
     let disabled: Vec<(uuid::Uuid, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
-        "SELECT id, auto_disabled_at FROM endpoints WHERE auto_disabled = true AND auto_disabled_at < NOW() - INTERVAL '5 minutes'"
+        "SELECT id, auto_disabled_at FROM endpoints WHERE auto_disabled = true AND auto_disabled_at < NOW() - INTERVAL '15 minutes'"
     ).fetch_all(pool).await?;
 
     for (endpoint_id, disabled_at) in disabled {
@@ -149,7 +149,7 @@ async fn run_recovery_tests(pool: &sqlx::PgPool, config: &CortexConfig) -> Resul
 
         let (success, fail) = (recent_success, recent_fail);
         let total = success + fail;
-        if total > 0 {
+        if total >= 10 { // Minimum delivery count before making recovery decision
             let sr = (success as f64 / total as f64) * 100.0;
             if sr >= config.recovery_min_success_rate {
                 sqlx::query(

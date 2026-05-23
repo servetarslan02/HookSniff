@@ -98,12 +98,26 @@ async fn predict_endpoint(
     let y_mean = rates.iter().sum::<f64>() / n;
     let mut num = 0.0;
     let mut den = 0.0;
+    let mut ss_tot = 0.0;
     for (i, &r) in rates.iter().enumerate() {
         let x = i as f64;
         num += (x - x_mean) * (r - y_mean);
         den += (x - x_mean).powi(2);
+        ss_tot += (r - y_mean).powi(2);
     }
     let slope = if den > 0.0 { num / den } else { 0.0 };
+    let intercept = y_mean - slope * x_mean;
+
+    // R² check: if fit is poor, don't produce a prediction
+    let ss_res: f64 = rates.iter().enumerate().map(|(i, &r)| {
+        let predicted = intercept + slope * i as f64;
+        (r - predicted).powi(2)
+    }).sum();
+    let r2 = if ss_tot > 0.0 { 1.0 - (ss_res / ss_tot) } else { 0.0 };
+    if r2 < 0.3 {
+        // Low R² — trend is not reliable, skip prediction
+        return Ok(None);
+    }
 
     let early = rates.iter().take(2).sum::<f64>() / 2.0;
     let late = rates.iter().rev().take(2).sum::<f64>() / 2.0;
@@ -128,6 +142,7 @@ async fn predict_endpoint(
             "current_sr": current_sr,
             "trend_slope": slope,
             "momentum": momentum,
+            "r2": r2,
             "hours_analyzed": stats.len(),
         }),
     }))

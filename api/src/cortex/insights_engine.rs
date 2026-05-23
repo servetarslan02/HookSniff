@@ -22,6 +22,13 @@ pub async fn generate_insights(pool: &sqlx::PgPool, config: &CortexConfig) -> Re
     for (eid, cid, sr7d, sr24h) in declining {
         let drop = sr7d - sr24h;
         let severity = if drop > 20.0 { "warning" } else { "info" };
+
+        // Check for existing insight in last 24h to prevent duplicates
+        let exists: Option<(i64,)> = sqlx::query_as(
+            "SELECT id FROM cortex_insights WHERE customer_id = $1 AND insight_type = 'declining_health' AND (data->>'endpoint_id') = $2 AND created_at > NOW() - INTERVAL '24 hours' AND dismissed = false LIMIT 1"
+        ).bind(cid).bind(eid.to_string()).fetch_optional(pool).await?;
+        if exists.is_some() { continue; }
+
         sqlx::query(
             "INSERT INTO cortex_insights (customer_id, insight_type, title, body, severity, data) VALUES ($1, 'declining_health', $2, $3, $4, $5)"
         )
@@ -47,6 +54,11 @@ pub async fn generate_insights(pool: &sqlx::PgPool, config: &CortexConfig) -> Re
     .fetch_all(pool).await?;
 
     for (eid, cid, p95) in slow {
+        let exists: Option<(i64,)> = sqlx::query_as(
+            "SELECT id FROM cortex_insights WHERE customer_id = $1 AND insight_type = 'high_latency' AND (data->>'endpoint_id') = $2 AND created_at > NOW() - INTERVAL '24 hours' AND dismissed = false LIMIT 1"
+        ).bind(cid).bind(eid.to_string()).fetch_optional(pool).await?;
+        if exists.is_some() { continue; }
+
         sqlx::query(
             "INSERT INTO cortex_insights (customer_id, insight_type, title, body, severity, data) VALUES ($1, 'high_latency', $2, $3, 'info', $4)"
         )
@@ -71,6 +83,11 @@ pub async fn generate_insights(pool: &sqlx::PgPool, config: &CortexConfig) -> Re
     ).fetch_all(pool).await?;
 
     for (eid, cid, err) in error_endpoints {
+        let exists: Option<(i64,)> = sqlx::query_as(
+            "SELECT id FROM cortex_insights WHERE customer_id = $1 AND insight_type = 'dominant_error' AND (data->>'endpoint_id') = $2 AND created_at > NOW() - INTERVAL '24 hours' AND dismissed = false LIMIT 1"
+        ).bind(cid).bind(eid.to_string()).fetch_optional(pool).await?;
+        if exists.is_some() { continue; }
+
         sqlx::query(
             "INSERT INTO cortex_insights (customer_id, insight_type, title, body, severity, data) VALUES ($1, 'dominant_error', $2, $3, 'info', $4)"
         )
