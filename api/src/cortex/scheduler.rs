@@ -132,7 +132,7 @@ fn should_run_stage(stage: CortexStage, last_run: Option<Instant>) -> bool {
     let interval = stage.interval_secs();
     let offset = stage.offset_secs();
     let now = chrono::Utc::now();
-    let secs_since_midnight = now.num_seconds_from_midnight() as u64;
+    let secs_since_midnight = now.time().num_seconds_from_midnight() as u64;
 
     // First run: check if we're within the offset window
     if last_run.is_none() {
