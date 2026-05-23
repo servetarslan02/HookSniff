@@ -209,7 +209,9 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
  const [testAndActivateLoading, setTestAndActivateLoading] = useState(false);
  const [friendlyError, setFriendlyError] = useState<{ title: string; message: string; action?: string } | null>(null);
 
- const isConfigured = !!(ssoConfig?.provider || ssoConfig?.issuer_url || ssoConfig?.client_id);
+ // isConfigured: true if API has config OR form has been filled with valid settings
+ const hasFormConfig = provider === 'oidc' ? !!(metadata && entityId) : !!(metadata || entityId || ssoUrl || certificate);
+ const isConfigured = !!(ssoConfig?.provider || ssoConfig?.issuer_url || ssoConfig?.client_id) || hasFormConfig;
  const isEnforced = ssoConfig?.enabled;
 
  // Populate form fields when config loads
