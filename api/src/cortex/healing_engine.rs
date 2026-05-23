@@ -70,6 +70,56 @@ pub async fn run_healing(
                 // Signal to circuit breaker to lower threshold
                 tracing::info!("🔧 Cortex: Circuit tightened for endpoint {} (score {})", endpoint_id, score);
             }
+            "rate_limit_reduce" => {
+                // Reduce the endpoint's rate limit by 25%
+                let current_limit: Option<(i32,)> = sqlx::query_as(
+                    "SELECT webhook_limit FROM endpoints WHERE id = $1"
+                ).bind(endpoint_id).fetch_optional(pool).await?;
+                if let Some((limit)) = current_limit {
+                    let new_limit = (limit as f64 * 0.75) as i32;
+                    sqlx::query(
+                        "UPDATE endpoints SET webhook_limit = $1 WHERE id = $2"
+                    ).bind(new_limit.max(10)).bind(endpoint_id).execute(pool).await?;
+                    tracing::info!("🔧 Cortex: Rate limit reduced {} → {} for endpoint {} (score {})", limit, new_limit.max(10), endpoint_id, score);
+                }
+            }
+            "fallback_url_switch" => {
+                // Trigger smart routing to switch to fallback URL
+                if let Ok(Some(decision)) = super::smart_routing::decide_routing(pool, endpoint_id).await {
+                    if let Some(url) = decision.get("recommended_url").and_then(|v| v.as_str()) {
+                        sqlx::query(
+                            "UPDATE endpoints SET active_url = $1 WHERE id = $2"
+                        ).bind(url).bind(endpoint_id).execute(pool).await.ok();
+                        tracing::info!("🔧 Cortex: Switched endpoint {} to fallback URL {} (score {})", endpoint_id, url, score);
+                    }
+                }
+            }
+            "retry_increase" => {
+                // Increase max retries for this endpoint
+                let current_retries: Option<(i32,)> = sqlx::query_as(
+                    "SELECT max_retries FROM endpoints WHERE id = $1"
+                ).bind(endpoint_id).fetch_optional(pool).await?;
+                if let Some((retries)) = current_retries {
+                    let new_retries = (retries + 2).min(10);
+                    sqlx::query(
+                        "UPDATE endpoints SET max_retries = $1 WHERE id = $2"
+                    ).bind(new_retries).bind(endpoint_id).execute(pool).await?;
+                    tracing::info!("🔧 Cortex: Max retries {} → {} for endpoint {} (score {})", retries, new_retries, endpoint_id, score);
+                }
+            }
+            "timeout_adjust" => {
+                // Increase timeout for this endpoint
+                let current_timeout: Option<(i32,)> = sqlx::query_as(
+                    "SELECT timeout_ms FROM endpoints WHERE id = $1"
+                ).bind(endpoint_id).fetch_optional(pool).await?;
+                if let Some((timeout)) = current_timeout {
+                    let new_timeout = (timeout as f64 * 1.5) as i32;
+                    sqlx::query(
+                        "UPDATE endpoints SET timeout_ms = $1 WHERE id = $2"
+                    ).bind(new_timeout.min(30000)).bind(endpoint_id).execute(pool).await?;
+                    tracing::info!("🔧 Cortex: Timeout {}ms → {}ms for endpoint {} (score {})", timeout, new_timeout.min(30000), endpoint_id, score);
+                }
+            }
             _ => {}
         }
 
@@ -173,28 +223,37 @@ async fn run_recovery_tests(pool: &sqlx::PgPool, config: &CortexConfig) -> Resul
 /// Determine the best action using ML bandit (if available) or fallback to rules.
 async fn determine_action_ml(pool: &sqlx::PgPool, endpoint_id: uuid::Uuid, score: i32, category: &str, _config: &CortexConfig) -> String {
     // Try ML bandit first
-    if let Ok(model_params) = super::ml::get_model_params(pool, endpoint_id, "retry_bandit").await {
+    if let Ok(model_params) = super::ml::get_model_params(pool, endpoint_id, "healing_bandit").await {
         if let Ok(mut model) = serde_json::from_value::<super::ml::bandit::BanditModel>(model_params) {
             if model.total_plays >= 5 {
-                // Use bandit to select strategy
                 let strategy = model.select_arm();
-                // Map bandit strategy to healing action
-                return match strategy.as_str() {
-                    "auto_disable" => "auto_disable".to_string(),
-                    "circuit_tighten" => "circuit_tighten".to_string(),
-                    "retry_slowdown" => "retry_slowdown".to_string(),
-                    _ => strategy,
-                };
+                return map_bandit_to_action(&strategy);
             }
         }
     }
 
-    // Fallback: rule-based
+    // Fallback: rule-based with expanded strategies
     if score >= 90 && category == "critical" {
         "auto_disable".to_string()
-    } else if score >= 70 {
+    } else if score >= 80 {
         "circuit_tighten".to_string()
+    } else if score >= 60 {
+        "rate_limit_reduce".to_string()
     } else {
         "retry_slowdown".to_string()
+    }
+}
+
+/// Map bandit strategy name to healing action
+fn map_bandit_to_action(strategy: &str) -> String {
+    match strategy {
+        "auto_disable" => "auto_disable".to_string(),
+        "circuit_tighten" => "circuit_tighten".to_string(),
+        "retry_slowdown" => "retry_slowdown".to_string(),
+        "rate_limit_reduce" => "rate_limit_reduce".to_string(),
+        "fallback_url_switch" => "fallback_url_switch".to_string(),
+        "retry_increase" => "retry_increase".to_string(),
+        "timeout_adjust" => "timeout_adjust".to_string(),
+        _ => strategy.to_string(),
     }
 }

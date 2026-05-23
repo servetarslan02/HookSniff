@@ -19,9 +19,11 @@ pub enum CortexStage {
     AnomalyScoring,
     AlertCorrelation,
     SelfHealing,
+    ProactiveHealing,
     Predictions,
     Insights,
     MlTraining,
+    MlQualityCheck,
     SmartRouting,
 }
 
@@ -33,9 +35,11 @@ impl CortexStage {
             Self::AnomalyScoring => "anomaly_scoring",
             Self::AlertCorrelation => "alert_correlation",
             Self::SelfHealing => "self_healing",
+            Self::ProactiveHealing => "proactive_healing",
             Self::Predictions => "predictions",
             Self::Insights => "insights",
             Self::MlTraining => "ml_training",
+            Self::MlQualityCheck => "ml_quality_check",
             Self::SmartRouting => "smart_routing",
         }
     }
@@ -47,9 +51,11 @@ impl CortexStage {
             Self::AnomalyScoring => "cortex_anomaly",
             Self::AlertCorrelation => "cortex_correlation",
             Self::SelfHealing => "cortex_healing",
+            Self::ProactiveHealing => "cortex_proactive",
             Self::Predictions => "cortex_predict",
             Self::Insights => "cortex_report",
             Self::MlTraining => "cortex_ml",
+            Self::MlQualityCheck => "cortex_ml_quality",
             Self::SmartRouting => "cortex_routing",
         }
     }
@@ -62,9 +68,11 @@ impl CortexStage {
             Self::AnomalyScoring => Duration::from_secs(300),
             Self::AlertCorrelation => Duration::from_secs(120),
             Self::SelfHealing => Duration::from_secs(300),
+            Self::ProactiveHealing => Duration::from_secs(300),
             Self::Predictions => Duration::from_secs(300),
             Self::Insights => Duration::from_secs(600),
             Self::MlTraining => Duration::from_secs(900),
+            Self::MlQualityCheck => Duration::from_secs(120),
             Self::SmartRouting => Duration::from_secs(120),
         }
     }
@@ -77,9 +85,11 @@ impl CortexStage {
             Self::AnomalyScoring => 300,    // 5 min
             Self::AlertCorrelation => 300,  // 5 min
             Self::SelfHealing => 300,       // 5 min
+            Self::ProactiveHealing => 900,  // 15 min
             Self::Predictions => 900,       // 15 min
             Self::Insights => 86400,        // 24 hours
             Self::MlTraining => 900,        // 15 min
+            Self::MlQualityCheck => 3600,   // 1 hour
             Self::SmartRouting => 900,      // 15 min
         }
     }
@@ -92,9 +102,11 @@ impl CortexStage {
             Self::AnomalyScoring => 180,    // minute 3
             Self::AlertCorrelation => 240,  // minute 4
             Self::SelfHealing => 300,       // minute 5
+            Self::ProactiveHealing => 360,  // minute 6
             Self::Predictions => 420,       // minute 7
             Self::SmartRouting => 480,      // minute 8
             Self::MlTraining => 600,        // minute 10
+            Self::MlQualityCheck => 660,    // minute 11
             Self::Insights => 7200,         // 02:00 UTC
         }
     }
@@ -107,9 +119,11 @@ const ALL_STAGES: &[CortexStage] = &[
     CortexStage::AnomalyScoring,
     CortexStage::AlertCorrelation,
     CortexStage::SelfHealing,
+    CortexStage::ProactiveHealing,
     CortexStage::Predictions,
     CortexStage::SmartRouting,
     CortexStage::MlTraining,
+    CortexStage::MlQualityCheck,
     CortexStage::Insights,
 ];
 
@@ -236,6 +250,10 @@ async fn execute_stage(
             let n = super::healing_engine::run_healing(pool, config).await?;
             Ok(n)
         }
+        CortexStage::ProactiveHealing => {
+            let n = super::proactive_healing::run_proactive(pool, config).await?;
+            Ok(n)
+        }
         CortexStage::Predictions => {
             let n = super::predictive_engine::run_predictions(pool, config).await?;
             Ok(n)
@@ -247,6 +265,25 @@ async fn execute_stage(
         CortexStage::MlTraining => {
             let n = super::ml::train_all(pool).await?;
             Ok(n)
+        }
+        CortexStage::MlQualityCheck => {
+            // Check model quality and reset degraded models
+            let reset_count = super::ml::quality_tracker::check_and_reset_degraded_models(pool, 60.0).await?;
+            if reset_count > 0 {
+                tracing::info!("🧠 ML Quality: reset {} degraded models", reset_count);
+            }
+            // Get quality summary for logging
+            if let Ok(summary) = super::ml::quality_tracker::get_quality_summary(pool).await {
+                for m in &summary {
+                    if m.quality_score < 50.0 {
+                        tracing::warn!(
+                            "🧠 ML Quality: endpoint {} model '{}' score {:.0}% (accuracy {:.0}%)",
+                            m.endpoint_id, m.model_type, m.quality_score, m.accuracy_pct
+                        );
+                    }
+                }
+            }
+            Ok(reset_count)
         }
         CortexStage::SmartRouting => {
             let endpoints: Vec<(uuid::Uuid,)> = sqlx::query_as(

@@ -15,6 +15,7 @@ pub mod recovery_surge;
 pub mod predictive_engine;
 pub mod insights_engine;
 pub mod smart_routing;
+pub mod proactive_healing;
 pub mod scheduler;
 
 pub use config::CortexConfig;
@@ -98,6 +99,8 @@ pub async fn try_cortex_lock(pool: &sqlx::PgPool, lock_name: &str, _ttl_secs: i6
         "cortex_correlation" => 9009,
         "cortex_memory" => 9010,
         "cortex_ml" => 9011,
+        "cortex_proactive" => 9012,
+        "cortex_ml_quality" => 9013,
         _ => 9099,
     };
     let result: (bool,) = sqlx::query_as("SELECT pg_try_advisory_lock($1)")
@@ -121,6 +124,8 @@ pub async fn release_cortex_lock(pool: &sqlx::PgPool, lock_name: &str) {
         "cortex_correlation" => 9009,
         "cortex_memory" => 9010,
         "cortex_ml" => 9011,
+        "cortex_proactive" => 9012,
+        "cortex_ml_quality" => 9013,
         _ => 9099,
     };
     let _ = sqlx::query("SELECT pg_advisory_unlock($1)")
