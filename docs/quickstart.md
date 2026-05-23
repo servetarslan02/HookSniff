@@ -1,133 +1,86 @@
-# HookSniff Quick Start Guide
+# 🚀 HookSniff Quickstart — 5 Dakikada İlk Webhook'unu Gönder
 
-Get started with HookSniff in 5 minutes.
+## 1. Kayıt Ol (1 dakika)
 
-## 1. Get Your API Key
+1. [hooksniff.vercel.app/register](https://hooksniff.vercel.app/register) adresine git
+2. Email ve şifreni gir
+3. Email doğrulama linkine tıkla
 
-1. Sign up at [hooksniff.com](https://hooksniff.com)
-2. Go to **Settings → API Keys**
-3. Create a new API key (starts with `hr_live_`)
+## 2. API Key Al (1 dakika)
 
-## 2. Install SDK
+1. Dashboard → **Core** → **API Keys** sekmesine git
+2. **"Create API Key"** butonuna tıkla
+3. Key'i kopyala (sadece bir kez gösterilir!)
 
-Choose your language:
+```
+hr_live_abc123def456...
+```
+
+## 3. Endpoint Oluştur (1 dakika)
+
+Webhook'ların nereye teslim edileceğini belirle.
 
 ```bash
-# Node.js / TypeScript
-npm install hooksniff
-
-# Python
-pip install hooksniff
-
-# Go
-go get github.com/servetarslan02/hooksniff-go
-
-# Rust
-cargo add hooksniff
-
-# Ruby
-gem install hooksniff
-
-# PHP
-composer require hooksniff/hooksniff
-
-# C#
-dotnet add package HookSniff
+curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
+  -H "Authorization: Bearer hr_live_SENIN_KEYIN" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://senin-siten.com/webhook"}'
 ```
 
-## 3. Create an Endpoint
-
-An endpoint is where HookSniff delivers your webhooks.
-
-```python
-from hooksniff import HookSniff
-
-client = HookSniff("hr_live_xxx")
-
-endpoint = client.endpoint.create(
-    url="https://your-app.com/webhook",
-    description="Order notifications",
-)
-print(f"Endpoint created: {endpoint.id}")
+Response:
+```json
+{
+  "id": "ep_abc123",
+  "url": "https://senin-siten.com/webhook",
+  "created_at": "2026-05-15T00:00:00Z"
+}
 ```
 
-## 4. Send a Webhook
+## 4. Webhook Gönder (1 dakika)
 
-```python
-message = client.message.create(
-    event="order.created",
-    data={
-        "order_id": "ORD-123",
-        "amount": 99.99,
-        "currency": "USD",
-    },
-)
-print(f"Message sent: {message.id}")
+```bash
+curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \
+  -H "Authorization: Bearer hr_live_SENIN_KEYIN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "endpoint_id": "ep_abc123",
+    "event": "order.created",
+    "data": {
+      "order_id": "12345",
+      "amount": 99.99,
+      "currency": "USD"
+    }
+  }'
 ```
 
-## 5. Verify Incoming Webhooks
-
-When your app receives a webhook from HookSniff, verify its signature:
-
-```python
-from hooksniff import Webhook
-
-wh = Webhook("whsec_xxx")  # Get from endpoint settings
-
-try:
-    payload = wh.verify(request.body, request.headers)
-    # ✅ Valid — process the webhook
-    print(f"Event: {payload['event']}")
-    print(f"Data: {payload['data']}")
-except Exception:
-    # ❌ Invalid — reject
-    return 403
+Response:
+```json
+{
+  "id": "wh_xyz789",
+  "status": "pending",
+  "event": "order.created",
+  "created_at": "2026-05-15T00:00:00Z"
+}
 ```
 
-## 6. Check Delivery Status
+## 5. Teslimatı Kontrol Et (1 dakika)
 
-```python
-# Get delivery attempts for a message
-attempts = client.message_attempt.list_by_msg(message.id)
-for attempt in attempts:
-    print(f"Status: {attempt.response_status_code}")
-    print(f"Duration: {attempt.duration_ms}ms")
-```
+Dashboard → **Deliveries** sekmesine git. Webhook'un durumunu göreceksin:
 
-## Next Steps
+- ✅ **Delivered** — Başarıyla teslim edildi
+- ⏳ **Pending** — Teslim edilmeyi bekliyor
+- ❌ **Failed** — Teslimat başarısız (otomatik retry)
 
-- [API Reference](https://api.hooksniff.com) — Full endpoint documentation
-- [SDK Reference](../sdks/README.md) — Language-specific guides
-- [Webhook Security](security.md) — Best practices
-- [Examples](../examples/) — Code samples
+## 🎉 Tebrikler!
 
-## Common Patterns
+İlk webhook'unu gönderdin. Şimdi ne yapabilirsin:
 
-### Retry Failed Deliveries
+- **[Entegrasyon Rehberleri](integrations/)** — Shopify, Stripe, GitHub gibi platformlarla bağla
+- **[API Dokümantasyonu](API.md)** — Tüm endpoint'leri öğren
+- **[SSS](faq/)** — Sık sorulan sorular
 
-```python
-# Resend a failed attempt
-client.message_attempt.resend(message_id, attempt_id)
-```
+## Sorun mu var?
 
-### List All Endpoints
-
-```python
-endpoints = client.endpoint.list()
-for ep in endpoints:
-    print(f"{ep.url} — {ep.description}")
-```
-
-### Filter by Event Type
-
-```python
-messages = client.message.list(event_types=["order.created", "order.updated"])
-```
-
-### Pagination
-
-```python
-# Auto-pagination (all SDKs support this)
-for endpoint in client.endpoint.list_iterator():
-    print(endpoint.url)
-```
+- Dashboard'da hata mı görüyorsun? → [SSS](faq/)'ye bak
+- API çalışmıyor mu? → [API Dokümantasyonu](API.md)'nu kontrol et
+- Hâlâ çözemedin mi? → support@hooksniff.dev
