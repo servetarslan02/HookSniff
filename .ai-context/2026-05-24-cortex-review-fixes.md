@@ -58,3 +58,14 @@
 - Dashboard'a eksik Cortex tab'ları (correlations, surge, routing) — Servet kalabalıklaşsın istemiyor, sonra düşünülebilir
 - Alert Evaluation Worker (Rust) — hala eksik
 - Rate Limiting implementasyonu
+- Merkezi Cortex Scheduler refactor (opsiyonel — şu anki offset yöntemi çalışıyor)
+
+## İkinci İnceleme: Job Scheduling
+- ML Engine lock çakışması düzeltildi (cortex_anomaly → cortex_ml)
+- Stage sıralaması offset ile garantilendi:
+  - dk 0: Stage 1 (hourly stats)
+  - dk 0+15sn: Stage 2 (profile)
+  - dk 1: Stage 3 (anomaly scoring)
+  - dk 1+90sn: Stage 4 (healing)
+  - dk 2: Stage 7 (predictions)
+  - dk 3: ML Engine (training)
