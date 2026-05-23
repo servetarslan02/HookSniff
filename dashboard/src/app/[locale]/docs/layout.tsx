@@ -48,6 +48,21 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       ],
     },
     {
+      title: 'Dashboard Features',
+      items: [
+        { name: 'Endpoints', href: '/docs/endpoints' },
+        { name: 'API Keys', href: '/docs/api-keys' },
+        { name: 'Deliveries', href: '/docs/deliveries' },
+        { name: 'Alerts', href: '/docs/alerts' },
+        { name: 'Analytics', href: '/docs/analytics' },
+        { name: 'Billing & Plans', href: '/docs/billing' },
+        { name: 'Streaming', href: '/docs/streaming', badge: 'New' },
+        { name: 'Environments', href: '/docs/environments', badge: 'New' },
+        { name: 'Background Tasks', href: '/docs/background-tasks', badge: 'New' },
+        { name: 'Service Tokens', href: '/docs/service-tokens' },
+      ],
+    },
+    {
       title: 'How-To Guides',
       items: [
         { name: 'Webhook Verification', href: '/docs/guides/webhook-verification' },
