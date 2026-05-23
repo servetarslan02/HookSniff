@@ -15,6 +15,7 @@ pub mod recovery_surge;
 pub mod predictive_engine;
 pub mod insights_engine;
 pub mod smart_routing;
+pub mod scheduler;
 
 pub use config::CortexConfig;
 
