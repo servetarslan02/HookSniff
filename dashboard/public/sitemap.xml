@@ -1,0 +1,906 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<url>
+<loc>https://hooksniff.vercel.app/en</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>daily</changefreq>
+<priority>1</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>daily</changefreq>
+<priority>1</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/about</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/about" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/about" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/about</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/about" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/about" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/faq</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/faq" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/faq" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/faq</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/faq" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/faq" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/contact</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/contact" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/contact" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/contact</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/contact" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/contact" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/privacy</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/privacy" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/privacy" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/privacy</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/privacy" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/privacy" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/terms</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/terms" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/terms" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/terms</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/terms" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/terms" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs/api-reference</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/api-reference" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/api-reference" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs/api-reference</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/api-reference" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/api-reference" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs/sdk-libraries</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/sdk-libraries" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/sdk-libraries" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs/sdk-libraries</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/sdk-libraries" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/sdk-libraries" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs/quickstart</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/quickstart" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/quickstart" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs/quickstart</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/quickstart" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/quickstart" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs/concepts</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/concepts" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/concepts" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs/concepts</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/concepts" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/concepts" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs/security</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/security" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/security" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs/security</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/security" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/security" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs/best-practices</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/best-practices" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/best-practices" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs/best-practices</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/best-practices" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/best-practices" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs/retries</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/retries" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/retries" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs/retries</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/retries" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/retries" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs/dlq</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/dlq" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/dlq" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs/dlq</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/dlq" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/dlq" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs/event-types</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/event-types" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/event-types" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs/event-types</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/event-types" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/event-types" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/docs/error-codes</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/error-codes" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/error-codes" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/docs/error-codes</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/docs/error-codes" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/docs/error-codes" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/status</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/status" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/status" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/status</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/status" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/status" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/login</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/login" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/login" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/login</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/login" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/login" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/register</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/register" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/register" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/register</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/register" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/register" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/pricing</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/pricing" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/pricing" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/pricing</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/pricing" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/pricing" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.9</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.9</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/compare</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/compare" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/compare" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/compare</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/compare" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/compare" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/alternatives/svix</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/alternatives/svix" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/alternatives/svix" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/alternatives/svix</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/alternatives/svix" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/alternatives/svix" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/alternatives/hookdeck</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/alternatives/hookdeck" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/alternatives/hookdeck" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/alternatives/hookdeck</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/alternatives/hookdeck" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/alternatives/hookdeck" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/alternatives/hook0</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/alternatives/hook0" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/alternatives/hook0" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/alternatives/hook0</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/alternatives/hook0" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/alternatives/hook0" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/alternatives/convoy</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/alternatives/convoy" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/alternatives/convoy" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/alternatives/convoy</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/alternatives/convoy" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/alternatives/convoy" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/playground</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/playground" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/playground" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/playground</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/playground" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/playground" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/what-is-webhook</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/what-is-webhook" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/what-is-webhook" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/what-is-webhook</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/what-is-webhook" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/what-is-webhook" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/build-vs-buy</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/build-vs-buy" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/build-vs-buy" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/build-vs-buy</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/build-vs-buy" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/build-vs-buy" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/startups</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/startups" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/startups" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/startups</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/startups" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/startups" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/customers</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/customers" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/customers" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/customers</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/customers" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/customers" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.8</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/hooksniff-vs-svix-vs-hookdeck</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/hooksniff-vs-svix-vs-hookdeck" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/hooksniff-vs-svix-vs-hookdeck" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/hooksniff-vs-svix-vs-hookdeck</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/hooksniff-vs-svix-vs-hookdeck" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/hooksniff-vs-svix-vs-hookdeck" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/may-2026-changelog</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/may-2026-changelog" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/may-2026-changelog" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/may-2026-changelog</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/may-2026-changelog" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/may-2026-changelog" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/building-mcp-ready-webhooks</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/building-mcp-ready-webhooks" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/building-mcp-ready-webhooks" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/building-mcp-ready-webhooks</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/building-mcp-ready-webhooks" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/building-mcp-ready-webhooks" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/webhook-integration-tutorial</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-integration-tutorial" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-integration-tutorial" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/webhook-integration-tutorial</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-integration-tutorial" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-integration-tutorial" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/webhook-architecture-deep-dive</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-architecture-deep-dive" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-architecture-deep-dive" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/webhook-architecture-deep-dive</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-architecture-deep-dive" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-architecture-deep-dive" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/customer-spotlight-ecommerce</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/customer-spotlight-ecommerce" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/customer-spotlight-ecommerce" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/customer-spotlight-ecommerce</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/customer-spotlight-ecommerce" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/customer-spotlight-ecommerce" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/why-ai-agents-need-webhooks</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/why-ai-agents-need-webhooks" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/why-ai-agents-need-webhooks" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/why-ai-agents-need-webhooks</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/why-ai-agents-need-webhooks" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/why-ai-agents-need-webhooks" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/gemini-webhook-integration</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/gemini-webhook-integration" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/gemini-webhook-integration" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/gemini-webhook-integration</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/gemini-webhook-integration" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/gemini-webhook-integration" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/stripe-webhook-guide</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/stripe-webhook-guide" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/stripe-webhook-guide" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/stripe-webhook-guide</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/stripe-webhook-guide" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/stripe-webhook-guide" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/changelog-may-2026</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/changelog-may-2026" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/changelog-may-2026" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/changelog-may-2026</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/changelog-may-2026" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/changelog-may-2026" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/introducing-hooksniff</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/introducing-hooksniff" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/introducing-hooksniff" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/introducing-hooksniff</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/introducing-hooksniff" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/introducing-hooksniff" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/webhook-best-practices</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-best-practices" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-best-practices" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/webhook-best-practices</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-best-practices" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-best-practices" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/fifo-webhook-delivery</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/fifo-webhook-delivery" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/fifo-webhook-delivery" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/fifo-webhook-delivery</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/fifo-webhook-delivery" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/fifo-webhook-delivery" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/github-webhook-guide</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/github-webhook-guide" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/github-webhook-guide" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/github-webhook-guide</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/github-webhook-guide" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/github-webhook-guide" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/cloudevents-standard</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/cloudevents-standard" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/cloudevents-standard" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/cloudevents-standard</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/cloudevents-standard" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/cloudevents-standard" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/webhook-security-guide</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-security-guide" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-security-guide" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/webhook-security-guide</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-security-guide" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-security-guide" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/shopify-webhook-incident-analysis</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/shopify-webhook-incident-analysis" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/shopify-webhook-incident-analysis" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/shopify-webhook-incident-analysis</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/shopify-webhook-incident-analysis" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/shopify-webhook-incident-analysis" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/what-is-a-webhook</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/what-is-a-webhook" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/what-is-a-webhook" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/what-is-a-webhook</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/what-is-a-webhook" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/what-is-a-webhook" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/webhook-vs-polling</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-vs-polling" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-vs-polling" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/webhook-vs-polling</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-vs-polling" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-vs-polling" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/best-free-webhook-services-2026</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/best-free-webhook-services-2026" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/best-free-webhook-services-2026" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/best-free-webhook-services-2026</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/best-free-webhook-services-2026" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/best-free-webhook-services-2026" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/webhook-vs-api</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-vs-api" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-vs-api" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/webhook-vs-api</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-vs-api" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-vs-api" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/webhook-examples</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-examples" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-examples" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/webhook-examples</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-examples" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-examples" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/how-to-use-webhooks</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/how-to-use-webhooks" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/how-to-use-webhooks" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/how-to-use-webhooks</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/how-to-use-webhooks" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/how-to-use-webhooks" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/en/blog/webhook-tutorial</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-tutorial" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-tutorial" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/tr/blog/webhook-tutorial</loc>
+<xhtml:link rel="alternate" hreflang="en" href="https://hooksniff.vercel.app/en/blog/webhook-tutorial" />
+<xhtml:link rel="alternate" hreflang="tr" href="https://hooksniff.vercel.app/tr/blog/webhook-tutorial" />
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+<url>
+<loc>https://hooksniff.vercel.app/feed.xml</loc>
+<lastmod>2026-05-23T11:07:57.900Z</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.6</priority>
+</url>
+</urlset>
+
