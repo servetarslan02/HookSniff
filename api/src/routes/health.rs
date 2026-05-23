@@ -273,14 +273,7 @@ pub async fn system_status(
         "operational".to_string()
     };
 
-    // Overall status
-    let overall_status = if components.iter().any(|c| c.status == "unhealthy") {
-        "down"
-    } else if components.iter().any(|c| c.status == "degraded") {
-        "degraded"
-    } else {
-        "operational"
-    };
+    // Overall status (reuse the already-computed String above)
 
     let status_code = if overall_status == "down" {
         StatusCode::SERVICE_UNAVAILABLE
