@@ -34,10 +34,7 @@ RUN groupadd -r hooksniff && \
     mkdir -p /app
 
 COPY --from=builder /app/target/release/hooksniff-api /usr/local/bin/hooksniff-api
-COPY entrypoint-api.sh /usr/local/bin/entrypoint-api.sh
-RUN chmod +x /usr/local/bin/entrypoint-api.sh
-
-RUN chown -R hooksniff:hooksniff /app
+RUN chmod +x /usr/local/bin/hooksniff-api && chown -R hooksniff:hooksniff /app
 
 USER hooksniff
 WORKDIR /app
@@ -47,4 +44,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=5s --retries=3 \
     CMD curl -f http://localhost:3000/health || exit 1
 
-CMD ["/usr/local/bin/entrypoint-api.sh"]
+CMD ["/usr/local/bin/hooksniff-api"]
