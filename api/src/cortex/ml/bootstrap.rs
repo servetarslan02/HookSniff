@@ -9,38 +9,35 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 use chrono::{Utc, Duration, Timelike, Datelike};
-use rand::Rng;
 
 /// Industry benchmark profiles
-pub struct EndpointProfile {
-    pub name: &'static str,
-    pub base_success_rate: f64,
-    pub base_latency_p50: f64,
-    pub base_latency_p95: f64,
-    pub base_latency_p99: f64,
-    pub traffic_pattern: TrafficPattern,
-    pub error_profile: ErrorProfile,
-    pub anomaly_probability: f64, // per-hour chance of anomaly
+struct EndpointProfile {
+    name: &'static str,
+    base_success_rate: f64,
+    base_latency_p50: f64,
+    base_latency_p95: f64,
+    base_latency_p99: f64,
+    traffic_pattern: TrafficPattern,
+    error_profile: ErrorProfile,
+    anomaly_probability: f64,
 }
 
-pub enum TrafficPattern {
-    Steady,           // Constant traffic (API webhooks)
-    BusinessHours,    // Peak 9-17, low night (B2B SaaS)
-    Ecommerce,        // Peak evenings + weekends (online store)
-    Spiky,            // Random bursts (event-driven)
-    Growing,          // Increasing over time (startup)
+enum TrafficPattern {
+    Steady,
+    BusinessHours,
+    Ecommerce,
+    Spiky,
+    Growing,
 }
 
-pub struct ErrorProfile {
-    pub timeout_pct: f64,
-    pub server_error_pct: f64,
-    pub connection_error_pct: f64,
-    pub rate_limit_pct: f64,
+struct ErrorProfile {
+    timeout_pct: f64,
+    server_error_pct: f64,
+    connection_error_pct: f64,
+    rate_limit_pct: f64,
 }
 
-/// Industry benchmarks for different endpoint types
 const PROFILES: &[EndpointProfile] = &[
-    // Healthy B2B SaaS endpoint
     EndpointProfile {
         name: "healthy_b2b",
         base_success_rate: 99.2,
@@ -48,15 +45,9 @@ const PROFILES: &[EndpointProfile] = &[
         base_latency_p95: 800.0,
         base_latency_p99: 2500.0,
         traffic_pattern: TrafficPattern::BusinessHours,
-        error_profile: ErrorProfile {
-            timeout_pct: 30.0,
-            server_error_pct: 40.0,
-            connection_error_pct: 20.0,
-            rate_limit_pct: 10.0,
-        },
+        error_profile: ErrorProfile { timeout_pct: 30.0, server_error_pct: 40.0, connection_error_pct: 20.0, rate_limit_pct: 10.0 },
         anomaly_probability: 0.02,
     },
-    // E-commerce webhook endpoint
     EndpointProfile {
         name: "ecommerce",
         base_success_rate: 97.5,
@@ -64,15 +55,9 @@ const PROFILES: &[EndpointProfile] = &[
         base_latency_p95: 1800.0,
         base_latency_p99: 5000.0,
         traffic_pattern: TrafficPattern::Ecommerce,
-        error_profile: ErrorProfile {
-            timeout_pct: 25.0,
-            server_error_pct: 35.0,
-            connection_error_pct: 15.0,
-            rate_limit_pct: 25.0,
-        },
+        error_profile: ErrorProfile { timeout_pct: 25.0, server_error_pct: 35.0, connection_error_pct: 15.0, rate_limit_pct: 25.0 },
         anomaly_probability: 0.05,
     },
-    // Slow but reliable endpoint
     EndpointProfile {
         name: "slow_reliable",
         base_success_rate: 99.8,
@@ -80,15 +65,9 @@ const PROFILES: &[EndpointProfile] = &[
         base_latency_p95: 4500.0,
         base_latency_p99: 9000.0,
         traffic_pattern: TrafficPattern::Steady,
-        error_profile: ErrorProfile {
-            timeout_pct: 50.0,
-            server_error_pct: 30.0,
-            connection_error_pct: 15.0,
-            rate_limit_pct: 5.0,
-        },
+        error_profile: ErrorProfile { timeout_pct: 50.0, server_error_pct: 30.0, connection_error_pct: 15.0, rate_limit_pct: 5.0 },
         anomaly_probability: 0.01,
     },
-    // Unstable endpoint (frequent issues)
     EndpointProfile {
         name: "unstable",
         base_success_rate: 88.0,
@@ -96,15 +75,9 @@ const PROFILES: &[EndpointProfile] = &[
         base_latency_p95: 3500.0,
         base_latency_p99: 12000.0,
         traffic_pattern: TrafficPattern::Spiky,
-        error_profile: ErrorProfile {
-            timeout_pct: 20.0,
-            server_error_pct: 45.0,
-            connection_error_pct: 25.0,
-            rate_limit_pct: 10.0,
-        },
+        error_profile: ErrorProfile { timeout_pct: 20.0, server_error_pct: 45.0, connection_error_pct: 25.0, rate_limit_pct: 10.0 },
         anomaly_probability: 0.15,
     },
-    // High-traffic startup (growing)
     EndpointProfile {
         name: "growing_startup",
         base_success_rate: 96.0,
@@ -112,15 +85,9 @@ const PROFILES: &[EndpointProfile] = &[
         base_latency_p95: 1500.0,
         base_latency_p99: 4000.0,
         traffic_pattern: TrafficPattern::Growing,
-        error_profile: ErrorProfile {
-            timeout_pct: 25.0,
-            server_error_pct: 30.0,
-            connection_error_pct: 20.0,
-            rate_limit_pct: 25.0,
-        },
+        error_profile: ErrorProfile { timeout_pct: 25.0, server_error_pct: 30.0, connection_error_pct: 20.0, rate_limit_pct: 25.0 },
         anomaly_probability: 0.08,
     },
-    // Internal microservice (very fast)
     EndpointProfile {
         name: "internal_fast",
         base_success_rate: 99.9,
@@ -128,26 +95,94 @@ const PROFILES: &[EndpointProfile] = &[
         base_latency_p95: 50.0,
         base_latency_p99: 150.0,
         traffic_pattern: TrafficPattern::Steady,
-        error_profile: ErrorProfile {
-            timeout_pct: 10.0,
-            server_error_pct: 60.0,
-            connection_error_pct: 25.0,
-            rate_limit_pct: 5.0,
-        },
+        error_profile: ErrorProfile { timeout_pct: 10.0, server_error_pct: 60.0, connection_error_pct: 25.0, rate_limit_pct: 5.0 },
         anomaly_probability: 0.005,
     },
 ];
 
+/// Random f64 in [0, 1)
+fn rand_f64() -> f64 {
+    rand::random::<f64>()
+}
+
+/// Random f64 in [min, max)
+fn rand_range(min: f64, max: f64) -> f64 {
+    min + rand_f64() * (max - min)
+}
+
+/// Random i32 in [min, max]
+fn rand_int(min: i32, max: i32) -> i32 {
+    if min >= max { return min; }
+    min + (rand_f64() * (max - min + 1) as f64).floor() as i32
+}
+
+/// Random bool with probability p
+fn rand_bool(p: f64) -> bool {
+    rand_f64() < p
+}
+
+fn traffic_multiplier(pattern: &TrafficPattern, hour: i32, day_of_week: i32, hour_idx: i64, total_hours: i64) -> f64 {
+    let t = match pattern {
+        TrafficPattern::Steady => 1.0,
+        TrafficPattern::BusinessHours => {
+            if hour >= 9 && hour <= 17 { 2.5 }
+            else if hour >= 7 && hour <= 20 { 1.5 }
+            else { 0.3 }
+        }
+        TrafficPattern::Ecommerce => {
+            if hour >= 18 && hour <= 23 { 3.0 }
+            else if hour >= 10 && hour <= 16 { 1.8 }
+            else { 0.4 }
+        }
+        TrafficPattern::Spiky => {
+            if rand_bool(0.1) { rand_range(3.0, 8.0) } else { rand_range(0.5, 1.5) }
+        }
+        TrafficPattern::Growing => {
+            1.0 + (hour_idx as f64 / total_hours as f64) * 2.0
+        }
+    };
+    if day_of_week >= 5 { t * 0.4 } else { t }
+}
+
+fn generate_error_breakdown(profile: &ErrorProfile, failed: i32) -> serde_json::Value {
+    if failed == 0 {
+        return serde_json::json!({"success": 0});
+    }
+    let timeout = (failed as f64 * profile.timeout_pct / 100.0).round() as i32;
+    let server_err = (failed as f64 * profile.server_error_pct / 100.0).round() as i32;
+    let conn_err = (failed as f64 * profile.connection_error_pct / 100.0).round() as i32;
+    let rate_limit = failed - timeout - server_err - conn_err;
+
+    let mut breakdown = serde_json::Map::new();
+    if timeout > 0 { breakdown.insert("ETIMEDOUT".into(), serde_json::json!(timeout)); }
+    if server_err > 0 {
+        let code = if rand_bool(0.6) { "500" } else { "503" };
+        breakdown.insert(code.into(), serde_json::json!(server_err));
+    }
+    if conn_err > 0 { breakdown.insert("ECONNRESET".into(), serde_json::json!(conn_err.max(0))); }
+    if rate_limit > 0 { breakdown.insert("429".into(), serde_json::json!(rate_limit.max(0))); }
+
+    serde_json::Value::Object(breakdown)
+}
+
+fn calculate_anomaly_score(success_rate: f64, latency: f64, profile: &EndpointProfile) -> f64 {
+    let mut score = 0.0;
+    let sr_drop = profile.base_success_rate - success_rate;
+    if sr_drop > 0.0 { score += (sr_drop * 2.0).min(50.0); }
+    let latency_ratio = latency / profile.base_latency_p50;
+    if latency_ratio > 1.5 { score += ((latency_ratio - 1.0) * 20.0).min(40.0); }
+    if sr_drop > 5.0 && latency_ratio > 2.0 { score += 15.0; }
+    score.min(100.0)
+}
+
 /// Generate synthetic hourly stats for all active endpoints
 pub async fn bootstrap_ml_data(
     pool: &PgPool,
-    hours_back: i64,    // how many hours of history to generate
-    endpoints_limit: i64, // max endpoints to seed
+    hours_back: i64,
+    endpoints_limit: i64,
 ) -> Result<BootstrapResult, sqlx::Error> {
-    let mut rng = rand::thread_rng();
     let mut result = BootstrapResult::default();
 
-    // Get active endpoints
     let endpoints: Vec<(Uuid, Uuid, String)> = sqlx::query_as(
         "SELECT id, customer_id, url FROM endpoints WHERE is_active = true ORDER BY created_at LIMIT $1"
     )
@@ -162,13 +197,11 @@ pub async fn bootstrap_ml_data(
     tracing::info!("🧠 ML Bootstrap: seeding {} endpoints with {}h history", endpoints.len(), hours_back);
 
     for (i, (endpoint_id, customer_id, url)) in endpoints.iter().enumerate() {
-        // Assign a random profile to this endpoint
         let profile_idx = i % PROFILES.len();
         let profile = &PROFILES[profile_idx];
 
         tracing::info!("  → endpoint {} ({})", url, profile.name);
 
-        // Generate hourly stats
         let mut hourly_data = Vec::new();
         let now = Utc::now();
 
@@ -177,41 +210,28 @@ pub async fn bootstrap_ml_data(
             let hour_of_day = hour_start.hour() as i32;
             let day_of_week = hour_start.weekday().num_days_from_monday() as i32;
 
-            // Calculate traffic multiplier based on pattern
-            let traffic_mult = calculate_traffic_multiplier(
-                &profile.traffic_pattern, hour_of_day, day_of_week, h, hours_back
-            );
+            let t_mult = traffic_multiplier(&profile.traffic_pattern, hour_of_day, day_of_week, h, hours_back);
+            let base_deliveries = (50.0 * t_mult) as i32;
+            let total = rand_int((base_deliveries as f64 * 0.7) as i32, (base_deliveries as f64 * 1.3) as i32).max(1);
 
-            // Base deliveries per hour (scaled by traffic)
-            let base_deliveries = (50.0 * traffic_mult) as i32;
-            let total = rng.gen_range((base_deliveries as f64 * 0.7) as i32..=(base_deliveries as f64 * 1.3) as i32).max(1);
-
-            // Success rate with realistic variation
-            let sr_variation = rng.gen_range(-2.0..2.0);
+            let sr_variation = rand_range(-2.0, 2.0);
             let mut success_rate = (profile.base_success_rate + sr_variation).min(100.0).max(50.0);
-
-            // Inject anomalies based on probability
-            let is_anomaly = rng.gen_bool(profile.anomaly_probability);
+            let is_anomaly = rand_bool(profile.anomaly_probability);
             if is_anomaly {
-                let anomaly_severity = rng.gen_range(0.3..0.8);
-                success_rate *= 1.0 - anomaly_severity;
+                success_rate *= 1.0 - rand_range(0.3, 0.8);
                 result.anomalies_injected += 1;
             }
 
             let successful = ((total as f64) * success_rate / 100.0).round() as i32;
             let failed = total - successful;
 
-            // Latency with variation
-            let lat_mult = if is_anomaly { rng.gen_range(1.5..3.0) } else { rng.gen_range(0.8..1.2) };
+            let lat_mult = if is_anomaly { rand_range(1.5, 3.0) } else { rand_range(0.8, 1.2) };
             let avg_latency = (profile.base_latency_p50 * lat_mult) as i32;
-            let p50 = (profile.base_latency_p50 * lat_mult * rng.gen_range(0.9..1.1)) as i32;
-            let p95 = (profile.base_latency_p95 * lat_mult * rng.gen_range(0.9..1.1)) as i32;
-            let p99 = (profile.base_latency_p99 * lat_mult * rng.gen_range(0.9..1.1)) as i32;
+            let p50 = (profile.base_latency_p50 * lat_mult * rand_range(0.9, 1.1)) as i32;
+            let p95 = (profile.base_latency_p95 * lat_mult * rand_range(0.9, 1.1)) as i32;
+            let p99 = (profile.base_latency_p99 * lat_mult * rand_range(0.9, 1.1)) as i32;
 
-            // Error breakdown
-            let error_breakdown = generate_error_breakdown(
-                &profile.error_profile, failed, &mut rng
-            );
+            let error_breakdown = generate_error_breakdown(&profile.error_profile, failed);
 
             hourly_data.push(HourlyData {
                 endpoint_id: *endpoint_id,
@@ -229,7 +249,6 @@ pub async fn bootstrap_ml_data(
 
         // Bulk insert hourly stats
         for data in &hourly_data {
-            // Check if data already exists
             let exists: Option<(i64,)> = sqlx::query_as(
                 "SELECT id FROM endpoint_hourly_stats WHERE endpoint_id = $1 AND hour_start = $2 LIMIT 1"
             )
@@ -238,9 +257,7 @@ pub async fn bootstrap_ml_data(
             .fetch_optional(pool)
             .await?;
 
-            if exists.is_some() {
-                continue; // skip existing
-            }
+            if exists.is_some() { continue; }
 
             sqlx::query(
                 r#"
@@ -266,13 +283,14 @@ pub async fn bootstrap_ml_data(
             result.hourly_stats_inserted += 1;
         }
 
-        // Update endpoint profile with synthetic data
+        // Update endpoint profile
         let avg_sr: f64 = hourly_data.iter().map(|d| {
             if d.total_deliveries > 0 { (d.successful as f64 / d.total_deliveries as f64) * 100.0 } else { 100.0 }
         }).sum::<f64>() / hourly_data.len().max(1) as f64;
 
-        let avg_lat: f64 = hourly_data.iter().map(|d| d.avg_latency_ms as f64).sum::<f64>() / hourly_data.len().max(1) as f64;
+        let avg_p50: f64 = hourly_data.iter().map(|d| d.p50_latency_ms as f64).sum::<f64>() / hourly_data.len().max(1) as f64;
         let avg_p95: f64 = hourly_data.iter().map(|d| d.p95_latency_ms as f64).sum::<f64>() / hourly_data.len().max(1) as f64;
+        let avg_p99: f64 = hourly_data.iter().map(|d| d.p99_latency_ms as f64).sum::<f64>() / hourly_data.len().max(1) as f64;
         let avg_per_hour: f64 = hourly_data.iter().map(|d| d.total_deliveries as f64).sum::<f64>() / hourly_data.len().max(1) as f64;
         let peak_per_hour = hourly_data.iter().map(|d| d.total_deliveries).max().unwrap_or(0);
 
@@ -280,9 +298,9 @@ pub async fn bootstrap_ml_data(
             r#"
             INSERT INTO endpoint_profiles 
                 (endpoint_id, success_rate_1h, success_rate_24h, success_rate_7d,
-                 latency_p50, latency_p95, latency_p99, avg_latency_ms,
-                 avg_deliveries_per_hour, peak_per_hour, sample_size, confidence, updated_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 0.8, NOW())
+                 latency_p50, latency_p95, latency_p99,
+                 avg_deliveries_per_hour, peak_deliveries_per_hour, sample_size, confidence, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 0.8, NOW())
             ON CONFLICT (endpoint_id) DO UPDATE SET
                 success_rate_1h = EXCLUDED.success_rate_1h,
                 success_rate_24h = EXCLUDED.success_rate_24h,
@@ -290,9 +308,8 @@ pub async fn bootstrap_ml_data(
                 latency_p50 = EXCLUDED.latency_p50,
                 latency_p95 = EXCLUDED.latency_p95,
                 latency_p99 = EXCLUDED.latency_p99,
-                avg_latency_ms = EXCLUDED.avg_latency_ms,
                 avg_deliveries_per_hour = EXCLUDED.avg_deliveries_per_hour,
-                peak_per_hour = EXCLUDED.peak_per_hour,
+                peak_deliveries_per_hour = EXCLUDED.peak_deliveries_per_hour,
                 sample_size = EXCLUDED.sample_size,
                 confidence = EXCLUDED.confidence,
                 updated_at = NOW()
@@ -302,10 +319,9 @@ pub async fn bootstrap_ml_data(
         .bind(avg_sr)
         .bind(avg_sr)
         .bind(avg_sr)
-        .bind(avg_lat as i32)
+        .bind(avg_p50 as i32)
         .bind(avg_p95 as i32)
-        .bind((avg_p95 * 2.5) as i32)
-        .bind(avg_lat as i32)
+        .bind(avg_p99 as i32)
         .bind(avg_per_hour)
         .bind(peak_per_hour)
         .bind(hourly_data.len() as i32)
@@ -314,16 +330,16 @@ pub async fn bootstrap_ml_data(
 
         result.profiles_updated += 1;
 
-        // Generate anomaly scores for anomalous hours
+        // Generate anomaly scores
         for data in &hourly_data {
             if data.total_deliveries == 0 { continue; }
             let sr = (data.successful as f64 / data.total_deliveries as f64) * 100.0;
             let anomaly_score = calculate_anomaly_score(sr, data.avg_latency_ms as f64, profile);
 
-            if anomaly_score > 40 {
-                let category = if anomaly_score >= 80 { "critical" }
-                    else if anomaly_score >= 70 { "high" }
-                    else if anomaly_score >= 40 { "medium" }
+            if anomaly_score > 40.0 {
+                let category = if anomaly_score >= 80.0 { "critical" }
+                    else if anomaly_score >= 70.0 { "high" }
+                    else if anomaly_score >= 40.0 { "medium" }
                     else { "low" };
 
                 sqlx::query(
@@ -347,10 +363,10 @@ pub async fn bootstrap_ml_data(
             }
         }
 
-        // Initialize ML models for this endpoint
-        super::ml::init_endpoint_models(pool, *endpoint_id).await?;
+        // Initialize ML models
+        super::init_endpoint_models(pool, *endpoint_id).await?;
 
-        // Train ML models with the generated data
+        // Train ML models
         let success_rates: Vec<f64> = hourly_data.iter().map(|d| {
             if d.total_deliveries > 0 { (d.successful as f64 / d.total_deliveries as f64) * 100.0 } else { 100.0 }
         }).collect();
@@ -358,132 +374,29 @@ pub async fn bootstrap_ml_data(
         let p95_latencies: Vec<f64> = hourly_data.iter().map(|d| d.p95_latency_ms as f64).collect();
         let delivery_rates: Vec<f64> = hourly_data.iter().map(|d| d.total_deliveries as f64).collect();
 
-        // Train adaptive thresholds
-        if let Err(e) = super::ml::adaptive_thresholds::train(pool, *endpoint_id, &success_rates, &latencies, &p95_latencies).await {
-            tracing::warn!("  ⚠️ adaptive_thresholds training failed: {:?}", e);
+        if let Err(e) = super::adaptive_thresholds::train(pool, *endpoint_id, &success_rates, &latencies, &p95_latencies).await {
+            tracing::warn!("  ⚠️ adaptive_thresholds: {:?}", e);
         }
-
-        // Train anomaly detector
-        if let Err(e) = super::ml::anomaly_detection::train(pool, *endpoint_id, &success_rates, &latencies, &delivery_rates).await {
-            tracing::warn!("  ⚠️ anomaly_detection training failed: {:?}", e);
+        if let Err(e) = super::anomaly_detection::train(pool, *endpoint_id, &success_rates, &latencies, &delivery_rates).await {
+            tracing::warn!("  ⚠️ anomaly_detection: {:?}", e);
         }
-
-        // Train time series forecaster
-        if let Err(e) = super::ml::time_series::train(pool, *endpoint_id, &success_rates, &latencies).await {
-            tracing::warn!("  ⚠️ time_series training failed: {:?}", e);
+        if let Err(e) = super::time_series::train(pool, *endpoint_id, &success_rates, &latencies).await {
+            tracing::warn!("  ⚠️ time_series: {:?}", e);
         }
-
-        // Initialize bandit models
-        if let Err(e) = super::ml::bandit::init_if_needed(pool, *endpoint_id).await {
-            tracing::warn!("  ⚠️ bandit init failed: {:?}", e);
+        if let Err(e) = super::bandit::init_if_needed(pool, *endpoint_id).await {
+            tracing::warn!("  ⚠️ bandit: {:?}", e);
         }
 
         result.models_trained += 1;
     }
 
     tracing::info!(
-        "🧠 ML Bootstrap complete: {} hourly stats, {} profiles, {} anomalies, {} models trained",
+        "🧠 ML Bootstrap: {} stats, {} profiles, {} anomalies, {} models",
         result.hourly_stats_inserted, result.profiles_updated,
         result.anomaly_scores_inserted, result.models_trained
     );
 
     Ok(result)
-}
-
-fn calculate_traffic_multiplier(
-    pattern: &TrafficPattern,
-    hour_of_day: i32,
-    day_of_week: i32,
-    hour_offset: i64,
-    total_hours: i64,
-) -> f64 {
-    let time_mult = match pattern {
-        TrafficPattern::Steady => 1.0,
-        TrafficPattern::BusinessHours => {
-            if hour_of_day >= 9 && hour_of_day <= 17 {
-                2.5 // peak work hours
-            } else if hour_of_day >= 7 && hour_of_day <= 20 {
-                1.5 // extended hours
-            } else {
-                0.3 // night
-            }
-        }
-        TrafficPattern::Ecommerce => {
-            if hour_of_day >= 18 && hour_of_day <= 23 {
-                3.0 // evening shopping
-            } else if hour_of_day >= 10 && hour_of_day <= 16 {
-                1.8 // daytime
-            } else {
-                0.4 // night
-            }
-        }
-        TrafficPattern::Spiky => {
-            let mut rng = rand::thread_rng();
-            if rng.gen_bool(0.1) {
-                rng.gen_range(3.0..8.0) // 10% chance of spike
-            } else {
-                rng.gen_range(0.5..1.5)
-            }
-        }
-        TrafficPattern::Growing => {
-            let growth_factor = 1.0 + (hour_offset as f64 / total_hours as f64) * 2.0;
-            growth_factor
-        }
-    };
-
-    // Weekend reduction for B2B
-    let weekend_mult = if day_of_week >= 5 { 0.4 } else { 1.0 };
-
-    time_mult * weekend_mult
-}
-
-fn generate_error_breakdown(
-    profile: &ErrorProfile,
-    failed: i32,
-    rng: &mut impl Rng,
-) -> serde_json::Value {
-    if failed == 0 {
-        return serde_json::json!({"success": 0});
-    }
-
-    let timeout = (failed as f64 * profile.timeout_pct / 100.0).round() as i32;
-    let server_err = (failed as f64 * profile.server_error_pct / 100.0).round() as i32;
-    let conn_err = (failed as f64 * profile.connection_error_pct / 100.0).round() as i32;
-    let rate_limit = failed - timeout - server_err - conn_err;
-
-    let mut breakdown = serde_json::Map::new();
-    if timeout > 0 { breakdown.insert("ETIMEDOUT".to_string(), serde_json::json!(timeout)); }
-    if server_err > 0 {
-        let code = if rng.gen_bool(0.6) { "500" } else { "503" };
-        breakdown.insert(code.to_string(), serde_json::json!(server_err));
-    }
-    if conn_err > 0 { breakdown.insert("ECONNRESET".to_string(), serde_json::json!(conn_err.max(0))); }
-    if rate_limit > 0 { breakdown.insert("429".to_string(), serde_json::json!(rate_limit.max(0))); }
-
-    serde_json::Value::Object(breakdown)
-}
-
-fn calculate_anomaly_score(success_rate: f64, latency: f64, profile: &EndpointProfile) -> f64 {
-    let mut score = 0.0;
-
-    // Success rate deviation
-    let sr_drop = profile.base_success_rate - success_rate;
-    if sr_drop > 0.0 {
-        score += (sr_drop * 2.0).min(50.0);
-    }
-
-    // Latency deviation
-    let latency_ratio = latency / profile.base_latency_p50;
-    if latency_ratio > 1.5 {
-        score += ((latency_ratio - 1.0) * 20.0).min(40.0);
-    }
-
-    // Combined: both bad = worse
-    if sr_drop > 5.0 && latency_ratio > 2.0 {
-        score += 15.0;
-    }
-
-    score.min(100.0)
 }
 
 #[derive(Debug, Default, serde::Serialize)]
