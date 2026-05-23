@@ -65,7 +65,7 @@ async fn detect_degradation_trends(
     .fetch_all(pool)
     .await?;
 
-    for (endpoint_id, customer_id, avg_sr, recent_sr, older_sr) in trending {
+    for (endpoint_id, customer_id, _avg_sr, recent_sr, older_sr) in trending {
         let drop = older_sr - recent_sr;
 
         // Calculate hours until anomaly threshold (rough estimate)

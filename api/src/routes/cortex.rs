@@ -193,7 +193,7 @@ async fn get_cortex_health(Extension(pool): Extension<PgPool>, Extension(c): Ext
 async fn post_ml_bootstrap(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
     let result = crate::cortex::ml::bootstrap::bootstrap_ml_data(&pool, 168, 50).await
-        .map_err(|e| AppError::Internal(e.to_string()))?;
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
     Ok(Json(serde_json::json!({
         "status": "ok",
         "result": result,
@@ -213,7 +213,7 @@ async fn get_ml_quality(Extension(pool): Extension<PgPool>, Extension(c): Extens
 async fn post_ml_quality_reset(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
     let reset_count = crate::cortex::ml::quality_tracker::check_and_reset_degraded_models(&pool, 50.0).await
-        .map_err(|e| AppError::Internal(e.to_string()))?;
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
     Ok(Json(serde_json::json!({
         "status": "ok",
         "models_reset": reset_count,
