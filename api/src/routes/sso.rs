@@ -52,7 +52,7 @@ pub fn router() -> Router {
         .route("/login-attempts", get(get_login_attempts))
         // SCIM endpoints (authenticated with SCIM token)
         .route("/scim/v2/Users", get(scim_list_users).post(scim_create_user))
-        .route("/scim/v2/Users/:id", get(scim_get_user).put(scim_update_user).patch(scim_patch_user).delete(scim_delete_user))
+        .route("/scim/v2/Users/{id}", get(scim_get_user).put(scim_update_user).patch(scim_patch_user).delete(scim_delete_user))
         .route("/scim/v2/Groups", get(scim_list_groups))
         .route("/scim/v2/ServiceProviderConfig", get(scim_service_provider_config))
         .route("/scim/v2/ResourceTypes", get(scim_resource_types))
