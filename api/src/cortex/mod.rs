@@ -96,6 +96,7 @@ pub async fn try_cortex_lock(pool: &sqlx::PgPool, lock_name: &str, _ttl_secs: i6
         "cortex_anomaly" => 9008,
         "cortex_correlation" => 9009,
         "cortex_memory" => 9010,
+        "cortex_ml" => 9011,
         _ => 9099,
     };
     let result: (bool,) = sqlx::query_as("SELECT pg_try_advisory_lock($1)")
@@ -118,6 +119,7 @@ pub async fn release_cortex_lock(pool: &sqlx::PgPool, lock_name: &str) {
         "cortex_anomaly" => 9008,
         "cortex_correlation" => 9009,
         "cortex_memory" => 9010,
+        "cortex_ml" => 9011,
         _ => 9099,
     };
     let _ = sqlx::query("SELECT pg_advisory_unlock($1)")

@@ -637,11 +637,11 @@ async fn main() -> Result<()> {
         }
     });
 
-    // Stage 4: Self-Healing (her 5 dakika)
+    // Stage 4: Self-Healing (her 5 dakika, anomaly'den 90sn SONRA)
     let cortex_healing_pool = pool.clone();
     tokio::spawn(async move {
         loop {
-            tokio::time::sleep(std::time::Duration::from_secs(5 * 60)).await;
+            tokio::time::sleep(std::time::Duration::from_secs(5 * 60 + 90)).await;
 
             if !hooksniff_api::cortex::try_cortex_lock(&cortex_healing_pool, "cortex_healing", 300).await {
                 continue;
@@ -658,10 +658,11 @@ async fn main() -> Result<()> {
     });
 
     // Stage 7: Predictions (her 15 dakika)
+    // Stage 7: Predictions (her 15 dakika, profil güncellemesinden 2dk SONRA)
     let cortex_predict_pool = pool.clone();
     tokio::spawn(async move {
         loop {
-            tokio::time::sleep(std::time::Duration::from_secs(15 * 60)).await;
+            tokio::time::sleep(std::time::Duration::from_secs(15 * 60 + 120)).await;
 
             if !hooksniff_api::cortex::try_cortex_lock(&cortex_predict_pool, "cortex_predict", 600).await {
                 continue;
@@ -701,12 +702,14 @@ async fn main() -> Result<()> {
     // ML ENGINE — Machine Learning Pipeline (her 15 dk)
     // ═══════════════════════════════════════════════════════
 
+    // ML Engine — Machine Learning Pipeline (her 15 dk)
+    // Offset: anomaly scoring'den SONRA çalışsın (dk %15 == 7)
     let ml_pool = pool.clone();
     tokio::spawn(async move {
         loop {
             tokio::time::sleep(std::time::Duration::from_secs(15 * 60)).await;
 
-            if !hooksniff_api::cortex::try_cortex_lock(&ml_pool, "cortex_anomaly", 600).await {
+            if !hooksniff_api::cortex::try_cortex_lock(&ml_pool, "cortex_ml", 600).await {
                 continue;
             }
 
@@ -719,7 +722,7 @@ async fn main() -> Result<()> {
                 Err(e) => tracing::error!("❌ ML Engine training failed: {:?}", e),
             }
 
-            hooksniff_api::cortex::release_cortex_lock(&ml_pool, "cortex_anomaly").await;
+            hooksniff_api::cortex::release_cortex_lock(&ml_pool, "cortex_ml").await;
         }
     });
 
