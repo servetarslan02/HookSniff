@@ -209,7 +209,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
  const [testAndActivateLoading, setTestAndActivateLoading] = useState(false);
  const [friendlyError, setFriendlyError] = useState<{ title: string; message: string; action?: string } | null>(null);
 
- const isConfigured = ssoConfig?.provider;
+ const isConfigured = !!(ssoConfig?.provider || ssoConfig?.issuer_url || ssoConfig?.client_id);
  const isEnforced = ssoConfig?.enabled;
 
  // Populate form fields when config loads
