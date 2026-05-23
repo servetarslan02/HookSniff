@@ -697,6 +697,32 @@ async fn main() -> Result<()> {
         }
     });
 
+    // ═══════════════════════════════════════════════════════
+    // ML ENGINE — Machine Learning Pipeline (her 15 dk)
+    // ═══════════════════════════════════════════════════════
+
+    let ml_pool = pool.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(15 * 60)).await;
+
+            if !hooksniff_api::cortex::try_cortex_lock(&ml_pool, "cortex_anomaly", 600).await {
+                continue;
+            }
+
+            match hooksniff_api::cortex::ml::train_all(&ml_pool).await {
+                Ok(n) => {
+                    if n > 0 {
+                        tracing::info!("🧠 ML Engine: trained {} endpoints", n);
+                    }
+                }
+                Err(e) => tracing::error!("❌ ML Engine training failed: {:?}", e),
+            }
+
+            hooksniff_api::cortex::release_cortex_lock(&ml_pool, "cortex_anomaly").await;
+        }
+    });
+
     let app = Router::new()
         // Root — service info
         .route(
