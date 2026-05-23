@@ -10,6 +10,7 @@
 
 use sqlx::PgPool;
 use tokio::time::{Duration, Instant};
+use chrono::Timelike;
 
 /// All Cortex stages in dependency order
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -132,7 +133,7 @@ fn should_run_stage(stage: CortexStage, last_run: Option<Instant>) -> bool {
     let interval = stage.interval_secs();
     let offset = stage.offset_secs();
     let now = chrono::Utc::now();
-    let secs_since_midnight = now.time().num_seconds_from_midnight() as u64;
+    let secs_since_midnight = (now.hour() * 3600 + now.minute() * 60 + now.second()) as u64;
 
     // First run: check if we're within the offset window
     if last_run.is_none() {
