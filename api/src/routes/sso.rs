@@ -913,9 +913,8 @@ async fn test_sso_connection(
     let (provider, enabled, metadata_url, sso_url, certificate, issuer_url, client_id, client_secret_enc, _meta2, _entity) =
         config.ok_or_else(|| AppError::BadRequest("No SSO configuration found. Please set up SSO first.".into()))?;
 
-    if !enabled {
-        return Err(AppError::BadRequest("SSO is not enabled. Please enable it before testing.".into()));
-    }
+    // Allow testing even when SSO is not yet enabled (needed for "Test & Activate" flow)
+    let _ = enabled; // suppress unused warning
 
     let mut issues = Vec::new();
     let mut test_details = serde_json::json!({});
