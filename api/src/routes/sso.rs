@@ -3324,7 +3324,7 @@ async fn scim_patch_user(
                         .fetch_optional(&pool)
                         .await?;
 
-                        if let Some((Some(mut existing))) = current {
+                        if let Some((Some(mut existing),)) = current {
                             existing.retain(|g| !group_list.contains(g));
                             sqlx::query(
                                 "UPDATE sso_user_attributes SET idp_groups = $1, last_synced_at = NOW() WHERE customer_id = $2 AND sso_config_id = $3"
