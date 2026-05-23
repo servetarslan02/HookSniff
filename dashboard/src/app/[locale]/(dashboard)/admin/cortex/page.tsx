@@ -272,17 +272,22 @@ function PredictionsTab({ token }: { token: string | null }) {
           {predictions.slice(0, 20).map((p: any, i: number) => (
             <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
               <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-sm font-bold ${
-                p[3] >= 0.7 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                p[3] >= 0.4 ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                p[4] >= 0.7 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                p[4] >= 0.4 ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
                 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
               }`}>
-                {Math.round(p[3] * 100)}%
+                {Math.round((p[4] || 0) * 100)}%
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">{p[2]}</p>
-                <p className="text-xs text-gray-500 dark:text-slate-400">Endpoint: {p[1].slice(0, 8)}...</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{typeof p[3] === 'string' ? p[3] : 'failure'}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">Endpoint: {typeof p[1] === 'string' ? p[1].slice(0, 8) : '?'}...</p>
+                {p[5] && typeof p[5] === 'object' && (
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
+                    {Object.entries(p[5]).map(([k, v]) => `${k}: ${typeof v === 'number' ? Math.round(v as number) : v}`).join(' · ')}
+                  </p>
+                )}
               </div>
-              <span className="text-xs text-gray-500 dark:text-slate-400">{new Date(p[6]).toLocaleString()}</span>
+              <span className="text-xs text-gray-500 dark:text-slate-400">{p[7] ? new Date(p[7]).toLocaleString() : ''}</span>
             </div>
           ))}
         </div>
