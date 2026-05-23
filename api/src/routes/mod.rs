@@ -111,6 +111,7 @@ pub fn api_router() -> Router {
         .nest("/custom-domains", custom_domains::router())
         .nest("/rate-limits", rate_limits::router())
         .nest("/service-tokens", service_tokens::router())
+        .nest("/cortex", cortex::router())
         .nest("/ws", ws::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
@@ -123,7 +124,6 @@ pub fn api_router() -> Router {
 
     let admin_routes = Router::new()
         .nest("/admin", admin::router())
-        .nest("/cortex", cortex::router())
         .layer(axum_middleware::from_fn(
             crate::middleware::admin_middleware,
         ))

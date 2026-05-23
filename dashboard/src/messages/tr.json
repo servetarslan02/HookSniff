@@ -1769,6 +1769,7 @@
       "email": "E-posta",
       "broadcasts": "Duyurular",
       "security": "Güvenlik",
+      "cortex": "Cortex",
       "userPanel": "Kullanıcı Paneli"
     },
     "noActivity": "Henüz aktivite kaydı yok",
