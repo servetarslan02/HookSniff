@@ -42,6 +42,21 @@ function LoginForm() {
   const t = useTranslations('auth');
   const tc = useTranslations('common');
   const passwordStrength = mode === 'register' ? getPasswordStrength(password) : null;
+  const isSubmitting = useRef(false);
+
+  // Reset oauthLoading if the page regains focus (redirect was blocked/cancelled)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        setOauthLoading(null);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', () => setOauthLoading(null));
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   // 2FA state
   const [twoFaStep, setTwoFaStep] = useState(false);
@@ -99,11 +114,13 @@ function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting.current) return; // Prevent double submission
     setError('');
     if (mode === 'register' && !consentChecked) {
       setError(t('consentRequired'));
       return;
     }
+    isSubmitting.current = true;
     setLoading(true);
     try {
       let user;
@@ -115,6 +132,7 @@ function LoginForm() {
         if (user && !user.id) {
           setSuccess(t('verifyEmailSent') || 'A verification email has been sent. Please check your inbox and verify your email before logging in.');
           setLoading(false);
+          isSubmitting.current = false;
           return;
         }
       }
@@ -137,6 +155,7 @@ function LoginForm() {
       }
     } finally {
       setLoading(false);
+      isSubmitting.current = false;
     }
   };
 

@@ -106,9 +106,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (res.ok) return res.json();
           // 401 = definitive auth failure → try refresh
           if (res.status === 401) {
+            const storedRt = localStorage.getItem('hooksniff_refresh');
             return fetch(`${API_BASE}/auth/refresh`, {
               method: 'POST',
               credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: storedRt ? JSON.stringify({ refresh_token: storedRt }) : undefined,
             }).then((refreshRes) => {
               if (!refreshRes.ok) throw new Error('Refresh failed');
               return refreshRes.json();
@@ -121,6 +124,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (data && data.token) {
             // Refresh returned a new token — use it
             updateToken(data.token);
+            // Save new refresh token for proxy fallback
+            if (data.refresh_token) localStorage.setItem('hooksniff_refresh', data.refresh_token);
             if (data.customer) {
               const u: User = {
                 id: data.customer.id,
@@ -207,6 +212,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: (data.customer.plan || 'developer') as User['plan'], is_admin: data.customer.is_admin ?? false, avatar_url: data.customer.avatar_url };
     persistAuth(u, data.customer.api_key, data.token);
+    // Save refresh token for proxy fallback (Vercel doesn't forward Set-Cookie)
+    if (data.refresh_token) localStorage.setItem('hooksniff_refresh', data.refresh_token);
     return u;
   }, [persistAuth]);
 
@@ -214,6 +221,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await twoFactorApi.verify(tempToken, code, backupCode);
     const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: (data.customer.plan || 'developer') as User['plan'], is_admin: data.customer.is_admin ?? false, avatar_url: data.customer.avatar_url };
     persistAuth(u, data.customer.api_key, data.token);
+    // Save refresh token for proxy fallback
+    if (data.refresh_token) localStorage.setItem('hooksniff_refresh', data.refresh_token);
     return u;
   }, [persistAuth]);
 
@@ -233,6 +242,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.customer) {
       const u: User = { id: data.customer.id, email: data.customer.email, name: data.customer.name, plan: (data.customer.plan || 'developer') as User['plan'], is_admin: data.customer.is_admin ?? false, avatar_url: data.customer.avatar_url };
       persistAuth(u, data.customer.api_key, data.token);
+      // Save refresh token for proxy fallback
+      if (data.refresh_token) localStorage.setItem('hooksniff_refresh', data.refresh_token);
       return u;
     }
     // Email verification flow — return a minimal user object
@@ -258,6 +269,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setApiKeyState(null);
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem('hooksniff_token');
+    localStorage.removeItem('hooksniff_refresh');
     clearAuthCookie();
   }, []);
 
