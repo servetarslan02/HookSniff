@@ -4,6 +4,7 @@
   "scripts": {
     "vercel-build": "cd dashboard && npm ci && npm run build"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "pg": "^8.21.0"
+  }
 }
