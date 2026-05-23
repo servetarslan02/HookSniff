@@ -31,7 +31,7 @@ pub async fn run_healing(
     .await?;
 
     for (endpoint_id, customer_id, score, category) in sick_endpoints {
-        let action_type = determine_action(score, &category, config);
+        let action_type = determine_action_ml(pool, endpoint_id, score, &category, config).await;
         let reason = format!("Anomaly score {score} ({category})");
 
         // Record the action
@@ -170,7 +170,26 @@ async fn run_recovery_tests(pool: &sqlx::PgPool, config: &CortexConfig) -> Resul
     Ok(())
 }
 
-fn determine_action(score: i32, category: &str, _config: &CortexConfig) -> String {
+/// Determine the best action using ML bandit (if available) or fallback to rules.
+async fn determine_action_ml(pool: &sqlx::PgPool, endpoint_id: uuid::Uuid, score: i32, category: &str, _config: &CortexConfig) -> String {
+    // Try ML bandit first
+    if let Ok(model_params) = super::ml::get_model_params(pool, endpoint_id, "retry_bandit").await {
+        if let Ok(mut model) = serde_json::from_value::<super::ml::bandit::BanditModel>(model_params) {
+            if model.total_plays >= 5 {
+                // Use bandit to select strategy
+                let strategy = model.select_arm();
+                // Map bandit strategy to healing action
+                return match strategy.as_str() {
+                    "auto_disable" => "auto_disable".to_string(),
+                    "circuit_tighten" => "circuit_tighten".to_string(),
+                    "retry_slowdown" => "retry_slowdown".to_string(),
+                    _ => strategy,
+                };
+            }
+        }
+    }
+
+    // Fallback: rule-based
     if score >= 90 && category == "critical" {
         "auto_disable".to_string()
     } else if score >= 70 {
