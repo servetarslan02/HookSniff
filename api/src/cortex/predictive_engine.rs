@@ -46,17 +46,53 @@ async fn predict_endpoint(
     endpoint_id: uuid::Uuid,
     config: &CortexConfig,
 ) -> Result<Option<Prediction>, sqlx::Error> {
-    // Get last 6 hours of stats for trend analysis
+    // Try ML time series forecasting first
+    let ts_params = super::ml::get_model_params(pool, endpoint_id, "ts_success_rate").await.unwrap_or(serde_json::json!({}));
+    let ts_samples = ts_params.get("samples").and_then(|s| s.as_i64()).unwrap_or(0);
+
+    if ts_samples >= 6 {
+        // ML path: use Holt-Winters + Linear Regression ensemble
+        let model: super::ml::time_series::TimeSeriesModel =
+            serde_json::from_value(ts_params).unwrap_or_else(|_| super::ml::time_series::TimeSeriesModel::new("success_rate"));
+
+        // Forecast 1 hour ahead
+        let forecast_1h = model.forecast(1);
+        // Forecast 3 hours ahead
+        let forecast_3h = model.forecast(3);
+
+        let failure_prob_1h = (1.0 - forecast_1h.point_forecast).max(0.0).min(1.0);
+        let failure_prob_3h = (1.0 - forecast_3h.point_forecast).max(0.0).min(1.0);
+
+        // Use the higher probability (more conservative)
+        let failure_prob = failure_prob_1h.max(failure_prob_3h);
+
+        if failure_prob < 0.1 { return Ok(None); }
+
+        return Ok(Some(Prediction {
+            prediction_type: "failure".to_string(),
+            probability: failure_prob,
+            factors: serde_json::json!({
+                "method": "ml_time_series",
+                "forecast_1h": forecast_1h.point_forecast,
+                "forecast_3h": forecast_3h.point_forecast,
+                "confidence_1h": forecast_1h.confidence,
+                "confidence_3h": forecast_3h.confidence,
+                "r2": model.regression_r2,
+                "trend": model.trend,
+                "samples": ts_samples,
+            }),
+        }));
+    }
+
+    // Fallback: simple trend analysis
     let stats: Vec<(i32, i32, i32)> = sqlx::query_as(
         "SELECT total_deliveries, successful, failed FROM endpoint_hourly_stats WHERE endpoint_id = $1 AND hour_start > NOW() - INTERVAL '6 hours' ORDER BY hour_start"
     ).bind(endpoint_id).fetch_all(pool).await?;
 
     if stats.len() < 3 { return Ok(None); }
 
-    // Calculate trend: success rate over time
     let rates: Vec<f64> = stats.iter().map(|(t, s, _)| if *t > 0 { *s as f64 / *t as f64 } else { 1.0 }).collect();
 
-    // Simple linear trend
     let n = rates.len() as f64;
     let x_mean = (n - 1.0) / 2.0;
     let y_mean = rates.iter().sum::<f64>() / n;
@@ -69,17 +105,14 @@ async fn predict_endpoint(
     }
     let slope = if den > 0.0 { num / den } else { 0.0 };
 
-    // Momentum: difference between last 2 and first 2 rates
     let early = rates.iter().take(2).sum::<f64>() / 2.0;
     let late = rates.iter().rev().take(2).sum::<f64>() / 2.0;
     let momentum = late - early;
 
     let current_sr = *rates.last().unwrap_or(&1.0);
     let failure_prob = if slope < config.predictive_trend_threshold {
-        // Declining trend
         (1.0 - current_sr + slope.abs()).min(1.0).max(0.0)
     } else if momentum < config.predictive_momentum_threshold {
-        // Negative momentum
         (1.0 - current_sr + momentum.abs() * 0.5).min(1.0).max(0.0)
     } else {
         (1.0 - current_sr).max(0.0)
@@ -91,6 +124,7 @@ async fn predict_endpoint(
         prediction_type: "failure".to_string(),
         probability: failure_prob,
         factors: serde_json::json!({
+            "method": "trend_fallback",
             "current_sr": current_sr,
             "trend_slope": slope,
             "momentum": momentum,
