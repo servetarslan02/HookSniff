@@ -20,8 +20,7 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/schemas': '/operational-webhooks',
   '/templates': '/operational-webhooks',
   '/inbound': '/operational-webhooks',
-  // DevTools section
-  '/playground': '/devtools',
+  // DevTools section (playground is public, don't redirect)
   '/signature-verifier': '/devtools',
   '/api-importer': '/devtools',
   '/webhook-builder': '/devtools',
