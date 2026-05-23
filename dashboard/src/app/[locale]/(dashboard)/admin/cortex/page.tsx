@@ -10,13 +10,13 @@ type Tab = 'overview' | 'anomalies' | 'healing' | 'predictions';
 
 interface CortexHealth {
   status: string;
-  metrics_24h: {
-    hourly_stats: number;
-    profiles: number;
-    anomalies: number;
-    healing_actions: number;
-    action_memory: number;
-    predictions: number;
+  metrics: {
+    hourly_stats_total: number;
+    profiles_total: number;
+    anomalies_24h: number;
+    healing_actions_24h: number;
+    action_memory_total: number;
+    predictions_24h: number;
     active_insights: number;
   };
 }
@@ -90,7 +90,7 @@ export default function CortexPage() {
         <div className="glass-card p-4 flex items-center gap-3">
           <div className={`w-3 h-3 rounded-full ${health.status === 'healthy' ? 'bg-emerald-500' : 'bg-yellow-500'} animate-pulse`} />
           <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
-            Cortex is {health.status} — {health.metrics_24h.active_insights} active insights
+            Cortex is {health.status} — {health.metrics?.active_insights ?? 0} active insights
           </span>
         </div>
       )}
@@ -123,16 +123,16 @@ export default function CortexPage() {
 }
 
 function OverviewTab({ health, token }: { health: CortexHealth | null; token: string | null }) {
-  if (!health) return null;
-  const m = health.metrics_24h;
+  if (!health?.metrics) return <p className="text-gray-500 dark:text-slate-400 text-center py-8">No data yet. Cortex needs time to collect metrics.</p>;
+  const m = health.metrics;
 
   const cards = [
-    { label: 'Hourly Stats', value: m.hourly_stats, icon: Clock, color: 'text-blue-600' },
-    { label: 'Profiles', value: m.profiles, icon: Layers, color: 'text-purple-600' },
-    { label: 'Anomalies (24h)', value: m.anomalies, icon: AlertTriangle, color: 'text-orange-600' },
-    { label: 'Healing Actions', value: m.healing_actions, icon: ShieldCheck, color: 'text-emerald-600' },
-    { label: 'Action Memory', value: m.action_memory, icon: Brain, color: 'text-pink-600' },
-    { label: 'Predictions', value: m.predictions, icon: TrendingUp, color: 'text-cyan-600' },
+    { label: 'Hourly Stats', value: m.hourly_stats_total, icon: Clock, color: 'text-blue-600' },
+    { label: 'Profiles', value: m.profiles_total, icon: Layers, color: 'text-purple-600' },
+    { label: 'Anomalies (24h)', value: m.anomalies_24h, icon: AlertTriangle, color: 'text-orange-600' },
+    { label: 'Healing Actions', value: m.healing_actions_24h, icon: ShieldCheck, color: 'text-emerald-600' },
+    { label: 'Action Memory', value: m.action_memory_total, icon: Brain, color: 'text-pink-600' },
+    { label: 'Predictions', value: m.predictions_24h, icon: TrendingUp, color: 'text-cyan-600' },
     { label: 'Active Insights', value: m.active_insights, icon: Zap, color: 'text-yellow-600' },
   ];
 
