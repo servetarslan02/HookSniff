@@ -10,6 +10,7 @@ pub mod background_tasks;
 pub mod billing;
 pub mod broadcasts;
 pub mod contact;
+pub mod cortex;
 pub mod coupons;
 pub mod custom_domains;
 pub mod customer_portal;
@@ -110,6 +111,7 @@ pub fn api_router() -> Router {
         .nest("/custom-domains", custom_domains::router())
         .nest("/rate-limits", rate_limits::router())
         .nest("/service-tokens", service_tokens::router())
+        .nest("/cortex", cortex::router())
         .nest("/ws", ws::router())
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
@@ -197,5 +199,6 @@ mod tests {
         let _ = message_poller::router();
         let _ = connectors::router();
         let _ = integrations::router();
+        let _ = cortex::router();
     }
 }

@@ -7,6 +7,7 @@ pub mod billing;
 pub mod cache;
 pub mod circuit_breaker;
 pub mod config;
+pub mod cortex;
 pub mod crypto;
 pub mod db;
 pub mod email;
