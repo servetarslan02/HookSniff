@@ -110,19 +110,19 @@ export default function AdminSecurityPage() {
   const [searchIp, setSearchIp] = useState('');
   const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
 
-  // ── React Query: Stats (stale 30s) ──
+  // ── React Query: Stats (stale 2min — security stats don't change often) ──
   const { data: stats } = useQuery({
     queryKey: ['admin', 'security-stats'],
     queryFn: () => adminApi.getSecurityStats(token!),
     enabled: !!token,
-    staleTime: 30_000,
+    staleTime: 120_000,
   });
 
-  // ── React Query: Events (stale 15s, filter-aware) ──
+  // ── React Query: Events (stale 30s, filter-aware) ──
   const { data: eventsData, isLoading: eventsLoading, refetch: refetchEvents } = useQuery({
     queryKey: ['admin', 'security-events', filterSeverity, filterResolved, searchIp, filterDateRange],
     queryFn: async () => {
-      const params: Record<string, string> = { per_page: '100' };
+      const params: Record<string, string> = { per_page: '50' };
       if (filterSeverity !== 'all') params.severity = filterSeverity;
       if (filterResolved !== 'all') params.resolved = filterResolved === 'resolved' ? 'true' : 'false';
       if (searchIp) params.ip = searchIp;
@@ -131,7 +131,7 @@ export default function AdminSecurityPage() {
       return adminApi.listSecurityEvents(token!, params);
     },
     enabled: !!token && tab === 'events',
-    staleTime: 15_000,
+    staleTime: 30_000,
   });
   const events: SecurityEvent[] = eventsData?.events || [];
 
