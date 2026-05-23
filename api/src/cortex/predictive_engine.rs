@@ -66,7 +66,7 @@ async fn predict_endpoint(
         // Use the higher probability (more conservative)
         let failure_prob = failure_prob_1h.max(failure_prob_3h);
 
-        if failure_prob < 0.1 { return Ok(None); }
+        if failure_prob < 0.05 { return Ok(None); }
 
         return Ok(Some(Prediction {
             prediction_type: "failure".to_string(),
@@ -132,7 +132,7 @@ async fn predict_endpoint(
         (1.0 - current_sr).max(0.0)
     };
 
-    if failure_prob < 0.1 { return Ok(None); }
+    if failure_prob < 0.05 { return Ok(None); }
 
     Ok(Some(Prediction {
         prediction_type: "failure".to_string(),
