@@ -75,7 +75,7 @@ pub async fn run_healing(
                 let current_limit: Option<(i32,)> = sqlx::query_as(
                     "SELECT webhook_limit FROM endpoints WHERE id = $1"
                 ).bind(endpoint_id).fetch_optional(pool).await?;
-                if let Some((limit)) = current_limit {
+                if let Some((limit,)) = current_limit {
                     let new_limit = (limit as f64 * 0.75) as i32;
                     sqlx::query(
                         "UPDATE endpoints SET webhook_limit = $1 WHERE id = $2"
@@ -99,7 +99,7 @@ pub async fn run_healing(
                 let current_retries: Option<(i32,)> = sqlx::query_as(
                     "SELECT max_retries FROM endpoints WHERE id = $1"
                 ).bind(endpoint_id).fetch_optional(pool).await?;
-                if let Some((retries)) = current_retries {
+                if let Some((retries,)) = current_retries {
                     let new_retries = (retries + 2).min(10);
                     sqlx::query(
                         "UPDATE endpoints SET max_retries = $1 WHERE id = $2"
@@ -112,12 +112,12 @@ pub async fn run_healing(
                 let current_timeout: Option<(i32,)> = sqlx::query_as(
                     "SELECT timeout_ms FROM endpoints WHERE id = $1"
                 ).bind(endpoint_id).fetch_optional(pool).await?;
-                if let Some((timeout)) = current_timeout {
-                    let new_timeout = (timeout as f64 * 1.5) as i32;
+                if let Some((timeout_val,)) = current_timeout {
+                    let new_timeout = (timeout_val as f64 * 1.5) as i32;
                     sqlx::query(
                         "UPDATE endpoints SET timeout_ms = $1 WHERE id = $2"
                     ).bind(new_timeout.min(30000)).bind(endpoint_id).execute(pool).await?;
-                    tracing::info!("🔧 Cortex: Timeout {}ms → {}ms for endpoint {} (score {})", timeout, new_timeout.min(30000), endpoint_id, score);
+                    tracing::info!("🔧 Cortex: Timeout {}ms → {}ms for endpoint {} (score {})", timeout_val, new_timeout.min(30000), endpoint_id, score);
                 }
             }
             _ => {}
