@@ -8,7 +8,7 @@ const footerLinks = [
   { nameKey: 'compare', href: '/compare' },
   { nameKey: 'customers', href: '/customers' },
   { nameKey: 'security', href: '/security' },
-  { nameKey: 'playground', href: '/devtools' },
+  { nameKey: 'playground', href: '/playground' },
   { nameKey: 'startups', href: '/startups' },
   { nameKey: 'newsletter', href: '/newsletter' },
   { nameKey: 'useCases', href: '/use-cases' },
