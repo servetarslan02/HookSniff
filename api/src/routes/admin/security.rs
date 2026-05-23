@@ -153,52 +153,57 @@ pub async fn list_security_events(
 }
 
 /// GET /v1/admin/security/stats — Security dashboard statistics.
+/// Single query using CTEs to minimize Neon round-trips.
 pub async fn security_stats(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
-) -> Result<Json<SecurityStats>, AppError> {
+) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&customer)?;
 
-    // Single query instead of 10 separate queries
-    let row = sqlx::query_as::<_, (i64, i64, i64, i64, i64, i64, i64)>(
-        r#"SELECT
-            COUNT(*) as total_events,
-            COUNT(*) FILTER (WHERE resolved = false) as unresolved_events,
-            COUNT(*) FILTER (WHERE severity = 'critical' AND created_at > NOW() - INTERVAL '7 days') as critical_events,
-            COUNT(*) FILTER (WHERE severity = 'high' AND created_at > NOW() - INTERVAL '7 days') as high_events,
-            COUNT(*) FILTER (WHERE event_type IN ('brute_force_login', 'brute_force_api') AND created_at > NOW() - INTERVAL '24 hours') as recent_brute_force,
-            COUNT(*) FILTER (WHERE event_type = 'credential_stuffing' AND created_at > NOW() - INTERVAL '24 hours') as recent_credential_stuffing,
-            COUNT(*) FILTER (WHERE event_type IN ('sql_injection_attempt', 'xss_attempt', 'path_traversal_attempt') AND created_at > NOW() - INTERVAL '24 hours') as recent_injection_attempts
-        FROM security_events"#
+    let row = sqlx::query_as::<_, (i64, i64, i64, i64, i64, i64, i64, serde_json::Value, serde_json::Value, serde_json::Value)>(
+        r#"WITH base AS (SELECT * FROM security_events),
+           counts AS (
+             SELECT
+               COUNT(*) as total_events,
+               COUNT(*) FILTER (WHERE resolved = false) as unresolved_events,
+               COUNT(*) FILTER (WHERE severity = 'critical' AND created_at > NOW() - INTERVAL '7 days') as critical_events,
+               COUNT(*) FILTER (WHERE severity = 'high' AND created_at > NOW() - INTERVAL '7 days') as high_events,
+               COUNT(*) FILTER (WHERE event_type IN ('brute_force_login','brute_force_api') AND created_at > NOW() - INTERVAL '24 hours') as brute,
+               COUNT(*) FILTER (WHERE event_type = 'credential_stuffing' AND created_at > NOW() - INTERVAL '24 hours') as stuff,
+               COUNT(*) FILTER (WHERE event_type IN ('sql_injection_attempt','xss_attempt','path_traversal_attempt') AND created_at > NOW() - INTERVAL '24 hours') as inject
+             FROM base
+           ),
+           by_type AS (
+             SELECT COALESCE(jsonb_agg(jsonb_build_object('event_type', event_type, 'count', cnt) ORDER BY cnt DESC), '[]'::jsonb) as data
+             FROM (SELECT event_type, COUNT(*) as cnt FROM base WHERE created_at > NOW() - INTERVAL '30 days' GROUP BY event_type ORDER BY cnt DESC LIMIT 10) t
+           ),
+           by_severity AS (
+             SELECT COALESCE(jsonb_agg(jsonb_build_object('severity', severity, 'count', cnt) ORDER BY cnt DESC), '[]'::jsonb) as data
+             FROM (SELECT severity, COUNT(*) as cnt FROM base WHERE created_at > NOW() - INTERVAL '30 days' GROUP BY severity) t
+           ),
+           by_ip AS (
+             SELECT COALESCE(jsonb_agg(jsonb_build_object('ip_address', ip_address, 'count', cnt) ORDER BY cnt DESC), '[]'::jsonb) as data
+             FROM (SELECT ip_address, COUNT(*) as cnt FROM base WHERE ip_address IS NOT NULL AND created_at > NOW() - INTERVAL '7 days' GROUP BY ip_address ORDER BY cnt DESC LIMIT 10) t
+           )
+           SELECT c.total_events, c.unresolved_events, c.critical_events, c.high_events,
+                  c.brute, c.stuff, c.inject, bt.data, bs.data, bi.data
+           FROM counts c, by_type bt, by_severity bs, by_ip bi"#
     ).fetch_one(&pool).await?;
 
-    let (total_events, unresolved_events, critical_events, high_events, recent_brute_force, recent_credential_stuffing, recent_injection_attempts) = row;
+    let (total, unresolved, critical, high, brute, stuff, inject, by_type, by_severity, by_ip) = row;
 
-    // Grouped queries (still needed but only 2 instead of 3)
-    let events_by_type = sqlx::query_as::<_, (String, i64)>(
-        "SELECT event_type, COUNT(*) as cnt FROM security_events WHERE created_at > NOW() - INTERVAL '30 days' GROUP BY event_type ORDER BY cnt DESC LIMIT 10"
-    ).fetch_all(&pool).await?;
-
-    let events_by_severity = sqlx::query_as::<_, (String, i64)>(
-        "SELECT severity, COUNT(*) as cnt FROM security_events WHERE created_at > NOW() - INTERVAL '30 days' GROUP BY severity ORDER BY cnt DESC"
-    ).fetch_all(&pool).await?;
-
-    let top_ips = sqlx::query_as::<_, (String, i64)>(
-        "SELECT ip_address, COUNT(*) as cnt FROM security_events WHERE ip_address IS NOT NULL AND created_at > NOW() - INTERVAL '7 days' GROUP BY ip_address ORDER BY cnt DESC LIMIT 10"
-    ).fetch_all(&pool).await?;
-
-    Ok(Json(SecurityStats {
-        total_events,
-        unresolved_events,
-        critical_events,
-        high_events,
-        events_by_type: events_by_type.into_iter().map(|(t, c)| EventTypeCount { event_type: t, count: c }).collect(),
-        events_by_severity: events_by_severity.into_iter().map(|(s, c)| SeverityCount { severity: s, count: c }).collect(),
-        top_ips: top_ips.into_iter().map(|(ip, c)| IpCount { ip_address: ip, count: c }).collect(),
-        recent_brute_force,
-        recent_credential_stuffing,
-        recent_injection_attempts,
-    }))
+    Ok(Json(serde_json::json!({
+        "total_events": total,
+        "unresolved_events": unresolved,
+        "critical_events": critical,
+        "high_events": high,
+        "recent_brute_force": brute,
+        "recent_credential_stuffing": stuff,
+        "recent_injection_attempts": inject,
+        "events_by_type": by_type,
+        "events_by_severity": by_severity,
+        "top_ips": by_ip,
+    })))
 }
 
 /// PUT /v1/admin/security/events/:id/resolve — Mark event as resolved.
