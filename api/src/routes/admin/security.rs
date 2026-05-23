@@ -98,7 +98,7 @@ pub async fn list_security_events(
     let offset = (page - 1) * per_page;
     let hours = params.hours.unwrap_or(72); // default: last 3 days
 
-    let mut conditions = vec!["created_at > NOW() - make_interval(hours => $1)".to_string()];
+    let mut conditions = vec!["created_at > NOW() - ($1 || ' hours')::interval".to_string()];
     let mut param_idx = 2;
 
     if params.severity.is_some() {
@@ -130,7 +130,7 @@ pub async fn list_security_events(
         where_clause, param_idx, param_idx + 1
     );
 
-    let mut query = sqlx::query_as::<_, SecurityEvent>(&query_sql).bind(hours);
+    let mut query = sqlx::query_as::<_, SecurityEvent>(&query_sql).bind(hours.to_string());
     if let Some(ref s) = params.severity { query = query.bind(s); }
     if let Some(ref t) = params.event_type { query = query.bind(t); }
     if let Some(r) = params.resolved { query = query.bind(r); }
@@ -141,7 +141,7 @@ pub async fn list_security_events(
     let events = query.fetch_all(&pool).await?;
 
     let count_sql = format!("SELECT COUNT(*) FROM security_events {}", where_clause);
-    let mut count_query = sqlx::query_scalar::<_, i64>(&count_sql).bind(hours);
+    let mut count_query = sqlx::query_scalar::<_, i64>(&count_sql).bind(hours.to_string());
     if let Some(ref s) = params.severity { count_query = count_query.bind(s); }
     if let Some(ref t) = params.event_type { count_query = count_query.bind(t); }
     if let Some(r) = params.resolved { count_query = count_query.bind(r); }
