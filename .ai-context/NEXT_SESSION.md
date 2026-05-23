@@ -40,13 +40,11 @@
 
 ---
 
-## 🔴 EKSİKLER — Backend (Rust cargo gerekli)
-
-### 1. Alert Evaluation Worker
-- `alert_rules` tablosu var, CRUD API var ama background worker yok
-- Kurallar tetiklenmiyor
-- Dosya: `api/src/jobs/alert_eval.rs` (yeni)
-- Plan: Her 60 saniyede bir kuralları kontrol et, eşleşen varsa alert tetikle
+## Sıradaki
+- Dashboard'da ML Quality tab'ı (model kalite metrikleri)
+- Dashboard'da Proactive Healing insights gösterimi
+- Worker'da cortex_integration aktif kullanımı (delivery outcome reporting)
+- Rate Limiting implementasyonu (Redis ile)
 
 ### 2. Redis State Migration
 - SSO state şu an in-memory (HashMap)
