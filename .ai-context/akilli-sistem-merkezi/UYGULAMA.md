@@ -1750,7 +1750,313 @@ Worker-API iletişimi: PostgreSQL üzerinden (worker yazar, API okur).
 
 ---
 
-## AŞAMA 5: Recovery Surge 🔴 YÜKSEK (YENİ)
+## AŞAMA 5: Action Memory + Adaptive Learning 🔴 YÜKSEK
+
+**Amaç:** Her self-healing aksiyonunun sonucunu kaydet, başarı oranlarını öğren, 
+her endpoint için en iyi stratejiyi otomatik seç (Multi-Armed Bandit).
+**Süre:** 2-3 oturum | **Risk:** DÜŞÜK | **Bağımlılık:** Aşama 4
+
+> **Neden Bu Aşama Önemli?**
+> Aşama 4'te aksiyon alıyoruz (auto-disable, recovery test vb.) ama sonucundan 
+> ders çıkarmıyoruz. Bu aşamayla sistem KENDİNİ ÖĞRENİR:
+> - "Bu endpoint'te auto-disable %80 işe yarıyor → devam et"
+> - "Bu endpoint'te retry yavaşlatma daha etkili → strateji değiştir"
+> - "Gece yapılan aksiyonlar %95 başarılı → gece daha agresif ol"
+
+### Adım 5.1 — Action History Tablosu (Migration)
+```
+□ Dosya oluştur: migrations/088_cortex_action_history.sql
+
+İçerik:
+
+  -- Cortex: Action history — her aksiyonun kaydı ve sonucu
+  -- Sistem bundan öğrenir: hangi aksiyon hangi endpoint'te işe yarıyor
+  CREATE TABLE IF NOT EXISTS cortex_action_history (
+      id BIGSERIAL PRIMARY KEY,
+      endpoint_id UUID NOT NULL REFERENCES endpoints(id) ON DELETE CASCADE,
+      customer_id UUID NOT NULL,
+      action_type VARCHAR(50) NOT NULL,
+          -- auto_disable, recovery_test, retry_slow, circuit_open,
+          -- notify_aggressive, cascade_prevent, surge_throttle
+      reason VARCHAR(100) NOT NULL,
+          -- anomaly_high, cascade_detected, failure_threshold, recovery_surge
+      anomaly_score INT,
+      context JSONB DEFAULT '{}',
+          -- Saat, trafik, error tipi, mevcut strateji vb.
+      outcome VARCHAR(30) DEFAULT 'pending',
+          -- success, failure, partial, customer_intervened, timeout
+      outcome_details TEXT,
+          -- Ne oldu? Müşteri müdahale etti mi? Ne kadar sürdü?
+      time_to_resolution_secs INT,
+          -- Aksiyon alındıktan sonra sorun ne kadar sürede düzeldi?
+      endpoint_success_rate_before FLOAT,
+          -- Aksiyon öncesi success rate
+      endpoint_success_rate_after FLOAT,
+          -- Aksiyon sonrası success rate (1 saat sonra ölçülür)
+      strategy_snapshot JSONB DEFAULT '{}',
+          -- Aksiyon anındaki strateji ayarları (snapshot)
+      created_at TIMESTAMPTZ DEFAULT now(),
+      resolved_at TIMESTAMPTZ
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_action_history_endpoint
+      ON cortex_action_history(endpoint_id, created_at DESC);
+  CREATE INDEX IF NOT EXISTS idx_action_history_customer
+      ON cortex_action_history(customer_id, created_at DESC);
+  CREATE INDEX IF NOT EXISTS idx_action_history_failures
+      ON cortex_action_history(endpoint_id, action_type, outcome)
+      WHERE outcome IN ('failure', 'partial', 'customer_intervened');
+  CREATE INDEX IF NOT EXISTS idx_action_history_pending
+      ON cortex_action_history(endpoint_id, created_at DESC)
+      WHERE outcome = 'pending';
+  CREATE INDEX IF NOT EXISTS idx_action_history_type_outcome
+      ON cortex_action_history(action_type, outcome, created_at DESC);
+
+□ Neon DB'ye uygula: node run-migrations.js
+□ Git commit: "feat(cortex): migration 088 - action history for adaptive learning"
+```
+
+### Adım 5.2 — Action Memory Modülü (api/src/cortex/action_memory.rs)
+```
+□ Dosya oluştur: api/src/cortex/action_memory.rs
+
+İçerik:
+
+  use sqlx::PgPool;
+  use uuid::Uuid;
+  use serde::{Deserialize, Serialize};
+
+  #[derive(Debug, Serialize, Deserialize)]
+  pub struct ActionRecord {
+      pub endpoint_id: Uuid,
+      pub customer_id: Uuid,
+      pub action_type: String,
+      pub reason: String,
+      pub anomaly_score: Option<i32>,
+      pub context: serde_json::Value,
+  }
+
+  #[derive(Debug, Serialize, Deserialize)]
+  pub struct ActionOutcome {
+      pub outcome: String,
+      pub outcome_details: Option<String>,
+      pub time_to_resolution_secs: Option<i32>,
+      pub success_rate_before: Option<f64>,
+      pub success_rate_after: Option<f64>,
+  }
+
+  /// Aksiyonu kaydet (self-healing aksiyon alırken çağrılır)
+  pub async fn record_action(pool: &PgPool, record: &ActionRecord) -> Result<i64, sqlx::Error> {
+      let row: (i64,) = sqlx::query_as(
+          r#"INSERT INTO cortex_action_history
+              (endpoint_id, customer_id, action_type, reason, anomaly_score, context)
+          VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"#
+      )
+      .bind(record.endpoint_id).bind(record.customer_id)
+      .bind(&record.action_type).bind(&record.reason)
+      .bind(record.anomaly_score).bind(&record.context)
+      .fetch_one(pool).await?;
+      Ok(row.0)
+  }
+
+  /// Aksiyon sonucunu güncelle
+  pub async fn resolve_action(pool: &PgPool, action_id: i64, outcome: &ActionOutcome) -> Result<(), sqlx::Error> {
+      sqlx::query(
+          r#"UPDATE cortex_action_history SET
+              outcome = $2, outcome_details = $3, time_to_resolution_secs = $4,
+              endpoint_success_rate_before = $5, endpoint_success_rate_after = $6,
+              resolved_at = NOW()
+          WHERE id = $1"#
+      )
+      .bind(action_id).bind(&outcome.outcome).bind(&outcome.outcome_details)
+      .bind(outcome.time_to_resolution_secs)
+      .bind(outcome.success_rate_before).bind(outcome.success_rate_after)
+      .execute(pool).await?;
+      Ok(())
+  }
+
+  /// Endpoint için en iyi aksiyonu bul (UCB1 Multi-Armed Bandit)
+  pub async fn get_best_action_for_endpoint(pool: &PgPool, endpoint_id: Uuid) -> Result<Option<String>, sqlx::Error> {
+      let best: Option<(String,)> = sqlx::query_as(
+          r#"SELECT action_type FROM cortex_action_history
+          WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '30 days'
+            AND outcome != 'pending'
+          GROUP BY action_type
+          HAVING COUNT(*) >= 3
+          ORDER BY
+              (SUM(CASE WHEN outcome = 'success' THEN 1.0 ELSE 0.0 END) / COUNT(*))
+              + SQRT(2.0 * LN((SELECT COUNT(*) FROM cortex_action_history
+                  WHERE endpoint_id = $1 AND outcome != 'pending'
+                  AND created_at > NOW() - INTERVAL '30 days')) / COUNT(*))
+              DESC
+          LIMIT 1"#
+      )
+      .bind(endpoint_id).fetch_optional(pool).await?;
+      Ok(best.map(|(t,)| t))
+  }
+
+  /// Pending aksiyonları timeout yap (1 saat)
+  pub async fn resolve_stale_actions(pool: &PgPool) -> Result<u64, sqlx::Error> {
+      let result = sqlx::query(
+          r#"UPDATE cortex_action_history SET
+              outcome = 'timeout',
+              outcome_details = 'Auto-resolved: no outcome reported within 1 hour',
+              resolved_at = NOW()
+          WHERE outcome = 'pending' AND created_at < NOW() - INTERVAL '1 hour'"#
+      ).execute(pool).await?;
+      Ok(result.rows_affected())
+  }
+
+□ api/src/cortex/mod.rs'ye ekle: pub mod action_memory;
+□ cargo check
+□ Git commit: "feat(cortex): action memory - record, resolve, UCB1 bandit"
+```
+
+### Adım 5.3 — Self-Healing Entegrasyonu
+```
+□ api/src/cortex/healing_engine.rs'de güncelle:
+
+  // Her aksiyon ALINDIĞINDA kaydet:
+  let action_id = crate::cortex::action_memory::record_action(&pool, &ActionRecord {
+      endpoint_id, customer_id,
+      action_type: "auto_disable".to_string(),
+      reason: "failure_threshold".to_string(),
+      anomaly_score: Some(score),
+      context: serde_json::json!({"hour": chrono::Utc::now().hour()}),
+  }).await.ok();
+
+  // Sonuç BELİRLENDİĞİNDE güncelle:
+  if let Some(aid) = action_id {
+      crate::cortex::action_memory::resolve_action(&pool, aid, &ActionOutcome {
+          outcome: if test_passed { "success" } else { "failure" }.to_string(),
+          outcome_details: Some(format!("Recovery test: {}", if test_passed { "passed" } else { "failed" })),
+          time_to_resolution_secs: Some(elapsed_secs),
+          success_rate_before: Some(success_rate_before),
+          success_rate_after: Some(success_rate_after),
+      }).await.ok();
+  }
+
+  // Karar verirken EN İYİ AKSİYONU SOR:
+  let best = crate::cortex::action_memory::get_best_action_for_endpoint(&pool, endpoint_id)
+      .await.unwrap_or(None);
+  // best Some("retry_slow") → retry yavaşlat
+  // best Some("notify_aggressive") → agresif bildirim
+  // best None → default strateji (auto_disable)
+
+□ cargo check
+□ Git commit: "feat(cortex): integrate action memory with self-healing (adaptive strategy)"
+```
+
+### Adım 5.4 — Adaptive Threshold Job'u (Her Saat)
+```
+□ api/src/main.rs'de ekle:
+
+  // Cortex: Adaptive threshold güncelleme (her saat)
+  let adaptive_pool = pool.clone();
+  tokio::spawn(async move {
+      loop {
+          tokio::time::sleep(std::time::Duration::from_secs(3600)).await;
+          if !hooksniff_api::cortex::try_cortex_lock(&adaptive_pool, "cortex_adaptive", 300).await {
+              continue;
+          }
+          // Her endpoint için en başarılı aksiyonu bul ve platform_settings'a yaz
+          let endpoints: Vec<(Uuid,)> = sqlx::query_as(
+              "SELECT DISTINCT endpoint_id FROM cortex_action_history
+               WHERE created_at > NOW() - INTERVAL '7 days' AND outcome != 'pending'
+               GROUP BY endpoint_id HAVING COUNT(*) >= 5"
+          ).fetch_all(&adaptive_pool).await.unwrap_or_default();
+
+          for (eid,) in endpoints {
+              if let Ok(Some(best)) = hooksniff_api::cortex::action_memory::
+                  get_best_action_for_endpoint(&adaptive_pool, eid).await
+              {
+                  let _ = sqlx::query(
+                      r#"INSERT INTO platform_settings (key, value)
+                      VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value"#
+                  )
+                  .bind(format!("adaptive_strategy:{}", eid))
+                  .bind(serde_json::json!({"preferred_action": best, "updated_at": chrono::Utc::now()}))
+                  .execute(&adaptive_pool).await;
+              }
+          }
+          hooksniff_api::cortex::release_cortex_lock(&adaptive_pool, "cortex_adaptive").await;
+      }
+  });
+
+□ Git commit: "feat(cortex): adaptive threshold job - per-endpoint strategy optimization"
+```
+
+### Adım 5.5 — Pending Aksiyon Çözümleme Job'u (Her 15 dk)
+```
+□ api/src/main.rs'de ekle:
+
+  let stale_pool = pool.clone();
+  tokio::spawn(async move {
+      loop {
+          tokio::time::sleep(std::time::Duration::from_secs(900)).await;
+          match hooksniff_api::cortex::action_memory::resolve_stale_actions(&stale_pool).await {
+              Ok(n) if n > 0 => tracing::info!("⏰ Resolved {} stale actions", n),
+              _ => {}
+          }
+      }
+  });
+
+□ Git commit: "feat(cortex): stale action resolver job"
+```
+
+### Adım 5.6 — Retention
+```
+□ api/src/jobs/retention.rs'de ekle:
+
+  let r = sqlx::query("DELETE FROM cortex_action_history WHERE created_at < NOW() - INTERVAL '90 days'")
+      .execute(pool).await?;
+  if r.rows_affected() > 0 {
+      tracing::info!("🧹 Cleaned {} old action_history records", r.rows_affected());
+  }
+
+□ Git commit: "feat(cortex): retention for action_history (90 days)"
+```
+
+### Adım 5.7 — API Endpoint'leri
+```
+□ api/src/routes/cortex.rs'ye ekle:
+
+  .route("/actions", get(get_action_history))
+  .route("/actions/stats", get(get_action_stats))
+  .route("/actions/best/:endpoint_id", get(get_best_action))
+
+□ Git commit: "feat(cortex): action memory API endpoints"
+```
+
+### Adım 5.8 — Dashboard Entegrasyonu
+```
+□ cortex/page.tsx'de "Healing" sekmesine ekle:
+
+  - Son 20 aksiyon tablosu (tip, endpoint, sonuç, süre)
+  - Aksiyon başarı oranları pie chart
+  - "En iyi strateji" kartı
+  - Pending aksiyon sayısı
+
+□ Git commit: "feat(cortex): action memory dashboard widgets"
+```
+
+### Adım 5.9 — Test
+```
+□ Self-healing aksiyonu al → cortex_action_history'de kayıt var mı
+□ Aksiyon sonucu güncelle → outcome ve resolved_at dolu mu
+□ get_best_action_for_endpoint() → UCB1 formülü çalışıyor mu
+□ 3 deneme sonrası en iyi aksiyonu doğru seçiyor mu
+□ Adaptive threshold job → platform_settings'a yazıyor mu
+□ Pending aksiyon 1 saat sonra timeout oluyor mu
+□ API endpoint'leri doğru veri döndürüyor mu
+□ Git push
+```
+
+### AŞAMA 5 TAMAMLANDI □
+
+---
+
+## AŞAMA 6: Recovery Surge 🔴 YÜKSEK (YENİ)
 
 **Amaç:** Kesinti SONRASI spike trafiğini kontrollü gönder. (Hookdeck modeli)
 **Süre:** 1-2 oturum | **Risk:** ORTA | **Bağımlılık:** Aşama 4
@@ -2070,11 +2376,11 @@ Worker-API iletişimi: PostgreSQL üzerinden (worker yazar, API okur).
 □ Git push
 ```
 
-### AŞAMA 5 TAMAMLANDI □
+### AŞAMA 6 TAMAMLANDI □
 
 ---
 
-## AŞAMA 6: Predictive Engine 🟡 ORTA
+## AŞAMA 7: Predictive Engine 🟡 ORTA
 
 **Amaç:** Failure prediction, capacity forecast.
 **Süre:** 1-2 oturum | **Risk:** DÜŞÜK | **Bağımlılık:** Aşama 1 + 2
@@ -2411,11 +2717,11 @@ Worker-API iletişimi: PostgreSQL üzerinden (worker yazar, API okur).
 □ Git push
 ```
 
-### AŞAMA 6 TAMAMLANDI □
+### AŞAMA 7 TAMAMLANDI □
 
 ---
 
-## AŞAMA 7: Insights Engine 🟡 ORTA
+## AŞAMA 8: Insights Engine 🟡 ORTA
 
 **Amaç:** Haftalık rapor, customer health, recommendations, haftalık email.
 **Süre:** 2 oturum | **Risk:** DÜŞÜK | **Bağımlılık:** Aşama 1 + 2
@@ -2867,16 +3173,16 @@ Worker-API iletişimi: PostgreSQL üzerinden (worker yazar, API okur).
 □ customer_health 4 skor dolu mu (integration, engagement, growth, stability)
 □ upgrade_probability mantıklı mı
 □ Email gönderildi mi
-□ API endpoint gerçek veri dönüyor mu (stub değil)
+□ API endpoint'leri gerçek veri dönüyor mu (stub değil)
 □ Distributed lock çalışıyor mu
 □ Git push
 ```
 
-### AŞAMA 7 TAMAMLANDI □
+### AŞAMA 8 TAMAMLANDI □
 
 ---
 
-## AŞAMA 8: Smart Routing 🟢 DÜŞÜK
+## AŞAMA 9: Smart Routing 🟢 DÜŞÜK
 
 **Amaç:** Fallback URL'ler arası akıllı seçim.
 **Süre:** 1 oturum | **Risk:** DÜŞÜK | **Bağımlılık:** Aşama 1 + 2
@@ -2922,7 +3228,7 @@ Worker-API iletişimi: PostgreSQL üzerinden (worker yazar, API okur).
   /// Routing kararı ver: primary mi, fallback mı?
   ///
   /// Mantık:
-  /// 1. Primary URL'in son 1 saatlik success rate'ini al
+  /// 1. Primary URL'in son 1 saatlik success rate'i
   /// 2. Eğer %50'nin altındaysa → fallback URL'e geç
   /// 3. Kararı routing_decisions tablosuna yaz
   /// 4. Worker bu tabloyu okuyarak delivery yapar
@@ -3105,7 +3411,7 @@ Worker-API iletişimi: PostgreSQL üzerinden (worker yazar, API okur).
 □ Git push
 ```
 
-### AŞAMA 8 TAMAMLANDI □
+### AŞAMA 9 TAMAMLANDI □
 
 ---
 
@@ -3122,10 +3428,11 @@ AŞAMA 1: Hourly Stats Aggregator        □ Tamamlandı
 AŞAMA 2: Profile Engine (3 pencere)      □ Tamamlandı
 AŞAMA 3: Anomaly + Alert Correlation    □ Tamamlandı
 AŞAMA 4: Self-Healing (14 gün)           □ Tamamlandı
-AŞAMA 5: Recovery Surge                  □ Tamamlandı
-AŞAMA 6: Predictive (trend + momentum)  □ Tamamlandı
-AŞAMA 7: Insights + Email               □ Tamamlandı
-AŞAMA 8: Smart Routing (15dk)            □ Tamamlandı
+AŞAMA 5: Action Memory + Adaptive Learn  □ Tamamlandı
+AŞAMA 6: Recovery Surge (spike koruma)   □ Tamamlandı
+AŞAMA 7: Predictive (trend + momentum)  □ Tamamlandı
+AŞAMA 8: Insights + Email               □ Tamamlandı
+AŞAMA 9: Smart Routing (15dk)            □ Tamamlandı
 ```
 
 ## 📦 MİGRASYON SIRASI
@@ -3135,10 +3442,11 @@ AŞAMA 8: Smart Routing (15dk)            □ Tamamlandı
 080_cortex_profiles.sql        → Aşama 2
 081_cortex_anomalies.sql       → Aşama 3
 082_cortex_healing.sql         → Aşama 4
-086_cortex_recovery_surge.sql  → Aşama 5
-083_cortex_predictions.sql     → Aşama 6
-084_cortex_insights.sql        → Aşama 7
-085_cortex_routing.sql         → Aşama 8
+088_cortex_action_memory.sql   → Aşama 5
+086_cortex_recovery_surge.sql  → Aşama 6
+083_cortex_predictions.sql     → Aşama 7
+084_cortex_insights.sql        → Aşama 8
+085_cortex_routing.sql         → Aşama 9
 087_cortex_config.sql          → CC-2 (opsiyonel, platform_settings'a JSON ekleme)
 ```
 
