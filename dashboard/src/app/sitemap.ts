@@ -5,6 +5,7 @@ import { blogSlugs } from '@/lib/blog-slugs';
 const BASE_URL = 'https://hooksniff.vercel.app';
 
 const locales = routing.locales;
+const lastModified = new Date('2026-05-23T00:00:00.000Z');
 
 const publicPages = [
   '',
@@ -49,12 +50,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     for (const locale of locales) {
       entries.push({
         url: `${BASE_URL}/${locale}${page}`,
-        lastModified: new Date(),
+        lastModified,
         changeFrequency: page === '' ? 'daily' : 'weekly',
         priority: page === '' ? 1 : page.startsWith('/blog') ? 0.9 : 0.8,
         alternates: {
           languages: Object.fromEntries(
-            locales.map((l) => [l, `${BASE_URL}/${l}${page}`])
+            [
+              ...locales.map((l) => [l, `${BASE_URL}/${l}${page}`]),
+              ['x-default', `${BASE_URL}/en${page}`],
+            ]
           ),
         },
       });
@@ -66,25 +70,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     for (const locale of locales) {
       entries.push({
         url: `${BASE_URL}/${locale}/blog/${slug}`,
-        lastModified: new Date(),
+        lastModified,
         changeFrequency: 'monthly',
         priority: 0.7,
         alternates: {
           languages: Object.fromEntries(
-            locales.map((l) => [l, `${BASE_URL}/${l}/blog/${slug}`])
+            [
+              ...locales.map((l) => [l, `${BASE_URL}/${l}/blog/${slug}`]),
+              ['x-default', `${BASE_URL}/en/blog/${slug}`],
+            ]
           ),
         },
       });
     }
   }
-
-  // RSS Feed
-  entries.push({
-    url: `${BASE_URL}/feed.xml`,
-    lastModified: new Date(),
-    changeFrequency: 'daily',
-    priority: 0.6,
-  });
 
   return entries;
 }
