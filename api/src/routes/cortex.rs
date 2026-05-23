@@ -3,7 +3,7 @@
 //! These endpoints expose the Cortex brain's data: all customers, all endpoints.
 //! Only accessible to admin users. The brain sees everything.
 
-use axum::{extract::Extension, Json, routing::get, Router};
+use axum::{extract::Extension, Json, routing::{get, post}, Router};
 use axum::extract::Path;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -29,6 +29,10 @@ pub fn router() -> Router {
         .route("/reports", get(get_weekly_reports))
         .route("/routing/decisions", get(get_routing_decisions))
         .route("/health", get(get_cortex_health))
+        .route("/ml/bootstrap", post(post_ml_bootstrap))
+        .route("/ml/quality", get(get_ml_quality))
+        .route("/ml/quality/reset", post(post_ml_quality_reset))
+        .route("/proactive/status", get(get_proactive_status))
 }
 
 fn require_admin(c: &Customer) -> Result<(), AppError> {
@@ -183,5 +187,48 @@ async fn get_cortex_health(Extension(pool): Extension<PgPool>, Extension(c): Ext
             "predictions_24h": predictions_count.0,
             "active_insights": insights_count.0,
         },
+    })))
+}
+
+async fn post_ml_bootstrap(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let result = crate::cortex::ml::bootstrap::bootstrap_ml_data(&pool, 168, 50).await
+        .map_err(|e| AppError::Internal(e.to_string()))?;
+    Ok(Json(serde_json::json!({
+        "status": "ok",
+        "result": result,
+    })))
+}
+
+async fn get_ml_quality(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let summary = crate::cortex::ml::quality_tracker::get_quality_summary(&pool).await
+        .unwrap_or_default();
+    Ok(Json(serde_json::json!({
+        "models": summary,
+        "total": summary.len(),
+    })))
+}
+
+async fn post_ml_quality_reset(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let reset_count = crate::cortex::ml::quality_tracker::check_and_reset_degraded_models(&pool, 50.0).await
+        .map_err(|e| AppError::Internal(e.to_string()))?;
+    Ok(Json(serde_json::json!({
+        "status": "ok",
+        "models_reset": reset_count,
+    })))
+}
+
+async fn get_proactive_status(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    // Get recent proactive insights
+    let insights: Vec<(i64, Uuid, String, String, String, serde_json::Value, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
+        "SELECT id, customer_id, insight_type, title, severity, data, created_at FROM cortex_insights WHERE insight_type LIKE 'proactive_%' AND dismissed = false ORDER BY created_at DESC LIMIT 50"
+    ).fetch_all(&pool).await.unwrap_or_default();
+
+    Ok(Json(serde_json::json!({
+        "proactive_insights": insights,
+        "count": insights.len(),
     })))
 }
