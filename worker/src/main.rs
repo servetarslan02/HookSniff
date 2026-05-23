@@ -70,6 +70,7 @@ use sqlx::PgPool;
 
 mod circuit_breaker;
 mod config;
+pub mod cortex_integration;
 pub mod delivery;
 mod fifo;
 pub mod metrics_push;
