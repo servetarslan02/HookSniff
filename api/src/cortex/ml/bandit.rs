@@ -179,6 +179,17 @@ pub async fn init_if_needed(pool: &PgPool, endpoint_id: uuid::Uuid) -> Result<()
         save_model_params(pool, endpoint_id, "throttle_bandit", &params, 0).await?;
     }
 
+    // Healing strategy A/B testing bandit
+    let existing = get_model_params(pool, endpoint_id, "healing_bandit").await?;
+    if existing.as_object().map_or(true, |o| o.is_empty()) {
+        let model = BanditModel::new(
+            &["auto_disable", "circuit_tighten", "retry_slowdown", "rate_limit_reduce", "fallback_url_switch", "retry_increase", "timeout_adjust"],
+            0.20 // 20% exploration rate (heuristic: need to learn what works)
+        );
+        let params = serde_json::to_value(&model).unwrap();
+        save_model_params(pool, endpoint_id, "healing_bandit", &params, 0).await?;
+    }
+
     Ok(())
 }
 
