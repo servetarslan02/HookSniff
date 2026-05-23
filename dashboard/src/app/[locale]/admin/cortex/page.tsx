@@ -491,7 +491,7 @@ function describePrediction(probability: number, factors: any): { title: string;
   if (pct >= 70) {
     return {
       title: 'Yüksek ihtimalle sorun çıkacak',
-      detail: `Cortex %{pct} olasılıkla bu endpoint'in başarısız olacağını tahmin ediyor`,
+      detail: `Cortex %${pct} olasılıkla bu endpoint'in başarısız olacağını tahmin ediyor`,
       emoji: '🔴',
       advice: 'Şimdi önlem alın: endpoint\'i kontrol edin veya yedek adrese geçin',
     };
@@ -499,7 +499,7 @@ function describePrediction(probability: number, factors: any): { title: string;
   if (pct >= 40) {
     return {
       title: 'Sorun çıkma ihtimali var',
-      detail: `Cortex %{pct} olasılıkla bir sorun bekliyor`,
+      detail: `Cortex %${pct} olasılıkla bir sorun bekliyor`,
       emoji: '🟠',
       advice: 'Endpoint\'inizi kontrol etmeniz önerilir',
     };
@@ -507,14 +507,14 @@ function describePrediction(probability: number, factors: any): { title: string;
   if (pct >= 20) {
     return {
       title: 'Küçük bir risk var',
-      detail: `Cortex %{pct} olasılıkla hafif bir performans düşüşü bekliyor`,
+      detail: `Cortex %${pct} olasılıkla hafif bir performans düşüşü bekliyor`,
       emoji: '🟡',
       advice: 'Şimdilik endişe verici değil, izleniyor',
     };
   }
   return {
     title: 'Düşük risk',
-    detail: `Cortex %{pct} olasılıkla küçük bir dalgalanma bekliyor`,
+    detail: `Cortex %${pct} olasılıkla küçük bir dalgalanma bekliyor`,
     emoji: '🟢',
     advice: 'Her şey normal görünüyor',
   };
