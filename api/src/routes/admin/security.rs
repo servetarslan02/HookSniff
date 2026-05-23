@@ -159,50 +159,33 @@ pub async fn security_stats(
 ) -> Result<Json<SecurityStats>, AppError> {
     require_admin(&customer)?;
 
-    let (total_events,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM security_events")
-        .fetch_one(&pool).await?;
-
-    let (unresolved_events,): (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM security_events WHERE resolved = false"
+    // Single query instead of 10 separate queries
+    let row = sqlx::query_as::<_, (i64, i64, i64, i64, i64, i64, i64)>(
+        r#"SELECT
+            COUNT(*) as total_events,
+            COUNT(*) FILTER (WHERE resolved = false) as unresolved_events,
+            COUNT(*) FILTER (WHERE severity = 'critical' AND created_at > NOW() - INTERVAL '7 days') as critical_events,
+            COUNT(*) FILTER (WHERE severity = 'high' AND created_at > NOW() - INTERVAL '7 days') as high_events,
+            COUNT(*) FILTER (WHERE event_type IN ('brute_force_login', 'brute_force_api') AND created_at > NOW() - INTERVAL '24 hours') as recent_brute_force,
+            COUNT(*) FILTER (WHERE event_type = 'credential_stuffing' AND created_at > NOW() - INTERVAL '24 hours') as recent_credential_stuffing,
+            COUNT(*) FILTER (WHERE event_type IN ('sql_injection_attempt', 'xss_attempt', 'path_traversal_attempt') AND created_at > NOW() - INTERVAL '24 hours') as recent_injection_attempts
+        FROM security_events"#
     ).fetch_one(&pool).await?;
 
-    let (critical_events,): (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM security_events WHERE severity = 'critical' AND created_at > NOW() - INTERVAL '7 days'"
-    ).fetch_one(&pool).await?;
+    let (total_events, unresolved_events, critical_events, high_events, recent_brute_force, recent_credential_stuffing, recent_injection_attempts) = row;
 
-    let (high_events,): (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM security_events WHERE severity = 'high' AND created_at > NOW() - INTERVAL '7 days'"
-    ).fetch_one(&pool).await?;
-
+    // Grouped queries (still needed but only 2 instead of 3)
     let events_by_type = sqlx::query_as::<_, (String, i64)>(
-        "SELECT event_type, COUNT(*) as cnt FROM security_events
-         WHERE created_at > NOW() - INTERVAL '30 days'
-         GROUP BY event_type ORDER BY cnt DESC LIMIT 10"
+        "SELECT event_type, COUNT(*) as cnt FROM security_events WHERE created_at > NOW() - INTERVAL '30 days' GROUP BY event_type ORDER BY cnt DESC LIMIT 10"
     ).fetch_all(&pool).await?;
 
     let events_by_severity = sqlx::query_as::<_, (String, i64)>(
-        "SELECT severity, COUNT(*) as cnt FROM security_events
-         WHERE created_at > NOW() - INTERVAL '30 days'
-         GROUP BY severity ORDER BY cnt DESC"
+        "SELECT severity, COUNT(*) as cnt FROM security_events WHERE created_at > NOW() - INTERVAL '30 days' GROUP BY severity ORDER BY cnt DESC"
     ).fetch_all(&pool).await?;
 
     let top_ips = sqlx::query_as::<_, (String, i64)>(
-        "SELECT ip_address, COUNT(*) as cnt FROM security_events
-         WHERE ip_address IS NOT NULL AND created_at > NOW() - INTERVAL '7 days'
-         GROUP BY ip_address ORDER BY cnt DESC LIMIT 10"
+        "SELECT ip_address, COUNT(*) as cnt FROM security_events WHERE ip_address IS NOT NULL AND created_at > NOW() - INTERVAL '7 days' GROUP BY ip_address ORDER BY cnt DESC LIMIT 10"
     ).fetch_all(&pool).await?;
-
-    let (recent_brute_force,): (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM security_events WHERE event_type IN ('brute_force_login', 'brute_force_api') AND created_at > NOW() - INTERVAL '24 hours'"
-    ).fetch_one(&pool).await?;
-
-    let (recent_credential_stuffing,): (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM security_events WHERE event_type = 'credential_stuffing' AND created_at > NOW() - INTERVAL '24 hours'"
-    ).fetch_one(&pool).await?;
-
-    let (recent_injection_attempts,): (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM security_events WHERE event_type IN ('sql_injection_attempt', 'xss_attempt', 'path_traversal_attempt') AND created_at > NOW() - INTERVAL '24 hours'"
-    ).fetch_one(&pool).await?;
 
     Ok(Json(SecurityStats {
         total_events,

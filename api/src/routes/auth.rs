@@ -277,6 +277,16 @@ async fn login(
             None, Some(&req.email), Some(&client_ip), Some(user_agent), detected.details,
         ).await;
         if detected.should_block {
+            // Auto-block suspicious IPs
+            let _ = sqlx::query(
+                "INSERT INTO ip_blocklist (ip_address, reason, auto_blocked, is_active, expires_at)
+                 VALUES ($1, $2, true, true, NOW() + INTERVAL '24 hours')
+                 ON CONFLICT (ip_address) DO UPDATE SET is_active = true, expires_at = NOW() + INTERVAL '24 hours', updated_at = NOW()"
+            )
+            .bind(&client_ip)
+            .bind(format!("Auto-blocked: suspicious user agent"))
+            .execute(&pool)
+            .await;
             return Err(AppError::coded(ErrorCode::RequestBlocked));
         }
     }
@@ -289,6 +299,16 @@ async fn login(
         ).await;
         if detected.should_block {
             tracing::warn!("🔒 Login blocked — brute force detected: {} from {}", req.email, client_ip);
+            // Auto-block IP in blocklist (expires in 24 hours)
+            let _ = sqlx::query(
+                "INSERT INTO ip_blocklist (ip_address, reason, auto_blocked, is_active, expires_at)
+                 VALUES ($1, $2, true, true, NOW() + INTERVAL '24 hours')
+                 ON CONFLICT (ip_address) DO UPDATE SET is_active = true, expires_at = NOW() + INTERVAL '24 hours', updated_at = NOW()"
+            )
+            .bind(&client_ip)
+            .bind(format!("Auto-blocked: {} ({})", detected.event_type, req.email))
+            .execute(&pool)
+            .await;
             return Err(AppError::coded(ErrorCode::TooManyAttempts));
         }
     }
