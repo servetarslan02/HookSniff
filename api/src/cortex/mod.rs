@@ -4,6 +4,7 @@
 //! Tüm eşikler CortexConfig'den okunur (platform_settings.cortex_config).
 
 pub mod config;
+pub mod ml;
 pub mod signal_collector;
 pub mod profile_engine;
 pub mod anomaly_scorer;
