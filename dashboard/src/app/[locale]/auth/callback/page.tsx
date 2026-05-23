@@ -30,13 +30,15 @@ export default function AuthCallbackPage() {
 
   // Check if token is passed in URL (from OAuth callback)
   const token = params.get('token');
-  // Note: 'refresh' param is not needed — backend sets HttpOnly cookies
+   const refreshToken = params.get('refresh');
 
-  if (token) {
-   // NOTE: The backend already set HttpOnly auth cookies before redirecting.
-   // We only store the token in localStorage for the frontend API client.
-   // Do NOT set cookies via document.cookie — it cannot set HttpOnly flag.
-   localStorage.setItem('hooksniff_token', token);
+   if (token) {
+    // NOTE: The backend already set HttpOnly auth cookies before redirecting.
+    // We only store the token in localStorage for the frontend API client.
+    // Do NOT set cookies via document.cookie — it cannot set HttpOnly flag.
+    localStorage.setItem('hooksniff_token', token);
+    // Save refresh token for proxy fallback (Vercel doesn't forward Set-Cookie)
+    if (refreshToken) localStorage.setItem('hooksniff_refresh', refreshToken);
    // Clean URL and redirect
    window.history.replaceState({}, '', '/auth/callback');
    router.replace('/core');
