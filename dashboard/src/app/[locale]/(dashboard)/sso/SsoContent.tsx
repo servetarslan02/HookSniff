@@ -223,6 +223,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
    setDefaultRole(ssoConfig.default_role || 'viewer');
    setDomainInput(ssoConfig.verified_domain || '');
    setAdminBypass(ssoConfig.admin_bypass ?? true);
+   setClientSecret(''); // don't populate secret
    // Parse role_mapping into visual entries
    if (ssoConfig.role_mapping && typeof ssoConfig.role_mapping === 'object') {
     const entries = Object.entries(ssoConfig.role_mapping)
@@ -241,7 +242,7 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
     setTeamMapping(JSON.stringify(ssoConfig.team_mapping));
    }
   }
- }, [ssoConfig]);
+ }, [ssoConfig, loading]);
 
  // Sync visual entries → JSON strings (for API submission)
  useEffect(() => {
