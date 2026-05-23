@@ -317,7 +317,7 @@ export default function CompareContent() {
                       <div key={name} className={`p-4 ${isWinner ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''}`}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold text-gray-500 dark:text-slate-500">{labels[name]}</span>
-                          <Badge text={typeof data.badge === 'string' ? t(data.badge) : data.badge} variant={getBadgeVariant(section.winner, name)} />
+                          <Badge text={typeof data.badge === 'string' ? (data.badge.startsWith('badge') ? t(data.badge) : data.badge) : data.badge} variant={getBadgeVariant(section.winner, name)} />
                         </div>
                         <p className="text-sm text-gray-600 dark:text-slate-400">{t(data.text)}</p>
                       </div>
