@@ -207,6 +207,9 @@ impl Metrics {
         output.push_str("# TYPE cache_hit_rate_percent gauge\n");
         output.push_str(&format!("cache_hit_rate_percent {cache_hit_rate:.2}\n"));
 
+        // Append Cortex metrics
+        output.push_str(&crate::cortex::CORTEX_METRICS.to_prometheus());
+
         output
     }
 }

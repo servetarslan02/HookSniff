@@ -1,0 +1,25 @@
+-- Cortex Stage 2: Endpoint behavior profiles
+CREATE TABLE IF NOT EXISTS endpoint_profiles (
+    endpoint_id UUID PRIMARY KEY REFERENCES endpoints(id) ON DELETE CASCADE,
+    latency_p50 INT DEFAULT 0,
+    latency_p95 INT DEFAULT 0,
+    latency_p99 INT DEFAULT 0,
+    latency_stddev FLOAT DEFAULT 0.0,
+    success_rate_1h FLOAT DEFAULT 100.0,
+    success_rate_24h FLOAT DEFAULT 100.0,
+    success_rate_7d FLOAT DEFAULT 100.0,
+    baseline_success_rate FLOAT DEFAULT 100.0,
+    avg_deliveries_per_hour FLOAT DEFAULT 0.0,
+    peak_deliveries_per_hour FLOAT DEFAULT 0.0,
+    traffic_pattern JSONB DEFAULT '{}',
+    dominant_error_type VARCHAR(100),
+    error_distribution JSONB DEFAULT '{}',
+    busiest_hour INT,
+    quietest_hour INT,
+    weekday_avg FLOAT DEFAULT 0.0,
+    weekend_avg FLOAT DEFAULT 0.0,
+    sample_size INT DEFAULT 0,
+    confidence FLOAT DEFAULT 0.0,
+    last_updated TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
