@@ -62,10 +62,11 @@
 
 ## İkinci İnceleme: Job Scheduling
 - ML Engine lock çakışması düzeltildi (cortex_anomaly → cortex_ml)
-- Stage sıralaması offset ile garantilendi:
-  - dk 0: Stage 1 (hourly stats)
-  - dk 0+15sn: Stage 2 (profile)
-  - dk 1: Stage 3 (anomaly scoring)
-  - dk 1+90sn: Stage 4 (healing)
-  - dk 2: Stage 7 (predictions)
-  - dk 3: ML Engine (training)
+- Stage sıralaması offset ile garantilendi
+- **Merkezi Scheduler kuruldu** (cortex/scheduler.rs):
+  - Tek `tokio::spawn`, 30s tick loop
+  - 9 stage dependency sırasıyla çalışır
+  - Per-stage timeout koruması
+  - Per-stage distributed lock
+  - Graceful error isolation
+  - main.rs: 179 satır spawn boilerplate → 3 satır
