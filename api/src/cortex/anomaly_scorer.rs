@@ -144,10 +144,13 @@ pub async fn score_endpoint(
         obj.insert("method".into(), serde_json::json!(method));
     }
 
-    sqlx::query(
-        "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, $5)"
-    ).bind(endpoint_id).bind(cid).bind(score).bind(&factors_json).bind(&category)
-    .execute(pool).await?;
+    // Only store medium+ anomalies (score >= 40) — low scores are noise
+    if score >= 40 {
+        sqlx::query(
+            "INSERT INTO anomaly_scores (endpoint_id, customer_id, score, factors, category) VALUES ($1, $2, $3, $4, $5)"
+        ).bind(endpoint_id).bind(cid).bind(score).bind(&factors_json).bind(&category)
+        .execute(pool).await?;
+    }
 
     Ok(Some(AnomalyResult { score, factors: factors_json, category }))
 }
