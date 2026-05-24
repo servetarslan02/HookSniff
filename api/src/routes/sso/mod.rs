@@ -2,6 +2,8 @@
 
 pub mod handlers;
 pub mod scim;
+pub mod saml;
+pub mod oidc;
 
 use axum::{
     routing::{delete, get, post},
@@ -17,6 +19,8 @@ use tokio::sync::Mutex;
 // Re-export handler functions for router
 use handlers::*;
 use scim::*;
+use saml::*;
+use oidc::*;
 
 // ── Router ──────────────────────────────────────────────────
 
