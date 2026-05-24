@@ -1,6 +1,7 @@
 //! SSO/SAML/OIDC Configuration & Login API
 
 pub mod handlers;
+pub mod scim;
 
 use axum::{
     routing::{delete, get, post},
@@ -15,6 +16,7 @@ use tokio::sync::Mutex;
 
 // Re-export handler functions for router
 use handlers::*;
+use scim::*;
 
 // ── Router ──────────────────────────────────────────────────
 
