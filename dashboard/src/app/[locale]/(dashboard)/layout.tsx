@@ -21,14 +21,10 @@ import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, 
 const NotificationCenter = dynamic(() => import('@/components/NotificationCenter').then(m => ({ default: m.NotificationCenter })), { ssr: false });
 // PERFORMANCE: useRealtime lazy-load — connection indicator loads after initial render
 function useRealtimeLazy() {
-  const [connectionState, setConnectionState] = useState<'connected' | 'connecting' | 'fallback' | 'disconnected'>('connected');
+  const [connectionState] = useState<'connected' | 'connecting' | 'fallback' | 'disconnected'>('connected');
   useEffect(() => {
-    let mounted = true;
-    import('@/hooks/useRealtime').then(m => {
-      // Can't call hook dynamically, so just set a reasonable default
-      // The real hook is used in pages that need it (deliveries, etc.)
-    }).catch(() => {});
-    return () => { mounted = false; };
+    // Preload the real module so pages that need WebSocket get it from cache
+    import('@/hooks/useRealtime').catch(() => {});
   }, []);
   return { connectionState };
 }
