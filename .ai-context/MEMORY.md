@@ -86,7 +86,7 @@ Rust dosyaları (sso.rs, inbound.rs, teams.rs, worker/main.rs) büyük ama stabi
 | Orijinal | Önce | Sonra | Azalma |
 |----------|------|-------|--------|
 | `useDashboardData.ts` | 1106 | 172 | **%84** |
-| `useAdminData.ts` | 851 | 363 | **%57** |
+| `useAdminData.ts` | 851 | 92 | **%89** |
 
 **useDashboardData.ts split dosyaları (12 adet):**
 - useTeams.ts (171), useNotifications.ts (154), useBilling.ts (70)
@@ -95,8 +95,9 @@ Rust dosyaları (sso.rs, inbound.rs, teams.rs, worker/main.rs) büyük ama stabi
 - useEndpoints.ts (85), useAnalytics.ts (82), useWebhooks.ts (112)
 - useInboundConfigs.ts (57), useRateLimits.ts (37)
 
-**useAdminData.ts split dosyaları (2 adet):**
+**useAdminData.ts split dosyaları (5 adet):**
 - useAdminUserDetail.ts (402), useAdminSystem.ts (109)
+- useAdminStats.ts (84), useAdminSettings.ts (150), useAdminAlerts.ts (58)
 
 **Paylaşılan yardımcı:** validated.ts (15) — schema-validated fetcher wrapper
 
