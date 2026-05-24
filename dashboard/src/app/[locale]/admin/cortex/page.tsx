@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
-import { Activity, AlertTriangle, BarChart3, Brain, CheckCircle2, ChevronDown, Clock, Cpu, Gauge, Globe, Heart, Layers, LineChart, RefreshCw, Settings, Shield, ShieldCheck, TrendingDown, TrendingUp, Zap, ArrowRight, Info } from '@/components/icons';
+import { Activity, AlertTriangle, BarChart3, Brain, CheckCircle2, ChevronDown, Clock, Cpu, Gauge, Globe, Heart, Layers, LineChart, RefreshCw, Settings, Shield, ShieldCheck, TrendingDown, TrendingUp, Zap, ArrowRight, Info, Target } from '@/components/icons';
 
-type Tab = 'overview' | 'anomalies' | 'healing' | 'predictions';
+type Tab = 'overview' | 'anomalies' | 'healing' | 'predictions' | 'ml_quality' | 'proactive';
 
 interface CortexHealth {
   status: string;
@@ -54,6 +54,8 @@ export default function CortexPage() {
     { id: 'anomalies' as Tab, label: 'Sorunlar', icon: AlertTriangle },
     { id: 'healing' as Tab, label: 'Düzeltmeler', icon: ShieldCheck },
     { id: 'predictions' as Tab, label: 'Tahminler', icon: Brain },
+    { id: 'ml_quality' as Tab, label: 'ML Kalite', icon: Target },
+    { id: 'proactive' as Tab, label: 'Proaktif', icon: Shield },
   ];
 
   if (loading) {
@@ -123,6 +125,8 @@ export default function CortexPage() {
       {activeTab === 'anomalies' && <AnomaliesTab token={token} />}
       {activeTab === 'healing' && <HealingTab token={token} />}
       {activeTab === 'predictions' && <PredictionsTab token={token} />}
+      {activeTab === 'ml_quality' && <MLQualityTab token={token} />}
+      {activeTab === 'proactive' && <ProactiveTab token={token} />}
     </div>
   );
 }
@@ -539,7 +543,7 @@ function PredictionsTab({ token }: { token: string | null }) {
       {/* Summary */}
       <div className="glass-card p-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Gelecek Tahminleri</h3>
-        <p className="text-sm text-gray-500 dark:sentence-400">
+        <p className="text-sm text-gray-500 dark:text-slate-400">
           Cortex geçmiş verileri analiz ederek gelecekteki olası sorunları tahmin eder. Ne kadar çok veri toplanırsa tahminler o kadar doğru olur.
         </p>
       </div>
@@ -597,6 +601,328 @@ function PredictionsTab({ token }: { token: string | null }) {
                            factors.method}
                         </p>
                       )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── ML Kalite (ML Quality) ────────────────────────────────
+
+interface ModelQuality {
+  endpoint_id: string;
+  model_type: string;
+  total_predictions: number;
+  avg_error_pct: number;
+  accuracy_pct: number;
+  error_stddev: number;
+  quality_score: number;
+}
+
+function describeQuality(score: number, accuracy: number, avgError: number): { title: string; detail: string; emoji: string; color: string } {
+  if (score >= 80) {
+    return {
+      title: 'Mükemmel kalite',
+      detail: `Tahminler %${Math.round(accuracy)} doğrulukla çalışıyor, ortalama hata %${avgError.toFixed(1)}`,
+      emoji: '🟢',
+      color: 'text-emerald-600 dark:text-emerald-400',
+    };
+  }
+  if (score >= 60) {
+    return {
+      title: 'İyi kalite',
+      detail: `Tahminler %${Math.round(accuracy)} doğrulukla çalışıyor, bazı iyileştirmeler yapılabilir`,
+      emoji: '🟡',
+      color: 'text-yellow-600 dark:text-yellow-400',
+    };
+  }
+  if (score >= 40) {
+    return {
+      title: 'Düşük kalite',
+      detail: `Tahminler %${Math.round(accuracy)} doğrulukla çalışıyor — model sıfırlanabilir`,
+      emoji: '🟠',
+      color: 'text-orange-600 dark:text-orange-400',
+    };
+  }
+  return {
+    title: 'Kritik kalite',
+    detail: `Tahminler güvenilir değil — %${Math.round(accuracy)} doğruluk. Model sıfırlanmalı`,
+    emoji: '🔴',
+    color: 'text-red-600 dark:text-red-400',
+  };
+}
+
+function MLQualityTab({ token }: { token: string | null }) {
+  const [models, setModels] = useState<ModelQuality[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [resetting, setResetting] = useState(false);
+
+  const fetchQuality = () => {
+    if (!token) return;
+    apiFetch<any>('/cortex/ml/quality', { token })
+      .then((d) => setModels(d.models || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchQuality(); }, [token]);
+
+  const handleReset = async () => {
+    if (!token || resetting) return;
+    setResetting(true);
+    try {
+      await apiFetch<any>('/cortex/ml/quality/reset', { token, method: 'POST' });
+      fetchQuality();
+    } catch (e) {
+      console.error('Failed to reset ML models', e);
+    } finally {
+      setResetting(false);
+    }
+  };
+
+  if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
+
+  const overallScore = models.length > 0
+    ? Math.round(models.reduce((sum, m) => sum + m.quality_score, 0) / models.length)
+    : 0;
+
+  return (
+    <div className="space-y-4">
+      <div className="glass-card p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">ML Model Kalitesi</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400">
+              Cortex'in tahmin modellerinin doğruluğu. Modeller ne kadar doğru tahmin yapıyorsa, uyarılar o kadar güvenilir.
+            </p>
+          </div>
+          {models.some(m => m.quality_score < 60) && (
+            <button
+              onClick={handleReset}
+              disabled={resetting}
+              className="px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-xl text-sm font-medium hover:bg-red-200 dark:hover:bg-red-900/50 transition flex items-center gap-2"
+            >
+              <RefreshCw size={14} className={resetting ? 'animate-spin' : ''} />
+              Düşük Kaliteli Modelleri Sıfırla
+            </button>
+          )}
+        </div>
+      </div>
+
+      {models.length > 0 && (
+        <div className="glass-card p-5">
+          <div className="flex items-center gap-4">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+              overallScore >= 80 ? 'bg-emerald-100 dark:bg-emerald-900/30' :
+              overallScore >= 60 ? 'bg-yellow-100 dark:bg-yellow-900/30' :
+              'bg-red-100 dark:bg-red-900/30'
+            }`}>
+              <span className={`text-2xl font-bold ${
+                overallScore >= 80 ? 'text-emerald-600' :
+                overallScore >= 60 ? 'text-yellow-600' :
+                'text-red-600'
+              }`}>{overallScore}</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Genel Kalite Skoru</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                {models.length} model izleniyor — {models.filter(m => m.quality_score >= 60).length} sağlıklı
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {models.length === 0 ? (
+        <div className="glass-card p-8 text-center">
+          <Target size={48} className="mx-auto text-gray-300 dark:text-slate-600 mb-4" />
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">Henüz model verisi yok</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+            ML modellerinin kalite takibi için yeterli tahmin verisi gerekiyor. Birkaç saat sonra veri görünmeye başlayacak.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {models.map((m, i) => {
+            const info = describeQuality(m.quality_score, m.accuracy_pct, m.avg_error_pct);
+            return (
+              <div key={i} className="glass-card p-4 hover:shadow-md transition">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl mt-0.5">{info.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {m.model_type.replace(/_/g, ' ')}
+                      </p>
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                        m.quality_score >= 80 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                        m.quality_score >= 60 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                        m.quality_score >= 40 ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                      }`}>
+                        Skor: {Math.round(m.quality_score)}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
+                    <div className="grid grid-cols-3 gap-3 mt-3">
+                      <div className="text-center p-2 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-slate-400">Doğruluk</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">%{Math.round(m.accuracy_pct)}</p>
+                      </div>
+                      <div className="text-center p-2 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-slate-400">Ort. Hata</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">%{m.avg_error_pct.toFixed(1)}</p>
+                      </div>
+                      <div className="text-center p-2 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-slate-400">Tahmin Sayısı</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{m.total_predictions}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Proaktif Korumа (Proactive Healing) ───────────────────
+
+interface ProactiveInsight {
+  id: number;
+  customer_id: string;
+  insight_type: string;
+  title: string;
+  severity: string;
+  data: any;
+  created_at: string;
+}
+
+function describeProactiveInsight(insight: ProactiveInsight): { title: string; detail: string; emoji: string; advice: string } {
+  const type = insight.insight_type;
+  const severity = insight.severity;
+  const data = insight.data || {};
+
+  const base = {
+    title: insight.title || type.replace(/_/g, ' '),
+    detail: data.description || data.detail || '',
+    emoji: severity === 'critical' ? '🔴' : severity === 'warning' ? '🟠' : severity === 'info' ? '🟡' : '🟢',
+    advice: data.advice || data.recommendation || '',
+  };
+
+  if (type === 'proactive_latency_trend') {
+    return { ...base, detail: `Gecikme artıyor: ${data.trend || 'yükseliş trendi'}`, advice: base.advice || 'Endpoint\'i kontrol edin, sunucu yavaşlıyor olabilir' };
+  }
+  if (type === 'proactive_rate_limit_risk') {
+    return { ...base, detail: `Hız sınırı riski: ${data.usage_pct || '?'}% kullanım`, advice: base.advice || 'Rate limit\'i artırmayı veya istekleri azaltmayı düşünün' };
+  }
+  if (type === 'proactive_stress_detection') {
+    return { ...base, detail: `Sunucu stresi tespit edildi: ${data.metric || 'genel'}`, advice: base.advice || 'Sunucu kaynaklarını kontrol edin' };
+  }
+  if (type === 'proactive_cascade_risk') {
+    return { ...base, detail: `${data.affected_endpoints || '?'} endpoint etkilenebilir`, advice: base.advice || 'Ana endpoint\'i onarın, diğerleri de etkilenebilir' };
+  }
+
+  return base;
+}
+
+function ProactiveTab({ token }: { token: string | null }) {
+  const [insights, setInsights] = useState<ProactiveInsight[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!token) return;
+    apiFetch<any>('/cortex/proactive/status', { token })
+      .then((d) => setInsights(d.proactive_insights || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [token]);
+
+  if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
+
+  const criticalCount = insights.filter(i => i.severity === 'critical').length;
+  const warningCount = insights.filter(i => i.severity === 'warning').length;
+
+  return (
+    <div className="space-y-4">
+      <div className="glass-card p-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Proaktif Korumа</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400">
+          Cortex sorun çıkmadan önce uyarı verir. Gecikme artışı, sunucu stresi veya toplu kesinti riski tespit edilse burada gösterilir.
+        </p>
+      </div>
+
+      {insights.length > 0 && (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="glass-card p-4 text-center">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{insights.length}</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400">Aktif Uyarı</p>
+          </div>
+          <div className="glass-card p-4 text-center">
+            <p className="text-2xl font-bold text-red-600">{criticalCount}</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400">Kritik</p>
+          </div>
+          <div className="glass-card p-4 text-center">
+            <p className="text-2xl font-bold text-orange-600">{warningCount}</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400">Uyarı</p>
+          </div>
+        </div>
+      )}
+
+      {insights.length === 0 ? (
+        <div className="glass-card p-8 text-center">
+          <Shield size={48} className="mx-auto text-emerald-400 mb-4" />
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">Proaktif uyarı yok</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+            Cortex her şeyin normal olduğunu tespit etti. Sorun çıkma riski düşük.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {insights.map((insight, i) => {
+            const info = describeProactiveInsight(insight);
+            return (
+              <div key={i} className="glass-card p-4 hover:shadow-md transition">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl mt-0.5">{info.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{info.title}</p>
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                        insight.severity === 'critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                        insight.severity === 'warning' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                        insight.severity === 'info' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                        'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                      }`}>
+                        {insight.severity === 'critical' ? 'Kritik' : insight.severity === 'warning' ? 'Uyarı' : insight.severity === 'info' ? 'Bilgi' : 'Normal'}
+                      </span>
+                    </div>
+                    {info.detail && <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>}
+                    {info.advice && (
+                      <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <p className="text-xs text-blue-700 dark:text-blue-300 flex items-center gap-1">
+                          <Info size={12} />
+                          {info.advice}
+                        </p>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-4 mt-2">
+                      <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1">
+                        <Clock size={12} />
+                        {new Date(insight.created_at).toLocaleString('tr-TR')}
+                      </p>
+                      <p className="text-xs text-gray-400 dark:text-slate-500">
+                        {insight.insight_type.replace(/_/g, ' ')}
+                      </p>
                     </div>
                   </div>
                 </div>
