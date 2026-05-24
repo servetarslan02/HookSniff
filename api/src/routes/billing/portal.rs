@@ -29,6 +29,10 @@ pub(crate) struct UsageResponse {
     pub(crate) endpoints: UsageCounter,
     pub(crate) rate_limit: RateLimitInfo,
     pub(crate) retention_days: i64,
+    /// How many days of data the customer currently has (days since oldest delivery)
+    pub(crate) data_age_days: i64,
+    /// How many days until the oldest data gets deleted (retention_days - data_age_days)
+    pub(crate) data_expires_in_days: i64,
     pub(crate) period: PeriodInfo,
 }
 
@@ -70,6 +74,20 @@ pub async fn get_usage(
     let webhook_limit = plan.max_webhooks_per_day();
     let endpoint_limit = plan.max_endpoints() as u64;
 
+    // Calculate data age (days since oldest delivery)
+    let oldest_delivery: Option<chrono::NaiveDateTime> = sqlx::query_scalar(
+        "SELECT MIN(created_at) FROM deliveries WHERE customer_id = $1"
+    )
+    .bind(customer.id)
+    .fetch_one(&pool)
+    .await?;
+
+    let retention = plan.retention_days();
+    let data_age_days = oldest_delivery
+        .map(|oldest| (chrono::Utc::now().naive_utc() - oldest).num_days())
+        .unwrap_or(0);
+    let data_expires_in_days = (retention - data_age_days).max(0);
+
     Ok(Json(UsageResponse {
         plan: plan.as_str().to_string(),
         payment_provider: customer.payment_provider.clone(),
@@ -86,7 +104,9 @@ pub async fn get_usage(
         rate_limit: RateLimitInfo {
             requests_per_minute: plan.max_requests_per_minute(),
         },
-        retention_days: plan.retention_days(),
+        retention_days: retention,
+        data_age_days,
+        data_expires_in_days,
         period: {
             let now = chrono::Utc::now();
             let start = now.format("%Y-%m-01").to_string();
