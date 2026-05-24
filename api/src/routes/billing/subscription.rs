@@ -532,7 +532,7 @@ pub async fn upgrade_plan(
     if let Some(ref code) = req.discount_code {
         let code_upper = code.to_uppercase();
         if let Ok(Some(coupon)) = sqlx::query_as::<_, crate::models::coupon::CouponCode>(
-            "SELECT * FROM coupon_codes WHERE UPPER(code) = $1 AND type = 'internal' AND is_active = true"
+            "SELECT id, code, type, discount_type, discount_value, target_plan, polar_discount_id, max_redemptions, redemption_count, expires_at, is_active, created_by, created_at, updated_at FROM coupon_codes WHERE UPPER(code) = $1 AND type = 'internal' AND is_active = true"
         )
         .bind(&code_upper)
         .fetch_optional(&pool)

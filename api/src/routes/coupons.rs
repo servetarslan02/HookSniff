@@ -30,7 +30,7 @@ async fn validate_coupon(
 
     // Look up coupon
     let coupon = sqlx::query_as::<_, crate::models::coupon::CouponCode>(
-        "SELECT * FROM coupon_codes WHERE UPPER(code) = $1"
+        "SELECT id, code, type, discount_type, discount_value, target_plan, polar_discount_id, max_redemptions, redemption_count, expires_at, is_active, created_by, created_at, updated_at FROM coupon_codes WHERE UPPER(code) = $1"
     )
     .bind(&code)
     .fetch_optional(&pool)
