@@ -1,18 +1,28 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-24 GMT+8 (OpenClaw oturumu 2)
+> Son güncelleme: 2026-05-24 GMT+8 (OpenClaw oturumu 3 — Performans Optimizasyonu)
 
 ## ✅ Son Oturumda Yapılan İşler
 
-### _visibilityCleanup Fix (BUG)
-- `dashboard/src/lib/api.ts`: `setInterval` tarayıcıda sayı döndürür, primitive değerlere feature eklenemez
-- Cleanup fonksiyonu modül seviyesinde değişkene taşındı
-- Commit: `735b1eb8`
+### Performans Ölçümü (64 Sayfa)
+- Dashboard (50) + Admin (14) sayfa ölçüldü
+- Ortalama: 1,127ms | Medyan: 893ms | P95: 2,058ms
+- Admin sayfaları dashboard'dan %27 daha hızlı
+- Sonuçlar: `.ai-context/2026-05-24-perf-all-pages.json`
 
-### Cortex ↔ Worker Entegrasyonu
-- Migration 101: eksik sütunlar + tablo adı düzeltmesi
-- Worker: healing action, smart routing, ML outcome reporting
-- API: routing decisions tabloya kaydetme
+### Layout Lazy-Load (Commit: da460579)
+- NotificationCenter: `dynamic()` import (308 satır deferred)
+- useRealtime: lazy preload (95 satır + WebSocket deferred)
+- api.ts prefetch: tüm prefetchForRoute() → dynamic import()
+
+### useDashboardData Lazy-Load (Commit: 56eb7ab3)
+- api.ts (1,367 satır) + schemas/api.ts (941 satır) → lazy module loaders
+- Her hook queryFn/mutationFn içinde dynamic import() kullanıyor
+- Toplam ~2,711 satır FCP'den SONRA yükleniyor
+
+### TypeScript & Build
+- 0 TypeScript hatası
+- Build başarılı (26.3s compile)
 - Commit: `18932265`
 
 ### SSO Auth Cookie Fix (BUG)
