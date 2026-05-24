@@ -40,6 +40,7 @@
 - `02d85729` — Session log güncelleme
 - `acae7570` — OAuth double-click fix (PKCE removal)
 - `a9b6c5a7` — OAuth callback hard redirect fix
+- `1e40adfa` — Session duration fix (1h token, 90d refresh, visibility handler)
 
 ### 5. OAuth Double-Click Fix (2 iteration)
 
@@ -71,6 +72,23 @@
 - 🟡 Keycloak SSO test
 
 ## Servet'e Notlar
-1. `b820786a` push edildi, Cloud Build tetiklenmeli
+1. `1e40adfa` push edildi — session fix + OAuth fix + Cortex tabs
 2. Dashboard'daki Cortex sayfasında artık 6 tab var
 3. ML Quality ve Proactive Healing tab'ları otomatik API'den veri çeker
+4. OAuth ilk tıklamada çalışmalı (hard redirect fix)
+5. PC'de random logout sorunu çözüldü (1 saatlik token + visibility handler)
+6. Mobile'da oturum artık 90 gün sonra refresh token dolunca sona erer
+
+### Session Duration Fix (4 dosya)
+
+**Sorunlar:**
+- PC: Arka plan sekme → setInterval throttle → 15dk token doluyor → random logout
+- Mobile: Sekme canlı kalıyor → refresh asla durmuyor → oturum kapanmıyor
+
+**Düzeltmeler:**
+- `api/src/auth/jwt.rs`: Access token **15dk → 1 saat**
+- `api/src/routes/auth.rs`: Auth cookie **900 → 3600**, refresh token **30 gün → 90 gün**
+- `api/src/routes/oauth.rs`: OAuth cookie'leri de güncellendi
+- `dashboard/src/lib/api.ts`:
+  - Proactive refresh **12dk → 50dk** (1 saatlik token'a uygun)
+  - `visibilitychange` handler eklendi — sekme geri geldiğinde token 10dk'dan az kaldıysa hemen refresh
