@@ -1,48 +1,6 @@
 use anyhow::Result;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use sqlx::PgPool;
-
-/// Archive delivered deliveries to dead_letters before deleting them.
-async fn archive_deliveries(pool: &PgPool, before: DateTime<Utc>) -> Result<u64> {
-    // Move delivered/failed deliveries to dead_letters for archival
-    let result = sqlx::query(
-        r#"
-        INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts, created_at)
-        SELECT d.id, d.endpoint_id, d.customer_id, d.payload,
-               'retention_policy' || ' - ' || d.status, d.attempt_count, d.created_at
-        FROM deliveries d
-        WHERE d.status IN ('delivered', 'failed')
-          AND d.created_at < $1
-          AND NOT EXISTS (
-              SELECT 1 FROM dead_letters dl WHERE dl.delivery_id = d.id
-          )
-        "#,
-    )
-    .bind(before)
-    .execute(pool)
-    .await?;
-
-    tracing::info!(
-        "📦 Archived {} deliveries to dead_letters",
-        result.rows_affected()
-    );
-
-    // Now delete the archived deliveries
-    let deleted = sqlx::query(
-        r#"
-        DELETE FROM deliveries
-        WHERE status IN ('delivered', 'failed')
-          AND created_at < $1
-          AND id IN (SELECT delivery_id FROM dead_letters)
-        "#,
-    )
-    .bind(before)
-    .execute(pool)
-    .await?;
-
-    tracing::info!("🗑️ Deleted {} old deliveries", deleted.rows_affected());
-    Ok(deleted.rows_affected())
-}
 
 /// Delete expired idempotency keys.
 async fn cleanup_idempotency_keys(pool: &PgPool) -> Result<u64> {
@@ -370,8 +328,8 @@ mod tests {
 
     #[test]
     fn test_archive_deliveries_sql_is_nontrivial() {
-        // The archive_deliveries function uses inline SQL with INSERT INTO dead_letters
-        // and DELETE FROM deliveries. Full integration tests require a database.
+        // Per-customer retention uses inline SQL with INSERT INTO dead_letters
+        // and DELETE FROM deliveries per customer. Full integration tests require a database.
         // This test verifies the module compiles correctly.
     }
 
