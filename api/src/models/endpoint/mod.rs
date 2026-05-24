@@ -1,0 +1,387 @@
+mod endpoint_tests;
+
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
+pub struct Endpoint {
+    pub id: Uuid,
+    pub customer_id: Uuid,
+    pub url: String,
+    pub description: Option<String>,
+    pub is_active: bool,
+    #[serde(skip_serializing, default)]
+    pub signing_secret: String,
+    pub retry_policy: Option<serde_json::Value>,
+    pub created_at: DateTime<Utc>,
+    pub allowed_ips: Option<serde_json::Value>,
+    #[sqlx(default)]
+    pub event_filter: Option<Vec<String>>,
+    pub custom_headers: Option<serde_json::Value>,
+    #[serde(skip_serializing)]
+    pub old_signing_secret: Option<String>,
+    pub secret_rotated_at: Option<DateTime<Utc>>,
+    // Smart routing fields
+    pub routing_strategy: String,
+    pub fallback_url: Option<String>,
+    pub avg_response_ms: i32,
+    pub failure_streak: i32,
+    pub last_failure_at: Option<DateTime<Utc>>,
+    /// Event delivery format: "standard" or "cloudevents".
+    pub format: String,
+    // FIFO ordering fields (migration 007)
+    pub fifo_enabled: Option<bool>,
+    pub fifo_sequence: Option<i64>,
+    pub fifo_group_by_customer: Option<bool>,
+    pub fifo_max_wait_secs: Option<i32>,
+    // Throttle fields (migration 008)
+    pub throttle_rate: Option<i32>,
+    pub throttle_period_secs: Option<i32>,
+    pub throttle_strategy: Option<String>,
+    // Application grouping (migration 013)
+    pub application_id: Option<Uuid>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum RoutingStrategy {
+    RoundRobin,
+    Latency,
+    Failover,
+    Weighted,
+    Random,
+}
+
+impl RoutingStrategy {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::RoundRobin => "round-robin",
+            Self::Latency => "latency",
+            Self::Failover => "failover",
+            Self::Weighted => "weighted",
+            Self::Random => "random",
+        }
+    }
+
+    pub fn parse_str(s: &str) -> Self {
+        match s {
+            "latency" => Self::Latency,
+            "failover" => Self::Failover,
+            "weighted" => Self::Weighted,
+            "random" => Self::Random,
+            _ => Self::RoundRobin,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RetryPolicy {
+    pub max_attempts: i32,
+    pub backoff: String,
+    pub initial_delay_secs: i32,
+    pub max_delay_secs: i32,
+}
+
+impl Default for RetryPolicy {
+    fn default() -> Self {
+        Self {
+            max_attempts: 3,
+            backoff: "exponential".to_string(),
+            initial_delay_secs: 10,
+            max_delay_secs: 3600,
+        }
+    }
+}
+
+impl RetryPolicy {
+    pub fn from_value(val: Option<&serde_json::Value>) -> Self {
+        val.and_then(|v| serde_json::from_value(v.clone()).ok())
+            .unwrap_or_default()
+    }
+
+    pub fn delay_for_attempt(&self, attempt: i32) -> i64 {
+        let base = self.initial_delay_secs as i64;
+        match self.backoff.as_str() {
+            "exponential" => {
+                let delay = base * 2_i64.pow((attempt - 1).max(0) as u32);
+                delay.min(self.max_delay_secs as i64)
+            }
+            "linear" => {
+                let delay = base * attempt as i64;
+                delay.min(self.max_delay_secs as i64)
+            }
+            _ => base, // fixed
+        }
+    }
+}
+
+/// The event delivery format.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+#[derive(Default)]
+pub enum DeliveryFormat {
+    /// Standard HookSniff format (default).
+    #[default]
+    Standard,
+    /// CloudEvents v1.0 envelope format.
+    CloudEvents,
+}
+
+impl DeliveryFormat {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Standard => "standard",
+            Self::CloudEvents => "cloudevents",
+        }
+    }
+
+    pub fn parse_str(s: &str) -> Self {
+        match s {
+            "cloudevents" => Self::CloudEvents,
+            _ => Self::Standard,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CreateEndpointRequest {
+    pub url: String,
+    pub description: Option<String>,
+    pub allowed_ips: Option<Vec<String>>,
+    pub event_filter: Option<Vec<String>>,
+    pub custom_headers: Option<serde_json::Value>,
+    pub retry_policy: Option<RetryPolicy>,
+    pub routing_strategy: Option<String>,
+    pub fallback_url: Option<String>,
+    /// Event delivery format: "standard" (default) or "cloudevents".
+    pub format: Option<String>,
+    /// Application this endpoint belongs to (optional).
+    pub application_id: Option<Uuid>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EndpointResponse {
+    pub id: Uuid,
+    pub url: String,
+    pub description: Option<String>,
+    pub is_active: bool,
+    pub retry_policy: Option<serde_json::Value>,
+    pub created_at: DateTime<Utc>,
+    pub allowed_ips: Option<serde_json::Value>,
+    pub event_filter: Option<Vec<String>>,
+    pub custom_headers: Option<serde_json::Value>,
+    pub routing_strategy: String,
+    pub fallback_url: Option<String>,
+    pub avg_response_ms: i32,
+    pub failure_streak: i32,
+    /// Event delivery format: "standard" or "cloudevents".
+    pub format: String,
+    /// Application this endpoint belongs to.
+    pub application_id: Option<Uuid>,
+}
+
+impl Endpoint {
+    pub fn to_response(self) -> EndpointResponse {
+        EndpointResponse {
+            id: self.id,
+            url: self.url,
+            description: self.description,
+            is_active: self.is_active,
+            retry_policy: self.retry_policy,
+            created_at: self.created_at,
+            allowed_ips: self.allowed_ips,
+            event_filter: self.event_filter,
+            custom_headers: self.custom_headers,
+            routing_strategy: self.routing_strategy,
+            fallback_url: self.fallback_url,
+            avg_response_ms: self.avg_response_ms,
+            failure_streak: self.failure_streak,
+            format: self.format,
+            application_id: self.application_id,
+        }
+    }
+
+    /// Check if the given IP matches the endpoint's allowlist.
+    /// Returns true if no allowlist is configured (allow all).
+    pub fn is_ip_allowed(&self, client_ip: &str) -> bool {
+        let allowed = match &self.allowed_ips {
+            Some(ips) => {
+                if let Some(arr) = ips.as_array() {
+                    arr.iter()
+                        .filter_map(|v| v.as_str())
+                        .map(|s| s.to_string())
+                        .collect::<Vec<_>>()
+                } else {
+                    return true; // Invalid format, allow all
+                }
+            }
+            None => return true, // No allowlist, allow all
+        };
+
+        if allowed.is_empty() {
+            return true; // Empty allowlist, allow all
+        }
+
+        allowed.iter().any(|cidr| matches_cidr(client_ip, cidr))
+    }
+
+    /// Check if the given event type matches the endpoint's event filter.
+    /// Returns true if no filter is configured (accept all events).
+    pub fn matches_event_filter(&self, event_type: &str) -> bool {
+        let filters = match &self.event_filter {
+            Some(f) if !f.is_empty() => f,
+            _ => return true, // No filter, accept all
+        };
+
+        filters
+            .iter()
+            .any(|pattern| matches_wildcard(pattern, event_type))
+    }
+
+    /// Determine the target URL for delivery based on routing strategy.
+    /// Returns (url, used_fallback).
+    pub fn resolve_target_url(&self) -> (String, bool) {
+        let strategy = RoutingStrategy::parse_str(&self.routing_strategy);
+
+        match strategy {
+            RoutingStrategy::Failover => {
+                // Use fallback if failure streak >= 3 and fallback is configured
+                if self.failure_streak >= 3 {
+                    if let Some(ref fallback) = self.fallback_url {
+                        return (fallback.clone(), true);
+                    }
+                }
+                (self.url.clone(), false)
+            }
+            RoutingStrategy::Latency => {
+                // If primary is healthy (failure streak < 3), use it
+                // Otherwise prefer fallback if available
+                if self.failure_streak >= 3 {
+                    if let Some(ref fallback) = self.fallback_url {
+                        return (fallback.clone(), true);
+                    }
+                }
+                (self.url.clone(), false)
+            }
+            RoutingStrategy::Weighted => {
+                // Weighted: distribute traffic based on endpoint health.
+                // Healthier endpoints get more traffic.
+                // If fallback exists, use it proportionally to primary's failure rate.
+                if let Some(ref fallback) = self.fallback_url {
+                    if self.failure_streak > 0 {
+                        // Higher failure streak = more traffic to fallback
+                        // failure_streak 1-2: ~30% fallback, 3+: ~70% fallback
+                        let fallback_weight = (self.failure_streak as f64 * 0.2).min(0.8);
+                        let roll: f64 = {
+                            use std::collections::hash_map::DefaultHasher;
+                            use std::hash::{Hash, Hasher};
+                            let mut h = DefaultHasher::new();
+                            self.id.hash(&mut h);
+                            chrono::Utc::now().timestamp_nanos_opt().unwrap_or(0).hash(&mut h);
+                            (h.finish() % 1000) as f64 / 1000.0
+                        };
+                        if roll < fallback_weight {
+                            return (fallback.clone(), true);
+                        }
+                    }
+                }
+                (self.url.clone(), false)
+            }
+            RoutingStrategy::Random => {
+                // Random: 50/50 chance between primary and fallback
+                if let Some(ref fallback) = self.fallback_url {
+                    let roll: bool = {
+                        use std::collections::hash_map::DefaultHasher;
+                        use std::hash::{Hash, Hasher};
+                        let mut h = DefaultHasher::new();
+                        self.id.hash(&mut h);
+                        chrono::Utc::now().timestamp_nanos_opt().unwrap_or(0).hash(&mut h);
+                        (h.finish() % 2) == 0
+                    };
+                    if roll {
+                        return (fallback.clone(), true);
+                    }
+                }
+                (self.url.clone(), false)
+            }
+            RoutingStrategy::RoundRobin => (self.url.clone(), false),
+        }
+    }
+
+    /// Check if endpoint is healthy for routing (not recently failing).
+    /// Returns true if the endpoint hasn't failed 3+ times in the last 5 minutes.
+    pub fn is_healthy(&self) -> bool {
+        if self.failure_streak < 3 {
+            return true;
+        }
+        // Check if the last failure was more than 5 minutes ago
+        if let Some(last_failure) = self.last_failure_at {
+            let elapsed = chrono::Utc::now() - last_failure;
+            elapsed.num_minutes() >= 5
+        } else {
+            true
+        }
+    }
+}
+
+/// Simple wildcard matching. `*` matches any sequence of characters.
+fn matches_wildcard(pattern: &str, value: &str) -> bool {
+    if pattern == "*" {
+        return true;
+    }
+
+    if !pattern.contains('*') {
+        return pattern == value;
+    }
+
+    let parts: Vec<&str> = pattern.split('*').collect();
+    if parts.len() == 2 {
+        let prefix = parts[0];
+        let suffix = parts[1];
+        value.starts_with(prefix)
+            && value.ends_with(suffix)
+            && value.len() >= prefix.len() + suffix.len()
+    } else {
+        let first = parts[0];
+        let last = parts[parts.len() - 1];
+        value.starts_with(first) && value.ends_with(last)
+    }
+}
+
+/// Check if an IP address matches a CIDR block or exact IP.
+fn matches_cidr(ip: &str, cidr: &str) -> bool {
+    if ip == cidr {
+        return true;
+    }
+
+    let parts: Vec<&str> = cidr.split('/').collect();
+    if parts.len() != 2 {
+        return ip == cidr;
+    }
+
+    let network = match parts[0].parse::<std::net::Ipv4Addr>() {
+        Ok(ip) => ip,
+        Err(_) => return false,
+    };
+
+    let prefix_len: u32 = match parts[1].parse() {
+        Ok(n) if n <= 32 => n,
+        _ => return false,
+    };
+
+    let client = match ip.parse::<std::net::Ipv4Addr>() {
+        Ok(ip) => ip,
+        Err(_) => return false,
+    };
+
+    if prefix_len == 0 {
+        return true;
+    }
+
+    let mask = !((1u32 << (32 - prefix_len)) - 1);
+    let network_bits = u32::from_be_bytes(network.octets());
+    let client_bits = u32::from_be_bytes(client.octets());
+
+    (network_bits & mask) == (client_bits & mask)
+}
