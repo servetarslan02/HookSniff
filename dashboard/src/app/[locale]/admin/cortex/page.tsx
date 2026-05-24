@@ -17,6 +17,9 @@ interface CortexHealth {
     action_memory_total: number;
     predictions_24h: number;
     active_insights: number;
+    ml_quality_samples_24h: number;
+    proactive_insights: number;
+    ml_predictions_total: number;
   };
 }
 
@@ -191,6 +194,20 @@ function OverviewTab({ health }: { health: CortexHealth | null }) {
       icon: BarChart3,
       color: 'text-purple-600',
       description: 'Toplanan saatlik istatistik',
+    },
+    {
+      label: 'ML Tahmin',
+      value: m.ml_predictions_total,
+      icon: Brain,
+      color: 'text-indigo-600',
+      description: m.ml_predictions_total === 0 ? 'Henüz tahmin üretilmedi' : `${m.ml_quality_samples_24h} kalite ölçümü (24s)`,
+    },
+    {
+      label: 'Proaktif Uyarı',
+      value: m.proactive_insights,
+      icon: Shield,
+      color: m.proactive_insights > 0 ? 'text-orange-600' : 'text-emerald-600',
+      description: m.proactive_insights === 0 ? 'Sorun yok, sistem izliyor' : 'Dikkat gereken durumlar var',
     },
   ];
 
@@ -739,7 +756,11 @@ function MLQualityTab({ token }: { token: string | null }) {
           <Target size={48} className="mx-auto text-gray-300 dark:text-slate-600 mb-4" />
           <p className="text-lg font-semibold text-gray-900 dark:text-white">Henüz model verisi yok</p>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-            ML modellerinin kalite takibi için yeterli tahmin verisi gerekiyor. Birkaç saat sonra veri görünmeye başlayacak.
+            Cortex'in tahmin modelleri veri topladıkça kalite metrikleri burada görünecek. 
+            İlk sonuçlar için en az birkaç saatlik webhook trafiği gerekiyor.
+          </p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-3">
+            📊 ML kalite kontrolü her saat başı çalışır · Tahminler her 15 dakikada bir üretilir
           </p>
         </div>
       ) : (
@@ -879,6 +900,10 @@ function ProactiveTab({ token }: { token: string | null }) {
           <p className="text-lg font-semibold text-gray-900 dark:text-white">Proaktif uyarı yok</p>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
             Cortex her şeyin normal olduğunu tespit etti. Sorun çıkma riski düşük.
+            Gecikme artışı, sunucu stresi veya toplu kesinti riski tespit edilirse burada gösterilecek.
+          </p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-3">
+            🛡️ Proaktif analiz her 15 dakikada bir çalışır
           </p>
         </div>
       ) : (
