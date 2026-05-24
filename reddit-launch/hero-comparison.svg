@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f23"/>
+      <stop offset="100%" style="stop-color:#1a1a3e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg3)"/>
+
+  <!-- Title -->
+  <text x="600" y="60" font-family="system-ui, sans-serif" font-size="36" font-weight="800" fill="white" text-anchor="middle">Why Developers Choose HookSniff</text>
+
+  <!-- Comparison Table -->
+  <!-- Header -->
+  <rect x="80" y="90" rx="8" ry="8" width="1040" height="50" fill="#1e1e2e"/>
+  <text x="300" y="122" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="#64748b" text-anchor="middle">Feature</text>
+  <text x="600" y="122" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="#f97316" text-anchor="middle">🪝 HookSniff</text>
+  <text x="900" y="122" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="#64748b" text-anchor="middle">Others</text>
+
+  <!-- Rows -->
+  <rect x="80" y="150" rx="0" ry="0" width="1040" height="50" fill="#15152a"/>
+  <text x="300" y="180" font-family="system-ui, sans-serif" font-size="15" fill="#cbd5e1" text-anchor="middle">Free tier</text>
+  <text x="600" y="180" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#22c55e" text-anchor="middle">10,000/mo ✅</text>
+  <text x="900" y="180" font-family="system-ui, sans-serif" font-size="15" fill="#ef4444" text-anchor="middle">100/mo or none ❌</text>
+
+  <rect x="80" y="200" rx="0" ry="0" width="1040" height="50" fill="#1e1e2e"/>
+  <text x="300" y="230" font-family="system-ui, sans-serif" font-size="15" fill="#cbd5e1" text-anchor="middle">Hosting cost</text>
+  <text x="600" y="230" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#22c55e" text-anchor="middle">$0/month ✅</text>
+  <text x="900" y="230" font-family="system-ui, sans-serif" font-size="15" fill="#ef4444" text-anchor="middle">$50-500/mo ❌</text>
+
+  <rect x="80" y="250" rx="0" ry="0" width="1040" height="50" fill="#15152a"/>
+  <text x="300" y="280" font-family="system-ui, sans-serif" font-size="15" fill="#cbd5e1" text-anchor="middle">HMAC signatures</text>
+  <text x="600" y="280" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#22c55e" text-anchor="middle">SHA-256 ✅</text>
+  <text x="900" y="280" font-family="system-ui, sans-serif" font-size="15" fill="#fbbf24" text-anchor="middle">Sometimes ⚠️</text>
+
+  <rect x="80" y="300" rx="0" ry="0" width="1040" height="50" fill="#1e1e2e"/>
+  <text x="300" y="330" font-family="system-ui, sans-serif" font-size="15" fill="#cbd5e1" text-anchor="middle">SDKs</text>
+  <text x="600" y="330" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#22c55e" text-anchor="middle">11 languages ✅</text>
+  <text x="900" y="330" font-family="system-ui, sans-serif" font-size="15" fill="#fbbf24" text-anchor="middle">2-4 languages ⚠️</text>
+
+  <rect x="80" y="350" rx="0" ry="0" width="1040" height="50" fill="#15152a"/>
+  <text x="300" y="380" font-family="system-ui, sans-serif" font-size="15" fill="#cbd5e1" text-anchor="middle">Open source</text>
+  <text x="600" y="380" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#22c55e" text-anchor="middle">MIT License ✅</text>
+  <text x="900" y="380" font-family="system-ui, sans-serif" font-size="15" fill="#ef4444" text-anchor="middle">Closed source ❌</text>
+
+  <rect x="80" y="400" rx="0" ry="0" width="1040" height="50" fill="#1e1e2e"/>
+  <text x="300" y="430" font-family="system-ui, sans-serif" font-size="15" fill="#cbd5e1" text-anchor="middle">Self-hostable</text>
+  <text x="600" y="430" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#22c55e" text-anchor="middle">Yes ✅</text>
+  <text x="900" y="430" font-family="system-ui, sans-serif" font-size="15" fill="#ef4444" text-anchor="middle">No ❌</text>
+
+  <rect x="80" y="450" rx="0" ry="0" width="1040" height="50" fill="#15152a"/>
+  <text x="300" y="480" font-family="system-ui, sans-serif" font-size="15" fill="#cbd5e1" text-anchor="middle">Dashboard</text>
+  <text x="600" y="480" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="#22c55e" text-anchor="middle">41 pages ✅</text>
+  <text x="900" y="480" font-family="system-ui, sans-serif" font-size="15" fill="#fbbf24" text-anchor="middle">Basic ⚠️</text>
+
+  <!-- Bottom CTA -->
+  <rect x="300" y="530" rx="30" ry="30" width="600" height="60" fill="#f97316"/>
+  <text x="600" y="567" font-family="system-ui, sans-serif" font-size="22" font-weight="800" fill="white" text-anchor="middle">Start Free → hooksniff.vercel.app</text>
+
+  <text x="600" y="615" font-family="system-ui, sans-serif" font-size="14" fill="#64748b" text-anchor="middle">No credit card • 10,000 webhooks/month • Cancel anytime</text>
+
+</svg>
