@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-25 GMT+8 (useAdminData hook split tamamlandı)
+> Son güncelleme: 2026-05-25 GMT+8 (useDashboardData hook split tamamlandı — 2. oturum)
 
 ## 🚀 Hızlı Başlangıç
 
@@ -14,31 +14,31 @@
 
 ## ✅ Son Oturumda Yapılan İşler
 
-### useDashboardData.ts Hook Split (3 adım, tamamlandı)
-- `useTeams.ts` — 14 hook (171 satır)
-- `useNotifications.ts` — 5 hook (154 satır)
-- `useBilling.ts` — 4 hook (70 satır)
-- `useDashboardData.ts`: 1106 → 754 satır (%32 küçüldü)
+### useDashboardData.ts — Tam Hook Split (10 dosya çıkarıldı)
+Orijinal 1106 satır → **172 satır** (%84 küçülme)
 
-### useAdminData.ts Hook Split (2 adım, tamamlandı)
-- `useAdminUserDetail.ts` — 30 hook (402 satır)
-- `useAdminSystem.ts` — 7 hook (109 satır)
-- `useAdminData.ts`: 851 → 363 satır (%57 küçüldü)
+| Dosya | Satır | Hook Sayısı |
+|-------|-------|-------------|
+| useTeams.ts | 171 | 14 |
+| useNotifications.ts | 154 | 5 |
+| useBilling.ts | 70 | 4 |
+| useAlerts.ts | 61 | 5 |
+| useTransforms.ts | 68 | 5 |
+| usePortal.ts | 68 | 5 |
+| useApiKeys.ts | 45 | 4 |
+| useServiceTokens.ts | 53 | 5 |
+| useEndpoints.ts | 85 | 4 |
+| useAnalytics.ts | 82 | 5 |
+| useWebhooks.ts | 112 | 6 |
+| useInboundConfigs.ts | 57 | 4 |
+| useRateLimits.ts | 37 | 3 |
 
-### Toplam Etki
-| Dosya | Önce | Sonra | Azalma |
-|-------|------|-------|--------|
-| useDashboardData.ts | 1106 | 754 | %32 |
-| useAdminData.ts | 851 | 363 | %57 |
-| **Toplam** | **1957** | **1117** | **%43** |
-
-### Yeni Dosyalar (7 adet)
-- useTeams.ts (171), useNotifications.ts (154), useBilling.ts (70)
-- useAdminUserDetail.ts (402), useAdminSystem.ts (109)
+### Paylaşılan yardımcı
+- `validated.ts` (15 satır) — schema-validated fetcher wrapper
 
 ### Her adımda:
 - ✅ `npx tsc --noEmit` → 0 hata
-- ✅ `npm run build` → exit 0, 363 sayfa
+- ✅ `npm run build` → exit 0
 - ✅ Re-export'lar → backward compatible
 - ✅ GitHub push
 
@@ -48,12 +48,10 @@
 
 Hook split'ler tamamlandı. Sıradaki adımlar Servet'in onayına bağlı:
 
-### Opsiyonel İyileştirmeler
-- [ ] `useAlerts.ts` çıkarma (useDashboardData.ts'den, ~60 satır)
-- [ ] `useTransforms.ts` çıkarma (~60 satır)
-- [ ] `usePortal.ts` çıkarma (~60 satır)
-- [ ] `useApiKeys.ts` çıkarma (~50 satır)
-- [ ] `useServiceTokens.ts` çıkarma (~60 satır)
+### useAdminData.ts Kalan Split (363 satır)
+- [ ] `useAdminUsers.ts` çıkarma (~100 satır)
+- [ ] `useAdminEndpoints.ts` çıkarma (~80 satır)
+- [ ] `useAdminBilling.ts` çıkarma (~60 satır)
 
 ### Veya yeni büyük görevler
 - [ ] Backend integration tests
