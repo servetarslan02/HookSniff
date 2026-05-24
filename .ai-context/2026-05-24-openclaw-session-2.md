@@ -61,6 +61,24 @@
   - Çözüm: `useEndpoints` ile endpoint_id → URL çözümleme
   - `endpointUrlMap` cache'den URL'yi bulur, yoksa ID'ye düşer
 
+### 6. Cortex ↔ Worker Entegrasyonu (BÜYÜK FIX)
+**Sorun:** Cortex karar veriyor ama worker uygulamıyordu.
+
+**Migration (`101_cortex_worker_integration.sql`):**
+- `endpoints.active_url` — smart routing URL switching
+- `endpoints.routing_config` — fallback URL yapılandırması
+- `delivery_attempts.response_url` — URL scoring
+- `routing_decisions` → `cortex_routing_decisions` tablo adı düzeltmesi
+
+**Worker (`main.rs`):**
+- Delivery öncesi: healing action kontrolü (timeout ayarlama)
+- Delivery öncesi: smart routing kontrolü (URL değiştirme)
+- Delivery sonrası: ML learning'e outcome raporlama
+- Her 5 dk: endpoint sağlık metrikleri raporlama
+
+**API (`smart_routing.rs`):**
+- Routing kararlarını `cortex_routing_decisions` tablosuna kaydetme
+
 ## Commitler
 - `d0e5088d` — SSO auth cookie fix + unwrap cleanup + session log
 - `735b1eb8` — Fix _visibilityCleanup: timer number property fix
