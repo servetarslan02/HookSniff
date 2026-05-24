@@ -34,12 +34,20 @@
 
 | Dosya | Satır | Öncelik |
 |-------|-------|---------|
-| `email.rs` | 1104 | Orta |
-| `config.rs` | 1060 | Orta |
 | `middleware/mod.rs` | 1052 | Orta |
 | `billing/stripe.rs` | 999 | Düşük |
 | `billing/mod.rs` | 984 | Düşük |
 | `sso/SsoContent.tsx` | 1310 | Düşük (Dashboard) |
+
+### email.rs Split — TAMAMLANDI ✅
+- 1104 → 566 satır (%49 küçülme)
+- 2 yeni modül: email_templates.rs, email_tests.rs
+- GitHub push: `c6a99711`
+
+### config.rs Split — TAMAMLANDI ✅
+- 1060 → 353 satır (%67 küçülme)
+- 1 yeni modül: config_tests.rs
+- GitHub push: `b12a1b28`
 
 ### worker/main.rs Split — TAMAMLANDI ✅
 - 1883 → 953 satır (%49 küçülme)
