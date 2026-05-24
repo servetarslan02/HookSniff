@@ -16,7 +16,7 @@ use crate::error::AppError;
 use crate::middleware::{generate_api_key, hash_api_key};
 use crate::models::customer::Customer;
 
-use super::handlers::{auto_join_team_direct, store_sso_user_attributes};
+use super::helpers::{auto_join_team_direct, store_sso_user_attributes};
 
 // ── SCIM Types ──────────────────────────────────────────────
 

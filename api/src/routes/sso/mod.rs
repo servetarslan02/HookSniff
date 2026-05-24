@@ -4,6 +4,7 @@ pub mod handlers;
 pub mod scim;
 pub mod saml;
 pub mod oidc;
+pub mod helpers;
 
 use axum::{
     routing::{delete, get, post},
