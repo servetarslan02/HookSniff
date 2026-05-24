@@ -596,31 +596,35 @@ async fn list_teams(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<TeamResponse>>, AppError> {
-    let teams = sqlx::query_as::<_, Team>(
-        r#"SELECT t.* FROM teams t
-           INNER JOIN team_members tm ON tm.team_id = t.id
-           WHERE tm.customer_id = $1
-           ORDER BY t.updated_at DESC LIMIT 100"#,
+    // Single query with COUNT(*) OVER() to avoid N+1
+    let teams = sqlx::query_as::<_, (Uuid, String, Uuid, i64, chrono::DateTime<chrono::Utc>, chrono::DateTime<chrono::Utc>)>(
+        r#"SELECT t.id, t.name, t.owner_id,
+                  COUNT(tm2.customer_id) OVER (PARTITION BY t.id) AS member_count,
+                  t.created_at, t.updated_at
+           FROM teams t
+           INNER JOIN team_members tm ON tm.team_id = t.id AND tm.customer_id = $1
+           LEFT JOIN team_members tm2 ON tm2.team_id = t.id
+           ORDER BY t.updated_at DESC
+           LIMIT 100"#,
     )
     .bind(customer.id)
     .fetch_all(&pool)
     .await?;
 
+    // Deduplicate (LEFT JOIN can multiply rows)
+    let mut seen = std::collections::HashSet::new();
     let mut result = Vec::with_capacity(teams.len());
-    for team in teams {
-        let count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM team_members WHERE team_id = $1")
-            .bind(team.id)
-            .fetch_one(&pool)
-            .await?;
-
-        result.push(TeamResponse {
-            id: team.id,
-            name: team.name,
-            owner_id: team.owner_id,
-            member_count: count.0,
-            created_at: team.created_at,
-            updated_at: team.updated_at,
-        });
+    for (id, name, owner_id, member_count, created_at, updated_at) in teams {
+        if seen.insert(id) {
+            result.push(TeamResponse {
+                id,
+                name,
+                owner_id,
+                member_count,
+                created_at,
+                updated_at,
+            });
+        }
     }
 
     Ok(Json(result))
