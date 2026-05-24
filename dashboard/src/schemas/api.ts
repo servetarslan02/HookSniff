@@ -492,6 +492,8 @@ export const BillingUsageSchema = z.object({
     requests_per_minute: z.number(),
   }).optional(),
   retention_days: z.number().optional(),
+  data_age_days: z.number().optional(),
+  data_expires_in_days: z.number().optional(),
 });
 export type BillingUsageValidated = z.infer<typeof BillingUsageSchema>;
 

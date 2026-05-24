@@ -199,15 +199,74 @@ async fn cleanup_old_payment_retries(pool: &PgPool) -> Result<u64> {
 }
 
 /// Run the retention job. Call this periodically (e.g., daily).
-pub async fn run_retention(pool: &PgPool, retention_days: i64) -> Result<()> {
-    tracing::info!(
-        "🔄 Running retention job (retention_days={})",
-        retention_days
-    );
+///
+/// Per-customer retention: each customer's data is retained based on their plan's
+/// retention_days (7 for Developer, 14 for Startup, 180 for Pro, 365 for Enterprise).
+pub async fn run_retention(pool: &PgPool, _default_retention_days: i64) -> Result<()> {
+    tracing::info!("🔄 Running per-customer retention job");
 
-    let cutoff = Utc::now() - chrono::Duration::days(retention_days);
+    // Get all active customers with their plan
+    let customers: Vec<(uuid::Uuid, String)> = sqlx::query_as(
+        "SELECT id, plan FROM customers WHERE is_active = true"
+    )
+    .fetch_all(pool)
+    .await?;
 
-    archive_deliveries(pool, cutoff).await?;
+    let mut total_deleted = 0u64;
+
+    for (customer_id, plan_str) in &customers {
+        let plan = crate::billing::Plan::parse_str(plan_str);
+        let retention = plan.retention_days();
+        let cutoff = Utc::now() - chrono::Duration::days(retention);
+
+        // Archive and delete this customer's old deliveries
+        let archived = sqlx::query(
+            r#"
+            INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts, created_at)
+            SELECT d.id, d.endpoint_id, d.customer_id, d.payload,
+                   'retention_policy - ' || d.status, d.attempt_count, d.created_at
+            FROM deliveries d
+            WHERE d.customer_id = $1
+              AND d.status IN ('delivered', 'failed')
+              AND d.created_at < $2
+              AND NOT EXISTS (
+                  SELECT 1 FROM dead_letters dl WHERE dl.delivery_id = d.id
+              )
+            "#,
+        )
+        .bind(customer_id)
+        .bind(cutoff)
+        .execute(pool)
+        .await?;
+
+        let deleted = sqlx::query(
+            r#"
+            DELETE FROM deliveries
+            WHERE customer_id = $1
+              AND status IN ('delivered', 'failed')
+              AND created_at < $2
+              AND id IN (SELECT delivery_id FROM dead_letters WHERE customer_id = $1)
+            "#,
+        )
+        .bind(customer_id)
+        .bind(cutoff)
+        .execute(pool)
+        .await?;
+
+        if deleted.rows_affected() > 0 {
+            tracing::info!(
+                "🗑️ Customer {}: deleted {} deliveries older than {} days (plan: {})",
+                customer_id, deleted.rows_affected(), retention, plan_str
+            );
+            total_deleted += deleted.rows_affected();
+        }
+    }
+
+    if total_deleted > 0 {
+        tracing::info!("🗑️ Total: {} old deliveries deleted across all customers", total_deleted);
+    }
+
+    // Global cleanup tasks (not per-customer)
     cleanup_idempotency_keys(pool).await?;
     cleanup_webhook_queue(pool).await?;
     cleanup_seen_webhooks(pool).await?;

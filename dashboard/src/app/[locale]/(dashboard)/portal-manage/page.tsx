@@ -33,6 +33,8 @@ export default function PortalPage() {
   // Prefer retention from billing usage API (authoritative, from DB plan),
   // fallback to plans API lookup
   const retentionDays = billingUsage?.retention_days ?? planLimits?.retention ?? null;
+  const dataAgeDays = billingUsage?.data_age_days ?? 0;
+  const dataExpiresInDays = billingUsage?.data_expires_in_days ?? null;
 
   const webhookUsed = billingUsage?.webhooks?.used ?? 0;
   const webhookRawLimit = billingUsage?.webhooks?.limit;
@@ -174,13 +176,36 @@ export default function PortalPage() {
             <div className="flex justify-between text-sm mb-2">
               <span className="text-gray-600 dark:text-slate-400">{tb('dataRetention')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
-                {retentionDays ?? '—'} {tb('days')}
+                {dataExpiresInDays !== null && dataExpiresInDays > 0
+                  ? `${dataExpiresInDays} ${tb('days')} ${tb('remaining') || 'kaldı'}`
+                  : dataExpiresInDays === 0
+                  ? (tb('dataExpired') || 'Süresi doldu')
+                  : `${retentionDays ?? '—'} ${tb('days')}`
+                }
               </span>
             </div>
             <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2">
-              <div className="h-2 rounded-full bg-brand-500" style={{ width: '100%' }} />
+              <div
+                className={`h-2 rounded-full transition-all ${
+                  dataExpiresInDays !== null && dataExpiresInDays <= 7
+                    ? 'bg-red-500'
+                    : dataExpiresInDays !== null && dataExpiresInDays <= 30
+                    ? 'bg-yellow-500'
+                    : 'bg-brand-500'
+                }`}
+                style={{
+                  width: retentionDays && retentionDays > 0
+                    ? `${Math.max(2, Math.min(100, ((retentionDays - dataAgeDays) / retentionDays) * 100))}%`
+                    : '100%',
+                }}
+              />
             </div>
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">{tb('retentionDesc')}</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">
+              {dataAgeDays > 0
+                ? `${dataAgeDays} ${tb('daysOldData') || 'günlük veri var'} — ${retentionDays} ${tb('days')} ${tb('retentionLabel') || 'saklanır'}`
+                : tb('retentionDesc')
+              }
+            </p>
           </div>
 
           {/* Plan Limits Grid */}
