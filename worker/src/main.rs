@@ -951,8 +951,3 @@ async fn process_pending(
 }
 
 // ── Delivery outcome helpers (Item 293: reduce function length) ──────
-
-/// Recover webhook_queue records stuck in "processing" for more than 5 minutes.
-///
-/// When the worker crashes mid-delivery, records stay in "processing" forever.
-/// This reaper checks max_attempts:
