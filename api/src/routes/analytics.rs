@@ -29,6 +29,7 @@ pub struct AnalyticsQuery {
 impl AnalyticsQuery {
     fn interval_hours(&self) -> i64 {
         match self.range.as_deref() {
+            Some("90d") => 90 * 24,
             Some("30d") => 30 * 24,
             Some("7d") => 7 * 24,
             _ => 24, // default 24h
@@ -37,6 +38,7 @@ impl AnalyticsQuery {
 
     fn bucket_size_hours(&self) -> i64 {
         match self.range.as_deref() {
+            Some("90d") => 24,  // daily buckets
             Some("30d") => 24, // daily buckets
             Some("7d") => 6,   // 6-hour buckets
             _ => 1,            // hourly buckets for 24h
@@ -69,7 +71,7 @@ pub struct SuccessRateResponse {
 
 #[derive(Debug, Serialize)]
 pub struct LatencyBucket {
-    pub timestamp: String,
+    pub ts: String,
     pub avg_ms: f64,
     pub p95_ms: f64,
 }
@@ -218,7 +220,7 @@ async fn latency_trend(
         buckets: buckets
             .into_iter()
             .map(|(ts, avg, p95)| LatencyBucket {
-                timestamp: ts.to_string(),
+                ts: ts.to_string(),
                 avg_ms: avg,
                 p95_ms: p95,
             })
@@ -467,7 +469,7 @@ mod tests {
     #[test]
     fn test_latency_bucket_serialization() {
         let bucket = LatencyBucket {
-            timestamp: "2024-01-01 12:00:00".to_string(),
+            ts: "2024-01-01 12:00:00".to_string(),
             avg_ms: 150.5,
             p95_ms: 300.0,
         };
