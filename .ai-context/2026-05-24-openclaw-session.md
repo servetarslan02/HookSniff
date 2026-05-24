@@ -37,6 +37,24 @@
 - `b820786a` — Cortex dashboard tab'ları
 - `44ae028f` — .ai-context güncelleme
 - `a70453c6` — Vercel build fix
+- `02d85729` — Session log güncelleme
+- `acae7570` — OAuth double-click fix
+
+### 5. OAuth Double-Click Fix (2 dosya)
+
+**Root Cause:** GitHub OAuth Apps PKCE desteklemez. `code_challenge` parametresi gönderilince GitHub ilk denemede sessizce reddediyor, ikinci denemede state cookie'den dolayı çalışıyor.
+
+**Düzeltmeler:**
+- `api/src/routes/oauth.rs`:
+  - GitHub OAuth'dan PKCE kaldırıldı (state param + SameSite cookies yeterli)
+  - GitHub callback'den PKCE verifier okuma kaldırıldı
+  - Google OAuth'da PKCE korundu (Google destekliyor)
+- `dashboard/src/app/[locale]/auth/callback/page.tsx`:
+  - Status state eklendi (processing / redirecting / error)
+  - localStorage.setItem try-catch'e alındı
+  - Redirect öncesi 100ms gecikme (localStorage flush garantisi)
+  - Proxy /api başarısız olursa doğrudan API'ye fallback çağrı
+  - Hata görünümünde URL gösterimi (debug için)
 
 ## Proje Durumu Değerlendirmesi
 
