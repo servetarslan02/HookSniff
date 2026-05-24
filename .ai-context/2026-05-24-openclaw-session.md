@@ -38,23 +38,22 @@
 - `44ae028f` — .ai-context güncelleme
 - `a70453c6` — Vercel build fix
 - `02d85729` — Session log güncelleme
-- `acae7570` — OAuth double-click fix
+- `acae7570` — OAuth double-click fix (PKCE removal)
+- `a9b6c5a7` — OAuth callback hard redirect fix
 
-### 5. OAuth Double-Click Fix (2 dosya)
+### 5. OAuth Double-Click Fix (2 iteration)
 
-**Root Cause:** GitHub OAuth Apps PKCE desteklemez. `code_challenge` parametresi gönderilince GitHub ilk denemede sessizce reddediyor, ikinci denemede state cookie'den dolayı çalışıyor.
+**Root Cause (iteration 1):** GitHub OAuth Apps PKCE desteklemez → kaldırıldı.
+**Root Cause (iteration 2):** `router.replace('/core')` client-side navigation, AuthProvider mount olmadan token okunamıyor → login'e düşüyor.
 
-**Düzeltmeler:**
-- `api/src/routes/oauth.rs`:
-  - GitHub OAuth'dan PKCE kaldırıldı (state param + SameSite cookies yeterli)
-  - GitHub callback'den PKCE verifier okuma kaldırıldı
-  - Google OAuth'da PKCE korundu (Google destekliyor)
-- `dashboard/src/app/[locale]/auth/callback/page.tsx`:
-  - Status state eklendi (processing / redirecting / error)
-  - localStorage.setItem try-catch'e alındı
-  - Redirect öncesi 100ms gecikme (localStorage flush garantisi)
-  - Proxy /api başarısız olursa doğrudan API'ye fallback çağrı
-  - Hata görünümünde URL gösterimi (debug için)
+**Final Çözüm:**
+- `api/src/routes/oauth.rs`: GitHub'dan PKCE kaldırıldı
+- `auth/callback/page.tsx`: Tamamen yeniden yazıldı
+  - `window.location.href = '/core'` — hard redirect, fresh page load
+  - Token API'de doğrulanıyor, redirect'ten önce
+  - localStorage'da token varsa (2. deneme) hemen redirect
+  - `useTranslations` kaldırıldı (bağımlılık azaltıldı)
+  - Hata durumunda retry butonu
 
 ## Proje Durumu Değerlendirmesi
 
