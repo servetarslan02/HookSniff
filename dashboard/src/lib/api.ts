@@ -111,12 +111,53 @@ export function startProactiveRefresh(onRefresh: (newToken: string) => void): vo
       onRefresh(newToken);
     }
     // If refresh fails, don't panic — the reactive 401 handler will catch it
-  }, 12 * 60 * 1000); // 12 minutes
+  }, 50 * 60 * 1000); // 50 minutes (token expires in 60 min, refresh 10 min early)
+
+  // BUG FIX: Refresh immediately when tab becomes visible again.
+  // Background tabs have setInterval throttled to 1-minute minimum,
+  // so the timer may not fire for 15+ minutes. When user returns,
+  // the token might be expired. This fixes random logouts on PC.
+  const handleVisibilityChange = async () => {
+    if (document.visibilityState === 'visible') {
+      // Check if token is close to expiry (or already expired)
+      const token = localStorage.getItem('hooksniff_token');
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const expiresAt = payload.exp * 1000;
+          const now = Date.now();
+          const minutesLeft = (expiresAt - now) / 60000;
+          // If less than 10 minutes left, refresh immediately
+          if (minutesLeft < 10) {
+            const newToken = await doRefresh();
+            if (newToken) {
+              onRefresh(newToken);
+            }
+          }
+        } catch {
+          // Token parse error — try refresh anyway
+          const newToken = await doRefresh();
+          if (newToken) {
+            onRefresh(newToken);
+          }
+        }
+      }
+    }
+  };
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  // Store cleanup function
+  (proactiveRefreshTimer as any)._visibilityCleanup = () => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  };
 }
 
 /** Stop proactive token refresh. Call on logout. */
 export function stopProactiveRefresh(): void {
   if (proactiveRefreshTimer) {
+    // Clean up visibility change listener
+    if ((proactiveRefreshTimer as any)._visibilityCleanup) {
+      (proactiveRefreshTimer as any)._visibilityCleanup();
+    }
     clearInterval(proactiveRefreshTimer);
     proactiveRefreshTimer = null;
   }
