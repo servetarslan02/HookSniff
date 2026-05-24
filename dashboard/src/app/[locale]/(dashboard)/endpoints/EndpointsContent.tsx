@@ -65,15 +65,19 @@ export function EndpointsContent() {
     }
   };
 
-  const handleToggle = async (id: string, currentState: boolean) => {
+  const handleToggle = (id: string, currentState: boolean) => {
     setTogglingId(id);
-    try {
-      await toggleEndpointMutation.mutateAsync({ id, is_active: !currentState });
-    } catch (err: unknown) {
-      toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToUpdate'), 'error');
-    } finally {
-      setTogglingId(null);
-    }
+    toggleEndpointMutation.mutate(
+      { id, is_active: !currentState },
+      {
+        onError: (err: unknown) => {
+          toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToUpdate'), 'error');
+        },
+        onSettled: () => {
+          setTogglingId(null);
+        },
+      }
+    );
   };
 
   const confirmDelete = async () => {
