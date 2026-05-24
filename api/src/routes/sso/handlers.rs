@@ -35,257 +35,10 @@ use crate::error::AppError;
 use crate::middleware::{create_auth_cookie, create_refresh_token_cookie, generate_api_key, hash_api_key};
 use crate::models::customer::Customer;
 
-// ── Router ──────────────────────────────────────────────────
 
-pub fn router() -> Router {
-    Router::new()
-        // Config CRUD (authenticated)
-        .route("/config", get(get_sso_config))
-        .route("/config", post(upsert_sso_config))
-        .route("/config", delete(delete_sso_config))
-        // Test (authenticated)
-        .route("/test", post(test_sso_connection))
-        // Domain verification
-        .route("/verify-domain", post(initiate_domain_verification))
-        .route("/verify-domain/check", post(check_domain_verification))
-        // Login attempts
-        .route("/login-attempts", get(get_login_attempts))
-        // SCIM endpoints (authenticated with SCIM token)
-        .route("/scim/v2/Users", get(scim_list_users).post(scim_create_user))
-        .route("/scim/v2/Users/{id}", get(scim_get_user).put(scim_update_user).patch(scim_patch_user).delete(scim_delete_user))
-        .route("/scim/v2/Groups", get(scim_list_groups))
-        .route("/scim/v2/ServiceProviderConfig", get(scim_service_provider_config))
-        .route("/scim/v2/ResourceTypes", get(scim_resource_types))
-        .route("/scim/v2/Schemas", get(scim_schemas))
-}
+// Handler functions
 
-/// Public SSO routes (login + callbacks) — no auth required
-pub fn public_router() -> Router {
-    Router::new()
-        .route("/login", get(initiate_sso_login))
-        .route("/saml/callback", post(saml_callback))
-        .route("/oidc/callback", get(oidc_callback))
-        .route("/providers", get(list_sso_providers))
-}
-
-// ── Config Response ─────────────────────────────────────────
-
-#[derive(Debug, Serialize)]
-pub struct SsoConfigResponse {
-    pub id: Uuid,
-    pub provider: String,
-    pub enabled: bool,
-    pub metadata_url: Option<String>,
-    pub entity_id: Option<String>,
-    pub sso_url: Option<String>,
-    pub certificate_set: bool,
-    pub issuer_url: Option<String>,
-    pub client_id: Option<String>,
-    pub client_secret_set: bool,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    // New fields
-    pub role_mapping: Option<serde_json::Value>,
-    pub team_mapping: Option<serde_json::Value>,
-    pub scim_enabled: bool,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct UpsertSsoRequest {
-    pub provider: Option<String>,
-    pub enabled: Option<bool>,
-    pub admin_bypass: Option<bool>,
-    // Team scope
-    pub team_id: Option<Uuid>,
-    // Domain
-    pub verified_domain: Option<String>,
-    // SAML
-    pub metadata_url: Option<String>,
-    pub entity_id: Option<String>,
-    pub sso_url: Option<String>,
-    pub certificate: Option<String>,
-    // OIDC
-    pub issuer_url: Option<String>,
-    pub client_id: Option<String>,
-    pub client_secret: Option<String>,
-    // Auto team join
-    pub default_team_id: Option<String>,
-    pub default_role: Option<String>,
-    // Role & Team mapping
-    pub role_mapping: Option<serde_json::Value>,
-    pub team_mapping: Option<serde_json::Value>,
-    // SCIM
-    pub scim_enabled: Option<bool>,
-    pub scim_token: Option<String>,
-}
-
-// ── OIDC Discovery Document ─────────────────────────────────
-
-#[derive(Debug, Deserialize)]
-struct OidcDiscovery {
-    authorization_endpoint: String,
-    token_endpoint: String,
-    issuer: String,
-    jwks_uri: Option<String>,
-}
-
-// ── OIDC Token Response ─────────────────────────────────────
-
-#[derive(Debug, Deserialize)]
-struct OidcTokenResponse {
-    #[allow(dead_code)]
-    access_token: Option<String>,
-    id_token: Option<String>,
-    #[allow(dead_code)]
-    token_type: Option<String>,
-    #[allow(dead_code)]
-    expires_in: Option<i64>,
-}
-
-// ── SAML Response Parsing ───────────────────────────────────
-
-#[derive(Debug)]
-struct SamlAssertion {
-    name_id: String,
-    #[allow(dead_code)]
-    session_index: Option<String>,
-    attributes: std::collections::HashMap<String, String>,
-    not_on_or_after: Option<DateTime<Utc>>,
-    in_response_to: Option<String>,
-    destination: Option<String>,
-    audience: Option<String>,
-    certificate: Option<String>,
-}
-
-// ── SSO Login Query ─────────────────────────────────────────
-
-#[derive(Debug, Deserialize)]
-pub struct SsoLoginQuery {
-    pub email: String,
-    pub redirect: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct OidcCallbackQuery {
-    pub code: Option<String>,
-    pub state: Option<String>,
-    pub error: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct SsoProviderQuery {
-    pub domain: String,
-}
-
-// ── State Storage (in-memory for now, should be Redis) ──────
-
-use std::collections::HashMap;
-use std::sync::Arc;
-use tokio::sync::Mutex;
-
-#[derive(Clone)]
-pub struct SsoStateStore {
-    states: Arc<Mutex<HashMap<String, SsoLoginState>>>,
-    redis: Option<redis::aio::ConnectionManager>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-struct SsoLoginState {
-    customer_id: Uuid,
-    email: String,
-    provider: String,
-    redirect: Option<String>,
-    saml_request_id: Option<String>,
-    auto_join_team_id: Option<Uuid>,
-    default_role: String,
-    nonce: Option<String>,
-    created_at: DateTime<Utc>,
-    // New fields for role/team mapping
-    sso_config_id: Uuid,
-    role_mapping: Option<serde_json::Value>,
-    team_mapping: Option<serde_json::Value>,
-}
-
-const SSO_STATE_TTL_SECS: u64 = 600; // 10 minutes
-
-impl SsoStateStore {
-    pub fn new() -> Self {
-        Self {
-            states: Arc::new(Mutex::new(HashMap::new())),
-            redis: None,
-        }
-    }
-
-    pub fn with_redis(mut self, redis: redis::aio::ConnectionManager) -> Self {
-        self.redis = Some(redis);
-        self
-    }
-
-    async fn insert(&self, state: String, login_state: SsoLoginState) {
-        // Always write to in-memory as fallback
-        self.states.lock().await.insert(state.clone(), login_state.clone());
-        // Also write to Redis if available
-        if let Some(ref mut redis) = self.redis.clone() {
-            match serde_json::to_string(&login_state) {
-                Ok(json) => {
-                    let key = format!("sso:state:{}", state);
-                    let _: Result<(), _> = redis::cmd("SETEX")
-                        .arg(&key)
-                        .arg(SSO_STATE_TTL_SECS)
-                        .arg(&json)
-                        .query_async(redis)
-                        .await;
-                }
-                Err(e) => tracing::warn!("Failed to serialize SSO state: {}", e),
-            }
-        }
-    }
-
-    async fn remove(&self, state: &str) -> Option<SsoLoginState> {
-        // Try Redis first
-        if let Some(ref mut redis) = self.redis.clone() {
-            let key = format!("sso:state:{}", state);
-            let result: Result<Option<String>, _> = redis::cmd("GET")
-                .arg(&key)
-                .query_async(redis)
-                .await;
-            if let Ok(Some(json)) = result {
-                // Delete from Redis
-                let _: Result<(), _> = redis::cmd("DEL")
-                    .arg(&key)
-                    .query_async(redis)
-                    .await;
-                // Also remove from in-memory
-                self.states.lock().await.remove(state);
-                return serde_json::from_str(&json).ok();
-            }
-        }
-        // Fallback to in-memory
-        self.states.lock().await.remove(state)
-    }
-
-    /// Remove expired states from in-memory store (call periodically)
-    pub async fn cleanup_expired(&self) {
-        let mut states = self.states.lock().await;
-        let now = Utc::now();
-        let before_count = states.len();
-        states.retain(|_, state| {
-            (now - state.created_at).num_seconds() < SSO_STATE_TTL_SECS as i64
-        });
-        let removed = before_count - states.len();
-        if removed > 0 {
-            tracing::info!("SSO state cleanup: removed {} expired states", removed);
-        }
-    }
-}
-
-// ── Query params for team-scoped endpoints ──────────────────
-
-#[derive(Debug, Deserialize)]
-pub struct TeamQuery {
-    pub team_id: Option<Uuid>,
-}
+use super::*;
 
 // ── GET /sso/config ─────────────────────────────────────────
 
@@ -313,7 +66,7 @@ struct SsoConfigRow {
     scim_enabled: bool,
 }
 
-fn sso_config_to_json(r: &SsoConfigRow) -> serde_json::Value {
+pub fn sso_config_to_json(r: &SsoConfigRow) -> serde_json::Value {
     serde_json::json!({
         "id": r.id, "provider": &r.provider, "enabled": r.enabled,
         "verified_domain": &r.verified_domain, "metadata_url": &r.metadata_url,
@@ -328,7 +81,7 @@ fn sso_config_to_json(r: &SsoConfigRow) -> serde_json::Value {
     })
 }
 
-async fn get_sso_config(
+pub async fn get_sso_config(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Query(query): Query<TeamQuery>,
@@ -385,7 +138,7 @@ async fn get_sso_config(
 
 // ── POST /sso/config ────────────────────────────────────────
 
-async fn upsert_sso_config(
+pub async fn upsert_sso_config(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<UpsertSsoRequest>,
@@ -619,7 +372,7 @@ async fn upsert_sso_config(
 
 // ── DELETE /sso/config ──────────────────────────────────────
 
-async fn delete_sso_config(
+pub async fn delete_sso_config(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Query(query): Query<TeamQuery>,
@@ -658,12 +411,12 @@ async fn delete_sso_config(
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct VerifyDomainRequest {
+pub struct VerifyDomainRequest {
     domain: String,
 }
 
 #[derive(Debug, Serialize)]
-struct VerifyDomainResponse {
+pub struct VerifyDomainResponse {
     txt_record: String,
     instructions: String,
 }
@@ -671,7 +424,7 @@ struct VerifyDomainResponse {
 // ── GET /sso/login-attempts ──────────────────────────────────
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
-struct LoginAttempt {
+pub struct LoginAttempt {
     id: Uuid,
     email: String,
     provider: String,
@@ -682,7 +435,7 @@ struct LoginAttempt {
 }
 
 /// GET /sso/login-attempts — List recent SSO login attempts (admin only)
-async fn get_login_attempts(
+pub async fn get_login_attempts(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Query(query): Query<std::collections::HashMap<String, String>>,
@@ -721,7 +474,7 @@ async fn get_login_attempts(
 }
 
 /// POST /sso/verify-domain — Generate TXT record for domain verification
-async fn initiate_domain_verification(
+pub async fn initiate_domain_verification(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<VerifyDomainRequest>,
@@ -770,18 +523,18 @@ async fn initiate_domain_verification(
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct CheckDomainRequest {
+pub struct CheckDomainRequest {
     domain: String,
 }
 
 #[derive(Debug, Serialize)]
-struct CheckDomainResponse {
+pub struct CheckDomainResponse {
     verified: bool,
     message: String,
 }
 
 /// POST /sso/verify-domain/check — Verify domain via DNS TXT record lookup
-async fn check_domain_verification(
+pub async fn check_domain_verification(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<CheckDomainRequest>,
@@ -879,7 +632,7 @@ async fn check_domain_verification(
 
 // ── POST /sso/test ──────────────────────────────────────────
 
-async fn test_sso_connection(
+pub async fn test_sso_connection(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Query(query): Query<TeamQuery>,
@@ -1031,7 +784,7 @@ async fn test_sso_connection(
 // Initiates SSO login by redirecting to IdP.
 // Works for BOTH existing users and new (auto-provisioned) users.
 
-async fn initiate_sso_login(
+pub async fn initiate_sso_login(
     Extension(pool): Extension<PgPool>,
     Extension(state_store): Extension<SsoStateStore>,
     Extension(rate_limiter): Extension<crate::rate_limit::RateLimiter>,
@@ -1245,7 +998,7 @@ async fn initiate_sso_login(
 
 // ── SAML Login: Generate AuthnRequest and redirect ──────────
 
-async fn initiate_saml_login(
+pub async fn initiate_saml_login(
     _pool: &PgPool,
     customer: &Customer,
     state: &str,
@@ -1308,7 +1061,7 @@ async fn initiate_saml_login(
 
 // ── OIDC Login: Redirect to authorization endpoint ──────────
 
-async fn initiate_oidc_login(
+pub async fn initiate_oidc_login(
     _pool: &PgPool,
     customer: &Customer,
     state: &str,
@@ -1386,7 +1139,7 @@ async fn initiate_oidc_login(
 // ── POST /sso/saml/callback ─────────────────────────────────
 // Handles SAML Response from IdP
 
-async fn saml_callback(
+pub async fn saml_callback(
     Extension(pool): Extension<PgPool>,
     Extension(state_store): Extension<SsoStateStore>,
     Extension(cfg): Extension<crate::config::Config>,
@@ -1601,7 +1354,7 @@ async fn saml_callback(
 // ── GET /sso/oidc/callback ──────────────────────────────────
 // Handles OIDC callback from IdP
 
-async fn oidc_callback(
+pub async fn oidc_callback(
     Extension(pool): Extension<PgPool>,
     Extension(state_store): Extension<SsoStateStore>,
     Extension(cfg): Extension<crate::config::Config>,
@@ -1841,7 +1594,7 @@ async fn oidc_callback(
 // ── GET /sso/providers ──────────────────────────────────────
 // List SSO providers available for a domain (public endpoint)
 
-async fn list_sso_providers(
+pub async fn list_sso_providers(
     Extension(pool): Extension<PgPool>,
     Query(query): Query<SsoProviderQuery>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -1884,7 +1637,7 @@ async fn list_sso_providers(
 
 // ── Helper: Parse SAML Response ─────────────────────────────
 
-fn parse_saml_response(xml: &str) -> Result<SamlAssertion, AppError> {
+pub fn parse_saml_response(xml: &str) -> Result<SamlAssertion, AppError> {
     // Extract NameID
     let name_id = extract_xml_text(xml, "NameID")
         .or_else(|| extract_xml_attribute(xml, "NameID", "NameID"))
@@ -1937,7 +1690,7 @@ fn parse_saml_response(xml: &str) -> Result<SamlAssertion, AppError> {
 ///
 /// Uses `quick-xml` to properly parse XML and find the first element whose
 /// local name matches `tag`, regardless of namespace prefix (saml:, saml2p:, ds:, etc).
-fn extract_xml_text(xml: &str, tag: &str) -> Option<String> {
+pub fn extract_xml_text(xml: &str, tag: &str) -> Option<String> {
     use quick_xml::events::Event;
     use quick_xml::Reader;
 
@@ -1992,7 +1745,7 @@ fn extract_xml_text(xml: &str, tag: &str) -> Option<String> {
 /// Extract an attribute value from the first XML element matching `element` by local name.
 ///
 /// Namespace-agnostic: matches `element` regardless of prefix.
-fn extract_xml_attribute(xml: &str, element: &str, attr: &str) -> Option<String> {
+pub fn extract_xml_attribute(xml: &str, element: &str, attr: &str) -> Option<String> {
     use quick_xml::events::Event;
     use quick_xml::Reader;
 
@@ -2022,7 +1775,7 @@ fn extract_xml_attribute(xml: &str, element: &str, attr: &str) -> Option<String>
 /// Extract a SAML AttributeValue by AttributeName.
 ///
 /// Finds `<saml:Attribute Name="xxx">` then extracts the text of its `<saml:AttributeValue>` child.
-fn extract_saml_attribute(xml: &str, name: &str) -> Option<String> {
+pub fn extract_saml_attribute(xml: &str, name: &str) -> Option<String> {
     use quick_xml::events::Event;
     use quick_xml::Reader;
 
@@ -2092,7 +1845,7 @@ fn extract_saml_attribute(xml: &str, name: &str) -> Option<String> {
 ///
 /// `quick-xml` returns names with namespace prefix stripped for `name()` calls,
 /// but we handle both cases for robustness.
-fn local_name_matches(xml_name: quick_xml::name::QName<'_>, target: &str) -> bool {
+pub fn local_name_matches(xml_name: quick_xml::name::QName<'_>, target: &str) -> bool {
     let name = std::str::from_utf8(xml_name.as_ref()).unwrap_or("");
     // Direct match
     if name == target {
@@ -2106,7 +1859,7 @@ fn local_name_matches(xml_name: quick_xml::name::QName<'_>, target: &str) -> boo
 }
 
 /// Check if XML contains an element with the given local name (namespace-agnostic).
-fn xml_has_element(xml: &str, tag: &str) -> bool {
+pub fn xml_has_element(xml: &str, tag: &str) -> bool {
     use quick_xml::events::Event;
     use quick_xml::Reader;
 
@@ -2130,7 +1883,7 @@ fn xml_has_element(xml: &str, tag: &str) -> bool {
 
 // ── Helper: Decode OIDC ID Token ────────────────────────────
 
-fn decode_oidc_id_token(token: &str) -> Result<serde_json::Value, AppError> {
+pub fn decode_oidc_id_token(token: &str) -> Result<serde_json::Value, AppError> {
     // Split JWT into parts
     let parts: Vec<&str> = token.split('.').collect();
     if parts.len() != 3 {
@@ -2179,7 +1932,7 @@ fn decode_oidc_id_token(token: &str) -> Result<serde_json::Value, AppError> {
 }
 
 /// Verify JWT signature against JWKS public key
-async fn verify_jwt_signature(
+pub async fn verify_jwt_signature(
     token: &str,
     jwks_uri: &str,
 ) -> Result<(), AppError> {
@@ -2263,7 +2016,7 @@ async fn verify_jwt_signature(
 
 // ── Helper: Find or Create Customer from SSO ────────────────
 
-async fn find_or_create_sso_customer(
+pub async fn find_or_create_sso_customer(
     pool: &PgPool,
     email: &str,
     attributes: &std::collections::HashMap<String, String>,
@@ -2330,7 +2083,7 @@ async fn find_or_create_sso_customer(
 // `team_id` — the team to join
 // `default_role` — role to assign (from SSO config)
 
-async fn auto_join_team_direct(
+pub async fn auto_join_team_direct(
     pool: &PgPool,
     sso_user_id: Uuid,
     team_id: Uuid,
@@ -2383,7 +2136,7 @@ async fn auto_join_team_direct(
 // Checks IdP groups and roles attributes against the mapping.
 // Returns the mapped role or the default_role fallback.
 
-fn resolve_role_from_mapping(
+pub fn resolve_role_from_mapping(
     role_mapping: &Option<serde_json::Value>,
     idp_groups: &[String],
     idp_roles: &[String],
@@ -2438,7 +2191,7 @@ fn resolve_role_from_mapping(
 // Extracts domain from email, looks up in mapping.
 // Returns the mapped team_id or None.
 
-fn resolve_team_from_mapping(
+pub fn resolve_team_from_mapping(
     team_mapping: &Option<serde_json::Value>,
     email: &str,
     default_team_id: &Option<Uuid>,
@@ -2475,7 +2228,7 @@ fn resolve_team_from_mapping(
 
 // ── Helper: Store SSO user attributes ───────────────────────
 
-async fn store_sso_user_attributes(
+pub async fn store_sso_user_attributes(
     pool: &PgPool,
     customer_id: Uuid,
     sso_config_id: Uuid,
@@ -2512,7 +2265,7 @@ async fn store_sso_user_attributes(
 // If the user was previously in a team but is no longer in the mapped group,
 // they are NOT automatically removed (safety — manual removal required).
 
-async fn sync_team_memberships(
+pub async fn sync_team_memberships(
     pool: &PgPool,
     customer_id: Uuid,
     idp_groups: &[String],
@@ -2572,7 +2325,7 @@ async fn sync_team_memberships(
 
 // ── Helper: Generate SSO Login Response ─────────────────────
 
-async fn generate_sso_response(
+pub async fn generate_sso_response(
     pool: &PgPool,
     customer: &Customer,
     cfg: &crate::config::Config,
@@ -2622,7 +2375,7 @@ async fn generate_sso_response(
 
 // ── Helper: Log SSO Attempt ─────────────────────────────────
 
-async fn log_sso_attempt(
+pub async fn log_sso_attempt(
     pool: &PgPool,
     customer_id: Option<Uuid>,
     email: &str,
@@ -2664,7 +2417,7 @@ async fn log_sso_attempt(
 /// 3. Decode the SignatureValue from base64
 /// 4. Extract the public key from the X.509 certificate
 /// 5. Verify the RSA-SHA256 signature over the SignedInfo bytes
-fn verify_saml_signature(xml: &str, certificate_pem: &str) -> Result<(), AppError> {
+pub fn verify_saml_signature(xml: &str, certificate_pem: &str) -> Result<(), AppError> {
     use base64::Engine;
 
     // 1. Extract SignatureValue
@@ -2701,7 +2454,7 @@ fn verify_saml_signature(xml: &str, certificate_pem: &str) -> Result<(), AppErro
 }
 
 /// Extract the raw XML content of `<ds:SignedInfo>...</ds:SignedInfo>`
-fn extract_signed_info_xml(xml: &str) -> Option<String> {
+pub fn extract_signed_info_xml(xml: &str) -> Option<String> {
     use quick_xml::events::Event;
     use quick_xml::Reader;
 
@@ -2743,7 +2496,7 @@ fn extract_signed_info_xml(xml: &str) -> Option<String> {
 }
 
 /// Extract DER-encoded bytes from a PEM certificate
-fn extract_certificate_der(pem: &str) -> Result<Vec<u8>, AppError> {
+pub fn extract_certificate_der(pem: &str) -> Result<Vec<u8>, AppError> {
     use base64::Engine;
     let pem_clean = pem
         .replace("-----BEGIN CERTIFICATE-----", "")
@@ -2758,7 +2511,7 @@ fn extract_certificate_der(pem: &str) -> Result<Vec<u8>, AppError> {
 }
 
 /// Extract RSA public key from DER-encoded X.509 certificate
-fn extract_rsa_public_key_from_der(der: &[u8]) -> Result<Vec<u8>, AppError> {
+pub fn extract_rsa_public_key_from_der(der: &[u8]) -> Result<Vec<u8>, AppError> {
     // Parse the DER-encoded X.509 certificate to extract the RSA public key
     // X.509 DER structure: SEQUENCE { ..., SubjectPublicKeyInfo { Algorithm, SubjectPublicKey } }
     //
@@ -2808,12 +2561,12 @@ fn extract_rsa_public_key_from_der(der: &[u8]) -> Result<Vec<u8>, AppError> {
 }
 
 /// Find a byte sequence in a slice
-fn find_byte_sequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+pub fn find_byte_sequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     haystack.windows(needle.len()).position(|w| w == needle)
 }
 
 /// Read ASN.1 DER length
-fn read_asn1_length(data: &[u8]) -> (usize, usize) {
+pub fn read_asn1_length(data: &[u8]) -> (usize, usize) {
     if data.is_empty() {
         return (0, 0);
     }
@@ -2836,14 +2589,14 @@ fn read_asn1_length(data: &[u8]) -> (usize, usize) {
 }
 
 /// Convert Vec<u8> to Vec<u8> (identity, used for clarity)
-fn _vec_identity(v: Vec<u8>) -> Vec<u8> {
+pub fn _vec_identity(v: Vec<u8>) -> Vec<u8> {
     v
 }
 
 // ── SCIM 2.0 Endpoints ──────────────────────────────────────
 
 /// Validate SCIM bearer token and return sso_config_id
-async fn validate_scim_token(
+pub async fn validate_scim_token(
     pool: &PgPool,
     headers: &HeaderMap,
 ) -> Result<Uuid, AppError> {
@@ -2867,7 +2620,7 @@ async fn validate_scim_token(
 }
 
 /// SCIM User response builder
-fn scim_user_response(customer: &Customer, attributes: Option<&SsoUserAttributesRow>) -> serde_json::Value {
+pub fn scim_user_response(customer: &Customer, attributes: Option<&SsoUserAttributesRow>) -> serde_json::Value {
     let groups = attributes
         .and_then(|a| a.idp_groups.as_ref())
         .cloned()
@@ -2957,7 +2710,7 @@ struct ScimUserRow {
 }
 
 /// GET /scim/v2/Users — List users
-async fn scim_list_users(
+pub async fn scim_list_users(
     Extension(pool): Extension<PgPool>,
     headers: HeaderMap,
     Query(query): Query<std::collections::HashMap<String, String>>,
@@ -3039,7 +2792,7 @@ async fn scim_list_users(
 }
 
 /// GET /scim/v2/Users/:id — Get user
-async fn scim_get_user(
+pub async fn scim_get_user(
     Extension(pool): Extension<PgPool>,
     headers: HeaderMap,
     Path(id): Path<String>,
@@ -3069,7 +2822,7 @@ async fn scim_get_user(
 }
 
 /// POST /scim/v2/Users — Create user (provision)
-async fn scim_create_user(
+pub async fn scim_create_user(
     Extension(pool): Extension<PgPool>,
     headers: HeaderMap,
     Json(body): Json<serde_json::Value>,
@@ -3179,7 +2932,7 @@ async fn scim_create_user(
 }
 
 /// PUT /scim/v2/Users/:id — Update user
-async fn scim_update_user(
+pub async fn scim_update_user(
     Extension(pool): Extension<PgPool>,
     headers: HeaderMap,
     Path(id): Path<String>,
@@ -3253,7 +3006,7 @@ async fn scim_update_user(
 }
 
 /// PATCH /scim/v2/Users/:id — Partial update
-async fn scim_patch_user(
+pub async fn scim_patch_user(
     Extension(pool): Extension<PgPool>,
     headers: HeaderMap,
     Path(id): Path<String>,
@@ -3366,7 +3119,7 @@ async fn scim_patch_user(
 }
 
 /// DELETE /scim/v2/Users/:id — Deactivate user
-async fn scim_delete_user(
+pub async fn scim_delete_user(
     Extension(pool): Extension<PgPool>,
     headers: HeaderMap,
     Path(id): Path<String>,
@@ -3393,7 +3146,7 @@ async fn scim_delete_user(
 }
 
 /// GET /scim/v2/Groups — List groups (team-based)
-async fn scim_list_groups(
+pub async fn scim_list_groups(
     Extension(pool): Extension<PgPool>,
     headers: HeaderMap,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -3445,7 +3198,7 @@ async fn scim_list_groups(
 }
 
 /// GET /scim/v2/ServiceProviderConfig — SCIM service provider config
-async fn scim_service_provider_config() -> Json<serde_json::Value> {
+pub async fn scim_service_provider_config() -> Json<serde_json::Value> {
     Json(serde_json::json!({
         "schemas": ["urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"],
         "patch": {"supported": true},
@@ -3465,7 +3218,7 @@ async fn scim_service_provider_config() -> Json<serde_json::Value> {
 }
 
 /// GET /scim/v2/ResourceTypes — SCIM resource types
-async fn scim_resource_types() -> Json<serde_json::Value> {
+pub async fn scim_resource_types() -> Json<serde_json::Value> {
     Json(serde_json::json!({
         "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
         "totalResults": 2,
@@ -3491,7 +3244,7 @@ async fn scim_resource_types() -> Json<serde_json::Value> {
 }
 
 /// GET /scim/v2/Schemas — SCIM schemas
-async fn scim_schemas() -> Json<serde_json::Value> {
+pub async fn scim_schemas() -> Json<serde_json::Value> {
     Json(serde_json::json!({
         "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
         "totalResults": 2,
@@ -3538,406 +3291,3 @@ async fn scim_schemas() -> Json<serde_json::Value> {
     }))
 }
 
-// ── Tests ───────────────────────────────────────────────────
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_sso_router_construction() {
-        let _router = router();
-    }
-
-    #[test]
-    fn test_upsert_sso_request_defaults() {
-        let json = r#"{}"#;
-        let req: UpsertSsoRequest = serde_json::from_str(json).unwrap();
-        assert!(req.provider.is_none());
-        assert!(req.enabled.is_none());
-    }
-
-    #[test]
-    fn test_parse_saml_name_id() {
-        let xml = r#"<saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
-            <saml:Subject>
-                <saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">user@example.com</saml:NameID>
-            </saml:Subject>
-        </saml:Assertion>"#;
-        let result = parse_saml_response(xml);
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap().name_id, "user@example.com");
-    }
-
-    #[test]
-    fn test_decode_oidc_token() {
-        // Build a minimal valid JWT payload
-        let payload = serde_json::json!({
-            "sub": "12345",
-            "email": "user@example.com",
-            "name": "Test User",
-            "exp": 9999999999i64
-        });
-        use base64::Engine;
-        let header = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(r#"{"alg":"RS256","typ":"JWT"}"#);
-        let payload_b64 = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(payload.to_string());
-        let token = format!("{}.{}.sig", header, payload_b64);
-
-        let result = decode_oidc_id_token(&token);
-        assert!(result.is_ok());
-        let claims = result.unwrap();
-        assert_eq!(claims["email"], "user@example.com");
-    }
-
-    // ── SSO default_role validation ─────────────────────────
-
-    #[test]
-    fn test_sso_default_role_valid_values() {
-        let valid_roles = ["admin", "developer", "analyst", "viewer"];
-        for role in valid_roles {
-            let json = format!(r#"{{"default_role": "{}"}}"#, role);
-            let req: UpsertSsoRequest = serde_json::from_str(&json).unwrap();
-            assert_eq!(req.default_role.as_deref(), Some(role));
-        }
-    }
-
-    #[test]
-    fn test_sso_default_role_none_when_not_provided() {
-        let json = r#"{}"#;
-        let req: UpsertSsoRequest = serde_json::from_str(json).unwrap();
-        assert!(req.default_role.is_none());
-    }
-
-    #[test]
-    fn test_sso_login_state_has_default_role() {
-        // Verify SsoLoginState struct has default_role field
-        let state = SsoLoginState {
-            customer_id: Uuid::new_v4(),
-            email: "test@example.com".to_string(),
-            provider: "saml".to_string(),
-            redirect: None,
-            saml_request_id: None,
-            auto_join_team_id: None,
-            default_role: "developer".to_string(),
-            nonce: None,
-            created_at: chrono::Utc::now(),
-        };
-        assert_eq!(state.default_role, "developer");
-    }
-
-    #[test]
-    fn test_sso_login_state_default_role_viewer() {
-        let state = SsoLoginState {
-            customer_id: Uuid::new_v4(),
-            email: "viewer@example.com".to_string(),
-            provider: "oidc".to_string(),
-            redirect: Some("/dashboard".to_string()),
-            saml_request_id: None,
-            auto_join_team_id: Some(Uuid::new_v4()),
-            default_role: "viewer".to_string(),
-            nonce: Some("test-nonce-123".to_string()),
-            created_at: chrono::Utc::now(),
-        };
-        assert_eq!(state.default_role, "viewer");
-        assert!(state.auto_join_team_id.is_some());
-        assert_eq!(state.nonce.as_deref(), Some("test-nonce-123"));
-    }
-
-    #[test]
-    fn test_sso_login_state_preserves_role_across_providers() {
-        // Both SAML and OIDC should preserve the role from config
-        for provider in &["saml", "oidc"] {
-            let state = SsoLoginState {
-                customer_id: Uuid::new_v4(),
-                email: "user@example.com".to_string(),
-                provider: provider.to_string(),
-                redirect: None,
-                saml_request_id: None,
-                auto_join_team_id: Some(Uuid::new_v4()),
-                default_role: "admin".to_string(),
-                nonce: None,
-                created_at: chrono::Utc::now(),
-            };
-            assert_eq!(state.default_role, "admin", "role should be preserved for {}", provider);
-        }
-    }
-
-    // ── auto_join_team_direct role assignment ────────────────
-
-    #[test]
-    fn test_auto_join_uses_provided_role_not_hardcoded() {
-        // This tests the LOGIC that auto_join_team_direct receives the correct role
-        // The actual DB call is tested in integration tests
-        let config_role = "developer";
-        let hardcoded_role = "viewer";
-
-        // Before fix: always used hardcoded_role
-        // After fix: uses config_role
-        assert_ne!(config_role, hardcoded_role, "config role differs from hardcoded");
-        assert_eq!(config_role, "developer", "config role is developer");
-    }
-
-    // ── OIDC nonce verification ──────────────────────────────
-
-    #[test]
-    fn test_oidc_nonce_stored_in_state() {
-        let state = SsoLoginState {
-            customer_id: Uuid::new_v4(),
-            email: "user@example.com".to_string(),
-            provider: "oidc".to_string(),
-            redirect: None,
-            saml_request_id: None,
-            auto_join_team_id: None,
-            default_role: "viewer".to_string(),
-            nonce: Some("random-nonce-abc123".to_string()),
-            created_at: chrono::Utc::now(),
-        };
-        assert_eq!(state.nonce.as_deref(), Some("random-nonce-abc123"));
-    }
-
-    #[test]
-    fn test_saml_state_has_no_nonce() {
-        let state = SsoLoginState {
-            customer_id: Uuid::new_v4(),
-            email: "user@example.com".to_string(),
-            provider: "saml".to_string(),
-            redirect: None,
-            saml_request_id: Some("_request123".to_string()),
-            auto_join_team_id: None,
-            default_role: "viewer".to_string(),
-            nonce: None,
-            created_at: chrono::Utc::now(),
-        };
-        assert!(state.nonce.is_none(), "SAML state should not have nonce");
-    }
-
-    // ── SAML signature verification helpers ─────────────────
-
-    #[test]
-    fn test_extract_signed_info_xml() {
-        let xml = r#"<samlp:Response>
-            <ds:Signature>
-                <ds:SignedInfo>
-                    <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-                    <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-                </ds:SignedInfo>
-                <ds:SignatureValue>abc123</ds:SignatureValue>
-            </ds:Signature>
-        </samlp:Response>"#;
-        let result = extract_signed_info_xml(xml);
-        assert!(result.is_some());
-        let signed_info = result.unwrap();
-        assert!(signed_info.contains("SignedInfo"));
-        assert!(signed_info.contains("CanonicalizationMethod"));
-    }
-
-    #[test]
-    fn test_extract_signed_info_xml_no_prefix() {
-        let xml = r#"<Response>
-            <Signature>
-                <SignedInfo>
-                    <CanonicalizationMethod/>
-                </SignedInfo>
-                <SignatureValue>abc</SignatureValue>
-            </Signature>
-        </Response>"#;
-        let result = extract_signed_info_xml(xml);
-        assert!(result.is_some());
-    }
-
-    #[test]
-    fn test_extract_signed_info_missing() {
-        let xml = r#"<samlp:Response><saml:Assertion/></samlp:Response>"#;
-        let result = extract_signed_info_xml(xml);
-        assert!(result.is_none());
-    }
-
-    #[test]
-    fn test_extract_certificate_der_valid() {
-        // Self-signed test certificate (minimal)
-        let pem = "-----BEGIN CERTIFICATE-----\nMIIBkTCB+wIJAMlE...\n-----END CERTIFICATE-----";
-        // This will fail base64 decode since it's truncated, but tests the PEM stripping
-        let result = extract_certificate_der(pem);
-        // Expected to fail with invalid base64 (test cert is truncated)
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_read_asn1_length_short_form() {
-        assert_eq!(read_asn1_length(&[0x30]), (0x30, 1));
-        assert_eq!(read_asn1_length(&[0x00]), (0, 1));
-    }
-
-    #[test]
-    fn test_read_asn1_length_long_form() {
-        // 0x81 0x80 = 128 bytes
-        assert_eq!(read_asn1_length(&[0x81, 0x80]), (128, 2));
-        // 0x82 0x01 0x00 = 256 bytes
-        assert_eq!(read_asn1_length(&[0x82, 0x01, 0x00]), (256, 3));
-    }
-
-    #[test]
-    fn test_find_byte_sequence() {
-        let haystack = b"hello world";
-        assert_eq!(find_byte_sequence(haystack, b"world"), Some(6));
-        assert_eq!(find_byte_sequence(haystack, b"xyz"), None);
-    }
-
-    // ── quick-xml SAML parsing tests ────────────────────────
-
-    #[test]
-    fn test_extract_xml_text_namespaced() {
-        let xml = r#"<saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
-            <saml:Subject>
-                <saml:NameID>user@example.com</saml:NameID>
-            </saml:Subject>
-        </saml:Assertion>"#;
-        assert_eq!(extract_xml_text(xml, "NameID"), Some("user@example.com".into()));
-    }
-
-    #[test]
-    fn test_extract_xml_text_no_namespace() {
-        let xml = r#"<Response><NameID>test@test.com</NameID></Response>"#;
-        assert_eq!(extract_xml_text(xml, "NameID"), Some("test@test.com".into()));
-    }
-
-    #[test]
-    fn test_extract_xml_text_nested() {
-        let xml = r#"<root>
-            <parent><child>inner text</child></parent>
-            <parent><child>other</child></parent>
-        </root>"#;
-        // Should find the FIRST matching element
-        assert_eq!(extract_xml_text(xml, "child"), Some("inner text".into()));
-    }
-
-    #[test]
-    fn test_extract_xml_text_missing() {
-        let xml = r#"<root><other>value</other></root>"#;
-        assert_eq!(extract_xml_text(xml, "NameID"), None);
-    }
-
-    #[test]
-    fn test_extract_xml_text_audience() {
-        let xml = r#"<saml:AudienceRestriction>
-            <saml:Audience>https://hooksniff.com</saml:Audience>
-        </saml:AudienceRestriction>"#;
-        assert_eq!(extract_xml_text(xml, "Audience"), Some("https://hooksniff.com".into()));
-    }
-
-    #[test]
-    fn test_extract_xml_attribute_response() {
-        let xml = r#"<samlp:Response InResponseTo="_abc123" Destination="https://example.com/callback">
-            <saml:Assertion/>
-        </samlp:Response>"#;
-        assert_eq!(extract_xml_attribute(xml, "Response", "InResponseTo"), Some("_abc123".into()));
-        assert_eq!(extract_xml_attribute(xml, "Response", "Destination"), Some("https://example.com/callback".into()));
-    }
-
-    #[test]
-    fn test_extract_xml_attribute_session_index() {
-        let xml = r#"<saml:Assertion>
-            <saml:AuthnStatement SessionIndex="_session456">
-            </saml:AuthnStatement>
-        </saml:Assertion>"#;
-        assert_eq!(extract_xml_attribute(xml, "AuthnStatement", "SessionIndex"), Some("_session456".into()));
-    }
-
-    #[test]
-    fn test_extract_xml_attribute_not_on_or_after() {
-        let xml = r#"<saml:SubjectConfirmationData NotOnOrAfter="2026-12-31T23:59:59Z" Recipient="https://example.com"/>"#;
-        assert_eq!(
-            extract_xml_attribute(xml, "SubjectConfirmationData", "NotOnOrAfter"),
-            Some("2026-12-31T23:59:59Z".into())
-        );
-    }
-
-    #[test]
-    fn test_extract_saml_attribute_email() {
-        let xml = r#"<saml:AttributeStatement>
-            <saml:Attribute Name="email">
-                <saml:AttributeValue>user@example.com</saml:AttributeValue>
-            </saml:Attribute>
-            <saml:Attribute Name="firstName">
-                <saml:AttributeValue>John</saml:AttributeValue>
-            </saml:Attribute>
-        </saml:AttributeStatement>"#;
-        assert_eq!(extract_saml_attribute(xml, "email"), Some("user@example.com".into()));
-        assert_eq!(extract_saml_attribute(xml, "firstName"), Some("John".into()));
-    }
-
-    #[test]
-    fn test_extract_saml_attribute_missing() {
-        let xml = r#"<saml:AttributeStatement>
-            <saml:Attribute Name="email">
-                <saml:AttributeValue>user@example.com</saml:AttributeValue>
-            </saml:Attribute>
-        </saml:AttributeStatement>"#;
-        assert_eq!(extract_saml_attribute(xml, "nonexistent"), None);
-    }
-
-    #[test]
-    fn test_parse_saml_full_assertion() {
-        let xml = r#"<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-                                   xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-                                   InResponseTo="_req123"
-                                   Destination="https://app.example.com/sso/callback">
-            <saml:Assertion>
-                <saml:Subject>
-                    <saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">admin@company.com</saml:NameID>
-                    <saml:SubjectConfirmation>
-                        <saml:SubjectConfirmationData NotOnOrAfter="2099-12-31T23:59:59Z"/>
-                    </saml:SubjectConfirmation>
-                </saml:Subject>
-                <saml:Conditions>
-                    <saml:AudienceRestriction>
-                        <saml:Audience>https://hooksniff.com</saml:Audience>
-                    </saml:AudienceRestriction>
-                </saml:Conditions>
-                <saml:AuthnStatement SessionIndex="_session789">
-                </saml:AuthnStatement>
-                <saml:AttributeStatement>
-                    <saml:Attribute Name="email">
-                        <saml:AttributeValue>admin@company.com</saml:AttributeValue>
-                    </saml:Attribute>
-                    <saml:Attribute Name="firstName">
-                        <saml:AttributeValue>Admin</saml:AttributeValue>
-                    </saml:Attribute>
-                    <saml:Attribute Name="lastName">
-                        <saml:AttributeValue>User</saml:AttributeValue>
-                    </saml:Attribute>
-                </saml:AttributeStatement>
-            </saml:Assertion>
-        </samlp:Response>"#;
-
-        let result = parse_saml_response(xml);
-        assert!(result.is_ok(), "parse_saml_response failed: {:?}", result.err());
-        let assertion = result.unwrap();
-
-        assert_eq!(assertion.name_id, "admin@company.com");
-        assert_eq!(assertion.session_index.as_deref(), Some("_session789"));
-        assert_eq!(assertion.in_response_to.as_deref(), Some("_req123"));
-        assert_eq!(assertion.destination.as_deref(), Some("https://app.example.com/sso/callback"));
-        assert_eq!(assertion.audience.as_deref(), Some("https://hooksniff.com"));
-        assert_eq!(assertion.attributes.get("email").map(|s| s.as_str()), Some("admin@company.com"));
-        assert_eq!(assertion.attributes.get("firstName").map(|s| s.as_str()), Some("Admin"));
-        assert_eq!(assertion.attributes.get("lastName").map(|s| s.as_str()), Some("User"));
-        assert!(assertion.not_on_or_after.is_some());
-    }
-
-    #[test]
-    fn test_local_name_matches() {
-        assert!(local_name_matches(b"NameID", "NameID"));
-        assert!(local_name_matches(b"saml:NameID", "NameID"));
-        assert!(local_name_matches(b"ds:Signature", "Signature"));
-        assert!(!local_name_matches(b"Other", "NameID"));
-    }
-
-    #[test]
-    fn test_xml_has_element() {
-        let xml = r#"<samlp:Response><ds:Signature><ds:SignatureValue>abc</ds:SignatureValue></ds:Signature></samlp:Response>"#;
-        assert!(xml_has_element(xml, "Signature"));
-        assert!(xml_has_element(xml, "SignatureValue"));
-        assert!(!xml_has_element(xml, "NonExistent"));
-    }
-}
