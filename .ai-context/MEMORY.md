@@ -59,7 +59,22 @@ HookSniff/
 
 ---
 
-## 🔧 Modular Split Durumu (2026-05-25)
+## 🔧 Modular Split Durumu (2026-05-25 — Tüm Split'ler)
+
+### 📊 Toplam Etki
+
+| Dosya | Önce | Sonra | Azalma |
+|-------|------|-------|--------|
+| worker/main.rs | 1883 | 953 | %49 |
+| webhooks/handlers.rs | 1177 | 851 | %28 |
+| auth/handlers.rs | 1033 | 905 | %12 |
+| inbound/handlers.rs | 870 | 295 | %66 |
+| email.rs | 1104 | 566 | %49 |
+| config.rs | 1060 | 353 | %67 |
+| middleware/mod.rs | 1052 | 642 | %39 |
+| **TOPLAM** | **8179** | **4565** | **%44** |
+
+**20 yeni dosya** oluşturuldu. `cargo check` ✅ tüm modüllerde.
 
 ### worker/main.rs Bölme — TAMAMLANDI ✅
 
@@ -67,7 +82,7 @@ Orijinal `main.rs` (1883 satır) 8 dosyaya bölündü:
 
 | Dosya | İçerik | Satır |
 |-------|--------|-------|
-| `main.rs` | Entry point + main loop + process_pending | 958 |
+| `main.rs` | Entry point + main loop + process_pending | 953 |
 | `types.rs` | WebhookMessage + WebhookQueueItem struct'ları | 23 |
 | `helpers.rs` | commit_tx, record_attempt, backoff, error classification, shutdown | 230 |
 | `health.rs` | Health server + READY static | 42 |
@@ -76,9 +91,58 @@ Orijinal `main.rs` (1883 satır) 8 dosyaya bölündü:
 | `grace.rs` | Grace period downgrade logic | 65 |
 | `retention.rs` | Retention cleanup logic | 110 |
 
-**Kural:** `pub use types::{...}` crate-level re-export, `use helpers::{...}` explicit import.
+### webhooks/handlers.rs Bölme — TAMAMLANDI ✅
 
-### api.ts Bölme — TAMAMLANDI ✅
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `handlers.rs` | HTTP handler'lar | 851 |
+| `helpers.rs` | CSV escape, date parse, team tracking, rate limiting | 243 |
+| `tests.rs` | Tüm test'ler | 125 |
+
+### auth/handlers.rs Bölme — TAMAMLANDI ✅
+
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `handlers.rs` | HTTP handler'lar | 905 |
+| `helpers.rs` | create_refresh_token, send_verification_email, generate_email_change_code | 75 |
+| `tests.rs` | Tüm test'ler | 100 |
+
+### inbound/handlers.rs Bölme — TAMAMLANDI ✅
+
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `handlers.rs` | HTTP handler'lar | 295 |
+| `tests.rs` | Provider, signature, config, HMAC test'leri | 600 |
+
+### email.rs Bölme — TAMAMLANDI ✅
+
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `email.rs` | EmailProvider + GCloudEmailClient | 566 |
+| `email_templates.rs` | Language enum + tüm template fonksiyonları | 324 |
+| `email_tests.rs` | GCloud client test'leri | 195 |
+
+### config.rs Bölme — TAMAMLANDI ✅
+
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `config.rs` | Config struct + from_env + validate_secret | 353 |
+| `config_tests.rs` | Tüm test'ler | 450 |
+
+### middleware/mod.rs Bölme — TAMAMLANDI ✅
+
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `mod.rs` | Auth cache, middleware fonksiyonları, API key, cookie | 642 |
+| `middleware_tests.rs` | Tüm test'ler | 300 |
+
+### Rust/Cargo Doğrulama
+- `cargo check` ✅ tüm modüllerde (0 hata)
+- `cargo test` ✅ worker'da 46 test geçti
+- `cargo clippy` ✅ (sadece warning'ler)
+- Rust bu ortamda kuruldu: `rustc 1.95.0`
+
+### api.ts Bölme — TAMAMLANDI ✅ (Önceki oturum)
 
 Orijinal `api.ts` (1369 satır) 5 dosyaya bölündü:
 
@@ -89,27 +153,6 @@ Orijinal `api.ts` (1369 satır) 5 dosyaya bölündü:
 | `api-teams.ts` | teams/notifications/broadcasts/alerts/inbound | 147 |
 | `api-integrations.ts` | connectors/integrations/stream + interface'ler | 177 |
 | `api-misc.ts` | 2FA/SSO/transforms/billing/analytics | 102 |
-
-**Kural:** Her split dosyası `apiFetch`'i `./api`'dan, tipleri `./api-types`'ten import eder. `api.ts` hepsini re-export eder.
-
-### Rust SSO Bölme — ADIM 1 TAMAMLANDI ✅ (2026-05-25)
-
-`sso.rs` (3943 satır) → `sso/` dizin modülüne dönüştürüldü:
-
-| Dosya | Satır | İçerik |
-|-------|-------|--------|
-| `sso/mod.rs` | 665 | Router + tüm type/struct tanımı + SsoStateStore + test'ler |
-| `sso/handlers.rs` | 3293 | Tüm handler fonksiyonları (config, login, SCIM, helpers) |
-
-**Durum:** ✅ `cargo check` — 0 hata, derleniyor
-
-**Sonraki adım:** `handlers.rs`'yi daha küçük parçalara bölmek:
-- `scim.rs` — SCIM 2.0 endpoint'leri (satır 2596+)
-- `saml.rs` — SAML parsing + signature verification helpers
-- `oidc.rs` — OIDC helpers
-- `helpers.rs` — Customer/team helper fonksiyonları
-- `config.rs` — Config CRUD handler'ları
-- `login.rs` — Login flow + callback handler'ları
 
 ### ⚠️ RUST BÖLME KURALLARI (ÇOK ÖNEMLİ — ÖĞRENİLDİ)
 
