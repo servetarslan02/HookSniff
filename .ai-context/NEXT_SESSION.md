@@ -9,6 +9,12 @@
 - Cleanup fonksiyonu modül seviyesinde değişkene taşındı
 - Commit: `735b1eb8`
 
+### Cortex ↔ Worker Entegrasyonu
+- Migration 101: eksik sütunlar + tablo adı düzeltmesi
+- Worker: healing action, smart routing, ML outcome reporting
+- API: routing decisions tabloya kaydetme
+- Commit: `18932265`
+
 ### SSO Auth Cookie Fix (BUG)
 - `api/src/routes/sso.rs`: Cookie 900s → 3600s (1 saat)
 - 5 adet `unwrap()` → proper error handling
