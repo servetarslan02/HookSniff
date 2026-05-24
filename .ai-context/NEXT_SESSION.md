@@ -34,9 +34,24 @@
 
 | Dosya | Satır | Öncelik |
 |-------|-------|---------|
-| `billing/stripe.rs` | 999 | Düşük |
-| `billing/mod.rs` | 984 | Düşük |
-| `sso/SsoContent.tsx` | 1310 | Düşük (Dashboard) |
+| `SsoContent.tsx` | 1167 | Düşük (handler'lar state'e çok bağlı) |
+| `polar/subscription.rs` | ~800 | Düşük |
+| `iyzico/` modülleri | ~600 | Düşük |
+
+### billing/stripe.rs Split — TAMAMLANDI ✅
+- 999 → 376 satır (%62 küçülme)
+- 2 yeni modül: stripe_handlers.rs (468), stripe_tests.rs (112)
+- GitHub push: `d582cb0e`
+
+### billing/mod.rs Split — TAMAMLANDI ✅
+- 984 → 507 satır (%48 küçülme)
+- 2 yeni modül: models.rs (97), billing_tests.rs (360)
+- GitHub push: `bd0bafed`
+
+### SsoContent.tsx Split — TAMAMLANDI ✅ (kısmi)
+- 1310 → 1167 satır (%11 küçülme)
+- 1 yeni modül: sso-utils.ts (163)
+- GitHub push: `10634d98`
 
 ### middleware/mod.rs Split — TAMAMLANDI ✅
 - 1052 → 642 satır (%39 küçülme)

@@ -400,30 +400,31 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-25 — OpenClaw İlk Oturum + Bug Fix)
+## 📝 Son Oturum (2026-05-25 — OpenClaw Split Oturumları)
 
 ### Özet
-Servet ile OpenClaw üzerinden ilk oturum. Proje keşfi, workspace kurulumu, 2 bug fix.
+Servet ile OpenClaw üzerinden. 3 büyük dosya split edildi, CSP header eklendi, SELECT * düzeltildi.
 
 ### Yapılan İşler:
-1. **Proje keşfi** — .ai-context/ hafıza sistemi okundu, durum analizi yapıldı
-2. **Workspace kurulumu** — IDENTITY.md, USER.md, MEMORY.md oluşturuldu
-3. **CSP Header** — `next.config.js`'ye Content-Security-Policy eklendi (BUG-022)
-4. **SELECT * fix** — coupon_codes tablosundaki 5 sorgu explicit kolon listesine geçirildi (BUG-009)
+1. **CSP Header** — `next.config.js`'ye Content-Security-Policy eklendi (BUG-022)
+2. **SELECT * fix** — coupon_codes tablosundaki 5 sorgu explicit kolon listesine geçirildi (BUG-009)
+3. **billing/stripe.rs split** — 999 → 376 satır (%62 küçülme)
+   - `stripe/mod.rs` (376): types, checkout, portal, cancel, helpers
+   - `stripe/stripe_handlers.rs` (468): webhook event handlers
+   - `stripe/stripe_tests.rs` (112): tests
+4. **billing/mod.rs split** — 984 → 507 satır (%48 küçülme)
+   - `billing/mod.rs` (507): Plan enum, BillingService, resolve_provider
+   - `billing/models.rs` (97): Usage, Subscription, Invoice structs
+   - `billing/billing_tests.rs` (360): tests
+5. **SsoContent.tsx split** — 1310 → 1167 satır (%11 küçülme)
+   - `sso-utils.ts` (163): IDP_TEMPLATES, getFriendlyError
+   - `SsoContent.tsx` (1167): main component
 
-### Değişen Dosyalar:
-- `dashboard/next.config.js` — CSP header
-- `api/src/routes/admin/coupons.rs` — 3 SELECT * fix
-- `api/src/routes/coupons.rs` — 1 SELECT * fix
-- `api/src/routes/billing/subscription.rs` — 1 SELECT * fix
+### Push: d13176de, 0355b4b9, d582cb0e, bd0bafed, 10634d98
 
-### Push: `d13176de`
-
-### Notlar:
-- Alert Evaluation Worker zaten implemente edilmiş (2026-05-20)
-- SDK Libraries sayfası zaten güncel (11/11 Stable)
-- Quickstart zaten 11 dilde mevcut
-- DOCS-REWRITE-PLAN.md güncel değil (planlanan işler zaten yapılmış)
+### Kalan Split'ler
+- SsoContent.tsx hâlâ 1167 satır — handler'lar state'e çok bağlı, custom hook zor
+- Düşük öncelik: polar/ modülleri, iyzico/ modülleri
 
 ---
 
