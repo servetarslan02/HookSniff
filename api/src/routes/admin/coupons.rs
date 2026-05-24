@@ -31,7 +31,7 @@ pub async fn list_coupons(
     require_admin(&customer)?;
 
     let coupons = sqlx::query_as::<_, CouponCode>(
-        "SELECT * FROM coupon_codes ORDER BY created_at DESC"
+        "SELECT id, code, type, discount_type, discount_value, target_plan, polar_discount_id, max_redemptions, redemption_count, expires_at, is_active, created_by, created_at, updated_at FROM coupon_codes ORDER BY created_at DESC"
     )
     .fetch_all(&pool)
     .await?;
@@ -51,7 +51,7 @@ pub async fn get_coupon(
     require_admin(&customer)?;
 
     let coupon = sqlx::query_as::<_, CouponCode>(
-        "SELECT * FROM coupon_codes WHERE id = $1"
+        "SELECT id, code, type, discount_type, discount_value, target_plan, polar_discount_id, max_redemptions, redemption_count, expires_at, is_active, created_by, created_at, updated_at FROM coupon_codes WHERE id = $1"
     )
     .bind(id)
     .fetch_optional(&pool)
@@ -264,7 +264,7 @@ pub async fn sync_to_polar(
     require_admin(&customer)?;
 
     let coupon = sqlx::query_as::<_, CouponCode>(
-        "SELECT * FROM coupon_codes WHERE id = $1"
+        "SELECT id, code, type, discount_type, discount_value, target_plan, polar_discount_id, max_redemptions, redemption_count, expires_at, is_active, created_by, created_at, updated_at FROM coupon_codes WHERE id = $1"
     )
     .bind(id)
     .fetch_optional(&pool)
