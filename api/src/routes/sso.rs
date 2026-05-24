@@ -1300,10 +1300,9 @@ async fn initiate_saml_login(
     tracing::info!("SAML login redirect: customer={}, idp={}", customer.id, sso_url);
 
     let mut headers = HeaderMap::new();
-    headers.insert(
-        "location",
-        axum::http::HeaderValue::from_str(&redirect_url).unwrap(),
-    );
+    let header_val = axum::http::HeaderValue::from_str(&redirect_url)
+        .map_err(|e| AppError::BadRequest(format!("Invalid redirect URL: {}", e)))?;
+    headers.insert("location", header_val);
     Ok((headers, Redirect::temporary(&redirect_url)))
 }
 
@@ -1378,10 +1377,9 @@ async fn initiate_oidc_login(
     tracing::info!("OIDC login redirect: customer={}, issuer={}", customer.id, issuer);
 
     let mut headers = HeaderMap::new();
-    headers.insert(
-        "location",
-        axum::http::HeaderValue::from_str(&auth_url).unwrap(),
-    );
+    let header_val = axum::http::HeaderValue::from_str(&auth_url)
+        .map_err(|e| AppError::BadRequest(format!("Invalid auth URL: {}", e)))?;
+    headers.insert("location", header_val);
     Ok((headers, Redirect::temporary(&auth_url)))
 }
 
@@ -2605,13 +2603,19 @@ async fn generate_sso_response(
     let app_url = cfg.app_url.as_deref().unwrap_or("https://hooksniff.vercel.app");
     let redirect_url = redirect.unwrap_or_else(|| format!("{}/dashboard", app_url));
 
-    let auth_cookie = create_auth_cookie(&token, 900); // HS-039: 15 min (matches JWT)
+    let auth_cookie = create_auth_cookie(&token, 3600); // 1 hour (matches JWT expiry)
     let refresh_cookie = create_refresh_token_cookie(&refresh_token, 30 * 86400);
 
     let mut headers = HeaderMap::new();
-    headers.insert("set-cookie", axum::http::HeaderValue::from_str(&auth_cookie).unwrap());
-    headers.append("set-cookie", axum::http::HeaderValue::from_str(&refresh_cookie).unwrap());
-    headers.insert("location", axum::http::HeaderValue::from_str(&redirect_url).unwrap());
+    let auth_val = axum::http::HeaderValue::from_str(&auth_cookie)
+        .map_err(|e| AppError::Internal(format!("Invalid auth cookie: {}", e)))?;
+    let refresh_val = axum::http::HeaderValue::from_str(&refresh_cookie)
+        .map_err(|e| AppError::Internal(format!("Invalid refresh cookie: {}", e)))?;
+    let redirect_val = axum::http::HeaderValue::from_str(&redirect_url)
+        .map_err(|e| AppError::Internal(format!("Invalid redirect URL: {}", e)))?;
+    headers.insert("set-cookie", auth_val);
+    headers.append("set-cookie", refresh_val);
+    headers.insert("location", redirect_val);
 
     Ok((headers, Redirect::temporary(&redirect_url)))
 }
