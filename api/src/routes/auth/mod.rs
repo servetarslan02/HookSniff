@@ -1,9 +1,11 @@
 pub mod handlers;
+pub mod helpers;
+mod tests;
 
 use handlers::*;
 
 // Re-export for external modules (auth_2fa, oauth, inbound, middleware)
-pub use handlers::create_refresh_token;
+pub use helpers::create_refresh_token;
 use axum::http::{HeaderMap, HeaderValue};
 use axum::response::IntoResponse;
 use axum::routing::{get, post, put};
