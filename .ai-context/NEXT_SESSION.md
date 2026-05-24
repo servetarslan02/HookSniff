@@ -34,19 +34,32 @@
 
 | Dosya | Satır | Öncelik |
 |-------|-------|---------|
-| `webhooks/handlers.rs` | 1177 | Yüksek |
-| `auth/handlers.rs` | 1033 | Orta |
-| `inbound/handlers.rs` | 870 | Orta |
 | `email.rs` | 1104 | Orta |
 | `config.rs` | 1060 | Orta |
 | `middleware/mod.rs` | 1052 | Orta |
 | `billing/stripe.rs` | 999 | Düşük |
 | `billing/mod.rs` | 984 | Düşük |
+| `sso/SsoContent.tsx` | 1310 | Düşük (Dashboard) |
 
 ### worker/main.rs Split — TAMAMLANDI ✅
-- 1883 → 958 satır (%49 küçülme)
+- 1883 → 953 satır (%49 küçülme)
 - 7 yeni modül: types, helpers, health, queue, notifications, grace, retention
-- GitHub push: `3ae4fd46`
+- GitHub push: `f7dd3034`
+
+### webhooks/handlers.rs Split — TAMAMLANDI ✅
+- 1177 → 851 satır (%28 küçülme)
+- 2 yeni modül: helpers.rs, tests.rs
+- GitHub push: `9a3d7a9b`
+
+### auth/handlers.rs Split — TAMAMLANDI ✅
+- 1033 → 905 satır (%12 küçülme)
+- 2 yeni modül: helpers.rs, tests.rs
+- GitHub push: `07c77aa9`
+
+### inbound/handlers.rs Split — TAMAMLANDI ✅
+- 870 → 295 satır (%66 küçülme)
+- 1 yeni modül: tests.rs
+- GitHub push: `631b6888`
 
 ### teams/handlers.rs Bölme Planı
 - Team CRUD handler'ları → `teams/crud.rs`
