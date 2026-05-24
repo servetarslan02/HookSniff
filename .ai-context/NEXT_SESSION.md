@@ -34,10 +34,19 @@
 
 | Dosya | Satır | Öncelik |
 |-------|-------|---------|
-| `teams/handlers.rs` | 1403 | Yüksek |
 | `webhooks/handlers.rs` | 1177 | Yüksek |
 | `auth/handlers.rs` | 1033 | Orta |
 | `inbound/handlers.rs` | 870 | Orta |
+| `email.rs` | 1104 | Orta |
+| `config.rs` | 1060 | Orta |
+| `middleware/mod.rs` | 1052 | Orta |
+| `billing/stripe.rs` | 999 | Düşük |
+| `billing/mod.rs` | 984 | Düşük |
+
+### worker/main.rs Split — TAMAMLANDI ✅
+- 1883 → 958 satır (%49 küçülme)
+- 7 yeni modül: types, helpers, health, queue, notifications, grace, retention
+- GitHub push: `3ae4fd46`
 
 ### teams/handlers.rs Bölme Planı
 - Team CRUD handler'ları → `teams/crud.rs`
