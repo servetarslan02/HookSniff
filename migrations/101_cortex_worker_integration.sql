@@ -19,5 +19,5 @@ CREATE INDEX IF NOT EXISTS idx_routing_decisions_endpoint
 
 -- 6. Index for response_url lookups
 CREATE INDEX IF NOT EXISTS idx_delivery_attempts_response_url
-    ON delivery_attempts(endpoint_id, response_url, created_at DESC)
+    ON delivery_attempts(response_url, created_at DESC)
     WHERE response_url IS NOT NULL;
