@@ -1,23 +1,7 @@
+//! Template definitions — 10 built-in webhook templates.
+
 use super::*;
-
-/// Returns all built-in webhook templates
-pub fn all_templates() -> Vec<WebhookTemplate> {
-    vec![
-        stripe_like_template(),
-        shopify_like_template(),
-        github_like_template(),
-        twilio_like_template(),
-        saas_platform_template(),
-        healthcare_template(),
-        slack_like_template(),
-        discord_template(),
-        linear_template(),
-        notion_template(),
-    ]
-}
-
-/// Stripe-like payments webhook template
-fn stripe_like_template() -> WebhookTemplate {
+pub(super) fn stripe_like_template() -> WebhookTemplate {
     WebhookTemplate {
         id: "stripe-like-payments".to_string(),
         name: "Stripe-like Payments Webhooks".to_string(),
@@ -78,7 +62,7 @@ fn stripe_like_template() -> WebhookTemplate {
 }
 
 /// Shopify-like order webhook template
-fn shopify_like_template() -> WebhookTemplate {
+pub(super) fn shopify_like_template() -> WebhookTemplate {
     WebhookTemplate {
         id: "shopify-like-orders".to_string(),
         name: "Shopify-like Order Webhooks".to_string(),
@@ -146,7 +130,7 @@ fn shopify_like_template() -> WebhookTemplate {
 }
 
 /// GitHub-like repository webhook template
-fn github_like_template() -> WebhookTemplate {
+pub(super) fn github_like_template() -> WebhookTemplate {
     WebhookTemplate {
         id: "github-like-repos".to_string(),
         name: "GitHub-like Repository Webhooks".to_string(),
@@ -210,7 +194,7 @@ fn github_like_template() -> WebhookTemplate {
 }
 
 /// Twilio-like messaging webhook template
-fn twilio_like_template() -> WebhookTemplate {
+pub(super) fn twilio_like_template() -> WebhookTemplate {
     WebhookTemplate {
         id: "twilio-like-messaging".to_string(),
         name: "Twilio-like Messaging Webhooks".to_string(),
@@ -276,7 +260,7 @@ fn twilio_like_template() -> WebhookTemplate {
 }
 
 /// SaaS platform webhook template
-fn saas_platform_template() -> WebhookTemplate {
+pub(super) fn saas_platform_template() -> WebhookTemplate {
     WebhookTemplate {
         id: "saas-platform".to_string(),
         name: "SaaS Platform Webhooks".to_string(),
@@ -344,7 +328,7 @@ fn saas_platform_template() -> WebhookTemplate {
 }
 
 /// Healthcare webhook template
-fn healthcare_template() -> WebhookTemplate {
+pub(super) fn healthcare_template() -> WebhookTemplate {
     WebhookTemplate {
         id: "healthcare-events".to_string(),
         name: "Healthcare Events Webhooks".to_string(),
@@ -412,7 +396,7 @@ fn healthcare_template() -> WebhookTemplate {
 }
 
 /// Slack-like notifications webhook template
-fn slack_like_template() -> WebhookTemplate {
+pub(super) fn slack_like_template() -> WebhookTemplate {
     WebhookTemplate {
         id: "slack-like-notifications".to_string(),
         name: "Slack-like Notification Webhooks".to_string(),
@@ -469,7 +453,7 @@ fn slack_like_template() -> WebhookTemplate {
 }
 
 /// Discord webhook template
-fn discord_template() -> WebhookTemplate {
+pub(super) fn discord_template() -> WebhookTemplate {
     WebhookTemplate {
         id: "discord-interactions".to_string(),
         name: "Discord Interaction Webhooks".to_string(),
@@ -535,7 +519,7 @@ fn discord_template() -> WebhookTemplate {
 }
 
 /// Linear webhook template
-fn linear_template() -> WebhookTemplate {
+pub(super) fn linear_template() -> WebhookTemplate {
     WebhookTemplate {
         id: "linear-project-events".to_string(),
         name: "Linear Project Webhooks".to_string(),
@@ -591,7 +575,7 @@ fn linear_template() -> WebhookTemplate {
 }
 
 /// Notion webhook template
-fn notion_template() -> WebhookTemplate {
+pub(super) fn notion_template() -> WebhookTemplate {
     WebhookTemplate {
         id: "notion-workspace-events".to_string(),
         name: "Notion Workspace Webhooks".to_string(),
@@ -644,260 +628,3 @@ fn notion_template() -> WebhookTemplate {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_all_templates_count() {
-        let templates = all_templates();
-        assert_eq!(templates.len(), 10);
-    }
-
-    #[test]
-    fn test_all_templates_unique_ids() {
-        let templates = all_templates();
-        let ids: Vec<&str> = templates.iter().map(|t| t.id.as_str()).collect();
-        let mut unique_ids = ids.clone();
-        unique_ids.sort();
-        unique_ids.dedup();
-        assert_eq!(ids.len(), unique_ids.len(), "Template IDs should be unique");
-    }
-
-    #[test]
-    fn test_stripe_template() {
-        let templates = all_templates();
-        let stripe = templates
-            .iter()
-            .find(|t| t.id == "stripe-like-payments")
-            .unwrap();
-        assert_eq!(stripe.name, "Stripe-like Payments Webhooks");
-        assert_eq!(stripe.industry, "fintech");
-        assert!(!stripe.event_types.is_empty());
-        assert!(stripe
-            .event_types
-            .contains(&"payment_intent.created".to_string()));
-        assert!(stripe.event_types.contains(&"charge.succeeded".to_string()));
-        assert!(stripe.event_types.contains(&"invoice.paid".to_string()));
-        assert!(stripe
-            .event_types
-            .contains(&"subscription.created".to_string()));
-        assert_eq!(stripe.endpoint_config.signing_algorithm, "hmac-sha256");
-        assert_eq!(stripe.retry_policy.max_attempts, 5);
-        assert_eq!(stripe.retry_policy.backoff, "exponential");
-        assert!(stripe.tags.contains(&"payments".to_string()));
-        assert!(stripe.tags.contains(&"fintech".to_string()));
-    }
-
-    #[test]
-    fn test_shopify_template() {
-        let templates = all_templates();
-        let shopify = templates
-            .iter()
-            .find(|t| t.id == "shopify-like-orders")
-            .unwrap();
-        assert_eq!(shopify.name, "Shopify-like Order Webhooks");
-        assert_eq!(shopify.industry, "ecommerce");
-        assert!(shopify.event_types.contains(&"orders/create".to_string()));
-        assert!(shopify
-            .event_types
-            .contains(&"orders/fulfilled".to_string()));
-        assert!(shopify
-            .event_types
-            .contains(&"inventory_levels/update".to_string()));
-        assert_eq!(shopify.retry_policy.max_attempts, 4);
-        assert!(shopify.tags.contains(&"ecommerce".to_string()));
-        assert!(shopify.tags.contains(&"inventory".to_string()));
-    }
-
-    #[test]
-    fn test_github_template() {
-        let templates = all_templates();
-        let github = templates
-            .iter()
-            .find(|t| t.id == "github-like-repos")
-            .unwrap();
-        assert_eq!(github.name, "GitHub-like Repository Webhooks");
-        assert_eq!(github.industry, "devtools");
-        assert!(github.event_types.contains(&"push".to_string()));
-        assert!(github
-            .event_types
-            .contains(&"pull_request.opened".to_string()));
-        assert!(github.event_types.contains(&"issues.opened".to_string()));
-        assert!(github
-            .event_types
-            .contains(&"workflow_run.completed".to_string()));
-        assert_eq!(github.retry_policy.max_attempts, 3);
-        assert!(github.tags.contains(&"devtools".to_string()));
-        assert!(github.tags.contains(&"ci-cd".to_string()));
-    }
-
-    #[test]
-    fn test_twilio_template() {
-        let templates = all_templates();
-        let twilio = templates
-            .iter()
-            .find(|t| t.id == "twilio-like-messaging")
-            .unwrap();
-        assert_eq!(twilio.name, "Twilio-like Messaging Webhooks");
-        assert_eq!(twilio.industry, "communications");
-        assert!(twilio.event_types.contains(&"message.sent".to_string()));
-        assert!(twilio
-            .event_types
-            .contains(&"message.delivered".to_string()));
-        assert!(twilio.event_types.contains(&"call.initiated".to_string()));
-        assert_eq!(
-            twilio.endpoint_config.content_type,
-            "application/x-www-form-urlencoded"
-        );
-        assert_eq!(twilio.retry_policy.max_attempts, 5);
-        assert_eq!(twilio.estimated_daily_volume, 50000);
-        assert!(twilio.tags.contains(&"messaging".to_string()));
-        assert!(twilio.tags.contains(&"sms".to_string()));
-    }
-
-    #[test]
-    fn test_templates_have_valid_retry_policies() {
-        for template in all_templates() {
-            assert!(
-                template.retry_policy.max_attempts > 0,
-                "{}: max_attempts should be > 0",
-                template.id
-            );
-            assert!(
-                template.retry_policy.initial_delay_secs > 0,
-                "{}: initial_delay_secs should be > 0",
-                template.id
-            );
-            assert!(
-                template.retry_policy.max_delay_secs > 0,
-                "{}: max_delay_secs should be > 0",
-                template.id
-            );
-            assert!(
-                !template.retry_policy.backoff.is_empty(),
-                "{}: backoff should not be empty",
-                template.id
-            );
-        }
-    }
-
-    #[test]
-    fn test_templates_have_agents() {
-        for template in all_templates() {
-            assert!(
-                !template.agents.is_empty(),
-                "{}: should have at least one agent",
-                template.id
-            );
-            for agent in &template.agents {
-                assert!(!agent.agent_name.is_empty());
-                assert!(!agent.description.is_empty());
-            }
-        }
-    }
-
-    #[test]
-    fn test_templates_have_endpoint_configs() {
-        for template in all_templates() {
-            assert!(!template.endpoint_config.url_placeholder.is_empty());
-            assert!(!template.endpoint_config.signing_algorithm.is_empty());
-            assert!(!template.endpoint_config.content_type.is_empty());
-            assert!(!template.endpoint_config.event_filter.is_empty());
-        }
-    }
-
-    #[test]
-    fn test_templates_have_non_zero_daily_volume() {
-        for template in all_templates() {
-            assert!(
-                template.estimated_daily_volume > 0,
-                "{}: daily volume should be > 0",
-                template.id
-            );
-        }
-    }
-
-    #[test]
-    fn test_templates_have_tags() {
-        for template in all_templates() {
-            assert!(
-                !template.tags.is_empty(),
-                "{}: should have at least one tag",
-                template.id
-            );
-        }
-    }
-
-    #[test]
-    fn test_templates_serialization_roundtrip() {
-        for template in all_templates() {
-            let json = serde_json::to_string(&template).unwrap();
-            let deserialized: WebhookTemplate = serde_json::from_str(&json).unwrap();
-            assert_eq!(deserialized.id, template.id);
-            assert_eq!(deserialized.name, template.name);
-            assert_eq!(deserialized.industry, template.industry);
-            assert_eq!(deserialized.event_types.len(), template.event_types.len());
-            assert_eq!(deserialized.agents.len(), template.agents.len());
-        }
-    }
-
-    #[test]
-    fn test_stripe_template_agents() {
-        let templates = all_templates();
-        let stripe = templates
-            .iter()
-            .find(|t| t.id == "stripe-like-payments")
-            .unwrap();
-        assert_eq!(stripe.agents.len(), 2);
-        assert_eq!(stripe.agents[0].agent_name, "fraud_detector");
-        assert!(stripe.agents[0].enabled_by_default);
-        assert_eq!(stripe.agents[1].agent_name, "transaction_anomaly_detector");
-        assert!(stripe.agents[1].enabled_by_default);
-    }
-
-    #[test]
-    fn test_shopify_template_agents() {
-        let templates = all_templates();
-        let shopify = templates
-            .iter()
-            .find(|t| t.id == "shopify-like-orders")
-            .unwrap();
-        assert_eq!(shopify.agents.len(), 3);
-        let inventory_agent = shopify
-            .agents
-            .iter()
-            .find(|a| a.agent_name == "inventory_optimizer")
-            .unwrap();
-        assert!(inventory_agent.enabled_by_default);
-        let cart_agent = shopify
-            .agents
-            .iter()
-            .find(|a| a.agent_name == "abandoned_cart_recovery")
-            .unwrap();
-        assert!(!cart_agent.enabled_by_default);
-    }
-
-    #[test]
-    fn test_twilio_content_type_is_form_encoded() {
-        let templates = all_templates();
-        let twilio = templates
-            .iter()
-            .find(|t| t.id == "twilio-like-messaging")
-            .unwrap();
-        assert_eq!(
-            twilio.endpoint_config.content_type,
-            "application/x-www-form-urlencoded"
-        );
-    }
-
-    #[test]
-    fn test_stripe_max_delay_is_24h() {
-        let templates = all_templates();
-        let stripe = templates
-            .iter()
-            .find(|t| t.id == "stripe-like-payments")
-            .unwrap();
-        assert_eq!(stripe.retry_policy.max_delay_secs, 86400);
-    }
-}
