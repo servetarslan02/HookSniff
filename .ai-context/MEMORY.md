@@ -75,9 +75,37 @@ Orijinal `api.ts` (1369 satır) 5 dosyaya bölündü:
 
 **Kural:** Her split dosyası `apiFetch`'i `./api`'dan, tipleri `./api-types`'ten import eder. `api.ts` hepsini re-export eder.
 
-### Rust Bölme — YAPILMADI (GEREKLİ DEĞİL)
+### Rust SSO Bölme — ADIM 1 TAMAMLANDI ✅ (2026-05-25)
 
-Rust dosyaları (sso.rs, inbound.rs, teams.rs, worker/main.rs) büyük ama stabil. Axum Handler trait uyumsuzluğu nedeniyle bölme başarısız oldu. Gerekirse ileride tekrar denenebilir.
+`sso.rs` (3943 satır) → `sso/` dizin modülüne dönüştürüldü:
+
+| Dosya | Satır | İçerik |
+|-------|-------|--------|
+| `sso/mod.rs` | 665 | Router + tüm type/struct tanımı + SsoStateStore + test'ler |
+| `sso/handlers.rs` | 3293 | Tüm handler fonksiyonları (config, login, SCIM, helpers) |
+
+**Durum:** ✅ `cargo check` — 0 hata, derleniyor
+
+**Sonraki adım:** `handlers.rs`'yi daha küçük parçalara bölmek:
+- `scim.rs` — SCIM 2.0 endpoint'leri (satır 2596+)
+- `saml.rs` — SAML parsing + signature verification helpers
+- `oidc.rs` — OIDC helpers
+- `helpers.rs` — Customer/team helper fonksiyonları
+- `config.rs` — Config CRUD handler'ları
+- `login.rs` — Login flow + callback handler'ları
+
+### ⚠️ RUST BÖLME KURALLARI (ÇOK ÖNEMLİ — ÖĞRENİLDİ)
+
+1. **Önce çalışır hali commit et** — split sonrası 0 hata olmadan devam etme
+2. **mod.rs type'ları tutar** — tüm struct/enum/const mod.rs'de, `pub` olarak
+3. **Sub-module'ler `pub async fn` kullanır** — handler'lar `pub` olmalı
+4. **`use super::*` ÇALIŞMIYOR** — duplicate import yaratıyor
+5. **Doğru yaklaşım:** `use super::{Type1, Type2};` — sadece gereken type'ları import et
+6. **External crate'ler her dosyada ayrı import edilmeli** — axum, chrono, sqlx, vb.
+7. **Cross-module fonksiyon çağrısı:** `helpers::function_name()` şeklinde prefix gerekli
+8. **Private type'lar pub yapılmalı** — handler fonksiyonun parametre/return type'ı pub olmalı
+9. **Adım adım böl** — tek seferde tüm dosyayı değil, bir parçayı çıkar, cargo check et
+10. **Rust kurulu değilse** — `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y` ile kur
 
 ### Dashboard Hook Bölme — TAMAMLANDI ✅ (2026-05-25, 2. oturum)
 
