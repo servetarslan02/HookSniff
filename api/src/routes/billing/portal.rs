@@ -28,6 +28,7 @@ pub(crate) struct UsageResponse {
     pub(crate) webhooks: UsageCounter,
     pub(crate) endpoints: UsageCounter,
     pub(crate) rate_limit: RateLimitInfo,
+    pub(crate) retention_days: i64,
     pub(crate) period: PeriodInfo,
 }
 
@@ -85,6 +86,7 @@ pub async fn get_usage(
         rate_limit: RateLimitInfo {
             requests_per_minute: plan.max_requests_per_minute(),
         },
+        retention_days: plan.retention_days(),
         period: {
             let now = chrono::Utc::now();
             let start = now.format("%Y-%m-01").to_string();

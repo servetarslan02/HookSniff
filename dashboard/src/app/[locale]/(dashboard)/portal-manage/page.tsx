@@ -30,6 +30,9 @@ export default function PortalPage() {
   const error = profileError;
   const currentPlan = profile?.plan || billingUsage?.plan || 'developer';
   const planLimits = getPlanLimits(currentPlan);
+  // Prefer retention from billing usage API (authoritative, from DB plan),
+  // fallback to plans API lookup
+  const retentionDays = billingUsage?.retention_days ?? planLimits?.retention ?? null;
 
   const webhookUsed = billingUsage?.webhooks?.used ?? 0;
   const webhookRawLimit = billingUsage?.webhooks?.limit;
@@ -171,7 +174,7 @@ export default function PortalPage() {
             <div className="flex justify-between text-sm mb-2">
               <span className="text-gray-600 dark:text-slate-400">{tb('dataRetention')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
-                {planLimits?.retention ?? '—'} {tb('days')}
+                {retentionDays ?? '—'} {tb('days')}
               </span>
             </div>
             <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2">
@@ -187,7 +190,7 @@ export default function PortalPage() {
                 <LimitChip value="∞" label={tb('endpoints')} />
                 <LimitChip value={formatLimit(planLimits.webhooks)} label={tb('webhooksMonth')} />
                 <LimitChip value={formatLimit(planLimits.rateLimit)} label={tb('rateLimit')} />
-                <LimitChip value={isUnlimited(planLimits.retention) ? '∞' : `${planLimits.retention}d`} label={tb('dataRetention')} />
+                <LimitChip value={isUnlimited(retentionDays) ? '∞' : `${retentionDays}d`} label={tb('dataRetention')} />
               </div>
             </div>
           )}
