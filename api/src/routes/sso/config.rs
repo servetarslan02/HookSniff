@@ -23,7 +23,7 @@ use super::{OidcDiscovery, TeamQuery, UpsertSsoRequest};
 
 /// Row struct for get_sso_config queries (19 fields — too many for tuple)
 #[derive(sqlx::FromRow)]
-struct SsoConfigRow {
+pub struct SsoConfigRow {
     id: Uuid,
     provider: String,
     enabled: bool,
