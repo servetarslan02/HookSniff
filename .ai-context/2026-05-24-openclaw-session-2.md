@@ -55,6 +55,12 @@
   - Liste sayfası `['endpoints']` kullanıyordu → UI tepki vermiyordu
   - Çözüm: Her iki cache de optimistic olarak güncelleniyor
 
+### 5. Delivery Detail Modal — Endpoint URL Gösterimi
+- `dashboard/src/app/[locale]/(dashboard)/deliveries/DeliveriesContent.tsx`
+  - Sorun: Modal `endpoint_id` (UUID) gösteriyordu, URL değil
+  - Çözüm: `useEndpoints` ile endpoint_id → URL çözümleme
+  - `endpointUrlMap` cache'den URL'yi bulur, yoksa ID'ye düşer
+
 ## Commitler
 - `d0e5088d` — SSO auth cookie fix + unwrap cleanup + session log
 - `735b1eb8` — Fix _visibilityCleanup: timer number property fix
