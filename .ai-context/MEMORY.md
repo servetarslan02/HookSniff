@@ -79,15 +79,26 @@ Orijinal `api.ts` (1369 satır) 5 dosyaya bölündü:
 
 Rust dosyaları (sso.rs, inbound.rs, teams.rs, worker/main.rs) büyük ama stabil. Axum Handler trait uyumsuzluğu nedeniyle bölme başarısız oldu. Gerekirse ileride tekrar denenebilir.
 
-### Dashboard Hook Bölme — TAMAMLANDI ✅ (2026-05-25)
+### Dashboard Hook Bölme — TAMAMLANDI ✅ (2026-05-25, 2. oturum)
 
-`useDashboardData.ts` (1106 satır) ve `useAdminData.ts` (851 satır) 5 dosyaya bölündü:
+`useDashboardData.ts` (1106 satır) ve `useAdminData.ts` (851 satır) toplam 15 dosyaya bölündü:
 
-| Orijinal | Önce | Sonra | Yeni Dosyalar |
-|----------|------|-------|---------------|
-| `useDashboardData.ts` | 1106 | 754 | useTeams.ts (171), useNotifications.ts (154), useBilling.ts (70) |
-| `useAdminData.ts` | 851 | 363 | useAdminUserDetail.ts (402), useAdminSystem.ts (109) |
-| **Toplam** | **1957** | **1117** | **%43 küçülme** |
+| Orijinal | Önce | Sonra | Azalma |
+|----------|------|-------|--------|
+| `useDashboardData.ts` | 1106 | 172 | **%84** |
+| `useAdminData.ts` | 851 | 363 | **%57** |
+
+**useDashboardData.ts split dosyaları (12 adet):**
+- useTeams.ts (171), useNotifications.ts (154), useBilling.ts (70)
+- useAlerts.ts (61), useTransforms.ts (68), usePortal.ts (68)
+- useApiKeys.ts (45), useServiceTokens.ts (53)
+- useEndpoints.ts (85), useAnalytics.ts (82), useWebhooks.ts (112)
+- useInboundConfigs.ts (57), useRateLimits.ts (37)
+
+**useAdminData.ts split dosyaları (2 adet):**
+- useAdminUserDetail.ts (402), useAdminSystem.ts (109)
+
+**Paylaşılan yardımcı:** validated.ts (15) — schema-validated fetcher wrapper
 
 **Kural:** Her split dosya `useAuth`'ı `@/lib/store`'dan, tipleri `@/lib/api` veya `@/schemas/api`'dan import eder. Orijinal dosya hepsini re-export eder.
 
