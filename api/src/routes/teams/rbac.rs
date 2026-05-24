@@ -9,7 +9,7 @@ use super::{Team, TeamMember};
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const VALID_ROLES: &[&str] = &["admin", "developer", "analyst", "viewer"];
+pub const VALID_ROLES: &[&str] = &["admin", "developer", "analyst", "viewer"];
 
 /// Role hierarchy: higher number = more permissions.
 /// Owner is not a stored role — it's derived from teams.owner_id.
@@ -283,7 +283,7 @@ async fn get_user_role(
 }
 
 /// Compute permissions based on role
-fn compute_permissions(role: &str) -> serde_json::Value {
+pub fn compute_permissions(role: &str) -> serde_json::Value {
     match role {
         "owner" | "admin" => serde_json::json!({
             "can_manage_team": true,
