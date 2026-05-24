@@ -66,7 +66,6 @@ const RETENTION_CLEANUP_INTERVAL_SECS: u64 = 6 * 3600;
 /// Cortex health report interval — every 5 minutes
 const CORTEX_HEALTH_REPORT_INTERVAL_SECS: u64 = 300;
 use anyhow::Result;
-use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgListener, PgPoolOptions};
 use sqlx::PgPool;
 
@@ -75,65 +74,23 @@ mod config;
 pub mod cortex_integration;
 pub mod delivery;
 mod fifo;
+mod grace;
+mod health;
+mod helpers;
+mod notifications;
 pub mod metrics_push;
 pub mod operational_webhook;
+mod queue;
+mod retention;
 pub mod telemetry;
 mod throttle;
+mod types;
 
-/// Shared readiness state — set to true once DB pool is connected.
-static READY: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
-
-/// Start health server with a pre-bound listener (for Cloud Run startup probe).
-/// Provides Kubernetes-compatible health endpoints:
-/// - `/health`  — legacy Cloud Run health check (always 200)
-/// - `/livez`   — liveness probe: process is alive (always 200)
-/// - `/readyz`  — readiness probe: ready to serve traffic (checks DB connectivity)
-async fn start_health_server(listener: tokio::net::TcpListener) {
-    use axum::{routing::get, Router};
-
-    let app = Router::new()
-        .route("/health", get(|| async { "ok" }))
-        .route("/livez", get(|| async { "ok" }))
-        .route("/readyz", get(|| async {
-            if READY.load(std::sync::atomic::Ordering::Relaxed) {
-                (axum::http::StatusCode::OK, "ready")
-            } else {
-                (axum::http::StatusCode::SERVICE_UNAVAILABLE, "not ready")
-            }
-        }))
-        .route("/", get(|| async { "HookSniff Worker 🐝" }));
-
-    if let Err(e) = axum::serve(listener, app).await {
-        tracing::error!("❌ Health server error: {}", e);
-    }
-}
-
-/// Webhook message format used by delivery modules.
-/// Bridges the queue item format with the delivery router.
-#[derive(Debug, Clone)]
-pub struct WebhookMessage {
-    pub delivery_id: String,
-    pub endpoint_id: String,
-    pub endpoint_url: String,
-    pub signing_secret: String,
-    pub payload: String,
-    pub custom_headers: Option<serde_json::Value>,
-}
-
-/// Webhook queue'dan gelen mesaj formatı
-#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
-pub struct WebhookQueueItem {
-    pub id: uuid::Uuid,
-    pub delivery_id: uuid::Uuid,
-    pub endpoint_id: uuid::Uuid,
-    pub endpoint_url: String,
-    pub payload: String,
-    pub custom_headers: Option<serde_json::Value>,
-    pub attempt_count: i32,
-    pub max_attempts: i32,
-    pub next_retry_at: Option<chrono::DateTime<chrono::Utc>>,
-    pub trace_id: Option<String>,
-}
+pub use types::{WebhookMessage, WebhookQueueItem};
+use helpers::{
+    calculate_backoff, commit_delivery_tx, is_non_retryable, is_transient_db_error,
+    record_delivery_attempt, shutdown_signal,
+};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -164,7 +121,7 @@ async fn main() -> Result<()> {
     let health_listener =
         tokio::net::TcpListener::bind(std::net::SocketAddr::from(([0, 0, 0, 0], health_port)))
             .await?;
-    tokio::spawn(start_health_server(health_listener));
+    tokio::spawn(health::start_health_server(health_listener));
     tracing::info!("🏥 Health server bound on :{}", health_port);
 
     // Start worker health metrics push to Grafana Cloud (every 60s)
@@ -190,7 +147,7 @@ async fn main() -> Result<()> {
         })?;
 
     // Mark readiness — DB pool connected, ready to serve traffic
-    READY.store(true, std::sync::atomic::Ordering::Relaxed);
+    health::READY.store(true, std::sync::atomic::Ordering::Relaxed);
     tracing::info!("✅ Readiness probe: ready (DB connected)");
 
     // HTTP client (shared, connection pooling, optimized for low latency)
@@ -335,7 +292,7 @@ async fn main() -> Result<()> {
                 }
             }
             _ = reaper_interval.tick() => {
-                match reap_zombies(&pool).await {
+                match queue::reap_zombies(&pool).await {
                     Ok(reaped) => {
                         if reaped > 0 {
                             tracing::warn!("🧟 Zombie reaper recovered {} stuck records", reaped);
@@ -346,7 +303,7 @@ async fn main() -> Result<()> {
                     }
                 }
                 // Also recover orphaned deliveries
-                match reap_orphaned_deliveries(&pool).await {
+                match queue::reap_orphaned_deliveries(&pool).await {
                     Ok(orphaned) => {
                         if orphaned > 0 {
                             tracing::warn!("🧟 Re-queued {} orphaned deliveries", orphaned);
@@ -370,7 +327,7 @@ async fn main() -> Result<()> {
             }
             _ = grace_interval.tick() => {
                 // HS-059: Downgrade customers past their grace period (7 days)
-                match process_expired_grace_periods(&pool).await {
+                match grace::process_expired_grace_periods(&pool).await {
                     Ok(downgraded) => {
                         if downgraded > 0 {
                             tracing::warn!(
@@ -386,7 +343,7 @@ async fn main() -> Result<()> {
             }
             _ = retention_interval.tick() => {
                 // Retention cleanup — delete old delivery data per plan
-                match cleanup_expired_retention(&pool).await {
+                match retention::cleanup_expired_retention(&pool).await {
                     Ok((deliveries, attempts)) => {
                         if deliveries > 0 || attempts > 0 {
                             tracing::info!(
@@ -422,135 +379,6 @@ async fn main() -> Result<()> {
     tracing::info!("👋 HookSniff Worker shut down gracefully");
 
     Ok(())
-}
-
-/// Wait for SIGTERM or SIGINT signal for graceful shutdown
-async fn shutdown_signal() {
-    let ctrl_c = async {
-        tokio::signal::ctrl_c()
-            .await
-            .expect("failed to install Ctrl+C handler");
-    };
-
-    #[cfg(unix)]
-    let terminate = async {
-        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
-            .expect("failed to install signal handler")
-            .recv()
-            .await;
-    };
-
-    #[cfg(not(unix))]
-    let terminate = std::future::pending::<()>();
-
-    tokio::select! {
-        _ = ctrl_c => {
-            tracing::info!("Received SIGINT (Ctrl+C), starting graceful shutdown...");
-        }
-        _ = terminate => {
-            tracing::info!("Received SIGTERM, starting graceful shutdown...");
-        }
-    }
-}
-
-
-// ── Delivery outcome helpers ────────────────────────────────
-
-/// Create an in-app notification for a dead-lettered delivery.
-/// Also sends email notification if user has email_on_failure enabled.
-async fn create_delivery_failure_notification(
-    pool: &sqlx::PgPool,
-    customer_id: uuid::Uuid,
-    delivery_id: uuid::Uuid,
-    endpoint_url: &str,
-    error_msg: &str,
-) {
-    // Use the shared helper from the API crate
-    // Note: worker imports api::notifications::helpers
-    let title = "⚠️ Webhook Teslimat Başarısız";
-    let message = format!("{} adresine teslimat başarısız oldu: {}", endpoint_url, error_msg);
-    let link = format!("/deliveries/{}", delivery_id);
-
-    let _ = sqlx::query(
-        "INSERT INTO notifications (customer_id, type, title, message, is_read, link) VALUES ($1, 'webhook_failed', $2, $3, false, $4)"
-    )
-    .bind(customer_id)
-    .bind(title)
-    .bind(&message)
-    .bind(&link)
-    .execute(pool)
-    .await;
-
-    // Send email notification if user has email_on_failure enabled
-    let email_prefs = sqlx::query_as::<_, (String, Option<String>, bool, bool)>(
-        r#"SELECT c.email, c.language,
-                  COALESCE(np.email_on_failure, true) as email_on_failure,
-                  COALESCE(np.email_on_dead_letter, true) as email_on_dead_letter
-           FROM customers c
-           LEFT JOIN notification_preferences np ON np.customer_id = c.id
-           WHERE c.id = $1"#
-    )
-    .bind(customer_id)
-    .fetch_optional(pool)
-    .await;
-
-    if let Ok(Some((email, lang, email_on_failure, email_on_dead_letter))) = email_prefs {
-        if !email_on_failure && !email_on_dead_letter {
-            return; // User disabled failure emails
-        }
-
-        // Get Resend API key from platform settings
-        let api_key: Option<String> = sqlx::query_scalar(
-            "SELECT value->>'resend_api_key' FROM platform_settings WHERE key = 'main'"
-        )
-        .fetch_optional(pool)
-        .await
-        .unwrap_or(None)
-        .flatten();
-
-        if let Some(key) = api_key {
-            if !key.is_empty() {
-                let sender: String = sqlx::query_scalar(
-                    "SELECT COALESCE(value->>'email_sender', 'noreply@resend.dev') FROM platform_settings WHERE key = 'main'"
-                )
-                .fetch_one(pool)
-                .await
-                .unwrap_or_else(|_| "noreply@resend.dev".to_string());
-
-                let is_tr = lang.as_deref() == Some("tr");
-                let (subject, body) = if is_tr {
-                    (
-                        format!("❌ Teslimat Başarısız: {}", endpoint_url),
-                        format!(
-                            "Webhook teslimatınız başarısız oldu.\n\nEndpoint: {}\nHata: {}\nTeslimat ID: {}\n\nDashboard'dan kontrol edin: https://hooksniff.vercel.app/deliveries/{}\n\n— HookSniff",
-                            endpoint_url, error_msg, delivery_id, delivery_id
-                        ),
-                    )
-                } else {
-                    (
-                        format!("❌ Delivery Failed: {}", endpoint_url),
-                        format!(
-                            "Your webhook delivery has failed.\n\nEndpoint: {}\nError: {}\nDelivery ID: {}\n\nCheck your dashboard: https://hooksniff.vercel.app/deliveries/{}\n\n— HookSniff",
-                            endpoint_url, error_msg, delivery_id, delivery_id
-                        ),
-                    )
-                };
-
-                let client = reqwest::Client::new();
-                let _ = client
-                    .post("https://api.resend.com/emails")
-                    .header("Authorization", format!("Bearer {}", key))
-                    .json(&serde_json::json!({
-                        "from": sender,
-                        "to": [email],
-                        "subject": subject,
-                        "text": body,
-                    }))
-                    .send()
-                    .await;
-            }
-        }
-    }
 }
 
 /// Move a delivery to dead_letter (non-retryable or max attempts exceeded).
@@ -1011,14 +839,14 @@ async fn process_pending(
                     let url_clone = item.endpoint_url.clone();
                     let err_clone = dl_err.clone();
                     tokio::spawn(async move {
-                        create_delivery_failure_notification(&pool_clone, customer_id, delivery_id, &url_clone, &err_clone).await;
+                        notifications::create_delivery_failure_notification(&pool_clone, customer_id, delivery_id, &url_clone, &err_clone).await;
                     });
                 }
 
                 {
                     let pool_clone = pool.clone();
                     let url_clone = item.endpoint_url.clone();
-                    tokio::spawn(async move { notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await; });
+                    tokio::spawn(async move { notifications::notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await; });
                 }
 
                 // Dispatch operational webhook: delivery.failed
@@ -1053,14 +881,14 @@ async fn process_pending(
                     let url_clone = item.endpoint_url.clone();
                     let err_clone = error_msg.clone();
                     tokio::spawn(async move {
-                        create_delivery_failure_notification(&pool_clone, customer_id, delivery_id, &url_clone, &err_clone).await;
+                        notifications::create_delivery_failure_notification(&pool_clone, customer_id, delivery_id, &url_clone, &err_clone).await;
                     });
                 }
 
                 {
                     let pool_clone = pool.clone();
                     let url_clone = item.endpoint_url.clone();
-                    tokio::spawn(async move { notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await; });
+                    tokio::spawn(async move { notifications::notify_endpoint_down(&pool_clone, endpoint_id, &url_clone, new_streak).await; });
                 }
 
                 // Dispatch operational webhook: delivery.failed
@@ -1124,760 +952,7 @@ async fn process_pending(
 
 // ── Delivery outcome helpers (Item 293: reduce function length) ──────
 
-/// Commit a delivery transaction with transient vs permanent error classification.
-async fn commit_delivery_tx(
-    tx: sqlx::PgTransaction<'_>,
-    delivery_id: uuid::Uuid,
-    context: &str,
-) -> Result<bool> {
-    match tx.commit().await {
-        Ok(()) => Ok(true),
-        Err(e) => {
-            if is_transient_db_error(&e) {
-                tracing::warn!(
-                    "⚠️ Delivery {} — transient DB commit failure ({}): {:?}",
-                    delivery_id, context, e
-                );
-            } else {
-                tracing::error!(
-                    "❌ Delivery {} — permanent DB commit failure ({}): {:?}",
-                    delivery_id, context, e
-                );
-            }
-            Ok(false)
-        }
-    }
-}
-
-/// Record the delivery attempt in the delivery_attempts table.
-#[allow(clippy::too_many_arguments)]
-async fn record_delivery_attempt(
-    tx: &mut sqlx::PgTransaction<'_>,
-    delivery_id: uuid::Uuid,
-    attempt: i32,
-    attempt_status: Option<i32>,
-    attempt_body: Option<&str>,
-    duration_ms: i32,
-    error_message: Option<&str>,
-    trace_id: Option<&str>,
-    attempt_headers: Option<&serde_json::Value>,
-) -> Result<()> {
-    record_attempt(
-        tx,
-        delivery_id,
-        attempt,
-        AttemptRecord {
-            status_code: attempt_status,
-            response_body: attempt_body,
-            duration_ms,
-            error_message,
-            trace_id,
-            response_headers: attempt_headers,
-        },
-    )
-    .await
-}
-
 /// Recover webhook_queue records stuck in "processing" for more than 5 minutes.
 ///
 /// When the worker crashes mid-delivery, records stay in "processing" forever.
 /// This reaper checks max_attempts:
-///   - If attempt_count >= max_attempts → dead letter (don't retry forever)
-///   - If attempt_count < max_attempts → reset to pending for retry
-///
-/// Item 267: Wrapped in a transaction for atomicity.
-async fn reap_zombies(pool: &PgPool) -> Result<usize> {
-    // Find stuck records with their max_attempts
-    let stuck: Vec<(uuid::Uuid, uuid::Uuid, uuid::Uuid, i32, i32)> = sqlx::query_as(
-        r#"
-        SELECT id, delivery_id, endpoint_id, attempt_count, max_attempts
-        FROM webhook_queue
-        WHERE status = 'processing'
-          AND updated_at < now() - interval '5 minutes'
-        "#,
-    )
-    .fetch_all(pool)
-    .await?;
-
-    if stuck.is_empty() {
-        return Ok(0);
-    }
-
-    // Item 267: Wrap all zombie reaper operations in a single transaction
-    let mut tx = pool.begin().await?;
-    let mut dead_lettered: Vec<(uuid::Uuid, uuid::Uuid, i32)> = Vec::new(); // (delivery_id, endpoint_id, attempt)
-
-    for (id, delivery_id, endpoint_id, attempt, max_attempts) in &stuck {
-        if *attempt >= *max_attempts {
-            // Max attempts exceeded → dead letter
-            tracing::error!(
-                "🧟 Zombie exceeded max attempts: queue_id={} delivery_id={} attempts={}/{} → dead_letter",
-                id, delivery_id, attempt, max_attempts
-            );
-
-            sqlx::query::<sqlx::Postgres>(
-                r#"
-                UPDATE webhook_queue
-                SET status = 'dead_letter', attempt_count = attempt_count + 1
-                WHERE id = $1
-                "#,
-            )
-            .bind(id)
-            .execute(&mut *tx)
-            .await?;
-
-            // Insert into dead_letters table
-            sqlx::query::<sqlx::Postgres>(
-                r#"
-                INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts)
-                SELECT id, endpoint_id, customer_id, payload, $2, $3
-                FROM deliveries WHERE id = $1
-                "#,
-            )
-            .bind(delivery_id)
-            .bind("zombie reaper: max attempts exceeded")
-            .bind(attempt + 1)
-            .execute(&mut *tx)
-            .await?;
-
-            // Update delivery status to failed
-            sqlx::query::<sqlx::Postgres>(
-                "UPDATE deliveries SET status = 'failed', error_message = $2 WHERE id = $1",
-            )
-            .bind(delivery_id)
-            .bind("zombie reaper: max attempts exceeded")
-            .execute(&mut *tx)
-            .await?;
-
-            dead_lettered.push((*delivery_id, *endpoint_id, *attempt));
-        } else {
-            // Reset to pending for retry
-            sqlx::query::<sqlx::Postgres>(
-                r#"
-                UPDATE webhook_queue
-                SET status = 'pending'
-                WHERE id = $1
-                "#,
-            )
-            .bind(id)
-            .execute(&mut *tx)
-            .await?;
-
-            tracing::warn!(
-                "🧟 Recovered zombie: queue_id={} delivery_id={} next_attempt={}",
-                id,
-                delivery_id,
-                attempt + 1
-            );
-        }
-    }
-
-    // Item 34: Add context for transient DB failures in zombie reaper
-    tx.commit().await.map_err(|e| {
-        if is_transient_db_error(&e) {
-            tracing::warn!("⚠️ Zombie reaper: transient DB commit failure: {:?}", e);
-        }
-        anyhow::anyhow!("Zombie reaper commit failed: {}", e)
-    })?;
-
-    // Dispatch operational webhooks for dead-lettered zombies
-    for (delivery_id, endpoint_id, attempt) in dead_lettered {
-        let pool_clone = pool.clone();
-        tokio::spawn(async move {
-            // Look up customer_id for this delivery
-            if let Ok(Some(customer_id)) = sqlx::query_scalar::<_, uuid::Uuid>(
-                "SELECT customer_id FROM deliveries WHERE id = $1",
-            )
-            .bind(delivery_id)
-            .fetch_optional(&pool_clone)
-            .await
-            {
-                let http_client = reqwest::Client::new();
-                let op_payload = serde_json::json!({
-                    "delivery_id": delivery_id.to_string(),
-                    "endpoint_id": endpoint_id.to_string(),
-                    "error": "zombie reaper: max attempts exceeded",
-                    "attempt": attempt,
-                });
-                operational_webhook::dispatch_event(
-                    &pool_clone,
-                    &http_client,
-                    customer_id,
-                    operational_webhook::OpWebhookEvent::DeliveryFailed,
-                    op_payload,
-                )
-                .await;
-            }
-        });
-    }
-
-    Ok(stuck.len())
-}
-
-/// Also recover deliveries stuck in 'pending' with no active queue entry.
-/// These are orphaned records from crashed workers.
-///
-/// Item 268: Uses a single JOIN query instead of N+1 per-delivery queries.
-async fn reap_orphaned_deliveries(pool: &PgPool) -> Result<usize> {
-    // Single query: find orphaned deliveries with their endpoint URLs
-    let orphaned: Vec<(uuid::Uuid, uuid::Uuid, uuid::Uuid, serde_json::Value, Option<serde_json::Value>, String)> =
-        sqlx::query_as(
-            r#"
-            SELECT d.id, d.endpoint_id, d.customer_id, d.payload, d.custom_headers, e.url
-            FROM deliveries d
-            JOIN endpoints e ON e.id = d.endpoint_id
-            WHERE d.status = 'pending'
-              AND d.created_at < now() - interval '10 minutes'
-              AND NOT EXISTS (
-                  SELECT 1 FROM webhook_queue wq
-                  WHERE wq.delivery_id = d.id
-                    AND wq.status IN ('pending', 'processing')
-              )
-            LIMIT 100
-            "#,
-        )
-        .fetch_all(pool)
-        .await?;
-
-    if orphaned.is_empty() {
-        return Ok(0);
-    }
-
-    let count = orphaned.len();
-
-    for (id, endpoint_id, _customer_id, payload, custom_headers, url) in &orphaned {
-        sqlx::query::<sqlx::Postgres>(
-            r#"INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, payload, custom_headers, status, attempt_count)
-               VALUES ($1, $2, $3, $4, $5, 'pending', 0)
-               ON CONFLICT (delivery_id) DO NOTHING"#,
-        )
-        .bind(id)
-        .bind(endpoint_id)
-        .bind(url)
-        .bind(payload)
-        .bind(custom_headers)
-        .execute(pool)
-        .await?;
-
-        tracing::warn!(
-            "🧟 Re-queued orphaned delivery: {} (endpoint={})",
-            id,
-            endpoint_id
-        );
-    }
-
-    Ok(count)
-}
-
-/// Delivery attempt data for recording
-struct AttemptRecord<'a> {
-    status_code: Option<i32>,
-    response_body: Option<&'a str>,
-    duration_ms: i32,
-    error_message: Option<&'a str>,
-    trace_id: Option<&'a str>,
-    response_headers: Option<&'a serde_json::Value>,
-}
-
-/// Record a delivery attempt
-async fn record_attempt(
-    conn: &mut sqlx::PgConnection,
-    delivery_id: uuid::Uuid,
-    attempt_number: i32,
-    record: AttemptRecord<'_>,
-) -> Result<()> {
-    sqlx::query::<sqlx::Postgres>(
-        r#"
-        INSERT INTO delivery_attempts (delivery_id, attempt_number, status_code, response_body, duration_ms, error_message, trace_id, response_headers)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        "#,
-    )
-    .bind(delivery_id)
-    .bind(attempt_number)
-    .bind(record.status_code)
-    .bind(record.response_body)
-    .bind(record.duration_ms)
-    .bind(record.error_message)
-    .bind(record.trace_id)
-    .bind(record.response_headers)
-    .execute(conn)
-    .await?;
-
-    Ok(())
-}
-
-/// Exponential backoff: 30s, 60s, 120s, 300s, 600s, 1800s
-fn calculate_backoff(attempt: i32) -> i64 {
-    let base = 30_i64;
-    let delay = base * 2_i64.pow((attempt - 1).max(0) as u32);
-    delay.min(1800) // Max 30 dakika
-}
-
-/// Check if an HTTP status code is non-retryable (client error).
-/// 4xx errors (except 429 Too Many Requests) should not be retried.
-/// - 400 Bad Request → client mistake, retry won't help
-/// - 401 Unauthorized → auth issue, retry won't help
-/// - 403 Forbidden → permission issue, retry won't help
-/// - 404 Not Found → endpoint gone, retry won't help
-/// - 429 Too Many Requests → SHOULD be retried (rate limited)
-/// - 5xx → SHOULD be retried (server error)
-fn is_non_retryable(status_code: i32) -> bool {
-    (400..500).contains(&status_code) && status_code != 429
-}
-
-/// Check if a sqlx error is transient (worth retrying or recovering).
-///
-/// Transient errors:
-/// - Connection closed/timed out
-/// - Serialization failure (PostgreSQL 40001)
-/// - Deadlock detected (PostgreSQL 40P01)
-/// - Connection pool timeout
-fn is_transient_db_error(e: &sqlx::Error) -> bool {
-    match e {
-        sqlx::Error::Io(_) => true,
-        sqlx::Error::PoolTimedOut => true,
-        sqlx::Error::PoolClosed => true,
-        sqlx::Error::Database(db_err) => {
-            // PostgreSQL error codes for transient failures
-            if let Some(code) = db_err.code() {
-                let code_str = code.as_ref();
-                // 40001: serialization_failure
-                // 40P01: deadlock_detected
-                // 08000: connection_exception
-                // 08001: sqlclient_unable_to_establish_sqlconnection
-                // 08003: connection_does_not_exist
-                // 08004: sqlserver_rejected_establishment_of_sqlconnection
-                // 08006: connection_failure
-                // 57P01: admin_shutdown
-                // 57P02: crash_shutdown
-                // 57P03: cannot_connect_now
-                return matches!(
-                    code_str,
-                    "40001"
-                        | "40P01"
-                        | "08000"
-                        | "08001"
-                        | "08003"
-                        | "08004"
-                        | "08006"
-                        | "57P01"
-                        | "57P02"
-                        | "57P03"
-                );
-            }
-            false
-        }
-        _ => false,
-    }
-}
-
-// ──────────────────────────────────────────────────────────────
-// Endpoint Down Email Notification
-// ──────────────────────────────────────────────────────────────
-
-/// Send email notification when an endpoint becomes unhealthy (failure_streak >= 5).
-/// Reads Resend config from platform_settings.
-/// Also dispatches `endpoint.disabled` operational webhook at threshold crossings.
-async fn notify_endpoint_down(
-    pool: &PgPool,
-    endpoint_id: uuid::Uuid,
-    endpoint_url: &str,
-    failure_streak: i32,
-) {
-    // Only notify at threshold crossings: 5, 10, 20, 50
-    if !matches!(failure_streak, 5 | 10 | 20 | 50) {
-        return;
-    }
-
-    // Get customer email, customer_id, and platform settings
-    let result = sqlx::query_as::<_, (String, uuid::Uuid, String, Option<String>, Option<String>)>(
-        r#"SELECT c.email, c.id, e.url, s.resend_api_key, s.email_sender
-           FROM endpoints e
-           JOIN customers c ON e.customer_id = c.id
-           CROSS JOIN (SELECT value FROM platform_settings WHERE key = 'main') ps
-           LEFT JOIN LATERAL (
-               SELECT
-                   (ps.value->>'resend_api_key') as resend_api_key,
-                   (ps.value->>'email_sender') as email_sender
-           ) s ON true
-           WHERE e.id = $1"#,
-    )
-    .bind(endpoint_id)
-    .fetch_optional(pool)
-    .await;
-
-    let (customer_email, customer_id, _url, api_key_opt, sender_opt) = match result {
-        Ok(Some(row)) => row,
-        _ => return, // Silently skip if we can't fetch
-    };
-
-    // Check notification preferences — skip email if user disabled failure alerts
-    let email_on_failure: bool = sqlx::query_scalar(
-        "SELECT COALESCE(email_on_failure, true) FROM notification_preferences WHERE customer_id = $1"
-    )
-    .bind(customer_id)
-    .fetch_optional(pool)
-    .await
-    .unwrap_or(None)
-    .unwrap_or(true); // Default: send if no preference set
-
-    // Dispatch operational webhook: endpoint.disabled (always, regardless of email pref)
-    {
-        let http_client = reqwest::Client::new();
-        let op_payload = serde_json::json!({
-            "endpoint_id": endpoint_id.to_string(),
-            "endpoint_url": endpoint_url,
-            "failure_streak": failure_streak,
-        });
-        operational_webhook::dispatch_event(
-            pool,
-            &http_client,
-            customer_id,
-            operational_webhook::OpWebhookEvent::EndpointDisabled,
-            op_payload,
-        )
-        .await;
-    }
-
-    if !email_on_failure {
-        tracing::debug!("📧 Skipping failure email for {} — user disabled email_on_failure", endpoint_url);
-        return;
-    }
-
-    let api_key = match api_key_opt {
-        Some(k) if !k.is_empty() => k,
-        _ => return, // No Resend key configured
-    };
-
-    let sender = sender_opt.as_deref().unwrap_or("noreply@resend.dev");
-
-    let subject = format!("⚠️ Endpoint Down: {}", endpoint_url);
-    let body = format!(
-        "Your endpoint has been experiencing failures.\n\n\
-         Endpoint: {}\n\
-         Consecutive failures: {}\n\n\
-         Please check your endpoint and ensure it's responding correctly.\n\n\
-         — HookSniff",
-        endpoint_url, failure_streak
-    );
-
-    let client = reqwest::Client::new();
-    let _ = client
-        .post("https://api.resend.com/emails")
-        .header("Authorization", format!("Bearer {}", api_key))
-        .json(&serde_json::json!({
-            "from": sender,
-            "to": [customer_email],
-            "subject": subject,
-            "text": body,
-        }))
-        .send()
-        .await;
-
-    tracing::info!("📧 Endpoint down notification sent for {}", endpoint_url);
-}
-
-// ──────────────────────────────────────────────────────────────
-// HS-059: Grace period — downgrade customers after 7 days
-// ──────────────────────────────────────────────────────────────
-
-/// Grace period in days after a failed payment before downgrade.
-const GRACE_PERIOD_DAYS: i64 = 7;
-
-/// Downgrade customers whose payment_failed_at is older than 7 days.
-/// Called every 6 hours by the worker's main loop.
-async fn process_expired_grace_periods(pool: &PgPool) -> Result<usize> {
-    let cutoff = chrono::Utc::now() - chrono::Duration::days(GRACE_PERIOD_DAYS);
-
-    // Find customers past grace period
-    let rows: Vec<(uuid::Uuid,)> = sqlx::query_as(
-        "SELECT id FROM customers \
-         WHERE payment_failed_at IS NOT NULL \
-         AND payment_failed_at < $1 \
-         AND plan != 'free'",
-    )
-    .bind(cutoff)
-    .fetch_all(pool)
-    .await?;
-
-    let count = rows.len();
-
-    for (customer_id,) in &rows {
-        let free_limit: i32 = 10_000; // Plan::Free.max_webhooks_per_month()
-
-        sqlx::query(
-            "UPDATE customers SET plan = 'free', webhook_limit = $1, \
-             payment_failed_at = NULL, cancel_at_period_end = false, updated_at = NOW() \
-             WHERE id = $2",
-        )
-        .bind(free_limit)
-        .bind(customer_id)
-        .execute(pool)
-        .await?;
-
-        // Disable excess endpoints (free plan = 5)
-        let max_endpoints: i64 = 5;
-        let active_count: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM endpoints WHERE customer_id = $1 AND is_active = true",
-        )
-        .bind(customer_id)
-        .fetch_one(pool)
-        .await?;
-
-        if active_count.0 > max_endpoints {
-            let excess = active_count.0 - max_endpoints;
-            sqlx::query(
-                "UPDATE endpoints SET is_active = false, updated_at = NOW() \
-                 WHERE id IN (\
-                   SELECT id FROM endpoints \
-                   WHERE customer_id = $1 AND is_active = true \
-                   ORDER BY created_at DESC \
-                   LIMIT $2\
-                 )",
-            )
-            .bind(customer_id)
-            .bind(excess)
-            .execute(pool)
-            .await?;
-        }
-
-        tracing::info!(
-            "⏰ Customer {} downgraded to free after {} day grace period",
-            customer_id,
-            GRACE_PERIOD_DAYS
-        );
-    }
-
-    Ok(count)
-}
-
-/// Retention cleanup — delete delivery data older than plan's retention days.
-/// Reads retention config from platform_settings, falls back to defaults.
-/// Runs every 6 hours.
-async fn cleanup_expired_retention(pool: &PgPool) -> Result<(i64, i64)> {
-    // Fetch retention days from platform_settings
-    let settings: Option<(serde_json::Value,)> =
-        sqlx::query_as("SELECT value FROM platform_settings WHERE key = 'main'")
-            .fetch_optional(pool)
-            .await?;
-
-    let (ret_free, ret_startup, ret_pro, ret_enterprise) = if let Some((value,)) = settings {
-        let obj = value.as_object();
-        (
-            obj.and_then(|o| o.get("retention_days_free")).and_then(|v| v.as_i64()).unwrap_or(7),
-            obj.and_then(|o| o.get("retention_days_startup")).and_then(|v| v.as_i64()).unwrap_or(14),
-            obj.and_then(|o| o.get("retention_days_pro")).and_then(|v| v.as_i64()).unwrap_or(30),
-            obj.and_then(|o| o.get("retention_days_enterprise")).and_then(|v| v.as_i64()).unwrap_or(90),
-        )
-    } else {
-        (7, 14, 180, 365)
-    };
-
-    // Delete deliveries per plan tier
-    let plan_configs = [
-        ("developer", ret_free),
-        ("startup", ret_startup),
-        ("pro", ret_pro),
-        ("enterprise", ret_enterprise),
-    ];
-
-    let mut total_deliveries = 0i64;
-    let mut total_attempts = 0i64;
-
-    for (plan, days) in &plan_configs {
-        let cutoff = chrono::Utc::now() - chrono::Duration::days(*days);
-
-        // Delete old delivery_attempts first (FK dependency)
-        let attempts_result = sqlx::query(
-            "DELETE FROM delivery_attempts WHERE delivery_id IN (\
-               SELECT d.id FROM deliveries d \
-               JOIN customers c ON c.id = d.customer_id \
-               WHERE c.plan = $1 AND d.created_at < $2\
-             )"
-        )
-        .bind(plan)
-        .bind(cutoff)
-        .execute(pool)
-        .await?;
-
-        // Delete old deliveries
-        let deliveries_result = sqlx::query(
-            "DELETE FROM deliveries WHERE id IN (\
-               SELECT d.id FROM deliveries d \
-               JOIN customers c ON c.id = d.customer_id \
-               WHERE c.plan = $1 AND d.created_at < $2\
-             )"
-        )
-        .bind(plan)
-        .bind(cutoff)
-        .execute(pool)
-        .await?;
-
-        let del_count = deliveries_result.rows_affected();
-        let att_count = attempts_result.rows_affected();
-
-        if del_count > 0 || att_count > 0 {
-            tracing::info!(
-                "🧹 Retention cleanup [{}]: deleted {} deliveries, {} attempts ({} days)",
-                plan, del_count, att_count, days
-            );
-        }
-
-        total_deliveries += del_count as i64;
-        total_attempts += att_count as i64;
-    }
-
-    // Also clean dead_letters older than 90 days (regardless of plan)
-    let dead_cutoff = chrono::Utc::now() - chrono::Duration::days(90);
-    let dead_result = sqlx::query("DELETE FROM dead_letters WHERE created_at < $1")
-        .bind(dead_cutoff)
-        .execute(pool)
-        .await?;
-    let dead_count = dead_result.rows_affected();
-    if dead_count > 0 {
-        tracing::info!("🧹 Retention cleanup: deleted {} old dead_letters", dead_count);
-    }
-
-    // Clean audit_log older than 365 days
-    let audit_cutoff = chrono::Utc::now() - chrono::Duration::days(365);
-    let audit_result = sqlx::query("DELETE FROM audit_log WHERE created_at < $1")
-        .bind(audit_cutoff)
-        .execute(pool)
-        .await?;
-    let audit_count = audit_result.rows_affected();
-    if audit_count > 0 {
-        tracing::info!("🧹 Retention cleanup: deleted {} old audit_log entries", audit_count);
-    }
-
-    Ok((total_deliveries, total_attempts + dead_count as i64 + audit_count as i64))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // ── calculate_backoff ───────────────────────────────────
-
-    #[test]
-    fn test_backoff_first_attempt() {
-        // attempt=1 → 30s
-        assert_eq!(calculate_backoff(1), 30);
-    }
-
-    #[test]
-    fn test_backoff_second_attempt() {
-        // attempt=2 → 60s
-        assert_eq!(calculate_backoff(2), 60);
-    }
-
-    #[test]
-    fn test_backoff_third_attempt() {
-        // attempt=3 → 120s
-        assert_eq!(calculate_backoff(3), 120);
-    }
-
-    #[test]
-    fn test_backoff_exponential_growth() {
-        assert_eq!(calculate_backoff(4), 240);
-        assert_eq!(calculate_backoff(5), 480);
-        assert_eq!(calculate_backoff(6), 960);
-    }
-
-    #[test]
-    fn test_backoff_capped_at_1800() {
-        // attempt=10 → 30 * 2^9 = 15360, but capped at 1800
-        assert_eq!(calculate_backoff(10), 1800);
-        assert_eq!(calculate_backoff(20), 1800);
-    }
-
-    #[test]
-    fn test_backoff_attempt_zero() {
-        // attempt=0 → 30 * 2^(-1).max(0) = 30 * 1 = 30
-        assert_eq!(calculate_backoff(0), 30);
-    }
-
-    // ── is_non_retryable ────────────────────────────────────
-
-    #[test]
-    fn test_non_retryable_400() {
-        assert!(is_non_retryable(400));
-    }
-
-    #[test]
-    fn test_non_retryable_401() {
-        assert!(is_non_retryable(401));
-    }
-
-    #[test]
-    fn test_non_retryable_403() {
-        assert!(is_non_retryable(403));
-    }
-
-    #[test]
-    fn test_non_retryable_404() {
-        assert!(is_non_retryable(404));
-    }
-
-    #[test]
-    fn test_retryable_429() {
-        // 429 SHOULD be retried (rate limited)
-        assert!(!is_non_retryable(429));
-    }
-
-    #[test]
-    fn test_retryable_500() {
-        assert!(!is_non_retryable(500));
-    }
-
-    #[test]
-    fn test_retryable_502() {
-        assert!(!is_non_retryable(502));
-    }
-
-    #[test]
-    fn test_retryable_503() {
-        assert!(!is_non_retryable(503));
-    }
-
-    #[test]
-    fn test_non_retryable_300() {
-        // 3xx is not in 400..500, so it's retryable (shouldn't happen in practice)
-        assert!(!is_non_retryable(300));
-    }
-
-    #[test]
-    fn test_non_retryable_200() {
-        // 200 is not in 400..500, so it's retryable (shouldn't happen in practice)
-        assert!(!is_non_retryable(200));
-    }
-
-    // ── is_transient_db_error ───────────────────────────────
-
-    #[test]
-    fn test_transient_db_pool_timeout() {
-        let err = sqlx::Error::PoolTimedOut;
-        assert!(is_transient_db_error(&err));
-    }
-
-    #[test]
-    fn test_transient_db_pool_closed() {
-        let err = sqlx::Error::PoolClosed;
-        assert!(is_transient_db_error(&err));
-    }
-
-    #[test]
-    fn test_transient_db_io_error() {
-        let io_err = std::io::Error::new(std::io::ErrorKind::ConnectionReset, "reset");
-        let err = sqlx::Error::Io(io_err);
-        assert!(is_transient_db_error(&err));
-    }
-
-    #[test]
-    fn test_non_transient_db_error() {
-        // RowNotFound is not transient
-        let err = sqlx::Error::RowNotFound;
-        assert!(!is_transient_db_error(&err));
-    }
-
-
-}
