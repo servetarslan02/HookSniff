@@ -1,35 +1,22 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
-  api, endpointsApi, webhooksApi, analyticsApi, statsApi,
+  api, endpointsApi, webhooksApi,
   applicationsApi,
-  inboundApi, apiFetch,
-  type DeliveryDetail, type DeliveryAttempt,
-  type AuditLogEntryResponse, type EndpointHealthResponse,
-  type RateLimitResponse,
+  apiFetch,
+  type AuditLogEntryResponse,
   type SchemaRegistryListResponse, type SearchResponseData,
   type TemplateListResponse,
 } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { validated } from './validated';
 import {
-  EndpointSchema,
-  DeliveryListResponseSchema,
-  StatsResponseSchema,
-  DeliveryTrendSchema,
-  SuccessRateSchema,
   ApplicationSchema,
-  InboundConfigSchema,
   SsoConfigSchema,
-  EndpointHealthSchema,
-  LatencyTrendSchema,
-  RateLimitSchema,
   SchemaRegistryListSchema,
   TemplateListSchema,
-  type EndpointValidated,
   type ApplicationValidated,
-  type InboundConfigValidated,
   type SsoConfigValidated,
 } from '@/schemas/api';
 
@@ -65,156 +52,24 @@ export {
   useServiceTokens, useCreateServiceToken, useDeleteServiceToken,
   useRevealServiceToken, useUpdateServiceToken,
 } from './useServiceTokens';
-
-// ── Endpoints ──
-export function useEndpoints() {
-  const { token } = useAuth();
-  return useQuery({
-    queryKey: ['endpoints'],
-    queryFn: validated(() => endpointsApi.list(token!), EndpointSchema.array()),
-    enabled: !!token,
-    staleTime: 30_000,
-  });
-}
-
-// ── Endpoint Detail ──
-export function useEndpointDetail(id: string) {
-  const { token } = useAuth();
-  return useQuery<EndpointValidated>({
-    queryKey: ['endpoint', id],
-    queryFn: validated(() => endpointsApi.get(token!, id), EndpointSchema),
-    enabled: !!token && !!id,
-    staleTime: 15_000,
-  });
-}
-
-// ── Webhooks (Deliveries) ──
-export function useWebhooks(params?: { page?: number; status?: string }) {
-  const { token } = useAuth();
-  return useQuery({
-    queryKey: ['webhooks', params],
-    queryFn: validated(
-      () => webhooksApi.list(token!, params),
-      DeliveryListResponseSchema
-    ),
-    enabled: !!token,
-    staleTime: 15_000,
-  });
-}
-
-// ── Dashboard Stats ──
-export function useDashboardStats() {
-  const { token } = useAuth();
-  return useQuery({
-    queryKey: ['stats'],
-    queryFn: validated(() => statsApi.get(token!), StatsResponseSchema),
-    enabled: !!token,
-    staleTime: 30_000,
-  });
-}
-
-// ── Analytics: Delivery Trend ──
-export function useDeliveryTrend(range = '24h') {
-  const { token } = useAuth();
-  return useQuery({
-    queryKey: ['analytics', 'delivery-trend', range],
-    queryFn: validated(
-      () => analyticsApi.deliveryTrend(token!, range),
-      DeliveryTrendSchema
-    ),
-    enabled: !!token,
-    staleTime: 30_000,
-  });
-}
-
-// ── Analytics: Success Rate ──
-export function useSuccessRate(range = '24h') {
-  const { token } = useAuth();
-  return useQuery({
-    queryKey: ['analytics', 'success-rate', range],
-    queryFn: validated(
-      () => analyticsApi.successRate(token!, range),
-      SuccessRateSchema
-    ),
-    enabled: !!token,
-    staleTime: 30_000,
-  });
-}
-
-// ── Mutations ──
-
-export function useDeleteEndpoint() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => endpointsApi.delete(token!, id),
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['endpoints'] });
-    },
-  });
-}
-
-export function useToggleEndpoint() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
-      endpointsApi.update(token!, id, { is_active }),
-    onMutate: async ({ id, is_active }) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['endpoint', id] });
-      await queryClient.cancelQueries({ queryKey: ['endpoints'] });
-
-      // Snapshot previous values for rollback
-      const previousDetail = queryClient.getQueryData(['endpoint', id]);
-      const previousList = queryClient.getQueryData(['endpoints']);
-
-      // Optimistic update: detail
-      queryClient.setQueryData(['endpoint', id], (old: unknown) => ({
-        ...(old as Record<string, unknown>),
-        is_active,
-      }));
-
-      // Optimistic update: list
-      queryClient.setQueryData(['endpoints'], (old: unknown) => {
-        if (!Array.isArray(old)) return old;
-        return old.map((ep: Record<string, unknown>) =>
-          ep.id === id ? { ...ep, is_active } : ep
-        );
-      });
-
-      return { previousDetail, previousList };
-    },
-    onError: (_err, { id }, context) => {
-      if (context?.previousDetail) {
-        queryClient.setQueryData(['endpoint', id], context.previousDetail);
-      }
-      if (context?.previousList) {
-        queryClient.setQueryData(['endpoints'], context.previousList);
-      }
-    },
-    onSettled: (_data, _error, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['endpoint', id] });
-      queryClient.invalidateQueries({ queryKey: ['endpoints'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-    },
-  });
-}
-
-export function useReplayDelivery() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => webhooksApi.replay(token!, id),
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['webhooks'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-    },
-  });
-}
+export {
+  useEndpoints, useEndpointDetail, useDeleteEndpoint, useToggleEndpoint,
+} from './useEndpoints';
+export {
+  useDashboardStats, useDeliveryTrend, useSuccessRate,
+  useEndpointHealth, useLatencyTrend,
+} from './useAnalytics';
+export {
+  useWebhooks, useReplayDelivery, useDeliveryDetail,
+  useDeliveryAttempts, useDeliveryLogs, useCreateWebhook,
+} from './useWebhooks';
+export {
+  useInboundConfigs, useCreateInboundConfig, useUpdateInboundConfig,
+  useDeleteInboundConfig,
+} from './useInboundConfigs';
+export {
+  useRateLimits, useSetRateLimit, useDeleteRateLimit,
+} from './useRateLimits';
 
 // ── Applications List ──
 export function useApplications() {
@@ -252,56 +107,6 @@ export function useApplicationDetail(id: string) {
   });
 }
 
-// ── Inbound Configs ──
-export function useInboundConfigs() {
-  const { token } = useAuth();
-  return useQuery<InboundConfigValidated[]>({
-    queryKey: ['inbound-configs'],
-    queryFn: validated(
-      () => inboundApi.listConfigs(token!),
-      InboundConfigSchema.array()
-    ),
-    enabled: !!token,
-    staleTime: 30_000,
-  });
-}
-
-export function useCreateInboundConfig() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: { provider: string; endpoint_id?: string | null; secret: string }) =>
-      inboundApi.createConfig(token!, data),
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['inbound-configs'] });
-    },
-  });
-}
-
-export function useUpdateInboundConfig() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { secret?: string; endpoint_id?: string | null; enabled?: boolean } }) =>
-      inboundApi.updateConfig(token!, id, data),
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['inbound-configs'] });
-    },
-  });
-}
-
-export function useDeleteInboundConfig() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) =>
-      inboundApi.deleteConfig(token!, id),
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['inbound-configs'] });
-    },
-  });
-}
-
 // ── SSO Config ──
 export function useSsoConfig(teamId?: string | null) {
   const { token } = useAuth();
@@ -316,70 +121,6 @@ export function useSsoConfig(teamId?: string | null) {
   });
 }
 
-// ── Delivery Detail ──
-export function useDeliveryDetail(id: string) {
-  const { token } = useAuth();
-  return useQuery<DeliveryDetail>({
-    queryKey: ['delivery', id],
-    queryFn: () => webhooksApi.get(token!, id),
-    enabled: !!token && !!id,
-    staleTime: 15_000,
-  });
-}
-
-// ── Delivery Attempts ──
-export function useDeliveryAttempts(id: string) {
-  const { token } = useAuth();
-  return useQuery<DeliveryAttempt[]>({
-    queryKey: ['delivery', id, 'attempts'],
-    queryFn: async () => {
-      try {
-        return await webhooksApi.getAttempts(token!, id);
-      } catch {
-        return [] as DeliveryAttempt[];
-      }
-    },
-    enabled: !!token && !!id,
-    staleTime: 15_000,
-  });
-}
-
-// ── Delivery Logs (with status counts) ──
-export function useDeliveryLogs(params: {
-  page?: number;
-  status?: string;
-  refetchInterval?: number;
-}) {
-  const { token } = useAuth();
-  return useQuery({
-    queryKey: ['delivery-logs', params],
-    queryFn: async () => {
-      const [data, deliveredData, failedData, pendingData] = await Promise.all([
-        webhooksApi.list(token!, {
-          page: params.page,
-          status: params.status === 'all' ? undefined : params.status,
-        }),
-        webhooksApi.list(token!, { page: 1, status: 'delivered' }).catch(() => ({ total: 0, deliveries: [] })),
-        webhooksApi.list(token!, { page: 1, status: 'failed' }).catch(() => ({ total: 0, deliveries: [] })),
-        webhooksApi.list(token!, { page: 1, status: 'pending' }).catch(() => ({ total: 0, deliveries: [] })),
-      ]);
-      return {
-        deliveries: data.deliveries,
-        total: data.total,
-        statusCounts: {
-          all: data.total,
-          delivered: deliveredData.total,
-          failed: failedData.total,
-          pending: pendingData.total,
-        },
-      };
-    },
-    enabled: !!token,
-    staleTime: 15_000,
-    refetchInterval: params.refetchInterval ?? false,
-  });
-}
-
 // ── Audit Log ──
 export function useAuditLogs(params?: { page?: number; limit?: number; action?: string }) {
   const { token } = useAuth();
@@ -388,65 +129,6 @@ export function useAuditLogs(params?: { page?: number; limit?: number; action?: 
     queryFn: () => api.getAuditLog(token!, params),
     enabled: !!token,
     staleTime: 15_000,
-  });
-}
-
-// ── Endpoint Health ──
-export function useEndpointHealth(range = '24h') {
-  const { token } = useAuth();
-  return useQuery<EndpointHealthResponse[]>({
-    queryKey: ['endpoint-health', range],
-    queryFn: validated(
-      () => api.getEndpointHealth(token || undefined, range),
-      EndpointHealthSchema.array()
-    ),
-    enabled: true,
-    staleTime: 15_000,
-    refetchInterval: 30_000,
-  });
-}
-
-// ── Latency Trend ──
-export function useLatencyTrend(range = '24h') {
-  const { token } = useAuth();
-  return useQuery({
-    queryKey: ['latency-trend', range],
-    queryFn: validated(
-      () => analyticsApi.latencyTrend(token!, range),
-      LatencyTrendSchema
-    ),
-    enabled: !!token,
-    staleTime: 30_000,
-  });
-}
-
-// ── Rate Limits ──
-export function useRateLimits() {
-  const { token } = useAuth();
-  return useQuery<RateLimitResponse[]>({
-    queryKey: ['rate-limits'],
-    queryFn: validated(() => api.getRateLimits(token!), RateLimitSchema.array()),
-    enabled: !!token,
-    staleTime: 15_000,
-  });
-}
-
-export function useSetRateLimit() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ endpointId, config }: { endpointId: string; config: { requests_per_second: number; burst_size: number; enabled: boolean } }) =>
-      api.setRateLimit(token!, endpointId, config),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['rate-limits'] }),
-  });
-}
-
-export function useDeleteRateLimit() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (endpointId: string) => api.deleteRateLimit(token!, endpointId),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['rate-limits'] }),
   });
 }
 
@@ -486,19 +168,5 @@ export function useTemplates(industry?: string) {
     queryFn: validated(() => api.getTemplates(token!, industry), TemplateListSchema),
     enabled: !!token,
     staleTime: 60_000,
-  });
-}
-
-// ── Create Webhook (for webhook-builder + webhooks/new) ──
-export function useCreateWebhook() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (body: { endpoint_id: string; event?: string; data: unknown }) =>
-      webhooksApi.create(token!, body),
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['webhooks'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-    },
   });
 }
