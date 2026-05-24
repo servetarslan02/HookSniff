@@ -29,11 +29,13 @@ let visibilityCleanup: (() => void) | null = null;
 
 // BUG FIX: Multi-tab refresh coordination via BroadcastChannel
 // Prevents multiple tabs from refreshing simultaneously (token is one-time-use).
+// Lazy init — avoids module-level side effect that blocks tree-shaking.
 let refreshChannel: BroadcastChannel | null = null;
-try {
-  refreshChannel = new BroadcastChannel('hooksniff-auth');
-} catch {
-  // BroadcastChannel not supported (Safari < 15.4) — graceful degradation
+function getRefreshChannel(): BroadcastChannel | null {
+  if (refreshChannel === null) {
+    try { refreshChannel = new BroadcastChannel('hooksniff-auth'); } catch { refreshChannel = undefined as any; }
+  }
+  return refreshChannel === (undefined as any) ? null : refreshChannel;
 }
 
 // HS-039: Global callback for syncing new tokens to the store.
@@ -70,8 +72,8 @@ function doRefresh(): Promise<string | null> {
           localStorage.setItem('hooksniff_refresh', data.refresh_token);
         }
         // BUG FIX: Broadcast new token to other tabs
-        if (newToken && refreshChannel) {
-          refreshChannel.postMessage({ type: 'TOKEN_REFRESHED', token: newToken });
+        if (newToken && getRefreshChannel()) {
+          getRefreshChannel()!.postMessage({ type: 'TOKEN_REFRESHED', token: newToken });
         }
         return newToken;
       })
@@ -99,8 +101,8 @@ export function startProactiveRefresh(onRefresh: (newToken: string) => void): vo
   onTokenRefreshed = onRefresh;
 
   // BUG FIX: Listen for token refreshes from other tabs
-  if (refreshChannel) {
-    refreshChannel.onmessage = (event) => {
+  if (getRefreshChannel()) {
+    getRefreshChannel()!.onmessage = (event) => {
       if (event.data?.type === 'TOKEN_REFRESHED' && event.data.token) {
         onRefresh(event.data.token);
       }
@@ -165,8 +167,8 @@ export function stopProactiveRefresh(): void {
     proactiveRefreshTimer = null;
   }
   // BUG FIX: Clean up BroadcastChannel listener
-  if (refreshChannel) {
-    refreshChannel.onmessage = null;
+  if (getRefreshChannel()) {
+    getRefreshChannel()!.onmessage = null;
   }
   // BUG FIX: Clear any pending refresh promise to prevent stale callbacks
   refreshPromise = null;
@@ -248,8 +250,8 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
             else localStorage.setItem('hooksniff_token', newToken);
             // BUG FIX: Broadcast new token to other tabs (doRefresh already does this,
             // but in case refresh was deduped, ensure all tabs get the token)
-            if (refreshChannel) {
-              refreshChannel.postMessage({ type: 'TOKEN_REFRESHED', token: newToken });
+            if (getRefreshChannel()) {
+              getRefreshChannel()!.postMessage({ type: 'TOKEN_REFRESHED', token: newToken });
             }
             headers["Authorization"] = `Bearer ${newToken}`;
             const retryRes = await fetch(`${API_BASE}${path}`, {
