@@ -59,7 +59,24 @@ HookSniff/
 
 ---
 
-## 🔧 Modular Split Durumu (2026-05-24)
+## 🔧 Modular Split Durumu (2026-05-25)
+
+### worker/main.rs Bölme — TAMAMLANDI ✅
+
+Orijinal `main.rs` (1883 satır) 8 dosyaya bölündü:
+
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `main.rs` | Entry point + main loop + process_pending | 958 |
+| `types.rs` | WebhookMessage + WebhookQueueItem struct'ları | 23 |
+| `helpers.rs` | commit_tx, record_attempt, backoff, error classification, shutdown | 230 |
+| `health.rs` | Health server + READY static | 42 |
+| `queue.rs` | reap_zombies + reap_orphaned_deliveries | 155 |
+| `notifications.rs` | delivery failure + endpoint down notifications | 190 |
+| `grace.rs` | Grace period downgrade logic | 65 |
+| `retention.rs` | Retention cleanup logic | 110 |
+
+**Kural:** `pub use types::{...}` crate-level re-export, `use helpers::{...}` explicit import.
 
 ### api.ts Bölme — TAMAMLANDI ✅
 
