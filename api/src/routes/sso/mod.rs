@@ -1,6 +1,8 @@
 //! SSO/SAML/OIDC Configuration & Login API
 
 pub mod handlers;
+pub mod config;
+pub mod login;
 pub mod scim;
 pub mod saml;
 pub mod oidc;
