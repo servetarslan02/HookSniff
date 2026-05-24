@@ -15,7 +15,7 @@ export type TeamRole = 'owner' | 'admin' | 'developer' | 'analyst' | 'viewer';
 export function useTeamRole(teamId?: string | null) {
   const { token, user } = useAuth();
 
-  const { data: teams } = useQuery({
+  const { data: teams, isLoading: teamsLoading } = useQuery({
     queryKey: ['teams'],
     queryFn: () => teamsApi.list(token!),
     enabled: !!token,
@@ -32,21 +32,15 @@ export function useTeamRole(teamId?: string | null) {
     staleTime: 30_000,
   });
 
-  const { data: teamDetail, isLoading: detailLoading } = useQuery({
-    queryKey: ['teams', effectiveTeamId, 'detail'],
-    queryFn: () => teamsApi.getDetail(token!, effectiveTeamId!),
-    enabled: !!token && !!effectiveTeamId,
-    staleTime: 30_000,
-  });
-
-  const isLoading = membersLoading || detailLoading;
+  const isLoading = teamsLoading || membersLoading;
 
   if (!effectiveTeamId || !user) {
     return { role: null as TeamRole | null, teamId: null, isLoading };
   }
 
-  // Check if user is team owner
-  if (teamDetail?.owner_id === user.id) {
+  // Check if user is team owner (owner_id is already in teams list — no need for getDetail)
+  const team = teams?.find((t) => t.id === effectiveTeamId);
+  if (team?.owner_id === user.id) {
     return { role: 'owner' as TeamRole, teamId: effectiveTeamId, isLoading };
   }
 
