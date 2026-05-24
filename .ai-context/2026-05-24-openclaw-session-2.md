@@ -49,8 +49,16 @@
   - SSO sayfası 4 API çağrısı → 2'ye düştü
   - Tüm `usePermissions`/`useTeamRole` kullanan sayfalar faydalanır
 
+### 4. Endpoint Toggle Fix
+- `dashboard/src/hooks/useDashboardData.ts`: `useToggleEndpoint` optimistic update
+  - Sorun: `onMutate` sadece `['endpoint', id]` cache'ini güncelliyordu
+  - Liste sayfası `['endpoints']` kullanıyordu → UI tepki vermiyordu
+  - Çözüm: Her iki cache de optimistic olarak güncelleniyor
+
 ## Commitler
 - `d0e5088d` — SSO auth cookie fix + unwrap cleanup + session log
 - `735b1eb8` — Fix _visibilityCleanup: timer number property fix
 - `e7d222bd` — Update session logs
 - `12178c56` — Fix slow page loads: N+1 query + redundant API calls
+- `af954ffd` — Update session log: page load perf fix
+- `7aba80b8` — Fix endpoint toggle: optimistic update list cache
