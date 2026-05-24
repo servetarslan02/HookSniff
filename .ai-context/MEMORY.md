@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-23 GMT+8 (RBAC Frontend Implementation)
+> Son güncelleme: 2026-05-24 GMT+8 (api.ts Modular Split)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -56,6 +56,42 @@ HookSniff/
 ├── Dockerfile.worker → Worker Docker image
 └── .ai-context/  → 🔑 KALICI HAFIZA (GitHub'da sync)
 ```
+
+---
+
+## 🔧 Modular Split Durumu (2026-05-24)
+
+### api.ts Bölme — TAMAMLANDI ✅
+
+Orijinal `api.ts` (1369 satır) 5 dosyaya bölündü:
+
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `api.ts` | Core API client + re-export'lar | 664 |
+| `api-admin.ts` | adminApi (admin endpoint'leri) | 313 |
+| `api-teams.ts` | teams/notifications/broadcasts/alerts/inbound | 147 |
+| `api-integrations.ts` | connectors/integrations/stream + interface'ler | 177 |
+| `api-misc.ts` | 2FA/SSO/transforms/billing/analytics | 102 |
+
+**Kural:** Her split dosyası `apiFetch`'i `./api`'dan, tipleri `./api-types`'ten import eder. `api.ts` hepsini re-export eder.
+
+### Rust Bölme — YAPILMADI (GEREKLİ DEĞİL)
+
+Rust dosyaları (sso.rs, inbound.rs, teams.rs, worker/main.rs) büyük ama stabil. Axum Handler trait uyumsuzluğu nedeniyle bölme başarısız oldu. Gerekirse ileride tekrar denenebilir.
+
+### Dashboard Hook Bölme — YAPILMADI (SIRADAKİ)
+
+`useDashboardData.ts` (1106 satır) ve `useAdminData.ts` (851 satır) hâlâ monolith. Sıradaki bölümme adayı.
+
+### ⚠️ BÖLME KURALLARI (DERS ALINDI)
+
+1. **Adım adım böl** — tek seferde tüm dosyayı değil, bir parçayı çıkar
+2. **Her adımda tsc kontrol et** — `npx tsc --noEmit` çalışmadan devam etme
+3. **Her adımda next build** — `npx next build` geçmeden devam etme
+4. **Her adımda commit at** — hata olursa geri almak kolay olsun
+5. **Tip import'larını unutma** — split dosya `api-types`'ten import etmeli
+6. **Re-export'ları unutma** — `api.ts` split dosyayı re-export etmeli
+7. **Gereksiz import'ları temizle** — taşınan tipleri orijinal dosyadan sil
 
 ---
 
