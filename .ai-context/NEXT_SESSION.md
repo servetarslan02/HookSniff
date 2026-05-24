@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-25 GMT+8 (useDashboardData hook split tamamlandı)
+> Son güncelleme: 2026-05-25 GMT+8 (useAdminData hook split tamamlandı)
 
 ## 🚀 Hızlı Başlangıç
 
@@ -15,50 +15,50 @@
 ## ✅ Son Oturumda Yapılan İşler
 
 ### useDashboardData.ts Hook Split (3 adım, tamamlandı)
-- `useTeams.ts` — 14 team hook'u (171 satır)
-- `useNotifications.ts` — 5 notification hook'u (154 satır)
-- `useBilling.ts` — 4 billing hook'u (70 satır)
+- `useTeams.ts` — 14 hook (171 satır)
+- `useNotifications.ts` — 5 hook (154 satır)
+- `useBilling.ts` — 4 hook (70 satır)
 - `useDashboardData.ts`: 1106 → 754 satır (%32 küçüldü)
-- Her adımda import/export kontrol edildi
-- Re-export'lar eklendi (backward compatible)
+
+### useAdminData.ts Hook Split (2 adım, tamamlandı)
+- `useAdminUserDetail.ts` — 30 hook (402 satır)
+- `useAdminSystem.ts` — 7 hook (109 satır)
+- `useAdminData.ts`: 851 → 363 satır (%57 küçüldü)
+
+### Toplam Etki
+| Dosya | Önce | Sonra | Azalma |
+|-------|------|-------|--------|
+| useDashboardData.ts | 1106 | 754 | %32 |
+| useAdminData.ts | 851 | 363 | %57 |
+| **Toplam** | **1957** | **1117** | **%43** |
+
+### Yeni Dosyalar (7 adet)
+- useTeams.ts (171), useNotifications.ts (154), useBilling.ts (70)
+- useAdminUserDetail.ts (402), useAdminSystem.ts (109)
+
+### Her adımda:
+- ✅ `npx tsc --noEmit` → 0 hata
+- ✅ `npm run build` → exit 0, 363 sayfa
+- ✅ Re-export'lar → backward compatible
+- ✅ GitHub push
 
 ---
 
-## 🟡 Sıradaki — useAdminData.ts Bölme (851 satır)
+## 🟡 Sıradaki — Yeni Özellikler veya İyileştirmeler
 
-Şu hook'lar çıkarılacak:
+Hook split'ler tamamlandı. Sıradaki adımlar Servet'in onayına bağlı:
 
-| Hedef Dosya | Hook'lar | Tahmini Satır |
-|-------------|----------|---------------|
-| `useAdminUsers.ts` | useAdminUsers, useAdminUserDetail, useUpdateUserPlan, useUpdateUserStatus | ~80 |
-| `useAdminStats.ts` | useAdminStats, useAdminSystemHealth | ~60 |
+### Opsiyonel İyileştirmeler
+- [ ] `useAlerts.ts` çıkarma (useDashboardData.ts'den, ~60 satır)
+- [ ] `useTransforms.ts` çıkarma (~60 satır)
+- [ ] `usePortal.ts` çıkarma (~60 satır)
+- [ ] `useApiKeys.ts` çıkarma (~50 satır)
+- [ ] `useServiceTokens.ts` çıkarma (~60 satır)
 
-### Kurallar (Aynen Uygula)
-
-1. **Tek seferde bir dosya çıkar**
-2. **Çıkarılan dosya:** `useAuth`'ı `@/lib/store`'dan, tipleri `@/lib/api`'dan import etsin
-3. **Orijinal dosya:** çıkarılan hook'ları `export { ... } from './useXxx'` ile re-export etsin
-4. **Her adımda:** `npx tsc --noEmit` (mümkünse) → kontrol et
-5. **Hata olursa:** geri al (`git checkout .`) ve farklı dene
-
----
-
-## 🔴 Yapılmaması Gerekenler
-
-- ❌ Tek seferde tüm dosyayı böl
-- ❌ Import'ları sonradan düzeltirim diye düşünme (anında düzelt)
-- ❌ Rust dosyalarını bölme (axum Handler trait uyumsuzluğu)
-
----
-
-## 📊 Proje Durumu
-
-| Kategori | Durum |
-|----------|-------|
-| P0 (Acil) | 14/14 ✅ |
-| P1 (Yüksek) | 44/44 ✅ |
-| P2 (Orta) | 17/38 (21 kaldı) |
-| P3 (Düşük) | 0/13 (13 kaldı) |
+### Veya yeni büyük görevler
+- [ ] Backend integration tests
+- [ ] OAuth kurulumu (Servet'in yapması gerek)
+- [ ] Migration uygulama (Servet'in yapması gerek)
 
 ---
 
