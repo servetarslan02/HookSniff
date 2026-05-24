@@ -22,8 +22,10 @@ function assertOnline(): void {
 // each firing their own refresh request (Item 138).
 let refreshPromise: Promise<string | null> | null = null;
 
-// HS-039: Proactive refresh interval — renews token at ~12 min (before 15 min expiry).
+// HS-039: Proactive refresh interval — renews token at ~50 min (before 60 min expiry).
 let proactiveRefreshTimer: ReturnType<typeof setInterval> | null = null;
+// Cleanup function for visibilitychange listener (stored separately, not on the timer number)
+let visibilityCleanup: (() => void) | null = null;
 
 // BUG FIX: Multi-tab refresh coordination via BroadcastChannel
 // Prevents multiple tabs from refreshing simultaneously (token is one-time-use).
@@ -145,8 +147,8 @@ export function startProactiveRefresh(onRefresh: (newToken: string) => void): vo
     }
   };
   document.addEventListener('visibilitychange', handleVisibilityChange);
-  // Store cleanup function
-  (proactiveRefreshTimer as any)._visibilityCleanup = () => {
+  // Store cleanup function in module-level variable (cannot set properties on a number)
+  visibilityCleanup = () => {
     document.removeEventListener('visibilitychange', handleVisibilityChange);
   };
 }
@@ -155,8 +157,9 @@ export function startProactiveRefresh(onRefresh: (newToken: string) => void): vo
 export function stopProactiveRefresh(): void {
   if (proactiveRefreshTimer) {
     // Clean up visibility change listener
-    if ((proactiveRefreshTimer as any)._visibilityCleanup) {
-      (proactiveRefreshTimer as any)._visibilityCleanup();
+    if (visibilityCleanup) {
+      visibilityCleanup();
+      visibilityCleanup = null;
     }
     clearInterval(proactiveRefreshTimer);
     proactiveRefreshTimer = null;
