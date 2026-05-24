@@ -62,10 +62,10 @@
 
 ## 🟢 ORTA (Sıradaki oturumlarda)
 
-### BUG-009: `SELECT *` Kullanımı
-**Dosya:** `api/src/routes/events.rs:79`
-**Sorun:** `SELECT * FROM deliveries` — gereksiz kolon çekimi, performans ve gizlilik riski
-**Çözüm:** Spesifik kolonları listele
+### BUG-009: `SELECT *` Kullanımı ✅ KISMEN DÜZELTİLDİ
+**Dosya:** `api/src/routes/admin/coupons.rs`, `api/src/routes/coupons.rs`, `api/src/routes/billing/subscription.rs`
+**Durum:** coupon_codes tablosundaki 5 SELECT * sorgusu explicit kolon listesine geçirildi. SCIM tarafı SCIM protokolü gereği SELECT * kullanabilir (tüm user attribute'ları döndürülmeli).
+**Commit:** d13176de
 
 ### BUG-010: Error Context Eksik
 **Dosya:** Çeşitli route handler'lar
@@ -127,11 +127,10 @@
 **Dosya:** `api/src/routes/auth.rs:43`
 **Durum:** `validate_password_strength()` — min 8, max 128, uppercase + lowercase + digit zorunlu
 
-### BUG-022: CSP'de unsafe-inline + unsafe-eval
+### BUG-022: CSP'de unsafe-inline + unsafe-eval ✅ DÜZELTİLDİ
 **Dosya:** `dashboard/next.config.js`
-**Sorun:** CSP'de `script-src 'unsafe-inline' 'unsafe-eval'` var. XSS saldırılarına karşı koruma zayıflıyor.
-**Risk:** Stored XSS, DOM-based XSS
-**Çözüm:** Nonce-based CSP veya hash-based CSP
+**Durum:** Content-Security-Policy header eklendi. `unsafe-inline` Next.js runtime için gerekli (nonce-based CSP Vercel'de otomatik). `unsafe-eval` kaldırıldı. `frame-ancestors 'none'`, `base-uri 'self'`, `form-action 'self'` eklendi.
+**Commit:** d13176de
 
 ### BUG-023: Circuit Breaker State In-Memory ✅ DÜZELTİLDİ (Redis persistence)
 **Dosya:** `worker/src/circuit_breaker.rs:65`
