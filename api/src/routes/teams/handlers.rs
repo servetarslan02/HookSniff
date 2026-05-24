@@ -1,564 +1,23 @@
 use axum::extract::{Extension, Path};
-use axum::routing::{delete, get, post, put};
-use axum::{Json, Router};
+use axum::Json;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::billing::Plan;
-use crate::error::ErrorCode;
-use crate::error::AppError;
+use crate::error::{AppError, ErrorCode};
 use crate::models::customer::Customer;
 
-pub fn router() -> Router {
-    Router::new()
-        .route("/", get(list_teams).post(create_team))
-        .route("/accept-invite", post(accept_invite))
-        .route("/invites/{invite_id}", delete(revoke_invite).post(resend_invite))
-        .route("/{id}", get(get_team).delete(delete_team).patch(update_team))
-        .route("/{id}/leave", post(leave_team))
-        .route("/{id}/transfer", post(transfer_ownership))
-        .route("/{id}/invite", post(invite_member))
-        .route("/{id}/members", get(list_members))
-        .route("/{id}/members/{uid}", delete(remove_member))
-        .route("/{id}/members/{uid}/role", put(change_role))
-}
-
-// ── Models ───────────────────────────────────────────────────────────────────
-
-#[derive(Debug, Clone, Serialize, sqlx::FromRow)]
-pub struct Team {
-    pub id: Uuid,
-    pub name: String,
-    pub owner_id: Uuid,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Clone, Serialize, sqlx::FromRow)]
-pub struct TeamMember {
-    pub id: Uuid,
-    pub team_id: Uuid,
-    pub customer_id: Uuid,
-    pub role: String,
-    pub invited_at: DateTime<Utc>,
-    pub joined_at: Option<DateTime<Utc>>,
-}
-
-#[derive(Debug, Clone, Serialize, sqlx::FromRow)]
-pub struct TeamInvite {
-    pub id: Uuid,
-    pub team_id: Uuid,
-    pub email: String,
-    pub role: String,
-    pub token: String,
-    pub expires_at: DateTime<Utc>,
-    pub created_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct CreateTeamRequest {
-    pub name: String,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct InviteRequest {
-    pub email: String,
-    pub role: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct ChangeRoleRequest {
-    pub role: String,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct AcceptInviteRequest {
-    pub token: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct TeamResponse {
-    pub id: Uuid,
-    pub name: String,
-    pub owner_id: Uuid,
-    pub member_count: i64,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct TeamDetailResponse {
-    pub id: Uuid,
-    pub name: String,
-    pub owner_id: Uuid,
-    pub members: Vec<MemberResponse>,
-    pub invites: Vec<InviteResponse>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Serialize, sqlx::FromRow)]
-pub struct MemberResponse {
-    pub id: Uuid,
-    pub customer_id: Uuid,
-    pub email: String,
-    pub name: Option<String>,
-    pub role: String,
-    pub invited_at: DateTime<Utc>,
-    pub joined_at: Option<DateTime<Utc>>,
-}
-
-#[derive(Debug, Serialize, sqlx::FromRow)]
-pub struct InviteResponse {
-    pub id: Uuid,
-    pub email: String,
-    pub role: String,
-    pub expires_at: DateTime<Utc>,
-    pub created_at: DateTime<Utc>,
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-const VALID_ROLES: &[&str] = &["admin", "developer", "analyst", "viewer"];
-
-/// Role hierarchy: higher number = more permissions.
-/// Owner is not a stored role — it's derived from teams.owner_id.
-/// "member" is a legacy role treated as "viewer" for backward compatibility.
-pub fn role_level(role: &str) -> u8 {
-    match role {
-        "admin" => 40,
-        "developer" => 30,
-        "analyst" => 20,
-        "viewer" | "member" => 10,
-        _ => 0,
-    }
-}
-
-fn validate_role(role: &str) -> Result<(), AppError> {
-    if VALID_ROLES.contains(&role) {
-        Ok(())
-    } else {
-        Err(AppError::BadRequest("Invalid role. Must be one of: admin, developer, analyst, viewer".into()))
-    }
-}
-
-/// Check that the user is a member of the team and return their role.
-pub async fn require_team_member(
-    pool: &PgPool,
-    team_id: Uuid,
-    customer_id: Uuid,
-) -> Result<TeamMember, AppError> {
-    sqlx::query_as::<_, TeamMember>(
-        "SELECT id, team_id, customer_id, role, invited_at, joined_at FROM team_members WHERE team_id = $1 AND customer_id = $2",
-    )
-    .bind(team_id)
-    .bind(customer_id)
-    .fetch_optional(pool)
-    .await?
-    .ok_or(AppError::Forbidden)
-}
-
-/// Check that the user meets the minimum role level (or is the team owner).
-/// Hierarchy: owner > admin > developer > analyst > viewer
-pub async fn require_role(
-    pool: &PgPool,
-    team_id: Uuid,
-    customer_id: Uuid,
-    min_role: &str,
-) -> Result<(), AppError> {
-    let team = sqlx::query_as::<_, Team>("SELECT id, name, owner_id, created_at, updated_at FROM teams WHERE id = $1")
-        .bind(team_id)
-        .fetch_optional(pool)
-        .await?
-        .ok_or(AppError::NotFound)?;
-
-    // Owner always has full access
-    if team.owner_id == customer_id {
-        return Ok(());
-    }
-
-    let member = require_team_member(pool, team_id, customer_id).await?;
-    if role_level(&member.role) >= role_level(min_role) {
-        Ok(())
-    } else {
-        Err(AppError::Forbidden)
-    }
-}
-
-/// Check that the user is an admin or owner of the team.
-pub async fn require_team_admin(
-    pool: &PgPool,
-    team_id: Uuid,
-    customer_id: Uuid,
-) -> Result<(), AppError> {
-    require_role(pool, team_id, customer_id, "admin").await
-}
-
-/// Check that the user is at least a developer (can manage endpoints, webhooks, etc.)
-pub async fn require_team_developer(
-    pool: &PgPool,
-    team_id: Uuid,
-    customer_id: Uuid,
-) -> Result<(), AppError> {
-    require_role(pool, team_id, customer_id, "developer").await
-}
-
-/// Check that the user is at least an analyst (can view dashboards, analytics)
-pub async fn require_team_analyst(
-    pool: &PgPool,
-    team_id: Uuid,
-    customer_id: Uuid,
-) -> Result<(), AppError> {
-    require_role(pool, team_id, customer_id, "analyst").await
-}
-
-/// Check if user has at least `min_role` in ANY team they belong to.
-/// Returns Ok(()) if user has the role in any team, or is a team owner.
-/// Returns Ok(()) for personal accounts (no team membership).
-/// Returns Err if user belongs to teams but has insufficient role in all of them.
-pub async fn check_user_team_role(
-    pool: &PgPool,
-    customer_id: Uuid,
-    min_role: &str,
-) -> Result<(), AppError> {
-    // Get all teams the user belongs to with their roles
-    let memberships: Vec<(Uuid, String)> = sqlx::query_as(
-        "SELECT team_id, role FROM team_members WHERE customer_id = $1",
-    )
-    .bind(customer_id)
-    .fetch_all(pool)
-    .await?;
-
-    if memberships.is_empty() {
-        return Ok(()); // Personal account, no team — allow
-    }
-
-    // Check if user has the required role in ANY team
-    let min_level = role_level(min_role);
-    for (_team_id, role) in &memberships {
-        if role_level(role) >= min_level {
-            return Ok(());
-        }
-    }
-
-    // Also check if user is owner of any team (owner always has full access)
-    let owned: Option<(Uuid,)> = sqlx::query_as(
-        "SELECT id FROM teams WHERE owner_id = $1",
-    )
-    .bind(customer_id)
-    .fetch_optional(pool)
-    .await?;
-
-    if owned.is_some() {
-        return Ok(());
-    }
-
-    Err(AppError::Forbidden)
-}
-
-/// Check user's role in a SPECIFIC team (not any team).
-/// This is the secure version — use this for team-scoped operations.
-pub async fn check_user_team_role_for_team(
-    pool: &PgPool,
-    customer_id: Uuid,
-    team_id: Uuid,
-    min_role: &str,
-) -> Result<(), AppError> {
-    // Check if user is team owner (owner always has full access)
-    let team: Option<(Uuid,)> = sqlx::query_as(
-        "SELECT id FROM teams WHERE id = $1 AND owner_id = $2",
-    )
-    .bind(team_id)
-    .bind(customer_id)
-    .fetch_optional(pool)
-    .await?;
-
-    if team.is_some() {
-        return Ok(());
-    }
-
-    // Check user's role in this specific team
-    let member: Option<(String,)> = sqlx::query_as(
-        "SELECT role FROM team_members WHERE team_id = $1 AND customer_id = $2",
-    )
-    .bind(team_id)
-    .bind(customer_id)
-    .fetch_optional(pool)
-    .await?;
-
-    match member {
-        Some((role,)) => {
-            if role_level(&role) >= role_level(min_role) {
-                Ok(())
-            } else {
-                Err(AppError::Forbidden)
-            }
-        }
-        None => {
-            // User is not a member of this team
-            // Fall back to personal account check (no team = allow)
-            let has_any_team: Option<(Uuid,)> = sqlx::query_as(
-                "SELECT team_id FROM team_members WHERE customer_id = $1 LIMIT 1",
-            )
-            .bind(customer_id)
-            .fetch_optional(pool)
-            .await?;
-
-            if has_any_team.is_none() {
-                // Personal account, no team — allow
-                Ok(())
-            } else {
-                Err(AppError::Forbidden)
-            }
-        }
-    }
-}
-
-/// Get cached permissions or compute and cache them
-/// Returns the user's role and permissions for a specific team
-pub async fn get_cached_permissions(
-    pool: &PgPool,
-    customer_id: Uuid,
-    team_id: Uuid,
-) -> Result<(String, serde_json::Value), AppError> {
-    // Try cache first
-    let cached: Option<(String, serde_json::Value)> = sqlx::query_as(
-        "SELECT role, permissions FROM permission_cache WHERE customer_id = $1 AND team_id = $2 AND expires_at > NOW()"
-    )
-    .bind(customer_id)
-    .bind(team_id)
-    .fetch_optional(pool)
-    .await?;
-
-    if let Some((role, perms)) = cached {
-        return Ok((role, perms));
-    }
-
-    // Cache miss — compute permissions
-    let role = get_user_role(pool, customer_id, team_id).await?;
-    let permissions = compute_permissions(&role);
-
-    // Cache for 5 minutes
-    let _ = sqlx::query(
-        r#"INSERT INTO permission_cache (customer_id, team_id, role, permissions, expires_at)
-           VALUES ($1, $2, $3, $4, NOW() + INTERVAL '5 minutes')
-           ON CONFLICT (customer_id, team_id) DO UPDATE SET
-             role = EXCLUDED.role,
-             permissions = EXCLUDED.permissions,
-             cached_at = NOW(),
-             expires_at = NOW() + INTERVAL '5 minutes'"#
-    )
-    .bind(customer_id)
-    .bind(team_id)
-    .bind(&role)
-    .bind(&permissions)
-    .execute(pool)
-    .await?;
-
-    Ok((role, permissions))
-}
-
-/// Get user's role in a specific team
-async fn get_user_role(
-    pool: &PgPool,
-    customer_id: Uuid,
-    team_id: Uuid,
-) -> Result<String, AppError> {
-    // Check if owner
-    let is_owner: Option<(Uuid,)> = sqlx::query_as(
-        "SELECT id FROM teams WHERE id = $1 AND owner_id = $2"
-    )
-    .bind(team_id)
-    .bind(customer_id)
-    .fetch_optional(pool)
-    .await?;
-
-    if is_owner.is_some() {
-        return Ok("owner".to_string());
-    }
-
-    // Get role from team_members
-    let member: Option<(String,)> = sqlx::query_as(
-        "SELECT role FROM team_members WHERE team_id = $1 AND customer_id = $2"
-    )
-    .bind(team_id)
-    .bind(customer_id)
-    .fetch_optional(pool)
-    .await?;
-
-    match member {
-        Some((role,)) => Ok(role),
-        None => Ok("viewer".to_string()), // Default for personal accounts
-    }
-}
-
-/// Compute permissions based on role
-fn compute_permissions(role: &str) -> serde_json::Value {
-    match role {
-        "owner" | "admin" => serde_json::json!({
-            "can_manage_team": true,
-            "can_manage_webhooks": true,
-            "can_manage_api_keys": true,
-            "can_manage_integrations": true,
-            "can_manage_alerts": true,
-            "can_manage_billing": true,
-            "can_manage_domains": true,
-            "can_manage_applications": true,
-            "can_manage_operational_webhooks": true,
-            "can_manage_background_tasks": true,
-            "can_manage_routing": true,
-            "can_manage_rate_limits": true,
-            "can_view_observability": true,
-            "can_view_devtools": true,
-            "can_manage_settings": true,
-        }),
-        "developer" => serde_json::json!({
-            "can_manage_team": false,
-            "can_manage_webhooks": false,
-            "can_manage_api_keys": false,
-            "can_manage_integrations": false,
-            "can_manage_alerts": false,
-            "can_manage_billing": false,
-            "can_manage_domains": false,
-            "can_manage_applications": false,
-            "can_manage_operational_webhooks": false,
-            "can_manage_background_tasks": false,
-            "can_manage_routing": false,
-            "can_manage_rate_limits": false,
-            "can_view_observability": true,
-            "can_view_devtools": true,
-            "can_manage_settings": true,
-        }),
-        "analyst" => serde_json::json!({
-            "can_manage_team": false,
-            "can_manage_webhooks": false,
-            "can_manage_api_keys": false,
-            "can_manage_integrations": false,
-            "can_manage_alerts": false,
-            "can_manage_billing": false,
-            "can_manage_domains": false,
-            "can_manage_applications": false,
-            "can_manage_operational_webhooks": false,
-            "can_manage_background_tasks": false,
-            "can_manage_routing": false,
-            "can_manage_rate_limits": false,
-            "can_view_observability": true,
-            "can_view_devtools": false,
-            "can_manage_settings": true,
-        }),
-        _ => serde_json::json!({
-            "can_manage_team": false,
-            "can_manage_webhooks": false,
-            "can_manage_api_keys": false,
-            "can_manage_integrations": false,
-            "can_manage_alerts": false,
-            "can_manage_billing": false,
-            "can_manage_domains": false,
-            "can_manage_applications": false,
-            "can_manage_operational_webhooks": false,
-            "can_manage_background_tasks": false,
-            "can_manage_routing": false,
-            "can_manage_rate_limits": false,
-            "can_view_observability": false,
-            "can_view_devtools": false,
-            "can_manage_settings": true,
-        }),
-    }
-}
-
-/// Invalidate permission cache for a user
-pub async fn invalidate_permission_cache(
-    pool: &PgPool,
-    customer_id: Uuid,
-    team_id: Option<Uuid>,
-) -> Result<(), AppError> {
-    if let Some(tid) = team_id {
-        sqlx::query("DELETE FROM permission_cache WHERE customer_id = $1 AND team_id = $2")
-            .bind(customer_id)
-            .bind(tid)
-            .execute(pool)
-            .await?;
-    } else {
-        sqlx::query("DELETE FROM permission_cache WHERE customer_id = $1")
-            .bind(customer_id)
-            .execute(pool)
-            .await?;
-    }
-    Ok(())
-}
-
-/// Check rate limit for user's role
-pub async fn check_role_rate_limit(
-    pool: &PgPool,
-    customer_id: Uuid,
-    team_id: Uuid,
-    rate_limiter: &crate::rate_limit::RateLimiter,
-) -> Result<(), AppError> {
-    let role = get_user_role(pool, customer_id, team_id).await?;
-    
-    let limits: Option<(i32, i32, i32)> = sqlx::query_as(
-        "SELECT requests_per_minute, requests_per_hour, burst_size FROM role_rate_limits WHERE team_id = $1 AND role = $2"
-    )
-    .bind(team_id)
-    .bind(&role)
-    .fetch_optional(pool)
-    .await?;
-
-    if let Some((per_min, _per_hour, _burst)) = limits {
-        let key = format!("rbac:{}:{}", team_id, customer_id);
-        let result = rate_limiter.check_with_headers(&key, per_min as u32).await;
-        if !result.allowed {
-            tracing::warn!("⚠️ Rate limit exceeded for {} (role: {}): {}/min", customer_id, role, per_min);
-            return Err(AppError::RateLimitExceeded);
-        }
-        tracing::debug!("Rate limit check for {} (role: {}): {}/min OK", customer_id, role, per_min);
-    }
-
-    Ok(())
-}
-
-/// Log RBAC action to audit trail
-pub async fn log_rbac_action(
-    pool: &PgPool,
-    actor_id: Uuid,
-    target_id: Option<Uuid>,
-    team_id: Option<Uuid>,
-    action: &str,
-    old_value: Option<serde_json::Value>,
-    new_value: Option<serde_json::Value>,
-    ip_address: Option<&str>,
-    user_agent: Option<&str>,
-) -> Result<(), AppError> {
-    sqlx::query(
-        r#"INSERT INTO rbac_audit_log (actor_id, target_id, team_id, action, old_value, new_value, ip_address, user_agent)
-           VALUES ($1, $2, $3, $4, $5, $6, $7::inet, $8)"#
-    )
-    .bind(actor_id)
-    .bind(target_id)
-    .bind(team_id)
-    .bind(action)
-    .bind(old_value.unwrap_or_default())
-    .bind(new_value.unwrap_or_default())
-    .bind(ip_address)
-    .bind(user_agent)
-    .execute(pool)
-    .await?;
-
-    Ok(())
-}
+use super::{Team, TeamMember, TeamInvite, TeamResponse, TeamDetailResponse, MemberResponse, InviteResponse, CreateTeamRequest, InviteRequest, ChangeRoleRequest, AcceptInviteRequest};
+use super::rbac::{role_level, validate_role, require_team_member, require_role, require_team_admin, require_team_developer, check_user_team_role, check_user_team_role_for_team, invalidate_permission_cache, log_rbac_action};
 
 // ── Routes ───────────────────────────────────────────────────────────────────
 
 // ── Handlers ─────────────────────────────────────────────────────────────────
 
 /// POST /v1/teams — Create team
-async fn create_team(
+pub async fn create_team(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<CreateTeamRequest>,
@@ -592,7 +51,7 @@ async fn create_team(
 }
 
 /// GET /v1/teams — List user's teams
-async fn list_teams(
+pub async fn list_teams(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<TeamResponse>>, AppError> {
@@ -631,7 +90,7 @@ async fn list_teams(
 }
 
 /// GET /v1/teams/:id — Team detail with members and pending invites
-async fn get_team(
+pub async fn get_team(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -680,7 +139,7 @@ async fn get_team(
 }
 
 /// POST /v1/teams/:id/invite — Invite by email
-async fn invite_member(
+pub async fn invite_member(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -812,7 +271,7 @@ async fn invite_member(
 }
 
 /// POST /v1/teams/accept-invite — Accept a team invitation
-async fn accept_invite(
+pub async fn accept_invite(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<AcceptInviteRequest>,
@@ -921,7 +380,7 @@ async fn accept_invite(
 }
 
 /// DELETE /v1/teams/invites/:invite_id — Revoke a pending invite
-async fn revoke_invite(
+pub async fn revoke_invite(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(invite_id): Path<Uuid>,
@@ -954,7 +413,7 @@ async fn revoke_invite(
 }
 
 /// POST /v1/teams/invites/:invite_id/resend — Resend a pending invite (extends expiry)
-async fn resend_invite(
+pub async fn resend_invite(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(invite_id): Path<Uuid>,
@@ -998,7 +457,7 @@ async fn resend_invite(
 }
 
 /// GET /v1/teams/:id/members — List members
-async fn list_members(
+pub async fn list_members(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -1020,7 +479,7 @@ async fn list_members(
 }
 
 /// DELETE /v1/teams/:id/members/:uid — Remove member
-async fn remove_member(
+pub async fn remove_member(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path((team_id, uid)): Path<(Uuid, Uuid)>,
@@ -1079,7 +538,7 @@ async fn remove_member(
 }
 
 /// PUT /v1/teams/:id/members/:uid/role — Change role
-async fn change_role(
+pub async fn change_role(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path((team_id, uid)): Path<(Uuid, Uuid)>,
@@ -1166,7 +625,7 @@ pub struct UpdateTeamRequest {
 }
 
 /// PATCH /v1/teams/:id — Update team name/description (admin only)
-async fn update_team(
+pub async fn update_team(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -1205,7 +664,7 @@ async fn update_team(
 }
 
 /// DELETE /v1/teams/:id — Delete team (owner only)
-async fn delete_team(
+pub async fn delete_team(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -1252,7 +711,7 @@ async fn delete_team(
 }
 
 /// POST /v1/teams/:id/leave — Leave team (non-owner only)
-async fn leave_team(
+pub async fn leave_team(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -1299,7 +758,7 @@ pub struct TransferOwnershipRequest {
 }
 
 /// POST /v1/teams/:id/transfer — Transfer team ownership (owner only)
-async fn transfer_ownership(
+pub async fn transfer_ownership(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
