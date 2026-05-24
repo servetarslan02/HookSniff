@@ -25,6 +25,7 @@
 
 pub mod signature;
 pub mod handlers;
+mod tests;
 
 use signature::*;
 use handlers::*;
