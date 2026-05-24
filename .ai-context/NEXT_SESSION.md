@@ -1,11 +1,11 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-25 GMT+8 (useDashboardData hook split tamamlandı — 2. oturum)
+> Son güncelleme: 2026-05-25 GMT+8 (sso.rs → sso/ directory split, adım 1 tamamlandı)
 
 ## 🚀 Hızlı Başlangıç
 
 1. `git pull` — en son kodu çek
-2. `MEMORY.md` oku — proje hafızası
+2. `MEMORY.md` oku — proje hafızası (Rust bölüm kuralları burada!)
 3. Bu dosyayı oku — yapılacaklar
 4. İşe başla
 5. Oturum sonunda: push + bu dosyayı güncelle
@@ -14,49 +14,61 @@
 
 ## ✅ Son Oturumda Yapılan İşler
 
-### useDashboardData.ts — Tam Hook Split (10 dosya çıkarıldı)
-Orijinal 1106 satır → **172 satır** (%84 küçülme)
+### Dashboard Hook Split (tamamlandı ✅)
+- `useDashboardData.ts`: 1106 → 172 satır (%84 küçülme)
+- `useAdminData.ts`: 851 → 92 satır (%89 küçülme)
+- Toplam 17 split dosya çıkarıldı
+- `validated.ts` paylaşılan helper
 
-| Dosya | Satır | Hook Sayısı |
-|-------|-------|-------------|
-| useTeams.ts | 171 | 14 |
-| useNotifications.ts | 154 | 5 |
-| useBilling.ts | 70 | 4 |
-| useAlerts.ts | 61 | 5 |
-| useTransforms.ts | 68 | 5 |
-| usePortal.ts | 68 | 5 |
-| useApiKeys.ts | 45 | 4 |
-| useServiceTokens.ts | 53 | 5 |
-| useEndpoints.ts | 85 | 4 |
-| useAnalytics.ts | 82 | 5 |
-| useWebhooks.ts | 112 | 6 |
-| useInboundConfigs.ts | 57 | 4 |
-| useRateLimits.ts | 37 | 3 |
-
-### Paylaşılan yardımcı
-- `validated.ts` (15 satır) — schema-validated fetcher wrapper
-
-### Her adımda:
-- ✅ `npx tsc --noEmit` → 0 hata
-- ✅ `npm run build` → exit 0
-- ✅ Re-export'lar → backward compatible
-- ✅ GitHub push
+### Rust sso.rs Split — Adım 1 (tamamlandı ✅)
+- `sso.rs` (3943 satır) → `sso/mod.rs` (665) + `sso/handlers.rs` (3293)
+- `cargo check` — 0 hata
+- Commit: `14ea5d64`
 
 ---
 
-## 🟡 Sıradaki — Yeni Özellikler veya İyileştirmeler
+## 🟡 Sıradaki — sso/handlers.rs Bölmeye Devam (3293 satır)
 
-Hook split'ler tamamlandı. Sıradaki adımlar Servet'in onayına bağlı:
+**ÖNEMLİ: Rust bölme kuralları için MEMORY.md'yi oku!**
 
-### useAdminData.ts Kalan Split (363 satır)
-- [ ] `useAdminUsers.ts` çıkarma (~100 satır)
-- [ ] `useAdminEndpoints.ts` çıkarma (~80 satır)
-- [ ] `useAdminBilling.ts` çıkarma (~60 satır)
+### Adım 2: SCIM endpoint'leri çıkar → `sso/scim.rs`
+- Satır 2596+ (SCIM 2.0 Endpoints section)
+- `validate_scim_token`, `scim_user_response`, `scim_list_users`, `scim_get_user`, `scim_create_user`, `scim_update_user`, `scim_patch_user`, `scim_delete_user`, `scim_list_groups`, `scim_service_provider_config`, `scim_resource_types`, `scim_schemas`
+- Yaklaşık ~700 satır
+- `cargo check` → commit
 
-### Veya yeni büyük görevler
-- [ ] Backend integration tests
-- [ ] OAuth kurulumu (Servet'in yapması gerek)
-- [ ] Migration uygulama (Servet'in yapması gerek)
+### Adım 3: SAML helpers çıkar → `sso/saml.rs`
+- `parse_saml_response`, XML extraction helpers, SAML signature verification
+- Yaklaşık ~450 satır
+- `cargo check` → commit
+
+### Adım 4: OIDC helpers çıkar → `sso/oidc.rs`
+- `decode_oidc_id_token`, `verify_jwt_signature`
+- Yaklaşık ~130 satır
+- `cargo check` → commit
+
+### Adım 5: Customer helpers çıkar → `sso/helpers.rs`
+- `find_or_create_sso_customer`, `auto_join_team_direct`, `resolve_role_from_mapping`, `resolve_team_from_mapping`, `store_sso_user_attributes`, `sync_team_memberships`, `generate_sso_response`, `log_sso_attempt`
+- Yaklaşık ~400 satır
+- `cargo check` → commit
+
+### Adım 6: Config handler'ları çıkar → `sso/config.rs`
+- `get_sso_config`, `upsert_sso_config`, `delete_sso_config`, `test_sso_connection`, `get_login_attempts`, `initiate_domain_verification`, `check_domain_verification`
+- Yaklaşık ~750 satır
+- `cargo check` → commit
+
+### Adım 7: Login handler'ları çıkar → `sso/login.rs`
+- `initiate_sso_login`, `saml_callback`, `oidc_callback`, `list_sso_providers`
+- Yaklaşık ~850 satır
+- `cargo check` → commit
+
+### Her adımda şunları yap:
+1. Fonksiyonları `pub async fn` yap
+2. Type'ları `pub struct` yap
+3. `use super::{GerekliType1, GerekliType2};` ekle (use super::* DEĞİL!)
+4. External crate'leri dosyada ayrı import et
+5. Cross-module çağrıları `helpers::function_name()` şeklinde prefix'le
+6. `cargo check` → 0 hata → commit → sonraki adım
 
 ---
 
