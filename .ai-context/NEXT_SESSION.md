@@ -34,24 +34,28 @@
 
 | Dosya | Satır | Öncelik |
 |-------|-------|---------|
+| `routes/auth/handlers.rs` | 905 | Orta (önceden split edildi, test çıkarılabilir) |
+| `routes/webhooks/handlers.rs` | 851 | Orta (önceden split edildi) |
+| `routes/teams/handlers.rs` | 827 | Orta (önceden split edildi) |
+| `routes/billing/subscription.rs` | 797 | Düşük |
+| `main.rs` | 788 | Düşük (zor split) |
+| `routes/oauth.rs` | 776 | Düşük |
+| `fifo/mod.rs` | 769 | Düşük |
 | `SsoContent.tsx` | 1167 | Düşük (handler'lar state'e çok bağlı) |
-| `polar/subscription.rs` | ~800 | Düşük |
-| `iyzico/` modülleri | ~600 | Düşük |
+| `admin/cortex/page.tsx` | 956 | Düşük |
 
-### billing/stripe.rs Split — TAMAMLANDI ✅
-- 999 → 376 satır (%62 küçülme)
-- 2 yeni modül: stripe_handlers.rs (468), stripe_tests.rs (112)
-- GitHub push: `d582cb0e`
+### 2026-05-25 Split'leri — TAMAMLANDI ✅
 
-### billing/mod.rs Split — TAMAMLANDI ✅
-- 984 → 507 satır (%48 küçülme)
-- 2 yeni modül: models.rs (97), billing_tests.rs (360)
-- GitHub push: `bd0bafed`
-
-### SsoContent.tsx Split — TAMAMLANDI ✅ (kısmi)
-- 1310 → 1167 satır (%11 küçülme)
-- 1 yeni modül: sso-utils.ts (163)
-- GitHub push: `10634d98`
+| Dosya | Önce | Sonra | Azalma |
+|-------|------|-------|--------|
+| billing/stripe.rs | 999 | 376 | %62 |
+| billing/mod.rs | 984 | 507 | %48 |
+| SsoContent.tsx | 1310 | 1167 | %11 |
+| templates/library.rs | 903 | 25 | %97 |
+| transform/mod.rs | 833 | 506 | %39 |
+| rate_limit.rs | 812 | 557 | %31 |
+| models/endpoint.rs | 889 | 387 | %56 |
+| **Toplam** | **6330** | **3525** | **%44** |
 
 ### middleware/mod.rs Split — TAMAMLANDI ✅
 - 1052 → 642 satır (%39 küçülme)
