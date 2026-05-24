@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-24 GMT+8 (api.ts Modular Split)
+> Son güncelleme: 2026-05-25 GMT+8 (Dashboard Hook Split)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -79,9 +79,17 @@ Orijinal `api.ts` (1369 satır) 5 dosyaya bölündü:
 
 Rust dosyaları (sso.rs, inbound.rs, teams.rs, worker/main.rs) büyük ama stabil. Axum Handler trait uyumsuzluğu nedeniyle bölme başarısız oldu. Gerekirse ileride tekrar denenebilir.
 
-### Dashboard Hook Bölme — YAPILMADI (SIRADAKİ)
+### Dashboard Hook Bölme — TAMAMLANDI ✅ (2026-05-25)
 
-`useDashboardData.ts` (1106 satır) ve `useAdminData.ts` (851 satır) hâlâ monolith. Sıradaki bölümme adayı.
+`useDashboardData.ts` (1106 satır) ve `useAdminData.ts` (851 satır) 5 dosyaya bölündü:
+
+| Orijinal | Önce | Sonra | Yeni Dosyalar |
+|----------|------|-------|---------------|
+| `useDashboardData.ts` | 1106 | 754 | useTeams.ts (171), useNotifications.ts (154), useBilling.ts (70) |
+| `useAdminData.ts` | 851 | 363 | useAdminUserDetail.ts (402), useAdminSystem.ts (109) |
+| **Toplam** | **1957** | **1117** | **%43 küçülme** |
+
+**Kural:** Her split dosya `useAuth`'ı `@/lib/store`'dan, tipleri `@/lib/api` veya `@/schemas/api`'dan import eder. Orijinal dosya hepsini re-export eder.
 
 ### ⚠️ BÖLME KURALLARI (DERS ALINDI)
 
@@ -289,6 +297,34 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-25 — Dashboard Hook Split)
+
+### Özet
+Servet ile oturum. Dashboard hook dosyaları kontrollü şekilde bölündü. 5 yeni dosya, toplam %43 küçülme.
+
+### Yapılan İşler:
+
+#### useDashboardData.ts Split (3 adım)
+1. `useTeams.ts` — 14 team hook'u (171 satır) → Commit: 52dbc69f
+2. `useNotifications.ts` — 5 notification hook'u (154 satır) → Commit: b59e7b5a
+3. `useBilling.ts` — 4 billing hook'u (70 satır) → Commit: 920c40c5
+- useDashboardData.ts: 1106 → 754 satır
+
+#### useAdminData.ts Split (2 adım)
+1. `useAdminUserDetail.ts` — 30 user detail hook'u (402 satır) → Commit: 9bafe092
+2. `useAdminSystem.ts` — 7 system hook'u (109 satır) → Commit: 66ed07e7
+- useAdminData.ts: 851 → 363 satır
+
+### Doğrulama
+- Her adımda `npx tsc --noEmit` → 0 hata ✅
+- Her adımda `npm run build` → 363 sayfa, exit 0 ✅
+- Re-export'lar → backward compatible ✅
+- node_modules kuruldu (730 paket, 0 vulnerability)
+
+### Push: 97c808c5
 
 ---
 
