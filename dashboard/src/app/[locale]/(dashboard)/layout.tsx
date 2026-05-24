@@ -1,33 +1,23 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { AuthGuard } from '@/components/AuthGuard';
+import { NotificationCenter } from '@/components/NotificationCenter';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { BroadcastBanner } from '@/components/BroadcastBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { useRealtime } from '@/hooks/useRealtime';
 import { useIdleTimeout } from '@/hooks/useIdleTimeout';
+import { apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
 import { usePermissions } from '@/hooks/usePermissions';
 import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, BookOpen, ExternalLink, LogOut, Shield, Globe } from '@/components/icons';
-
-// PERFORMANCE: Lazy-load NotificationCenter (308 lines) — only needed when bell icon clicked
-const NotificationCenter = dynamic(() => import('@/components/NotificationCenter').then(m => ({ default: m.NotificationCenter })), { ssr: false });
-// PERFORMANCE: useRealtime lazy-load — connection indicator loads after initial render
-function useRealtimeLazy() {
-  const [connectionState] = useState<'connected' | 'connecting' | 'fallback' | 'disconnected'>('connected');
-  useEffect(() => {
-    // Preload the real module so pages that need WebSocket get it from cache
-    import('@/hooks/useRealtime').catch(() => {});
-  }, []);
-  return { connectionState };
-}
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -39,7 +29,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations('nav');
   const tc = useTranslations('common');
   const locale = useLocale();
-  const { connectionState } = useRealtimeLazy();
+  const { connectionState } = useRealtime();
   const perms = usePermissions();
 
   // Auto-logout after 1 hour of inactivity
@@ -54,43 +44,43 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
-  // Prefetch API data for a route on hover — lazy-import api to avoid loading 1367-line module eagerly
+  // Prefetch API data for a route on hover
   const prefetchForRoute = (href: string) => {
     if (!token) return [];
     const base = [
-      { queryKey: ['stats'], queryFn: () => import('@/lib/api').then(m => m.statsApi.get(token)), staleTime: 30_000 },
+      { queryKey: ['stats'], queryFn: () => statsApi.get(token), staleTime: 30_000 },
     ];
     switch (href) {
       case '/core':
         return [
           ...base,
-          { queryKey: ['webhooks', { page: 1 }], queryFn: () => import('@/lib/api').then(m => m.webhooksApi.list(token, { page: 1 })), staleTime: 15_000 },
-          { queryKey: ['analytics', 'delivery-trend', '7d'], queryFn: () => import('@/lib/api').then(m => m.analyticsApi.deliveryTrend(token, '7d')), staleTime: 30_000 },
-          { queryKey: ['endpoints'], queryFn: () => import('@/lib/api').then(m => m.apiFetch('/endpoints', { token })), staleTime: 30_000 },
+          { queryKey: ['webhooks', { page: 1 }], queryFn: () => webhooksApi.list(token, { page: 1 }), staleTime: 15_000 },
+          { queryKey: ['analytics', 'delivery-trend', '7d'], queryFn: () => analyticsApi.deliveryTrend(token, '7d'), staleTime: 30_000 },
+          { queryKey: ['endpoints'], queryFn: () => apiFetch('/endpoints', { token }), staleTime: 30_000 },
         ];
       case '/observability':
         return [
           ...base,
-          { queryKey: ['delivery-logs', { page: 1 }], queryFn: () => import('@/lib/api').then(m => m.webhooksApi.list(token, { page: 1 })), staleTime: 15_000 },
-          { queryKey: ['analytics', 'success-rate', '24h'], queryFn: () => import('@/lib/api').then(m => m.analyticsApi.successRate(token, '24h')), staleTime: 30_000 },
+          { queryKey: ['delivery-logs', { page: 1 }], queryFn: () => webhooksApi.list(token, { page: 1 }), staleTime: 15_000 },
+          { queryKey: ['analytics', 'success-rate', '24h'], queryFn: () => analyticsApi.successRate(token, '24h'), staleTime: 30_000 },
         ];
       case '/applications':
         return [
-          { queryKey: ['applications'], queryFn: () => import('@/lib/api').then(m => m.apiFetch('/applications', { token })), staleTime: 30_000 },
+          { queryKey: ['applications'], queryFn: () => apiFetch('/applications', { token }), staleTime: 30_000 },
         ];
       case '/account':
         return [
-          { queryKey: ['portal-profile'], queryFn: () => import('@/lib/api').then(m => m.apiFetch('/portal/me', { token })), staleTime: 30_000 },
-          { queryKey: ['billing', 'usage'], queryFn: () => import('@/lib/api').then(m => m.apiFetch('/billing/usage', { token })), staleTime: 60_000 },
+          { queryKey: ['portal-profile'], queryFn: () => apiFetch('/portal/me', { token }), staleTime: 30_000 },
+          { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
         ];
       case '/billing':
         return [
-          { queryKey: ['billing', 'usage'], queryFn: () => import('@/lib/api').then(m => m.apiFetch('/billing/usage', { token })), staleTime: 60_000 },
-          { queryKey: ['billing', 'subscription'], queryFn: () => import('@/lib/api').then(m => m.apiFetch('/billing/subscription', { token })), staleTime: 60_000 },
+          { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
+          { queryKey: ['billing', 'subscription'], queryFn: () => apiFetch('/billing/subscription', { token }), staleTime: 60_000 },
         ];
       case '/organization':
         return [
-          { queryKey: ['teams'], queryFn: () => import('@/lib/api').then(m => m.apiFetch('/teams', { token })), staleTime: 30_000 },
+          { queryKey: ['teams'], queryFn: () => apiFetch('/teams', { token }), staleTime: 30_000 },
         ];
       default:
         return base;
