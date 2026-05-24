@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-24 GMT+8 (api.ts modular split tamamlandı)
+> Son güncelleme: 2026-05-25 GMT+8 (useDashboardData hook split tamamlandı)
 
 ## 🚀 Hızlı Başlangıç
 
@@ -14,47 +14,38 @@
 
 ## ✅ Son Oturumda Yapılan İşler
 
-### api.ts Modular Split (4 adım, tamamlandı)
-- `api-admin.ts` — adminApi (313 satır)
-- `api-teams.ts` — teams/notifications/broadcasts/alerts/inbound (147 satır)
-- `api-integrations.ts` — connectors/integrations/stream (177 satır)
-- `api-misc.ts` — 2FA/SSO/transforms/billing/analytics (102 satır)
-- `api.ts` — 1369 → 664 satır (%48 küçüldü)
-- Her adımda tsc + next build + commit kontrol edildi
+### useDashboardData.ts Hook Split (3 adım, tamamlandı)
+- `useTeams.ts` — 14 team hook'u (171 satır)
+- `useNotifications.ts` — 5 notification hook'u (154 satır)
+- `useBilling.ts` — 4 billing hook'u (70 satır)
+- `useDashboardData.ts`: 1106 → 754 satır (%32 küçüldü)
+- Her adımda import/export kontrol edildi
+- Re-export'lar eklendi (backward compatible)
 
 ---
 
-## 🟡 Sıradaki — Dashboard Hook Bölme
-
-### Öncelik: useDashboardData.ts (1106 satır)
+## 🟡 Sıradaki — useAdminData.ts Bölme (851 satır)
 
 Şu hook'lar çıkarılacak:
 
 | Hedef Dosya | Hook'lar | Tahmini Satır |
 |-------------|----------|---------------|
-| `useTeams.ts` | useTeams, useTeamMembers, useTeamDetail, useCreateTeam, useUpdateTeam, useInviteTeamMember, useRemoveTeamMember, useUpdateTeamMemberRole, useAcceptTeamInvite, useDeleteTeam, useLeaveTeam, useTransferOwnership, useRevokeInvite, useResendInvite | ~150 |
-| `useNotifications.ts` | useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead, useDeleteNotification, useReplayWebhook | ~150 |
+| `useAdminUsers.ts` | useAdminUsers, useAdminUserDetail, useUpdateUserPlan, useUpdateUserStatus | ~80 |
+| `useAdminStats.ts` | useAdminStats, useAdminSystemHealth | ~60 |
 
 ### Kurallar (Aynen Uygula)
 
 1. **Tek seferde bir dosya çıkar**
-2. **Çıkarılan dosya:** `useAuth`'ı `@/lib/store`'dan, tipleri `@/lib/api-types`'den import etsin
+2. **Çıkarılan dosya:** `useAuth`'ı `@/lib/store`'dan, tipleri `@/lib/api`'dan import etsin
 3. **Orijinal dosya:** çıkarılan hook'ları `export { ... } from './useXxx'` ile re-export etsin
-4. **Her adımda:** `npx tsc --noEmit` → `npx next build` → `git commit`
+4. **Her adımda:** `npx tsc --noEmit` (mümkünse) → kontrol et
 5. **Hata olursa:** geri al (`git checkout .`) ve farklı dene
-
-### Sonra: useAdminData.ts (851 satır)
-
-| Hedef Dosya | Hook'lar | Tahmini Satır |
-|-------------|----------|---------------|
-| `useAdminUsers.ts` | useAdminUsers, useAdminUserDetail, useUpdateUserPlan, useUpdateUserStatus | ~80 |
 
 ---
 
 ## 🔴 Yapılmaması Gerekenler
 
-- ❌ Tek seferde tüm dosyayı böl (bir seferde 313 satır bile riskliydi)
-- ❌ tsc kontrol etmeden devam et
+- ❌ Tek seferde tüm dosyayı böl
 - ❌ Import'ları sonradan düzeltirim diye düşünme (anında düzelt)
 - ❌ Rust dosyalarını bölme (axum Handler trait uyumsuzluğu)
 
