@@ -353,8 +353,8 @@ export default function RevenueContent({
           <desc>{t('revenueChartDesc')}</desc>
           <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
           <XAxis dataKey="month" tick={{ fontSize: 11 }} className="text-gray-500 dark:text-slate-400" interval="preserveStartEnd" />
-          <YAxis tick={{ fontSize: 11 }} className="text-gray-500 dark:text-slate-400" tickFormatter={(v: any) => `$${v}`} width={50} />
-          <Tooltip contentStyle={{ backgroundColor: 'rgb(15 23 42)', border: 'none', borderRadius: '12px', color: 'white', fontSize: '12px' }} formatter={(value: any) => [`$${Number(value).toLocaleString()}`, t("revenue")]} />
+          <YAxis tick={{ fontSize: 11 }} className="text-gray-500 dark:text-slate-400" tickFormatter={(v) => `$${v}`} width={50} />
+          <Tooltip contentStyle={{ backgroundColor: 'rgb(15 23 42)', border: 'none', borderRadius: '12px', color: 'white', fontSize: '12px' }} formatter={(value) => [`$${Number(value).toLocaleString()}`, t("revenue")]} />
           <Bar dataKey="revenue" fill="#8b5cf6" radius={[6, 6, 0, 0]} maxBarSize={48} />
          </BarChart>
         </ResponsiveContainer>
@@ -377,7 +377,7 @@ export default function RevenueContent({
              <Cell key={`cell-${index}`} fill={PLAN_COLORS[entry.name.toLowerCase()] || '#94a3b8'} />
             ))}
            </Pie>
-           <Tooltip contentStyle={{ backgroundColor: 'rgb(15 23 42)', border: 'none', borderRadius: '12px', color: 'white', fontSize: '12px' }} formatter={(value: any) => [`$${Number(value).toLocaleString()}`, t("revenue")]} />
+           <Tooltip contentStyle={{ backgroundColor: 'rgb(15 23 42)', border: 'none', borderRadius: '12px', color: 'white', fontSize: '12px' }} formatter={(value) => [`$${Number(value).toLocaleString()}`, t("revenue")]} />
           </PieChart>
          </ResponsiveContainer>
         </div>

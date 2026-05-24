@@ -265,7 +265,7 @@ export function OverviewTab({
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={analytics.daily_deliveries!.slice(-14)}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v: any) => v.slice(5)} />
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => v.slice(5)} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip
                     contentStyle={{ backgroundColor: 'rgb(15 23 42)', border: 'none', borderRadius: '12px', color: 'white' }}
