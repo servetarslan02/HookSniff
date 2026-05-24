@@ -400,31 +400,31 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-25 — OpenClaw Split Oturumları)
+## 📝 Son Oturum (2026-05-25 — OpenClaw Split Oturumları — 7 Dosya)
 
 ### Özet
-Servet ile OpenClaw üzerinden. 3 büyük dosya split edildi, CSP header eklendi, SELECT * düzeltildi.
+Servet ile OpenClaw üzerinden. 7 büyük dosya split edildi, CSP header eklendi, SELECT * düzeltildi.
 
 ### Yapılan İşler:
 1. **CSP Header** — `next.config.js`'ye Content-Security-Policy eklendi (BUG-022)
 2. **SELECT * fix** — coupon_codes tablosundaki 5 sorgu explicit kolon listesine geçirildi (BUG-009)
-3. **billing/stripe.rs split** — 999 → 376 satır (%62 küçülme)
-   - `stripe/mod.rs` (376): types, checkout, portal, cancel, helpers
-   - `stripe/stripe_handlers.rs` (468): webhook event handlers
-   - `stripe/stripe_tests.rs` (112): tests
-4. **billing/mod.rs split** — 984 → 507 satır (%48 küçülme)
-   - `billing/mod.rs` (507): Plan enum, BillingService, resolve_provider
-   - `billing/models.rs` (97): Usage, Subscription, Invoice structs
-   - `billing/billing_tests.rs` (360): tests
-5. **SsoContent.tsx split** — 1310 → 1167 satır (%11 küçülme)
-   - `sso-utils.ts` (163): IDP_TEMPLATES, getFriendlyError
-   - `SsoContent.tsx` (1167): main component
+3. **billing/stripe.rs split** — 999 → 376 satır (%62)
+4. **billing/mod.rs split** — 984 → 507 satır (%48)
+5. **SsoContent.tsx split** — 1310 → 1167 satır (%11)
+6. **templates/library.rs split** — 903 → 25 satır (%97)
+7. **transform/mod.rs split** — 833 → 506 satır (%39)
+8. **rate_limit.rs split** — 812 → 557 satır (%31)
+9. **models/endpoint.rs split** — 889 → 387 satır (%56)
 
-### Push: d13176de, 0355b4b9, d582cb0e, bd0bafed, 10634d98
+### Toplam Etki
+| Metrik | Değer |
+|--------|-------|
+| Split edilen dosya | 7 |
+| Oluşturulan yeni dosya | 13 |
+| Toplam satır azalması | 6330 → 3525 (%44) |
+| Commit sayısı | 10 |
 
-### Kalan Split'ler
-- SsoContent.tsx hâlâ 1167 satır — handler'lar state'e çok bağlı, custom hook zor
-- Düşük öncelik: polar/ modülleri, iyzico/ modülleri
+### Push: d13176de, 0355b4b9, d582cb0e, bd0bafed, 10634d98, 54737689, 656f822a, b411029d, 94725c49, 0d189e50
 
 ---
 
