@@ -1,74 +1,77 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-25 GMT+8 (sso.rs → sso/ directory split, adım 1 tamamlandı)
+> Son güncelleme: 2026-05-25 GMT+8 (OpenClaw oturumu — genel durum kontrolü)
 
 ## 🚀 Hızlı Başlangıç
 
 1. `git pull` — en son kodu çek
-2. `MEMORY.md` oku — proje hafızası (Rust bölüm kuralları burada!)
+2. `MEMORY.md` oku — proje hafızası
 3. Bu dosyayı oku — yapılacaklar
 4. İşe başla
 5. Oturum sonunda: push + bu dosyayı güncelle
 
 ---
 
-## ✅ Son Oturumda Yapılan İşler
+## ✅ Tamamlanan İşler (Önceki Oturumlar)
 
 ### Dashboard Hook Split (tamamlandı ✅)
 - `useDashboardData.ts`: 1106 → 172 satır (%84 küçülme)
 - `useAdminData.ts`: 851 → 92 satır (%89 küçülme)
-- Toplam 17 split dosya çıkarıldı
-- `validated.ts` paylaşılan helper
+- 17 split dosya + `validated.ts` paylaşılan helper
 
-### Rust sso.rs Split — Adım 1 (tamamlandı ✅)
-- `sso.rs` (3943 satır) → `sso/mod.rs` (665) + `sso/handlers.rs` (3293)
-- `cargo check` — 0 hata
-- Commit: `14ea5d64`
+### Rust Modül Split'leri (tamamlandı ✅)
+- **sso.rs** → sso/ dizin (mod.rs + config + login + scim + saml + saml_handler + oidc + oidc_handler + helpers + tests)
+- **teams.rs** → teams/ dizin (mod.rs + handlers + rbac)
+- **webhooks.rs** → webhooks/ dizin (mod.rs + handlers)
+- **auth.rs** → auth/ dizin (mod.rs + handlers)
+- **inbound.rs** → inbound/ dizin (mod.rs + handlers + signature)
+- **billing/** → polar/ dizin (subscription + webhooks + grace + portal + refund_requests + tests)
+- **admin/** → 20+ dosya (gdpr, users, security, stats, revenue, settings, customers, broadcasts, monitoring, refunds, coupons, feature_flags, alerts, export, audit, delivery)
 
 ---
 
-## 🟡 Sıradaki — sso/handlers.rs Bölmeye Devam (3293 satır)
+## 🟡 Kalan Büyük Dosyalar (Split Gereken)
 
-**ÖNEMLİ: Rust bölme kuralları için MEMORY.md'yi oku!**
+| Dosya | Satır | Öncelik |
+|-------|-------|---------|
+| `teams/handlers.rs` | 1403 | Yüksek |
+| `webhooks/handlers.rs` | 1177 | Yüksek |
+| `auth/handlers.rs` | 1033 | Orta |
+| `inbound/handlers.rs` | 870 | Orta |
 
-### Adım 2: SCIM endpoint'leri çıkar → `sso/scim.rs`
-- Satır 2596+ (SCIM 2.0 Endpoints section)
-- `validate_scim_token`, `scim_user_response`, `scim_list_users`, `scim_get_user`, `scim_create_user`, `scim_update_user`, `scim_patch_user`, `scim_delete_user`, `scim_list_groups`, `scim_service_provider_config`, `scim_resource_types`, `scim_schemas`
-- Yaklaşık ~700 satır
-- `cargo check` → commit
+### teams/handlers.rs Bölme Planı
+- Team CRUD handler'ları → `teams/crud.rs`
+- Team member management → `teams/members.rs`
+- Team invitation handler'ları → `teams/invitations.rs`
+- mod.rs: router + type'lar + test'ler
 
-### Adım 3: SAML helpers çıkar → `sso/saml.rs`
-- `parse_saml_response`, XML extraction helpers, SAML signature verification
-- Yaklaşık ~450 satır
-- `cargo check` → commit
+### webhooks/handlers.rs Bölme Planı
+- Webhook CRUD → `webhooks/crud.rs`
+- Webhook delivery/retry → `webhooks/delivery.rs`
+- Webhook test/payload → `webhooks/test.rs`
+- mod.rs: router + type'lar
 
-### Adım 4: OIDC helpers çıkar → `sso/oidc.rs`
-- `decode_oidc_id_token`, `verify_jwt_signature`
-- Yaklaşık ~130 satır
-- `cargo check` → commit
+### auth/handlers.rs Bölme Planı
+- Login/register → `auth/credentials.rs`
+- Password reset → `auth/password.rs`
+- Session management → `auth/session.rs`
+- mod.rs: router + type'lar
 
-### Adım 5: Customer helpers çıkar → `sso/helpers.rs`
-- `find_or_create_sso_customer`, `auto_join_team_direct`, `resolve_role_from_mapping`, `resolve_team_from_mapping`, `store_sso_user_attributes`, `sync_team_memberships`, `generate_sso_response`, `log_sso_attempt`
-- Yaklaşık ~400 satır
-- `cargo check` → commit
+### inbound/handlers.rs Bölme Planı
+- Inbound CRUD → `inbound/crud.rs`
+- Inbound processing → `inbound/processing.rs`
+- mod.rs: router + type'lar + signature
 
-### Adım 6: Config handler'ları çıkar → `sso/config.rs`
-- `get_sso_config`, `upsert_sso_config`, `delete_sso_config`, `test_sso_connection`, `get_login_attempts`, `initiate_domain_verification`, `check_domain_verification`
-- Yaklaşık ~750 satır
-- `cargo check` → commit
+---
 
-### Adım 7: Login handler'ları çıkar → `sso/login.rs`
-- `initiate_sso_login`, `saml_callback`, `oidc_callback`, `list_sso_providers`
-- Yaklaşık ~850 satır
-- `cargo check` → commit
+## ⚠️ Rust Bölme Kuralları (MEMORY.md'den)
 
-### Her adımda şunları yap:
-1. Fonksiyonları `pub async fn` yap
-2. Type'ları `pub struct` yap
-3. `use super::{GerekliType1, GerekliType2};` ekle (use super::* DEĞİL!)
-4. External crate'leri dosyada ayrı import et
-5. Cross-module çağrıları `helpers::function_name()` şeklinde prefix'le
-6. `cargo check` → 0 hata → commit → sonraki adım
+1. **Önce çalışır hali commit et** — split sonrası 0 hata olmadan devam etme
+2. **mod.rs type'ları tutar** — tüm struct/enum/const mod.rs'de, `pub` olarak
+3. **`use super::*` ÇALIŞMIYOR** — `use super::{Type1, Type2};` kullan
+4. **External crate'ler** her dosyada ayrı import edilmeli
+5. **Cross-module fonksiyon** çağrısı prefix gerekli (`helpers::fn_name`)
+6. **Adım adım böl**, her adımda `cargo check`
 
 ---
 
@@ -79,3 +82,11 @@
 3. **Secret Manager güncelle** — OAuth credential'ları ekle
 4. **Migration 087-100 uygula** — Neon DB'de çalıştır
 5. **iyzico hesap aç** — ödeme entegrasyonu için
+
+---
+
+## 📝 Notlar
+
+- Rust/Cargo bu ortamda kurulu değil → `cargo check` yapılamıyor
+- Split işlemleri kod analizi ile yapılıyor, compile doğrulama Servet'in ortamında yapılmalı
+- Her split sonrası commit atılmalı
