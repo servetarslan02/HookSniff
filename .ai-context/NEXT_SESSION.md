@@ -1,90 +1,66 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-24 GMT+8 (OpenClaw oturumu 3 — Performans Optimizasyonu)
+> Son güncelleme: 2026-05-24 GMT+8 (api.ts modular split tamamlandı)
+
+## 🚀 Hızlı Başlangıç
+
+1. `git pull` — en son kodu çek
+2. `MEMORY.md` oku — proje hafızası
+3. Bu dosyayı oku — yapılacaklar
+4. İşe başla
+5. Oturum sonunda: push + bu dosyayı güncelle
+
+---
 
 ## ✅ Son Oturumda Yapılan İşler
 
-### Performans Ölçümü (64 Sayfa)
-- Dashboard (50) + Admin (14) sayfa ölçüldü
-- Ortalama: 1,127ms | Medyan: 893ms | P95: 2,058ms
-- Admin sayfaları dashboard'dan %27 daha hızlı
-- Sonuçlar: `.ai-context/2026-05-24-perf-all-pages.json`
-
-### Layout Lazy-Load (Commit: da460579)
-- NotificationCenter: `dynamic()` import (308 satır deferred)
-- useRealtime: lazy preload (95 satır + WebSocket deferred)
-- api.ts prefetch: tüm prefetchForRoute() → dynamic import()
-
-### useDashboardData Lazy-Load (Commit: 56eb7ab3)
-- api.ts (1,367 satır) + schemas/api.ts (941 satır) → lazy module loaders
-- Her hook queryFn/mutationFn içinde dynamic import() kullanıyor
-- Toplam ~2,711 satır FCP'den SONRA yükleniyor
-
-### TypeScript & Build
-- 0 TypeScript hatası
-- Build başarılı (26.3s compile)
-- Commit: `18932265`
-
-### SSO Auth Cookie Fix (BUG)
-- `api/src/routes/sso.rs`: Cookie 900s → 3600s (1 saat)
-- 5 adet `unwrap()` → proper error handling
-- Commit: `d0e5088d`
-
-### Cortex Dashboard (önceki oturum)
-- ML Quality + Proactive Healing tab'ları
-- OAuth double-click fix
-- Session duration fix (PC 1 saat, mobile 90 gün)
+### api.ts Modular Split (4 adım, tamamlandı)
+- `api-admin.ts` — adminApi (313 satır)
+- `api-teams.ts` — teams/notifications/broadcasts/alerts/inbound (147 satır)
+- `api-integrations.ts` — connectors/integrations/stream (177 satır)
+- `api-misc.ts` — 2FA/SSO/transforms/billing/analytics (102 satır)
+- `api.ts` — 1369 → 664 satır (%48 küçüldü)
+- Her adımda tsc + next build + commit kontrol edildi
 
 ---
 
-## 🔴 Servet'in Yapması Gereken (Kod Dışı)
+## 🟡 Sıradaki — Dashboard Hook Bölme
 
-### 1. Google OAuth Client ID
-- https://console.cloud.google.com/apis/credentials → proje: hooksniff-app
-- Mevcut OAuth 2.0 Client ID'yi bul
-- Client ID'yi kopyala (xxx.apps.googleusercontent.com formatında)
+### Öncelik: useDashboardData.ts (1106 satır)
 
-### 2. GitHub OAuth App
-- https://github.com/settings/developers → New OAuth App
-- Application name: HookSniff
-- Homepage URL: https://hooksniff.vercel.app
-- Callback URL: https://hooksniff-api-1046140057667.europe-west1.run.app/v1/oauth/github/callback
+Şu hook'lar çıkarılacak:
 
-### 3. Secret Manager Güncelle
-- `google-client-id` → gerçek değer gir
-- `github-client-id` → gerçek değer gir
-- `github-client-secret` → gerçek değer gir
+| Hedef Dosya | Hook'lar | Tahmini Satır |
+|-------------|----------|---------------|
+| `useTeams.ts` | useTeams, useTeamMembers, useTeamDetail, useCreateTeam, useUpdateTeam, useInviteTeamMember, useRemoveTeamMember, useUpdateTeamMemberRole, useAcceptTeamInvite, useDeleteTeam, useLeaveTeam, useTransferOwnership, useRevokeInvite, useResendInvite | ~150 |
+| `useNotifications.ts` | useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead, useDeleteNotification, useReplayWebhook | ~150 |
 
-### 4. Migration Uygula (Neon DB)
-- Migration 087-100 dosyaları `migrations/` klasöründe mevcut
-- Sırasıyla uygulanmalı
+### Kurallar (Aynen Uygula)
 
-### 5. Cloud Build Tetikle
-- Push yapıldı, Cloud Build otomatik tetiklenmeli
-- Build log: https://console.cloud.google.com/cloud-build/history?project=hooksniff-app
+1. **Tek seferde bir dosya çıkar**
+2. **Çıkarılan dosya:** `useAuth`'ı `@/lib/store`'dan, tipleri `@/lib/api-types`'den import etsin
+3. **Orijinal dosya:** çıkarılan hook'ları `export { ... } from './useXxx'` ile re-export etsin
+4. **Her adımda:** `npx tsc --noEmit` → `npx next build` → `git commit`
+5. **Hata olursa:** geri al (`git checkout .`) ve farklı dene
 
----
+### Sonra: useAdminData.ts (851 satır)
 
-## 🟡 Sıradaki Kod İşleri
-
-### Backend Integration Tests
-- Gerçek API ile çalışan test'ler
-- SAML/OIDC callback akışı end-to-end
-- SCIM provisioning akışı end-to-end
-
-### Git Cleanup (P3)
-- Stale branch'ler temizle
-- 20+ açık Dependabot PR kontrol et
-- Commit convention standardize et
-
-### SDK İyileştirmeleri (P3)
-- 11 SDK'da retry logic ekle
-- OpenAPI schema vs actual API mismatch düzelt
-- Version mismatch (Kotlin) kontrol et
+| Hedef Dosya | Hook'lar | Tahmini Satır |
+|-------------|----------|---------------|
+| `useAdminUsers.ts` | useAdminUsers, useAdminUserDetail, useUpdateUserPlan, useUpdateUserStatus | ~80 |
 
 ---
 
-## 📊 Proje Durumu Özeti
+## 🔴 Yapılmaması Gerekenler
+
+- ❌ Tek seferde tüm dosyayı böl (bir seferde 313 satır bile riskliydi)
+- ❌ tsc kontrol etmeden devam et
+- ❌ Import'ları sonradan düzeltirim diye düşünme (anında düzelt)
+- ❌ Rust dosyalarını bölme (axum Handler trait uyumsuzluğu)
+
+---
+
+## 📊 Proje Durumu
 
 | Kategori | Durum |
 |----------|-------|
@@ -92,29 +68,13 @@
 | P1 (Yüksek) | 44/44 ✅ |
 | P2 (Orta) | 17/38 (21 kaldı) |
 | P3 (Düşük) | 0/13 (13 kaldı) |
-| **Toplam** | **75/103** |
-
-### Tamamlanan Modüller
-- ✅ Cortex Dashboard (6 tab)
-- ✅ RBAC Frontend + Backend
-- ✅ SSO Enhancements
-- ✅ SCIM 2.0
-- ✅ SDK Roadmap (Faz 8-15)
-- ✅ Rate Limiting (Redis)
-- ✅ Alert Evaluation Worker
-- ✅ Redis State Migration (SSO)
-- ✅ Session Duration Fix
-- ✅ OAuth Double-Click Fix
-- ✅ SSO Auth Cookie Fix
 
 ---
 
-## 🔑 Hesap Bilgileri (Hatırlatma)
+## 🔴 Servet'in Yapması Gereken (Kod Dışı)
 
-| Servis | Bilgi |
-|--------|-------|
-| Dashboard | https://hooksniff.vercel.app |
-| API | https://hooksniff-api-1046140057667.europe-west1.run.app |
-| Admin email | servetarslan02@gmail.com |
-| Google Cloud | proje: hooksniff-app |
-| Neon DB | proje: hookrelay |
+1. **Google OAuth Client ID** — Google Cloud Console'dan al
+2. **GitHub OAuth App** — GitHub Developer Settings'ten al
+3. **Secret Manager güncelle** — OAuth credential'ları ekle
+4. **Migration 087-100 uygula** — Neon DB'de çalıştır
+5. **iyzico hesap aç** — ödeme entegrasyonu için
