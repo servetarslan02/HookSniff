@@ -84,6 +84,20 @@ pub async fn decide_routing(
 
         super::CORTEX_METRICS.routing_decisions.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
 
+        // Record decision for worker to pick up
+        let _ = sqlx::query(
+            r#"
+            INSERT INTO cortex_routing_decisions (endpoint_id, recommended_url, reason, alternatives, created_at)
+            VALUES ($1, $2, $3, $4, NOW())
+            "#
+        )
+        .bind(endpoint_id)
+        .bind(&best_url)
+        .bind(format!("Current SR {:.1}%, p95 {}ms", sr, p95))
+        .bind(serde_json::json!(url_scores))
+        .execute(pool)
+        .await;
+
         return Ok(Some(serde_json::json!({
             "decision": "switch",
             "reason": format!("Current SR {:.1}%, p95 {}ms", sr, p95),

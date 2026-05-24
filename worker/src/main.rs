@@ -63,6 +63,8 @@ const RESPONSE_BODY_TRUNCATE_BYTES: usize = 500;
 const GRACE_CHECK_INTERVAL_SECS: u64 = 6 * 3600;
 /// Retention cleanup interval — runs every 6 hours
 const RETENTION_CLEANUP_INTERVAL_SECS: u64 = 6 * 3600;
+/// Cortex health report interval — every 5 minutes
+const CORTEX_HEALTH_REPORT_INTERVAL_SECS: u64 = 300;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgListener, PgPoolOptions};
@@ -266,6 +268,10 @@ async fn main() -> Result<()> {
     let mut retention_interval = tokio::time::interval(std::time::Duration::from_secs(RETENTION_CLEANUP_INTERVAL_SECS));
     retention_interval.tick().await; // skip first immediate tick
 
+    // Cortex: periodic health report
+    let mut cortex_health_interval = tokio::time::interval(std::time::Duration::from_secs(CORTEX_HEALTH_REPORT_INTERVAL_SECS));
+    cortex_health_interval.tick().await; // skip first immediate tick
+
     // Main loop: poll PostgreSQL queue with NOTIFY-based wake-up
     //
     // Flow: poll → if items found → process & loop immediately
@@ -391,6 +397,22 @@ async fn main() -> Result<()> {
                     }
                     Err(e) => {
                         tracing::error!("❌ Retention cleanup error: {:?}", e);
+                    }
+                }
+            }
+            _ = cortex_health_interval.tick() => {
+                // Cortex: Report endpoint health metrics for ML learning
+                let endpoints: Vec<(uuid::Uuid,)> = sqlx::query_as(
+                    "SELECT id FROM endpoints WHERE is_active = true LIMIT 200"
+                ).fetch_all(&pool).await.unwrap_or_default();
+
+                for (eid,) in &endpoints {
+                    if let Ok(Some((sr, avg_lat, p95))) = sqlx::query_as::<_, (f64, f64, i32)>(
+                        "SELECT success_rate_1h, avg_latency_ms, COALESCE(latency_p95, 0) FROM endpoint_profiles WHERE endpoint_id = $1"
+                    ).bind(eid).fetch_optional(&pool).await {
+                        let _ = cortex_integration::report_endpoint_health(
+                            &pool, *eid, sr, avg_lat, p95 as f64
+                        ).await;
                     }
                 }
             }
@@ -819,8 +841,23 @@ async fn process_pending(
                 }
             };
 
+            // ── Cortex: Check for healing actions before delivery ──
+            let _adjusted_timeout_ms: Option<u64> = None;
+            if let Ok(Some(action)) = cortex_integration::get_active_healing_action(&pool, endpoint_id).await {
+                if let Some(factor) = action.get_timeout_adjustment() {
+                    let _ = (30_000u64 as f64 * factor) as u64; // reserved for future use
+                }
+            }
+
+            // ── Cortex: Check for smart routing decision ──
+            let mut cortex_routing_url: Option<String> = None;
+            if let Ok(Some(url)) = cortex_integration::get_routing_decision(&pool, endpoint_id).await {
+                cortex_routing_url = Some(url.clone());
+                tracing::info!("🔀 Cortex routing: endpoint {} → {}", endpoint_id, url);
+            }
+
             // Build WebhookMessage and delegate HTTP delivery to the delivery module
-            let webhook_msg = WebhookMessage {
+            let mut webhook_msg = WebhookMessage {
                 delivery_id: delivery_id.to_string(),
                 endpoint_id: item.endpoint_id.to_string(),
                 endpoint_url: item.endpoint_url.clone(),
@@ -829,6 +866,11 @@ async fn process_pending(
                 custom_headers: item.custom_headers.clone(),
             };
 
+            // Apply Cortex routing decision if available
+            if let Some(ref routed_url) = cortex_routing_url {
+                webhook_msg.endpoint_url = routed_url.clone();
+            }
+
             let result = delivery::deliver_with_routing(&http_client, &pool, &webhook_msg, attempt).await?;
 
             let status_code = result.status_code;
@@ -836,6 +878,25 @@ async fn process_pending(
             let duration_ms = result.duration_ms;
             let resp_headers = &result.response_headers;
             let is_network_error = !result.error.is_empty();
+
+            // ── Cortex: Report delivery outcome for ML learning ──
+            {
+                let strategy = if is_network_error { "network_error" } else { "http" };
+                let success = result.success;
+                let latency = duration_ms as f64;
+                let code = if is_network_error { 0u16 } else { status_code as u16 };
+                let pool_cx = pool.clone();
+                tokio::spawn(async move {
+                    // Get customer_id for this delivery
+                    if let Ok(Some(cid)) = sqlx::query_scalar::<_, uuid::Uuid>(
+                        "SELECT customer_id FROM deliveries WHERE id = $1"
+                    ).bind(delivery_id).fetch_optional(&pool_cx).await {
+                        let _ = cortex_integration::report_delivery_outcome(
+                            &pool_cx, endpoint_id, cid, success, latency, code, strategy,
+                        ).await;
+                    }
+                });
+            }
 
             // Derive error message and optional fields for record_attempt
             let error_msg = if is_network_error {
