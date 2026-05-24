@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   api, endpointsApi, webhooksApi, analyticsApi, statsApi,
-  billingApiExtended, applicationsApi, alertsApi,
+  applicationsApi, alertsApi,
   transformsApi, inboundApi, apiFetch,
   type AlertRule,
   type DeliveryDetail, type DeliveryAttempt,
@@ -20,10 +20,6 @@ import {
   StatsResponseSchema,
   DeliveryTrendSchema,
   SuccessRateSchema,
-  BillingUsageSchema,
-  BillingSubscriptionSchema,
-  OverageSettingsSchema,
-  InvoiceSchema,
   ApplicationSchema,
   TransformRuleSchema,
   InboundConfigSchema,
@@ -40,10 +36,6 @@ import {
   ServiceTokenSchema,
   TemplateListSchema,
   type EndpointValidated,
-  type BillingUsageValidated,
-  type BillingSubscriptionValidated,
-  type OverageSettingsValidated,
-  type InvoiceValidated,
   type ApplicationValidated,
   type TransformRuleValidated,
   type InboundConfigValidated,
@@ -61,6 +53,9 @@ export {
   useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead,
   useDeleteNotification, useReplayWebhook,
 } from './useNotifications';
+export {
+  useBillingUsage, useBillingInvoices, useBillingSubscription, useOverageSettings,
+} from './useBilling';
 
 // ── Schema-validated fetcher wrapper ──
 function validated<T>(
@@ -220,50 +215,6 @@ export function useReplayDelivery() {
       queryClient.invalidateQueries({ queryKey: ['webhooks'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
-  });
-}
-
-// ── Billing Usage ──
-export function useBillingUsage() {
-  const { token } = useAuth();
-  return useQuery<BillingUsageValidated>({
-    queryKey: ['billing', 'usage'],
-    queryFn: validated(() => billingApiExtended.getUsage(token!), BillingUsageSchema),
-    enabled: !!token,
-    staleTime: 60_000,
-  });
-}
-
-// ── Billing Invoices ──
-export function useBillingInvoices() {
-  const { token } = useAuth();
-  return useQuery<InvoiceValidated[]>({
-    queryKey: ['billing', 'invoices'],
-    queryFn: validated(() => billingApiExtended.getInvoices(token!), InvoiceSchema.array()),
-    enabled: !!token,
-    staleTime: 60_000,
-  });
-}
-
-// ── Billing Subscription ──
-export function useBillingSubscription() {
-  const { token } = useAuth();
-  return useQuery<BillingSubscriptionValidated>({
-    queryKey: ['billing', 'subscription'],
-    queryFn: validated(() => billingApiExtended.getSubscription(token!), BillingSubscriptionSchema),
-    enabled: !!token,
-    staleTime: 60_000,
-  });
-}
-
-// ── Overage Settings ──
-export function useOverageSettings() {
-  const { token } = useAuth();
-  return useQuery<OverageSettingsValidated>({
-    queryKey: ['billing', 'overage'],
-    queryFn: validated(() => billingApiExtended.getOverageSettings(token!), OverageSettingsSchema),
-    enabled: !!token,
-    staleTime: 60_000,
   });
 }
 
