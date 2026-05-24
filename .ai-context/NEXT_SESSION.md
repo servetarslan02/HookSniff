@@ -4,10 +4,15 @@
 
 ## ✅ Son Oturumda Yapılan İşler
 
+### _visibilityCleanup Fix (BUG)
+- `dashboard/src/lib/api.ts`: `setInterval` tarayıcıda sayı döndürür, primitive değerlere feature eklenemez
+- Cleanup fonksiyonu modül seviyesinde değişkene taşındı
+- Commit: `735b1eb8`
+
 ### SSO Auth Cookie Fix (BUG)
 - `api/src/routes/sso.rs`: Cookie 900s → 3600s (1 saat)
 - 5 adet `unwrap()` → proper error handling
-- Commit: push edildi
+- Commit: `d0e5088d`
 
 ### Cortex Dashboard (önceki oturum)
 - ML Quality + Proactive Healing tab'ları

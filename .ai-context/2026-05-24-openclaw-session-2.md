@@ -41,4 +41,5 @@
 5. iyzico hesap aç
 
 ## Commitler
-- SSO auth cookie fix + unwrap cleanup (tek commit)
+- `d0e5088d` — SSO auth cookie fix + unwrap cleanup + session log
+- `735b1eb8` — Fix _visibilityCleanup: timer number property fix
