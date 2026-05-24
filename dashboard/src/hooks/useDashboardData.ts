@@ -158,17 +158,36 @@ export function useToggleEndpoint() {
     mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
       endpointsApi.update(token!, id, { is_active }),
     onMutate: async ({ id, is_active }) => {
+      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['endpoint', id] });
-      const previous = queryClient.getQueryData(['endpoint', id]);
+      await queryClient.cancelQueries({ queryKey: ['endpoints'] });
+
+      // Snapshot previous values for rollback
+      const previousDetail = queryClient.getQueryData(['endpoint', id]);
+      const previousList = queryClient.getQueryData(['endpoints']);
+
+      // Optimistic update: detail
       queryClient.setQueryData(['endpoint', id], (old: unknown) => ({
         ...(old as Record<string, unknown>),
         is_active,
       }));
-      return { previous };
+
+      // Optimistic update: list
+      queryClient.setQueryData(['endpoints'], (old: unknown) => {
+        if (!Array.isArray(old)) return old;
+        return old.map((ep: Record<string, unknown>) =>
+          ep.id === id ? { ...ep, is_active } : ep
+        );
+      });
+
+      return { previousDetail, previousList };
     },
     onError: (_err, { id }, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(['endpoint', id], context.previous);
+      if (context?.previousDetail) {
+        queryClient.setQueryData(['endpoint', id], context.previousDetail);
+      }
+      if (context?.previousList) {
+        queryClient.setQueryData(['endpoints'], context.previousList);
       }
     },
     onSettled: (_data, _error, { id }) => {
