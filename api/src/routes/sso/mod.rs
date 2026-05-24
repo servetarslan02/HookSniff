@@ -3,6 +3,8 @@
 pub mod handlers;
 pub mod config;
 pub mod login;
+pub mod saml_handler;
+pub mod oidc_handler;
 pub mod scim;
 pub mod saml;
 pub mod oidc;
@@ -22,8 +24,12 @@ use tokio::sync::Mutex;
 // Re-export handler functions for router
 use handlers::*;
 use scim::*;
-use saml::*;
-use oidc::*;
+use login::{initiate_sso_login, list_sso_providers};
+use saml_handler::saml_callback;
+use oidc_handler::oidc_callback;
+
+// Re-export config types used by other modules
+pub use config::{SsoConfigRow, sso_config_to_json};
 
 // ── Router ──────────────────────────────────────────────────
 
