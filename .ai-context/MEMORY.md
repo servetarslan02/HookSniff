@@ -400,7 +400,34 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-25 — Dashboard Hook Split)
+## 📝 Son Oturum (2026-05-25 — OpenClaw İlk Oturum + Bug Fix)
+
+### Özet
+Servet ile OpenClaw üzerinden ilk oturum. Proje keşfi, workspace kurulumu, 2 bug fix.
+
+### Yapılan İşler:
+1. **Proje keşfi** — .ai-context/ hafıza sistemi okundu, durum analizi yapıldı
+2. **Workspace kurulumu** — IDENTITY.md, USER.md, MEMORY.md oluşturuldu
+3. **CSP Header** — `next.config.js`'ye Content-Security-Policy eklendi (BUG-022)
+4. **SELECT * fix** — coupon_codes tablosundaki 5 sorgu explicit kolon listesine geçirildi (BUG-009)
+
+### Değişen Dosyalar:
+- `dashboard/next.config.js` — CSP header
+- `api/src/routes/admin/coupons.rs` — 3 SELECT * fix
+- `api/src/routes/coupons.rs` — 1 SELECT * fix
+- `api/src/routes/billing/subscription.rs` — 1 SELECT * fix
+
+### Push: `d13176de`
+
+### Notlar:
+- Alert Evaluation Worker zaten implemente edilmiş (2026-05-20)
+- SDK Libraries sayfası zaten güncel (11/11 Stable)
+- Quickstart zaten 11 dilde mevcut
+- DOCS-REWRITE-PLAN.md güncel değil (planlanan işler zaten yapılmış)
+
+---
+
+## 📝 Önceki Oturum (2026-05-25 — Dashboard Hook Split)
 
 ### Özet
 Servet ile oturum. Dashboard hook dosyaları kontrollü şekilde bölündü. 5 yeni dosya, toplam %43 küçülme.
