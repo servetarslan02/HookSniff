@@ -274,36 +274,27 @@ async fn github_login() -> Result<impl axum::response::IntoResponse, AppError> {
     let redirect_uri = format!("{}/v1/oauth/github/callback", redirect_base);
     let state = uuid::Uuid::new_v4().to_string();
 
-    // PKCE: generate code_verifier and code_challenge
-    let pkce_verifier = generate_pkce_verifier();
-    let pkce_challenge = compute_pkce_challenge(&pkce_verifier);
+    // NOTE: GitHub OAuth Apps (web application flow) do NOT support PKCE.
+    // PKCE is only supported for GitHub Apps using device flow.
+    // Sending code_challenge causes GitHub to silently reject the auth request.
+    // We rely on state parameter (CSRF) + SameSite cookies for security.
 
     let url = format!(
-        "https://github.com/login/oauth/authorize?client_id={}&redirect_uri={}&scope=user:email&state={}&code_challenge={}&code_challenge_method=S256",
+        "https://github.com/login/oauth/authorize?client_id={}&redirect_uri={}&scope=user:email&state={}",
         client_id,
         urlencoding::encode(&redirect_uri),
         state,
-        pkce_challenge
     );
 
-    // Save state + PKCE verifier in short-lived cookies
+    // Save state in short-lived cookie (CSRF protection)
     let state_cookie = format!(
         "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
         OAUTH_STATE_COOKIE, state, OAUTH_STATE_MAX_AGE
-    );
-    let pkce_cookie = format!(
-        "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
-        OAUTH_PKCE_COOKIE, pkce_verifier, OAUTH_STATE_MAX_AGE
     );
     let mut headers = HeaderMap::new();
     headers.insert(
         "set-cookie",
         axum::http::HeaderValue::from_str(&state_cookie)
-            .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
-    );
-    headers.append(
-        "set-cookie",
-        axum::http::HeaderValue::from_str(&pkce_cookie)
             .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
     );
     headers.insert(
@@ -336,17 +327,14 @@ async fn github_callback(
         .ok_or_else(|| AppError::coded(ErrorCode::OidcMissingState))?;
     verify_oauth_state(&req, &expected_state)?;
 
-    // Extract PKCE code_verifier from cookie
-    let pkce_verifier = extract_pkce_verifier(&req);
-
     let client_id = std::env::var("GITHUB_CLIENT_ID")
         .map_err(|_| AppError::coded(ErrorCode::GithubOauthNotConfigured))?;
 
     let client_secret = std::env::var("GITHUB_CLIENT_SECRET")
         .map_err(|_| AppError::coded(ErrorCode::GithubOauthNotConfigured))?;
 
-    // Exchange code for token (with PKCE verifier if available)
-    let access_token = exchange_github_code(&code, &client_id, &client_secret, pkce_verifier.as_deref()).await?;
+    // Exchange code for token (no PKCE — GitHub OAuth Apps don't support it)
+    let access_token = exchange_github_code(&code, &client_id, &client_secret, None).await?;
 
     // Get user info
     let user_info = get_github_user_info(&access_token).await?;
