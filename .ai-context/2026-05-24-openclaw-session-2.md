@@ -40,6 +40,17 @@
 4. Neon DB'ye migration uygula (087-100)
 5. iyzico hesap aç
 
+### 3. Page Load Performance Fix
+- `api/src/routes/teams.rs`: `list_teams` N+1 sorgu düzeltmesi
+  - Her takım için ayrı COUNT(*) → tek sorguyla `COUNT(*) OVER(PARTITION BY)`
+  - N takım = N+1 sorgu → 1 sorgu
+- `dashboard/src/hooks/useTeamRole.ts`: Gereksiz `getDetail` kaldırıldı
+  - `owner_id` zaten `teamsApi.list`'ten geliyor
+  - SSO sayfası 4 API çağrısı → 2'ye düştü
+  - Tüm `usePermissions`/`useTeamRole` kullanan sayfalar faydalanır
+
 ## Commitler
 - `d0e5088d` — SSO auth cookie fix + unwrap cleanup + session log
 - `735b1eb8` — Fix _visibilityCleanup: timer number property fix
+- `e7d222bd` — Update session logs
+- `12178c56` — Fix slow page loads: N+1 query + redundant API calls
