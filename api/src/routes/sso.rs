@@ -2608,11 +2608,11 @@ async fn generate_sso_response(
 
     let mut headers = HeaderMap::new();
     let auth_val = axum::http::HeaderValue::from_str(&auth_cookie)
-        .map_err(|e| AppError::Internal(format!("Invalid auth cookie: {}", e)))?;
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Invalid auth cookie: {}", e)))?;
     let refresh_val = axum::http::HeaderValue::from_str(&refresh_cookie)
-        .map_err(|e| AppError::Internal(format!("Invalid refresh cookie: {}", e)))?;
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Invalid refresh cookie: {}", e)))?;
     let redirect_val = axum::http::HeaderValue::from_str(&redirect_url)
-        .map_err(|e| AppError::Internal(format!("Invalid redirect URL: {}", e)))?;
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Invalid redirect URL: {}", e)))?;
     headers.insert("set-cookie", auth_val);
     headers.append("set-cookie", refresh_val);
     headers.insert("location", redirect_val);
