@@ -1,4 +1,3 @@
-import CodeBlock from '@/components/CodeBlock';
 import { CreditCard } from '@/components/icons';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
