@@ -23,6 +23,7 @@ pub mod industry;
 pub mod jobs;
 pub mod metrics;
 pub mod middleware;
+pub mod middleware_tests;
 pub mod models;
 pub mod notifications;
 pub mod qstash;
