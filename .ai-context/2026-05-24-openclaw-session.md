@@ -18,11 +18,25 @@
 - **PredictionsTab typo fix**: `dark:sentence-400` → `dark:text-slate-400`
 - Import: `Target` eklendi (icons.ts'den)
 
-### 2. Değişen Dosyalar
-- `dashboard/src/app/[locale]/admin/cortex/page.tsx` — 615 → 936 satır
+### 2. Vercel Build Fix (5 dosya)
+- `cortex/page.tsx`: unused import'lar kaldırıldı (Activity, ChevronDown, Cpu, Gauge, Heart, Layers, LineChart, Settings, TrendingDown, ArrowRight)
+- `cortex/page.tsx`: unused değişkenler kaldırıldı (useTranslations, category, method)
+- `cortex/page.tsx`: unused `factors` parametresi `_factors` olarak yeniden adlandırıldı
+- `docs/billing/page.tsx`, `docs/deliveries/page.tsx`, `docs/endpoints/page.tsx`, `docs/service-tokens/page.tsx`: unused `CodeBlock` import kaldırıldı
+- `npx tsc --noEmit` → **0 hata** ✅
+- `npm run build` → **exit 0** ✅
 
-### 3. Commit
-- `b820786a` — push edildi
+### 3. Değişen Dosyalar
+- `dashboard/src/app/[locale]/admin/cortex/page.tsx` — 615 → 931 satır
+- `dashboard/src/app/[locale]/docs/billing/page.tsx` — 1 satır silindi
+- `dashboard/src/app/[locale]/docs/deliveries/page.tsx` — 1 satır silindi
+- `dashboard/src/app/[locale]/docs/endpoints/page.tsx` — 1 satır silindi
+- `dashboard/src/app/[locale]/docs/service-tokens/page.tsx` — 1 satır silindi
+
+### 4. Commitlar
+- `b820786a` — Cortex dashboard tab'ları
+- `44ae028f` — .ai-context güncelleme
+- `a70453c6` — Vercel build fix
 
 ## Proje Durumu Değerlendirmesi
 
