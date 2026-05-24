@@ -11,6 +11,8 @@ pub mod cortex;
 pub mod crypto;
 pub mod db;
 pub mod email;
+pub mod email_templates;
+pub mod email_tests;
 pub mod error;
 pub mod events;
 pub mod feature_flags;
