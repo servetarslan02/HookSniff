@@ -112,7 +112,10 @@ pub fn generate_access_token(
     secret: &str,
     is_admin: bool,
 ) -> Result<String, AppError> {
-    generate_token_with_duration(customer_id, email, plan, secret, Duration::minutes(15), is_admin)
+    // 1 hour expiry — long enough to survive background tab throttling,
+    // short enough to limit damage if token is leaked.
+    // Proactive refresh still runs every 50 minutes for active sessions.
+    generate_token_with_duration(customer_id, email, plan, secret, Duration::hours(1), is_admin)
 }
 
 pub fn generate_token_with_duration(
@@ -368,9 +371,9 @@ mod tests {
         let before = Utc::now().timestamp() as usize;
         let token = generate_access_token(Uuid::new_v4(), "a@b.com", "developer", secret, false).unwrap();
         let claims = verify_token(&token, secret).unwrap();
-        // 15 minutes = 900s, allow 5s tolerance
-        assert!(claims.exp >= before + 895);
-        assert!(claims.exp <= before + 905);
+        // 1 hour = 3600s, allow 5s tolerance
+        assert!(claims.exp >= before + 3595);
+        assert!(claims.exp <= before + 3605);
     }
 
     // ── generate_token_with_duration ──────────────────────────

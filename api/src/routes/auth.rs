@@ -31,8 +31,8 @@ const REGISTER_RATE_LIMIT: u32 = 5;
 /// HS-039: Access token lifetime — 15 minutes (short-lived for security).
 /// Proactive refresh on the frontend renews it at ~12 min while the user is active.
 /// Idle timeout (1 hour) handles logout for inactive users.
-const TOKEN_MAX_AGE: i64 = 900;   // 15 minutes (matches JWT expiry)
-const REFRESH_TOKEN_MAX_AGE: i64 = 2592000;
+const TOKEN_MAX_AGE: i64 = 3600;   // 1 hour (matches JWT expiry)
+const REFRESH_TOKEN_MAX_AGE: i64 = 7776000;  // 90 days
 const RESET_RATE_LIMIT: u32 = 5;
 const VERIFY_EMAIL_RATE_LIMIT: u32 = 10;
 const REFRESH_RATE_LIMIT: u32 = 30;
@@ -1100,8 +1100,8 @@ mod tests {
     fn test_constants_values() {
         assert_eq!(LOGIN_RATE_LIMIT, 10);
         assert_eq!(REGISTER_RATE_LIMIT, 5);
-        assert_eq!(TOKEN_MAX_AGE, 900);
-        assert_eq!(REFRESH_TOKEN_MAX_AGE, 2592000);
+        assert_eq!(TOKEN_MAX_AGE, 3600);
+        assert_eq!(REFRESH_TOKEN_MAX_AGE, 7776000);
         assert_eq!(RESET_RATE_LIMIT, 5);
         assert_eq!(VERIFY_EMAIL_RATE_LIMIT, 10);
         assert_eq!(REFRESH_RATE_LIMIT, 30);
@@ -1150,7 +1150,7 @@ mod tests {
         assert!(headers.contains_key("set-cookie"));
         let cookie = headers.get("set-cookie").unwrap().to_str().unwrap();
         assert!(cookie.contains("hooksniff_token=test_jwt"));
-        assert!(cookie.contains("Max-Age=900"));
+        assert!(cookie.contains("Max-Age=3600"));
         assert_eq!(json["token"], "test_jwt");
     }
 
