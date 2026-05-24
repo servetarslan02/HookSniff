@@ -7,7 +7,7 @@ import {
   inboundApi, apiFetch,
   type DeliveryDetail, type DeliveryAttempt,
   type AuditLogEntryResponse, type EndpointHealthResponse,
-  type ApiKeyResponse, type RateLimitResponse,
+  type RateLimitResponse,
   type SchemaRegistryListResponse, type SearchResponseData,
   type ServiceTokenResponse, type TemplateListResponse,
 } from '@/lib/api';
@@ -24,7 +24,6 @@ import {
   SsoConfigSchema,
   EndpointHealthSchema,
   LatencyTrendSchema,
-  ApiKeySchema,
   RateLimitSchema,
   SchemaRegistryListSchema,
   ServiceTokenSchema,
@@ -60,6 +59,9 @@ export {
   usePortalConfig, usePortalEmbedCode, useUpdatePortalConfig,
   usePortalProfile, usePortalUsage,
 } from './usePortal';
+export {
+  useApiKeys, useCreateApiKey, useDeleteApiKey, useRotateApiKey,
+} from './useApiKeys';
 
 // ── Endpoints ──
 export function useEndpoints() {
@@ -412,44 +414,6 @@ export function useLatencyTrend(range = '24h') {
     ),
     enabled: !!token,
     staleTime: 30_000,
-  });
-}
-
-// ── API Keys ──
-export function useApiKeys() {
-  const { token } = useAuth();
-  return useQuery<ApiKeyResponse[]>({
-    queryKey: ['api-keys'],
-    queryFn: validated(() => api.getApiKeys(token!), ApiKeySchema.array()),
-    enabled: !!token,
-    staleTime: 15_000,
-  });
-}
-
-export function useCreateApiKey() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (name: string) => api.createApiKey(token!, name),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['api-keys'] }),
-  });
-}
-
-export function useDeleteApiKey() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => api.deleteApiKey(token!, id),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['api-keys'] }),
-  });
-}
-
-export function useRotateApiKey() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => api.rotateApiKey(token!, id),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['api-keys'] }),
   });
 }
 
