@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { webhooksApi, type DeliveryAttempt } from '@/lib/api';
-import { useWebhooks, useReplayDelivery, useSearch } from '@/hooks/useDashboardData';
+import { useWebhooks, useReplayDelivery, useSearch, useEndpoints } from '@/hooks/useDashboardData';
 import { useDeliveryStream } from '@/hooks/useDeliveryStream';
 import { useIsFeatureEnabled } from '@/hooks/useAdminData';
 import ConfirmDialog from '@/components/ConfirmDialog';
@@ -84,6 +84,18 @@ export default function DeliveriesContent() {
     status: filter === 'all' ? undefined : filter,
   });
 
+  // ── Data: endpoints (for resolving endpoint_id → URL) ──
+  const { data: endpointsList } = useEndpoints();
+  const endpointUrlMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    if (endpointsList) {
+      for (const ep of endpointsList) {
+        map[ep.id] = ep.url;
+      }
+    }
+    return map;
+  }, [endpointsList]);
+
   // ── Data: status counts (from Logs page — extra API calls for badges) ──
   const [statusCounts, setStatusCounts] = useState({ all: 0, delivered: 0, failed: 0, pending: 0 });
   useEffect(() => {
@@ -120,8 +132,11 @@ export default function DeliveriesContent() {
       // Server-side search results (SearchResult has endpoint_url, not endpoint_id)
       return (searchResults?.deliveries ?? []) as DisplayDelivery[];
     }
-    // Merge SSE into main list
-    const mainDeliveries: DisplayDelivery[] = (data?.deliveries ?? []) as DisplayDelivery[];
+    // Merge SSE into main list, resolve endpoint_id → URL from cached endpoints
+    const mainDeliveries: DisplayDelivery[] = (data?.deliveries ?? []).map((d: Record<string, unknown>) => ({
+      ...d,
+      endpoint_url: endpointUrlMap[d.endpoint_id as string] || undefined,
+    })) as DisplayDelivery[];
     if (sseDeliveries.length === 0) return mainDeliveries;
     const existingIds = new Set(mainDeliveries.map((d) => d.id));
     const newFromSse = sseDeliveries
@@ -129,6 +144,7 @@ export default function DeliveriesContent() {
       .map((sse) => ({
         id: sse.id,
         endpoint_id: sse.endpoint_id,
+        endpoint_url: endpointUrlMap[sse.endpoint_id] || undefined,
         event: sse.event,
         status: sse.status,
         attempt_count: sse.attempts,
@@ -136,7 +152,7 @@ export default function DeliveriesContent() {
         created_at: sse.created_at,
       }));
     return [...newFromSse, ...mainDeliveries];
-  }, [isSearching, searchResults, data, sseDeliveries]);
+  }, [isSearching, searchResults, data, sseDeliveries, endpointUrlMap]);
 
   const total = isSearching ? (searchResults?.total ?? 0) : (data?.total ?? 0);
   const loading = isSearching ? searchLoading : isLoading;
@@ -463,7 +479,7 @@ export default function DeliveriesContent() {
             <div className="p-6 space-y-4">
               <DetailRow label={tl('deliveryId')} value={selectedDelivery.id} mono />
               <DetailRow label={tl('event')} value={selectedDelivery.event || '—'} />
-              <DetailRow label={tl('endpoint')} value={selectedDelivery.endpoint_id} mono />
+              <DetailRow label={tl('endpoint')} value={selectedDelivery.endpoint_url || selectedDelivery.endpoint_id} mono />
               <DetailRow
                 label={tl('status')}
                 value={<StatusBadge status={selectedDelivery.status} />}
