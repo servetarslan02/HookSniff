@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
-import { Activity, AlertTriangle, BarChart3, Brain, CheckCircle2, ChevronDown, Clock, Cpu, Gauge, Globe, Heart, Layers, LineChart, RefreshCw, Settings, Shield, ShieldCheck, TrendingDown, TrendingUp, Zap, ArrowRight, Info, Target } from '@/components/icons';
+import { AlertTriangle, BarChart3, Brain, CheckCircle2, Clock, Globe, RefreshCw, Shield, ShieldCheck, TrendingUp, Zap, Info, Target } from '@/components/icons';
 
 type Tab = 'overview' | 'anomalies' | 'healing' | 'predictions' | 'ml_quality' | 'proactive';
 
@@ -22,7 +21,6 @@ interface CortexHealth {
 }
 
 export default function CortexPage() {
-  const t = useTranslations('cortex');
   const { token } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [health, setHealth] = useState<CortexHealth | null>(null);
@@ -121,7 +119,7 @@ export default function CortexPage() {
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'overview' && <OverviewTab health={health} token={token} />}
+      {activeTab === 'overview' && <OverviewTab health={health} />}
       {activeTab === 'anomalies' && <AnomaliesTab token={token} />}
       {activeTab === 'healing' && <HealingTab token={token} />}
       {activeTab === 'predictions' && <PredictionsTab token={token} />}
@@ -133,7 +131,7 @@ export default function CortexPage() {
 
 // ─── Genel Bakış ───────────────────────────────────────────
 
-function OverviewTab({ health, token }: { health: CortexHealth | null; token: string | null }) {
+function OverviewTab({ health }: { health: CortexHealth | null }) {
   if (!health?.metrics) {
     return (
       <div className="glass-card p-8 text-center">
@@ -232,8 +230,7 @@ function OverviewTab({ health, token }: { health: CortexHealth | null; token: st
 
 // ─── Sorunlar (Anomalies) ──────────────────────────────────
 
-function describeAnomaly(score: number, factors: any, category: string): { title: string; detail: string; emoji: string } {
-  const method = factors?.method || 'unknown';
+function describeAnomaly(score: number, factors: any): { title: string; detail: string; emoji: string } {
   const sr = factors?.sr || factors?.success_rate;
   const latency = factors?.latency || factors?.latency_ms;
 
@@ -300,9 +297,8 @@ function AnomaliesTab({ token }: { token: string | null }) {
           {anomalies.slice(0, 20).map((a: any, i: number) => {
             const score = a[3] || 0;
             const factors = a[4] || {};
-            const category = a[5] || 'low';
             const ts = a[6];
-            const info = describeAnomaly(score, factors, category);
+            const info = describeAnomaly(score, factors);
 
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
@@ -488,9 +484,8 @@ function HealingTab({ token }: { token: string | null }) {
 
 // ─── Tahminler (Predictions) ───────────────────────────────
 
-function describePrediction(probability: number, factors: any): { title: string; detail: string; emoji: string; advice: string } {
+function describePrediction(probability: number, _factors: any): { title: string; detail: string; emoji: string; advice: string } {
   const pct = Math.round(probability * 100);
-  const method = factors?.method || 'unknown';
 
   if (pct >= 70) {
     return {
