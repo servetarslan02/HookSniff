@@ -176,6 +176,11 @@ async fn get_cortex_health(Extension(pool): Extension<PgPool>, Extension(c): Ext
     let predictions_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM predictions WHERE created_at > NOW() - INTERVAL '24 hours'").fetch_one(&pool).await.unwrap_or((0,));
     let insights_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM cortex_insights WHERE dismissed = false").fetch_one(&pool).await.unwrap_or((0,));
 
+    // ML quality and proactive diagnostics
+    let ml_quality_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM ml_model_quality WHERE measured_at > NOW() - INTERVAL '24 hours'").fetch_one(&pool).await.unwrap_or((0,));
+    let proactive_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM cortex_insights WHERE insight_type LIKE 'proactive_%' AND dismissed = false").fetch_one(&pool).await.unwrap_or((0,));
+    let ml_predictions_total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM predictions").fetch_one(&pool).await.unwrap_or((0,));
+
     Ok(Json(serde_json::json!({
         "status": "healthy",
         "metrics": {
@@ -186,6 +191,9 @@ async fn get_cortex_health(Extension(pool): Extension<PgPool>, Extension(c): Ext
             "action_memory_total": memory_count.0,
             "predictions_24h": predictions_count.0,
             "active_insights": insights_count.0,
+            "ml_quality_samples_24h": ml_quality_count.0,
+            "proactive_insights": proactive_count.0,
+            "ml_predictions_total": ml_predictions_total.0,
         },
     })))
 }
