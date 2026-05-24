@@ -2,17 +2,15 @@ use axum::body::Body;
 use axum::extract::{Extension, Path, Query};
 use axum::http::{header, StatusCode};
 use axum::response::Response;
-use axum::routing::{get, post};
-use axum::{Json, Router};
+use axum::Json;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::config::Config;
-use crate::error::ErrorCode;
 use crate::db;
-use crate::error::AppError;
+use crate::error::{AppError, ErrorCode};
 use crate::events::overage::track_daily_event;
 use crate::feature_flags::FeatureFlagService;
 use crate::middleware::idempotency;
@@ -25,35 +23,9 @@ use crate::models::delivery::{
 use crate::models::endpoint::{Endpoint, RetryPolicy};
 use crate::validation;
 
-pub fn router() -> Router {
-    Router::new()
-        .route("/", get(list_deliveries).post(create_webhook))
-        .route("/batch", post(batch_webhooks))
-        .route("/batch/replay", post(batch_replay))
-        .route("/export", get(export_deliveries))
-        .route("/{id}", get(get_delivery))
-        .route("/{id}/replay", post(replay_webhook))
-        .route("/{id}/attempts", get(get_delivery_attempts))
-}
+use super::{ListParams, ExportParams};
 
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct ListParams {
-    page: Option<i64>,
-    per_page: Option<i64>,
-    status: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct ExportParams {
-    format: Option<String>,
-    status: Option<String>,
-    date_from: Option<String>,
-    date_to: Option<String>,
-}
-
-async fn list_deliveries(
+pub async fn list_deliveries(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
@@ -61,7 +33,7 @@ async fn list_deliveries(
 ) -> Result<Json<DeliveryListResponse>, AppError> {
     // ── Role enforcement: analyst can view deliveries ──
     if let Some(Extension(ref scope)) = service_token {
-        super::teams::require_team_analyst(&pool, scope.team_id, customer.id).await?;
+        crate::routes::teams::require_team_analyst(&pool, scope.team_id, customer.id).await?;
     }
 
     let page = params.page.unwrap_or(1).max(1);
@@ -138,7 +110,7 @@ async fn list_deliveries(
     }))
 }
 
-async fn create_webhook(
+pub async fn create_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
@@ -153,9 +125,9 @@ async fn create_webhook(
 
     // ── Role enforcement: require at least developer for write ops ──
     if let Some(tid) = team_id {
-        super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        crate::routes::teams::require_team_developer(&pool, tid, customer.id).await?;
     } else {
-        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+        crate::routes::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     // Check idempotency key
@@ -378,7 +350,7 @@ async fn create_webhook(
     Ok(Json(delivery.to_response()))
 }
 
-async fn batch_webhooks(
+pub async fn batch_webhooks(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
@@ -390,9 +362,9 @@ async fn batch_webhooks(
 
     // ── Role enforcement: require at least developer for write ops ──
     if let Some(tid) = team_id {
-        super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        crate::routes::teams::require_team_developer(&pool, tid, customer.id).await?;
     } else {
-        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+        crate::routes::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     if req.webhooks.len() > 100 {
@@ -560,7 +532,7 @@ async fn batch_webhooks(
     Ok(Json(BatchResponse { deliveries, errors }))
 }
 
-async fn replay_webhook(
+pub async fn replay_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(_cfg): Extension<Config>,
@@ -571,9 +543,9 @@ async fn replay_webhook(
 
     // ── Role enforcement: require at least developer for write ops ──
     if let Some(tid) = team_id {
-        super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        crate::routes::teams::require_team_developer(&pool, tid, customer.id).await?;
     } else {
-        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+        crate::routes::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     let original = sqlx::query_as::<_, Delivery>(
@@ -670,11 +642,11 @@ fn escape_csv_cell(value: &str) -> String {
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
-struct BatchReplayRequest {
+pub(crate) struct BatchReplayRequest {
     delivery_ids: Vec<Uuid>,
 }
 
-async fn batch_replay(
+pub async fn batch_replay(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(_cfg): Extension<Config>,
@@ -686,9 +658,9 @@ async fn batch_replay(
 
     // ── Role enforcement: require at least developer for write ops ──
     if let Some(tid) = team_id {
-        super::teams::require_team_developer(&pool, tid, customer.id).await?;
+        crate::routes::teams::require_team_developer(&pool, tid, customer.id).await?;
     } else {
-        super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+        crate::routes::teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
 
     // Gate behind bulk_replay feature flag
@@ -786,7 +758,7 @@ async fn batch_replay(
 /// Resolve the effective webhook limit and the customer_id to track usage against.
 /// When operating within a team, the team owner's plan limit and their webhook_count apply.
 /// Returns (tracking_customer_id, webhook_limit).
-async fn resolve_team_tracking(
+pub async fn resolve_team_tracking(
     pool: &PgPool,
     customer: &Customer,
     team_id: Option<Uuid>,
@@ -812,7 +784,7 @@ async fn resolve_team_tracking(
 /// When team_id is provided, webhook_count is tracked on the team owner's record
 /// (team-level counting), and the team owner's plan limit applies.
 /// Returns Err if at the limit (and overage is not allowed).
-async fn reserve_webhook_slot(
+pub async fn reserve_webhook_slot(
     pool: &PgPool,
     customer: &Customer,
     count: i64,
@@ -844,7 +816,7 @@ fn parse_date_str(s: &str, default_hms: (u32, u32, u32)) -> Option<DateTime<Utc>
 fn parse_date_from_str(s: &str) -> Option<DateTime<Utc>> { parse_date_str(s, (0, 0, 0)) }
 fn parse_date_to_str(s: &str) -> Option<DateTime<Utc>> { parse_date_str(s, (23, 59, 59)) }
 
-async fn export_deliveries(
+pub async fn export_deliveries(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Query(params): Query<ExportParams>,
@@ -926,7 +898,7 @@ async fn export_deliveries(
     }
 }
 
-async fn get_delivery(
+pub async fn get_delivery(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -943,7 +915,7 @@ async fn get_delivery(
     Ok(Json(delivery.to_response()))
 }
 
-async fn get_delivery_attempts(
+pub async fn get_delivery_attempts(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -1182,24 +1154,24 @@ mod tests {
     fn test_webhook_create_requires_developer() {
         // create_webhook requires at least developer role
         let min_role = "developer";
-        let min_level = super::super::teams::role_level(min_role);
-        assert!(super::super::teams::role_level("admin") >= min_level);
-        assert!(super::super::teams::role_level("developer") >= min_level);
-        assert!(super::super::teams::role_level("analyst") < min_level);
-        assert!(super::super::teams::role_level("viewer") < min_level);
+        let min_level = super::crate::routes::teams::role_level(min_role);
+        assert!(super::crate::routes::teams::role_level("admin") >= min_level);
+        assert!(super::crate::routes::teams::role_level("developer") >= min_level);
+        assert!(super::crate::routes::teams::role_level("analyst") < min_level);
+        assert!(super::crate::routes::teams::role_level("viewer") < min_level);
     }
 
     #[test]
     fn test_webhook_batch_requires_developer() {
         // batch_webhooks requires at least developer role
-        let min_level = super::super::teams::role_level("developer");
+        let min_level = super::crate::routes::teams::role_level("developer");
         assert_eq!(min_level, 30);
     }
 
     #[test]
     fn test_webhook_replay_requires_developer() {
         // replay_webhook requires at least developer role
-        let min_level = super::super::teams::role_level("developer");
-        assert!(super::super::teams::role_level("viewer") < min_level, "viewer cannot replay");
+        let min_level = super::crate::routes::teams::role_level("developer");
+        assert!(super::crate::routes::teams::role_level("viewer") < min_level, "viewer cannot replay");
     }
 }
