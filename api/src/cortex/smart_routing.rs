@@ -50,12 +50,13 @@ pub async fn decide_routing(
                 r#"
                 SELECT
                     COUNT(*) as total,
-                    COUNT(*) FILTER (WHERE status_code BETWEEN 200 AND 299) as success,
-                    COALESCE(AVG(duration_ms) FILTER (WHERE status_code BETWEEN 200 AND 299), 0.0) as avg_latency
-                FROM delivery_attempts
-                WHERE endpoint_id = $1
-                  AND created_at > NOW() - INTERVAL '1 hour'
-                  AND response_url = $2
+                    COUNT(*) FILTER (WHERE da.status_code BETWEEN 200 AND 299) as success,
+                    COALESCE(AVG(da.duration_ms) FILTER (WHERE da.status_code BETWEEN 200 AND 299), 0.0) as avg_latency
+                FROM delivery_attempts da
+                JOIN deliveries d ON d.id = da.delivery_id
+                WHERE d.endpoint_id = $1
+                  AND da.created_at > NOW() - INTERVAL '1 hour'
+                  AND da.response_url = $2
                 "#
             ).bind(endpoint_id).bind(url).fetch_optional(pool).await.unwrap_or(None);
 
