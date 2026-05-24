@@ -1,6 +1,9 @@
 pub mod rbac;
 pub mod handlers;
 
+#[cfg(test)]
+mod tests;
+
 // Re-export RBAC functions for backward compatibility
 pub use rbac::{role_level, require_team_member, require_role, require_team_admin, require_team_developer, require_team_analyst, check_user_team_role, check_user_team_role_for_team, get_cached_permissions, invalidate_permission_cache, check_role_rate_limit, log_rbac_action};
 
