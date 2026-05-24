@@ -9,7 +9,7 @@ import {
   type AuditLogEntryResponse, type EndpointHealthResponse,
   type RateLimitResponse,
   type SchemaRegistryListResponse, type SearchResponseData,
-  type ServiceTokenResponse, type TemplateListResponse,
+  type TemplateListResponse,
 } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { validated } from './validated';
@@ -26,7 +26,6 @@ import {
   LatencyTrendSchema,
   RateLimitSchema,
   SchemaRegistryListSchema,
-  ServiceTokenSchema,
   TemplateListSchema,
   type EndpointValidated,
   type ApplicationValidated,
@@ -62,6 +61,10 @@ export {
 export {
   useApiKeys, useCreateApiKey, useDeleteApiKey, useRotateApiKey,
 } from './useApiKeys';
+export {
+  useServiceTokens, useCreateServiceToken, useDeleteServiceToken,
+  useRevealServiceToken, useUpdateServiceToken,
+} from './useServiceTokens';
 
 // ── Endpoints ──
 export function useEndpoints() {
@@ -472,52 +475,6 @@ export function useSearch(params: { q?: string; status?: string; page?: number; 
     queryFn: () => api.search(token!, searchParams),
     enabled,
     staleTime: 10_000,
-  });
-}
-
-// ── Service Tokens ──
-export function useServiceTokens() {
-  const { token } = useAuth();
-  return useQuery<ServiceTokenResponse[]>({
-    queryKey: ['service-tokens'],
-    queryFn: validated(() => api.getServiceTokens(token!), ServiceTokenSchema.array()),
-    enabled: !!token,
-    staleTime: 15_000,
-  });
-}
-
-export function useCreateServiceToken() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (name: string) => api.createServiceToken(token!, name),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['service-tokens'] }),
-  });
-}
-
-export function useDeleteServiceToken() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => api.deleteServiceToken(token!, id),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['service-tokens'] }),
-  });
-}
-
-export function useRevealServiceToken() {
-  const { token } = useAuth();
-  return useMutation({
-    mutationFn: (id: string) => api.revealServiceToken(token!, id),
-  });
-}
-
-export function useUpdateServiceToken() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, body }: { id: string; body: { name?: string; is_active?: boolean } }) =>
-      api.updateServiceToken(token!, id, body),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['service-tokens'] }),
   });
 }
 
