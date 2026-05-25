@@ -3,6 +3,7 @@
 import { LazySection, Skeletons } from '@/components/LazySection';
 import { useState } from 'react';
 import { useAuth } from '@/lib/store';
+import { VirtualList } from '@/components/VirtualList';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import type { FeatureFlagValidated } from '@/schemas/api';
@@ -161,9 +162,15 @@ export default function FeatureFlagsPage() {
             <p>{t('emptyState')}</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-            {flags.map((flag) => (
-              <div key={flag.id} className="px-4 sm:px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+          <VirtualList
+            items={flags}
+            height={Math.min(flags.length * 80, 500)}
+            itemHeight={80}
+            overscan={3}
+            keyExtractor={(flag) => flag.id}
+            emptyMessage={t('emptyState')}
+            renderItem={(flag) => (
+              <div className="px-4 sm:px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition border-b border-gray-200/50 dark:border-slate-700/50">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                     {/* Toggle */}
@@ -236,8 +243,8 @@ export default function FeatureFlagsPage() {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          />
         )}
       </div>
       </LazySection>

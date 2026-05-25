@@ -5,6 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { useAdminAuditLogs } from '@/hooks/useAdminData';
 import { useTranslations, useLocale } from 'next-intl';
+import { VirtualList } from '@/components/VirtualList';
 import { AlertTriangle, ArrowUpFromLine, ClipboardList, CreditCard, DollarSign, Eye, FileOutput, Flag, FlaskConical, Inbox, Key, Lock, Mail, Pencil, Plus, Settings, Shield, ShieldCheck, Trash2, User, UserMinus, Users } from '@/components/icons';
 
 const ACTION_COLORS: Record<string, React.ReactNode> = {
@@ -242,11 +243,16 @@ export default function AdminActivityPage() {
               <div className="col-span-3">{t('details')}</div>
             </div>
 
-            <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-              {entries.map((entry) => (
+            <VirtualList
+              items={entries}
+              height={Math.min(entries.length * 80, 600)}
+              itemHeight={80}
+              overscan={5}
+              keyExtractor={(entry) => entry.id}
+              emptyMessage={t('noActivity')}
+              renderItem={(entry) => (
                 <div
-                  key={entry.id}
-                  className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition"
+                  className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition border-b border-gray-200/50 dark:border-slate-700/50"
                 >
                   {/* Action */}
                   <div className="md:col-span-3 flex items-center gap-2">
@@ -302,8 +308,8 @@ export default function AdminActivityPage() {
                     )}
                   </div>
                 </div>
-              ))}
-            </div>
+              )}
+            />
 
             {/* Pagination */}
             {total > perPage && (
