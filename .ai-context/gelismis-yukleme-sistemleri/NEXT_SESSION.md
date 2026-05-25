@@ -30,6 +30,8 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md            ← Yapılan i�
 | 0 | QueryClient optimizasyonu | 1 | ✅ | 2026-05-25 | 707b64e0 |
 | 1 | Layout Suspense Boundaries | 2 | ✅ | 2026-05-26 | (pending push) |
 | 2 | Virtual Scrolling | 3 | ✅ | 2026-05-26 | 0981bc4a, 805a5b67, 6d33f997, bde296d8 |
+| 3 | Concurrent Features | 4 | ✅ | 2026-05-26 | e3b74c99, c6b29fda |
+| 4 | Akıllı Prefetch | 5 | ✅ | 2026-05-26 | 6b4061dc |
 
 ### Adım 1 Detay — Layout Suspense Boundaries (2026-05-26)
 
@@ -88,7 +90,7 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md            ← Yapılan i�
 
 | 2 | Virtual Scrolling | 3 | ✅ | 2026-05-26 | 0981bc4a, 805a5b67, 6d33f997, bde296d8, dd3bdceb |
 | 3 | Concurrent Features | 4 | ✅ | 2026-05-26 | e3b74c99, c6b29fda |
-| 4 | Akıllı Prefetch | 5 | ⏳ | — | — |
+| 4 | Akıllı Prefetch | 5 | ✅ | 2026-05-26 | 6b4061dc |
 | 5 | Turbopack | 8 | ⏳ | — | — |
 | 6 | React Compiler | 9 | ⏳ | — | — |
 | 7 | Cache Components | 6 | ⏳ | — | — |
@@ -101,7 +103,72 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md            ← Yapılan i�
 
 ---
 
-## 🔜 Sıradaki Adım: ADIM 1 — Layout Suspense Boundaries
+## 🔜 Sıradaki Adım: ADIM 6 — Cache Components (Katman 6)
+
+### Ne Yapılacak?
+
+Next.js `"use cache"` desteği ekle. Statik sayfalar (docs, pricing, about) sunucuda cache'lenir, anında yüklenir.
+
+### Dosyalar
+
+| Dosya | İşlem |
+|-------|-------|
+| `dashboard/next.config.ts` | `cacheComponents: true` ekle |
+| `docs/page.tsx`, `pricing/page.tsx`, `about/page.tsx` vb. | `"use cache"` direktifi ekle |
+
+### Adım Adım
+
+#### 6.1 — next.config.ts güncelle
+
+```ts
+const nextConfig = {
+  reactStrictMode: true,
+  cacheComponents: true,  // ← YENİ
+  // ... mevcut config
+};
+```
+
+#### 6.2 — Statik sayfalara "use cache" ekle
+
+```tsx
+// docs/page.tsx, pricing/page.tsx, about/page.tsx vb.
+"use cache";
+
+export default function DocsPage() {
+  // Bu sayfa sunucuda cache'lenir, anında yüklenir
+}
+```
+
+#### 6.3 — Test et
+
+```bash
+cd dashboard && npm run build
+# Manuel: sayfa geçişleri anında mı?
+```
+
+#### 6.4 — Commit
+
+```bash
+git add . && git commit -m "perf: Cache Components — statik sayfalar sunucuda cache'lenir" && git push
+```
+
+---
+
+### Adım 5 Detay — Akıllı Prefetch (2026-05-26) ✅ TAMAMLANDI
+
+**Yapılan:**
+- Dashboard layout `prefetchForRoute()` genişletildi: 12 rota (core, applications, organization, operational-webhooks, observability, devtools, integrations, custom-domain, routing-config, account, billing)
+- Admin layout `prefetchForAdminRoute()` eklendi: 11 rota (admin, users, revenue, refund-requests, feature-flags, coupons, system, activity, alerts, security, cortex)
+- `DashboardOverview.tsx`: 4 quick action Link → PrefetchLink (applications, deliveries, devtools, observability)
+- `RecentDeliveriesTable.tsx`: Delivery detail Link → PrefetchLink (hover'da delivery + attempts prefetch)
+
+**Etki:** Sidebar hover'da veri prefetch → tıklamada sayfa anında açılır
+
+**Commit:** 6b4061dc
+
+---
+
+## 🔜 Sıradaki Adım: ADIM 7 — View Transitions (Katman 7)
 
 ### Ne Yapılacak?
 
