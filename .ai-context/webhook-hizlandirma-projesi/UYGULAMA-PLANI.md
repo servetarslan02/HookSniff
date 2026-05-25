@@ -1079,7 +1079,7 @@ done | awk '{sum+=$1; count++} END {print "Avg:", sum/count*1000, "ms"}'
 
 > **Süre:** 1 oturum | **Etki:** ~50ms/connection → ~0ms | **Risk:** Düşük
 
-### 4.1 HTTP Client Config
+### 5.1 HTTP Client Config
 
 ```rust
 // worker/src/main.rs
@@ -1105,7 +1105,7 @@ let http_client = reqwest::Client::builder()
     .build()?;
 ```
 
-### 4.2 HTTP/2 vs HTTP/1.1 Görselleştirme
+### 5.2 HTTP/2 vs HTTP/1.1 Görselleştirme
 
 ```
 HTTP/1.1 — 10 webhook, aynı endpoint:
@@ -1124,7 +1124,7 @@ HTTP/2 — 10 webhook, aynı endpoint:
   Toplam: ~50ms (multiplexing overhead ≈ 0ms)
 ```
 
-### 4.3 Faz 2 Doğrulama
+### 5.3 Faz 2 Doğrulama
 
 - [ ] `cargo check` — 0 hata
 - [ ] HTTP/2 connection reuse → Grafana'da connection count azalır
@@ -1136,7 +1136,7 @@ HTTP/2 — 10 webhook, aynı endpoint:
 
 > **Süre:** 1-2 oturum | **Etki:** Geçici hatalarda 30s → 100ms | **Risk:** Düşük
 
-### 5.1 Error Classifier
+### 6.1 Error Classifier
 
 ```rust
 #[derive(Debug, Clone, PartialEq)]
@@ -1179,7 +1179,7 @@ pub fn classify_error(
 }
 ```
 
-### 5.2 Tiered Backoff Calculator
+### 6.2 Tiered Backoff Calculator
 
 ```rust
 pub fn calculate_backoff(
@@ -1235,7 +1235,7 @@ pub fn with_jitter(duration: Duration) -> Duration {
 }
 ```
 
-### 5.3 Max Attempts
+### 6.3 Max Attempts
 
 ```rust
 pub fn max_attempts_for_category(category: &RetryCategory) -> i32 {
@@ -1249,7 +1249,7 @@ pub fn max_attempts_for_category(category: &RetryCategory) -> i32 {
 }
 ```
 
-### 5.4 Retry Akış Diyagramı
+### 6.4 Retry Akış Diyagramı
 
 ```
 Webhook teslimat hatası
@@ -1274,7 +1274,7 @@ Error Classifier
         └─ Direkt DLQ (retry yok)
 ```
 
-### 5.5 Faz 3 Doğrulama
+### 6.5 Faz 3 Doğrulama
 
 - [ ] `cargo check` — 0 hata
 - [ ] Transient hata → 100ms'de retry
@@ -1288,7 +1288,7 @@ Error Classifier
 
 > **Süre:** 1 oturum | **Etki:** ~30ms/call → ~0ms | **Risk:** Çok düşük
 
-### 6.1 DNS Cache (LRU)
+### 7.1 DNS Cache (LRU)
 
 ```rust
 // worker/src/dns_cache.rs
@@ -1344,7 +1344,7 @@ impl DnsCache {
 }
 ```
 
-### 6.2 SSRF Cache
+### 7.2 SSRF Cache
 
 ```rust
 // worker/src/ssrf_cache.rs
@@ -1381,7 +1381,7 @@ impl SsrfCache {
 }
 ```
 
-### 6.3 Faz 4 Doğrulama
+### 7.3 Faz 4 Doğrulama
 
 - [ ] DNS cache hit rate > %90
 - [ ] SSRF cache → tekrar DNS çözümleme yok
@@ -1393,7 +1393,7 @@ impl SsrfCache {
 
 > **Süre:** 1 oturum | **Etki:** Hızlı endpoint'lerde %100 throughput | **Risk:** Düşük
 
-### 7.1 Implementation
+### 8.1 Implementation
 
 ```rust
 // Mevcut: sabit limit
@@ -1410,7 +1410,7 @@ async fn get_endpoint_concurrency(endpoint_id: Uuid, avg_latency_ms: u32) -> usi
 }
 ```
 
-### 7.2 Faz 5 Doğrulama
+### 8.2 Faz 5 Doğrulama
 
 - [ ] Hızlı endpoint (< 200ms) → 20 concurrent
 - [ ] Yavaş endpoint (> 1s) → 5 concurrent
@@ -1422,7 +1422,7 @@ async fn get_endpoint_concurrency(endpoint_id: Uuid, avg_latency_ms: u32) -> usi
 
 > **Süre:** 2 oturum | **Etki:** Yüksek throughput'ta %30-50 | **Risk:** Orta
 
-### 8.1 Implementation
+### 9.1 Implementation
 
 ```rust
 async fn process_batch(items: Vec<WebhookMessage>) {
@@ -1443,7 +1443,7 @@ async fn process_batch(items: Vec<WebhookMessage>) {
 }
 ```
 
-### 8.2 Faz 6 Doğrulama
+### 9.2 Faz 6 Doğrulama
 
 - [ ] Batch destekleyen endpoint → tek HTTP isteği
 - [ ] Desteklemeyen → mevcut paralel teslimat
@@ -1453,7 +1453,7 @@ async fn process_batch(items: Vec<WebhookMessage>) {
 
 ## 10. Grafana Metrikleri & Monitoring
 
-### 9.1 Yeni Metrikler
+### 10.1 Yeni Metrikler
 
 ```rust
 // worker/src/metrics.rs — mevcut dosyaya ekle
@@ -1519,7 +1519,7 @@ pub fn inc_redis_oom_errors() {
 }
 ```
 
-### 9.2 Grafana Dashboard Panelleri
+### 10.2 Grafana Dashboard Panelleri
 
 ```json
 {
@@ -1587,7 +1587,7 @@ pub fn inc_redis_oom_errors() {
 
 ## 11. Test & Doğrulama
 
-### 10.1 Redis Streams Test
+### 11.1 Redis Streams Test
 
 ```bash
 # Redis'e mesaj ekle
@@ -1606,7 +1606,7 @@ redis-cli XINFO STREAM hooksniff:webhooks
 redis-cli XINFO GROUPS hooksniff:webhooks
 ```
 
-### 10.2 Latency Test
+### 11.2 Latency Test
 
 ```bash
 # Webhook gönder ve süreyi ölç
@@ -1617,7 +1617,7 @@ time curl -X POST \
   -d '{"endpoint_id": "'$EP_ID'", "event": "test.speed", "data": {"ts": "'$(date +%s%N)'"}}'
 ```
 
-### 10.3 Load Test (k6)
+### 11.3 Load Test (k6)
 
 ```javascript
 // tests/load/webhook_speed_test.js
