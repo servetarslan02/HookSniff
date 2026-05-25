@@ -4,6 +4,7 @@
 //! Uses distributed locks (via Redis) to prevent duplicate work
 //! in multi-instance deployments.
 
+use chrono::Datelike;
 use sqlx::PgPool;
 
 use crate::config;
@@ -20,7 +21,7 @@ pub fn spawn_background_jobs(
     job_queue: Option<jobs::job_queue::JobQueue>,
     email_provider: EmailProvider,
     fcm_client: Option<FcmClient>,
-    retention_days: i32,
+    retention_days: i64,
 ) {
     // Job queue worker (processes email + notification jobs from Redis)
     if let Some(ref queue) = job_queue {

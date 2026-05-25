@@ -322,9 +322,7 @@ pub async fn delete_sso_config(
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct VerifyDomainRequest { domain: String }
-
-#[derive(Debug, Serialize)]
+pub struct VerifyDomainRequest { pub domain: String }
 
 pub mod domain;
 pub use domain::*;

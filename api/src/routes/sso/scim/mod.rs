@@ -139,7 +139,7 @@ pub fn scim_user_response(customer: &Customer, attributes: Option<&SsoUserAttrib
 }
 
 /// Helper to build Customer from ScimUserRow
-fn scim_row_to_customer(r: &ScimUserRow) -> Customer {
+pub fn scim_row_to_customer(r: &ScimUserRow) -> Customer {
     Customer {
         id: r.id, email: r.email.clone(), api_key_hash: r.api_key_hash.clone(),
         api_key_prefix: r.api_key_prefix.clone(), plan: r.plan.clone(),
@@ -164,7 +164,7 @@ fn scim_row_to_customer(r: &ScimUserRow) -> Customer {
 }
 
 /// Helper to build SsoUserAttributesRow from ScimUserRow
-fn scim_row_to_attrs(r: &ScimUserRow) -> SsoUserAttributesRow {
+pub fn scim_row_to_attrs(r: &ScimUserRow) -> SsoUserAttributesRow {
     SsoUserAttributesRow {
         idp_user_id: r.idp_user_id.clone(),
         idp_groups: r.idp_groups.clone(),
