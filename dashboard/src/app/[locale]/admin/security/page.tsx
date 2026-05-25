@@ -7,6 +7,7 @@ import { adminApi } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useTranslations } from 'next-intl';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import {
   Shield, AlertTriangle, AlertCircle, Info, Ban, Unlock,
   CheckCircle2, XCircle, Search, Globe, Clock, RefreshCw,
@@ -107,7 +108,7 @@ export default function AdminSecurityPage() {
   const [filterSeverity, setFilterSeverity] = useState('all');
   const [filterResolved, setFilterResolved] = useState('all');
   const [filterDateRange, setFilterDateRange] = useState('');
-  const [searchIp, setSearchIp] = useState('');
+  const { input: searchIp, deferredValue: debouncedSearchIp, handleChange: handleSearchIpChange } = useDebouncedSearch();
   const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
 
   // ── React Query: Stats (stale 2min — security stats don't change often) ──
@@ -120,12 +121,12 @@ export default function AdminSecurityPage() {
 
   // ── React Query: Events (stale 30s, filter-aware) ──
   const { data: eventsData, isLoading: eventsLoading, refetch: refetchEvents } = useQuery({
-    queryKey: ['admin', 'security-events', filterSeverity, filterResolved, searchIp, filterDateRange],
+    queryKey: ['admin', 'security-events', filterSeverity, filterResolved, debouncedSearchIp, filterDateRange],
     queryFn: async () => {
       const params: Record<string, string> = { per_page: '50' };
       if (filterSeverity !== 'all') params.severity = filterSeverity;
       if (filterResolved !== 'all') params.resolved = filterResolved === 'resolved' ? 'true' : 'false';
-      if (searchIp) params.ip = searchIp;
+      if (debouncedSearchIp) params.ip = debouncedSearchIp;
       const since = getSinceParam(filterDateRange);
       if (since) params.since = since;
       return adminApi.listSecurityEvents(token!, params);
@@ -350,7 +351,7 @@ export default function AdminSecurityPage() {
             </select>
             <div className="relative flex-1 min-w-[200px]">
               <Search size={14} strokeWidth={1.75} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" value={searchIp} onChange={(e) => setSearchIp(e.target.value)} placeholder="IP ara..." className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" />
+              <input type="text" value={searchIp} onChange={handleSearchIpChange} placeholder="IP ara..." className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" />
             </div>
             <button onClick={() => refetchEvents()} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition">
               <RefreshCw size={16} strokeWidth={1.75} />
