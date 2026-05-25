@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { VirtualList } from '@/components/VirtualList';
 
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -157,9 +158,15 @@ export default function SchemasPage() {
             <p className="text-xs text-gray-400 dark:text-slate-500">{t('noSchemasDesc')}</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100 dark:divide-slate-800">
-            {schemas.map((s) => (
-              <div key={s.id} className="px-6 py-4 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
+          <VirtualList
+            items={schemas}
+            height={Math.min(schemas.length * 80, 500)}
+            itemHeight={80}
+            overscan={3}
+            keyExtractor={(s) => s.id}
+            emptyMessage={t('noSchemas')}
+            renderItem={(s) => (
+              <div className="px-6 py-4 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition border-b border-gray-100 dark:border-slate-800">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3">
@@ -185,8 +192,8 @@ export default function SchemasPage() {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          />
         )}
       </div>
 
