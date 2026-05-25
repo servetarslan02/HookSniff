@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-25 GMT+8 (OpenClaw oturumu — genel durum kontrolü)
+> Son güncelleme: 2026-05-25 GMT+8 (OpenClaw oturumu — 4 dosya split)
 
 ## 🚀 Hızlı Başlangıç
 
@@ -42,6 +42,16 @@
 | `fifo/mod.rs` | 769 | Düşük |
 | `SsoContent.tsx` | 1167 | Düşük (handler'lar state'e çok bağlı) |
 | `admin/cortex/page.tsx` | 956 | Düşük |
+
+### 2026-05-25 OpenClaw Split'leri — TAMAMLANDI ✅
+
+| Dosya | Önce | Sonra | Azalma |
+|-------|------|-------|--------|
+| SsoContent.tsx | 1167 | 959 (2 dosya) | %18 |
+| subscription.rs | 797 | 674 (4 dosya) | %15 |
+| oauth.rs | 776 | 678 (4 dosya) | %13 |
+| cortex/page.tsx | 956 | 714 (7 dosya) | %25 |
+| **Toplam** | **3696** | **3025 (17 dosya)** | **%18** |
 
 ### 2026-05-25 Oturum 8 Split'leri — TAMAMLANDI ✅
 
