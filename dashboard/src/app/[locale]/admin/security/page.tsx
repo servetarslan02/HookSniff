@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useTranslations } from 'next-intl';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
+import { VirtualList } from '@/components/VirtualList';
 import {
   Shield, AlertTriangle, AlertCircle, Info, Ban, Unlock,
   CheckCircle2, XCircle, Search, Globe, Clock, RefreshCw,
@@ -363,11 +364,17 @@ export default function AdminSecurityPage() {
           ) : events.length === 0 ? (
             <div className="glass-card p-12 text-center"><Shield size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" /><p className="text-gray-500 dark:text-slate-400 text-sm">{t('noEvents')}</p></div>
           ) : (
-            <div className="space-y-2">
-              {events.map((event) => {
+            <VirtualList
+              items={events}
+              height={600}
+              itemHeight={80}
+              overscan={5}
+              keyExtractor={(event) => event.id}
+              emptyMessage={t('noEvents')}
+              renderItem={(event) => {
                 const isExpanded = expandedEvent === event.id;
                 return (
-                  <div key={event.id} className={`glass-card transition-all ${event.resolved ? 'opacity-60' : ''} border-l-4 ${event.severity === 'critical' ? 'border-red-500' : event.severity === 'high' ? 'border-orange-500' : event.severity === 'medium' ? 'border-amber-500' : 'border-blue-500'}`}>
+                  <div className={`glass-card transition-all ${event.resolved ? 'opacity-60' : ''} border-l-4 ${event.severity === 'critical' ? 'border-red-500' : event.severity === 'high' ? 'border-orange-500' : event.severity === 'medium' ? 'border-amber-500' : 'border-blue-500'} mb-2`}>
                     <div className="p-4 cursor-pointer" onClick={() => setExpandedEvent(isExpanded ? null : event.id)}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
@@ -415,8 +422,8 @@ export default function AdminSecurityPage() {
                     )}
                   </div>
                 );
-              })}
-            </div>
+              }}
+            />
           )}
         </>
       )}

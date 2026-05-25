@@ -8,6 +8,7 @@ import { useAdminBroadcasts } from '@/hooks/useAdminData';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualList } from '@/components/VirtualList';
 import {
   Mail, Send, AlertTriangle, CheckCircle2, ClipboardList, XCircle,
   Megaphone, Plus, Pencil, Trash2, Eye, EyeOff, Calendar,
@@ -321,20 +322,28 @@ export default function AdminEmailPage() {
             <div className="glass-card overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700"><h3 className="text-sm font-semibold text-gray-900 dark:text-white"><ClipboardList size={14} strokeWidth={1.75} className="inline mr-1.5" />Bildirim Geçmişi ({broadcasts.length})</h3></div>
               <div className="divide-y divide-gray-100 dark:divide-slate-800">
-                {broadcasts.map((b) => (
-                  <div key={b.id} className={`px-4 py-3 flex items-center justify-between gap-3 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition ${!b.is_active ? 'opacity-50' : ''}`}>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap"><span className="text-sm font-medium text-gray-900 dark:text-white truncate">{b.title}</span>{severityBadge(b.severity)}<span className="text-[11px] text-gray-400 dark:text-slate-500">{typeLabel(b.broadcast_type)}</span>{!b.is_active && <span className="text-[11px] text-gray-400">(pasif)</span>}</div>
-                      <p className="text-xs text-gray-500 dark:text-slate-400 truncate mt-0.5">{b.message}</p>
-                      <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-400 dark:text-slate-500">{b.target_plan && <span>Plan: {b.target_plan}</span>}<span>{new Date(b.created_at).toLocaleDateString()}</span></div>
+                <VirtualList
+                  items={broadcasts}
+                  height={500}
+                  itemHeight={72}
+                  overscan={5}
+                  keyExtractor={(b) => b.id}
+                  emptyMessage="Bildirim bulunamadı"
+                  renderItem={(b) => (
+                    <div className={`px-4 py-3 flex items-center justify-between gap-3 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition ${!b.is_active ? 'opacity-50' : ''}`}>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap"><span className="text-sm font-medium text-gray-900 dark:text-white truncate">{b.title}</span>{severityBadge(b.severity)}<span className="text-[11px] text-gray-400 dark:text-slate-500">{typeLabel(b.broadcast_type)}</span>{!b.is_active && <span className="text-[11px] text-gray-400">(pasif)</span>}</div>
+                        <p className="text-xs text-gray-500 dark:text-slate-400 truncate mt-0.5">{b.message}</p>
+                        <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-400 dark:text-slate-500">{b.target_plan && <span>Plan: {b.target_plan}</span>}<span>{new Date(b.created_at).toLocaleDateString()}</span></div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button onClick={() => handleToggleBroadcast(b)} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title={b.is_active ? 'Pasifleştir' : 'Aktifleştir'}>{b.is_active ? <Eye size={15} strokeWidth={1.75} /> : <EyeOff size={15} strokeWidth={1.75} />}</button>
+                        <button onClick={() => handleEditBroadcast(b)} className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title="Düzenle"><Pencil size={15} strokeWidth={1.75} /></button>
+                        <button onClick={() => setDeleteTarget(b.id)} className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title="Sil"><Trash2 size={15} strokeWidth={1.75} /></button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button onClick={() => handleToggleBroadcast(b)} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title={b.is_active ? 'Pasifleştir' : 'Aktifleştir'}>{b.is_active ? <Eye size={15} strokeWidth={1.75} /> : <EyeOff size={15} strokeWidth={1.75} />}</button>
-                      <button onClick={() => handleEditBroadcast(b)} className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title="Düzenle"><Pencil size={15} strokeWidth={1.75} /></button>
-                      <button onClick={() => setDeleteTarget(b.id)} className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title="Sil"><Trash2 size={15} strokeWidth={1.75} /></button>
-                    </div>
-                  </div>
-                ))}
+                  )}
+                />
               </div>
             </div>
           )}
