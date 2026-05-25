@@ -1,85 +1,69 @@
-# .ai-context — AI Session Memory
+# 📁 .ai-context — AI Hafıza Sistemi
 
-Bu klasör AI助手 tarafından oturum bilgilerini korumak için kullanılır.
-Tüm dosyalar GitHub'da saklanır — workspace silinse bile korunur.
+> Bu klasör AI助手 tarafından oturum bilgilerini korumak için kullanılır.
+> Tüm dosyalar GitHub'da saklanır — workspace silinse bile korunur.
 
-## Klasör Yapısı
+---
+
+## 📂 Klasör Yapısı
 
 ```
 .ai-context/
-├── MEMORY.md              ← Uzun vadeli hafıza (ana oturum)
-├── NEXT_SESSION.md        ← Sonraki oturum planı
-├── ONBOARDING.md          ← Yeni oturum rehberi
 │
-├── audit/                 ← Kod denetim ve sistem analiz raporları
-│   ├── AUDIT_REPORT_2026-05-08.md
-│   ├── AUDIT_REPORT_2026-05-09.md
-│   ├── CODEBASE_AUDIT.md
-│   ├── CODEBASE_REVIEW_2026-05-09.md
-│   ├── FULL_SYSTEM_AUDIT.md
-│   ├── SYSTEM_ANALYSIS.md
-│   ├── SECURITY_TRUST_REPORT.md
-│   └── DASHBOARD_ISSUES.md
+├── MEMORY.md                    ← Uzun vadeli hafıza (ana oturum)
+├── NEXT_SESSION.md              ← Sonraki oturum planı
+├── ONBOARDING.md                ← Yeni oturum rehberi
+├── WORKFLOW.md                  ← Workflow kuralları
+├── README.md                    ← Bu dosya
 │
-├── mobile/                ← Mobil uygulama planları
-│   ├── MASTER_PLAN.md
-│   ├── DECISIONS.md
-│   ├── APP_AUDIT.md
-│   ├── PERFORMANCE.md
-│   └── RESOURCES.md
+├── gelismis-yukleme-sistemleri/ ← ⚡ AKTİF PROJE — Performans optimizasyonu
+│   ├── PLAN.md                  ← 14 katmanlı zirve plan
+│   ├── NEXT_SESSION.md          ← Sonraki oturum rehberi
+│   ├── GECIS_STRATEJISI.md      ← Temiz geçiş kuralları
+│   ├── MEMORY.md                ← Proje hafızası
+│   ├── PAGE_TRACKER.md          ← 172 sayfa takibi
+│   ├── TEST_RESULTS.md          ← Test sonuçları
+│   └── README.md                ← Klasör rehberi
 │
-├── sdk/                   ← SDK strateji ve rehberler
-│   ├── STRATEGY.md
-│   ├── AUDIT.md
-│   ├── PUBLISH_GUIDE.md
-│   └── MANAGEMENT_RESEARCH.md
+├── audit/                       ← Kod denetim raporları
+├── code-review/                 ← Kod inceleme notları
+├── market/                      ← Pazar, rekabet analizi
+├── mobile/                      ← Mobil uygulama planları
+├── sdk/                         ← SDK strateji ve rehberler
+├── sdk-roadmap/                 ← SDK yol haritası
+├── strategy/                    ← Strateji raporları
 │
-├── market/                ← Pazar, rekabet, müşteri analizi
-│   ├── COMPETITIVE_ANALYSIS.md
-│   ├── CUSTOMER_INSIGHTS.md
-│   ├── MARKET_RESEARCH.md
-│   ├── MASTER_RECOMMENDATIONS.md
-│   ├── PRODUCT_IMPROVEMENTS.md
-│   ├── FEATURE_PLAN.md
-│   └── RESOURCES.md
+├── logs/                        ← Oturum logları
+│   └── archive/                 ← Eski loglar (132 dosya)
 │
-├── logs/                  ← Günlük oturum logları
-│   ├── 2026-05-08.md
-│   ├── 2026-05-09.md
-│   ├── 2026-05-10.md
-│   └── 2026-05-08-review-notes.md
-│
-├── strategy/              ← Strateji raporları (31 dosya)
-│   ├── 01-launch/
-│   ├── 02-growth/
-│   ├── 03-product/
-│   ├── 04-security/
-│   ├── 05-business/
-│   ├── 06-analytics/
-│   └── 07-legal/
-│
-├── admin-panel-eksikleri/ ← Admin panel detaylı analiz
-│   ├── ADMIN-PANEL-ANALYSIS.md
-│   └── ADMIN-PANEL-PAGE-DETAIL.md
-│
-└── README.md              ← Bu dosya
+└── archive/                     ← Arşiv (eski dosyalar)
+    ├── old-plans/               ← Eski planlar
+    ├── old-reports/             ← Eski raporlar
+    ├── 2026-05-*.md             ← Eski oturum logları (taşındı)
+    └── ALL-FINDINGS*.txt        ← Eski bulgu dosyaları
 ```
 
-## Yeni Oturumda İlk Okunacak
+---
 
-1. **`MEMORY.md`** — Proje durumu, servisler, oturum geçmişi
-2. **`NEXT_SESSION.md`** — Öncelikli yapılacaklar
-3. **`ONBOARDING.md`** — Genel rehber
+## 🚀 Yeni Oturumda İlk Okunacak
 
-## Hafıza Akışı
+1. **`gelismis-yukleme-sistemleri/NEXT_SESSION.md`** — Performans projesi sıradaki adım
+2. **`gelismis-yukleme-sistemleri/GECIS_STRATEJISI.md`** — Geçiş kuralları
+3. **`MEMORY.md`** — Genel proje durumu
+4. **`NEXT_SESSION.md`** — Genel sıradaki işler
 
-```
-Oturum başı:
-  git pull → MEMORY.md oku → NEXT_SESSION.md oku → devam et
+---
 
-Oturum sırasında:
-  Değişiklik yap → MEMORY.md/NEXT_SESSION.md güncelle
+## 📊 Dosya Sayıları
 
-Oturum sonunda:
-  git add .ai-context/ && git commit && git push
-```
+| Konum | Dosya sayısı |
+|-------|-------------|
+| Kök (aktif) | 5 |
+| gelismis-yukleme-sistemleri/ | 7 |
+| Aktif klasörler | ~60 |
+| Arşiv | ~160 |
+| **Toplam** | ~230 |
+
+---
+
+*Son güncelleme: 2026-05-26*
