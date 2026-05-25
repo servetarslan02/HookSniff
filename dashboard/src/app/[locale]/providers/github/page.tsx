@@ -1,3 +1,4 @@
+"use cache";
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { GitHubWebhooksPageContent } from './content';
