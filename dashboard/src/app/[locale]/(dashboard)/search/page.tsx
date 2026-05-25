@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { VirtualTable } from '@/components/VirtualTable';
 import { useSearch } from '@/hooks/useDashboardData';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { StatusBadge } from '@/components/StatusBadge';
 
 export default function SearchPage() {
@@ -12,27 +13,13 @@ export default function SearchPage() {
   const t = useTranslations('search');
   const tc = useTranslations('common');
 
-  const [query, setQuery] = useState('');
+  const { input: query, deferredValue: debouncedQuery, handleChange: handleQueryChange } = useDebouncedSearch();
   const [status, setStatus] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [debouncedStatus, setDebouncedStatus] = useState('');
   const [page, setPage] = useState(1);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Debounce search input
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      setDebouncedQuery(query);
-      setDebouncedStatus(status);
-      setPage(1);
-    }, 300);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [query, status]);
 
   const { data: results, isLoading } = useSearch({
     q: debouncedQuery || undefined,
-    status: debouncedStatus || undefined,
+    status: status || undefined,
     page,
     per_page: 20,
   });
@@ -59,7 +46,7 @@ export default function SearchPage() {
       <form onSubmit={handleSearch} className="glass-card p-4 sm:p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <div className="md:col-span-2">
-            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+            <input type="text" value={query} onChange={handleQueryChange}
               placeholder={t('searchPlaceholder')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 transition" />
           </div>
@@ -83,7 +70,7 @@ export default function SearchPage() {
           <div className="p-8 text-center text-gray-500 dark:text-slate-400">{t('searching')}</div>
         ) : deliveries.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400">
-            {debouncedQuery || debouncedStatus ? t('noResultsQuery') : t('enterQuery')}
+            {debouncedQuery || status ? t('noResultsQuery') : t('enterQuery')}
           </div>
         ) : (
           <>
