@@ -1,5 +1,7 @@
 pub mod rbac;
-pub mod handlers;
+pub mod team;
+pub mod members;
+pub mod invites;
 
 #[cfg(test)]
 mod tests;
@@ -7,14 +9,20 @@ mod tests;
 // Re-export RBAC functions for backward compatibility
 pub use rbac::{role_level, require_team_member, require_role, require_team_admin, require_team_developer, require_team_analyst, check_user_team_role, check_user_team_role_for_team, get_cached_permissions, invalidate_permission_cache, check_role_rate_limit, log_rbac_action};
 
+// Re-export handler functions
+pub use team::{create_team, list_teams, get_team, update_team, delete_team, leave_team, transfer_ownership};
+pub use members::{list_members, remove_member, change_role};
+pub use invites::{invite_member, accept_invite, revoke_invite, resend_invite};
+
+// Re-export types used by other modules
+pub use members::ChangeRoleRequest;
+pub use team::UpdateTeamRequest;
+
 use axum::routing::{delete, get, post, put};
 use axum::Router;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
-// Re-export handler functions for router
-use handlers::*;
 
 pub fn router() -> Router {
     Router::new()
@@ -73,12 +81,6 @@ pub struct CreateTeamRequest {
 pub struct InviteRequest {
     pub email: String,
     pub role: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct ChangeRoleRequest {
-    pub role: String,
 }
 
 #[derive(Debug, Deserialize)]
