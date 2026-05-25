@@ -483,7 +483,46 @@ pub static HTTP2_CONNECTION_REUSE: AtomicU64 = AtomicU64::new(0);
 
 ---
 
-## 6. Test Talimatları
+## 6. Eksik Parçalar (PLAN v2'de Giderilen)
+
+### 6.1 Signing Secret Cache
+- Mevcut: Her `process_pending` batch'inde DB sorgusu
+- Yeni: `worker/src/secret_cache.rs` — 5 dakika TTL ile in-memory cache
+- Redis queue'da signing secret payload'da yok, cache'ten alınacak
+
+### 6.2 Consumer Name Uniqueness
+- Her worker instance unique consumer name kullanmalı
+- Format: `worker-{pid}` veya `worker-{hostname}-{pid}`
+- Aksi halde mesajlar yanlış worker'a gider
+
+### 6.3 XAUTOCLAIM (Crash Recovery)
+- Worker crash olursa, processing'de kalan mesajlar "stuck" olur
+- XAUTOCLAIM ile 5 dk+ pending mesajları geri al
+- Her worker restart'ta bir kez çalıştır
+
+### 6.4 HTTP/2 TLS Sorunu
+- `http2_prior_knowledge(true)` = H2C (TLS yok)
+- Müşteri endpoint'leri HTTPS gerektirir
+- Çözüm: İki client (H2C iç servisler, HTTPS müşteriler)
+
+### 6.5 Grafana Metrikleri (Yeni)
+```rust
+// Queue tipi (0=PG, 1=Redis)
+pub static QUEUE_TYPE: AtomicU8 = AtomicU8::new(0);
+// Redis queue latency (microseconds)
+pub static REDIS_QUEUE_LATENCY_US: AtomicU64 = AtomicU64::new(0);
+// Redis queue errors
+pub static REDIS_QUEUE_ERRORS: AtomicU64 = AtomicU64::new(0);
+// PG fallback count (Redis yoksa)
+pub static PG_QUEUE_FALLBACK: AtomicU64 = AtomicU64::new(0);
+// Signing secret cache hit/miss
+pub static SECRET_CACHE_HIT: AtomicU64 = AtomicU64::new(0);
+pub static SECRET_CACHE_MISS: AtomicU64 = AtomicU64::new(0);
+```
+
+---
+
+## 7. Test Talimatları
 
 ### 6.1 Redis Streams Test
 
