@@ -1,6 +1,5 @@
 use super::super::*;
 use super::subscription_status::PauseRequest;
-use serde::Deserialize;
 
 // ──────────────────────────────────────────────────────────────
 // DELETE /v1/billing/subscription — Cancel subscription

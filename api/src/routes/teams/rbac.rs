@@ -1,9 +1,7 @@
 use sqlx::PgPool;
 use uuid::Uuid;
-use chrono::{DateTime, Utc};
 
-use crate::error::{AppError, ErrorCode};
-use crate::models::customer::Customer;
+use crate::error::AppError;
 
 use super::{Team, TeamMember};
 

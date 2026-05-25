@@ -1,7 +1,6 @@
 use super::super::*;
 use crate::error::ErrorCode;
 use super::subscription_status::UpgradeRequest;
-use serde::{Deserialize, Serialize};
 
 // ──────────────────────────────────────────────────────────────
 // Proration calculation

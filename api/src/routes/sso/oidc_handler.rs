@@ -1,16 +1,13 @@
 use axum::extract::{Extension, Query};
 use axum::http::HeaderMap;
 use axum::response::Redirect;
-use chrono::Utc;
 use sqlx::PgPool;
-use uuid::Uuid;
 
 use crate::crypto;
 use crate::error::{AppError, ErrorCode};
 use crate::models::customer::Customer;
 
-use super::{OidcCallbackQuery, OidcDiscovery, OidcTokenResponse, SsoLoginState, SsoStateStore};
-use super::config::{SsoConfigRow, sso_config_to_json};
+use super::{OidcCallbackQuery, OidcDiscovery, OidcTokenResponse, SsoStateStore};
 use super::oidc::{decode_oidc_id_token, verify_jwt_signature};
 use super::helpers::{find_or_create_sso_customer, auto_join_team_direct, resolve_role_from_mapping, resolve_team_from_mapping, store_sso_user_attributes, sync_team_memberships, generate_sso_response, log_sso_attempt};
 

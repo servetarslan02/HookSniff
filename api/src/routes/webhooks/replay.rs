@@ -94,7 +94,7 @@ pub async fn replay_webhook(
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct BatchReplayRequest {
+pub struct BatchReplayRequest {
     delivery_ids: Vec<Uuid>,
 }
 

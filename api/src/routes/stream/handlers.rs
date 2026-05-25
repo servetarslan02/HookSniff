@@ -3,7 +3,7 @@ use axum::{
     response::sse::{Event, Sse},
     Json,
 };
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use futures::stream::Stream;
 use sqlx::PgPool;
 use std::convert::Infallible;

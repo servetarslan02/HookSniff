@@ -4,7 +4,7 @@ use axum::http::{HeaderMap, HeaderValue};
 use axum::response::IntoResponse;
 use axum::extract::Extension;
 use axum::Json;
-use chrono::{Duration, Utc};
+use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -19,8 +19,8 @@ use crate::models::customer::{
 };
 
 use super::{
-    REFRESH_TOKEN_MAX_AGE, VERIFY_EMAIL_RATE_LIMIT, REFRESH_RATE_LIMIT, RESET_RATE_LIMIT,
-    auth_response_with_cookie, extract_client_ip, send_email_with_fallback,
+    VERIFY_EMAIL_RATE_LIMIT, REFRESH_RATE_LIMIT, RESET_RATE_LIMIT,
+    auth_response_with_cookie, extract_client_ip,
 };
 use super::helpers::{create_refresh_token, send_verification_email_for_customer};
 

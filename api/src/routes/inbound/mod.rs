@@ -30,22 +30,16 @@ mod tests;
 use signature::*;
 use handlers::*;
 
-use axum::body::Bytes;
 use axum::extract::{Extension, Path};
 use axum::http::HeaderMap;
-use axum::response::IntoResponse;
 use axum::routing::{get, post, put};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::db;
-use crate::routes::auth::CUSTOMER_SELECT;
 use crate::error::AppError;
 use crate::models::customer::Customer;
-use crate::models::delivery::Delivery;
-use crate::models::endpoint::Endpoint;
 
 pub fn router() -> Router {
     Router::new()
@@ -193,7 +187,7 @@ impl Provider {
 // ── Config CRUD ──
 
 #[derive(Debug, Deserialize)]
-struct CreateConfigRequest {
+pub struct CreateConfigRequest {
     provider: String,
     secret: String,
     endpoint_id: Option<Uuid>,
@@ -201,7 +195,7 @@ struct CreateConfigRequest {
 }
 
 #[derive(Debug, Deserialize)]
-struct UpdateConfigRequest {
+pub struct UpdateConfigRequest {
     secret: Option<String>,
     endpoint_id: Option<Option<Uuid>>,
     enabled: Option<bool>,
