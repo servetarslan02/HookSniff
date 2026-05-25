@@ -1,6 +1,6 @@
 use axum::{
     extract::Extension,
-    http::{HeaderMap, StatusCode},
+    http::HeaderMap,
     Json,
 };
 use sqlx::PgPool;

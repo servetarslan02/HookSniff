@@ -1,6 +1,5 @@
 use axum::extract::{Extension, Path, Query};
 use axum::Json;
-use chrono::{DateTime, Utc};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -9,7 +8,6 @@ use crate::config::Config;
 use crate::error::{AppError, ErrorCode};
 use crate::models::customer::Customer;
 
-use super::UserDetail;
 use crate::routes::admin::{PaginationParams, PaginatedUsers, UserDetailResponse, PlanRequest, SendEmailRequest, StatusRequest, UserSummary, EndpointSummary, DeliverySummary, UsageStats, require_admin, require_admin_write};
 
 pub async fn list_users(

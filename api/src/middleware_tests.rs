@@ -1,6 +1,5 @@
 //! Tests for middleware module.
 
-use super::*;
 
 // ── generate_api_key ──────────────────────────────────────
 

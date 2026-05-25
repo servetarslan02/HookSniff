@@ -1,6 +1,5 @@
 //! Password reset and change handlers.
 
-use axum::response::IntoResponse;
 use axum::extract::Extension;
 use axum::http::HeaderMap;
 use axum::Json;

@@ -1,6 +1,5 @@
 //! Tests for webhook routes.
 
-use super::*;
 use uuid::Uuid;
 
 #[test]

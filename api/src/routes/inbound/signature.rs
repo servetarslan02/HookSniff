@@ -1,6 +1,5 @@
 use axum::http::HeaderMap;
 
-use super::Provider;
 
 // ── Signature Verification ──
 

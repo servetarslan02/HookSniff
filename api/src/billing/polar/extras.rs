@@ -1,4 +1,3 @@
-use crate::error::AppError;
 
 use super::PolarProvider;
 

@@ -8,7 +8,6 @@
 //! - invoice.payment_failed → mark payment failed
 //! - charge.dispute.created → handle chargeback
 
-use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -166,7 +165,7 @@ async fn handle_subscription_updated(
         .and_then(|v| v.as_str())
         .ok_or_else(|| AppError::BadRequest("Missing subscription id".into()))?;
 
-    let status = data
+    let _status = data
         .get("status")
         .and_then(|v| v.as_str())
         .unwrap_or("active");
