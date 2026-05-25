@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-25 GMT+8 (OpenClaw oturumu — 11 dosya split, 15 yeni dosya)
+> Son güncelleme: 2026-05-25 GMT+8 (OpenClaw Oturumu 9 — 71 compile hatası düzeltildi)
 
 ## 🚀 Hızlı Başlangıç
 
@@ -13,6 +13,20 @@
 ---
 
 ## ✅ Tamamlanan İşler (Önceki Oturumlar)
+
+### 71 Compile Hatası Düzeltmesi — 2026-05-25 (Oturum 9) ✅
+
+Split'lerden kalan tüm import/visibility sorunları düzeltildi:
+- `integration_handlers.rs`: private fn'ler + eksik import'lar
+- `stream/mod.rs`: duplicate mod handlers
+- `stream/handlers.rs`: private fn'ler + eksik import'lar
+- `sso/config/mod.rs`: stray derive + private field
+- `sso/config/domain.rs`: eksik import'lar
+- `sso/scim/mod.rs`: private helper fn'ler
+- `sso/scim/users.rs`: eksik import
+- `background.rs`: type mismatch i32→i64
+- **Sonuç:** `cargo check` — 0 hata ✅
+- **Commit:** `c60c3a44`
 
 ### OpenClaw Split — 2026-05-25 (15 dosya, 22 yeni dosya, %51 küçülme) ✅
 
