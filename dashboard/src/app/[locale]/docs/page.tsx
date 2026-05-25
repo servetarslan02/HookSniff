@@ -7,6 +7,9 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: 'Documentation — HookSniff',
   description: 'Complete documentation for HookSniff webhook delivery platform. Guides, API reference, SDKs, and more.',
+  alternates: {
+    canonical: 'https://hooksniff.vercel.app/docs',
+  },
 };
 
 /* ───────────────────────────────────────────────

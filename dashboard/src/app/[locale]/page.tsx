@@ -5,6 +5,9 @@ import { HomeContent } from './content';
 export const metadata: Metadata = {
   title: 'Webhook Delivery Made Simple',
   description: 'Send, monitor, and manage webhooks with automatic retries, signature verification, and real-time delivery tracking',
+  alternates: {
+    canonical: 'https://hooksniff.vercel.app/',
+  },
 };
 
 // ISR: revalidate every hour
