@@ -1,4 +1,4 @@
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
 import { Lightbulb, X, Check, Link as LinkIcon } from '@/components/icons';

@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { API_BASE } from '@/lib/api';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Mail } from '@/components/icons';

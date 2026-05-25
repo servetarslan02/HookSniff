@@ -1,6 +1,7 @@
 'use client';
 
-import { Link, usePathname } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
+import { usePathname } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import Footer from '@/components/Footer';

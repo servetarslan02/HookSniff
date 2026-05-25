@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Link } from '@/i18n/navigation';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useAuth } from '@/lib/store';
 import { adminApi } from '@/lib/api';
