@@ -13,15 +13,16 @@
 1. [Mevcut Sistem & Darboğazlar](#1-mevcut-sistem--darboğazlar)
 2. [Sektör Karşılaştırması & Tezler](#2-sektör-karşılaştırması--tezler)
 3. [Faz 1: Redis Streams Queue](#3-faz-1-redis-streams-queue)
-4. [Faz 2: HTTP/2 + Connection Pooling](#4-faz-2-http2--connection-pooling)
-5. [Faz 3: 3 Katmanlı Retry Stratejisi](#5-faz-3-3-katmanlı-retry-stratejisi)
-6. [Faz 4: DNS + SSRF Cache](#6-faz-4-dns--ssrf-cache)
-7. [Faz 5: Dynamic Concurrency](#7-faz-5-dynamic-concurrency)
-8. [Faz 6: Batch Processing](#8-faz-6-batch-processing)
-9. [Grafana Metrikleri & Monitoring](#9-grafana-metrikleri--monitoring)
-10. [Test & Doğrulama](#10-test--doğrulama)
-11. [Rollback Planı](#11-rollback-planı)
-12. [Zaman Çizelgesi](#12-zaman-çizelgesi)
+4. [Faz 1 Ek: Production Konfigürasyonu](#4-faz-1-ek-production-konfigürasyonu)
+5. [Faz 2: HTTP/2 + Connection Pooling](#5-faz-2-http2--connection-pooling)
+6. [Faz 3: 3 Katmanlı Retry Stratejisi](#6-faz-3-3-katmanlı-retry-stratejisi)
+7. [Faz 4: DNS + SSRF Cache](#7-faz-4-dns--ssrf-cache)
+8. [Faz 5: Dynamic Concurrency](#8-faz-5-dynamic-concurrency)
+9. [Faz 6: Batch Processing](#9-faz-6-batch-processing)
+10. [Grafana Metrikleri & Monitoring](#10-grafana-metrikleri--monitoring)
+11. [Test & Doğrulama](#11-test--doğrulama)
+12. [Rollback Planı](#12-rollback-planı)
+13. [Zaman Çizelgesi](#13-zaman-çizelgesi)
 
 ---
 
@@ -764,7 +765,317 @@ async fn mark_dead_letter(pool: &PgPool, delivery_id: Uuid, reason: &str, attemp
 
 ---
 
-## 4. Faz 2: HTTP/2 + Connection Pooling
+## 4. Faz 1 Ek: Production Konfigürasyonu
+
+> **Bu bölüm Faz 1 ile birlikte uygulanır.** Redis Streams'in production'da güvenilir çalışması için kritik ayarlar.
+
+### 4.1 Feature Flag Mekanizması
+
+Redis queue runtime'da açılıp kapatılabilir. Bu sayede deploy sırasında sorun olursa anında geri dönülür.
+
+```rust
+// api/src/config.rs ve worker/src/config.rs
+pub struct QueueConfig {
+    /// Redis queue aktif mi? (env: USE_REDIS_QUEUE)
+    pub use_redis_queue: bool,
+    /// Redis URL (env: REDIS_URL)
+    pub redis_url: Option<String>,
+}
+
+impl QueueConfig {
+    pub fn from_env() -> Self {
+        Self {
+            use_redis_queue: std::env::var("USE_REDIS_QUEUE")
+                .map(|v| v == "true" || v == "1")
+                .unwrap_or(false),
+            redis_url: std::env::var("REDIS_URL").ok(),
+        }
+    }
+}
+```
+
+```rust
+// api/src/main.rs — Feature flag kontrolü
+let queue_config = QueueConfig::from_env();
+
+let redis_queue = if queue_config.use_redis_queue {
+    match queue_config.redis_url.as_deref() {
+        Some(url) => match queue::RedisQueue::new(url).await {
+            Ok(rq) => {
+                tracing::info!("✅ Redis Streams queue active (USE_REDIS_QUEUE=true)");
+                metrics::set_queue_type(1);
+                Some(rq)
+            }
+            Err(e) => {
+                tracing::error!("❌ Redis connection failed ({}), falling back to PG", e);
+                metrics::set_queue_type(0);
+                None
+            }
+        },
+        None => {
+            tracing::warn!("⚠️ USE_REDIS_QUEUE=true but REDIS_URL not set, using PG queue");
+            metrics::set_queue_type(0);
+            None
+        }
+    }
+} else {
+    tracing::info!("ℹ️ Redis queue disabled (USE_REDIS_QUEUE=false), using PG queue");
+    metrics::set_queue_type(0);
+    None
+};
+```
+
+```bash
+# .env.production.example — yeni değişkenler
+USE_REDIS_QUEUE=false   # true yapınca Redis queue aktif
+REDIS_URL=rediss://default:***@***-***.upstash.io:6379  # zaten mevcut
+```
+
+### 4.2 Upstash Redis Production Konfigürasyonu
+
+Upstash dashboard'dan yapılması gereken ayarlar:
+
+| Ayar | Değer | Sebep |
+|------|-------|-------|
+| **maxmemory-policy** | `noeviction` | Queue dolarsa hata versin, mesaj silinmesin |
+| **AOF persistence** | `appendfsync everysec` | Redis restart olursa mesajlar kaybolmasın |
+| **Eviction** | Yok | Queue verisi silinmemeli |
+
+> ⚠️ **Kritik:** `noeviction` seçilmezse Redis memory dolduğunda queue mesajlarını silebilir. Bu veri kaybına yol açar.
+
+```bash
+# Upstash CLI ile kontrol (opsiyonel)
+upstash redis config set maxmemory-policy noeviction
+```
+
+### 4.3 Deploy Sırası (Rolling Update)
+
+**Kritik:** API ve worker aynı anda deploy edilmemeli. Sıra önemli.
+
+```
+Deploy Sırası:
+    1️⃣ Worker deploy (Redis queue okumaya başlar)
+         ↓ Başarılıysa
+    2️⃣ API deploy (Redis queue'ya yazmaya başlar)
+         ↓ Başarılıysa
+    3️⃣ USE_REDIS_QUEUE=true yap (feature flag aç)
+```
+
+**Neden worker önce?**
+- API Redis'e yazmaya başlarsa ama worker henüz okumuyorsa → mesajlar birikir
+- Worker önce okumaya başlarsa → API yazdığı anda işlenir
+
+```bash
+# 1. Worker deploy (henüz USE_REDIS_QUEUE=false)
+gcloud run deploy hooksniff-worker --source . --region europe-west1
+
+# 2. API deploy (henüz USE_REDIS_QUEUE=false)
+gcloud run deploy hooksniff-api --source . --region europe-west1
+
+# 3. Feature flag aç (her ikisi de yeni kodda)
+gcloud run services update hooksniff-worker \
+  --set-env-vars USE_REDIS_QUEUE=true --region europe-west1
+gcloud run services update hooksniff-api \
+  --set-env-vars USE_REDIS_QUEUE=true --region europe-west1
+```
+
+### 4.4 FIFO Endpoint'lerin Redis'teki Davranışı
+
+Mevcut FIFO mantığı PG tablo sırasına bakıyor (`should_deliver_fifo`). Redis Streams'te sıra doğal olarak korunur ama consumer group paralel okuma yapıyor.
+
+**Çözüm:** FIFO endpoint'ler için `XREADGROUP`'da `COUNT=1` kullan (tek tek oku, paralel değil).
+
+```rust
+// worker/src/main.rs — FIFO-aware okuma
+let batch_size = if has_fifo_endpoints() { 1 } else { 50 };
+let messages = redis_queue.read_batch(&consumer_name, batch_size, 100).await?;
+
+// VEYA: FIFO endpoint'ler için ayrı consumer group
+// hooksniff-workers-fifo → COUNT=1, tek consumer
+// hooksniff-workers → COUNT=50, paralel
+```
+
+**Öneri:** İlk aşada FIFO'yu PG'de bırak (mevcut `should_deliver_fifo` çalışmaya devam etsin). Redis queue sadece FIFO olmayan webhook'lar için kullanılsın. İleride FIFO için ayrı stream açılabilir.
+
+```rust
+// publish_to_queue — FIFO kontrolü
+if fifo::should_deliver_fifo(pool, endpoint_id).await.unwrap_or(false) {
+    // FIFO endpoint → PG queue (mevcut davranış)
+    pg_enqueue(pool, delivery_id, ...).await?;
+} else {
+    // Normal endpoint → Redis queue (yeni, hızlı)
+    redis.enqueue(&msg).await?;
+}
+```
+
+### 4.5 Redis OOM (Out of Memory) Senaryosu
+
+Redis memory dolduğunda ne olacak?
+
+| maxmemory-policy | Davranış | Risk |
+|-----------------|----------|------|
+| `noeviction` | Yeni XADD hata döner → PG fallback | ✅ Güvenli |
+| `volatile-lru` | TTL'li key'leri siler | ❌ Queue verisi silinebilir |
+| `allkeys-lru` | Tüm key'lerden siler | ❌ Queue verisi silinebilir |
+
+**Seçim:** `noeviction` — Redis doluysa PG fallback otomatik devreye girer.
+
+```rust
+// api/src/queue.rs — OOM yakalama
+pub async fn enqueue(&mut self, msg: &QueueMessage) -> Result<String> {
+    let result: Result<String, _> = redis::cmd("XADD")
+        .arg(STREAM_KEY)
+        .arg("MAXLEN").arg("~").arg(MAX_STREAM_LEN)
+        .arg("*")
+        // ... field'lar
+        .query_async(&mut self.conn).await;
+
+    match result {
+        Ok(id) => Ok(id),
+        Err(e) => {
+            if e.to_string().contains("OOM") || e.to_string().contains("maxmemory") {
+                tracing::error!("🔴 Redis OOM — falling back to PG queue");
+                metrics::inc_redis_oom_errors();
+                Err(anyhow::anyhow!("Redis OOM"))
+            } else {
+                Err(e.into())
+            }
+        }
+    }
+}
+```
+
+**Grafana alert:**
+```json
+{
+  "alert": {
+    "name": "Redis OOM",
+    "condition": "rate(hooksniff_redis_oom_errors[5m]) > 0",
+    "message": "Redis Out of Memory — PG fallback active"
+  }
+}
+```
+
+### 4.6 Trace ID Correlation (OpenTelemetry)
+
+Webhook yolunu baştan sona takip etmek için trace_id Redis queue'da taşınır.
+
+```rust
+// api/src/telemetry.rs
+pub fn current_trace_id() -> Option<String> {
+    use opentelemetry::trace::TraceContextExt;
+    let span = opentelemetry::Context::current().span();
+    let span_context = span.span_context();
+    if span_context.is_valid() {
+        Some(span_context.trace_id().to_string())
+    } else {
+        None
+    }
+}
+
+// api/src/db.rs — publish_to_queue'da
+let trace_id = crate::telemetry::current_trace_id();
+msg.trace_id = trace_id.clone();
+
+// worker/src/main.rs — process_queue_message'da
+let span = tracing::info_span!(
+    "process_queue_message",
+    delivery_id = %msg.delivery_id,
+    endpoint_id = %msg.endpoint_id,
+    trace_id = %msg.trace_id.as_deref().unwrap_or("unknown"),
+    queue_type = "redis",
+);
+let _guard = span.enter();
+```
+
+**Grafana'da sorgulama:**
+```
+# Belirli bir webhook'un tüm yolunu görmek
+{trace_id="abc123"} | json
+```
+
+### 4.7 Log Formatı (Structured Logging)
+
+Redis queue mode'da log'lara yeni field'lar eklenir.
+
+```rust
+// Tüm log'larda tutarlı format
+tracing::info!(
+    queue_type = "redis",
+    stream_id = %stream_id,
+    consumer = %consumer_name,
+    delivery_id = %msg.delivery_id,
+    endpoint_id = %msg.endpoint_id,
+    attempt = msg.attempt_count,
+    latency_ms = duration.as_millis() as u64,
+    "📤 Webhook delivered"
+);
+
+// Hata log'u
+tracing::error!(
+    queue_type = "redis",
+    delivery_id = %msg.delivery_id,
+    error = %e,
+    redis_cmd = "XREADGROUP",
+    "❌ Redis queue read failed"
+);
+
+// Fallback log'u
+tracing::warn!(
+    queue_type = "pg_fallback",
+    reason = "redis_unavailable",
+    delivery_id = %delivery_id,
+    "⚠️ Using PostgreSQL queue fallback"
+);
+```
+
+**Grafana sorgu örnekleri:**
+```
+# Redis queue hataları
+{queue_type="redis"} |= "error"
+
+# PG fallback kullanımı
+{queue_type="pg_fallback"}
+
+# Yavaş teslimatlar
+{queue_type="redis"} | latency_ms > 100
+```
+
+### 4.8 Before/After Benchmark Stratejisi
+
+Deploy sonrası performansı karşılaştırmak için:
+
+```bash
+# 1. BEFORE — PG queue ile ölç (USE_REDIS_QUEUE=false)
+# 100 webhook gönder, latency kaydet
+for i in $(seq 1 100); do
+  curl -s -o /dev/null -w "%{time_total}\n" -X POST \
+    $API_URL/v1/webhooks \
+    -H "Authorization: Bearer $API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"endpoint_id":"'$EP_ID'","event":"bench.before","data":{"i":'$i'}}'
+done | awk '{sum+=$1; count++} END {print "Avg:", sum/count*1000, "ms"}'
+
+# 2. AFTER — Redis queue ile ölç (USE_REDIS_QUEUE=true)
+# Aynı testi tekrar çalıştır
+
+# 3. Grafana'da karşılaştır
+# - queue_latency_ms (before vs after)
+# - p50, p95, p99 latency
+# - throughput (webhook/s)
+```
+
+**Beklenen sonuçlar:**
+
+| Metrik | Before (PG) | After (Redis) | İyileşme |
+|--------|-------------|---------------|----------|
+| Queue latency (avg) | ~500ms | < 5ms | **100x** |
+| Queue latency (p99) | ~1000ms | < 10ms | **100x** |
+| Throughput | ~50/s | ~500/s | **10x** |
+
+---
+
+## 5. Faz 2: HTTP/2 + Connection Pooling
 
 > **Süre:** 1 oturum | **Etki:** ~50ms/connection → ~0ms | **Risk:** Düşük
 
@@ -821,7 +1132,7 @@ HTTP/2 — 10 webhook, aynı endpoint:
 
 ---
 
-## 5. Faz 3: 3 Katmanlı Retry Stratejisi
+## 6. Faz 3: 3 Katmanlı Retry Stratejisi
 
 > **Süre:** 1-2 oturum | **Etki:** Geçici hatalarda 30s → 100ms | **Risk:** Düşük
 
@@ -973,7 +1284,7 @@ Error Classifier
 
 ---
 
-## 6. Faz 4: DNS + SSRF Cache
+## 7. Faz 4: DNS + SSRF Cache
 
 > **Süre:** 1 oturum | **Etki:** ~30ms/call → ~0ms | **Risk:** Çok düşük
 
@@ -1078,7 +1389,7 @@ impl SsrfCache {
 
 ---
 
-## 7. Faz 5: Dynamic Concurrency
+## 8. Faz 5: Dynamic Concurrency
 
 > **Süre:** 1 oturum | **Etki:** Hızlı endpoint'lerde %100 throughput | **Risk:** Düşük
 
@@ -1107,7 +1418,7 @@ async fn get_endpoint_concurrency(endpoint_id: Uuid, avg_latency_ms: u32) -> usi
 
 ---
 
-## 8. Faz 6: Batch Processing
+## 9. Faz 6: Batch Processing
 
 > **Süre:** 2 oturum | **Etki:** Yüksek throughput'ta %30-50 | **Risk:** Orta
 
@@ -1140,7 +1451,7 @@ async fn process_batch(items: Vec<WebhookMessage>) {
 
 ---
 
-## 9. Grafana Metrikleri & Monitoring
+## 10. Grafana Metrikleri & Monitoring
 
 ### 9.1 Yeni Metrikler
 
@@ -1175,6 +1486,9 @@ pub static TIER1_RETRY_COUNT: AtomicU64 = AtomicU64::new(0);
 pub static TIER2_RETRY_COUNT: AtomicU64 = AtomicU64::new(0);
 pub static TIER3_RETRY_COUNT: AtomicU64 = AtomicU64::new(0);
 
+// Redis OOM errors
+pub static REDIS_OOM_ERRORS: AtomicU64 = AtomicU64::new(0);
+
 // Helper fonksiyonlar
 pub fn record_queue_latency_us(us: u64) {
     REDIS_QUEUE_LATENCY_US.store(us, Ordering::Relaxed);
@@ -1199,6 +1513,9 @@ pub fn inc_dns_cache_hit() {
 }
 pub fn inc_dns_cache_miss() {
     DNS_CACHE_MISS.fetch_add(1, Ordering::Relaxed);
+}
+pub fn inc_redis_oom_errors() {
+    REDIS_OOM_ERRORS.fetch_add(1, Ordering::Relaxed);
 }
 ```
 
@@ -1244,6 +1561,16 @@ pub fn inc_dns_cache_miss() {
       "type": "gauge"
     },
     {
+      "title": "Redis OOM Hataları",
+      "targets": [{"expr": "rate(hooksniff_redis_oom_errors[5m])"}],
+      "type": "timeseries",
+      "alert": {
+        "name": "Redis OOM",
+        "condition": "rate(hooksniff_redis_oom_errors[5m]) > 0",
+        "message": "Redis Out of Memory — PG fallback active"
+      }
+    },
+    {
       "title": "Retry Dağılımı",
       "targets": [
         {"expr": "hooksniff_tier1_retry_count", "legendFormat": "Tier 1 (Immediate)"},
@@ -1258,7 +1585,7 @@ pub fn inc_dns_cache_miss() {
 
 ---
 
-## 10. Test & Doğrulama
+## 11. Test & Doğrulama
 
 ### 10.1 Redis Streams Test
 
@@ -1333,7 +1660,7 @@ export default function () {
 
 ---
 
-## 11. Rollback Planı
+## 12. Rollback Planı
 
 ### Her Faz İçin
 
@@ -1384,7 +1711,7 @@ echo "✅ Rollback complete. Monitoring Grafana for issues..."
 
 ---
 
-## 12. Zaman Çizelgesi
+## 13. Zaman Çizelgesi
 
 | Faz | Süre | Etki | Oturum |
 |-----|------|------|--------|

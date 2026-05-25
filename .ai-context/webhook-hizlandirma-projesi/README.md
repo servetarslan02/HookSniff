@@ -11,14 +11,9 @@
 
 | Dosya | İçerik | Öncelik |
 |-------|--------|---------|
-| **`UYGULAMA-PLANI.md`** | **TÜM PLAN TEK BELGEDE** — aşamalar, kod örnekleri, tezler, testler | ⭐ Ana doküman |
+| **`UYGULAMA-PLANI.md`** | **TÜM PLAN TEK BELGEDE** — 13 bölüm, kod örnekleri, tezler, testler, production config | ⭐ Ana doküman |
 | **`NEXT_SESSION.md`** | Sonraki oturum rehberi — sıradaki adım | ⭐ Her oturum oku |
 | **`MEMORY.md`** | Kararlar, uyarılar, ilerleme takibi | ⭐ Her oturum oku |
-| `RAPOR.md` | Derin analiz raporu (rakip karşılaştırma, mimari) | Referans |
-| `PLAN.md` | Eski plan v4 final (kod referansları) | Referans |
-| `TEKNIK-DETAY.md` | Teknik detaylar (kod örnekleri, konfigürasyon) | Referans |
-| `INCELEME.md` | Plan incelemesi (alternatifler, eksikler) | Referans |
-| `DUZELTMELER.md` | 7 kritik sorunun düzeltmesi | Referans |
 | `README.md` | Bu dosya | — |
 
 ---
@@ -40,6 +35,26 @@ cat .ai-context/webhook-hizlandirma-projesi/UYGULAMA-PLANI.md
 
 ---
 
+## 📊 UYGULAMA-PLANI.md İçeriği (13 Bölüm)
+
+| # | Bölüm | İçerik |
+|---|-------|--------|
+| 1 | Mevcut Sistem & Darboğazlar | Akış diyagramı, 7 darboğaz, kod referansları |
+| 2 | Sektör Karşılaştırması & Tezler | 5 rakip analizi, 5 tez (Redis, retry, HTTP/2, free tier, alternatifler) |
+| 3 | Faz 1: Redis Streams Queue | 10 adım, tam kod örnekleri, helper fonksiyonlar |
+| 4 | Faz 1 Ek: Production Config | Feature flag, Upstash ayarları, deploy sırası, FIFO, OOM, trace ID, logging, benchmark |
+| 5 | Faz 2: HTTP/2 + Connection Pooling | Config, görselleştirme |
+| 6 | Faz 3: 3 Katmanlı Retry | Error classifier, tiered backoff, akış diyagramı |
+| 7 | Faz 4: DNS + SSRF Cache | LRU cache, SSRF cache |
+| 8 | Faz 5: Dynamic Concurrency | Dinamik limit |
+| 9 | Faz 6: Batch Processing | Endpoint grouping |
+| 10 | Grafana Metrikleri | 12 metric, 8 panel (OOM alert dahil) |
+| 11 | Test & Doğrulama | Redis CLI, latency, k6 load test |
+| 12 | Rollback Planı | Feature flag, acil durum scripti |
+| 13 | Zaman Çizelgesi | ~10 oturum, $0 maliyet, beklenen sonuçlar |
+
+---
+
 ## 🎯 Hedefler
 
 | Metrik | Mevcut | Hedef | Svix |
@@ -49,21 +64,6 @@ cat .ai-context/webhook-hizlandirma-projesi/UYGULAMA-PLANI.md
 | İlk retry | 30s | **100ms** | 5s |
 | Concurrent delivery | 50 | **200+** | 100+ |
 | Throughput | ~50/s | **500+/s** | 1000+/s |
-
----
-
-## 📊 Faz Durumu
-
-| Faz | Açıklama | Süre | Etki | Durum |
-|-----|----------|------|------|-------|
-| 1 | Redis Streams Queue | 2-3 oturum | 1000ms → < 10ms | ⏳ |
-| 2 | HTTP/2 + Connection Pool | 1 oturum | ~50ms → ~0ms | ⏳ |
-| 3 | 3 Katmanlı Retry | 1-2 oturum | 30s → 100ms | ⏳ |
-| 4 | DNS + SSRF Cache | 1 oturum | ~30ms → ~0ms | ⏳ |
-| 5 | Dynamic Concurrency | 1 oturum | %100 throughput | ⏳ |
-| 6 | Batch Processing | 2 oturum | %30-50 throughput | ⏳ |
-
-**Toplam:** ~10 oturum, **$0 ek maliyet**
 
 ---
 
