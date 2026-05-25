@@ -8,6 +8,7 @@ const nextConfig = {
   reactStrictMode: true,
   experimental: {
     cacheComponents: true,
+    turbo: true,
   },
   typescript: {
     ignoreBuildErrors: true,
