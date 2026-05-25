@@ -6,6 +6,7 @@ import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
 import { useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PrefetchLink } from '@/components/PrefetchLink';
@@ -60,6 +61,56 @@ const adminNavigation = [
 // Memoized sidebar — only re-renders when pathname changes
 const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: { pathname: string; onClose: () => void; isOpen: boolean }) {
   const t = useTranslations('admin');
+  const { token } = useAuth();
+
+  // Prefetch admin API data on hover
+  const prefetchForAdminRoute = (href: string) => {
+    if (!token) return [];
+    switch (href) {
+      case '/admin':
+        return [
+          { queryKey: ['admin', 'stats'], queryFn: () => adminApi.getStats(token), staleTime: 30_000 },
+        ];
+      case '/admin/users':
+        return [
+          { queryKey: ['admin', 'users', { page: 1 }], queryFn: () => adminApi.getUsers(token, { page: 1 }), staleTime: 15_000 },
+        ];
+      case '/admin/revenue':
+        return [
+          { queryKey: ['admin', 'revenue'], queryFn: () => apiFetch('/admin/revenue', { token }), staleTime: 30_000 },
+        ];
+      case '/admin/refund-requests':
+        return [
+          { queryKey: ['admin', 'refund-requests'], queryFn: () => apiFetch('/admin/refund-requests', { token }), staleTime: 15_000 },
+        ];
+      case '/admin/feature-flags':
+        return [
+          { queryKey: ['admin', 'feature-flags'], queryFn: () => apiFetch('/admin/feature-flags', { token }), staleTime: 30_000 },
+        ];
+      case '/admin/coupons':
+        return [
+          { queryKey: ['admin', 'coupons'], queryFn: () => apiFetch('/admin/coupons', { token }), staleTime: 30_000 },
+        ];
+      case '/admin/system':
+        return [
+          { queryKey: ['admin', 'system'], queryFn: () => adminApi.getSystem(token), staleTime: 15_000 },
+        ];
+      case '/admin/activity':
+        return [
+          { queryKey: ['admin', 'activity'], queryFn: () => apiFetch('/admin/activity', { token }), staleTime: 15_000 },
+        ];
+      case '/admin/alerts':
+        return [
+          { queryKey: ['admin', 'alerts'], queryFn: () => apiFetch('/admin/alerts', { token }), staleTime: 15_000 },
+        ];
+      case '/admin/security':
+        return [
+          { queryKey: ['admin', 'security'], queryFn: () => apiFetch('/admin/security', { token }), staleTime: 30_000 },
+        ];
+      default:
+        return [];
+    }
+  };
 
   return (
     <aside
@@ -89,6 +140,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
                 href={item.href}
                 onClick={onClose}
                 hoverDelay={80}
+                prefetchData={prefetchForAdminRoute(item.href)}
                 className="flex items-center gap-2.5 px-3 py-2 text-[15px] font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
               >
                 <span className="inline-flex items-center">{item.icon}</span>
@@ -102,6 +154,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
               href={item.href}
               onClick={onClose}
               hoverDelay={80}
+              prefetchData={prefetchForAdminRoute(item.href)}
               className={clsx(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] font-medium transition',
                 isActive
