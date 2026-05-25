@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
 import { useTemplates } from '@/hooks/useDashboardData';
+import { VirtualList } from '@/components/VirtualList';
 import { BarChart3, Bot, ClipboardList, Radio, X } from '@/components/icons';
 
 interface Template {
@@ -95,9 +96,15 @@ export default function TemplatesPage() {
      <p className="text-sm text-gray-500 dark:text-slate-400">{t('noTemplatesDesc')}</p>
     </div>
    ) : (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-     {templates.map((tpl) => (
-      <div key={tpl.id} className="glass-card p-6 hover:shadow-lg transition flex flex-col">
+    <VirtualList
+      items={templates}
+      height={Math.min(templates.length * 280, 600)}
+      itemHeight={280}
+      overscan={2}
+      keyExtractor={(tpl) => tpl.id}
+      emptyMessage={t('noTemplates')}
+      renderItem={(tpl) => (
+      <div className="glass-card p-6 hover:shadow-lg transition flex flex-col mb-6">
        <div className="flex-1">
         <div className="flex items-start justify-between mb-2">
          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{getTemplateName(tpl.id) || tpl.name}</h3>
@@ -152,8 +159,8 @@ export default function TemplatesPage() {
         </button>
        </div>
       </div>
-     ))}
-    </div>
+     )}
+    />
    )}
 
    {/* Detail Modal */}

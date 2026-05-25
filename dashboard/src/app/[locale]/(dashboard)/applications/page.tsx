@@ -10,6 +10,7 @@ import { useToast } from '@/components/Toast';
 import { useApplications } from '@/hooks/useDashboardData';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazySection, Skeletons } from '@/components/LazySection';
+import { VirtualList } from '@/components/VirtualList';
 import { Smartphone, Pencil } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -270,14 +271,17 @@ export default function ApplicationsPage() {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          {filteredApps.map((app) => {
+        <VirtualList
+          items={filteredApps}
+          height={Math.min(filteredApps.length * 180, 600)}
+          itemHeight={180}
+          overscan={2}
+          keyExtractor={(app) => app.id}
+          emptyMessage={t('noApplications') || 'No applications'}
+          renderItem={(app) => {
             const labels = getAppLabels(app);
             return (
-              <div
-                key={app.id}
-                className="relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow"
-              >
+              <div className="relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow mb-4">
                 {/* UUID */}
                 <p className="text-[11px] font-mono text-gray-400 dark:text-gray-500 mb-1 truncate">
                   {app.id}
@@ -352,8 +356,8 @@ export default function ApplicationsPage() {
                 </RoleGuard>
               </div>
             );
-          })}
-        </div>
+          }}
+        />
       )}
       </LazySection>
 
