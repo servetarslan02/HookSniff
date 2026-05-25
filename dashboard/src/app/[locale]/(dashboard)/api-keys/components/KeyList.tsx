@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { VirtualList } from '@/components/VirtualList';
 import { RefreshCw, ShieldCheck, Trash2 } from '@/components/icons';
 import { RoleGuard } from '@/components/RoleGuard';
 
@@ -51,11 +52,16 @@ export function KeyList({
           <p className="text-gray-500 dark:text-slate-400">{t('noKeys')}</p>
         </div>
       ) : (
-        <div className="divide-y divide-gray-100 dark:divide-slate-800">
-          {keys.map((key) => (
+        <VirtualList
+          items={keys}
+          height={Math.min(keys.length * 72, 400)}
+          itemHeight={72}
+          overscan={3}
+          keyExtractor={(key) => key.id}
+          emptyMessage={t('noKeys')}
+          renderItem={(key) => (
             <div
-              key={key.id}
-              className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition"
+              className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition border-b border-gray-100 dark:divide-slate-800"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 flex-wrap">
@@ -101,8 +107,8 @@ export function KeyList({
                 </RoleGuard>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        />
       )}
     </div>
   );

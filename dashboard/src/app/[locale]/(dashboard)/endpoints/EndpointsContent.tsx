@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { VirtualList } from '@/components/VirtualList';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import { AlertTriangle, ClipboardList, Key, Trash2 } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
@@ -269,9 +270,15 @@ export function EndpointsContent() {
             </div>
           )}
 
-          <div className="grid gap-4">
-          {endpoints.map((ep) => (
-            <div key={ep.id} className="glass-card p-6 hover-lift">
+          <VirtualList
+            items={endpoints}
+            height={Math.min(endpoints.length * 120, 600)}
+            itemHeight={120}
+            overscan={3}
+            keyExtractor={(ep) => ep.id}
+            emptyMessage={t('noEndpointsYet')}
+            renderItem={(ep) => (
+            <div className="glass-card p-6 hover-lift mb-4">
               <div className="flex items-start justify-between">
                 {endpoints.length > 1 && (
                   <input
@@ -342,8 +349,8 @@ export function EndpointsContent() {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+            )}
+          />
         </>
       )}
       </LazySection>
