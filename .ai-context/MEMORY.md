@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-25 GMT+8 (Dashboard Hook Split)
+> Son güncelleme: 2026-05-25 GMT+8 (Oturum 8 — auth+webhooks+teams split)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -66,17 +66,57 @@ HookSniff/
 | Dosya | Önce | Sonra | Azalma |
 |-------|------|-------|--------|
 | worker/main.rs | 1883 | 953 | %49 |
-| webhooks/handlers.rs | 1177 | 851 | %28 |
-| auth/handlers.rs | 1033 | 905 | %12 |
+| webhooks/handlers.rs | 1177 | 851→3 modül | %100 (silindi) |
+| auth/handlers.rs | 1033 | 905→5 modül | %100 (silindi) |
 | inbound/handlers.rs | 870 | 295 | %66 |
 | email.rs | 1104 | 566 | %49 |
 | config.rs | 1060 | 353 | %67 |
 | middleware/mod.rs | 1052 | 642 | %39 |
-| **TOPLAM** | **8179** | **4565** | **%44** |
+| teams/handlers.rs | — | 827→3 modül | %100 (silindi) |
+| **TOPLAM** | **9006** | **—** | **—** |
 
-**20 yeni dosya** oluşturuldu. `cargo check` ✅ tüm modüllerde.
+**31 yeni dosya** oluşturuldu. `cargo check` ✅ tüm modüllerde.
 
-### worker/main.rs Bölme — TAMAMLANDI ✅
+### 🔥 YENİ — Oturum 8 Split'leri (2026-05-25)
+
+#### auth/handlers.rs → 5 Modül — TAMAMLANDI ✅
+
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `credentials.rs` | register + login | 243 |
+| `password.rs` | forgot/reset/change password | 152 |
+| `session.rs` | verify email, refresh, logout, revoke | 218 |
+| `profile.rs` | get_me, update_profile, consent | 78 |
+| `gdpr.rs` | export, delete account, email change | 288 |
+| `mod.rs` | constants (pub), shared helpers, router | — |
+| `helpers.rs` | create_refresh_token, send_verification_email | 75 |
+| `tests.rs` | Tüm test'ler | 100 |
+
+**Visibility kuralı:** Sub-module erişimi için sabitler ve fonksiyonlar `pub` olmalı. `pub(crate)` items `pub use` ile re-export edilemez (E0364).
+
+#### webhooks/handlers.rs → 3 Modül — TAMAMLANDI ✅
+
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `crud.rs` | list, get, get_attempts, export | 270 |
+| `create.rs` | create_webhook, batch_webhooks | 340 |
+| `replay.rs` | replay_webhook, batch_replay | 220 |
+| `helpers.rs` | CSV escape, date parse, rate limiting | 243 |
+| `tests.rs` | Tüm test'ler | 125 |
+
+#### teams/handlers.rs → 3 Modül — TAMAMLANDI ✅
+
+| Dosya | İçerik | Satır |
+|-------|--------|-------|
+| `team.rs` | create, list, get, update, delete, leave, transfer | 310 |
+| `members.rs` | list_members, remove_member, change_role | 150 |
+| `invites.rs` | invite, accept, revoke, resend | 280 |
+| `rbac.rs` | RBAC fonksiyonları (önceden ayrı) | — |
+| `tests.rs` | Tüm test'ler | 280 |
+
+### Eski Split'ler (Önceki Oturumlar)
+
+#### worker/main.rs Bölme — TAMAMLANDI ✅
 
 Orijinal `main.rs` (1883 satır) 8 dosyaya bölündü:
 
@@ -166,6 +206,9 @@ Orijinal `api.ts` (1369 satır) 5 dosyaya bölündü:
 8. **Private type'lar pub yapılmalı** — handler fonksiyonun parametre/return type'ı pub olmalı
 9. **Adım adım böl** — tek seferde tüm dosyayı değil, bir parçayı çıkar, cargo check et
 10. **Rust kurulu değilse** — `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y` ile kur
+11. **Sub-module visibility:** Parent mod.rs'deki sabitler/fonksiyonlar `pub` olmalı (sub-module `use super::X` ile erişir)
+12. **`pub(crate)` items `pub use` ile re-export edilemez** — E0364 hatası. Ya `pub` yap ya da re-export etme
+13. **`mod_defs` modülü gereksiz** — doğrudan `use super::X;` daha temiz
 
 ### Dashboard Hook Bölme — TAMAMLANDI ✅ (2026-05-25, 2. oturum)
 
