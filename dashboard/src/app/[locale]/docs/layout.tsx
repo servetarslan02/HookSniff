@@ -4,7 +4,8 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import Footer from '@/components/Footer';
-import { useState, useEffect, useRef } from 'react';
+import { SkeletonDocs } from '@/components/LoadingSkeletons';
+import { useState, useEffect, useRef, Suspense } from 'react';
 
 interface NavItem {
   name: string;
@@ -267,7 +268,9 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
           {/* ─── Content ─── */}
           <main className="flex-1 min-w-0 py-8 lg:py-10">
-            <div className="max-w-4xl">{children}</div>
+            <Suspense fallback={<SkeletonDocs />}>
+              <div className="max-w-4xl">{children}</div>
+            </Suspense>
           </main>
         </div>
       </div>

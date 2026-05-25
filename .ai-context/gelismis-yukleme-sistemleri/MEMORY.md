@@ -63,6 +63,23 @@ HookSniff dashboard'unda **172 sayfa** var. Tüm sayfaları zirve performans tek
 2. **PLAN.md v2 güncellendi** — 14 katman
 3. **NEXT_SESSION.md v2 güncellendi** — Tüm adımların detaylı talimatları
 
+### 2026-05-26 — Üçüncü Oturum (OpenClaw — Servet)
+
+#### Yapılan
+1. **Adım 1 tamamlandı: Layout Suspense Boundaries**
+   - `LoadingSkeletons.tsx` oluşturuldu (3 skeleton bileşeni)
+   - Dashboard layout → Suspense + SkeletonDashboard
+   - Admin layout → Suspense + SkeletonAdmin
+   - Docs layout → Suspense + SkeletonDocs
+   - Etki: 172 sayfa otomatik loading skeleton alır
+
+#### Plan Değerlendirmesi (OpenClaw)
+- Plan genel olarak iyi yapılandırılmış
+- Zamanlama gerçekçi değil: 13 adım × ~1.5 saat = ~20 oturum
+- Incremental rollout önerisi: her katmanda 3-5 sayfada başla
+- "use cache" + dinamik veri = stale data riski
+- Performans baseline (Lighthouse) ölçümü eksik
+
 ---
 
 ## 🎯 Kritik Sayfalar (En Yavaş)
