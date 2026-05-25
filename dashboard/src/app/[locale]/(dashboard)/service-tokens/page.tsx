@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useServiceTokens, useCreateServiceToken, useDeleteServiceToken, useRevealServiceToken, useUpdateServiceToken } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
+import { VirtualTable } from '@/components/VirtualTable';
 import { ClipboardList, Eye, EyeOff } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -123,53 +124,51 @@ export default function ServiceTokensPage() {
       )}
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                <th className="px-3 sm:px-6 py-3">{t('name')}</th>
-                <th className="px-3 sm:px-6 py-3">{t('token')}</th>
-                <th className="px-3 sm:px-6 py-3 hidden sm:table-cell">{t('createdAt')}</th>
-                <th className="px-3 sm:px-6 py-3 text-right">{tc('actions')}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
-              {tokens.length === 0 ? (
-                <tr><td colSpan={4} className="px-6 py-12 text-center text-sm text-gray-500 dark:text-slate-400">{t('noTokens')}</td></tr>
-              ) : tokens.map((tok) => (
-                <tr key={tok.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                  <td className="px-3 sm:px-6 py-3">
-                    {editingId === tok.id ? (
-                      <div className="flex items-center gap-2">
-                        <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="px-2 py-1 text-sm rounded-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent" autoFocus onKeyDown={(e) => { if (e.key === 'Enter') handleEditSave(); if (e.key === 'Escape') setEditingId(null); }} />
-                        <button onClick={handleEditSave} disabled={updateToken.isPending} className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-medium">{updateToken.isPending ? tc('saving') : tc('save')}</button>
-                        <button onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs">{tc('cancel')}</button>
-                      </div>
-                    ) : (
-                      <span className="font-medium text-gray-900 dark:text-white">{tok.name}</span>
-                    )}
-                  </td>
-                  <td className="px-3 sm:px-6 py-3">
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <code className="text-xs font-mono text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-gray-700 px-1.5 sm:px-2 py-1 rounded-sm select-all truncate max-w-[120px] sm:max-w-none">{revealedTokens[tok.id] || tok.token_prefix || '••••••••••••••••'}</code>
-                      <button onClick={() => handleReveal(tok.id)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={revealedTokens[tok.id] ? t('hide') : t('reveal')}>{revealedTokens[tok.id] ? <EyeOff size={16} strokeWidth={1.75} /> : <Eye size={16} strokeWidth={1.75} />}</button>
-                      <button onClick={() => handleCopy(String(revealedTokens[tok.id] || tok.token_prefix || ''))} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition hidden sm:inline-flex" title={tc('copyToClipboard')}><ClipboardList size={18} strokeWidth={1.75} /></button>
+        {tokens.length === 0 ? (
+          <div className="px-6 py-12 text-center text-sm text-gray-500 dark:text-slate-400">{t('noTokens')}</div>
+        ) : (
+          <VirtualTable
+            data={tokens}
+            estimateSize={64}
+            header={
+              <div className="grid grid-cols-[minmax(120px,1fr)_minmax(160px,2fr)_140px_140px] text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
+                <div className="px-3 sm:px-6 py-3">{t('name')}</div>
+                <div className="px-3 sm:px-6 py-3">{t('token')}</div>
+                <div className="px-3 sm:px-6 py-3 hidden sm:block">{t('createdAt')}</div>
+                <div className="px-3 sm:px-6 py-3 text-right">{tc('actions')}</div>
+              </div>
+            }
+            renderRow={(tok) => (
+              <div className="grid grid-cols-[minmax(120px,1fr)_minmax(160px,2fr)_140px_140px] hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors border-b border-gray-100 dark:divide-gray-700/50">
+                <div className="px-3 sm:px-6 py-3 flex items-center">
+                  {editingId === tok.id ? (
+                    <div className="flex items-center gap-2">
+                      <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="px-2 py-1 text-sm rounded-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent" autoFocus onKeyDown={(e) => { if (e.key === 'Enter') handleEditSave(); if (e.key === 'Escape') setEditingId(null); }} />
+                      <button onClick={handleEditSave} disabled={updateToken.isPending} className="text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-medium">{updateToken.isPending ? tc('saving') : tc('save')}</button>
+                      <button onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs">{tc('cancel')}</button>
                     </div>
-                  </td>
-                  <td className="px-3 sm:px-6 py-3 text-gray-500 dark:text-slate-400 text-xs hidden sm:table-cell">{formatDate(tok.created_at)}</td>
-                  <td className="px-3 sm:px-6 py-3">
-                    <div className="flex items-center justify-end gap-1.5 sm:gap-2">
-                      <RoleGuard require="canManageApiKeys">
-                        <button onClick={() => { setEditingId(tok.id); setEditName(tok.name); }} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition">{tc('edit')}</button>
-                        <button onClick={() => setDeleteId(tok.id)} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition">{tc('delete')}</button>
-                      </RoleGuard>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  ) : (
+                    <span className="font-medium text-gray-900 dark:text-white">{tok.name}</span>
+                  )}
+                </div>
+                <div className="px-3 sm:px-6 py-3 flex items-center">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <code className="text-xs font-mono text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-gray-700 px-1.5 sm:px-2 py-1 rounded-sm select-all truncate max-w-[120px] sm:max-w-none">{revealedTokens[tok.id] || tok.token_prefix || '••••••••••••••••'}</code>
+                    <button onClick={() => handleReveal(tok.id)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition" title={revealedTokens[tok.id] ? t('hide') : t('reveal')}>{revealedTokens[tok.id] ? <EyeOff size={16} strokeWidth={1.75} /> : <Eye size={16} strokeWidth={1.75} />}</button>
+                    <button onClick={() => handleCopy(String(revealedTokens[tok.id] || tok.token_prefix || ''))} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition hidden sm:inline-flex" title={tc('copyToClipboard')}><ClipboardList size={18} strokeWidth={1.75} /></button>
+                  </div>
+                </div>
+                <div className="px-3 sm:px-6 py-3 text-gray-500 dark:text-slate-400 text-xs hidden sm:flex items-center">{formatDate(tok.created_at)}</div>
+                <div className="px-3 sm:px-6 py-3 flex items-center justify-end gap-1.5 sm:gap-2">
+                  <RoleGuard require="canManageApiKeys">
+                    <button onClick={() => { setEditingId(tok.id); setEditName(tok.name); }} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition">{tc('edit')}</button>
+                    <button onClick={() => setDeleteId(tok.id)} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition">{tc('delete')}</button>
+                  </RoleGuard>
+                </div>
+              </div>
+            )}
+          />
+        )}
         <div className="flex justify-end px-6 py-4 border-t border-gray-200 dark:border-gray-700">
           <RoleGuard require="canManageApiKeys">
             <button onClick={() => setShowCreate(!showCreate)} className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">+ {t('createToken')}</button>
