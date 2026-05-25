@@ -12,11 +12,12 @@
 cd /root/.openclaw/workspace/HookSniff
 git pull origin main
 
-# 2. Hafıza oku
-cat .ai-context/gelismis-yukleme-sistemleri/PLAN.md
-cat .ai-context/gelismis-yukleme-sistemleri/NEXT_SESSION.md      ← BU DOSYA
-cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
-cat .ai-context/gelismis-yukleme-sistemleri/PAGE_TRACKER.md
+# 2. Hafıza oku (ÖNCELİK SIRASI!)
+cat .ai-context/gelismis-yukleme-sistemleri/ESKI_VS_YENI.md      ← ⚠️ İLK BUNU OKU — hangi dosyalara dokunulmaz
+cat .ai-context/gelismis-yukleme-sistemleri/NEXT_SESSION.md      ← BU DOSYA — sıradaki adım
+cat .ai-context/gelismis-yukleme-sistemleri/PAGE_TRACKER.md      ← Sayfa takibi
+cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md            ← Yapılan işler
+cat .ai-context/gelismis-yukleme-sistemleri/PLAN.md              ← Genel plan
 
 # 3. Kalınan yerden devam et (aşağıdaki "Sıradaki Adım" bölümüne bak)
 ```
@@ -486,10 +487,28 @@ ANALYZE=true npm run build
 
 1. **Tek seferde bir adım** — Birden fazla adımı aynı anda yapma
 2. **Her adımda test** — `cargo check + cargo test + npm run build`
-3. **Eski kodu silme** — Sadece üstüne ekle
+3. **Eski kodu silme** — Sadece üstüne ekle (ESKI_VS_YENI.md'ye bak)
 4. **Commit at** — Her başarılı adımda commit + push
 5. **PAGE_TRACKER.md güncelle** — Hangi sayfa tamamlandı işaretle
 6. **MEMORY.md güncelle** — Oturum sonunda bulguları kaydet
+7. **ESKI_VS_YENI.md oku** — Her oturum başında hangi dosyalara dokunulmayacağını bil
+
+### 🚫 DOKUNULMAYACAK DOSYALAR
+- `hooks/useEndpoints.ts`, `useWebhooks.ts`, `useBilling.ts`, vb. (26 hook)
+- `lib/api.ts`, `lib/api-types.ts`, `lib/store.tsx`, `lib/errors.ts`
+- `components/StatusBadge.tsx`, `ConfirmDialog.tsx`, `Toast.tsx`, vb.
+- `api/src/`, `worker/src/`, `common/src/` (Rust kodu)
+- Sayfa bileşenleri (sadece layout Suspense sarmalar)
+
+### ✅ DEĞİŞTİRİLEBİLECEK DOSYALAR
+- `components/LoadingSkeletons.tsx` (yeni oluşturulacak)
+- `components/VirtualList.tsx` (zaten var)
+- `hooks/useVirtualList.ts` (yeni oluşturulacak)
+- `hooks/useDebouncedSearch.ts` (yeni oluşturulacak)
+- `app/[locale]/providers.tsx` (zaten güncellendi)
+- `app/[locale]/(dashboard)/layout.tsx` (Suspense eklenecek)
+- `app/[locale]/admin/layout.tsx` (Suspense eklenecek)
+- `app/[locale]/docs/layout.tsx` (Suspense eklenecek)
 
 ---
 
