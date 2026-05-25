@@ -6,6 +6,7 @@ import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useTranslations } from 'next-intl';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { Plus, Trash2, RefreshCw, Check, X, ClipboardList, Search, Pencil, Clock, Shuffle } from '@/components/icons';
 
 interface Coupon {
@@ -46,7 +47,7 @@ export default function CouponsContent() {
   const [toggling, setToggling] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<Coupon | null>(null);
-  const [search, setSearch] = useState('');
+  const { input: search, deferredValue: debouncedSearch, handleChange: handleSearchChange } = useDebouncedSearch();
   const [typeFilter, setTypeFilter] = useState('');
 
   // Create / Edit form state
@@ -234,7 +235,7 @@ export default function CouponsContent() {
 
   // ── Filter ──
   const filteredCoupons = coupons.filter((c) => {
-    if (search && !c.code.toLowerCase().includes(search.toLowerCase())) return false;
+    if (debouncedSearch && !c.code.toLowerCase().includes(debouncedSearch.toLowerCase())) return false;
     if (typeFilter && c.type !== typeFilter) return false;
     return true;
   });
@@ -278,7 +279,7 @@ export default function CouponsContent() {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleSearchChange}
             placeholder={t('searchCoupons') || t('searchCoupons')}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
           />
@@ -389,8 +390,8 @@ export default function CouponsContent() {
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700/50 flex items-center justify-between">
           <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('couponCount', { count: filteredCoupons.length }) || `${filteredCoupons.length} kupon`}</span>
-          {(search || typeFilter) && (
-            <button type="button" onClick={() => { setSearch(''); setTypeFilter(''); }} className="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300">{t('clearFilters') || 'Filtreleri temizle'}</button>
+          {(debouncedSearch || typeFilter) && (
+            <button type="button" onClick={() => { handleSearchChange({ target: { value: '' } } as React.ChangeEvent<HTMLInputElement>); setTypeFilter(''); }} className="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300">{t('clearFilters') || 'Filtreleri temizle'}</button>
           )}
         </div>
         {filteredCoupons.length === 0 ? (
