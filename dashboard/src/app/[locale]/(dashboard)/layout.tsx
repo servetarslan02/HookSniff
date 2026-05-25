@@ -14,6 +14,7 @@ import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { BroadcastBanner } from '@/components/BroadcastBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { SkeletonDashboard } from '@/components/LoadingSkeletons';
+import { ViewTransition } from '@/components/ViewTransition';
 import { useRealtime } from '@/hooks/useRealtime';
 import { useIdleTimeout } from '@/hooks/useIdleTimeout';
 import { apiFetch, statsApi, webhooksApi, analyticsApi, operationalWebhooksApi, environmentsApi, endpointsApi, applicationsApi } from '@/lib/api';
@@ -332,7 +333,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           <BroadcastBanner />
           <ErrorBoundary>
             <Suspense fallback={<SkeletonDashboard />}>
-              {children}
+              <ViewTransition>{children}</ViewTransition>
             </Suspense>
           </ErrorBoundary>
         </main>
