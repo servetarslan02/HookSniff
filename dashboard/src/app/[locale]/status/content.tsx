@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { API_BASE } from '@/lib/api';
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 import type { StatusData, HistoryDay, Incident, Maintenance } from './components/types';

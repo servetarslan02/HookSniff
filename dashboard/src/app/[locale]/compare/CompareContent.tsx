@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Inbox, Anchor, Check, X, AlertTriangle, LinkIcon } from '@/components/icons';
 

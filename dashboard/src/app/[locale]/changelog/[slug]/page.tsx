@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import Image from 'next/image';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 

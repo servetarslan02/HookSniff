@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { AlertTriangle, FlaskConical, Lightbulb, Lock, ShieldCheck, Zap } from '@/components/icons';
 
 /* ─── Timeout-aware fetch helper ─── */

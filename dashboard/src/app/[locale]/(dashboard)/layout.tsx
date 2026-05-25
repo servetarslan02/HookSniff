@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
-import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import { usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/lib/store';

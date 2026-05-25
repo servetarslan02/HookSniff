@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { Clock , Check, X } from '@/components/icons';
 import { useSearchParams } from 'next/navigation';
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { useToast } from '@/components/Toast';
 import { API_BASE } from '@/lib/api';
 

@@ -4,7 +4,8 @@ import { Check, X } from '@/components/icons';
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import { Link, useRouter } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
+import { useRouter } from '@/i18n/navigation';
 import { API_BASE } from '@/lib/api';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
