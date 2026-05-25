@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { ViewTransition } from '@/components/ViewTransition';
 
 export const metadata: Metadata = {
   title: 'Newsletter — HookSniff',
@@ -20,5 +21,5 @@ export const metadata: Metadata = {
 };
 
 export default function NewsletterLayout({ children }: { children: React.ReactNode }) {
-  return <Suspense>{children}</Suspense>;
+  return <Suspense><ViewTransition>{children}</ViewTransition></Suspense>;
 }
