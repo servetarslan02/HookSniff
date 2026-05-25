@@ -23,6 +23,7 @@ use tokio::sync::Mutex;
 
 // Re-export handler functions for router
 use handlers::*;
+use config::*;
 use scim::*;
 use login::{initiate_sso_login, list_sso_providers};
 use saml_handler::saml_callback;
