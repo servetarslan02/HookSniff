@@ -1,4 +1,3 @@
-"use cache";
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { SecurityPageContent } from './content';

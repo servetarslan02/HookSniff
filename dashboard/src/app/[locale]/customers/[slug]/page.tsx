@@ -3,7 +3,6 @@ import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { AlertTriangle } from '@/components/icons';
 
-export const revalidate = 3600;
 export const metadata = { title: 'Customer Stories — HookSniff' };
 
 const storySlugs = [

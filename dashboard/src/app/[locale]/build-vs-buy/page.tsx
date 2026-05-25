@@ -1,7 +1,5 @@
 import BuildVsBuyContent from './BuildVsBuyContent';
 
-// Revalidate every hour for ISR
-export const revalidate = 3600;
 
 
 export const metadata = {

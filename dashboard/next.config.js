@@ -6,16 +6,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    cacheComponents: true,
-    turbo: true,
-    reactCompiler: true,
-  },
+  turbopack: {},
+  experimental: {},
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   images: {
     formats: ['image/avif', 'image/webp'],

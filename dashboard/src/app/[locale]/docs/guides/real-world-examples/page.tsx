@@ -2,7 +2,6 @@ import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { Bell, Building2, DollarSign, Globe, Rocket, ShoppingCart } from '@/components/icons';
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Real-World Examples — HookSniff Docs',

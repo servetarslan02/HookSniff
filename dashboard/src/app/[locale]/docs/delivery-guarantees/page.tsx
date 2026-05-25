@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Check } from '@/components/icons';
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
  title: 'Delivery Guarantees',

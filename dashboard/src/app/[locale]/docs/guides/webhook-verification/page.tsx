@@ -3,7 +3,6 @@ import { Check, Lock, RefreshCw, Ruler, Shield, X } from '@/components/icons';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Webhook Verification — HookSniff Docs',

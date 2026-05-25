@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Building2 , Check, X } from '@/components/icons';
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Multi-Tenant Webhooks — HookSniff Docs',

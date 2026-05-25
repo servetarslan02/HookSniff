@@ -7,8 +7,6 @@ export const metadata: Metadata = {
   description: 'Get up and running with HookSniff in minutes',
 };
 
-// ISR: revalidate every hour
-export const revalidate = 3600;
 
 export default function GetStartedPage() {
   return (

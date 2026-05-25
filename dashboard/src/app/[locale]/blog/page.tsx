@@ -7,8 +7,6 @@ export const metadata: Metadata = {
   description: 'Insights on webhooks, API design, and developer tools from HookSniff',
 };
 
-// ISR: revalidate every hour
-export const revalidate = 3600;
 
 export default function BlogPage() {
   return (

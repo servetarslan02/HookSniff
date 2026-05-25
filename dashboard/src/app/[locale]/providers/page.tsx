@@ -12,8 +12,6 @@ function GithubIcon({ size = 32, strokeWidth = 1.5, ...props }: { size?: number;
   );
 }
 
-// Revalidate every hour for ISR
-export const revalidate = 3600;
 
 
 export const metadata = {
