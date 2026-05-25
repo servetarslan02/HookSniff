@@ -87,7 +87,7 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md            ← Yapılan i�
 - admin/security/page.tsx (IP arama kutusu var)
 
 | 2 | Virtual Scrolling | 3 | ✅ | 2026-05-26 | 0981bc4a, 805a5b67, 6d33f997, bde296d8, dd3bdceb |
-| 3 | Concurrent Features | 4 | 🔄 | 2026-05-26 | e3b74c99 |
+| 3 | Concurrent Features | 4 | ✅ | 2026-05-26 | e3b74c99, c6b29fda |
 | 4 | Akıllı Prefetch | 5 | ⏳ | — | — |
 | 5 | Turbopack | 8 | ⏳ | — | — |
 | 6 | React Compiler | 9 | ⏳ | — | — |
