@@ -4060,7 +4060,8 @@
     "continuityHooksniff": "Open-source (MIT). Self-hostable. No vendor lock-in. Growing community.",
     "continuitySvix": "YC/a16z backed. Powers Fortune 500 webhooks. Years of production history.",
     "continuityHookdeck": "VC-backed. Established customer base. SOC 2 certified.",
-    "continuityHook0": "Bootstrapped, no VC. '100% bootstrapped, we are here to stay.'"
+    "continuityHook0": "Bootstrapped, no VC. '100% bootstrapped, we are here to stay.'",
+    "sdks": "SDKs"
   },
   "customers": {
     "title": "Customer Stories",
@@ -4122,7 +4123,8 @@
     "quoteNeuralOpsShort": "HookSniff is the nervous system for our AI agent fleet. Events trigger actions in real-time.",
     "quoteCloudSyncShort": "Free tier that actually works. We process 8K webhooks/month without paying a cent.",
     "quoteMedConnect": "GDPR compliance and EU data processing were non-negotiable. HookSniff checked every box.",
-    "quoteBuildKit": "The webhook playground and 11 SDKs made integration a breeze. Our developers love it."
+    "quoteBuildKit": "The webhook playground and 11 SDKs made integration a breeze. Our developers love it.",
+    "backToList": "Back to Customer Stories"
   },
   "providers": {
     "title": "Providers",
@@ -4649,7 +4651,25 @@
     "cvCon1": "Go-only SDK",
     "cvCon2": "Smaller ecosystem",
     "cvCon3": "No managed cloud offering",
-    "cvCon4": "No longer actively maintained"
+    "cvCon4": "No longer actively maintained",
+    "hooksniffPro1": "Best price/feature ratio ($24/mo)",
+    "hooksniffPro2": "11 SDKs covering every major language",
+    "hooksniffPro3": "FIFO delivery + CloudEvents + Schema Registry",
+    "hooksniffCon1": "Younger product, less enterprise trust",
+    "hooksniffCon2": "SOC 2 audit in progress (not Type 2 yet)",
+    "hookdeckPro1": "Advanced routing and filtering",
+    "hookdeckPro2": "99.999% uptime SLA",
+    "hookdeckCon1": "Closed-source, cloud-only",
+    "hookdeckCon2": "Usage-based pricing can get expensive",
+    "hook0Pro1": "100% self-hosted, European data sovereignty",
+    "hook0Pro2": "Free and open-source",
+    "hook0Con1": "Only 4 SDKs",
+    "hook0Con2": "No SOC 2 or compliance certifications",
+    "convoyPro1": "Lightweight, Go-native",
+    "convoyPro2": "Free and open-source",
+    "convoyCon1": "Only 1 SDK (Go)",
+    "convoyCon2": "No longer actively maintained",
+    "pricingFree": "Free"
   },
   "cookieConsent": {
     "title": "Cookie Consent",

@@ -1,5 +1,11 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import { BlogPostContent } from './BlogPostContent';
+import { posts } from '@/lib/blog/data';
+
+export async function generateStaticParams() {
+  return Object.keys(posts).map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
   const { slug } = await params;

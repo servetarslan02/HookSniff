@@ -5,7 +5,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
 import { Lightbulb, X, Check, Link as LinkIcon } from '@/components/icons';
 
-export function HookdeckContent() 
+export function HookdeckContent() {
   const t = useTranslations('alternatives');
   const tc = useTranslations('compare');
 
@@ -24,6 +24,7 @@ export function HookdeckContent()
   ];
 
   return (
+    <div>
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
@@ -84,3 +85,4 @@ export function HookdeckContent()
     </div>
   );
 
+}
