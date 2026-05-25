@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, API_BASE, type AdminUser } from '@/lib/api';
 import { useAdminUsers, useUpdateUserPlan, useUpdateUserStatus } from '@/hooks/useAdminData';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { useTranslations, useLocale } from 'next-intl';
 import { UserFilters } from './components/UserFilters';
 import { BulkActions } from './components/BulkActions';
@@ -32,7 +33,7 @@ export default function AdminUsersPage() {
   const { toast } = useToast();
   const locale = useLocale();
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
+  const { input: search, deferredValue: debouncedSearch, handleChange: handleSearchChange } = useDebouncedSearch();
   const [planFilter, setPlanFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [dateRange, setDateRange] = useState('');
@@ -63,7 +64,7 @@ export default function AdminUsersPage() {
   // React Query — replaces fetchUsers + useState + useEffect
   const { data, isLoading } = useAdminUsers({
     page,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     plan: planFilter || undefined,
     status: statusFilter || undefined,
     created_after: dateParams,
@@ -257,7 +258,7 @@ export default function AdminUsersPage() {
       {/* Search & Filters */}
       <UserFilters
         search={search}
-        setSearch={setSearch}
+        setSearch={handleSearchChange}
         planFilter={planFilter}
         setPlanFilter={setPlanFilter}
         statusFilter={statusFilter}
