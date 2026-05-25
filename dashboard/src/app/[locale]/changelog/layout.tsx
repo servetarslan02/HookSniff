@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { ViewTransition } from '@/components/ViewTransition';
 
 export const metadata: Metadata = {
   title: 'Changelog — HookSniff',
@@ -25,5 +26,5 @@ export const metadata: Metadata = {
 };
 
 export default function ChangelogLayout({ children }: { children: React.ReactNode }) {
-  return <Suspense>{children}</Suspense>;
+  return <Suspense><ViewTransition>{children}</ViewTransition></Suspense>;
 }
