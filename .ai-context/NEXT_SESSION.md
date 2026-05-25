@@ -1,6 +1,6 @@
 # NEXT_SESSION.md — Sonraki Oturum Planı
 
-> Son güncelleme: 2026-05-25 GMT+8 (OpenClaw oturumu — 4 dosya split)
+> Son güncelleme: 2026-05-25 GMT+8 (OpenClaw oturumu — 11 dosya split, 15 yeni dosya)
 
 ## 🚀 Hızlı Başlangıç
 
@@ -13,6 +13,27 @@
 ---
 
 ## ✅ Tamamlanan İşler (Önceki Oturumlar)
+
+### OpenClaw Split — 2026-05-25 (11 dosya, 15 yeni dosya) ✅
+
+| Dosya | Önce | Sonra | Azalma |
+|-------|------|-------|--------|
+| main.rs | 788 | 331 | %58 |
+| models/customer.rs | 691 | 270 | %61 |
+| events/publisher.rs | 657 | 261 | %60 |
+| models/delivery.rs | 624 | 219 | %65 |
+| ws/handler.rs | 569 | 306 | %46 |
+| schemas/mod.rs | 562 | 338 | %40 |
+| retry_policy/mod.rs | 659 | 466 | %29 |
+| billing/iyzico.rs | 661 | 482 | %27 |
+| routes/endpoints.rs | 656 | 509 | %22 |
+| routes/health.rs | 663 | 541 | %18 |
+| fifo/mod.rs | 769 | 635 | %17 |
+| **TOPLAM** | **8265** | **4956** | **%40** |
+
+Yeni dosyalar: cors.rs, background.rs, 8× tests.rs (her biri mod.rs + tests.rs yapısı)
+
+Push: fd2828fa, 5bae3af0, bef66ce1, f06e4486
 
 ### Dashboard Hook Split (tamamlandı ✅)
 - `useDashboardData.ts`: 1106 → 172 satır (%84 küçülme)
@@ -30,18 +51,20 @@
 
 ---
 
-## 🟡 Kalan Dosyalar (Split Gereken — Düşük Öncelik)
+## 🟡 Kalan Dosyalar (600+ satır — Düşük Öncelik)
 
-> 2026-05-25: auth, webhooks, teams split'leri TAMAMLANDI ✅
+> 2026-05-25: test çıkarma split'leri tamamlandı. Kalan dosyalar saf iş mantığı, split için refactor gerekir.
 
-| Dosya | Satır | Öncelik |
-|-------|-------|---------|
-| `routes/billing/subscription.rs` | 797 | Düşük |
-| `main.rs` | 788 | Düşük (zor split) |
-| `routes/oauth.rs` | 776 | Düşük |
-| `fifo/mod.rs` | 769 | Düşük |
-| `SsoContent.tsx` | 1167 | Düşük (handler'lar state'e çok bağlı) |
-| `admin/cortex/page.tsx` | 956 | Düşük |
+| Dosya | Satır | Not |
+|-------|-------|-----|
+| `routes/sso/scim.rs` | 743 | Saf SCIM endpoint kodu |
+| `routes/stream.rs` | 671 | Saf streaming kodu |
+| `middleware/mod.rs` | 642 | Zaten split edildi (tests ayrı) |
+| `fifo/mod.rs` | 635 | Zaten split edildi (tests ayrı) |
+| `templates/library/template_defs.rs` | 630 | Template veri tanımları |
+| `routes/integrations.rs` | 620 | Saf endpoint kodu |
+| `routes/inbound/tests.rs` | 593 | Zaten test dosyası |
+| `routes/sso/config.rs` | 585 | Saf SSO config kodu |
 
 ### 2026-05-25 OpenClaw Split'leri — TAMAMLANDI ✅
 
@@ -143,6 +166,8 @@
 4. **External crate'ler** her dosyada ayrı import edilmeli
 5. **Cross-module fonksiyon** çağrısı prefix gerekli (`helpers::fn_name`)
 6. **Adım adım böl**, her adımda `cargo check`
+7. **Test çıkarma** — `file.rs` → `file/mod.rs` + `file/tests.rs` (dizin modülü gerekli)
+8. **`file.rs` + `file/` dizini bir arada OLAMAZ** — ya `file.rs` ya `file/mod.rs`
 
 ---
 
