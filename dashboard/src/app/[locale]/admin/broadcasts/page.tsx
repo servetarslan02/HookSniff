@@ -8,6 +8,7 @@ import { useAdminBroadcasts } from '@/hooks/useAdminData';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualList } from '@/components/VirtualList';
 import {
   Megaphone,
   Plus,
@@ -408,11 +409,16 @@ export default function AdminBroadcastsPage() {
           <p className="text-gray-400 dark:text-slate-500 text-xs mt-1">Create your first broadcast announcement above</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {broadcasts.map((b) => (
+        <VirtualList
+          items={broadcasts}
+          height={600}
+          itemHeight={100}
+          overscan={5}
+          keyExtractor={(b) => b.id}
+          emptyMessage="No broadcasts yet"
+          renderItem={(b) => (
             <div
-              key={b.id}
-              className={`glass-card p-4 transition-all ${
+              className={`glass-card p-4 mb-3 transition-all ${
                 !b.is_active ? 'opacity-60' : ''
               } ${
                 b.severity === 'critical' ? 'border-l-4 border-red-500' :
@@ -461,8 +467,8 @@ export default function AdminBroadcastsPage() {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        />
       )}
 
       {/* Delete Confirmation */}
