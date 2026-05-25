@@ -1,17 +1,26 @@
-pub mod handlers;
 pub mod helpers;
+pub mod credentials;
+pub mod password;
+pub mod session;
+pub mod profile;
+pub mod gdpr;
 mod tests;
 
-use handlers::*;
+// Re-export all handler functions so the router sees them
+pub use credentials::{register, login};
+pub use password::{forgot_password, reset_password, change_password};
+pub use session::{verify_email, resend_verification, refresh_token, logout, revoke_current_token, revoke_all_tokens};
+pub use profile::{get_me, update_profile, get_consent, update_consent};
+pub use gdpr::{export_data, delete_account, request_email_change, confirm_email_change};
 
 // Re-export for external modules (auth_2fa, oauth, inbound, middleware)
 pub use helpers::create_refresh_token;
+
 use axum::http::{HeaderMap, HeaderValue};
 use axum::response::IntoResponse;
 use axum::routing::{get, post, put};
 use axum::{Json, Router};
 use chrono::{Duration, Utc};
-use serde::Deserialize;
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
@@ -30,28 +39,26 @@ use crate::models::customer::{
 };
 
 // ════════════════════════════════════════════════════════
-// Constants
+// Constants (pub within auth module — sub-modules use `super::CONSTANT`)
 // ════════════════════════════════════════════════════════
 
-const LOGIN_RATE_LIMIT: u32 = 10;
-const REGISTER_RATE_LIMIT: u32 = 5;
+pub const LOGIN_RATE_LIMIT: u32 = 10;
+pub const REGISTER_RATE_LIMIT: u32 = 5;
 /// HS-039: Access token lifetime — 15 minutes (short-lived for security).
-/// Proactive refresh on the frontend renews it at ~12 min while the user is active.
-/// Idle timeout (1 hour) handles logout for inactive users.
-const TOKEN_MAX_AGE: i64 = 3600;   // 1 hour (matches JWT expiry)
-const REFRESH_TOKEN_MAX_AGE: i64 = 7776000;  // 90 days
-const RESET_RATE_LIMIT: u32 = 5;
-const VERIFY_EMAIL_RATE_LIMIT: u32 = 10;
-const REFRESH_RATE_LIMIT: u32 = 30;
+pub const TOKEN_MAX_AGE: i64 = 3600;   // 1 hour (matches JWT expiry)
+pub const REFRESH_TOKEN_MAX_AGE: i64 = 7776000;  // 90 days
+pub const RESET_RATE_LIMIT: u32 = 5;
+pub const VERIFY_EMAIL_RATE_LIMIT: u32 = 10;
+pub const REFRESH_RATE_LIMIT: u32 = 30;
 
 /// Full SELECT for Customer — used by auth and auth_2fa modules.
-pub(crate) const CUSTOMER_SELECT: &str = "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, current_period_end, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at, paused_at, paused_until, pause_plan, billing_interval, has_used_startup_trial, avatar_url FROM customers";
+pub const CUSTOMER_SELECT: &str = "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, current_period_end, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at, paused_at, paused_until, pause_plan, billing_interval, has_used_startup_trial, avatar_url FROM customers";
 
 // ════════════════════════════════════════════════════════
-// Helpers
+// Shared helpers (sub-modules call `super::function_name()`)
 // ════════════════════════════════════════════════════════
 
-fn validate_password_strength(password: &str) -> Result<(), AppError> {
+pub fn validate_password_strength(password: &str) -> Result<(), AppError> {
     if password.len() < 8 {
         return Err(AppError::coded(ErrorCode::PasswordTooShort));
     }
@@ -80,8 +87,6 @@ pub fn auth_response_with_cookie(body: AuthResponse) -> (HeaderMap, Json<serde_j
         headers.append("set-cookie", HeaderValue::from_str(&refresh_cookie).unwrap_or_else(|_| HeaderValue::from_static("")));
     }
 
-    // Include refresh_token in body so frontend can store it in localStorage as fallback
-    // (Vercel proxy doesn't forward Set-Cookie from upstream API)
     let mut response = serde_json::json!({ "token": body.token, "customer": body.customer });
     if let Some(ref rt) = body.refresh_token {
         response["refresh_token"] = serde_json::json!(rt);
@@ -112,7 +117,6 @@ pub async fn send_audit_log(pool: &PgPool, customer_id: Uuid, action: &str, head
 }
 
 /// Send email via job queue with fallback to direct send.
-/// `send_direct` is called as fallback when job queue is unavailable or enqueue fails.
 pub async fn send_email_with_fallback<F>(
     job_queue: Option<&crate::jobs::job_queue::JobQueue>,
     email_provider: &crate::email::EmailProvider,
@@ -176,4 +180,3 @@ pub fn router() -> Router {
 
     public.merge(protected)
 }
-
