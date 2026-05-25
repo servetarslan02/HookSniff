@@ -1563,3 +1563,48 @@ Servet ile OpenClaw oturumu. Gelişmiş Yükleme Sistemleri planı incelendi. Ad
 ### Sonraki Adım:
 - Adım 2: Virtual Scrolling (Katman 3) — `deliveries`, `endpoints`, `logs` sayfalarıyla başla
 - node_modules kurulu değil → Servet'in ortamında `npm run build` ile doğrula
+
+## 📝 Son Oturum (2026-05-26 05:16–05:25 — SEO Canonical Fix)
+
+### Özet
+Servet ile OpenClaw oturumu. Google Search Console'daki 5 dizin hatası incelendi, 4 dosyada canonical düzeltmesi yapıldı.
+
+### Search Console Bulguları (7 sayfa etkilenmiş)
+1. **`/en/docs`** — "Kullanıcı tarafından seçilen standart sayfa olmadan kopya" → Root layout canonical'ı tüm sayfaları `/en`'e yönlendiriyordu
+2. **`/tr`** — "Yönlendirmeli sayfa" → 307 redirect, normal davranış
+3. **`/blog/webhook-architecture-deep-dive`** — "Tarandı ama dizine eklenmemiş" → Google'ın içerik kalitesi kararı, teknik sorun yok
+4. **`/en/register`** — "Tarandı ama dizine eklenmemiş" → Redirect sayfası, noindex eklenmeli
+5. **`/en`** — "Google farklı canonical seçti" → Root layout hatası
+6. **`/de/docs/self-hosting`** + **`/ko/docs/self-hosting`** — "Doğru canonical'lı alternatif sayfa" → Normal (de/ko locale'leri aktif değil)
+
+### Yapılan Düzeltmeler
+- `layout.tsx`: Root layout'tan `canonical: /{locale}` kaldırıldı (tüm sayfaları homepage'e yönlendiriyordu)
+- `page.tsx` (home): `canonical: /` eklendi
+- `docs/page.tsx`: `canonical: /docs` eklendi
+- `register/page.tsx`: `canonical: /login` + `robots: noindex` eklendi
+
+### Push: de1f68ba
+
+## 📝 Son Oturum (2026-05-26 05:16–06:12 — Webhook Hızlandırma + SEO + Grafana)
+
+### Yapılan İşler:
+1. **SEO Canonical Fix** — 4 dosya, push `de1f68ba`
+   - Root layout canonical hatası düzeltildi (tüm sayfalar /en'e yönlendiriyordu)
+   - Home, docs, register sayfalarına per-page canonical eklendi
+   - Google Search Console'da 5/5 doğrulama başlatıldı
+2. **Grafana Worker Down Alert** — pause edildi (API: `glsa_EvV4uYJF4e9oOdmVLXgJ6rqa6JkrQVG1_50d9e12f`)
+3. **Webhook Hızlandırma Projesi** — `.ai-context/webhook-hizlandirma-projesi/` klasörü oluşturuldu
+   - RAPOR.md: Sektör analizi (Stripe, Svix, Hookdeck)
+   - PLAN.md v4: Redis Streams + HTTP/2 + 3 katmanlı retry
+   - TEKNIK-DETAY.md: Kod örnekleri
+   - INCELEME.md: 11 alternatif analizi
+   - DUZELTMELER.md: 7 kritik düzeltme
+4. **Upstash Redis kotası dolmuş** — 500K/500K cmd kullanılmış
+
+### Kararlar:
+- Redis Streams queue kullanılacak (PostgreSQL queue'nun yerine)
+- HTTP/2 connection pooling eklenecek
+- 3 katmanlı retry (100ms, 300ms, 500ms transient)
+- Upstash Redis kotası yenilenmeli veya yeni DB oluşturulmalı
+
+### Push: de1f68ba, 66286777, efae618f, 4d23377b, 229a0516, f43a8af9
