@@ -19,10 +19,7 @@
 ### Karar 1: Redis Streams (QStash/NATS Değil)
 - **Tarih:** 2026-05-26
 - **Sebep:** Mevcut Upstash Redis zaten kurulu, < 1ms gecikme, $0.20/100K komut
-- **Alternatifler reddedildi:**
-  - QStash: Daha pahalı ($1/100K), daha yavaş (~10-50ms), free tier düşük
-  - NATS: Ek servis gerekir, performans farkı minimal
-  - PG Outbox: Hâlâ PG polling,Redis kadar hızlı değil
+- **Alternatifler reddedildi:** QStash (pahalı+yavaş), NATS (ek servis), PG Outbox (yavaş)
 
 ### Karar 2: Redis-First + PG Fallback (Dual-Write Değil)
 - **Tarih:** 2026-05-26
@@ -31,19 +28,29 @@
 
 ### Karar 3: 3 Katmanlı Retry (Hookdeck Modeli)
 - **Tarih:** 2026-05-26
-- **Sebep:** Geçici hatalarda 30s → 100ms, kalıcı hatalarda boşuna retry yok
-- **Katmanlar:**
-  - Tier 1: 100ms, 300ms, 500ms (transient)
-  - Tier 2: 1m, 5m, 15m, 1h, 4h (server error)
-  - Tier 3: 6h, 12h, 24h (endpoint down, 3 gün)
+- **Katmanlar:** Tier 1 (100ms/300ms/500ms), Tier 2 (1m-4h), Tier 3 (6h-24h)
 
 ### Karar 4: Signing Secret In-Memory Cache
 - **Tarih:** 2026-05-26
-- **Sebep:** Her webhook'ta DB sorgusu gereksiz, 5 dk TTL yeterli
+- **Sebep:** Her webhook'ta DB sorgusu gereksiz, 5 dk TTL
 
 ### Karar 5: Retry'ları PG'de Tut
 - **Tarih:** 2026-05-26
-- **Sebep:** Mevcut `next_retry_at` mantığı zaten var, Redis retry stream ek karmaşıklık
+- **Sebep:** Mevcut `next_retry_at` mantığı zaten var
+
+### Karar 6: Feature Flag ile Deploy
+- **Tarih:** 2026-05-26
+- **Sebep:** `USE_REDIS_QUEUE` env var ile runtime'da toggle, anında geri dönüş
+- **Deploy sırası:** Worker önce → API sonra → Feature flag aç
+
+### Karar 7: FIFO Endpoint'leri PG'de Bırak
+- **Tarih:** 2026-05-26
+- **Sebep:** Redis Streams paralel okuma FIFO'yu bozabilir, mevcut PG mantığı güvenli
+- **İleride:** FIFO için ayrı stream açılabilir
+
+### Karar 8: Redis maxmemory-policy = noeviction
+- **Tarih:** 2026-05-26
+- **Sebep:** Queue dolarsa hata versin (PG fallback), mesaj silinmesin
 
 ---
 
@@ -54,23 +61,23 @@
 3. **ConnectionManager Clone:** redis crate v1.2.1'de Clone implement ediyor ✅
 4. **Consumer name uniqueness:** `worker-{pid}` formatı kullanılmalı
 5. **Upstash free tier:** 500K komut/ay — mevcut 2-5K webhook/ay için yeterli
+6. **Deploy sırası:** Worker önce deploy, API sonra, en son feature flag aç
+7. **Redis OOM:** `noeviction` — OOM'da PG fallback otomatik devreye girer
 
 ---
 
-## 📁 Dosya Yapısı
+## 📁 Dosya Yapısı (Güncel)
 
 ```
 webhook-hizlandirma-projesi/
-├── UYGULAMA-PLANI.md    ← TÜM PLAN TEK BELGEDE (ana doküman)
+├── UYGULAMA-PLANI.md    ← TÜM PLAN TEK BELDE (13 bölüm, 1700+ satır)
 ├── MEMORY.md            ← Bu dosya (hafıza)
 ├── NEXT_SESSION.md      ← Sonraki oturum rehberi
-├── RAPOR.md             ← Derin analiz raporu
-├── PLAN.md              ← Eski plan (v4 final)
-├── TEKNIK-DETAY.md      ← Teknik detaylar
-├── INCELEME.md          ← Plan incelemesi
-├── DUZELTMELER.md       ← Düzeltmeler
 └── README.md            ← Klasör rehberi
 ```
+
+> Eski dosyalar (RAPOR.md, PLAN.md, TEKNIK-DETAY.md, INCELEME.md, DUZELTMELER.md)
+> UYGULAMA-PLANI.md'ye entegre edildi ve silindi.
 
 ---
 
@@ -79,19 +86,12 @@ webhook-hizlandirma-projesi/
 | Faz | Durum | Tarih | Not |
 |-----|-------|-------|-----|
 | Faz 1: Redis Streams | ⏳ Bekliyor | — | En kritik faz |
+| Faz 1 Ek: Production Config | ⏳ Bekliyor | — | Feature flag, deploy, FIFO, OOM |
 | Faz 2: HTTP/2 | ⏳ Bekliyor | — | |
 | Faz 3: 3 Katmanlı Retry | ⏳ Bekliyor | — | |
 | Faz 4: DNS + SSRF Cache | ⏳ Bekliyor | — | |
 | Faz 5: Dynamic Concurrency | ⏳ Bekliyor | — | |
 | Faz 6: Batch Processing | ⏳ Bekliyor | — | |
-
----
-
-## 📚 Referanslar
-
-- Svix Redis Streams: https://www.svix.com/resources/guides/redis-message-queue/
-- Hookdeck Webhooks at Scale: https://hookdeck.com/blog/webhooks-at-scale
-- Redis Streams Docs: https://redis.io/docs/latest/develop/data-types/streams/
 
 ---
 
