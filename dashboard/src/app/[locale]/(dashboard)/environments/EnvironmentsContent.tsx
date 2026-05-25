@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { AlertTriangle, Globe, Lock } from '@/components/icons';
+import { VirtualList } from '@/components/VirtualList';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 export function EnvironmentsContent() {
@@ -209,9 +210,15 @@ export function EnvironmentsContent() {
 
       {/* ── Environment Cards ── */}
       {!isLoading && !error && envs.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {envs.map(env => (
-            <div key={env.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition">
+        <VirtualList
+          items={envs}
+          height={Math.min(envs.length * 160, 500)}
+          itemHeight={160}
+          overscan={2}
+          keyExtractor={(env) => env.id}
+          emptyMessage={t('noEnvironments')}
+          renderItem={(env) => (
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition mb-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: env.color || '#6b7280' }} />
@@ -241,8 +248,8 @@ export function EnvironmentsContent() {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        />
       )}
 
       {/* ── Create Environment Modal ── */}
