@@ -7,8 +7,6 @@ export const metadata: Metadata = {
   description: 'Simple, transparent pricing for webhook delivery. Start free, scale when ready',
 };
 
-// ISR: revalidate every hour
-export const revalidate = 3600;
 
 export default function PricingPage() {
   return (

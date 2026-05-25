@@ -2,7 +2,6 @@ import CodeBlock from '@/components/CodeBlock';
 import { BarChart3, DollarSign, Package, Plug, Radio, RefreshCw, Shuffle } from '@/components/icons';
 import type { Metadata } from 'next';
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
  title: 'Migration from Svix — HookSniff Docs',

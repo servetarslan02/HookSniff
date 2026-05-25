@@ -3,7 +3,6 @@ import { BarChart3 } from '@/components/icons';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Analytics — HookSniff Docs',

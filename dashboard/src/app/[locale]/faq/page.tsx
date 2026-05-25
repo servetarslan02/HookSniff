@@ -7,8 +7,6 @@ export const metadata: Metadata = {
   description: 'Frequently asked questions about HookSniff',
 };
 
-// ISR: revalidate every hour
-export const revalidate = 3600;
 
 export default function FAQPage() {
   return (

@@ -3,7 +3,6 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
 import { Building2, Lightbulb, X, Check } from '@/components/icons';
 
-export const revalidate = 3600;
 
 export default async function SvixAlternativePage() {
   const t = await getTranslations('alternatives');

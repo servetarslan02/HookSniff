@@ -3,7 +3,6 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
 import { Building2, Link2, Package, Check, X } from '@/components/icons';
 
-export const revalidate = 3600;
 
 export const metadata = {
   title: 'Svix Alternatives — Best Webhook Services Compared (2026) | HookSniff',
