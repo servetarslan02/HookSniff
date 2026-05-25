@@ -14,16 +14,12 @@
 //! - `GET    /v1/integrations/{id}/events`  — List integration events
 //! - `GET    /v1/integrations/{id}/stats`   — Get integration statistics
 
-use axum::extract::{Extension, Path, Query};
 use axum::routing::{get, post};
-use axum::{Json, Router};
+use axum::Router;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::error::AppError;
-use crate::models::customer::Customer;
 
 pub fn router() -> Router {
     Router::new()

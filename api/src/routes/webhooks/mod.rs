@@ -26,7 +26,7 @@ pub fn router() -> Router {
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct ListParams {
+pub struct ListParams {
     pub page: Option<i64>,
     pub per_page: Option<i64>,
     pub status: Option<String>,
@@ -34,7 +34,7 @@ pub(crate) struct ListParams {
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct ExportParams {
+pub struct ExportParams {
     pub format: Option<String>,
     pub status: Option<String>,
     pub date_from: Option<String>,

@@ -8,7 +8,7 @@
 //! Forecasts: success rate, latency, delivery volume
 
 use sqlx::PgPool;
-use super::{get_model_params, save_model_params};
+use super::save_model_params;
 
 /// Time series model stored per endpoint
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]

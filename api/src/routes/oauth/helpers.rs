@@ -1,4 +1,4 @@
-use axum::{extract::Extension, Json};
+use axum::Json;
 use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;

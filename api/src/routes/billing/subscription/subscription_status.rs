@@ -1,5 +1,4 @@
 use super::super::*;
-use crate::error::ErrorCode;
 use serde::{Deserialize, Serialize};
 
 // ──────────────────────────────────────────────────────────────

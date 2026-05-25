@@ -8,7 +8,7 @@ use axum::{
     Json,
 };
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -17,7 +17,7 @@ use crate::crypto;
 use crate::middleware::hash_api_key;
 use crate::models::customer::Customer;
 
-use super::{OidcDiscovery, TeamQuery, UpsertSsoRequest};
+use super::{TeamQuery, UpsertSsoRequest};
 
 // ── GET /sso/config ─────────────────────────────────────────
 

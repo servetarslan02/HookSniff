@@ -20,7 +20,7 @@ use super::{
 pub async fn scim_list_users(
     Extension(pool): Extension<PgPool>,
     headers: HeaderMap,
-    Query(query): Query<std::collections::HashMap<String, String>>,
+    Query(_query): Query<std::collections::HashMap<String, String>>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let config_id = validate_scim_token(&pool, &headers).await?;
 
@@ -32,7 +32,7 @@ pub async fn scim_list_users(
     .fetch_optional(&pool)
     .await?;
 
-    let owner_id = match owner_id {
+    let _owner_id = match owner_id {
         Some((id,)) => id,
         None => return Ok(Json(serde_json::json!({
             "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
@@ -137,7 +137,7 @@ pub async fn scim_create_user(
     .fetch_optional(&pool)
     .await?;
 
-    let default_role = config.and_then(|(r,)| r).unwrap_or_else(|| "viewer".to_string());
+    let _default_role = config.and_then(|(r,)| r).unwrap_or_else(|| "viewer".to_string());
 
     // Find or create customer
     let existing = sqlx::query_as::<_, Customer>(
@@ -230,7 +230,7 @@ pub async fn scim_update_user(
     let customer_id = Uuid::parse_str(&id)
         .map_err(|_| AppError::BadRequest("Invalid user ID".into()))?;
 
-    let customer = sqlx::query_as::<_, Customer>(
+    let _customer = sqlx::query_as::<_, Customer>(
         "SELECT * FROM customers WHERE id = $1"
     )
     .bind(customer_id)

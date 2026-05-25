@@ -9,8 +9,6 @@
 //!
 //! Application: "At night, use strategy A. During peak hours, use strategy B."
 
-use sqlx::PgPool;
-use super::{get_model_params, save_model_params};
 
 /// Contextual bandit model
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]

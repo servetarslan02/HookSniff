@@ -5,7 +5,7 @@ use axum::Json;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::error::{AppError, ErrorCode};
+use crate::error::AppError;
 use crate::models::customer::{Customer, CustomerResponse, UpdateProfileRequest};
 
 // ── Profile ─────────────────────────────────────────────────

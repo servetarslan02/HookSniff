@@ -17,26 +17,17 @@ pub use gdpr::{export_data, delete_account, request_email_change, confirm_email_
 pub use helpers::create_refresh_token;
 
 use axum::http::{HeaderMap, HeaderValue};
-use axum::response::IntoResponse;
 use axum::routing::{get, post, put};
 use axum::{Json, Router};
-use chrono::{Duration, Utc};
-use sqlx::{PgPool, Row};
+use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::auth::jwt;
 use crate::error::ErrorCode;
-use crate::config::Config;
 use crate::error::AppError;
 use crate::middleware::{
-    clear_auth_cookie, clear_refresh_token_cookie, create_auth_cookie, create_refresh_token_cookie,
-    generate_api_key, hash_api_key,
+    create_auth_cookie, create_refresh_token_cookie,
 };
-use crate::models::customer::{
-    AuthResponse, ChangePasswordRequest, CreateCustomerRequest, Customer, CustomerResponse,
-    ForgotPasswordRequest, LoginRequest, RefreshTokenRequest, ResendVerificationRequest,
-    ResetPasswordRequest, TwoFactorRequiredResponse, UpdateProfileRequest, VerifyEmailRequest,
-};
+use crate::models::customer::AuthResponse;
 
 // ════════════════════════════════════════════════════════
 // Constants (pub within auth module — sub-modules use `super::CONSTANT`)

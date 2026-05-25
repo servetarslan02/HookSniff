@@ -1,8 +1,6 @@
 //! Tests for email module.
 
-use super::*;
 use crate::config::Config;
-use base64::Engine;
 
 fn make_test_config() -> Config {
     Config {
