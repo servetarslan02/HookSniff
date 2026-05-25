@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import type { Invoice } from '@/lib/api';
+import { VirtualTable } from '@/components/VirtualTable';
 import { billingApiExtended } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -67,64 +68,40 @@ export function InvoiceTable({
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    {t('invoice')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    {t('date')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    {t('plan')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    {t('amount')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    {t('status')}
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                    {t('actions')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                {invoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
-                    <td className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400">
-                      {inv.id.slice(0, 8)}…
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">
-                      {new Date(inv.date).toLocaleDateString(locale)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">{inv.plan}</span>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                      ${inv.amount.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <InvoiceStatusBadge status={inv.status} />
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleDownloadInvoice(inv)}
-                          disabled={downloadingInvoice === inv.id}
-                          className="text-xs text-gray-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 disabled:opacity-50 flex items-center gap-1"
-                          title={t('downloadInvoice') || 'Download invoice'}
-                        >
-                          <Download size={14} strokeWidth={1.75} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <VirtualTable
+              data={invoices}
+              estimateSize={56}
+              header={
+                <div className="grid grid-cols-[80px_110px_minmax(100px,1fr)_90px_90px_120px] bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50">
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('invoice')}</div>
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('date')}</div>
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('plan')}</div>
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('amount')}</div>
+                  <div className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</div>
+                  <div className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('actions')}</div>
+                </div>
+              }
+              renderRow={(inv) => (
+                <div className="grid grid-cols-[80px_110px_minmax(100px,1fr)_90px_90px_120px] hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition border-b border-gray-200/50 dark:border-slate-700/50">
+                  <div className="px-6 py-4 text-sm font-mono text-gray-600 dark:text-slate-400 flex items-center">{inv.id.slice(0, 8)}…</div>
+                  <div className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400 flex items-center">{new Date(inv.date).toLocaleDateString(locale)}</div>
+                  <div className="px-6 py-4 flex items-center"><span className="text-sm font-medium text-gray-900 dark:text-white">{inv.plan}</span></div>
+                  <div className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white flex items-center">${inv.amount.toFixed(2)}</div>
+                  <div className="px-6 py-4 flex items-center"><InvoiceStatusBadge status={inv.status} /></div>
+                  <div className="px-6 py-4 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadInvoice(inv)}
+                      disabled={downloadingInvoice === inv.id}
+                      className="text-xs text-gray-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 disabled:opacity-50 flex items-center gap-1"
+                      title={t('downloadInvoice') || 'Download invoice'}
+                    >
+                      <Download size={14} strokeWidth={1.75} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            />
           </div>
         )}
       </div>

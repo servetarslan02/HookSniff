@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuditLogs } from '@/hooks/useDashboardData';
+import { VirtualTable } from '@/components/VirtualTable';
 import { ClipboardList, CreditCard, Image, Key, Link2, LogOut, Package, Pencil, Pin, RefreshCw, Settings, Trash2, User, UserMinus, Users } from '@/components/icons';
 
 /* ─── Types ─── */
@@ -80,45 +81,33 @@ export default function AuditLogPage() {
       ) : (
         <div className="glass-card overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colTime')}</th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colAction')}</th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">{t('colActor')}</th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">{t('colResource')}</th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">{t('colDetails')}</th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">{t('colIp')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                {entries.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">
-                      {new Date(entry.timestamp).toLocaleString()}
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        <span>{ACTION_ICONS[entry.action] || <Pin size={16} strokeWidth={1.75} />}</span>
-                        <span className="text-xs sm:text-sm font-mono text-gray-900 dark:text-white">{entry.action}</span>
-                      </div>
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden sm:table-cell">{entry.actor_email || entry.actor}</td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-400 hidden md:table-cell">
-                      {entry.resource_type}/{entry.resource_id?.slice(0, 8)}
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 max-w-xs truncate hidden lg:table-cell">
-                      {entry.details
-                        ? typeof entry.details === 'string'
-                          ? entry.details
-                          : JSON.stringify(entry.details)
-                        : '—'}
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-500 hidden lg:table-cell">{entry.ip_address}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <VirtualTable
+                data={entries}
+                estimateSize={56}
+                header={
+                  <div className="grid grid-cols-[140px_120px_minmax(100px,1fr)_120px_minmax(100px,1fr)_100px] bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50">
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colTime')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colAction')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:block">{t('colActor')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">{t('colResource')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:block">{t('colDetails')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:block">{t('colIp')}</div>
+                  </div>
+                }
+                renderRow={(entry) => (
+                  <div className="grid grid-cols-[140px_120px_minmax(100px,1fr)_120px_minmax(100px,1fr)_100px] hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition border-b border-gray-200/50 dark:border-slate-700/50">
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">{new Date(entry.timestamp).toLocaleString()}</div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 flex items-center gap-1.5 sm:gap-2">
+                      <span>{ACTION_ICONS[entry.action] || <Pin size={16} strokeWidth={1.75} />}</span>
+                      <span className="text-xs sm:text-sm font-mono text-gray-900 dark:text-white">{entry.action}</span>
+                    </div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden sm:flex items-center">{entry.actor_email || entry.actor}</div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-400 hidden md:flex items-center">{entry.resource_type}/{entry.resource_id?.slice(0, 8)}</div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 max-w-xs truncate hidden lg:flex items-center">{entry.details ? (typeof entry.details === 'string' ? entry.details : JSON.stringify(entry.details)) : '—'}</div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-500 hidden lg:flex items-center">{entry.ip_address}</div>
+                  </div>
+                )}
+              />
           </div>
           {hasMore && (
             <div className="p-4 text-center border-t border-gray-200/50 dark:border-slate-700/50">
