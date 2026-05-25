@@ -1,83 +1,84 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-26
+> **Son güncelleme:** 2026-05-26 (OpenClaw oturumu)
 > **Bu dosya her oturum başında okunur.**
 
 ---
 
-## 🚨 ACİL: Build Düzeltmesi
+## ✅ Build Durumu: ÇALIŞIYOR
 
-Son commit (`0f11eca1`) build geçemiyor. 7 content dosyasında parse hatası var.
+Build sorunu çözüldü. `npm run build` → exit 0 ✅
 
-### Sorun
-Content dosyaları (`ConvoyContent.tsx`, `Hook0Content.tsx`, vb.) Python script ile oluşturulurken `</Suspense>` ve `<Suspense>` tag'leri kaldı. Temizlendi ama hâlâ hata var.
-
-### Çözüm
-Her content dosyasını kontrol et:
-1. `import { Suspense } from 'react'` satırı varsa SİL
-2. `<Suspense fallback={...}>` satırı varsa SİL
-3. `</Suspense>` satırı varsa SİL
-4. `'use client';` olduğundan emin ol
-5. `getTranslations` → `useTranslations` (client hook)
-6. `async function` → `function`
-
-Kontrol edilecek dosyalar:
-```
-src/app/[locale]/alternatives/convoy/ConvoyContent.tsx
-src/app/[locale]/alternatives/hook0/Hook0Content.tsx
-src/app/[locale]/alternatives/hookdeck-alternatives/HookdecksContent.tsx
-src/app/[locale]/alternatives/hookdeck/HookdeckContent.tsx
-src/app/[locale]/alternatives/svix-alternatives/SvixsContent.tsx
-src/app/[locale]/alternatives/svix/SvixContent.tsx
-src/app/[locale]/alternatives/webhook-relay/WebhookRelayContent.tsx
-src/app/[locale]/blog/[slug]/BlogPostContent.tsx
-src/app/[locale]/customers/[slug]/CustomerStoryContent.tsx
-```
-
-### Build testi
-```bash
-cd dashboard && npm run build
-```
-
-### Başarılı olursa
-```bash
-git add -A && git commit -m "fix: cacheComponents — content dosyaları temizlendi, build ✅"
-git push origin main
-```
+### Son Yapılan İş (2026-05-26)
+- 40 docs sayfası yeniden yapılandırıldı: `async Content` + `Suspense` wrapper
+- `cacheComponents: true` **açılamıyor** — `next-intl`'in `getTranslations()` server-side Suspense ile uyumsuz
+- `cacheComponents` yorum satırında kaldı, ileride açılabilir
+- Commit: `e538c6c1`
 
 ---
 
-## 📊 Katman Durumu
+## 📊 Katman Durumu (Gelişmiş Yükleme Sistemleri)
 
 | Katman | Durum | Not |
 |--------|-------|-----|
-| 1. React Query | ✅ | Global hook'lar |
-| 2. Suspense Boundaries | ✅ | 5 layout |
-| 3. Virtual Scrolling | ✅ | 21 sayfa + DeliveriesContent |
-| 4. Concurrent Features | ✅ | useDebouncedSearch |
+| 1. React Query | ✅ | 47 dosyada useQuery/useMutation |
+| 2. Suspense Boundaries | ✅ | 3 layout (dashboard, admin, docs) + 40 docs page |
+| 3. Virtual Scrolling | ✅ | VirtualTable, 9 sayfada |
+| 4. Concurrent Features | ✅ | useDebouncedSearch, 8 sayfada |
 | 5. Akıllı Prefetch | ✅ | PrefetchLink |
-| 6. Cache Components | 🔄 | `cacheComponents: true` eklendi, server/client split yapılıyor |
+| 6. Cache Components | ❌ | `next-intl` uyumsuz — ileride açılacak |
 | 7. View Transitions | ✅ | 5 layout |
 | 8. Turbopack | ✅ | Config aktif |
 | 9. React Compiler | ✅ | babel-plugin-react-compiler kuruldu |
 
----
-
-## 🔜 Sonraki Adımlar (Build geçtikten sonra)
-
-1. `npm run build` başarılı olana kadar content dosyalarını temizle
-2. `git push`
-3. Vercel'de deploy kontrol et
-4. Katman 10-14 planına geç (PLAN.md'ye bak)
+**Tüm katmanlar aktif (Cache Components hariç).**
 
 ---
 
-## 📁 Commit Geçmişi (Bugün)
+## 🔜 Sonraki Adımlar
+
+### Öncelik Sırası
+
+1. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
+2. **DB Sorgu Optimizasyonu** — slow query log, index optimizasyonu (6 oturum)
+3. **API Hızlandırma** — auth cache, rate limiting Redis'e taşıma (8 oturum)
+4. **Webhook Hızlandırma** — Redis Streams queue (10 oturum)
+5. **Cold Start** — minScale:1 (0.5 oturum)
+
+### Kritik Notlar
+
+- **Upstash Redis kotası dolmuş** (500K/500K) — yeni hesap veya alternatif gerekli
+- **`cacheComponents: true`** açılamaz — `next-intl` server-side `getTranslations` Suspense gerektiriyor, layout yapısı buna izin vermiyor
+- **Gelişmiş yükleme sistemi** 9/9 katman aktif (cacheComponents hariç)
+- **Dashboard build** stabil, tüm sayfalar derleniyor
+
+---
+
+## 📁 Son Commit'ler
 
 | Commit | Açıklama |
 |--------|----------|
+| `e538c6c1` | refactor: docs pages — async Content + Suspense wrapper (40 pages) |
 | `0f11eca1` | wip: cacheComponents — server/client split devam ediyor |
 | `c0ea8430` | feat: React Compiler — Katman 9 TAMAMLANDI |
 | `34d9ff60` | perf: ViewTransition — changelog + newsletter |
 | `c700b751` | perf: Deliveries VirtualTable |
 | `f62ac666` | fix: build hataları düzeltildi |
+
+---
+
+## 📊 Proje Hızlandırma Planları
+
+7 proje planı `.ai-context/` klasöründe hazır:
+
+| Proje | Oturum | Öncelik |
+|-------|--------|---------|
+| DB Sorgu Optimizasyonu | 6 | 🔴 Yüksek |
+| API Hızlandırma | 8 | 🔴 Yüksek |
+| Webhook Hızlandırma | 10 | 🔴 Yüksek |
+| Cold Start | 4 | 🟡 Orta |
+| WebSocket/SSE | 7 | 🟢 Düşük |
+| Güvenlik Geliştirme | 20 | 🟢 Düşük |
+| Cortex Geliştirme | 19 | 🟢 Düşük |
+
+**Toplam:** ~74 oturum. Önerilen sıra: DB → API → Webhook → Cold Start → diğerleri.
