@@ -1,3 +1,4 @@
+"use cache";
 import type { Metadata } from 'next';
 import CodeBlock from '@/components/CodeBlock';
 
