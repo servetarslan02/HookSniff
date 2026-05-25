@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-25 GMT+8 (Oturum 8 — split'ler + OpenClaw)
+> Son güncelleme: 2026-05-26 GMT+8 (OpenClaw — Katman 5 Akıllı Prefetch tamamlandı)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
