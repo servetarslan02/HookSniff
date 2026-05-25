@@ -30,19 +30,27 @@
 
 ---
 
-## 🟡 Kalan Büyük Dosyalar (Split Gereken)
+## 🟡 Kalan Dosyalar (Split Gereken — Düşük Öncelik)
+
+> 2026-05-25: auth, webhooks, teams split'leri TAMAMLANDI ✅
 
 | Dosya | Satır | Öncelik |
 |-------|-------|---------|
-| `routes/auth/handlers.rs` | 905 | Orta (önceden split edildi, test çıkarılabilir) |
-| `routes/webhooks/handlers.rs` | 851 | Orta (önceden split edildi) |
-| `routes/teams/handlers.rs` | 827 | Orta (önceden split edildi) |
 | `routes/billing/subscription.rs` | 797 | Düşük |
 | `main.rs` | 788 | Düşük (zor split) |
 | `routes/oauth.rs` | 776 | Düşük |
 | `fifo/mod.rs` | 769 | Düşük |
 | `SsoContent.tsx` | 1167 | Düşük (handler'lar state'e çok bağlı) |
 | `admin/cortex/page.tsx` | 956 | Düşük |
+
+### 2026-05-25 Oturum 8 Split'leri — TAMAMLANDI ✅
+
+| Dosya | Önce | Sonra | Azalma |
+|-------|------|-------|--------|
+| auth/handlers.rs | 905 | 5 modül | %100 (silindi) |
+| webhooks/handlers.rs | 851 | 3 modül | %100 (silindi) |
+| teams/handlers.rs | 827 | 3 modül | %100 (silindi) |
+| **Toplam** | **2583** | **11 yeni dosya** | **%100** |
 
 ### 2026-05-25 Split'leri — TAMAMLANDI ✅
 
