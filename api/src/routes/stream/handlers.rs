@@ -1,21 +1,28 @@
 use axum::{
     extract::{Extension, Path, Query},
-    response::Sse,
+    response::sse::{Event, Sse},
     Json,
 };
 use chrono::{DateTime, Utc};
+use futures::stream::Stream;
 use sqlx::PgPool;
+use std::convert::Infallible;
+use std::time::Duration;
+use tokio::time::interval;
 use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
 use crate::routes::teams;
 
-use super::{StreamChannel, StreamMessage, StreamSubscription};
+use super::{
+    ChannelResponse, CreateChannelRequest, MessageFilter, PublishEventRequest, StreamChannel,
+    StreamMessage, StreamParams, StreamSubscription, UpdateChannelRequest,
+};
 
 
 /// List all stream channels for the customer.
-async fn list_channels(
+pub async fn list_channels(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<StreamChannel>>, AppError> {
@@ -35,7 +42,7 @@ async fn list_channels(
 }
 
 /// Create a new stream channel.
-async fn create_channel(
+pub async fn create_channel(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<CreateChannelRequest>,
@@ -63,7 +70,7 @@ async fn create_channel(
 }
 
 /// Get a channel with recent messages.
-async fn get_channel(
+pub async fn get_channel(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -97,7 +104,7 @@ async fn get_channel(
 }
 
 /// Update a channel.
-async fn update_channel(
+pub async fn update_channel(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -133,7 +140,7 @@ async fn update_channel(
 }
 
 /// Delete a channel.
-async fn delete_channel(
+pub async fn delete_channel(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -155,7 +162,7 @@ async fn delete_channel(
 }
 
 /// SSE subscribe to a channel.
-async fn subscribe_to_channel(
+pub async fn subscribe_to_channel(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -311,7 +318,7 @@ async fn subscribe_to_channel(
 }
 
 /// List recent messages for a channel.
-async fn list_messages(
+pub async fn list_messages(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -362,7 +369,7 @@ async fn list_messages(
 }
 
 /// List active subscriptions.
-async fn list_subscriptions(
+pub async fn list_subscriptions(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<StreamSubscription>>, AppError> {
@@ -385,7 +392,7 @@ async fn list_subscriptions(
 }
 
 /// Get a specific subscription.
-async fn get_subscription(
+pub async fn get_subscription(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -408,7 +415,7 @@ async fn get_subscription(
 }
 
 /// Disconnect a subscription.
-async fn disconnect_subscription(
+pub async fn disconnect_subscription(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -440,7 +447,7 @@ async fn disconnect_subscription(
 }
 
 /// SSE delivery stream (legacy compatibility endpoint).
-async fn sse_deliveries_legacy(
+pub async fn sse_deliveries_legacy(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<PublishEventRequest>,
@@ -493,7 +500,7 @@ async fn sse_deliveries_legacy(
 }
 
 /// Publish an event to a stream channel.
-async fn publish_event(
+pub async fn publish_event(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Json(req): Json<PublishEventRequest>,

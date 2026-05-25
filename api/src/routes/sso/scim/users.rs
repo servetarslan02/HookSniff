@@ -11,8 +11,8 @@ use crate::middleware::{generate_api_key, hash_api_key};
 use crate::models::customer::Customer;
 
 use super::{
-    auto_join_team_direct, scim_user_response, store_sso_user_attributes,
-    validate_scim_token, ScimUserRow, SsoUserAttributesRow,
+    auto_join_team_direct, scim_row_to_attrs, scim_row_to_customer, scim_user_response,
+    store_sso_user_attributes, validate_scim_token, ScimUserRow, SsoUserAttributesRow,
 };
 
 // ── GET /scim/v2/Users — List users ────────────────────────

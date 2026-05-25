@@ -7,10 +7,14 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::error::AppError;
+use crate::error::{AppError, ErrorCode};
 use crate::models::customer::Customer;
+use crate::routes::sso::{OidcDiscovery, TeamQuery};
 
-pub struct VerifyDomainResponse { txt_record: String, instructions: String }
+use super::VerifyDomainRequest;
+
+#[derive(Debug, Serialize)]
+pub struct VerifyDomainResponse { pub txt_record: String, pub instructions: String }
 
 // ── Login Attempts ──────────────────────────────────────────
 
