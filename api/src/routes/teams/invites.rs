@@ -3,12 +3,11 @@
 use axum::extract::{Extension, Path};
 use axum::Json;
 use chrono::Utc;
-use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::billing::Plan;
-use crate::error::{AppError, ErrorCode};
+use crate::error::AppError;
 use crate::models::customer::Customer;
 
 use super::{TeamInvite, InviteRequest, AcceptInviteRequest};

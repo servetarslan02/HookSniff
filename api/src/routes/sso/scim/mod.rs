@@ -3,17 +3,13 @@
 //! System for Cross-domain Identity Management (SCIM) 2.0 implementation
 //! for automated user provisioning and deprovisioning.
 
-use axum::{
-    extract::{Extension, Path, Query},
-    http::{HeaderMap, StatusCode},
-    Json,
-};
+use axum::http::HeaderMap;
 use chrono::{DateTime, Utc};
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::AppError;
-use crate::middleware::{generate_api_key, hash_api_key};
+use crate::middleware::hash_api_key;
 use crate::models::customer::Customer;
 
 use super::helpers::{auto_join_team_direct, store_sso_user_attributes};

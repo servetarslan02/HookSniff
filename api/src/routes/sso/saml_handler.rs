@@ -9,8 +9,7 @@ use uuid::Uuid;
 use crate::error::{AppError, ErrorCode};
 use crate::models::customer::Customer;
 
-use super::{SsoLoginState, SsoStateStore};
-use super::config::{SsoConfigRow, sso_config_to_json};
+use super::SsoStateStore;
 use super::saml::{parse_saml_response, verify_saml_signature, xml_has_element};
 use super::helpers::{find_or_create_sso_customer, auto_join_team_direct, resolve_role_from_mapping, resolve_team_from_mapping, store_sso_user_attributes, sync_team_memberships, generate_sso_response, log_sso_attempt};
 

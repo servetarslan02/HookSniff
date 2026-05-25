@@ -14,21 +14,12 @@
 //! - `GET    /v1/stream/deliveries`              — SSE delivery stream (legacy compat)
 //! - `POST   /v1/stream/publish`                 — Publish event to channel
 
-use axum::extract::{Extension, Path, Query};
-use axum::response::sse::{Event, Sse};
 use axum::routing::{get, post};
-use axum::{Json, Router};
+use axum::Router;
 use chrono::{DateTime, Utc};
-use futures::stream::Stream;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
-use std::convert::Infallible;
-use std::time::Duration;
-use tokio::time::interval;
 use uuid::Uuid;
 
-use crate::error::AppError;
-use crate::models::customer::Customer;
 
 pub mod handlers;
 pub use handlers::*;

@@ -178,7 +178,7 @@ pub async fn run_retention(pool: &PgPool, _default_retention_days: i64) -> Resul
         let cutoff = Utc::now() - chrono::Duration::days(retention);
 
         // Archive and delete this customer's old deliveries
-        let archived = sqlx::query(
+        let _archived = sqlx::query(
             r#"
             INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts, created_at)
             SELECT d.id, d.endpoint_id, d.customer_id, d.payload,

@@ -12,7 +12,7 @@ use crate::auth::jwt;
 use crate::error::{AppError, ErrorCode};
 use crate::models::customer::Customer;
 
-use super::{extract_client_ip, send_email_with_fallback};
+use super::send_email_with_fallback;
 use super::helpers::generate_email_change_code;
 
 // ── GDPR ────────────────────────────────────────────────────

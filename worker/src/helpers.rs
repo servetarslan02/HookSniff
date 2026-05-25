@@ -1,7 +1,6 @@
 //! Utility functions for the HookSniff Worker.
 
 use anyhow::Result;
-use sqlx::PgPool;
 
 /// Delivery attempt data for recording
 pub struct AttemptRecord<'a> {

@@ -19,13 +19,10 @@ pub mod extras;
 #[cfg(test)]
 mod tests;
 
-use async_trait::async_trait;
 use hmac::{Hmac, KeyInit, Mac};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
-use uuid::Uuid;
 
-use crate::billing::provider::{CheckoutResult, PaymentProviderImpl, WebhookResult};
 use crate::billing::Plan;
 use crate::error::AppError;
 

@@ -12,11 +12,9 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::error::{AppError, ErrorCode};
-use crate::middleware::generate_api_key;
 use crate::models::customer::Customer;
 
 use super::{SsoLoginQuery, SsoLoginState, SsoProviderQuery, SsoStateStore};
-use super::helpers::{find_or_create_sso_customer, generate_sso_response, log_sso_attempt};
 use super::saml_handler::initiate_saml_login;
 use super::oidc_handler::initiate_oidc_login;
 
