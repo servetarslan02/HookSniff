@@ -1,6 +1,9 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
+import { PrefetchLink } from '@/components/PrefetchLink';
+import { useAuth } from '@/lib/store';
+import { apiFetch } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 import { VirtualTable } from '@/components/VirtualTable';
 import type { AdminUser } from '@/lib/api';
@@ -57,6 +60,15 @@ export function UserTable({
   t,
   tc,
 }: UserTableProps) {
+  const { token } = useAuth();
+
+  // Prefetch user detail on hover
+  const userDetailPrefetch = (id: string) => token ? [
+    { queryKey: ['admin', 'user', id], queryFn: () => apiFetch(`/admin/users/${id}`, { token }), staleTime: 30_000 },
+    { queryKey: ['admin', 'user', id, 'endpoints'], queryFn: () => apiFetch(`/admin/users/${id}/endpoints`, { token }), staleTime: 30_000 },
+    { queryKey: ['admin', 'user', id, 'webhooks'], queryFn: () => apiFetch(`/admin/users/${id}/webhooks`, { token }), staleTime: 30_000 },
+  ] : [];
+
   return (
     <div className="glass-card overflow-hidden">
       {isLoading ? (
@@ -143,7 +155,7 @@ export function UserTable({
             </div>
             <div className="px-3 py-3 sm:py-4 flex items-center">
               <div className="flex items-center gap-1 sm:gap-2">
-                <Link href={`/admin/users/${u.id}`} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">{tc('view')}</Link>
+                <PrefetchLink href={`/admin/users/${u.id}`} prefetchData={userDetailPrefetch(u.id)} hoverDelay={80} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">{tc('view')}</PrefetchLink>
                 <button type="button" onClick={() => { setPlanChangeTarget(u); setNewPlan(u.plan); }} className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium hidden md:inline">{t('changePlan')}</button>
                 <button type="button" onClick={() => handleToggleStatus(u)} className={`text-xs font-medium hidden md:inline ${u.status === 'active' ? 'text-red-600 dark:text-red-400 hover:text-red-700' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'}`}>
                   {u.status === 'active' ? t('banUser') : t('activateUser')}

@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { PrefetchLink } from '@/components/PrefetchLink';
 import { useAuth } from '@/lib/store';
+import { adminApi } from '@/lib/api';
 import { useAdminAuditLogs } from '@/hooks/useAdminData';
 import { useTranslations, useLocale } from 'next-intl';
 import { VirtualList } from '@/components/VirtualList';
@@ -131,8 +133,10 @@ const KNOWN_ACTIONS = [
 const perPage = 20;
 
 export default function AdminActivityPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   if (!user?.is_admin) return null;
+
+  const adminStatsPrefetch = token ? [{ queryKey: ['admin', 'stats'], queryFn: () => adminApi.getStats(token), staleTime: 30_000 }] : [];
 
   const [page, setPage] = useState(1);
   const [actionFilter, setActionFilter] = useState('');
@@ -172,12 +176,14 @@ export default function AdminActivityPage() {
             {t('activityDesc')}
           </p>
         </div>
-        <Link
+        <PrefetchLink
           href="/admin"
+          prefetchData={adminStatsPrefetch}
+          hoverDelay={80}
           className="text-sm text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 transition"
         >
           ← {tc('back')}
-        </Link>
+        </PrefetchLink>
       </div>
 
       {/* Filter */}

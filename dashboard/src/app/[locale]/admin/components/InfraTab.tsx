@@ -1,6 +1,9 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
+import { PrefetchLink } from '@/components/PrefetchLink';
+import { useAuth } from '@/lib/store';
+import { apiFetch } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { Flag, Repeat, Rocket, CheckCircle2, Triangle } from '@/components/icons';
 
@@ -11,6 +14,9 @@ interface InfraTabProps {
 
 export default function InfraTab({ featureFlags, deployInfo }: InfraTabProps) {
   const t = useTranslations('admin');
+  const { token } = useAuth();
+
+  const featureFlagsPrefetch = token ? [{ queryKey: ['admin', 'feature-flags'], queryFn: () => apiFetch('/admin/feature-flags', { token }), staleTime: 30_000 }] : [];
 
   return (
     <>
@@ -38,7 +44,7 @@ export default function InfraTab({ featureFlags, deployInfo }: InfraTabProps) {
         ) : (
           <div className="py-4 text-center">
             <p className="text-sm text-gray-500 dark:text-slate-400">{t('noFeatureFlags') || 'No feature flags configured yet'}</p>
-            <Link href="/admin/feature-flags" className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium mt-1 inline-block">{t('createFlag') || 'Create flag'} →</Link>
+            <PrefetchLink href="/admin/feature-flags" prefetchData={featureFlagsPrefetch} hoverDelay={80} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium mt-1 inline-block">{t('createFlag') || 'Create flag'} →</PrefetchLink>
           </div>
         )}
       </div>
