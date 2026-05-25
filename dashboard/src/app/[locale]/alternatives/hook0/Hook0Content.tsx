@@ -5,10 +5,11 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
 import { Lightbulb, X, Check } from '@/components/icons';
 
-export function Hook0Content() 
+export function Hook0Content() {
   const t = useTranslations('alternatives');
   const tc = useTranslations('compare');
   return (
+    <div>
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
@@ -75,3 +76,4 @@ export function Hook0Content()
     </div>
   );
 
+}

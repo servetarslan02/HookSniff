@@ -4062,7 +4062,8 @@
     "continuityHooksniff": "Açık kaynak (MIT). Kendi kendine barındırılabilir. Satıcı kilidi yok. Büyüyen topluluk.",
     "continuitySvix": "YC/a16z destekli. Fortune 500 webhook'larını çalıştırıyor. Yıllık üretim geçmişi.",
     "continuityHookdeck": "VC destekli. Kurulmuş müşteri tabanı. SOC 2 sertifikalı.",
-    "continuityHook0": "Kendi kendine finanse ediliyor, VC yok. '100% bootstrapped, burada kalacağız.'"
+    "continuityHook0": "Kendi kendine finanse ediliyor, VC yok. '100% bootstrapped, burada kalacağız.'",
+    "sdks": "SDKs"
   },
   "customers": {
     "title": "Müşteri Hikayeleri",
@@ -4124,7 +4125,8 @@
     "quoteNeuralOpsShort": "HookSniff, YZ agent filomuzun sinir sistemi. Olaylar gerçek zamanlı olarak aksiyonları tetikliyor.",
     "quoteCloudSyncShort": "Gerçekten çalışan ücretsiz plan. Ayda 8K webhook'ı bir kuruş ödemeden işliyoruz.",
     "quoteMedConnect": "GDPR uyumluluğu ve AB veri işleme müzakere edilemezdi. HookSniff her kutuyu işaretledi.",
-    "quoteBuildKit": "Webhook playground'ı ve 11 SDK entegrasyonu kolaylaştırdı. Geliştiricilerimiz bayılıyor."
+    "quoteBuildKit": "Webhook playground'ı ve 11 SDK entegrasyonu kolaylaştırdı. Geliştiricilerimiz bayılıyor.",
+    "backToList": "Müşeri Hikayelerine Dön"
   },
   "providers": {
     "title": "Sağlayıcılar",
@@ -4651,7 +4653,25 @@
     "cvCon1": "Yalnızca Go SDK",
     "cvCon2": "Daha küçük ekosistem",
     "cvCon3": "Yönetilen bulut teklifi yok",
-    "cvCon4": "Artık aktif olarak geliştirilmiyor"
+    "cvCon4": "Artık aktif olarak geliştirilmiyor",
+    "hooksniffPro1": "En iyi fiyat/özellik oranı ($24/ay)",
+    "hooksniffPro2": "Her büyük dili kapsayan 11 SDK",
+    "hooksniffPro3": "FIFO teslimat + CloudEvents + Şema Kaydı",
+    "hooksniffCon1": "Daha genç ürün, daha az kurumsal güven",
+    "hooksniffCon2": "SOC 2 denetimi devam ediyor",
+    "hookdeckPro1": "Gelişmiş yönlendirme ve filtreleme",
+    "hookdeckPro2": "%99.999 uptime SLA",
+    "hookdeckCon1": "Kapalı kaynak, sadece bulut",
+    "hookdeckCon2": "Kullanım bazlı fiyatlandırma pahalı olabilir",
+    "hook0Pro1": "%100 kendi kendine barındırma, Avrupa veri egemenliği",
+    "hook0Pro2": "Ücretsiz ve açık kaynak",
+    "hook0Con1": "Sadece 4 SDK",
+    "hook0Con2": "SOC 2 veya uyumluluk sertifikası yok",
+    "convoyPro1": "Hafif, Go-native",
+    "convoyPro2": "Ücretsiz ve açık kaynak",
+    "convoyCon1": "Sadece 1 SDK (Go)",
+    "convoyCon2": "Artık aktif olarak geliştirilmiyor",
+    "pricingFree": "Ücretsiz"
   },
   "cookieConsent": {
     "title": "Çerez Onayı",
