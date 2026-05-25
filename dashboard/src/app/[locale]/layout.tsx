@@ -76,12 +76,14 @@ export async function generateMetadata({
       google: 'TQD51mWwYf0O3V5DviqzU5MZ4I-fKtrrEC66qPOPXzM',
     },
     alternates: {
-      canonical: `https://hooksniff.vercel.app/${locale}`,
       languages: Object.fromEntries(
-        locales.map((l) => [
-          l,
-          `https://hooksniff.vercel.app/${l}`,
-        ])
+        [
+          ...locales.map((l) => [
+            l,
+            `https://hooksniff.vercel.app/${l}`,
+          ]),
+          ['x-default', 'https://hooksniff.vercel.app/en'],
+        ]
       ),
     },
     metadataBase: new URL(
