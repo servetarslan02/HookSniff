@@ -82,6 +82,23 @@ HookSniff dashboard'unda **172 sayfa** var. Tüm sayfaları zirve performans tek
 
 ---
 
+### 2026-05-26 — Dördüncü Oturum (OpenClaw — Servet, devam)
+
+#### Yapılan
+1. **Adım 2 başladı: Virtual Scrolling (Katman 3)**
+   - `LogsContent.tsx` → `VirtualTable` (@tanstack/react-virtual)
+   - `service-tokens/page.tsx` → `VirtualTable`
+   - `admin/users/UserTable.tsx` → `VirtualTable`
+   - Build başarılı ✅
+   - 3/21 liste sayfası virtual scrolling'e geçti
+
+#### Plan Değerlendirmesi (devam)
+- Kalan 18 sayfa bir sonraki oturumda tamamlanacak
+- Card layout sayfalar (endpoints, alerts, transforms) VirtualList bileşeni gerektirir
+- Tablo layout sayfalar (admin/activity, audit-log) VirtualTable ile doğrudan geçebilir
+
+---
+
 ## 🎯 Kritik Sayfalar (En Yavaş)
 
 | Sayfa | Sorun | Öncelik |
