@@ -1608,3 +1608,26 @@ Servet ile OpenClaw oturumu. Google Search Console'daki 5 dizin hatası incelend
 - Upstash Redis kotası yenilenmeli veya yeni DB oluşturulmalı
 
 ### Push: de1f68ba, 66286777, efae618f, 4d23377b, 229a0516, f43a8af9
+
+## 📝 Son Oturum (2026-05-26 07:26–07:50 — OpenClaw İlk Oturum)
+
+### Özet
+Servet ile OpenClaw üzerinden ilk oturum. Proje incelendi, 7 hızlandırma planı değerlendirildi, build düzeltmesi yapıldı.
+
+### Yapılan İşler:
+1. **Proje klonlandı** — HookSniff repo, `.ai-context` hafıza sistemi incelendi
+2. **7 hızlandırma planı değerlendirildi** — Webhook, WebSocket/SSE, Cold Start, Cortex, DB, Güvenlik, API
+   - Cortex (19 oturum) ve Güvenlik (20 oturum) aşırı büyümüş → küçültme önerildi
+   - Fly.io free tier kaldırılmış → alternatif olarak Upstash yeni hesap önerildi
+3. **Build düzeltmesi** — 40 docs sayfası `async Content` + `Suspense` wrapper pattern'e geçirildi
+4. **`cacheComponents: true`** denendi → `next-intl` uyumsuz, açılamıyor
+5. **NEXT_SESSION.md güncellendi**
+
+### Kararlar:
+- Redis alternatifi: Upstash yeni hesap (en kolay, $0)
+- Hızlandırma sıralaması: DB → API → Webhook → Cold Start → diğerleri
+- `cacheComponents` şimdilik kapalı kalacak
+
+### Push: `e538c6c1`
+
+### Build: ✅ exit 0
