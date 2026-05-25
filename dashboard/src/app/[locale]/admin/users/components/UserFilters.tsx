@@ -7,7 +7,7 @@ interface PlanOption {
 
 interface UserFiltersProps {
   search: string;
-  setSearch: (value: string) => void;
+  setSearch: ((value: string) => void) | ((e: React.ChangeEvent<HTMLInputElement>) => void);
   planFilter: string;
   setPlanFilter: (value: string) => void;
   statusFilter: string;
@@ -44,7 +44,7 @@ export function UserFilters({
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={setSearch as (e: React.ChangeEvent<HTMLInputElement>) => void}
             placeholder={t('searchByEmail')}
             aria-label={t('searchByEmail')}
             className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 transition text-sm"

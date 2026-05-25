@@ -8,6 +8,7 @@ import { Link } from '@/i18n/navigation';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { useApplications } from '@/hooks/useDashboardData';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import { VirtualList } from '@/components/VirtualList';
@@ -60,11 +61,11 @@ export default function ApplicationsPage() {
   const [editName, setEditName] = useState('');
   const [editDesc, setEditDesc] = useState('');
   const [editing, setEditing] = useState(false);
-  const [search, setSearch] = useState('');
+  const { input: search, deferredValue: debouncedSearch, handleChange: handleSearchChange } = useDebouncedSearch();
 
   const filteredApps = useMemo(() => {
-    if (!search.trim()) return apps;
-    const q = search.toLowerCase();
+    if (!debouncedSearch.trim()) return apps;
+    const q = debouncedSearch.toLowerCase();
     return apps.filter(
       (app) =>
         app.name.toLowerCase().includes(q) ||
@@ -184,7 +185,7 @@ export default function ApplicationsPage() {
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={handleSearchChange}
           placeholder={t('searchPlaceholder') || 'Search for a specific application...'}
           className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
         />
