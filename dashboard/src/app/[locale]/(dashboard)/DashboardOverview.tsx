@@ -16,11 +16,30 @@ import {
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
 import { Link } from '@/i18n/navigation';
+import { PrefetchLink } from '@/components/PrefetchLink';
+import { useAuth } from '@/lib/store';
+import { apiFetch, applicationsApi, webhooksApi, endpointsApi, analyticsApi } from '@/lib/api';
 import { Settings, Eye, EyeOff, Link2, Package, FlaskConical, TrendingUp, Inbox, RefreshCw } from '@/components/icons';
 
 export function DashboardOverview() {
   const t = useTranslations('dashboard');
   const tc = useTranslations('common');
+  const { token } = useAuth();
+
+  // Prefetch data for quick action links
+  const deliveryPrefetch = token ? [
+    { queryKey: ['webhooks', { page: 1 }], queryFn: () => webhooksApi.list(token, { page: 1 }), staleTime: 15_000 },
+  ] : [];
+  const appPrefetch = token ? [
+    { queryKey: ['applications'], queryFn: () => applicationsApi.list(token), staleTime: 30_000 },
+  ] : [];
+  const devtoolsPrefetch = token ? [
+    { queryKey: ['endpoints'], queryFn: () => endpointsApi.list(token), staleTime: 30_000 },
+  ] : [];
+  const analyticsPrefetch = token ? [
+    { queryKey: ['analytics', 'success-rate', '24h'], queryFn: () => analyticsApi.successRate(token, '24h'), staleTime: 30_000 },
+    { queryKey: ['analytics', 'delivery-trend', '7d'], queryFn: () => analyticsApi.deliveryTrend(token, '7d'), staleTime: 30_000 },
+  ] : [];
 
   const [widgets, setWidgets] = useState<WidgetConfig[]>(loadWidgetConfig);
   const [showWidgetSettings, setShowWidgetSettings] = useState(false);
@@ -351,34 +370,42 @@ export function DashboardOverview() {
               {t('quickActions')}
             </h4>
             <div className="space-y-2">
-              <Link
+              <PrefetchLink
                 href="/applications"
+                prefetchData={appPrefetch}
+                hoverDelay={80}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 <Link2 size={16} strokeWidth={1.75} className="text-gray-400" />
                 {t('manageEndpoints')}
-              </Link>
-              <Link
+              </PrefetchLink>
+              <PrefetchLink
                 href="/deliveries"
+                prefetchData={deliveryPrefetch}
+                hoverDelay={80}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 <Package size={16} strokeWidth={1.75} className="text-gray-400" />
                 {t('viewDeliveries')}
-              </Link>
-              <Link
+              </PrefetchLink>
+              <PrefetchLink
                 href="/devtools"
+                prefetchData={devtoolsPrefetch}
+                hoverDelay={80}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 <FlaskConical size={16} strokeWidth={1.75} className="text-gray-400" />
                 {t('openPlayground')}
-              </Link>
-              <Link
+              </PrefetchLink>
+              <PrefetchLink
                 href="/observability"
+                prefetchData={analyticsPrefetch}
+                hoverDelay={80}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
               >
                 <TrendingUp size={16} strokeWidth={1.75} className="text-gray-400" />
                 {t('viewAnalytics')}
-              </Link>
+              </PrefetchLink>
             </div>
           </div>
         </div>
@@ -405,12 +432,14 @@ export function DashboardOverview() {
           <h3 className="text-base font-semibold text-gray-900 dark:text-white">
             {t('recentDeliveries')}
           </h3>
-          <Link
+          <PrefetchLink
             href="/deliveries"
+            prefetchData={deliveryPrefetch}
+            hoverDelay={80}
             className="text-sm text-brand-600 dark:text-brand-400 hover:underline font-medium"
           >
             {t('viewAll')}
-          </Link>
+          </PrefetchLink>
         </div>
 
         {loading ? (
@@ -425,12 +454,14 @@ export function DashboardOverview() {
             <p className="text-gray-500 dark:text-slate-500 text-sm">
               {t('noDeliveries')}
             </p>
-            <Link
+            <PrefetchLink
               href="/devtools"
+              prefetchData={devtoolsPrefetch}
+              hoverDelay={80}
               className="inline-block mt-3 px-4 py-2 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-700 transition"
             >
               {t('tryPlayground')}
-            </Link>
+            </PrefetchLink>
           </div>
         ) : (
           <div className="overflow-x-auto">

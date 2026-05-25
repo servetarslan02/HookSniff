@@ -16,7 +16,9 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { SkeletonDashboard } from '@/components/LoadingSkeletons';
 import { useRealtime } from '@/hooks/useRealtime';
 import { useIdleTimeout } from '@/hooks/useIdleTimeout';
-import { apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
+import { apiFetch, statsApi, webhooksApi, analyticsApi, operationalWebhooksApi, environmentsApi, endpointsApi, applicationsApi } from '@/lib/api';
+import { teamsApi, notificationsApi, alertsApi } from '@/lib/api-teams';
+import { integrationsApi, connectorsApi } from '@/lib/api-integrations';
 import { usePermissions } from '@/hooks/usePermissions';
 import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, BookOpen, ExternalLink, LogOut, Shield, Globe } from '@/components/icons';
 
@@ -45,7 +47,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
-  // Prefetch API data for a route on hover
+  // Prefetch API data for a route on hover — all sidebar routes covered
   const prefetchForRoute = (href: string) => {
     if (!token) return [];
     const base = [
@@ -57,7 +59,19 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           ...base,
           { queryKey: ['webhooks', { page: 1 }], queryFn: () => webhooksApi.list(token, { page: 1 }), staleTime: 15_000 },
           { queryKey: ['analytics', 'delivery-trend', '7d'], queryFn: () => analyticsApi.deliveryTrend(token, '7d'), staleTime: 30_000 },
-          { queryKey: ['endpoints'], queryFn: () => apiFetch('/endpoints', { token }), staleTime: 30_000 },
+          { queryKey: ['endpoints'], queryFn: () => endpointsApi.list(token), staleTime: 30_000 },
+        ];
+      case '/applications':
+        return [
+          { queryKey: ['applications'], queryFn: () => applicationsApi.list(token), staleTime: 30_000 },
+        ];
+      case '/organization':
+        return [
+          { queryKey: ['teams'], queryFn: () => teamsApi.list(token), staleTime: 30_000 },
+        ];
+      case '/operational-webhooks':
+        return [
+          { queryKey: ['operational-webhooks'], queryFn: () => operationalWebhooksApi.list(token), staleTime: 30_000 },
         ];
       case '/observability':
         return [
@@ -65,9 +79,24 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           { queryKey: ['delivery-logs', { page: 1 }], queryFn: () => webhooksApi.list(token, { page: 1 }), staleTime: 15_000 },
           { queryKey: ['analytics', 'success-rate', '24h'], queryFn: () => analyticsApi.successRate(token, '24h'), staleTime: 30_000 },
         ];
-      case '/applications':
+      case '/devtools':
         return [
-          { queryKey: ['applications'], queryFn: () => apiFetch('/applications', { token }), staleTime: 30_000 },
+          { queryKey: ['endpoints'], queryFn: () => endpointsApi.list(token), staleTime: 30_000 },
+          { queryKey: ['schemas'], queryFn: () => apiFetch('/schemas', { token }), staleTime: 60_000 },
+        ];
+      case '/integrations':
+        return [
+          { queryKey: ['connectors'], queryFn: () => connectorsApi.list(token), staleTime: 30_000 },
+          { queryKey: ['integrations'], queryFn: () => integrationsApi.list(token), staleTime: 30_000 },
+        ];
+      case '/custom-domain':
+        return [
+          { queryKey: ['custom-domain'], queryFn: () => apiFetch('/custom-domain', { token }), staleTime: 60_000 },
+        ];
+      case '/routing-config':
+        return [
+          { queryKey: ['routing-rules'], queryFn: () => apiFetch('/routing/rules', { token }), staleTime: 30_000 },
+          { queryKey: ['endpoints'], queryFn: () => endpointsApi.list(token), staleTime: 30_000 },
         ];
       case '/account':
         return [
@@ -78,10 +107,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         return [
           { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
           { queryKey: ['billing', 'subscription'], queryFn: () => apiFetch('/billing/subscription', { token }), staleTime: 60_000 },
-        ];
-      case '/organization':
-        return [
-          { queryKey: ['teams'], queryFn: () => apiFetch('/teams', { token }), staleTime: 30_000 },
         ];
       default:
         return base;
