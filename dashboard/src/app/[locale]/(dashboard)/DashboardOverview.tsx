@@ -479,9 +479,9 @@ export function DashboardOverview() {
                 {recentDeliveries.map((d) => (
                   <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
                     <td className="px-3 sm:px-4 py-2 sm:py-3">
-                      <Link href={`/deliveries/${d.id}`} className="font-mono text-xs text-brand-600 dark:text-brand-400 hover:underline">
+                      <PrefetchLink href={`/deliveries/${d.id}`} prefetchData={token ? [{ queryKey: ['delivery', d.id], queryFn: () => apiFetch(`/webhooks/${d.id}`, { token }), staleTime: 30_000 }] : []} hoverDelay={80} className="font-mono text-xs text-brand-600 dark:text-brand-400 hover:underline">
                         {d.id.slice(0, 8)}…
-                      </Link>
+                      </PrefetchLink>
                     </td>
                     <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-700 dark:text-slate-300">{d.event || '—'}</td>
                     <td className="px-3 sm:px-4 py-2 sm:py-3">
