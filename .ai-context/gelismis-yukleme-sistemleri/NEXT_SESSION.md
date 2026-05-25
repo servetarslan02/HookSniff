@@ -29,6 +29,7 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md            ← Yapılan i�
 |---|------|--------|-------|-------|--------|
 | 0 | QueryClient optimizasyonu | 1 | ✅ | 2026-05-25 | 707b64e0 |
 | 1 | Layout Suspense Boundaries | 2 | ✅ | 2026-05-26 | (pending push) |
+| 2 | Virtual Scrolling (partial) | 3 | 🔄 | 2026-05-26 | 0981bc4a |
 
 ### Adım 1 Detay — Layout Suspense Boundaries (2026-05-26)
 
@@ -40,7 +41,37 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md            ← Yapılan i�
 
 **Etki:** 172 sayfa — tüm dashboard/admin/docs sayfaları otomatik loading skeleton alır
 
-**Sonraki adım:** Adım 2 — Virtual Scrolling (Katman 3)
+**Sonraki adım:** Adım 2 — Virtual Scrolling (Katman 3) — DEVAM
+
+### Adım 2 Detay — Virtual Scrolling (2026-05-26, partial)
+
+**Yapılan:**
+- `LogsContent.tsx` → `VirtualTable` (@tanstack/react-virtual)
+- `service-tokens/page.tsx` → `VirtualTable`
+- `admin/users/UserTable.tsx` → `VirtualTable`
+- Build başarılı ✅
+
+**Kalan (18 sayfa):**
+- endpoints/EndpointsContent.tsx (card layout → VirtualList)
+- notifications/page.tsx (list layout → VirtualList)
+- alerts/page.tsx (list layout → VirtualList)
+- transforms/page.tsx (card layout)
+- templates/page.tsx (card layout)
+- environments/EnvironmentsContent.tsx
+- schemas/page.tsx
+- audit-log/page.tsx
+- search/page.tsx
+- admin/alerts/page.tsx
+- admin/feature-flags/page.tsx
+- admin/activity/page.tsx (grid layout → VirtualTable)
+- operational-webhooks/OperationalWebhooksList.tsx (card layout)
+- inbound/InboundContent.tsx (card layout)
+- applications/page.tsx
+- team/components/TeamList.tsx (list layout)
+- api-keys/components/KeyList.tsx (list layout)
+- billing/components/InvoiceTable.tsx
+
+**Sonraki adım:** Adım 3 — Concurrent Features (Katman 4)
 | 2 | Virtual Scrolling | 3 | ⏳ | — | — |
 | 3 | Concurrent Features | 4 | ⏳ | — | — |
 | 4 | Akıllı Prefetch | 5 | ⏳ | — | — |
