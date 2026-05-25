@@ -13,6 +13,7 @@ import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
 import { BarChart3, Brain, Users, DollarSign, Flag, Monitor, Settings, ClipboardList, Bell, Mail, Zap, Lock, Shield, FolderOpen, RefreshCw } from '@/components/icons';
 import { SkeletonAdmin } from '@/components/LoadingSkeletons';
+import { ViewTransition } from '@/components/ViewTransition';
 
 // Lazy-load heavy components — not needed for initial paint
 const AdminNotificationCenter = lazy(() =>
@@ -320,7 +321,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         {/* Item 127/128 — Page content with ARIA landmark and skip-to-content target */}
         <main id="admin-main-content" role="main" className="p-3 sm:p-4 md:p-6 lg:p-8 page-enter">
           <Suspense fallback={<SkeletonAdmin />}>
-            {children}
+            <ViewTransition>{children}</ViewTransition>
           </Suspense>
         </main>
       </div>
