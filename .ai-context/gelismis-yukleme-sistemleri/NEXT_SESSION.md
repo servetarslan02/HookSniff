@@ -71,9 +71,25 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md            ← Yapılan i�
 - operational-webhooks/OperationalWebhooksList.tsx (az kayıt)
 - inbound/InboundContent.tsx (az kayıt)
 
-**Sonraki adım:** Adım 3 — Concurrent Features (Katman 4)
+**Sonraki adım:** Adım 4 — Akıllı Prefetch (Katman 5)
+
+### Adım 3 Detay — Concurrent Features (2026-05-26) 🔄 DEVAM
+
+**Yapılan:**
+- `useDebouncedSearch.ts` hook oluşturuldu (useDeferredValue tabanlı)
+- `deliveries/DeliveriesContent.tsx` → useDebouncedSearch
+- `logs/LogsContent.tsx` → useDebouncedSearch
+- `applications/page.tsx` → useDebouncedSearch
+- `admin/users/page.tsx` → useDebouncedSearch
+- Build başarılı ✅
+
+**Kalan:**
+- search/page.tsx (arama kutusu var)
+- admin/coupons/content.tsx (arama kutusu var)
+- admin/security/page.tsx (IP arama kutusu var)
+
 | 2 | Virtual Scrolling | 3 | ✅ | 2026-05-26 | 0981bc4a, 805a5b67, 6d33f997, bde296d8 |
-| 3 | Concurrent Features | 4 | ⏳ | — | — |
+| 3 | Concurrent Features | 4 | 🔄 | 2026-05-26 | e3b74c99 |
 | 4 | Akıllı Prefetch | 5 | ⏳ | — | — |
 | 5 | Turbopack | 8 | ⏳ | — | — |
 | 6 | React Compiler | 9 | ⏳ | — | — |
