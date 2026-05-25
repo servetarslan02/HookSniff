@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
+import { VirtualTable } from '@/components/VirtualTable';
 import { useSearch } from '@/hooks/useDashboardData';
 import { StatusBadge } from '@/components/StatusBadge';
 
@@ -90,30 +91,30 @@ export default function SearchPage() {
               <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{total.toLocaleString()} result{total !== 1 ? 's' : ''}</span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">ID</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('event')}</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('status')}</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase hidden sm:table-cell">{t('endpoint')}</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase hidden md:table-cell">{t('attempts')}</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase hidden lg:table-cell">{t('time')}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                  {deliveries.map((d) => (
-                    <tr key={d.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer" onClick={() => router.push(`/deliveries/${d.id}`)}>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 8)}…</td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4"><span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-700 text-xs font-mono text-gray-700 dark:text-slate-300">{d.event || '—'}</span></td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4"><StatusBadge status={d.status} /></td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 font-mono max-w-[200px] truncate hidden sm:table-cell">{d.endpoint_url}</td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:table-cell">{d.attempt_count}{d.response_status && <span className="ml-1 text-xs text-gray-500 dark:text-slate-400">({d.response_status})</span>}</td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-500 hidden lg:table-cell">{new Date(d.created_at).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <VirtualTable
+                data={deliveries}
+                estimateSize={56}
+                header={
+                  <div className="grid grid-cols-[80px_120px_90px_minmax(120px,1fr)_80px_140px] bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50">
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">ID</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('event')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">{t('status')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase hidden sm:block">{t('endpoint')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase hidden md:block">{t('attempts')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase hidden lg:block">{t('time')}</div>
+                  </div>
+                }
+                renderRow={(d) => (
+                  <div className="grid grid-cols-[80px_120px_90px_minmax(120px,1fr)_80px_140px] hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer border-b border-gray-200/50 dark:border-slate-700/50" onClick={() => router.push(`/deliveries/${d.id}`)}>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 8)}…</div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 flex items-center"><span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-700 text-xs font-mono text-gray-700 dark:text-slate-300">{d.event || '—'}</span></div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 flex items-center"><StatusBadge status={d.status} /></div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 font-mono max-w-[200px] truncate hidden sm:flex items-center">{d.endpoint_url}</div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:flex items-center">{d.attempt_count}{d.response_status && <span className="ml-1 text-xs text-gray-500 dark:text-slate-400">({d.response_status})</span>}</div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-500 hidden lg:flex items-center">{new Date(d.created_at).toLocaleString()}</div>
+                  </div>
+                )}
+              />
             </div>
 
             {totalPages > 1 && (
