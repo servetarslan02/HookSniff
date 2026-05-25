@@ -3,7 +3,6 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
 import { Link as LinkIcon, X, Check } from '@/components/icons';
 
-export const revalidate = 3600;
 
 export const metadata = {
   title: 'Hookdeck Alternatives — Best Webhook Services Compared (2026) | HookSniff',

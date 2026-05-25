@@ -2,8 +2,6 @@ import { useTranslations } from 'next-intl';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
-// Revalidate every hour for ISR
-export const revalidate = 3600;
 
 
 export const metadata = {

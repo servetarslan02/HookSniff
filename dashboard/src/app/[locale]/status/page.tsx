@@ -7,8 +7,6 @@ export const metadata: Metadata = {
   description: 'Real-time status and uptime monitoring for HookSniff services',
 };
 
-// ISR: revalidate every hour
-export const revalidate = 3600;
 
 export default function StatusPage() {
   return (

@@ -1,8 +1,6 @@
 import { useTranslations } from 'next-intl';
 import type { Metadata } from 'next';
 
-// Revalidate every hour for ISR
-export const revalidate = 3600;
 
 
 export const metadata: Metadata = {
@@ -11,8 +9,6 @@ export const metadata: Metadata = {
 };
 
 
-// Force SSR — SSG output was missing on Vercel for this page
-export const dynamic = 'force-dynamic';
 
 // Force redeploy — docs/api page fix
 export default function ApiReferencePage() {

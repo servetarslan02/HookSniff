@@ -7,8 +7,6 @@ export const metadata: Metadata = {
   description: 'Track all updates, features, and improvements to HookSniff',
 };
 
-// ISR: revalidate every hour
-export const revalidate = 3600;
 
 export default function ChangelogPage() {
   return (

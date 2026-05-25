@@ -3,6 +3,7 @@
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { usePathname } from '@/i18n/navigation';
 import { clsx } from 'clsx';
+import { ViewTransition } from '@/components/ViewTransition';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import Footer from '@/components/Footer';
 import { SkeletonDocs } from '@/components/LoadingSkeletons';
@@ -270,7 +271,9 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           {/* ─── Content ─── */}
           <main className="flex-1 min-w-0 py-8 lg:py-10">
             <Suspense fallback={<SkeletonDocs />}>
-              <div className="max-w-4xl">{children}</div>
+              <ViewTransition>
+                <div className="max-w-4xl">{children}</div>
+              </ViewTransition>
             </Suspense>
           </main>
         </div>

@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { Check, X } from '@/components/icons';
 import { getTranslations } from 'next-intl/server';
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Retry Strategies',

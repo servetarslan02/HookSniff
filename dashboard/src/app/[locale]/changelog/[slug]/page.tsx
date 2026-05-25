@@ -5,8 +5,6 @@ import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import Image from 'next/image';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
-// ISR: revalidate every hour
-export const revalidate = 3600;
 import {
   changelog,
   getChangelogBySlug,
