@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Link, useRouter } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
+import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import Footer from '@/components/Footer';

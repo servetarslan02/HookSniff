@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import PublicNavbar from '@/components/PublicNavbar';
 import Footer from '@/components/Footer';
 

@@ -1,4 +1,4 @@
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 
 export default function NotFound() {
   return (

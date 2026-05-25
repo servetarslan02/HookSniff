@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import { useAuth } from '@/lib/store';
 import { applicationsApi, type Application } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/navigation';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { apiFetch } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';

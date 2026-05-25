@@ -15,7 +15,6 @@ import {
 } from '@/components/LazyCharts';
 import { StatCard } from '@/components/tremor/StatCard';
 import { ChartCard } from '@/components/tremor/ChartCard';
-import { Link } from '@/i18n/navigation';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useAuth } from '@/lib/store';
 import { apiFetch, applicationsApi, webhooksApi, endpointsApi, analyticsApi } from '@/lib/api';

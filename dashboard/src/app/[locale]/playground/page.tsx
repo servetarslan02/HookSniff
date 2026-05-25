@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { useTranslations } from 'next-intl';
 import PublicNavbar from '@/components/PublicNavbar';
 import { FlaskConical, ShieldCheck, Lightbulb, Lock, Zap, AlertTriangle } from '@/components/icons';

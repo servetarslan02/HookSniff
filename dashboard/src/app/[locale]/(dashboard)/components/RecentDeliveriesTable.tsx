@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl';
 import { type Delivery } from '@/lib/api';
-import { Link } from '@/i18n/navigation';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';

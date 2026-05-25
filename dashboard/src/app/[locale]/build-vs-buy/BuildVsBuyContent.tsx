@@ -2,7 +2,7 @@
 import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DollarSign, Lightbulb, Wrench } from '@/components/icons';
 
