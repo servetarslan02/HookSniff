@@ -5,6 +5,8 @@ import { useAuth } from '@/lib/store';
 import { applicationsApi, type Application } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { PrefetchLink } from '@/components/PrefetchLink';
+import { apiFetch } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { useApplications } from '@/hooks/useDashboardData';
@@ -46,6 +48,12 @@ export default function ApplicationsPage() {
   const queryClient = useQueryClient();
   const t = useTranslations('applications');
   const tc = useTranslations('common');
+
+  // Prefetch application detail on hover
+  const appDetailPrefetch = (id: string) => token ? [
+    { queryKey: ['application', id], queryFn: () => apiFetch(`/applications/${id}`, { token }), staleTime: 30_000 },
+    { queryKey: ['application', id, 'endpoints'], queryFn: () => apiFetch(`/applications/${id}/endpoints`, { token }), staleTime: 30_000 },
+  ] : [];
 
   // React Query hook for data fetching
   const { data: apps = [], isLoading: loading } = useApplications();
@@ -289,12 +297,14 @@ export default function ApplicationsPage() {
                 </p>
 
                 {/* Name */}
-                <Link
+                <PrefetchLink
                   href={`/applications/${app.id}`}
+                  prefetchData={appDetailPrefetch(app.id)}
+                  hoverDelay={80}
                   className="text-base font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   {app.name}
-                </Link>
+                </PrefetchLink>
 
                 {/* Description */}
                 {app.description && (
@@ -319,12 +329,14 @@ export default function ApplicationsPage() {
 
                 {/* Footer */}
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-                  <Link
+                  <PrefetchLink
                     href={`/applications/${app.id}`}
+                    prefetchData={appDetailPrefetch(app.id)}
+                    hoverDelay={80}
                     className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
                   >
                     {t('manageEndpoints') || 'Manage endpoints'} →
-                  </Link>
+                  </PrefetchLink>
                   <span className="text-xs text-gray-400 dark:text-gray-500">
                     {tc('created') || 'Created'} {formatDate(app.created_at)}
                   </span>
