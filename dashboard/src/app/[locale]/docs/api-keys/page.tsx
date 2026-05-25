@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import { Key } from '@/components/icons';
 import type { Metadata } from 'next';
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
   description: 'Create and manage API keys for authenticating with the HookSniff API.',
 };
 
-export default async function APIKeysPage() {
+
+
+async function APIKeysPageContent() {
   const t = await getTranslations('docsApiKeys');
   return (
     <article className="prose prose-gray max-w-none">
@@ -38,5 +41,13 @@ export default async function APIKeysPage() {
         </ul>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <APIKeysPageContent />
+    </Suspense>
   );
 }

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import { BarChart3 } from '@/components/icons';
 import type { Metadata } from 'next';
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
   description: 'Monitor webhook delivery performance with real-time analytics.',
 };
 
-export default async function AnalyticsPage() {
+
+
+async function AnalyticsPageContent() {
   const t = await getTranslations('docsAnalytics');
   return (
     <article className="prose prose-gray max-w-none">
@@ -54,5 +57,13 @@ curl -H "Authorization: Bearer YOUR_API_KEY" \\
   "https://hooksniff-api-1046140057667.europe-west1.run.app/v1/analytics/latency?range=7d"`} />
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <AnalyticsPageContent />
+    </Suspense>
   );
 }

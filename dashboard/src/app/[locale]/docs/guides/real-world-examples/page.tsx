@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { Bell, Building2, DollarSign, Globe, Rocket, ShoppingCart } from '@/components/icons';
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 
 export default function RealWorldExamplesPage() {
   return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Globe size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Real-World Examples</h1>
       <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
@@ -335,5 +337,6 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
         />
       </section>
     </article>
+    </Suspense>
   );
 }

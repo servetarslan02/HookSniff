@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { ArrowRight } from '@/components/icons';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -8,7 +9,9 @@ export const metadata: Metadata = {
   description: 'Track webhook deliveries, inspect payloads, and replay failed attempts.',
 };
 
-export default async function DeliveriesPage() {
+
+
+async function DeliveriesPageContent() {
   const t = await getTranslations('docsDeliveries');
   return (
     <article className="prose prose-gray max-w-none">
@@ -38,5 +41,13 @@ export default async function DeliveriesPage() {
         </div>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <DeliveriesPageContent />
+    </Suspense>
   );
 }
