@@ -1,6 +1,9 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
+import { PrefetchLink } from '@/components/PrefetchLink';
+import { useAuth } from '@/lib/store';
+import { apiFetch, adminApi } from '@/lib/api';
 import { useTranslations, useLocale } from 'next-intl';
 import { Monitor, Users, DollarSign, Settings } from '@/components/icons';
 
@@ -13,6 +16,16 @@ interface ActivityTabProps {
 export default function ActivityTab({ auditLogs, stats, mrr }: ActivityTabProps) {
   const t = useTranslations('admin');
   const locale = useLocale();
+  const { token } = useAuth();
+
+  // Prefetch admin data on hover
+  const adminPrefetch: Record<string, Array<{ queryKey: string[]; queryFn: () => Promise<unknown>; staleTime: number }>> = {
+    '/admin/activity': token ? [{ queryKey: ['admin', 'activity'], queryFn: () => apiFetch('/admin/activity', { token }), staleTime: 15_000 }] : [],
+    '/admin/system': token ? [{ queryKey: ['admin', 'system'], queryFn: () => adminApi.getSystem(token), staleTime: 15_000 }] : [],
+    '/admin/users': token ? [{ queryKey: ['admin', 'users', { page: 1 }], queryFn: () => adminApi.getUsers(token, { page: 1 }), staleTime: 15_000 }] : [],
+    '/admin/revenue': token ? [{ queryKey: ['admin', 'revenue'], queryFn: () => apiFetch('/admin/revenue', { token }), staleTime: 30_000 }] : [],
+    '/admin/settings': token ? [{ queryKey: ['admin', 'settings'], queryFn: () => apiFetch('/admin/settings', { token }), staleTime: 30_000 }] : [],
+  };
 
   return (
     <>
@@ -20,9 +33,9 @@ export default function ActivityTab({ auditLogs, stats, mrr }: ActivityTabProps)
       <div className="glass-card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200/50 dark:border-slate-700/50 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('recentActivity')}</h2>
-          <Link href="/admin/activity" className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">
+          <PrefetchLink href="/admin/activity" prefetchData={adminPrefetch['/admin/activity']} hoverDelay={80} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">
             {t('viewAll')} →
-          </Link>
+          </PrefetchLink>
         </div>
         <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
           {auditLogs.length > 0 ? auditLogs.map((entry: any) => (
@@ -72,34 +85,34 @@ export default function ActivityTab({ auditLogs, stats, mrr }: ActivityTabProps)
         <div className="glass-card p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('quickActions')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Link href="/admin/system" className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+            <PrefetchLink href="/admin/system" prefetchData={adminPrefetch['/admin/system']} hoverDelay={80} className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
               <Monitor size={24} strokeWidth={1.75} className="text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{t('viewSystemHealth')}</p>
                 <p className="text-xs text-gray-500 dark:text-slate-400">{t('systemHealth')}</p>
               </div>
-            </Link>
-            <Link href="/admin/users" className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+            </PrefetchLink>
+            <PrefetchLink href="/admin/users" prefetchData={adminPrefetch['/admin/users']} hoverDelay={80} className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
               <Users size={24} strokeWidth={1.75} className="text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{t('userManagement')}</p>
                 <p className="text-xs text-gray-500 dark:text-slate-400">{t('totalUsers')}: {stats?.total_users || 0}</p>
               </div>
-            </Link>
-            <Link href="/admin/revenue" className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+            </PrefetchLink>
+            <PrefetchLink href="/admin/revenue" prefetchData={adminPrefetch['/admin/revenue']} hoverDelay={80} className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
               <DollarSign size={24} strokeWidth={1.75} className="text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{t('revenue')}</p>
                 <p className="text-xs text-gray-500 dark:text-slate-400">MRR: {t('currencySymbol')}{mrr.toLocaleString()}</p>
               </div>
-            </Link>
-            <Link href="/admin/settings" className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+            </PrefetchLink>
+            <PrefetchLink href="/admin/settings" prefetchData={adminPrefetch['/admin/settings']} hoverDelay={80} className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
               <Settings size={24} strokeWidth={1.75} className="text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">{t('platformSettings')}</p>
                 <p className="text-xs text-gray-500 dark:text-slate-400">{t('settingsNav')}</p>
               </div>
-            </Link>
+            </PrefetchLink>
           </div>
         </div>
       </div>

@@ -1,6 +1,9 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
+import { PrefetchLink } from '@/components/PrefetchLink';
+import { useAuth } from '@/lib/store';
+import { apiFetch, adminApi } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { AlertTriangle, CheckCircle2, Circle, CalendarDays } from '@/components/icons';
 
@@ -16,6 +19,10 @@ interface HealthTabProps {
 
 export default function HealthTab({ stats: _stats, rateLimitData, failedDeliveriesData, queueStatus, totalEndpoints, activeEndpoints, disabledEndpoints }: HealthTabProps) {
   const t = useTranslations('admin');
+  const { token } = useAuth();
+
+  const usersPrefetch = token ? [{ queryKey: ['admin', 'users', { page: 1 }], queryFn: () => adminApi.getUsers(token, { page: 1 }), staleTime: 15_000 }] : [];
+  const activityPrefetch = token ? [{ queryKey: ['admin', 'activity'], queryFn: () => apiFetch('/admin/activity', { token }), staleTime: 15_000 }] : [];
 
   return (
     <>
@@ -24,7 +31,7 @@ export default function HealthTab({ stats: _stats, rateLimitData, failedDeliveri
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('endpointStatus')}</h2>
-            <Link href="/admin/users" className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">{t('viewAllEndpoints')} →</Link>
+            <PrefetchLink href="/admin/users" prefetchData={usersPrefetch} hoverDelay={80} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">{t('viewAllEndpoints')} →</PrefetchLink>
           </div>
           {totalEndpoints != null ? (
             <div className="space-y-4">
@@ -57,7 +64,7 @@ export default function HealthTab({ stats: _stats, rateLimitData, failedDeliveri
         <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('securityWarnings')}</h2>
-            <Link href="/admin/activity" className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">{t('viewSecurityLogs')} →</Link>
+            <PrefetchLink href="/admin/activity" prefetchData={activityPrefetch} hoverDelay={80} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">{t('viewSecurityLogs')} →</PrefetchLink>
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
