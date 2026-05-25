@@ -1,4 +1,6 @@
-pub mod handlers;
+pub mod crud;
+pub mod create;
+pub mod replay;
 mod helpers;
 mod tests;
 
@@ -6,7 +8,10 @@ use axum::routing::{get, post};
 use axum::Router;
 use serde::Deserialize;
 
-use handlers::*;
+// Re-export all handler functions
+pub use crud::{list_deliveries, get_delivery, get_delivery_attempts, export_deliveries};
+pub use create::{create_webhook, batch_webhooks};
+pub use replay::{replay_webhook, batch_replay};
 
 pub fn router() -> Router {
     Router::new()
