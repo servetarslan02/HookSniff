@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualList } from '@/components/VirtualList';
 import { ClipboardList, Inbox, Pencil, Trash2 } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -185,11 +186,17 @@ export default function OperationalWebhooksList() {
           </RoleGuard>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {endpoints.map(ep => {
+        <VirtualList
+          items={endpoints}
+          height={Math.min(endpoints.length * 200, 600)}
+          itemHeight={200}
+          overscan={2}
+          keyExtractor={(ep) => ep.id}
+          emptyMessage={t('noEndpoints')}
+          renderItem={(ep) => {
             const isEditing = editTarget === ep.id;
             return (
-              <div key={ep.id} className={`glass-card p-5 transition ${selectedId === ep.id ? 'ring-2 ring-brand-500' : ''} ${isEditing ? 'ring-2 ring-brand-500' : ''}`}>
+              <div className={`glass-card p-5 transition mb-4 ${selectedId === ep.id ? 'ring-2 ring-brand-500' : ''} ${isEditing ? 'ring-2 ring-brand-500' : ''}`}>
                 <div className="cursor-pointer" onClick={() => !isEditing && setSelectedId(selectedId === ep.id ? null : ep.id)}>
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -252,8 +259,8 @@ export default function OperationalWebhooksList() {
                 )}
               </div>
             );
-          })}
-        </div>
+          }}
+        />
       )}
 
       {/* Delivery log */}
