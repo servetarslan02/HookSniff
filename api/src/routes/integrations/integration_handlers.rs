@@ -2,6 +2,7 @@ use axum::{
     extract::{Extension, Path, Query},
     Json,
 };
+use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -9,9 +10,13 @@ use crate::error::AppError;
 use crate::models::customer::Customer;
 use crate::routes::teams;
 
-use super::{IntegrationJoinRow, IntegrationResponse};
+use super::{
+    to_response, CreateIntegrationRequest, EventFilter, Integration, IntegrationEvent,
+    IntegrationJoinRow, IntegrationResponse, IntegrationStats, UpdateIntegrationRequest,
+    INTEGRATION_JOIN_SQL,
+};
 
-async fn list_integrations(
+pub async fn list_integrations(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<IntegrationResponse>>, AppError> {
@@ -27,7 +32,7 @@ async fn list_integrations(
 }
 
 /// Get a single integration by ID.
-async fn get_integration(
+pub async fn get_integration(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -46,7 +51,7 @@ async fn get_integration(
 }
 
 /// Create a new integration.
-async fn create_integration(
+pub async fn create_integration(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
@@ -54,7 +59,7 @@ async fn create_integration(
 ) -> Result<Json<IntegrationResponse>, AppError> {
     // ── Role enforcement: require at least developer ──
     if let Some(Extension(ref scope)) = service_token {
-        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+        crate::routes::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
     } else {
         teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
@@ -119,7 +124,7 @@ async fn create_integration(
 }
 
 /// Update an integration.
-async fn update_integration(
+pub async fn update_integration(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
@@ -128,7 +133,7 @@ async fn update_integration(
 ) -> Result<Json<IntegrationResponse>, AppError> {
     // ── Role enforcement: require at least developer ──
     if let Some(Extension(ref scope)) = service_token {
-        super::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
+        crate::routes::teams::require_team_developer(&pool, scope.team_id, customer.id).await?;
     } else {
         teams::check_user_team_role(&pool, customer.id, "developer").await?;
     }
@@ -191,7 +196,7 @@ async fn update_integration(
 }
 
 /// Delete an integration.
-async fn delete_integration(
+pub async fn delete_integration(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
@@ -199,7 +204,7 @@ async fn delete_integration(
 ) -> Result<Json<serde_json::Value>, AppError> {
     // ── Role enforcement: require admin for destructive ops ──
     if let Some(Extension(ref scope)) = service_token {
-        super::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
+        crate::routes::teams::require_team_admin(&pool, scope.team_id, customer.id).await?;
     } else {
         teams::check_user_team_role(&pool, customer.id, "admin").await?;
     }
@@ -218,7 +223,7 @@ async fn delete_integration(
 }
 
 /// Send a test event through the integration.
-async fn test_integration(
+pub async fn test_integration(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -271,7 +276,7 @@ async fn test_integration(
 }
 
 /// List events for an integration.
-async fn list_events(
+pub async fn list_events(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,
@@ -324,7 +329,7 @@ async fn list_events(
 }
 
 /// Get statistics for an integration.
-async fn get_stats(
+pub async fn get_stats(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Path(id): Path<Uuid>,

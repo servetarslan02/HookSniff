@@ -33,6 +33,8 @@ use crate::models::customer::Customer;
 pub mod handlers;
 pub use handlers::*;
 
+// Types and re-exports are below; handlers are in handlers.rs
+
 pub fn router() -> Router {
     Router::new()
         .route("/channels", get(list_channels).post(create_channel))
@@ -136,11 +138,3 @@ pub struct MessageFilter {
     pub event_type: Option<String>,
     pub limit: Option<i64>,
 }
-
-
-// ──────────────────────────────────────────────────────────────
-// Handlers
-// ──────────────────────────────────────────────────────────────
-
-pub mod handlers;
-pub use handlers::*;
