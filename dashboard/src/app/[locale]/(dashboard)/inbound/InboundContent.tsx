@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { useEndpoints, useInboundConfigs, useCreateInboundConfig, useUpdateInboundConfig, useDeleteInboundConfig } from '@/hooks/useDashboardData';
 import type { InboundConfigValidated } from '@/schemas/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualList } from '@/components/VirtualList';
 import { CreditCard, Download, FileText, Gamepad2, GitBranch, Inbox, Link2, MessageSquare, Pencil, ShoppingBag, Smartphone, Trash2, TriangleRight } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -228,14 +229,20 @@ export function InboundContent() {
       {configs.length > 0 && (
         <div className="glass-card p-6">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{t('inbound.activeConfigs')} ({configs.length})</h3>
-          <div className="space-y-3">
-            {configs.map(cfg => {
+          <VirtualList
+            items={configs}
+            height={Math.min(configs.length * 100, 500)}
+            itemHeight={100}
+            overscan={2}
+            keyExtractor={(cfg) => cfg.id}
+            emptyMessage={t('inbound.noConfigs')}
+            renderItem={(cfg) => {
               const provider = PROVIDERS.find(p => p.id === cfg.provider);
               const endpoint = endpoints.find(ep => ep.id === cfg.endpoint_id);
               const isEditing = editTarget === cfg.id;
 
               return (
-                <div key={cfg.id} className={`p-4 rounded-xl border transition ${isEditing ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-500/5' : 'border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-950'}`}>
+                <div className={`p-4 rounded-xl border transition mb-3 ${isEditing ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-500/5' : 'border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-950'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{provider?.icon || <Link2 size={16} strokeWidth={1.75} />}</span>
@@ -283,8 +290,8 @@ export function InboundContent() {
                   )}
                 </div>
               );
-            })}
-          </div>
+            }}
+          />
         </div>
       )}
 
