@@ -1,6 +1,5 @@
 'use client';
 
-import { Link } from '@/i18n/navigation';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';

@@ -1,5 +1,5 @@
 import CodeBlock from '@/components/CodeBlock';
-import Link from 'next/link';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 

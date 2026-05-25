@@ -3,7 +3,8 @@
 import { getErrorMessage } from '@/lib/errors';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter, Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
+import { useRouter } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';

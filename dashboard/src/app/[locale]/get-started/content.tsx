@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Link } from '@/i18n/navigation';
+import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { useAuth } from '@/lib/store';
 import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
