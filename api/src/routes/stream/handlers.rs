@@ -1,143 +1,18 @@
-//! Streaming — Real-time event streaming with channels, subscriptions, and SSE.
-//!
-//! ## Endpoints
-//!
-//! - `GET    /v1/stream/channels`                — List stream channels
-//! - `POST   /v1/stream/channels`                — Create channel
-//! - `GET    /v1/stream/channels/{id}`           — Get channel
-//! - `PUT    /v1/stream/channels/{id}`           — Update channel
-//! - `DELETE /v1/stream/channels/{id}`           — Delete channel
-//! - `GET    /v1/stream/channels/{id}/subscribe` — SSE subscribe to channel
-//! - `GET    /v1/stream/channels/{id}/messages`  — Recent messages
-//! - `GET    /v1/stream/subscriptions`           — List active subscriptions
-//! - `DELETE /v1/stream/subscriptions/{id}`      — Disconnect subscription
-//! - `GET    /v1/stream/deliveries`              — SSE delivery stream (legacy compat)
-//! - `POST   /v1/stream/publish`                 — Publish event to channel
-
-use axum::extract::{Extension, Path, Query};
-use axum::response::sse::{Event, Sse};
-use axum::routing::{get, post};
-use axum::{Json, Router};
+use axum::{
+    extract::{Extension, Path, Query},
+    response::Sse,
+    Json,
+};
 use chrono::{DateTime, Utc};
-use futures::stream::Stream;
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use std::convert::Infallible;
-use std::time::Duration;
-use tokio::time::interval;
 use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
+use crate::routes::teams;
 
-pub fn router() -> Router {
-    Router::new()
-        .route("/channels", get(list_channels).post(create_channel))
-        .route(
-            "/channels/{id}",
-            get(get_channel).put(update_channel).delete(delete_channel),
-        )
-        .route("/channels/{id}/subscribe", get(subscribe_to_channel))
-        .route("/channels/{id}/messages", get(list_messages))
-        .route("/subscriptions", get(list_subscriptions))
-        .route("/subscriptions/{id}", get(get_subscription).delete(disconnect_subscription))
-        .route("/deliveries", get(sse_deliveries_legacy))
-        .route("/publish", post(publish_event))
-}
+use super::{StreamChannel, StreamMessage, StreamSubscription};
 
-// ──────────────────────────────────────────────────────────────
-// Types
-// ──────────────────────────────────────────────────────────────
-
-#[derive(Debug, Serialize, sqlx::FromRow)]
-pub struct StreamChannel {
-    pub id: Uuid,
-    pub customer_id: Uuid,
-    pub name: String,
-    pub description: Option<String>,
-    pub channel_type: String,
-    pub event_filter: Option<Vec<String>>,
-    pub enabled: bool,
-    pub max_subscribers: i32,
-    pub current_subscribers: i32,
-    pub total_messages: i64,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Serialize, sqlx::FromRow)]
-pub struct StreamSubscription {
-    pub id: Uuid,
-    pub channel_id: Uuid,
-    pub customer_id: Uuid,
-    pub connection_type: String,
-    pub client_id: Option<String>,
-    pub event_filter: Option<Vec<String>>,
-    pub connected_at: DateTime<Utc>,
-    pub last_heartbeat_at: DateTime<Utc>,
-    pub messages_sent: i64,
-    pub metadata: serde_json::Value,
-}
-
-#[derive(Debug, Serialize, sqlx::FromRow)]
-pub struct StreamMessage {
-    pub id: Uuid,
-    pub channel_id: Uuid,
-    pub event_type: String,
-    pub payload: serde_json::Value,
-    pub delivered_count: i32,
-    pub created_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ChannelResponse {
-    #[serde(flatten)]
-    pub channel: StreamChannel,
-    pub recent_messages: Vec<StreamMessage>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CreateChannelRequest {
-    pub name: String,
-    pub description: Option<String>,
-    pub channel_type: Option<String>,
-    pub event_filter: Option<Vec<String>>,
-    pub max_subscribers: Option<i32>,
-    pub enabled: Option<bool>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct UpdateChannelRequest {
-    pub name: Option<String>,
-    pub description: Option<String>,
-    pub event_filter: Option<Vec<String>>,
-    pub max_subscribers: Option<i32>,
-    pub enabled: Option<bool>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct PublishEventRequest {
-    pub channel_id: Uuid,
-    pub event_type: String,
-    pub payload: serde_json::Value,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct StreamParams {
-    pub since: Option<String>,
-    pub event_types: Option<String>, // comma-separated
-}
-
-#[derive(Debug, Deserialize)]
-pub struct MessageFilter {
-    pub event_type: Option<String>,
-    pub limit: Option<i64>,
-}
-
-
-// ──────────────────────────────────────────────────────────────
-// Handlers
-// ──────────────────────────────────────────────────────────────
 
 /// List all stream channels for the customer.
 async fn list_channels(
@@ -145,7 +20,7 @@ async fn list_channels(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<StreamChannel>>, AppError> {
     // RBAC: viewer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+    teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
     let channels = sqlx::query_as::<_, StreamChannel>(
         "SELECT id, customer_id, name, description, channel_type, event_filter, enabled, \
@@ -166,7 +41,7 @@ async fn create_channel(
     Json(req): Json<CreateChannelRequest>,
 ) -> Result<Json<StreamChannel>, AppError> {
     // RBAC: developer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+    teams::check_user_team_role(&pool, customer.id, "developer").await?;
     let channel = sqlx::query_as::<_, StreamChannel>(
         "INSERT INTO stream_channels \
          (customer_id, name, description, channel_type, event_filter, max_subscribers, enabled) \
@@ -194,7 +69,7 @@ async fn get_channel(
     Path(id): Path<Uuid>,
 ) -> Result<Json<ChannelResponse>, AppError> {
     // RBAC: viewer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+    teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
     let channel = sqlx::query_as::<_, StreamChannel>(
         "SELECT id, customer_id, name, description, channel_type, event_filter, enabled, \
@@ -229,7 +104,7 @@ async fn update_channel(
     Json(req): Json<UpdateChannelRequest>,
 ) -> Result<Json<StreamChannel>, AppError> {
     // RBAC: developer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+    teams::check_user_team_role(&pool, customer.id, "developer").await?;
 
     let channel = sqlx::query_as::<_, StreamChannel>(
         "UPDATE stream_channels SET \
@@ -264,7 +139,7 @@ async fn delete_channel(
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // RBAC: admin or higher to delete channels
-    super::teams::check_user_team_role(&pool, customer.id, "admin").await?;
+    teams::check_user_team_role(&pool, customer.id, "admin").await?;
 
     let result = sqlx::query("DELETE FROM stream_channels WHERE id = $1 AND customer_id = $2")
         .bind(id)
@@ -287,7 +162,7 @@ async fn subscribe_to_channel(
     Query(params): Query<StreamParams>,
 ) -> Result<Sse<impl Stream<Item = Result<Event, Infallible>>>, AppError> {
     // RBAC: developer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+    teams::check_user_team_role(&pool, customer.id, "developer").await?;
 
     // Verify channel exists and belongs to customer
     let channel = sqlx::query_as::<_, StreamChannel>(
@@ -443,7 +318,7 @@ async fn list_messages(
     Query(filter): Query<MessageFilter>,
 ) -> Result<Json<Vec<StreamMessage>>, AppError> {
     // RBAC: viewer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+    teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
     // Verify channel belongs to customer
     let exists: bool = sqlx::query_scalar(
@@ -492,7 +367,7 @@ async fn list_subscriptions(
     Extension(customer): Extension<Customer>,
 ) -> Result<Json<Vec<StreamSubscription>>, AppError> {
     // RBAC: viewer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+    teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
     let subs = sqlx::query_as::<_, StreamSubscription>(
         "SELECT s.id, s.channel_id, s.customer_id, s.connection_type, s.client_id, \
@@ -516,7 +391,7 @@ async fn get_subscription(
     Path(id): Path<Uuid>,
 ) -> Result<Json<StreamSubscription>, AppError> {
     // RBAC: viewer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
+    teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
     let sub = sqlx::query_as::<_, StreamSubscription>(
         "SELECT id, channel_id, customer_id, connection_type, client_id, event_filter, \
@@ -539,7 +414,7 @@ async fn disconnect_subscription(
     Path(id): Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // RBAC: developer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+    teams::check_user_team_role(&pool, customer.id, "developer").await?;
 
     let sub = sqlx::query_as::<_, StreamSubscription>(
         "DELETE FROM stream_subscriptions \
@@ -571,7 +446,7 @@ async fn sse_deliveries_legacy(
     Json(req): Json<PublishEventRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // RBAC: developer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+    teams::check_user_team_role(&pool, customer.id, "developer").await?;
 
     // Verify channel belongs to customer
     let channel = sqlx::query_as::<_, StreamChannel>(
@@ -624,7 +499,7 @@ async fn publish_event(
     Json(req): Json<PublishEventRequest>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     // RBAC: developer or higher
-    super::teams::check_user_team_role(&pool, customer.id, "developer").await?;
+    teams::check_user_team_role(&pool, customer.id, "developer").await?;
 
     // Verify channel belongs to customer
     let channel = sqlx::query_as::<_, StreamChannel>(
