@@ -20,6 +20,22 @@ Faz 6: Batch Processing             → 1x → 1.5-2x throughput
 
 ---
 
+## ⚠️ KRİTİK: DUZELTMELER.md Oku!
+
+Bu plan v2'de 7 kritik sorun tespit edildi. **Uygulamadan önce DUZELTMELER.md oku!**
+
+| Sorun | Özet |
+|-------|------|
+| Type mismatch | QueueMessage.delivery_id String olmalı (Uuid değil) |
+| Method adı | `circuit_breaker.allow_request()` (is_open değil) |
+| Clone sorunu | Ack spawn dışında yapılmalı |
+| Eksik fonksiyonlar | get_signing_secret, commit_delivery, schedule_retry, mark_failed, is_retryable |
+| Dual-write | Redis-first + PG fallback (ikisine birden yazma) |
+| claim_pending | Worker startup'ta çağırılmamış |
+| Imports | Semaphore, Mutex, HashMap, Uuid import gerekli |
+
+---
+
 ## ⚙️ Mevcut Sistem Notları
 
 ### Zaten Var Olan Altyapı
