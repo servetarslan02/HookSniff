@@ -6,6 +6,7 @@ import { useToast } from '@/components/Toast';
 import { useEndpoints, useTransformRules, useCreateTransformRule, useDeleteTransformRule, useUpdateTransformRule, useTestTransform } from '@/hooks/useDashboardData';
 import type { TransformRuleValidated } from '@/schemas/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualList } from '@/components/VirtualList';
 import { FlaskConical, Pencil, X } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -224,9 +225,15 @@ export default function TransformsPage() {
    ) : rules.length === 0 ? (
     <div className="glass-card p-12 text-center text-gray-500 dark:text-slate-400">{t('empty')}</div>
    ) : (
-    <div className="space-y-3">
-     {rules.map((rule: TransformRuleValidated) => (
-      <div key={rule.id} className={`glass-card p-5 transition ${editTarget === rule.id ? 'ring-2 ring-brand-500' : ''}`}>
+    <VirtualList
+      items={rules}
+      height={Math.min(rules.length * 120, 500)}
+      itemHeight={120}
+      overscan={2}
+      keyExtractor={(rule) => rule.id}
+      emptyMessage={t('empty')}
+      renderItem={(rule) => (
+      <div className={`glass-card p-5 transition mb-3 ${editTarget === rule.id ? 'ring-2 ring-brand-500' : ''}`}>
        <div className="flex items-start justify-between">
         <div className="space-y-2 flex-1">
          {rule.rule_json.filter && (
@@ -261,8 +268,8 @@ export default function TransformsPage() {
         </div>
        </div>
       </div>
-     ))}
-    </div>
+     )}
+    />
    )}
 
    {/* Test Modal */}
