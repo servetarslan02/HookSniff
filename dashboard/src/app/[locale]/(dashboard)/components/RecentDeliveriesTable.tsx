@@ -3,6 +3,9 @@
 import { useTranslations } from 'next-intl';
 import { type Delivery } from '@/lib/api';
 import { Link } from '@/i18n/navigation';
+import { PrefetchLink } from '@/components/PrefetchLink';
+import { useAuth } from '@/lib/store';
+import { apiFetch } from '@/lib/api';
 
 interface RecentDeliveriesTableProps {
   deliveries: Delivery[];
@@ -11,6 +14,12 @@ interface RecentDeliveriesTableProps {
 
 export function RecentDeliveriesTable({ deliveries, loading }: RecentDeliveriesTableProps) {
   const t = useTranslations('dashboard');
+  const { token } = useAuth();
+
+  const deliveryDetailPrefetch = (id: string) => token ? [
+    { queryKey: ['delivery', id], queryFn: () => apiFetch(`/webhooks/${id}`, { token }), staleTime: 30_000 },
+    { queryKey: ['delivery', id, 'attempts'], queryFn: () => apiFetch(`/webhooks/${id}/attempts`, { token }), staleTime: 30_000 },
+  ] : [];
 
   if (loading) {
     return (
@@ -58,9 +67,9 @@ export function RecentDeliveriesTable({ deliveries, loading }: RecentDeliveriesT
                 {new Date(d.created_at).toLocaleString()}
               </td>
               <td className="py-2.5 px-4 text-right">
-                <Link href={`/deliveries/${d.id}`} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">
+                <PrefetchLink href={`/deliveries/${d.id}`} prefetchData={deliveryDetailPrefetch(d.id)} hoverDelay={80} className="text-xs text-brand-600 dark:text-brand-400 hover:underline">
                   {t('view')}
-                </Link>
+                </PrefetchLink>
               </td>
             </tr>
           ))}
