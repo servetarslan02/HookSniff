@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
@@ -7,7 +8,9 @@ export const metadata: Metadata = {
   description: 'Understand the difference between webhooks and polling, and when to use each',
 };
 
-export default async function WebhookVsPollingPage() {
+
+
+async function WebhookVsPollingPageContent() {
   const t = await getTranslations('docsWebhookVsPolling');
   return (
     <article className="prose prose-gray max-w-none">
@@ -107,5 +110,13 @@ export default async function WebhookVsPollingPage() {
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('hybridDesc')}</p>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <WebhookVsPollingPageContent />
+    </Suspense>
   );
 }

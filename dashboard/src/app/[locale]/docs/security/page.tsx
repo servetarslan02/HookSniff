@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import { AlertTriangle, Check, Key, KeyRound, Lock, Shield, ShieldCheck, X } from '@/components/icons';
 import type { Metadata } from 'next';
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
   description: 'How HookSniff secures webhook deliveries with HMAC-SHA256 signatures, SSRF protection, and TLS',
 };
 
-export default async function SecurityPage() {
+
+
+async function SecurityPageContent() {
   const t = await getTranslations('docsSecurity');
   return (
     <article className="prose prose-gray max-w-none">
@@ -194,5 +197,13 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/2f
         </ol>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <SecurityPageContent />
+    </Suspense>
   );
 }

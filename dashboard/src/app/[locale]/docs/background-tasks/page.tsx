@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import { Settings } from '@/components/icons';
 import type { Metadata } from 'next';
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
   description: 'Monitor and manage asynchronous background jobs.',
 };
 
-export default async function BackgroundTasksPage() {
+
+
+async function BackgroundTasksPageContent() {
   const t = await getTranslations('docsBackgroundTasks');
   return (
     <article className="prose prose-gray max-w-none">
@@ -34,5 +37,13 @@ curl -X PUT https://hooksniff-api-1046140057667.europe-west1.run.app/v1/backgrou
   -H "Authorization: Bearer YOUR_API_KEY"`} />
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <BackgroundTasksPageContent />
+    </Suspense>
   );
 }
