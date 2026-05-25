@@ -156,23 +156,33 @@ git add . && git commit -m "perf: Cache Components — statik sayfalar sunucuda 
 
 ### Adım 5 Detay — Akıllı Prefetch (2026-05-26) ✅ TAMAMLANDI
 
-**Yapılan:**
-- Dashboard layout `prefetchForRoute()` genişletildi: 12 rota (core, applications, organization, operational-webhooks, observability, devtools, integrations, custom-domain, routing-config, account, billing)
-- Admin layout `prefetchForAdminRoute()` eklendi: 11 rota (admin, users, revenue, refund-requests, feature-flags, coupons, system, activity, alerts, security, cortex)
-- `DashboardOverview.tsx`: 4 quick action Link → PrefetchLink (applications, deliveries, devtools, observability)
-- `RecentDeliveriesTable.tsx`: Delivery detail Link → PrefetchLink (hover'da delivery + attempts prefetch)
+**Yapılan (ilk commit — 6b4061dc):**
+- Dashboard layout `prefetchForRoute()` genişletildi: 12 rota
+- Admin layout `prefetchForAdminRoute()` eklendi: 11 rota
+- `DashboardOverview.tsx`: 4 quick action Link → PrefetchLink
+- `RecentDeliveriesTable.tsx`: delivery detail Link → PrefetchLink
 
-**Etki:** Sidebar hover'da veri prefetch → tıklamada sayfa anında açılır
+**Yapılan (ikinci commit — 00fb2d4b — tüm sayfalar):**
+- `applications/page.tsx`: app detail Link → PrefetchLink (application + endpoints)
+- `admin/users/UserTable.tsx`: user detail Link → PrefetchLink (user + endpoints + webhooks)
+- `admin/components/ActivityTab.tsx`: 5 Link → PrefetchLink (activity, system, users, revenue, settings)
+- `admin/components/HealthTab.tsx`: 2 Link → PrefetchLink (users, activity)
+- `admin/components/InfraTab.tsx`: 1 Link → PrefetchLink (feature-flags)
+- `admin/activity/page.tsx`: back Link → PrefetchLink (admin stats)
 
-**Commit:** 6b4061dc
+**Atlanan (statik — prefetch gerektirmez):**
+- `sandbox/content.tsx` — login linki
+- `webhooks/guides/`, `webhooks/glossary/`, `webhooks/page.tsx` — statik/marketing
+
+**Etki:** Hover'da veri prefetch → tıklamada sayfa anında açılır
 
 ---
 
-## 🔜 Sıradaki Adım: ADIM 7 — View Transitions (Katman 7)
+## 🔜 Sıradaki Adım: ADIM 6 — Cache Components (Katman 6)
 
 ### Ne Yapılacak?
 
-Dashboard, Admin ve Docs layout'larına `<Suspense>` boundaries ekle. **172 sayfa** tek seferde etkilenir.
+Next.js `"use cache"` desteği ekle. Statik sayfalar (docs, pricing, about) sunucuda cache'lenir, anında yüklenir.
 
 ### Dosyalar
 
