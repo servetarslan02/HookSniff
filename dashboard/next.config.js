@@ -9,6 +9,7 @@ const nextConfig = {
   experimental: {
     cacheComponents: true,
     turbo: true,
+    reactCompiler: true,
   },
   typescript: {
     ignoreBuildErrors: true,
