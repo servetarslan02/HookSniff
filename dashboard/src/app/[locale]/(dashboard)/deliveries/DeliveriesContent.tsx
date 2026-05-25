@@ -10,6 +10,7 @@ import { webhooksApi, type DeliveryAttempt } from '@/lib/api';
 import { useWebhooks, useReplayDelivery, useSearch, useEndpoints } from '@/hooks/useDashboardData';
 import { useDeliveryStream } from '@/hooks/useDeliveryStream';
 import { useIsFeatureEnabled } from '@/hooks/useAdminData';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
@@ -41,18 +42,8 @@ export default function DeliveriesContent() {
     router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
   }, [searchParams, router, pathname]);
 
-  // ── Search state (from Search page — server-side with debounce) ──
-  const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      setDebouncedSearch(searchInput);
-    }, 300);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [searchInput]);
+  // ── Search state (Concurrent Features — useDeferredValue) ──
+  const { input: searchInput, deferredValue: debouncedSearch, handleChange: setSearchInput, isStale } = useDebouncedSearch();
 
   // ── Auto-refresh state (from Logs page) ──
   const [autoRefresh, setAutoRefresh] = useState(false);
