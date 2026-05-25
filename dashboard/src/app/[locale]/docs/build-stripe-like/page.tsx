@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import type { Metadata } from 'next';
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
   description: 'Step-by-step guide to building a production-grade webhook system like Stripe',
 };
 
-export default async function BuildStripeLikePage() {
+
+
+async function BuildStripeLikePageContent() {
   const t = await getTranslations('docsBuildStripeLike');
   return (
     <article className="prose prose-gray max-w-none">
@@ -143,5 +146,13 @@ invoice.overdue`}
         </p>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <BuildStripeLikePageContent />
+    </Suspense>
   );
 }

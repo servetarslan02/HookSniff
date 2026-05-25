@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import { AlertTriangle, Bell, Check } from '@/components/icons';
 import type { Metadata } from 'next';
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
   description: 'Configure alert rules to monitor webhook deliveries.',
 };
 
-export default async function AlertsPage() {
+
+
+async function AlertsPageContent() {
   const t = await getTranslations('docsAlerts');
   return (
     <article className="prose prose-gray max-w-none">
@@ -71,5 +74,13 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/alerts/
         </ul>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <AlertsPageContent />
+    </Suspense>
   );
 }

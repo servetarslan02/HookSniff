@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -132,7 +133,9 @@ const sections = [
    Page
    ─────────────────────────────────────────────── */
 
-export default async function DocsPage() {
+
+
+async function DocsPageContent() {
   const t = await getTranslations('docs');
   const tp = await getTranslations('docsPageMap');
 
@@ -358,7 +361,10 @@ export default async function DocsPage() {
   );
 }
 
-/* ─── Helper ─── */
-function clsx(...args: (string | boolean | undefined | null)[]) {
-  return args.filter(Boolean).join(' ');
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <DocsPageContent />
+    </Suspense>
+  );
 }

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -8,7 +9,9 @@ export const metadata: Metadata = {
   description: 'Ensure webhook deliveries are processed exactly once',
 };
 
-export default async function IdempotencyPage() {
+
+
+async function IdempotencyPageContent() {
   const t = await getTranslations('docsIdempotency');
   return (
     <article className="prose prose-gray max-w-none">
@@ -103,5 +106,13 @@ Idempotency-Key: order-12345-updated
         </ul>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <IdempotencyPageContent />
+    </Suspense>
   );
 }
