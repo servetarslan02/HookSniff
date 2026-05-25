@@ -15,6 +15,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useTranslations } from 'next-intl';
 import { RoleGuard } from '@/components/RoleGuard';
+import { VirtualTable } from '@/components/VirtualTable';
 import { AlertTriangle, Check, CheckCircle2, ClipboardList, Clock, Inbox, Package, X, XCircle } from '@/components/icons';
 
 type StatusFilter = 'all' | 'delivered' | 'failed' | 'pending';
@@ -362,73 +363,72 @@ export default function DeliveriesContent() {
             )}
 
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50/50 dark:bg-slate-800/50">
+              <VirtualTable
+                data={deliveries}
+                estimateSize={56}
+                header={
+                  <div className={`grid ${bulkReplayEnabled ? 'grid-cols-[40px_120px_140px_100px_80px_80px_140px_100px]' : 'grid-cols-[120px_140px_100px_80px_80px_140px_100px]'} bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50`}>
                     {bulkReplayEnabled && (
-                      <th className="px-3 py-3 w-10">
+                      <div className="px-3 py-3">
                         <input type="checkbox" checked={deliveries.length > 0 && selectedIds.size === deliveries.length} onChange={toggleSelectAll} className="w-4 h-4 rounded-sm text-brand-600 focus:ring-brand-500" aria-label={t('selectAll')} />
-                      </th>
+                      </div>
                     )}
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('event')}</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">{t('attempts')}</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">{t('response')}</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('time')}</th>
-                    <th className="px-3 sm:px-6 py-3" />
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                  {deliveries.map((d) => (
-                    <tr
-                      key={d.id}
-                      className={`hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer ${selectedIds.has(d.id) ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''}`}
-                      onClick={() => router.push(`/deliveries/${d.id}`)}
-                    >
-                      {bulkReplayEnabled && (
-                        <td className="px-3 py-3 sm:py-4">
-                          <input type="checkbox" checked={selectedIds.has(d.id)} onChange={(e) => toggleSelect(d.id, e as unknown as React.MouseEvent)} onClick={(e) => e.stopPropagation()} className="w-4 h-4 rounded-sm text-brand-600 focus:ring-brand-500" aria-label={`Select ${d.id.slice(0, 12)}`} />
-                        </td>
-                      )}
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 12)}…</td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">{d.event || '—'}</span>
-                      </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4"><StatusBadge status={d.status} /></td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:table-cell">
-                        <div className="flex items-center gap-1.5">
-                          {d.attempt_count > 1 && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
-                          {d.attempt_count}
-                        </div>
-                      </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
-                        {d.response_status ? (
-                          <span className={`text-xs sm:text-sm font-mono font-medium ${
-                            d.response_status < 300 ? 'text-green-600 dark:text-green-400'
-                              : d.response_status < 400 ? 'text-blue-600 dark:text-blue-400'
-                              : d.response_status < 500 ? 'text-yellow-600 dark:text-yellow-400'
-                              : 'text-red-600 dark:text-red-400'
-                          }`}>{d.response_status}</span>
-                        ) : <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-500">—</span>}
-                      </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">
-                        {new Date(d.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4">
-                        <div className="flex items-center gap-2">
-                          <button type="button" onClick={(e) => { e.stopPropagation(); openDetailModal(d); }} className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition" title={tl('deliveryDetails')}>
-                            <Package size={16} strokeWidth={1.75} />
-                          </button>
-                          <button type="button" onClick={(e) => { e.stopPropagation(); router.push(`/deliveries/${d.id}`); }} className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-300 text-sm font-medium transition">
-                            {t('viewDetails')}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('event')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">{t('attempts')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">{t('response')}</div>
+                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('time')}</div>
+                    <div className="px-3 sm:px-6 py-3" />
+                  </div>
+                }
+                renderRow={(d) => (
+                  <div
+                    className={`grid ${bulkReplayEnabled ? 'grid-cols-[40px_120px_140px_100px_80px_80px_140px_100px]' : 'grid-cols-[120px_140px_100px_80px_80px_140px_100px]'} hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer border-b border-gray-200/50 dark:border-slate-700/50 ${selectedIds.has(d.id) ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''}`}
+                    onClick={() => router.push(`/deliveries/${d.id}`)}
+                  >
+                    {bulkReplayEnabled && (
+                      <div className="px-3 py-3 sm:py-4">
+                        <input type="checkbox" checked={selectedIds.has(d.id)} onChange={(e) => toggleSelect(d.id, e as unknown as React.MouseEvent)} onClick={(e) => e.stopPropagation()} className="w-4 h-4 rounded-sm text-brand-600 focus:ring-brand-500" aria-label={`Select ${d.id.slice(0, 12)}`} />
+                      </div>
+                    )}
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 12)}…</div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">{d.event || '—'}</span>
+                    </div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4"><StatusBadge status={d.status} /></div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:flex items-center">
+                      <div className="flex items-center gap-1.5">
+                        {d.attempt_count > 1 && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                        {d.attempt_count}
+                      </div>
+                    </div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 hidden md:flex items-center">
+                      {d.response_status ? (
+                        <span className={`text-xs sm:text-sm font-mono font-medium ${
+                          d.response_status < 300 ? 'text-green-600 dark:text-green-400'
+                            : d.response_status < 400 ? 'text-blue-600 dark:text-blue-400'
+                            : d.response_status < 500 ? 'text-yellow-600 dark:text-yellow-400'
+                            : 'text-red-600 dark:text-red-400'
+                        }`}>{d.response_status}</span>
+                      ) : <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-500">—</span>}
+                    </div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">
+                      {new Date(d.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                    <div className="px-3 sm:px-6 py-3 sm:py-4">
+                      <div className="flex items-center gap-2">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); openDetailModal(d); }} className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition" title={tl('deliveryDetails')}>
+                          <Package size={16} strokeWidth={1.75} />
+                        </button>
+                        <button type="button" onClick={(e) => { e.stopPropagation(); router.push(`/deliveries/${d.id}`); }} className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:text-brand-300 text-sm font-medium transition">
+                          {t('viewDetails')}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              />
             </div>
 
             {/* ─── Pagination ─── */}
