@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
@@ -7,7 +8,9 @@ export const metadata: Metadata = {
   description: 'HookSniff API error codes reference',
 };
 
-export default async function ErrorCodesPage() {
+
+
+async function ErrorCodesPageContent() {
   const t = await getTranslations('docsErrorCodes');
   return (
     <article className="prose prose-gray max-w-none">
@@ -132,5 +135,13 @@ export default async function ErrorCodesPage() {
         </ul>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <ErrorCodesPageContent />
+    </Suspense>
   );
 }

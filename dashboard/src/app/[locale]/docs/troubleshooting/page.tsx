@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -8,7 +9,9 @@ export const metadata: Metadata = {
   description: 'Common issues and solutions for HookSniff webhook deliveries',
 };
 
-export default async function TroubleshootingPage() {
+
+
+async function TroubleshootingPageContent() {
   const t = await getTranslations('docsTroubleshooting');
   return (
     <article className="prose prose-gray max-w-none">
@@ -111,5 +114,13 @@ export default async function TroubleshootingPage() {
         </ul>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <TroubleshootingPageContent />
+    </Suspense>
   );
 }

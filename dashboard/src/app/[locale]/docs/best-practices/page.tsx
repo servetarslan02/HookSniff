@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { Check, X } from '@/components/icons';
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
   description: 'Production patterns for sending and receiving webhooks',
 };
 
-export default async function BestPracticesPage() {
+
+
+async function BestPracticesPageContent() {
   const t = await getTranslations('docsBestPractices');
   return (
     <article className="prose prose-gray max-w-none">
@@ -248,5 +251,13 @@ SELECT 1 FROM processed_webhooks WHERE delivery_id = $1;`}
         </p>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <BestPracticesPageContent />
+    </Suspense>
   );
 }

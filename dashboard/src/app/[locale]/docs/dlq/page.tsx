@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -8,7 +9,9 @@ export const metadata: Metadata = {
   description: 'Manage failed webhook deliveries with the dead letter queue',
 };
 
-export default async function DlqPage() {
+
+
+async function DlqPageContent() {
   const t = await getTranslations('docsDlq');
   return (
     <article className="prose prose-gray max-w-none">
@@ -117,5 +120,13 @@ export default async function DlqPage() {
         <p className="text-gray-600 dark:text-slate-400 mt-4">{t('retentionExpired')}</p>
       </section>
     </article>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <DlqPageContent />
+    </Suspense>
   );
 }
