@@ -28,7 +28,19 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md            ← Yapılan i�
 | # | Adım | Katman | Durum | Tarih | Commit |
 |---|------|--------|-------|-------|--------|
 | 0 | QueryClient optimizasyonu | 1 | ✅ | 2026-05-25 | 707b64e0 |
-| 1 | Layout Suspense Boundaries | 2 | ⏳ | — | — |
+| 1 | Layout Suspense Boundaries | 2 | ✅ | 2026-05-26 | (pending push) |
+
+### Adım 1 Detay — Layout Suspense Boundaries (2026-05-26)
+
+**Yapılan:**
+- `LoadingSkeletons.tsx` oluşturuldu (SkeletonDashboard, SkeletonAdmin, SkeletonDocs)
+- `(dashboard)/layout.tsx` → Suspense eklendi (SkeletonDashboard fallback)
+- `admin/layout.tsx` → Suspense eklendi (SkeletonAdmin fallback)
+- `docs/layout.tsx` → Suspense eklendi (SkeletonDocs fallback)
+
+**Etki:** 172 sayfa — tüm dashboard/admin/docs sayfaları otomatik loading skeleton alır
+
+**Sonraki adım:** Adım 2 — Virtual Scrolling (Katman 3)
 | 2 | Virtual Scrolling | 3 | ⏳ | — | — |
 | 3 | Concurrent Features | 4 | ⏳ | — | — |
 | 4 | Akıllı Prefetch | 5 | ⏳ | — | — |

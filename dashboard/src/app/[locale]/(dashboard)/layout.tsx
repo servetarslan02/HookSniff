@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
@@ -13,6 +13,7 @@ import { PrefetchLink } from '@/components/PrefetchLink';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { BroadcastBanner } from '@/components/BroadcastBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { SkeletonDashboard } from '@/components/LoadingSkeletons';
 import { useRealtime } from '@/hooks/useRealtime';
 import { useIdleTimeout } from '@/hooks/useIdleTimeout';
 import { apiFetch, statsApi, webhooksApi, analyticsApi } from '@/lib/api';
@@ -305,7 +306,9 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           <EmailVerificationBanner />
           <BroadcastBanner />
           <ErrorBoundary>
-            {children}
+            <Suspense fallback={<SkeletonDashboard />}>
+              {children}
+            </Suspense>
           </ErrorBoundary>
         </main>
       </div>
