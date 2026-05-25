@@ -1,4 +1,3 @@
-"use cache";
 import { useTranslations } from 'next-intl';
 import CodeBlock from '@/components/CodeBlock';
 

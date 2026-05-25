@@ -2,7 +2,6 @@ import CodeBlock from '@/components/CodeBlock';
 import { AlertTriangle, Check, FileText, Key, RefreshCw, Search, Shield, Timer, X, Zap } from '@/components/icons';
 import type { Metadata } from 'next';
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Error Handling — HookSniff Docs',

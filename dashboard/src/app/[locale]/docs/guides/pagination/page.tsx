@@ -2,7 +2,6 @@ import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { FileText } from '@/components/icons';
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Pagination — HookSniff Docs',

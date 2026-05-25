@@ -3,8 +3,6 @@ import {useTranslations} from 'next-intl';
 import {Box, Check, Circle, Code2, Coffee, FileCode, FileText, FlaskConical, Gem, Hash, Key, Package, Radio, RefreshCw, ShieldCheck, Smartphone,  Zap} from '@/components/icons';
 import type {Metadata} from 'next';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
  title: 'SDK Libraries — HookSniff',

@@ -6,8 +6,6 @@ import type { Metadata } from 'next';
 import { posts, authors, categoryGradients, getRelatedPosts, getAdjacentPosts, tokenizeCode } from '@/lib/blog/data';
 import { sanitizeHighlightHtml } from '@/lib/sanitize';
 
-// Revalidate every hour for ISR
-export const revalidate = 3600;
 
 
 

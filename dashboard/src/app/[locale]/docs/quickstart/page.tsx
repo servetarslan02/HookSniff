@@ -4,7 +4,6 @@ import SdkTabs from '@/components/SdkTabs';
 import CodeBlock from '@/components/CodeBlock';
 import type {Metadata} from 'next';
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
  title: 'Quickstart — HookSniff',

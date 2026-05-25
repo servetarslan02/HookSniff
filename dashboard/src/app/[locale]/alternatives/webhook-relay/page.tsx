@@ -3,7 +3,6 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getTranslations } from 'next-intl/server';
 import { Lightbulb, Shuffle, X, Check } from '@/components/icons';
 
-export const revalidate = 3600;
 
 export default async function WebhookRelayAlternativePage() {
   const t = await getTranslations('alternatives');

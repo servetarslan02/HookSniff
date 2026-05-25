@@ -1,8 +1,6 @@
 import { useTranslations } from 'next-intl';
 import type { Metadata } from 'next';
 
-// Revalidate every hour for ISR
-export const revalidate = 3600;
 
 
 export const metadata: Metadata = {

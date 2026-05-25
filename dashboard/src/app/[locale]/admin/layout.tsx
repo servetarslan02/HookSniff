@@ -224,12 +224,12 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           <Lock size={64} strokeWidth={1.75} className="text-gray-300 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t("accessDenied")}</h2>
           <p className="text-gray-500 dark:text-slate-400 mb-4">{t("noAdminPrivileges")}</p>
-          <Link
+          <PrefetchLink
             href={"/applications"}
             className="inline-flex px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition"
           >
             {tc('backToDashboard')}
-          </Link>
+          </PrefetchLink>
         </div>
       </div>
     );
