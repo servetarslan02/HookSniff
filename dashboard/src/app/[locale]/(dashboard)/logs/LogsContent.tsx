@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { type Delivery, type DeliveryAttempt, webhooksApi } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
+import { VirtualTable } from '@/components/VirtualTable';
 import { useTranslations } from 'next-intl';
 import { useDeliveryLogs } from '@/hooks/useDashboardData';
 import { LazySection, Skeletons } from '@/components/LazySection';
@@ -176,104 +177,64 @@ export function LogsContent() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                      ID
-                    </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                      Event
-                    </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">
-                      Endpoint
-                    </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">
-                      Attempts
-                    </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">
-                      Response
-                    </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden xs:table-cell">
-                      Time
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                  {filtered.map((d) => (
-                    <tr
-                      key={d.id}
-                      className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer"
-                      onClick={() => {
-                        setSelected(d);
-                        setAttempts([]);
-                        if (token) {
-                          setAttemptsLoading(true);
-                          webhooksApi.getAttempts(token, d.id)
-                            .then((a) => setAttempts(a))
-                            .catch(() => setAttempts([]))
-                            .finally(() => setAttemptsLoading(false));
-                        }
-                      }}
-                    >
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-400">
-                        {d.id.slice(0, 8)}…
-                      </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">
-                          {d.event || '—'}
-                        </span>
-                      </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-500 hidden sm:table-cell">
-                        {d.endpoint_id?.slice(0, 8)}…
-                      </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4">
-                        <StatusBadge status={d.status} />
-                      </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:table-cell">
-                        <div className="flex items-center gap-1.5">
-                          {d.attempt_count > 1 && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                          )}
-                          {d.attempt_count}
-                        </div>
-                      </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
-                        {d.response_status ? (
-                          <span
-                            className={`text-xs sm:text-sm font-mono font-medium ${
-                              d.response_status < 300
-                                ? 'text-green-600 dark:text-green-400'
-                                : d.response_status < 400
-                                ? 'text-blue-600 dark:text-blue-400'
-                                : d.response_status < 500
-                                ? 'text-yellow-600 dark:text-yellow-400'
-                                : 'text-red-600 dark:text-red-400'
-                            }`}
-                          >
-                            {d.response_status}
-                          </span>
-                        ) : (
-                          <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-500">—</span>
-                        )}
-                      </td>
-                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap hidden xs:table-cell">
-                        {new Date(d.created_at).toLocaleString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <VirtualTable
+              data={filtered}
+              estimateSize={56}
+              header={
+                <div className="grid grid-cols-[80px_120px_minmax(100px,1fr)_90px_70px_80px_140px] bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50">
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Event</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:block">Endpoint</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">Att.</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:block">Resp</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Time</div>
+                </div>
+              }
+              renderRow={(d) => (
+                <div
+                  className="grid grid-cols-[80px_120px_minmax(100px,1fr)_90px_70px_80px_140px] hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer border-b border-gray-200/50 dark:border-slate-700/50"
+                  onClick={() => {
+                    setSelected(d);
+                    setAttempts([]);
+                    if (token) {
+                      setAttemptsLoading(true);
+                      webhooksApi.getAttempts(token, d.id)
+                        .then((a) => setAttempts(a))
+                        .catch(() => setAttempts([]))
+                        .finally(() => setAttemptsLoading(false));
+                    }
+                  }}
+                >
+                  <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 8)}…</div>
+                  <div className="px-3 sm:px-6 py-3 sm:py-4">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">{d.event || '—'}</span>
+                  </div>
+                  <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-500 hidden sm:flex items-center">{d.endpoint_id?.slice(0, 8)}…</div>
+                  <div className="px-3 sm:px-6 py-3 sm:py-4 flex items-center"><StatusBadge status={d.status} /></div>
+                  <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:flex items-center gap-1.5">
+                    {d.attempt_count > 1 && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                    {d.attempt_count}
+                  </div>
+                  <div className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:flex items-center">
+                    {d.response_status ? (
+                      <span className={`text-xs sm:text-sm font-mono font-medium ${d.response_status < 300 ? 'text-green-600 dark:text-green-400' : d.response_status < 400 ? 'text-blue-600 dark:text-blue-400' : d.response_status < 500 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>{d.response_status}</span>
+                    ) : (
+                      <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-500">—</span>
+                    )}
+                  </div>
+                  <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap flex items-center">
+                    {new Date(d.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+              )}
+              emptyState={
+                <div className="p-12 text-center">
+                  <div className="flex justify-center mb-3 text-gray-400"><Inbox size={36} strokeWidth={1.5} /></div>
+                  <p className="text-gray-500 dark:text-slate-500">{search ? t('noLogsSearch') : t('noLogs')}</p>
+                </div>
+              }
+            />
 
             {/* Pagination */}
             {total > perPage && (
