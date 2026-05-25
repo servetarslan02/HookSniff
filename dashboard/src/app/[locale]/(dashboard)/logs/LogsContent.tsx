@@ -10,6 +10,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { VirtualTable } from '@/components/VirtualTable';
 import { useTranslations } from 'next-intl';
 import { useDeliveryLogs } from '@/hooks/useDashboardData';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import { AlertTriangle, Check, CheckCircle2, ClipboardList, Clock, Inbox, X, XCircle } from '@/components/icons';
 
@@ -22,7 +23,7 @@ export function LogsContent() {
   const searchParams = useSearchParams();
   const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
   const filter = (searchParams.get('status') || 'all') as StatusFilter;
-  const [search, setSearch] = useState('');
+  const { input: search, deferredValue: debouncedSearch, handleChange: handleSearchChange, isStale } = useDebouncedSearch();
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [attempts, setAttempts] = useState<DeliveryAttempt[]>([]);
   const [attemptsLoading, setAttemptsLoading] = useState(false);
@@ -43,10 +44,10 @@ export function LogsContent() {
 
   const filtered = deliveries.filter(
     (d) =>
-      !search ||
-      d.event?.toLowerCase().includes(search.toLowerCase()) ||
-      d.id.includes(search) ||
-      d.endpoint_id?.includes(search)
+      !debouncedSearch ||
+      d.event?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      d.id.includes(debouncedSearch) ||
+      d.endpoint_id?.includes(debouncedSearch)
   );
 
   const totalPages = Math.ceil(total / perPage);
@@ -91,7 +92,7 @@ export function LogsContent() {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleSearchChange}
             placeholder={t('searchPlaceholder')}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
           />
@@ -172,7 +173,7 @@ export function LogsContent() {
           <div className="p-12 text-center">
             <div className="flex justify-center mb-3 text-gray-400"><Inbox size={36} strokeWidth={1.5} /></div>
             <p className="text-gray-500 dark:text-slate-500">
-              {search ? t('noLogsSearch') : t('noLogs')}
+              {debouncedSearch ? t('noLogsSearch') : t('noLogs')}
             </p>
           </div>
         ) : (
