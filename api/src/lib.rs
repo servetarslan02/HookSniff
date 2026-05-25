@@ -3,11 +3,13 @@
 
 pub mod audit;
 pub mod auth;
+pub mod background;
 pub mod billing;
 pub mod cache;
 pub mod circuit_breaker;
 pub mod config;
 pub mod config_tests;
+pub mod cors;
 pub mod cortex;
 pub mod crypto;
 pub mod db;
