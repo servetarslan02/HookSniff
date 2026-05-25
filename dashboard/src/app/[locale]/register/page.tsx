@@ -8,6 +8,13 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: 'Register',
   description: 'Create a free HookSniff account',
+  alternates: {
+    canonical: 'https://hooksniff.vercel.app/login',
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 
