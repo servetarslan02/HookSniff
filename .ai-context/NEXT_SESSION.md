@@ -14,14 +14,18 @@
 
 ## ✅ Tamamlanan İşler (Önceki Oturumlar)
 
-### OpenClaw Split — 2026-05-25 (11 dosya, 15 yeni dosya) ✅
+### OpenClaw Split — 2026-05-25 (15 dosya, 22 yeni dosya, %51 küçülme) ✅
 
 | Dosya | Önce | Sonra | Azalma |
 |-------|------|-------|--------|
 | main.rs | 788 | 331 | %58 |
+| sso/scim.rs | 743 | 181 | %76 |
+| stream.rs | 671 | 146 | %78 |
 | models/customer.rs | 691 | 270 | %61 |
 | events/publisher.rs | 657 | 261 | %60 |
 | models/delivery.rs | 624 | 219 | %65 |
+| integrations.rs | 620 | 250 | %60 |
+| sso/config.rs | 585 | 330 | %44 |
 | ws/handler.rs | 569 | 306 | %46 |
 | schemas/mod.rs | 562 | 338 | %40 |
 | retry_policy/mod.rs | 659 | 466 | %29 |
@@ -29,11 +33,11 @@
 | routes/endpoints.rs | 656 | 509 | %22 |
 | routes/health.rs | 663 | 541 | %18 |
 | fifo/mod.rs | 769 | 635 | %17 |
-| **TOPLAM** | **8265** | **4956** | **%40** |
+| **TOPLAM** | **9618** | **4665** | **%51** |
 
-Yeni dosyalar: cors.rs, background.rs, 8× tests.rs (her biri mod.rs + tests.rs yapısı)
+22 yeni dosya: cors.rs, background.rs, 12× tests.rs, scim/users.rs, scim/groups.rs, stream/handlers.rs, integration_handlers.rs, config/domain.rs
 
-Push: fd2828fa, 5bae3af0, bef66ce1, f06e4486
+Push: fd2828fa, 5bae3af0, bef66ce1, f06e4486, 371c528d, 1fdfadba
 
 ### Dashboard Hook Split (tamamlandı ✅)
 - `useDashboardData.ts`: 1106 → 172 satır (%84 küçülme)
@@ -51,20 +55,10 @@ Push: fd2828fa, 5bae3af0, bef66ce1, f06e4486
 
 ---
 
-## 🟡 Kalan Dosyalar (600+ satır — Düşük Öncelik)
+## 🟢 Split'ler Tamamlandı
 
-> 2026-05-25: test çıkarma split'leri tamamlandı. Kalan dosyalar saf iş mantığı, split için refactor gerekir.
-
-| Dosya | Satır | Not |
-|-------|-------|-----|
-| `routes/sso/scim.rs` | 743 | Saf SCIM endpoint kodu |
-| `routes/stream.rs` | 671 | Saf streaming kodu |
-| `middleware/mod.rs` | 642 | Zaten split edildi (tests ayrı) |
-| `fifo/mod.rs` | 635 | Zaten split edildi (tests ayrı) |
-| `templates/library/template_defs.rs` | 630 | Template veri tanımları |
-| `routes/integrations.rs` | 620 | Saf endpoint kodu |
-| `routes/inbound/tests.rs` | 593 | Zaten test dosyası |
-| `routes/sso/config.rs` | 585 | Saf SSO config kodu |
+> 2026-05-25: 15 dosya split edildi, %51 küçülme. Kalan dosyaların hepsi 650 satır altında.
+> Kalan dosyalar ya test dosyası (inbound/tests.rs, teams/tests.rs) ya da zaten split edilmiş (middleware, fifo, health, rate_limit).
 
 ### 2026-05-25 OpenClaw Split'leri — TAMAMLANDI ✅
 
