@@ -3,6 +3,7 @@
 import { LazySection, Skeletons } from '@/components/LazySection';
 import { useState } from 'react';
 import { useAdminAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert } from '@/hooks/useAdminData';
+import { VirtualList } from '@/components/VirtualList';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import type { AlertRuleAdmin } from '@/lib/api';
@@ -280,13 +281,18 @@ export default function AdminAlertsPage() {
 
       {/* Alert List */}
       {filteredAlerts.length > 0 ? (
-        <div className="space-y-3">
-          {filteredAlerts.map((alert) => {
+        <VirtualList
+          items={filteredAlerts}
+          height={Math.min(filteredAlerts.length * 80, 500)}
+          itemHeight={80}
+          overscan={3}
+          keyExtractor={(alert) => alert.id}
+          emptyMessage={t('noAlerts') || 'No alerts'}
+          renderItem={(alert) => {
             const cond = CONDITIONS.find((c) => c.value === alert.condition);
             return (
               <div
-                key={alert.id}
-                className={`glass-card p-4 flex items-center justify-between gap-4 transition ${
+                className={`glass-card p-4 flex items-center justify-between gap-4 transition mb-3 ${
                   !alert.is_active ? 'opacity-60' : ''
                 }`}
               >
@@ -357,8 +363,8 @@ export default function AdminAlertsPage() {
                 </div>
               </div>
             );
-          })}
-        </div>
+          }}
+        />
       ) : (
         <div className="glass-card p-12 text-center">
           <Bell size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-4" />

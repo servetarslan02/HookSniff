@@ -12,6 +12,7 @@ import {
   useDeleteNotification,
 } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualList } from '@/components/VirtualList';
 import { Circle, AlertTriangle, Bell, CreditCard, Users } from '@/components/icons';
 
 type NotifType = 'all' | 'webhook_failed' | 'alert' | 'system' | 'billing';
@@ -227,11 +228,16 @@ export default function NotificationsPage() {
         {/* ── Notification Items ── */}
         {!isLoading && !error && notifications.length > 0 && (
           <>
-            <div className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-              {notifications.map((n) => (
+            <VirtualList
+              items={notifications}
+              height={Math.min(notifications.length * 100, 600)}
+              itemHeight={100}
+              overscan={3}
+              keyExtractor={(n) => n.id}
+              emptyMessage={t('noNotifications')}
+              renderItem={(n) => (
                 <div
-                  key={n.id}
-                  className={`px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition ${
+                  className={`px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition border-b border-gray-200/50 dark:border-slate-700/50 ${
                     !n.read ? 'bg-brand-50/30 dark:bg-brand-500/5' : ''
                   }`}
                 >
@@ -288,8 +294,8 @@ export default function NotificationsPage() {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              )}
+            />
 
             {/* Pagination */}
             {total > perPage && (

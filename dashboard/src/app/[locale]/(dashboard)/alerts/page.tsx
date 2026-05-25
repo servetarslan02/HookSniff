@@ -7,6 +7,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import type { AlertRule } from '@/lib/api';
 import { useAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert, useTestAlert } from '@/hooks/useDashboardData';
+import { VirtualList } from '@/components/VirtualList';
 import { Bell, Link2, Mail, MessageSquare } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -200,9 +201,15 @@ export default function AlertsPage() {
         </div>
       ) : (
         <div className="glass-card overflow-hidden">
-          <div className="divide-y divide-gray-100 dark:divide-slate-700">
-            {alerts.map(alert => (
-              <div key={alert.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
+          <VirtualList
+            items={alerts}
+            height={Math.min(alerts.length * 72, 500)}
+            itemHeight={72}
+            overscan={3}
+            keyExtractor={(alert) => alert.id}
+            emptyMessage={t('empty')}
+            renderItem={(alert) => (
+              <div className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition border-b border-gray-100 dark:border-slate-700">
                 <div>
                   <div className="flex items-center gap-3">
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{alert.name}</h3>
@@ -228,8 +235,8 @@ export default function AlertsPage() {
                   </RoleGuard>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          />
         </div>
       )}
 
