@@ -5,12 +5,53 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
 import { Building2, Link2, Package, Check, X } from '@/components/icons';
 
-export function SvixsContent() 
+function getAlternatives(t: ReturnType<typeof useTranslations>) {
+  return [
+    {
+      name: 'Svix',
+      icon: '🔷',
+      price: '$490/mo (Professional)',
+      pros: [t('svixPro1'), t('svixPro2'), t('svixPro3')],
+      cons: [t('svixCon1'), t('svixCon2')],
+    },
+    {
+      name: 'HookSniff',
+      icon: '🪝',
+      price: '$24/mo (Startup)',
+      pros: [t('hooksniffPro1'), t('hooksniffPro2'), t('hooksniffPro3')],
+      cons: [t('hooksniffCon1'), t('hooksniffCon2')],
+    },
+    {
+      name: 'Hookdeck',
+      icon: '🎴',
+      price: '$39/mo+ (Team)',
+      pros: [t('hookdeckPro1'), t('hookdeckPro2')],
+      cons: [t('hookdeckCon1'), t('hookdeckCon2')],
+    },
+    {
+      name: 'Hook0',
+      icon: '🪝',
+      price: t('pricingFree'),
+      pros: [t('hook0Pro1'), t('hook0Pro2')],
+      cons: [t('hook0Con1'), t('hook0Con2')],
+    },
+    {
+      name: 'Convoy',
+      icon: '📦',
+      price: t('pricingFree'),
+      pros: [t('convoyPro1'), t('convoyPro2')],
+      cons: [t('convoyCon1'), t('convoyCon2')],
+    },
+  ];
+}
+
+export function SvixsContent() {
   const t = useTranslations('alternatives');
   const tc = useTranslations('compare');
   const alternatives = getAlternatives(t);
 
   return (
+    <div>
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="items-center gap-3 flex">
@@ -122,3 +163,4 @@ export function SvixsContent()
     </div>
   );
 
+}
