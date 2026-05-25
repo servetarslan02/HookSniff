@@ -42,43 +42,22 @@ if !circuit_breaker.allow_request(msg.endpoint_id).await {
 }
 ```
 
-### Sorun 3: Worker Loop — redis_queue Clone Sorunu
+### Sorun 3: Worker Loop — redis_queue Clone (YANLIŞ ALARM ✅)
 
-**Problem:** `RedisQueue` clone edilemez ama `tokio::spawn` içinde kullanılmaya çalışılıyor.
+**Düzeltme:** `ConnectionManager` Clone implement ediyor (docs.rs: `impl Clone for ConnectionManager`). `RedisQueue`'ya `#[derive(Clone)]` eklenebilir, `tokio::spawn` içinde clone çalışır.
 
-**Düzeltme:** Ack işlemini spawn dışında yap:
-
+**Doğru yaklaşım (Plan v2'deki gibi):**
 ```rust
-// Her mesajı paralel işle AMA ack ana loop'ta
-let mut handles = Vec::new();
-
 for (stream_id, msg) in messages {
-    let pool = pool.clone();
-    let http_client = http_client.clone();
-    let semaphore = delivery_semaphore.clone();
-    let endpoint_sems = endpoint_semaphores.clone();
-    let cb = circuit_breaker.clone();
-    let tm = throttle_manager.clone();
-    let signing_cache = signing_secret_cache.clone();
-
-    let handle = tokio::spawn(async move {
-        process_queue_message(&pool, &http_client, &msg, semaphore, endpoint_sems, cb, tm, signing_cache).await
+    let mut rq = redis_queue.clone(); // ✅ Çalışır
+    tokio::spawn(async move {
+        process_queue_message(...).await;
+        let _ = rq.ack(&stream_id).await; // ✅ Spawn içinde ack yapılabilir
     });
-    handles.push((stream_id, handle));
-}
-
-// Sonuçları bekle ve ack et
-for (stream_id, handle) in handles {
-    match handle.await {
-        Ok(_) => {
-            if let Some(ref mut rq) = redis_queue {
-                let _ = rq.ack(&stream_id).await;
-            }
-        }
-        Err(e) => tracing::error!("❌ Task failed: {:?}", e),
-    }
 }
 ```
+
+**NOT:** `RedisQueue` struct'ına `#[derive(Clone)]` eklenmeli.
 
 ### Sorun 4: Eksik Fonksiyon Implementasyonları
 

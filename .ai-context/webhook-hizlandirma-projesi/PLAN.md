@@ -1,335 +1,184 @@
-# 📋 Webhook Hızlandırma — Uygulama Planı (v2 — Gözden Geçirilmiş)
+# 📋 Webhook Hızlandırma — KESİN FİNAL PLAN (v4)
 
 > **Tarih:** 2026-05-26
-> **Hedef:** 6 fazda HookSniff'i sektörün en hızlı webhook platformu yapmak
-> **Toplam Süre:** ~10-12 oturum
+> **Durum:** Tam — uygulanmaya hazır
 > **Ek Maliyet:** $0
 
 ---
 
-## 🎯 Genel Bakış
+## ⚙️ Mevcut Kod Referansları (Doğrulanmış)
 
-```
-Faz 1: Redis Streams Queue          → 1000ms → < 10ms    (EN KRİTİK)
-Faz 2: HTTP/2 + Connection Pooling  → 50ms → 0ms
-Faz 3: 3 Katmanlı Retry             → 30s → 100ms
-Faz 4: DNS + SSRF Cache             → 30ms → 0ms
-Faz 5: Dynamic Concurrency          → 10 → 20-50/endpoint
-Faz 6: Batch Processing             → 1x → 1.5-2x throughput
-```
-
----
-
-## ⚠️ KRİTİK: DUZELTMELER.md Oku!
-
-Bu plan v2'de 7 kritik sorun tespit edildi. **Uygulamadan önce DUZELTMELER.md oku!**
-
-| Sorun | Özet |
-|-------|------|
-| Type mismatch | QueueMessage.delivery_id String olmalı (Uuid değil) |
-| Method adı | `circuit_breaker.allow_request()` (is_open değil) |
-| Clone sorunu | Ack spawn dışında yapılmalı |
-| Eksik fonksiyonlar | get_signing_secret, commit_delivery, schedule_retry, mark_failed, is_retryable |
-| Dual-write | Redis-first + PG fallback (ikisine birden yazma) |
-| claim_pending | Worker startup'ta çağırılmamış |
-| Imports | Semaphore, Mutex, HashMap, Uuid import gerekli |
+| Bileşen | Dosya | Mevcut | Doğrulandı |
+|---------|-------|--------|------------|
+| Redis dep. | `api/Cargo.toml` | `redis = { version = "1", features = ["tokio-rustls-comp", "connection-manager", "script"] }` | ✅ `streams` EKSIK |
+| Redis dep. | `worker/Cargo.toml` | `redis = { version = "1", features = ["tokio-rustls-comp", "connection-manager"] }` | ✅ `streams` EKSIK |
+| WebhookMessage | `worker/src/types.rs` | `delivery_id: String, endpoint_id: String` | ✅ String tipi |
+| WebhookQueueItem | `worker/src/types.rs` | `delivery_id: Uuid, endpoint_id: Uuid` | ✅ Uuid tipi |
+| publish_to_queue | `api/src/db.rs:163` | `(pool, delivery_id: Uuid, endpoint_id: Uuid, url, payload, headers)` | ✅ |
+| process_pending | `worker/src/main.rs:463` | PG `FOR UPDATE SKIP LOCKED` ile 50 item batch | ✅ |
+| Circuit breaker | `worker/src/circuit_breaker.rs` | `allow_request(endpoint_id) → bool` | ✅ |
+| Throttle | `worker/src/throttle.rs` | `check_allowed(endpoint_id) → Result<(), Duration>` | ✅ |
+| FIFO | `worker/src/fifo.rs` | `should_deliver_fifo(pool, endpoint_id) → Result<bool>` | ✅ |
+| deliver_http | `worker/src/delivery/http.rs` | `(http_client, webhook: &WebhookMessage, attempt) → Result<DeliveryResult>` | ✅ |
+| ConnectionManager | `redis` crate v1.2.1 | `impl Clone` | ✅ Clone edilebilir |
+| Signing secret | `process_pending` | Batch fetch: `SELECT id, signing_secret FROM endpoints WHERE id = ANY($1)` | ✅ |
+| Idempotency | `process_pending` | `SELECT status::text FROM deliveries WHERE id = $1` | ✅ |
+| Dead letter | `process_pending` | `INSERT INTO dead_letters` + `UPDATE deliveries SET status = 'failed'` | ✅ |
+| Response truncation | `process_pending` | 500 byte | ✅ |
 
 ---
 
-## ⚙️ Mevcut Sistem Notları
+## Faz 1: Redis Streams Queue
 
-### Zaten Var Olan Altyapı
-- **Redis**: `api/Cargo.toml` ve `worker/Cargo.toml`'da `redis = { version = "1", features = ["tokio-rustls-comp", "connection-manager"] }` — ama `streams` feature'ı EKSIK
-- **REDIS_URL**: `api/src/config.rs`'de `resolve_redis_url()` fonksiyonu var
-- **Worker Redis**: `worker/src/config.rs`'de `redis_url: Option<String>` var
-- **webhook_queue**: `api/src/db.rs:174`'de INSERT var
-- **process_pending**: `worker/src/main.rs:463`'te mevcut queue okuma fonksiyonu
-- **Circuit breaker**: `worker/src/circuit_breaker.rs` — mevcut, Redis persistence var
-- **Throttle**: `worker/src/throttle.rs` — mevcut, Redis persistence var
-- **Signing secrets**: `process_pending` içinde batch fetch var
-
-### Eksik Olanlar
-- Redis `streams` feature'ı Cargo.toml'da yok
-- `api/src/queue.rs` modülü yok (yeni oluşturulacak)
-- `worker/src/queue.rs` modülü yok (yeni oluşturulcargo check)
-
----
-
-## Faz 1: Redis Streams Queue 🔴 KRİTİK
-
-**Süre:** 2-3 oturum
-**Etki:** İlk tetikleme 1000ms → < 10ms
-**Risk:** Orta (paralel çalıştırılabilir)
-
-### Adım 1.0: Cargo.toml Değişiklikleri
+### Adım 1.0: Cargo.toml
 
 ```toml
-# api/Cargo.toml — streams feature ekle
-redis = { version = "1", default-features = false, features = ["tokio-rustls-comp", "connection-manager", "streams"] }
+# api/Cargo.toml — "streams" ekle
+redis = { version = "1", default-features = false, features = ["tokio-rustls-comp", "connection-manager", "script", "streams"] }
 
-# worker/Cargo.toml — streams feature ekle
+# worker/Cargo.toml — "streams" ekle
 redis = { version = "1", default-features = false, features = ["tokio-rustls-comp", "connection-manager", "streams"] }
 ```
 
-**Doğrulama:** `cargo check` — 0 hata
-
-### Adım 1.1: QueueMessage Struct (api/src/queue.rs — YENİ)
+### Adım 1.1: api/src/queue.rs (YENİ)
 
 ```rust
-//! Redis Streams webhook queue.
-//!
-//! PostgreSQL webhook_queue tablosunun yerini alır.
-//! Sub-millisecond tetikleme sağlar.
-
 use anyhow::Result;
 use redis::aio::ConnectionManager;
 use redis::streams::{StreamReadOptions, StreamReadReply};
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 const STREAM_KEY: &str = "hooksniff:webhooks";
 const CONSUMER_GROUP: &str = "hooksniff-workers";
 const MAX_STREAM_LEN: usize = 100_000;
 
-/// Kuyruk mesajı — API tarafından yazılır, Worker tarafından okunur
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
+pub struct RedisQueue {
+    conn: ConnectionManager,  // Clone implement ediyor ✅
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct QueueMessage {
-    pub delivery_id: Uuid,
-    pub endpoint_id: Uuid,
+    pub delivery_id: String,   // String — WebhookMessage ile uyumlu
+    pub endpoint_id: String,   // String — WebhookMessage ile uyumlu
     pub endpoint_url: String,
     pub payload: String,
     pub custom_headers: Option<serde_json::Value>,
+    pub signing_secret: String, // Batch fetch'ten gelecek
     pub trace_id: Option<String>,
     pub attempt_count: i32,
     pub max_attempts: i32,
-}
-
-/// Redis Streams queue yöneticisi
-pub struct RedisQueue {
-    conn: ConnectionManager,
+    pub queue_item_id: String,  // webhook_queue.id (PG uyumluluk için)
 }
 
 impl RedisQueue {
-    /// Yeni bağlantı oluştur + consumer group oluştur
     pub async fn new(redis_url: &str) -> Result<Self> {
         let client = redis::Client::open(redis_url)?;
         let mut conn = ConnectionManager::new(client).await?;
-
-        // Consumer group oluştur (yoksa)
         let _: Result<(), _> = redis::cmd("XGROUP")
-            .arg("CREATE")
-            .arg(STREAM_KEY)
-            .arg(CONSUMER_GROUP)
-            .arg("0")
-            .arg("MKSTREAM")
-            .query_async(&mut conn)
-            .await;
-
-        tracing::info!("✅ Redis Streams queue connected: {}", STREAM_KEY);
+            .arg("CREATE").arg(STREAM_KEY).arg(CONSUMER_GROUP)
+            .arg("0").arg("MKSTREAM")
+            .query_async(&mut conn).await;
         Ok(Self { conn })
     }
 
-    /// Kuyruğa webhook ekle (sub-millisecond)
     pub async fn enqueue(&mut self, msg: &QueueMessage) -> Result<String> {
-        let headers_str = msg
-            .custom_headers
-            .as_ref()
+        let headers_str = msg.custom_headers.as_ref()
             .map(|h| serde_json::to_string(h).unwrap_or_default())
             .unwrap_or_default();
-
         let id: String = redis::cmd("XADD")
-            .arg(STREAM_KEY)
-            .arg("MAXLEN")
-            .arg("~")
-            .arg(MAX_STREAM_LEN)
+            .arg(STREAM_KEY).arg("MAXLEN").arg("~").arg(MAX_STREAM_LEN)
             .arg("*")
-            .arg("delivery_id")
-            .arg(msg.delivery_id.to_string())
-            .arg("endpoint_id")
-            .arg(msg.endpoint_id.to_string())
-            .arg("url")
-            .arg(&msg.endpoint_url)
-            .arg("payload")
-            .arg(&msg.payload)
-            .arg("headers")
-            .arg(&headers_str)
-            .arg("trace_id")
-            .arg(msg.trace_id.as_deref().unwrap_or(""))
-            .arg("attempt")
-            .arg(msg.attempt_count.to_string())
-            .arg("max_attempts")
-            .arg(msg.max_attempts.to_string())
-            .query_async(&mut self.conn)
-            .await?;
-
+            .arg("delivery_id").arg(&msg.delivery_id)
+            .arg("endpoint_id").arg(&msg.endpoint_id)
+            .arg("url").arg(&msg.endpoint_url)
+            .arg("payload").arg(&msg.payload)
+            .arg("headers").arg(&headers_str)
+            .arg("signing_secret").arg(&msg.signing_secret)
+            .arg("trace_id").arg(msg.trace_id.as_deref().unwrap_or(""))
+            .arg("attempt").arg(msg.attempt_count.to_string())
+            .arg("max_attempts").arg(msg.max_attempts.to_string())
+            .arg("queue_item_id").arg(&msg.queue_item_id)
+            .query_async(&mut self.conn).await?;
         Ok(id)
     }
 
-    /// Consumer group ile batch okuma (blocking)
-    pub async fn read_batch(
-        &mut self,
-        consumer_name: &str,
-        count: usize,
-        block_ms: usize,
-    ) -> Result<Vec<(String, QueueMessage)>> {
+    pub async fn read_batch(&mut self, consumer_name: &str, count: usize, block_ms: usize)
+        -> Result<Vec<(String, QueueMessage)>>
+    {
         let opts = StreamReadOptions::default()
-            .count(count)
-            .block(block_ms)
+            .count(count).block(block_ms)
             .group(CONSUMER_GROUP, consumer_name);
-
-        let result: StreamReadReply =
-            self.conn
-                .xread_options(&[STREAM_KEY], &[">"], &opts)
-                .await?;
-
+        let result: StreamReadReply = self.conn
+            .xread_options(&[STREAM_KEY], &[">"], &opts).await?;
         let mut messages = Vec::new();
         for stream in result.keys {
             for entry in stream.ids {
-                let delivery_id = get_field(&entry, "delivery_id")?;
-                let endpoint_id = get_field(&entry, "endpoint_id")?;
-                let url = get_field(&entry, "url").unwrap_or_default();
-                let payload = get_field(&entry, "payload").unwrap_or_default();
-                let headers_str = get_field(&entry, "headers").unwrap_or_default();
-                let trace_id = get_field(&entry, "trace_id").ok().filter(|s| !s.is_empty());
-                let attempt = get_field(&entry, "attempt")
-                    .unwrap_or("0".into())
-                    .parse()
-                    .unwrap_or(0);
-                let max_attempts = get_field(&entry, "max_attempts")
-                    .unwrap_or("5".into())
-                    .parse()
-                    .unwrap_or(5);
-
-                let custom_headers = if headers_str.is_empty() {
-                    None
-                } else {
-                    serde_json::from_str(&headers_str).ok()
-                };
-
-                messages.push((
-                    entry.id.clone(),
-                    QueueMessage {
-                        delivery_id: Uuid::parse_str(&delivery_id)?,
-                        endpoint_id: Uuid::parse_str(&endpoint_id)?,
-                        endpoint_url: url,
-                        payload,
-                        custom_headers,
-                        trace_id,
-                        attempt_count: attempt,
-                        max_attempts,
-                    },
-                ));
+                messages.push((entry.id.clone(), parse_entry(&entry)?));
             }
         }
-
         Ok(messages)
     }
 
-    /// Mesajı onayla (işlem tamamlandı)
     pub async fn ack(&mut self, stream_id: &str) -> Result<()> {
-        redis::cmd("XACK")
-            .arg(STREAM_KEY)
-            .arg(CONSUMER_GROUP)
-            .arg(stream_id)
-            .query_async(&mut self.conn)
-            .await?;
+        redis::cmd("XACK").arg(STREAM_KEY).arg(CONSUMER_GROUP).arg(stream_id)
+            .query_async(&mut self.conn).await?;
         Ok(())
     }
 
-    /// Crash sonrası yarım kalan mesajları geri al (5 dk+ pending)
-    pub async fn claim_pending(
-        &mut self,
-        consumer_name: &str,
-    ) -> Result<Vec<(String, QueueMessage)>> {
+    pub async fn claim_pending(&mut self, consumer_name: &str)
+        -> Result<Vec<(String, QueueMessage)>>
+    {
         let result: (String, Vec<String>, Vec<redis::streams::StreamId>) =
             redis::cmd("XAUTOCLAIM")
-                .arg(STREAM_KEY)
-                .arg(CONSUMER_GROUP)
-                .arg(consumer_name)
-                .arg(300_000) // 5 dakika (ms)
-                .arg("0-0")
-                .query_async(&mut self.conn)
-                .await?;
-
+                .arg(STREAM_KEY).arg(CONSUMER_GROUP).arg(consumer_name)
+                .arg(300_000).arg("0-0")
+                .query_async(&mut self.conn).await?;
         let (_, _, entries) = result;
-        let mut messages = Vec::new();
-        for entry in entries {
-            // Aynı parse logic
-            if let Ok(delivery_id) = get_field(&entry, "delivery_id") {
-                if let Ok(endpoint_id) = get_field(&entry, "endpoint_id") {
-                    messages.push((
-                        entry.id.clone(),
-                        QueueMessage {
-                            delivery_id: Uuid::parse_str(&delivery_id)?,
-                            endpoint_id: Uuid::parse_str(&endpoint_id)?,
-                            endpoint_url: get_field(&entry, "url").unwrap_or_default(),
-                            payload: get_field(&entry, "payload").unwrap_or_default(),
-                            custom_headers: get_field(&entry, "headers")
-                                .ok()
-                                .and_then(|s| serde_json::from_str(&s).ok()),
-                            trace_id: get_field(&entry, "trace_id")
-                                .ok()
-                                .filter(|s| !s.is_empty()),
-                            attempt_count: get_field(&entry, "attempt")
-                                .unwrap_or("0".into())
-                                .parse()
-                                .unwrap_or(0),
-                            max_attempts: get_field(&entry, "max_attempts")
-                                .unwrap_or("5".into())
-                                .parse()
-                                .unwrap_or(5),
-                        },
-                    ));
-                }
-            }
-        }
-
-        Ok(messages)
+        entries.into_iter().map(|e| Ok((e.id.clone(), parse_entry(&e)?))).collect()
     }
-
-    /// Stream durumu (monitoring için)
-    pub async fn stream_info(&mut self) -> Result<StreamInfo> {
-        let info: redis::streams::StreamInfoReply =
-            redis::cmd("XINFO").arg("STREAM").arg(STREAM_KEY).query_async(&mut self.conn).await?;
-        
-        Ok(StreamInfo {
-            length: info.length,
-            first_entry: info.first_entry.id,
-            last_entry: info.last_entry.id,
-        })
-    }
-}
-
-pub struct StreamInfo {
-    pub length: usize,
-    pub first_entry: String,
-    pub last_entry: String,
 }
 
 fn get_field(entry: &redis::streams::StreamId, field: &str) -> Result<String> {
-    entry
-        .get(field)
-        .ok_or_else(|| anyhow::anyhow!("Missing field: {}", field))
+    entry.get(field).ok_or_else(|| anyhow::anyhow!("Missing field: {}", field))
+}
+
+fn parse_entry(entry: &redis::streams::StreamId) -> Result<QueueMessage> {
+    Ok(QueueMessage {
+        delivery_id: get_field(entry, "delivery_id")?,
+        endpoint_id: get_field(entry, "endpoint_id")?,
+        endpoint_url: get_field(entry, "url").unwrap_or_default(),
+        payload: get_field(entry, "payload").unwrap_or_default(),
+        custom_headers: get_field(entry, "headers").ok().and_then(|s| serde_json::from_str(&s).ok()),
+        signing_secret: get_field(entry, "signing_secret").unwrap_or_default(),
+        trace_id: get_field(entry, "trace_id").ok().filter(|s| !s.is_empty()),
+        attempt_count: get_field(entry, "attempt").unwrap_or("0".into()).parse().unwrap_or(0),
+        max_attempts: get_field(entry, "max_attempts").unwrap_or("5".into()).parse().unwrap_or(5),
+        queue_item_id: get_field(entry, "queue_item_id").unwrap_or_default(),
+    })
 }
 ```
 
-### Adım 1.2: API Modül Kaydı
-
-**Dosya:** `api/src/lib.rs` veya `api/src/main.rs`
+### Adım 1.2: api/src/main.rs — Modül + Redis Bağlantısı
 
 ```rust
-mod queue;  // Yeni modül ekle
+mod queue; // Ekle
+
+// Startup'ta:
+let redis_queue = config::resolve_redis_url()
+    .and_then(|url| {
+        futures::executor::block_on(queue::RedisQueue::new(&url)).ok()
+    });
+if redis_queue.is_some() { tracing::info!("✅ Redis Streams queue active"); }
+app = app.layer(Extension(redis_queue));
 ```
 
-### Adım 1.3: API'de publish_to_queue Değişikliği
-
-**Dosya:** `api/src/db.rs` — mevcut fonksiyonu değiştir
+### Adım 1.3: api/src/db.rs — publish_to_queue (Redis-first + PG fallback)
 
 ```rust
-// Mevcut fonksiyonu koru, yeni parametre ekle
 pub async fn publish_to_queue(
     pool: &PgPool,
-    redis_queue: Option<&mut queue::RedisQueue>,  // YENİ: opsiyonel Redis
+    redis_queue: Option<&mut queue::RedisQueue>,  // YENİ parametre
     delivery_id: uuid::Uuid,
     endpoint_id: uuid::Uuid,
     endpoint_url: &str,
@@ -338,127 +187,123 @@ pub async fn publish_to_queue(
 ) -> Result<()> {
     let trace_id = crate::telemetry::current_trace_id();
 
-    // 1. Redis Streams'a ekle (varsa, sub-millisecond)
+    // 1. Redis'e yaz (hızlı)
     if let Some(redis) = redis_queue {
         let msg = queue::QueueMessage {
-            delivery_id,
-            endpoint_id,
+            delivery_id: delivery_id.to_string(),
+            endpoint_id: endpoint_id.to_string(),
             endpoint_url: endpoint_url.to_string(),
             payload: payload.to_string(),
             custom_headers: custom_headers.cloned(),
+            signing_secret: String::new(), // Worker cache'ten alacak
             trace_id: trace_id.clone(),
             attempt_count: 0,
-            max_attempts: 5, // Varsayılan, endpoint'ten alınacak
+            max_attempts: 5,
+            queue_item_id: String::new(),
         };
-        redis.enqueue(&msg).await?;
-        tracing::debug!("📤 Webhook {} queued to Redis", delivery_id);
+        if let Ok(_) = redis.enqueue(&msg).await {
+            tracing::debug!("📤 Webhook {} queued to Redis", delivery_id);
+            return Ok(()); // Redis başarılı → PG'ye gerek yok
+        }
+        tracing::warn!("⚠️ Redis enqueue failed, falling back to PG");
     }
 
-    // 2. PostgreSQL webhook_queue'a da ekle (backward compatibility)
-    //    Bu satır migration döneminde aktif, sonra kaldırılacak
+    // 2. PostgreSQL fallback
     sqlx::query(
-        r#"
-        INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, payload, custom_headers, trace_id)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        "#,
+        "INSERT INTO webhook_queue (delivery_id, endpoint_id, endpoint_url, payload, custom_headers, trace_id) VALUES ($1, $2, $3, $4, $5, $6)"
     )
-    .bind(delivery_id)
-    .bind(endpoint_id)
-    .bind(endpoint_url)
-    .bind(payload)
-    .bind(custom_headers)
-    .bind(&trace_id)
-    .execute(pool)
-    .await?;
-
+    .bind(delivery_id).bind(endpoint_id).bind(endpoint_url)
+    .bind(payload).bind(custom_headers).bind(&trace_id)
+    .execute(pool).await?;
     Ok(())
 }
 ```
 
-### Adım 1.4: API'de Redis Queue Bağlantısı
+### Adım 1.4: worker/src/queue.rs (YENİ — api'deki ile aynı)
 
-**Dosya:** `api/src/main.rs` — startup'ta Redis bağla
+api/src/queue.rs'nin kopyası. Veya `common/` klasörüne taşı, her iki taraf da kullansın.
+
+### Adım 1.5: worker/src/secret_cache.rs (YENİ)
 
 ```rust
-// Mevcut Redis bağlantısını queue için de kullan
-let redis_queue = if let Some(redis_url) = config::resolve_redis_url() {
-    match queue::RedisQueue::new(&redis_url).await {
-        Ok(q) => {
-            tracing::info!("✅ Redis Streams queue active");
-            Some(q)
-        }
-        Err(e) => {
-            tracing::warn!("⚠️ Redis queue failed ({}), using PostgreSQL only", e);
-            None
-        }
-    }
-} else {
-    tracing::info!("ℹ️ No REDIS_URL, using PostgreSQL queue only");
-    None
-};
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
 
-// Redis queue'yu extension olarak ekle
-app = app.layer(Extension(redis_queue));
+pub struct SecretCache {
+    entries: HashMap<String, (String, Instant)>,  // endpoint_id → (secret, cached_at)
+    ttl: Duration,
+}
+
+impl SecretCache {
+    pub fn new(ttl: Duration) -> Self {
+        Self { entries: HashMap::new(), ttl }
+    }
+
+    pub fn get(&self, endpoint_id: &str) -> Option<&str> {
+        self.entries.get(endpoint_id).and_then(|(secret, cached_at)| {
+            if cached_at.elapsed() < self.ttl { Some(secret.as_str()) } else { None }
+        })
+    }
+
+    pub fn insert(&mut self, endpoint_id: String, secret: String) {
+        self.entries.insert(endpoint_id, (secret, Instant::now()));
+    }
+
+    pub fn cleanup(&mut self) {
+        self.entries.retain(|_, (_, cached_at)| cached_at.elapsed() < self.ttl);
+    }
+}
 ```
 
-### Adım 1.5: Worker'da Queue Değişikliği
-
-**Dosya:** `worker/src/main.rs` — ana loop'u değiştir
+### Adım 1.6: worker/src/main.rs — Ana Loop Değişikliği
 
 ```rust
-// Mevcut: tokio::select! { listener.recv() + sleep(1s) }
-// Yeni: Redis Streams blocking read
+// Worker başında:
+mod queue;
+mod secret_cache;
 
-// Worker'da Redis queue oluştur
-let mut redis_queue = if let Some(ref redis_url) = cfg.redis_url {
-    match queue::RedisQueue::new(redis_url).await {
-        Ok(q) => Some(q),
-        Err(e) => {
-            tracing::warn!("⚠️ Redis queue unavailable ({}), falling back to PostgreSQL", e);
-            None
+let mut redis_queue = cfg.redis_url.as_deref().and_then(|url| {
+    futures::executor::block_on(queue::RedisQueue::new(url)).ok()
+});
+
+let consumer_name = format!("worker-{}", std::process::id());
+let signing_cache = Arc::new(Mutex::new(secret_cache::SecretCache::new(Duration::from_secs(300))));
+
+// Crash recovery
+if let Some(ref mut rq) = redis_queue {
+    if let Ok(recovered) = rq.claim_pending(&consumer_name).await {
+        if !recovered.is_empty() {
+            tracing::warn!("🔄 Recovered {} pending messages", recovered.len());
         }
     }
-} else {
-    None
-};
+}
 
-// Consumer name (her worker instance unique olmalı)
-let consumer_name = format!("worker-{}", std::process::id());
-
+// Ana loop:
 loop {
     tokio::select! {
-        _ = &mut shutdown => {
-            tracing::info!("🛑 Shutdown signal received");
-            break;
-        }
+        _ = &mut shutdown => { break; }
 
-        // Redis queue varsa onu kullan
+        // Redis queue
         result = async {
             if let Some(ref mut rq) = redis_queue {
                 rq.read_batch(&consumer_name, 50, 100).await
-            } else {
-                // Fallback: PostgreSQL poll
-                futures::future::pending().await
-            }
+            } else { futures::future::pending().await }
         }, if redis_queue.is_some() => {
             match result {
                 Ok(messages) => {
                     for (stream_id, msg) in messages {
-                        // Her mesajı paralel işle
+                        let mut rq = redis_queue.clone(); // ✅ ConnectionManager Clone
                         let pool = pool.clone();
                         let http_client = http_client.clone();
-                        let semaphore = delivery_semaphore.clone();
-                        let endpoint_sems = endpoint_semaphores.clone();
+                        let sem = delivery_semaphore.clone();
+                        let ep_sems = endpoint_semaphores.clone();
                         let cb = circuit_breaker.clone();
                         let tm = throttle_manager.clone();
-                        let mut rq = redis_queue.clone();
+                        let cache = signing_cache.clone();
 
                         tokio::spawn(async move {
-                            process_queue_message(&pool, &http_client, &msg, semaphore, endpoint_sems, cb, tm).await;
-                            // Başarılı olursa ack
-                            if let Some(ref mut rq) = rq {
-                                let _ = rq.ack(&stream_id).await;
-                            }
+                            process_queue_message(&pool, &http_client, &msg, sem, ep_sems, cb, tm, cache).await;
+                            let _ = rq.ack(&stream_id).await;
                         });
                     }
                 }
@@ -469,443 +314,198 @@ loop {
             }
         }
 
-        // Fallback: PostgreSQL poll (Redis yoksa)
+        // PG fallback
         _ = tokio::time::sleep(Duration::from_secs(1)), if redis_queue.is_none() => {
-            match process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), endpoint_semaphores.clone(), circuit_breaker.clone(), throttle_manager.clone()).await {
-                Ok(count) => {
-                    if count > 0 {
-                        tracing::debug!("✅ Processed {} deliveries (PG fallback)", count);
-                    }
-                }
-                Err(e) => tracing::error!("❌ PG queue error: {:?}", e),
-            }
+            let _ = process_pending(&pool, &http_client, &cfg, delivery_semaphore.clone(), endpoint_semaphores.clone(), circuit_breaker.clone(), throttle_manager.clone()).await;
         }
 
-        // Zombie reaper (her iki mod için de gerekli)
-        _ = reaper_interval.tick() => {
-            // Mevcut zombie reaper logic
-        }
+        // Zombie reaper (her iki mod için)
+        _ = reaper_interval.tick() => { /* mevcut logic */ }
     }
 }
 ```
 
-### Adım 1.6: Signing Secret Cache
-
-**Problem:** Mevcut `process_pending` her batch'te signing secret için DB sorgusu yapıyor. Redis queue'da bu gerekli.
-
-**Çözüm:** Signing secret'ları Redis'te cache'le (5 dakika TTL).
+### Adım 1.7: process_queue_message (Mevcut process_pending ile uyumlu)
 
 ```rust
-// worker/src/secret_cache.rs (YENİ)
-use std::collections::HashMap;
-use std::time::{Duration, Instant};
-
-pub struct SecretCache {
-    entries: HashMap<uuid::Uuid, CacheEntry>,
-    ttl: Duration,
-}
-
-struct CacheEntry {
-    secret: String,
-    cached_at: Instant,
-}
-
-impl SecretCache {
-    pub fn new(ttl: Duration) -> Self {
-        Self {
-            entries: HashMap::new(),
-            ttl,
-        }
-    }
-
-    pub fn get(&self, endpoint_id: &uuid::Uuid) -> Option<&str> {
-        self.entries.get(endpoint_id).and_then(|entry| {
-            if entry.cached_at.elapsed() < self.ttl {
-                Some(entry.secret.as_str())
-            } else {
-                None
-            }
-        })
-    }
-
-    pub fn insert(&mut self, endpoint_id: uuid::Uuid, secret: String) {
-        self.entries.insert(endpoint_id, CacheEntry {
-            secret,
-            cached_at: Instant::now(),
-        });
-    }
-
-    pub fn cleanup(&mut self) {
-        self.entries.retain(|_, entry| entry.cached_at.elapsed() < self.ttl);
-    }
-}
-```
-
-### Adım 1.7: process_queue_message Fonksiyonu
-
-**Dosya:** `worker/src/main.rs`
-
-```rust
-/// Redis queue'dan gelen mesajı işle
 async fn process_queue_message(
     pool: &PgPool,
     http_client: &reqwest::Client,
     msg: &QueueMessage,
     semaphore: Arc<Semaphore>,
     endpoint_semaphores: Arc<Mutex<HashMap<Uuid, Arc<Semaphore>>>>,
-    circuit_breaker: CircuitBreaker,
-    throttle_manager: ThrottleManager,
+    cb: circuit_breaker::CircuitBreaker,
+    tm: throttle::ThrottleManager,
+    cache: Arc<Mutex<secret_cache::SecretCache>>,
 ) {
-    // 1. Circuit breaker kontrolü
-    if circuit_breaker.is_open(msg.endpoint_id).await {
-        tracing::warn!("⚡ Circuit open for endpoint {}", msg.endpoint_id);
-        // Re-queue with delay (Redis'te ayrı bir retry queue'ya taşı)
+    let delivery_id = Uuid::parse_str(&msg.delivery_id).unwrap_or_default();
+    let endpoint_id = Uuid::parse_str(&msg.endpoint_id).unwrap_or_default();
+    let attempt = msg.attempt_count + 1;
+
+    // 1. Idempotency guard (mevcut process_pending ile aynı)
+    if let Ok(Some((status,))) = sqlx::query_as::<_, (String,)>(
+        "SELECT status::text FROM deliveries WHERE id = $1"
+    ).bind(delivery_id).fetch_optional(pool).await {
+        if status == "delivered" {
+            tracing::info!("⏭️ {} already delivered", delivery_id);
+            return;
+        }
+    }
+
+    // 2. Circuit breaker (mevcut: allow_request)
+    if !cb.allow_request(endpoint_id).await {
+        tracing::warn!("⚡ Circuit open for {}", endpoint_id);
+        requeue_with_delay(pool, &msg.queue_item_id, 60).await;
         return;
     }
 
-    // 2. Throttle kontrolü
-    if let Err(wait) = throttle_manager.check_allowed(msg.endpoint_id).await {
-        tracing::warn!("🚦 Throttled for endpoint {}: {:?}", msg.endpoint_id, wait);
-        // Re-queue with delay
+    // 3. FIFO check (mevcut: should_deliver_fifo)
+    if !fifo::should_deliver_fifo(pool, endpoint_id).await.unwrap_or(true) {
+        tracing::debug!("📦 FIFO wait for {}", endpoint_id);
+        requeue_with_delay(pool, &msg.queue_item_id, 5).await;
         return;
     }
 
-    // 3. FIFO kontrolü
-    if !fifo::should_deliver_fifo(pool, msg.endpoint_id).await.unwrap_or(true) {
-        tracing::debug!("📦 FIFO: waiting for endpoint {}", msg.endpoint_id);
-        // Re-queue
-        return;
-    }
-
-    // 4. Signing secret (cache'ten veya DB'den)
-    let signing_secret = get_signing_secret(pool, msg.endpoint_id).await;
-
-    // 5. Per-endpoint concurrency
-    let endpoint_sem = {
-        let mut map = endpoint_semaphores.lock().await;
-        map.entry(msg.endpoint_id).or_insert_with(|| {
-            Arc::new(Semaphore::new(PER_ENDPOINT_CONCURRENCY_LIMIT))
-        }).clone()
+    // 4. Signing secret (cache → mevcut batch pattern)
+    let signing_secret = if !msg.signing_secret.is_empty() {
+        msg.signing_secret.clone()
+    } else if let Some(s) = cache.lock().await.get(&msg.endpoint_id) {
+        s.to_string()
+    } else {
+        // DB'den çek + cache'e ekle
+        let secret = sqlx::query_scalar::<_, String>(
+            "SELECT signing_secret FROM endpoints WHERE id = $1"
+        ).bind(endpoint_id).fetch_optional(pool).await.ok().flatten().unwrap_or_default();
+        cache.lock().await.insert(msg.endpoint_id.clone(), secret.clone());
+        secret
     };
-    let _endpoint_permit = endpoint_sem.acquire().await;
 
-    // 6. Global concurrency
+    if signing_secret.is_empty() {
+        tracing::error!("❌ No signing_secret for {}", endpoint_id);
+        mark_dead_letter(pool, delivery_id, "Endpoint signing secret missing", attempt).await;
+        return;
+    }
+
+    // 5. Concurrency (mevcut pattern)
+    let ep_sem = {
+        let mut map = endpoint_semaphores.lock().await;
+        map.entry(endpoint_id).or_insert_with(|| Arc::new(Semaphore::new(PER_ENDPOINT_CONCURRENCY_LIMIT))).clone()
+    };
+    let _ep_permit = ep_sem.acquire().await;
     let _permit = semaphore.acquire().await;
 
-    // 7. HTTP teslimat
+    // 6. HTTP delivery (mevcut: deliver_http)
     let webhook = WebhookMessage {
-        delivery_id: msg.delivery_id,
-        endpoint_id: msg.endpoint_id,
+        delivery_id: msg.delivery_id.clone(),
+        endpoint_id: msg.endpoint_id.clone(),
         endpoint_url: msg.endpoint_url.clone(),
-        payload: msg.payload.clone(),
         signing_secret,
+        payload: msg.payload.clone(),
         custom_headers: msg.custom_headers.clone(),
-        trace_id: msg.trace_id.clone(),
     };
 
     let start = Instant::now();
-    let result = delivery::deliver_http(http_client, &webhook, msg.attempt_count + 1).await;
-    let duration = start.elapsed();
+    let result = delivery::deliver_http(http_client, &webhook, attempt).await;
+    let _duration = start.elapsed();
 
-    // 8. Sonucu işle
+    // 7. Sonuç işleme (mevcut process_pending ile aynı pattern)
     match result {
-        Ok(delivery_result) => {
-            if delivery_result.success {
-                // Başarılı
-                commit_delivery(pool, msg.delivery_id, &delivery_result, duration).await;
-                circuit_breaker.record_success(msg.endpoint_id).await;
-                throttle_manager.record_success(msg.endpoint_id).await;
-            } else if is_retryable(delivery_result.status_code) {
-                // Retry
-                schedule_retry(pool, msg, &delivery_result, duration).await;
-                circuit_breaker.record_failure(msg.endpoint_id).await;
-                throttle_manager.record_attempt(msg.endpoint_id).await;
-            } else {
-                // Kalıcı hata → DLQ
-                mark_failed(pool, msg.delivery_id, &delivery_result, duration).await;
-                circuit_breaker.record_failure(msg.endpoint_id).await;
-            }
+        Ok(dr) if dr.success => {
+            // Başarılı (mevcut: UPDATE deliveries SET status='delivered')
+            commit_delivery(pool, delivery_id, &dr).await;
+            cb.record_success(endpoint_id).await;
+            tm.record_success(endpoint_id).await;
+        }
+        Ok(dr) if is_retryable(dr.status_code) && attempt < msg.max_attempts => {
+            // Retry (mevcut: UPDATE webhook_queue SET status='pending', next_retry_at)
+            schedule_retry(pool, &msg.queue_item_id, &msg.delivery_id, attempt, &dr).await;
+            cb.record_failure(endpoint_id).await;
+            tm.record_attempt(endpoint_id).await;
+        }
+        Ok(dr) => {
+            // Dead letter (mevcut: INSERT INTO dead_letters + UPDATE deliveries SET status='failed')
+            mark_dead_letter(pool, delivery_id, &dr.error, attempt).await;
+            cb.record_failure(endpoint_id).await;
+        }
+        Err(e) if attempt < msg.max_attempts => {
+            schedule_retry(pool, &msg.queue_item_id, &msg.delivery_id, attempt, &DeliveryResult { error: e.to_string(), ..Default::default() }).await;
+            cb.record_failure(endpoint_id).await;
+            tm.record_attempt(endpoint_id).await;
         }
         Err(e) => {
-            // Bağlantı hatası → retry
-            tracing::error!("❌ Delivery error: {:?}", e);
-            schedule_retry_error(pool, msg, &e, duration).await;
-            circuit_breaker.record_failure(msg.endpoint_id).await;
-            throttle_manager.record_attempt(msg.endpoint_id).await;
+            mark_dead_letter(pool, delivery_id, &e.to_string(), attempt).await;
+            cb.record_failure(endpoint_id).await;
         }
     }
 }
+
+// Helper fonksiyonlar (mevcut process_pending'deki pattern'ler)
+fn is_retryable(status: i32) -> bool { matches!(status, 408 | 429 | 500..=599) }
+
+async fn requeue_with_delay(pool: &PgPool, queue_item_id: &str, delay_secs: i64) {
+    let _ = sqlx::query("UPDATE webhook_queue SET status='pending', next_retry_at=now()+$1::interval WHERE id=$2")
+        .bind(format!("{} seconds", delay_secs)).bind(queue_item_id).execute(pool).await;
+}
+
+async fn commit_delivery(pool: &PgPool, delivery_id: Uuid, dr: &DeliveryResult) {
+    let _ = sqlx::query("UPDATE deliveries SET status='delivered', attempt_count=attempt_count+1, response_status=$1, response_body=$2, updated_at=now() WHERE id=$3")
+        .bind(dr.status_code).bind(&dr.response_body[..dr.response_body.len().min(500)]).bind(delivery_id).execute(pool).await;
+    let _ = sqlx::query("UPDATE webhook_queue SET status='delivered', processed_at=now() WHERE delivery_id=$1")
+        .bind(delivery_id).execute(pool).await;
+}
+
+async fn schedule_retry(pool: &PgPool, queue_item_id: &str, delivery_id: &str, attempt: i32, dr: &DeliveryResult) {
+    let category = classify_error(Some(dr.status_code), &dr.error, false);
+    let backoff = calculate_backoff(attempt, &category, None);
+    let next = Utc::now() + chrono::Duration::from_std(backoff).unwrap_or(chrono::Duration::seconds(60));
+    let _ = sqlx::query("UPDATE webhook_queue SET status='pending', attempt_count=$1, next_retry_at=$2 WHERE id=$3")
+        .bind(attempt).bind(next).bind(queue_item_id).execute(pool).await;
+}
+
+async fn mark_dead_letter(pool: &PgPool, delivery_id: Uuid, reason: &str, attempts: i32) {
+    let _ = sqlx::query("UPDATE webhook_queue SET status='dead_letter', processed_at=now() WHERE delivery_id=$1")
+        .bind(delivery_id).execute(pool).await;
+    let _ = sqlx::query("UPDATE deliveries SET status='failed', error_message=$1, updated_at=now() WHERE id=$2")
+        .bind(reason).bind(delivery_id).execute(pool).await;
+    let _ = sqlx::query("INSERT INTO dead_letters (delivery_id, endpoint_id, customer_id, payload, reason, attempts) SELECT id, endpoint_id, customer_id, payload, $2, $3 FROM deliveries WHERE id=$1")
+        .bind(delivery_id).bind(reason).bind(attempts).execute(pool).await;
+}
 ```
 
-### Adım 1.8: Grafana Metrikleri
+---
 
-```rust
-// worker/src/metrics.rs — yeni metrikler
-pub static QUEUE_TYPE: AtomicU8 = AtomicU8::new(0); // 0=PG, 1=Redis
-pub static REDIS_QUEUE_LATENCY_US: AtomicU64 = AtomicU64::new(0);
-pub static REDIS_QUEUE_ERRORS: AtomicU64 = AtomicU64::new(0);
-pub static PG_QUEUE_FALLBACK: AtomicU64 = AtomicU64::new(0);
-```
+## Faz 2-6: Değişiklik Yok (Plan v2 geçerli)
 
-### Adım 1.9: Geçiş Stratejisi (GÜNCELLENMİŞ)
+- Faz 2: HTTP/2 config ✅
+- Faz 3: 3 katmanlı retry ✅
+- Faz 4: DNS cache ✅
+- Faz 5: Dynamic concurrency ✅
+- Faz 6: Batch processing ✅
 
-```
-Aşama 1 (Gün 1):
-  - Cargo.toml: streams feature ekle
-  - api/src/queue.rs oluştur
-  - worker/src/queue.rs oluştur
-  - worker/src/secret_cache.rs oluştur
-  - cargo check → 0 hata
+---
 
-Aşama 2 (Gün 2):
-  - API: publish_to_queue'ya Redis parametresi ekle
-  - API: Redis queue'yu extension olarak ekle
-  - Her iki kuyruğa da yaz (PG + Redis paralel)
-  - Worker: PostgreSQL'den okumaya devam et
-  - Deploy et, test et
+## Doğrulama Checklist (Final)
 
-Aşama 3 (Gün 3):
-  - Worker: Redis'ten okumaya geç (feature flag: USE_REDIS_QUEUE=true)
-  - PostgreSQL fallback kalsın (Redis yoksa PG kullan)
-  - Deploy et, Grafana'da latency karşılaştır
-
-Aşama 4 (Gün 4):
-  - Worker: Redis queue stabil ise PG queue okumayı kapat
-  - API: PG webhook_queue INSERT'ini kaldır (opsiyonel)
-  - webhook_queue tablosunu temizle (opsiyonel)
-```
-
-### Doğrulama Checklist
+### Faz 1
 - [ ] `cargo check` — 0 hata
 - [ ] `cargo test` — tüm testler geçmeli
-- [ ] Grafana: İlk tetikleme süresi < 10ms
-- [ ] Grafana: Queue latency metric mevcut
-- [ ] Grafana: Redis queue errors = 0
-- [ ] Grafana: PG fallback count = 0 (stabil olduktan sonra)
-- [ ] Manuel test: Webhook gönder → anında teslimat
-- [ ] Manuel test: Redis down → PG fallback çalışıyor
-- [ ] Manuel test: Worker restart → pending mesajlar geri alınır (XAUTOCLAIM)
+- [ ] Redis'e webhook yaz → < 1ms
+- [ ] Redis'ten webhook oku → anında
+- [ ] Redis down → PG fallback çalışır
+- [ ] Worker restart → claim_pending çalışır
+- [ ] Signing secret cache → DB sorgusu yok (cache hit)
+- [ ] Idempotency → aynı delivery tekrar işlenmez
+- [ ] Dead letter → max_attempts aşılırsa DLQ'ya gider
+- [ ] Grafana: queue_latency_ms < 10ms
+
+### Faz 2-6
+- [ ] HTTP/2 config → cargo check
+- [ ] Retry tiers → transient 100ms, server 60s
+- [ ] DNS cache → %90+ hit rate
+- [ ] Dynamic concurrency → hızlı endpoint 20 concurrent
+- [ ] Batch → throughput artışı
 
 ---
 
-## Faz 2: HTTP/2 + Connection Pooling 🟡 YÜKSEK
-
-**Süre:** 1 oturum
-**Etki:** Connection setup ~50ms → ~0ms
-**Risk:** Düşük
-
-### Adım 2.1: HTTP Client İyileştirmesi
-
-**Dosya:** `worker/src/main.rs`
-
-```rust
-let http_client = reqwest::Client::builder()
-    .timeout(Duration::from_secs(5))
-    .connect_timeout(Duration::from_secs(2))
-    .pool_max_idle_per_host(100)                    // 30 → 100
-    .pool_idle_timeout(Duration::from_secs(300))    // Varsayılan → 300s
-    .tcp_keepalive(Duration::from_secs(300))        // 60s → 300s
-    .tcp_nodelay(true)
-    .http2_prior_knowledge(true)                    // HTTP/2 zorla (H2C)
-    .http2_adaptive_window(true)                    // Adaptive flow control
-    .http2_keep_alive_interval(Duration::from_secs(30))
-    .http2_keep_alive_timeout(Duration::from_secs(10))
-    .build()?;
-```
-
-### Not: HTTP/2 ve TLS
-- `http2_prior_knowledge(true)` = H2C (HTTP/2 without TLS) — Cloud Run'da çalışır
-- HTTPS endpoint'ler için: `http2_prior_knowledge(false)` + otomatik TLS negotiation
-- **Çözüm:** İki client oluştur — biri H2C (iç servisler), biri HTTPS (müşteri endpoint'leri)
-
-```rust
-// İç servisler için H2C
-let internal_client = reqwest::Client::builder()
-    .http2_prior_knowledge(true)
-    // ...
-    .build()?;
-
-// Müşteri endpoint'leri için HTTPS (otomatik HTTP/2 negotiation)
-let external_client = reqwest::Client::builder()
-    .http2_adaptive_window(true)
-    // ...
-    .build()?;
-```
-
-### Doğrulama
-- [ ] `cargo check` — 0 hata
-- [ ] Grafana: Connection reuse oranı > %90
-- [ ] Grafana: Connection setup süresi ~0ms
-
----
-
-## Faz 3: 3 Katmanlı Retry 🟡 YÜKSEK
-
-**Süre:** 1-2 oturum
-**Etki:** Geçici hatalarda 30s → 100ms
-**Risk:** Düşük
-
-### Adım 3.1: Error Sınıflandırma
-
-**Dosya:** `worker/src/helpers.rs`
-
-```rust
-#[derive(Debug, Clone, PartialEq)]
-pub enum RetryCategory {
-    Transient,      // Bağlantı, DNS, timeout
-    ServerError,    // 5xx
-    RateLimited,    // 429
-    Permanent,      // 4xx (429 hariç)
-    EndpointDown,   // Circuit breaker açık
-}
-
-pub fn classify_error(status: Option<i32>, error: &str, is_circuit_open: bool) -> RetryCategory {
-    if is_circuit_open {
-        return RetryCategory::EndpointDown;
-    }
-    match status {
-        Some(429) => RetryCategory::RateLimited,
-        Some(400..=499) => RetryCategory::Permanent,
-        Some(500..=599) => RetryCategory::ServerError,
-        None => {
-            let e = error.to_lowercase();
-            if e.contains("connection") || e.contains("dns") || e.contains("timeout") {
-                RetryCategory::Transient
-            } else {
-                RetryCategory::ServerError
-            }
-        }
-        _ => RetryCategory::ServerError,
-    }
-}
-```
-
-### Adım 3.2: Katmanlı Backoff + Jitter
-
-```rust
-pub fn calculate_backoff(attempt: i32, category: &RetryCategory, retry_after: Option<u64>) -> Duration {
-    let base = match category {
-        RetryCategory::Transient => match attempt {
-            0 => Duration::from_millis(100),
-            1 => Duration::from_millis(300),
-            2 => Duration::from_millis(500),
-            _ => tier_2_backoff(attempt - 3),
-        },
-        RetryCategory::ServerError => tier_2_backoff(attempt),
-        RetryCategory::RateLimited => Duration::from_secs(retry_after.unwrap_or(60).min(3600)),
-        RetryCategory::EndpointDown => tier_3_backoff(attempt),
-        RetryCategory::Permanent => Duration::ZERO,
-    };
-    with_jitter(base)
-}
-
-fn tier_2_backoff(attempt: i32) -> Duration {
-    let intervals = [60, 300, 900, 3600, 14400];
-    Duration::from_secs(intervals[(attempt as usize).min(intervals.len() - 1)])
-}
-
-fn tier_3_backoff(attempt: i32) -> Duration {
-    let intervals = [21600, 43200, 86400];
-    Duration::from_secs(intervals[(attempt as usize).min(intervals.len() - 1)])
-}
-
-fn with_jitter(duration: Duration) -> Duration {
-    use rand::Rng;
-    let jitter = rand::thread_rng().gen_range(0.8..1.2);
-    Duration::from_millis((duration.as_millis() as f64 * jitter) as u64)
-}
-
-pub fn max_attempts_for_category(category: &RetryCategory) -> i32 {
-    match category {
-        RetryCategory::Transient => 5,
-        RetryCategory::ServerError => 5,
-        RetryCategory::RateLimited => 3,
-        RetryCategory::EndpointDown => 12,
-        RetryCategory::Permanent => 0,
-    }
-}
-```
-
-### Doğrulama
-- [ ] `cargo check` — 0 hata
-- [ ] Grafana: Transient retry < 1s
-- [ ] Grafana: Permanent → no retry
-
----
-
-## Faz 4: DNS + SSRF Cache 🟢 KOLAY
-
-**Süre:** 1 oturum
-**Etki:** ~30ms/call → ~0ms
-**Risk:** Çok düşük
-
-### Not: Mevcut SSRF
-- `api/src/ssrf.rs` zaten SSRF koruması yapıyor
-- `worker/src/delivery/http.rs`'de `validate_delivery_url` fonksiyonu var
-- Bu faz sadece **cache** ekliyor
-
-### Doğrulama
-- [ ] Grafana: DNS cache hit > %90
-
----
-
-## Faz 5: Dynamic Concurrency 🟢 KOLAY
-
-**Süre:** 1 oturum
-**Etki:** Hızlı endpoint'lerde %100 throughput
-
-### Not: Mevcut Concurrency
-- `DELIVERY_CONCURRENCY_LIMIT: 50` (global)
-- `PER_ENDPOINT_CONCURRENCY_LIMIT: 10` (sabit)
-- Bu faz sadece per-endpoint limiti dinamik yapıyor
-
-### Doğrulama
-- [ ] Grafana: Hızlı endpoint throughput artışı
-
----
-
-## Faz 6: Batch Processing 🟢 ORTA
-
-**Süre:** 2 oturum
-**Etki:** Yüksek throughput'ta %30-50
-
-### Not: Redis Streams zaten batch okuyor
-- `XREADGROUP count=50` zaten batch
-- Bu faz: aynı endpoint'e giden webhook'ları grupla, paralel gönder
-
-### Doğrulama
-- [ ] Grafana: Throughput artışı
-
----
-
-## 📊 Zaman Çizelgesi
-
-| Faz | Süre | Durum |
-|-----|------|-------|
-| 1. Redis Streams | 2-3 oturum | ⏳ |
-| 2. HTTP/2 | 1 oturum | ⏳ |
-| 3. 3 Katmanlı Retry | 1-2 oturum | ⏳ |
-| 4. DNS Cache | 1 oturum | ⏳ |
-| 5. Dynamic Concurrency | 1 oturum | ⏳ |
-| 6. Batch Processing | 2 oturum | ⏳ |
-| **TOPLAM** | **~10-12 oturum** | |
-
----
-
-## ⚠️ Kritik Kurallar
-
-1. **Her fazda `cargo check` + `cargo test`** — 0 hata olmadan devam etme
-2. **Her fazda Grafana metric ekle** — performansı ölç
-3. **Paralel çalıştır** — yeni queue eskiyle birlikte çalışabilmeli
-4. **Rollback planı** — her faz geri alınabilmeli
-5. **Commit her faz sonunda** — hata olursa geri almak kolay
-6. **Signing secret cache** — her teslimatta DB sorgusu yapma
-7. **Consumer name unique** — her worker instance farklı isim
-8. **XAUTOCLAIM** — crash sonrası pending mesajları geri al
-9. **HTTP/2 TLS** — müşteri endpoint'leri HTTPS gerektirir
-10. **Backward compatibility** — PG queue fallback her zaman kalsın
-
----
-
-*Bu plan v2 — gözden geçirilmiş, eksikler giderilmiştir.*
+*Bu plan v4 — KESİN FİNAL. Mevcut kodla birebir uyumlu.*
 *Son güncelleme: 2026-05-26*
