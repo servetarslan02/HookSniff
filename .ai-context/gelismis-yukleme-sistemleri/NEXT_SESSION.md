@@ -35,14 +35,33 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 | 12 | **PPR** | **10** | **✅** | **2026-05-26** | **1b037609** |
 | 13 | **<Activity/>** | **11** | **✅** | **2026-05-26** | **0fe49f5c, fbde69e8** |
 | 14 | **Infinite Scroll** | **12** | **✅** | **2026-05-26** | **6abb3819, fbde69e8** |
-| 15 | Service Worker + PWA | 13 | ⏳ | — | — |
+| 15 | **Service Worker + PWA** | **13** | **✅** | **2026-05-26** | **pending push** |
 | 16 | TanStack DB | 14 | ⏳ | — | — |
 
 ---
 
-## 🔜 Sıradaki Adım: Service Worker + PWA (Katman 13)
+## 🔜 Sıradaki Adım: TanStack DB (Katman 14)
 
-### <Activity/> (Katman 11) — TAMAMLANDI ✅
+### Service Worker + PWA (Katman 13) — TAMAMLANDI ✅
+
+**Yapılan:**
+1. `src/app/[locale]/manifest.ts` — Dinamik PWA manifest (Next.js 16 built-in)
+2. `public/sw.js` — Service Worker (4 cache stratejisi: static, image, API, page)
+3. `src/components/ServiceWorkerRegister.tsx` — SW kayıt + update prompt UI
+4. `src/app/[locale]/offline/page.tsx` — Offline fallback sayfası
+5. Root layout'a `<ServiceWorkerRegister />` eklendi
+6. Eski `public/manifest.json` kaldırıldı (manifest.ts ile değiştirildi)
+7. Build: ✅ 592 sayfa, exit 0
+
+**Cache stratejileri:**
+- Static assets (JS/CSS/font) → Cache-first (hızlı tekrar ziyaret)
+- Images → Cache-first
+- API → Network-first, 3s timeout, cache fallback (eski veri > veri yok)
+- Pages → Network-first, 5s timeout, cache fallback
+- Cache boyut limitleri: Pages 50, API 100, Images 60 (FIFO trim)
+- Auth/real-time endpoint'leri asla cache'lenmez
+
+### Sıradaki Aktif Katman: TanStack DB (Katman 14)
 
 **Yapılan:**
 1. DashboardShell, AdminShell, DocsShell → Activity mode="visible"
@@ -98,7 +117,7 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 | 10 | PPR | ✅ | ppr: true, 3 layout server component |
 | 11 | **<Activity/>** | **✅** | **Tüm shell'ler + tab sayfaları** |
 | 12 | **Infinite Scroll** | **✅** | **Tüm listeler (7 sayfa)** |
-| 13 | Service Worker + PWA | ⏳ | Sıradaki |
+| 13 | **Service Worker + PWA** | **✅** | **4 dosya: manifest.ts, sw.js, ServiceWorkerRegister, offline page** |
 | 14 | TanStack DB | ⏳ | — |
 
 ---
