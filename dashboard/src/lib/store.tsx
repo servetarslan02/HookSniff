@@ -84,99 +84,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, [updateToken]);
 
-  // On mount: restore user info from localStorage, then verify session with backend
+  // On mount: restore user info from localStorage, then verify session in background
   useEffect(() => {
-    // Restore user info from localStorage (NOT api_key — it's sensitive)
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
+    const savedToken = localStorage.getItem('hooksniff_token');
+    const storedUser = localStorage.getItem(STORAGE_KEY);
+
+    if (storedUser) {
       try {
-        const { user: u } = JSON.parse(stored);
+        const { user: u } = JSON.parse(storedUser);
         setUser(u);
       } catch {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-    // Verify session by calling the backend directly
-    const savedToken = localStorage.getItem('hooksniff_token');
+
     if (savedToken) {
+      setToken(savedToken);
+      tokenRef.current = savedToken;
+      startSessionRefresh();
+
+      // Background verification - don't block isLoading
       fetch(`${API_BASE}/auth/me`, {
         headers: { 'Authorization': `Bearer ${savedToken}` },
-      })
-        .then((res) => {
-          if (res.ok) return res.json();
-          // 401 = definitive auth failure → try refresh
-          if (res.status === 401) {
-            const storedRt = localStorage.getItem('hooksniff_refresh');
-            return fetch(`${API_BASE}/auth/refresh`, {
-              method: 'POST',
-              credentials: 'include',
-              headers: { 'Content-Type': 'application/json' },
-              body: storedRt ? JSON.stringify({ refresh_token: storedRt }) : undefined,
-            }).then((refreshRes) => {
-              if (!refreshRes.ok) throw new Error('Refresh failed');
-              return refreshRes.json();
-            });
-          }
-          // Other errors (500, network, CORS) → don't clear auth, just use localStorage
-          return null;
-        })
-        .then((data) => {
-          if (data && data.token) {
-            // Refresh returned a new token — use it
-            updateToken(data.token);
-            // Save new refresh token for proxy fallback
-            if (data.refresh_token) localStorage.setItem('hooksniff_refresh', data.refresh_token);
-            if (data.customer) {
-              const u: User = {
-                id: data.customer.id,
-                email: data.customer.email,
-                name: data.customer.name,
-                username: toSlug(data.customer.email.split('@')[0]),
-                plan: data.customer.plan,
-                is_admin: data.customer.is_admin ?? false,
-                avatar_url: data.customer.avatar_url,
-              };
-              setUser(u);
-              setApiKeyState(null);
-              localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
-            }
-            startSessionRefresh();
-          } else if (data && data.id) {
-            // /auth/me returned valid user — session is good
-            const username = toSlug(data.email.split('@')[0]);
-            const u: User = {
-              id: data.id,
-              email: data.email,
-              name: data.name,
-              username,
-              plan: data.plan,
-              is_admin: data.is_admin ?? false,
-              avatar_url: data.avatar_url,
-            };
-            setUser(u);
-            setApiKeyState(null);
-            updateToken(savedToken); // This sets cookie + localStorage
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
-            startSessionRefresh();
-          }
-          // If data is null (non-401 error), keep localStorage user as-is
-        })
-        .catch(() => {
-          // BUG FIX: Do NOT clear auth on network/CORS errors.
-          // Keep the user from localStorage — they might still be valid.
-          // Only clear auth on definitive 401 (handled above in the refresh flow).
-          // If the network is down, the user stays "logged in" with cached data.
-          // Next page load or API call will re-validate.
-        })
-        .finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
+      }).then(res => {
+        if (res.status === 401) {
+          // Token expired, try refresh silently
+          const storedRt = localStorage.getItem('hooksniff_refresh');
+          return fetch(`${API_BASE}/auth/refresh`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: storedRt ? JSON.stringify({ refresh_token: storedRt }) : undefined,
+          });
+        }
+        return res;
+      }).then(async res => {
+        if (!res || !res.ok) return;
+        const data = await res.json();
+        if (data.token) updateToken(data.token);
+        if (data.customer || data.id) {
+          const raw = data.customer || data;
+          const u: User = {
+            id: raw.id,
+            email: raw.email,
+            name: raw.name,
+            username: toSlug(raw.email.split('@')[0]),
+            plan: raw.plan,
+            is_admin: raw.is_admin ?? false,
+            avatar_url: raw.avatar_url,
+          };
+          setUser(u);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
+        }
+      }).catch(() => {});
     }
 
-    // Cleanup: stop refresh on unmount
+    setIsLoading(false);
     return () => stopProactiveRefresh();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
+  }, [updateToken, startSessionRefresh]); // eslint-disable-line react-hooks/exhaustive-deps
   const persistAuth = useCallback((u: User, k?: string, authToken?: string) => {
     // Generate username slug from email prefix (unique per user)
     const slug = toSlug(u.email.split('@')[0]);
