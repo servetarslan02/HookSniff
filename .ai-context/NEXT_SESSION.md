@@ -1,18 +1,31 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-26 (OpenClaw — Cache Components bloke, Infinite Scroll sıradaki)
+> **Son güncelleme:** 2026-05-27 (OpenClaw — Dashboard hata düzeltmeleri, tüm sayfalar çalışır)
 > **Bu dosya her oturum başında okunur.**
 
 ---
 
 ## ✅ Build Durumu: ÇALIŞIYOR
 
-Build sorunu çözüldü. `npm run build` → exit 0 ✅
+Build stabil. `npm run build` → exit 0 ✅
 
-### Son Yapılan İş (2026-05-26)
-- 40 docs sayfası yeniden yapılandırıldı: `async Content` + `Suspense` wrapper
-- `cacheComponents: true` **açılamıyor** — `next-intl`'in `getTranslations()` server-side Suspense ile uyumsuz
-- `cacheComponents` yorum satırında kaldı, ileride açılabilir
+### Son Yapılan İş (2026-05-27)
+- **Dashboard tüm sayfalar düzeltildi** — "Something went wrong" hatası çözüldü
+- 5 ayrı hata tespit edilip düzeltildi:
+  1. `QueryClientRequiredError` → TanStack DB collection'larına `queryClient` parametresi eklendi
+  2. `QueryBuilderError` → `useLiveQuery` callback'inden `null` döndürüldü (plain array yerine)
+  3. `useDeliveryLogs` import eksik → DeliveriesContent'e eklendi
+  4. `applications.noApplications` i18n eksik → en.json ve tr.json'a eklendi
+  5. Undefined data crash → tüm `useLive*` hook'larına `safeMap` null guard eklendi
+- **Vercel projesi düzeltildi** — `hooksniff-dash` projesine link, `hooksniff.vercel.app`'a deploy
+- Git email `servetarslan02@gmail.com` olarak ayarlandı (Vercel deploy için)
+- Commit'ler: `1cdd067a`, `bbb0f5cf`, `2b604fd7`, `2b233d56`, `d56c1ada`
+
+### ⚠️ Kritik Not — Vercel Projesi
+- CLI ile deploy ederken `--name hooksniff-dash` KULLANMA
+- Önce `vercel link --project hooksniff-dash` yap, sonra `vercel --prod` ile deploy et
+- Vercel proje adı: `hooksniff-dash` (hooksniff.vercel.app buna bağlı)
+- Alternatif proje: `dashboard` (farklı URL)
 - Commit: `e538c6c1`
 
 ---
