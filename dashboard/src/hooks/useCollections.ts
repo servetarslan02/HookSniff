@@ -175,6 +175,25 @@ export function useLiveTransforms(endpointId: string) {
   };
 }
 
+// ── Applications ──
+export function useLiveApplications() {
+  const { token } = useAuth();
+  const collection = useMemo(
+    () => (token ? createApplicationsCollection(token) : null),
+    [token]
+  );
+
+  const { data, isLoading, error } = useLiveQuery((q) =>
+    collection ? q.from({ app: collection }) : q.from({ app: [] as Record<string, unknown>[] })
+  );
+
+  return {
+    data: data?.map((d: Record<string, unknown>) => d.app) ?? [],
+    isLoading: !token || isLoading,
+    error,
+  };
+}
+
 // ── Inbound Configs ──
 export function useLiveInboundConfigs() {
   const { token } = useAuth();

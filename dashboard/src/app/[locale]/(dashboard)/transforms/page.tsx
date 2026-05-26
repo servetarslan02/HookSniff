@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
-import { useEndpoints, useTransformRules, useCreateTransformRule, useDeleteTransformRule, useUpdateTransformRule, useTestTransform } from '@/hooks/useDashboardData';
+import { useTransformRules, useCreateTransformRule, useDeleteTransformRule, useUpdateTransformRule, useTestTransform } from '@/hooks/useDashboardData';
+import { useLiveEndpoints } from '@/hooks/useCollections';
 import type { TransformRuleValidated } from '@/schemas/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { VirtualList } from '@/components/VirtualList';
@@ -15,7 +16,7 @@ export default function TransformsPage() {
  const tc = useTranslations('common');
  const { toast } = useToast();
 
- const { data: endpoints = [] } = useEndpoints();
+ const { data: endpoints = [] } = useLiveEndpoints();
  const [selectedEndpoint, setSelectedEndpoint] = useState('');
  const { data: rules = [], isLoading: loading } = useTransformRules(selectedEndpoint);
  const createMutation = useCreateTransformRule();
