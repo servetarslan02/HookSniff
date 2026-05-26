@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-26 GMT+8 (OpenClaw — Katman 5 Akıllı Prefetch tamamlandı)
+> Son güncelleme: 2026-05-26 GMT+8 (OpenClaw — Katman 2 Suspense Boundaries tamamlandı, tüm katmanlar incelendi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
@@ -1631,3 +1631,53 @@ Servet ile OpenClaw üzerinden ilk oturum. Proje incelendi, 7 hızlandırma plan
 ### Push: `e538c6c1`
 
 ### Build: ✅ exit 0
+
+---
+
+## 📝 Son Oturum (2026-05-26 16:20–17:10 — OpenClaw Katman İnceleme + Suspense Refactor)
+
+### Özet
+Servet ile OpenClaw üzerinden gelişmiş yükleme sistemleri katmanları incelendi. 1-9 numaralı katmanlar detaylı kontrol edildi. 16 docs sayfası Suspense pattern'e geçirildi.
+
+### Yapılan İşler:
+
+#### 1. Katman 1 (React Query) — Tamamlandı ✅
+- `deliveries/DeliveriesContent.tsx`: Raw `webhooksApi.list()` status counts → `useDeliveryLogs` hook
+- `deliveries/DeliveriesContent.tsx`: Raw `webhooksApi.getAttempts()` → `useDeliveryAttempts` hook
+- `logs/LogsContent.tsx`: Raw `webhooksApi.getAttempts()` → `useDeliveryAttempts` hook
+- Commit: `f2f1df57`
+
+#### 2. Katman 2 (Suspense Boundaries) — Tamamlandı ✅
+- 16 docs sayfası `async Content` + `Suspense` pattern'e geçirildi
+- 6 sayfada `useTranslations` → `getTranslations` dönüştürüldü
+- `api-reference`: Helper fonksiyon `async` yapıldı
+- Build başarılı ✅
+- Commit: `7f515761`
+
+#### 3. Katman 3-9 İnceleme — Hepsi Tamam ✅
+| Katman | Durum | Not |
+|--------|-------|-----|
+| 3. Virtual Scrolling | ✅ | 38 dosya (20 VirtualTable + 18 VirtualList) |
+| 4. Concurrent Features | ✅ | 8 dosya useDebouncedSearch |
+| 5. Akıllı Prefetch | ✅ | 59 dosya PrefetchLink |
+| 6. Cache Components | ⏳ | Altyapı hazır, config açılacak |
+| 7. View Transitions | ✅ | 5 layout'ta aktif |
+| 8. Turbopack | ✅ | Next.js 16 default |
+| 9. React Compiler | ✅ | reactCompiler: true |
+
+#### 4. Katman 10 (PPR) — Altyapı Hazır ⏳
+- Suspense Boundaries: ✅
+- loading.tsx: ✅ (36 dosya)
+- Config: Henüz `experimental.ppr` eklenmedi
+
+### Kararlar:
+- `cacheComponents: true` artık açılabilir (16 docs sayfası Suspense ile sarıldı)
+- PPR `experimental.ppr: 'incremental'` ile başlanabilir
+- Katman 2 tamamlandığı için Katman 6 ve 10 açılabilir
+
+### Build: ✅ exit 0
+
+### Eksikler (Sonraki Oturum):
+1. `cacheComponents: true` aç → build test et
+2. `experimental.ppr: 'incremental'` ekle → build test et
+3. `.ai-context` dosyalarını GitHub'a push et
