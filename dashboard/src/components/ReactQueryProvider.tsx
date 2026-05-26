@@ -11,8 +11,8 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
         defaultOptions: {
           queries: {
             // ── Performans Cache Stratejisi ──
-            staleTime: 30_000,               // 30 sn: Bu süre içinde veri "taze" sayılır
-            gcTime: 5 * 60 * 1000,           // 5 dk: Bellekte tutulur
+            staleTime: 60_000,               // 60 sn: Veri 1 dakika boyunca "taze" sayılır
+            gcTime: 10 * 60 * 1000,          // 10 dk: Bellekte tutulur
             refetchOnWindowFocus: 'always',  // Sekmeye geri gelince arka planda yenile
             refetchOnReconnect: 'always',    // İnternet geri gelince arka planda yenile
             refetchOnMount: 'always',        // Sayfa açıldığında arka planda yenile (cache varsa anında gösterir)
