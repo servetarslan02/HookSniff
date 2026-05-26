@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Activity } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
@@ -423,7 +423,7 @@ export default function AdminUserDetailPage() {
         ))}
       </div>
 
-      {activeTab === "overview" && (
+      <Activity mode={activeTab === "overview" ? "visible" : "hidden"}>
         <OverviewTab
           detail={detail}
           planHistory={planHistory}
@@ -438,13 +438,13 @@ export default function AdminUserDetailPage() {
           handleViewDelivery={handleViewDelivery}
           handleReplay={handleReplay}
         />
-      )}
+      </Activity>
 
-      {activeTab === "endpoints" && (
+      <Activity mode={activeTab === "endpoints" ? "visible" : "hidden"}>
         <EndpointsTab userEndpoints={userEndpoints} t={t} />
-      )}
+      </Activity>
 
-      {activeTab === "webhooks" && (
+      <Activity mode={activeTab === "webhooks" ? "visible" : "hidden"}>
         <WebhooksTab
           userWebhooks={userWebhooks}
           webhooksTotal={webhooksTotal}
@@ -457,21 +457,21 @@ export default function AdminUserDetailPage() {
           t={t}
           tc={tc}
         />
-      )}
+      </Activity>
 
-      {activeTab === "apikeys" && (
+      <Activity mode={activeTab === "apikeys" ? "visible" : "hidden"}>
         <ApiKeysTab userApiKeys={userApiKeys} t={t} />
-      )}
+      </Activity>
 
-      {activeTab === "applications" && (
+      <Activity mode={activeTab === "applications" ? "visible" : "hidden"}>
         <ApplicationsTab userApps={userApps} t={t} />
-      )}
+      </Activity>
 
-      {activeTab === "usage" && (
+      <Activity mode={activeTab === "usage" ? "visible" : "hidden"}>
         <UsageTab userUsage={userUsage} t={t} />
-      )}
+      </Activity>
 
-      {activeTab === "notes" && (
+      <Activity mode={activeTab === "notes" ? "visible" : "hidden"}>
         <NotesTab
           userTags={userTags}
           userNotes={userNotes}
@@ -485,9 +485,9 @@ export default function AdminUserDetailPage() {
           addNoteMutation={addNoteMutation}
           t={t}
         />
-      )}
+      </Activity>
 
-      {activeTab === "communications" && (
+      <Activity mode={activeTab === "communications" ? "visible" : "hidden"}>
         <CommunicationsTab
           userComms={userComms}
           commsTotal={commsTotal}
@@ -498,9 +498,9 @@ export default function AdminUserDetailPage() {
           t={t}
           tc={tc}
         />
-      )}
+      </Activity>
 
-      {activeTab === "billing" && (
+      <Activity mode={activeTab === "billing" ? "visible" : "hidden"}>
         <BillingTab
           detail={detail}
           userInvoices={userInvoices}
@@ -522,7 +522,7 @@ export default function AdminUserDetailPage() {
           tc={tc}
           setShowRefundModal={setShowRefundModal}
         />
-      )}
+      </Activity>
 
       <UserModals
         detail={detail}
