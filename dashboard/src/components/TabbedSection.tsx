@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { useState, useCallback, useEffect, useRef, Activity, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 
 export interface Tab {
@@ -213,22 +213,17 @@ export function TabbedSection({
           if (!visited.has(tab.key)) return null;
 
           const isActive = tab.key === active;
-          const isFading = fadingIn === tab.key;
 
           return (
-            <div
-              key={tab.key}
-              id={`tabpanel-${tab.key}`}
-              role="tabpanel"
-              aria-labelledby={tab.key}
-              style={{
-                display: isActive ? 'block' : 'none',
-                opacity: isFading ? 0 : 1,
-                transition: `opacity ${fadeMs}ms ease-out`,
-              }}
-            >
-              {resolveContent(tab)}
-            </div>
+            <Activity key={tab.key} mode={isActive ? 'visible' : 'hidden'}>
+              <div
+                id={`tabpanel-${tab.key}`}
+                role="tabpanel"
+                aria-labelledby={tab.key}
+              >
+                {resolveContent(tab)}
+              </div>
+            </Activity>
           );
         })}
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Activity } from 'react';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 import { AlertTriangle, BarChart3, Brain, Globe, RefreshCw, Shield, ShieldCheck, TrendingUp, Zap, Target } from '@/components/icons';
@@ -97,12 +97,12 @@ export default function CortexPage() {
         ))}
       </div>
 
-      {activeTab === 'overview' && <OverviewTab health={health} />}
-      {activeTab === 'anomalies' && <AnomaliesTab token={token} />}
-      {activeTab === 'healing' && <HealingTab token={token} />}
-      {activeTab === 'predictions' && <PredictionsTab token={token} />}
-      {activeTab === 'ml_quality' && <MLQualityTab token={token} />}
-      {activeTab === 'proactive' && <ProactiveTab token={token} />}
+      <Activity mode={activeTab === 'overview' ? 'visible' : 'hidden'}><OverviewTab health={health} /></Activity>
+      <Activity mode={activeTab === 'anomalies' ? 'visible' : 'hidden'}><AnomaliesTab token={token} /></Activity>
+      <Activity mode={activeTab === 'healing' ? 'visible' : 'hidden'}><HealingTab token={token} /></Activity>
+      <Activity mode={activeTab === 'predictions' ? 'visible' : 'hidden'}><PredictionsTab token={token} /></Activity>
+      <Activity mode={activeTab === 'ml_quality' ? 'visible' : 'hidden'}><MLQualityTab token={token} /></Activity>
+      <Activity mode={activeTab === 'proactive' ? 'visible' : 'hidden'}><ProactiveTab token={token} /></Activity>
     </div>
   );
 }
