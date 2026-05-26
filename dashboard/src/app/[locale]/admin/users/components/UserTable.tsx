@@ -32,6 +32,8 @@ interface UserTableProps {
   setPlanChangeTarget: (user: AdminUser) => void;
   setNewPlan: (plan: string) => void;
   planBadgeColors: PlanBadgeColors;
+  hasMore?: boolean;
+  handleLoadMore?: () => void;
   t: any;
   tc: any;
 }
@@ -56,6 +58,8 @@ export function UserTable({
   setPlanChangeTarget,
   setNewPlan,
   planBadgeColors,
+  hasMore,
+  handleLoadMore,
   t,
   tc,
 }: UserTableProps) {
@@ -168,57 +172,21 @@ export function UserTable({
         )}
       />
 
-          {/* Pagination */}
-          {total > perPage && (
-            <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
-              <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">
-                {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
-              </span>
-              <div className="flex gap-1">
-                <button type="button"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
-                >
-                  {tc('previous')}
-                </button>
-                {/* Page numbers — hidden on mobile */}
-                <div className="hidden sm:flex gap-1">
-                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-                  let pageNum: number;
-                  if (totalPages <= 7) {
-                    pageNum = i + 1;
-                  } else if (page <= 4) {
-                    pageNum = i + 1;
-                  } else if (page >= totalPages - 3) {
-                    pageNum = totalPages - 6 + i;
-                  } else {
-                    pageNum = page - 3 + i;
-                  }
-                  return (
-                    <button
-                      key={pageNum}
-                      type="button"
-                      onClick={() => setPage(pageNum)}
-                      className={`px-3 py-1.5 rounded-lg text-sm border transition ${
-                        page === pageNum
-                          ? 'bg-red-600 text-white border-red-600'
-                          : 'border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
+          {/* Infinite Scroll */}
+          {hasMore && (
+            <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-center">
+              {isLoading ? (
+                <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                  <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
+                  <span className="text-sm">{tc('loading')}</span>
                 </div>
-                <button type="button"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page >= totalPages}
-                  className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+              ) : (
+                <button type="button" onClick={handleLoadMore}
+                  className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
                 >
-                  {tc('next')}
+                  {tc('showing', { from: 1, to: sortedUsers.length, total })} — {tc('loadMore') || 'Load more'}
                 </button>
-              </div>
+              )}
             </div>
           )}
         </>

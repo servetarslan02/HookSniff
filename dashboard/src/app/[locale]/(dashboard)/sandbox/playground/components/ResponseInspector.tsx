@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Activity } from 'react';
 import { useTranslations } from 'next-intl';
 import { Clock, FlaskConical } from '@/components/icons';
 
@@ -71,13 +71,16 @@ export function ResponseInspector({
       </div>
 
       {/* Content */}
-      <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-auto max-h-[400px]">
-        {activeTab === 'body'
-          ? JSON.stringify(response, null, 2)
-          : Object.entries(headers)
-              .map(([k, v]) => `${k}: ${v}`)
-              .join('\n') || t('noHeaders')}
-      </pre>
+      <Activity mode={activeTab === 'body' ? 'visible' : 'hidden'}>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-auto max-h-[400px]">
+          {JSON.stringify(response, null, 2)}
+        </pre>
+      </Activity>
+      <Activity mode={activeTab === 'headers' ? 'visible' : 'hidden'}>
+        <pre className="bg-gray-900 text-green-400 p-4 rounded-xl text-xs font-mono overflow-auto max-h-[400px]">
+          {Object.entries(headers).map(([k, v]) => `${k}: ${v}`).join('\n') || t('noHeaders')}
+        </pre>
+      </Activity>
     </div>
   );
 }

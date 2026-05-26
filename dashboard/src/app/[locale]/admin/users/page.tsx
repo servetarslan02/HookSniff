@@ -1,7 +1,7 @@
 'use client';
 
 import { LazySection, Skeletons } from '@/components/LazySection';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, API_BASE, type AdminUser } from '@/lib/api';
@@ -79,6 +79,32 @@ export default function AdminUsersPage() {
   const users = useMemo(() => data?.users ?? [], [data?.users]);
   const total = data?.total ?? 0;
 
+  // Accumulate users from all loaded pages
+  const [allUsers, setAllUsers] = useState<AdminUser[]>([]);
+  const prevFilterRef = useRef(`${debouncedSearch}-${planFilter}-${statusFilter}-${dateRange}-${sortField}-${sortDir}`);
+
+  useEffect(() => {
+    const filterKey = `${debouncedSearch}-${planFilter}-${statusFilter}-${dateRange}-${sortField}-${sortDir}`;
+    if (filterKey !== prevFilterRef.current) {
+      setAllUsers(users);
+      setPage(1);
+      prevFilterRef.current = filterKey;
+    } else if (page === 1) {
+      setAllUsers(users);
+    } else if (users.length > 0) {
+      setAllUsers((prev) => {
+        const existingIds = new Set(prev.map((u) => u.id));
+        const newItems = users.filter((u) => !existingIds.has(u.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [users, page, debouncedSearch, planFilter, statusFilter, dateRange, sortField, sortDir]);
+
+  const hasMore = allUsers.length < total;
+  const handleLoadMore = useCallback(() => {
+    if (!isLoading && hasMore) setPage((p) => p + 1);
+  }, [isLoading, hasMore]);
+
   const handleSort = (field: typeof sortField) => {
     if (sortField === field) {
       setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
@@ -90,7 +116,7 @@ export default function AdminUsersPage() {
   };
 
   // Backend handles sorting now, no need for frontend sort
-  const sortedUsers = users;
+  const sortedUsers = allUsers;
 
   const handleExportCSV = async () => {
     if (!token) return;
@@ -309,6 +335,8 @@ export default function AdminUsersPage() {
         setPlanChangeTarget={setPlanChangeTarget}
         setNewPlan={setNewPlan}
         planBadgeColors={PLAN_BADGE_COLORS}
+        hasMore={hasMore}
+        handleLoadMore={handleLoadMore}
         t={t}
         tc={tc}
       />
