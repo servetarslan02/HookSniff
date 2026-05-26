@@ -70,7 +70,6 @@ export default function DeliveriesContent() {
   const tc = useTranslations('common');
   const tl = useTranslations('logs');
   const ts = useTranslations('search');
-  const perPage = 20;
 
   // ── Data: main list (from Deliveries page — useWebhooks) ──
   const { data, isLoading, error: queryError, refetch } = useWebhooks({
@@ -222,7 +221,6 @@ export default function DeliveriesContent() {
     }
   };
 
-  const totalPages = Math.ceil(total / perPage);
 
   // ── Status filter tabs (unified: tabs with counts, like Logs) ──
   const statusFilters: { key: StatusFilter; label: string; icon: React.ReactNode }[] = [
