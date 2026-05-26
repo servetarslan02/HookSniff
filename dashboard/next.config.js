@@ -3,12 +3,10 @@ const createNextIntlPlugin = require('next-intl/plugin');
 const { withSentryConfig } = require('@sentry/nextjs');
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
-const enableExperimentalPerf = process.env.NEXT_EXPERIMENTAL_PERF === '1';
-
 const nextConfig = {
   reactStrictMode: true,
-  cacheComponents: enableExperimentalPerf,
-  reactCompiler: enableExperimentalPerf,
+  cacheComponents: true,
+  reactCompiler: true,
   turbopack: {
     root: __dirname,
   },

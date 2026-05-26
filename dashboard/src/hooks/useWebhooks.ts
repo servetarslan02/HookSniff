@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query';
-import { webhooksApi, type DeliveryDetail, type DeliveryAttempt } from '@/lib/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { webhooksApi, statsApi, type DeliveryDetail, type DeliveryAttempt } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { validated } from './validated';
 import { DeliveryListResponseSchema } from '@/schemas/api';
@@ -65,40 +65,23 @@ export function useDeliveryAttempts(id: string) {
   });
 }
 
-// ── Status Counts (cached separately, longer staleTime) ──
+// ── Status Counts (single API call instead of 4!) ──
 export function useStatusCounts() {
   const { token } = useAuth();
-  return useQueries({
-    queries: [
-      {
-        queryKey: ['status-counts', 'all'],
-        queryFn: async () => (await webhooksApi.list(token!, { page: 1 })).total,
-        enabled: !!token,
-        staleTime: 60_000,
-        placeholderData: (previousData: number | undefined) => previousData ?? 0,
-      },
-      {
-        queryKey: ['status-counts', 'delivered'],
-        queryFn: async () => (await webhooksApi.list(token!, { page: 1, status: 'delivered' })).total,
-        enabled: !!token,
-        staleTime: 60_000,
-        placeholderData: (previousData: number | undefined) => previousData ?? 0,
-      },
-      {
-        queryKey: ['status-counts', 'failed'],
-        queryFn: async () => (await webhooksApi.list(token!, { page: 1, status: 'failed' })).total,
-        enabled: !!token,
-        staleTime: 60_000,
-        placeholderData: (previousData: number | undefined) => previousData ?? 0,
-      },
-      {
-        queryKey: ['status-counts', 'pending'],
-        queryFn: async () => (await webhooksApi.list(token!, { page: 1, status: 'pending' })).total,
-        enabled: !!token,
-        staleTime: 60_000,
-        placeholderData: (previousData: number | undefined) => previousData ?? 0,
-      },
-    ],
+  return useQuery({
+    queryKey: ['status-counts'],
+    queryFn: async () => {
+      const stats = await statsApi.get(token!);
+      return {
+        all: stats.total_deliveries,
+        delivered: stats.delivered,
+        failed: stats.failed,
+        pending: stats.pending,
+      };
+    },
+    enabled: !!token,
+    staleTime: 60_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
