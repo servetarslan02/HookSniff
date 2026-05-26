@@ -67,7 +67,6 @@ export default function NotificationsPage() {
   const prevFilterRef = useRef(`${typeFilter}-${readFilter}`);
   const t = useTranslations('notifications');
   const tc = useTranslations('common');
-  const perPage = 20;
 
   const { data, isLoading, error, refetch } = useNotifications({
     page: currentPage,
@@ -138,7 +137,6 @@ export default function NotificationsPage() {
     setDeleteTarget(null);
   };
 
-  const totalPages = Math.ceil(total / perPage);
 
   const updateFilter = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());

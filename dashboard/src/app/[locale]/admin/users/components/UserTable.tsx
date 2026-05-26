@@ -21,11 +21,7 @@ interface UserTableProps {
   sortField: 'email' | 'name' | 'plan' | 'status' | 'created_at';
   sortDir: 'asc' | 'desc';
   handleSort: (field: 'email' | 'name' | 'plan' | 'status' | 'created_at') => void;
-  page: number;
-  setPage: (page: number | ((p: number) => number)) => void;
-  totalPages: number;
   total: number;
-  perPage: number;
   locale: string;
   handleToggleStatus: (user: AdminUser) => void;
   handleImpersonate: (user: AdminUser) => void;
@@ -47,11 +43,7 @@ export function UserTable({
   sortField,
   sortDir,
   handleSort,
-  page,
-  setPage,
-  totalPages,
   total,
-  perPage,
   locale,
   handleToggleStatus,
   handleImpersonate,

@@ -51,7 +51,6 @@ export default function AdminUsersPage() {
   const [banReason, setBanReason] = useState('');
   const t = useTranslations('admin');
   const tc = useTranslations('common');
-  const perPage = 20;
 
   // Compute date range params
   const dateParams = useMemo(() => {
@@ -202,9 +201,6 @@ export default function AdminUsersPage() {
     }
   };
 
-  const totalPages = Math.ceil(total / perPage);
-
-  // Bulk selection helpers
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -324,11 +320,7 @@ export default function AdminUsersPage() {
         sortField={sortField}
         sortDir={sortDir}
         handleSort={handleSort}
-        page={page}
-        setPage={setPage}
-        totalPages={totalPages}
         total={total}
-        perPage={perPage}
         locale={locale}
         handleToggleStatus={handleToggleStatus}
         handleImpersonate={handleImpersonate}
