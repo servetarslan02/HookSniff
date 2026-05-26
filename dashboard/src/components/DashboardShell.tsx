@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
