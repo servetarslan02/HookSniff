@@ -19,15 +19,15 @@ Build sorunu çözüldü. `npm run build` → exit 0 ✅
 
 ## 📊 Katman Durumu (Gelişmiş Yükleme Sistemleri)
 
-| Katman | Durum | Not |
-|--------|-------|-----|
-| 1. React Query | ✅ | 47 dosyada useQuery/useMutation |
-| 2. Suspense Boundaries | ✅ | 3 layout (dashboard, admin, docs) + 40 docs page |
-| 3. Virtual Scrolling | ✅ | VirtualTable, 9 sayfada |
-| 4. Concurrent Features | ✅ | useDebouncedSearch, 8 sayfada |
-| 5. Akıllı Prefetch | ✅ | PrefetchLink |
+| Katman | Durum | Kapsam |
+|--------|-------|--------|
+| 1. React Query | ✅ | 46 dosyada useQuery/useMutation |
+| 2. Suspense Boundaries | ✅ | 3 layout + 40 docs page refactor |
+| 3. Virtual Scrolling | ✅ | VirtualTable 17 + VirtualList 19 = 36 dosyada |
+| 4. Concurrent Features | ✅ | useDebouncedSearch 8 dosyada (tüm text search input'larda) |
+| 5. Akıllı Prefetch | ✅ | PrefetchLink 60 dosyada (tüm Link'ler PrefetchLink) |
 | 6. Cache Components | ❌ | `next-intl` uyumsuz — ileride açılacak |
-| 7. View Transitions | ✅ | 5 layout |
+| 7. View Transitions | ✅ | 6 dosyada |
 | 8. Turbopack | ✅ | Config aktif |
 | 9. React Compiler | ✅ | babel-plugin-react-compiler kuruldu |
 
