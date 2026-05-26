@@ -43,25 +43,32 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 
 ---
 
-## 🔜 Sıradaki Adım: ADIM 8 — Cache Components (Katman 6)
+## 🔜 Sıradaki Adım: ADIM 9 — PPR + Infinite Scroll (Katman 10 + 12)
 
-### Durum
-16 docs sayfası Suspense pattern'e geçirildi. Artık `cacheComponents: true` açılabilir.
+### Cache Components (Katman 6) — BLOKE ❌
+
+`cacheComponents: true` Vercel build'inde çalışmıyor. Sebep:
+- `next-intl`'in `getTranslations()` fonksiyonu build zamanında `headers()` okuyor
+- `cacheComponents` tüm server component'leri build'de cache'lemeye çalışıyor
+- `headers()` runtime context gerektirir → build hatası
+- 46 sayfaya `setRequestLocale` ekledim ama sorunu çözmedi (hata Vercel'in kendi build step'inden geliyor)
+
+**Alternatif yaklaşım:** Sayfa bazında `"use cache"` directive kullanmak (global config yerine). Ama bu çok büyük refactor, şimdilik atlanıyor.
+
+### PPR (Katman 10) — BLOKE ❌
+
+PPR sadece server component'lerde çalışır. Dashboard ve docs layout'ları `'use client'` olarak tanımlı. Layout'ları server component'e çevirmek büyük bir refactor.
+
+### Sıradaki Aktif Katman: Infinite Scroll (Katman 12)
+
+Bu katman bloke değil, hemen yapılabilir.
 
 ### Ne Yapılacak?
 
-1. **next.config.js**: `cacheComponents: true` aç
-2. **Build test et**: `npm run build`
-3. **Hata varsa düzelt**: Kalan sayfaları Suspense ile sar
-4. **Commit + push**
-
-### Tahmini Süre: 1-2 oturum
-
-### Notlar
-- `cacheComponents: true` açıldığında, tüm sayfalar `getTranslations` kullandığı için "Uncached data was accessed outside of <Suspense" hatası alınabilir
-- 16 docs sayfası artık `getTranslations` (server) kullanıyor — uyumlu
-- Dashboard sayfaları layout Suspense ile sarılı — uyumlu
-- Admin sayfaları layout Suspense ile sarılı — uyumlu
+1. `useInfiniteWebhooks.ts` hook oluştur (useInfiniteQuery)
+2. `LoadMoreTrigger.tsx` component oluştur (IntersectionObserver)
+3. `DeliveriesContent.tsx`'i pagination'dan infinite scroll'a çevir
+4. Test et + commit + push
 
 ---
 

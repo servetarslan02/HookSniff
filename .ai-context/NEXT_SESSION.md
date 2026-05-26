@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-26 (OpenClaw — DB Optimizasyonu Faz 1 tamamlandı)
+> **Son güncelleme:** 2026-05-26 (OpenClaw — Cache Components bloke, Infinite Scroll sıradaki)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -26,12 +26,14 @@ Build sorunu çözüldü. `npm run build` → exit 0 ✅
 | 3. Virtual Scrolling | ✅ | VirtualTable 17 + VirtualList 19 = 36 dosyada |
 | 4. Concurrent Features | ✅ | useDebouncedSearch 8 dosyada (tüm text search input'larda) |
 | 5. Akıllı Prefetch | ✅ | PrefetchLink 60 dosyada (tüm Link'ler PrefetchLink) |
-| 6. Cache Components | ❌ | `next-intl` uyumsuz — ileride açılacak |
+| 6. Cache Components | ❌ | next-intl headers() ile uyumsuz — per-page "use cache" gerekir |
 | 7. View Transitions | ✅ | 6 dosyada |
 | 8. Turbopack | ✅ | Config aktif |
 | 9. React Compiler | ✅ | babel-plugin-react-compiler kuruldu |
+| 10. PPR | ❌ | Client layout'lar ile uyumsuz |
+| 11. Infinite Scroll | ⏳ | Sıradaki adım |
 
-**Tüm katmanlar aktif (Cache Components hariç).**
+**Aktif katmanlar: 1-5, 7-9. Bloke: 6, 10. Sıradaki: 12 (Infinite Scroll).**
 
 ---
 
