@@ -48,7 +48,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
 
   // Prefetch API data for a route on hover
-  const prefetchForRoute = (href: string) => {
+  const prefetchForRoute = useCallback((href: string) => {
     if (!token) return [];
     const base = [
       { queryKey: ['stats'], queryFn: () => statsApi.get(token), staleTime: 30_000 },
@@ -111,7 +111,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       default:
         return base;
     }
-  };
+  }, [token]);
 
   // Close profile dropdown on outside click
   useEffect(() => {
@@ -124,7 +124,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const navItems = [
+  const navItems = useMemo(() => [
     ...(user?.is_admin ? [{ name: t('adminPanel') || 'Admin Panel', href: '/admin', icon: <Shield size={16} strokeWidth={1.75} />, isSpecial: true }] : []),
     { name: t('core'), href: '/core', icon: <LayoutDashboard size={16} strokeWidth={1.75} /> },
     ...(perms.canManageApplications ? [{ name: t('applications'), href: '/applications', icon: <Smartphone size={16} strokeWidth={1.75} /> }] : []),
@@ -137,7 +137,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     ...(perms.canManageRouting ? [{ name: t('routingConfig'), href: '/routing-config', icon: <Settings size={16} strokeWidth={1.75} /> }] : []),
     ...(perms.canManageBilling ? [{ name: t('billingSection'), href: '/billing', icon: <CreditCard size={16} strokeWidth={1.75} /> }] : []),
     { name: t('account'), href: '/account', icon: <UserCircle size={16} strokeWidth={1.75} /> },
-  ];
+  ], [user?.is_admin, t, perms]);
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -185,6 +185,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   hoverDelay={80}
                   prefetchData={prefetchForRoute(item.href)}
+                  prefetchDataOnHover={true}
                   className="flex items-center px-3 py-2 text-[15px] font-semibold rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
                   onClick={() => setSidebarOpen(false)}
                 >
@@ -199,6 +200,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 hoverDelay={80}
                 prefetchData={prefetchForRoute(item.href)}
+                prefetchDataOnHover={true}
                 className={clsx(
                   'flex items-center px-3 py-2.5 text-[15px] rounded-lg transition-colors',
                   isActive

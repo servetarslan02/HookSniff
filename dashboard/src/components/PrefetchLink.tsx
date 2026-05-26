@@ -43,36 +43,33 @@ interface PrefetchLinkProps extends Omit<LinkProps, 'prefetch'> {
  */
 export function PrefetchLink({
   prefetchData,
-  prefetchRoute = true,
+  prefetchRoute, // Ignored now, we use default Link prefetch
   prefetchDataOnHover = false,
   hoverDelay = 150,
   onMouseEnter,
   children,
+  prefetch: nextPrefetch,
   ...linkProps
 }: PrefetchLinkProps) {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   const handleMouseEnter = useCallback(
     (e: MouseEvent<HTMLAnchorElement>) => {
       onMouseEnter?.(e);
 
+      if (!prefetchDataOnHover || !prefetchData || document.visibilityState !== 'visible') {
+        return;
+      }
+
       // Small delay to avoid prefetching on accidental hovers
       const timer = setTimeout(() => {
-        // Prefetch route chunk
-        if (prefetchRoute) {
-          router.prefetch(linkProps.href as string);
-        }
-
-        if (prefetchDataOnHover && prefetchData && document.visibilityState === 'visible') {
-          for (const query of prefetchData) {
-            if (queryClient.getQueryData(query.queryKey) !== undefined) continue;
-            queryClient.prefetchQuery({
-              queryKey: query.queryKey,
-              queryFn: query.queryFn,
-              staleTime: query.staleTime ?? 5 * 60 * 1000, // 5 min default
-            });
-          }
+        for (const query of prefetchData) {
+          if (queryClient.getQueryData(query.queryKey) !== undefined) continue;
+          queryClient.prefetchQuery({
+            queryKey: query.queryKey,
+            queryFn: query.queryFn,
+            staleTime: query.staleTime ?? 5 * 60 * 1000, // 5 min default
+          });
         }
       }, hoverDelay);
 
@@ -81,11 +78,11 @@ export function PrefetchLink({
       const target = e.currentTarget;
       target.addEventListener('mouseleave', handleMouseLeave, { once: true });
     },
-    [onMouseEnter, prefetchRoute, prefetchDataOnHover, prefetchData, hoverDelay, router, queryClient, linkProps.href]
+    [onMouseEnter, prefetchDataOnHover, prefetchData, hoverDelay, queryClient]
   );
 
   return (
-    <Link {...linkProps} prefetch={false} onMouseEnter={handleMouseEnter}>
+    <Link {...linkProps} prefetch={nextPrefetch} onMouseEnter={handleMouseEnter}>
       {children}
     </Link>
   );
