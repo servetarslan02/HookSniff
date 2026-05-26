@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualTable } from '@/components/VirtualTable';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import { AlertCircle, CheckCircle2, ClipboardList, Key, Link2, Pause } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
@@ -331,8 +332,12 @@ export function AppDetailContent() {
             </button>
           </div>
         ) : (
-          <div className="space-y-3">
-            {endpoints.map((ep) => (
+          <VirtualTable
+            data={endpoints}
+            estimateSize={88}
+            header={null}
+            emptyState={null}
+            renderRow={(ep) => (
               <div
                 key={ep.id}
                 className="group bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5 hover:border-gray-300 dark:hover:border-slate-600 hover:shadow-sm transition-all"
@@ -441,8 +446,8 @@ export function AppDetailContent() {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          />
         )}
       </div>
       </LazySection>

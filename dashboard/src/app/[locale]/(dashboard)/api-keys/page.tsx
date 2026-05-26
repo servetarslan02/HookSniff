@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useApiKeys, useCreateApiKey, useDeleteApiKey, useRotateApiKey } from '@/hooks/useDashboardData';
+import { VirtualTable } from '@/components/VirtualTable';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 export default function ApiKeysPage() {
@@ -84,9 +85,13 @@ export default function ApiKeysPage() {
         ) : keys.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400">{t('noKeys')}</div>
         ) : (
-          <div className="divide-y divide-gray-100 dark:divide-slate-800">
-            {keys.map((key) => (
-              <div key={key.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
+          <VirtualTable
+            data={keys}
+            estimateSize={72}
+            header={null}
+            emptyState={<div className="p-12 text-center text-gray-500 dark:text-slate-400">{t('noKeys')}</div>}
+            renderRow={(key) => (
+              <div key={key.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition border-b border-gray-100 dark:divide-slate-800">
                 <div>
                   <div className="text-sm font-medium text-gray-900 dark:text-white">{key.name || t('unnamedKey')}</div>
                   <div className="text-xs font-mono text-gray-500 dark:text-slate-400 mt-1">{key.api_key_prefix}...</div>
@@ -112,8 +117,8 @@ export default function ApiKeysPage() {
                   </RoleGuard>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          />
         )}
       </div>
     </div>
