@@ -90,13 +90,13 @@ export default function DeliveriesContent() {
     return map;
   }, [endpointsList]);
 
-  // ── Data: status counts (cached separately, 60s staleTime) ──
-  const statusCountQueries = useStatusCounts();
+  // ── Data: status counts (single API call, 60s staleTime) ──
+  const { data: statusCountData } = useStatusCounts();
   const statusCounts = {
-    all: (statusCountQueries[0].data as number) ?? 0,
-    delivered: (statusCountQueries[1].data as number) ?? 0,
-    failed: (statusCountQueries[2].data as number) ?? 0,
-    pending: (statusCountQueries[3].data as number) ?? 0,
+    all: statusCountData?.all ?? 0,
+    delivered: statusCountData?.delivered ?? 0,
+    failed: statusCountData?.failed ?? 0,
+    pending: statusCountData?.pending ?? 0,
   };
 
   // ── Data: SSE stream (from Deliveries page) ──
