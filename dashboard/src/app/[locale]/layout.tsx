@@ -7,7 +7,7 @@ import './globals.css';
 import { AuthProvider } from '@/lib/store';
 import { ToastProvider } from '@/components/Toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { ReactQueryProvider } from './providers';
+import { ReactQueryProvider } from '@/components/ReactQueryProvider';
 import { CookieConsent } from '@/components/CookieConsent';
 import { AnalyticsWrapper } from '@/components/AnalyticsWrapper';
 

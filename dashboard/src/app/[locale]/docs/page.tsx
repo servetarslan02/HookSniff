@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { clsx } from 'clsx';
 
 
 export const metadata: Metadata = {
