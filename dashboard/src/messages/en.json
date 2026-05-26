@@ -1316,7 +1316,8 @@
     "postgres": "PostgreSQL",
     "hex": "hex",
     "OK": "OK",
-    "webhook": "webhook"
+    "webhook": "webhook",
+    "errorCodesLink": "Error Codes"
   },
   "status": {
     "title": "HookSniff Status",
@@ -3777,7 +3778,9 @@
     "post19Excerpt": "An honest comparison of webhooks and polling — latency, bandwidth, scalability, and when to use each approach.",
     "post20Title": "Best Free Webhook Services in 2026 (Honest Comparison)",
     "post20Excerpt": "We compared HookSniff, Svix, Hookdeck, and Hook0 — pricing, features, free tiers, and which one fits your needs.",
-    "backToList": "← Back to Blog"
+    "backToList": "← Back to Blog",
+    "showMore": "Show more",
+    "remaining": "remaining"
   },
   "changelog": {
     "title": "Changelog",
