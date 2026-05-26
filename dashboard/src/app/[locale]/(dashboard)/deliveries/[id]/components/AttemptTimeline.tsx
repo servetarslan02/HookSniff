@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { StatusBadge } from '@/components/StatusBadge';
 import type { DeliveryAttempt } from '@/lib/api';
+import { VirtualTable } from '@/components/VirtualTable';
 import { Check, Clock, X } from '@/components/icons';
 
 function getHttpStatusColor(code?: number): string {
@@ -64,8 +65,12 @@ export function AttemptTimeline({
           {/* Timeline line */}
           <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-slate-700" />
 
-          <div className="space-y-6">
-            {attempts.sort((a, b) => a.attempt_number - b.attempt_number).map((attempt) => (
+          <VirtualTable
+            data={[...attempts].sort((a, b) => a.attempt_number - b.attempt_number)}
+            estimateSize={80}
+            header={null}
+            emptyState={null}
+            renderRow={(attempt) => (
               <div key={attempt.id} className="relative pl-12">
                 {/* Timeline dot */}
                 <div className={`absolute left-3.5 top-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 ${getAttemptStatusColor(attempt.status)} z-10`} />
@@ -179,8 +184,8 @@ export function AttemptTimeline({
                   )}
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          />
         </div>
       )}
     </div>

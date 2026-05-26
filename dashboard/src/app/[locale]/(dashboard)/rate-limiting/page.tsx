@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useRateLimits, useSetRateLimit, useDeleteRateLimit } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualTable } from '@/components/VirtualTable';
 import { BarChart3, Bell, Pencil, RefreshCw, Trash2, Zap } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -122,47 +123,48 @@ export default function RateLimitingPage() {
             <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{t('perEndpointLimits')}</h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50/50 dark:bg-slate-800/50">
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('endpoint')}</th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('rps')}</th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">{t('rpm')}</th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('burst')}</th>
-                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">{t('status')}</th>
-                  <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200/50 dark:divide-slate-700/50">
-                {limits.map((limit) => (
-                  <tr key={limit.endpoint_id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
-                    <td className="px-6 py-4"><div className="text-sm font-mono text-gray-900 dark:text-white truncate max-w-xs">{limit.endpoint_id.slice(0, 12)}...</div></td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">{limit.requests_per_second}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">{limit.requests_per_second * 60}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">{limit.burst_size}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-0.5 rounded-full text-xs ${limit.enabled ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'}`}>
-                        {limit.enabled ? tc('active') : tc('inactive')}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <RoleGuard require="canManageRateLimits">
-                          <button type="button" onClick={() => handleEdit(limit.endpoint_id)}
-                            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium">
-                            <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('editLimit')}
-                          </button>
-                          <button type="button" onClick={() => setDeleteTarget(limit.endpoint_id)}
-                            className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 font-medium">
-                            <Trash2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('deleteLimit')}
-                          </button>
-                        </RoleGuard>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <VirtualTable
+              data={limits}
+              estimateSize={56}
+              header={
+                <div className="bg-gray-50/50 dark:bg-slate-800/50 flex">
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider flex-1">{t('endpoint')}</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider w-20">{t('rps')}</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider w-20 hidden sm:table-cell">{t('rpm')}</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider w-20">{t('burst')}</div>
+                  <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider w-24 hidden md:table-cell">{t('status')}</div>
+                  <div className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider w-32">{tc('actions')}</div>
+                </div>
+              }
+              emptyState={null}
+              renderRow={(limit) => (
+                <div key={limit.endpoint_id} className="flex hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition border-b border-gray-200/50 dark:border-slate-700/50">
+                  <div className="px-6 py-4 flex-1"><div className="text-sm font-mono text-gray-900 dark:text-white truncate max-w-xs">{limit.endpoint_id.slice(0, 12)}...</div></div>
+                  <div className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400 w-20">{limit.requests_per_second}</div>
+                  <div className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400 w-20 hidden sm:table-cell">{limit.requests_per_second * 60}</div>
+                  <div className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400 w-20">{limit.burst_size}</div>
+                  <div className="px-6 py-4 w-24 hidden md:table-cell">
+                    <span className={`px-2 py-0.5 rounded-full text-xs ${limit.enabled ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400'}`}>
+                      {limit.enabled ? tc('active') : tc('inactive')}
+                    </span>
+                  </div>
+                  <div className="px-6 py-4 text-right w-32">
+                    <div className="flex items-center justify-end gap-2">
+                      <RoleGuard require="canManageRateLimits">
+                        <button type="button" onClick={() => handleEdit(limit.endpoint_id)}
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium">
+                          <Pencil size={16} strokeWidth={1.75} className="inline mr-1" /> {t('editLimit')}
+                        </button>
+                        <button type="button" onClick={() => setDeleteTarget(limit.endpoint_id)}
+                          className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 font-medium">
+                          <Trash2 size={16} strokeWidth={1.75} className="inline mr-1" /> {t('deleteLimit')}
+                        </button>
+                      </RoleGuard>
+                    </div>
+                  </div>
+                </div>
+              )}
+            />
           </div>
         </div>
       )}

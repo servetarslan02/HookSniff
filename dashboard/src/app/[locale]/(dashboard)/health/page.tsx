@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useEndpointHealth } from '@/hooks/useDashboardData';
+import { VirtualTable } from '@/components/VirtualTable';
 import { Activity, AlertTriangle } from '@/components/icons';
 
 type TimeRange = '24h' | '7d' | '30d' | '90d';
@@ -114,8 +115,12 @@ export default function EndpointHealthPage() {
             <p className="text-sm text-gray-500 dark:text-slate-400">{t('noEndpointsDesc')}</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100 dark:divide-slate-800">
-            {endpoints.map((ep) => {
+          <VirtualTable
+            data={endpoints}
+            estimateSize={120}
+            header={null}
+            emptyState={null}
+            renderRow={(ep) => {
               const status = STATUS_CONFIG[ep.health_status] || STATUS_CONFIG.healthy;
               return (
                 <div key={ep.id} className="px-6 py-5 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
@@ -189,8 +194,8 @@ export default function EndpointHealthPage() {
                   </div>
                 </div>
               );
-            })}
-          </div>
+            }}
+          />
         )}
       </div>
     </div>
