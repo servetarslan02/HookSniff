@@ -6,7 +6,8 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig = {
   reactStrictMode: true,
-  cacheComponents: true,
+  // cacheComponents: true,  // blocked: next-intl getTranslations + client layouts cause build errors
+  cacheComponents: false,
   reactCompiler: true,
   turbopack: {},
   experimental: {},
