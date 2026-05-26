@@ -45,30 +45,25 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 
 ## 🔜 Sıradaki Adım: ADIM 9 — PPR + Infinite Scroll (Katman 10 + 12)
 
-### Cache Components (Katman 6) — BLOKE ❌
+### Cache Components (Katman 6) — TAMAMLANDI ✅
 
-`cacheComponents: true` Vercel build'inde çalışmıyor. Sebep:
-- `next-intl`'in `getTranslations()` fonksiyonu build zamanında `headers()` okuyor
-- `cacheComponents` tüm server component'leri build'de cache'lemeye çalışıyor
-- `headers()` runtime context gerektirir → build hatası
-- 46 sayfaya `setRequestLocale` ekledim ama sorunu çözmedi (hata Vercel'in kendi build step'inden geliyor)
-
-**Alternatif yaklaşım:** Sayfa bazında `"use cache"` directive kullanmak (global config yerine). Ama bu çok büyük refactor, şimdilik atlanıyor.
+`cacheComponents: true` Vercel'de başarıyla build edildi. Yapılan düzeltmeler:
+- `docs/page.tsx`: `clsx` import eksik → eklendi
+- `providers/page.tsx`: `useTranslations` (client hook) → `getTranslations` (server) + `setRequestLocale` + Suspense
+- `providers.tsx`: `ReactQueryProvider` component'inden taşındı → `components/ReactQueryProvider.tsx` (route olarak algılanıyordu)
+- `focusManager.setEventListener` → `useEffect` içine taşındı (prerender safe)
+- Eksik i18n key'leri eklendi:
+  - `docsOrganization`: permDeveloper, permAnalyst, permViewAnalytics
+  - `docs`: dashboard, api, postgres, hex, OK, webhook
+  - `docsApiKeys`: tam namespace (12 key)
+  - `docs.errorCodes`: code, meaning, description
+- Vercel deploy: READY ✅
 
 ### PPR (Katman 10) — BLOKE ❌
 
 PPR sadece server component'lerde çalışır. Dashboard ve docs layout'ları `'use client'` olarak tanımlı. Layout'ları server component'e çevirmek büyük bir refactor.
 
 ### Sıradaki Aktif Katman: Infinite Scroll (Katman 12)
-
-Bu katman bloke değil, hemen yapılabilir.
-
-### Ne Yapılacak?
-
-1. `useInfiniteWebhooks.ts` hook oluştur (useInfiniteQuery)
-2. `LoadMoreTrigger.tsx` component oluştur (IntersectionObserver)
-3. `DeliveriesContent.tsx`'i pagination'dan infinite scroll'a çevir
-4. Test et + commit + push
 
 ---
 
