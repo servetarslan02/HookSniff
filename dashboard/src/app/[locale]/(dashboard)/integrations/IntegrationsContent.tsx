@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualTable } from '@/components/VirtualTable';
 import { CreditCard, ShoppingBag, GitBranch, MessageSquare, Pause, Phone, Play, Gamepad2, TriangleRight, FileText, Plug, Link2, Pencil, Trash2 } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -285,8 +286,12 @@ export default function IntegrationsContent() {
           </RoleGuard>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {integrations.map(ig => (
+        <VirtualTable
+          data={integrations}
+          estimateSize={140}
+          header={null}
+          emptyState={null}
+          renderRow={(ig) => (
             <div key={ig.id}
               className={`glass-card p-5 cursor-pointer hover:shadow-md transition ${selectedId === ig.id ? 'ring-2 ring-brand-500' : ''}`}
               onClick={() => { setSelectedId(selectedId === ig.id ? null : ig.id); setTab('overview'); }}>
@@ -335,8 +340,8 @@ export default function IntegrationsContent() {
                 </RoleGuard>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        />
       )}
 
       {/* Detail Panel */}
