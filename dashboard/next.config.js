@@ -6,8 +6,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig = {
   reactStrictMode: true,
-  // cacheComponents: true,  // TODO: next-intl getTranslations reads headers() — needs per-page "use cache" instead
-  cacheComponents: false,
+  cacheComponents: true,
   reactCompiler: true,
   turbopack: {},
   experimental: {},
