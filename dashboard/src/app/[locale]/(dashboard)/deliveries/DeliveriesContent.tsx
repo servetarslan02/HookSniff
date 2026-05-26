@@ -1,13 +1,13 @@
 'use client';
 
 import { getErrorMessage } from '@/lib/errors';
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
-import { webhooksApi, type DeliveryAttempt } from '@/lib/api';
-import { useWebhooks, useReplayDelivery, useSearch, useEndpoints } from '@/hooks/useDashboardData';
+import { webhooksApi } from '@/lib/api';
+import { useWebhooks, useReplayDelivery, useSearch, useEndpoints, useDeliveryAttempts } from '@/hooks/useDashboardData';
 import { useDeliveryStream } from '@/hooks/useDeliveryStream';
 import { useIsFeatureEnabled } from '@/hooks/useAdminData';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
@@ -60,8 +60,7 @@ export default function DeliveriesContent() {
 
   // ── Detail modal state (from Logs page) ──
   const [selectedDelivery, setSelectedDelivery] = useState<DisplayDelivery | null>(null);
-  const [attempts, setAttempts] = useState<DeliveryAttempt[]>([]);
-  const [attemptsLoading, setAttemptsLoading] = useState(false);
+  const { data: attempts = [], isLoading: attemptsLoading } = useDeliveryAttempts(selectedDelivery?.id ?? '');
 
   // ── i18n ──
   const t = useTranslations('deliveries');
@@ -88,17 +87,9 @@ export default function DeliveriesContent() {
     return map;
   }, [endpointsList]);
 
-  // ── Data: status counts (from Logs page — extra API calls for badges) ──
-  const [statusCounts, setStatusCounts] = useState({ all: 0, delivered: 0, failed: 0, pending: 0 });
-  useEffect(() => {
-    if (!token) return;
-    const counts = { all: 0, delivered: 0, failed: 0, pending: 0 };
-    // Get total
-    webhooksApi.list(token, { page: 1 }).then(d => { counts.all = d.total; setStatusCounts({ ...counts }); }).catch(() => {});
-    webhooksApi.list(token, { page: 1, status: 'delivered' }).then(d => { counts.delivered = d.total; setStatusCounts({ ...counts }); }).catch(() => {});
-    webhooksApi.list(token, { page: 1, status: 'failed' }).then(d => { counts.failed = d.total; setStatusCounts({ ...counts }); }).catch(() => {});
-    webhooksApi.list(token, { page: 1, status: 'pending' }).then(d => { counts.pending = d.total; setStatusCounts({ ...counts }); }).catch(() => {});
-  }, [token, page, filter]); // refresh counts when filter/page changes
+  // ── Data: status counts (via useDeliveryLogs) ──
+  const { data: statusCountsData } = useDeliveryLogs({ page: 1 });
+  const statusCounts = statusCountsData?.statusCounts ?? { all: 0, delivered: 0, failed: 0, pending: 0 };
 
   // ── Data: SSE stream (from Deliveries page) ──
   const { connected: sseConnected, deliveries: sseDeliveries } = useDeliveryStream({
@@ -181,17 +172,9 @@ export default function DeliveriesContent() {
     }
   };
 
-  // ── Detail modal handlers (from Logs page) ──
+  // ── Detail modal handler ──
   const openDetailModal = (d: DisplayDelivery) => {
     setSelectedDelivery(d);
-    setAttempts([]);
-    if (token) {
-      setAttemptsLoading(true);
-      webhooksApi.getAttempts(token, d.id)
-        .then((a) => setAttempts(a))
-        .catch(() => setAttempts([]))
-        .finally(() => setAttemptsLoading(false));
-    }
   };
 
   // ── Selection handlers ──
