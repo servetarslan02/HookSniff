@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { webhooksApi } from '@/lib/api';
-import { useWebhooks, useReplayDelivery, useSearch, useDeliveryAttempts } from '@/hooks/useDashboardData';
+import { useWebhooks, useReplayDelivery, useSearch, useDeliveryAttempts, useDeliveryLogs } from '@/hooks/useDashboardData';
 import { useLiveEndpoints } from '@/hooks/useCollections';
 import { useDeliveryStream } from '@/hooks/useDeliveryStream';
 import { useIsFeatureEnabled } from '@/hooks/useAdminData';
