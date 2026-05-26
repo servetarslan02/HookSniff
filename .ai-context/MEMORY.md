@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-26 GMT+8 (OpenClaw — Katman 2 Suspense Boundaries tamamlandı, tüm katmanlar incelendi)
+> Son güncelleme: 2026-05-27 GMT+8 (OpenClaw — Dashboard hata düzeltmeleri, tüm kullanıcı panel sayfaları çalışır hale getirildi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 
 ---
