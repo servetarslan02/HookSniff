@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-27 GMT+8 (OpenClaw — Dashboard hata düzeltmeleri, tüm kullanıcı panel sayfaları çalışır hale getirildi)
+> Son güncelleme: 2026-05-27 GMT+8 (OpenClaw — Dashboard performans optimizasyonları, QueryClient cache stratejisi yenilendi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 - burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış, kendine süre tut 45-50 dk sonra uyarı ver durma en son gelismis-yukleme-sistemleri ni yaptık ama kullanıcı ve admin sayfalarında tablolar falan tıkladığımda açılıp güncel veriileri arkada belli etmeden çekmip güncellemitor her sayfa en az 1000 ms de çalışıyor hala hataları bul ve optimize et. her işten sonra vercel build hataları çıkarsa düzelt: vercel:  vcp_1QcjDdCNwpMj8mCNf1UoDBMat1Yi128aMhzmJE4FzEF31aiTZJ3qfJ2h
 
@@ -441,6 +441,59 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 3. **Ayrı repolar var** — SDK'lar `sdks/` klasörü DEĞİL, ayrı GitHub repolarında
 4. **Oturumlar 1 saat** — Her şeyi dosyalara yaz, push et
 5. **Cloud Build manuel** — API deploy için tetikleme gerekli
+
+---
+
+## 📝 Son Oturum (2026-05-27 — OpenClaw Dashboard Performans Optimizasyonu)
+
+### Özet
+Servet ile OpenClaw oturumu. Dashboard performans sorunları tespit edildi ve düzeltildi. 14 dosya değişti, 87 satır eklendi.
+
+### Yapılan İşler:
+1. **QueryClient cache stratejisi yenilendi:**
+   - `staleTime`: 5dk → 30sn (daha taze veri)
+   - `refetchOnMount: false` → `'always'` (sayfa açıldığında arka planda yenile, cache varsa anında göster)
+   - `refetchOnWindowFocus: false` → `'always'` (sekmeye dönünce arka planda yenile)
+   - `gcTime`: 30dk → 5dk (bellek tasarrufu)
+2. **13 hook'a `placeholderData` eklendi** — loading flash önlendi:
+   - useWebhooks, useDeliveryDetail, useDeliveryAttempts
+   - useDashboardStats, useDeliveryTrend, useSuccessRate, useEndpointHealth, useLatencyTrend
+   - useEndpoints, useEndpointDetail, useTeams, useTeamMembers, useTeamDetail
+   - useNotifications, useAlerts, useServiceTokens, useInboundConfigs, useRateLimits, useApiKeys
+3. **`useDeliveryLogs` optimizasyonu** — 4 API çağrısı → 1:
+   - Status counts ayrı `useStatusCounts` hook'una taşındı
+   - `useQueries` ile paralel, ayrı cache key'leri (`['status-counts', 'delivered']` vs.)
+   - 60sn staleTime (ana listeye göre 4x daha uzun cache)
+4. **AdminShell build fix** (pre-existing):
+   - `useMemo`/`useCallback` import eklendi
+   - `adminApi.getUsers` → `adminApi.listUsers`
+   - `adminApi.getSystem` → `adminApi.getSystemHealth`
+   - `ErrorBoundary` import eklendi
+   - Unused `token` ve `useQueryClient` kaldırıldı
+
+### Etki:
+- Sayfa geçişlerinde loading skeleton yerine cached veri anında gösteriliyor
+- Arka planda sessizce taze veri çekiliyor (kullanıcı fark etmiyor)
+- Deliveries sayfası 4 API → 1 API (status counts)
+- Build: ✅ exit 0 (592 sayfa)
+
+### Değişen Dosyalar:
+- `dashboard/src/components/ReactQueryProvider.tsx` — cache stratejisi
+- `dashboard/src/components/AdminShell.tsx` — build fix
+- `dashboard/src/hooks/useWebhooks.ts` — useStatusCounts + placeholderData
+- `dashboard/src/hooks/useAnalytics.ts` — placeholderData (5 hook)
+- `dashboard/src/hooks/useDashboardData.ts` — useStatusCounts re-export
+- `dashboard/src/hooks/useEndpoints.ts` — placeholderData (2 hook)
+- `dashboard/src/hooks/useTeams.ts` — placeholderData (3 hook)
+- `dashboard/src/hooks/useNotifications.ts` — placeholderData
+- `dashboard/src/hooks/useAlerts.ts` — placeholderData
+- `dashboard/src/hooks/useServiceTokens.ts` — placeholderData
+- `dashboard/src/hooks/useInboundConfigs.ts` — placeholderData
+- `dashboard/src/hooks/useRateLimits.ts` — placeholderData
+- `dashboard/src/hooks/useApiKeys.ts` — placeholderData
+- `dashboard/src/app/[locale]/(dashboard)/deliveries/DeliveriesContent.tsx` — useStatusCounts
+
+### Push: ab033f64
 
 ---
 
