@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/store';
 import { useTranslations } from 'next-intl';
-import { useServiceTokens, useCreateServiceToken, useDeleteServiceToken, useRevealServiceToken, useUpdateServiceToken } from '@/hooks/useDashboardData';
+import { useLiveServiceTokens } from '@/hooks/useCollections';
+import { useCreateServiceToken, useDeleteServiceToken, useRevealServiceToken, useUpdateServiceToken } from '@/hooks/useDashboardData';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import { VirtualTable } from '@/components/VirtualTable';
@@ -16,7 +17,7 @@ export default function ServiceTokensPage() {
   const t = useTranslations('serviceTokens');
   const tc = useTranslations('common');
 
-  const { data: tokens = [], isLoading } = useServiceTokens();
+  const { data: tokens = [], isLoading } = useLiveServiceTokens();
   const createToken = useCreateServiceToken();
   const deleteToken = useDeleteServiceToken();
   const revealToken = useRevealServiceToken();

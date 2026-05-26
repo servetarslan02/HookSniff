@@ -6,7 +6,8 @@ import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
 import type { AlertRule } from '@/lib/api';
-import { useAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert, useTestAlert } from '@/hooks/useDashboardData';
+import { useLiveAlerts } from '@/hooks/useCollections';
+import { useCreateAlert, useUpdateAlert, useDeleteAlert, useTestAlert } from '@/hooks/useDashboardData';
 import { VirtualList } from '@/components/VirtualList';
 import { Bell, Link2, Mail, MessageSquare } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
@@ -23,7 +24,7 @@ export default function AlertsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
 
-  const { data: alerts = [], isLoading: loading } = useAlerts();
+  const { data: alerts = [], isLoading: loading } = useLiveAlerts();
   const createAlertMutation = useCreateAlert();
   const updateAlertMutation = useUpdateAlert();
   const deleteAlertMutation = useDeleteAlert();

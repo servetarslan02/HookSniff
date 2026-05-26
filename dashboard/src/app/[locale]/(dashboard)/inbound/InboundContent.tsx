@@ -5,7 +5,8 @@ import { useState } from 'react';
 import { useToast } from '@/components/Toast';
 import { API_BASE } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { useEndpoints, useInboundConfigs, useCreateInboundConfig, useUpdateInboundConfig, useDeleteInboundConfig } from '@/hooks/useDashboardData';
+import { useLiveEndpoints, useLiveInboundConfigs } from '@/hooks/useCollections';
+import { useCreateInboundConfig, useUpdateInboundConfig, useDeleteInboundConfig } from '@/hooks/useDashboardData';
 import type { InboundConfigValidated } from '@/schemas/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { VirtualList } from '@/components/VirtualList';
@@ -29,8 +30,8 @@ export function InboundContent() {
   const t = useTranslations();
   const tc = useTranslations('common');
 
-  const { data: endpoints = [] } = useEndpoints();
-  const { data: configs = [] } = useInboundConfigs();
+  const { data: endpoints = [] } = useLiveEndpoints();
+  const { data: configs = [] } = useLiveInboundConfigs();
   const createMutation = useCreateInboundConfig();
   const updateMutation = useUpdateInboundConfig();
   const deleteMutation = useDeleteInboundConfig();
