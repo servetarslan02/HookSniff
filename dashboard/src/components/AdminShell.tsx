@@ -62,7 +62,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
   const t = useTranslations('admin');
   const { token } = useAuth();
 
-  const prefetchForAdminRoute = (href: string) => {
+  const prefetchForAdminRoute = useCallback((href: string) => {
     if (!token) return [];
     switch (href) {
       case '/admin':
@@ -88,7 +88,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
       default:
         return [];
     }
-  };
+  }, [token]);
 
   return (
     <aside
@@ -118,6 +118,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
                 onClick={onClose}
                 hoverDelay={80}
                 prefetchData={prefetchForAdminRoute(item.href)}
+                prefetchDataOnHover={true}
                 className="flex items-center gap-2.5 px-3 py-2 text-[15px] font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
               >
                 <span className="inline-flex items-center">{item.icon}</span>
@@ -132,6 +133,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
               onClick={onClose}
               hoverDelay={80}
               prefetchData={prefetchForAdminRoute(item.href)}
+              prefetchDataOnHover={true}
               className={clsx(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] font-medium transition',
                 isActive
@@ -167,27 +169,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       router.push("/");
     }
   }, [user, router, locale]);
-
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const routes = [
-      '/admin/users', '/admin/revenue', '/admin/feature-flags',
-      '/admin/coupons', '/admin/system', '/admin/settings',
-      '/admin/activity', '/admin/alerts', '/admin/email', '/admin/security',
-    ];
-    routes.forEach((route, i) => {
-      setTimeout(() => router.prefetch(route), i * 100);
-    });
-  }, [router]);
-
-  useEffect(() => {
-    if (!token) return;
-    setTimeout(() => queryClient.prefetchQuery({ queryKey: ['admin', 'users'], queryFn: () => adminApi.listUsers(token), staleTime: 5 * 60_000 }), 200);
-    setTimeout(() => queryClient.prefetchQuery({ queryKey: ['admin', 'alerts'], queryFn: () => adminApi.listAlerts(token), staleTime: 5 * 60_000 }), 400);
-    setTimeout(() => queryClient.prefetchQuery({ queryKey: ['admin', 'security-stats'], queryFn: () => adminApi.getSecurityStats(token), staleTime: 5 * 60_000 }), 600);
-    setTimeout(() => queryClient.prefetchQuery({ queryKey: ['admin', 'broadcasts'], queryFn: () => adminApi.listBroadcasts(token, {}), staleTime: 5 * 60_000 }), 800);
-  }, [token, queryClient]);
 
   if (!user?.is_admin) {
     return (
