@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Star } from '@/components/icons';
@@ -31,7 +31,19 @@ export function BlogPageContent() {
   });
 
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
-  const paginatedPosts = filteredPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
+  const [displayCount, setDisplayCount] = useState(POSTS_PER_PAGE);
+  const paginatedPosts = filteredPosts.slice(0, displayCount);
+  const hasMore = displayCount < filteredPosts.length;
+
+  // Reset display count when filter changes
+  const prevFilterRef = useRef(`${activeCategory}-${searchQuery}`);
+  useEffect(() => {
+    const key = `${activeCategory}-${searchQuery}`;
+    if (key !== prevFilterRef.current) {
+      setDisplayCount(POSTS_PER_PAGE);
+      prevFilterRef.current = key;
+    }
+  }, [activeCategory, searchQuery]);
 
   const handleCategoryClick = (catKey: string) => {
     setActiveCategory(catKey);
@@ -210,25 +222,14 @@ export function BlogPageContent() {
           ))}
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-4 mt-10">
+        {/* Show More */}
+        {hasMore && (
+          <div className="flex items-center justify-center mt-10">
             <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:border-brand-300 dark:hover:border-brand-500/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              onClick={() => setDisplayCount((c) => c + POSTS_PER_PAGE)}
+              className="px-6 py-2.5 text-sm font-medium text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:border-brand-300 dark:hover:border-brand-500/40 transition-colors"
             >
-              {t('previous')}
-            </button>
-            <span className="text-sm text-gray-500 dark:text-slate-500">
-              {t('pageOf', { page: currentPage, totalPages })}
-            </span>
-            <button
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:border-brand-300 dark:hover:border-brand-500/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              {t('next')}
+              {t('showMore') || 'Show more'} ({filteredPosts.length - displayCount} {t('remaining') || 'remaining'})
             </button>
           </div>
         )}
