@@ -14,6 +14,7 @@ export function useRateLimits() {
     queryFn: validated(() => api.getRateLimits(token!), RateLimitSchema.array()),
     enabled: !!token,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 

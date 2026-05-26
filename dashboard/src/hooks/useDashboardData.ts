@@ -62,6 +62,7 @@ export {
 export {
   useWebhooks, useReplayDelivery, useDeliveryDetail,
   useDeliveryAttempts, useDeliveryLogs, useCreateWebhook,
+  useStatusCounts,
 } from './useWebhooks';
 export {
   useInboundConfigs, useCreateInboundConfig, useUpdateInboundConfig,
