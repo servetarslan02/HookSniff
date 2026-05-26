@@ -4718,7 +4718,8 @@
     "notFoundDesc": "This application may have been deleted or you don't have access.",
     "manageEndpoints": "Manage endpoints",
     "edit": "Edit",
-    "created": "Application created"
+    "created": "Application created",
+    "noApplications": "No applications"
   },
   "serviceTokens": {
     "title": "Service Tokens",

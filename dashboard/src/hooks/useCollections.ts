@@ -199,7 +199,7 @@ export function useLiveApplications() {
   );
 
   return {
-    data: data?.map((d: Record<string, unknown>) => d.app) ?? [],
+    data: (data?.map((d: Record<string, unknown>) => d.app).filter(Boolean) ?? []) as Record<string, unknown>[],
     isLoading: !token || isLoading,
     error,
   };
