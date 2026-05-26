@@ -1,7 +1,7 @@
 'use client';
 
 import { getErrorMessage } from '@/lib/errors';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
@@ -48,6 +48,9 @@ export default function DeliveriesContent() {
 
   // ── Auto-refresh state (from Logs page) ──
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allDeliveriesAcc, setAllDeliveriesAcc] = useState<DisplayDelivery[]>([]);
+  const prevFilterRef = useRef(`${filter}-${debouncedSearch}`);
 
   // ── Replay state (from Deliveries page) ──
   const [replayTarget, setReplayTarget] = useState<DisplayDelivery | null>(null);
@@ -71,7 +74,7 @@ export default function DeliveriesContent() {
 
   // ── Data: main list (from Deliveries page — useWebhooks) ──
   const { data, isLoading, error: queryError, refetch } = useWebhooks({
-    page,
+    page: currentPage,
     status: filter === 'all' ? undefined : filter,
   });
 
@@ -101,7 +104,7 @@ export default function DeliveriesContent() {
   const { data: searchResults, isLoading: searchLoading } = useSearch({
     q: debouncedSearch || undefined,
     status: filter !== 'all' ? filter : undefined,
-    page,
+    page: currentPage,
     per_page: 20,
   });
 
@@ -140,6 +143,29 @@ export default function DeliveriesContent() {
   const total = isSearching ? (searchResults?.total ?? 0) : (data?.total ?? 0);
   const loading = isSearching ? searchLoading : isLoading;
   const error = queryError ? (getErrorMessage(queryError, tc('unknownError')) || tc('failedToLoadDeliveries')) : '';
+
+  // Accumulate deliveries across pages
+  useEffect(() => {
+    const filterKey = `${filter}-${debouncedSearch}`;
+    if (filterKey !== prevFilterRef.current) {
+      setAllDeliveriesAcc(deliveries);
+      setCurrentPage(1);
+      prevFilterRef.current = filterKey;
+    } else if (currentPage === 1) {
+      setAllDeliveriesAcc(deliveries);
+    } else if (deliveries.length > 0) {
+      setAllDeliveriesAcc((prev) => {
+        const existingIds = new Set(prev.map((d) => d.id));
+        const newItems = deliveries.filter((d) => !existingIds.has(d.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [deliveries, currentPage, filter, debouncedSearch]);
+
+  const hasMore = allDeliveriesAcc.length < total;
+  const handleLoadMore = useCallback(() => {
+    if (!loading && hasMore) setCurrentPage((p) => p + 1);
+  }, [loading, hasMore]);
 
   // ── Replay handlers ──
   const handleReplay = async () => {
@@ -272,6 +298,7 @@ export default function DeliveriesContent() {
               else params.set('status', f.key);
               const qs = params.toString();
               router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
+              setCurrentPage(1);
             }}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition ${
               filter === f.key
@@ -347,7 +374,7 @@ export default function DeliveriesContent() {
 
             <div className="overflow-x-auto">
               <VirtualTable
-                data={deliveries}
+                data={allDeliveriesAcc}
                 estimateSize={56}
                 header={
                   <div className={`grid ${bulkReplayEnabled ? 'grid-cols-[40px_120px_140px_100px_80px_80px_140px_100px]' : 'grid-cols-[120px_140px_100px_80px_80px_140px_100px]'} bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50`}>
@@ -414,21 +441,21 @@ export default function DeliveriesContent() {
               />
             </div>
 
-            {/* ─── Pagination ─── */}
-            {total > perPage && (
-              <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
-                <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">
-                  {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
-                </span>
-                <nav aria-label={tc('pagination')} className="flex items-center gap-2">
-                  <button type="button" onClick={() => setParam('page', String(Math.max(1, page - 1)))} disabled={page === 1} aria-label={tc('previous')} className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 text-gray-700 dark:text-slate-300 transition">
-                    {tc('previous')}
+            {/* ─── Infinite Scroll ─── */}
+            {hasMore && (
+              <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-center">
+                {loading ? (
+                  <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                    <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
+                    <span className="text-sm">{tc('loading')}</span>
+                  </div>
+                ) : (
+                  <button type="button" onClick={handleLoadMore}
+                    className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
+                  >
+                    {tc('showing', { from: 1, to: allDeliveriesAcc.length, total })} — {tc('loadMore') || 'Load more'}
                   </button>
-                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">{tc('pageOf', { page, totalPages })}</span>
-                  <button type="button" onClick={() => setParam('page', String(Math.min(totalPages, page + 1)))} disabled={page >= totalPages} aria-label={tc('next')} className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 text-gray-700 dark:text-slate-300 transition">
-                    {tc('next')}
-                  </button>
-                </nav>
+                )}
               </div>
             )}
           </>
