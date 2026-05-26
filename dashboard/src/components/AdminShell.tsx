@@ -170,6 +170,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     }
   }, [user, router, locale]);
 
+  // Extract path without locale for matching
+  const cleanPath = useMemo(() => {
+    const p = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
+    return p.startsWith('/') ? p : `/${p}`;
+  }, [pathname, locale]);
+
   if (!user?.is_admin) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
@@ -181,12 +187,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             href={"/applications"}
             className="inline-flex px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition"
           >
-            {tc('backToDashboard')}
+            {tc('backToDashboard') || 'Back to Dashboard'}
           </PrefetchLink>
         </div>
       </div>
     );
   }
+
+  const activeNavItem = adminNavigation.find((n) => n.href === cleanPath || (n.href !== '/admin' && cleanPath.startsWith(n.href)));
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
@@ -206,7 +214,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      <AdminSidebar pathname={pathname} onClose={() => setSidebarOpen(false)} isOpen={sidebarOpen} />
+      <AdminSidebar pathname={cleanPath} onClose={() => setSidebarOpen(false)} isOpen={sidebarOpen} />
 
       <div className="md:pl-64">
         <header role="banner" className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
@@ -223,7 +231,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </button>
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {adminNavigation.find((n) => n.href === pathname)?.nameKey ? t(`nav.${adminNavigation.find((n) => n.href === pathname)!.nameKey}`) : t('adminPanel')}
+                {activeNavItem?.nameKey ? t(`nav.${activeNavItem.nameKey}`) : t('adminPanel')}
               </h1>
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400">
                 {t('adminBadge')}
@@ -264,9 +272,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <main id="admin-main-content" role="main" className="p-3 sm:p-4 md:p-6 lg:p-8 page-enter">
-          <Suspense fallback={<SkeletonAdmin />}>
-            <ViewTransition>{children}</ViewTransition>
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<SkeletonAdmin />}>
+              <ViewTransition>{children}</ViewTransition>
+            </Suspense>
+          </ErrorBoundary>
         </main>
       </div>
     </div>
