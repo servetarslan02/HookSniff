@@ -35,7 +35,7 @@ export function useLiveEndpoints() {
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ endpoint: collection }) : q.from({ endpoint: [] as Record<string, unknown>[] })
+    collection ? q.from({ endpoint: collection }) : null
   );
 
   return {
@@ -55,7 +55,7 @@ export function useLiveDeliveries(params?: { page?: number; status?: string }) {
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ delivery: collection }) : q.from({ delivery: [] as Record<string, unknown>[] })
+    collection ? q.from({ delivery: collection }) : null
   );
 
   return {
@@ -75,7 +75,7 @@ export function useLiveTeams() {
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ team: collection }) : q.from({ team: [] as Record<string, unknown>[] })
+    collection ? q.from({ team: collection }) : null
   );
 
   return {
@@ -95,7 +95,7 @@ export function useLiveApiKeys() {
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ key: collection }) : q.from({ key: [] as Record<string, unknown>[] })
+    collection ? q.from({ key: collection }) : null
   );
 
   return {
@@ -115,7 +115,7 @@ export function useLiveNotifications() {
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ notification: collection }) : q.from({ notification: [] as Record<string, unknown>[] })
+    collection ? q.from({ notification: collection }) : null
   );
 
   return {
@@ -135,7 +135,7 @@ export function useLiveAlerts() {
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ alert: collection }) : q.from({ alert: [] as Record<string, unknown>[] })
+    collection ? q.from({ alert: collection }) : null
   );
 
   return {
@@ -155,7 +155,7 @@ export function useLiveServiceTokens() {
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ token: collection }) : q.from({ token: [] as Record<string, unknown>[] })
+    collection ? q.from({ token: collection }) : null
   );
 
   return {
@@ -175,7 +175,7 @@ export function useLiveTransforms(endpointId: string) {
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ transform: collection }) : q.from({ transform: [] as Record<string, unknown>[] })
+    collection ? q.from({ transform: collection }) : null
   );
 
   return {
@@ -195,7 +195,7 @@ export function useLiveApplications() {
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ app: collection }) : q.from({ app: [] as Record<string, unknown>[] })
+    collection ? q.from({ app: collection }) : null
   );
 
   return {
@@ -215,7 +215,7 @@ export function useLiveInboundConfigs() {
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ config: collection }) : q.from({ config: [] as Record<string, unknown>[] })
+    collection ? q.from({ config: collection }) : null
   );
 
   return {
