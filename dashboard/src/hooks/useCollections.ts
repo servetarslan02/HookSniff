@@ -10,6 +10,7 @@
 
 import { useLiveQuery } from '@tanstack/react-db';
 import { useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/store';
 import {
   createEndpointsCollection,
@@ -21,14 +22,16 @@ import {
   createServiceTokensCollection,
   createTransformsCollection,
   createInboundConfigsCollection,
+  createApplicationsCollection,
 } from '@/lib/collections';
 
 // ── Endpoints ──
 export function useLiveEndpoints() {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
   const collection = useMemo(
-    () => (token ? createEndpointsCollection(token) : null),
-    [token]
+    () => (token ? createEndpointsCollection(token, queryClient) : null),
+    [token, queryClient]
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
@@ -45,9 +48,10 @@ export function useLiveEndpoints() {
 // ── Deliveries ──
 export function useLiveDeliveries(params?: { page?: number; status?: string }) {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
   const collection = useMemo(
-    () => (token ? createDeliveriesCollection(token, params) : null),
-    [token, params?.page, params?.status]
+    () => (token ? createDeliveriesCollection(token, queryClient, params) : null),
+    [token, queryClient, params?.page, params?.status]
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
@@ -64,9 +68,10 @@ export function useLiveDeliveries(params?: { page?: number; status?: string }) {
 // ── Teams ──
 export function useLiveTeams() {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
   const collection = useMemo(
-    () => (token ? createTeamsCollection(token) : null),
-    [token]
+    () => (token ? createTeamsCollection(token, queryClient) : null),
+    [token, queryClient]
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
@@ -83,9 +88,10 @@ export function useLiveTeams() {
 // ── API Keys ──
 export function useLiveApiKeys() {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
   const collection = useMemo(
-    () => (token ? createApiKeysCollection(token) : null),
-    [token]
+    () => (token ? createApiKeysCollection(token, queryClient) : null),
+    [token, queryClient]
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
@@ -102,9 +108,10 @@ export function useLiveApiKeys() {
 // ── Notifications ──
 export function useLiveNotifications() {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
   const collection = useMemo(
-    () => (token ? createNotificationsCollection(token) : null),
-    [token]
+    () => (token ? createNotificationsCollection(token, queryClient) : null),
+    [token, queryClient]
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
@@ -121,9 +128,10 @@ export function useLiveNotifications() {
 // ── Alerts ──
 export function useLiveAlerts() {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
   const collection = useMemo(
-    () => (token ? createAlertsCollection(token) : null),
-    [token]
+    () => (token ? createAlertsCollection(token, queryClient) : null),
+    [token, queryClient]
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
@@ -140,9 +148,10 @@ export function useLiveAlerts() {
 // ── Service Tokens ──
 export function useLiveServiceTokens() {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
   const collection = useMemo(
-    () => (token ? createServiceTokensCollection(token) : null),
-    [token]
+    () => (token ? createServiceTokensCollection(token, queryClient) : null),
+    [token, queryClient]
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
@@ -159,9 +168,10 @@ export function useLiveServiceTokens() {
 // ── Transforms ──
 export function useLiveTransforms(endpointId: string) {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
   const collection = useMemo(
-    () => (token && endpointId ? createTransformsCollection(token, endpointId) : null),
-    [token, endpointId]
+    () => (token && endpointId ? createTransformsCollection(token, queryClient, endpointId) : null),
+    [token, queryClient, endpointId]
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
@@ -178,9 +188,10 @@ export function useLiveTransforms(endpointId: string) {
 // ── Applications ──
 export function useLiveApplications() {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
   const collection = useMemo(
-    () => (token ? createApplicationsCollection(token) : null),
-    [token]
+    () => (token ? createApplicationsCollection(token, queryClient) : null),
+    [token, queryClient]
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
@@ -197,9 +208,10 @@ export function useLiveApplications() {
 // ── Inbound Configs ──
 export function useLiveInboundConfigs() {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
   const collection = useMemo(
-    () => (token ? createInboundConfigsCollection(token) : null),
-    [token]
+    () => (token ? createInboundConfigsCollection(token, queryClient) : null),
+    [token, queryClient]
   );
 
   const { data, isLoading, error } = useLiveQuery((q) =>
