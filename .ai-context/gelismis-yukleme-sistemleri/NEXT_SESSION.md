@@ -26,8 +26,13 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 | 3 | Concurrent Features | 4 | ✅ | 2026-05-26 | e3b74c99, c6b29fda |
 | 4 | Akıllı Prefetch | 5 | ✅ | 2026-05-26 | 6b4061dc, 00fb2d4b |
 | 5 | Build Fix + Cache Components Prep | 6 | ✅ | 2026-05-26 | c306d5be, ebf5ab55 |
-| 6 | Cache Components (use cache) | 6 | ⏳ | — | — |
-| 7 | View Transitions | 7 | ⏳ | — | — |
+| 6 | 16 Docs Suspense Refactor | 2 | ✅ | 2026-05-26 | 7f515761 |
+| 7 | React Query — deliveries + logs | 1 | ✅ | 2026-05-26 | f2f1df57 |
+| 8 | Cache Components (use cache) | 6 | ⏳ | — | — |
+| 9 | View Transitions | 7 | ✅ | — | Zaten aktif (5 layout) |
+| 10 | Turbopack | 8 | ✅ | — | Zaten aktif (Next.js 16 default) |
+| 11 | React Compiler | 9 | ✅ | — | Zaten aktif (reactCompiler: true) |
+| 12 | PPR | 10 | ⏳ | — | Altyapı hazır, config açılacak |
 | 8 | Turbopack | 8 | ⏳ | — | — |
 | 9 | React Compiler | 9 | ⏳ | — | — |
 | 10 | PPR | 10 | ⏳ | — | — |
@@ -38,51 +43,44 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 
 ---
 
-## 🔜 Sıradaki Adım: ADIM 6 — Cache Components (Katman 6)
+## 🔜 Sıradaki Adım: ADIM 8 — Cache Components (Katman 6)
 
-### Neden Erteleme?
-
-`cacheComponents: true` aktifken, tüm sayfalar `getTranslations` kullandığı için "Uncached data was accessed outside of <Suspense" hatası alıyor. **60+ docs sayfası** refactor edilmeli:
-
-1. Her docs sayfasının içeriğini ayrı bir component'e taşı
-2. Sayfada Suspense ile sar
-3. `getTranslations` çağıran component'i Suspense içine koy
+### Durum
+16 docs sayfası Suspense pattern'e geçirildi. Artık `cacheComponents: true` açılabilir.
 
 ### Ne Yapılacak?
 
-```tsx
-// docs/quickstart/page.tsx — ÖRNEK
-import { Suspense } from 'react';
-import { QuickstartContent } from './content';
-
-export const metadata = { title: 'Quickstart — HookSniff' };
-
-export default function QuickstartPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <QuickstartContent />
-    </Suspense>
-  );
-}
-
-// docs/quickstart/content.tsx — YENİ
-import { getTranslations } from 'next-intl/server';
-
-export async function QuickstartContent() {
-  const t = await getTranslations('docs');
-  return <div>...</div>;
-}
-```
-
-### Adım Adım
-
 1. **next.config.js**: `cacheComponents: true` aç
-2. **Her docs sayfası**: İçeriği ayrı component'e taşı, Suspense ile sar
-3. **`cargo check + cargo test`**
-4. **`npm run build`** — hata varsa düzelt
-5. **Commit + push**
+2. **Build test et**: `npm run build`
+3. **Hata varsa düzelt**: Kalan sayfaları Suspense ile sar
+4. **Commit + push**
 
-### Tahmini Süre: 2-3 oturum (60+ sayfa)
+### Tahmini Süre: 1-2 oturum
+
+### Notlar
+- `cacheComponents: true` açıldığında, tüm sayfalar `getTranslations` kullandığı için "Uncached data was accessed outside of <Suspense" hatası alınabilir
+- 16 docs sayfası artık `getTranslations` (server) kullanıyor — uyumlu
+- Dashboard sayfaları layout Suspense ile sarılı — uyumlu
+- Admin sayfaları layout Suspense ile sarılı — uyumlu
+
+---
+
+## 📊 Katman Durumu (2026-05-26)
+
+| # | Katman | Durum | Not |
+|---|--------|-------|-----|
+| 1 | React Query | ✅ | 46 dosya useQuery/useMutation |
+| 2 | Suspense Boundaries | ✅ | 16 docs sayfası refactor edildi |
+| 3 | Virtual Scrolling | ✅ | 38 dosya |
+| 4 | Concurrent Features | ✅ | 8 dosya useDebouncedSearch |
+| 5 | Akıllı Prefetch | ✅ | 59 dosya PrefetchLink |
+| 6 | Cache Components | ⏳ | Altyapı hazır, config açılacak |
+| 7 | View Transitions | ✅ | 5 layout'ta aktif |
+| 8 | Turbopack | ✅ | Next.js 16 default |
+| 9 | React Compiler | ✅ | reactCompiler: true |
+| 10 | PPR | ⏳ | Altyapı hazır, config açılacak |
+
+**Sonraki adım:** Cache Components + PPR config aç
 
 ---
 
