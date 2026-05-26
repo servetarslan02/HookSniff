@@ -6,12 +6,13 @@ import { useState } from 'react';
 import { useToast } from '@/components/Toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useTranslations } from 'next-intl';
-import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
+import { useCreateWebhook } from '@/hooks/useDashboardData';
+import { useLiveEndpoints } from '@/hooks/useCollections';
 import { AlertTriangle, Radio } from '@/components/icons';
 
 export default function SendWebhookPage() {
   const { toast } = useToast();
-  const { data: endpoints = [] } = useEndpoints();
+  const { data: endpoints = [] } = useLiveEndpoints();
   const createWebhook = useCreateWebhook();
   const [endpointId, setEndpointId] = useState('');
   const [eventType, setEventType] = useState('');

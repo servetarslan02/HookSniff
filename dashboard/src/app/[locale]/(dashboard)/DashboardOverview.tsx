@@ -3,7 +3,8 @@
 import { useState, useCallback, type DragEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { DashboardWidget, loadWidgetConfig, saveWidgetConfig, type WidgetConfig } from '@/components/DashboardWidget';
-import { useDashboardStats, useDeliveryTrend, useWebhooks, useEndpoints } from '@/hooks/useDashboardData';
+import { useDashboardStats, useDeliveryTrend, useWebhooks } from '@/hooks/useDashboardData';
+import { useLiveEndpoints } from '@/hooks/useCollections';
 import {
   LazyAreaChart as AreaChart,
   Area,

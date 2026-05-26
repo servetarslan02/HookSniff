@@ -8,7 +8,7 @@ import { PrefetchLink } from '@/components/PrefetchLink';
 import { apiFetch } from '@/lib/api';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
-import { useApplications } from '@/hooks/useDashboardData';
+import { useLiveApplications } from '@/hooks/useCollections';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazySection, Skeletons } from '@/components/LazySection';
@@ -55,7 +55,7 @@ export default function ApplicationsPage() {
   ] : [];
 
   // React Query hook for data fetching
-  const { data: apps = [], isLoading: loading } = useApplications();
+  const { data: apps = [], isLoading: loading } = useLiveApplications();
 
   // UI state (kept as useState)
   const [showCreate, setShowCreate] = useState(false);
