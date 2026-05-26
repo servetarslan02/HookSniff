@@ -2,7 +2,7 @@
 
 > Son güncelleme: 2026-05-27 GMT+8 (OpenClaw — Dashboard hata düzeltmeleri, tüm kullanıcı panel sayfaları çalışır hale getirildi)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
-
+- burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış en son gelismis-yukleme-sistemleri ni yaptık ama kullanıcı ve admin sayfalarında tablolar falan tıkladığımda açılıp güncel veriileri arkada belli etmeden çekmip güncellemitor her sayfa en az 1000 ms de çalışıyor hala hataları bul ve optimize et
 ---
 
 ## 🚀 Hızlı Başlangıç (Her Oturum)
