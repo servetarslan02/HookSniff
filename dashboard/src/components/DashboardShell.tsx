@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
+import { useState, useRef, useEffect, useCallback, Suspense, Activity } from 'react';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useTranslations, useLocale } from 'next-intl';
@@ -329,7 +329,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <BroadcastBanner />
           <ErrorBoundary>
             <Suspense fallback={<SkeletonDashboard />}>
-              <ViewTransition>{children}</ViewTransition>
+              <Activity mode="visible">
+                <ViewTransition>{children}</ViewTransition>
+              </Activity>
             </Suspense>
           </ErrorBoundary>
         </main>
