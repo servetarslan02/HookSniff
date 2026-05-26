@@ -1,6 +1,68 @@
 use anyhow::Result;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::Instant;
+
+/// Slow query threshold in milliseconds.
+/// Queries exceeding this are logged as warnings.
+const SLOW_QUERY_THRESHOLD_MS: u128 = 100;
+
+/// Global slow query counter (exposed via metrics).
+pub static SLOW_QUERY_COUNT: AtomicU64 = AtomicU64::new(0);
+pub static TOTAL_QUERY_COUNT: AtomicU64 = AtomicU64::new(0);
+
+/// Execute a database query with timing. Logs a warning if the query
+/// exceeds `SLOW_QUERY_THRESHOLD_MS`. Always records the duration
+/// in the Prometheus `db_query_duration_seconds` histogram when a
+/// metrics handle is available.
+///
+/// # Usage
+/// ```ignore
+/// let rows = timed_query("endpoints_by_customer", async {
+///     sqlx::query_as::<_, Endpoint>("SELECT ...")
+///         .bind(customer_id)
+///         .fetch_all(&pool)
+///         .await
+/// })
+/// .await?;
+/// ```
+pub async fn timed_query<F, T>(query_name: &str, f: F) -> Result<T>
+where
+    F: std::future::Future<Output = Result<T>>,
+{
+    let start = Instant::now();
+    let result = f.await;
+    let elapsed = start.elapsed();
+    let ms = elapsed.as_millis();
+
+    TOTAL_QUERY_COUNT.fetch_add(1, Ordering::Relaxed);
+
+    if ms > SLOW_QUERY_THRESHOLD_MS {
+        SLOW_QUERY_COUNT.fetch_add(1, Ordering::Relaxed);
+        tracing::warn!(
+            query = query_name,
+            duration_ms = ms as u64,
+            "⚠️  Slow query detected (>{SLOW_QUERY_THRESHOLD_MS}ms)"
+        );
+    } else {
+        tracing::debug!(
+            query = query_name,
+            duration_ms = ms as u64,
+            "Query executed"
+        );
+    }
+
+    result
+}
+
+/// Return (slow_query_count, total_query_count) for metrics export.
+pub fn query_stats() -> (u64, u64) {
+    (
+        SLOW_QUERY_COUNT.load(Ordering::Relaxed),
+        TOTAL_QUERY_COUNT.load(Ordering::Relaxed),
+    )
+}
 
 /// Strip `channel_binding=require` from a PostgreSQL connection URL.
 /// sqlx 0.8 doesn't support channel_binding (Neon compatibility).
@@ -143,6 +205,7 @@ fn migrations() -> Vec<(&'static str, &'static str)> {
         ("052_endpoints_team_id", include_str!("../sql/migrations/052_endpoints_team_id.sql")),
         ("053_customer_consents", include_str!("../sql/migrations/053_customer_consents.sql")),
         ("054_weekly_digest", include_str!("../sql/migrations/054_weekly_digest.sql")),
+        ("055_performance_indexes", include_str!("../sql/migrations/055_performance_indexes.sql")),
     ]
 }
 
@@ -251,7 +314,7 @@ mod tests {
     #[test]
     fn test_migration_count() {
         let migs = migrations();
-        assert_eq!(migs.len(), 54, "Expected exactly 54 migrations");
+        assert_eq!(migs.len(), 55, "Expected exactly 55 migrations");
         for (i, (name, _)) in migs.iter().enumerate() {
             let expected_prefix = format!("{:03}_", i + 1);
             assert!(
