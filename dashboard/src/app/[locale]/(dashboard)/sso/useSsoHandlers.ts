@@ -6,7 +6,8 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
-import { useSsoConfig, useTeams } from '@/hooks/useDashboardData';
+import { useSsoConfig } from '@/hooks/useDashboardData';
+import { useTeams } from '@/hooks/useTeams';
 import { IDP_TEMPLATES, getFriendlyError } from './sso-utils';
 
 /* ─── SSO Handlers Hook ─── */

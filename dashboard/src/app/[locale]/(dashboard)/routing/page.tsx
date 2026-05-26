@@ -23,7 +23,7 @@ export default function RoutingPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { data: endpoints = [], isLoading } = useEndpoints();
+  const { data: endpoints = [], isLoading } = useLiveEndpoints();
 
   const [editId, setEditId] = useState<string | null>(null);
   const [editStrategy, setEditStrategy] = useState('round-robin');

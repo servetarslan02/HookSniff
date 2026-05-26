@@ -45,7 +45,7 @@ export default function WebhookBuilderPage() {
   const t = useTranslations('webhookBuilder');
   const tc = useTranslations('common');
   const { toast } = useToast();
-  const { data: endpoints = [], isLoading: loadingEndpoints } = useEndpoints();
+  const { data: endpoints = [], isLoading: loadingEndpoints } = useLiveEndpoints();
   const createWebhook = useCreateWebhook();
 
   const [eventType, setEventType] = useState('order.created');

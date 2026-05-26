@@ -51,7 +51,7 @@ export function DashboardOverview() {
   const { data: stats, isLoading: statsLoading, refetch: refetchStats, error: statsError } = useDashboardStats();
   const { data: trendData, refetch: refetchTrend, error: trendError, isFetching: trendFetching } = useDeliveryTrend(timeRange);
   const { data: deliveriesData, refetch: refetchDeliveries, error: deliveriesError } = useWebhooks({ page: 1 });
-  const { data: endpoints, refetch: refetchEndpoints, error: endpointsError } = useEndpoints();
+  const { data: endpoints, refetch: refetchEndpoints, error: endpointsError } = useLiveEndpoints();
 
   const recentDeliveries = deliveriesData?.deliveries?.slice(0, 5) ?? [];
   const endpointCount = endpoints?.length ?? 0;

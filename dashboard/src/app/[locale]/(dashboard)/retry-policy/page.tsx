@@ -22,7 +22,7 @@ export default function RetryPolicyPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { data: endpoints = [], isLoading } = useEndpoints();
+  const { data: endpoints = [], isLoading } = useLiveEndpoints();
 
   const [editId, setEditId] = useState<string | null>(null);
   const [maxAttempts, setMaxAttempts] = useState(5);
