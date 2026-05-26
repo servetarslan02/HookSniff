@@ -1,4 +1,5 @@
-import { useTranslations } from 'next-intl';
+import { Suspense } from 'react';
+import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 
@@ -11,8 +12,8 @@ export const metadata: Metadata = {
 
 
 // Force redeploy — docs/api page fix
-export default function ApiReferencePage() {
-  const t = useTranslations('docs');
+async function ApiReferenceContent() {
+  const t = await getTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('apiReference')}</h1>
@@ -746,7 +747,7 @@ export default function ApiReferencePage() {
   );
 }
 
-function ApiMethod({
+async function ApiMethod({
   method,
   path,
   description,
@@ -759,7 +760,7 @@ function ApiMethod({
   request?: string;
   response: string;
 }) {
-  const t = useTranslations('docs');
+  const t = await getTranslations('docs');
   const methodColors: Record<string, string> = {
     GET: 'bg-green-100 text-green-800',
     POST: 'bg-blue-100 text-blue-800',
@@ -791,5 +792,13 @@ function ApiMethod({
         </pre>
       </div>
     </div>
+  );
+}
+
+export default function ApiReferencePage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <ApiReferenceContent />
+    </Suspense>
   );
 }

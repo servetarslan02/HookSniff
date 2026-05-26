@@ -1,5 +1,6 @@
+import { Suspense } from 'react';
 /* eslint-disable no-useless-escape -- Code examples contain intentional escapes (Elixir, Ruby, etc.) */
-import {useTranslations} from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import {Box, Check, Circle, Code2, Coffee, FileCode, FileText, FlaskConical, Gem, Hash, Key, Package, Radio, RefreshCw, ShieldCheck, Smartphone,  Zap} from '@/components/icons';
 import type {Metadata} from 'next';
 
@@ -691,8 +692,8 @@ const sharedFeatures = [
  {icon: <Zap size={16} strokeWidth={1.75} />, title: 'Rate Limit Parsing', desc: 'SDKs parse X-RateLimit-* headers and throw typed errors on 429.'},
 ];
 
-export default function SdksPage() {
- const t = useTranslations('docs');
+async function SdksContent() {
+ const t = await getTranslations('docs');
  return (
   <article className="prose prose-gray max-w-none">
    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('sdks') || 'SDK Libraries'}</h1>
@@ -866,4 +867,12 @@ export default function SdksPage() {
    </section>
   </article>
  );
+}
+
+export default function SdksPage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <SdksContent />
+    </Suspense>
+  );
 }

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { Check } from '@/components/icons';
 
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
  description: 'Understand HookSniff webhook delivery guarantees and reliability',
 };
 
-export default function DeliveryGuaranteesPage() {
+async function DeliveryGuaranteesContent() {
  return (
   <article className="prose prose-gray max-w-none">
    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Delivery Guarantees</h1>
@@ -99,4 +100,12 @@ SELECT 1 FROM processed_webhooks WHERE delivery_id = $1;
    </section>
   </article>
  );
+}
+
+export default function DeliveryGuaranteesPage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <DeliveryGuaranteesContent />
+    </Suspense>
+  );
 }

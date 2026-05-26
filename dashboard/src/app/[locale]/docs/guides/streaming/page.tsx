@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { Radio } from '@/components/icons';
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
   description: 'Real-time SSE streaming and rate limiting configuration',
 };
 
-export default function StreamingPage() {
+async function StreamingContent() {
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><Radio size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Streaming & Rate Limiting</h1>
@@ -177,5 +178,13 @@ try {
         </div>
       </section>
     </article>
+  );
+}
+
+export default function StreamingPage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <StreamingContent />
+    </Suspense>
   );
 }
