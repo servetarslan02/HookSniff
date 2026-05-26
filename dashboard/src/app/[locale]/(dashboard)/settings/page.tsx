@@ -8,7 +8,7 @@ import { NotificationSection } from './components/NotificationSection';
 import { PrivacyConsentSection } from './components/PrivacyConsentSection';
 import { DangerZoneSection } from './components/DangerZoneSection';
 import { TwoFactorSection } from './components/TwoFactorSection';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Activity } from 'react';
 import { clsx } from 'clsx';
 
 type Tab = 'profile' | 'security' | 'notifications' | 'privacy' | 'danger';
@@ -146,16 +146,24 @@ export default function SettingsPage() {
 
       {/* ── Tab Content ── */}
       <div className="animate-slide-up">
-        {activeTab === 'profile' && <ProfileSection user={user} token={token} />}
-        {activeTab === 'security' && (
+        <Activity mode={activeTab === 'profile' ? 'visible' : 'hidden'}>
+          <ProfileSection user={user} token={token} />
+        </Activity>
+        <Activity mode={activeTab === 'security' ? 'visible' : 'hidden'}>
           <div className="space-y-5">
             <PasswordSection token={token} />
             <TwoFactorSection />
           </div>
-        )}
-        {activeTab === 'notifications' && <NotificationSection />}
-        {activeTab === 'privacy' && <PrivacyConsentSection />}
-        {activeTab === 'danger' && <DangerZoneSection />}
+        </Activity>
+        <Activity mode={activeTab === 'notifications' ? 'visible' : 'hidden'}>
+          <NotificationSection />
+        </Activity>
+        <Activity mode={activeTab === 'privacy' ? 'visible' : 'hidden'}>
+          <PrivacyConsentSection />
+        </Activity>
+        <Activity mode={activeTab === 'danger' ? 'visible' : 'hidden'}>
+          <DangerZoneSection />
+        </Activity>
       </div>
     </div>
   );
