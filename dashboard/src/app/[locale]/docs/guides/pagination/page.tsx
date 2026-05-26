@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 import { FileText } from '@/components/icons';
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
   description: 'Paginate through endpoints, deliveries, and events using cursor-based pagination',
 };
 
-export default function PaginationPage() {
+async function PaginationContent() {
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><FileText size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Pagination</h1>
@@ -188,5 +189,13 @@ GET /v1/webhooks?after=2024-01-01T00:00:00Z&before=2024-01-31T23:59:59Z`}
         />
       </section>
     </article>
+  );
+}
+
+export default function PaginationPage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <PaginationContent />
+    </Suspense>
   );
 }

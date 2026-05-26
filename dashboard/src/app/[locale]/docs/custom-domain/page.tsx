@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import CodeBlock from '@/components/CodeBlock';
 
@@ -6,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Use your own domain for the webhook portal. White-label your customers experience.',
 };
 
-export default function CustomDomainDocsPage() {
+async function CustomDomainDocsContent() {
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">🌐 Custom Domain</h1>
@@ -199,5 +200,13 @@ DELETE /v1/custom-domains/:id`}
         </div>
       </section>
     </article>
+  );
+}
+
+export default function CustomDomainDocsPage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <CustomDomainDocsContent />
+    </Suspense>
   );
 }

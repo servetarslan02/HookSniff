@@ -1,4 +1,5 @@
-import { useTranslations } from 'next-intl';
+import { Suspense } from 'react';
+import { getTranslations } from 'next-intl/server';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 
@@ -10,8 +11,8 @@ export const metadata: Metadata = {
 };
 
 
-export default function SelfHostingPage() {
-  const t = useTranslations('docs');
+async function SelfHostingContent() {
+  const t = await getTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Self-Hosting Guide</h1>
@@ -191,5 +192,13 @@ make db-shell`}
         />
       </section>
     </article>
+  );
+}
+
+export default function SelfHostingPage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <SelfHostingContent />
+    </Suspense>
   );
 }
