@@ -14,6 +14,7 @@ export function useApiKeys() {
     queryFn: validated(() => api.getApiKeys(token!), ApiKeySchema.array()),
     enabled: !!token,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
