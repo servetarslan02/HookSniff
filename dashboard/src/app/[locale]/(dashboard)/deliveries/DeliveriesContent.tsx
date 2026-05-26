@@ -79,7 +79,7 @@ export default function DeliveriesContent() {
   });
 
   // ── Data: endpoints (for resolving endpoint_id → URL) ──
-  const { data: endpointsList } = useEndpoints();
+  const { data: endpointsList } = useLiveEndpoints();
   const endpointUrlMap = useMemo(() => {
     const map: Record<string, string> = {};
     if (endpointsList) {

@@ -22,20 +22,20 @@ import {
 
 // ── Re-exports ──
 export {
-  useTeams, useTeamMembers, useTeamDetail, useCreateTeam, useUpdateTeam,
+  useTeamMembers, useTeamDetail, useCreateTeam, useUpdateTeam,
   useInviteTeamMember, useRemoveTeamMember, useUpdateTeamMemberRole,
   useAcceptTeamInvite, useDeleteTeam, useLeaveTeam, useTransferOwnership,
   useRevokeInvite, useResendInvite,
 } from './useTeams';
 export {
-  useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead,
+  useMarkNotificationAsRead, useMarkAllNotificationsAsRead,
   useDeleteNotification, useReplayWebhook,
 } from './useNotifications';
 export {
   useBillingUsage, useBillingInvoices, useBillingSubscription, useOverageSettings,
 } from './useBilling';
 export {
-  useAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert, useTestAlert,
+  useCreateAlert, useUpdateAlert, useDeleteAlert, useTestAlert,
 } from './useAlerts';
 export {
   useTransformRules, useCreateTransformRule, useDeleteTransformRule,
@@ -46,14 +46,14 @@ export {
   usePortalProfile, usePortalUsage,
 } from './usePortal';
 export {
-  useApiKeys, useCreateApiKey, useDeleteApiKey, useRotateApiKey,
+  useCreateApiKey, useDeleteApiKey, useRotateApiKey,
 } from './useApiKeys';
 export {
-  useServiceTokens, useCreateServiceToken, useDeleteServiceToken,
+  useCreateServiceToken, useDeleteServiceToken,
   useRevealServiceToken, useUpdateServiceToken,
 } from './useServiceTokens';
 export {
-  useEndpoints, useEndpointDetail, useDeleteEndpoint, useToggleEndpoint,
+  useEndpointDetail, useDeleteEndpoint, useToggleEndpoint,
 } from './useEndpoints';
 export {
   useDashboardStats, useDeliveryTrend, useSuccessRate,
@@ -70,17 +70,6 @@ export {
 export {
   useRateLimits, useSetRateLimit, useDeleteRateLimit,
 } from './useRateLimits';
-
-// ── Applications List ──
-export function useApplications() {
-  const { token } = useAuth();
-  return useQuery<ApplicationValidated[]>({
-    queryKey: ['applications'],
-    queryFn: validated(() => applicationsApi.list(token!), ApplicationSchema.array()),
-    enabled: !!token,
-    staleTime: 30_000,
-  });
-}
 
 // ── Application Detail (app + endpoints + deliveries) ──
 export function useApplicationDetail(id: string) {
