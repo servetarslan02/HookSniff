@@ -4720,7 +4720,8 @@
     "notFoundDesc": "Bu uygulama silinmiş olabilir veya erişim izniniz yok.",
     "manageEndpoints": "Endpoint'leri yönet",
     "edit": "Düzenle",
-    "created": "Uygulama oluşturuldu"
+    "created": "Uygulama oluşturuldu",
+    "noApplications": "Uygulama yok"
   },
   "serviceTokens": {
     "title": "Hizmet Jetonları",
