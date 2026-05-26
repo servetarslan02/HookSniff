@@ -11,10 +11,10 @@
 import { createCollection } from '@tanstack/react-db';
 import { queryCollectionOptions } from '@tanstack/query-db-collection';
 import { endpointsApi, webhooksApi, teamsApi, notificationsApi, alertsApi, transformsApi, inboundApi, api } from '@/lib/api';
-import { useAuth } from '@/lib/store';
+import type { QueryClient } from '@tanstack/react-query';
 
 // ── Endpoints Collection ──
-export function createEndpointsCollection(token: string) {
+export function createEndpointsCollection(token: string, queryClient: QueryClient) {
   return createCollection(
     queryCollectionOptions({
       queryKey: ['endpoints'],
@@ -22,6 +22,7 @@ export function createEndpointsCollection(token: string) {
         const res = await endpointsApi.list(token);
         return Array.isArray(res) ? res : [];
       },
+      queryClient,
       getKey: (item: Record<string, unknown>) => item.id as string,
       staleTime: 30_000,
     })
@@ -29,7 +30,7 @@ export function createEndpointsCollection(token: string) {
 }
 
 // ── Deliveries Collection ──
-export function createDeliveriesCollection(token: string, params?: { page?: number; status?: string }) {
+export function createDeliveriesCollection(token: string, queryClient: QueryClient, params?: { page?: number; status?: string }) {
   return createCollection(
     queryCollectionOptions({
       queryKey: ['webhooks', params],
@@ -37,6 +38,7 @@ export function createDeliveriesCollection(token: string, params?: { page?: numb
         const res = await webhooksApi.list(token, params);
         return res?.deliveries ?? [];
       },
+      queryClient,
       getKey: (item: Record<string, unknown>) => item.id as string,
       staleTime: 15_000,
     })
@@ -44,7 +46,7 @@ export function createDeliveriesCollection(token: string, params?: { page?: numb
 }
 
 // ── Teams Collection ──
-export function createTeamsCollection(token: string) {
+export function createTeamsCollection(token: string, queryClient: QueryClient) {
   return createCollection(
     queryCollectionOptions({
       queryKey: ['teams'],
@@ -52,6 +54,7 @@ export function createTeamsCollection(token: string) {
         const res = await teamsApi.list(token);
         return Array.isArray(res) ? res : [];
       },
+      queryClient,
       getKey: (item: Record<string, unknown>) => item.id as string,
       staleTime: 30_000,
     })
@@ -59,7 +62,7 @@ export function createTeamsCollection(token: string) {
 }
 
 // ── API Keys Collection ──
-export function createApiKeysCollection(token: string) {
+export function createApiKeysCollection(token: string, queryClient: QueryClient) {
   return createCollection(
     queryCollectionOptions({
       queryKey: ['apiKeys'],
@@ -68,6 +71,7 @@ export function createApiKeysCollection(token: string) {
         const res = await apiKeysApi.list(token);
         return Array.isArray(res) ? res : [];
       },
+      queryClient,
       getKey: (item: Record<string, unknown>) => item.id as string,
       staleTime: 30_000,
     })
@@ -75,7 +79,7 @@ export function createApiKeysCollection(token: string) {
 }
 
 // ── Notifications Collection ──
-export function createNotificationsCollection(token: string) {
+export function createNotificationsCollection(token: string, queryClient: QueryClient) {
   return createCollection(
     queryCollectionOptions({
       queryKey: ['notifications'],
@@ -83,6 +87,7 @@ export function createNotificationsCollection(token: string) {
         const res = await notificationsApi.list(token);
         return Array.isArray(res) ? res : [];
       },
+      queryClient,
       getKey: (item: Record<string, unknown>) => item.id as string,
       staleTime: 15_000,
     })
@@ -90,7 +95,7 @@ export function createNotificationsCollection(token: string) {
 }
 
 // ── Alerts Collection ──
-export function createAlertsCollection(token: string) {
+export function createAlertsCollection(token: string, queryClient: QueryClient) {
   return createCollection(
     queryCollectionOptions({
       queryKey: ['alerts'],
@@ -98,6 +103,7 @@ export function createAlertsCollection(token: string) {
         const res = await alertsApi.list(token);
         return Array.isArray(res) ? res : [];
       },
+      queryClient,
       getKey: (item: Record<string, unknown>) => item.id as string,
       staleTime: 30_000,
     })
@@ -105,7 +111,7 @@ export function createAlertsCollection(token: string) {
 }
 
 // ── Service Tokens Collection ──
-export function createServiceTokensCollection(token: string) {
+export function createServiceTokensCollection(token: string, queryClient: QueryClient) {
   return createCollection(
     queryCollectionOptions({
       queryKey: ['service-tokens'],
@@ -113,6 +119,7 @@ export function createServiceTokensCollection(token: string) {
         const res = await api.getServiceTokens(token);
         return Array.isArray(res) ? res : [];
       },
+      queryClient,
       getKey: (item: Record<string, unknown>) => item.id as string,
       staleTime: 30_000,
     })
@@ -120,7 +127,7 @@ export function createServiceTokensCollection(token: string) {
 }
 
 // ── Transforms Collection ──
-export function createTransformsCollection(token: string, endpointId: string) {
+export function createTransformsCollection(token: string, queryClient: QueryClient, endpointId: string) {
   return createCollection(
     queryCollectionOptions({
       queryKey: ['transforms', endpointId],
@@ -128,6 +135,7 @@ export function createTransformsCollection(token: string, endpointId: string) {
         const res = await transformsApi.list(token, endpointId);
         return Array.isArray(res) ? res : [];
       },
+      queryClient,
       getKey: (item: Record<string, unknown>) => item.id as string,
       staleTime: 30_000,
     })
@@ -135,7 +143,7 @@ export function createTransformsCollection(token: string, endpointId: string) {
 }
 
 // ── Applications Collection ──
-export function createApplicationsCollection(token: string) {
+export function createApplicationsCollection(token: string, queryClient: QueryClient) {
   return createCollection(
     queryCollectionOptions({
       queryKey: ['applications'],
@@ -144,12 +152,15 @@ export function createApplicationsCollection(token: string) {
         const res = await applicationsApi.list(token);
         return Array.isArray(res) ? res : [];
       },
+      queryClient,
       getKey: (item: Record<string, unknown>) => item.id as string,
       staleTime: 30_000,
     })
   );
 }
-export function createInboundConfigsCollection(token: string) {
+
+// ── Inbound Configs Collection ──
+export function createInboundConfigsCollection(token: string, queryClient: QueryClient) {
   return createCollection(
     queryCollectionOptions({
       queryKey: ['inboundConfigs'],
@@ -157,6 +168,7 @@ export function createInboundConfigsCollection(token: string) {
         const res = await inboundApi.listConfigs(token);
         return Array.isArray(res) ? res : [];
       },
+      queryClient,
       getKey: (item: Record<string, unknown>) => item.id as string,
       staleTime: 30_000,
     })
