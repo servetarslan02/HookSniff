@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuditLogs } from '@/hooks/useDashboardData';
 import { VirtualTable } from '@/components/VirtualTable';
@@ -31,12 +31,33 @@ export default function AuditLogPage() {
   const t = useTranslations('auditLog');
   const [filter, setFilter] = useState('');
   const [page, setPage] = useState(1);
+  const [allEntries, setAllEntries] = useState<any[]>([]);
+  const prevFilterRef = useRef(filter);
 
   const { data, isLoading, isFetching } = useAuditLogs({ page, limit: 50, action: filter || undefined });
   const entries = data?.entries ?? [];
   const hasMore = data?.has_more ?? false;
 
-  const loadMore = () => setPage((p) => p + 1);
+  // Accumulate entries from all loaded pages
+  useEffect(() => {
+    if (filter !== prevFilterRef.current) {
+      setAllEntries(entries);
+      setPage(1);
+      prevFilterRef.current = filter;
+    } else if (page === 1) {
+      setAllEntries(entries);
+    } else if (entries.length > 0) {
+      setAllEntries((prev) => {
+        const existingIds = new Set(prev.map((e: any) => e.id));
+        const newItems = entries.filter((e: any) => !existingIds.has(e.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [entries, page, filter]);
+
+  const loadMore = useCallback(() => {
+    if (!isFetching && hasMore) setPage((p) => p + 1);
+  }, [isFetching, hasMore]);
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
@@ -50,7 +71,7 @@ export default function AuditLogPage() {
         </div>
         <select
           value={filter}
-          onChange={(e) => { setFilter(e.target.value); setPage(1); }}
+          onChange={(e) => { setFilter(e.target.value); setPage(1); setAllEntries([]); }}
           className="px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-xs sm:text-sm text-gray-900 dark:text-white"
         >
           <option value="">{t('filterAll')}</option>
@@ -65,12 +86,12 @@ export default function AuditLogPage() {
       </div>
 
       {/* Entries */}
-      {isLoading && entries.length === 0 ? (
+      {isLoading && allEntries.length === 0 ? (
         <div className="glass-card p-12 text-center">
           <div className="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-4" />
           <p className="text-gray-500 dark:text-slate-400">{t('loading')}</p>
         </div>
-      ) : entries.length === 0 ? (
+      ) : allEntries.length === 0 ? (
         <div className="glass-card p-12 text-center">
           <div className="text-5xl mb-4"><ClipboardList size={18} strokeWidth={1.75} /></div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('noActivity')}</h2>
@@ -82,7 +103,7 @@ export default function AuditLogPage() {
         <div className="glass-card overflow-hidden">
           <div className="overflow-x-auto">
             <VirtualTable
-                data={entries}
+                data={allEntries}
                 estimateSize={56}
                 header={
                   <div className="grid grid-cols-[140px_120px_minmax(100px,1fr)_120px_minmax(100px,1fr)_100px] bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50">

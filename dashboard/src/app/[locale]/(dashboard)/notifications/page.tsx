@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
@@ -59,16 +59,18 @@ export default function NotificationsPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
   const typeFilter = (searchParams.get('type') || 'all') as NotifType;
   const readFilter = (searchParams.get('read') || 'all') as 'all' | 'read' | 'unread';
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allNotifications, setAllNotifications] = useState<any[]>([]);
+  const prevFilterRef = useRef(`${typeFilter}-${readFilter}`);
   const t = useTranslations('notifications');
   const tc = useTranslations('common');
   const perPage = 20;
 
   const { data, isLoading, error, refetch } = useNotifications({
-    page,
+    page: currentPage,
     type: typeFilter === 'all' ? undefined : typeFilter,
     read: readFilter === 'all' ? undefined : readFilter === 'read',
   });
@@ -76,6 +78,29 @@ export default function NotificationsPage() {
   const notifications = data?.notifications ?? [];
   const total = data?.total ?? 0;
   const unreadCount = data?.unread_count ?? 0;
+
+  // Accumulate notifications from all loaded pages
+  useEffect(() => {
+    const filterKey = `${typeFilter}-${readFilter}`;
+    if (filterKey !== prevFilterRef.current) {
+      setAllNotifications(notifications);
+      setCurrentPage(1);
+      prevFilterRef.current = filterKey;
+    } else if (currentPage === 1) {
+      setAllNotifications(notifications);
+    } else if (notifications.length > 0) {
+      setAllNotifications((prev) => {
+        const existingIds = new Set(prev.map((n: any) => n.id));
+        const newItems = notifications.filter((n: any) => !existingIds.has(n.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [notifications, currentPage, typeFilter, readFilter]);
+
+  const hasMore = allNotifications.length < total;
+  const handleLoadMore = useCallback(() => {
+    if (!isLoading && hasMore) setCurrentPage((p) => p + 1);
+  }, [isLoading, hasMore]);
 
   const markAsReadMutation = useMarkNotificationAsRead();
   const markAllAsReadMutation = useMarkAllNotificationsAsRead();
@@ -122,6 +147,7 @@ export default function NotificationsPage() {
     else params.set(key, value);
     const qs = params.toString();
     router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
+    setCurrentPage(1);
   };
 
   return (
@@ -141,7 +167,7 @@ export default function NotificationsPage() {
             {t('subtitle')}
           </p>
         </div>
-        {notifications.length > 0 && unreadCount > 0 && (
+        {allNotifications.length > 0 && unreadCount > 0 && (
           <button type="button"
             onClick={handleMarkAllAsRead}
             className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-xl hover:bg-brand-100 dark:hover:bg-brand-500/20 transition"
@@ -218,7 +244,7 @@ export default function NotificationsPage() {
         )}
 
         {/* ── Empty State ── */}
-        {!isLoading && !error && notifications.length === 0 && (
+        {!isLoading && !error && allNotifications.length === 0 && (
           <div className="p-12 text-center">
             <Bell size={48} strokeWidth={1.75} className="text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 dark:text-slate-500">{t('noNotifications')}</p>
@@ -226,11 +252,11 @@ export default function NotificationsPage() {
         )}
 
         {/* ── Notification Items ── */}
-        {!isLoading && !error && notifications.length > 0 && (
+        {!isLoading && !error && allNotifications.length > 0 && (
           <>
             <VirtualList
-              items={notifications}
-              height={Math.min(notifications.length * 100, 600)}
+              items={allNotifications}
+              height={Math.min(allNotifications.length * 100, 600)}
               itemHeight={100}
               overscan={3}
               keyExtractor={(n) => n.id}
@@ -297,39 +323,21 @@ export default function NotificationsPage() {
               )}
             />
 
-            {/* Pagination */}
-            {total > perPage && (
-              <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
-                <span className="text-sm text-gray-500 dark:text-slate-400">
-                  {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
-                </span>
-                <div className="flex gap-2">
-                  <button type="button"
-                    onClick={() => {
-                      const params = new URLSearchParams(searchParams.toString());
-                      params.set('page', String(Math.max(1, page - 1)));
-                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
-                    }}
-                    disabled={page === 1}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+            {/* Infinite Scroll */}
+            {hasMore && (
+              <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-center">
+                {isLoading ? (
+                  <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                    <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
+                    <span className="text-sm">{tc('loading')}</span>
+                  </div>
+                ) : (
+                  <button type="button" onClick={handleLoadMore}
+                    className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
                   >
-                    {tc('previous')}
+                    {tc('showing', { from: 1, to: allNotifications.length, total })} — {tc('loadMore') || 'Load more'}
                   </button>
-                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400">
-                    {tc('pageOf', { page, totalPages })}
-                  </span>
-                  <button type="button"
-                    onClick={() => {
-                      const params = new URLSearchParams(searchParams.toString());
-                      params.set('page', String(Math.min(totalPages, page + 1)));
-                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
-                    }}
-                    disabled={page >= totalPages}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
-                  >
-                    {tc('next')}
-                  </button>
-                </div>
+                )}
               </div>
             )}
           </>
