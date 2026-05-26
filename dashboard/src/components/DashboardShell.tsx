@@ -1,0 +1,339 @@
+'use client';
+
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
+import { usePathname, useRouter } from '@/i18n/navigation';
+import { clsx } from 'clsx';
+import { useTranslations, useLocale } from 'next-intl';
+import { useAuth } from '@/lib/store';
+import { AuthGuard } from '@/components/AuthGuard';
+import { NotificationCenter } from '@/components/NotificationCenter';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { PrefetchLink } from '@/components/PrefetchLink';
+import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
+import { BroadcastBanner } from '@/components/BroadcastBanner';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { SkeletonDashboard } from '@/components/LoadingSkeletons';
+import { ViewTransition } from '@/components/ViewTransition';
+import { useRealtime } from '@/hooks/useRealtime';
+import { useIdleTimeout } from '@/hooks/useIdleTimeout';
+import { apiFetch, statsApi, webhooksApi, analyticsApi, operationalWebhooksApi, environmentsApi, endpointsApi, applicationsApi } from '@/lib/api';
+import { teamsApi, notificationsApi, alertsApi } from '@/lib/api-teams';
+import { integrationsApi, connectorsApi } from '@/lib/api-integrations';
+import { usePermissions } from '@/hooks/usePermissions';
+import { LayoutDashboard, Smartphone, Layers, Zap, Eye, Code2, Settings, Users, CreditCard, UserCircle, BookOpen, ExternalLink, LogOut, Shield, Globe } from '@/components/icons';
+
+export function DashboardShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout, token } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations('nav');
+  const tc = useTranslations('common');
+  const locale = useLocale();
+  const { connectionState } = useRealtime();
+  const perms = usePermissions();
+
+  // Auto-logout after 1 hour of inactivity
+  const handleIdle = useCallback(() => {
+    if (token) {
+      logout();
+      router.push('/login');
+    }
+  }, [logout, router, token]);
+  useIdleTimeout(handleIdle);
+
+  const cleanPath = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
+
+  // Prefetch API data for a route on hover
+  const prefetchForRoute = (href: string) => {
+    if (!token) return [];
+    const base = [
+      { queryKey: ['stats'], queryFn: () => statsApi.get(token), staleTime: 30_000 },
+    ];
+    switch (href) {
+      case '/core':
+        return [
+          ...base,
+          { queryKey: ['webhooks', { page: 1 }], queryFn: () => webhooksApi.list(token, { page: 1 }), staleTime: 15_000 },
+          { queryKey: ['analytics', 'delivery-trend', '7d'], queryFn: () => analyticsApi.deliveryTrend(token, '7d'), staleTime: 30_000 },
+          { queryKey: ['endpoints'], queryFn: () => endpointsApi.list(token), staleTime: 30_000 },
+        ];
+      case '/applications':
+        return [
+          { queryKey: ['applications'], queryFn: () => applicationsApi.list(token), staleTime: 30_000 },
+        ];
+      case '/organization':
+        return [
+          { queryKey: ['teams'], queryFn: () => teamsApi.list(token), staleTime: 30_000 },
+        ];
+      case '/operational-webhooks':
+        return [
+          { queryKey: ['operational-webhooks'], queryFn: () => operationalWebhooksApi.list(token), staleTime: 30_000 },
+        ];
+      case '/observability':
+        return [
+          ...base,
+          { queryKey: ['delivery-logs', { page: 1 }], queryFn: () => webhooksApi.list(token, { page: 1 }), staleTime: 15_000 },
+          { queryKey: ['analytics', 'success-rate', '24h'], queryFn: () => analyticsApi.successRate(token, '24h'), staleTime: 30_000 },
+        ];
+      case '/devtools':
+        return [
+          { queryKey: ['endpoints'], queryFn: () => endpointsApi.list(token), staleTime: 30_000 },
+          { queryKey: ['schemas'], queryFn: () => apiFetch('/schemas', { token }), staleTime: 60_000 },
+        ];
+      case '/integrations':
+        return [
+          { queryKey: ['connectors'], queryFn: () => connectorsApi.list(token), staleTime: 30_000 },
+          { queryKey: ['integrations'], queryFn: () => integrationsApi.list(token), staleTime: 30_000 },
+        ];
+      case '/custom-domain':
+        return [
+          { queryKey: ['custom-domain'], queryFn: () => apiFetch('/custom-domain', { token }), staleTime: 60_000 },
+        ];
+      case '/routing-config':
+        return [
+          { queryKey: ['routing-rules'], queryFn: () => apiFetch('/routing/rules', { token }), staleTime: 30_000 },
+          { queryKey: ['endpoints'], queryFn: () => endpointsApi.list(token), staleTime: 30_000 },
+        ];
+      case '/account':
+        return [
+          { queryKey: ['portal-profile'], queryFn: () => apiFetch('/portal/me', { token }), staleTime: 30_000 },
+          { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
+        ];
+      case '/billing':
+        return [
+          { queryKey: ['billing', 'usage'], queryFn: () => apiFetch('/billing/usage', { token }), staleTime: 60_000 },
+          { queryKey: ['billing', 'subscription'], queryFn: () => apiFetch('/billing/subscription', { token }), staleTime: 60_000 },
+        ];
+      default:
+        return base;
+    }
+  };
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const navItems = [
+    ...(user?.is_admin ? [{ name: t('adminPanel') || 'Admin Panel', href: '/admin', icon: <Shield size={16} strokeWidth={1.75} />, isSpecial: true }] : []),
+    { name: t('core'), href: '/core', icon: <LayoutDashboard size={16} strokeWidth={1.75} /> },
+    ...(perms.canManageApplications ? [{ name: t('applications'), href: '/applications', icon: <Smartphone size={16} strokeWidth={1.75} /> }] : []),
+    { name: t('organization'), href: '/organization', icon: <Users size={16} strokeWidth={1.75} /> },
+    ...(perms.canManageOperationalWebhooks ? [{ name: t('webhookDashboard'), href: '/operational-webhooks', icon: <Layers size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canViewObservability ? [{ name: t('observability'), href: '/observability', icon: <Eye size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canViewDevtools ? [{ name: t('devtools'), href: '/devtools', icon: <Code2 size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canManageIntegrations ? [{ name: t('integrations'), href: '/integrations', icon: <Zap size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canManageDomains ? [{ name: t('customDomain') || 'Custom Domain', href: '/custom-domain', icon: <Globe size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canManageRouting ? [{ name: t('routingConfig'), href: '/routing-config', icon: <Settings size={16} strokeWidth={1.75} /> }] : []),
+    ...(perms.canManageBilling ? [{ name: t('billingSection'), href: '/billing', icon: <CreditCard size={16} strokeWidth={1.75} /> }] : []),
+    { name: t('account'), href: '/account', icon: <UserCircle size={16} strokeWidth={1.75} /> },
+  ];
+
+  return (
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden cursor-default"
+          onPointerDown={() => setSidebarOpen(false)}
+          aria-label="Close sidebar"
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={clsx(
+          'fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-auto flex flex-col',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <div className="flex items-center justify-between h-16 px-4 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+          <a href="https://hooksniff.vercel.app/" className="flex items-center space-x-2">
+            <span className="text-2xl">🪝</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">HookSniff</span>
+          </a>
+
+          <button
+            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 lg:hidden rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
+          {navItems.map((item) => {
+            const isActive = cleanPath === item.href || cleanPath.startsWith(item.href + '/');
+            if (item.isSpecial) {
+              return (
+                <PrefetchLink
+                  key={item.href}
+                  href={item.href}
+                  hoverDelay={80}
+                  prefetchData={prefetchForRoute(item.href)}
+                  className="flex items-center px-3 py-2 text-[15px] font-semibold rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <span className="mr-2.5 flex-shrink-0 inline-flex items-center">{item.icon}</span>
+                  {item.name}
+                </PrefetchLink>
+              );
+            }
+            return (
+              <PrefetchLink
+                key={item.href}
+                href={item.href}
+                hoverDelay={80}
+                prefetchData={prefetchForRoute(item.href)}
+                className={clsx(
+                  'flex items-center px-3 py-2.5 text-[15px] rounded-lg transition-colors',
+                  isActive
+                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                )}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3 flex-shrink-0 inline-flex items-center">{item.icon}</span>
+                {item.name}
+              </PrefetchLink>
+            );
+          })}
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-3 sm:px-4 lg:px-6">
+          <button
+            className="p-2 -ml-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 lg:hidden rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open sidebar"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div className="flex-1" />
+
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            <div className="hidden sm:flex items-center gap-3">
+              <NotificationCenter />
+              <LanguageSwitcher />
+              <ThemeToggle />
+            </div>
+            <span
+              className={`w-2 h-2 rounded-full ${
+                connectionState === 'connected' ? 'bg-green-500 animate-pulse'
+                  : connectionState === 'connecting' ? 'bg-yellow-500 animate-pulse'
+                  : connectionState === 'fallback' ? 'bg-orange-500'
+                  : 'bg-red-500'
+              }`}
+              title={`WS: ${connectionState}`}
+              aria-label={`WebSocket: ${connectionState}`}
+            />
+
+            {/* Profile dropdown */}
+            <div className="relative" ref={profileRef}>
+              <button
+                type="button"
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              >
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt={user.name || user.email} className="w-8 h-8 rounded-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                    {(user?.name?.charAt(0) || user?.email?.charAt(0) || '?').toUpperCase()}
+                  </div>
+                )}
+              </button>
+
+              {profileOpen && (
+                <div className="absolute right-0 top-full mt-1 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+                  <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {user?.name || user?.email}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {user?.email}
+                    </p>
+                  </div>
+                  <div className="sm:hidden border-b border-gray-100 dark:border-gray-700 py-1">
+                    <div className="px-4 py-2 flex items-center gap-2">
+                      <NotificationCenter />
+                      <LanguageSwitcher />
+                      <ThemeToggle />
+                    </div>
+                  </div>
+                  <a
+                    href="/settings-section"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    <Settings size={16} strokeWidth={1.75} className="text-gray-400" />
+                    {t('settingsSection')}
+                  </a>
+                  <a
+                    href="https://hooksniff.vercel.app/docs"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    <BookOpen size={16} strokeWidth={1.75} className="text-gray-400" />
+                    {tc('documentation') || 'Documentation'}
+                  </a>
+                  <a
+                    href="https://hooksniff.vercel.app/docs/api-reference"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    <ExternalLink size={16} strokeWidth={1.75} className="text-gray-400" />
+                    API Reference
+                  </a>
+                  <div className="border-t border-gray-100 dark:border-gray-700 mt-1" />
+                  <button
+                    type="button"
+                    onClick={() => { setProfileOpen(false); logout(); router.push('/login'); }}
+                    className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                  >
+                    <LogOut size={16} strokeWidth={1.75} />
+                    {tc('logout')}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
+          <EmailVerificationBanner />
+          <BroadcastBanner />
+          <ErrorBoundary>
+            <Suspense fallback={<SkeletonDashboard />}>
+              <ViewTransition>{children}</ViewTransition>
+            </Suspense>
+          </ErrorBoundary>
+        </main>
+      </div>
+    </div>
+  );
+}
