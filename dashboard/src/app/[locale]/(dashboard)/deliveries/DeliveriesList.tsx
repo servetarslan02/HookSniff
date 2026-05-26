@@ -49,7 +49,6 @@ export default function DeliveriesPage() {
   const [batchReplaying, setBatchReplaying] = useState(false);
   const t = useTranslations('deliveries');
   const tc = useTranslations('common');
-  const perPage = 20;
   const isSearching = deferredSearch.length > 0;
   const { data, isLoading, error: queryError, refetch } = useWebhooks({
     page: currentPage,
@@ -130,7 +129,6 @@ export default function DeliveriesPage() {
     !deferredSearch || d.event?.toLowerCase().includes(deferredSearch.toLowerCase()) || d.id.includes(deferredSearch)
   );
 
-  const totalPages = Math.ceil(total / perPage);
 
   const toggleSelect = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();

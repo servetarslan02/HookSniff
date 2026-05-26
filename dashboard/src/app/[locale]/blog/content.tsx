@@ -30,7 +30,6 @@ export function BlogPageContent() {
     return matchesSearch && matchesCategory;
   });
 
-  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   const [displayCount, setDisplayCount] = useState(POSTS_PER_PAGE);
   const paginatedPosts = filteredPosts.slice(0, displayCount);
   const hasMore = displayCount < filteredPosts.length;

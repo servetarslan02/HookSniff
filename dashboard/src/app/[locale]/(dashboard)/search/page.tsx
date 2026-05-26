@@ -28,7 +28,6 @@ export default function SearchPage() {
 
   const deliveries = results?.deliveries ?? [];
   const total = results?.total ?? 0;
-  const perPage = results?.per_page ?? 20;
 
   // Accumulate results
   useEffect(() => {
