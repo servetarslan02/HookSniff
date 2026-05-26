@@ -1318,7 +1318,8 @@
     "postgres": "PostgreSQL",
     "hex": "hex",
     "OK": "OK",
-    "webhook": "webhook"
+    "webhook": "webhook",
+    "errorCodesLink": "Hata Kodları"
   },
   "status": {
     "title": "HookSniff Durumu",
@@ -3779,7 +3780,9 @@
     "post19Excerpt": "Webhook ve polling'in dürüst karşılaştırması — gecikme, bant genişliği, ölçeklenebilirlik ve her yaklaşımı ne zaman kullanmanız gerektiği.",
     "post20Title": "2026'nın En İyi Ücretsiz Webhook Servisleri (Dürüst Karşılaştırma)",
     "post20Excerpt": "HookSniff, Svix, Hookdeck ve Hook0'ı karşılaştırdık — fiyatlandırma, özellikler, ücretsiz katmanlar ve hangisi ihtiyaçlarınıza uygun.",
-    "backToList": "← Bloga Dön"
+    "backToList": "← Bloga Dön",
+    "showMore": "Daha fazla göster",
+    "remaining": "kalan"
   },
   "changelog": {
     "title": "Değişiklik Günlüğü",
