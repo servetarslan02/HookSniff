@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import {AlertTriangle, BarChart3, Bell, Lightbulb, Package, RefreshCw} from '@/components/icons';
 import SdkTabs from '@/components/SdkTabs';
 import CodeBlock from '@/components/CodeBlock';
@@ -330,7 +330,9 @@ curl -X POST http://localhost:3000/webhook \\
 },
 ];
 
-async function QuickstartContent() {
+async function QuickstartContent(params: Promise<{ locale: string }>) {
+  const { locale } = await params;
+  setRequestLocale(locale);
  const t = await getTranslations('docs');
  return (
   <article className="prose prose-gray max-w-none">
@@ -500,10 +502,10 @@ curl https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/MSG_ID
  );
 }
 
-export default function QuickstartPage() {
+export default async function QuickstartPage(params: Promise<{ locale: string }>) {
   return (
     <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
-      <QuickstartContent />
+      <QuickstartContent {...params} />
     </Suspense>
   );
 }

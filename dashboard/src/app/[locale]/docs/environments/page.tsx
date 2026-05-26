@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import { Layers } from '@/components/icons';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 
 export const metadata: Metadata = {
@@ -12,7 +12,9 @@ export const metadata: Metadata = {
 
 
 
-async function EnvironmentsPageContent() {
+async function EnvironmentsPageContent(params: Promise<{ locale: string }>) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('docsEnvironments');
   return (
     <article className="prose prose-gray max-w-none">
@@ -52,10 +54,10 @@ curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/environ
   );
 }
 
-export default function Page() {
+export default async function Page(params: Promise<{ locale: string }>) {
   return (
     <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
-      <EnvironmentsPageContent />
+      <EnvironmentsPageContent {...params} />
     </Suspense>
   );
 }
