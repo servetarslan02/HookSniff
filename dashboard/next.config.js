@@ -7,6 +7,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const nextConfig = {
   reactStrictMode: true,
   cacheComponents: true,
+  ppr: true,
   reactCompiler: true,
   turbopack: {},
   experimental: {},

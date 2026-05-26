@@ -84,7 +84,7 @@ export function SkeletonDocs() {
               <div
                 key={i}
                 className="h-4 rounded bg-gray-100 dark:bg-gray-800"
-                style={{ width: `${60 + Math.random() * 30}%` }}
+                style={{ width: `${60 + ((g * 7 + i * 13) % 30)}%` }}
               />
             ))}
           </div>
