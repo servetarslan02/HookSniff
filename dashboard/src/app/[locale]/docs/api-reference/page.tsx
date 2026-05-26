@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 
@@ -12,7 +12,9 @@ export const metadata: Metadata = {
 
 
 // Force redeploy — docs/api page fix
-async function ApiReferenceContent() {
+async function ApiReferenceContent(params: Promise<{ locale: string }>) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('docs');
   return (
     <article className="prose prose-gray max-w-none">
@@ -795,10 +797,10 @@ async function ApiMethod({
   );
 }
 
-export default function ApiReferencePage() {
+export default async function ApiReferencePage(params: Promise<{ locale: string }>) {
   return (
     <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
-      <ApiReferenceContent />
+      <ApiReferenceContent {...params} />
     </Suspense>
   );
 }
