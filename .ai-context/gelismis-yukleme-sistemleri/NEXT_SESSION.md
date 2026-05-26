@@ -33,35 +33,52 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 | 10 | Turbopack | 8 | ✅ | — | Zaten aktif (Next.js 16 default) |
 | 11 | React Compiler | 9 | ✅ | — | Zaten aktif (reactCompiler: true) |
 | 12 | **PPR** | **10** | **✅** | **2026-05-26** | **1b037609** |
-| 13 | **<Activity/>** | **11** | **⏳** | **—** | **—** |
-| 14 | Infinite Scroll | 12 | ⏳ | — | — |
+| 13 | **<Activity/>** | **11** | **✅** | **2026-05-26** | **0fe49f5c, fbde69e8** |
+| 14 | **Infinite Scroll** | **12** | **✅** | **2026-05-26** | **6abb3819, fbde69e8** |
 | 15 | Service Worker + PWA | 13 | ⏳ | — | — |
 | 16 | TanStack DB | 14 | ⏳ | — | — |
 
 ---
 
-## 🔜 Sıradaki Adım: <Activity/> (Katman 11)
+## 🔜 Sıradaki Adım: Service Worker + PWA (Katman 13)
 
-### PPR (Katman 10) — TAMAMLANDI ✅
+### <Activity/> (Katman 11) — TAMAMLANDI ✅
 
 **Yapılan:**
-1. Dashboard, Admin, Docs layout'ları server component'e çevrildi
-2. DashboardShell, AdminShell, DocsShell client component olarak ayrıldı
-3. LoadingSkeletons: Math.random() → deterministik width
-4. next.config.js: ppr: true eklendi
-5. Build: 589 sayfa Partial Prerender ✅
-6. Commit: 1b037609
+1. DashboardShell, AdminShell, DocsShell → Activity mode="visible"
+2. Settings page → 5 sekme Activity ile sarmalandı
+3. Admin user detail → 9 sekme Activity ile sarmalandı
+4. Admin cortex → 6 sekme Activity ile sarmalandı
+5. ResponseInspector → 2 sekme Activity ile sarmalandı
+6. TabbedSection bileşeni → display:none yerine Activity kullanıldı
+7. Commit: 0fe49f5c, fbde69e8
 
-### Sıradaki Aktif Katman: <Activity/> (Katman 11)
+### Infinite Scroll (Katman 12) — TAMAMLANDI ✅
 
-**Ne yapacak:** Aktif olmayan sekmeleri `<Activity mode="hidden">` ile sarmala → bellek tasarrufu
+**Yapılan:**
+1. useInfiniteScroll hook oluşturuldu (IntersectionObserver)
+2. InfiniteVirtualList bileşeni oluşturuldu
+3. Deliveries → pagination kaldırıldı, infinite scroll
+4. Logs → pagination kaldırıldı, infinite scroll
+5. Audit-log → data accumulation + load more
+6. Notifications → pagination kaldırıldı, infinite scroll
+7. Search → pagination kaldırıldı, infinite scroll
+8. Admin/Users → pagination kaldırıldı, infinite scroll
+9. Admin/Activity → pagination kaldırıldı, infinite scroll
+10. Commit: 6abb3819, fbde69e8
+
+### Sıradaki Aktif Katman: Service Worker + PWA (Katman 13)
+
+**Ne yapacak:** Offline cache, anında yükleme, PWA manifest
 
 **Adımlar:**
-1. Aktif olmayan sayfaları/sekme bileşenlerini `<Activity mode="hidden">` ile sarmala
-2. Bellek kullanımını ölç (Chrome DevTools)
-3. cargo check + cargo test + npm run build
-4. Manuel kontrol
-5. Commit + push
+1. next-pwa kurulumu
+2. Service Worker oluştur
+3. Cache stratejisi belirle
+4. manifest.json oluştur
+5. cargo check + cargo test + npm run build
+6. Manuel kontrol
+7. Commit + push
 
 ---
 
@@ -79,9 +96,9 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 | 8 | Turbopack | ✅ | Next.js 16 default |
 | 9 | React Compiler | ✅ | reactCompiler: true |
 | 10 | PPR | ✅ | ppr: true, 3 layout server component |
-| 11 | **<Activity/>** | **⏳** | **Sıradaki adım** |
-| 12 | Infinite Scroll | ⏳ | — |
-| 13 | Service Worker + PWA | ⏳ | — |
+| 11 | **<Activity/>** | **✅** | **Tüm shell'ler + tab sayfaları** |
+| 12 | **Infinite Scroll** | **✅** | **Tüm listeler (7 sayfa)** |
+| 13 | Service Worker + PWA | ⏳ | Sıradaki |
 | 14 | TanStack DB | ⏳ | — |
 
 ---
