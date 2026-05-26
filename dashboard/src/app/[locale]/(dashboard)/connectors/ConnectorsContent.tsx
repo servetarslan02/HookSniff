@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualTable } from '@/components/VirtualTable';
 import { CreditCard, FileText, Gamepad2, GitBranch, MessageSquare, Pencil, Phone, Plug, ShoppingBag, Trash2, TriangleRight } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -207,11 +208,15 @@ export function ConnectorsContent() {
             </button>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {configs.map(cfg => {
+          <VirtualTable
+            data={configs}
+            estimateSize={120}
+            header={null}
+            emptyState={null}
+            renderRow={(cfg) => {
               const isEditing = editTarget === cfg.id;
               return (
-                <div key={cfg.id} className={`glass-card p-5 transition ${selectedId === cfg.id ? 'ring-2 ring-brand-500' : ''} ${isEditing ? 'ring-2 ring-brand-500' : ''}`}>
+                <div key={cfg.id} className={`glass-card p-5 transition mb-3 ${selectedId === cfg.id ? 'ring-2 ring-brand-500' : ''} ${isEditing ? 'ring-2 ring-brand-500' : ''}`}>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-xl">{PROVIDER_ICONS[cfg.connector_name] || <Plug size={16} strokeWidth={1.75} />}</span>
@@ -252,8 +257,8 @@ export function ConnectorsContent() {
                   )}
                 </div>
               );
-            })}
-          </div>
+            }}
+          />
         )}
       </div>
 

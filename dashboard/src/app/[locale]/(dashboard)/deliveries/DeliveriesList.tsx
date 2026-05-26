@@ -3,6 +3,7 @@
 import { getErrorMessage } from '@/lib/errors';
 
 import { useState, useCallback, useMemo } from 'react';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
@@ -40,7 +41,7 @@ export default function DeliveriesPage() {
     const qs = params.toString();
     router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
   }, [searchParams, router, pathname]);
-  const [search, setSearch] = useState('');
+  const { input: search, deferredValue: deferredSearch, handleChange: handleSearchChange } = useDebouncedSearch();
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [replayTarget, setReplayTarget] = useState<Delivery | null>(null);
   const [replaying, setReplaying] = useState(false);
@@ -102,11 +103,11 @@ export default function DeliveriesPage() {
   };
 
   const filtered = mergedDeliveries.filter((d) =>
-    !search || d.event?.toLowerCase().includes(search.toLowerCase()) || d.id.includes(search)
+    !deferredSearch || d.event?.toLowerCase().includes(deferredSearch.toLowerCase()) || d.id.includes(deferredSearch)
   );
 
   const totalPages = Math.ceil(total / perPage);
-  const isSearching = search.length > 0;
+  const isSearching = deferredSearch.length > 0;
 
   const toggleSelect = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -159,7 +160,7 @@ export default function DeliveriesPage() {
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={handleSearchChange}
           placeholder={t('searchPlaceholder')}
           className="pl-3 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-full sm:w-auto"
         />

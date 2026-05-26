@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualTable } from '@/components/VirtualTable';
 import { Pencil, Plug, Radio, Trash2 } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -331,8 +332,12 @@ export function StreamingContent() {
           </button>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {channels.map(ch => (
+        <VirtualTable
+          data={channels}
+          estimateSize={160}
+          header={null}
+          emptyState={null}
+          renderRow={(ch) => (
             <div key={ch.id}
               className={`glass-card p-5 cursor-pointer hover:shadow-md transition ${selectedId === ch.id ? 'ring-2 ring-brand-500' : ''}`}
               onClick={() => { setSelectedId(selectedId === ch.id ? null : ch.id); setTab('overview'); stopLive(); }}>
@@ -372,8 +377,8 @@ export function StreamingContent() {
                 </RoleGuard>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        />
       )}
 
       {/* Detail Panel */}
