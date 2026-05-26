@@ -210,6 +210,39 @@ impl Metrics {
         // Append Cortex metrics
         output.push_str(&crate::cortex::CORTEX_METRICS.to_prometheus());
 
+        // ── DB query stats (atomic counters from db.rs) ──
+        let (slow_queries, total_queries) = crate::db::query_stats();
+        output.push_str("# HELP hooksniff_slow_query_count Total slow queries (>100ms)\n");
+        output.push_str("# TYPE hooksniff_slow_query_count counter\n");
+        output.push_str(&format!("hooksniff_slow_query_count {slow_queries}\n"));
+        output.push_str("# HELP hooksniff_total_query_count Total queries executed\n");
+        output.push_str("# TYPE hooksniff_total_query_count counter\n");
+        output.push_str(&format!("hooksniff_total_query_count {total_queries}\n"));
+
+        // ── DB pool status (from main pool passed via render_with_pool) ──
+        // Note: pool stats are rendered separately in render_with_pool()
+
+        output
+    }
+
+    /// Render metrics including DB pool stats.
+    pub fn render_with_pool(&self, pool: &sqlx::PgPool) -> String {
+        let mut output = self.render();
+
+        let pool_size = pool.size();
+        let pool_idle = pool.num_idle();
+        let pool_active = pool_size - pool_idle;
+
+        output.push_str("# HELP hooksniff_db_pool_size Total DB pool connections\n");
+        output.push_str("# TYPE hooksniff_db_pool_size gauge\n");
+        output.push_str(&format!("hooksniff_db_pool_size {pool_size}\n"));
+        output.push_str("# HELP hooksniff_db_pool_idle Idle DB pool connections\n");
+        output.push_str("# TYPE hooksniff_db_pool_idle gauge\n");
+        output.push_str(&format!("hooksniff_db_pool_idle {pool_idle}\n"));
+        output.push_str("# HELP hooksniff_db_pool_active Active DB pool connections\n");
+        output.push_str("# TYPE hooksniff_db_pool_active gauge\n");
+        output.push_str(&format!("hooksniff_db_pool_active {pool_active}\n"));
+
         output
     }
 }
