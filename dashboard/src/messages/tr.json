@@ -1312,7 +1312,13 @@
     "permDeveloper": "Geliştirici",
     "permAnalyst": "Analist",
     "permViewAnalytics": "Analitik Görüntüle",
-    "permAdmin": "Admin"
+    "permAdmin": "Admin",
+    "dashboard": "Dashboard",
+    "api": "API",
+    "postgres": "PostgreSQL",
+    "hex": "hex",
+    "OK": "OK",
+    "webhook": "webhook"
   },
   "status": {
     "title": "HookSniff Durumu",
@@ -6623,7 +6629,10 @@
     "apiAudit": "Denetim Günlüğü API'si",
     "apiTeamsDesc": "Ekipler, üye yönetimi, davetler ve rol değişiklikleri için tam CRUD.",
     "apiSsoDesc": "SSO yapılandırma yönetimi, bağlantı testi, alan adı doğrulama ve giriş akışı.",
-    "apiAuditDesc": "Sayfalama ve filtreleme ile denetim günlüğü kayıtlarını sorgulama."
+    "apiAuditDesc": "Sayfalama ve filtreleme ile denetim günlüğü kayıtlarını sorgulama.",
+    "permDeveloper": "Geliştirici",
+    "permAnalyst": "Analist",
+    "permViewAnalytics": "Analitik görüntüle"
   },
   "docsPageMap": {
     "gettingStarted": "Başlarken",
@@ -7022,5 +7031,19 @@
     "sec2": "CI/CD'de kullanılan belirteçler için son kullanma tarihleri ayarlayın",
     "sec3": "Belirteçleri düzenli olarak döndürün",
     "sec4": "Denetim günlüğünde belirteç kullanımını izleyin"
+  },
+  "docsApiKeys": {
+    "title": "API Anahtarları",
+    "subtitle": "İsteklerinizi API anahtarlarıyla doğrulayın.",
+    "whatIs": "API Anahtarları Nedir?",
+    "whatIsDesc": "API anahtarları, HookSniff API'ye yaptığınız istekleri doğrulamak için kullanılır. Her anahtar hesabınızla ilişkilidir ve istediğiniz zaman iptal edilebilir.",
+    "security": "Güvenlik En İyi Uygulamaları",
+    "sec1": "API anahtarınızı asla açık depolarda veya istemci tarafı kodlarda paylaşmayın",
+    "sec2": "API anahtarınızı saklamak için ortam değişkenleri kullanın",
+    "sec3": "Anahtarlarınızı düzenli olarak yenileyin",
+    "sec4": "En az ayrıcalık ilkesini uygulayın — yalnızca ihtiyacınız olan izinleri verin",
+    "sec5": "API anahtarı kullanımınızı şüpheli etkinlikler için izleyin",
+    "format": "Anahtar Formatı",
+    "formatDesc": "API anahtarları whsec_ ile başlar, ardından base64 kodlanmış bir sır gelir. İsteklerinizde Authorization başlığında Bearer token olarak ekleyin."
   }
 }

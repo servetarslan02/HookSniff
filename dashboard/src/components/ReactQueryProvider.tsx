@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
@@ -31,10 +31,10 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
   );
 
   // ── Focus Manager: Sekme odaklanınca refetch yapma ──
-  // (Linear, Cal.com tarzı — sadece manuel refresh)
-  if (typeof window !== 'undefined') {
+  // useEffect içinde — prerender sırasında çalışmaz
+  useEffect(() => {
     focusManager.setEventListener(() => () => {});
-  }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -1,7 +1,8 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { CreditCard, ShoppingBag } from '@/components/icons';
+import { Suspense } from 'react';
 
 function GithubIcon({ size = 32, strokeWidth = 1.5, ...props }: { size?: number; strokeWidth?: number; [key: string]: unknown }) {
   return (
@@ -11,8 +12,6 @@ function GithubIcon({ size = 32, strokeWidth = 1.5, ...props }: { size?: number;
     </svg>
   );
 }
-
-
 
 export const metadata = {
   title: 'Webhook Provider Guides — Stripe, GitHub, Shopify & More | HookSniff',
@@ -25,8 +24,9 @@ const providers = [
   { name: 'Shopify', icon: <ShoppingBag size={32} strokeWidth={1.5} className="text-green-600 dark:text-green-400" />, desc: 'Orders, products, customers, and inventory.', href: '/providers/shopify', color: 'green' },
 ];
 
-export default function ProvidersPage() {
-  const t = useTranslations('providers');
+async function ProvidersContent({ locale }: { locale: string }) {
+  setRequestLocale(locale);
+  const t = await getTranslations('providers');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
@@ -63,5 +63,14 @@ export default function ProvidersPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default async function ProvidersPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 dark:bg-slate-950 animate-pulse" />}>
+      <ProvidersContent locale={locale} />
+    </Suspense>
   );
 }

@@ -1310,7 +1310,13 @@
     "permDeveloper": "Developer",
     "permAnalyst": "Analyst",
     "permViewAnalytics": "View Analytics",
-    "permAdmin": "Admin"
+    "permAdmin": "Admin",
+    "dashboard": "Dashboard",
+    "api": "API",
+    "postgres": "PostgreSQL",
+    "hex": "hex",
+    "OK": "OK",
+    "webhook": "webhook"
   },
   "status": {
     "title": "HookSniff Status",
@@ -6621,7 +6627,10 @@
     "apiAudit": "Audit Log API",
     "apiTeamsDesc": "Full CRUD for teams, member management, invites, and role changes.",
     "apiSsoDesc": "SSO config management, connection testing, domain verification, and login flow.",
-    "apiAuditDesc": "Query audit log entries with pagination and filtering."
+    "apiAuditDesc": "Query audit log entries with pagination and filtering.",
+    "permDeveloper": "Developer",
+    "permAnalyst": "Analyst",
+    "permViewAnalytics": "View analytics"
   },
   "docsPageMap": {
     "gettingStarted": "Getting Started",
@@ -7020,5 +7029,19 @@
     "sec2": "Set expiration dates for tokens used in CI/CD",
     "sec3": "Rotate tokens regularly",
     "sec4": "Monitor token usage in the audit log"
+  },
+  "docsApiKeys": {
+    "title": "API Keys",
+    "subtitle": "Authenticate your requests with API keys.",
+    "whatIs": "What are API Keys?",
+    "whatIsDesc": "API keys are used to authenticate your requests to the HookSniff API. Each key is associated with your account and can be revoked at any time.",
+    "security": "Security Best Practices",
+    "sec1": "Never share your API key in public repositories or client-side code",
+    "sec2": "Use environment variables to store your API key",
+    "sec3": "Rotate your keys regularly",
+    "sec4": "Use the principle of least privilege — only grant the permissions you need",
+    "sec5": "Monitor your API key usage for suspicious activity",
+    "format": "Key Format",
+    "formatDesc": "API keys start with whsec_ followed by a base64-encoded secret. Include it in your requests as a Bearer token in the Authorization header."
   }
 }
