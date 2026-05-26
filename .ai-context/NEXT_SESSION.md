@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-27 (OpenClaw — Dashboard performans optimizasyonları)
+> **Son güncelleme:** 2026-05-27 (OpenClaw — Performans Optimizasyonu v2)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -9,7 +9,17 @@
 
 Build stabil. `npm run build` → exit 0 ✅
 
-### Son Yapılan İş (2026-05-27 — Performans Optimizasyonu)
+### Son Yapılan İş (2026-05-27 — Performans Optimizasyonu v2)
+- **`reactCompiler: true` varsayılan olarak açıldı** — `NEXT_EXPERIMENTAL_PERF` env var kaldırıldı, artık her build'de aktif
+- **`cacheComponents: true` varsayılan olarak açıldı**
+- **`useStatusCounts` optimizasyonu:** 4 ayrı API çağrısı → 1 (`/v1/stats` endpoint'i kullanılıyor) — %75 daha az ağ trafiği
+- **QueryClient staleTime:** 30sn → 60sn (daha az gereksiz refetch)
+- **gcTime:** 5dk → 10dk (cache daha uzun tutulur)
+- **API timeout:** 30sn → 10sn (hızlı hata tespiti)
+- **DeliveriesContent:** `useStatusCounts` yeni format'a uygun hale getirildi
+- Commit: `5f52ccaa`
+
+### Önceki Yapılan İş (2026-05-27 — Performans Optimizasyonu v1)
 - **QueryClient cache stratejisi yenilendi:**
   - `staleTime`: 5dk → 30sn (daha taze veri)
   - `refetchOnMount: false` → `'always'` (sayfa açıldığında arka planda yenile)
