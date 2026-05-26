@@ -39,10 +39,13 @@ export function NotificationCenter() {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchNotifications();
+      }
+    }, 120_000);
     return () => clearInterval(interval);
   }, [fetchNotifications]);
-
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
