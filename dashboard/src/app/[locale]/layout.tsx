@@ -50,6 +50,7 @@ export async function generateMetadata({
       shortcut: '/favicon.svg',
       apple: '/apple-touch-icon.png',
     },
+    manifest: '/manifest.webmanifest',
     openGraph: {
       title: 'HookSniff — Webhook Delivery Service',
       description: t('hero.subtitle'),
