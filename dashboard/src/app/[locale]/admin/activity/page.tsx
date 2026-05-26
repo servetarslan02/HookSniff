@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useAuth } from '@/lib/store';
 import { adminApi } from '@/lib/api';
@@ -139,6 +139,8 @@ export default function AdminActivityPage() {
 
   const [page, setPage] = useState(1);
   const [actionFilter, setActionFilter] = useState('');
+  const [allEntries, setAllEntries] = useState<any[]>([]);
+  const prevFilterRef = useRef(actionFilter);
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const locale = useLocale();
@@ -151,7 +153,28 @@ export default function AdminActivityPage() {
 
   const entries = data?.entries ?? [];
   const total = data?.total ?? 0;
-  const totalPages = Math.ceil(total / perPage);
+
+  // Accumulate entries
+  useEffect(() => {
+    if (actionFilter !== prevFilterRef.current) {
+      setAllEntries(entries);
+      setPage(1);
+      prevFilterRef.current = actionFilter;
+    } else if (page === 1) {
+      setAllEntries(entries);
+    } else if (entries.length > 0) {
+      setAllEntries((prev) => {
+        const existingIds = new Set(prev.map((e: any) => e.id));
+        const newItems = entries.filter((e: any) => !existingIds.has(e.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [entries, page, actionFilter]);
+
+  const hasMore = allEntries.length < total;
+  const handleLoadMore = useCallback(() => {
+    if (!isLoading && hasMore) setPage((p) => p + 1);
+  }, [isLoading, hasMore]);
 
   const formatAction = (action: string) => {
     return action.replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -195,7 +218,7 @@ export default function AdminActivityPage() {
             <select
               id="action-filter"
               value={actionFilter}
-              onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
+              onChange={(e) => { setActionFilter(e.target.value); setPage(1); setAllEntries([]); }}
               className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm"
             >
               <option value="">{t('allActions')}</option>
@@ -205,7 +228,7 @@ export default function AdminActivityPage() {
             </select>
           </div>
           <span className="text-sm text-gray-500 dark:text-slate-400 sm:ml-auto">
-            {tc('showing', { from: Math.min((page - 1) * perPage + 1, total), to: Math.min(page * perPage, total), total })}
+            {tc('showing', { from: 1, to: allEntries.length, total })}
           </span>
         </div>
       </div>
@@ -232,7 +255,7 @@ export default function AdminActivityPage() {
               </button>
             </div>
           </div>
-        ) : entries.length === 0 ? (
+        ) : allEntries.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <span className="text-4xl block mb-3" aria-hidden="true"><ClipboardList size={18} strokeWidth={1.75} /></span>
             <p className="text-gray-500 dark:text-slate-400 text-sm">{t('noActivity')}</p>
@@ -249,8 +272,8 @@ export default function AdminActivityPage() {
             </div>
 
             <VirtualList
-              items={entries}
-              height={Math.min(entries.length * 80, 600)}
+              items={allEntries}
+              height={Math.min(allEntries.length * 80, 600)}
               itemHeight={80}
               overscan={5}
               keyExtractor={(entry) => entry.id}
@@ -316,28 +339,21 @@ export default function AdminActivityPage() {
               )}
             />
 
-            {/* Pagination */}
-            {total > perPage && (
-              <div className="px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
-                <span className="text-sm text-gray-500 dark:text-slate-400">
-                  {t('page')} {page} / {totalPages}
-                </span>
-                <div className="flex gap-2">
-                  <button type="button"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+            {/* Infinite Scroll */}
+            {hasMore && (
+              <div className="px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-center">
+                {isLoading ? (
+                  <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                    <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
+                    <span className="text-sm">{tc('loading')}</span>
+                  </div>
+                ) : (
+                  <button type="button" onClick={handleLoadMore}
+                    className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
                   >
-                    {tc('previous')}
+                    {t('page')} {page} — {tc('loadMore') || 'Load more'}
                   </button>
-                  <button type="button"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page >= totalPages}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
-                  >
-                    {tc('next')}
-                  </button>
-                </div>
+                )}
               </div>
             )}
           </>

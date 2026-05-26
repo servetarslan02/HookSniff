@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { VirtualTable } from '@/components/VirtualTable';
@@ -16,6 +16,8 @@ export default function SearchPage() {
   const { input: query, deferredValue: debouncedQuery, handleChange: handleQueryChange } = useDebouncedSearch();
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
+  const [allResults, setAllResults] = useState<any[]>([]);
+  const prevQueryRef = useRef(`${debouncedQuery}-${status}`);
 
   const { data: results, isLoading } = useSearch({
     q: debouncedQuery || undefined,
@@ -27,13 +29,34 @@ export default function SearchPage() {
   const deliveries = results?.deliveries ?? [];
   const total = results?.total ?? 0;
   const perPage = results?.per_page ?? 20;
-  const totalPages = Math.ceil(total / perPage);
+
+  // Accumulate results
+  useEffect(() => {
+    const queryKey = `${debouncedQuery}-${status}`;
+    if (queryKey !== prevQueryRef.current) {
+      setAllResults(deliveries);
+      setPage(1);
+      prevQueryRef.current = queryKey;
+    } else if (page === 1) {
+      setAllResults(deliveries);
+    } else if (deliveries.length > 0) {
+      setAllResults((prev) => {
+        const existingIds = new Set(prev.map((d: any) => d.id));
+        const newItems = deliveries.filter((d: any) => !existingIds.has(d.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [deliveries, page, debouncedQuery, status]);
+
+  const hasMore = allResults.length < total;
+  const handleLoadMore = useCallback(() => {
+    if (!isLoading && hasMore) setPage((p) => p + 1);
+  }, [isLoading, hasMore]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setDebouncedQuery(query);
-    setDebouncedStatus(status);
     setPage(1);
+    setAllResults([]);
   };
 
   return (
@@ -68,18 +91,18 @@ export default function SearchPage() {
       <div className="glass-card overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center text-gray-500 dark:text-slate-400">{t('searching')}</div>
-        ) : deliveries.length === 0 ? (
+        ) : allResults.length === 0 ? (
           <div className="p-12 text-center text-gray-500 dark:text-slate-400">
             {debouncedQuery || status ? t('noResultsQuery') : t('enterQuery')}
           </div>
         ) : (
           <>
             <div className="px-3 sm:px-6 py-2 sm:py-3 border-b border-gray-200/50 dark:border-slate-700/50">
-              <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{total.toLocaleString()} result{total !== 1 ? 's' : ''}</span>
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{allResults.length.toLocaleString()} result{allResults.length !== 1 ? 's' : ''}</span>
             </div>
             <div className="overflow-x-auto">
               <VirtualTable
-                data={deliveries}
+                data={allResults}
                 estimateSize={56}
                 header={
                   <div className="grid grid-cols-[80px_120px_90px_minmax(120px,1fr)_80px_140px] bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50">
@@ -104,12 +127,21 @@ export default function SearchPage() {
               />
             </div>
 
-            {totalPages > 1 && (
-              <nav aria-label={tc('pagination')} className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200/50 dark:border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
-                <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 dark:border-slate-600 rounded-lg disabled:opacity-50 transition">{tc('previous')}</button>
-                <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{tc('pageOf', { page, total: totalPages })}</span>
-                <button type="button" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages} className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 dark:border-slate-600 rounded-lg disabled:opacity-50 transition">{tc('next')}</button>
-              </nav>
+            {hasMore && (
+              <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200/50 dark:border-slate-700/50 flex items-center justify-center">
+                {isLoading ? (
+                  <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                    <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
+                    <span className="text-sm">{tc('loading')}</span>
+                  </div>
+                ) : (
+                  <button type="button" onClick={handleLoadMore}
+                    className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
+                  >
+                    {allResults.length}/{total} — {tc('loadMore') || 'Load more'}
+                  </button>
+                )}
+              </div>
             )}
           </>
         )}
