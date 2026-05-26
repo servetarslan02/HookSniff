@@ -712,7 +712,7 @@ async function ApiReferenceContent(params: Promise<{ locale: string }>) {
 
       {/* Error Codes */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('errorCodes')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('errorCodesLink')}</h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="bg-gray-50">
