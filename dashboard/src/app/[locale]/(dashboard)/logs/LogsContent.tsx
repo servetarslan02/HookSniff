@@ -1,7 +1,7 @@
 'use client';
 
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -19,8 +19,10 @@ export function LogsContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
   const filter = (searchParams.get('status') || 'all') as StatusFilter;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allLogs, setAllLogs] = useState<Delivery[]>([]);
+  const prevFilterRef = useRef(filter);
   const { input: search, deferredValue: debouncedSearch, handleChange: handleSearchChange, isStale } = useDebouncedSearch();
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
@@ -32,7 +34,7 @@ export function LogsContent() {
   const { data: attempts = [], isLoading: attemptsLoading } = useDeliveryAttempts(selected?.id ?? '');
 
   const { data, isLoading, error, refetch } = useDeliveryLogs({
-    page,
+    page: currentPage,
     status: filter === 'all' ? undefined : filter,
     refetchInterval: autoRefresh ? 5000 : undefined,
   });
@@ -41,15 +43,35 @@ export function LogsContent() {
   const total = data?.total ?? 0;
   const statusCounts = data?.statusCounts ?? { all: 0, delivered: 0, failed: 0, pending: 0 };
 
-  const filtered = deliveries.filter(
+  // Accumulate logs from all loaded pages
+  useEffect(() => {
+    if (filter !== prevFilterRef.current) {
+      setAllLogs(deliveries);
+      setCurrentPage(1);
+      prevFilterRef.current = filter;
+    } else if (currentPage === 1) {
+      setAllLogs(deliveries);
+    } else if (deliveries.length > 0) {
+      setAllLogs((prev) => {
+        const existingIds = new Set(prev.map((d) => d.id));
+        const newItems = deliveries.filter((d) => !existingIds.has(d.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [deliveries, currentPage, filter]);
+
+  const hasMore = allLogs.length < total;
+  const handleLoadMore = useCallback(() => {
+    if (!isLoading && hasMore) setCurrentPage((p) => p + 1);
+  }, [isLoading, hasMore]);
+
+  const filtered = allLogs.filter(
     (d) =>
       !debouncedSearch ||
       d.event?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
       d.id.includes(debouncedSearch) ||
       d.endpoint_id?.includes(debouncedSearch)
   );
-
-  const totalPages = Math.ceil(total / perPage);
 
   return (
     <div className="space-y-6">
@@ -117,6 +139,7 @@ export function LogsContent() {
                 else params.set('status', f);
                 const qs = params.toString();
                 router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
+                setCurrentPage(1);
               }}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition ${
                 filter === f
@@ -226,41 +249,21 @@ export function LogsContent() {
               }
             />
 
-            {/* Pagination */}
-            {total > perPage && (
-              <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
-                <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">
-                  {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
-                </span>
-                <nav aria-label={tc('pagination')} className="flex items-center gap-2">
-                  <button type="button"
-                    onClick={() => {
-                      const params = new URLSearchParams(searchParams.toString());
-                      params.set('page', String(Math.max(1, page - 1)));
-                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
-                    }}
-                    disabled={page === 1}
-                    aria-label={tc('previous')}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 text-gray-700 dark:text-slate-300 transition"
+            {/* Infinite Scroll */}
+            {hasMore && (
+              <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-center">
+                {isLoading ? (
+                  <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                    <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
+                    <span className="text-sm">{tc('loading')}</span>
+                  </div>
+                ) : (
+                  <button type="button" onClick={handleLoadMore}
+                    className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
                   >
-                    {tc('previous')}
+                    {tc('showing', { from: 1, to: allLogs.length, total })} — {tc('loadMore') || 'Load more'}
                   </button>
-                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">
-                    {tc('pageOf', { page, totalPages })}
-                  </span>
-                  <button type="button"
-                    onClick={() => {
-                      const params = new URLSearchParams(searchParams.toString());
-                      params.set('page', String(Math.min(totalPages, page + 1)));
-                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
-                    }}
-                    disabled={page >= totalPages}
-                    aria-label={tc('next')}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 text-gray-700 dark:text-slate-300 transition"
-                  >
-                    {tc('next')}
-                  </button>
-                </nav>
+                )}
               </div>
             )}
           </>
