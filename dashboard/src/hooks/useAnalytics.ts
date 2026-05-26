@@ -21,6 +21,7 @@ export function useDashboardStats() {
     queryFn: validated(() => statsApi.get(token!), StatsResponseSchema),
     enabled: !!token,
     staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -35,6 +36,7 @@ export function useDeliveryTrend(range = '24h') {
     ),
     enabled: !!token,
     staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -49,6 +51,7 @@ export function useSuccessRate(range = '24h') {
     ),
     enabled: !!token,
     staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -64,6 +67,7 @@ export function useEndpointHealth(range = '24h') {
     enabled: true,
     staleTime: 15_000,
     refetchInterval: 30_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -78,5 +82,6 @@ export function useLatencyTrend(range = '24h') {
     ),
     enabled: !!token,
     staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
   });
 }

@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, lazy, Suspense, memo } from 'react';
+import { useState, useEffect, lazy, Suspense, memo, useMemo, useCallback } from 'react';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
-import { useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/lib/api';
 import { apiFetch } from '@/lib/api';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
@@ -68,7 +68,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
       case '/admin':
         return [{ queryKey: ['admin', 'stats'], queryFn: () => adminApi.getStats(token), staleTime: 30_000 }];
       case '/admin/users':
-        return [{ queryKey: ['admin', 'users', { page: 1 }], queryFn: () => adminApi.getUsers(token, { page: 1 }), staleTime: 15_000 }];
+        return [{ queryKey: ['admin', 'users', { page: 1 }], queryFn: () => adminApi.listUsers(token, { page: 1 }), staleTime: 15_000 }];
       case '/admin/revenue':
         return [{ queryKey: ['admin', 'revenue'], queryFn: () => apiFetch('/admin/revenue', { token }), staleTime: 30_000 }];
       case '/admin/refund-requests':
@@ -78,7 +78,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
       case '/admin/coupons':
         return [{ queryKey: ['admin', 'coupons'], queryFn: () => apiFetch('/admin/coupons', { token }), staleTime: 30_000 }];
       case '/admin/system':
-        return [{ queryKey: ['admin', 'system'], queryFn: () => adminApi.getSystem(token), staleTime: 15_000 }];
+        return [{ queryKey: ['admin', 'system'], queryFn: () => adminApi.getSystemHealth(token), staleTime: 15_000 }];
       case '/admin/activity':
         return [{ queryKey: ['admin', 'activity'], queryFn: () => apiFetch('/admin/activity', { token }), staleTime: 15_000 }];
       case '/admin/alerts':
@@ -154,7 +154,7 @@ const AdminSidebar = memo(function AdminSidebar({ pathname, onClose, isOpen }: {
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const locale = useLocale();

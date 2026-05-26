@@ -14,6 +14,7 @@ export function useServiceTokens() {
     queryFn: validated(() => api.getServiceTokens(token!), ServiceTokenSchema.array()),
     enabled: !!token,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 

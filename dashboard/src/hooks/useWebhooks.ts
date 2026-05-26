@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query';
 import { webhooksApi, type DeliveryDetail, type DeliveryAttempt } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { validated } from './validated';
@@ -17,6 +17,7 @@ export function useWebhooks(params?: { page?: number; status?: string }) {
     ),
     enabled: !!token,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -29,6 +30,7 @@ export function useReplayDelivery() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['webhooks'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: ['status-counts'] });
     },
   });
 }
@@ -41,6 +43,7 @@ export function useDeliveryDetail(id: string) {
     queryFn: () => webhooksApi.get(token!, id),
     enabled: !!token && !!id,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -58,10 +61,49 @@ export function useDeliveryAttempts(id: string) {
     },
     enabled: !!token && !!id,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
+  });
+}
+
+// ── Status Counts (cached separately, longer staleTime) ──
+export function useStatusCounts() {
+  const { token } = useAuth();
+  return useQueries({
+    queries: [
+      {
+        queryKey: ['status-counts', 'all'],
+        queryFn: async () => (await webhooksApi.list(token!, { page: 1 })).total,
+        enabled: !!token,
+        staleTime: 60_000,
+        placeholderData: (previousData: number | undefined) => previousData ?? 0,
+      },
+      {
+        queryKey: ['status-counts', 'delivered'],
+        queryFn: async () => (await webhooksApi.list(token!, { page: 1, status: 'delivered' })).total,
+        enabled: !!token,
+        staleTime: 60_000,
+        placeholderData: (previousData: number | undefined) => previousData ?? 0,
+      },
+      {
+        queryKey: ['status-counts', 'failed'],
+        queryFn: async () => (await webhooksApi.list(token!, { page: 1, status: 'failed' })).total,
+        enabled: !!token,
+        staleTime: 60_000,
+        placeholderData: (previousData: number | undefined) => previousData ?? 0,
+      },
+      {
+        queryKey: ['status-counts', 'pending'],
+        queryFn: async () => (await webhooksApi.list(token!, { page: 1, status: 'pending' })).total,
+        enabled: !!token,
+        staleTime: 60_000,
+        placeholderData: (previousData: number | undefined) => previousData ?? 0,
+      },
+    ],
   });
 }
 
 // ── Delivery Logs (with status counts) ──
+// Optimized: uses separate status-counts queries cached at 60s
 export function useDeliveryLogs(params: {
   page?: number;
   status?: string;
@@ -71,29 +113,19 @@ export function useDeliveryLogs(params: {
   return useQuery({
     queryKey: ['delivery-logs', params],
     queryFn: async () => {
-      const [data, deliveredData, failedData, pendingData] = await Promise.all([
-        webhooksApi.list(token!, {
-          page: params.page,
-          status: params.status === 'all' ? undefined : params.status,
-        }),
-        webhooksApi.list(token!, { page: 1, status: 'delivered' }).catch(() => ({ total: 0, deliveries: [] })),
-        webhooksApi.list(token!, { page: 1, status: 'failed' }).catch(() => ({ total: 0, deliveries: [] })),
-        webhooksApi.list(token!, { page: 1, status: 'pending' }).catch(() => ({ total: 0, deliveries: [] })),
-      ]);
+      const data = await webhooksApi.list(token!, {
+        page: params.page,
+        status: params.status === 'all' ? undefined : params.status,
+      });
       return {
         deliveries: data.deliveries,
         total: data.total,
-        statusCounts: {
-          all: data.total,
-          delivered: deliveredData.total,
-          failed: failedData.total,
-          pending: pendingData.total,
-        },
       };
     },
     enabled: !!token,
     staleTime: 15_000,
     refetchInterval: params.refetchInterval ?? false,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -107,6 +139,7 @@ export function useCreateWebhook() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['webhooks'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: ['status-counts'] });
     },
   });
 }

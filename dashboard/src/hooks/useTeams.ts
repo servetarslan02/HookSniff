@@ -15,6 +15,7 @@ export function useTeams() {
     },
     enabled: !!token,
     staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -28,6 +29,7 @@ export function useTeamMembers(teamId: string | null) {
     },
     enabled: !!token && !!teamId,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -38,6 +40,7 @@ export function useTeamDetail(teamId: string | null) {
     queryFn: () => teamsApi.getDetail(token!, teamId!),
     enabled: !!token && !!teamId,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 

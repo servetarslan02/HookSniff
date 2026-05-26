@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { webhooksApi } from '@/lib/api';
-import { useWebhooks, useReplayDelivery, useSearch, useDeliveryAttempts, useDeliveryLogs } from '@/hooks/useDashboardData';
+import { useWebhooks, useReplayDelivery, useSearch, useDeliveryAttempts, useDeliveryLogs, useStatusCounts } from '@/hooks/useDashboardData';
 import { useLiveEndpoints } from '@/hooks/useCollections';
 import { useDeliveryStream } from '@/hooks/useDeliveryStream';
 import { useIsFeatureEnabled } from '@/hooks/useAdminData';
@@ -90,9 +90,14 @@ export default function DeliveriesContent() {
     return map;
   }, [endpointsList]);
 
-  // ── Data: status counts (via useDeliveryLogs) ──
-  const { data: statusCountsData } = useDeliveryLogs({ page: 1 });
-  const statusCounts = statusCountsData?.statusCounts ?? { all: 0, delivered: 0, failed: 0, pending: 0 };
+  // ── Data: status counts (cached separately, 60s staleTime) ──
+  const statusCountQueries = useStatusCounts();
+  const statusCounts = {
+    all: (statusCountQueries[0].data as number) ?? 0,
+    delivered: (statusCountQueries[1].data as number) ?? 0,
+    failed: (statusCountQueries[2].data as number) ?? 0,
+    pending: (statusCountQueries[3].data as number) ?? 0,
+  };
 
   // ── Data: SSE stream (from Deliveries page) ──
   const { connected: sseConnected, deliveries: sseDeliveries } = useDeliveryStream({
