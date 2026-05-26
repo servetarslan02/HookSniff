@@ -4,7 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { TabbedSection } from '@/components/TabbedSection';
 import { useTranslations } from 'next-intl';
-import { useTeams } from '@/hooks/useDashboardData';
+import { useLiveTeams } from '@/hooks/useCollections';
 import { Users, ShieldCheck, ScrollText } from '@/components/icons';
 
 const tabSkeleton = (
@@ -24,7 +24,7 @@ const AuditLogPage = dynamic(() => import('../audit-log/page'), { ssr: false, lo
 
 export default function OrganizationPage() {
   const t = useTranslations('nav');
-  const { data: teams = [] } = useTeams();
+  const { data: teams = [] } = useLiveTeams();
   const [selectedTeamId, _setSelectedTeamId] = useState<string>('');
 
   // Default to first team if none selected

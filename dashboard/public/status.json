@@ -18,7 +18,7 @@
       "status": "down",
       "latency_ms": 1,
       "description": "HookSniff REST API (Cloud Run)",
-      "last_checked": "2026-05-26T14:09:32.295Z"
+      "last_checked": "2026-05-26T14:21:43.741Z"
     },
     {
       "name": "Dashboard",
@@ -36,7 +36,7 @@
       "status": "degraded",
       "latency_ms": 0,
       "description": "Next.js frontend (Vercel)",
-      "last_checked": "2026-05-26T14:09:32.295Z"
+      "last_checked": "2026-05-26T14:21:43.741Z"
     },
     {
       "name": "Worker",
@@ -54,7 +54,7 @@
       "status": "unknown",
       "latency_ms": null,
       "description": "Background delivery worker (Cloud Run)",
-      "last_checked": "2026-05-26T14:09:32.295Z"
+      "last_checked": "2026-05-26T14:21:43.741Z"
     },
     {
       "name": "Database",
@@ -72,7 +72,7 @@
       "status": "down",
       "latency_ms": 0,
       "description": "PostgreSQL (Neon)",
-      "last_checked": "2026-05-26T14:09:32.295Z"
+      "last_checked": "2026-05-26T14:21:43.741Z"
     },
     {
       "name": "Cache",
@@ -90,7 +90,7 @@
       "status": "unknown",
       "latency_ms": 0,
       "description": "Redis (Upstash)",
-      "last_checked": "2026-05-26T14:09:32.295Z"
+      "last_checked": "2026-05-26T14:21:43.741Z"
     },
     {
       "name": "Email Service",
@@ -106,9 +106,9 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 284,
+      "latency_ms": 299,
       "description": "Gmail API",
-      "last_checked": "2026-05-26T14:09:32.295Z"
+      "last_checked": "2026-05-26T14:21:43.741Z"
     },
     {
       "name": "Storage",
@@ -124,195 +124,27 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 54,
+      "latency_ms": 52,
       "description": "Cloudflare R2",
-      "last_checked": "2026-05-26T14:09:32.295Z"
+      "last_checked": "2026-05-26T14:21:43.741Z"
     }
   ],
-  "checked_at": "2026-05-26T14:09:32.295Z",
+  "checked_at": "2026-05-26T14:21:43.741Z",
   "response_times": {
     "API": [
-      138,
-      155,
-      121,
-      167,
-      143,
-      129,
-      148,
-      136,
-      159,
-      141,
-      133,
-      145,
-      152,
-      138,
-      162,
-      127,
-      149,
-      156,
-      134,
-      143,
-      131,
-      147,
-      139,
+      1,
       1
     ],
     "Dashboard": [
-      89,
-      92,
-      78,
-      95,
-      87,
-      91,
-      83,
-      96,
-      88,
-      85,
-      93,
-      90,
-      86,
-      97,
-      84,
-      91,
-      89,
-      94,
-      82,
-      88,
-      91,
-      86,
-      93,
-      87
-    ],
-    "Worker": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
-    ],
-    "Database": [
-      23,
-      21,
-      25,
-      19,
-      28,
-      22,
-      24,
-      20,
-      26,
-      23,
-      21,
-      27,
-      22,
-      24,
-      19,
-      25,
-      23,
-      28,
-      21,
-      24,
-      22,
-      26,
-      20,
-      23
-    ],
-    "Cache": [
-      8,
-      7,
-      9,
-      6,
-      11,
-      8,
-      7,
-      10,
-      8,
-      9,
-      7,
-      12,
-      8,
-      7,
-      9,
-      8,
-      10,
-      7,
-      8,
-      11,
-      7,
-      9,
-      8,
-      7
+      1
     ],
     "Email Service": [
-      367,
-      305,
-      278,
-      325,
-      291,
-      348,
-      312,
-      289,
-      335,
-      301,
-      276,
-      341,
-      293,
-      358,
-      307,
-      282,
-      329,
-      296,
-      345,
-      308,
-      286,
-      341,
-      251,
-      284
+      323,
+      299
     ],
     "Storage": [
-      52,
-      44,
-      41,
-      47,
       43,
-      50,
-      46,
-      40,
-      49,
-      44,
-      38,
-      51,
-      43,
-      47,
-      45,
-      41,
-      48,
-      44,
-      50,
-      42,
-      52,
-      39,
-      38,
-      54
+      52
     ]
   }
-}
 }

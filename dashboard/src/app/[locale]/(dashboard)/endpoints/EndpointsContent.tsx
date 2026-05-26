@@ -5,7 +5,8 @@ import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
 import { endpointsApi } from '@/lib/api';
-import { useEndpoints, useDeleteEndpoint, useToggleEndpoint } from '@/hooks/useDashboardData';
+import { useLiveEndpoints } from '@/hooks/useCollections';
+import { useDeleteEndpoint, useToggleEndpoint } from '@/hooks/useDashboardData';
 import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useToast } from '@/components/Toast';
@@ -35,7 +36,7 @@ export function EndpointsContent() {
   const tc = useTranslations('common');
 
   // React Query — replaces useEffect + useState + fetch
-  const { data: endpoints = [], isLoading, error: queryError } = useEndpoints();
+  const { data: endpoints = [], isLoading, error: queryError } = useLiveEndpoints();
   const deleteEndpointMutation = useDeleteEndpoint();
   const toggleEndpointMutation = useToggleEndpoint();
 

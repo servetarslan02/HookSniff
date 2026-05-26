@@ -6,8 +6,8 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { useLiveTeams } from '@/hooks/useCollections';
 import {
-  useTeams,
   useTeamMembers,
   useTeamDetail,
   useCreateTeam,
@@ -52,7 +52,7 @@ function TeamPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const { data: teams = [], isLoading: loading } = useTeams();
+  const { data: teams = [], isLoading: loading } = useLiveTeams();
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const { data: members = [] } = useTeamMembers(selectedTeamId);
   const { data: teamDetail } = useTeamDetail(selectedTeamId);

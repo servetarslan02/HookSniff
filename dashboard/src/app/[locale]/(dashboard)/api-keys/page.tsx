@@ -2,14 +2,15 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useApiKeys, useCreateApiKey, useDeleteApiKey, useRotateApiKey } from '@/hooks/useDashboardData';
+import { useLiveApiKeys } from '@/hooks/useCollections';
+import { useCreateApiKey, useDeleteApiKey, useRotateApiKey } from '@/hooks/useDashboardData';
 import { VirtualTable } from '@/components/VirtualTable';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
 export default function ApiKeysPage() {
   const t = useTranslations('apiKeys');
   const tc = useTranslations('common');
-  const { data: keys = [], isLoading } = useApiKeys();
+  const { data: keys = [], isLoading } = useLiveApiKeys();
   const createKey = useCreateApiKey();
   const deleteKey = useDeleteApiKey();
   const rotateKey = useRotateApiKey();
