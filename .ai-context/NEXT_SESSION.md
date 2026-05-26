@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-27 (OpenClaw — Dashboard hata düzeltmeleri, tüm sayfalar çalışır)
+> **Son güncelleme:** 2026-05-27 (OpenClaw — Dashboard performans optimizasyonları)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -9,7 +9,19 @@
 
 Build stabil. `npm run build` → exit 0 ✅
 
-### Son Yapılan İş (2026-05-27)
+### Son Yapılan İş (2026-05-27 — Performans Optimizasyonu)
+- **QueryClient cache stratejisi yenilendi:**
+  - `staleTime`: 5dk → 30sn (daha taze veri)
+  - `refetchOnMount: false` → `'always'` (sayfa açıldığında arka planda yenile)
+  - `refetchOnWindowFocus: false` → `'always'` (sekmeye dönünce yenile)
+  - `gcTime`: 30dk → 5dk (bellek tasarrufu)
+- **13 hook'a `placeholderData` eklendi** — loading flash önlendi, sayfa geçişlerinde anında veri gösterimi
+- **`useDeliveryLogs` optimizasyonu:** 4 API çağrısı → 1 (status counts ayrı cache'li, 60sn staleTime)
+- **`useStatusCounts` hook eklendi** — `useQueries` ile paralel, ayrı cache key'leri
+- **AdminShell build fix** — `useMemo`/`useCallback` import, `getUsers`→`listUsers`, `getSystem`→`getSystemHealth`
+- Commit: `ab033f64`
+
+### Önceki Yapılan İş (2026-05-27)
 - **Dashboard tüm sayfalar düzeltildi** — "Something went wrong" hatası çözüldü
 - 5 ayrı hata tespit edilip düzeltildi:
   1. `QueryClientRequiredError` → TanStack DB collection'larına `queryClient` parametresi eklendi
