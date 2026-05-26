@@ -4,20 +4,18 @@
 import { useState } from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
-import { useAuth } from '@/lib/store';
-import { type Delivery, type DeliveryAttempt, webhooksApi } from '@/lib/api';
+import { useTranslations } from 'next-intl';
+import type { Delivery } from '@/lib/api';
+import { useDeliveryLogs, useDeliveryAttempts } from '@/hooks/useDashboardData';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { StatusBadge } from '@/components/StatusBadge';
 import { VirtualTable } from '@/components/VirtualTable';
-import { useTranslations } from 'next-intl';
-import { useDeliveryLogs } from '@/hooks/useDashboardData';
-import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { LazySection, Skeletons } from '@/components/LazySection';
 import { AlertTriangle, Check, CheckCircle2, ClipboardList, Clock, Inbox, X, XCircle } from '@/components/icons';
 
 type StatusFilter = 'all' | 'delivered' | 'failed' | 'pending';
 
 export function LogsContent() {
-  const { token } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -25,12 +23,13 @@ export function LogsContent() {
   const filter = (searchParams.get('status') || 'all') as StatusFilter;
   const { input: search, deferredValue: debouncedSearch, handleChange: handleSearchChange, isStale } = useDebouncedSearch();
   const [selected, setSelected] = useState<Delivery | null>(null);
-  const [attempts, setAttempts] = useState<DeliveryAttempt[]>([]);
-  const [attemptsLoading, setAttemptsLoading] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const t = useTranslations('logs');
   const tc = useTranslations('common');
   const perPage = 20;
+
+  // ── Delivery attempts (React Query) ──
+  const { data: attempts = [], isLoading: attemptsLoading } = useDeliveryAttempts(selected?.id ?? '');
 
   const { data, isLoading, error, refetch } = useDeliveryLogs({
     page,
@@ -195,17 +194,7 @@ export function LogsContent() {
               renderRow={(d) => (
                 <div
                   className="grid grid-cols-[80px_120px_minmax(100px,1fr)_90px_70px_80px_140px] hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer border-b border-gray-200/50 dark:border-slate-700/50"
-                  onClick={() => {
-                    setSelected(d);
-                    setAttempts([]);
-                    if (token) {
-                      setAttemptsLoading(true);
-                      webhooksApi.getAttempts(token, d.id)
-                        .then((a) => setAttempts(a))
-                        .catch(() => setAttempts([]))
-                        .finally(() => setAttemptsLoading(false));
-                    }
-                  }}
+                  onClick={() => setSelected(d)}
                 >
                   <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-400">{d.id.slice(0, 8)}…</div>
                   <div className="px-3 sm:px-6 py-3 sm:py-4">
