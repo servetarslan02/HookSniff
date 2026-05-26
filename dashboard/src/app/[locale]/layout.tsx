@@ -12,6 +12,7 @@ import { CookieConsent } from '@/components/CookieConsent';
 import { AnalyticsWrapper } from '@/components/AnalyticsWrapper';
 import { ViewTransition } from '@/components/ViewTransition';
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
+import { TanStackDBProvider } from '@/components/TanStackDBProvider';
 import { Suspense } from 'react';
 
 const inter = Inter({
@@ -179,6 +180,7 @@ export default async function LocaleLayout({
           <ThemeProvider>
             <AuthProvider>
               <ReactQueryProvider>
+                <TanStackDBProvider>
                 <ToastProvider>
                   <Suspense>
                     <ViewTransition>
@@ -189,6 +191,7 @@ export default async function LocaleLayout({
                   <AnalyticsWrapper />
                   <ServiceWorkerRegister />
                 </ToastProvider>
+                </TanStackDBProvider>
               </ReactQueryProvider>
             </AuthProvider>
           </ThemeProvider>
