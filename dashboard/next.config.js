@@ -6,7 +6,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig = {
   reactStrictMode: true,
-  // cacheComponents: true,  // TODO: Enable after wrapping all pages in Suspense (60+ docs pages need refactor)
+  cacheComponents: true,
   reactCompiler: true,
   turbopack: {},
   experimental: {},
