@@ -10,6 +10,8 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { ReactQueryProvider } from '@/components/ReactQueryProvider';
 import { CookieConsent } from '@/components/CookieConsent';
 import { AnalyticsWrapper } from '@/components/AnalyticsWrapper';
+import { ViewTransition } from '@/components/ViewTransition';
+import { Suspense } from 'react';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -177,7 +179,11 @@ export default async function LocaleLayout({
             <AuthProvider>
               <ReactQueryProvider>
                 <ToastProvider>
+                  <Suspense>
+                    <ViewTransition>
                   {children}
+                  </ViewTransition>
+                  </Suspense>
                   <CookieConsent />
                   <AnalyticsWrapper />
                 </ToastProvider>
