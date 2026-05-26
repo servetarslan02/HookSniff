@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, lazy, Suspense, memo, Activity } from 'react';
+import { useState, useEffect, lazy, Suspense, memo } from 'react';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { clsx } from 'clsx';
 import { useAuth } from '@/lib/store';
@@ -284,9 +284,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
         <main id="admin-main-content" role="main" className="p-3 sm:p-4 md:p-6 lg:p-8 page-enter">
           <Suspense fallback={<SkeletonAdmin />}>
-            <Activity mode="visible">
-              <ViewTransition>{children}</ViewTransition>
-            </Activity>
+            <ViewTransition>{children}</ViewTransition>
           </Suspense>
         </main>
       </div>

@@ -15,6 +15,8 @@ interface PrefetchLinkProps extends Omit<LinkProps, 'prefetch'> {
   }>;
   /** Prefetch the route chunk on hover (default: true) */
   prefetchRoute?: boolean;
+  /** Prefetch API data on hover (default: false) */
+  prefetchDataOnHover?: boolean;
   /** Delay before prefetching in ms (default: 100) */
   hoverDelay?: number;
 }
@@ -42,7 +44,8 @@ interface PrefetchLinkProps extends Omit<LinkProps, 'prefetch'> {
 export function PrefetchLink({
   prefetchData,
   prefetchRoute = true,
-  hoverDelay = 100,
+  prefetchDataOnHover = false,
+  hoverDelay = 150,
   onMouseEnter,
   children,
   ...linkProps
@@ -61,9 +64,9 @@ export function PrefetchLink({
           router.prefetch(linkProps.href as string);
         }
 
-        // Prefetch React Query data
-        if (prefetchData) {
+        if (prefetchDataOnHover && prefetchData && document.visibilityState === 'visible') {
           for (const query of prefetchData) {
+            if (queryClient.getQueryData(query.queryKey) !== undefined) continue;
             queryClient.prefetchQuery({
               queryKey: query.queryKey,
               queryFn: query.queryFn,
@@ -78,7 +81,7 @@ export function PrefetchLink({
       const target = e.currentTarget;
       target.addEventListener('mouseleave', handleMouseLeave, { once: true });
     },
-    [onMouseEnter, prefetchRoute, prefetchData, hoverDelay, router, queryClient, linkProps.href]
+    [onMouseEnter, prefetchRoute, prefetchDataOnHover, prefetchData, hoverDelay, router, queryClient, linkProps.href]
   );
 
   return (
