@@ -25,6 +25,14 @@ import {
   createApplicationsCollection,
 } from '@/lib/collections';
 
+// ── Helper: safe map that filters undefined ──
+function safeMap<T>(data: unknown[] | undefined, key: string): T[] {
+  if (!data) return [];
+  return data
+    .map((d) => (d as Record<string, unknown>)?.[key])
+    .filter((item): item is T => item != null && typeof item === 'object');
+}
+
 // ── Endpoints ──
 export function useLiveEndpoints() {
   const { token } = useAuth();
@@ -39,7 +47,7 @@ export function useLiveEndpoints() {
   );
 
   return {
-    data: data?.map((d: Record<string, unknown>) => d.endpoint) ?? [],
+    data: safeMap<Record<string, unknown>>(data, 'endpoint'),
     isLoading: !token || isLoading,
     error,
   };
@@ -59,7 +67,7 @@ export function useLiveDeliveries(params?: { page?: number; status?: string }) {
   );
 
   return {
-    data: data?.map((d: Record<string, unknown>) => d.delivery) ?? [],
+    data: safeMap<Record<string, unknown>>(data, 'delivery'),
     isLoading: !token || isLoading,
     error,
   };
@@ -79,7 +87,7 @@ export function useLiveTeams() {
   );
 
   return {
-    data: data?.map((d: Record<string, unknown>) => d.team) ?? [],
+    data: safeMap<Record<string, unknown>>(data, 'team'),
     isLoading: !token || isLoading,
     error,
   };
@@ -99,7 +107,7 @@ export function useLiveApiKeys() {
   );
 
   return {
-    data: data?.map((d: Record<string, unknown>) => d.key) ?? [],
+    data: safeMap<Record<string, unknown>>(data, 'key'),
     isLoading: !token || isLoading,
     error,
   };
@@ -119,7 +127,7 @@ export function useLiveNotifications() {
   );
 
   return {
-    data: data?.map((d: Record<string, unknown>) => d.notification) ?? [],
+    data: safeMap<Record<string, unknown>>(data, 'notification'),
     isLoading: !token || isLoading,
     error,
   };
@@ -139,7 +147,7 @@ export function useLiveAlerts() {
   );
 
   return {
-    data: data?.map((d: Record<string, unknown>) => d.alert) ?? [],
+    data: safeMap<Record<string, unknown>>(data, 'alert'),
     isLoading: !token || isLoading,
     error,
   };
@@ -159,7 +167,7 @@ export function useLiveServiceTokens() {
   );
 
   return {
-    data: data?.map((d: Record<string, unknown>) => d.token) ?? [],
+    data: safeMap<Record<string, unknown>>(data, 'token'),
     isLoading: !token || isLoading,
     error,
   };
@@ -179,7 +187,7 @@ export function useLiveTransforms(endpointId: string) {
   );
 
   return {
-    data: data?.map((d: Record<string, unknown>) => d.transform) ?? [],
+    data: safeMap<Record<string, unknown>>(data, 'transform'),
     isLoading: !token || isLoading,
     error,
   };
@@ -199,7 +207,7 @@ export function useLiveApplications() {
   );
 
   return {
-    data: (data?.map((d: Record<string, unknown>) => d.app).filter(Boolean) ?? []) as Record<string, unknown>[],
+    data: safeMap<Record<string, unknown>>(data, 'app'),
     isLoading: !token || isLoading,
     error,
   };
@@ -219,7 +227,7 @@ export function useLiveInboundConfigs() {
   );
 
   return {
-    data: data?.map((d: Record<string, unknown>) => d.config) ?? [],
+    data: safeMap<Record<string, unknown>>(data, 'config'),
     isLoading: !token || isLoading,
     error,
   };
