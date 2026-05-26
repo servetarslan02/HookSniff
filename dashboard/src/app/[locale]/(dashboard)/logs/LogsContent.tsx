@@ -28,7 +28,6 @@ export function LogsContent() {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const t = useTranslations('logs');
   const tc = useTranslations('common');
-  const perPage = 20;
 
   // ── Delivery attempts (React Query) ──
   const { data: attempts = [], isLoading: attemptsLoading } = useDeliveryAttempts(selected?.id ?? '');
