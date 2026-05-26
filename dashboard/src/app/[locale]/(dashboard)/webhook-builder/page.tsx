@@ -3,7 +3,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
-import { useEndpoints, useCreateWebhook } from '@/hooks/useDashboardData';
+import { useCreateWebhook } from '@/hooks/useDashboardData';
+import { useLiveEndpoints } from '@/hooks/useCollections';
 import { AlertTriangle, Check, ClipboardList, Eye, FileText, Rocket, Trash2, X, Zap } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 

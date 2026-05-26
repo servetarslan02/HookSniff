@@ -134,7 +134,21 @@ export function createTransformsCollection(token: string, endpointId: string) {
   );
 }
 
-// ── Inbound Configs Collection ──
+// ── Applications Collection ──
+export function createApplicationsCollection(token: string) {
+  return createCollection(
+    queryCollectionOptions({
+      queryKey: ['applications'],
+      queryFn: async () => {
+        const { applicationsApi } = await import('@/lib/api');
+        const res = await applicationsApi.list(token);
+        return Array.isArray(res) ? res : [];
+      },
+      getKey: (item: Record<string, unknown>) => item.id as string,
+      staleTime: 30_000,
+    })
+  );
+}
 export function createInboundConfigsCollection(token: string) {
   return createCollection(
     queryCollectionOptions({

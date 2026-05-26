@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { useEndpoints } from '@/hooks/useDashboardData';
+import { useLiveEndpoints } from '@/hooks/useCollections';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { endpointsApi, type RetryPolicyConfig } from '@/lib/api';
