@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Team, TeamMember } from '@/lib/api';
+import { VirtualTable } from '@/components/VirtualTable';
 import { AlertTriangle, BarChart3, Check, ClipboardList, Clock, Eye, Link2, Pencil, Shield, User, X } from '@/components/icons';
 
 const ROLE_OPTIONS = ['admin', 'developer', 'analyst', 'viewer'] as const;
@@ -278,11 +279,23 @@ export function TeamDetail({
             <p className="text-xs text-gray-400 dark:text-slate-500">Invite team members to collaborate</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100 dark:divide-slate-700/50">
-            {members.map((m) => (
+          <VirtualTable
+            data={members}
+            estimateSize={72}
+            header={null}
+            emptyState={
+              <div className="px-6 py-12 text-center">
+                <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-100 dark:bg-slate-700/50 flex items-center justify-center">
+                  <span className="text-2xl"><User size={18} strokeWidth={1.75} /></span>
+                </div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{t('noMembers')}</p>
+                <p className="text-xs text-gray-400 dark:text-slate-500">Invite team members to collaborate</p>
+              </div>
+            }
+            renderRow={(m) => (
               <div
                 key={m.id}
-                className="group px-6 py-4 flex items-center gap-4 hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors"
+                className="group px-6 py-4 flex items-center gap-4 hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors border-b border-gray-100 dark:border-slate-700/50"
               >
                 {/* Avatar */}
                 <div className="relative">
@@ -338,8 +351,8 @@ export function TeamDetail({
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          />
         )}
       </div>
 
@@ -380,11 +393,16 @@ export function TeamDetail({
             <span className="text-xs font-medium text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">{invites.length}</span>
           </div>
           <div className="divide-y divide-gray-100 dark:divide-slate-700/50">
-            {invites.map((inv) => {
+            <VirtualTable
+              data={invites}
+              estimateSize={72}
+              header={null}
+              emptyState={null}
+              renderRow={(inv) => {
               const daysLeft = Math.max(0, Math.ceil((new Date(inv.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
               const isExpiringSoon = daysLeft <= 2;
               return (
-                <div key={inv.id} className="group px-6 py-4 flex items-center gap-4 hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                <div key={inv.id} className="group px-6 py-4 flex items-center gap-4 hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors border-b border-gray-100 dark:border-slate-700/50">
                   <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-500/15 flex items-center justify-center text-amber-600 dark:text-amber-400 text-sm shrink-0">
                     <Clock size={16} strokeWidth={1.75} className="inline mr-1" /> </div>
                   <div className="flex-1 min-w-0">
@@ -425,7 +443,8 @@ export function TeamDetail({
                   </button>
                 </div>
               );
-            })}
+            }}
+            />
           </div>
         </div>
       )}

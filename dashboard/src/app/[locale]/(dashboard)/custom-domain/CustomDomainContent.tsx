@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { apiFetch } from '@/lib/api';
+import { VirtualTable } from '@/components/VirtualTable';
 import { AlertTriangle, CheckCircle2, Clock, Globe, Lock, XCircle, ExternalLink } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -349,8 +350,12 @@ export function CustomDomainContent() {
       {!loadingDomains && existingDomains.length > 0 && (
         <div className="glass-card p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('existingDomains')}</h2>
-          <div className="space-y-3">
-            {existingDomains.map((d) => (
+          <VirtualTable
+            data={existingDomains}
+            estimateSize={100}
+            header={null}
+            emptyState={null}
+            renderRow={(d) => (
               <div key={d.id} className="rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
                 {/* Domain header */}
                 <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-900">
@@ -424,8 +429,8 @@ export function CustomDomainContent() {
                   </div>
                 )}
               </div>
-            ))}
-          </div>
+            )}
+          />
         </div>
       )}
 

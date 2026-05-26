@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualTable } from '@/components/VirtualTable';
 import { Ban, CheckCircle2, Clock, RefreshCw, XCircle } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 
@@ -103,8 +104,12 @@ export default function BackgroundTasksPage() {
           </div>
 
           {/* Task rows */}
-          <div className="divide-y divide-gray-100 dark:divide-slate-700">
-            {tasks.map(task => (
+          <VirtualTable
+            data={tasks}
+            estimateSize={64}
+            header={null}
+            emptyState={null}
+            renderRow={(task) => (
               <div key={task.id}>
                 {/* Main row */}
                 <div className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer"
@@ -204,8 +209,8 @@ export default function BackgroundTasksPage() {
                   </div>
                 )}
               </div>
-            ))}
-          </div>
+            )}
+          />
         </div>
       )}
 

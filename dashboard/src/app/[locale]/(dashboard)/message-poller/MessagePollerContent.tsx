@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { VirtualTable } from '@/components/VirtualTable';
 import { Inbox } from '@/components/icons';
 
 function formatDate(s: string | null) {
@@ -153,8 +154,12 @@ export function MessagePollerContent() {
             <h3 className="font-semibold text-gray-900 dark:text-white">{t('messages')} ({data.messages.length})</h3>
             {data.done && <span className="px-2 py-0.5 text-xs bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 rounded-full">{t('allCaughtUp')}</span>}
           </div>
-          <div className="divide-y divide-gray-100 dark:divide-slate-700">
-            {data.messages.map(msg => (
+          <VirtualTable
+            data={data.messages}
+            estimateSize={56}
+            header={null}
+            emptyState={null}
+            renderRow={(msg) => (
               <div key={msg.id}>
                 <div className="px-6 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer"
                   onClick={() => setExpandedMsg(expandedMsg === msg.id ? null : msg.id)}>
@@ -213,8 +218,8 @@ export function MessagePollerContent() {
                   </div>
                 )}
               </div>
-            ))}
-          </div>
+            )}
+          />
         </div>
       )}
 
