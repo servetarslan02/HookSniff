@@ -6,11 +6,11 @@ import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { useTranslations } from 'next-intl';
 import {
-  useNotifications,
   useMarkNotificationAsRead,
   useMarkAllNotificationsAsRead,
   useDeleteNotification,
 } from '@/hooks/useDashboardData';
+import { useNotifications } from '@/hooks/useNotifications';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { VirtualList } from '@/components/VirtualList';
 import { Circle, AlertTriangle, Bell, CreditCard, Users } from '@/components/icons';
