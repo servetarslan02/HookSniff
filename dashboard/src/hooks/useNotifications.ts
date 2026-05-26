@@ -21,6 +21,7 @@ export function useNotifications(params?: {
       }),
     enabled: !!token,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
