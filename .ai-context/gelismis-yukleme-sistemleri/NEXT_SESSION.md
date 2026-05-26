@@ -29,7 +29,7 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 | 6 | 16 Docs Suspense Refactor | 2 | ✅ | 2026-05-26 | 7f515761 |
 | 7 | React Query — deliveries + logs | 1 | ✅ | 2026-05-26 | f2f1df57 |
 | 8 | Cache Components (use cache) | 6 | ⏳ | — | — |
-| 9 | View Transitions | 7 | ✅ | — | Zaten aktif (5 layout) |
+| 9 | View Transitions | 7 | ✅ | — | Zaten aktif (tüm site) |
 | 10 | Turbopack | 8 | ✅ | — | Zaten aktif (Next.js 16 default) |
 | 11 | React Compiler | 9 | ✅ | — | Zaten aktif (reactCompiler: true) |
 | 12 | **PPR** | **10** | **✅** | **2026-05-26** | **1b037609** |
@@ -75,7 +75,7 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 | 4 | Concurrent Features | ✅ | 8 dosya useDebouncedSearch |
 | 5 | Akıllı Prefetch | ✅ | 59 dosya PrefetchLink |
 | 6 | Cache Components | ⏳ | Altyapı hazır, config açılacak |
-| 7 | View Transitions | ✅ | 5 layout'ta aktif |
+| 7 | View Transitions | ✅ | Tüm site (root layout + 5 shell) |
 | 8 | Turbopack | ✅ | Next.js 16 default |
 | 9 | React Compiler | ✅ | reactCompiler: true |
 | 10 | PPR | ✅ | ppr: true, 3 layout server component |
