@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import type { Metadata } from 'next';
 
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Run HookSniff on Kubernetes with Helm or raw manifests',
 };
 
-export default function KubernetesPage() {
+async function KubernetesContent() {
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Deploy to Kubernetes</h1>
@@ -65,5 +66,13 @@ kubectl autoscale deployment hooksniff-worker --min=1 --max=5 --cpu-percent=70 -
         />
       </section>
     </article>
+  );
+}
+
+export default function KubernetesPage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <KubernetesContent />
+    </Suspense>
   );
 }

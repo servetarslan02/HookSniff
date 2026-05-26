@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import SdkTabs from '@/components/SdkTabs';
 import { Check, Lock, RefreshCw, Ruler, Shield, X } from '@/components/icons';
 import CodeBlock from '@/components/CodeBlock';
@@ -370,7 +371,7 @@ app.post("webhook") { req async throws -> Response in
   },
 ];
 
-export default function WebhookVerificationPage() {
+async function WebhookVerificationContent() {
   return (
     <article className="prose prose-gray max-w-none">
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">
@@ -554,5 +555,13 @@ valid = any(verify(sig, secret) for sig in sigs)`}
         />
       </section>
     </article>
+  );
+}
+
+export default function WebhookVerificationPage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <WebhookVerificationContent />
+    </Suspense>
   );
 }

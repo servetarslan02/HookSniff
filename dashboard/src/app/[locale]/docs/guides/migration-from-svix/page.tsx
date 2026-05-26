@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import CodeBlock from '@/components/CodeBlock';
 import { BarChart3, DollarSign, Package, Plug, Radio, RefreshCw, Shuffle } from '@/components/icons';
 import type { Metadata } from 'next';
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
  description: 'Migrate from Svix to HookSniff: SDK changes, API differences, and step-by-step guide',
 };
 
-export default function MigrationFromSvixPage() {
+async function MigrationFromSvixContent() {
  return (
   <article className="prose prose-gray max-w-none">
    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2"><RefreshCw size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> Migration from Svix</h1>
@@ -225,4 +226,12 @@ signature = "v1," + base64(hmac_sha256(secret, signed_content))
    </section>
   </article>
  );
+}
+
+export default function MigrationFromSvixPage() {
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-8 w-64 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" /><div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" /><div className="h-64 w-full rounded bg-gray-200 dark:bg-gray-700" /></div>}>
+      <MigrationFromSvixContent />
+    </Suspense>
+  );
 }
