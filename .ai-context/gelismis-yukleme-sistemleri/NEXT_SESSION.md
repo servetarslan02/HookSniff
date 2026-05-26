@@ -33,32 +33,35 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 | 10 | Turbopack | 8 | ✅ | — | Zaten aktif (Next.js 16 default) |
 | 11 | React Compiler | 9 | ✅ | — | Zaten aktif (reactCompiler: true) |
 | 12 | **PPR** | **10** | **✅** | **2026-05-26** | **1b037609** |
-| 13 | Infinite Scroll | 12 | ⏳ | — | — |
-| 14 | <Activity/> | 11 | ⏳ | — | — |
+| 13 | **<Activity/>** | **11** | **⏳** | **—** | **—** |
+| 14 | Infinite Scroll | 12 | ⏳ | — | — |
 | 15 | Service Worker + PWA | 13 | ⏳ | — | — |
 | 16 | TanStack DB | 14 | ⏳ | — | — |
 
 ---
 
-## 🔜 Sıradaki Adım: Infinite Scroll (Katman 12)
+## 🔜 Sıradaki Adım: <Activity/> (Katman 11)
 
 ### PPR (Katman 10) — TAMAMLANDI ✅
 
 **Yapılan:**
-1. **Dashboard layout** → Server component'e çevrildi, `DashboardShell.tsx` client component olarak ayrıldı
-2. **Admin layout** → Server component'e çevrildi, `AdminShell.tsx` client component olarak ayrıldı
-3. **Docs layout** → Server component'e çevrildi, `DocsShell.tsx` client component olarak ayrıldı
-4. **LoadingSkeletons** → `Math.random()` hatası düzeltildi (deterministik width)
-5. **next.config.js** → `ppr: true` eklendi
-6. **Build** → 589 sayfa Partial Prerender ile generate edildi ✅
+1. Dashboard, Admin, Docs layout'ları server component'e çevrildi
+2. DashboardShell, AdminShell, DocsShell client component olarak ayrıldı
+3. LoadingSkeletons: Math.random() → deterministik width
+4. next.config.js: ppr: true eklendi
+5. Build: 589 sayfa Partial Prerender ✅
+6. Commit: 1b037609
 
-**Build Sonucu:**
-- ✅ Compiled successfully in 48s
-- ✅ 589/589 static pages generated
-- ✅ Partial Prerender (◐) aktif
-- ⚠️ INSUFFICIENT_PATH warning'leri var (api-reference sayfası, fatal değil)
+### Sıradaki Aktif Katman: <Activity/> (Katman 11)
 
-### Sıradaki Aktif Katman: Infinite Scroll (Katman 12)
+**Ne yapacak:** Aktif olmayan sekmeleri `<Activity mode="hidden">` ile sarmala → bellek tasarrufu
+
+**Adımlar:**
+1. Aktif olmayan sayfaları/sekme bileşenlerini `<Activity mode="hidden">` ile sarmala
+2. Bellek kullanımını ölç (Chrome DevTools)
+3. cargo check + cargo test + npm run build
+4. Manuel kontrol
+5. Commit + push
 
 ---
 
@@ -75,9 +78,11 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 | 7 | View Transitions | ✅ | 5 layout'ta aktif |
 | 8 | Turbopack | ✅ | Next.js 16 default |
 | 9 | React Compiler | ✅ | reactCompiler: true |
-| 10 | **PPR** | **✅** | **ppr: true, 3 layout server component** |
-
-**Sonraki adım:** Infinite Scroll (Katman 12) — useInfiniteScroll hook oluştur
+| 10 | PPR | ✅ | ppr: true, 3 layout server component |
+| 11 | **<Activity/>** | **⏳** | **Sıradaki adım** |
+| 12 | Infinite Scroll | ⏳ | — |
+| 13 | Service Worker + PWA | ⏳ | — |
+| 14 | TanStack DB | ⏳ | — |
 
 ---
 
@@ -110,20 +115,17 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 
 ### Yapılan
 1. **PPR (Katman 10) tamamlandı:**
-   - `DashboardShell.tsx` — client component (351 satır)
-   - `AdminShell.tsx` — client component (334 satır)
-   - `DocsShell.tsx` — client component (285 satır)
+   - DashboardShell.tsx, AdminShell.tsx, DocsShell.tsx — client component olarak ayrıldı
    - 3 layout server component'e çevrildi
-   - `LoadingSkeletons.tsx` — Math.random() düzeltmesi
-   - `next.config.js` — `ppr: true` eklendi
-2. **Build başarılı** — 589 sayfa Partial Prerender ✅
-3. **GitHub'a push edildi** — commit: 1b037609
+   - LoadingSkeletons: Math.random() düzeltmesi
+   - next.config.js: ppr: true
+   - Build: 589 sayfa Partial Prerender ✅
+   - Commit: 1b037609
 
-### Plan Değerlendirmesi
-- PPR (Katman 10) başarıyla tamamlandı
-- Cache Components (Katman 6) ertelendi — büyük refactor gerektiriyor
-- Sonraki adım: Infinite Scroll (Katman 12)
+### Sonraki Oturum
+- **Katman 11: <Activity/>** — Bellek tasarrufu için arka plan sekmeleri duraklat
+- Sırayla gidilecek, atlanmayacak
 
 ---
 
-*Bu dosya her oturum sonunda güncellenir. v4: PPR tamamlandı.*
+*Bu dosya her oturum sonunda güncellenir. v4: PPR tamamlandı, sıradaki: <Activity/> (Katman 11)*
