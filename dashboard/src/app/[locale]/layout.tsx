@@ -11,6 +11,7 @@ import { ReactQueryProvider } from '@/components/ReactQueryProvider';
 import { CookieConsent } from '@/components/CookieConsent';
 import { AnalyticsWrapper } from '@/components/AnalyticsWrapper';
 import { ViewTransition } from '@/components/ViewTransition';
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 import { Suspense } from 'react';
 
 const inter = Inter({
@@ -186,6 +187,7 @@ export default async function LocaleLayout({
                   </Suspense>
                   <CookieConsent />
                   <AnalyticsWrapper />
+                  <ServiceWorkerRegister />
                 </ToastProvider>
               </ReactQueryProvider>
             </AuthProvider>
