@@ -1,4 +1,4 @@
-# 📋 Sonraki Oturum Rehberi — Gelişmiş Yükleme Sistemleri (v3)
+# 📋 Sonraki Oturum Rehberi — Gelişmiş Yükleme Sistemleri (v4)
 
 > **Son güncelleme:** 2026-05-26
 > **Bu dosya her oturum başında okunur.** Yeni oturum buradan devam eder.
@@ -32,36 +32,31 @@ cat .ai-context/gelismis-yukleme-sistemleri/MEMORY.md
 | 9 | View Transitions | 7 | ✅ | — | Zaten aktif (5 layout) |
 | 10 | Turbopack | 8 | ✅ | — | Zaten aktif (Next.js 16 default) |
 | 11 | React Compiler | 9 | ✅ | — | Zaten aktif (reactCompiler: true) |
-| 12 | PPR | 10 | ⏳ | — | Altyapı hazır, config açılacak |
-| 8 | Turbopack | 8 | ⏳ | — | — |
-| 9 | React Compiler | 9 | ⏳ | — | — |
-| 10 | PPR | 10 | ⏳ | — | — |
-| 11 | Infinite Scroll | 12 | ⏳ | — | — |
-| 12 | <Activity/> | 11 | ⏳ | — | — |
-| 13 | Service Worker + PWA | 13 | ⏳ | — | — |
-| 14 | TanStack DB | 14 | ⏳ | — | — |
+| 12 | **PPR** | **10** | **✅** | **2026-05-26** | **1b037609** |
+| 13 | Infinite Scroll | 12 | ⏳ | — | — |
+| 14 | <Activity/> | 11 | ⏳ | — | — |
+| 15 | Service Worker + PWA | 13 | ⏳ | — | — |
+| 16 | TanStack DB | 14 | ⏳ | — | — |
 
 ---
 
-## 🔜 Sıradaki Adım: ADIM 9 — PPR + Infinite Scroll (Katman 10 + 12)
+## 🔜 Sıradaki Adım: Infinite Scroll (Katman 12)
 
-### Cache Components (Katman 6) — TAMAMLANDI ✅
+### PPR (Katman 10) — TAMAMLANDI ✅
 
-`cacheComponents: true` Vercel'de başarıyla build edildi. Yapılan düzeltmeler:
-- `docs/page.tsx`: `clsx` import eksik → eklendi
-- `providers/page.tsx`: `useTranslations` (client hook) → `getTranslations` (server) + `setRequestLocale` + Suspense
-- `providers.tsx`: `ReactQueryProvider` component'inden taşındı → `components/ReactQueryProvider.tsx` (route olarak algılanıyordu)
-- `focusManager.setEventListener` → `useEffect` içine taşındı (prerender safe)
-- Eksik i18n key'leri eklendi:
-  - `docsOrganization`: permDeveloper, permAnalyst, permViewAnalytics
-  - `docs`: dashboard, api, postgres, hex, OK, webhook
-  - `docsApiKeys`: tam namespace (12 key)
-  - `docs.errorCodes`: code, meaning, description
-- Vercel deploy: READY ✅
+**Yapılan:**
+1. **Dashboard layout** → Server component'e çevrildi, `DashboardShell.tsx` client component olarak ayrıldı
+2. **Admin layout** → Server component'e çevrildi, `AdminShell.tsx` client component olarak ayrıldı
+3. **Docs layout** → Server component'e çevrildi, `DocsShell.tsx` client component olarak ayrıldı
+4. **LoadingSkeletons** → `Math.random()` hatası düzeltildi (deterministik width)
+5. **next.config.js** → `ppr: true` eklendi
+6. **Build** → 589 sayfa Partial Prerender ile generate edildi ✅
 
-### PPR (Katman 10) — BLOKE ❌
-
-PPR sadece server component'lerde çalışır. Dashboard ve docs layout'ları `'use client'` olarak tanımlı. Layout'ları server component'e çevirmek büyük bir refactor.
+**Build Sonucu:**
+- ✅ Compiled successfully in 48s
+- ✅ 589/589 static pages generated
+- ✅ Partial Prerender (◐) aktif
+- ⚠️ INSUFFICIENT_PATH warning'leri var (api-reference sayfası, fatal değil)
 
 ### Sıradaki Aktif Katman: Infinite Scroll (Katman 12)
 
@@ -80,9 +75,9 @@ PPR sadece server component'lerde çalışır. Dashboard ve docs layout'ları `'
 | 7 | View Transitions | ✅ | 5 layout'ta aktif |
 | 8 | Turbopack | ✅ | Next.js 16 default |
 | 9 | React Compiler | ✅ | reactCompiler: true |
-| 10 | PPR | ⏳ | Altyapı hazır, config açılacak |
+| 10 | **PPR** | **✅** | **ppr: true, 3 layout server component** |
 
-**Sonraki adım:** Cache Components + PPR config aç
+**Sonraki adım:** Infinite Scroll (Katman 12) — useInfiniteScroll hook oluştur
 
 ---
 
@@ -111,24 +106,24 @@ PPR sadece server component'lerde çalışır. Dashboard ve docs layout'ları `'
 
 ---
 
-## 🔧 Bu Oturumda Yapılan (2026-05-26 — OpenClaw 5. Oturum)
+## 🔧 Bu Oturumda Yapılan (2026-05-26 — OpenClaw 6. Oturum)
 
 ### Yapılan
-1. **7 alternatif sayfası düzeltildi** — Eksik `{` ve `<div>` wrapper
-2. **Blog sistemi refactor edildi** — `posts.ts` çıkarıldı, `BlogPostContent.tsx` yeniden yazıldı
-3. **Changelog sayfası Suspense ile sarıldı** — `ChangelogEntryContent.tsx` oluşturuldu
-4. **Customer StoryContent yeniden yazıldı** — `useParams` ile düzeltildi
-5. **Eksik translation key'leri eklendi** — `compare.sdks`, `alternatives.*`, `customers.*`
-6. **`cacheComponents` geçici olarak devre dışı bırakıldı** — 60+ docs sayfası Suspense gerektiriyor
-7. **Build başarıyla geçti** ✅
-8. **GitHub'a push edildi** — commit: ebf5ab55
+1. **PPR (Katman 10) tamamlandı:**
+   - `DashboardShell.tsx` — client component (351 satır)
+   - `AdminShell.tsx` — client component (334 satır)
+   - `DocsShell.tsx` — client component (285 satır)
+   - 3 layout server component'e çevrildi
+   - `LoadingSkeletons.tsx` — Math.random() düzeltmesi
+   - `next.config.js` — `ppr: true` eklendi
+2. **Build başarılı** — 589 sayfa Partial Prerender ✅
+3. **GitHub'a push edildi** — commit: 1b037609
 
 ### Plan Değerlendirmesi
-- Cache Components (Katman 6) ertelendi — büyük refactor gerekiyor
-- View Transitions (Katman 7) sonraki adım olarak yapılabilir
-- Turbopack (Katman 8) zaten aktif (Next.js 16 default)
-- React Compiler (Katman 9) zaten aktif (`reactCompiler: true`)
+- PPR (Katman 10) başarıyla tamamlandı
+- Cache Components (Katman 6) ertelendi — büyük refactor gerektiriyor
+- Sonraki adım: Infinite Scroll (Katman 12)
 
 ---
 
-*Bu dosya her oturumda güncellenir. v3: Cache Components ertelendi, build düzeltmeleri yapıldı.*
+*Bu dosya her oturum sonunda güncellenir. v4: PPR tamamlandı.*
