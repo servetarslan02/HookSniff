@@ -37,26 +37,8 @@ export function AnalyticsWrapper() {
   const [consent, setConsent] = useState<boolean | null>(null);
 
   useEffect(() => {
+    // Check consent only once on mount to avoid interval overhead
     setConsent(hasAnalyticsConsent());
-
-    // Listen for cross-tab consent changes
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === LS_KEY) {
-        setConsent(hasAnalyticsConsent());
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-
-    // Poll for same-tab changes (localStorage doesn't fire events in same tab)
-    const interval = setInterval(() => {
-      const current = hasAnalyticsConsent();
-      setConsent(prev => (prev !== current ? current : prev));
-    }, 1500);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
-    };
   }, []);
 
   if (!consent) return null;
@@ -65,23 +47,6 @@ export function AnalyticsWrapper() {
     <>
       <Analytics />
       <SpeedInsights />
-      <Script
-        defer
-        src="https://static.cloudflareinsights.com/beacon.min.js"
-        data-cf-beacon='{"token": "27a349759d954a7c84fe74ded3846abe"}'
-      />
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-BKZM7CMBJR"
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-BKZM7CMBJR');
-        `}
-      </Script>
     </>
   );
 }
