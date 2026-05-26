@@ -2,7 +2,7 @@
 
 import { getErrorMessage } from '@/lib/errors';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
@@ -27,17 +27,17 @@ export default function DeliveriesPage() {
   const searchParams = useSearchParams();
   const bulkReplayEnabled = useIsFeatureEnabled('bulk_replay');
 
-  // URL-driven state — page and filter survive refresh
-  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+  // URL-driven state — filter survives refresh (page removed for infinite scroll)
   const filter = searchParams.get('status') || 'all';
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allDeliveries, setAllDeliveries] = useState<any[]>([]);
+  const prevFilterRef = useRef(filter);
 
-  const setParam = useCallback((key: string, value: string) => {
+  const setFilterParam = useCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value === 'all' || value === '1') {
-      params.delete(key);
-    } else {
-      params.set(key, value);
-    }
+    params.delete('page');
+    if (value === 'all') params.delete('status');
+    else params.set('status', value);
     const qs = params.toString();
     router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
   }, [searchParams, router, pathname]);
@@ -50,10 +50,9 @@ export default function DeliveriesPage() {
   const t = useTranslations('deliveries');
   const tc = useTranslations('common');
   const perPage = 20;
-
-  // React Query — replaces fetchData + useState + useEffect
+  const isSearching = deferredSearch.length > 0;
   const { data, isLoading, error: queryError, refetch } = useWebhooks({
-    page,
+    page: currentPage,
     status: filter === 'all' ? undefined : filter,
   });
   const replayMutation = useReplayDelivery();
@@ -63,6 +62,31 @@ export default function DeliveriesPage() {
   const loading = isLoading;
   const error = queryError ? (getErrorMessage(queryError, tc('unknownError')) || tc('failedToLoadDeliveries')) : '';
 
+  // Accumulate deliveries from all loaded pages
+  useEffect(() => {
+    if (filter !== prevFilterRef.current) {
+      // Filter changed — reset accumulated data
+      setAllDeliveries(deliveries);
+      setCurrentPage(1);
+      prevFilterRef.current = filter;
+    } else if (currentPage === 1) {
+      setAllDeliveries(deliveries);
+    } else if (deliveries.length > 0) {
+      setAllDeliveries((prev) => {
+        const existingIds = new Set(prev.map((d: any) => d.id));
+        const newItems = deliveries.filter((d: any) => !existingIds.has(d.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [deliveries, currentPage, filter]);
+
+  const hasMore = allDeliveries.length < total;
+  const handleLoadMore = useCallback(() => {
+    if (!isLoading && hasMore) {
+      setCurrentPage((p) => p + 1);
+    }
+  }, [isLoading, hasMore]);
+
   // SSE stream — real-time delivery updates as secondary data source
   const { connected: sseConnected, deliveries: sseDeliveries } = useDeliveryStream({
     token: token || '',
@@ -71,8 +95,8 @@ export default function DeliveriesPage() {
 
   // Merge SSE deliveries into the main list (deduplicate by id)
   const mergedDeliveries = useMemo(() => {
-    if (sseDeliveries.length === 0) return deliveries;
-    const existingIds = new Set(deliveries.map((d) => d.id));
+    if (sseDeliveries.length === 0) return allDeliveries;
+    const existingIds = new Set(allDeliveries.map((d: any) => d.id));
     const newFromSse = sseDeliveries
       .filter((sse) => !existingIds.has(sse.id))
       .map((sse) => ({
@@ -84,8 +108,8 @@ export default function DeliveriesPage() {
         response_status: undefined,
         created_at: sse.created_at,
       } as Delivery));
-    return [...newFromSse, ...deliveries];
-  }, [deliveries, sseDeliveries]);
+    return [...newFromSse, ...allDeliveries];
+  }, [allDeliveries, sseDeliveries]);
 
   const handleReplay = async () => {
     if (!replayTarget) return;
@@ -107,7 +131,6 @@ export default function DeliveriesPage() {
   );
 
   const totalPages = Math.ceil(total / perPage);
-  const isSearching = deferredSearch.length > 0;
 
   const toggleSelect = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -176,14 +199,7 @@ export default function DeliveriesPage() {
         ].map((f) => (
           <button
             key={f.key}
-            onClick={() => {
-              const params = new URLSearchParams(searchParams.toString());
-              params.delete('page');
-              if (f.key === 'all') params.delete('status');
-              else params.set('status', f.key);
-              const qs = params.toString();
-              router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
-            }}
+            onClick={() => setFilterParam(f.key)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
               filter === f.key
                 ? 'bg-gray-900 text-white'
@@ -326,31 +342,23 @@ export default function DeliveriesPage() {
               }
             />
 
-            {/* Pagination */}
-            {total > perPage && !isSearching && (
-              <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between">
-                <span className="text-sm text-gray-500 dark:text-slate-400">
-                  {tc('showing', { from: (page - 1) * perPage + 1, to: Math.min(page * perPage, total), total })}
-                </span>
-                <nav aria-label={tc('pagination')} className="flex gap-2">
-                  <button type="button"
-                    onClick={() => setParam('page', String(Math.max(1, page - 1)))}
-                    disabled={page === 1}
-                    aria-label={tc('previous')}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 transition"
+            {/* Infinite Scroll — loads more data when scrolling down */}
+            {hasMore && (
+              <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-center">
+                {loading ? (
+                  <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                    <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
+                    <span className="text-sm">{t('loadingDeliveries')}</span>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleLoadMore}
+                    className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
                   >
-                    {tc('previous')}
+                    {tc('showing', { from: 1, to: allDeliveries.length, total })} — {t('loadMore') || 'Daha fazla yükle'}
                   </button>
-                  <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400" aria-live="polite">{tc('pageOf', { page, totalPages })}</span>
-                  <button type="button"
-                    onClick={() => setParam('page', String(Math.min(totalPages, page + 1)))}
-                    disabled={page >= totalPages}
-                    aria-label={tc('next')}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-slate-700 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-800 dark:bg-slate-950 transition"
-                  >
-                    {tc('next')}
-                  </button>
-                </nav>
+                )}
               </div>
             )}
           </>
