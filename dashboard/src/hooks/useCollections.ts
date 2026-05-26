@@ -1,234 +1,121 @@
 'use client';
 
 /**
- * TanStack DB Live Query Hooks — Katman 14
+ * Compatibility hooks for the previous TanStack DB live-query layer.
  *
- * Reactive data hooks using TanStack DB's live queries.
- * Sub-millisecond updates when data changes.
- * Drop-in replacement for existing useQuery hooks.
+ * The live-query implementation was expensive during route transitions and
+ * caused prerender failures in Next's production build. Keep the public hook
+ * names stable, but use React Query underneath for predictable caching.
  */
 
-import { useLiveQuery } from '@tanstack/react-db';
-import { useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/lib/store';
+import { useQuery } from '@tanstack/react-query';
 import {
-  createEndpointsCollection,
-  createDeliveriesCollection,
-  createTeamsCollection,
-  createApiKeysCollection,
-  createNotificationsCollection,
-  createAlertsCollection,
-  createServiceTokensCollection,
-  createTransformsCollection,
-  createInboundConfigsCollection,
-  createApplicationsCollection,
-} from '@/lib/collections';
+  api,
+  alertsApi,
+  applicationsApi,
+  endpointsApi,
+  inboundApi,
+  notificationsApi,
+  teamsApi,
+  transformsApi,
+  webhooksApi,
+} from '@/lib/api';
+import type {
+  AlertRule,
+  ApiKeyResponse,
+  Application,
+  Delivery,
+  Endpoint,
+  InboundConfig,
+  Notification,
+  ServiceTokenResponse,
+  Team,
+  TransformRule,
+} from '@/lib/api';
+import { useAuth } from '@/lib/store';
 
-// ── Helper: safe map that filters undefined ──
-function safeMap<T>(data: unknown[] | undefined, key: string): T[] {
-  if (!data) return [];
-  return data
-    .map((d) => (d as Record<string, unknown>)?.[key])
-    .filter((item): item is T => item != null && typeof item === 'object');
+function useTokenQuery<TData>(
+  queryKey: readonly unknown[],
+  queryFn: (token: string) => Promise<TData>,
+  staleTime = 30_000
+) {
+  const { token } = useAuth();
+  return useQuery<TData>({
+    queryKey,
+    queryFn: () => queryFn(token!),
+    enabled: !!token,
+    staleTime,
+    placeholderData: (previous) => previous,
+  });
 }
 
-// ── Endpoints ──
 export function useLiveEndpoints() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const collection = useMemo(
-    () => (token ? createEndpointsCollection(token, queryClient) : null),
-    [token, queryClient]
-  );
-
-  const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ endpoint: collection }) : null
-  );
-
-  return {
-    data: safeMap<Record<string, unknown>>(data, 'endpoint'),
-    isLoading: !token || isLoading,
-    error,
-  };
+  return useTokenQuery<Endpoint[]>(['endpoints'], async (token) => {
+    const res = await endpointsApi.list(token);
+    return Array.isArray(res) ? res : [];
+  });
 }
 
-// ── Deliveries ──
 export function useLiveDeliveries(params?: { page?: number; status?: string }) {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const collection = useMemo(
-    () => (token ? createDeliveriesCollection(token, queryClient, params) : null),
-    [token, queryClient, params?.page, params?.status]
-  );
-
-  const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ delivery: collection }) : null
-  );
-
-  return {
-    data: safeMap<Record<string, unknown>>(data, 'delivery'),
-    isLoading: !token || isLoading,
-    error,
-  };
+  return useTokenQuery<Delivery[]>(['webhooks', params], async (token) => {
+    const res = await webhooksApi.list(token, params);
+    return res?.deliveries ?? [];
+  }, 15_000);
 }
 
-// ── Teams ──
 export function useLiveTeams() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const collection = useMemo(
-    () => (token ? createTeamsCollection(token, queryClient) : null),
-    [token, queryClient]
-  );
-
-  const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ team: collection }) : null
-  );
-
-  return {
-    data: safeMap<Record<string, unknown>>(data, 'team'),
-    isLoading: !token || isLoading,
-    error,
-  };
+  return useTokenQuery<Team[]>(['teams'], async (token) => {
+    const res = await teamsApi.list(token);
+    return Array.isArray(res) ? res : [];
+  });
 }
 
-// ── API Keys ──
 export function useLiveApiKeys() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const collection = useMemo(
-    () => (token ? createApiKeysCollection(token, queryClient) : null),
-    [token, queryClient]
-  );
-
-  const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ key: collection }) : null
-  );
-
-  return {
-    data: safeMap<Record<string, unknown>>(data, 'key'),
-    isLoading: !token || isLoading,
-    error,
-  };
+  return useTokenQuery<ApiKeyResponse[]>(['api-keys'], async (token) => {
+    const res = await api.getApiKeys(token);
+    return Array.isArray(res) ? res : [];
+  }, 15_000);
 }
 
-// ── Notifications ──
 export function useLiveNotifications() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const collection = useMemo(
-    () => (token ? createNotificationsCollection(token, queryClient) : null),
-    [token, queryClient]
-  );
-
-  const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ notification: collection }) : null
-  );
-
-  return {
-    data: safeMap<Record<string, unknown>>(data, 'notification'),
-    isLoading: !token || isLoading,
-    error,
-  };
+  return useTokenQuery<Notification[]>(['notifications'], async (token) => {
+    const res = await notificationsApi.list(token);
+    return Array.isArray(res) ? res : [];
+  }, 15_000);
 }
 
-// ── Alerts ──
 export function useLiveAlerts() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const collection = useMemo(
-    () => (token ? createAlertsCollection(token, queryClient) : null),
-    [token, queryClient]
-  );
-
-  const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ alert: collection }) : null
-  );
-
-  return {
-    data: safeMap<Record<string, unknown>>(data, 'alert'),
-    isLoading: !token || isLoading,
-    error,
-  };
+  return useTokenQuery<AlertRule[]>(['alerts'], async (token) => {
+    const res = await alertsApi.list(token);
+    return Array.isArray(res) ? res : [];
+  });
 }
 
-// ── Service Tokens ──
 export function useLiveServiceTokens() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const collection = useMemo(
-    () => (token ? createServiceTokensCollection(token, queryClient) : null),
-    [token, queryClient]
-  );
-
-  const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ token: collection }) : null
-  );
-
-  return {
-    data: safeMap<Record<string, unknown>>(data, 'token'),
-    isLoading: !token || isLoading,
-    error,
-  };
+  return useTokenQuery<ServiceTokenResponse[]>(['service-tokens'], async (token) => {
+    const res = await api.getServiceTokens(token);
+    return Array.isArray(res) ? res : [];
+  });
 }
 
-// ── Transforms ──
 export function useLiveTransforms(endpointId: string) {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const collection = useMemo(
-    () => (token && endpointId ? createTransformsCollection(token, queryClient, endpointId) : null),
-    [token, queryClient, endpointId]
-  );
-
-  const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ transform: collection }) : null
-  );
-
-  return {
-    data: safeMap<Record<string, unknown>>(data, 'transform'),
-    isLoading: !token || isLoading,
-    error,
-  };
+  return useTokenQuery<TransformRule[]>(['transforms', endpointId], async (token) => {
+    if (!endpointId) return [];
+    const res = await transformsApi.list(token, endpointId);
+    return Array.isArray(res) ? res : [];
+  });
 }
 
-// ── Applications ──
 export function useLiveApplications() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const collection = useMemo(
-    () => (token ? createApplicationsCollection(token, queryClient) : null),
-    [token, queryClient]
-  );
-
-  const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ app: collection }) : null
-  );
-
-  return {
-    data: safeMap<Record<string, unknown>>(data, 'app'),
-    isLoading: !token || isLoading,
-    error,
-  };
+  return useTokenQuery<Application[]>(['applications'], async (token) => {
+    const res = await applicationsApi.list(token);
+    return Array.isArray(res) ? res : [];
+  });
 }
 
-// ── Inbound Configs ──
 export function useLiveInboundConfigs() {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const collection = useMemo(
-    () => (token ? createInboundConfigsCollection(token, queryClient) : null),
-    [token, queryClient]
-  );
-
-  const { data, isLoading, error } = useLiveQuery((q) =>
-    collection ? q.from({ config: collection }) : null
-  );
-
-  return {
-    data: safeMap<Record<string, unknown>>(data, 'config'),
-    isLoading: !token || isLoading,
-    error,
-  };
+  return useTokenQuery<InboundConfig[]>(['inboundConfigs'], async (token) => {
+    const res = await inboundApi.listConfigs(token);
+    return Array.isArray(res) ? res : [];
+  });
 }
