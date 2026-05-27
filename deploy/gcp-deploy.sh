@@ -2,29 +2,23 @@
 # ═══════════════════════════════════════════════════════════════════
 # HookSniff — Google Cloud Run Deployment Script
 # ═══════════════════════════════════════════════════════════════════
-# Bu script HookSniff'ı Google Cloud Run'a deploy eder.
+# This script deploys HookSniff to Google Cloud Run with proper
+# secret management and verification.
 #
-# Gereksinimler:
+# Requirements:
 #   - Google Cloud SDK (gcloud): https://cloud.google.com/sdk/docs/install
 #   - Docker: https://docs.docker.com/get-docker/
-#   - Google Cloud hesabı ve proje: hooksniff-app
+#   - Active Google Cloud project with billing enabled
 #
-# Kullanım:
+# Usage:
 #   chmod +x deploy/gcp-deploy.sh
 #   ./deploy/gcp-deploy.sh
+#
 # ═══════════════════════════════════════════════════════════════════
 
 set -euo pipefail
 
-# ── Configuration ──
-POLAR_PRODUCT_PRO="${POLAR_PRODUCT_PRO:?Set POLAR_PRODUCT_PRO env var}"
-POLAR_PRODUCT_BUSINESS="${POLAR_PRODUCT_BUSINESS:?Set POLAR_PRODUCT_BUSINESS env var}"
-APP_URL="${APP_URL:-https://hooksniff.is-a.dev}"
-CORS_ORIGINS="${CORS_ORIGINS:-https://hooksniff.is-a.dev}"
-NOTIFY_FROM_EMAIL="${NOTIFY_FROM_EMAIL:-noreply@hooksniff.is-a.dev}"
-OTEL_EXPORTER_OTLP_ENDPOINT="${OTEL_EXPORTER_OTLP_ENDPOINT:-https://otlp-gateway-prod-eu-west-2.grafana.net/otlp}"
-
-# ── Renkli output ──
+# ── Colors ──
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -36,110 +30,146 @@ success() { echo -e "${GREEN}✅ $1${NC}"; }
 warn() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 error() { echo -e "${RED}❌ $1${NC}"; exit 1; }
 
-# ── Konfigürasyon ──
-PROJECT_ID="hooksniff-app"
-REGION="europe-west3"  # Frankfurt — Türkiye'ye ~100ms (europe-west1 yerine)
+# ── Configuration ──
+PROJECT_ID="${GCP_PROJECT_ID:-hooksniff-app}"
+REGION="${GCP_REGION:-europe-west1}"
+REPO_NAME="hooksniff"
 API_SERVICE="hooksniff-api"
 WORKER_SERVICE="hooksniff-worker"
-REPO="hooksniff"
+DASHBOARD_SERVICE="hooksniff-dashboard"
+
+# ── Verify .env.production exists ──
+if [ ! -f ".env.production" ]; then
+    error ".env.production file not found! Copy it first:\n  cp deploy/env.production.example .env.production\n  Then fill in all [REQUIRED] values"
+fi
+
+# ── Parse .env.production ──
+export $(grep -v '^#' .env.production | grep -v '^$' | xargs)
+
+# ── Validate required variables ──
+validate_env() {
+    local var=$1
+    local value=$(eval echo \$$var 2>/dev/null || echo "")
+    if [ -z "$value" ] || [[ "$value" == \[REQUIRED* ]]; then
+        error "$var is not set! Check .env.production"
+    fi
+}
+
+validate_env "DATABASE_URL"
+validate_env "REDIS_URL"
+validate_env "HMAC_SECRET"
+validate_env "JWT_SECRET"
+validate_env "POLAR_ACCESS_TOKEN"
+validate_env "POLAR_WEBHOOK_SECRET"
+validate_env "RESEND_API_KEY"
 
 echo ""
 echo "🪝 HookSniff — Google Cloud Run Deployment"
-echo "═══════════════════════════════════════════"
+echo "════════════════════════════════════════════════════════════════"
 echo ""
 
-# ── Adım 1: GCloud CLI kontrol ──
-info "Google Cloud SDK kontrol ediliyor..."
+# ── Step 1: Verify gcloud CLI ──
+info "Checking Google Cloud SDK..."
 if ! command -v gcloud &>/dev/null; then
-    error "gcloud CLI bulunamadı! Yüklemek için: https://cloud.google.com/sdk/docs/install"
+    error "gcloud CLI not found! Install from: https://cloud.google.com/sdk/docs/install"
 fi
-success "gcloud CLI bulundu: $(gcloud --version | head -1)"
+success "gcloud CLI found: $(gcloud --version | head -1)"
 
-# ── Adım 2: Proje ayarla ──
-info "Proje ayarlanıyor: $PROJECT_ID"
-gcloud config set project "$PROJECT_ID"
-success "Proje ayarlandı: $PROJECT_ID"
+# ── Step 2: Set project ──
+info "Setting GCP project: $PROJECT_ID"
+gcloud config set project "$PROJECT_ID" --quiet
+success "Project set to: $PROJECT_ID"
 
-# ── Adım 3: API'leri aktifleştir ──
-info "Gerekli API'ler aktifleştirılıyor..."
+# ── Step 3: Enable required APIs ──
+info "Enabling required Google Cloud APIs..."
 gcloud services enable \
     run.googleapis.com \
     artifactregistry.googleapis.com \
     cloudbuild.googleapis.com \
     secretmanager.googleapis.com \
+    containerregistry.googleapis.com \
     --quiet
-success "API'ler aktifleştirildi"
+success "APIs enabled"
 
-# ── Adım 4: Artifact Registry repo oluştur ──
-info "Artifact Registry repo oluşturuluyor..."
-gcloud artifacts repositories create "$REPO" \
+# ── Step 4: Create Artifact Registry repository ──
+info "Creating Artifact Registry repository..."
+gcloud artifacts repositories create "$REPO_NAME" \
     --repository-format=docker \
     --location="$REGION" \
     --description="HookSniff container images" \
-    --quiet 2>/dev/null || warn "Repo zaten mevcut"
-success "Artifact Registry repo hazır: $REGION-docker.pkg.dev/$PROJECT_ID/$REPO"
+    --quiet 2>/dev/null || warn "Repository already exists"
+success "Artifact Registry ready: $REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME"
 
-# ── Adım 5: Docker'ı Artifact Registry'e bağla ──
-info "Docker Artifact Registry'e bağlanıyor..."
+# ── Step 5: Configure Docker authentication ──
+info "Configuring Docker authentication..."
 gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
-success "Docker bağlandı"
+success "Docker authenticated with Artifact Registry"
 
-# ── Adım 6: Secret'ları oluştur ──
-info "Secret'lar Google Secret Manager'a yükleniyor..."
+# ── Step 6: Create/Update Secrets in Secret Manager ──
+info "Managing secrets in Google Secret Manager..."
 
-# .env.production dosyasından secret'ları oku
-if [ ! -f .env.production ]; then
-    error ".env.production dosyası bulunamadı! Lütfen önce oluşturun."
-fi
-
-# Her secret için Google Secret Manager'a yükle
-create_secret() {
-    local name=$1
-    local value=$2
-    if [ -z "$value" ]; then
-        warn "Secret '$name' boş, atlanıyor"
-        return
+create_or_update_secret() {
+    local secret_name=$1
+    local secret_value=$2
+    
+    if gcloud secrets describe "$secret_name" --project="$PROJECT_ID" &>/dev/null; then
+        echo -n "$secret_value" | gcloud secrets versions add "$secret_name" --data-file=- --project="$PROJECT_ID" --quiet
+        warn "Secret '$secret_name' updated"
+    else
+        echo -n "$secret_value" | gcloud secrets create "$secret_name" \
+            --data-file=- \
+            --replication-policy="automatic" \
+            --project="$PROJECT_ID" \
+            --quiet
+        success "Secret '$secret_name' created"
     fi
-    echo -n "$value" | gcloud secrets create "$name" \
-        --data-file=- \
-        --replication-policy="automatic" \
-        --quiet 2>/dev/null || \
-    echo -n "$value" | gcloud secrets versions add "$name" \
-        --data-file=- \
-        --quiet 2>/dev/null || \
-    warn "Secret '$name' güncellenemedi"
 }
 
-# .env.production'dan secret'ları oku
-source <(grep -v '^#' .env.production | grep -v '^$' | sed 's/^/export /')
+# Create secrets from .env.production
+create_or_update_secret "hooksniff-db-url" "$DATABASE_URL"
+create_or_update_secret "hooksniff-redis-url" "$REDIS_URL"
+create_or_update_secret "hooksniff-hmac-secret" "$HMAC_SECRET"
+create_or_update_secret "hooksniff-jwt-secret" "$JWT_SECRET"
+create_or_update_secret "hooksniff-encryption-key" "${ENCRYPTION_KEY:-}"
+create_or_update_secret "hooksniff-polar-token" "$POLAR_ACCESS_TOKEN"
+create_or_update_secret "hooksniff-polar-webhook-secret" "$POLAR_WEBHOOK_SECRET"
+create_or_update_secret "hooksniff-resend-api-key" "$RESEND_API_KEY"
+create_or_update_secret "hooksniff-otel-headers" "${OTEL_EXPORTER_OTLP_HEADERS:-}"
 
-create_secret "hooksniff-hmac-secret" "$HMAC_SECRET"
-create_secret "hooksniff-jwt-secret" "$JWT_SECRET"
-create_secret "hooksniff-database-url" "$DATABASE_URL"
-create_secret "hooksniff-redis-url" "$REDIS_URL"
-create_secret "hooksniff-polar-token" "$POLAR_ACCESS_TOKEN"
-create_secret "hooksniff-polar-webhook-secret" "$POLAR_WEBHOOK_SECRET"
-create_secret "hooksniff-resend-api-key" "$RESEND_API_KEY"
-create_secret "hooksniff-otel-headers" "$OTEL_EXPORTER_OTLP_HEADERS"
+success "Secrets synchronized to Google Secret Manager"
 
-success "Secret'lar yüklendi"
+# ── Step 7: Build Docker images ──
+API_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/api:latest"
+WORKER_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/worker:latest"
+DASHBOARD_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/dashboard:latest"
 
-# ── Adım 7: Docker image'ları build ve push ──
-API_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO/api:latest"
-WORKER_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO/worker:latest"
+info "Building API image..."
+docker build -f Dockerfile.api -t "$API_IMAGE" . --quiet
+success "API image built"
 
-info "API image build ediliyor..."
-docker build -f Dockerfile.api -t "$API_IMAGE" .
-docker push "$API_IMAGE"
-success "API image push edildi: $API_IMAGE"
+info "Building Worker image..."
+docker build -f Dockerfile.worker -t "$WORKER_IMAGE" . --quiet
+success "Worker image built"
 
-info "Worker image build ediliyor..."
-docker build -f Dockerfile.worker -t "$WORKER_IMAGE" .
-docker push "$WORKER_IMAGE"
-success "Worker image push edildi: $WORKER_IMAGE"
+info "Building Dashboard image..."
+docker build -f Dockerfile.dashboard -t "$DASHBOARD_IMAGE" . --quiet
+success "Dashboard image built"
 
-# ── Adım 8: Cloud Run API servisi deploy ──
-info "API Cloud Run'a deploy ediliyor..."
+# ── Step 8: Push images to Artifact Registry ──
+info "Pushing API image to Artifact Registry..."
+docker push "$API_IMAGE" --quiet
+success "API image pushed"
+
+info "Pushing Worker image to Artifact Registry..."
+docker push "$WORKER_IMAGE" --quiet
+success "Worker image pushed"
+
+info "Pushing Dashboard image to Artifact Registry..."
+docker push "$DASHBOARD_IMAGE" --quiet
+success "Dashboard image pushed"
+
+# ── Step 9: Deploy API to Cloud Run ──
+info "Deploying API to Cloud Run..."
 gcloud run deploy "$API_SERVICE" \
     --image="$API_IMAGE" \
     --region="$REGION" \
@@ -150,51 +180,68 @@ gcloud run deploy "$API_SERVICE" \
     --cpu=1 \
     --min-instances=0 \
     --max-instances=3 \
-    --set-env-vars="APP_ENV=production,PORT=3000,RUST_LOG=info,hooksniff=info,LOG_FORMAT=json,CORS_ORIGINS=${CORS_ORIGINS},APP_URL=${APP_URL},POLAR_PRODUCT_PRO=${POLAR_PRODUCT_PRO},POLAR_PRODUCT_BUSINESS=${POLAR_PRODUCT_BUSINESS},POLAR_ENV=production,RATE_LIMIT_STORE=redis,RETENTION_DAYS=7,WEBHOOK_FORMAT=standard,NOTIFY_FROM_EMAIL=${NOTIFY_FROM_EMAIL},OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT},MAX_PAYLOAD_BYTES=1048576,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300" \
-    --set-secrets="HMAC_SECRET=hooksniff-hmac-secret:latest,JWT_SECRET=hooksniff-jwt-secret:latest,DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest" \
+    --timeout=300 \
+    --set-env-vars="APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,WEBHOOK_FORMAT=standard,MAX_PAYLOAD_BYTES=1048576,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,RATE_LIMIT_STORE=redis,OTEL_ENABLED=${OTEL_ENABLED:-false}" \
+    --set-secrets="DATABASE_URL=hooksniff-db-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,JWT_SECRET=hooksniff-jwt-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest" \
+    --project="$PROJECT_ID" \
     --quiet
 
-API_URL=$(gcloud run services describe "$API_SERVICE" --region="$REGION" --format='value(status.url)')
-success "API deploy edildi: $API_URL"
+API_URL=$(gcloud run services describe "$API_SERVICE" --region="$REGION" --format='value(status.url)' --project="$PROJECT_ID")
+success "API deployed: $API_URL"
 
-# ── Adım 9: Cloud Run Worker servisi deploy ──
-info "Worker Cloud Run'a deploy ediliyor..."
+# ── Step 10: Deploy Worker to Cloud Run ──
+info "Deploying Worker to Cloud Run..."
 gcloud run deploy "$WORKER_SERVICE" \
     --image="$WORKER_IMAGE" \
     --region="$REGION" \
     --platform=managed \
     --no-allow-unauthenticated \
-    --memory=256Mi \
+    --memory=512Mi \
     --cpu=1 \
     --min-instances=0 \
-    --max-instances=2 \
-    --set-env-vars="APP_ENV=production,RUST_LOG=info,hooksniff=info,NOTIFY_FROM_EMAIL=noreply@hooksniff.is-a.dev,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp" \
-    --set-secrets="DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest" \
+    --max-instances=4 \
+    --set-env-vars="APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json" \
+    --set-secrets="DATABASE_URL=hooksniff-db-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest" \
+    --project="$PROJECT_ID" \
     --quiet
 
-success "Worker deploy edildi"
+success "Worker deployed"
 
-# ── Adım 10: Custom domain mapping ──
-info "Custom domain mapping yapılıyor..."
-gcloud run domain-mappings create \
-    --service="$API_SERVICE" \
-    --domain="api.hooksniff.is-a.dev" \
+# ── Step 11: Deploy Dashboard to Cloud Run ──
+info "Deploying Dashboard to Cloud Run..."
+gcloud run deploy "$DASHBOARD_SERVICE" \
+    --image="$DASHBOARD_IMAGE" \
     --region="$REGION" \
-    --quiet 2>/dev/null || warn "Domain mapping zaten mevcut veya Cloudflare DNS gerektirir"
+    --platform=managed \
+    --allow-unauthenticated \
+    --port=3001 \
+    --memory=256Mi \
+    --cpu=0.5 \
+    --min-instances=0 \
+    --max-instances=2 \
+    --set-env-vars="NEXT_PUBLIC_API_URL=$API_URL/v1,NODE_ENV=production" \
+    --project="$PROJECT_ID" \
+    --quiet
 
-success "Domain mapping oluşturuldu"
+DASHBOARD_URL=$(gcloud run services describe "$DASHBOARD_SERVICE" --region="$REGION" --format='value(status.url)' --project="$PROJECT_ID")
+success "Dashboard deployed: $DASHBOARD_URL"
 
-# ── Tamamlandı ──
+# ── Deployment complete ──
 echo ""
-echo "═══════════════════════════════════════════"
-echo "🎉 Deployment tamamlandı!"
+echo "════════════════════════════════════════════════════════════════"
+echo "✅ Deployment Complete!"
+echo "════════════════════════════════════════════════════════════════"
 echo ""
-echo "  API URL:     $API_URL"
-echo "  Dashboard:   https://hooksniff.is-a.dev"
-echo "  API Domain:  https://api.hooksniff.is-a.dev"
+echo "Service URLs:"
+echo "  🔌 API:       $API_URL"
+echo "  📊 Dashboard: $DASHBOARD_URL"
 echo ""
-echo "  Sonraki adımlar:"
-echo "  1. Cloudflare DNS'de api.hooksniff.is-a.dev → $API_URL CNAME ekle"
-echo "  2. Polar.sh webhook URL'ini kaydet"
-echo "  3. Resend domain doğrulamasını yap"
-echo "═══════════════════════════════════════════"
+echo "Next steps:"
+echo "  1. Test API: curl $API_URL/health"
+echo "  2. Update NEXT_PUBLIC_API_URL in Dashboard if needed"
+echo "  3. Configure custom domain: gcloud run domain-mappings create --help"
+echo "  4. View logs: gcloud run logs read $API_SERVICE --region=$REGION"
+echo ""
+echo "Project: $PROJECT_ID"
+echo "Region:  $REGION"
+echo ""
