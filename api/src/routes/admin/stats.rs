@@ -86,6 +86,11 @@ pub struct ChurnedUser {
 // ── Handlers ──────────────────────────────────────────────
 
 /// GET /v1/admin/stats — System-wide stats (cached 60s in Redis).
+///
+/// Performance: consolidated from 12 separate queries into 3 batch queries using CTEs.
+/// - Query 1: Aggregate counts (users, deliveries, endpoints, revenue, active users)
+/// - Query 2: Users by plan breakdown
+/// - Query 3: Recent signups
 pub async fn system_stats(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
@@ -99,94 +104,109 @@ pub async fn system_stats(
         }
     }
 
-    let total_users: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM customers")
-        .fetch_one(&pool)
-        .await?;
+    // ── Query 1: All aggregate counts in a single round-trip ──
+    #[derive(sqlx::FromRow)]
+    struct AggRow {
+        total_users: i64,
+        total_deliveries: i64,
+        total_revenue: f64,
+        active_users_today: i64,
+        total_endpoints: i64,
+        active_endpoints: i64,
+        users_yesterday: i64,
+        deliveries_yesterday: i64,
+        revenue_yesterday: f64,
+        active_users_yesterday: i64,
+        active_webhooks: i64,
+    }
 
-    let total_deliveries: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM deliveries")
-        .fetch_one(&pool)
-        .await?;
-
-    let revenue: (Option<f64>,) = sqlx::query_as(
-        "SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) as revenue \
-         FROM invoices WHERE status = 'paid'",
+    let agg: AggRow = sqlx::query_as::<_, AggRow>(
+        r#"
+        WITH
+          users AS (SELECT COUNT(*) AS c FROM customers),
+          deliveries AS (SELECT COUNT(*) AS c FROM deliveries),
+          revenue AS (
+            SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) AS c
+            FROM invoices WHERE status = 'paid'
+          ),
+          active_today AS (
+            SELECT COUNT(DISTINCT customer_id) AS c
+            FROM deliveries WHERE created_at >= CURRENT_DATE
+          ),
+          endpoints AS (
+            SELECT
+              COUNT(*) AS total,
+              COUNT(*) FILTER (WHERE is_active = TRUE) AS active
+            FROM endpoints
+          ),
+          users_yesterday AS (
+            SELECT COUNT(*) AS c FROM customers WHERE created_at < CURRENT_DATE
+          ),
+          deliveries_yesterday AS (
+            SELECT COUNT(*) AS c FROM deliveries WHERE created_at < CURRENT_DATE
+          ),
+          revenue_yesterday AS (
+            SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) AS c
+            FROM invoices WHERE status = 'paid' AND paid_at < CURRENT_DATE
+          ),
+          active_yesterday AS (
+            SELECT COUNT(DISTINCT customer_id) AS c
+            FROM deliveries
+            WHERE created_at >= CURRENT_DATE - INTERVAL '1 day'
+              AND created_at < CURRENT_DATE
+          ),
+          pending_webhooks AS (
+            SELECT COUNT(*) AS c FROM deliveries WHERE status = 'pending'
+          )
+        SELECT
+          users.c                       AS total_users,
+          deliveries.c                  AS total_deliveries,
+          revenue.c                     AS total_revenue,
+          active_today.c                AS active_users_today,
+          endpoints.total               AS total_endpoints,
+          endpoints.active              AS active_endpoints,
+          users_yesterday.c             AS users_yesterday,
+          deliveries_yesterday.c        AS deliveries_yesterday,
+          revenue_yesterday.c           AS revenue_yesterday,
+          active_yesterday.c            AS active_users_yesterday,
+          pending_webhooks.c            AS active_webhooks
+        FROM users, deliveries, revenue, active_today, endpoints,
+             users_yesterday, deliveries_yesterday, revenue_yesterday,
+             active_yesterday, pending_webhooks
+        "#,
     )
     .fetch_one(&pool)
     .await?;
 
-    let active_today: (i64,) = sqlx::query_as(
-        "SELECT COUNT(DISTINCT customer_id) FROM deliveries WHERE created_at >= CURRENT_DATE",
-    )
-    .fetch_one(&pool)
-    .await?;
-
+    // ── Query 2: Users by plan ──
     let users_by_plan = sqlx::query_as::<_, PlanCount>(
         "SELECT plan, COUNT(*) as count FROM customers GROUP BY plan ORDER BY count DESC",
     )
     .fetch_all(&pool)
     .await?;
 
+    // ── Query 3: Recent signups ──
     let recent_signups = sqlx::query_as::<_, RecentSignup>(
         "SELECT id, email, name, plan, created_at FROM customers ORDER BY created_at DESC LIMIT 10",
     )
     .fetch_all(&pool)
     .await?;
 
-    let users_yesterday: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM customers WHERE created_at < CURRENT_DATE",
-    )
-    .fetch_one(&pool)
-    .await?;
-
-    let deliveries_yesterday: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM deliveries WHERE created_at < CURRENT_DATE",
-    )
-    .fetch_one(&pool)
-    .await?;
-
-    let revenue_yesterday: (Option<f64>,) = sqlx::query_as(
-        "SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) as revenue \
-         FROM invoices WHERE status = 'paid' AND paid_at < CURRENT_DATE",
-    )
-    .fetch_one(&pool)
-    .await?;
-
-    let active_yesterday: (i64,) = sqlx::query_as(
-        "SELECT COUNT(DISTINCT customer_id) FROM deliveries WHERE created_at >= CURRENT_DATE - INTERVAL '1 day' AND created_at < CURRENT_DATE",
-    )
-    .fetch_one(&pool)
-    .await?;
-
-    let active_webhooks: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM deliveries WHERE status = 'pending'",
-    )
-    .fetch_one(&pool)
-    .await?;
-
-    let total_endpoints: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM endpoints")
-        .fetch_one(&pool)
-        .await?;
-
-    let active_endpoints: (i64,) =
-        sqlx::query_as("SELECT COUNT(*) FROM endpoints WHERE is_active = TRUE")
-            .fetch_one(&pool)
-            .await?;
-
     let stats = SystemStats {
-        total_users: total_users.0,
-        total_deliveries: total_deliveries.0,
-        total_revenue: revenue.0.unwrap_or(0.0),
-        active_users_today: active_today.0,
-        total_endpoints: total_endpoints.0,
-        active_endpoints: active_endpoints.0,
+        total_users: agg.total_users,
+        total_deliveries: agg.total_deliveries,
+        total_revenue: agg.total_revenue,
+        active_users_today: agg.active_users_today,
+        total_endpoints: agg.total_endpoints,
+        active_endpoints: agg.active_endpoints,
         users_by_plan,
         recent_signups,
         trends: StatsTrends {
-            total_users_yesterday: users_yesterday.0,
-            total_deliveries_yesterday: deliveries_yesterday.0,
-            revenue_yesterday: revenue_yesterday.0.unwrap_or(0.0),
-            active_users_yesterday: active_yesterday.0,
-            active_webhooks: active_webhooks.0,
+            total_users_yesterday: agg.users_yesterday,
+            total_deliveries_yesterday: agg.deliveries_yesterday,
+            revenue_yesterday: agg.revenue_yesterday,
+            active_users_yesterday: agg.active_users_yesterday,
+            active_webhooks: agg.active_webhooks,
         },
     };
 
@@ -205,6 +225,11 @@ pub async fn system_stats(
 }
 
 /// GET /v1/admin/revenue — Full revenue response (cached 60s in Redis).
+///
+/// Performance: consolidated from 5 queries into 3:
+/// - Query 1: Monthly revenue (last 12 months) + MRR + collected revenue in one scan
+/// - Query 2: Revenue by plan
+/// - Query 3: Customer counts (total + churned) for churn rate
 pub async fn revenue_by_month(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
@@ -221,6 +246,7 @@ pub async fn revenue_by_month(
         }
     }
 
+    // ── Query 1: Monthly revenue breakdown (last 12 months) ──
     let monthly_revenue = sqlx::query_as::<_, RevenueRow>(
         r#"SELECT
             TO_CHAR(DATE_TRUNC('month', NOW()) - (n || ' months')::interval, 'YYYY-MM') as month,
@@ -238,6 +264,7 @@ pub async fn revenue_by_month(
     .fetch_all(&pool)
     .await?;
 
+    // ── Query 2: Revenue by plan (single scan) ──
     let revenue_by_plan = sqlx::query_as::<_, RevenueByPlan>(
         r#"SELECT
             plan,
@@ -252,27 +279,48 @@ pub async fn revenue_by_month(
     .fetch_all(&pool)
     .await?;
 
-    let mrr: (Option<f64>,) = sqlx::query_as(
-        "SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) as mrr \
-         FROM invoices \
-         WHERE status = 'paid' \
-           AND paid_at >= DATE_TRUNC('month', NOW())",
+    // ── Query 3: MRR + collected + customer counts in one CTE ──
+    #[derive(sqlx::FromRow)]
+    struct RevenueAgg {
+        mrr: f64,
+        collected_revenue: f64,
+        total_customers: i64,
+        churned: i64,
+    }
+
+    let agg: RevenueAgg = sqlx::query_as::<_, RevenueAgg>(
+        r#"
+        WITH
+          mrr AS (
+            SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) AS v
+            FROM invoices
+            WHERE status = 'paid' AND paid_at >= DATE_TRUNC('month', NOW())
+          ),
+          collected AS (
+            SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) AS v
+            FROM invoices WHERE status = 'paid'
+          ),
+          customers AS (
+            SELECT COUNT(*) AS total FROM customers
+          ),
+          churned AS (
+            SELECT COUNT(*) AS c
+            FROM customers
+            WHERE is_active = FALSE AND updated_at >= NOW() - INTERVAL '30 days'
+          )
+        SELECT
+          mrr.v             AS mrr,
+          collected.v       AS collected_revenue,
+          customers.total   AS total_customers,
+          churned.c         AS churned
+        FROM mrr, collected, customers, churned
+        "#,
     )
     .fetch_one(&pool)
     .await?;
 
-    let total_customers: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM customers")
-        .fetch_one(&pool)
-        .await?;
-
-    let churned: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM customers WHERE is_active = FALSE AND updated_at >= NOW() - INTERVAL '30 days'",
-    )
-    .fetch_one(&pool)
-    .await?;
-
-    let churn_rate = if total_customers.0 > 0 {
-        (churned.0 as f64 / total_customers.0 as f64) * 100.0
+    let churn_rate = if agg.total_customers > 0 {
+        (agg.churned as f64 / agg.total_customers as f64) * 100.0
     } else {
         0.0
     };
@@ -291,20 +339,13 @@ pub async fn revenue_by_month(
         0.0
     };
 
-    let collected_revenue: (Option<f64>,) = sqlx::query_as(
-        "SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) \
-         FROM invoices WHERE status = 'paid'",
-    )
-    .fetch_one(&pool)
-    .await?;
-
     let revenue_response = RevenueResponse {
         monthly_revenue,
         revenue_by_plan,
-        mrr: mrr.0.unwrap_or(0.0),
+        mrr: agg.mrr,
         churn_rate,
         mrr_trend,
-        collected_revenue: collected_revenue.0.unwrap_or(0.0),
+        collected_revenue: agg.collected_revenue,
     };
 
     if let Some(ref cache) = cache_layer {
