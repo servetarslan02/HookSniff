@@ -47,6 +47,7 @@ export function useQueueStatus(enabled = true) {
     queryFn: validated(() => adminApi.getQueueStatus(token!), QueueStatusSchema),
     enabled: !!token && enabled,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -58,6 +59,7 @@ export function useFailedDeliveries(params?: { limit?: number; since?: string })
     queryFn: validated(() => adminApi.getFailedDeliveries(token!, params), FailedDeliveriesResponseSchema),
     enabled: !!token && !!params,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -80,6 +82,7 @@ export function useRateLimitViolations(params?: { limit?: number; since?: string
     queryFn: validated(() => adminApi.getRateLimitViolations(token!, params), RateLimitViolationsResponseSchema),
     enabled: !!token && !!params,
     staleTime: 15_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
