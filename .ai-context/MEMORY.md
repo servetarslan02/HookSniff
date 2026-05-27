@@ -1,6 +1,6 @@
 # MEMORY.md — HookSniff Proje Hafızası
 
-> Son güncelleme: 2026-05-27 GMT+8 (OpenClaw — Performans Optimizasyonu v2: reactCompiler varsayılan, status counts 4→1 API, staleTime artırıldı)
+> Son güncelleme: 2026-05-27 GMT+8 (OpenClaw — Performans Optimizasyonu v4: staleTime 30sn, auto-refresh)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 - burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış, kendine süre tut 45-50 dk sonra uyarı ver durma en son gelismis-yukleme-sistemleri ni yaptık ama kullanıcı ve admin sayfalarında tablolar falan tıkladığımda açılıp güncel veriileri arkada belli etmeden çekmip güncellemitor her sayfa en az 1000 ms de çalışıyor hala tarayıcıdan aç yavaşlığın sebebini loglardan bak hataları bul ve optimize et. muhalkak tarayıcı kontrolü yapıyorsun ilk iş olarak kod kontrolüyşe falan uğraşma hesap bilgileri next-sessıon da var. işten sonra vercel build hataları çıkarsa düzelt: vercel:  vcp_1QcjDdCNwpMj8mCNf1UoDBMat1Yi128aMhzmJE4FzEF31aiTZJ3qfJ2h
 gcp json : {
@@ -460,7 +460,25 @@ Dunning email'leri dönem bitmeden GÖNDERİLİR:
 
 ---
 
-## 📝 Son Oturum (2026-05-27 — OpenClaw Dashboard Performans Optimizasyonu)
+## 📝 Son Oturum (2026-05-27 — OpenClaw Performans Optimizasyonu v4)
+
+### Özet
+Servet ile OpenClaw oturumu. staleTime ve auto-refresh optimizasyonu. 3 dosya değişti.
+
+### Yapılan İşler:
+1. **Global staleTime:** 60sn → 30sn — sayfa geçişlerinde daha taze veri
+2. **Deliveries auto-refresh:** Toggle vardı ama veri çekme bağlı değildi → 30sn'de bir refetch
+3. **Build:** ✅ exit 0
+4. **Push:** `1f61b627`
+
+### Değişen Dosyalar:
+- `dashboard/src/components/ReactQueryProvider.tsx` — staleTime
+- `dashboard/src/app/[locale]/(dashboard)/deliveries/DeliveriesContent.tsx` — auto-refresh
+- `.ai-context/NEXT_SESSION.md` — güncellendi
+
+---
+
+## 📝 Önceki Oturum (2026-05-27 — OpenClaw Dashboard Performans Optimizasyonu)
 
 ### Özet
 Servet ile OpenClaw oturumu. Dashboard performans sorunları tespit edildi ve düzeltildi. 14 dosya değişti, 87 satır eklendi.

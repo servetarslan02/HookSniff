@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-27 (OpenClaw — Performans Optimizasyonu v3: Duplicate API Temizliği)
+> **Son güncelleme:** 2026-05-27 (OpenClaw — Performans Optimizasyonu v4: staleTime + Auto-Refresh)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -9,7 +9,12 @@
 
 Build stabil. `npm run build` → exit 0 ✅
 
-### Son Yapılan İş (2026-05-27 — Performans Optimizasyonu v3: Duplicate API + JWT Auth Cache)
+### Son Yapılan İş (2026-05-27 — Performans Optimizasyonu v4: staleTime + Auto-Refresh)
+- **Global staleTime:** 60sn → 30sn (sayfa geçişlerinde daha taze veri)
+- **Deliveries auto-refresh:** Toggle var ama veri çekme bağlı değildi → artık 30sn'de bir refetch
+- **Commit:** `1f61b627`
+
+### Önceki Yapılan İş (2026-05-27 — Performans Optimizasyonu v3: Duplicate API + JWT Auth Cache)
 - **NotificationCenter:** 4 doğrudan API çağrısı → React Query hook'ları (cached, deduplicated)
 - **BroadcastBanner:** doğrudan fetch → `useBroadcasts` React Query hook'u
 - **EmailVerificationBanner:** ayrı `/auth/me` fetch'i → store'dan `email_verified` okuma (0 API)
