@@ -231,7 +231,7 @@ impl Metrics {
 
         let pool_size = pool.size();
         let pool_idle = pool.num_idle();
-        let pool_active = pool_size - pool_idle;
+        let pool_active = pool_size - (pool_idle as u32);
 
         output.push_str("# HELP hooksniff_db_pool_size Total DB pool connections\n");
         output.push_str("# TYPE hooksniff_db_pool_size gauge\n");
