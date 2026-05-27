@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-28 (OpenClaw — Performans Optimizasyonu v5: Admin CTE + Batch Hooks)
+> **Son güncelleme:** 2026-05-28 (OpenClaw — Güvenlik Fix + Kod Analizi)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -8,6 +8,15 @@
 ## ✅ Build Durumu: ÇALIŞIYOR
 
 Build stabil. `npm run build` → exit 0 ✅
+
+### Son Yapılan İş (2026-05-28 — OpenClaw Oturumu: Güvenlik Fix + Kod Analiz)
+- **Worker response header sızıntısı düzeltildi:** `delivery/http.rs` — Set-Cookie, Authorization gibi hassas header'lar artık saklanmıyor
+- **Commit:** `97328281`
+- **Kod analizi:** 114 sessiz catch bloğu tespit edildi (çoğu Cortex sayfalarında, kasıtlı)
+- **Admin stats/revenue CTE:** sağlam, Redis cache 60sn TTL
+- **Dashboard auth:** Token yönetimi doğru (proactive refresh + BroadcastChannel)
+- **idempotency hash:** Zaten SHA-256 (önceki oturumda düzeltilmiş)
+- **GCP log erişimi:** sandbox'ta gcloud CLI yok — Servet GCP Console'dan logları çekmeli
 
 ### Son Yapılan İş (2026-05-28 — Performans Optimizasyonu v5: Admin CTE + Batch Hooks + DB Indexes)
 - **Backend admin/stats.rs:** 12 ayrı DB sorgusu → 3 CTE sorgusu (tek round-trip)
