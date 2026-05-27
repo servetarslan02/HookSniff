@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-27 (OpenClaw — Performans Optimizasyonu v2)
+> **Son güncelleme:** 2026-05-27 (OpenClaw — Performans Optimizasyonu v3: Duplicate API Temizliği)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -9,7 +9,16 @@
 
 Build stabil. `npm run build` → exit 0 ✅
 
-### Son Yapılan İş (2026-05-27 — Performans Optimizasyonu v2)
+### Son Yapılan İş (2026-05-27 — Performans Optimizasyonu v3: Duplicate API Temizliği)
+- **NotificationCenter:** 4 doğrudan API çağrısı → React Query hook'ları (cached, deduplicated)
+- **BroadcastBanner:** doğrudan fetch → `useBroadcasts` React Query hook'u
+- **EmailVerificationBanner:** ayrı `/auth/me` fetch'i → store'dan `email_verified` okuma (0 API)
+- **Store:** `email_verified` User interface'ine eklendi
+- **Yeni hook'lar:** `useBroadcasts.ts`, `useUnreadCounts.ts`
+- **Sonuç:** 19 → 12 API çağrısı sayfa başına (%37 azalma), broadcasts ve teams duplicate'ları tamamen silindi
+- **Commit:** `0b212b12`
+
+### Önceki Yapılan İş (2026-05-27 — Performans Optimizasyonu v2)
 - **`reactCompiler: true` varsayılan olarak açıldı** — `NEXT_EXPERIMENTAL_PERF` env var kaldırıldı, artık her build'de aktif
 - **`cacheComponents: true` varsayılan olarak açıldı**
 - **`useStatusCounts` optimizasyonu:** 4 ayrı API çağrısı → 1 (`/v1/stats` endpoint'i kullanılıyor) — %75 daha az ağ trafiği
@@ -75,12 +84,13 @@ Build stabil. `npm run build` → exit 0 ✅
 ## 🔜 Sonraki Adımlar
 
 ### Öncelik Sırası
-1. tarayıcıdan sayfa ms leri ölçüleceka ve yüksek ms sebepleri bulunup düzeltilecek en önemli öncelik bu giriş servetarslan02@gmail.com  Alayci_165 bu en öncelikli iş muhakkak tarayıcıdan lomtrol yapışacak ilk işle. olarak
-1. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
-2. **DB Sorgu Optimizasyonu** — slow query log, index optimizasyonu (6 oturum)
-3. **API Hızlandırma** — auth cache, rate limiting Redis'e taşıma (8 oturum)
-4. **Webhook Hızlandırma** — Redis Streams queue (10 oturum)
-5. **Cold Start** — minScale:1 (0.5 oturum)
+1. **API yavaşlıkları (500-900ms)** — Rust backend yavaş, Cloud Run cold start veya DB sorguları. Backend log'larına bak, slow query'leri bul. en önemli iş bu
+2. **auth/me hâlâ 2x çağrılıyor** — store'dan bir kez, muhtemelen usePermissions veya useTeams'den bir kez daha. Tekilleştir.
+3. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
+4. **DB Sorgu Optimizasyonu** — slow query log, index optimizasyonu (6 oturum)
+5. **API Hızlandırma** — auth cache, rate limiting Redis'e taşıma (8 oturum)
+6. **Webhook Hızlandırma** — Redis Streams queue (10 oturum)
+7. **Cold Start** — minScale:1 (0.5 oturum)
 
 ### Kritik Notlar
 
