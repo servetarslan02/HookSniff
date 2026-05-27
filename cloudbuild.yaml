@@ -23,9 +23,9 @@ steps:
       - '-f'
       - 'Dockerfile.api'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:$SHORT_SHA'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/api:$SHORT_SHA'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
       - '.'
     waitFor: ['run-migrations']
 
@@ -38,9 +38,9 @@ steps:
       - '-f'
       - 'Dockerfile.worker'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:$SHORT_SHA'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:$SHORT_SHA'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
       - '.'
     waitFor: ['run-migrations']
 
@@ -53,9 +53,9 @@ steps:
       - '-f'
       - 'Dockerfile.dashboard'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/dashboard:$SHORT_SHA'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/dashboard:$SHORT_SHA'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/dashboard:latest'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/dashboard:latest'
       - '.'
     waitFor: ['-']
 
@@ -64,7 +64,7 @@ steps:
     id: 'push-api'
     args:
       - 'push'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
     waitFor: ['build-api']
 
   # Step 6: Push Worker image
@@ -72,7 +72,7 @@ steps:
     id: 'push-worker'
     args:
       - 'push'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
     waitFor: ['build-worker']
 
   # Step 7: Push Dashboard image
@@ -80,7 +80,7 @@ steps:
     id: 'push-dashboard'
     args:
       - 'push'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/hooksniff/dashboard:latest'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/dashboard:latest'
     waitFor: ['build-dashboard']
 
   # Step 8: Deploy API to Cloud Run
