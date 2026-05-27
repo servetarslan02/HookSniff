@@ -105,7 +105,7 @@ Build stabil. `npm run build` → exit 0 ✅
 
 ### Öncelik Sırası
 1. ~~**API yavaşlıkları (500-900ms)**~~ → JWT auth cache eklendi, deploy sonrası test et
-2. ~~**GCP logları**~~ → Health endpoint kontrol edildi, API sağlıklı (DB 23ms, queue boş)
+2. öncelikli işin gcp logları çekip tüm hataları düzeltmek ne gerekiyorsa kur bağlan çöz
 3. ~~**auth/me 2x çağrılıyor**~~ → React Strict Mode useRef guard ile düzeltildi
 4. ~~**DB Index Optimizasyonu**~~ → Migration 102: 9 yeni index eklendi
 5. **API Hızlandırma** — auth cache, rate limiting Redis'e taşıma (8 oturum)
