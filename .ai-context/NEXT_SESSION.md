@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-27 (OpenClaw — Performans Optimizasyonu v4: staleTime + Auto-Refresh)
+> **Son güncelleme:** 2026-05-28 (OpenClaw — Performans Optimizasyonu v5: Admin CTE + Batch Hooks)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -9,7 +9,21 @@
 
 Build stabil. `npm run build` → exit 0 ✅
 
-### Son Yapılan İş (2026-05-27 — Performans Optimizasyonu v4: staleTime + Auto-Refresh)
+### Son Yapılan İş (2026-05-28 — Performans Optimizasyonu v5: Admin CTE + Batch Hooks)
+- **Backend admin/stats.rs:** 12 ayrı DB sorgusu → 3 CTE sorgusu (tek round-trip)
+  - AggRow struct ile tüm aggregate'ler tek sorguda
+  - users_by_plan ve recent_signups ayrı (zaten hızlı)
+- **Backend admin/revenue.rs:** 5 sorgu → 3 sorgu (MRR + collected + churn tek CTE'de)
+- **Backend stats.rs (user):** 2 sorgu → 1 CTE (deliveries + endpoints)
+- **Frontend useAdminBatch.ts:** Yeni hook — 8 API çağrısı → 3 paralel grup
+  - Group 1 (immediate): stats + revenue
+  - Group 2 (300ms deferred): queue + failed deliveries
+  - Group 3 (500ms deferred): audit logs + feature flags + deploy info + rate limits
+- **Admin page:** Batched hooks kullanıyor
+- **placeholderData:** Admin stats, users, queue, failed-deliveries, rate-limit hook'larına eklendi
+- **Commit:** `293f6975`
+
+### Önceki Yapılan İş (2026-05-27 — Performans Optimizasyonu v4: staleTime + Auto-Refresh)
 - **Global staleTime:** 60sn → 30sn (sayfa geçişlerinde daha taze veri)
 - **Deliveries auto-refresh:** Toggle var ama veri çekme bağlı değildi → artık 30sn'de bir refetch
 - **Commit:** `1f61b627`
