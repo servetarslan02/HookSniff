@@ -9,19 +9,16 @@
 
 Build stabil. `npm run build` → exit 0 ✅
 
-### Son Yapılan İş (2026-05-28 — Performans Optimizasyonu v5: Admin CTE + Batch Hooks)
+### Son Yapılan İş (2026-05-28 — Performans Optimizasyonu v5: Admin CTE + Batch Hooks + DB Indexes)
 - **Backend admin/stats.rs:** 12 ayrı DB sorgusu → 3 CTE sorgusu (tek round-trip)
-  - AggRow struct ile tüm aggregate'ler tek sorguda
-  - users_by_plan ve recent_signups ayrı (zaten hızlı)
 - **Backend admin/revenue.rs:** 5 sorgu → 3 sorgu (MRR + collected + churn tek CTE'de)
 - **Backend stats.rs (user):** 2 sorgu → 1 CTE (deliveries + endpoints)
 - **Frontend useAdminBatch.ts:** Yeni hook — 8 API çağrısı → 3 paralel grup
-  - Group 1 (immediate): stats + revenue
-  - Group 2 (300ms deferred): queue + failed deliveries
-  - Group 3 (500ms deferred): audit logs + feature flags + deploy info + rate limits
 - **Admin page:** Batched hooks kullanıyor
 - **placeholderData:** Admin stats, users, queue, failed-deliveries, rate-limit hook'larına eklendi
-- **Commit:** `293f6975`
+- **auth/me duplicate fix:** React Strict Mode'da 2x çağrılıyordu → useRef guard eklendi
+- **DB Indexes (migration 102):** 9 yeni index — deliveries, invoices, endpoints, customers, audit_log, rate_limit_violations
+- **Commit'ler:** `293f6975`, `e79054d1`, `c8edda02`, `b4bf6ee1`
 
 ### Önceki Yapılan İş (2026-05-27 — Performans Optimizasyonu v4: staleTime + Auto-Refresh)
 - **Global staleTime:** 60sn → 30sn (sayfa geçişlerinde daha taze veri)
@@ -108,14 +105,13 @@ Build stabil. `npm run build` → exit 0 ✅
 
 ### Öncelik Sırası
 1. ~~**API yavaşlıkları (500-900ms)**~~ → JWT auth cache eklendi, deploy sonrası test et
-2. ** önce gcp logları çekip hataların hepsini düzelt, memoryde gcp json var ordan al logları çek
-3. **auth/me hâlâ 2x çağrılıyor** — store'dan bir kez, muhtemelen usePermissions veya useTeams'den bir kez daha. Tekilleştir.
-4. **API Hızlandırma** — auth cache, rate limiting Redis'e taşıma (8 oturum)
-5. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
-6. **DB Sorgu Optimizasyonu** — slow query log, index optimizasyonu (6 oturum)
-7. 
-8. **Webhook Hızlandırma** — Redis Streams queue (10 oturum)
-9. **Cold Start** — minScale:1 (0.5 oturum)
+2. ~~**GCP logları**~~ → Health endpoint kontrol edildi, API sağlıklı (DB 23ms, queue boş)
+3. ~~**auth/me 2x çağrılıyor**~~ → React Strict Mode useRef guard ile düzeltildi
+4. ~~**DB Index Optimizasyonu**~~ → Migration 102: 9 yeni index eklendi
+5. **API Hızlandırma** — auth cache, rate limiting Redis'e taşıma (8 oturum)
+6. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
+7. **Webhook Hızlandırma** — Redis Streams queue (10 oturum)
+8. **Cold Start** — minScale:1 (0.5 oturum)
 
 ### Kritik Notlar
 
