@@ -16,6 +16,128 @@ use crate::error::AppError;
 use crate::models::customer::Customer;
 
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use tokio::sync::Mutex;
+use std::time::Instant;
+use uuid::Uuid;
+use sqlx::PgPool;
+
+/// Layer 1: In-memory cache for team tracking info
+const TEAM_CACHE_TTL: std::time::Duration = std::time::Duration::from_secs(10);
+const TEAM_CACHE_MAX_ENTRIES: usize = 1000;
+
+struct TeamCache {
+    entries: HashMap<Uuid, (models::TeamTrackingInfo, Instant)>,
+}
+
+impl TeamCache {
+    fn new() -> Self {
+        Self {
+            entries: HashMap::new(),
+        }
+    }
+
+    fn get(&self, team_id: &Uuid) -> Option<models::TeamTrackingInfo> {
+        self.entries.get(team_id).and_then(|(info, expiry)| {
+            if Instant::now() < *expiry {
+                Some(info.clone())
+            } else {
+                None
+            }
+        })
+    }
+
+    fn insert(&mut self, team_id: Uuid, info: models::TeamTrackingInfo) {
+        if self.entries.len() >= TEAM_CACHE_MAX_ENTRIES {
+            self.entries.retain(|_, (_, expiry)| Instant::now() < *expiry);
+        }
+        self.entries.insert(team_id, (info, Instant::now() + TEAM_CACHE_TTL));
+    }
+}
+
+static TEAM_CACHE: once_cell::sync::Lazy<Mutex<TeamCache>> =
+    once_cell::sync::Lazy::new(|| Mutex::new(TeamCache::new()));
+
+/// Resolve the effective webhook limit and the customer_id to track usage against.
+/// Uses dual-layer cache (in-memory + Redis) to minimize DB lookups.
+pub async fn resolve_team_tracking(
+    pool: &PgPool,
+    cache: &Option<crate::cache::CacheLayer>,
+    customer: &Customer,
+    team_id: Option<Uuid>,
+) -> models::TeamTrackingInfo {
+    let tid = match team_id {
+        Some(id) => id,
+        None => return models::TeamTrackingInfo {
+            tracking_id: customer.id,
+            plan: customer.plan.clone(),
+            webhook_limit: customer.webhook_limit,
+            allow_overage: customer.allow_overage,
+            overage_email_notification: customer.overage_email_notification,
+        },
+    };
+
+    // 1. Try In-memory cache
+    {
+        let cache_lock = TEAM_CACHE.lock().await;
+        if let Some(info) = cache_lock.get(&tid) {
+            return info;
+        }
+    }
+
+    // 2. Try Redis cache
+    let redis_cached: Option<models::TeamTrackingInfo> = if let Some(ref c) = cache {
+        c.get("team_tracking", &tid.to_string()).await
+    } else {
+        None
+    };
+
+    if let Some(info) = redis_cached {
+        let mut cache_lock = TEAM_CACHE.lock().await;
+        cache_lock.insert(tid, info.clone());
+        return info;
+    }
+
+    // 3. Cache miss — query DB
+    let result: Option<(Uuid, String, i64, bool, bool)> = sqlx::query_as(
+        "SELECT c.id, c.plan, c.webhook_limit, c.allow_overage, c.overage_email_notification FROM teams t JOIN customers c ON c.id = t.owner_id WHERE t.id = $1"
+    )
+    .bind(tid)
+    .fetch_optional(pool)
+    .await
+    .ok()
+    .flatten();
+
+    let info = if let Some((owner_id, plan, limit, allow_overage, overage_email)) = result {
+        models::TeamTrackingInfo {
+            tracking_id: owner_id,
+            plan,
+            webhook_limit: limit,
+            allow_overage,
+            overage_email_notification: overage_email,
+        }
+    } else {
+        // Fallback to customer's own limits if team resolution fails
+        models::TeamTrackingInfo {
+            tracking_id: customer.id,
+            plan: customer.plan.clone(),
+            webhook_limit: customer.webhook_limit,
+            allow_overage: customer.allow_overage,
+            overage_email_notification: customer.overage_email_notification,
+        }
+    };
+
+    // Populate caches
+    if let Some(ref c) = cache {
+        c.set_with_ttl("team_tracking", &tid.to_string(), &info, crate::cache::PLAN_TTL).await;
+    }
+    {
+        let mut cache_lock = TEAM_CACHE.lock().await;
+        cache_lock.insert(tid, info.clone());
+    }
+
+    info
+}
 
 /// Subscription plan definitions with limits
 /// New plan structure: Developer ($0) / Startup ($29) / Pro ($49) / Enterprise (Custom)

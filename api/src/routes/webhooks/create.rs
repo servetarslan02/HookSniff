@@ -25,6 +25,7 @@ pub async fn create_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
+    Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     Extension(is_test): Extension<crate::middleware::IsTestKey>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Extension(feature_flags): Extension<FeatureFlagService>,
@@ -121,15 +122,34 @@ pub async fn create_webhook(
         return Err(AppError::PayloadTooLarge);
     }
 
-    // Verify endpoint exists and belongs to customer
-    let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
-    )
-    .bind(req.endpoint_id)
-    .bind(customer.id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::NotFound)?;
+    // Verify endpoint exists and belongs to customer (Use cache for Phase 3)
+    let endpoint_key = format!("{}:{}", customer.id, req.endpoint_id);
+    let endpoint: Endpoint = if let Some(ref c) = cache {
+        if let Some(cached) = c.get::<Endpoint>("endpoint", &endpoint_key).await {
+            cached
+        } else {
+            let ep = sqlx::query_as::<_, Endpoint>(
+                "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+            )
+            .bind(req.endpoint_id)
+            .bind(customer.id)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::NotFound)?;
+            
+            c.set_with_ttl("endpoint", &endpoint_key, &ep, crate::cache::ENDPOINT_TTL).await;
+            ep
+        }
+    } else {
+        sqlx::query_as::<_, Endpoint>(
+            "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND customer_id = $2 AND is_active = true",
+        )
+        .bind(req.endpoint_id)
+        .bind(customer.id)
+        .fetch_optional(&pool)
+        .await?
+        .ok_or(AppError::NotFound)?
+    };
 
     // Check event filter
     if let Some(ref event) = req.event {
@@ -177,7 +197,7 @@ pub async fn create_webhook(
     let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
     // Atomic check-and-increment: reserve webhook slot before creating delivery
-    reserve_webhook_slot(&pool, &customer, 1, team_id).await?;
+    reserve_webhook_slot(&pool, &cache, &customer, 1, team_id).await?;
 
     // Track daily event usage for overage notifications (best-effort)
     let _ = track_daily_event(&pool, &customer, None, team_id).await;
@@ -263,6 +283,7 @@ pub async fn batch_webhooks(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(cfg): Extension<Config>,
+    Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<BatchWebhookRequest>,
@@ -282,7 +303,7 @@ pub async fn batch_webhooks(
 
     // Atomic check-and-increment for batch: reserve slots for all webhooks in the batch
     let batch_count = req.webhooks.len() as i64;
-    reserve_webhook_slot(&pool, &customer, batch_count, team_id).await?;
+    reserve_webhook_slot(&pool, &cache, &customer, batch_count, team_id).await?;
 
     // Track daily event usage for overage notifications (best-effort, once per batch)
     let _ = track_daily_event(&pool, &customer, None, team_id).await;
@@ -425,12 +446,12 @@ pub async fn batch_webhooks(
     // Rollback excess webhook_count for failed/filtered items
     let excess = batch_count - created_count;
     if excess > 0 {
-        let (tracking_id, _, _) = resolve_team_tracking(&pool, &customer, team_id).await;
+        let info = resolve_team_tracking(&pool, &cache, &customer, team_id).await;
         let _ = sqlx::query(
             "UPDATE customers SET webhook_count = GREATEST(0, webhook_count - $1) WHERE id = $2",
         )
         .bind(excess)
-        .bind(tracking_id)
+        .bind(info.tracking_id)
         .execute(&pool)
         .await;
     }
