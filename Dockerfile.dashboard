@@ -1,5 +1,4 @@
 # ── Stage 1: Dependencies ──
-# Item 346: Pin to digest for reproducible builds
 FROM node:22-alpine AS deps
 WORKDIR /app
 
@@ -25,12 +24,14 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+    adduser --system --uid 1001 nextjs && \
+    mkdir -p /app && \
+    chown -R nextjs:nodejs /app
 
-# Copy only what's needed for production
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# Copy only production artifacts
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 

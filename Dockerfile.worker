@@ -1,38 +1,39 @@
 # ── Stage 1: Builder ──
-# Item 346: Pin to digest for reproducible builds
 FROM rust:1.95-bookworm AS builder
 
-# Install build dependencies (aws-lc-sys needs cmake + C compiler)
+# Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends pkg-config cmake && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY Cargo.toml ./
-COPY Cargo.lock ./
+COPY Cargo.toml Cargo.lock ./
 COPY api/ api/
 COPY worker/ worker/
 COPY common/ common/
 COPY vendor/ vendor/
 
-# Build release binary
+# Build release binary with optimizations
 RUN cargo build --release -p hooksniff-worker && \
     strip /app/target/release/hooksniff-worker
 
 # ── Stage 2: Runtime ──
 FROM debian:bookworm-slim
 
+# Install only runtime dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
+# Create non-root user with no shell
 RUN groupadd -r hooksniff && \
-    useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff && \
-    mkdir -p /app
+    useradd -r -g hooksniff -d /app -s /sbin/nologin -u 10001 hooksniff && \
+    mkdir -p /app && \
+    chown -R hooksniff:hooksniff /app
 
-COPY --from=builder /app/target/release/hooksniff-worker /usr/local/bin/hooksniff-worker
+COPY --from=builder --chown=hooksniff:hooksniff /app/target/release/hooksniff-worker /usr/local/bin/hooksniff-worker
 
-RUN chown -R hooksniff:hooksniff /app
+RUN chmod 755 /usr/local/bin/hooksniff-worker
 
 USER hooksniff
 WORKDIR /app
