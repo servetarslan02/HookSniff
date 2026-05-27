@@ -366,7 +366,6 @@ pub async fn auth_middleware(
 
             customer
         }
-        }
     } else {
         // JWT token authentication
         let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
