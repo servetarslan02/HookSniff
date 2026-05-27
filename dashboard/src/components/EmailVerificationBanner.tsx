@@ -3,7 +3,6 @@
 import {useState} from 'react';
 import {useTranslations} from 'next-intl';
 import {useAuth} from '@/lib/store';
-import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {API_BASE} from '@/lib/api';
 import {useToast} from '@/components/Toast';
 import {Mail, X} from '@/components/icons';
@@ -15,22 +14,9 @@ export function EmailVerificationBanner() {
  const {toast} = useToast();
  const [dismissed, setDismissed] = useState(false);
  const [sending, setSending] = useState(false);
- const queryClient = useQueryClient();
 
- // Use React Query — cached, deduplicated with store's auth/me
- const {data: meData} = useQuery({
-  queryKey: ['auth', 'me'],
-  queryFn: async () => {
-   const res = await fetch(`${API_BASE}/auth/me`, {
-    headers: {Authorization: `Bearer ${token}`},
-   });
-   if (!res.ok) throw new Error('Failed');
-   return res.json();
-  },
-  enabled: !!token && !!user,
-  staleTime: 5 * 60 * 1000, // 5 dk — email_verified nadiren değişir
- });
- const verified = meData ? (meData.email_verified ?? true) : null;
+ // Use email_verified from store — no extra API call needed
+ const verified = user?.email_verified ?? true;
 
  if (!user || dismissed || verified === null || verified) return null;
 
