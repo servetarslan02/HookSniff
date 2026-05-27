@@ -15,8 +15,11 @@ gcp json : {
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/hooksniff-deploy%40hooksniff-app.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
-}
+
+neon: postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+
 gcp hatalarınıda düzelt, panellerfe verilerde görünmüyor izleme kullanıclar vs
+
 ---
 
 ## 🚀 Hızlı Başlangıç (Her Oturum)
