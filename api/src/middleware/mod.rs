@@ -371,23 +371,57 @@ pub async fn auth_middleware(
         // JWT token authentication
         let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
 
-        // HS-261: Check if token has been revoked (individual or all-tokens-for-customer)
-        check_token_revocation(&pool, &claims).await?;
+        // Try Redis + in-memory cache first (keyed by user ID)
+        let user_id_str = claims.sub.to_string();
+        let redis_cached: Option<Customer> = if let Some(ref c) = cache {
+            c.get("jwt_user", &user_id_str).await
+        } else {
+            None
+        };
 
-        sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
-            .bind(claims.sub)
-            .fetch_optional(&*pool)
-            .await?
-            .ok_or(AppError::Unauthorized)?
-    };
+        let customer = if let Some(c) = redis_cached {
+            c
+        } else {
+            let mem_cached = {
+                let cache = AUTH_CACHE.lock().await;
+                cache.get(&user_id_str)
+            };
 
-    req.extensions_mut().insert(customer);
-    req.extensions_mut().insert(IsTestKey(is_test));
-    if let Some(team_id) = service_token_team {
-        req.extensions_mut().insert(ServiceTokenScope { team_id });
+            if let Some(c) = mem_cached {
+                // Populate Redis for other instances
+                if let Some(ref c2) = cache {
+                    c2.set("jwt_user", &user_id_str, &c).await;
+                }
+                c
+            } else {
+                // Cache miss — check revocation + fetch customer
+                check_token_revocation(&pool, &claims).await?;
+
+                let c = sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
+                    .bind(claims.sub)
+                    .fetch_optional(&*pool)
+                    .await?
+                    .ok_or(AppError::Unauthorized)?;
+
+                // Cache in both Redis and in-memory (short TTL for security)
+                if let Some(ref c2) = cache {
+                    c2.set("jwt_user", &user_id_str, &c).await;
+                }
+                {
+                    let mut mem_cache = AUTH_CACHE.lock().await;
+                    mem_cache.insert(user_id_str, c.clone());
+                }
+                c
+            }
+        };
+
+        req.extensions_mut().insert(customer);
+        req.extensions_mut().insert(IsTestKey(is_test));
+        if let Some(team_id) = service_token_team {
+            req.extensions_mut().insert(ServiceTokenScope { team_id });
+        }
+        Ok(next.run(req).await)
     }
-    Ok(next.run(req).await)
-}
 
 /// JWT-based auth middleware for dashboard routes
 pub async fn jwt_auth_middleware(
@@ -402,10 +436,7 @@ pub async fn jwt_auth_middleware(
 
     let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
 
-    // HS-261: Check if token has been revoked
-    check_token_revocation(&pool, &claims).await?;
-
-    // Try Redis cache for JWT customer lookup (keyed by user ID)
+    // Try Redis + in-memory cache for JWT customer lookup (keyed by user ID)
     let user_id_str = claims.sub.to_string();
     let redis_cached: Option<Customer> = if let Some(ref c) = cache {
         c.get("jwt_user", &user_id_str).await
@@ -415,15 +446,35 @@ pub async fn jwt_auth_middleware(
     let customer = if let Some(c) = redis_cached {
         c
     } else {
-        let c = sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
-            .bind(claims.sub)
-            .fetch_optional(&*pool)
-            .await?
-            .ok_or(AppError::Unauthorized)?;
-        if let Some(ref c2) = cache {
-            c2.set("jwt_user", &user_id_str, &c).await;
+        let mem_cached = {
+            let cache = AUTH_CACHE.lock().await;
+            cache.get(&user_id_str)
+        };
+
+        if let Some(c) = mem_cached {
+            if let Some(ref c2) = cache {
+                c2.set("jwt_user", &user_id_str, &c).await;
+            }
+            c
+        } else {
+            // Cache miss — check revocation + fetch customer
+            check_token_revocation(&pool, &claims).await?;
+
+            let c = sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
+                .bind(claims.sub)
+                .fetch_optional(&*pool)
+                .await?
+                .ok_or(AppError::Unauthorized)?;
+
+            if let Some(ref c2) = cache {
+                c2.set("jwt_user", &user_id_str, &c).await;
+            }
+            {
+                let mut mem_cache = AUTH_CACHE.lock().await;
+                mem_cache.insert(user_id_str, c.clone());
+            }
+            c
         }
-        c
     };
 
     req.extensions_mut().insert(customer);
