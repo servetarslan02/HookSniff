@@ -78,6 +78,13 @@ export default function DeliveriesContent() {
     status: filter === 'all' ? undefined : filter,
   });
 
+  // Auto-refresh: refetch every 30s when toggle is on
+  useEffect(() => {
+    if (!autoRefresh) return;
+    const interval = setInterval(() => refetch(), 30_000);
+    return () => clearInterval(interval);
+  }, [autoRefresh, refetch]);
+
   // ── Data: endpoints (for resolving endpoint_id → URL) ──
   const { data: endpointsList } = useLiveEndpoints();
   const endpointUrlMap = useMemo(() => {
