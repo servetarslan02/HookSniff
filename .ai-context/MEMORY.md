@@ -2,8 +2,12 @@
 
 > Son güncelleme: 2026-05-27 GMT+8 (OpenClaw — Performans Optimizasyonu v4: staleTime 30sn, auto-refresh)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
-- burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış, kendine süre tut 45-50 dk sonra uyarı ver durma en son gelismis-yukleme-sistemleri ni yaptık ama kullanıcı ve admin sayfalarında tablolar falan tıkladığımda açılıp güncel veriileri arkada belli etmeden çekmip güncellemitor her sayfa en az 1000 ms de çalışıyor hala tarayıcıdan aç yavaşlığın sebebini loglardan bak hataları bul ve optimize et. muhalkak tarayıcı kontrolü yapıyorsun ilk iş olarak kod kontrolüyşe falan uğraşma hesap bilgileri next-sessıon da var. işten sonra vercel build hataları çıkarsa düzelt: vercel:  vcp_1QcjDdCNwpMj8mCNf1UoDBMat1Yi128aMhzmJE4FzEF31aiTZJ3qfJ2h
-gcp json : {
+- burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış, kendine süre tut 45-50 dk sonra uyarı ver durma en son gelismis-yukleme-sistemleri ni yaptık ama kullanıcı ve admin sayfalarında tablolar falan tıkladığımda açılıp güncel veriileri arkada belli etmeden çekmip güncellemitor her sayfa en az 1000 ms de çalışıyor hala tarayıcıdan aç yavaşlığın sebebini loglardan bak hataları bul ve optimize et. muhalkak tarayıcı kontrolü yapıyorsun ilk iş olarak kod kontrolüyşe falan uğraşma hesap bilgileri next-sessıon da var. işten sonra vercel build hataları çıkarsa düzelt:
+- vercel:  vcp_1QcjDdCNwpMj8mCNf1UoDBMat1Yi128aMhzmJE4FzEF31aiTZJ3qfJ2h
+google cloud da hata var bu jsonla logları çek hataları düzelt ilk işin bu önclikli olarak
+gcp json :
+
+{
   "type": "service_account",
   "project_id": "hooksniff-app",
   "private_key_id": "38c1ec8c7b24c7a45f03d6ed87e54e0caa18e1f2",
@@ -15,6 +19,8 @@ gcp json : {
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/hooksniff-deploy%40hooksniff-app.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
+}
+
 
 neon: postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 
