@@ -1,0 +1,161 @@
+╔═════════════════════════════════════════════════════════════════╗
+║                  GCP DEPLOYMENT — QUICK START                    ║
+║                                                                 ║
+║  Read: GCP_DEPLOYMENT_GUIDE.txt (full setup instructions)        ║
+║  Read: DEPLOYMENT_FIXES_SUMMARY.txt (what was fixed)             ║
+╚═════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 1: Sign up for external services (5-10 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+☐ Neon Database     https://console.neon.tech
+☐ Upstash Redis     https://console.upstash.com
+☐ Polar.sh Payments https://polar.sh
+☐ Resend Email      https://resend.com
+☐ Google Cloud      https://console.cloud.google.com (with billing)
+
+Get credentials from each and save to clipboard
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 2: Configure environment (2-5 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+$ cp deploy/env.production.example .env.production
+$ nano .env.production
+
+Fill these [REQUIRED] fields:
+  ☐ DATABASE_URL (from Neon)
+  ☐ REDIS_URL (from Upstash)
+  ☐ HMAC_SECRET (generate: openssl rand -hex 32)
+  ☐ JWT_SECRET (generate: openssl rand -hex 32)
+  ☐ POLAR_ACCESS_TOKEN (from Polar.sh)
+  ☐ POLAR_WEBHOOK_SECRET (from Polar.sh)
+  ☐ POLAR_PRODUCT_PRO (from Polar.sh)
+  ☐ POLAR_PRODUCT_BUSINESS (from Polar.sh)
+  ☐ RESEND_API_KEY (from Resend)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 3: Authenticate with Google Cloud (1-2 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+$ gcloud auth login
+$ gcloud config set project hooksniff-app
+
+Verify:
+$ gcloud auth list  → Should show ACTIVE
+$ gcloud config get-value project  → Should show: hooksniff-app
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 4: Deploy to Google Cloud Run (10-15 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+$ chmod +x deploy/gcp-deploy.sh
+$ ./deploy/gcp-deploy.sh
+
+This will:
+  ✓ Validate .env.production
+  ✓ Enable GCP APIs
+  ✓ Create Artifact Registry
+  ✓ Build Docker images (takes ~5-10 min for Rust)
+  ✓ Push to Google Cloud
+  ✓ Deploy API, Worker, Dashboard
+  ✓ Output service URLs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 5: Verify deployment is working (2-3 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+$ bash deploy/troubleshoot-gcp.sh all
+
+Or manually:
+$ curl https://hooksniff-api-XXXXX.run.app/health
+$ gcloud run logs read hooksniff-api --limit=20
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT'S BEEN FIXED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ cloudbuild.yaml — Fixed migration step, secret references, dashboard
+✅ Dockerfile.api — Security fixes, Cloud Run compatibility
+✅ Dockerfile.worker — Security fixes, Cloud Run compatibility  
+✅ Dockerfile.dashboard — Fixed permissions and healthchecks
+✅ deploy/env.production.example — Clear requirements with links
+✅ deploy/gcp-deploy.sh — Robust error handling & validation
+✅ deploy/troubleshoot-gcp.sh — Diagnostic checks + error guide
+✅ GCP_DEPLOYMENT_GUIDE.txt — Complete setup walkthrough
+
+See: DEPLOYMENT_FIXES_SUMMARY.txt for detailed explanation
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Problem: .env.production not found
+→ $ cp deploy/env.production.example .env.production
+
+Problem: Secret validation fails
+→ Check which fields are [REQUIRED] and fill them
+
+Problem: Docker build fails
+→ $ docker build -f Dockerfile.api . (test locally)
+
+Problem: API returns 502 Bad Gateway
+→ $ gcloud run logs read hooksniff-api --limit=50
+
+Problem: "permission denied" or "gcloud not found"
+→ Install Google Cloud SDK: https://cloud.google.com/sdk/docs/install
+
+Run diagnostics:
+→ $ bash deploy/troubleshoot-gcp.sh all
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+USEFUL LINKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Google Cloud:
+  • Console: https://console.cloud.google.com
+  • Cloud Run: https://console.cloud.google.com/run
+  • Secrets: https://console.cloud.google.com/security/secret-manager
+  • Logs: https://console.cloud.google.com/logs/query
+
+Services:
+  • Neon: https://console.neon.tech
+  • Upstash: https://console.upstash.com
+  • Polar.sh: https://dashboard.polar.sh
+  • Resend: https://resend.com
+
+Documentation:
+  • Cloud Run Docs: https://cloud.google.com/run/docs
+  • Full guide: See GCP_DEPLOYMENT_GUIDE.txt
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ESTIMATED TIME TOTAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+☐ Sign up for services:          5-10 min
+☐ Configure .env.production:     2-5 min
+☐ Google Cloud auth:             1-2 min
+☐ Run deploy script:             10-15 min (includes ~5-10 min Rust build)
+☐ Verify deployment:             2-3 min
+                              ──────────────
+TOTAL:                           25-40 minutes
+
+Once deployed, Cloud Run handles auto-scaling and uptime.
+Free tier covers 2M requests/month + 360K vCPU-seconds.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AFTER DEPLOYMENT (Optional)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+☐ Set up custom domain
+☐ Enable Cloud Build triggers for auto-deploy
+☐ Configure monitoring & alerts
+☐ Set up database backups
+☐ Tune auto-scaling policies
+
+See GCP_DEPLOYMENT_GUIDE.txt Step 6 for details.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Ready? Start with: $ cp deploy/env.production.example .env.production
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

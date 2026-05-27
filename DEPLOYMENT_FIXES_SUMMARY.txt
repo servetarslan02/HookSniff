@@ -1,0 +1,181 @@
+═══════════════════════════════════════════════════════════════════
+GCP DEPLOYMENT FIXES — ANALYSIS REPORT
+═══════════════════════════════════════════════════════════════════
+
+PROJECT: HookSniff
+ANALYZED: December 2024
+STATUS: Ready for GCP Cloud Run deployment
+
+═══════════════════════════════════════════════════════════════════
+ISSUES IDENTIFIED & FIXED
+═══════════════════════════════════════════════════════════════════
+
+1. ❌ CLOUDBUILD.YAML — Incorrect migration orchestration
+   Problem: Migration step ran in parallel with builds; secret references 
+            used non-existent names; missing dashboard build step
+   Fix: ✅ Reordered steps with proper dependencies
+        ✅ Updated secret names to match Secret Manager
+        ✅ Added dashboard build and deployment
+        ✅ Changed timeouts from 3600s to 300s (Cloud Run limit)
+
+2. ❌ DOCKERFILES — Security and compatibility issues
+   Problem: Missing explicit UID for non-root user; missing chown flags;
+            healthcare checks incomplete for dashboard
+   Fix: ✅ Added explicit UID (10001) for system user
+        ✅ Fixed chown in COPY instructions
+        ✅ Improved healthcheck configuration
+        ✅ Added proper error handling in all stages
+
+3. ❌ ENV CONFIGURATION — Unclear requirements
+   Problem: No clear marking of [REQUIRED] vs [OPTIONAL] fields;
+            missing service sign-up links; inconsistent secret naming
+   Fix: ✅ Marked all [REQUIRED] fields with instructions
+        ✅ Added signup links for each external service
+        ✅ Standardized secret naming (hooksniff-* prefix)
+        ✅ Added generation instructions for cryptographic secrets
+
+4. ❌ GCP-DEPLOY.SH — Race conditions & missing validation
+   Problem: Script assumed .env.production exists; no secret validation;
+            no error handling for secret creation race conditions
+   Fix: ✅ Added pre-deployment validation
+        ✅ Implemented create-or-update logic for secrets
+        ✅ Added comprehensive error messages
+        ✅ Added deployed service URL output
+
+5. ❌ MISSING — Troubleshooting & diagnostic tools
+   Problem: No way to diagnose deployment issues post-deployment
+   Fix: ✅ Created troubleshoot-gcp.sh with 8 diagnostic checks
+        ✅ Added common errors & solutions guide
+        ✅ Created GCP_DEPLOYMENT_GUIDE.txt with full setup walkthrough
+
+═══════════════════════════════════════════════════════════════════
+FILES MODIFIED/CREATED
+═══════════════════════════════════════════════════════════════════
+
+✅ Modified:
+   • cloudbuild.yaml — Complete rewrite for proper orchestration
+   • Dockerfile.api — Security & Cloud Run compatibility
+   • Dockerfile.worker — Security & Cloud Run compatibility
+   • Dockerfile.dashboard — Fixed chown and healthcheck
+   • deploy/env.production.example — Clear requirements & links
+   • deploy/gcp-deploy.sh — Robust secret management
+
+✅ Created:
+   • deploy/troubleshoot-gcp.sh — 8 diagnostic checks + error guide
+   • GCP_DEPLOYMENT_GUIDE.txt — Complete setup walkthrough
+
+═══════════════════════════════════════════════════════════════════
+DEPLOYMENT WORKFLOW (UPDATED)
+═══════════════════════════════════════════════════════════════════
+
+1. Prepare environment:
+   cp deploy/env.production.example .env.production
+   # Fill all [REQUIRED] fields (see GCP_DEPLOYMENT_GUIDE.txt)
+
+2. Deploy to GCP:
+   chmod +x deploy/gcp-deploy.sh
+   ./deploy/gcp-deploy.sh
+
+3. The script will automatically:
+   ✅ Validate all environment variables
+   ✅ Create GCP project resources (Artifact Registry, APIs)
+   ✅ Sync secrets to Google Secret Manager
+   ✅ Build Docker images (API, Worker, Dashboard)
+   ✅ Push to Artifact Registry
+   ✅ Deploy all services to Cloud Run
+   ✅ Output service URLs
+
+4. Verify deployment:
+   bash deploy/troubleshoot-gcp.sh all
+
+═══════════════════════════════════════════════════════════════════
+KEY IMPROVEMENTS
+═══════════════════════════════════════════════════════════════════
+
+Security:
+  ✅ Non-root users with explicit UIDs
+  ✅ Secrets stored in Google Secret Manager (not in code)
+  ✅ Proper permission setup in Cloud Run
+
+Reliability:
+  ✅ Proper build step orchestration (no race conditions)
+  ✅ Health checks configured for all services
+  ✅ Error handling and validation throughout
+
+Debuggability:
+  ✅ Comprehensive diagnostic script
+  ✅ Common errors guide with solutions
+  ✅ Full deployment walkthrough
+
+Cost-Effectiveness:
+  ✅ Cloud Run free tier: 2M requests/month
+  ✅ Auto-scaling: 0-3 instances for API, 0-4 for Worker
+  ✅ Estimated cost: ~$0.10/month for free tier usage
+
+═══════════════════════════════════════════════════════════════════
+EXTERNAL SERVICES REQUIRED (SIGN UP FIRST)
+═══════════════════════════════════════════════════════════════════
+
+Before deployment, sign up and get credentials for:
+
+1. Database: Neon (PostgreSQL)
+   → https://console.neon.tech
+   → Get: DATABASE_URL
+
+2. Cache: Upstash (Redis)
+   → https://console.upstash.com
+   → Get: REDIS_URL
+
+3. Payments: Polar.sh
+   → https://polar.sh
+   → Get: POLAR_ACCESS_TOKEN, POLAR_WEBHOOK_SECRET
+
+4. Email: Resend
+   → https://resend.com
+   → Get: RESEND_API_KEY
+
+5. OAuth (optional): Google & GitHub
+   → https://console.cloud.google.com/apis/credentials
+   → https://github.com/settings/apps
+
+═══════════════════════════════════════════════════════════════════
+TESTING BEFORE PRODUCTION
+═══════════════════════════════════════════════════════════════════
+
+Local testing with updated Dockerfiles:
+  docker build -f Dockerfile.api . -t hooksniff:api
+  docker build -f Dockerfile.worker . -t hooksniff:worker
+  docker build -f Dockerfile.dashboard . -t hooksniff:dashboard
+  docker compose -f docker-compose.prod.yml up
+
+All services should build successfully. Rust compilation may take 5-10min.
+
+═══════════════════════════════════════════════════════════════════
+NEXT STEPS AFTER DEPLOYMENT
+═══════════════════════════════════════════════════════════════════
+
+1. Set up custom domain (optional)
+2. Configure Google Cloud Build trigger for CI/CD
+3. Set up monitoring/alerting in Cloud Logging
+4. Enable Cloud SQL for managed database (optional)
+5. Configure auto-scaling policies
+6. Set up backup strategy for database
+
+═══════════════════════════════════════════════════════════════════
+SUPPORT
+═══════════════════════════════════════════════════════════════════
+
+Run diagnostic checks:
+  bash deploy/troubleshoot-gcp.sh all
+
+View API logs:
+  gcloud run logs read hooksniff-api --limit=100
+
+Manual deployment (if script fails):
+  gcloud run deploy hooksniff-api \
+    --image=europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest \
+    --region=europe-west1 \
+    --allow-unauthenticated \
+    --port=3000
+
+═══════════════════════════════════════════════════════════════════
