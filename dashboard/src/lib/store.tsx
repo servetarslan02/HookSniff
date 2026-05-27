@@ -86,7 +86,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [updateToken]);
 
   // On mount: restore user info from localStorage, then verify session in background
+  // useRef guard prevents double-fetch in React Strict Mode (dev only)
+  const didInitRef = useRef(false);
   useEffect(() => {
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+
     const savedToken = localStorage.getItem('hooksniff_token');
     const storedUser = localStorage.getItem(STORAGE_KEY);
 
