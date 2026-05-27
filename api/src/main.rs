@@ -36,10 +36,32 @@ async fn main() -> Result<()> {
     validate_encryption_key(&cfg)?;
     validate_jwt_config()?;
 
-    // ── Database ────────────────────────────────────────────────
-    let pool = db::create_pool(&cfg.database_url).await?;
+    // ── Database & Services (Parallel Initialization for Phase 7) ────────────────
+    let db_url = cfg.database_url.clone();
+    let redis_url = config::resolve_redis_url();
 
-    let health_pool = match db::create_health_pool(&cfg.database_url).await {
+    let (pool_res, rate_limiter, cache_layer) = tokio::join!(
+        db::create_pool(&db_url),
+        rate_limit::create_rate_limiter(),
+        async {
+            if let Some(ref url) = redis_url {
+                match cache::CacheLayer::new(url, cache::API_KEY_TTL).await {
+                    Ok(c) => Some(c),
+                    Err(e) => {
+                        tracing::warn!("Redis cache unavailable ({e}), running without cache");
+                        None
+                    }
+                }
+            } else {
+                tracing::info!("Redis URL not configured, running without cache");
+                None
+            }
+        }
+    );
+
+    let pool = pool_res?;
+
+    let health_pool = match db::create_health_pool(&db_url).await {
         Ok(p) => {
             tracing::info!("✅ Health check pool created (5 connections)");
             db::HealthPool(p)
@@ -52,25 +74,7 @@ async fn main() -> Result<()> {
 
     // ── Shared services ─────────────────────────────────────────
     let metrics = std::sync::Arc::new(metrics::Metrics::new());
-    let rate_limiter = rate_limit::create_rate_limiter().await;
     let throttle_manager = throttle::ThrottleManager::new();
-
-    let cache_layer = match config::resolve_redis_url() {
-        Some(url) => match cache::CacheLayer::new(&url, cache::API_KEY_TTL).await {
-            Ok(c) => {
-                tracing::info!("✅ Redis cache layer connected");
-                Some(c)
-            }
-            Err(e) => {
-                tracing::warn!("Redis cache unavailable ({e}), running without cache");
-                None
-            }
-        },
-        None => {
-            tracing::info!("Redis URL not configured, running without cache");
-            None
-        }
-    };
 
     // Feature flags (DB-backed, refreshes every 60s)
     let feature_flag_service = feature_flags::FeatureFlagService::new(pool.clone()).await;

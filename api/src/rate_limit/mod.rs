@@ -491,9 +491,11 @@ fn extract_api_key_prefix(req: &Request) -> Option<String> {
 /// Axum middleware for plan-based rate limiting with proper headers.
 pub async fn rate_limit_middleware(
     limiter: axum::extract::Extension<RateLimiter>,
+    metrics: axum::extract::Extension<Arc<crate::metrics::Metrics>>,
     req: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
+    let start = Instant::now();
     let key = extract_key(&req);
 
     // Try to determine the customer's plan
@@ -505,6 +507,9 @@ pub async fn rate_limit_middleware(
 
     let plan_limit = plan.max_requests_per_minute();
     let result = limiter.check_with_headers(&key, plan_limit).await;
+
+    // Record rate limit latency
+    metrics.rate_limit_latency_seconds.observe(start.elapsed().as_secs_f64());
 
     // HS-038j: Use safe header insertion — skip if value is invalid instead of panicking.
     fn insert_header(headers: &mut axum::http::HeaderMap, name: &'static str, value: &str) {

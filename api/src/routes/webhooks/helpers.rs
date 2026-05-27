@@ -62,30 +62,8 @@ pub fn parse_date_to_str(s: &str) -> Option<DateTime<Utc>> {
     parse_date_str(s, (23, 59, 59))
 }
 
-/// Resolve the effective webhook limit and the customer_id to track usage against.
-/// When operating within a team, the team owner's plan limit and their webhook_count apply.
-/// Returns (tracking_customer_id, webhook_limit, allow_overage).
-pub async fn resolve_team_tracking(
-    pool: &PgPool,
-    customer: &Customer,
-    team_id: Option<Uuid>,
-) -> (Uuid, i64, bool) {
-    if let Some(tid) = team_id {
-        let result: Option<(Uuid, String, i64, bool)> = sqlx::query_as(
-            "SELECT c.id, c.plan, c.webhook_limit, c.allow_overage FROM teams t JOIN customers c ON c.id = t.owner_id WHERE t.id = $1"
-        )
-        .bind(tid)
-        .fetch_optional(pool)
-        .await
-        .ok()
-        .flatten();
-
-        if let Some((owner_id, _plan, limit, allow_overage)) = result {
-            return (owner_id, limit, allow_overage);
-        }
-    }
-    (customer.id, customer.webhook_limit, customer.allow_overage)
-}
+use crate::billing::models::TeamTrackingInfo;
+use crate::billing::resolve_team_tracking;
 
 /// Atomically increment webhook_count with overage support.
 /// When team_id is provided, webhook_count is tracked on the team owner's record
@@ -93,19 +71,19 @@ pub async fn resolve_team_tracking(
 /// Returns Err if at the limit (and overage is not allowed).
 pub async fn reserve_webhook_slot(
     pool: &PgPool,
+    cache: &Option<crate::cache::CacheLayer>,
     customer: &Customer,
     count: i64,
     team_id: Option<Uuid>,
 ) -> Result<(), AppError> {
-    let (tracking_id, effective_limit, allow_overage) =
-        resolve_team_tracking(pool, customer, team_id).await;
+    let info = resolve_team_tracking(pool, cache, customer, team_id).await;
 
-    let updated: Option<(Uuid, i64)> = if allow_overage {
+    let updated: Option<(Uuid, i64)> = if info.allow_overage {
         sqlx::query_as(
             "UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 RETURNING id, webhook_count"
         )
         .bind(count)
-        .bind(tracking_id)
+        .bind(info.tracking_id)
         .fetch_optional(pool)
         .await?
     } else {
@@ -113,8 +91,8 @@ pub async fn reserve_webhook_slot(
             "UPDATE customers SET webhook_count = webhook_count + $1 WHERE id = $2 AND webhook_count + $1 <= $3 RETURNING id, webhook_count"
         )
         .bind(count)
-        .bind(tracking_id)
-        .bind(effective_limit)
+        .bind(info.tracking_id)
+        .bind(info.webhook_limit)
         .fetch_optional(pool)
         .await?
     };

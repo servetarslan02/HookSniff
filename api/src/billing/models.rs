@@ -6,6 +6,15 @@ use serde::{Deserialize, Serialize};
 
 use super::Plan;
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TeamTrackingInfo {
+    pub tracking_id: uuid::Uuid,
+    pub plan: String,
+    pub webhook_limit: i64,
+    pub allow_overage: bool,
+    pub overage_email_notification: bool,
+}
+
 /// Usage tracking per customer
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Usage {

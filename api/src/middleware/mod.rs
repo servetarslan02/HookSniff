@@ -12,28 +12,34 @@ use crate::routes::auth::CUSTOMER_SELECT;
 
 const AUTH_COOKIE_NAME: &str = "hooksniff_token";
 const REFRESH_COOKIE_NAME: &str = "hooksniff_refresh";
-const AUTH_CACHE_TTL: Duration = Duration::from_secs(30);
+
+/// Layer 1: In-memory TTL (short to minimize inconsistency)
+const AUTH_CACHE_MEMORY_TTL: Duration = Duration::from_secs(10);
+/// Layer 2: Redis TTL
+const AUTH_CACHE_REDIS_TTL: Duration = Duration::from_secs(60);
+
 /// Maximum number of cached auth entries to prevent unbounded memory growth
 const AUTH_CACHE_MAX_ENTRIES: usize = 10_000;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
+use crate::cache::CacheLayer;
 
-/// Simple in-memory cache for auth lookups (prefix → (customer, expiry))
-/// Uses tokio::sync::Mutex to safely hold across .await points.
-struct AuthCache {
+/// Dual-layer auth cache: In-memory (L1) + Redis (L2)
+struct AuthCacheV2 {
     entries: HashMap<String, (Customer, Instant)>,
 }
 
-impl AuthCache {
+impl AuthCacheV2 {
     fn new() -> Self {
         Self {
             entries: HashMap::new(),
         }
     }
 
-    fn get(&self, prefix: &str) -> Option<Customer> {
-        self.entries.get(prefix).and_then(|(customer, expiry)| {
+    /// Try to get from L1 (in-memory)
+    fn get_l1(&self, key: &str) -> Option<Customer> {
+        self.entries.get(key).and_then(|(customer, expiry)| {
             if Instant::now() < *expiry {
                 Some(customer.clone())
             } else {
@@ -42,12 +48,11 @@ impl AuthCache {
         })
     }
 
-    fn insert(&mut self, prefix: String, customer: Customer) {
-        // Evict expired entries before inserting to bound memory usage
+    /// Insert into L1
+    fn insert_l1(&mut self, key: String, customer: Customer) {
         if self.entries.len() >= AUTH_CACHE_MAX_ENTRIES {
             self.cleanup();
         }
-        // If still at capacity after cleanup, evict oldest entry
         if self.entries.len() >= AUTH_CACHE_MAX_ENTRIES {
             if let Some(oldest_key) = self
                 .entries
@@ -59,19 +64,17 @@ impl AuthCache {
             }
         }
         self.entries
-            .insert(prefix, (customer, Instant::now() + AUTH_CACHE_TTL));
+            .insert(key, (customer, Instant::now() + AUTH_CACHE_MEMORY_TTL));
     }
 
-    /// Remove all expired entries from the cache
     fn cleanup(&mut self) {
         self.entries
             .retain(|_, (_, expiry)| Instant::now() < *expiry);
     }
 }
 
-/// Global auth cache — uses tokio::sync::Mutex for safe async access.
-static AUTH_CACHE: once_cell::sync::Lazy<Mutex<AuthCache>> =
-    once_cell::sync::Lazy::new(|| Mutex::new(AuthCache::new()));
+static AUTH_CACHE: once_cell::sync::Lazy<Mutex<AuthCacheV2>> =
+    once_cell::sync::Lazy::new(|| Mutex::new(AuthCacheV2::new()));
 
 /// Start a background task that periodically cleans up expired auth cache entries.
 /// Call this once from main.rs during server startup.
@@ -226,48 +229,49 @@ pub async fn auth_middleware(
     pool: axum::extract::Extension<PgPool>,
     cfg: axum::extract::Extension<crate::config::Config>,
     cache: axum::extract::Extension<Option<crate::cache::CacheLayer>>,
+    metrics: axum::extract::Extension<std::sync::Arc<crate::metrics::Metrics>>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, AppError> {
+    let start = Instant::now();
     let token = extract_token(&req).ok_or(AppError::Unauthorized)?;
     let cache = cache.0;
 
     let is_test = token.starts_with("hr_test_");
     let mut service_token_team: Option<Uuid> = None;
     let customer = if token.starts_with("hr_live_") || token.starts_with("hr_test_") {
-        // API key authentication — check Redis cache, then in-memory cache, then DB
+        // API key authentication — check caches then DB
         let prefix = token[..24.min(token.len())].to_string();
 
-        // 1. Try Redis cache first (shared across instances)
-        let redis_cached: Option<Customer> = if let Some(ref c) = cache {
-            c.get("apikey", &prefix).await
-        } else {
-            None
+        // 1. Try In-memory cache (L1 - fastest)
+        let mem_cached = {
+            let cache_lock = AUTH_CACHE.lock().await;
+            cache_lock.get_l1(&prefix)
         };
-        if let Some(c) = redis_cached {
+
+        if let Some(c) = mem_cached {
             c
         } else {
-            // 2. Try in-memory cache (fast, per-instance)
-            let mem_cached = {
-                let cache = AUTH_CACHE.lock().await;
-                cache.get(&prefix)
+            // 2. Try Redis cache (L2 - shared)
+            let redis_cached: Option<Customer> = if let Some(ref c) = cache {
+                c.get("apikey", &prefix).await
+            } else {
+                None
             };
 
-            if let Some(c) = mem_cached {
-                // Also populate Redis for other instances
-                if let Some(ref c2) = cache {
-                    c2.set("apikey", &prefix, &c).await;
-                }
+            if let Some(c) = redis_cached {
+                // Populate L1
+                let mut cache_lock = AUTH_CACHE.lock().await;
+                cache_lock.insert_l1(prefix, c.clone());
                 c
             } else {
-                // Cache miss — query DB (no lock held during async operations)
+                // 3. Cache miss — query DB
                 let candidates =
                     sqlx::query_as::<_, Customer>(&format!("{} WHERE api_key_prefix = $1", CUSTOMER_SELECT))
                         .bind(&prefix)
                         .fetch_all(&*pool)
                         .await?;
 
-                // Also check api_keys table for additional keys
                 let api_key_candidates: Vec<(String,)> = sqlx::query_as(
                     "SELECT api_key_hash FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
                 )
@@ -275,7 +279,6 @@ pub async fn auth_middleware(
                 .fetch_all(&*pool)
                 .await?;
 
-                // Try customers table first (legacy primary key)
                 let mut found: Option<Customer> = None;
                 for c in &candidates {
                     if verify_api_key(&token, &c.api_key_hash) {
@@ -284,7 +287,6 @@ pub async fn auth_middleware(
                     }
                 }
 
-                // If not found in customers, try api_keys table
                 if found.is_none() {
                     for (hash,) in &api_key_candidates {
                         if verify_api_key(&token, hash) {
@@ -303,7 +305,6 @@ pub async fn auth_middleware(
                     }
                 }
 
-                // If not found in api_keys, try service_tokens (organization-level tokens)
                 if found.is_none() {
                     let st_candidates: Vec<(String,)> = sqlx::query_as(
                         "SELECT token_hash FROM service_tokens WHERE token_prefix = $1 AND is_active = true",
@@ -314,8 +315,6 @@ pub async fn auth_middleware(
 
                     for (hash,) in &st_candidates {
                         if verify_api_key(&token, hash) {
-                            // Service token auth: resolve the team owner as the customer + team_id
-                            // First get the team_id from the service token
                             let team_id_opt: Option<Uuid> = sqlx::query_scalar(
                                 "SELECT t.id FROM teams t \
                                  INNER JOIN service_tokens st ON st.team_id = t.id \
@@ -327,7 +326,6 @@ pub async fn auth_middleware(
                             .await?;
 
                             if let Some(team_id) = team_id_opt {
-                                // Then fetch the team owner as customer
                                 let customer = sqlx::query_as::<_, Customer>(
                                     &format!("{} c INNER JOIN teams t ON t.owner_id = c.id WHERE t.id = $1", CUSTOMER_SELECT)
                                 )
@@ -338,7 +336,6 @@ pub async fn auth_middleware(
                                 if let Some(c) = customer {
                                     found = Some(c);
                                     service_token_team = Some(team_id);
-                                    // Update last_used_at
                                     let _ = sqlx::query(
                                         "UPDATE service_tokens SET last_used_at = NOW() WHERE token_prefix = $1 AND token_hash = $2"
                                     )
@@ -355,13 +352,13 @@ pub async fn auth_middleware(
 
                 let customer = found.ok_or(AppError::Unauthorized)?;
 
-                // Cache the result in both Redis (shared) and in-memory (fast)
+                // Populate both L1 and L2 caches
                 if let Some(ref c) = cache {
-                    c.set("apikey", &prefix, &customer).await;
+                    c.set_with_ttl("apikey", &prefix, &customer, AUTH_CACHE_REDIS_TTL).await;
                 }
                 {
                     let mut mem_cache = AUTH_CACHE.lock().await;
-                    mem_cache.insert(prefix, customer.clone());
+                    mem_cache.insert_l1(prefix, customer.clone());
                 }
 
                 customer
@@ -370,31 +367,30 @@ pub async fn auth_middleware(
     } else {
         // JWT token authentication
         let claims = crate::auth::jwt::verify_token(&token, &cfg.jwt_secret)?;
-
-        // Try Redis + in-memory cache first (keyed by user ID)
         let user_id_str = claims.sub.to_string();
-        let redis_cached: Option<Customer> = if let Some(ref c) = cache {
-            c.get("jwt_user", &user_id_str).await
-        } else {
-            None
+
+        // 1. Try L1 cache
+        let mem_cached = {
+            let cache_lock = AUTH_CACHE.lock().await;
+            cache_lock.get_l1(&user_id_str)
         };
 
-        if let Some(c) = redis_cached {
+        if let Some(c) = mem_cached {
             c
         } else {
-            let mem_cached = {
-                let cache = AUTH_CACHE.lock().await;
-                cache.get(&user_id_str)
+            // 2. Try L2 cache
+            let redis_cached: Option<Customer> = if let Some(ref c) = cache {
+                c.get("jwt_user", &user_id_str).await
+            } else {
+                None
             };
 
-            if let Some(c) = mem_cached {
-                // Populate Redis for other instances
-                if let Some(ref c2) = cache {
-                    c2.set("jwt_user", &user_id_str, &c).await;
-                }
+            if let Some(c) = redis_cached {
+                let mut mem_cache = AUTH_CACHE.lock().await;
+                mem_cache.insert_l1(user_id_str, c.clone());
                 c
             } else {
-                // Cache miss — check revocation + fetch customer
+                // 3. Cache miss
                 check_token_revocation(&pool, &claims).await?;
 
                 let c = sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
@@ -403,18 +399,20 @@ pub async fn auth_middleware(
                     .await?
                     .ok_or(AppError::Unauthorized)?;
 
-                // Cache in both Redis and in-memory (short TTL for security)
                 if let Some(ref c2) = cache {
-                    c2.set("jwt_user", &user_id_str, &c).await;
+                    c2.set_with_ttl("jwt_user", &user_id_str, &c, AUTH_CACHE_REDIS_TTL).await;
                 }
                 {
                     let mut mem_cache = AUTH_CACHE.lock().await;
-                    mem_cache.insert(user_id_str, c.clone());
+                    mem_cache.insert_l1(user_id_str, c.clone());
                 }
                 c
             }
         }
     };
+
+    // Record auth latency metric
+    metrics.auth_latency_seconds.observe(start.elapsed().as_secs_f64());
 
     req.extensions_mut().insert(customer);
     req.extensions_mut().insert(IsTestKey(is_test));
@@ -430,9 +428,11 @@ pub async fn jwt_auth_middleware(
     pool: axum::extract::Extension<PgPool>,
     cfg: axum::extract::Extension<crate::config::Config>,
     cache: axum::extract::Extension<Option<crate::cache::CacheLayer>>,
+    metrics: axum::extract::Extension<std::sync::Arc<crate::metrics::Metrics>>,
     mut req: Request,
     next: Next,
 ) -> Result<Response, AppError> {
+    let start = Instant::now();
     let token = extract_token(&req).ok_or(AppError::Unauthorized)?;
     let cache = cache.0;
 
@@ -440,26 +440,29 @@ pub async fn jwt_auth_middleware(
 
     // Try Redis + in-memory cache for JWT customer lookup (keyed by user ID)
     let user_id_str = claims.sub.to_string();
-    let redis_cached: Option<Customer> = if let Some(ref c) = cache {
-        c.get("jwt_user", &user_id_str).await
-    } else {
-        None
+
+    // 1. Try L1 cache
+    let mem_cached = {
+        let cache_lock = AUTH_CACHE.lock().await;
+        cache_lock.get_l1(&user_id_str)
     };
-    let customer = if let Some(c) = redis_cached {
+
+    let customer = if let Some(c) = mem_cached {
         c
     } else {
-        let mem_cached = {
-            let cache = AUTH_CACHE.lock().await;
-            cache.get(&user_id_str)
+        // 2. Try L2 cache
+        let redis_cached: Option<Customer> = if let Some(ref c) = cache {
+            c.get("jwt_user", &user_id_str).await
+        } else {
+            None
         };
 
-        if let Some(c) = mem_cached {
-            if let Some(ref c2) = cache {
-                c2.set("jwt_user", &user_id_str, &c).await;
-            }
+        if let Some(c) = redis_cached {
+            let mut mem_cache = AUTH_CACHE.lock().await;
+            mem_cache.insert_l1(user_id_str, c.clone());
             c
         } else {
-            // Cache miss — check revocation + fetch customer
+            // 3. Cache miss — check revocation + fetch customer
             check_token_revocation(&pool, &claims).await?;
 
             let c = sqlx::query_as::<_, Customer>(&format!("{} WHERE id = $1", CUSTOMER_SELECT))
@@ -469,15 +472,17 @@ pub async fn jwt_auth_middleware(
                 .ok_or(AppError::Unauthorized)?;
 
             if let Some(ref c2) = cache {
-                c2.set("jwt_user", &user_id_str, &c).await;
+                c2.set_with_ttl("jwt_user", &user_id_str, &c, AUTH_CACHE_REDIS_TTL).await;
             }
             {
                 let mut mem_cache = AUTH_CACHE.lock().await;
-                mem_cache.insert(user_id_str, c.clone());
+                mem_cache.insert_l1(user_id_str, c.clone());
             }
             c
         }
     };
+
+    metrics.auth_latency_seconds.observe(start.elapsed().as_secs_f64());
 
     req.extensions_mut().insert(customer);
     Ok(next.run(req).await)
@@ -594,13 +599,19 @@ pub fn extract_refresh_token(req: &axum::extract::Request) -> Option<String> {
 
 
 /// Request metrics middleware — records latency, status code, and method for every request.
-pub async fn request_metrics_middleware(request: Request, next: Next) -> Response {
+pub async fn request_metrics_middleware(
+    metrics: axum::extract::Extension<std::sync::Arc<crate::metrics::Metrics>>,
+    request: Request,
+    next: Next
+) -> Response {
+    metrics.active_connections.inc();
     let method = request.method().clone();
     let path = request.uri().path().to_string();
     let start = std::time::Instant::now();
 
     let response = next.run(request).await;
 
+    metrics.active_connections.dec();
     let duration = start.elapsed();
     let status = response.status().as_u16();
 
