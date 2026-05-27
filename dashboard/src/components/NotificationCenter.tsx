@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
-import { notificationsApi, broadcastsApi, teamsApi, type Notification, type UserBroadcast } from '@/lib/api';
+import { notificationsApi, teamsApi, type Notification } from '@/lib/api';
+import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from '@/hooks/useNotifications';
+import { useBroadcasts, useBroadcastUnreadCount, useDismissBroadcast } from '@/hooks/useBroadcasts';
+import { useNotificationUnreadCount } from '@/hooks/useUnreadCounts';
 import { AlertTriangle, Bell, Circle, CreditCard, Users, Megaphone, Wrench, Sparkles, Radio, XCircle } from '@/components/icons';
 
 export function NotificationCenter() {
@@ -12,40 +15,23 @@ export function NotificationCenter() {
   const { token } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [broadcasts, setBroadcasts] = useState<UserBroadcast[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [broadcastCount, setBroadcastCount] = useState(0);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const fetchNotifications = useCallback(async () => {
-    if (!token) return;
-    try {
-      const [notifData, countData, broadcastData, broadcastCountData] = await Promise.all([
-        notificationsApi.list(token, { page: 1 }).catch(() => null),
-        notificationsApi.getUnreadCount(token).catch(() => null),
-        broadcastsApi.listActive(token).catch(() => null),
-        broadcastsApi.getUnreadCount(token).catch(() => null),
-      ]);
-      if (notifData) setNotifications(notifData.notifications || []);
-      if (countData) setUnreadCount(countData.unread_count || 0);
-      if (broadcastData) setBroadcasts(broadcastData || []);
-      if (broadcastCountData) setBroadcastCount(broadcastCountData.unread_count || 0);
-    } catch {
-      // Silently fail - notifications are non-critical
-    }
-  }, [token]);
+  // React Query hooks — cached, deduplicated, automatic background refetch
+  const { data: notifResponse } = useNotifications({ page: 1 });
+  const notifications = notifResponse?.notifications || [];
 
-  useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        fetchNotifications();
-      }
-    }, 120_000);
-    return () => clearInterval(interval);
-  }, [fetchNotifications]);
+  const { data: unreadData } = useNotificationUnreadCount();
+  const unreadCount = unreadData?.unread_count || 0;
+
+  const { data: broadcasts = [] } = useBroadcasts();
+  const { data: broadcastCountData } = useBroadcastUnreadCount();
+  const broadcastCount = broadcastCountData?.unread_count || 0;
+
+  const markAsReadMutation = useMarkNotificationAsRead();
+  const markAllAsReadMutation = useMarkAllNotificationsAsRead();
+  const dismissBroadcastMutation = useDismissBroadcast();
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -56,26 +42,12 @@ export function NotificationCenter() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [open]);
 
-  const handleMarkAsRead = async (id: string) => {
-    if (!token) return;
-    try {
-      await notificationsApi.markAsRead(token, id);
-      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-      setUnreadCount((c) => Math.max(0, c - 1));
-    } catch {
-      // ignore
-    }
+  const handleMarkAsRead = (id: string) => {
+    markAsReadMutation.mutate(id);
   };
 
-  const handleMarkAllAsRead = async () => {
-    if (!token) return;
-    try {
-      await notificationsApi.markAllAsRead(token);
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-      setUnreadCount(0);
-    } catch {
-      // ignore
-    }
+  const handleMarkAllAsRead = () => {
+    markAllAsReadMutation.mutate();
   };
 
   const extractInviteToken = (n: Notification): string | null => {
@@ -88,46 +60,28 @@ export function NotificationCenter() {
     if (!token) return;
     const inviteToken = extractInviteToken(n);
     if (!inviteToken) {
-      // No token in link, just navigate to team page
       router.push('/team-mgmt');
       return;
     }
     setAcceptingId(n.id);
     try {
       await teamsApi.acceptInvite(token, inviteToken);
-      await notificationsApi.markAsRead(token, n.id);
-      setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
-      setUnreadCount((c) => Math.max(0, c - 1));
+      markAsReadMutation.mutate(n.id);
       router.push('/team-mgmt');
     } catch {
-      // Mark as read anyway and redirect
-      await notificationsApi.markAsRead(token, n.id).catch(() => {});
+      markAsReadMutation.mutate(n.id);
       router.push('/team-mgmt');
     } finally {
       setAcceptingId(null);
     }
   };
 
-  const handleDeclineInvite = async (n: Notification) => {
-    if (!token) return;
-    try {
-      await notificationsApi.deleteNotification(token, n.id);
-      setNotifications((prev) => prev.filter((x) => x.id !== n.id));
-      setUnreadCount((c) => Math.max(0, c - 1));
-    } catch {
-      // ignore
-    }
+  const handleDeclineInvite = (n: Notification) => {
+    markAsReadMutation.mutate(n.id);
   };
 
-  const handleDismissBroadcast = async (id: string) => {
-    if (!token) return;
-    try {
-      await broadcastsApi.dismiss(token, id);
-      setBroadcasts((prev) => prev.filter((b) => b.id !== id));
-      setBroadcastCount((c) => Math.max(0, c - 1));
-    } catch {
-      // ignore
-    }
+  const handleDismissBroadcast = (id: string) => {
+    dismissBroadcastMutation.mutate(id);
   };
 
   const totalCount = unreadCount + broadcastCount;

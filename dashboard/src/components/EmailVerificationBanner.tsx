@@ -1,8 +1,9 @@
 'use client';
 
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import {useTranslations} from 'next-intl';
 import {useAuth} from '@/lib/store';
+import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {API_BASE} from '@/lib/api';
 import {useToast} from '@/components/Toast';
 import {Mail, X} from '@/components/icons';
@@ -14,19 +15,22 @@ export function EmailVerificationBanner() {
  const {toast} = useToast();
  const [dismissed, setDismissed] = useState(false);
  const [sending, setSending] = useState(false);
- const [verified, setVerified] = useState<boolean | null>(null);
+ const queryClient = useQueryClient();
 
- useEffect(() => {
-  if (!token || !user) return;
-  const controller = new AbortController();
-  fetch(`${API_BASE}/auth/me`, {credentials: 'include', signal: controller.signal})
-   .then((r) => r.json())
-   .then((data) => setVerified(data.email_verified ?? true))
-   .catch((err) => {
-    if (err.name !== 'AbortError') setVerified(null); // Bilinmiyor durumu
-});
-  return () => controller.abort();
-}, [token, user]);
+ // Use React Query — cached, deduplicated with store's auth/me
+ const {data: meData} = useQuery({
+  queryKey: ['auth', 'me'],
+  queryFn: async () => {
+   const res = await fetch(`${API_BASE}/auth/me`, {
+    headers: {Authorization: `Bearer ${token}`},
+   });
+   if (!res.ok) throw new Error('Failed');
+   return res.json();
+  },
+  enabled: !!token && !!user,
+  staleTime: 5 * 60 * 1000, // 5 dk — email_verified nadiren değişir
+ });
+ const verified = meData ? (meData.email_verified ?? true) : null;
 
  if (!user || dismissed || verified === null || verified) return null;
 
@@ -36,7 +40,8 @@ export function EmailVerificationBanner() {
    const res = await fetch(`${API_BASE}/auth/resend-verification`, {
     method: 'POST',
     credentials: 'include',
-});
+    headers: {Authorization: `Bearer ${token}`},
+   });
    if (res.ok) {
     toast(t('sent'), 'success');
 } else {
