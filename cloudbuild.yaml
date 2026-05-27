@@ -1,3 +1,5 @@
+timeout: 3600s
+
 steps:
   # Run database migrations
   - name: 'node:22-slim'
@@ -5,18 +7,21 @@ steps:
     entrypoint: 'sh'
     args:
       - '-c'
-      - 'npm install pg && node run-migrations.js'
+      - 'npm install --no-audit --no-fund pg && node run-migrations.js'
     secretEnv: ['DATABASE_URL']
+    waitFor: ['-'] # Start immediately
 
   # Build API image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '--no-cache', '-f', 'Dockerfile.api', '-t', 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/api:latest', '.']
     id: 'build-api'
+    waitFor: ['-'] # Start immediately
 
   # Build Worker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '--no-cache', '-f', 'Dockerfile.worker', '-t', 'europe-west1-docker.pkg.dev/hooksniff-app/hooksniff/worker:latest', '.']
     id: 'build-worker'
+    waitFor: ['-'] # Start immediately
 
   # Push both images
   - name: 'gcr.io/cloud-builders/docker'
