@@ -97,9 +97,17 @@ pub async fn deliver_http(
     match result {
         Ok(mut response) => {
             let status_code = response.status().as_u16() as i32;
+            // HS-SEC: Filter sensitive headers before storing response.
+            // Prevents leaking auth tokens, session cookies, etc. to dashboard users.
+            const SENSITIVE_HEADERS: &[&str] = &[
+                "set-cookie", "set-cookie2", "authorization", "proxy-authenticate",
+                "proxy-authorization", "www-authenticate", "x-frame-options",
+                "strict-transport-security", "content-security-policy",
+            ];
             let resp_headers: serde_json::Value = serde_json::json!(response
                 .headers()
                 .iter()
+                .filter(|(k, _)| !SENSITIVE_HEADERS.contains(&k.as_str().to_lowercase().as_str()))
                 .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap_or("").to_string()))
                 .collect::<std::collections::HashMap<String, String>>());
 
