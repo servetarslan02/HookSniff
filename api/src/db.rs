@@ -211,8 +211,26 @@ fn migrations() -> Vec<(&'static str, &'static str)> {
 
 async fn run_migrations(pool: &PgPool) -> Result<()> {
     ensure_migrations_table(pool).await?;
+    
+    // Fetch all applied migrations in one query to avoid N+1 queries at startup
+    let applied_rows: Vec<(String,)> = sqlx::query_as("SELECT name FROM _migrations")
+        .fetch_all(pool)
+        .await?;
+    
+    let applied_names: std::collections::HashSet<String> = applied_rows
+        .into_iter()
+        .map(|(name,)| name)
+        .collect();
+
     for (name, sql) in migrations() {
-        run_migration(pool, name, sql).await?;
+        if !applied_names.contains(name) {
+            tracing::info!("🔄 Running migration: {}", name);
+            sqlx::raw_sql(sql).execute(pool).await?;
+            record_migration(pool, name).await?;
+            tracing::info!("✅ Migration '{}' completed", name);
+        } else {
+            tracing::debug!("⏭️  Migration '{}' already applied, skipping", name);
+        }
     }
     tracing::info!("✅ All database migrations completed");
     Ok(())
