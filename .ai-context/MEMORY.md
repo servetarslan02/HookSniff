@@ -3,7 +3,20 @@
 > Son güncelleme: 2026-05-27 GMT+8 (OpenClaw — Performans Optimizasyonu v2: reactCompiler varsayılan, status counts 4→1 API, staleTime artırıldı)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 - burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış, kendine süre tut 45-50 dk sonra uyarı ver durma en son gelismis-yukleme-sistemleri ni yaptık ama kullanıcı ve admin sayfalarında tablolar falan tıkladığımda açılıp güncel veriileri arkada belli etmeden çekmip güncellemitor her sayfa en az 1000 ms de çalışıyor hala tarayıcıdan aç yavaşlığın sebebini loglardan bak hataları bul ve optimize et. muhalkak tarayıcı kontrolü yapıyorsun ilk iş olarak kod kontrolüyşe falan uğraşma hesap bilgileri next-sessıon da var. işten sonra vercel build hataları çıkarsa düzelt: vercel:  vcp_1QcjDdCNwpMj8mCNf1UoDBMat1Yi128aMhzmJE4FzEF31aiTZJ3qfJ2h
-
+gcp json : {
+  "type": "service_account",
+  "project_id": "hooksniff-app",
+  "private_key_id": "38c1ec8c7b24c7a45f03d6ed87e54e0caa18e1f2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMDtSVfM6sF7kT\n/6uRVTaFq5gbiahKc+yb4F9Zd2rqrMyh2p49JtOLgXCtSk08tevy8GxckUfu971u\nkhCAJXzxnv6nf6+c2oy9C8EIK4BCRgzFjGVyaZvF9ntxI9kKuLIZ8ZCxMI6TyV8z\n3HkzFh5rWGHtSUSgcFvjyh1BAuH6QPANsM6g8YCU4SpIiC5M4F7tKF3UDxAs30xk\nAuMpKO4Vl3Zbdqb3wg2BQ68QIkH3hlYF+Sf/9jpK1rzpS0hlI76uAm3vfUOTer23\nNeGcejT37DnAyv3AeIk+4vP+4vY1imlVJp52kLp/F2kHm1A6aw2L+Ghs7MVdBWvV\nkMm0xaNBAgMBAAECggEABR8DKUxEUI/Y2n5iYyeZEnI7w0cpZNLzd3cCVZe4ZHLZ\nQN+gdIburLPfLM4uUY18QjDT+1+/BymLBMUgKmMmd1bm67O5580ZVp4+pjKXSbKB\n3AxZuG0blnSI5Q5CAnGfsKR+HeBK170oSUApf4V41ndVn9OkqAUh3T3jjY/htXrT\ns/L7+jxIKzwJNxwhzIQZtIb/i6CSGhNniN9nNAtI44XLUBNMlUsyeU6ZKynNkAtx\npI7aQjlKE66nUnY3iQHmN5yzgx1G+WBVA55rdta9B70w1uwirl8i85ppqQctybZo\niYxsK99qcbjclc5tLbjKrWIqXqJGv0rlEkWSU8fC0QKBgQD8i4iqVvrb9lypnXBN\nbfutI2io3Nl9uaev9o/OnIOxCpIkLRlmYT6y5Ko5rKXOsOXErmx9rbuOxgj3AKVq\nMYmYn06QtRAH8akEWIyElhYqdlO7/iJoPz0ypLPmaSmtRtadeoSIsldN99URxyoN\nFiznnrEWHSTWEukprQzJLPYgSQKBgQDO2XwCAy5/Byh7+enIQWT9pV+pWbcwrlyt\nO7DwIuKmy8y66arvK5Q9J6iZV1mgyZBj5JDvap6MZNJJQbXwYJghEzCsbDo+rqa+\nZaMV7pWOnWwKuEXjScWob2btm9GsGKhRQAEcr4xzeNpmFv/qNI0nkqOKr97BZuIH\nYC0O1YrbOQKBgBBqcYPBC6VoqjVMSpR95bInbxIq6OhHPSMu/8IKYnULntxDIjeJ\ncq3mNzpwgoag8Q6L1/mDZYGuVb7Yh+gTOEJ3eH/nhRc/GiFyMBAeQWqZLnA14L6t\n/ahhFGCRzWe6BxFNeXf5P7uNtIfnTlBzdI/JvPEXC+HucMGIwiABkC4hAoGANjlV\nBMIIwkwCFN3ipxhdfRCJDz/xgdVzfgYT0B+VAtySAr2WjbQC3DU1QV1gpYGxVD5q\nsBhnD66uYX3UT/tCZgk9zTVh32SxWWATbIBqvEQQOo8r4vVH12u8s7URNegQ15vL\nrtVmIC8iMXj+BUtZZXJPZN/NqS1rOzu/FBBuoiECgYEAuISpk0c0062Q7JKGz1ui\nBZyTfgo6ehY5tmbe1fi5JyLX7xN3eDYai31VPr5bj/B29d0n12RxK2M91iVF0FA3\nPIkiBsJd9y4zPTadCXsBS6KoxuXPNpQ8m5w2Q+zN3uZ5xu1S62RGgQbZDALrLaWt\nQV+vPzjoExDKRcumb3qFyDs=\n-----END PRIVATE KEY-----\n",
+  "client_email": "hooksniff-deploy@hooksniff-app.iam.gserviceaccount.com",
+  "client_id": "102841305021098884587",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/hooksniff-deploy%40hooksniff-app.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
+gcp hatalarınıda düzelt, panellerfe verilerde görünmüyor izleme kullanıclar vs
 ---
 
 ## 🚀 Hızlı Başlangıç (Her Oturum)
