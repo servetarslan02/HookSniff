@@ -22,6 +22,7 @@ export function useAdminStats() {
     queryFn: validated(() => adminApi.getStats(token!), AdminStatsSchema),
     enabled: !!token,
     staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -33,6 +34,7 @@ export function useAdminRevenue() {
     queryFn: validated(() => adminApi.getRevenue(token!), RevenueSchema),
     enabled: !!token,
     staleTime: 60_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 

@@ -28,39 +28,56 @@ async fn get_stats(
     // RBAC: viewer or higher required to view stats
     super::teams::check_user_team_role(&pool, customer.id, "viewer").await?;
 
-    let stats: (i64, i64, i64, i64) = sqlx::query_as(
+    // Single query: delivery counts + endpoint count via CTE
+    #[derive(sqlx::FromRow)]
+    struct StatsRow {
+        total: i64,
+        delivered: i64,
+        failed: i64,
+        pending: i64,
+        endpoints_count: i64,
+    }
+
+    let row: StatsRow = sqlx::query_as::<_, StatsRow>(
         r#"
+        WITH
+          delivery_stats AS (
+            SELECT
+              COUNT(*)                                    AS total,
+              COUNT(*) FILTER (WHERE status = 'delivered') AS delivered,
+              COUNT(*) FILTER (WHERE status = 'failed')    AS failed,
+              COUNT(*) FILTER (WHERE status = 'pending')   AS pending
+            FROM deliveries WHERE customer_id = $1
+          ),
+          ep_count AS (
+            SELECT COUNT(*) AS c FROM endpoints WHERE customer_id = $1
+          )
         SELECT
-            COUNT(*) as total,
-            COUNT(*) FILTER (WHERE status = 'delivered'),
-            COUNT(*) FILTER (WHERE status = 'failed'),
-            COUNT(*) FILTER (WHERE status = 'pending')
-        FROM deliveries WHERE customer_id = $1
+          delivery_stats.total,
+          delivery_stats.delivered,
+          delivery_stats.failed,
+          delivery_stats.pending,
+          ep_count.c AS endpoints_count
+        FROM delivery_stats, ep_count
         "#,
     )
     .bind(customer.id)
     .fetch_one(&pool)
     .await?;
 
-    let endpoints_count: (i64,) =
-        sqlx::query_as("SELECT COUNT(*) FROM endpoints WHERE customer_id = $1")
-            .bind(customer.id)
-            .fetch_one(&pool)
-            .await?;
-
-    let success_rate = if stats.0 > 0 {
-        (stats.1 as f64 / stats.0 as f64) * 100.0
+    let success_rate = if row.total > 0 {
+        (row.delivered as f64 / row.total as f64) * 100.0
     } else {
         100.0
     };
 
     Ok(Json(StatsResponse {
-        total_deliveries: stats.0,
-        delivered: stats.1,
-        failed: stats.2,
-        pending: stats.3,
+        total_deliveries: row.total,
+        delivered: row.delivered,
+        failed: row.failed,
+        pending: row.pending,
         success_rate,
-        endpoints_count: endpoints_count.0,
+        endpoints_count: row.endpoints_count,
     }))
 }
 

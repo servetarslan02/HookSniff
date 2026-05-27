@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { useAdminStats, useAdminRevenue, useAdminAuditLogs, useAdminFeatureFlags, useAdminDeployInfo, useRateLimitViolations, useFailedDeliveries, useQueueStatus } from '@/hooks/useAdminData';
+import { useAdminDashboardPrimary, useAdminDashboardHealth, useAdminDashboardDeferred } from '@/hooks/useAdminBatch';
 import { StatCard } from '@/components/tremor/StatCard';
 import { useTranslations } from 'next-intl';
 import { BarChart3, ClipboardList, Heart, Building2, RefreshCw, Download, Users, Package, DollarSign, Flame } from '@/components/icons';
@@ -26,20 +26,18 @@ const HealthTab = dynamic(() => import('./components/HealthTab'), { ssr: false, 
 const InfraTab = dynamic(() => import('./components/InfraTab'), { ssr: false, loading: () => tabSkeleton });
 
 export default function AdminOverviewPage() {
-  // Primary data — needed for above-the-fold stats
-  const { data: stats, refetch: refetchStats } = useAdminStats();
-  const { data: revenue, refetch: refetchRevenue } = useAdminRevenue();
+  // Group 1: Above-the-fold stats (immediate)
+  const { stats, revenue, refetchStats, refetchRevenue } = useAdminDashboardPrimary();
 
-  // Secondary data — deferred 500ms (not needed for initial render)
+  // Group 2: Health essentials (deferred 300ms)
+  const [healthReady, setHealthReady] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setHealthReady(true), 300); return () => clearTimeout(t); }, []);
+  const { queueStatus, failedDeliveries: failedDeliveriesData, refetchQueue, refetchFailed } = useAdminDashboardHealth(healthReady);
+
+  // Group 3: Deferred detail data (deferred 500ms)
   const [deferredReady, setDeferredReady] = useState(false);
   useEffect(() => { const t = setTimeout(() => setDeferredReady(true), 500); return () => clearTimeout(t); }, []);
-
-  const { data: auditLogsData, refetch: refetchAuditLogs } = useAdminAuditLogs(deferredReady ? { limit: 5 } : undefined);
-  const { data: featureFlagsData, refetch: refetchFeatureFlags } = useAdminFeatureFlags(deferredReady);
-  const { data: deployInfo, refetch: refetchDeployInfo } = useAdminDeployInfo(deferredReady);
-  const { data: rateLimitData, refetch: refetchRateLimit } = useRateLimitViolations(deferredReady ? { limit: 1 } : undefined);
-  const { data: failedDeliveriesData, refetch: refetchFailed } = useFailedDeliveries(deferredReady ? { limit: 1 } : undefined);
-  const { data: queueStatus, refetch: refetchQueue } = useQueueStatus(deferredReady);
+  const { auditLogs: auditLogsData, featureFlags: featureFlagsData, deployInfo, rateLimitData, refetchAuditLogs, refetchFeatureFlags, refetchDeployInfo, refetchRateLimit } = useAdminDashboardDeferred(deferredReady);
 
   const auditLogs = auditLogsData?.entries ?? [];
   const featureFlags = featureFlagsData?.flags ?? [];
@@ -48,7 +46,11 @@ export default function AdminOverviewPage() {
   const handleRefreshAll = async () => {
     setRefreshing(true);
     try {
-      await Promise.all([refetchStats(), refetchRevenue(), refetchAuditLogs(), refetchFeatureFlags(), refetchDeployInfo(), refetchRateLimit(), refetchFailed(), refetchQueue()]);
+      await Promise.all([
+        refetchStats(), refetchRevenue(),
+        refetchQueue(), refetchFailed(),
+        refetchAuditLogs(), refetchFeatureFlags(), refetchDeployInfo(), refetchRateLimit(),
+      ]);
     } finally {
       setTimeout(() => setRefreshing(false), 500);
     }
