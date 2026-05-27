@@ -10,6 +10,10 @@ pub struct Metrics {
     pub http_requests_total: IntCounterVec,
     pub http_request_duration_seconds: Histogram,
     pub active_connections: Gauge,
+    // -- Auth metrics --
+    pub auth_latency_seconds: Histogram,
+    // -- Rate limit metrics --
+    pub rate_limit_latency_seconds: Histogram,
     // ── Webhook delivery metrics ──
     pub webhook_deliveries_total: IntCounterVec,
     pub delivery_count: IntCounterVec,
@@ -55,6 +59,28 @@ impl Metrics {
             "active_connections",
             "Number of active connections",
         ))
+        .expect("valid metric definition");
+
+        let auth_latency_seconds = Histogram::with_opts(
+            HistogramOpts::new(
+                "auth_latency_seconds",
+                "Authentication middleware latency in seconds",
+            )
+            .buckets(vec![
+                0.0001, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1,
+            ]),
+        )
+        .expect("valid metric definition");
+
+        let rate_limit_latency_seconds = Histogram::with_opts(
+            HistogramOpts::new(
+                "rate_limit_latency_seconds",
+                "Rate limit middleware latency in seconds",
+            )
+            .buckets(vec![
+                0.0001, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1,
+            ]),
+        )
         .expect("valid metric definition");
 
         let webhook_deliveries_total = IntCounterVec::new(
@@ -141,6 +167,9 @@ impl Metrics {
             .register(Box::new(active_connections.clone()))
             .expect("valid metric definition");
         registry
+            .register(Box::new(auth_latency_seconds.clone()))
+            .expect("valid metric definition");
+        registry
             .register(Box::new(webhook_deliveries_total.clone()))
             .expect("valid metric definition");
         registry
@@ -162,10 +191,13 @@ impl Metrics {
             .register(Box::new(db_query_duration_seconds.clone()))
             .expect("valid metric definition");
         registry
-            .register(Box::new(cache_hits_total.clone()))
+            .register(Box::new(auth_latency_seconds.clone()))
             .expect("valid metric definition");
         registry
-            .register(Box::new(cache_misses_total.clone()))
+            .register(Box::new(rate_limit_latency_seconds.clone()))
+            .expect("valid metric definition");
+        registry
+            .register(Box::new(webhook_deliveries_total.clone()))
             .expect("valid metric definition");
 
         Self {
@@ -173,6 +205,8 @@ impl Metrics {
             http_requests_total,
             http_request_duration_seconds,
             active_connections,
+            auth_latency_seconds,
+            rate_limit_latency_seconds,
             webhook_deliveries_total,
             delivery_count,
             delivery_latency_seconds,
