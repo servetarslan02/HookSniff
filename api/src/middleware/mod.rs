@@ -247,124 +247,125 @@ pub async fn auth_middleware(
         if let Some(c) = redis_cached {
             c
         } else {
-        // 2. Try in-memory cache (fast, per-instance)
-        let mem_cached = {
-            let cache = AUTH_CACHE.lock().await;
-            cache.get(&prefix)
-        };
+            // 2. Try in-memory cache (fast, per-instance)
+            let mem_cached = {
+                let cache = AUTH_CACHE.lock().await;
+                cache.get(&prefix)
+            };
 
-        if let Some(c) = mem_cached {
-            // Also populate Redis for other instances
-            if let Some(ref c2) = cache {
-                c2.set("apikey", &prefix, &c).await;
-            }
-            c
-        } else {
-            // Cache miss — query DB (no lock held during async operations)
-            let candidates =
-                sqlx::query_as::<_, Customer>(&format!("{} WHERE api_key_prefix = $1", CUSTOMER_SELECT))
-                    .bind(&prefix)
-                    .fetch_all(&*pool)
-                    .await?;
-
-            // Also check api_keys table for additional keys
-            let api_key_candidates: Vec<(String,)> = sqlx::query_as(
-                "SELECT api_key_hash FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
-            )
-            .bind(&prefix)
-            .fetch_all(&*pool)
-            .await?;
-
-            // Try customers table first (legacy primary key)
-            let mut found: Option<Customer> = None;
-            for c in &candidates {
-                if verify_api_key(&token, &c.api_key_hash) {
-                    found = Some(c.clone());
-                    break;
+            if let Some(c) = mem_cached {
+                // Also populate Redis for other instances
+                if let Some(ref c2) = cache {
+                    c2.set("apikey", &prefix, &c).await;
                 }
-            }
-
-            // If not found in customers, try api_keys table
-            if found.is_none() {
-                for (hash,) in &api_key_candidates {
-                    if verify_api_key(&token, hash) {
-                        let owner: Option<Customer> = sqlx::query_as(
-                            "SELECT c.* FROM customers c INNER JOIN api_keys ak ON ak.customer_id = c.id WHERE ak.api_key_prefix = $1 AND ak.api_key_hash = $2"
-                        )
+                c
+            } else {
+                // Cache miss — query DB (no lock held during async operations)
+                let candidates =
+                    sqlx::query_as::<_, Customer>(&format!("{} WHERE api_key_prefix = $1", CUSTOMER_SELECT))
                         .bind(&prefix)
-                        .bind(hash)
-                        .fetch_optional(&*pool)
+                        .fetch_all(&*pool)
                         .await?;
-                        if let Some(c) = owner {
-                            found = Some(c);
-                        }
-                        break;
-                    }
-                }
-            }
 
-            // If not found in api_keys, try service_tokens (organization-level tokens)
-            if found.is_none() {
-                let st_candidates: Vec<(String,)> = sqlx::query_as(
-                    "SELECT token_hash FROM service_tokens WHERE token_prefix = $1 AND is_active = true",
+                // Also check api_keys table for additional keys
+                let api_key_candidates: Vec<(String,)> = sqlx::query_as(
+                    "SELECT api_key_hash FROM api_keys WHERE api_key_prefix = $1 AND is_active = true",
                 )
                 .bind(&prefix)
                 .fetch_all(&*pool)
                 .await?;
 
-                for (hash,) in &st_candidates {
-                    if verify_api_key(&token, hash) {
-                        // Service token auth: resolve the team owner as the customer + team_id
-                        // First get the team_id from the service token
-                        let team_id_opt: Option<Uuid> = sqlx::query_scalar(
-                            "SELECT t.id FROM teams t \
-                             INNER JOIN service_tokens st ON st.team_id = t.id \
-                             WHERE st.token_prefix = $1 AND st.token_hash = $2"
-                        )
-                        .bind(&prefix)
-                        .bind(hash)
-                        .fetch_optional(&*pool)
-                        .await?;
-
-                        if let Some(team_id) = team_id_opt {
-                            // Then fetch the team owner as customer
-                            let customer = sqlx::query_as::<_, Customer>(
-                                &format!("{} c INNER JOIN teams t ON t.owner_id = c.id WHERE t.id = $1", CUSTOMER_SELECT)
-                            )
-                            .bind(team_id)
-                            .fetch_optional(&*pool)
-                            .await?;
-
-                            if let Some(c) = customer {
-                                found = Some(c);
-                                service_token_team = Some(team_id);
-                                // Update last_used_at
-                                let _ = sqlx::query(
-                                    "UPDATE service_tokens SET last_used_at = NOW() WHERE token_prefix = $1 AND token_hash = $2"
-                                )
-                                .bind(&prefix)
-                                .bind(hash)
-                                .execute(&*pool)
-                                .await;
-                            }
-                        }
+                // Try customers table first (legacy primary key)
+                let mut found: Option<Customer> = None;
+                for c in &candidates {
+                    if verify_api_key(&token, &c.api_key_hash) {
+                        found = Some(c.clone());
                         break;
                     }
                 }
-            }
 
-            let customer = found.ok_or(AppError::Unauthorized)?;
+                // If not found in customers, try api_keys table
+                if found.is_none() {
+                    for (hash,) in &api_key_candidates {
+                        if verify_api_key(&token, hash) {
+                            let owner: Option<Customer> = sqlx::query_as(
+                                "SELECT c.* FROM customers c INNER JOIN api_keys ak ON ak.customer_id = c.id WHERE ak.api_key_prefix = $1 AND ak.api_key_hash = $2"
+                            )
+                            .bind(&prefix)
+                            .bind(hash)
+                            .fetch_optional(&*pool)
+                            .await?;
+                            if let Some(c) = owner {
+                                found = Some(c);
+                            }
+                            break;
+                        }
+                    }
+                }
 
-            // Cache the result in both Redis (shared) and in-memory (fast)
-            if let Some(ref c) = cache {
-                c.set("apikey", &prefix, &customer).await;
-            }
-            {
-                let mut mem_cache = AUTH_CACHE.lock().await;
-                mem_cache.insert(prefix, customer.clone());
-            }
+                // If not found in api_keys, try service_tokens (organization-level tokens)
+                if found.is_none() {
+                    let st_candidates: Vec<(String,)> = sqlx::query_as(
+                        "SELECT token_hash FROM service_tokens WHERE token_prefix = $1 AND is_active = true",
+                    )
+                    .bind(&prefix)
+                    .fetch_all(&*pool)
+                    .await?;
 
-            customer
+                    for (hash,) in &st_candidates {
+                        if verify_api_key(&token, hash) {
+                            // Service token auth: resolve the team owner as the customer + team_id
+                            // First get the team_id from the service token
+                            let team_id_opt: Option<Uuid> = sqlx::query_scalar(
+                                "SELECT t.id FROM teams t \
+                                 INNER JOIN service_tokens st ON st.team_id = t.id \
+                                 WHERE st.token_prefix = $1 AND st.token_hash = $2"
+                            )
+                            .bind(&prefix)
+                            .bind(hash)
+                            .fetch_optional(&*pool)
+                            .await?;
+
+                            if let Some(team_id) = team_id_opt {
+                                // Then fetch the team owner as customer
+                                let customer = sqlx::query_as::<_, Customer>(
+                                    &format!("{} c INNER JOIN teams t ON t.owner_id = c.id WHERE t.id = $1", CUSTOMER_SELECT)
+                                )
+                                .bind(team_id)
+                                .fetch_optional(&*pool)
+                                .await?;
+
+                                if let Some(c) = customer {
+                                    found = Some(c);
+                                    service_token_team = Some(team_id);
+                                    // Update last_used_at
+                                    let _ = sqlx::query(
+                                        "UPDATE service_tokens SET last_used_at = NOW() WHERE token_prefix = $1 AND token_hash = $2"
+                                    )
+                                    .bind(&prefix)
+                                    .bind(hash)
+                                    .execute(&*pool)
+                                    .await;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                let customer = found.ok_or(AppError::Unauthorized)?;
+
+                // Cache the result in both Redis (shared) and in-memory (fast)
+                if let Some(ref c) = cache {
+                    c.set("apikey", &prefix, &customer).await;
+                }
+                {
+                    let mut mem_cache = AUTH_CACHE.lock().await;
+                    mem_cache.insert(prefix, customer.clone());
+                }
+
+                customer
+            }
         }
     } else {
         // JWT token authentication
@@ -378,7 +379,7 @@ pub async fn auth_middleware(
             None
         };
 
-        let customer = if let Some(c) = redis_cached {
+        if let Some(c) = redis_cached {
             c
         } else {
             let mem_cached = {
@@ -412,15 +413,17 @@ pub async fn auth_middleware(
                 }
                 c
             }
-        };
-
-        req.extensions_mut().insert(customer);
-        req.extensions_mut().insert(IsTestKey(is_test));
-        if let Some(team_id) = service_token_team {
-            req.extensions_mut().insert(ServiceTokenScope { team_id });
         }
-        Ok(next.run(req).await)
+    };
+
+    req.extensions_mut().insert(customer);
+    req.extensions_mut().insert(IsTestKey(is_test));
+    if let Some(team_id) = service_token_team {
+        req.extensions_mut().insert(ServiceTokenScope { team_id });
     }
+    Ok(next.run(req).await)
+}
+
 
 /// JWT-based auth middleware for dashboard routes
 pub async fn jwt_auth_middleware(
