@@ -59,6 +59,7 @@ export function useAdminUsers(params?: {
     ),
     enabled: !!token,
     staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
   });
 }
 
