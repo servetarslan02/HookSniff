@@ -7,32 +7,7 @@ use crate::billing::Plan;
 use crate::email::EmailProvider;
 use crate::models::customer::Customer;
 
-/// Resolve the effective daily event limit and the customer_id to track usage against.
-/// When operating within a team, the team owner's plan limit and their daily counter apply.
-/// Returns (tracking_customer_id, daily_limit, allow_overage, overage_email_notification).
-async fn resolve_team_tracking(
-    pool: &PgPool,
-    customer: &Customer,
-    team_id: Option<uuid::Uuid>,
-) -> (uuid::Uuid, u64, bool, bool) {
-    if let Some(tid) = team_id {
-        let result: Option<(uuid::Uuid, String, bool, bool)> = sqlx::query_as(
-            "SELECT c.id, c.plan, c.allow_overage, c.overage_email_notification FROM teams t JOIN customers c ON c.id = t.owner_id WHERE t.id = $1"
-        )
-        .bind(tid)
-        .fetch_optional(pool)
-        .await
-        .ok()
-        .flatten();
-
-        if let Some((owner_id, plan_str, allow_overage, overage_email)) = result {
-            let daily_limit = Plan::parse_str(&plan_str).max_events_per_day();
-            return (owner_id, daily_limit, allow_overage, overage_email);
-        }
-    }
-    let daily_limit = Plan::parse_str(&customer.plan).max_events_per_day();
-    (customer.id, daily_limit, customer.allow_overage, customer.overage_email_notification)
-}
+use crate::billing::resolve_team_tracking;
 
 /// Track daily event usage and return whether the customer is over their limit.
 /// Also sends email notifications when approaching or exceeding limits.
@@ -41,10 +16,12 @@ async fn resolve_team_tracking(
 pub async fn track_daily_event(
     pool: &PgPool,
     customer: &Customer,
+    cache: &Option<crate::cache::CacheLayer>,
     email_client: Option<&EmailProvider>,
     team_id: Option<uuid::Uuid>,
 ) -> Result<bool, sqlx::Error> {
-    let (tracking_id, daily_limit, _allow_overage, overage_email_notification) = resolve_team_tracking(pool, customer, team_id).await;
+    let info = resolve_team_tracking(pool, cache, customer, team_id).await;
+    let daily_limit = Plan::parse_str(&info.plan).max_events_per_day();
 
     // Upsert daily counter — tracked on the team owner when in team context
     let row: (i64, i64,) = sqlx::query_as(
@@ -58,7 +35,7 @@ pub async fn track_daily_event(
          END \
          RETURNING event_count, overage_count",
     )
-    .bind(tracking_id)
+    .bind(info.tracking_id)
     .bind(daily_limit as i64)
     .fetch_one(pool)
     .await?;
@@ -67,13 +44,13 @@ pub async fn track_daily_event(
     let is_over_limit = current_count > daily_limit as i64;
 
     // Email notification logic — send to the team owner when in team context
-    if overage_email_notification {
+    if info.overage_email_notification {
         // Resolve the notification recipient (team owner when in team context)
-        let notify_customer: Option<Customer> = if team_id.is_some() && tracking_id != customer.id {
+        let notify_customer: Option<Customer> = if team_id.is_some() && info.tracking_id != customer.id {
             sqlx::query_as::<_, Customer>(
                 "SELECT id, email, api_key_hash, api_key_prefix, plan, webhook_limit, webhook_count, created_at, password_hash, stripe_customer_id, stripe_subscription_id, payment_provider, polar_customer_id, polar_subscription_id, iyzico_customer_id, iyzico_subscription_id, name, is_active, is_admin, role, updated_at, email_verified, totp_secret, totp_enabled, cancel_at_period_end, payment_failed_at, current_period_end, allow_overage, overage_email_notification, card_last4, card_brand, card_exp_month, card_exp_year, card_updated_at, paused_at, paused_until, pause_plan, billing_interval, has_used_startup_trial, avatar_url FROM customers WHERE id = $1"
             )
-            .bind(tracking_id)
+            .bind(info.tracking_id)
             .fetch_optional(pool)
             .await
             .ok()
@@ -90,18 +67,18 @@ pub async fn track_daily_event(
             let _ = send_limit_notification(pool, notify_ref, email_client, "approaching", current_count, daily_limit).await;
         } else if current_count == threshold_100 {
             let _ = send_limit_notification(pool, notify_ref, email_client, "at_limit", current_count, daily_limit).await;
-        } else if overage_count == 1 && _allow_overage {
+        } else if overage_count == 1 && info.allow_overage {
             let _ = send_limit_notification(pool, notify_ref, email_client, "exceeded", current_count, daily_limit).await;
         }
     }
 
     // Send overage event to Polar.sh for metered billing
-    if is_over_limit && _allow_overage {
+    if is_over_limit && info.allow_overage {
         // Get polar_customer_id for the tracking customer
         let polar_id: Option<String> = sqlx::query_scalar(
             "SELECT polar_customer_id FROM customers WHERE id = $1 AND polar_customer_id IS NOT NULL"
         )
-        .bind(tracking_id)
+        .bind(info.tracking_id)
         .fetch_optional(pool)
         .await
         .ok()
