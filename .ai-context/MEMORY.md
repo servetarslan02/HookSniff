@@ -1,5 +1,5 @@
 # MEMORY.md — HookSniff Proje Hafızası
-
+- bak önce google cloud u düzelte eksin hata loglarını çek düzelt artık yazamıyorum mesaj sürekli farklı şeylerle uğraşıp durma çek şu loglarıda düzelt artık sağla solla uğraşm
 > Son güncelleme: 2026-05-27 GMT+8 (OpenClaw — Performans Optimizasyonu v4: staleTime 30sn, auto-refresh)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 - burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış, kendine süre tut 45-50 dk sonra uyarı ver durma en son gelismis-yukleme-sistemleri ni yaptık ama kullanıcı ve admin sayfalarında tablolar falan tıkladığımda açılıp güncel veriileri arkada belli etmeden çekmip güncellemitor her sayfa en az 1000 ms de çalışıyor hala tarayıcıdan aç yavaşlığın sebebini loglardan bak hataları bul ve optimize et. muhalkak tarayıcı kontrolü yapıyorsun ilk iş olarak kod kontrolüyşe falan uğraşma hesap bilgileri next-sessıon da var. işten sonra vercel build hataları çıkarsa düzelt:
