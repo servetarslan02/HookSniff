@@ -1,22 +1,20 @@
 # ── Stage 1: Builder ──
-# Item 346: Pin to digest for reproducible builds (run `docker pull rust:1.95-bookworm` to get digest)
 FROM rust:1.95-bookworm AS builder
 
-# Install build dependencies (aws-lc-sys needs cmake + C compiler)
+# Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends pkg-config cmake && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY Cargo.toml ./
-COPY Cargo.lock ./
+COPY Cargo.toml Cargo.lock ./
 COPY api/ api/
 COPY worker/ worker/
 COPY common/ common/
 COPY docs/ docs/
 COPY vendor/ vendor/
 
-# Build release binary
+# Build release binary with optimizations
 RUN cargo build --release -p hooksniff-api && \
     strip /app/target/release/hooksniff-api
 
@@ -28,19 +26,22 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Create non-root user and app directory
+# Create non-root user with no shell
 RUN groupadd -r hooksniff && \
-    useradd -r -g hooksniff -d /app -s /sbin/nologin hooksniff && \
-    mkdir -p /app
+    useradd -r -g hooksniff -d /app -s /sbin/nologin -u 10001 hooksniff && \
+    mkdir -p /app && \
+    chown -R hooksniff:hooksniff /app
 
-COPY --from=builder /app/target/release/hooksniff-api /usr/local/bin/hooksniff-api
-RUN chmod +x /usr/local/bin/hooksniff-api && chown -R hooksniff:hooksniff /app
+COPY --from=builder --chown=hooksniff:hooksniff /app/target/release/hooksniff-api /usr/local/bin/hooksniff-api
+
+RUN chmod 755 /usr/local/bin/hooksniff-api
 
 USER hooksniff
 WORKDIR /app
 
 EXPOSE 3000
 
+# Healthcheck for Cloud Run
 HEALTHCHECK --interval=15s --timeout=5s --retries=3 \
     CMD curl -f http://localhost:3000/health || exit 1
 

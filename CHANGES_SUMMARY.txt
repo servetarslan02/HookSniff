@@ -1,0 +1,232 @@
+═══════════════════════════════════════════════════════════════════
+HOOKSNIFF GCP DEPLOYMENT — CHANGES SUMMARY
+═══════════════════════════════════════════════════════════════════
+
+Modified Files:
+───────────────────────────────────────────────────────────────────
+
+1. cloudbuild.yaml
+   Changes: Complete rewrite
+   - Fixed migration step ordering and dependencies
+   - Updated all secret references to match Secret Manager names
+   - Added dashboard build and deployment step
+   - Added proper wait conditions between steps
+   - Changed image registry to europe-west1
+   - Added $SHORT_SHA tagging for versioning
+   - Reduced timeout from 3600s to 300s (Cloud Run limit)
+   
+   Before: Migration ran in parallel with builds, secrets had wrong names
+   After:  Proper orchestration, validated secret references, dashboard support
+
+2. Dockerfile.api
+   Changes: Security & Cloud Run compatibility improvements
+   - Added explicit UID (10001) for system user
+   - Fixed COPY --chown in builder stage
+   - Improved healthcheck with HTTP endpoint
+   - Better error handling for missing dependencies
+   
+   Before: Missing UID, permission issues, incomplete healthchecks
+   After:  Cloud Run compatible, proper security context
+
+3. Dockerfile.worker
+   Changes: Security & Cloud Run compatibility improvements
+   - Added explicit UID (10001) for system user
+   - Fixed COPY --chown in builder stage
+   - Better permission management
+   
+   Before: Missing UID, potential permission issues
+   After:  Cloud Run compatible, proper security context
+
+4. Dockerfile.dashboard
+   Changes: Permission fixes & healthcheck improvements
+   - Added mkdir -p /app before chown (fixes permission errors)
+   - Fixed COPY --chown in builder stage
+   - Better healthcheck configuration
+   
+   Before: COPY --chown could fail, incomplete healthchecks
+   After:  Robust permission handling, proper health checks
+
+5. deploy/env.production.example
+   Changes: Complete rewrite with clear requirements
+   - Added [REQUIRED] and [OPTIONAL] markers
+   - Added signup links for each external service
+   - Added secret generation instructions (openssl)
+   - Organized by service category (DATABASE, CACHE, PAYMENTS, EMAIL)
+   - Added format examples for each credential type
+   - Added comments explaining what each variable does
+   
+   Before: Minimal comments, unclear which fields were needed
+   After:  Crystal clear requirements, easy to follow
+
+6. deploy/gcp-deploy.sh
+   Changes: Robust error handling & validation
+   - Added pre-deployment validation for .env.production
+   - Implemented create-or-update logic for secrets (prevents race conditions)
+   - Added comprehensive error messages
+   - Added service URL output after deployment
+   - Added secret encryption in Google Secret Manager
+   - Better logging and status indicators
+   
+   Before: Assumed .env.production exists, no validation
+   After:  Fail-fast validation, clear error messages
+
+Created Files:
+───────────────────────────────────────────────────────────────────
+
+1. deploy/troubleshoot-gcp.sh (NEW)
+   Purpose: Comprehensive diagnostic and troubleshooting tool
+   Features:
+   - Check GCP authentication status
+   - Verify Cloud Run services deployed
+   - Check Google Secret Manager secrets
+   - View environment variables
+   - Display recent API logs
+   - Check resource limits
+   - Common errors & solutions guide
+   - Deployment verification checklist
+   
+   Usage: bash deploy/troubleshoot-gcp.sh all
+          bash deploy/troubleshoot-gcp.sh logs
+          bash deploy/troubleshoot-gcp.sh errors
+
+2. GCP_DEPLOYMENT_GUIDE.txt (NEW)
+   Purpose: Complete setup walkthrough
+   Includes:
+   - Prerequisites (gcloud, Docker, billing)
+   - Step-by-step GCP project setup
+   - Environment configuration instructions
+   - External service credential gathering
+   - Google Cloud authentication
+   - Full deployment steps
+   - Verification procedures
+   - Custom domain configuration
+   - Cost estimation
+   - Common issues & solutions
+   - Useful links
+
+3. DEPLOYMENT_FIXES_SUMMARY.txt (NEW)
+   Purpose: High-level overview of all fixes
+   Includes:
+   - Issues identified
+   - Fixes applied
+   - Files modified/created
+   - Updated deployment workflow
+   - Key improvements (security, reliability, debuggability)
+   - External services required
+   - Testing procedures
+   - Next steps after deployment
+
+4. QUICK_START_GCP.txt (NEW)
+   Purpose: Fast reference checklist for deployment
+   Includes:
+   - 5-step quick start
+   - Time estimates
+   - Troubleshooting quick links
+   - Useful links
+   - What was fixed summary
+
+═══════════════════════════════════════════════════════════════════
+DEPLOYMENT CHECKLIST FOR PUSH
+═══════════════════════════════════════════════════════════════════
+
+Before pushing to GitHub:
+
+☑ Modified files are ready:
+  ☐ cloudbuild.yaml
+  ☐ Dockerfile.api
+  ☐ Dockerfile.worker
+  ☐ Dockerfile.dashboard
+  ☐ deploy/env.production.example
+  ☐ deploy/gcp-deploy.sh
+
+☑ New files ready:
+  ☐ deploy/troubleshoot-gcp.sh
+  ☐ GCP_DEPLOYMENT_GUIDE.txt
+  ☐ DEPLOYMENT_FIXES_SUMMARY.txt
+  ☐ QUICK_START_GCP.txt
+
+☑ Do NOT push:
+  ☐ .env.production (contains secrets!)
+  ☐ Service account JSON file
+  ☐ API tokens or credentials
+
+Push command:
+  git add -A
+  git commit -m "fix: GCP Cloud Run deployment configuration
+
+  - Fixed cloudbuild.yaml with proper step orchestration
+  - Updated Dockerfiles for Cloud Run compatibility
+  - Added comprehensive environment validation
+  - Created diagnostic and troubleshooting tools
+  - Added complete deployment guide and quick start
+  
+  Fixes issues with secret management, build ordering, and
+  deployment verification. Ready for production GCP deployment."
+  
+  git push origin main
+
+═══════════════════════════════════════════════════════════════════
+POST-PUSH INSTRUCTIONS FOR USER
+═══════════════════════════════════════════════════════════════════
+
+After pushing to GitHub:
+
+1. Read the quick start:
+   cat QUICK_START_GCP.txt
+
+2. Sign up for external services:
+   - Neon (PostgreSQL)
+   - Upstash (Redis)
+   - Polar.sh (Payments)
+   - Resend (Email)
+
+3. Create .env.production:
+   cp deploy/env.production.example .env.production
+
+4. Fill in all [REQUIRED] fields from external services
+
+5. Deploy:
+   chmod +x deploy/gcp-deploy.sh
+   ./deploy/gcp-deploy.sh
+
+6. Verify:
+   bash deploy/troubleshoot-gcp.sh all
+
+═══════════════════════════════════════════════════════════════════
+SECURITY NOTES
+═══════════════════════════════════════════════════════════════════
+
+⚠️  IMPORTANT: Never commit to GitHub:
+  - .env.production (contains secrets)
+  - Google Cloud service account JSON files
+  - API tokens or passwords
+  - Private keys
+
+✅ Verify .gitignore includes:
+  .env
+  .env.production
+  *.json (service account files)
+  .env*.local
+  
+✅ Secrets are managed by:
+  - Google Secret Manager (for production)
+  - Local .env file (for development)
+
+═══════════════════════════════════════════════════════════════════
+TESTING LOCALLY (OPTIONAL)
+═══════════════════════════════════════════════════════════════════
+
+Before deploying to GCP, test locally:
+
+1. Build all images:
+   docker build -f Dockerfile.api . -t hooksniff:api
+   docker build -f Dockerfile.worker . -t hooksniff:worker
+   docker build -f Dockerfile.dashboard . -t hooksniff:dashboard
+
+2. Test with compose:
+   docker compose -f docker-compose.prod.yml up
+
+Note: First build takes 5-10 minutes due to Rust compilation.
+      Subsequent builds are faster due to Docker caching.
+
+═══════════════════════════════════════════════════════════════════
