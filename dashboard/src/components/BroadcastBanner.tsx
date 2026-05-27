@@ -1,9 +1,8 @@
 'use client';
 
-import {useState, useEffect, useCallback} from 'react';
-import {useAuth} from '@/lib/store';
-import {broadcastsApi, type UserBroadcast} from '@/lib/api';
+import {useState} from 'react';
 import {useRouter} from '@/i18n/navigation';
+import {useBroadcasts, useDismissBroadcast} from '@/hooks/useBroadcasts';
 import {X, AlertTriangle, AlertCircle, Info, ExternalLink} from '@/components/icons';
 
 const severityConfig: Record<string, {bg: string; border: string; text: string; icon: React.ReactNode}> = {
@@ -28,34 +27,15 @@ const severityConfig: Record<string, {bg: string; border: string; text: string; 
 };
 
 export function BroadcastBanner() {
- const {token} = useAuth();
  const router = useRouter();
- const [broadcasts, setBroadcasts] = useState<UserBroadcast[]>([]);
+ const {data: broadcasts = []} = useBroadcasts();
+ const dismissMutation = useDismissBroadcast();
  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
- const fetchBroadcasts = useCallback(async () => {
-  if (!token) return;
-  try {
-   const data = await broadcastsApi.listActive(token);
-   setBroadcasts(data || []);
-} catch {
-   // silently fail
-}
-}, [token]);
-
- useEffect(() => {
-  fetchBroadcasts();
-}, [fetchBroadcasts]);
-
- const handleDismiss = async (id: string) => {
-  if (!token) return;
+ const handleDismiss = (id: string) => {
   setDismissed((prev) => new Set(prev).add(id));
-  try {
-   await broadcastsApi.dismiss(token, id);
-} catch {
-   // ignore
-}
-};
+  dismissMutation.mutate(id);
+ };
 
  // Filter out dismissed and only show warning/critical as banners
  const visibleBroadcasts = broadcasts.filter(
