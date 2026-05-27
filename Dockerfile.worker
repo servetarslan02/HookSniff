@@ -37,4 +37,4 @@ RUN chown -R hooksniff:hooksniff /app
 USER hooksniff
 WORKDIR /app
 
-CMD ["hooksniff-worker"]
+CMD ["/usr/local/bin/hooksniff-worker"]
