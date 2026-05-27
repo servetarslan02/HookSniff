@@ -5,6 +5,7 @@ const { withSentryConfig } = require('@sentry/nextjs');
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   cacheComponents: true,
   reactCompiler: true,
   turbopack: {
