@@ -102,8 +102,9 @@ steps:
       - '--max-instances=3'
       - '--timeout=300'
       - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,WEBHOOK_FORMAT=standard,MAX_PAYLOAD_BYTES=1048576,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,RATE_LIMIT_STORE=redis,OTEL_ENABLED=true'
-      - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,JWT_SECRET=hooksniff-jwt-secret:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest'
+      - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,JWT_SECRET=hooksniff-jwt-secret:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest'
       - '--project=$PROJECT_ID'
+      - '--quiet'
     waitFor: ['push-api']
 
   # Step 9: Deploy Worker to Cloud Run
@@ -123,8 +124,9 @@ steps:
       - '--min-instances=0'
       - '--max-instances=4'
       - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,OTEL_ENABLED=true'
-      - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest'
+      - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest'
       - '--project=$PROJECT_ID'
+      - '--quiet'
     waitFor: ['push-worker']
 
   # Step 10: Deploy Dashboard to Cloud Run
@@ -144,8 +146,9 @@ steps:
       - '--cpu=0.5'
       - '--min-instances=0'
       - '--max-instances=2'
-      - '--set-env-vars=NEXT_PUBLIC_API_URL=https://hooksniff-api-1046140057667.europe-west1.run.app/v1,NODE_ENV=production'
+      - '--set-env-vars=NEXT_PUBLIC_API_URL=https://hooksniff-api-sdjufmaqka-ew.a.run.app/v1,NODE_ENV=production'
       - '--project=$PROJECT_ID'
+      - '--quiet'
     waitFor: ['push-dashboard', 'deploy-api']
 
 images:
