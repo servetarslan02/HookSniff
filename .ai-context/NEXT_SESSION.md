@@ -9,14 +9,18 @@
 
 Build stabil. `npm run build` → exit 0 ✅
 
-### Son Yapılan İş (2026-05-27 — Performans Optimizasyonu v3: Duplicate API Temizliği)
+### Son Yapılan İş (2026-05-27 — Performans Optimizasyonu v3: Duplicate API + JWT Auth Cache)
 - **NotificationCenter:** 4 doğrudan API çağrısı → React Query hook'ları (cached, deduplicated)
 - **BroadcastBanner:** doğrudan fetch → `useBroadcasts` React Query hook'u
 - **EmailVerificationBanner:** ayrı `/auth/me` fetch'i → store'dan `email_verified` okuma (0 API)
 - **Store:** `email_verified` User interface'ine eklendi
 - **Yeni hook'lar:** `useBroadcasts.ts`, `useUnreadCounts.ts`
-- **Sonuç:** 19 → 12 API çağrısı sayfa başına (%37 azalma), broadcasts ve teams duplicate'ları tamamen silindi
-- **Commit:** `0b212b12`
+- **Frontend Sonuç:** 19 → 12 API çağrısı sayfa başına (%37 azalma), broadcasts ve teams duplicate'ları tamamen silindi
+- **JWT Auth Cache (Rust backend):** Her istekte 3 DB sorgusu → cache hit'te 0 DB sorgusu
+  - `auth_middleware` ve `jwt_auth_middleware`'a Redis + in-memory cache eklendi
+  - Sayfa başına 36 → ~3 DB sorgusu (%92 azalma)
+  - Cache TTL: 30sn (güvenlik dengesi)
+- **Commit:** `3413b217`
 
 ### Önceki Yapılan İş (2026-05-27 — Performans Optimizasyonu v2)
 - **`reactCompiler: true` varsayılan olarak açıldı** — `NEXT_EXPERIMENTAL_PERF` env var kaldırıldı, artık her build'de aktif
@@ -84,7 +88,7 @@ Build stabil. `npm run build` → exit 0 ✅
 ## 🔜 Sonraki Adımlar
 
 ### Öncelik Sırası
-1. **API yavaşlıkları (500-900ms)** — Rust backend yavaş, Cloud Run cold start veya DB sorguları. Backend log'larına bak, slow query'leri bul. en önemli iş bu
+1. ~~**API yavaşlıkları (500-900ms)**~~ → JWT auth cache eklendi, deploy sonrası test et
 2. **auth/me hâlâ 2x çağrılıyor** — store'dan bir kez, muhtemelen usePermissions veya useTeams'den bir kez daha. Tekilleştir.
 3. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
 4. **DB Sorgu Optimizasyonu** — slow query log, index optimizasyonu (6 oturum)
