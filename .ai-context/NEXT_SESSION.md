@@ -75,7 +75,7 @@ Build stabil. `npm run build` → exit 0 ✅
 ## 🔜 Sonraki Adımlar
 
 ### Öncelik Sırası
-1. tarayıcıdan sayfa ms leri ölçülecrl ve yüksek ms sebepleri bulunup düzeltilecek en önemli öncelik bu giriş servetarslan02@gmail.com  Alayci_165
+1. tarayıcıdan sayfa ms leri ölçüleceka ve yüksek ms sebepleri bulunup düzeltilecek en önemli öncelik bu giriş servetarslan02@gmail.com  Alayci_165 bu en öncelikli iş muhakkak tarayıcıdan lomtrol yapışacak ilk işle. olarak
 1. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
 2. **DB Sorgu Optimizasyonu** — slow query log, index optimizasyonu (6 oturum)
 3. **API Hızlandırma** — auth cache, rate limiting Redis'e taşıma (8 oturum)
