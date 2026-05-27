@@ -94,12 +94,14 @@ Build stabil. `npm run build` → exit 0 ✅
 
 ### Öncelik Sırası
 1. ~~**API yavaşlıkları (500-900ms)**~~ → JWT auth cache eklendi, deploy sonrası test et
-2. **auth/me hâlâ 2x çağrılıyor** — store'dan bir kez, muhtemelen usePermissions veya useTeams'den bir kez daha. Tekilleştir.
-3. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
-4. **DB Sorgu Optimizasyonu** — slow query log, index optimizasyonu (6 oturum)
-5. **API Hızlandırma** — auth cache, rate limiting Redis'e taşıma (8 oturum)
-6. **Webhook Hızlandırma** — Redis Streams queue (10 oturum)
-7. **Cold Start** — minScale:1 (0.5 oturum)
+2. ** önce gcp logları çekip hataların hepsini düzelt, memoryde gcp json var ordan al logları çek
+3. **auth/me hâlâ 2x çağrılıyor** — store'dan bir kez, muhtemelen usePermissions veya useTeams'den bir kez daha. Tekilleştir.
+4. **API Hızlandırma** — auth cache, rate limiting Redis'e taşıma (8 oturum)
+5. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
+6. **DB Sorgu Optimizasyonu** — slow query log, index optimizasyonu (6 oturum)
+7. 
+8. **Webhook Hızlandırma** — Redis Streams queue (10 oturum)
+9. **Cold Start** — minScale:1 (0.5 oturum)
 
 ### Kritik Notlar
 
