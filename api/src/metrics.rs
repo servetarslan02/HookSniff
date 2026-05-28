@@ -191,15 +191,8 @@ impl Metrics {
             .register(Box::new(db_query_duration_seconds.clone()))
             .expect("valid metric definition");
         registry
-            .register(Box::new(auth_latency_seconds.clone()))
-            .expect("valid metric definition");
-        registry
             .register(Box::new(rate_limit_latency_seconds.clone()))
             .expect("valid metric definition");
-        registry
-            .register(Box::new(webhook_deliveries_total.clone()))
-            .expect("valid metric definition");
-
         Self {
             registry,
             http_requests_total,
