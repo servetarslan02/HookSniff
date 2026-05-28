@@ -23,7 +23,6 @@ const AUTH_CACHE_MAX_ENTRIES: usize = 10_000;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
-use crate::cache::CacheLayer;
 
 /// Dual-layer auth cache: In-memory (L1) + Redis (L2)
 struct AuthCacheV2 {

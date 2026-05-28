@@ -200,7 +200,7 @@ pub async fn create_webhook(
     reserve_webhook_slot(&pool, &cache, &customer, 1, team_id).await?;
 
     // Track daily event usage for overage notifications (best-effort)
-    let _ = track_daily_event(&pool, &customer, None, team_id).await;
+    let _ = track_daily_event(&pool, &customer, &cache, None, team_id).await;
 
     let delivery = sqlx::query_as::<_, Delivery>(
         "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) VALUES ($1, $2, $3, $4, 'pending', $5, $6) RETURNING *",
@@ -306,7 +306,7 @@ pub async fn batch_webhooks(
     reserve_webhook_slot(&pool, &cache, &customer, batch_count, team_id).await?;
 
     // Track daily event usage for overage notifications (best-effort, once per batch)
-    let _ = track_daily_event(&pool, &customer, None, team_id).await;
+    let _ = track_daily_event(&pool, &customer, &cache, None, team_id).await;
 
     // Collect unique endpoint IDs and fetch all in one query (eliminates N+1)
     let endpoint_ids: Vec<Uuid> = req
