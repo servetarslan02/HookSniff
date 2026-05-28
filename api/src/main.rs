@@ -186,7 +186,6 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(pool.clone()))
         .layer(axum::Extension(health_pool))
         .layer(axum::Extension(cfg.clone()))
-        .layer(axum::Extension(metrics.clone()))
         .layer(axum::Extension(email_provider))
         .layer(axum::Extension(job_queue))
         .layer(axum::Extension(cache_layer))
@@ -206,7 +205,8 @@ async fn main() -> Result<()> {
         .layer(axum::middleware::from_fn(middleware::request_timeout_middleware))
         .layer(axum::middleware::from_fn(middleware::security_headers_middleware))
         .layer(axum::middleware::from_fn(rate_limit::rate_limit_middleware))
-        .layer(axum::Extension(rate_limiter));
+        .layer(axum::Extension(rate_limiter))
+        .layer(axum::Extension(metrics));
 
     // ── Start server ────────────────────────────────────────────
     let addr = format!("0.0.0.0:{}", cfg.port);
