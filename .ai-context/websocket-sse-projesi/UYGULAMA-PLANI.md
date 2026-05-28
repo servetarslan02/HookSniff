@@ -4,7 +4,7 @@
 > **Hedef:** Real-time webhook durum güncellemelerini optimize etmek
 > **Mevcut:** SSE + WebSocket var ama optimize değil → **Hedef: < 100ms gecikme, 1000+ bağlantı**
 > **Ek Maliyet:** $0
-
+- neon: postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 ---
 
 ## 📖 İçindekiler
