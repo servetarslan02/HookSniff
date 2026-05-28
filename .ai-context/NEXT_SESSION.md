@@ -100,6 +100,14 @@ API deploy: europe-west1 ✅ (revision 01031-n8j, sıfır panic, sıfır hata)
 - Git email `servetarslan02@gmail.com` olarak ayarlandı (Vercel deploy için)
 - Commit'ler: `1cdd067a`, `bbb0f5cf`, `2b604fd7`, `2b233d56`, `d56c1ada`
 
+### ⚠️ Kritik Not — Redis Durumu
+- **Redis yapılandırılmamış** — API health check: `"note": "not configured"`
+- Upstash kotası dolmuş (500K/500K)
+- REDIS_URL GCP Secret Manager'da (`hooksniff-redis-url`)
+- Yeni Upstash hesabı veya alternatif gerekli
+- **Redis yokken:** API cache çalışmıyor, her istek DB'ye gidiyor (yavaş ama çalışıyor)
+- Servet yeni Upstash hesabı oluşturmalı, REDIS_URL'i vermeli
+
 ### ⚠️ Kritik Not — Vercel Projesi
 - CLI ile deploy ederken `--name hooksniff-dash` KULLANMA
 - Önce `vercel link --project hooksniff-dash` yap, sonra `vercel --prod` ile deploy et
