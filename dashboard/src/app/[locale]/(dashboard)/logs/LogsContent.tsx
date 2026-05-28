@@ -6,7 +6,7 @@ import { useRouter, usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import type { Delivery } from '@/lib/api';
-import { useDeliveryLogs, useDeliveryAttempts } from '@/hooks/useDashboardData';
+import { useDeliveryLogs, useDeliveryAttempts, useStatusCounts } from '@/hooks/useDashboardData';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { StatusBadge } from '@/components/StatusBadge';
 import { VirtualTable } from '@/components/VirtualTable';
@@ -23,7 +23,7 @@ export function LogsContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [allLogs, setAllLogs] = useState<Delivery[]>([]);
   const prevFilterRef = useRef(filter);
-  const { input: search, deferredValue: debouncedSearch, handleChange: handleSearchChange, isStale } = useDebouncedSearch();
+  const { input: search, deferredValue: debouncedSearch, handleChange: handleSearchChange, isStale: _isStale } = useDebouncedSearch();
   const [selected, setSelected] = useState<Delivery | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const t = useTranslations('logs');
@@ -38,9 +38,10 @@ export function LogsContent() {
     refetchInterval: autoRefresh ? 5000 : undefined,
   });
 
+  const { data: rawStatusCounts } = useStatusCounts();
   const deliveries = data?.deliveries ?? [];
   const total = data?.total ?? 0;
-  const statusCounts = data?.statusCounts ?? { all: 0, delivered: 0, failed: 0, pending: 0 };
+  const statusCounts = rawStatusCounts ?? { all: 0, delivered: 0, failed: 0, pending: 0 };
 
   // Accumulate logs from all loaded pages
   useEffect(() => {

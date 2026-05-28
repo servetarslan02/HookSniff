@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import Script from 'next/script';
+
 
 const LS_KEY = 'hooksniff_cookie_consent';
 
