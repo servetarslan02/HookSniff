@@ -1,14 +1,15 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-29 (OpenClaw — Gece Oturumu)
+> **Son güncelleme:** 2026-05-29 (OpenClaw — Oturum 2)
 > **Bu dosya her oturum başında okunur.**
 
 ---
 
-## ✅ Build Durumu: GCP error 
+## ✅ Build Durumu: TEMİZ
 
-Dashboard: `npm run build` → hatalar var memoryde json var logları al gerekeni kur ve düzelt düzeldiğini takip et
+Dashboard: `npm run build` → exit 0 ✅ (584+ sayfa, 0 TypeScript hatası)
 API deploy: europe-west1 ✅ (revision 01031-n8j)
+Cargo: Sandbox'ta kurulu değil — API compile kontrolü yapılamıyor
 
 ---
 
