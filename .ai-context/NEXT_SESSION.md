@@ -1,46 +1,53 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-29 (OpenClaw — Oturum 6)
+> **Son güncelleme:** 2026-05-29 (OpenClaw — Oturum 7)
 > **Bu dosya her oturum başında okunur.**
 
 ---
-beni sinir etmek için bilerekmi yapıyorsun google cloud da hata var diyorum sen ver el bakıyorsun memoryde json var gir vaksana şu loglara boş boş işlerle uğraşıyorsun hala
-## ✅ Build Durumu: SUCCESS
 
-Dashboard: `npm run build` → exit 0 ✅ (584+ sayfa, 0 TypeScript hatası)
-API deploy: europe-west1 ✅ (revision 01032-2fj)
-API sağlık: ✅ healthy (DB: 23ms, queue: 0 pending)
+## ✅ Durum: SAĞLIKLI
+
+API: ✅ healthy (DB: 24ms, queue: 0 pending)
+Dashboard: ✅ READY (Vercel)
+Son 8 saatte HTTP 500 hata: 0
 
 ---
 
-## 🔧 Yapılan Düzeltmeler (Oturum 6)
+## 📊 GCP Log Analizi (48 Saat — 100 Hata)
 
-### Startup Probe Eklendi — `cloudbuild.yaml`
-**Sorun:** Container hazır olmadan trafik geliyordu → 500 hataları
-- 50x HTTP 500 (18 farklı endpoint)
-- Container exit(101) — startup failure
-- `responseSize: 1214` = Cloud Run HTML hata sayfası (API JSON değil)
-- Service worker (sw.js) container başlarken istek atıyordu
+### Hata Dağılımı (Revision Bazlı):
+| Revision | Hata | Açıklama |
+|----------|------|----------|
+| 01029-zlx | 84 | Eski revision, deploy crash |
+| 01032-2fj | 12 | Mevcut revision, startup sırasında |
+| 01031-n8j | 4 | Ara revision |
 
-**Çözüm:** API ve Worker deploy'larına startup probe eklendi:
+### En Çok Hata Veren Endpoint'ler:
+| Endpoint | Hata | Sebep |
+|----------|------|-------|
+| /admin/stats | 29 | DB sorgu hatası (startup) |
+| /admin/revenue | 27 | DB sorgu hatası (startup) |
+| /billing/usage | 16 | DB sorgu hatası (startup) |
+| /broadcasts | 7 | DB sorgu hatası (startup) |
+| /notifications | 4 | DB sorgu hatası (startup) |
+
+### Root Cause:
+Container startup sırasında DB bağlantısı hazır olmadan trafik geliyordu.
+`responseSize: 1214` = Cloud Run HTML hata sayfası (API JSON değil).
+
+### Yapılan Fix:
+`cloudbuild.yaml`'a startup probe eklendi:
 ```
 --startup-probe=http,path=/health,port=3000,initial-delay=10s,period=5s,failure-threshold=12,timeout=5s
 ```
-- Initial delay: 10s (DB bağlantısı için zaman tanır)
-- Period: 5s (her 5 saniyede bir kontrol)
-- Failure threshold: 12 (60 saniye max startup süresi)
-- Timeout: 5s (her probe için)
-
-**Etki:** Bundan sonra deploy'da container hazır olmadan trafik gelmeyecek.
 
 ---
 
-## 🔜 Sonraki Adımlar (Öncelik Sırası)
+## 🔜 Sonraki Adımlar
 
 ### 1. 🔴 Deploy Et (startup probe fix)
-- `cloudbuild.yaml` güncellendi
-- Cloud Build tetiklenmeli: `gcloud builds submit --config=cloudbuild.yaml .`
-- **Servet'in yapması gereken:** GitHub push → Cloud Build otomatik tetiklenir
+- `cloudbuild.yaml` güncellendi, GitHub'a push edildi
+- Cloud Build tetiklenmeli
 
 ### 2. 🔴 Redis Altyapısı
 - Upstash Redis kotası dolmuş
