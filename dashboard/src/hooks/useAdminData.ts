@@ -9,6 +9,7 @@ import {
   DeployInfoSchema,
   AdminUsersResponseSchema,
   type DeployInfoValidated,
+  type AdminUsersResponseValidated,
 } from '@/schemas/api';
 
 // ── Re-exports ──
@@ -51,7 +52,7 @@ export function useAdminUsers(params?: {
   sort_dir?: string;
 }) {
   const { token } = useAuth();
-  return useQuery({
+  return useQuery<AdminUsersResponseValidated>({
     queryKey: ['admin', 'users', params],
     queryFn: validated(
       () => adminApi.listUsers(token!, params),
@@ -59,7 +60,7 @@ export function useAdminUsers(params?: {
     ),
     enabled: !!token,
     staleTime: 30_000,
-    placeholderData: (previousData) => previousData,
+    placeholderData: (prev) => prev,
   });
 }
 

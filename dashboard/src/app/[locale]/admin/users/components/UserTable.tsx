@@ -132,8 +132,8 @@ export function UserTable({
             <div className="px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 flex items-center">{u.name || '—'}</div>
             <div className="px-3 py-3 sm:py-4 flex items-center">
               <div className="flex items-center gap-1 sm:gap-1.5">
-                <span className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${planBadgeColors[u.plan] || planBadgeColors.developer}`}>
-                  {u.plan}
+                <span className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${planBadgeColors[u.plan ?? 'developer'] || planBadgeColors.developer}`}>
+                  {u.plan ?? 'developer'}
                 </span>
                 {u.role && u.role !== 'member' && (
                   <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 hidden sm:inline-flex">
@@ -143,17 +143,17 @@ export function UserTable({
               </div>
             </div>
             <div className="px-3 py-3 sm:py-4 flex items-center">
-              <StatusBadge status={u.status} />
+              <StatusBadge status={u.status ?? 'active'} />
             </div>
             <div className="px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 flex items-center">
-              {new Date(u.created_at).toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+              {new Date(u.created_at ?? '').toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })}
             </div>
             <div className="px-3 py-3 sm:py-4 flex items-center">
               <div className="flex items-center gap-1 sm:gap-2">
                 <PrefetchLink href={`/admin/users/${u.id}`} prefetchData={userDetailPrefetch(u.id)} hoverDelay={80} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">{tc('view')}</PrefetchLink>
-                <button type="button" onClick={() => { setPlanChangeTarget(u); setNewPlan(u.plan); }} className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium hidden md:inline">{t('changePlan')}</button>
-                <button type="button" onClick={() => handleToggleStatus(u)} className={`text-xs font-medium hidden md:inline ${u.status === 'active' ? 'text-red-600 dark:text-red-400 hover:text-red-700' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'}`}>
-                  {u.status === 'active' ? t('banUser') : t('activateUser')}
+                <button type="button" onClick={() => { setPlanChangeTarget(u); setNewPlan(u.plan ?? 'developer'); }} className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium hidden md:inline">{t('changePlan')}</button>
+                <button type="button" onClick={() => handleToggleStatus(u)} className={`text-xs font-medium hidden md:inline ${(u.status ?? 'active') === 'active' ? 'text-red-600 dark:text-red-400 hover:text-red-700' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'}`}>
+                  {(u.status ?? 'active') === 'active' ? t('banUser') : t('activateUser')}
                 </button>
                 <button type="button" onClick={() => handleImpersonate(u)} className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 font-medium hidden md:inline" title={t('viewAsUser')}>
                   <Eye size={16} strokeWidth={1.75} className="inline mr-1" /> {t('impersonateUser')}

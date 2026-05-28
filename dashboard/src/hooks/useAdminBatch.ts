@@ -23,6 +23,7 @@ import {
 import type {
   AdminStatsValidated,
   RevenueValidated,
+  AuditLogResponseValidated,
   DeployInfoValidated,
 } from '@/schemas/api';
 
@@ -140,8 +141,8 @@ export function useAdminDashboardDeferred(enabled = true) {
       },
     ],
     combine: (results) => ({
-      auditLogs: results[0].data,
-      featureFlags: results[1].data,
+      auditLogs: results[0].data as AuditLogResponseValidated | undefined,
+      featureFlags: results[1].data as { flags: any[] } | undefined,
       deployInfo: results[2].data as DeployInfoValidated | undefined,
       rateLimitData: results[3].data,
       isLoading: results.some((r) => r.isLoading),

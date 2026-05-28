@@ -47,6 +47,7 @@ export const DeliveryListResponseSchema = z.object({
   page: z.number(),
   per_page: z.number(),
 });
+export type DeliveryListResponseValidated = z.infer<typeof DeliveryListResponseSchema>;
 
 // ── Admin Stats Schema ──
 export const AdminStatsSchema = z.object({
@@ -116,6 +117,7 @@ export const AuditLogResponseSchema = z.object({
   limit: z.number().optional(),
   offset: z.number().optional(),
 });
+export type AuditLogResponseValidated = z.infer<typeof AuditLogResponseSchema>;
 
 // ── Endpoint Health Schema ──
 export const EndpointHealthSchema = z.object({
@@ -157,6 +159,7 @@ export type FeatureFlagValidated = z.infer<typeof FeatureFlagSchema>;
 export const FeatureFlagsResponseSchema = z.object({
   flags: z.array(FeatureFlagSchema),
 });
+export type FeatureFlagsResponseValidated = z.infer<typeof FeatureFlagsResponseSchema>;
 
 // ── Deploy Info Schema ──
 export const DeployInfoSchema = z.object({
@@ -218,6 +221,7 @@ export const StatsResponseSchema = z.object({
   success_rate: z.number(),
   endpoints_count: z.number(),
 });
+export type StatsResponseValidated = z.infer<typeof StatsResponseSchema>;
 
 // ── Health Schema ──
 export const HealthResponseSchema = z.object({
@@ -238,6 +242,7 @@ export const DeliveryTrendSchema = z.object({
     })
   ),
 });
+export type DeliveryTrendValidated = z.infer<typeof DeliveryTrendSchema>;
 
 // ── Success Rate Schema ──
 export const SuccessRateSchema = z.object({
@@ -247,6 +252,7 @@ export const SuccessRateSchema = z.object({
   pending: z.number(),
   success_rate: z.number(),
 });
+export type SuccessRateValidated = z.infer<typeof SuccessRateSchema>;
 
 // ── WS Event Schema ──
 export const WsEventSchema = z.object({
@@ -445,6 +451,7 @@ export const FailedDeliveriesResponseSchema = z.object({
   })),
   count: z.number(),
 });
+export type FailedDeliveriesResponseValidated = z.infer<typeof FailedDeliveriesResponseSchema>;
 
 // ── Dead Letters Response Schema ──
 export const DeadLettersResponseSchema = z.object({
@@ -472,6 +479,7 @@ export const RateLimitViolationsResponseSchema = z.object({
   })),
   count: z.number(),
 });
+export type RateLimitViolationsResponseValidated = z.infer<typeof RateLimitViolationsResponseSchema>;
 
 // ── API Latency Response Schema ──
 export const ApiLatencyResponseSchema = z.object({
@@ -875,6 +883,7 @@ export const LatencyBucketSchema = z.object({
 export const LatencyTrendSchema = z.object({
   buckets: z.array(LatencyBucketSchema),
 });
+export type LatencyTrendValidated = z.infer<typeof LatencyTrendSchema>;
 
 // ── API Key Schema ──
 export const ApiKeySchema = z.object({
