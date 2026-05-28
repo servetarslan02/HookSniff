@@ -4,7 +4,7 @@
 > **Bu dosya her oturum başında okunur.**
 
 ---
-
+beni sinir etmek için bilerekmi yapıyorsun google cloud da hata var diyorum sen ver el bakıyorsun memoryde json var gir vaksana şu loglara boş boş işlerle uğraşıyorsun hala
 ## ✅ Build Durumu: SUCCESS
 
 Dashboard: `npm run build` → exit 0 ✅ (584+ sayfa, 0 TypeScript hatası)
