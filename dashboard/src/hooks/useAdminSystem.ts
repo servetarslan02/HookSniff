@@ -11,6 +11,8 @@ import {
   RateLimitViolationsResponseSchema,
   ApiLatencyResponseSchema,
   type SystemHealthValidated,
+  type FailedDeliveriesResponseValidated,
+  type RateLimitViolationsResponseValidated,
 } from '@/schemas/api';
 
 // ── Schema-validated fetcher wrapper ──
@@ -54,12 +56,12 @@ export function useQueueStatus(enabled = true) {
 // ── Failed Deliveries ──
 export function useFailedDeliveries(params?: { limit?: number; since?: string }) {
   const { token } = useAuth();
-  return useQuery({
+  return useQuery<FailedDeliveriesResponseValidated>({
     queryKey: ['admin', 'failed-deliveries', params],
     queryFn: validated(() => adminApi.getFailedDeliveries(token!, params), FailedDeliveriesResponseSchema),
     enabled: !!token && !!params,
     staleTime: 15_000,
-    placeholderData: (previousData) => previousData,
+    placeholderData: (prev) => prev,
   });
 }
 
@@ -77,12 +79,12 @@ export function useDeadLetters(params?: { limit?: number; since?: string }) {
 // ── Rate Limit Violations ──
 export function useRateLimitViolations(params?: { limit?: number; since?: string }) {
   const { token } = useAuth();
-  return useQuery({
+  return useQuery<RateLimitViolationsResponseValidated>({
     queryKey: ['admin', 'rate-limit-violations', params],
     queryFn: validated(() => adminApi.getRateLimitViolations(token!, params), RateLimitViolationsResponseSchema),
     enabled: !!token && !!params,
     staleTime: 15_000,
-    placeholderData: (previousData) => previousData,
+    placeholderData: (prev) => prev,
   });
 }
 

@@ -11,24 +11,28 @@ import {
   SuccessRateSchema,
   EndpointHealthSchema,
   LatencyTrendSchema,
+  type StatsResponseValidated,
+  type DeliveryTrendValidated,
+  type SuccessRateValidated,
+  type LatencyTrendValidated,
 } from '@/schemas/api';
 
 // ── Dashboard Stats ──
 export function useDashboardStats() {
   const { token } = useAuth();
-  return useQuery({
+  return useQuery<StatsResponseValidated>({
     queryKey: ['stats'],
     queryFn: validated(() => statsApi.get(token!), StatsResponseSchema),
     enabled: !!token,
     staleTime: 30_000,
-    placeholderData: (previousData) => previousData,
+    placeholderData: (prev) => prev,
   });
 }
 
 // ── Analytics: Delivery Trend ──
 export function useDeliveryTrend(range = '24h') {
   const { token } = useAuth();
-  return useQuery({
+  return useQuery<DeliveryTrendValidated>({
     queryKey: ['analytics', 'delivery-trend', range],
     queryFn: validated(
       () => analyticsApi.deliveryTrend(token!, range),
@@ -36,14 +40,14 @@ export function useDeliveryTrend(range = '24h') {
     ),
     enabled: !!token,
     staleTime: 30_000,
-    placeholderData: (previousData) => previousData,
+    placeholderData: (prev) => prev,
   });
 }
 
 // ── Analytics: Success Rate ──
 export function useSuccessRate(range = '24h') {
   const { token } = useAuth();
-  return useQuery({
+  return useQuery<SuccessRateValidated>({
     queryKey: ['analytics', 'success-rate', range],
     queryFn: validated(
       () => analyticsApi.successRate(token!, range),
@@ -51,7 +55,7 @@ export function useSuccessRate(range = '24h') {
     ),
     enabled: !!token,
     staleTime: 30_000,
-    placeholderData: (previousData) => previousData,
+    placeholderData: (prev) => prev,
   });
 }
 
@@ -74,7 +78,7 @@ export function useEndpointHealth(range = '24h') {
 // ── Latency Trend ──
 export function useLatencyTrend(range = '24h') {
   const { token } = useAuth();
-  return useQuery({
+  return useQuery<LatencyTrendValidated>({
     queryKey: ['latency-trend', range],
     queryFn: validated(
       () => analyticsApi.latencyTrend(token!, range),
@@ -82,6 +86,6 @@ export function useLatencyTrend(range = '24h') {
     ),
     enabled: !!token,
     staleTime: 30_000,
-    placeholderData: (previousData) => previousData,
+    placeholderData: (prev) => prev,
   });
 }

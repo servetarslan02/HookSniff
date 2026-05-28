@@ -30,19 +30,7 @@ export default function DeliveriesContent() {
   const bulkReplayEnabled = useIsFeatureEnabled('bulk_replay');
 
   // ── URL-driven state ──
-  const _page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
   const filter = (searchParams.get('status') || 'all') as StatusFilter;
-
-  const _setParam = useCallback((key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value === 'all' || value === '1' || value === 'table') {
-      params.delete(key);
-    } else {
-      params.set(key, value);
-    }
-    const qs = params.toString();
-    router.push(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
-  }, [searchParams, router, pathname]);
 
   // ── Search state (Concurrent Features — useDeferredValue) ──
   const { input: searchInput, deferredValue: debouncedSearch, handleChange: setSearchInput, isStale: _isStale } = useDebouncedSearch();

@@ -127,10 +127,10 @@ export interface AdminUser {
   id: string;
   email: string;
   name?: string | null;
-  plan: string;
-  role: string;
-  status: 'active' | 'banned';
-  created_at: string;
+  plan?: string | null;
+  role?: string | null;
+  status?: string | null;
+  created_at?: string | null;
   is_active?: boolean | null;
   is_admin?: boolean | null;
   total_deliveries?: number | null;
