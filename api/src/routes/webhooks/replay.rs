@@ -21,6 +21,7 @@ pub async fn replay_webhook(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(_cfg): Extension<Config>,
+    Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<DeliveryResponse>, AppError> {
@@ -57,10 +58,10 @@ pub async fn replay_webhook(
         serde_json::to_string(&original.payload).map_err(|e| AppError::Internal(e.into()))?;
 
     // Atomic check-and-increment: reserve webhook slot before creating replay delivery
-    reserve_webhook_slot(&pool, &customer, 1, team_id).await?;
+    reserve_webhook_slot(&pool, &cache, &customer, 1, team_id).await?;
 
     // Track daily event usage for overage notifications (best-effort)
-    let _ = track_daily_event(&pool, &customer, None, team_id).await;
+    let _ = track_daily_event(&pool, &customer, &cache, None, team_id).await;
 
     let new_delivery = sqlx::query_as::<_, Delivery>(
         "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, replay_count) VALUES ($1, $2, $3, $4, 'pending', $5, 1) RETURNING *",
@@ -102,6 +103,7 @@ pub async fn batch_replay(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(_cfg): Extension<Config>,
+    Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     Extension(feature_flags): Extension<FeatureFlagService>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<BatchReplayRequest>,
@@ -160,7 +162,7 @@ pub async fn batch_replay(
         };
 
         // Rate limit check — never-blocked mode support
-        if reserve_webhook_slot(&pool, &customer, 1, team_id).await.is_err() {
+        if reserve_webhook_slot(&pool, &cache, &customer, 1, team_id).await.is_err() {
             errors.push(serde_json::json!({ "id": id, "error": "Rate limit exceeded" }));
             continue;
         }
