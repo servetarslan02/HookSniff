@@ -1,4 +1,16 @@
-# ── Stage 1: Builder ──
+# ── Stage 1: Planner (cargo-chef) ──
+FROM lukemathwalker/cargo-chef:latest-rust-1.95-bookworm AS planner
+WORKDIR /app
+COPY . .
+RUN cargo chef prepare --recipe-json recipe.json
+
+# ── Stage 2: Cacher (Compile dependencies) ──
+FROM lukemathwalker/cargo-chef:latest-rust-1.95-bookworm AS cacher
+WORKDIR /app
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-json recipe.json
+
+# ── Stage 3: Builder ──
 FROM rust:1.95-bookworm AS builder
 
 # Install build dependencies
@@ -7,18 +19,16 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY Cargo.toml Cargo.lock ./
-COPY api/ api/
-COPY worker/ worker/
-COPY common/ common/
-COPY docs/ docs/
-COPY vendor/ vendor/
+COPY . .
+# Copy pre-compiled dependencies from cacher
+COPY --from=cacher /app/target target
+COPY --from=cacher $CARGO_HOME $CARGO_HOME
 
-# Build release binary with optimizations
+# Build release binary (uses cached dependencies)
 RUN cargo build --release -p hooksniff-api && \
     strip /app/target/release/hooksniff-api
 
-# ── Stage 2: Runtime ──
+# ── Stage 4: Runtime ──
 FROM debian:bookworm-slim
 
 # Install only runtime dependencies
