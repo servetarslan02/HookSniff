@@ -8,6 +8,7 @@ use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 use sqlx::PgPool;
+use crate::db;
 
 use crate::error::AppError;
 use crate::models::customer::Customer;
@@ -94,25 +95,27 @@ async fn delivery_trend(
     let bucket_hours = query.bucket_size_hours();
     let range_label = query.range.as_deref().unwrap_or("24h");
 
-    let buckets: Vec<(DateTime<Utc>, i64, i64, i64)> = sqlx::query_as(
-        r#"
-        SELECT
-            date_trunc('hour', created_at) - (EXTRACT(HOUR FROM created_at)::int % $3) * INTERVAL '1 hour' AS bucket,
-            COUNT(*) FILTER (WHERE status = 'delivered') AS successful,
-            COUNT(*) FILTER (WHERE status = 'failed') AS failed,
-            COUNT(*) AS total
-        FROM deliveries
-        WHERE customer_id = $1
-          AND created_at >= now() - INTERVAL '1 hour' * $2
-        GROUP BY bucket
-        ORDER BY bucket ASC
-        "#,
-    )
-    .bind(customer.id)
-    .bind(hours)
-    .bind(bucket_hours as i32)
-    .fetch_all(&pool)
-    .await?;
+    let buckets: Vec<(DateTime<Utc>, i64, i64, i64)> = db::timed_query("analytics_delivery_trend", async {
+        sqlx::query_as(
+            r#"
+            SELECT
+                date_trunc('hour', created_at) - (EXTRACT(HOUR FROM created_at)::int % $3) * INTERVAL '1 hour' AS bucket,
+                COUNT(*) FILTER (WHERE status = 'delivered') AS successful,
+                COUNT(*) FILTER (WHERE status = 'failed') AS failed,
+                COUNT(*) AS total
+            FROM deliveries
+            WHERE customer_id = $1
+              AND created_at >= now() - INTERVAL '1 hour' * $2
+            GROUP BY bucket
+            ORDER BY bucket ASC
+            "#,
+        )
+        .bind(customer.id)
+        .bind(hours)
+        .bind(bucket_hours as i32)
+        .fetch_all(&pool)
+        .await
+    }).await?;
 
     Ok(Json(DeliveryTrendResponse {
         range: range_label.to_string(),
@@ -138,21 +141,23 @@ async fn success_rate(
     let hours = query.interval_hours();
     let range_label = query.range.as_deref().unwrap_or("24h");
 
-    let stats: (i64, i64, i64) = sqlx::query_as(
-        r#"
-        SELECT
-            COUNT(*) FILTER (WHERE status = 'delivered'),
-            COUNT(*) FILTER (WHERE status = 'failed'),
-            COUNT(*) FILTER (WHERE status = 'pending')
-        FROM deliveries
-        WHERE customer_id = $1
-          AND created_at >= now() - INTERVAL '1 hour' * $2
-        "#,
-    )
-    .bind(customer.id)
-    .bind(hours)
-    .fetch_one(&pool)
-    .await?;
+    let stats: (i64, i64, i64) = db::timed_query("analytics_success_rate", async {
+        sqlx::query_as(
+            r#"
+            SELECT
+                COUNT(*) FILTER (WHERE status = 'delivered'),
+                COUNT(*) FILTER (WHERE status = 'failed'),
+                COUNT(*) FILTER (WHERE status = 'pending')
+            FROM deliveries
+            WHERE customer_id = $1
+              AND created_at >= now() - INTERVAL '1 hour' * $2
+            "#,
+        )
+        .bind(customer.id)
+        .bind(hours)
+        .fetch_one(&pool)
+        .await
+    }).await?;
 
     let total = stats.0 + stats.1 + stats.2;
     let rate = if total > 0 {
