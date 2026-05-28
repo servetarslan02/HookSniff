@@ -143,7 +143,7 @@ API deploy: europe-west1 ✅ (revision 01031-n8j, sıfır panic, sıfır hata)
 1. ~~**API yavaşlıkları (500-900ms)**~~ → JWT auth cache eklendi, deploy sonrası test et
 3. ~~**auth/me 2x çağrılıyor**~~ → React Strict Mode useRef guard ile düzeltildi
 4. ~~**DB Index Optimizasyonu**~~ → Migration 102: 9 yeni index eklendi
-5. **API Hızlandırma** — önce api hızlandırma klasörünü incele adımları sırasıyla gerçekleştir, tüm site apileri için gerçekleştir.
+5. **websocket-sse-projesi** — önce websocket-sse-projesi klasörünü incele adımları sırasıyla gerçekleştir, tüm site apileri için gerçekleştir.
 6. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
 7. **Webhook Hızlandırma** — Redis Streams queue (10 oturum)
 8. **Cold Start** — minScale:1 (0.5 oturum)
