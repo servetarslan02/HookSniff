@@ -137,7 +137,7 @@ API deploy: europe-west1 ✅ (revision 01031-n8j, sıfır panic, sıfır hata)
 | 8. Turbopack | ✅ | Config aktif |
 | 9. React Compiler | ✅ | babel-plugin-react-compiler kuruldu |
 | 10. PPR | ❌ | Client layout'lar ile uyumsuz |
-| 11. Infinite Scroll | ⏳ | Sıradaki adım |
+| 11. Infinite Scroll | ✅ | IntersectionObserver auto-load (DeliveriesList + DeliveriesContent) |
 
 **Aktif katmanlar: 1-9. Bloke: 10. Sıradaki: 12 (Infinite Scroll).**
 
