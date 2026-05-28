@@ -63,7 +63,7 @@ pub fn parse_date_to_str(s: &str) -> Option<DateTime<Utc>> {
 }
 
 use crate::billing::models::TeamTrackingInfo;
-use crate::billing::resolve_team_tracking;
+pub use crate::billing::resolve_team_tracking;
 
 /// Atomically increment webhook_count with overage support.
 /// When team_id is provided, webhook_count is tracked on the team owner's record
