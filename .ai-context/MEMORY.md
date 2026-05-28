@@ -1,5 +1,5 @@
 # MEMORY.md — HookSniff Proje Hafızası
-> Son güncelleme: 2026-05-28 GMT+8 (OpenClaw — Startup Panic Fix + Deploy Fix)
+> Son güncelleme: 2026-05-29 GMT+8 (OpenClaw — Dashboard Deploy + Verifikasyon)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 - burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış, kendine süre tut 45-50 dk sonra uyarı ver githup pushla buraları güncelle soradaki işin api hozlandırma klasörü. işten sonra vercel build hataları çıkarsa düzelt:
 - vercel:  vcp_1QcjDdCNwpMj8mCNf1UoDBMat1Yi128aMhzmJE4FzEF31aiTZJ3qfJ2h
@@ -27,6 +27,32 @@ gcp hatalarınıda düzelt, panellerfe verilerde görünmüyor izleme kullanıcl
 ---
 
 ## 📝 Son Oturum Logları
+
+### 2026-05-29 — Dashboard Deploy + Verifikasyon
+**Süre:** ~30 dk | **Agent:** OpenClaw (webchat)
+
+**Yapılanlar:**
+1. Repo klonlandı, tüm `.ai-context` dosyaları okundu
+2. API sağlık kontrolü: ✅ sağlıklı (DB: 22ms, queue: 0 pending)
+3. Veritabanı doğrulaması: 55 kullanıcı, 144 delivery, 26 endpoint, $544 gelir
+4. Dashboard Vercel'e deploy edildi: `hooksniff-dash` → https://hooksniff.vercel.app
+5. Vercel proxy doğrulandı: `/api/health` → 200
+6. Admin endpoint'leri çalışıyor (UNAUTHORIZED = auth gerektiriyor, doğru)
+7. Build başarılı (88s, 584 sayfa)
+
+**Tespitler:**
+- Veritabanında veri var (55 kullanıcı, 144 delivery)
+- Admin kullanıcıları mevcut (servetarslan02@gmail.com, ai-test@hooksniff.com)
+- API CTE sorguları çalışıyor (individüel test edildi)
+- Sentry upload hatası non-fatal (org token geçersiz)
+
+**Kalan İşler:**
+- Servet'in dashboard'da veri görebilmesi için login olması gerekiyor
+- Upstash Redis kotası dolmuş — yeni hesap gerekli
+- Webhook Hızlandırma (Redis Streams queue)
+- Cold Start optimizasyonu (minScale:1)
+
+---
 
 ### 2026-05-28 — Startup Panic Fix + Deploy Fix
 **Süre:** ~45 dk | **Agent:** OpenClaw (webchat)
