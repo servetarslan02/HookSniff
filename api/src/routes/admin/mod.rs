@@ -419,7 +419,6 @@ mod tests {
     fn test_admin_router_construction() {
         let _router = router();
     }
-}
 
     #[test]
     fn test_user_summary_banned_status() {
@@ -452,3 +451,5 @@ mod tests {
         let from_json: serde_json::Value = serde_json::from_str(&json_str).unwrap();
         assert_eq!(from_json["event"], "user.signup");
     }
+}
+
