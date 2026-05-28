@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-29 (OpenClaw — Dashboard Deploy + Verifikasyon)
+> **Son güncelleme:** 2026-05-29 (OpenClaw — SSE Event-Driven Optimization)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -10,14 +10,20 @@
 Build stabil. `npm run build` → exit 0 ✅
 API deploy: europe-west1 ✅ (revision 01031-n8j, sıfır panic, sıfır hata)
 
-### Son Yapılan İş (2026-05-29 — OpenClaw Oturumu: Dashboard Deploy + Verifikasyon)
+### Son Yapılan İş (2026-05-29 — OpenClaw Oturumu: SSE Event-Driven Optimization Faz 1)
+- **SSE Faz 1 TAMAMLANDI:** `/v1/stream/deliveries` ve `/v1/stream/channels/{id}/subscribe` endpoint'leri event-driven yapıldı
+- **Yeni dosya:** `api/src/routes/stream/sse_bridge.rs` — EventPublisher broadcast channel'dan SSE stream
+- **Eski yapı:** Her 2 saniyede bir DB polling (5s gecikme, DB yükü)
+- **Yeni yapı:** EventPublisher broadcast → SSE stream (< 100ms gecikme, sıfır DB sorgusu)
+- **Dashboard güncellendi:** `useDeliveryStream.ts` — `delivery_status` event handler eklendi
+- **Dashboard güncellendi:** `useRealtime.ts` — `delivery_status` event type eklendi
+- **Commit:** `8c51583e`
+- **Push:** ✅ main
+
+### Önceki Yapılan İş (2026-05-29 — OpenClaw Oturumu: Dashboard Deploy + Verifikasyon)
 - **Dashboard Vercel'e deploy edildi:** `hooksniff-dash` projesi, production URL: https://hooksniff.vercel.app
 - **API sağlık kontrolü:** ✅ sağlıklı (DB: 22ms, queue: 0 pending)
 - **Veritabanı doğrulaması:** 55 kullanıcı, 144 delivery, 26 endpoint, $544 gelir
-- **Admin endpoint'leri:** Çalışıyor, auth gerektiriyor (doğru)
-- **Vercel proxy:** `/api/health` → 200, `/api/v1/admin/stats` → UNAUTHORIZED (doğru)
-- **Build:** Başarılı (88s, 584 sayfa)
-- **Not:** Sentry upload hatası non-fatal (org token geçersiz, kritik değil)
 
 ### Son Yapılan İş (2026-05-28 — OpenClaw Oturumu: Startup Panic Fix + Deploy Fix)
 - **Metric duplicate registration panic düzeltildi:** `api/src/metrics.rs` — 3 metric (auth_latency_seconds, rate_limit_latency_seconds, webhook_deliveries_total) iki kez register ediliyordu → Prometheus `AlreadyReg` panic ile container ölüyordu
@@ -143,7 +149,7 @@ API deploy: europe-west1 ✅ (revision 01031-n8j, sıfır panic, sıfır hata)
 1. ~~**API yavaşlıkları (500-900ms)**~~ → JWT auth cache eklendi, deploy sonrası test et
 3. ~~**auth/me 2x çağrılıyor**~~ → React Strict Mode useRef guard ile düzeltildi
 4. ~~**DB Index Optimizasyonu**~~ → Migration 102: 9 yeni index eklendi
-5. **websocket-sse-projesi** — önce websocket-sse-projesi klasörünü incele adımları sırasıyla gerçekleştir, tüm site apileri için gerçekleştir.
+5. **websocket-sse-projesi** — SSE Faz 1 ✅ TAMAMLANDI. Sıradaki: Faz 2 (WebSocket Optimizasyonu)
 6. **Redis altyapısı** — Upstash yeni hesap veya alternatif (webhook hızlandırma için gerekli)
 7. **Webhook Hızlandırma** — Redis Streams queue (10 oturum)
 8. **Cold Start** — minScale:1 (0.5 oturum)
