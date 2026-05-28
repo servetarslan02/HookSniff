@@ -4,12 +4,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { webhooksApi, statsApi, type DeliveryDetail, type DeliveryAttempt } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { validated } from './validated';
-import { DeliveryListResponseSchema } from '@/schemas/api';
+import { DeliveryListResponseSchema, type DeliveryListResponseValidated } from '@/schemas/api';
 
 // ── Webhooks (Deliveries) ──
 export function useWebhooks(params?: { page?: number; status?: string }) {
   const { token } = useAuth();
-  return useQuery({
+  return useQuery<DeliveryListResponseValidated>({
     queryKey: ['webhooks', params],
     queryFn: validated(
       () => webhooksApi.list(token!, params),
@@ -17,7 +17,7 @@ export function useWebhooks(params?: { page?: number; status?: string }) {
     ),
     enabled: !!token,
     staleTime: 15_000,
-    placeholderData: (previousData) => previousData,
+    placeholderData: (prev) => prev,
   });
 }
 
