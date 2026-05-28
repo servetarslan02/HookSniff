@@ -320,9 +320,9 @@ enum StageOutcome {
 /// Call this ONCE from main.rs — replaces all individual tokio::spawn stage tasks.
 pub fn start_cortex_scheduler(pool: PgPool) {
     tokio::spawn(async move {
-        tracing::info!("🧠 Cortex Scheduler started — tick every 30s, 9 stages");
+        tracing::info!("🧠 Cortex Scheduler started — tick every 30s, {} stages", ALL_STAGES.len());
 
-        let mut last_runs: [Option<Instant>; 9] = [None; 9];
+        let mut last_runs: Vec<Option<Instant>> = vec![None; ALL_STAGES.len()];
         let mut ticker = tokio::time::interval(Duration::from_secs(30));
         let mut tick_count: u64 = 0;
 
