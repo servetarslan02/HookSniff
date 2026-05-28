@@ -32,6 +32,40 @@ pub struct WsGateway {
     pub jwt_secret: String,
     /// HS-019: Maximum concurrent WebSocket connections.
     pub max_connections: usize,
+    /// Per-customer connection limit (default: 10).
+    pub max_connections_per_customer: usize,
+    /// Connection metrics for monitoring.
+    pub metrics: Arc<WsConnectionMetrics>,
+}
+
+/// WebSocket connection metrics for monitoring (lightweight, no Prometheus dependency).
+pub struct WsConnectionMetrics {
+    /// Total connections ever established.
+    pub total_connections: std::sync::atomic::AtomicU64,
+    /// Currently active connections.
+    pub active_connections: std::sync::atomic::AtomicU64,
+    /// Connections rejected due to limit.
+    pub rejected_connections: std::sync::atomic::AtomicU64,
+    /// Messages successfully sent.
+    pub messages_sent: std::sync::atomic::AtomicU64,
+    /// Messages dropped (slow consumer).
+    pub messages_dropped: std::sync::atomic::AtomicU64,
+    /// Stale connections cleaned up.
+    pub stale_cleanups: std::sync::atomic::AtomicU64,
+}
+
+impl WsConnectionMetrics {
+    pub fn new() -> Self {
+        use std::sync::atomic::AtomicU64;
+        Self {
+            total_connections: AtomicU64::new(0),
+            active_connections: AtomicU64::new(0),
+            rejected_connections: AtomicU64::new(0),
+            messages_sent: AtomicU64::new(0),
+            messages_dropped: AtomicU64::new(0),
+            stale_cleanups: AtomicU64::new(0),
+        }
+    }
 }
 
 /// A single WebSocket connection with its metadata and subscriptions.
@@ -95,11 +129,14 @@ impl WsGateway {
             event_tx,
             jwt_secret,
             max_connections: 1000, // HS-019: Default limit
+            max_connections_per_customer: 10, // Per-customer limit
+            metrics: Arc::new(WsConnectionMetrics::new()),
         }
     }
 
     /// Register a new WebSocket connection.
     /// HS-019: Rejects new connections when max_connections is reached.
+    /// Per-customer limit: max 10 connections per customer.
     pub async fn add_connection(
         &self,
         customer_id: Uuid,
@@ -108,14 +145,28 @@ impl WsGateway {
     ) -> Result<String, &'static str> {
         let mut connections = self.connections.write().await;
 
-        // HS-019: Check connection limit
+        // HS-019: Check global connection limit
         if connections.len() >= self.max_connections {
             warn!(
-                "⚠️ WebSocket connection limit reached ({}/{}), rejecting new connection",
+                "⚠️ WebSocket global limit reached ({}/{}), rejecting",
                 connections.len(),
                 self.max_connections
             );
+            self.metrics.rejected_connections.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
             return Err("Connection limit reached");
+        }
+
+        // Per-customer connection limit
+        let customer_count = connections.values()
+            .filter(|c| c.customer_id == customer_id)
+            .count();
+        if customer_count >= self.max_connections_per_customer {
+            warn!(
+                "⚠️ WebSocket per-customer limit reached for {} ({}/{})",
+                customer_id, customer_count, self.max_connections_per_customer
+            );
+            self.metrics.rejected_connections.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            return Err("Per-customer connection limit reached");
         }
 
         let connection_id = Uuid::new_v4().to_string();
@@ -130,11 +181,19 @@ impl WsGateway {
 
         connections.insert(connection_id.clone(), connection);
 
+        // Update metrics
+        self.metrics.total_connections.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        self.metrics.active_connections.store(
+            connections.len() as u64,
+            std::sync::atomic::Ordering::Relaxed,
+        );
+
         info!(
-            "🔌 WebSocket connection {} established ({}/{})",
+            "🔌 WebSocket connection {} established ({}/{}, customer: {})",
             connection_id,
             connections.len(),
-            self.max_connections
+            self.max_connections,
+            customer_id,
         );
         Ok(connection_id)
     }
@@ -143,6 +202,10 @@ impl WsGateway {
     pub async fn remove_connection(&self, connection_id: &str) {
         let mut connections = self.connections.write().await;
         if connections.remove(connection_id).is_some() {
+            self.metrics.active_connections.store(
+                connections.len() as u64,
+                std::sync::atomic::Ordering::Relaxed,
+            );
             info!("🔌 WebSocket connection {} removed", connection_id);
         }
     }
@@ -175,6 +238,8 @@ impl WsGateway {
     /// Broadcast an event to all matching connections.
     ///
     /// Filters connections by customer_id and event type patterns.
+    /// Uses try_send for bounded channels — drops events for slow consumers
+    /// rather than blocking the broadcast loop.
     pub async fn broadcast_event(&self, event: WsEvent) {
         let connections = self.connections.read().await;
 
@@ -182,13 +247,22 @@ impl WsGateway {
             // Check if the event matches any of the connection's filters
             if event_matches_filters(&event.event_type, &conn.event_filters) {
                 let msg = WsMessage::Event(event.clone());
-                // BUG-025: Use try_send for bounded channel — drop events for slow consumers
-                // rather than blocking the broadcast loop.
-                if conn.tx.try_send(msg).is_err() {
-                    warn!(
-                        "Failed to send event to connection {} (channel full or closed)",
-                        conn.connection_id
-                    );
+                match conn.tx.try_send(msg) {
+                    Ok(_) => {
+                        self.metrics.messages_sent.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                    }
+                    Err(tokio::sync::mpsc::error::TrySendError::Full(_)) => {
+                        // Slow consumer — drop event, don't block
+                        self.metrics.messages_dropped.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        warn!(
+                            "⚠️ Slow consumer: connection {} channel full, dropping event",
+                            conn.connection_id
+                        );
+                    }
+                    Err(tokio::sync::mpsc::error::TrySendError::Closed(_)) => {
+                        // Connection closed — will be cleaned up by stale checker
+                        debug!("Connection {} closed, skipping", conn.connection_id);
+                    }
                 }
             }
         }
@@ -209,9 +283,10 @@ impl WsGateway {
         self.connections.read().await.len()
     }
 
-    /// Clean up stale connections (no heartbeat in 5 minutes).
+    /// Clean up stale connections (no heartbeat in 60 seconds).
+    /// Reduced from 5 minutes to 60 seconds for faster cleanup.
     pub async fn cleanup_stale(&self) {
-        let stale_threshold = chrono::Utc::now() - chrono::Duration::minutes(5);
+        let stale_threshold = chrono::Utc::now() - chrono::Duration::seconds(60);
         let mut connections = self.connections.write().await;
         let stale_ids: Vec<String> = connections
             .iter()
@@ -221,9 +296,64 @@ impl WsGateway {
 
         for id in &stale_ids {
             connections.remove(id);
-            info!("🧹 Cleaned up stale WebSocket connection {}", id);
+        }
+
+        if !stale_ids.is_empty() {
+            self.metrics.stale_cleanups.fetch_add(
+                stale_ids.len() as u64,
+                std::sync::atomic::Ordering::Relaxed,
+            );
+            self.metrics.active_connections.store(
+                connections.len() as u64,
+                std::sync::atomic::Ordering::Relaxed,
+            );
+            info!(
+                "🧹 Cleaned up {} stale WebSocket connections ({} active)",
+                stale_ids.len(),
+                connections.len()
+            );
         }
     }
+
+    /// Graceful shutdown — notify all clients and close connections.
+    pub async fn shutdown(&self) {
+        let connections = self.connections.read().await;
+        let count = connections.len();
+
+        for (_, conn) in connections.iter() {
+            let msg = WsMessage::Error {
+                code: "server_shutdown".to_string(),
+                message: "Server is shutting down. Please reconnect.".to_string(),
+            };
+            let _ = conn.tx.try_send(msg);
+        }
+
+        info!("🔌 WebSocket gateway shutdown — {} connections notified", count);
+    }
+
+    /// Get connection metrics snapshot for monitoring.
+    pub fn metrics_snapshot(&self) -> WsMetricsSnapshot {
+        use std::sync::atomic::Ordering;
+        WsMetricsSnapshot {
+            total_connections: self.metrics.total_connections.load(Ordering::Relaxed),
+            active_connections: self.metrics.active_connections.load(Ordering::Relaxed),
+            rejected_connections: self.metrics.rejected_connections.load(Ordering::Relaxed),
+            messages_sent: self.metrics.messages_sent.load(Ordering::Relaxed),
+            messages_dropped: self.metrics.messages_dropped.load(Ordering::Relaxed),
+            stale_cleanups: self.metrics.stale_cleanups.load(Ordering::Relaxed),
+        }
+    }
+}
+
+/// Snapshot of WebSocket metrics for API responses.
+#[derive(Debug, Serialize)]
+pub struct WsMetricsSnapshot {
+    pub total_connections: u64,
+    pub active_connections: u64,
+    pub rejected_connections: u64,
+    pub messages_sent: u64,
+    pub messages_dropped: u64,
+    pub stale_cleanups: u64,
 }
 
 /// Check if an event type matches a list of filter patterns.
