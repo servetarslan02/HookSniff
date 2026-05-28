@@ -142,12 +142,20 @@ pub async fn confirm_2fa(
         .execute(&pool)
         .await?;
 
-    for hash in &backup_code_hashes {
-        sqlx::query("INSERT INTO tfa_backup_codes (customer_id, code_hash) VALUES ($1, $2)")
-            .bind(customer.id)
-            .bind(hash)
-            .execute(&pool)
-            .await?;
+    // Batch INSERT — tek sorguyla tüm backup codes (N+1 fix)
+    if !backup_code_hashes.is_empty() {
+        let mut query = String::from("INSERT INTO tfa_backup_codes (customer_id, code_hash) VALUES ");
+        let mut params: Vec<String> = Vec::new();
+        for i in 0..backup_code_hashes.len() {
+            params.push(format!("(${}, ${})", i * 2 + 1, i * 2 + 2));
+        }
+        query.push_str(&params.join(", "));
+
+        let mut q = sqlx::query(&query);
+        for hash in &backup_code_hashes {
+            q = q.bind(customer.id).bind(hash);
+        }
+        q.execute(&pool).await?;
     }
 
     sqlx::query("UPDATE customers SET totp_enabled = true, updated_at = NOW() WHERE id = $1")
