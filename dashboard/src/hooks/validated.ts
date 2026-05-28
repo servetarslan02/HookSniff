@@ -6,19 +6,10 @@
  */
 export function validated<T>(
   fetcher: () => Promise<unknown>,
-  schema: { safeParse: (data: unknown) => { success: true; data: T } | { success: false; error: unknown } }
-): () => Promise<T | unknown> {
+  schema: { parse: (data: unknown) => T }
+): () => Promise<T> {
   return async () => {
     const data = await fetcher();
-    const parsed = schema.safeParse(data);
-
-    if (!parsed.success) {
-      return data;
-    }
-
-    return {
-      ...(data as Record<string, unknown>),
-      ...(parsed.data as Record<string, unknown>),
-    } as T;
+    return schema.parse(data);
   };
 }
