@@ -2,7 +2,7 @@
 
 > **Son güncelleme:** 2026-05-29 (OpenClaw — Oturum 7)
 > **Bu dosya her oturum başında okunur.**
-bilerek yapıyorsun dimi gcp hata veriyoe sen ver el bakıyorsun, tinermi içiyprsun keyin kafadını yaşıyorsun
+bilerek yapıyorsun dimi gcp hata veriyoe sen vercel bakıyorsun, tinermi içiyprsun keyin kafadını yaşıyorsun şu gcp yi çmz beni sinir etme 
 ---
 
 ## ✅ Durum: SAĞLIKLI
