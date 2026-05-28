@@ -172,12 +172,12 @@ export const AdminUserSchema = z.object({
   id: z.string(),
   email: z.string(),
   name: z.string().nullish(),
-  plan: z.string(),
-  role: z.string(),
-  status: z.enum(['active', 'banned']),
+  plan: z.string().nullish().default('developer'),
+  role: z.string().nullish().default('member'),
+  status: z.string().nullish().default('active'),
   is_active: z.boolean().nullish(),
   is_admin: z.boolean().nullish(),
-  created_at: z.string(),
+  created_at: z.string().nullish().default(''),
   total_deliveries: z.number().nullish(),
   total_endpoints: z.number().nullish(),
 });
@@ -259,16 +259,54 @@ export type WsEvent = z.infer<typeof WsEventSchema>;
 // ── System Health Schema ──
 export const SystemHealthSchema = z.object({
   status: z.string().optional(),
-  database: z.object({ status: z.string(), latency_ms: z.number() }).optional(),
-  redis: z.object({ status: z.string(), latency_ms: z.number() }).optional(),
-  api: z.object({ status: z.string(), uptime_seconds: z.number() }).optional(),
-  queue: z.object({ pending: z.number(), processing: z.number(), failed: z.number() }).optional(),
+  database: z.object({
+    status: z.string(),
+    latency_ms: z.number().nullish(),
+    error: z.string().optional(),
+  }).optional(),
+  redis: z.object({
+    status: z.string(),
+    latency_ms: z.number().nullish(),
+    note: z.string().optional(),
+    error: z.string().optional(),
+  }).optional(),
+  api: z.object({
+    status: z.string(),
+    uptime_seconds: z.number().nullish(),
+  }).optional(),
+  queue: z.object({
+    pending: z.number().nullish(),
+    processing: z.number().nullish(),
+    failed: z.number().nullish(),
+  }).optional(),
   checks: z.object({
-    database: z.object({ status: z.string(), latency_ms: z.number() }).optional(),
-    queue: z.object({ status: z.string(), latency_ms: z.number(), pending_count: z.number().optional() }).optional(),
-    redis: z.object({ status: z.string(), latency_ms: z.number(), note: z.string().optional() }).optional(),
-    last_delivery: z.object({ status: z.string(), last_delivered_at: z.string().optional() }).optional(),
-    db_size: z.object({ status: z.string(), size: z.string().optional() }).optional(),
+    database: z.object({
+      status: z.string(),
+      latency_ms: z.number().nullish(),
+      error: z.string().optional(),
+    }).optional(),
+    queue: z.object({
+      status: z.string(),
+      latency_ms: z.number().nullish(),
+      pending_count: z.number().nullish(),
+      error: z.string().optional(),
+    }).optional(),
+    redis: z.object({
+      status: z.string(),
+      latency_ms: z.number().nullish(),
+      note: z.string().optional(),
+      error: z.string().optional(),
+    }).optional(),
+    last_delivery: z.object({
+      status: z.string(),
+      last_delivered_at: z.string().nullish(),
+      error: z.string().optional(),
+    }).optional(),
+    db_size: z.object({
+      status: z.string(),
+      size: z.string().nullish(),
+      error: z.string().optional(),
+    }).optional(),
     recent_errors: z.object({
       status: z.string(),
       errors: z.array(z.object({
@@ -277,12 +315,14 @@ export const SystemHealthSchema = z.object({
         error: z.string().optional(),
         created_at: z.string(),
       })).optional(),
+      error: z.string().optional(),
     }).optional(),
     queue_detail: z.object({
       status: z.string(),
-      pending: z.number().optional(),
-      processing: z.number().optional(),
-      failed_last_hour: z.number().optional(),
+      pending: z.number().nullish(),
+      processing: z.number().nullish(),
+      failed_last_hour: z.number().nullish(),
+      error: z.string().optional(),
     }).optional(),
   }).optional(),
 });
