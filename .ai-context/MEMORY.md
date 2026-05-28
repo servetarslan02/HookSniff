@@ -1,5 +1,5 @@
 # MEMORY.md — HookSniff Proje Hafızası
-> Son güncelleme: 2026-05-29 GMT+8 (OpenClaw — Admin Fix + Code Review)
+> Son güncelleme: 2026-05-29 GMT+8 (OpenClaw — Oturum 2)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 - burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış, kendine süre tut 45-50 dk sonra uyarı ver githup pushla buraları güncelle soradaki işin api hozlandırma klasörü. işten sonra vercel build hataları çıkarsa düzelt:
 - vercel:  vcp_1QcjDdCNwpMj8mCNf1UoDBMat1Yi128aMhzmJE4FzEF31aiTZJ3qfJ2h
@@ -27,6 +27,23 @@ gcp hatalarınıda düzelt,
 ---
 
 ## 📝 Son Oturum Logları
+
+### 2026-05-29 — OpenClaw Oturum 2 (webchat)
+**Süre:** ~45 dk | **Agent:** OpenClaw (webchat)
+
+**Yapılanlar:**
+1. **Repo klonlandı** — `.ai-context` hafıza sistemi tamamen okundu
+2. **npm install** — 730+ paket, 0 vulnerability ✅
+3. **Dashboard build** — `npx next build` → exit 0 ✅ (584+ sayfa, 0 TS hatası)
+4. **Git config** — servetarslan02@gmail.com olarak ayarlandı
+5. **Oturum logu** — `.ai-context/logs/2026-05-29-openclaw-session-2.md`
+
+**Tespitler:**
+- Cargo/Rust sandbox'ta kurulu değil — API compile kontrolü yapılamıyor
+- Dashboard build temiz
+- Redis kotası hala dolmuş — yeni Upstash hesabı gerekli
+
+---
 
 ### 2026-05-29 — Admin Fix + Code Review (OpenClaw)
 **Süre:** ~30 dk | **Agent:** OpenClaw (webchat)
