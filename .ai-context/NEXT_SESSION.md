@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-28 (OpenClaw — Startup Panic Fix + Deploy Fix)
+> **Son güncelleme:** 2026-05-29 (OpenClaw — Dashboard Deploy + Verifikasyon)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -9,6 +9,15 @@
 
 Build stabil. `npm run build` → exit 0 ✅
 API deploy: europe-west1 ✅ (revision 01031-n8j, sıfır panic, sıfır hata)
+
+### Son Yapılan İş (2026-05-29 — OpenClaw Oturumu: Dashboard Deploy + Verifikasyon)
+- **Dashboard Vercel'e deploy edildi:** `hooksniff-dash` projesi, production URL: https://hooksniff.vercel.app
+- **API sağlık kontrolü:** ✅ sağlıklı (DB: 22ms, queue: 0 pending)
+- **Veritabanı doğrulaması:** 55 kullanıcı, 144 delivery, 26 endpoint, $544 gelir
+- **Admin endpoint'leri:** Çalışıyor, auth gerektiriyor (doğru)
+- **Vercel proxy:** `/api/health` → 200, `/api/v1/admin/stats` → UNAUTHORIZED (doğru)
+- **Build:** Başarılı (88s, 584 sayfa)
+- **Not:** Sentry upload hatası non-fatal (org token geçersiz, kritik değil)
 
 ### Son Yapılan İş (2026-05-28 — OpenClaw Oturumu: Startup Panic Fix + Deploy Fix)
 - **Metric duplicate registration panic düzeltildi:** `api/src/metrics.rs` — 3 metric (auth_latency_seconds, rate_limit_latency_seconds, webhook_deliveries_total) iki kez register ediliyordu → Prometheus `AlreadyReg` panic ile container ölüyordu
