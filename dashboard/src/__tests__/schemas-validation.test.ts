@@ -436,6 +436,22 @@ describe('SystemHealthSchema', () => {
     const result = SystemHealthSchema.safeParse({});
     expect(result.success).toBe(true);
   });
+
+  it('accepts degraded health payloads with missing latency and error details', () => {
+    const health = {
+      status: 'degraded',
+      database: { status: 'unhealthy', error: 'DB unavailable' },
+      redis: { status: 'healthy', note: 'not configured' },
+      checks: {
+        database: { status: 'unhealthy', error: 'DB unavailable' },
+        queue: { status: 'healthy', pending_count: 0 },
+        redis: { status: 'healthy', note: 'not configured' },
+      },
+    };
+
+    const result = SystemHealthSchema.safeParse(health);
+    expect(result.success).toBe(true);
+  });
 });
 
 // ════════════════════════════════════════════════════════════════
@@ -534,6 +550,32 @@ describe('Cross-schema validation', () => {
       page: 1,
       per_page: 20,
     };
+    const result = AdminUsersResponseSchema.safeParse(response);
+    expect(result.success).toBe(true);
+  });
+
+  it('AdminUsersResponseSchema accepts null-valued user rows from the API', () => {
+    const response = {
+      users: [
+        {
+          id: 'user-1',
+          email: 'admin@test.com',
+          name: null,
+          plan: null,
+          role: null,
+          status: 'banned',
+          is_active: false,
+          is_admin: null,
+          created_at: '2026-05-16T00:00:00Z',
+          total_deliveries: null,
+          total_endpoints: null,
+        },
+      ],
+      total: 1,
+      page: 1,
+      per_page: 20,
+    };
+
     const result = AdminUsersResponseSchema.safeParse(response);
     expect(result.success).toBe(true);
   });

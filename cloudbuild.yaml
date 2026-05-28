@@ -25,26 +25,32 @@ steps:
         cargo check --workspace
     waitFor: ['-']
 
-  # Step 3: Build API image (with caching)
-  - name: 'gcr.io/kaniko-project/executor:latest'
+  # Step 3: Build API image
+  - name: 'gcr.io/cloud-builders/docker'
     id: 'build-api'
     args:
-      - '--destination=europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
-      - '--destination=europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/api:$SHORT_SHA'
-      - '--dockerfile=Dockerfile.api'
-      - '--cache=true'
-      - '--cache-ttl=168h'
+      - 'build'
+      - '-f'
+      - 'Dockerfile.api'
+      - '-t'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/api:$SHORT_SHA'
+      - '-t'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
+      - '.'
     waitFor: ['rust-check']
 
-  # Step 4: Build Worker image (with caching)
-  - name: 'gcr.io/kaniko-project/executor:latest'
+  # Step 4: Build Worker image
+  - name: 'gcr.io/cloud-builders/docker'
     id: 'build-worker'
     args:
-      - '--destination=europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
-      - '--destination=europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:$SHORT_SHA'
-      - '--dockerfile=Dockerfile.worker'
-      - '--cache=true'
-      - '--cache-ttl=168h'
+      - 'build'
+      - '-f'
+      - 'Dockerfile.worker'
+      - '-t'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:$SHORT_SHA'
+      - '-t'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
+      - '.'
     waitFor: ['rust-check']
 
   # Step 5: Build Dashboard image
@@ -62,7 +68,23 @@ steps:
       - '.'
     waitFor: ['-']
 
-  # Step 6: Push Dashboard image
+  # Step 6: Push API image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-api'
+    args:
+      - 'push'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/api:latest'
+    waitFor: ['build-api']
+
+  # Step 7: Push Worker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-worker'
+    args:
+      - 'push'
+      - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/worker:latest'
+    waitFor: ['build-worker']
+
+  # Step 8: Push Dashboard image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-dashboard'
     args:
@@ -70,7 +92,7 @@ steps:
       - 'europe-west3-docker.pkg.dev/$PROJECT_ID/hooksniff/dashboard:latest'
     waitFor: ['build-dashboard']
 
-  # Step 7: Deploy API to Cloud Run
+  # Step 9: Deploy API to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-api'
     entrypoint: gcloud
@@ -92,9 +114,9 @@ steps:
       - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,JWT_SECRET=hooksniff-jwt-secret:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest'
       - '--project=$PROJECT_ID'
       - '--quiet'
-    waitFor: ['build-api']
+    waitFor: ['push-api']
 
-  # Step 8: Deploy Worker to Cloud Run
+  # Step 10: Deploy Worker to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-worker'
     entrypoint: gcloud
@@ -114,9 +136,9 @@ steps:
       - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest'
       - '--project=$PROJECT_ID'
       - '--quiet'
-    waitFor: ['build-worker']
+    waitFor: ['push-worker']
 
-  # Step 9: Deploy Dashboard to Cloud Run
+  # Step 11: Deploy Dashboard to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-dashboard'
     entrypoint: gcloud
