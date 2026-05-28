@@ -11,7 +11,7 @@ Dashboard: `npm run build` → exit 0 ✅ (584+ sayfa, 0 TypeScript hatası)
 TypeScript: `npx tsc --noEmit` → exit 0 ✅ (0 hata)
 API deploy: europe-west1 ✅ (revision 01031-n8j)
 API sağlık: ✅ healthy (DB: 23ms, queue: 0 pending, uptime: ~8 saat)
-
+abicim mino2.5 pro salak değilsin dimi sana diyorum ki google cloud byildlerde hata var sen hala cargo rust falan uğraşıyorsun aq orada çıkmıyoe hatalar gcp son build loglarına bakacaksın hala yerel testlerle uğraşıyorsun gir şu logları çek artık, sana mesaj attığımda senin sistemin hata veriyoe mesajlarım sana ulaşamıyor o uüzden kaç oturumdur buraya yazıo duruyorum kaç oturum geöti sen hala boş boş testler çalıltırıyorsun gcp error veriyoe loglara bak diyorum mesajımda sana gelmiyor lütfen yorma beni şu logları çek bak artık
 ---
 
 ## 🔜 Sonraki Adımlar (Öncelik Sırası)
