@@ -48,8 +48,9 @@ gcp hatalarınıda düzelt, panellerfe verilerde görünmüyor izleme kullanıcl
 
 **Kalan İşler:**
 - Servet'in dashboard'da veri görebilmesi için login olması gerekiyor
-- Upstash Redis kotası dolmuş — yeni hesap gerekli
-- Webhook Hızlandırma (Redis Streams queue)
+- Upstash Redis kotası dolmuş — yeni hesap gerekli (REDIS_URL GCP Secret Manager'da)
+- Redis yokken API cache çalışmıyor → her istek DB'ye gidiyor (yavaş ama çalışıyor)
+- Webhook Hızlandırma (Redis Streams queue) — Redis gerekli
 - Cold Start optimizasyonu (minScale:1)
 
 ---
