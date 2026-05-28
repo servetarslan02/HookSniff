@@ -375,25 +375,32 @@ pub async fn notify_sdk_update(
     let sdk_list: Vec<String> = req.updates.iter().map(|u| format!("{}:{}", u.sdk, u.published_version)).collect();
     let link = format!("/settings?sdk_updates={}", sdk_list.join(","));
 
-    let mut count = 0;
-    for (user_id,) in &users {
-        sqlx::query(
-            r#"INSERT INTO notifications (customer_id, type, title, message, is_read, link)
-               VALUES ($1, 'system', $2, $3, FALSE, $4)"#,
-        )
-        .bind(user_id)
-        .bind(&title)
-        .bind(&message)
-        .bind(&link)
-        .execute(&pool)
-        .await?;
-        count += 1;
+    // Batch INSERT — tek sorguyla tüm kullanıcılara notification gönder (N+1 fix)
+    if !users.is_empty() {
+        let mut query = String::from(
+            "INSERT INTO notifications (customer_id, type, title, message, is_read, link) VALUES "
+        );
+        let mut params: Vec<String> = Vec::new();
+        for (i, (user_id,)) in users.iter().enumerate() {
+            let base = i * 5;
+            params.push(format!(
+                "(${}, 'system', ${}, ${}, FALSE, ${})",
+                base + 1, base + 2, base + 3, base + 4
+            ));
+        }
+        query.push_str(&params.join(", "));
+
+        let mut q = sqlx::query(&query);
+        for (user_id,) in &users {
+            q = q.bind(user_id).bind(&title).bind(&message).bind(&link);
+        }
+        q.execute(&pool).await?;
     }
 
-    tracing::info!("📢 SDK update notification sent to {} users", count);
+    tracing::info!("📢 SDK update notification sent to {} users", users.len());
 
     Ok(Json(serde_json::json!({
-        "message": format!("Notification sent to {} user(s)", count),
+        "message": format!("Notification sent to {} user(s)", users.len()),
         "title": title,
         "updates_count": req.updates.len(),
     })))
