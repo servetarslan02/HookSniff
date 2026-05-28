@@ -2,7 +2,9 @@
 # since all Dockerfiles use the root as build context. No per-service
 # .dockerignore files are needed.
 .git
-.github.ai-contexttarget/
+.github
+.ai-context
+target/
 dashboard/node_modules/
 dashboard/.next/
 dashboard/.turbo/
