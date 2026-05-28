@@ -179,6 +179,23 @@ export default function DeliveriesContent() {
     if (!loading && hasMore) setCurrentPage((p) => p + 1);
   }, [loading, hasMore]);
 
+  // IntersectionObserver for infinite scroll — auto-load on scroll
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && hasMore && !loading) {
+          handleLoadMore();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, loading, handleLoadMore]);
+
   // ── Replay handlers ──
   const handleReplay = async () => {
     if (!replayTarget) return;
@@ -452,21 +469,13 @@ export default function DeliveriesContent() {
               />
             </div>
 
-            {/* ─── Infinite Scroll ─── */}
+            {/* ─── Infinite Scroll sentinel ─── */}
             {hasMore && (
-              <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-center">
-                {loading ? (
-                  <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
-                    <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
-                    <span className="text-sm">{tc('loading')}</span>
-                  </div>
-                ) : (
-                  <button type="button" onClick={handleLoadMore}
-                    className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
-                  >
-                    {tc('showing', { from: 1, to: allDeliveriesAcc.length, total })} — {tc('loadMore') || 'Load more'}
-                  </button>
-                )}
+              <div ref={sentinelRef} className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-center">
+                <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                  <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
+                  <span className="text-sm">{tc('loading')}</span>
+                </div>
               </div>
             )}
           </>

@@ -86,6 +86,25 @@ export default function DeliveriesPage() {
     }
   }, [isLoading, hasMore]);
 
+  // IntersectionObserver for infinite scroll — triggers load when sentinel is visible
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && hasMore && !isLoading) {
+          handleLoadMore();
+        }
+      },
+      { rootMargin: '200px' } // Trigger 200px before reaching the bottom
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, handleLoadMore]);
+
   // SSE stream — real-time delivery updates as secondary data source
   const { connected: sseConnected, deliveries: sseDeliveries } = useDeliveryStream({
     token: token || '',
@@ -340,23 +359,13 @@ export default function DeliveriesPage() {
               }
             />
 
-            {/* Infinite Scroll — loads more data when scrolling down */}
+            {/* Infinite Scroll sentinel — IntersectionObserver triggers auto-load */}
             {hasMore && (
-              <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-center">
-                {loading ? (
-                  <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
-                    <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
-                    <span className="text-sm">{t('loadingDeliveries')}</span>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleLoadMore}
-                    className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
-                  >
-                    {tc('showing', { from: 1, to: allDeliveries.length, total })} — {t('loadMore') || 'Daha fazla yükle'}
-                  </button>
-                )}
+              <div ref={sentinelRef} className="px-6 py-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-center">
+                <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
+                  <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-brand-500 rounded-full animate-spin" />
+                  <span className="text-sm">{t('loadingDeliveries')}</span>
+                </div>
               </div>
             )}
           </>
