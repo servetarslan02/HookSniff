@@ -32,11 +32,11 @@ export default function AnalyticsPage() {
 
   const loading = trendLoading || srLoading || latencyLoading;
 
-  const chartData = trendData?.buckets.map(b => ({
+  const chartData = (trendData as any)?.buckets?.map((b: any) => ({
     date: new Date(b.timestamp).toLocaleString(undefined, {
       month: 'short',
       day: 'numeric',
-      ...(trendData.range === '24h' ? { hour: '2-digit', minute: '2-digit' } : {}),
+      ...((trendData as any)?.range === '24h' ? { hour: '2-digit', minute: '2-digit' } : {}),
     }),
     successful: b.successful,
     failed: b.failed,
@@ -143,11 +143,11 @@ export default function AnalyticsPage() {
             <ChartEmpty message={tc('noResults')} />
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={latencyData.buckets.map(b => ({
+              <AreaChart data={(latencyData as any)?.buckets?.map((b: any) => ({
                 date: new Date(b.ts).toLocaleString(undefined, { month: 'short', day: 'numeric' }),
                 avg: b.avg_ms,
                 p95: b.p95_ms,
-              }))} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+              })) ?? []} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="latencyColorAvg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} /><stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} /></linearGradient>
                   <linearGradient id="latencyColorP95" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} /><stop offset="95%" stopColor="#f59e0b" stopOpacity={0} /></linearGradient>

@@ -190,6 +190,7 @@ export const AdminUsersResponseSchema = z.object({
   page: z.number(),
   per_page: z.number(),
 });
+export type AdminUsersResponseValidated = z.infer<typeof AdminUsersResponseSchema>;
 
 // ── Admin User Detail Schema ──
 export const AdminUserDetailSchema = z.object({

@@ -12,11 +12,9 @@ import {
 import { useAuth } from '@/lib/store';
 import { validated } from './validated';
 import {
-  ApplicationSchema,
   SsoConfigSchema,
   SchemaRegistryListSchema,
   TemplateListSchema,
-  type ApplicationValidated,
   type SsoConfigValidated,
 } from '@/schemas/api';
 

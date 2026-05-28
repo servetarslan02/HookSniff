@@ -88,7 +88,7 @@ export default function AdminSystemPage() {
     if (selectedFailed.size === failedDeliveries.length) {
       setSelectedFailed(new Set());
     } else {
-      setSelectedFailed(new Set(failedDeliveries.map((d) => d.id)));
+      setSelectedFailed(new Set(failedDeliveries.map((d: any) => d.id)));
     }
   };
 
@@ -165,10 +165,10 @@ export default function AdminSystemPage() {
       {/* Below the fold: Queue + DB Size */}
       <LazySection fallback={Skeletons.card} rootMargin={300}>
         <QueueStatusSection
-          queueStatus={queueStatus}
-          dbSize={health?.checks?.db_size?.size}
-          queueDetail={health?.checks?.queue_detail}
-          recentErrors={health?.checks?.recent_errors?.errors}
+          queueStatus={queueStatus as any}
+          dbSize={health?.checks?.db_size?.size ?? undefined}
+          queueDetail={health?.checks?.queue_detail as any}
+          recentErrors={health?.checks?.recent_errors?.errors as any}
           locale={locale}
         />
       </LazySection>

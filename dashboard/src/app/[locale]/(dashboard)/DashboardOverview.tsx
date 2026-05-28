@@ -105,7 +105,7 @@ export function DashboardOverview() {
     return widgets.find((w) => w.id === id)?.visible ?? true;
   }, [widgets]);
 
-  const chartData = trendData?.buckets.map((b) => ({
+  const chartData = (trendData as any)?.buckets?.map((b: any) => ({
     date: new Date(b.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
     successful: b.successful,
     failed: b.failed,
@@ -476,7 +476,7 @@ export function DashboardOverview() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
-                {recentDeliveries.map((d) => (
+                {recentDeliveries.map((d: any) => (
                   <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
                     <td className="px-3 sm:px-4 py-2 sm:py-3">
                       <PrefetchLink href={`/deliveries/${d.id}`} prefetchData={token ? [{ queryKey: ['delivery', d.id], queryFn: () => apiFetch(`/webhooks/${d.id}`, { token }), staleTime: 30_000 }] : []} hoverDelay={80} className="font-mono text-xs text-brand-600 dark:text-brand-400 hover:underline">
