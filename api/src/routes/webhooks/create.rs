@@ -75,16 +75,19 @@ pub async fn create_webhook(
         let dedup_window = chrono::Duration::seconds(60); // 60s dedup window
         let cutoff = Utc::now() - dedup_window;
 
-        let duplicate = sqlx::query_as::<_, (Uuid, String, chrono::DateTime<Utc>)>(
-            "SELECT id, status, created_at FROM deliveries \
-             WHERE endpoint_id = $1 AND customer_id = $2 AND payload_hash = $3 \
-             AND created_at >= $4 ORDER BY created_at DESC LIMIT 1"
-        )
-        .bind(req.endpoint_id)
-        .bind(customer.id)
-        .bind(&content_hash)
-        .bind(cutoff)
-        .fetch_optional(&pool)
+        let duplicate = db::timed_query("webhook_dedup_check", async {
+            sqlx::query_as::<_, (Uuid, String, chrono::DateTime<Utc>)>(
+                "SELECT id, status, created_at FROM deliveries \
+                 WHERE endpoint_id = $1 AND customer_id = $2 AND payload_hash = $3 \
+                 AND created_at >= $4 ORDER BY created_at DESC LIMIT 1"
+            )
+            .bind(req.endpoint_id)
+            .bind(customer.id)
+            .bind(&content_hash)
+            .bind(cutoff)
+            .fetch_optional(&pool)
+            .await
+        })
         .await?;
 
         if let Some((dup_id, dup_status, dup_created)) = duplicate {
@@ -202,16 +205,19 @@ pub async fn create_webhook(
     // Track daily event usage for overage notifications (best-effort)
     let _ = track_daily_event(&pool, &customer, &cache, None, team_id).await;
 
-    let delivery = sqlx::query_as::<_, Delivery>(
-        "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) VALUES ($1, $2, $3, $4, 'pending', $5, $6) RETURNING *",
-    )
-    .bind(endpoint.id)
-    .bind(customer.id)
-    .bind(&payload)
-    .bind(&req.event)
-    .bind(retry_policy.max_attempts)
-    .bind(is_test.0)
-    .fetch_one(&pool)
+    let delivery = db::timed_query("webhook_create_delivery", async {
+        sqlx::query_as::<_, Delivery>(
+            "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts, is_test) VALUES ($1, $2, $3, $4, 'pending', $5, $6) RETURNING *",
+        )
+        .bind(endpoint.id)
+        .bind(customer.id)
+        .bind(&payload)
+        .bind(&req.event)
+        .bind(retry_policy.max_attempts)
+        .bind(is_test.0)
+        .fetch_one(&pool)
+        .await
+    })
     .await?;
 
     // Publish DeliveryCreated event (best-effort)
@@ -317,12 +323,15 @@ pub async fn batch_webhooks(
         .into_iter()
         .collect();
 
-    let endpoints: Vec<Endpoint> = sqlx::query_as::<_, Endpoint>(
-        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = ANY($1) AND customer_id = $2 AND is_active = true",
-    )
-    .bind(&endpoint_ids)
-    .bind(customer.id)
-    .fetch_all(&pool)
+    let endpoints: Vec<Endpoint> = db::timed_query("webhook_batch_endpoints", async {
+        sqlx::query_as::<_, Endpoint>(
+            "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = ANY($1) AND customer_id = $2 AND is_active = true",
+        )
+        .bind(&endpoint_ids)
+        .bind(customer.id)
+        .fetch_all(&pool)
+        .await
+    })
     .await?;
 
     let endpoint_map: std::collections::HashMap<Uuid, Endpoint> =
@@ -382,15 +391,18 @@ pub async fn batch_webhooks(
 
         let retry_policy = RetryPolicy::from_value(endpoint.retry_policy.as_ref());
 
-        match sqlx::query_as::<_, Delivery>(
-            "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts) VALUES ($1, $2, $3, $4, 'pending', $5) RETURNING *",
-        )
-        .bind(endpoint.id)
-        .bind(customer.id)
-        .bind(&payload)
-        .bind(&webhook_req.event)
-        .bind(retry_policy.max_attempts)
-        .fetch_one(&pool)
+        match db::timed_query("webhook_batch_create_delivery", async {
+            sqlx::query_as::<_, Delivery>(
+                "INSERT INTO deliveries (endpoint_id, customer_id, payload, event_type, status, max_attempts) VALUES ($1, $2, $3, $4, 'pending', $5) RETURNING *",
+            )
+            .bind(endpoint.id)
+            .bind(customer.id)
+            .bind(&payload)
+            .bind(&webhook_req.event)
+            .bind(retry_policy.max_attempts)
+            .fetch_one(&pool)
+            .await
+        })
         .await
         {
             Ok(delivery) => {
