@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-28 (OpenClaw — Güvenlik Fix + Kod Analizi)
+> **Son güncelleme:** 2026-05-28 (OpenClaw — Startup Panic Fix + Deploy Fix)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -8,8 +8,18 @@
 ## ✅ Build Durumu: ÇALIŞIYOR
 
 Build stabil. `npm run build` → exit 0 ✅
+API deploy: europe-west1 ✅ (revision 01031-n8j, sıfır panic, sıfır hata)
 
-### Son Yapılan İş (2026-05-28 — OpenClaw Oturumu: Güvenlik Fix + Kod Analiz)
+### Son Yapılan İş (2026-05-28 — OpenClaw Oturumu: Startup Panic Fix + Deploy Fix)
+- **Metric duplicate registration panic düzeltildi:** `api/src/metrics.rs` — 3 metric (auth_latency_seconds, rate_limit_latency_seconds, webhook_deliveries_total) iki kez register ediliyordu → Prometheus `AlreadyReg` panic ile container ölüyordu
+- **Cortex scheduler index out of bounds düzeltildi:** `api/src/cortex/scheduler.rs` — ALL_STAGES 11 eleman ama last_runs array'i 9 slot → Vec'e çevrildi
+- **Cloud Build region düzeltildi:** `cloudbuild.yaml` — deploy region europe-west3 → europe-west1 (production URL ile eşleşmiyordu)
+- **Dashboard API URL düzeltildi:** cloudbuild'deki NEXT_PUBLIC_API_URL europe-west3 endpoint'ini → production europe-west1 URL'ini gösteriyor
+- **GCP log erişimi sağlandı:** gcloud CLI kuruldu, service account ile auth yapıldı
+- **Commit'ler:** `9cfd0ae9`, `6d5495cd`, `2aae08b7`
+- **Deploy:** Manuel europe-west1 deploy + cloudbuild fix (artık otomatik build'lerdoğru region'a gidecek)
+
+### Önceki Yapılan İş (2026-05-28 — OpenClaw Oturumu: Güvenlik Fix + Kod Analiz)
 - **Worker response header sızıntısı düzeltildi:** `delivery/http.rs` — Set-Cookie, Authorization gibi hassas header'lar artık saklanmıyor
 - **Commit:** `97328281`
 - **Kod analizi:** 114 sessiz catch bloğu tespit edildi (çoğu Cortex sayfalarında, kasıtlı)
