@@ -5,11 +5,11 @@
 
 ---
 
-## ✅ Build Durumu: TEMİZ
+## ✅ Build Durumu: error 
 
 Dashboard: `npm run build` → exit 0 ✅ (584+ sayfa, 0 TypeScript hatası)
 API deploy: europe-west1 ✅ (revision 01031-n8j)
-Cargo: Sandbox'ta kurulu değil — API compile kontrolü yapılamıyor
+beni çıldırtıyorsun sana gcp hata var diyorum sen sağı solu inceliyorsun hala memory de gcp json vermişim ne gerekşyorsa kur ve loglardan hataları bul çöz, sana mesaj atamıyorum sistemin hata veriyor o yızden yorma beni gerekeni kur ve gcp loglarından hataları bul hallet boş beleş şeylerle uğraşma sürekli
 
 ---
 
