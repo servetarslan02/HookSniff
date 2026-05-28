@@ -22,7 +22,7 @@ gcp json :
 
 neon: postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 
-gcp hatalarınıda düzelt, panellerfe verilerde görünmüyor izleme kullanıclar vs
+gcp hatalarınıda düzelt,  
 
 ---
 
