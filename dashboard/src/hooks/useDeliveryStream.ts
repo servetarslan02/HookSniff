@@ -79,6 +79,20 @@ export function useDeliveryStream({ token, enabled = true, onDelivery }: UseDeli
                 } catch {
                   // ignore parse errors
                 }
+              } else if (eventType === 'delivery_status') {
+                // Event-driven status update from new SSE bridge
+                try {
+                  const update = JSON.parse(data);
+                  setDeliveries((prev) =>
+                    prev.map((d) =>
+                      d.id === update.id
+                        ? { ...d, status: update.new_status || update.status }
+                        : d
+                    )
+                  );
+                } catch {
+                  // ignore parse errors
+                }
               }
             }
           }

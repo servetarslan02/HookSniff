@@ -7,11 +7,11 @@
 //! - `GET    /v1/stream/channels/{id}`           — Get channel
 //! - `PUT    /v1/stream/channels/{id}`           — Update channel
 //! - `DELETE /v1/stream/channels/{id}`           — Delete channel
-//! - `GET    /v1/stream/channels/{id}/subscribe` — SSE subscribe to channel
+//! - `GET    /v1/stream/channels/{id}/subscribe` — SSE subscribe (event-driven, no polling)
 //! - `GET    /v1/stream/channels/{id}/messages`  — Recent messages
 //! - `GET    /v1/stream/subscriptions`           — List active subscriptions
 //! - `DELETE /v1/stream/subscriptions/{id}`      — Disconnect subscription
-//! - `GET    /v1/stream/deliveries`              — SSE delivery stream (legacy compat)
+//! - `GET    /v1/stream/deliveries`              — SSE delivery stream (event-driven, < 100ms)
 //! - `POST   /v1/stream/publish`                 — Publish event to channel
 
 use axum::routing::{get, post};
@@ -22,6 +22,7 @@ use uuid::Uuid;
 
 
 pub mod handlers;
+pub mod sse_bridge;
 pub use handlers::*;
 
 // Types and re-exports are below; handlers are in handlers.rs
@@ -33,11 +34,13 @@ pub fn router() -> Router {
             "/channels/{id}",
             get(get_channel).put(update_channel).delete(delete_channel),
         )
-        .route("/channels/{id}/subscribe", get(subscribe_to_channel))
+        // Event-driven SSE: subscribes to EventPublisher broadcast (no DB polling)
+        .route("/channels/{id}/subscribe", get(sse_bridge::channel_event_stream))
         .route("/channels/{id}/messages", get(list_messages))
         .route("/subscriptions", get(list_subscriptions))
         .route("/subscriptions/{id}", get(get_subscription).delete(disconnect_subscription))
-        .route("/deliveries", get(sse_deliveries_legacy))
+        // Event-driven delivery stream: < 100ms latency, no DB polling
+        .route("/deliveries", get(sse_bridge::delivery_event_stream))
         .route("/publish", post(publish_event))
 }
 
