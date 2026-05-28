@@ -5,9 +5,9 @@
 
 ---
 
-## ✅ Build Durumu: ÇALIŞIYOR
+## ✅ Build Durumu: GCP error 
 
-Build stabil. Dashboard: `npm run build` → exit 0 ✅
+Dashboard: `npm run build` → hatalar var memoryde json var logları al gerekeni kur ve düzelt düzeldiğini takip et
 API deploy: europe-west1 ✅ (revision 01031-n8j)
 
 ---
