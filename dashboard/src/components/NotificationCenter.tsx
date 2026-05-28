@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/lib/store';
-import { notificationsApi, teamsApi, type Notification } from '@/lib/api';
+import { teamsApi, type Notification } from '@/lib/api';
 import { useNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from '@/hooks/useNotifications';
 import { useBroadcasts, useBroadcastUnreadCount, useDismissBroadcast } from '@/hooks/useBroadcasts';
 import { useNotificationUnreadCount } from '@/hooks/useUnreadCounts';

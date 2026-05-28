@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, type ComponentProps, type MouseEvent } from 'react';
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
 type LinkProps = ComponentProps<typeof Link>;
@@ -19,6 +19,8 @@ interface PrefetchLinkProps extends Omit<LinkProps, 'prefetch'> {
   prefetchDataOnHover?: boolean;
   /** Delay before prefetching in ms (default: 100) */
   hoverDelay?: number;
+  /** Next.js prefetch mode */
+  prefetch?: boolean | null;
 }
 
 /**
