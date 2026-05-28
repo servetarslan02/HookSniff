@@ -7,6 +7,7 @@
 
 use axum::{
     extract::Extension,
+    http::HeaderMap,
     response::sse::{Event, Sse},
 };
 use chrono::Utc;
@@ -35,6 +36,7 @@ pub async fn delivery_event_stream(
     Extension(customer): Extension<Customer>,
     Extension(publisher): Extension<Option<EventPublisher>>,
     Extension(gateway): Extension<Arc<WsGateway>>,
+    headers: HeaderMap,
 ) -> Result<Sse<impl Stream<Item = Result<Event, Infallible>>>, AppError> {
     let publisher = match publisher {
         Some(p) => p,
@@ -74,6 +76,63 @@ pub async fn delivery_event_stream(
                 "type": "delivery_stream",
             }).to_string());
         yield Ok(connected);
+
+        // Reconnection replay: if Last-Event-ID header is present,
+        // send recent events from EventPublisher so client doesn't miss anything
+        if let Some(last_id) = headers.get("last-event-id") {
+            if let Ok(id_str) = last_id.to_str() {
+                tracing::info!(
+                    "📡 SSE reconnection: client sent Last-Event-ID: {}",
+                    id_str
+                );
+                // Get recent events and replay those the client missed
+                if let Ok(recent) = publisher.get_recent(50).await {
+                    for envelope in recent {
+                        // Skip events older than the last one the client saw
+                        if envelope.id.to_string() <= id_str {
+                            continue;
+                        }
+
+                        let should_send = match &envelope.event {
+                            AppEvent::DeliveryCreated { customer_id: cid, .. } => *cid == customer_id,
+                            AppEvent::DeliveryStatusChanged { customer_id: cid, .. } => *cid == customer_id,
+                            _ => false,
+                        };
+
+                        if !should_send {
+                            continue;
+                        }
+
+                        let (event_type, data) = match &envelope.event {
+                            AppEvent::DeliveryCreated { delivery_id, endpoint_id, event_type, .. } => {
+                                ("delivery", serde_json::json!({
+                                    "id": delivery_id,
+                                    "endpoint_id": endpoint_id,
+                                    "event": event_type,
+                                    "status": "pending",
+                                    "attempts": 0,
+                                    "created_at": Utc::now().to_rfc3339(),
+                                }))
+                            }
+                            AppEvent::DeliveryStatusChanged { delivery_id, old_status, new_status, .. } => {
+                                ("delivery_status", serde_json::json!({
+                                    "id": delivery_id,
+                                    "old_status": old_status,
+                                    "new_status": new_status,
+                                    "updated_at": Utc::now().to_rfc3339(),
+                                }))
+                            }
+                            _ => continue,
+                        };
+
+                        yield Ok(Event::default()
+                            .event(event_type)
+                            .id(envelope.id.to_string())
+                            .data(data.to_string()));
+                    }
+                }
+            }
+        }
 
         loop {
             match rx.recv().await {
