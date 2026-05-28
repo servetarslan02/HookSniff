@@ -7,6 +7,7 @@ use axum::Json;
 use chrono::Duration;
 use sqlx::PgPool;
 use uuid::Uuid;
+use crate::db;
 
 use crate::auth::jwt;
 use crate::config::Config;
@@ -52,8 +53,10 @@ pub async fn register(
     let api_key_prefix = api_key[..24].to_string();
     let password_hash = jwt::hash_password_async(password.clone()).await?;
 
-    let existing: Option<(Uuid,)> = sqlx::query_as("SELECT id FROM customers WHERE email = $1")
-        .bind(&req.email).fetch_optional(&pool).await?;
+    let existing: Option<(Uuid,)> = db::timed_query("auth_register_check", async {
+        sqlx::query_as("SELECT id FROM customers WHERE email = $1")
+            .bind(&req.email).fetch_optional(&pool).await
+    }).await?;
 
     if existing.is_some() {
         tracing::info!("Registration attempt for existing email: {}", req.email);
@@ -165,8 +168,10 @@ pub async fn login(
     }
 
     // HS-038f: Timing attack mitigation — always verify password
-    let customer = sqlx::query_as::<_, Customer>(&format!("{} WHERE email = $1", CUSTOMER_SELECT))
-        .bind(&req.email).fetch_optional(&pool).await?;
+    let customer = db::timed_query("auth_login_lookup", async {
+        sqlx::query_as::<_, Customer>(&format!("{} WHERE email = $1", CUSTOMER_SELECT))
+            .bind(&req.email).fetch_optional(&pool).await
+    }).await?;
 
     static DUMMY_HASH: once_cell::sync::Lazy<String> = once_cell::sync::Lazy::new(|| {
         jwt::hash_password("dummy_password_for_timing_mitigation_2026")
