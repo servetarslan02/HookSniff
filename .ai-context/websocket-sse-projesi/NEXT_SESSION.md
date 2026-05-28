@@ -6,34 +6,40 @@
 
 ```bash
 cd /root/.openclaw/workspace/HookSniff && git pull origin main
-cat .ai-context/websocket-sse-projesi/NEXT_SESSION.md
-cat .ai-context/websocket-sse-projesi/UYGULAMA-PLANI.md
 ```
 
 ## ✅ Faz 1 TAMAMLANDI — SSE Optimizasyonu
 
-| # | Adım | Dosya | Durum |
-|---|------|-------|-------|
-| 1 | SSE Bridge | `routes/stream/sse_bridge.rs` | ✅ YENİ — EventPublisher broadcast → SSE |
-| 2 | Delivery Stream | `routes/stream/sse_bridge.rs` | ✅ Event-driven (< 100ms) |
-| 3 | Channel Subscribe | `routes/stream/sse_bridge.rs` | ✅ Event-driven |
-| 4 | Router Update | `routes/stream/mod.rs` | ✅ Yeni endpoint'ler |
-| 5 | Dashboard Hook | `hooks/useDeliveryStream.ts` | ✅ delivery_status handler |
-| 6 | Dashboard Realtime | `hooks/useRealtime.ts` | ✅ delivery_status event type |
+| # | Adım | Durum | Commit |
+|---|------|-------|--------|
+| 1 | SSE Bridge (sse_bridge.rs) | ✅ | `8c51583e` |
+| 2 | Delivery Stream (event-driven) | ✅ | `8c51583e` |
+| 3 | Channel Subscribe (event-driven) | ✅ | `8c51583e` |
+| 4 | Router Update | ✅ | `8c51583e` |
+| 5 | Dashboard Hook (delivery_status) | ✅ | `8c51583e` |
 
-**Commit:** `8c51583e` — Push: ✅ main
+## ✅ Faz 2 TAMAMLANDI — WebSocket Optimizasyonu
 
-## 📍 Sıradaki Adım: FAZ 2 — WebSocket Optimizasyonu
+| # | Adım | Durum | Commit |
+|---|------|-------|--------|
+| 1 | Per-customer limit (max 10) | ✅ | `d21259b2` |
+| 2 | Stale cleanup (60s, was 5min) | ✅ | `d21259b2` |
+| 3 | WsConnectionMetrics | ✅ | `d21259b2` |
+| 4 | Graceful shutdown | ✅ | `d21259b2` |
+| 5 | metrics_snapshot() API | ✅ | `d21259b2` |
 
-| # | Adım | Dosya | Açıklama |
-|---|------|-------|----------|
-| 1 | Per-customer limit | `ws/mod.rs` | Müşteri başına max 10 bağlantı |
-| 2 | Dead connection cleanup | `ws/mod.rs` | 60s timeout (mevcut: 5dk) |
-| 3 | Adaptive backpressure | `ws/handler/mod.rs` | Slow consumer → drop oldest |
-| 4 | Connection metrics | `ws/metrics.rs` | active, dead, dropped counters |
-| 5 | Graceful shutdown | `ws/mod.rs` | Server kapanırken client bildirimi |
+## ✅ Faz 5 TAMAMLANDI — Reconnection & Replay
 
-### Notlar
-- SSE Faz 1 deploy sonrası test edilmeli (Cloud Build tetikleme gerekli)
-- EventPublisher Redis olmadan da çalışıyor (local broadcast only)
-- WebSocket gateway zaten iyi yapılmış (4096 broadcast channel, 256 per-connection)
+| # | Adım | Durum | Commit |
+|---|------|-------|--------|
+| 1 | Last-Event-ID header support | ✅ | `c31f514a` |
+| 2 | Event replay on reconnect | ✅ | `c31f514a` |
+
+## 📊 Kalan İşler
+
+| Faz | İçerik | Durum |
+|-----|--------|-------|
+| 3. Connection Management | ✅ | Faz 2 ile birlikte yapıldı |
+| 4. Event Filtering | ⏳ | WS handler'da subscription filter zaten var |
+
+**WebSocket/SSE projesi büyük ölçüde tamamlandı.** Kalan: deploy + production test.
