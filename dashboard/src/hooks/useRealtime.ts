@@ -13,6 +13,7 @@ export function useRealtime() {
     switch (event.type) {
       case 'delivery.created':
       case 'delivery.status_changed':
+      case 'delivery_status':
         queryClient.invalidateQueries({ queryKey: ['deliveries'] });
         queryClient.invalidateQueries({ queryKey: ['webhooks'] });
         queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
