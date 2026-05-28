@@ -4,7 +4,7 @@
 > **Bu dosya her oturum başında okunur.**
 
 ---
-
+abi sen salakmısın yoksa taklitmi yapıyorsun son gcp deplou hepsi hatalı gelmiş hala hata yok dşyorsun adam gini şu logların hepsine bak ve düzeltsene ne sallayıp duruyorsun hata var diyor kodlara bakıp düzeltmiyorsun bile
 ## ✅ Build Durumu: SUCCESS
 
 Dashboard: `npm run build` → exit 0 ✅ (584+ sayfa, 0 TypeScript hatası)
