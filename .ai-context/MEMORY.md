@@ -1,5 +1,5 @@
 # MEMORY.md — HookSniff Proje Hafızası
-> Son güncelleme: 2026-05-29 GMT+8 (OpenClaw — TypeScript Fix + Build Validation)
+> Son güncelleme: 2026-05-29 GMT+8 (OpenClaw — Admin Fix + Code Review)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 - burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış, kendine süre tut 45-50 dk sonra uyarı ver githup pushla buraları güncelle soradaki işin api hozlandırma klasörü. işten sonra vercel build hataları çıkarsa düzelt:
 - vercel:  vcp_1QcjDdCNwpMj8mCNf1UoDBMat1Yi128aMhzmJE4FzEF31aiTZJ3qfJ2h
@@ -27,6 +27,26 @@ gcp hatalarınıda düzelt, panellerfe verilerde görünmüyor izleme kullanıcl
 ---
 
 ## 📝 Son Oturum Logları
+
+### 2026-05-29 — Admin Fix + Code Review (OpenClaw)
+**Süre:** ~30 dk | **Agent:** OpenClaw (webchat)
+
+**Yapılanlar:**
+1. **Repo klonlandı** — `.ai-context` hafıza sistemi okundu
+2. **admin/mod.rs düzeltildi** — İki test fonksiyonu `mod tests` bloğunun dışındaydı, içeri taşındı
+3. **Dashboard build doğrulandı** — `npm run build` ✅ exit 0
+4. **API sağlık kontrolü** — ✅ DB: 24ms, queue: 0 pending
+5. **CORS doğrulandı** — hooksniff.vercel.app izinli
+6. **Redis fallback** — Graceful, API Redis olmadan正常 çalışıyor
+7. **Workspace hafıza dosyaları oluşturuldu** — MEMORY.md, USER.md, IDENTITY.md
+
+**Commit:** `25295a63` — fix(api): admin/mod.rs test functions moved inside mod tests block
+
+**Bulgular:**
+- API sağlıklı çalışıyor, deploy sorunları muhtemelen GCP Cloud Build tarafında
+- Redis kotası dolmuş — yeni Upstash hesabı gerekli
+- Dashboard panellerde veri görünmeme sorunu muhtemelen Redis/cache kaynaklı
+- SSE/WebSocket optimizasyonları kod olarak tamamlanmış, deploy edilmemiş
 
 ### 2026-05-29 — TypeScript Fix + Build Validation (OpenClaw)
 **Süre:** ~20 dk | **Agent:** OpenClaw (webchat)

@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-29 (OpenClaw — TypeScript Fix + Build Validation)
+> **Son güncelleme:** 2026-05-29 (OpenClaw — Admin Fix + Code Review)
 > **Bu dosya her oturum başında okunur.**
 
 ---
@@ -10,7 +10,16 @@
 Build stabil. `npm run build` → exit 0 ✅
 API deploy: europe-west1 ✅ (revision 01031-n8j, sıfır panic, sıfır hata)
 
-### Son Yapılan İş (2026-05-29 — OpenClaw Oturumu: SSE Event-Driven Optimization Faz 1)
+### Son Yapılan İş (2026-05-29 — OpenClaw Oturumu: Admin Fix + Code Review)
+- **admin/mod.rs düzeltildi:** İki test fonksiyonu (`test_user_summary_banned_status`, `test_delivery_summary_event_alias`) `mod tests` bloğunun dışındaydı → içeri taşındı
+- **Dashboard build doğrulandı:** `npm run build` ✅ exit 0 (584+ sayfa)
+- **API sağlık kontrolü:** ✅ sağlıklı (DB: 24ms, queue: 0 pending)
+- **CORS yapılandırması:** ✅ hooksniff.vercel.app izinli
+- **Redis fallback:** ✅ Graceful — Redis yoksa API正常 çalışıyor
+- **Commit:** `25295a63`
+- **Push:** ✅ main
+
+### Önceki Yapılan İş (2026-05-29 — OpenClaw Oturumu: SSE Event-Driven Optimization Faz 1)
 - **SSE Faz 1 TAMAMLANDI:** `/v1/stream/deliveries` ve `/v1/stream/channels/{id}/subscribe` endpoint'leri event-driven yapıldı
 - **Yeni dosya:** `api/src/routes/stream/sse_bridge.rs` — EventPublisher broadcast channel'dan SSE stream
 - **Eski yapı:** Her 2 saniyede bir DB polling (5s gecikme, DB yükü)
