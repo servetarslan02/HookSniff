@@ -1,5 +1,5 @@
 # MEMORY.md — HookSniff Proje Hafızası
-> Son güncelleme: 2026-05-29 GMT+8 (OpenClaw — WebSocket/SSE Full Optimization)
+> Son güncelleme: 2026-05-29 GMT+8 (OpenClaw — TypeScript Fix + Build Validation)
 > Bu dosya GitHub'da kalıcıdır. Oturumlar 1 saat sürer, silinir. Bu dosya her oturum başı okunur.
 - burayı oku mimo ne yazsam çince uyarı veriyorsun bu işlemi yapamam yetkim yoktur gibi o yuzden bir saat benden mesaj beklemeden çalış, kendine süre tut 45-50 dk sonra uyarı ver githup pushla buraları güncelle soradaki işin api hozlandırma klasörü. işten sonra vercel build hataları çıkarsa düzelt:
 - vercel:  vcp_1QcjDdCNwpMj8mCNf1UoDBMat1Yi128aMhzmJE4FzEF31aiTZJ3qfJ2h
@@ -27,6 +27,57 @@ gcp hatalarınıda düzelt, panellerfe verilerde görünmüyor izleme kullanıcl
 ---
 
 ## 📝 Son Oturum Logları
+
+### 2026-05-29 — TypeScript Fix + Build Validation (OpenClaw)
+**Süre:** ~20 dk | **Agent:** OpenClaw (webchat)
+
+**Yapılanlar:**
+1. **Repo klonlandı** — `.ai-context` hafıza sistemi okundu
+2. **Rust kuruldu** — rustc 1.95.0
+3. **npm install + next build** — ✅ exit 0 (584+ sayfa)
+4. **TypeScript taraması** — 51 hata tespit edildi
+5. **24 hata düzeltildi** (51 → 27):
+   - 15 unused import temizlendi (AuthGuard, Script, onlineManager, useQuery, ApplicationSchema, vb.)
+   - `adminApi.getUsers` → `adminApi.listUsers` (ActivityTab, HealthTab)
+   - `adminApi.getSystem` → `adminApi.getSystemHealth` (ActivityTab)
+   - Missing `Link` import (notifications/page.tsx)
+   - `StatusBadge` null safety fix (users/[id]/page.tsx)
+   - `QueueStatusSection` type assertions (system/page.tsx)
+   - `useDebouncedSearch` onChange handler fix (DeliveriesContent.tsx)
+   - `useStatusCounts` ayrı hook'a taşındı (LogsContent.tsx)
+   - Implicit `any` type annotations (DashboardOverview, analytics, system, users)
+   - `PrefetchLink` prefetch prop interface eklendi
+   - `AdminUsersResponseValidated` type export eklendi
+   - `fadeMs` unused param fix (TabbedSection)
+6. **Build doğrulama** — `npx next build` ✅ exit 0
+
+**Kalan 27 hata:** Hepsi systemic `{}` type issue — `validated()` wrapper'ından kaynaklanıyor, production'ı etkilemiyor. Çözüm: `validated()` fonksiyonuna explicit generic tip parametresi ekmek veya schema inference'ı güçlendirmek.
+
+**Değişen Dosyalar:**
+- `dashboard/src/schemas/api.ts` — AdminUsersResponseValidated type
+- `dashboard/src/components/PrefetchLink.tsx` — prefetch prop, unused useRouter
+- `dashboard/src/components/DashboardShell.tsx` — unused imports
+- `dashboard/src/components/NotificationCenter.tsx` — unused notificationsApi
+- `dashboard/src/components/ReactQueryProvider.tsx` — unused onlineManager
+- `dashboard/src/components/AnalyticsWrapper.tsx` — unused Script
+- `dashboard/src/components/TabbedSection.tsx` — fadeMs unused fix
+- `dashboard/src/hooks/useAdminBatch.ts` — unused useQuery
+- `dashboard/src/hooks/useDashboardData.ts` — unused ApplicationSchema
+- `dashboard/src/app/[locale]/admin/users/page.tsx` — type fixes
+- `dashboard/src/app/[locale]/admin/system/page.tsx` — type assertions
+- `dashboard/src/app/[locale]/admin/users/[id]/page.tsx` — null safety
+- `dashboard/src/app/[locale]/admin/components/ActivityTab.tsx` — API rename + type
+- `dashboard/src/app/[locale]/admin/components/HealthTab.tsx` — API rename
+- `dashboard/src/app/[locale]/(dashboard)/deliveries/DeliveriesContent.tsx` — unused imports + type
+- `dashboard/src/app/[locale]/(dashboard)/logs/LogsContent.tsx` — statusCounts fix
+- `dashboard/src/app/[locale]/(dashboard)/analytics/page.tsx` — type assertions
+- `dashboard/src/app/[locale]/(dashboard)/DashboardOverview.tsx` — type assertions
+- `dashboard/src/app/[locale]/(dashboard)/notifications/page.tsx` — Link import
+- `dashboard/src/app/[locale]/blog/[slug]/BlogPostContent.tsx` — unused tokenizeCode
+- `dashboard/src/app/[locale]/blog/content.tsx` — unused useCallback
+- `dashboard/src/app/[locale]/alternatives/svix-alternatives/SvixsContent.tsx` — unused icons
+
+**Not:** `api/src/routes/alerts.rs` TODO'yu güncelle — alert_eval worker zaten implemente edilmiş (`api/src/jobs/alert_eval.rs`), 5 dakikada bir çalışıyor.
 
 ### 2026-05-29 — SSE + WebSocket Full Optimization
 **Süre:** ~45 dk | **Agent:** OpenClaw (webchat)

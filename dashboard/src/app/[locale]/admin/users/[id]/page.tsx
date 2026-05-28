@@ -367,7 +367,7 @@ export default function AdminUserDetailPage() {
             }`}>
               {detail.user.plan}
             </span>
-            <StatusBadge status={detail.user.status} />
+            <StatusBadge status={detail.user.status ?? 'active'} />
           </div>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">{detail.user.email}</p>
         </div>

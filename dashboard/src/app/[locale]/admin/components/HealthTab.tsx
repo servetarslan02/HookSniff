@@ -20,7 +20,7 @@ export default function HealthTab({ stats: _stats, rateLimitData, failedDeliveri
   const t = useTranslations('admin');
   const { token } = useAuth();
 
-  const usersPrefetch = token ? [{ queryKey: ['admin', 'users', { page: 1 }], queryFn: () => adminApi.getUsers(token, { page: 1 }), staleTime: 15_000 }] : [];
+  const usersPrefetch = token ? [{ queryKey: ['admin', 'users', { page: 1 }], queryFn: () => adminApi.listUsers(token, { page: 1 }), staleTime: 15_000 }] : [];
   const activityPrefetch = token ? [{ queryKey: ['admin', 'activity'], queryFn: () => apiFetch('/admin/activity', { token }), staleTime: 15_000 }] : [];
 
   return (

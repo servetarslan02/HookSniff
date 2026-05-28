@@ -18,10 +18,10 @@ export default function ActivityTab({ auditLogs, stats, mrr }: ActivityTabProps)
   const { token } = useAuth();
 
   // Prefetch admin data on hover
-  const adminPrefetch: Record<string, Array<{ queryKey: string[]; queryFn: () => Promise<unknown>; staleTime: number }>> = {
+  const adminPrefetch: Record<string, Array<{ queryKey: (string | number | object)[]; queryFn: () => Promise<unknown>; staleTime: number }>> = {
     '/admin/activity': token ? [{ queryKey: ['admin', 'activity'], queryFn: () => apiFetch('/admin/activity', { token }), staleTime: 15_000 }] : [],
-    '/admin/system': token ? [{ queryKey: ['admin', 'system'], queryFn: () => adminApi.getSystem(token), staleTime: 15_000 }] : [],
-    '/admin/users': token ? [{ queryKey: ['admin', 'users', { page: 1 }], queryFn: () => adminApi.getUsers(token, { page: 1 }), staleTime: 15_000 }] : [],
+    '/admin/system': token ? [{ queryKey: ['admin', 'system'], queryFn: () => adminApi.getSystemHealth(token), staleTime: 15_000 }] : [],
+    '/admin/users': token ? [{ queryKey: ['admin', 'users', { page: 1 }], queryFn: () => adminApi.listUsers(token, { page: 1 }), staleTime: 15_000 }] : [],
     '/admin/revenue': token ? [{ queryKey: ['admin', 'revenue'], queryFn: () => apiFetch('/admin/revenue', { token }), staleTime: 30_000 }] : [],
     '/admin/settings': token ? [{ queryKey: ['admin', 'settings'], queryFn: () => apiFetch('/admin/settings', { token }), staleTime: 30_000 }] : [],
   };

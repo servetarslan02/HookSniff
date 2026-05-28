@@ -10,7 +10,7 @@
  * Each group shares a single useQueries call for parallel fetching.
  */
 
-import { useQuery, useQueries } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 import { adminApi } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { validated } from './validated';

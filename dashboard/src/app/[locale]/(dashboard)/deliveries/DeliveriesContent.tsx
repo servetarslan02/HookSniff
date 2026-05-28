@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { webhooksApi } from '@/lib/api';
-import { useWebhooks, useReplayDelivery, useSearch, useDeliveryAttempts, useDeliveryLogs, useStatusCounts } from '@/hooks/useDashboardData';
+import { useWebhooks, useReplayDelivery, useSearch, useDeliveryAttempts, useStatusCounts } from '@/hooks/useDashboardData';
 import { useLiveEndpoints } from '@/hooks/useCollections';
 import { useDeliveryStream } from '@/hooks/useDeliveryStream';
 import { useIsFeatureEnabled } from '@/hooks/useAdminData';
@@ -30,10 +30,10 @@ export default function DeliveriesContent() {
   const bulkReplayEnabled = useIsFeatureEnabled('bulk_replay');
 
   // ── URL-driven state ──
-  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+  const _page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
   const filter = (searchParams.get('status') || 'all') as StatusFilter;
 
-  const setParam = useCallback((key: string, value: string) => {
+  const _setParam = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value === 'all' || value === '1' || value === 'table') {
       params.delete(key);
@@ -45,7 +45,7 @@ export default function DeliveriesContent() {
   }, [searchParams, router, pathname]);
 
   // ── Search state (Concurrent Features — useDeferredValue) ──
-  const { input: searchInput, deferredValue: debouncedSearch, handleChange: setSearchInput, isStale } = useDebouncedSearch();
+  const { input: searchInput, deferredValue: debouncedSearch, handleChange: setSearchInput, isStale: _isStale } = useDebouncedSearch();
 
   // ── Auto-refresh state (from Logs page) ──
   const [autoRefresh, setAutoRefresh] = useState(false);
@@ -308,7 +308,7 @@ export default function DeliveriesContent() {
         <input
           type="text"
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+          onChange={setSearchInput}
           placeholder={ts('searchPlaceholder')}
           className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
         />

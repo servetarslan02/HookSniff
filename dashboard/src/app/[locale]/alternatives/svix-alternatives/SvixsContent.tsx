@@ -3,7 +3,7 @@
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslations } from 'next-intl';
-import { Building2, Link2, Package, Check, X } from '@/components/icons';
+import { Check, X } from '@/components/icons';
 
 function getAlternatives(t: ReturnType<typeof useTranslations>) {
   return [

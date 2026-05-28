@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { adminApi, API_BASE, type AdminUser } from '@/lib/api';
 import { useAdminUsers, useUpdateUserPlan, useUpdateUserStatus } from '@/hooks/useAdminData';
+
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 import { useTranslations, useLocale } from 'next-intl';
 import { UserFilters } from './components/UserFilters';
@@ -92,8 +93,8 @@ export default function AdminUsersPage() {
       setAllUsers(users);
     } else if (users.length > 0) {
       setAllUsers((prev) => {
-        const existingIds = new Set(prev.map((u) => u.id));
-        const newItems = users.filter((u) => !existingIds.has(u.id));
+        const existingIds = new Set(prev.map((u: any) => u.id));
+        const newItems = users.filter((u: any) => !existingIds.has(u.id));
         return [...prev, ...newItems];
       });
     }

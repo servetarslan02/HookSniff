@@ -1,6 +1,6 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-29 (OpenClaw — SSE Event-Driven Optimization)
+> **Son güncelleme:** 2026-05-29 (OpenClaw — TypeScript Fix + Build Validation)
 > **Bu dosya her oturum başında okunur.**
 
 ---
