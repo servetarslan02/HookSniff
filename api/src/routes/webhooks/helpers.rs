@@ -62,7 +62,6 @@ pub fn parse_date_to_str(s: &str) -> Option<DateTime<Utc>> {
     parse_date_str(s, (23, 59, 59))
 }
 
-use crate::billing::models::TeamTrackingInfo;
 pub use crate::billing::resolve_team_tracking;
 
 /// Atomically increment webhook_count with overage support.
