@@ -88,7 +88,7 @@ pub async fn get_active_healing_action(
 pub async fn report_delivery_outcome(
     pool: &PgPool,
     endpoint_id: Uuid,
-    customer_id: Uuid,
+    _customer_id: Uuid,
     success: bool,
     latency_ms: f64,
     status_code: u16,
