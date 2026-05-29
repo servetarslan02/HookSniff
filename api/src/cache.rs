@@ -200,6 +200,13 @@ impl CacheLayer {
     pub fn conn(&self) -> &ConnectionManager {
         &self.conn
     }
+
+    /// Ping the Redis server to check connectivity and keep the connection warm.
+    pub async fn ping(&self) -> Result<(), redis::RedisError> {
+        let mut conn = self.conn.clone();
+        let _: String = redis::cmd("PING").query_async(&mut conn).await?;
+        Ok(())
+    }
 }
 
 // ──────────────────────────────────────────────────────────────

@@ -550,7 +550,7 @@ valid = any(verify(sig, secret) for sig in sigs)`}
           Rotate secrets via the dashboard: <strong>Endpoints → Select endpoint → Rotate Secret</strong>, or via the API:
         </p>
         <CodeBlock
-          code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints/EP_ID/rotate-secret \\
+          code={`curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/endpoints/EP_ID/rotate-secret \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
       </section>

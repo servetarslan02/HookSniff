@@ -94,7 +94,7 @@ async function RetriesPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('customPolicy')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('customPolicyDesc')}</p>
         <CodeBlock
-          code={`curl -X PUT https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints/ep_abc123/retry-policy \\
+          code={`curl -X PUT https://atlas-wales-commons-oriental.trycloudflare.com/v1/endpoints/ep_abc123/retry-policy \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -128,7 +128,7 @@ async function RetriesPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('replaying')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('replayingDesc')}</p>
         <CodeBlock
-          code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/wh_xyz789/replay \\
+          code={`curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/webhooks/wh_xyz789/replay \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">{t('replayingTip')}</p>

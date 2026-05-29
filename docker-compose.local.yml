@@ -1,0 +1,86 @@
+# HookSniff — Local Server Mode (Vercel Compatible)
+# Bilgisayarınızı sınırsız bir sunucuya dönüştürür.
+# Kullanım: docker-compose -f docker-compose.local.yml up -d
+
+services:
+  # ── PostgreSQL (Neon Yerine) ──
+  postgres:
+    image: postgres:17-alpine
+    container_name: hooksniff-db-local
+    environment:
+      POSTGRES_USER: hooksniff
+      POSTGRES_PASSWORD: hooksniff_pass_2026
+      POSTGRES_DB: hooksniff
+    ports:
+      - "5432:5432"
+    volumes:
+      - hs_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hooksniff -d hooksniff"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: always
+
+  # ── Redis (Upstash Yerine) ──
+  redis:
+    image: redis:7-alpine
+    container_name: hooksniff-redis-local
+    ports:
+      - "6379:6379"
+    volumes:
+      - hs_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: always
+
+  # ── HookSniff API (GCP Yerine) ──
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: hooksniff-api-local
+    ports:
+      - "3000:3000"
+    environment:
+      APP_ENV: production
+      PORT: "3000"
+      DATABASE_URL: "postgresql://hooksniff:hooksniff_pass_2026@postgres:5432/hooksniff?sslmode=disable"
+      REDIS_URL: "redis://redis:6379"
+      HMAC_SECRET: "hooksniff-local-hmac-secret-2026"
+      JWT_SECRET: "hooksniff-local-jwt-secret-2026"
+      RUST_LOG: "info"
+      MAX_PAYLOAD_BYTES: "1048576"
+      RETENTION_DAYS: "60"
+      WEBHOOK_FORMAT: "standard"
+      RATE_LIMIT_STORE: "redis"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+
+  # ── HookSniff Worker ──
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: hooksniff-worker-local
+    environment:
+      DATABASE_URL: "postgresql://hooksniff:hooksniff_pass_2026@postgres:5432/hooksniff?sslmode=disable"
+      REDIS_URL: "redis://redis:6379"
+      RUST_LOG: "info"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  hs_postgres_data:
+  hs_redis_data:

@@ -17,7 +17,7 @@ export function EmbedCodePanel({
   const t = useTranslations('portalCustomize');
   const { toast } = useToast();
 
-  const apiBase = 'https://hooksniff-api-1046140057667.europe-west1.run.app';
+  const apiBase = 'https://atlas-wales-commons-oriental.trycloudflare.com';
   const dashBase = 'https://hooksniff.vercel.app';
 
   const fallbackIframe = `<iframe

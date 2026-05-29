@@ -5,7 +5,7 @@ import { HookSniffError, createApiError, createNetworkError } from './api-errors
 
 // In production, "/api/v1" is proxied by Vercel rewrites to the GCP Cloud Run API (see vercel.json).
 // In development, point directly to the local API server.
-export const API_BASE = typeof window !== 'undefined' ? '/api/v1' : 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
+export const API_BASE = typeof window !== 'undefined' ? '/api/v1' : 'https://atlas-wales-commons-oriental.trycloudflare.com/v1';
 
 const REQUEST_TIMEOUT_MS = 10_000;
 const MAX_RETRIES = 2;
