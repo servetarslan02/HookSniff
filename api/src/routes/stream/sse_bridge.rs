@@ -18,7 +18,7 @@ use tokio::sync::broadcast;
 use uuid::Uuid;
 
 use crate::error::AppError;
-use crate::events::{AppEvent, EventEnvelope, EventPublisher};
+use crate::events::{AppEvent, EventPublisher};
 use crate::models::customer::Customer;
 use crate::ws::WsGateway;
 
@@ -44,7 +44,7 @@ pub async fn delivery_event_stream(
             // EventPublisher not configured — return empty stream
             tracing::warn!("SSE delivery stream requested but EventPublisher not configured");
             let stream = async_stream::stream! {
-                yield Ok(Event::default()
+                yield Ok::<_, Infallible>(Event::default()
                     .event("error")
                     .data("Event system not configured"));
             };
@@ -75,7 +75,7 @@ pub async fn delivery_event_stream(
                 "server_time": Utc::now().to_rfc3339(),
                 "type": "delivery_stream",
             }).to_string());
-        yield Ok(connected);
+        yield Ok::<_, Infallible>(connected);
 
         // Reconnection replay: if Last-Event-ID header is present,
         // send recent events from EventPublisher so client doesn't miss anything
@@ -89,7 +89,7 @@ pub async fn delivery_event_stream(
                 if let Ok(recent) = publisher.get_recent(50).await {
                     for envelope in recent {
                         // Skip events older than the last one the client saw
-                        if envelope.id.to_string() <= id_str {
+                        if envelope.id.to_string().as_str() <= id_str.as_str() {
                             continue;
                         }
 
@@ -125,7 +125,7 @@ pub async fn delivery_event_stream(
                             _ => continue,
                         };
 
-                        yield Ok(Event::default()
+                        yield Ok::<_, Infallible>(Event::default()
                             .event(event_type)
                             .id(envelope.id.to_string())
                             .data(data.to_string()));
@@ -187,14 +187,14 @@ pub async fn delivery_event_stream(
                         .id(envelope.id.to_string())
                         .data(data.to_string());
 
-                    yield Ok(event);
+                    yield Ok::<_, Infallible>(event);
                 }
                 Err(broadcast::error::RecvError::Lagged(n)) => {
                     tracing::warn!("SSE client (customer {}) lagged {} events", customer_id, n);
                     let lagged = Event::default()
                         .event("lagged")
                         .data(format!("{} events missed", n));
-                    yield Ok(lagged);
+                    yield Ok::<_, Infallible>(lagged);
                 }
                 Err(broadcast::error::RecvError::Closed) => {
                     tracing::info!("SSE delivery stream: publisher closed");
@@ -229,7 +229,7 @@ pub async fn channel_event_stream(
             // Fallback to DB polling if EventPublisher not available
             tracing::warn!("EventPublisher not available, channel stream will be empty");
             let stream = async_stream::stream! {
-                yield Ok(Event::default()
+                yield Ok::<_, Infallible>(Event::default()
                     .event("error")
                     .data("Event system not configured"));
             };
@@ -260,7 +260,7 @@ pub async fn channel_event_stream(
                 "customer_id": customer_id,
                 "server_time": Utc::now().to_rfc3339(),
             }).to_string());
-        yield Ok(connected);
+        yield Ok::<_, Infallible>(connected);
 
         loop {
             match rx.recv().await {
@@ -302,11 +302,11 @@ pub async fn channel_event_stream(
                         .id(envelope.id.to_string())
                         .data(data);
 
-                    yield Ok(event);
+                    yield Ok::<_, Infallible>(event);
                 }
                 Err(broadcast::error::RecvError::Lagged(n)) => {
                     tracing::warn!("SSE channel client lagged {} events", n);
-                    yield Ok(Event::default()
+                    yield Ok::<_, Infallible>(Event::default()
                         .event("lagged")
                         .data(format!("{} events missed", n)));
                 }
