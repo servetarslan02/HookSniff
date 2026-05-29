@@ -432,7 +432,7 @@ pub async fn health_check(
 
     // Recent error logs (last 10 failed deliveries)
     let recent_errors = match sqlx::query_as::<_, (String, Option<String>, Option<String>, chrono::DateTime<chrono::Utc>)>(
-        "SELECT id::text, event, error_message, created_at FROM deliveries WHERE status = 'failed' ORDER BY created_at DESC LIMIT 10",
+        "SELECT id::text, event_type, error_message, created_at FROM deliveries WHERE status = 'failed' ORDER BY created_at DESC LIMIT 10",
     )
     .fetch_all(pool)
     .await
