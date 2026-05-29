@@ -45,7 +45,7 @@ webhook-id: msg_abc123`}
           {t('idempotencyKeyDesc')}
         </p>
         <CodeBlock
-          code={`curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/webhooks \\
+          code={`curl -X POST https://your-api.trycloudflare.com/v1/webhooks \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Idempotency-Key: order-12345-created" \\
   -H "Content-Type: application/json" \\

@@ -65,7 +65,7 @@ async function DlqPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('inspecting')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('inspectingDesc')}</p>
         <CodeBlock
-          code={`curl "https://podcasts-settled-frames-soft.trycloudflare.com/v1/webhooks?status=failed" \\
+          code={`curl "https://your-api.trycloudflare.com/v1/webhooks?status=failed" \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4 mb-4">{t('responseIncludes')}</p>
@@ -92,7 +92,7 @@ async function DlqPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('replaying')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('replayingDesc')}</p>
         <CodeBlock
-          code={`curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/webhooks/wh_xyz789/replay \\
+          code={`curl -X POST https://your-api.trycloudflare.com/v1/webhooks/wh_xyz789/replay \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">{t('replayingTip')}</p>

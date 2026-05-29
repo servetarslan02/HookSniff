@@ -153,7 +153,7 @@ payload, err := wh.Verify(r.Body, r.Header)`}
         </p>
         <CodeBlock
           code={`# Enable 2FA
-curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/auth/2fa/enable \\
+curl -X POST https://your-api.trycloudflare.com/v1/auth/2fa/enable \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"password": "your_password"}'

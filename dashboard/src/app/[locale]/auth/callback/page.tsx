@@ -52,7 +52,7 @@ export default function AuthCallbackPage() {
       }
 
       // Verify the token works before redirecting
-      const apiUrl = 'https://podcasts-settled-frames-soft.trycloudflare.com';
+      const apiUrl = 'https://your-api.trycloudflare.com';
       fetch(`${apiUrl}/v1/auth/me`, {
         headers: { 'Authorization': `Bearer ${token}` },
       })

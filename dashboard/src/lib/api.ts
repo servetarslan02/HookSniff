@@ -5,7 +5,8 @@ import { HookSniffError, createApiError, createNetworkError } from './api-errors
 
 // In production, "/api/v1" is proxied by Vercel rewrites to the GCP Cloud Run API (see vercel.json).
 // In development, point directly to the local API server.
-export const API_BASE = typeof window !== 'undefined' ? '/api/v1' : 'https://podcasts-settled-frames-soft.trycloudflare.com/v1';
+const DEFAULT_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+export const API_BASE = typeof window !== 'undefined' ? '/api/v1' : (DEFAULT_API_URL.endsWith('/v1') ? DEFAULT_API_URL : `${DEFAULT_API_URL}/v1`);
 
 const REQUEST_TIMEOUT_MS = 10_000;
 const MAX_RETRIES = 2;
