@@ -2,14 +2,8 @@
 
 > **Son güncelleme:** 2026-05-29 (OpenClaw — Oturum 8)
 > **Bu dosya her oturum başında okunur.**
-özürlü sana milypnuncu mesajım bu gcp de sorun var wrroe veriyor diyorum sen hala vercel diyorsun
 ---
-
-## ✅ Durum: SAĞLIKLI
-I: ✅ healthy (DB: 24ms)
-Dashboard: ✅ Vercel build çalışıyor (584+ sayfa, ~2-3 dk sürüyor)
-GCP: ✅ Son 8+ saatte HTTP 500 hata yok
-
+- google cloud build lerde hata var cargo\rust taramalarında çıkmıyor o yüzden memory.md de gcp json var ordan alıp google cli ne gerekiyorsa kur ve gcp build loglarından,hataları çek göe ve çöz, uygulama yüklü değil falan deme ne ferekiyoesa kuracaksın
 ---
 
 ## 🔧 Yapılan Düzeltmeler
