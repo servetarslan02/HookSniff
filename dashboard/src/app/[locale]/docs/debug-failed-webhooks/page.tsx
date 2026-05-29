@@ -27,7 +27,7 @@ async function DebugFailedWebhooksPageContent(params: Promise<{ locale: string }
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step1')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('step1Desc')}</p>
         <CodeBlock
-          code={`curl "https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks?status=failed&per_page=10" \\
+          code={`curl "https://atlas-wales-commons-oriental.trycloudflare.com/v1/webhooks?status=failed&per_page=10" \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
       </section>
@@ -37,7 +37,7 @@ async function DebugFailedWebhooksPageContent(params: Promise<{ locale: string }
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step2')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('step2Desc')}</p>
         <CodeBlock
-          code={`curl "https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/wh_xyz789/attempts" \\
+          code={`curl "https://atlas-wales-commons-oriental.trycloudflare.com/v1/webhooks/wh_xyz789/attempts" \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
@@ -84,7 +84,7 @@ async function DebugFailedWebhooksPageContent(params: Promise<{ locale: string }
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('step4')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('step4Desc')}</p>
         <CodeBlock
-          code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks/wh_xyz789/replay \\
+          code={`curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/webhooks/wh_xyz789/replay \\
   -H "Authorization: Bearer hr_live_YOUR_KEY"`}
         />
         <p className="text-gray-600 dark:text-slate-400 mt-4">{t('step4Tip')}</p>

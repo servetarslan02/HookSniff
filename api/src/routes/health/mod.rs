@@ -296,6 +296,22 @@ pub async fn system_status(
     )
 }
 
+/// Warm-up endpoint: DB ve Redis bağlantılarını sıcak tutar
+pub async fn warmup(
+    axum::extract::Extension(health_pool): axum::extract::Extension<crate::db::HealthPool>,
+    axum::extract::Extension(cache_layer): axum::extract::Extension<Option<crate::cache::CacheLayer>>,
+) -> &'static str {
+    // DB bağlantısını sıcak tut
+    let _ = sqlx::query("SELECT 1").execute(&health_pool.0).await;
+
+    // Redis bağlantısını sıcak tut
+    if let Some(ref cache) = cache_layer {
+        let _ = cache.ping().await;
+    }
+
+    "ok"
+}
+
 /// Comprehensive health check that verifies:
 /// - Database connectivity (simple query)
 /// - Queue depth (webhook_queue table)

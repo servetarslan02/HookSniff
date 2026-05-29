@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { Cloud, Database, HardDrive, Mail, Monitor, Settings, Zap } from '@/components/icons';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-1046140057667.europe-west1.run.app/v1';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://atlas-wales-commons-oriental.trycloudflare.com/v1';
 const TIMEOUT = 5000;
 
 async function checkEndpoint(url: string, timeout = TIMEOUT): Promise<{ ok: boolean; latency: number }> {
