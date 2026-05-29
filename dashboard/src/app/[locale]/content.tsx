@@ -466,13 +466,13 @@ export function HomeContent() {
           </div>
           <pre className="p-4 sm:p-6 text-xs sm:text-sm font-mono text-gray-800 dark:text-slate-300 overflow-x-auto bg-white dark:bg-slate-800 max-w-full">
             <code className="break-all sm:break-normal">{`# Create an endpoint
-curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/endpoints \\
+curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/endpoints \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"url": "https://myapp.com/webhook"}'
 
 # Send a webhook
-curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/webhooks \\
+curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/webhooks \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"endpoint_id": "ep_abc123", "event": "order.created", "data": {"order_id": "12345"}}'`}</code>

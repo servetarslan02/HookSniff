@@ -36,7 +36,7 @@ const nextConfig = {
           "style-src 'self' 'unsafe-inline'",
           "img-src 'self' data: https: blob:",
           "font-src 'self' data:",
-          "connect-src 'self' https://atlas-wales-commons-oriental.trycloudflare.com https://*.sentry.io https://vitals.vercel-insights.com https://cloudflareinsights.com wss:",
+          "connect-src 'self' https://podcasts-settled-frames-soft.trycloudflare.com https://*.sentry.io https://vitals.vercel-insights.com https://cloudflareinsights.com wss:",
           "frame-ancestors 'none'",
           "base-uri 'self'",
           "form-action 'self'",
@@ -48,11 +48,11 @@ const nextConfig = {
     return [
       {
         source: '/api/health',
-        destination: 'https://atlas-wales-commons-oriental.trycloudflare.com/health',
+        destination: 'https://podcasts-settled-frames-soft.trycloudflare.com/health',
       },
       {
         source: '/api/:path*',
-        destination: 'https://atlas-wales-commons-oriental.trycloudflare.com/:path*',
+        destination: 'https://podcasts-settled-frames-soft.trycloudflare.com/:path*',
       },
     ];
   },
