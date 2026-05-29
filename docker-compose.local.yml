@@ -50,8 +50,9 @@ services:
       PORT: "3000"
       DATABASE_URL: "postgresql://hooksniff:hooksniff_pass_2026@postgres:5432/hooksniff?sslmode=disable"
       REDIS_URL: "redis://redis:6379"
-      HMAC_SECRET: "hooksniff-local-hmac-secret-2026"
-      JWT_SECRET: "hooksniff-local-jwt-secret-2026"
+      HMAC_SECRET: "hs_live_2026_local_secure_v1_9a2f7c3e"
+      JWT_SECRET: "hs_jwt_2026_local_secure_v1_8b4d1a0c"
+      ENCRYPTION_KEY: "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
       RUST_LOG: "info"
       MAX_PAYLOAD_BYTES: "1048576"
       RETENTION_DAYS: "60"
@@ -79,6 +80,35 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    restart: always
+
+  # ── Git Watcher (Otomatik Güncelleyici) ──
+  # GitHub'daki değişiklikleri her 5 dakikada bir kontrol eder ve PC'nizdeki sistemi günceller.
+  watcher:
+    image: docker:dind
+    container_name: hooksniff-git-watcher
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /app
+    environment:
+      GIT_REPO_URL: "https://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@github.com/servetarslan02/HookSniff"
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        apk add --no-cache git
+        while true; do
+          echo "🔍 GitHub kontrol ediliyor..."
+          git fetch origin main
+          LOCAL=$$(git rev-parse HEAD)
+          REMOTE=$$(git rev-parse @{u})
+          if [ $$LOCAL != $$REMOTE ]; then
+            echo "🚀 Yeni kod bulundu! Güncelleniyor..."
+            git pull origin main --rebase
+            docker compose -f docker-compose.local.yml up -d --build api worker
+          fi
+          sleep 300
+        done
     restart: always
 
 volumes:

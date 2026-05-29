@@ -32,20 +32,20 @@ async function EnvironmentsPageContent(params: Promise<{ locale: string }>) {
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('variablesDesc')}</p>
         <CodeBlock code={`# List environments
 curl -H "Authorization: Bearer YOUR_API_KEY" \\
-  https://atlas-wales-commons-oriental.trycloudflare.com/v1/environments
+  https://podcasts-settled-frames-soft.trycloudflare.com/v1/environments
 
 # Create environment
-curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/environments \\
+curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/environments \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"name": "Staging", "slug": "staging"}'
 
 # List variables
 curl -H "Authorization: Bearer YOUR_API_KEY" \\
-  https://atlas-wales-commons-oriental.trycloudflare.com/v1/environments/ENV_ID/variables
+  https://podcasts-settled-frames-soft.trycloudflare.com/v1/environments/ENV_ID/variables
 
 # Create variable
-curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/environments/ENV_ID/variables \\
+curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/environments/ENV_ID/variables \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"key": "WEBHOOK_SECRET", "value": "whsec_..."}'`} />
