@@ -381,7 +381,7 @@ pub async fn notify_sdk_update(
             "INSERT INTO notifications (customer_id, type, title, message, is_read, link) VALUES "
         );
         let mut params: Vec<String> = Vec::new();
-        for (i, (user_id,)) in users.iter().enumerate() {
+        for (i, (_user_id,)) in users.iter().enumerate() {
             let base = i * 5;
             params.push(format!(
                 "(${}, 'system', ${}, ${}, FALSE, ${})",
