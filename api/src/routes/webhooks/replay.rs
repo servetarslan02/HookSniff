@@ -35,7 +35,7 @@ pub async fn replay_webhook(
     }
 
     let original = sqlx::query_as::<_, Delivery>(
-        "SELECT id, endpoint_id, customer_id, payload, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, response_body, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test, event, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash, custom_headers FROM deliveries WHERE id = $1 AND customer_id = $2",
+        "SELECT id, endpoint_id, customer_id, payload, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, response_body, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash FROM deliveries WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
@@ -136,7 +136,7 @@ pub async fn batch_replay(
 
     for id in &req.delivery_ids {
         let original = sqlx::query_as::<_, Delivery>(
-            "SELECT id, endpoint_id, customer_id, payload, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, response_body, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test, event, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash, custom_headers FROM deliveries WHERE id = $1 AND customer_id = $2",
+            "SELECT id, endpoint_id, customer_id, payload, event_type, status, attempt_count, max_attempts, last_attempt_at, response_status, response_body, next_retry_at, replay_count, created_at, sequence_num, fifo_group_id, updated_at, error_message, is_test, processed_at, idempotency_key, source_ip, request_headers, application_id, payload_hash FROM deliveries WHERE id = $1 AND customer_id = $2",
         )
         .bind(id)
         .bind(customer.id)
