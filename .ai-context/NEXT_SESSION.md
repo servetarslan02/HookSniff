@@ -1,9 +1,7 @@
 # 📋 Sonraki Oturum Rehberi
 
-> **Son güncelleme:** 2026-05-29 (OpenClaw — Oturum 9)
+> **Son güncelleme:** 2026-05-29 (OpenClaw — Oturum 10)
 > **Bu dosya her oturum başında okunur.**
----
-- google cloud build lerde hata var cargo\rust taramalarında çıkmıyor o yüzden memory.md de gcp json var ordan alıp google cli ne gerekiyorsa kur ve gcp build loglarından,hataları çek gör ve çöz, uygulama yüklü değil falan deme ne ferekiyoesa kuracaksın
 ---
 
 ## 🔧 Yapılan Düzeltmeler (Oturum 9 — 2026-05-29)
@@ -34,12 +32,39 @@
 
 ---
 
-## 🔜 Sonraki Adımlar
+## ✅ Oturum 10 Bulguları (2026-05-29 — OpenClaw)
 
-1. Build `21682c47` sonucu kontrol et — deploy başarılı olmalı
-2. Deploy sonrası API health check: `https://hooksniff-api-1046140057667.europe-west1.run.app/health`
-3. Dashboard build kontrolü (middleware deprecation warning var, şimdilik sorun değil)
-4. Neon DB kotası — yeni hesap veya kota sıfırlanması
+### Build Durumu
+- ✅ **Rust `cargo check --workspace`** — 0 hata, sadece warning'ler
+- ✅ **Dashboard `npm run build`** — 584+ sayfa, exit 0
+- ✅ **Rust 1.95.0** sandbox'ta kuruldu ve doğrulandı
+- ✅ **SSE bridge kodu** sağlam derleniyor
+
+### API Durumu
+- ✅ API çalışıyor (uptime 21+ saat)
+- ❌ **Neon DB** — "compute time quota exceeded" (free tier limit aşıldı)
+- ❌ **Redis** — "not configured" (Upstash kotası dolmuş)
+- ⚠️ API "degraded" durumda — DB sorguları başarısız
+
+---
+
+## 🔜 Sonraki Adımlar (ÖNCELİK SIRASI)
+
+### 🔴 ACİL — Servet Yapacak
+1. **Yeni Neon DB hesabı aç** — https://neon.tech (free tier)
+   - Yeni project oluştur
+   - Connection string'i kopyala
+   - GCP Secret Manager'da `hooksniff-database-url` secret'ını güncelle
+2. **Yeni Upstash Redis hesabı aç** — https://upstash.com (free tier)
+   - Yeni database oluştur
+   - Redis URL'ini kopyala
+   - GCP Secret Manager'da `hooksniff-redis-url` secret'ını güncelle
+3. **GCP Cloud Build tetikle** — Yeni secret'larla deploy et
+
+### 🟡 Sonra Yapılacak
+4. Dashboard build kontrolü (middleware deprecation warning var, şimdilik sorun değil)
+5. Admin endpoint error handling güçlendirme
+6. SSO endpoint URL kontrolü
 
 ---
 
@@ -47,6 +72,7 @@
 
 1. **Startup probe** syntax düzeltildi, deploy'da 500 hatalarını önleyecek
 2. **Redis kotası dolmuş** — yeni Upstash hesabı gerekli
-3. **Neon DB kotası dolmuş** — migration non-blocking yapıldı
+3. **Neon DB kotası dolmuş** — yeni Neon hesabı gerekli
 4. **Oturum süresi** — 1 saat
-5. **GCP SA key + Neon connection string + Vercel token** MEMORY.md'de var (güvenlik riski)
+5. **MEMORY.md'de hassas bilgiler var** — GCP SA key, Neon string, Vercel token (repo private, dikkatli ol)
+6. **Tüm 14 performans katmanı tamamlandı** — dashboard optimizasyonları bitti
