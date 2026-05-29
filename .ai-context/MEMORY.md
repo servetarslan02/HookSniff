@@ -161,7 +161,7 @@ gcp hatalarınıda düzelt,
 - Sentry upload hatası non-fatal (org token geçersiz)
 
 **Kalan İşler:**
-- Servet'in dashboard'da veri görebilmesi için login olması gerekiyor
+- GCP gereken kurulacak son buildlerin kogları çekikecek ve hatalar çözülecek. öncelikli iş bu çözüldüğünden emin olmadan başka işe geçilmeyecek.
 - Upstash Redis kotası dolmuş — yeni hesap gerekli (REDIS_URL GCP Secret Manager'da)
 - Redis yokken API cache çalışmıyor → her istek DB'ye gidiyor (yavaş ama çalışıyor)
 - Webhook Hızlandırma (Redis Streams queue) — Redis gerekli
