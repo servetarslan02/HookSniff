@@ -39,7 +39,7 @@ async function InboundWebhooksPageContent(params: Promise<{ locale: string }>) {
       {/* Create Config */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('createConfig')}</h2>
-        <CodeBlock code={`curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/inbound \\
+        <CodeBlock code={`curl -X POST https://your-api.trycloudflare.com/v1/inbound \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{\\"provider\\": \\"stripe\\", \\"endpoint_id\\": \\"ep_abc123\\"}'`} />

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://podcasts-settled-frames-soft.trycloudflare.com/v1';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://your-api.trycloudflare.com/v1';
 
 export async function GET(request: NextRequest) {
   try {
