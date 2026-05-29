@@ -48,15 +48,15 @@ async function AnalyticsPageContent(params: Promise<{ locale: string }>) {
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('apiDesc')}</p>
         <CodeBlock code={`# Delivery trends
 curl -H "Authorization: Bearer YOUR_API_KEY" \\
-  "https://atlas-wales-commons-oriental.trycloudflare.com/v1/analytics/deliveries?range=7d"
+  "https://podcasts-settled-frames-soft.trycloudflare.com/v1/analytics/deliveries?range=7d"
 
 # Success rate
 curl -H "Authorization: Bearer YOUR_API_KEY" \\
-  "https://atlas-wales-commons-oriental.trycloudflare.com/v1/analytics/success-rate?range=30d"
+  "https://podcasts-settled-frames-soft.trycloudflare.com/v1/analytics/success-rate?range=30d"
 
 # Latency trend
 curl -H "Authorization: Bearer YOUR_API_KEY" \\
-  "https://atlas-wales-commons-oriental.trycloudflare.com/v1/analytics/latency?range=7d"`} />
+  "https://podcasts-settled-frames-soft.trycloudflare.com/v1/analytics/latency?range=7d"`} />
       </section>
     </article>
   );

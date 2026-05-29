@@ -46,7 +46,7 @@ async function EventTypesPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('registering')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('registeringDesc')}</p>
         <CodeBlock
-          code={`curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/webhooks \\
+          code={`curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/webhooks \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -63,7 +63,7 @@ async function EventTypesPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('filtering')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('filteringDesc')}</p>
         <CodeBlock
-          code={`curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/endpoints \\
+          code={`curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/endpoints \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
