@@ -132,7 +132,7 @@ steps:
       - '--cpu=1'
       - '--min-instances=1'
       - '--max-instances=4'
-      - '--startup-probe=httpGet.port=3000,httpGet.path=/health,initialDelaySeconds=10,periodSeconds=5,failureThreshold=12,timeoutSeconds=5'
+      - '--startup-probe=httpGet.port=8080,httpGet.path=/health,initialDelaySeconds=10,periodSeconds=5,failureThreshold=12,timeoutSeconds=5'
       - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,OTEL_ENABLED=true'
       - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest'
       - '--project=$PROJECT_ID'
