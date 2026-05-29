@@ -13,6 +13,7 @@ use axum::{
 use chrono::Utc;
 use futures::stream::Stream;
 use std::convert::Infallible;
+use std::pin::Pin;
 use std::sync::Arc;
 use tokio::sync::broadcast;
 use uuid::Uuid;
@@ -37,7 +38,7 @@ pub async fn delivery_event_stream(
     Extension(publisher): Extension<Option<EventPublisher>>,
     Extension(gateway): Extension<Arc<WsGateway>>,
     headers: HeaderMap,
-) -> Result<Sse<impl Stream<Item = Result<Event, Infallible>>>, AppError> {
+) -> Result<Sse<Pin<Box<dyn Stream<Item = Result<Event, Infallible>> + Send>>>, AppError> {
     let publisher = match publisher {
         Some(p) => p,
         None => {
@@ -48,7 +49,7 @@ pub async fn delivery_event_stream(
                     .event("error")
                     .data("Event system not configured"));
             };
-            return Ok(Sse::new(stream).keep_alive(
+            return Ok(Sse::new(Box::pin(stream).keep_alive(
                 axum::response::sse::KeepAlive::new()
                     .interval(std::time::Duration::from_secs(15))
                     .text("ping"),
@@ -204,7 +205,7 @@ pub async fn delivery_event_stream(
         }
     };
 
-    Ok(Sse::new(stream).keep_alive(
+    Ok(Sse::new(Box::pin(stream).keep_alive(
         axum::response::sse::KeepAlive::new()
             .interval(std::time::Duration::from_secs(15))
             .text("ping"),
@@ -222,7 +223,7 @@ pub async fn channel_event_stream(
     Extension(publisher): Extension<Option<EventPublisher>>,
     axum::extract::Path(channel_id): axum::extract::Path<Uuid>,
     axum::extract::Query(params): axum::extract::Query<super::StreamParams>,
-) -> Result<Sse<impl Stream<Item = Result<Event, Infallible>>>, AppError> {
+) -> Result<Sse<Pin<Box<dyn Stream<Item = Result<Event, Infallible>> + Send>>>, AppError> {
     let publisher = match publisher {
         Some(p) => p,
         None => {
@@ -233,7 +234,7 @@ pub async fn channel_event_stream(
                     .event("error")
                     .data("Event system not configured"));
             };
-            return Ok(Sse::new(stream).keep_alive(
+            return Ok(Sse::new(Box::pin(stream).keep_alive(
                 axum::response::sse::KeepAlive::new()
                     .interval(std::time::Duration::from_secs(15))
                     .text("ping"),
@@ -317,7 +318,7 @@ pub async fn channel_event_stream(
         }
     };
 
-    Ok(Sse::new(stream).keep_alive(
+    Ok(Sse::new(Box::pin(stream).keep_alive(
         axum::response::sse::KeepAlive::new()
             .interval(std::time::Duration::from_secs(15))
             .text("ping"),
