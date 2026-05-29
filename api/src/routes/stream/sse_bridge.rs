@@ -49,7 +49,7 @@ pub async fn delivery_event_stream(
                     .event("error")
                     .data("Event system not configured"));
             };
-            return Ok(Sse::new(Box::pin(stream).keep_alive(
+            return Ok(Sse::new(Box::pin(stream)).keep_alive(
                 axum::response::sse::KeepAlive::new()
                     .interval(std::time::Duration::from_secs(15))
                     .text("ping"),
@@ -205,7 +205,7 @@ pub async fn delivery_event_stream(
         }
     };
 
-    Ok(Sse::new(Box::pin(stream).keep_alive(
+    Ok(Sse::new(Box::pin(stream)).keep_alive(
         axum::response::sse::KeepAlive::new()
             .interval(std::time::Duration::from_secs(15))
             .text("ping"),
@@ -234,7 +234,7 @@ pub async fn channel_event_stream(
                     .event("error")
                     .data("Event system not configured"));
             };
-            return Ok(Sse::new(Box::pin(stream).keep_alive(
+            return Ok(Sse::new(Box::pin(stream)).keep_alive(
                 axum::response::sse::KeepAlive::new()
                     .interval(std::time::Duration::from_secs(15))
                     .text("ping"),
@@ -318,7 +318,7 @@ pub async fn channel_event_stream(
         }
     };
 
-    Ok(Sse::new(Box::pin(stream).keep_alive(
+    Ok(Sse::new(Box::pin(stream)).keep_alive(
         axum::response::sse::KeepAlive::new()
             .interval(std::time::Duration::from_secs(15))
             .text("ping"),
