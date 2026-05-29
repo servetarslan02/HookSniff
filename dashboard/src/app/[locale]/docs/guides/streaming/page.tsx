@@ -26,7 +26,7 @@ async function StreamingContent() {
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Connect to Stream</h3>
         <CodeBlock
-          code={`curl -N https://podcasts-settled-frames-soft.trycloudflare.com/v1/stream/deliveries \\
+          code={`curl -N https://your-api.trycloudflare.com/v1/stream/deliveries \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Accept: text/event-stream"`}
         />
@@ -91,7 +91,7 @@ stream.on('error', (err) => {
 
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Set Rate Limit</h3>
         <CodeBlock
-          code={`curl -X POST https://podcasts-settled-frames-soft.trycloudflare.com/v1/endpoints/EP_ID/rate-limit \\
+          code={`curl -X POST https://your-api.trycloudflare.com/v1/endpoints/EP_ID/rate-limit \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
