@@ -8,7 +8,7 @@
 use axum::{
     extract::Extension,
     http::HeaderMap,
-    response::sse::{Event, Sse},
+    response::{IntoResponse, sse::{Event, Sse}},
 };
 use chrono::Utc;
 use futures::stream::Stream;
@@ -38,7 +38,7 @@ pub async fn delivery_event_stream(
     Extension(publisher): Extension<Option<EventPublisher>>,
     Extension(gateway): Extension<Arc<WsGateway>>,
     headers: HeaderMap,
-) -> Result<Sse<Pin<Box<dyn Stream<Item = Result<Event, Infallible>> + Send>>>, AppError> {
+) -> Result<impl IntoResponse, AppError> {
     let publisher = match publisher {
         Some(p) => p,
         None => {
@@ -90,7 +90,7 @@ pub async fn delivery_event_stream(
                 if let Ok(recent) = publisher.get_recent(50).await {
                     for envelope in recent {
                         // Skip events older than the last one the client saw
-                        if envelope.id.to_string().as_str() <= id_str.as_str() {
+                        if envelope.id.to_string().as_str() <= id_str {
                             continue;
                         }
 
@@ -223,7 +223,7 @@ pub async fn channel_event_stream(
     Extension(publisher): Extension<Option<EventPublisher>>,
     axum::extract::Path(channel_id): axum::extract::Path<Uuid>,
     axum::extract::Query(params): axum::extract::Query<super::StreamParams>,
-) -> Result<Sse<Pin<Box<dyn Stream<Item = Result<Event, Infallible>> + Send>>>, AppError> {
+) -> Result<impl IntoResponse, AppError> {
     let publisher = match publisher {
         Some(p) => p,
         None => {
