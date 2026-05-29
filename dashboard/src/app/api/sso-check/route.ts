@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://atlas-wales-commons-oriental.trycloudflare.com';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://podcasts-settled-frames-soft.trycloudflare.com';
 
 export async function GET(request: NextRequest) {
   const domain = request.nextUrl.searchParams.get('domain');

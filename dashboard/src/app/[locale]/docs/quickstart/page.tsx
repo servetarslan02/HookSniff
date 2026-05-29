@@ -445,15 +445,15 @@ async function QuickstartContent(params: Promise<{ locale: string }>) {
     </p>
     <CodeBlock
      code={`# List recent deliveries
-curl https://atlas-wales-commons-oriental.trycloudflare.com/v1/webhooks?limit=10 \\
+curl https://podcasts-settled-frames-soft.trycloudflare.com/v1/webhooks?limit=10 \\
  -H "Authorization: Bearer hr_live_YOUR_KEY"
 
 # Get specific delivery details
-curl https://atlas-wales-commons-oriental.trycloudflare.com/v1/webhooks/MSG_ID \\
+curl https://podcasts-settled-frames-soft.trycloudflare.com/v1/webhooks/MSG_ID \\
  -H "Authorization: Bearer hr_live_YOUR_KEY"
 
 # Get delivery attempts (HTTP responses from your server)
-curl https://atlas-wales-commons-oriental.trycloudflare.com/v1/webhooks/MSG_ID/attempts \\
+curl https://podcasts-settled-frames-soft.trycloudflare.com/v1/webhooks/MSG_ID/attempts \\
  -H "Authorization: Bearer hr_live_YOUR_KEY"`}
     />
    </section>
