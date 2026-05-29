@@ -212,7 +212,7 @@ async function DocsPageContent(params: Promise<{ locale: string }>) {
             <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-500">{tp('apiBase')}</span>
           </div>
           <code className="text-sm font-mono text-gray-800 dark:text-slate-300 break-all">
-            https://hooksniff-api-1046140057667.europe-west1.run.app/v1
+            https://atlas-wales-commons-oriental.trycloudflare.com/v1
           </code>
         </div>
         <div className="flex-1 rounded-xl border border-gray-200/60 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02] p-5">

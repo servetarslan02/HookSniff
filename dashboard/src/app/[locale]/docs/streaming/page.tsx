@@ -31,7 +31,7 @@ async function StreamingPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('subscribing')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('subscribingDesc')}</p>
         <CodeBlock code={`const eventSource = new EventSource(
-  'https://hooksniff-api-1046140057667.europe-west1.run.app/v1/stream/channels/CHANNEL_ID/subscribe'
+  'https://atlas-wales-commons-oriental.trycloudflare.com/v1/stream/channels/CHANNEL_ID/subscribe'
 );
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);

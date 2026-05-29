@@ -178,7 +178,7 @@ export function StreamingContent() {
     setIsLive(true);
     setLiveEvents([]);
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-1046140057667.europe-west1.run.app';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://atlas-wales-commons-oriental.trycloudflare.com';
     const url = `${baseUrl}/v1/stream/channels/${channelId}/subscribe`;
     const es = new EventSource(url, { withCredentials: true });
     esRef.current = es;

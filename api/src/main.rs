@@ -36,6 +36,8 @@ async fn main() -> Result<()> {
     validate_encryption_key(&cfg)?;
     validate_jwt_config()?;
 
+    let startup_start = std::time::Instant::now();
+
     // ── Database & Services (Parallel Initialization for Phase 7) ────────────────
     let db_url = cfg.database_url.clone();
     let redis_url = config::resolve_redis_url();
@@ -60,6 +62,22 @@ async fn main() -> Result<()> {
     );
 
     let pool = pool_res?;
+    
+    // ── Phase 2: Warm-up Task (Background) ──────────────────────
+    let warmup_pool = pool.clone();
+    let warmup_cache = cache_layer.clone();
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(std::time::Duration::from_secs(30));
+        loop {
+            interval.tick().await;
+            // DB bağlantısını sıcak tut
+            let _ = sqlx::query("SELECT 1").execute(&warmup_pool).await;
+            // Redis bağlantısını sıcak tut
+            if let Some(ref cache) = warmup_cache {
+                let _ = cache.ping().await;
+            }
+        }
+    });
 
     let health_pool = match db::create_health_pool(&db_url).await {
         Ok(p) => {
@@ -157,6 +175,12 @@ async fn main() -> Result<()> {
     let sso_store = build_sso_store().await;
 
     // ── Build application ───────────────────────────────────────
+    let startup_duration = startup_start.elapsed();
+    tracing::info!(
+        startup_ms = startup_duration.as_millis() as u64,
+        "✅ API started"
+    );
+
     let app = Router::new()
         .route(
             "/",

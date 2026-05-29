@@ -32,10 +32,10 @@ async function BackgroundTasksPageContent(params: Promise<{ locale: string }>) {
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('monitoringDesc')}</p>
         <CodeBlock code={`# List tasks
 curl -H "Authorization: Bearer YOUR_API_KEY" \\
-  https://hooksniff-api-1046140057667.europe-west1.run.app/v1/background-tasks
+  https://atlas-wales-commons-oriental.trycloudflare.com/v1/background-tasks
 
 # Cancel task (requires admin)
-curl -X PUT https://hooksniff-api-1046140057667.europe-west1.run.app/v1/background-tasks/TASK_ID \\
+curl -X PUT https://atlas-wales-commons-oriental.trycloudflare.com/v1/background-tasks/TASK_ID \\
   -H "Authorization: Bearer YOUR_API_KEY"`} />
       </section>
     </article>
