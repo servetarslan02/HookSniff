@@ -31,7 +31,7 @@ async function StreamingPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('subscribing')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('subscribingDesc')}</p>
         <CodeBlock code={`const eventSource = new EventSource(
-  'https://podcasts-settled-frames-soft.trycloudflare.com/v1/stream/channels/CHANNEL_ID/subscribe'
+  'https://your-api.trycloudflare.com/v1/stream/channels/CHANNEL_ID/subscribe'
 );
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);

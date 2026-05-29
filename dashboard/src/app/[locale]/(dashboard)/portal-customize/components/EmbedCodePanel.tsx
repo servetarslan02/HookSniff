@@ -17,7 +17,7 @@ export function EmbedCodePanel({
   const t = useTranslations('portalCustomize');
   const { toast } = useToast();
 
-  const apiBase = 'https://podcasts-settled-frames-soft.trycloudflare.com';
+  const apiBase = 'https://your-api.trycloudflare.com';
   const dashBase = 'https://hooksniff.vercel.app';
 
   const fallbackIframe = `<iframe

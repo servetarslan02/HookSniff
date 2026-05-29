@@ -1,4 +1,4 @@
-/** @type {import('next').NextConfig} */
+﻿/** @type {import('next').NextConfig} */
 const createNextIntlPlugin = require('next-intl/plugin');
 const { withSentryConfig } = require('@sentry/nextjs');
 
@@ -36,7 +36,7 @@ const nextConfig = {
           "style-src 'self' 'unsafe-inline'",
           "img-src 'self' data: https: blob:",
           "font-src 'self' data:",
-          "connect-src 'self' https://podcasts-settled-frames-soft.trycloudflare.com https://*.sentry.io https://vitals.vercel-insights.com https://cloudflareinsights.com wss:",
+          "connect-src 'self' https://your-api.trycloudflare.com https://*.sentry.io https://vitals.vercel-insights.com https://cloudflareinsights.com wss:",
           "frame-ancestors 'none'",
           "base-uri 'self'",
           "form-action 'self'",
@@ -45,20 +45,24 @@ const nextConfig = {
     }];
   },
   async rewrites() {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    // Remove /v1 suffix from apiBase for rewrites if present, as the path already includes it or handles it
+    const normalizedApiBase = apiBase.endsWith('/v1') ? apiBase.slice(0, -3) : apiBase;
+    
     return [
       {
         source: '/api/health',
-        destination: 'https://podcasts-settled-frames-soft.trycloudflare.com/health',
+        destination: `${normalizedApiBase}/health`,
       },
       {
         source: '/api/:path*',
-        destination: 'https://podcasts-settled-frames-soft.trycloudflare.com/:path*',
+        destination: `${normalizedApiBase}/:path*`,
       },
     ];
   },
 };
 
-// Bundle analyzer — ANALYZE=true npm run build
+// Bundle analyzer â€” ANALYZE=true npm run build
 const withBundleAnalyzer = process.env.ANALYZE === 'true'
   ? require('@next/bundle-analyzer')({ enabled: true })
   : (config) => config;
@@ -78,7 +82,7 @@ if (process.env.SENTRY_ORG && process.env.SENTRY_PROJECT && process.env.SENTRY_A
     telemetry: false,
     // Don't fail the build if Sentry upload fails
     errorHandler: (err) => {
-      console.warn('⚠️ Sentry upload error (non-fatal):', err.message);
+      console.warn('âš ï¸ Sentry upload error (non-fatal):', err.message);
     },
   });
 } else {
