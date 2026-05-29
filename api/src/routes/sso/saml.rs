@@ -125,13 +125,11 @@ pub fn extract_xml_text(xml: &str, tag: &str) -> Option<String> {
 
     let mut reader = Reader::from_str(xml);
     let mut buf = Vec::new();
-    let mut found = false;
 
     loop {
         match reader.read_event_into(&mut buf) {
             Ok(Event::Start(ref e)) => {
                 if local_name_matches(e.name(), tag) {
-                    found = true;
                     // Read text content
                     let mut text = String::new();
                     loop {
@@ -150,9 +148,6 @@ pub fn extract_xml_text(xml: &str, tag: &str) -> Option<String> {
                             Ok(Event::Eof) => break,
                             _ => {}
                         }
-                    }
-                    if found && !text.is_empty() {
-                        return Some(text);
                     }
                 }
             }

@@ -27,12 +27,13 @@ pub static TOTAL_QUERY_COUNT: AtomicU64 = AtomicU64::new(0);
 /// })
 /// .await?;
 /// ```
-pub async fn timed_query<F, T>(query_name: &str, f: F) -> Result<T>
+pub async fn timed_query<F, T, E>(query_name: &str, f: F) -> Result<T>
 where
-    F: std::future::Future<Output = Result<T>>,
+    F: std::future::Future<Output = std::result::Result<T, E>>,
+    E: Into<anyhow::Error>,
 {
     let start = Instant::now();
-    let result = f.await;
+    let result = f.await.map_err(Into::into);
     let elapsed = start.elapsed();
     let ms = elapsed.as_millis();
 
