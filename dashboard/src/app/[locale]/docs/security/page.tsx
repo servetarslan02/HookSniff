@@ -153,7 +153,7 @@ payload, err := wh.Verify(r.Body, r.Header)`}
         </p>
         <CodeBlock
           code={`# Enable 2FA
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/auth/2fa/enable \\
+curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/auth/2fa/enable \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"password": "your_password"}'

@@ -54,16 +54,16 @@ async function AlertsPageContent(params: Promise<{ locale: string }>) {
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('apiDesc')}</p>
         <CodeBlock code={`# List alert rules
 curl -H "Authorization: Bearer YOUR_API_KEY" \\
-  https://hooksniff-api-1046140057667.europe-west1.run.app/v1/alerts
+  https://atlas-wales-commons-oriental.trycloudflare.com/v1/alerts
 
 # Create alert rule
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/alerts \\
+curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/alerts \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"name": "High failures", "condition": "failure_rate", "threshold": 5, "channels": ["email"]}'
 
 # Test alert
-curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/alerts/ALERT_ID/test \\
+curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/alerts/ALERT_ID/test \\
   -H "Authorization: Bearer YOUR_API_KEY"`} />
       </section>
       <section className="mb-12">

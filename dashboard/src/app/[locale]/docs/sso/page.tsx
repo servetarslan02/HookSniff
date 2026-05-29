@@ -57,7 +57,7 @@ export default function SsoDocsPage() {
           <ol className="space-y-3 text-sm text-gray-700 dark:text-slate-300 list-decimal list-inside">
             <li>Go to <strong>Azure Portal → Azure Active Directory → App registrations → New registration</strong></li>
             <li>Name: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">HookSniff</code></li>
-            <li>Redirect URI: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">https://hooksniff-api-1046140057667.europe-west1.run.app/v1/sso/oidc/callback</code></li>
+            <li>Redirect URI: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">https://atlas-wales-commons-oriental.trycloudflare.com/v1/sso/oidc/callback</code></li>
             <li>Copy <strong>Application (client) ID</strong> and <strong>Directory (tenant) ID</strong></li>
             <li>Go to <strong>Certificates & secrets → New client secret</strong> → copy the value</li>
             <li>In HookSniff SSO page:
@@ -82,7 +82,7 @@ export default function SsoDocsPage() {
           <ol className="space-y-3 text-sm text-gray-700 dark:text-slate-300 list-decimal list-inside">
             <li>Go to <strong>Google Cloud Console → APIs & Services → Credentials → Create OAuth 2.0 Client ID</strong></li>
             <li>Application type: <strong>Web application</strong></li>
-            <li>Authorized redirect URI: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">https://hooksniff-api-1046140057667.europe-west1.run.app/v1/sso/oidc/callback</code></li>
+            <li>Authorized redirect URI: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">https://atlas-wales-commons-oriental.trycloudflare.com/v1/sso/oidc/callback</code></li>
             <li>Copy <strong>Client ID</strong> and <strong>Client Secret</strong></li>
             <li>In HookSniff SSO page:
               <ul className="ml-6 mt-1 space-y-1">
@@ -107,7 +107,7 @@ export default function SsoDocsPage() {
             <li>Go to <strong>Okta Admin → Applications → Create App Integration</strong></li>
             <li>Sign-in method: <strong>OIDC - OpenID Connect</strong></li>
             <li>Application type: <strong>Web Application</strong></li>
-            <li>Sign-in redirect URI: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">https://hooksniff-api-1046140057667.europe-west1.run.app/v1/sso/oidc/callback</code></li>
+            <li>Sign-in redirect URI: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">https://atlas-wales-commons-oriental.trycloudflare.com/v1/sso/oidc/callback</code></li>
             <li>Copy <strong>Client ID</strong> and <strong>Client Secret</strong></li>
             <li>In HookSniff SSO page:
               <ul className="ml-6 mt-1 space-y-1">
@@ -133,7 +133,7 @@ export default function SsoDocsPage() {
             <li>Go to <strong>Clients → Create client</strong></li>
             <li>Client type: <strong>OpenID Connect</strong></li>
             <li>Client ID: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">hooksniff</code></li>
-            <li>Valid redirect URIs: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">https://hooksniff-api-1046140057667.europe-west1.run.app/v1/sso/oidc/callback</code></li>
+            <li>Valid redirect URIs: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">https://atlas-wales-commons-oriental.trycloudflare.com/v1/sso/oidc/callback</code></li>
             <li>Go to <strong>Credentials</strong> tab → copy <strong>Client Secret</strong></li>
             <li>In HookSniff SSO page:
               <ul className="ml-6 mt-1 space-y-1">
@@ -156,7 +156,7 @@ export default function SsoDocsPage() {
           </div>
           <ol className="space-y-3 text-sm text-gray-700 dark:text-slate-300 list-decimal list-inside">
             <li>Go to <strong>Applications → Add App → SAML Custom Connector (Advanced)</strong></li>
-            <li>Set <strong>ACS URL</strong>: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">https://hooksniff-api-1046140057667.europe-west1.run.app/v1/sso/saml/callback</code></li>
+            <li>Set <strong>ACS URL</strong>: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">https://atlas-wales-commons-oriental.trycloudflare.com/v1/sso/saml/callback</code></li>
             <li>Set <strong>Entity ID</strong>: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs">urn:hooksniff:sp</code></li>
             <li>Copy the <strong>SAML Metadata URL</strong> or download the certificate</li>
             <li>In HookSniff SSO page:

@@ -40,7 +40,7 @@ async function IdempotencyPageContent(params: Promise<{ locale: string }>) {
           {t('howItWorksDesc')}
         </p>
         <CodeBlock
-          code={`curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \\
+          code={`curl -X POST https://atlas-wales-commons-oriental.trycloudflare.com/v1/webhooks \\
   -H "Authorization: Bearer hr_live_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -H "Idempotency-Key: order-12345-created" \\

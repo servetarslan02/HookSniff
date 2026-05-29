@@ -52,7 +52,7 @@ export default function AuthCallbackPage() {
       }
 
       // Verify the token works before redirecting
-      const apiUrl = 'https://hooksniff-api-1046140057667.europe-west1.run.app';
+      const apiUrl = 'https://atlas-wales-commons-oriental.trycloudflare.com';
       fetch(`${apiUrl}/v1/auth/me`, {
         headers: { 'Authorization': `Bearer ${token}` },
       })
