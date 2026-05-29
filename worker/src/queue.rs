@@ -153,7 +153,7 @@ pub async fn reap_orphaned_deliveries(pool: &PgPool) -> Result<usize> {
     let orphaned: Vec<(uuid::Uuid, uuid::Uuid, uuid::Uuid, serde_json::Value, Option<serde_json::Value>, String)> =
         sqlx::query_as(
             r#"
-            SELECT d.id, d.endpoint_id, d.customer_id, d.payload, d.custom_headers, e.url
+            SELECT d.id, d.endpoint_id, d.customer_id, d.payload, e.custom_headers, e.url
             FROM deliveries d
             JOIN endpoints e ON e.id = d.endpoint_id
             WHERE d.status = 'pending'
