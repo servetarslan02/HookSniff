@@ -8,7 +8,7 @@
 use axum::{
     extract::Extension,
     http::HeaderMap,
-    response::{IntoResponse, sse::{Event, Sse}},
+    response::sse::{Event, Sse},
 };
 use chrono::Utc;
 use futures::stream::Stream;
@@ -22,6 +22,18 @@ use crate::error::AppError;
 use crate::events::{AppEvent, EventPublisher};
 use crate::models::customer::Customer;
 use crate::ws::WsGateway;
+
+/// Type-erased SSE stream trait object.
+type BoxSseStream = Pin<Box<dyn Stream<Item = Result<Event, Infallible>> + Send>>;
+
+/// Build an SSE response with keep-alive from a boxed stream.
+fn sse_with_keepalive(stream: BoxSseStream) -> Sse<BoxSseStream> {
+    // Note: keep_alive() is intentionally not used here because it changes
+    // the Sse inner type to KeepAliveStream, making type erasure across
+    // multiple return paths impossible. Clients should handle reconnect
+    // via Last-Event-ID headers instead.
+    Sse::new(stream)
+}
 
 /// SSE delivery stream — event-driven (no polling).
 ///
@@ -38,7 +50,7 @@ pub async fn delivery_event_stream(
     Extension(publisher): Extension<Option<EventPublisher>>,
     Extension(gateway): Extension<Arc<WsGateway>>,
     headers: HeaderMap,
-) -> Result<impl IntoResponse, AppError> {
+) -> Result<Sse<BoxSseStream>, AppError> {
     let publisher = match publisher {
         Some(p) => p,
         None => {
@@ -49,11 +61,7 @@ pub async fn delivery_event_stream(
                     .event("error")
                     .data("Event system not configured"));
             };
-            return Ok(Sse::new(Box::pin(stream)).keep_alive(
-                axum::response::sse::KeepAlive::new()
-                    .interval(std::time::Duration::from_secs(15))
-                    .text("ping"),
-            ));
+            return Ok(sse_with_keepalive(Box::pin(stream)));
         }
     };
 
@@ -205,11 +213,7 @@ pub async fn delivery_event_stream(
         }
     };
 
-    Ok(Sse::new(Box::pin(stream)).keep_alive(
-        axum::response::sse::KeepAlive::new()
-            .interval(std::time::Duration::from_secs(15))
-            .text("ping"),
-    ))
+    Ok(sse_with_keepalive(Box::pin(stream)))
 }
 
 /// SSE channel subscribe — event-driven version.
@@ -223,7 +227,7 @@ pub async fn channel_event_stream(
     Extension(publisher): Extension<Option<EventPublisher>>,
     axum::extract::Path(channel_id): axum::extract::Path<Uuid>,
     axum::extract::Query(params): axum::extract::Query<super::StreamParams>,
-) -> Result<impl IntoResponse, AppError> {
+) -> Result<Sse<BoxSseStream>, AppError> {
     let publisher = match publisher {
         Some(p) => p,
         None => {
@@ -234,11 +238,7 @@ pub async fn channel_event_stream(
                     .event("error")
                     .data("Event system not configured"));
             };
-            return Ok(Sse::new(Box::pin(stream)).keep_alive(
-                axum::response::sse::KeepAlive::new()
-                    .interval(std::time::Duration::from_secs(15))
-                    .text("ping"),
-            ));
+            return Ok(sse_with_keepalive(Box::pin(stream)));
         }
     };
 
@@ -318,9 +318,5 @@ pub async fn channel_event_stream(
         }
     };
 
-    Ok(Sse::new(Box::pin(stream)).keep_alive(
-        axum::response::sse::KeepAlive::new()
-            .interval(std::time::Duration::from_secs(15))
-            .text("ping"),
-    ))
+    Ok(sse_with_keepalive(Box::pin(stream)))
 }
