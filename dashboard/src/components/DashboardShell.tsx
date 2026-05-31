@@ -12,6 +12,7 @@ import { PrefetchLink } from '@/components/PrefetchLink';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { BroadcastBanner } from '@/components/BroadcastBanner';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import type { default as ErrorBoundaryType } from '@/components/ErrorBoundary';
 import { SkeletonDashboard } from '@/components/LoadingSkeletons';
 import { ViewTransition } from '@/components/ViewTransition';
 import { useRealtime } from '@/hooks/useRealtime';
@@ -328,11 +329,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
           <EmailVerificationBanner />
           <BroadcastBanner />
-          <ErrorBoundary>
+          
             <Suspense fallback={<SkeletonDashboard />}>
               <ViewTransition>{children}</ViewTransition>
             </Suspense>
-          </ErrorBoundary>
+          
         </main>
       </div>
     </div>
