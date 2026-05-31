@@ -8,6 +8,7 @@ import { adminApi } from '@/lib/api';
 import { apiFetch } from '@/lib/api';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import type { default as ErrorBoundaryType } from '@/components/ErrorBoundary';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';
@@ -272,11 +273,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <main id="admin-main-content" role="main" className="p-3 sm:p-4 md:p-6 lg:p-8 page-enter">
-          <ErrorBoundary>
+          
             <Suspense fallback={<SkeletonAdmin />}>
               <ViewTransition>{children}</ViewTransition>
             </Suspense>
-          </ErrorBoundary>
+          
         </main>
       </div>
     </div>
