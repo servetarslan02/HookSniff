@@ -75,7 +75,7 @@ pub async fn analyze_stage_performance(
     // Son 24 saatteki çalıştırma istatistikleri
     let stats: Option<(f64, i64, i64, i64)> = sqlx::query_as(
         "SELECT
-            COALESCE(AVG(duration_ms), 0) as avg_dur,
+            COALESCE(AVG(duration_ms), 0)::DOUBLE PRECISION as avg_dur,
             COUNT(*) as total_runs,
             COUNT(*) FILTER (WHERE status = 'success') as success_runs,
             COUNT(*) FILTER (WHERE status = 'timeout') as timeout_runs
@@ -89,7 +89,7 @@ pub async fn analyze_stage_performance(
     let (avg_dur, total_runs, success_runs, timeout_runs) = stats.unwrap_or((0.0, 0, 0, 0));
 
     // P95 ve max duration
-    let percentiles: Option<(f64, i64)> = sqlx::query_as(
+    let percentiles: Option<(Option<f64>, Option<i64>)> = sqlx::query_as(
         "SELECT
             PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY duration_ms) as p95,
             MAX(duration_ms) as max_dur
@@ -100,7 +100,9 @@ pub async fn analyze_stage_performance(
     .fetch_optional(pool)
     .await?;
 
-    let (p95_dur, max_dur) = percentiles.unwrap_or((0.0, 0));
+    let (p95_dur, max_dur) = percentiles.unwrap_or((None, None));
+    let p95_dur = p95_dur.unwrap_or(0.0);
+    let max_dur_int = max_dur.unwrap_or(0);
 
     // Trend: son 6 saat vs önceki 6 saat
     let recent_avg: Option<(f64,)> = sqlx::query_as(
@@ -137,7 +139,7 @@ pub async fn analyze_stage_performance(
         stage_name: stage_name.to_string(),
         avg_duration_ms: avg_dur,
         p95_duration_ms: p95_dur,
-        max_duration_ms: max_dur as u64,
+        max_duration_ms: max_dur_int as u64,
         success_rate,
         timeout_rate,
         runs_last_24h: total_runs,
