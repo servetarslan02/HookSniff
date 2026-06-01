@@ -6,7 +6,8 @@
   "ignoreCommand": "git diff --quiet HEAD~1 HEAD -- dashboard/ api/ vercel.json package.json worker/ common/ || exit 1",
   "rewrites": [
     { "source": "/api/health", "destination": "https://hooksniff-api-cec4.onrender.com/health" },
-    { "source": "/api/:path*", "destination": "https://hooksniff-api-cec4.onrender.com/v1/:path*" }
+    { "source": "/api/v1/:path*", "destination": "https://hooksniff-api-cec4.onrender.com/v1/:path*" },
+    { "source": "/api/:path*", "destination": "https://hooksniff-api-cec4.onrender.com/:path*" }
   ],
   "headers": [
     {
