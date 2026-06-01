@@ -82,7 +82,7 @@ pub async fn resolve_customer_from_endpoint(
     endpoint_id: Uuid,
 ) -> Option<(Customer, Endpoint)> {
     let endpoint = sqlx::query_as::<_, Endpoint>(
-        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND is_active = true",
+        "SELECT id, customer_id, url, description, is_active, signing_secret, retry_policy, created_at, allowed_ips, event_filter, custom_headers, old_signing_secret, secret_rotated_at, routing_strategy, fallback_url, avg_response_ms, failure_streak, last_failure_at, format, fifo_enabled, fifo_sequence, fifo_group_by_customer, fifo_max_wait_secs, throttle_rate, throttle_period_secs, throttle_strategy, application_id FROM endpoints WHERE id = $1 AND is_active = true AND (auto_disabled = false OR auto_disabled IS NULL)",
     )
     .bind(endpoint_id)
     .fetch_optional(pool)

@@ -37,6 +37,7 @@ pub async fn init_endpoint_models(pool: &PgPool, endpoint_id: uuid::Uuid) -> Res
         "time_series",
         "contextual_bandit",
         "drift_detector",
+        "healing_bandit",
     ];
     for model_type in &models {
         sqlx::query(
