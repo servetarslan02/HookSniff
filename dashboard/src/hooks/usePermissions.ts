@@ -1,6 +1,7 @@
 'use client';
 
 import { useTeamRole, type TeamRole } from './useTeamRole';
+import { useAuth } from '@/lib/store';
 
 export interface Permissions {
   /** Can manage team members, roles, invites */
@@ -58,15 +59,18 @@ export interface Permissions {
  *                 If not provided, uses the first team.
  */
 export function usePermissions(teamId?: string | null): Permissions {
+  const { user } = useAuth();
   const { role, teamId: resolvedTeamId, isLoading } = useTeamRole(teamId);
 
-  const isAdmin = role === 'owner' || role === 'admin';
+  // Platform admin (is_admin flag) bypasses team role checks
+  const isPlatformAdmin = !!user?.is_admin;
+  const isAdmin = isPlatformAdmin || role === 'owner' || role === 'admin';
   const isDeveloper = isAdmin || role === 'developer';
   const isAnalyst = isDeveloper || role === 'analyst';
   const isAnyMember = !!role;
 
   return {
-    // Admin-only (require_team_admin in backend)
+    // Admin-only (require_team_admin in backend) — platform admins get all
     canManageTeam: isAdmin,
     canManageWebhooks: isAdmin,
     canManageApiKeys: isAdmin,
@@ -81,13 +85,13 @@ export function usePermissions(teamId?: string | null): Permissions {
     canManageRateLimits: isAdmin,
 
     // Developer+ (require_role("developer") in backend)
-    canViewDevtools: isDeveloper,
+    canViewDevtools: isPlatformAdmin || isDeveloper,
 
     // Analyst+ (require_role("analyst") in backend — read access)
-    canViewObservability: isAnalyst,
+    canViewObservability: isPlatformAdmin || isAnalyst,
 
-    // All members
-    canManageSettings: isAnyMember,
+    // All members — platform admins always have access
+    canManageSettings: isPlatformAdmin || isAnyMember,
 
     // Meta
     isOwner: role === 'owner',
