@@ -14,6 +14,16 @@ pub mod time_series;
 pub mod contextual_bandit;
 pub mod quality_tracker;
 pub mod bootstrap;
+pub mod drift_detection;
+pub mod model_monitor;
+pub mod explainable;
+pub mod cortex_tracing;
+pub mod feature_store;
+pub mod versioning;
+pub mod advanced_forecast;
+pub mod chaos;
+pub mod ab_testing;
+pub mod automl;
 
 use sqlx::PgPool;
 
@@ -26,6 +36,7 @@ pub async fn init_endpoint_models(pool: &PgPool, endpoint_id: uuid::Uuid) -> Res
         "circuit_bandit",
         "time_series",
         "contextual_bandit",
+        "drift_detector",
     ];
     for model_type in &models {
         sqlx::query(
@@ -154,4 +165,9 @@ async fn train_endpoint(pool: &PgPool, endpoint_id: uuid::Uuid) -> Result<(), sq
     bandit::init_if_needed(pool, endpoint_id).await?;
 
     Ok(())
+}
+
+/// Drift sonrası tek endpoint için yeniden eğitim tetikler
+pub async fn train_endpoint_for_drift(pool: &PgPool, endpoint_id: uuid::Uuid) -> Result<(), sqlx::Error> {
+    train_endpoint(pool, endpoint_id).await
 }
