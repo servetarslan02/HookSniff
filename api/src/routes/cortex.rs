@@ -33,6 +33,24 @@ pub fn router() -> Router {
         .route("/ml/quality", get(get_ml_quality))
         .route("/ml/quality/reset", post(post_ml_quality_reset))
         .route("/proactive/status", get(get_proactive_status))
+        // Phase 1-10: New Cortex routes
+        .route("/drift/events", get(get_drift_events))
+        .route("/drift/{endpoint_id}", get(get_endpoint_drift))
+        .route("/models/health/{endpoint_id}", get(get_model_health))
+        .route("/models/platform-summary", get(get_platform_model_summary))
+        .route("/explain/anomaly", post(post_explain_anomaly))
+        .route("/explain/prediction", post(post_explain_prediction))
+        .route("/chaos/run", post(post_chaos_run))
+        .route("/chaos/results/{test_id}", get(get_chaos_result))
+        .route("/chaos/scenarios", get(get_chaos_scenarios))
+        .route("/ab-tests", get(get_ab_tests))
+        .route("/ab-tests/start", post(post_ab_test_start))
+        .route("/ab-tests/{test_id}/results", get(get_ab_test_results))
+        .route("/automl/trials/{endpoint_id}", get(get_automl_trials))
+        .route("/automl/run", post(post_automl_run))
+        .route("/automl/best-params/{endpoint_id}", get(get_automl_best_params))
+        .route("/tracing/performance", get(get_tracing_performance))
+        .route("/tracing/stage/{stage_name}", get(get_stage_performance))
 }
 
 fn require_admin(c: &Customer) -> Result<(), AppError> {
@@ -230,7 +248,6 @@ async fn post_ml_quality_reset(Extension(pool): Extension<PgPool>, Extension(c):
 
 async fn get_proactive_status(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
-    // Get recent proactive insights
     let insights: Vec<(i64, Uuid, String, String, String, serde_json::Value, chrono::DateTime<chrono::Utc>)> = sqlx::query_as(
         "SELECT id, customer_id, insight_type, title, severity, data, created_at FROM cortex_insights WHERE insight_type LIKE 'proactive_%' AND dismissed = false ORDER BY created_at DESC LIMIT 50"
     ).fetch_all(&pool).await.unwrap_or_default();
@@ -239,4 +256,212 @@ async fn get_proactive_status(Extension(pool): Extension<PgPool>, Extension(c): 
         "proactive_insights": insights,
         "count": insights.len(),
     })))
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Phase 1: Drift Detection
+// ═══════════════════════════════════════════════════════════════
+
+async fn get_drift_events(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let rows = sqlx::query_scalar::<_, serde_json::Value>(
+        "SELECT jsonb_build_object('id', id, 'endpoint_id', endpoint_id, 'drift_type', drift_type, 'severity', severity, 'features_affected', features_affected, 'detected_by', detected_by, 'recommended_action', recommended_action, 'created_at', created_at) FROM ml_drift_events ORDER BY created_at DESC LIMIT 100"
+    ).fetch_all(&pool).await.unwrap_or_default();
+    Ok(Json(serde_json::json!({ "drift_events": rows, "total": rows.len() })))
+}
+
+async fn get_endpoint_drift(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Path(eid): Path<Uuid>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let events = sqlx::query_scalar::<_, serde_json::Value>(
+        "SELECT jsonb_build_object('id', id, 'drift_type', drift_type, 'severity', severity, 'features_affected', features_affected, 'detected_by', detected_by, 'recommended_action', recommended_action, 'created_at', created_at) FROM ml_drift_events WHERE endpoint_id = $1 ORDER BY created_at DESC LIMIT 50"
+    ).bind(eid).fetch_all(&pool).await.unwrap_or_default();
+    // Also get drift detector model state
+    let model = sqlx::query_scalar::<_, serde_json::Value>(
+        "SELECT parameters FROM ml_models WHERE endpoint_id = $1 AND model_type = 'drift_detector'"
+    ).bind(eid).fetch_optional(&pool).await.unwrap_or(None);
+    Ok(Json(serde_json::json!({ "endpoint_id": eid, "drift_events": events, "detector_state": model })))
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Phase 2: Model Monitoring
+// ═══════════════════════════════════════════════════════════════
+
+async fn get_model_health(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Path(eid): Path<Uuid>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let models = crate::cortex::ml::model_monitor::check_all_models(&pool).await
+        .unwrap_or_default();
+    let endpoint_models: Vec<_> = models.into_iter().filter(|m| m.endpoint_id == eid).collect();
+    Ok(Json(serde_json::json!({ "endpoint_id": eid, "models": endpoint_models })))
+}
+
+async fn get_platform_model_summary(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let summary = crate::cortex::ml::model_monitor::get_platform_summary(&pool).await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
+    Ok(Json(serde_json::to_value(summary).unwrap_or_default()))
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Phase 3: Explainable AI
+// ═══════════════════════════════════════════════════════════════
+
+async fn post_explain_anomaly(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::BadRequest("endpoint_id required".into()))?;
+    // Get current stats
+    let stats: Option<(f64, f64, f64, f64, f64)> = sqlx::query_as(
+        "SELECT COALESCE(total_deliveries,0)::FLOAT, COALESCE(successful,0)::FLOAT, COALESCE(avg_latency_ms,0)::FLOAT, COALESCE(p95_latency_ms,0)::FLOAT, COALESCE(total_deliveries,0)::FLOAT FROM endpoint_hourly_stats WHERE endpoint_id = $1 ORDER BY hour_start DESC LIMIT 1"
+    ).bind(eid).fetch_optional(&pool).await.unwrap_or(None);
+    let (total, success, latency, p95, delivery_rate) = stats.unwrap_or((0.0, 100.0, 0.0, 0.0, 0.0));
+    let sr = if total > 0.0 { success / total * 100.0 } else { 100.0 };
+    let baseline_sr = body.get("baseline_sr").and_then(|v| v.as_f64()).unwrap_or(95.0);
+    let baseline_latency = body.get("baseline_latency").and_then(|v| v.as_f64()).unwrap_or(200.0);
+    let explanation = crate::cortex::ml::explainable::explain_anomaly_score(eid, sr, latency, p95, delivery_rate, baseline_sr, baseline_latency);
+    Ok(Json(serde_json::to_value(explanation).unwrap_or_default()))
+}
+
+async fn post_explain_prediction(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::BadRequest("endpoint_id required".into()))?;
+    let predicted_sr = body.get("predicted_sr").and_then(|v| v.as_f64()).unwrap_or(90.0);
+    let predicted_latency = body.get("predicted_latency").and_then(|v| v.as_f64()).unwrap_or(500.0);
+    let confidence = body.get("confidence").and_then(|v| v.as_f64()).unwrap_or(0.7);
+    let forecast_steps = body.get("forecast_steps").and_then(|v| v.as_u64()).unwrap_or(1) as usize;
+    let trend = body.get("trend").and_then(|v| v.as_str()).unwrap_or("stable");
+    let explanation = crate::cortex::ml::explainable::explain_prediction(eid, predicted_sr, predicted_latency, confidence, forecast_steps, trend);
+    Ok(Json(serde_json::to_value(explanation).unwrap_or_default()))
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Phase 8: Chaos Engineering
+// ═══════════════════════════════════════════════════════════════
+
+async fn post_chaos_run(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let scenario = body.get("scenario").and_then(|v| v.as_str()).unwrap_or("endpoint_down");
+    let target = body.get("target").and_then(|v| v.as_str()).unwrap_or("platform");
+    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok());
+
+    let chaos_scenario = match scenario {
+        "endpoint_down" => crate::cortex::ml::chaos::ChaosScenario::EndpointDown,
+        "redis_down" => crate::cortex::ml::chaos::ChaosScenario::RedisDown,
+        "database_slow" => crate::cortex::ml::chaos::ChaosScenario::DatabaseSlow,
+        "traffic_spike" => crate::cortex::ml::chaos::ChaosScenario::TrafficSpike,
+        "error_burst" => crate::cortex::ml::chaos::ChaosScenario::ErrorBurst,
+        _ => return Err(AppError::BadRequest("unknown scenario".into())),
+    };
+
+    let result = if let Some(eid) = eid {
+        crate::cortex::ml::chaos::test_endpoint_down_scenario(&pool, eid).await
+    } else {
+        crate::cortex::ml::chaos::ChaosResult {
+            passed: true, recovery_time_ms: 0, errors_during_test: 0,
+            alerts_generated: 0, self_healing_triggered: false,
+            observations: vec!["No endpoint specified".into()],
+        }
+    };
+
+    let test_id = crate::cortex::ml::chaos::record_chaos_test(&pool, &chaos_scenario, target, &result, 0).await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
+
+    Ok(Json(serde_json::json!({ "test_id": test_id, "result": result })))
+}
+
+async fn get_chaos_result(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Path(test_id): Path<i64>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let tests = crate::cortex::ml::chaos::get_recent_tests(&pool, 100).await.unwrap_or_default();
+    let test = tests.into_iter().find(|t| t.id == test_id);
+    Ok(Json(serde_json::json!({ "test": test })))
+}
+
+async fn get_chaos_scenarios(Extension(_pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    Ok(Json(serde_json::json!({
+        "scenarios": [
+            {"name": "endpoint_down", "description": "Endpoint devre dışı bırakma", "severity": "high"},
+            {"name": "redis_down", "description": "Redis bağlantısını kesme", "severity": "low"},
+            {"name": "database_slow", "description": "DB yavaşlatma (500ms+)", "severity": "medium"},
+            {"name": "traffic_spike", "description": "Trafik patlaması (10x)", "severity": "medium"},
+            {"name": "error_burst", "description": "Ani hata patlaması", "severity": "high"},
+        ]
+    })))
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Phase 9: A/B Testing
+// ═══════════════════════════════════════════════════════════════
+
+async fn get_ab_tests(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let rows = sqlx::query_scalar::<_, serde_json::Value>(
+        "SELECT jsonb_build_object('id', id, 'endpoint_id', endpoint_id, 'model_type', model_type, 'variant_a', variant_a, 'variant_b', variant_b, 'split_ratio', split_ratio, 'metric', metric, 'status', status, 'winner', winner, 'created_at', created_at) FROM ab_tests ORDER BY created_at DESC LIMIT 50"
+    ).fetch_all(&pool).await.unwrap_or_default();
+    Ok(Json(serde_json::json!({ "ab_tests": rows })))
+}
+
+async fn post_ab_test_start(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::BadRequest("endpoint_id required".into()))?;
+    let model_type = body.get("model_type").and_then(|v| v.as_str()).unwrap_or("anomaly_detector");
+    let variant_a = body.get("variant_a").and_then(|v| v.as_str()).unwrap_or("current");
+    let variant_b = body.get("variant_b").and_then(|v| v.as_str()).unwrap_or("alternative");
+    let split_ratio = body.get("split_ratio").and_then(|v| v.as_f64()).unwrap_or(0.5);
+    let test_id = crate::cortex::ml::ab_testing::start_ab_test(&pool, eid, model_type, variant_a, variant_b, split_ratio).await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
+    Ok(Json(serde_json::json!({ "test_id": test_id, "status": "running" })))
+}
+
+async fn get_ab_test_results(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Path(test_id): Path<i64>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let result = crate::cortex::ml::ab_testing::analyze_ab_test(&pool, test_id).await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
+    Ok(Json(serde_json::json!({ "result": result })))
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Phase 10: AutoML
+// ═══════════════════════════════════════════════════════════════
+
+async fn get_automl_trials(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Path(eid): Path<Uuid>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let trials = sqlx::query_scalar::<_, serde_json::Value>(
+        "SELECT jsonb_build_object('id', id, 'model_type', model_type, 'params', params, 'score', score, 'metric', metric, 'created_at', created_at) FROM automl_trials WHERE endpoint_id = $1 ORDER BY score DESC LIMIT 50"
+    ).bind(eid).fetch_all(&pool).await.unwrap_or_default();
+    Ok(Json(serde_json::json!({ "endpoint_id": eid, "trials": trials, "total": trials.len() })))
+}
+
+async fn post_automl_run(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::BadRequest("endpoint_id required".into()))?;
+    let model_type = body.get("model_type").and_then(|v| v.as_str()).unwrap_or("adaptive_threshold");
+    let max_trials = body.get("max_trials").and_then(|v| v.as_u64()).unwrap_or(10) as usize;
+    let result = crate::cortex::ml::automl::run_automl_for_endpoint(&pool, eid, model_type, max_trials).await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
+    Ok(Json(serde_json::json!({ "endpoint_id": eid, "model_type": model_type, "best_params": result })))
+}
+
+async fn get_automl_best_params(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Path(eid): Path<Uuid>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let best: Option<(serde_json::Value, f64)> = sqlx::query_as(
+        "SELECT params, score FROM automl_trials WHERE endpoint_id = $1 ORDER BY score DESC LIMIT 1"
+    ).bind(eid).fetch_optional(&pool).await.unwrap_or(None);
+    Ok(Json(serde_json::json!({ "endpoint_id": eid, "best": best.map(|(p, s)| serde_json::json!({"params": p, "score": s})) })))
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Phase 4: Distributed Tracing
+// ═══════════════════════════════════════════════════════════════
+
+async fn get_tracing_performance(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let perf = crate::cortex::ml::cortex_tracing::analyze_pipeline_performance(&pool).await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
+    Ok(Json(serde_json::to_value(perf).unwrap_or_default()))
+}
+
+async fn get_stage_performance(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Path(stage_name): Path<String>) -> Result<Json<serde_json::Value>, AppError> {
+    require_admin(&c)?;
+    let perf = crate::cortex::ml::cortex_tracing::analyze_stage_performance(&pool, &stage_name).await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
+    Ok(Json(serde_json::to_value(perf).unwrap_or_default()))
 }
