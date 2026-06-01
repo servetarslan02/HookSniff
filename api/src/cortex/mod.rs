@@ -40,6 +40,7 @@ pub struct CortexMetrics {
     pub predictions_generated: AtomicU64,
     pub insights_generated: AtomicU64,
     pub routing_decisions: AtomicU64,
+    pub drift_detected: AtomicU64,
 }
 
 pub static CORTEX_METRICS: CortexMetrics = CortexMetrics {
@@ -58,6 +59,7 @@ pub static CORTEX_METRICS: CortexMetrics = CortexMetrics {
     predictions_generated: AtomicU64::new(0),
     insights_generated: AtomicU64::new(0),
     routing_decisions: AtomicU64::new(0),
+    drift_detected: AtomicU64::new(0),
 };
 
 impl CortexMetrics {
@@ -80,6 +82,9 @@ impl CortexMetrics {
         out.push_str(&format!("cortex_predictions_generated_total {}\n", self.predictions_generated.load(Ordering::Relaxed)));
         out.push_str(&format!("cortex_insights_generated_total {}\n", self.insights_generated.load(Ordering::Relaxed)));
         out.push_str(&format!("cortex_routing_decisions_total {}\n", self.routing_decisions.load(Ordering::Relaxed)));
+        out.push_str("# HELP cortex_drift_detected_total Total drift events detected\n");
+        out.push_str("# TYPE cortex_drift_detected_total counter\n");
+        out.push_str(&format!("cortex_drift_detected_total {}\n", self.drift_detected.load(Ordering::Relaxed)));
         out
     }
 }
