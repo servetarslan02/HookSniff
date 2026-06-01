@@ -79,8 +79,8 @@ export function AdminNotificationCenter() {
 
       setNotifications(items);
       if (broadcastData) setBroadcasts(broadcastData);
-    } catch {
-      // silent
+    } catch (err) {
+      console.warn('[AdminNotificationCenter] fetch error:', err);
     }
   }, [token]);
 
@@ -105,7 +105,9 @@ export function AdminNotificationCenter() {
     try {
       await broadcastsApi.dismiss(token, id);
       setBroadcasts((prev) => prev.filter((b) => b.id !== id));
-    } catch { /* ignore */ }
+    } catch (err) {
+      console.warn('[AdminNotificationCenter] dismiss broadcast error:', err);
+    }
   };
 
   const totalCount = notifications.length + broadcasts.length;

@@ -24,16 +24,18 @@ function describeHealingAction(actionType: string, reason: string, outcome: stri
 export function HealingTab({ token }: { token: string | null }) {
   const [actions, setActions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
     apiFetch<any>('/cortex/healing/actions', { token })
       .then((d) => setActions(d.actions || []))
-      .catch(() => {})
+      .catch((err) => { console.error('[HealingTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
       .finally(() => setLoading(false));
   }, [token]);
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
+  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   return (
     <div className="space-y-4">

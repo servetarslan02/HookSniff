@@ -15,16 +15,18 @@ function describePrediction(probability: number, _factors: any): { title: string
 export function PredictionsTab({ token }: { token: string | null }) {
   const [predictions, setPredictions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
     apiFetch<any>('/cortex/predictions', { token })
       .then((d) => setPredictions(d.predictions || []))
-      .catch(() => {})
+      .catch((err) => { console.error('[PredictionsTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
       .finally(() => setLoading(false));
   }, [token]);
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
+  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   return (
     <div className="space-y-4">

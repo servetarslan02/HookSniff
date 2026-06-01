@@ -95,7 +95,10 @@ export default function AuthCallbackPage() {
     // No token anywhere — show error
     setError('No login token received. Please try logging in again.');
     setStatus('error');
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // OAuth callback: intentionally runs once on mount to process URL token params
+    // Adding searchParams/token/callback to deps would cause infinite re-processing loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (error) {
     return (

@@ -20,16 +20,18 @@ export function ABTestTab() {
   const { token } = useAuth();
   const [tests, setTests] = useState<AbTest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
     apiFetch<{ ab_tests: AbTest[] }>('/cortex/ab-tests', { token })
       .then(d => setTests(d.ab_tests ?? []))
-      .catch(() => {})
+      .catch((err) => { console.error('[ABTestTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
       .finally(() => setLoading(false));
   }, [token]);
 
   if (loading) return <div className="flex justify-center py-12"><div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" /></div>;
+  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   return (
     <div className="space-y-4">

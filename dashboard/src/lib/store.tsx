@@ -143,12 +143,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(u);
           localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: u }));
         }
-      }).catch(() => {});
+      }).catch((err) => {
+        console.warn('[store] session restore failed:', err);
+      });
     }
 
     setIsLoading(false);
     return () => stopProactiveRefresh();
-  }, [updateToken, startSessionRefresh]); // eslint-disable-line react-hooks/exhaustive-deps
+    // stopProactiveRefresh is a stable module-level import (not a React value), safe to omit
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateToken, startSessionRefresh]);
   const persistAuth = useCallback((u: User, k?: string, authToken?: string) => {
     // Generate username slug from email prefix (unique per user)
     const slug = toSlug(u.email.split('@')[0]);

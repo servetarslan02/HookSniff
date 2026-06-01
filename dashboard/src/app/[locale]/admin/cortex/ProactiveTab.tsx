@@ -28,16 +28,18 @@ function describeProactiveInsight(insight: ProactiveInsight): { title: string; d
 export function ProactiveTab({ token }: { token: string | null }) {
   const [insights, setInsights] = useState<ProactiveInsight[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
     apiFetch<any>('/cortex/proactive/status', { token })
       .then((d) => setInsights(d.proactive_insights || []))
-      .catch(() => {})
+      .catch((err) => { console.error('[ProactiveTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
       .finally(() => setLoading(false));
   }, [token]);
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
+  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   const criticalCount = insights.filter(i => i.severity === 'critical').length;
   const warningCount = insights.filter(i => i.severity === 'warning').length;
