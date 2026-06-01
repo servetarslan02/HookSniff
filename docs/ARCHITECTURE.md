@@ -132,17 +132,19 @@ worker/src/delivery/
 - Billing & usage
 - Alerts configuration
 - Endpoint health monitoring
-- AI Center (anomaly detection, actions, blocklist)
+- Cortex (ML anomaly detection, auto-healing, predictions, drift detection)
 - Playground (webhook tester)
 
 
-Autonomous management system for anomaly detection and automated remediation.
+ML-powered intelligent protection system with 12 stages.
 
-**Built-in Agents:**
-- `fraud_detector` — Detects suspicious webhook patterns
-- `churn_detector` — Identifies at-risk customers
-- `customer_segmenter` — Segments customers by behavior
-- `inventory_optimizer` — Optimizes resource allocation
+**Core Modules:**
+- `signal_collector` — Hourly delivery stats aggregation
+- `profile_engine` — Endpoint behavioral profiling
+- `anomaly_scorer` — ML anomaly detection (EWMA + IQR + Z-Score)
+- `healing_engine` — Auto-disable, rate limit, timeout, fallback URL
+- `drift_detection` — Concept drift (Page-Hinkley + ADWIN + KS)
+- `model_monitor` — Per-model health (accuracy, F1, quality)
 
 **Capabilities:**
 - Risk scoring per endpoint (0-100)
