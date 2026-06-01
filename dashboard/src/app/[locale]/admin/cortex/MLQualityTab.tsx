@@ -24,13 +24,14 @@ function describeQuality(score: number, accuracy: number, avgError: number): { t
 export function MLQualityTab({ token }: { token: string | null }) {
   const [models, setModels] = useState<ModelQuality[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [resetting, setResetting] = useState(false);
 
   const fetchQuality = () => {
     if (!token) return;
     apiFetch<any>('/cortex/ml/quality', { token })
       .then((d) => setModels(d.models || []))
-      .catch(() => {})
+      .catch((err) => { console.error('[MLQualityTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
       .finally(() => setLoading(false));
   };
 
@@ -45,6 +46,7 @@ export function MLQualityTab({ token }: { token: string | null }) {
   };
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
+  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   const overallScore = models.length > 0 ? Math.round(models.reduce((sum, m) => sum + m.quality_score, 0) / models.length) : 0;
 

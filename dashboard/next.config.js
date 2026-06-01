@@ -12,9 +12,8 @@ const nextConfig = {
     root: __dirname,
   },
   experimental: {},
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  typescript: {},
+  // ignoreBuildErrors removed — TS errors should fail builds
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [

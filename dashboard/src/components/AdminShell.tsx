@@ -7,8 +7,6 @@ import { useAuth } from '@/lib/store';
 import { adminApi } from '@/lib/api';
 import { apiFetch } from '@/lib/api';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import ErrorBoundary from '@/components/ErrorBoundary';
-import type { default as ErrorBoundaryType } from '@/components/ErrorBoundary';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { useTranslations, useLocale } from 'next-intl';

@@ -31,12 +31,13 @@ export function ModelMonitorTab() {
   const { token } = useAuth();
   const [summary, setSummary] = useState<PlatformSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
     apiFetch<PlatformSummary>('/cortex/models/platform-summary', { token })
       .then(setSummary)
-      .catch(() => {})
+      .catch((err) => { console.error('[ModelMonitorTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -47,6 +48,7 @@ export function ModelMonitorTab() {
     'text-orange-600 bg-orange-50 dark:bg-orange-900/30';
 
   if (loading) return <div className="flex justify-center py-12"><div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" /></div>;
+  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   return (
     <div className="space-y-4">
