@@ -201,6 +201,11 @@ async fn create_endpoint(
         }
     }
 
+    // Initialize Cortex ML models for this endpoint (drift, anomaly, bandit, etc.)
+    if let Err(e) = crate::cortex::ml::init_endpoint_models(&pool, endpoint.id).await {
+        tracing::warn!("Failed to initialize ML models for endpoint {}: {:?}", endpoint.id, e);
+    }
+
     Ok(Json(endpoint.to_response()))
 }
 
