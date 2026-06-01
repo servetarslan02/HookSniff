@@ -54,13 +54,13 @@
 
 | Faz | Durum |
 |-----|-------|
-| Faz 1: Drift Detection | ⏳ |
-| Faz 2: Model Monitoring | ⏳ |
-| Faz 3: Explainable AI | ⏳ |
-| Faz 4: Distributed Tracing | ⏳ |
-| Faz 5: Feature Store | ⏳ |
-| Faz 6: Model Versiyonlama | ⏳ |
-| Faz 7: Advanced Forecasting | ⏳ |
-| Faz 8: Chaos Engineering | ⏳ |
-| Faz 9: A/B Testing | ⏳ |
-| Faz 10: AutoML | ⏳ |
+| Faz 1: Drift Detection | ✅ (2026-06-01) |
+| Faz 2: Model Monitoring | ✅ (2026-06-01) |
+| Faz 3: Explainable AI | ✅ (2026-06-01) |
+| Faz 4: Distributed Tracing | ✅ (2026-06-01) |
+| Faz 5: Feature Store | ✅ (2026-06-01) |
+| Faz 6: Model Versiyonlama | ✅ (2026-06-01) |
+| Faz 7: Advanced Forecasting | ✅ (2026-06-01) |
+| Faz 8: Chaos Engineering | ✅ (2026-06-01) |
+| Faz 9: A/B Testing | ✅ (2026-06-01) |
+| Faz 10: AutoML | ✅ (2026-06-01) |
