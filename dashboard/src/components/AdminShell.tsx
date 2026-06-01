@@ -160,8 +160,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const tc = useTranslations('common');
   const locale = useLocale();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     document.title = 'HookSniff — Webhook Teslimat Servisi';
   }, []);
 
@@ -176,6 +178,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     const p = pathname.replace(new RegExp(`^/${locale}`), '') || '/';
     return p.startsWith('/') ? p : `/${p}`;
   }, [pathname, locale]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full" />
+      </div>
+    );
+  }
 
   if (!user?.is_admin) {
     return (
