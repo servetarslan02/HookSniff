@@ -19,12 +19,13 @@ export function DriftTab() {
   const { token } = useAuth();
   const [events, setEvents] = useState<DriftEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
     apiFetch<{ drift_events: DriftEvent[] }>('/cortex/drift/events', { token })
       .then(d => setEvents(d.drift_events ?? []))
-      .catch(() => {})
+      .catch((err) => { console.error('[DriftTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -37,6 +38,7 @@ export function DriftTab() {
     type === 'sudden' ? '⚡' : type === 'gradual' ? '📈' : type === 'incremental' ? '🔄' : '⚠️';
 
   if (loading) return <div className="flex justify-center py-12"><div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" /></div>;
+  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   return (
     <div className="space-y-4">
