@@ -477,12 +477,15 @@ async fn process_pending(
         UPDATE webhook_queue
         SET status = 'processing'
         WHERE id IN (
-            SELECT id FROM webhook_queue
-            WHERE status = 'pending'
-              AND (next_retry_at IS NULL OR next_retry_at <= now())
-            ORDER BY created_at
+            SELECT wq.id FROM webhook_queue wq
+            JOIN endpoints e ON e.id = wq.endpoint_id
+            WHERE wq.status = 'pending'
+              AND (wq.next_retry_at IS NULL OR wq.next_retry_at <= now())
+              AND e.is_active = true
+              AND (e.auto_disabled = false OR e.auto_disabled IS NULL)
+            ORDER BY wq.created_at
             LIMIT 50
-            FOR UPDATE SKIP LOCKED
+            FOR UPDATE OF wq SKIP LOCKED
         )
         RETURNING id, delivery_id, endpoint_id, endpoint_url, payload, custom_headers,
                   attempt_count, max_attempts, next_retry_at, trace_id
