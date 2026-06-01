@@ -68,7 +68,8 @@ export function NotificationCenter() {
       await teamsApi.acceptInvite(token, inviteToken);
       markAsReadMutation.mutate(n.id);
       router.push('/team-mgmt');
-    } catch {
+    } catch (err) {
+      console.error('[NotificationCenter] acceptInvite error:', err);
       markAsReadMutation.mutate(n.id);
       router.push('/team-mgmt');
     } finally {

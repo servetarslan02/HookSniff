@@ -11,8 +11,6 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { PrefetchLink } from '@/components/PrefetchLink';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { BroadcastBanner } from '@/components/BroadcastBanner';
-import ErrorBoundary from '@/components/ErrorBoundary';
-import type { default as ErrorBoundaryType } from '@/components/ErrorBoundary';
 import { SkeletonDashboard } from '@/components/LoadingSkeletons';
 import { ViewTransition } from '@/components/ViewTransition';
 import { useRealtime } from '@/hooks/useRealtime';

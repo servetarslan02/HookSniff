@@ -23,16 +23,18 @@ function describeAnomaly(score: number, factors: any): { title: string; detail: 
 export function AnomaliesTab({ token }: { token: string | null }) {
   const [anomalies, setAnomalies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
     apiFetch<any>('/cortex/anomalies', { token })
       .then((d) => setAnomalies(d.anomalies || []))
-      .catch(() => {})
+      .catch((err) => { console.error('[AnomaliesTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
       .finally(() => setLoading(false));
   }, [token]);
 
   if (loading) return <div className="animate-pulse h-40 bg-gray-100 dark:bg-slate-800 rounded-xl" />;
+  if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;
 
   return (
     <div className="space-y-4">
