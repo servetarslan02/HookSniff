@@ -33,6 +33,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations('nav');
   const tc = useTranslations('common');
   const locale = useLocale();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
   const { connectionState } = useRealtime();
   const perms = usePermissions();
 
@@ -138,6 +141,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     ...(perms.canManageBilling ? [{ name: t('billingSection'), href: '/billing', icon: <CreditCard size={16} strokeWidth={1.75} /> }] : []),
     { name: t('account'), href: '/account', icon: <UserCircle size={16} strokeWidth={1.75} /> },
   ], [user?.is_admin, t, perms]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
