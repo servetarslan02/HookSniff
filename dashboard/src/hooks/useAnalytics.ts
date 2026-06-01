@@ -68,7 +68,7 @@ export function useEndpointHealth(range = '24h') {
       () => api.getEndpointHealth(token || undefined, range),
       EndpointHealthSchema.array()
     ),
-    enabled: true,
+    enabled: !!token,
     staleTime: 15_000,
     refetchInterval: 30_000,
     placeholderData: (previousData) => previousData,
