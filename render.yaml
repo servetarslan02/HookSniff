@@ -23,6 +23,16 @@ services:
     plan: free
     branch: main
     autoDeploy: true
+    ignoredFiles:
+      - .ai-context/**
+      - docs/**
+      - docs-sdk/**
+      - "*.md"
+      - scripts/**
+      - reddit-launch/**
+      - research/**
+      - tests/**
+      - vendor/**
     envVars:
       - key: APP_ENV
         value: production
@@ -83,6 +93,16 @@ services:
     plan: free
     branch: main
     autoDeploy: true
+    ignoredFiles:
+      - .ai-context/**
+      - docs/**
+      - docs-sdk/**
+      - "*.md"
+      - scripts/**
+      - reddit-launch/**
+      - research/**
+      - tests/**
+      - vendor/**
     envVars:
       - key: APP_ENV
         value: production
