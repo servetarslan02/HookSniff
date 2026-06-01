@@ -26,6 +26,7 @@ pub enum CortexStage {
     MlTraining,
     MlQualityCheck,
     SmartRouting,
+    DriftDetection,
 }
 
 impl CortexStage {
@@ -42,6 +43,7 @@ impl CortexStage {
             Self::MlTraining => "ml_training",
             Self::MlQualityCheck => "ml_quality_check",
             Self::SmartRouting => "smart_routing",
+            Self::DriftDetection => "drift_detection",
         }
     }
 
@@ -58,6 +60,7 @@ impl CortexStage {
             Self::MlTraining => "cortex_ml",
             Self::MlQualityCheck => "cortex_ml_quality",
             Self::SmartRouting => "cortex_routing",
+            Self::DriftDetection => "cortex_drift",
         }
     }
 
@@ -75,6 +78,7 @@ impl CortexStage {
             Self::MlTraining => Duration::from_secs(900),
             Self::MlQualityCheck => Duration::from_secs(120),
             Self::SmartRouting => Duration::from_secs(120),
+            Self::DriftDetection => Duration::from_secs(300),
         }
     }
 
@@ -92,6 +96,7 @@ impl CortexStage {
             Self::MlTraining => 900,        // 15 min
             Self::MlQualityCheck => 3600,   // 1 hour
             Self::SmartRouting => 900,      // 15 min
+            Self::DriftDetection => 600,     // 10 min
         }
     }
 
@@ -109,6 +114,7 @@ impl CortexStage {
             Self::MlTraining => 600,        // minute 10
             Self::MlQualityCheck => 660,    // minute 11
             Self::Insights => 7200,         // 02:00 UTC
+            Self::DriftDetection => 540,     // minute 9
         }
     }
 }
@@ -123,6 +129,7 @@ const ALL_STAGES: &[CortexStage] = &[
     CortexStage::ProactiveHealing,
     CortexStage::Predictions,
     CortexStage::SmartRouting,
+    CortexStage::DriftDetection,
     CortexStage::MlTraining,
     CortexStage::MlQualityCheck,
     CortexStage::Insights,
@@ -298,6 +305,58 @@ async fn execute_stage(
             }
             super::CORTEX_METRICS.routing_decisions.fetch_add(decisions, std::sync::atomic::Ordering::Relaxed);
             Ok(decisions)
+        }
+        CortexStage::DriftDetection => {
+            let endpoints: Vec<(uuid::Uuid,)> = sqlx::query_as(
+                "SELECT DISTINCT endpoint_id FROM endpoint_hourly_stats ORDER BY endpoint_id"
+            ).fetch_all(pool).await?;
+            let mut drift_count = 0u64;
+            for (eid,) in &endpoints {
+                // Son saatlik verileri al
+                let stats: Vec<(f64, f64, f64, i32)> = sqlx::query_as(
+                    "SELECT COALESCE(total_deliveries,0)::FLOAT, COALESCE(successful,0)::FLOAT, COALESCE(avg_latency_ms,0)::FLOAT, COALESCE(p95_latency_ms,0)
+                     FROM endpoint_hourly_stats WHERE endpoint_id = $1 ORDER BY hour_start DESC LIMIT 24"
+                ).bind(eid).fetch_all(pool).await?;
+
+                if stats.len() < 3 { continue; }
+
+                // Drift analyzer yükle veya oluştur
+                let mut analyzer = super::ml::drift_detection::load_or_create_analyzer(pool, *eid).await?;
+
+                // Son veriyi analiz et
+                let (total, successful, latency, _p95) = stats[0];
+                let sr = if total > 0.0 { successful / total * 100.0 } else { 100.0 };
+                let result = analyzer.analyze(sr, latency);
+
+                // Sonucu kaydet
+                super::ml::drift_detection::save_analyzer_state(pool, *eid, &analyzer).await?;
+
+                if result.is_drifting {
+                    drift_count += 1;
+                    let event_id = super::ml::drift_detection::record_drift_event(pool, *eid, &result).await?;
+
+                    tracing::warn!(
+                        "🔀 Drift detected for endpoint {}: type={}, severity={:.2}, features={:?}, action={}, event_id={}",
+                        eid, result.drift_type, result.severity, result.features_affected, result.recommended_action, event_id
+                    );
+
+                    // Kritik drift — hemen yeniden eğitim tetikle
+                    if result.severity > 0.7 {
+                        if let Err(e) = super::ml::train_endpoint_for_drift(pool, *eid).await {
+                            tracing::error!("Failed to retrain after drift for {}: {:?}", eid, e);
+                        } else {
+                            tracing::info!("🔄 Retrained models for endpoint {} after drift", eid);
+                            // Drift sonrası baseline sıfırla
+                            sqlx::query("UPDATE ml_models SET parameters = jsonb_set(parameters, '{baseline_collected}', 'false') WHERE endpoint_id = $1 AND model_type = 'drift_detector'")
+                                .bind(eid).execute(pool).await?;
+                        }
+                    }
+                }
+            }
+            if drift_count > 0 {
+                super::CORTEX_METRICS.drift_detected.fetch_add(drift_count, std::sync::atomic::Ordering::Relaxed);
+            }
+            Ok(drift_count)
         }
     }
 }
