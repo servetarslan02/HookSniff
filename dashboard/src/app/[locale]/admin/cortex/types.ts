@@ -1,4 +1,4 @@
-export type Tab = 'overview' | 'anomalies' | 'healing' | 'predictions' | 'ml_quality' | 'proactive';
+export type Tab = 'overview' | 'anomalies' | 'healing' | 'predictions' | 'ml_quality' | 'proactive' | 'drift' | 'monitor' | 'ab_tests' | 'automl';
 
 export interface CortexHealth {
   status: string;
