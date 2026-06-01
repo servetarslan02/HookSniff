@@ -29,9 +29,9 @@ LOG_FORMAT=json
 
 ---
 
-## Optional: AI Center
+## Cortex — ML Protection System
 
-HookSniff includes an AI Center for automated monitoring and anomaly detection. It runs as a background job every 30 seconds.
+HookSniff includes Cortex, an ML-powered system for anomaly detection, auto-healing, drift detection, and predictive monitoring. It runs as a background scheduler with 13 stages every 30 seconds.
 
 ### What it does
 
@@ -62,7 +62,7 @@ If neither is set, rule-based analysis runs (threshold-based, mathematical).
 ### API Endpoints
 
 ```
-GET  /v1/ai/status          — AI Center status
+GET  /v1/cortex/health       — Cortex system health
 GET  /v1/ai/events          — Event logs
 GET  /v1/ai/risks           — Risk scores
 GET  /v1/ai/actions         — Action queue
