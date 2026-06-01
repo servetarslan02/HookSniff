@@ -109,8 +109,8 @@ function LoginForm() {
   const handleSsoLogin = () => {
     const domain = email.split('@')[1];
     if (!domain) return;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://your-api.trycloudflare.com';
-    window.location.href = `${apiUrl}/v1/sso/login?email=${encodeURIComponent(email)}`;
+    // Use /api/v1 path — goes through Vercel rewrite proxy to backend
+    window.location.href = `/api/v1/sso/login?email=${encodeURIComponent(email)}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -441,7 +441,8 @@ function LoginForm() {
                 disabled={oauthLoading !== null}
                 onClick={() => {
                   setOauthLoading('google');
-                  window.location.href = 'https://your-api.trycloudflare.com/v1/oauth/google';
+                  // Use /api/v1 path — goes through Vercel rewrite proxy to backend
+                  window.location.href = '/api/v1/oauth/google';
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-60"
               >
@@ -455,7 +456,8 @@ function LoginForm() {
                 disabled={oauthLoading !== null}
                 onClick={() => {
                   setOauthLoading('github');
-                  window.location.href = 'https://your-api.trycloudflare.com/v1/oauth/github';
+                  // Use /api/v1 path — goes through Vercel rewrite proxy to backend
+                  window.location.href = '/api/v1/oauth/github';
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-60"
               >

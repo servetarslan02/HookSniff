@@ -17,7 +17,7 @@ interface State {
   error: Error | null;
 }
 
-export default class ErrorBoundary extends Component<Props, State> {
+class ErrorBoundaryImpl extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -72,3 +72,5 @@ export default class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
+
+export default ErrorBoundaryImpl;
