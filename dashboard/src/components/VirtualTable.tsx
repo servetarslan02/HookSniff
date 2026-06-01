@@ -40,14 +40,15 @@ export function VirtualTable<T>({
       {header}
       <div
         ref={parentRef}
-        className="overflow-auto max-h-[600px]"
-        style={{ contain: 'strict' }}
+        className="overflow-auto"
+        style={{ maxHeight: 'calc(100vh - 200px)', minHeight: 200, position: 'relative' }}
       >
         <div
           style={{
             height: `${virtualizer.getTotalSize()}px`,
             width: '100%',
             position: 'relative',
+            overflow: 'hidden',
           }}
         >
           {virtualizer.getVirtualItems().map((virtualRow) => (
