@@ -12,6 +12,11 @@ export function validated<T extends ZodType>(
 ): () => Promise<z.infer<T>> {
   return async () => {
     const data = await fetcher();
-    return schema.parse(data);
+    try {
+      return schema.parse(data);
+    } catch (err) {
+      console.error('[validated] Schema validation failed:', err, '\nRaw data:', data);
+      throw err;
+    }
   };
 }
