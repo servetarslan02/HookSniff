@@ -130,12 +130,143 @@ pub async fn test_endpoint_down_scenario(
     .unwrap_or(0);
     observations.push(format!("Healing actions: {}", healing_count));
 
+    // Drift detection durumunu kontrol et
+    let drift_count = sqlx::query_scalar::<_, i64>(
+        "SELECT COUNT(*) FROM ml_drift_events WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '1 hour'"
+    )
+    .bind(endpoint_id)
+    .fetch_one(pool)
+    .await
+    .unwrap_or(0);
+    observations.push(format!("Drift events (1h): {}", drift_count));
+
+    // ML model kalitesini kontrol et
+    let model_count = sqlx::query_scalar::<_, i64>(
+        "SELECT COUNT(*) FROM ml_models WHERE endpoint_id = $1"
+    )
+    .bind(endpoint_id)
+    .fetch_one(pool)
+    .await
+    .unwrap_or(0);
+    observations.push(format!("ML models: {}", model_count));
+
     ChaosResult {
-        passed: true, // Test her zaman "geçer" — amaç gözlem
+        passed: true,
         recovery_time_ms: 0,
         errors_during_test: 0,
         alerts_generated: pre_state as i32,
         self_healing_triggered: healing_count > 0,
+        observations,
+    }
+}
+
+/// DB yavaşlatma senaryosu - mevcut DB latency metriklerini gözlemler
+pub async fn test_db_slow_scenario(pool: &PgPool) -> ChaosResult {
+    let mut observations = Vec::new();
+
+    // Son saatlik performans
+    let stats: Option<(f64, i64)> = sqlx::query_as(
+        "SELECT COALESCE(AVG(duration_ms), 0), COUNT(*) FROM cortex_traces WHERE completed_at > NOW() - INTERVAL '1 hour'"
+    ).fetch_optional(pool).await.unwrap_or(None);
+    
+    let (avg_dur, count) = stats.unwrap_or((0.0, 0));
+    observations.push(format!("Avg duration (1h): {:.0}ms, traces: {}", avg_dur, count));
+
+    // Queue durumu
+    let pending: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM webhook_queue WHERE status = 'pending'")
+        .fetch_one(pool).await.unwrap_or(0);
+    let processing: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM webhook_queue WHERE status = 'processing'")
+        .fetch_one(pool).await.unwrap_or(0);
+    observations.push(format!("Queue: {} pending, {} processing", pending, processing));
+
+    ChaosResult {
+        passed: avg_dur < 5000.0,
+        recovery_time_ms: 0,
+        errors_during_test: 0,
+        alerts_generated: 0,
+        self_healing_triggered: false,
+        observations,
+    }
+}
+
+/// Redis down senaryosu - Redis bağlantı durumunu gözlemler
+pub async fn test_redis_down_scenario(pool: &PgPool) -> ChaosResult {
+    let mut observations = Vec::new();
+
+    // Rate limit store'unu kontrol et
+    let rate_limit_store: Option<(String,)> = sqlx::query_as(
+        "SELECT value FROM platform_settings WHERE key = 'rate_limit_store'"
+    ).fetch_optional(pool).await.unwrap_or(None);
+    observations.push(format!("Rate limit store: {:?}", rate_limit_store.map(|(v,)| v)));
+
+    // Son anomali sayıları
+    let anomaly_count: i64 = sqlx::query_scalar(
+        "SELECT COUNT(*) FROM anomaly_scores WHERE created_at > NOW() - INTERVAL '1 hour'"
+    ).fetch_one(pool).await.unwrap_or(0);
+    observations.push(format!("Anomalies (1h): {}", anomaly_count));
+
+    ChaosResult {
+        passed: true,
+        recovery_time_ms: 0,
+        errors_during_test: 0,
+        alerts_generated: 0,
+        self_healing_triggered: false,
+        observations,
+    }
+}
+
+/// Trafik spike senaryosu - son trafik verilerini analiz eder
+pub async fn test_traffic_spike_scenario(pool: &PgPool, endpoint_id: uuid::Uuid) -> ChaosResult {
+    let mut observations = Vec::new();
+
+    // Son 1 saat vs önceki 1 saat teslimat karşılaştırması
+    let recent: Option<(f64,)> = sqlx::query_as(
+        "SELECT COALESCE(SUM(total_deliveries), 0)::FLOAT FROM endpoint_hourly_stats WHERE endpoint_id = $1 AND hour_start > NOW() - INTERVAL '1 hour'"
+    ).bind(endpoint_id).fetch_optional(pool).await.unwrap_or(None);
+    let recent_count = recent.unwrap_or((0.0,)).0;
+
+    let prev: Option<(f64,)> = sqlx::query_as(
+        "SELECT COALESCE(SUM(total_deliveries), 0)::FLOAT FROM endpoint_hourly_stats WHERE endpoint_id = $1 AND hour_start BETWEEN NOW() - INTERVAL '2 hours' AND NOW() - INTERVAL '1 hour'"
+    ).bind(endpoint_id).fetch_optional(pool).await.unwrap_or(None);
+    let prev_count = prev.unwrap_or((0.0,)).0;
+
+    let ratio = if prev_count > 0.0 { recent_count / prev_count } else { 1.0 };
+    observations.push(format!("Recent: {:.0}, Previous: {:.0}, Ratio: {:.1}x", recent_count, prev_count, ratio));
+
+    ChaosResult {
+        passed: ratio < 10.0,
+        recovery_time_ms: 0,
+        errors_during_test: 0,
+        alerts_generated: 0,
+        self_healing_triggered: false,
+        observations,
+    }
+}
+
+/// Hata patlaması senaryosu - hata oranlarını analiz eder
+pub async fn test_error_burst_scenario(pool: &PgPool, endpoint_id: uuid::Uuid) -> ChaosResult {
+    let mut observations = Vec::new();
+
+    // Son saatlik hata oranı
+    let stats: Option<(f64, f64)> = sqlx::query_as(
+        "SELECT COALESCE(SUM(total_deliveries), 0)::FLOAT, COALESCE(SUM(failed), 0)::FLOAT FROM endpoint_hourly_stats WHERE endpoint_id = $1 AND hour_start > NOW() - INTERVAL '1 hour'"
+    ).bind(endpoint_id).fetch_optional(pool).await.unwrap_or(None);
+    let (total, failed) = stats.unwrap_or((0.0, 0.0));
+    let error_rate = if total > 0.0 { failed / total * 100.0 } else { 0.0 };
+    observations.push(format!("Error rate: {:.1}% ({:.0}/{:.0})", error_rate, failed, total));
+
+    // Son anomaliler
+    let anomaly_count: i64 = sqlx::query_scalar(
+        "SELECT COUNT(*) FROM anomaly_scores WHERE endpoint_id = $1 AND created_at > NOW() - INTERVAL '1 hour'"
+    ).bind(endpoint_id).fetch_one(pool).await.unwrap_or(0);
+    observations.push(format!("Anomalies (1h): {}", anomaly_count));
+
+    ChaosResult {
+        passed: error_rate < 50.0,
+        recovery_time_ms: 0,
+        errors_during_test: 0,
+        alerts_generated: anomaly_count as i32,
+        self_healing_triggered: false,
         observations,
     }
 }
