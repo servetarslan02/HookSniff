@@ -18,7 +18,7 @@
       "status": "down",
       "latency_ms": 0,
       "description": "HookSniff REST API (Cloud Run)",
-      "last_checked": "2026-06-01T20:42:52.236Z"
+      "last_checked": "2026-06-01T20:52:19.985Z"
     },
     {
       "name": "Dashboard",
@@ -36,7 +36,7 @@
       "status": "degraded",
       "latency_ms": 0,
       "description": "Next.js frontend (Vercel)",
-      "last_checked": "2026-06-01T20:42:52.236Z"
+      "last_checked": "2026-06-01T20:52:19.985Z"
     },
     {
       "name": "Worker",
@@ -54,7 +54,7 @@
       "status": "unknown",
       "latency_ms": null,
       "description": "Background delivery worker (Cloud Run)",
-      "last_checked": "2026-06-01T20:42:52.236Z"
+      "last_checked": "2026-06-01T20:52:19.985Z"
     },
     {
       "name": "Database",
@@ -72,7 +72,7 @@
       "status": "down",
       "latency_ms": 0,
       "description": "PostgreSQL (Neon)",
-      "last_checked": "2026-06-01T20:42:52.236Z"
+      "last_checked": "2026-06-01T20:52:19.985Z"
     },
     {
       "name": "Cache",
@@ -90,7 +90,7 @@
       "status": "unknown",
       "latency_ms": 0,
       "description": "Redis (Upstash)",
-      "last_checked": "2026-06-01T20:42:52.236Z"
+      "last_checked": "2026-06-01T20:52:19.985Z"
     },
     {
       "name": "Email Service",
@@ -106,9 +106,9 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 260,
+      "latency_ms": 340,
       "description": "Gmail API",
-      "last_checked": "2026-06-01T20:42:52.236Z"
+      "last_checked": "2026-06-01T20:52:19.985Z"
     },
     {
       "name": "Storage",
@@ -124,12 +124,12 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 51,
+      "latency_ms": 39,
       "description": "Cloudflare R2",
-      "last_checked": "2026-06-01T20:42:52.236Z"
+      "last_checked": "2026-06-01T20:52:19.985Z"
     }
   ],
-  "checked_at": "2026-06-01T20:42:52.236Z",
+  "checked_at": "2026-06-01T20:52:19.985Z",
   "response_times": {
     "Email Service": [
       286,
@@ -138,7 +138,8 @@
       343,
       304,
       299,
-      260
+      260,
+      340
     ],
     "Storage": [
       48,
@@ -147,7 +148,8 @@
       54,
       51,
       45,
-      51
+      51,
+      39
     ],
     "API": [
       1,
