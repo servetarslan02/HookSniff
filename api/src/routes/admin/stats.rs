@@ -123,9 +123,9 @@ pub async fn system_stats(
     let agg: AggRow = sqlx::query_as::<_, AggRow>(
         r#"
         WITH
-          users AS (SELECT COUNT(*) AS c FROM customers),
-          deliveries AS (SELECT COUNT(*) AS c FROM deliveries),
-          revenue AS (
+          u_count AS (SELECT COUNT(*) AS c FROM customers),
+          d_count AS (SELECT COUNT(*) AS c FROM deliveries),
+          rev AS (
             SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) AS c
             FROM invoices WHERE status = 'paid'
           ),
@@ -133,19 +133,19 @@ pub async fn system_stats(
             SELECT COUNT(DISTINCT customer_id) AS c
             FROM deliveries WHERE created_at >= CURRENT_DATE
           ),
-          endpoints AS (
+          ep AS (
             SELECT
               COUNT(*) AS total,
               COUNT(*) FILTER (WHERE is_active = TRUE) AS active
             FROM endpoints
           ),
-          users_yesterday AS (
+          u_yesterday AS (
             SELECT COUNT(*) AS c FROM customers WHERE created_at < CURRENT_DATE
           ),
-          deliveries_yesterday AS (
+          d_yesterday AS (
             SELECT COUNT(*) AS c FROM deliveries WHERE created_at < CURRENT_DATE
           ),
-          revenue_yesterday AS (
+          rev_yesterday AS (
             SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) AS c
             FROM invoices WHERE status = 'paid' AND paid_at < CURRENT_DATE
           ),
@@ -155,24 +155,24 @@ pub async fn system_stats(
             WHERE created_at >= CURRENT_DATE - INTERVAL '1 day'
               AND created_at < CURRENT_DATE
           ),
-          pending_webhooks AS (
+          pending_wh AS (
             SELECT COUNT(*) AS c FROM deliveries WHERE status = 'pending'
           )
         SELECT
-          users.c                       AS total_users,
-          deliveries.c                  AS total_deliveries,
-          revenue.c                     AS total_revenue,
-          active_today.c                AS active_users_today,
-          endpoints.total               AS total_endpoints,
-          endpoints.active              AS active_endpoints,
-          users_yesterday.c             AS users_yesterday,
-          deliveries_yesterday.c        AS deliveries_yesterday,
-          revenue_yesterday.c           AS revenue_yesterday,
-          active_yesterday.c            AS active_users_yesterday,
-          pending_webhooks.c            AS active_webhooks
-        FROM users, deliveries, revenue, active_today, endpoints,
-             users_yesterday, deliveries_yesterday, revenue_yesterday,
-             active_yesterday, pending_webhooks
+          u_count.c                       AS total_users,
+          d_count.c                       AS total_deliveries,
+          rev.c                           AS total_revenue,
+          active_today.c                  AS active_users_today,
+          ep.total                        AS total_endpoints,
+          ep.active                       AS active_endpoints,
+          u_yesterday.c                   AS users_yesterday,
+          d_yesterday.c                   AS deliveries_yesterday,
+          rev_yesterday.c                 AS revenue_yesterday,
+          active_yesterday.c              AS active_users_yesterday,
+          pending_wh.c                    AS active_webhooks
+        FROM u_count, d_count, rev, active_today, ep,
+             u_yesterday, d_yesterday, rev_yesterday,
+             active_yesterday, pending_wh
         "#,
     )
     .fetch_one(&pool)
