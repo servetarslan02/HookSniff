@@ -5,8 +5,8 @@
   "installCommand": "cd dashboard && npm ci",
   "ignoreCommand": "git diff --quiet HEAD~1 HEAD -- dashboard/ api/ vercel.json package.json worker/ common/ || exit 1",
   "rewrites": [
-    { "source": "/api/health", "destination": "https://bg3mrgzrpigd.shares.zrok.io/health" },
-    { "source": "/api/:path*", "destination": "https://bg3mrgzrpigd.shares.zrok.io/:path*" }
+    { "source": "/api/health", "destination": "https://hooksniff-api-cec4.onrender.com/health" },
+    { "source": "/api/:path*", "destination": "https://hooksniff-api-cec4.onrender.com/:path*" }
   ],
   "headers": [
     {
