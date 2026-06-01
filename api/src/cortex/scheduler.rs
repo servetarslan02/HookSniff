@@ -27,6 +27,7 @@ pub enum CortexStage {
     MlQualityCheck,
     SmartRouting,
     DriftDetection,
+    CleanupJob,
 }
 
 impl CortexStage {
@@ -44,6 +45,7 @@ impl CortexStage {
             Self::MlQualityCheck => "ml_quality_check",
             Self::SmartRouting => "smart_routing",
             Self::DriftDetection => "drift_detection",
+            Self::CleanupJob => "cleanup_job",
         }
     }
 
@@ -61,6 +63,7 @@ impl CortexStage {
             Self::MlQualityCheck => "cortex_ml_quality",
             Self::SmartRouting => "cortex_routing",
             Self::DriftDetection => "cortex_drift",
+            Self::CleanupJob => "cortex_cleanup",
         }
     }
 
@@ -79,6 +82,7 @@ impl CortexStage {
             Self::MlQualityCheck => Duration::from_secs(120),
             Self::SmartRouting => Duration::from_secs(120),
             Self::DriftDetection => Duration::from_secs(300),
+            Self::CleanupJob => Duration::from_secs(300),
         }
     }
 
@@ -97,6 +101,7 @@ impl CortexStage {
             Self::MlQualityCheck => 3600,   // 1 hour
             Self::SmartRouting => 900,      // 15 min
             Self::DriftDetection => 600,     // 10 min
+            Self::CleanupJob => 86400,     // 24 hours
         }
     }
 
@@ -115,6 +120,7 @@ impl CortexStage {
             Self::MlQualityCheck => 660,    // minute 11
             Self::Insights => 7200,         // 02:00 UTC
             Self::DriftDetection => 540,     // minute 9
+            Self::CleanupJob => 7800,     // 02:30 UTC
         }
     }
 }
@@ -133,6 +139,7 @@ const ALL_STAGES: &[CortexStage] = &[
     CortexStage::MlTraining,
     CortexStage::MlQualityCheck,
     CortexStage::Insights,
+    CortexStage::CleanupJob,
 ];
 
 /// Check if a stage should run now
@@ -293,6 +300,33 @@ async fn execute_stage(
         }
         CortexStage::SelfHealing => {
             let n = super::healing_engine::run_healing(pool, config).await?;
+
+            // Trigger recovery surge for endpoints with high failure streaks
+            let stuck_endpoints: Vec<(uuid::Uuid,)> = sqlx::query_as(
+                "SELECT id FROM endpoints WHERE failure_streak >= 5 AND is_active = true AND (auto_disabled = false OR auto_disabled IS NULL)"
+            ).fetch_all(pool).await.unwrap_or_default();
+
+            for (eid,) in &stuck_endpoints {
+                // Check if surge already running
+                let existing: Option<(String,)> = sqlx::query_as(
+                    "SELECT status FROM recovery_surges WHERE endpoint_id = $1 AND status IN ('active', 'ramping')"
+                ).bind(eid).fetch_optional(pool).await.unwrap_or(None);
+
+                if existing.is_none() {
+                    // Get queued count for this endpoint
+                    let queued: (i32,) = sqlx::query_as(
+                        "SELECT COUNT(*)::integer FROM webhook_queue WHERE endpoint_id = $1 AND status = 'pending'"
+                    ).bind(eid).fetch_one(pool).await.unwrap_or((0,));
+
+                    if queued.0 > 0 {
+                        if let Err(e) = super::recovery_surge::start_surge(pool, *eid, queued.0, config).await {
+                            tracing::debug!("Surge start skipped for {}: {:?}", eid, e);
+                        } else {
+                            tracing::info!("🚀 Recovery surge triggered for endpoint {} ({} queued)", eid, queued.0);
+                        }
+                    }
+                }
+            }
             Ok(n)
         }
         CortexStage::ProactiveHealing => {
@@ -394,6 +428,53 @@ async fn execute_stage(
                 super::CORTEX_METRICS.drift_detected.fetch_add(drift_count, std::sync::atomic::Ordering::Relaxed);
             }
             Ok(drift_count)
+        }
+        CortexStage::CleanupJob => {
+            let mut cleaned = 0u64;
+
+            // 1. Prune old model versions (keep last 10 per model)
+            if let Ok(n) = super::ml::versioning::prune_old_versions(pool, 10).await {
+                cleaned += n;
+                if n > 0 { tracing::info!("🧹 Cleanup: pruned {} old model versions", n); }
+            }
+
+            // 2. Clean old cortex traces (90 days)
+            if let Ok(r) = sqlx::query("DELETE FROM cortex_traces WHERE completed_at < NOW() - INTERVAL '90 days'")
+                .execute(pool).await {
+                cleaned += r.rows_affected();
+            }
+
+            // 3. Clean old drift events (180 days)
+            if let Ok(r) = sqlx::query("DELETE FROM ml_drift_events WHERE created_at < NOW() - INTERVAL '180 days'")
+                .execute(pool).await {
+                cleaned += r.rows_affected();
+            }
+
+            // 4. Clean old chaos tests (90 days)
+            if let Ok(r) = sqlx::query("DELETE FROM chaos_tests WHERE started_at < NOW() - INTERVAL '90 days'")
+                .execute(pool).await {
+                cleaned += r.rows_affected();
+            }
+
+            // 5. Clean old AutoML trials (90 days)
+            if let Ok(r) = sqlx::query("DELETE FROM automl_trials WHERE created_at < NOW() - INTERVAL '90 days'")
+                .execute(pool).await {
+                cleaned += r.rows_affected();
+            }
+
+            // 6. Clean old A/B test decisions (90 days)
+            if let Ok(r) = sqlx::query("DELETE FROM ab_test_decisions WHERE created_at < NOW() - INTERVAL '90 days'")
+                .execute(pool).await {
+                cleaned += r.rows_affected();
+            }
+
+            // 7. Expire feature store cache
+            super::ml::feature_store::FEATURE_STORE.evict_expired();
+
+            if cleaned > 0 {
+                tracing::info!("🧹 Cleanup: removed {} total old records", cleaned);
+            }
+            Ok(cleaned)
         }
     }
 }
