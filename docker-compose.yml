@@ -70,11 +70,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dashboard
+      args:
+        NEXT_PUBLIC_API_URL: "http://api:3000/v1"
     container_name: hooksniff-dashboard
     ports:
       - "3001:3001"
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:3000/v1"
       PORT: "3001"
     depends_on:
       - api
