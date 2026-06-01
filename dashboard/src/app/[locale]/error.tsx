@@ -15,6 +15,20 @@ export default function Error({
 
   useEffect(() => {
     console.error('Page error:', error);
+
+    // Auto-reload on ChunkLoadError (stale Vercel cache after deploy)
+    // Only once per session to prevent infinite reload loops
+    if (
+      error.name === 'ChunkLoadError' ||
+      error.message?.includes('ChunkLoadError') ||
+      error.message?.includes('Failed to load chunk')
+    ) {
+      const reloaded = sessionStorage.getItem('chunk_error_reloaded');
+      if (!reloaded) {
+        sessionStorage.setItem('chunk_error_reloaded', '1');
+        window.location.reload();
+      }
+    }
   }, [error]);
 
   return (
