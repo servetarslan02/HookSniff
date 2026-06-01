@@ -175,9 +175,22 @@ async fn run_stage_with_timeout(
     let start = Instant::now();
     let timeout = stage.timeout();
     let lock_name = stage.lock_name();
+    let run_id = uuid::Uuid::new_v4().to_string();
+    let started_at = chrono::Utc::now();
 
     if !super::try_cortex_lock(pool, lock_name, timeout.as_secs() as i64).await {
         tracing::debug!("⏭️  Cortex [{}] — lock busy, skipping", stage.name());
+        // Trace: skipped
+        let _ = super::ml::cortex_tracing::record_trace(pool, &super::ml::cortex_tracing::CortexTrace {
+            run_id: run_id.clone(),
+            stage_name: stage.name().to_string(),
+            duration_ms: 0,
+            items_processed: 0,
+            status: "skipped".to_string(),
+            error_message: Some("lock_busy".to_string()),
+            started_at,
+            completed_at: chrono::Utc::now(),
+        }).await;
         return StageResult {
             stage: stage.name(),
             outcome: StageOutcome::Skipped("lock_busy"),
@@ -190,24 +203,48 @@ async fn run_stage_with_timeout(
     super::release_cortex_lock(pool, lock_name).await;
 
     let duration_ms = start.elapsed().as_millis() as u64;
+    let completed_at = chrono::Utc::now();
 
-    match result {
+    let (outcome, trace_status, items, error_msg) = match &result {
         Ok(Ok(count)) => {
             tracing::info!(
                 "✅ Cortex [{}] — {} items in {}ms",
                 stage.name(), count, duration_ms
             );
-            StageResult { stage: stage.name(), outcome: StageOutcome::Success(count), duration_ms }
+            (
+                StageResult { stage: stage.name(), outcome: StageOutcome::Success(*count), duration_ms },
+                "success", *count, None
+            )
         }
         Ok(Err(e)) => {
             tracing::error!("❌ Cortex [{}]: {:?}", stage.name(), e);
-            StageResult { stage: stage.name(), outcome: StageOutcome::Error(format!("{:?}", e)), duration_ms }
+            (
+                StageResult { stage: stage.name(), outcome: StageOutcome::Error(format!("{:?}", e)), duration_ms },
+                "error", 0, Some(format!("{:?}", e))
+            )
         }
         Err(_) => {
             tracing::warn!("⏰ Cortex [{}] timed out after {}s", stage.name(), timeout.as_secs());
-            StageResult { stage: stage.name(), outcome: StageOutcome::Timeout, duration_ms }
+            (
+                StageResult { stage: stage.name(), outcome: StageOutcome::Timeout, duration_ms },
+                "timeout", 0, Some("timeout".to_string())
+            )
         }
-    }
+    };
+
+    // Record trace (best-effort, non-blocking)
+    let _ = super::ml::cortex_tracing::record_trace(pool, &super::ml::cortex_tracing::CortexTrace {
+        run_id,
+        stage_name: stage.name().to_string(),
+        duration_ms,
+        items_processed: items,
+        status: trace_status.to_string(),
+        error_message: error_msg,
+        started_at,
+        completed_at,
+    }).await;
+
+    outcome
 }
 
 /// Execute a single stage, returning the number of items processed

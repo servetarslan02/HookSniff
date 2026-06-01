@@ -139,6 +139,11 @@ pub async fn train_all(pool: &PgPool) -> Result<u64, sqlx::Error> {
 
 /// Train all ML models for a single endpoint
 async fn train_endpoint(pool: &PgPool, endpoint_id: uuid::Uuid) -> Result<(), sqlx::Error> {
+    // Snapshot current models BEFORE training (for rollback support)
+    for model_type in &["adaptive_threshold", "anomaly_detector", "time_series"] {
+        let _ = versioning::snapshot_current_model(pool, endpoint_id, model_type, "scheduled_training").await;
+    }
+
     // Get hourly stats for this endpoint
     let stats: Vec<(f64, f64, f64, f64, i32)> = sqlx::query_as(
         "SELECT COALESCE(total_deliveries, 0)::FLOAT, COALESCE(successful, 0)::FLOAT, COALESCE(failed, 0)::FLOAT, COALESCE(avg_latency_ms, 0)::FLOAT, COALESCE(p95_latency_ms, 0) FROM endpoint_hourly_stats WHERE endpoint_id = $1 ORDER BY hour_start"
@@ -162,8 +167,15 @@ async fn train_endpoint(pool: &PgPool, endpoint_id: uuid::Uuid) -> Result<(), sq
     time_series::train(pool, endpoint_id, &success_rates, &latencies).await?;
 
     // 4. Bandit models are trained online (not batch)
-    // Initialize if not exists
     bandit::init_if_needed(pool, endpoint_id).await?;
+
+    // Record features for analytics (non-blocking)
+    for (i, sr) in success_rates.iter().rev().take(1).enumerate() {
+        let _ = record_feature(pool, endpoint_id, "latest_success_rate", *sr).await;
+        if let Some(lat) = latencies.last() {
+            let _ = record_feature(pool, endpoint_id, "latest_latency", *lat).await;
+        }
+    }
 
     Ok(())
 }
