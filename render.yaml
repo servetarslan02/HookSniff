@@ -53,12 +53,11 @@ services:
       - key: POLAR_WEBHOOK_SECRET
         sync: false
       - key: POLAR_PRODUCT_PRO
-        value: your-polar-product-pro-id
+        sync: false
       - key: POLAR_PRODUCT_BUSINESS
-        value: your-polar-product-business-id
+        sync: false
       - key: POLAR_ENV
         value: production
-        sync: false
       - key: NOTIFY_FROM_EMAIL
         value: noreply@hooksniff.vercel.app
       - key: NOTIFY_EMAIL
@@ -93,6 +92,5 @@ services:
         sync: false
       - key: NOTIFY_FROM_EMAIL
         value: noreply@hooksniff.vercel.app
-        sync: false
       - key: OTEL_ENABLED
         value: "false"
