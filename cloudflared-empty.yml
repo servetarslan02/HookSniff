@@ -1,0 +1,3 @@
+# Temporary empty config for quick tunnel (bypasses user config)
+# Bu dosya BASLAT.ps1 tarafından otomatik kullanılır
+url: http://localhost:3000
