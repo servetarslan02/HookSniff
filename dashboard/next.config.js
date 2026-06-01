@@ -36,7 +36,7 @@ const nextConfig = {
           "style-src 'self' 'unsafe-inline'",
           "img-src 'self' data: https: blob:",
           "font-src 'self' data:",
-          "connect-src 'self' https://*.trycloudflare.com https://*.shares.zrok.io https://*.sentry.io https://vitals.vercel-insights.com https://cloudflareinsights.com wss:",
+          "connect-src 'self' https://hooksniff-api-cec4.onrender.com wss://hooksniff-api-cec4.onrender.com https://*.sentry.io https://vitals.vercel-insights.com https://cloudflareinsights.com wss:",
           "frame-ancestors 'none'",
           "base-uri 'self'",
           "form-action 'self'",
