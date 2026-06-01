@@ -179,7 +179,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     return p.startsWith('/') ? p : `/${p}`;
   }, [pathname, locale]);
 
-  if (!mounted) {
+  if (!mounted || !user) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full" />
@@ -187,7 +187,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user?.is_admin) {
+  if (!user.is_admin) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
