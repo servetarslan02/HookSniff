@@ -33,7 +33,7 @@ export const DeliverySchema = z.object({
   id: z.string(),
   endpoint_id: z.string(),
   event: z.string().nullish(),
-  status: z.enum(['pending', 'delivered', 'failed']),
+  status: z.string(),  // Accept any status string from backend (pending, delivered, failed, etc.)
   attempt_count: z.number(),
   response_status: z.number().nullish(),
   created_at: z.string(),
