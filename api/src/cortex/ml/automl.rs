@@ -206,17 +206,37 @@ pub async fn run_automl_for_endpoint(
         endpoint_id, model_type, score, params
     );
 
+    // Auto-deploy: If we have 5+ trials and current best is significantly better, apply it
+    if optimizer.trials.len() >= 5 {
+        if let Some(best) = optimizer.best_params() {
+            let best_score = optimizer.trials.iter().map(|t| t.score).fold(0.0f64, f64::max);
+            // Get current model quality as baseline
+            let current_quality: Option<(f64,)> = sqlx::query_as(
+                "SELECT COALESCE(AVG(quality_score), 50.0) FROM ml_model_quality WHERE endpoint_id = $1 AND model_type = $2"
+            ).bind(endpoint_id).bind(model_type).fetch_optional(pool).await.unwrap_or(None);
+            let baseline = current_quality.unwrap_or((50.0,)).0;
+
+            if best_score > baseline + 5.0 {
+                tracing::info!(
+                    "🤖 AutoML: auto-deploying best params for {} (score {:.1} > baseline {:.1})",
+                    model_type, best_score, baseline
+                );
+                super::save_model_params(pool, endpoint_id, model_type, best, 0).await?;
+            }
+        }
+    }
+
     Ok(Some(params))
 }
 
-/// Parametre setini değerlendir (puanla)
+/// Parametre setini değerlendir (puanla) — multi-metric
 async fn evaluate_params(
     pool: &PgPool,
     endpoint_id: Uuid,
     model_type: &str,
     params: &serde_json::Value,
 ) -> Result<f64, sqlx::Error> {
-    // Son kalite skorunu al
+    // 1. Quality score from ml_model_quality (son 7 gün)
     let quality: Option<(f64,)> = sqlx::query_as(
         "SELECT COALESCE(AVG(quality_score), 50.0) FROM ml_model_quality
          WHERE endpoint_id = $1 AND model_type = $2 AND measured_at > NOW() - INTERVAL '7 days'"
@@ -225,14 +245,37 @@ async fn evaluate_params(
     .bind(model_type)
     .fetch_optional(pool)
     .await?;
-
     let base_score = quality.map(|(s,)| s).unwrap_or(50.0);
 
-    // Parametre sapmasına göre bonus/ceza
-    let alpha = params.get("alpha").and_then(|v| v.as_f64()).unwrap_or(0.3);
-    let optimal_alpha_penalty = -((alpha - 0.3).abs() * 20.0).min(10.0);
+    // 2. Success rate improvement (son 24h vs önceki 24h)
+    let recent_sr: Option<(f64,)> = sqlx::query_as(
+        "SELECT COALESCE(AVG(CASE WHEN total_deliveries > 0 THEN successful::float / total_deliveries * 100.0 ELSE 100.0 END), 100.0)
+         FROM endpoint_hourly_stats WHERE endpoint_id = $1 AND hour_start > NOW() - INTERVAL '24 hours'"
+    ).bind(endpoint_id).fetch_optional(pool).await?;
+    let prev_sr: Option<(f64,)> = sqlx::query_as(
+        "SELECT COALESCE(AVG(CASE WHEN total_deliveries > 0 THEN successful::float / total_deliveries * 100.0 ELSE 100.0 END), 100.0)
+         FROM endpoint_hourly_stats WHERE endpoint_id = $1 AND hour_start BETWEEN NOW() - INTERVAL '48 hours' AND NOW() - INTERVAL '24 hours'"
+    ).bind(endpoint_id).fetch_optional(pool).await?;
+    let sr_improvement = recent_sr.unwrap_or((100.0,)).0 - prev_sr.unwrap_or((100.0,)).0;
 
-    Ok((base_score + optimal_alpha_penalty).clamp(0.0, 100.0))
+    // 3. Latency impact (düşük daha iyi)
+    let recent_latency: Option<(f64,)> = sqlx::query_as(
+        "SELECT COALESCE(AVG(avg_latency_ms), 0) FROM endpoint_hourly_stats WHERE endpoint_id = $1 AND hour_start > NOW() - INTERVAL '24 hours'"
+    ).bind(endpoint_id).fetch_optional(pool).await?;
+    let latency_score = (1000.0 - recent_latency.unwrap_or((0.0,)).0).max(0.0) / 10.0;
+
+    // 4. Parametre penalty (alpha sapması)
+    let alpha = params.get("alpha").and_then(|v| v.as_f64()).unwrap_or(0.3);
+    let alpha_penalty = -((alpha - 0.3).abs() * 15.0).min(8.0);
+
+    // Sonuç: %50 quality + %20 SR improvement + %15 latency + %15 parametre penalty
+    let score = (base_score * 0.50
+        + (sr_improvement + 50.0).clamp(0.0, 100.0) * 0.20
+        + latency_score.clamp(0.0, 100.0) * 0.15
+        + (50.0 + alpha_penalty).clamp(0.0, 100.0) * 0.15
+    ).clamp(0.0, 100.0);
+
+    Ok(score)
 }
 
 /// Rastgele perturbation üret
