@@ -142,7 +142,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     { name: t('account'), href: '/account', icon: <UserCircle size={16} strokeWidth={1.75} /> },
   ], [user?.is_admin, t, perms]);
 
-  if (!mounted) {
+  if (!mounted || !user) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full" />
