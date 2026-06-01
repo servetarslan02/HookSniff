@@ -51,7 +51,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: ENCRYPTION_KEY
-        generateValue: true
+        sync: false
       - key: RETENTION_DAYS
         value: "7"
       - key: CORS_ORIGINS
@@ -109,7 +109,7 @@ services:
       - key: RUST_LOG
         value: info,hooksniff=info
       - key: ENCRYPTION_KEY
-        generateValue: true
+        sync: false
       - key: DATABASE_URL
         sync: false
       - key: REDIS_URL
