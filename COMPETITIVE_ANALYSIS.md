@@ -255,7 +255,7 @@ hooksniff.vercel.app zaten var. Alternatifler:
 
 ### Convoy'dan (Kapanmış)
 - **Ders:** Open source tek başına yetmiyor, şirket desteği gerekli
-- **Circuit breaking:** İyi bir feature, bizde de var (ai-center)
+- **Circuit breaking:** İyi bir feature, bizde de var (cortex/healing_engine)
 - **JavaScript transformations:** Payload dönüştürme gücü
 
 ---

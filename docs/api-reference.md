@@ -713,23 +713,27 @@ Returns health details for a single endpoint.
 
 ---
 
-## AI Center
+## Cortex — Intelligent Protection System
 
-The AI Center provides anomaly detection, risk scoring, and automated remediation.
+Cortex is HookSniff's ML-powered system that monitors webhook endpoints, detects anomalies, predicts failures, and auto-heals issues.
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/v1/ai/status` | GET | Overall AI center status |
-| `/v1/ai/events` | GET | List events (filter by severity, type) |
-| `/v1/ai/risks` | GET | Risk scores for endpoints |
-| `/v1/ai/actions` | GET | List AI actions |
-| `/v1/ai/actions/{id}/approve` | POST | Approve a pending action |
-| `/v1/ai/actions/{id}/reject` | POST | Reject a pending action |
-| `/v1/ai/actions/{id}/rollback` | POST | Rollback an executed action |
-| `/v1/ai/blocklist` | GET/POST | Manage IP/customer/endpoint blocks |
-| `/v1/ai/blocklist/{id}` | DELETE | Remove a block entry |
-| `/v1/ai/providers` | GET | AI provider status |
-| `/v1/ai/stats` | GET | AI center statistics |
+| `/v1/cortex/health` | GET | Cortex system health & metrics |
+| `/v1/cortex/anomalies` | GET | Recent anomaly scores |
+| `/v1/cortex/anomalies/high` | GET | High-severity anomalies |
+| `/v1/cortex/healing/actions` | GET | Auto-healing action history |
+| `/v1/cortex/predictions` | GET | Failure predictions |
+| `/v1/cortex/insights` | GET | Active insights |
+| `/v1/cortex/profiles` | GET | Endpoint behavioral profiles |
+| `/v1/cortex/ml/quality` | GET | ML model quality scores |
+| `/v1/cortex/ml/quality/reset` | POST | Reset degraded models |
+| `/v1/cortex/drift/events` | GET | Concept drift detection events |
+| `/v1/cortex/models/platform-summary` | GET | Platform model health overview |
+| `/v1/cortex/ab-tests` | GET | A/B test configurations |
+| `/v1/cortex/chaos/scenarios` | GET | Chaos engineering scenarios |
+| `/v1/cortex/automl/trials/{id}` | GET | AutoML optimization trials |
+| `/v1/cortex/tracing/performance` | GET | Pipeline performance metrics |
 
 ---
 
