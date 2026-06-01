@@ -10,6 +10,10 @@ import { HealingTab } from './HealingTab';
 import { PredictionsTab } from './PredictionsTab';
 import { MLQualityTab } from './MLQualityTab';
 import { ProactiveTab } from './ProactiveTab';
+import { DriftTab } from './DriftTab';
+import { ModelMonitorTab } from './ModelMonitorTab';
+import { ABTestTab } from './ABTestTab';
+import { AutoMLTab } from './AutoMLTab';
 
 export default function CortexPage() {
   const { token } = useAuth();
@@ -45,6 +49,10 @@ export default function CortexPage() {
     { id: 'predictions' as Tab, label: 'Tahminler', icon: Brain },
     { id: 'ml_quality' as Tab, label: 'ML Kalite', icon: Target },
     { id: 'proactive' as Tab, label: 'Proaktif', icon: Shield },
+    { id: 'drift' as Tab, label: 'Drift', icon: TrendingUp },
+    { id: 'monitor' as Tab, label: 'Model İzleme', icon: Zap },
+    { id: 'ab_tests' as Tab, label: 'A/B Tests', icon: Globe },
+    { id: 'automl' as Tab, label: 'AutoML', icon: Brain },
   ];
 
   if (loading) {
@@ -103,6 +111,10 @@ export default function CortexPage() {
       <Activity mode={activeTab === 'predictions' ? 'visible' : 'hidden'}><PredictionsTab token={token} /></Activity>
       <Activity mode={activeTab === 'ml_quality' ? 'visible' : 'hidden'}><MLQualityTab token={token} /></Activity>
       <Activity mode={activeTab === 'proactive' ? 'visible' : 'hidden'}><ProactiveTab token={token} /></Activity>
+      <Activity mode={activeTab === 'drift' ? 'visible' : 'hidden'}><DriftTab /></Activity>
+      <Activity mode={activeTab === 'monitor' ? 'visible' : 'hidden'}><ModelMonitorTab /></Activity>
+      <Activity mode={activeTab === 'ab_tests' ? 'visible' : 'hidden'}><ABTestTab /></Activity>
+      <Activity mode={activeTab === 'automl' ? 'visible' : 'hidden'}><AutoMLTab /></Activity>
     </div>
   );
 }
