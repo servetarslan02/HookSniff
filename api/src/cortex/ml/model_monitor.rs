@@ -68,7 +68,7 @@ pub async fn check_model_health(
     model_type: &str,
 ) -> Result<Option<ModelHealth>, sqlx::Error> {
     // Model bilgisini al
-    let model: Option<(serde_json::Value, i32, Option<chrono::DateTime<chrono::Utc>>)> = sqlx::query_as(
+    let model: Option<(serde_json::Value, Option<i32>, Option<chrono::DateTime<chrono::Utc>>)> = sqlx::query_as(
         "SELECT parameters, training_samples, last_trained FROM ml_models WHERE endpoint_id = $1 AND model_type = $2"
     )
     .bind(endpoint_id)
@@ -81,6 +81,7 @@ pub async fn check_model_health(
         None => return Ok(None),
     };
     let _params = params;
+    let training_samples = training_samples.unwrap_or(0);
 
     // Son 24 saatteki prediction outcome'ları say
     let outcomes: Option<(i64, i64, i64)> = sqlx::query_as(
