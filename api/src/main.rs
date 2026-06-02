@@ -243,38 +243,45 @@ async fn main() -> Result<()> {
                 metrics.clone(),
             ),
         )
-        .layer(axum::Extension(pool.clone()))
-        .layer(axum::Extension(health_pool))
-        .layer(axum::Extension(cfg.clone()))
-        .layer(axum::Extension(email_provider))
-        .layer(axum::Extension(job_queue))
-        .layer(axum::Extension(cache_layer))
-        .layer(axum::Extension(feature_flag_service))
-        .layer(axum::Extension(event_publisher))
-        .layer(axum::Extension(ws_gateway))
-        .layer(axum::Extension(qstash_client))
-        .layer(axum::Extension(r2_client))
-        .layer(axum::Extension(sso_store))
-        .layer(cors::build_cors_layer(&cfg))
-        .layer(TraceLayer::new_for_http())
-        .layer(tower_http::limit::RequestBodyLimitLayer::new(2 * 1024 * 1024))
-        .layer(tower_http::compression::CompressionLayer::new())
+        // ── Axum layer ordering ──────────────────────────────────────────────
+        // `.layer(A).layer(B)` → request flows B → A → handler
+        // Therefore: Extensions must be LAST (outermost) so they add data to the
+        // request BEFORE any middleware tries to extract it.
+        //
+        // Order: routes → middleware (inner) → tower layers → Extensions (outer)
+        //
+        // Middleware (inner — runs AFTER extensions have added data)
         .layer(axum::middleware::from_fn(telemetry::trace_id_middleware))
         .layer(axum::middleware::from_fn(middleware::request_id_middleware))
         .layer(axum::middleware::from_fn(middleware::request_metrics_middleware))
         .layer(axum::middleware::from_fn(middleware::request_timeout_middleware))
         .layer(axum::middleware::from_fn(middleware::security_headers_middleware))
         .layer(axum::middleware::from_fn(rate_limit::rate_limit_middleware))
-        .layer(axum::Extension(rate_limiter))
-        .layer(axum::Extension(metrics))
-        // Security middleware — Extension must be OUTER (after middleware) so middleware can access it
-        // In axum: .layer(A).layer(B) → request flows B → A → handler
-        // So Extension must be B (outer) and middleware must be A (inner)
         .layer(axum::middleware::from_fn(middleware::ip_blocklist::ip_blocklist_middleware))
-        .layer(axum::Extension(std::sync::Arc::new(middleware::ip_blocklist::IpBlocklistCache::new())))
         .layer(axum::middleware::from_fn(middleware::bot_detection::bot_detection_middleware))
         .layer(axum::middleware::from_fn(middleware::ddos::ddos_middleware))
-        .layer(axum::Extension(std::sync::Arc::new(hooksniff_api::security::ddos::DdosProtection::new())));
+        // Tower layers (between middleware and extensions)
+        .layer(tower_http::compression::CompressionLayer::new())
+        .layer(tower_http::limit::RequestBodyLimitLayer::new(2 * 1024 * 1024))
+        .layer(TraceLayer::new_for_http())
+        .layer(cors::build_cors_layer(&cfg))
+        // Extensions (outer — add data to request, so middleware can extract them)
+        .layer(axum::Extension(std::sync::Arc::new(hooksniff_api::security::ddos::DdosProtection::new())))
+        .layer(axum::Extension(std::sync::Arc::new(middleware::ip_blocklist::IpBlocklistCache::new())))
+        .layer(axum::Extension(metrics))
+        .layer(axum::Extension(rate_limiter))
+        .layer(axum::Extension(sso_store))
+        .layer(axum::Extension(r2_client))
+        .layer(axum::Extension(qstash_client))
+        .layer(axum::Extension(ws_gateway))
+        .layer(axum::Extension(event_publisher))
+        .layer(axum::Extension(feature_flag_service))
+        .layer(axum::Extension(cache_layer))
+        .layer(axum::Extension(job_queue))
+        .layer(axum::Extension(email_provider))
+        .layer(axum::Extension(cfg.clone()))
+        .layer(axum::Extension(health_pool))
+        .layer(axum::Extension(pool.clone()));
 
     // ── Start server — bind TCP listener FIRST so Render's startup probe sees the port ──
     let addr = format!("0.0.0.0:{}", cfg.port);
