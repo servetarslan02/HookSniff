@@ -78,15 +78,15 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool> {
     let clean_url = clean_database_url(database_url);
     let pool = PgPoolOptions::new()
         .max_connections(30)                              // Neon free tier: 100 max, 30 bizim için yeterli
-        .min_connections(5)                               // Sıcak bağlantılar hazır beklesin
-        .acquire_timeout(std::time::Duration::from_secs(5))  // 5sn'de bağlantı alamazsa hata döndür
+        .min_connections(0)                               // Lazy: startup'ta bağlantı açma, ilk istekte aç
+        .acquire_timeout(std::time::Duration::from_secs(15)) // 15sn: Neon cold start için yeterli
         .idle_timeout(std::time::Duration::from_secs(300))   // 5dk kullanılmayan bağlantıyı kapat
         .max_lifetime(std::time::Duration::from_secs(1800))  // 30dk'da bir bağlantıları yenile (memory leak önleme)
         .connect(&clean_url)
         .await?;
     run_migrations(&pool).await?;
     tracing::info!(
-        "✅ Database pool created (min=5, max=30, idle_timeout=5m, max_lifetime=30m)"
+        "✅ Database pool created (min=0, max=30, acquire_timeout=15s, idle_timeout=5m)"
     );
     Ok(pool)
 }
@@ -96,7 +96,7 @@ pub async fn create_health_pool(database_url: &str) -> Result<PgPool> {
     let clean_url = clean_database_url(database_url);
     let pool = PgPoolOptions::new()
         .max_connections(5)
-        .acquire_timeout(std::time::Duration::from_secs(3))
+        .acquire_timeout(std::time::Duration::from_secs(10))
         .connect(&clean_url)
         .await?;
     Ok(pool)
