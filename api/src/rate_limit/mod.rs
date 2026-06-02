@@ -384,9 +384,12 @@ pub async fn create_rate_limiter() -> RateLimiter {
 
     let store: Arc<dyn RateLimitStore> = match std::env::var("RATE_LIMIT_STORE").as_deref() {
         Ok("redis") => match crate::config::resolve_redis_url() {
-            Some(url) => match RedisRateLimiter::new(&url).await {
-                Ok(rl) => Arc::new(rl),
-                Err(e) => {
+            Some(url) => match tokio::time::timeout(
+                std::time::Duration::from_secs(5),
+                RedisRateLimiter::new(&url)
+            ).await {
+                Ok(Ok(rl)) => Arc::new(rl),
+                Ok(Err(e)) => {
                     tracing::warn!(
                         "Failed to connect to Redis ({e}), falling back to in-memory rate limiter"
                     );
@@ -397,6 +400,10 @@ pub async fn create_rate_limiter() -> RateLimiter {
                              Fix Redis connection immediately."
                         );
                     }
+                    Arc::new(InMemoryRateLimiter::new())
+                }
+                Err(_) => {
+                    tracing::warn!("Redis rate limiter timed out (5s), falling back to in-memory");
                     Arc::new(InMemoryRateLimiter::new())
                 }
             },
