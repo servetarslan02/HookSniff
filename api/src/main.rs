@@ -267,12 +267,14 @@ async fn main() -> Result<()> {
         .layer(axum::middleware::from_fn(rate_limit::rate_limit_middleware))
         .layer(axum::Extension(rate_limiter))
         .layer(axum::Extension(metrics))
-        // Security middleware
-        .layer(axum::Extension(std::sync::Arc::new(middleware::ip_blocklist::IpBlocklistCache::new())))
+        // Security middleware — Extension must be OUTER (after middleware) so middleware can access it
+        // In axum: .layer(A).layer(B) → request flows B → A → handler
+        // So Extension must be B (outer) and middleware must be A (inner)
         .layer(axum::middleware::from_fn(middleware::ip_blocklist::ip_blocklist_middleware))
+        .layer(axum::Extension(std::sync::Arc::new(middleware::ip_blocklist::IpBlocklistCache::new())))
         .layer(axum::middleware::from_fn(middleware::bot_detection::bot_detection_middleware))
-        .layer(axum::Extension(std::sync::Arc::new(hooksniff_api::security::ddos::DdosProtection::new())))
-        .layer(axum::middleware::from_fn(middleware::ddos::ddos_middleware));
+        .layer(axum::middleware::from_fn(middleware::ddos::ddos_middleware))
+        .layer(axum::Extension(std::sync::Arc::new(hooksniff_api::security::ddos::DdosProtection::new())));
 
     // ── Start server — bind TCP listener FIRST so Render's startup probe sees the port ──
     let addr = format!("0.0.0.0:{}", cfg.port);
@@ -281,9 +283,13 @@ async fn main() -> Result<()> {
     // Bind the TCP listener immediately — Render needs to see the port open within seconds
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     
-    // Mark health checks as ready AFTER binding (health_check returns 200 during startup)
+    // Mark health checks as ready AFTER full initialization but BEFORE serving
+    // The health_check function returns 200 during startup when HEALTH_CHECKS_READY is false,
+    // so Render's startup probe will pass immediately. Once we set this to true,
+    // health_check will do full DB/Redis checks.
     routes::health::set_health_checks_ready();
     
+    // Serve — all middleware layers, extensions, and routes are fully initialized here
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await?;
