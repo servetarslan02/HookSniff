@@ -58,8 +58,8 @@ export function AdminNotificationCenter() {
             id: 'queue-failed',
             type: 'system',
             severity: queueData.failed_last_hour > 10 ? 'critical' : 'high',
-            title: 'Başarısız Teslimatlar',
-            message: `Son 1 saatte ${queueData.failed_last_hour} başarısız teslimat`,
+            title: 'Failed Deliveries',
+            message: `Son 1 saatte ${queueData.failed_last_hour} failed deliveries`,
             time: new Date().toISOString(),
             link: '/admin/system',
           });
@@ -69,8 +69,8 @@ export function AdminNotificationCenter() {
             id: 'queue-backlog',
             type: 'system',
             severity: 'medium',
-            title: 'Kuyruk Birikmesi',
-            message: `${queueData.pending} teslimat bekliyor`,
+            title: 'Queue Backlog',
+            message: `${queueData.pending} deliveries pending`,
             time: new Date().toISOString(),
             link: '/admin/system',
           });
@@ -145,11 +145,11 @@ export function AdminNotificationCenter() {
   const relativeTime = (dateStr: string) => {
     const diff = Math.max(0, Date.now() - new Date(dateStr).getTime());
     const mins = Math.floor(diff / 60_000);
-    if (mins < 1) return 'az önce';
-    if (mins < 60) return `${mins}dk önce`;
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
     const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}sa önce`;
-    return `${Math.floor(hours / 24)}g önce`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.floor(hours / 24)}d ago`;
   };
 
   return (
@@ -157,7 +157,7 @@ export function AdminNotificationCenter() {
       <button
         onClick={() => setOpen(!open)}
         className="relative p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
-        aria-label="Admin Bildirimleri"
+        aria-label="Admin Notifications"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -174,7 +174,7 @@ export function AdminNotificationCenter() {
           <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
               <Shield size={14} strokeWidth={1.75} className="text-red-500" />
-              Admin Bildirimleri
+              Admin Notifications
             </h3>
             <span className="text-[10px] font-medium text-gray-400 dark:text-slate-500 uppercase tracking-wider">
               {totalCount} adet
@@ -238,8 +238,8 @@ export function AdminNotificationCenter() {
             {notifications.length === 0 && broadcasts.length === 0 && (
               <div className="p-6 text-center">
                 <CheckCircle2 size={32} strokeWidth={1.5} className="text-green-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500 dark:text-slate-400">Her şey yolunda</p>
-                <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Admin bildirimi yok</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">All clear</p>
+                <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">No admin notifications</p>
               </div>
             )}
           </div>
@@ -249,7 +249,7 @@ export function AdminNotificationCenter() {
               onClick={() => setOpen(false)}
               className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium"
             >
-              Güvenlik Merkezi →
+              Security Center →
             </Link>
           </div>
         </div>
@@ -260,17 +260,17 @@ export function AdminNotificationCenter() {
 
 function getSecurityLabel(eventType: string): string {
   const labels: Record<string, string> = {
-    brute_force_login: 'Brute Force Giriş',
+    brute_force_login: 'Brute Force Login',
     brute_force_api: 'Brute Force API',
     credential_stuffing: 'Credential Stuffing',
     password_spray: 'Password Spray',
     sql_injection_attempt: 'SQL Injection',
-    xss_attempt: 'XSS Saldırısı',
+    xss_attempt: 'XSS Attack',
     path_traversal_attempt: 'Path Traversal',
-    scanner_detected: 'Tarayıcı Tespit',
-    suspicious_user_agent: 'Şüpheli UA',
-    disabled_account_login: 'Pasif Hesap Girişi',
-    rate_limit_exceeded: 'Rate Limit Aşıldı',
+    scanner_detected: 'Scanner Detected',
+    suspicious_user_agent: 'Suspicious UA',
+    disabled_account_login: 'Disabled Account Login',
+    rate_limit_exceeded: 'Rate Limit Exceeded',
   };
   return labels[eventType] || eventType;
 }
