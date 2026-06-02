@@ -56,7 +56,7 @@ pub async fn rotate_api_key(
     let (name, description) = old_key.unwrap_or((None, None));
 
     sqlx::query(
-        "INSERT INTO api_keys (customer_id, name, description, key_hash, key_prefix, is_test, rotated_from) VALUES ($1, $2, $3, $4, $5, false, $6)"
+        "INSERT INTO api_keys (customer_id, name, description, api_key_hash, api_key_prefix, is_test, rotated_from) VALUES ($1, $2, $3, $4, $5, false, $6)"
     )
     .bind(customer_id).bind(name).bind(description).bind(&key_hash).bind(key_prefix).bind(key_id)
     .execute(&mut *tx).await?;
