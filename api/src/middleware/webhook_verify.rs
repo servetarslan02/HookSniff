@@ -52,6 +52,12 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
             .cloned()
             .unwrap_or_default();
 
+        // Get old signing secret for rotation support (24h overlap)
+        let old_signing_secret = req
+            .extensions()
+            .get::<Option<String>>()
+            .and_then(|v| v.clone());
+
         if !signing_secret.is_empty() {
             // Get the body for verification
             let body = std::mem::replace(req.body_mut(), Body::empty());
@@ -70,59 +76,30 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
                         .and_then(|v| v.parse::<i64>().ok())
                 });
 
-            match signing::verify_standard_signature(
+            match signing::verify_with_rotation(
                 &signing_secret,
-                &id,
-                &ts,
-                &sig,
+                old_signing_secret.as_deref(),
                 &body_str,
-                tolerance,
+                &sig,
+                None, // secret_rotated_at not available in middleware context
             ) {
-                Ok(()) => {
+                true => {
                     // Reconstruct the request with the consumed body
                     *req.body_mut() = Body::from(body_bytes);
                     Ok(next.run(req).await)
                 }
-                Err(e) => {
-                    // The common VerificationError doesn't include MissingHeader
-                    // (headers are already extracted above), so use debug format
-                    // to distinguish error types for appropriate HTTP status codes.
-                    let err_str = format!("{:?}", e);
-                    if err_str.contains("TimestampExpired") {
-                        tracing::warn!("Webhook timestamp expired");
-                        Err((
-                            StatusCode::BAD_REQUEST,
-                            axum::Json(json!({
-                                "error": {
-                                    "code": "TIMESTAMP_EXPIRED",
-                                    "message": "Webhook timestamp expired"
-                                }
-                            })),
-                        )
-                            .into_response())
-                    } else if err_str.contains("InvalidTimestamp") {
-                        Err((
-                            StatusCode::BAD_REQUEST,
-                            axum::Json(json!({
-                                "error": {
-                                    "code": "INVALID_TIMESTAMP",
-                                    "message": "Invalid webhook timestamp"
-                                }
-                            })),
-                        )
-                            .into_response())
-                    } else {
-                        Err((
-                            StatusCode::UNAUTHORIZED,
-                            axum::Json(json!({
-                                "error": {
-                                    "code": "INVALID_SIGNATURE",
-                                    "message": "Webhook signature verification failed"
-                                }
-                            })),
-                        )
-                            .into_response())
-                    }
+                false => {
+                    tracing::warn!("Webhook signature verification failed");
+                    Err((
+                        StatusCode::UNAUTHORIZED,
+                        axum::Json(json!({
+                            "error": {
+                                "code": "INVALID_SIGNATURE",
+                                "message": "Webhook signature verification failed"
+                            }
+                        })),
+                    )
+                        .into_response())
                 }
             }
         } else {
