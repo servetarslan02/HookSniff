@@ -44,6 +44,7 @@ pub struct AdvancedForecaster {
     seasonal_hourly: Vec<f64>,
     seasonal_daily: Vec<f64>,
     hourly_period: usize,
+    #[allow(dead_code)]
     daily_period: usize,
     residuals: Vec<f64>,
     n: usize,

@@ -170,7 +170,7 @@ async fn train_endpoint(pool: &PgPool, endpoint_id: uuid::Uuid) -> Result<(), sq
     bandit::init_if_needed(pool, endpoint_id).await?;
 
     // Record features for analytics (non-blocking)
-    for (i, sr) in success_rates.iter().rev().take(1).enumerate() {
+    for (_i, sr) in success_rates.iter().rev().take(1).enumerate() {
         let _ = record_feature(pool, endpoint_id, "latest_success_rate", *sr).await;
         if let Some(lat) = latencies.last() {
             let _ = record_feature(pool, endpoint_id, "latest_latency", *lat).await;

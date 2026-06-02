@@ -167,7 +167,7 @@ pub async fn extract_features(
 
     // 24h features
     if stats.len() > 1 {
-        let (t24, s24, lat24, _, _) = stats.iter().fold((0.0f64, 0.0f64, 0.0f64, 0.0f64, 0i32), |acc, (t, s, l, p, _)| {
+        let (t24, s24, _lat24, _, _) = stats.iter().fold((0.0f64, 0.0f64, 0.0f64, 0.0f64, 0i32), |acc, (t, s, l, p, _)| {
             (acc.0 + t, acc.1 + s, acc.2 + l, acc.3 + *p as f64, 0)
         });
         let sr_24h = if t24 > 0.0 { s24 / t24 * 100.0 } else { 100.0 };
