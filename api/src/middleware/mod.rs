@@ -2,6 +2,7 @@ pub mod bot_detection;
 pub mod idempotency;
 pub mod ip_blocklist;
 pub mod webhook_verify;
+pub mod zero_trust;
 
 use axum::{extract::Request, http::header::{HeaderValue, AUTHORIZATION}, middleware::Next, response::Response};
 use sqlx::PgPool;
