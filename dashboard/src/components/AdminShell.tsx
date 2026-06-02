@@ -162,7 +162,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    document.title = 'HookSniff — Webhook Teslimat Servisi';
+    document.title = 'HookSniff — Webhook Delivery Service';
   }, []);
 
   useEffect(() => {
