@@ -79,14 +79,25 @@ pub async fn zero_trust_middleware(
     .await;
 
     if threat.is_threat {
+        // Block if action is Block OR confidence is very high (rapor: "Görüyor ve vuruyor")
+        if matches!(threat.action, crate::security::threat_detector::ThreatAction::Block) || threat.confidence > 0.8 {
+            tracing::warn!(
+                customer_id = %customer.id,
+                threat_type = ?threat.threat_type,
+                confidence = threat.confidence,
+                details = %threat.details,
+                "🔒 Threat detected — blocking request"
+            );
+            return Err(AppError::Forbidden);
+        }
+        // Lower severity: warn + continue (rate limit layer handles throttling)
         tracing::warn!(
             customer_id = %customer.id,
             threat_type = ?threat.threat_type,
             confidence = threat.confidence,
             details = %threat.details,
-            "⚠️ Threat detected — blocking request"
+            "⚠️ Threat detected — logged, request allowed"
         );
-        return Err(AppError::Forbidden);
     }
 
     Ok(next.run(request).await)
