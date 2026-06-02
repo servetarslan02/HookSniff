@@ -60,7 +60,7 @@ pub async fn verify_request(
 
     // 3. Check IP reputation
     let ip_blocked: Option<(bool,)> = sqlx::query_as(
-        "SELECT EXISTS(SELECT 1 FROM ip_blocks WHERE ip_address = $1 AND is_active = true)"
+        "SELECT EXISTS(SELECT 1 FROM ip_blocklist WHERE ip_address = $1 AND is_active = true)"
     )
     .bind(ip)
     .fetch_optional(pool)
