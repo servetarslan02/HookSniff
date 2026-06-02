@@ -36,8 +36,7 @@ services:
     envVars:
       - key: APP_ENV
         value: production
-      - key: PORT
-        value: "3000"
+      # Do not set PORT — Render injects it (e.g. 10000). Hardcoding 3000 breaks deploy health checks.
       - key: RUST_LOG
         value: info,hooksniff=info
       - key: LOG_FORMAT
@@ -45,6 +44,10 @@ services:
       - key: DATABASE_URL
         sync: false  # Set in Render dashboard
       - key: REDIS_URL
+        sync: false  # Prefer Upstash rediss:// URL in dashboard
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
         sync: false
       - key: HMAC_SECRET
         generateValue: true

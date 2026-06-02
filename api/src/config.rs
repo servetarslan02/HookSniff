@@ -9,6 +9,19 @@ use std::fmt;
 ///    Upstash REST URL format: `https://host.upstash.io`
 ///    → TCP URL: `rediss://default:<token>@host:6379`
 ///
+/// Max wait for optional Redis clients during API startup (Render deploy probe window).
+pub fn redis_startup_timeout() -> std::time::Duration {
+    let prod = matches!(
+        std::env::var("APP_ENV").as_deref(),
+        Ok("production") | Ok("prod")
+    );
+    if prod {
+        std::time::Duration::from_secs(2)
+    } else {
+        std::time::Duration::from_secs(5)
+    }
+}
+
 /// Returns `None` if neither is available.
 pub fn resolve_redis_url() -> Option<String> {
     // 1. Explicit REDIS_URL takes priority
