@@ -68,5 +68,25 @@ pub async fn zero_trust_middleware(
         );
     }
 
+    // Also run threat detection (now with customer_id available)
+    let threat = crate::security::threat_detector::analyze_request(
+        &pool,
+        &ip,
+        Some(customer.id),
+        path,
+        method,
+    )
+    .await;
+
+    if threat.is_threat {
+        tracing::warn!(
+            customer_id = %customer.id,
+            threat_type = ?threat.threat_type,
+            confidence = threat.confidence,
+            details = %threat.details,
+            "⚠️ Threat detected"
+        );
+    }
+
     Ok(next.run(request).await)
 }
