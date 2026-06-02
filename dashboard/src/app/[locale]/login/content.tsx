@@ -28,8 +28,7 @@ function getPasswordStrength(pw: string): { score: number; color: string } {
 
 function LoginForm() {
   const searchParams = useSearchParams();
-  const initialMode = searchParams.get('mode') === 'register' ? 'register' : 'login';
-  const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -44,6 +43,12 @@ function LoginForm() {
   const tc = useTranslations('common');
   const passwordStrength = mode === 'register' ? getPasswordStrength(password) : null;
   const isSubmitting = useRef(false);
+
+  // Read mode from searchParams on client side (avoids SSR hydration mismatch)
+  useEffect(() => {
+    const m = searchParams.get('mode');
+    if (m === 'register') setMode('register');
+  }, [searchParams]);
 
   // Reset oauthLoading if the page regains focus (redirect was blocked/cancelled)
   useEffect(() => {
