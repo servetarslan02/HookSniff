@@ -25,12 +25,16 @@ const ALLOWED_BOTS: &[&str] = &[
     "python-requests", "httpie",
 ];
 
-/// Suspicious request patterns
+/// Suspicious request patterns (expanded)
 const SCANNER_PATHS: &[&str] = &[
     "/.env", "/wp-admin", "/wp-login", "/xmlrpc.php",
     "/phpmyadmin", "/admin/config", "/.git/config",
+    "/.git/HEAD", "/.gitignore", "/.svn",
     "/actuator", "/debug", "/console", "/shell",
     "/api/v1/../", "/api/v1/..%2f",
+    "/cgi-bin", "/scripts", "/setup", "/install",
+    "/.well-known/security.txt", "/favicon.ico/.env",
+    "/telemetry", "/metrics/prometheus", "/server-status",
 ];
 
 /// Bot detection result
