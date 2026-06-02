@@ -412,28 +412,31 @@ async fn execute_stage(
             Ok(decisions)
         }
         CortexStage::DriftDetection => {
-            let endpoints: Vec<(uuid::Uuid,)> = sqlx::query_as(
-                "SELECT DISTINCT endpoint_id FROM endpoint_hourly_stats ORDER BY endpoint_id"
+            // BATCH: Fetch ALL endpoint stats in ONE query instead of N queries
+            let all_stats: Vec<(uuid::Uuid, f64, f64)> = sqlx::query_as(
+                r#"
+                WITH latest AS (
+                    SELECT DISTINCT ON (endpoint_id)
+                        endpoint_id,
+                        COALESCE(total_deliveries, 0)::FLOAT as total,
+                        COALESCE(successful, 0)::FLOAT as ok,
+                        COALESCE(avg_latency_ms, 0)::FLOAT as latency
+                    FROM endpoint_hourly_stats
+                    ORDER BY endpoint_id, hour_start DESC
+                )
+                SELECT endpoint_id,
+                    CASE WHEN total > 0 THEN ok / total * 100.0 ELSE 100.0 END,
+                    latency
+                FROM latest
+                "#
             ).fetch_all(pool).await?;
+
             let mut drift_count = 0u64;
-            for (eid,) in &endpoints {
-                // Son saatlik verileri al
-                let stats: Vec<(f64, f64, f64, f64)> = sqlx::query_as(
-                    "SELECT COALESCE(total_deliveries,0)::FLOAT, COALESCE(successful,0)::FLOAT, COALESCE(avg_latency_ms,0)::FLOAT, COALESCE(p95_latency_ms,0)::FLOAT
-                     FROM endpoint_hourly_stats WHERE endpoint_id = $1 ORDER BY hour_start DESC LIMIT 24"
-                ).bind(eid).fetch_all(pool).await?;
-
-                if stats.len() < 3 { continue; }
-
-                // Drift analyzer yükle veya oluştur
+            for (eid, sr, latency) in &all_stats {
                 let mut analyzer = super::ml::drift_detection::load_or_create_analyzer(pool, *eid).await?;
 
-                // Son veriyi analiz et
-                let (total, successful, latency, _p95) = stats[0];
-                let sr = if total > 0.0 { successful / total * 100.0 } else { 100.0 };
-                let result = analyzer.analyze(sr, latency);
+                let result = analyzer.analyze(*sr, *latency);
 
-                // Sonucu kaydet
                 super::ml::drift_detection::save_analyzer_state(pool, *eid, &analyzer).await?;
 
                 if result.is_drifting {
@@ -445,13 +448,11 @@ async fn execute_stage(
                         eid, result.drift_type, result.severity, result.features_affected, result.recommended_action, event_id
                     );
 
-                    // Kritik drift — hemen yeniden eğitim tetikle
                     if result.severity > 0.7 {
                         if let Err(e) = super::ml::train_endpoint_for_drift(pool, *eid).await {
                             tracing::error!("Failed to retrain after drift for {}: {:?}", eid, e);
                         } else {
                             tracing::info!("🔄 Retrained models for endpoint {} after drift", eid);
-                            // Drift sonrası baseline sıfırla
                             sqlx::query("UPDATE ml_models SET parameters = jsonb_set(parameters, '{baseline_collected}', 'false') WHERE endpoint_id = $1 AND model_type = 'drift_detector'")
                                 .bind(eid).execute(pool).await?;
                         }
