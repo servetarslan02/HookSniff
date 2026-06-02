@@ -93,6 +93,33 @@ pub fn spawn_background_jobs(
         }
     });
 
+    // ── Compliance audit (daily, distributed lock) ──
+    let compliance_pool = pool.clone();
+    let compliance_queue = job_queue.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(6 * 60 * 60)).await; // Every 6 hours
+            let should_run = if let Some(ref queue) = compliance_queue {
+                queue.try_acquire_lock("compliance_audit", 3600).await.unwrap_or(true)
+            } else {
+                true
+            };
+            if should_run {
+                let results = crate::security::compliance::run_compliance_checks(&compliance_pool).await;
+                let failed: Vec<_> = results.iter().filter(|r| !r.passed).collect();
+                if !failed.is_empty() {
+                    tracing::warn!(
+                        failed_count = failed.len(),
+                        "⚠️ Compliance audit found issues: {}",
+                        failed.iter().map(|r| format!("{}: {}", r.check_name, r.details)).collect::<Vec<_>>().join("; ")
+                    );
+                } else {
+                    tracing::info!("✅ Compliance audit: all checks passed");
+                }
+            }
+        }
+    });
+
     // ── Daily webhook count reset (every 24 hours) ──────────────
     let daily_reset_pool = pool.clone();
     tokio::spawn(async move {

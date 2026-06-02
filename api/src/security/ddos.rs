@@ -1,37 +1,12 @@
 //! DDoS Protection — Multi-Layer Rate Limiting
 //!
-//! Provides 4-layer DDoS protection:
-//! 1. IP-based rate limiting
-//! 2. Endpoint-based rate limiting  
-//! 3. Global rate limiting
-//! 4. Behavioral analysis
+//! Uses Upstash Redis for distributed rate limiting across instances.
+//! Falls back to in-memory if Redis unavailable.
 
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::RwLock;
-
-/// Sliding window rate limiter entry
-struct RateLimitEntry {
-    requests: Vec<Instant>,
-}
-
-impl RateLimitEntry {
-    fn new() -> Self {
-        Self { requests: Vec::new() }
-    }
-
-    /// Count requests within the window and prune old entries
-    fn count_in_window(&mut self, window: Duration) -> usize {
-        let cutoff = Instant::now() - window;
-        self.requests.retain(|t| *t > cutoff);
-        self.requests.len()
-    }
-
-    fn add_request(&mut self) {
-        self.requests.push(Instant::now());
-    }
-}
 
 /// Rate limiter result
 pub struct RateLimitResult {
@@ -40,132 +15,114 @@ pub struct RateLimitResult {
     pub retry_after: Option<Duration>,
 }
 
-/// Multi-layer DDoS protection
+/// Multi-layer DDoS protection with Redis backing
 pub struct DdosProtection {
-    /// Layer 1: Per-IP limits
-    ip_limits: Arc<RwLock<HashMap<String, RateLimitEntry>>>,
-    /// Layer 2: Per-endpoint limits
-    endpoint_limits: Arc<RwLock<HashMap<String, RateLimitEntry>>>,
-    /// Layer 3: Global limits
-    global_limit: Arc<RwLock<RateLimitEntry>>,
-    /// Layer 4: Per-customer limits
-    customer_limits: Arc<RwLock<HashMap<String, RateLimitEntry>>>,
+    /// In-memory fallback for when Redis is unavailable
+    memory_limits: Arc<RwLock<HashMap<String, Vec<Instant>>>>,
 }
 
 impl DdosProtection {
     pub fn new() -> Self {
         Self {
-            ip_limits: Arc::new(RwLock::new(HashMap::new())),
-            endpoint_limits: Arc::new(RwLock::new(HashMap::new())),
-            global_limit: Arc::new(RwLock::new(RateLimitEntry::new())),
-            customer_limits: Arc::new(RwLock::new(HashMap::new())),
+            memory_limits: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
-    /// Check IP rate limit (1000 req/min)
+    /// Check IP rate limit (1000 req/min) — uses Redis if available, memory fallback
     pub async fn check_ip(&self, ip: &str) -> RateLimitResult {
-        let mut limits = self.ip_limits.write().await;
-        let entry = limits.entry(ip.to_string()).or_insert_with(RateLimitEntry::new);
-        let count = entry.count_in_window(Duration::from_secs(60));
-        
-        if count >= 1000 {
-            RateLimitResult {
-                allowed: false,
-                remaining: 0,
-                retry_after: Some(Duration::from_secs(60)),
-            }
-        } else {
-            entry.add_request();
-            RateLimitResult {
-                allowed: true,
-                remaining: (1000 - count - 1) as u64,
-                retry_after: None,
-            }
-        }
-    }
-
-    /// Check endpoint rate limit (100 req/min per endpoint)
-    pub async fn check_endpoint(&self, endpoint_id: &str) -> RateLimitResult {
-        let mut limits = self.endpoint_limits.write().await;
-        let entry = limits.entry(endpoint_id.to_string()).or_insert_with(RateLimitEntry::new);
-        let count = entry.count_in_window(Duration::from_secs(60));
-        
-        if count >= 100 {
-            RateLimitResult {
-                allowed: false,
-                remaining: 0,
-                retry_after: Some(Duration::from_secs(60)),
-            }
-        } else {
-            entry.add_request();
-            RateLimitResult {
-                allowed: true,
-                remaining: (100 - count - 1) as u64,
-                retry_after: None,
-            }
-        }
+        self.check_rate_limit(ip, 1000, 60).await
     }
 
     /// Check global rate limit (10000 req/min)
     pub async fn check_global(&self) -> RateLimitResult {
-        let mut limit = self.global_limit.write().await;
-        let count = limit.count_in_window(Duration::from_secs(60));
-        
-        if count >= 10000 {
+        self.check_rate_limit("global", 10000, 60).await
+    }
+
+    /// Generic rate limit check
+    async fn check_rate_limit(&self, key: &str, max: usize, window_secs: u64) -> RateLimitResult {
+        // Try Redis first
+        if let Some(redis_url) = crate::config::resolve_redis_url() {
+            if let Ok(result) = self.check_redis(&redis_url, key, max, window_secs).await {
+                return result;
+            }
+        }
+        // Fallback to in-memory
+        self.check_memory(key, max, window_secs).await
+    }
+
+    /// Redis-based rate limiting using INCR + EXPIRE
+    async fn check_redis(&self, redis_url: &str, key: &str, max: usize, window_secs: u64) -> Result<RateLimitResult, ()> {
+        let client = redis::Client::open(redis_url).map_err(|_| ())?;
+        let mut conn = redis::aio::ConnectionManager::new(client).await.map_err(|_| ())?;
+
+        let redis_key = format!("ddos:{}:{}", key, window_secs);
+        let count: i64 = redis::cmd("INCR")
+            .arg(&redis_key)
+            .query_async(&mut conn)
+            .await
+            .map_err(|_| ())?;
+
+        if count == 1 {
+            // First request in window — set expiry
+            let _: () = redis::cmd("EXPIRE")
+                .arg(&redis_key)
+                .arg(window_secs)
+                .query_async(&mut conn)
+                .await
+                .map_err(|_| ())?;
+        }
+
+        if count as usize > max {
+            // Get TTL for retry-after
+            let ttl: i64 = redis::cmd("TTL")
+                .arg(&redis_key)
+                .query_async(&mut conn)
+                .await
+                .unwrap_or(window_secs as i64);
+
+            Ok(RateLimitResult {
+                allowed: false,
+                remaining: 0,
+                retry_after: Some(Duration::from_secs(ttl.max(1) as u64)),
+            })
+        } else {
+            Ok(RateLimitResult {
+                allowed: true,
+                remaining: (max as i64 - count).max(0) as u64,
+                retry_after: None,
+            })
+        }
+    }
+
+    /// In-memory fallback rate limiting
+    async fn check_memory(&self, key: &str, max: usize, window_secs: u64) -> RateLimitResult {
+        let mut limits = self.memory_limits.write().await;
+        let entry = limits.entry(key.to_string()).or_insert_with(Vec::new);
+        let cutoff = Instant::now() - Duration::from_secs(window_secs);
+        entry.retain(|t| *t > cutoff);
+
+        if entry.len() >= max {
             RateLimitResult {
                 allowed: false,
                 remaining: 0,
-                retry_after: Some(Duration::from_secs(60)),
+                retry_after: Some(Duration::from_secs(window_secs)),
             }
         } else {
-            limit.add_request();
+            entry.push(Instant::now());
             RateLimitResult {
                 allowed: true,
-                remaining: (10000 - count - 1) as u64,
+                remaining: (max - entry.len()) as u64,
                 retry_after: None,
             }
         }
     }
 
-    /// Check customer rate limit (plan-based)
-    pub async fn check_customer(&self, customer_id: &str, limit_per_min: usize) -> RateLimitResult {
-        let mut limits = self.customer_limits.write().await;
-        let entry = limits.entry(customer_id.to_string()).or_insert_with(RateLimitEntry::new);
-        let count = entry.count_in_window(Duration::from_secs(60));
-        
-        if count >= limit_per_min {
-            RateLimitResult {
-                allowed: false,
-                remaining: 0,
-                retry_after: Some(Duration::from_secs(60)),
-            }
-        } else {
-            entry.add_request();
-            RateLimitResult {
-                allowed: true,
-                remaining: (limit_per_min - count - 1) as u64,
-                retry_after: None,
-            }
-        }
-    }
-
-    /// Periodic cleanup of stale entries (call every 5 minutes)
+    /// Periodic cleanup of stale in-memory entries
     pub async fn cleanup(&self) {
         let cutoff = Instant::now() - Duration::from_secs(300);
-        
-        self.ip_limits.write().await.retain(|_, entry| {
-            entry.requests.retain(|t| *t > cutoff);
-            !entry.requests.is_empty()
-        });
-        
-        self.endpoint_limits.write().await.retain(|_, entry| {
-            entry.requests.retain(|t| *t > cutoff);
-            !entry.requests.is_empty()
-        });
-        
-        self.customer_limits.write().await.retain(|_, entry| {
-            entry.requests.retain(|t| *t > cutoff);
-            !entry.requests.is_empty()
+        self.memory_limits.write().await.retain(|_, entries| {
+            entries.retain(|t| *t > cutoff);
+            !entries.is_empty()
         });
     }
 }
