@@ -418,14 +418,14 @@ async fn execute_stage(
                 WITH latest AS (
                     SELECT DISTINCT ON (endpoint_id)
                         endpoint_id,
-                        COALESCE(total_deliveries, 0)::FLOAT as total,
-                        COALESCE(successful, 0)::FLOAT as ok,
+                        COALESCE(total_deliveries, 0)::NUMERIC as total,
+                        COALESCE(successful, 0)::NUMERIC as ok,
                         COALESCE(avg_latency_ms, 0)::FLOAT as latency
                     FROM endpoint_hourly_stats
                     ORDER BY endpoint_id, hour_start DESC
                 )
                 SELECT endpoint_id,
-                    CASE WHEN total > 0 THEN ok / total * 100.0 ELSE 100.0 END,
+                    CASE WHEN total > 0 THEN (ok / total * 100.0)::FLOAT ELSE 100.0 END,
                     latency
                 FROM latest
                 "#
