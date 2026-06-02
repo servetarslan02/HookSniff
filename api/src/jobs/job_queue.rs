@@ -45,7 +45,7 @@ pub enum EmailTemplate {
 
 /// Redis-backed job queue.
 ///
-/// Uses Redis lists (LPUSH/BRPOP) for reliable job delivery.
+/// Uses Redis lists (LPUSH/RPOP) for reliable job delivery.
 /// Scheduled jobs use distributed locks to prevent duplicate execution
 /// across multiple API instances.
 #[derive(Clone)]
@@ -93,7 +93,7 @@ impl JobQueue {
     }
 
     /// Process jobs from the queue in a loop.
-    /// This function never returns — it blocks on BRPOP and processes jobs.
+    /// This function never returns — it polls Redis and processes jobs.
     pub async fn process_jobs(
         self,
         email_provider: crate::email::EmailProvider,
@@ -103,7 +103,9 @@ impl JobQueue {
         tracing::info!("🔄 Job queue worker started");
         loop {
             match self.poll_one_job(&email_provider, fcm.as_ref(), &pool).await {
-                Ok(()) => {}
+                Ok(()) => {
+                    tokio::time::sleep(Duration::from_millis(500)).await;
+                }
                 Err(e) => {
                     tracing::error!("❌ Job processing error: {:?}", e);
                     // Brief pause before retrying to avoid tight error loops
@@ -113,7 +115,7 @@ impl JobQueue {
         }
     }
 
-    /// Poll and process a single job. Blocks up to 5 seconds waiting for a job.
+    /// Poll and process a single job if one is available.
     async fn poll_one_job(
         &self,
         email_provider: &crate::email::EmailProvider,
@@ -122,16 +124,14 @@ impl JobQueue {
     ) -> Result<()> {
         let mut conn = self.conn.clone();
 
-        // BRPOP blocks until a job arrives (or timeout)
-        let result: Option<(String, String)> = redis::cmd("BRPOP")
+        let result: Option<String> = redis::cmd("RPOP")
             .arg("hooksniff:jobs")
-            .arg(5) // 5 second timeout
             .query_async(&mut conn)
             .await?;
 
-        let (_key, payload) = match result {
-            Some(r) => r,
-            None => return Ok(()), // Timeout, no job — loop again
+        let payload = match result {
+            Some(payload) => payload,
+            None => return Ok(()),
         };
 
         let job: Job = serde_json::from_str(&payload)?;
