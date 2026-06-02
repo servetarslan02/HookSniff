@@ -113,6 +113,7 @@ pub fn api_router() -> Router {
         .nest("/service-tokens", service_tokens::router())
         .nest("/cortex", cortex::router())
         .nest("/ws", ws::router())
+        .layer(axum_middleware::from_fn(crate::middleware::zero_trust::zero_trust_middleware))
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     // Inbound webhooks — config routes need auth, provider routes are public (signature-verified)
