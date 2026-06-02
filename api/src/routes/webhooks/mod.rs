@@ -2,6 +2,7 @@ pub mod crud;
 pub mod create;
 pub mod replay;
 mod helpers;
+#[cfg(test)]
 mod tests;
 
 use axum::routing::{get, post};

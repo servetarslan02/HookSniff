@@ -109,11 +109,11 @@ async fn auto_block_ip(pool: &PgPool, ip: &str, reason: &str) -> Result<(), sqlx
 
 /// Send alert to admin (via security events table)
 async fn alert_admin(
-    pool: &PgPool,
+    _pool: &PgPool,
     incident_type: &IncidentType,
     severity: &IncidentSeverity,
     ip: &str,
-    details: &serde_json::Value,
+    _details: &serde_json::Value,
 ) -> Result<(), sqlx::Error> {
     // The admin notification system reads from security_events
     // This is picked up by the AdminNotificationCenter in the dashboard

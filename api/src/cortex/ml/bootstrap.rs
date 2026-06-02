@@ -34,6 +34,7 @@ struct ErrorProfile {
     timeout_pct: f64,
     server_error_pct: f64,
     connection_error_pct: f64,
+    #[allow(dead_code)]
     rate_limit_pct: f64,
 }
 

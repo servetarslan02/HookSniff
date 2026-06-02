@@ -17,7 +17,7 @@ pub async fn verify_request(
     pool: &PgPool,
     customer_id: Uuid,
     ip: &str,
-    user_agent: &str,
+    _user_agent: &str,
     path: &str,
     method: &str,
 ) -> ZtVerification {
