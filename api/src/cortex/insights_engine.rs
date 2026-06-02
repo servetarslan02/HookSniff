@@ -110,8 +110,8 @@ pub async fn generate_weekly_report(
 ) -> Result<serde_json::Value, sqlx::Error> {
     let endpoints: Vec<(String, f64, f64, i32, i32)> = sqlx::query_as(
         r#"
-        SELECT e.url, COALESCE(ep.success_rate_7d, 100.0), COALESCE(ep.latency_p95::FLOAT, 0.0),
-               COALESCE(ep.sample_size, 0), COALESCE(ep.confidence * 100, 0)::INT
+        SELECT e.url, COALESCE(ep.success_rate_7d, 100.0)::FLOAT, COALESCE(ep.latency_p95::FLOAT, 0.0),
+               COALESCE(ep.sample_size, 0)::INT, COALESCE(ep.confidence * 100, 0)::INT
         FROM endpoints e
         LEFT JOIN endpoint_profiles ep ON ep.endpoint_id = e.id
         WHERE e.customer_id = $1 AND e.is_active = true
