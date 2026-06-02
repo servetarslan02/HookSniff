@@ -69,7 +69,8 @@ pub async fn rotate_api_key(
     Ok(new_key)
 }
 
-/// Rotate endpoint signing secret with 24h overlap
+/// Rotate endpoint signing secret with 24h overlap.
+/// Old secret stays valid for 24h via `previous_signing_secret` column.
 pub async fn rotate_signing_secret(
     pool: &PgPool,
     endpoint_id: Uuid,
@@ -77,6 +78,7 @@ pub async fn rotate_signing_secret(
 ) -> Result<(String, String), sqlx::Error> {
     let new_secret = format!("whsec_{}", generate_api_key());
 
+    // Get current secret
     let current: Option<(String,)> = sqlx::query_as(
         "SELECT signing_secret FROM endpoints WHERE id = $1 AND customer_id = $2"
     )
@@ -85,9 +87,16 @@ pub async fn rotate_signing_secret(
 
     let old_secret = current.map(|(s,)| s).unwrap_or_default();
 
-    sqlx::query("UPDATE endpoints SET signing_secret = $1, secret_rotated_at = NOW() WHERE id = $2 AND customer_id = $3")
-        .bind(&new_secret).bind(endpoint_id).bind(customer_id)
-        .execute(pool).await?;
+    // Save old secret as previous (24h overlap) + set new secret
+    sqlx::query(
+        "UPDATE endpoints SET \
+         old_signing_secret = signing_secret, \
+         secret_rotated_at = NOW(), \
+         signing_secret = $1 \
+         WHERE id = $2 AND customer_id = $3"
+    )
+    .bind(&new_secret).bind(endpoint_id).bind(customer_id)
+    .execute(pool).await?;
 
     crate::audit::log_action(pool, customer_id, "signing_secret_rotated", "endpoint",
         Some(&endpoint_id.to_string()), Some(serde_json::json!({ "overlap_hours": 24 })), None, None
