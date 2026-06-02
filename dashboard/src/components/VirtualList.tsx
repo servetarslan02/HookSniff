@@ -27,7 +27,7 @@ export function VirtualList<T>({
   renderItem,
   keyExtractor,
   className = '',
-  emptyMessage = 'Veri bulunamadı',
+  emptyMessage = 'No data found',
 }: VirtualListProps<T>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
