@@ -84,8 +84,9 @@ pub async fn zero_trust_middleware(
             threat_type = ?threat.threat_type,
             confidence = threat.confidence,
             details = %threat.details,
-            "⚠️ Threat detected"
+            "⚠️ Threat detected — blocking request"
         );
+        return Err(AppError::Forbidden);
     }
 
     Ok(next.run(request).await)
