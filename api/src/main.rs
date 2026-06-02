@@ -234,7 +234,9 @@ async fn main() -> Result<()> {
         // Security middleware
         .layer(axum::Extension(std::sync::Arc::new(middleware::ip_blocklist::IpBlocklistCache::new())))
         .layer(axum::middleware::from_fn(middleware::ip_blocklist::ip_blocklist_middleware))
-        .layer(axum::middleware::from_fn(middleware::bot_detection::bot_detection_middleware));
+        .layer(axum::middleware::from_fn(middleware::bot_detection::bot_detection_middleware))
+        .layer(axum::Extension(std::sync::Arc::new(hooksniff_api::security::ddos::DdosProtection::new())))
+        .layer(axum::middleware::from_fn(middleware::ddos::ddos_middleware));
 
     // ── Start server ────────────────────────────────────────────
     let addr = format!("0.0.0.0:{}", cfg.port);
