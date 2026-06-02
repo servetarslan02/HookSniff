@@ -1,4 +1,5 @@
 pub mod bot_detection;
+pub mod ddos;
 pub mod idempotency;
 pub mod ip_blocklist;
 pub mod webhook_verify;
