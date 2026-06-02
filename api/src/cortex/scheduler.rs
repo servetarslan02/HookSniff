@@ -185,29 +185,32 @@ async fn run_stage_with_timeout(
     let run_id = uuid::Uuid::new_v4().to_string();
     let started_at = chrono::Utc::now();
 
-    if !super::try_cortex_lock(pool, lock_name, timeout.as_secs() as i64).await {
-        tracing::debug!("⏭️  Cortex [{}] — lock busy, skipping", stage.name());
-        // Trace: skipped
-        let _ = super::ml::cortex_tracing::record_trace(pool, &super::ml::cortex_tracing::CortexTrace {
-            run_id: run_id.clone(),
-            stage_name: stage.name().to_string(),
-            duration_ms: 0,
-            items_processed: 0,
-            status: "skipped".to_string(),
-            error_message: Some("lock_busy".to_string()),
-            started_at,
-            completed_at: chrono::Utc::now(),
-        }).await;
-        return StageResult {
-            stage: stage.name(),
-            outcome: StageOutcome::Skipped("lock_busy"),
-            duration_ms: 0,
-        };
-    }
+    let mut lock_conn = match super::try_cortex_lock(pool, lock_name, timeout.as_secs() as i64).await {
+        Some(conn) => conn,
+        None => {
+            tracing::debug!("⏭️  Cortex [{}] — lock busy, skipping", stage.name());
+            let _ = super::ml::cortex_tracing::record_trace(pool, &super::ml::cortex_tracing::CortexTrace {
+                run_id: run_id.clone(),
+                stage_name: stage.name().to_string(),
+                duration_ms: 0,
+                items_processed: 0,
+                status: "skipped".to_string(),
+                error_message: Some("lock_busy".to_string()),
+                started_at,
+                completed_at: chrono::Utc::now(),
+            }).await;
+            return StageResult {
+                stage: stage.name(),
+                outcome: StageOutcome::Skipped("lock_busy"),
+                duration_ms: 0,
+            };
+        }
+    };
 
     let result = tokio::time::timeout(timeout, execute_stage(pool, stage, config)).await;
 
-    super::release_cortex_lock(pool, lock_name).await;
+    // Release lock on the SAME connection, then return to pool
+    super::release_cortex_lock(&mut lock_conn, lock_name).await;
 
     let duration_ms = start.elapsed().as_millis() as u64;
     let completed_at = chrono::Utc::now();
@@ -276,13 +279,44 @@ async fn execute_stage(
             Ok(n)
         }
         CortexStage::AnomalyScoring => {
-            let endpoints: Vec<(uuid::Uuid,)> = sqlx::query_as(
-                "SELECT id FROM endpoints WHERE is_active = true"
-            ).fetch_all(pool).await?;
+            // Batch fetch: all active endpoints with their latest stats in ONE query
+            let rows: Vec<(uuid::Uuid, i32, i32, i32, f64, f64, f64, f64, serde_json::Value)> = sqlx::query_as(
+                r#"
+                WITH latest_stats AS (
+                    SELECT DISTINCT ON (endpoint_id)
+                        endpoint_id, total_deliveries, successful, failed,
+                        avg_latency_ms, p95_latency_ms, error_breakdown
+                    FROM endpoint_hourly_stats
+                    ORDER BY endpoint_id, hour_start DESC
+                )
+                SELECT
+                    e.id,
+                    COALESCE(ls.total_deliveries, 0),
+                    COALESCE(ls.successful, 0),
+                    COALESCE(ls.failed, 0),
+                    COALESCE(p.latency_p95, $1)::FLOAT,
+                    COALESCE(p.latency_p99, $2)::FLOAT,
+                    COALESCE(p.success_rate_1h, 100.0)::FLOAT,
+                    COALESCE(p.avg_deliveries_per_hour, 0.0)::FLOAT,
+                    COALESCE(ls.error_breakdown, '{}'::jsonb)
+                FROM endpoints e
+                LEFT JOIN latest_stats ls ON ls.endpoint_id = e.id
+                LEFT JOIN endpoint_profiles p ON p.endpoint_id = e.id
+                WHERE e.is_active = true
+                "#
+            )
+            .bind(config.anomaly_default_p95_ms)
+            .bind(config.anomaly_default_p99_ms)
+            .fetch_all(pool).await?;
+
             let mut scored = 0u64;
-            for (eid,) in &endpoints {
-                if let Ok(Some(result)) = super::anomaly_scorer::score_endpoint(pool, *eid, config).await {
-                    if result.score > config.anomaly_high_threshold {
+            for (eid, total, successful, failed, _p95, _p99, sr_1h, avg_per_hour, _errors) in &rows {
+                if *total == 0 { continue; }
+                let result = super::anomaly_scorer::score_endpoint_from_stats(
+                    pool, *eid, *total, *successful, *failed, *sr_1h, *avg_per_hour, config,
+                ).await;
+                if let Ok(Some(r)) = result {
+                    if r.score > config.anomaly_high_threshold {
                         super::CORTEX_METRICS.anomaly_scores_high.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                     }
                     scored += 1;

@@ -2,8 +2,18 @@
 //!
 //! Automatically takes corrective actions on unhealthy endpoints.
 //! Records all actions in action memory for adaptive learning.
+//!
+//! CIRCUIT BREAKER PATTERN: Instead of looking at just 1 hour and panicking,
+//! we require CONSECUTIVE high anomaly scores over a longer window before
+//! taking destructive actions (auto_disable). Non-destructive actions
+//! (rate_limit_reduce, circuit_tighten) still trigger on single high scores.
 
 use super::config::CortexConfig;
+
+/// Minimum consecutive high anomaly scores before auto-disable (circuit breaker)
+const AUTO_DISABLE_MIN_CONSECUTIVE: i32 = 3;
+/// Window for circuit breaker check (hours)
+const CIRCUIT_BREAKER_WINDOW_HOURS: i32 = 3;
 
 /// Check endpoints and take healing actions if needed.
 /// Returns number of actions taken.
@@ -13,14 +23,15 @@ pub async fn run_healing(
 ) -> Result<u64, sqlx::Error> {
     let mut actions = 0u64;
 
-    // Find endpoints with high anomaly scores (last hour)
+    // Find endpoints with high anomaly scores in the CIRCUIT BREAKER window (3 hours)
+    // Not just 1 hour — prevents panic on temporary network blips
     let sick_endpoints: Vec<(uuid::Uuid, uuid::Uuid, i32, String)> = sqlx::query_as(
         r#"
         SELECT DISTINCT ON (a.endpoint_id) a.endpoint_id, a.customer_id, a.score, a.category
         FROM anomaly_scores a
         JOIN endpoints e ON e.id = a.endpoint_id
         WHERE a.score > $1
-          AND a.created_at > NOW() - INTERVAL '1 hour'
+          AND a.created_at > NOW() - INTERVAL '3 hours'
           AND e.is_active = true
           AND e.auto_disabled = false
         ORDER BY a.endpoint_id, a.created_at DESC
@@ -31,8 +42,38 @@ pub async fn run_healing(
     .await?;
 
     for (endpoint_id, customer_id, score, category) in sick_endpoints {
+        // CIRCUIT BREAKER: Count consecutive high scores in the window
+        let consecutive_high: (i64,) = sqlx::query_as(
+            r#"
+            SELECT COUNT(*) FROM anomaly_scores
+            WHERE endpoint_id = $1
+              AND score > $2
+              AND created_at > NOW() - INTERVAL '3 hours'
+            "#
+        )
+        .bind(endpoint_id)
+        .bind(config.anomaly_high_threshold)
+        .fetch_one(pool)
+        .await
+        .unwrap_or((0,));
+
         let action_type = determine_action_ml(pool, endpoint_id, score, &category, config).await;
-        let reason = format!("Anomaly score {score} ({category})");
+
+        // BLOCK auto_disable unless circuit breaker threshold met
+        let effective_action = if action_type == "auto_disable" && consecutive_high.0 < AUTO_DISABLE_MIN_CONSECUTIVE as i64 {
+            tracing::info!(
+                "🔧 Circuit breaker: endpoint {} has {}/{} consecutive high scores — downgrade auto_disable → circuit_tighten",
+                endpoint_id, consecutive_high.0, AUTO_DISABLE_MIN_CONSECUTIVE
+            );
+            "circuit_tighten".to_string()
+        } else {
+            action_type
+        };
+
+        let reason = format!(
+            "Anomaly score {score} ({category}), {} consecutive high scores in {}h",
+            consecutive_high.0, CIRCUIT_BREAKER_WINDOW_HOURS
+        );
 
         // Record the action
         sqlx::query(
@@ -42,25 +83,25 @@ pub async fn run_healing(
             "#
         )
         .bind(endpoint_id)
-        .bind(&action_type)
+        .bind(&effective_action)
         .bind(&reason)
-        .bind(serde_json::json!({ "score": score, "category": category }))
+        .bind(serde_json::json!({ "score": score, "category": category, "consecutive": consecutive_high.0 }))
         .execute(pool)
         .await?;
 
         // Record in action memory (Stage 5 integration)
         super::action_memory::record_action(
-            pool, endpoint_id, Some(customer_id), &action_type, &reason,
-            serde_json::json!({ "score": score, "category": category }),
+            pool, endpoint_id, Some(customer_id), &effective_action, &reason,
+            serde_json::json!({ "score": score, "category": category, "consecutive": consecutive_high.0 }),
         ).await?;
 
         // Execute the action
-        match action_type.as_str() {
+        match effective_action.as_str() {
             "auto_disable" => {
                 sqlx::query(
                     "UPDATE endpoints SET auto_disabled = true, auto_disabled_at = NOW(), auto_disable_reason = $1 WHERE id = $2"
                 ).bind(&reason).bind(endpoint_id).execute(pool).await?;
-                tracing::warn!("🔧 Cortex: Auto-disabled endpoint {} (score {})", endpoint_id, score);
+                tracing::warn!("🔧 Cortex: Auto-disabled endpoint {} (score {}, {} consecutive)", endpoint_id, score, consecutive_high.0);
             }
             "retry_slowdown" => {
                 // Signal to retry policy to slow down (stored in healing_actions, read by worker)
