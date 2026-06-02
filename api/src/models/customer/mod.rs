@@ -65,6 +65,9 @@ pub struct Customer {
     /// Whether to send email notifications for overage. Default: true.
     #[serde(default = "default_true")]
     pub overage_email_notification: bool,
+    /// When customer accepted overage terms (legal requirement for metered billing)
+    #[serde(default)]
+    pub overage_terms_accepted_at: Option<DateTime<Utc>>,
     /// Card last 4 digits (from payment provider)
     #[serde(default)]
     pub card_last4: Option<String>,

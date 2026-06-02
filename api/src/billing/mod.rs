@@ -222,13 +222,26 @@ impl Plan {
         }
     }
 
-    /// Overage price per event in dollars (USD) — charged when daily limit exceeded
+    /// Overage price per event in microcents (μ¢) — integer-safe for billing.
+    /// 1 microcent = $0.000001. All calculations use i64 to avoid floating point errors.
+    /// Display: divide by 1_000_000 to get dollars.
+    pub fn overage_price_per_event_microcents(&self) -> i64 {
+        match self {
+            Plan::Developer => 0,       // blocked at limit
+            Plan::Startup => 30,        // $0.00003 = 30 μ¢
+            Plan::Pro => 1,             // $0.000001 = 1 μ¢
+            Plan::Enterprise => 0,      // custom
+        }
+    }
+
+    /// Overage price per event in dollars (USD) — DEPRECATED, use overage_price_per_event_microcents()
+    /// Kept for backward compatibility with display-only code.
     pub fn overage_price_per_event(&self) -> f64 {
         match self {
-            Plan::Developer => 0.0,     // blocked at limit
-            Plan::Startup => 0.00003,   // $0.00003/event (0.003 cents)
-            Plan::Pro => 0.000001,      // $0.000001/event (0.0001 cents)
-            Plan::Enterprise => 0.0,    // custom
+            Plan::Developer => 0.0,
+            Plan::Startup => 0.00003,
+            Plan::Pro => 0.000001,
+            Plan::Enterprise => 0.0,
         }
     }
 
