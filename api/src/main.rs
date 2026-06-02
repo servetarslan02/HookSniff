@@ -47,10 +47,18 @@ async fn main() -> Result<()> {
         rate_limit::create_rate_limiter(),
         async {
             if let Some(ref url) = redis_url {
-                match cache::CacheLayer::new(url, cache::API_KEY_TTL).await {
-                    Ok(c) => Some(c),
-                    Err(e) => {
+                // 5s timeout — fail fast instead of blocking startup for 15s+
+                match tokio::time::timeout(
+                    std::time::Duration::from_secs(5),
+                    cache::CacheLayer::new(url, cache::API_KEY_TTL)
+                ).await {
+                    Ok(Ok(c)) => Some(c),
+                    Ok(Err(e)) => {
                         tracing::warn!("Redis cache unavailable ({e}), running without cache");
+                        None
+                    }
+                    Err(_) => {
+                        tracing::warn!("Redis cache connection timed out (5s), running without cache");
                         None
                     }
                 }
@@ -104,7 +112,16 @@ async fn main() -> Result<()> {
     // Event publisher (Redis Streams + local broadcast)
     let event_publisher = if cfg.event_publisher_enabled {
         let redis_url = config::resolve_redis_url();
-        let publisher = events::EventPublisher::new(redis_url.as_deref()).await;
+        let publisher = match tokio::time::timeout(
+            std::time::Duration::from_secs(5),
+            events::EventPublisher::new(redis_url.as_deref())
+        ).await {
+            Ok(p) => p,
+            Err(_) => {
+                tracing::warn!("Redis EventPublisher timed out (5s), using local broadcast");
+                events::EventPublisher::new(None).await
+            }
+        };
         if publisher.has_redis() {
             tracing::info!("✅ Event publisher initialized (Redis Streams)");
         } else {
@@ -143,10 +160,17 @@ async fn main() -> Result<()> {
     let fcm_client = notifications::FcmClient::from_config(&cfg);
 
     let job_queue = match config::resolve_redis_url() {
-        Some(ref url) if !url.is_empty() => match jobs::job_queue::JobQueue::new(url).await {
-            Ok(q) => Some(q),
-            Err(e) => {
+        Some(ref url) if !url.is_empty() => match tokio::time::timeout(
+            std::time::Duration::from_secs(5),
+            jobs::job_queue::JobQueue::new(url)
+        ).await {
+            Ok(Ok(q)) => Some(q),
+            Ok(Err(e)) => {
                 tracing::warn!("Redis job queue unavailable ({}), falling back to tokio::spawn", e);
+                None
+            }
+            Err(_) => {
+                tracing::warn!("Redis job queue timed out (5s), falling back to tokio::spawn");
                 None
             }
         },
@@ -314,12 +338,16 @@ async fn build_sso_store() -> routes::sso::SsoStateStore {
     let mut sso_store = routes::sso::SsoStateStore::new();
     if let Some(url) = config::resolve_redis_url() {
         match redis::Client::open(url.as_str()) {
-            Ok(client) => match redis::aio::ConnectionManager::new(client).await {
-                Ok(conn) => {
+            Ok(client) => match tokio::time::timeout(
+                std::time::Duration::from_secs(5),
+                redis::aio::ConnectionManager::new(client)
+            ).await {
+                Ok(Ok(conn)) => {
                     tracing::info!("✅ SSO state store using Redis");
                     sso_store = sso_store.with_redis(conn);
                 }
-                Err(e) => tracing::warn!("SSO state Redis unavailable ({e}), using in-memory"),
+                Ok(Err(e)) => tracing::warn!("SSO state Redis unavailable ({e}), using in-memory"),
+                Err(_) => tracing::warn!("SSO state Redis timed out (5s), using in-memory"),
             },
             Err(e) => tracing::warn!("SSO state Redis client error ({e}), using in-memory"),
         }
