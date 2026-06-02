@@ -79,14 +79,14 @@ async function EventProcessingPageContent(params: Promise<{ locale: string }>) {
 
       {/* Payload Signing */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Payload İmzalama</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Payload Signing</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Teslimattan önce, HookSniff payload'ı HMAC-SHA256 kullanarak imzalar:
+          Before delivery, HookSniff signs the payload with HMAC-SHA256:
         </p>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-          <li>İmza: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">v1,{'{'}base64(hmac_sha256(secret, body)){'}'}</code></li>
-          <li>Zaman damgası: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">webhook-timestamp</code> (Unix saniye)</li>
-          <li>Teslimat ID: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">webhook-id</code></li>
+          <li>Signature: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">v1,{'{'}base64(hmac_sha256(secret, body)){'}'}</code></li>
+          <li>Timestamp: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">webhook-timestamp</code> (Unix seconds)</li>
+          <li>Delivery ID: <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">webhook-id</code></li>
         </ul>
       </section>
 
@@ -94,26 +94,26 @@ async function EventProcessingPageContent(params: Promise<{ locale: string }>) {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Fanout</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Bir olay birden fazla uç noktaya teslim edilebilir. <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.created</code>'ı dinleyen 5 uç noktanız varsa, HookSniff 5 ayrı teslimat oluşturur — her birinin kendi imza gizli anahtarı, tekrar politikası ve teslimat takibi vardır.
+          A single event can be delivered to multiple endpoints. If you have 5 endpoints listening to <code className="bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-sm text-sm">order.created</code>, HookSniff creates 5 separate deliveries — each with their own signing secret, retry policy, and delivery tracking.
         </p>
       </section>
 
       {/* Ordering */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Sıralama</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Ordering</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          HookSniff olayları uç nokta başına FIFO sırasıyla teslim eder. Her teslimat bir sıra numarası içerir. Bir teslimat başarısız olup tekrar denendiğinde, aynı uç noktaya yapılan sonraki teslimatlar tekrar tamamlanana kadar bekletilir.
+          HookSniff delivers events in FIFO order per endpoint. Each delivery includes a sequence number. When a delivery fails and is retried, subsequent deliveries to the same endpoint are held until the retry completes.
         </p>
       </section>
 
       {/* Timeouts */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Zaman Aşımları</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Timeouts</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">
-          Her teslimat denemesinin 30 saniyelik bir zaman aşımı vardır. Uç noktanız 30 saniye içinde yanıt vermezse, deneme başarısız olarak işaretlenir ve tekrar denenir.
+          Each delivery attempt has a 30-second timeout. If your endpoint doesn't respond within 30 seconds, the attempt is marked as failed and retried.
         </p>
         <p className="text-gray-600 dark:text-slate-400">
-          <strong>En iyi uygulama:</strong> Hemen 200 döndürün ve asenkron işleyin. <Link href="/docs/best-practices" className="text-brand-600 hover:text-brand-700">En İyi Uygulamalar</Link>'a bakın.
+          <strong>Best practice:</strong> Return 200 immediately and process asynchronously. See <Link href="/docs/best-practices" className="text-brand-600 hover:text-brand-700">Best Practices</Link>.
         </p>
       </section>
     </article>
