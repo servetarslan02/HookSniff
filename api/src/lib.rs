@@ -35,6 +35,7 @@ pub mod resend_email;
 pub mod retry_policy;
 pub mod routes;
 pub mod schemas;
+pub mod security;
 pub mod security_monitor;
 pub mod signing;
 pub mod ssrf;
