@@ -27,7 +27,9 @@ pub fn init(cfg: &crate::config::Config) -> TracerGuard {
             .unwrap_or(false);
 
     let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cfg.rust_log));
+        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cfg.rust_log))
+        // Suppress noisy PostgreSQL advisory lock notices
+        .add_directive("sqlx::postgres::notice=error".parse().unwrap());
 
     if cfg.otel_enabled {
         init_otel(env_filter, use_json, cfg)
