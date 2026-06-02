@@ -2,8 +2,18 @@ use axum::http::StatusCode;
 use axum::Json;
 use serde::Serialize;
 use serde_json::{json, Value};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::OnceLock;
 use std::time::Instant;
+
+/// When false, `/health` returns HTTP 200 with a minimal payload so Render deploy
+/// probes pass while Redis/SSO/job-queue init is still running.
+static HEALTH_CHECKS_READY: AtomicBool = AtomicBool::new(false);
+
+/// Enable full DB/queue/redis health probes (call after DB + health pool are up).
+pub fn set_health_checks_ready() {
+    HEALTH_CHECKS_READY.store(true, Ordering::Release);
+}
 
 /// Health response cache TTL in seconds.
 /// Health check hits DB + Redis on every request — cache for 30s to reduce load.
@@ -322,6 +332,20 @@ pub async fn health_check(
     axum::extract::Extension(health_pool): axum::extract::Extension<crate::db::HealthPool>,
     axum::extract::Extension(cache_layer): axum::extract::Extension<Option<crate::cache::CacheLayer>>,
 ) -> (StatusCode, Json<Value>) {
+    if !HEALTH_CHECKS_READY.load(Ordering::Acquire) {
+        return (
+            StatusCode::OK,
+            Json(json!({
+                "status": "healthy",
+                "_phase": "startup",
+                "api": {
+                    "status": "healthy",
+                    "uptime_seconds": uptime_seconds()
+                }
+            })),
+        );
+    }
+
     // Try to serve from Redis cache first
     if let Some(ref cache) = cache_layer {
         if let Some(cached) = cache.get::<Value>("health", "check").await {
