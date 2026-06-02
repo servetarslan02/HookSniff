@@ -164,7 +164,7 @@ pub async fn capacity_forecast(
 
     // Get rate limit for this endpoint
     let rate_limit: Option<(i32,)> = sqlx::query_as(
-        "SELECT webhook_limit FROM endpoints WHERE id = $1"
+        "SELECT COALESCE(c.webhook_limit, 10000) FROM endpoints e JOIN customers c ON c.id = e.customer_id WHERE e.id = $1"
     ).bind(endpoint_id).fetch_optional(pool).await?;
 
     let limit = rate_limit.map(|(l,)| l).unwrap_or(10000);

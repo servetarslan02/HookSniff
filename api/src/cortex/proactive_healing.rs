@@ -129,13 +129,14 @@ async fn predict_peak_preparation(
             ep.endpoint_id, e.customer_id,
             ep.avg_deliveries_per_hour,
             ep.peak_deliveries_per_hour,
-            e.webhook_limit
+            COALESCE(c.webhook_limit, 10000)
         FROM endpoint_profiles ep
         JOIN endpoints e ON e.id = ep.endpoint_id
+        JOIN customers c ON c.id = e.customer_id
         WHERE e.is_active = true
-          AND e.webhook_limit > 0
+          AND COALESCE(c.webhook_limit, 10000) > 0
           AND ep.avg_deliveries_per_hour > 0
-          AND (ep.avg_deliveries_per_hour * 24.0 / e.webhook_limit::FLOAT) * 100.0 > 80.0
+          AND (ep.avg_deliveries_per_hour * 24.0 / COALESCE(c.webhook_limit, 10000)::FLOAT) * 100.0 > 80.0
         "#
     )
     .fetch_all(pool)
