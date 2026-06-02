@@ -413,20 +413,22 @@ async fn execute_stage(
         }
         CortexStage::DriftDetection => {
             // BATCH: Fetch ALL endpoint stats in ONE query instead of N queries
+            // Cast everything to FLOAT8 explicitly — PostgreSQL integer division returns NUMERIC
+            // which doesn't match Rust's f64 (FLOAT8) type
             let all_stats: Vec<(uuid::Uuid, f64, f64)> = sqlx::query_as(
                 r#"
                 WITH latest AS (
                     SELECT DISTINCT ON (endpoint_id)
                         endpoint_id,
-                        COALESCE(total_deliveries, 0) as total,
-                        COALESCE(successful, 0) as ok,
-                        COALESCE(avg_latency_ms, 0) as latency
+                        COALESCE(total_deliveries, 0)::FLOAT8 as total,
+                        COALESCE(successful, 0)::FLOAT8 as ok,
+                        COALESCE(avg_latency_ms, 0)::FLOAT8 as latency
                     FROM endpoint_hourly_stats
                     ORDER BY endpoint_id, hour_start DESC
                 )
                 SELECT endpoint_id,
-                    CASE WHEN total > 0 THEN LEAST(GREATEST(ok::FLOAT / total::FLOAT * 100.0, 0.0), 100.0) ELSE 100.0 END,
-                    LEAST(latency, 999999.0)
+                    CASE WHEN total > 0.0 THEN LEAST(GREATEST(ok / total * 100.0, 0.0), 100.0)::FLOAT8 ELSE 100.0::FLOAT8 END,
+                    LEAST(latency, 999999.0)::FLOAT8
                 FROM latest
                 "#
             ).fetch_all(pool).await?;
