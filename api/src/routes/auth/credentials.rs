@@ -191,6 +191,8 @@ pub async fn login(
         let _ = crate::security_monitor::record_login_attempt(
             &pool, &req.email, &client_ip, Some(user_agent), false, Some("account_disabled"),
         ).await;
+        // Record in Redis for fast threat detection
+        crate::security::threat_detector::record_failed_login(&client_ip).await;
         let _ = crate::security_monitor::log_security_event(
             &pool, crate::security_monitor::event_types::DISABLED_ACCOUNT_LOGIN,
             "medium", Some(customer.id), Some(&req.email), Some(&client_ip), Some(user_agent),
@@ -202,6 +204,8 @@ pub async fn login(
         let _ = crate::security_monitor::record_login_attempt(
             &pool, &req.email, &client_ip, Some(user_agent), false, Some("wrong_password"),
         ).await;
+        // Record in Redis for fast threat detection
+        crate::security::threat_detector::record_failed_login(&client_ip).await;
         return Err(AppError::coded(ErrorCode::InvalidCredentials));
     }
 
