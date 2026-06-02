@@ -13,6 +13,7 @@ pub mod refunds;
 pub mod refund_requests;
 pub mod revenue;
 pub mod security;
+pub mod security_audit;
 pub mod settings;
 pub mod stats;
 pub mod users;
@@ -174,6 +175,11 @@ pub fn router() -> Router {
         .route("/security/blocklist", get(security::list_ip_blocklist).post(security::block_ip))
         .route("/security/blocklist/{id}", delete(security::unblock_ip))
         .route("/security/blocklist/check", post(security::check_ip_blocked))
+        // ── Security Audit (OWASP, Compliance) ──
+        .route("/security/audit", get(security_audit::run_audit))
+        .route("/security/incidents", get(security_audit::get_incidents))
+        .route("/security/health", get(security_audit::security_health))
+        .route("/security/rotate-key/{id}", post(security_audit::rotate_key))
 }
 
 // ── Common Types ──────────────────────────────────────────
