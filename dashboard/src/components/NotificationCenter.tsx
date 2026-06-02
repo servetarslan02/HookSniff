@@ -229,13 +229,13 @@ export function NotificationCenter() {
                             disabled={acceptingId === n.id}
                             className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition disabled:opacity-50"
                           >
-                            {acceptingId === n.id ? '...' : (t('acceptInvite') || 'Kabul Et')}
+                            {acceptingId === n.id ? '...' : (t('acceptInvite') || 'Accept')}
                           </button>
                           <button
                             onClick={() => handleDeclineInvite(n)}
                             className="px-3 py-1 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg transition"
                           >
-                            {t('declineInvite') || 'Reddet'}
+                            {t('declineInvite') || 'Decline'}
                           </button>
                         </div>
                       )}
