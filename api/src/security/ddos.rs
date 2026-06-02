@@ -19,13 +19,32 @@ pub struct RateLimitResult {
 pub struct DdosProtection {
     /// In-memory fallback for when Redis is unavailable
     memory_limits: Arc<RwLock<HashMap<String, Vec<Instant>>>>,
+    /// Shared Redis connection (lazy-initialized once)
+    redis_conn: Arc<RwLock<Option<redis::aio::ConnectionManager>>>,
 }
 
 impl DdosProtection {
     pub fn new() -> Self {
         Self {
             memory_limits: Arc::new(RwLock::new(HashMap::new())),
+            redis_conn: Arc::new(RwLock::new(None)),
         }
+    }
+
+    /// Get or create shared Redis connection
+    async fn get_redis_conn(&self, redis_url: &str) -> Option<redis::aio::ConnectionManager> {
+        // Check if we already have a connection
+        {
+            let conn = self.redis_conn.read().await;
+            if conn.is_some() {
+                return conn.clone();
+            }
+        }
+        // Create new connection (only happens once)
+        let client = redis::Client::open(redis_url).ok()?;
+        let conn = redis::aio::ConnectionManager::new(client).await.ok()?;
+        *self.redis_conn.write().await = Some(conn.clone());
+        Some(conn)
     }
 
     /// Check IP rate limit (1000 req/min) — uses Redis if available, memory fallback
@@ -50,40 +69,42 @@ impl DdosProtection {
         self.check_memory(key, max, window_secs).await
     }
 
-    /// Redis-based rate limiting using INCR + EXPIRE
+    /// Redis-based rate limiting — atomic Lua script (INCR + EXPIRE in one call, no race)
     async fn check_redis(&self, redis_url: &str, key: &str, max: usize, window_secs: u64) -> Result<RateLimitResult, ()> {
-        let client = redis::Client::open(redis_url).map_err(|_| ())?;
-        let mut conn = redis::aio::ConnectionManager::new(client).await.map_err(|_| ())?;
+        let mut conn = match self.get_redis_conn(redis_url).await {
+            Some(c) => c,
+            None => return Err(()),
+        };
 
         let redis_key = format!("ddos:{}:{}", key, window_secs);
-        let count: i64 = redis::cmd("INCR")
-            .arg(&redis_key)
-            .query_async(&mut conn)
+
+        // Atomic Lua script: INCR + conditional EXPIRE (no race condition)
+        let lua = redis::Script::new(
+            r#"
+            local current = redis.call('INCR', KEYS[1])
+            if current == 1 then
+                redis.call('EXPIRE', KEYS[1], ARGV[1])
+            end
+            local ttl = redis.call('TTL', KEYS[1])
+            return {current, ttl}
+            "#,
+        );
+
+        let result: Vec<i64> = lua
+            .key(&redis_key)
+            .arg(window_secs as i64)
+            .invoke_async(&mut conn)
             .await
             .map_err(|_| ())?;
 
-        if count == 1 {
-            // First request in window — set expiry
-            let _: () = redis::cmd("EXPIRE")
-                .arg(&redis_key)
-                .arg(window_secs)
-                .query_async(&mut conn)
-                .await
-                .map_err(|_| ())?;
-        }
+        let count = result[0];
+        let ttl = result[1].max(1) as u64;
 
         if count as usize > max {
-            // Get TTL for retry-after
-            let ttl: i64 = redis::cmd("TTL")
-                .arg(&redis_key)
-                .query_async(&mut conn)
-                .await
-                .unwrap_or(window_secs as i64);
-
             Ok(RateLimitResult {
                 allowed: false,
                 remaining: 0,
-                retry_after: Some(Duration::from_secs(ttl.max(1) as u64)),
+                retry_after: Some(Duration::from_secs(ttl)),
             })
         } else {
             Ok(RateLimitResult {
