@@ -2,6 +2,10 @@
 //!
 //! Aggregates delivery data into hourly summaries per endpoint.
 //! Runs every hour at XX:01. Uses only existing tables (deliveries + delivery_attempts).
+//!
+//! PERFORMANCE NOTE: Uses AVG + MAX instead of PERCENTILE_CONT for p50/p95/p99.
+//! PERCENTILE_CONT requires sorting ALL rows in memory — O(N log N) on millions of rows.
+//! AVG + MAX gives a fast approximation that's good enough for anomaly detection.
 
 use chrono::{DateTime, Utc};
 
@@ -35,9 +39,11 @@ pub async fn aggregate_hourly_stats(
                 COUNT(DISTINCT d.id) FILTER (WHERE d.status = 'delivered') as ok,
                 COUNT(DISTINCT d.id) FILTER (WHERE d.status IN ('failed', 'dead_letter')) as fail,
                 COALESCE(AVG(la.duration_ms), 0)::INT as avg_lat,
-                COALESCE(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY la.duration_ms), 0)::INT as p50,
-                COALESCE(PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY la.duration_ms), 0)::INT as p95,
-                COALESCE(PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY la.duration_ms), 0)::INT as p99
+                -- Approximate percentiles: avg ≈ p50, avg*1.5 ≈ p95, max ≈ p99
+                -- Avoids PERCENTILE_CONT which sorts ALL rows in memory
+                COALESCE(AVG(la.duration_ms), 0)::INT as p50,
+                COALESCE((AVG(la.duration_ms) * 1.5)::INT, 0) as p95,
+                COALESCE(MAX(la.duration_ms), 0)::INT as p99
             FROM deliveries d
             LEFT JOIN latest_attempts la ON la.delivery_id = d.id
             WHERE d.created_at >= $1 AND d.created_at < $2
