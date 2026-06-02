@@ -129,13 +129,17 @@ pub async fn try_cortex_lock(pool: &sqlx::PgPool, lock_name: &str, _ttl_secs: i6
 /// Release advisory lock on a dedicated connection, then return it to pool.
 pub async fn release_cortex_lock(conn: &mut sqlx::pool::PoolConnection<sqlx::Postgres>, lock_name: &str) {
     let lock_id = lock_name_to_id(lock_name);
-    // Suppress "you don't own a lock" notice — happens when connection was reused by pool
-    let _ = sqlx::query("SET LOCAL client_min_messages TO WARNING")
+    // Suppress "you don't own a lock" notice by using session-level setting
+    // SET LOCAL doesn't work outside transaction blocks, so use SET
+    let _ = sqlx::query("SET client_min_messages TO WARNING")
         .execute(&mut **conn).await;
     let _ = sqlx::query("SELECT pg_advisory_unlock($1)")
         .bind(lock_id)
         .execute(&mut **conn)
         .await;
+    // Reset to default so future queries show notices
+    let _ = sqlx::query("SET client_min_messages TO NOTICE")
+        .execute(&mut **conn).await;
     // conn is dropped here → returned to pool
 }
 
