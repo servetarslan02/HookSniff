@@ -119,6 +119,7 @@ pub fn api_router() -> Router {
     // Inbound webhooks — config routes need auth, provider routes are public (signature-verified)
     let inbound_config_routes = Router::new()
         .nest("/inbound", inbound::router())
+        .layer(axum_middleware::from_fn(crate::middleware::zero_trust::zero_trust_middleware))
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
     let inbound_public_routes = Router::new()
         .nest("/inbound", inbound::public_router());
@@ -128,6 +129,7 @@ pub fn api_router() -> Router {
         .layer(axum_middleware::from_fn(
             crate::middleware::admin_middleware,
         ))
+        .layer(axum_middleware::from_fn(crate::middleware::zero_trust::zero_trust_middleware))
         .layer(axum_middleware::from_fn(crate::middleware::auth_middleware));
 
     Router::new()

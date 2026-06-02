@@ -44,7 +44,7 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
         .map(|s| s.to_string());
 
     // If all Standard Webhooks headers are present, verify them
-    if let (Some(id), Some(ts), Some(sig)) = (msg_id, timestamp, signature) {
+    if let (Some(_id), Some(_ts), Some(sig)) = (msg_id, timestamp, signature) {
         // Get the signing secret from extensions (set by endpoint resolution)
         let signing_secret = req
             .extensions()
@@ -67,7 +67,7 @@ pub async fn webhook_verify_middleware(mut req: Request, next: Next) -> Result<R
             let body_str = String::from_utf8_lossy(&body_bytes).to_string();
 
             // Read tolerance from config
-            let tolerance = req
+            let _tolerance = req
                 .extensions()
                 .get::<crate::config::Config>()
                 .and_then(|_| {
