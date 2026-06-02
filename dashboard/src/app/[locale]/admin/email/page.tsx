@@ -15,20 +15,20 @@ import {
 } from '@/components/icons';
 
 const BROADCAST_TYPES = [
-  { value: 'announcement', label: 'Duyuru' },
-  { value: 'maintenance', label: 'Bakım' },
-  { value: 'feature', label: 'Yeni Özellik' },
-  { value: 'incident', label: 'Olay' },
+  { value: 'announcement', label: 'Announcement' },
+  { value: 'maintenance', label: 'Maintenance' },
+  { value: 'feature', label: 'New Feature' },
+  { value: 'incident', label: 'Incident' },
 ];
 
 const SEVERITY_OPTIONS = [
-  { value: 'info', label: 'Bilgi', color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400' },
-  { value: 'warning', label: 'Uyarı', color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400' },
-  { value: 'critical', label: 'Kritik', color: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400' },
+  { value: 'info', label: 'Info', color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400' },
+  { value: 'warning', label: 'Warning', color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400' },
+  { value: 'critical', label: 'Critical', color: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400' },
 ];
 
 const PLAN_TARGET_OPTIONS = [
-  { value: '', label: 'Tüm Planlar' },
+  { value: '', label: 'All Plans' },
   { value: 'free', label: 'Free' },
   { value: 'startup', label: 'Startup' },
   { value: 'pro', label: 'Pro' },
@@ -112,20 +112,20 @@ export default function AdminEmailPage() {
       if (editingId) { await adminApi.updateBroadcast(token!, editingId, payload); return 'updated'; }
       else { await adminApi.createBroadcast(token!, payload); return 'created'; }
     },
-    onSuccess: (action) => { qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] }); toast(`Bildirim ${action === 'created' ? 'oluşturuldu' : 'güncellendi'}`, 'success'); resetBForm(); },
-    onError: () => toast('Bildirim kaydedilemedi', 'error'),
+    onSuccess: (action) => { qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] }); toast(`Broadcast ${action === 'created' ? 'oluşturuldu' : 'güncellendi'}`, 'success'); resetBForm(); },
+    onError: () => toast('Broadcast kaydedilemedi', 'error'),
   });
 
   const deleteBroadcastMutation = useMutation({
     mutationFn: (id: string) => adminApi.deleteBroadcast(token!, id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] }); toast('Bildirim silindi', 'success'); setDeleteTarget(null); },
-    onError: () => toast('Bildirim silinemedi', 'error'),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] }); toast('Broadcast silindi', 'success'); setDeleteTarget(null); },
+    onError: () => toast('Broadcast silinemedi', 'error'),
   });
 
   const toggleBroadcastMutation = useMutation({
     mutationFn: (b: Broadcast) => adminApi.updateBroadcast(token!, b.id, { is_active: !b.is_active }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'broadcasts'] }),
-    onError: () => toast('Bildirim güncellenemedi', 'error'),
+    onError: () => toast('Broadcast güncellenemedi', 'error'),
   });
 
   const resetBForm = () => { setBForm(emptyBroadcastForm); setEditingId(null); setShowBForm(false); };
@@ -178,10 +178,10 @@ export default function AdminEmailPage() {
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            {mode === 'email' ? <><Mail size={24} strokeWidth={1.75} className="inline mr-1" />{t('bulkEmail') || 'Toplu E-posta'}</> : <><Megaphone size={24} strokeWidth={1.75} className="inline mr-1" />{t('broadcasts') || 'Bildirim'}</>}
+            {mode === 'email' ? <><Mail size={24} strokeWidth={1.75} className="inline mr-1" />{t('bulkEmail') || 'Bulk Email'}</> : <><Megaphone size={24} strokeWidth={1.75} className="inline mr-1" />{t('broadcasts') || 'Broadcast'}</>}
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
-            {mode === 'email' ? (t('bulkEmailDesc') || 'Kullanıcılara toplu e-posta gönder.') : (t('broadcastsDesc') || 'Tüm kullanıcılara global bildirim gönder. Çan ikonunda ve banner olarak gösterilir.')}
+            {mode === 'email' ? (t('bulkEmailDesc') || 'Send bulk email to users.') : (t('broadcastsDesc') || 'Tüm kullanıcılara global bildirim gönder. Çan ikonunda ve banner olarak gösterilir.')}
           </p>
         </div>
         <div className="flex bg-gray-100 dark:bg-slate-800 rounded-xl p-1 shrink-0 w-fit">
@@ -189,7 +189,7 @@ export default function AdminEmailPage() {
             <Mail size={14} strokeWidth={1.75} className="inline mr-1.5" />E-posta
           </button>
           <button onClick={() => setMode('broadcast')} className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${mode === 'broadcast' ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'}`}>
-            <Megaphone size={14} strokeWidth={1.75} className="inline mr-1.5" />Bildirim
+            <Megaphone size={14} strokeWidth={1.75} className="inline mr-1.5" />Broadcast
           </button>
         </div>
       </div>
@@ -280,35 +280,35 @@ export default function AdminEmailPage() {
         <>
           {!showBForm && (
             <button onClick={() => { resetBForm(); setShowBForm(true); }} className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors flex items-center gap-1.5">
-              <Plus size={16} strokeWidth={1.75} />Yeni Bildirim Oluştur
+              <Plus size={16} strokeWidth={1.75} />Yeni Broadcast Create
             </button>
           )}
 
           {showBForm && (
             <div className="glass-card p-6 border-2 border-brand-200 dark:border-brand-500/30">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{editingId ? 'Bildirimi Düzenle' : 'Yeni Bildirim'}</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{editingId ? 'Edit Notification' : 'New Notification'}</h2>
                 <button onClick={resetBForm} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300"><XCircle size={20} strokeWidth={1.75} /></button>
               </div>
               <div className="space-y-4">
                 <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Başlık *</label><input type="text" value={bForm.title} onChange={(e) => setBForm({ ...bForm, title: e.target.value })} placeholder="Örn: Planlı Bakım Duyurusu" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
-                <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Mesaj *</label><textarea value={bForm.message} onChange={(e) => setBForm({ ...bForm, message: e.target.value })} placeholder="Kullanıcılara gönderilecek mesajı yazın..." rows={4} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Message *</label><textarea value={bForm.message} onChange={(e) => setBForm({ ...bForm, message: e.target.value })} placeholder="Kullanıcılara gönderilecek mesajı yazın..." rows={4} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" /></div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Tür</label><select value={bForm.broadcast_type} onChange={(e) => setBForm({ ...bForm, broadcast_type: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm">{BROADCAST_TYPES.map(bt => <option key={bt.value} value={bt.value}>{bt.label}</option>)}</select></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Önem</label><select value={bForm.severity} onChange={(e) => setBForm({ ...bForm, severity: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm">{SEVERITY_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}</select></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Type</label><select value={bForm.broadcast_type} onChange={(e) => setBForm({ ...bForm, broadcast_type: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm">{BROADCAST_TYPES.map(bt => <option key={bt.value} value={bt.value}>{bt.label}</option>)}</select></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Priority</label><select value={bForm.severity} onChange={(e) => setBForm({ ...bForm, severity: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm">{SEVERITY_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}</select></div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Link (opsiyonel)</label><input type="url" value={bForm.link} onChange={(e) => setBForm({ ...bForm, link: e.target.value })} placeholder="https://status.hooksniff.com" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" /></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Link Yazısı</label><input type="text" value={bForm.link_text} onChange={(e) => setBForm({ ...bForm, link_text: e.target.value })} placeholder="Durumu Gör" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Link (optional)</label><input type="url" value={bForm.link} onChange={(e) => setBForm({ ...bForm, link: e.target.value })} placeholder="https://status.hooksniff.com" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Link Text</label><input type="text" value={bForm.link_text} onChange={(e) => setBForm({ ...bForm, link_text: e.target.value })} placeholder="View Status" className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" /></div>
                 </div>
-                <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Hedef Plan</label><select value={bForm.target_plan} onChange={(e) => setBForm({ ...bForm, target_plan: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm">{PLAN_TARGET_OPTIONS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}</select></div>
+                <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Target Plan</label><select value={bForm.target_plan} onChange={(e) => setBForm({ ...bForm, target_plan: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm">{PLAN_TARGET_OPTIONS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}</select></div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5"><Calendar size={14} strokeWidth={1.75} className="inline mr-1" />Başlangıç (opsiyonel)</label><input type="datetime-local" value={bForm.starts_at} onChange={(e) => setBForm({ ...bForm, starts_at: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" /></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5"><Calendar size={14} strokeWidth={1.75} className="inline mr-1" />Bitiş (opsiyonel)</label><input type="datetime-local" value={bForm.expires_at} onChange={(e) => setBForm({ ...bForm, expires_at: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5"><Calendar size={14} strokeWidth={1.75} className="inline mr-1" />Start Date (optional)</label><input type="datetime-local" value={bForm.starts_at} onChange={(e) => setBForm({ ...bForm, starts_at: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5"><Calendar size={14} strokeWidth={1.75} className="inline mr-1" />End Date (optional)</label><input type="datetime-local" value={bForm.expires_at} onChange={(e) => setBForm({ ...bForm, expires_at: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm" /></div>
                 </div>
                 <div className="flex gap-3 justify-end pt-2">
-                  <button onClick={resetBForm} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl transition-colors">İptal</button>
-                  <button onClick={handleSaveBroadcast} disabled={saveBroadcastMutation.isPending || !bForm.title.trim() || !bForm.message.trim()} className="px-6 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors">{saveBroadcastMutation.isPending ? 'Kaydediliyor...' : editingId ? 'Güncelle' : 'Oluştur'}</button>
+                  <button onClick={resetBForm} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl transition-colors">Cancel</button>
+                  <button onClick={handleSaveBroadcast} disabled={saveBroadcastMutation.isPending || !bForm.title.trim() || !bForm.message.trim()} className="px-6 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors">{saveBroadcastMutation.isPending ? 'Saving...' : editingId ? 'Update' : 'Create'}</button>
                 </div>
               </div>
             </div>
@@ -317,10 +317,10 @@ export default function AdminEmailPage() {
           {broadcastLoading ? (
             <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="glass-card p-4 animate-pulse"><div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-2" /><div className="h-3 bg-gray-200 dark:bg-slate-700 rounded w-2/3" /></div>)}</div>
           ) : broadcasts.length === 0 ? (
-            <div className="glass-card p-12 text-center"><Megaphone size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" /><p className="text-gray-500 dark:text-slate-400 text-sm">Henüz bildirim yok</p><p className="text-gray-400 dark:text-slate-500 text-xs mt-1">Yukarıdan ilk bildiriminizi oluşturun</p></div>
+            <div className="glass-card p-12 text-center"><Megaphone size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" /><p className="text-gray-500 dark:text-slate-400 text-sm">No notifications yet</p><p className="text-gray-400 dark:text-slate-500 text-xs mt-1">Yukarıdan ilk bildiriminizi oluşturun</p></div>
           ) : (
             <div className="glass-card overflow-hidden">
-              <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700"><h3 className="text-sm font-semibold text-gray-900 dark:text-white"><ClipboardList size={14} strokeWidth={1.75} className="inline mr-1.5" />Bildirim Geçmişi ({broadcasts.length})</h3></div>
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700"><h3 className="text-sm font-semibold text-gray-900 dark:text-white"><ClipboardList size={14} strokeWidth={1.75} className="inline mr-1.5" />Notification History ({broadcasts.length})</h3></div>
               <div className="divide-y divide-gray-100 dark:divide-slate-800">
                 <VirtualList
                   items={broadcasts}
@@ -328,16 +328,16 @@ export default function AdminEmailPage() {
                   itemHeight={72}
                   overscan={5}
                   keyExtractor={(b) => b.id}
-                  emptyMessage="Bildirim bulunamadı"
+                  emptyMessage="No notifications found"
                   renderItem={(b) => (
                     <div className={`px-4 py-3 flex items-center justify-between gap-3 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition ${!b.is_active ? 'opacity-50' : ''}`}>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap"><span className="text-sm font-medium text-gray-900 dark:text-white truncate">{b.title}</span>{severityBadge(b.severity)}<span className="text-[11px] text-gray-400 dark:text-slate-500">{typeLabel(b.broadcast_type)}</span>{!b.is_active && <span className="text-[11px] text-gray-400">(pasif)</span>}</div>
+                        <div className="flex items-center gap-2 flex-wrap"><span className="text-sm font-medium text-gray-900 dark:text-white truncate">{b.title}</span>{severityBadge(b.severity)}<span className="text-[11px] text-gray-400 dark:text-slate-500">{typeLabel(b.broadcast_type)}</span>{!b.is_active && <span className="text-[11px] text-gray-400">(inactive)</span>}</div>
                         <p className="text-xs text-gray-500 dark:text-slate-400 truncate mt-0.5">{b.message}</p>
                         <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-400 dark:text-slate-500">{b.target_plan && <span>Plan: {b.target_plan}</span>}<span>{new Date(b.created_at).toLocaleDateString()}</span></div>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
-                        <button onClick={() => handleToggleBroadcast(b)} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title={b.is_active ? 'Pasifleştir' : 'Aktifleştir'}>{b.is_active ? <Eye size={15} strokeWidth={1.75} /> : <EyeOff size={15} strokeWidth={1.75} />}</button>
+                        <button onClick={() => handleToggleBroadcast(b)} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title={b.is_active ? 'Deactivate' : 'Activate'}>{b.is_active ? <Eye size={15} strokeWidth={1.75} /> : <EyeOff size={15} strokeWidth={1.75} />}</button>
                         <button onClick={() => handleEditBroadcast(b)} className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title="Düzenle"><Pencil size={15} strokeWidth={1.75} /></button>
                         <button onClick={() => setDeleteTarget(b.id)} className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition" title="Sil"><Trash2 size={15} strokeWidth={1.75} /></button>
                       </div>
@@ -350,7 +350,7 @@ export default function AdminEmailPage() {
         </>
       )}
 
-      <ConfirmDialog open={!!deleteTarget} title="Bildirimi Sil" message="Bu bildirimi silmek istediğinize emin misiniz? Bu işlem geri alınamaz." confirmLabel="Sil" cancelLabel="İptal" variant="danger" onConfirm={handleDeleteBroadcast} onCancel={() => setDeleteTarget(null)} />
+      <ConfirmDialog open={!!deleteTarget} title="Broadcasti Sil" message="Bu bildirimi silmek istediğinize emin misiniz? Bu işlem geri alınamaz." confirmLabel="Sil" cancelLabel="Cancel" variant="danger" onConfirm={handleDeleteBroadcast} onCancel={() => setDeleteTarget(null)} />
     </div>
   );
 }
