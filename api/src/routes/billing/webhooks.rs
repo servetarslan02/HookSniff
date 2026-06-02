@@ -291,36 +291,25 @@ async fn process_webhook_result(
             provider_subscription_id,
             event_id: _,
         } => {
-            let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
             if let Some(sub_col) = provider_sub_col(provider) {
-                // Only clear subscription_id, NOT customer_id (needed for re-subscribe & portal)
+                // CONSUMER RIGHTS FIX: Do NOT immediately downgrade to free.
+                // Customer paid for the current period — they keep access until period ends.
+                // Set cancel_at_period_end = true; background job will downgrade when period expires.
                 let query = format!(
-                    "UPDATE customers SET plan = 'free', {} = NULL, webhook_limit = $2, \
-                     cancel_at_period_end = false, payment_failed_at = NULL, \
-                     paused_at = NULL, paused_until = NULL, pause_plan = NULL, \
-                     card_last4 = NULL, card_brand = NULL, card_exp_month = NULL, card_exp_year = NULL, \
-                     billing_interval = NULL, \
-                     updated_at = NOW() WHERE {} = $1",
-                    sub_col, sub_col
+                    "UPDATE customers SET \
+                     cancel_at_period_end = true, \
+                     updated_at = NOW() \
+                     WHERE {} = $1",
+                    sub_col
                 );
-                sqlx::query(&query).bind(provider_subscription_id).bind(free_limit)
+                sqlx::query(&query).bind(provider_subscription_id)
                     .execute(pool).await?;
             } else {
                 return Ok(());
             }
 
-            // HS-060: Clean up excess endpoints on cancellation
-            if let Some(sub_col) = provider_sub_col(provider) {
-                let cid_query = format!("SELECT id FROM customers WHERE {} = $1", sub_col);
-                let customer_id: Option<(uuid::Uuid,)> = sqlx::query_as(&cid_query)
-                    .bind(provider_subscription_id).fetch_optional(pool).await?;
-                if let Some((cid,)) = customer_id {
-                    cleanup_excess_endpoints(pool, cid, &Plan::Developer).await?;
-                }
-            }
-
             tracing::info!(
-                "✅ {} subscription {} canceled, customer downgraded to free",
+                "✅ {} subscription {} marked for cancellation (will downgrade at period end)",
                 provider,
                 provider_subscription_id
             );
@@ -333,7 +322,7 @@ async fn process_webhook_result(
                 {
                     let pool_clone = pool.clone();
                     tokio::spawn(async move {
-                        crate::notifications::helpers::subscription_canceled(&pool_clone, cid, "free").await;
+                        crate::notifications::helpers::subscription_canceled(&pool_clone, cid, "cancel_at_period_end").await;
                     });
                 }
             }
@@ -421,7 +410,8 @@ async fn process_webhook_result(
                 if let Some(plan) = plan_name {
                     let _ = sqlx::query(
                         "INSERT INTO invoices (customer_id, amount_cents, currency, status, plan, provider, provider_invoice_id, paid_at) \
-                         VALUES ($1, $2, $3, 'paid', $4, $5, $6, NOW())",
+                         VALUES ($1, $2, $3, 'paid', $4, $5, $6, NOW()) \
+                         ON CONFLICT (provider_invoice_id) DO NOTHING",
                     )
                     .bind(cid)
                     .bind(*amount_cents as i64)

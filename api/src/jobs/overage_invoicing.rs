@@ -70,15 +70,19 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
 
     for (customer_id, email, plan_str, total_overage, lang_raw) in &overage_customers {
         let plan = Plan::parse_str(plan_str);
-        let overage_price = plan.overage_price_per_event();
+        // Use integer microcents to avoid floating point errors
+        let overage_price_microcents = plan.overage_price_per_event_microcents();
 
         // Skip if price is 0 (developer/enterprise with custom pricing)
-        if overage_price <= 0.0 {
+        if overage_price_microcents <= 0 {
             continue;
         }
 
-        let total_amount = *total_overage as f64 * overage_price;
-        let amount_cents = (total_amount * 100.0).round() as i64;
+        // Calculate in microcents, then convert to cents for invoice storage
+        // total_overage * microcents_per_event = total_microcents
+        // total_microcents / 1_000 = amount_cents (rounded)
+        let total_microcents = *total_overage as i64 * overage_price_microcents;
+        let amount_cents = (total_microcents + 500) / 1000; // round to nearest cent
 
         if amount_cents <= 0 {
             continue;
@@ -126,6 +130,10 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
 
         invoices_created += 1;
 
+        // Convert cents to dollars for display
+        let total_dollars = amount_cents as f64 / 100.0;
+        let price_per_event_dollars = overage_price_microcents as f64 / 1_000_000.0;
+
         // Send overage invoice email
         let lang = Language::parse_lang(lang_raw);
         let (subject, body) = match lang {
@@ -133,7 +141,7 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
             (
                 format!(
                     "💰 HookSniff: Overage Invoice — ${:.2}",
-                    total_amount
+                    total_dollars
                 ),
                 format!(
                     "Hello,\n\n\
@@ -148,8 +156,8 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
                     "",
                     plan_str,
                     total_overage,
-                    overage_price,
-                    total_amount
+                    price_per_event_dollars,
+                    total_dollars
                 ),
             )
             }
@@ -157,7 +165,7 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
             (
                 format!(
                     "💰 HookSniff: Aşım Faturası — ${:.2}",
-                    total_amount
+                    total_dollars
                 ),
                 format!(
                     "Merhaba,\n\n\
@@ -172,8 +180,8 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
                     "",
                     plan_str,
                     total_overage,
-                    overage_price,
-                    total_amount
+                    price_per_event_dollars,
+                    total_dollars
                 ),
             )
             }
@@ -183,7 +191,7 @@ pub async fn run_overage_invoicing(pool: &PgPool, email_client: &ResendEmailClie
 
         tracing::info!(
             "💰 Overage invoice created for {}: {} events × ${:.6} = ${:.2} ({} cents)",
-            email, total_overage, overage_price, total_amount, amount_cents
+            email, total_overage, price_per_event_dollars, total_dollars, amount_cents
         );
     }
 
