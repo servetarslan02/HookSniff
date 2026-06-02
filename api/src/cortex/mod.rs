@@ -91,33 +91,54 @@ impl CortexMetrics {
 
 /// Distributed lock for Cortex jobs (PostgreSQL advisory locks)
 /// Prevents duplicate work when multiple API instances are running.
-pub async fn try_cortex_lock(pool: &sqlx::PgPool, lock_name: &str, _ttl_secs: i64) -> bool {
-    let lock_id = match lock_name {
-        "cortex_hourly" => 9001i64,
-        "cortex_profile" => 9002,
-        "cortex_healing" => 9003,
-        "cortex_surge" => 9004,
-        "cortex_predict" => 9005,
-        "cortex_report" => 9006,
-        "cortex_routing" => 9007,
-        "cortex_anomaly" => 9008,
-        "cortex_correlation" => 9009,
-        "cortex_memory" => 9010,
-        "cortex_ml" => 9011,
-        "cortex_proactive" => 9012,
-        "cortex_ml_quality" => 9013,
-        _ => 9099,
+///
+/// IMPORTANT: Returns a dedicated connection that MUST be held for the entire
+/// duration of the locked operation. If the connection is dropped, the advisory
+/// lock is released (PostgreSQL session-scoped locks).
+pub async fn try_cortex_lock(pool: &sqlx::PgPool, lock_name: &str, _ttl_secs: i64) -> Option<sqlx::pool::PoolConnection<sqlx::Postgres>> {
+    let lock_id = lock_name_to_id(lock_name);
+
+    // Acquire a DEDICATED connection (not from pool auto-release)
+    let mut conn = match pool.acquire().await {
+        Ok(c) => c,
+        Err(e) => {
+            tracing::error!("Failed to acquire connection for cortex lock {}: {:?}", lock_name, e);
+            return None;
+        }
     };
-    let result: (bool,) = sqlx::query_as("SELECT pg_try_advisory_lock($1)")
+
+    let result: (bool,) = match sqlx::query_as("SELECT pg_try_advisory_lock($1)")
         .bind(lock_id)
-        .fetch_one(pool)
+        .fetch_one(&mut *conn)
         .await
-        .unwrap_or((false,));
-    result.0
+    {
+        Ok(r) => r,
+        Err(e) => {
+            tracing::error!("Advisory lock query failed for {}: {:?}", lock_name, e);
+            return None;
+        }
+    };
+
+    if result.0 {
+        Some(conn) // Caller holds this → lock stays alive
+    } else {
+        None // Lock busy, connection dropped → no lock to release
+    }
 }
 
-pub async fn release_cortex_lock(pool: &sqlx::PgPool, lock_name: &str) {
-    let lock_id = match lock_name {
+/// Release advisory lock on a dedicated connection, then return it to pool.
+pub async fn release_cortex_lock(conn: &mut sqlx::pool::PoolConnection<sqlx::Postgres>, lock_name: &str) {
+    let lock_id = lock_name_to_id(lock_name);
+    let _ = sqlx::query("SELECT pg_advisory_unlock($1)")
+        .bind(lock_id)
+        .execute(&mut **conn)
+        .await;
+    // conn is dropped here → returned to pool
+}
+
+/// Map lock name to numeric advisory lock ID
+fn lock_name_to_id(lock_name: &str) -> i64 {
+    match lock_name {
         "cortex_hourly" => 9001i64,
         "cortex_profile" => 9002,
         "cortex_healing" => 9003,
@@ -132,11 +153,7 @@ pub async fn release_cortex_lock(pool: &sqlx::PgPool, lock_name: &str) {
         "cortex_proactive" => 9012,
         "cortex_ml_quality" => 9013,
         _ => 9099,
-    };
-    let _ = sqlx::query("SELECT pg_advisory_unlock($1)")
-        .bind(lock_id)
-        .execute(pool)
-        .await;
+    }
 }
 
 /// Format cortex metrics for Prometheus /metrics endpoint
