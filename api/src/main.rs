@@ -37,28 +37,43 @@ async fn main() -> Result<()> {
     validate_jwt_config()?;
 
     let startup_start = std::time::Instant::now();
+    let redis_startup = config::redis_startup_timeout();
 
-    // ── Database & Services (Parallel Initialization for Phase 7) ────────────────
+    // ── Database & core services (parallel) ─────────────────────
     let db_url = cfg.database_url.clone();
     let redis_url = config::resolve_redis_url();
 
-    let (pool_res, rate_limiter, cache_layer) = tokio::join!(
-        db::create_pool(&db_url),
+    let pool = db::create_pool(&db_url).await?;
+
+    let (health_pool, rate_limiter, cache_layer) = tokio::join!(
+        async {
+            match db::create_health_pool(&db_url).await {
+                Ok(p) => {
+                    tracing::info!("✅ Health check pool created (5 connections)");
+                    db::HealthPool(p)
+                }
+                Err(e) => {
+                    tracing::warn!("Health pool creation failed ({e}), using main pool");
+                    db::HealthPool(pool.clone())
+                }
+            }
+        },
         rate_limit::create_rate_limiter(),
         async {
             if let Some(ref url) = redis_url {
-                // 5s timeout — fail fast instead of blocking startup for 15s+
-                match tokio::time::timeout(
-                    std::time::Duration::from_secs(5),
-                    cache::CacheLayer::new(url, cache::API_KEY_TTL)
-                ).await {
+                match tokio::time::timeout(redis_startup, cache::CacheLayer::new(url, cache::API_KEY_TTL))
+                    .await
+                {
                     Ok(Ok(c)) => Some(c),
                     Ok(Err(e)) => {
                         tracing::warn!("Redis cache unavailable ({e}), running without cache");
                         None
                     }
                     Err(_) => {
-                        tracing::warn!("Redis cache connection timed out (5s), running without cache");
+                        tracing::warn!(
+                            "Redis cache connection timed out ({:?}), running without cache",
+                            redis_startup
+                        );
                         None
                     }
                 }
@@ -69,71 +84,93 @@ async fn main() -> Result<()> {
         }
     );
 
-    let pool = pool_res?;
-    
-    // ── Phase 2: Warm-up Task (Background) ──────────────────────
+    routes::health::set_health_checks_ready();
+
+    // ── Warm-up (background) ────────────────────────────────────
     let warmup_pool = pool.clone();
     let warmup_cache = cache_layer.clone();
     tokio::spawn(async move {
         let mut interval = tokio::time::interval(std::time::Duration::from_secs(30));
         loop {
             interval.tick().await;
-            // DB bağlantısını sıcak tut
             let _ = sqlx::query("SELECT 1").execute(&warmup_pool).await;
-            // Redis bağlantısını sıcak tut
             if let Some(ref cache) = warmup_cache {
                 let _ = cache.ping().await;
             }
         }
     });
 
-    let health_pool = match db::create_health_pool(&db_url).await {
-        Ok(p) => {
-            tracing::info!("✅ Health check pool created (5 connections)");
-            db::HealthPool(p)
-        }
-        Err(e) => {
-            tracing::warn!("Health pool creation failed ({e}), using main pool");
-            db::HealthPool(pool.clone())
-        }
-    };
-
     // ── Shared services ─────────────────────────────────────────
     let metrics = std::sync::Arc::new(metrics::Metrics::new());
     let throttle_manager = throttle::ThrottleManager::new();
 
-    // Feature flags (DB-backed, refreshes every 60s)
     let feature_flag_service = feature_flags::FeatureFlagService::new(pool.clone()).await;
     let ffs_clone = feature_flag_service.clone();
     tokio::spawn(async move {
         feature_flags::feature_flag_refresher(ffs_clone).await;
     });
 
-    // Event publisher (Redis Streams + local broadcast)
-    let event_publisher = if cfg.event_publisher_enabled {
-        let redis_url = config::resolve_redis_url();
-        let publisher = match tokio::time::timeout(
-            std::time::Duration::from_secs(5),
-            events::EventPublisher::new(redis_url.as_deref())
-        ).await {
-            Ok(p) => p,
-            Err(_) => {
-                tracing::warn!("Redis EventPublisher timed out (5s), using local broadcast");
-                events::EventPublisher::new(None).await
+    let event_publisher_enabled = cfg.event_publisher_enabled;
+    let (event_publisher, job_queue, sso_store) = tokio::join!(
+        async {
+            if !event_publisher_enabled {
+                tracing::info!("Event publisher disabled (EVENT_PUBLISHER_ENABLED=false)");
+                return None;
             }
-        };
-        if publisher.has_redis() {
-            tracing::info!("✅ Event publisher initialized (Redis Streams)");
-        } else {
-            tracing::info!("✅ Event publisher initialized (local broadcast only — no Redis)");
-        }
-        Some(publisher)
-    } else {
-        tracing::info!("Event publisher disabled (EVENT_PUBLISHER_ENABLED=false)");
-        None
-    };
+            let redis_url = config::resolve_redis_url();
+            let publisher = match tokio::time::timeout(
+                redis_startup,
+                events::EventPublisher::new(redis_url.as_deref()),
+            )
+            .await
+            {
+                Ok(p) => p,
+                Err(_) => {
+                    tracing::warn!(
+                        "Redis EventPublisher timed out ({:?}), using local broadcast",
+                        redis_startup
+                    );
+                    events::EventPublisher::new(None).await
+                }
+            };
+            if publisher.has_redis() {
+                tracing::info!("✅ Event publisher initialized (Redis Streams)");
+            } else {
+                tracing::info!("✅ Event publisher initialized (local broadcast only — no Redis)");
+            }
+            Some(publisher)
+        },
+        async {
+            match config::resolve_redis_url() {
+                Some(url) if !url.is_empty() => {
+                    match tokio::time::timeout(redis_startup, jobs::job_queue::JobQueue::new(&url))
+                        .await
+                    {
+                        Ok(Ok(q)) => Some(q),
+                        Ok(Err(e)) => {
+                            tracing::warn!(
+                                "Redis job queue unavailable ({e}), falling back to tokio::spawn"
+                            );
+                            None
+                        }
+                        Err(_) => {
+                            tracing::warn!(
+                                "Redis job queue timed out ({:?}), falling back to tokio::spawn",
+                                redis_startup
+                            );
+                            None
+                        }
+                    }
+                }
+                _ => {
+                    tracing::info!("Redis URL not configured, using tokio::spawn for background jobs");
+                    None
+                }
+            }
+        },
+        build_sso_store()
+    );
 
-    // WebSocket gateway
     let ws_gateway = std::sync::Arc::new(hooksniff_api::ws::WsGateway::new(
         cfg.jwt_secret.clone(),
     ));
@@ -145,7 +182,6 @@ async fn main() -> Result<()> {
         tracing::info!("✅ Event bridge started (EventPublisher → WsGateway)");
     }
 
-    // Optional clients
     let qstash_client = hooksniff_api::qstash::QStashClient::from_env();
     if qstash_client.is_some() {
         tracing::info!("✅ QStash client initialized");
@@ -159,28 +195,6 @@ async fn main() -> Result<()> {
     let email_provider = email::EmailProvider::from_config(&cfg);
     let fcm_client = notifications::FcmClient::from_config(&cfg);
 
-    let job_queue = match config::resolve_redis_url() {
-        Some(ref url) if !url.is_empty() => match tokio::time::timeout(
-            std::time::Duration::from_secs(5),
-            jobs::job_queue::JobQueue::new(url)
-        ).await {
-            Ok(Ok(q)) => Some(q),
-            Ok(Err(e)) => {
-                tracing::warn!("Redis job queue unavailable ({}), falling back to tokio::spawn", e);
-                None
-            }
-            Err(_) => {
-                tracing::warn!("Redis job queue timed out (5s), falling back to tokio::spawn");
-                None
-            }
-        },
-        _ => {
-            tracing::info!("Redis URL not configured, using tokio::spawn for background jobs");
-            None
-        }
-    };
-
-    // ── Background jobs ─────────────────────────────────────────
     background::spawn_background_jobs(
         pool.clone(),
         job_queue.clone(),
@@ -189,14 +203,12 @@ async fn main() -> Result<()> {
         cfg.retention_days,
     );
 
-    // Auth cache cleanup
     middleware::start_auth_cache_cleanup();
 
-    // Cortex central scheduler
-    hooksniff_api::cortex::scheduler::start_cortex_scheduler(pool.clone());
-
-    // ── SSO state store ─────────────────────────────────────────
-    let sso_store = build_sso_store().await;
+    let pool_cortex = pool.clone();
+    tokio::spawn(async move {
+        hooksniff_api::cortex::scheduler::start_cortex_scheduler(pool_cortex);
+    });
 
     // ── Build application ───────────────────────────────────────
     let startup_duration = startup_start.elapsed();
@@ -335,11 +347,12 @@ fn validate_jwt_config() -> Result<()> {
 
 /// Build SSO state store with optional Redis backend
 async fn build_sso_store() -> routes::sso::SsoStateStore {
+    let redis_startup = config::redis_startup_timeout();
     let mut sso_store = routes::sso::SsoStateStore::new();
     if let Some(url) = config::resolve_redis_url() {
         match redis::Client::open(url.as_str()) {
             Ok(client) => match tokio::time::timeout(
-                std::time::Duration::from_secs(5),
+                redis_startup,
                 redis::aio::ConnectionManager::new(client)
             ).await {
                 Ok(Ok(conn)) => {
@@ -347,7 +360,10 @@ async fn build_sso_store() -> routes::sso::SsoStateStore {
                     sso_store = sso_store.with_redis(conn);
                 }
                 Ok(Err(e)) => tracing::warn!("SSO state Redis unavailable ({e}), using in-memory"),
-                Err(_) => tracing::warn!("SSO state Redis timed out (5s), using in-memory"),
+                Err(_) => tracing::warn!(
+                    "SSO state Redis timed out ({:?}), using in-memory",
+                    redis_startup
+                ),
             },
             Err(e) => tracing::warn!("SSO state Redis client error ({e}), using in-memory"),
         }

@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "vercel-build": "cd dashboard && npm ci && npm run build",
-    "render-deploy": "curl -X POST https://api.render.com/v1/blueprint-registrations -H \"Authorization: Bearer rnd_wnnEz7F4r8PaOrmepaRYANRKv6Ky\" -H \"Content-Type: application/json\" -d '{\"repo\": \"https://github.com/servetarslan02/HookSniff\", \"branch\": \"main\"}'"
+    "render-deploy": "bash deploy.sh"
   },
   "dependencies": {
     "pg": "^8.21.0"
