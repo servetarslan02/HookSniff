@@ -274,11 +274,16 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(std::sync::Arc::new(hooksniff_api::security::ddos::DdosProtection::new())))
         .layer(axum::middleware::from_fn(middleware::ddos::ddos_middleware));
 
-    // ── Start server ────────────────────────────────────────────
+    // ── Start server — bind TCP listener FIRST so Render's startup probe sees the port ──
     let addr = format!("0.0.0.0:{}", cfg.port);
     tracing::info!("🚀 HookSniff API running on port {}", cfg.port);
 
+    // Bind the TCP listener immediately — Render needs to see the port open within seconds
     let listener = tokio::net::TcpListener::bind(&addr).await?;
+    
+    // Mark health checks as ready AFTER binding (health_check returns 200 during startup)
+    routes::health::set_health_checks_ready();
+    
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await?;
