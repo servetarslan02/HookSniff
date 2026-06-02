@@ -57,7 +57,7 @@ async fn check_expired_keys(pool: &PgPool) -> ComplianceResult {
 async fn check_2fa_adoption(pool: &PgPool) -> ComplianceResult {
     let total: Option<(i64,)> = sqlx::query_as("SELECT COUNT(*) FROM customers")
         .fetch_optional(pool).await.unwrap_or(None);
-    let with_2fa: Option<(i64,)> = sqlx::query_as("SELECT COUNT(*) FROM customers WHERE two_factor_enabled = true")
+    let with_2fa: Option<(i64,)> = sqlx::query_as("SELECT COUNT(*) FROM customers WHERE totp_enabled = true")
         .fetch_optional(pool).await.unwrap_or(None);
 
     let total = total.map(|(c,)| c).unwrap_or(0);
