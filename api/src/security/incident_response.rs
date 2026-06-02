@@ -93,7 +93,7 @@ pub async fn create_incident(
 async fn auto_block_ip(pool: &PgPool, ip: &str, reason: &str) -> Result<(), sqlx::Error> {
     sqlx::query(
         r#"
-        INSERT INTO ip_blocks (ip_address, reason, auto_blocked, is_active)
+        INSERT INTO ip_blocklist (ip_address, reason, auto_blocked, is_active)
         VALUES ($1, $2, true, true)
         ON CONFLICT (ip_address) DO UPDATE SET is_active = true, reason = $2
         "#,

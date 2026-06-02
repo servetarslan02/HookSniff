@@ -1,6 +1,6 @@
 //! IP Blocklist Middleware
 //!
-//! Checks every incoming request against the `ip_blocks` table.
+//! Checks every incoming request against the `ip_blocklist` table.
 //! Blocked IPs get an immediate 403 response without hitting any handler.
 //!
 //! Integrates with the admin security dashboard (routes/admin/security.rs).
@@ -33,7 +33,7 @@ impl IpBlocklistCache {
     /// Refresh the blocklist from the database.
     pub async fn refresh(&self, pool: &PgPool) {
         let rows: Vec<(String,)> = sqlx::query_as(
-            "SELECT ip_address FROM ip_blocks WHERE is_active = true AND (expires_at IS NULL OR expires_at > NOW())"
+            "SELECT ip_address FROM ip_blocklist WHERE is_active = true AND (expires_at IS NULL OR expires_at > NOW())"
         )
         .fetch_all(pool)
         .await

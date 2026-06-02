@@ -72,7 +72,7 @@ pub async fn security_health(
 ) -> Result<Json<serde_json::Value>, AppError> {
     // Check various security subsystems
     let blocklist_count: Option<(i64,)> = sqlx::query_as(
-        "SELECT COUNT(*) FROM ip_blocks WHERE is_active = true"
+        "SELECT COUNT(*) FROM ip_blocklist WHERE is_active = true"
     )
     .fetch_optional(&pool)
     .await
