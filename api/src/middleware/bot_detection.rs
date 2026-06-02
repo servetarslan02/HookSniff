@@ -159,24 +159,5 @@ pub async fn bot_detection_middleware(
         tracing::debug!(bot_type = %result.bot_type, "Allowed bot detected");
     }
 
-    // Also run threat detection on every request (even non-bot)
-    let threat = crate::security::threat_detector::analyze_request(
-        &pool,
-        &ip,
-        None, // customer_id not yet available at this middleware stage
-        request.uri().path(),
-        request.method().as_str(),
-    )
-    .await;
-
-    if threat.is_threat {
-        tracing::warn!(
-            threat_type = ?threat.threat_type,
-            confidence = threat.confidence,
-            details = %threat.details,
-            "⚠️ Threat detected"
-        );
-    }
-
     Ok(next.run(request).await)
 }
