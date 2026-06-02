@@ -101,8 +101,10 @@ pub async fn security_health(
             "rate_limiting": "active",
             "bot_detection": "active",
             "ip_blocklist": "active",
+            "ddos_protection": "active",
             "threat_detection": "active",
             "incident_response": "active",
+            "zero_trust": "active",
             "compliance": "active",
         }
     })))
