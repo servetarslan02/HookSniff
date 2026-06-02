@@ -6,7 +6,6 @@
 //! - Dashboard entegrasyonu için structured JSON
 
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
 use uuid::Uuid;
 
 /// ML kararının açıklaması

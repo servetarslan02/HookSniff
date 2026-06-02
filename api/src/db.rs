@@ -121,6 +121,7 @@ async fn ensure_migrations_table(pool: &PgPool) -> Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 async fn is_migration_applied(pool: &PgPool, name: &str) -> Result<bool> {
     let row: Option<(String,)> = sqlx::query_as("SELECT name FROM _migrations WHERE name = $1")
         .bind(name)
@@ -137,6 +138,7 @@ async fn record_migration(pool: &PgPool, name: &str) -> Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 async fn run_migration(pool: &PgPool, name: &str, sql: &str) -> Result<()> {
     if is_migration_applied(pool, name).await? {
         tracing::debug!("⏭️  Migration '{}' already applied, skipping", name);
