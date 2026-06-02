@@ -384,8 +384,8 @@ async fn execute_stage(
             let mut drift_count = 0u64;
             for (eid,) in &endpoints {
                 // Son saatlik verileri al
-                let stats: Vec<(f64, f64, f64, i32)> = sqlx::query_as(
-                    "SELECT COALESCE(total_deliveries,0)::FLOAT, COALESCE(successful,0)::FLOAT, COALESCE(avg_latency_ms,0)::FLOAT, COALESCE(p95_latency_ms,0)
+                let stats: Vec<(f64, f64, f64, f64)> = sqlx::query_as(
+                    "SELECT COALESCE(total_deliveries,0)::FLOAT, COALESCE(successful,0)::FLOAT, COALESCE(avg_latency_ms,0)::FLOAT, COALESCE(p95_latency_ms,0)::FLOAT
                      FROM endpoint_hourly_stats WHERE endpoint_id = $1 ORDER BY hour_start DESC LIMIT 24"
                 ).bind(eid).fetch_all(pool).await?;
 
