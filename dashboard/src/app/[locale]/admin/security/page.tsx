@@ -51,14 +51,14 @@ const SEVERITY_BAR_COLORS: Record<string, string> = {
   critical: 'bg-red-500', high: 'bg-orange-500', medium: 'bg-amber-500', low: 'bg-blue-500',
 };
 const EVENT_TYPE_LABELS: Record<string, string> = {
-  brute_force_login: 'Brute Force Giriş', brute_force_api: 'Brute Force API',
+  brute_force_login: 'Brute Force Login', brute_force_api: 'Brute Force API',
   credential_stuffing: 'Credential Stuffing', password_spray: 'Password Spray',
-  sql_injection_attempt: 'SQL Injection', xss_attempt: 'XSS Saldırısı',
-  path_traversal_attempt: 'Path Traversal', scanner_detected: 'Tarayıcı Tespit',
-  suspicious_user_agent: 'Şüpheli UA', disabled_account_login: 'Pasif Hesap Girişi',
-  password_reset_abuse: 'Şifre Sıfırlama İstismarı', account_enumeration: 'Hesap Numaralandırma',
-  rate_limit_exceeded: 'Rate Limit Aşıldı', unusual_location: 'Olağandışı Konum',
-  login_new_device: 'Yeni Cihaz Girişi',
+  sql_injection_attempt: 'SQL Injection', xss_attempt: 'XSS Attack',
+  path_traversal_attempt: 'Path Traversal', scanner_detected: 'Scanner Detected',
+  suspicious_user_agent: 'Suspicious UA', disabled_account_login: 'Disabled Account Login',
+  password_reset_abuse: 'Password Reset Abuse', account_enumeration: 'Account Enumeration',
+  rate_limit_exceeded: 'Rate Limit Exceeded', unusual_location: 'Unusual Location',
+  login_new_device: 'New Device Login',
 };
 const SEVERITY_OPTIONS = ['all', 'critical', 'high', 'medium', 'low'];
 const RESOLVED_OPTIONS = ['all', 'unresolved', 'resolved'];
@@ -68,11 +68,11 @@ const RESOLVED_OPTIONS = ['all', 'unresolved', 'resolved'];
 function relativeTime(dateStr: string): string {
   const diff = Math.max(0, Date.now() - new Date(dateStr).getTime());
   const mins = Math.floor(diff / 60_000);
-  if (mins < 1) return 'az önce';
-  if (mins < 60) return `${mins}dk önce`;
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}sa önce`;
-  return `${Math.floor(hours / 24)}g önce`;
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
 }
 
 function isValidIp(ip: string): boolean {
@@ -168,7 +168,7 @@ export default function AdminSecurityPage() {
       adminApi.blockIp(token!, payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'ip-blocklist'] });
-      toast('IP bloklandı', 'success');
+      toast('IP blocked', 'success');
       setBlockForm(emptyBlockForm);
       setShowBlockForm(false);
     },
@@ -179,17 +179,17 @@ export default function AdminSecurityPage() {
     mutationFn: (id: string) => adminApi.unblockIp(token!, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'ip-blocklist'] });
-      toast('IP bloğu kaldırıldı', 'success');
+      toast('IP unblocked', 'success');
       setUnblockTarget(null);
     },
-    onError: () => toast('Kaldırılamadı', 'error'),
+    onError: () => toast('Failed to remove', 'error'),
   });
 
   // ── Handlers ──
   const handleBlockIp = () => {
     const ip = blockForm.ip_address.trim();
     if (!ip) return;
-    if (!isValidIp(ip)) { setBlockIpError('Geçerli bir IP adresi girin'); return; }
+    if (!isValidIp(ip)) { setBlockIpError('Please enter a valid IP address'); return; }
     setBlockIpError('');
     const payload: { ip_address: string; reason?: string; expires_hours?: number } = { ip_address: ip };
     if (blockForm.reason.trim()) payload.reason = blockForm.reason.trim();
@@ -320,14 +320,14 @@ export default function AdminSecurityPage() {
           </div>
           {stats.top_ips.length > 0 && (
             <div className="glass-card p-5 lg:col-span-2">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4"><Globe size={14} strokeWidth={1.75} className="inline mr-1.5" />En Çok Olay Olan IP'ler (7 gün)</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4"><Globe size={14} strokeWidth={1.75} className="inline mr-1.5" />Top IPs with Events (7d)</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {stats.top_ips.map((ip, i) => (
                   <div key={i} className="flex items-center justify-between py-2 px-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
                     <button onClick={() => handleBlockFromEvent(ip.ip_address)} className="text-sm font-mono text-gray-700 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition">{ip.ip_address}</button>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-gray-500 dark:text-slate-400">{ip.count} olay</span>
-                      <button onClick={() => handleBlockFromEvent(ip.ip_address)} className="text-xs text-red-500 hover:text-red-700 transition" title="Bu IP'yi blokla"><Ban size={12} strokeWidth={1.75} /></button>
+                      <span className="text-xs font-medium text-gray-500 dark:text-slate-400">{ip.count} events</span>
+                      <button onClick={() => handleBlockFromEvent(ip.ip_address)} className="text-xs text-red-500 hover:text-red-700 transition" title="Block this IP"><Ban size={12} strokeWidth={1.75} /></button>
                     </div>
                   </div>
                 ))}
@@ -352,7 +352,7 @@ export default function AdminSecurityPage() {
             </select>
             <div className="relative flex-1 min-w-[200px]">
               <Search size={14} strokeWidth={1.75} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" value={searchIp} onChange={handleSearchIpChange} placeholder="IP ara..." className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" />
+              <input type="text" value={searchIp} onChange={handleSearchIpChange} placeholder="Search IP..." className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white" />
             </div>
             <button onClick={() => refetchEvents()} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition">
               <RefreshCw size={16} strokeWidth={1.75} />
@@ -397,7 +397,7 @@ export default function AdminSecurityPage() {
                         <div className="flex items-center gap-2 shrink-0">
                           {!event.resolved && (
                             <button onClick={(e) => { e.stopPropagation(); resolveMutation.mutate(event.id); }} className="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-500/10 hover:bg-green-100 dark:hover:bg-green-500/20 rounded-lg transition">
-                              <CheckCircle2 size={14} strokeWidth={1.75} className="inline mr-1" />Çöz
+                              <CheckCircle2 size={14} strokeWidth={1.75} className="inline mr-1" />Resolve
                             </button>
                           )}
                           {isExpanded ? <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg> : <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>}
@@ -407,16 +407,16 @@ export default function AdminSecurityPage() {
                     {isExpanded && (
                       <div className="px-4 pb-4 pt-0 border-t border-gray-100 dark:border-slate-700/50 mt-2">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                          <div><span className="text-[11px] text-gray-400 uppercase">Olay ID</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.id}</p></div>
+                          <div><span className="text-[11px] text-gray-400 uppercase">Event ID</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.id}</p></div>
                           <div><span className="text-[11px] text-gray-400 uppercase">Müşteri ID</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.customer_id || '—'}</p></div>
                           <div><span className="text-[11px] text-gray-400 uppercase">Email</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.email || '—'}</p></div>
                           <div><span className="text-[11px] text-gray-400 uppercase">IP Adresi</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.ip_address || '—'}</p></div>
                           <div className="sm:col-span-2"><span className="text-[11px] text-gray-400 uppercase">User Agent</span><p className="text-xs text-gray-700 dark:text-slate-300 break-all">{event.user_agent || '—'}</p></div>
-                          <div><span className="text-[11px] text-gray-400 uppercase">Tarih</span><p className="text-xs text-gray-700 dark:text-slate-300">{new Date(event.created_at).toLocaleString()}</p></div>
-                          <div><span className="text-[11px] text-gray-400 uppercase">{t('resolvedBadge')}</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.resolved ? `Evet (${event.resolved_at ? new Date(event.resolved_at).toLocaleString() : ''})` : 'Hayır'}</p></div>
+                          <div><span className="text-[11px] text-gray-400 uppercase">Date</span><p className="text-xs text-gray-700 dark:text-slate-300">{new Date(event.created_at).toLocaleString()}</p></div>
+                          <div><span className="text-[11px] text-gray-400 uppercase">{t('resolvedBadge')}</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.resolved ? `Yes (${event.resolved_at ? new Date(event.resolved_at).toLocaleString() : ''})` : 'Hayır'}</p></div>
                         </div>
                         {event.details && Object.keys(event.details).length > 0 && (
-                          <div className="mt-3"><span className="text-[11px] text-gray-400 uppercase">Detaylar</span><pre className="mt-1 text-xs font-mono text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800 rounded-lg p-3 overflow-x-auto max-h-32">{JSON.stringify(event.details, null, 2)}</pre></div>
+                          <div className="mt-3"><span className="text-[11px] text-gray-400 uppercase">Details</span><pre className="mt-1 text-xs font-mono text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800 rounded-lg p-3 overflow-x-auto max-h-32">{JSON.stringify(event.details, null, 2)}</pre></div>
                         )}
                       </div>
                     )}
