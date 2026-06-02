@@ -8,6 +8,7 @@ pub mod billing;
 pub mod cache;
 pub mod circuit_breaker;
 pub mod config;
+#[cfg(test)]
 pub mod config_tests;
 pub mod cors;
 pub mod cortex;
@@ -15,6 +16,7 @@ pub mod crypto;
 pub mod db;
 pub mod email;
 pub mod email_templates;
+#[cfg(test)]
 pub mod email_tests;
 pub mod error;
 pub mod events;

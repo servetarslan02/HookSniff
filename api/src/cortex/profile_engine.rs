@@ -10,6 +10,7 @@ use uuid::Uuid;
 struct ProfileRow {
     total_7d: i64,
     successful_7d: i64,
+    #[allow(dead_code)]
     failed_7d: i64,
     avg_lat: f64,
     p95_lat: f64,

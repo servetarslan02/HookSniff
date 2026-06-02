@@ -320,7 +320,7 @@ async fn post_explain_anomaly(Extension(pool): Extension<PgPool>, Extension(c): 
     Ok(Json(serde_json::to_value(explanation).unwrap_or_default()))
 }
 
-async fn post_explain_prediction(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
+async fn post_explain_prediction(Extension(_pool): Extension<PgPool>, Extension(c): Extension<Customer>, Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
     let eid = body.get("endpoint_id").and_then(|v| v.as_str()).and_then(|s| Uuid::parse_str(s).ok()).ok_or(AppError::BadRequest("endpoint_id required".into()))?;
     let predicted_sr = body.get("predicted_sr").and_then(|v| v.as_f64()).unwrap_or(90.0);
