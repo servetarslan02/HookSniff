@@ -230,7 +230,11 @@ async fn main() -> Result<()> {
         .layer(axum::middleware::from_fn(middleware::security_headers_middleware))
         .layer(axum::middleware::from_fn(rate_limit::rate_limit_middleware))
         .layer(axum::Extension(rate_limiter))
-        .layer(axum::Extension(metrics));
+        .layer(axum::Extension(metrics))
+        // Security middleware
+        .layer(axum::Extension(std::sync::Arc::new(middleware::ip_blocklist::IpBlocklistCache::new())))
+        .layer(axum::middleware::from_fn(middleware::ip_blocklist::ip_blocklist_middleware))
+        .layer(axum::middleware::from_fn(middleware::bot_detection::bot_detection_middleware));
 
     // ── Start server ────────────────────────────────────────────
     let addr = format!("0.0.0.0:{}", cfg.port);
