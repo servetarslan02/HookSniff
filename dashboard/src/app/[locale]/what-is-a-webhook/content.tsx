@@ -18,7 +18,7 @@ export function WhatIsWebhookPageContent() {
         <div className="prose prose-gray dark:prose-invert max-w-none space-y-8">
           <section>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("simpleExplanation")}</h2>
-            <p className="text-gray-600 dark:text-slate-400 leading-relaxed">Bir webhook, bir şey olduğunda bir uygulamanın başka bir uygulamaya gerçek zamanlı veri gönderme yoludur. Uygulamanızın sürekli olarak &quot;Yeni veri var mı? Yeni veri var mı?&quot; diye sormak (polling) yerine, diğer uygulama bir şey değiştiğinde size söyler.</p>
+            <p className="text-gray-600 dark:text-slate-400 leading-relaxed">A webhook is a way for one application to send real-time data to another when something happens. Instead of your application constantly asking &quot;Is there new data? Is there new data?&quot; (polling), the other application tells you when something changes.</p>
             <div className="p-4 bg-brand-50 dark:bg-brand-500/10 rounded-lg border border-brand-200 dark:border-brand-500/20 my-4">
               <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{t("thinkOfIt")}</p>
               <p className="text-sm text-gray-600 dark:text-slate-400"><strong>{t("polling")}</strong> {t("pizzaPollingDesc")}</p>
@@ -75,10 +75,10 @@ export function WhatIsWebhookPageContent() {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t("security")}</h2>
             <p className="text-gray-600 dark:text-slate-400 mb-3">{t("securityDesc")}</p>
             <ul className="space-y-2 text-gray-600 dark:text-slate-400">
-              <li><strong>{t("hmac")}</strong> — Gönderen payload'ı bir gizli anahtarla imzalar. Siz imzayı doğrularsınız.</li>
-              <li><strong>{t("https")}</strong> — İletimdeki verileri şifrelemek için her zaman TLS kullanın.</li>
-              <li><strong>{t("ipWhitelisting")}</strong> — Yalnızca bilinen IP adreslerinden gelen istekleri kabul edin.</li>
-              <li><strong>{t("timestampValidation")}</strong> — Tekrar saldırılarını önlemek için eski istekleri reddedin.</li>
+              <li><strong>{t("hmac")}</strong> — The sender signs the payload with a secret key. You verify the signature.</li>
+              <li><strong>{t("https")}</strong> — Always use TLS to encrypt data in transit.</li>
+              <li><strong>{t("ipWhitelisting")}</strong> — Only accept requests from known IP addresses.</li>
+              <li><strong>{t("timestampValidation")}</strong> — Reject old requests to prevent replay attacks.</li>
             </ul>
           </section>
 
