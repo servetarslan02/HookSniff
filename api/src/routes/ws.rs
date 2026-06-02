@@ -39,6 +39,7 @@ pub async fn ws_handler(
 
 /// Origin header validation — only allow trusted domains.
 fn validate_origin(headers: &HeaderMap) -> Result<(), StatusCode> {
+    #[allow(unused_mut)] // mut is needed in debug builds (cfg(debug_assertions) extend)
     let mut allowed_origins = vec![
         "https://hooksniff.vercel.app",
         "https://www.hooksniff.vercel.app",
