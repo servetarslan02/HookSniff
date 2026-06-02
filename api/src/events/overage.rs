@@ -85,13 +85,25 @@ pub async fn track_daily_event(
         .flatten();
 
         if let Some(ext_id) = polar_id {
-            // Send event to Polar (best-effort, don't block)
+            // CRITICAL: Always send 1 (delta), NOT overage_count (cumulative).
+            // Polar's meter uses SUM — sending cumulative count causes exponential billing.
+            // Example: 3 overages → sending 1,2,3 → Polar sums to 6 instead of 3.
             let cfg = crate::billing::polar::PolarConfig::from_env();
             if let Some(cfg) = cfg {
                 let provider = crate::billing::polar::PolarProvider::new(cfg);
-                // Use tokio::spawn to not block the request
+                // Retry up to 3 times with exponential backoff
                 tokio::spawn(async move {
-                    let _ = provider.ingest_overage_event(&ext_id, overage_count).await;
+                    for attempt in 0..3u32 {
+                        match provider.ingest_overage_event(&ext_id, 1).await {
+                            Ok(()) => break,
+                            Err(e) => {
+                                tracing::warn!("⚠️ Polar overage event attempt {}/3 failed for {}: {}", attempt + 1, ext_id, e);
+                                if attempt < 2 {
+                                    tokio::time::sleep(tokio::time::Duration::from_secs(2u64.pow(attempt + 1))).await;
+                                }
+                            }
+                        }
+                    }
                 });
             }
         }

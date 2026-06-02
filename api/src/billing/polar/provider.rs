@@ -385,12 +385,18 @@ impl PaymentProviderImpl for PolarProvider {
                     .execute(pool)
                     .await;
 
-                    // Downgrade to free
+                    // Downgrade to free and clean up Polar IDs
+                    // IMPORTANT: Clear polar_subscription_id to prevent "already subscribed" errors
+                    // when customer tries to resubscribe later.
                     let free_limit = Plan::Developer.max_webhooks_per_day() as i64;
                     let _ = sqlx::query(
                         "UPDATE customers SET \
                          plan = 'free', webhook_limit = $1, \
                          cancel_at_period_end = false, \
+                         polar_subscription_id = NULL, \
+                         polar_customer_id = NULL, \
+                         current_period_end = NULL, \
+                         billing_interval = NULL, \
                          updated_at = NOW() \
                          WHERE id = $2",
                     )
