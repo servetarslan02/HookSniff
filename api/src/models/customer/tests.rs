@@ -33,6 +33,7 @@ mod tests {
             current_period_end: None,
             allow_overage: false,
             overage_email_notification: false,
+            overage_terms_accepted_at: None,
             role: "user".to_string(),
             card_last4: Some("4242".to_string()),
             card_brand: Some("visa".to_string()),
