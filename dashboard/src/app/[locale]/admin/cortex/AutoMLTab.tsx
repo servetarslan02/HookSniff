@@ -16,7 +16,6 @@ interface Trial {
 
 export function AutoMLTab() {
   const t = useTranslations('cortex.autoML');
-  const tc = useTranslations('cortex.common');
   const { token } = useAuth();
   const [trials, setTrials] = useState<Trial[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +41,7 @@ export function AutoMLTab() {
       {trials.length === 0 ? (
         <div className="glass-card p-8 text-center">
           <p className="text-gray-500 dark:text-slate-400">{t('empty')}</p>
-          <p className="text-xs text-gray-400 mt-2">POST /cortex/automl/run {`{ "endpoint_id": "...", "model_type": "adaptive_threshold" }`}</p>
+          <p className="text-xs text-gray-400 mt-2">POST /cortex/automl/run {'{ "endpoint_id": "...", "model_type": "adaptive_threshold" }'}</p>
         </div>
       ) : (
         <div className="space-y-2">
