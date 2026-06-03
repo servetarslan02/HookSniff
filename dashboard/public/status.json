@@ -16,9 +16,9 @@
         }
       },
       "status": "down",
-      "latency_ms": 4,
+      "latency_ms": 2,
       "description": "HookSniff REST API (Cloud Run)",
-      "last_checked": "2026-06-03T20:01:19.815Z"
+      "last_checked": "2026-06-03T20:06:51.673Z"
     },
     {
       "name": "Dashboard",
@@ -34,9 +34,9 @@
         }
       },
       "status": "degraded",
-      "latency_ms": 1,
+      "latency_ms": 0,
       "description": "Next.js frontend (Vercel)",
-      "last_checked": "2026-06-03T20:01:19.815Z"
+      "last_checked": "2026-06-03T20:06:51.673Z"
     },
     {
       "name": "Worker",
@@ -54,7 +54,7 @@
       "status": "unknown",
       "latency_ms": null,
       "description": "Background delivery worker (Cloud Run)",
-      "last_checked": "2026-06-03T20:01:19.815Z"
+      "last_checked": "2026-06-03T20:06:51.673Z"
     },
     {
       "name": "Database",
@@ -70,9 +70,9 @@
         }
       },
       "status": "down",
-      "latency_ms": 1,
+      "latency_ms": 0,
       "description": "PostgreSQL (Neon)",
-      "last_checked": "2026-06-03T20:01:19.815Z"
+      "last_checked": "2026-06-03T20:06:51.673Z"
     },
     {
       "name": "Cache",
@@ -90,7 +90,7 @@
       "status": "unknown",
       "latency_ms": 0,
       "description": "Redis (Upstash)",
-      "last_checked": "2026-06-03T20:01:19.815Z"
+      "last_checked": "2026-06-03T20:06:51.673Z"
     },
     {
       "name": "Email Service",
@@ -106,9 +106,9 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 307,
+      "latency_ms": 303,
       "description": "Gmail API",
-      "last_checked": "2026-06-03T20:01:19.815Z"
+      "last_checked": "2026-06-03T20:06:51.673Z"
     },
     {
       "name": "Storage",
@@ -124,24 +124,27 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 38,
+      "latency_ms": 45,
       "description": "Cloudflare R2",
-      "last_checked": "2026-06-03T20:01:19.815Z"
+      "last_checked": "2026-06-03T20:06:51.673Z"
     }
   ],
-  "checked_at": "2026-06-03T20:01:19.815Z",
+  "checked_at": "2026-06-03T20:06:51.673Z",
   "response_times": {
     "API": [
       1,
-      4
+      4,
+      2
     ],
     "Email Service": [
       281,
-      307
+      307,
+      303
     ],
     "Storage": [
       51,
-      38
+      38,
+      45
     ],
     "Dashboard": [
       1
