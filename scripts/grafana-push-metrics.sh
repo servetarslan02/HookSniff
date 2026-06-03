@@ -7,7 +7,7 @@ GRAFANA_USER="1625476"
 GRAFANA_TOKEN="glc_eyJvIjoiMTc1NzMzNSIsIm4iOiJob29rc25pZmYtaG9va3NuaWZmLW90ZWwiLCJrIjoiOHZuSDRNdlU0NTEzTkMzbGt3eDE0eDljIiwibSI6eyJyIjoidXMifX0="
 
 # Fetch health data from API
-HEALTH=$(curl -s https://hooksniff-api-1046140057667.europe-west1.run.app/health 2>/dev/null)
+HEALTH=$(curl -s https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/health 2>/dev/null)
 
 if [ -z "$HEALTH" ]; then
   echo "API unreachable"
