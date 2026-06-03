@@ -447,7 +447,7 @@
   "alerts": {
     "title": "Alert Rules",
     "subtitle": "Get notified when webhooks fail or endpoints have issues.",
-    "newAlert": "+ New Alert",
+    "newAlert": "New Alert",
     "cancel": "Cancel",
     "create": "Create Alert",
     "createTitle": "Create Alert",
@@ -538,12 +538,12 @@
   "team": {
     "title": "Team Management",
     "subtitle": "Manage your teams and collaborate with others",
-    "createTeam": "+ Create Team",
+    "createTeam": "Create Team",
     "yourTeams": "Your Teams",
     "noTeams": "No teams yet",
     "loadingTeams": "Loading teams…",
     "members": "members",
-    "invite": "+ Invite",
+    "invite": "Invite",
     "noMembers": "No members yet. Invite someone!",
     "selectTeam": "Select a team to view details",
     "createTitle": "Create Team",
@@ -574,7 +574,7 @@
     "failedToUpdateRole": "Could not update the role. Please try again.",
     "cannotDemoteSelf": "You cannot demote yourself. Ask another owner.",
     "descriptionLabel": "Description (optional)",
-    "inviteBtn": "+ Invite",
+    "inviteBtn": "Invite",
     "joinedPrefix": "Joined",
     "membersCount": "{count} members",
     "roleOwner": "Owner",
@@ -2963,7 +2963,7 @@
   "transforms": {
     "title": "📋 Webhook Transforms",
     "subtitle": "Filter, map, and enrich webhook payloads before delivery",
-    "newRule": "+ New Rule",
+    "newRule": "New Rule",
     "selectEndpoint": "Select Endpoint",
     "chooseEndpoint": "Choose an endpoint…",
     "newTransformRule": "New Transform Rule",
@@ -3464,7 +3464,7 @@
     "templates": "Templates",
     "eventType": "Event Type",
     "payloadFields": "Payload Fields",
-    "addField": "+ Add field",
+    "addField": "Add field",
     "sendTo": "Send To",
     "endpointPlaceholder": "ep_your_endpoint_id",
     "sending": "Sending…",
@@ -4733,7 +4733,7 @@
     "name": "Name",
     "token": "Token",
     "createdAt": "Created at",
-    "createToken": "+ Create service token",
+    "createToken": "Create service token",
     "createTitle": "Create Service Token",
     "namePlaceholder": "e.g., Production, CI/CD, Staging",
     "created": "Service token created!",
@@ -4952,7 +4952,7 @@
   "connectors": {
     "title": "Connectors",
     "subtitle": "Manage external service integrations (Stripe, Shopify, GitHub, etc.).",
-    "addConnector": "+ Add Connector",
+    "addConnector": "Add Connector",
     "availableConnectors": "Available Connectors",
     "yourConfigurations": "Your Configurations",
     "noConnectors": "No connectors configured",
@@ -4985,7 +4985,7 @@
   "environments": {
     "title": "Environments",
     "subtitle": "Manage dev, staging, and production environments",
-    "newEnvironment": "+ New Environment",
+    "newEnvironment": "New Environment",
     "createEnvironment": "Create Environment",
     "name": "Name",
     "namePlaceholder": "Production",
@@ -5076,7 +5076,7 @@
   "streaming": {
     "title": "Streaming",
     "subtitle": "Real-time event streaming — SSE and WebSocket channels",
-    "newChannel": "+ New Channel",
+    "newChannel": "New Channel",
     "createChannel": "Create Stream Channel",
     "name": "Name",
     "namePlaceholder": "e.g. live-deliveries",
@@ -7249,6 +7249,15 @@
     "securityPage": {
       "title": "Security Monitoring",
       "subtitle": "Enterprise-grade security, startup-friendly pricing"
+    },
+    "overview": {
+      "noData": "Collecting data. Cortex will start showing insights once it has enough data from your webhooks.",
+      "metric": {
+        "issues24h": "Issues (Last 24h)",
+        "autoFix": "Auto Correction",
+        "predictions": "Prediction",
+        "proactiveAlert": "Proactive Alert"
+      }
     }
   }
 }

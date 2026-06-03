@@ -447,7 +447,7 @@
   "alerts": {
     "title": "Alarm Kuralları",
     "subtitle": "Webhook'lar başarısız olduğunda veya endpoint'lerde sorun olduğunda bildirim alın.",
-    "newAlert": "+ Yeni Alarm",
+    "newAlert": "Yeni Alarm",
     "cancel": "İptal",
     "create": "Alarm Oluştur",
     "createTitle": "Alarm Oluştur",
@@ -540,12 +540,12 @@
   "team": {
     "title": "Ekip Yönetimi",
     "subtitle": "Ekiplerinizi yönetin ve başkalarıyla işbirliği yapın",
-    "createTeam": "+ Ekip Oluştur",
+    "createTeam": "Ekip Oluştur",
     "yourTeams": "Ekipleriniz",
     "noTeams": "Henüz ekip yok",
     "loadingTeams": "Ekipler yükleniyor...",
     "members": "üye",
-    "invite": "+ Davet Et",
+    "invite": "Davet Et",
     "noMembers": "Henüz üye yok. Birini davet edin!",
     "selectTeam": "Detayları görmek için bir ekip seçin",
     "createTitle": "Ekip Oluştur",
@@ -576,7 +576,7 @@
     "failedToUpdateRole": "Rol güncellenemedi",
     "cannotDemoteSelf": "Kendinizi alt rütbe düşüremezsiniz. Başka bir sahipten isteyin.",
     "descriptionLabel": "Açıklama (isteğe bağlı)",
-    "inviteBtn": "+ Davet Et",
+    "inviteBtn": "Davet Et",
     "joinedPrefix": "Katıldı",
     "membersCount": "{count} üye",
     "roleOwner": "Sahip",
@@ -3101,7 +3101,7 @@
   "transforms": {
     "title": "🔄 Webhook Dönüştürmeleri",
     "subtitle": "Webhook verilerini teslimattan önce filtreleyin, eşleyin ve zenginleştirin.",
-    "newRule": "+ Yeni Kural",
+    "newRule": "Yeni Kural",
     "selectEndpoint": "Endpoint Seçin",
     "chooseEndpoint": "Bir endpoint seçin...",
     "newTransformRule": "Yeni Dönüştürme Kuralı",
@@ -3466,7 +3466,7 @@
     "templates": "Şablonlar",
     "eventType": "Olay Türü",
     "payloadFields": "Payload Alanları",
-    "addField": "+ Alan ekle",
+    "addField": "Alan ekle",
     "sendTo": "Gönder",
     "endpointPlaceholder": "ep_endpoint_id_niz",
     "sending": "Gönderiliyor...",
@@ -4735,7 +4735,7 @@
     "name": "Ad",
     "token": "Jeton",
     "createdAt": "Oluşturuldu",
-    "createToken": "+ Hizmet jetonu oluştur",
+    "createToken": "Hizmet jetonu oluştur",
     "createTitle": "Hizmet Jetonu Oluştur",
     "namePlaceholder": "ör. Üretim, CI/CD, Staging",
     "created": "Hizmet jetonu oluşturuldu!",
@@ -4954,7 +4954,7 @@
   "connectors": {
     "title": "Bağlayıcılar",
     "subtitle": "Harici hizmet entegrasyonlarını yönetin (Stripe, Shopify, GitHub, vb.).",
-    "addConnector": "+ Bağlayıcı Ekle",
+    "addConnector": "Bağlayıcı Ekle",
     "availableConnectors": "Mevcut Bağlayıcılar",
     "yourConfigurations": "Yapılandırmalarınız",
     "noConnectors": "Henüz bağlayıcı yapılandırması yok",
@@ -4987,7 +4987,7 @@
   "environments": {
     "title": "Ortamlar",
     "subtitle": "Geliştirme, staging ve üretim ortamlarını yönetin",
-    "newEnvironment": "+ Yeni Ortam",
+    "newEnvironment": "Yeni Ortam",
     "createEnvironment": "Ortam Oluştur",
     "name": "Ad",
     "namePlaceholder": "Production",
@@ -5078,7 +5078,7 @@
   "streaming": {
     "title": "Yayın",
     "subtitle": "Gerçek zamanlı olay yayını — SSE ve WebSocket kanalları",
-    "newChannel": "+ Yeni Kanal",
+    "newChannel": "Yeni Kanal",
     "createChannel": "Yayın Kanalı Oluştur",
     "name": "İsim",
     "namePlaceholder": "örn. canlı-teslimatlar",
@@ -7251,6 +7251,15 @@
     "securityPage": {
       "title": "Güvenlik İzleme",
       "subtitle": "Kurumsal düzeyde güvenlik, girişim dostu fiyatlandırma"
+    },
+    "overview": {
+      "noData": "Henüz veri toplanıyor. Cortex'i webhook'lardan yeterli veri topladığında göstermeye başlayacak.",
+      "metric": {
+        "issues24h": "Sorun (Son 24 Saat)",
+        "autoFix": "Otomatik Düzeltme",
+        "predictions": "Tahmin",
+        "proactiveAlert": "Proaktif Uyarı"
+      }
     }
   }
 }

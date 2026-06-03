@@ -95,7 +95,7 @@ export function ProactiveTab({ token }: { token: string | null }) {
                         insight.severity === 'info' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
                         'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                       }`}>
-                        {insight.severity === 'critical' ? tc('severity.critical') : insight.severity === 'warning' ? tc('severity.warning') : insight.severity === 'info' ? tc('severity.info') : tc('severity.normal')
+                        {insight.severity === 'critical' ? tc('severity.critical') : insight.severity === 'warning' ? tc('severity.warning') : insight.severity === 'info' ? tc('severity.info') : tc('severity.normal')}
                       </span>
                     </div>
                     {info.detail && <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>}
@@ -105,7 +105,7 @@ export function ProactiveTab({ token }: { token: string | null }) {
                       </div>
                     )}
                     <div className="flex items-center gap-4 mt-2">
-                      <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1"><Clock size={12} /> {new Date(insight.created_at).toLocaleString('tr-TR')}</p>
+                      <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1"><Clock size={12} /> {new Date(insight.created_at).toLocaleString()}</p>
                       <p className="text-xs text-gray-400 dark:text-slate-500">{insight.insight_type.replace(/_/g, ' ')}</p>
                     </div>
                   </div>
