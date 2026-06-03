@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 
@@ -17,6 +18,8 @@ interface AbTest {
 }
 
 export function ABTestTab() {
+  const t = useTranslations('cortex.abTest');
+  const tc = useTranslations('cortex.common');
   const { token } = useAuth();
   const [tests, setTests] = useState<AbTest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +29,7 @@ export function ABTestTab() {
     if (!token) return;
     apiFetch<{ ab_tests: AbTest[] }>('/cortex/ab-tests', { token })
       .then(d => setTests(d.ab_tests ?? []))
-      .catch((err) => { console.error('[ABTestTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
+      .catch((err) => { console.error('[ABTestTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -36,13 +39,13 @@ export function ABTestTab() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">A/B Testleri</h2>
-        <span className="text-sm text-gray-500">{tests.length} test</span>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('title')}</h2>
+        <span className="text-sm text-gray-500">{t('testCount', {n: tests.length})}</span>
       </div>
 
       {tests.length === 0 ? (
         <div className="glass-card p-8 text-center">
-          <p className="text-gray-500 dark:text-slate-400">Henüz A/B testi yok. Model karşılaştırmaları için API'den test başlatın.</p>
+          <p className="text-gray-500 dark:text-slate-400">{t('empty')}</p>
         </div>
       ) : (
         <div className="space-y-3">
