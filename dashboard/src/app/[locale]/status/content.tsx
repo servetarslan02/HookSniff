@@ -14,7 +14,6 @@ import { UptimeBar } from './components/UptimeBar';
 import { ComponentRow } from './components/ComponentRow';
 import { IncidentLog } from './components/IncidentLog';
 import { MaintenanceSection } from './components/MaintenanceSection';
-import { Cloud, Database, HardDrive, Mail, Monitor, Settings, Zap } from '@/components/icons';
 
 // ─── Fallback Data ───
 function unreachableData(): StatusData {
@@ -22,13 +21,13 @@ function unreachableData(): StatusData {
     overall_status: 'down',
     uptime_30d: 0,
     components: [
-      { name: 'API', icon: <Zap size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'HookSniff REST API (Cloud Run)', last_checked: new Date().toISOString() },
-      { name: 'Dashboard', icon: <Monitor size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'Next.js frontend (Vercel)', last_checked: new Date().toISOString() },
-      { name: 'Worker', icon: <Settings size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'Background delivery worker (Cloud Run)', last_checked: new Date().toISOString() },
-      { name: 'Database', icon: <Database size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'PostgreSQL (Neon)', last_checked: new Date().toISOString() },
-      { name: 'Cache', icon: <HardDrive size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'Redis (Upstash)', last_checked: new Date().toISOString() },
-      { name: 'Email Service', icon: <Mail size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'Gmail API', last_checked: new Date().toISOString() },
-      { name: 'Storage', icon: <Cloud size={16} strokeWidth={1.75} />, status: 'unknown', latency_ms: null, description: 'Cloudflare R2', last_checked: new Date().toISOString() },
+      { name: 'API', icon: null, status: 'unknown', latency_ms: null, description: 'HookSniff REST API (Cloud Run)', last_checked: new Date().toISOString() },
+      { name: 'Dashboard', icon: null, status: 'unknown', latency_ms: null, description: 'Next.js frontend (Vercel)', last_checked: new Date().toISOString() },
+      { name: 'Worker', icon: null, status: 'unknown', latency_ms: null, description: 'Background delivery worker (Cloud Run)', last_checked: new Date().toISOString() },
+      { name: 'Database', icon: null, status: 'unknown', latency_ms: null, description: 'PostgreSQL (Neon)', last_checked: new Date().toISOString() },
+      { name: 'Cache', icon: null, status: 'unknown', latency_ms: null, description: 'Redis (Upstash)', last_checked: new Date().toISOString() },
+      { name: 'Email Service', icon: null, status: 'unknown', latency_ms: null, description: 'Gmail API', last_checked: new Date().toISOString() },
+      { name: 'Storage', icon: null, status: 'unknown', latency_ms: null, description: 'Cloudflare R2', last_checked: new Date().toISOString() },
     ],
     checked_at: new Date().toISOString(),
     response_times: {},
