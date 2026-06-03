@@ -44,18 +44,15 @@ const nextConfig = {
     }];
   },
   async rewrites() {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    // Remove /v1 suffix from apiBase for rewrites if present, as the path already includes it or handles it
-    const normalizedApiBase = apiBase.endsWith('/v1') ? apiBase.slice(0, -3) : apiBase;
-    
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
     return [
       {
         source: '/api/health',
-        destination: `${normalizedApiBase}/health`,
+        destination: `${apiBase}/health`,
       },
       {
         source: '/api/:path*',
-        destination: `${normalizedApiBase}/:path*`,
+        destination: `${apiBase}/:path*`,
       },
     ];
   },
