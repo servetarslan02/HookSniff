@@ -6,6 +6,7 @@ import { useLiveApiKeys } from '@/hooks/useCollections';
 import { useCreateApiKey, useDeleteApiKey, useRotateApiKey } from '@/hooks/useDashboardData';
 import { VirtualTable } from '@/components/VirtualTable';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function ApiKeysPage() {
   const t = useTranslations('apiKeys');
@@ -17,6 +18,7 @@ export default function ApiKeysPage() {
 
   const [newKeyName, setNewKeyName] = useState('');
   const [revealedKey, setRevealedKey] = useState<string | null>(null);
+  const [rotateConfirm, setRotateConfirm] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const handleCreate = () => {
@@ -31,7 +33,10 @@ export default function ApiKeysPage() {
 
   const handleRotate = (id: string) => {
     rotateKey.mutate(id, {
-      onSuccess: (data) => setRevealedKey(data.key),
+      onSuccess: (data) => {
+        setRevealedKey(data.key);
+        setRotateConfirm(null);
+      },
     });
   };
 
@@ -106,15 +111,8 @@ export default function ApiKeysPage() {
                     {key.is_active ? tc('active') : tc('inactive')}
                   </span>
                   <RoleGuard require="canManageApiKeys">
-                    <button onClick={() => handleRotate(key.id)} disabled={rotateKey.isPending} className="text-sm text-brand-600 dark:text-brand-400 hover:underline">{t('rotate')}</button>
-                    {deleteConfirm === key.id ? (
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => handleDelete(key.id)} disabled={deleteKey.isPending} className="text-sm text-red-600 hover:underline">{tc('confirm')}</button>
-                        <button onClick={() => setDeleteConfirm(null)} className="text-sm text-gray-500 hover:underline">{tc('cancel')}</button>
-                      </div>
-                  ) : (
+                    <button onClick={() => setRotateConfirm(key.id)} className="text-sm text-brand-600 dark:text-brand-400 hover:underline">{t('rotate')}</button>
                     <button onClick={() => setDeleteConfirm(key.id)} className="text-sm text-red-600 dark:text-red-400 hover:underline">{tc('delete')}</button>
-                  )}
                   </RoleGuard>
                 </div>
               </div>
@@ -122,6 +120,41 @@ export default function ApiKeysPage() {
           />
         )}
       </div>
+
+      {/* Rotate Confirmation Dialog */}
+      <ConfirmDialog
+        open={!!rotateConfirm}
+        title={t('rotateTitle')}
+        message={t('rotateDesc')}
+        variant="danger"
+        confirmLabel={t('rotateConfirm')}
+        loading={rotateKey.isPending}
+        onConfirm={() => rotateConfirm && handleRotate(rotateConfirm)}
+        onCancel={() => setRotateConfirm(null)}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={!!deleteConfirm}
+        title={tc('delete')}
+        message={t('deleteDesc')}
+        variant="danger"
+        loading={deleteKey.isPending}
+        onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)}
+        onCancel={() => setDeleteConfirm(null)}
+      />
+
+      {/* Revealed Key Banner (after rotate or create) */}
+      {revealedKey && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setRevealedKey(null)}>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-lg mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('keyCreated')}</h3>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('copyKeyWarning')}</p>
+            <code className="block text-sm font-mono bg-gray-100 dark:bg-slate-700 px-4 py-3 rounded-lg select-all break-all">{revealedKey}</code>
+            <button onClick={() => setRevealedKey(null)} className="mt-4 w-full py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">{tc('close')}</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
