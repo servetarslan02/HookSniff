@@ -2461,6 +2461,8 @@
     "rotateDesc": "The old key will stop working immediately. You’ll receive a new key to replace it.",
     "deleteTitle": "Delete API Key?",
     "deleteDesc": "This action cannot be undone. Any services using this key will immediately lose access.",
+    "rotateConfirm": "Yes, rotate key",
+    "copyKeyWarning": "Copy this key now - it will not be shown again after you close this dialog.",
     "failedToLoad": "Could not load API keys. Please refresh the page.",
     "create": "Create API Key",
     "unnamedKey": "Unnamed Key",
