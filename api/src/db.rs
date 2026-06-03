@@ -295,7 +295,7 @@ pub async fn publish_to_queue_fast(
             payload: payload.to_string(),
             custom_headers: custom_headers.cloned(),
             signing_secret: signing_secret.to_string(),
-            trace_id: trace_id.clone(),
+            trace_id: Some(trace_id.clone()),
             attempt_count: 0,
             max_attempts,
             queue_item_id: String::new(),

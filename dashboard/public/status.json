@@ -16,9 +16,9 @@
         }
       },
       "status": "down",
-      "latency_ms": 1,
+      "latency_ms": 0,
       "description": "HookSniff REST API (Cloud Run)",
-      "last_checked": "2026-06-03T22:18:05.235Z"
+      "last_checked": "2026-06-03T22:20:55.673Z"
     },
     {
       "name": "Dashboard",
@@ -34,9 +34,9 @@
         }
       },
       "status": "degraded",
-      "latency_ms": 1,
+      "latency_ms": 0,
       "description": "Next.js frontend (Vercel)",
-      "last_checked": "2026-06-03T22:18:05.235Z"
+      "last_checked": "2026-06-03T22:20:55.673Z"
     },
     {
       "name": "Worker",
@@ -54,7 +54,7 @@
       "status": "unknown",
       "latency_ms": null,
       "description": "Background delivery worker (Cloud Run)",
-      "last_checked": "2026-06-03T22:18:05.235Z"
+      "last_checked": "2026-06-03T22:20:55.673Z"
     },
     {
       "name": "Database",
@@ -72,7 +72,7 @@
       "status": "down",
       "latency_ms": 0,
       "description": "PostgreSQL (Neon)",
-      "last_checked": "2026-06-03T22:18:05.235Z"
+      "last_checked": "2026-06-03T22:20:55.673Z"
     },
     {
       "name": "Cache",
@@ -90,7 +90,7 @@
       "status": "unknown",
       "latency_ms": 0,
       "description": "Redis (Upstash)",
-      "last_checked": "2026-06-03T22:18:05.235Z"
+      "last_checked": "2026-06-03T22:20:55.673Z"
     },
     {
       "name": "Email Service",
@@ -106,9 +106,9 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 291,
+      "latency_ms": 252,
       "description": "Gmail API",
-      "last_checked": "2026-06-03T22:18:05.235Z"
+      "last_checked": "2026-06-03T22:20:55.673Z"
     },
     {
       "name": "Storage",
@@ -124,12 +124,12 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 35,
+      "latency_ms": 37,
       "description": "Cloudflare R2",
-      "last_checked": "2026-06-03T22:18:05.235Z"
+      "last_checked": "2026-06-03T22:20:55.673Z"
     }
   ],
-  "checked_at": "2026-06-03T22:18:05.235Z",
+  "checked_at": "2026-06-03T22:20:55.673Z",
   "response_times": {
     "API": [
       1,
@@ -143,7 +143,8 @@
       274,
       325,
       268,
-      291
+      291,
+      252
     ],
     "Storage": [
       47,
@@ -151,7 +152,8 @@
       36,
       45,
       45,
-      35
+      35,
+      37
     ],
     "Dashboard": [
       1,
