@@ -18,7 +18,7 @@
       "status": "down",
       "latency_ms": 0,
       "description": "HookSniff REST API (Cloud Run)",
-      "last_checked": "2026-06-03T22:52:03.003Z"
+      "last_checked": "2026-06-03T22:55:17.478Z"
     },
     {
       "name": "Dashboard",
@@ -36,7 +36,7 @@
       "status": "degraded",
       "latency_ms": 0,
       "description": "Next.js frontend (Vercel)",
-      "last_checked": "2026-06-03T22:52:03.003Z"
+      "last_checked": "2026-06-03T22:55:17.478Z"
     },
     {
       "name": "Worker",
@@ -54,7 +54,7 @@
       "status": "unknown",
       "latency_ms": null,
       "description": "Background delivery worker (Cloud Run)",
-      "last_checked": "2026-06-03T22:52:03.003Z"
+      "last_checked": "2026-06-03T22:55:17.478Z"
     },
     {
       "name": "Database",
@@ -72,7 +72,7 @@
       "status": "down",
       "latency_ms": 0,
       "description": "PostgreSQL (Neon)",
-      "last_checked": "2026-06-03T22:52:03.003Z"
+      "last_checked": "2026-06-03T22:55:17.478Z"
     },
     {
       "name": "Cache",
@@ -90,7 +90,7 @@
       "status": "unknown",
       "latency_ms": 0,
       "description": "Redis (Upstash)",
-      "last_checked": "2026-06-03T22:52:03.003Z"
+      "last_checked": "2026-06-03T22:55:17.478Z"
     },
     {
       "name": "Email Service",
@@ -106,9 +106,9 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 294,
+      "latency_ms": 278,
       "description": "Gmail API",
-      "last_checked": "2026-06-03T22:52:03.003Z"
+      "last_checked": "2026-06-03T22:55:17.478Z"
     },
     {
       "name": "Storage",
@@ -124,35 +124,18 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 51,
+      "latency_ms": 36,
       "description": "Cloudflare R2",
-      "last_checked": "2026-06-03T22:52:03.003Z"
+      "last_checked": "2026-06-03T22:55:17.478Z"
     }
   ],
-  "checked_at": "2026-06-03T22:52:03.003Z",
+  "checked_at": "2026-06-03T22:55:17.478Z",
   "response_times": {
-    "API": [
-      1,
-      1
-    ],
     "Email Service": [
-      267,
-      276,
-      313,
-      307,
-      294
+      278
     ],
     "Storage": [
-      53,
-      35,
-      49,
-      43,
-      51
-    ],
-    "Dashboard": [
-      1
+      36
     ]
-  }
-}  ]
   }
 }
