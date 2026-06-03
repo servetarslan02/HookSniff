@@ -186,42 +186,44 @@ async fn latency_trend(
     let hours = query.interval_hours();
     let range_label = query.range.as_deref().unwrap_or("24h");
 
-    let buckets: Vec<(chrono::DateTime<chrono::Utc>, f64, f64)> = sqlx::query_as(
-        r#"
-        SELECT
-            date_trunc('hour', da.created_at) AS bucket,
-            COALESCE(AVG(da.duration_ms), 0)::FLOAT AS avg_ms,
-            0::FLOAT AS p95_ms
-        FROM delivery_attempts da
-        JOIN deliveries d ON d.id = da.delivery_id
-        WHERE d.customer_id = $1
-          AND da.created_at >= now() - ($2 || ' hours')::interval
-          AND da.duration_ms IS NOT NULL
-        GROUP BY date_trunc('hour', da.created_at)
-        ORDER BY bucket ASC
-        "#,
-    )
-    .bind(customer.id)
-    .bind(hours.to_string())
-    .fetch_all(&pool)
-    .await?;
+    let buckets: Vec<(DateTime<Utc>, f64, f64)> = db::timed_query("analytics_latency_buckets", async {
+        sqlx::query_as(
+            r#"
+            SELECT
+                date_trunc('hour', da.created_at) AS bucket,
+                COALESCE(AVG(da.duration_ms), 0)::FLOAT AS avg_ms,
+                0::FLOAT AS p95_ms
+            FROM delivery_attempts da
+            JOIN deliveries d ON d.id = da.delivery_id
+            WHERE d.customer_id = $1
+              AND da.created_at >= now() - INTERVAL '1 hour' * $2
+              AND da.duration_ms IS NOT NULL
+            GROUP BY date_trunc('hour', da.created_at)
+            ORDER BY bucket ASC
+            "#,
+        )
+        .bind(customer.id)
+        .bind(hours)
+        .fetch_all(&pool)
+        .await
+    }).await.unwrap_or_default();
 
     // Overall avg (lightweight — p95 computed in Rust from bucket data)
-    let overall_row: (f64,) = sqlx::query_as(
+    let overall_avg: f64 = sqlx::query_scalar(
         r#"
         SELECT COALESCE(AVG(da.duration_ms), 0)::FLOAT
         FROM delivery_attempts da
         JOIN deliveries d ON d.id = da.delivery_id
         WHERE d.customer_id = $1
-          AND da.created_at >= now() - ($2 || ' hours')::interval
+          AND da.created_at >= now() - INTERVAL '1 hour' * $2
           AND da.duration_ms IS NOT NULL
         "#,
     )
     .bind(customer.id)
-    .bind(hours.to_string())
+    .bind(hours)
     .fetch_one(&pool)
-    .await?;
-    let overall_avg = overall_row.0;
+    .await
+    .unwrap_or(0.0);
 
     // Compute p95 from bucket avg values (lightweight approximation)
     let mut avg_values: Vec<f64> = buckets.iter().map(|(_, avg, _)| *avg).collect();
