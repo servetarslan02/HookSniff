@@ -3,7 +3,7 @@
   "project_number": "499907444852",
   "region": "europe-west1",
   "service_name": "hooksniff-api",
-  "cloud_run_url": "https://hooksniff-api-499907444852.europe-west1.run.app",
+  "cloud_run_url": "https://hooksniff-api-e6ztf3x2ma-ew.a.run.app",
   "image": "europe-west1-docker.pkg.dev/project-0d7b3b3f-2204-4957-909/hooksniff-repo/hooksniff-api:latest",
   "artifact_registry": {
     "location": "europe-west1",
@@ -11,10 +11,10 @@
   },
   "service_account": "hooksniff-sa@project-0d7b3b3f-2204-4957-909.iam.gserviceaccount.com",
   "env_vars": {
-    "DATABASE_URL": "postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require",
-    "REDIS_URL": "redis://default:gQAAAAAAAYCPAAIgcDI1ZGFhYWUxZGRhZjM0YjhhYTQ1OGFjOGEzZTg1OTMzNg@integral-ostrich-98447.upstash.io:6379",
-    "ENCRYPTION_KEY": "db0d93278dc81632d7de27be1e3ba736655eae279a2efdc8170ca5f7082e662c",
-    "JWT_SECRET": "hooksniff-jwt-secret-2026-production",
+    "DATABASE_URL": "[SEE GCP SECRET MANAGER]",
+    "REDIS_URL": "[SEE GCP SECRET MANAGER]",
+    "ENCRYPTION_KEY": "[SEE GCP SECRET MANAGER]",
+    "JWT_SECRET": "[SEE GCP SECRET MANAGER]",
     "PORT": "8080"
   },
   "created_at": "2026-06-03T08:48:00Z",

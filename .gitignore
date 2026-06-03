@@ -79,3 +79,5 @@ deploy/keys/
 hooksniff-app-*.json
 gcp-key.json
 .env*
+
+gcp-config.json
