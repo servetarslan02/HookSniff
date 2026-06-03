@@ -7,38 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added — SDK (11 dil)
-- Node.js SDK v1.0.0 — Svix'ten adapte (63 dosya, ~40 model)
-- Python SDK v1.0.0 — Svix SDK'dan doğrudan (127 dosya, 101 model)
-- Go SDK v1.0.0 — Svix SDK'dan doğrudan (115 dosya, 99 model)
-- Rust SDK v1.0.0 — Svix SDK'dan doğrudan (118 dosya, 98 model)
-- Ruby SDK v1.0.0 — Svix'ten adapte (74 dosya, 48 model)
-- Java SDK v1.0.0 — Svix'ten adapte (158 dosya, 104 model)
-- Kotlin SDK v1.0.0 — Svix'ten adapte (131 dosya, 103 model)
-- PHP SDK v1.0.0 — Svix'ten adapte (89 dosya, ~50 model)
-- C# SDK v1.0.0 — Svix'ten adapte (67 dosya, ~40 model)
-- Swift SDK v1.0.0 — HookSniff custom (~14 dosya)
-- Elixir SDK v1.0.0 — OpenAPI'den adapte (247 dosya)
-- Tüm SDK'larda: auto-retry + exponential backoff, webhook verification (HMAC-SHA256), auto-idempotency key
+### Added — SDK (11 Languages, In Development)
+
+SDK source code is being generated and organized. Current state:
+
+- **C# SDK** — Models + API classes generated (431 files in `.cleanup/csharp-HookSniff.Sdk/`)
+- **Kotlin SDK** — Models + tests generated (710 files in `.cleanup/kotlin-hooksniff-main/`)
+- **PHP SDK** — Tests generated (204 files in `.cleanup/php-test/`)
+- **Ruby SDK** — Models generated (171 files in `.cleanup/ruby-hooksniff-models/`)
+- **Node.js SDK** — Dependencies installed (`sdks/node/`), source code pending
+- **Python SDK** — Planned (OpenAPI codegen from `docs/openapi.yaml`)
+- **Go SDK** — Planned (OpenAPI codegen from `docs/openapi.yaml`)
+- **Rust SDK** — Planned (OpenAPI codegen from `docs/openapi.yaml`)
+- **Java SDK** — Planned (OpenAPI codegen from `docs/openapi.yaml`)
+- **Elixir SDK** — Planned (OpenAPI codegen from `docs/openapi.yaml`)
+- **Swift SDK** — Planned (hand-craft or OpenAPI codegen)
+
+See [docs/sdk-coverage.md](docs/sdk-coverage.md) for detailed status.
 
 ### Added — CI/CD
-- Local CI script'leri: `local-ci.sh`, `local-sdk-test.sh`, `local-sdk-publish.sh`
-- Makefile entegrasyonu: `make ci`, `make ci-test`, `make ci-publish`
-- 11 SDK için local test runner
-- SDK publish dry-run + gerçek publish desteği (npm, PyPI, crates.io, RubyGems, Maven, NuGet, Hex, Packagist)
-- GitHub Actions workflow'ları (ci.yml, sdk-publish.yml, deploy.yml, trivy-scan.yml)
+- Local CI scripts: `local-ci.sh`, `local-sdk-test.sh`, `local-sdk-publish.sh`
+- Makefile integration: `make ci`, `make ci-test`, `make ci-publish`
+- Local test runner for 11 SDKs
+- SDK publish dry-run + live publish support (npm, PyPI, crates.io, RubyGems, Maven, NuGet, Hex, Packagist)
+- GitHub Actions workflows (ci.yml, sdk-publish.yml, deploy.yml, trivy-scan.yml)
 
 ### Fixed
-- 23 eksik i18n key eklendi (en + tr) — MISSING_MESSAGE hataları düzeltildi
-- `AlertRule` ve 16 type `@/lib/api`'dan export edildi
-- Dashboard build: TypeScript compilation başarılı
+- 23 missing i18n keys added (en + tr) — MISSING_MESSAGE errors resolved
+- `AlertRule` and 16 types exported from `@/lib/api`
+- Dashboard build: TypeScript compilation successful
 
-### Fixed (DB — AŞAMA 5)
-- Performance indexes for deliveries, delivery_attempts, dead_letters, token tables, idempotency_keys (Items 182-191, 187)
-- ON DELETE CASCADE added to dead_letters, teams, installed_agents foreign keys (Items 177-181)
-- password_hash NOT NULL enforced with OAuth sentinel value (Item 173)
-- amount_cents upgraded from INT to BIGINT on payment_transactions and invoices (Item 186)
-- Unbounded list queries capped with LIMIT on 8 route handlers (Item 193)
+### Fixed (Database — Phase 5)
+- Performance indexes for deliveries, delivery_attempts, dead_letters, token tables, idempotency_keys
+- ON DELETE CASCADE added to dead_letters, teams, installed_agents foreign keys
+- password_hash NOT NULL enforced with OAuth sentinel value
+- amount_cents upgraded from INT to BIGINT on payment_transactions and invoices
+- Unbounded list queries capped with LIMIT on 8 route handlers
 
 ### Added
 - GDPR endpoints: `GET /v1/auth/export` (data export) + `DELETE /v1/auth/account` (account deletion)

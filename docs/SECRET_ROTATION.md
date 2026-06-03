@@ -1,43 +1,43 @@
 # Secret Rotation Policy — HookSniff
 
-> Son güncelleme: 2026-05-12
-> Sahip: Servet Arslan + AI Agent
+> Last updated: 2026-06-03
+> Owner: Servet Arslan + AI Agent
 
 ---
 
-## 1. Secret Envanteri
+## 1. Secret Inventory
 
-| # | Secret | Kullanım Yeri | Rotation Frequency | Son Rotation | Severity |
-|---|--------|---------------|-------------------|--------------|----------|
-| 1 | `JWT_SECRET` | API — token imzalama | 90 gün | — | 🔴 CRITICAL |
-| 2 | `DATABASE_URL` (Neon) | API + Worker — PostgreSQL | 90 gün | — | 🔴 CRITICAL |
-| 3 | `REDIS_URL` (Upstash) | API — rate limiting, cache | 90 gün | — | 🟡 HIGH |
-| 4 | `POLAR_SECRET_KEY` | API — ödeme (Polar.sh) | 90 gün | — | 🔴 CRITICAL |
-| 5 | `POLAR_WEBHOOK_SECRET` | API — webhook doğrulama | 90 gün | — | 🟡 HIGH |
-| 6 | `RESEND_API_KEY` | API — email gönderimi | 90 gün | — | 🟡 HIGH |
-| 7 | `OTEL_EXPORTER_OTLP_HEADERS` | API + Worker — Grafana OTEL | 180 gün | — | 🟢 LOW |
-| 8 | `GRAFANA_SERVICE_ACCOUNT_TOKEN` | Monitoring — Grafana API | 180 gün | — | 🟢 LOW |
-| 9 | `CLOUDFLARE_R2_*` | API — dosya depolama | 90 gün | — | 🟡 HIGH |
-| 10 | `ADMIN_API_KEY` | API — admin endpoint'ler | 30 gün | — | 🔴 CRITICAL |
-| 11 | `NEON_API_KEY` | Backup script — Neon API | 90 gün | — | 🟡 HIGH |
-| 12 | `GOOGLE_OAUTH_CLIENT_SECRET` | Dashboard — Google login | 180 gün | — | 🟡 HIGH |
+| # | Secret | Usage | Rotation Frequency | Last Rotation | Severity |
+|---|--------|-------|-------------------|--------------|----------|
+| 1 | `JWT_SECRET` | API — token signing | 90 days | — | 🔴 CRITICAL |
+| 2 | `DATABASE_URL` (Neon) | API + Worker — PostgreSQL | 90 days | — | 🔴 CRITICAL |
+| 3 | `REDIS_URL` (Upstash) | API — rate limiting, cache | 90 days | — | 🟡 HIGH |
+| 4 | `POLAR_SECRET_KEY` | API — payments (Polar.sh) | 90 days | — | 🔴 CRITICAL |
+| 5 | `POLAR_WEBHOOK_SECRET` | API — webhook verification | 90 days | — | 🟡 HIGH |
+| 6 | `RESEND_API_KEY` | API — email sending | 90 days | — | 🟡 HIGH |
+| 7 | `OTEL_EXPORTER_OTLP_HEADERS` | API + Worker — Grafana OTEL | 180 days | — | 🟢 LOW |
+| 8 | `GRAFANA_SERVICE_ACCOUNT_TOKEN` | Monitoring — Grafana API | 180 days | — | 🟢 LOW |
+| 9 | `CLOUDFLARE_R2_*` | API — file storage | 90 days | — | 🟡 HIGH |
+| 10 | `ADMIN_API_KEY` | API — admin endpoints | 30 days | — | 🔴 CRITICAL |
+| 11 | `NEON_API_KEY` | Backup script — Neon API | 90 days | — | 🟡 HIGH |
+| 12 | `GOOGLE_OAUTH_CLIENT_SECRET` | Dashboard — Google login | 180 days | — | 🟡 HIGH |
 
 ---
 
-## 2. Rotation Frequency Kuralları
+## 2. Rotation Frequency Rules
 
-| Severity | Frequency | Açıklama |
-|----------|-----------|----------|
-| 🔴 CRITICAL | 30-90 gün | JWT, ödeme, admin key |
-| 🟡 HIGH | 90 gün | Database, cache, email, storage |
-| 🟢 LOW | 180 gün | Monitoring, OTEL, non-critical API |
+| Severity | Frequency | Description |
+|----------|-----------|-------------|
+| 🔴 CRITICAL | 30–90 days | JWT, payments, admin key |
+| 🟡 HIGH | 90 days | Database, cache, email, storage |
+| 🟢 LOW | 180 days | Monitoring, OTEL, non-critical API |
 
-### Zorunlu Rotation Durumları
-- ⚠️ **Immediate**: Herhangi bir secret'ın sızdığı tespit edilirse
-- ⚠️ **Immediate**: Ekip üyesi projeden ayrılırsa
-- ⚠️ **Immediate**: Güvenlik ihlali şüphesi varsa
-- 📅 **Scheduled**: Takvime göre (yukarıdaki frequency tablosu)
-- 📅 **Post-incident**: Herhangi bir güvenlik olayından sonra
+### Mandatory Rotation Triggers
+- ⚠️ **Immediate**: Any secret is detected as leaked
+- ⚠️ **Immediate**: Team member leaves the project
+- ⚠️ **Immediate**: Security breach suspected
+- 📅 **Scheduled**: Per the frequency table above
+- 📅 **Post-incident**: After any security event
 
 ---
 
@@ -57,13 +57,13 @@
 ### 3.2 JWT_SECRET Rotation
 
 ```bash
-# 1. Yeni secret oluştur
+# 1. Generate new secret
 NEW_JWT_SECRET=$(openssl rand -base64 48)
 
-# 2. GCP Secret Manager'da güncelle
+# 2. Update in GCP Secret Manager
 gcloud secrets versions add jwt-secret --data-file=<(echo "$NEW_JWT_SECRET")
 
-# 3. Cloud Run'da güncelle (API + Worker)
+# 3. Update Cloud Run (API + Worker)
 gcloud run services update hooksniff-api \
   --region=europe-west1 \
   --update-secrets=JWT_SECRET=jwt-secret:latest
@@ -76,10 +76,10 @@ gcloud run services update hooksniff-worker \
 gcloud run services update-traffic hooksniff-api --to-latest
 gcloud run services update-traffic hooksniff-worker --to-latest
 
-# 5. Doğrulama
+# 5. Verify
 curl -s https://hooksniff-api-*.run.app/health | jq .
 
-# 6. Kaydet
+# 6. Log rotation date
 ./scripts/rotate-secrets.sh --update JWT_SECRET "$(date +%Y-%m-%d)"
 ```
 
@@ -87,16 +87,16 @@ curl -s https://hooksniff-api-*.run.app/health | jq .
 
 ```bash
 # 1. Neon Dashboard → Settings → Connection → Reset password
-#    veya Neon CLI:
+#    or Neon CLI:
 neon projects connection-string reset --project-id <id>
 
-# 2. Yeni connection string'i al
+# 2. Get new connection string
 NEW_DB_URL="postgresql://..."
 
 # 3. GCP Secret Manager
 gcloud secrets versions add database-url --data-file=<(echo "$NEW_DB_URL")
 
-# 4. Cloud Run güncelle (API + Worker)
+# 4. Update Cloud Run (API + Worker)
 gcloud run services update hooksniff-api \
   --region=europe-west1 \
   --update-secrets=DATABASE_URL=database-url:latest
@@ -105,7 +105,7 @@ gcloud run services update hooksniff-worker \
   --region=europe-west1 \
   --update-secrets=DATABASE_URL=database-url:latest
 
-# 5. Backup script'indeki credentials'ı güncelle
+# 5. Update credentials in backup script
 # scripts/backup-cron.sh — Neon connection string
 ```
 
@@ -113,7 +113,7 @@ gcloud run services update hooksniff-worker \
 
 ```bash
 # 1. Polar.sh Dashboard → Settings → API Keys → Revoke old + Create new
-# 2. Webhook secret'i de yenile (Settings → Webhooks → Secret)
+# 2. Rotate webhook secret (Settings → Webhooks → Secret)
 
 # 3. GCP Secret Manager
 gcloud secrets versions add polar-secret --data-file=<(echo "$NEW_POLAR_KEY")

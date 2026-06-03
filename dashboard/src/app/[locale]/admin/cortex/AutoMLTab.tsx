@@ -45,17 +45,17 @@ export function AutoMLTab() {
         </div>
       ) : (
         <div className="space-y-2">
-          {trials.sort((a, b) => b.score - a.score).map((t, i) => (
-            <div key={t.id} className={`glass-card p-3 ${i === 0 ? 'border-l-4 border-emerald-500' : ''}`}>
+          {trials.sort((a, b) => b.score - a.score).map((trial, i) => (
+            <div key={trial.id} className={`glass-card p-3 ${i === 0 ? 'border-l-4 border-emerald-500' : ''}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-mono text-gray-700 dark:text-slate-300">{t.model_type}</span>
+                  <span className="text-sm font-mono text-gray-700 dark:text-slate-300">{trial.model_type}</span>
                   {i === 0 && <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">{t('best')}</span>}
                 </div>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">{t.score.toFixed(1)} {t.metric}</span>
+                <span className="text-sm font-bold text-gray-900 dark:text-white">{trial.score.toFixed(1)} {trial.metric}</span>
               </div>
               <div className="mt-1 flex flex-wrap gap-2">
-                {Object.entries(t.params).map(([k, v]) => (
+                {Object.entries(trial.params).map(([k, v]) => (
                   <span key={k} className="text-xs bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded">
                     {k}: {typeof v === 'number' ? v.toFixed(3) : v}
                   </span>

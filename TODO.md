@@ -1,51 +1,52 @@
-# HookSniff — Yapılacaklar
+# HookSniff — Todo List
 
-> Son güncelleme: 2026-05-09
-
----
-
-## ✅ Tamamlanan Teknik Görevler
-
-26/26 teknik görev tamamlandı. Detaylı liste için `FEATURES.md` ve `CHANGELOG.md`'ye bakın.
+> Last updated: 2026-06-03
 
 ---
 
-## 🔄 Devam Eden İşler
+## ✅ Completed Technical Tasks
 
-| Görev | Durum | Not |
-|-------|-------|-----|
-| OTLP exporter fix | ✅ | Graceful fallback eklendi, GitHub'a push edildi |
-| GitHub docs güncelleme | ✅ | SECURITY, CONTRIBUTING, CHANGELOG, LICENSE, CODE_OF_CONDUCT eklendi |
-| Stale referans temizliği | ✅ | HookRelay → HookSniff, X-HookSniff-Signature → Standard Webhooks |
+26/26 technical tasks completed. See [FEATURES.md](FEATURES.md) and [CHANGELOG.md](CHANGELOG.md) for details.
 
 ---
 
-## 📋 Servet'in Yapması Gereken
+## 🔄 In Progress
 
-| Görev | Durum | Not |
-|-------|-------|-----|
-| iyzico hesap aç | ❌ | Vergi levhası + banka hesabı gerekli |
-| Domain kararı | ❌ | hooksniff.vercel.app yeterli şimdilik |
-| GCP SA key rotate | ⚠️ | Chat'te paylaşıldı, yeni key oluştur |
-| GitHub PAT rotate | ⚠️ | Chat'te paylaşıldı, yeni token oluştur |
+| Task | Status | Notes |
+|------|--------|-------|
+| OTLP exporter fix | ✅ | Graceful fallback added, pushed to GitHub |
+| GitHub docs update | ✅ | SECURITY, CONTRIBUTING, CHANGELOG, LICENSE, CODE_OF_CONDUCT added |
+| Stale reference cleanup | ✅ | HookRelay → HookSniff, X-HookSniff-Signature → Standard Webhooks |
+| Documentation overhaul | 🔄 | Converting all docs to English, Svix-style formatting |
 
 ---
 
-## 🚀 Sonraki Adımlar (Opsiyonel)
+## 📋 Pending Actions
 
-### Altyapı
-- [ ] GitHub Actions CI'yı aktif et (deploy workflow)
-- [ ] Grafana Cloud alert rules kur
-- [ ] Cloudflare R2 storage entegrasyonu
+| Task | Status | Notes |
+|------|--------|-------|
+| iyzico account setup | ⏳ | Requires tax certificate + bank account |
+| Domain decision | ⏳ | hooksniff.vercel.app sufficient for now |
+| GCP SA key rotate | ⚠️ | New key created, needs activation |
+| GitHub PAT rotate | ⚠️ | New token created, needs activation |
 
-### SDK Publish
+---
+
+## 🚀 Next Steps (Optional)
+
+### Infrastructure
+- [ ] Activate GitHub Actions CI deploy workflow
+- [ ] Configure Grafana Cloud alert rules
+- [ ] Cloudflare R2 storage integration
+
+### SDK Publishing
 - [ ] npm `@hooksniff/sdk` publish
 - [ ] PyPI `hooksniff` publish
 - [ ] crates.io `hooksniff` publish
 - [ ] Terraform Registry submit
 
 ### Enterprise
-- [ ] gRPC delivery implementasyonu
-- [ ] SQS delivery implementasyonu
-- [ ] SOC 2 hazırlık
-- [ ] Integration test coverage artır
+- [ ] gRPC delivery implementation
+- [ ] SQS delivery implementation
+- [ ] SOC 2 preparation
+- [ ] Integration test coverage expansion

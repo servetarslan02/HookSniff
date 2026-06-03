@@ -2,6 +2,8 @@
 
 Migrating from [Svix](https://svix.com) to [HookSniff](https://hooksniff.com)? Here's what changed.
 
+> Last updated: 2026-06-03
+
 ## Quick Migration
 
 ### Node.js

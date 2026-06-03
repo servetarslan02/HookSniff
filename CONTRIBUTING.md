@@ -23,10 +23,9 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Prerequisites
 
-- [Rust](https://rustup.rs/) 1.82+
+- [Rust](https://rustup.rs/) 1.95+
 - [Node.js](https://nodejs.org/) 20+
 - [Docker](https://docker.com/) & Docker Compose
-- [protoc](https://grpc.io/docs/protoc-installation/) (for future gRPC delivery support)
 
 ## Quick Setup
 
@@ -87,7 +86,7 @@ HookSniff/
 │       ├── main.rs             # PostgreSQL LISTEN/NOTIFY + polling
 │       ├── delivery/           # HTTP delivery router
 │       └── signing.rs          # Webhook signing for deliveries
-├── dashboard/                  # Next.js 15 — 76 files, 41 pages
+├── dashboard/                  # Next.js 16 — 76 files, 41 pages
 │   └── src/
 │       ├── app/[locale]/       # App Router with i18n
 │       │   ├── page.tsx        # Landing page (typewriter, particles, pricing)
@@ -183,14 +182,14 @@ HookSniff/
 
 ### Rust
 
-- **Format**: `cargo fmt` (enforced in CI — `cargo fmt --check`)
-- **Lint**: `cargo clippy -- -D warnings` (enforced in CI)
+- **Format**: `cargo fmt` (enforced in CI — `cargo fmt --check`)  
+- **Lint**: `cargo clippy -- -D warnings` (enforced in CI)  
 - **Logging**: `tracing` macros (`info!`, `warn!`, `error!`, `debug!`), not `println!`
 - **Errors**: `anyhow::Result` for propagation, `thiserror` for custom `AppError` type
 - **Async**: Tokio runtime, `async fn` everywhere
 - **Docs**: `///` doc comments on public items
 
-### TypeScript (Dashboard)
+### Dashboard (Next.js 16)
 
 - **Format**: Prettier (included)
 - **Lint**: ESLint (enforced in CI — `npm run lint`)

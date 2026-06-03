@@ -1,22 +1,90 @@
 # SDK Coverage Report
 
-> Auto-generated: 2026-05-12 — Items 353-354
+> Last updated: 2026-06-03
 
 ## Summary
 
-| SDK | Language | API Modules | High-Level Resources | Status |
-|-----|----------|-------------|---------------------|--------|
-| Python | Python | 33/33 ✅ | Full (OpenAPI-generated) | Complete |
-| Go | Go | 33/33 ✅ | Full (OpenAPI-generated) | Complete |
-| Ruby | Ruby | 33/33 ✅ | Full (OpenAPI-generated) | Complete |
-| Rust | Rust | 33/33 ✅ | Full (OpenAPI-generated) | Complete |
-| C# | C# | 33/33 ✅ | Full (OpenAPI-generated) | Complete |
-| Elixir | Elixir | 33/33 ✅ | Full (OpenAPI-generated) | Complete |
-| PHP | PHP | 33/33 ✅ | Full (OpenAPI-generated) | Complete |
-| Node.js | TypeScript | 10/33 ⚠️ | 10 hand-crafted | **Partial** |
-| Java | Java | 10/33 ⚠️ | 10 hand-crafted | **Partial** |
-| Swift | Swift | 10/33 ⚠️ | 10 hand-crafted | **Partial** |
-| Kotlin | Kotlin | 0/33 ❌ | Models only | **Models only** |
+| SDK | Language | Location | API Modules | Status |
+|-----|----------|----------|-------------|--------|
+| C# | C# | `.cleanup/csharp-HookSniff.Sdk/` | 33/33 | 🔄 In cleanup — needs proper package setup |
+| Kotlin | Kotlin | `.cleanup/kotlin-hooksniff-main/` | Models only | 🔄 In cleanup — models only, no API client |
+| PHP | PHP | `.cleanup/php-test/` | Tests only | 🔄 In cleanup — test files only |
+| Ruby | Ruby | `.cleanup/ruby-hooksniff-models/` | Models only | 🔄 In cleanup — models only |
+| Node.js | TypeScript | `sdks/node/` | — | ⚠️ Dependencies only, no source code |
+| Python | Python | — | — | ⏳ Not started |
+| Go | Go | — | — | ⏳ Not started |
+| Rust | Rust | — | — | ⏳ Not started |
+| Java | Java | — | — | ⏳ Not started |
+| Elixir | Elixir | — | — | ⏳ Not started |
+| Swift | Swift | — | — | ⏳ Not started |
+
+## Current State
+
+### Files in `.cleanup/` (generated but not organized as packages)
+
+| SDK | Files | Content |
+|-----|-------|---------|
+| C# | 431 .cs files | Models + API classes (OpenAPI-generated) |
+| Kotlin | 710 .kt files | Models + tests (OpenAPI-generated) |
+| PHP | 204 .php files | Tests only (no API client) |
+| Ruby | 171 .rb files | Models only (no API client) |
+
+### Missing SDKs
+
+The following SDKs have no code in the repository:
+
+- **Python** — No files. Plan: Generate from `docs/openapi.yaml` using OpenAPI Generator
+- **Go** — No files. Plan: Generate from `docs/openapi.yaml` using OpenAPI Generator
+- **Rust** — No files. Plan: Generate from `docs/openapi.yaml` using OpenAPI Generator
+- **Java** — No files. Plan: Generate from `docs/openapi.yaml` using OpenAPI Generator
+- **Elixir** — No files. Plan: Generate from `docs/openapi.yaml` using OpenAPI Generator
+- **Swift** — No files. Plan: Hand-craft or generate from OpenAPI spec
+
+### What Needs to Happen
+
+1. **Move `.cleanup/` SDKs to `sdks/`** — Reorganize C#, Kotlin, PHP, Ruby into proper package directories
+2. **Generate missing SDKs** — Use `openapi-codegen.py` to generate Python, Go, Rust, Java, Elixir from `docs/openapi.yaml`
+3. **Fix Node.js SDK** — Add actual source code to `sdks/node/`
+4. **Add package files** — Each SDK needs proper package manifest (package.json, setup.py, go.mod, Cargo.toml, etc.)
+5. **Add tests** — Integration tests for each SDK
+6. **Publish** — npm, PyPI, crates.io, etc.
+
+## API Module List (33 total)
+
+These are the API modules that SDKs should cover:
+
+| # | Module | Route |
+|---|--------|-------|
+| 1 | Admin | `/v1/admin` |
+| 2 | Alerts | `/v1/alerts` |
+| 3 | Analytics | `/v1/analytics` |
+| 4 | API Keys | `/v1/api-keys` |
+| 5 | Auth | `/v1/auth` |
+| 6 | Billing | `/v1/billing` |
+| 7 | Contact | `/v1/contact` |
+| 8 | Customer Portal | `/v1/portal` |
+| 9 | Delivery Details | `/v1/webhooks/{id}/details` |
+| 10 | Devices | `/v1/devices` |
+| 11 | Embed | `/v1/embed` |
+| 12 | Endpoints | `/v1/endpoints` |
+| 13 | Events | `/v1/events` |
+| 14 | Health | `/v1/health` |
+| 15 | Inbound | `/v1/inbound` |
+| 16 | Notifications | `/v1/notifications` |
+| 17 | OAuth | `/v1/oauth` |
+| 18 | Outbound IPs | `/v1/outbound-ips` |
+| 19 | Playground | `/v1/playground` |
+| 20 | Routing | `/v1/routing` |
+| 21 | Schemas | `/v1/schemas` |
+| 22 | Search | `/v1/search` |
+| 23 | Simulator | `/v1/simulator` |
+| 24 | SSO | `/v1/sso` |
+| 25 | Stats | `/v1/stats` |
+| 26 | Stream | `/v1/stream` |
+| 27 | Teams | `/v1/teams` |
+| 28 | Templates | `/v1/templates` |
+| 29 | Transforms | `/v1/endpoints/{id}/transforms` |
+| 30 | Webhooks | `/v1/webhooks` |
 
 ## API Module List (33 total)
 

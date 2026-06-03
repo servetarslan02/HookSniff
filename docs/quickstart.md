@@ -1,46 +1,50 @@
-# 🚀 HookSniff Quickstart — 5 Dakikada İlk Webhook'unu Gönder
+# HookSniff Quickstart — Send Your First Webhook in 5 Minutes
 
-## 1. Kayıt Ol (1 dakika)
+This guide walks you through registering, creating an endpoint, and sending your first webhook.
 
-1. [hooksniff.vercel.app/register](https://hooksniff.vercel.app/register) adresine git
-2. Email ve şifreni gir
-3. Email doğrulama linkine tıkla
+---
 
-## 2. API Key Al (1 dakika)
+## 1. Register (1 minute)
 
-1. Dashboard → **Core** → **API Keys** sekmesine git
-2. **"Create API Key"** butonuna tıkla
-3. Key'i kopyala (sadece bir kez gösterilir!)
+1. Go to [hooksniff.vercel.app/register](https://hooksniff.vercel.app/register)
+2. Enter your email and password
+3. Click the email verification link
+
+## 2. Get an API Key (1 minute)
+
+1. In the dashboard, go to **Core** → **API Keys**
+2. Click **"Create API Key"**
+3. Copy the key (it's only shown once!)
 
 ```
 hr_live_abc123def456...
 ```
 
-## 3. Endpoint Oluştur (1 dakika)
+## 3. Create an Endpoint (1 minute)
 
-Webhook'ların nereye teslim edileceğini belirle.
+Tell HookSniff where to deliver your webhooks.
 
 ```bash
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/endpoints \
-  -H "Authorization: Bearer hr_live_SENIN_KEYIN" \
+  -H "Authorization: Bearer hr_live_YOUR_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://senin-siten.com/webhook"}'
+  -d '{"url": "https://your-app.com/webhook"}'
 ```
 
 Response:
 ```json
 {
   "id": "ep_abc123",
-  "url": "https://senin-siten.com/webhook",
+  "url": "https://your-app.com/webhook",
   "created_at": "2026-05-15T00:00:00Z"
 }
 ```
 
-## 4. Webhook Gönder (1 dakika)
+## 4. Send a Webhook (1 minute)
 
 ```bash
 curl -X POST https://hooksniff-api-1046140057667.europe-west1.run.app/v1/webhooks \
-  -H "Authorization: Bearer hr_live_SENIN_KEYIN" \
+  -H "Authorization: Bearer hr_live_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "endpoint_id": "ep_abc123",
@@ -63,24 +67,25 @@ Response:
 }
 ```
 
-## 5. Teslimatı Kontrol Et (1 dakika)
+## 5. Check Delivery Status (1 minute)
 
-Dashboard → **Deliveries** sekmesine git. Webhook'un durumunu göreceksin:
+Go to **Deliveries** in the dashboard. You'll see your webhook status:
 
-- ✅ **Delivered** — Başarıyla teslim edildi
-- ⏳ **Pending** — Teslim edilmeyi bekliyor
-- ❌ **Failed** — Teslimat başarısız (otomatik retry)
+- ✅ **Delivered** — Successfully delivered
+- ⏳ **Pending** — Awaiting delivery
+- ❌ **Failed** — Delivery failed (automatic retry in progress)
 
-## 🎉 Tebrikler!
+---
 
-İlk webhook'unu gönderdin. Şimdi ne yapabilirsin:
+## What's Next?
 
-- **[Entegrasyon Rehberleri](integrations/)** — Shopify, Stripe, GitHub gibi platformlarla bağla
-- **[API Dokümantasyonu](API.md)** — Tüm endpoint'leri öğren
-- **[SSS](faq/)** — Sık sorulan sorular
+- **[SDK Examples](SDK_EXAMPLES.md)** — Use official SDKs for your language
+- **[API Reference](api-reference.md)** — Full API documentation
+- **[Architecture](ARCHITECTURE.md)** — How HookSniff works under the hood
+- **[Deployment Guide](DEPLOYMENT.md)** — Deploy to production
 
-## Sorun mu var?
+## Need Help?
 
-- Dashboard'da hata mı görüyorsun? → [SSS](faq/)'ye bak
-- API çalışmıyor mu? → [API Dokümantasyonu](API.md)'nu kontrol et
-- Hâlâ çözemedin mi? → support@hooksniff.dev
+- Check the [Troubleshooting Guide](TROUBLESHOOTING.md)
+- Open a [GitHub Issue](https://github.com/servetarslan02/HookSniff/issues)
+- Email: hello@hooksniff.com
