@@ -19,6 +19,14 @@ export default function DeliveryDetailPage() {
   const { toast } = useToast();
   const router = useRouter();
 
+  const goBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 2) {
+      router.back();
+    } else {
+      router.push('/observability');
+    }
+  };
+
   const { data: delivery, isLoading, error, refetch } = useDeliveryDetail(id);
   const { data: attempts = [] } = useDeliveryAttempts(id);
   const replayMutation = useReplayWebhook();
@@ -93,7 +101,7 @@ export default function DeliveryDetailPage() {
             {t('tryAgain')}
           </button>
           <button type="button"
-            onClick={() => router.back()}
+            onClick={goBack}
             className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-700 transition"
           >
             {t('backToDeliveries')}
@@ -111,7 +119,7 @@ export default function DeliveryDetailPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <button type="button"
-            onClick={() => router.back()}
+            onClick={goBack}
             className="p-2 -ml-2 text-gray-500 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition"
             title={t('backToDeliveries')}
           >
