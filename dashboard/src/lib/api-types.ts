@@ -317,6 +317,7 @@ export interface LatencyTrendResponse {
   range: string;
   buckets: LatencyBucket[];
   overall_avg_ms: number;
+  overall_p95_ms: number;
 }
 
 export interface AuditLogEntry {
