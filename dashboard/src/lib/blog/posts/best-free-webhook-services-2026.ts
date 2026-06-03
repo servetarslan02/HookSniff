@@ -39,7 +39,7 @@ We compared five webhook services:
 - Automatic retries with exponential backoff
 - HMAC-SHA256 signatures
 - Dashboard with delivery logs
-- 11 SDKs (Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift)
+- 11 SDKs (in development) (Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift)
 - No credit card required
 
 ### Svix Free Tier
@@ -136,7 +136,7 @@ Most services use similar APIs. If you are on Svix, HookSniff is API-compatible 
 
 ## Conclusion
 
-For most developers and startups, HookSniff offers the best value. You get 11 SDKs, automatic retries, HMAC signatures, and a real-time dashboard — all for free.
+For most developers and startups, HookSniff offers the best value. You get 11 SDKs (in development), automatic retries, HMAC signatures, and a real-time dashboard — all for free.
 
 If you need enterprise compliance (SOC 2, HIPAA), Svix is worth the premium. If you need advanced routing, Hookdeck is the best choice.
 

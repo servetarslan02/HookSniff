@@ -114,7 +114,7 @@ async function WhatIsHookSniffPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('whyHooksniff')}</h2>
         <ul className="space-y-2 text-gray-600 dark:text-slate-400">
           <li><strong>Rust</strong> — {t('why1')}</li>
-          <li><strong>11 SDK</strong> — {t('why2')}</li>
+          <li><strong>11 SDK</strong> (geliştirme aşamasında) — {t('why2')}</li>
           <li><strong>Standard Webhooks</strong> — {t('why3')}</li>
           <li><strong>{t('why4').split('—')[0].trim()}</strong> — {t('why4').split('—')[1]}</li>
           <li><strong>FIFO</strong> — {t('why5')}</li>

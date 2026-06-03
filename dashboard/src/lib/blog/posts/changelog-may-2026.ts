@@ -23,7 +23,7 @@ export const post: Post = {
 
 ### SDK Updates
 
-All 11 SDKs remain up-to-date: Node.js, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift.
+All 11 SDKs (in development) remain up-to-date: Node.js, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift.
 
 ### What is Next
 

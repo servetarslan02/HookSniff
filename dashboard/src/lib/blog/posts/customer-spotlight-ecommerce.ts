@@ -41,7 +41,7 @@ ShopStream evaluated three options:
 
 1. **Fix the in-house system** — Estimated 4-6 weeks of engineering time to add ordering, proper retries, and monitoring.
 2. **Adopt Svix** — Solid product, but $500/month for their volume, and no FIFO delivery.
-3. **Try HookSniff** — Free tier covered their volume, FIFO included, and 11 SDKs for their polyglot backend (Node.js for the API, Python for data pipelines, Go for the warehouse integration).
+3. **Try HookSniff** — Free tier covered their volume, FIFO included, and 11 SDKs (in development) for their polyglot backend (Node.js for the API, Python for data pipelines, Go for the warehouse integration).
 
 They chose HookSniff.
 

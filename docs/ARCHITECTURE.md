@@ -338,13 +338,13 @@ The API blocks webhook delivery to internal/private networks:
 | API keys | Argon2 hashed in database, never stored in plaintext |
 | Signing secrets | Stored in DB, only transmitted over TLS |
 | JWT tokens | Short-lived, signed with server-side secret |
-| TLS | Terminated at Fly.io edge proxy |
+| TLS | Terminated at Cloudflare edge |
 | Database | Neon PostgreSQL with SSL (`sslmode=require`) |
 | Payloads | Stored in DB, retained per plan (7-90 days) |
 
 ### Network Security
 
-- All services communicate over Fly.io private network (6PN)
+- All services communicate over secure HTTPS
 - No public ports except API (3000) and Dashboard (3001)
 - Internal services (PostgreSQL) are not publicly accessible
 - Health checks on all services
@@ -437,7 +437,7 @@ api_keys (
 |-------|-----------|---------|
 | API | Rust, Axum, SQLx | Async REST API |
 | Worker | Rust, Tokio | Webhook delivery engine |
-| Dashboard | TypeScript, Next.js 14, Tailwind CSS | Web UI |
+| Dashboard | TypeScript, Next.js 16, Tailwind CSS | Web UI |
 | Database | PostgreSQL (Neon) | Persistent storage |
 | Queue | PostgreSQL (webhook_queue) | Async message delivery |
 | Auth | JWT + Argon2 + HMAC-SHA256 | Multi-layer auth |
@@ -445,5 +445,5 @@ api_keys (
 | Monitoring | Prometheus + Grafana | Metrics & dashboards |
 | Tracing | OpenTelemetry, Jaeger | Distributed tracing |
 | Container | Docker, Docker Compose | Local dev |
-| Deploy | Fly.io | Production hosting |
+| Deploy | Google Cloud Run + Vercel | Production hosting |
 | CI/CD | GitHub Actions | Automated builds |
