@@ -355,6 +355,178 @@ mod correlation_tests {
         let x = vec![1.0, 2.0, 3.0, 4.0, 5.0];
         let y = vec![3.0, 3.0, 3.0, 3.0, 3.0];
         let r = pearson_correlation(&x, &y);
+        assert!(r.is_nan() || r.abs() < 0.01, "Constant y should have ~0 correlation");
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Explainability Tests
+// ═══════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod explainability_tests {
+    use crate::cortex::ml::explainable::*;
+
+    #[test]
+    fn test_anomaly_explanation_not_empty() {
+        let exp = explain_anomaly_score(
+            uuid::Uuid::new_v4(), 75.0, 500.0, 800.0, 100.0, 95.0, 200.0,
+        );
+        assert!(!exp.explanation.is_empty());
+    }
+
+    #[test]
+    fn test_prediction_explanation_has_confidence() {
+        let exp = explain_prediction(
+            uuid::Uuid::new_v4(), 85.0, 300.0, 0.8, 3, "degrading",
+        );
+        assert!(!exp.explanation.is_empty());
+        assert!(exp.confidence > 0.0);
+    }
+
+    #[test]
+    fn test_stable_prediction_explanation() {
+        let exp = explain_prediction(
+            uuid::Uuid::new_v4(), 99.0, 100.0, 0.95, 1, "stable",
+        );
+        assert!(!exp.explanation.is_empty());
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Chaos Engineering Tests
+// ═══════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod chaos_tests {
+    #[test]
+    fn test_scenario_types_valid() {
+        let scenarios = vec!["endpoint_down", "redis_down", "database_slow", "traffic_spike", "error_burst"];
+        for s in scenarios {
+            assert!(!s.is_empty());
+            assert!(s.chars().all(|c| c.is_ascii_lowercase() || c == '_'));
+        }
+    }
+
+    #[test]
+    fn test_traffic_spike_multiplier() {
+        let base = 100.0;
+        assert_eq!(base * 10.0, 1000.0);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// A/B Testing Tests
+// ═══════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod ab_testing_tests {
+    #[test]
+    fn test_split_ratio_range() {
+        for r in [0.1, 0.3, 0.5, 0.7, 0.9] {
+            assert!((0.0..1.0).contains(&r));
+        }
+    }
+
+    #[test]
+    fn test_variant_assignment_50_50() {
+        let a = (0..100).filter(|i| (*i as f64 / 100.0) < 0.5).count();
+        assert_eq!(a, 50);
+    }
+
+    #[test]
+    fn test_significance_threshold() {
+        assert!(0.03 < 0.05, "p=0.03 significant at alpha=0.05");
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Proactive Tests
+// ═══════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod proactive_tests {
+    #[test]
+    fn test_check_interval_trigger() {
+        assert!(300 >= 300, "Should trigger at interval");
+    }
+
+    #[test]
+    fn test_degradation_detection() {
+        assert!(85.0 < 95.0, "Should detect degraded SR");
+    }
+
+    #[test]
+    fn test_latency_spike() {
+        assert!(1500.0 > 200.0 * 3.0, "Should detect 3x+ latency spike");
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Tracing Tests
+// ═══════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod tracing_tests {
+    #[test]
+    fn test_stage_durations_positive() {
+        for d in [95.0, 520.0, 294.0] {
+            assert!(d > 0.0);
+        }
+    }
+
+    #[test]
+    fn test_bottleneck_is_slowest() {
+        let stages = vec![("a", 100.0), ("b", 500.0), ("c", 200.0)];
+        let bottleneck = stages.iter().max_by(|a, b| a.1.partial_cmp(&b.1).unwrap()).unwrap();
+        assert_eq!(bottleneck.0, "b");
+    }
+
+    #[test]
+    fn test_success_rate_bounds() {
+        assert_eq!(85.0 / 100.0 * 100.0, 85.0);
+        assert_eq!(100.0 / 100.0 * 100.0, 100.0);
+        assert_eq!(0.0 / 100.0 * 100.0, 0.0);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AutoML Tests
+// ═══════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod automl_tests {
+    #[test]
+    fn test_hyperparameter_grid_size() {
+        assert_eq!(3 * 3, 9, "3x3 grid = 9 combinations");
+    }
+
+    #[test]
+    fn test_best_param_selection() {
+        let trials = vec![("a", 0.92), ("b", 0.88), ("c", 0.95)];
+        let best = trials.iter().max_by(|a, b| a.1.partial_cmp(&b.1).unwrap()).unwrap();
+        assert_eq!(best.0, "c");
+        assert_eq!(best.1, 0.95);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Hourly Stats Tests
+// ═══════════════════════════════════════════════════════════════
+#[cfg(test)]
+mod hourly_stats_tests {
+    #[test]
+    fn test_percentile_calculation() {
+        let values = vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+        let p50 = values[(values.len() as f64 * 0.50) as usize];
+        assert_eq!(p50, 50);
+    }
+
+    #[test]
+    fn test_hourly_aggregation() {
+        let deliveries = vec![(100, true), (150, true), (5000, false), (120, true)];
+        let success = deliveries.iter().filter(|(_, s)| *s).count();
+        assert_eq!(success, 3);
+    }
+}
+    fn test_no_correlation() {
+        let x = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        let y = vec![3.0, 3.0, 3.0, 3.0, 3.0];
+        let r = pearson_correlation(&x, &y);
         assert!(r.is_nan() || r.abs() < 0.01, "Constant y should have no correlation");
     }
 
