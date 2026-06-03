@@ -3,51 +3,102 @@
 [![CI](https://github.com/servetarslan02/HookSniff/actions/workflows/ci.yml/badge.svg)](https://github.com/servetarslan02/HookSniff/actions/workflows/ci.yml)
 [![Deploy](https://github.com/servetarslan02/HookSniff/actions/workflows/deploy.yml/badge.svg)](https://github.com/servetarslan02/HookSniff/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Rust](https://img.shields.io/badge/Rust-1.82+-orange.svg)](https://www.rust-lang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
+[![Rust](https://img.shields.io/badge/Rust-1.95+-orange.svg)](https://www.rust-lang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org/)
 
-**Reliable webhook delivery for developers.**
+**The webhook infrastructure for developers.**
 
-Send webhooks. We deliver them. If they fail, we retry. Simple.
+HookSniff is an open-source webhook delivery platform built in Rust. It handles sending, receiving, retrying, and monitoring webhooks — so you can focus on building your product.
+
+---
+
+---
+
+## Why HookSniff?
+
+Webhooks are the backbone of modern integrations, but building reliable webhook infrastructure is hard. HookSniff gives you:
+
+- **Reliable delivery** — Automatic retries with exponential backoff and jitter. Failed deliveries go to a dead letter queue, never lost.
+- **Standard Webhooks** — HMAC-SHA256 signatures with `whsec_` secrets, fully compliant with the [Standard Webhooks](https://www.standardwebhooks.com/) specification.
+- **Smart routing** — Round-robin, failover, weighted, and random strategies with automatic fallback URLs.
+- **FIFO ordering** — Guaranteed ordered delivery with sequence numbers for event-sourced systems.
+- **Real-time visibility** — SSE streaming, WebSocket updates, and a full analytics dashboard.
+- **Cortex AI** — ML-powered anomaly detection, auto-healing, drift detection, and predictive monitoring.
+- **11 SDKs** — Official clients for Node.js, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, and Swift.
 
 ---
 
 ## Features
 
-- **Reliable delivery** — Automatic retries with exponential backoff + jitter
-- **HMAC signatures** — Standard Webhooks compliant (HMAC-SHA256, `whsec_` secrets)
-- **Dashboard** — 41 pages: real-time analytics, endpoint management, team collaboration (Next.js 15)
-- **Simple API** — 30 route modules, RESTful design, Swagger UI
-- **Multi-provider billing** — Polar.sh (global) + iyzico (Turkey) + Stripe (legacy)
-- **User auth** — JWT + API key (Argon2id), 2FA (TOTP), email verification
-- **Multiple delivery methods** — HTTP, WebSocket, Email (gRPC, SQS planned)
-- **Dead letter queue** — Failed deliveries preserved for debugging
-- **OpenTelemetry** — Distributed tracing (Grafana Cloud), structured JSON logging
-- **Smart routing** — Round-robin, failover, weighted, random with fallback URLs
-- **FIFO delivery** — Ordered delivery with sequence numbers
-- **Per-endpoint throttling** — Token bucket / sliding window to protect customer servers
-- **SSRF protection** — Blocks private IPs, metadata endpoints, DNS validation
-- **Schema registry** — JSON schema validation with versioning
-- **CloudEvents** — v1.0 event format support
-- **Inbound proxy** — Receive webhooks from Stripe, GitHub, Shopify
-- **11 SDKs** — Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift
-- **GDPR compliant** — Data export + account deletion endpoints
-- **Free-tier friendly** — Runs entirely on free services ($0/month)
+### Core Webhook Delivery
+
+| Feature | Description |
+|---------|-------------|
+| **Automatic retries** | Exponential backoff with jitter, configurable per endpoint |
+| **Dead letter queue** | Failed deliveries preserved for debugging and replay |
+| **Batch operations** | Send and replay webhooks in bulk |
+| **Idempotency** | `Idempotency-Key` header with 24h TTL prevents duplicate processing |
+| **FIFO ordering** | Sequence numbers guarantee ordered delivery |
+| **Per-endpoint throttling** | Token bucket / sliding window to protect customer servers |
+| **Payload transformation** | Filter, map, and enrich webhook payloads per endpoint |
+| **Schema registry** | JSON schema validation with versioning |
+| **CloudEvents v1.0** | Standard event format support |
+| **Multiple delivery methods** | HTTP, WebSocket, Email |
+
+### Security
+
+| Feature | Description |
+|---------|-------------|
+| **HMAC-SHA256 signatures** | Standard Webhooks compliant (`whsec_` secrets) |
+| **SSRF protection** | Blocks private IPs, metadata endpoints, DNS validation |
+| **Rate limiting** | Sliding window algorithm, per-plan limits |
+| **API key auth** | `hr_live_*` / `hr_test_*` keys, Argon2id hashed |
+| **JWT + 2FA** | Dashboard auth with TOTP two-factor authentication |
+| **SSO/SAML** | Enterprise single sign-on |
+| **OAuth** | Google and GitHub social login |
+| **GDPR** | Data export and account deletion endpoints |
+
+### Monitoring & Observability
+
+| Feature | Description |
+|---------|-------------|
+| **Real-time stream** | SSE (`GET /v1/stream/deliveries`) + WebSocket |
+| **Analytics** | Delivery trends, success rates, latency percentiles (24h/7d/30d) |
+| **Alerts** | Configurable alert rules with notification channels |
+| **Endpoint health** | Per-endpoint success rate, p95/p99 latency, failure streaks |
+| **OpenTelemetry** | Distributed tracing with Grafana Cloud |
+| **Prometheus metrics** | `GET /metrics` endpoint |
+| **Cortex AI** | Anomaly detection, auto-healing, drift detection, predictive monitoring |
+
+### Platform
+
+| Feature | Description |
+|---------|-------------|
+| **Dashboard** | 40+ pages: analytics, endpoint management, team collaboration (Next.js 16) |
+| **Admin panel** | User management, revenue dashboard, system health |
+| **Teams** | Team CRUD, invitations, roles (admin/editor/viewer) |
+| **Billing** | Polar.sh (global) + iyzico (Turkey) multi-provider support |
+| **Inbound proxy** | Receive webhooks from Stripe, GitHub, Shopify |
+| **Embeddable portal** | Customer-facing portal widget |
+| **CLI** | Command-line tool for endpoint and webhook management |
+| **11 SDKs** | Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift |
+
+---
 
 ## Tech Stack
 
-| Component | Technology | Hosting | Cost |
-|---|---|---|---|
-| API | Rust (Axum) | Google Cloud Run (Free Tier) | $0 |
-| Worker | Rust | Google Cloud Run (Free Tier) | $0 |
-| Database | PostgreSQL | Neon (serverless) | $0 (0.5 GB) |
-| Cache / Queue | PostgreSQL + Redis | Upstash (serverless) | $0 (256 MB) |
-| Dashboard | Next.js 15 | Vercel | $0 |
-| CDN/DNS | Cloudflare | Cloudflare Free | $0 |
-| Monitoring | Grafana + OpenTelemetry | Grafana Cloud | $0 |
-| Storage | Cloudflare R2 | Cloudflare R2 | $0 (10 GB) |
-| Email | GCloud Gmail API | Service Account | $0 (2K/day) |
-| Billing | Polar.sh + iyzico | Polar.sh / iyzico | Pay per transaction |
+| Component | Technology | Hosting |
+|---|---|---|
+| **API** | Rust (Axum 0.8, sqlx 0.8) | Google Cloud Run |
+| **Worker** | Rust (Tokio) | Google Cloud Run |
+| **Database** | PostgreSQL 16 | Neon (serverless) |
+| **Cache / Queue** | Redis | Upstash (serverless) |
+| **Dashboard** | Next.js 16, React, TypeScript, Tailwind | Vercel |
+| **CDN/DNS** | Cloudflare | Cloudflare Free |
+| **Monitoring** | Grafana + OpenTelemetry | Grafana Cloud |
+| **Storage** | Cloudflare R2 | S3-compatible |
+| **Email** | Resend + Gmail API | Service Account |
+| **Billing** | Polar.sh + iyzico | Per-transaction |
 
 ## Quick Start
 

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/Toast';
 import { useAuth } from '@/lib/store';
 import { endpointsApi } from '@/lib/api';
+import { useQueryClient } from '@tanstack/react-query';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { Key } from '@/components/icons';
 
@@ -19,6 +20,7 @@ export function SignatureCard({
   const tCommon = useTranslations('common');
   const { token } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showRotateConfirm, setShowRotateConfirm] = useState(false);
   const [rotating, setRotating] = useState(false);
   const [newSecret, setNewSecret] = useState<string | null>(null);
@@ -29,6 +31,7 @@ export function SignatureCard({
     try {
       const data = await endpointsApi.rotateSecret(token, endpointId);
       setNewSecret(data.signing_secret);
+      queryClient.invalidateQueries({ queryKey: ['endpoint', endpointId] });
       toast(t('toastSecretRotated'), 'success');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('toastRotationFailed');

@@ -8,6 +8,7 @@ import { useEndpointDetail } from '@/hooks/useDashboardData';
 import { endpointsApi, type RetryPolicyConfig } from '@/lib/api';
 import { useAuth } from '@/lib/store';
 import { useIsFeatureEnabled } from '@/hooks/useAdminData';
+import { useQueryClient } from '@tanstack/react-query';
 import { RetryPolicyCard } from './components/RetryPolicyCard';
 import { SignatureCard } from './components/SignatureCard';
 import { RateLimitCard } from './components/RateLimitCard';
@@ -19,6 +20,7 @@ export default function EndpointSettingsPage() {
   const { token } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const customRetryEnabled = useIsFeatureEnabled('custom_retry_schedules');
 
   // React Query hooks
@@ -27,6 +29,7 @@ export default function EndpointSettingsPage() {
     if (!token || !id) return;
     try {
       await endpointsApi.updateRetryPolicy(token, id, policy);
+      queryClient.invalidateQueries({ queryKey: ['endpoint', id] });
       toast(t('toastRetryUpdated'), 'success');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('toastUpdateFailed');
