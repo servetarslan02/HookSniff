@@ -1,24 +1,41 @@
-# Item 347: This root .dockerignore covers all services (api, worker, dashboard)
+# Item 347: This root .dockerignore covers all services (api, worker)
 # since all Dockerfiles use the root as build context. No per-service
 # .dockerignore files are needed.
 .git
 .github
 .ai-context
 target/
-dashboard/node_modules/
-dashboard/.next/
-dashboard/.turbo/
+
+# Frontend — not needed for API/Worker builds
+dashboard/
+landing/
+portal/
+
+# Docs & non-runtime files
+docs/
+docs-sdk/
+monitoring/
+tests/
+scripts/
+reddit-launch/
+research/
+mcp/
+deploy/
+terraform/
+workers/
+sdks/
+migrations/
+
+# Build/config artifacts
 *.md
 !README.md
 .env*
 !.env.example
-monitoring/
-tests/
-scripts/
-landing/
-k8s/
 *.ps1
 *.sh
 !entrypoint-api.sh
 .gitignore
 .DS_Store
+.vscode
+node_modules/
+cargo-mutants.toml
