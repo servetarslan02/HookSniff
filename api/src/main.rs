@@ -13,6 +13,7 @@ use hooksniff_api::feature_flags;
 use hooksniff_api::jobs;
 use hooksniff_api::metrics;
 use hooksniff_api::middleware;
+use hooksniff_api::queue;
 use hooksniff_api::notifications;
 use hooksniff_api::rate_limit;
 use hooksniff_api::routes;
