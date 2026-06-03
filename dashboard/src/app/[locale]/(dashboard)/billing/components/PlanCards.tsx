@@ -119,7 +119,7 @@ export function PlanCards({
                   onClick={() => { onDiscountCodeChange(couponInput); setShowCoupon(false); }}
                   className="px-3 py-1.5 rounded-xl text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition"
                 >
-                  {t('confirmCoupon') || 'Onayla'}
+                  {t('confirmCoupon') || 'Confirm'}
                 </button>
                 <button
                   type="button"
@@ -135,7 +135,7 @@ export function PlanCards({
                 onClick={() => setShowCoupon(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium border border-gray-300 dark:border-slate-600 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
               >
-                {discountCode ? `🎟️ ${discountCode}` : (t('enterCoupon') || 'Kupon Kodu Gir')}
+                {discountCode ? `🎟️ ${discountCode}` : (t('enterCoupon') || 'Enter Coupon Code')}
               </button>
             )}
           </div>

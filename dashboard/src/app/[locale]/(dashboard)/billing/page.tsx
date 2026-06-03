@@ -55,7 +55,7 @@ export default function BillingPage() {
     const modalRef = showUpgradeModal ? upgradeModalRef : showPauseModal ? pauseModalRef : cancelModalRef;
     modalRef.current?.focus();
     return () => document.removeEventListener('keydown', handler);
-  }, [showUpgradeModal, showCancelModal]);
+  }, [showUpgradeModal, showCancelModal, showPauseModal]);
 
   const handleCancel = async () => {
     if (!token) return;
