@@ -236,8 +236,8 @@ export function PlanCards({
                   {t('currentPlanLabel')}
                 </div>
               ) : isDowngrade ? (
-                <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-50 dark:bg-slate-900 text-gray-400 dark:text-slate-500 border border-gray-200 dark:border-slate-700">
-                  {t('lowerPlan') || 'Lower Plan'}
+                <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-50 dark:bg-slate-900 text-gray-400 dark:text-slate-600 border border-gray-200 dark:border-slate-700 cursor-not-allowed">
+                  {t('currentPlanLabel')}
                 </div>
               ) : (
                 <button type="button"
