@@ -25,22 +25,31 @@ pub async fn verify_request(
     let mut reasons = Vec::new();
 
     // 1. Check if customer account is active
-    let account_active: Option<(bool,)> = sqlx::query_as(
-        "SELECT COALESCE(is_active, true) FROM customers WHERE id = $1"
+    let account_active: Option<(bool, bool)> = sqlx::query_as(
+        "SELECT COALESCE(is_active, true), COALESCE(is_admin, false) FROM customers WHERE id = $1"
     )
     .bind(customer_id)
     .fetch_optional(pool)
     .await
     .unwrap_or(None);
 
-    if let Some((active,)) = account_active {
-        if !active {
-            return ZtVerification {
-                allowed: false,
-                reason: "Account disabled".to_string(),
-                risk_score: 1.0,
-            };
-        }
+    let (active, is_admin) = account_active.unwrap_or((true, false));
+
+    if !active {
+        return ZtVerification {
+            allowed: false,
+            reason: "Account disabled".to_string(),
+            risk_score: 1.0,
+        };
+    }
+
+    // Admin users bypass risk scoring — they've already passed auth
+    if is_admin {
+        return ZtVerification {
+            allowed: true,
+            reason: "Admin verified".to_string(),
+            risk_score: 0.0,
+        };
     }
 
     // 2. Check for recent suspicious activity
@@ -77,24 +86,16 @@ pub async fn verify_request(
         }
     }
 
-    // 4. Admin path requires elevated verification
+    // 4. Admin path requires elevated verification (already checked above for admin bypass)
     if path.starts_with("/admin") || path.contains("/admin/") {
-        let is_admin: Option<(bool,)> = sqlx::query_as(
-            "SELECT COALESCE(is_admin, false) FROM customers WHERE id = $1"
-        )
-        .bind(customer_id)
-        .fetch_optional(pool)
-        .await
-        .unwrap_or(None);
-
-        if let Some((admin,)) = is_admin {
-            if !admin {
-                return ZtVerification {
-                    allowed: false,
-                    reason: "Admin access required".to_string(),
-                    risk_score: 1.0,
-                };
-            }
+        // This check is redundant for admins (already bypassed above),
+        // but protects against non-admin users accessing admin paths
+        if !is_admin {
+            return ZtVerification {
+                allowed: false,
+                reason: "Admin access required".to_string(),
+                risk_score: 1.0,
+            };
         }
     }
 
