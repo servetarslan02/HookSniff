@@ -251,19 +251,59 @@ pub async fn create_webhook(
         return Ok(Json(resp));
     }
 
-    db::publish_to_queue(
-        &pool,
-        delivery.id,
-        endpoint.id,
-        &endpoint.url,
-        &payload_str,
-        endpoint.custom_headers.as_ref(),
-    )
-    .await
-    .map_err(|e| {
-        tracing::error!("Failed to publish to queue: {:?}", e);
-        AppError::Internal(e)
-    })?;
+    // ── Publish to queue: Redis-first, PG fallback ──
+    // If USE_REDIS_QUEUE is enabled and Redis is available, use Redis Streams
+    // for < 10ms delivery latency. Otherwise, fall back to PostgreSQL queue.
+    let redis_guard = redis_queue.lock().await;
+    let redis_available = redis_guard.as_ref().map(|r| r.is_available()).unwrap_or(false);
+    drop(redis_guard);
+
+    if cfg.use_redis_queue && redis_available {
+        if let Some(ref mut rq) = *redis_queue.lock().await {
+            let msg = crate::queue::WebhookMessage {
+                delivery_id: delivery.id.to_string(),
+                endpoint_id: endpoint.id.to_string(),
+                url: endpoint.url.clone(),
+                payload: payload_str.clone(),
+                custom_headers: endpoint.custom_headers.clone(),
+                attempt: 1,
+            };
+            if let Ok(msg_id) = rq.enqueue(&msg).await {
+                tracing::info!(
+                    "⚡ Redis enqueue: delivery={} msg_id={} ({}ms)",
+                    delivery.id, msg_id, start.elapsed().as_millis()
+                );
+                // Update delivery status to queued
+                sqlx::query("UPDATE deliveries SET status = 'queued' WHERE id = $1")
+                    .bind(delivery.id)
+                    .execute(&pool)
+                    .await
+                    .ok();
+            } else {
+                tracing::warn!("Redis enqueue failed, falling back to PG queue");
+                db::publish_to_queue(&pool, delivery.id, endpoint.id, &endpoint.url, &payload_str, endpoint.custom_headers.as_ref())
+                    .await
+                    .map_err(|e| {
+                        tracing::error!("Failed to publish to queue: {:?}", e);
+                        AppError::Internal(e)
+                    })?;
+            }
+        } else {
+            db::publish_to_queue(&pool, delivery.id, endpoint.id, &endpoint.url, &payload_str, endpoint.custom_headers.as_ref())
+                .await
+                .map_err(|e| {
+                    tracing::error!("Failed to publish to queue: {:?}", e);
+                    AppError::Internal(e)
+                })?;
+        }
+    } else {
+        db::publish_to_queue(&pool, delivery.id, endpoint.id, &endpoint.url, &payload_str, endpoint.custom_headers.as_ref())
+            .await
+            .map_err(|e| {
+                tracing::error!("Failed to publish to queue: {:?}", e);
+                AppError::Internal(e)
+            })?;
+    }
 
     // Store idempotency key if provided
     if let Some(key) = idempotency_key {
