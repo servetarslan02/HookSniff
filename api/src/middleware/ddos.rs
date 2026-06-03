@@ -14,6 +14,11 @@ pub async fn ddos_middleware(
     request: Request,
     next: Next,
 ) -> Result<Response, AppError> {
+    // Authenticated requests pass through — per-user rate limiting handles abuse
+    if request.headers().get("authorization").is_some() {
+        return Ok(next.run(request).await);
+    }
+
     let ip = request
         .headers()
         .get("x-forwarded-for")

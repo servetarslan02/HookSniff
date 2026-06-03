@@ -75,10 +75,19 @@ pub async fn ip_blocklist_middleware(
     }
 
     // Allow admin users — check for Customer extension (set after auth middleware)
+    // NOTE: This bypass only works if auth_middleware runs BEFORE ip_blocklist_middleware.
+    // Currently ip_blocklist runs before auth, so we also check the Authorization header.
     if let Some(customer) = request.extensions().get::<crate::models::customer::Customer>() {
         if customer.is_admin {
             return Ok(next.run(request).await);
         }
+    }
+
+    // If request has Authorization header, let it pass through to auth middleware.
+    // Auth + Zero Trust will handle admin verification and blocking.
+    // This prevents admins from being blocked by IP blocklist before their identity is verified.
+    if request.headers().get("authorization").is_some() {
+        return Ok(next.run(request).await);
     }
 
     let ip = extract_client_ip(&request);

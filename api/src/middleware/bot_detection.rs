@@ -113,6 +113,11 @@ pub async fn bot_detection_middleware(
     request: Request,
     next: Next,
 ) -> Result<Response, AppError> {
+    // Authenticated requests pass through — auth + Zero Trust handle admin verification
+    if request.headers().get("authorization").is_some() {
+        return Ok(next.run(request).await);
+    }
+
     let result = detect_bot(&request);
 
     // Extract IP once for all checks
