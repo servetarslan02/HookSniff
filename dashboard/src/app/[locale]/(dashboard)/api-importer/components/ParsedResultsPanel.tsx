@@ -33,22 +33,19 @@ export function ParsedResultsPanel({
 
     setImporting(true);
     setImported(0);
-    let success = 0;
 
-    for (const ep of selected) {
-      try {
+    const results = await Promise.allSettled(
+      selected.map(async (ep, i) => {
         const url = ep.path.startsWith('http') ? ep.path : `${spec.baseUrl}${ep.path}`;
         await endpointsApi.create(token, {
           url: url || 'https://example.com/webhook',
           description: `[${ep.method}] ${ep.description}`,
         });
-        success++;
-        setImported(success);
-      } catch {
-        // Continue with remaining
-      }
-    }
+        setImported(i + 1);
+      })
+    );
 
+    const success = results.filter((r) => r.status === 'fulfilled').length;
     toast(t('imported', { success, total: selected.length }), success > 0 ? 'success' : 'error');
     setImporting(false);
   }, [spec, token, toast, t]);
@@ -94,8 +91,6 @@ export function ParsedResultsPanel({
               }`}
             >
               <input
-                role="switch"
-                aria-checked={ep.selected}
                 type="checkbox"
                 checked={ep.selected}
                 onChange={() => onToggleEndpoint(i)}
