@@ -45,7 +45,7 @@ export default function PortalPage() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl space-y-6">
+      <div className=" space-y-6">
         <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-48 animate-pulse" />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => <div key={i} className="h-28 bg-gray-200 dark:bg-slate-700 rounded-2xl animate-pulse" />)}
@@ -57,7 +57,7 @@ export default function PortalPage() {
 
   if (error) {
     return (
-      <div className="max-w-4xl">
+      <div className="">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('title')}</h1>
         <div className="p-5 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
           <div className="flex items-center gap-3">
@@ -78,7 +78,7 @@ export default function PortalPage() {
   }
 
   return (
-    <div className="max-w-4xl space-y-6">
+    <div className=" space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
@@ -149,7 +149,7 @@ export default function PortalPage() {
               <span className="text-gray-600 dark:text-slate-400">{tb('webhooksThisMonth')}</span>
               <span className="font-medium text-gray-900 dark:text-white">
                 {webhookUnlimited ? (
-                  <>{webhookUsed.toLocaleString()} / <span className="text-brand-500">∞ {tb('unlimited') || 'Sınırsız'}</span></>
+                  <>{webhookUsed.toLocaleString()} / <span className="text-brand-500">∞ {tb('unlimited') || 'Unlimited'}</span></>
                 ) : (
                   <>{webhookUsed.toLocaleString()} / {webhookLimit.toLocaleString()}</>
                 )}
@@ -202,7 +202,7 @@ export default function PortalPage() {
             </div>
             <p className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">
               {dataAgeDays > 0
-                ? `${dataAgeDays} ${tb('daysOldData') || 'günlük veri var'} — ${retentionDays} ${tb('days')} ${tb('retentionLabel') || 'saklanır'}`
+                ? `${dataAgeDays} ${tb('daysOldData') || 'days old data'} — ${retentionDays} ${tb('days')} ${tb('retentionLabel') || 'retention'}`
                 : tb('retentionDesc')
               }
             </p>
