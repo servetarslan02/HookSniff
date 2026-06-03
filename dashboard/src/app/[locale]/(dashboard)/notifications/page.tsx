@@ -106,14 +106,20 @@ export default function NotificationsPage() {
   const deleteMutation = useDeleteNotification();
 
   const handleMarkAsRead = async (id: string) => {
+    // Optimistic local update
+    setAllNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
     try {
       await markAsReadMutation.mutateAsync(id);
     } catch {
+      // Rollback on error
+      setAllNotifications(prev => prev.map(n => n.id === id ? { ...n, read: false } : n));
       toast(t('failedToMarkRead'), 'error');
     }
   };
 
   const handleMarkAllAsRead = async () => {
+    // Optimistic local update
+    setAllNotifications(prev => prev.map(n => ({ ...n, read: true })));
     try {
       await markAllAsReadMutation.mutateAsync();
       toast(t('allReadSuccess'), 'success');
