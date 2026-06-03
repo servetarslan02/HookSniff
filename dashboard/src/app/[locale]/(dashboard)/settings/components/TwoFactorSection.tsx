@@ -22,7 +22,6 @@ export function TwoFactorSection() {
 
   // Enable flow
   const [qrCodeUrl, setQrCodeUrl] = useState('');
-  const [_otpauthUri, setOtpauthUri] = useState('');
   const [secret, setSecret] = useState('');
   const [totpCode, setTotpCode] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
@@ -55,7 +54,6 @@ export function TwoFactorSection() {
       const data = await twoFactorApi.enable(token);
       // Build otpauth URI and QR code URL on frontend to avoid backend encoding issues
       const otpauth = data.otpauth_url || `otpauth://totp/HookSniff?secret=${data.secret}&issuer=HookSniff&digits=6&period=30`;
-      setOtpauthUri(otpauth);
       // Generate QR code URL — encode the otpauth URI properly
       setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauth)}`);
       setSecret(data.secret);
@@ -87,7 +85,6 @@ export function TwoFactorSection() {
   const handleCloseEnable = () => {
     setShowEnable(false);
     setQrCodeUrl('');
-    setOtpauthUri('');
     setSecret('');
     setTotpCode('');
     setBackupCodes([]);
