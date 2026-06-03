@@ -1,5 +1,17 @@
 # Security Policy
 
+HookSniff takes security seriously. This document covers our vulnerability reporting process, security architecture, and compliance posture.
+
+## Table of Contents
+
+- [Supported Versions](#supported-versions)
+- [Reporting a Vulnerability](#reporting-a-vulnerability)
+- [Security Architecture](#security-architecture)
+- [Compliance](#compliance)
+- [Responsible Disclosure](#responsible-disclosure)
+
+---
+
 ## Supported Versions
 
 | Version | Supported          |
@@ -163,6 +175,28 @@ Endpoints (`api/src/routes/auth.rs`):
 - `X-Request-ID` header for request correlation
 - Prometheus metrics at `/metrics`
 - Circuit breaker for failing endpoints
+
+### Cortex AI — ML-Powered Security
+
+HookSniff includes an AI-powered monitoring layer (`api/src/cortex/`):
+
+- **Anomaly detection** — EWMA, IQR, and Z-Score algorithms detect unusual delivery patterns
+- **Auto-healing** — Automatic endpoint disabling, rate limiting, and fallback URL activation for high-risk endpoints
+- **Drift detection** — Page-Hinkley, ADWIN, and Kolmogorov-Smirnov tests detect behavioral changes
+- **Risk scoring** — Per-endpoint risk score (0–100) based on delivery patterns
+- **Blocklists** — Automatic IP, customer, and endpoint blocking for suspicious activity
+
+---
+
+## Compliance
+
+| Standard | Status | Notes |
+|----------|--------|-------|
+| GDPR | ✅ Compliant | Data export + account deletion endpoints |
+| Standard Webhooks | ✅ Compliant | HMAC-SHA256 with `whsec_` secrets |
+| SOC 2 Type II | ⏳ Planned | Security audit preparation in progress |
+| HIPAA | ⏳ Planned | Healthcare data handling (future) |
+| PCI-DSS | ⏳ Planned | Payment data handling (future) |
 
 ---
 

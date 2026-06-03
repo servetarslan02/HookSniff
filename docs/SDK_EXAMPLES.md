@@ -1,9 +1,11 @@
 # HookSniff — SDK Usage Examples
 
-> Son güncelleme: 2026-05-12
+> Last updated: 2026-06-03
 > API Base URL: `https://hooksniff-api-1046140057667.europe-west1.run.app/v1`
 
 All SDKs follow the same pattern: initialize client → use resources (endpoints, webhooks) → handle responses.
+
+> **Note:** Only the Node.js SDK example below reflects the planned API. Other SDK examples show the target API design — actual SDK packages are in development. See [sdk-coverage.md](sdk-coverage.md) for current status.
 
 ---
 

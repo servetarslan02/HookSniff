@@ -1,92 +1,92 @@
 # Self-Host Guide — HookSniff
 
-HookSniff'i kendi sunucunuzda çalıştırın. Tek komutla kurulum.
+Run HookSniff on your own infrastructure with a single command.
 
-## Hızlı Kurulum
+## Quick Setup
 
 ```bash
-# 1. Repo'yu klonlayın
+# 1. Clone the repository
 git clone https://github.com/servetarslan02/HookSniff.git
 cd HookSniff
 
-# 2. Tek komutla başlatın
+# 2. Start with one command
 make self-host
 ```
 
-Bu komut şunları yapar:
-- `.env.example` → `.env` kopyalar (düzenlemeniz gerekir)
-- Docker image'ları build eder
-- Tüm servisleri başlatır (API, Worker, Dashboard, PostgreSQL, Redis)
-- Sağlık kontrolü yapar
+This command:
+- Copies `.env.example` → `.env` (you'll need to edit it)
+- Builds Docker images
+- Starts all services (API, Worker, Dashboard, PostgreSQL, Redis)
+- Runs health checks
 
-## Servisler
+## Services
 
-| Servis | Port | Açıklama |
-|--------|------|----------|
-| Dashboard | 3001 | Web arayüzü |
+| Service | Port | Description |
+|---------|------|-------------|
+| Dashboard | 3001 | Web UI |
 | API | 3000 | REST API |
-| PostgreSQL | 5432 | Veritabanı |
+| PostgreSQL | 5432 | Database |
 | Redis | 6379 | Cache + Queue |
 
-## Yönetim Komutları
+## Management Commands
 
 ```bash
-# Durum kontrolü
+# Check status
 make self-host-status
 
-# Veritabanı yedekleme
+# Backup database
 make self-host-backup
 
-# Güncelleme (git pull + rebuild)
+# Update (git pull + rebuild)
 make self-host-update
 
-# Tüm servisleri durdur
+# Stop all services
 make stop
 
-# Logları göster
+# View logs
 make logs
 
-# Tek servis logu
+# View logs for a specific service
 make logs-api
 make logs-worker
 make logs-db
 ```
 
-## İlk Kurulum
+## Initial Setup
 
-Servisleri başlattıktan sonra:
+After starting the services:
 
 ```bash
-# İlk kullanıcıyı oluşturun
+# Create the first user
 curl -X POST http://localhost:3000/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email": "admin@example.com", "password": "your-password"}'
 
-# API key'inizi dashboard'dan oluşturun
+# Create an API key from the dashboard
 # http://localhost:3001/dashboard/api-keys
 ```
 
-## Ortam Değişkenleri (.env)
+## Environment Variables (.env)
 
 ```env
-# Veritabanı (Docker PostgreSQL kullanıyorsanız değişmeyin)
+# Database (don't change if using Docker PostgreSQL)
 DATABASE_URL=postgresql://hooksniff:hooksniff@postgres:5432/hooksniff
 
-# Redis (Docker Redis kullanıyorsanız değişmeyin)
+# Redis (don't change if using Docker Redis)
 REDIS_URL=redis://redis:6379
 
-# JWT Secret (değiştirin!)
-JWT_SECRET=rastgele-64-karakter-hex-string
+# JWT Secret (change this!)
+JWT_SECRET=random-64-character-hex-string
 
-# HMAC Secret (değiştirin!)
-HMAC_SECRET=rastgele-64-karakter-hex-string
+# HMAC Secret (change this!)
+HMAC_SECRET=random-64-character-hex-string
 
-# API Base URL (production'da domain'iniz)
+# API Base URL (your domain in production)
 API_BASE_URL=http://localhost:3000
 DASHBOARD_URL=http://localhost:3001
 ```
 
-Secret üretmek için:
+Generate secrets:
 ```bash
 make generate-secret
 ```
@@ -133,70 +133,78 @@ sudo ufw allow 443/tcp
 sudo ufw enable
 ```
 
-## Docker Compose (Doğrudan)
+## Docker Compose (Direct)
 
 ```bash
-# Başlat
+# Start
 docker compose up -d --build
 
-# Durdur
+# Stop
 docker compose down
 
-# Veritabanı sıfırla
+# Reset database
 docker compose down -v
 docker compose up -d --build
 ```
 
-## Sorun Giderme
+## Troubleshooting
 
 ```bash
-# Servis durumlarını kontrol et
+# Check service status
 make status
 
-# Logları göster
+# View logs
 make logs
 
-# Otomatik düzeltme
+# Auto-fix common issues
 make fix
 
-# Her şeyi sıfırla
+# Reset everything
 make reset
 ```
 
-### Yaygın Sorunlar
+### Common Issues
 
-**Port kullanımda:**
+**Port in use:**
 ```bash
 sudo lsof -i :3000
 sudo lsof -i :3001
 ```
 
-**Veritabanı bağlantı hatası:**
+**Database connection error:**
 ```bash
 make db-shell
-# PostgreSQL kabuğunda:
-# \dt  (tabloları listele)
+# In the PostgreSQL shell:
+# \dt  (list tables)
 # SELECT COUNT(*) FROM customers;
 ```
 
-**Docker bellek yetersiz:**
+**Docker out of memory:**
 ```bash
 docker system prune -a
 ```
 
-## Güncelleme
+## Updating
 
 ```bash
-# Tek komutla güncelleme
+# One-command update
 make self-host-update
 
-#veya manuel:
+# Or manually:
 git pull origin main
 docker compose build
 docker compose up -d
 ```
 
-## Yedekleme ve Geri Yükleme
+## Backup and Restore
+
+```bash
+# Backup
+make self-host-backup
+
+# Restore
+psql "$DATABASE_URL" < backup.sql
+```
 
 ```bash
 # Yedekle

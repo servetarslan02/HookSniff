@@ -1,49 +1,57 @@
-# 🚀 HookSniff Deploy Rehberi
+# HookSniff — Deployment Guide
 
-> Son güncelleme: 2026-05-09
-> Servet, bu rehberi adım adım takip et. Her adımda takılırsan bana sor.
+> Last updated: 2026-06-03
+
+This guide walks through deploying HookSniff to production. For a complete free-tier setup, see [FREE_TIER_SETUP.md](FREE_TIER_SETUP.md).
 
 ---
 
-## Adım 1: Vercel Dashboard (5 dk)
+## Table of Contents
 
-### 1.1 Build Hatasını Kontrol Et
-1. https://vercel.com adresine git
-2. **hooksniff** projesine tıkla
-3. **Deployments** sekmesine git
-4. En son deploy'a tıkla
-5. **Building** veya **Error** mu yazıyor?
-6. Eğer **Error** ise → Build Logs'u aç, bana gönder
+- [Step 1: Vercel Dashboard](#step-1-vercel-dashboard)
+- [Step 2: GitHub Actions CI/CD](#step-2-github-actions-cicd)
+- [Step 3: Cloudflare DNS](#step-3-cloudflare-dns)
+- [Step 4: Verify Deployment](#step-4-verify-deployment)
 
-### 1.2 Manuel Redeploy
-1. Deployments sekmesinde en son deploy'ın yanındaki **"..."** butonuna bas
-2. **Redeploy** seç
-3. "Redeploy" onayla
-4. 1-3 dakika bekle
-5. https://hooksniff.vercel.app adresini kontrol et
+---
+
+## Step 1: Vercel Dashboard
+
+### 1.1 Check Build Status
+1. Go to [vercel.com](https://vercel.com)
+2. Select the **hooksniff** project
+3. Open the **Deployments** tab
+4. Check the latest deployment status
+5. If **Error** → open Build Logs and investigate
+
+### 1.2 Manual Redeploy
+1. In the Deployments tab, click **"..."** on the latest deployment
+2. Select **Redeploy**
+3. Confirm and wait 1–3 minutes
+4. Verify at https://hooksniff.vercel.app
 
 ### 1.3 Environment Variables
-1. **Settings** → **Environment Variables**
-2. Şu değişkenin tanımlı olduğundan emin ol:
+1. Go to **Settings** → **Environment Variables**
+2. Ensure this variable is defined:
    ```
    NEXT_PUBLIC_API_URL = https://hooksniff-api-1046140057667.europe-west1.run.app/v1
    ```
 
 ---
 
-## Adım 2: GitHub Actions CI/CD (Otomatik)
+## Step 2: GitHub Actions CI/CD
 
-CI/CD `.github/workflows/deploy.yml` ile yapılandırıldı:
+CI/CD is configured in `.github/workflows/deploy.yml`:
 
-1. `main` branch'e push → CI çalışır (lint, test, build)
-2. CI başarılı → Deploy tetiklenir
+1. Push to `main` → CI runs (lint, test, build)
+2. If CI passes → Deploy triggers automatically
 3. Docker image build + push → Artifact Registry
-4. Cloud Run servisleri güncellenir
+4. Cloud Run services updated
 
-### Gerekli GitHub Secrets
+### Required GitHub Secrets
 - `GCP_SA_KEY` — GCP service account JSON key
 
-### Manuel Deploy (opsiyonel)
+### Manual Deploy (optional)
 ```bash
 # Authenticate
 gcloud auth activate-service-account --key-file=gcp-sa-key.json
@@ -57,13 +65,13 @@ gcloud run deploy hooksniff-api --image europe-west1-docker.pkg.dev/hooksniff-ap
 
 ---
 
-## Adım 3: Cloudflare DNS (5 dk)
+## Step 3: Cloudflare DNS
 
-### 3.1 Cloudflare'a Gir
-1. https://dash.cloudflare.com adresine git
-2. Zone'unu seç
+### 3.1 Log in to Cloudflare
+1. Go to [dash.cloudflare.com](https://dash.cloudflare.com)
+2. Select your zone
 
-### 3.2 DNS Kayıtları
+### 3.2 DNS Records
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
@@ -72,7 +80,7 @@ gcloud run deploy hooksniff-api --image europe-west1-docker.pkg.dev/hooksniff-ap
 
 ---
 
-## Adım 4: Test Et (5 dk)
+## Step 4: Verify Deployment
 
 ### 4.1 API Health Check
 ```bash
@@ -81,9 +89,9 @@ curl https://hooksniff-api-1046140057667.europe-west1.run.app/health
 ```
 
 ### 4.2 Dashboard Test
-1. https://hooksniff.vercel.app adresine git
-2. Kayıt ol veya giriş yap
-3. Dashboard yükleniyor mu kontrol et
+1. Go to https://hooksniff.vercel.app
+2. Register or log in
+3. Verify the dashboard loads correctly
 
 ### 4.3 Webhook Test
 ```bash

@@ -1,216 +1,90 @@
-# 🪝 HookSniff — Rekabet Analizi ve Eksikler Raporu
+# HookSniff — Competitive Analysis
 
-> **Tarih:** 2026-05-06
-> **Hazırlayan:** Mamo (AI)
-> **Amaç:** Rakipleri, yasal düzenlemeleri ve eksiklerimizi tespit etmek
+> Last updated: 2026-06-03
+
+This document compares HookSniff with other webhook delivery platforms and identifies areas for improvement.
 
 ---
 
-## 📊 Pazar Durumu
+## Market Overview
 
-Webhook delivery pazarı 2026'da olgunlaşıyor. Büyük oyuncular var ama hala boşluklar mevcut.
+The webhook delivery market is maturing in 2026. Major players exist, but gaps remain — especially in pricing, self-hosting flexibility, and developer experience.
 
-### Rakip Karşılaştırma Tablosu
+## Competitor Comparison
 
-| Özellik | **Svix** | **Hookdeck** | **Hook0** | **Convoy** | **HookSniff (Biz)** |
-|---------|----------|-------------|-----------|------------|-------------------|
-| **Fiyat** | $490/ay | $39/ay | €59/ay | Ücretsiz (açık kaynak) | $49/ay |
-| **Lisans** | MIT (açık kaynak) | Apache 2.0 (Outpost) | SSPL v1 | Elastic License v2.0 | MIT |
-| **Dil** | Rust | Go (Outpost) | Rust | Go | Rust |
+| Feature | **Svix** | **Hookdeck** | **Hook0** | **Convoy** | **HookSniff** |
+|---------|----------|-------------|-----------|------------|---------------|
+| **Price** | $490/mo | $39/mo | €59/mo | Free (OSS) | $49/mo |
+| **License** | MIT | Apache 2.0 (Outpost) | SSPL v1 | Elastic License v2.0 | MIT |
+| **Language** | Rust | Go (Outpost) | Rust | Go | Rust |
 | **Self-hosted** | ✅ | ✅ (Outpost) | ✅ | ✅ | ✅ |
-| **FIFO Sıralama** | ✅ | ❌ | ❌ | ❌ | ✅ |
-| **Endpoint Throttling** | ✅ | ❌ | ❌ | ❌ | ✅ |
-| **Multi-destination** | HTTP + Bridge | 8 tür | HTTPS only | HTTP only | HTTP + WS + Email |
-| **SOC 2 Type II** | ✅ | ✅ | ❌ | ❌ | ❌ |
-| **HIPAA** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **PCI-DSS** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **FIFO ordering** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Endpoint throttling** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Multi-destination** | HTTP + Bridge | 8 types | HTTPS only | HTTP only | HTTP + WS + Email |
+| **SOC 2 Type II** | ✅ | ✅ | ❌ | ❌ | ⏳ Planned |
+| **HIPAA** | ✅ | ❌ | ❌ | ❌ | ⏳ Planned |
+| **PCI-DSS** | ✅ | ❌ | ❌ | ❌ | ⏳ Planned |
 | **GDPR** | ✅ | ✅ | ✅ (EU) | ❌ | ✅ |
-| **Uptime** | 99.99999% | Yüksek | Düşük | <99% | Ölçülmemiş |
-| **SDK Sayısı** | 10+ | 3 | 2 | 3 | 11 (Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift) |
-| **Customer Portal** | ✅ | ✅ | ✅ | ❌ | ✅ |
-| **OTel Desteği** | ✅ | ✅ | ❌ | ✅ | ✅ |
-| **Schema Registry** | ✅ | ❌ | ❌ | ❌ | ✅ |
-| **Inbound Proxy** | ❌ | ❌ | ❌ | ❌ | ✅ (Stripe, GitHub, Shopify) |
-| **Embeddable Widget** | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **SDK count** | 10+ | 3 | 2 | 3 | **11 (in development)** |
+| **Customer portal** | ✅ | ✅ | ✅ | ❌ | ✅ |
+| **OpenTelemetry** | ✅ | ✅ | ❌ | ✅ | ✅ |
+| **Schema registry** | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Inbound proxy** | ❌ | ❌ | ❌ | ❌ | ✅ (Stripe, GitHub, Shopify) |
+| **Embeddable widget** | ❌ | ❌ | ❌ | ❌ | ✅ |
 | **Standard Webhooks** | ✅ | ❌ | ❌ | ❌ | ✅ |
-| **Smart Routing** | ❌ | ✅ | ❌ | ❌ | ✅ (round-robin, failover) |
-| **Firma Durumu** | a16z backed, aktif | Aktif | Bootstrapped, EU | ⚠️ Kapandı | Bireysel |
+| **Smart routing** | ❌ | ✅ | ❌ | ❌ | ✅ (round-robin, failover) |
+| **Cortex AI** | ❌ | ❌ | ❌ | ❌ | ✅ (ML anomaly detection) |
 
 ---
 
-## 🔴 Kritik Eksiklikler
+## HookSniff Advantages
 
-### 1. Domain ve Marka
-- **hooksniff.vercel.app zaten var!** — İsim çakışması
-- Henüz domain alınmamış
-- **Yapılacak:** Alternatif isim düşün (bkz. isim önerileri aşağıda)
+1. **Most SDKs planned (11)** — More language coverage than any competitor (in development)
+2. **Lowest price ($49/mo)** — 10x cheaper than Svix for comparable features
+3. **FIFO ordering** — Only Svix also offers this; critical for event-sourced systems
+4. **Endpoint throttling** — Protects customer servers; no competitor offers this
+5. **Inbound webhook proxy** — Unique feature for receiving webhooks from Stripe, GitHub, Shopify
+6. **Embeddable portal widget** — Unique customer-facing portal for dashboard embedding
+7. **Cortex AI** — ML-powered anomaly detection and auto-healing; no competitor has this
+8. **Smart routing** — Round-robin, failover, weighted strategies with fallback URLs
+9. **Standard Webhooks compliant** — Industry-standard HMAC-SHA256 signing
 
-### 2. Yasal Uyumluluk — Hiçbiri Yok!
-Rakiplerin hepsinin en az bir sertifikası var, bizim hiç yok:
+## Areas for Improvement
 
-| Sertifika | Ne Demek | Maliyet | Öncelik |
-|-----------|----------|---------|---------|
-| **SOC 2 Type II** | Güvenlik denetim raporu | $5K-20K | 🔴 Yüksek |
-| **GDPR** | Avrupa veri koruma | Ücretsiz (uygulama) | 🔴 Yüksek |
-| **CCPA** | California veri koruma | Ücretsiz (uygulama) | 🟡 Orta |
-| **HIPAA** | Sağlık verisi | $10K+ | 🟢 Düşük |
-| **PCI-DSS** | Ödeme verisi | $5K-15K | 🟢 Düşük |
+### High Priority
 
-**Başlangıç için minimum:** GDPR uyumlu gizlilik politikası + ToS + veri işleme anlaşması
+| Area | Current State | Action Required |
+|------|--------------|-----------------|
+| SOC 2 Type II | Not started | Engage auditor, prepare evidence collection |
+| GDPR compliance | ✅ Data export + deletion | Add DPA template, cookie consent |
+| Uptime SLA | Not measured | Set up status page, define SLA targets |
 
-### 3. Customer Portal (Müşteri Paneli)
-- Svix, Hookdeck ve Hook0'un hepsinde var
-- Müşteriler kendi webhook'larını yönetebilmeli
-- **Bizde:** Dashboard var ama multi-tenant müşteri portalı yok
+### Medium Priority
 
-### 4. Production Deploy Yok
-- Henüz canlıda değil
-- Rakipler zaten milyarlarca webhook teslim ediyor
+| Area | Current State | Action Required |
+|------|--------------|-----------------|
+| Integration tests | Partial | Expand test coverage for all API routes |
+| Documentation | Good | Add more SDK examples, migration guides |
+| Performance benchmarks | k6 tests exist | Publish benchmark results |
 
----
+### Low Priority
 
-## 🟡 Orta Seviye Eksiklikler
-
-### 5. Standard Webhooks Uyumluluğu
-- https://github.com/standard-webhooks/standard-webhooks
-- Endüstri standardı imzalama protokolü
-- Svix tarafından başlatılmış, Zapier, Twilio, Mux gibi şirketler destekliyor
-- **Bizde:** HMAC-SHA256 var ama standard-webhooks spec'e tam uyumlu mu kontrol edilmeli
-- **Yapılacak:** Standard Webhooks spec'ini implemente et
-
-### 6. Embeddable Portal
-- Rakiplerde müşteriler kendi dashboard'larına portal ekleyebiliyor
-- **Bizde:** Yok — FEATURES.md'de "başlanmadı" olarak işaretli
-
-### 7. FIFO Sıralama
-- Svix'in en büyük rekabet avantajı
-- Webhook'ların sırasıyla teslim edilmesi (örn: order.created → order.paid → order.shipped)
-- **Bizde:** Yok
-
-### 8. Endpoint Throttling
-- Belirli endpoint'lere istek hızı sınırı
-- Müşterilerin sunucularını korumak için kritik
-- **Bizde:** Rate limiting var ama per-endpoint throttling yok
-
-### 9. Payload Transformations
-- Webhook verisini filtreleme, dönüştürme, zenginleştirme
-- **Bizde:** FEATURES.md'de "başlanmadı"
-
-### 10. SDK'lar — 11 Dil Destekleniyor
-HookSniff 11 dilde SDK sunuyor (rakiplerin çoğundan fazla):
-- ✅ Node.js
-- ✅ Python
-- ✅ Go
-- ✅ Rust
-- ✅ Ruby
-- ✅ Java
-- ✅ Kotlin
-- ✅ PHP
-- ✅ C#
-- ✅ Elixir
-- ✅ Swift
+| Area | Current State | Action Required |
+|------|--------------|-----------------|
+| HIPAA compliance | Not started | Future for healthcare customers |
+| PCI-DSS compliance | Not started | Future for payment processors |
+| Terraform provider | Skeleton exists | Complete implementation |
 
 ---
 
-## 🟢 Düşük Seviye Eksiklikler
+## Reference Repositories
 
-### 11. Webhook Replay UI
-- Backend'de replay endpoint'i var ama UI'da eksik
-
-### 12. Bulk Operations
-- Toplu webhook gönderme, toplu replay
-
-### 13. Event Schema Validation
-- JSON Schema ile event doğrulama
-
-### 14. Rate Limit Dashboard
-- Backend'de rate limiting var ama UI'da gösterilmiyor
-
-### 15. WebSocket Real-time Updates
-- Dashboard'da canlı güncelleme yok
-
-### 16. Self-Hosted Docker Image
-- Tek komutla kurulabilir Docker image'ı yok
-
----
-
-## 🔗 Faydalı GitHub Repoları
-
-### Referans Olarak Kullanılacaklar
-
-| Repo | Neden Faydalı | Lisans |
-|------|---------------|--------|
-| [svix/svix-webhooks](https://github.com/svix/svix-webhooks) | En olgun webhook platformu, Rust, MIT. Kod yapısı, retry logic, SDK tasarımı için referans | MIT |
-| [hookdeck/outpost](https://github.com/hookdeck/outpost) | Go ile yazılmış, multi-tenant, Apache 2.0. Event destination mimarisi için referans | Apache 2.0 |
-| [hook0/hook0](https://github.com/hook0/hook0) | Rust, self-hosted, müşteri portalı tasarımı için referans | SSPL v1 |
-| [standard-webhooks/standard-webhooks](https://github.com/standard-webhooks/standard-webhooks) | Endüstri standardı, implementasyon gerekli. 10+ dilde referans kod | MIT |
-
-### Direkt Kullanılabilecekler
-
-| Repo | Ne İşe Yarar | Lisans |
-|------|-------------|--------|
-| [standard-webhooks/standard-webhooks/libraries/rust](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries/rust) | Rust webhook imza doğrulama kütüphanesi | MIT |
-| [standard-webhooks/standard-webhooks/libraries/python](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries/python) | Python SDK için imza doğrulama | MIT |
-| [standard-webhooks/standard-webhooks/libraries/go](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries/go) | Go SDK için imza doğrulama | MIT |
-| [svix/svix-webhooks/go](https://github.com/svix/svix-webhooks/tree/main/go) | Go SDK referans implementasyonu | MIT |
-| [svix/svix-webhooks/python](https://github.com/svix/svix-webhooks/tree/main/python) | Python SDK referans implementasyonu | MIT |
-
-### İlham Alınacaklar
-
-| Repo | Ne Öğrenebiliriz |
-|------|-----------------|
-| [temporalio/sdk-rust](https://github.com/temporalio/sdk-rust) | Temporal Rust SDK kullanımı |
-| [Quickwit-oss/tantivy](https://github.com/Quickwit-oss/tantivy) | Rust full-text search (webhook log arama için) |
-| [tokio-rs/axum](https://github.com/tokio-rs/axum) | Axum best practices |
-
----
-
-## 🎯 Önerilen İsim Alternatifleri
-
-hooksniff.vercel.app zaten var. Alternatifler:
-
-| İsim | Domain Uygunluğu | Not |
-|------|------------------|-----|
-| **HookFire** | hookfire.dev/com | Kısa, akılda kalıcı |
-| **WebhookHQ** | webhookhq.com | Profesyonel |
-| **HookStream** | hookstream.dev | Modern |
-| **EventPilot** | eventpilot.dev | Geniş kapsamlı |
-| **HookDrop** | hookdrop.com | Basit, akılda kalıcı |
-| **Pulsehook** | pulsehook.com | Enerjik |
-
----
-
-## 📋 Öncelik Sıralaması (Yapılacaklar)
-
-### Hafta 1: Temel
-1. ✅ Domain al (alternatif isim seç)
-2. ✅ ToS + Privacy Policy (GDPR uyumlu)
-3. ✅ Local test, hataları düzelt
-4. ✅ Standard Webhooks uyumluluğunu kontrol et
-
-### Hafta 2-3: Ürün
-5. Customer portal (multi-tenant)
-6. Embeddable portal
-7. Endpoint throttling
-8. Payload transformations
-
-### Hafta 4+: Büyüme
-9. Production deploy (Oracle Cloud Free Tier / Railway)
-10. Beta kullanıcı bul (Reddit, HN, ProductHunt)
-11. SOC 2 sertifikası araştırması
-12. Ek SDK'lar (Ruby, Java, PHP)
-
----
-
-## 🏢 Rakip Şirketlerin İş Modelleri
-
-### Svix — Kurumsal Dev
-| Metrik | Değer |
-|--------|-------|
-| **Funding** | ~$17M (a16z, YC Continuity, Aleph) |
-| **Müşteri segmenti** | Enterprise (Fortune 500) + Startup |
-| **Ekip** | 15-25 kişi (Rust engineers, DevRel, Sales) |
-| **Fiyat** | $490/ay başlangıç, enterprise custom |
+| Repository | Why It's Useful | License |
+|-----------|-----------------|---------|
+| [svix/svix-webhooks](https://github.com/svix/svix-webhooks) | Most mature webhook platform; Rust; code structure, retry logic, SDK design reference | MIT |
+| [hookdeck/outpost](https://github.com/hookdeck/outpost) | Go, multi-tenant, Apache 2.0; event destination architecture reference | Apache 2.0 |
+| [hook0/hook0](https://github.com/hook0/hook0) | Rust, self-hosted; customer portal design reference | SSPL v1 |
+| [standard-webhooks/standard-webhooks](https://github.com/standard-webhooks/standard-webhooks) | Industry standard; implementation reference in 10+ languages | MIT |
 | **Avantaj** | Brand recognition, Standard Webhooks standardı, SOC 2 + HIPAA + PCI-DSS |
 
 ### Hookdeck — Niş Oyuncu

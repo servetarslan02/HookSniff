@@ -1,26 +1,30 @@
-# ☁️ Google Cloud Setup Guide for HookSniff
+# Google Cloud Setup Guide for HookSniff
 
-Bu rehber, HookSniff'in Google Cloud Build ve Cloud Run üzerinde sorunsuz çalışması için gerekli adımları içerir.
+This guide covers the required setup steps for running HookSniff on Google Cloud Build and Cloud Run.
 
-## 1. Gerekli IAM Rolleri
+---
 
-Cloud Build servis hesabının (`{PROJECT_NUMBER}@cloudbuild.gserviceaccount.com`) aşağıdaki rollere sahip olduğundan emin olun:
+## 1. Required IAM Roles
 
-- **Cloud Build Service Agent** (Varsayılan)
-- **Cloud Run Admin** (Deploy yapabilmek için)
-- **Service Account User** (Cloud Run servisini başlatabilmek için)
-- **Artifact Registry Writer** (Docker image'larını push edebilmek için)
-- **Secret Manager Secret Accessor** (Secret'lara erişebilmek için)
+Ensure the Cloud Build service account (`{PROJECT_NUMBER}@cloudbuild.gserviceaccount.com`) has the following roles:
 
-## 2. Artifact Registry Kurulumu
+| Role | Purpose |
+|------|---------|
+| **Cloud Build Service Agent** | Default role for Cloud Build |
+| **Cloud Run Admin** | Deploy services to Cloud Run |
+| **Service Account User** | Start Cloud Run services |
+| **Artifact Registry Writer** | Push Docker images |
+| **Secret Manager Secret Accessor** | Access secrets during deployment |
 
-Görüntülerin yükleneceği repository'nin mevcut olduğundan emin olun:
+## 2. Artifact Registry Setup
+
+Ensure the Docker image repository exists:
 
 - **Location:** `europe-west1`
 - **Format:** `Docker`
 - **Repository ID:** `hooksniff`
 
-Eğer yoksa oluşturmak için:
+Create if it doesn't exist:
 ```bash
 gcloud artifacts repositories create hooksniff \
     --repository-format=docker \
@@ -28,9 +32,9 @@ gcloud artifacts repositories create hooksniff \
     --description="HookSniff Docker images"
 ```
 
-## 3. Secret Manager Secret'ları
+## 3. Secret Manager Secrets
 
-`cloudbuild.yaml` içinde tanımlı olan tüm secret'ların Secret Manager'da mevcut olduğundan emin olun:
+Ensure all secrets referenced in `cloudbuild.yaml` exist in Secret Manager:
 
 | Secret Name | Description |
 |-------------|-------------|
@@ -39,14 +43,14 @@ gcloud artifacts repositories create hooksniff \
 | `jwt-secret` | JWT signing secret |
 | `hmac-secret` | Webhook signing secret |
 | `gcp-sa-json` | Google Cloud Service Account JSON |
-| ... ve diğerleri ... | (cloudbuild.yaml içindeki tam listeyi kontrol edin) |
 
-## 4. Troubleshooting (Sık Karşılaşılan Hatalar)
+Check `cloudbuild.yaml` for the full list of required secrets.
 
-- **Timeout:** Rust build'leri uzun sürer. `cloudbuild.yaml`'a `timeout: 3600s` ekledik.
-- **Permission Denied:** Genelde Secret Manager veya Cloud Run yetkisi eksikliğinden kaynaklanır. 1. adımı kontrol edin.
-- **Image Not Found:** Artifact Registry repository isminin `hooksniff` olduğundan emin olun.
-- **OAUTH_REDIRECT_BASE:** Cloud Run deploy edildikten sonra URL değişmiş olabilir. `cloudbuild.yaml` içindeki project number'ı kontrol edin.
+## 4. Troubleshooting
 
----
-*Hazırlayan: Gemini CLI*
+| Issue | Solution |
+|-------|----------|
+| **Timeout** | Rust builds are slow. `cloudbuild.yaml` has `timeout: 3600s` configured. |
+| **Permission Denied** | Usually missing Secret Manager or Cloud Run roles. Check step 1. |
+| **Image Not Found** | Verify Artifact Registry repository name is `hooksniff`. |
+| **OAUTH_REDIRECT_BASE** | Cloud Run URL may have changed after redeploy. Check project number in `cloudbuild.yaml`. |
