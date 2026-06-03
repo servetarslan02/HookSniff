@@ -1,6 +1,6 @@
 // HookSniff Edge Worker — Cloudflare Workers
 // Handles: caching, rate limiting, security headers, custom domain routing
-const ORIGIN = 'https://hooksniff-api-1046140057667.europe-west1.run.app';
+const ORIGIN = 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app';
 const KNOWN_HOSTS = ['hooksniff.vercel.app', 'hookrelay.com', 'hooksniff.com', 'localhost'];
 const CACHE_TTL = { '/health': 30, '/v1/status': 30, '/v1/outbound-ips': 3600, '/v1/stats': 120, '/v1/analytics/': 30 };
 const NEVER_CACHE = ['/v1/auth/','/v1/webhooks/','/v1/deliveries/','/v1/billing/','/v1/endpoints/','/v1/teams/','/v1/api-keys/','/v1/notifications/','/v1/settings/','/v1/portal/'];
