@@ -1,0 +1,23 @@
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env.local
+- Cache Components enabled
+- Experiments (use with caution):
+  · optimizePackageImports
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 18.7s
+  Running TypeScript ...
+Failed to type check.
+
+./src/app/[locale]/admin/users/components/UserTable.tsx:48:3
+Type error: 'handleImpersonate' is declared but its value is never read.
+
+  [90m46 |[0m   locale,
+  [90m47 |[0m   handleToggleStatus: _handleToggleStatus,
+[31m[1m>[0m [90m48 |[0m   handleImpersonate,
+  [90m   |[0m   [31m[1m^[0m
+  [90m49 |[0m   setPlanChangeTarget,
+  [90m50 |[0m   setNewPlan,
+  [90m51 |[0m   planBadgeColors,
+Next.js build worker exited with code: 1 and signal: null
