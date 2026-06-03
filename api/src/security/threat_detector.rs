@@ -124,10 +124,10 @@ pub async fn analyze_request(
         entry.len() as i64
     };
 
-    if event_count > 50 {
+    if event_count > 200 {
         score += 0.5;
         reasons.push(format!("High request rate: {} in 5min", event_count));
-    } else if event_count > 20 {
+    } else if event_count > 100 {
         score += 0.3;
         reasons.push(format!("Elevated requests: {} in 5min", event_count));
     }
@@ -161,7 +161,7 @@ pub async fn analyze_request(
         entry.len() as i64
     };
 
-    if unique_paths > 20 {
+    if unique_paths > 50 {
         score += 0.4;
         reasons.push(format!("Scanning: {} unique endpoints", unique_paths));
     }
@@ -178,10 +178,10 @@ pub async fn analyze_request(
         entry.len() as i64
     };
 
-    if failures > 10 {
+    if failures > 30 {
         score += 0.5;
         reasons.push(format!("Brute force: {} failed logins in 15min", failures));
-    } else if failures > 5 {
+    } else if failures > 15 {
         score += 0.3;
         reasons.push(format!("Multiple failed logins: {} in 15min", failures));
     }
@@ -193,7 +193,7 @@ pub async fn analyze_request(
         "/wp-login", "/xmlrpc.php", "/cgi-bin", "/setup",
     ];
     if suspicious_paths.iter().any(|p| path.contains(p)) {
-        score += 0.6;
+        score += 0.2;
         reasons.push(format!("Suspicious path: {}", path));
     }
 
@@ -204,11 +204,11 @@ pub async fn analyze_request(
     }
 
     // Determine action (rapor: Block veya Warn based on severity)
-    let (is_threat, action, threat_type) = if score > 0.8 {
+    let (is_threat, action, threat_type) = if score > 0.95 {
         (true, ThreatAction::Block, ThreatType::SuspiciousPattern)
-    } else if score > 0.5 {
+    } else if score > 0.7 {
         (true, ThreatAction::RateLimit, ThreatType::ApiAbuse)
-    } else if score > 0.3 {
+    } else if score > 0.5 {
         (true, ThreatAction::Warn, ThreatType::SuspiciousPattern)
     } else {
         (false, ThreatAction::Allow, ThreatType::SuspiciousPattern)
