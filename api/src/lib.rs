@@ -31,6 +31,7 @@ pub mod middleware_tests;
 pub mod models;
 pub mod notifications;
 pub mod qstash;
+pub mod queue;
 pub mod r2;
 pub mod rate_limit;
 pub mod resend_email;

@@ -1,0 +1,230 @@
+//! Redis Streams-based webhook queue for sub-millisecond delivery.
+//!
+//! Architecture: Redis-first with PostgreSQL fallback.
+//! - Write: Try Redis XADD first, fall back to PostgreSQL INSERT on failure
+//! - Read: Worker uses XREADGROUP with blocking reads
+//! - Ack: XACK after successful delivery
+//! - Recovery: XAUTOCLAIM for crash recovery (5 min timeout)
+
+use anyhow::Result;
+use redis::aio::ConnectionManager;
+use redis::streams::{StreamReadOptions, StreamReadReply};
+use serde::{Deserialize, Serialize};
+
+const STREAM_KEY: &str = "hooksniff:webhooks";
+const CONSUMER_GROUP: &str = "hooksniff-workers";
+const MAX_STREAM_LEN: usize = 100_000;
+
+/// Redis Streams queue client.
+#[derive(Debug, Clone)]
+pub struct RedisQueue {
+    conn: ConnectionManager,
+}
+
+/// Message pushed to Redis Streams.
+/// Fields are String (not Uuid) for compatibility with WebhookMessage.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QueueMessage {
+    pub delivery_id: String,
+    pub endpoint_id: String,
+    pub endpoint_url: String,
+    pub payload: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_headers: Option<serde_json::Value>,
+    pub signing_secret: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trace_id: Option<String>,
+    pub attempt_count: i32,
+    pub max_attempts: i32,
+    pub queue_item_id: String,
+}
+
+impl RedisQueue {
+    /// Create a new Redis queue connection and ensure consumer group exists.
+    pub async fn new(redis_url: &str) -> Result<Self> {
+        let client = redis::Client::open(redis_url)?;
+        let mut conn = ConnectionManager::new(client).await?;
+
+        // Create consumer group (idempotent — BUSYGROUP error is swallowed)
+        let _: Result<(), _> = redis::cmd("XGROUP")
+            .arg("CREATE")
+            .arg(STREAM_KEY)
+            .arg(CONSUMER_GROUP)
+            .arg("0")
+            .arg("MKSTREAM")
+            .query_async(&mut conn)
+            .await;
+
+        tracing::info!(
+            "✅ Redis Streams queue active — stream={}, group={}",
+            STREAM_KEY,
+            CONSUMER_GROUP
+        );
+        Ok(Self { conn })
+    }
+
+    /// Push a message to the stream (sub-millisecond).
+    pub async fn enqueue(&mut self, msg: &QueueMessage) -> Result<String> {
+        let headers_str = msg
+            .custom_headers
+            .as_ref()
+            .map(|h| serde_json::to_string(h).unwrap_or_default())
+            .unwrap_or_default();
+
+        let id: String = redis::cmd("XADD")
+            .arg(STREAM_KEY)
+            .arg("MAXLEN")
+            .arg("~")
+            .arg(MAX_STREAM_LEN)
+            .arg("*")
+            .arg("delivery_id")
+            .arg(&msg.delivery_id)
+            .arg("endpoint_id")
+            .arg(&msg.endpoint_id)
+            .arg("url")
+            .arg(&msg.endpoint_url)
+            .arg("payload")
+            .arg(&msg.payload)
+            .arg("headers")
+            .arg(&headers_str)
+            .arg("signing_secret")
+            .arg(&msg.signing_secret)
+            .arg("trace_id")
+            .arg(msg.trace_id.as_deref().unwrap_or(""))
+            .arg("attempt")
+            .arg(msg.attempt_count.to_string())
+            .arg("max_attempts")
+            .arg(msg.max_attempts.to_string())
+            .arg("queue_item_id")
+            .arg(&msg.queue_item_id)
+            .query_async(&mut self.conn)
+            .await?;
+
+        Ok(id)
+    }
+
+    /// Read a batch of messages using consumer group (blocking).
+    pub async fn read_batch(
+        &mut self,
+        consumer_name: &str,
+        count: usize,
+        block_ms: usize,
+    ) -> Result<Vec<(String, QueueMessage)>> {
+        let opts = StreamReadOptions::default()
+            .count(count)
+            .block(block_ms)
+            .group(CONSUMER_GROUP, consumer_name);
+
+        let result: StreamReadReply = self
+            .conn
+            .xread_options(&[STREAM_KEY], &[">"], &opts)
+            .await?;
+
+        let mut messages = Vec::new();
+        for stream in result.keys {
+            for entry in stream.ids {
+                match parse_entry(&entry) {
+                    Ok(msg) => messages.push((entry.id.clone(), msg)),
+                    Err(e) => {
+                        tracing::warn!("Failed to parse stream entry {}: {}", entry.id, e);
+                    }
+                }
+            }
+        }
+        Ok(messages)
+    }
+
+    /// Acknowledge a message (delivery complete).
+    pub async fn ack(&mut self, stream_id: &str) -> Result<()> {
+        redis::cmd("XACK")
+            .arg(STREAM_KEY)
+            .arg(CONSUMER_GROUP)
+            .arg(stream_id)
+            .query_async(&mut self.conn)
+            .await?;
+        Ok(())
+    }
+
+    /// Crash recovery — claim pending messages older than 5 minutes.
+    pub async fn claim_pending(
+        &mut self,
+        consumer_name: &str,
+    ) -> Result<Vec<(String, QueueMessage)>> {
+        let result: (String, Vec<String>, Vec<redis::streams::StreamId>) =
+            redis::cmd("XAUTOCLAIM")
+                .arg(STREAM_KEY)
+                .arg(CONSUMER_GROUP)
+                .arg(consumer_name)
+                .arg(300_000) // 5 min timeout
+                .arg("0-0")
+                .query_async(&mut self.conn)
+                .await?;
+
+        let (_, _, entries) = result;
+        entries
+            .into_iter()
+            .filter_map(|e| match parse_entry(&e) {
+                Ok(msg) => Some(Ok((e.id.clone(), msg))),
+                Err(err) => {
+                    tracing::warn!("Failed to parse claimed entry {}: {}", e.id, err);
+                    None
+                }
+            })
+            .collect()
+    }
+
+    /// Get stream info for monitoring.
+    pub async fn info(&mut self) -> Result<StreamInfo> {
+        let info: redis::streams::StreamInfoReply =
+            redis::cmd("XINFO")
+                .arg("STREAM")
+                .arg(STREAM_KEY)
+                .query_async(&mut self.conn)
+                .await?;
+
+        Ok(StreamInfo {
+            length: info.length,
+            first_entry: info.first_entry.id,
+            last_entry: info.last_entry.id,
+        })
+    }
+}
+
+/// Stream metadata for monitoring.
+#[derive(Debug)]
+pub struct StreamInfo {
+    pub length: usize,
+    pub first_entry: String,
+    pub last_entry: String,
+}
+
+fn get_field(entry: &redis::streams::StreamId, field: &str) -> Result<String> {
+    entry
+        .get(field)
+        .ok_or_else(|| anyhow::anyhow!("Missing field: {}", field))
+}
+
+fn parse_entry(entry: &redis::streams::StreamId) -> Result<QueueMessage> {
+    Ok(QueueMessage {
+        delivery_id: get_field(entry, "delivery_id")?,
+        endpoint_id: get_field(entry, "endpoint_id")?,
+        endpoint_url: get_field(entry, "url").unwrap_or_default(),
+        payload: get_field(entry, "payload").unwrap_or_default(),
+        custom_headers: get_field(entry, "headers")
+            .ok()
+            .and_then(|s| serde_json::from_str(&s).ok()),
+        signing_secret: get_field(entry, "signing_secret").unwrap_or_default(),
+        trace_id: get_field(entry, "trace_id")
+            .ok()
+            .filter(|s| !s.is_empty()),
+        attempt_count: get_field(entry, "attempt")
+            .unwrap_or("0".into())
+            .parse()
+            .unwrap_or(0),
+        max_attempts: get_field(entry, "max_attempts")
+            .unwrap_or("5".into())
+            .parse()
+            .unwrap_or(5),
+        queue_item_id: get_field(entry, "queue_item_id").unwrap_or_default(),
+    })
+}

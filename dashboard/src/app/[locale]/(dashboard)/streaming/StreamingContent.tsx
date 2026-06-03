@@ -178,7 +178,7 @@ export function StreamingContent() {
     setIsLive(true);
     setLiveEvents([]);
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://your-api.trycloudflare.com';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
     const url = `${baseUrl}/v1/stream/channels/${channelId}/subscribe`;
     const es = new EventSource(url, { withCredentials: true });
     esRef.current = es;
@@ -232,7 +232,7 @@ export function StreamingContent() {
           <ReadOnlyBadge />
         </div>
         <RoleGuard require="canManageWebhooks">
-          <button onClick={() => { resetForm(); setShowCreate(true); }}
+          <button type="button" onClick={() => { resetForm(); setShowCreate(true); }}
             className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
             + {t('newChannel')}
           </button>
@@ -258,7 +258,7 @@ export function StreamingContent() {
                   <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('type')}</label>
                   <select value={formType} onChange={e => setFormType(e.target.value)} disabled={!!editTarget}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm disabled:opacity-50">
-                    {CHANNEL_TYPES.map(ct => <option key={ct.value} value={ct.value}>{ct.icon} {ct.label}</option>)}
+                    {CHANNEL_TYPES.map(ct => <option key={ct.value} value={ct.value}>{ct.label}</option>)}
                   </select>
                 </div>
               </div>
@@ -276,8 +276,8 @@ export function StreamingContent() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button onClick={resetForm} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
-              <button onClick={handleCreateOrUpdate} disabled={createMutation.isPending || updateMutation.isPending}
+              <button type="button" onClick={resetForm} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
+              <button type="button" onClick={handleCreateOrUpdate} disabled={createMutation.isPending || updateMutation.isPending}
                 className="px-5 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60">
                 {(createMutation.isPending || updateMutation.isPending) ? tc('creating') : editTarget ? t('saveChanges') : t('createChannelBtn')}
               </button>
@@ -306,8 +306,8 @@ export function StreamingContent() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button onClick={() => setShowPublish(false)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
-              <button onClick={handlePublish} disabled={publishMutation.isPending}
+              <button type="button" onClick={() => setShowPublish(false)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
+              <button type="button" onClick={handlePublish} disabled={publishMutation.isPending}
                 className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition disabled:opacity-60">
                 {publishMutation.isPending ? t('publishing') : t('publishBtn')}
               </button>
@@ -327,7 +327,7 @@ export function StreamingContent() {
           <div className="text-5xl mb-4"><Radio size={18} strokeWidth={1.75} /></div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noChannels')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noChannelsDesc')}</p>
-          <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+          <button type="button" onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
             + {t('newChannel')}
           </button>
         </div>
@@ -348,7 +348,7 @@ export function StreamingContent() {
                     {CHANNEL_TYPES.find(ct => ct.value === ch.channel_type)?.icon} {ch.channel_type.toUpperCase()}
                   </span>
                 </div>
-                <button onClick={e => { e.stopPropagation(); toggleMutation.mutate({ id: ch.id, enabled: !ch.enabled }); }}
+                <button type="button" onClick={e => { e.stopPropagation(); toggleMutation.mutate({ id: ch.id, enabled: !ch.enabled }); }}
                   className={`px-2 py-0.5 rounded-full text-xs font-medium ${ch.enabled ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-400'}`}>
                   {ch.enabled ? t('live') : t('off')}
                 </button>
