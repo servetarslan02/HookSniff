@@ -68,35 +68,52 @@ pub async fn zero_trust_middleware(
         );
     }
 
-    // Also run threat detection (now with customer_id available)
-    let threat = crate::security::threat_detector::analyze_request(
-        &pool,
-        &ip,
-        Some(customer.id),
-        path,
-        method,
-    )
-    .await;
+    // Skip threat detection for admin users — they already passed auth.
+    // Only run threat detection for non-admin or when risk is already elevated.
+    let is_admin_path = path.starts_with("/admin") || path.contains("/admin/");
+    
+    if !is_admin_path || result.risk_score < 0.3 {
+        // Run threat detection only for non-admin paths or low-risk admin requests
+        let threat = crate::security::threat_detector::analyze_request(
+            &pool,
+            &ip,
+            Some(customer.id),
+            path,
+            method,
+        )
+        .await;
 
-    if threat.is_threat {
-        // Block if action is Block OR confidence is very high (rapor: "Görüyor ve vuruyor")
-        if matches!(threat.action, crate::security::threat_detector::ThreatAction::Block) || threat.confidence > 0.8 {
+        if threat.is_threat {
+            // Block if action is Block AND confidence is very high
+            // But NEVER block admin users who passed Zero Trust verification
+            let should_block = matches!(threat.action, crate::security::threat_detector::ThreatAction::Block)
+                && threat.confidence > 0.8
+                && result.risk_score < 0.5; // Don't block if Zero Trust already verified
+
+            if should_block {
+                tracing::warn!(
+                    customer_id = %customer.id,
+                    threat_type = ?threat.threat_type,
+                    confidence = threat.confidence,
+                    details = %threat.details,
+                    "🔒 Threat detected — blocking request"
+                );
+                return Err(AppError::Forbidden);
+            }
+            // Lower severity or admin: warn + continue
             tracing::warn!(
                 customer_id = %customer.id,
                 threat_type = ?threat.threat_type,
                 confidence = threat.confidence,
                 details = %threat.details,
-                "🔒 Threat detected — blocking request"
+                "⚠️ Threat detected — logged, request allowed"
             );
-            return Err(AppError::Forbidden);
         }
-        // Lower severity: warn + continue (rate limit layer handles throttling)
-        tracing::warn!(
+    } else {
+        tracing::debug!(
             customer_id = %customer.id,
-            threat_type = ?threat.threat_type,
-            confidence = threat.confidence,
-            details = %threat.details,
-            "⚠️ Threat detected — logged, request allowed"
+            path = %path,
+            "Admin path — skipping threat detection (Zero Trust already verified)"
         );
     }
 
