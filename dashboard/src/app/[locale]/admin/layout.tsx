@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { setRequestLocale } from 'next-intl/server';
 import { SkeletonAdmin } from '@/components/LoadingSkeletons';
-import { AdminShell } from '@/components/AdminShell';
+import { AdminShellClient } from '@/components/AdminShellClient';
 
 type Props = {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ export default async function AdminLayout({ children, params }: Props) {
 
   return (
     <Suspense fallback={<SkeletonAdmin />}>
-      <AdminShell>{children}</AdminShell>
+      <AdminShellClient>{children}</AdminShellClient>
     </Suspense>
   );
 }
