@@ -20,7 +20,7 @@
  * 14. HTTP Method Enforcement
  */
 
-const API = process.env.API_URL || 'https://hooksniff-api-499907444852.europe-west1.run.app';
+const API = process.env.API_URL || 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app';
 const EMAIL = process.env.TEST_EMAIL || 'servetarslan02@gmail.com';
 const PASSWORD = process.env.TEST_PASSWORD || 'Alayci_165';
 
