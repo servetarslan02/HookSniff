@@ -448,17 +448,30 @@ pub async fn batch_webhooks(
         .await
         {
             Ok(delivery) => {
-                // Publish to queue immediately — fail the delivery if publish fails
-                if let Err(e) = db::publish_to_queue(
-                    &pool,
-                    delivery.id,
-                    endpoint.id,
-                    &endpoint.url,
-                    &payload_str,
-                    endpoint.custom_headers.as_ref(),
-                )
-                .await
-                {
+                // ── Publish to queue: Redis-first, PG fallback ──
+                let redis_guard = redis_queue.lock().await;
+                let redis_available = redis_guard.as_ref().map(|r| r.is_available()).unwrap_or(false);
+                drop(redis_guard);
+
+                let queue_result = if cfg.use_redis_queue && redis_available {
+                    if let Some(ref mut rq) = *redis_queue.lock().await {
+                        let msg = crate::queue::WebhookMessage {
+                            delivery_id: delivery.id.to_string(),
+                            endpoint_id: endpoint.id.to_string(),
+                            url: endpoint.url.clone(),
+                            payload: payload_str.clone(),
+                            custom_headers: endpoint.custom_headers.clone(),
+                            attempt: 1,
+                        };
+                        rq.enqueue(&msg).await.map(|_| ())
+                    } else {
+                        db::publish_to_queue(&pool, delivery.id, endpoint.id, &endpoint.url, &payload_str, endpoint.custom_headers.as_ref()).await
+                    }
+                } else {
+                    db::publish_to_queue(&pool, delivery.id, endpoint.id, &endpoint.url, &payload_str, endpoint.custom_headers.as_ref()).await
+                };
+
+                if let Err(e) = queue_result {
                     tracing::error!(
                         "Failed to publish batch delivery {} to queue: {:?} — marking as failed",
                         delivery.id,

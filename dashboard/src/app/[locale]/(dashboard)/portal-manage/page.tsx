@@ -22,12 +22,12 @@ export default function PortalPage() {
   const t = useTranslations('portal');
   const tb = useTranslations('billing');
   const locale = useLocale();
-  const { data: profile, isLoading: profileLoading, error: profileError } = usePortalProfile();
-  const { data: billingUsage, isLoading: billingLoading } = useBillingUsage();
+  const { data: profile, isLoading: profileLoading } = usePortalProfile();
+  const { data: billingUsage, isLoading: billingLoading, error: billingError } = useBillingUsage();
   const { getPlanLimits } = usePlans();
 
   const loading = profileLoading || billingLoading;
-  const error = profileError;
+  const error = billingError;
   const currentPlan = profile?.plan || billingUsage?.plan || 'developer';
   const planLimits = getPlanLimits(currentPlan);
   // Prefer retention from billing usage API (authoritative, from DB plan),
