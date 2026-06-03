@@ -124,16 +124,22 @@ export default function OperationalWebhooksList() {
         </div>
         <RoleGuard require="canManageOperationalWebhooks">
           <button onClick={() => { setShowCreate(true); setEditTarget(null); }} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-            + {t('newEndpoint')}
+            {t('newEndpoint')}
           </button>
         </RoleGuard>
       </div>
 
 
-      {/* Create form */}
+      {/* Create Endpoint Modal */}
       {showCreate && (
-        <div className="glass-card p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('createEndpoint')}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowCreate(false)}>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 max-w-2xl w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('createEndpoint')}</h3>
+              <button onClick={() => setShowCreate(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">URL</label>
@@ -158,14 +164,15 @@ export default function OperationalWebhooksList() {
               ))}
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 justify-end mt-4">
+            <button onClick={() => setShowCreate(false)} className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
             <button onClick={() => { if (newUrl.trim()) createMutation.mutate({ url: newUrl, description: newDesc || undefined, event_types: newEvents.length > 0 ? newEvents : undefined }); }}
               disabled={createMutation.isPending} className="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50">
               {createMutation.isPending ? tc('creating') : t('create')}
             </button>
-            <button onClick={() => setShowCreate(false)} className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-700 transition">{tc('cancel')}</button>
           </div>
         </div>
+      </div>
       )}
 
       {/* Endpoints list */}
@@ -181,7 +188,7 @@ export default function OperationalWebhooksList() {
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noEndpointsDesc')}</p>
           <RoleGuard require="canManageOperationalWebhooks">
             <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-              + {t('newEndpoint')}
+              {t('newEndpoint')}
             </button>
           </RoleGuard>
         </div>
