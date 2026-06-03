@@ -83,7 +83,7 @@ export function AnomaliesTab({ token }: { token: string | null }) {
                       {ts && (
                         <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1">
                           <Clock size={12} />
-                          {new Date(ts).toLocaleString('tr-TR')}
+                          {new Date(ts).toLocaleString()}
                         </p>
                       )}
                       {factors?.method && (
