@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, Activity } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 import { AlertTriangle, BarChart3, Brain, Globe, RefreshCw, Shield, ShieldCheck, TrendingUp, Zap, Target } from '@/components/icons';
@@ -16,6 +17,7 @@ import { ABTestTab } from './ABTestTab';
 import { AutoMLTab } from './AutoMLTab';
 
 export default function CortexPage() {
+  const t = useTranslations('cortex');
   const { token } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [health, setHealth] = useState<CortexHealth | null>(null);
@@ -43,16 +45,16 @@ export default function CortexPage() {
   };
 
   const tabs = [
-    { id: 'overview' as Tab, label: 'Genel Bakış', icon: BarChart3 },
-    { id: 'anomalies' as Tab, label: 'Sorunlar', icon: AlertTriangle },
-    { id: 'healing' as Tab, label: 'Düzeltmeler', icon: ShieldCheck },
-    { id: 'predictions' as Tab, label: 'Tahminler', icon: Brain },
-    { id: 'ml_quality' as Tab, label: 'ML Kalite', icon: Target },
-    { id: 'proactive' as Tab, label: 'Proaktif', icon: Shield },
-    { id: 'drift' as Tab, label: 'Drift', icon: TrendingUp },
-    { id: 'monitor' as Tab, label: 'Model İzleme', icon: Zap },
-    { id: 'ab_tests' as Tab, label: 'A/B Tests', icon: Globe },
-    { id: 'automl' as Tab, label: 'AutoML', icon: Brain },
+    { id: 'overview' as Tab, label: t('tabs.overview'), icon: BarChart3 },
+    { id: 'anomalies' as Tab, label: t('tabs.anomalies'), icon: AlertTriangle },
+    { id: 'healing' as Tab, label: t('tabs.healing'), icon: ShieldCheck },
+    { id: 'predictions' as Tab, label: t('tabs.predictions'), icon: Brain },
+    { id: 'ml_quality' as Tab, label: t('tabs.mlQuality'), icon: Target },
+    { id: 'proactive' as Tab, label: t('tabs.proactive'), icon: Shield },
+    { id: 'drift' as Tab, label: t('tabs.drift'), icon: TrendingUp },
+    { id: 'monitor' as Tab, label: t('tabs.monitor'), icon: Zap },
+    { id: 'ab_tests' as Tab, label: t('tabs.abTests'), icon: Globe },
+    { id: 'automl' as Tab, label: t('tabs.automl'), icon: Brain },
   ];
 
   if (loading) {
@@ -69,14 +71,14 @@ export default function CortexPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
             <Brain className="text-brand-600" size={28} />
-            Cortex — Akıllı Koruma
+            {t('title')}
           </h1>
-          <p className="text-gray-500 dark:text-slate-400 mt-1">Webhook'larınızı izler, sorunları tespit eder ve otomatik düzeltir</p>
+          <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
         </div>
         <button onClick={handleRefresh} disabled={refreshing}
           className="px-4 py-2 bg-gray-100 dark:bg-slate-800 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition flex items-center gap-2">
           <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
-          Yenile
+          {t('refresh')}
         </button>
       </div>
 
@@ -85,8 +87,8 @@ export default function CortexPage() {
           <div className={`w-3 h-3 rounded-full ${health.status === 'healthy' ? 'bg-emerald-500' : 'bg-yellow-500'} animate-pulse`} />
           <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
             {health.status === 'healthy'
-              ? `Her şey yolunda — ${health.metrics?.active_insights ?? 0} aktif öneri mevcut`
-              : `Dikkat — ${health.metrics?.anomalies_24h ?? 0} sorun tespit edildi`}
+              ? `${t('healthy')} — ${health.metrics?.active_insights ?? 0} ${t('activeInsights')}`
+              : `${t('unhealthy')} — ${health.metrics?.anomalies_24h ?? 0} ${t('anomaliesDetected')}`}
           </span>
         </div>
       )}

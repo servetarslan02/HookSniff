@@ -7051,5 +7051,26 @@
     "sec5": "API anahtarı kullanımınızı şüpheli etkinlikler için izleyin",
     "format": "Anahtar Formatı",
     "formatDesc": "API anahtarları whsec_ ile başlar, ardından base64 kodlanmış bir sır gelir. İsteklerinizde Authorization başlığında Bearer token olarak ekleyin."
+  },
+  "cortex": {
+    "title": "Cortex — Akıllı Koruma",
+    "subtitle": "Webhook'larınızı izler, sorunları tespit eder ve otomatik düzeltir",
+    "refresh": "Yenile",
+    "healthy": "Her şey yolunda",
+    "unhealthy": "Dikkat",
+    "activeInsights": "aktif öneri mevcut",
+    "anomaliesDetected": "sorun tespit edildi",
+    "tabs": {
+      "overview": "Genel Bakış",
+      "anomalies": "Sorunlar",
+      "healing": "Düzeltmeler",
+      "predictions": "Tahminler",
+      "mlQuality": "ML Kalite",
+      "proactive": "Proaktif",
+      "drift": "Drift",
+      "monitor": "Model İzleme",
+      "abTests": "A/B Tests",
+      "automl": "AutoML"
+    }
   }
 }
