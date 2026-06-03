@@ -8,7 +8,6 @@ import { useToast } from '@/components/Toast';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useTranslations } from 'next-intl';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
-import { VirtualList } from '@/components/VirtualList';
 import {
   Shield, AlertTriangle, AlertCircle, Info, Ban, Unlock,
   CheckCircle2, XCircle, Search, Globe, Clock, RefreshCw,
@@ -341,13 +340,13 @@ export default function AdminSecurityPage() {
       {tab === 'events' && (
         <>
           <div className="flex items-center gap-3 flex-wrap">
-            <select value={filterSeverity} onChange={(e) => setFilterSeverity(e.target.value)} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
+            <select value={filterSeverity} onChange={(e) => setFilterSeverity(e.target.value)} className="px-3 pr-8 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_8px_center] bg-no-repeat">
               {SEVERITY_OPTIONS.map(s => <option key={s} value={s}>{s === 'all' ? t('allSeverity') : s.toUpperCase()}</option>)}
             </select>
-            <select value={filterResolved} onChange={(e) => setFilterResolved(e.target.value)} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
+            <select value={filterResolved} onChange={(e) => setFilterResolved(e.target.value)} className="px-3 pr-8 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_8px_center] bg-no-repeat">
               {RESOLVED_OPTIONS.map(r => <option key={r} value={r}>{r === 'all' ? t('allStatus') : r === 'unresolved' ? t('unresolved') : t('resolvedFilter')}</option>)}
             </select>
-            <select value={filterDateRange} onChange={(e) => setFilterDateRange(e.target.value)} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
+            <select value={filterDateRange} onChange={(e) => setFilterDateRange(e.target.value)} className="px-3 pr-8 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_8px_center] bg-no-repeat">
               {DATE_RANGE_OPTIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
             </select>
             <div className="relative flex-1 min-w-[200px]">
@@ -364,14 +363,8 @@ export default function AdminSecurityPage() {
           ) : events.length === 0 ? (
             <div className="glass-card p-12 text-center"><Shield size={48} strokeWidth={1.25} className="text-gray-300 dark:text-slate-600 mx-auto mb-3" /><p className="text-gray-500 dark:text-slate-400 text-sm">{t('noEvents')}</p></div>
           ) : (
-            <VirtualList
-              items={events}
-              height={600}
-              itemHeight={80}
-              overscan={5}
-              keyExtractor={(event) => event.id}
-              emptyMessage={t('noEvents')}
-              renderItem={(event) => {
+            <div className="space-y-2 max-h-[600px] overflow-auto">
+              {events.map((event) => {
                 const isExpanded = expandedEvent === event.id;
                 return (
                   <div className={`glass-card transition-all ${event.resolved ? 'opacity-60' : ''} border-l-4 ${event.severity === 'critical' ? 'border-red-500' : event.severity === 'high' ? 'border-orange-500' : event.severity === 'medium' ? 'border-amber-500' : 'border-blue-500'} mb-2`}>
@@ -394,36 +387,36 @@ export default function AdminSecurityPage() {
                           </div>
                           {(() => { const d = event.details; return d?.reason ? <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">{String(d.reason)}</p> : null; })()}
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
                           {!event.resolved && (
-                            <button onClick={(e) => { e.stopPropagation(); resolveMutation.mutate(event.id); }} className="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-500/10 hover:bg-green-100 dark:hover:bg-green-500/20 rounded-lg transition">
-                              <CheckCircle2 size={14} strokeWidth={1.75} className="inline mr-1" />Resolve
+                            <button onClick={(e) => { e.stopPropagation(); resolveMutation.mutate(event.id); }} className="hidden sm:inline-flex px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-500/10 hover:bg-green-100 dark:hover:bg-green-500/20 rounded-lg transition items-center gap-1">
+                              <CheckCircle2 size={14} strokeWidth={1.75} />Resolve
                             </button>
                           )}
-                          {isExpanded ? <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg> : <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>}
+                          <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'} /></svg>
                         </div>
                       </div>
                     </div>
                     {isExpanded && (
                       <div className="px-4 pb-4 pt-0 border-t border-gray-100 dark:border-slate-700/50 mt-2">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                          <div><span className="text-[11px] text-gray-400 uppercase">Event ID</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.id}</p></div>
-                          <div><span className="text-[11px] text-gray-400 uppercase">Müşteri ID</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.customer_id || '—'}</p></div>
-                          <div><span className="text-[11px] text-gray-400 uppercase">Email</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.email || '—'}</p></div>
-                          <div><span className="text-[11px] text-gray-400 uppercase">IP Adresi</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.ip_address || '—'}</p></div>
-                          <div className="sm:col-span-2"><span className="text-[11px] text-gray-400 uppercase">User Agent</span><p className="text-xs text-gray-700 dark:text-slate-300 break-all">{event.user_agent || '—'}</p></div>
-                          <div><span className="text-[11px] text-gray-400 uppercase">Date</span><p className="text-xs text-gray-700 dark:text-slate-300">{new Date(event.created_at).toLocaleString()}</p></div>
-                          <div><span className="text-[11px] text-gray-400 uppercase">{t('resolvedBadge')}</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.resolved ? `Yes (${event.resolved_at ? new Date(event.resolved_at).toLocaleString() : ''})` : 'Hayır'}</p></div>
+                          <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Event ID</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.id}</p></div>
+                          <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Müşteri ID</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.customer_id || '—'}</p></div>
+                          <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Email</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.email || '—'}</p></div>
+                          <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">IP Adresi</span><p className="text-xs font-mono text-gray-700 dark:text-slate-300">{event.ip_address || '—'}</p></div>
+                          <div className="sm:col-span-2"><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">User Agent</span><p className="text-xs text-gray-700 dark:text-slate-300 break-all">{event.user_agent || '—'}</p></div>
+                          <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Date</span><p className="text-xs text-gray-700 dark:text-slate-300">{new Date(event.created_at).toLocaleString()}</p></div>
+                          <div><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">{t('resolvedBadge')}</span><p className="text-xs text-gray-700 dark:text-slate-300">{event.resolved ? `Yes (${event.resolved_at ? new Date(event.resolved_at).toLocaleString() : ''})` : 'Hayır'}</p></div>
                         </div>
                         {event.details && Object.keys(event.details).length > 0 && (
-                          <div className="mt-3"><span className="text-[11px] text-gray-400 uppercase">Details</span><pre className="mt-1 text-xs font-mono text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800 rounded-lg p-3 overflow-x-auto max-h-32">{JSON.stringify(event.details, null, 2)}</pre></div>
+                          <div className="mt-3"><span className="block text-[11px] text-gray-400 uppercase tracking-wide mb-1">Details</span><pre className="text-xs font-mono text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800 rounded-lg p-3 overflow-x-auto max-h-32">{JSON.stringify(event.details, null, 2)}</pre></div>
                         )}
                       </div>
                     )}
                   </div>
                 );
-              }}
-            />
+              })}
+            </div>
           )}
         </>
       )}
