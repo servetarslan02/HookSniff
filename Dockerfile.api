@@ -13,7 +13,7 @@ COPY worker/ worker/
 COPY common/ common/
 COPY vendor/ vendor/
 
-# Dependency cache (faster rebuilds on Render)
+# Dependency cache (faster rebuilds)
 RUN mkdir -p api/src worker/src && \
     echo "fn main() {}" > api/src/main.rs && \
     echo "fn main() {}" > worker/src/main.rs && \
@@ -46,7 +46,7 @@ RUN chmod 755 /usr/local/bin/hooksniff-api
 USER hooksniff
 WORKDIR /app
 
-# Render injects PORT (typically 10000); do not hardcode in EXPOSE
+# Cloud Run injects PORT; do not hardcode in EXPOSE
 EXPOSE 10000
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=3 \

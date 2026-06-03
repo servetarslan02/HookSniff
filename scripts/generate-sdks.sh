@@ -4,7 +4,7 @@ set -e
 export JAVA_HOME=/tmp/jdk-17.0.12
 export PATH=$JAVA_HOME/bin:$PATH
 SPEC="docs/openapi.yaml"
-BASE_URL="https://hooksniff-api-1046140057667.europe-west1.run.app"
+BASE_URL="https://hooksniff-api-e6ztf3x2ma-ew.a.run.app"
 
 generate() {
   local lang=$1
