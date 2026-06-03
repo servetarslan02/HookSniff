@@ -1,26 +1,29 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { CheckCircle2, Clock } from '@/components/icons';
 
-function describeAnomaly(score: number, factors: any): { title: string; detail: string; emoji: string } {
+function describeAnomaly(score: number, factors: any, t: any): { title: string; detail: string; emoji: string } {
   const sr = factors?.sr || factors?.success_rate;
   const latency = factors?.latency || factors?.latency_ms;
 
   if (score >= 80) {
-    return { title: 'Kritik sorun — endpoint ciddi şekilde etkilenmiş', detail: sr ? `Başarı oranı %${Math.round(sr)}'ye düştü` : 'Performans ciddi şekilde düştü', emoji: '🔴' };
+    return { title: t('severity.critical'), detail: sr ? t('detail.srDropped', {v: Math.round(sr)}) : t('detail.performanceDropped'), emoji: '🔴' };
   }
   if (score >= 60) {
-    return { title: 'Büyük sorun — endpoint yavaşlıyor', detail: latency ? `Gecikme ${Math.round(latency)}ms'ye çıktı` : 'Hata oranı normalden yüksek', emoji: '🟠' };
+    return { title: t('severity.major'), detail: latency ? t('detail.latencyIncreased', {v: Math.round(latency)}) : t('detail.errorRateHigh'), emoji: '🟠' };
   }
   if (score >= 40) {
-    return { title: 'Küçük sorun — performans hafif düştü', detail: 'Şiddetli değil ama izlenmeli', emoji: '🟡' };
+    return { title: t('severity.minor'), detail: t('detail.shouldMonitor'), emoji: '🟡' };
   }
-  return { title: 'Normal — küçük dalgalanma', detail: 'Endişe verici değil', emoji: '🟢' };
+  return { title: t('severity.normal'), detail: t('detail.noConcern'), emoji: '🟢' };
 }
 
 export function AnomaliesTab({ token }: { token: string | null }) {
+  const t = useTranslations('cortex.anomalies');
+  const tc = useTranslations('cortex.common');
   const [anomalies, setAnomalies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +32,7 @@ export function AnomaliesTab({ token }: { token: string | null }) {
     if (!token) return;
     apiFetch<any>('/cortex/anomalies', { token })
       .then((d) => setAnomalies(d.anomalies || []))
-      .catch((err) => { console.error('[AnomaliesTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
+      .catch((err) => { console.error('[AnomaliesTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -39,17 +42,17 @@ export function AnomaliesTab({ token }: { token: string | null }) {
   return (
     <div className="space-y-4">
       <div className="glass-card p-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Tespit Edilen Sorunlar</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('title')}</h3>
         <p className="text-sm text-gray-500 dark:text-slate-400">
-          Cortex her 5 dakikada bir endpoint'lerinizi kontrol eder. Ani hata artışı, yavaşlama veya kesinti tespit ederse burada gösterir.
+          {t('description')}
         </p>
       </div>
 
       {anomalies.length === 0 ? (
         <div className="glass-card p-8 text-center">
           <CheckCircle2 size={48} className="mx-auto text-emerald-400 mb-4" />
-          <p className="text-lg font-semibold text-gray-900 dark:text-white">Hiç sorun yok</p>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Tüm endpoint'ler normal çalışıyor</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">{t('empty.title')}</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('empty.description')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -57,7 +60,7 @@ export function AnomaliesTab({ token }: { token: string | null }) {
             const score = a[3] || 0;
             const factors = a[4] || {};
             const ts = a[6];
-            const info = describeAnomaly(score, factors);
+            const info = describeAnomaly(score, factors, t);
 
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
@@ -72,7 +75,7 @@ export function AnomaliesTab({ token }: { token: string | null }) {
                         score >= 40 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
                         'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300'
                       }`}>
-                        Skor: {score}
+                        {tc('score')}: {score}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
@@ -85,7 +88,7 @@ export function AnomaliesTab({ token }: { token: string | null }) {
                       )}
                       {factors?.method && (
                         <p className="text-xs text-gray-400 dark:text-slate-500">
-                          {factors.method === 'ml' ? '🧠 ML ile tespit edildi' : '📊 Formül ile tespit edildi'}
+                          {factors.method === 'ml' ? t('detectedBy.ml') : t('detectedBy.formula')}
                         </p>
                       )}
                     </div>
