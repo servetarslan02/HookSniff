@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { Clock, Info, Shield } from '@/components/icons';
 import { ProactiveInsight } from './types';
 
-function describeProactiveInsight(insight: ProactiveInsight): { title: string; detail: string; emoji: string; advice: string } {
+function describeProactiveInsight(insight: ProactiveInsight, t: any): { title: string; detail: string; emoji: string; advice: string } {
   const type = insight.insight_type;
   const severity = insight.severity;
   const data = (insight as any).data || {};
@@ -17,15 +18,17 @@ function describeProactiveInsight(insight: ProactiveInsight): { title: string; d
     advice: data.advice || data.recommendation || '',
   };
 
-  if (type === 'proactive_latency_trend') return { ...base, detail: `Gecikme artıyor: ${data.trend || 'yükseliş trendi'}`, advice: base.advice || 'Endpoint\'i kontrol edin, sunucu yavaşlıyor olabilir' };
-  if (type === 'proactive_rate_limit_risk') return { ...base, detail: `Hız sınırı riski: ${data.usage_pct || '?'}% kullanım`, advice: base.advice || 'Rate limit\'i artırmayı veya istekleri azaltmayı düşünün' };
-  if (type === 'proactive_stress_detection') return { ...base, detail: `Sunucu stresi tespit edildi: ${data.metric || 'genel'}`, advice: base.advice || 'Sunucu kaynaklarını kontrol edin' };
-  if (type === 'proactive_cascade_risk') return { ...base, detail: `${data.affected_endpoints || '?'} endpoint etkilenebilir`, advice: base.advice || 'Ana endpoint\'i onarın, diğerleri de etkilenebilir' };
+  if (type === 'proactive_latency_trend') return { ...base, detail: t('detail.latencyTrend', {v: data.trend || 'yükseliş trendi'}), advice: base.advice || t('advice.latencyTrend') };
+  if (type === 'proactive_rate_limit_risk') return { ...base, detail: t('detail.rateLimitRisk', {v: data.usage_pct || '?'}), advice: base.advice || t('advice.rateLimitRisk') };
+  if (type === 'proactive_stress_detection') return { ...base, detail: t('detail.stressDetection', {v: data.metric || 'genel'}), advice: base.advice || t('advice.stressDetection') };
+  if (type === 'proactive_cascade_risk') return { ...base, detail: t('detail.cascadeRisk', {v: data.affected_endpoints || '?'}), advice: base.advice || t('advice.cascadeRisk') };
 
   return base;
 }
 
 export function ProactiveTab({ token }: { token: string | null }) {
+  const t = useTranslations('cortex.proactive');
+  const tc = useTranslations('cortex.common');
   const [insights, setInsights] = useState<ProactiveInsight[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +37,7 @@ export function ProactiveTab({ token }: { token: string | null }) {
     if (!token) return;
     apiFetch<any>('/cortex/proactive/status', { token })
       .then((d) => setInsights(d.proactive_insights || []))
-      .catch((err) => { console.error('[ProactiveTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
+      .catch((err) => { console.error('[ProactiveTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -47,23 +50,23 @@ export function ProactiveTab({ token }: { token: string | null }) {
   return (
     <div className="space-y-4">
       <div className="glass-card p-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Proaktif Korumа</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400">Cortex sorun çıkmadan önce uyarı verir.</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('title')}</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400">{t('description')}</p>
       </div>
 
       {insights.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
           <div className="glass-card p-4 text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{insights.length}</p>
-            <p className="text-xs text-gray-500 dark:text-slate-400">Aktif Uyarı</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400">{t('stats.activeAlerts')}</p>
           </div>
           <div className="glass-card p-4 text-center">
             <p className="text-2xl font-bold text-red-600">{criticalCount}</p>
-            <p className="text-xs text-gray-500 dark:text-slate-400">Kritik</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400">{t('stats.critical')}</p>
           </div>
           <div className="glass-card p-4 text-center">
             <p className="text-2xl font-bold text-orange-600">{warningCount}</p>
-            <p className="text-xs text-gray-500 dark:text-slate-400">Uyarı</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400">{t('stats.warning')}</p>
           </div>
         </div>
       )}
@@ -71,14 +74,14 @@ export function ProactiveTab({ token }: { token: string | null }) {
       {insights.length === 0 ? (
         <div className="glass-card p-8 text-center">
           <Shield size={48} className="mx-auto text-emerald-400 mb-4" />
-          <p className="text-lg font-semibold text-gray-900 dark:text-white">Proaktif uyarı yok</p>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Cortex her şeyin normal olduğunu tespit etti.</p>
-          <p className="text-xs text-gray-400 dark:text-slate-500 mt-3">🛡️ Proaktif analiz her 15 dakikada bir çalışır</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">{t('empty.title')}</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('empty.description')}</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-3">{t('empty.info')}</p>
         </div>
       ) : (
         <div className="space-y-3">
           {insights.map((insight, i) => {
-            const info = describeProactiveInsight(insight);
+            const info = describeProactiveInsight(insight, t);
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
                 <div className="flex items-start gap-3">
@@ -92,7 +95,7 @@ export function ProactiveTab({ token }: { token: string | null }) {
                         insight.severity === 'info' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
                         'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                       }`}>
-                        {insight.severity === 'critical' ? 'Kritik' : insight.severity === 'warning' ? 'Uyarı' : insight.severity === 'info' ? 'Bilgi' : 'Normal'}
+                        {insight.severity === 'critical' ? tc('severity.critical') : insight.severity === 'warning' ? tc('severity.warning') : insight.severity === 'info' ? tc('severity.info') : tc('severity.normal')
                       </span>
                     </div>
                     {info.detail && <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>}
