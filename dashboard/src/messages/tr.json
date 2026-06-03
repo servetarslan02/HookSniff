@@ -1472,14 +1472,24 @@
       "Hesabınızı istediğiniz zaman panel üzerinden sonlandırabilirsiniz",
       "Bu Şartları ihlal etmeniz durumunda hesabınızı sonlandırabilir veya askıya alabiliriz",
       "180 gün önceden bildirimle Hizmeti durdurabiliriz",
-      "Fesih üzerine verileriniz 180 gün içinde silinecektir"
+      "Fesih üzerine verileriniz 30 gün içinde silinecektir"
     ],
     "s14Title": "14. Değişiklikler",
     "s14Text": "Bu Şartları zaman zaman güncelleyebiliriz. Önemli değişiklikleri e-posta veya panel bildirimi ile size bildiririz. Değişikliklerden sonra kullanıma devam etmeniz kabul anlamına gelir.",
-    "s15Title": "15. Geçerli Hukuk",
-    "s15Text": "Bu Şartlar Türkiye yasalarına tabidir. Herhangi bir uyuşmazlık Türkiye mahkemelerinde çözülecektir.",
-    "s16Title": "16. İletişim",
-    "s16Text": "Bu Şartlarla ilgili sorularınız için bizimle iletişime geçin:",
+    "s15Title": "15. Mücbir Sebep",
+    "s15Text": "Doğal afetler, savaş veya terör eylemleri, hükümet eylemleri, salgınlar, elektrik kesintileri, internet kesintileri veya üçüncü taraf hizmet arızaları dahil ancak bunlarla sınırlı olmamak üzere, makul kontrolümüz dışındaki nedenlerle performansımızdaki herhangi bir başarısızlık veya gecikmeden sorumlu olmayacağız.",
+    "s16Title": "16. Uyuşmazlık Çözümü",
+    "s16Intro": "Bu Şartlardan kaynaklanan uyuşmazlıklar aşağıdaki şekilde çözülecektir:",
+    "s16Items": [
+      "Müzakere: Taraflar önce iyi niyetle müzakere yoluyla çözmeye çalışacaktır",
+      "Arabuluculuk: Müzakere başarısız olursa, arabuluculuk denenecektir",
+      "Tahkim: Arabuluculuk başarısız olursa, uyuşmazlıklar Türkiye'de bağlayıcı tahkim yoluyla çözülecektir",
+      "Toplu dava feragati: Uyuşmazlıkları bireysel olarak çözmeyi ve tolu davalara katılma hakkından feragat etmeyi kabul edersiniz"
+    ],
+    "s17Title": "17. Geçerli Hukuk",
+    "s17Text": "Bu Şartlar Türkiye yasalarına tabidir. Herhangi bir uyuşmazlık Türkiye mahkemelerinde çözülecektir.",
+    "s18Title": "18. İletişim",
+    "s18Text": "Bu Şartlarla ilgili sorularınız için bizimle iletişime geçin:",
     "contactForm": "iletişim formu"
   },
   "privacy": {
@@ -1573,6 +1583,24 @@
       "Onayı geri çekme: İşlem onaya dayandığında"
     ],
     "s8How": "Bu haklarınızı kullanmak için iletişim formundan bize ulaşın",
+    "s8GdprTitle": "8.1 GDPR Uyumluluğu (AB Kullanıcıları)",
+    "s8GdprText": "Avrupa Ekonomik Alanı'nda (AEA) bulunuyorsanız, Genel Veri Koruma Tüzüğü (GDPR) kapsamında ek haklarınız vardır:",
+    "s8GdprItems": [
+      "Yasal dayanak: Verileri rıza, sözleşme ifası ve meşru menfaatler temelinde işleriz",
+      "Veri Koruma Sorumlusu: dpo@hooksniff.com adresinden iletişime geçin",
+      "Denetim otoritesi: Yerel veri koruma makamına şikayette bulunma hakkınız vardır",
+      "Veri taşınabilirliği: Verilerinizi yapılandırılmış, makine tarafından okunabilir formatta talep edebilirsiniz",
+      "Silme hakkı: Kişisel verilerinizin tamamen silinmesini talep edebilirsiniz",
+      "Otomatik karar verme: Otomatik karar verme veya profilleleme kullanmıyoruz"
+    ],
+    "s8CcpaTitle": "8.2 CCPA Uyumluluğu (Kaliforniya Kullanıcıları)",
+    "s8CcpaText": "Kaliforniya sakiniyseniz, California Tüketici Gizliliği Yasası (CCPA) kapsamında haklarınız vardır:",
+    "s8CcpaItems": [
+      "Bilgi hakkı: Hangi kişisel bilgileri topladığımızı, kullandığımızı ve paylaştığımızı talep edebilirsiniz",
+      "Silme hakkı: Kişisel bilgilerinizin silinmesini talep edebilirsiniz",
+      "Vazgeçme hakkı: Kişisel bilgilerinizi satmıyoruz",
+      "Ayrımcılık yapmama: Haklarınızı kullandığınız için size karşı ayrımcılık yapmayacağız"
+    ],
     "s9Title": "9. Çerezler",
     "s9Text": "Kimlik doğrulama ve oturum yönetimi için temel çerezler kullanırız. Çerezleri tarayıcı ayarlarınızdan kontrol edebilirsiniz.",
     "s10Title": "10. Uluslararası Aktarımlar",
