@@ -75,7 +75,7 @@ pub async fn get_usage(
     let endpoint_limit = plan.max_endpoints() as u64;
 
     // Calculate data age (days since oldest delivery)
-    let oldest_delivery: Option<chrono::NaiveDateTime> = sqlx::query_scalar(
+    let oldest_delivery: Option<chrono::DateTime<chrono::Utc>> = sqlx::query_scalar(
         "SELECT MIN(created_at) FROM deliveries WHERE customer_id = $1"
     )
     .bind(customer.id)
@@ -84,7 +84,7 @@ pub async fn get_usage(
 
     let retention = plan.retention_days();
     let data_age_days = oldest_delivery
-        .map(|oldest| (chrono::Utc::now().naive_utc() - oldest).num_days())
+        .map(|oldest| (chrono::Utc::now() - oldest).num_days())
         .unwrap_or(0);
     let data_expires_in_days = (retention - data_age_days).max(0);
 
