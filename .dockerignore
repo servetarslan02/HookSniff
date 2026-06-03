@@ -12,7 +12,6 @@ landing/
 portal/
 
 # Docs & non-runtime files
-docs/
 docs-sdk/
 monitoring/
 tests/
