@@ -131,17 +131,23 @@ export function InboundContent() {
           <ReadOnlyBadge />
         </div>
         <RoleGuard require="canManageWebhooks">
-          <button onClick={() => { setShowCreate(!showCreate); setEditTarget(null); resetForm(); }} className="bg-brand-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-            + {t('inbound.addProvider')}
+          <button onClick={() => { setShowCreate(true); setEditTarget(null); resetForm(); }} className="bg-brand-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+            {t('inbound.addProvider')}
           </button>
         </RoleGuard>
       </div>
 
 
-      {/* Create form */}
+      {/* Add Provider Modal */}
       {showCreate && (
-        <div className="glass-card p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('inbound.addProvider')}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => { setShowCreate(false); resetForm(); }}>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 max-w-2xl w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('inbound.addProvider')}</h3>
+              <button onClick={() => { setShowCreate(false); resetForm(); }} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
             {PROVIDERS.map(p => (
@@ -154,7 +160,7 @@ export function InboundContent() {
           </div>
 
           {selectedProvider && (
-            <>
+            <div className="mt-4 space-y-4">
               <div>
                 <label htmlFor="inbound-webhook-secret" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('inbound.webhookSecret')}</label>
                 <input id="inbound-webhook-secret" value={webhookSecret} onChange={e => setWebhookSecret(e.target.value)} placeholder="whsec_..." type="password" autoComplete="off"
@@ -171,13 +177,14 @@ export function InboundContent() {
                 </select>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 justify-end">
+                <button onClick={() => { setShowCreate(false); resetForm(); }} className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition">{t('inbound.cancel')}</button>
                 <button onClick={handleCreate} disabled={createMutation.isPending} className="bg-brand-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50">{t('inbound.save')}</button>
-                <button onClick={() => { setShowCreate(false); resetForm(); }} className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-700 transition">{t('inbound.cancel')}</button>
               </div>
-            </>
+            </div>
           )}
         </div>
+      </div>
       )}
 
       {/* Inbound URL info */}
@@ -303,7 +310,7 @@ export function InboundContent() {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('inbound.noConfigs')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('inbound.noConfigsDesc')}</p>
           <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-            + {t('inbound.addProvider')}
+            {t('inbound.addProvider')}
           </button>
         </div>
       )}
