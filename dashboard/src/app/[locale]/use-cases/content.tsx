@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import PublicNavbar from '@/components/PublicNavbar';
-import { Cloud, ShoppingCart, CreditCard, Bot, Wrench, HeartPulse, Anchor, XCircle, CheckCircle } from '@/components/icons';
+import { Cloud, ShoppingCart, CreditCard, Bot, Wrench, HeartPulse, XCircle, CheckCircle } from '@/components/icons';
 
 /* ─── Data ─── */
 
