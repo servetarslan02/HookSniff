@@ -235,18 +235,17 @@ export function PlanCards({
                 <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
                   {t('currentPlanLabel')}
                 </div>
-              ) : isDowngrade ? (
-                <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-50 dark:bg-slate-900 text-gray-400 dark:text-slate-600 border border-gray-200 dark:border-slate-700 cursor-not-allowed">
-                  {t('currentPlanLabel')}
-                </div>
               ) : (
                 <button type="button"
                   onClick={() => onUpgrade(plan.key, billingPeriod)}
+                  disabled={isDowngrade}
                   className={clsx(
                     'w-full py-2.5 rounded-xl text-sm font-medium transition',
-                    plan.popular
-                      ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600'
-                      : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'
+                    isDowngrade
+                      ? 'bg-gray-50 dark:bg-slate-900 text-gray-400 dark:text-slate-600 border border-gray-200 dark:border-slate-700 cursor-not-allowed'
+                      : plan.popular
+                        ? 'bg-brand-600 dark:bg-brand-500 text-white hover:bg-brand-700 dark:hover:bg-brand-600'
+                        : 'bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-slate-700'
                   )}
                 >
                   {t('upgradeTo', { action: t('upgrade'), plan: t(plan.nameKey) })}
