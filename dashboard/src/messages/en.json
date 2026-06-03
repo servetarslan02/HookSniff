@@ -7049,5 +7049,26 @@
     "sec5": "Monitor your API key usage for suspicious activity",
     "format": "Key Format",
     "formatDesc": "API keys start with whsec_ followed by a base64-encoded secret. Include it in your requests as a Bearer token in the Authorization header."
+  },
+  "cortex": {
+    "title": "Cortex — Smart Protection",
+    "subtitle": "Monitors your webhooks, detects issues and auto-fixes",
+    "refresh": "Refresh",
+    "healthy": "Everything is fine",
+    "unhealthy": "Attention",
+    "activeInsights": "active insight(s) available",
+    "anomaliesDetected": "issue(s) detected",
+    "tabs": {
+      "overview": "Overview",
+      "anomalies": "Issues",
+      "healing": "Fixes",
+      "predictions": "Predictions",
+      "mlQuality": "ML Quality",
+      "proactive": "Proactive",
+      "drift": "Drift",
+      "monitor": "Model Monitoring",
+      "abTests": "A/B Tests",
+      "automl": "AutoML"
+    }
   }
 }
