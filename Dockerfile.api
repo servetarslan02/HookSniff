@@ -53,3 +53,5 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=3 \
     CMD sh -c 'curl -sf "http://127.0.0.1:${PORT:-10000}/health" || exit 1'
 
 CMD ["/usr/local/bin/hooksniff-api"]
+
+# Force rebuild 2026-06-04 01:53:20
