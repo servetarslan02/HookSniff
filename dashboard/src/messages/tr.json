@@ -290,7 +290,7 @@
     "title": "Endpoint'ler",
     "subtitle": "Webhook endpoint'lerinizi yönetin",
     "create": "Endpoint Oluştur",
-    "newEndpoint": "+ Yeni Endpoint",
+    "newEndpoint": "Yeni Endpoint",
     "empty": "Henüz endpoint yok. Webhook almaya başlamak için bir tane oluşturun.",
     "emptyDesc": "Webhook almaya başlamak için ilk endpoint'inizi oluşturun",
     "deleteConfirm": "Bu endpoint silinsin mi?",
@@ -328,7 +328,9 @@
     "copy": "Kopyala",
     "delete": "Sil",
     "disable": "Devre Dışı Bırak",
-    "enable": "Etkinleştir"
+    "enable": "Etkinleştir",
+    "rotateConfirm": "Evet, anahtari dondur",
+    "rotateDesc": "Eski imza anahtari hemen geçersiz olacak. Eski anahtarla imzalanan tüm webhook dogrulama islemleri basarisiz olacaktir."
   },
   "deliveries": {
     "title": "Teslimatlar",

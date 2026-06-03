@@ -60,7 +60,7 @@ export function HealingTab({ token }: { token: string | null }) {
             const reason = a[3] || '';
             const outcome = a[5] || 'pending';
             const ts = a[7];
-            const info = describeHealingAction(actionType, reason, outcome);
+            const info = describeHealingAction(actionType, reason, outcome, t);
 
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
@@ -74,13 +74,13 @@ export function HealingTab({ token }: { token: string | null }) {
                         outcome === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
                         'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300'
                       }`}>
-                        {outcome === 'recovered' ? 'Çözüldü' : outcome === 'pending' ? 'Devam ediyor' : outcome}
+                        {outcome === 'recovered' ? t('status.recovered') : outcome === 'pending' ? t('status.pending') : outcome}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
                     <div className="flex items-center gap-4 mt-2">
                       {ts && <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1"><Clock size={12} /> {new Date(ts).toLocaleString('tr-TR')}</p>}
-                      {reason && <p className="text-xs text-gray-400 dark:text-slate-500">Sebep: {reason}</p>}
+                      {reason && <p className="text-xs text-gray-400 dark:text-slate-500">{t('reason', {v: reason})}</p>}
                     </div>
                   </div>
                 </div>
