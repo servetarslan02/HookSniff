@@ -202,16 +202,15 @@ pub async fn admin_revenue_metrics(
             .fetch_one(&pool)
             .await?;
 
-    let mrr: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0::double precision) as mrr
+    let mrr_val: f64 = sqlx::query_scalar(
+        r#"SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0::double precision)
            FROM invoices
            WHERE status = 'paid'
              AND paid_at >= NOW() - INTERVAL '30 days'"#,
     )
     .fetch_one(&pool)
-    .await?;
-
-    let mrr_val = mrr.0.unwrap_or(0.0);
+    .await
+    .unwrap_or(0.0);
     let arr = mrr_val * 12.0;
 
     let arpu = if paying_customers > 0 {
