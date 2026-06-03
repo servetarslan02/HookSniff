@@ -332,6 +332,7 @@ pub async fn batch_webhooks(
     Extension(cfg): Extension<Config>,
     Extension(cache): Extension<Option<crate::cache::CacheLayer>>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    Extension(redis_queue): Extension<std::sync::Arc<std::sync::Mutex<Option<crate::queue::RedisQueue>>>>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     Json(req): Json<BatchWebhookRequest>,
 ) -> Result<Json<BatchResponse>, AppError> {
