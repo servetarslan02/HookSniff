@@ -1,8 +1,8 @@
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
+import PublicNavbar from '@/components/PublicNavbar';
 import Image from 'next/image';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { changelog, getChangelogBySlug, typeConfig, areaConfig } from '@/lib/changelog-data';
 
 export async function ChangelogEntryContent({ slug }: { slug: string }) {
@@ -17,18 +17,7 @@ export async function ChangelogEntryContent({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <Link href="/changelog" className="text-gray-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Changelog</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-900 dark:text-white font-medium">{release.version}</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle={release.version} />
 
       <main className="max-w-4xl mx-auto px-6 py-16">
         <div className="mb-10">
