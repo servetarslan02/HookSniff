@@ -18,7 +18,7 @@
       "status": "down",
       "latency_ms": 1,
       "description": "HookSniff REST API (Cloud Run)",
-      "last_checked": "2026-06-03T18:41:16.085Z"
+      "last_checked": "2026-06-03T18:45:51.328Z"
     },
     {
       "name": "Dashboard",
@@ -34,9 +34,9 @@
         }
       },
       "status": "degraded",
-      "latency_ms": 0,
+      "latency_ms": 1,
       "description": "Next.js frontend (Vercel)",
-      "last_checked": "2026-06-03T18:41:16.085Z"
+      "last_checked": "2026-06-03T18:45:51.328Z"
     },
     {
       "name": "Worker",
@@ -54,7 +54,7 @@
       "status": "unknown",
       "latency_ms": null,
       "description": "Background delivery worker (Cloud Run)",
-      "last_checked": "2026-06-03T18:41:16.085Z"
+      "last_checked": "2026-06-03T18:45:51.328Z"
     },
     {
       "name": "Database",
@@ -72,7 +72,7 @@
       "status": "down",
       "latency_ms": 0,
       "description": "PostgreSQL (Neon)",
-      "last_checked": "2026-06-03T18:41:16.085Z"
+      "last_checked": "2026-06-03T18:45:51.328Z"
     },
     {
       "name": "Cache",
@@ -90,7 +90,7 @@
       "status": "unknown",
       "latency_ms": 0,
       "description": "Redis (Upstash)",
-      "last_checked": "2026-06-03T18:41:16.085Z"
+      "last_checked": "2026-06-03T18:45:51.328Z"
     },
     {
       "name": "Email Service",
@@ -106,9 +106,9 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 277,
+      "latency_ms": 340,
       "description": "Gmail API",
-      "last_checked": "2026-06-03T18:41:16.085Z"
+      "last_checked": "2026-06-03T18:45:51.328Z"
     },
     {
       "name": "Storage",
@@ -124,20 +124,24 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 49,
+      "latency_ms": 46,
       "description": "Cloudflare R2",
-      "last_checked": "2026-06-03T18:41:16.085Z"
+      "last_checked": "2026-06-03T18:45:51.328Z"
     }
   ],
-  "checked_at": "2026-06-03T18:41:16.085Z",
+  "checked_at": "2026-06-03T18:45:51.328Z",
   "response_times": {
     "API": [
       1,
       1,
       7,
+      1,
+      1,
+      1,
       1
     ],
     "Dashboard": [
+      1,
       1,
       1,
       1
@@ -148,7 +152,10 @@
       268,
       336,
       266,
-      277
+      277,
+      332,
+      336,
+      340
     ],
     "Storage": [
       44,
@@ -156,7 +163,10 @@
       40,
       43,
       40,
-      49
+      49,
+      47,
+      45,
+      46
     ],
     "Database": [
       1
