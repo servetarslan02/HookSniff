@@ -7069,6 +7069,184 @@
       "monitor": "Model Monitoring",
       "abTests": "A/B Tests",
       "automl": "AutoML"
+    },
+    "common": {
+      "dataLoadError": "An error occurred loading data",
+      "score": "Score",
+      "severity": {
+        "critical": "Critical",
+        "warning": "Warning",
+        "info": "Info",
+        "normal": "Normal"
+      }
+    },
+    "anomalies": {
+      "title": "Detected Issues",
+      "description": "Cortex checks your endpoints every 5 minutes. It shows sudden error spikes, slowdowns, or outages here.",
+      "empty": {
+        "title": "No issues found",
+        "description": "All endpoints are working normally"
+      },
+      "severity": {
+        "critical": "Critical issue — endpoint severely affected",
+        "major": "Major issue — endpoint slowing down",
+        "minor": "Minor issue — performance slightly degraded",
+        "normal": "Normal — minor fluctuation"
+      },
+      "detail": {
+        "performanceDropped": "Performance severely degraded",
+        "errorRateHigh": "Error rate higher than normal",
+        "shouldMonitor": "Not severe but should be monitored",
+        "noConcern": "Not concerning"
+      },
+      "detectedBy": {
+        "ml": "🧠 Detected by ML",
+        "formula": "📊 Detected by formula"
+      }
+    },
+    "healing": {
+      "title": "Auto Corrections",
+      "description": "Cortex automatically intervenes when it detects issues. All corrections are listed here.",
+      "empty": {
+        "title": "No corrections made",
+        "description": "All endpoints are healthy, no intervention needed"
+      },
+      "status": {
+        "recovered": "Resolved",
+        "pending": "Ongoing"
+      },
+      "action": {
+        "auto_disable": {
+          "recovered": "Endpoint reopened",
+          "disabled": "Endpoint temporarily closed"
+        },
+        "circuit_tighten": "Firewall tightened",
+        "retry_slowdown": "Retry slowed down",
+        "rate_limit_reduce": "Rate limit reduced",
+        "fallback_url_switch": "Switched to backup URL",
+        "retry_increase": "Retry count increased",
+        "timeout_adjust": "Timeout increased",
+        "proactive_throttle": "Proactive throttling applied",
+        "cascade_alert": "Batch issue warning",
+        "unknown": "Unknown action"
+      },
+      "detail": {
+        "auto_disable": {
+          "recovered": "Endpoint is healthy again, auto-reopened",
+          "disabled": "Temporarily disabled due to too many errors"
+        },
+        "circuit_tighten": "Increased protection sensitivity due to high error rate",
+        "retry_slowdown": "Server is struggling, increased interval between retries",
+        "rate_limit_reduce": "Reduced request count to protect server",
+        "fallback_url_switch": "Main URL has issues, redirected to backup",
+        "retry_increase": "More retries will be attempted for failed deliveries",
+        "timeout_adjust": "Server responding slowly, extended wait time",
+        "proactive_throttle": "Latency increasing, precaution taken before issues occur",
+        "cascade_alert": "Multiple endpoints affected simultaneously"
+      }
+    },
+    "predictions": {
+      "title": "Future Predictions",
+      "description": "Cortex analyzes historical data to predict future potential issues.",
+      "empty": {
+        "title": "No predictions yet",
+        "description": "At least a few hours of data are needed to generate predictions."
+      },
+      "severity": {
+        "high": "Highly likely to have issues",
+        "medium": "Possible issues",
+        "low": "Small risk",
+        "minimal": "Low risk"
+      },
+      "detail": {},
+      "advice": {
+        "high": "Take action now: check endpoint or switch to backup URL",
+        "medium": "It is recommended to check your endpoint",
+        "low": "Not concerning at the moment, being monitored",
+        "minimal": "Everything looks normal"
+      },
+      "method": {
+        "timeSeries": "🧠 Time series analysis",
+        "trend": "📊 Trend analysis"
+      }
+    },
+    "mlQuality": {
+      "title": "ML Model Quality",
+      "description": "Accuracy of Cortex prediction models.",
+      "resetButton": "Reset Low Quality Models",
+      "overallScore": "Overall Quality Score",
+      "empty": {
+        "title": "No model data yet",
+        "description": "Quality metrics will appear here as Cortex prediction models collect data.",
+        "info": "📊 ML quality check runs hourly · Predictions generated every 15 minutes"
+      },
+      "quality": {
+        "excellent": "Excellent quality",
+        "good": "Good quality",
+        "low": "Low quality",
+        "critical": "Critical quality"
+      },
+      "detail": {},
+      "metric": {
+        "accuracy": "Accuracy",
+        "avgError": "Avg Error",
+        "predictionCount": "Prediction Count"
+      }
+    },
+    "proactive": {
+      "title": "Proactive Protection",
+      "description": "Cortex warns before issues occur.",
+      "stats": {
+        "activeAlerts": "Active Alerts",
+        "critical": "Critical",
+        "warning": "Warning"
+      },
+      "empty": {
+        "title": "No proactive alerts",
+        "description": "Cortex detected everything is normal.",
+        "info": "🛡️ Proactive analysis runs every 15 minutes"
+      },
+      "detail": {},
+      "advice": {
+        "latencyTrend": "Check the endpoint, server may be slowing down",
+        "rateLimitRisk": "Consider increasing rate limit or reducing requests",
+        "stressDetection": "Check server resources",
+        "cascadeRisk": "Fix the main endpoint, others may also be affected"
+      }
+    },
+    "drift": {
+      "title": "Drift Detection Events",
+      "empty": "No drift detected yet. ML models are working normally. ✅",
+      "severity": "Severity",
+      "affected": "Affected:",
+      "detected": "Detected:",
+      "action": "Action:"
+    },
+    "modelMonitor": {
+      "stats": {
+        "totalModels": "Total Models",
+        "healthy": "Healthy",
+        "warning": "Warning",
+        "critical": "Critical"
+      },
+      "avgAccuracy": "Avg Accuracy",
+      "avgF1": "Avg F1 Score",
+      "worstModels": "Worst Models"
+    },
+    "abTest": {
+      "title": "A/B Tests",
+      "empty": "No A/B tests yet. Start a test from the API to compare models.",
+      "endpoint": "Endpoint:",
+      "traffic": "% traffic"
+    },
+    "autoML": {
+      "title": "AutoML Optimization Trials",
+      "empty": "No AutoML trials yet. Start an optimization from the API.",
+      "best": "Best"
+    },
+    "securityPage": {
+      "title": "Security Monitoring",
+      "subtitle": "Enterprise-grade security, startup-friendly pricing"
     }
   }
 }

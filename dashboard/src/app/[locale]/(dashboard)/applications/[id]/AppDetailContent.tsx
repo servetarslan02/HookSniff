@@ -183,8 +183,8 @@ export function AppDetailContent() {
               </div>
             </div>
           </div>
-          <span className="font-mono text-xs text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">
-            {app.id.slice(0, 8)}…
+          <span className="font-mono text-xs text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg cursor-help" title={app.id}>
+            {app.id.slice(0, 8)}
           </span>
         </div>
       </div>
