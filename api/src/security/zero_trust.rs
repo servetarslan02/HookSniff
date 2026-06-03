@@ -62,8 +62,8 @@ pub async fn verify_request(
     .unwrap_or(None);
 
     let events = recent_events.map(|(c,)| c).unwrap_or(0);
-    if events > 5 {
-        risk_score += 0.4;
+    if events > 20 {
+        risk_score += 0.3;
         reasons.push(format!("{} high-severity events in 1h", events));
     }
 
