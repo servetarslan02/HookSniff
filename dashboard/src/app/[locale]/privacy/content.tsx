@@ -22,6 +22,8 @@ export function PrivacyPageContent() {
   const s5 = t.raw('s5Items') as string[];
   const s6 = t.raw('s6Items') as string[];
   const s8 = t.raw('s8Items') as string[];
+  const s8Gdpr = t.raw('s8GdprItems') as string[];
+  const s8Ccpa = t.raw('s8CcpaItems') as string[];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
@@ -112,6 +114,20 @@ export function PrivacyPageContent() {
             <p className="mb-2">{t('s8Intro')}</p>
             <ListItems items={s8} />
             <p className="mt-4">{t('s8How')}</p>
+
+            {/* GDPR Compliance */}
+            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl">
+              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">{t('s8GdprTitle')}</h3>
+              <p className="text-sm text-blue-800 dark:text-blue-400 mb-3">{t('s8GdprText')}</p>
+              <ListItems items={s8Gdpr} />
+            </div>
+
+            {/* CCPA Compliance */}
+            <div className="mt-4 p-4 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 rounded-xl">
+              <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-300 mb-2">{t('s8CcpaTitle')}</h3>
+              <p className="text-sm text-purple-800 dark:text-purple-400 mb-3">{t('s8CcpaText')}</p>
+              <ListItems items={s8Ccpa} />
+            </div>
           </section>
 
           <section>
