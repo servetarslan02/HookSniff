@@ -60,17 +60,32 @@ impl IpBlocklistCache {
 }
 
 /// Axum middleware: block requests from IPs in the blocklist.
+/// Admin users and health/status endpoints are exempt from blocking.
 pub async fn ip_blocklist_middleware(
     axum::extract::Extension(cache): axum::extract::Extension<Arc<IpBlocklistCache>>,
     axum::extract::Extension(pool): axum::extract::Extension<PgPool>,
     request: Request,
     next: Next,
 ) -> Result<Response, AppError> {
+    let path = request.uri().path();
+
+    // Always allow health checks and status endpoints
+    if path.starts_with("/health") || path.starts_with("/v1/health") || path.starts_with("/v1/status") || path.starts_with("/metrics") {
+        return Ok(next.run(request).await);
+    }
+
+    // Allow admin users — check for Customer extension (set after auth middleware)
+    if let Some(customer) = request.extensions().get::<crate::models::customer::Customer>() {
+        if customer.is_admin {
+            return Ok(next.run(request).await);
+        }
+    }
+
     let ip = extract_client_ip(&request);
 
     if let Some(ip) = &ip {
         if cache.is_blocked(ip, &pool).await {
-            tracing::warn!(ip = %ip, "🚫 Blocked IP attempted access");
+            tracing::warn!(ip = %ip, path = %path, "🚫 Blocked IP attempted access");
             crate::security_monitor::log_security_event(
                 &pool,
                 "blocked_ip_access",
@@ -79,7 +94,7 @@ pub async fn ip_blocklist_middleware(
                 None,
                 Some(ip),
                 None,
-                serde_json::json!({ "path": request.uri().path() }),
+                serde_json::json!({ "path": path }),
             ).await.ok();
             return Err(AppError::Forbidden);
         }
