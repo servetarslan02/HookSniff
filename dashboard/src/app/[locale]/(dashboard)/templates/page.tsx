@@ -6,8 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
 import { useTemplates } from '@/hooks/useDashboardData';
-import { VirtualList } from '@/components/VirtualList';
-import { BarChart3, Bot, ClipboardList, Radio, X } from '@/components/icons';
+import { BarChart3, ClipboardList, Radio, X } from '@/components/icons';
 
 interface Template {
  id: string;
@@ -96,71 +95,57 @@ export default function TemplatesPage() {
      <p className="text-sm text-gray-500 dark:text-slate-400">{t('noTemplatesDesc')}</p>
     </div>
    ) : (
-    <VirtualList
-      items={templates}
-      height={Math.min(templates.length * 280, 600)}
-      itemHeight={280}
-      overscan={2}
-      keyExtractor={(tpl) => tpl.id}
-      emptyMessage={t('noTemplates')}
-      renderItem={(tpl) => (
-      <div className="glass-card p-6 hover:shadow-lg transition flex flex-col mb-6">
-       <div className="flex-1">
-        <div className="flex items-start justify-between mb-2">
-         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{getTemplateName(tpl.id) || tpl.name}</h3>
-         {tpl.industry && (
-          <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 rounded-md">{tpl.industry}</span>
-         )}
-        </div>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-3">{getTemplateDesc(tpl.id) || tpl.description}</p>
-
-        {/* Tags */}
-        {tpl.tags && tpl.tags.length > 0 && (
-         <div className="flex flex-wrap gap-1.5 mb-3">
-          {tpl.tags.map((tag) => (
-           <span key={tag} className="px-2 py-0.5 text-xs bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 rounded-md">
-            {t(`tag_${tag}`, { defaultMessage: tag })}
-           </span>
-          ))}
-         </div>
+   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {templates.map((tpl) => (
+     <div key={tpl.id} className="glass-card p-5 hover:shadow-lg transition flex flex-col">
+      <div className="flex-1">
+       <div className="flex items-start justify-between mb-2">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">{getTemplateName(tpl.id) || tpl.name}</h3>
+        {tpl.industry && (
+         <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 rounded-md shrink-0 ml-2">{tpl.industry}</span>
         )}
-
-        {/* Stats */}
-        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-slate-400 mb-4">
-         <span><Radio size={16} strokeWidth={1.75} className="inline mr-1" /> {tpl.event_types.length} events</span>
-         {tpl.estimated_daily_volume && <span className="inline-flex items-center gap-1"><BarChart3 size={14} strokeWidth={1.75} /> ~{tpl.estimated_daily_volume.toLocaleString()}/day</span>}
-         {tpl.agents && tpl.agents.length > 0 && <span><Bot size={16} strokeWidth={1.75} className="inline mr-1" /> {tpl.agents.length} agents</span>}
-        </div>
-
-        {/* Event Types Preview */}
-        <div className="flex flex-wrap gap-1 mb-4">
-         {tpl.event_types.slice(0, 6).map((ev) => (
-          <span key={ev} className="px-1.5 py-0.5 text-xs font-mono bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-400 rounded border border-gray-200 dark:border-slate-700">{ev}</span>
-         ))}
-         {tpl.event_types.length > 6 && (
-          <span className="px-1.5 py-0.5 text-xs text-gray-400 dark:text-slate-500">+{tpl.event_types.length - 6} more</span>
-         )}
-        </div>
        </div>
-
-       {/* Actions */}
-       <div className="flex items-center gap-2 pt-4 border-t border-gray-100 dark:border-slate-700">
-        <button
-         onClick={() => setSelectedTemplate(tpl)}
-         className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-lg transition"
-        >
-         {t('viewDetails') || 'View Details'}
-        </button>
-        <button
-         onClick={() => openApply(tpl)}
-         className="flex-1 px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition"
-        >
-         {t('apply') || 'Apply'}
-        </button>
+       <p className="text-xs text-gray-500 dark:text-slate-400 mb-3 line-clamp-2">{getTemplateDesc(tpl.id) || tpl.description}</p>
+       {tpl.tags && tpl.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1 mb-3">
+         {tpl.tags.slice(0, 3).map((tag) => (
+          <span key={tag} className="px-2 py-0.5 text-xs bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 rounded-md">
+           {t(`tag_${tag}`, { defaultMessage: tag })}
+          </span>
+         ))}
+         {tpl.tags.length > 3 && <span className="px-1 text-xs text-gray-400">+{tpl.tags.length - 3}</span>}
+        </div>
+       )}
+       <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-slate-500 mb-3">
+        <span><Radio size={12} strokeWidth={1.75} className="inline mr-1" /> {tpl.event_types.length} events</span>
+        {tpl.estimated_daily_volume && <span className="inline-flex items-center gap-1"><BarChart3 size={12} strokeWidth={1.75} /> ~{tpl.estimated_daily_volume.toLocaleString()}/day</span>}
+       </div>
+       <div className="flex flex-wrap gap-1 mb-3">
+        {tpl.event_types.slice(0, 3).map((ev) => (
+         <span key={ev} className="px-1.5 py-0.5 text-xs font-mono bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-400 rounded border border-gray-200 dark:border-slate-700">{ev}</span>
+        ))}
+        {tpl.event_types.length > 3 && (
+         <span className="px-1.5 py-0.5 text-xs text-gray-400 dark:text-slate-500">+{tpl.event_types.length - 3}</span>
+        )}
        </div>
       </div>
-     )}
-    />
+      <div className="flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-slate-700">
+       <button
+        onClick={() => setSelectedTemplate(tpl)}
+        className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-lg transition"
+       >
+        {t('viewDetails') || 'Details'}
+       </button>
+       <button
+        onClick={() => openApply(tpl)}
+        className="flex-1 px-3 py-2 text-xs font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition"
+       >
+        {t('apply') || 'Apply'}
+       </button>
+      </div>
+     </div>
+    ))}
+   </div>
    )}
 
    {/* Detail Modal */}
