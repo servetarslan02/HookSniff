@@ -97,6 +97,9 @@ export default function middleware(request: NextRequest) {
   }
 
   // Auth check for dashboard routes (non-public)
+  // NOTE: Only list truly public pages here. Dashboard routes under (dashboard)/
+  // are already protected by AuthGuard in (dashboard)/layout.tsx — listing them
+  // here would bypass the middleware redirect and force a slower client-side check.
   const publicPaths = [
     '/login', '/register', '/auth', '/forgot-password', '/reset-password',
     '/verify-email', '/pricing', '/about', '/contact', '/blog', '/docs',
@@ -104,10 +107,6 @@ export default function middleware(request: NextRequest) {
     '/use-cases', '/webhooks', '/what-is-a-webhook', '/security',
     '/privacy', '/terms', '/status', '/newsletter', '/build-vs-buy',
     '/get-started', '/startups', '/compare', '/playground',
-    // Consolidated dashboard routes
-    '/core', '/applications', '/deliveries', '/operational-webhooks',
-    '/integrations', '/observability', '/devtools', '/routing-config',
-    '/account', '/billing', '/organization',
   ];
   const isPublic = withoutLocale === '/' || publicPaths.some((path) => withoutLocale.startsWith(path));
   if (!isPublic && !withoutLocale.startsWith('/admin')) {
