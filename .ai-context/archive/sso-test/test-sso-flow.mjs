@@ -7,7 +7,7 @@ import http from 'node:http';
 import crypto from 'node:crypto';
 
 const MOCK_IDP = 'http://localhost:8080';
-const API_URL = 'https://hooksniff-api-1046140057667.europe-west1.run.app';
+const API_URL = 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app';
 
 const results = [];
 

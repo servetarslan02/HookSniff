@@ -10,7 +10,7 @@ const KEYCLOAK = 'http://localhost:8080';
 const REALM = 'hooksniff';
 const CLIENT_ID = 'hooksniff-client';
 const CLIENT_SECRET = 'hooksniff-secret-key-2026';
-const API_BASE = 'https://hooksniff-api-1046140057667.europe-west1.run.app';
+const API_BASE = 'https://hooksniff-api-e6ztf3x2ma-ew.a.run.app';
 
 const TEST_USERS = [
   { email: 'admin@hooksniff.dev', password: 'Admin123!', expectedRole: 'admin', name: 'Admin User' },

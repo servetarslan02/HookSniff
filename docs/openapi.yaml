@@ -16,7 +16,7 @@ info:
   license:
     name: Proprietary
 servers:
-- url: https://hooksniff-api-1046140057667.europe-west1.run.app/v1
+- url: https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1
   description: Production (Google Cloud Run)
 - url: http://localhost:3000/v1
   description: Local development

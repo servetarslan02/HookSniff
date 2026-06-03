@@ -63,7 +63,7 @@ pub async fn initiate_oidc_login(
 
     let redirect_uri = format!(
         "{}/v1/sso/oidc/callback",
-        std::env::var("API_URL").unwrap_or_else(|_| "https://hooksniff-api-1046140057667.europe-west1.run.app".to_string())
+        std::env::var("API_URL").unwrap_or_else(|_| "https://hooksniff-api-e6ztf3x2ma-ew.a.run.app".to_string())
     );
 
     // Use the nonce from state (generated in initiate_sso_login) for replay protection
@@ -164,7 +164,7 @@ pub async fn oidc_callback(
 
     let redirect_uri = format!(
         "{}/v1/sso/oidc/callback",
-        std::env::var("API_URL").unwrap_or_else(|_| "https://hooksniff-api-1046140057667.europe-west1.run.app".to_string())
+        std::env::var("API_URL").unwrap_or_else(|_| "https://hooksniff-api-e6ztf3x2ma-ew.a.run.app".to_string())
     );
 
     // Exchange authorization code for tokens
