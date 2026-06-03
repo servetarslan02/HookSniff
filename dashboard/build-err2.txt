@@ -1,0 +1,21 @@
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env.local
+- Cache Components enabled
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 15.5s
+  Running TypeScript ...
+Failed to type check.
+
+./src/app/[locale]/alternatives/convoy/ConvoyContent.tsx:10:9
+Type error: 'tc' is declared but its value is never read.
+
+  [90m 8 |[0m [36mexport[0m [36mfunction[0m [33mConvoyContent[0m() {
+  [90m 9 |[0m   [36mconst[0m t = useTranslations([32m'alternatives'[0m);
+[31m[1m>[0m [90m10 |[0m   [36mconst[0m tc = useTranslations([32m'compare'[0m);
+  [90m   |[0m         [31m[1m^[0m
+  [90m11 |[0m   [36mreturn[0m (
+  [90m12 |[0m     <div>
+  [90m13 |[0m       <[33mPublicNavbar[0m pageTitle=[32m"HookSniff vs Convoy"[0m />
+Next.js build worker exited with code: 1 and signal: null

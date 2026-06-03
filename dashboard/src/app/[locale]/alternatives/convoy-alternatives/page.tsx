@@ -1,5 +1,5 @@
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 import { X, Check } from '@/components/icons';
 
 
@@ -12,18 +12,7 @@ export const metadata = {
 export default function ConvoyAlternativesPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <Link href="/alternatives" className="text-gray-600 dark:text-slate-400">Alternatives</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Convoy</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle="Convoy Alternatives" />
 
       <main className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
@@ -45,7 +34,7 @@ export default function ConvoyAlternativesPage() {
               <tbody>
                 {[
                   { name: 'Convoy', price: 'Free', sdks: '1 (Go)', cloud: <X size={14} strokeWidth={1.75} className="text-red-500" />, oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, portal: 'Basic', hl: false },
-                  { name: 'HookSniff', price: '$24/mo', sdks: '11', cloud: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, portal: 'Full', hl: true },
+                  { name: 'HookSniff', price: '$49/mo', sdks: '11', cloud: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, portal: 'Full', hl: true },
                   { name: 'Svix', price: '$490/mo', sdks: '6', cloud: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, portal: 'Full', hl: false },
                   { name: 'Hookdeck', price: '$39/mo+', sdks: '8', cloud: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, oss: <X size={14} strokeWidth={1.75} className="text-red-500" />, portal: 'Full', hl: false },
                   { name: 'Hook0', price: 'Free', sdks: '4', cloud: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, oss: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, portal: 'Basic', hl: false },

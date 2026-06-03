@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
 import Image from 'next/image';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 import { Check } from '@/components/icons';
 import {
  changelog,
@@ -82,17 +82,7 @@ export function ChangelogPageContent() {
 
  return (
   <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-   {/* Nav */}
-   <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-    <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-     <div className="items-center gap-3 flex">
-      <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-      <span className="text-gray-500 dark:text-slate-500">/</span>
-      <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
-     </div>
-     <LanguageSwitcher />
-    </div>
-   </nav>
+   <PublicNavbar pageTitle={t("title")} />
 
    <main className="max-w-6xl mx-auto px-6 py-16">
     {/* Hero */}

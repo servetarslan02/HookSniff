@@ -1,0 +1,30 @@
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env.local
+- Cache Components enabled
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./src/app/[locale]/status/content.tsx:151:17
+Expected '</', got 'jsx text'
+  [90m149 |[0m
+  [90m150 |[0m       <main className=[32m"max-w-4xl mx-auto px-4 py-8"[0m>
+[31m[1m>[0m [90m151 |[0m           </div>
+  [90m    |[0m                 [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m152 |[0m         </div>
+  [90m    |[0m [31m[1m^^^^^^^^[0m
+  [90m153 |[0m       </nav>
+  [90m154 |[0m
+  [90m155 |[0m       <div className=[32m"max-w-4xl mx-auto px-4 py-10"[0m>
+
+Parsing ecmascript source code failed
+
+Import trace:
+  Server Component:
+    ./src/app/[locale]/status/content.tsx
+    ./src/app/[locale]/status/page.tsx
+
+
+    at <unknown> (./src/app/[locale]/status/content.tsx:151:17)

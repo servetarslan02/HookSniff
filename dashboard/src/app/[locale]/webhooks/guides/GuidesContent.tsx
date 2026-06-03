@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 
 const guides = [
   {
@@ -45,18 +45,7 @@ export function GuidesContent() {
   const t = useTranslations('webhooks');
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <Link href="/webhooks" className="text-gray-600 dark:text-slate-400">{t("title")}</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">{t("guides")}</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle={t("guides")} />
 
       <main className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-12">

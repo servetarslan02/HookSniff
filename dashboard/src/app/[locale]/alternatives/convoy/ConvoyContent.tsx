@@ -1,7 +1,7 @@
 'use client';
 
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import { Package, X, Check, AlertTriangle } from '@/components/icons';
 
@@ -10,16 +10,7 @@ export function ConvoyContent() {
   const tc = useTranslations('compare');
   return (
     <div>
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">{tc("sdks")} / Convoy</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle="HookSniff vs Convoy" />
       <main className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">HookSniff vs Convoy</h1>
@@ -33,7 +24,7 @@ export function ConvoyContent() {
               <th className="text-center py-3 px-4 font-semibold text-gray-900 dark:text-white">Convoy</th>
             </tr></thead>
             <tbody>{[
-              { featureKey: 'pricePro', hooksniff: '$24/mo', convoy: 'Free (self-hosted)', bestFor: 'convoy' },
+              { featureKey: 'pricePro', hooksniff: '$49/mo', convoy: 'Free (self-hosted)', bestFor: 'convoy' },
               { featureKey: 'sdkCount', hooksniff: '11', convoy: '1 (Go)', bestFor: 'hooksniff' },
               { featureKey: 'fifoDelivery', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, convoy: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
               { featureKey: 'cloudEvents', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, convoy: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
