@@ -247,62 +247,70 @@ export function AppDetailContent() {
           </RoleGuard>
         </div>
 
-        {/* ── Create Form ── */}
+        {/* ── Create Endpoint Modal ── */}
         {showCreate && (
-          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 mb-4">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
-              {te('create') || 'Create endpoint'}
-            </h3>
-            {error && (
-              <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-sm border border-red-200 dark:border-red-500/20">
-                {error}
-              </div>
-            )}
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div>
-                <label htmlFor="ep-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
-                  {te('urlLabel') || 'URL'}
-                </label>
-                <input
-                  id="ep-url"
-                  type="url"
-                  value={newUrl}
-                  onChange={(e) => setNewUrl(e.target.value)}
-                  placeholder={te('form.urlPlaceholder') || 'https://your-app.com/webhooks'}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition placeholder:text-gray-400 dark:placeholder:text-slate-500"
-                />
-              </div>
-              <div>
-                <label htmlFor="ep-desc" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
-                  {te('descriptionLabel') || 'Description'}
-                </label>
-                <input
-                  id="ep-desc"
-                  type="text"
-                  value={newDesc}
-                  onChange={(e) => setNewDesc(e.target.value)}
-                  placeholder={te('form.descriptionPlaceholder') || 'What does this endpoint do?'}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition placeholder:text-gray-400 dark:placeholder:text-slate-500"
-                />
-              </div>
-              <div className="flex gap-3">
-                <button
-                  type="submit"
-                  disabled={creating}
-                  className="px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium rounded-xl hover:opacity-90 transition disabled:opacity-50"
-                >
-                  {creating ? (tc('creating') || 'Creating...') : (tc('create') || 'Create')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setShowCreate(false); setError(''); }}
-                  className="px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition"
-                >
-                  {tc('cancel') || 'Cancel'}
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => { setShowCreate(false); setError(''); }}>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 max-w-lg w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {te('create') || 'Create endpoint'}
+                </h3>
+                <button onClick={() => { setShowCreate(false); setError(''); }} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
-            </form>
+              {error && (
+                <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-sm border border-red-200 dark:border-red-500/20">
+                  {error}
+                </div>
+              )}
+              <form onSubmit={handleCreate} className="space-y-4">
+                <div>
+                  <label htmlFor="ep-url" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
+                    {te('urlLabel') || 'URL'}
+                  </label>
+                  <input
+                    id="ep-url"
+                    type="url"
+                    value={newUrl}
+                    onChange={(e) => setNewUrl(e.target.value)}
+                    placeholder={te('form.urlPlaceholder') || 'https://your-app.com/webhooks'}
+                    required
+                    autoFocus
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition placeholder:text-gray-400 dark:placeholder:text-slate-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="ep-desc" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
+                    {te('descriptionLabel') || 'Description'}
+                  </label>
+                  <input
+                    id="ep-desc"
+                    type="text"
+                    value={newDesc}
+                    onChange={(e) => setNewDesc(e.target.value)}
+                    placeholder={te('form.descriptionPlaceholder') || 'What does this endpoint do?'}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition placeholder:text-gray-400 dark:placeholder:text-slate-500"
+                  />
+                </div>
+                <div className="flex gap-3 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => { setShowCreate(false); setError(''); }}
+                    className="px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition"
+                  >
+                    {tc('cancel') || 'Cancel'}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={creating}
+                    className="px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium rounded-xl hover:opacity-90 transition disabled:opacity-50"
+                  >
+                    {creating ? (tc('creating') || 'Creating...') : (tc('create') || 'Create')}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
 
