@@ -1,52 +1,52 @@
-# HookSniff — Disaster Recovery (Felaket Kurtarma) Prosedürü
+# HookSniff — Disaster Recovery Procedures
 
-> Son güncelleme: 2026-05-12
-> Sahip: DevOps / AI Agent
-> İlgili: [INCIDENT_RESPONSE.md](./INCIDENT_RESPONSE.md), [RUNBOOK.md](./RUNBOOK.md)
+> Last updated: 2026-06-03
+> Owner: DevOps / AI Agent
+> Related: [INCIDENT_RESPONSE.md](./INCIDENT_RESPONSE.md), [RUNBOOK.md](./RUNBOOK.md)
 
 ---
 
-## İçindekiler
+## Table of Contents
 
-1. [RTO/RPO Hedefleri](#rtorpo-hedefleri)
-2. [Servis Mimarisi Özeti](#servis-mimarisi-özeti)
-3. [Scenario 1: Veritabanı Arızası](#scenario-1-veritabanı-arızası)
+1. [RTO/RPO Targets](#rtorpo-targets)
+2. [Service Architecture Summary](#service-architecture-summary)
+3. [Scenario 1: Database Failure](#scenario-1-database-failure)
 4. [Scenario 2: API/Worker Crash](#scenario-2-apiworker-crash)
 5. [Scenario 3: Dashboard Down](#scenario-3-dashboard-down)
-6. [Scenario 4: Tüm Bölge Çöküşü](#scenario-4-tüm-bölge-çöküşü)
-7. [Kurtarma Kontrol Listesi](#kurtarma-kontrol-listesi)
-8. [Backup Stratejisi](#backup-stratejisi)
-9. [Periyodik DR Testleri](#periyodik-dr-testleri)
-10. [İletişim ve Escalation](#iletişim-ve-escalation)
+6. [Scenario 4: Full Region Outage](#scenario-4-full-region-outage)
+7. [Recovery Checklist](#recovery-checklist)
+8. [Backup Strategy](#backup-strategy)
+9. [Periodic DR Tests](#periodic-dr-tests)
+10. [Escalation](#escalation)
 
 ---
 
-## RTO/RPO Hedefleri
+## RTO/RPO Targets
 
-| Metrik | Hedef | Açıklama |
-|--------|-------|----------|
-| **RTO** (Recovery Time Objective) | **< 15 dakika** | Servisin tekrar çalışır duruma gelme süresi |
-| **RPO** (Recovery Point Objective) | **< 1 saat** | Kabul edilebilir veri kaybı süresi |
-| **MTTR** (Mean Time To Recovery) | **< 30 dakika** | Ortalama kurtarma süresi |
-| **Veri Kaybı** | **0 webhook event** | Webhook event'leri asla kaybolmamalı |
+| Metric | Target | Description |
+|--------|--------|-------------|
+| **RTO** (Recovery Time Objective) | **< 15 minutes** | Time to restore service |
+| **RPO** (Recovery Point Objective) | **< 1 hour** | Acceptable data loss window |
+| **MTTR** (Mean Time To Recovery) | **< 30 minutes** | Average recovery time |
+| **Data Loss** | **0 webhook events** | Webhook events must never be lost |
 
-### Servis Bazlı Hedefler
+### Per-Service Targets
 
-| Servis | RTO | RPO | Öncelik |
-|--------|-----|-----|---------|
-| Neon PostgreSQL | 10 dk | 1 saat (point-in-time) | 🔴 Kritik |
-| Cloud Run API | 5 dk | 0 (stateless) | 🔴 Kritik |
-| Cloud Run Worker | 5 dk | 0 (stateless) | 🔴 Kritik |
-| Vercel Dashboard | 2 dk | 0 (static) | 🟡 Yüksek |
-| Upstash Redis | 5 dk | Cache-only, rebuildable | 🟢 Normal |
+| Service | RTO | RPO | Priority |
+|---------|-----|-----|----------|
+| Neon PostgreSQL | 10 min | 1 hour (point-in-time) | 🔴 Critical |
+| Cloud Run API | 5 min | 0 (stateless) | 🔴 Critical |
+| Cloud Run Worker | 5 min | 0 (stateless) | 🔴 Critical |
+| Vercel Dashboard | 2 min | 0 (static) | 🟡 High |
+| Upstash Redis | 5 min | Cache-only, rebuildable | 🟢 Normal |
 
 ---
 
-## Servis Mimarisi Özeti
+## Service Architecture Summary
 
 ```
 ┌──────────────┐     ┌──────────────────┐     ┌────────────────┐
-│   Kullanıcı   │────▶│  Cloudflare CDN  │────▶│ Vercel Dashbrd │
+│    User      │────▶│  Cloudflare CDN  │────▶│ Vercel Dashboard│
 └──────────────┘     └──────────────────┘     └────────────────┘
                             │
                             ▼
@@ -70,72 +70,72 @@
 
 ---
 
-## Scenario 1: Veritabanı Arızası (Neon PostgreSQL)
+## Scenario 1: Database Failure (Neon PostgreSQL)
 
-### Belirtiler
-- API 500 hataları döndürüyor
-- `db_query_duration_seconds` metrikleri anormal yüksek
-- Neon dashboard'da "Degraded" veya "Down" durumu
-- Worker webhook delivery'leri durmuş
+### Symptoms
+- API returning 500 errors
+- `db_query_duration_seconds` metrics abnormally high
+- Neon dashboard shows "Degraded" or "Down" status
+- Worker webhook deliveries stopped
 
-### Tanılama
+### Diagnosis
 
 ```bash
-# 1. Neon durumunu kontrol et
+# 1. Check Neon status
 # https://console.neon.tech → Project → Status
 
-# 2. Bağlantı testi
+# 2. Connection test
 psql "$DATABASE_URL" -c "SELECT 1;"
 
-# 3. Son backup'ları listele
+# 3. List recent backups
 ls -lt /var/backups/hooksniff/ | head -10
 
-# 4. Grafana'da DB metriklerini kontrol et
+# 4. Check DB metrics in Grafana
 # https://hookrelay.grafana.net → Dashboards → HookSniff
 ```
 
-### Kurtarma Adımları
+### Recovery Steps
 
 ```bash
-# ── Adım 1: Neon Console'dan restore ──
+# ── Step 1: Restore from Neon Console ──
 # https://console.neon.tech → Branches → Restore
-# Point-in-time recovery: Son 24 saat (Neon free tier)
-# Neon Pro: 7 gün point-in-time recovery
+# Point-in-time recovery: Last 24 hours (Neon free tier)
+# Neon Pro: 7 days point-in-time recovery
 
-# ── Adım 2: Backup'tan restore (Neon erişilemezse) ──
-# En son backup'ı bul
+# ── Step 2: Restore from backup (if Neon unreachable) ──
+# Find latest backup
 LATEST_BACKUP=$(ls -t /var/backups/hooksniff/hooksniff-backup-*.sql | head -1)
-echo "Restore edilecek backup: $LATEST_BACKUP"
+echo "Backup to restore: $LATEST_BACKUP"
 
-# Yeni Neon branch oluştur veya mevcut DB'ye restore
-# Neon CLI veya console üzerinden
+# Create new Neon branch or restore to existing DB
+# Via Neon CLI or console
 psql "$DATABASE_URL" < "$LATEST_BACKUP"
 
-# ── Adım 3: Migration'ları çalıştır ──
+# ── Step 3: Run migrations ──
 cd /root/.openclaw/workspace/HookSniff
-# (Eğer migration'lar varsa)
+# (If migrations exist)
 # cargo run --bin migrate
 
-# ── Adım 4: Veri doğrulama ──
+# ── Step 4: Data validation ──
 psql "$DATABASE_URL" -c "SELECT COUNT(*) FROM webhooks;"
 psql "$DATABASE_URL" -c "SELECT COUNT(*) FROM endpoints;"
 psql "$DATABASE_URL" -c "SELECT COUNT(*) FROM users;"
 
-# ── Adım 5: Servisleri yeniden başlat ──
-# Cloud Run'da revision deploy (aynı image, yeni env)
+# ── Step 5: Restart services ──
+# Cloud Run revision deploy (same image, new env)
 gcloud run deploy hooksniff-api --image="$API_IMAGE" --region=europe-west1 --no-traffic
 gcloud run deploy hooksniff-worker --image="$WORKER_IMAGE" --region=europe-west1 --no-traffic
 
-# ── Adım 6: Health check + traffic ──
+# ── Step 6: Health check + traffic ──
 ./deploy/cloud-run/blue-green.sh hooksniff-api
 ./deploy/cloud-run/blue-green.sh hooksniff-worker
 ```
 
-### Önleme
-- ✅ Neon backup cron her gün 03:00 UTC (aktif)
-- ✅ Backup retention: 30 gün
-- ⚠️ Neon free tier: Point-in-time recovery yok (sadece daily backup)
-- 📋 Öneri: Neon Pro'ya yükselt ($19/ay) → 7 gün PITR
+### Prevention
+- ✅ Neon backup cron daily at 03:00 UTC (active)
+- ✅ Backup retention: 30 days
+- ⚠️ Neon free tier: No point-in-time recovery (daily backup only)
+- 📋 Recommendation: Upgrade to Neon Pro ($19/mo) → 7-day PITR
 
 ---
 

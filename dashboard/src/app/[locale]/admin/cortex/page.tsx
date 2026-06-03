@@ -122,11 +122,12 @@ export default function CortexPage() {
 }
 
 function OverviewTab({ health }: { health: CortexHealth | null }) {
+  const t = useTranslations('cortex');
   if (!health?.metrics) {
     return (
       <div className="glass-card p-8 text-center">
         <Brain size={48} className="mx-auto text-gray-300 dark:text-slate-600 mb-4" />
-        <p className="text-gray-500 dark:text-slate-400">t('overview.noData').split('.')[0] + '. ' + t('overview.noData').split('.').slice(1).join('.')n başlaması için birkaç dakika bekleyin.</p>
+        <p className="text-gray-500 dark:text-slate-400">{t('overview.noData')}</p>
       </div>
     );
   }

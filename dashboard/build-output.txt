@@ -1,0 +1,16 @@
+﻿Ôû▓ Next.js 16.2.6 (Turbopack)
+- Environments: .env.local
+- Cache Components enabled
+
+node.exe : ÔÜá The "middleware" file convention is deprecated. Please use "prox
+y" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ÔÜá The "middle...leware-to-proxy 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 18.0s
+  Running TypeScript ...

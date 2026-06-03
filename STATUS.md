@@ -1,13 +1,13 @@
-# 🪝 HookSniff — Durum Özeti
+# HookSniff — Status Overview
 
-> Son güncelleme: 2026-05-09
+> Last updated: 2026-06-03
 
 ---
 
-## URL'ler
+## Live URLs
 
-| Servis | URL | Durum |
-|--------|-----|-------|
+| Service | URL | Status |
+|---------|-----|--------|
 | Dashboard | https://hooksniff.vercel.app | ✅ Live |
 | API | https://hooksniff-api-1046140057667.europe-west1.run.app | ✅ Healthy |
 | Worker | https://hooksniff-worker-1046140057667.europe-west1.run.app | ✅ Deployed |
@@ -15,10 +15,10 @@
 
 ---
 
-## Altyapı
+## Infrastructure
 
-| Bileşen | Servis | Durum | Not |
-|---------|--------|-------|-----|
+| Component | Service | Status | Notes |
+|-----------|---------|--------|-------|
 | Frontend | Vercel | ✅ | hooksniff.vercel.app |
 | API | Google Cloud Run | ✅ | europe-west1 |
 | Worker | Google Cloud Run | ✅ | europe-west1 |
@@ -28,18 +28,18 @@
 | CDN | Cloudflare | ✅ | Free tier |
 | Email | Gmail API | ✅ | GCP Service Account |
 | Monitoring | Grafana Cloud | ✅ | OpenTelemetry |
-| Billing (Global) | Polar.sh | ✅ | Pro plan aktif |
-| Billing (TR) | iyzico | ❌ | Hesap açılacak |
+| Billing (Global) | Polar.sh | ✅ | Pro plan active |
+| Billing (Turkey) | iyzico | ⏳ | Account pending |
 
 ---
 
-## CI/CD Durumu
+## CI/CD Status
 
-| Kontrol | Durum |
-|---------|-------|
-| cargo fmt | ✅ strict |
-| cargo clippy | ✅ strict (-D warnings) |
-| cargo test | ✅ |
+| Check | Status |
+|-------|--------|
+| `cargo fmt` | ✅ strict |
+| `cargo clippy` | ✅ strict (`-D warnings`) |
+| `cargo test` | ✅ |
 | Dashboard ESLint | ✅ |
 | Dashboard Build | ✅ |
 | Security Audit | ✅ |
@@ -47,19 +47,19 @@
 
 ---
 
-## GitHub Docs Durumu
+## Documentation Status
 
-| Dosya | Durum |
-|-------|-------|
-| README.md | ✅ Badge'ler, features, pricing, API endpoints |
-| CONTRIBUTING.md | ✅ 30 route module, dev setup, PR process |
-| SECURITY.md | ✅ Kod referanslı güvenlik politikası |
+| File | Status |
+|------|--------|
+| README.md | ✅ Badges, features, pricing, API endpoints, SDK examples |
+| CONTRIBUTING.md | ✅ 30 route modules, dev setup, PR process |
+| SECURITY.md | ✅ Code-referenced security policy, Cortex AI |
 | CODE_OF_CONDUCT.md | ✅ Contributor Covenant v2.0 |
-| CHANGELOG.md | ✅ v0.1.0 tüm modüller documented |
+| CHANGELOG.md | ✅ v0.1.0 all modules documented |
 | LICENSE | ✅ MIT |
-| FEATURES.md | ✅ Tüm modüller documented |
+| FEATURES.md | ✅ All modules documented |
 | docs/DEPLOYMENT.md | ✅ Cloud Run + Polar.sh |
-| docs/quickstart.md | ✅ Standard Webhooks format |
+| docs/QUICKSTART.md | ✅ 5-minute quickstart |
 | docs/examples.md | ✅ Node.js + Python Standard Webhooks |
 | .github/ISSUE_TEMPLATE/ | ✅ Bug report + feature request |
 | .github/PULL_REQUEST_TEMPLATE.md | ✅ |
@@ -67,22 +67,13 @@
 
 ---
 
-## Servet'in Yapması Gereken
+## Monthly Cost ($0/month)
 
-1. ~~GitHub token yenile~~ → ⚠️ Yeni token oluşturulmalı (chat'te paylaşıldı)
-2. ~~GCP SA key rotate~~ → ⚠️ Yeni key oluşturulmalı (chat'te paylaşıldı)
-3. **iyzico hesap** — vergi levhası + banka hesabı
-4. **Domain kararı** — şimdilik hooksniff.vercel.app yeterli
-
----
-
-## Maliyet ($0/ay)
-
-| Servis | Free Tier |
-|--------|-----------|
-| Vercel | ✅ 100GB bant genişliği |
-| Cloud Run | ✅ 2 milyon istek/ay |
+| Service | Free Tier |
+|---------|-----------|
+| Vercel | ✅ 100GB bandwidth |
+| Cloud Run | ✅ 2M requests/month |
 | Neon | ✅ 512MB PostgreSQL |
-| Upstash | ✅ 10K komut/gün |
-| Cloudflare R2 | ✅ 10GB depolama |
-| Grafana | ✅ 10K log/ay |
+| Upstash | ✅ 10K commands/day |
+| Cloudflare R2 | ✅ 10GB storage |
+| Grafana | ✅ 10K logs/month |

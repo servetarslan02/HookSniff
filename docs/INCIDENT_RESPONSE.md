@@ -1,6 +1,6 @@
 # HookSniff — Incident Response Procedures
 
-> Son güncelleme: 2026-05-12
+> Last updated: 2026-06-03
 
 ---
 
