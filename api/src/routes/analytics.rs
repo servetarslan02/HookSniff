@@ -195,32 +195,33 @@ async fn latency_trend(
         FROM delivery_attempts da
         JOIN deliveries d ON d.id = da.delivery_id
         WHERE d.customer_id = $1
-          AND da.created_at >= now() - make_interval(hours => $2)
+          AND da.created_at >= now() - ($2 || ' hours')::interval
           AND da.duration_ms IS NOT NULL
         GROUP BY date_trunc('hour', da.created_at)
         ORDER BY bucket ASC
         "#,
     )
     .bind(customer.id)
-    .bind(hours as i32)
+    .bind(hours.to_string())
     .fetch_all(&pool)
     .await?;
 
     // Overall avg (lightweight — p95 computed in Rust from bucket data)
-    let overall_avg: f64 = sqlx::query_scalar(
+    let overall_row: (f64,) = sqlx::query_as(
         r#"
-        SELECT COALESCE(AVG(da.duration_ms), 0)::DOUBLE PRECISION
+        SELECT COALESCE(AVG(da.duration_ms), 0)::FLOAT
         FROM delivery_attempts da
         JOIN deliveries d ON d.id = da.delivery_id
         WHERE d.customer_id = $1
-          AND da.created_at >= now() - make_interval(hours => $2)
+          AND da.created_at >= now() - ($2 || ' hours')::interval
           AND da.duration_ms IS NOT NULL
         "#,
     )
     .bind(customer.id)
-    .bind(hours as i32)
+    .bind(hours.to_string())
     .fetch_one(&pool)
     .await?;
+    let overall_avg = overall_row.0;
 
     // Compute p95 from bucket avg values (lightweight approximation)
     let mut avg_values: Vec<f64> = buckets.iter().map(|(_, avg, _)| *avg).collect();

@@ -18,7 +18,7 @@
       "status": "down",
       "latency_ms": 0,
       "description": "HookSniff REST API (Cloud Run)",
-      "last_checked": "2026-06-03T21:22:01.203Z"
+      "last_checked": "2026-06-03T21:29:35.086Z"
     },
     {
       "name": "Dashboard",
@@ -36,7 +36,7 @@
       "status": "degraded",
       "latency_ms": 0,
       "description": "Next.js frontend (Vercel)",
-      "last_checked": "2026-06-03T21:22:01.203Z"
+      "last_checked": "2026-06-03T21:29:35.086Z"
     },
     {
       "name": "Worker",
@@ -54,7 +54,7 @@
       "status": "unknown",
       "latency_ms": null,
       "description": "Background delivery worker (Cloud Run)",
-      "last_checked": "2026-06-03T21:22:01.203Z"
+      "last_checked": "2026-06-03T21:29:35.086Z"
     },
     {
       "name": "Database",
@@ -72,7 +72,7 @@
       "status": "down",
       "latency_ms": 0,
       "description": "PostgreSQL (Neon)",
-      "last_checked": "2026-06-03T21:22:01.203Z"
+      "last_checked": "2026-06-03T21:29:35.086Z"
     },
     {
       "name": "Cache",
@@ -90,7 +90,7 @@
       "status": "unknown",
       "latency_ms": 0,
       "description": "Redis (Upstash)",
-      "last_checked": "2026-06-03T21:22:01.203Z"
+      "last_checked": "2026-06-03T21:29:35.086Z"
     },
     {
       "name": "Email Service",
@@ -106,9 +106,9 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 277,
+      "latency_ms": 319,
       "description": "Gmail API",
-      "last_checked": "2026-06-03T21:22:01.203Z"
+      "last_checked": "2026-06-03T21:29:35.086Z"
     },
     {
       "name": "Storage",
@@ -124,18 +124,20 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 47,
+      "latency_ms": 44,
       "description": "Cloudflare R2",
-      "last_checked": "2026-06-03T21:22:01.203Z"
+      "last_checked": "2026-06-03T21:29:35.086Z"
     }
   ],
-  "checked_at": "2026-06-03T21:22:01.203Z",
+  "checked_at": "2026-06-03T21:29:35.086Z",
   "response_times": {
     "Email Service": [
-      277
+      277,
+      319
     ],
     "Storage": [
-      47
+      47,
+      44
     ]
   }
 }
