@@ -80,6 +80,9 @@ export function AppDetailContent() {
     setTogglingId(id);
     try {
       await toggleEndpointMutation.mutateAsync({ id, is_active: !currentState });
+      // Invalidate application detail cache so the UI reflects the toggle
+      queryClient.invalidateQueries({ queryKey: ['application', appId] });
+      queryClient.invalidateQueries({ queryKey: ['endpoints'] });
     } catch (err: unknown) {
       toast((err instanceof Error ? err.message : tc('unknownError')) || tc('failedToUpdate'), 'error');
     } finally {
