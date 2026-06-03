@@ -76,11 +76,13 @@ export function UserTable({
         </div>
       ) : (
         <>
+      <div className="overflow-x-auto">
+      <div className="min-w-[800px]">
       <VirtualTable
         data={sortedUsers}
         estimateSize={60}
         header={
-          <div className="grid grid-cols-[36px_70px_minmax(140px,1fr)_100px_100px_90px_110px_180px] bg-gray-50/50 dark:bg-slate-800/50">
+          <div className="grid grid-cols-[36px_70px_minmax(140px,1fr)_100px_100px_90px_110px_150px] bg-gray-50/50 dark:bg-slate-800/50">
             <div className="px-3 py-3 flex items-center">
               <input
                 type="checkbox"
@@ -110,7 +112,7 @@ export function UserTable({
           </div>
         }
         renderRow={(u) => (
-          <div className={`grid grid-cols-[36px_70px_minmax(140px,1fr)_100px_100px_90px_110px_180px] hover:bg-gray-100 dark:hover:bg-gray-700 transition border-b border-gray-200/50 dark:border-slate-700/50 ${selectedIds.has(u.id) ? 'bg-red-50/50 dark:bg-red-500/5' : ''}`}>
+          <div className={`grid grid-cols-[36px_70px_minmax(140px,1fr)_100px_100px_90px_110px_150px] hover:bg-gray-100 dark:hover:bg-gray-700 transition border-b border-gray-200/50 dark:border-slate-700/50 ${selectedIds.has(u.id) ? 'bg-red-50/50 dark:bg-red-500/5' : ''}`}>
             <div className="px-3 py-4 flex items-center">
               <input
                 type="checkbox"
@@ -163,6 +165,8 @@ export function UserTable({
           </div>
         )}
       />
+      </div>
+      </div>
 
           {/* Infinite Scroll */}
           {hasMore && (
