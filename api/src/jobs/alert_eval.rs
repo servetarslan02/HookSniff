@@ -239,7 +239,7 @@ async fn evaluate_consecutive_failures(pool: &PgPool, customer_id: Uuid) -> Resu
 // ── Notification dispatchers ─────────────────────────────────────
 
 /// Send alert notification email.
-async fn send_alert_email(
+pub async fn send_alert_email(
     email_client: &ResendEmailClient,
     to: &str,
     alert_name: &str,
@@ -287,7 +287,7 @@ async fn send_alert_email(
 }
 
 /// Send alert to Slack via incoming webhook.
-async fn send_slack_webhook(
+pub async fn send_slack_webhook(
     webhook_url: Option<&str>,
     alert_name: &str,
     condition: &str,
@@ -316,7 +316,7 @@ async fn send_slack_webhook(
 }
 
 /// Send alert via operational webhook (customer's configured webhook URL).
-async fn send_webhook_notification(
+pub async fn send_webhook_notification(
     pool: &PgPool,
     customer_id: Uuid,
     alert_name: &str,
