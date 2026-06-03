@@ -43,7 +43,7 @@ export function SpecInputPanel({
   }
 }`;
 
-  const fetchSpec = async () => {
+  const fetchSpec = useCallback(async () => {
     if (!specUrl) return;
     setFetching(true);
     try {
@@ -63,7 +63,7 @@ export function SpecInputPanel({
     } finally {
       setFetching(false);
     }
-  };
+  }, [specUrl, onParsed, toast, t]);
 
   const parseContent = useCallback(() => {
     if (!specContent) return;
@@ -94,7 +94,7 @@ export function SpecInputPanel({
       if (mode === 'url' && specUrl && !fetching) fetchSpec();
       else if (mode === 'paste' && specContent && !parsing) parseContent();
     }
-  }, [mode, specUrl, specContent, fetching, parsing]);
+  }, [mode, specUrl, specContent, fetching, parsing, fetchSpec, parseContent]);
 
   return (
     <div onKeyDown={handleKeyDown}>
