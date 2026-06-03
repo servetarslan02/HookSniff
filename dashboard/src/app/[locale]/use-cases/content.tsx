@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 import { Cloud, ShoppingCart, CreditCard, Bot, Wrench, HeartPulse, Anchor, XCircle, CheckCircle } from '@/components/icons';
 
 /* ─── Data ─── */
@@ -248,7 +248,7 @@ hs.webhooks.send(
     ],
     solutions: [
       'Webhook playground — test payloads before going live',
-      '11 SDKs covering every major language',
+      '11 SDKs (in development) covering every major language',
       'Per-delivery logs with request/response bodies',
       'Embeddable portal for your users to manage their webhooks',
     ],
@@ -358,17 +358,7 @@ export function UseCasesPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      {/* Nav */}
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white"><Anchor size={20} strokeWidth={1.75} className="inline mr-1" /> HookSniff</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle={t("title")} />
 
       <main className="max-w-6xl mx-auto px-6 py-16">
         {/* Hero */}

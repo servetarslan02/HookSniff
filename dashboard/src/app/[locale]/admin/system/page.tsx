@@ -100,7 +100,7 @@ export default function AdminSystemPage() {
     { label: t('database'), value: 'Neon PostgreSQL', detail: 'Serverless, Free tier' },
     { label: t('cache'), value: 'Upstash Redis', detail: 'Serverless, Free tier' },
     { label: t('cdn'), value: 'Cloudflare Workers', detail: 'Edge proxy, DNS, SSL' },
-    { label: t('dashboard'), value: 'Vercel', detail: 'Next.js 15, Hobby plan' },
+    { label: t('dashboard'), value: 'Vercel', detail: 'Next.js 16, Hobby plan' },
     { label: t('monitoring'), value: 'Grafana Cloud', detail: 'OpenTelemetry, Free tier' },
   ];
 

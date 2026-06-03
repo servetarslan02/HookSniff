@@ -87,7 +87,7 @@ HookSniff/
 │       ├── main.rs             # PostgreSQL LISTEN/NOTIFY + polling
 │       ├── delivery/           # HTTP delivery router
 │       └── signing.rs          # Webhook signing for deliveries
-├── dashboard/                  # Next.js 15 — 76 files, 41 pages
+├── dashboard/                  # Next.js 16 — 76 files, 41 pages
 │   └── src/
 │       ├── app/[locale]/       # App Router with i18n
 │       │   ├── page.tsx        # Landing page (typewriter, particles, pricing)
