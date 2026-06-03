@@ -1474,10 +1474,20 @@
     ],
     "s14Title": "14. Modifications",
     "s14Text": "We may update these Terms from time to time. We will notify you of material changes via email or dashboard notification. Continued use after changes constitutes acceptance.",
-    "s15Title": "15. Governing Law",
-    "s15Text": "These Terms are governed by the laws of Turkey. Any disputes shall be resolved in the courts of Turkey.",
-    "s16Title": "16. Contact",
-    "s16Text": "For questions about these Terms, contact us via the",
+    "s15Title": "15. Force Majeure",
+    "s15Text": "We shall not be liable for any failure or delay in performance due to circumstances beyond our reasonable control, including but not limited to: natural disasters, acts of war or terrorism, government actions, epidemics, power outages, internet disruptions, or third-party service failures.",
+    "s16Title": "16. Dispute Resolution",
+    "s16Intro": "Any disputes arising from these Terms shall be resolved as follows:",
+    "s16Items": [
+      "Negotiation: The parties shall first attempt to resolve disputes through good-faith negotiation",
+      "Mediation: If negotiation fails, the parties shall attempt mediation",
+      "Arbitration: If mediation fails, disputes shall be resolved by binding arbitration in Turkey",
+      "Class Action Waiver: You agree to resolve disputes individually and waive any right to participate in class actions"
+    ],
+    "s17Title": "17. Governing Law",
+    "s17Text": "These Terms are governed by the laws of Turkey. Any disputes shall be resolved in the courts of Turkey.",
+    "s18Title": "18. Contact",
+    "s18Text": "For questions about these Terms, contact us via the",
     "contactForm": "contact form"
   },
   "privacy": {
@@ -1571,6 +1581,24 @@
       "Withdraw consent: Where processing is based on consent"
     ],
     "s8How": "To exercise these rights, contact us via the contact form",
+    "s8GdprTitle": "8.1 GDPR Compliance (EU Users)",
+    "s8GdprText": "If you are located in the European Economic Area (EEA), you have additional rights under the General Data Protection Regulation (GDPR):",
+    "s8GdprItems": [
+      "Legal basis: We process data based on consent, contract performance, and legitimate interests",
+      "Data Protection Officer: Contact via dpo@hooksniff.com",
+      "Supervisory authority: You have the right to lodge a complaint with your local data protection authority",
+      "Data portability: You can request your data in a structured, machine-readable format",
+      "Right to erasure: You can request complete deletion of your personal data",
+      "Automated decision-making: We do not use automated decision-making or profiling"
+    ],
+    "s8CcpaTitle": "8.2 CCPA Compliance (California Users)",
+    "s8CcpaText": "If you are a California resident, you have rights under the California Consumer Privacy Act (CCPA):",
+    "s8CcpaItems": [
+      "Right to know: You can request what personal information we collect, use, and share",
+      "Right to delete: You can request deletion of your personal information",
+      "Right to opt-out: We do not sell your personal information",
+      "Non-discrimination: We will not discriminate against you for exercising your rights"
+    ],
     "s9Title": "9. Cookies",
     "s9Text": "We use essential cookies for authentication and session management. You can control cookies through your browser settings.",
     "s10Title": "10. International Transfers",
