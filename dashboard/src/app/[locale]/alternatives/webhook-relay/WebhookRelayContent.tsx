@@ -7,7 +7,6 @@ import { Lightbulb, Shuffle, X, Check } from '@/components/icons';
 
 export function WebhookRelayContent() {
   const t = useTranslations('alternatives');
-  const tc = useTranslations('compare');
   return (
     <div>
       <PublicNavbar pageTitle="HookSniff vs Webhook Relay" />

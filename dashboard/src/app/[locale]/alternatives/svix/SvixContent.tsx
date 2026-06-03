@@ -7,7 +7,6 @@ import { Building2, Lightbulb, X, Check } from '@/components/icons';
 
 export function SvixContent() {
   const t = useTranslations('alternatives');
-  const tc = useTranslations('compare');
 
   const rows = [
     { featureKey: 'pricePro', hooksniff: '$49/mo', svix: '$490/mo', bestFor: 'hooksniff' },

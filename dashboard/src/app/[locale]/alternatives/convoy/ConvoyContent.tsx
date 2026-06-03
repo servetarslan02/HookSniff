@@ -7,7 +7,6 @@ import { Package, X, Check, AlertTriangle } from '@/components/icons';
 
 export function ConvoyContent() {
   const t = useTranslations('alternatives');
-  const tc = useTranslations('compare');
   return (
     <div>
       <PublicNavbar pageTitle="HookSniff vs Convoy" />
