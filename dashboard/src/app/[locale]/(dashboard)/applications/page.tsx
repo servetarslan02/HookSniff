@@ -290,11 +290,6 @@ export default function ApplicationsPage() {
             const labels = getAppLabels(app);
             return (
               <div className="relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow mb-4">
-                {/* UUID */}
-                <p className="text-[11px] font-mono text-gray-400 dark:text-gray-500 mb-1 truncate">
-                  {app.id}
-                </p>
-
                 {/* Name */}
                 <PrefetchLink
                   href={`/applications/${app.id}`}
