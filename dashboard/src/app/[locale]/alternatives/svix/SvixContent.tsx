@@ -1,7 +1,7 @@
 'use client';
 
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import { Building2, Lightbulb, X, Check } from '@/components/icons';
 
@@ -26,18 +26,7 @@ export function SvixContent() {
 
   return (
     <div>
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">{tc("sdks")}</span>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Svix</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle={`HookSniff vs Svix`} />
       <main className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">HookSniff vs Svix</h1>
