@@ -43,19 +43,8 @@ const nextConfig = {
       ],
     }];
   },
-  async rewrites() {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1';
-    return [
-      {
-        source: '/api/health',
-        destination: `${apiBase}/health`,
-      },
-      {
-        source: '/api/:path*',
-        destination: `${apiBase}/:path*`,
-      },
-    ];
-  },
+  // Rewrites removed — Next.js API routes proxy to backend directly
+  // This avoids Vercel edge DNS_HOSTNAME_RESOLVED_PRIVATE issues
 };
 
 // Bundle analyzer â€” ANALYZE=true npm run build
