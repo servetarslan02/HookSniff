@@ -206,12 +206,10 @@ async fn latency_trend(
     .fetch_all(&pool)
     .await?;
 
-    // Overall avg + p95 (single pass over entire range)
-    let overall: (f64, f64) = sqlx::query_as(
+    // Overall avg (lightweight — p95 computed in Rust from bucket data)
+    let overall_avg: f64 = sqlx::query_scalar(
         r#"
-        SELECT
-            COALESCE(AVG(da.duration_ms), 0)::FLOAT,
-            COALESCE(PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY da.duration_ms), 0)::FLOAT
+        SELECT COALESCE(AVG(da.duration_ms), 0)::DOUBLE PRECISION
         FROM delivery_attempts da
         JOIN deliveries d ON d.id = da.delivery_id
         WHERE d.customer_id = $1
@@ -224,6 +222,16 @@ async fn latency_trend(
     .fetch_one(&pool)
     .await?;
 
+    // Compute p95 from bucket avg values (lightweight approximation)
+    let mut avg_values: Vec<f64> = buckets.iter().map(|(_, avg, _)| *avg).collect();
+    avg_values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+    let p95 = if avg_values.is_empty() {
+        0.0
+    } else {
+        let idx = ((avg_values.len() as f64) * 0.95).ceil() as usize;
+        avg_values[idx.min(avg_values.len()) - 1]
+    };
+
     Ok(Json(LatencyTrendResponse {
         range: range_label.to_string(),
         buckets: buckets
@@ -234,8 +242,8 @@ async fn latency_trend(
                 p95_ms: p95,
             })
             .collect(),
-        overall_avg_ms: overall.0,
-        overall_p95_ms: overall.1,
+        overall_avg_ms: overall_avg,
+        overall_p95_ms: p95,
     }))
 }
 
