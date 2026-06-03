@@ -156,7 +156,7 @@ steps:
       - '--cpu=0.5'
       - '--min-instances=1'
       - '--max-instances=2'
-      - '--set-env-vars=NEXT_PUBLIC_API_URL=https://hooksniff-api-1046140057667.europe-west1.run.app/v1,NODE_ENV=production'
+      - '--set-env-vars=NEXT_PUBLIC_API_URL=https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1,NODE_ENV=production'
       - '--project=$PROJECT_ID'
       - '--quiet'
     waitFor: ['push-dashboard', 'deploy-api']
