@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
 import { useTemplates } from '@/hooks/useDashboardData';
-import { BarChart3, ClipboardList, Radio, X } from '@/components/icons';
+import { BarChart3, Bot, ClipboardList, Radio, X } from '@/components/icons';
 
 interface Template {
  id: string;
