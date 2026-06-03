@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-API_URL="https://hooksniff-api-1046140057667.europe-west1.run.app"
+API_URL="https://hooksniff-api-e6ztf3x2ma-ew.a.run.app"
 OTLP_URL="https://otlp-gateway-prod-eu-west-2.grafana.net/otlp/v1/metrics"
 DB_URL="postgresql://neondb_owner:npg_HUw5KmSC2nQL@ep-frosty-bar-al0hyt9d-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require"
 export DB_URL

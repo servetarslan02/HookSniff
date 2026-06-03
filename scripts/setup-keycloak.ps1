@@ -20,7 +20,7 @@ $client = @{
     protocol = "openid-connect"
     publicClient = $false
     secret = "hooksniff-secret-key"
-    redirectUris = @("https://hooksniff-api-1046140057667.europe-west1.run.app/v1/sso/oidc/callback", "https://hooksniff.vercel.app/*")
+    redirectUris = @("https://hooksniff-api-e6ztf3x2ma-ew.a.run.app/v1/sso/oidc/callback", "https://hooksniff.vercel.app/*")
     standardFlowEnabled = $true
     directAccessGrantsEnabled = $true
 } | ConvertTo-Json -Depth 3

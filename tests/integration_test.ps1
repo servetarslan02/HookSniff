@@ -18,7 +18,7 @@
 # ---------------------------------------------------------------------------
 $BaseUrl = $env:HOOKSNIFF_BASE_URL ?? "http://localhost:3000"
 $ApiBase = "$BaseUrl/v1"
-$TestEmail = "integration-test-$(Get-Date -UFormat '%s')@hooksniff.is-a.dev"
+$TestEmail = "integration-test-$(Get-Date -UFormat '%s')@hooksniff.vercel.app"
 $TestPassword = "TestPass1234!"
 
 # Test counters
