@@ -11,9 +11,16 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
   },
-  experimental: {},
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-icons',
+      'recharts',
+      'date-fns',
+      'lodash-es',
+    ],
+  },
   typescript: {},
-  // ignoreBuildErrors removed — TS errors should fail builds
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
