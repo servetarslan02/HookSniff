@@ -393,43 +393,43 @@ export default function DeliveriesContent() {
                 data={allDeliveriesAcc}
                 estimateSize={56}
                 header={
-                  <div className="flex bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50 min-w-[700px]">
+                  <div className="flex bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50 min-w-[760px]">
                     {bulkReplayEnabled && (
-                      <div className="w-[40px] shrink-0 px-3 py-3">
+                      <div className="w-[36px] shrink-0 px-2 py-3">
                         <input type="checkbox" checked={deliveries.length > 0 && selectedIds.size === deliveries.length} onChange={toggleSelectAll} className="w-4 h-4 rounded-sm text-brand-600 focus:ring-brand-500" aria-label={t('selectAll')} />
                       </div>
                     )}
-                    <div className="w-[130px] shrink-0 px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</div>
-                    <div className="flex-1 min-w-[120px] px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('event')}</div>
-                    <div className="w-[100px] shrink-0 px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</div>
-                    <div className="w-[80px] shrink-0 px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">{t('attempts')}</div>
-                    <div className="w-[80px] shrink-0 px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">{t('response')}</div>
-                    <div className="w-[160px] shrink-0 px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('time')}</div>
-                    <div className="w-[100px] shrink-0 px-3 sm:px-6 py-3" />
+                    <div className="w-[160px] shrink-0 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">ID</div>
+                    <div className="w-[150px] shrink-0 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('event')}</div>
+                    <div className="w-[110px] shrink-0 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</div>
+                    <div className="w-[70px] shrink-0 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">{t('attempts')}</div>
+                    <div className="w-[70px] shrink-0 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">{t('response')}</div>
+                    <div className="flex-1 min-w-[140px] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('time')}</div>
+                    <div className="w-[110px] shrink-0 px-3 py-3" />
                   </div>
                 }
                 renderRow={(d) => (
                   <div
-                    className={`flex hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer border-b border-gray-200/50 dark:border-slate-700/50 min-w-[700px] ${selectedIds.has(d.id) ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''}`}
+                    className={`flex hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition cursor-pointer border-b border-gray-200/50 dark:border-slate-700/50 min-w-[760px] ${selectedIds.has(d.id) ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''}`}
                     onClick={() => router.push(`/deliveries/${d.id}`)}
                   >
                     {bulkReplayEnabled && (
-                      <div className="w-[40px] shrink-0 px-3 py-3">
+                      <div className="w-[36px] shrink-0 px-2 py-3">
                         <input type="checkbox" checked={selectedIds.has(d.id)} onChange={(e) => toggleSelect(d.id, e as unknown as React.MouseEvent)} onClick={(e) => e.stopPropagation()} className="w-4 h-4 rounded-sm text-brand-600 focus:ring-brand-500" aria-label={`Select ${d.id.slice(0, 12)}`} />
                       </div>
                     )}
-                    <div className="w-[130px] shrink-0 px-3 sm:px-6 py-3 text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-400 overflow-hidden text-ellipsis">{d.id.slice(0, 12)}…</div>
-                    <div className="flex-1 min-w-[120px] px-3 sm:px-6 py-3">
+                    <div className="w-[160px] shrink-0 px-3 py-3 text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-400 overflow-hidden text-ellipsis">{d.id.slice(0, 12)}…</div>
+                    <div className="w-[150px] shrink-0 px-3 py-3">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-xs font-mono text-gray-700 dark:text-slate-300">{d.event || '—'}</span>
                     </div>
-                    <div className="w-[100px] shrink-0 px-3 sm:px-6 py-3"><StatusBadge status={d.status} /></div>
-                    <div className="w-[80px] shrink-0 px-3 sm:px-6 py-3 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:flex items-center">
+                    <div className="w-[110px] shrink-0 px-3 py-3"><StatusBadge status={d.status} /></div>
+                    <div className="w-[70px] shrink-0 px-3 py-3 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:flex items-center">
                       <div className="flex items-center gap-1.5">
                         {d.attempt_count > 1 && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
                         {d.attempt_count}
                       </div>
                     </div>
-                    <div className="w-[80px] shrink-0 px-3 sm:px-6 py-3 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:flex items-center">
+                    <div className="w-[70px] shrink-0 px-3 py-3 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden md:flex items-center">
                       {d.response_status ? (
                         <span className={`text-xs sm:text-sm font-mono font-medium ${
                           d.response_status < 300 ? 'text-green-600 dark:text-green-400'
@@ -439,11 +439,11 @@ export default function DeliveriesContent() {
                         }`}>{d.response_status}</span>
                       ) : <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-500">—</span>}
                     </div>
-                    <div className="w-[160px] shrink-0 px-3 sm:px-6 py-3 text-xs sm:text-sm text-gray-500 dark:text-slate-400 overflow-hidden text-ellipsis">
+                    <div className="flex-1 min-w-[140px] px-3 py-3 text-xs sm:text-sm text-gray-500 dark:text-slate-400">
                       {new Date(d.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </div>
-                    <div className="w-[100px] shrink-0 px-3 sm:px-6 py-3">
-                      <div className="flex items-center gap-2">
+                    <div className="w-[110px] shrink-0 px-3 py-3">
+                      <div className="flex items-center gap-1.5">
                         <button type="button" onClick={(e) => { e.stopPropagation(); openDetailModal(d); }} className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition" title={tl('deliveryDetails')}>
                           <Package size={16} strokeWidth={1.75} />
                         </button>
