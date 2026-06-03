@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, EyeOff, ExternalLink, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 import { IDP_TEMPLATES } from './sso-utils';
