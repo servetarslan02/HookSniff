@@ -79,8 +79,8 @@ export function UserTable({
         data={sortedUsers}
         estimateSize={60}
         header={
-          <div className="grid grid-cols-[36px_1fr_80px_80px_80px_100px] md:grid-cols-[36px_70px_1fr_80px_80px_80px_100px] lg:grid-cols-[36px_70px_1fr_100px_90px_90px_100px_120px] bg-gray-50/50 dark:bg-slate-800/50">
-            <div className="px-2 py-3 flex items-center">
+          <div className="grid grid-cols-[32px_minmax(0,1.5fr)_auto_auto_auto_auto] gap-x-1 bg-gray-50/50 dark:bg-slate-800/50">
+            <div className="px-1 py-3 flex items-center">
               <input
                 type="checkbox"
                 checked={sortedUsers.length > 0 && selectedIds.size === sortedUsers.length}
@@ -89,25 +89,24 @@ export function UserTable({
                 className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
               />
             </div>
-            <div className="hidden md:flex px-2 py-3 items-center"><span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{tc('id')}</span></div>
-            <button type="button" onClick={() => handleSort('email')} className="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByEmail')}>
+            <button type="button" onClick={() => handleSort('email')} className="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1 truncate" aria-label={t('sortByEmail')}>
               {tc('email')} {sortField === 'email' && (sortDir === 'asc' ? '↑' : '↓')}
             </button>
-            <button type="button" onClick={() => handleSort('plan')} className="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByPlan')}>
+            <button type="button" onClick={() => handleSort('plan')} className="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1 whitespace-nowrap" aria-label={t('sortByPlan')}>
               {tc('plan')} {sortField === 'plan' && (sortDir === 'asc' ? '↑' : '↓')}
             </button>
-            <button type="button" onClick={() => handleSort('status')} className="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByStatus')}>
+            <button type="button" onClick={() => handleSort('status')} className="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1 whitespace-nowrap" aria-label={t('sortByStatus')}>
               {tc('status')} {sortField === 'status' && (sortDir === 'asc' ? '↑' : '↓')}
             </button>
-            <button type="button" onClick={() => handleSort('created_at')} className="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1" aria-label={t('sortByCreated')}>
+            <button type="button" onClick={() => handleSort('created_at')} className="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-slate-300 transition flex items-center gap-1 whitespace-nowrap" aria-label={t('sortByCreated')}>
               {tc('created')} {sortField === 'created_at' && (sortDir === 'asc' ? '↑' : '↓')}
             </button>
-            <div className="hidden lg:flex px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider items-center">{tc('actions')}</div>
+            <div className="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center whitespace-nowrap">{tc('actions')}</div>
           </div>
         }
         renderRow={(u) => (
-          <div className={`grid grid-cols-[36px_1fr_80px_80px_80px_100px] md:grid-cols-[36px_70px_1fr_80px_80px_80px_100px] lg:grid-cols-[36px_70px_1fr_100px_90px_90px_100px_120px] hover:bg-gray-100 dark:hover:bg-gray-700 transition border-b border-gray-200/50 dark:border-slate-700/50 ${selectedIds.has(u.id) ? 'bg-red-50/50 dark:bg-red-500/5' : ''}`}>
-            <div className="px-2 py-3 flex items-center">
+          <div className={`grid grid-cols-[32px_minmax(0,1.5fr)_auto_auto_auto_auto] gap-x-1 hover:bg-gray-100 dark:hover:bg-gray-700 transition border-b border-gray-200/50 dark:border-slate-700/50 ${selectedIds.has(u.id) ? 'bg-red-50/50 dark:bg-red-500/5' : ''}`}>
+            <div className="px-1 py-3 flex items-center">
               <input
                 type="checkbox"
                 checked={selectedIds.has(u.id)}
@@ -116,33 +115,31 @@ export function UserTable({
                 className="w-4 h-4 rounded-sm border-gray-300 dark:border-slate-600 text-red-600 focus:ring-red-500"
               />
             </div>
-            <div className="hidden md:flex px-2 py-3 text-xs font-mono text-gray-600 dark:text-slate-400 items-center">{u.id.slice(0, 8)}…</div>
             <div className="px-2 py-3 flex items-center min-w-0">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="w-7 h-7 rounded-full bg-linear-to-br from-red-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                   {(u.name || u.email)?.charAt(0).toUpperCase() || '?'}
                 </div>
                 <div className="min-w-0">
-                  <span className="text-xs sm:text-sm text-gray-900 dark:text-white truncate block">{u.email}</span>
-                  <span className="text-[11px] text-gray-500 dark:text-slate-400 truncate block lg:hidden">{u.name || '—'}</span>
+                  <span className="text-xs text-gray-900 dark:text-white truncate block max-w-[180px] sm:max-w-none">{u.email}</span>
+                  <span className="text-[11px] text-gray-500 dark:text-slate-400 truncate block">{u.name || '—'}</span>
                 </div>
               </div>
             </div>
-            <div className="hidden lg:flex px-2 py-3 text-xs text-gray-600 dark:text-slate-400 items-center truncate">{u.name || '—'}</div>
             <div className="px-2 py-3 flex items-center">
-              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[11px] font-medium ${planBadgeColors[u.plan ?? 'developer'] || planBadgeColors.developer}`}>
+              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap ${planBadgeColors[u.plan ?? 'developer'] || planBadgeColors.developer}`}>
                 {u.plan ?? 'dev'}
               </span>
             </div>
             <div className="px-2 py-3 flex items-center">
               <StatusBadge status={u.status ?? 'active'} />
             </div>
-            <div className="px-2 py-3 text-[11px] text-gray-500 dark:text-slate-400 flex items-center">
+            <div className="px-2 py-3 text-[11px] text-gray-500 dark:text-slate-400 flex items-center whitespace-nowrap">
               {new Date(u.created_at ?? '').toLocaleDateString(locale === 'tr' ? 'tr-TR' : 'en-US', { day: '2-digit', month: '2-digit', year: '2-digit' })}
             </div>
-            <div className="hidden lg:flex px-2 py-3 items-center gap-2">
+            <div className="px-2 py-3 flex items-center gap-2 whitespace-nowrap">
               <PrefetchLink href={`/admin/users/${u.id}`} prefetchData={userDetailPrefetch(u.id)} hoverDelay={80} className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 font-medium">{tc('view')}</PrefetchLink>
-              <button type="button" onClick={() => { setPlanChangeTarget(u); setNewPlan(u.plan ?? 'developer'); }} className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium">{t('changePlan')}</button>
+              <button type="button" onClick={() => { setPlanChangeTarget(u); setNewPlan(u.plan ?? 'developer'); }} className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 font-medium hidden sm:inline">{t('changePlan')}</button>
             </div>
           </div>
         )}      />
