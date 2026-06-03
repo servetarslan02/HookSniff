@@ -25,6 +25,7 @@ export function TermsPageContent() {
   const s11 = t.raw('s11Items') as string[];
   const s12 = t.raw('s12Items') as string[];
   const s13 = t.raw('s13Items') as string[];
+  const s16 = t.raw('s16Items') as string[];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
@@ -116,7 +117,18 @@ export function TermsPageContent() {
 
           <section>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">{t('s16Title')}</h2>
-            <p>{t('s16Text')} <a href="/contact" className="text-brand-600 dark:text-brand-400 hover:underline">{t('contactForm')}</a></p>
+            <p className="mb-2">{t('s16Intro')}</p>
+            <ListItems items={s16} />
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">{t('s17Title')}</h2>
+            <p>{t('s17Text')}</p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">{t('s18Title')}</h2>
+            <p>{t('s18Text')} <a href="/contact" className="text-brand-600 dark:text-brand-400 hover:underline">{t('contactForm')}</a></p>
           </section>
         </div>
       </main>

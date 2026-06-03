@@ -312,18 +312,32 @@ async fn test_alert(
     Extension(pool): Extension<PgPool>,
     Extension(customer): Extension<Customer>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
+    Extension(email_client): Extension<crate::resend_email::ResendEmailClient>,
     axum::extract::Path(id): axum::extract::Path<Uuid>,
 ) -> Result<Json<serde_json::Value>, AppError> {
-    // Verify ownership and fetch alert details
-    let alert_info: Option<(Uuid, String, String)> = sqlx::query_as(
-        "SELECT id, name, condition FROM alert_rules WHERE id = $1 AND customer_id = $2",
+    // Verify ownership and fetch alert details (including channels + webhook_url)
+    let alert_info: Option<(Uuid, String, String, serde_json::Value, Option<String>)> = sqlx::query_as(
+        "SELECT id, name, condition, channels, webhook_url FROM alert_rules WHERE id = $1 AND customer_id = $2",
     )
     .bind(id)
     .bind(customer.id)
     .fetch_optional(&pool)
     .await?;
 
-    let (alert_id, alert_name, alert_condition) = alert_info.ok_or(AppError::NotFound)?;
+    let (alert_id, alert_name, alert_condition, channels_json, webhook_url) = alert_info.ok_or(AppError::NotFound)?;
+
+    // Fetch customer email + language for email channel
+    let customer_info: Option<(String, String)> = sqlx::query_as(
+        "SELECT email, COALESCE(language, 'en') FROM customers WHERE id = $1"
+    )
+    .bind(customer.id)
+    .fetch_optional(&pool)
+    .await?;
+
+    let channels: Vec<String> = channels_json
+        .as_array()
+        .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
+        .unwrap_or_default();
 
     // Publish AlertTriggered event (best-effort)
     if let Some(ref publisher) = event_publisher {
@@ -340,19 +354,73 @@ async fn test_alert(
     // Log the test alert trigger for debugging
     tracing::info!("🔔 Test alert triggered: '{}' (condition: {}, customer: {})", alert_name, alert_condition, customer.id);
 
+    // Send test notifications via configured channels
+    let mut channels_sent: Vec<String> = Vec::new();
+    let test_value = 42.0;
+    let test_threshold = 10;
+
+    for channel in &channels {
+        let sent = match channel.as_str() {
+            "email" => {
+                if let Some((ref email, ref lang)) = customer_info {
+                    crate::jobs::alert_eval::send_alert_email(
+                        &email_client,
+                        email,
+                        &alert_name,
+                        &alert_condition,
+                        test_value,
+                        test_threshold,
+                        crate::email::Language::parse_lang(lang),
+                    ).await.is_ok()
+                } else {
+                    false
+                }
+            }
+            "slack" => {
+                crate::jobs::alert_eval::send_slack_webhook(
+                    webhook_url.as_deref(),
+                    &alert_name,
+                    &alert_condition,
+                    test_value,
+                    test_threshold,
+                ).await.is_ok()
+            }
+            "webhook" => {
+                crate::jobs::alert_eval::send_webhook_notification(
+                    &pool,
+                    customer.id,
+                    &alert_name,
+                    &alert_condition,
+                    test_value,
+                    test_threshold,
+                ).await.is_ok()
+            }
+            _ => false,
+        };
+
+        if sent {
+            channels_sent.push(channel.clone());
+        }
+    }
+
     // Create an in-app notification for the user
     let _ = sqlx::query(
         "INSERT INTO notifications (customer_id, type, title, message, is_read) VALUES ($1, 'alert', $2, $3, false)"
     )
     .bind(customer.id)
     .bind(format!("🚨 Test Alert: {}", alert_name))
-    .bind(format!("Condition '{}' would be evaluated. This is a test notification.", alert_condition))
+    .bind(format!(
+        "Test notification sent via: {}. Condition '{}'.",
+        if channels_sent.is_empty() { "none".to_string() } else { channels_sent.join(", ") },
+        alert_condition
+    ))
     .execute(&pool)
     .await;
 
     Ok(Json(serde_json::json!({
         "success": true,
-        "message": "Test alert sent. Check your notification inbox."
+        "channels_sent": channels_sent,
+        "message": format!("Test alert sent via: {}", if channels_sent.is_empty() { "none (check channel config)".to_string() } else { channels_sent.join(", ") })
     })))
 }
 
