@@ -1,9 +1,46 @@
 'use client';
 
+import { memo, useMemo } from 'react';
 import { AlertTriangle, BarChart3, Building2, Check, CheckCircle2, ClipboardList, Eye, EyeOff, ExternalLink, Globe, Key, Pencil, Shield, ShieldCheck, Users, XCircle } from '@/components/icons';
 import { RoleGuard, ReadOnlyBadge } from '@/components/RoleGuard';
 import { IDP_TEMPLATES } from './sso-utils';
 import { useSsoHandlers } from './useSsoHandlers';
+
+/* ─── Sub-sections (memoized to prevent unnecessary re-renders) ─── */
+const LoadingSkeleton = memo(function LoadingSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="glass-card p-6 animate-pulse">
+        <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/3 mb-4" />
+        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2" />
+      </div>
+    </div>
+  );
+});
+
+const UpgradePrompt = memo(function UpgradePrompt({ t }: { t: (key: string) => string }) {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+        <p className="text-gray-500 dark:text-slate-400 mt-1">{t('subtitle')}</p>
+      </div>
+      <div className="glass-card p-8 text-center">
+        <div className="text-5xl mb-4"><ShieldCheck size={18} strokeWidth={1.75} /></div>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('enterpriseOnlyTitle')}</h2>
+        <p className="text-gray-500 dark:text-slate-400 mb-6 max-w-md mx-auto">{t('enterpriseOnlyDesc')}</p>
+        <a href="/billing" className="inline-block px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition">
+          {t('upgradeNow')}
+        </a>
+        <p className="mt-4 text-sm text-gray-500 dark:text-slate-400">
+          <a href="/docs/sso" target="_blank" rel="noopener noreferrer" className="text-brand-600 dark:text-brand-400 hover:underline">
+            {t('learnMore') || 'Learn how SSO works →'}
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+});
 
 /* ─── SSO/SAML Configuration Page (Enterprise Only) ─── */
 export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
@@ -11,39 +48,12 @@ export function SsoContent({ teamId: teamIdProp }: { teamId?: string } = {}) {
 
   // ── Loading ──
   if (h.loading) {
-    return (
-      <div className="space-y-6">
-        <div className="glass-card p-6 animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/3 mb-4" />
-          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded-sm w-1/2" />
-        </div>
-      </div>
-    );
+    return <LoadingSkeleton />;
   }
 
   // ── Non-Enterprise: upgrade prompt ──
   if (!h.isEnterprise) {
-    return (
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{h.t('title')}</h1>
-          <p className="text-gray-500 dark:text-slate-400 mt-1">{h.t('subtitle')}</p>
-        </div>
-        <div className="glass-card p-8 text-center">
-          <div className="text-5xl mb-4"><ShieldCheck size={18} strokeWidth={1.75} /></div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{h.t('enterpriseOnlyTitle')}</h2>
-          <p className="text-gray-500 dark:text-slate-400 mb-6 max-w-md mx-auto">{h.t('enterpriseOnlyDesc')}</p>
-          <a href="/billing" className="inline-block px-6 py-3 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition">
-            {h.t('upgradeNow')}
-          </a>
-          <p className="mt-4 text-sm text-gray-500 dark:text-slate-400">
-            <a href="/docs/sso" target="_blank" rel="noopener noreferrer" className="text-brand-600 dark:text-brand-400 hover:underline">
-              {h.t('learnMore') || 'Learn how SSO works →'}
-            </a>
-          </p>
-        </div>
-      </div>
-    );
+    return <UpgradePrompt t={h.t} />;
   }
 
   // ── Enterprise: full SSO config ──

@@ -28,7 +28,7 @@ export default function AnalyticsPage() {
 
   const { data: trendData, isLoading: trendLoading } = useDeliveryTrend(timeRange);
   const { data: successRateData, isLoading: srLoading } = useSuccessRate(timeRange);
-  const { data: latencyData, isLoading: latencyLoading } = useLatencyTrend(timeRange);
+  const { data: latencyData, isLoading: latencyLoading, error: latencyError } = useLatencyTrend(timeRange);
 
   const loading = trendLoading || srLoading || latencyLoading;
 
