@@ -68,7 +68,7 @@ export function DriftTab() {
                     </span>
                   </div>
                 </div>
-                <time className="text-xs text-gray-500">{new Date(ev.created_at).toLocaleString('tr-TR')}</time>
+                <time className="text-xs text-gray-500">{new Date(ev.created_at).toLocaleString()}</time>
               </div>
               <div className="mt-2 text-sm text-gray-600 dark:text-slate-400">
                 <p><strong>{t('affected')}</strong> {ev.features_affected.join(', ') || '—'}</p>

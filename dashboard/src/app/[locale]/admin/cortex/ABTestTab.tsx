@@ -63,16 +63,16 @@ export function ABTestTab() {
               <div className="mt-2 flex gap-4 text-sm">
                 <div className="flex-1 p-2 rounded bg-gray-50 dark:bg-slate-800 text-center">
                   <div className="font-medium">A: {t.variant_a}</div>
-                  <div className="text-xs text-gray-500">{(t.split_ratio * 100).toFixed(0)}% trafik</div>
+                  <div className="text-xs text-gray-500">{(t.split_ratio * 100).toFixed(0)}% {t('traffic')}</div>
                 </div>
                 <div className="flex items-center text-gray-400">vs</div>
                 <div className="flex-1 p-2 rounded bg-gray-50 dark:bg-slate-800 text-center">
                   <div className="font-medium">B: {t.variant_b}</div>
-                  <div className="text-xs text-gray-500">{((1 - t.split_ratio) * 100).toFixed(0)}% trafik</div>
+                  <div className="text-xs text-gray-500">{((1 - t.split_ratio) * 100).toFixed(0)}% {t('traffic')}</div>
                 </div>
               </div>
               {t.winner && (
-                <div className="mt-2 text-sm text-emerald-600 font-medium">🏆 Kazanan: {t.winner}</div>
+                <div className="mt-2 text-sm text-emerald-600 font-medium">🏆 {t('winner', {v: t.winner})}</div>
               )}
             </div>
           ))}

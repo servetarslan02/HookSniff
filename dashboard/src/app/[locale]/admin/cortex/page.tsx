@@ -126,27 +126,27 @@ function OverviewTab({ health }: { health: CortexHealth | null }) {
     return (
       <div className="glass-card p-8 text-center">
         <Brain size={48} className="mx-auto text-gray-300 dark:text-slate-600 mb-4" />
-        <p className="text-gray-500 dark:text-slate-400">Henüz veri toplanıyor. Cortex'in başlaması için birkaç dakika bekleyin.</p>
+        <p className="text-gray-500 dark:text-slate-400">t('overview.noData').split('.')[0] + '. ' + t('overview.noData').split('.').slice(1).join('.')n başlaması için birkaç dakika bekleyin.</p>
       </div>
     );
   }
   const m = health.metrics;
 
   const systemHealth = m.anomalies_24h === 0 && m.healing_actions_24h === 0
-    ? { icon: '✅', text: 'Tüm endpoint\'ler sağlıklı', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' }
+    ? { icon: '✅', text: t('anomalies.empty.description'), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' }
     : m.anomalies_24h > 10
-    ? { icon: '🚨', text: `${m.anomalies_24h} sorun tespit edildi — müdahale gerekebilir`, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' }
-    : { icon: '⚠️', text: `${m.anomalies_24h} küçük sorun tespit edildi, ${m.healing_actions_24h} düzeltme yapıldı`, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20' };
+    ? { icon: '🚨', text: `${m.anomalies_24h} t('overview.issuesDetected', {n: m.anomalies_24h}).split('—')[0].trim()`, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' }
+    : { icon: '⚠️', text: `${m.anomalies_24h} t('overview.minorIssues', {n: m.anomalies_24h, h: m.healing_actions_24h}).split(',')[0].trim(), ${m.healing_actions_24h} düzeltme yapıldı`, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20' };
 
   const cards = [
     { label: 'İzlenen Endpoint', value: m.profiles_total, icon: Globe, color: 'text-blue-600', description: 'Aktif webhook adresleriniz' },
-    { label: 'Sorun (Son 24 Saat)', value: m.anomalies_24h, icon: AlertTriangle, color: m.anomalies_24h > 0 ? 'text-orange-600' : 'text-emerald-600', description: m.anomalies_24h === 0 ? 'Hiç sorun yok' : 'Performans düşüşü veya hata artışı' },
-    { label: 'Otomatik Düzeltme', value: m.healing_actions_24h, icon: ShieldCheck, color: 'text-emerald-600', description: 'Cortex\'in otomatik yaptığı müdahaleler' },
-    { label: 'Tahmin', value: m.predictions_24h, icon: TrendingUp, color: 'text-cyan-600', description: 'Olası gelecek sorunlar hakkında uyarı' },
+    { label: t('overview.metric.issues24h'), value: m.anomalies_24h, icon: AlertTriangle, color: m.anomalies_24h > 0 ? 'text-orange-600' : 'text-emerald-600', description: m.anomalies_24h === 0 ? 'Hiç sorun yok' : 'Performans düşüşü veya hata artışı' },
+    { label: t('overview.metric.autoFix'), value: m.healing_actions_24h, icon: ShieldCheck, color: 'text-emerald-600', description: 'Cortex\'in otomatik yaptığı müdahaleler' },
+    { label: t('overview.metric.predictions'), value: m.predictions_24h, icon: TrendingUp, color: 'text-cyan-600', description: 'Olası gelecek sorunlar hakkında uyarı' },
     { label: 'Aktif Öneri', value: m.active_insights, icon: Zap, color: 'text-yellow-600', description: 'İncelemeniz gereken öneriler' },
     { label: 'Veri Noktası', value: m.hourly_stats_total, icon: BarChart3, color: 'text-purple-600', description: 'Toplanan saatlik istatistik' },
     { label: 'ML Tahmin', value: m.ml_predictions_total, icon: Brain, color: 'text-indigo-600', description: m.ml_predictions_total === 0 ? 'Henüz tahmin üretilmedi' : `${m.ml_quality_samples_24h} kalite ölçümü (24s)` },
-    { label: 'Proaktif Uyarı', value: m.proactive_insights, icon: Shield, color: m.proactive_insights > 0 ? 'text-orange-600' : 'text-emerald-600', description: m.proactive_insights === 0 ? 'Sorun yok, sistem izliyor' : 'Dikkat gereken durumlar var' },
+    { label: t('overview.metric.proactiveAlert'), value: m.proactive_insights, icon: Shield, color: m.proactive_insights > 0 ? 'text-orange-600' : 'text-emerald-600', description: m.proactive_insights === 0 ? 'Sorun yok, sistem izliyor' : 'Dikkat gereken durumlar var' },
   ];
 
   return (
