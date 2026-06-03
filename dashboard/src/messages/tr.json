@@ -7235,18 +7235,21 @@
       },
       "avgAccuracy": "Ort. Accuracy",
       "avgF1": "Ort. F1 Score",
-      "worstModels": "En Kötü Modeller"
+      "worstModels": "En Kötü Modeller",
+      "error": "Model verileri yüklenemedi. Cortex ML servisi başlatılıyor olabilir."
     },
     "abTest": {
       "title": "A/B Testleri",
       "empty": "Henüz A/B testi yok. Model karşılaştırmaları için API'den test başlatın.",
       "endpoint": "Endpoint:",
-      "traffic": "% trafik"
+      "traffic": "% trafik",
+      "winner": "Kazanan: {v}"
     },
     "autoML": {
       "title": "AutoML Optimizasyon Denemeleri",
       "empty": "Henüz AutoML denemesi yok. API'den optimizasyon başlatın.",
-      "best": "En İyi"
+      "best": "En İyi",
+      "trialCount": "{n} deneme"
     },
     "securityPage": {
       "title": "Güvenlik İzleme",
@@ -7258,7 +7261,27 @@
         "issues24h": "Sorun (Son 24 Saat)",
         "autoFix": "Otomatik Düzeltme",
         "predictions": "Tahmin",
-        "proactiveAlert": "Proaktif Uyarı"
+        "proactiveAlert": "Proaktif Uyarı",
+        "monitoredEndpoints": "İzlenen Endpoint",
+        "activeInsights": "Aktif Öneri",
+        "dataPoints": "Veri Noktası",
+        "mlPredictions": "ML Tahmin"
+      },
+      "issuesDetected": "{n} sorun tespit edildi — hemen inceleyin",
+      "minorIssues": "{n} küçük sorun, {h} düzeltme yapıldı",
+      "statsSummary": "Son 24 saatte {dataPoints} veri noktası toplandı, {endpoints} endpoint izleniyor",
+      "desc": {
+        "monitoredEndpoints": "Aktif webhook adresleriniz",
+        "noIssues": "Hiç sorun yok",
+        "performanceDrop": "Performans düşüşü veya hata artışı",
+        "autoFix": "Cortex'in otomatik yaptığı müdahaleler",
+        "predictions": "Olası gelecek sorunlar hakkında uyarı",
+        "activeInsights": "İncelemeniz gereken öneriler",
+        "dataPoints": "Toplanan saatlik istatistik",
+        "noPredictions": "Henüz tahmin üretilmedi",
+        "qualitySamples": "{n} kalite ölçümü (24s)",
+        "systemNormal": "Sorun yok, sistem izliyor",
+        "needsAttention": "Dikkat gereken durumlar var"
       }
     }
   }
