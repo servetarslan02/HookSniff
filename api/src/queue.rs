@@ -8,7 +8,6 @@
 
 use anyhow::Result;
 use redis::aio::ConnectionManager;
-use redis::streams::{StreamReadOptions, StreamReadReply};
 use serde::{Deserialize, Serialize};
 
 const STREAM_KEY: &str = "hooksniff:webhooks";
@@ -22,7 +21,6 @@ pub struct RedisQueue {
 }
 
 /// Message pushed to Redis Streams.
-/// Fields are String (not Uuid) for compatibility with WebhookMessage.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QueueMessage {
     pub delivery_id: String,
@@ -46,7 +44,7 @@ impl RedisQueue {
         let mut conn = ConnectionManager::new(client).await?;
 
         // Create consumer group (idempotent — BUSYGROUP error is swallowed)
-        let _: Result<(), _> = redis::cmd("XGROUP")
+        let _: Result<(), redis::RedisError> = redis::cmd("XGROUP")
             .arg("CREATE")
             .arg(STREAM_KEY)
             .arg(CONSUMER_GROUP)
@@ -110,28 +108,21 @@ impl RedisQueue {
         count: usize,
         block_ms: usize,
     ) -> Result<Vec<(String, QueueMessage)>> {
-        let opts = StreamReadOptions::default()
-            .count(count)
-            .block(block_ms)
-            .group(CONSUMER_GROUP, consumer_name);
-
-        let result: StreamReadReply = self
-            .conn
-            .xread_options(&[STREAM_KEY], &[">"], &opts)
+        let result: redis::Value = redis::cmd("XREADGROUP")
+            .arg("GROUP")
+            .arg(CONSUMER_GROUP)
+            .arg(consumer_name)
+            .arg("COUNT")
+            .arg(count)
+            .arg("BLOCK")
+            .arg(block_ms)
+            .arg("STREAMS")
+            .arg(STREAM_KEY)
+            .arg(">")
+            .query_async(&mut self.conn)
             .await?;
 
-        let mut messages = Vec::new();
-        for stream in result.keys {
-            for entry in stream.ids {
-                match parse_entry(&entry) {
-                    Ok(msg) => messages.push((entry.id.clone(), msg)),
-                    Err(e) => {
-                        tracing::warn!("Failed to parse stream entry {}: {}", entry.id, e);
-                    }
-                }
-            }
-        }
-        Ok(messages)
+        parse_stream_result(result)
     }
 
     /// Acknowledge a message (delivery complete).
@@ -150,81 +141,150 @@ impl RedisQueue {
         &mut self,
         consumer_name: &str,
     ) -> Result<Vec<(String, QueueMessage)>> {
-        let result: (String, Vec<String>, Vec<redis::streams::StreamId>) =
-            redis::cmd("XAUTOCLAIM")
-                .arg(STREAM_KEY)
-                .arg(CONSUMER_GROUP)
-                .arg(consumer_name)
-                .arg(300_000) // 5 min timeout
-                .arg("0-0")
-                .query_async(&mut self.conn)
-                .await?;
+        let result: redis::Value = redis::cmd("XAUTOCLAIM")
+            .arg(STREAM_KEY)
+            .arg(CONSUMER_GROUP)
+            .arg(consumer_name)
+            .arg(300_000) // 5 min timeout
+            .arg("0-0")
+            .query_async(&mut self.conn)
+            .await?;
 
-        let (_, _, entries) = result;
-        entries
-            .into_iter()
-            .filter_map(|e| match parse_entry(&e) {
-                Ok(msg) => Some(Ok((e.id.clone(), msg))),
-                Err(err) => {
-                    tracing::warn!("Failed to parse claimed entry {}: {}", e.id, err);
-                    None
+        parse_xautoclaim_result(result)
+    }
+
+    /// Get stream length for monitoring.
+    pub async fn len(&mut self) -> Result<usize> {
+        let info: redis::Value = redis::cmd("XLEN")
+            .arg(STREAM_KEY)
+            .query_async(&mut self.conn)
+            .await?;
+
+        match info {
+            redis::Value::Int(n) => Ok(n as usize),
+            _ => Ok(0),
+        }
+    }
+}
+
+/// Parse XREADGROUP result into (stream_id, QueueMessage) pairs.
+fn parse_stream_result(value: redis::Value) -> Result<Vec<(String, QueueMessage)>> {
+    let mut messages = Vec::new();
+
+    if let redis::Value::Array(streams) = value {
+        for stream in streams {
+            if let redis::Value::Array(stream_data) = stream {
+                if stream_data.len() < 2 {
+                    continue;
                 }
-            })
-            .collect()
+                if let redis::Value::Array(entries) = &stream_data[1] {
+                    for entry in entries {
+                        if let Some((id, msg)) = parse_stream_entry(entry) {
+                            messages.push((id, msg));
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    /// Get stream info for monitoring.
-    pub async fn info(&mut self) -> Result<StreamInfo> {
-        let info: redis::streams::StreamInfoReply =
-            redis::cmd("XINFO")
-                .arg("STREAM")
-                .arg(STREAM_KEY)
-                .query_async(&mut self.conn)
-                .await?;
+    Ok(messages)
+}
 
-        Ok(StreamInfo {
-            length: info.length,
-            first_entry: info.first_entry.id,
-            last_entry: info.last_entry.id,
-        })
+/// Parse XAUTOCLAIM result.
+fn parse_xautoclaim_result(value: redis::Value) -> Result<Vec<(String, QueueMessage)>> {
+    let mut messages = Vec::new();
+
+    if let redis::Value::Array(result) = value {
+        if result.len() >= 2 {
+            if let redis::Value::Array(entries) = &result[1] {
+                for entry in entries {
+                    if let Some((id, msg)) = parse_stream_entry(entry) {
+                        messages.push((id, msg));
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(messages)
+}
+
+/// Parse a single stream entry: [id, [field, val, field, val, ...]]
+fn parse_stream_entry(entry: &redis::Value) -> Option<(String, QueueMessage)> {
+    if let redis::Value::Array(entry_data) = entry {
+        if entry_data.len() < 2 {
+            return None;
+        }
+
+        let stream_id = match &entry_data[0] {
+            redis::Value::Data(bytes) => String::from_utf8_lossy(bytes).to_string(),
+            redis::Value::BulkString(bytes) => String::from_utf8_lossy(bytes).to_string(),
+            _ => return None,
+        };
+
+        let fields = extract_fields(&entry_data[1]);
+
+        let delivery_id = fields.get("delivery_id")?.clone();
+        let endpoint_id = fields.get("endpoint_id")?.clone();
+
+        Some((
+            stream_id.clone(),
+            QueueMessage {
+                delivery_id,
+                endpoint_id,
+                endpoint_url: fields.get("url").cloned().unwrap_or_default(),
+                payload: fields.get("payload").cloned().unwrap_or_default(),
+                custom_headers: fields
+                    .get("headers")
+                    .and_then(|s| serde_json::from_str(s).ok()),
+                signing_secret: fields.get("signing_secret").cloned().unwrap_or_default(),
+                trace_id: fields.get("trace_id").filter(|s| !s.is_empty()).cloned(),
+                attempt_count: fields
+                    .get("attempt")
+                    .and_then(|s| s.parse().ok())
+                    .unwrap_or(0),
+                max_attempts: fields
+                    .get("max_attempts")
+                    .and_then(|s| s.parse().ok())
+                    .unwrap_or(5),
+                queue_item_id: fields.get("queue_item_id").cloned().unwrap_or_default(),
+            },
+        ))
+    } else {
+        None
     }
 }
 
-/// Stream metadata for monitoring.
-#[derive(Debug)]
-pub struct StreamInfo {
-    pub length: usize,
-    pub first_entry: String,
-    pub last_entry: String,
-}
+/// Extract field-value pairs from a Redis stream entry's field array.
+fn extract_fields(value: &redis::Value) -> std::collections::HashMap<String, String> {
+    let mut map = std::collections::HashMap::new();
 
-fn get_field(entry: &redis::streams::StreamId, field: &str) -> Result<String> {
-    entry
-        .get(field)
-        .ok_or_else(|| anyhow::anyhow!("Missing field: {}", field))
-}
+    if let redis::Value::Array(items) = value {
+        let mut i = 0;
+        while i + 1 < items.len() {
+            let key = match &items[i] {
+                redis::Value::Data(bytes) => String::from_utf8_lossy(bytes).to_string(),
+                redis::Value::BulkString(bytes) => String::from_utf8_lossy(bytes).to_string(),
+                _ => {
+                    i += 2;
+                    continue;
+                }
+            };
+            let val = match &items[i + 1] {
+                redis::Value::Data(bytes) => String::from_utf8_lossy(bytes).to_string(),
+                redis::Value::BulkString(bytes) => String::from_utf8_lossy(bytes).to_string(),
+                redis::Value::Int(n) => n.to_string(),
+                redis::Value::Nil => String::new(),
+                _ => {
+                    i += 2;
+                    continue;
+                }
+            };
+            map.insert(key, val);
+            i += 2;
+        }
+    }
 
-fn parse_entry(entry: &redis::streams::StreamId) -> Result<QueueMessage> {
-    Ok(QueueMessage {
-        delivery_id: get_field(entry, "delivery_id")?,
-        endpoint_id: get_field(entry, "endpoint_id")?,
-        endpoint_url: get_field(entry, "url").unwrap_or_default(),
-        payload: get_field(entry, "payload").unwrap_or_default(),
-        custom_headers: get_field(entry, "headers")
-            .ok()
-            .and_then(|s| serde_json::from_str(&s).ok()),
-        signing_secret: get_field(entry, "signing_secret").unwrap_or_default(),
-        trace_id: get_field(entry, "trace_id")
-            .ok()
-            .filter(|s| !s.is_empty()),
-        attempt_count: get_field(entry, "attempt")
-            .unwrap_or("0".into())
-            .parse()
-            .unwrap_or(0),
-        max_attempts: get_field(entry, "max_attempts")
-            .unwrap_or("5".into())
-            .parse()
-            .unwrap_or(5),
-        queue_item_id: get_field(entry, "queue_item_id").unwrap_or_default(),
-    })
+    map
 }

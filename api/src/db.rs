@@ -287,7 +287,7 @@ pub async fn publish_to_queue_fast(
     let trace_id = crate::telemetry::current_trace_id();
 
     // ── Try Redis first (fast path) ──
-    if Some(redis) = redis_queue.as_mut() {
+    if let Some(ref mut redis) = redis_queue {
         let msg = crate::queue::QueueMessage {
             delivery_id: delivery_id.to_string(),
             endpoint_id: endpoint_id.to_string(),
