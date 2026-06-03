@@ -171,10 +171,16 @@ export default function TransformsPage() {
     </select>
    </div>
 
-   {/* Create / Edit form */}
+   {/* Create / Edit Modal */}
    {(showCreate || isEditing) && (
-    <div className="glass-card p-6 space-y-4">
-     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{isEditing ? t('editTransformRule') : t('newTransformRule')}</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => { setShowCreate(false); setEditTarget(null); resetForm(); }}>
+     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center justify-between mb-4">
+       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{isEditing ? t('editTransformRule') : t('newTransformRule')}</h3>
+       <button onClick={() => { setShowCreate(false); setEditTarget(null); resetForm(); }} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+       </button>
+      </div>
 
      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       <div>
@@ -197,7 +203,7 @@ export default function TransformsPage() {
       </div>
      </div>
 
-     <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-end">
+     <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-end mt-4">
       <div className="flex-1">
        <label htmlFor="transform-enrich-key" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('enrichKey')}</label>
        <input id="transform-enrich-key" value={enrichKey} onChange={e => setEnrichKey(e.target.value)} placeholder="source" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
@@ -206,16 +212,15 @@ export default function TransformsPage() {
        <label htmlFor="transform-enrich-value" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('enrichValue')}</label>
        <input id="transform-enrich-value" value={enrichValue} onChange={e => setEnrichValue(e.target.value)} placeholder="hooksniff" className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
       </div>
-      <div className="flex gap-2">
-       {isEditing && (
-        <button type="button" onClick={() => { setEditTarget(null); resetForm(); }} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
-       )}
+      <div className="flex gap-2 justify-end">
+       <button type="button" onClick={() => { setShowCreate(false); setEditTarget(null); resetForm(); }} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
        <button type="button" onClick={isEditing ? handleUpdate : handleCreate} disabled={createMutation.isPending || updateMutation.isPending} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50">
         {isEditing ? t('update') : t('create')}
        </button>
       </div>
      </div>
     </div>
+   </div>
    )}
 
    {/* Rules list */}
