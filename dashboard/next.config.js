@@ -5,7 +5,7 @@ const { withSentryConfig } = require('@sentry/nextjs');
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
+  // output: 'standalone' removed — incompatible with Vercel API routes
   cacheComponents: true,
   reactCompiler: true,
   turbopack: {
