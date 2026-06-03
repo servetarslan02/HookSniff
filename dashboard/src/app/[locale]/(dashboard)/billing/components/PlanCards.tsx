@@ -236,12 +236,9 @@ export function PlanCards({
                   {t('currentPlanLabel')}
                 </div>
               ) : isDowngrade ? (
-                <button type="button"
-                  onClick={() => onUpgrade(plan.key, billingPeriod)}
-                  className="w-full py-2.5 rounded-xl text-sm font-medium transition bg-gray-50 dark:bg-slate-900 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700"
-                >
-                  {t('downgrade') || 'Downgrade'}
-                </button>
+                <div className="w-full py-2.5 rounded-xl text-sm font-medium text-center bg-gray-50 dark:bg-slate-900 text-gray-400 dark:text-slate-500 border border-gray-200 dark:border-slate-700">
+                  {t('lowerPlan') || 'Lower Plan'}
+                </div>
               ) : (
                 <button type="button"
                   onClick={() => onUpgrade(plan.key, billingPeriod)}
