@@ -13,9 +13,9 @@ export const post: Post = {
 
 You are reading this on our new blog! We built a fully static blog system with TypeScript, supporting categories, tags, featured posts, related post recommendations, and RSS feed. No CMS — just code and content. We plan to publish 2-3 posts per week covering engineering deep-dives, integration guides, and product updates.
 
-### SDKs: 11 of 11 Published
+### SDKs: 11 Languages (In Development)
 
-All 11 official SDKs are now published to their respective package managers:
+All 11 SDKs are in development and targeting their respective package managers:
 
 - **Node.js** → npm (@hooksniff/node)
 - **Python** → PyPI (hooksniff)

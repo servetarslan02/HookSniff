@@ -64,7 +64,7 @@ const sections = [
       { title: 'Core Concepts', desc: 'Endpoints, deliveries, retries, DLQ, and the event lifecycle.', href: '/docs/concepts' },
       { title: 'Quickstart', desc: 'Send your first webhook in under 5 minutes.', href: '/docs/quickstart' },
       { title: 'Configuration', desc: 'Environment variables, plan limits, and config options.', href: '/docs/configuration' },
-      { title: 'SDKs & Libraries', desc: 'Official SDKs for 11 programming languages.', href: '/docs/sdk-libraries' },
+      { title: 'SDKs & Libraries', desc: 'SDKs for 11 programming languages (in development).', href: '/docs/sdk-libraries' },
       { title: 'Best Practices', desc: 'Production patterns for webhook integrations.', href: '/docs/best-practices' },
     ],
   },

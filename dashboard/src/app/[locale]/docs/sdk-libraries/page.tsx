@@ -7,7 +7,7 @@ import type {Metadata} from 'next';
 
 export const metadata: Metadata = {
  title: 'SDK Libraries — HookSniff',
- description: 'Official SDKs for 11 languages. Type-safe, auto-retry, pagination, webhook verification built-in.',
+ description: 'SDKs for 11 languages (in development). Type-safe, auto-retry, pagination, webhook verification built-in.',
 };
 
 const sdks = [
@@ -700,7 +700,7 @@ async function SdksContent(params: Promise<{ locale: string }>) {
   <article className="prose prose-gray max-w-none">
    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">{t('sdks') || 'SDK Libraries'}</h1>
    <p className="text-lg text-gray-600 dark:slate-400 mb-2">
-    Official SDKs for <strong>11 languages</strong>. Type-safe, auto-retry, pagination, and webhook verification built-in.
+    SDKs for <strong>11 languages</strong> (in development). Type-safe, auto-retry, pagination, and webhook verification built-in.
    </p>
    <p className="text-gray-600 dark:text-slate-400 mb-8">
     Every SDK wraps the full HookSniff REST API. No raw HTTP calls needed — just import, initialize, and go.

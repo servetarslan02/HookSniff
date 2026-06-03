@@ -165,7 +165,7 @@ HookSniff/
 │   │   └── ...
 │   └── Cargo.toml
 │
-├── dashboard/              # Next.js 15 frontend
+├── dashboard/              # Next.js 16 frontend
 │   ├── src/
 │   │   ├── app/            # App router pages
 │   │   ├── components/     # React components

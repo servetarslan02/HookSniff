@@ -10,7 +10,7 @@ export function SvixContent() {
   const tc = useTranslations('compare');
 
   const rows = [
-    { featureKey: 'pricePro', hooksniff: '$24/mo', svix: '$490/mo', bestFor: 'hooksniff' },
+    { featureKey: 'pricePro', hooksniff: '$49/mo', svix: '$490/mo', bestFor: 'hooksniff' },
     { featureKey: 'freeTier', hooksniff: `10,000 ${t('events')}`, svix: `Unlimited ${t('events')}`, bestFor: 'svix' },
     { featureKey: 'sdkCount', hooksniff: '11', svix: '6', bestFor: 'hooksniff' },
     { featureKey: 'fifoDelivery', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, svix: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },

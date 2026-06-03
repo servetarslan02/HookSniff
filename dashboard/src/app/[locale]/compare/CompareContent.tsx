@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import Image from 'next/image';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 import { Inbox, Anchor, Check, X, AlertTriangle, LinkIcon } from '@/components/icons';
 
 const tlDrKeys = ['tlDr1', 'tlDr2', 'tlDr3', 'tlDr4', 'tlDr5'];
@@ -25,13 +25,13 @@ const sectionKeys = [
     hook0: { text: 'uptimeHook0', badge: 'badgeNa' },
   },
   { titleKey: 'sectionPricingTitle', descKey: 'sectionPricingDesc', bestFitKey: 'bestFitPricing', winner: 'hooksniff',
-    hooksniff: { text: 'pricingHooksniff', badge: '$24/mo' },
+    hooksniff: { text: 'pricingHooksniff', badge: '$49/mo' },
     svix: { text: 'pricingSvix', badge: '$490/mo' },
     hookdeck: { text: 'pricingHookdeck', badge: '$39/mo+' },
     hook0: { text: 'pricingHook0', badge: 'pricingFree' },
   },
   { titleKey: 'sectionSdkTitle', descKey: 'sectionSdkDesc', bestFitKey: 'bestFitSdk', winner: 'tie',
-    hooksniff: { text: 'sdkHooksniff', badge: '11 SDKs' },
+    hooksniff: { text: 'sdkHooksniff', badge: '11 SDKs (dev)' },
     svix: { text: 'sdkSvix', badge: '11 SDKs' },
     hookdeck: { text: 'sdkHookdeck', badge: '8 SDKs' },
     hook0: { text: 'sdkHook0', badge: '4 SDKs' },
@@ -200,16 +200,7 @@ export default function CompareContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white"><Anchor size={20} strokeWidth={1.75} className="inline mr-1" /> HookSniff</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle={t("title")} />
 
       <main className="max-w-7xl mx-auto px-6 py-16">
         {/* Hero */}

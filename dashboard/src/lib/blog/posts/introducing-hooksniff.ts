@@ -19,7 +19,7 @@ HookSniff is a webhook delivery service that handles the hard parts so you can f
 - **HMAC signatures** — Standard Webhooks compliant
 - **Dead letter queue** — Failed deliveries preserved for debugging
 - **Real-time dashboard** — See every delivery, its status, and payload
-- **11 SDKs** — Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift
+- **11 SDKs (in development)** — Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift
 
 ### Free Forever
 
