@@ -203,7 +203,7 @@ pub async fn admin_revenue_metrics(
             .await?;
 
     let mrr: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) as mrr
+        r#"SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0::double precision) as mrr
            FROM invoices
            WHERE status = 'paid'
              AND paid_at >= NOW() - INTERVAL '30 days'"#,

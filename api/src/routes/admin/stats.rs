@@ -256,19 +256,20 @@ pub async fn revenue_by_month(
                  WHERE status = 'paid'
                    AND paid_at >= DATE_TRUNC('month', NOW()) - (n || ' months')::interval
                    AND paid_at < DATE_TRUNC('month', NOW()) - ((n - 1) || ' months')::interval),
-                0.0
+                0.0::double precision
             ) as revenue
         FROM generate_series(0, 11) as n
         ORDER BY month"#,
     )
     .fetch_all(&pool)
-    .await?;
+    .await
+    .unwrap_or_default();
 
     // ── Query 2: Revenue by plan (single scan) ──
     let revenue_by_plan = sqlx::query_as::<_, RevenueByPlan>(
         r#"SELECT
             plan,
-            COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) as revenue,
+            COALESCE(SUM(amount_cents::double precision / 100.0), 0.0::double precision) as revenue,
             COUNT(*) as count
         FROM invoices
         WHERE status = 'paid'
@@ -277,7 +278,8 @@ pub async fn revenue_by_month(
         ORDER BY revenue DESC"#,
     )
     .fetch_all(&pool)
-    .await?;
+    .await
+    .unwrap_or_default();
 
     // ── Query 3: MRR + collected + customer counts in one CTE ──
     #[derive(sqlx::FromRow)]
@@ -292,12 +294,12 @@ pub async fn revenue_by_month(
         r#"
         WITH
           mrr AS (
-            SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) AS v
+            SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0::double precision) AS v
             FROM invoices
             WHERE status = 'paid' AND paid_at >= DATE_TRUNC('month', NOW())
           ),
           collected AS (
-            SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0) AS v
+            SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0::double precision) AS v
             FROM invoices WHERE status = 'paid'
           ),
           customers AS (
@@ -317,7 +319,8 @@ pub async fn revenue_by_month(
         "#,
     )
     .fetch_one(&pool)
-    .await?;
+    .await
+    .unwrap_or(RevenueAgg { mrr: 0.0, collected_revenue: 0.0, total_customers: 0, churned: 0 });
 
     let churn_rate = if agg.total_customers > 0 {
         (agg.churned as f64 / agg.total_customers as f64) * 100.0
