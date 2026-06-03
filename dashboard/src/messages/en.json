@@ -7233,18 +7233,21 @@
       },
       "avgAccuracy": "Avg Accuracy",
       "avgF1": "Avg F1 Score",
-      "worstModels": "Worst Models"
+      "worstModels": "Worst Models",
+      "error": "Could not load model data. The Cortex ML service may be starting up."
     },
     "abTest": {
       "title": "A/B Tests",
       "empty": "No A/B tests yet. Start a test from the API to compare models.",
       "endpoint": "Endpoint:",
-      "traffic": "% traffic"
+      "traffic": "% traffic",
+      "winner": "Winner: {v}"
     },
     "autoML": {
       "title": "AutoML Optimization Trials",
       "empty": "No AutoML trials yet. Start an optimization from the API.",
-      "best": "Best"
+      "best": "Best",
+      "trialCount": "{n} trial(s)"
     },
     "securityPage": {
       "title": "Security Monitoring",
@@ -7256,7 +7259,27 @@
         "issues24h": "Issues (Last 24h)",
         "autoFix": "Auto Correction",
         "predictions": "Prediction",
-        "proactiveAlert": "Proactive Alert"
+        "proactiveAlert": "Proactive Alert",
+        "monitoredEndpoints": "Monitored Endpoints",
+        "activeInsights": "Active Insights",
+        "dataPoints": "Data Points",
+        "mlPredictions": "ML Predictions"
+      },
+      "issuesDetected": "{n} issues detected — investigate immediately",
+      "minorIssues": "{n} minor issues, {h} auto-fixes applied",
+      "statsSummary": "In the last 24h: {dataPoints} data points collected, {endpoints} endpoints monitored",
+      "desc": {
+        "monitoredEndpoints": "Your active webhook addresses",
+        "noIssues": "No issues",
+        "performanceDrop": "Performance drop or error increase",
+        "autoFix": "Interventions automatically performed by Cortex",
+        "predictions": "Warnings about possible future issues",
+        "activeInsights": "Recommendations you need to review",
+        "dataPoints": "Hourly statistics collected",
+        "noPredictions": "No predictions generated yet",
+        "qualitySamples": "{n} quality samples (24h)",
+        "systemNormal": "No issues, system monitoring",
+        "needsAttention": "Situations requiring attention"
       }
     }
   }

@@ -49,30 +49,30 @@ export function ABTestTab() {
         </div>
       ) : (
         <div className="space-y-3">
-          {tests.map(t => (
-            <div key={t.id} className="glass-card p-4">
+          {tests.map(abtest => (
+            <div key={abtest.id} className="glass-card p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="font-medium text-gray-900 dark:text-white">{t.model_type}</span>
-                  <span className="ml-2 text-xs text-gray-500">Endpoint: {t.endpoint_id.slice(0, 8)}...</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{abtest.model_type}</span>
+                  <span className="ml-2 text-xs text-gray-500">{t('endpoint')} {abtest.endpoint_id.slice(0, 8)}...</span>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full ${t.status === 'running' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
-                  {t.status}
+                <span className={`text-xs px-2 py-1 rounded-full ${abtest.status === 'running' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
+                  {abtest.status}
                 </span>
               </div>
               <div className="mt-2 flex gap-4 text-sm">
                 <div className="flex-1 p-2 rounded bg-gray-50 dark:bg-slate-800 text-center">
-                  <div className="font-medium">A: {t.variant_a}</div>
-                  <div className="text-xs text-gray-500">{(t.split_ratio * 100).toFixed(0)}% {t('traffic')}</div>
+                  <div className="font-medium">A: {abtest.variant_a}</div>
+                  <div className="text-xs text-gray-500">{(abtest.split_ratio * 100).toFixed(0)}% {t('traffic')}</div>
                 </div>
                 <div className="flex items-center text-gray-400">vs</div>
                 <div className="flex-1 p-2 rounded bg-gray-50 dark:bg-slate-800 text-center">
-                  <div className="font-medium">B: {t.variant_b}</div>
-                  <div className="text-xs text-gray-500">{((1 - t.split_ratio) * 100).toFixed(0)}% {t('traffic')}</div>
+                  <div className="font-medium">B: {abtest.variant_b}</div>
+                  <div className="text-xs text-gray-500">{((1 - abtest.split_ratio) * 100).toFixed(0)}% {t('traffic')}</div>
                 </div>
               </div>
-              {t.winner && (
-                <div className="mt-2 text-sm text-emerald-600 font-medium">🏆 {t('winner', {v: t.winner})}</div>
+              {abtest.winner && (
+                <div className="mt-2 text-sm text-emerald-600 font-medium">🏆 {t('winner', {v: abtest.winner})}</div>
               )}
             </div>
           ))}

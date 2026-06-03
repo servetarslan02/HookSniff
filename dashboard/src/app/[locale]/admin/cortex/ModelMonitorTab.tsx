@@ -40,7 +40,7 @@ export function ModelMonitorTab() {
     if (!token) return;
     apiFetch<PlatformSummary>('/cortex/models/platform-summary', { token })
       .then(setSummary)
-      .catch((err) => { console.error('[ModelMonitorTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
+      .catch((err) => { console.error('[ModelMonitorTab] fetch error:', err); setError(err?.status === 503 ? t('error') : err?.message || tc('dataLoadError')); })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -59,7 +59,7 @@ export function ModelMonitorTab() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: '{t('stats.totalModels')}', value: summary.total_models, color: 'text-gray-900 dark:text-white' },
+              { label: t('stats.totalModels'), value: summary.total_models, color: 'text-gray-900 dark:text-white' },
               { label: t('stats.healthy'), value: summary.healthy, color: 'text-emerald-600' },
               { label: t('stats.warning'), value: summary.warning + summary.degraded, color: 'text-yellow-600' },
               { label: t('stats.critical'), value: summary.critical, color: 'text-red-600' },
