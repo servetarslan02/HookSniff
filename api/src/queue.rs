@@ -127,7 +127,7 @@ impl RedisQueue {
 
     /// Acknowledge a message (delivery complete).
     pub async fn ack(&mut self, stream_id: &str) -> Result<()> {
-        redis::cmd("XACK")
+        let _: redis::Value = redis::cmd("XACK")
             .arg(STREAM_KEY)
             .arg(CONSUMER_GROUP)
             .arg(stream_id)
