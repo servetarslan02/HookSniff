@@ -153,17 +153,24 @@ pub async fn login(
             None, Some(&req.email), Some(&client_ip), Some(user_agent), detected.details.clone(),
         ).await;
         if detected.should_block {
-            tracing::warn!("🔒 Login blocked — brute force detected: {} from {}", req.email, client_ip);
-            let _ = sqlx::query(
-                "INSERT INTO ip_blocklist (ip_address, reason, auto_blocked, is_active, expires_at)
-                 VALUES ($1, $2, true, true, NOW() + INTERVAL '24 hours')
-                 ON CONFLICT (ip_address) DO UPDATE SET is_active = true, expires_at = NOW() + INTERVAL '24 hours', updated_at = NOW()"
-            )
-            .bind(&client_ip)
-            .bind(format!("Auto-blocked: {} ({})", detected.event_type, req.email))
-            .execute(&pool)
-            .await;
-            return Err(AppError::coded(ErrorCode::TooManyAttempts));
+            // Don't auto-block admin IPs — they might be testing or have forgotten their password
+            let is_admin = sqlx::query_scalar::<_, bool>("SELECT COALESCE(is_admin, false) FROM customers WHERE email = $1")
+                .bind(&req.email).fetch_optional(&pool).await.unwrap_or(None).unwrap_or(false);
+            if !is_admin {
+                tracing::warn!("🔒 Login blocked — brute force detected: {} from {}", req.email, client_ip);
+                let _ = sqlx::query(
+                    "INSERT INTO ip_blocklist (ip_address, reason, auto_blocked, is_active, expires_at)
+                     VALUES ($1, $2, true, true, NOW() + INTERVAL '24 hours')
+                     ON CONFLICT (ip_address) DO UPDATE SET is_active = true, expires_at = NOW() + INTERVAL '24 hours', updated_at = NOW()"
+                )
+                .bind(&client_ip)
+                .bind(format!("Auto-blocked: {} ({})", detected.event_type, req.email))
+                .execute(&pool)
+                .await;
+                return Err(AppError::coded(ErrorCode::TooManyAttempts));
+            } else {
+                tracing::warn!("⚠️ Brute force detected for admin {} from {} — NOT blocking IP", req.email, client_ip);
+            }
         }
     }
 
