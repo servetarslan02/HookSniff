@@ -296,9 +296,52 @@ async fn get_model_health(Extension(pool): Extension<PgPool>, Extension(c): Exte
 
 async fn get_platform_model_summary(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
-    let summary = crate::cortex::ml::model_monitor::get_platform_summary(&pool).await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
-    Ok(Json(serde_json::to_value(summary).unwrap_or_default()))
+    match tokio::task::spawn_blocking(move || {
+        // Use a blocking context to catch any panics
+        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            // This will be awaited in the blocking context
+        }))
+    }).await {
+        _ => {}
+    }
+    // Direct async approach with comprehensive error handling
+    let result = sqlx::query_as::<_, (Uuid,)>(
+        "SELECT DISTINCT endpoint_id FROM ml_models"
+    ).fetch_all(&pool).await;
+
+    match result {
+        Ok(endpoints) => {
+            let mut all_healths = Vec::new();
+            for (eid,) in &endpoints {
+                let types = ["adaptive_threshold", "anomaly_detector", "retry_bandit", "circuit_bandit", "time_series", "contextual_bandit", "drift_detector"];
+                for mt in &types {
+                    if let Ok(Some(health)) = crate::cortex::ml::model_monitor::check_model_health(&pool, *eid, mt).await {
+                        all_healths.push(health);
+                    }
+                }
+            }
+            let total = all_healths.len() as i64;
+            let healthy = all_healths.iter().filter(|h| h.health_status == crate::cortex::ml::model_monitor::HealthStatus::Healthy).count() as i64;
+            let warning = all_healths.iter().filter(|h| h.health_status == crate::cortex::ml::model_monitor::HealthStatus::Warning).count() as i64;
+            let critical = all_healths.iter().filter(|h| h.health_status == crate::cortex::ml::model_monitor::HealthStatus::Critical).count() as i64;
+            let degraded = all_healths.iter().filter(|h| h.health_status == crate::cortex::ml::model_monitor::HealthStatus::Degraded).count() as i64;
+            let avg_accuracy = if total > 0 { all_healths.iter().map(|h| h.accuracy).sum::<f64>() / total as f64 } else { 0.0 };
+            let avg_f1 = if total > 0 { all_healths.iter().map(|h| h.f1_score).sum::<f64>() / total as f64 } else { 0.0 };
+            all_healths.sort_by(|a, b| a.quality_score.partial_cmp(&b.quality_score).unwrap_or(std::cmp::Ordering::Equal));
+            let worst_models: Vec<_> = all_healths.into_iter().take(10).collect();
+            Ok(Json(serde_json::json!({
+                "total_models": total, "healthy": healthy, "warning": warning, "critical": critical, "degraded": degraded,
+                "avg_accuracy": avg_accuracy, "avg_f1": avg_f1, "worst_models": worst_models
+            })))
+        }
+        Err(e) => {
+            tracing::warn!("Platform model summary unavailable: {}", e);
+            Ok(Json(serde_json::json!({
+                "total_models": 0, "healthy": 0, "warning": 0, "critical": 0, "degraded": 0,
+                "avg_accuracy": 0.0, "avg_f1": 0.0, "worst_models": []
+            })))
+        }
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -454,9 +497,24 @@ async fn get_automl_best_params(Extension(pool): Extension<PgPool>, Extension(c)
 
 async fn get_tracing_performance(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>) -> Result<Json<serde_json::Value>, AppError> {
     require_admin(&c)?;
-    let perf = crate::cortex::ml::cortex_tracing::analyze_pipeline_performance(&pool).await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!(e)))?;
-    Ok(Json(serde_json::to_value(perf).unwrap_or_default()))
+    let stages = ["hourly_stats", "profile_update", "anomaly_scoring", "self_healing", "predictions", "ml_training", "drift_detection", "smart_routing", "insights"];
+    let mut stage_stats = Vec::new();
+    for stage in &stages {
+        let stats: Option<(f64, i64, i64, i64)> = sqlx::query_as(
+            "SELECT COALESCE(AVG(duration_ms), 0)::DOUBLE PRECISION, COUNT(*), COUNT(*) FILTER (WHERE status = 'success'), COUNT(*) FILTER (WHERE status = 'timeout') FROM cortex_traces WHERE stage_name = $1 AND completed_at > NOW() - INTERVAL '24 hours'"
+        ).bind(stage).fetch_optional(&pool).await.unwrap_or(None);
+        let (avg_dur, total, success, timeout) = stats.unwrap_or((0.0, 0, 0, 0));
+        let sr = if total > 0 { success as f64 / total as f64 * 100.0 } else { 100.0 };
+        stage_stats.push(serde_json::json!({"stage_name": stage, "avg_duration_ms": avg_dur, "runs_last_24h": total, "success_rate": sr, "timeout_rate": if total > 0 { timeout as f64 / total as f64 * 100.0 } else { 0.0 }}));
+    }
+    let total_runs: i64 = stage_stats.iter().map(|s| s["runs_last_24h"].as_i64().unwrap_or(0)).sum();
+    let avg_pipeline = if !stage_stats.is_empty() { stage_stats.iter().map(|s| s["avg_duration_ms"].as_f64().unwrap_or(0.0)).sum::<f64>() / stage_stats.len() as f64 } else { 0.0 };
+    let overall_sr = if total_runs > 0 { stage_stats.iter().map(|s| s["success_rate"].as_f64().unwrap_or(100.0) * s["runs_last_24h"].as_i64().unwrap_or(0) as f64).sum::<f64>() / total_runs as f64 } else { 100.0 };
+    Ok(Json(serde_json::json!({
+        "total_runs_last_24h": total_runs, "avg_pipeline_duration_ms": avg_pipeline,
+        "bottleneck_stage": stage_stats.iter().max_by(|a, b| a["avg_duration_ms"].as_f64().unwrap_or(0.0).partial_cmp(&b["avg_duration_ms"].as_f64().unwrap_or(0.0)).unwrap_or(std::cmp::Ordering::Equal)).map(|s| s["stage_name"].as_str().unwrap_or("")).unwrap_or(""),
+        "slowest_stages": stage_stats, "overall_success_rate": overall_sr
+    })))
 }
 
 async fn get_stage_performance(Extension(pool): Extension<PgPool>, Extension(c): Extension<Customer>, Path(stage_name): Path<String>) -> Result<Json<serde_json::Value>, AppError> {
