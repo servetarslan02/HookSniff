@@ -3,10 +3,11 @@ export type * from './api-types';
 
 import { HookSniffError, createApiError, createNetworkError } from './api-errors';
 
-// In production, "/api/v1" is proxied by Vercel rewrites to the GCP Cloud Run API (see vercel.json).
-// In development, point directly to the local API server.
+// In production, call the GCP Cloud Run API directly (CORS is configured).
+// NEXT_PUBLIC_API_URL is set in Vercel env vars.
 const DEFAULT_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-export const API_BASE = typeof window !== 'undefined' ? '/api/v1' : (DEFAULT_API_URL.endsWith('/v1') ? DEFAULT_API_URL : `${DEFAULT_API_URL}/v1`);
+const apiBase = DEFAULT_API_URL.endsWith('/v1') ? DEFAULT_API_URL : `${DEFAULT_API_URL}/v1`;
+export const API_BASE = typeof window !== 'undefined' ? apiBase : apiBase;
 
 const REQUEST_TIMEOUT_MS = 10_000;
 const MAX_RETRIES = 2;
