@@ -70,12 +70,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /**
    * HS-039: Start proactive token refresh for the current session.
-   * Called after login or session restore. Renews token every 12 min.
+   * Called after login or session restore. Renews token every 50 min.
+   * HS-039b: Also starts inactivity tracking — auto-logs out after 1 hour idle.
    */
+  const logoutRef = useRef<(() => void) | null>(null);
   const startSessionRefresh = useCallback(() => {
-    startProactiveRefresh((newToken: string) => {
-      updateToken(newToken);
-    });
+    startProactiveRefresh(
+      (newToken: string) => { updateToken(newToken); },
+      () => { logoutRef.current?.(); },
+    );
   }, [updateToken]);
 
   // HS-039: Register token sync callback for 401 handler in api.ts
@@ -248,6 +251,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('hooksniff_refresh');
     clearAuthCookie();
   }, []);
+
+  // Wire up logout ref for inactivity auto-logout
+  useEffect(() => { logoutRef.current = logout; }, [logout]);
 
   const setApiKey = useCallback((key: string) => {
     setApiKeyState(key);
