@@ -186,7 +186,7 @@ async fn latency_trend(
     let hours = query.interval_hours();
     let range_label = query.range.as_deref().unwrap_or("24h");
 
-    let buckets: Vec<(chrono::NaiveDateTime, f64, f64)> = sqlx::query_as(
+    let buckets: Vec<(chrono::DateTime<chrono::Utc>, f64, f64)> = sqlx::query_as(
         r#"
         SELECT
             date_trunc('hour', da.created_at) AS bucket,
