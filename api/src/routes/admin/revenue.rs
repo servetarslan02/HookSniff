@@ -221,14 +221,15 @@ pub async fn admin_revenue_metrics(
     };
 
     let avg_months: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(AVG(
-             CASE WHEN COUNT(*) > 1
-               THEN EXTRACT(EPOCH FROM (MAX(paid_at) - MIN(paid_at))) / 2592000.0
-               ELSE 0.0
-             END
-           ), 0.0)
-           FROM invoices WHERE status = 'paid'
-           GROUP BY customer_id"#,
+        r#"SELECT COALESCE(AVG(avg_months), 0.0) FROM (
+             SELECT customer_id,
+               CASE WHEN COUNT(*) > 1
+                 THEN EXTRACT(EPOCH FROM (MAX(paid_at) - MIN(paid_at))) / 2592000.0
+                 ELSE 0.0
+               END as avg_months
+             FROM invoices WHERE status = 'paid'
+             GROUP BY customer_id
+           ) sub"#,
     )
     .fetch_one(&pool)
     .await?;
