@@ -7,7 +7,7 @@
 //!
 //! ## How to use these tests:
 //! Each test module contains one or more test functions that verify a specific
-//! OWASP protection. Tests use the live API at hooksniff-api-499907444852.europe-west1.run.app.
+//! OWASP protection. Tests use the live API at hooksniff-api-e6ztf3x2ma-ew.a.run.app.
 //!
 //! ## Prerequisites:
 //! - A running HookSniff API instance
