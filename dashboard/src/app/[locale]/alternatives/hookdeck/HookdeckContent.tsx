@@ -1,7 +1,7 @@
 'use client';
 
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 import { useTranslations } from 'next-intl';
 import { Lightbulb, X, Check, Link as LinkIcon } from '@/components/icons';
 
@@ -10,7 +10,7 @@ export function HookdeckContent() {
   const tc = useTranslations('compare');
 
   const rows = [
-    { featureKey: 'pricePro', hooksniff: '$24/mo', hookdeck: '$39/mo + usage', bestFor: 'hooksniff' },
+    { featureKey: 'pricePro', hooksniff: '$49/mo', hookdeck: '$39/mo + usage', bestFor: 'hooksniff' },
     { featureKey: 'freeTier', hooksniff: `10,000 ${t('events')}`, hookdeck: `10,000 ${t('events')}`, bestFor: 'tie' },
     { featureKey: 'sdkCount', hooksniff: '11', hookdeck: '8', bestFor: 'hooksniff' },
     { featureKey: 'fifoDelivery', hooksniff: <Check size={14} strokeWidth={1.75} className="text-emerald-500" />, hookdeck: <X size={14} strokeWidth={1.75} className="text-red-500" />, bestFor: 'hooksniff' },
@@ -25,18 +25,7 @@ export function HookdeckContent() {
 
   return (
     <div>
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">{tc("sdks")}</span>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Hookdeck</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle="HookSniff vs Hookdeck" />
       <main className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">HookSniff vs Hookdeck</h1>

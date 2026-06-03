@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { API_BASE } from '@/lib/api';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 
 import type { StatusData, HistoryDay, Incident, Maintenance } from './components/types';
 import { uptimeColor } from './components/utils';
@@ -145,24 +145,9 @@ export function StatusPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <span className="text-xl">🪝</span>
-            <span className="font-bold text-gray-900 dark:text-white">HookSniff</span>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">{t("title")}</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <button className="text-xs font-medium text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
-              <Bell size={16} strokeWidth={1.75} className="inline-block align-text-bottom mr-1" /> {t('subscribeToUpdates')}
-            </button>
-            <LanguageSwitcher />
-          </div>
-        </div>
-      </nav>
+      <PublicNavbar pageTitle={t("title")} />
 
-      <div className="max-w-4xl mx-auto px-4 py-10">
+      <main className="max-w-4xl mx-auto px-4 py-10">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t("systemStatus")}</h1>
@@ -241,7 +226,7 @@ export function StatusPageContent() {
           </p>
           <p className="text-xs">{t('poweredBy')}</p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
