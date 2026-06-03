@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/store';
 import { apiFetch } from '@/lib/api';
 
@@ -28,6 +29,8 @@ interface PlatformSummary {
 }
 
 export function ModelMonitorTab() {
+  const t = useTranslations('cortex.modelMonitor');
+  const tc = useTranslations('cortex.common');
   const { token } = useAuth();
   const [summary, setSummary] = useState<PlatformSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,10 +59,10 @@ export function ModelMonitorTab() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: 'Toplam Model', value: summary.total_models, color: 'text-gray-900 dark:text-white' },
-              { label: 'Sağlıklı', value: summary.healthy, color: 'text-emerald-600' },
-              { label: 'Uyarı', value: summary.warning + summary.degraded, color: 'text-yellow-600' },
-              { label: 'Kritik', value: summary.critical, color: 'text-red-600' },
+              { label: '{t('stats.totalModels')}', value: summary.total_models, color: 'text-gray-900 dark:text-white' },
+              { label: t('stats.healthy'), value: summary.healthy, color: 'text-emerald-600' },
+              { label: t('stats.warning'), value: summary.warning + summary.degraded, color: 'text-yellow-600' },
+              { label: t('stats.critical'), value: summary.critical, color: 'text-red-600' },
             ].map(({ label, value, color }) => (
               <div key={label} className="glass-card p-3 text-center">
                 <div className={`text-2xl font-bold ${color}`}>{value}</div>
@@ -81,7 +84,7 @@ export function ModelMonitorTab() {
 
           {summary.worst_models.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">En Kötü Modeller</h3>
+              <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('worstModels')}</h3>
               {summary.worst_models.map((m, i) => (
                 <div key={i} className="glass-card p-3 mb-2">
                   <div className="flex items-center justify-between">
