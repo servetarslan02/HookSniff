@@ -47,7 +47,6 @@ function getAlternatives(t: ReturnType<typeof useTranslations>) {
 
 export function SvixsContent() {
   const t = useTranslations('alternatives');
-  const tc = useTranslations('compare');
   const alternatives = getAlternatives(t);
 
   return (

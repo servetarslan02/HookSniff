@@ -7,7 +7,6 @@ import { Lightbulb, X, Check } from '@/components/icons';
 
 export function Hook0Content() {
   const t = useTranslations('alternatives');
-  const tc = useTranslations('compare');
   return (
     <div>
       <PublicNavbar pageTitle="HookSniff vs Hook0" />
