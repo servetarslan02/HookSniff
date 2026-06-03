@@ -105,7 +105,7 @@ export default function SettingsPage() {
   }, []);
 
   return (
-    <div className="max-w-5xl">
+    <div>
       {/* ── Header ── */}
       <div className="mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
