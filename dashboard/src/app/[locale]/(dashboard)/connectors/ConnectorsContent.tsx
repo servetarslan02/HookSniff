@@ -111,7 +111,7 @@ export function ConnectorsContent() {
           <ReadOnlyBadge />
         </div>
         <RoleGuard require="canManageIntegrations">
-          <button onClick={() => { setShowCreate(true); setEditTarget(null); }}
+          <button type="button" onClick={() => { setShowCreate(true); setEditTarget(null); }}
             className="bg-brand-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
             + {t('addConnector')}
           </button>
@@ -178,9 +178,9 @@ export function ConnectorsContent() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button onClick={() => { setShowCreate(false); setConfigName(''); setSelectedConnector(''); }}
+              <button type="button" onClick={() => { setShowCreate(false); setConfigName(''); setSelectedConnector(''); }}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
-              <button onClick={() => { if (selectedConnector && configName.trim()) createMutation.mutate({ connector_id: selectedConnector, name: configName }); }}
+              <button type="button" onClick={() => { if (selectedConnector && configName.trim()) createMutation.mutate({ connector_id: selectedConnector, name: configName }); }}
                 disabled={createMutation.isPending || !selectedConnector || !configName.trim()}
                 className="px-5 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60">
                 {createMutation.isPending ? tc('creating') : t('create')}
@@ -203,7 +203,7 @@ export function ConnectorsContent() {
             <div className="text-5xl mb-4"><Plug size={18} strokeWidth={1.75} /></div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noConnectors')}</h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noConnectorsDesc')}</p>
-            <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+            <button type="button" onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
               + {t('addConnector')}
             </button>
           </div>
@@ -225,7 +225,7 @@ export function ConnectorsContent() {
                         <span className="text-xs text-gray-500 dark:text-slate-400">{cfg.connector_display_name}</span>
                       </div>
                     </div>
-                    <button onClick={() => handleToggle(cfg)}
+                    <button type="button" onClick={() => handleToggle(cfg)}
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.is_active ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-400'}`}>
                       {cfg.is_active ? t('active') : t('inactive')}
                     </button>
@@ -248,9 +248,9 @@ export function ConnectorsContent() {
                           className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={handleUpdate} disabled={updateMutation.isPending}
+                        <button type="button" onClick={handleUpdate} disabled={updateMutation.isPending}
                           className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition disabled:opacity-50">{t('save')}</button>
-                        <button onClick={() => setEditTarget(null)}
+                        <button type="button" onClick={() => setEditTarget(null)}
                           className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
                       </div>
                     </div>

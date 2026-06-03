@@ -201,7 +201,7 @@ export default function IntegrationsContent() {
           <ReadOnlyBadge />
         </div>
         <RoleGuard require="canManageIntegrations">
-          <button onClick={() => { resetForm(); setShowCreate(true); }}
+          <button type="button" onClick={() => { resetForm(); setShowCreate(true); }}
             className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
             + {t('newIntegration')}
           </button>
@@ -233,7 +233,7 @@ export default function IntegrationsContent() {
                 <select value={formConnectorConfig} onChange={e => setFormConnectorConfig(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm">
                   <option value="">{t('selectConnector')}</option>
-                  {configs.map(c => <option key={c.id} value={c.id}>{PROVIDER_ICONS[c.connector_name] || <Plug size={16} strokeWidth={1.75} />} {c.connector_display_name} — {c.name}</option>)}
+                  {configs.map(c => <option key={c.id} value={c.id}>{c.connector_display_name} — {c.name}</option>)}
                 </select>
               </div>
               <div>
@@ -258,8 +258,8 @@ export default function IntegrationsContent() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button onClick={resetForm} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
-              <button onClick={handleCreateOrUpdate} disabled={createMutation.isPending || updateMutation.isPending}
+              <button type="button" onClick={resetForm} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">{tc('cancel')}</button>
+              <button type="button" onClick={handleCreateOrUpdate} disabled={createMutation.isPending || updateMutation.isPending}
                 className="px-5 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60">
                 {(createMutation.isPending || updateMutation.isPending) ? tc('creating') : editTarget ? t('saveChanges') : t('createIntegration')}
               </button>
@@ -280,7 +280,7 @@ export default function IntegrationsContent() {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noIntegrations')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('noIntegrationsDesc')}</p>
           <RoleGuard require="canManageIntegrations">
-            <button onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
+            <button type="button" onClick={() => setShowCreate(true)} className="bg-brand-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-brand-700 transition">
               + {t('newIntegration')}
             </button>
           </RoleGuard>
