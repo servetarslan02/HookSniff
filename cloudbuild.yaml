@@ -190,7 +190,3 @@ availableSecrets:
       env: OTEL_EXPORTER_OTLP_HEADERS
     - versionName: projects/$PROJECT_ID/secrets/encryption-key/versions/latest
       env: ENCRYPTION_KEY
-    - versionName: projects/$PROJECT_ID/secrets/hooksniff-polar-product-pro/versions/latest
-      env: POLAR_PRODUCT_PRO
-    - versionName: projects/$PROJECT_ID/secrets/hooksniff-polar-product-business/versions/latest
-      env: POLAR_PRODUCT_BUSINESS
