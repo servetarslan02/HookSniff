@@ -99,51 +99,59 @@ export default function SchemasPage() {
         </div>
         <RoleGuard require="canManageWebhooks">
           <button
-            onClick={() => setShowCreate(!showCreate)}
+            onClick={() => setShowCreate(true)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-xl hover:bg-brand-700 transition"
           >
-            + {t('createSchema')}
+            {t('createSchema')}
           </button>
         </RoleGuard>
       </div>
 
-      {/* Create Form */}
+      {/* Create Schema Modal */}
       {showCreate && (
-        <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('createSchema')}</h2>
-          <form onSubmit={handleCreate} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('schemaName')}</label>
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="order.created"
-                required
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">JSON Schema</label>
-              <textarea
-                value={newSchema}
-                onChange={(e) => setNewSchema(e.target.value)}
-                rows={8}
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-sm font-mono text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-              />
-            </div>
-            {createError && (
-              <p className="text-sm text-red-600 dark:text-red-400">{createError}</p>
-            )}
-            <div className="flex gap-3 justify-end">
-              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
-                {tc('cancel')}
-              </button>
-              <button type="submit" disabled={creating || !newName.trim()} className="px-5 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60">
-                {creating ? tc('creating') : tc('create')}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => { setShowCreate(false); setCreateError(''); }}>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 max-w-2xl w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('createSchema')}</h2>
+              <button onClick={() => { setShowCreate(false); setCreateError(''); }} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
-          </form>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('schemaName')}</label>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="order.created"
+                  required
+                  autoFocus
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">JSON Schema</label>
+                <textarea
+                  value={newSchema}
+                  onChange={(e) => setNewSchema(e.target.value)}
+                  rows={8}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-sm font-mono text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                />
+              </div>
+              {createError && (
+                <p className="text-sm text-red-600 dark:text-red-400">{createError}</p>
+              )}
+              <div className="flex gap-3 justify-end">
+                <button type="button" onClick={() => { setShowCreate(false); setCreateError(''); }} className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+                  {tc('cancel')}
+                </button>
+                <button type="submit" disabled={creating || !newName.trim()} className="px-5 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-xl hover:bg-brand-700 transition disabled:opacity-60">
+                  {creating ? tc('creating') : tc('create')}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
