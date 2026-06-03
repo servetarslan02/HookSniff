@@ -7,7 +7,6 @@ import { Link as LinkIcon, X, Check } from '@/components/icons';
 
 export function HookdecksContent() {
   const t = useTranslations('alternatives');
-  const tc = useTranslations('compare');
 
   return (
     <div>

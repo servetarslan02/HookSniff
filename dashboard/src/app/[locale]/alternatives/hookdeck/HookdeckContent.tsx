@@ -7,7 +7,6 @@ import { Lightbulb, X, Check, Link as LinkIcon } from '@/components/icons';
 
 export function HookdeckContent() {
   const t = useTranslations('alternatives');
-  const tc = useTranslations('compare');
 
   const rows = [
     { featureKey: 'pricePro', hooksniff: '$49/mo', hookdeck: '$39/mo + usage', bestFor: 'hooksniff' },
