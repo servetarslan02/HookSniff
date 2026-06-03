@@ -37,7 +37,7 @@ pub const LOGIN_RATE_LIMIT: u32 = 10;
 pub const REGISTER_RATE_LIMIT: u32 = 5;
 /// HS-039: Access token lifetime — 15 minutes (short-lived for security).
 pub const TOKEN_MAX_AGE: i64 = 3600;   // 1 hour (matches JWT expiry)
-pub const REFRESH_TOKEN_MAX_AGE: i64 = 7776000;  // 90 days
+pub const REFRESH_TOKEN_MAX_AGE: i64 = 2592000;  // 30 days
 pub const RESET_RATE_LIMIT: u32 = 5;
 pub const VERIFY_EMAIL_RATE_LIMIT: u32 = 10;
 pub const REFRESH_RATE_LIMIT: u32 = 30;
