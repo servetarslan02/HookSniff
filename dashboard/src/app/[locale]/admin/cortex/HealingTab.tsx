@@ -79,7 +79,7 @@ export function HealingTab({ token }: { token: string | null }) {
                     </div>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
                     <div className="flex items-center gap-4 mt-2">
-                      {ts && <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1"><Clock size={12} /> {new Date(ts).toLocaleString('tr-TR')}</p>}
+                      {ts && <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1"><Clock size={12} /> {new Date(ts).toLocaleString()}</p>}
                       {reason && <p className="text-xs text-gray-400 dark:text-slate-500">{t('reason', {v: reason})}</p>}
                     </div>
                   </div>

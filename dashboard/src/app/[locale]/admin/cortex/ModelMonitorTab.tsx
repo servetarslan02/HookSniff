@@ -40,7 +40,7 @@ export function ModelMonitorTab() {
     if (!token) return;
     apiFetch<PlatformSummary>('/cortex/models/platform-summary', { token })
       .then(setSummary)
-      .catch((err) => { console.error('[ModelMonitorTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
+      .catch((err) => { console.error('[ModelMonitorTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -74,11 +74,11 @@ export function ModelMonitorTab() {
           <div className="glass-card p-3 flex gap-6">
             <div className="text-center">
               <div className="text-lg font-bold text-gray-900 dark:text-white">{summary.avg_accuracy.toFixed(1)}%</div>
-              <div className="text-xs text-gray-500">Ort. Accuracy</div>
+              <div className="text-xs text-gray-500">{t('avgAccuracy')}</div>
             </div>
             <div className="text-center">
               <div className="text-lg font-bold text-gray-900 dark:text-white">{summary.avg_f1.toFixed(1)}%</div>
-              <div className="text-xs text-gray-500">Ort. F1 Score</div>
+              <div className="text-xs text-gray-500">{t('avgF1')}</div>
             </div>
           </div>
 
