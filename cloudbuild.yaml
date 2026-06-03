@@ -110,8 +110,8 @@ steps:
       - '--max-instances=3'
       - '--timeout=300'
       - '--startup-probe=httpGet.port=3000,httpGet.path=/health,initialDelaySeconds=10,periodSeconds=5,failureThreshold=12,timeoutSeconds=5'
-      - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,WEBHOOK_FORMAT=standard,MAX_PAYLOAD_BYTES=1048576,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,RATE_LIMIT_STORE=redis,OTEL_ENABLED=true'
-      - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,JWT_SECRET=hooksniff-jwt-secret:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest'
+      - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,WEBHOOK_FORMAT=standard,MAX_PAYLOAD_BYTES=1048576,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,RATE_LIMIT_STORE=redis,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://o4511400113471488.ingest.de.sentry.io/api/4511400117010512/integration/otlp,CORS_ORIGINS=https://hooksniff.vercel.app,APP_URL=https://hooksniff.vercel.app,NOTIFY_EMAIL=support@hooksniff.vercel.app,NOTIFY_FROM_EMAIL=noreply@hooksniff.vercel.app,POLAR_ENV=production'
+      - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,JWT_SECRET=hooksniff-jwt-secret:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,POLAR_ACCESS_TOKEN=hooksniff-polar-token:latest,POLAR_WEBHOOK_SECRET=hooksniff-polar-webhook-secret:latest,RESEND_API_KEY=hooksniff-resend-api-key:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest,POLAR_PRODUCT_PRO=hooksniff-polar-product-pro:latest,POLAR_PRODUCT_BUSINESS=hooksniff-polar-product-business:latest'
       - '--project=$PROJECT_ID'
       - '--quiet'
     waitFor: ['push-api', 'run-migrations']
@@ -133,7 +133,7 @@ steps:
       - '--min-instances=1'
       - '--max-instances=4'
       - '--startup-probe=httpGet.port=8080,httpGet.path=/health,initialDelaySeconds=10,periodSeconds=5,failureThreshold=12,timeoutSeconds=5'
-      - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,OTEL_ENABLED=true'
+      - '--set-env-vars=APP_ENV=production,RUST_LOG=info,LOG_FORMAT=json,OTEL_ENABLED=true,OTEL_EXPORTER_OTLP_ENDPOINT=https://o4511400113471488.ingest.de.sentry.io/api/4511400117010512/integration/otlp,WEBHOOK_FORMAT=standard,RATE_LIMIT_STORE=redis,RETENTION_DAYS=30,WEBHOOK_TIMESTAMP_TOLERANCE_SECS=300,NOTIFY_FROM_EMAIL=noreply@hooksniff.vercel.app'
       - '--set-secrets=DATABASE_URL=hooksniff-database-url:latest,REDIS_URL=hooksniff-redis-url:latest,HMAC_SECRET=hooksniff-hmac-secret:latest,OTEL_EXPORTER_OTLP_HEADERS=hooksniff-otel-headers:latest,ENCRYPTION_KEY=encryption-key:latest'
       - '--project=$PROJECT_ID'
       - '--quiet'
@@ -174,3 +174,23 @@ availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_ID/secrets/hooksniff-database-url/versions/latest
       env: DATABASE_URL
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-redis-url/versions/latest
+      env: REDIS_URL
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-jwt-secret/versions/latest
+      env: JWT_SECRET
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-hmac-secret/versions/latest
+      env: HMAC_SECRET
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-polar-token/versions/latest
+      env: POLAR_ACCESS_TOKEN
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-polar-webhook-secret/versions/latest
+      env: POLAR_WEBHOOK_SECRET
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-resend-api-key/versions/latest
+      env: RESEND_API_KEY
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-otel-headers/versions/latest
+      env: OTEL_EXPORTER_OTLP_HEADERS
+    - versionName: projects/$PROJECT_ID/secrets/encryption-key/versions/latest
+      env: ENCRYPTION_KEY
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-polar-product-pro/versions/latest
+      env: POLAR_PRODUCT_PRO
+    - versionName: projects/$PROJECT_ID/secrets/hooksniff-polar-product-business/versions/latest
+      env: POLAR_PRODUCT_BUSINESS
