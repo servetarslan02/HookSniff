@@ -8,46 +8,36 @@
                             └────────┬────────┘
                                      │
                             ┌────────▼────────┐
-                            │   Fly.io Proxy   │
-                            │   (TLS, LB)      │
+                            │   Cloudflare    │
+                            │   (CDN, DNS,    │
+                            │    SSL, DDoS)   │
                             └────────┬────────┘
                                      │
                     ┌────────────────┼────────────────┐
                     │                │                │
            ┌────────▼───────┐ ┌─────▼─────┐ ┌───────▼───────┐
-           │   API Server   │ │ Dashboard │ │  Healthcheck  │
-           │   (Axum/Rust)  │ │ (Next.js) │ │   (internal)  │
+           │   API Server   │ │ Dashboard │ │    Worker     │
+           │   (Axum/Rust)  │ │ (Next.js) │ │   (Rust)      │
            │   Port 3000    │ │ Port 3001 │ │               │
-           └──┬──┬──┬───────┘ └─────┬─────┘ └───────────────┘
-              │  │  │               │
-              │  │  │               │ (API calls via HTTP)
-              │  │  │               │
-              │  │  └───────────────┼────► PostgreSQL (Neon)
-              │  │                  │         sslmode=require
-              │  │                  │
-              │  └──────────────────┼────► PostgreSQL (Neon)
-              │                     │         sslmode=require
-              │                     │
-              └─────────────────────┼────► PostgreSQL Queue
-                                    │         (webhook_queue table)
-                                    │
-                                    ▼
-                              ┌───────────┐
-                              │  Worker   │
-                              │ (Rust)    │
-                              └─────┬─────┘
-                                    │
-                    ┌───────────────┼───────────────┐
-                    │               │               │
-                    ▼               ▼               ▼
-              ┌──────────┐   ┌──────────┐   ┌──────────┐
-              │  HTTP    │   │  gRPC    │   │  SQS     │
-              │ Delivery │   │ Delivery │   │ Delivery │
-              └──────────┘   └──────────┘   └──────────┘
-                    │
-                    ▼
-              Customer Endpoints
-              (webhooks delivered)
+           └──┬──┬──┬───────┘ └─────┬─────┘ └───────┬───────┘
+              │  │  │               │               │
+              │  │  │               │ (API calls    │
+              │  │  │               │  via HTTP)    │
+              │  │  └───────────────┼───────────────┤
+              │  │                  │               │
+              │  │                  ▼               ▼
+              │  │            ┌──────────┐   ┌──────────┐
+              │  │            │ PostgreSQL│   │  Redis   │
+              │  │            │  (Neon)  │   │ (Upstash)│
+              │  │            └──────────┘   └──────────┘
+              │  │
+              │  └──────────────┼────► Cloudflare R2 (storage)
+              │                 │
+              └─────────────────┼────► Grafana Cloud (monitoring)
+                                │
+                                ▼
+                          Customer Endpoints
+                          (webhooks delivered)
 ```
 
 ## Components
@@ -95,24 +85,20 @@
 **Responsibilities:**
 - Polls `webhook_queue` table for pending deliveries
 - Executes webhook delivery with retry logic
-- Signs payloads with HMAC-SHA256 (`Standard Webhooks headers (webhook-id, webhook-timestamp, webhook-signature)`)
-- Supports multiple delivery backends:
-  - **HTTP** — Standard webhook delivery (primary)
-  - **gRPC** — For gRPC-capable endpoints
-  - **SQS** — Forward to AWS SQS queues
-  - **WebSocket** — Real-time delivery
+- Signs payloads with HMAC-SHA256 (Standard Webhooks headers: `webhook-id`, `webhook-timestamp`, `webhook-signature`)
+- **HTTP delivery** — Standard webhook delivery (primary)
+- **WebSocket delivery** — Real-time delivery
 - Fanout: one event → multiple endpoints
 - Exponential backoff retry with jitter
 - Retry scheduler: polls DB every 30s for pending retries
+- Dead letter queue for permanently failed deliveries
 
-**Delivery Backends:**
+**Delivery Flow:**
 
 ```
 worker/src/delivery/
 ├── mod.rs          # Delivery trait + factory
 ├── http.rs         # HTTP POST delivery
-├── grpc.rs         # gRPC delivery
-├── sqs.rs          # AWS SQS delivery
 └── websocket.rs    # WebSocket delivery
 ```
 
@@ -120,7 +106,7 @@ worker/src/delivery/
 
 | Property | Value |
 |----------|-------|
-| Framework | Next.js 14 (App Router) |
+| Framework | Next.js 16 (App Router) |
 | Port | 3001 |
 | UI | Tailwind CSS + Radix UI + Tremor |
 

@@ -25,7 +25,7 @@
 
 | Tool | Version | Install |
 |------|---------|---------|
-| **Rust** | 1.75+ (MSRV) | [rustup.rs](https://rustup.rs/) |
+| **Rust** | 1.95+ (MSRV) | [rustup.rs](https://rustup.rs/) |
 | **Node.js** | 20+ LTS | [nodejs.org](https://nodejs.org/) |
 | **PostgreSQL** | 16+ | [postgresql.org](https://www.postgresql.org/download/) |
 | **Docker** | 24+ | [docs.docker.com](https://docs.docker.com/get-docker/) |

@@ -529,8 +529,8 @@ cd dashboard && npm run test:visual:update  # Update baselines
 schemathesis run http://localhost:3000/openapi.json --checks all
 
 # ── SDKs ──
-cd sdks && make test                # Node.js + Python
-cd sdks && ./run-tests.sh           # All 11 SDKs
+cd sdks && make test                # Node.js (when available)
+# cd sdks && ./run-tests.sh        # All SDKs (when available)
 
 # ── Load ──
 k6 run tests/load/api-load-test.js

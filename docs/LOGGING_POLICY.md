@@ -1,42 +1,42 @@
-# HookSniff — Log Retention Policy (Günlük Saklama Politikası)
+# HookSniff — Log Retention Policy
 
-> Son güncelleme: 2026-05-12
-> Sahip: DevOps / AI Agent
-> İlgili: [SECURITY.md](./SECURITY.md), [RUNBOOK.md](./RUNBOOK.md)
+> Last updated: 2026-06-03
+> Owner: DevOps / AI Agent
+> Related: [SECURITY.md](./SECURITY.md), [RUNBOOK.md](./RUNBOOK.md)
 
 ---
 
-## İçindekiler
+## Table of Contents
 
-1. [Log Seviyeleri](#log-seviyeleri)
-2. [Retention Policy (Saklama Süreleri)](#retention-policy)
-3. [PII Masking Rules (Kişisel Veri Maskeleme)](#pii-masking-rules)
-4. [Log Formatı](#log-formatı)
-5. [Alert Rules (Uyarı Kuralları)](#alert-rules)
-6. [Log Kaynakları](#log-kaynakları)
+1. [Log Levels](#log-levels)
+2. [Retention Policy](#retention-policy)
+3. [PII Masking Rules](#pii-masking-rules)
+4. [Log Format](#log-format)
+5. [Alert Rules](#alert-rules)
+6. [Log Sources](#log-sources)
 7. [Compliance](#compliance)
 
 ---
 
-## Log Seviyeleri
+## Log Levels
 
-HookSniff, standart log seviyelerini kullanır. Her seviye belirli bir ciddiyet ve aksiyon beklentisi taşır.
+HookSniff uses standard log levels. Each level carries a specific severity and action expectation.
 
-| Seviye | Kullanım | Örnek |
-|--------|----------|-------|
-| `FATAL` | Servis çökmesi, geri dönüşü olmayan hatalar | DB bağlantısı tamamen koptu, OOM |
-| `ERROR` | İşlem başarısız, kullanıcı etkilendi | Webhook delivery başarısız, auth hatası |
-| `WARN` | Potansiyel sorun, aksiyon gerekebilir | Rate limit yaklaşıyor, retry sayısı yüksek |
-| `INFO` | Normal iş akışı olayları | Webhook alındı, endpoint oluşturuldu, user login |
-| `DEBUG` | Detaylı hata ayıklama bilgisi | HTTP header'lar, SQL query'ler, cache hit/miss |
-| `TRACE` | Çok detaylı, sadece geliştirme ortamında | Her fonksiyon girişi/çıkışı |
+| Level | Usage | Example |
+|-------|-------|--------|
+| `FATAL` | Service crash, unrecoverable errors | DB connection lost, OOM |
+| `ERROR` | Operation failed, user affected | Webhook delivery failed, auth error |
+| `WARN` | Potential issue, action may be needed | Rate limit approaching, retry count high |
+| `INFO` | Normal business flow events | Webhook received, endpoint created, user login |
+| `DEBUG` | Detailed debugging info | HTTP headers, SQL queries, cache hit/miss |
+| `TRACE` | Very detailed, development only | Every function entry/exit |
 
-### Seviye Kullanım Kuralları
+### Level Usage Rules
 
-- **Production:** `INFO` ve üzeri (varsayılan)
-- **Staging:** `DEBUG` ve üzeri
-- **Development:** `TRACE` dahil tümü
-- **Dinamik seviye:** `RUST_LOG` ortam değişkeni ile değiştirilebilir
+- **Production:** `INFO` and above (default)
+- **Staging:** `DEBUG` and above
+- **Development:** All levels including `TRACE`
+- **Dynamic level:** Configurable via `RUST_LOG` environment variable
 
 ```bash
 # Production
@@ -53,35 +53,35 @@ RUST_LOG=hooksniff::api::webhooks=debug,hooksniff::worker=info
 
 ## Retention Policy
 
-### Grafana Cloud (Ana Log Deposu)
+### Grafana Cloud (Primary Log Store)
 
-| Log Türü | Saklama Süresi | Açıklama |
-|----------|----------------|----------|
-| **Application logs** (API + Worker) | **30 gün** | Tüm INFO ve üzeri loglar |
-| **Access logs** (HTTP request) | **30 gün** | Her HTTP isteği |
-| **Audit logs** (güvenlik) | **90 gün** | Login, permission değişiklikleri |
-| **Error logs** | **30 gün** | ERROR ve FATAL seviyeleri |
-| **Debug logs** | **7 gün** | Sadece gerektiğinde aktif |
+| Log Type | Retention | Description |
+|----------|-----------|-------------|
+| **Application logs** (API + Worker) | **30 days** | All INFO and above logs |
+| **Access logs** (HTTP request) | **30 days** | Every HTTP request |
+| **Audit logs** (security) | **90 days** | Login, permission changes |
+| **Error logs** | **30 days** | ERROR and FATAL levels |
+| **Debug logs** | **7 days** | Only when needed |
 
-### Saklama Süresi Hesaplaması
+### Retention Calculation
 
 Grafana Cloud free tier:
-- **10 GB/ay** log volume
-- **50 GB** toplam saklama
-- **30 gün** default retention
+- **10 GB/month** log volume
+- **50 GB** total storage
+- **30 days** default retention
 
-HookSniff tahmini günlük volume:
-- ~50 MB/gün (INFO seviyesi, normal trafik)
-- ~150 MB/gün (DEBUG seviyesi, yüksek trafik)
-- **Aylık toplam:** ~1.5 GB (INFO) — free tier yeterli
+HookSniff estimated daily volume:
+- ~50 MB/day (INFO level, normal traffic)
+- ~150 MB/day (DEBUG level, high traffic)
+- **Monthly total:** ~1.5 GB (INFO) — free tier sufficient
 
-### Yedekleme ve Arşivleme
+### Backup and Archiving
 
-| İşlem | Sıklık | Saklama | Konum |
-|-------|--------|---------|-------|
-| Grafana Cloud export | Haftalık | 90 gün | Cloudflare R2 |
-| Audit log export | Aylık | 1 yıl | Cloudflare R2 |
-| Error log snapshot | Günlük | 30 gün | Grafana Cloud |
+| Operation | Frequency | Retention | Location |
+|-----------|-----------|-----------|----------|
+| Grafana Cloud export | Weekly | 90 days | Cloudflare R2 |
+| Audit log export | Monthly | 1 year | Cloudflare R2 |
+| Error log snapshot | Daily | 30 days | Grafana Cloud |
 
 ```bash
 # Grafana Cloud'dan log export (API ile)
@@ -146,21 +146,21 @@ tracing::info!(
 );
 ```
 
-### Maskeleme Kuralları
+### Masking Rules
 
-1. **Log oluşturma anında maskele** — Log storage'a gitmeden önce
-2. **Geri dönüşü olmayan maskeleme** — Maskelenmiş veri orijinalinden kurtarılamaz
-3. **Audit log istisnası** — Audit log'lar orijinal veriyi saklar (erişim kontrolü ile)
-4. **Debug modunda bile maskele** — Debug log'ları PII korumalı olmalı
+1. **Mask at log creation time** — Before log reaches storage
+2. **Irreversible masking** — Masked data cannot be recovered to original
+3. **Audit log exception** — Audit logs retain original data (with access control)
+4. **Mask even in debug mode** — Debug logs must be PII-safe
 
-### Kesinlikle Loglanmaması Gerekenler
+### Never Log These
 
-- ❌ Kullanıcı şifreleri (plain veya hash)
-- ❌ OAuth token'ları
-- ❌ JWT secret'ları
-- ❌ Database connection string'leri (credentials içeren)
-- ❌ Private key'ler
-- ❌ Webhook secret'ları (signature verification için kullanılan)
+- ❌ User passwords (plain or hash)
+- ❌ OAuth tokens
+- ❌ JWT secrets
+- ❌ Database connection strings (with credentials)
+- ❌ Private keys
+- ❌ Webhook secrets (used for signature verification)
 
 ---
 
@@ -208,18 +208,18 @@ tracing::info!(
 
 ## Alert Rules
 
-### Log Bazlı Alert'ler
+### Log-Based Alert Rules
 
-| Alert | Koşul | Seviye | Aksiyon |
-|-------|-------|--------|---------|
-| `ErrorSpike` | 5 dakikada >50 ERROR log | 🔴 Critical | Otomatik rollback değerlendir |
-| `FatalDetected` | Herhangi bir FATAL log | 🔴 Critical | Acil müdahale |
-| `AuthFailureSpike` | 1 dakikada >20 auth hatası | 🟡 Warning | Brute-force kontrolü |
-| `WebhookDeliveryErrors` | 5 dakikada >%10 delivery hatası | 🔴 Critical | Worker durumu kontrol |
-| `DatabaseConnectionErrors` | >3 DB bağlantı hatası/dakika | 🔴 Critical | Neon durumu kontrol |
-| `HighRetryRate` | >%20 request retry | 🟡 Warning | API durumu kontrol |
-| `MemoryPressure` | >%90 memory kullanımı | 🟡 Warning | Instance scaling kontrol |
-| `SlowQueries` | >5 sorgu >2 saniye/dakika | 🟡 Warning | DB indeks kontrolü |
+| Alert | Condition | Level | Action |
+|-------|-----------|-------|--------|
+| `ErrorSpike` | >50 ERROR logs in 5 min | 🔴 Critical | Evaluate automatic rollback |
+| `FatalDetected` | Any FATAL log | 🔴 Critical | Immediate response |
+| `AuthFailureSpike` | >20 auth failures in 1 min | 🟡 Warning | Brute-force check |
+| `WebhookDeliveryErrors` | >10% delivery errors in 5 min | 🔴 Critical | Check Worker status |
+| `DatabaseConnectionErrors` | >3 DB connection errors/min | 🔴 Critical | Check Neon status |
+| `HighRetryRate` | >20% request retry | 🟡 Warning | Check API status |
+| `MemoryPressure` | >90% memory usage | 🟡 Warning | Check instance scaling |
+| `SlowQueries` | >5 queries >2s/min | 🟡 Warning | Check DB indexes |
 
 ### Grafana Cloud Alert Konfigürasyonu
 

@@ -29,7 +29,7 @@ This guide walks you through setting up every service, getting credentials, and 
 |---------|---------|-----------|-----------------|
 | Neon | PostgreSQL database | 0.5 GB, 100 CU-hrs, 10 projects | $19/mo (Scale) |
 | Upstash Redis | Rate limiting + caching | 256 MB, 500K cmds/mo | $120/mo (Pro) |
-| Google Cloud Run | API + Worker hosting | 2M istek, 360K vCPU-saniye (Free Tier) | Pay-as-you-go |
+| Google Cloud Run | API + Worker hosting | 2M requests, 360K vCPU-seconds (Free Tier) | Pay-as-you-go |
 | Vercel | Dashboard hosting | 100 GB BW, unlimited sites | $20/mo (Pro) |
 | Grafana Cloud | Monitoring + tracing | 10K metrics, 50 GB logs, 50 GB traces | Pay-as-you-go |
 | Cloudflare R2 | Webhook payload storage | 10 GB, egress free | $0.015/GB-mo |
@@ -471,7 +471,7 @@ APP_URL=https://hooksniff.vercel.app
 
 ### Gotchas
 
-- **"Proxied"** means Cloudflare hides your Cloud Run servisi's IP. This is good for security and DDoS protection.
+- **"Proxied"** means Cloudflare hides your Cloud Run service's IP. This is good for security and DDoS protection.
 - **Full (Strict) SSL** requires an origin certificate on your VM. Without it, use "Full" (not strict).
 - **Free plan** includes DDoS protection — no need to upgrade for security.
 - **Orange cloud** (proxied) vs **Grey cloud** (DNS only): Keep API and dashboard proxied for SSL and caching.
