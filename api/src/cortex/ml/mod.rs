@@ -24,6 +24,8 @@ pub mod advanced_forecast;
 pub mod chaos;
 pub mod ab_testing;
 pub mod automl;
+#[cfg(test)]
+mod tests;
 
 use sqlx::PgPool;
 
