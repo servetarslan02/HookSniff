@@ -28,6 +28,12 @@ let proactiveRefreshTimer: ReturnType<typeof setInterval> | null = null;
 // Cleanup function for visibilitychange listener (stored separately, not on the timer number)
 let visibilityCleanup: (() => void) | null = null;
 
+// HS-039b: Inactivity auto-logout — logs out after 1 hour of no user activity.
+// If user is active, token keeps refreshing. If idle for 1 hour, session ends.
+const INACTIVITY_TIMEOUT_MS = 60 * 60 * 1000; // 1 hour
+let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
+let activityCleanup: (() => void) | null = null;
+
 // BUG FIX: Multi-tab refresh coordination via BroadcastChannel
 // Prevents multiple tabs from refreshing simultaneously (token is one-time-use).
 // Lazy init — avoids module-level side effect that blocks tree-shaking.
@@ -88,35 +94,65 @@ function doRefresh(): Promise<string | null> {
 
 /**
  * HS-039: Start proactive token refresh.
- * Renews the access token every 12 minutes (3 min before 15-min expiry).
+ * Renews the access token every 50 minutes (10 min before 60-min expiry).
  * While the user is active, the session never drops.
- * Call this after login. Call stopProactiveRefresh() on logout.
  *
- * BUG FIX: Listens for BroadcastChannel messages from other tabs
- * to sync tokens without each tab refreshing independently.
- * BUG FIX: Re-registers onTokenRefreshed callback (cleared by stopProactiveRefresh on logout).
+ * HS-039b: Auto-logout after 1 hour of inactivity.
+ * Tracks mouse, keyboard, scroll, touch events. If no activity for 1 hour,
+ * calls the logout callback to end the session.
+ *
+ * Call this after login. Call stopProactiveRefresh() on logout.
  */
-export function startProactiveRefresh(onRefresh: (newToken: string) => void): void {
+export function startProactiveRefresh(
+  onRefresh: (newToken: string) => void,
+  onLogout?: () => void,
+): void {
   stopProactiveRefresh();
-  // BUG FIX: Re-register the callback that was cleared by stopProactiveRefresh
   onTokenRefreshed = onRefresh;
 
-  // BUG FIX: Listen for token refreshes from other tabs
+  // ── BroadcastChannel: sync tokens across tabs ──
   if (getRefreshChannel()) {
     getRefreshChannel()!.onmessage = (event) => {
       if (event.data?.type === 'TOKEN_REFRESHED' && event.data.token) {
         onRefresh(event.data.token);
       }
+      if (event.data?.type === 'INACTIVITY_LOGOUT') {
+        // Another tab triggered logout — sync
+        onLogout?.();
+      }
     };
   }
 
+  // ── Proactive token refresh (every 50 min) ──
   proactiveRefreshTimer = setInterval(async () => {
     const newToken = await doRefresh();
     if (newToken) {
       onRefresh(newToken);
     }
-    // If refresh fails, don't panic — the reactive 401 handler will catch it
-  }, 50 * 60 * 1000); // 50 minutes (token expires in 60 min, refresh 10 min early)
+  }, 50 * 60 * 1000);
+
+  // ── Inactivity tracking (auto-logout after 1 hour idle) ──
+  if (typeof window !== 'undefined' && onLogout) {
+    const resetTimer = () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        // Broadcast to other tabs
+        if (getRefreshChannel()) {
+          getRefreshChannel()!.postMessage({ type: 'INACTIVITY_LOGOUT' });
+        }
+        onLogout();
+      }, INACTIVITY_TIMEOUT_MS);
+    };
+
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    events.forEach((e) => document.addEventListener(e, resetTimer, { passive: true }));
+    resetTimer(); // Start the timer
+
+    activityCleanup = () => {
+      events.forEach((e) => document.removeEventListener(e, resetTimer));
+      if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; }
+    };
+  }
 
   // BUG FIX: Refresh immediately when tab becomes visible again.
   // Background tabs have setInterval throttled to 1-minute minimum,
@@ -156,25 +192,19 @@ export function startProactiveRefresh(onRefresh: (newToken: string) => void): vo
   };
 }
 
-/** Stop proactive token refresh. Call on logout. */
+/** Stop proactive token refresh and inactivity tracking. Call on logout. */
 export function stopProactiveRefresh(): void {
   if (proactiveRefreshTimer) {
-    // Clean up visibility change listener
-    if (visibilityCleanup) {
-      visibilityCleanup();
-      visibilityCleanup = null;
-    }
+    if (visibilityCleanup) { visibilityCleanup(); visibilityCleanup = null; }
     clearInterval(proactiveRefreshTimer);
     proactiveRefreshTimer = null;
   }
-  // BUG FIX: Clean up BroadcastChannel listener
-  if (getRefreshChannel()) {
-    getRefreshChannel()!.onmessage = null;
-  }
-  // BUG FIX: Clear any pending refresh promise to prevent stale callbacks
+  // Clean up inactivity tracking
+  if (activityCleanup) { activityCleanup(); activityCleanup = null; }
+  if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; }
+  // Clean up BroadcastChannel
+  if (getRefreshChannel()) { getRefreshChannel()!.onmessage = null; }
   refreshPromise = null;
-  // BUG FIX: Clear the token refresh callback to prevent race condition
-  // (logout clears state, then refresh callback fires and restores token)
   onTokenRefreshed = null;
 }
 
