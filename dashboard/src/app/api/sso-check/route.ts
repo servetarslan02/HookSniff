@@ -1,6 +1,6 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-cec4.onrender.com';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-499907444852.europe-west1.run.app';
 
 export async function GET(request: NextRequest) {
   const domain = request.nextUrl.searchParams.get('domain');
