@@ -86,6 +86,23 @@ async fn main() -> Result<()> {
 
     routes::health::set_health_checks_ready();
 
+    // ── Redis Streams Queue (webhook fast path) ─────────────────
+    let mut redis_queue: Option<queue::RedisQueue> = None;
+    if let Some(ref url) = redis_url {
+        match tokio::time::timeout(redis_startup, queue::RedisQueue::new(url)).await {
+            Ok(Ok(q)) => {
+                tracing::info!("✅ Redis Streams webhook queue active");
+                redis_queue = Some(q);
+            }
+            Ok(Err(e)) => {
+                tracing::warn!("Redis Streams queue unavailable ({}), using PG fallback", e);
+            }
+            Err(_) => {
+                tracing::warn!("Redis Streams queue timed out, using PG fallback");
+            }
+        }
+    }
+
     // ── Warm-up (background) ────────────────────────────────────
     let warmup_pool = pool.clone();
     let warmup_cache = cache_layer.clone();
@@ -281,6 +298,7 @@ async fn main() -> Result<()> {
         .layer(axum::Extension(email_provider))
         .layer(axum::Extension(cfg.clone()))
         .layer(axum::Extension(health_pool))
+        .layer(axum::Extension(std::sync::Arc::new(std::sync::Mutex::new(redis_queue))))
         .layer(axum::Extension(pool.clone()));
 
     // ── Start server — bind TCP listener FIRST so Render's startup probe sees the port ──

@@ -271,6 +271,51 @@ pub async fn publish_to_queue(
     Ok(())
 }
 
+/// Publish to Redis Streams queue first, fall back to PostgreSQL on failure.
+/// This is the fast path — sub-millisecond when Redis is available.
+pub async fn publish_to_queue_fast(
+    pool: &PgPool,
+    redis_queue: &mut Option<crate::queue::RedisQueue>,
+    delivery_id: uuid::Uuid,
+    endpoint_id: uuid::Uuid,
+    endpoint_url: &str,
+    payload: &str,
+    custom_headers: Option<&serde_json::Value>,
+    signing_secret: &str,
+    max_attempts: i32,
+) -> Result<()> {
+    let trace_id = crate::telemetry::current_trace_id();
+
+    // ── Try Redis first (fast path) ──
+    if Some(redis) = redis_queue.as_mut() {
+        let msg = crate::queue::QueueMessage {
+            delivery_id: delivery_id.to_string(),
+            endpoint_id: endpoint_id.to_string(),
+            endpoint_url: endpoint_url.to_string(),
+            payload: payload.to_string(),
+            custom_headers: custom_headers.cloned(),
+            signing_secret: signing_secret.to_string(),
+            trace_id: trace_id.clone(),
+            attempt_count: 0,
+            max_attempts,
+            queue_item_id: String::new(),
+        };
+
+        match redis.enqueue(&msg).await {
+            Ok(stream_id) => {
+                tracing::debug!("📤 Webhook {} queued to Redis (stream_id={})", delivery_id, stream_id);
+                return Ok(());
+            }
+            Err(e) => {
+                tracing::warn!("Redis queue failed for {}: {} — falling back to PG", delivery_id, e);
+            }
+        }
+    }
+
+    // ── Fallback: PostgreSQL queue ──
+    publish_to_queue(pool, delivery_id, endpoint_id, endpoint_url, payload, custom_headers).await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
