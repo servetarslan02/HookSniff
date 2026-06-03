@@ -1,16 +1,69 @@
-//! SSRF (Server-Side Request Forgery) Koruması
+//! SSRF (Server-Side Request Forgery) Protection
 //!
-//! Webhook endpoint URL'lerini teslimattan önce kontrol eder.
-//! Internal/private IP'lere yapılan istekleri engeller.
+//! Validates webhook endpoint URLs before delivery.
+//! Blocks requests to internal/private IPs.
 //!
-//! ## Korunan adresler
-//! - Private IP aralıkları: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+//! ## Protected addresses
+//! - Private IP ranges: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
 //! - Loopback: 127.0.0.0/8, ::1
 //! - Link-local: 169.254.0.0/16, fe80::/10
-//! - Metadata endpoint'leri: 169.254.169.254 (AWS), metadata.google.internal (GCP)
+//! - Metadata endpoints: 169.254.169.254 (AWS), metadata.google.internal (GCP)
 //! - localhost, 0.0.0.0
 
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, ToSocketAddrs};
+use std::collections::HashMap;
+use std::sync::Mutex;
+use std::time::{Duration, Instant};
+
+/// DNS cache TTL — avoids repeated DNS lookups for the same host.
+const DNS_CACHE_TTL: Duration = Duration::from_secs(300); // 5 minutes
+
+/// Cached DNS entry.
+struct DnsCacheEntry {
+    ip: IpAddr,
+    expires_at: Instant,
+}
+
+/// Global DNS cache with TTL.
+static DNS_CACHE: Mutex<Option<HashMap<String, DnsCacheEntry>>> = Mutex::new(None);
+
+/// Lookup DNS with caching. Returns cached IP if still valid, otherwise resolves and caches.
+fn dns_lookup_cached(host: &str) -> Result<IpAddr, SsrfError> {
+    // Check cache first
+    {
+        let mut cache = DNS_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+        if let Some(ref map) = *cache {
+            if let Some(entry) = map.get(host) {
+                if Instant::now() < entry.expires_at {
+                    return Ok(entry.ip);
+                }
+            }
+        }
+    }
+
+    // Cache miss — resolve DNS
+    let ip = (host, 0)
+        .to_socket_addrs()
+        .map_err(|_| SsrfError::DnsResolutionFailed(host.to_string()))?
+        .next()
+        .map(|addr| addr.ip())
+        .ok_or_else(|| SsrfError::DnsResolutionFailed(host.to_string()))?;
+
+    // Store in cache
+    {
+        let mut cache = DNS_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+        let map = cache.get_or_insert_with(HashMap::new);
+        map.insert(
+            host.to_string(),
+            DnsCacheEntry {
+                ip,
+                expires_at: Instant::now() + DNS_CACHE_TTL,
+            },
+        );
+    }
+
+    Ok(ip)
+}
 
 /// SSRF doğrulama hatası
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -93,23 +146,10 @@ pub fn validate_url_and_resolve(url: &str) -> Result<IpAddr, SsrfError> {
         return Ok(ip);
     }
 
-    // DNS çözümleme
-    let addrs: Vec<IpAddr> = std::net::ToSocketAddrs::to_socket_addrs(&(host_str, 0))
-        .map_err(|_| SsrfError::DnsResolutionFailed(host_str.to_string()))?
-        .map(|addr| addr.ip())
-        .collect();
-
-    if addrs.is_empty() {
-        return Err(SsrfError::DnsResolutionFailed(host_str.to_string()));
-    }
-
-    // Tüm resolve edilen IP'leri kontrol et
-    for ip in &addrs {
-        check_ip(ip)?;
-    }
-
-    // Return first resolved IP for callers to use directly
-    Ok(addrs[0])
+    // DNS resolution with caching
+    let ip = dns_lookup_cached(host_str)?;
+    check_ip(&ip)?;
+    Ok(ip)
 }
 
 /// URL'in SSRF saldırılarına karşı güvenli olup olmadığını kontrol et.

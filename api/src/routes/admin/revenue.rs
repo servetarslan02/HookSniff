@@ -219,7 +219,7 @@ pub async fn admin_revenue_metrics(
         0.0
     };
 
-    let avg_months: (Option<f64>,) = sqlx::query_as(
+    let avg_months_val: f64 = sqlx::query_scalar(
         r#"SELECT COALESCE(AVG(avg_months), 0.0::double precision) FROM (
              SELECT customer_id,
                CASE WHEN COUNT(*) > 1
@@ -231,12 +231,12 @@ pub async fn admin_revenue_metrics(
            ) sub"#,
     )
     .fetch_one(&pool)
-    .await?;
-    let avg_months_val = avg_months.0.unwrap_or(0.0);
+    .await
+    .unwrap_or(0.0);
 
     let ltv = arpu * avg_months_val;
 
-    let churned: (i64,) = sqlx::query_as(
+    let churned: i64 = sqlx::query_scalar(
         r#"SELECT COUNT(*)::bigint FROM (
              SELECT customer_id FROM invoices WHERE status = 'paid'
              GROUP BY customer_id
@@ -244,14 +244,15 @@ pub async fn admin_revenue_metrics(
            ) churned"#,
     )
     .fetch_one(&pool)
-    .await?;
+    .await
+    .unwrap_or(0);
     let churn_rate = if paying_customers > 0 {
-        (churned.0 as f64 / paying_customers as f64) * 100.0
+        (churned as f64 / paying_customers as f64) * 100.0
     } else {
         0.0
     };
 
-    let current_month_rev: (Option<f64>,) = sqlx::query_as(
+    let current_month_rev: f64 = sqlx::query_scalar(
         r#"SELECT COALESCE(SUM(i.amount_cents::double precision / 100.0), 0.0::double precision)
            FROM invoices i
            JOIN customers c ON c.id = i.customer_id
@@ -260,9 +261,10 @@ pub async fn admin_revenue_metrics(
              AND c.created_at < DATE_TRUNC('month', NOW())"#,
     )
     .fetch_one(&pool)
-    .await?;
+    .await
+    .unwrap_or(0.0);
 
-    let last_month_rev: (Option<f64>,) = sqlx::query_as(
+    let last_month_rev: f64 = sqlx::query_scalar(
         r#"SELECT COALESCE(SUM(i.amount_cents::double precision / 100.0), 0.0::double precision)
            FROM invoices i
            JOIN customers c ON c.id = i.customer_id
@@ -272,15 +274,16 @@ pub async fn admin_revenue_metrics(
              AND c.created_at < DATE_TRUNC('month', NOW() - INTERVAL '1 month')"#,
     )
     .fetch_one(&pool)
-    .await?;
+    .await
+    .unwrap_or(0.0);
 
-    let nrr = if last_month_rev.0.unwrap_or(0.0) > 0.0 {
-        (current_month_rev.0.unwrap_or(0.0) / last_month_rev.0.unwrap_or(0.0)) * 100.0
+    let nrr = if last_month_rev > 0.0 {
+        (current_month_rev / last_month_rev) * 100.0
     } else {
         100.0
     };
 
-    let expansion: (Option<f64>,) = sqlx::query_as(
+    let expansion: f64 = sqlx::query_scalar(
         r#"SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0::double precision)
            FROM invoices i
            JOIN customers c ON c.id = i.customer_id
@@ -290,7 +293,8 @@ pub async fn admin_revenue_metrics(
              AND c.created_at < DATE_TRUNC('month', NOW()) - INTERVAL '1 month'"#,
     )
     .fetch_one(&pool)
-    .await?;
+    .await
+    .unwrap_or(0.0);
 
     Ok(Json(serde_json::json!({
         "mrr": mrr_val,
@@ -298,7 +302,7 @@ pub async fn admin_revenue_metrics(
         "arpu": arpu,
         "ltv": ltv,
         "nrr": nrr,
-        "expansion_revenue": expansion.0.unwrap_or(0.0),
+        "expansion_revenue": expansion,
         "total_customers": total_customers,
         "paying_customers": paying_customers,
         "churn_rate": churn_rate,
@@ -345,7 +349,7 @@ pub async fn admin_revenue_cohorts(
              customers_active,
              total_revenue_cents,
              CASE WHEN customers_signed_up > 0
-               THEN ROUND(customers_active::double precision / customers_signed_up * 100, 1)::double precision
+               THEN ROUND((customers_active::numeric / customers_signed_up * 100), 1)::double precision
                ELSE 0.0::double precision
              END as retention_rate
            FROM cohort_revenue

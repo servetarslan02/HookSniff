@@ -11,13 +11,15 @@ use std::time::Duration;
 /// Shared HTTP client for API → external service calls.
 ///
 /// - 15 second timeout (connect + read)
-/// - Connection pooling enabled
+/// - Connection pooling enabled (HTTP/2 multiplexing)
 /// - TLS via rustls
+/// - HTTP/2 preferred (falls back to HTTP/1.1)
 static SHARED_CLIENT: LazyLock<Client> = LazyLock::new(|| {
     Client::builder()
         .timeout(Duration::from_secs(15))
         .connect_timeout(Duration::from_secs(5))
         .pool_idle_timeout(Duration::from_secs(90))
+        .pool_max_idle_per_host(10)
         .build()
         .expect("Failed to create shared HTTP client")
 });
