@@ -35,7 +35,7 @@ const nextConfig = {
           "style-src 'self' 'unsafe-inline'",
           "img-src 'self' data: https: blob:",
           "font-src 'self' data:",
-          "connect-src 'self' https://hooksniff-api-499907444852.europe-west1.run.app wss://hooksniff-api-499907444852.europe-west1.run.app https://*.sentry.io https://vitals.vercel-insights.com https://cloudflareinsights.com wss:",
+          "connect-src 'self' https://hooksniff-api-e6ztf3x2ma-ew.a.run.app wss://hooksniff-api-e6ztf3x2ma-ew.a.run.app https://*.sentry.io https://vitals.vercel-insights.com https://cloudflareinsights.com wss:",
           "frame-ancestors 'none'",
           "base-uri 'self'",
           "form-action 'self'",
