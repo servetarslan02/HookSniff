@@ -221,11 +221,11 @@ pub async fn admin_revenue_metrics(
     };
 
     let avg_months: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(AVG(avg_months), 0.0) FROM (
+        r#"SELECT COALESCE(AVG(avg_months), 0.0::double precision) FROM (
              SELECT customer_id,
                CASE WHEN COUNT(*) > 1
                  THEN EXTRACT(EPOCH FROM (MAX(paid_at) - MIN(paid_at))) / 2592000.0
-                 ELSE 0.0
+                 ELSE 0.0::double precision
                END as avg_months
              FROM invoices WHERE status = 'paid'
              GROUP BY customer_id
@@ -238,7 +238,7 @@ pub async fn admin_revenue_metrics(
     let ltv = arpu * avg_months_val;
 
     let churned: (i64,) = sqlx::query_as(
-        r#"SELECT COUNT(*) FROM (
+        r#"SELECT COUNT(*)::bigint FROM (
              SELECT customer_id FROM invoices WHERE status = 'paid'
              GROUP BY customer_id
              HAVING MAX(paid_at) < NOW() - INTERVAL '30 days'
@@ -253,7 +253,7 @@ pub async fn admin_revenue_metrics(
     };
 
     let current_month_rev: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(SUM(i.amount_cents::double precision / 100.0), 0.0)
+        r#"SELECT COALESCE(SUM(i.amount_cents::double precision / 100.0), 0.0::double precision)
            FROM invoices i
            JOIN customers c ON c.id = i.customer_id
            WHERE i.status = 'paid'
@@ -264,7 +264,7 @@ pub async fn admin_revenue_metrics(
     .await?;
 
     let last_month_rev: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(SUM(i.amount_cents::double precision / 100.0), 0.0)
+        r#"SELECT COALESCE(SUM(i.amount_cents::double precision / 100.0), 0.0::double precision)
            FROM invoices i
            JOIN customers c ON c.id = i.customer_id
            WHERE i.status = 'paid'
@@ -282,7 +282,7 @@ pub async fn admin_revenue_metrics(
     };
 
     let expansion: (Option<f64>,) = sqlx::query_as(
-        r#"SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0)
+        r#"SELECT COALESCE(SUM(amount_cents::double precision / 100.0), 0.0::double precision)
            FROM invoices i
            JOIN customers c ON c.id = i.customer_id
            WHERE i.status = 'paid'
@@ -334,8 +334,8 @@ pub async fn admin_revenue_cohorts(
                COALESCE(SUM(
                  CASE WHEN i.paid_at >= cb.cohort_start
                    AND i.paid_at < cb.cohort_start + INTERVAL '1 month'
-                 THEN i.amount_cents ELSE 0 END
-               ), 0) as total_revenue_cents
+                 THEN i.amount_cents::bigint ELSE 0::bigint END
+               ), 0::bigint) as total_revenue_cents
              FROM cohort_base cb
              LEFT JOIN invoices i ON i.customer_id = cb.customer_id AND i.status = 'paid'
              GROUP BY cb.cohort_month
@@ -346,8 +346,8 @@ pub async fn admin_revenue_cohorts(
              customers_active,
              total_revenue_cents,
              CASE WHEN customers_signed_up > 0
-               THEN ROUND(customers_active::numeric / customers_signed_up * 100, 1)
-               ELSE 0
+               THEN ROUND(customers_active::double precision / customers_signed_up * 100, 1)::double precision
+               ELSE 0.0::double precision
              END as retention_rate
            FROM cohort_revenue
            ORDER BY cohort_month DESC"#,
