@@ -137,7 +137,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Latency Trend */}
-      <ChartCard title={t('latencyTrend')} subtitle={t('latencyTrendDesc')} showTimeRange timeRange={timeRange} onTimeRangeChange={setTimeRange}>
+      <ChartCard title={t('latencyTrend')} subtitle={`${t('avgLabel')}: ${(latencyData as any)?.overall_avg_ms?.toFixed(0) ?? '—'}ms · ${t('p95Label')}: ${(latencyData as any)?.overall_p95_ms?.toFixed(0) ?? '—'}ms`} showTimeRange timeRange={timeRange} onTimeRangeChange={setTimeRange}>
         <div className="h-80">
           {latencyLoading ? <ChartLoading /> : !latencyData || latencyData.buckets.length === 0 ? (
             <ChartEmpty message={tc('noResults')} />

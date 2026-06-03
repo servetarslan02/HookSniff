@@ -82,6 +82,7 @@ pub struct LatencyTrendResponse {
     pub range: String,
     pub buckets: Vec<LatencyBucket>,
     pub overall_avg_ms: f64,
+    pub overall_p95_ms: f64,
 }
 
 /// GET /v1/analytics/deliveries?range=24h|7d|30d
@@ -190,7 +191,7 @@ async fn latency_trend(
         SELECT
             date_trunc('hour', da.created_at) AS bucket,
             COALESCE(AVG(da.duration_ms), 0)::FLOAT AS avg_ms,
-            COALESCE(PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY da.duration_ms), 0)::FLOAT AS p95_ms
+            0::FLOAT AS p95_ms
         FROM delivery_attempts da
         JOIN deliveries d ON d.id = da.delivery_id
         WHERE d.customer_id = $1
@@ -205,9 +206,12 @@ async fn latency_trend(
     .fetch_all(&pool)
     .await?;
 
-    let overall: (f64,) = sqlx::query_as(
+    // Overall avg + p95 (single pass over entire range)
+    let overall: (f64, f64) = sqlx::query_as(
         r#"
-        SELECT COALESCE(AVG(da.duration_ms), 0)::FLOAT
+        SELECT
+            COALESCE(AVG(da.duration_ms), 0)::FLOAT,
+            COALESCE(PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY da.duration_ms), 0)::FLOAT
         FROM delivery_attempts da
         JOIN deliveries d ON d.id = da.delivery_id
         WHERE d.customer_id = $1
@@ -231,6 +235,7 @@ async fn latency_trend(
             })
             .collect(),
         overall_avg_ms: overall.0,
+        overall_p95_ms: overall.1,
     }))
 }
 
@@ -491,10 +496,12 @@ mod tests {
             range: "30d".to_string(),
             buckets: vec![],
             overall_avg_ms: 120.0,
+            overall_p95_ms: 250.0,
         };
         let json = serde_json::to_value(&resp).unwrap();
         assert_eq!(json["range"], "30d");
         assert_eq!(json["overall_avg_ms"], 120.0);
+        assert_eq!(json["overall_p95_ms"], 250.0);
         assert!(json["buckets"].as_array().unwrap().is_empty());
     }
 
