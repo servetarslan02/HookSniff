@@ -290,7 +290,7 @@
     "title": "Endpoints",
     "subtitle": "Manage your webhook endpoints",
     "create": "Create Endpoint",
-    "newEndpoint": "+ New Endpoint",
+    "newEndpoint": "New Endpoint",
     "empty": "No endpoints yet. Create one to start receiving webhooks.",
     "emptyDesc": "Create your first endpoint to start receiving webhooks",
     "deleteConfirm": "Delete this endpoint?",
@@ -328,7 +328,9 @@
     "copy": "Copy",
     "delete": "Delete",
     "disable": "Disable",
-    "enable": "Enable"
+    "enable": "Enable",
+    "rotateConfirm": "Yes, rotate secret",
+    "rotateDesc": "The old signing secret will stop working immediately. All webhooks signed with the old secret will fail verification."
   },
   "deliveries": {
     "title": "Deliveries",

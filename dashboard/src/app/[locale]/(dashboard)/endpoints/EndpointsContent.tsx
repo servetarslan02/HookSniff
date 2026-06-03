@@ -31,6 +31,7 @@ export function EndpointsContent() {
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [rotatingId, setRotatingId] = useState<string | null>(null);
+  const [rotateConfirmId, setRotateConfirmId] = useState<string | null>(null);
   const [newSecret, setNewSecret] = useState<string | null>(null);
   const t = useTranslations('endpoints');
   const tc = useTranslations('common');
@@ -314,7 +315,7 @@ export function EndpointsContent() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => handleRotateSecret(ep)}
+                    onClick={() => setRotateConfirmId(ep.id)}
                     disabled={rotatingId === ep.id}
                     className="text-gray-500 dark:text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 transition p-2"
                     aria-label={t('rotateSecret')}
@@ -363,6 +364,24 @@ export function EndpointsContent() {
         variant="danger"
         onConfirm={confirmDelete}
         onCancel={() => setDeleteId(null)}
+      />
+
+      {/* Rotate Secret Confirmation Dialog */}
+      <ConfirmDialog
+        open={!!rotateConfirmId}
+        title={t('rotateSecret') || 'Rotate Secret'}
+        message={t('rotateDesc') || 'The old signing secret will stop working immediately.'}
+        variant="danger"
+        confirmLabel={rotatingId ? (t('rotating') || 'Rotating...') : (t('rotateSecret') || 'Rotate Secret')}
+        loading={!!rotatingId}
+        onConfirm={() => {
+          if (rotateConfirmId) {
+            const ep = endpoints.find((e) => e.id === rotateConfirmId);
+            if (ep) handleRotateSecret(ep);
+            setRotateConfirmId(null);
+          }
+        }}
+        onCancel={() => setRotateConfirmId(null)}
       />
 
       {/* New Secret Modal */}

@@ -1,18 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/api';
 import { Brain, Clock, Info } from '@/components/icons';
 
-function describePrediction(probability: number, _factors: any): { title: string; detail: string; emoji: string; advice: string } {
+function describePrediction(probability: number, _factors: any, t: any): { title: string; detail: string; emoji: string; advice: string } {
   const pct = Math.round(probability * 100);
-  if (pct >= 70) return { title: 'Yüksek ihtimalle sorun çıkacak', detail: `Cortex %${pct} olasılıkla bu endpoint'in başarısız olacağını tahmin ediyor`, emoji: '🔴', advice: 'Şimdi önlem alın: endpoint\'i kontrol edin veya yedek adrese geçin' };
-  if (pct >= 40) return { title: 'Sorun çıkma ihtimali var', detail: `Cortex %${pct} olasılıkla bir sorun bekliyor`, emoji: '🟠', advice: 'Endpoint\'inizi kontrol etmeniz önerilir' };
-  if (pct >= 20) return { title: 'Küçük bir risk var', detail: `Cortex %${pct} olasılıkla hafif bir performans düşüşü bekliyor`, emoji: '🟡', advice: 'Şimdilik endişe verici değil, izleniyor' };
-  return { title: 'Düşük risk', detail: `Cortex %${pct} olasılıkla küçük bir dalgalanma bekliyor`, emoji: '🟢', advice: 'Her şey normal görünüyor' };
+  if (pct >= 70) return { title: t('severity.high'), detail: t('detail.high', {v: pct}), emoji: '🔴', advice: t('advice.high') };
+  if (pct >= 40) return { title: t('severity.medium'), detail: t('detail.medium', {v: pct}), emoji: '🟠', advice: t('advice.medium') };
+  if (pct >= 20) return { title: t('severity.low'), detail: t('detail.low', {v: pct}), emoji: '🟡', advice: t('advice.low') };
+  return { title: t('severity.minimal'), detail: t('detail.minimal', {v: pct}), emoji: '🟢', advice: t('advice.minimal') };
 }
 
 export function PredictionsTab({ token }: { token: string | null }) {
+  const t = useTranslations('cortex.predictions');
+  const tc = useTranslations('cortex.common');
   const [predictions, setPredictions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +24,7 @@ export function PredictionsTab({ token }: { token: string | null }) {
     if (!token) return;
     apiFetch<any>('/cortex/predictions', { token })
       .then((d) => setPredictions(d.predictions || []))
-      .catch((err) => { console.error('[PredictionsTab] fetch error:', err); setError(err?.message || 'Veri yüklenirken hata oluştu'); })
+      .catch((err) => { console.error('[PredictionsTab] fetch error:', err); setError(err?.message || tc('dataLoadError')); })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -31,15 +34,15 @@ export function PredictionsTab({ token }: { token: string | null }) {
   return (
     <div className="space-y-4">
       <div className="glass-card p-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Gelecek Tahminleri</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400">Cortex geçmiş verileri analiz ederek gelecekteki olası sorunları tahmin eder.</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('title')}</h3>
+        <p className="text-sm text-gray-500 dark:text-slate-400">{t('description')}</p>
       </div>
 
       {predictions.length === 0 ? (
         <div className="glass-card p-8 text-center">
           <Brain size={48} className="mx-auto text-gray-300 dark:text-slate-600 mb-4" />
-          <p className="text-lg font-semibold text-gray-900 dark:text-white">Henüz tahmin yok</p>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Tahmin üretilmesi için en az birkaç saatlik veri gerekiyor.</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">{t('empty.title')}</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t('empty.description')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -47,7 +50,7 @@ export function PredictionsTab({ token }: { token: string | null }) {
             const probability = p[4] || 0;
             const factors = p[5] || {};
             const ts = p[7];
-            const info = describePrediction(probability, factors);
+            const info = describePrediction(probability, factors, t);
 
             return (
               <div key={i} className="glass-card p-4 hover:shadow-md transition">
@@ -61,15 +64,15 @@ export function PredictionsTab({ token }: { token: string | null }) {
                         probability >= 0.4 ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
                         probability >= 0.2 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
                         'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                      }`}>%{Math.round(probability * 100)} ihtimal</span>
+                      }`}>{t('probability', {v: Math.round(probability * 100)})}</span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-slate-400">{info.detail}</p>
                     <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                       <p className="text-xs text-blue-700 dark:text-blue-300 flex items-center gap-1"><Info size={12} /> {info.advice}</p>
                     </div>
                     <div className="flex items-center gap-4 mt-2">
-                      {ts && <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1"><Clock size={12} /> {new Date(ts).toLocaleString('tr-TR')}</p>}
-                      {factors?.method && <p className="text-xs text-gray-400 dark:text-slate-500">{factors.method === 'ml_time_series' ? '🧠 Zaman serisi analizi' : factors.method === 'trend_fallback' ? '📊 Trend analizi' : factors.method}</p>}
+                      {ts && <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center gap-1"><Clock size={12} /> {new Date(ts).toLocaleString()}</p>}
+                      {factors?.method && <p className="text-xs text-gray-400 dark:text-slate-500">{factors.method === 'ml_time_series' ? t('method.timeSeries') : factors.method === 'trend_fallback' ? t('method.trend') : factors.method}</p>}
                     </div>
                   </div>
                 </div>
