@@ -17,7 +17,7 @@
     "test:visual:update": "playwright test --config=playwright.config.ts --update-snapshots"
   },
   "dependencies": {
-    "@next/bundle-analyzer": "^16.2.6",
+    "@next/bundle-analyzer": "^16.2.7",
     "@sentry/nextjs": "^10.53.1",
     "@tanstack/query-db-collection": "^1.0.38",
     "@tanstack/react-db": "^0.1.85",
