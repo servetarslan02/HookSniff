@@ -30,41 +30,41 @@ async function ArchitectureContent(params: Promise<{ locale: string }>) {
         <p className="text-gray-600 dark:text-slate-400 mb-4">
           HookSniff consists of four main components:
         </p>
-        <pre className="bg-gray-900 text-green-400 p-6 rounded-xl text-sm font-mono overflow-x-auto">
-{`                            ┌─────────────────┐
-                            │    Internet      │
-                            └────────┬────────┘
-                                     │
-                            ┌────────▼────────┐
-                            │   TLS Proxy     │
-                            │   (Fly.io)      │
-                            └────────┬────────┘
-                                     │
-                    ┌────────────────┼────────────────┐
-                    │                │                │
-           ┌────────▼───────┐ ┌─────▼─────┐ ┌───────▼───────┐
-           │   API Server   │ │ Dashboard │ │  Healthcheck  │
-           │   (Axum/Rust)  │ │ (Next.js) │ │   (internal)  │
-           └──┬──┬──┬───────┘ └─────┬─────┘ └───────────────┘
-              │  │  │               │
-              │  │  └───────────────┼────► PostgreSQL (Neon)
-              │  │                  │
-              └──┼──────────────────┼────► Redis
-                 │                  │
-                 └──────────────────┼────► PostgreSQL Queue
-                                    │
-                                    ▼
-                              ┌───────────┐
-                              │  Worker   │
-                              │  (Rust)   │
-                              └─────┬─────┘
-                                    │
-                    ┌───────────────┼───────────────┐
-                    ▼               ▼               ▼
-              ┌──────────┐   ┌──────────┐
-              │  HTTP    │   │WebSocket │
-              │ Delivery │   │ Delivery │
-              └──────────┘   └──────────┘`}
+        <pre className="bg-gray-900 text-green-400 p-6 rounded-xl text-sm font-mono overflow-x-auto leading-relaxed">
+{`                         ┌───────────────────┐
+                         │      Internet      │
+                         └─────────┬─────────┘
+                                   │
+                         ┌─────────▼─────────┐
+                         │    Cloudflare     │
+                         │   CDN · DNS · SSL │
+                         └─────────┬─────────┘
+                                   │
+              ┌────────────────────┼────────────────────┐
+              │                    │                    │
+     ┌────────▼────────┐  ┌───────▼───────┐  ┌────────▼────────┐
+     │   API Server    │  │   Dashboard   │  │     Worker      │
+     │   (Axum/Rust)   │  │  (Next.js 16) │  │    (Rust)       │
+     │   Port 3000     │  │   Port 3001   │  │                 │
+     └──┬───┬───┬──────┘  └───────┬───────┘  └────────┬────────┘
+        │   │   │                 │                    │
+        │   │   │                 │  (API calls        │
+        │   │   │                 │   via HTTP)        │
+        │   │   └─────────────────┼────────────────────┤
+        │   │                     │                    │
+        │   │                     ▼                    ▼
+        │   │              ┌────────────┐      ┌────────────┐
+        │   │              │ PostgreSQL │      │   Redis    │
+        │   │              │   (Neon)   │      │ (Upstash)  │
+        │   │              └────────────┘      └────────────┘
+        │   │
+        │   └─────────────┼──► Cloudflare R2 (storage)
+        │                 │
+        └─────────────────┼──► Grafana Cloud (monitoring)
+                          │
+                          ▼
+                   Customer Endpoints
+                   (webhooks delivered)`}
         </pre>
       </section>
 
@@ -147,8 +147,8 @@ async function ArchitectureContent(params: Promise<{ locale: string }>) {
               <tr><td className="px-4 py-3">Database</td><td className="px-4 py-3">PostgreSQL (Neon)</td><td className="px-4 py-3">{t("persistentStorage")}</td></tr>
               <tr><td className="px-4 py-3">Queue</td><td className="px-4 py-3">PostgreSQL</td><td className="px-4 py-3">{t("asyncMessage")}</td></tr>
               <tr><td className="px-4 py-3">{t("auth")}</td><td className="px-4 py-3">JWT + Argon2 + HMAC</td><td className="px-4 py-3">Multi-layer auth</td></tr>
-              <tr><td className="px-4 py-3">{t("billing")}</td><td className="px-4 py-3">Stripe</td><td className="px-4 py-3">{t("payments")}</td></tr>
-              <tr><td className="px-4 py-3">Deploy</td><td className="px-4 py-3">Fly.io</td><td className="px-4 py-3">{t("productionHosting")}</td></tr>
+              <tr><td className="px-4 py-3">{t("billing")}</td><td className="px-4 py-3">Polar.sh</td><td className="px-4 py-3">{t("payments")}</td></tr>
+              <tr><td className="px-4 py-3">Deploy</td><td className="px-4 py-3">Google Cloud Run + Vercel</td><td className="px-4 py-3">{t("productionHosting")}</td></tr>
             </tbody>
           </table></div>
         </div>
