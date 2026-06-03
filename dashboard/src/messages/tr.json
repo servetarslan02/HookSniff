@@ -1433,7 +1433,7 @@
     "s8Items": [
       "Webhook teslimat günlükleri planınızın saklama süresine göre tutulur",
       "Ücretsiz plan: 7 gün",
-      "Pro plan: 180 gün",
+      "Pro plan: 30 gün",
       "Business plan: 90 gün",
       "Saklama süresinden sonra veriler otomatik olarak kalıcı olarak silinir"
     ],
@@ -1494,7 +1494,7 @@
       "E-posta adresi",
       "Ad (isteğe bağlı)",
       "Şirket adı (isteğe bağlı)",
-      "Ödeme bilgileri (Stripe tarafından işlenir, bizde saklanmaz)"
+      "Ödeme bilgileri (Polar.sh tarafından işlenir, bizde saklanmaz)"
     ],
     "s22Title": "2.2 Kullanım Verileri",
     "s22Items": [
@@ -5120,7 +5120,7 @@
     "deliveredTo": "{count} aboneye teslim edildi",
     "noActiveSubscriptions": "Aktif abonelik yok",
     "client": "İstemci",
-    "connected": "Bağlanma",
+    "connected": "Bağlı",
     "disconnect": "Bağlantıyı Kes",
     "disabled": "Devre dışı",
     "totalMessages": "Toplam Mesaj",
@@ -5422,7 +5422,7 @@
     "dlqPayload": "Orijinal payload korunur",
     "dlqAttempts": "Tüm deneme detayları (durum kodları, hatalar, zaman damgaları)",
     "dlqReplay": "Tekrar oynatma yeteneği — teslimatı başka bir deneme için tekrar kuyruğa alın",
-    "dlqRetention": "Plan bazlı saklama (Geliştirici: 7 gün, Girişim: 14 gün, Pro: 180 gün, Kurumsal: 365 gün).",
+    "dlqRetention": "Plan bazlı saklama (Ücretsiz: 7 gün, Pro: 30 gün, İş: 90 gün, Kurumsal: 365 gün).",
     "apiKeys": "API Anahtarları",
     "apiKeyProblem": "Sorun: Şifrenizi paylaşmadan API isteklerini nasıl doğrularsınız?",
     "apiKeySolution": "Çözüm: API anahtarları hr_live_ önekli uzun ömürlü token'lardır. Birden fazla anahtar oluşturabilir (servis veya ekip üyesi başına bir tane) ve kesinti olmadan döndürebilirsiniz.",
