@@ -1,9 +1,9 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { Cloud, Database, HardDrive, Mail, Monitor, Settings, Zap } from '@/components/icons';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-cec4.onrender.com/v1';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://hooksniff-api-499907444852.europe-west1.run.app/v1';
 const TIMEOUT = 5000;
 
 async function checkEndpoint(url: string, timeout = TIMEOUT): Promise<{ ok: boolean; latency: number }> {
