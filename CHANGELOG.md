@@ -121,7 +121,7 @@ See [docs/sdk-coverage.md](docs/sdk-coverage.md) for detailed status.
 - Dead letter queue for permanently failed deliveries
 - Health check server for Cloud Run
 
-#### Dashboard (Next.js 15) — 41 pages
+#### Dashboard (Next.js 16) — 41 pages
 - **Landing Page**: Typewriter effect, floating particles, code example, features grid, pricing table, how-it-works, dashboard preview mockup
 - **Auth**: Login, register, 2FA setup, email verification, password reset
 - **Dashboard**: Overview (stat cards, delivery trend chart, success rate donut, live activity feed, recent deliveries), endpoints management, delivery logs, analytics, alerts, API keys, billing, team management, settings, notifications, health monitoring, inbound webhooks, playground, portal, routing, schemas, search, templates, transforms, webhook creation

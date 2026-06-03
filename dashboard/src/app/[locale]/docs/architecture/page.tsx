@@ -104,7 +104,7 @@ async function ArchitectureContent(params: Promise<{ locale: string }>) {
           <div className="p-5 border border-gray-200 dark:border-slate-700 rounded-xl">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t("dashboard")}</h3>
             <p className="text-gray-600 dark:text-slate-400 mb-3">
-              Web UI built with <strong>Next.js 14 (App Router)</strong>, Tailwind CSS, Radix UI, and Tremor.
+              Web UI built with <strong>Next.js 16 (App Router)</strong>, Tailwind CSS, Radix UI, and Tremor.
             </p>
             <ul className="space-y-1 text-sm text-gray-600 dark:text-slate-400">
               <li>• Endpoint management and monitoring</li>
@@ -143,7 +143,7 @@ async function ArchitectureContent(params: Promise<{ locale: string }>) {
             <tbody className="divide-y divide-gray-200">
               <tr><td className="px-4 py-3">API</td><td className="px-4 py-3">Rust, Axum, SQLx</td><td className="px-4 py-3">{t("asyncRestApi")}</td></tr>
               <tr><td className="px-4 py-3">{t("worker")}</td><td className="px-4 py-3">Rust, Tokio</td><td className="px-4 py-3">{t("deliveryEngine")}</td></tr>
-              <tr><td className="px-4 py-3">{t("dashboard")}</td><td className="px-4 py-3">Next.js 14, Tailwind CSS</td><td className="px-4 py-3">{t("webui")}</td></tr>
+              <tr><td className="px-4 py-3">{t("dashboard")}</td><td className="px-4 py-3">Next.js 16, Tailwind CSS</td><td className="px-4 py-3">{t("webui")}</td></tr>
               <tr><td className="px-4 py-3">Database</td><td className="px-4 py-3">PostgreSQL (Neon)</td><td className="px-4 py-3">{t("persistentStorage")}</td></tr>
               <tr><td className="px-4 py-3">Queue</td><td className="px-4 py-3">PostgreSQL</td><td className="px-4 py-3">{t("asyncMessage")}</td></tr>
               <tr><td className="px-4 py-3">{t("auth")}</td><td className="px-4 py-3">JWT + Argon2 + HMAC</td><td className="px-4 py-3">Multi-layer auth</td></tr>

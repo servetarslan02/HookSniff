@@ -101,31 +101,31 @@ export default function AuditLogPage() {
         </div>
       ) : (
         <div className="glass-card overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto min-w-0">
             <VirtualTable
                 data={allEntries}
-                estimateSize={56}
+                estimateSize={64}
                 header={
-                  <div className="grid grid-cols-[140px_120px_minmax(100px,1fr)_120px_minmax(100px,1fr)_100px] bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50">
-                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colTime')}</div>
-                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colAction')}</div>
-                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:block">{t('colActor')}</div>
-                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">{t('colResource')}</div>
-                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:block">{t('colDetails')}</div>
-                    <div className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:block">{t('colIp')}</div>
+                  <div className="flex bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-200/50 dark:border-slate-700/50 min-w-[700px]">
+                    <div className="w-[160px] shrink-0 px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colTime')}</div>
+                    <div className="w-[140px] shrink-0 px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('colAction')}</div>
+                    <div className="flex-1 min-w-[120px] px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden sm:block">{t('colActor')}</div>
+                    <div className="w-[140px] shrink-0 px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">{t('colResource')}</div>
+                    <div className="flex-1 min-w-[150px] px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:block">{t('colDetails')}</div>
+                    <div className="w-[120px] shrink-0 px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider hidden lg:block">{t('colIp')}</div>
                   </div>
                 }
                 renderRow={(entry) => (
-                  <div className="grid grid-cols-[140px_120px_minmax(100px,1fr)_120px_minmax(100px,1fr)_100px] hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition border-b border-gray-200/50 dark:border-slate-700/50">
-                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">{new Date(entry.timestamp).toLocaleString()}</div>
-                    <div className="px-3 sm:px-6 py-3 sm:py-4 flex items-center gap-1.5 sm:gap-2">
-                      <span>{ACTION_ICONS[entry.action] || <Pin size={16} strokeWidth={1.75} />}</span>
-                      <span className="text-xs sm:text-sm font-mono text-gray-900 dark:text-white">{entry.action}</span>
+                  <div className="flex hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition border-b border-gray-200/50 dark:border-slate-700/50 min-w-[700px]">
+                    <div className="w-[160px] shrink-0 px-3 sm:px-6 py-3 text-xs sm:text-sm text-gray-500 dark:text-slate-400 overflow-hidden text-ellipsis">{new Date(entry.timestamp).toLocaleString()}</div>
+                    <div className="w-[140px] shrink-0 px-3 sm:px-6 py-3 flex items-center gap-1.5">
+                      <span className="shrink-0">{ACTION_ICONS[entry.action] || <Pin size={16} strokeWidth={1.75} />}</span>
+                      <span className="text-xs sm:text-sm font-mono text-gray-900 dark:text-white truncate">{entry.action}</span>
                     </div>
-                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 dark:text-slate-400 hidden sm:flex items-center">{entry.actor_email || entry.actor}</div>
-                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-400 hidden md:flex items-center">{entry.resource_type}/{entry.resource_id?.slice(0, 8)}</div>
-                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400 max-w-xs truncate hidden lg:flex items-center">{entry.details ? (typeof entry.details === 'string' ? entry.details : JSON.stringify(entry.details)) : '—'}</div>
-                    <div className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-500 hidden lg:flex items-center">{entry.ip_address}</div>
+                    <div className="flex-1 min-w-[120px] px-3 sm:px-6 py-3 text-xs sm:text-sm text-gray-600 dark:text-slate-400 overflow-hidden text-ellipsis hidden sm:flex items-center">{entry.actor_email || entry.actor}</div>
+                    <div className="w-[140px] shrink-0 px-3 sm:px-6 py-3 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-400 overflow-hidden text-ellipsis hidden md:flex items-center">{entry.resource_type}/{entry.resource_id?.slice(0, 8)}</div>
+                    <div className="flex-1 min-w-[150px] px-3 sm:px-6 py-3 text-xs sm:text-sm text-gray-500 dark:text-slate-400 overflow-hidden text-ellipsis hidden lg:flex items-center">{entry.details ? (typeof entry.details === 'string' ? entry.details : JSON.stringify(entry.details)) : '—'}</div>
+                    <div className="w-[120px] shrink-0 px-3 sm:px-6 py-3 text-xs sm:text-sm font-mono text-gray-500 dark:text-slate-500 overflow-hidden text-ellipsis hidden lg:flex items-center">{entry.ip_address}</div>
                   </div>
                 )}
               />

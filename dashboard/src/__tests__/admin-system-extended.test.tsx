@@ -347,7 +347,7 @@ describe('AdminSystemPage - Extended', () => {
     });
     expect(container!.textContent).toContain('4 OCPU, 24 GB RAM');
     expect(container!.textContent).toContain('Serverless, 0.5 GB');
-    expect(container!.textContent).toContain('Next.js 15');
+    expect(container!.textContent).toContain('Next.js 16');
   });
 
   // --- Auto-refresh ---

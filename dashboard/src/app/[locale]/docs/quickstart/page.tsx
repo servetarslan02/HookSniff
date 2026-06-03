@@ -340,7 +340,7 @@ async function QuickstartContent(params: Promise<{ locale: string }>) {
     {t('quickstart') || 'Quickstart'}
    </h1>
    <p className="text-lg text-gray-600 dark:text-slate-400 mb-8">
-    Send your first webhook in under 5 minutes. Works with all 11 SDKs.
+    Send your first webhook in under 5 minutes. Works with all 11 SDKs (in development).
    </p>
 
    {/* Step 1: Get API Key */}

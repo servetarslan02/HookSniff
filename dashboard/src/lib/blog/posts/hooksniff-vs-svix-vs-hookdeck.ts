@@ -16,7 +16,7 @@ In 2026, four services dominate the landscape: **HookSniff**, **Svix**, **Hookde
 | Feature | HookSniff | Svix | Hookdeck | Hook0 |
 |---------|-----------|------|----------|-------|
 | **Price (free tier)** | 10,000 events/mo | Unlimited events* | 10,000 events/mo | Free (self-hosted) |
-| **Paid plans** | $29–99/mo | Custom pricing | $39/mo+ | N/A |
+| **Paid plans** | $49–149/mo | Custom pricing | $39/mo+ | N/A |
 | **SDKs** | 11 | 6 | 8 | 3 |
 | **FIFO delivery** | Yes | No | No | No |
 | **Schema registry** | Yes | No | No | No |
@@ -28,7 +28,7 @@ In 2026, four services dominate the landscape: **HookSniff**, **Svix**, **Hookde
 
 ### Pricing Deep-Dive
 
-**HookSniff** offers a generous free tier with 10,000 webhooks per month at $0. For higher volumes, Pro ($29/mo) and Business ($99/mo) plans are available. For startups and indie developers, the free tier is a great starting point.
+**HookSniff** offers a generous free tier with 10,000 webhooks per month at $0. For higher volumes, Pro ($49/mo) and Business ($149/mo) plans are available. For startups and indie developers, the free tier is a great starting point.
 
 **Svix** offers a managed cloud with pricing that scales based on usage. Their Professional plan starts around $490/month for higher volumes. They also offer an open-source self-hosted version, but you need to manage your own infrastructure.
 
@@ -38,7 +38,7 @@ In 2026, four services dominate the landscape: **HookSniff**, **Svix**, **Hookde
 
 ### SDK Coverage
 
-This is where HookSniff pulls ahead significantly. We publish **11 official SDKs**: Node.js, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, and Swift. Every SDK follows the same conventions, generates from our OpenAPI spec, and includes full type safety.
+This is where HookSniff pulls ahead significantly. We publish **11 SDKs (in development)**: Node.js, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, and Swift. Every SDK follows the same conventions, generates from our OpenAPI spec, and includes full type safety.
 
 Svix provides 6 SDKs (Node, Python, Go, Java, Kotlin, Ruby). Hookdeck covers 8 (Node, Python, Go, Ruby, PHP, Java, .NET, Elixir). Hook0 has 3 community-maintained SDKs.
 

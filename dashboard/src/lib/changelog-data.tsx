@@ -88,13 +88,13 @@ export const changelog: ChangelogItem[] = [
     version: 'v0.4.0',
     slug: 'v0-4-0',
     date: '2026-05-09',
-    title: '11 SDKs Published & Test Coverage 100%',
+    title: '11 SDKs (In Development) & Test Coverage 100%',
     summary: 'All 11 language SDKs published to npm, PyPI, crates.io, NuGet, Maven Central, Hex.pm, RubyGems, Packagist, Swift Package Index. Test count: 1378.',
     area: 'sdk',
     entries: [
       {
         type: 'feature',
-        text: 'All 11 SDKs published — Node.js, Python, Rust, C#, Go, Swift, PHP, Elixir, Java, Kotlin, Ruby',
+        text: 'All 11 SDKs (in development) — Node.js, Python, Rust, C#, Go, Swift, PHP, Elixir, Java, Kotlin, Ruby',
         detail: "Her SDK kendi package manager'ında yayınlandı. Base URL'ler GCP Cloud Run'a points to.",
         code: {
           lang: 'bash',
@@ -157,7 +157,7 @@ composer require hooksniff/hooksniff-php`,
     slug: 'v0-2-0',
     date: '2026-04-28',
     title: 'Core Platform — 30 API Routes, 41 Dashboard Pages',
-    summary: 'Full webhook delivery engine with Rust/Axum, Next.js 15 dashboard (8 languages), FIFO delivery, schema registry, and CloudEvents support.',
+    summary: 'Full webhook delivery engine with Rust/Axum, Next.js 16 dashboard (8 languages), FIFO delivery, schema registry, and CloudEvents support.',
     area: 'api',
     entries: [
       {
@@ -168,7 +168,7 @@ composer require hooksniff/hooksniff-php`,
       },
       {
         type: 'feature',
-        text: 'Next.js 15 dashboard — 41 pages, 8 languages',
+        text: 'Next.js 16 dashboard — 41 pages, 8 languages',
         detail: 'TR, EN, DE, FR, ES, JA, KO, PT-BR. next-intl ile i18n.',
         commit: 'a5893a0',
       },

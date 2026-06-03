@@ -27,7 +27,7 @@ async function MigrationFromSvixContent() {
       { icon: <Shuffle size={16} strokeWidth={1.75} />, title: 'Smart Routing', desc: 'Round-robin and failover routing built-in.' },
       { icon: <BarChart3 size={16} strokeWidth={1.75} />, title: 'Real-time Streaming', desc: 'SSE streaming for live delivery monitoring.' },
       { icon: <Plug size={16} strokeWidth={1.75} />, title: '30+ API Resources', desc: 'Billing, analytics, alerts, SSO, connectors, and more.' },
-      { icon: <Package size={16} strokeWidth={1.75} />, title: '11 SDKs', desc: 'Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift.' },
+      { icon: <Package size={16} strokeWidth={1.75} />, title: '11 SDKs (in dev)', desc: 'Node, Python, Go, Rust, Ruby, Java, Kotlin, PHP, C#, Elixir, Swift.' },
      ].map(({ icon, title, desc }) => (
       <div key={title} className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
        <div className="flex items-center gap-2 mb-2">
