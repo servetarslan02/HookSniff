@@ -16,9 +16,9 @@
         }
       },
       "status": "down",
-      "latency_ms": 1,
+      "latency_ms": 0,
       "description": "HookSniff REST API (Cloud Run)",
-      "last_checked": "2026-06-03T21:21:08.611Z"
+      "last_checked": "2026-06-03T21:22:01.203Z"
     },
     {
       "name": "Dashboard",
@@ -34,9 +34,9 @@
         }
       },
       "status": "degraded",
-      "latency_ms": 1,
+      "latency_ms": 0,
       "description": "Next.js frontend (Vercel)",
-      "last_checked": "2026-06-03T21:21:08.611Z"
+      "last_checked": "2026-06-03T21:22:01.203Z"
     },
     {
       "name": "Worker",
@@ -54,7 +54,7 @@
       "status": "unknown",
       "latency_ms": null,
       "description": "Background delivery worker (Cloud Run)",
-      "last_checked": "2026-06-03T21:21:08.611Z"
+      "last_checked": "2026-06-03T21:22:01.203Z"
     },
     {
       "name": "Database",
@@ -72,7 +72,7 @@
       "status": "down",
       "latency_ms": 0,
       "description": "PostgreSQL (Neon)",
-      "last_checked": "2026-06-03T21:21:08.611Z"
+      "last_checked": "2026-06-03T21:22:01.203Z"
     },
     {
       "name": "Cache",
@@ -90,7 +90,7 @@
       "status": "unknown",
       "latency_ms": 0,
       "description": "Redis (Upstash)",
-      "last_checked": "2026-06-03T21:21:08.611Z"
+      "last_checked": "2026-06-03T21:22:01.203Z"
     },
     {
       "name": "Email Service",
@@ -108,7 +108,7 @@
       "status": "healthy",
       "latency_ms": 277,
       "description": "Gmail API",
-      "last_checked": "2026-06-03T21:21:08.611Z"
+      "last_checked": "2026-06-03T21:22:01.203Z"
     },
     {
       "name": "Storage",
@@ -124,37 +124,18 @@
         }
       },
       "status": "healthy",
-      "latency_ms": 39,
+      "latency_ms": 47,
       "description": "Cloudflare R2",
-      "last_checked": "2026-06-03T21:21:08.611Z"
+      "last_checked": "2026-06-03T21:22:01.203Z"
     }
   ],
-  "checked_at": "2026-06-03T21:21:08.611Z",
+  "checked_at": "2026-06-03T21:22:01.203Z",
   "response_times": {
-    "API": [
-      1,
-      2,
-      1
-    ],
-    "Dashboard": [
-      1,
-      1
-    ],
     "Email Service": [
-      275,
-      288,
-      338,
       277
     ],
     "Storage": [
-      51,
-      38,
-      49,
-      39
-    ]
-  }
-}": [
-      1
+      47
     ]
   }
 }
