@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import PublicNavbar from '@/components/PublicNavbar';
 import { useParams } from 'next/navigation';
 
 const stories: Record<string, { company: string; logo: string; industry: string; quote: string; author: string; metric: string; metricLabel: string; desc: string }> = {
@@ -21,12 +21,7 @@ export function CustomerStoryContent() {
   if (!story) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-        <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-          <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <LanguageSwitcher />
-          </div>
-        </nav>
+        <PublicNavbar />
         <main className="max-w-4xl mx-auto px-6 py-16 text-center">
           <p className="text-gray-600 dark:text-slate-400">Story not found.</p>
           <Link href="/customers" className="text-brand-600 dark:text-brand-400 hover:underline mt-4 inline-block">← Back to Customer Stories</Link>
@@ -37,16 +32,7 @@ export function CustomerStoryContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <nav className="border-b border-gray-200/50 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="items-center gap-3 flex">
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">🪝 HookSniff</Link>
-            <span className="text-gray-500 dark:text-slate-500">/</span>
-            <Link href="/customers" className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition">{t('title')}</Link>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </nav>
+      <PublicNavbar pageTitle={story.company} />
 
       <main className="max-w-4xl mx-auto px-6 py-16">
         <div className="mb-10">
