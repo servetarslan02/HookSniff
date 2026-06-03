@@ -135,18 +135,18 @@ function OverviewTab({ health }: { health: CortexHealth | null }) {
   const systemHealth = m.anomalies_24h === 0 && m.healing_actions_24h === 0
     ? { icon: '✅', text: t('anomalies.empty.description'), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' }
     : m.anomalies_24h > 10
-    ? { icon: '🚨', text: `${m.anomalies_24h} t('overview.issuesDetected', {n: m.anomalies_24h}).split('—')[0].trim()`, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' }
-    : { icon: '⚠️', text: `${m.anomalies_24h} t('overview.minorIssues', {n: m.anomalies_24h, h: m.healing_actions_24h}).split(',')[0].trim(), ${m.healing_actions_24h} düzeltme yapıldı`, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20' };
+    ? { icon: '🚨', text: t('overview.issuesDetected', { n: m.anomalies_24h }), color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' }
+    : { icon: '⚠️', text: t('overview.minorIssues', { n: m.anomalies_24h, h: m.healing_actions_24h }), color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20' };
 
   const cards = [
-    { label: 'İzlenen Endpoint', value: m.profiles_total, icon: Globe, color: 'text-blue-600', description: 'Aktif webhook adresleriniz' },
-    { label: t('overview.metric.issues24h'), value: m.anomalies_24h, icon: AlertTriangle, color: m.anomalies_24h > 0 ? 'text-orange-600' : 'text-emerald-600', description: m.anomalies_24h === 0 ? 'Hiç sorun yok' : 'Performans düşüşü veya hata artışı' },
-    { label: t('overview.metric.autoFix'), value: m.healing_actions_24h, icon: ShieldCheck, color: 'text-emerald-600', description: 'Cortex\'in otomatik yaptığı müdahaleler' },
-    { label: t('overview.metric.predictions'), value: m.predictions_24h, icon: TrendingUp, color: 'text-cyan-600', description: 'Olası gelecek sorunlar hakkında uyarı' },
-    { label: 'Aktif Öneri', value: m.active_insights, icon: Zap, color: 'text-yellow-600', description: 'İncelemeniz gereken öneriler' },
-    { label: 'Veri Noktası', value: m.hourly_stats_total, icon: BarChart3, color: 'text-purple-600', description: 'Toplanan saatlik istatistik' },
-    { label: 'ML Tahmin', value: m.ml_predictions_total, icon: Brain, color: 'text-indigo-600', description: m.ml_predictions_total === 0 ? 'Henüz tahmin üretilmedi' : `${m.ml_quality_samples_24h} kalite ölçümü (24s)` },
-    { label: t('overview.metric.proactiveAlert'), value: m.proactive_insights, icon: Shield, color: m.proactive_insights > 0 ? 'text-orange-600' : 'text-emerald-600', description: m.proactive_insights === 0 ? 'Sorun yok, sistem izliyor' : 'Dikkat gereken durumlar var' },
+    { label: t('overview.metric.monitoredEndpoints'), value: m.profiles_total, icon: Globe, color: 'text-blue-600', description: t('overview.desc.monitoredEndpoints') },
+    { label: t('overview.metric.issues24h'), value: m.anomalies_24h, icon: AlertTriangle, color: m.anomalies_24h > 0 ? 'text-orange-600' : 'text-emerald-600', description: m.anomalies_24h === 0 ? t('overview.desc.noIssues') : t('overview.desc.performanceDrop') },
+    { label: t('overview.metric.autoFix'), value: m.healing_actions_24h, icon: ShieldCheck, color: 'text-emerald-600', description: t('overview.desc.autoFix') },
+    { label: t('overview.metric.predictions'), value: m.predictions_24h, icon: TrendingUp, color: 'text-cyan-600', description: t('overview.desc.predictions') },
+    { label: t('overview.metric.activeInsights'), value: m.active_insights, icon: Zap, color: 'text-yellow-600', description: t('overview.desc.activeInsights') },
+    { label: t('overview.metric.dataPoints'), value: m.hourly_stats_total, icon: BarChart3, color: 'text-purple-600', description: t('overview.desc.dataPoints') },
+    { label: t('overview.metric.mlPredictions'), value: m.ml_predictions_total, icon: Brain, color: 'text-indigo-600', description: m.ml_predictions_total === 0 ? t('overview.desc.noPredictions') : t('overview.desc.qualitySamples', { n: m.ml_quality_samples_24h }) },
+    { label: t('overview.metric.proactiveAlert'), value: m.proactive_insights, icon: Shield, color: m.proactive_insights > 0 ? 'text-orange-600' : 'text-emerald-600', description: m.proactive_insights === 0 ? t('overview.desc.systemNormal') : t('overview.desc.needsAttention') },
   ];
 
   return (
@@ -156,7 +156,7 @@ function OverviewTab({ health }: { health: CortexHealth | null }) {
         <div>
           <p className={`font-semibold ${systemHealth.color}`}>{systemHealth.text}</p>
           <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-            Son 24 saatte {m.hourly_stats_total} veri noktası toplandı, {m.profiles_total} endpoint izleniyor
+            {t('overview.statsSummary', { dataPoints: m.hourly_stats_total, endpoints: m.profiles_total })}
           </p>
         </div>
       </div>
