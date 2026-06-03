@@ -29,6 +29,7 @@ pub async fn create_webhook(
     Extension(is_test): Extension<crate::middleware::IsTestKey>,
     Extension(event_publisher): Extension<Option<crate::events::EventPublisher>>,
     Extension(feature_flags): Extension<FeatureFlagService>,
+    Extension(redis_queue): Extension<std::sync::Arc<std::sync::Mutex<Option<crate::queue::RedisQueue>>>>,
     service_token: Option<Extension<crate::middleware::ServiceTokenScope>>,
     headers: axum::http::header::HeaderMap,
     Json(req): Json<CreateWebhookRequest>,
