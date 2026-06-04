@@ -105,7 +105,12 @@ export function StatusPageContent() {
           fetch('/maintenance.json', { cache: 'force-cache' }).catch(() => null),
         ];
         const [histRes, incRes, mntRes] = await Promise.all(promises);
-        if (histRes?.ok) setHistory(await histRes.json());
+        if (histRes?.ok) {
+          const raw: HistoryDay[] = await histRes.json();
+          // Filter out corrupted entries (uptime < 50% without incidents)
+          const cleaned = raw.filter((h) => h.uptime > 50 || (h.incidents && h.incidents.length > 0));
+          setHistory(cleaned);
+        }
         if (incRes?.ok) setIncidents(await incRes.json());
         if (mntRes?.ok) setMaintenance(await mntRes.json());
       } catch { /* non-critical */ }
