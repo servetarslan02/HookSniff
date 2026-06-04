@@ -1,7 +1,7 @@
 use axum::{
     extract::{Extension, Query},
     http::HeaderMap,
-    response::Redirect,
+    response::{IntoResponse, Redirect},
 };
 use sqlx::PgPool;
 
@@ -35,6 +35,10 @@ pub async fn github_login() -> Result<impl axum::response::IntoResponse, AppErro
         state,
     );
 
+    let state_cookie = format!(
+        "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
+        OAUTH_STATE_COOKIE, state, OAUTH_STATE_MAX_AGE
+    );
     // Build response manually to guarantee Set-Cookie is included
     let mut response = axum::response::Html(format!(
         "<html><head><meta http-equiv=\"refresh\" content=\"0;url={url}\"></head><body>Redirecting...</body></html>"
