@@ -1,6 +1,7 @@
 'use client';
 
 import { getErrorMessage } from '@/lib/errors';
+import { API_BASE } from '@/lib/api';
 
 import { useState, useEffect, useRef } from 'react';
 import { PrefetchLink as Link } from '@/components/PrefetchLink';
@@ -446,8 +447,8 @@ function LoginForm() {
                 disabled={oauthLoading !== null}
                 onClick={() => {
                   setOauthLoading('google');
-                  // Use /api/v1 path — goes through Vercel rewrite proxy to backend
-                  window.location.href = '/api/v1/oauth/google';
+                  // Go directly to API — cookie must be set on API domain for state verification
+                  window.location.href = `${API_BASE}/oauth/google`;
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-60"
               >
@@ -461,8 +462,8 @@ function LoginForm() {
                 disabled={oauthLoading !== null}
                 onClick={() => {
                   setOauthLoading('github');
-                  // Use /api/v1 path — goes through Vercel rewrite proxy to backend
-                  window.location.href = '/api/v1/oauth/github';
+                  // Go directly to API — cookie must be set on API domain for state verification
+                  window.location.href = `${API_BASE}/oauth/github`;
                 }}
                 className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition disabled:opacity-60"
               >
