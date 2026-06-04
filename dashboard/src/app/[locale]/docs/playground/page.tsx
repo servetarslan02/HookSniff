@@ -29,7 +29,7 @@ async function PlaygroundPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('thePlayground')}</h2>
         <p className="text-gray-600 dark:text-slate-400 mb-4">{t('playgroundDesc')}</p>
         <div className="not-prose rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4">
-          <p className="text-sm text-blue-800 dark:text-blue-300">💡 {t('playgroundNote')}</p>
+          <p className="text-sm text-blue-800 dark:text-blue-300"> {t('playgroundNote')}</p>
         </div>
       </section>
 
@@ -58,27 +58,27 @@ async function PlaygroundPageContent(params: Promise<{ locale: string }>) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('playgroundFeatures')}</h2>
         <div className="space-y-4 not-prose">
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🌐 {t('feature1Title')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2"> {t('feature1Title')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('feature1Desc')}</p>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">📋 {t('feature2Title')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2"> {t('feature2Title')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('feature2Desc')}</p>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🤖 {t('feature3Title')}</h3>
+ <h3 className="font-semibold text-gray-900 dark:text-white mb-2"> {t('feature3Title')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('feature3Desc')}</p>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">🔍 {t('feature4Title')}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2"> {t('feature4Title')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('feature4Desc')}</p>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">📜 {t('feature5Title')}</h3>
+ <h3 className="font-semibold text-gray-900 dark:text-white mb-2"> {t('feature5Title')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('feature5Desc')}</p>
           </div>
           <div className="rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">📡 {t('feature6Title')}</h3>
+ <h3 className="font-semibold text-gray-900 dark:text-white mb-2"> {t('feature6Title')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400">{t('feature6Desc')}</p>
           </div>
         </div>

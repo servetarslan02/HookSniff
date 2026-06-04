@@ -49,7 +49,7 @@ export function ReadOnlyBadge({ teamId }: { teamId?: string | null }) {
 
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-      👁️ Read-only
+ Read-only
     </span>
   );
 }

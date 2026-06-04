@@ -38,7 +38,7 @@ export function DriftTab() {
     'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
 
   const getTypeIcon = (type: string) =>
-    type === 'sudden' ? '⚡' : type === 'gradual' ? '📈' : type === 'incremental' ? '🔄' : '⚠️';
+    type === 'sudden' ? 'Sudden' : type === 'gradual' ? 'Gradual' : type === 'incremental' ? 'Incremental' : 'Unknown';
 
   if (loading) return <div className="flex justify-center py-12"><div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" /></div>;
   if (error) return <div className="glass-card p-8 text-center"><p className="text-red-500">{error}</p></div>;

@@ -99,7 +99,7 @@ export function UserFilters({
           onClick={handleExportCSV}
           className="px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2"
         >
-          <span aria-hidden="true">⬇</span> {t('exportCSV')}
+ <span aria-hidden="true"></span> {t('exportCSV')}
         </button>
       </div>
     </form>

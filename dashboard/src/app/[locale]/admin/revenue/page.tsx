@@ -208,7 +208,7 @@ export default function AdminRevenuePage() {
         <StatCard label={t('churnRate')} value={revenue?.churn_rate?.toFixed(1) || '0'} icon={<span className="text-lg" aria-hidden="true"><TrendingDown size={18} strokeWidth={1.75} /></span>} color="red" isPercent />
         <button type="button" onClick={handleExportCSV}
           className="glass-card p-4 sm:p-6 flex flex-col items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 transition cursor-pointer border border-gray-200 dark:border-slate-700">
-          <span className="text-2xl" aria-hidden="true">⬇</span>
+ <span className="text-2xl" aria-hidden="true"></span>
           <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300">{t('exportReport')}</span>
         </button>
       </div>

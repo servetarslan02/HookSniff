@@ -6,6 +6,7 @@
     "render-deploy": "bash deploy.sh"
   },
   "dependencies": {
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.21.0"
   }
 }

@@ -134,10 +134,10 @@ function OverviewTab({ health }: { health: CortexHealth | null }) {
   const m = health.metrics;
 
   const systemHealth = m.anomalies_24h === 0 && m.healing_actions_24h === 0
-    ? { icon: '✅', text: t('anomalies.empty.description'), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' }
+    ? { icon: 'ok', text: t('anomalies.empty.description'), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' }
     : m.anomalies_24h > 10
-    ? { icon: '🚨', text: t('overview.issuesDetected', { n: m.anomalies_24h }), color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' }
-    : { icon: '⚠️', text: t('overview.minorIssues', { n: m.anomalies_24h, h: m.healing_actions_24h }), color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20' };
+    ? { icon: 'alert', text: t('overview.issuesDetected', { n: m.anomalies_24h }), color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' }
+    : { icon: 'warning', text: t('overview.minorIssues', { n: m.anomalies_24h, h: m.healing_actions_24h }), color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/20' };
 
   const cards = [
     { label: t('overview.metric.monitoredEndpoints'), value: m.profiles_total, icon: Globe, color: 'text-blue-600', description: t('overview.desc.monitoredEndpoints') },

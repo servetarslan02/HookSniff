@@ -96,8 +96,20 @@ pub async fn reserve_webhook_slot(
         .await?
     };
     if updated.is_none() {
+        // ── Limit exceeded notification (best-effort) ──
+        let _ = crate::notifications::helpers::limit_exceeded(
+            pool, info.tracking_id, info.webhook_limit, info.webhook_limit
+        ).await;
         Err(AppError::RateLimitExceeded)
     } else {
+        let new_count = updated.unwrap().1;
+        // ── Limit approaching notification at 80% (best-effort) ──
+        let threshold = (info.webhook_limit as f64 * 0.8) as i64;
+        if new_count >= threshold && new_count - count < threshold {
+            let _ = crate::notifications::helpers::limit_approaching(
+                pool, info.tracking_id, new_count, info.webhook_limit
+            ).await;
+        }
         Ok(())
     }
 }

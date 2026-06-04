@@ -29,7 +29,7 @@ export function PortalPreview({ config }: { config: PortalConfig }) {
             {config.logo_url ? (
               <Image src={config.logo_url} alt={t("logo")} width={28} height={28} className="w-7 h-7 rounded-md" />
             ) : (
-              <span className="text-xl">🪝</span>
+ <span className="text-xl"></span>
             )}
             <span className="text-white text-sm font-semibold">
               {config.company_name || 'HookSniff'} {t('portalLabel')}

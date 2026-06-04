@@ -169,7 +169,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       >
         <div className="flex items-center justify-between h-16 px-4 sm:px-6 border-b border-gray-200 dark:border-gray-700">
           <a href="https://hooksniff.vercel.app/" className="flex items-center space-x-2">
-            <span className="text-2xl">🪝</span>
+ <span className="text-2xl"></span>
             <span className="text-xl font-bold text-gray-900 dark:text-white">HookSniff</span>
           </a>
 
