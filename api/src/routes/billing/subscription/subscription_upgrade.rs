@@ -196,7 +196,8 @@ pub async fn upgrade_plan(
                 )
                 .bind(coupon.id)
                 .fetch_optional(&pool)
-                .await?
+                .await
+                .map_err(|e| AppError::Internal(anyhow::anyhow!("coupon_update_redemption_count: {}", e)))?
                 .unwrap_or(0)
             } else {
                 sqlx::query_scalar(
@@ -205,7 +206,8 @@ pub async fn upgrade_plan(
                 )
                 .bind(coupon.id)
                 .fetch_one(&pool)
-                .await?
+                .await
+                .map_err(|e| AppError::Internal(anyhow::anyhow!("coupon_update_redemption_count: {}", e)))?
             };
 
             if updated_rows == 0 {
@@ -241,7 +243,8 @@ pub async fn upgrade_plan(
             .bind(webhook_limit)
             .bind(customer.id)
             .execute(&pool)
-            .await?;
+            .await
+            .map_err(|e| AppError::Internal(anyhow::anyhow!("coupon_update_customer_plan: {}", e)))?;
 
             sqlx::query(
                 "INSERT INTO coupon_redemptions (coupon_id, customer_id) VALUES ($1, $2)"
@@ -249,7 +252,8 @@ pub async fn upgrade_plan(
             .bind(coupon.id)
             .bind(customer.id)
             .execute(&pool)
-            .await?;
+            .await
+            .map_err(|e| AppError::Internal(anyhow::anyhow!("coupon_insert_redemption: {}", e)))?;
 
             let provider_name = &customer.payment_provider;
             sqlx::query(
@@ -259,7 +263,8 @@ pub async fn upgrade_plan(
             .bind(new_plan.as_str())
             .bind(if provider_name.is_empty() { "polar" } else { provider_name })
             .execute(&pool)
-            .await?;
+            .await
+            .map_err(|e| AppError::Internal(anyhow::anyhow!("coupon_insert_invoice: {}", e)))?;
 
             {
                 let rid = customer.id.to_string();
@@ -296,7 +301,8 @@ pub async fn upgrade_plan(
         )
         .bind(&code_upper)
         .fetch_optional(&pool)
-        .await?;
+        .await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("polar_coupon_lookup: {}", e)))?;
 
         if let Some(ref pc) = polar_coupon {
             // Found a polar coupon — make sure it's synced to Polar
@@ -380,7 +386,8 @@ pub async fn upgrade_plan(
             .bind(&provider_name)
             .bind(customer.id)
             .execute(&pool)
-            .await?;
+            .await
+            .map_err(|e| AppError::Internal(anyhow::anyhow!("update_payment_provider: {}", e)))?;
     }
 
     // ── Look up polar_discount_id for coupon code (if applicable) ──
@@ -392,8 +399,7 @@ pub async fn upgrade_plan(
         .bind(&code_upper)
         .fetch_optional(&pool)
         .await
-        .ok()
-        .flatten();
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("lookup_polar_discount_id: {}", e)))?;
 
         if found_id.is_none() && req.discount_code.is_some() {
             tracing::warn!("Coupon code '{}' provided but no polar_discount_id found in DB", code_upper);
