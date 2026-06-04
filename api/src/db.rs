@@ -12,6 +12,9 @@ const SLOW_QUERY_THRESHOLD_MS: u128 = 100;
 pub static SLOW_QUERY_COUNT: AtomicU64 = AtomicU64::new(0);
 pub static TOTAL_QUERY_COUNT: AtomicU64 = AtomicU64::new(0);
 
+/// Global Redis queue — initialized at startup, shared across all handlers
+pub static REDIS_QUEUE: std::sync::Mutex<Option<crate::queue::RedisQueue>> = std::sync::Mutex::new(None);
+
 /// Execute a database query with timing. Logs a warning if the query
 /// exceeds `SLOW_QUERY_THRESHOLD_MS`. Always records the duration
 /// in the Prometheus `db_query_duration_seconds` histogram when a
@@ -271,8 +274,48 @@ pub async fn publish_to_queue(
     Ok(())
 }
 
+/// Global Redis circuit breaker — auto-disables Redis when rate limit/OOM is hit.
+/// After cooldown period, Redis is re-enabled automatically.
+use std::sync::atomic::AtomicBool;
+pub static REDIS_CIRCUIT_OPEN: AtomicBool = AtomicBool::new(false);
+pub static REDIS_CIRCUIT_OPENED_AT: AtomicU64 = AtomicU64::new(0);
+const REDIS_CIRCUIT_COOLDOWN_SECS: u64 = 60; // Re-enable after 60s
+
+/// Check if Redis circuit breaker is open (Redis temporarily disabled).
+fn is_redis_circuit_open() -> bool {
+    if !REDIS_CIRCUIT_OPEN.load(Ordering::Relaxed) {
+        return false;
+    }
+    // Check if cooldown has elapsed
+    let opened_at = REDIS_CIRCUIT_OPENED_AT.load(Ordering::Relaxed);
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+    if now.saturating_sub(opened_at) > REDIS_CIRCUIT_COOLDOWN_SECS {
+        REDIS_CIRCUIT_OPEN.store(false, Ordering::Relaxed);
+        tracing::info!("🟢 Redis circuit breaker closed — re-enabling Redis queue");
+        false
+    } else {
+        true
+    }
+}
+
+fn open_redis_circuit(reason: &str) {
+    if !REDIS_CIRCUIT_OPEN.load(Ordering::Relaxed) {
+        REDIS_CIRCUIT_OPEN.store(true, Ordering::Relaxed);
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+        REDIS_CIRCUIT_OPENED_AT.store(now, Ordering::Relaxed);
+        tracing::warn!("🔴 Redis circuit breaker OPEN ({}). Falling back to PG for {}s", reason, REDIS_CIRCUIT_COOLDOWN_SECS);
+    }
+}
+
 /// Publish to Redis Streams queue first, fall back to PostgreSQL on failure.
 /// This is the fast path — sub-millisecond when Redis is available.
+/// Auto-circuits to PG when Redis hits rate limits or OOM.
 pub async fn publish_to_queue_fast(
     pool: &PgPool,
     redis_queue: &mut Option<crate::queue::RedisQueue>,
@@ -283,8 +326,20 @@ pub async fn publish_to_queue_fast(
     custom_headers: Option<&serde_json::Value>,
     signing_secret: &str,
     max_attempts: i32,
+    fifo_enabled: bool,
 ) -> Result<()> {
     let trace_id = crate::telemetry::current_trace_id();
+
+    // ── FIFO endpoints always use PG queue (Redis parallel reads break ordering) ──
+    if fifo_enabled {
+        tracing::debug!("📦 FIFO endpoint {} → PG queue (ordering guarantee)", endpoint_id);
+        return publish_to_queue(pool, delivery_id, endpoint_id, endpoint_url, payload, custom_headers).await;
+    }
+
+    // ── Check Redis circuit breaker (auto-fallback when rate limited/OOM) ──
+    if is_redis_circuit_open() {
+        return publish_to_queue(pool, delivery_id, endpoint_id, endpoint_url, payload, custom_headers).await;
+    }
 
     // ── Try Redis first (fast path) ──
     if let Some(ref mut redis) = redis_queue {
@@ -307,7 +362,14 @@ pub async fn publish_to_queue_fast(
                 return Ok(());
             }
             Err(e) => {
-                tracing::warn!("Redis queue failed for {}: {} — falling back to PG", delivery_id, e);
+                let err_msg = e.to_string();
+                if err_msg.contains("OOM") || err_msg.contains("maxmemory") || err_msg.contains("max requests") {
+                    tracing::error!("🔴 Redis OOM/rate-limit for {}: {} — falling back to PG", delivery_id, err_msg);
+                    open_redis_circuit("rate_limit/OOM");
+                    crate::db::SLOW_QUERY_COUNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                } else {
+                    tracing::warn!("Redis queue failed for {}: {} — falling back to PG", delivery_id, e);
+                }
             }
         }
     }

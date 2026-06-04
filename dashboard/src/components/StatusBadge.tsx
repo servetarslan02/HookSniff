@@ -1,6 +1,7 @@
 'use client';
 
 import { Check, Repeat, SkipForward, X } from '@/components/icons';
+import { useTranslations } from 'next-intl';
 
 interface StatusBadgeProps {
   status: string;
@@ -104,15 +105,20 @@ const sizeClasses = {
 };
 
 export function StatusBadge({ status, size = 'md', className = '' }: StatusBadgeProps) {
+  const t = useTranslations('common');
   const style = statusStyles[status] || statusStyles.pending;
   const sizeClass = sizeClasses[size];
+
+  // Translate status label
+  const statusKey = `statusLabels.${status}`;
+  const translatedStatus = t(statusKey) !== statusKey ? t(statusKey) : status.charAt(0).toUpperCase() + status.slice(1);
 
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full font-medium ring-1 ring-inset ${style.bg} ${style.text} ${style.ring} ${sizeClass} ${className}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
-      {status}
+      {translatedStatus}
     </span>
   );
 }

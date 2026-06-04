@@ -122,7 +122,25 @@
     "placeholderSearch": "Ara...",
     "placeholderEmail": "siz@ornek.com",
     "noData": "Veri yok",
-    "unlimited": "Sınırsız"
+    "unlimited": "Sınırsız",
+    "statusLabels": {
+      "delivered": "Teslim Edildi",
+      "success": "Başarılı",
+      "failed": "Başarısız",
+      "error": "Hata",
+      "pending": "Bekliyor",
+      "active": "Aktif",
+      "inactive": "Pasif",
+      "banned": "Yasaklı",
+      "warning": "Uyarı",
+      "paid": "Ödendi",
+      "replayed": "Tekrarlandı",
+      "cached": "Önbellek",
+      "filtered": "Filtrelendi",
+      "processing": "İşleniyor",
+      "dead_letter": "Ölü Mektup",
+      "cancelled": "İptal"
+    }
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -284,7 +302,25 @@
     "timeRange7d": "7 Gün",
     "timeRange30d": "30 Gün",
     "loadingShort": "Yükleniyor...",
-    "successLabel": "başarılı"
+    "successLabel": "başarılı",
+    "statusLabels": {
+      "delivered": "Teslim Edildi",
+      "success": "Başarılı",
+      "failed": "Başarısız",
+      "error": "Hata",
+      "pending": "Bekliyor",
+      "active": "Aktif",
+      "inactive": "Pasif",
+      "banned": "Yasaklı",
+      "warning": "Uyarı",
+      "paid": "Ödendi",
+      "replayed": "Tekrarlandı",
+      "cached": "Önbellek",
+      "filtered": "Filtrelendi",
+      "processing": "İşleniyor",
+      "dead_letter": "Ölü Mektup",
+      "cancelled": "İptal"
+    }
   },
   "endpoints": {
     "title": "Endpoint'ler",
@@ -628,7 +664,23 @@
     "typeAlerts": "Uyarılar",
     "typeSystem": "Sistem",
     "typeBilling": "Faturalandırma",
-    "typeTeamInvite": "Ekip Daveti"
+    "typeTeamInvite": "Ekip Daveti",
+    "typeLabels": {
+      "webhook_failed": "Webhook Başarısız",
+      "alert": "Uyarı",
+      "system": "Sistem",
+      "billing": "Fatura",
+      "team_invite": "Ekip Daveti",
+      "delivery_failed": "Teslimat Başarısız",
+      "endpoint_disabled": "Uç Nokta Devre Dışı",
+      "usage_limit": "Kullanım Limiti"
+    },
+    "timeAgo": {
+      "justNow": "az önce",
+      "minutes": "{n}dk önce",
+      "hours": "{n}sa önce",
+      "days": "{n}g önce"
+    }
   },
   "webhooks": {
     "title": "Webhook'lar",
@@ -3010,7 +3062,26 @@
     "colResource": "Kaynak",
     "colDetails": "Detaylar",
     "colIp": "IP",
-    "loadMore": "Daha fazla yükle"
+    "loadMore": "Daha fazla yükle",
+    "actions": {
+      "auth.login": "Giriş yapıldı",
+      "auth.logout": "Çıkış yapıldı",
+      "auth.register": "Hesap oluşturuldu",
+      "endpoint.create": "Uç nokta oluşturuldu",
+      "endpoint.update": "Uç nokta güncellendi",
+      "endpoint.delete": "Uç nokta silindi",
+      "apikey.create": "API anahtarı oluşturuldu",
+      "apikey.rotate": "API anahtarı yenilendi",
+      "apikey.delete": "API anahtarı silindi",
+      "webhook.send": "Webhook gönderildi",
+      "webhook.replay": "Webhook tekrar gönderildi",
+      "team.invite": "Ekip üyesi davet edildi",
+      "team.remove": "Ekip üyesi çıkarıldı",
+      "settings.update": "Ayarlar güncellendi",
+      "billing.update": "Fatura güncellendi",
+      "schema.create": "Şema oluşturuldu",
+      "portal.update": "Portal güncellendi"
+    }
   },
   "routing": {
     "title": "🔀 Yönlendirme",
@@ -3413,7 +3484,25 @@
     "copyTitle": "Kopyala",
     "copyHeaders": "Başlıkları kopyala",
     "copyPayload": "Veriyi kopyala",
-    "copyResponseBody": "Yanıt gövdesini kopyala"
+    "copyResponseBody": "Yanıt gövdesini kopyala",
+    "statusLabels": {
+      "delivered": "Teslim Edildi",
+      "success": "Başarılı",
+      "failed": "Başarısız",
+      "error": "Hata",
+      "pending": "Bekliyor",
+      "active": "Aktif",
+      "inactive": "Pasif",
+      "banned": "Yasaklı",
+      "warning": "Uyarı",
+      "paid": "Ödendi",
+      "replayed": "Tekrarlandı",
+      "cached": "Önbellek",
+      "filtered": "Filtrelendi",
+      "processing": "İşleniyor",
+      "dead_letter": "Ölü Mektup",
+      "cancelled": "İptal"
+    }
   },
   "templatesPage": {
     "title": "📦 Şablonlar",
@@ -4977,7 +5066,14 @@
     "error": "Hata",
     "cancelTask": "Görevi İptal Et",
     "cancelTitle": "Görevi İptal Et",
-    "cancelConfirm": "Bu görevi iptal etmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+    "cancelConfirm": "Bu görevi iptal etmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+    "statusLabels": {
+      "pending": "Bekliyor",
+      "running": "Çalışıyor",
+      "completed": "Tamamlandı",
+      "failed": "Başarısız",
+      "cancelled": "İptal"
+    }
   },
   "connectors": {
     "title": "Bağlayıcılar",
@@ -5101,7 +5197,12 @@
     "commitTitle": "İmleçi Onayla",
     "commitConfirm": "Bu mesaj işlendi olarak işaretlecek ve imleç ileriye taşınacak. Devam edilsin mi?",
     "seekTitle": "İmleçi Taşı",
-    "seekConfirm": "İmleç bu mesaja taşınacak. Önceki mesajlar atlanacak. Devam edilsin mi?"
+    "seekConfirm": "İmleç bu mesaja taşınacak. Önceki mesajlar atlanacak. Devam edilsin mi?",
+    "statusLabels": {
+      "delivered": "Teslim Edildi",
+      "failed": "Başarısız",
+      "pending": "Bekliyor"
+    }
   },
   "streaming": {
     "title": "Yayın",
@@ -5955,7 +6056,12 @@
     "payload": "Veri",
     "deliveredAt": "Teslim edilme",
     "deleteEndpoint": "Endpoint Sil",
-    "deleteConfirm": "Bu endpoint'i silmek istediğinizden emin misiniz? Artık sistem olayı bildirimleri almayacaksınız."
+    "deleteConfirm": "Bu endpoint'i silmek istediğinizden emin misiniz? Artık sistem olayı bildirimleri almayacaksınız.",
+    "statusLabels": {
+      "success": "Başarılı",
+      "failed": "Başarısız",
+      "pending": "Bekliyor"
+    }
   },
   "integrations": {
     "title": "Entegrasyonlar",
@@ -6024,7 +6130,16 @@
     "avgDuration": "Ort. Süre",
     "last24h": "Son 24 saat",
     "deleteIntegration": "Entegrasyonu Sil",
-    "deleteConfirm": "Bu entegrasyonu silmek istediğinizden emin misiniz? Olaylar artık endpoint'e yönlendirilmeyecek."
+    "deleteConfirm": "Bu entegrasyonu silmek istediğinizden emin misiniz? Olaylar artık endpoint'e yönlendirilmeyecek.",
+    "healthStatuses": {
+      "healthy": "Sağlıklı",
+      "warning": "Uyarı",
+      "critical": "Kritik",
+      "degraded": "Bozulmuş",
+      "new": "Yeni",
+      "inactive": "Pasif",
+      "error": "Hata"
+    }
   },
   "docsDashboard": {
     "title": "Panel Rehberi",
@@ -7264,14 +7379,44 @@
       "avgAccuracy": "Ort. Accuracy",
       "avgF1": "Ort. F1 Score",
       "worstModels": "En Kötü Modeller",
-      "error": "Model verileri yüklenemedi. Cortex ML servisi başlatılıyor olabilir."
+      "error": "Model verileri yüklenemedi. Cortex ML servisi başlatılıyor olabilir.",
+      "modelTypes": {
+        "adaptive_threshold": "Akıllı Eşik",
+        "anomaly_detector": "Anomali Tespiti",
+        "retry_bandit": "Akıllı Yeniden Deneme",
+        "latency_predictor": "Gecikme Tahmini",
+        "pattern_classifier": "Kalıp Sınıflandırıcı",
+        "drift_detector": "Sapma İzleyici"
+      },
+      "healthStatuses": {
+        "healthy": "Sağlıklı",
+        "warning": "Dikkat Gerekli",
+        "critical": "Kritik Sorun",
+        "degraded": "Bozulmuş",
+        "stale": "Güncel Değil"
+      },
+      "issues": {
+        "model_stale": "Model güncel değil ({value})",
+        "few_samples": "Yetersiz veri ({value} örnek)",
+        "low_accuracy": "Düşük doğruluk ({value})",
+        "high_false_positive": "Çok fazla yanlış alarm ({value})",
+        "data_drift": "Veri kalıbı değişti",
+        "concept_drift": "Davranış kalıbı değişti",
+        "prediction_lag": "Tahminler gecikiyor"
+      }
     },
     "abTest": {
       "title": "A/B Testleri",
       "empty": "Henüz A/B testi yok. Model karşılaştırmaları için API'den test başlatın.",
       "endpoint": "Endpoint:",
       "traffic": "% trafik",
-      "winner": "Kazanan: {v}"
+      "winner": "Kazanan: {v}",
+      "statusLabels": {
+        "running": "Devam Ediyor",
+        "completed": "Tamamlandı",
+        "cancelled": "İptal Edildi",
+        "pending": "Bekliyor"
+      }
     },
     "autoML": {
       "title": "AutoML Optimizasyon Denemeleri",
@@ -7311,6 +7456,13 @@
         "systemNormal": "Sorun yok, sistem izliyor",
         "needsAttention": "Dikkat gereken durumlar var"
       }
+    }
+  },
+  "operationalWebhooks": {
+    "statusLabels": {
+      "success": "Başarılı",
+      "failed": "Başarısız",
+      "pending": "Bekliyor"
     }
   }
 }

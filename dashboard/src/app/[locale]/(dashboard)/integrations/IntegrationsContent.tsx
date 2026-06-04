@@ -303,7 +303,7 @@ export default function IntegrationsContent() {
                     <span className="text-xs text-gray-500 dark:text-slate-400">{ig.connector_display_name} → endpoint</span>
                   </div>
                 </div>
-                <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${HEALTH_COLORS[ig.health_status] || HEALTH_COLORS.new}`}>{ig.health_status}</span>
+                <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${HEALTH_COLORS[ig.health_status] || HEALTH_COLORS.new}`}>{t(`healthStatuses.${ig.health_status}`) !== `healthStatuses.${ig.health_status}` ? t(`healthStatuses.${ig.health_status}`) : ig.health_status}</span>
               </div>
 
               {ig.description && <p className="text-xs text-gray-500 dark:text-slate-400 mb-2 line-clamp-2">{ig.description}</p>}
@@ -362,7 +362,7 @@ export default function IntegrationsContent() {
             {tab === 'overview' && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('status')}</span><div className={`mt-1 inline-block px-2 py-0.5 text-xs rounded-full ${HEALTH_COLORS[selected.health_status]}`}>{selected.health_status}</div></div>
+                  <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('status')}</span><div className={`mt-1 inline-block px-2 py-0.5 text-xs rounded-full ${HEALTH_COLORS[selected.health_status]}`}>{t(`healthStatuses.${selected.health_status}`) !== `healthStatuses.${selected.health_status}` ? t(`healthStatuses.${selected.health_status}`) : selected.health_status}</div></div>
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('connector')}</span><p className="text-sm font-medium text-gray-900 dark:text-white">{selected.connector_display_name}</p></div>
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('totalDeliveries')}</span><p className="text-sm font-medium text-gray-900 dark:text-white">{selected.total_deliveries}</p></div>
                   <div><span className="text-xs text-gray-500 dark:text-slate-400">{t('failureRate')}</span><p className="text-sm font-medium text-gray-900 dark:text-white">{selected.total_deliveries > 0 ? `${((selected.total_failures / selected.total_deliveries) * 100).toFixed(1)}%` : '—'}</p></div>

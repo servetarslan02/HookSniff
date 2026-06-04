@@ -289,7 +289,7 @@ export default function OperationalWebhooksList() {
                     onClick={() => setExpandedDelivery(expandedDelivery === d.id ? null : d.id)}>
                     <div className="flex items-center gap-3">
                       <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${d.status === 'success' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : d.status === 'failed' ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400'}`}>
-                        {d.status}
+                        {t(`statusLabels.${d.status}`) !== `statusLabels.${d.status}` ? t(`statusLabels.${d.status}`) : d.status}
                       </span>
                       <span className="text-sm font-mono text-gray-700 dark:text-slate-300">{d.event_type}</span>
                     </div>
