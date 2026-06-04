@@ -48,4 +48,5 @@ export interface StatusData {
   components: ComponentStatus[];
   checked_at: string;
   response_times?: Record<string, number[]>;
+  history?: HistoryDay[];
 }

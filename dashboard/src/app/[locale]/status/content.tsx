@@ -57,6 +57,10 @@ export function StatusPageContent() {
         setData(json);
         setDataSource('api');
         loaded = true;
+        // API includes cleaned history — use it directly
+        if (json.history && json.history.length > 0) {
+          setHistory(json.history);
+        }
       }
     } catch { /* continue */ }
 
@@ -92,14 +96,15 @@ export function StatusPageContent() {
       }
     }
 
-    // Load supplementary data (non-critical)
+    // Load supplementary data (non-critical) — skip history if already from API
     const loadSupplemental = async () => {
       try {
-        const [histRes, incRes, mntRes] = await Promise.all([
-          fetch('/status-history.json', { cache: 'force-cache' }).catch(() => null),
+        const promises: [Promise<Response | null> | null, Promise<Response | null>, Promise<Response | null>] = [
+          history.length === 0 ? fetch('/status-history.json', { cache: 'force-cache' }).catch(() => null) : null,
           fetch('/incidents.json', { cache: 'force-cache' }).catch(() => null),
           fetch('/maintenance.json', { cache: 'force-cache' }).catch(() => null),
-        ]);
+        ];
+        const [histRes, incRes, mntRes] = await Promise.all(promises);
         if (histRes?.ok) setHistory(await histRes.json());
         if (incRes?.ok) setIncidents(await incRes.json());
         if (mntRes?.ok) setMaintenance(await mntRes.json());
