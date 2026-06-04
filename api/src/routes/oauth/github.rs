@@ -35,22 +35,15 @@ pub async fn github_login() -> Result<impl axum::response::IntoResponse, AppErro
         state,
     );
 
-    let state_cookie = format!(
-        "{}={}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={}",
-        OAUTH_STATE_COOKIE, state, OAUTH_STATE_MAX_AGE
-    );
-    let mut headers = HeaderMap::new();
-    headers.insert(
-        "set-cookie",
-        axum::http::HeaderValue::from_str(&state_cookie)
-            .unwrap_or_else(|_| axum::http::HeaderValue::from_static("")),
-    );
-    headers.insert(
-        "location",
-        axum::http::HeaderValue::from_str(&url)
-            .unwrap_or_else(|_| axum::http::HeaderValue::from_static("/")),
-    );
-    Ok((headers, Redirect::temporary(&url)))
+    // Build response manually to guarantee Set-Cookie is included
+    let mut response = axum::response::Html(format!(
+        "<html><head><meta http-equiv=\"refresh\" content=\"0;url={url}\"></head><body>Redirecting...</body></html>"
+    , url = url))
+    .into_response();
+    response.headers_mut().insert("set-cookie", axum::http::HeaderValue::from_str(&state_cookie).unwrap_or_else(|_| axum::http::HeaderValue::from_static("")));
+    response.headers_mut().insert("location", axum::http::HeaderValue::from_str(&url).unwrap_or_else(|_| axum::http::HeaderValue::from_static("/")));
+    *response.status_mut() = axum::http::StatusCode::TEMPORARY_REDIRECT;
+    Ok(response)
 }
 
 /// GET /oauth/github/callback — Handle GitHub OAuth callback
