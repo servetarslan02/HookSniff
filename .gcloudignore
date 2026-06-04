@@ -1,27 +1,25 @@
-node_modules/
-.next/
-target/
+# Ignore dashboard (not needed for API build)
+dashboard/
+# Ignore docs and non-build files
+docs/
+docs-sdk/
+.ai-context/
 .git/
+node_modules/
+target/
+.next/
+# Ignore non-essential files
 *.md
 *.ps1
 *.sh
 *.py
 *.patch
-*.toml
-dashboard/
-docs/
-docs-sdk/
-reddit-launch/
-research/
 terraform/
-vendor/
-.zig-cache/
-.ai-context/
-tests/
-src/
-mcp/
 monitoring/
 grafana-*.json
-*.sql
-!migrations/
-!run-migrations.js
+reddit-launch/
+research/
+vendor/.zig-cache/
+tests/
+mcp/
+src/
