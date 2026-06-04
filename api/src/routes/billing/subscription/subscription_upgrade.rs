@@ -32,6 +32,72 @@ fn calculate_proration(
 }
 
 // ──────────────────────────────────────────────────────────────
+// Auto-sync coupon to Polar (used when polar_discount_id is NULL)
+// ──────────────────────────────────────────────────────────────
+
+/// Auto-sync a polar-type coupon to Polar.sh when it hasn't been synced yet.
+/// Returns the Polar discount ID on success.
+async fn auto_sync_coupon_to_polar(
+    pool: &PgPool,
+    coupon: &crate::models::coupon::CouponCode,
+) -> Result<String, AppError> {
+    let polar_cfg = crate::billing::polar::PolarConfig::from_env()
+        .ok_or_else(|| AppError::Internal(anyhow::anyhow!("Polar not configured")))?;
+    let client = crate::http_client::get_client();
+
+    let basis_points = (coupon.discount_value as u64) * 100; // e.g., 100% = 10000
+
+    let mut polar_body = serde_json::json!({
+        "name": coupon.code,
+        "code": coupon.code,
+        "type": "percentage",
+        "basis_points": if coupon.discount_type == "free_month" { 10000 } else { basis_points },
+        "duration": "once"
+    });
+
+    if let Some(ref expires_at) = coupon.expires_at {
+        polar_body["ends_at"] = serde_json::json!(expires_at.to_rfc3339());
+    }
+
+    let resp = client
+        .post(format!("{}/v1/discounts", polar_cfg.base_url))
+        .header("Authorization", format!("Bearer {}", polar_cfg.access_token))
+        .header("Content-Type", "application/json")
+        .json(&polar_body)
+        .send()
+        .await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Polar API error: {}", e)))?;
+
+    if !resp.status().is_success() {
+        let status = resp.status();
+        let body = resp.text().await.unwrap_or_default();
+        tracing::error!("Polar discount creation failed during auto-sync: {} {}", status, body);
+        return Err(AppError::Internal(anyhow::anyhow!(
+            "Failed to create discount in Polar.sh ({}): {}", status, body
+        )));
+    }
+
+    #[derive(serde::Deserialize)]
+    struct PolarDiscount {
+        id: String,
+    }
+
+    let discount: PolarDiscount = resp.json().await
+        .map_err(|e| AppError::Internal(anyhow::anyhow!("Failed to parse Polar response: {}", e)))?;
+
+    // Save the polar_discount_id to DB
+    let _ = sqlx::query(
+        "UPDATE coupon_codes SET polar_discount_id = $2, updated_at = NOW() WHERE id = $1"
+    )
+    .bind(coupon.id)
+    .bind(&discount.id)
+    .execute(pool)
+    .await;
+
+    Ok(discount.id)
+}
+
+// ──────────────────────────────────────────────────────────────
 // POST /v1/billing/upgrade — Upgrade plan (with proration)
 // ──────────────────────────────────────────────────────────────
 
@@ -98,13 +164,22 @@ pub async fn upgrade_plan(
     // ── Internal coupon check ──
     if let Some(ref code) = req.discount_code {
         let code_upper = code.to_uppercase();
-        if let Ok(Some(coupon)) = sqlx::query_as::<_, crate::models::coupon::CouponCode>(
+        let coupon_result = sqlx::query_as::<_, crate::models::coupon::CouponCode>(
             "SELECT id, code, type, discount_type, discount_value, target_plan, polar_discount_id, max_redemptions, redemption_count, expires_at, is_active, created_by, created_at, updated_at FROM coupon_codes WHERE UPPER(code) = $1 AND type = 'internal' AND is_active = true"
         )
         .bind(&code_upper)
         .fetch_optional(&pool)
-        .await
-        {
+        .await;
+
+        match coupon_result {
+            Err(e) => {
+                tracing::error!("Coupon lookup failed for code '{}': {:?}", code_upper, e);
+                return Err(AppError::Internal(anyhow::anyhow!("Failed to validate coupon code: {}", e)));
+            }
+            Ok(None) => {
+                tracing::info!("No internal coupon found for code '{}', checking polar coupons", code_upper);
+            }
+            Ok(Some(coupon)) => {
             let now = Utc::now();
 
             if let Some(expires_at) = coupon.expires_at {
@@ -202,15 +277,50 @@ pub async fn upgrade_plan(
                 ).await;
             }
 
-            return Ok(Json(super::subscription_status::UpgradeResponse {
-                checkout_url: None,
-                provider: "internal".to_string(),
-                message: format!("Plan upgraded to {} using coupon {}", new_plan.as_str(), coupon.code),
-                prorated_amount_cents: None,
-                days_remaining: None,
-                requires_contact: None,
-                contact_url: None,
-            }));
+                return Ok(Json(super::subscription_status::UpgradeResponse {
+                    checkout_url: None,
+                    provider: "internal".to_string(),
+                    message: format!("Plan upgraded to {} using coupon {}", new_plan.as_str(), coupon.code),
+                    prorated_amount_cents: None,
+                    days_remaining: None,
+                    requires_contact: None,
+                    contact_url: None,
+                }));
+            }
+        }
+
+        // If we reach here, the code was provided but no internal coupon was found.
+        // Check if it's a polar coupon that exists but hasn't been synced yet.
+        let polar_coupon = sqlx::query_as::<_, crate::models::coupon::CouponCode>(
+            "SELECT id, code, type, discount_type, discount_value, target_plan, polar_discount_id, max_redemptions, redemption_count, expires_at, is_active, created_by, created_at, updated_at FROM coupon_codes WHERE UPPER(code) = $1 AND type = 'polar' AND is_active = true"
+        )
+        .bind(&code_upper)
+        .fetch_optional(&pool)
+        .await?;
+
+        if let Some(ref pc) = polar_coupon {
+            // Found a polar coupon — make sure it's synced to Polar
+            if pc.polar_discount_id.is_none() {
+                tracing::warn!("Polar coupon '{}' exists but not synced — attempting auto-sync", code_upper);
+                // Try auto-sync
+                let sync_result = auto_sync_coupon_to_polar(&pool, pc).await;
+                match sync_result {
+                    Ok(discount_id) => {
+                        tracing::info!("Auto-synced coupon '{}' to Polar, discount_id={}", code_upper, discount_id);
+                    }
+                    Err(e) => {
+                        tracing::error!("Auto-sync failed for coupon '{}': {:?}", code_upper, e);
+                        return Err(AppError::BadRequest(
+                            "This coupon code has not been synced to the payment provider yet. Please contact support.".into()
+                        ));
+                    }
+                }
+            }
+        } else if req.discount_code.is_some() {
+            // Code was provided but no coupon found at all (neither internal nor polar)
+            return Err(AppError::BadRequest(
+                format!("Coupon code '{}' is not valid or has expired.", code_upper)
+            ));
         }
     }
 
@@ -273,8 +383,29 @@ pub async fn upgrade_plan(
             .await?;
     }
 
+    // ── Look up polar_discount_id for coupon code (if applicable) ──
+    let polar_discount_id = if let Some(ref code) = req.discount_code {
+        let code_upper = code.to_uppercase();
+        let found_id = sqlx::query_scalar::<_, String>(
+            "SELECT polar_discount_id FROM coupon_codes WHERE UPPER(code) = $1 AND is_active = true AND polar_discount_id IS NOT NULL"
+        )
+        .bind(&code_upper)
+        .fetch_optional(&pool)
+        .await
+        .ok()
+        .flatten();
+
+        if found_id.is_none() && req.discount_code.is_some() {
+            tracing::warn!("Coupon code '{}' provided but no polar_discount_id found in DB", code_upper);
+        }
+
+        found_id
+    } else {
+        None
+    };
+
     let result = billing_svc
-        .checkout(&customer, &new_plan, Some(&provider_name), req.billing_period.as_deref() == Some("annual"), req.discount_code.as_deref())
+        .checkout(&customer, &new_plan, Some(&provider_name), req.billing_period.as_deref() == Some("annual"), req.discount_code.as_deref(), polar_discount_id)
         .await?;
 
     if let Some(ref url) = result.checkout_url {

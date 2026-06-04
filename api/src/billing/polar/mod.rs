@@ -115,6 +115,7 @@ impl PolarConfig {
 /// Request to create a checkout session.
 ///
 /// Polar.sh API v1 requires `products` (array) instead of `product_id`.
+/// See: https://polar.sh/docs/api-reference/checkouts/create-session
 #[derive(Debug, Serialize)]
 pub struct CreateCheckoutRequest {
     /// Product IDs to include in the checkout (Polar v1 API format).
@@ -131,12 +132,15 @@ pub struct CreateCheckoutRequest {
     /// Checkout locale.
     #[serde(skip_serializing_if = "Option::is_none")]
     locale: Option<String>,
-    /// Discount code to apply.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    discount_code: Option<String>,
     /// Discount ID to auto-apply (no code needed).
+    /// NOTE: Polar checkout API only supports `discount_id` (UUID),
+    /// NOT `discount_code`. The code must be resolved to an ID first.
     #[serde(skip_serializing_if = "Option::is_none")]
     discount_id: Option<String>,
+    /// Whether to allow customers to enter discount codes manually.
+    /// Default is true. Set to false when a discount is auto-applied.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    allow_discount_codes: Option<bool>,
     /// Metadata for the checkout.
     #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<std::collections::HashMap<String, String>>,
@@ -241,7 +245,7 @@ impl PolarProvider {
     async fn lookup_discount_id(&self, code: &str) -> Result<Option<String>, AppError> {
         let resp = self
             .client
-            .get(format!("{}/v1/discounts/", self.config.base_url))
+            .get(format!("{}/v1/discounts", self.config.base_url))
             .header(
                 "Authorization",
                 format!("Bearer {}", self.config.access_token),
