@@ -87,10 +87,10 @@ async function CloudEventsPageContent(params: Promise<{ locale: string }>) {
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('benefits')}</h2>
         <ul className="space-y-2">
-          <li className="text-gray-600 dark:text-slate-400"> {t('benefit1')}</li>
-          <li className="text-gray-600 dark:text-slate-400"> {t('benefit2')}</li>
-          <li className="text-gray-600 dark:text-slate-400"> {t('benefit3')}</li>
-          <li className="text-gray-600 dark:text-slate-400"> {t('benefit4')}</li>
+          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit1')}</li>
+          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit2')}</li>
+          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit3')}</li>
+          <li className="text-gray-600 dark:text-slate-400">✅ {t('benefit4')}</li>
         </ul>
       </section>
 

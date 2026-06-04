@@ -72,7 +72,7 @@ export function ABTestTab() {
                 </div>
               </div>
               {abtest.winner && (
- <div className="mt-2 text-sm text-emerald-600 font-medium"> {t('winner', {v: abtest.winner})}</div>
+                <div className="mt-2 text-sm text-emerald-600 font-medium">🏆 {t('winner', {v: abtest.winner})}</div>
               )}
             </div>
           ))}

@@ -101,7 +101,7 @@ export default function BuildVsBuyContent() {
                 </div>
                 <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
- <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-2"> HookSniff</p>
+                    <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-2">🪝 HookSniff</p>
                     <p className="text-sm text-gray-700 dark:text-slate-300">{dim.hooksniff}</p>
                   </div>
                   <div className="p-4 rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
@@ -140,7 +140,7 @@ export default function BuildVsBuyContent() {
               </div>
             </div>
             <div>
- <h3 className="font-bold text-gray-900 dark:text-white mb-4"> HookSniff</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-4">🪝 HookSniff</h3>
               <ul className="space-y-3">
                 {hooksniffCostRows.map((row) => (
                   <li key={row.item} className="flex justify-between items-start text-sm">

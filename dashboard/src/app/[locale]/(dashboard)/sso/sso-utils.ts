@@ -22,7 +22,7 @@ export const IDP_TEMPLATES: IdpTemplate[] = [
   {
     id: 'azure',
     name: 'Microsoft Azure AD',
- icon: '',
+    icon: '🪟',
     provider: 'oidc',
     issuerPrefix: 'https://login.microsoftonline.com/',
     issuerSuffix: '/v2.0',
@@ -34,7 +34,7 @@ export const IDP_TEMPLATES: IdpTemplate[] = [
   {
     id: 'google',
     name: 'Google Workspace',
-    icon: 'google',
+    icon: '🔴',
     provider: 'oidc',
     issuerUrl: 'https://accounts.google.com',
     clientIdPlaceholder: 'Client ID from Google Cloud Console',
@@ -44,7 +44,7 @@ export const IDP_TEMPLATES: IdpTemplate[] = [
   {
     id: 'okta',
     name: 'Okta',
-    icon: 'okta',
+    icon: '🔵',
     provider: 'oidc',
     issuerPrefix: 'https://',
     issuerSuffix: '.okta.com',
@@ -56,7 +56,7 @@ export const IDP_TEMPLATES: IdpTemplate[] = [
   {
     id: 'keycloak',
     name: 'Keycloak',
-    icon: 'keycloak',
+    icon: '🦁',
     provider: 'oidc',
     issuerPrefix: 'https://',
     issuerSuffix: '/realms/{realm}',
@@ -68,7 +68,7 @@ export const IDP_TEMPLATES: IdpTemplate[] = [
   {
     id: 'auth0',
     name: 'Auth0',
-    icon: 'key',
+    icon: '🔑',
     provider: 'oidc',
     issuerPrefix: 'https://',
     issuerSuffix: '.auth0.com',
@@ -80,7 +80,7 @@ export const IDP_TEMPLATES: IdpTemplate[] = [
   {
     id: 'onelogin',
     name: 'OneLogin',
-    icon: 'onelogin',
+    icon: '🟢',
     provider: 'saml',
     metadataPlaceholder: 'https://{your-org}.onelogin.com/saml/metadata/{app-id}',
     ssoUrlPlaceholder: 'https://{your-org}.onelogin.com/trust/saml2/http-post/sso/{app-id}',
@@ -91,7 +91,7 @@ export const IDP_TEMPLATES: IdpTemplate[] = [
   {
     id: 'adfs',
     name: 'AD FS',
- icon: '',
+    icon: '🏛️',
     provider: 'saml',
     metadataPlaceholder: 'https://{your-adfs}/FederationMetadata/2007-06/FederationMetadata.xml',
     ssoUrlPlaceholder: 'https://{your-adfs}/adfs/ls/',

@@ -158,7 +158,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
 
               <Link href="/" className="flex items-center gap-2.5 group">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#4c6ef5] to-[#7c3aed] flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-[#4c6ef5]/20 group-hover:shadow-[#4c6ef5]/40 transition-shadow">
- 
+                  🪝
                 </div>
                 <span className="text-[15px] font-semibold text-gray-900 dark:text-white tracking-tight">
                   HookSniff
